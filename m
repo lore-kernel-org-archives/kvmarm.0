@@ -1,196 +1,112 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 18/55] KVM: arm/arm64: vgic-new: Add GICv2 world switch
- backend
-Date: Tue, 10 May 2016 15:45:20 +0100
-Message-ID: <5731F400.4080004@arm.com>
-References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
- <1462531568-9799-19-git-send-email-andre.przywara@arm.com>
- <20160510133043.GF27623@cbox> <5731E52A.9000402@arm.com>
- <20160510141119.GB20499@cbox> <5731F196.4040906@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v3a] KVM: arm/arm64: pmu: abstract access to number of
+ SPIs
+Date: Tue, 10 May 2016 16:58:32 +0200
+Message-ID: <20160510145832.cv3ozila3kisije6@hawk.localdomain>
+References: <5731AF57.2040707@linaro.org>
+ <1462890906-6134-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <5731F196.4040906@arm.com>
+Content-Disposition: inline
+In-Reply-To: <1462890906-6134-1-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/05/16 15:35, Marc Zyngier wrote:
-> On 10/05/16 15:11, Christoffer Dall wrote:
->> On Tue, May 10, 2016 at 02:42:02PM +0100, Marc Zyngier wrote:
->>> On 10/05/16 14:30, Christoffer Dall wrote:
->>>> On Fri, May 06, 2016 at 11:45:31AM +0100, Andre Przywara wrote:
->>>>> From: Marc Zyngier <marc.zyngier@arm.com>
->>>>>
->>>>> Processing maintenance interrupts and accessing the list registers
->>>>> are dependent on the host's GIC version.
->>>>> Introduce vgic-v2.c to contain GICv2 specific functions.
->>>>> Implement the GICv2 specific code for syncing the emulation state
->>>>> into the VGIC registers.
->>>>>
->>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->>>>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
->>>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>>>> ---
->>>>> Changelog RFC..v1:
->>>>> - remove explicit LR_STATE clearing on maintenance interrupt handling
->>>>> - improve documentation for vgic_v2_populate_lr()
->>>>> - remove WARN_ON on non-edge IRQs in maintenance interrupts
->>>>> - simplify multi-CPU source SGI handling
->>>>>
->>>>> Changelog v1 .. v2:
->>>>> - inject the IRQ priority into the list register
->>>>>
->>>>> Changelog v2 .. v3:
->>>>> - cleanup diff containing rebase artifacts
->>>>>
->>>>>  include/linux/irqchip/arm-gic.h |   1 +
->>>>>  virt/kvm/arm/vgic/vgic-v2.c     | 178 ++++++++++++++++++++++++++++++++++++++++
->>>>>  virt/kvm/arm/vgic/vgic.c        |   6 ++
->>>>>  virt/kvm/arm/vgic/vgic.h        |   6 ++
->>>>>  4 files changed, 191 insertions(+)
->>>>>  create mode 100644 virt/kvm/arm/vgic/vgic-v2.c
->>>>>
->>>>> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
->>>>> index 9c94026..be0d26f 100644
->>>>> --- a/include/linux/irqchip/arm-gic.h
->>>>> +++ b/include/linux/irqchip/arm-gic.h
->>>>> @@ -76,6 +76,7 @@
->>>>>  #define GICH_LR_VIRTUALID		(0x3ff << 0)
->>>>>  #define GICH_LR_PHYSID_CPUID_SHIFT	(10)
->>>>>  #define GICH_LR_PHYSID_CPUID		(0x3ff << GICH_LR_PHYSID_CPUID_SHIFT)
->>>>> +#define GICH_LR_PRIORITY_SHIFT		23
->>>>>  #define GICH_LR_STATE			(3 << 28)
->>>>>  #define GICH_LR_PENDING_BIT		(1 << 28)
->>>>>  #define GICH_LR_ACTIVE_BIT		(1 << 29)
->>>>> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
->>>>> new file mode 100644
->>>>> index 0000000..4cee616
->>>>> --- /dev/null
->>>>> +++ b/virt/kvm/arm/vgic/vgic-v2.c
->>>>> @@ -0,0 +1,178 @@
->>>>> +/*
->>>>> + * Copyright (C) 2015, 2016 ARM Ltd.
->>>>> + *
->>>>> + * This program is free software; you can redistribute it and/or modify
->>>>> + * it under the terms of the GNU General Public License version 2 as
->>>>> + * published by the Free Software Foundation.
->>>>> + *
->>>>> + * This program is distributed in the hope that it will be useful,
->>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>>>> + * GNU General Public License for more details.
->>>>> + *
->>>>> + * You should have received a copy of the GNU General Public License
->>>>> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->>>>> + */
->>>>> +
->>>>> +#include <linux/irqchip/arm-gic.h>
->>>>> +#include <linux/kvm.h>
->>>>> +#include <linux/kvm_host.h>
->>>>> +
->>>>> +#include "vgic.h"
->>>>> +
->>>>> +/*
->>>>> + * Call this function to convert a u64 value to an unsigned long * bitmask
->>>>> + * in a way that works on both 32-bit and 64-bit LE and BE platforms.
->>>>> + *
->>>>> + * Warning: Calling this function may modify *val.
->>>>> + */
->>>>> +static unsigned long *u64_to_bitmask(u64 *val)
->>>>> +{
->>>>> +#if defined(CONFIG_CPU_BIG_ENDIAN) && BITS_PER_LONG == 32
->>>>> +	*val = (*val >> 32) | (*val << 32);
->>>>> +#endif
->>>>> +	return (unsigned long *)val;
->>>>> +}
->>>>> +
->>>>> +void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu)
->>>>> +{
->>>>> +	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
->>>>> +
->>>>> +	if (cpuif->vgic_misr & GICH_MISR_EOI) {
->>>>> +		u64 eisr = cpuif->vgic_eisr;
->>>>> +		unsigned long *eisr_bmap = u64_to_bitmask(&eisr);
->>>>> +		int lr;
->>>>> +
->>>>> +		for_each_set_bit(lr, eisr_bmap, kvm_vgic_global_state.nr_lr) {
->>>>> +			u32 intid = cpuif->vgic_lr[lr] & GICH_LR_VIRTUALID;
->>>>> +
->>>>> +			WARN_ON(cpuif->vgic_lr[lr] & GICH_LR_STATE);
->>>>> +
->>>>> +			kvm_notify_acked_irq(vcpu->kvm, 0,
->>>>> +					     intid - VGIC_NR_PRIVATE_IRQS);
->>>>> +
->>>>
->>>> why do we need to do this?  I cannot find any consumers of this info
->>>> after we've left the hyp code.
->>>
->>> I believe that's for vhost and irqfd. Or am I misreading your question?
->>>
->>
->> I meant the setting of the bits in vgic_elrsr (sorry, badly placed
->> comment)...
->>
->>>> Also, I think I offered a comment about why we would potentially need
->>>> this in the first place.  This is the famous race where hardware doesn't
->>>> guarantee consistency between the MISR and ELRSR right?
->>>
->>> That's the one (except it is between EISR and ELRSR). I don't have your
->>> initial comment at hand, but would something like the following do?
->>>
->>> 			/*
->>> 			 * The maintenance interrupt may not have had a
->>> 			 * chance to update ELRSR, so let's mark the LRs
->>> 			 * presents in EISR as empty.
->>> 			 */
->>>>
->>>>> +			cpuif->vgic_elrsr |= 1ULL << lr;
->>
->> so, why are we doing this?
+On Tue, May 10, 2016 at 03:35:06PM +0100, Andre Przywara wrote:
+> Currently the PMU uses a member of the struct vgic_dist directly,
+> which not only breaks abstraction, but will fail with the new VGIC.
+> Abstract this access in the VGIC header file.
 > 
-> Ah! I finally see what you mean: we don't reuse LRs at all with the new code
-> base, so knowing which LR is empty is irrelevant. In which case, something
-> like that should be done:
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+> Hi Eric, Marc,
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index e88b5aa..5a8f4d4 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -52,8 +52,6 @@ void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu)
->  
->  			kvm_notify_acked_irq(vcpu->kvm, 0,
->  					     intid - VGIC_NR_PRIVATE_IRQS);
-> -
-> -			cpuif->vgic_elrsr |= 1ULL << lr;
->  		}
->  	}
->  
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 53f7847..4102f0f 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -43,8 +43,6 @@ void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
->  
->  			kvm_notify_acked_irq(vcpu->kvm, 0,
->  					     intid - VGIC_NR_PRIVATE_IRQS);
-> -
-> -			cpuif->vgic_elrsr |= 1ULL << lr;
->  		}
->  
->  		/*
+> as this if-statement was quite confusing (it wasn't even the negation
+> that was wrong), I rewrote it a bit to be more readable.
+> This one works now with PPIs (after fixing kvmtool).
 > 
-> I'll give it a spin, just to be safe.
+> Does that make sense?
+> 
+> Cheers,
+> Andre.
+> 
+>  include/kvm/arm_vgic.h |  2 ++
+>  virt/kvm/arm/pmu.c     | 19 +++++++++++--------
+>  2 files changed, 13 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 6a98e05..d406f8e 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -351,6 +351,8 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+>  #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+>  #define vgic_ready(k)		((k)->arch.vgic.ready)
+> +#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
+> +				 ((i) < (k)->arch.vgic.nr_irqs))
+>  
+>  int vgic_v2_probe(struct device_node *vgic_node,
+>  		  const struct vgic_ops **ops,
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 575c7aa..6ab9d6b 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -436,6 +436,11 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * For one VM the interrupt type must be same for each vcpu.
+> + * As a PPI, the interrupt number is the same for all vcpus,
+> + * while as an SPI it must be a separate number per vcpu.
+> + */
+>  static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
 
-Seems OK on GICv2, and this of course leads to some more possible
-cleanups or optimizations (I think we can get to a state where we
-completely disregards ELRSR). I'll have a look.
+While at it, I'd change this function name to have 'pmu' in it. It's
+just a static function, but without pmu in it it looks a bit confusing
+now to check the irq is [a valid] spi or ppi number, and then to call
+the generically named 'irq_is_valid' on it as well.
 
 Thanks,
+drew
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+>  {
+>  	int i;
+> @@ -457,6 +462,7 @@ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+>  	return true;
+>  }
+>  
+> +#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
+>  
+>  int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  {
+> @@ -471,14 +477,11 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  		if (get_user(irq, uaddr))
+>  			return -EFAULT;
+>  
+> -		/*
+> -		 * The PMU overflow interrupt could be a PPI or SPI, but for one
+> -		 * VM the interrupt type must be same for each vcpu. As a PPI,
+> -		 * the interrupt number is the same for all vcpus, while as an
+> -		 * SPI it must be a separate number per vcpu.
+> -		 */
+> -		if (irq < VGIC_NR_SGIS || irq >= vcpu->kvm->arch.vgic.nr_irqs ||
+> -		    !irq_is_valid(vcpu->kvm, irq, irq < VGIC_NR_PRIVATE_IRQS))
+> +		/* The PMU overflow interrupt can be a PPI or a valid SPI. */
+> +		if (!(irq_is_ppi(irq) || vgic_valid_spi(vcpu->kvm, irq)))
+> +			return -EINVAL;
+> +
+> +		if (!irq_is_valid(vcpu->kvm, irq, irq < VGIC_NR_PRIVATE_IRQS))
+>  			return -EINVAL;
+>  
+>  		if (kvm_arm_pmu_irq_initialized(vcpu))
+> -- 
+> 2.7.3
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
