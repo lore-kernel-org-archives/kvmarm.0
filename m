@@ -1,183 +1,211 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 11/29] kvm-arm: Use explicit stage2 helper routines
-Date: Wed, 11 May 2016 15:30:04 +0200
-Message-ID: <1462973422-10021-12-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 25/29] irqchip/gic-v3: Parse and export virtual GIC information
+Date: Wed, 11 May 2016 15:30:18 +0200
+Message-ID: <1462973422-10021-26-git-send-email-christoffer.dall@linaro.org>
 References: <1462973422-10021-1-git-send-email-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A932F49B47
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:29:15 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HK6sUUm5Qcri for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 May 2016 09:29:09 -0400 (EDT)
-Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77F9249B34
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:29:03 -0400 (EDT)
-Received: by mail-wm0-f48.google.com with SMTP id a17so83059822wme.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 06:32:01 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1462973422-10021-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Julien Grall <julien.grall@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
+From: Julien Grall <julien.grall@arm.com>
 
-We have stage2 page table helpers for both arm and arm64. Switch to
-the stage2 helpers for routines that only deal with stage2 page table.
+Fill up the recently introduced gic_kvm_info with the hardware
+information used for virtualization.
 
+Signed-off-by: Julien Grall <julien.grall@arm.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Jason Cooper <jason@lakedaemon.net>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/kvm/mmu.c | 48 ++++++++++++++++++++++++------------------------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+ drivers/irqchip/irq-gic-v3.c           | 114 ++++++++++++++++++++++++++++++++-
+ include/linux/irqchip/arm-gic-common.h |   1 +
+ 2 files changed, 114 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index d0c0ee9..f93f717 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -319,9 +319,9 @@ static void stage2_flush_pmds(struct kvm *kvm, pud_t *pud,
- 	pmd_t *pmd;
- 	phys_addr_t next;
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index 6a9f5ff..05a8560 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -30,6 +30,7 @@
+ #include <linux/slab.h>
  
--	pmd = pmd_offset(pud, addr);
-+	pmd = stage2_pmd_offset(pud, addr);
- 	do {
--		next = kvm_pmd_addr_end(addr, end);
-+		next = stage2_pmd_addr_end(addr, end);
- 		if (!pmd_none(*pmd)) {
- 			if (pmd_thp_or_huge(*pmd))
- 				kvm_flush_dcache_pmd(*pmd);
-@@ -337,11 +337,11 @@ static void stage2_flush_puds(struct kvm *kvm, pgd_t *pgd,
- 	pud_t *pud;
- 	phys_addr_t next;
+ #include <linux/irqchip.h>
++#include <linux/irqchip/arm-gic-common.h>
+ #include <linux/irqchip/arm-gic-v3.h>
  
--	pud = pud_offset(pgd, addr);
-+	pud = stage2_pud_offset(pgd, addr);
- 	do {
--		next = kvm_pud_addr_end(addr, end);
--		if (!pud_none(*pud)) {
--			if (pud_huge(*pud))
-+		next = stage2_pud_addr_end(addr, end);
-+		if (!stage2_pud_none(*pud)) {
-+			if (stage2_pud_huge(*pud))
- 				kvm_flush_dcache_pud(*pud);
- 			else
- 				stage2_flush_pmds(kvm, pud, addr, next);
-@@ -357,9 +357,9 @@ static void stage2_flush_memslot(struct kvm *kvm,
- 	phys_addr_t next;
- 	pgd_t *pgd;
+ #include <asm/cputype.h>
+@@ -58,6 +59,8 @@ struct gic_chip_data {
+ static struct gic_chip_data gic_data __read_mostly;
+ static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
  
--	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
-+	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	do {
--		next = kvm_pgd_addr_end(addr, end);
-+		next = stage2_pgd_addr_end(addr, end);
- 		stage2_flush_puds(kvm, pgd, addr, next);
- 	} while (pgd++, addr = next, addr != end);
- }
-@@ -807,16 +807,16 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	pgd_t *pgd;
- 	pud_t *pud;
- 
--	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
--	if (WARN_ON(pgd_none(*pgd))) {
-+	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
-+	if (WARN_ON(stage2_pgd_none(*pgd))) {
- 		if (!cache)
- 			return NULL;
- 		pud = mmu_memory_cache_alloc(cache);
--		pgd_populate(NULL, pgd, pud);
-+		stage2_pgd_populate(pgd, pud);
- 		get_page(virt_to_page(pgd));
- 	}
- 
--	return pud_offset(pgd, addr);
-+	return stage2_pud_offset(pgd, addr);
++static struct gic_kvm_info gic_v3_kvm_info;
++
+ #define gic_data_rdist()		(this_cpu_ptr(gic_data.rdists.rdist))
+ #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+ #define gic_data_rdist_sgi_base()	(gic_data_rdist_rd_base() + SZ_64K)
+@@ -903,6 +906,30 @@ static int __init gic_validate_dist_version(void __iomem *dist_base)
+ 	return 0;
  }
  
- static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-@@ -826,15 +826,15 @@ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	pmd_t *pmd;
++static void __init gic_of_setup_kvm_info(struct device_node *node)
++{
++	int ret;
++	struct resource r;
++	u32 gicv_idx;
++
++	gic_v3_kvm_info.type = GIC_V3;
++
++	gic_v3_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
++	if (!gic_v3_kvm_info.maint_irq)
++		return;
++
++	if (of_property_read_u32(node, "#redistributor-regions",
++				 &gicv_idx))
++		gicv_idx = 1;
++
++	gicv_idx += 3;	/* Also skip GICD, GICC, GICH */
++	ret = of_address_to_resource(node, gicv_idx, &r);
++	if (!ret)
++		gic_v3_kvm_info.vcpu = r;
++
++	gic_set_kvm_info(&gic_v3_kvm_info);
++}
++
+ static int __init gic_of_init(struct device_node *node, struct device_node *parent)
+ {
+ 	void __iomem *dist_base;
+@@ -954,8 +981,10 @@ static int __init gic_of_init(struct device_node *node, struct device_node *pare
  
- 	pud = stage2_get_pud(kvm, cache, addr);
--	if (pud_none(*pud)) {
-+	if (stage2_pud_none(*pud)) {
- 		if (!cache)
- 			return NULL;
- 		pmd = mmu_memory_cache_alloc(cache);
--		pud_populate(NULL, pud, pmd);
-+		stage2_pud_populate(pud, pmd);
- 		get_page(virt_to_page(pud));
- 	}
+ 	err = gic_init_bases(dist_base, rdist_regs, nr_redist_regions,
+ 			     redist_stride, &node->fwnode);
+-	if (!err)
++	if (!err) {
++		gic_of_setup_kvm_info(node);
+ 		return 0;
++	}
  
--	return pmd_offset(pud, addr);
-+	return stage2_pmd_offset(pud, addr);
+ out_unmap_rdist:
+ 	for (i = 0; i < nr_redist_regions; i++)
+@@ -976,6 +1005,9 @@ static struct
+ 	struct redist_region *redist_regs;
+ 	u32 nr_redist_regions;
+ 	bool single_redist;
++	u32 maint_irq;
++	int maint_irq_mode;
++	phys_addr_t vcpu_base;
+ } acpi_data __initdata;
+ 
+ static void __init
+@@ -1112,7 +1144,85 @@ static bool __init acpi_validate_gic_table(struct acpi_subtable_header *header,
+ 	return true;
  }
  
- static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
-@@ -1042,10 +1042,10 @@ static void stage2_wp_pmds(pud_t *pud, phys_addr_t addr, phys_addr_t end)
- 	pmd_t *pmd;
- 	phys_addr_t next;
++static int __init gic_acpi_parse_virt_madt_gicc(struct acpi_subtable_header *header,
++						const unsigned long end)
++{
++	struct acpi_madt_generic_interrupt *gicc =
++		(struct acpi_madt_generic_interrupt *)header;
++	int maint_irq_mode;
++	static int first_madt = true;
++
++	/* Skip unusable CPUs */
++	if (!(gicc->flags & ACPI_MADT_ENABLED))
++		return 0;
++
++	maint_irq_mode = (gicc->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
++		ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
++
++	if (first_madt) {
++		first_madt = false;
++
++		acpi_data.maint_irq = gicc->vgic_interrupt;
++		acpi_data.maint_irq_mode = maint_irq_mode;
++		acpi_data.vcpu_base = gicc->gicv_base_address;
++
++		return 0;
++	}
++
++	/*
++	 * The maintenance interrupt and GICV should be the same for every CPU
++	 */
++	if ((acpi_data.maint_irq != gicc->vgic_interrupt) ||
++	    (acpi_data.maint_irq_mode != maint_irq_mode) ||
++	    (acpi_data.vcpu_base != gicc->gicv_base_address))
++		return -EINVAL;
++
++	return 0;
++}
++
++static bool __init gic_acpi_collect_virt_info(void)
++{
++	int count;
++
++	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
++				      gic_acpi_parse_virt_madt_gicc, 0);
++
++	return (count > 0);
++}
++
+ #define ACPI_GICV3_DIST_MEM_SIZE (SZ_64K)
++#define ACPI_GICV2_VCTRL_MEM_SIZE	(SZ_4K)
++#define ACPI_GICV2_VCPU_MEM_SIZE	(SZ_8K)
++
++static void __init gic_acpi_setup_kvm_info(void)
++{
++	int irq;
++
++	if (!gic_acpi_collect_virt_info()) {
++		pr_warn("Unable to get hardware information used for virtualization\n");
++		return;
++	}
++
++	gic_v3_kvm_info.type = GIC_V3;
++
++	irq = acpi_register_gsi(NULL, acpi_data.maint_irq,
++				acpi_data.maint_irq_mode,
++				ACPI_ACTIVE_HIGH);
++	if (irq <= 0)
++		return;
++
++	gic_v3_kvm_info.maint_irq = irq;
++
++	if (acpi_data.vcpu_base) {
++		struct resource *vcpu = &gic_v3_kvm_info.vcpu;
++
++		vcpu->flags = IORESOURCE_MEM;
++		vcpu->start = acpi_data.vcpu_base;
++		vcpu->end = vcpu->start + ACPI_GICV2_VCPU_MEM_SIZE - 1;
++	}
++
++	gic_set_kvm_info(&gic_v3_kvm_info);
++}
  
--	pmd = pmd_offset(pud, addr);
-+	pmd = stage2_pmd_offset(pud, addr);
+ static int __init
+ gic_acpi_init(struct acpi_subtable_header *header, const unsigned long end)
+@@ -1161,6 +1271,8 @@ gic_acpi_init(struct acpi_subtable_header *header, const unsigned long end)
+ 		goto out_fwhandle_free;
  
- 	do {
--		next = kvm_pmd_addr_end(addr, end);
-+		next = stage2_pmd_addr_end(addr, end);
- 		if (!pmd_none(*pmd)) {
- 			if (pmd_thp_or_huge(*pmd)) {
- 				if (!kvm_s2pmd_readonly(pmd))
-@@ -1070,12 +1070,12 @@ static void  stage2_wp_puds(pgd_t *pgd, phys_addr_t addr, phys_addr_t end)
- 	pud_t *pud;
- 	phys_addr_t next;
+ 	acpi_set_irq_model(ACPI_IRQ_MODEL_GIC, domain_handle);
++	gic_acpi_setup_kvm_info();
++
+ 	return 0;
  
--	pud = pud_offset(pgd, addr);
-+	pud = stage2_pud_offset(pgd, addr);
- 	do {
--		next = kvm_pud_addr_end(addr, end);
--		if (!pud_none(*pud)) {
-+		next = stage2_pud_addr_end(addr, end);
-+		if (!stage2_pud_none(*pud)) {
- 			/* TODO:PUD not supported, revisit later if supported */
--			BUG_ON(pud_huge(*pud));
-+			BUG_ON(stage2_pud_huge(*pud));
- 			stage2_wp_pmds(pud, addr, next);
- 		}
- 	} while (pud++, addr = next, addr != end);
-@@ -1092,7 +1092,7 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
- 	pgd_t *pgd;
- 	phys_addr_t next;
+ out_fwhandle_free:
+diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
+index ef34f6f..c647b05 100644
+--- a/include/linux/irqchip/arm-gic-common.h
++++ b/include/linux/irqchip/arm-gic-common.h
+@@ -15,6 +15,7 @@
  
--	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
-+	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	do {
- 		/*
- 		 * Release kvm_mmu_lock periodically if the memory region is
-@@ -1104,8 +1104,8 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
- 		if (need_resched() || spin_needbreak(&kvm->mmu_lock))
- 			cond_resched_lock(&kvm->mmu_lock);
+ enum gic_type {
+ 	GIC_V2,
++	GIC_V3,
+ };
  
--		next = kvm_pgd_addr_end(addr, end);
--		if (pgd_present(*pgd))
-+		next = stage2_pgd_addr_end(addr, end);
-+		if (stage2_pgd_present(*pgd))
- 			stage2_wp_puds(pgd, addr, next);
- 	} while (pgd++, addr = next, addr != end);
- }
+ struct gic_kvm_info {
 -- 
 2.1.2.330.g565301e.dirty
+
