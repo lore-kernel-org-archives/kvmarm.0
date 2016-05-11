@@ -1,114 +1,189 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 05/29] kvm-arm: Replace kvm_pmd_huge with pmd_thp_or_huge
-Date: Wed, 11 May 2016 15:29:58 +0200
-Message-ID: <1462973422-10021-6-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 01/29] arm64: Reuse TCR field definitions for EL1 and EL2
+Date: Wed, 11 May 2016 15:29:54 +0200
+Message-ID: <1462973422-10021-2-git-send-email-christoffer.dall@linaro.org>
 References: <1462973422-10021-1-git-send-email-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1462973422-10021-1-git-send-email-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Both arm and arm64 now provides a helper, pmd_thp_or_huge()
-to check if the given pmd represents a huge page. Use that
-instead of our own custom check.
+TCR_EL1, TCR_EL2 and VTCR_EL2, all share some field positions
+(TG0, ORGN0, IRGN0 and SH0) and their corresponding value definitions.
 
-Suggested-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+This patch makes the TCR_EL1 definitions reusable and uses them for TCR_EL2
+and VTCR_EL2 fields.
+
+This also fixes a bug where we assume TG0 in {V}TCR_EL2 is 1bit field.
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Will Deacon <will.deacon@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/kvm/mmu.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h       | 48 ++++++++++----------
+ arch/arm64/include/asm/pgtable-hwdef.h | 80 ++++++++++++++++++++++++++--------
+ 2 files changed, 88 insertions(+), 40 deletions(-)
 
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 774d00b..7837f0a 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -45,7 +45,6 @@ static phys_addr_t hyp_idmap_vector;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 3f29887..a46b39f 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -96,32 +96,34 @@
+ 			 SCTLR_EL2_SA | SCTLR_EL2_I)
  
- #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
+ /* TCR_EL2 Registers bits */
+-#define TCR_EL2_RES1	((1 << 31) | (1 << 23))
+-#define TCR_EL2_TBI	(1 << 20)
+-#define TCR_EL2_PS	(7 << 16)
+-#define TCR_EL2_PS_40B	(2 << 16)
+-#define TCR_EL2_TG0	(1 << 14)
+-#define TCR_EL2_SH0	(3 << 12)
+-#define TCR_EL2_ORGN0	(3 << 10)
+-#define TCR_EL2_IRGN0	(3 << 8)
+-#define TCR_EL2_T0SZ	0x3f
+-#define TCR_EL2_MASK	(TCR_EL2_TG0 | TCR_EL2_SH0 | \
+-			 TCR_EL2_ORGN0 | TCR_EL2_IRGN0 | TCR_EL2_T0SZ)
++#define TCR_EL2_RES1		((1 << 31) | (1 << 23))
++#define TCR_EL2_TBI		(1 << 20)
++#define TCR_EL2_PS_SHIFT	16
++#define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
++#define TCR_EL2_PS_40B		(2 << TCR_EL2_PS_SHIFT)
++#define TCR_EL2_TG0_MASK	TCR_TG0_MASK
++#define TCR_EL2_SH0_MASK	TCR_SH0_MASK
++#define TCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
++#define TCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
++#define TCR_EL2_T0SZ_MASK	0x3f
++#define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
++			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK | TCR_EL2_T0SZ_MASK)
  
--#define kvm_pmd_huge(_x)	(pmd_huge(_x) || pmd_trans_huge(_x))
- #define kvm_pud_huge(_x)	pud_huge(_x)
- 
- #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
-@@ -115,7 +114,7 @@ static bool kvm_is_device_pfn(unsigned long pfn)
-  */
- static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
- {
--	if (!kvm_pmd_huge(*pmd))
-+	if (!pmd_thp_or_huge(*pmd))
- 		return;
- 
- 	pmd_clear(pmd);
-@@ -177,7 +176,7 @@ static void clear_pud_entry(struct kvm *kvm, pud_t *pud, phys_addr_t addr)
- static void clear_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr)
- {
- 	pte_t *pte_table = pte_offset_kernel(pmd, 0);
--	VM_BUG_ON(kvm_pmd_huge(*pmd));
-+	VM_BUG_ON(pmd_thp_or_huge(*pmd));
- 	pmd_clear(pmd);
- 	kvm_tlb_flush_vmid_ipa(kvm, addr);
- 	pte_free_kernel(NULL, pte_table);
-@@ -240,7 +239,7 @@ static void unmap_pmds(struct kvm *kvm, pud_t *pud,
- 	do {
- 		next = kvm_pmd_addr_end(addr, end);
- 		if (!pmd_none(*pmd)) {
--			if (kvm_pmd_huge(*pmd)) {
-+			if (pmd_thp_or_huge(*pmd)) {
- 				pmd_t old_pmd = *pmd;
- 
- 				pmd_clear(pmd);
-@@ -326,7 +325,7 @@ static void stage2_flush_pmds(struct kvm *kvm, pud_t *pud,
- 	do {
- 		next = kvm_pmd_addr_end(addr, end);
- 		if (!pmd_none(*pmd)) {
--			if (kvm_pmd_huge(*pmd))
-+			if (pmd_thp_or_huge(*pmd))
- 				kvm_flush_dcache_pmd(*pmd);
- 			else
- 				stage2_flush_ptes(kvm, pmd, addr, next);
-@@ -1050,7 +1049,7 @@ static void stage2_wp_pmds(pud_t *pud, phys_addr_t addr, phys_addr_t end)
- 	do {
- 		next = kvm_pmd_addr_end(addr, end);
- 		if (!pmd_none(*pmd)) {
--			if (kvm_pmd_huge(*pmd)) {
-+			if (pmd_thp_or_huge(*pmd)) {
- 				if (!kvm_s2pmd_readonly(pmd))
- 					kvm_set_s2pmd_readonly(pmd);
- 			} else {
-@@ -1331,7 +1330,7 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	if (!pmd || pmd_none(*pmd))	/* Nothing there */
- 		goto out;
- 
--	if (kvm_pmd_huge(*pmd)) {	/* THP, HugeTLB */
-+	if (pmd_thp_or_huge(*pmd)) {	/* THP, HugeTLB */
- 		*pmd = pmd_mkyoung(*pmd);
- 		pfn = pmd_pfn(*pmd);
- 		pfn_valid = true;
-@@ -1555,7 +1554,7 @@ static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
- 	if (!pmd || pmd_none(*pmd))	/* Nothing there */
- 		return 0;
- 
--	if (kvm_pmd_huge(*pmd)) {	/* THP, HugeTLB */
-+	if (pmd_thp_or_huge(*pmd)) {	/* THP, HugeTLB */
- 		if (pmd_young(*pmd)) {
- 			*pmd = pmd_mkold(*pmd);
- 			return 1;
-@@ -1585,7 +1584,7 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
- 	if (!pmd || pmd_none(*pmd))	/* Nothing there */
- 		return 0;
- 
--	if (kvm_pmd_huge(*pmd))		/* THP, HugeTLB */
-+	if (pmd_thp_or_huge(*pmd))		/* THP, HugeTLB */
- 		return pmd_young(*pmd);
- 
- 	pte = pte_offset_kernel(pmd, gpa);
+ /* VTCR_EL2 Registers bits */
+ #define VTCR_EL2_RES1		(1 << 31)
+-#define VTCR_EL2_PS_MASK	(7 << 16)
+-#define VTCR_EL2_TG0_MASK	(1 << 14)
+-#define VTCR_EL2_TG0_4K		(0 << 14)
+-#define VTCR_EL2_TG0_64K	(1 << 14)
+-#define VTCR_EL2_SH0_MASK	(3 << 12)
+-#define VTCR_EL2_SH0_INNER	(3 << 12)
+-#define VTCR_EL2_ORGN0_MASK	(3 << 10)
+-#define VTCR_EL2_ORGN0_WBWA	(1 << 10)
+-#define VTCR_EL2_IRGN0_MASK	(3 << 8)
+-#define VTCR_EL2_IRGN0_WBWA	(1 << 8)
+-#define VTCR_EL2_SL0_MASK	(3 << 6)
+-#define VTCR_EL2_SL0_LVL1	(1 << 6)
++#define VTCR_EL2_PS_MASK	TCR_EL2_PS_MASK
++#define VTCR_EL2_TG0_MASK	TCR_TG0_MASK
++#define VTCR_EL2_TG0_4K		TCR_TG0_4K
++#define VTCR_EL2_TG0_64K	TCR_TG0_64K
++#define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
++#define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
++#define VTCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
++#define VTCR_EL2_ORGN0_WBWA	TCR_ORGN0_WBWA
++#define VTCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
++#define VTCR_EL2_IRGN0_WBWA	TCR_IRGN0_WBWA
++#define VTCR_EL2_SL0_SHIFT	6
++#define VTCR_EL2_SL0_MASK	(3 << VTCR_EL2_SL0_SHIFT)
++#define VTCR_EL2_SL0_LVL1	(1 << VTCR_EL2_SL0_SHIFT)
+ #define VTCR_EL2_T0SZ_MASK	0x3f
+ #define VTCR_EL2_T0SZ_40B	24
+ #define VTCR_EL2_VS_SHIFT	19
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index 5c25b83..936f173 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -208,23 +208,69 @@
+ #define TCR_T1SZ(x)		((UL(64) - (x)) << TCR_T1SZ_OFFSET)
+ #define TCR_TxSZ(x)		(TCR_T0SZ(x) | TCR_T1SZ(x))
+ #define TCR_TxSZ_WIDTH		6
+-#define TCR_IRGN_NC		((UL(0) << 8) | (UL(0) << 24))
+-#define TCR_IRGN_WBWA		((UL(1) << 8) | (UL(1) << 24))
+-#define TCR_IRGN_WT		((UL(2) << 8) | (UL(2) << 24))
+-#define TCR_IRGN_WBnWA		((UL(3) << 8) | (UL(3) << 24))
+-#define TCR_IRGN_MASK		((UL(3) << 8) | (UL(3) << 24))
+-#define TCR_ORGN_NC		((UL(0) << 10) | (UL(0) << 26))
+-#define TCR_ORGN_WBWA		((UL(1) << 10) | (UL(1) << 26))
+-#define TCR_ORGN_WT		((UL(2) << 10) | (UL(2) << 26))
+-#define TCR_ORGN_WBnWA		((UL(3) << 10) | (UL(3) << 26))
+-#define TCR_ORGN_MASK		((UL(3) << 10) | (UL(3) << 26))
+-#define TCR_SHARED		((UL(3) << 12) | (UL(3) << 28))
+-#define TCR_TG0_4K		(UL(0) << 14)
+-#define TCR_TG0_64K		(UL(1) << 14)
+-#define TCR_TG0_16K		(UL(2) << 14)
+-#define TCR_TG1_16K		(UL(1) << 30)
+-#define TCR_TG1_4K		(UL(2) << 30)
+-#define TCR_TG1_64K		(UL(3) << 30)
++
++#define TCR_IRGN0_SHIFT		8
++#define TCR_IRGN0_MASK		(UL(3) << TCR_IRGN0_SHIFT)
++#define TCR_IRGN0_NC		(UL(0) << TCR_IRGN0_SHIFT)
++#define TCR_IRGN0_WBWA		(UL(1) << TCR_IRGN0_SHIFT)
++#define TCR_IRGN0_WT		(UL(2) << TCR_IRGN0_SHIFT)
++#define TCR_IRGN0_WBnWA		(UL(3) << TCR_IRGN0_SHIFT)
++
++#define TCR_IRGN1_SHIFT		24
++#define TCR_IRGN1_MASK		(UL(3) << TCR_IRGN1_SHIFT)
++#define TCR_IRGN1_NC		(UL(0) << TCR_IRGN1_SHIFT)
++#define TCR_IRGN1_WBWA		(UL(1) << TCR_IRGN1_SHIFT)
++#define TCR_IRGN1_WT		(UL(2) << TCR_IRGN1_SHIFT)
++#define TCR_IRGN1_WBnWA		(UL(3) << TCR_IRGN1_SHIFT)
++
++#define TCR_IRGN_NC		(TCR_IRGN0_NC | TCR_IRGN1_NC)
++#define TCR_IRGN_WBWA		(TCR_IRGN0_WBWA | TCR_IRGN1_WBWA)
++#define TCR_IRGN_WT		(TCR_IRGN0_WT | TCR_IRGN1_WT)
++#define TCR_IRGN_WBnWA		(TCR_IRGN0_WBnWA | TCR_IRGN1_WBnWA)
++#define TCR_IRGN_MASK		(TCR_IRGN0_MASK | TCR_IRGN1_MASK)
++
++
++#define TCR_ORGN0_SHIFT		10
++#define TCR_ORGN0_MASK		(UL(3) << TCR_ORGN0_SHIFT)
++#define TCR_ORGN0_NC		(UL(0) << TCR_ORGN0_SHIFT)
++#define TCR_ORGN0_WBWA		(UL(1) << TCR_ORGN0_SHIFT)
++#define TCR_ORGN0_WT		(UL(2) << TCR_ORGN0_SHIFT)
++#define TCR_ORGN0_WBnWA		(UL(3) << TCR_ORGN0_SHIFT)
++
++#define TCR_ORGN1_SHIFT		26
++#define TCR_ORGN1_MASK		(UL(3) << TCR_ORGN1_SHIFT)
++#define TCR_ORGN1_NC		(UL(0) << TCR_ORGN1_SHIFT)
++#define TCR_ORGN1_WBWA		(UL(1) << TCR_ORGN1_SHIFT)
++#define TCR_ORGN1_WT		(UL(2) << TCR_ORGN1_SHIFT)
++#define TCR_ORGN1_WBnWA		(UL(3) << TCR_ORGN1_SHIFT)
++
++#define TCR_ORGN_NC		(TCR_ORGN0_NC | TCR_ORGN1_NC)
++#define TCR_ORGN_WBWA		(TCR_ORGN0_WBWA | TCR_ORGN1_WBWA)
++#define TCR_ORGN_WT		(TCR_ORGN0_WT | TCR_ORGN1_WT)
++#define TCR_ORGN_WBnWA		(TCR_ORGN0_WBnWA | TCR_ORGN1_WBnWA)
++#define TCR_ORGN_MASK		(TCR_ORGN0_MASK | TCR_ORGN1_MASK)
++
++#define TCR_SH0_SHIFT		12
++#define TCR_SH0_MASK		(UL(3) << TCR_SH0_SHIFT)
++#define TCR_SH0_INNER		(UL(3) << TCR_SH0_SHIFT)
++
++#define TCR_SH1_SHIFT		28
++#define TCR_SH1_MASK		(UL(3) << TCR_SH1_SHIFT)
++#define TCR_SH1_INNER		(UL(3) << TCR_SH1_SHIFT)
++#define TCR_SHARED		(TCR_SH0_INNER | TCR_SH1_INNER)
++
++#define TCR_TG0_SHIFT		14
++#define TCR_TG0_MASK		(UL(3) << TCR_TG0_SHIFT)
++#define TCR_TG0_4K		(UL(0) << TCR_TG0_SHIFT)
++#define TCR_TG0_64K		(UL(1) << TCR_TG0_SHIFT)
++#define TCR_TG0_16K		(UL(2) << TCR_TG0_SHIFT)
++
++#define TCR_TG1_SHIFT		30
++#define TCR_TG1_MASK		(UL(3) << TCR_TG1_SHIFT)
++#define TCR_TG1_16K		(UL(1) << TCR_TG1_SHIFT)
++#define TCR_TG1_4K		(UL(2) << TCR_TG1_SHIFT)
++#define TCR_TG1_64K		(UL(3) << TCR_TG1_SHIFT)
++
+ #define TCR_ASID16		(UL(1) << 36)
+ #define TCR_TBI0		(UL(1) << 37)
+ #define TCR_HA			(UL(1) << 39)
 -- 
 2.1.2.330.g565301e.dirty
 
