@@ -1,155 +1,129 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 27/55] KVM: arm/arm64: vgic-new: Add PRIORITY
- registers handlers
-Date: Wed, 11 May 2016 15:37:48 +0200
-Message-ID: <20160511133748.GT27623@cbox>
+Subject: Re: [PATCH v3 23/55] KVM: arm/arm64: vgic-new: Add CTLR, TYPER and
+ IIDR handlers
+Date: Wed, 11 May 2016 15:38:51 +0200
+Message-ID: <20160511133851.GU27623@cbox>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
- <1462531568-9799-28-git-send-email-andre.przywara@arm.com>
+ <1462531568-9799-24-git-send-email-andre.przywara@arm.com>
+ <20160511120533.GM27623@cbox>
+ <57332AD8.6050306@arm.com>
+ <20160511131556.GR27623@cbox>
+ <57333359.3000505@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ED6849B2C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:34:18 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NNY4ZG7NTTOZ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 May 2016 09:34:16 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5048B49B47
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:34:14 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id g17so83215694wme.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 06:37:12 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1462531568-9799-28-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+In-Reply-To: <57333359.3000505@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 06, 2016 at 11:45:40AM +0100, Andre Przywara wrote:
-> The priority register handlers are shared between the v2 and v3
-> emulation, so their implementation goes into vgic-mmio.c, to be
-> easily referenced from the v3 emulation as well later.
-> There is a corner case when we change the priority of a pending
-> interrupt which we don't handle at the moment.
+On Wed, May 11, 2016 at 02:27:53PM +0100, Marc Zyngier wrote:
+> On 11/05/16 14:15, Christoffer Dall wrote:
+> > On Wed, May 11, 2016 at 01:51:36PM +0100, Marc Zyngier wrote:
+> >> On 11/05/16 13:05, Christoffer Dall wrote:
+> >>> On Fri, May 06, 2016 at 11:45:36AM +0100, Andre Przywara wrote:
+> >>>> From: Marc Zyngier <marc.zyngier@arm.com>
+> >>>>
+> >>>> Those three registers are v2 emulation specific, so their implementation
+> >>>> lives entirely in vgic-mmio-v2.c. Also they are handled in one function,
+> >>>> as their implementation is pretty simple.
+> >>>> When the guest enables the distributor, we kick all VCPUs to get
+> >>>> potentially pending interrupts serviced.
+> >>>>
+> >>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> >>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> >>>> ---
+> >>>> Changelog RFC..v1:
+> >>>> - kick VCPUs is the distributor gets enabled
+> >>>> - improve comment
+> >>>>
+> >>>> Changelog v1 .. v2:
+> >>>> - adapt to new MMIO framework
+> >>>> - use switch() statements to improve readability
+> >>>>
+> >>>> Changelog v2 .. v3:
+> >>>> - add vgic_kick_vcpus() implementation
+> >>>>
+> >>>>  include/linux/irqchip/arm-gic.h  |  1 +
+> >>>>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 48 +++++++++++++++++++++++++++++++++++++++-
+> >>>>  virt/kvm/arm/vgic/vgic.c         | 15 +++++++++++++
+> >>>>  virt/kvm/arm/vgic/vgic.h         |  4 ++++
+> >>>>  4 files changed, 67 insertions(+), 1 deletion(-)
+> >>>>
+> >>>> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
+> >>>> index be0d26f..fd05185 100644
+> >>>> --- a/include/linux/irqchip/arm-gic.h
+> >>>> +++ b/include/linux/irqchip/arm-gic.h
+> >>>> @@ -33,6 +33,7 @@
+> >>>>  
+> >>>>  #define GIC_DIST_CTRL			0x000
+> >>>>  #define GIC_DIST_CTR			0x004
+> >>>> +#define GIC_DIST_IIDR			0x008
+> >>>>  #define GIC_DIST_IGROUP			0x080
+> >>>>  #define GIC_DIST_ENABLE_SET		0x100
+> >>>>  #define GIC_DIST_ENABLE_CLEAR		0x180
+> >>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> >>>> index 2729a22..69e96f7 100644
+> >>>> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> >>>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> >>>> @@ -20,9 +20,55 @@
+> >>>>  #include "vgic.h"
+> >>>>  #include "vgic-mmio.h"
+> >>>>  
+> >>>> +static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
+> >>>> +					    gpa_t addr, unsigned int len)
+> >>>> +{
+> >>>> +	u32 value;
+> >>>> +
+> >>>> +	switch (addr & 0x0c) {
+> >>>> +	case GIC_DIST_CTRL:
+> >>>> +		value = vcpu->kvm->arch.vgic.enabled ? GICD_ENABLE : 0;
+> >>>> +		break;
+> >>>> +	case GIC_DIST_CTR:
+> >>>> +		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
+> >>>> +		value = (value >> 5) - 1;
+> >>>> +		value |= (atomic_read(&vcpu->kvm->online_vcpus) - 1) << 5;
+> >>>> +		break;
+> >>>> +	case GIC_DIST_IIDR:
+> >>>> +		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
+> >>>> +		break;
+> >>>> +	default:
+> >>>> +		return 0;
+> >>>> +	}
+> >>>> +
+> >>>> +	return extract_bytes(value, addr & 3, len);
+> >>>> +}
+> >>>> +
+> >>>> +static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
+> >>>> +				    gpa_t addr, unsigned int len,
+> >>>> +				    unsigned long val)
+> >>>> +{
+> >>>> +	switch (addr & 0x0c) {
+> >>>> +	case GIC_DIST_CTRL:
+> >>>> +		if (!(addr & 1)) {
+> >>>
+> >>> what is this !(addr & 1) check?
+> >>
+> >> We check that the write includes the lowest byte of the register. But as
+> >> we only have aligned accesses, it probably doesn't matter... I'll hack
+> >> that away.
+> >>
+> > where do we check to only have aligned accesses?
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
-> Changelog v1 .. v2:
-> - adapt to new MMIO framework
+> Looks like a missing feature. The v2 spec says:
 > 
->  virt/kvm/arm/vgic/vgic-mmio-v2.c |  2 +-
->  virt/kvm/arm/vgic/vgic-mmio.c    | 39 +++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic-mmio.h    |  7 +++++++
->  3 files changed, 47 insertions(+), 1 deletion(-)
+> 4.1.4 GIC register access
+> All registers support 32-bit word accesses with the access type defined
+> in Table 4-1 on page 4-73 and Table 4-2 on page 4-74.
+> In addition, the GICD_IPRIORITYRn, GICD_ITARGETSRn, GICD_CPENDSGIRn, and
+> GICD_SPENDSGIRn registers support byte accesses.
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> index 054b52d..2e17250 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> @@ -84,7 +84,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_CLEAR,
->  		vgic_mmio_read_active, vgic_mmio_write_cactive, 1),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
-> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
-> +		vgic_mmio_read_priority, vgic_mmio_write_priority, 8),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
->  		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index dbf683e..d7fe9e6 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -282,6 +282,45 @@ retry:
->  	}
->  }
->  
-> +unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
-> +				      gpa_t addr, unsigned int len)
-> +{
-> +	u32 intid = addr & 0x3ff;
-> +	int i;
-> +	u64 val = 0;
-> +
-> +	for (i = 0; i < len; i++) {
-> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> +
-> +		val |= (u64)irq->priority << (i * 8);
-> +	}
-> +
-> +	return val;
-
-IPRIORITYRn is specifically one of the registers requiring byte access
-to be implemented; why are we not doing the extract_bytes thing here?
-
-> +}
-> +
-> +/*
-> + * We currently don't handle changing the priority of an interrupt that
-> + * is already pending on a VCPU. If there is a need for this, we would
-> + * need to make this VCPU exit and re-evaluate the priorities, potentially
-> + * leading to this interrupt getting presented now to the guest (if it has
-> + * been masked by the priority mask before).
-
-I thought we were just going to do a vcpu_kick here?
-
-> + */
-> +void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
-> +			      gpa_t addr, unsigned int len,
-> +			      unsigned long val)
-> +{
-> +	u32 intid = addr & 0x3ff;
-> +	int i;
-> +
-> +	for (i = 0; i < len; i++) {
-> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> +
-> +		spin_lock(&irq->irq_lock);
-> +		irq->priority = (val >> (i * 8)) & 0xff;
-
-If I wasn't mistaken on my comment in the previous patch, then you have
-a problem here too...
-
-> +		spin_unlock(&irq->irq_lock);
-> +	}
-> +}
-> +
->  static int match_region(const void *key, const void *elt)
->  {
->  	const unsigned int offset = (unsigned long)key;
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-> index fa875dc..cd04ac5 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.h
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
-> @@ -107,6 +107,13 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
->  			     gpa_t addr, unsigned int len,
->  			     unsigned long val);
->  
-> +unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
-> +				      gpa_t addr, unsigned int len);
-> +
-> +void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
-> +			      gpa_t addr, unsigned int len,
-> +			      unsigned long val);
-> +
->  unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
->  
->  #endif
-> -- 
-> 2.7.3
+> Similar thing for v3 (8.1.3).
 > 
+> By the look of it, we should add checks in all accessors. I'll get onto it.
 > 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+Yeah, that's probably the easiest.
+
+-Christoffer
