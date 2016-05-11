@@ -1,146 +1,127 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 23/55] KVM: arm/arm64: vgic-new: Add CTLR, TYPER and
- IIDR handlers
-Date: Wed, 11 May 2016 14:27:53 +0100
-Message-ID: <57333359.3000505@arm.com>
-References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
- <1462531568-9799-24-git-send-email-andre.przywara@arm.com>
- <20160511120533.GM27623@cbox> <57332AD8.6050306@arm.com>
- <20160511131556.GR27623@cbox>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 067EE49B34
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:25:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YNv+ozLC+iQM for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 May 2016 09:24:59 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5DB149B2F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:24:58 -0400 (EDT)
-In-Reply-To: <20160511131556.GR27623@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PULL 00/29] KVM/ARM Changes for v4.7
+Date: Wed, 11 May 2016 15:29:53 +0200
+Message-ID: <1462973422-10021-1-git-send-email-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/05/16 14:15, Christoffer Dall wrote:
-> On Wed, May 11, 2016 at 01:51:36PM +0100, Marc Zyngier wrote:
->> On 11/05/16 13:05, Christoffer Dall wrote:
->>> On Fri, May 06, 2016 at 11:45:36AM +0100, Andre Przywara wrote:
->>>> From: Marc Zyngier <marc.zyngier@arm.com>
->>>>
->>>> Those three registers are v2 emulation specific, so their implementation
->>>> lives entirely in vgic-mmio-v2.c. Also they are handled in one function,
->>>> as their implementation is pretty simple.
->>>> When the guest enables the distributor, we kick all VCPUs to get
->>>> potentially pending interrupts serviced.
->>>>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>>> ---
->>>> Changelog RFC..v1:
->>>> - kick VCPUs is the distributor gets enabled
->>>> - improve comment
->>>>
->>>> Changelog v1 .. v2:
->>>> - adapt to new MMIO framework
->>>> - use switch() statements to improve readability
->>>>
->>>> Changelog v2 .. v3:
->>>> - add vgic_kick_vcpus() implementation
->>>>
->>>>  include/linux/irqchip/arm-gic.h  |  1 +
->>>>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 48 +++++++++++++++++++++++++++++++++++++++-
->>>>  virt/kvm/arm/vgic/vgic.c         | 15 +++++++++++++
->>>>  virt/kvm/arm/vgic/vgic.h         |  4 ++++
->>>>  4 files changed, 67 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
->>>> index be0d26f..fd05185 100644
->>>> --- a/include/linux/irqchip/arm-gic.h
->>>> +++ b/include/linux/irqchip/arm-gic.h
->>>> @@ -33,6 +33,7 @@
->>>>  
->>>>  #define GIC_DIST_CTRL			0x000
->>>>  #define GIC_DIST_CTR			0x004
->>>> +#define GIC_DIST_IIDR			0x008
->>>>  #define GIC_DIST_IGROUP			0x080
->>>>  #define GIC_DIST_ENABLE_SET		0x100
->>>>  #define GIC_DIST_ENABLE_CLEAR		0x180
->>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>>> index 2729a22..69e96f7 100644
->>>> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>>> @@ -20,9 +20,55 @@
->>>>  #include "vgic.h"
->>>>  #include "vgic-mmio.h"
->>>>  
->>>> +static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
->>>> +					    gpa_t addr, unsigned int len)
->>>> +{
->>>> +	u32 value;
->>>> +
->>>> +	switch (addr & 0x0c) {
->>>> +	case GIC_DIST_CTRL:
->>>> +		value = vcpu->kvm->arch.vgic.enabled ? GICD_ENABLE : 0;
->>>> +		break;
->>>> +	case GIC_DIST_CTR:
->>>> +		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
->>>> +		value = (value >> 5) - 1;
->>>> +		value |= (atomic_read(&vcpu->kvm->online_vcpus) - 1) << 5;
->>>> +		break;
->>>> +	case GIC_DIST_IIDR:
->>>> +		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
->>>> +		break;
->>>> +	default:
->>>> +		return 0;
->>>> +	}
->>>> +
->>>> +	return extract_bytes(value, addr & 3, len);
->>>> +}
->>>> +
->>>> +static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
->>>> +				    gpa_t addr, unsigned int len,
->>>> +				    unsigned long val)
->>>> +{
->>>> +	switch (addr & 0x0c) {
->>>> +	case GIC_DIST_CTRL:
->>>> +		if (!(addr & 1)) {
->>>
->>> what is this !(addr & 1) check?
->>
->> We check that the write includes the lowest byte of the register. But as
->> we only have aligned accesses, it probably doesn't matter... I'll hack
->> that away.
->>
-> where do we check to only have aligned accesses?
+Hi Paolo and Radim,
 
-Looks like a missing feature. The v2 spec says:
+Here is the initial set of changes for KVM/ARM for v4.7.
 
-4.1.4 GIC register access
-All registers support 32-bit word accesses with the access type defined
-in Table 4-1 on page 4-73 and Table 4-2 on page 4-74.
-In addition, the GICD_IPRIORITYRn, GICD_ITARGETSRn, GICD_CPENDSGIRn, and
-GICD_SPENDSGIRn registers support byte accesses.
+Sorry I'm a bit late with these, but we were trying to get the new vgic
+implementation in as part of this, but I have decided to send this pull
+request now, and we can follow up with another for the new VGIC,
+assuming we feel like we have that in place in a few days.
 
-Similar thing for v3 (8.1.3).
+There are a few changes in this pull request touching things outside
+KVM, but they should all carry the necessary acks and it made the
+merge process much easier to do it this way.
 
-By the look of it, we should add checks in all accessors. I'll get onto it.
+Hope this works for you guys.
+
+For a description of the content, see below; otherwise:
+
+The following changes since commit 06a71a24bae57a07afee9cda6b00495347d8a448:
+
+  arm64: KVM: unregister notifiers in hyp mode teardown path (2016-04-06 13:47:52 +0200)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.7
+
+for you to fetch changes up to 06485053244480f5f403d8f89b8617bd7d549113:
+
+  kvm: arm64: Enable hardware updates of the Access Flag for Stage 2 page tables (2016-05-09 22:23:08 +0200)
+
 
 Thanks,
+-Christoffer
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+----------------------------------------------------------------
+KVM/ARM Changes for Linux v4.7
+
+Reworks our stage 2 page table handling to have page table manipulation
+macros separate from those of the host systems as the underlying
+hardware page tables can be configured to be noticably different in
+layout from the stage 1 page tables used by the host.
+
+Adds 16K page size support based on the above.
+
+Adds a generic firmware probing layer for the timer and GIC so that KVM
+initializes using the same logic based on both ACPI and FDT.
+
+Finally adds support for hardware updating of the access flag.
+
+----------------------------------------------------------------
+Catalin Marinas (1):
+      kvm: arm64: Enable hardware updates of the Access Flag for Stage 2 page tables
+
+Julien Grall (10):
+      clocksource: arm_arch_timer: Gather KVM specific information in a structure
+      clocksource: arm_arch_timer: Extend arch_timer_kvm_info to get the virtual IRQ
+      irqchip/gic-v2: Gather ACPI specific data in a single structure
+      irqchip/gic-v2: Parse and export virtual GIC information
+      irqchip/gic-v3: Prefix all pr_* messages by "GICv3: "
+      irqchip/gic-v3: Gather all ACPI specific data in a single structure
+      irqchip/gic-v3: Parse and export virtual GIC information
+      KVM: arm/arm64: arch_timer: Rely on the arch timer to parse the firmware tables
+      KVM: arm/arm64: vgic: Rely on the GIC driver to parse the firmware tables
+      clocksource: arm_arch_timer: Remove arch_timer_get_timecounter
+
+Marc Zyngier (1):
+      arm/arm64: KVM: Enforce Break-Before-Make on Stage-2 page tables
+
+Suzuki K Poulose (17):
+      arm64: Reuse TCR field definitions for EL1 and EL2
+      arm64: Cleanup VTCR_EL2 and VTTBR field values
+      kvm arm: Move fake PGD handling to arch specific files
+      arm64: Introduce pmd_thp_or_huge
+      kvm-arm: Replace kvm_pmd_huge with pmd_thp_or_huge
+      kvm-arm: Remove kvm_pud_huge()
+      kvm-arm: arm32: Introduce stage2 page table helpers
+      kvm-arm: arm: Introduce hyp page table empty checks
+      kvm-arm: arm64: Introduce stage2 page table helpers
+      kvm-arm: arm64: Introduce hyp page table empty checks
+      kvm-arm: Use explicit stage2 helper routines
+      kvm-arm: Add explicit hyp page table modifiers
+      kvm-arm: Add stage2 page table modifiers
+      kvm-arm: Cleanup kvm_* wrappers
+      kvm: arm64: Get rid of fake page table levels
+      kvm-arm: Cleanup stage2 pgd handling
+      arm64: kvm: Add support for 16K pages
+
+ arch/arm/include/asm/kvm_mmu.h                |  43 +--
+ arch/arm/include/asm/stage2_pgtable.h         |  61 ++++
+ arch/arm/kvm/arm.c                            |   2 +-
+ arch/arm/kvm/mmu.c                            | 408 ++++++++++++++------------
+ arch/arm64/include/asm/kvm_arm.h              |  85 +++---
+ arch/arm64/include/asm/kvm_mmu.h              | 111 ++-----
+ arch/arm64/include/asm/pgtable-hwdef.h        |  80 +++--
+ arch/arm64/include/asm/pgtable.h              |  15 +-
+ arch/arm64/include/asm/stage2_pgtable-nopmd.h |  42 +++
+ arch/arm64/include/asm/stage2_pgtable-nopud.h |  39 +++
+ arch/arm64/include/asm/stage2_pgtable.h       | 142 +++++++++
+ arch/arm64/kvm/Kconfig                        |   1 -
+ arch/arm64/kvm/hyp/s2-setup.c                 |   8 +
+ drivers/clocksource/arm_arch_timer.c          |  11 +-
+ drivers/irqchip/irq-gic-common.c              |  13 +
+ drivers/irqchip/irq-gic-common.h              |   3 +
+ drivers/irqchip/irq-gic-v3.c                  | 176 +++++++++--
+ drivers/irqchip/irq-gic.c                     |  87 +++++-
+ include/clocksource/arm_arch_timer.h          |  12 +-
+ include/kvm/arm_vgic.h                        |   7 +-
+ include/linux/irqchip/arm-gic-common.h        |  34 +++
+ virt/kvm/arm/arch_timer.c                     |  40 +--
+ virt/kvm/arm/vgic-v2.c                        |  61 ++--
+ virt/kvm/arm/vgic-v3.c                        |  47 +--
+ virt/kvm/arm/vgic.c                           |  50 ++--
+ 25 files changed, 1053 insertions(+), 525 deletions(-)
+ create mode 100644 arch/arm/include/asm/stage2_pgtable.h
+ create mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
+ create mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
+ create mode 100644 arch/arm64/include/asm/stage2_pgtable.h
+ create mode 100644 include/linux/irqchip/arm-gic-common.h
