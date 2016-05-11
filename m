@@ -1,28 +1,27 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v3 24/55] KVM: arm/arm64: vgic-new: Add ENABLE registers
- handlers
-Date: Wed, 11 May 2016 14:24:22 +0100
-Message-ID: <57333286.2050708@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 23/55] KVM: arm/arm64: vgic-new: Add CTLR, TYPER and
+ IIDR handlers
+Date: Wed, 11 May 2016 14:27:53 +0100
+Message-ID: <57333359.3000505@arm.com>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
- <1462531568-9799-25-git-send-email-andre.przywara@arm.com>
- <20160511123423.GO27623@cbox> <57332DCD.1020701@arm.com>
- <20160511131402.GQ27623@cbox>
+ <1462531568-9799-24-git-send-email-andre.przywara@arm.com>
+ <20160511120533.GM27623@cbox> <57332AD8.6050306@arm.com>
+ <20160511131556.GR27623@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA04949B42
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:21:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 067EE49B34
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:25:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AMt7SbRNyZSm for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 May 2016 09:20:58 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD48549B2F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:20:58 -0400 (EDT)
-In-Reply-To: <20160511131402.GQ27623@cbox>
+ with ESMTP id YNv+ozLC+iQM for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 May 2016 09:24:59 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5DB149B2F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:24:58 -0400 (EDT)
+In-Reply-To: <20160511131556.GR27623@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,118 +32,115 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 11/05/16 14:14, Christoffer Dall wrote:
-> On Wed, May 11, 2016 at 02:04:13PM +0100, Andre Przywara wrote:
->> Hi,
->>
->> On 11/05/16 13:34, Christoffer Dall wrote:
->>> On Fri, May 06, 2016 at 11:45:37AM +0100, Andre Przywara wrote:
->>>> As the enable register handlers are shared between the v2 and v3
->>>> emulation, their implementation goes into vgic-mmio.c, to be easily
->>>> referenced from the v3 emulation as well later.
+On 11/05/16 14:15, Christoffer Dall wrote:
+> On Wed, May 11, 2016 at 01:51:36PM +0100, Marc Zyngier wrote:
+>> On 11/05/16 13:05, Christoffer Dall wrote:
+>>> On Fri, May 06, 2016 at 11:45:36AM +0100, Andre Przywara wrote:
+>>>> From: Marc Zyngier <marc.zyngier@arm.com>
 >>>>
+>>>> Those three registers are v2 emulation specific, so their implementation
+>>>> lives entirely in vgic-mmio-v2.c. Also they are handled in one function,
+>>>> as their implementation is pretty simple.
+>>>> When the guest enables the distributor, we kick all VCPUs to get
+>>>> potentially pending interrupts serviced.
+>>>>
+>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 >>>> ---
 >>>> Changelog RFC..v1:
->>>> - use lower bits of address to determine IRQ number
->>>> - remove TODO, confirmed to be fine
+>>>> - kick VCPUs is the distributor gets enabled
+>>>> - improve comment
 >>>>
 >>>> Changelog v1 .. v2:
 >>>> - adapt to new MMIO framework
+>>>> - use switch() statements to improve readability
 >>>>
->>>>  virt/kvm/arm/vgic/vgic-mmio-v2.c |  4 +--
->>>>  virt/kvm/arm/vgic/vgic-mmio.c    | 56 ++++++++++++++++++++++++++++++++++++++++
->>>>  virt/kvm/arm/vgic/vgic-mmio.h    | 11 ++++++++
->>>>  3 files changed, 69 insertions(+), 2 deletions(-)
+>>>> Changelog v2 .. v3:
+>>>> - add vgic_kick_vcpus() implementation
 >>>>
+>>>>  include/linux/irqchip/arm-gic.h  |  1 +
+>>>>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 48 +++++++++++++++++++++++++++++++++++++++-
+>>>>  virt/kvm/arm/vgic/vgic.c         | 15 +++++++++++++
+>>>>  virt/kvm/arm/vgic/vgic.h         |  4 ++++
+>>>>  4 files changed, 67 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
+>>>> index be0d26f..fd05185 100644
+>>>> --- a/include/linux/irqchip/arm-gic.h
+>>>> +++ b/include/linux/irqchip/arm-gic.h
+>>>> @@ -33,6 +33,7 @@
+>>>>  
+>>>>  #define GIC_DIST_CTRL			0x000
+>>>>  #define GIC_DIST_CTR			0x004
+>>>> +#define GIC_DIST_IIDR			0x008
+>>>>  #define GIC_DIST_IGROUP			0x080
+>>>>  #define GIC_DIST_ENABLE_SET		0x100
+>>>>  #define GIC_DIST_ENABLE_CLEAR		0x180
 >>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>>> index 69e96f7..448d1da 100644
+>>>> index 2729a22..69e96f7 100644
 >>>> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
 >>>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>>> @@ -72,9 +72,9 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
->>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
->>>>  		vgic_mmio_read_rao, vgic_mmio_write_wi, 1),
->>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
->>>> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
->>>> +		vgic_mmio_read_enable, vgic_mmio_write_senable, 1),
->>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_CLEAR,
->>>> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
->>>> +		vgic_mmio_read_enable, vgic_mmio_write_cenable, 1),
->>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
->>>>  		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
->>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
->>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
->>>> index 41cf4f4..077ae86 100644
->>>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->>>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->>>> @@ -46,6 +46,62 @@ void vgic_mmio_write_wi(struct kvm_vcpu *vcpu, gpa_t addr,
->>>>  	/* Ignore */
->>>>  }
+>>>> @@ -20,9 +20,55 @@
+>>>>  #include "vgic.h"
+>>>>  #include "vgic-mmio.h"
 >>>>  
->>>> +/*
->>>> + * Read accesses to both GICD_ICENABLER and GICD_ISENABLER return the value
->>>> + * of the enabled bit, so there is only one function for both here.
->>>> + */
->>>> +unsigned long vgic_mmio_read_enable(struct kvm_vcpu *vcpu,
->>>> +				    gpa_t addr, unsigned int len)
+>>>> +static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
+>>>> +					    gpa_t addr, unsigned int len)
 >>>> +{
->>>> +	u32 intid = (addr & 0x7f) * 8;
->>>
->>> is there anything we can do about this to make it more intuitive?  A
->>> macro to generate the mask/offset based on bits per interrupt or
->>> something?
->>
->> Yes, something where you give it the address and the bits-per-IRQ and it
->> tells you the IRQ number.
->> Not sure it is advisable to squash this into v4 still?
->>
->>>
->>>> +	u32 value = 0;
->>>> +	int i;
+>>>> +	u32 value;
 >>>> +
->>>> +	/* Loop over all IRQs affected by this read */
->>>> +	for (i = 0; i < len * 8; i++) {
->>>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>>>> +	switch (addr & 0x0c) {
+>>>> +	case GIC_DIST_CTRL:
+>>>> +		value = vcpu->kvm->arch.vgic.enabled ? GICD_ENABLE : 0;
+>>>> +		break;
+>>>> +	case GIC_DIST_CTR:
+>>>> +		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
+>>>> +		value = (value >> 5) - 1;
+>>>> +		value |= (atomic_read(&vcpu->kvm->online_vcpus) - 1) << 5;
+>>>> +		break;
+>>>> +	case GIC_DIST_IIDR:
+>>>> +		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
+>>>> +		break;
+>>>> +	default:
+>>>> +		return 0;
+>>>> +	}
 >>>> +
->>>> +		if (irq->enabled)
->>>> +			value |= (1U << i);
+>>>> +	return extract_bytes(value, addr & 3, len);
+>>>> +}
+>>>> +
+>>>> +static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
+>>>> +				    gpa_t addr, unsigned int len,
+>>>> +				    unsigned long val)
+>>>> +{
+>>>> +	switch (addr & 0x0c) {
+>>>> +	case GIC_DIST_CTRL:
+>>>> +		if (!(addr & 1)) {
 >>>
->>> I couldn't find the code anywhere that enforces word-aligned accesses to
->>> these registers.  Do we have that?
+>>> what is this !(addr & 1) check?
 >>
->> Not that I am aware of. I was suggesting this since we have one in the
->> IROUTER function. Architecturally we don't need to support halfword
->> accesses, it's: byte + word, word only or double-word + word, depending
->> on the actual register, IIRC.
->> As a fix we can at least deny (read: ignore) halfword accesses in
->> general in the dispatcher. Shall I do this (two two-liners)?
->> I think byte and word accesses are safe with the existing handlers last
->> time I checked.
+>> We check that the write includes the lowest byte of the register. But as
+>> we only have aligned accesses, it probably doesn't matter... I'll hack
+>> that away.
 >>
->>> If that's not the case, doesn't this break of you do a non-word aligned
->>> access?
->>
->> Why would it? vgic_data_host_to_mmio_bus and extract_bytes should cover
->> this, shouldn't they?
->>
-> 
-> I think this breaks on a simple byte access.  Let's say you are
-> accessing byte 1 (addr & 0x7ff == 1), then because you start your loop
-> at 0, you're going to set bits [7:0] in the value variable, and then
-> extract bits [15:8] in extract_bytes(), right?
+> where do we check to only have aligned accesses?
 
-Looks like, yes. I thought that it would take care of that, because a
-handler function shouldn't be bothered with this: it just acts on the
-lower bytes (till the length) and extract_bytes() does the rest. I think
-this is what the old magic vgic_reg_access does due to "regval >>
-word_offset".
+Looks like a missing feature. The v2 spec says:
 
-Do you care to fix this in extract_bytes?
+4.1.4 GIC register access
+All registers support 32-bit word accesses with the access type defined
+in Table 4-1 on page 4-73 and Table 4-2 on page 4-74.
+In addition, the GICD_IPRIORITYRn, GICD_ITARGETSRn, GICD_CPENDSGIRn, and
+GICD_SPENDSGIRn registers support byte accesses.
 
-Cheers,
-Andre.
+Similar thing for v3 (8.1.3).
+
+By the look of it, we should add checks in all accessors. I'll get onto it.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
