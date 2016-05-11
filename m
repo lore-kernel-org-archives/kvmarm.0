@@ -1,68 +1,179 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 08/29] kvm-arm: arm: Introduce hyp page table empty checks
-Date: Wed, 11 May 2016 15:30:01 +0200
-Message-ID: <1462973422-10021-9-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 16/29] kvm-arm: Cleanup stage2 pgd handling
+Date: Wed, 11 May 2016 15:30:09 +0200
+Message-ID: <1462973422-10021-17-git-send-email-christoffer.dall@linaro.org>
 References: <1462973422-10021-1-git-send-email-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B015849B5A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:29:05 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NYlI1NhU807O for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 May 2016 09:29:04 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB46E49B47
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:29:00 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id a17so83057220wme.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 06:31:58 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1462973422-10021-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Introduce hyp_pxx_table_empty helpers for checking whether
-a given table entry is empty. This will be used explicitly
-once we switch to explicit routines for hyp page table walk.
+Now that we don't have any fake page table levels for arm64,
+cleanup the common code to get rid of the dead code.
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/asm/kvm_mmu.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_mmu.h   | 19 -------------------
+ arch/arm/kvm/arm.c               |  2 +-
+ arch/arm/kvm/mmu.c               | 37 ++++++-------------------------------
+ arch/arm64/include/asm/kvm_mmu.h | 18 ------------------
+ 4 files changed, 7 insertions(+), 69 deletions(-)
 
 diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 7d207b4..5522cdd 100644
+index a7736d5..6344ea0 100644
 --- a/arch/arm/include/asm/kvm_mmu.h
 +++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -160,7 +160,11 @@ static inline bool kvm_page_empty(void *ptr)
+@@ -150,25 +150,6 @@ static inline bool kvm_page_empty(void *ptr)
+ #define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
+ #define hyp_pud_table_empty(pudp) false
  
- #define kvm_pte_table_empty(kvm, ptep) kvm_page_empty(ptep)
- #define kvm_pmd_table_empty(kvm, pmdp) kvm_page_empty(pmdp)
--#define kvm_pud_table_empty(kvm, pudp) (0)
-+#define kvm_pud_table_empty(kvm, pudp) false
-+
-+#define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
-+#define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
-+#define hyp_pud_table_empty(pudp) false
+-static inline void *kvm_get_hwpgd(struct kvm *kvm)
+-{
+-	return kvm->arch.pgd;
+-}
+-
+-static inline unsigned int kvm_get_hwpgd_size(void)
+-{
+-	return PTRS_PER_S2_PGD * sizeof(pgd_t);
+-}
+-
+-static inline pgd_t *kvm_setup_fake_pgd(pgd_t *hwpgd)
+-{
+-	return hwpgd;
+-}
+-
+-static inline void kvm_free_fake_pgd(pgd_t *pgd)
+-{
+-}
+-
+ struct kvm;
  
- static inline void *kvm_get_hwpgd(struct kvm *kvm)
+ #define kvm_flush_dcache_to_poc(a,l)	__cpuc_flush_dcache_area((a), (l))
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index dded1b7..be4b639 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -448,7 +448,7 @@ static void update_vttbr(struct kvm *kvm)
+ 	kvm_next_vmid &= (1 << kvm_vmid_bits) - 1;
+ 
+ 	/* update vttbr to be used with the new vmid */
+-	pgd_phys = virt_to_phys(kvm_get_hwpgd(kvm));
++	pgd_phys = virt_to_phys(kvm->arch.pgd);
+ 	BUG_ON(pgd_phys & ~VTTBR_BADDR_MASK);
+ 	vmid = ((u64)(kvm->arch.vmid) << VTTBR_VMID_SHIFT) & VTTBR_VMID_MASK(kvm_vmid_bits);
+ 	kvm->arch.vttbr = pgd_phys | vmid;
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index d3fa96e..42eefab 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -43,6 +43,7 @@ static unsigned long hyp_idmap_start;
+ static unsigned long hyp_idmap_end;
+ static phys_addr_t hyp_idmap_vector;
+ 
++#define S2_PGD_SIZE	(PTRS_PER_S2_PGD * sizeof(pgd_t))
+ #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
+ 
+ #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
+@@ -736,20 +737,6 @@ int create_hyp_io_mappings(void *from, void *to, phys_addr_t phys_addr)
+ 				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
+ }
+ 
+-/* Free the HW pgd, one page at a time */
+-static void kvm_free_hwpgd(void *hwpgd)
+-{
+-	free_pages_exact(hwpgd, kvm_get_hwpgd_size());
+-}
+-
+-/* Allocate the HW PGD, making sure that each page gets its own refcount */
+-static void *kvm_alloc_hwpgd(void)
+-{
+-	unsigned int size = kvm_get_hwpgd_size();
+-
+-	return alloc_pages_exact(size, GFP_KERNEL | __GFP_ZERO);
+-}
+-
+ /**
+  * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
+  * @kvm:	The KVM struct pointer for the VM.
+@@ -764,29 +751,17 @@ static void *kvm_alloc_hwpgd(void)
+ int kvm_alloc_stage2_pgd(struct kvm *kvm)
  {
+ 	pgd_t *pgd;
+-	void *hwpgd;
+ 
+ 	if (kvm->arch.pgd != NULL) {
+ 		kvm_err("kvm_arch already initialized?\n");
+ 		return -EINVAL;
+ 	}
+ 
+-	hwpgd = kvm_alloc_hwpgd();
+-	if (!hwpgd)
++	/* Allocate the HW PGD, making sure that each page gets its own refcount */
++	pgd = alloc_pages_exact(S2_PGD_SIZE, GFP_KERNEL | __GFP_ZERO);
++	if (!pgd)
+ 		return -ENOMEM;
+ 
+-	/*
+-	 * When the kernel uses more levels of page tables than the
+-	 * guest, we allocate a fake PGD and pre-populate it to point
+-	 * to the next-level page table, which will be the real
+-	 * initial page table pointed to by the VTTBR.
+-	 */
+-	pgd = kvm_setup_fake_pgd(hwpgd);
+-	if (IS_ERR(pgd)) {
+-		kvm_free_hwpgd(hwpgd);
+-		return PTR_ERR(pgd);
+-	}
+-
+ 	kvm_clean_pgd(pgd);
+ 	kvm->arch.pgd = pgd;
+ 	return 0;
+@@ -874,8 +849,8 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
+ 		return;
+ 
+ 	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
+-	kvm_free_hwpgd(kvm_get_hwpgd(kvm));
+-	kvm_free_fake_pgd(kvm->arch.pgd);
++	/* Free the HW pgd, one page at a time */
++	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
+ 	kvm->arch.pgd = NULL;
+ }
+ 
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e3fee0a..249c4fc 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -141,24 +141,6 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return (pmd_val(*pmd) & PMD_S2_RDWR) == PMD_S2_RDONLY;
+ }
+ 
+-static inline void *kvm_get_hwpgd(struct kvm *kvm)
+-{
+-	return kvm->arch.pgd;
+-}
+-
+-static inline unsigned int kvm_get_hwpgd_size(void)
+-{
+-	return PTRS_PER_S2_PGD * sizeof(pgd_t);
+-}
+-
+-static inline pgd_t *kvm_setup_fake_pgd(pgd_t *hwpgd)
+-{
+-	return hwpgd;
+-}
+-
+-static inline void kvm_free_fake_pgd(pgd_t *pgd)
+-{
+-}
+ static inline bool kvm_page_empty(void *ptr)
+ {
+ 	struct page *ptr_page = virt_to_page(ptr);
 -- 
 2.1.2.330.g565301e.dirty
+
