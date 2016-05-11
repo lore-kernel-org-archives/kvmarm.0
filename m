@@ -1,26 +1,27 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v3a] KVM: arm/arm64: pmu: abstract access to number of SPIs
-Date: Wed, 11 May 2016 14:52:49 +0100
-Message-ID: <57333931.6050206@arm.com>
-References: <5731AF57.2040707@linaro.org>
- <1462890906-6134-1-git-send-email-andre.przywara@arm.com>
- <20160510145832.cv3ozila3kisije6@hawk.localdomain>
+Subject: Re: [PATCH v3 24/55] KVM: arm/arm64: vgic-new: Add ENABLE registers
+ handlers
+Date: Wed, 11 May 2016 15:18:00 +0100
+Message-ID: <57333F18.5030605@arm.com>
+References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
+ <1462531568-9799-25-git-send-email-andre.przywara@arm.com>
+ <20160511123423.GO27623@cbox> <5733300C.9070304@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7B4848531
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:49:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09BF749B30
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 10:14:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DmvyXG6fwbjQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 May 2016 09:49:21 -0400 (EDT)
+ with ESMTP id 2QoR5cB00TXG for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 May 2016 10:14:46 -0400 (EDT)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C660F4113E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 09:49:21 -0400 (EDT)
-In-Reply-To: <20160510145832.cv3ozila3kisije6@hawk.localdomain>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A544749B2F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 May 2016 10:14:46 -0400 (EDT)
+In-Reply-To: <5733300C.9070304@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,69 +31,85 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Drew,
+Hi,
 
-On 10/05/16 15:58, Andrew Jones wrote:
-> On Tue, May 10, 2016 at 03:35:06PM +0100, Andre Przywara wrote:
->> Currently the PMU uses a member of the struct vgic_dist directly,
->> which not only breaks abstraction, but will fail with the new VGIC.
->> Abstract this access in the VGIC header file.
+On 11/05/16 14:13, Marc Zyngier wrote:
+> On 11/05/16 13:34, Christoffer Dall wrote:
+>> On Fri, May 06, 2016 at 11:45:37AM +0100, Andre Przywara wrote:
+>>> As the enable register handlers are shared between the v2 and v3
+>>> emulation, their implementation goes into vgic-mmio.c, to be easily
+>>> referenced from the v3 emulation as well later.
+>>>
+>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>>> ---
+>>> Changelog RFC..v1:
+>>> - use lower bits of address to determine IRQ number
+>>> - remove TODO, confirmed to be fine
+>>>
+>>> Changelog v1 .. v2:
+>>> - adapt to new MMIO framework
+>>>
+>>>  virt/kvm/arm/vgic/vgic-mmio-v2.c |  4 +--
+>>>  virt/kvm/arm/vgic/vgic-mmio.c    | 56 ++++++++++++++++++++++++++++++++++++++++
+>>>  virt/kvm/arm/vgic/vgic-mmio.h    | 11 ++++++++
+>>>  3 files changed, 69 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+>>> index 69e96f7..448d1da 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+>>> @@ -72,9 +72,9 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
+>>>  		vgic_mmio_read_rao, vgic_mmio_write_wi, 1),
+>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
+>>> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
+>>> +		vgic_mmio_read_enable, vgic_mmio_write_senable, 1),
+>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_CLEAR,
+>>> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
+>>> +		vgic_mmio_read_enable, vgic_mmio_write_cenable, 1),
+>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
+>>>  		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
+>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
+>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+>>> index 41cf4f4..077ae86 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+>>> @@ -46,6 +46,62 @@ void vgic_mmio_write_wi(struct kvm_vcpu *vcpu, gpa_t addr,
+>>>  	/* Ignore */
+>>>  }
+>>>  
+>>> +/*
+>>> + * Read accesses to both GICD_ICENABLER and GICD_ISENABLER return the value
+>>> + * of the enabled bit, so there is only one function for both here.
+>>> + */
+>>> +unsigned long vgic_mmio_read_enable(struct kvm_vcpu *vcpu,
+>>> +				    gpa_t addr, unsigned int len)
+>>> +{
+>>> +	u32 intid = (addr & 0x7f) * 8;
 >>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->> Hi Eric, Marc,
->>
->> as this if-statement was quite confusing (it wasn't even the negation
->> that was wrong), I rewrote it a bit to be more readable.
->> This one works now with PPIs (after fixing kvmtool).
->>
->> Does that make sense?
->>
->> Cheers,
->> Andre.
->>
->>  include/kvm/arm_vgic.h |  2 ++
->>  virt/kvm/arm/pmu.c     | 19 +++++++++++--------
->>  2 files changed, 13 insertions(+), 8 deletions(-)
->>
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index 6a98e05..d406f8e 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -351,6 +351,8 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
->>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
->>  #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
->>  #define vgic_ready(k)		((k)->arch.vgic.ready)
->> +#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
->> +				 ((i) < (k)->arch.vgic.nr_irqs))
->>  
->>  int vgic_v2_probe(struct device_node *vgic_node,
->>  		  const struct vgic_ops **ops,
->> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
->> index 575c7aa..6ab9d6b 100644
->> --- a/virt/kvm/arm/pmu.c
->> +++ b/virt/kvm/arm/pmu.c
->> @@ -436,6 +436,11 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
->>  	return 0;
->>  }
->>  
->> +/*
->> + * For one VM the interrupt type must be same for each vcpu.
->> + * As a PPI, the interrupt number is the same for all vcpus,
->> + * while as an SPI it must be a separate number per vcpu.
->> + */
->>  static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+>> is there anything we can do about this to make it more intuitive?  A
+>> macro to generate the mask/offset based on bits per interrupt or
+>> something?
 > 
-> While at it, I'd change this function name to have 'pmu' in it. It's
-> just a static function, but without pmu in it it looks a bit confusing
-> now to check the irq is [a valid] spi or ppi number, and then to call
-> the generically named 'irq_is_valid' on it as well.
+> Untested (and thus probably wrong):
+> 
+> #define VGIC_ADDR_IRQ_MASK(bits) ((1024 - 1) >> (4 - (bits))
+> #define VGIC_ADDR_IRQ_MULT(bits) (8 / (bits))
+> #define VGIC_ADDR_TO_INTID(addr, bits)  (((addr) & VGIC_ADDR_IRQ_MASK(bits)) * \
+> 					 VGIC_ADDR_IRQ_MULT(bits))
+> 
 
-Yes, indeed. Did that in the new series.
+Would:
 
-Thanks!
+#define VGIC_ADDR_IRQ_MASK(bits) GENMASK_ULL((bits) + 10 - 1 - 1, 0)
+#define VGIC_ADDR_TO_INTID(addr, bits) (((addr) &		\
+			VGIC_ADDR_IRQ_MASK(bits)) * 64 / (bits) / 8)
+
+work for all bitnesses?
+
+Cheers,
 Andre.
