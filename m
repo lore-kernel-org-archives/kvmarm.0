@@ -1,314 +1,132 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v3 13/55] KVM: arm/arm64: vgic-new: Add data structure
- definitions
-Date: Thu, 12 May 2016 14:25:23 +0100
-Message-ID: <57348443.3090906@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 36/55] KVM: arm/arm64: vgic-new: Add GICv3 IROUTER
+ register handlers
+Date: Thu, 12 May 2016 15:41:39 +0200
+Message-ID: <20160512134139.GA5878@cbox>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
- <1462531568-9799-14-git-send-email-andre.przywara@arm.com>
- <20160512121258.GG27623@cbox>
+ <1462531568-9799-37-git-send-email-andre.przywara@arm.com>
+ <20160512122119.GH27623@cbox>
+ <57347925.2030902@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 45C6F49B1D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2016 09:22:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pUQi6ioMvqz8 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 May 2016 09:21:54 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6324D49B1A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2016 09:21:53 -0400 (EDT)
-In-Reply-To: <20160512121258.GG27623@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <57347925.2030902@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 12/05/16 13:12, Christoffer Dall wrote:
-> On Fri, May 06, 2016 at 11:45:26AM +0100, Andre Przywara wrote:
->> From: Christoffer Dall <christoffer.dall@linaro.org>
->>
->> Add a new header file for the new and improved GIC implementation.
->> The big change is that we now have a struct vgic_irq per IRQ instead
->> of spreading all the information over various bitmaps.
->>
->> We include this new header conditionally from within the old header
->> file for the time being to avoid touching all the users.
->>
->> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->> Changes RFC .. v1:
->> - adapt to 4.6-rc (adding live_lrs member)
->> - elaborate on ap_list usage
->>
->> Changes v1 .. v2:
->> - change data type of dist->enabled to bool
->>
->>  include/kvm/arm_vgic.h  |   5 ++
->>  include/kvm/vgic/vgic.h | 201 ++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 206 insertions(+)
->>  create mode 100644 include/kvm/vgic/vgic.h
->>
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index c14ff77..d406f8e 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -19,6 +19,10 @@
->>  #ifndef __ASM_ARM_KVM_VGIC_H
->>  #define __ASM_ARM_KVM_VGIC_H
->>  
->> +#ifdef CONFIG_KVM_NEW_VGIC
->> +#include <kvm/vgic/vgic.h>
->> +#else
->> +
->>  #include <linux/kernel.h>
->>  #include <linux/kvm.h>
->>  #include <linux/irqreturn.h>
->> @@ -366,4 +370,5 @@ static inline int vgic_v3_probe(struct device_node *vgic_node,
->>  }
->>  #endif
->>  
->> +#endif	/* old VGIC include */
->>  #endif
->> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
->> new file mode 100644
->> index 0000000..39933ee
->> --- /dev/null
->> +++ b/include/kvm/vgic/vgic.h
->> @@ -0,0 +1,201 @@
->> +/*
->> + * Copyright (C) 2015, 2016 ARM Ltd.
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License
->> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +#ifndef __ASM_ARM_KVM_VGIC_VGIC_H
->> +#define __ASM_ARM_KVM_VGIC_VGIC_H
->> +
->> +#include <linux/kernel.h>
->> +#include <linux/kvm.h>
->> +#include <linux/irqreturn.h>
->> +#include <linux/spinlock.h>
->> +#include <linux/types.h>
->> +#include <kvm/iodev.h>
->> +
->> +#define VGIC_V3_MAX_CPUS	255
->> +#define VGIC_V2_MAX_CPUS	8
->> +#define VGIC_NR_IRQS_LEGACY     256
->> +#define VGIC_NR_SGIS		16
->> +#define VGIC_NR_PPIS		16
->> +#define VGIC_NR_PRIVATE_IRQS	(VGIC_NR_SGIS + VGIC_NR_PPIS)
->> +#define VGIC_MAX_PRIVATE	(VGIC_NR_PRIVATE_IRQS - 1)
->> +#define VGIC_MAX_SPI		1019
->> +#define VGIC_MAX_RESERVED	1023
->> +#define VGIC_MIN_LPI		8192
->> +
->> +enum vgic_type {
->> +	VGIC_V2,		/* Good ol' GICv2 */
->> +	VGIC_V3,		/* New fancy GICv3 */
->> +};
->> +
->> +/* same for all guests, as depending only on the _host's_ GIC model */
->> +struct vgic_global {
->> +	/* type of the host GIC */
->> +	enum vgic_type		type;
->> +
->> +	/* Physical address of vgic virtual cpu interface */
->> +	phys_addr_t		vcpu_base;
->> +
->> +	/* virtual control interface mapping */
->> +	void __iomem		*vctrl_base;
->> +
->> +	/* Number of implemented list registers */
->> +	int			nr_lr;
->> +
->> +	/* Maintenance IRQ number */
+On Thu, May 12, 2016 at 01:37:57PM +0100, Marc Zyngier wrote:
+> On 12/05/16 13:21, Christoffer Dall wrote:
+> > On Fri, May 06, 2016 at 11:45:49AM +0100, Andre Przywara wrote:
+> >> Since GICv3 supports much more than the 8 CPUs the GICv2 ITARGETSR
+> >> register can handle, the new IROUTER register covers the whole range
+> >> of possible target (V)CPUs by using the same MPIDR that the cores
+> >> report themselves.
+> >> In addition to translating this MPIDR into a vcpu pointer we store
+> >> the originally written value as well. The architecture allows to
+> >> write any values into the register, which must be read back as written.
+> >>
+> >> Since we don't support affinity level 3, we don't need to take care
+> >> about the upper word of this 64-bit register, which simplifies the
+> >> handling a bit.
+> >>
+> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> >> ---
+> >> Changelog RFC..v1:
+> >> - fold in and simplify vgic_v3_irq_change_affinity
+> >>
+> >> Changelog v1 .. v2:
+> >> - adapt to new MMIO framework
+> >>
+> >>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 65 +++++++++++++++++++++++++++++++++++++++-
+> >>  1 file changed, 64 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> >> index 48fba9c..3bcc2c4 100644
+> >> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> >> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> >> @@ -86,6 +86,69 @@ static u32 compress_mpidr(unsigned long mpidr)
+> >>  	return ret;
+> >>  }
+> >>  
+> >> +static unsigned long decompress_mpidr(u32 value)
+> >> +{
+> >> +	unsigned long mpidr;
+> >> +
+> >> +	mpidr  = ((value >>  0) & 0xFF) << MPIDR_LEVEL_SHIFT(0);
+> >> +	mpidr |= ((value >>  8) & 0xFF) << MPIDR_LEVEL_SHIFT(1);
+> >> +	mpidr |= ((value >> 16) & 0xFF) << MPIDR_LEVEL_SHIFT(2);
+> >> +	mpidr |= (u64)((value >> 24) & 0xFF) << MPIDR_LEVEL_SHIFT(3);
+> >> +
+> >> +	return mpidr;
+> >> +}
+> >> +
+> >> +static unsigned long vgic_mmio_read_irouter(struct kvm_vcpu *vcpu,
+> >> +					    gpa_t addr, unsigned int len)
+> >> +{
+> >> +	int intid = (addr & 0x1fff) / 8;
+> >> +	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
+> >> +	unsigned long mpidr;
+> >> +
+> >> +	if (!irq)
+> >> +		return 0;
+> >> +
+> >> +	mpidr = decompress_mpidr(irq->mpidr);
+> > 
+> > I'm unsure here; do we ned a READ_ONCE() in lieu taking the lock or are
+> > we guaranteed that this is a single memory access even with compiler
+> > inlining etc.?
 > 
-> nit: this is the physial INTID, right?
+> I can't imagine the compiler being stupid enough to read this multiple
+> times, but better safe than sorry. +1 for READ_ONCE().
 > 
->> +	unsigned int		maint_irq;
->> +
->> +	/* maximum number of VCPUs allowed (GICv2 limits us to 8) */
->> +	int			max_gic_vcpus;
->> +
->> +	/* Only needed for the legacy KVM_CREATE_IRQCHIP */
->> +	bool			can_emulate_gicv2;
->> +};
->> +
->> +extern struct vgic_global kvm_vgic_global_state;
->> +
->> +#define VGIC_V2_MAX_LRS		(1 << 6)
->> +#define VGIC_V3_MAX_LRS		16
->> +#define VGIC_V3_LR_INDEX(lr)	(VGIC_V3_MAX_LRS - 1 - lr)
->> +
->> +enum vgic_irq_config {
->> +	VGIC_CONFIG_EDGE = 0,
->> +	VGIC_CONFIG_LEVEL
->> +};
->> +
->> +struct vgic_irq {
->> +	spinlock_t irq_lock;		/* Protects the content of the struct */
->> +	struct list_head ap_list;
->> +
->> +	struct kvm_vcpu *vcpu;		/* SGIs and PPIs: The VCPU
->> +					 * SPIs and LPIs: The VCPU whose ap_list
->> +					 * on which this is queued.
+> > 
+> >> +	return extract_bytes(mpidr, addr & 7, len);
+> >> +}
+> >> +
+> >> +static void vgic_mmio_write_irouter(struct kvm_vcpu *vcpu,
+> >> +				    gpa_t addr, unsigned int len,
+> >> +				    unsigned long val)
+> >> +{
+> >> +	int intid = (addr & 0x1fff) / 8;
+> >> +	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
+> >> +	unsigned long mask = 0xffffffff;	/* upper word is WI */
+> >> +	u64 mpidr;
+> >> +
+> >> +	if (!irq)
+> >> +		return;
+> >> +
+> >> +	/*
+> >> +	 * There are only two supported options:
+> >> +	 * (1) aligned 64-bit access
+> >> +	 * (2) aligned 32-bit access
+> >> +	 *
+> >> +	 * TODO: make this check generic and move it to dispatch_...()
+> >> +	 */
+> >> +	if (len != 4 && len != 8)
+> >> +		return;
+> >> +
+> >> +
+> >> +	/* The upper word is WI for us since we don't implement Aff3. */
+> >> +	if (addr & 4)
+> >> +		return;
+> >> +
+> >> +	spin_lock(&irq->irq_lock);
+> >> +
+> >> +	mpidr = decompress_mpidr(irq->mpidr);
+> >> +	mpidr = (mpidr & ~mask) | (val & mask);
+> >> +	irq->mpidr = compress_mpidr(mpidr);
+> >> +	irq->target_vcpu = kvm_mpidr_to_vcpu(vcpu->kvm, mpidr);
+> > 
+> > this is weird because it doesn't preserve read-as-written semantics but
+> > allows a guest to write something into the RES0 field and read that back
+> > in the Aff3 field...
 > 
-> nit: s/on which this is queued/this is queued on/
+> I don't see how we get this RES0/Aff3 mixup, but I can see other issues:
 > 
->> +					 */
->> +
->> +	struct kvm_vcpu *target_vcpu;	/* The VCPU that this interrupt should
->> +					 * be send to, as a result of the
-> 
-> nit: s/send/sent/
+oh, never mind, compress_mpidr expects aff3 in bits[39:32] and throws
+the rest away.
 
-Both fixed.
-
->> +					 * targets reg (v2) or the
->> +					 * affinity reg (v3).
->> +					 */
->> +
->> +	u32 intid;			/* Guest visible INTID */
->> +	bool pending;
->> +	bool line_level;		/* Level only */
->> +	bool soft_pending;		/* Level only */
->> +	bool active;			/* not used for LPIs */
->> +	bool enabled;
->> +	bool hw;			/* Tied to HW IRQ */
->> +	u32 hwintid;			/* HW INTID number */
->> +	union {
->> +		u8 targets;			/* GICv2 target VCPUs mask */
->> +		u32 mpidr;			/* GICv3 target VCPU */
->> +	};
->> +	u8 source;			/* GICv2 SGIs only */
->> +	u8 priority;
->> +	enum vgic_irq_config config;	/* Level or edge */
->> +};
->> +
->> +struct vgic_dist {
->> +	bool			in_kernel;
->> +	bool			ready;
->> +
->> +	/* vGIC model the kernel emulates for the guest (GICv2 or GICv3) */
->> +	u32			vgic_model;
->> +
->> +	int			nr_spis;
->> +
->> +	/* TODO: Consider moving to global state */
->> +	/* Virtual control interface mapping */
->> +	void __iomem		*vctrl_base;
->> +
->> +	/* base addresses in guest physical address space: */
->> +	gpa_t			vgic_dist_base;		/* distributor */
->> +	union {
->> +		/* either a GICv2 CPU interface */
->> +		gpa_t			vgic_cpu_base;
->> +		/* or a number of GICv3 redistributor regions */
->> +		gpa_t			vgic_redist_base;
->> +	};
->> +
->> +	/* distributor enabled */
->> +	bool			enabled;
->> +
->> +	struct vgic_irq		*spis;
->> +};
->> +
->> +struct vgic_v2_cpu_if {
->> +	u32		vgic_hcr;
->> +	u32		vgic_vmcr;
->> +	u32		vgic_misr;	/* Saved only */
->> +	u64		vgic_eisr;	/* Saved only */
->> +	u64		vgic_elrsr;	/* Saved only */
->> +	u32		vgic_apr;
->> +	u32		vgic_lr[VGIC_V2_MAX_LRS];
->> +};
->> +
->> +struct vgic_v3_cpu_if {
->> +#ifdef CONFIG_KVM_ARM_VGIC_V3
->> +	u32		vgic_hcr;
->> +	u32		vgic_vmcr;
->> +	u32		vgic_sre;	/* Restored only, change ignored */
->> +	u32		vgic_misr;	/* Saved only */
->> +	u32		vgic_eisr;	/* Saved only */
->> +	u32		vgic_elrsr;	/* Saved only */
->> +	u32		vgic_ap0r[4];
->> +	u32		vgic_ap1r[4];
->> +	u64		vgic_lr[VGIC_V3_MAX_LRS];
->> +#endif
->> +};
->> +
->> +struct vgic_cpu {
->> +	/* CPU vif control registers for world switch */
->> +	union {
->> +		struct vgic_v2_cpu_if	vgic_v2;
->> +		struct vgic_v3_cpu_if	vgic_v3;
->> +	};
->> +
->> +	unsigned int used_lrs;
->> +	struct vgic_irq private_irqs[VGIC_NR_PRIVATE_IRQS];
->> +
->> +	spinlock_t ap_list_lock;	/* Protects the ap_list */
->> +
->> +	/*
->> +	 * List of IRQs that this VCPU should consider because they are either
->> +	 * Active or Pending (hence the name; AP list), or because they recently
->> +	 * were one of the two and need to be migrated off this list to another
->> +	 * VCPU.
->> +	 */
->> +	struct list_head ap_list_head;
->> +
->> +	u64 live_lrs;
->> +};
->> +
->> +#define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
->> +#define vgic_initialized(k)	(false)
->> +#define vgic_ready(k)		((k)->arch.vgic.ready)
->> +#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
->> +			((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS))
-> 
-> this should really be a static inline at this point.
-
-I think I tried this at the very beginning and it doesn't work. I get:
-
-In file included from include/kvm/arm_vgic.h:23:0,
-                 from arch/arm64/include/asm/kvm_host.h:39,
-                 from include/linux/kvm_host.h:36,
-                 from arch/arm64/kernel/asm-offsets.c:24:
-include/kvm/vgic/vgic.h: In function 'vgic_valid_spi':
-include/kvm/vgic/vgic.h:232:13: error: dereferencing pointer to
-incomplete type 'struct kvm'
-   (irq < kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS);
-             ^
-./Kbuild:80: recipe for target 'arch/arm64/kernel/asm-offsets.s' failed
-make[3]: *** [arch/arm64/kernel/asm-offsets.s] Error 1
-
-Is this because asm-offsets.s includes this file and struct kvm is
-opaque at this point?
-Or is my brain totally GICed by now?
-
-Cheers,
-Andre.
+/me hides under table.
