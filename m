@@ -1,370 +1,173 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2] KVM: arm/arm64: vgic-new: Switch to
- firmware-independent probing
-Date: Thu, 12 May 2016 21:02:16 +0200
-Message-ID: <20160512190216.GO27623@cbox>
-References: <1462869983-5410-1-git-send-email-marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 49/55] KVM: arm/arm64: vgic-new: vgic_init: implement
+ vgic_create
+Date: Thu, 12 May 2016 21:08:36 +0200
+Message-ID: <20160512190836.GP27623@cbox>
+References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
+ <1462531568-9799-50-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0050849B37
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2016 15:05:00 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 317Lf9znmc7X for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 May 2016 15:04:59 -0400 (EDT)
+Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DEE9B49B30
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2016 15:04:58 -0400 (EDT)
+Received: by mail-wm0-f47.google.com with SMTP id e201so270567355wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2016 12:08:00 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1462869983-5410-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: andre.przywara@arm.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <1462531568-9799-50-git-send-email-andre.przywara@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 10, 2016 at 09:46:23AM +0100, Marc Zyngier wrote:
-> As we did for the legacy code, switch the new VGIC implementation
-> the firmware-independent probing, giving us ACPI support for free.
+On Fri, May 06, 2016 at 11:46:02AM +0100, Andre Przywara wrote:
+> From: Eric Auger <eric.auger@linaro.org>
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-So just remembered you wrote this after sending my comments to patch 48.
-
-Are we planning to squash this into the series so I can review in
-completeness/with context, or?
-
-Thanks,
--Christoffer
-
+> This patch implements the vgic_creation function which is
+> called on CREATE_IRQCHIP VM IOCTL (v2 only) or KVM_CREATE_DEVICE
+> 
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
-> - From v1: Some additional cleanups, rebased on the lastest drop.
+>  include/kvm/vgic/vgic.h       |  1 +
+>  virt/kvm/arm/vgic/vgic-init.c | 84 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 85 insertions(+)
 > 
->  virt/kvm/arm/vgic/vgic-init.c | 39 ++++++++++----------
->  virt/kvm/arm/vgic/vgic-v2.c   | 82 +++++++++++++++----------------------------
->  virt/kvm/arm/vgic/vgic-v3.c   | 44 ++++++-----------------
->  virt/kvm/arm/vgic/vgic.h      |  8 +++--
->  4 files changed, 63 insertions(+), 110 deletions(-)
-> 
+> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+> index d144e3d..899b7b7 100644
+> --- a/include/kvm/vgic/vgic.h
+> +++ b/include/kvm/vgic/vgic.h
+> @@ -202,6 +202,7 @@ struct vgic_cpu {
+>  };
+>  
+>  int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
+> +int kvm_vgic_create(struct kvm *kvm, u32 type);
+>  int kvm_vgic_hyp_init(void);
+>  
+>  int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
 > diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index 7fefb12..0c2c504 100644
+> index f10997b..a150363 100644
 > --- a/virt/kvm/arm/vgic/vgic-init.c
 > +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -17,8 +17,6 @@
->  #include <linux/uaccess.h>
->  #include <linux/interrupt.h>
->  #include <linux/cpu.h>
-> -#include <linux/of_address.h>
-> -#include <linux/of_irq.h>
->  #include <linux/kvm_host.h>
->  #include <kvm/arm_vgic.h>
+> @@ -24,6 +24,90 @@
 >  #include <asm/kvm_mmu.h>
-> @@ -387,14 +385,6 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
->  	return IRQ_HANDLED;
->  }
->  
-> -static const struct of_device_id vgic_ids[] = {
-> -	{ .compatible = "arm,cortex-a15-gic",	.data = vgic_v2_probe, },
-> -	{ .compatible = "arm,cortex-a7-gic",	.data = vgic_v2_probe, },
-> -	{ .compatible = "arm,gic-400",		.data = vgic_v2_probe, },
-> -	{ .compatible = "arm,gic-v3",		.data = vgic_v3_probe, },
-> -	{},
-> -};
-> -
->  /**
->   * kvm_vgic_hyp_init: populates the kvm_vgic_global_state variable
->   * according to the host GIC model. Accordingly calls either
-> @@ -403,23 +393,33 @@ static const struct of_device_id vgic_ids[] = {
->   */
->  int kvm_vgic_hyp_init(void)
->  {
-> -	const struct of_device_id *matched_id;
-> -	const int (*vgic_probe)(struct device_node *);
-> -	struct device_node *vgic_node;
-> +	const struct gic_kvm_info *gic_kvm_info;
->  	int ret;
->  
-> -	vgic_node = of_find_matching_node_and_match(NULL,
-> -						    vgic_ids, &matched_id);
-> -	if (!vgic_node) {
-> -		kvm_err("error: no compatible GIC node found\n");
-> +	gic_kvm_info = gic_get_kvm_info();
-> +	if (!gic_kvm_info)
->  		return -ENODEV;
-> +
-> +	if (!gic_kvm_info->maint_irq) {
-> +		kvm_err("No vgic maintenance irq\n");
-> +		return -ENXIO;
->  	}
->  
-> -	vgic_probe = matched_id->data;
-> -	ret = vgic_probe(vgic_node);
-> +	switch (gic_kvm_info->type) {
-> +	case GIC_V2:
-> +		ret = vgic_v2_probe(gic_kvm_info);
-> +		break;
-> +	case GIC_V3:
-> +		ret = vgic_v3_probe(gic_kvm_info);
-> +		break;
-> +	default:
-> +		ret = -ENODEV;
-> +	};
-> +
->  	if (ret)
->  		return ret;
->  
-> +	kvm_vgic_global_state.maint_irq = gic_kvm_info->maint_irq;
->  	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq,
->  				 vgic_maintenance_handler,
->  				 "vgic", kvm_get_running_vcpus());
-> @@ -437,6 +437,7 @@ int kvm_vgic_hyp_init(void)
->  
->  	on_each_cpu(vgic_init_maintenance_interrupt, NULL, 1);
->  
-> +	kvm_info("vgic interrupt IRQ%d\n", kvm_vgic_global_state.maint_irq);
->  	return 0;
->  
->  out_free_irq:
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index 4493593..e88b5aa 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -18,9 +18,6 @@
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
->  #include <kvm/arm_vgic.h>
-> -#include <linux/of.h>
-> -#include <linux/of_address.h>
-> -#include <linux/of_irq.h>
->  #include <asm/kvm_mmu.h>
->  
 >  #include "vgic.h"
-> @@ -278,81 +275,58 @@ out:
->   *
->   * Returns 0 if a GICv2 has been found, returns an error code otherwise
->   */
-> -int vgic_v2_probe(struct device_node *vgic_node)
-> +int vgic_v2_probe(const struct gic_kvm_info *info)
->  {
->  	int ret;
-> -	struct resource vctrl_res;
-> -	struct resource vcpu_res;
 >  
-> -	kvm_vgic_global_state.maint_irq = irq_of_parse_and_map(vgic_node, 0);
-> -	if (!kvm_vgic_global_state.maint_irq) {
-> -		kvm_err("error getting vgic maintenance irq from DT\n");
-> -		ret = -ENXIO;
-> -		goto out;
-> +	if (!info->vctrl.start) {
-> +		kvm_err("GICH not present in the firmware table\n");
-> +		return -ENXIO;
->  	}
->  
-> -	ret = of_address_to_resource(vgic_node, 2, &vctrl_res);
-> -	if (ret) {
-> -		kvm_err("Cannot obtain GICH resource\n");
-> -		goto out;
-> +	if (!PAGE_ALIGNED(info->vcpu.start)) {
-> +		kvm_err("GICV physical address 0x%llx not page aligned\n",
-> +			(unsigned long long)info->vcpu.start);
-> +		return -ENXIO;
+> +/* CREATION */
+> +
+> +/**
+> + * kvm_vgic_create: triggered by the instantiation of the VGIC device by
+> + * user space, either through the legacy ARM specific VM IOCTL (CREATE_IRQCHIP)
+
+nit: is KVM_CREATE_IRQCHIP ARM specific or are we talking about the ARM
+implementation of a generic ioctl?
+
+> + * or through the generic VM IOCTL, KVM_CREATE_DEVICE API.
+> + * Completion can be tested by irqchip_in_kernel
+
+s/Completion can be tested by irqchip_in_kernel/
+  irqchip_in_kernel() tells you if this function succeeded or not/
+
+> + */
+> +int kvm_vgic_create(struct kvm *kvm, u32 type)
+> +{
+> +	int i, vcpu_lock_idx = -1, ret;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	if (irqchip_in_kernel(kvm)) {
+> +		ret = -EEXIST;
+> +		goto out;
 > +	}
 > +
-> +	if (!PAGE_ALIGNED(resource_size(&info->vcpu))) {
-> +		kvm_err("GICV size 0x%llx not a multiple of page size 0x%lx\n",
-> +			(unsigned long long)resource_size(&info->vcpu),
-> +			PAGE_SIZE);
-> +		return -ENXIO;
->  	}
->  
-> -	kvm_vgic_global_state.vctrl_base = of_iomap(vgic_node, 2);
-> +	kvm_vgic_global_state.vctrl_base = ioremap(info->vctrl.start,
-> +						   resource_size(&info->vctrl));
->  	if (!kvm_vgic_global_state.vctrl_base) {
->  		kvm_err("Cannot ioremap GICH\n");
-> -		ret = -ENOMEM;
-> -		goto out;
-> +		return -ENOMEM;
->  	}
->  
->  	kvm_vgic_global_state.nr_lr =
->  		readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VTR);
-> -	kvm_vgic_global_state.nr_lr = (kvm_vgic_global_state.nr_lr & 0x3f) + 1;
-> +	kvm_vgic_global_state.nr_lr &= 0x3f;
-> +	kvm_vgic_global_state.nr_lr += 1;
->  
->  	ret = create_hyp_io_mappings(kvm_vgic_global_state.vctrl_base,
->  				     kvm_vgic_global_state.vctrl_base +
-> -					 resource_size(&vctrl_res),
-> -				     vctrl_res.start);
-> +					 resource_size(&info->vctrl),
-> +				     info->vctrl.start);
->  	if (ret) {
->  		kvm_err("Cannot map VCTRL into hyp\n");
-> -		goto out_unmap;
-> -	}
-> -
-> -	if (of_address_to_resource(vgic_node, 3, &vcpu_res)) {
-> -		kvm_err("Cannot obtain GICV resource\n");
-> -		ret = -ENXIO;
-> -		goto out_unmap;
-> -	}
-> -
-> -	if (!PAGE_ALIGNED(vcpu_res.start)) {
-> -		kvm_err("GICV physical address 0x%llx not page aligned\n",
-> -			(unsigned long long)vcpu_res.start);
-> -		ret = -ENXIO;
-> -		goto out_unmap;
-> -	}
-> -
-> -	if (!PAGE_ALIGNED(resource_size(&vcpu_res))) {
-> -		kvm_err("GICV size 0x%llx not a multiple of page size 0x%lx\n",
-> -			(unsigned long long)resource_size(&vcpu_res),
-> -			PAGE_SIZE);
-> -		ret = -ENXIO;
-> -		goto out_unmap;
-> +		iounmap(kvm_vgic_global_state.vctrl_base);
-> +		return ret;
->  	}
->  
->  	kvm_vgic_global_state.can_emulate_gicv2 = true;
->  	kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
->  
-> -	kvm_vgic_global_state.vcpu_base = vcpu_res.start;
-> -
-> -	kvm_info("%s@%llx IRQ%d\n", vgic_node->name,
-> -		 vctrl_res.start, kvm_vgic_global_state.maint_irq);
-> -
-> +	kvm_vgic_global_state.vcpu_base = info->vcpu.start;
->  	kvm_vgic_global_state.type = VGIC_V2;
->  	kvm_vgic_global_state.max_gic_vcpus = VGIC_V2_MAX_CPUS;
-> -	goto out;
->  
-> -out_unmap:
-> -	iounmap(kvm_vgic_global_state.vctrl_base);
-> -out:
-> -	of_node_put(vgic_node);
-> -	return ret;
-> +	kvm_info("vgic-v2@%llx\n", info->vctrl.start);
+> +	/*
+> +	 * This function is also called by the KVM_CREATE_IRQCHIP handler,
+> +	 * which had no chance yet to check the availability of the GICv2
+> +	 * emulation. So check this here again. KVM_CREATE_DEVICE does
+> +	 * the proper checks already.
+> +	 */
+> +	if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
+> +		!kvm_vgic_global_state.can_emulate_gicv2) {
+> +		ret = -ENODEV;
+> +		goto out;
+> +	}
 > +
-> +	return 0;
->  }
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 6d7422f..6073f5d 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -16,9 +16,6 @@
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
->  #include <kvm/arm_vgic.h>
-> -#include <linux/of.h>
-> -#include <linux/of_address.h>
-> -#include <linux/of_irq.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/kvm_asm.h>
->  
-> @@ -271,21 +268,9 @@ out:
->   *
->   * Returns 0 if a GICv3 has been found, returns an error code otherwise
->   */
-> -int vgic_v3_probe(struct device_node *vgic_node)
-> +int vgic_v3_probe(const struct gic_kvm_info *info)
->  {
-> -	u32 ich_vtr_el2;
-> -	u32 gicv_idx;
-> -	int ret = 0;
-> -	struct resource vcpu_res;
-> -
-> -	kvm_vgic_global_state.maint_irq = irq_of_parse_and_map(vgic_node, 0);
-> -	if (!kvm_vgic_global_state.maint_irq) {
-> -		kvm_err("error getting vgic maintenance irq from DT\n");
-> -		ret = -ENXIO;
-> -		goto out;
-> -	}
-> -
-> -	ich_vtr_el2 = kvm_call_hyp(__vgic_v3_get_ich_vtr_el2);
-> +	u32 ich_vtr_el2 = kvm_call_hyp(__vgic_v3_get_ich_vtr_el2);
->  
->  	/*
->  	 * The ListRegs field is 5 bits, but there is a architectural
-> @@ -294,27 +279,23 @@ int vgic_v3_probe(struct device_node *vgic_node)
->  	kvm_vgic_global_state.nr_lr = (ich_vtr_el2 & 0xf) + 1;
->  	kvm_vgic_global_state.can_emulate_gicv2 = false;
->  
-> -	if (of_property_read_u32(vgic_node, "#redistributor-regions",
-> -				 &gicv_idx))
-> -		gicv_idx = 1;
-> -
-> -	gicv_idx += 3; /* Also skip GICD, GICC, GICH */
-> -	if (of_address_to_resource(vgic_node, gicv_idx, &vcpu_res)) {
-> +	if (!info->vcpu.start) {
->  		kvm_info("GICv3: no GICV resource entry\n");
->  		kvm_vgic_global_state.vcpu_base = 0;
-> -	} else if (!PAGE_ALIGNED(vcpu_res.start)) {
-> +	} else if (!PAGE_ALIGNED(info->vcpu.start)) {
->  		pr_warn("GICV physical address 0x%llx not page aligned\n",
-> -			(unsigned long long)vcpu_res.start);
-> +			(unsigned long long)info->vcpu.start);
->  		kvm_vgic_global_state.vcpu_base = 0;
-> -	} else if (!PAGE_ALIGNED(resource_size(&vcpu_res))) {
-> +	} else if (!PAGE_ALIGNED(resource_size(&info->vcpu))) {
->  		pr_warn("GICV size 0x%llx not a multiple of page size 0x%lx\n",
-> -			(unsigned long long)resource_size(&vcpu_res),
-> +			(unsigned long long)resource_size(&info->vcpu),
->  			PAGE_SIZE);
->  		kvm_vgic_global_state.vcpu_base = 0;
->  	} else {
-> -		kvm_vgic_global_state.vcpu_base = vcpu_res.start;
-> +		kvm_vgic_global_state.vcpu_base = info->vcpu.start;
->  		kvm_vgic_global_state.can_emulate_gicv2 = true;
->  		kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
-> +		kvm_info("vgic-v2@%llx\n", info->vcpu.start);
->  	}
->  	if (kvm_vgic_global_state.vcpu_base == 0)
->  		kvm_info("disabling GICv2 emulation\n");
-> @@ -324,10 +305,5 @@ int vgic_v3_probe(struct device_node *vgic_node)
->  	kvm_vgic_global_state.type = VGIC_V3;
->  	kvm_vgic_global_state.max_gic_vcpus = VGIC_V3_MAX_CPUS;
->  
-> -	kvm_info("%s@%llx IRQ%d\n", vgic_node->name,
-> -		 vcpu_res.start, kvm_vgic_global_state.maint_irq);
-> -
-> -out:
-> -	of_node_put(vgic_node);
-> -	return ret;
-> +	return 0;
->  }
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 5c7dc99..83d3c48 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -16,6 +16,8 @@
->  #ifndef __KVM_ARM_VGIC_NEW_H__
->  #define __KVM_ARM_VGIC_NEW_H__
->  
-> +#include <linux/irqchip/arm-gic-common.h>
+> +	/*
+> +	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
+> +	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
+> +	 * that no other VCPUs are run while we create the vgic.
+> +	 */
+> +	ret = -EBUSY;
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (!mutex_trylock(&vcpu->mutex))
+> +			goto out_unlock;
+> +		vcpu_lock_idx = i;
+> +	}
 > +
->  #define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
->  #define IMPLEMENTER_ARM		0x43b
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (vcpu->arch.has_run_once)
+> +			goto out_unlock;
+> +	}
+> +	ret = 0;
+> +
+> +	if (type == KVM_DEV_TYPE_ARM_VGIC_V2)
+> +		kvm->arch.max_vcpus = VGIC_V2_MAX_CPUS;
+> +	else
+> +		kvm->arch.max_vcpus = VGIC_V3_MAX_CPUS;
+> +
+> +	if (atomic_read(&kvm->online_vcpus) > kvm->arch.max_vcpus) {
+> +		ret = -E2BIG;
+> +		goto out_unlock;
+> +	}
+> +
+> +	kvm->arch.vgic.in_kernel = true;
+> +	kvm->arch.vgic.vgic_model = type;
+> +
+> +	/*
+> +	 * kvm_vgic_global_state.vctrl_base is set on vgic probe (kvm_arch_init)
+> +	 * it is stored in distributor struct for asm save/restore purpose
+
+we don't have any assembly code anymore, so could we simply export the
+global state to __hyp code?
+
+> +	 */
+> +	kvm->arch.vgic.vctrl_base = kvm_vgic_global_state.vctrl_base;
+> +
+> +	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+> +	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+> +	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
+> +
+> +out_unlock:
+> +	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+> +		vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
+> +		mutex_unlock(&vcpu->mutex);
+> +	}
+> +
+> +out:
+> +	mutex_unlock(&kvm->lock);
+> +	return ret;
+> +}
+> +
+>  /* GENERIC PROBE */
 >  
-> @@ -44,7 +46,7 @@ int vgic_v2_cpuif_uaccess(struct kvm_vcpu *vcpu, bool is_write,
->  void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v2_enable(struct kvm_vcpu *vcpu);
-> -int vgic_v2_probe(struct device_node *vgic_node);
-> +int vgic_v2_probe(const struct gic_kvm_info *info);
->  int vgic_v2_map_resources(struct kvm *kvm);
->  int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
->  			     enum vgic_type);
-> @@ -58,7 +60,7 @@ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
->  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v3_enable(struct kvm_vcpu *vcpu);
-> -int vgic_v3_probe(struct device_node *vgic_node);
-> +int vgic_v3_probe(const struct gic_kvm_info *info);
->  int vgic_v3_map_resources(struct kvm *kvm);
->  int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
->  #else
-> @@ -97,7 +99,7 @@ static inline void vgic_v3_enable(struct kvm_vcpu *vcpu)
->  {
->  }
->  
-> -static inline int vgic_v3_probe(struct device_node *vgic_node)
-> +static inline int vgic_v3_probe(const struct gic_kvm_info *info)
->  {
->  	return -ENODEV;
->  }
+>  static void vgic_init_maintenance_interrupt(void *info)
 > -- 
-> 2.1.4
+> 2.7.3
 > 
