@@ -1,25 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2] KVM: arm/arm64: vgic-new: Switch to
- firmware-independent probing
-Date: Fri, 13 May 2016 09:02:24 +0100
-Message-ID: <57358A10.8070404@arm.com>
-References: <1462869983-5410-1-git-send-email-marc.zyngier@arm.com>
- <20160512190216.GO27623@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 38/55] KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM
+ device ops registration
+Date: Fri, 13 May 2016 12:11:47 +0200
+Message-ID: <20160513101147.GA16274@cbox>
+References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
+ <1462531568-9799-39-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D563F407AD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2016 03:59:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AEFC49B3F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2016 06:08:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NwEUhLsjU6V8 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 May 2016 03:59:24 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD04A4053F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2016 03:59:24 -0400 (EDT)
-In-Reply-To: <20160512190216.GO27623@cbox>
+ with ESMTP id J6Gv1yNAi--k for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 May 2016 06:08:07 -0400 (EDT)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15CC449B37
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2016 06:08:06 -0400 (EDT)
+Received: by mail-wm0-f45.google.com with SMTP id g17so21744004wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2016 03:11:09 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1462531568-9799-39-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,27 +32,19 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/05/16 20:02, Christoffer Dall wrote:
-> On Tue, May 10, 2016 at 09:46:23AM +0100, Marc Zyngier wrote:
->> As we did for the legacy code, switch the new VGIC implementation
->> the firmware-independent probing, giving us ACPI support for free.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+On Fri, May 06, 2016 at 11:45:51AM +0100, Andre Przywara wrote:
+> From: Eric Auger <eric.auger@linaro.org>
 > 
-> So just remembered you wrote this after sending my comments to patch 48.
+> This patch introduces the skeleton for the KVM device operations
+> associated to KVM_DEV_TYPE_ARM_VGIC_V2 and KVM_DEV_TYPE_ARM_VGIC_V3.
 > 
-> Are we planning to squash this into the series so I can review in
-> completeness/with context, or?
+> At that stage kvm_vgic_create is stubbed.
+> 
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 
-This should indeed be squashed in the existing series, no need for an
-intermediate step.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
