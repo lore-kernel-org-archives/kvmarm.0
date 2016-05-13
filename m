@@ -1,130 +1,109 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] fixup! vgic-new: make vgic_register_redist_iodevs more
- readable
-Date: Thu, 12 May 2016 21:44:09 +0200
-Message-ID: <20160512194409.GW27623@cbox>
-References: <1463057068-2291-1-git-send-email-andre.przywara@arm.com>
+Subject: Re: [PATCH v3 45/55] KVM: arm/arm64: vgic-new: Add userland access
+ to VGIC dist registers
+Date: Fri, 13 May 2016 09:51:32 +0200
+Message-ID: <20160513075132.GE27623@cbox>
+References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
+ <1462531568-9799-46-git-send-email-andre.przywara@arm.com>
+ <20160512184110.GK27623@cbox>
+ <5734D51D.3000105@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDCF949B3F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2016 15:40:32 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gmewD+sGaprT for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 May 2016 15:40:32 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7D1749B37
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2016 15:40:31 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id e201so271587520wme.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2016 12:43:32 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1463057068-2291-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <5734D51D.3000105@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 12, 2016 at 01:44:28PM +0100, Andre Przywara wrote:
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 42 ++++++++++++++++++++--------------------
->  1 file changed, 21 insertions(+), 21 deletions(-)
+On Thu, May 12, 2016 at 08:10:21PM +0100, Andre Przywara wrote:
+> Hi,
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index 97995e2..1985d56 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -318,7 +318,7 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
->  {
->  	int nr_vcpus = atomic_read(&kvm->online_vcpus);
->  	struct kvm_vcpu *vcpu;
-> -	struct vgic_io_device *devices, *device;
-> +	struct vgic_io_device *devices;
->  	int c, ret = 0;
->  
->  	devices = kmalloc(sizeof(struct vgic_io_device) * nr_vcpus * 2,
-> @@ -326,45 +326,45 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
->  	if (!devices)
->  		return -ENOMEM;
->  
-> -	device = devices;
->  	kvm_for_each_vcpu(c, vcpu, kvm) {
-> -		kvm_iodevice_init(&device->dev, &kvm_io_gic_ops);
-> -		device->base_addr = redist_base_address;
-> -		device->regions = vgic_v3_rdbase_registers;
-> -		device->nr_regions = ARRAY_SIZE(vgic_v3_rdbase_registers);
-> -		device->redist_vcpu = vcpu;
-> +		gpa_t rd_base = redist_base_address + c * SZ_64K * 2;
-> +		gpa_t sgi_base = rd_base + SZ_64K;
-> +		struct vgic_io_device *rd_dev = &devices[c * 2];
-> +		struct vgic_io_device *sgi_dev = &devices[c * 2 + 1];
-> +
-> +		kvm_iodevice_init(&rd_dev->dev, &kvm_io_gic_ops);
-> +		rd_dev->base_addr = rd_base;
-> +		rd_dev->regions = vgic_v3_rdbase_registers;
-> +		rd_dev->nr_regions = ARRAY_SIZE(vgic_v3_rdbase_registers);
-> +		rd_dev->redist_vcpu = vcpu;
->  
->  		mutex_lock(&kvm->slots_lock);
-> -		ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS,
-> -					      redist_base_address,
-> -					      SZ_64K, &device->dev);
-> +		ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, rd_base,
-> +					      SZ_64K, &rd_dev->dev);
->  		mutex_unlock(&kvm->slots_lock);
->  
->  		if (ret)
->  			break;
->  
-> -		device++;
-> -		kvm_iodevice_init(&device->dev, &kvm_io_gic_ops);
-> -		device->base_addr = redist_base_address + SZ_64K;
-> -		device->regions = vgic_v3_sgibase_registers;
-> -		device->nr_regions = ARRAY_SIZE(vgic_v3_sgibase_registers);
-> -		device->redist_vcpu = vcpu;
-> +		kvm_iodevice_init(&sgi_dev->dev, &kvm_io_gic_ops);
-> +		sgi_dev->base_addr = sgi_base;
-> +		sgi_dev->regions = vgic_v3_sgibase_registers;
-> +		sgi_dev->nr_regions = ARRAY_SIZE(vgic_v3_sgibase_registers);
-> +		sgi_dev->redist_vcpu = vcpu;
->  
->  		mutex_lock(&kvm->slots_lock);
-> -		ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS,
-> -					      redist_base_address + SZ_64K,
-> -					      SZ_64K, &device->dev);
-> +		ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, sgi_base,
-> +					      SZ_64K, &sgi_dev->dev);
->  		mutex_unlock(&kvm->slots_lock);
->  		if (ret) {
->  			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
->  						  &devices[c * 2].dev);
->  			break;
->  		}
-> -		device++;
-> -		redist_base_address += 2 * SZ_64K;
->  	}
->  
->  	if (ret) {
-> +		/* The current c failed, so we start with the previous one. */
->  		for (c--; c >= 0; c--) {
->  			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
->  						  &devices[c * 2].dev);
-> -- 
-> 2.8.2
+> On 12/05/16 19:41, Christoffer Dall wrote:
+> > On Fri, May 06, 2016 at 11:45:58AM +0100, Andre Przywara wrote:
+> >> Userland may want to save and restore the state of the in-kernel VGIC,
+> >> so we provide the code which takes a userland request and translate
+> >> that into calls to our MMIO framework.
+> >>
+> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> >> ---
+> >>  virt/kvm/arm/vgic/vgic-kvm-device.c | 50 ++++++++++++++++++++++++++++++++++++-
+> >>  1 file changed, 49 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> >> index c952f6f..bb33af8 100644
+> >> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> >> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> >> @@ -264,7 +264,55 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+> > 
+> > come to think of it, this is GICv2 specific right?
+> > 
+> > why don't we call it vgic_v2_attr_regs_access then?
+> > 
+> > and should it really live in this file?
+> 
+> Mmmh, at the moment every userland access is v2 specific, but
+> potentially this function should cover GICv3 as well, I think. We might
+> need some adjustments once this will be implemented, but in general I
+> don't see anything too v2 specific in here?
+
+
+the defines being used below are v2 specific and it's going to stay that
+way.  But ok, if you think it will be reworked to cater for both v2 and
+v3, fine.
+
+> 
+> >>  				 struct kvm_device_attr *attr,
+> >>  				 u32 *reg, bool is_write)
+> >>  {
+> >> -	return -ENXIO;
+> >> +	gpa_t addr;
+> >> +	int cpuid, ret, c;
+> >> +	struct kvm_vcpu *vcpu, *tmp_vcpu;
+> >> +
+> >> +	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
+> >> +		 KVM_DEV_ARM_VGIC_CPUID_SHIFT;
+> >> +	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
+> >> +	addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
+> >> +
+> >> +	mutex_lock(&dev->kvm->lock);
+> >> +
+> >> +	ret = vgic_init(dev->kvm);
+> >> +	if (ret)
+> >> +		goto out;
+> >> +
+> >> +	if (cpuid >= atomic_read(&dev->kvm->online_vcpus)) {
+> >> +		ret = -EINVAL;
+> >> +		goto out;
+> >> +	}
+> >> +
+> >> +	/*
+> >> +	 * Ensure that no other VCPU is running by checking the vcpu->cpu
+> >> +	 * field.  If no other VPCUs are running we can safely access the VGIC
+> >> +	 * state, because even if another VPU is run after this point, that
+> >> +	 * VCPU will not touch the vgic state, because it will block on
+> >> +	 * getting the vgic->lock in kvm_vgic_sync_hwstate().
+> >> +	 */
+> > 
+> > eh, I don't see us grabbing any vgic->lock (does that still exist?)
+> > here?
+> 
+> Yeah, that scared me the other day too.
+> In fact I think we cannot guarantee this requirement anymore with our
+> existing locks - but maybe we can pause the guest explicitly as we do
+> now for the clear-active handler?
 > 
 
-Thanks for this, also the comment on the error path !
+I think that should work, yes.
 
-Looks good,
+Even if you're doing a restore of the state before actually running your
+VCPUs, the make all requests wouldn't do anything and your VCPUs would
+block in the early part of the run loop.  They will call
+first_run_init() though, but I can't easily make that out to be a
+problem.
+
+An alternative is to do something similar to kvm_vgic_create(), perhaps
+factor out that logic, which grabs the mutexes of all vcpus.
+
 -Christoffer
