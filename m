@@ -1,118 +1,103 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 37/56] KVM: arm/arm64: vgic-new: Add GICv3 IROUTER register
- handlers
-Date: Mon, 16 May 2016 10:54:22 +0100
-Message-ID: <1463392481-26583-95-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 17/56] KVM: arm/arm64: vgic-new: Add IRQ sorting
+Date: Mon, 16 May 2016 10:54:02 +0100
+Message-ID: <1463392481-26583-75-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84CC949BAD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V6osG0xcmTst for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:53:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6276449C23
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:27 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since GICv3 supports much more than the 8 CPUs the GICv2 ITARGETSR
-register can handle, the new IROUTER register covers the whole range
-of possible target (V)CPUs by using the same MPIDR that the cores
-report themselves.
-In addition to translating this MPIDR into a vcpu pointer we store
-the originally written value as well. The architecture allows to
-write any values into the register, which must be read back as written.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Since we don't support affinity level 3, we don't need to take care
-about the upper word of this 64-bit register, which simplifies the
-handling a bit.
+Adds the sorting function to cover the case where you have more IRQs
+to consider than you have LRs. We now consider priorities.
 
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@linaro.org>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
-Changelog RFC..v1:
-- fold in and simplify vgic_v3_irq_change_affinity
+ virt/kvm/arm/vgic/vgic.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
-Changelog v1 .. v2:
-- adapt to new MMIO framework
-
-Changelog v3 .. v4:
-- move accessor width check into dispatcher
-- use IRQ number accessor macro
-
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index b893284..7b9340b 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -75,6 +75,41 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
- 	}
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 62fede6..1bc8f92 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -16,6 +16,7 @@
+ 
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
++#include <linux/list_sort.h>
+ 
+ #include "vgic.h"
+ 
+@@ -103,6 +104,62 @@ static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
  }
  
-+static unsigned long vgic_mmio_read_irouter(struct kvm_vcpu *vcpu,
-+					    gpa_t addr, unsigned int len)
+ /*
++ * The order of items in the ap_lists defines how we'll pack things in LRs as
++ * well, the first items in the list being the first things populated in the
++ * LRs.
++ *
++ * A hard rule is that active interrupts can never be pushed out of the LRs
++ * (and therefore take priority) since we cannot reliably trap on deactivation
++ * of IRQs and therefore they have to be present in the LRs.
++ *
++ * Otherwise things should be sorted by the priority field and the GIC
++ * hardware support will take care of preemption of priority groups etc.
++ *
++ * Return negative if "a" sorts before "b", 0 to preserve order, and positive
++ * to sort "b" before "a".
++ */
++static int vgic_irq_cmp(void *priv, struct list_head *a, struct list_head *b)
 +{
-+	int intid = VGIC_ADDR_TO_INTID(addr, 64);
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
++	struct vgic_irq *irqa = container_of(a, struct vgic_irq, ap_list);
++	struct vgic_irq *irqb = container_of(b, struct vgic_irq, ap_list);
++	bool penda, pendb;
++	int ret;
 +
-+	if (!irq)
-+		return 0;
++	spin_lock(&irqa->irq_lock);
++	spin_lock(&irqb->irq_lock);
 +
-+	return extract_bytes(READ_ONCE(irq->mpidr), addr & 7, len);
++	if (irqa->active || irqb->active) {
++		ret = (int)irqb->active - (int)irqa->active;
++		goto out;
++	}
++
++	penda = irqa->enabled && irqa->pending;
++	pendb = irqb->enabled && irqb->pending;
++
++	if (!penda || !pendb) {
++		ret = (int)pendb - (int)penda;
++		goto out;
++	}
++
++	/* Both pending and enabled, sort by priority */
++	ret = irqa->priority - irqb->priority;
++out:
++	spin_unlock(&irqb->irq_lock);
++	spin_unlock(&irqa->irq_lock);
++	return ret;
 +}
 +
-+static void vgic_mmio_write_irouter(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len,
-+				    unsigned long val)
++/* Must be called with the ap_list_lock held */
++static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
 +{
-+	int intid = VGIC_ADDR_TO_INTID(addr, 64);
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
 +
-+	if (!irq)
-+		return;
++	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
 +
-+	/* The upper word is WI for us since we don't implement Aff3. */
-+	if (addr & 4)
-+		return;
-+
-+	spin_lock(&irq->irq_lock);
-+
-+	/* We only care about and preserve Aff0, Aff1 and Aff2. */
-+	irq->mpidr = val & GENMASK(23, 0);
-+	irq->target_vcpu = kvm_mpidr_to_vcpu(vcpu->kvm, irq->mpidr);
-+
-+	spin_unlock(&irq->irq_lock);
++	list_sort(NULL, &vgic_cpu->ap_list_head, vgic_irq_cmp);
 +}
 +
- static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
- 					      gpa_t addr, unsigned int len)
- {
-@@ -170,7 +205,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 64,
-+		vgic_mmio_read_irouter, vgic_mmio_write_irouter, 64,
- 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
- 		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
++/*
+  * Only valid injection if changing level for level-triggered IRQs or for a
+  * rising edge.
+  */
 -- 
 2.8.2
+
