@@ -1,186 +1,158 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 05/56] KVM: arm/arm64: Remove the IRQ field from struct irq_phys_map
-Date: Mon, 16 May 2016 10:53:50 +0100
-Message-ID: <1463392481-26583-63-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 56/56] KVM: arm/arm64: vgic-new: enable build
+Date: Mon, 16 May 2016 10:53:44 +0100
+Message-ID: <1463392481-26583-57-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C68E49B5D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:33 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 7sFJvEXCQj1n for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2016 05:52:32 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6450B49B54
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:30 -0400 (EDT)
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+Now that the new VGIC implementation has reached feature parity with
+the old one, add the new files to the build system and add a Kconfig
+option to switch between the two versions.
+We set the default to the new version to get maximum test coverage,
+in case people experience problems they can switch back to the old
+behaviour if needed.
 
-The communication of a Linux IRQ number from outside the VGIC to the
-vgic was a leftover from the day when the vgic code cared about how a
-particular device injects virtual interrupts mapped to a physical
-interrupt.
-
-We can safely remove this notion, leaving all physical IRQ handling to
-be done in the device driver (the arch timer in this case), which makes
-room for a saner API for the new VGIC.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
 ---
 Changelog v1 .. v2:
-- update kerneldoc comments on kvm_vgic_map_phys_irq()
+- adjust the changed filenames in the Makefiles
+- add vgic-mmio-v2.c and vgic-mmio-v3.c to the Makefiles
 
-Changelog v2 .. v3:
-- include <linux/irq.h>
+ arch/arm/kvm/Kconfig          |  7 +++++++
+ arch/arm/kvm/Makefile         | 11 +++++++++++
+ arch/arm64/kvm/Kconfig        |  7 +++++++
+ arch/arm64/kvm/Makefile       | 12 ++++++++++++
+ virt/kvm/arm/hyp/vgic-v2-sr.c |  5 +++++
+ 5 files changed, 42 insertions(+)
 
- include/kvm/arm_vgic.h    |  3 +--
- virt/kvm/arm/arch_timer.c | 23 +++++++++++++++++++++--
- virt/kvm/arm/vgic.c       | 28 ++++++----------------------
- 3 files changed, 28 insertions(+), 26 deletions(-)
-
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index c7bb184..9ad7625 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -158,7 +158,6 @@ struct vgic_io_device {
- struct irq_phys_map {
- 	u32			virt_irq;
- 	u32			phys_irq;
--	u32			irq;
- };
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 95a0005..02abfff 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -46,6 +46,13 @@ config KVM_ARM_HOST
+ 	---help---
+ 	  Provides host support for ARM processors.
  
- struct irq_phys_map_entry {
-@@ -346,7 +345,7 @@ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
- void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
--					   int virt_irq, int irq);
-+					   int virt_irq, int phys_irq);
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
- bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
- 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 962b442..e45895a 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -20,6 +20,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/interrupt.h>
-+#include <linux/irq.h>
- 
- #include <clocksource/arm_arch_timer.h>
- #include <asm/arch_timer.h>
-@@ -300,7 +301,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	if (timer->active_cleared_last && !phys_active)
- 		return;
- 
--	ret = irq_set_irqchip_state(timer->map->irq,
-+	ret = irq_set_irqchip_state(host_vtimer_irq,
- 				    IRQCHIP_STATE_ACTIVE,
- 				    phys_active);
- 	WARN_ON(ret);
-@@ -333,6 +334,9 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct irq_phys_map *map;
-+	struct irq_desc *desc;
-+	struct irq_data *data;
-+	int phys_irq;
- 
- 	/*
- 	 * The vcpu timer irq number cannot be determined in
-@@ -352,10 +356,25 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 	kvm_timer_update_state(vcpu);
- 
- 	/*
-+	 * Find the physical IRQ number corresponding to the host_vtimer_irq
-+	 */
-+	desc = irq_to_desc(host_vtimer_irq);
-+	if (!desc) {
-+		kvm_err("%s: no interrupt descriptor\n", __func__);
-+		return -EINVAL;
-+	}
++config KVM_NEW_VGIC
++	bool "New VGIC implementation"
++	depends on KVM
++	default y
++	---help---
++	  uses the new VGIC implementation
 +
-+	data = irq_desc_get_irq_data(desc);
-+	while (data->parent_data)
-+		data = data->parent_data;
+ source drivers/vhost/Kconfig
+ 
+ endif # VIRTUALIZATION
+diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+index eb1bf43..a596b58 100644
+--- a/arch/arm/kvm/Makefile
++++ b/arch/arm/kvm/Makefile
+@@ -21,7 +21,18 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+ obj-y += kvm-arm.o init.o interrupts.o
+ obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
+ obj-y += coproc.o coproc_a15.o coproc_a7.o mmio.o psci.o perf.o
 +
-+	phys_irq = data->hwirq;
++ifeq ($(CONFIG_KVM_NEW_VGIC),y)
++obj-y += $(KVM)/arm/vgic/vgic.o
++obj-y += $(KVM)/arm/vgic/vgic-init.o
++obj-y += $(KVM)/arm/vgic/vgic-irqfd.o
++obj-y += $(KVM)/arm/vgic/vgic-v2.o
++obj-y += $(KVM)/arm/vgic/vgic-mmio.o
++obj-y += $(KVM)/arm/vgic/vgic-mmio-v2.o
++obj-y += $(KVM)/arm/vgic/vgic-kvm-device.o
++else
+ obj-y += $(KVM)/arm/vgic.o
+ obj-y += $(KVM)/arm/vgic-v2.o
+ obj-y += $(KVM)/arm/vgic-v2-emul.o
++endif
+ obj-y += $(KVM)/arm/arch_timer.o
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index aa2e34e..c4f26ef 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -54,6 +54,13 @@ config KVM_ARM_PMU
+ 	  Adds support for a virtual Performance Monitoring Unit (PMU) in
+ 	  virtual machines.
+ 
++config KVM_NEW_VGIC
++	bool "New VGIC implementation"
++	depends on KVM
++	default y
++        ---help---
++          uses the new VGIC implementation
 +
-+	/*
- 	 * Tell the VGIC that the virtual interrupt is tied to a
- 	 * physical interrupt. We do that once per VCPU.
- 	 */
--	map = kvm_vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq);
-+	map = kvm_vgic_map_phys_irq(vcpu, irq->irq, phys_irq);
- 	if (WARN_ON(IS_ERR(map)))
- 		return PTR_ERR(map);
+ source drivers/vhost/Kconfig
  
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 06abd59..a7e496a 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1711,38 +1711,24 @@ static struct list_head *vgic_get_irq_phys_map_list(struct kvm_vcpu *vcpu,
- /**
-  * kvm_vgic_map_phys_irq - map a virtual IRQ to a physical IRQ
-  * @vcpu: The VCPU pointer
-- * @virt_irq: The virtual irq number
-- * @irq: The Linux IRQ number
-+ * @virt_irq: The virtual IRQ number for the guest
-+ * @phys_irq: The hardware IRQ number of the host
-  *
-  * Establish a mapping between a guest visible irq (@virt_irq) and a
-- * Linux irq (@irq). On injection, @virt_irq will be associated with
-- * the physical interrupt represented by @irq. This mapping can be
-+ * hardware irq (@phys_irq). On injection, @virt_irq will be associated with
-+ * the physical interrupt represented by @phys_irq. This mapping can be
-  * established multiple times as long as the parameters are the same.
-  *
-  * Returns a valid pointer on success, and an error pointer otherwise
-  */
- struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
--					   int virt_irq, int irq)
-+					   int virt_irq, int phys_irq)
- {
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	struct list_head *root = vgic_get_irq_phys_map_list(vcpu, virt_irq);
- 	struct irq_phys_map *map;
- 	struct irq_phys_map_entry *entry;
--	struct irq_desc *desc;
--	struct irq_data *data;
--	int phys_irq;
+ endif # VIRTUALIZATION
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 122cff4..a7a958c 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -20,10 +20,22 @@ kvm-$(CONFIG_KVM_ARM_HOST) += emulate.o inject_fault.o regmap.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
  
--	desc = irq_to_desc(irq);
--	if (!desc) {
--		kvm_err("%s: no interrupt descriptor\n", __func__);
--		return ERR_PTR(-EINVAL);
--	}
--
--	data = irq_desc_get_irq_data(desc);
--	while (data->parent_data)
--		data = data->parent_data;
--
--	phys_irq = data->hwirq;
++ifeq ($(CONFIG_KVM_NEW_VGIC),y)
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-init.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-irqfd.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v2.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v3.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v2.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v3.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-kvm-device.o
++else
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2-emul.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3-emul.o
++endif
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+ kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index caac41f..a3f12b3 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -21,7 +21,12 @@
  
- 	/* Create a new mapping */
- 	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-@@ -1755,8 +1741,7 @@ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
- 	map = vgic_irq_map_search(vcpu, virt_irq);
- 	if (map) {
- 		/* Make sure this mapping matches */
--		if (map->phys_irq != phys_irq	||
--		    map->irq      != irq)
-+		if (map->phys_irq != phys_irq)
- 			map = ERR_PTR(-EINVAL);
+ #include <asm/kvm_hyp.h>
  
- 		/* Found an existing, valid mapping */
-@@ -1766,7 +1751,6 @@ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
- 	map           = &entry->map;
- 	map->virt_irq = virt_irq;
- 	map->phys_irq = phys_irq;
--	map->irq      = irq;
++#ifdef CONFIG_KVM_NEW_VGIC
++extern struct vgic_global kvm_vgic_global_state;
++#define vgic_v2_params kvm_vgic_global_state
++#else
+ extern struct vgic_params vgic_v2_params;
++#endif
  
- 	list_add_tail_rcu(&entry->entry, root);
- 
+ static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu,
+ 					    void __iomem *base)
 -- 
 2.8.2
-
