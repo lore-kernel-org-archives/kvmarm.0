@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 11/56] KVM: arm/arm64: pmu: abstract access to number of
- SPIs
-Date: Mon, 16 May 2016 10:52:59 +0100
-Message-ID: <1463392481-26583-12-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 29/56] KVM: arm/arm64: vgic-new: Add CONFIG registers
+ handlers
+Date: Mon, 16 May 2016 10:53:17 +0100
+Message-ID: <1463392481-26583-30-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BD4F49B1D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:51:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AD0C49B9D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:51:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IP333niUwzBZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:51:22 -0400 (EDT)
+ with ESMTP id 3Gm0xfLYoBQD for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2016 05:51:49 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EEE7410B5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:51:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7715F49AF5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:51:49 -0400 (EDT)
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,90 +32,112 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently the PMU uses a member of the struct vgic_dist directly,
-which not only breaks abstraction, but will fail with the new VGIC.
-Abstract this access in the VGIC header file and refactor the validity
-check in the PMU code.
+The config register handlers are shared between the v2 and v3
+emulation, so their implementation goes into vgic-mmio.c, to be
+easily referenced from the v3 emulation as well later.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
+Changelog v1 .. v2:
+- adapt to new MMIO framework
+
 Changelog v3 .. v4:
-- fix logic to allow PPIs again
-- refactor IRQ validity check
+- specify accessor width
+- use IRQ number accessor macro
+- replace extract_bytes() with simple return
 
- include/kvm/arm_vgic.h |  2 ++
- virt/kvm/arm/pmu.c     | 25 ++++++++++++++-----------
- 2 files changed, 16 insertions(+), 11 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v2.c |  2 +-
+ virt/kvm/arm/vgic/vgic-mmio.c    | 46 ++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.h    |  7 ++++++
+ 3 files changed, 54 insertions(+), 1 deletion(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 67a6637..ade7005 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -348,6 +348,8 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
- #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
- #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
- #define vgic_ready(k)		((k)->arch.vgic.ready)
-+#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
-+				 ((i) < (k)->arch.vgic.nr_irqs))
- 
- int vgic_v2_probe(const struct gic_kvm_info *gic_kvm_info,
- 		  const struct vgic_ops **ops,
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 575c7aa..a027569 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -436,7 +436,14 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
- 	return 0;
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index d564a30..bb7389e 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -96,7 +96,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
+ 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 2,
++		vgic_mmio_read_config, vgic_mmio_write_config, 2,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 5c8af05..5fe6896 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -277,6 +277,52 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
+ 	}
  }
  
--static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
-+#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
++unsigned long vgic_mmio_read_config(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 2);
++	u32 value = 0;
++	int i;
 +
-+/*
-+ * For one VM the interrupt type must be same for each vcpu.
-+ * As a PPI, the interrupt number is the same for all vcpus,
-+ * while as an SPI it must be a separate number per vcpu.
-+ */
-+static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
- {
- 	int i;
- 	struct kvm_vcpu *vcpu;
-@@ -445,7 +452,7 @@ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
- 		if (!kvm_arm_pmu_irq_initialized(vcpu))
- 			continue;
- 
--		if (is_ppi) {
-+		if (irq_is_ppi(irq)) {
- 			if (vcpu->arch.pmu.irq_num != irq)
- 				return false;
- 		} else {
-@@ -457,7 +464,6 @@ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
- 	return true;
- }
- 
--
- int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- {
- 	switch (attr->attr) {
-@@ -471,14 +477,11 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 		if (get_user(irq, uaddr))
- 			return -EFAULT;
- 
--		/*
--		 * The PMU overflow interrupt could be a PPI or SPI, but for one
--		 * VM the interrupt type must be same for each vcpu. As a PPI,
--		 * the interrupt number is the same for all vcpus, while as an
--		 * SPI it must be a separate number per vcpu.
--		 */
--		if (irq < VGIC_NR_SGIS || irq >= vcpu->kvm->arch.vgic.nr_irqs ||
--		    !irq_is_valid(vcpu->kvm, irq, irq < VGIC_NR_PRIVATE_IRQS))
-+		/* The PMU overflow interrupt can be a PPI or a valid SPI. */
-+		if (!(irq_is_ppi(irq) || vgic_valid_spi(vcpu->kvm, irq)))
-+			return -EINVAL;
++	for (i = 0; i < len * 4; i++) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
 +
-+		if (!pmu_irq_is_valid(vcpu->kvm, irq))
- 			return -EINVAL;
++		if (irq->config == VGIC_CONFIG_EDGE)
++			value |= (2U << (i * 2));
++	}
++
++	return value;
++}
++
++void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
++			    gpa_t addr, unsigned int len,
++			    unsigned long val)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 2);
++	int i;
++
++	for (i = 0; i < len * 4; i++) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++		if (intid + i < 16)
++			continue;
++
++		/*
++		 * The spec says that interrupts must be disabled before
++		 * changing the configuration to avoid UNDEFINED behaviour.
++		 */
++
++		spin_lock(&irq->irq_lock);
++		if (test_bit(i * 2 + 1, &val)) {
++			irq->config = VGIC_CONFIG_EDGE;
++		} else {
++			irq->config = VGIC_CONFIG_LEVEL;
++			irq->pending = irq->line_level | irq->soft_pending;
++		}
++		spin_unlock(&irq->irq_lock);
++	}
++}
++
+ static int match_region(const void *key, const void *elt)
+ {
+ 	const unsigned int offset = (unsigned long)key;
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 6983922..0bd0ece 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -124,6 +124,13 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
+ 			      gpa_t addr, unsigned int len,
+ 			      unsigned long val);
  
- 		if (kvm_arm_pmu_irq_initialized(vcpu))
++unsigned long vgic_mmio_read_config(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len);
++
++void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
++			    gpa_t addr, unsigned int len,
++			    unsigned long val);
++
+ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
+ 
+ #endif
 -- 
 2.8.2
