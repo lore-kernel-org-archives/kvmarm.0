@@ -1,145 +1,117 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 25/56] KVM: arm/arm64: vgic-new: Add ENABLE registers handlers
-Date: Mon, 16 May 2016 10:54:10 +0100
-Message-ID: <1463392481-26583-83-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 45/56] KVM: arm/arm64: vgic-new: Export register access
+ interface
+Date: Mon, 16 May 2016 10:54:30 +0100
+Message-ID: <1463392481-26583-103-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6758A49C38
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:39 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id JIe7ZFN-Fo5d for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2016 05:53:39 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4206349CA5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:39 -0400 (EDT)
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As the enable register handlers are shared between the v2 and v3
-emulation, their implementation goes into vgic-mmio.c, to be easily
-referenced from the v3 emulation as well later.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
+Userland can access the emulated GIC to save and restore its state
+for initialization or migration purposes.
+The kvm_io_bus API requires an absolute gpa, which does not fit the
+KVM_DEV_ARM_VGIC_GRP_DIST_REGS user API, that only provides relative
+offsets. So we provide a wrapper to plug into our MMIO framework and
+find the respective register handler.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
-Changelog RFC..v1:
-- use lower bits of address to determine IRQ number
-- remove TODO, confirmed to be fine
-
 Changelog v1 .. v2:
 - adapt to new MMIO framework
+- handle endianess explicitly
 
-Changelog v3 .. v4:
-- specify accessor width
-- use IRQ number accessor macro
-- replace extract_bytes() with simple return
+Changelog v2 .. v3:
+- wrap accessor function for easier reusage later
+- moved from earlier in the series
 
- virt/kvm/arm/vgic/vgic-mmio-v2.c |  4 +--
- virt/kvm/arm/vgic/vgic-mmio.c    | 56 ++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-mmio.h    | 11 ++++++++
- 3 files changed, 69 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 36 ++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h         |  2 ++
+ 2 files changed, 38 insertions(+)
 
 diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index d812c93..d5355b5 100644
+index 7189690..a255122 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -72,10 +72,10 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 		vgic_mmio_read_rao, vgic_mmio_write_wi, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
-+		vgic_mmio_read_enable, vgic_mmio_write_senable, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_CLEAR,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
-+		vgic_mmio_read_enable, vgic_mmio_write_cenable, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 1a97765..32ed8db 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -39,6 +39,62 @@ void vgic_mmio_write_wi(struct kvm_vcpu *vcpu, gpa_t addr,
- 	/* Ignore */
+@@ -296,3 +296,39 @@ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+ 
+ 	return -ENXIO;
  }
- 
++
 +/*
-+ * Read accesses to both GICD_ICENABLER and GICD_ISENABLER return the value
-+ * of the enabled bit, so there is only one function for both here.
++ * When userland tries to access the VGIC register handlers, we need to
++ * create a usable struct vgic_io_device to be passed to the handlers and we
++ * have to set up a buffer similar to what would have happened if a guest MMIO
++ * access occurred, including doing endian conversions on BE systems.
 + */
-+unsigned long vgic_mmio_read_enable(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len)
++static int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
++			bool is_write, int offset, u32 *val)
 +{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-+	u32 value = 0;
-+	int i;
++	unsigned int len = 4;
++	u8 buf[4];
++	int ret;
 +
-+	/* Loop over all IRQs affected by this read */
-+	for (i = 0; i < len * 8; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		if (irq->enabled)
-+			value |= (1U << i);
++	if (is_write) {
++		vgic_data_host_to_mmio_bus(buf, len, *val);
++		ret = kvm_io_gic_ops.write(vcpu, &dev->dev, offset, len, buf);
++	} else {
++		ret = kvm_io_gic_ops.read(vcpu, &dev->dev, offset, len, buf);
++		if (!ret)
++			*val = vgic_data_mmio_bus_to_host(buf, len);
 +	}
 +
-+	return value;
++	return ret;
 +}
 +
-+void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
-+			     gpa_t addr, unsigned int len,
-+			     unsigned long val)
++int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
++			 int offset, u32 *val)
 +{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-+	int i;
++	struct vgic_io_device dev = {
++		.regions = vgic_v2_dist_registers,
++		.nr_regions = ARRAY_SIZE(vgic_v2_dist_registers),
++	};
 +
-+	for_each_set_bit(i, &val, len * 8) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		spin_lock(&irq->irq_lock);
-+		irq->enabled = true;
-+		vgic_queue_irq_unlock(vcpu->kvm, irq);
-+	}
++	return vgic_uaccess(vcpu, &dev, is_write, offset, val);
 +}
-+
-+void vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
-+			     gpa_t addr, unsigned int len,
-+			     unsigned long val)
-+{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-+	int i;
-+
-+	for_each_set_bit(i, &val, len * 8) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		spin_lock(&irq->irq_lock);
-+
-+		irq->enabled = false;
-+
-+		spin_unlock(&irq->irq_lock);
-+	}
-+}
-+
- static int match_region(const void *key, const void *elt)
- {
- 	const unsigned int offset = (unsigned long)key;
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index 10404ac..66fd6fa 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -84,6 +84,17 @@ unsigned long vgic_mmio_read_rao(struct kvm_vcpu *vcpu,
- void vgic_mmio_write_wi(struct kvm_vcpu *vcpu, gpa_t addr,
- 			unsigned int len, unsigned long val);
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index a264c5f..f826026 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -38,6 +38,8 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
+ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
+ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
++int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
++			 int offset, u32 *val);
+ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
+ 			     enum vgic_type);
  
-+unsigned long vgic_mmio_read_enable(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len);
-+
-+void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
-+			     gpa_t addr, unsigned int len,
-+			     unsigned long val);
-+
-+void vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
-+			     gpa_t addr, unsigned int len,
-+			     unsigned long val);
-+
- unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
- 
- #endif
 -- 
 2.8.2
-
