@@ -1,23 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 46/56] KVM: arm/arm64: vgic-new: Add userland access to
- VGIC dist registers
-Date: Mon, 16 May 2016 10:54:31 +0100
-Message-ID: <1463392481-26583-104-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 53/56] KVM: arm/arm64: vgic-new: Add vgic_v2/v3_enable
+Date: Mon, 16 May 2016 10:54:38 +0100
+Message-ID: <1463392481-26583-111-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDE7949CAA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E7E949C41
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id snrul+HOwWsj for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:53:40 -0400 (EDT)
+ with ESMTP id G47JCFCW63C9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2016 05:53:51 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B97C149B56
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 35C3949C48
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:51 -0400 (EDT)
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,75 +31,78 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Userland may want to save and restore the state of the in-kernel VGIC,
-so we provide the code which takes a userland request and translate
-that into calls to our MMIO framework.
+From: Eric Auger <eric.auger@linaro.org>
 
+Enable the VGIC operation by properly initialising the registers
+in the hypervisor GIC interface.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-kvm-device.c | 50 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 49 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-v2.c | 11 ++++++++++-
+ virt/kvm/arm/vgic/vgic-v3.c | 23 ++++++++++++++++++++++-
+ 2 files changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 78621283..c3ec453 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -238,7 +238,55 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
- 				 struct kvm_device_attr *attr,
- 				 u32 *reg, bool is_write)
- {
--	return -ENXIO;
-+	gpa_t addr;
-+	int cpuid, ret, c;
-+	struct kvm_vcpu *vcpu, *tmp_vcpu;
-+
-+	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
-+		 KVM_DEV_ARM_VGIC_CPUID_SHIFT;
-+	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
-+	addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
-+
-+	mutex_lock(&dev->kvm->lock);
-+
-+	ret = vgic_init(dev->kvm);
-+	if (ret)
-+		goto out;
-+
-+	if (cpuid >= atomic_read(&dev->kvm->online_vcpus)) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	/*
-+	 * Ensure that no other VCPU is running by checking the vcpu->cpu
-+	 * field.  If no other VPCUs are running we can safely access the VGIC
-+	 * state, because even if another VPU is run after this point, that
-+	 * VCPU will not touch the vgic state, because it will block on
-+	 * getting the vgic->lock in kvm_vgic_sync_hwstate().
-+	 */
-+	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm) {
-+		if (unlikely(tmp_vcpu->cpu != -1)) {
-+			ret = -EBUSY;
-+			goto out;
-+		}
-+	}
-+
-+	switch (attr->group) {
-+	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
-+		ret = -EINVAL;
-+		break;
-+	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
-+		ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, reg);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+out:
-+	mutex_unlock(&dev->kvm->lock);
-+	return ret;
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 1fe031b..8ad42c2 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -206,9 +206,18 @@ void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ 			GICH_VMCR_PRIMASK_SHIFT;
  }
  
- /* V2 ops */
+-/* not yet implemented */
+ void vgic_v2_enable(struct kvm_vcpu *vcpu)
+ {
++	/*
++	 * By forcing VMCR to zero, the GIC will restore the binary
++	 * points to their reset values. Anything else resets to zero
++	 * anyway.
++	 */
++	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = 0;
++	vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr = ~0;
++
++	/* Get the show on the road... */
++	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
+ }
+ 
+ /* check for overlapping regions and for regions crossing the end of memory */
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 637ff2b..336a461 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -186,9 +186,30 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ 	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
+ }
+ 
+-/* not yet implemented */
+ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+ {
++	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
++
++	/*
++	 * By forcing VMCR to zero, the GIC will restore the binary
++	 * points to their reset values. Anything else resets to zero
++	 * anyway.
++	 */
++	vgic_v3->vgic_vmcr = 0;
++	vgic_v3->vgic_elrsr = ~0;
++
++	/*
++	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
++	 * way, so we force SRE to 1 to demonstrate this to the guest.
++	 * This goes with the spec allowing the value to be RAO/WI.
++	 */
++	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++		vgic_v3->vgic_sre = ICC_SRE_EL1_SRE;
++	else
++		vgic_v3->vgic_sre = 0;
++
++	/* Get the show on the road... */
++	vgic_v3->vgic_hcr = ICH_HCR_EN;
+ }
+ 
+ /* check for overlapping regions and for regions crossing the end of memory */
 -- 
 2.8.2
