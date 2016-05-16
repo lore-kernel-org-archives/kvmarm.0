@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 43/56] KVM: arm/arm64: vgic-new: vgic_kvm_device:
- KVM_DEV_ARM_VGIC_GRP_ADDR
-Date: Mon, 16 May 2016 10:54:28 +0100
-Message-ID: <1463392481-26583-101-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 29/56] KVM: arm/arm64: vgic-new: Add CONFIG registers
+ handlers
+Date: Mon, 16 May 2016 10:54:14 +0100
+Message-ID: <1463392481-26583-87-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7044749C37
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B4C4549C65
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IG21YuKqB0Hh for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:53:36 -0400 (EDT)
+ with ESMTP id eGEZdDYgX43u for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2016 05:53:15 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AD3C49C23
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E1A349C5E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:15 -0400 (EDT)
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,87 +32,112 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@linaro.org>
+The config register handlers are shared between the v2 and v3
+emulation, so their implementation goes into vgic-mmio.c, to be
+easily referenced from the v3 emulation as well later.
 
-This patch implements the KVM_DEV_ARM_VGIC_GRP_ADDR group which
-enables to set the base address of GIC regions as seen by the guest.
-
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-kvm-device.c | 38 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+Changelog v1 .. v2:
+- adapt to new MMIO framework
 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 082829a..a709097 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -112,6 +112,17 @@ static int vgic_set_common_attr(struct kvm_device *dev,
- 	int r;
+Changelog v3 .. v4:
+- specify accessor width
+- use IRQ number accessor macro
+- replace extract_bytes() with simple return
+
+ virt/kvm/arm/vgic/vgic-mmio-v2.c |  2 +-
+ virt/kvm/arm/vgic/vgic-mmio.c    | 46 ++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.h    |  7 ++++++
+ 3 files changed, 54 insertions(+), 1 deletion(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index d564a30..bb7389e 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -96,7 +96,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
+ 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 2,
++		vgic_mmio_read_config, vgic_mmio_write_config, 2,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 5c8af05..5fe6896 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -277,6 +277,52 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
+ 	}
+ }
  
- 	switch (attr->group) {
-+	case KVM_DEV_ARM_VGIC_GRP_ADDR: {
-+		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-+		u64 addr;
-+		unsigned long type = (unsigned long)attr->attr;
++unsigned long vgic_mmio_read_config(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 2);
++	u32 value = 0;
++	int i;
 +
-+		if (copy_from_user(&addr, uaddr, sizeof(addr)))
-+			return -EFAULT;
++	for (i = 0; i < len * 4; i++) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
 +
-+		r = kvm_vgic_addr(dev->kvm, type, &addr, true);
-+		return (r == -ENODEV) ? -ENXIO : r;
++		if (irq->config == VGIC_CONFIG_EDGE)
++			value |= (2U << (i * 2));
 +	}
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS: {
- 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
- 		u32 val;
-@@ -164,6 +175,19 @@ static int vgic_get_common_attr(struct kvm_device *dev,
- 	int r = -ENXIO;
- 
- 	switch (attr->group) {
-+	case KVM_DEV_ARM_VGIC_GRP_ADDR: {
-+		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-+		u64 addr;
-+		unsigned long type = (unsigned long)attr->attr;
 +
-+		r = kvm_vgic_addr(dev->kvm, type, &addr, false);
-+		if (r)
-+			return (r == -ENODEV) ? -ENXIO : r;
++	return value;
++}
 +
-+		if (copy_to_user(uaddr, &addr, sizeof(addr)))
-+			return -EFAULT;
-+		break;
++void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
++			    gpa_t addr, unsigned int len,
++			    unsigned long val)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 2);
++	int i;
++
++	for (i = 0; i < len * 4; i++) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++		if (intid + i < 16)
++			continue;
++
++		/*
++		 * The spec says that interrupts must be disabled before
++		 * changing the configuration to avoid UNDEFINED behaviour.
++		 */
++
++		spin_lock(&irq->irq_lock);
++		if (test_bit(i * 2 + 1, &val)) {
++			irq->config = VGIC_CONFIG_EDGE;
++		} else {
++			irq->config = VGIC_CONFIG_LEVEL;
++			irq->pending = irq->line_level | irq->soft_pending;
++		}
++		spin_unlock(&irq->irq_lock);
 +	}
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS: {
- 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++}
++
+ static int match_region(const void *key, const void *elt)
+ {
+ 	const unsigned int offset = (unsigned long)key;
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 6983922..0bd0ece 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -124,6 +124,13 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
+ 			      gpa_t addr, unsigned int len,
+ 			      unsigned long val);
  
-@@ -227,6 +251,13 @@ static int vgic_v2_has_attr(struct kvm_device *dev,
- 			    struct kvm_device_attr *attr)
- {
- 	switch (attr->group) {
-+	case KVM_DEV_ARM_VGIC_GRP_ADDR:
-+		switch (attr->attr) {
-+		case KVM_VGIC_V2_ADDR_TYPE_DIST:
-+		case KVM_VGIC_V2_ADDR_TYPE_CPU:
-+			return 0;
-+		}
-+		break;
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
- 		return 0;
- 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
-@@ -267,6 +298,13 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 			    struct kvm_device_attr *attr)
- {
- 	switch (attr->group) {
-+	case KVM_DEV_ARM_VGIC_GRP_ADDR:
-+		switch (attr->attr) {
-+		case KVM_VGIC_V3_ADDR_TYPE_DIST:
-+		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
-+			return 0;
-+		}
-+		break;
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
- 		return 0;
- 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
++unsigned long vgic_mmio_read_config(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len);
++
++void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
++			    gpa_t addr, unsigned int len,
++			    unsigned long val);
++
+ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
+ 
+ #endif
 -- 
 2.8.2
