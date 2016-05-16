@@ -1,127 +1,70 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 10/56] KVM: arm/arm64: Export mmio_read/write_bus
-Date: Mon, 16 May 2016 10:53:55 +0100
-Message-ID: <1463392481-26583-68-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 13/56] KVM: arm/arm64: move GICv2 emulation defines into arm-gic-v3.h
+Date: Mon, 16 May 2016 10:53:58 +0100
+Message-ID: <1463392481-26583-71-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01F7349B95
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:47 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TyJCWiY-Qm2C for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:52:46 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF61C49BA7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:46 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+As (some) GICv3 hosts can emulate a GICv2, some GICv2 specific masks
+for the list register definition also apply to GICv3 LRs.
+At the moment we have those definitions in the KVM VGICv3
+implementation, so let's move them into the GICv3 header file to
+have them automatically defined.
 
-Rename mmio_{read,write}_bus to kvm_mmio_{read,write}_bus and export
-them out of mmio.c.
-This will be needed later for the new VGIC implementation.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_mmio.h   |  3 +++
- arch/arm/kvm/mmio.c               | 10 +++++-----
- arch/arm64/include/asm/kvm_mmio.h |  3 +++
- 3 files changed, 11 insertions(+), 5 deletions(-)
+ include/linux/irqchip/arm-gic-v3.h | 5 +++++
+ virt/kvm/arm/vgic-v3.c             | 8 +-------
+ 2 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
-index d8e90c8..f3a7de7 100644
---- a/arch/arm/include/asm/kvm_mmio.h
-+++ b/arch/arm/include/asm/kvm_mmio.h
-@@ -28,6 +28,9 @@ struct kvm_decode {
- 	bool sign_extend;
- };
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index d5d798b..ec938d1 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -276,6 +276,11 @@
+ #define ICH_LR_PHYS_ID_SHIFT		32
+ #define ICH_LR_PHYS_ID_MASK		(0x3ffULL << ICH_LR_PHYS_ID_SHIFT)
  
-+void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
-+unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
++/* These are for GICv2 emulation only */
++#define GICH_LR_VIRTUALID		(0x3ffUL << 0)
++#define GICH_LR_PHYSID_CPUID_SHIFT	(10)
++#define GICH_LR_PHYSID_CPUID		(7UL << GICH_LR_PHYSID_CPUID_SHIFT)
 +
- int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
- int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		 phys_addr_t fault_ipa);
-diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index 0158e9e..10f80a6 100644
---- a/arch/arm/kvm/mmio.c
-+++ b/arch/arm/kvm/mmio.c
-@@ -23,7 +23,7 @@
+ #define ICH_MISR_EOI			(1 << 0)
+ #define ICH_MISR_U			(1 << 1)
  
- #include "trace.h"
+diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+index c02a1b1..75b02fa 100644
+--- a/virt/kvm/arm/vgic-v3.c
++++ b/virt/kvm/arm/vgic-v3.c
+@@ -29,12 +29,6 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_mmu.h>
  
--static void mmio_write_buf(char *buf, unsigned int len, unsigned long data)
-+void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data)
- {
- 	void *datap = NULL;
- 	union {
-@@ -55,7 +55,7 @@ static void mmio_write_buf(char *buf, unsigned int len, unsigned long data)
- 	memcpy(buf, datap, len);
- }
+-/* These are for GICv2 emulation only */
+-#define GICH_LR_VIRTUALID		(0x3ffUL << 0)
+-#define GICH_LR_PHYSID_CPUID_SHIFT	(10)
+-#define GICH_LR_PHYSID_CPUID		(7UL << GICH_LR_PHYSID_CPUID_SHIFT)
+-#define ICH_LR_VIRTUALID_MASK		(BIT_ULL(32) - 1)
+-
+ static u32 ich_vtr_el2;
  
--static unsigned long mmio_read_buf(char *buf, unsigned int len)
-+unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len)
- {
- 	unsigned long data = 0;
- 	union {
-@@ -66,7 +66,7 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
+ static struct vgic_lr vgic_v3_get_lr(const struct kvm_vcpu *vcpu, int lr)
+@@ -43,7 +37,7 @@ static struct vgic_lr vgic_v3_get_lr(const struct kvm_vcpu *vcpu, int lr)
+ 	u64 val = vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr];
  
- 	switch (len) {
- 	case 1:
--		data = buf[0];
-+		data = *(u8 *)buf;
- 		break;
- 	case 2:
- 		memcpy(&tmp.hword, buf, len);
-@@ -103,7 +103,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		if (len > sizeof(unsigned long))
- 			return -EINVAL;
+ 	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+-		lr_desc.irq = val & ICH_LR_VIRTUALID_MASK;
++		lr_desc.irq = val & ICH_LR_VIRTUAL_ID_MASK;
+ 	else
+ 		lr_desc.irq = val & GICH_LR_VIRTUALID;
  
--		data = mmio_read_buf(run->mmio.data, len);
-+		data = kvm_mmio_read_buf(run->mmio.data, len);
- 
- 		if (vcpu->arch.mmio_decode.sign_extend &&
- 		    len < sizeof(unsigned long)) {
-@@ -189,7 +189,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 					       len);
- 
- 		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, len, fault_ipa, data);
--		mmio_write_buf(data_buf, len, data);
-+		kvm_mmio_write_buf(data_buf, len, data);
- 
- 		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, fault_ipa, len,
- 				       data_buf);
-diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
-index fe612a9..75ea420 100644
---- a/arch/arm64/include/asm/kvm_mmio.h
-+++ b/arch/arm64/include/asm/kvm_mmio.h
-@@ -30,6 +30,9 @@ struct kvm_decode {
- 	bool sign_extend;
- };
- 
-+void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
-+unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
-+
- int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
- int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		 phys_addr_t fault_ipa);
 -- 
 2.8.2
+
