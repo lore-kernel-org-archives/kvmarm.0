@@ -1,82 +1,129 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 21/56] KVM: arm/arm64: vgic-new: Implement kvm_vgic_vcpu_pending_irq
-Date: Mon, 16 May 2016 10:54:06 +0100
-Message-ID: <1463392481-26583-79-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 15/56] KVM: arm/arm64: vgic-new: Add acccessor to new
+ struct vgic_irq instance
+Date: Mon, 16 May 2016 10:54:00 +0100
+Message-ID: <1463392481-26583-73-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B622249BBD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Pq2klD10j8ml for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2016 05:52:54 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8074949BE1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:54 -0400 (EDT)
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Tell KVM whether a particular VCPU has an IRQ that needs handling
-in the guest. This is used to decide whether a VCPU is runnable.
+The new VGIC implementation centers around a struct vgic_irq instance
+per virtual IRQ.
+Provide a function to retrieve the right instance for a given IRQ
+number and (in case of private interrupts) the right VCPU.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Eric Auger <eric.auger@linaro.org>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
-Changelog RFC..v1:
-- return false if distributor is disabled
-- add vgic_kick_vcpus() implementations
+ virt/kvm/arm/vgic/vgic.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h | 22 ++++++++++++++++++++++
+ 2 files changed, 63 insertions(+)
+ create mode 100644 virt/kvm/arm/vgic/vgic.c
+ create mode 100644 virt/kvm/arm/vgic/vgic.h
 
-Changelog v2 .. v3:
-- remove vgic_kick_vcpus() implementation from this patch
-
- include/kvm/vgic/vgic.h  |  2 ++
- virt/kvm/arm/vgic/vgic.c | 25 +++++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
-
-diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index 9506267..f663288 100644
---- a/include/kvm/vgic/vgic.h
-+++ b/include/kvm/vgic/vgic.h
-@@ -184,6 +184,8 @@ struct vgic_cpu {
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 			bool level);
- 
-+int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
-+
- #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
- #define vgic_initialized(k)	(false)
- #define vgic_ready(k)		((k)->arch.vgic.ready)
 diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index eca3cd0..bea8d3b 100644
---- a/virt/kvm/arm/vgic/vgic.c
+new file mode 100644
+index 0000000..fb45537
+--- /dev/null
 +++ b/virt/kvm/arm/vgic/vgic.c
-@@ -519,3 +519,28 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 	vgic_flush_lr_state(vcpu);
- 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
- }
+@@ -0,0 +1,41 @@
++/*
++ * Copyright (C) 2015, 2016 ARM Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
++
++#include "vgic.h"
++
++struct vgic_global __section(.hyp.text) kvm_vgic_global_state;
++
++struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
++			      u32 intid)
 +{
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_irq *irq;
-+	bool pending = false;
++	/* SGIs and PPIs */
++	if (intid <= VGIC_MAX_PRIVATE)
++		return &vcpu->arch.vgic_cpu.private_irqs[intid];
 +
-+	if (!vcpu->kvm->arch.vgic.enabled)
-+		return false;
++	/* SPIs */
++	if (intid <= VGIC_MAX_SPI)
++		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
 +
-+	spin_lock(&vgic_cpu->ap_list_lock);
++	/* LPIs are not yet covered */
++	if (intid >= VGIC_MIN_LPI)
++		return NULL;
 +
-+	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-+		spin_lock(&irq->irq_lock);
-+		pending = irq->pending && irq->enabled;
-+		spin_unlock(&irq->irq_lock);
-+
-+		if (pending)
-+			break;
-+	}
-+
-+	spin_unlock(&vgic_cpu->ap_list_lock);
-+
-+	return pending;
++	WARN(1, "Looking up struct vgic_irq for reserved INTID");
++	return NULL;
 +}
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+new file mode 100644
+index 0000000..61b8d22
+--- /dev/null
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -0,0 +1,22 @@
++/*
++ * Copyright (C) 2015, 2016 ARM Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef __KVM_ARM_VGIC_NEW_H__
++#define __KVM_ARM_VGIC_NEW_H__
++
++struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
++			      u32 intid);
++
++#endif
 -- 
 2.8.2
-
