@@ -1,7 +1,7 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 17/56] KVM: arm/arm64: vgic-new: Add IRQ sorting
-Date: Mon, 16 May 2016 10:54:02 +0100
-Message-ID: <1463392481-26583-75-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 11/56] KVM: arm/arm64: pmu: abstract access to number of SPIs
+Date: Mon, 16 May 2016 10:53:56 +0100
+Message-ID: <1463392481-26583-69-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
@@ -10,94 +10,91 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+Currently the PMU uses a member of the struct vgic_dist directly,
+which not only breaks abstraction, but will fail with the new VGIC.
+Abstract this access in the VGIC header file and refactor the validity
+check in the PMU code.
 
-Adds the sorting function to cover the case where you have more IRQs
-to consider than you have LRs. We now consider priorities.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+Changelog v3 .. v4:
+- fix logic to allow PPIs again
+- refactor IRQ validity check
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 62fede6..1bc8f92 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -16,6 +16,7 @@
+ include/kvm/arm_vgic.h |  2 ++
+ virt/kvm/arm/pmu.c     | 25 ++++++++++++++-----------
+ 2 files changed, 16 insertions(+), 11 deletions(-)
+
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 67a6637..ade7005 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -348,6 +348,8 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+ #define vgic_ready(k)		((k)->arch.vgic.ready)
++#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
++				 ((i) < (k)->arch.vgic.nr_irqs))
  
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
-+#include <linux/list_sort.h>
- 
- #include "vgic.h"
- 
-@@ -103,6 +104,62 @@ static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+ int vgic_v2_probe(const struct gic_kvm_info *gic_kvm_info,
+ 		  const struct vgic_ops **ops,
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 575c7aa..a027569 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -436,7 +436,14 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+ 	return 0;
  }
  
- /*
-+ * The order of items in the ap_lists defines how we'll pack things in LRs as
-+ * well, the first items in the list being the first things populated in the
-+ * LRs.
-+ *
-+ * A hard rule is that active interrupts can never be pushed out of the LRs
-+ * (and therefore take priority) since we cannot reliably trap on deactivation
-+ * of IRQs and therefore they have to be present in the LRs.
-+ *
-+ * Otherwise things should be sorted by the priority field and the GIC
-+ * hardware support will take care of preemption of priority groups etc.
-+ *
-+ * Return negative if "a" sorts before "b", 0 to preserve order, and positive
-+ * to sort "b" before "a".
-+ */
-+static int vgic_irq_cmp(void *priv, struct list_head *a, struct list_head *b)
-+{
-+	struct vgic_irq *irqa = container_of(a, struct vgic_irq, ap_list);
-+	struct vgic_irq *irqb = container_of(b, struct vgic_irq, ap_list);
-+	bool penda, pendb;
-+	int ret;
-+
-+	spin_lock(&irqa->irq_lock);
-+	spin_lock(&irqb->irq_lock);
-+
-+	if (irqa->active || irqb->active) {
-+		ret = (int)irqb->active - (int)irqa->active;
-+		goto out;
-+	}
-+
-+	penda = irqa->enabled && irqa->pending;
-+	pendb = irqb->enabled && irqb->pending;
-+
-+	if (!penda || !pendb) {
-+		ret = (int)pendb - (int)penda;
-+		goto out;
-+	}
-+
-+	/* Both pending and enabled, sort by priority */
-+	ret = irqa->priority - irqb->priority;
-+out:
-+	spin_unlock(&irqb->irq_lock);
-+	spin_unlock(&irqa->irq_lock);
-+	return ret;
-+}
-+
-+/* Must be called with the ap_list_lock held */
-+static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+
-+	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
-+
-+	list_sort(NULL, &vgic_cpu->ap_list_head, vgic_irq_cmp);
-+}
+-static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
++#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
 +
 +/*
-  * Only valid injection if changing level for level-triggered IRQs or for a
-  * rising edge.
-  */
++ * For one VM the interrupt type must be same for each vcpu.
++ * As a PPI, the interrupt number is the same for all vcpus,
++ * while as an SPI it must be a separate number per vcpu.
++ */
++static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+ {
+ 	int i;
+ 	struct kvm_vcpu *vcpu;
+@@ -445,7 +452,7 @@ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+ 		if (!kvm_arm_pmu_irq_initialized(vcpu))
+ 			continue;
+ 
+-		if (is_ppi) {
++		if (irq_is_ppi(irq)) {
+ 			if (vcpu->arch.pmu.irq_num != irq)
+ 				return false;
+ 		} else {
+@@ -457,7 +464,6 @@ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+ 	return true;
+ }
+ 
+-
+ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
+ 	switch (attr->attr) {
+@@ -471,14 +477,11 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		if (get_user(irq, uaddr))
+ 			return -EFAULT;
+ 
+-		/*
+-		 * The PMU overflow interrupt could be a PPI or SPI, but for one
+-		 * VM the interrupt type must be same for each vcpu. As a PPI,
+-		 * the interrupt number is the same for all vcpus, while as an
+-		 * SPI it must be a separate number per vcpu.
+-		 */
+-		if (irq < VGIC_NR_SGIS || irq >= vcpu->kvm->arch.vgic.nr_irqs ||
+-		    !irq_is_valid(vcpu->kvm, irq, irq < VGIC_NR_PRIVATE_IRQS))
++		/* The PMU overflow interrupt can be a PPI or a valid SPI. */
++		if (!(irq_is_ppi(irq) || vgic_valid_spi(vcpu->kvm, irq)))
++			return -EINVAL;
++
++		if (!pmu_irq_is_valid(vcpu->kvm, irq))
+ 			return -EINVAL;
+ 
+ 		if (kvm_arm_pmu_irq_initialized(vcpu))
 -- 
 2.8.2
 
