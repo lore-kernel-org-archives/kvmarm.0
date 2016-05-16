@@ -1,132 +1,121 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 34/56] KVM: arm/arm64: vgic-new: Add GICv3 CTLR, IIDR,
- TYPER handlers
-Date: Mon, 16 May 2016 10:54:19 +0100
-Message-ID: <1463392481-26583-92-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 12/56] KVM: arm/arm64: Provide functionality to pause and resume a guest
+Date: Mon, 16 May 2016 10:53:57 +0100
+Message-ID: <1463392481-26583-70-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 127B149B67
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:23 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lN7KFv4jRuN6 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:53:23 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1E9149C23
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:53:22 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As in the GICv2 emulation we handle those three registers in one
-function.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
+For some rare corner cases in our VGIC emulation later we have to stop
+the guest to make sure the VGIC state is consistent.
+Provide the necessary framework to pause and resume a guest.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
-Changelog RFC..v1:
-- kick VCPUs if distributor gets enabled
+ arch/arm/include/asm/kvm_host.h   |  4 ++++
+ arch/arm/kvm/arm.c                | 25 +++++++++++++------------
+ arch/arm64/include/asm/kvm_host.h |  4 ++++
+ 3 files changed, 21 insertions(+), 12 deletions(-)
 
-Changelog v1 .. v2:
-- rewrite write handler to use switch statement
-
-Changelog v3 .. v4:
-- specify accessor width
-
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 48 +++++++++++++++++++++++++++++++++++++++-
- virt/kvm/arm/vgic/vgic.h         |  1 +
- 2 files changed, 48 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 31f1a13..f11ef46 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -22,6 +22,52 @@
- #include "vgic.h"
- #include "vgic-mmio.h"
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 3850701..832be03 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -41,6 +41,8 @@
  
-+static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
-+					    gpa_t addr, unsigned int len)
-+{
-+	u32 value = 0;
+ #define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
+ 
++#define KVM_REQ_VCPU_EXIT	8
 +
-+	switch (addr & 0x0c) {
-+	case GICD_CTLR:
-+		if (vcpu->kvm->arch.vgic.enabled)
-+			value |= GICD_CTLR_ENABLE_SS_G1;
-+		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
-+		break;
-+	case GICD_TYPER:
-+		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-+		value = (value >> 5) - 1;
-+		value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
-+		break;
-+	case GICD_IIDR:
-+		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-+		break;
-+	default:
-+		return 0;
-+	}
-+
-+	return value;
+ u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+@@ -225,6 +227,8 @@ static inline void kvm_arch_mmu_notifier_invalidate_page(struct kvm *kvm,
+ 
+ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+ struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
++void kvm_arm_halt_guest(struct kvm *kvm);
++void kvm_arm_resume_guest(struct kvm *kvm);
+ 
+ int kvm_arm_copy_coproc_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+ unsigned long kvm_arm_num_coproc_regs(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index be4b639..3b4fd03 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -492,30 +492,31 @@ bool kvm_arch_intc_initialized(struct kvm *kvm)
+ 	return vgic_initialized(kvm);
+ }
+ 
+-static void kvm_arm_halt_guest(struct kvm *kvm) __maybe_unused;
+-static void kvm_arm_resume_guest(struct kvm *kvm) __maybe_unused;
+-
+-static void kvm_arm_halt_guest(struct kvm *kvm)
++void kvm_arm_halt_guest(struct kvm *kvm)
+ {
+ 	int i;
+ 	struct kvm_vcpu *vcpu;
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		vcpu->arch.pause = true;
+-	force_vm_exit(cpu_all_mask);
++	kvm_make_all_cpus_request(kvm, KVM_REQ_VCPU_EXIT);
 +}
 +
-+static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len,
-+				    unsigned long val)
++static void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
 +{
-+	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+	bool was_enabled = dist->enabled;
++	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
 +
-+	switch (addr & 0x0c) {
-+	case GICD_CTLR:
-+		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
++	vcpu->arch.pause = false;
++	swake_up(wq);
+ }
+ 
+-static void kvm_arm_resume_guest(struct kvm *kvm)
++void kvm_arm_resume_guest(struct kvm *kvm)
+ {
+ 	int i;
+ 	struct kvm_vcpu *vcpu;
+ 
+-	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
+-
+-		vcpu->arch.pause = false;
+-		swake_up(wq);
+-	}
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		kvm_arm_resume_vcpu(vcpu);
+ }
+ 
+ static void vcpu_sleep(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 4cd4196..fa94f91 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -44,6 +44,8 @@
+ 
+ #define KVM_VCPU_MAX_FEATURES 4
+ 
++#define KVM_REQ_VCPU_EXIT	8
 +
-+		if (!was_enabled && dist->enabled)
-+			vgic_kick_vcpus(vcpu->kvm);
-+		break;
-+	case GICD_TYPER:
-+	case GICD_IIDR:
-+		return;
-+	}
-+}
-+
- /*
-  * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
-  * redistributors, while SPIs are covered by registers in the distributor
-@@ -48,7 +94,7 @@
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+ int kvm_arch_dev_ioctl_check_extension(long ext);
+@@ -325,6 +327,8 @@ static inline void kvm_arch_mmu_notifier_invalidate_page(struct kvm *kvm,
  
- static const struct vgic_register_region vgic_v3_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GICD_CTLR,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
-+		vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc, 16,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR,
- 		vgic_mmio_read_rao, vgic_mmio_write_wi, 1,
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 6742b11..44c6a1b 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -19,6 +19,7 @@
- #define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
- #define IMPLEMENTER_ARM		0x43b
+ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+ struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
++void kvm_arm_halt_guest(struct kvm *kvm);
++void kvm_arm_resume_guest(struct kvm *kvm);
  
-+#define INTERRUPT_ID_BITS_SPIS	10
- #define VGIC_PRI_BITS		5
- 
- #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
+ u64 __kvm_call_hyp(void *hypfn, ...);
+ #define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__)
 -- 
 2.8.2
+
