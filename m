@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 27/56] KVM: arm/arm64: vgic-new: Add ACTIVE registers
+Subject: [PATCH v4 37/56] KVM: arm/arm64: vgic-new: Add GICv3 IROUTER register
  handlers
-Date: Mon, 16 May 2016 10:53:15 +0100
-Message-ID: <1463392481-26583-28-git-send-email-andre.przywara@arm.com>
+Date: Mon, 16 May 2016 10:53:25 +0100
+Message-ID: <1463392481-26583-38-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29A9249AF5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:51:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4770349B8D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CKZgcm6w9V87 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:51:47 -0400 (EDT)
+ with ESMTP id Imu+g1k4aCDZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2016 05:52:02 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DAAB49BB1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:51:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F304049B8A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:01 -0400 (EDT)
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,167 +32,87 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The active register handlers are shared between the v2 and v3
-emulation, so their implementation goes into vgic-mmio.c, to be
-easily referenced from the v3 emulation as well later.
-Since activation/deactivation of an interrupt may happen entirely
-in the guest without it ever exiting, we need some extra logic to
-properly track the active state.
-Putting it on an ap_list on activation is similar to the normal case
-handled by vgic_queue_irq_unlock(), but differs in some details that
-make a separate implementation worthwhile.
+Since GICv3 supports much more than the 8 CPUs the GICv2 ITARGETSR
+register can handle, the new IROUTER register covers the whole range
+of possible target (V)CPUs by using the same MPIDR that the cores
+report themselves.
+In addition to translating this MPIDR into a vcpu pointer we store
+the originally written value as well. The architecture allows to
+write any values into the register, which must be read back as written.
+
+Since we don't support affinity level 3, we don't need to take care
+about the upper word of this 64-bit register, which simplifies the
+handling a bit.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
 Changelog RFC..v1:
-- handling queueing in write handler
-- remove IRQ lock from read handler
+- fold in and simplify vgic_v3_irq_change_affinity
 
 Changelog v1 .. v2:
 - adapt to new MMIO framework
 
 Changelog v3 .. v4:
-- specify accessor width
+- move accessor width check into dispatcher
 - use IRQ number accessor macro
-- drop elaborate write_sactive handler and use new vgic_queue_irq_unlock()
-- properly emulate clear active by halting the guest (Christoffer)
-- replace extract_bytes() with simple return
 
- virt/kvm/arm/vgic/vgic-mmio-v2.c |  4 +-
- virt/kvm/arm/vgic/vgic-mmio.c    | 82 ++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-mmio.h    | 10 +++++
- 3 files changed, 94 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 37 ++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index c13a708..12e101b 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -84,10 +84,10 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 		vgic_mmio_read_pending, vgic_mmio_write_cpending, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
-+		vgic_mmio_read_active, vgic_mmio_write_sactive, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_CLEAR,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
-+		vgic_mmio_read_active, vgic_mmio_write_cactive, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index d8dc8f6..74d140e 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -155,6 +155,88 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index b893284..7b9340b 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -75,6 +75,41 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
  	}
  }
  
-+unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len)
++static unsigned long vgic_mmio_read_irouter(struct kvm_vcpu *vcpu,
++					    gpa_t addr, unsigned int len)
 +{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-+	u32 value = 0;
-+	int i;
++	int intid = VGIC_ADDR_TO_INTID(addr, 64);
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
 +
-+	/* Loop over all IRQs affected by this read */
-+	for (i = 0; i < len * 8; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++	if (!irq)
++		return 0;
 +
-+		if (irq->active)
-+			value |= (1U << i);
-+	}
-+
-+	return value;
++	return extract_bytes(READ_ONCE(irq->mpidr), addr & 7, len);
 +}
 +
-+void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
-+			     gpa_t addr, unsigned int len,
-+			     unsigned long val)
++static void vgic_mmio_write_irouter(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len,
++				    unsigned long val)
 +{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-+	int i;
++	int intid = VGIC_ADDR_TO_INTID(addr, 64);
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
 +
-+	kvm_arm_halt_guest(vcpu->kvm);
-+	for_each_set_bit(i, &val, len * 8) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++	if (!irq)
++		return;
 +
-+		spin_lock(&irq->irq_lock);
-+		/*
-+		 * If this virtual IRQ was written into a list register, we
-+		 * have to make sure the CPU that runs the VCPU thread has
-+		 * synced back LR state to the struct vgic_irq.  We can only
-+		 * know this for sure, when either this irq is not assigned to
-+		 * anyone's AP list anymore, or the VCPU thread is not
-+		 * running on any CPUs.
-+		 *
-+		 * In the opposite case, we know the VCPU thread may be on its
-+		 * way back from the guest and still has to sync back this
-+		 * IRQ, so we release and re-acquire the spin_lock to let the
-+		 * other thread sync back the IRQ.
-+		 */
-+		while (irq->vcpu && /* IRQ may have state in an LR somewhere */
-+		       irq->vcpu->cpu != -1) /* VCPU thread is running */
-+			cond_resched_lock(&irq->irq_lock);
++	/* The upper word is WI for us since we don't implement Aff3. */
++	if (addr & 4)
++		return;
 +
-+		irq->active = false;
-+		spin_unlock(&irq->irq_lock);
-+	}
-+	kvm_arm_resume_guest(vcpu->kvm);
++	spin_lock(&irq->irq_lock);
++
++	/* We only care about and preserve Aff0, Aff1 and Aff2. */
++	irq->mpidr = val & GENMASK(23, 0);
++	irq->target_vcpu = kvm_mpidr_to_vcpu(vcpu->kvm, irq->mpidr);
++
++	spin_unlock(&irq->irq_lock);
 +}
 +
-+void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
-+			     gpa_t addr, unsigned int len,
-+			     unsigned long val)
-+{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-+	int i;
-+
-+	for_each_set_bit(i, &val, len * 8) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		spin_lock(&irq->irq_lock);
-+
-+		/*
-+		 * If the IRQ was already active or it was on a VCPU before
-+		 * or there is no target VCPU assigned at the moment, then
-+		 * just proceed.
-+		 */
-+		if (irq->active || irq->vcpu || !irq->target_vcpu) {
-+			irq->active = true;
-+
-+			spin_unlock(&irq->irq_lock);
-+			continue;
-+		}
-+
-+		irq->active = true;
-+		vgic_queue_irq_unlock(vcpu->kvm, irq);
-+	}
-+}
-+
- static int match_region(const void *key, const void *elt)
+ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
+ 					      gpa_t addr, unsigned int len)
  {
- 	const unsigned int offset = (unsigned long)key;
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index 01db98a..dd96a71 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -106,6 +106,16 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val);
- 
-+unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len);
-+
-+void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
-+			     gpa_t addr, unsigned int len,
-+			     unsigned long val);
-+
-+void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
-+			     gpa_t addr, unsigned int len,
-+			     unsigned long val);
- 
- unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
- 
+@@ -170,7 +205,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 64,
++		vgic_mmio_read_irouter, vgic_mmio_write_irouter, 64,
+ 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
+ 		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
 -- 
 2.8.2
