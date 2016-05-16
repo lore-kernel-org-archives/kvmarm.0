@@ -1,129 +1,82 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 09/56] KVM: arm/arm64: Fix MMIO emulation data handling
-Date: Mon, 16 May 2016 10:53:54 +0100
-Message-ID: <1463392481-26583-67-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 21/56] KVM: arm/arm64: vgic-new: Implement kvm_vgic_vcpu_pending_irq
+Date: Mon, 16 May 2016 10:54:06 +0100
+Message-ID: <1463392481-26583-79-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BA0B49BB9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:46 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pCikt-y9SRl9 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:52:46 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FD2D49BF4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:45 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
 
-When the kernel was handling a guest MMIO read access internally, we
-need to copy the emulation result into the run->mmio structure in order
-for the kvm_handle_mmio_return() function to pick it up and inject the
-	result back into the guest.
+Tell KVM whether a particular VCPU has an IRQ that needs handling
+in the guest. This is used to decide whether a VCPU is runnable.
 
-Currently the only user of kvm_io_bus for ARM is the VGIC, which did
-this copying itself, so this was not causing issues so far.
-
-But with the upcoming new vgic implementation we need this done
-properly.
-
-Update the kvm_handle_mmio_return description and cleanup the code to
-only perform a single copying when needed.
-
-Code and commit message inspired by Andre Przywara.
-
-Reported-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/mmio.c | 14 +++++++-------
- virt/kvm/arm/vgic.c |  7 -------
- 2 files changed, 7 insertions(+), 14 deletions(-)
+Changelog RFC..v1:
+- return false if distributor is disabled
+- add vgic_kick_vcpus() implementations
 
-diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index 0f6600f..0158e9e 100644
---- a/arch/arm/kvm/mmio.c
-+++ b/arch/arm/kvm/mmio.c
-@@ -87,11 +87,10 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
+Changelog v2 .. v3:
+- remove vgic_kick_vcpus() implementation from this patch
+
+ include/kvm/vgic/vgic.h  |  2 ++
+ virt/kvm/arm/vgic/vgic.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
+
+diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+index 9506267..f663288 100644
+--- a/include/kvm/vgic/vgic.h
++++ b/include/kvm/vgic/vgic.h
+@@ -184,6 +184,8 @@ struct vgic_cpu {
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level);
  
- /**
-  * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
-+ *			     or in-kernel IO emulation
-+ *
-  * @vcpu: The VCPU pointer
-  * @run:  The VCPU run struct containing the mmio data
-- *
-- * This should only be called after returning from userspace for MMIO load
-- * emulation.
-  */
- int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
-@@ -206,18 +205,19 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	run->mmio.is_write	= is_write;
- 	run->mmio.phys_addr	= fault_ipa;
- 	run->mmio.len		= len;
--	if (is_write)
--		memcpy(run->mmio.data, data_buf, len);
- 
- 	if (!ret) {
- 		/* We handled the access successfully in the kernel. */
-+		if (!is_write)
-+			memcpy(run->mmio.data, data_buf, len);
- 		vcpu->stat.mmio_exit_kernel++;
- 		kvm_handle_mmio_return(vcpu, run);
- 		return 1;
--	} else {
--		vcpu->stat.mmio_exit_user++;
- 	}
- 
-+	if (is_write)
-+		memcpy(run->mmio.data, data_buf, len);
-+	vcpu->stat.mmio_exit_user++;
- 	run->exit_reason	= KVM_EXIT_MMIO;
- 	return 0;
++int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
++
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	(false)
+ #define vgic_ready(k)		((k)->arch.vgic.ready)
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index eca3cd0..bea8d3b 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -519,3 +519,28 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	vgic_flush_lr_state(vcpu);
+ 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
  }
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index f76bb64..c3bfbb9 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -819,7 +819,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	struct vgic_io_device *iodev = container_of(this,
- 						    struct vgic_io_device, dev);
--	struct kvm_run *run = vcpu->run;
- 	const struct vgic_io_range *range;
- 	struct kvm_exit_mmio mmio;
- 	bool updated_state;
-@@ -848,12 +847,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
- 		updated_state = false;
- 	}
- 	spin_unlock(&dist->lock);
--	run->mmio.is_write	= is_write;
--	run->mmio.len		= len;
--	run->mmio.phys_addr	= addr;
--	memcpy(run->mmio.data, val, len);
--
--	kvm_handle_mmio_return(vcpu, run);
- 
- 	if (updated_state)
- 		vgic_kick_vcpus(vcpu->kvm);
++
++int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
++{
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_irq *irq;
++	bool pending = false;
++
++	if (!vcpu->kvm->arch.vgic.enabled)
++		return false;
++
++	spin_lock(&vgic_cpu->ap_list_lock);
++
++	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
++		spin_lock(&irq->irq_lock);
++		pending = irq->pending && irq->enabled;
++		spin_unlock(&irq->irq_lock);
++
++		if (pending)
++			break;
++	}
++
++	spin_unlock(&vgic_cpu->ap_list_lock);
++
++	return pending;
++}
 -- 
 2.8.2
+
