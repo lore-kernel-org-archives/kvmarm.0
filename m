@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 45/56] KVM: arm/arm64: vgic-new: Export register access
- interface
-Date: Mon, 16 May 2016 10:53:33 +0100
-Message-ID: <1463392481-26583-46-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 50/56] KVM: arm/arm64: vgic-new: vgic_init: implement
+ vgic_create
+Date: Mon, 16 May 2016 10:53:38 +0100
+Message-ID: <1463392481-26583-51-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4762D49BA4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08FAE49B9D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E2xhiA5mzcAU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:52:14 -0400 (EDT)
+ with ESMTP id T6kslarTGS8A for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2016 05:52:22 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED1E149B76
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F69649BF5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:21 -0400 (EDT)
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,86 +32,127 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
 
-Userland can access the emulated GIC to save and restore its state
-for initialization or migration purposes.
-The kvm_io_bus API requires an absolute gpa, which does not fit the
-KVM_DEV_ARM_VGIC_GRP_DIST_REGS user API, that only provides relative
-offsets. So we provide a wrapper to plug into our MMIO framework and
-find the respective register handler.
+This patch implements the vgic_creation function which is
+called on CREATE_IRQCHIP VM IOCTL (v2 only) or KVM_CREATE_DEVICE
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
-Changelog v1 .. v2:
-- adapt to new MMIO framework
-- handle endianess explicitly
+Changelog v3 .. v4:
+- fix comment
 
-Changelog v2 .. v3:
-- wrap accessor function for easier reusage later
-- moved from earlier in the series
+ include/kvm/vgic/vgic.h       |  1 +
+ virt/kvm/arm/vgic/vgic-init.c | 84 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 85 insertions(+)
 
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 36 ++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h         |  2 ++
- 2 files changed, 38 insertions(+)
-
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 7189690..a255122 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -296,3 +296,39 @@ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+index 393489f..0634d89 100644
+--- a/include/kvm/vgic/vgic.h
++++ b/include/kvm/vgic/vgic.h
+@@ -195,6 +195,7 @@ struct vgic_cpu {
+ };
  
- 	return -ENXIO;
- }
+ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
++int kvm_vgic_create(struct kvm *kvm, u32 type);
+ int kvm_vgic_hyp_init(void);
+ 
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 4523beb..15d5428 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -22,6 +22,90 @@
+ #include <asm/kvm_mmu.h>
+ #include "vgic.h"
+ 
++/* CREATION */
 +
-+/*
-+ * When userland tries to access the VGIC register handlers, we need to
-+ * create a usable struct vgic_io_device to be passed to the handlers and we
-+ * have to set up a buffer similar to what would have happened if a guest MMIO
-+ * access occurred, including doing endian conversions on BE systems.
++/**
++ * kvm_vgic_create: triggered by the instantiation of the VGIC device by
++ * user space, either through the legacy KVM_CREATE_IRQCHIP ioctl (v2 only)
++ * or through the generic KVM_CREATE_DEVICE API ioctl.
++ * irqchip_in_kernel() tells you if this function succeeded or not.
 + */
-+static int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
-+			bool is_write, int offset, u32 *val)
++int kvm_vgic_create(struct kvm *kvm, u32 type)
 +{
-+	unsigned int len = 4;
-+	u8 buf[4];
-+	int ret;
++	int i, vcpu_lock_idx = -1, ret;
++	struct kvm_vcpu *vcpu;
 +
-+	if (is_write) {
-+		vgic_data_host_to_mmio_bus(buf, len, *val);
-+		ret = kvm_io_gic_ops.write(vcpu, &dev->dev, offset, len, buf);
-+	} else {
-+		ret = kvm_io_gic_ops.read(vcpu, &dev->dev, offset, len, buf);
-+		if (!ret)
-+			*val = vgic_data_mmio_bus_to_host(buf, len);
++	mutex_lock(&kvm->lock);
++
++	if (irqchip_in_kernel(kvm)) {
++		ret = -EEXIST;
++		goto out;
 +	}
 +
++	/*
++	 * This function is also called by the KVM_CREATE_IRQCHIP handler,
++	 * which had no chance yet to check the availability of the GICv2
++	 * emulation. So check this here again. KVM_CREATE_DEVICE does
++	 * the proper checks already.
++	 */
++	if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
++		!kvm_vgic_global_state.can_emulate_gicv2) {
++		ret = -ENODEV;
++		goto out;
++	}
++
++	/*
++	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
++	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
++	 * that no other VCPUs are run while we create the vgic.
++	 */
++	ret = -EBUSY;
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		if (!mutex_trylock(&vcpu->mutex))
++			goto out_unlock;
++		vcpu_lock_idx = i;
++	}
++
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		if (vcpu->arch.has_run_once)
++			goto out_unlock;
++	}
++	ret = 0;
++
++	if (type == KVM_DEV_TYPE_ARM_VGIC_V2)
++		kvm->arch.max_vcpus = VGIC_V2_MAX_CPUS;
++	else
++		kvm->arch.max_vcpus = VGIC_V3_MAX_CPUS;
++
++	if (atomic_read(&kvm->online_vcpus) > kvm->arch.max_vcpus) {
++		ret = -E2BIG;
++		goto out_unlock;
++	}
++
++	kvm->arch.vgic.in_kernel = true;
++	kvm->arch.vgic.vgic_model = type;
++
++	/*
++	 * kvm_vgic_global_state.vctrl_base is set on vgic probe (kvm_arch_init)
++	 * it is stored in distributor struct for asm save/restore purpose
++	 */
++	kvm->arch.vgic.vctrl_base = kvm_vgic_global_state.vctrl_base;
++
++	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
++	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
++	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
++
++out_unlock:
++	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
++		vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
++		mutex_unlock(&vcpu->mutex);
++	}
++
++out:
++	mutex_unlock(&kvm->lock);
 +	return ret;
 +}
 +
-+int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-+			 int offset, u32 *val)
-+{
-+	struct vgic_io_device dev = {
-+		.regions = vgic_v2_dist_registers,
-+		.nr_regions = ARRAY_SIZE(vgic_v2_dist_registers),
-+	};
-+
-+	return vgic_uaccess(vcpu, &dev, is_write, offset, val);
-+}
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index a264c5f..f826026 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -38,6 +38,8 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
- void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
- void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
- int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
-+int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-+			 int offset, u32 *val);
- int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
- 			     enum vgic_type);
+ /* GENERIC PROBE */
  
+ static void vgic_init_maintenance_interrupt(void *info)
 -- 
 2.8.2
