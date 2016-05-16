@@ -1,120 +1,85 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 30/56] KVM: arm/arm64: vgic-new: Add TARGET registers
- handlers
-Date: Mon, 16 May 2016 10:53:18 +0100
-Message-ID: <1463392481-26583-31-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 02/56] KVM: arm/arm64: vgic: avoid map in kvm_vgic_inject_mapped_irq()
+Date: Mon, 16 May 2016 10:53:47 +0100
+Message-ID: <1463392481-26583-60-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD4F949BA4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:51:51 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hgZ8NbvgaYCn for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:51:51 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4C2749BA8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:51:50 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The target register handlers are v2 emulation specific, so their
-implementation lives entirely in vgic-mmio-v2.c.
-We copy the old VGIC behaviour of assigning an IRQ to the first VCPU
-set in the target mask instead of making it possibly pending on
-multiple VCPUs.
+When we want to inject a hardware mapped IRQ into a guest, we actually
+only need the virtual IRQ number from the irq_phys_map.
+So let's pass this number directly from the arch timer to the VGIC
+to avoid using the map as a parameter.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@linaro.org>
 ---
-Changelog RFC..v1:
-- remove runtime VCPU determination from this v2-only register
-- fold in implementation of vgic_v2_irq_change_affinity()
-- replace ffs() with __ffs()
+ include/kvm/arm_vgic.h    | 2 +-
+ virt/kvm/arm/arch_timer.c | 2 +-
+ virt/kvm/arm/vgic.c       | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-Changelog v1 .. v2:
-- adapt to new MMIO framework
-
-Changelog v3 .. v4:
-- specify accessor width
-- use IRQ number accessor macro
-
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 43 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 42 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index bb7389e..52389ff 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -64,6 +64,47 @@ static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
- 	}
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index be6037a..e22f015 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -342,7 +342,7 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+ 			bool level);
+ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
+-			       struct irq_phys_map *map, bool level);
++			       unsigned int virt_irq, bool level);
+ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 409db33..a9c6c1c 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -177,7 +177,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
+ 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->map->virt_irq,
+ 				   timer->irq.level);
+ 	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
+-					 timer->map,
++					 timer->map->virt_irq,
+ 					 timer->irq.level);
+ 	WARN_ON(ret);
+ }
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index f6c6172..81c557c 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -1666,7 +1666,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+  * kvm_vgic_inject_mapped_irq - Inject a physically mapped IRQ to the vgic
+  * @kvm:     The VM structure pointer
+  * @cpuid:   The CPU for PPIs
+- * @map:     Pointer to a irq_phys_map structure describing the mapping
++ * @virt_irq: The virtual IRQ to be injected
+  * @level:   Edge-triggered:  true:  to trigger the interrupt
+  *			      false: to ignore the call
+  *	     Level-sensitive  true:  raise the input signal
+@@ -1677,7 +1677,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+  * being HIGH and 0 being LOW and all devices being active-HIGH.
+  */
+ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
+-			       struct irq_phys_map *map, bool level)
++			       unsigned int virt_irq, bool level)
+ {
+ 	int ret;
+ 
+@@ -1685,7 +1685,7 @@ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
+ 	if (ret)
+ 		return ret;
+ 
+-	return vgic_update_irq_pending(kvm, cpuid, map->virt_irq, level);
++	return vgic_update_irq_pending(kvm, cpuid, virt_irq, level);
  }
  
-+static unsigned long vgic_mmio_read_target(struct kvm_vcpu *vcpu,
-+					   gpa_t addr, unsigned int len)
-+{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 8);
-+	int i;
-+	u64 val = 0;
-+
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		val |= (u64)irq->targets << (i * 8);
-+	}
-+
-+	return val;
-+}
-+
-+static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
-+				   gpa_t addr, unsigned int len,
-+				   unsigned long val)
-+{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 8);
-+	int i;
-+
-+	/* GICD_ITARGETSR[0-7] are read-only */
-+	if (intid < VGIC_NR_PRIVATE_IRQS)
-+		return;
-+
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid + i);
-+		int target;
-+
-+		spin_lock(&irq->irq_lock);
-+
-+		irq->targets = (val >> (i * 8)) & 0xff;
-+		target = irq->targets ? __ffs(irq->targets) : 0;
-+		irq->target_vcpu = kvm_get_vcpu(vcpu->kvm, target);
-+
-+		spin_unlock(&irq->irq_lock);
-+	}
-+}
-+
- static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
- 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
-@@ -93,7 +134,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 		vgic_mmio_read_priority, vgic_mmio_write_priority, 8,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
-+		vgic_mmio_read_target, vgic_mmio_write_target, 8,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
- 		vgic_mmio_read_config, vgic_mmio_write_config, 2,
+ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
 -- 
 2.8.2
+
