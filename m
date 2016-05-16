@@ -1,50 +1,47 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v4 00/56] KVM: arm/arm64: Rework virtual GIC emulation
-Date: Mon, 16 May 2016 11:14:14 +0100
-Message-ID: <57399D76.4090209@arm.com>
-References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
- <1463392481-26583-58-git-send-email-andre.przywara@arm.com>
+From: Matt Evans <matt.evans@arm.com>
+Subject: [PATCH] kvm: arm64: Fix EC field in inject_abt64
+Date: Mon, 16 May 2016 13:54:56 +0100
+Message-ID: <5739C320.6010602@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED71749BC1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 06:10:33 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tkzrYBkx+pYT for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 06:10:32 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B940549BC0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 06:10:32 -0400 (EDT)
-In-Reply-To: <1463392481-26583-58-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: nd@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/05/16 10:53, Andre Przywara wrote:
-> Hi,
-> 
-> a new update for the new VGIC series.
-....
+The EC field of the constructed ESR is conditionally modified by ORing in
+ESR_ELx_EC_DABT_LOW for a data abort.  However, ESR_ELx_EC_SHIFT is missing
+from this condition.
 
-Oh dear,
-apologies for the (double) spam!
-Having the file name pattern _twice_ on the git send-email command line
-really results in having everything send out twice ;-)
-As those series are actually identical, please ignore/delete this one
-(the mails sent out later).
+Signed-off-by: Matt Evans <matt.evans@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: <stable@vger.kernel.org>
+---
+ arch/arm64/kvm/inject_fault.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Sorry for the inconvenience!
-Andre.
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 4d1ac81..e9e0e6d 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -162,7 +162,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+ 		esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
+ 
+ 	if (!is_iabt)
+-		esr |= ESR_ELx_EC_DABT_LOW;
++		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
+ 
+ 	vcpu_sys_reg(vcpu, ESR_EL1) = esr | ESR_ELx_FSC_EXTABT;
+ }
+-- 
+1.9.1
