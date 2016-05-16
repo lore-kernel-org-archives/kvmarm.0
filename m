@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 15/56] KVM: arm/arm64: vgic-new: Add acccessor to new
- struct vgic_irq instance
-Date: Mon, 16 May 2016 10:54:00 +0100
-Message-ID: <1463392481-26583-73-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 03/56] KVM: arm/arm64: vgic: avoid map in
+ kvm_vgic_map_is_active()
+Date: Mon, 16 May 2016 10:53:48 +0100
+Message-ID: <1463392481-26583-61-git-send-email-andre.przywara@arm.com>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B622249BBD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 74DB549C23
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Pq2klD10j8ml for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2016 05:52:54 -0400 (EDT)
+ with ESMTP id 3E5VzaUG2qZR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2016 05:52:36 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8074949BE1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50FED49B5D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2016 05:52:36 -0400 (EDT)
 In-Reply-To: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,98 +32,76 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+For getting the active state of a mapped IRQ, we actually only need
+the virtual IRQ number, not the pointer to the mapping entry.
+Pass the virtual IRQ number from the arch timer to the VGIC directly.
 
-The new VGIC implementation centers around a struct vgic_irq instance
-per virtual IRQ.
-Provide a function to retrieve the right instance for a given IRQ
-number and (in case of private interrupts) the right VCPU.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic.c | 41 +++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h | 22 ++++++++++++++++++++++
- 2 files changed, 63 insertions(+)
- create mode 100644 virt/kvm/arm/vgic/vgic.c
- create mode 100644 virt/kvm/arm/vgic/vgic.h
+Changelog v1 .. v2:
+- rewrap phys_active determination to fit in 80 characters
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-new file mode 100644
-index 0000000..fb45537
---- /dev/null
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -0,0 +1,41 @@
-+/*
-+ * Copyright (C) 2015, 2016 ARM Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <linux/kvm.h>
-+#include <linux/kvm_host.h>
-+
-+#include "vgic.h"
-+
-+struct vgic_global __section(.hyp.text) kvm_vgic_global_state;
-+
-+struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-+			      u32 intid)
-+{
-+	/* SGIs and PPIs */
-+	if (intid <= VGIC_MAX_PRIVATE)
-+		return &vcpu->arch.vgic_cpu.private_irqs[intid];
-+
-+	/* SPIs */
-+	if (intid <= VGIC_MAX_SPI)
-+		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
-+
-+	/* LPIs are not yet covered */
-+	if (intid >= VGIC_MIN_LPI)
-+		return NULL;
-+
-+	WARN(1, "Looking up struct vgic_irq for reserved INTID");
-+	return NULL;
-+}
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-new file mode 100644
-index 0000000..61b8d22
---- /dev/null
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -0,0 +1,22 @@
-+/*
-+ * Copyright (C) 2015, 2016 ARM Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef __KVM_ARM_VGIC_NEW_H__
-+#define __KVM_ARM_VGIC_NEW_H__
-+
-+struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-+			      u32 intid);
-+
-+#endif
+ include/kvm/arm_vgic.h    | 2 +-
+ virt/kvm/arm/arch_timer.c | 6 ++----
+ virt/kvm/arm/vgic.c       | 6 +++---
+ 3 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index e22f015..9830232 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -348,7 +348,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+ 					   int virt_irq, int irq);
+ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
+-bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
++bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+ 
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index a9c6c1c..37f82c1 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -274,10 +274,8 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	* to ensure that hardware interrupts from the timer triggers a guest
+ 	* exit.
+ 	*/
+-	if (timer->irq.level || kvm_vgic_map_is_active(vcpu, timer->map))
+-		phys_active = true;
+-	else
+-		phys_active = false;
++	phys_active = timer->irq.level ||
++			kvm_vgic_map_is_active(vcpu, timer->map->virt_irq);
+ 
+ 	/*
+ 	 * We want to avoid hitting the (re)distributor as much as
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 81c557c..2fd43a6 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -1102,18 +1102,18 @@ static bool dist_active_irq(struct kvm_vcpu *vcpu)
+ 	return test_bit(vcpu->vcpu_id, dist->irq_active_on_cpu);
+ }
+ 
+-bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, struct irq_phys_map *map)
++bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+ {
+ 	int i;
+ 
+ 	for (i = 0; i < vcpu->arch.vgic_cpu.nr_lr; i++) {
+ 		struct vgic_lr vlr = vgic_get_lr(vcpu, i);
+ 
+-		if (vlr.irq == map->virt_irq && vlr.state & LR_STATE_ACTIVE)
++		if (vlr.irq == virt_irq && vlr.state & LR_STATE_ACTIVE)
+ 			return true;
+ 	}
+ 
+-	return vgic_irq_is_active(vcpu, map->virt_irq);
++	return vgic_irq_is_active(vcpu, virt_irq);
+ }
+ 
+ /*
 -- 
 2.8.2
