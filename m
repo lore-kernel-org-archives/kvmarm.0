@@ -1,26 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [kvm-unit-tests PATCH 00/10] arm/arm64: add gic framework
-Date: Wed, 18 May 2016 11:07:14 +0200
-Message-ID: <20160518090714.GA3827@cbox>
-References: <1463385444-12916-1-git-send-email-drjones@redhat.com>
+Subject: Re: [PATCH v4 11/56] KVM: arm/arm64: pmu: abstract access to number
+ of SPIs
+Date: Wed, 18 May 2016 12:27:17 +0200
+Message-ID: <20160518102717.GB3827@cbox>
+References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
+ <1463392481-26583-12-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FF5E411BE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 05:03:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2468411BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 06:23:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hYX9hCgrx1DV for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 May 2016 05:03:12 -0400 (EDT)
-Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5EA70410B5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 05:03:12 -0400 (EDT)
-Received: by mail-wm0-f48.google.com with SMTP id a17so68750098wme.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 02:06:28 -0700 (PDT)
+ with ESMTP id 1wrezWbDntiP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 May 2016 06:23:15 -0400 (EDT)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B705A410B5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 06:23:15 -0400 (EDT)
+Received: by mail-wm0-f50.google.com with SMTP id g17so25646303wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 03:26:32 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1463385444-12916-1-git-send-email-drjones@redhat.com>
+In-Reply-To: <1463392481-26583-12-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,113 +32,98 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Drew,
-
-Thanks for doing this.  I'm happy to see some tests for the GIC.
-
-I've been pondering with how to write unit tests for all the MMIO
-implementations.  If you have some thoughts on how that could be easily
-fitted into this framework, that would probably be a good place to do it
-;)
-
--Christoffer
-
-On Mon, May 16, 2016 at 09:57:14AM +0200, Andrew Jones wrote:
-> Import defines, and steal enough helper functions, from Linux to
-> enable programming of the gic (v2 and v3). Then use the framework
-> to add an initial test (an ipi test; self, target-list, broadcast).
+On Mon, May 16, 2016 at 10:52:59AM +0100, Andre Przywara wrote:
+> Currently the PMU uses a member of the struct vgic_dist directly,
+> which not only breaks abstraction, but will fail with the new VGIC.
+> Abstract this access in the VGIC header file and refactor the validity
+> check in the PMU code.
 > 
-> It's my hope that this framework will be a suitable base on which
-> more tests may be easily added, particularly because we have
-> vgic-new and tcg gicv3 emulation getting close to merge.
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+> Changelog v3 .. v4:
+> - fix logic to allow PPIs again
+> - refactor IRQ validity check
 > 
-> To run it, along with other tests, just do
+>  include/kvm/arm_vgic.h |  2 ++
+>  virt/kvm/arm/pmu.c     | 25 ++++++++++++++-----------
+>  2 files changed, 16 insertions(+), 11 deletions(-)
 > 
->  ./configure [ --arch=[arm|arm64] --cross-prefix=$PREFIX ]
->  make
->  export QEMU=$PATH_TO_QEMU
->  ./run_tests.sh
-> 
-> To run it separately do, e.g.
-> 
-> $QEMU -machine virt,accel=tcg -cpu cortex-a57 \
->  -device virtio-serial-device \
->  -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
->  -display none -serial stdio \
->  -kernel arm/gic.flat \
->  -smp 123 -machine gic-version=3 -append ipi
-> 
->       ^^ note, we can go nuts with nr-cpus on TCG :-)
-> 
-> Or, a KVM example using a different "sender" cpu and irq (other than zero)
-> 
-> $QEMU -machine virt,accel=kvm -cpu host \
->  -device virtio-serial-device \
->  -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
->  -display none -serial stdio \
->  -kernel arm/gic.flat \
->  -smp 48 -machine gic-version=3 -append 'ipi sender=42 irq=1'
-> 
-> 
-> Patches:
-> 01-05: fixes and functionality needed by the later gic patches
-> 06-07: code theft from Linux (defines, helper functions)
-> 08-10: arm/gic.flat (the base of the gic unit test), currently just IPI
-> 
-> Available here: https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic
-> 
-> 
-> Andrew Jones (10):
->   lib: xstr: allow multiple args
->   arm64: fix get_"sysreg32" and make MPIDR 64bit
->   arm/arm64: smp: support more than 8 cpus
->   arm/arm64: add some delay routines
->   arm/arm64: irq enable/disable
->   arm/arm64: add initial gicv2 support
->   arm64: add initial gicv3 support
->   arm/arm64: gicv2: add an IPI test
->   arm/arm64: gicv3: add an IPI test
->   arm/arm64: gic: don't just use zero
-> 
->  arm/Makefile.common        |   7 +-
->  arm/gic.c                  | 338 +++++++++++++++++++++++++++++++++++++++++++++
->  arm/run                    |  19 ++-
->  arm/selftest.c             |   5 +-
->  arm/unittests.cfg          |  13 ++
->  lib/arm/asm/arch_gicv3.h   | 184 ++++++++++++++++++++++++
->  lib/arm/asm/gic-v2.h       |  74 ++++++++++
->  lib/arm/asm/gic-v3.h       | 320 ++++++++++++++++++++++++++++++++++++++++++
->  lib/arm/asm/gic.h          |  21 +++
->  lib/arm/asm/processor.h    |  38 ++++-
->  lib/arm/asm/setup.h        |   4 +-
->  lib/arm/gic.c              | 127 +++++++++++++++++
->  lib/arm/processor.c        |  15 ++
->  lib/arm/setup.c            |  12 +-
->  lib/arm64/asm/arch_gicv3.h | 169 +++++++++++++++++++++++
->  lib/arm64/asm/gic-v2.h     |   1 +
->  lib/arm64/asm/gic-v3.h     |   1 +
->  lib/arm64/asm/gic.h        |   1 +
->  lib/arm64/asm/processor.h  |  53 +++++--
->  lib/arm64/asm/sysreg.h     |  44 ++++++
->  lib/arm64/processor.c      |  15 ++
->  lib/libcflat.h             |   4 +-
->  22 files changed, 1439 insertions(+), 26 deletions(-)
->  create mode 100644 arm/gic.c
->  create mode 100644 lib/arm/asm/arch_gicv3.h
->  create mode 100644 lib/arm/asm/gic-v2.h
->  create mode 100644 lib/arm/asm/gic-v3.h
->  create mode 100644 lib/arm/asm/gic.h
->  create mode 100644 lib/arm/gic.c
->  create mode 100644 lib/arm64/asm/arch_gicv3.h
->  create mode 100644 lib/arm64/asm/gic-v2.h
->  create mode 100644 lib/arm64/asm/gic-v3.h
->  create mode 100644 lib/arm64/asm/gic.h
->  create mode 100644 lib/arm64/asm/sysreg.h
-> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 67a6637..ade7005 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -348,6 +348,8 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+>  #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+>  #define vgic_ready(k)		((k)->arch.vgic.ready)
+> +#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
+> +				 ((i) < (k)->arch.vgic.nr_irqs))
+>  
+>  int vgic_v2_probe(const struct gic_kvm_info *gic_kvm_info,
+>  		  const struct vgic_ops **ops,
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 575c7aa..a027569 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -436,7 +436,14 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> -static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+> +#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
+> +
+> +/*
+> + * For one VM the interrupt type must be same for each vcpu.
+> + * As a PPI, the interrupt number is the same for all vcpus,
+> + * while as an SPI it must be a separate number per vcpu.
+> + */
+> +static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+>  {
+>  	int i;
+>  	struct kvm_vcpu *vcpu;
+> @@ -445,7 +452,7 @@ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+>  		if (!kvm_arm_pmu_irq_initialized(vcpu))
+>  			continue;
+>  
+> -		if (is_ppi) {
+> +		if (irq_is_ppi(irq)) {
+>  			if (vcpu->arch.pmu.irq_num != irq)
+>  				return false;
+>  		} else {
+> @@ -457,7 +464,6 @@ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+>  	return true;
+>  }
+>  
+> -
+>  int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  {
+>  	switch (attr->attr) {
+> @@ -471,14 +477,11 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  		if (get_user(irq, uaddr))
+>  			return -EFAULT;
+>  
+> -		/*
+> -		 * The PMU overflow interrupt could be a PPI or SPI, but for one
+> -		 * VM the interrupt type must be same for each vcpu. As a PPI,
+> -		 * the interrupt number is the same for all vcpus, while as an
+> -		 * SPI it must be a separate number per vcpu.
+> -		 */
+> -		if (irq < VGIC_NR_SGIS || irq >= vcpu->kvm->arch.vgic.nr_irqs ||
+> -		    !irq_is_valid(vcpu->kvm, irq, irq < VGIC_NR_PRIVATE_IRQS))
+> +		/* The PMU overflow interrupt can be a PPI or a valid SPI. */
+> +		if (!(irq_is_ppi(irq) || vgic_valid_spi(vcpu->kvm, irq)))
+> +			return -EINVAL;
+> +
+> +		if (!pmu_irq_is_valid(vcpu->kvm, irq))
+>  			return -EINVAL;
+>  
+>  		if (kvm_arm_pmu_irq_initialized(vcpu))
 > -- 
-> 2.4.11
+> 2.8.2
 > 
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
