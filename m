@@ -1,66 +1,69 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 22/56] KVM: arm/arm64: vgic-new: Add MMIO handling
- framework
-Date: Wed, 18 May 2016 20:06:37 +0200
-Message-ID: <20160518180637.GO6666@cbox>
-References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
- <1463392481-26583-23-git-send-email-andre.przywara@arm.com>
- <20160518123115.GE3827@cbox>
- <573C9081.6080500@arm.com>
+Subject: Re: [PATCH] kvm: arm64: Fix EC field in inject_abt64
+Date: Wed, 18 May 2016 21:53:47 +0200
+Message-ID: <20160518195347.GA26840@cbox>
+References: <5739C320.6010602@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CEAFA41145
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 15:49:45 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CLvZ-SEy51o1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 May 2016 15:49:44 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F6BB4113E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 15:49:44 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id n129so200684543wmn.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 12:53:02 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <573C9081.6080500@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <5739C320.6010602@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Matt Evans <matt.evans@arm.com>
+Cc: marc.zyngier@arm.com, nd@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 18, 2016 at 04:55:45PM +0100, Andre Przywara wrote:
-> Hi,
+On Mon, May 16, 2016 at 01:54:56PM +0100, Matt Evans wrote:
+> The EC field of the constructed ESR is conditionally modified by ORing in
+> ESR_ELx_EC_DABT_LOW for a data abort.  However, ESR_ELx_EC_SHIFT is missing
+> from this condition.
 > 
-> ....
+> Signed-off-by: Matt Evans <matt.evans@arm.com>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: <stable@vger.kernel.org>
+> ---
+>  arch/arm64/kvm/inject_fault.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> >> +
-> >> +/* generate a mask that covers 1024 interrupts with <b> bits per IRQ */
-> >> +#define VGIC_ADDR_IRQ_MASK(b) GENMASK_ULL(ilog2(b) + ilog2(1024) - \
-> >> +					  ilog2(BITS_PER_BYTE) - 1, 0)
-> >> +#define VGIC_ADDR_TO_INTID(addr, bits)  (((addr) & VGIC_ADDR_IRQ_MASK(bits)) * \
-> >> +					64 / (bits) / 8)
-> > 
-> > In the comment we end up adding here, can we also describe why
-> > (addr & <magic mask>) * <magic 64> / (bits) / <BITS_PER_BYTE OR BYTES_PER_ULL>
-> > gives us what we need, because I don't get it.
-> 
-> The reason is: we deal with 8 bits per byte, but have
-> bits-per-interrupts values bigger than 8. Doing the maths in floating
-> point arithmetic would work fine:
-> 
-> (float)(addr & mask) * (8.0 / bits_per_IRQ)
-> 
-> So would this comment make sense?
-> 
-> /*
->  * Since we can have more than 8 bits per interrupt, we can't use
->  * "8 / bpi" as a multiplicand directly, so we use a
->  * fixed-point-arithmetic version of it tailored to cover at most 64
->  * bits per IRQ.
->  */
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index 4d1ac81..e9e0e6d 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -162,7 +162,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+>  		esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
+>  
+>  	if (!is_iabt)
+> -		esr |= ESR_ELx_EC_DABT_LOW;
+> +		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
+>  
+>  	vcpu_sys_reg(vcpu, ESR_EL1) = esr | ESR_ELx_FSC_EXTABT;
+>  }
+> -- 
+> 1.9.1
 > 
 
-Something like this certainly helps, here's another version which is
-easier for me to understand, but you can take your pick:
+Applied to queue.
 
- /*
-  * (addr & mask) gives us the byte offset for the INT ID, so we want to
-  * divide this with 'bytes per irq' to get the INT ID, which is given
-  * by '(bits) / 8'.  But we do this with fixed-point-arithmetic and
-  * take advantage of the fact that division by a fraction equals
-  * multiplication with the inverted fraction, and scale up both the
-  * numerator and denominator with 8 to support at most 64 bits per IRQ:
-  */
-
-At least I think we all agree that the approach works by now.
-
+Thanks!
 -Christoffer
