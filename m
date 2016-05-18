@@ -1,173 +1,116 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v4 32/56] KVM: arm/arm64: vgic-new: Add SGIPENDR register
- handlers
-Date: Wed, 18 May 2016 14:31:18 +0100
-Message-ID: <573C6EA6.90803@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 37/56] KVM: arm/arm64: vgic-new: Add GICv3 IROUTER
+ register handlers
+Date: Wed, 18 May 2016 15:49:23 +0200
+Message-ID: <20160518134923.GK3827@cbox>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
- <1463392481-26583-33-git-send-email-andre.przywara@arm.com>
- <20160518131449.GI3827@cbox>
+ <1463392481-26583-38-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AFBD4113E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 09:27:31 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n-Q3G7taCXMn for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 May 2016 09:27:30 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8F9C410B5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 09:27:29 -0400 (EDT)
-In-Reply-To: <20160518131449.GI3827@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1463392481-26583-38-git-send-email-andre.przywara@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Mon, May 16, 2016 at 10:53:25AM +0100, Andre Przywara wrote:
+> Since GICv3 supports much more than the 8 CPUs the GICv2 ITARGETSR
+> register can handle, the new IROUTER register covers the whole range
+> of possible target (V)CPUs by using the same MPIDR that the cores
+> report themselves.
+> In addition to translating this MPIDR into a vcpu pointer we store
+> the originally written value as well. The architecture allows to
+> write any values into the register, which must be read back as written.
+> 
+> Since we don't support affinity level 3, we don't need to take care
+> about the upper word of this 64-bit register, which simplifies the
+> handling a bit.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+> Changelog RFC..v1:
+> - fold in and simplify vgic_v3_irq_change_affinity
+> 
+> Changelog v1 .. v2:
+> - adapt to new MMIO framework
+> 
+> Changelog v3 .. v4:
+> - move accessor width check into dispatcher
+> - use IRQ number accessor macro
+> 
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 37 ++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 36 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index b893284..7b9340b 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -75,6 +75,41 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> +static unsigned long vgic_mmio_read_irouter(struct kvm_vcpu *vcpu,
+> +					    gpa_t addr, unsigned int len)
+> +{
+> +	int intid = VGIC_ADDR_TO_INTID(addr, 64);
+> +	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
+> +
+> +	if (!irq)
+> +		return 0;
+> +
+> +	return extract_bytes(READ_ONCE(irq->mpidr), addr & 7, len);
 
-On 18/05/16 14:14, Christoffer Dall wrote:
-> On Mon, May 16, 2016 at 10:53:20AM +0100, Andre Przywara wrote:
->> As this register is v2 specific, its implementation lives entirely
->> in vgic-mmio-v2.c.
->> This register allows setting the source mask of an IPI.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->> ---
->> Changelog RFC..v1:
->> - remove IRQ lock from read handler
->> - update pending bit on setting the first / clearing the last bit
->> - queue virtual IRQ if necessary
->>
->> Changelog v1 .. v2:
->> - adapt to new MMIO framework
->>
->> Changelog v3 .. v4:
->> - specify accessor width
->>
->>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 62 +++++++++++++++++++++++++++++++++=
-+++++--
->>  1 file changed, 60 insertions(+), 2 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-m=
-mio-v2.c
->> index c884e9b..3925d4c 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> @@ -146,6 +146,64 @@ static void vgic_mmio_write_target(struct kvm_vcpu =
-*vcpu,
->>  	}
->>  }
->>  =
+So for this to work for accesses to the upper word, we rely on this only
+ever running on AArch64 where an unsigned long is 64 bits and the call
+to extract_bytes converts the u32 irq->mpidr to 64 bit unsigned long?
 
->> +static unsigned long vgic_mmio_read_sgipend(struct kvm_vcpu *vcpu,
->> +					    gpa_t addr, unsigned int len)
->> +{
->> +	u32 intid =3D addr & 0x0f;
-> =
+Feels a bit weird, but I suppose this always works:
 
-> is there a reason why we cannot use the magic macro here?
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-I wasn't sure about this, because it's not covering all 1024 interrupts,
-but just SGIs, so it's always fixed to 16 interrupts =E1 8 bits. The
-default mask would be too big in this case.
-I guess it would work anyway because this region is limited to 16 bytes
-in our description, so we could use this here anyway to make it more
-aligned with the other handlers, maybe adding a comment about the
-difference?
-
-Cheers,
-Andre.
-
-> =
-
->> +	int i;
->> +	u64 val =3D 0;
->> +
->> +	for (i =3D 0; i < len; i++) {
->> +		struct vgic_irq *irq =3D vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->> +
->> +		val |=3D (u64)irq->source << (i * 8);
->> +	}
->> +	return val;
->> +}
->> +
->> +static void vgic_mmio_write_sgipendc(struct kvm_vcpu *vcpu,
->> +				     gpa_t addr, unsigned int len,
->> +				     unsigned long val)
->> +{
->> +	u32 intid =3D addr & 0x0f;
->> +	int i;
->> +
->> +	for (i =3D 0; i < len; i++) {
->> +		struct vgic_irq *irq =3D vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->> +
->> +		spin_lock(&irq->irq_lock);
->> +
->> +		irq->source &=3D ~((val >> (i * 8)) & 0xff);
->> +		if (!irq->source)
->> +			irq->pending =3D false;
->> +
->> +		spin_unlock(&irq->irq_lock);
->> +	}
->> +}
->> +
->> +static void vgic_mmio_write_sgipends(struct kvm_vcpu *vcpu,
->> +				     gpa_t addr, unsigned int len,
->> +				     unsigned long val)
->> +{
->> +	u32 intid =3D addr & 0x0f;
->> +	int i;
->> +
->> +	for (i =3D 0; i < len; i++) {
->> +		struct vgic_irq *irq =3D vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->> +
->> +		spin_lock(&irq->irq_lock);
->> +
->> +		irq->source |=3D (val >> (i * 8)) & 0xff;
->> +
->> +		if (irq->source) {
->> +			irq->pending =3D true;
->> +			vgic_queue_irq_unlock(vcpu->kvm, irq);
->> +		} else {
->> +			spin_unlock(&irq->irq_lock);
->> +		}
->> +	}
->> +}
->> +
->>  static const struct vgic_register_region vgic_v2_dist_registers[] =3D {
->>  	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
->>  		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
->> @@ -184,10 +242,10 @@ static const struct vgic_register_region vgic_v2_d=
-ist_registers[] =3D {
->>  		vgic_mmio_read_raz, vgic_mmio_write_sgir, 4,
->>  		VGIC_ACCESS_32bit),
->>  	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_CLEAR,
->> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
->> +		vgic_mmio_read_sgipend, vgic_mmio_write_sgipendc, 16,
->>  		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
->>  	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_SET,
->> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
->> +		vgic_mmio_read_sgipend, vgic_mmio_write_sgipends, 16,
->>  		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
->>  };
->>  =
-
->> -- =
-
->> 2.8.2
->>
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-> =
+> +}
+> +
+> +static void vgic_mmio_write_irouter(struct kvm_vcpu *vcpu,
+> +				    gpa_t addr, unsigned int len,
+> +				    unsigned long val)
+> +{
+> +	int intid = VGIC_ADDR_TO_INTID(addr, 64);
+> +	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
+> +
+> +	if (!irq)
+> +		return;
+> +
+> +	/* The upper word is WI for us since we don't implement Aff3. */
+> +	if (addr & 4)
+> +		return;
+> +
+> +	spin_lock(&irq->irq_lock);
+> +
+> +	/* We only care about and preserve Aff0, Aff1 and Aff2. */
+> +	irq->mpidr = val & GENMASK(23, 0);
+> +	irq->target_vcpu = kvm_mpidr_to_vcpu(vcpu->kvm, irq->mpidr);
+> +
+> +	spin_unlock(&irq->irq_lock);
+> +}
+> +
+>  static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
+>  					      gpa_t addr, unsigned int len)
+>  {
+> @@ -170,7 +205,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+>  		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
+> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 64,
+> +		vgic_mmio_read_irouter, vgic_mmio_write_irouter, 64,
+>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
+>  		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
+> -- 
+> 2.8.2
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
