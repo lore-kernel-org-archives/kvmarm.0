@@ -1,427 +1,343 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 22/56] KVM: arm/arm64: vgic-new: Add MMIO handling
- framework
-Date: Wed, 18 May 2016 15:12:33 +0100
-Message-ID: <573C7851.4010401@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 16/56] KVM: arm/arm64: vgic-new: Implement virtual IRQ
+ injection
+Date: Wed, 18 May 2016 16:14:27 +0200
+Message-ID: <20160518141427.GA6666@cbox>
 References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
- <1463392481-26583-23-git-send-email-andre.przywara@arm.com>
- <573B1DB0.7030901@arm.com> <20160518122521.GD3827@cbox>
+ <1463392481-26583-17-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160518122521.GD3827@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CDDC2412C2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 10:10:26 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id D2ftExXScoh2 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 May 2016 10:10:24 -0400 (EDT)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8887740F90
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 10:10:24 -0400 (EDT)
+Received: by mail-wm0-f52.google.com with SMTP id r12so36929567wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2016 07:13:41 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1463392481-26583-17-git-send-email-andre.przywara@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 18/05/16 13:25, Christoffer Dall wrote:
-> On Tue, May 17, 2016 at 02:33:36PM +0100, Marc Zyngier wrote:
->> On 16/05/16 10:53, Andre Przywara wrote:
->>> From: Marc Zyngier <marc.zyngier@arm.com>
->>>
->>> Add an MMIO handling framework to the VGIC emulation:
->>> Each register is described by its offset, size (or number of bits p=
-er
->>> IRQ, if applicable) and the read/write handler functions. We provid=
-e
->>> initialization macros to describe each GIC register later easily.
->>>
->>> Separate dispatch functions for read and write accesses are connect=
-ed
->>> to the kvm_io_bus framework and binary-search for the responsible
->>> register handler based on the offset address within the region.
->>> We convert the incoming data (referenced by a pointer) to the host'=
-s
->>> endianess and use pass-by-value to hand the data over to the actual
->>> handler functions.
->>>
->>> The register handler prototype and the endianess conversion are
->>> courtesy of Christoffer Dall.
->>>
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>> Changelog RFC..v1:
->>> - rework MMIO dispatching to use only one kvm_io_bus device
->>> - document purpose of register region macros
->>> - rename "this" parameter to "dev"
->>> - change IGROUPR to be RAO (returning 1 =3D> Group1 IRQs)
->>>
->>> Changelog v1 .. v2:
->>> * MASSIVE rework:
->>> - store register_region pointer in kvm_io_bus linked struct
->>> - replace write_mask_xxx functions with extract_bytes() implementat=
-ion
->>> - change handler functions' prototypes to take and return unsigned =
-long
->>> - use binary search to find matching register handler
->>> - convert endianess of input data in dispatch_mmio_xxx functions
->>> - improve readability of register initializer macros
->>> - remove any GICv2/GICv3 specific functions from vgic-mmio.c
->>> - rename file from vgic_mmio.c to vgic-mmio.c
->>>
->>> Changelog v2 .. v3:
->>> - replace inclusion of vgic/vgic.h with arm_vgic.h
->>>
->>> Changelog v3 .. v4:
->>> - add IRQ number accessor macro
->>> - check access width in dispatcher
->>> - treat non-covered MMIO addresses as RAZ/WI
->>> - remove extract_bytes() (re-introduced as static later in the seri=
-es)
->>>
->>>  include/kvm/vgic/vgic.h       |  13 +++
->>>  virt/kvm/arm/vgic/vgic-mmio.c | 184 ++++++++++++++++++++++++++++++=
-++++++++++++
->>>  virt/kvm/arm/vgic/vgic-mmio.h |  87 ++++++++++++++++++++
->>>  3 files changed, 284 insertions(+)
->>>  create mode 100644 virt/kvm/arm/vgic/vgic-mmio.c
->>>  create mode 100644 virt/kvm/arm/vgic/vgic-mmio.h
->>>
->>> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
->>> index f663288..ff3f9c2 100644
->>> --- a/include/kvm/vgic/vgic.h
->>> +++ b/include/kvm/vgic/vgic.h
->>> @@ -106,6 +106,16 @@ struct vgic_irq {
->>>  	enum vgic_irq_config config;	/* Level or edge */
->>>  };
->>> =20
->>> +struct vgic_register_region;
->>> +
->>> +struct vgic_io_device {
->>> +	gpa_t base_addr;
->>> +	struct kvm_vcpu *redist_vcpu;
->>> +	const struct vgic_register_region *regions;
->>> +	int nr_regions;
->>> +	struct kvm_io_device dev;
->>> +};
->>> +
->>>  struct vgic_dist {
->>>  	bool			in_kernel;
->>>  	bool			ready;
->>> @@ -132,6 +142,9 @@ struct vgic_dist {
->>>  	bool			enabled;
->>> =20
->>>  	struct vgic_irq		*spis;
->>> +
->>> +	struct vgic_io_device	dist_iodev;
->>> +	struct vgic_io_device	*redist_iodevs;
->>>  };
->>> =20
->>>  struct vgic_v2_cpu_if {
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic=
--mmio.c
->>> new file mode 100644
->>> index 0000000..012b82b
->>> --- /dev/null
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->>> @@ -0,0 +1,184 @@
->>> +/*
->>> + * VGIC MMIO handling functions
->>> + *
->>> + * This program is free software; you can redistribute it and/or m=
-odify
->>> + * it under the terms of the GNU General Public License version 2 =
-as
->>> + * published by the Free Software Foundation.
->>> + *
->>> + * This program is distributed in the hope that it will be useful,
->>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>> + * GNU General Public License for more details.
->>> + */
->>> +
->>> +#include <linux/bitops.h>
->>> +#include <linux/bsearch.h>
->>> +#include <linux/kvm.h>
->>> +#include <linux/kvm_host.h>
->>> +#include <kvm/iodev.h>
->>> +#include <kvm/arm_vgic.h>
->>> +
->>> +#include "vgic.h"
->>> +#include "vgic-mmio.h"
->>> +
->>> +unsigned long vgic_mmio_read_raz(struct kvm_vcpu *vcpu,
->>> +				 gpa_t addr, unsigned int len)
->>> +{
->>> +	return 0;
->>> +}
->>> +
->>> +unsigned long vgic_mmio_read_rao(struct kvm_vcpu *vcpu,
->>> +				 gpa_t addr, unsigned int len)
->>> +{
->>> +	return -1UL;
->>> +}
->>> +
->>> +void vgic_mmio_write_wi(struct kvm_vcpu *vcpu, gpa_t addr,
->>> +			unsigned int len, unsigned long val)
->>> +{
->>> +	/* Ignore */
->>> +}
->>> +
->>> +static int match_region(const void *key, const void *elt)
->>> +{
->>> +	const unsigned int offset =3D (unsigned long)key;
->>> +	const struct vgic_register_region *region =3D elt;
->>> +
->>> +	if (offset < region->reg_offset)
->>> +		return -1;
->>> +
->>> +	if (offset >=3D region->reg_offset + region->len)
->>> +		return 1;
->>> +
->>> +	return 0;
->>> +}
->>> +
->>> +/* Find the proper register handler entry given a certain address =
-offset. */
->>> +static const struct vgic_register_region *
->>> +vgic_find_mmio_region(const struct vgic_register_region *region, i=
-nt nr_regions,
->>> +		      unsigned int offset)
->>> +{
->>> +	return bsearch((void *)(uintptr_t)offset, region, nr_regions,
->>> +		       sizeof(region[0]), match_region);
->>> +}
->>> +
->>> +/*
->>> + * kvm_mmio_read_buf() returns a value in a format where it can be=
- converted
->>> + * to a byte array and be directly observed as the guest wanted it=
- to appear
->>> + * in memory if it had done the store itself, which is LE for the =
-GIC, as the
->>> + * guest knows the GIC is always LE.
->>> + *
->>> + * We convert this value to the CPUs native format to deal with it=
- as a data
->>> + * value.
->>> + */
->>> +unsigned long vgic_data_mmio_bus_to_host(const void *val, unsigned=
- int len)
->>> +{
->>> +	unsigned long data =3D kvm_mmio_read_buf(val, len);
->>> +
->>> +	switch (len) {
->>> +	case 1:
->>> +		return data;
->>> +	case 2:
->>> +		return le16_to_cpu(data);
->>> +	case 4:
->>> +		return le32_to_cpu(data);
->>> +	default:
->>> +		return le64_to_cpu(data);
->>> +	}
->>> +}
->>> +
->>> +/*
->>> + * kvm_mmio_write_buf() expects a value in a format such that if c=
-onverted to
->>> + * a byte array it is observed as the guest would see it if it cou=
-ld perform
->>> + * the load directly.  Since the GIC is LE, and the guest knows th=
-is, the
->>> + * guest expects a value in little endian format.
->>> + *
->>> + * We convert the data value from the CPUs native format to LE so =
-that the
->>> + * value is returned in the proper format.
->>> + */
->>> +void vgic_data_host_to_mmio_bus(void *buf, unsigned int len,
->>> +				unsigned long data)
->>> +{
->>> +	switch (len) {
->>> +	case 1:
->>> +		break;
->>> +	case 2:
->>> +		data =3D cpu_to_le16(data);
->>> +		break;
->>> +	case 4:
->>> +		data =3D cpu_to_le32(data);
->>> +		break;
->>> +	default:
->>> +		data =3D cpu_to_le64(data);
->>> +	}
->>> +
->>> +	kvm_mmio_write_buf(buf, len, data);
->>> +}
->>> +
->>> +static
->>> +struct vgic_io_device *kvm_to_vgic_iodev(const struct kvm_io_devic=
-e *dev)
->>> +{
->>> +	return container_of(dev, struct vgic_io_device, dev);
->>> +}
->>> +
->>> +static bool check_region(const struct vgic_register_region *region=
-,
->>> +			 gpa_t addr, int len)
->>> +{
->>> +	if ((region->access_flags & VGIC_ACCESS_8bit) && len =3D=3D 1)
->>> +		return true;
->>> +	if ((region->access_flags & VGIC_ACCESS_32bit) &&
->>> +	    len =3D=3D sizeof(u32) && !(addr & 3))
->>> +		return true;
->>> +	if ((region->access_flags & VGIC_ACCESS_64bit) &&
->>> +	    len =3D=3D sizeof(u64) && !(addr & 7))
->>> +		return true;
->>> +
->>> +	return false;
->>> +}
->>> +
->>> +static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io=
-_device *dev,
->>> +			      gpa_t addr, int len, void *val)
->>> +{
->>> +	struct vgic_io_device *iodev =3D kvm_to_vgic_iodev(dev);
->>> +	const struct vgic_register_region *region;
->>> +	struct kvm_vcpu *r_vcpu;
->>> +	unsigned long data;
->>> +
->>> +	region =3D vgic_find_mmio_region(iodev->regions, iodev->nr_region=
-s,
->>> +				       addr - iodev->base_addr);
->>> +	if (!region || !check_region(region, addr, len)) {
->>> +		memset(val, 0, len);
->>> +		return 0;
->>> +	}
->>> +
->>> +	r_vcpu =3D iodev->redist_vcpu ? iodev->redist_vcpu : vcpu;
->>> +	data =3D region->read(r_vcpu, addr, len);
->>> +	vgic_data_host_to_mmio_bus(val, len, data);
->>> +	return 0;
->>> +}
->>> +
->>> +static int dispatch_mmio_write(struct kvm_vcpu *vcpu, struct kvm_i=
-o_device *dev,
->>> +			       gpa_t addr, int len, const void *val)
->>> +{
->>> +	struct vgic_io_device *iodev =3D kvm_to_vgic_iodev(dev);
->>> +	const struct vgic_register_region *region;
->>> +	struct kvm_vcpu *r_vcpu;
->>> +	unsigned long data =3D vgic_data_mmio_bus_to_host(val, len);
->>> +
->>> +	region =3D vgic_find_mmio_region(iodev->regions, iodev->nr_region=
-s,
->>> +				       addr - iodev->base_addr);
->>> +	if (!region)
->>> +		return 0;
->>> +
->>> +	if (!check_region(region, addr, len))
->>> +		return 0;
->>> +
->>> +	r_vcpu =3D iodev->redist_vcpu ? iodev->redist_vcpu : vcpu;
->>> +	region->write(r_vcpu, addr, len, data);
->>> +	return 0;
->>> +}
->>> +
->>> +struct kvm_io_device_ops kvm_io_gic_ops =3D {
->>> +	.read =3D dispatch_mmio_read,
->>> +	.write =3D dispatch_mmio_write,
->>> +};
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic=
--mmio.h
->>> new file mode 100644
->>> index 0000000..855b1db
->>> --- /dev/null
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
->>> @@ -0,0 +1,87 @@
->>> +/*
->>> + * Copyright (C) 2015, 2016 ARM Ltd.
->>> + *
->>> + * This program is free software; you can redistribute it and/or m=
-odify
->>> + * it under the terms of the GNU General Public License version 2 =
-as
->>> + * published by the Free Software Foundation.
->>> + *
->>> + * This program is distributed in the hope that it will be useful,
->>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>> + * GNU General Public License for more details.
->>> + *
->>> + * You should have received a copy of the GNU General Public Licen=
-se
->>> + * along with this program.  If not, see <http://www.gnu.org/licen=
-ses/>.
->>> + */
->>> +#ifndef __KVM_ARM_VGIC_MMIO_H__
->>> +#define __KVM_ARM_VGIC_MMIO_H__
->>> +
->>> +struct vgic_register_region {
->>> +	unsigned int reg_offset;
->>> +	unsigned int len;
->>> +	unsigned int bits_per_irq;
->>> +	unsigned int access_flags;
->>> +	unsigned long (*read)(struct kvm_vcpu *vcpu, gpa_t addr,
->>> +			      unsigned int len);
->>> +	void (*write)(struct kvm_vcpu *vcpu, gpa_t addr, unsigned int len=
-,
->>> +		      unsigned long val);
->>> +};
->>> +
->>> +extern struct kvm_io_device_ops kvm_io_gic_ops;
->>> +
->>> +#define VGIC_ACCESS_8bit	1
->>> +#define VGIC_ACCESS_32bit	2
->>> +#define VGIC_ACCESS_64bit	4
->>> +
->>> +/* generate a mask that covers 1024 interrupts with <b> bits per I=
-RQ */
->>
->> Hmmm. I'd appreciate some additional comments, specially when it com=
-es
->> to the various restrictions. May I'd suggest something like:
->>
->> /*
->>  * Generate a mask that covers the number of bytes required to addre=
-ss
->>  * up to 1024 interrupts, each represented by <b> bits. This assumes
->>  * that <b> is a power of two.
->>  *
->>  * ilog2(b) + ilog2(1024) is the number of bits required to bit-addr=
-ess
->>  * 1024 interrupts, each represented by b bits. Minus ilog2(8) conve=
-rts
->>  * this to a byte address.
->=20
-> So I'm guessting this is a rewrite of ilog2( (b * 1024) / 8), but I'm
+On Mon, May 16, 2016 at 10:53:04AM +0100, Andre Przywara wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> Provide a vgic_queue_irq_unlock() function which decides whether a
+> given IRQ needs to be queued to a VCPU's ap_list.
+> This should be called whenever an IRQ becomes pending or enabled,
+> either as a result of userspace injection, from in-kernel emulated
+> devices like the architected timer or from MMIO accesses to the
+> distributor emulation.
+> Also provides the necessary functions to allow userland to inject an
+> IRQ to a guest.
+> Since this is the first code that starts using our locking mechanism, we
+> add some (hopefully) clear documentation of our locking strategy and
+> requirements along with this patch.
+> 
+> [Andre: refactor out vgic_queue_irq_unlock()]
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+> Changelog RFC..v1:
+> - add spinlock checks protected by CONFIG_DEBUG_SPINLOCK
+> - add more comments to vgic_target_oracle
+> - remove BUG_ON() if IRQ is neither edge or level
+> - rename vgic_queue_irq() to vgic_queue_irq_unlock()
+> - simplify initial check in vgic_queue_irq_unlock()
+> - extend retry loop to ask the oracle again
+> - minor comment fixes
+> 
+> Changelog v1 .. v2:
+> - move most IRQ injection code into vgic_update_irq_pending()
+> 
+> Changelog v3 .. v4:
+> - simplify vgic_queue_irq_unlock() to allow reusage later
+> 
+>  include/kvm/vgic/vgic.h  |   3 +
+>  virt/kvm/arm/vgic/vgic.c | 211 +++++++++++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h |   1 +
+>  3 files changed, 215 insertions(+)
+> 
+> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+> index 6ca0781..7b6ca90 100644
+> --- a/include/kvm/vgic/vgic.h
+> +++ b/include/kvm/vgic/vgic.h
+> @@ -181,6 +181,9 @@ struct vgic_cpu {
+>  	u64 live_lrs;
+>  };
+>  
+> +int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+> +			bool level);
+> +
+>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+>  #define vgic_initialized(k)	(false)
+>  #define vgic_ready(k)		((k)->arch.vgic.ready)
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index fb45537..62fede6 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -19,8 +19,31 @@
+>  
+>  #include "vgic.h"
+>  
+> +#define CREATE_TRACE_POINTS
+> +#include "../trace.h"
+> +
+> +#ifdef CONFIG_DEBUG_SPINLOCK
+> +#define DEBUG_SPINLOCK_BUG_ON(p) BUG_ON(p)
+> +#else
+> +#define DEBUG_SPINLOCK_BUG_ON(p)
+> +#endif
+> +
+>  struct vgic_global __section(.hyp.text) kvm_vgic_global_state;
+>  
+> +/*
+> + * Locking order is always:
+> + *   vgic_cpu->ap_list_lock
+> + *     vgic_irq->irq_lock
+> + *
+> + * (that is, always take the ap_list_lock before the struct vgic_irq lock).
+> + *
+> + * When taking more than one ap_list_lock at the same time, always take the
+> + * lowest numbered VCPU's ap_list_lock first, so:
+> + *   vcpuX->vcpu_id < vcpuY->vcpu_id:
+> + *     spin_lock(vcpuX->arch.vgic_cpu.ap_list_lock);
+> + *     spin_lock(vcpuY->arch.vgic_cpu.ap_list_lock);
+> + */
+> +
+>  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  			      u32 intid)
+>  {
+> @@ -39,3 +62,191 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  	WARN(1, "Looking up struct vgic_irq for reserved INTID");
+>  	return NULL;
+>  }
+> +
+> +/**
+> + * kvm_vgic_target_oracle - compute the target vcpu for an irq
+> + *
+> + * @irq:	The irq to route. Must be already locked.
+> + *
+> + * Based on the current state of the interrupt (enabled, pending,
+> + * active, vcpu and target_vcpu), compute the next vcpu this should be
+> + * given to. Return NULL if this shouldn't be injected at all.
+> + *
+> + * Requires the IRQ lock to be held.
+> + */
+> +static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+> +{
+> +	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
+> +
+> +	/* If the interrupt is active, it must stay on the current vcpu */
+> +	if (irq->active)
+> +		return irq->vcpu;
+> +
+> +	/*
+> +	 * If the IRQ is not active but enabled and pending, we should direct
+> +	 * it to its configured target VCPU.
+> +	 * If the distributor is disabled, pending interrupts shouldn't be
+> +	 * forwarded.
+> +	 */
+> +	if (irq->enabled && irq->pending) {
+> +		if (unlikely(irq->target_vcpu &&
+> +			     !irq->target_vcpu->kvm->arch.vgic.enabled))
+> +			return NULL;
+> +
+> +		return irq->target_vcpu;
+> +	}
+> +
+> +	/* If neither active nor pending and enabled, then this IRQ should not
+> +	 * be queued to any VCPU.
+> +	 */
+> +	return NULL;
+> +}
+> +
+> +/*
+> + * Only valid injection if changing level for level-triggered IRQs or for a
+> + * rising edge.
+> + */
+> +static bool vgic_validate_injection(struct vgic_irq *irq, bool level)
+> +{
+> +	switch (irq->config) {
+> +	case VGIC_CONFIG_LEVEL:
+> +		return irq->line_level != level;
+> +	case VGIC_CONFIG_EDGE:
+> +		return level;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +/*
+> + * Check whether an IRQ needs to (and can) be queued to a VCPU's ap list.
+> + * Do the queuing if necessary, taking the right locks in the right order.
+> + * Returns true when the IRQ was queued, false otherwise.
+> + *
+> + * Needs to be entered with the IRQ lock already held, but will return
+> + * with all locks dropped.
+> + */
+> +bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
+> +
+> +retry:
+> +	vcpu = vgic_target_oracle(irq);
+> +	if (irq->vcpu || !vcpu) {
+> +		/*
+> +		 * If this IRQ is already on a VCPU's ap_list, then it
+> +		 * cannot be moved or modified and there is no more work for
+> +		 * us to do.
+> +		 *
+> +		 * Otherwise, if the irq is not pending and enabled, it does
+> +		 * not need to be inserted into an ap_list and there is also
+> +		 * no more work for us to do.
+> +		 */
+> +		spin_unlock(&irq->irq_lock);
+> +		return false;
+> +	}
+> +
+> +	/*
+> +	 * We must unlock the irq lock to take the ap_list_lock where
+> +	 * we are going to insert this new pending interrupt.
+> +	 */
+> +	spin_unlock(&irq->irq_lock);
+> +
+> +	/* someone can do stuff here, which we re-check below */
+> +
+> +	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
+> +	spin_lock(&irq->irq_lock);
+> +
+> +	/*
+> +	 * Did something change behind our backs?
+> +	 *
+> +	 * There are two cases:
+> +	 * 1) The irq lost its pending state or was disabled behind our
+> +	 *    backs and/or it was queued to another VCPU's ap_list.
+> +	 *    Then drop the locks and return.
+> +	 * 2) Someone changed the affinity on this irq behind our
+> +	 *    backs and we are now holding the wrong ap_list_lock.
+> +	 *    Then drop the locks and try the new VCPU.
 
-Yes, same thing.
+nit: get rid of the 'Then drop the locks and return' from clause (1) and
+write, 'In both cases, drop the locks and retry' as a separate paragraph
+in the end.
 
-> stupid enough to not understand our use of logarithms here.  Can some=
-one
-> remind me whatever I forgot at CS 101?
+> +	 */
+> +
+> +	if (unlikely(irq->vcpu || vcpu != vgic_target_oracle(irq))) {
+> +		spin_unlock(&irq->irq_lock);
+> +		spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+> +
+> +		spin_lock(&irq->irq_lock);
+> +		goto retry;
+> +	}
+> +
+> +	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
+> +	irq->vcpu = vcpu;
+> +
+> +	spin_unlock(&irq->irq_lock);
+> +	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+> +
+> +	kvm_vcpu_kick(vcpu);
+> +
+> +	return true;
+> +}
+> +
+> +static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+> +				   unsigned int intid, bool level,
+> +				   bool mapped_irq)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct vgic_irq *irq;
+> +	int ret;
+> +
+> +	trace_vgic_update_irq_pending(cpuid, intid, level);
+> +
+> +	vcpu = kvm_get_vcpu(kvm, cpuid);
+> +	if (!vcpu && intid < VGIC_NR_PRIVATE_IRQS)
+> +		return -EINVAL;
+> +
+> +	irq = vgic_get_irq(kvm, vcpu, intid);
+> +	if (!irq)
+> +		return -EINVAL;
+> +
+> +	if (irq->hw != mapped_irq)
+> +		return -EINVAL;
+> +
+> +	spin_lock(&irq->irq_lock);
+> +
+> +	if (!vgic_validate_injection(irq, level)) {
+> +		/* Nothing to see here, move along... */
+> +		spin_unlock(&irq->irq_lock);
+> +		return 0;
+> +	}
+> +
+> +	if (irq->config == VGIC_CONFIG_LEVEL) {
+> +		irq->line_level = level;
+> +		irq->pending = level || irq->soft_pending;
+> +	} else {
+> +		irq->pending = true;
+> +	}
+> +
+> +	vgic_queue_irq_unlock(kvm, irq);
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
+> + * @kvm:     The VM structure pointer
+> + * @cpuid:   The CPU for PPIs
+> + * @intid:   The INTID to inject a new state to.
+> + * @level:   Edge-triggered:  true:  to trigger the interrupt
+> + *			      false: to ignore the call
+> + *	     Level-sensitive  true:  raise the input signal
+> + *			      false: lower the input signal
+> + *
+> + * The VGIC is not concerned with devices being active-LOW or active-HIGH for
+> + * level-sensitive interrupts.  You can think of the level parameter as 1
+> + * being HIGH and 0 being LOW and all devices being active-HIGH.
+> + */
+> +int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+> +			bool level)
+> +{
+> +	return vgic_update_irq_pending(kvm, cpuid, intid, level, false);
+> +}
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 61b8d22..c625767 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -18,5 +18,6 @@
+>  
+>  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  			      u32 intid);
+> +bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
+>  
+>  #endif
+> -- 
+> 2.8.2
+> 
 
-I'm bad at explaining that kind of things, so let me just quote
-Wikipedia (https://en.wikipedia.org/wiki/Binary_logarithm):
+Besides the comment nit:
 
-"The number of digits (bits) in the binary representation of a positive
-integer n is the integral part of 1 + log2=E2=80=8An"
-
-Is that what you were missing?
-
->=20
->>  */
->>
->>> +#define VGIC_ADDR_IRQ_MASK(b) GENMASK_ULL(ilog2(b) + ilog2(1024) -=
- \
->>> +					  ilog2(BITS_PER_BYTE) - 1, 0)
->>
->> /*
->>  * Convert a base address into a base interrupt (each interrupt
->>  * represented by <bits> bits. This assumes that <bits> is a power
->>  * of two, that <addr> both part of a memory region aligned on a
->=20
-> did you mean '<addr> *is* both part of' ?
-
-Indeed.
-
-Thanks,
-
-	M.
---=20
-Jazz is not dead. It just smells funny...
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
