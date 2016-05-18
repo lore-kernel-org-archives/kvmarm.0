@@ -1,28 +1,31 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [PATCH v3] KVM: arm/arm64: Add VGICv3 save/restore API
  documentation
-Date: Wed, 18 May 2016 19:03:49 +0200
-Message-ID: <20160518170349.GL6666@cbox>
+Date: Wed, 18 May 2016 19:04:13 +0200
+Message-ID: <20160518170413.GM6666@cbox>
 References: <1463150637-6896-1-git-send-email-christoffer.dall@linaro.org>
- <CAFEAcA8fcxo18HhfboE5j=SC8TyrPXqmpsPNymM8zw4PhMTRDw@mail.gmail.com>
+ <5735ED2F.4030104@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA8fcxo18HhfboE5j=SC8TyrPXqmpsPNymM8zw4PhMTRDw@mail.gmail.com>
+In-Reply-To: <5735ED2F.4030104@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Peter Maydell <peter.maydell@linaro.org>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 13, 2016 at 04:28:44PM +0100, Peter Maydell wrote:
-> On 13 May 2016 at 15:43, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+On Fri, May 13, 2016 at 04:05:19PM +0100, Marc Zyngier wrote:
+> On 13/05/16 15:43, Christoffer Dall wrote:
 > > Factor out the GICv3-specific documentation into a separate
 > > documentation file.  Add description for how to access distributor,
 > > redistributor, and CPU interface registers for GICv3 in this new file,
 > > and add a group for accesing level triggered IRQ information for GICv3
+> 
+> accessing
+> 
 > > as well.
-> >
+> > 
 > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > > ---
 > > Changes since v2:
@@ -31,14 +34,12 @@ On Fri, May 13, 2016 at 04:28:44PM +0100, Peter Maydell wrote:
 > >  - Specified exception behavior for STATUSR registers
 > >  - Added group for level-triggered IRQ status info
 > >  - Removed acks from Marc/Peter as content has changed
-> 
-> Hi; I have one substantial point and a few typos to point out.
-> 
+> > 
 > >  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 176 ++++++++++++++++++++++
 > >  Documentation/virtual/kvm/devices/arm-vgic.txt    |  21 +--
 > >  2 files changed, 180 insertions(+), 17 deletions(-)
 > >  create mode 100644 Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> >
+> > 
 > > diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
 > > new file mode 100644
 > > index 0000000..69201e8
@@ -87,9 +88,6 @@ On Fri, May 13, 2016 at 04:28:44PM +0100, Peter Maydell wrote:
 > > +    lower and higher word.
 > > +
 > > +    Writes to read-only registers can be ignored by the kernel.
-> 
-> Presumably "are ignored".
-> 
 > > +
 > > +    KVM_DEV_ARM_VGIC_GRP_DIST_REGS accesses the main distributor registers.
 > > +    KVM_DEV_ARM_VGIC_GRP_REDIST_REGS accesses the redistributor of the CPU
@@ -100,7 +98,7 @@ On Fri, May 13, 2016 at 04:28:44PM +0100, Peter Maydell wrote:
 > > +    effect as reading or writing the register on real hardware (except for
 > > +    GICD_STATUS and GICR_STATUSR, see blow), and the mpidr field is used to
 > 
-> "GICD_STATUSR". "below".
+>                                          below
 > 
 > > +    specify which redistributor is accessed.  The mpidr is ignored for the
 > > +    distributor.
@@ -135,9 +133,59 @@ On Fri, May 13, 2016 at 04:28:44PM +0100, Peter Maydell wrote:
 > > +    architecture defined MPIDR, and the field is encoded as follows:
 > > +      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
 > > +      |    Aff3    |    Aff2    |    Aff1    |    Aff0   |
+> > +
+> > +    The instr field encodes the system register to access based on the fields
+> > +    defined in the A64 instruction set encoding for system register access
+> > +    (RES means the bits are reserved for future use and should be zero):
 > 
-> ASCII art diagram missing a space after "Aff0" ?
+> Should we call this field RES0 in order to match the various
+> architecture documents?
 > 
+> > +
+> > +      | 15 ... 14 | 13 ... 11 | 10 ... 7 | 6 ... 3 | 2 ... 0 |
+> > +      |   Op 0    |    Op1    |    CRn   |   CRm   |   Op2   |
+> > +
+> > +    All system regs accessed through this API are (rw, 64-bit) and
+> > +    kvm_device_attr.addr points to a __u64 value.
+> > +
+> > +    KVM_DEV_ARM_VGIC_CPU_SYSREGS accesses the CPU interface registers for the
+> > +    CPU specified by the mpidr field.
+> > +
+> > +
+> > +  Limitations:
+> > +    - Priorities are not implemented, and registers are RAZ/WI
+> 
+> Is that still true? We should also document the lack of Group0 support.
+> 
+> > +  Errors:
+> > +    -ENXIO: Getting or setting this register is not yet supported
+> > +    -EBUSY: VCPU is running
+> > +    -EINVAL: Invalid mpidr supplied
+> > +
+> > +
+> > +  KVM_DEV_ARM_VGIC_GRP_NR_IRQS
+> > +  Attributes:
+> > +    A value describing the number of interrupts (SGI, PPI and SPI) for
+> > +    this GIC instance, ranging from 64 to 1024, in increments of 32.
+> > +
+> > +    kvm_device_attr.addr points to a __u32 value.
+> > +
+> > +  Errors:
+> > +    -EINVAL: Value set is out of the expected range
+> > +    -EBUSY: Value has already be set.
+> > +
+> > +
+> > +  KVM_DEV_ARM_VGIC_GRP_CTRL
+> > +  Attributes:
+> > +    KVM_DEV_ARM_VGIC_CTRL_INIT
+> > +      request the initialization of the VGIC, no additional parameter in
+> > +      kvm_device_attr.addr.
+> > +  Errors:
+> > +    -ENXIO: VGIC not properly configured as required prior to calling
+> > +     this attribute
+> > +    -ENODEV: no online VCPU
+> > +    -ENOMEM: memory shortage when allocating vgic internal data
+> > +
 > > +
 > > +  KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
 > > +  Attributes:
@@ -153,53 +201,97 @@ On Fri, May 13, 2016 at 04:28:44PM +0100, Peter Maydell wrote:
 > > +
 > > +      VGIC_LEVEL_INFO_LINE_LEVEL:
 > > +        Get/Set the intput level of the IRQ line for a given IRQ.
+> > +	vINTID must be a multiple of 32.
 > 
-> "input"
+> Is it for a single interrupt, or a set of 32 interrupts? I believe this
+> is the latter, so the "for a given IRQ" is a bit misleading ("for a set
+> of 32 contiguous interrupts"?).
 > 
-> > +       vINTID must be a multiple of 32.
 > > +
 > > +        kvm_device_attr.addr points to a __u32 value which will contain a
-> > +       bitmap where a set bit means the interrupt level is asserted.
+> > +	bitmap where a set bit means the interrupt level is asserted.
 > > +
-> > +       Bit[n] indicates the status for interrupt vINTID + n.
+> > +	Bit[n] indicates the status for interrupt vINTID + n.
 > > +
 > > +
 > > +      VGIC_LEVEL_INFO_SOFT_PENDING
 > > +        Get/Set the latch state of a GIVEN level-triggered IRQ as manipulated by
+> > +	guest writes to GICD_SPENDR.
+> > +	vINTID must be a multiple of 32.
 > 
-> Why is "given" capitalised?
-
-Just a mistake, some magic VIM keystroke must have happenede here.
-
+> Same here. Also, can you clear the soft-pending bit through this
+> interface? If so, this is not equivalent to a write to GICD_SPENDR.
 > 
-> I would like this to simply get/set the latch state regardless of whether
-> the interrupt is edge triggered or level triggered. (Obviously if the
-> interrupt is edge triggered this is equivalent to accessing the
-> ISPENDR/ICPENDR registers, but I don't want in userspace to have to
-> manually look at whether each interrupt is edge or level in order to
-> identify whether to use ISPENDR or this API, when in fact the state
-> in the kernel is exactly the same. I just want a straightforward
-> get/set accessor to the underlying state.)
+> > +
+> > +        kvm_device_attr.addr points to a __u32 value which will contain a
+> > +	bitmap where a set bit means the guest has set the interrupt by writing
+> > +	to the SPENDR.
+> > +
+> > +	Bit[n] indicates the status for interrupt vINTID + n.
+> > +
+> > +
+> > +    SGIs and any interrupt with a higher ID than the number of interrupts
+> 
+>                                             INTID
+> 
+> > +    supported, will be RAZ/WI.  LPIs are always edge-triggered and are
+> > +    therefore not supported by this interface.
+> > +
+> > +    PPIs are reported per VCPU as specified in the mpidr field, and SPIs are
+> > +    reported with the same value regardless of the mpidr specified.
+> > +
+> > +    The mpidr field encodes the CPU ID based on the affinity information in the
+> > +    architecture defined MPIDR, and the field is encoded as follows:
+> > +      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
+> > +      |    Aff3    |    Aff2    |    Aff1    |    Aff0   |
+> > diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> > index 59541d4..257b854 100644
+> > --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
+> > +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> > @@ -3,16 +3,16 @@ ARM Virtual Generic Interrupt Controller (VGIC)
+> >  
+> >  Device types supported:
+> >    KVM_DEV_TYPE_ARM_VGIC_V2     ARM Generic Interrupt Controller v2.0
+> > -  KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
+> >  
+> >  Only one VGIC instance may be instantiated through either this API or the
+> >  legacy KVM_CREATE_IRQCHIP api.  The created VGIC will act as the VM interrupt
+> >  controller, requiring emulated user-space devices to inject interrupts to the
+> >  VGIC instead of directly to CPUs.
+> >  
+> > -Creating a guest GICv3 device requires a host GICv3 as well.
+> > -GICv3 implementations with hardware compatibility support allow a guest GICv2
+> > -as well.
+> > +GICv3 implementations with hardware compatibility support allow creating a
+> > +guest GICv2 through this interface.  For information on creating a guest GICv3
+> > +device, see arm-vgic-v3.txt.  It is not possible to create both a GICv3 and
+> > +GICv2 device on the same VM.
+> >  
+> >  Groups:
+> >    KVM_DEV_ARM_VGIC_GRP_ADDR
+> > @@ -27,19 +27,6 @@ Groups:
+> >        interface register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V2.
+> >        This address needs to be 4K aligned and the region covers 4 KByte.
+> >  
+> > -    KVM_VGIC_V3_ADDR_TYPE_DIST (rw, 64-bit)
+> > -      Base address in the guest physical address space of the GICv3 distributor
+> > -      register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+> > -      This address needs to be 64K aligned and the region covers 64 KByte.
+> > -
+> > -    KVM_VGIC_V3_ADDR_TYPE_REDIST (rw, 64-bit)
+> > -      Base address in the guest physical address space of the GICv3
+> > -      redistributor register mappings. There are two 64K pages for each
+> > -      VCPU and all of the redistributor pages are contiguous.
+> > -      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+> > -      This address needs to be 64K aligned.
+> > -
+> > -
+> >    KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+> >    Attributes:
+> >      The attr field of kvm_device_attr encodes two values:
+> > 
 > 
 
-I think my reservations against this come from the fact that we're
-getting farther and farther away from anything that looks like
-software's interface to the GIC hardware as specified by the
-architecture, and it was kind of the motivation for our choice of API
-here in the first place to try to stay close to that.
+Ack on all your points, will consider them on respin.
 
-That being said, what we're designing an API for here is a different
-case that for what the software view of the hardware via registers has
-been designed for, so potentially it's ok to deviate from that.
-
-How about we special-case the SPENDR region, and make CPENDR region
-RAZ/WI, and the SPENDR region then reflects the latch state exclusively.
-Or is this more confusing than just having a separate 'fake' region?
-
-Do you have a suggestion in mind for wording/naming of the 'latch state'
-that makes sense for software people who have access to the GIC manual,
-but doesn't necessarily understand how the hardware would be built and
-why 'latch state' logically has clear semantics... ?
-
-Thanks,
 -Christoffer
