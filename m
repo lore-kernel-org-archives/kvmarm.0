@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 33/57] KVM: arm/arm64: vgic-new: Add SGIPENDR register
- handlers
-Date: Thu, 19 May 2016 19:08:12 +0100
-Message-ID: <1463681316-23039-34-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 42/57] KVM: arm/arm64: vgic-new: vgic_kvm_device:
+ KVM_DEV_ARM_VGIC_GRP_CTRL
+Date: Thu, 19 May 2016 19:08:21 +0100
+Message-ID: <1463681316-23039-43-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 697F549B3C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:06:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF58A49BBB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:06:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5Es34hDhER20 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2016 14:06:05 -0400 (EDT)
+ with ESMTP id NePUGGzhgKlo for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2016 14:06:29 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 406AE49B2C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 89C9549B93
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:56 -0400 (EDT)
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,108 +32,72 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As this register is v2 specific, its implementation lives entirely
-in vgic-mmio-v2.c.
-This register allows setting the source mask of an IPI.
+From: Eric Auger <eric.auger@linaro.org>
 
+This patch implements the KVM_DEV_ARM_VGIC_GRP_CTRL group API
+featuring KVM_DEV_ARM_VGIC_CTRL_INIT attribute. The vgic_init
+function is not yet implemented though.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
-Changelog RFC..v1:
-- remove IRQ lock from read handler
-- update pending bit on setting the first / clearing the last bit
-- queue virtual IRQ if necessary
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-Changelog v1 .. v2:
-- adapt to new MMIO framework
-
-Changelog v3 .. v4:
-- specify accessor width
-
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 62 ++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 60 insertions(+), 2 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index c884e9b..3925d4c 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -146,6 +146,64 @@ static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 05ff925..e153f12 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -23,6 +23,8 @@
+ static int vgic_set_common_attr(struct kvm_device *dev,
+ 				struct kvm_device_attr *attr)
+ {
++	int r;
++
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS: {
+ 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+@@ -55,6 +57,16 @@ static int vgic_set_common_attr(struct kvm_device *dev,
+ 
+ 		return ret;
  	}
- }
- 
-+static unsigned long vgic_mmio_read_sgipend(struct kvm_vcpu *vcpu,
-+					    gpa_t addr, unsigned int len)
-+{
-+	u32 intid = addr & 0x0f;
-+	int i;
-+	u64 val = 0;
-+
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		val |= (u64)irq->source << (i * 8);
-+	}
-+	return val;
-+}
-+
-+static void vgic_mmio_write_sgipendc(struct kvm_vcpu *vcpu,
-+				     gpa_t addr, unsigned int len,
-+				     unsigned long val)
-+{
-+	u32 intid = addr & 0x0f;
-+	int i;
-+
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		spin_lock(&irq->irq_lock);
-+
-+		irq->source &= ~((val >> (i * 8)) & 0xff);
-+		if (!irq->source)
-+			irq->pending = false;
-+
-+		spin_unlock(&irq->irq_lock);
-+	}
-+}
-+
-+static void vgic_mmio_write_sgipends(struct kvm_vcpu *vcpu,
-+				     gpa_t addr, unsigned int len,
-+				     unsigned long val)
-+{
-+	u32 intid = addr & 0x0f;
-+	int i;
-+
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		spin_lock(&irq->irq_lock);
-+
-+		irq->source |= (val >> (i * 8)) & 0xff;
-+
-+		if (irq->source) {
-+			irq->pending = true;
-+			vgic_queue_irq_unlock(vcpu->kvm, irq);
-+		} else {
-+			spin_unlock(&irq->irq_lock);
++	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
++		switch (attr->attr) {
++		case KVM_DEV_ARM_VGIC_CTRL_INIT:
++			mutex_lock(&dev->kvm->lock);
++			r = vgic_init(dev->kvm);
++			mutex_unlock(&dev->kvm->lock);
++			return r;
 +		}
++		break;
 +	}
-+}
-+
- static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
- 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
-@@ -184,10 +242,10 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 		vgic_mmio_read_raz, vgic_mmio_write_sgir, 4,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_CLEAR,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
-+		vgic_mmio_read_sgipend, vgic_mmio_write_sgipendc, 16,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_SET,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
-+		vgic_mmio_read_sgipend, vgic_mmio_write_sgipends, 16,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
- };
+ 	}
  
+ 	return -ENXIO;
+@@ -131,6 +143,11 @@ static int vgic_v2_has_attr(struct kvm_device *dev,
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+ 		return 0;
++	case KVM_DEV_ARM_VGIC_GRP_CTRL:
++		switch (attr->attr) {
++		case KVM_DEV_ARM_VGIC_CTRL_INIT:
++			return 0;
++		}
+ 	}
+ 	return -ENXIO;
+ }
+@@ -166,6 +183,11 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+ 		return 0;
++	case KVM_DEV_ARM_VGIC_GRP_CTRL:
++		switch (attr->attr) {
++		case KVM_DEV_ARM_VGIC_CTRL_INIT:
++			return 0;
++		}
+ 	}
+ 	return -ENXIO;
+ }
 -- 
 2.8.2
