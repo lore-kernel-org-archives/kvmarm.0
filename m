@@ -1,126 +1,157 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 38/57] KVM: arm/arm64: vgic-new: Add GICv3 IROUTER register
- handlers
-Date: Thu, 19 May 2016 19:08:17 +0100
-Message-ID: <1463681316-23039-39-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 48/57] KVM: arm/arm64: vgic-new: Add GICH_VMCR accessors
+Date: Thu, 19 May 2016 19:08:27 +0100
+Message-ID: <1463681316-23039-49-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D8E8449BAE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:06:28 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iwxDbV5dJvYj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2016 14:06:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B66F549BC1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:50 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since GICv3 supports much more than the 8 CPUs the GICv2 ITARGETSR
-register can handle, the new IROUTER register covers the whole range
-of possible target (V)CPUs by using the same MPIDR that the cores
-report themselves.
-In addition to translating this MPIDR into a vcpu pointer we store
-the originally written value as well. The architecture allows to
-write any values into the register, which must be read back as written.
-
-Since we don't support affinity level 3, we don't need to take care
-about the upper word of this 64-bit register, which simplifies the
-handling a bit.
+Since the GIC CPU interface is always virtualized by the hardware,
+we don't have CPU interface state information readily available in our
+emulation if userland wants to save or restore it.
+Fortunately the GIC hypervisor interface provides the VMCR register to
+access the required virtual CPU interface bits.
+Provide wrappers for GICv2 and GICv3 hosts to have access to this
+register.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
-Changelog RFC..v1:
-- fold in and simplify vgic_v3_irq_change_affinity
-
-Changelog v1 .. v2:
-- adapt to new MMIO framework
+Changelog v2 .. v3:
+- remove exported v2/v3 selector functions (as per Marc's patch)
 
 Changelog v3 .. v4:
-- move accessor width check into dispatcher
-- use IRQ number accessor macro
+- move struct vgic_vmcr into the VGIC's private header file
 
-Changelog v4 .. v5:
-- make upper word of IROUTER read-as-zero
+ virt/kvm/arm/vgic/vgic-v2.c | 29 +++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c | 22 ++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h    | 21 +++++++++++++++++++++
+ 3 files changed, 72 insertions(+)
 
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 41 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 40 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index abf0d8d..78764d9 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -75,6 +75,45 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
- 	}
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index fb5e65c..d943059 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -174,3 +174,32 @@ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr)
+ {
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = 0;
+ }
++
++void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
++{
++	u32 vmcr;
++
++	vmcr  = (vmcrp->ctlr << GICH_VMCR_CTRL_SHIFT) & GICH_VMCR_CTRL_MASK;
++	vmcr |= (vmcrp->abpr << GICH_VMCR_ALIAS_BINPOINT_SHIFT) &
++		GICH_VMCR_ALIAS_BINPOINT_MASK;
++	vmcr |= (vmcrp->bpr << GICH_VMCR_BINPOINT_SHIFT) &
++		GICH_VMCR_BINPOINT_MASK;
++	vmcr |= (vmcrp->pmr << GICH_VMCR_PRIMASK_SHIFT) &
++		GICH_VMCR_PRIMASK_MASK;
++
++	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = vmcr;
++}
++
++void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
++{
++	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr;
++
++	vmcrp->ctlr = (vmcr & GICH_VMCR_CTRL_MASK) >>
++			GICH_VMCR_CTRL_SHIFT;
++	vmcrp->abpr = (vmcr & GICH_VMCR_ALIAS_BINPOINT_MASK) >>
++			GICH_VMCR_ALIAS_BINPOINT_SHIFT;
++	vmcrp->bpr  = (vmcr & GICH_VMCR_BINPOINT_MASK) >>
++			GICH_VMCR_BINPOINT_SHIFT;
++	vmcrp->pmr  = (vmcr & GICH_VMCR_PRIMASK_MASK) >>
++			GICH_VMCR_PRIMASK_SHIFT;
++}
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index fb547da..8548297 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -160,3 +160,25 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
+ {
+ 	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr] = 0;
+ }
++
++void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
++{
++	u32 vmcr;
++
++	vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
++	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
++	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
++	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
++
++	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
++}
++
++void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
++{
++	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
++
++	vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
++	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
++	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
++	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
++}
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index f826026..d2c1fd5 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -27,6 +27,13 @@
+ 
+ #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
+ 
++struct vgic_vmcr {
++	u32	ctlr;
++	u32	abpr;
++	u32	bpr;
++	u32	pmr;
++};
++
+ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 			      u32 intid);
+ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
+@@ -40,6 +47,8 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
+ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+ int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			 int offset, u32 *val);
++void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
++void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
+ 			     enum vgic_type);
+ 
+@@ -49,6 +58,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
+ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
++void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
++void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
+ #else
+ static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+@@ -72,6 +83,16 @@ static inline void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+ {
  }
  
-+static unsigned long vgic_mmio_read_irouter(struct kvm_vcpu *vcpu,
-+					    gpa_t addr, unsigned int len)
++static inline
++void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
 +{
-+	int intid = VGIC_ADDR_TO_INTID(addr, 64);
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
-+
-+	if (!irq)
-+		return 0;
-+
-+	/* The upper word is RAZ for us. */
-+	if (addr & 4)
-+		return 0;
-+
-+	return extract_bytes(READ_ONCE(irq->mpidr), addr & 7, len);
 +}
 +
-+static void vgic_mmio_write_irouter(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len,
-+				    unsigned long val)
++static inline
++void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
 +{
-+	int intid = VGIC_ADDR_TO_INTID(addr, 64);
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
-+
-+	if (!irq)
-+		return;
-+
-+	/* The upper word is WI for us since we don't implement Aff3. */
-+	if (addr & 4)
-+		return;
-+
-+	spin_lock(&irq->irq_lock);
-+
-+	/* We only care about and preserve Aff0, Aff1 and Aff2. */
-+	irq->mpidr = val & GENMASK(23, 0);
-+	irq->target_vcpu = kvm_mpidr_to_vcpu(vcpu->kvm, irq->mpidr);
-+
-+	spin_unlock(&irq->irq_lock);
 +}
 +
- static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
- 					      gpa_t addr, unsigned int len)
+ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
+ 					      gpa_t dist_base_address)
  {
-@@ -170,7 +209,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 64,
-+		vgic_mmio_read_irouter, vgic_mmio_write_irouter, 64,
- 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
- 		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
 -- 
 2.8.2
+
