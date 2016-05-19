@@ -1,94 +1,103 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 32/57] KVM: arm/arm64: vgic-new: Add SGIR register handler
-Date: Thu, 19 May 2016 19:08:11 +0100
-Message-ID: <1463681316-23039-33-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 22/57] KVM: arm/arm64: vgic-new: Implement
+ kvm_vgic_vcpu_pending_irq
+Date: Thu, 19 May 2016 19:08:01 +0100
+Message-ID: <1463681316-23039-23-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B1FAB49B2C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:41 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id oRxnzZ4-SEeH for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2016 14:05:40 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 392CA49B53
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:26 -0400 (EDT)
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Triggering an IPI via this register is v2 specific, so the
-implementation lives entirely in vgic-mmio-v2.c.
+From: Eric Auger <eric.auger@linaro.org>
 
+Tell KVM whether a particular VCPU has an IRQ that needs handling
+in the guest. This is used to decide whether a VCPU is runnable.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
 Changelog RFC..v1:
-- silently return on illegal TargetListFilter value (=3)
+- return false if distributor is disabled
+- add vgic_kick_vcpus() implementations
 
-Changelog v1 .. v2:
-- adapt to new MMIO framework
+Changelog v2 .. v3:
+- remove vgic_kick_vcpus() implementation from this patch
 
-Changelog v3 .. v4:
-- specify accessor width
+ include/kvm/vgic/vgic.h  |  2 ++
+ virt/kvm/arm/vgic/vgic.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 43 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 42 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 52389ff..c884e9b 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -64,6 +64,47 @@ static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
- 	}
- }
+diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+index 9506267..f663288 100644
+--- a/include/kvm/vgic/vgic.h
++++ b/include/kvm/vgic/vgic.h
+@@ -184,6 +184,8 @@ struct vgic_cpu {
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level);
  
-+static void vgic_mmio_write_sgir(struct kvm_vcpu *source_vcpu,
-+				 gpa_t addr, unsigned int len,
-+				 unsigned long val)
++int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
++
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	(false)
+ #define vgic_ready(k)		((k)->arch.vgic.ready)
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 719cef0..48fdaf3 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -520,3 +520,28 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	vgic_flush_lr_state(vcpu);
+ 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+ }
++
++int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
 +{
-+	int nr_vcpus = atomic_read(&source_vcpu->kvm->online_vcpus);
-+	int intid = val & 0xf;
-+	int targets = (val >> 16) & 0xff;
-+	int mode = (val >> 24) & 0x03;
-+	int c;
-+	struct kvm_vcpu *vcpu;
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_irq *irq;
++	bool pending = false;
 +
-+	switch (mode) {
-+	case 0x0:		/* as specified by targets */
-+		break;
-+	case 0x1:
-+		targets = (1U << nr_vcpus) - 1;			/* all, ... */
-+		targets &= ~(1U << source_vcpu->vcpu_id);	/* but self */
-+		break;
-+	case 0x2:		/* this very vCPU only */
-+		targets = (1U << source_vcpu->vcpu_id);
-+		break;
-+	case 0x3:		/* reserved */
-+		return;
-+	}
++	if (!vcpu->kvm->arch.vgic.enabled)
++		return false;
 +
-+	kvm_for_each_vcpu(c, vcpu, source_vcpu->kvm) {
-+		struct vgic_irq *irq;
++	spin_lock(&vgic_cpu->ap_list_lock);
 +
-+		if (!(targets & (1U << c)))
-+			continue;
-+
-+		irq = vgic_get_irq(source_vcpu->kvm, vcpu, intid);
-+
++	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
 +		spin_lock(&irq->irq_lock);
-+		irq->pending = true;
-+		irq->source |= 1U << source_vcpu->vcpu_id;
++		pending = irq->pending && irq->enabled;
++		spin_unlock(&irq->irq_lock);
 +
-+		vgic_queue_irq_unlock(source_vcpu->kvm, irq);
++		if (pending)
++			break;
 +	}
-+}
 +
- static unsigned long vgic_mmio_read_target(struct kvm_vcpu *vcpu,
- 					   gpa_t addr, unsigned int len)
- {
-@@ -140,7 +181,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 		vgic_mmio_read_config, vgic_mmio_write_config, 2,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
-+		vgic_mmio_read_raz, vgic_mmio_write_sgir, 4,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_CLEAR,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
++	spin_unlock(&vgic_cpu->ap_list_lock);
++
++	return pending;
++}
 -- 
 2.8.2
-
