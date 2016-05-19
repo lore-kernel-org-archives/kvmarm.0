@@ -1,7 +1,7 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 35/57] KVM: arm/arm64: vgic-new: Add GICv3 CTLR, IIDR, TYPER handlers
-Date: Thu, 19 May 2016 19:08:14 +0100
-Message-ID: <1463681316-23039-36-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 40/57] KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM device ops registration
+Date: Thu, 19 May 2016 19:08:19 +0100
+Message-ID: <1463681316-23039-41-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
@@ -10,103 +10,152 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As in the GICv2 emulation we handle those three registers in one
-function.
+From: Eric Auger <eric.auger@linaro.org>
 
+This patch introduces the skeleton for the KVM device operations
+associated to KVM_DEV_TYPE_ARM_VGIC_V2 and KVM_DEV_TYPE_ARM_VGIC_V3.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
-Changelog RFC..v1:
-- kick VCPUs if distributor gets enabled
-
 Changelog v1 .. v2:
-- rewrite write handler to use switch statement
+- rename vgic_kvm_device.c to vgic-kvm-device.c
 
-Changelog v3 .. v4:
-- specify accessor width
+Changelog v2 .. v3:
+- replace inclusion of vgic/vgic.h with arm_vgic.h
+- add kvm_register_vgic_device() prototype to this patch
 
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 48 +++++++++++++++++++++++++++++++++++++++-
- virt/kvm/arm/vgic/vgic.h         |  1 +
- 2 files changed, 48 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 108 ++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h            |   2 +
+ 2 files changed, 110 insertions(+)
+ create mode 100644 virt/kvm/arm/vgic/vgic-kvm-device.c
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 02ddaf7..34afa75 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -22,6 +22,52 @@
- #include "vgic.h"
- #include "vgic-mmio.h"
- 
-+static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
-+					    gpa_t addr, unsigned int len)
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+new file mode 100644
+index 0000000..ff332f3
+--- /dev/null
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -0,0 +1,108 @@
++/*
++ * VGIC: KVM DEVICE API
++ *
++ * Copyright (C) 2015 ARM Ltd.
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++#include <linux/kvm_host.h>
++#include <kvm/arm_vgic.h>
++
++/* common helpers */
++
++static int vgic_create(struct kvm_device *dev, u32 type)
 +{
-+	u32 value = 0;
-+
-+	switch (addr & 0x0c) {
-+	case GICD_CTLR:
-+		if (vcpu->kvm->arch.vgic.enabled)
-+			value |= GICD_CTLR_ENABLE_SS_G1;
-+		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
-+		break;
-+	case GICD_TYPER:
-+		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-+		value = (value >> 5) - 1;
-+		value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
-+		break;
-+	case GICD_IIDR:
-+		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-+		break;
-+	default:
-+		return 0;
-+	}
-+
-+	return value;
++	return kvm_vgic_create(dev->kvm, type);
 +}
 +
-+static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len,
-+				    unsigned long val)
++static void vgic_destroy(struct kvm_device *dev)
 +{
-+	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+	bool was_enabled = dist->enabled;
++	kfree(dev);
++}
 +
-+	switch (addr & 0x0c) {
-+	case GICD_CTLR:
-+		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
-+
-+		if (!was_enabled && dist->enabled)
-+			vgic_kick_vcpus(vcpu->kvm);
++void kvm_register_vgic_device(unsigned long type)
++{
++	switch (type) {
++	case KVM_DEV_TYPE_ARM_VGIC_V2:
++		kvm_register_device_ops(&kvm_arm_vgic_v2_ops,
++					KVM_DEV_TYPE_ARM_VGIC_V2);
 +		break;
-+	case GICD_TYPER:
-+	case GICD_IIDR:
-+		return;
++#ifdef CONFIG_KVM_ARM_VGIC_V3
++	case KVM_DEV_TYPE_ARM_VGIC_V3:
++		kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
++					KVM_DEV_TYPE_ARM_VGIC_V3);
++		break;
++#endif
 +	}
 +}
 +
- /*
-  * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
-  * redistributors, while SPIs are covered by registers in the distributor
-@@ -48,7 +94,7 @@
- 
- static const struct vgic_register_region vgic_v3_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GICD_CTLR,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
-+		vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc, 16,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR,
- 		vgic_mmio_read_rao, vgic_mmio_write_wi, 1,
++/* V2 ops */
++
++static int vgic_v2_set_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++static int vgic_v2_get_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++static int vgic_v2_has_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++struct kvm_device_ops kvm_arm_vgic_v2_ops = {
++	.name = "kvm-arm-vgic-v2",
++	.create = vgic_create,
++	.destroy = vgic_destroy,
++	.set_attr = vgic_v2_set_attr,
++	.get_attr = vgic_v2_get_attr,
++	.has_attr = vgic_v2_has_attr,
++};
++
++/* V3 ops */
++
++#ifdef CONFIG_KVM_ARM_VGIC_V3
++
++static int vgic_v3_set_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++static int vgic_v3_get_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++static int vgic_v3_has_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++struct kvm_device_ops kvm_arm_vgic_v3_ops = {
++	.name = "kvm-arm-vgic-v3",
++	.create = vgic_create,
++	.destroy = vgic_destroy,
++	.set_attr = vgic_v3_set_attr,
++	.get_attr = vgic_v3_get_attr,
++	.has_attr = vgic_v3_has_attr,
++};
++
++#endif /* CONFIG_KVM_ARM_VGIC_V3 */
++
 diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 6742b11..44c6a1b 100644
+index 44c6a1b..77b0ab3 100644
 --- a/virt/kvm/arm/vgic/vgic.h
 +++ b/virt/kvm/arm/vgic/vgic.h
-@@ -19,6 +19,7 @@
- #define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
- #define IMPLEMENTER_ARM		0x43b
+@@ -73,4 +73,6 @@ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
+ }
+ #endif
  
-+#define INTERRUPT_ID_BITS_SPIS	10
- #define VGIC_PRI_BITS		5
- 
- #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
++void kvm_register_vgic_device(unsigned long type);
++
+ #endif
 -- 
 2.8.2
 
