@@ -1,207 +1,70 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 05/57] KVM: arm/arm64: Remove the IRQ field from struct
- irq_phys_map
-Date: Thu, 19 May 2016 19:07:44 +0100
-Message-ID: <1463681316-23039-6-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 14/57] KVM: arm/arm64: move GICv2 emulation defines into arm-gic-v3.h
+Date: Thu, 19 May 2016 19:07:53 +0100
+Message-ID: <1463681316-23039-15-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0120749B30
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tIG42hTO57Md for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2016 14:05:05 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73F4949B2F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:01 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+As (some) GICv3 hosts can emulate a GICv2, some GICv2 specific masks
+for the list register definition also apply to GICv3 LRs.
+At the moment we have those definitions in the KVM VGICv3
+implementation, so let's move them into the GICv3 header file to
+have them automatically defined.
 
-The communication of a Linux IRQ number from outside the VGIC to the
-vgic was a leftover from the day when the vgic code cared about how a
-particular device injects virtual interrupts mapped to a physical
-interrupt.
-
-We can safely remove this notion, leaving all physical IRQ handling to
-be done in the device driver (the arch timer in this case), which makes
-room for a saner API for the new VGIC.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
-Changelog v1 .. v2:
-- update kerneldoc comments on kvm_vgic_map_phys_irq()
+ include/linux/irqchip/arm-gic-v3.h | 5 +++++
+ virt/kvm/arm/vgic-v3.c             | 8 +-------
+ 2 files changed, 6 insertions(+), 7 deletions(-)
 
-Changelog v2 .. v3:
-- include <linux/irq.h>
-
- include/kvm/arm_vgic.h    |  3 +--
- virt/kvm/arm/arch_timer.c | 23 +++++++++++++++++++++--
- virt/kvm/arm/vgic.c       | 28 ++++++----------------------
- 3 files changed, 28 insertions(+), 26 deletions(-)
-
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index c7bb184..9ad7625 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -158,7 +158,6 @@ struct vgic_io_device {
- struct irq_phys_map {
- 	u32			virt_irq;
- 	u32			phys_irq;
--	u32			irq;
- };
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index d5d798b..ec938d1 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -276,6 +276,11 @@
+ #define ICH_LR_PHYS_ID_SHIFT		32
+ #define ICH_LR_PHYS_ID_MASK		(0x3ffULL << ICH_LR_PHYS_ID_SHIFT)
  
- struct irq_phys_map_entry {
-@@ -346,7 +345,7 @@ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
- void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
--					   int virt_irq, int irq);
-+					   int virt_irq, int phys_irq);
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
- bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
- 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 962b442..e45895a 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -20,6 +20,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/interrupt.h>
-+#include <linux/irq.h>
- 
- #include <clocksource/arm_arch_timer.h>
- #include <asm/arch_timer.h>
-@@ -300,7 +301,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	if (timer->active_cleared_last && !phys_active)
- 		return;
- 
--	ret = irq_set_irqchip_state(timer->map->irq,
-+	ret = irq_set_irqchip_state(host_vtimer_irq,
- 				    IRQCHIP_STATE_ACTIVE,
- 				    phys_active);
- 	WARN_ON(ret);
-@@ -333,6 +334,9 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct irq_phys_map *map;
-+	struct irq_desc *desc;
-+	struct irq_data *data;
-+	int phys_irq;
- 
- 	/*
- 	 * The vcpu timer irq number cannot be determined in
-@@ -352,10 +356,25 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 	kvm_timer_update_state(vcpu);
- 
- 	/*
-+	 * Find the physical IRQ number corresponding to the host_vtimer_irq
-+	 */
-+	desc = irq_to_desc(host_vtimer_irq);
-+	if (!desc) {
-+		kvm_err("%s: no interrupt descriptor\n", __func__);
-+		return -EINVAL;
-+	}
++/* These are for GICv2 emulation only */
++#define GICH_LR_VIRTUALID		(0x3ffUL << 0)
++#define GICH_LR_PHYSID_CPUID_SHIFT	(10)
++#define GICH_LR_PHYSID_CPUID		(7UL << GICH_LR_PHYSID_CPUID_SHIFT)
 +
-+	data = irq_desc_get_irq_data(desc);
-+	while (data->parent_data)
-+		data = data->parent_data;
-+
-+	phys_irq = data->hwirq;
-+
-+	/*
- 	 * Tell the VGIC that the virtual interrupt is tied to a
- 	 * physical interrupt. We do that once per VCPU.
- 	 */
--	map = kvm_vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq);
-+	map = kvm_vgic_map_phys_irq(vcpu, irq->irq, phys_irq);
- 	if (WARN_ON(IS_ERR(map)))
- 		return PTR_ERR(map);
+ #define ICH_MISR_EOI			(1 << 0)
+ #define ICH_MISR_U			(1 << 1)
  
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 06abd59..a7e496a 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1711,38 +1711,24 @@ static struct list_head *vgic_get_irq_phys_map_list(struct kvm_vcpu *vcpu,
- /**
-  * kvm_vgic_map_phys_irq - map a virtual IRQ to a physical IRQ
-  * @vcpu: The VCPU pointer
-- * @virt_irq: The virtual irq number
-- * @irq: The Linux IRQ number
-+ * @virt_irq: The virtual IRQ number for the guest
-+ * @phys_irq: The hardware IRQ number of the host
-  *
-  * Establish a mapping between a guest visible irq (@virt_irq) and a
-- * Linux irq (@irq). On injection, @virt_irq will be associated with
-- * the physical interrupt represented by @irq. This mapping can be
-+ * hardware irq (@phys_irq). On injection, @virt_irq will be associated with
-+ * the physical interrupt represented by @phys_irq. This mapping can be
-  * established multiple times as long as the parameters are the same.
-  *
-  * Returns a valid pointer on success, and an error pointer otherwise
-  */
- struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
--					   int virt_irq, int irq)
-+					   int virt_irq, int phys_irq)
- {
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	struct list_head *root = vgic_get_irq_phys_map_list(vcpu, virt_irq);
- 	struct irq_phys_map *map;
- 	struct irq_phys_map_entry *entry;
--	struct irq_desc *desc;
--	struct irq_data *data;
--	int phys_irq;
+diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+index c02a1b1..75b02fa 100644
+--- a/virt/kvm/arm/vgic-v3.c
++++ b/virt/kvm/arm/vgic-v3.c
+@@ -29,12 +29,6 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_mmu.h>
  
--	desc = irq_to_desc(irq);
--	if (!desc) {
--		kvm_err("%s: no interrupt descriptor\n", __func__);
--		return ERR_PTR(-EINVAL);
--	}
+-/* These are for GICv2 emulation only */
+-#define GICH_LR_VIRTUALID		(0x3ffUL << 0)
+-#define GICH_LR_PHYSID_CPUID_SHIFT	(10)
+-#define GICH_LR_PHYSID_CPUID		(7UL << GICH_LR_PHYSID_CPUID_SHIFT)
+-#define ICH_LR_VIRTUALID_MASK		(BIT_ULL(32) - 1)
 -
--	data = irq_desc_get_irq_data(desc);
--	while (data->parent_data)
--		data = data->parent_data;
--
--	phys_irq = data->hwirq;
+ static u32 ich_vtr_el2;
  
- 	/* Create a new mapping */
- 	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-@@ -1755,8 +1741,7 @@ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
- 	map = vgic_irq_map_search(vcpu, virt_irq);
- 	if (map) {
- 		/* Make sure this mapping matches */
--		if (map->phys_irq != phys_irq	||
--		    map->irq      != irq)
-+		if (map->phys_irq != phys_irq)
- 			map = ERR_PTR(-EINVAL);
+ static struct vgic_lr vgic_v3_get_lr(const struct kvm_vcpu *vcpu, int lr)
+@@ -43,7 +37,7 @@ static struct vgic_lr vgic_v3_get_lr(const struct kvm_vcpu *vcpu, int lr)
+ 	u64 val = vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr];
  
- 		/* Found an existing, valid mapping */
-@@ -1766,7 +1751,6 @@ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
- 	map           = &entry->map;
- 	map->virt_irq = virt_irq;
- 	map->phys_irq = phys_irq;
--	map->irq      = irq;
- 
- 	list_add_tail_rcu(&entry->entry, root);
+ 	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+-		lr_desc.irq = val & ICH_LR_VIRTUALID_MASK;
++		lr_desc.irq = val & ICH_LR_VIRTUAL_ID_MASK;
+ 	else
+ 		lr_desc.irq = val & GICH_LR_VIRTUALID;
  
 -- 
 2.8.2
+
