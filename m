@@ -1,82 +1,104 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v3] KVM: arm/arm64: Add VGICv3 save/restore API documentation
-Date: Thu, 19 May 2016 11:44:23 +0100
-Message-ID: <CAFEAcA_RATH6-6PuqevNWw=X=C+_hphhspu6_u=hcpeeRfLtpg@mail.gmail.com>
-References: <1463150637-6896-1-git-send-email-christoffer.dall@linaro.org>
- <CAFEAcA8fcxo18HhfboE5j=SC8TyrPXqmpsPNymM8zw4PhMTRDw@mail.gmail.com> <20160518170349.GL6666@cbox>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v4 32/56] KVM: arm/arm64: vgic-new: Add SGIPENDR register
+ handlers
+Date: Thu, 19 May 2016 14:25:22 +0100
+Message-ID: <d2a62bb3-791a-b6d2-a41b-faa671f5e3f6@arm.com>
+References: <1463392481-26583-1-git-send-email-andre.przywara@arm.com>
+ <1463392481-26583-33-git-send-email-andre.przywara@arm.com>
+ <20160518131449.GI3827@cbox> <573C6EA6.90803@arm.com>
+ <20160518135022.GL3827@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160518170349.GL6666@cbox>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AD04412DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 09:21:31 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id K4Ja-vgXmPKy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2016 09:21:30 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E0CB4410EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 09:21:29 -0400 (EDT)
+In-Reply-To: <20160518135022.GL3827@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 18 May 2016 at 18:03, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> On Fri, May 13, 2016 at 04:28:44PM +0100, Peter Maydell wrote:
->> I would like this to simply get/set the latch state regardless of whether
->> the interrupt is edge triggered or level triggered. (Obviously if the
->> interrupt is edge triggered this is equivalent to accessing the
->> ISPENDR/ICPENDR registers, but I don't want in userspace to have to
->> manually look at whether each interrupt is edge or level in order to
->> identify whether to use ISPENDR or this API, when in fact the state
->> in the kernel is exactly the same. I just want a straightforward
->> get/set accessor to the underlying state.)
+Hi,
 
-> I think my reservations against this come from the fact that we're
-> getting farther and farther away from anything that looks like
-> software's interface to the GIC hardware as specified by the
-> architecture, and it was kind of the motivation for our choice of API
-> here in the first place to try to stay close to that.
->
-> That being said, what we're designing an API for here is a different
-> case that for what the software view of the hardware via registers has
-> been designed for, so potentially it's ok to deviate from that.
+On 18/05/16 14:50, Christoffer Dall wrote:
+> On Wed, May 18, 2016 at 02:31:18PM +0100, Andre Przywara wrote:
+>> Hi,
+>>
+>> On 18/05/16 14:14, Christoffer Dall wrote:
+>>> On Mon, May 16, 2016 at 10:53:20AM +0100, Andre Przywara wrote:
+>>>> As this register is v2 specific, its implementation lives entirely
+>>>> in vgic-mmio-v2.c.
+>>>> This register allows setting the source mask of an IPI.
+>>>>
+>>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>>>> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+>>>> ---
+>>>> Changelog RFC..v1:
+>>>> - remove IRQ lock from read handler
+>>>> - update pending bit on setting the first / clearing the last bit
+>>>> - queue virtual IRQ if necessary
+>>>>
+>>>> Changelog v1 .. v2:
+>>>> - adapt to new MMIO framework
+>>>>
+>>>> Changelog v3 .. v4:
+>>>> - specify accessor width
+>>>>
+>>>>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 62 +++++++++++++++++++++++++++++++=
++++++++--
+>>>>  1 file changed, 60 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic=
+-mmio-v2.c
+>>>> index c884e9b..3925d4c 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
+>>>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+>>>> @@ -146,6 +146,64 @@ static void vgic_mmio_write_target(struct kvm_vcp=
+u *vcpu,
+>>>>  	}
+>>>>  }
+>>>>  =
 
-Yes; our two deviations are just the two awkward points where the
-register view of the hardware doesn't provide complete access to
-the internal state.
+>>>> +static unsigned long vgic_mmio_read_sgipend(struct kvm_vcpu *vcpu,
+>>>> +					    gpa_t addr, unsigned int len)
+>>>> +{
+>>>> +	u32 intid =3D addr & 0x0f;
+>>>
+>>> is there a reason why we cannot use the magic macro here?
+>>
+>> I wasn't sure about this, because it's not covering all 1024 interrupts,
+>> but just SGIs, so it's always fixed to 16 interrupts =E1 8 bits. The
+>> default mask would be too big in this case.
+>> I guess it would work anyway because this region is limited to 16 bytes
+>> in our description, so we could use this here anyway to make it more
+>> aligned with the other handlers, maybe adding a comment about the
+>> difference?
+>>
+> meh, either way works for me actually, whatever you prefer.
 
-> How about we special-case the SPENDR region, and make CPENDR region
-> RAZ/WI, and the SPENDR region then reflects the latch state exclusively.
-> Or is this more confusing than just having a separate 'fake' region?
+So for the records: we can't use the macro here, since it relies on
+masking and thus a certain alignment, which the SGIPENDR registers do
+not have (being mapped to 0xF10 and 0xF20, respectively). So the
+calculated intid would be much higher than the number of actually
+allocated interrupts - with all the consequences ;-)
 
-I don't have a preference either way here.
-
-> Do you have a suggestion in mind for wording/naming of the 'latch state'
-> that makes sense for software people who have access to the GIC manual,
-> but doesn't necessarily understand how the hardware would be built and
-> why 'latch state' logically has clear semantics... ?
-
-This is a bit tricky because the spec leaves you to deduce how things
-work and doesn't provide much terminology to work with either. Here's
-an attempt at an explanation, which is a bit long-winded but I can't
-see any way to be more concise:
-
-This returns the value of the latched pending state for the interrupts.
-This is identical to the value read from ISPENDR for an edge triggered
-interrupt, but may differ for level triggered interrupts. For edge
-triggered interrupts, once an interrupt becomes pending (whether because
-of an edge detected on the input line or because of a guest write to
-ISPENDR) this state is "latched", and only cleared when either the
-interrupt is activated or when the guest writes to ICPENDR. A
-level triggered interrupt may be pending either because the level input
-is held high by a device, or because of a guest write to the ISPENDR
-register. Only ISPENDR writes are latched: if the device lowers the line
-level then the interrupt is no longer pending unless the guest also
-wrote to ISPENDR, and conversely writes to ICPENDR or activations of the
-interrupt do not clear the pending status if the line level is still
-being held high. (These rules are documented in the GICv3 specification
-descriptions of the ICPENDR and ISPENDR registers.)
-For a level triggered interrupt the value returned here is that of the
-latch which is set by ISPENDR and cleared by ICPENDR or interrupt
-activation, whereas the value read from ISPENDR is the logical OR of
-the latch value and the input line level. Raw access to the latch state
-is provided to userspace so that it can save and restore the entire GIC
-internal state (which is defined by the combination of the current input
-line level and the latch state, and cannot be deduced from purely the
-line level and the value of the ISPENDR registers).
-
-thanks
--- PMM
+Cheers,
+Andre.
