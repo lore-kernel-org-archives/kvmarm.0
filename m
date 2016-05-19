@@ -1,245 +1,154 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 08/57] KVM: arm/arm64: Move timer IRQ map to latest
- possible time
-Date: Thu, 19 May 2016 19:07:47 +0100
-Message-ID: <1463681316-23039-9-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 27/57] KVM: arm/arm64: vgic-new: Add PENDING registers handlers
+Date: Thu, 19 May 2016 19:08:06 +0100
+Message-ID: <1463681316-23039-28-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6E7B49B32
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tdqQXf6TwMRz for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2016 14:05:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0445412ED
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:05 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+The pending register handlers are shared between the v2 and v3
+emulation, so their implementation goes into vgic-mmio.c, to be easily
+referenced from the v3 emulation as well later.
+For level triggered interrupts the real line level is unaffected by
+this write, so we keep this state separate and combine it with the
+device's level to get the actual pending state.
 
-We are about to modify the VGIC to allocate all data structures
-dynamically and store mapped IRQ information on a per-IRQ struct, which
-is indeed allocated dynamically at init time.
-
-Therefore, we cannot record the mapped IRQ info from the timer at timer
-reset time like it's done now, because VCPU reset happens before timer
-init.
-
-A possible later time to do this is on the first run of a per VCPU, it
-just requires us to move the enable state to be a per-VCPU state and do
-the lookup of the physical IRQ number when we are about to run the VCPU.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/kvm/arm.c           |  6 ++--
- include/kvm/arm_arch_timer.h |  8 +++---
- virt/kvm/arm/arch_timer.c    | 66 +++++++++++++++++++++++++-------------------
- virt/kvm/arm/hyp/timer-sr.c  |  5 ++--
- 4 files changed, 47 insertions(+), 38 deletions(-)
+Changelog RFC..v1:
+- remove IRQ lock from read handler
+- remove TODO from clear pending handler
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index be4b639..ceb9345 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -459,7 +459,7 @@ static void update_vttbr(struct kvm *kvm)
- static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
--	int ret;
-+	int ret = 0;
- 
- 	if (likely(vcpu->arch.has_run_once))
- 		return 0;
-@@ -482,9 +482,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- 	 * interrupts from the virtual timer with a userspace gic.
- 	 */
- 	if (irqchip_in_kernel(kvm) && vgic_initialized(kvm))
--		kvm_timer_enable(kvm);
-+		ret = kvm_timer_enable(vcpu);
- 
--	return 0;
-+	return ret;
+Changelog v1 .. v2:
+- adapt to new MMIO framework
+
+Changelog v3 .. v4:
+- specify accessor width
+- use IRQ number accessor macro
+- replace extract_bytes() with simple return
+
+ virt/kvm/arm/vgic/vgic-mmio-v2.c |  4 +--
+ virt/kvm/arm/vgic/vgic-mmio.c    | 60 ++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.h    | 12 ++++++++
+ 3 files changed, 74 insertions(+), 2 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index d5355b5..c13a708 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -78,10 +78,10 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 		vgic_mmio_read_enable, vgic_mmio_write_cenable, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
++		vgic_mmio_read_pending, vgic_mmio_write_spending, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
++		vgic_mmio_read_pending, vgic_mmio_write_cpending, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 32ed8db..d8dc8f6 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -95,6 +95,66 @@ void vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
+ 	}
  }
  
- bool kvm_arch_intc_initialized(struct kvm *kvm)
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index a47b7de..dda39d8 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -24,9 +24,6 @@
- #include <linux/workqueue.h>
- 
- struct arch_timer_kvm {
--	/* Is the timer enabled */
--	bool			enabled;
--
- 	/* Virtual offset */
- 	cycle_t			cntvoff;
- };
-@@ -55,10 +52,13 @@ struct arch_timer_cpu {
- 
- 	/* Active IRQ state caching */
- 	bool				active_cleared_last;
++unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
++				     gpa_t addr, unsigned int len)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
++	u32 value = 0;
++	int i;
 +
-+	/* Is the timer enabled */
-+	bool			enabled;
- };
- 
- int kvm_timer_hyp_init(void);
--void kvm_timer_enable(struct kvm *kvm);
-+int kvm_timer_enable(struct kvm_vcpu *vcpu);
- void kvm_timer_init(struct kvm *kvm);
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 			 const struct kvm_irq_level *irq);
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 3232105..e2d5b6f 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -197,7 +197,7 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	 * because the guest would never see the interrupt.  Instead wait
- 	 * until we call this function from kvm_timer_flush_hwstate.
- 	 */
--	if (!vgic_initialized(vcpu->kvm))
-+	if (!vgic_initialized(vcpu->kvm) || !timer->enabled)
- 		return -ENODEV;
- 
- 	if (kvm_timer_should_fire(vcpu) != timer->irq.level)
-@@ -333,9 +333,6 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 			 const struct kvm_irq_level *irq)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--	struct irq_desc *desc;
--	struct irq_data *data;
--	int phys_irq;
- 
- 	/*
- 	 * The vcpu timer irq number cannot be determined in
-@@ -354,26 +351,7 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 	timer->cntv_ctl = 0;
- 	kvm_timer_update_state(vcpu);
- 
--	/*
--	 * Find the physical IRQ number corresponding to the host_vtimer_irq
--	 */
--	desc = irq_to_desc(host_vtimer_irq);
--	if (!desc) {
--		kvm_err("%s: no interrupt descriptor\n", __func__);
--		return -EINVAL;
--	}
--
--	data = irq_desc_get_irq_data(desc);
--	while (data->parent_data)
--		data = data->parent_data;
--
--	phys_irq = data->hwirq;
--
--	/*
--	 * Tell the VGIC that the virtual interrupt is tied to a
--	 * physical interrupt. We do that once per VCPU.
--	 */
--	return kvm_vgic_map_phys_irq(vcpu, irq->irq, phys_irq);
-+	return 0;
- }
- 
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
-@@ -501,10 +479,40 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
- 	kvm_vgic_unmap_phys_irq(vcpu, timer->irq.irq);
- }
- 
--void kvm_timer_enable(struct kvm *kvm)
-+int kvm_timer_enable(struct kvm_vcpu *vcpu)
- {
--	if (kvm->arch.timer.enabled)
--		return;
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct irq_desc *desc;
-+	struct irq_data *data;
-+	int phys_irq;
-+	int ret;
++	/* Loop over all IRQs affected by this read */
++	for (i = 0; i < len * 8; i++) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
 +
-+	if (timer->enabled)
-+		return 0;
-+
-+	/*
-+	 * Find the physical IRQ number corresponding to the host_vtimer_irq
-+	 */
-+	desc = irq_to_desc(host_vtimer_irq);
-+	if (!desc) {
-+		kvm_err("%s: no interrupt descriptor\n", __func__);
-+		return -EINVAL;
++		if (irq->pending)
++			value |= (1U << i);
 +	}
 +
-+	data = irq_desc_get_irq_data(desc);
-+	while (data->parent_data)
-+		data = data->parent_data;
++	return value;
++}
 +
-+	phys_irq = data->hwirq;
++void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
++			      gpa_t addr, unsigned int len,
++			      unsigned long val)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
++	int i;
 +
-+	/*
-+	 * Tell the VGIC that the virtual interrupt is tied to a
-+	 * physical interrupt. We do that once per VCPU.
-+	 */
-+	ret = kvm_vgic_map_phys_irq(vcpu, timer->irq.irq, phys_irq);
-+	if (ret)
-+		return ret;
++	for_each_set_bit(i, &val, len * 8) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
 +
- 
- 	/*
- 	 * There is a potential race here between VCPUs starting for the first
-@@ -515,7 +523,9 @@ void kvm_timer_enable(struct kvm *kvm)
- 	 * the arch timers are enabled.
- 	 */
- 	if (timecounter && wqueue)
--		kvm->arch.timer.enabled = 1;
-+		timer->enabled = 1;
++		spin_lock(&irq->irq_lock);
++		irq->pending = true;
++		if (irq->config == VGIC_CONFIG_LEVEL)
++			irq->soft_pending = true;
 +
-+	return 0;
- }
- 
- void kvm_timer_init(struct kvm *kvm)
-diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
-index ea00d69..798866a 100644
---- a/virt/kvm/arm/hyp/timer-sr.c
-+++ b/virt/kvm/arm/hyp/timer-sr.c
-@@ -24,11 +24,10 @@
- /* vcpu is already in the HYP VA space */
- void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
++		vgic_queue_irq_unlock(vcpu->kvm, irq);
++	}
++}
++
++void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
++			      gpa_t addr, unsigned int len,
++			      unsigned long val)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
++	int i;
++
++	for_each_set_bit(i, &val, len * 8) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++		spin_lock(&irq->irq_lock);
++
++		if (irq->config == VGIC_CONFIG_LEVEL) {
++			irq->soft_pending = false;
++			irq->pending = irq->line_level;
++		} else {
++			irq->pending = false;
++		}
++
++		spin_unlock(&irq->irq_lock);
++	}
++}
++
+ static int match_region(const void *key, const void *elt)
  {
--	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	u64 val;
+ 	const unsigned int offset = (unsigned long)key;
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 5a86e30..b18120d 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -107,6 +107,18 @@ void vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
+ 			     gpa_t addr, unsigned int len,
+ 			     unsigned long val);
  
--	if (kvm->arch.timer.enabled) {
-+	if (timer->enabled) {
- 		timer->cntv_ctl = read_sysreg_el0(cntv_ctl);
- 		timer->cntv_cval = read_sysreg_el0(cntv_cval);
- 	}
-@@ -60,7 +59,7 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
- 	val |= CNTHCTL_EL1PCTEN;
- 	write_sysreg(val, cnthctl_el2);
++unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
++				     gpa_t addr, unsigned int len);
++
++void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
++			      gpa_t addr, unsigned int len,
++			      unsigned long val);
++
++void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
++			      gpa_t addr, unsigned int len,
++			      unsigned long val);
++
++
+ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
  
--	if (kvm->arch.timer.enabled) {
-+	if (timer->enabled) {
- 		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
- 		write_sysreg_el0(timer->cntv_cval, cntv_cval);
- 		isb();
+ #endif
 -- 
 2.8.2
+
