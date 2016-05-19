@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 02/57] KVM: arm/arm64: vgic: avoid map in
- kvm_vgic_inject_mapped_irq()
-Date: Thu, 19 May 2016 19:07:41 +0100
-Message-ID: <1463681316-23039-3-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 04/57] KVM: arm/arm64: vgic: avoid map in
+ kvm_vgic_unmap_phys_irq()
+Date: Thu, 19 May 2016 19:07:43 +0100
+Message-ID: <1463681316-23039-5-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 417A6499A1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:04:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4AF549B30
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xymMKSa-uwAL for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2016 14:04:57 -0400 (EDT)
+ with ESMTP id IOZ-aNSn8XQE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2016 14:05:05 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 258B4412A6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:04:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 088F5411E3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:00 -0400 (EDT)
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,75 +32,77 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When we want to inject a hardware mapped IRQ into a guest, we actually
-only need the virtual IRQ number from the irq_phys_map.
-So let's pass this number directly from the arch timer to the VGIC
-to avoid using the map as a parameter.
+kvm_vgic_unmap_phys_irq() only needs the virtual IRQ number, so let's
+just pass that between the arch timer and the VGIC to get rid of
+the irq_phys_map pointer.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Eric Auger <eric.auger@linaro.org>
 ---
- include/kvm/arm_vgic.h    | 2 +-
- virt/kvm/arm/arch_timer.c | 2 +-
- virt/kvm/arm/vgic.c       | 6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ include/kvm/arm_vgic.h    |  2 +-
+ virt/kvm/arm/arch_timer.c |  2 +-
+ virt/kvm/arm/vgic.c       | 11 ++++-------
+ 3 files changed, 6 insertions(+), 9 deletions(-)
 
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index be6037a..e22f015 100644
+index 9830232..c7bb184 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -342,7 +342,7 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
- 			bool level);
- int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
--			       struct irq_phys_map *map, bool level);
-+			       unsigned int virt_irq, bool level);
- void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+@@ -347,7 +347,7 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
  struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+ 					   int virt_irq, int irq);
+-int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
++int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+ 
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 409db33..a9c6c1c 100644
+index 37f82c1..962b442 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -177,7 +177,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
- 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->map->virt_irq,
- 				   timer->irq.level);
- 	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
--					 timer->map,
-+					 timer->map->virt_irq,
- 					 timer->irq.level);
- 	WARN_ON(ret);
+@@ -486,7 +486,7 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+ 
+ 	timer_disarm(timer);
+ 	if (timer->map)
+-		kvm_vgic_unmap_phys_irq(vcpu, timer->map);
++		kvm_vgic_unmap_phys_irq(vcpu, timer->map->virt_irq);
  }
+ 
+ void kvm_timer_enable(struct kvm *kvm)
 diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index f6c6172..81c557c 100644
+index 2fd43a6..06abd59 100644
 --- a/virt/kvm/arm/vgic.c
 +++ b/virt/kvm/arm/vgic.c
-@@ -1666,7 +1666,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
-  * kvm_vgic_inject_mapped_irq - Inject a physically mapped IRQ to the vgic
-  * @kvm:     The VM structure pointer
-  * @cpuid:   The CPU for PPIs
-- * @map:     Pointer to a irq_phys_map structure describing the mapping
-+ * @virt_irq: The virtual IRQ to be injected
-  * @level:   Edge-triggered:  true:  to trigger the interrupt
-  *			      false: to ignore the call
-  *	     Level-sensitive  true:  raise the input signal
-@@ -1677,7 +1677,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
-  * being HIGH and 0 being LOW and all devices being active-HIGH.
+@@ -1812,25 +1812,22 @@ static void vgic_free_phys_irq_map_rcu(struct rcu_head *rcu)
+ /**
+  * kvm_vgic_unmap_phys_irq - Remove a virtual to physical IRQ mapping
+  * @vcpu: The VCPU pointer
+- * @map: The pointer to a mapping obtained through kvm_vgic_map_phys_irq
++ * @virt_irq: The virtual IRQ number to be unmapped
+  *
+  * Remove an existing mapping between virtual and physical interrupts.
   */
- int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
--			       struct irq_phys_map *map, bool level)
-+			       unsigned int virt_irq, bool level)
+-int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map)
++int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
  {
- 	int ret;
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+ 	struct irq_phys_map_entry *entry;
+ 	struct list_head *root;
  
-@@ -1685,7 +1685,7 @@ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
- 	if (ret)
- 		return ret;
+-	if (!map)
+-		return -EINVAL;
+-
+-	root = vgic_get_irq_phys_map_list(vcpu, map->virt_irq);
++	root = vgic_get_irq_phys_map_list(vcpu, virt_irq);
  
--	return vgic_update_irq_pending(kvm, cpuid, map->virt_irq, level);
-+	return vgic_update_irq_pending(kvm, cpuid, virt_irq, level);
- }
+ 	spin_lock(&dist->irq_phys_map_lock);
  
- static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+ 	list_for_each_entry(entry, root, entry) {
+-		if (&entry->map == map) {
++		if (entry->map.virt_irq == virt_irq) {
+ 			list_del_rcu(&entry->entry);
+ 			call_rcu(&entry->rcu, vgic_free_phys_irq_map_rcu);
+ 			break;
 -- 
 2.8.2
