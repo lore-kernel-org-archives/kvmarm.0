@@ -1,106 +1,128 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 18/57] KVM: arm/arm64: vgic-new: Add IRQ sorting
-Date: Thu, 19 May 2016 19:07:57 +0100
-Message-ID: <1463681316-23039-19-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 11/57] KVM: arm/arm64: Export mmio_read/write_bus
+Date: Thu, 19 May 2016 19:07:50 +0100
+Message-ID: <1463681316-23039-12-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E20EA49B5B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:21 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id RDgR5E-i4B+t for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2016 14:05:20 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2D049B5A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:10 -0400 (EDT)
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Adds the sorting function to cover the case where you have more IRQs
-to consider than you have LRs. We now consider priorities.
+Rename mmio_{read,write}_bus to kvm_mmio_{read,write}_bus and export
+them out of mmio.c.
+This will be needed later for the new VGIC implementation.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 ---
-Changelog v4 .. v5:
-- add nested spin lock annotation
+ arch/arm/include/asm/kvm_mmio.h   |  3 +++
+ arch/arm/kvm/mmio.c               | 10 +++++-----
+ arch/arm64/include/asm/kvm_mmio.h |  3 +++
+ 3 files changed, 11 insertions(+), 5 deletions(-)
 
- virt/kvm/arm/vgic/vgic.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
-
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index ada1d02..bce17de 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -16,6 +16,7 @@
+diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
+index d8e90c8..f3a7de7 100644
+--- a/arch/arm/include/asm/kvm_mmio.h
++++ b/arch/arm/include/asm/kvm_mmio.h
+@@ -28,6 +28,9 @@ struct kvm_decode {
+ 	bool sign_extend;
+ };
  
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
-+#include <linux/list_sort.h>
++void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
++unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
++
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
+diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
+index 0158e9e..10f80a6 100644
+--- a/arch/arm/kvm/mmio.c
++++ b/arch/arm/kvm/mmio.c
+@@ -23,7 +23,7 @@
  
- #include "vgic.h"
+ #include "trace.h"
  
-@@ -103,6 +104,62 @@ static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+-static void mmio_write_buf(char *buf, unsigned int len, unsigned long data)
++void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data)
+ {
+ 	void *datap = NULL;
+ 	union {
+@@ -55,7 +55,7 @@ static void mmio_write_buf(char *buf, unsigned int len, unsigned long data)
+ 	memcpy(buf, datap, len);
  }
  
- /*
-+ * The order of items in the ap_lists defines how we'll pack things in LRs as
-+ * well, the first items in the list being the first things populated in the
-+ * LRs.
-+ *
-+ * A hard rule is that active interrupts can never be pushed out of the LRs
-+ * (and therefore take priority) since we cannot reliably trap on deactivation
-+ * of IRQs and therefore they have to be present in the LRs.
-+ *
-+ * Otherwise things should be sorted by the priority field and the GIC
-+ * hardware support will take care of preemption of priority groups etc.
-+ *
-+ * Return negative if "a" sorts before "b", 0 to preserve order, and positive
-+ * to sort "b" before "a".
-+ */
-+static int vgic_irq_cmp(void *priv, struct list_head *a, struct list_head *b)
-+{
-+	struct vgic_irq *irqa = container_of(a, struct vgic_irq, ap_list);
-+	struct vgic_irq *irqb = container_of(b, struct vgic_irq, ap_list);
-+	bool penda, pendb;
-+	int ret;
+-static unsigned long mmio_read_buf(char *buf, unsigned int len)
++unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len)
+ {
+ 	unsigned long data = 0;
+ 	union {
+@@ -66,7 +66,7 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
+ 
+ 	switch (len) {
+ 	case 1:
+-		data = buf[0];
++		data = *(u8 *)buf;
+ 		break;
+ 	case 2:
+ 		memcpy(&tmp.hword, buf, len);
+@@ -103,7 +103,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		if (len > sizeof(unsigned long))
+ 			return -EINVAL;
+ 
+-		data = mmio_read_buf(run->mmio.data, len);
++		data = kvm_mmio_read_buf(run->mmio.data, len);
+ 
+ 		if (vcpu->arch.mmio_decode.sign_extend &&
+ 		    len < sizeof(unsigned long)) {
+@@ -189,7 +189,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 					       len);
+ 
+ 		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, len, fault_ipa, data);
+-		mmio_write_buf(data_buf, len, data);
++		kvm_mmio_write_buf(data_buf, len, data);
+ 
+ 		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, fault_ipa, len,
+ 				       data_buf);
+diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
+index fe612a9..75ea420 100644
+--- a/arch/arm64/include/asm/kvm_mmio.h
++++ b/arch/arm64/include/asm/kvm_mmio.h
+@@ -30,6 +30,9 @@ struct kvm_decode {
+ 	bool sign_extend;
+ };
+ 
++void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
++unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
 +
-+	spin_lock(&irqa->irq_lock);
-+	spin_lock_nested(&irqb->irq_lock, SINGLE_DEPTH_NESTING);
-+
-+	if (irqa->active || irqb->active) {
-+		ret = (int)irqb->active - (int)irqa->active;
-+		goto out;
-+	}
-+
-+	penda = irqa->enabled && irqa->pending;
-+	pendb = irqb->enabled && irqb->pending;
-+
-+	if (!penda || !pendb) {
-+		ret = (int)pendb - (int)penda;
-+		goto out;
-+	}
-+
-+	/* Both pending and enabled, sort by priority */
-+	ret = irqa->priority - irqb->priority;
-+out:
-+	spin_unlock(&irqb->irq_lock);
-+	spin_unlock(&irqa->irq_lock);
-+	return ret;
-+}
-+
-+/* Must be called with the ap_list_lock held */
-+static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+
-+	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
-+
-+	list_sort(NULL, &vgic_cpu->ap_list_head, vgic_irq_cmp);
-+}
-+
-+/*
-  * Only valid injection if changing level for level-triggered IRQs or for a
-  * rising edge.
-  */
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
 -- 
 2.8.2
-
