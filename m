@@ -1,7 +1,7 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 51/57] KVM: arm/arm64: vgic-new: vgic_init: implement vgic_create
-Date: Thu, 19 May 2016 19:08:30 +0100
-Message-ID: <1463681316-23039-52-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 44/57] KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM_DEV_ARM_VGIC_GRP_ADDR
+Date: Thu, 19 May 2016 19:08:23 +0100
+Message-ID: <1463681316-23039-45-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
@@ -12,127 +12,86 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Eric Auger <eric.auger@linaro.org>
 
-This patch implements kvm_vgic_create, which is called on the
-KVM_CREATE_IRQCHIP VM ioctl (GICv2 only) or via KVM_CREATE_DEVICE.
+This patch implements the KVM_DEV_ARM_VGIC_GRP_ADDR group which
+enables to set the base address of GIC regions as seen by the guest.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
-Changelog v3 .. v4:
-- fix comment
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 38 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
- include/kvm/vgic/vgic.h       |  1 +
- virt/kvm/arm/vgic/vgic-init.c | 84 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 85 insertions(+)
-
-diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index 393489f..0634d89 100644
---- a/include/kvm/vgic/vgic.h
-+++ b/include/kvm/vgic/vgic.h
-@@ -195,6 +195,7 @@ struct vgic_cpu {
- };
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 082829a..a709097 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -112,6 +112,17 @@ static int vgic_set_common_attr(struct kvm_device *dev,
+ 	int r;
  
- int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
-+int kvm_vgic_create(struct kvm *kvm, u32 type);
- int kvm_vgic_hyp_init(void);
+ 	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_ADDR: {
++		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
++		u64 addr;
++		unsigned long type = (unsigned long)attr->attr;
++
++		if (copy_from_user(&addr, uaddr, sizeof(addr)))
++			return -EFAULT;
++
++		r = kvm_vgic_addr(dev->kvm, type, &addr, true);
++		return (r == -ENODEV) ? -ENXIO : r;
++	}
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS: {
+ 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+ 		u32 val;
+@@ -164,6 +175,19 @@ static int vgic_get_common_attr(struct kvm_device *dev,
+ 	int r = -ENXIO;
  
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 4523beb..15d5428 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -22,6 +22,90 @@
- #include <asm/kvm_mmu.h>
- #include "vgic.h"
+ 	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_ADDR: {
++		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
++		u64 addr;
++		unsigned long type = (unsigned long)attr->attr;
++
++		r = kvm_vgic_addr(dev->kvm, type, &addr, false);
++		if (r)
++			return (r == -ENODEV) ? -ENXIO : r;
++
++		if (copy_to_user(uaddr, &addr, sizeof(addr)))
++			return -EFAULT;
++		break;
++	}
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS: {
+ 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
  
-+/* CREATION */
-+
-+/**
-+ * kvm_vgic_create: triggered by the instantiation of the VGIC device by
-+ * user space, either through the legacy KVM_CREATE_IRQCHIP ioctl (v2 only)
-+ * or through the generic KVM_CREATE_DEVICE API ioctl.
-+ * irqchip_in_kernel() tells you if this function succeeded or not.
-+ */
-+int kvm_vgic_create(struct kvm *kvm, u32 type)
-+{
-+	int i, vcpu_lock_idx = -1, ret;
-+	struct kvm_vcpu *vcpu;
-+
-+	mutex_lock(&kvm->lock);
-+
-+	if (irqchip_in_kernel(kvm)) {
-+		ret = -EEXIST;
-+		goto out;
-+	}
-+
-+	/*
-+	 * This function is also called by the KVM_CREATE_IRQCHIP handler,
-+	 * which had no chance yet to check the availability of the GICv2
-+	 * emulation. So check this here again. KVM_CREATE_DEVICE does
-+	 * the proper checks already.
-+	 */
-+	if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
-+		!kvm_vgic_global_state.can_emulate_gicv2) {
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+
-+	/*
-+	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
-+	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
-+	 * that no other VCPUs are run while we create the vgic.
-+	 */
-+	ret = -EBUSY;
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (!mutex_trylock(&vcpu->mutex))
-+			goto out_unlock;
-+		vcpu_lock_idx = i;
-+	}
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (vcpu->arch.has_run_once)
-+			goto out_unlock;
-+	}
-+	ret = 0;
-+
-+	if (type == KVM_DEV_TYPE_ARM_VGIC_V2)
-+		kvm->arch.max_vcpus = VGIC_V2_MAX_CPUS;
-+	else
-+		kvm->arch.max_vcpus = VGIC_V3_MAX_CPUS;
-+
-+	if (atomic_read(&kvm->online_vcpus) > kvm->arch.max_vcpus) {
-+		ret = -E2BIG;
-+		goto out_unlock;
-+	}
-+
-+	kvm->arch.vgic.in_kernel = true;
-+	kvm->arch.vgic.vgic_model = type;
-+
-+	/*
-+	 * kvm_vgic_global_state.vctrl_base is set on vgic probe (kvm_arch_init)
-+	 * it is stored in distributor struct for asm save/restore purpose
-+	 */
-+	kvm->arch.vgic.vctrl_base = kvm_vgic_global_state.vctrl_base;
-+
-+	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
-+	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
-+	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
-+
-+out_unlock:
-+	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
-+		vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
-+		mutex_unlock(&vcpu->mutex);
-+	}
-+
-+out:
-+	mutex_unlock(&kvm->lock);
-+	return ret;
-+}
-+
- /* GENERIC PROBE */
- 
- static void vgic_init_maintenance_interrupt(void *info)
+@@ -227,6 +251,13 @@ static int vgic_v2_has_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
+ 	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_ADDR:
++		switch (attr->attr) {
++		case KVM_VGIC_V2_ADDR_TYPE_DIST:
++		case KVM_VGIC_V2_ADDR_TYPE_CPU:
++			return 0;
++		}
++		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+ 		return 0;
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+@@ -267,6 +298,13 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
+ 	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_ADDR:
++		switch (attr->attr) {
++		case KVM_VGIC_V3_ADDR_TYPE_DIST:
++		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
++			return 0;
++		}
++		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+ 		return 0;
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
 -- 
 2.8.2
 
