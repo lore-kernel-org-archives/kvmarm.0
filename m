@@ -1,123 +1,147 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 56/57] KVM: arm/arm64: vgic-new: implement mapped IRQ handling
-Date: Thu, 19 May 2016 19:08:35 +0100
-Message-ID: <1463681316-23039-57-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 30/57] KVM: arm/arm64: vgic-new: Add CONFIG registers
+ handlers
+Date: Thu, 19 May 2016 19:08:09 +0100
+Message-ID: <1463681316-23039-31-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CAD7E40402
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:06:05 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id z+zvUbavaN1u for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2016 14:06:04 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 89D0E49B56
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2016 14:05:38 -0400 (EDT)
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we now store the mapped hardware IRQ number in our vgic_irq struct,
-we no longer need the irq_phys_map for the new VGIC.
-Implement the hardware IRQ mapping on top of the reworked arch timer
-interface.
+The config register handlers are shared between the v2 and v3
+emulation, so their implementation goes into vgic-mmio.c, to be
+easily referenced from the v3 emulation as well later.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
-Changelog RFC..v1:
-- adapt to new arch_timer mapped IRQ interface
-- implement inject_mapped_irq() as a macro (since it is identical to
-  the "un-mapped" IRQ implementation)
-
 Changelog v1 .. v2:
-- replace inject_mapped_irq() macro with a separate implementation,
-  which only allows mapped IRQs to be injected via this interface
+- adapt to new MMIO framework
+
+Changelog v3 .. v4:
+- specify accessor width
+- use IRQ number accessor macro
+- replace extract_bytes() with simple return
 
 Changelog v4 .. v5:
-- avoid accessing uninitialized spinlock on kvm_vgic_unmap_phys_irq
+- make PPIs CONFIG register access read-only
 
- include/kvm/vgic/vgic.h  |  5 +++++
- virt/kvm/arm/vgic/vgic.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+)
+ virt/kvm/arm/vgic/vgic-mmio-v2.c |  2 +-
+ virt/kvm/arm/vgic/vgic-mmio.c    | 47 ++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.h    |  7 ++++++
+ 3 files changed, 55 insertions(+), 1 deletion(-)
 
-diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index 17b2a73..3fbd175 100644
---- a/include/kvm/vgic/vgic.h
-+++ b/include/kvm/vgic/vgic.h
-@@ -206,6 +206,11 @@ int kvm_vgic_hyp_init(void);
- 
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 			bool level);
-+int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
-+			       bool level);
-+int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
-+int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
-+bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
- 
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 6b892a4..fc74367 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -312,6 +312,47 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 	return vgic_update_irq_pending(kvm, cpuid, intid, level, false);
- }
- 
-+int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
-+			       bool level)
-+{
-+	return vgic_update_irq_pending(kvm, cpuid, intid, level, true);
-+}
-+
-+int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-+
-+	BUG_ON(!irq);
-+
-+	spin_lock(&irq->irq_lock);
-+
-+	irq->hw = true;
-+	irq->hwintid = phys_irq;
-+
-+	spin_unlock(&irq->irq_lock);
-+
-+	return 0;
-+}
-+
-+int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-+
-+	BUG_ON(!irq);
-+
-+	if (!vgic_initialized(vcpu->kvm))
-+		return -EAGAIN;
-+
-+	spin_lock(&irq->irq_lock);
-+
-+	irq->hw = false;
-+	irq->hwintid = 0;
-+
-+	spin_unlock(&irq->irq_lock);
-+
-+	return 0;
-+}
-+
- /**
-  * vgic_prune_ap_list - Remove non-relevant interrupts from the list
-  *
-@@ -564,3 +605,15 @@ void vgic_kick_vcpus(struct kvm *kvm)
- 			kvm_vcpu_kick(vcpu);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index d564a30..bb7389e 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -96,7 +96,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
+ 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 2,
++		vgic_mmio_read_config, vgic_mmio_write_config, 2,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 6f4e05b..9de80be 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -276,6 +276,53 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
  	}
  }
-+
-+bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+ 
++unsigned long vgic_mmio_read_config(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len)
 +{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-+	bool map_is_active;
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 2);
++	u32 value = 0;
++	int i;
 +
-+	spin_lock(&irq->irq_lock);
-+	map_is_active = irq->hw && irq->active;
-+	spin_unlock(&irq->irq_lock);
++	for (i = 0; i < len * 4; i++) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
 +
-+	return map_is_active;
++		if (irq->config == VGIC_CONFIG_EDGE)
++			value |= (2U << (i * 2));
++	}
++
++	return value;
 +}
++
++void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
++			    gpa_t addr, unsigned int len,
++			    unsigned long val)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 2);
++	int i;
++
++	for (i = 0; i < len * 4; i++) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++		/*
++		 * The configuration cannot be changed for SGIs in general,
++		 * for PPIs this is IMPLEMENTATION DEFINED. The arch timer
++		 * code relies on PPIs being level triggered, so we also
++		 * make them read-only here.
++		 */
++		if (intid + i < VGIC_NR_PRIVATE_IRQS)
++			continue;
++
++		spin_lock(&irq->irq_lock);
++		if (test_bit(i * 2 + 1, &val)) {
++			irq->config = VGIC_CONFIG_EDGE;
++		} else {
++			irq->config = VGIC_CONFIG_LEVEL;
++			irq->pending = irq->line_level | irq->soft_pending;
++		}
++		spin_unlock(&irq->irq_lock);
++	}
++}
++
+ static int match_region(const void *key, const void *elt)
+ {
+ 	const unsigned int offset = (unsigned long)key;
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 62ecec0..5e4a3e4 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -136,6 +136,13 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
+ 			      gpa_t addr, unsigned int len,
+ 			      unsigned long val);
+ 
++unsigned long vgic_mmio_read_config(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len);
++
++void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
++			    gpa_t addr, unsigned int len,
++			    unsigned long val);
++
+ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
+ 
+ #endif
 -- 
 2.8.2
-
