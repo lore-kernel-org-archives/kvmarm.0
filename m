@@ -1,7 +1,7 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 40/57] KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM device ops registration
-Date: Thu, 19 May 2016 19:08:19 +0100
-Message-ID: <1463681316-23039-41-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v5 45/57] KVM: arm/arm64: vgic-new: vgic_kvm_device: access to VGIC registers
+Date: Thu, 19 May 2016 19:08:24 +0100
+Message-ID: <1463681316-23039-46-git-send-email-andre.przywara@arm.com>
 References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
@@ -12,150 +12,166 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Eric Auger <eric.auger@linaro.org>
 
-This patch introduces the skeleton for the KVM device operations
-associated to KVM_DEV_TYPE_ARM_VGIC_V2 and KVM_DEV_TYPE_ARM_VGIC_V3.
+This patch implements the switches for KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+and KVM_DEV_ARM_VGIC_GRP_CPU_REGS API which allows the userspace to
+access VGIC registers.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
-Changelog v1 .. v2:
-- rename vgic_kvm_device.c to vgic-kvm-device.c
+Changelog v3 .. v4:
+- check for proper alignment on userland GIC accesses
 
-Changelog v2 .. v3:
-- replace inclusion of vgic/vgic.h with arm_vgic.h
-- add kvm_register_vgic_device() prototype to this patch
-
- virt/kvm/arm/vgic/vgic-kvm-device.c | 108 ++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h            |   2 +
- 2 files changed, 110 insertions(+)
- create mode 100644 virt/kvm/arm/vgic/vgic-kvm-device.c
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 53 +++++++++++++++++++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-mmio-v2.c    | 38 ++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h            |  1 +
+ 3 files changed, 90 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-new file mode 100644
-index 0000000..ff332f3
---- /dev/null
+index a709097..78621283 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
 +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -0,0 +1,108 @@
-+/*
-+ * VGIC: KVM DEVICE API
+@@ -226,6 +226,21 @@ void kvm_register_vgic_device(unsigned long type)
+ 	}
+ }
+ 
++/** vgic_attr_regs_access: allows user space to read/write VGIC registers
 + *
-+ * Copyright (C) 2015 ARM Ltd.
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ * @dev: kvm device handle
++ * @attr: kvm device attribute
++ * @reg: address the value is read or written
++ * @is_write: write flag
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
 + */
-+#include <linux/kvm_host.h>
-+#include <kvm/arm_vgic.h>
-+
-+/* common helpers */
-+
-+static int vgic_create(struct kvm_device *dev, u32 type)
++static int vgic_attr_regs_access(struct kvm_device *dev,
++				 struct kvm_device_attr *attr,
++				 u32 *reg, bool is_write)
 +{
-+	return kvm_vgic_create(dev->kvm, type);
++	return -ENXIO;
 +}
 +
-+static void vgic_destroy(struct kvm_device *dev)
-+{
-+	kfree(dev);
-+}
+ /* V2 ops */
+ 
+ static int vgic_v2_set_attr(struct kvm_device *dev,
+@@ -234,8 +249,23 @@ static int vgic_v2_set_attr(struct kvm_device *dev,
+ 	int ret;
+ 
+ 	ret = vgic_set_common_attr(dev, attr);
+-	return ret;
++	if (ret != -ENXIO)
++		return ret;
 +
-+void kvm_register_vgic_device(unsigned long type)
-+{
-+	switch (type) {
-+	case KVM_DEV_TYPE_ARM_VGIC_V2:
-+		kvm_register_device_ops(&kvm_arm_vgic_v2_ops,
-+					KVM_DEV_TYPE_ARM_VGIC_V2);
-+		break;
-+#ifdef CONFIG_KVM_ARM_VGIC_V3
-+	case KVM_DEV_TYPE_ARM_VGIC_V3:
-+		kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
-+					KVM_DEV_TYPE_ARM_VGIC_V3);
-+		break;
-+#endif
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
++	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++		u32 reg;
++
++		if (get_user(reg, uaddr))
++			return -EFAULT;
+ 
++		return vgic_attr_regs_access(dev, attr, &reg, true);
 +	}
-+}
++	}
 +
-+/* V2 ops */
++	return -ENXIO;
+ }
+ 
+ static int vgic_v2_get_attr(struct kvm_device *dev,
+@@ -244,7 +274,23 @@ static int vgic_v2_get_attr(struct kvm_device *dev,
+ 	int ret;
+ 
+ 	ret = vgic_get_common_attr(dev, attr);
+-	return ret;
++	if (ret != -ENXIO)
++		return ret;
 +
-+static int vgic_v2_set_attr(struct kvm_device *dev,
-+			    struct kvm_device_attr *attr)
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
++	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++		u32 reg = 0;
++
++		ret = vgic_attr_regs_access(dev, attr, &reg, false);
++		if (ret)
++			return ret;
++		return put_user(reg, uaddr);
++	}
++	}
++
++	return -ENXIO;
+ }
+ 
+ static int vgic_v2_has_attr(struct kvm_device *dev,
+@@ -258,6 +304,9 @@ static int vgic_v2_has_attr(struct kvm_device *dev,
+ 			return 0;
+ 		}
+ 		break;
++	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
++	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
++		return vgic_v2_has_attr_regs(dev, attr);
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+ 		return 0;
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index 3925d4c..7189690 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -258,3 +258,41 @@ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev)
+ 
+ 	return SZ_4K;
+ }
++
++int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
 +{
++	int nr_irqs = dev->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
++	const struct vgic_register_region *regions;
++	gpa_t addr;
++	int nr_regions, i, len;
++
++	addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
++
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
++		regions = vgic_v2_dist_registers;
++		nr_regions = ARRAY_SIZE(vgic_v2_dist_registers);
++		break;
++	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
++		return -ENXIO;		/* TODO: describe CPU i/f regs also */
++	default:
++		return -ENXIO;
++	}
++
++	/* We only support aligned 32-bit accesses. */
++	if (addr & 3)
++		return -ENXIO;
++
++	for (i = 0; i < nr_regions; i++) {
++		if (regions[i].bits_per_irq)
++			len = (regions[i].bits_per_irq * nr_irqs) / 8;
++		else
++			len = regions[i].len;
++
++		if (regions[i].reg_offset <= addr &&
++		    regions[i].reg_offset + len > addr)
++			return 0;
++	}
++
 +	return -ENXIO;
 +}
-+
-+static int vgic_v2_get_attr(struct kvm_device *dev,
-+			    struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+
-+static int vgic_v2_has_attr(struct kvm_device *dev,
-+			    struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+
-+struct kvm_device_ops kvm_arm_vgic_v2_ops = {
-+	.name = "kvm-arm-vgic-v2",
-+	.create = vgic_create,
-+	.destroy = vgic_destroy,
-+	.set_attr = vgic_v2_set_attr,
-+	.get_attr = vgic_v2_get_attr,
-+	.has_attr = vgic_v2_has_attr,
-+};
-+
-+/* V3 ops */
-+
-+#ifdef CONFIG_KVM_ARM_VGIC_V3
-+
-+static int vgic_v3_set_attr(struct kvm_device *dev,
-+			    struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+
-+static int vgic_v3_get_attr(struct kvm_device *dev,
-+			    struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+
-+static int vgic_v3_has_attr(struct kvm_device *dev,
-+			    struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+
-+struct kvm_device_ops kvm_arm_vgic_v3_ops = {
-+	.name = "kvm-arm-vgic-v3",
-+	.create = vgic_create,
-+	.destroy = vgic_destroy,
-+	.set_attr = vgic_v3_set_attr,
-+	.get_attr = vgic_v3_get_attr,
-+	.has_attr = vgic_v3_has_attr,
-+};
-+
-+#endif /* CONFIG_KVM_ARM_VGIC_V3 */
-+
 diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 44c6a1b..77b0ab3 100644
+index 6abc9a3..a264c5f 100644
 --- a/virt/kvm/arm/vgic/vgic.h
 +++ b/virt/kvm/arm/vgic/vgic.h
-@@ -73,4 +73,6 @@ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
- }
- #endif
+@@ -37,6 +37,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
+ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
++int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
+ 			     enum vgic_type);
  
-+void kvm_register_vgic_device(unsigned long type);
-+
- #endif
 -- 
 2.8.2
 
