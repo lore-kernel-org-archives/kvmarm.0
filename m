@@ -1,144 +1,74 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2] KVM: arm/arm64: vgic-new: Synchronize changes to
- active state
-Date: Fri, 20 May 2016 15:07:57 +0100
-Message-ID: <573F1A3D.7050808@arm.com>
-References: <1463751027-17517-1-git-send-email-christoffer.dall@linaro.org>
- <1463752410-3800-1-git-send-email-christoffer.dall@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3] KVM: arm/arm64: Add VGICv3 save/restore API
+ documentation
+Date: Fri, 20 May 2016 16:11:06 +0200
+Message-ID: <20160520141106.GA10370@cbox>
+References: <1463150637-6896-1-git-send-email-christoffer.dall@linaro.org>
+ <5735ED2F.4030104@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1463752410-3800-1-git-send-email-christoffer.dall@linaro.org>
+Content-Disposition: inline
+In-Reply-To: <5735ED2F.4030104@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@linaro.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Peter Maydell <peter.maydell@linaro.org>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 20/05/16 14:53, Christoffer Dall wrote:
-> When modifying the active state of an interrupt via the MMIO interface,
-> we should ensure that the write has the intended effect.
-> 
-> If a guest sets an interrupt to active, but that interrupt is already
-> flushed into a list register on a running VCPU, then that VCPU will
-> write the active state back into the struct vgic_irq upon returning from
-> the guest and syncing its state.  This is a non-benign race, because the
-> guest can observe that an interrupt is not active, and it can have a
-> reasonable expectations that other VCPUs will not ack any IRQs, and then
-> set the state to active, and expect it to stay that way.  Currently we
-> are not honoring this case.
-> 
-> Thefore, change both the SACTIVE and CACTIVE mmio handlers to stop the
-> world, change the irq state, potentially queue the irq if we're setting
-> it to active, and then continue.
-> 
-> We take this chance to slightly optimize these functions by not stopping
-> the world when touching private interrupts where there is inherently no
-> possible race.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
-> Changes since v1:
->  - Dont' stop the world for private IRQs
-> 
->  virt/kvm/arm/vgic/vgic-mmio.c | 87 ++++++++++++++++++++++++-------------------
->  1 file changed, 48 insertions(+), 39 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index 4ef3571..b014c8c 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -173,6 +173,36 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
->  	return value;
->  }
->  
-> +static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-> +				    bool new_active_state)
-> +{
-> +	spin_lock(&irq->irq_lock);
-> +	/*
-> +	 * If this virtual IRQ was written into a list register, we
-> +	 * have to make sure the CPU that runs the VCPU thread has
-> +	 * synced back LR state to the struct vgic_irq.  We can only
-> +	 * know this for sure, when either this irq is not assigned to
-> +	 * anyone's AP list anymore, or the VCPU thread is not
-> +	 * running on any CPUs.
-> +	 *
-> +	 * In the opposite case, we know the VCPU thread may be on its
-> +	 * way back from the guest and still has to sync back this
-> +	 * IRQ, so we release and re-acquire the spin_lock to let the
-> +	 * other thread sync back the IRQ.
-> +	 */
-> +	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
-> +	       irq->vcpu->cpu != -1) { /* VCPU thread is running */
-> +		BUG_ON(irq->intid < VGIC_NR_PRIVATE_IRQS);
-> +		cond_resched_lock(&irq->irq_lock);
-> +	}
-> +
-> +	irq->active = new_active_state;
-> +	if (new_active_state)
-> +		vgic_queue_irq_unlock(vcpu->kvm, irq);
-> +	else
-> +		spin_unlock(&irq->irq_lock);
-> +}
-> +
->  void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
->  			     gpa_t addr, unsigned int len,
->  			     unsigned long val)
-> @@ -180,32 +210,18 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
->  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->  	int i;
->  
-> -	kvm_arm_halt_guest(vcpu->kvm);
-> +	/* Only the VCPU itself can access its active state regs */
+Hi Marc,
 
-I'm afraid this is not true for GICv3 (the private interrupts are
-handled by the redistributors, which are not banked).
+[turns out I did have a few questions]
 
-> +	if (intid >= VGIC_NR_PRIVATE_IRQS)
-> +		kvm_arm_halt_guest(vcpu->kvm);
-	else {
-		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
-		irq->target_vcpu.arch.pause = true;
-		kvm_make_request(irq->target_vcpu, KVM_REQ_VCPU_EXIT);
-		/* and then it is a bit complicated... */
-	}
-> +
->  	for_each_set_bit(i, &val, len * 8) {
->  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> -
-> -		spin_lock(&irq->irq_lock);
-> -		/*
-> -		 * If this virtual IRQ was written into a list register, we
-> -		 * have to make sure the CPU that runs the VCPU thread has
-> -		 * synced back LR state to the struct vgic_irq.  We can only
-> -		 * know this for sure, when either this irq is not assigned to
-> -		 * anyone's AP list anymore, or the VCPU thread is not
-> -		 * running on any CPUs.
-> -		 *
-> -		 * In the opposite case, we know the VCPU thread may be on its
-> -		 * way back from the guest and still has to sync back this
-> -		 * IRQ, so we release and re-acquire the spin_lock to let the
-> -		 * other thread sync back the IRQ.
-> -		 */
-> -		while (irq->vcpu && /* IRQ may have state in an LR somewhere */
-> -		       irq->vcpu->cpu != -1) /* VCPU thread is running */
-> -			cond_resched_lock(&irq->irq_lock);
-> -
-> -		irq->active = false;
-> -		spin_unlock(&irq->irq_lock);
-> +		vgic_mmio_change_active(vcpu, irq, false);
->  	}
-> -	kvm_arm_resume_guest(vcpu->kvm);
-> +
-> +	/* Only the VCPU itself can access its active state regs */
-> +	if (intid >= VGIC_NR_PRIVATE_IRQS)
-> +		kvm_arm_resume_guest(vcpu->kvm);
->  }
+On Fri, May 13, 2016 at 04:05:19PM +0100, Marc Zyngier wrote:
+> On 13/05/16 15:43, Christoffer Dall wrote:
 
-I though we had a way to stop a single vcpu without too much hassle,
-but I'm not seeing any standard way to do that. Grmbl...
+[...]
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> > +
+> > +  KVM_DEV_ARM_VGIC_CPU_SYSREGS
+> > +  Attributes:
+> > +    The attr field of kvm_device_attr encodes two values:
+> > +    bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
+> > +    values:   |         mpidr         |      RES     |    instr    |
+> > +
+> > +    The mpidr field encodes the CPU ID based on the affinity information in the
+> > +    architecture defined MPIDR, and the field is encoded as follows:
+> > +      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
+> > +      |    Aff3    |    Aff2    |    Aff1    |    Aff0   |
+> > +
+> > +    The instr field encodes the system register to access based on the fields
+> > +    defined in the A64 instruction set encoding for system register access
+> > +    (RES means the bits are reserved for future use and should be zero):
+> 
+> Should we call this field RES0 in order to match the various
+> architecture documents?
+> 
+
+I define this below, so I don't think this is hugely important.  If you
+think it clarifies things, I can fix it.
+
+> > +
+> > +      | 15 ... 14 | 13 ... 11 | 10 ... 7 | 6 ... 3 | 2 ... 0 |
+> > +      |   Op 0    |    Op1    |    CRn   |   CRm   |   Op2   |
+> > +
+> > +    All system regs accessed through this API are (rw, 64-bit) and
+> > +    kvm_device_attr.addr points to a __u64 value.
+> > +
+> > +    KVM_DEV_ARM_VGIC_CPU_SYSREGS accesses the CPU interface registers for the
+> > +    CPU specified by the mpidr field.
+> > +
+> > +
+> > +  Limitations:
+> > +    - Priorities are not implemented, and registers are RAZ/WI
+> 
+> Is that still true? We should also document the lack of Group0 support.
+> 
+
+The priorities limiation must go out.  Not sure why we need to document
+the lack of Group0 support on the user api?  Isn't that a strictly
+internal limitation, but unlrelated to getting/setting the userspace
+state?
+
+
+Thanks,
+-Christoffer
