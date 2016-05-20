@@ -1,34 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH] KVM: arm/arm64: vgic-new: Synchronize changes to active state
-Date: Fri, 20 May 2016 15:30:27 +0200
-Message-ID: <1463751027-17517-1-git-send-email-christoffer.dall@linaro.org>
+Subject: [PATCH v2] KVM: arm/arm64: vgic-new: Synchronize changes to active
+ state
+Date: Fri, 20 May 2016 15:53:30 +0200
+Message-ID: <1463752410-3800-1-git-send-email-christoffer.dall@linaro.org>
+References: <1463751027-17517-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83B3648531
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2016 09:26:21 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O9G04W1yTlNV for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 May 2016 09:26:20 -0400 (EDT)
-Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53BFB412A6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2016 09:26:19 -0400 (EDT)
-Received: by mail-wm0-f53.google.com with SMTP id n129so272099413wmn.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2016 06:29:42 -0700 (PDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1463751027-17517-1-git-send-email-christoffer.dall@linaro.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 When modifying the active state of an interrupt via the MMIO interface,
@@ -47,16 +38,23 @@ Thefore, change both the SACTIVE and CACTIVE mmio handlers to stop the
 world, change the irq state, potentially queue the irq if we're setting
 it to active, and then continue.
 
+We take this chance to slightly optimize these functions by not stopping
+the world when touching private interrupts where there is inherently no
+possible race.
+
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-mmio.c | 69 ++++++++++++++++++++-----------------------
- 1 file changed, 32 insertions(+), 37 deletions(-)
+Changes since v1:
+ - Dont' stop the world for private IRQs
+
+ virt/kvm/arm/vgic/vgic-mmio.c | 87 ++++++++++++++++++++++++-------------------
+ 1 file changed, 48 insertions(+), 39 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 4ef3571..90b0dc4 100644
+index 4ef3571..b014c8c 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -173,6 +173,34 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+@@ -173,6 +173,36 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
  	return value;
  }
  
@@ -78,8 +76,10 @@ index 4ef3571..90b0dc4 100644
 +	 * other thread sync back the IRQ.
 +	 */
 +	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
-+	       irq->vcpu->cpu != -1) /* VCPU thread is running */
++	       irq->vcpu->cpu != -1) { /* VCPU thread is running */
++		BUG_ON(irq->intid < VGIC_NR_PRIVATE_IRQS);
 +		cond_resched_lock(&irq->irq_lock);
++	}
 +
 +	irq->active = new_active_state;
 +	if (new_active_state)
@@ -91,8 +91,15 @@ index 4ef3571..90b0dc4 100644
  void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
  			     gpa_t addr, unsigned int len,
  			     unsigned long val)
-@@ -183,27 +211,7 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
- 	kvm_arm_halt_guest(vcpu->kvm);
+@@ -180,32 +210,18 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+ 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+ 	int i;
+ 
+-	kvm_arm_halt_guest(vcpu->kvm);
++	/* Only the VCPU itself can access its active state regs */
++	if (intid >= VGIC_NR_PRIVATE_IRQS)
++		kvm_arm_halt_guest(vcpu->kvm);
++
  	for_each_set_bit(i, &val, len * 8) {
  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
 -
@@ -118,13 +125,22 @@ index 4ef3571..90b0dc4 100644
 -		spin_unlock(&irq->irq_lock);
 +		vgic_mmio_change_active(vcpu, irq, false);
  	}
- 	kvm_arm_resume_guest(vcpu->kvm);
+-	kvm_arm_resume_guest(vcpu->kvm);
++
++	/* Only the VCPU itself can access its active state regs */
++	if (intid >= VGIC_NR_PRIVATE_IRQS)
++		kvm_arm_resume_guest(vcpu->kvm);
  }
-@@ -215,25 +223,12 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+ 
+ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+@@ -215,25 +231,18 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
  	int i;
  
-+	kvm_arm_halt_guest(vcpu->kvm);
++	/* Only the VCPU itself can access its active state regs */
++	if (intid >= VGIC_NR_PRIVATE_IRQS)
++		kvm_arm_halt_guest(vcpu->kvm);
++
  	for_each_set_bit(i, &val, len * 8) {
  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
 -
@@ -145,7 +161,10 @@ index 4ef3571..90b0dc4 100644
 -		vgic_queue_irq_unlock(vcpu->kvm, irq);
 +		vgic_mmio_change_active(vcpu, irq, true);
  	}
-+	kvm_arm_resume_guest(vcpu->kvm);
++
++	/* Only the VCPU itself can access its active state regs */
++	if (intid >= VGIC_NR_PRIVATE_IRQS)
++		kvm_arm_resume_guest(vcpu->kvm);
  }
  
  unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
