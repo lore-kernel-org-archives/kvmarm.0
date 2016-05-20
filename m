@@ -1,219 +1,289 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3] KVM: arm/arm64: vgic-new: Synchronize changes to
- active state
-Date: Fri, 20 May 2016 16:49:08 +0200
-Message-ID: <20160520144908.GA26381@cbox>
-References: <1463752410-3800-1-git-send-email-christoffer.dall@linaro.org>
- <1463754660-25805-1-git-send-email-christoffer.dall@linaro.org>
- <573F2283.2030909@arm.com> <573F2365.5020605@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B91EE40FA6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2016 10:44:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oDMU+o2l3gx8 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 May 2016 10:44:57 -0400 (EDT)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9CAE940F90
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2016 10:44:57 -0400 (EDT)
-Received: by mail-wm0-f47.google.com with SMTP id n129so86202849wmn.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2016 07:48:20 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <573F2365.5020605@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Subject: [PATCH v4] KVM: arm/arm64: Add VGICv3 save/restore API documentation
+Date: Fri, 20 May 2016 17:00:45 +0200
+Message-ID: <1463756445-26974-1-git-send-email-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 20, 2016 at 03:47:01PM +0100, Marc Zyngier wrote:
-> On 20/05/16 15:43, Marc Zyngier wrote:
-> > On 20/05/16 15:31, Christoffer Dall wrote:
-> >> When modifying the active state of an interrupt via the MMIO interface,
-> >> we should ensure that the write has the intended effect.
-> >>
-> >> If a guest sets an interrupt to active, but that interrupt is already
-> >> flushed into a list register on a running VCPU, then that VCPU will
-> >> write the active state back into the struct vgic_irq upon returning from
-> >> the guest and syncing its state.  This is a non-benign race, because the
-> >> guest can observe that an interrupt is not active, and it can have a
-> >> reasonable expectations that other VCPUs will not ack any IRQs, and then
-> >> set the state to active, and expect it to stay that way.  Currently we
-> >> are not honoring this case.
-> >>
-> >> Thefore, change both the SACTIVE and CACTIVE mmio handlers to stop the
-> >> world, change the irq state, potentially queue the irq if we're setting
-> >> it to active, and then continue.
-> >>
-> >> We take this chance to slightly optimize these functions by not stopping
-> >> the world when touching private interrupts where there is inherently no
-> >> possible race.
-> >>
-> >> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> >> ---
-> >> Changes since v1:
-> >>  - Dont' stop the world for private IRQs
-> >> Changes since v2:
-> >>  - Explicitly stop the VCPU that private IRQs target because GICv3
-> >>    redistributors allow any VCPU to tamper with the active state of
-> >>    interrupts private to another VCPU.
-> >>
-> >>  arch/arm/include/asm/kvm_host.h   |   2 +
-> >>  arch/arm/kvm/arm.c                |   8 ++-
-> >>  arch/arm64/include/asm/kvm_host.h |   2 +
-> >>  virt/kvm/arm/vgic/vgic-mmio.c     | 105 ++++++++++++++++++++++++--------------
-> >>  4 files changed, 77 insertions(+), 40 deletions(-)
-> >>
-> >> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> >> index 832be03..987da9f 100644
-> >> --- a/arch/arm/include/asm/kvm_host.h
-> >> +++ b/arch/arm/include/asm/kvm_host.h
-> >> @@ -229,6 +229,8 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
-> >>  struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
-> >>  void kvm_arm_halt_guest(struct kvm *kvm);
-> >>  void kvm_arm_resume_guest(struct kvm *kvm);
-> >> +void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
-> >> +void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
-> >>  
-> >>  int kvm_arm_copy_coproc_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
-> >>  unsigned long kvm_arm_num_coproc_regs(struct kvm_vcpu *vcpu);
-> >> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> >> index e89329d..5a599c2 100644
-> >> --- a/arch/arm/kvm/arm.c
-> >> +++ b/arch/arm/kvm/arm.c
-> >> @@ -502,7 +502,13 @@ void kvm_arm_halt_guest(struct kvm *kvm)
-> >>  	kvm_make_all_cpus_request(kvm, KVM_REQ_VCPU_EXIT);
-> >>  }
-> >>  
-> >> -static void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
-> >> +void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu)
-> >> +{
-> >> +	vcpu->arch.pause = true;
-> >> +	kvm_vcpu_kick(vcpu);
-> >> +}
-> >> +
-> >> +void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
-> >>  {
-> >>  	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
-> >>  
-> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> >> index fa94f91..38746d2 100644
-> >> --- a/arch/arm64/include/asm/kvm_host.h
-> >> +++ b/arch/arm64/include/asm/kvm_host.h
-> >> @@ -329,6 +329,8 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
-> >>  struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
-> >>  void kvm_arm_halt_guest(struct kvm *kvm);
-> >>  void kvm_arm_resume_guest(struct kvm *kvm);
-> >> +void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
-> >> +void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
-> >>  
-> >>  u64 __kvm_call_hyp(void *hypfn, ...);
-> >>  #define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__)
-> >> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> >> index 4ef3571..059595e 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> >> @@ -173,6 +173,66 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
-> >>  	return value;
-> >>  }
-> >>  
-> >> +static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-> >> +				    bool new_active_state)
-> >> +{
-> >> +	spin_lock(&irq->irq_lock);
-> >> +	/*
-> >> +	 * If this virtual IRQ was written into a list register, we
-> >> +	 * have to make sure the CPU that runs the VCPU thread has
-> >> +	 * synced back LR state to the struct vgic_irq.  We can only
-> >> +	 * know this for sure, when either this irq is not assigned to
-> >> +	 * anyone's AP list anymore, or the VCPU thread is not
-> >> +	 * running on any CPUs.
-> >> +	 *
-> >> +	 * In the opposite case, we know the VCPU thread may be on its
-> >> +	 * way back from the guest and still has to sync back this
-> >> +	 * IRQ, so we release and re-acquire the spin_lock to let the
-> >> +	 * other thread sync back the IRQ.
-> >> +	 */
-> >> +	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
-> >> +	       irq->vcpu->cpu != -1) { /* VCPU thread is running */
-> >> +		BUG_ON(irq->intid < VGIC_NR_PRIVATE_IRQS);
-> >> +		cond_resched_lock(&irq->irq_lock);
-> >> +	}
-> >> +
-> >> +	irq->active = new_active_state;
-> >> +	if (new_active_state)
-> >> +		vgic_queue_irq_unlock(vcpu->kvm, irq);
-> >> +	else
-> >> +		spin_unlock(&irq->irq_lock);
-> >> +}
-> >> +
-> >> +/*
-> >> + * If we are fiddling with an IRQ's active state, we have to make sure the IRQ
-> >> + * is not queued on some running VCPU's LRs, because then the change to the
-> >> + * active state can be overwritten when the VCPU's state is synced coming back
-> >> + * from the guest.
-> >> + *
-> >> + * For shared interrupts, we have to stop all the VCPUs because interrupts can
-> >> + * be migrated while we don't hold the IRQ locks and we don't want to be
-> >> + * chasing moving targets.
-> >> + *
-> >> + * For private interrupts, we only have to make sure the single and only VCPU
-> >> + * that can potentially queue the IRQ is stopped.
-> >> + */
-> >> +static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
-> >> +{
-> >> +	if (intid < VGIC_NR_PRIVATE_IRQS)
-> >> +		kvm_arm_halt_vcpu(vcpu);
-> >> +	else
-> >> +		kvm_arm_halt_guest(vcpu->kvm);
-> >> +}
-> >> +
-> >> +/* See vgic_change_active_prepare */
-> >> +static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
-> >> +{
-> >> +	if (intid < VGIC_NR_PRIVATE_IRQS)
-> >> +		kvm_arm_resume_vcpu(vcpu);
-> >> +	else
-> >> +		kvm_arm_resume_guest(vcpu->kvm);
-> >> +}
-> >> +
-> >>  void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
-> >>  			     gpa_t addr, unsigned int len,
-> >>  			     unsigned long val)
-> >> @@ -180,32 +240,12 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
-> >>  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> >>  	int i;
-> >>  
-> >> -	kvm_arm_halt_guest(vcpu->kvm);
-> >> +	vgic_change_active_prepare(vcpu, intid);
-> > 
-> > You're still only halting the current vcpu, not the one targeted by the
-> > interrupt.
-> > 
-> > Let's not bother with that for the time being. I'm happy to merge v1,
-> > and optimize this when this starts bugging us (and this is going to take
-> > a while).
-> 
-> Actually, I now realize that you are right. The MMIO handler is passing
-> us the target vcpu, not the the one causing the exit. I'm an idiot.
+Factor out the GICv3-specific documentation into a separate
+documentation file.  Add description for how to access distributor,
+redistributor, and CPU interface registers for GICv3 in this new file,
+and add a group for accessing level triggered IRQ information for GICv3
+as well.
 
-You are most certainly not.
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+Changes since v2:
+ - Changed distributor access to be 32-bits in size
+ - Clearly specified data type pointed to by addr field
+ - Specified exception behavior for STATUSR registers
+ - Added group for level-triggered IRQ status info
+ - Removed acks from Marc/Peter as content has changed
 
-> 
-> So this looks fine to me.
-> 
+Changes since v3:
+ - Fix typos
+ - Clarified level register containing 32 IRQs
+ - Removed limitations about priority support which are no longer true
+ - Special-case the SPENDR register accesses to access the latch state
+   and the CPENDR register accesses to be RAZ/WI.
 
-Cool, thanks.
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 198 ++++++++++++++++++++++
+ Documentation/virtual/kvm/devices/arm-vgic.txt    |  21 +--
+ 2 files changed, 202 insertions(+), 17 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/devices/arm-vgic-v3.txt
 
--Christoffer
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+new file mode 100644
+index 0000000..3eed940
+--- /dev/null
++++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+@@ -0,0 +1,198 @@
++ARM Virtual Generic Interrupt Controller v3 and later (VGICv3)
++==============================================================
++
++
++Device types supported:
++  KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
++
++Only one VGIC instance may be instantiated through this API.  The created VGIC
++will act as the VM interrupt controller, requiring emulated user-space devices
++to inject interrupts to the VGIC instead of directly to CPUs.  It is not
++possible to create both a GICv3 and GICv2 on the same VM.
++
++Creating a guest GICv3 device requires a host GICv3 as well.
++
++Groups:
++  KVM_DEV_ARM_VGIC_GRP_ADDR
++  Attributes:
++    KVM_VGIC_V3_ADDR_TYPE_DIST (rw, 64-bit)
++      Base address in the guest physical address space of the GICv3 distributor
++      register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
++      This address needs to be 64K aligned and the region covers 64 KByte.
++
++    KVM_VGIC_V3_ADDR_TYPE_REDIST (rw, 64-bit)
++      Base address in the guest physical address space of the GICv3
++      redistributor register mappings. There are two 64K pages for each
++      VCPU and all of the redistributor pages are contiguous.
++      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
++      This address needs to be 64K aligned.
++
++
++  KVM_DEV_ARM_VGIC_GRP_DIST_REGS
++  KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
++  Attributes:
++    The attr field of kvm_device_attr encodes two values:
++    bits:     | 63   ....  32  |  31   ....    0 |
++    values:   |      mpidr     |      offset     |
++
++    All distributor regs are (rw, 32-bit) and kvm_device_attr.addr points to a
++    __u32 value.  64-bit registers must be accessed by separately accessing the
++    lower and higher word.
++
++    Writes to read-only registers are ignored by the kernel.
++
++    KVM_DEV_ARM_VGIC_GRP_DIST_REGS accesses the main distributor registers.
++    KVM_DEV_ARM_VGIC_GRP_REDIST_REGS accesses the redistributor of the CPU
++    specified by the mpidr.
++
++    The offset is relative to the "[Re]Distributor base address" as defined
++    in the GICv3/4 specs.  Getting or setting such a register has the same
++    effect as reading or writing the register on real hardware, except for the
++    following registers: GICD_STATUSR, GICR_STATUSR, GICD_ISPENDR,
++    GICR_ISPENDR0, GICD_ICPENDR, and GICR_ICPENDR0.  These registers behave
++    differently when accessed via this interface compared to their
++    architecturally defined behavior to allow software a full view of the
++    VGIC's internal state.
++
++    The mpidr field is used to specify which
++    redistributor is accessed.  The mpidr is ignored for the distributor.
++
++    The mpidr encoding is based on the affinity information in the
++    architecture defined MPIDR, and the field is encoded as follows:
++      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
++      |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
++
++    Note that distributor fields are not banked, but return the same value
++    regardless of the mpidr used to access the register.
++
++    The GICD_STATUSR and GICR_STATUSR registers are architecturally defined such
++    that a write of a clear bit has no effect, whereas a write with a set bit
++    clears that value.  To allow userspace to freely set the values of these two
++    registers, setting the attributes with the register offsets for these two
++    registers simply sets the non-reserved bits to the value written.
++
++
++    Accesses (reads and writes) to the GICD_ISPENDR register region and
++    GICR_ISPENDR0 registers get/set the value of the latched pending state for
++    the interrupts.
++
++    This is identical to the value read from ISPENDR for an edge triggered
++    interrupt, but may differ for level triggered interrupts. For edge triggered
++    interrupts, once an interrupt becomes pending (whether because of an edge
++    detected on the input line or because of a guest write to ISPENDR) this
++    state is "latched", and only cleared when either the interrupt is activated
++    or when the guest writes to ICPENDR. A level triggered interrupt may be
++    pending either because the level input is held high by a device, or because
++    of a guest write to the ISPENDR register. Only ISPENDR writes are latched;
++    if the device lowers the line level then the interrupt is no longer pending
++    unless the guest also wrote to ISPENDR, and conversely writes to ICPENDR or
++    activations of the interrupt do not clear the pending status if the line
++    level is still being held high.  (These rules are documented in the GICv3
++    specification descriptions of the ICPENDR and ISPENDR registers.)
++    For a level triggered interrupt the value accessed here
++    is that of the latch which is set by ISPENDR and cleared by ICPENDR or
++    interrupt activation, whereas the value read from ISPENDR is the logical OR
++    of the latch value and the input line level.
++
++    Raw access to the latch state is provided to userspace so that it can save
++    and restore the entire GIC internal state (which is defined by the
++    combination of the current input line level and the latch state, and cannot
++    be deduced from purely the line level and the value of the ISPENDR
++    registers).
++
++    Accesses to GICD_ICPENDR register region and GICR_ICPENDR0 registers have
++    RAZ/WI semantics, meaning that reads always return 0 and writes are always
++    ignored.
++
++  Errors:
++    -ENXIO: Getting or setting this register is not yet supported
++    -EBUSY: One or more VCPUs are running
++
++
++  KVM_DEV_ARM_VGIC_CPU_SYSREGS
++  Attributes:
++    The attr field of kvm_device_attr encodes two values:
++    bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
++    values:   |         mpidr         |      RES     |    instr    |
++
++    The mpidr field encodes the CPU ID based on the affinity information in the
++    architecture defined MPIDR, and the field is encoded as follows:
++      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
++      |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
++
++    The instr field encodes the system register to access based on the fields
++    defined in the A64 instruction set encoding for system register access
++    (RES means the bits are reserved for future use and should be zero):
++
++      | 15 ... 14 | 13 ... 11 | 10 ... 7 | 6 ... 3 | 2 ... 0 |
++      |   Op 0    |    Op1    |    CRn   |   CRm   |   Op2   |
++
++    All system regs accessed through this API are (rw, 64-bit) and
++    kvm_device_attr.addr points to a __u64 value.
++
++    KVM_DEV_ARM_VGIC_CPU_SYSREGS accesses the CPU interface registers for the
++    CPU specified by the mpidr field.
++
++  Errors:
++    -ENXIO: Getting or setting this register is not yet supported
++    -EBUSY: VCPU is running
++    -EINVAL: Invalid mpidr supplied
++
++
++  KVM_DEV_ARM_VGIC_GRP_NR_IRQS
++  Attributes:
++    A value describing the number of interrupts (SGI, PPI and SPI) for
++    this GIC instance, ranging from 64 to 1024, in increments of 32.
++
++    kvm_device_attr.addr points to a __u32 value.
++
++  Errors:
++    -EINVAL: Value set is out of the expected range
++    -EBUSY: Value has already be set.
++
++
++  KVM_DEV_ARM_VGIC_GRP_CTRL
++  Attributes:
++    KVM_DEV_ARM_VGIC_CTRL_INIT
++      request the initialization of the VGIC, no additional parameter in
++      kvm_device_attr.addr.
++  Errors:
++    -ENXIO: VGIC not properly configured as required prior to calling
++     this attribute
++    -ENODEV: no online VCPU
++    -ENOMEM: memory shortage when allocating vgic internal data
++
++
++  KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
++  Attributes:
++    The attr field of kvm_device_attr encodes the following values:
++    bits:     | 63      ....       32 | 31   ....    10 | 9  ....  0 |
++    values:   |         mpidr         |      info       |   vINTID   |
++
++    The vINTID specifies which set of IRQs is reported on.
++
++    The info field specifies which information userspace wants to get or set
++    using this interface.  Currently we support two different pieces of
++    information:
++
++      VGIC_LEVEL_INFO_LINE_LEVEL:
++	Get/Set the input level of the IRQ line for a set of 32 contiguously
++	numbered interrupts.
++	vINTID must be a multiple of 32.
++
++        kvm_device_attr.addr points to a __u32 value which will contain a
++	bitmap where a set bit means the interrupt level is asserted.
++
++	Bit[n] indicates the status for interrupt vINTID + n.
++
++    SGIs and any interrupt with a higher ID than the number of interrupts
++    supported, will be RAZ/WI.  LPIs are always edge-triggered and are
++    therefore not supported by this interface.
++
++    PPIs are reported per VCPU as specified in the mpidr field, and SPIs are
++    reported with the same value regardless of the mpidr specified.
++
++    The mpidr field encodes the CPU ID based on the affinity information in the
++    architecture defined MPIDR, and the field is encoded as follows:
++      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
++      |    Aff3    |    Aff2    |    Aff1    |    Aff0   |
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+index 59541d4..257b854 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+@@ -3,16 +3,16 @@ ARM Virtual Generic Interrupt Controller (VGIC)
+ 
+ Device types supported:
+   KVM_DEV_TYPE_ARM_VGIC_V2     ARM Generic Interrupt Controller v2.0
+-  KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
+ 
+ Only one VGIC instance may be instantiated through either this API or the
+ legacy KVM_CREATE_IRQCHIP api.  The created VGIC will act as the VM interrupt
+ controller, requiring emulated user-space devices to inject interrupts to the
+ VGIC instead of directly to CPUs.
+ 
+-Creating a guest GICv3 device requires a host GICv3 as well.
+-GICv3 implementations with hardware compatibility support allow a guest GICv2
+-as well.
++GICv3 implementations with hardware compatibility support allow creating a
++guest GICv2 through this interface.  For information on creating a guest GICv3
++device, see arm-vgic-v3.txt.  It is not possible to create both a GICv3 and
++GICv2 device on the same VM.
+ 
+ Groups:
+   KVM_DEV_ARM_VGIC_GRP_ADDR
+@@ -27,19 +27,6 @@ Groups:
+       interface register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V2.
+       This address needs to be 4K aligned and the region covers 4 KByte.
+ 
+-    KVM_VGIC_V3_ADDR_TYPE_DIST (rw, 64-bit)
+-      Base address in the guest physical address space of the GICv3 distributor
+-      register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+-      This address needs to be 64K aligned and the region covers 64 KByte.
+-
+-    KVM_VGIC_V3_ADDR_TYPE_REDIST (rw, 64-bit)
+-      Base address in the guest physical address space of the GICv3
+-      redistributor register mappings. There are two 64K pages for each
+-      VCPU and all of the redistributor pages are contiguous.
+-      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+-      This address needs to be 64K aligned.
+-
+-
+   KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+   Attributes:
+     The attr field of kvm_device_attr encodes two values:
+-- 
+2.1.2.330.g565301e.dirty
+
