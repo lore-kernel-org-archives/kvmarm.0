@@ -1,157 +1,153 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 48/57] KVM: arm/arm64: vgic-new: Add GICH_VMCR accessors
-Date: Thu, 19 May 2016 19:08:27 +0100
-Message-ID: <1463681316-23039-49-git-send-email-andre.przywara@arm.com>
-References: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1463681316-23039-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH] KVM: arm/arm64: vgic-new: Synchronize changes to active state
+Date: Fri, 20 May 2016 15:30:27 +0200
+Message-ID: <1463751027-17517-1-git-send-email-christoffer.dall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 83B3648531
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2016 09:26:21 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id O9G04W1yTlNV for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 May 2016 09:26:20 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53BFB412A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2016 09:26:19 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id n129so272099413wmn.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2016 06:29:42 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since the GIC CPU interface is always virtualized by the hardware,
-we don't have CPU interface state information readily available in our
-emulation if userland wants to save or restore it.
-Fortunately the GIC hypervisor interface provides the VMCR register to
-access the required virtual CPU interface bits.
-Provide wrappers for GICv2 and GICv3 hosts to have access to this
-register.
+When modifying the active state of an interrupt via the MMIO interface,
+we should ensure that the write has the intended effect.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+If a guest sets an interrupt to active, but that interrupt is already
+flushed into a list register on a running VCPU, then that VCPU will
+write the active state back into the struct vgic_irq upon returning from
+the guest and syncing its state.  This is a non-benign race, because the
+guest can observe that an interrupt is not active, and it can have a
+reasonable expectations that other VCPUs will not ack any IRQs, and then
+set the state to active, and expect it to stay that way.  Currently we
+are not honoring this case.
+
+Thefore, change both the SACTIVE and CACTIVE mmio handlers to stop the
+world, change the irq state, potentially queue the irq if we're setting
+it to active, and then continue.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
-Changelog v2 .. v3:
-- remove exported v2/v3 selector functions (as per Marc's patch)
+ virt/kvm/arm/vgic/vgic-mmio.c | 69 ++++++++++++++++++++-----------------------
+ 1 file changed, 32 insertions(+), 37 deletions(-)
 
-Changelog v3 .. v4:
-- move struct vgic_vmcr into the VGIC's private header file
-
- virt/kvm/arm/vgic/vgic-v2.c | 29 +++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-v3.c | 22 ++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h    | 21 +++++++++++++++++++++
- 3 files changed, 72 insertions(+)
-
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index fb5e65c..d943059 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -174,3 +174,32 @@ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr)
- {
- 	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = 0;
- }
-+
-+void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-+{
-+	u32 vmcr;
-+
-+	vmcr  = (vmcrp->ctlr << GICH_VMCR_CTRL_SHIFT) & GICH_VMCR_CTRL_MASK;
-+	vmcr |= (vmcrp->abpr << GICH_VMCR_ALIAS_BINPOINT_SHIFT) &
-+		GICH_VMCR_ALIAS_BINPOINT_MASK;
-+	vmcr |= (vmcrp->bpr << GICH_VMCR_BINPOINT_SHIFT) &
-+		GICH_VMCR_BINPOINT_MASK;
-+	vmcr |= (vmcrp->pmr << GICH_VMCR_PRIMASK_SHIFT) &
-+		GICH_VMCR_PRIMASK_MASK;
-+
-+	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = vmcr;
-+}
-+
-+void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-+{
-+	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr;
-+
-+	vmcrp->ctlr = (vmcr & GICH_VMCR_CTRL_MASK) >>
-+			GICH_VMCR_CTRL_SHIFT;
-+	vmcrp->abpr = (vmcr & GICH_VMCR_ALIAS_BINPOINT_MASK) >>
-+			GICH_VMCR_ALIAS_BINPOINT_SHIFT;
-+	vmcrp->bpr  = (vmcr & GICH_VMCR_BINPOINT_MASK) >>
-+			GICH_VMCR_BINPOINT_SHIFT;
-+	vmcrp->pmr  = (vmcr & GICH_VMCR_PRIMASK_MASK) >>
-+			GICH_VMCR_PRIMASK_SHIFT;
-+}
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index fb547da..8548297 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -160,3 +160,25 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
- {
- 	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr] = 0;
- }
-+
-+void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-+{
-+	u32 vmcr;
-+
-+	vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
-+	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
-+	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
-+	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
-+
-+	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
-+}
-+
-+void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-+{
-+	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
-+
-+	vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
-+	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
-+	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
-+	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
-+}
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index f826026..d2c1fd5 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -27,6 +27,13 @@
- 
- #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
- 
-+struct vgic_vmcr {
-+	u32	ctlr;
-+	u32	abpr;
-+	u32	bpr;
-+	u32	pmr;
-+};
-+
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
- bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
-@@ -40,6 +47,8 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
- int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
- int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 			 int offset, u32 *val);
-+void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-+void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
- 			     enum vgic_type);
- 
-@@ -49,6 +58,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
- void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
- void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
- void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
-+void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-+void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
- #else
- static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
-@@ -72,6 +83,16 @@ static inline void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
- {
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 4ef3571..90b0dc4 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -173,6 +173,34 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+ 	return value;
  }
  
-+static inline
-+void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
++static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
++				    bool new_active_state)
 +{
++	spin_lock(&irq->irq_lock);
++	/*
++	 * If this virtual IRQ was written into a list register, we
++	 * have to make sure the CPU that runs the VCPU thread has
++	 * synced back LR state to the struct vgic_irq.  We can only
++	 * know this for sure, when either this irq is not assigned to
++	 * anyone's AP list anymore, or the VCPU thread is not
++	 * running on any CPUs.
++	 *
++	 * In the opposite case, we know the VCPU thread may be on its
++	 * way back from the guest and still has to sync back this
++	 * IRQ, so we release and re-acquire the spin_lock to let the
++	 * other thread sync back the IRQ.
++	 */
++	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
++	       irq->vcpu->cpu != -1) /* VCPU thread is running */
++		cond_resched_lock(&irq->irq_lock);
++
++	irq->active = new_active_state;
++	if (new_active_state)
++		vgic_queue_irq_unlock(vcpu->kvm, irq);
++	else
++		spin_unlock(&irq->irq_lock);
 +}
 +
-+static inline
-+void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-+{
-+}
-+
- static inline int vgic_register_redist_iodevs(struct kvm *kvm,
- 					      gpa_t dist_base_address)
- {
+ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+ 			     gpa_t addr, unsigned int len,
+ 			     unsigned long val)
+@@ -183,27 +211,7 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+ 	kvm_arm_halt_guest(vcpu->kvm);
+ 	for_each_set_bit(i, &val, len * 8) {
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+-
+-		spin_lock(&irq->irq_lock);
+-		/*
+-		 * If this virtual IRQ was written into a list register, we
+-		 * have to make sure the CPU that runs the VCPU thread has
+-		 * synced back LR state to the struct vgic_irq.  We can only
+-		 * know this for sure, when either this irq is not assigned to
+-		 * anyone's AP list anymore, or the VCPU thread is not
+-		 * running on any CPUs.
+-		 *
+-		 * In the opposite case, we know the VCPU thread may be on its
+-		 * way back from the guest and still has to sync back this
+-		 * IRQ, so we release and re-acquire the spin_lock to let the
+-		 * other thread sync back the IRQ.
+-		 */
+-		while (irq->vcpu && /* IRQ may have state in an LR somewhere */
+-		       irq->vcpu->cpu != -1) /* VCPU thread is running */
+-			cond_resched_lock(&irq->irq_lock);
+-
+-		irq->active = false;
+-		spin_unlock(&irq->irq_lock);
++		vgic_mmio_change_active(vcpu, irq, false);
+ 	}
+ 	kvm_arm_resume_guest(vcpu->kvm);
+ }
+@@ -215,25 +223,12 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+ 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+ 	int i;
+ 
++	kvm_arm_halt_guest(vcpu->kvm);
+ 	for_each_set_bit(i, &val, len * 8) {
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+-
+-		spin_lock(&irq->irq_lock);
+-
+-		/*
+-		 * If the IRQ was already active or there is no target VCPU
+-		 * assigned at the moment, then just proceed.
+-		 */
+-		if (irq->active || !irq->target_vcpu) {
+-			irq->active = true;
+-
+-			spin_unlock(&irq->irq_lock);
+-			continue;
+-		}
+-
+-		irq->active = true;
+-		vgic_queue_irq_unlock(vcpu->kvm, irq);
++		vgic_mmio_change_active(vcpu, irq, true);
+ 	}
++	kvm_arm_resume_guest(vcpu->kvm);
+ }
+ 
+ unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
 -- 
-2.8.2
-
+2.1.2.330.g565301e.dirty
