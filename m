@@ -1,73 +1,54 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 3/7] KVM: arm/arm64: vgic-v2: Always resample level interrupts
-Date: Mon, 23 May 2016 13:36:59 +0100
-Message-ID: <1464007023-11736-4-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 6/7] arm64: KVM: vgic-v3: Prevent the guest from messing with ICC_SRE_EL1
+Date: Mon, 23 May 2016 13:37:02 +0100
+Message-ID: <1464007023-11736-7-git-send-email-marc.zyngier@arm.com>
 References: <1464007023-11736-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BF0249B87
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2016 08:33:49 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5biQgB+h05n7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 May 2016 08:33:48 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A65049B43
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2016 08:33:44 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1464007023-11736-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When reading back from the list registers, we need to perform
-two actions for level interrupts:
-1) clear the soft-pending bit if the interrupt is not pending
-   anymore *in the list register*
-2) resample the line level and propagate it to the pending state
+Both our GIC emulations are "strict", in the sense that we either
+emulate a GICv2 or a GICv3, and not a GICv3 with GICv2 legacy
+support.
 
-But these two actions linked, and we should *always* resample
-the line level, no matter what state is in the list register.
-Otherwise, we may end-up injecting spurious interrupts that
-have been already retired.
+But when running on a GICv3 host, we still allow the guest to
+tinker with the ICC_SRE_EL1 register during its time slice:
+it can switch SRE off, observe that it is off, and yet on the
+next world switch, find the SRE bit to be set again. Not very
+nice.
+
+An obvious solution is to always trap accesses to ICC_SRE_EL1
+(by clearing ICC_SRE_EL2.Enable), and to let the handler return
+the programmed value on a read, or ignore the write.
+
+That way, the guest can always observe that our GICv3 is SRE==1
+only.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-v2.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/hyp/vgic-v3-sr.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index 8ad42c2..f659af0 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -112,10 +112,13 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 			}
- 		}
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 3129df9..40c3b4c 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -313,10 +313,8 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 	 * Prevent the guest from touching the GIC system registers if
+ 	 * SRE isn't enabled for GICv3 emulation.
+ 	 */
+-	if (!cpu_if->vgic_sre) {
+-		write_gicreg(read_gicreg(ICC_SRE_EL2) & ~ICC_SRE_EL2_ENABLE,
+-			     ICC_SRE_EL2);
+-	}
++	write_gicreg(read_gicreg(ICC_SRE_EL2) & ~ICC_SRE_EL2_ENABLE,
++		     ICC_SRE_EL2);
+ }
  
--		/* Clear soft pending state when level IRQs have been acked */
--		if (irq->config == VGIC_CONFIG_LEVEL &&
--		    !(val & GICH_LR_PENDING_BIT)) {
--			irq->soft_pending = false;
-+		/*
-+		 * Clear soft pending state when level irqs have been acked.
-+		 * Always resample the line level.
-+		 */
-+		if (irq->config == VGIC_CONFIG_LEVEL) {
-+			if (!(val & GICH_LR_PENDING_BIT))
-+				irq->soft_pending = false;
- 			irq->pending = irq->line_level;
- 		}
- 
+ void __hyp_text __vgic_v3_init_lrs(void)
 -- 
 2.1.4
+
