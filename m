@@ -1,24 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 49/59] KVM: arm/arm64: vgic-new: Add GICH_VMCR accessors
-Date: Tue, 24 May 2016 11:09:43 +0200
-Message-ID: <1464080993-10884-50-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 37/59] KVM: arm/arm64: vgic-new: Add GICv3 redistributor IIDR
+ and TYPER handler
+Date: Tue, 24 May 2016 11:09:31 +0200
+Message-ID: <1464080993-10884-38-git-send-email-christoffer.dall@linaro.org>
 References: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AF5449BDC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:07:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB27249C13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:07:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XrztIa2rwxgJ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 May 2016 05:07:18 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E83A349C55
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:07:11 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id a136so62272862wme.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:10:45 -0700 (PDT)
+ with ESMTP id bpFYVzIMUTrq for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 May 2016 05:07:14 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16EE449C61
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:07:07 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id n129so15354238wmn.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:10:40 -0700 (PDT)
 In-Reply-To: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,141 +36,73 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Andre Przywara <andre.przywara@arm.com>
 
-Since the GIC CPU interface is always virtualized by the hardware,
-we don't have CPU interface state information readily available in our
-emulation if userland wants to save or restore it.
-Fortunately the GIC hypervisor interface provides the VMCR register to
-access the required virtual CPU interface bits.
-Provide wrappers for GICv2 and GICv3 hosts to have access to this
-register.
+The redistributor TYPER tells the OS about the associated MPIDR,
+also the LAST bit is crucial to determine the number of redistributors.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-v2.c | 29 +++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-v3.c | 22 ++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h    | 21 +++++++++++++++++++++
- 3 files changed, 72 insertions(+)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index fb5e65c..d943059 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -174,3 +174,32 @@ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr)
- {
- 	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = 0;
- }
-+
-+void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-+{
-+	u32 vmcr;
-+
-+	vmcr  = (vmcrp->ctlr << GICH_VMCR_CTRL_SHIFT) & GICH_VMCR_CTRL_MASK;
-+	vmcr |= (vmcrp->abpr << GICH_VMCR_ALIAS_BINPOINT_SHIFT) &
-+		GICH_VMCR_ALIAS_BINPOINT_MASK;
-+	vmcr |= (vmcrp->bpr << GICH_VMCR_BINPOINT_SHIFT) &
-+		GICH_VMCR_BINPOINT_MASK;
-+	vmcr |= (vmcrp->pmr << GICH_VMCR_PRIMASK_SHIFT) &
-+		GICH_VMCR_PRIMASK_MASK;
-+
-+	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = vmcr;
-+}
-+
-+void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-+{
-+	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr;
-+
-+	vmcrp->ctlr = (vmcr & GICH_VMCR_CTRL_MASK) >>
-+			GICH_VMCR_CTRL_SHIFT;
-+	vmcrp->abpr = (vmcr & GICH_VMCR_ALIAS_BINPOINT_MASK) >>
-+			GICH_VMCR_ALIAS_BINPOINT_SHIFT;
-+	vmcrp->bpr  = (vmcr & GICH_VMCR_BINPOINT_MASK) >>
-+			GICH_VMCR_BINPOINT_SHIFT;
-+	vmcrp->pmr  = (vmcr & GICH_VMCR_PRIMASK_MASK) >>
-+			GICH_VMCR_PRIMASK_SHIFT;
-+}
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index fb547da..8548297 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -160,3 +160,25 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
- {
- 	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr] = 0;
- }
-+
-+void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-+{
-+	u32 vmcr;
-+
-+	vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
-+	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
-+	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
-+	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
-+
-+	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
-+}
-+
-+void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-+{
-+	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
-+
-+	vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
-+	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
-+	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
-+	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
-+}
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index f826026..d2c1fd5 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -27,6 +27,13 @@
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index bd062b8..64edd23 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -22,6 +22,13 @@
+ #include "vgic.h"
+ #include "vgic-mmio.h"
  
- #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
- 
-+struct vgic_vmcr {
-+	u32	ctlr;
-+	u32	abpr;
-+	u32	bpr;
-+	u32	pmr;
-+};
++/* extract @num bytes at @offset bytes offset in data */
++static unsigned long extract_bytes(unsigned long data, unsigned int offset,
++				   unsigned int num)
++{
++	return (data >> (offset * 8)) & GENMASK_ULL(num * 8 - 1, 0);
++}
 +
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
- bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
-@@ -40,6 +47,8 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
- int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
- int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 			 int offset, u32 *val);
-+void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-+void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
- 			     enum vgic_type);
- 
-@@ -49,6 +58,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
- void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
- void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
- void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
-+void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-+void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
- #else
- static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
-@@ -72,6 +83,16 @@ static inline void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 					    gpa_t addr, unsigned int len)
  {
+@@ -68,6 +75,27 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
+ 	}
  }
  
-+static inline
-+void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
++static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
++					      gpa_t addr, unsigned int len)
 +{
++	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
++	int target_vcpu_id = vcpu->vcpu_id;
++	u64 value;
++
++	value = (mpidr & GENMASK(23, 0)) << 32;
++	value |= ((target_vcpu_id & 0xffff) << 8);
++	if (target_vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
++		value |= GICR_TYPER_LAST;
++
++	return extract_bytes(value, addr & 7, len);
 +}
 +
-+static inline
-+void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
++static unsigned long vgic_mmio_read_v3r_iidr(struct kvm_vcpu *vcpu,
++					     gpa_t addr, unsigned int len)
 +{
++	return (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
 +}
 +
- static inline int vgic_register_redist_iodevs(struct kvm *kvm,
- 					      gpa_t dist_base_address)
- {
+ /*
+  * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
+  * redistributors, while SPIs are covered by registers in the distributor
+@@ -142,10 +170,10 @@ static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GICR_IIDR,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
++		vgic_mmio_read_v3r_iidr, vgic_mmio_write_wi, 4,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GICR_TYPER,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
++		vgic_mmio_read_v3r_typer, vgic_mmio_write_wi, 8,
+ 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GICR_PROPBASER,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
 -- 
 2.1.2.330.g565301e.dirty
