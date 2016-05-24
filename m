@@ -1,86 +1,224 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 47/59] KVM: arm/arm64: vgic-new: Export register access interface
-Date: Tue, 24 May 2016 11:09:41 +0200
-Message-ID: <1464080993-10884-48-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 59/59] KVM: arm/arm64: vgic-new: Synchronize changes to active state
+Date: Tue, 24 May 2016 11:09:53 +0200
+Message-ID: <1464080993-10884-60-git-send-email-christoffer.dall@linaro.org>
 References: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Userland can access the emulated GIC to save and restore its state
-for initialization or migration purposes.
-The kvm_io_bus API requires an absolute gpa, which does not fit the
-KVM_DEV_ARM_VGIC_GRP_DIST_REGS user API, that only provides relative
-offsets. So we provide a wrapper to plug into our MMIO framework and
-find the respective register handler.
+When modifying the active state of an interrupt via the MMIO interface,
+we should ensure that the write has the intended effect.
+
+If a guest sets an interrupt to active, but that interrupt is already
+flushed into a list register on a running VCPU, then that VCPU will
+write the active state back into the struct vgic_irq upon returning from
+the guest and syncing its state.  This is a non-benign race, because the
+guest can observe that an interrupt is not active, and it can have a
+reasonable expectations that other VCPUs will not ack any IRQs, and then
+set the state to active, and expect it to stay that way.  Currently we
+are not honoring this case.
+
+Thefore, change both the SACTIVE and CACTIVE mmio handlers to stop the
+world, change the irq state, potentially queue the irq if we're setting
+it to active, and then continue.
+
+We take this chance to slightly optimize these functions by not stopping
+the world when touching private interrupts where there is inherently no
+possible race.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 36 ++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h         |  2 ++
- 2 files changed, 38 insertions(+)
+ arch/arm/include/asm/kvm_host.h   |   2 +
+ arch/arm/kvm/arm.c                |   8 ++-
+ arch/arm64/include/asm/kvm_host.h |   2 +
+ virt/kvm/arm/vgic/vgic-mmio.c     | 105 ++++++++++++++++++++++++--------------
+ 4 files changed, 77 insertions(+), 40 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 7189690..a255122 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -296,3 +296,39 @@ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 832be03..987da9f 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -229,6 +229,8 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+ struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
+ void kvm_arm_halt_guest(struct kvm *kvm);
+ void kvm_arm_resume_guest(struct kvm *kvm);
++void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
++void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
  
- 	return -ENXIO;
+ int kvm_arm_copy_coproc_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+ unsigned long kvm_arm_num_coproc_regs(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index e89329d..5a599c2 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -502,7 +502,13 @@ void kvm_arm_halt_guest(struct kvm *kvm)
+ 	kvm_make_all_cpus_request(kvm, KVM_REQ_VCPU_EXIT);
  }
-+
-+/*
-+ * When userland tries to access the VGIC register handlers, we need to
-+ * create a usable struct vgic_io_device to be passed to the handlers and we
-+ * have to set up a buffer similar to what would have happened if a guest MMIO
-+ * access occurred, including doing endian conversions on BE systems.
-+ */
-+static int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
-+			bool is_write, int offset, u32 *val)
+ 
+-static void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
++void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu)
 +{
-+	unsigned int len = 4;
-+	u8 buf[4];
-+	int ret;
++	vcpu->arch.pause = true;
++	kvm_vcpu_kick(vcpu);
++}
 +
-+	if (is_write) {
-+		vgic_data_host_to_mmio_bus(buf, len, *val);
-+		ret = kvm_io_gic_ops.write(vcpu, &dev->dev, offset, len, buf);
-+	} else {
-+		ret = kvm_io_gic_ops.read(vcpu, &dev->dev, offset, len, buf);
-+		if (!ret)
-+			*val = vgic_data_mmio_bus_to_host(buf, len);
++void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
+ 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index fa94f91..38746d2 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -329,6 +329,8 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+ struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+ void kvm_arm_halt_guest(struct kvm *kvm);
+ void kvm_arm_resume_guest(struct kvm *kvm);
++void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
++void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
+ 
+ u64 __kvm_call_hyp(void *hypfn, ...);
+ #define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__)
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 4ef3571..059595e 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -173,6 +173,66 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+ 	return value;
+ }
+ 
++static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
++				    bool new_active_state)
++{
++	spin_lock(&irq->irq_lock);
++	/*
++	 * If this virtual IRQ was written into a list register, we
++	 * have to make sure the CPU that runs the VCPU thread has
++	 * synced back LR state to the struct vgic_irq.  We can only
++	 * know this for sure, when either this irq is not assigned to
++	 * anyone's AP list anymore, or the VCPU thread is not
++	 * running on any CPUs.
++	 *
++	 * In the opposite case, we know the VCPU thread may be on its
++	 * way back from the guest and still has to sync back this
++	 * IRQ, so we release and re-acquire the spin_lock to let the
++	 * other thread sync back the IRQ.
++	 */
++	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
++	       irq->vcpu->cpu != -1) { /* VCPU thread is running */
++		BUG_ON(irq->intid < VGIC_NR_PRIVATE_IRQS);
++		cond_resched_lock(&irq->irq_lock);
 +	}
 +
-+	return ret;
++	irq->active = new_active_state;
++	if (new_active_state)
++		vgic_queue_irq_unlock(vcpu->kvm, irq);
++	else
++		spin_unlock(&irq->irq_lock);
 +}
 +
-+int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-+			 int offset, u32 *val)
++/*
++ * If we are fiddling with an IRQ's active state, we have to make sure the IRQ
++ * is not queued on some running VCPU's LRs, because then the change to the
++ * active state can be overwritten when the VCPU's state is synced coming back
++ * from the guest.
++ *
++ * For shared interrupts, we have to stop all the VCPUs because interrupts can
++ * be migrated while we don't hold the IRQ locks and we don't want to be
++ * chasing moving targets.
++ *
++ * For private interrupts, we only have to make sure the single and only VCPU
++ * that can potentially queue the IRQ is stopped.
++ */
++static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
 +{
-+	struct vgic_io_device dev = {
-+		.regions = vgic_v2_dist_registers,
-+		.nr_regions = ARRAY_SIZE(vgic_v2_dist_registers),
-+	};
-+
-+	return vgic_uaccess(vcpu, &dev, is_write, offset, val);
++	if (intid < VGIC_NR_PRIVATE_IRQS)
++		kvm_arm_halt_vcpu(vcpu);
++	else
++		kvm_arm_halt_guest(vcpu->kvm);
 +}
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index a264c5f..f826026 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -38,6 +38,8 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
- void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
- void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
- int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
-+int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-+			 int offset, u32 *val);
- int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
- 			     enum vgic_type);
++
++/* See vgic_change_active_prepare */
++static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
++{
++	if (intid < VGIC_NR_PRIVATE_IRQS)
++		kvm_arm_resume_vcpu(vcpu);
++	else
++		kvm_arm_resume_guest(vcpu->kvm);
++}
++
+ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+ 			     gpa_t addr, unsigned int len,
+ 			     unsigned long val)
+@@ -180,32 +240,12 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+ 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+ 	int i;
  
+-	kvm_arm_halt_guest(vcpu->kvm);
++	vgic_change_active_prepare(vcpu, intid);
+ 	for_each_set_bit(i, &val, len * 8) {
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+-
+-		spin_lock(&irq->irq_lock);
+-		/*
+-		 * If this virtual IRQ was written into a list register, we
+-		 * have to make sure the CPU that runs the VCPU thread has
+-		 * synced back LR state to the struct vgic_irq.  We can only
+-		 * know this for sure, when either this irq is not assigned to
+-		 * anyone's AP list anymore, or the VCPU thread is not
+-		 * running on any CPUs.
+-		 *
+-		 * In the opposite case, we know the VCPU thread may be on its
+-		 * way back from the guest and still has to sync back this
+-		 * IRQ, so we release and re-acquire the spin_lock to let the
+-		 * other thread sync back the IRQ.
+-		 */
+-		while (irq->vcpu && /* IRQ may have state in an LR somewhere */
+-		       irq->vcpu->cpu != -1) /* VCPU thread is running */
+-			cond_resched_lock(&irq->irq_lock);
+-
+-		irq->active = false;
+-		spin_unlock(&irq->irq_lock);
++		vgic_mmio_change_active(vcpu, irq, false);
+ 	}
+-	kvm_arm_resume_guest(vcpu->kvm);
++	vgic_change_active_finish(vcpu, intid);
+ }
+ 
+ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+@@ -215,25 +255,12 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+ 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+ 	int i;
+ 
++	vgic_change_active_prepare(vcpu, intid);
+ 	for_each_set_bit(i, &val, len * 8) {
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+-
+-		spin_lock(&irq->irq_lock);
+-
+-		/*
+-		 * If the IRQ was already active or there is no target VCPU
+-		 * assigned at the moment, then just proceed.
+-		 */
+-		if (irq->active || !irq->target_vcpu) {
+-			irq->active = true;
+-
+-			spin_unlock(&irq->irq_lock);
+-			continue;
+-		}
+-
+-		irq->active = true;
+-		vgic_queue_irq_unlock(vcpu->kvm, irq);
++		vgic_mmio_change_active(vcpu, irq, true);
+ 	}
++	vgic_change_active_finish(vcpu, intid);
+ }
+ 
+ unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
 -- 
 2.1.2.330.g565301e.dirty
 
