@@ -1,24 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 24/59] KVM: arm/arm64: vgic-new: Add MMIO handling framework
-Date: Tue, 24 May 2016 11:09:18 +0200
-Message-ID: <1464080993-10884-25-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 30/59] KVM: arm/arm64: vgic-new: Add PRIORITY registers handlers
+Date: Tue, 24 May 2016 11:09:24 +0200
+Message-ID: <1464080993-10884-31-git-send-email-christoffer.dall@linaro.org>
 References: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99B2649B43
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D952449C36
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tRIwBT7BZAyf for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 May 2016 05:06:50 -0400 (EDT)
-Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C19A49BCC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:47 -0400 (EDT)
-Received: by mail-wm0-f52.google.com with SMTP id n129so118546322wmn.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:10:20 -0700 (PDT)
+ with ESMTP id gO6rlyvWkR2d for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 May 2016 05:06:56 -0400 (EDT)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1AF8049BE9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:53 -0400 (EDT)
+Received: by mail-wm0-f48.google.com with SMTP id z87so11870816wmh.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:10:26 -0700 (PDT)
 In-Reply-To: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,363 +30,120 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
 
-Add an MMIO handling framework to the VGIC emulation:
-Each register is described by its offset, size (or number of bits per
-IRQ, if applicable) and the read/write handler functions. We provide
-initialization macros to describe each GIC register later easily.
+The priority register handlers are shared between the v2 and v3
+emulation, so their implementation goes into vgic-mmio.c, to be
+easily referenced from the v3 emulation as well later.
+There is a corner case when we change the priority of a pending
+interrupt which we don't handle at the moment.
 
-Separate dispatch functions for read and write accesses are connected
-to the kvm_io_bus framework and binary-search for the responsible
-register handler based on the offset address within the region.
-We convert the incoming data (referenced by a pointer) to the host's
-endianess and use pass-by-value to hand the data over to the actual
-handler functions.
-
-The register handler prototype and the endianess conversion are
-courtesy of Christoffer Dall.
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/vgic/vgic.h       |  13 +++
- virt/kvm/arm/vgic/vgic-mmio.c | 184 ++++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-mmio.h |  99 +++++++++++++++++++++++
- 3 files changed, 296 insertions(+)
- create mode 100644 virt/kvm/arm/vgic/vgic-mmio.c
- create mode 100644 virt/kvm/arm/vgic/vgic-mmio.h
+ virt/kvm/arm/vgic/vgic-mmio-v2.c |  2 +-
+ virt/kvm/arm/vgic/vgic-mmio.c    | 40 ++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.h    |  7 +++++++
+ virt/kvm/arm/vgic/vgic.h         |  2 ++
+ 4 files changed, 50 insertions(+), 1 deletion(-)
 
-diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index f663288..ff3f9c2 100644
---- a/include/kvm/vgic/vgic.h
-+++ b/include/kvm/vgic/vgic.h
-@@ -106,6 +106,16 @@ struct vgic_irq {
- 	enum vgic_irq_config config;	/* Level or edge */
- };
- 
-+struct vgic_register_region;
-+
-+struct vgic_io_device {
-+	gpa_t base_addr;
-+	struct kvm_vcpu *redist_vcpu;
-+	const struct vgic_register_region *regions;
-+	int nr_regions;
-+	struct kvm_io_device dev;
-+};
-+
- struct vgic_dist {
- 	bool			in_kernel;
- 	bool			ready;
-@@ -132,6 +142,9 @@ struct vgic_dist {
- 	bool			enabled;
- 
- 	struct vgic_irq		*spis;
-+
-+	struct vgic_io_device	dist_iodev;
-+	struct vgic_io_device	*redist_iodevs;
- };
- 
- struct vgic_v2_cpu_if {
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index 12e101b..d564a30 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -90,7 +90,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 		vgic_mmio_read_active, vgic_mmio_write_cactive, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
++		vgic_mmio_read_priority, vgic_mmio_write_priority, 8,
+ 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
 diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-new file mode 100644
-index 0000000..012b82b
---- /dev/null
+index 79a4622..6f4e05b 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -0,0 +1,184 @@
-+/*
-+ * VGIC MMIO handling functions
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ */
-+
-+#include <linux/bitops.h>
-+#include <linux/bsearch.h>
-+#include <linux/kvm.h>
-+#include <linux/kvm_host.h>
-+#include <kvm/iodev.h>
-+#include <kvm/arm_vgic.h>
-+
-+#include "vgic.h"
-+#include "vgic-mmio.h"
-+
-+unsigned long vgic_mmio_read_raz(struct kvm_vcpu *vcpu,
-+				 gpa_t addr, unsigned int len)
+@@ -236,6 +236,46 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+ 	}
+ }
+ 
++unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
++				      gpa_t addr, unsigned int len)
 +{
-+	return 0;
-+}
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 8);
++	int i;
++	u64 val = 0;
 +
-+unsigned long vgic_mmio_read_rao(struct kvm_vcpu *vcpu,
-+				 gpa_t addr, unsigned int len)
-+{
-+	return -1UL;
-+}
++	for (i = 0; i < len; i++) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
 +
-+void vgic_mmio_write_wi(struct kvm_vcpu *vcpu, gpa_t addr,
-+			unsigned int len, unsigned long val)
-+{
-+	/* Ignore */
-+}
++		val |= (u64)irq->priority << (i * 8);
++	}
 +
-+static int match_region(const void *key, const void *elt)
-+{
-+	const unsigned int offset = (unsigned long)key;
-+	const struct vgic_register_region *region = elt;
-+
-+	if (offset < region->reg_offset)
-+		return -1;
-+
-+	if (offset >= region->reg_offset + region->len)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+/* Find the proper register handler entry given a certain address offset. */
-+static const struct vgic_register_region *
-+vgic_find_mmio_region(const struct vgic_register_region *region, int nr_regions,
-+		      unsigned int offset)
-+{
-+	return bsearch((void *)(uintptr_t)offset, region, nr_regions,
-+		       sizeof(region[0]), match_region);
++	return val;
 +}
 +
 +/*
-+ * kvm_mmio_read_buf() returns a value in a format where it can be converted
-+ * to a byte array and be directly observed as the guest wanted it to appear
-+ * in memory if it had done the store itself, which is LE for the GIC, as the
-+ * guest knows the GIC is always LE.
-+ *
-+ * We convert this value to the CPUs native format to deal with it as a data
-+ * value.
++ * We currently don't handle changing the priority of an interrupt that
++ * is already pending on a VCPU. If there is a need for this, we would
++ * need to make this VCPU exit and re-evaluate the priorities, potentially
++ * leading to this interrupt getting presented now to the guest (if it has
++ * been masked by the priority mask before).
 + */
-+unsigned long vgic_data_mmio_bus_to_host(const void *val, unsigned int len)
++void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
++			      gpa_t addr, unsigned int len,
++			      unsigned long val)
 +{
-+	unsigned long data = kvm_mmio_read_buf(val, len);
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 8);
++	int i;
 +
-+	switch (len) {
-+	case 1:
-+		return data;
-+	case 2:
-+		return le16_to_cpu(data);
-+	case 4:
-+		return le32_to_cpu(data);
-+	default:
-+		return le64_to_cpu(data);
++	for (i = 0; i < len; i++) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++		spin_lock(&irq->irq_lock);
++		/* Narrow the priority range to what we actually support */
++		irq->priority = (val >> (i * 8)) & GENMASK(7, 8 - VGIC_PRI_BITS);
++		spin_unlock(&irq->irq_lock);
 +	}
 +}
 +
-+/*
-+ * kvm_mmio_write_buf() expects a value in a format such that if converted to
-+ * a byte array it is observed as the guest would see it if it could perform
-+ * the load directly.  Since the GIC is LE, and the guest knows this, the
-+ * guest expects a value in little endian format.
-+ *
-+ * We convert the data value from the CPUs native format to LE so that the
-+ * value is returned in the proper format.
-+ */
-+void vgic_data_host_to_mmio_bus(void *buf, unsigned int len,
-+				unsigned long data)
-+{
-+	switch (len) {
-+	case 1:
-+		break;
-+	case 2:
-+		data = cpu_to_le16(data);
-+		break;
-+	case 4:
-+		data = cpu_to_le32(data);
-+		break;
-+	default:
-+		data = cpu_to_le64(data);
-+	}
-+
-+	kvm_mmio_write_buf(buf, len, data);
-+}
-+
-+static
-+struct vgic_io_device *kvm_to_vgic_iodev(const struct kvm_io_device *dev)
-+{
-+	return container_of(dev, struct vgic_io_device, dev);
-+}
-+
-+static bool check_region(const struct vgic_register_region *region,
-+			 gpa_t addr, int len)
-+{
-+	if ((region->access_flags & VGIC_ACCESS_8bit) && len == 1)
-+		return true;
-+	if ((region->access_flags & VGIC_ACCESS_32bit) &&
-+	    len == sizeof(u32) && !(addr & 3))
-+		return true;
-+	if ((region->access_flags & VGIC_ACCESS_64bit) &&
-+	    len == sizeof(u64) && !(addr & 7))
-+		return true;
-+
-+	return false;
-+}
-+
-+static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
-+			      gpa_t addr, int len, void *val)
-+{
-+	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
-+	const struct vgic_register_region *region;
-+	struct kvm_vcpu *r_vcpu;
-+	unsigned long data;
-+
-+	region = vgic_find_mmio_region(iodev->regions, iodev->nr_regions,
-+				       addr - iodev->base_addr);
-+	if (!region || !check_region(region, addr, len)) {
-+		memset(val, 0, len);
-+		return 0;
-+	}
-+
-+	r_vcpu = iodev->redist_vcpu ? iodev->redist_vcpu : vcpu;
-+	data = region->read(r_vcpu, addr, len);
-+	vgic_data_host_to_mmio_bus(val, len, data);
-+	return 0;
-+}
-+
-+static int dispatch_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
-+			       gpa_t addr, int len, const void *val)
-+{
-+	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
-+	const struct vgic_register_region *region;
-+	struct kvm_vcpu *r_vcpu;
-+	unsigned long data = vgic_data_mmio_bus_to_host(val, len);
-+
-+	region = vgic_find_mmio_region(iodev->regions, iodev->nr_regions,
-+				       addr - iodev->base_addr);
-+	if (!region)
-+		return 0;
-+
-+	if (!check_region(region, addr, len))
-+		return 0;
-+
-+	r_vcpu = iodev->redist_vcpu ? iodev->redist_vcpu : vcpu;
-+	region->write(r_vcpu, addr, len, data);
-+	return 0;
-+}
-+
-+struct kvm_io_device_ops kvm_io_gic_ops = {
-+	.read = dispatch_mmio_read,
-+	.write = dispatch_mmio_write,
-+};
+ static int match_region(const void *key, const void *elt)
+ {
+ 	const unsigned int offset = (unsigned long)key;
 diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-new file mode 100644
-index 0000000..3023ecf
---- /dev/null
+index 50b4464..7e73f10 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
 +++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -0,0 +1,99 @@
-+/*
-+ * Copyright (C) 2015, 2016 ARM Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef __KVM_ARM_VGIC_MMIO_H__
-+#define __KVM_ARM_VGIC_MMIO_H__
+@@ -129,6 +129,13 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+ 			     gpa_t addr, unsigned int len,
+ 			     unsigned long val);
+ 
++unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
++				      gpa_t addr, unsigned int len);
 +
-+struct vgic_register_region {
-+	unsigned int reg_offset;
-+	unsigned int len;
-+	unsigned int bits_per_irq;
-+	unsigned int access_flags;
-+	unsigned long (*read)(struct kvm_vcpu *vcpu, gpa_t addr,
-+			      unsigned int len);
-+	void (*write)(struct kvm_vcpu *vcpu, gpa_t addr, unsigned int len,
-+		      unsigned long val);
-+};
++void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
++			      gpa_t addr, unsigned int len,
++			      unsigned long val);
 +
-+extern struct kvm_io_device_ops kvm_io_gic_ops;
+ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
+ 
+ #endif
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index cf62015..e57f8d5 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -19,6 +19,8 @@
+ #define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
+ #define IMPLEMENTER_ARM		0x43b
+ 
++#define VGIC_PRI_BITS		5
 +
-+#define VGIC_ACCESS_8bit	1
-+#define VGIC_ACCESS_32bit	2
-+#define VGIC_ACCESS_64bit	4
-+
-+/*
-+ * Generate a mask that covers the number of bytes required to address
-+ * up to 1024 interrupts, each represented by <bits> bits. This assumes
-+ * that <bits> is a power of two.
-+ */
-+#define VGIC_ADDR_IRQ_MASK(bits) (((bits) * 1024 / 8) - 1)
-+
-+/*
-+ * (addr & mask) gives us the byte offset for the INT ID, so we want to
-+ * divide this with 'bytes per irq' to get the INT ID, which is given
-+ * by '(bits) / 8'.  But we do this with fixed-point-arithmetic and
-+ * take advantage of the fact that division by a fraction equals
-+ * multiplication with the inverted fraction, and scale up both the
-+ * numerator and denominator with 8 to support at most 64 bits per IRQ:
-+ */
-+#define VGIC_ADDR_TO_INTID(addr, bits)  (((addr) & VGIC_ADDR_IRQ_MASK(bits)) * \
-+					64 / (bits) / 8)
-+
-+/*
-+ * Some VGIC registers store per-IRQ information, with a different number
-+ * of bits per IRQ. For those registers this macro is used.
-+ * The _WITH_LENGTH version instantiates registers with a fixed length
-+ * and is mutually exclusive with the _PER_IRQ version.
-+ */
-+#define REGISTER_DESC_WITH_BITS_PER_IRQ(off, rd, wr, bpi, acc)		\
-+	{								\
-+		.reg_offset = off,					\
-+		.bits_per_irq = bpi,					\
-+		.len = bpi * 1024 / 8,					\
-+		.access_flags = acc,					\
-+		.read = rd,						\
-+		.write = wr,						\
-+	}
-+
-+#define REGISTER_DESC_WITH_LENGTH(off, rd, wr, length, acc)		\
-+	{								\
-+		.reg_offset = off,					\
-+		.bits_per_irq = 0,					\
-+		.len = length,						\
-+		.access_flags = acc,					\
-+		.read = rd,						\
-+		.write = wr,						\
-+	}
-+
-+int kvm_vgic_register_mmio_region(struct kvm *kvm, struct kvm_vcpu *vcpu,
-+				  struct vgic_register_region *reg_desc,
-+				  struct vgic_io_device *region,
-+				  int nr_irqs, bool offset_private);
-+
-+unsigned long vgic_data_mmio_bus_to_host(const void *val, unsigned int len);
-+
-+void vgic_data_host_to_mmio_bus(void *buf, unsigned int len,
-+				unsigned long data);
-+
-+unsigned long vgic_mmio_read_raz(struct kvm_vcpu *vcpu,
-+				 gpa_t addr, unsigned int len);
-+
-+unsigned long vgic_mmio_read_rao(struct kvm_vcpu *vcpu,
-+				 gpa_t addr, unsigned int len);
-+
-+void vgic_mmio_write_wi(struct kvm_vcpu *vcpu, gpa_t addr,
-+			unsigned int len, unsigned long val);
-+
-+#endif
+ #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
+ 
+ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
 -- 
 2.1.2.330.g565301e.dirty
