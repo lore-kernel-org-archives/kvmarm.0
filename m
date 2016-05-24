@@ -1,170 +1,159 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 26/59] KVM: arm/arm64: vgic-new: Add CTLR,
- TYPER and IIDR handlers
-Date: Tue, 24 May 2016 11:09:20 +0200
-Message-ID: <1464080993-10884-27-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 42/59] KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM_DEV_ARM_VGIC_GRP_NR_IRQS
+Date: Tue, 24 May 2016 11:09:36 +0200
+Message-ID: <1464080993-10884-43-git-send-email-christoffer.dall@linaro.org>
 References: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7752149B43
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:51 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u9AKEivefioU for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 May 2016 05:06:50 -0400 (EDT)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 70E3A49BDB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:49 -0400 (EDT)
-Received: by mail-wm0-f45.google.com with SMTP id z87so15350678wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:10:22 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
 
-Those three registers are v2 emulation specific, so their implementation
-lives entirely in vgic-mmio-v2.c. Also they are handled in one function,
-as their implementation is pretty simple.
-When the guest enables the distributor, we kick all VCPUs to get
-potentially pending interrupts serviced.
+This patch implements the KVM_DEV_ARM_VGIC_GRP_NR_IRQS group. This
+modality is supported by both VGIC V2 and V3 KVM device as will be
+other groups, hence the introduction of common helpers.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/linux/irqchip/arm-gic.h  |  1 +
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 46 +++++++++++++++++++++++++++++++++++++++-
- virt/kvm/arm/vgic/vgic.c         | 15 +++++++++++++
- virt/kvm/arm/vgic/vgic.h         |  4 ++++
- 4 files changed, 65 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 83 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 79 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
-index be0d26f..fd05185 100644
---- a/include/linux/irqchip/arm-gic.h
-+++ b/include/linux/irqchip/arm-gic.h
-@@ -33,6 +33,7 @@
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index ff332f3..05ff925 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -15,9 +15,69 @@
+  */
+ #include <linux/kvm_host.h>
+ #include <kvm/arm_vgic.h>
++#include <linux/uaccess.h>
++#include "vgic.h"
  
- #define GIC_DIST_CTRL			0x000
- #define GIC_DIST_CTR			0x004
-+#define GIC_DIST_IIDR			0x008
- #define GIC_DIST_IGROUP			0x080
- #define GIC_DIST_ENABLE_SET		0x100
- #define GIC_DIST_ENABLE_CLEAR		0x180
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index a3e31a9..d812c93 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -20,9 +20,53 @@
- #include "vgic.h"
- #include "vgic-mmio.h"
+ /* common helpers */
  
-+static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
-+					    gpa_t addr, unsigned int len)
++static int vgic_set_common_attr(struct kvm_device *dev,
++				struct kvm_device_attr *attr)
 +{
-+	u32 value;
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++		u32 val;
++		int ret = 0;
 +
-+	switch (addr & 0x0c) {
-+	case GIC_DIST_CTRL:
-+		value = vcpu->kvm->arch.vgic.enabled ? GICD_ENABLE : 0;
++		if (get_user(val, uaddr))
++			return -EFAULT;
++
++		/*
++		 * We require:
++		 * - at least 32 SPIs on top of the 16 SGIs and 16 PPIs
++		 * - at most 1024 interrupts
++		 * - a multiple of 32 interrupts
++		 */
++		if (val < (VGIC_NR_PRIVATE_IRQS + 32) ||
++		    val > VGIC_MAX_RESERVED ||
++		    (val & 31))
++			return -EINVAL;
++
++		mutex_lock(&dev->kvm->lock);
++
++		if (vgic_ready(dev->kvm) || dev->kvm->arch.vgic.nr_spis)
++			ret = -EBUSY;
++		else
++			dev->kvm->arch.vgic.nr_spis =
++				val - VGIC_NR_PRIVATE_IRQS;
++
++		mutex_unlock(&dev->kvm->lock);
++
++		return ret;
++	}
++	}
++
++	return -ENXIO;
++}
++
++static int vgic_get_common_attr(struct kvm_device *dev,
++				struct kvm_device_attr *attr)
++{
++	int r = -ENXIO;
++
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++
++		r = put_user(dev->kvm->arch.vgic.nr_spis +
++			     VGIC_NR_PRIVATE_IRQS, uaddr);
 +		break;
-+	case GIC_DIST_CTR:
-+		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-+		value = (value >> 5) - 1;
-+		value |= (atomic_read(&vcpu->kvm->online_vcpus) - 1) << 5;
-+		break;
-+	case GIC_DIST_IIDR:
-+		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-+		break;
-+	default:
++	}
++	}
++
++	return r;
++}
++
+ static int vgic_create(struct kvm_device *dev, u32 type)
+ {
+ 	return kvm_vgic_create(dev->kvm, type);
+@@ -49,18 +109,29 @@ void kvm_register_vgic_device(unsigned long type)
+ static int vgic_v2_set_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
+-	return -ENXIO;
++	int ret;
++
++	ret = vgic_set_common_attr(dev, attr);
++	return ret;
++
+ }
+ 
+ static int vgic_v2_get_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
+-	return -ENXIO;
++	int ret;
++
++	ret = vgic_get_common_attr(dev, attr);
++	return ret;
+ }
+ 
+ static int vgic_v2_has_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
 +		return 0;
 +	}
-+
-+	return value;
-+}
-+
-+static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len,
-+				    unsigned long val)
-+{
-+	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+	bool was_enabled = dist->enabled;
-+
-+	switch (addr & 0x0c) {
-+	case GIC_DIST_CTRL:
-+		dist->enabled = val & GICD_ENABLE;
-+		if (!was_enabled && dist->enabled)
-+			vgic_kick_vcpus(vcpu->kvm);
-+		break;
-+	case GIC_DIST_CTR:
-+	case GIC_DIST_IIDR:
-+		/* Nothing to do */
-+		return;
-+	}
-+}
-+
- static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 12,
-+		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
- 		vgic_mmio_read_rao, vgic_mmio_write_wi, 1,
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 7e01008..12ae84b 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -545,3 +545,18 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
- 
- 	return pending;
+ 	return -ENXIO;
  }
-+
-+void vgic_kick_vcpus(struct kvm *kvm)
-+{
-+	struct kvm_vcpu *vcpu;
-+	int c;
-+
-+	/*
-+	 * We've injected an interrupt, time to find out who deserves
-+	 * a good kick...
-+	 */
-+	kvm_for_each_vcpu(c, vcpu, kvm) {
-+		if (kvm_vgic_vcpu_pending_irq(vcpu))
-+			kvm_vcpu_kick(vcpu);
+ 
+@@ -80,18 +151,22 @@ struct kvm_device_ops kvm_arm_vgic_v2_ops = {
+ static int vgic_v3_set_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
+-	return -ENXIO;
++	return vgic_set_common_attr(dev, attr);
+ }
+ 
+ static int vgic_v3_get_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
+-	return -ENXIO;
++	return vgic_get_common_attr(dev, attr);
+ }
+ 
+ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
++		return 0;
 +	}
-+}
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index fd9acaa..cf62015 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -16,11 +16,15 @@
- #ifndef __KVM_ARM_VGIC_NEW_H__
- #define __KVM_ARM_VGIC_NEW_H__
+ 	return -ENXIO;
+ }
  
-+#define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
-+#define IMPLEMENTER_ARM		0x43b
-+
- #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
- 
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
- bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
-+void vgic_kick_vcpus(struct kvm *kvm);
- 
- void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu);
- void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
 -- 
 2.1.2.330.g565301e.dirty
+
