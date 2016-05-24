@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 44/59] KVM: arm/arm64: vgic-new: vgic_kvm_device: implement
- kvm_vgic_addr
-Date: Tue, 24 May 2016 11:09:38 +0200
-Message-ID: <1464080993-10884-45-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 48/59] KVM: arm/arm64: vgic-new: Add userland access to VGIC
+ dist registers
+Date: Tue, 24 May 2016 11:09:42 +0200
+Message-ID: <1464080993-10884-49-git-send-email-christoffer.dall@linaro.org>
 References: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33EC649C57
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:07:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D41F349B7C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:07:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TkgDyFs-B5XZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 May 2016 05:07:14 -0400 (EDT)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFA3249BCD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:07:06 -0400 (EDT)
-Received: by mail-wm0-f45.google.com with SMTP id n129so118560837wmn.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:10:40 -0700 (PDT)
+ with ESMTP id RK7Dz91jvQw2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 May 2016 05:07:18 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 082BA49BDC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:07:11 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id a136so62272220wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:10:44 -0700 (PDT)
 In-Reply-To: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,153 +31,98 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@linaro.org>
+From: Andre Przywara <andre.przywara@arm.com>
 
-kvm_vgic_addr is used by the userspace to set the base address of
-the following register regions, as seen by the guest:
-- distributor(v2 and v3),
-- re-distributors (v3),
-- CPU interface (v2).
+Userland may want to save and restore the state of the in-kernel VGIC,
+so we provide the code which takes a userland request and translate
+that into calls to our MMIO framework.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>From Christoffer:
+When accessing the VGIC state from userspace we really don't want a VCPU
+to be messing with the state at the same time, and the API specifies
+that we should return -EBUSY if any VCPUs are running.
+Check and prevent VCPUs from running by grabbing their mutexes, one by
+one, and error out if we fail.
+(Note: This could potentially be simplified to just do a simple check
+and see if any VCPUs are running, and return -EBUSY then, without
+enforcing the locking throughout the duration of the uaccess, if we
+think that taking/releasing all these mutexes for every single GIC
+register access is too heavyweight.)
+
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/vgic/vgic.h             |  2 +
- virt/kvm/arm/vgic/vgic-kvm-device.c | 86 +++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h            |  3 ++
- 3 files changed, 91 insertions(+)
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 55 ++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 54 insertions(+), 1 deletion(-)
 
-diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index 00e3dca..3689b9b 100644
---- a/include/kvm/vgic/vgic.h
-+++ b/include/kvm/vgic/vgic.h
-@@ -194,6 +194,8 @@ struct vgic_cpu {
- 	u64 live_lrs;
- };
- 
-+int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
-+
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 			bool level);
- 
 diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index e153f12..082829a 100644
+index 78621283..9ee27cb 100644
 --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
 +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -16,10 +16,96 @@
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
- #include <linux/uaccess.h>
-+#include <asm/kvm_mmu.h>
- #include "vgic.h"
- 
- /* common helpers */
- 
-+static int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
-+			     phys_addr_t addr, phys_addr_t alignment)
-+{
-+	if (addr & ~KVM_PHYS_MASK)
-+		return -E2BIG;
+@@ -238,7 +238,60 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+ 				 struct kvm_device_attr *attr,
+ 				 u32 *reg, bool is_write)
+ {
+-	return -ENXIO;
++	gpa_t addr;
++	int cpuid, ret, c;
++	struct kvm_vcpu *vcpu, *tmp_vcpu;
++	int vcpu_lock_idx = -1;
 +
-+	if (!IS_ALIGNED(addr, alignment))
-+		return -EINVAL;
++	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
++		 KVM_DEV_ARM_VGIC_CPUID_SHIFT;
++	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
++	addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
 +
-+	if (!IS_VGIC_ADDR_UNDEF(*ioaddr))
-+		return -EEXIST;
++	mutex_lock(&dev->kvm->lock);
 +
-+	return 0;
-+}
++	ret = vgic_init(dev->kvm);
++	if (ret)
++		goto out;
 +
-+/**
-+ * kvm_vgic_addr - set or get vgic VM base addresses
-+ * @kvm:   pointer to the vm struct
-+ * @type:  the VGIC addr type, one of KVM_VGIC_V[23]_ADDR_TYPE_XXX
-+ * @addr:  pointer to address value
-+ * @write: if true set the address in the VM address space, if false read the
-+ *          address
-+ *
-+ * Set or get the vgic base addresses for the distributor and the virtual CPU
-+ * interface in the VM physical address space.  These addresses are properties
-+ * of the emulated core/SoC and therefore user space initially knows this
-+ * information.
-+ * Check them for sanity (alignment, double assignment). We can't check for
-+ * overlapping regions in case of a virtual GICv3 here, since we don't know
-+ * the number of VCPUs yet, so we defer this check to map_resources().
-+ */
-+int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
-+{
-+	int r = 0;
-+	struct vgic_dist *vgic = &kvm->arch.vgic;
-+	int type_needed;
-+	phys_addr_t *addr_ptr, alignment;
++	if (cpuid >= atomic_read(&dev->kvm->online_vcpus)) {
++		ret = -EINVAL;
++		goto out;
++	}
 +
-+	mutex_lock(&kvm->lock);
-+	switch (type) {
-+	case KVM_VGIC_V2_ADDR_TYPE_DIST:
-+		type_needed = KVM_DEV_TYPE_ARM_VGIC_V2;
-+		addr_ptr = &vgic->vgic_dist_base;
-+		alignment = SZ_4K;
++	/*
++	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
++	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
++	 * that no other VCPUs are run and fiddle with the vgic state while we
++	 * access it.
++	 */
++	ret = -EBUSY;
++	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm) {
++		if (!mutex_trylock(&tmp_vcpu->mutex))
++			goto out;
++		vcpu_lock_idx = c;
++	}
++
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
++		ret = -EINVAL;
 +		break;
-+	case KVM_VGIC_V2_ADDR_TYPE_CPU:
-+		type_needed = KVM_DEV_TYPE_ARM_VGIC_V2;
-+		addr_ptr = &vgic->vgic_cpu_base;
-+		alignment = SZ_4K;
++	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
++		ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, reg);
 +		break;
-+#ifdef CONFIG_KVM_ARM_VGIC_V3
-+	case KVM_VGIC_V3_ADDR_TYPE_DIST:
-+		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
-+		addr_ptr = &vgic->vgic_dist_base;
-+		alignment = SZ_64K;
-+		break;
-+	case KVM_VGIC_V3_ADDR_TYPE_REDIST:
-+		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
-+		addr_ptr = &vgic->vgic_redist_base;
-+		alignment = SZ_64K;
-+		break;
-+#endif
 +	default:
-+		r = -ENODEV;
-+		goto out;
-+	}
-+
-+	if (vgic->vgic_model != type_needed) {
-+		r = -ENODEV;
-+		goto out;
-+	}
-+
-+	if (write) {
-+		r = vgic_check_ioaddr(kvm, addr_ptr, *addr, alignment);
-+		if (!r)
-+			*addr_ptr = *addr;
-+	} else {
-+		*addr = *addr_ptr;
++		ret = -EINVAL;
++		break;
 +	}
 +
 +out:
-+	mutex_unlock(&kvm->lock);
-+	return r;
-+}
++	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
++		tmp_vcpu = kvm_get_vcpu(dev->kvm, vcpu_lock_idx);
++		mutex_unlock(&tmp_vcpu->mutex);
++	}
 +
- static int vgic_set_common_attr(struct kvm_device *dev,
- 				struct kvm_device_attr *attr)
- {
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 77b0ab3..6abc9a3 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -19,6 +19,9 @@
- #define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
- #define IMPLEMENTER_ARM		0x43b
++	mutex_unlock(&dev->kvm->lock);
++	return ret;
+ }
  
-+#define VGIC_ADDR_UNDEF		(-1)
-+#define IS_VGIC_ADDR_UNDEF(_x)  ((_x) == VGIC_ADDR_UNDEF)
-+
- #define INTERRUPT_ID_BITS_SPIS	10
- #define VGIC_PRI_BITS		5
- 
+ /* V2 ops */
 -- 
 2.1.2.330.g565301e.dirty
