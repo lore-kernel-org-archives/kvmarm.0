@@ -1,25 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 09/59] KVM: arm/arm64: Move timer IRQ map to latest possible
- time
-Date: Tue, 24 May 2016 11:09:03 +0200
-Message-ID: <1464080993-10884-10-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 13/59] KVM: arm/arm64: pmu: abstract access to number of SPIs
+Date: Tue, 24 May 2016 11:09:07 +0200
+Message-ID: <1464080993-10884-14-git-send-email-christoffer.dall@linaro.org>
 References: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5647A49BB3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 47FD749B79
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DA0gDePdiHLE for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 May 2016 05:06:31 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3813149BA2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:31 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id n129so15332227wmn.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:10:04 -0700 (PDT)
+ with ESMTP id 5Rmy06foXAsT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 May 2016 05:06:38 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B99249B8F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:35 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id z87so15341946wmh.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:10:08 -0700 (PDT)
 In-Reply-To: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,215 +30,91 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We are about to modify the VGIC to allocate all data structures
-dynamically and store mapped IRQ information on a per-IRQ struct, which
-is indeed allocated dynamically at init time.
+From: Andre Przywara <andre.przywara@arm.com>
 
-Therefore, we cannot record the mapped IRQ info from the timer at timer
-reset time like it's done now, because VCPU reset happens before timer
-init.
+Currently the PMU uses a member of the struct vgic_dist directly,
+which not only breaks abstraction, but will fail with the new VGIC.
+Abstract this access in the VGIC header file and refactor the validity
+check in the PMU code.
 
-A possible later time to do this is on the first run of a per VCPU, it
-just requires us to move the enable state to be a per-VCPU state and do
-the lookup of the physical IRQ number when we are about to run the VCPU.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arch/arm/kvm/arm.c           |  6 ++--
- include/kvm/arm_arch_timer.h |  8 +++---
- virt/kvm/arm/arch_timer.c    | 66 +++++++++++++++++++++++++-------------------
- virt/kvm/arm/hyp/timer-sr.c  |  5 ++--
- 4 files changed, 47 insertions(+), 38 deletions(-)
+ include/kvm/arm_vgic.h |  2 ++
+ virt/kvm/arm/pmu.c     | 25 ++++++++++++++-----------
+ 2 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index be4b639..ceb9345 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -459,7 +459,7 @@ static void update_vttbr(struct kvm *kvm)
- static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
--	int ret;
-+	int ret = 0;
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 67a6637..ade7005 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -348,6 +348,8 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+ #define vgic_ready(k)		((k)->arch.vgic.ready)
++#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
++				 ((i) < (k)->arch.vgic.nr_irqs))
  
- 	if (likely(vcpu->arch.has_run_once))
- 		return 0;
-@@ -482,9 +482,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- 	 * interrupts from the virtual timer with a userspace gic.
- 	 */
- 	if (irqchip_in_kernel(kvm) && vgic_initialized(kvm))
--		kvm_timer_enable(kvm);
-+		ret = kvm_timer_enable(vcpu);
- 
--	return 0;
-+	return ret;
+ int vgic_v2_probe(const struct gic_kvm_info *gic_kvm_info,
+ 		  const struct vgic_ops **ops,
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 575c7aa..a027569 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -436,7 +436,14 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+ 	return 0;
  }
  
- bool kvm_arch_intc_initialized(struct kvm *kvm)
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index a47b7de..dda39d8 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -24,9 +24,6 @@
- #include <linux/workqueue.h>
- 
- struct arch_timer_kvm {
--	/* Is the timer enabled */
--	bool			enabled;
--
- 	/* Virtual offset */
- 	cycle_t			cntvoff;
- };
-@@ -55,10 +52,13 @@ struct arch_timer_cpu {
- 
- 	/* Active IRQ state caching */
- 	bool				active_cleared_last;
+-static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
++#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
 +
-+	/* Is the timer enabled */
-+	bool			enabled;
- };
- 
- int kvm_timer_hyp_init(void);
--void kvm_timer_enable(struct kvm *kvm);
-+int kvm_timer_enable(struct kvm_vcpu *vcpu);
- void kvm_timer_init(struct kvm *kvm);
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 			 const struct kvm_irq_level *irq);
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 3232105..e2d5b6f 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -197,7 +197,7 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	 * because the guest would never see the interrupt.  Instead wait
- 	 * until we call this function from kvm_timer_flush_hwstate.
- 	 */
--	if (!vgic_initialized(vcpu->kvm))
-+	if (!vgic_initialized(vcpu->kvm) || !timer->enabled)
- 		return -ENODEV;
- 
- 	if (kvm_timer_should_fire(vcpu) != timer->irq.level)
-@@ -333,9 +333,6 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 			 const struct kvm_irq_level *irq)
++/*
++ * For one VM the interrupt type must be same for each vcpu.
++ * As a PPI, the interrupt number is the same for all vcpus,
++ * while as an SPI it must be a separate number per vcpu.
++ */
++static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
  {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--	struct irq_desc *desc;
--	struct irq_data *data;
--	int phys_irq;
+ 	int i;
+ 	struct kvm_vcpu *vcpu;
+@@ -445,7 +452,7 @@ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+ 		if (!kvm_arm_pmu_irq_initialized(vcpu))
+ 			continue;
  
- 	/*
- 	 * The vcpu timer irq number cannot be determined in
-@@ -354,26 +351,7 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 	timer->cntv_ctl = 0;
- 	kvm_timer_update_state(vcpu);
- 
--	/*
--	 * Find the physical IRQ number corresponding to the host_vtimer_irq
--	 */
--	desc = irq_to_desc(host_vtimer_irq);
--	if (!desc) {
--		kvm_err("%s: no interrupt descriptor\n", __func__);
--		return -EINVAL;
--	}
--
--	data = irq_desc_get_irq_data(desc);
--	while (data->parent_data)
--		data = data->parent_data;
--
--	phys_irq = data->hwirq;
--
--	/*
--	 * Tell the VGIC that the virtual interrupt is tied to a
--	 * physical interrupt. We do that once per VCPU.
--	 */
--	return kvm_vgic_map_phys_irq(vcpu, irq->irq, phys_irq);
-+	return 0;
+-		if (is_ppi) {
++		if (irq_is_ppi(irq)) {
+ 			if (vcpu->arch.pmu.irq_num != irq)
+ 				return false;
+ 		} else {
+@@ -457,7 +464,6 @@ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+ 	return true;
  }
  
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
-@@ -501,10 +479,40 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
- 	kvm_vgic_unmap_phys_irq(vcpu, timer->irq.irq);
- }
- 
--void kvm_timer_enable(struct kvm *kvm)
-+int kvm_timer_enable(struct kvm_vcpu *vcpu)
+-
+ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
  {
--	if (kvm->arch.timer.enabled)
--		return;
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct irq_desc *desc;
-+	struct irq_data *data;
-+	int phys_irq;
-+	int ret;
-+
-+	if (timer->enabled)
-+		return 0;
-+
-+	/*
-+	 * Find the physical IRQ number corresponding to the host_vtimer_irq
-+	 */
-+	desc = irq_to_desc(host_vtimer_irq);
-+	if (!desc) {
-+		kvm_err("%s: no interrupt descriptor\n", __func__);
-+		return -EINVAL;
-+	}
-+
-+	data = irq_desc_get_irq_data(desc);
-+	while (data->parent_data)
-+		data = data->parent_data;
-+
-+	phys_irq = data->hwirq;
-+
-+	/*
-+	 * Tell the VGIC that the virtual interrupt is tied to a
-+	 * physical interrupt. We do that once per VCPU.
-+	 */
-+	ret = kvm_vgic_map_phys_irq(vcpu, timer->irq.irq, phys_irq);
-+	if (ret)
-+		return ret;
-+
+ 	switch (attr->attr) {
+@@ -471,14 +477,11 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		if (get_user(irq, uaddr))
+ 			return -EFAULT;
  
- 	/*
- 	 * There is a potential race here between VCPUs starting for the first
-@@ -515,7 +523,9 @@ void kvm_timer_enable(struct kvm *kvm)
- 	 * the arch timers are enabled.
- 	 */
- 	if (timecounter && wqueue)
--		kvm->arch.timer.enabled = 1;
-+		timer->enabled = 1;
+-		/*
+-		 * The PMU overflow interrupt could be a PPI or SPI, but for one
+-		 * VM the interrupt type must be same for each vcpu. As a PPI,
+-		 * the interrupt number is the same for all vcpus, while as an
+-		 * SPI it must be a separate number per vcpu.
+-		 */
+-		if (irq < VGIC_NR_SGIS || irq >= vcpu->kvm->arch.vgic.nr_irqs ||
+-		    !irq_is_valid(vcpu->kvm, irq, irq < VGIC_NR_PRIVATE_IRQS))
++		/* The PMU overflow interrupt can be a PPI or a valid SPI. */
++		if (!(irq_is_ppi(irq) || vgic_valid_spi(vcpu->kvm, irq)))
++			return -EINVAL;
 +
-+	return 0;
- }
++		if (!pmu_irq_is_valid(vcpu->kvm, irq))
+ 			return -EINVAL;
  
- void kvm_timer_init(struct kvm *kvm)
-diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
-index ea00d69..798866a 100644
---- a/virt/kvm/arm/hyp/timer-sr.c
-+++ b/virt/kvm/arm/hyp/timer-sr.c
-@@ -24,11 +24,10 @@
- /* vcpu is already in the HYP VA space */
- void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
- {
--	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	u64 val;
- 
--	if (kvm->arch.timer.enabled) {
-+	if (timer->enabled) {
- 		timer->cntv_ctl = read_sysreg_el0(cntv_ctl);
- 		timer->cntv_cval = read_sysreg_el0(cntv_cval);
- 	}
-@@ -60,7 +59,7 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
- 	val |= CNTHCTL_EL1PCTEN;
- 	write_sysreg(val, cnthctl_el2);
- 
--	if (kvm->arch.timer.enabled) {
-+	if (timer->enabled) {
- 		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
- 		write_sysreg_el0(timer->cntv_cval, cntv_cval);
- 		isb();
+ 		if (kvm_arm_pmu_irq_initialized(vcpu))
 -- 
 2.1.2.330.g565301e.dirty
