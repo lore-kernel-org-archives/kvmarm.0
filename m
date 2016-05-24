@@ -1,25 +1,23 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 10/59] KVM: arm/arm64: Get rid of vgic_cpu->nr_lr
-Date: Tue, 24 May 2016 11:09:04 +0200
-Message-ID: <1464080993-10884-11-git-send-email-christoffer.dall@linaro.org>
-References: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 00/59] KVM/ARM Changes for v4.7 take 2
+Date: Tue, 24 May 2016 11:08:54 +0200
+Message-ID: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 48FF849B8A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 511D349B49
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Pj+f1MuRDcoj for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 May 2016 05:06:32 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D51949B79
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:32 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id z87so11868761wmh.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:10:05 -0700 (PDT)
-In-Reply-To: <1464080993-10884-1-git-send-email-christoffer.dall@linaro.org>
+ with ESMTP id DuCe1FHU1TUU for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 May 2016 05:06:23 -0400 (EDT)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E8B29499A1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 05:06:22 -0400 (EDT)
+Received: by mail-wm0-f51.google.com with SMTP id n129so118526519wmn.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2016 02:09:55 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,155 +28,150 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The number of list registers is a property of the underlying system, not
-of emulated VGIC CPU interface.
+Hi Paolo and Radim,
 
-As we are about to move this variable to global state in the new vgic
-for clarity, move it from the legacy implementation as well to make the
-merge of the new code easier.
+Here's another set of changes for v4.7.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
----
- include/kvm/arm_vgic.h        |  3 ---
- virt/kvm/arm/hyp/vgic-v2-sr.c | 12 +++++++-----
- virt/kvm/arm/vgic-v2.c        |  4 +++-
- virt/kvm/arm/vgic.c           | 12 ++----------
- 4 files changed, 12 insertions(+), 19 deletions(-)
+This set of changes include the new vgic, which is a reimplementation of
+our horribly broken legacy vgic implementation.  The two implementations
+will live side-by-side (with the new being the configured default) for
+one kernel release and then we'll remove the legacy one.
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 3e17fb4..67a6637 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -304,9 +304,6 @@ struct vgic_cpu {
- 	unsigned long   *active_shared;
- 	unsigned long   *pend_act_shared;
- 
--	/* Number of list registers on this CPU */
--	int		nr_lr;
--
- 	/* CPU vif control registers for world switch */
- 	union {
- 		struct vgic_v2_cpu_if	vgic_v2;
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-index 674bdf8..caac41f 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-@@ -21,11 +21,13 @@
- 
- #include <asm/kvm_hyp.h>
- 
-+extern struct vgic_params vgic_v2_params;
-+
- static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu,
- 					    void __iomem *base)
- {
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
--	int nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-+	int nr_lr = (kern_hyp_va(&vgic_v2_params))->nr_lr;
- 	u32 eisr0, eisr1;
- 	int i;
- 	bool expect_mi;
-@@ -67,7 +69,7 @@ static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu,
- static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
- {
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
--	int nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-+	int nr_lr = (kern_hyp_va(&vgic_v2_params))->nr_lr;
- 	u32 elrsr0, elrsr1;
- 
- 	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
-@@ -86,7 +88,7 @@ static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
- static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
- {
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
--	int nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-+	int nr_lr = (kern_hyp_va(&vgic_v2_params))->nr_lr;
- 	int i;
- 
- 	for (i = 0; i < nr_lr; i++) {
-@@ -141,13 +143,13 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
- 	struct vgic_dist *vgic = &kvm->arch.vgic;
- 	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
--	int i, nr_lr;
-+	int nr_lr = (kern_hyp_va(&vgic_v2_params))->nr_lr;
-+	int i;
- 	u64 live_lrs = 0;
- 
- 	if (!base)
- 		return;
- 
--	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
- 
- 	for (i = 0; i < nr_lr; i++)
- 		if (cpu_if->vgic_lr[i] & GICH_LR_STATE)
-diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
-index 7e826c9..334cd7a 100644
---- a/virt/kvm/arm/vgic-v2.c
-+++ b/virt/kvm/arm/vgic-v2.c
-@@ -171,7 +171,7 @@ static const struct vgic_ops vgic_v2_ops = {
- 	.enable			= vgic_v2_enable,
- };
- 
--static struct vgic_params vgic_v2_params;
-+struct vgic_params __section(.hyp.text) vgic_v2_params;
- 
- static void vgic_cpu_init_lrs(void *params)
- {
-@@ -201,6 +201,8 @@ int vgic_v2_probe(const struct gic_kvm_info *gic_kvm_info,
- 	const struct resource *vctrl_res = &gic_kvm_info->vctrl;
- 	const struct resource *vcpu_res = &gic_kvm_info->vcpu;
- 
-+	memset(vgic, 0, sizeof(*vgic));
-+
- 	if (!gic_kvm_info->maint_irq) {
- 		kvm_err("error getting vgic maintenance irq\n");
- 		ret = -ENXIO;
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 91d42a8..f76bb64 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -690,12 +690,11 @@ bool vgic_handle_cfg_reg(u32 *reg, struct kvm_exit_mmio *mmio,
-  */
- void vgic_unqueue_irqs(struct kvm_vcpu *vcpu)
- {
--	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 	u64 elrsr = vgic_get_elrsr(vcpu);
- 	unsigned long *elrsr_ptr = u64_to_bitmask(&elrsr);
- 	int i;
- 
--	for_each_clear_bit(i, elrsr_ptr, vgic_cpu->nr_lr) {
-+	for_each_clear_bit(i, elrsr_ptr, vgic->nr_lr) {
- 		struct vgic_lr lr = vgic_get_lr(vcpu, i);
- 
- 		/*
-@@ -1106,7 +1105,7 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
- {
- 	int i;
- 
--	for (i = 0; i < vcpu->arch.vgic_cpu.nr_lr; i++) {
-+	for (i = 0; i < vgic->nr_lr; i++) {
- 		struct vgic_lr vlr = vgic_get_lr(vcpu, i);
- 
- 		if (vlr.irq == virt_irq && vlr.state & LR_STATE_ACTIVE)
-@@ -1866,13 +1865,6 @@ static int vgic_vcpu_init_maps(struct kvm_vcpu *vcpu, int nr_irqs)
- 		return -ENOMEM;
- 	}
- 
--	/*
--	 * Store the number of LRs per vcpu, so we don't have to go
--	 * all the way to the distributor structure to find out. Only
--	 * assembly code should use this one.
--	 */
--	vgic_cpu->nr_lr = vgic->nr_lr;
--
- 	return 0;
- }
- 
--- 
-2.1.2.330.g565301e.dirty
+Also fixes a non-critical issue with virtual abort injection to guests.
+
+The following changes since commit 06485053244480f5f403d8f89b8617bd7d549113:
+
+  kvm: arm64: Enable hardware updates of the Access Flag for Stage 2 page tables (2016-05-09 22:23:08 +0200)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4-7-take2
+
+for you to fetch changes up to 35a2d58588f0992627e74b447ccab21570544c86:
+
+  KVM: arm/arm64: vgic-new: Synchronize changes to active state (2016-05-20 16:26:38 +0200)
+
+
+Thanks,
+-Christoffer
+
+
+Andre Przywara (29):
+      KVM: arm/arm64: vgic: streamline vgic_update_irq_pending() interface
+      KVM: arm/arm64: vgic: avoid map in kvm_vgic_inject_mapped_irq()
+      KVM: arm/arm64: vgic: avoid map in kvm_vgic_map_is_active()
+      KVM: arm/arm64: vgic: avoid map in kvm_vgic_unmap_phys_irq()
+      KVM: arm/arm64: arch_timer: Remove irq_phys_map
+      KVM: arm/arm64: vgic: Remove irq_phys_map from interface
+      KVM: arm/arm64: pmu: abstract access to number of SPIs
+      KVM: arm/arm64: move GICv2 emulation defines into arm-gic-v3.h
+      KVM: arm/arm64: vgic-new: Add GICv2 MMIO handling framework
+      KVM: arm/arm64: vgic-new: Add ENABLE registers handlers
+      KVM: arm/arm64: vgic-new: Add PENDING registers handlers
+      KVM: arm/arm64: vgic-new: Add ACTIVE registers handlers
+      KVM: arm/arm64: vgic-new: Add PRIORITY registers handlers
+      KVM: arm/arm64: vgic-new: Add CONFIG registers handlers
+      KVM: arm/arm64: vgic-new: Add TARGET registers handlers
+      KVM: arm/arm64: vgic-new: Add SGIR register handler
+      KVM: arm/arm64: vgic-new: Add SGIPENDR register handlers
+      KVM: arm/arm64: vgic-new: Add GICv3 MMIO handling framework
+      KVM: arm/arm64: vgic-new: Add GICv3 CTLR, IIDR, TYPER handlers
+      KVM: arm/arm64: vgic-new: Add GICv3 redistributor IIDR and TYPER handler
+      KVM: arm/arm64: vgic-new: Add GICv3 IDREGS register handler
+      KVM: arm/arm64: vgic-new: Add GICv3 IROUTER register handlers
+      KVM: arm/arm64: vgic-new: Add GICv3 SGI system register trap handler
+      KVM: arm/arm64: vgic-new: Add userland access to VGIC dist registers
+      KVM: arm/arm64: vgic-new: Add GICH_VMCR accessors
+      KVM: arm/arm64: vgic-new: Add userland GIC CPU interface access
+      KVM: arm/arm64: vgic-new: Wire up irqfd injection
+      KVM: arm/arm64: vgic-new: implement mapped IRQ handling
+      KVM: arm/arm64: vgic-new: enable build
+
+Christoffer Dall (12):
+      KVM: arm/arm64: Remove the IRQ field from struct irq_phys_map
+      KVM: arm/arm64: Move timer IRQ map to latest possible time
+      KVM: arm/arm64: Get rid of vgic_cpu->nr_lr
+      KVM: arm/arm64: Fix MMIO emulation data handling
+      KVM: arm/arm64: Export mmio_read/write_bus
+      KVM: arm/arm64: Provide functionality to pause and resume a guest
+      KVM: arm/arm64: vgic-new: Add data structure definitions
+      KVM: arm/arm64: vgic-new: Add acccessor to new struct vgic_irq instance
+      KVM: arm/arm64: vgic-new: Implement virtual IRQ injection
+      KVM: arm/arm64: vgic-new: Add IRQ sorting
+      KVM: arm/arm64: vgic-new: Export register access interface
+      KVM: arm/arm64: vgic-new: Synchronize changes to active state
+
+Eric Auger (12):
+      KVM: arm/arm64: vgic-new: Implement kvm_vgic_vcpu_pending_irq
+      KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM device ops registration
+      KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM_DEV_ARM_VGIC_GRP_NR_IRQS
+      KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM_DEV_ARM_VGIC_GRP_CTRL
+      KVM: arm/arm64: vgic-new: vgic_kvm_device: implement kvm_vgic_addr
+      KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM_DEV_ARM_VGIC_GRP_ADDR
+      KVM: arm/arm64: vgic-new: vgic_kvm_device: access to VGIC registers
+      KVM: arm/arm64: vgic-new: vgic_init: implement kvm_vgic_hyp_init
+      KVM: arm/arm64: vgic-new: vgic_init: implement vgic_create
+      KVM: arm/arm64: vgic-new: vgic_init: implement vgic_init
+      KVM: arm/arm64: vgic-new: vgic_init: implement map_resources
+      KVM: arm/arm64: vgic-new: Add vgic_v2/v3_enable
+
+Marc Zyngier (5):
+      KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework
+      KVM: arm/arm64: vgic-new: Add GICv2 world switch backend
+      KVM: arm/arm64: vgic-new: Add GICv3 world switch backend
+      KVM: arm/arm64: vgic-new: Add MMIO handling framework
+      KVM: arm/arm64: vgic-new: Add CTLR, TYPER and IIDR handlers
+
+Matt Evans (1):
+      kvm: arm64: Fix EC field in inject_abt64
+
+ arch/arm/include/asm/kvm_host.h     |   6 +
+ arch/arm/include/asm/kvm_mmio.h     |   3 +
+ arch/arm/kvm/Kconfig                |   7 +
+ arch/arm/kvm/Makefile               |  11 +
+ arch/arm/kvm/arm.c                  |  37 ++-
+ arch/arm/kvm/mmio.c                 |  24 +-
+ arch/arm64/include/asm/kvm_host.h   |   6 +
+ arch/arm64/include/asm/kvm_mmio.h   |   3 +
+ arch/arm64/kvm/Kconfig              |   7 +
+ arch/arm64/kvm/Makefile             |  12 +
+ arch/arm64/kvm/inject_fault.c       |   2 +-
+ include/kvm/arm_arch_timer.h        |  11 +-
+ include/kvm/arm_vgic.h              |  20 +-
+ include/kvm/vgic/vgic.h             | 246 ++++++++++++++
+ include/linux/irqchip/arm-gic-v3.h  |   6 +
+ include/linux/irqchip/arm-gic.h     |   2 +
+ virt/kvm/arm/arch_timer.c           |  68 ++--
+ virt/kvm/arm/hyp/timer-sr.c         |   5 +-
+ virt/kvm/arm/hyp/vgic-v2-sr.c       |  17 +-
+ virt/kvm/arm/pmu.c                  |  25 +-
+ virt/kvm/arm/vgic-v2.c              |   4 +-
+ virt/kvm/arm/vgic-v3.c              |   8 +-
+ virt/kvm/arm/vgic.c                 |  86 ++---
+ virt/kvm/arm/vgic/vgic-init.c       | 452 ++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-irqfd.c      |  52 +++
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 431 +++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio-v2.c    | 446 ++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio-v3.c    | 455 ++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.c       | 526 ++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.h       | 150 +++++++++
+ virt/kvm/arm/vgic/vgic-v2.c         | 352 ++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c         | 330 +++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.c            | 619 ++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h            | 131 ++++++++
+ 34 files changed, 4404 insertions(+), 156 deletions(-)
+ create mode 100644 include/kvm/vgic/vgic.h
+ create mode 100644 virt/kvm/arm/vgic/vgic-init.c
+ create mode 100644 virt/kvm/arm/vgic/vgic-irqfd.c
+ create mode 100644 virt/kvm/arm/vgic/vgic-kvm-device.c
+ create mode 100644 virt/kvm/arm/vgic/vgic-mmio-v2.c
+ create mode 100644 virt/kvm/arm/vgic/vgic-mmio-v3.c
+ create mode 100644 virt/kvm/arm/vgic/vgic-mmio.c
+ create mode 100644 virt/kvm/arm/vgic/vgic-mmio.h
+ create mode 100644 virt/kvm/arm/vgic/vgic-v2.c
+ create mode 100644 virt/kvm/arm/vgic/vgic-v3.c
+ create mode 100644 virt/kvm/arm/vgic/vgic.c
+ create mode 100644 virt/kvm/arm/vgic/vgic.h
