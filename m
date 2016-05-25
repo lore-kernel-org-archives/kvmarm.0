@@ -1,23 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: The VM can not start
-Date: Wed, 25 May 2016 13:49:31 +0100
-Message-ID: <57459F5B.8040509@arm.com>
-References: <7cf68d7e.b48b.154e7c60d2e.Coremail.zm290293817@163.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v4 06/12] KVM: arm64: implement basic ITS register handlers
+Date: Wed, 25 May 2016 14:49:03 +0100
+Message-ID: <0c89ea29-4c40-ce87-f499-d600c466ace4@arm.com>
+References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
+ <1458958450-19662-7-git-send-email-andre.przywara@arm.com>
+ <5704D8B8.4000504@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBBDD49B3F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2016 08:45:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6777949B2E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2016 09:44:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id emrY52JBrPEr for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 May 2016 08:45:58 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DFA049B3B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2016 08:45:57 -0400 (EDT)
-In-Reply-To: <7cf68d7e.b48b.154e7c60d2e.Coremail.zm290293817@163.com>
+ with ESMTP id AmMGJ5n6YSXw for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 May 2016 09:44:53 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 69B3F412C2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2016 09:44:52 -0400 (EDT)
+In-Reply-To: <5704D8B8.4000504@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,126 +30,85 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: zhumin <zm290293817@163.com>, kvmarm@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[Please do NOT send HTML emails to this mailing list]
+Hi Eric,
 
-On 25/05/16 12:56, zhumin wrote:
-> *Hello everyone:*
-> *I try to put some function of hyp.S(in the EL2) to the EL3, and I
-> implement it in Linux kernel 3.18.*
+On 06/04/16 10:36, Eric Auger wrote:
+> Hi Andre,
+> On 03/26/2016 03:14 AM, Andre Przywara wrote:
+>> Add emulation for some basic MMIO registers used in the ITS emulation.
 
-What function? Why?
+...
 
-> *But when I start the VM using the lkvm tool, the VM cannot start normally.*
-> *The output message like these:*
-> terminal_0: Listening for serial connection on port 5000
-> terminal_1: Listening for serial connection on port 5001
-> terminal_2: Listening for serial connection on port 5002
-> terminal_3: Listening for serial connection on port 5003
-> Visualization web server started on port 2001
-> Simulation is started
-> Initializing cgroup subsys cpu
-> Linux version 3.14.43 (zm@centospc) (gcc version 4.9.1 20140529
-> (prerelease) (crosstool-NG linaro-1.13.1-4.9-2014.07 - Linaro GCC
-> 4.9-2014.06) ) #1 SMP PREEMPT Sat Jun 13 17:19:23 CST 2015
-> CPU: AArch64 Processor [410fd000] revision 0
-> bootconsole [earlycon0] enabled
-> cma: CMA: reserved 16 MiB at 9f000000
-> psci: probing function IDs from device-tree
-> PERCPU: Embedded 10 pages/cpu @ffffffc01efeb000 s11328 r8192 d21440 u40960
-> Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 129280
-> Kernel command line: pci=firmware earlyprintk=smh console=hvc0
-> root=/dev/vda init=/bin/sh
-> PID hash table entries: 2048 (order: 2, 16384 bytes)
-> Dentry cache hash table entries: 65536 (order: 7, 524288 bytes)
-> Inode-cache hash table entries: 32768 (order: 6, 262144 bytes)
-> software IO TLB [mem 0x9a000000-0x9e000000] (64MB) mapped at
-> [ffffffc01a000000-ffffffc01dffffff]
-> Memory: 420452K/524288K available (4120K kernel code, 288K rwdata, 1504K
-> rodata, 191K init, 165K bss, 103836K reserved)
-> Virtual kernel memory layout:
->     vmalloc : 0xffffff8000000000 - 0xffffffbbffff0000   (245759 MB)
->     vmemmap : 0xffffffbc01c00000 - 0xffffffbc02300000   (     7 MB)
->     modules : 0xffffffbffc000000 - 0xffffffc000000000   (    64 MB)
->     memory  : 0xffffffc000000000 - 0xffffffc020000000   (   512 MB)
->       .init : 0xffffffc000600000 - 0xffffffc00062fc40   (   192 kB)
->       .text : 0xffffffc000080000 - 0xffffffc0005ff1d4   (  5629 kB)
->       .data : 0xffffffc000630000 - 0xffffffc0006782a0   (   289 kB)
-> SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
-> Preemptible hierarchical RCU implementation.
->     RCU restricting CPUs from NR_CPUS=8 to nr_cpu_ids=1.
-> RCU: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
-> NR_IRQS:64 nr_irqs:64 0
-> Architected cp15 timer(s) running at 100.00MHz (virt).
-> sched_clock: 56 bits at 100MHz, resolution 10ns, wraps every 2748779069440ns
-> Console: colour dummy device 80x25
-> Calibrating delay loop (skipped), value calculated using timer
-> frequency.. 200.00 BogoMIPS (lpj=1000000)
-> pid_max: default: 32768 minimum: 301
-> Mount-cache hash table entries: 1024 (order: 1, 8192 bytes)
-> Mountpoint-cache hash table entries: 1024 (order: 1, 8192 bytes)
-> hw perfevents: enabled with arm/armv8-pmuv3 PMU driver, 1 counters available
-> *Then the system is stopped there.*
-> *While in the normal execution, the system should continue as follows: *
-> Brought up 1 CPUs
-> SMP: Total of 1 processors activated.
-> devtmpfs: initialized
-> atomic64 test passed
-> regulator-dummy: no parameters
-> NET: Registered protocol family 16
-> vdso: 2 pages (1 code, 1 data) at base ffffffc000635000
-> hw-breakpoint: found 16 breakpoint and 16 watchpoint registers.
-> Serial: AMBA PL011 UART driver
-> bio: create slab <bio-0> at 0
-> SCSI subsystem initialized
-> usbcore: registered new interface driver usbfs
-> usbcore: registered new interface driver hub
-> usbcore: registered new device driver usb
-> Switched to clocksource arch_sys_counter
-> NET: Registered protocol family 2
-> TCP established hash table entries: 4096 (order: 3, 32768 bytes)
-> TCP bind hash table entries: 4096 (order: 4, 65536 bytes)
-> TCP: Hash tables configured (established 4096 bind 4096)
-> TCP: reno registered
-> UDP hash table entries: 256 (order: 1, 8192 bytes)
-> UDP-Lite hash table entries: 256 (order: 1, 8192 bytes)
-> NET: Registered protocol family 1
-> RPC: Registered named UNIX socket transport module.
-> RPC: Registered udp transport module.
-> RPC: Registered tcp transport module.
-> RPC: Registered tcp NFSv4.1 backchannel transport module.
-> kvm [1]: HYP mode not available
-> futex hash table entries: 256 (order: 2, 16384 bytes)
-> fuse init (API version 7.22)
-> 9p: Installing v9fs 9p2000 file system support
-> msgmni has been set to 853
-> io scheduler noop registered
-> io scheduler cfq registered (default)
-> Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
-> 3f8.U6_16550A: ttyS0 at MMIO 0x3f8 (irq = 32, base_baud = 115200) is a
-> 16550A
-> 2f8.U6_16550A: ttyS1 at MMIO 0x2f8 (irq = 33, base_baud = 115200) is a
-> 16550A
-> 3e8.U6_16550A: ttyS2 at MMIO 0x3e8 (irq = 34, base_baud = 115200) is a
-> 16550A
-> 2e8.U6_16550A: ttyS3 at MMIO 0x2e8 (irq = 35, base_baud = 115200) is a
-> 16550A
-> console [hvc0] enabled
-> bootconsole [earlycon0] disabled
-> So, what's the problem is?
+>> +
+>> +/*
+>> + * By writing to CWRITER the guest announces new commands to be processed.
+>> + * Since we cannot read from guest memory inside the ITS spinlock, we
+>> + * iterate over the command buffer (with the lock dropped) until the read
+>> + * pointer matches the write pointer. Other VCPUs writing this register in the
+>> + * meantime will just update the write pointer, leaving the command
+>> + * processing to the first instance of the function.
+>> + */
+>> +static int vgic_mmio_write_its_cwriter(struct kvm_vcpu *vcpu,
+>> +				       struct kvm_io_device *this,
+>> +				       gpa_t addr, int len, const void *val)
+>> +{
+>> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>> +	struct vgic_its *its = &dist->its;
+>> +	gpa_t cbaser = its_cmd_buffer_base(vcpu->kvm);
+>> +	u64 cmd_buf[4];
+>> +	u32 reg;
+>> +	bool finished;
+>> +
+>> +	reg = mask64(its->cwriter & 0xfffe0, addr & 7, len, val);
+>> +	reg &= 0xfffe0;
+>> +	if (reg > its_cmd_buffer_size(vcpu->kvm))
+>> +		return 0;
+>> +
+>> +	spin_lock(&its->lock);
+>> +
+>> +	/*
+>> +	 * If there is still another VCPU handling commands, let this
+>> +	 * one pick up the new CWRITER and process "our" new commands as well.
+>> +	 */
+>> +	finished = (its->cwriter != its->creadr);
+> empty?
 
-I bet you don't have any interrupts delivered to your guest.
+Maybe that is indeed less misleading ...
 
-> Can someone give me some advice or feedback?
+>> +	its->cwriter = reg;
+>> +
+>> +	spin_unlock(&its->lock);
+> Assuming we have 2 vcpus attempting a cwriter write at the same moment I
+> don't understand what does guarantee they are not going to execute the
+> following loop concurrently and possibly execute vits_handle_command
+> twice on the same cmd from the same its->creadr start?
 
-Not really, unless you try to explain what you're trying to achieve.
-Using EL3 to do the job of EL2 is at best weird, and feels like a school
-project gone horribly wrong...
+So does my explanation of the algorithm in that other mail today explain
+it? Or do you still see a hole in the locking scheme here?
 
-Thanks,
+>> +
+>> +	while (!finished) {
+>> +		int ret = kvm_read_guest(vcpu->kvm, cbaser + its->creadr,
+>> +					 cmd_buf, 32);
+>> +		if (ret) {
+>> +			/*
+>> +			 * Gah, we are screwed. Reset CWRITER to that command
+>> +			 * that we have finished processing and return.
+>> +			 */
+>> +			spin_lock(&its->lock);
+>> +			its->cwriter = its->creadr;
+> don't get why do you set the queue empty?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+So from a guest's point of view this is something like an ITS internal
+error which shouldn't happen. So I just bail out, but leave the queue in
+a consistent (read: empty) state to allow possible future commands to be
+processed at best effort.
+I guess this is the best we can come up with, since there is no feasible
+way of communicating errors back(?)
+
+Cheers,
+Andre.
