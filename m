@@ -1,20 +1,23 @@
-From: zhumin  <zm290293817@163.com>
-Subject: The VM can not start
-Date: Wed, 25 May 2016 19:56:37 +0800 (CST)
-Message-ID: <7cf68d7e.b48b.154e7c60d2e.Coremail.zm290293817@163.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: The VM can not start
+Date: Wed, 25 May 2016 13:49:31 +0100
+Message-ID: <57459F5B.8040509@arm.com>
+References: <7cf68d7e.b48b.154e7c60d2e.Coremail.zm290293817@163.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============7668910514506648380=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D35C49B36
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2016 07:53:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBBDD49B3F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2016 08:45:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SylsgZ6ebhnQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 May 2016 07:53:04 -0400 (EDT)
-Received: from m13-27.163.com (m13-27.163.com [220.181.13.27])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE70C49B32
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2016 07:53:03 -0400 (EDT)
+ with ESMTP id emrY52JBrPEr for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 May 2016 08:45:58 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DFA049B3B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2016 08:45:57 -0400 (EDT)
+In-Reply-To: <7cf68d7e.b48b.154e7c60d2e.Coremail.zm290293817@163.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -24,221 +27,126 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+To: zhumin <zm290293817@163.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============7668910514506648380==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_193856_836348220.1464177397037"
+[Please do NOT send HTML emails to this mailing list]
 
-------=_Part_193856_836348220.1464177397037
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
+On 25/05/16 12:56, zhumin wrote:
+> *Hello everyone:*
+> *I try to put some function of hyp.S(in the EL2) to the EL3, and I
+> implement it in Linux kernel 3.18.*
 
-SGVsbG8gZXZlcnlvbmU6CkkgdHJ5IHRvIHB1dCBzb21lIGZ1bmN0aW9uIG9mIGh5cC5TKGluIHRo
-ZSBFTDIpIHRvIHRoZSBFTDMsIGFuZCBJIGltcGxlbWVudCBpdCBpbiBMaW51eCBrZXJuZWwgMy4x
-OC4KQnV0IHdoZW4gSSBzdGFydCB0aGUgVk0gdXNpbmcgdGhlIGxrdm0gdG9vbCwgdGhlIFZNIGNh
-bm5vdCBzdGFydCBub3JtYWxseS4KVGhlIG91dHB1dCBtZXNzYWdlIGxpa2UgdGhlc2U6CnRlcm1p
-bmFsXzA6IExpc3RlbmluZyBmb3Igc2VyaWFsIGNvbm5lY3Rpb24gb24gcG9ydCA1MDAwCnRlcm1p
-bmFsXzE6IExpc3RlbmluZyBmb3Igc2VyaWFsIGNvbm5lY3Rpb24gb24gcG9ydCA1MDAxCnRlcm1p
-bmFsXzI6IExpc3RlbmluZyBmb3Igc2VyaWFsIGNvbm5lY3Rpb24gb24gcG9ydCA1MDAyCnRlcm1p
-bmFsXzM6IExpc3RlbmluZyBmb3Igc2VyaWFsIGNvbm5lY3Rpb24gb24gcG9ydCA1MDAzClZpc3Vh
-bGl6YXRpb24gd2ViIHNlcnZlciBzdGFydGVkIG9uIHBvcnQgMjAwMQpTaW11bGF0aW9uIGlzIHN0
-YXJ0ZWQKSW5pdGlhbGl6aW5nIGNncm91cCBzdWJzeXMgY3B1CkxpbnV4IHZlcnNpb24gMy4xNC40
-MyAoem1AY2VudG9zcGMpIChnY2MgdmVyc2lvbiA0LjkuMSAyMDE0MDUyOSAocHJlcmVsZWFzZSkg
-KGNyb3NzdG9vbC1ORyBsaW5hcm8tMS4xMy4xLTQuOS0yMDE0LjA3IC0gTGluYXJvIEdDQyA0Ljkt
-MjAxNC4wNikgKSAjMSBTTVAgUFJFRU1QVCBTYXQgSnVuIDEzIDE3OjE5OjIzIENTVCAyMDE1CkNQ
-VTogQUFyY2g2NCBQcm9jZXNzb3IgWzQxMGZkMDAwXSByZXZpc2lvbiAwCmJvb3Rjb25zb2xlIFtl
-YXJseWNvbjBdIGVuYWJsZWQKY21hOiBDTUE6IHJlc2VydmVkIDE2IE1pQiBhdCA5ZjAwMDAwMApw
-c2NpOiBwcm9iaW5nIGZ1bmN0aW9uIElEcyBmcm9tIGRldmljZS10cmVlClBFUkNQVTogRW1iZWRk
-ZWQgMTAgcGFnZXMvY3B1IEBmZmZmZmZjMDFlZmViMDAwIHMxMTMyOCByODE5MiBkMjE0NDAgdTQw
-OTYwCkJ1aWx0IDEgem9uZWxpc3RzIGluIFpvbmUgb3JkZXIsIG1vYmlsaXR5IGdyb3VwaW5nIG9u
-LiAgVG90YWwgcGFnZXM6IDEyOTI4MApLZXJuZWwgY29tbWFuZCBsaW5lOiBwY2k9ZmlybXdhcmUg
-ZWFybHlwcmludGs9c21oIGNvbnNvbGU9aHZjMCByb290PS9kZXYvdmRhIGluaXQ9L2Jpbi9zaApQ
-SUQgaGFzaCB0YWJsZSBlbnRyaWVzOiAyMDQ4IChvcmRlcjogMiwgMTYzODQgYnl0ZXMpCkRlbnRy
-eSBjYWNoZSBoYXNoIHRhYmxlIGVudHJpZXM6IDY1NTM2IChvcmRlcjogNywgNTI0Mjg4IGJ5dGVz
-KQpJbm9kZS1jYWNoZSBoYXNoIHRhYmxlIGVudHJpZXM6IDMyNzY4IChvcmRlcjogNiwgMjYyMTQ0
-IGJ5dGVzKQpzb2Z0d2FyZSBJTyBUTEIgW21lbSAweDlhMDAwMDAwLTB4OWUwMDAwMDBdICg2NE1C
-KSBtYXBwZWQgYXQgW2ZmZmZmZmMwMWEwMDAwMDAtZmZmZmZmYzAxZGZmZmZmZl0KTWVtb3J5OiA0
-MjA0NTJLLzUyNDI4OEsgYXZhaWxhYmxlICg0MTIwSyBrZXJuZWwgY29kZSwgMjg4SyByd2RhdGEs
-IDE1MDRLIHJvZGF0YSwgMTkxSyBpbml0LCAxNjVLIGJzcywgMTAzODM2SyByZXNlcnZlZCkKVmly
-dHVhbCBrZXJuZWwgbWVtb3J5IGxheW91dDoKICAgIHZtYWxsb2MgOiAweGZmZmZmZjgwMDAwMDAw
-MDAgLSAweGZmZmZmZmJiZmZmZjAwMDAgICAoMjQ1NzU5IE1CKQogICAgdm1lbW1hcCA6IDB4ZmZm
-ZmZmYmMwMWMwMDAwMCAtIDB4ZmZmZmZmYmMwMjMwMDAwMCAgICggICAgIDcgTUIpCiAgICBtb2R1
-bGVzIDogMHhmZmZmZmZiZmZjMDAwMDAwIC0gMHhmZmZmZmZjMDAwMDAwMDAwICAgKCAgICA2NCBN
-QikKICAgIG1lbW9yeSAgOiAweGZmZmZmZmMwMDAwMDAwMDAgLSAweGZmZmZmZmMwMjAwMDAwMDAg
-ICAoICAgNTEyIE1CKQogICAgICAuaW5pdCA6IDB4ZmZmZmZmYzAwMDYwMDAwMCAtIDB4ZmZmZmZm
-YzAwMDYyZmM0MCAgICggICAxOTIga0IpCiAgICAgIC50ZXh0IDogMHhmZmZmZmZjMDAwMDgwMDAw
-IC0gMHhmZmZmZmZjMDAwNWZmMWQ0ICAgKCAgNTYyOSBrQikKICAgICAgLmRhdGEgOiAweGZmZmZm
-ZmMwMDA2MzAwMDAgLSAweGZmZmZmZmMwMDA2NzgyYTAgICAoICAgMjg5IGtCKQpTTFVCOiBIV2Fs
-aWduPTY0LCBPcmRlcj0wLTMsIE1pbk9iamVjdHM9MCwgQ1BVcz0xLCBOb2Rlcz0xClByZWVtcHRp
-YmxlIGhpZXJhcmNoaWNhbCBSQ1UgaW1wbGVtZW50YXRpb24uCiAgICBSQ1UgcmVzdHJpY3Rpbmcg
-Q1BVcyBmcm9tIE5SX0NQVVM9OCB0byBucl9jcHVfaWRzPTEuClJDVTogQWRqdXN0aW5nIGdlb21l
-dHJ5IGZvciByY3VfZmFub3V0X2xlYWY9MTYsIG5yX2NwdV9pZHM9MQpOUl9JUlFTOjY0IG5yX2ly
-cXM6NjQgMApBcmNoaXRlY3RlZCBjcDE1IHRpbWVyKHMpIHJ1bm5pbmcgYXQgMTAwLjAwTUh6ICh2
-aXJ0KS4Kc2NoZWRfY2xvY2s6IDU2IGJpdHMgYXQgMTAwTUh6LCByZXNvbHV0aW9uIDEwbnMsIHdy
-YXBzIGV2ZXJ5IDI3NDg3NzkwNjk0NDBucwpDb25zb2xlOiBjb2xvdXIgZHVtbXkgZGV2aWNlIDgw
-eDI1CkNhbGlicmF0aW5nIGRlbGF5IGxvb3AgKHNraXBwZWQpLCB2YWx1ZSBjYWxjdWxhdGVkIHVz
-aW5nIHRpbWVyIGZyZXF1ZW5jeS4uIDIwMC4wMCBCb2dvTUlQUyAobHBqPTEwMDAwMDApCnBpZF9t
-YXg6IGRlZmF1bHQ6IDMyNzY4IG1pbmltdW06IDMwMQpNb3VudC1jYWNoZSBoYXNoIHRhYmxlIGVu
-dHJpZXM6IDEwMjQgKG9yZGVyOiAxLCA4MTkyIGJ5dGVzKQpNb3VudHBvaW50LWNhY2hlIGhhc2gg
-dGFibGUgZW50cmllczogMTAyNCAob3JkZXI6IDEsIDgxOTIgYnl0ZXMpCmh3IHBlcmZldmVudHM6
-IGVuYWJsZWQgd2l0aCBhcm0vYXJtdjgtcG11djMgUE1VIGRyaXZlciwgMSBjb3VudGVycyBhdmFp
-bGFibGUKVGhlbiB0aGUgc3lzdGVtIGlzIHN0b3BwZWQgdGhlcmUuCldoaWxlIGluIHRoZSBub3Jt
-YWwgZXhlY3V0aW9uLCB0aGUgc3lzdGVtIHNob3VsZCBjb250aW51ZSBhcyBmb2xsb3dzOgpCcm91
-Z2h0IHVwIDEgQ1BVcwpTTVA6IFRvdGFsIG9mIDEgcHJvY2Vzc29ycyBhY3RpdmF0ZWQuCmRldnRt
-cGZzOiBpbml0aWFsaXplZAphdG9taWM2NCB0ZXN0IHBhc3NlZApyZWd1bGF0b3ItZHVtbXk6IG5v
-IHBhcmFtZXRlcnMKTkVUOiBSZWdpc3RlcmVkIHByb3RvY29sIGZhbWlseSAxNgp2ZHNvOiAyIHBh
-Z2VzICgxIGNvZGUsIDEgZGF0YSkgYXQgYmFzZSBmZmZmZmZjMDAwNjM1MDAwCmh3LWJyZWFrcG9p
-bnQ6IGZvdW5kIDE2IGJyZWFrcG9pbnQgYW5kIDE2IHdhdGNocG9pbnQgcmVnaXN0ZXJzLgpTZXJp
-YWw6IEFNQkEgUEwwMTEgVUFSVCBkcml2ZXIKYmlvOiBjcmVhdGUgc2xhYiA8YmlvLTA+IGF0IDAK
-U0NTSSBzdWJzeXN0ZW0gaW5pdGlhbGl6ZWQKdXNiY29yZTogcmVnaXN0ZXJlZCBuZXcgaW50ZXJm
-YWNlIGRyaXZlciB1c2Jmcwp1c2Jjb3JlOiByZWdpc3RlcmVkIG5ldyBpbnRlcmZhY2UgZHJpdmVy
-IGh1Ygp1c2Jjb3JlOiByZWdpc3RlcmVkIG5ldyBkZXZpY2UgZHJpdmVyIHVzYgpTd2l0Y2hlZCB0
-byBjbG9ja3NvdXJjZSBhcmNoX3N5c19jb3VudGVyCk5FVDogUmVnaXN0ZXJlZCBwcm90b2NvbCBm
-YW1pbHkgMgpUQ1AgZXN0YWJsaXNoZWQgaGFzaCB0YWJsZSBlbnRyaWVzOiA0MDk2IChvcmRlcjog
-MywgMzI3NjggYnl0ZXMpClRDUCBiaW5kIGhhc2ggdGFibGUgZW50cmllczogNDA5NiAob3JkZXI6
-IDQsIDY1NTM2IGJ5dGVzKQpUQ1A6IEhhc2ggdGFibGVzIGNvbmZpZ3VyZWQgKGVzdGFibGlzaGVk
-IDQwOTYgYmluZCA0MDk2KQpUQ1A6IHJlbm8gcmVnaXN0ZXJlZApVRFAgaGFzaCB0YWJsZSBlbnRy
-aWVzOiAyNTYgKG9yZGVyOiAxLCA4MTkyIGJ5dGVzKQpVRFAtTGl0ZSBoYXNoIHRhYmxlIGVudHJp
-ZXM6IDI1NiAob3JkZXI6IDEsIDgxOTIgYnl0ZXMpCk5FVDogUmVnaXN0ZXJlZCBwcm90b2NvbCBm
-YW1pbHkgMQpSUEM6IFJlZ2lzdGVyZWQgbmFtZWQgVU5JWCBzb2NrZXQgdHJhbnNwb3J0IG1vZHVs
-ZS4KUlBDOiBSZWdpc3RlcmVkIHVkcCB0cmFuc3BvcnQgbW9kdWxlLgpSUEM6IFJlZ2lzdGVyZWQg
-dGNwIHRyYW5zcG9ydCBtb2R1bGUuClJQQzogUmVnaXN0ZXJlZCB0Y3AgTkZTdjQuMSBiYWNrY2hh
-bm5lbCB0cmFuc3BvcnQgbW9kdWxlLgprdm0gWzFdOiBIWVAgbW9kZSBub3QgYXZhaWxhYmxlCmZ1
-dGV4IGhhc2ggdGFibGUgZW50cmllczogMjU2IChvcmRlcjogMiwgMTYzODQgYnl0ZXMpCmZ1c2Ug
-aW5pdCAoQVBJIHZlcnNpb24gNy4yMikKOXA6IEluc3RhbGxpbmcgdjlmcyA5cDIwMDAgZmlsZSBz
-eXN0ZW0gc3VwcG9ydAptc2dtbmkgaGFzIGJlZW4gc2V0IHRvIDg1MwppbyBzY2hlZHVsZXIgbm9v
-cCByZWdpc3RlcmVkCmlvIHNjaGVkdWxlciBjZnEgcmVnaXN0ZXJlZCAoZGVmYXVsdCkKU2VyaWFs
-OiA4MjUwLzE2NTUwIGRyaXZlciwgNCBwb3J0cywgSVJRIHNoYXJpbmcgZGlzYWJsZWQKM2Y4LlU2
-XzE2NTUwQTogdHR5UzAgYXQgTU1JTyAweDNmOCAoaXJxID0gMzIsIGJhc2VfYmF1ZCA9IDExNTIw
-MCkgaXMgYSAxNjU1MEEKMmY4LlU2XzE2NTUwQTogdHR5UzEgYXQgTU1JTyAweDJmOCAoaXJxID0g
-MzMsIGJhc2VfYmF1ZCA9IDExNTIwMCkgaXMgYSAxNjU1MEEKM2U4LlU2XzE2NTUwQTogdHR5UzIg
-YXQgTU1JTyAweDNlOCAoaXJxID0gMzQsIGJhc2VfYmF1ZCA9IDExNTIwMCkgaXMgYSAxNjU1MEEK
-MmU4LlU2XzE2NTUwQTogdHR5UzMgYXQgTU1JTyAweDJlOCAoaXJxID0gMzUsIGJhc2VfYmF1ZCA9
-IDExNTIwMCkgaXMgYSAxNjU1MEEKY29uc29sZSBbaHZjMF0gZW5hYmxlZApib290Y29uc29sZSBb
-ZWFybHljb24wXSBkaXNhYmxlZApTbywgd2hhdCdzIHRoZSBwcm9ibGVtIGlzPwpDYW4gc29tZW9u
-ZSBnaXZlIG1lIHNvbWUgYWR2aWNlIG9yIGZlZWRiYWNrPwpUaGFuayB5b3UgZm9yIHlvdXIgaGVs
-cC4KCgoK
-------=_Part_193856_836348220.1464177397037
-Content-Type: text/html; charset=GBK
-Content-Transfer-Encoding: base64
+What function? Why?
 
-PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
-Zm9udC1mYW1pbHk6QXJpYWwiPjxkaXYgc3R5bGU9ImxpbmUtaGVpZ2h0OjEuNztjb2xvcjojMDAw
-MDAwO2ZvbnQtc2l6ZToxNHB4O2ZvbnQtZmFtaWx5OkFyaWFsIj48ZGl2PjxzcGFuIHN0eWxlPSJm
-b250LXNpemU6IDI0cHg7Ij48Yj5IZWxsbyBldmVyeW9uZTo8L2I+PC9zcGFuPjwvZGl2PjxkaXY+
-PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTogMjRweDsiPjxiPkkgdHJ5IHRvIHB1dCBzb21lIGZ1bmN0
-aW9uIG9mIGh5cC5TKGluIHRoZSBFTDIpIHRvIHRoZSBFTDMsIGFuZCBJIGltcGxlbWVudCBpdCBp
-biBMaW51eCBrZXJuZWwgMy4xOC48L2I+PC9zcGFuPjwvZGl2PjxkaXY+PHNwYW4gc3R5bGU9ImZv
-bnQtc2l6ZTogMjRweDsiPjxiPkJ1dCB3aGVuIEkgc3RhcnQgdGhlIFZNIHVzaW5nIHRoZSBsa3Zt
-IHRvb2wsIHRoZSBWTSBjYW5ub3Qgc3RhcnQgbm9ybWFsbHkuPC9iPjxicj48Yj5UaGUgb3V0cHV0
-IG1lc3NhZ2UgbGlrZSB0aGVzZTo8L2I+PC9zcGFuPjxicj50ZXJtaW5hbF8wOiBMaXN0ZW5pbmcg
-Zm9yIHNlcmlhbCBjb25uZWN0aW9uIG9uIHBvcnQgNTAwMDxicj50ZXJtaW5hbF8xOiBMaXN0ZW5p
-bmcgZm9yIHNlcmlhbCBjb25uZWN0aW9uIG9uIHBvcnQgNTAwMTxicj50ZXJtaW5hbF8yOiBMaXN0
-ZW5pbmcgZm9yIHNlcmlhbCBjb25uZWN0aW9uIG9uIHBvcnQgNTAwMjxicj50ZXJtaW5hbF8zOiBM
-aXN0ZW5pbmcgZm9yIHNlcmlhbCBjb25uZWN0aW9uIG9uIHBvcnQgNTAwMzxicj5WaXN1YWxpemF0
-aW9uIHdlYiBzZXJ2ZXIgc3RhcnRlZCBvbiBwb3J0IDIwMDE8YnI+U2ltdWxhdGlvbiBpcyBzdGFy
-dGVkPGJyPkluaXRpYWxpemluZyBjZ3JvdXAgc3Vic3lzIGNwdTxicj5MaW51eCB2ZXJzaW9uIDMu
-MTQuNDMgKHptQGNlbnRvc3BjKSAoZ2NjIHZlcnNpb24gNC45LjEgMjAxNDA1MjkgKHByZXJlbGVh
-c2UpIChjcm9zc3Rvb2wtTkcgbGluYXJvLTEuMTMuMS00LjktMjAxNC4wNyAtIExpbmFybyBHQ0Mg
-NC45LTIwMTQuMDYpICkgIzEgU01QIFBSRUVNUFQgU2F0IEp1biAxMyAxNzoxOToyMyBDU1QgMjAx
-NTxicj5DUFU6IEFBcmNoNjQgUHJvY2Vzc29yIFs0MTBmZDAwMF0gcmV2aXNpb24gMDxicj5ib290
-Y29uc29sZSBbZWFybHljb24wXSBlbmFibGVkPGJyPmNtYTogQ01BOiByZXNlcnZlZCAxNiBNaUIg
-YXQgOWYwMDAwMDA8YnI+cHNjaTogcHJvYmluZyBmdW5jdGlvbiBJRHMgZnJvbSBkZXZpY2UtdHJl
-ZTxicj5QRVJDUFU6IEVtYmVkZGVkIDEwIHBhZ2VzL2NwdSBAZmZmZmZmYzAxZWZlYjAwMCBzMTEz
-MjggcjgxOTIgZDIxNDQwIHU0MDk2MDxicj5CdWlsdCAxIHpvbmVsaXN0cyBpbiBab25lIG9yZGVy
-LCBtb2JpbGl0eSBncm91cGluZyBvbi4mbmJzcDsgVG90YWwgcGFnZXM6IDEyOTI4MDxicj5LZXJu
-ZWwgY29tbWFuZCBsaW5lOiBwY2k9ZmlybXdhcmUgZWFybHlwcmludGs9c21oIGNvbnNvbGU9aHZj
-MCByb290PS9kZXYvdmRhIGluaXQ9L2Jpbi9zaDxicj5QSUQgaGFzaCB0YWJsZSBlbnRyaWVzOiAy
-MDQ4IChvcmRlcjogMiwgMTYzODQgYnl0ZXMpPGJyPkRlbnRyeSBjYWNoZSBoYXNoIHRhYmxlIGVu
-dHJpZXM6IDY1NTM2IChvcmRlcjogNywgNTI0Mjg4IGJ5dGVzKTxicj5Jbm9kZS1jYWNoZSBoYXNo
-IHRhYmxlIGVudHJpZXM6IDMyNzY4IChvcmRlcjogNiwgMjYyMTQ0IGJ5dGVzKTxicj5zb2Z0d2Fy
-ZSBJTyBUTEIgW21lbSAweDlhMDAwMDAwLTB4OWUwMDAwMDBdICg2NE1CKSBtYXBwZWQgYXQgW2Zm
-ZmZmZmMwMWEwMDAwMDAtZmZmZmZmYzAxZGZmZmZmZl08YnI+TWVtb3J5OiA0MjA0NTJLLzUyNDI4
-OEsgYXZhaWxhYmxlICg0MTIwSyBrZXJuZWwgY29kZSwgMjg4SyByd2RhdGEsIDE1MDRLIHJvZGF0
-YSwgMTkxSyBpbml0LCAxNjVLIGJzcywgMTAzODM2SyByZXNlcnZlZCk8YnI+VmlydHVhbCBrZXJu
-ZWwgbWVtb3J5IGxheW91dDo8YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7IHZtYWxsb2MgOiAweGZmZmZm
-ZjgwMDAwMDAwMDAgLSAweGZmZmZmZmJiZmZmZjAwMDAmbmJzcDsmbmJzcDsgKDI0NTc1OSBNQik8
-YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7IHZtZW1tYXAgOiAweGZmZmZmZmJjMDFjMDAwMDAgLSAweGZm
-ZmZmZmJjMDIzMDAwMDAmbmJzcDsmbmJzcDsgKCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyA3IE1C
-KTxicj4mbmJzcDsmbmJzcDsmbmJzcDsgbW9kdWxlcyA6IDB4ZmZmZmZmYmZmYzAwMDAwMCAtIDB4
-ZmZmZmZmYzAwMDAwMDAwMCZuYnNwOyZuYnNwOyAoJm5ic3A7Jm5ic3A7Jm5ic3A7IDY0IE1CKTxi
-cj4mbmJzcDsmbmJzcDsmbmJzcDsgbWVtb3J5Jm5ic3A7IDogMHhmZmZmZmZjMDAwMDAwMDAwIC0g
-MHhmZmZmZmZjMDIwMDAwMDAwJm5ic3A7Jm5ic3A7ICgmbmJzcDsmbmJzcDsgNTEyIE1CKTxicj4m
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgLmluaXQgOiAweGZmZmZmZmMwMDA2MDAwMDAg
-LSAweGZmZmZmZmMwMDA2MmZjNDAmbmJzcDsmbmJzcDsgKCZuYnNwOyZuYnNwOyAxOTIga0IpPGJy
-PiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAudGV4dCA6IDB4ZmZmZmZmYzAwMDA4MDAw
-MCAtIDB4ZmZmZmZmYzAwMDVmZjFkNCZuYnNwOyZuYnNwOyAoJm5ic3A7IDU2Mjkga0IpPGJyPiZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAuZGF0YSA6IDB4ZmZmZmZmYzAwMDYzMDAwMCAt
-IDB4ZmZmZmZmYzAwMDY3ODJhMCZuYnNwOyZuYnNwOyAoJm5ic3A7Jm5ic3A7IDI4OSBrQik8YnI+
-U0xVQjogSFdhbGlnbj02NCwgT3JkZXI9MC0zLCBNaW5PYmplY3RzPTAsIENQVXM9MSwgTm9kZXM9
-MTxicj5QcmVlbXB0aWJsZSBoaWVyYXJjaGljYWwgUkNVIGltcGxlbWVudGF0aW9uLjxicj4mbmJz
-cDsmbmJzcDsmbmJzcDsgUkNVIHJlc3RyaWN0aW5nIENQVXMgZnJvbSBOUl9DUFVTPTggdG8gbnJf
-Y3B1X2lkcz0xLjxicj5SQ1U6IEFkanVzdGluZyBnZW9tZXRyeSBmb3IgcmN1X2Zhbm91dF9sZWFm
-PTE2LCBucl9jcHVfaWRzPTE8YnI+TlJfSVJRUzo2NCBucl9pcnFzOjY0IDA8YnI+QXJjaGl0ZWN0
-ZWQgY3AxNSB0aW1lcihzKSBydW5uaW5nIGF0IDEwMC4wME1IeiAodmlydCkuPGJyPnNjaGVkX2Ns
-b2NrOiA1NiBiaXRzIGF0IDEwME1IeiwgcmVzb2x1dGlvbiAxMG5zLCB3cmFwcyBldmVyeSAyNzQ4
-Nzc5MDY5NDQwbnM8YnI+Q29uc29sZTogY29sb3VyIGR1bW15IGRldmljZSA4MHgyNTxicj5DYWxp
-YnJhdGluZyBkZWxheSBsb29wIChza2lwcGVkKSwgdmFsdWUgY2FsY3VsYXRlZCB1c2luZyB0aW1l
-ciBmcmVxdWVuY3kuLiAyMDAuMDAgQm9nb01JUFMgKGxwaj0xMDAwMDAwKTxicj5waWRfbWF4OiBk
-ZWZhdWx0OiAzMjc2OCBtaW5pbXVtOiAzMDE8YnI+TW91bnQtY2FjaGUgaGFzaCB0YWJsZSBlbnRy
-aWVzOiAxMDI0IChvcmRlcjogMSwgODE5MiBieXRlcyk8YnI+TW91bnRwb2ludC1jYWNoZSBoYXNo
-IHRhYmxlIGVudHJpZXM6IDEwMjQgKG9yZGVyOiAxLCA4MTkyIGJ5dGVzKTxicj5odyBwZXJmZXZl
-bnRzOiBlbmFibGVkIHdpdGggYXJtL2FybXY4LXBtdXYzIFBNVSBkcml2ZXIsIDEgY291bnRlcnMg
-YXZhaWxhYmxlPGJyPjxzcGFuIHN0eWxlPSJmb250LXNpemU6IDI0cHg7IGNvbG9yOiByZ2IoMjU1
-LCAwLCAwKTsiPjxiPlRoZW4gdGhlIHN5c3RlbSBpcyBzdG9wcGVkIHRoZXJlLjwvYj48YnI+PGI+
-V2hpbGUgaW4gdGhlIG5vcm1hbCBleGVjdXRpb24sIHRoZSBzeXN0ZW0gc2hvdWxkIGNvbnRpbnVl
-IGFzIGZvbGxvd3M6IDwvYj48L3NwYW4+PGJyPkJyb3VnaHQgdXAgMSBDUFVzPGJyPlNNUDogVG90
-YWwgb2YgMSBwcm9jZXNzb3JzIGFjdGl2YXRlZC48YnI+ZGV2dG1wZnM6IGluaXRpYWxpemVkPGJy
-PmF0b21pYzY0IHRlc3QgcGFzc2VkPGJyPnJlZ3VsYXRvci1kdW1teTogbm8gcGFyYW1ldGVyczxi
-cj5ORVQ6IFJlZ2lzdGVyZWQgcHJvdG9jb2wgZmFtaWx5IDE2PGJyPnZkc286IDIgcGFnZXMgKDEg
-Y29kZSwgMSBkYXRhKSBhdCBiYXNlIGZmZmZmZmMwMDA2MzUwMDA8YnI+aHctYnJlYWtwb2ludDog
-Zm91bmQgMTYgYnJlYWtwb2ludCBhbmQgMTYgd2F0Y2hwb2ludCByZWdpc3RlcnMuPGJyPlNlcmlh
-bDogQU1CQSBQTDAxMSBVQVJUIGRyaXZlcjxicj5iaW86IGNyZWF0ZSBzbGFiICZsdDtiaW8tMCZn
-dDsgYXQgMDxicj5TQ1NJIHN1YnN5c3RlbSBpbml0aWFsaXplZDxicj51c2Jjb3JlOiByZWdpc3Rl
-cmVkIG5ldyBpbnRlcmZhY2UgZHJpdmVyIHVzYmZzPGJyPnVzYmNvcmU6IHJlZ2lzdGVyZWQgbmV3
-IGludGVyZmFjZSBkcml2ZXIgaHViPGJyPnVzYmNvcmU6IHJlZ2lzdGVyZWQgbmV3IGRldmljZSBk
-cml2ZXIgdXNiPGJyPlN3aXRjaGVkIHRvIGNsb2Nrc291cmNlIGFyY2hfc3lzX2NvdW50ZXI8YnI+
-TkVUOiBSZWdpc3RlcmVkIHByb3RvY29sIGZhbWlseSAyPGJyPlRDUCBlc3RhYmxpc2hlZCBoYXNo
-IHRhYmxlIGVudHJpZXM6IDQwOTYgKG9yZGVyOiAzLCAzMjc2OCBieXRlcyk8YnI+VENQIGJpbmQg
-aGFzaCB0YWJsZSBlbnRyaWVzOiA0MDk2IChvcmRlcjogNCwgNjU1MzYgYnl0ZXMpPGJyPlRDUDog
-SGFzaCB0YWJsZXMgY29uZmlndXJlZCAoZXN0YWJsaXNoZWQgNDA5NiBiaW5kIDQwOTYpPGJyPlRD
-UDogcmVubyByZWdpc3RlcmVkPGJyPlVEUCBoYXNoIHRhYmxlIGVudHJpZXM6IDI1NiAob3JkZXI6
-IDEsIDgxOTIgYnl0ZXMpPGJyPlVEUC1MaXRlIGhhc2ggdGFibGUgZW50cmllczogMjU2IChvcmRl
-cjogMSwgODE5MiBieXRlcyk8YnI+TkVUOiBSZWdpc3RlcmVkIHByb3RvY29sIGZhbWlseSAxPGJy
-PlJQQzogUmVnaXN0ZXJlZCBuYW1lZCBVTklYIHNvY2tldCB0cmFuc3BvcnQgbW9kdWxlLjxicj5S
-UEM6IFJlZ2lzdGVyZWQgdWRwIHRyYW5zcG9ydCBtb2R1bGUuPGJyPlJQQzogUmVnaXN0ZXJlZCB0
-Y3AgdHJhbnNwb3J0IG1vZHVsZS48YnI+UlBDOiBSZWdpc3RlcmVkIHRjcCBORlN2NC4xIGJhY2tj
-aGFubmVsIHRyYW5zcG9ydCBtb2R1bGUuPGJyPmt2bSBbMV06IEhZUCBtb2RlIG5vdCBhdmFpbGFi
-bGU8YnI+ZnV0ZXggaGFzaCB0YWJsZSBlbnRyaWVzOiAyNTYgKG9yZGVyOiAyLCAxNjM4NCBieXRl
-cyk8YnI+ZnVzZSBpbml0IChBUEkgdmVyc2lvbiA3LjIyKTxicj45cDogSW5zdGFsbGluZyB2OWZz
-IDlwMjAwMCBmaWxlIHN5c3RlbSBzdXBwb3J0PGJyPm1zZ21uaSBoYXMgYmVlbiBzZXQgdG8gODUz
-PGJyPmlvIHNjaGVkdWxlciBub29wIHJlZ2lzdGVyZWQ8YnI+aW8gc2NoZWR1bGVyIGNmcSByZWdp
-c3RlcmVkIChkZWZhdWx0KTxicj5TZXJpYWw6IDgyNTAvMTY1NTAgZHJpdmVyLCA0IHBvcnRzLCBJ
-UlEgc2hhcmluZyBkaXNhYmxlZDxicj4zZjguVTZfMTY1NTBBOiB0dHlTMCBhdCBNTUlPIDB4M2Y4
-IChpcnEgPSAzMiwgYmFzZV9iYXVkID0gMTE1MjAwKSBpcyBhIDE2NTUwQTxicj4yZjguVTZfMTY1
-NTBBOiB0dHlTMSBhdCBNTUlPIDB4MmY4IChpcnEgPSAzMywgYmFzZV9iYXVkID0gMTE1MjAwKSBp
-cyBhIDE2NTUwQTxicj4zZTguVTZfMTY1NTBBOiB0dHlTMiBhdCBNTUlPIDB4M2U4IChpcnEgPSAz
-NCwgYmFzZV9iYXVkID0gMTE1MjAwKSBpcyBhIDE2NTUwQTxicj4yZTguVTZfMTY1NTBBOiB0dHlT
-MyBhdCBNTUlPIDB4MmU4IChpcnEgPSAzNSwgYmFzZV9iYXVkID0gMTE1MjAwKSBpcyBhIDE2NTUw
-QTxicj5jb25zb2xlIFtodmMwXSBlbmFibGVkPGJyPmJvb3Rjb25zb2xlIFtlYXJseWNvbjBdIGRp
-c2FibGVkPGJyPjxzcGFuIHN0eWxlPSJmb250LXNpemU6IDI0cHg7IGNvbG9yOiByZ2IoMCwgMCwg
-MjU1KTsiPlNvLCB3aGF0J3MgdGhlIHByb2JsZW0gaXM/PGJyPkNhbiBzb21lb25lIGdpdmUgbWUg
-c29tZSBhZHZpY2Ugb3IgZmVlZGJhY2s/IDxicj5UaGFuayB5b3UgZm9yIHlvdXIgaGVscC48YnI+
-PC9zcGFuPjxicj48L2Rpdj48ZGl2Pjxicj48L2Rpdj48L2Rpdj48L2Rpdj4=
-------=_Part_193856_836348220.1464177397037--
+> *But when I start the VM using the lkvm tool, the VM cannot start normally.*
+> *The output message like these:*
+> terminal_0: Listening for serial connection on port 5000
+> terminal_1: Listening for serial connection on port 5001
+> terminal_2: Listening for serial connection on port 5002
+> terminal_3: Listening for serial connection on port 5003
+> Visualization web server started on port 2001
+> Simulation is started
+> Initializing cgroup subsys cpu
+> Linux version 3.14.43 (zm@centospc) (gcc version 4.9.1 20140529
+> (prerelease) (crosstool-NG linaro-1.13.1-4.9-2014.07 - Linaro GCC
+> 4.9-2014.06) ) #1 SMP PREEMPT Sat Jun 13 17:19:23 CST 2015
+> CPU: AArch64 Processor [410fd000] revision 0
+> bootconsole [earlycon0] enabled
+> cma: CMA: reserved 16 MiB at 9f000000
+> psci: probing function IDs from device-tree
+> PERCPU: Embedded 10 pages/cpu @ffffffc01efeb000 s11328 r8192 d21440 u40960
+> Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 129280
+> Kernel command line: pci=firmware earlyprintk=smh console=hvc0
+> root=/dev/vda init=/bin/sh
+> PID hash table entries: 2048 (order: 2, 16384 bytes)
+> Dentry cache hash table entries: 65536 (order: 7, 524288 bytes)
+> Inode-cache hash table entries: 32768 (order: 6, 262144 bytes)
+> software IO TLB [mem 0x9a000000-0x9e000000] (64MB) mapped at
+> [ffffffc01a000000-ffffffc01dffffff]
+> Memory: 420452K/524288K available (4120K kernel code, 288K rwdata, 1504K
+> rodata, 191K init, 165K bss, 103836K reserved)
+> Virtual kernel memory layout:
+>     vmalloc : 0xffffff8000000000 - 0xffffffbbffff0000   (245759 MB)
+>     vmemmap : 0xffffffbc01c00000 - 0xffffffbc02300000   (     7 MB)
+>     modules : 0xffffffbffc000000 - 0xffffffc000000000   (    64 MB)
+>     memory  : 0xffffffc000000000 - 0xffffffc020000000   (   512 MB)
+>       .init : 0xffffffc000600000 - 0xffffffc00062fc40   (   192 kB)
+>       .text : 0xffffffc000080000 - 0xffffffc0005ff1d4   (  5629 kB)
+>       .data : 0xffffffc000630000 - 0xffffffc0006782a0   (   289 kB)
+> SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+> Preemptible hierarchical RCU implementation.
+>     RCU restricting CPUs from NR_CPUS=8 to nr_cpu_ids=1.
+> RCU: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+> NR_IRQS:64 nr_irqs:64 0
+> Architected cp15 timer(s) running at 100.00MHz (virt).
+> sched_clock: 56 bits at 100MHz, resolution 10ns, wraps every 2748779069440ns
+> Console: colour dummy device 80x25
+> Calibrating delay loop (skipped), value calculated using timer
+> frequency.. 200.00 BogoMIPS (lpj=1000000)
+> pid_max: default: 32768 minimum: 301
+> Mount-cache hash table entries: 1024 (order: 1, 8192 bytes)
+> Mountpoint-cache hash table entries: 1024 (order: 1, 8192 bytes)
+> hw perfevents: enabled with arm/armv8-pmuv3 PMU driver, 1 counters available
+> *Then the system is stopped there.*
+> *While in the normal execution, the system should continue as follows: *
+> Brought up 1 CPUs
+> SMP: Total of 1 processors activated.
+> devtmpfs: initialized
+> atomic64 test passed
+> regulator-dummy: no parameters
+> NET: Registered protocol family 16
+> vdso: 2 pages (1 code, 1 data) at base ffffffc000635000
+> hw-breakpoint: found 16 breakpoint and 16 watchpoint registers.
+> Serial: AMBA PL011 UART driver
+> bio: create slab <bio-0> at 0
+> SCSI subsystem initialized
+> usbcore: registered new interface driver usbfs
+> usbcore: registered new interface driver hub
+> usbcore: registered new device driver usb
+> Switched to clocksource arch_sys_counter
+> NET: Registered protocol family 2
+> TCP established hash table entries: 4096 (order: 3, 32768 bytes)
+> TCP bind hash table entries: 4096 (order: 4, 65536 bytes)
+> TCP: Hash tables configured (established 4096 bind 4096)
+> TCP: reno registered
+> UDP hash table entries: 256 (order: 1, 8192 bytes)
+> UDP-Lite hash table entries: 256 (order: 1, 8192 bytes)
+> NET: Registered protocol family 1
+> RPC: Registered named UNIX socket transport module.
+> RPC: Registered udp transport module.
+> RPC: Registered tcp transport module.
+> RPC: Registered tcp NFSv4.1 backchannel transport module.
+> kvm [1]: HYP mode not available
+> futex hash table entries: 256 (order: 2, 16384 bytes)
+> fuse init (API version 7.22)
+> 9p: Installing v9fs 9p2000 file system support
+> msgmni has been set to 853
+> io scheduler noop registered
+> io scheduler cfq registered (default)
+> Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+> 3f8.U6_16550A: ttyS0 at MMIO 0x3f8 (irq = 32, base_baud = 115200) is a
+> 16550A
+> 2f8.U6_16550A: ttyS1 at MMIO 0x2f8 (irq = 33, base_baud = 115200) is a
+> 16550A
+> 3e8.U6_16550A: ttyS2 at MMIO 0x3e8 (irq = 34, base_baud = 115200) is a
+> 16550A
+> 2e8.U6_16550A: ttyS3 at MMIO 0x2e8 (irq = 35, base_baud = 115200) is a
+> 16550A
+> console [hvc0] enabled
+> bootconsole [earlycon0] disabled
+> So, what's the problem is?
 
+I bet you don't have any interrupts delivered to your guest.
 
---===============7668910514506648380==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> Can someone give me some advice or feedback?
 
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Not really, unless you try to explain what you're trying to achieve.
+Using EL3 to do the job of EL2 is at best weird, and feels like a school
+project gone horribly wrong...
 
---===============7668910514506648380==--
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
