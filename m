@@ -1,114 +1,64 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v4 06/12] KVM: arm64: implement basic ITS register handlers
-Date: Wed, 25 May 2016 14:49:03 +0100
-Message-ID: <0c89ea29-4c40-ce87-f499-d600c466ace4@arm.com>
-References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
- <1458958450-19662-7-git-send-email-andre.przywara@arm.com>
- <5704D8B8.4000504@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6777949B2E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2016 09:44:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AmMGJ5n6YSXw for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 May 2016 09:44:53 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 69B3F412C2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2016 09:44:52 -0400 (EDT)
-In-Reply-To: <5704D8B8.4000504@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v2 0/7] vgic fixes for 4.7-rc1
+Date: Wed, 25 May 2016 15:26:32 +0100
+Message-ID: <1464186399-16604-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+The dust has not yet settled on the new vgic, but here's the first
+batch of fixes anyway!
 
-On 06/04/16 10:36, Eric Auger wrote:
-> Hi Andre,
-> On 03/26/2016 03:14 AM, Andre Przywara wrote:
->> Add emulation for some basic MMIO registers used in the ITS emulation.
+The first two patches are courtesy of Christoffer, who noticed that we
+fail to clear LRs that generate a maintenance interrupt, leading to
+potential screaming interrupts. This bug already exists in the current
+mainline (cc stable?)
 
-...
+The next two address a bug where we fail to properly resample the line
+level on exit, which could result in spurious interrupts being
+injected. This is specific to the new vgic implementation.
 
->> +
->> +/*
->> + * By writing to CWRITER the guest announces new commands to be processed.
->> + * Since we cannot read from guest memory inside the ITS spinlock, we
->> + * iterate over the command buffer (with the lock dropped) until the read
->> + * pointer matches the write pointer. Other VCPUs writing this register in the
->> + * meantime will just update the write pointer, leaving the command
->> + * processing to the first instance of the function.
->> + */
->> +static int vgic_mmio_write_its_cwriter(struct kvm_vcpu *vcpu,
->> +				       struct kvm_io_device *this,
->> +				       gpa_t addr, int len, const void *val)
->> +{
->> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->> +	struct vgic_its *its = &dist->its;
->> +	gpa_t cbaser = its_cmd_buffer_base(vcpu->kvm);
->> +	u64 cmd_buf[4];
->> +	u32 reg;
->> +	bool finished;
->> +
->> +	reg = mask64(its->cwriter & 0xfffe0, addr & 7, len, val);
->> +	reg &= 0xfffe0;
->> +	if (reg > its_cmd_buffer_size(vcpu->kvm))
->> +		return 0;
->> +
->> +	spin_lock(&its->lock);
->> +
->> +	/*
->> +	 * If there is still another VCPU handling commands, let this
->> +	 * one pick up the new CWRITER and process "our" new commands as well.
->> +	 */
->> +	finished = (its->cwriter != its->creadr);
-> empty?
+The following two patches tighten our GICv3 emulation by preventing
+the guest from changing the SRE setting. This bug already exists in
+mainline, though it is hardly critical.
 
-Maybe that is indeed less misleading ...
+The last patch is actually a performance optimization: if the guest is
+using GICv3, we can drop a number of barriers (since we don't need to
+change SRE, and there is no memory-mapped view to synchronize
+with). This results in a world switch that is 2.5% faster on my LS2085
+box when running GICv3 guests. I suspect that the bigger the box, the
+bigger this impact this change will have (system-wide DSBs don't really
+come cheap).
 
->> +	its->cwriter = reg;
->> +
->> +	spin_unlock(&its->lock);
-> Assuming we have 2 vcpus attempting a cwriter write at the same moment I
-> don't understand what does guarantee they are not going to execute the
-> following loop concurrently and possibly execute vits_handle_command
-> twice on the same cmd from the same its->creadr start?
+These patches have been tested on top of the kvmarm/next branch.
 
-So does my explanation of the algorithm in that other mail today explain
-it? Or do you still see a hole in the locking scheme here?
+Thanks,
 
->> +
->> +	while (!finished) {
->> +		int ret = kvm_read_guest(vcpu->kvm, cbaser + its->creadr,
->> +					 cmd_buf, 32);
->> +		if (ret) {
->> +			/*
->> +			 * Gah, we are screwed. Reset CWRITER to that command
->> +			 * that we have finished processing and return.
->> +			 */
->> +			spin_lock(&its->lock);
->> +			its->cwriter = its->creadr;
-> don't get why do you set the queue empty?
+	M.
 
-So from a guest's point of view this is something like an ITS internal
-error which shouldn't happen. So I just bail out, but leave the queue in
-a consistent (read: empty) state to allow possible future commands to be
-processed at best effort.
-I guess this is the best we can come up with, since there is no feasible
-way of communicating errors back(?)
+- From v1: Fix pending bit regeneration by adding the soft_pending bit
+  to the mix.
 
-Cheers,
-Andre.
+Christoffer Dall (2):
+  KVM: arm/arm64: vgic-v2: Clear all dirty LRs
+  KVM: arm/arm64: vgic-v3: Clear all dirty LRs
+
+Marc Zyngier (5):
+  KVM: arm/arm64: vgic-v2: Always resample level interrupts
+  KVM: arm/arm64: vgic-v3: Always resample level interrupts
+  arm64: KVM: Make ICC_SRE_EL1 access return the configured SRE value
+  arm64: KVM: vgic-v3: Prevent the guest from messing with ICC_SRE_EL1
+  arm64: KVM: vgic-v3: Relax synchronization when SRE==1
+
+ arch/arm64/kvm/hyp/vgic-v3-sr.c | 36 +++++++++++++++++++++---------------
+ arch/arm64/kvm/sys_regs.c       | 13 ++++++++++++-
+ virt/kvm/arm/hyp/vgic-v2-sr.c   |  7 +++----
+ virt/kvm/arm/vgic/vgic-v2.c     | 14 +++++++++-----
+ virt/kvm/arm/vgic/vgic-v3.c     | 14 +++++++++-----
+ 5 files changed, 54 insertions(+), 30 deletions(-)
+
+-- 
+2.1.4
+
