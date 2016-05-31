@@ -1,73 +1,47 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 01/12] KVM: extend struct kvm_msi to hold a 32-bit
- device ID
-Date: Tue, 31 May 2016 15:05:59 +0200
-Message-ID: <20160531130559.GA12568@cbox>
-References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
- <1458958450-19662-2-git-send-email-andre.przywara@arm.com>
- <20160403091508.GA5261@cbox>
- <e520a5a8-b259-27f3-f33c-f87e008f1c6f@arm.com>
- <5745CFF6.6070001@arm.com>
+Subject: Re: [PATCH v2 0/7] vgic fixes for 4.7-rc1
+Date: Tue, 31 May 2016 16:14:14 +0200
+Message-ID: <20160531141414.GB12568@cbox>
+References: <1464186399-16604-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <5745CFF6.6070001@arm.com>
+In-Reply-To: <1464186399-16604-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 25, 2016 at 05:16:54PM +0100, Marc Zyngier wrote:
-> On 25/05/16 16:55, Andre Przywara wrote:
-> > Hi Christoffer,
-> > 
-> > On 03/04/16 10:15, Christoffer Dall wrote:
-> >> On Sat, Mar 26, 2016 at 02:13:59AM +0000, Andre Przywara wrote:
-> >>> The ARM GICv3 ITS MSI controller requires a device ID to be able to
-> >>> assign the proper interrupt vector. On real hardware, this ID is
-> >>> sampled from the bus. To be able to emulate an ITS controller, extend
-> >>> the KVM MSI interface to let userspace provide such a device ID. For
-> >>> PCI devices, the device ID is simply the 16-bit bus-device-function
-> >>> triplet, which should be easily available to the userland tool.
-> >>>
-> >>> Also there is a new KVM capability which advertises whether the
-> >>> current VM requires a device ID to be set along with the MSI data.
-> >>> This flag is still reported as not available everywhere, later we will
-> >>> enable it when ITS emulation is used.
-> >>>
-> >>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> >>> Reviewed-by: Eric Auger <eric.auger@linaro.org>
-> >>> ---
-> >>>  Documentation/virtual/kvm/api.txt | 12 ++++++++++--
-> >>>  include/uapi/linux/kvm.h          |  5 ++++-
-> >>>  2 files changed, 14 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> >>> index cb2ef0b..8f7351d 100644
-> >>> --- a/Documentation/virtual/kvm/api.txt
-> >>> +++ b/Documentation/virtual/kvm/api.txt
-> >>> @@ -2163,10 +2163,18 @@ struct kvm_msi {
-> >>>  	__u32 address_hi;
-> >>>  	__u32 data;
-> >>>  	__u32 flags;
-> >>> -	__u8  pad[16];
-> >>> +	__u32 devid;
-> >>
-> >> Are we imposing any unfortunate restrictions for other architectures by
-> >> using a u32 over a u64 for the device ID?
-> > 
-> > Mmmh, good point. I guess not only for other architectures, but also for
-> > the future in general.
-> > 
-> > Are there any objections against increasing this to a u64?
+On Wed, May 25, 2016 at 03:26:32PM +0100, Marc Zyngier wrote:
+> The dust has not yet settled on the new vgic, but here's the first
+> batch of fixes anyway!
 > 
-> I'm not sure this is really necessary. A PCI RID is 16bit, and expanding
-> it to 32bit is already making quite a bit of space for further extension.
+> The first two patches are courtesy of Christoffer, who noticed that we
+> fail to clear LRs that generate a maintenance interrupt, leading to
+> potential screaming interrupts. This bug already exists in the current
+> mainline (cc stable?)
 > 
-> Also, some architecture might be unhappy of having a 64bit quantity that
-> is not 64bit aligned...
+> The next two address a bug where we fail to properly resample the line
+> level on exit, which could result in spurious interrupts being
+> injected. This is specific to the new vgic implementation.
 > 
-ok, thanks for the explanation.
+> The following two patches tighten our GICv3 emulation by preventing
+> the guest from changing the SRE setting. This bug already exists in
+> mainline, though it is hardly critical.
+> 
+> The last patch is actually a performance optimization: if the guest is
+> using GICv3, we can drop a number of barriers (since we don't need to
+> change SRE, and there is no memory-mapped view to synchronize
+> with). This results in a world switch that is 2.5% faster on my LS2085
+> box when running GICv3 guests. I suspect that the bigger the box, the
+> bigger this impact this change will have (system-wide DSBs don't really
+> come cheap).
+> 
+> These patches have been tested on top of the kvmarm/next branch.
+> 
+
+Thanks, applied to queue (with cc stable for v4.6+ as I only think this
+applies post our optimizations that went in for v4.6)
 
 -Christoffer
