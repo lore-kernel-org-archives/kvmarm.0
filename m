@@ -1,43 +1,44 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 0/3] arm64: Kill ESR_LNX_EXEC
-Date: Tue, 31 May 2016 17:53:11 +0100
-Message-ID: <20160531165311.GD11321@e104818-lin.cambridge.arm.com>
-References: <1464694383-31700-1-git-send-email-mark.rutland@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AEFA441145
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 May 2016 12:49:24 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V0sCR2E+Lws4 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 May 2016 12:49:23 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DAAA40F90
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 May 2016 12:49:23 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <1464694383-31700-1-git-send-email-mark.rutland@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: marc.zyngier@arm.com, will.deacon@arm.com, dave.martin@arm.com, shijie.huang@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH] KVM: arm/arm64: vgic-new: Removel harmful BUG_ON
+Date: Thu,  2 Jun 2016 09:24:06 +0100
+Message-ID: <1464855846-1625-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 31, 2016 at 12:33:00PM +0100, Mark Rutland wrote:
-> Mark Rutland (3):
->   arm64: add macro to extract ESR_ELx.EC
->   arm64/kvm: use ESR_ELx_EC to extract EC
->   arm64: kill ESR_LNX_EXEC
+When changing the active bit from an MMIO trap, we decide to
+explode if the intid is that of a private interrupt.
 
-For the series:
+This really looks like a leftover from a previous version, as
+the callers explicitly check for private interrupts and handle
+them correctly. I've managed to reproduce it using a custom
+guest.
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Dropping the BUG_ON seems like the right thing to do.
+
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-mmio.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 059595e..9f6fab7 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -191,10 +191,8 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 	 * other thread sync back the IRQ.
+ 	 */
+ 	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
+-	       irq->vcpu->cpu != -1) { /* VCPU thread is running */
+-		BUG_ON(irq->intid < VGIC_NR_PRIVATE_IRQS);
++	       irq->vcpu->cpu != -1) /* VCPU thread is running */
+ 		cond_resched_lock(&irq->irq_lock);
+-	}
+ 
+ 	irq->active = new_active_state;
+ 	if (new_active_state)
+-- 
+2.1.4
+
