@@ -1,240 +1,278 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v2 06/10] arm/arm64: add initial gicv2 support
-Date: Sat,  4 Jun 2016 20:16:01 +0200
-Message-ID: <1465064165-14885-7-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 08/10] arm/arm64: gicv2: add an IPI test
+Date: Sat,  4 Jun 2016 20:16:03 +0200
+Message-ID: <1465064165-14885-9-git-send-email-drjones@redhat.com>
 References: <1465064165-14885-1-git-send-email-drjones@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F25A410EB
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Jun 2016 14:12:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 7M28FLxzUpbE for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  4 Jun 2016 14:12:28 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42D9041AF6
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Jun 2016 14:12:28 -0400 (EDT)
 In-Reply-To: <1465064165-14885-1-git-send-email-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
-
-Add some gicv2 support. This just adds init and enable
-functions, allowing unit tests to start messing with it.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arm/Makefile.common    |  1 +
- lib/arm/asm/gic-v2.h   | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++
- lib/arm/asm/gic.h      | 20 ++++++++++++++
- lib/arm/gic.c          | 69 ++++++++++++++++++++++++++++++++++++++++++++++
- lib/arm64/asm/gic-v2.h |  1 +
- lib/arm64/asm/gic.h    |  1 +
- 6 files changed, 166 insertions(+)
- create mode 100644 lib/arm/asm/gic-v2.h
- create mode 100644 lib/arm/asm/gic.h
- create mode 100644 lib/arm/gic.c
- create mode 100644 lib/arm64/asm/gic-v2.h
- create mode 100644 lib/arm64/asm/gic.h
+v2: add more details in the output if a test fails,
+    report spurious interrupts if we get them
+---
+ arm/Makefile.common |   6 +-
+ arm/gic.c           | 194 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg   |   7 ++
+ 3 files changed, 204 insertions(+), 3 deletions(-)
+ create mode 100644 arm/gic.c
 
 diff --git a/arm/Makefile.common b/arm/Makefile.common
-index a2dc82618b885..0dc9cac241007 100644
+index 0dc9cac241007..c641f6e4f15d3 100644
 --- a/arm/Makefile.common
 +++ b/arm/Makefile.common
-@@ -43,6 +43,7 @@ cflatobjs += lib/arm/mmu.o
- cflatobjs += lib/arm/bitops.o
- cflatobjs += lib/arm/psci.o
- cflatobjs += lib/arm/smp.o
-+cflatobjs += lib/arm/gic.o
+@@ -9,9 +9,9 @@ ifeq ($(LOADADDR),)
+ 	LOADADDR = 0x40000000
+ endif
  
- libeabi = lib/arm/libeabi.a
- eabiobjs = lib/arm/eabi_compat.o
-diff --git a/lib/arm/asm/gic-v2.h b/lib/arm/asm/gic-v2.h
+-tests-common = \
+-	$(TEST_DIR)/selftest.flat \
+-	$(TEST_DIR)/spinlock-test.flat
++tests-common  = $(TEST_DIR)/selftest.flat
++tests-common += $(TEST_DIR)/spinlock-test.flat
++tests-common += $(TEST_DIR)/gic.flat
+ 
+ all: test_cases
+ 
+diff --git a/arm/gic.c b/arm/gic.c
 new file mode 100644
-index 0000000000000..973c2bf3cc796
+index 0000000000000..cf7ec1c90413c
 --- /dev/null
-+++ b/lib/arm/asm/gic-v2.h
-@@ -0,0 +1,74 @@
++++ b/arm/gic.c
+@@ -0,0 +1,194 @@
 +/*
-+ * All GIC* defines are lifted from include/linux/irqchip/arm-gic.h
++ * GIC tests
 + *
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
++ * GICv2
++ *   . test sending/receiving IPIs
 + *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM_GIC_V2_H_
-+#define _ASMARM_GIC_V2_H_
-+
-+#define GIC_CPU_CTRL			0x00
-+#define GIC_CPU_PRIMASK			0x04
-+#define GIC_CPU_BINPOINT		0x08
-+#define GIC_CPU_INTACK			0x0c
-+#define GIC_CPU_EOI			0x10
-+#define GIC_CPU_RUNNINGPRI		0x14
-+#define GIC_CPU_HIGHPRI			0x18
-+#define GIC_CPU_ALIAS_BINPOINT		0x1c
-+#define GIC_CPU_ACTIVEPRIO		0xd0
-+#define GIC_CPU_IDENT			0xfc
-+#define GIC_CPU_DEACTIVATE		0x1000
-+
-+#define GICC_ENABLE			0x1
-+#define GICC_INT_PRI_THRESHOLD		0xf0
-+
-+#define GIC_CPU_CTRL_EOImodeNS		(1 << 9)
-+
-+#define GICC_IAR_INT_ID_MASK		0x3ff
-+#define GICC_INT_SPURIOUS		1023
-+#define GICC_DIS_BYPASS_MASK		0x1e0
-+
-+#define GIC_DIST_CTRL			0x000
-+#define GIC_DIST_CTR			0x004
-+#define GIC_DIST_IGROUP			0x080
-+#define GIC_DIST_ENABLE_SET		0x100
-+#define GIC_DIST_ENABLE_CLEAR		0x180
-+#define GIC_DIST_PENDING_SET		0x200
-+#define GIC_DIST_PENDING_CLEAR		0x280
-+#define GIC_DIST_ACTIVE_SET		0x300
-+#define GIC_DIST_ACTIVE_CLEAR		0x380
-+#define GIC_DIST_PRI			0x400
-+#define GIC_DIST_TARGET			0x800
-+#define GIC_DIST_CONFIG			0xc00
-+#define GIC_DIST_SOFTINT		0xf00
-+#define GIC_DIST_SGI_PENDING_CLEAR	0xf10
-+#define GIC_DIST_SGI_PENDING_SET	0xf20
-+
-+#define GICD_ENABLE			0x1
-+#define GICD_DISABLE			0x0
-+#define GICD_INT_ACTLOW_LVLTRIG		0x0
-+#define GICD_INT_EN_CLR_X32		0xffffffff
-+#define GICD_INT_EN_SET_SGI		0x0000ffff
-+#define GICD_INT_EN_CLR_PPI		0xffff0000
-+#define GICD_INT_DEF_PRI		0xa0
-+#define GICD_INT_DEF_PRI_X4		((GICD_INT_DEF_PRI << 24) |\
-+					(GICD_INT_DEF_PRI << 16) |\
-+					(GICD_INT_DEF_PRI << 8) |\
-+					GICD_INT_DEF_PRI)
-+#ifndef __ASSEMBLY__
-+
-+struct gicv2_data {
-+	void *dist_base;
-+	void *cpu_base;
-+};
-+extern struct gicv2_data gicv2_data;
-+
-+#define gicv2_dist_base()		(gicv2_data.dist_base)
-+#define gicv2_cpu_base()		(gicv2_data.cpu_base)
-+
-+extern int gicv2_init(void);
-+extern void gicv2_enable_defaults(void);
-+
-+#endif /* !__ASSEMBLY__ */
-+#endif /* _ASMARM_GIC_V2_H_ */
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-new file mode 100644
-index 0000000000000..b1237d1c5ef22
---- /dev/null
-+++ b/lib/arm/asm/gic.h
-@@ -0,0 +1,20 @@
-+/*
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM_GIC_H_
-+#define _ASMARM_GIC_H_
-+
-+#include <asm/gic-v2.h>
-+
-+/*
-+ * gic_init will try to find all known gics, and then
-+ * initialize the gic data for the one found.
-+ * returns
-+ *  0   : no gic was found
-+ *  > 0 : the gic version of the gic found
-+ */
-+extern int gic_init(void);
-+
-+#endif /* _ASMARM_GIC_H_ */
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-new file mode 100644
-index 0000000000000..64a3049c9e8ce
---- /dev/null
-+++ b/lib/arm/gic.c
-@@ -0,0 +1,69 @@
-+/*
 + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
 + *
 + * This work is licensed under the terms of the GNU LGPL, version 2.
 + */
 +#include <libcflat.h>
-+#include <devicetree.h>
++#include <asm/setup.h>
++#include <asm/processor.h>
 +#include <asm/gic.h>
 +#include <asm/smp.h>
++#include <asm/barrier.h>
 +#include <asm/io.h>
 +
-+struct gicv2_data gicv2_data;
++static int gic_version;
++static int acked[NR_CPUS], spurious[NR_CPUS];
++static cpumask_t ready;
 +
-+/*
-+ * Documentation/devicetree/bindings/interrupt-controller/arm,gic.txt
-+ */
-+static bool
-+gic_get_dt_bases(const char *compatible, void **base1, void **base2)
++static void nr_cpu_check(int nr)
 +{
-+	struct dt_pbus_reg reg;
-+	struct dt_device gic;
-+	struct dt_bus bus;
-+	int node, ret;
-+
-+	dt_bus_init_defaults(&bus);
-+	dt_device_init(&gic, &bus, NULL);
-+
-+	node = dt_device_find_compatible(&gic, compatible);
-+	assert(node >= 0 || node == -FDT_ERR_NOTFOUND);
-+
-+	if (node == -FDT_ERR_NOTFOUND)
-+		return false;
-+
-+	dt_device_bind_node(&gic, node);
-+
-+	ret = dt_pbus_translate(&gic, 0, &reg);
-+	assert(ret == 0);
-+	*base1 = ioremap(reg.addr, reg.size);
-+
-+	ret = dt_pbus_translate(&gic, 1, &reg);
-+	assert(ret == 0);
-+	*base2 = ioremap(reg.addr, reg.size);
-+
-+	return true;
++	if (nr_cpus < nr)
++		report_abort("At least %d cpus required", nr);
 +}
 +
-+int gicv2_init(void)
++static void wait_on_ready(void)
 +{
-+	return gic_get_dt_bases("arm,cortex-a15-gic",
-+			&gicv2_data.dist_base, &gicv2_data.cpu_base);
++	cpumask_set_cpu(smp_processor_id(), &ready);
++	while (!cpumask_full(&ready))
++		cpu_relax();
 +}
 +
-+int gic_init(void)
++static void check_acked(cpumask_t *mask)
 +{
-+	if (gicv2_init())
-+		return 2;
-+	return 0;
-+}
++	int missing = 0, extra = 0, unexpected = 0;
++	int nr_pass, cpu, i;
 +
-+void gicv2_enable_defaults(void)
-+{
-+	if (smp_processor_id() == 0) {
-+		writel(GICD_INT_DEF_PRI_X4, gicv2_dist_base() + GIC_DIST_PRI);
-+		writel(GICD_INT_EN_SET_SGI, gicv2_dist_base() + GIC_DIST_ENABLE_SET);
-+		writel(GICD_ENABLE, gicv2_dist_base() + GIC_DIST_CTRL);
++	/* Wait up to 5s for all interrupts to be delivered */
++	for (i = 0; i < 50; ++i) {
++		mdelay(100);
++		nr_pass = 0;
++		for_each_present_cpu(cpu) {
++			smp_rmb();
++			nr_pass += cpumask_test_cpu(cpu, mask) ?
++				acked[cpu] == 1 : acked[cpu] == 0;
++		}
++		if (nr_pass == nr_cpus) {
++			report("Completed in %d ms", true, ++i * 100);
++			return;
++		}
 +	}
-+	writel(GICC_INT_PRI_THRESHOLD, gicv2_cpu_base() + GIC_CPU_PRIMASK);
-+	writel(GICC_ENABLE, gicv2_cpu_base() + GIC_CPU_CTRL);
++
++	for_each_present_cpu(cpu) {
++		if (cpumask_test_cpu(cpu, mask)) {
++			if (!acked[cpu])
++				++missing;
++			else if (acked[cpu] > 1)
++				++extra;
++		} else {
++			if (acked[cpu])
++				++unexpected;
++		}
++	}
++
++	report("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
++	       false, missing, extra, unexpected);
 +}
-diff --git a/lib/arm64/asm/gic-v2.h b/lib/arm64/asm/gic-v2.h
-new file mode 100644
-index 0000000000000..52226624a2092
---- /dev/null
-+++ b/lib/arm64/asm/gic-v2.h
-@@ -0,0 +1 @@
-+#include "../../arm/asm/gic-v2.h"
-diff --git a/lib/arm64/asm/gic.h b/lib/arm64/asm/gic.h
-new file mode 100644
-index 0000000000000..e5eb302a31b4d
---- /dev/null
-+++ b/lib/arm64/asm/gic.h
-@@ -0,0 +1 @@
-+#include "../../arm/asm/gic.h"
++
++static void ipi_handler(struct pt_regs *regs __unused)
++{
++	u32 iar = readl(gicv2_cpu_base() + GIC_CPU_INTACK);
++
++	if (iar != GICC_INT_SPURIOUS) {
++		writel(iar, gicv2_cpu_base() + GIC_CPU_EOI);
++		smp_rmb(); /* pairs with wmb in ipi_test functions */
++		++acked[smp_processor_id()];
++		smp_wmb(); /* pairs with rmb in check_acked */
++	} else {
++		++spurious[smp_processor_id()];
++		smp_wmb();
++	}
++}
++
++static void ipi_test_self(void)
++{
++	cpumask_t mask;
++
++	report_prefix_push("self");
++	memset(acked, 0, sizeof(acked));
++	smp_wmb();
++	cpumask_clear(&mask);
++	cpumask_set_cpu(0, &mask);
++	writel(2 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	check_acked(&mask);
++	report_prefix_pop();
++}
++
++static void ipi_test_smp(void)
++{
++	cpumask_t mask;
++	unsigned long tlist;
++
++	report_prefix_push("target-list");
++	memset(acked, 0, sizeof(acked));
++	smp_wmb();
++	tlist = cpumask_bits(&cpu_present_mask)[0] & 0xaa;
++	cpumask_bits(&mask)[0] = tlist;
++	writel((u8)tlist << 16, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	check_acked(&mask);
++	report_prefix_pop();
++
++	report_prefix_push("broadcast");
++	memset(acked, 0, sizeof(acked));
++	smp_wmb();
++	cpumask_copy(&mask, &cpu_present_mask);
++	cpumask_clear_cpu(0, &mask);
++	writel(1 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	check_acked(&mask);
++	report_prefix_pop();
++}
++
++static void ipi_enable(void)
++{
++	gicv2_enable_defaults();
++#ifdef __arm__
++	install_exception_handler(EXCPTN_IRQ, ipi_handler);
++#else
++	install_irq_handler(EL1H_IRQ, ipi_handler);
++#endif
++	local_irq_enable();
++}
++
++static void ipi_recv(void)
++{
++	ipi_enable();
++	cpumask_set_cpu(smp_processor_id(), &ready);
++	while (1)
++		wfi();
++}
++
++int main(int argc, char **argv)
++{
++	char pfx[8];
++	int cpu;
++
++	gic_version = gic_init();
++	if (!gic_version)
++		report_abort("No gic present!");
++
++	snprintf(pfx, 8, "gicv%d", gic_version);
++	report_prefix_push(pfx);
++
++	if (argc < 2) {
++
++		report_prefix_push("ipi");
++		ipi_enable();
++		ipi_test_self();
++		report_prefix_pop();
++
++	} else if (!strcmp(argv[1], "ipi")) {
++
++		report_prefix_push(argv[1]);
++		nr_cpu_check(2);
++		ipi_enable();
++
++		for_each_present_cpu(cpu) {
++			if (cpu == 0)
++				continue;
++			smp_boot_secondary(cpu, ipi_recv);
++		}
++		wait_on_ready();
++		ipi_test_self();
++		ipi_test_smp();
++
++		smp_rmb();
++		for_each_present_cpu(cpu) {
++			if (spurious[cpu]) {
++				printf("ipi: WARN: cpu%d got %d spurious "
++				       "interrupts\n",
++				       spurious[cpu], smp_processor_id());
++			}
++		}
++
++		report_prefix_pop();
++
++	} else {
++		report_abort("Unknown subtest '%s'", argv[1]);
++	}
++
++	return report_summary();
++}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index ffd12e5794aa0..bb364675043f0 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -51,3 +51,10 @@ file = selftest.flat
+ smp = $MAX_SMP
+ extra_params = -append 'smp'
+ groups = selftest
++
++# Test GIC emulation
++[gicv2-ipi]
++file = gic.flat
++smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
++extra_params = -machine gic-version=2 -append 'ipi'
++groups = gic
 -- 
 2.4.11
-
