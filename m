@@ -1,225 +1,112 @@
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [kvm-unit-tests PATCH v2 03/10] arm/arm64: smp: support more than 8 cpus
-Date: Mon, 06 Jun 2016 18:32:56 +0100
-Message-ID: <87wpm2gr3r.fsf@linaro.org>
-References: <20160606163133.kzbk5qapmhvv5kem@hawk.localdomain>
+Subject: Re: [kvm-unit-tests PATCH v2 04/10] arm/arm64: add some delay routines
+Date: Mon, 06 Jun 2016 18:39:50 +0100
+Message-ID: <87vb1mgqs9.fsf@linaro.org>
+References: <1465064165-14885-5-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20160606163133.kzbk5qapmhvv5kem@hawk.localdomain>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8238410B5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jun 2016 13:35:28 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QE2XxERSO76v for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jun 2016 13:35:26 -0400 (EDT)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 991D140FA6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jun 2016 13:35:26 -0400 (EDT)
+Received: by mail-wm0-f50.google.com with SMTP id k204so36798678wmk.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jun 2016 10:39:36 -0700 (PDT)
+In-reply-to: <1465064165-14885-5-git-send-email-drjones@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com, peter.maydell@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-Andrew Jones <drjones@redhat.com> writes:
-
-> On Mon, Jun 06, 2016 at 05:22:49PM +0100, Alex Benn=C3=A9e wrote:
->>
->> Andrew Jones <drjones@redhat.com> writes:
->>
->> > Signed-off-by: Andrew Jones <drjones@redhat.com>
->> > ---
->> >  arm/run                   | 19 ++++++++++++-------
->> >  arm/selftest.c            |  5 ++++-
->> >  lib/arm/asm/processor.h   |  9 +++++++--
->> >  lib/arm/asm/setup.h       |  4 ++--
->> >  lib/arm/setup.c           | 12 +++++++++++-
->> >  lib/arm64/asm/processor.h |  9 +++++++--
->> >  6 files changed, 43 insertions(+), 15 deletions(-)
->> >
->> > diff --git a/arm/run b/arm/run
->> > index a2f35ef6a7e63..2d0698619606e 100755
->> > --- a/arm/run
->> > +++ b/arm/run
->> > @@ -31,13 +31,6 @@ if [ -z "$ACCEL" ]; then
->> >  	fi
->> >  fi
->> >
->> > -if [ "$HOST" =3D "aarch64" ] && [ "$ACCEL" =3D "kvm" ]; then
->> > -	processor=3D"host"
->> > -	if [ "$ARCH" =3D "arm" ]; then
->> > -		processor+=3D",aarch64=3Doff"
->> > -	fi
->> > -fi
->> > -
->> >  qemu=3D"${QEMU:-qemu-system-$ARCH_NAME}"
->> >  qpath=3D$(which $qemu 2>/dev/null)
->> >
->> > @@ -53,6 +46,18 @@ fi
->> >
->> >  M=3D'-machine virt'
->> >
->> > +if [ "$ACCEL" =3D "kvm" ]; then
->> > +	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
->> > +		M+=3D',gic-version=3Dhost'
->> > +	fi
->> > +	if [ "$HOST" =3D "aarch64" ]; then
->> > +		processor=3D"host"
->> > +		if [ "$ARCH" =3D "arm" ]; then
->> > +			processor+=3D",aarch64=3Doff"
->> > +		fi
->> > +	fi
->> > +fi
->> > +
->> >  if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; th=
-en
->> >  	echo "$qpath doesn't support virtio-console for chr-testdev. Exi=
-ting."
->> >  	exit 2
->> > diff --git a/arm/selftest.c b/arm/selftest.c
->> > index 5656f2bb1cc88..ad1f452f8ebfa 100644
->> > --- a/arm/selftest.c
->> > +++ b/arm/selftest.c
->> > @@ -313,9 +313,10 @@ static bool psci_check(void)
->> >  static cpumask_t smp_reported;
->> >  static void cpu_report(void)
->> >  {
->> > +	unsigned long mpidr =3D get_mpidr();
->> >  	int cpu =3D smp_processor_id();
->> >
->> > -	report("CPU%d online", true, cpu);
->> > +	report("CPU(%3d) mpidr=3D%lx", mpidr_to_cpu(mpidr) =3D=3D cpu, c=
-pu, mpidr);
->> >  	cpumask_set_cpu(cpu, &smp_reported);
->> >  	halt();
->> >  }
->> > @@ -344,6 +345,7 @@ int main(int argc, char **argv)
->> >
->> >  	} else if (strcmp(argv[1], "smp") =3D=3D 0) {
->> >
->> > +		unsigned long mpidr =3D get_mpidr();
->> >  		int cpu;
->> >
->> >  		report("PSCI version", psci_check());
->> > @@ -354,6 +356,7 @@ int main(int argc, char **argv)
->> >  			smp_boot_secondary(cpu, cpu_report);
->> >  		}
->> >
->> > +		report("CPU(%3d) mpidr=3D%lx", mpidr_to_cpu(mpidr) =3D=3D 0, 0,=
- mpidr);
->> >  		cpumask_set_cpu(0, &smp_reported);
->> >  		while (!cpumask_full(&smp_reported))
->> >  			cpu_relax();
->> > diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
->> > index f25e7eee3666c..d2048f5f5f7e6 100644
->> > --- a/lib/arm/asm/processor.h
->> > +++ b/lib/arm/asm/processor.h
->> > @@ -40,8 +40,13 @@ static inline unsigned int get_mpidr(void)
->> >  	return mpidr;
->> >  }
->> >
->> > -/* Only support Aff0 for now, up to 4 cpus */
->> > -#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
->> > +#define MPIDR_HWID_BITMASK 0xffffff
->> > +extern int mpidr_to_cpu(unsigned long mpidr);
->> > +
->> > +#define MPIDR_LEVEL_SHIFT(level) \
->> > +	(((1 << level) >> 1) << 3)
->> > +#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
->> > +	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
->> >
->> >  extern void start_usr(void (*func)(void *arg), void *arg, unsigne=
-d long sp_usr);
->> >  extern bool is_user(void);
->> > diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
->> > index cb8fdbd38dd5d..c501c6ddd8657 100644
->> > --- a/lib/arm/asm/setup.h
->> > +++ b/lib/arm/asm/setup.h
->> > @@ -10,8 +10,8 @@
->> >  #include <asm/page.h>
->> >  #include <asm/pgtable-hwdef.h>
->> >
->> > -#define NR_CPUS			8
->> > -extern u32 cpus[NR_CPUS];
->> > +#define NR_CPUS			255
->> > +extern u64 cpus[NR_CPUS];
->> >  extern int nr_cpus;
->> >
->> >  #define NR_MEM_REGIONS		8
->> > diff --git a/lib/arm/setup.c b/lib/arm/setup.c
->> > index 8c6172ff94106..1d6b6949c920e 100644
->> > --- a/lib/arm/setup.c
->> > +++ b/lib/arm/setup.c
->> > @@ -24,12 +24,22 @@ extern unsigned long stacktop;
->> >  extern void io_init(void);
->> >  extern void setup_args(const char *args);
->> >
->> > -u32 cpus[NR_CPUS] =3D { [0 ... NR_CPUS-1] =3D (~0U) };
->> > +u64 cpus[NR_CPUS] =3D { [0 ... NR_CPUS-1] =3D (~0U) };
->> >  int nr_cpus;
->> >
->> >  struct mem_region mem_regions[NR_MEM_REGIONS];
->> >  phys_addr_t __phys_offset, __phys_end;
->> >
->> > +int mpidr_to_cpu(unsigned long mpidr)
->> > +{
->> > +	int i;
->> > +
->> > +	for (i =3D 0; i < nr_cpus; ++i)
->> > +		if (cpus[i] =3D=3D (mpidr & MPIDR_HWID_BITMASK))
->> > +			return i;
->> > +	return -1;
->> > +}
->> > +
->> >  static void cpu_set(int fdtnode __unused, u32 regval, void *info =
-__unused)
->> >  {
->> >  	int cpu =3D nr_cpus++;
->> > diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
->> > index 9a208ff729b7e..7e448dc81a6aa 100644
->> > --- a/lib/arm64/asm/processor.h
->> > +++ b/lib/arm64/asm/processor.h
->> > @@ -78,8 +78,13 @@ static inline type get_##reg(void)				\
->> >
->> >  DEFINE_GET_SYSREG64(mpidr)
->> >
->> > -/* Only support Aff0 for now, gicv2 only */
->> > -#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
->> > +#define MPIDR_HWID_BITMASK 0xff00ffffff
->> > +extern int mpidr_to_cpu(unsigned long mpidr);
->> > +
->> > +#define MPIDR_LEVEL_SHIFT(level) \
->> > +	(((1 << level) >> 1) << 3)
->> > +#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
->> > +	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
->>
->> Doesn't Aff3 break this little macro? It sits at 32:39 with a gap fo=
-r
->> MT, RES0, U, RES1 for bits 25:31
->
-> Nope, doesn't break. I had the same thought when I lifted it from
-> Linux, but stare at it long enough and you'll see that it works :-)
-
-Maybe a comment although I'm hard pressed to think of a good one except
-maybe and explicit:
-
-    /* Shifts to 0, 8, 16, 32 */
-
-But either way:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
->
-> Thanks,
-> drew
->
->>
->> >
->> >  extern void start_usr(void (*func)(void *arg), void *arg, unsigne=
-d long sp_usr);
->> >  extern bool is_user(void);
->>
->>
->> --
->> Alex Benn=C3=A9e
->> --
->> To unsubscribe from this list: send the line "unsubscribe kvm" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
---
-Alex Benn=C3=A9e
+CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IEFsbG93IGEgdGhy
+ZWFkIHRvIHdhaXQgc29tZSBzcGVjaWZpZWQgYW1vdW50IG9mIHRpbWUuIENhbgo+IHNwZWNpZnkg
+aW4gY3ljbGVzLCB1c2VjcywgYW5kIG1zZWNzLgoKSSB3b25kZXIgaWYgZGVsYXkoKSBhbmQgbWRl
+bGF5KCkgY2FuIGJlIGluIGNvbW1vbiBjb2RlIHdpdGgganVzdCB0aGUKZnJlcSBhbmQgY291bnQg
+Z2V0dGluZyBmdW5jdGlvbnMgaW4gc3BlY2lmaWMgY29kZT8gSSBndWVzcyB0aGF0IHdvdWxkCm5l
+ZWQgYSBsaWIvYXJtLWdlbmVyaWMvIG9yIHNvbWUgc3VjaD8KCk90aGVyd2lzZToKClJldmlld2Vk
+LWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Cgo+Cj4gU2lnbmVkLW9m
+Zi1ieTogQW5kcmV3IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+Cj4gLS0tCj4gIGxpYi9hcm0v
+YXNtL3Byb2Nlc3Nvci5oICAgfCAxOSArKysrKysrKysrKysrKysrKysrCj4gIGxpYi9hcm0vcHJv
+Y2Vzc29yLmMgICAgICAgfCAxNSArKysrKysrKysrKysrKysKPiAgbGliL2FybTY0L2FzbS9wcm9j
+ZXNzb3IuaCB8IDE5ICsrKysrKysrKysrKysrKysrKysKPiAgbGliL2FybTY0L3Byb2Nlc3Nvci5j
+ICAgICB8IDE1ICsrKysrKysrKysrKysrKwo+ICA0IGZpbGVzIGNoYW5nZWQsIDY4IGluc2VydGlv
+bnMoKykKPgo+IGRpZmYgLS1naXQgYS9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaCBiL2xpYi9hcm0v
+YXNtL3Byb2Nlc3Nvci5oCj4gaW5kZXggZDIwNDhmNWY1ZjdlNi4uYWZjOTAzY2E3ZDRhYiAxMDA2
+NDQKPiAtLS0gYS9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaAo+ICsrKyBiL2xpYi9hcm0vYXNtL3By
+b2Nlc3Nvci5oCj4gQEAgLTUsNyArNSw5IEBACj4gICAqCj4gICAqIFRoaXMgd29yayBpcyBsaWNl
+bnNlZCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdOVSBMR1BMLCB2ZXJzaW9uIDIuCj4gICAqLwo+
+ICsjaW5jbHVkZSA8bGliY2ZsYXQuaD4KPiAgI2luY2x1ZGUgPGFzbS9wdHJhY2UuaD4KPiArI2lu
+Y2x1ZGUgPGFzbS9iYXJyaWVyLmg+Cj4KPiAgZW51bSB2ZWN0b3Igewo+ICAJRVhDUFROX1JTVCwK
+PiBAQCAtNTEsNCArNTMsMjEgQEAgZXh0ZXJuIGludCBtcGlkcl90b19jcHUodW5zaWduZWQgbG9u
+ZyBtcGlkcik7Cj4gIGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgqZnVuYykodm9pZCAqYXJn
+KSwgdm9pZCAqYXJnLCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7Cj4gIGV4dGVybiBib29sIGlzX3Vz
+ZXIodm9pZCk7Cj4KPiArc3RhdGljIGlubGluZSB1NjQgZ2V0X2NudHZjdCh2b2lkKQo+ICt7Cj4g
+Kwl1NjQgdmN0Owo+ICsJaXNiKCk7Cj4gKwlhc20gdm9sYXRpbGUoIm1ycmMgcDE1LCAxLCAlUTAs
+ICVSMCwgYzE0IiA6ICI9ciIgKHZjdCkpOwo+ICsJcmV0dXJuIHZjdDsKPiArfQo+ICsKPiArZXh0
+ZXJuIHZvaWQgZGVsYXkodTY0IGN5Y2xlcyk7Cj4gK2V4dGVybiB2b2lkIHVkZWxheSh1bnNpZ25l
+ZCBsb25nIHVzZWNzKTsKPiArCj4gK3N0YXRpYyBpbmxpbmUgdm9pZCBtZGVsYXkodW5zaWduZWQg
+bG9uZyBtc2VjcykKPiArewo+ICsJd2hpbGUgKG1zZWNzLS0pCj4gKwkJdWRlbGF5KDEwMDApOwo+
+ICt9Cj4gKwo+ICAjZW5kaWYgLyogX0FTTUFSTV9QUk9DRVNTT1JfSF8gKi8KPiBkaWZmIC0tZ2l0
+IGEvbGliL2FybS9wcm9jZXNzb3IuYyBiL2xpYi9hcm0vcHJvY2Vzc29yLmMKPiBpbmRleCA1NGZk
+Yjg3ZWYwMTk2Li5jMmVlMzYwZGY2ODg0IDEwMDY0NAo+IC0tLSBhL2xpYi9hcm0vcHJvY2Vzc29y
+LmMKPiArKysgYi9saWIvYXJtL3Byb2Nlc3Nvci5jCj4gQEAgLTksNiArOSw3IEBACj4gICNpbmNs
+dWRlIDxhc20vcHRyYWNlLmg+Cj4gICNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+Cj4gICNpbmNs
+dWRlIDxhc20vdGhyZWFkX2luZm8uaD4KPiArI2luY2x1ZGUgPGFzbS9iYXJyaWVyLmg+Cj4KPiAg
+c3RhdGljIGNvbnN0IGNoYXIgKnByb2Nlc3Nvcl9tb2Rlc1tdID0gewo+ICAJIlVTRVJfMjYiLCAi
+RklRXzI2IiAsICJJUlFfMjYiICwgIlNWQ18yNiIgLAo+IEBAIC0xNDEsMyArMTQyLDE3IEBAIGJv
+b2wgaXNfdXNlcih2b2lkKQo+ICB7Cj4gIAlyZXR1cm4gY3VycmVudF90aHJlYWRfaW5mbygpLT5m
+bGFncyAmIFRJRl9VU0VSX01PREU7Cj4gIH0KPiArCj4gK3ZvaWQgZGVsYXkodTY0IGN5Y2xlcykK
+PiArewo+ICsJdTY0IHN0YXJ0ID0gZ2V0X2NudHZjdCgpOwo+ICsJd2hpbGUgKChnZXRfY250dmN0
+KCkgLSBzdGFydCkgPCBjeWNsZXMpCj4gKwkJY3B1X3JlbGF4KCk7Cj4gK30KPiArCj4gK3ZvaWQg
+dWRlbGF5KHVuc2lnbmVkIGxvbmcgdXNlYykKPiArewo+ICsJdW5zaWduZWQgaW50IGZycTsKPiAr
+CWFzbSB2b2xhdGlsZSgibXJjIHAxNSwgMCwgJTAsIGMxNCwgYzAsIDAiIDogIj1yIiAoZnJxKSk7
+Cj4gKwlkZWxheSgodTY0KXVzZWMgKiBmcnEgLyAxMDAwMDAwKTsKPiArfQo+IGRpZmYgLS1naXQg
+YS9saWIvYXJtNjQvYXNtL3Byb2Nlc3Nvci5oIGIvbGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaAo+
+IGluZGV4IDdlNDQ4ZGM4MWE2YWEuLjk0ZjdjZTM1YjY1YzEgMTAwNjQ0Cj4gLS0tIGEvbGliL2Fy
+bTY0L2FzbS9wcm9jZXNzb3IuaAo+ICsrKyBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKPiBA
+QCAtMTcsOCArMTcsMTAgQEAKPiAgI2RlZmluZSBTQ1RMUl9FTDFfTQkoMSA8PCAwKQo+Cj4gICNp
+Zm5kZWYgX19BU1NFTUJMWV9fCj4gKyNpbmNsdWRlIDxsaWJjZmxhdC5oPgo+ICAjaW5jbHVkZSA8
+YXNtL3B0cmFjZS5oPgo+ICAjaW5jbHVkZSA8YXNtL2Vzci5oPgo+ICsjaW5jbHVkZSA8YXNtL2Jh
+cnJpZXIuaD4KPgo+ICBlbnVtIHZlY3RvciB7Cj4gIAlFTDFUX1NZTkMsCj4gQEAgLTg5LDUgKzkx
+LDIyIEBAIGV4dGVybiBpbnQgbXBpZHJfdG9fY3B1KHVuc2lnbmVkIGxvbmcgbXBpZHIpOwo+ICBl
+eHRlcm4gdm9pZCBzdGFydF91c3Iodm9pZCAoKmZ1bmMpKHZvaWQgKmFyZyksIHZvaWQgKmFyZywg
+dW5zaWduZWQgbG9uZyBzcF91c3IpOwo+ICBleHRlcm4gYm9vbCBpc191c2VyKHZvaWQpOwo+Cj4g
+K3N0YXRpYyBpbmxpbmUgdTY0IGdldF9jbnR2Y3Qodm9pZCkKPiArewo+ICsJdTY0IHZjdDsKPiAr
+CWlzYigpOwo+ICsJYXNtIHZvbGF0aWxlKCJtcnMgJTAsIGNudHZjdF9lbDAiIDogIj1yIiAodmN0
+KSk7Cj4gKwlyZXR1cm4gdmN0Owo+ICt9Cj4gKwo+ICtleHRlcm4gdm9pZCBkZWxheSh1NjQgY3lj
+bGVzKTsKPiArZXh0ZXJuIHZvaWQgdWRlbGF5KHVuc2lnbmVkIGxvbmcgdXNlY3MpOwo+ICsKPiAr
+c3RhdGljIGlubGluZSB2b2lkIG1kZWxheSh1bnNpZ25lZCBsb25nIG1zZWNzKQo+ICt7Cj4gKwl3
+aGlsZSAobXNlY3MtLSkKPiArCQl1ZGVsYXkoMTAwMCk7Cj4gK30KPiArCj4gICNlbmRpZiAvKiAh
+X19BU1NFTUJMWV9fICovCj4gICNlbmRpZiAvKiBfQVNNQVJNNjRfUFJPQ0VTU09SX0hfICovCj4g
+ZGlmZiAtLWdpdCBhL2xpYi9hcm02NC9wcm9jZXNzb3IuYyBiL2xpYi9hcm02NC9wcm9jZXNzb3Iu
+Ywo+IGluZGV4IGRlZWFiNGVjOWM4YWMuLjUwZmE4MzVjNmYxZTMgMTAwNjQ0Cj4gLS0tIGEvbGli
+L2FybTY0L3Byb2Nlc3Nvci5jCj4gKysrIGIvbGliL2FybTY0L3Byb2Nlc3Nvci5jCj4gQEAgLTks
+NiArOSw3IEBACj4gICNpbmNsdWRlIDxhc20vcHRyYWNlLmg+Cj4gICNpbmNsdWRlIDxhc20vcHJv
+Y2Vzc29yLmg+Cj4gICNpbmNsdWRlIDxhc20vdGhyZWFkX2luZm8uaD4KPiArI2luY2x1ZGUgPGFz
+bS9iYXJyaWVyLmg+Cj4KPiAgc3RhdGljIGNvbnN0IGNoYXIgKnZlY3Rvcl9uYW1lc1tdID0gewo+
+ICAJImVsMXRfc3luYyIsCj4gQEAgLTI1MywzICsyNTQsMTcgQEAgYm9vbCBpc191c2VyKHZvaWQp
+Cj4gIHsKPiAgCXJldHVybiBjdXJyZW50X3RocmVhZF9pbmZvKCktPmZsYWdzICYgVElGX1VTRVJf
+TU9ERTsKPiAgfQo+ICsKPiArdm9pZCBkZWxheSh1NjQgY3ljbGVzKQo+ICt7Cj4gKwl1NjQgc3Rh
+cnQgPSBnZXRfY250dmN0KCk7Cj4gKwl3aGlsZSAoKGdldF9jbnR2Y3QoKSAtIHN0YXJ0KSA8IGN5
+Y2xlcykKPiArCQljcHVfcmVsYXgoKTsKPiArfQo+ICsKPiArdm9pZCB1ZGVsYXkodW5zaWduZWQg
+bG9uZyB1c2VjKQo+ICt7Cj4gKwl1bnNpZ25lZCBpbnQgZnJxOwo+ICsJYXNtIHZvbGF0aWxlKCJt
+cnMgJTAsIGNudGZycV9lbDAiIDogIj1yIiAoZnJxKSk7Cj4gKwlkZWxheSgodTY0KXVzZWMgKiBm
+cnEgLyAxMDAwMDAwKTsKPiArfQoKCi0tCkFsZXggQmVubsOpZQpfX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBs
+aXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1h
+bi9saXN0aW5mby9rdm1hcm0K
