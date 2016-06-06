@@ -1,76 +1,69 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 01/10] lib: xstr: allow multiple args
-Date: Mon, 6 Jun 2016 14:12:39 +0200
-Message-ID: <20160606121239.paubfta2c74epgfk@hawk.localdomain>
-References: <1465064165-14885-2-git-send-email-drjones@redhat.com>
- <87d1nuiod6.fsf@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [kvm-unit-tests PATCH v2 02/10] arm64: fix get_"sysreg32" and make MPIDR 64bit
+Date: Mon, 06 Jun 2016 13:47:50 +0100
+Message-ID: <87bn3eiivd.fsf@linaro.org>
+References: <1465064165-14885-3-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <87d1nuiod6.fsf@linaro.org>
+In-reply-to: <1465064165-14885-3-git-send-email-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: Andrew Jones <drjones@redhat.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com, peter.maydell@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jun 06, 2016 at 11:49:09AM +0100, Alex Benn=E9e wrote:
->=20
-> Andrew Jones <drjones@redhat.com> writes:
->=20
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  lib/libcflat.h | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/lib/libcflat.h b/lib/libcflat.h
-> > index 582e3fc60e287..e5e588c742763 100644
-> > --- a/lib/libcflat.h
-> > +++ b/lib/libcflat.h
-> > @@ -27,8 +27,8 @@
-> >
-> >  #define __unused __attribute__((__unused__))
-> >
-> > -#define xstr(s) xxstr(s)
-> > -#define xxstr(s) #s
-> > +#define xstr(s...) xxstr(s)
-> > +#define xxstr(s...) #s
->=20
-> OK my knowledge of stringinfication is still rusty despite having rea=
-d
-> the QEMU softmmu code. However:
->=20
->                 printf("Unknown subtest:" xstr(foo,ba) "\n");
->=20
-> Yields:
->=20
->                 Unknown subtestfoo,ba
->=20
-> Is that what you wanted? Or were you aiming for xstr(foo,ba) =3D> foo=
-ba
 
-The way I did it (which is like Linux) is what I wanted, see Linux's
-version in include/linux/stringify.h. I can correct $SUBJECT to make
-that more clear if you like.
+Andrew Jones <drjones@redhat.com> writes:
 
-Thanks,
-drew
+> mrs is always 64bit, so we should always use a 64bit register.
+> Sometimes we'll only want to return the lower 32, but not for
+> MPIDR, as that does define fields in the upper 32.
+>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  lib/arm64/asm/processor.h | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
+>
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 84d5c7ce752b0..9a208ff729b7e 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -66,14 +66,17 @@ static inline unsigned long current_level(void)
+>  	return el & 0xc;
+>  }
+>
+> -#define DEFINE_GET_SYSREG32(reg)				\
+> -static inline unsigned int get_##reg(void)			\
+> +#define DEFINE_GET_SYSREG(reg, type)				\
+> +static inline type get_##reg(void)				\
+>  {								\
+> -	unsigned int reg;					\
+> -	asm volatile("mrs %0, " #reg "_el1" : "=3Dr" (reg));	\
+> -	return reg;						\
+> +	unsigned long r;					\
+> +	asm volatile("mrs %0, " #reg "_el1" : "=3Dr" (r));	\
+> +	return (type)r;						\
+>  }
+> -DEFINE_GET_SYSREG32(mpidr)
+> +#define DEFINE_GET_SYSREG32(reg) DEFINE_GET_SYSREG(reg, unsigned int=
+)
+> +#define DEFINE_GET_SYSREG64(reg) DEFINE_GET_SYSREG(reg, unsigned lon=
+g)
+
+I guess this is a hang-over the kernel style to use int/long over
+u32/u64?
+
+Otherwise:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> +
+> +DEFINE_GET_SYSREG64(mpidr)
+>
+>  /* Only support Aff0 for now, gicv2 only */
+>  #define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
 
 
-
->=20
-> As an aside I couldn't actually see xstr being called with multiple
-> arguments in the source tree.
->=20
-> >
-> >  #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
-> >  #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
->=20
->=20
-> --
-> Alex Benn=E9e
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--
+Alex Benn=C3=A9e
