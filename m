@@ -1,136 +1,82 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 11/15] arm/arm64: KVM: Kill free_boot_hyp_pgd
-Date: Tue,  7 Jun 2016 11:58:31 +0100
-Message-ID: <1465297115-13091-12-git-send-email-marc.zyngier@arm.com>
-References: <1465297115-13091-1-git-send-email-marc.zyngier@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [kvm-unit-tests PATCH v2 05/10] arm/arm64: irq
+ enable/disable
+Date: Tue, 07 Jun 2016 17:22:20 +0100
+Message-ID: <87portge9v.fsf@linaro.org>
+References: <1465064165-14885-6-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 524E549B5A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2016 06:54:48 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hwH-F8iAz0qi for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jun 2016 06:54:46 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8250149B66
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2016 06:54:44 -0400 (EDT)
-In-Reply-To: <1465297115-13091-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
+In-reply-to: <1465064165-14885-6-git-send-email-drjones@redhat.com>
+List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
+List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel/>
+List-Post: <mailto:qemu-devel@nongnu.org>
+List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
+List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+Sender: "Qemu-devel" <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
+To: Andrew Jones <drjones@redhat.com>
+Cc: peter.maydell@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no way to free the boot PGD, because it doesn't exist
-anymore as a standalone entity.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/include/asm/kvm_mmu.h   |  1 -
- arch/arm/kvm/arm.c               |  4 ----
- arch/arm/kvm/mmu.c               | 30 +++++++-----------------------
- arch/arm64/include/asm/kvm_mmu.h |  1 -
- 4 files changed, 7 insertions(+), 29 deletions(-)
+Andrew Jones <drjones@redhat.com> writes:
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 898e7c8..ea32d39 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -51,7 +51,6 @@
- 
- int create_hyp_mappings(void *from, void *to);
- int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
--void free_boot_hyp_pgd(void);
- void free_hyp_pgds(void);
- 
- void stage2_unmap_vm(struct kvm *kvm);
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 7f424fc..ca5ac1a 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -1322,10 +1322,6 @@ static int init_hyp_mode(void)
- 		}
- 	}
- 
--#ifndef CONFIG_HOTPLUG_CPU
--	free_boot_hyp_pgd();
--#endif
--
- 	/* set size of VMID supported by CPU */
- 	kvm_vmid_bits = kvm_get_vmid_bits();
- 	kvm_info("%d-bit VMID\n", kvm_vmid_bits);
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 647dbb2..46b8604 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -482,27 +482,6 @@ static void unmap_hyp_range(pgd_t *pgdp, phys_addr_t start, u64 size)
- }
- 
- /**
-- * free_boot_hyp_pgd - free HYP boot page tables
-- *
-- * Free the HYP boot page tables. The bounce page is also freed.
-- */
--void free_boot_hyp_pgd(void)
--{
--	mutex_lock(&kvm_hyp_pgd_mutex);
--
--	if (boot_hyp_pgd) {
--		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
--		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
--		boot_hyp_pgd = NULL;
--	}
--
--	if (hyp_pgd)
--		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
--
--	mutex_unlock(&kvm_hyp_pgd_mutex);
--}
--
--/**
-  * free_hyp_pgds - free Hyp-mode page tables
-  *
-  * Assumes hyp_pgd is a page table used strictly in Hyp-mode and
-@@ -516,11 +495,16 @@ void free_hyp_pgds(void)
- {
- 	unsigned long addr;
- 
--	free_boot_hyp_pgd();
--
- 	mutex_lock(&kvm_hyp_pgd_mutex);
- 
-+	if (boot_hyp_pgd) {
-+		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
-+		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
-+		boot_hyp_pgd = NULL;
-+	}
-+
- 	if (hyp_pgd) {
-+		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
- 		for (addr = PAGE_OFFSET; virt_addr_valid(addr); addr += PGDIR_SIZE)
- 			unmap_hyp_range(hyp_pgd, KERN_TO_HYP(addr), PGDIR_SIZE);
- 		for (addr = VMALLOC_START; is_vmalloc_addr((void*)addr); addr += PGDIR_SIZE)
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 7a23e18..3c4dd4e 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -161,7 +161,6 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
- 
- int create_hyp_mappings(void *from, void *to);
- int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
--void free_boot_hyp_pgd(void);
- void free_hyp_pgds(void);
- 
- void stage2_unmap_vm(struct kvm *kvm);
--- 
-2.1.4
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+> ---
+>  lib/arm/asm/processor.h   | 10 ++++++++++
+>  lib/arm64/asm/processor.h | 10 ++++++++++
+>  2 files changed, 20 insertions(+)
+>
+> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+> index afc903ca7d4ab..75a8d08b89330 100644
+> --- a/lib/arm/asm/processor.h
+> +++ b/lib/arm/asm/processor.h
+> @@ -35,6 +35,16 @@ static inline unsigned long current_cpsr(void)
+>
+>  #define current_mode() (current_cpsr() & MODE_MASK)
+>
+> +static inline void local_irq_enable(void)
+> +{
+> +	asm volatile("cpsie i" : : : "memory", "cc");
+> +}
+> +
+> +static inline void local_irq_disable(void)
+> +{
+> +	asm volatile("cpsid i" : : : "memory", "cc");
+> +}
+> +
+>  static inline unsigned int get_mpidr(void)
+>  {
+>  	unsigned int mpidr;
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 94f7ce35b65c1..d54a4ed1c1876 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -68,6 +68,16 @@ static inline unsigned long current_level(void)
+>  	return el & 0xc;
+>  }
+>
+> +static inline void local_irq_enable(void)
+> +{
+> +	asm volatile("msr daifclr, #2" : : : "memory");
+> +}
+> +
+> +static inline void local_irq_disable(void)
+> +{
+> +	asm volatile("msr daifset, #2" : : : "memory");
+> +}
+> +
+>  #define DEFINE_GET_SYSREG(reg, type)				\
+>  static inline type get_##reg(void)				\
+>  {								\
+
+
+--
+Alex Bennée
