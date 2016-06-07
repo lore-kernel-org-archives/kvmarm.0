@@ -1,194 +1,64 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 04/10] arm/arm64: add some delay
- routines
-Date: Mon, 6 Jun 2016 19:48:30 +0200
-Message-ID: <20160606174830.oxpsi3rh4duj6l7z@hawk.localdomain>
-References: <1465064165-14885-5-git-send-email-drjones@redhat.com>
- <87vb1mgqs9.fsf@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 00/12] KVM: arm64: GICv3 ITS emulation
+Date: Tue, 7 Jun 2016 10:02:37 +0200
+Message-ID: <CAMJs5B8h6wj16AMXVmuUa00TRzBJRq3_xMJfMEH67F1GMFJ2AA@mail.gmail.com>
+References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
+ <DB5PR04MB099754E61027226E5210C2399A590@DB5PR04MB0997.eurprd04.prod.outlook.com>
+ <32b86adb-cdba-89bb-3f19-e7677f39fa1f@arm.com>
+ <DB5PR04MB09977DF578DFB03A582745869A5C0@DB5PR04MB0997.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <87vb1mgqs9.fsf@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com, peter.maydell@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F4132410EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2016 03:58:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 1u7hvvBp2MRS for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Jun 2016 03:58:27 -0400 (EDT)
+Received: from mail-yw0-f179.google.com (mail-yw0-f179.google.com
+ [209.85.161.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42234410B5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2016 03:58:26 -0400 (EDT)
+Received: by mail-yw0-f179.google.com with SMTP id o16so162808435ywd.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Jun 2016 01:02:38 -0700 (PDT)
+In-Reply-To: <DB5PR04MB09977DF578DFB03A582745869A5C0@DB5PR04MB0997.eurprd04.prod.outlook.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Bharat Bhushan <bharat.bhushan@nxp.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Diana Madalina Craciun <diana.craciun@nxp.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jun 06, 2016 at 06:39:50PM +0100, Alex Benn=E9e wrote:
->=20
-> Andrew Jones <drjones@redhat.com> writes:
->=20
-> > Allow a thread to wait some specified amount of time. Can
-> > specify in cycles, usecs, and msecs.
->=20
-> I wonder if delay() and mdelay() can be in common code with just the
-> freq and count getting functions in specific code? I guess that would
-> need a lib/arm-generic/ or some such?
+Hi Bharat,
 
-I'll think about that.
 
->=20
-> Otherwise:
->=20
-> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+
+On Mon, Jun 6, 2016 at 7:29 AM, Bharat Bhushan <bharat.bhushan@nxp.com> wrote:
+> Hi Andre,
+>
+> On clarification, are V5 version of patches are based on new-GIC emulation patches? How are you testing these patches, kvm-tool?
+>
+> Hi Christoffer/Peter,
+>
+> Is someone working on QEMU side patches? We need this feature a bit urgently so if no one is working then we can start working on this.
+>
+Eric Auger (now with Red Hat) was planning to pick up Pavel's series
+and do a respin:
+
+https://lists.gnu.org/archive/html/qemu-devel/2015-11/msg05197.html
+
+If you are ready to commit resources to this *immediately* and if Eric
+agrees then it would be good for you to pick up this series, but
+should you choose to do so please make sure you can actually commit
+resources to the work and to keep up with revisions this time around.
 
 Thanks,
-drew
-
->=20
-> >
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  lib/arm/asm/processor.h   | 19 +++++++++++++++++++
-> >  lib/arm/processor.c       | 15 +++++++++++++++
-> >  lib/arm64/asm/processor.h | 19 +++++++++++++++++++
-> >  lib/arm64/processor.c     | 15 +++++++++++++++
-> >  4 files changed, 68 insertions(+)
-> >
-> > diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-> > index d2048f5f5f7e6..afc903ca7d4ab 100644
-> > --- a/lib/arm/asm/processor.h
-> > +++ b/lib/arm/asm/processor.h
-> > @@ -5,7 +5,9 @@
-> >   *
-> >   * This work is licensed under the terms of the GNU LGPL, version =
-2.
-> >   */
-> > +#include <libcflat.h>
-> >  #include <asm/ptrace.h>
-> > +#include <asm/barrier.h>
-> >
-> >  enum vector {
-> >  	EXCPTN_RST,
-> > @@ -51,4 +53,21 @@ extern int mpidr_to_cpu(unsigned long mpidr);
-> >  extern void start_usr(void (*func)(void *arg), void *arg, unsigned=
- long sp_usr);
-> >  extern bool is_user(void);
-> >
-> > +static inline u64 get_cntvct(void)
-> > +{
-> > +	u64 vct;
-> > +	isb();
-> > +	asm volatile("mrrc p15, 1, %Q0, %R0, c14" : "=3Dr" (vct));
-> > +	return vct;
-> > +}
-> > +
-> > +extern void delay(u64 cycles);
-> > +extern void udelay(unsigned long usecs);
-> > +
-> > +static inline void mdelay(unsigned long msecs)
-> > +{
-> > +	while (msecs--)
-> > +		udelay(1000);
-> > +}
-> > +
-> >  #endif /* _ASMARM_PROCESSOR_H_ */
-> > diff --git a/lib/arm/processor.c b/lib/arm/processor.c
-> > index 54fdb87ef0196..c2ee360df6884 100644
-> > --- a/lib/arm/processor.c
-> > +++ b/lib/arm/processor.c
-> > @@ -9,6 +9,7 @@
-> >  #include <asm/ptrace.h>
-> >  #include <asm/processor.h>
-> >  #include <asm/thread_info.h>
-> > +#include <asm/barrier.h>
-> >
-> >  static const char *processor_modes[] =3D {
-> >  	"USER_26", "FIQ_26" , "IRQ_26" , "SVC_26" ,
-> > @@ -141,3 +142,17 @@ bool is_user(void)
-> >  {
-> >  	return current_thread_info()->flags & TIF_USER_MODE;
-> >  }
-> > +
-> > +void delay(u64 cycles)
-> > +{
-> > +	u64 start =3D get_cntvct();
-> > +	while ((get_cntvct() - start) < cycles)
-> > +		cpu_relax();
-> > +}
-> > +
-> > +void udelay(unsigned long usec)
-> > +{
-> > +	unsigned int frq;
-> > +	asm volatile("mrc p15, 0, %0, c14, c0, 0" : "=3Dr" (frq));
-> > +	delay((u64)usec * frq / 1000000);
-> > +}
-> > diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> > index 7e448dc81a6aa..94f7ce35b65c1 100644
-> > --- a/lib/arm64/asm/processor.h
-> > +++ b/lib/arm64/asm/processor.h
-> > @@ -17,8 +17,10 @@
-> >  #define SCTLR_EL1_M	(1 << 0)
-> >
-> >  #ifndef __ASSEMBLY__
-> > +#include <libcflat.h>
-> >  #include <asm/ptrace.h>
-> >  #include <asm/esr.h>
-> > +#include <asm/barrier.h>
-> >
-> >  enum vector {
-> >  	EL1T_SYNC,
-> > @@ -89,5 +91,22 @@ extern int mpidr_to_cpu(unsigned long mpidr);
-> >  extern void start_usr(void (*func)(void *arg), void *arg, unsigned=
- long sp_usr);
-> >  extern bool is_user(void);
-> >
-> > +static inline u64 get_cntvct(void)
-> > +{
-> > +	u64 vct;
-> > +	isb();
-> > +	asm volatile("mrs %0, cntvct_el0" : "=3Dr" (vct));
-> > +	return vct;
-> > +}
-> > +
-> > +extern void delay(u64 cycles);
-> > +extern void udelay(unsigned long usecs);
-> > +
-> > +static inline void mdelay(unsigned long msecs)
-> > +{
-> > +	while (msecs--)
-> > +		udelay(1000);
-> > +}
-> > +
-> >  #endif /* !__ASSEMBLY__ */
-> >  #endif /* _ASMARM64_PROCESSOR_H_ */
-> > diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-> > index deeab4ec9c8ac..50fa835c6f1e3 100644
-> > --- a/lib/arm64/processor.c
-> > +++ b/lib/arm64/processor.c
-> > @@ -9,6 +9,7 @@
-> >  #include <asm/ptrace.h>
-> >  #include <asm/processor.h>
-> >  #include <asm/thread_info.h>
-> > +#include <asm/barrier.h>
-> >
-> >  static const char *vector_names[] =3D {
-> >  	"el1t_sync",
-> > @@ -253,3 +254,17 @@ bool is_user(void)
-> >  {
-> >  	return current_thread_info()->flags & TIF_USER_MODE;
-> >  }
-> > +
-> > +void delay(u64 cycles)
-> > +{
-> > +	u64 start =3D get_cntvct();
-> > +	while ((get_cntvct() - start) < cycles)
-> > +		cpu_relax();
-> > +}
-> > +
-> > +void udelay(unsigned long usec)
-> > +{
-> > +	unsigned int frq;
-> > +	asm volatile("mrs %0, cntfrq_el0" : "=3Dr" (frq));
-> > +	delay((u64)usec * frq / 1000000);
-> > +}
->=20
->=20
-> --
-> Alex Benn=E9e
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-Christoffer
