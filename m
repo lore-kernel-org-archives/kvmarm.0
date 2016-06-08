@@ -1,307 +1,78 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v5 10/13] KVM: arm64: sync LPI configuration and pending
- tables
-Date: Wed, 8 Jun 2016 16:31:25 +0100
-Message-ID: <57583A4D.2040501@arm.com>
-References: <1464962572-3925-1-git-send-email-andre.przywara@arm.com>
- <1464962572-3925-11-git-send-email-andre.przywara@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH] KVM: arm/arm64: Stop leaking vcpu pid references
+Date: Wed,  8 Jun 2016 17:24:45 +0100
+Message-ID: <1465403085-2358-1-git-send-email-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1464962572-3925-11-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DF8749D6F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2016 12:22:40 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Nsdw2SI4NFuD for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jun 2016 12:22:39 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5453349D6A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2016 12:22:39 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/06/16 15:02, Andre Przywara wrote:
-> The LPI configuration and pending tables of the GICv3 LPIs are held
-> in tables in (guest) memory. To achieve reasonable performance, we
-> cache this data in our own data structures, so we need to sync those
-> two views from time to time. This behaviour is well described in the
-> GICv3 spec and is also exercised by hardware, so the sync points are
-> well known.
+kvm provides kvm_vcpu_uninit(), which amongst other things, releases the
+last reference to the struct pid of the task that was last running the vcpu.
 
-Care to describe them?
+On arm64 built with CONFIG_DEBUG_KMEMLEAK, starting a guest with kvmtool,
+then killing it with SIGKILL results (after some considerable time) in:
+> cat /sys/kernel/debug/kmemleak
+> unreferenced object 0xffff80007d5ea080 (size 128):
+>  comm "lkvm", pid 2025, jiffies 4294942645 (age 1107.776s)
+>  hex dump (first 32 bytes):
+>    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>  backtrace:
+>    [<ffff8000001b30ec>] create_object+0xfc/0x278
+>    [<ffff80000071da34>] kmemleak_alloc+0x34/0x70
+>    [<ffff80000019fa2c>] kmem_cache_alloc+0x16c/0x1d8
+>    [<ffff8000000d0474>] alloc_pid+0x34/0x4d0
+>    [<ffff8000000b5674>] copy_process.isra.6+0x79c/0x1338
+>    [<ffff8000000b633c>] _do_fork+0x74/0x320
+>    [<ffff8000000b66b0>] SyS_clone+0x18/0x20
+>    [<ffff800000085cb0>] el0_svc_naked+0x24/0x28
+>    [<ffffffffffffffff>] 0xffffffffffffffff
 
-> 
-> Provide functions that read the guest memory and store the
-> information from the configuration and pending tables in the kernel.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/vgic/vgic.h      |   2 +
->  virt/kvm/arm/vgic/vgic-its.c | 145 +++++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.h     |   6 ++
->  3 files changed, 153 insertions(+)
-> 
-> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-> index 77f4503..dec63f0 100644
-> --- a/include/kvm/vgic/vgic.h
-> +++ b/include/kvm/vgic/vgic.h
-> @@ -131,6 +131,8 @@ struct vgic_its {
->  	u32			cwriter;
->  	struct list_head	device_list;
->  	struct list_head	collection_list;
-> +	/* memory used for buffering guest's memory */
-> +	void			*buffer_page;
->  };
->  
->  struct vgic_dist {
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 4f248ef..84e6f3b 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -93,6 +93,128 @@ static struct its_itte *find_itte_by_lpi(struct vgic_its *its, int lpi)
->  
->  #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
->  
-> +#define LPI_PROP_ENABLE_BIT(p)	((p) & LPI_PROP_ENABLED)
-> +#define LPI_PROP_PRIORITY(p)	((p) & 0xfc)
-> +
-> +/* stores the priority and enable bit for a given LPI */
-> +static void update_lpi_config(struct kvm *kvm, struct its_itte *itte, u8 prop)
-> +{
-> +	spin_lock(&itte->irq.irq_lock);
-> +	itte->irq.priority = LPI_PROP_PRIORITY(prop);
-> +	itte->irq.enabled = LPI_PROP_ENABLE_BIT(prop);
-> +
-> +	vgic_queue_irq_unlock(kvm, &itte->irq);
-> +}
-> +
-> +#define GIC_LPI_OFFSET 8192
-> +
-> +/* We scan the table in chunks the size of the smallest page size */
-> +#define CHUNK_SIZE 4096U
+On x86 kvm_vcpu_uninit() is called on the path from kvm_arch_destroy_vm(),
+on arm no equivalent call is made. Add the call to kvm_arch_vcpu_free().
 
-SZ_4K. And why 4K?
+Signed-off-by: James Morse <james.morse@arm.com>
+Fixes: 749cf76c5a36 ("KVM: ARM: Initial skeleton to compile KVM support")
+Cc: <stable@vger.kernel.org> # 3.10+
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/kvm/arm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> +
-> +static u32 max_lpis_propbaser(u64 propbaser)
-> +{
-> +	int nr_idbits = (propbaser & 0x1f) + 1;
-> +
-> +	return 1U << min(nr_idbits, INTERRUPT_ID_BITS_ITS);
-> +}
-> +
-> +/*
-> + * Scan the whole LPI configuration table and put the LPI configuration
-> + * data in our own data structures. This relies on the LPI being
-> + * mapped before.
-> + */
-> +static bool its_update_lpis_configuration(struct kvm *kvm, struct vgic_its *its,
-> +					  u64 prop_base_reg)
-
-Why do you have to pass prop_base_reg here? You already have struct kvm
-that provides it. Also, the fact that you pass an ITS here shows how
-wrong the current design is (LPIs are at the redistributor level, and
-completely independent of the ITS implementation).
-
-> +{
-> +	u8 *prop = its->buffer_page;
-> +	u32 tsize;
-> +	gpa_t propbase;
-> +	int lpi = GIC_LPI_OFFSET;
-> +	struct its_itte *itte;
-> +	struct its_device *device;
-> +	int ret;
-> +
-> +	propbase = BASER_BASE_ADDRESS(prop_base_reg);
-
-So you're extracting bits [47:12] and use that as an address. No matter
-how you look at it, this is wrong. You either use [39:12] (because
-that's what KVM implements so far as the IPA range), or you use the
-architecturally defined range [51:12]. I strongly suggest you use the
-latter (and use a specific macro for that if you really have to use one).
-
-> +	tsize = max_lpis_propbaser(prop_base_reg);
-> +
-> +	while (tsize > 0) {
-> +		int chunksize = min(tsize, CHUNK_SIZE);
-> +
-> +		ret = kvm_read_guest(kvm, propbase, prop, chunksize);
-> +		if (ret)
-> +			return false;
-> +
-> +		spin_lock(&its->lock);
-> +		/*
-> +		 * Updating the status for all allocated LPIs. We catch
-> +		 * those LPIs that get disabled. We really don't care
-> +		 * about unmapped LPIs, as they need to be updated
-> +		 * later manually anyway once they get mapped.
-> +		 */
-
-So why do you have to read the whole of the property table? Just iterate
-over the existing mappings (the LPIs that are allocated in the system)
-and read the single byte that actually matters (instead of reading
-several kb of useless data).
-
-> +		for_each_lpi(device, itte, its) {
-> +			if (itte->lpi < lpi || itte->lpi >= lpi + chunksize)
-> +				continue;
-> +
-> +			update_lpi_config(kvm, itte, prop[itte->lpi - lpi]);
-> +		}
-> +		spin_unlock(&its->lock);
-> +		tsize -= chunksize;
-> +		lpi += chunksize;
-> +		propbase += chunksize;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +/*
-> + * Scan the whole LPI pending table and sync the pending bit in there
-> + * with our own data structures. This relies on the LPI being
-> + * mapped before.
-> + */
-> +static bool its_sync_lpi_pending_table(struct kvm_vcpu *vcpu,
-> +				       struct vgic_its *its, u64 base_addr_reg)
-
-Same thing about the pending table address.
-
-> +{
-> +	unsigned long *pendmask = its->buffer_page;
-> +	u32 nr_lpis = 1U << INTERRUPT_ID_BITS_ITS;
-> +	gpa_t pendbase;
-> +	int lpi = 0;
-> +	struct its_itte *itte;
-> +	struct its_device *device;
-> +	int ret;
-> +	int lpi_bit, nr_bits;
-> +
-> +	pendbase = BASER_BASE_ADDRESS(base_addr_reg);
-
-And now you're getting 4 bits of junk that the guest may have written.
-Great!
-
-> +
-> +	while (nr_lpis > 0) {
-> +		nr_bits = min(nr_lpis, CHUNK_SIZE * BITS_PER_BYTE);
-> +
-> +		ret = kvm_read_guest(vcpu->kvm, pendbase, pendmask,
-> +				     nr_bits / BITS_PER_BYTE);
-> +		if (ret)
-> +			return false;
-> +
-> +		spin_lock(&its->lock);
-> +		for_each_lpi(device, itte, its) {
-> +			lpi_bit = itte->lpi - lpi;
-> +			if (lpi_bit < 0 || lpi_bit >= nr_bits)
-> +				continue;
-> +
-> +			if (!test_bit(lpi_bit, pendmask))
-> +				continue;
-> +
-> +			spin_lock(&itte->irq.irq_lock);
-> +			itte->irq.pending = true;
-> +			vgic_queue_irq_unlock(vcpu->kvm, &itte->irq);
-
-Same comment about reading way too much data. You have the list of LPIs,
-use that to find out the right *bit* that actually matters. You'll need
-that functionality when being issued a MAPI/MAPVI anyway.
-
-> +		}
-> +		spin_unlock(&its->lock);
-> +		nr_lpis -= nr_bits;
-> +		lpi += nr_bits;
-> +		pendbase += nr_bits / BITS_PER_BYTE;
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  #define ITS_FRAME(addr) ((addr) & ~(SZ_64K - 1))
->  
->  static unsigned long vgic_mmio_read_its_ctlr(struct kvm_vcpu *vcpu,
-> @@ -355,6 +477,21 @@ struct vgic_register_region its_registers[] = {
->  		VGIC_ACCESS_32bit),
->  };
->  
-> +/* This is called on setting the LPI enable bit in the redistributor. */
-> +void vgic_enable_lpis(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 prop_base_reg, pend_base_reg;
-> +	struct vgic_its *its;
-> +
-> +	pend_base_reg = vcpu->arch.vgic_cpu.pendbaser;
-> +	prop_base_reg = vcpu->kvm->arch.vgic.propbaser;
-> +
-> +	list_for_each_entry(its, &vcpu->kvm->arch.vits_list, its_list) {
-> +		its_update_lpis_configuration(vcpu->kvm, its, prop_base_reg);
-> +		its_sync_lpi_pending_table(vcpu, its, pend_base_reg);
-> +	}
-> +}
-> +
->  int vits_init(struct kvm *kvm, struct vgic_its *its)
->  {
->  	struct vgic_io_device *iodev = &its->iodev;
-> @@ -381,6 +518,8 @@ void vits_destroy(struct kvm *kvm, struct vgic_its *its)
->  	struct list_head *dev_cur, *dev_temp;
->  	struct list_head *cur, *temp;
->  
-> +	kfree(its->buffer_page);
-> +
->  	/*
->  	 * We may end up here without the lists ever having been initialized.
->  	 * Check this and bail out early to avoid dereferencing a NULL pointer.
-> @@ -419,6 +558,12 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
->  	if (!its)
->  		return -ENOMEM;
->  
-> +	its->buffer_page = kmalloc(CHUNK_SIZE, GFP_KERNEL);
-
-kzalloc.
-
-> +	if (!its->buffer_page) {
-> +		kfree(its);
-> +		return -ENOMEM;
-> +	}
-> +
->  	spin_lock_init(&its->lock);
->  
->  	its->vgic_its_base = VGIC_ADDR_UNDEF;
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 6fecd70..46c239f 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -25,6 +25,7 @@
->  #define IS_VGIC_ADDR_UNDEF(_x)  ((_x) == VGIC_ADDR_UNDEF)
->  
->  #define INTERRUPT_ID_BITS_SPIS	10
-> +#define INTERRUPT_ID_BITS_ITS	16
-
-What provision do we have to make this configurable? I'd rather tackle
-this now than having to rev it later.
-
->  #define VGIC_PRI_BITS		5
->  
->  #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
-> @@ -79,6 +80,7 @@ int vits_init(struct kvm *kvm, struct vgic_its *its);
->  void vits_destroy(struct kvm *kvm, struct vgic_its *its);
->  int kvm_vgic_register_its_device(void);
->  struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid);
-> +void vgic_enable_lpis(struct kvm_vcpu *vcpu);
->  #else
->  static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
->  {
-> @@ -154,6 +156,10 @@ static inline struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid)
->  {
->  	return NULL;
->  }
-> +
-> +static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
-> +{
-> +}
->  #endif
->  
->  int kvm_register_vgic_device(unsigned long type);
-> 
-
-Thanks,
-
-	M.
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 893941ec98dc..f1bde7c4e736 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -263,6 +263,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
+ 	kvm_timer_vcpu_terminate(vcpu);
+ 	kvm_vgic_vcpu_destroy(vcpu);
+ 	kvm_pmu_vcpu_destroy(vcpu);
++	kvm_vcpu_uninit(vcpu);
+ 	kmem_cache_free(kvm_vcpu_cache, vcpu);
+ }
+ 
 -- 
-Jazz is not dead. It just smells funny...
+2.8.0.rc3
