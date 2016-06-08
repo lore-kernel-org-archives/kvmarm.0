@@ -1,205 +1,58 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v5 12/13] KVM: arm64: implement MSI injection in ITS
- emulation
-Date: Wed, 8 Jun 2016 17:46:47 +0100
-Message-ID: <57584BF7.8090204@arm.com>
+Subject: Re: [PATCH v5 00/13] KVM: arm64: GICv3 ITS emulation
+Date: Wed, 8 Jun 2016 18:03:43 +0100
+Message-ID: <57584FEF.7040005@arm.com>
 References: <1464962572-3925-1-git-send-email-andre.przywara@arm.com>
- <1464962572-3925-13-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1464962572-3925-13-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1464962572-3925-1-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Andre,
+
 On 03/06/16 15:02, Andre Przywara wrote:
-> When userland wants to inject a MSI into the guest, we have to use
-> our data structures to find the LPI number and the VCPU to receive
-> the interrupt.
-> Use the wrapper functions to iterate the linked lists and find the
-> proper Interrupt Translation Table Entry. Then set the pending bit
-> in this ITTE to be later picked up by the LR handling code. Kick
-> the VCPU which is meant to handle this interrupt.
-> We provide a VGIC emulation model specific routine for the actual
-> MSI injection. The wrapper functions return an error for models not
-> (yet) implementing MSIs (like the GICv2 emulation).
-> We also provide the handler for the ITS "INT" command, which allows a
-> guest to trigger an MSI via the ITS command queue.
+> Hi,
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 85 ++++++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.h     |  6 ++++
->  2 files changed, 91 insertions(+)
+> please welcome a reworked version of the ITS emulation support.
+> It allows those KVM guests that use an emulated GICv3 to use LPIs as well,
+> though in the moment this is limited to emulated PCI devices.
+> This is based on v4.7-rc1 and only works with the new VGIC implementation.
+> There have been some modifications due to changes in the underlying
+> VGIC code (changed MMIO handlers, etc.).
+> Some other changes relate to the fact that any redistributor related
+> variables are now held in the vgic_cpu structure, so they are naturally
+> per VCPU.
+> Also this series supports multiple ITSes and makes them independent from
+> the distributor. There is a new KVM device, which can be created multiple
+> times.
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 72145c1..c257b08 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -46,6 +46,16 @@ static struct vgic_its *find_its(struct kvm *kvm, gpa_t base_address)
->  	return NULL;
->  }
->  
-> +#define ITS_DOORBELL_OFFSET (SZ_64K + 0x40)
-> +static struct vgic_its *find_its_doorbell(struct kvm *kvm, gpa_t doorbell)
-> +{
-> +	/*
-> +	 * The actual doorbell address is in the second page of the ITS
-> +	 * frame, at offset 0x40.
-> +	 */
-> +	return find_its(kvm, doorbell - ITS_DOORBELL_OFFSET);
+> You can find all of this code (and the prerequisites) in the
+> its-emul/v5 branch of my repository [1].
+> This has been briefly tested on the model and on GICv3 hardware.
+> Since there are quite some fundamental changes in this version, I expect
+> some issues in the code, so if you have GICv3 capable hardware, please
+> test it on your setup.
+> Also of course any review comments are very welcome!
 
-Hold on. This is an MMIO write (coming from a device, but hey). Why
-can't you generate that write directly? And why can't we get the ITS
-address directly from the region that we hit? We cache the target vcpu
-for redistributors. We could perfectly cache the ITS there instead of
-setting it to NULL (creative use of a union will get you a long way).
+I've stopped reviewing after patch 12, as there is way too many design
+issues. What I really want to see in the next drop:
 
-> +}
-> +
->  struct its_device {
->  	struct list_head dev_list;
->  
-> @@ -363,6 +373,61 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +/*
-> + * Translates an incoming MSI request into the redistributor (=VCPU) and
-> + * the associated LPI number. Sets the LPI pending bit and also marks the
-> + * VCPU as having a pending interrupt.
-> + */
-> +int vits_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-> +{
-> +	struct vgic_its *its;
-> +	struct its_itte *itte;
-> +	struct kvm_vcpu *vcpu;
-> +	bool inject = false;
-> +	u64 doorbell;
-> +	int ret = 0;
-> +
-> +	if (!vgic_has_its(kvm))
-> +		return -ENODEV;
-> +
-> +	if (!(msi->flags & KVM_MSI_VALID_DEVID))
-> +		return -EINVAL;
-> +
-> +	doorbell = (u64)msi->address_hi << 32 | msi->address_lo;
-> +	its = find_its_doorbell(kvm, doorbell);
-> +	if (!its)
-> +		return -EINVAL;
-> +
-> +	spin_lock(&its->lock);
-> +
-> +	if (!its->enabled) {
-> +		ret = -EAGAIN;
+1) Locking. The current implementation is too complicated, has holes,
+and this leads to interesting bugs.
+2) Split between vgic_irq and ITEs. They are not the same, and your
+design explodes in the face of multiple ITSs.
+3) Handling of collections is extremely creative, and doesn't remotely
+match my reading of the architecture.
 
-Why -EAGAIN? Is retrying going to help? What would happen on the actual HW?
+There is also all kind of buglets all over the shop, which can be
+swiftly addressed, but the above three points are real blockers for me.
 
-> +		goto out_unlock;
-> +	}
-> +
-> +	itte = find_itte(its, msi->devid, msi->data);
-> +	/* Triggering an unmapped IRQ gets silently dropped. */
-> +	if (!itte || !its_is_collection_mapped(itte->collection))
-> +		goto out_unlock;
-> +
-> +	vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
-> +	if (!vcpu || !vcpu->arch.vgic_cpu.lpis_enabled)
-> +		goto out_unlock;
-> +
-> +	inject = true;
-> +
-> +out_unlock:
-> +	spin_unlock(&its->lock);
-
-So you release the ITS lock here....
-
-> +
-> +	if (inject) {
-> +		spin_lock(&itte->irq.irq_lock);
-
-and take the IRQ lock here.
-
-In the meantime, the guest has injected a DISCARD, which has freed the
-itte structure. Bingo. I've been saying that the locking is silly, and
-I'll say it again.
-
-> +		itte->irq.pending = true;
-> +		vgic_queue_irq_unlock(kvm, &itte->irq);
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->  struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid)
->  {
->  	struct vgic_its *its;
-> @@ -791,6 +856,23 @@ static int vits_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
->  	return 0;
->  }
->  
-> +/* The INT command injects the LPI associated with that DevID/EvID pair. */
-> +static int vits_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
-> +			       u64 *its_cmd)
-> +{
-> +	u64 doorbell = its->vgic_its_base + ITS_DOORBELL_OFFSET;
-> +	struct kvm_msi msi = {
-> +		.address_lo = doorbell & 0xffffffff,
-> +		.address_hi = doorbell >> 32,
-> +		.data = its_cmd_get_id(its_cmd),
-> +		.devid = its_cmd_get_deviceid(its_cmd),
-> +		.flags = KVM_MSI_VALID_DEVID,
-> +	};
-
-Really???
-
-> +
-> +	vits_inject_msi(kvm, &msi);
-> +	return 0;
-> +}
-> +
->  /*
->   * This function expects the ITS lock to be dropped, so the actual command
->   * handlers must take care of proper locking when needed.
-> @@ -826,6 +908,9 @@ static int vits_handle_command(struct kvm *kvm, struct vgic_its *its,
->  	case GITS_CMD_MOVALL:
->  		ret = vits_cmd_handle_movall(kvm, its, its_cmd);
->  		break;
-> +	case GITS_CMD_INT:
-> +		ret = vits_cmd_handle_int(kvm, its, its_cmd);
-> +		break;
->  	case GITS_CMD_INV:
->  		ret = vits_cmd_handle_inv(kvm, its, its_cmd);
->  		break;
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 46c239f..5949d69 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -81,6 +81,7 @@ void vits_destroy(struct kvm *kvm, struct vgic_its *its);
->  int kvm_vgic_register_its_device(void);
->  struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid);
->  void vgic_enable_lpis(struct kvm_vcpu *vcpu);
-> +int vits_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
->  #else
->  static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
->  {
-> @@ -160,6 +161,11 @@ static inline struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid)
->  static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
->  {
->  }
-> +
-> +static inline int vits_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-> +{
-> +	return -ENODEV;
-> +}
->  #endif
->  
->  int kvm_register_vgic_device(unsigned long type);
-> 
+Thanks,
 
 	M.
 -- 
