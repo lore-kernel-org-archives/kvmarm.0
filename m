@@ -1,48 +1,79 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 2/5] arm64: Add PTE_HYP_XN page table flag
-Date: Mon, 13 Jun 2016 15:00:46 +0100
-Message-ID: <1465826449-14349-3-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 4/5] arm/arm64: KVM: Map the HYP text as read-only
+Date: Mon, 13 Jun 2016 15:00:48 +0100
+Message-ID: <1465826449-14349-5-git-send-email-marc.zyngier@arm.com>
 References: <1465826449-14349-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1465826449-14349-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>
-Cc: Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-EL2 page tables can be configured to deny code from being
-executed, which is done by setting bit 54 in the page descriptor.
+There should be no reason for mapping the HYP text read/write.
 
-It is the same bit as PTE_UXN, but the "USER" reference felt odd
-in the hypervisor code.
+As such, let's have a new set of flags (PAGE_HYP_EXEC) that allows
+execution, but makes the page as read-only, and update the two call
+sites that deal with mapping code.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/pgtable-hwdef.h | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm/include/asm/pgtable.h        | 1 +
+ arch/arm/kvm/arm.c                    | 2 +-
+ arch/arm/kvm/mmu.c                    | 2 +-
+ arch/arm64/include/asm/pgtable-prot.h | 1 +
+ 4 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index 2813748..c3ae239 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -164,6 +164,7 @@
- #define PTE_CONT		(_AT(pteval_t, 1) << 52)	/* Contiguous range */
- #define PTE_PXN			(_AT(pteval_t, 1) << 53)	/* Privileged XN */
- #define PTE_UXN			(_AT(pteval_t, 1) << 54)	/* User XN */
-+#define PTE_HYP_XN		(_AT(pteval_t, 1) << 54)	/* HYP XN */
+diff --git a/arch/arm/include/asm/pgtable.h b/arch/arm/include/asm/pgtable.h
+index f332087..7487bf9 100644
+--- a/arch/arm/include/asm/pgtable.h
++++ b/arch/arm/include/asm/pgtable.h
+@@ -98,6 +98,7 @@ extern pgprot_t		pgprot_s2_device;
+ #define PAGE_KERNEL		_MOD_PROT(pgprot_kernel, L_PTE_XN)
+ #define PAGE_KERNEL_EXEC	pgprot_kernel
+ #define PAGE_HYP		_MOD_PROT(pgprot_kernel, L_PTE_HYP)
++#define PAGE_HYP_EXEC		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_RDONLY)
+ #define PAGE_HYP_RO		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_RDONLY | L_PTE_XN)
+ #define PAGE_HYP_DEVICE		_MOD_PROT(pgprot_hyp_device, L_PTE_HYP)
+ #define PAGE_S2			_MOD_PROT(pgprot_s2, L_PTE_S2_RDONLY)
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 0b5099f..d7bf2dd 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1285,7 +1285,7 @@ static int init_hyp_mode(void)
+ 	 * Map the Hyp-code called directly from the host
+ 	 */
+ 	err = create_hyp_mappings(kvm_ksym_ref(__hyp_text_start),
+-				  kvm_ksym_ref(__hyp_text_end), PAGE_HYP);
++				  kvm_ksym_ref(__hyp_text_end), PAGE_HYP_EXEC);
+ 	if (err) {
+ 		kvm_err("Cannot map world-switch code\n");
+ 		goto out_err;
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 6023abd..8a0aa37 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -1687,7 +1687,7 @@ static int kvm_map_idmap_text(pgd_t *pgd)
+ 	err = 	__create_hyp_mappings(pgd,
+ 				      hyp_idmap_start, hyp_idmap_end,
+ 				      __phys_to_pfn(hyp_idmap_start),
+-				      PAGE_HYP);
++				      PAGE_HYP_EXEC);
+ 	if (err)
+ 		kvm_err("Failed to idmap %lx-%lx\n",
+ 			hyp_idmap_start, hyp_idmap_end);
+diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+index 88db58c..3802048 100644
+--- a/arch/arm64/include/asm/pgtable-prot.h
++++ b/arch/arm64/include/asm/pgtable-prot.h
+@@ -56,6 +56,7 @@
+ #define PAGE_KERNEL_EXEC_CONT	__pgprot(_PAGE_DEFAULT | PTE_UXN | PTE_DIRTY | PTE_WRITE | PTE_CONT)
  
- /*
-  * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
+ #define PAGE_HYP		__pgprot(_PAGE_DEFAULT | PTE_HYP)
++#define PAGE_HYP_EXEC		__pgprot(_PAGE_DEFAULT | PTE_HYP | PTE_RDONLY)
+ #define PAGE_HYP_RO		__pgprot(_PAGE_DEFAULT | PTE_HYP | PTE_RDONLY | PTE_HYP_XN)
+ #define PAGE_HYP_DEVICE		__pgprot(PROT_DEVICE_nGnRE | PTE_HYP)
+ 
 -- 
 2.1.4
+
