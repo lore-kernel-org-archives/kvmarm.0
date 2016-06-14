@@ -1,75 +1,61 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 4/5] arm/arm64: KVM: Map the HYP text as read-only
-Date: Mon, 13 Jun 2016 16:30:03 +0100
-Message-ID: <20160613153003.GD29783@leverpostej>
-References: <1465826449-14349-1-git-send-email-marc.zyngier@arm.com>
- <1465826449-14349-5-git-send-email-marc.zyngier@arm.com>
- <20160613150251.GB29783@leverpostej>
- <575ECE49.3070209@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: Status of live migration on ARMv7
+Date: Tue, 14 Jun 2016 20:20:25 +0100
+Message-ID: <20160614202025.226dd45d@arm.com>
+References: <trinity-d5cbcace-be15-4c67-b55c-1a70d1fb7c21-1465735240100@3capp-gmx-bs77>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <575ECE49.3070209@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 37E88499A1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Jun 2016 15:16:01 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6+aEMsQgGL3G for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Jun 2016 15:16:00 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA0FE4998D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Jun 2016 15:15:59 -0400 (EDT)
+In-Reply-To: <trinity-d5cbcace-be15-4c67-b55c-1a70d1fb7c21-1465735240100@3capp-gmx-bs77>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: ib10evp0@gmx.org
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jun 13, 2016 at 04:16:25PM +0100, Marc Zyngier wrote:
-> On 13/06/16 16:02, Mark Rutland wrote:
-> > On Mon, Jun 13, 2016 at 03:00:48PM +0100, Marc Zyngier wrote:
-> >> There should be no reason for mapping the HYP text read/write.
-> >>
-> >> As such, let's have a new set of flags (PAGE_HYP_EXEC) that allows
-> >> execution, but makes the page as read-only, and update the two call
-> >> sites that deal with mapping code.
-> >>
-> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> >> ---
-> >>  arch/arm/include/asm/pgtable.h        | 1 +
-> >>  arch/arm/kvm/arm.c                    | 2 +-
-> >>  arch/arm/kvm/mmu.c                    | 2 +-
-> >>  arch/arm64/include/asm/pgtable-prot.h | 1 +
-> >>  4 files changed, 4 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/arch/arm/include/asm/pgtable.h b/arch/arm/include/asm/pgtable.h
-> >> index f332087..7487bf9 100644
-> >> --- a/arch/arm/include/asm/pgtable.h
-> >> +++ b/arch/arm/include/asm/pgtable.h
-> >> @@ -98,6 +98,7 @@ extern pgprot_t		pgprot_s2_device;
-> >>  #define PAGE_KERNEL		_MOD_PROT(pgprot_kernel, L_PTE_XN)
-> >>  #define PAGE_KERNEL_EXEC	pgprot_kernel
-> >>  #define PAGE_HYP		_MOD_PROT(pgprot_kernel, L_PTE_HYP)
-> >> +#define PAGE_HYP_EXEC		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_RDONLY)
-> >>  #define PAGE_HYP_RO		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_RDONLY | L_PTE_XN)
-> >>  #define PAGE_HYP_DEVICE		_MOD_PROT(pgprot_hyp_device, L_PTE_HYP)
-> >>  #define PAGE_S2			_MOD_PROT(pgprot_s2, L_PTE_S2_RDONLY)
-> >> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> >> index 0b5099f..d7bf2dd 100644
-> >> --- a/arch/arm/kvm/arm.c
-> >> +++ b/arch/arm/kvm/arm.c
-> >> @@ -1285,7 +1285,7 @@ static int init_hyp_mode(void)
-> >>  	 * Map the Hyp-code called directly from the host
-> >>  	 */
-> >>  	err = create_hyp_mappings(kvm_ksym_ref(__hyp_text_start),
-> >> -				  kvm_ksym_ref(__hyp_text_end), PAGE_HYP);
-> >> +				  kvm_ksym_ref(__hyp_text_end), PAGE_HYP_EXEC);
-> > 
-> > As far as I can tell, __hyp_text_{start,end} aren't guaranteed to be
-> > page-aligned. Are we certain that we'll never share a page with
-> > something that we'll subsequently want to map non-executable?
+On Sun, 12 Jun 2016 14:40:40 +0200
+ib10evp0@gmx.org wrote:
+
+> Hi,
 > 
-> The HYP text sits firmly in the middle of the rest of the text, so I'm
-> not too worried. We could force some additional alignment just in case
-> we end-up moving things around, but I don't see it as a problem we can
-> have today.
+> I was wondering what the status of live migration for ARMv7 with
+> Virtualization Extensions is. I saw somebody was able to live migrate
+> on ARM [1] but the repository he linked [2] has not been updated for
+> 2 years. I'd like to know if live migration support for ARM is
+> already in the mainstream kernel or if there are any custom patches
+> required and if so if there is any newer code than [2].
 
-Sure, jsut though I should check.
+Everything that's needed for a typical ARMv7 is already in mainline,
+both for the kernel and qemu. And since the code is almost entirely
+shared with ARMv8, it is probably in the same state. If it not working,
+then it is a bug that should be addressed.
 
-Given that, FWIW, for the series:
+> BTW: The Migration page [3] claims the migration feature is hardware
+> independent but it remains unclear if this expands to CPU
+> architectures and if this applies to live migration or only offline
+> migration. Some clarification in this regard would be nice to have.
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
+We do have support for live migration (migrating the VM whilst it is
+still running, tracking memory that gets dirtied).
 
-Thanks,
-Mark.
+	M.
+-- 
+Jazz is not dead. It just smells funny.
