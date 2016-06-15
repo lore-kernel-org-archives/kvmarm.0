@@ -1,26 +1,21 @@
-From: ib10evp0@gmx.org
-Subject: Re: Status of live migration on ARMv7
-Date: Wed, 15 Jun 2016 09:57:38 +0200
-Message-ID: <trinity-6221473b-321b-46e3-96bb-352ca845b317-1465977458891@3capp-gmx-bs76>
-References: <trinity-d5cbcace-be15-4c67-b55c-1a70d1fb7c21-1465735240100@3capp-gmx-bs77>
- <20160614202025.226dd45d@arm.com>
- <trinity-6f860951-3365-4cc6-986a-3b19853fd387-1465937561349@3capp-gmx-bs24>,
- <20160614220940.171387d5@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH] kvmtool: devices.c: Update parent when inserting into rbtree
+Date: Wed, 15 Jun 2016 11:59:08 +0100
+Message-ID: <1465988348-968-1-git-send-email-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 564BC48529
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jun 2016 03:53:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 459B8412C2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jun 2016 06:56:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ETnE0NtnRQvr for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Jun 2016 03:53:08 -0400 (EDT)
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1907849B2E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jun 2016 03:53:07 -0400 (EDT)
-In-Reply-To: <20160614220940.171387d5@arm.com>
+ with ESMTP id gtw8bGQzKWAP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Jun 2016 06:56:48 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2096A41145
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jun 2016 06:56:47 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,21 +25,34 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc.
+When walking the devices rbtree to insert a node, we must keep track of the
+parent node when we descend. If we skip this step, we always insert new
+nodes with a NULL parent, bypassing __rb_insert()s rebalance code.
 
-> I know it is available because I did review the code. Look for commits
-> 
-> 7276030 KVM: arm/arm64: Enable Dirty Page logging for ARMv8
-> 15a49a4 KVM: arm: page logging 2nd stage fault handling
-> 53c810c KVM: arm: dirty logging write protect support
-> c647355 KVM: arm: Add initial dirty page locking support
-> 
-> as well as the generic infrastructure that precede them.
+Things get worse when we come to walk the tree, as we can't move up a
+level. This isn't a problem in practice, as all devices appear to be
+inserted in-order, so our rbtree is actually a monochrome linked list.
 
-Thanks for your detailed response. It's all clear now.
+Signed-off-by: James Morse <james.morse@arm.com>
+---
+ devices.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Regards
+diff --git a/devices.c b/devices.c
+index b560a59..a7c666a 100644
+--- a/devices.c
++++ b/devices.c
+@@ -45,6 +45,7 @@ int device__register(struct device_header *dev)
+ 		int num = rb_entry(*node, struct device_header, node)->dev_num;
+ 		int result = dev->dev_num - num;
+ 
++		parent = *node;
+ 		if (result < 0)
+ 			node = &((*node)->rb_left);
+ 		else if (result > 0)
+-- 
+2.8.0.rc3
