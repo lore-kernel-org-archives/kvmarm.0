@@ -1,23 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v6 04/15] KVM: arm/arm64: extend arch CAP checks to allow
- per-VM capabilities
-Date: Fri, 17 Jun 2016 13:08:36 +0100
-Message-ID: <1466165327-32060-5-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v6 12/15] KVM: arm64: allow updates of LPI configuration table
+Date: Fri, 17 Jun 2016 13:08:44 +0100
+Message-ID: <1466165327-32060-13-git-send-email-andre.przywara@arm.com>
 References: <1466165327-32060-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 93C4349B8A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2016 08:04:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6A9749B87
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2016 08:04:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jZR2Ap81tmmx for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jun 2016 08:04:08 -0400 (EDT)
+ with ESMTP id cQxDjpAIMUCg for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jun 2016 08:04:17 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1241A49B6F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2016 08:04:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CAB3049BCB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2016 08:04:17 -0400 (EDT)
 In-Reply-To: <1466165327-32060-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,73 +31,74 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM capabilities can be a per-VM property, though ARM/ARM64 currently
-does not pass on the VM pointer to the architecture specific
-capability handlers.
-Add a "struct kvm*" parameter to those function to later allow proper
-per-VM capability reporting.
+The (system-wide) LPI configuration table is held in a table in
+(guest) memory. To achieve reasonable performance, we cache this data
+in our struct vgic_irq. If the guest updates the configuration data
+(which consists of the enable bit and the priority value), it issues
+an INV or INVALL command to allow us to update our information.
+Provide functions that update that information for one LPI or all LPIs
+mapped to a specific collection.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/asm/kvm_host.h   | 2 +-
- arch/arm/kvm/arm.c                | 2 +-
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/reset.c            | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 45 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 96387d4..3c40facd 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -281,7 +281,7 @@ static inline void __cpu_reset_hyp_mode(phys_addr_t boot_pgd_ptr,
- 	 */
- }
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index ba2af85..285cbe6 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -150,6 +150,51 @@ struct its_itte {
+ #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
+ #define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
+ #define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
++#define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
++
++#define GIC_LPI_OFFSET 8192
++
++#define LPI_PROP_ENABLE_BIT(p)	((p) & LPI_PROP_ENABLED)
++#define LPI_PROP_PRIORITY(p)	((p) & 0xfc)
++
++/*
++ * Reads the configuration data for a given LPI from guest memory and
++ * updates the fields in struct vgic_irq.
++ * If filter_vcpu is not NULL, applies only if the IRQ is targeting this
++ * VCPU. Unconditionally applies if filter_vcpu is NULL.
++ */
++static int update_lpi_config_filtered(struct kvm *kvm, struct vgic_irq *irq,
++				      struct kvm_vcpu *filter_vcpu)
++{
++	u64 propbase = PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
++	u8 prop;
++	int ret;
++
++	ret = kvm_read_guest(kvm, propbase + irq->intid - GIC_LPI_OFFSET,
++			     &prop, 1);
++
++	if (ret)
++		return ret;
++
++	spin_lock(&irq->irq_lock);
++
++	if (!filter_vcpu || filter_vcpu == irq->target_vcpu) {
++		irq->priority = LPI_PROP_PRIORITY(prop);
++		irq->enabled = LPI_PROP_ENABLE_BIT(prop);
++
++		vgic_queue_irq_put(kvm, irq);
++	} else {
++		spin_unlock(&irq->irq_lock);
++	}
++
++	return 0;
++}
++
++/* Updates the priority and enable bit for a given LPI. */
++int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq)
++{
++	return update_lpi_config_filtered(kvm, irq, NULL);
++}
  
--static inline int kvm_arch_dev_ioctl_check_extension(long ext)
-+static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	return 0;
- }
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 893941e..a268c85 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -201,7 +201,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = KVM_MAX_VCPUS;
- 		break;
- 	default:
--		r = kvm_arch_dev_ioctl_check_extension(ext);
-+		r = kvm_arch_dev_ioctl_check_extension(kvm, ext);
- 		break;
- 	}
- 	return r;
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 49095fc..ebe8904 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -47,7 +47,7 @@
- 
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
--int kvm_arch_dev_ioctl_check_extension(long ext);
-+int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
- unsigned long kvm_hyp_reset_entry(void);
- void __extended_idmap_trampoline(phys_addr_t boot_pgd, phys_addr_t idmap_start);
- 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index b1ad730..6ec9dfe 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -65,7 +65,7 @@ static bool cpu_has_32bit_el1(void)
-  * We currently assume that the number of HW registers is uniform
-  * across all CPUs (see cpuinfo_sanity_check).
-  */
--int kvm_arch_dev_ioctl_check_extension(long ext)
-+int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	int r;
- 
+ /*
+  * Scan the whole LPI pending table and sync the pending bit in there
 -- 
 2.8.2
