@@ -1,24 +1,32 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: Increase GICV size to 64KB so !4KB page-size kernels are able to
- initialize KVM
-Date: Wed, 22 Jun 2016 11:06:06 +0100
-Message-ID: <576A630E.10800@arm.com>
-References: <8b9c3e26-97b1-307f-8227-5ca3a4966c84@riken.jp>
+From: Ralph Palutke <ralph.palutke@fau.de>
+Subject: Android guest on KVM/ARM
+Date: Wed, 22 Jun 2016 12:06:06 +0200
+Message-ID: <20160622100606.GA6749@faubox.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============1241204105768835274=="
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 77BB549B30
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2016 06:01:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AFC749B4A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2016 06:01:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1Knt3+QcP+az for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jun 2016 06:01:16 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EDAF411E3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2016 06:01:15 -0400 (EDT)
-In-Reply-To: <8b9c3e26-97b1-307f-8227-5ca3a4966c84@riken.jp>
+ with ESMTP id n0HSkB907fEM for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jun 2016 06:01:45 -0400 (EDT)
+Received: from mx-rz-2.rrze.uni-erlangen.de (mx-rz-2.rrze.uni-erlangen.de
+ [131.188.11.21])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC8B1411E3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2016 06:01:43 -0400 (EDT)
+Received: from mx-rz-2.rrze.uni-erlangen.de (mx-rz-2.rrze.uni-erlangen.de
+ [IPv6:2001:638:a000:1025::15])
+ by mx-rz-2.rrze.uni-erlangen.de (Postfix) with ESMTP id 3rZKxm1M0zzPnqg
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2016 12:06:36 +0200 (CEST)
+Received: from faubox.localdomain (faui1-88.informatik.uni-erlangen.de
+ [131.188.31.88])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ (Authenticated sender: U2FsdGVkX192tdhroMWWb8yGSqgjBZlIH+CbYuZa4H8=)
+ by smtp-auth.uni-erlangen.de (Postfix) with ESMTPSA id 3rZKxg4FxlzPmvP
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2016 12:06:31 +0200 (CEST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,53 +36,145 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Itaru Kitayama <itaru.kitayama@riken.jp>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 22/06/16 07:48, Itaru Kitayama wrote:
-> Against the tag v4.7-rc2 in the kvmtree.
-> 
-> ---
->   drivers/irqchip/irq-gic.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-> index fbc4ae2..bd463a3 100644
-> --- a/drivers/irqchip/irq-gic.c
-> +++ b/drivers/irqchip/irq-gic.c
-> @@ -1425,7 +1425,7 @@ static bool __init gic_validate_dist(struct 
-> acpi_subtable_header *header,
->   #define ACPI_GICV2_DIST_MEM_SIZE       (SZ_4K)
->   #define ACPI_GIC_CPU_IF_MEM_SIZE       (SZ_8K)
->   #define ACPI_GICV2_VCTRL_MEM_SIZE      (SZ_4K)
-> -#define ACPI_GICV2_VCPU_MEM_SIZE       (SZ_8K)
-> +#define ACPI_GICV2_VCPU_MEM_SIZE       (SZ_64K)
-> 
->   static void __init gic_acpi_setup_kvm_info(void)
->   {
-> 
 
-I'm afraid this is the wrong approach. No matter how you look at it, the
-size of the GICV region is 8kB, and not 64kB. On some systems the GICV
-region is *aliased* over 128kB (first 4kB aliased over the first 64kB
-page, second 4kB aliased over the second 64kB page). The usable range
-for the GICV region is then the f000-10fff region in order to preserve
-the contiguity of the two 4kB blocks.
+--===============1241204105768835274==
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
+	micalg=sha-256; boundary="0F1p//8PRICkK4MW"
+Content-Disposition: inline
 
-In that case, ACPI ought to provide the base address of the usable
-range, not some dummy address. It would be different if the ACPI tables
-would provide the size of the region (where we could make an educated
-guess at what is happening, just like with DT), but the information is
-simply not available. So my advise here is to fix your ACPI tables (or
-get them fixed).
 
-What is actually missing in KVM is a way to describe the offset within a
-page at which the GICV region must be mapped. I have patches for that
-that I may revive if there is some interest.
+--0F1p//8PRICkK4MW
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-Thanks,
+Hello everyone,
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+I try to virtualize an Android system via KVM/ARM. Currently I've
+installed Linaro Debian 16.03 RBP on a Lemaker Hikey board. Now, is
+there any Android build that would suite my needs? Since the usual way
+to install Android on a board is via fastboot, I'm not sure how to
+install it as a KVM/ARM guest. Because I run it on an ARM board, I would
+have assumed I could run an unmodified Android guest.
+Any suggestions how to proceed?
+
+Regards,
+RP
+
+--
+
+--0F1p//8PRICkK4MW
+Content-Type: application/x-pkcs7-signature
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIITkQYJKoZIhvcNAQcCoIITgjCCE34CAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0B
+BwGgghCTMIIFhTCCBG2gAwIBAgIHF6QlNQ3EvzANBgkqhkiG9w0BAQsFADBaMQswCQYDVQQG
+EwJERTETMBEGA1UEChMKREZOLVZlcmVpbjEQMA4GA1UECxMHREZOLVBLSTEkMCIGA1UEAxMb
+REZOLVZlcmVpbiBQQ0EgR2xvYmFsIC0gRzAxMB4XDTE0MDUyNzE0NTYzN1oXDTE5MDcwOTIz
+NTkwMFowgaMxCzAJBgNVBAYTAkRFMQ8wDQYDVQQIEwZCYXllcm4xETAPBgNVBAcTCEVybGFu
+Z2VuMSgwJgYDVQQKEx9Vbml2ZXJzaXRhZXQgRXJsYW5nZW4tTnVlcm5iZXJnMQ0wCwYDVQQL
+EwRSUlpFMQ8wDQYDVQQDEwZGQVUtQ0ExJjAkBgkqhkiG9w0BCQEWF2NhQHJyemUudW5pLWVy
+bGFuZ2VuLmRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAt4zo7dRsCRRgHOL7
+iMEQXwWSXMbFa8Acei7z6I0pxFUxT18yK4n+fgq4f/cCDMaWjKJ4KWY6p78qUiFZRG0zCw6Y
+PesxyVen2KUbt4hTvS4TzZrPULDs3ZXej22Ug+UMfrVlcrxcJA7Tm7/O5uotER46J1xX6KuW
+6vnjyG7L6JREwa6jAaAfW2b2XVffvfleqS+QXCdTNSSEWIAHC1qPEhnTbaAwIltrlFeP4tJm
+/7rsw9OpCZ2gx/dZKzzOkzznj5FJI81uKcoOjgoBGR9o2ROJvfoc8x8xO7lWIFHlMi5En+AA
+e1XdgL5RxyOmP/LhdQ34Siqyo4OUWxW/33goCQIDAQABo4ICBDCCAgAwEgYDVR0TAQH/BAgw
+BgEB/wIBATAOBgNVHQ8BAf8EBAMCAQYwEQYDVR0gBAowCDAGBgRVHSAAMB0GA1UdDgQWBBT0
+c/P6xkKzxlxpwFi+dDj5YSuOYjAfBgNVHSMEGDAWgBRJt8bP6D0ff+pEexMp9/EKcD7eZDAi
+BgNVHREEGzAZgRdjYUBycnplLnVuaS1lcmxhbmdlbi5kZTCBiAYDVR0fBIGAMH4wPaA7oDmG
+N2h0dHA6Ly9jZHAxLnBjYS5kZm4uZGUvZ2xvYmFsLXJvb3QtY2EvcHViL2NybC9jYWNybC5j
+cmwwPaA7oDmGN2h0dHA6Ly9jZHAyLnBjYS5kZm4uZGUvZ2xvYmFsLXJvb3QtY2EvcHViL2Ny
+bC9jYWNybC5jcmwwgdcGCCsGAQUFBwEBBIHKMIHHMDMGCCsGAQUFBzABhidodHRwOi8vb2Nz
+cC5wY2EuZGZuLmRlL09DU1AtU2VydmVyL09DU1AwRwYIKwYBBQUHMAKGO2h0dHA6Ly9jZHAx
+LnBjYS5kZm4uZGUvZ2xvYmFsLXJvb3QtY2EvcHViL2NhY2VydC9jYWNlcnQuY3J0MEcGCCsG
+AQUFBzAChjtodHRwOi8vY2RwMi5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9jYWNl
+cnQvY2FjZXJ0LmNydDANBgkqhkiG9w0BAQsFAAOCAQEAC92/m1BdLxjcPa38cIRyZjtTNwr9
+vxdTohjSjxvblI0hVfSqQ3ILqeTHY0k2lqzZwJWzk+AqYBXn2gKI26lxQEnXbrCJOXO7LjAj
+VhImAfA9fSsQwt58j/pgB/GAKofR9xHLRZLzjkJJk1jutpXDJkGOu8JiKjSLaOaeJIBPpE99
+YBNeysGXeCZ8G0ns4W3SXXMt4qGE+Ex4hQyiMZQqx3IyyUELpCblQMD83rzf94YJ+Tco7ApV
+BnTqGaVsQPB9ryPvRHdcWY5UMIpxclaVNED9MATFALPhjQBahknvo90zNC2Mgqm8GrYqHgvw
+PlrOynSUGown/xfyMPnWibHjtzCCBNUwggO9oAMCAQICCFBOxvU9EbRkMA0GCSqGSIb3DQEB
+CwUAMHExCzAJBgNVBAYTAkRFMRwwGgYDVQQKExNEZXV0c2NoZSBUZWxla29tIEFHMR8wHQYD
+VQQLExZULVRlbGVTZWMgVHJ1c3QgQ2VudGVyMSMwIQYDVQQDExpEZXV0c2NoZSBUZWxla29t
+IFJvb3QgQ0EgMjAeFw0xNDA3MjIxMjA4MjZaFw0xOTA3MDkyMzU5MDBaMFoxCzAJBgNVBAYT
+AkRFMRMwEQYDVQQKEwpERk4tVmVyZWluMRAwDgYDVQQLEwdERk4tUEtJMSQwIgYDVQQDExtE
+Rk4tVmVyZWluIFBDQSBHbG9iYWwgLSBHMDEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+AoIBAQDpm8NnhfkNrvWNVMOWUDU9YuluTO2U1wBblSJ01CDrNI/W7MAxBAuZgeKmFNJSoCgj
+hIt0iQReW+DieMF4yxbLKDU5ey2QRdDtoAB6fL9KDhsAw4bpXCsxEXsM84IkQ4wcOItqaACa
+7txPeKvSxhObdq3u3ibo7wGvdA/BCaL2a869080UME/15eOkyGKbghoDJzANAmVgTe3RCSMq
+ljVYJ9N2xnG2kB3E7f81hn1vM7PbD8URwoqDoZRdQWvY0hD1TP3KUazZve+Sg7va64sWVlZD
+z+HVEz2mHycwzUlU28kTNJpxdcVs6qcLmPkhnSevPqM5OUhqjK3JmfvDEvK9AgMBAAGjggGG
+MIIBgjAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFEm3xs/oPR9/6kR7Eyn38QpwPt5kMB8G
+A1UdIwQYMBaAFDHDeRu69VPXF+CJei0XbAqzK50zMBIGA1UdEwEB/wQIMAYBAf8CAQIwYgYD
+VR0gBFswWTARBg8rBgEEAYGtIYIsAQEEAgIwEQYPKwYBBAGBrSGCLAEBBAMAMBEGDysGAQQB
+ga0hgiwBAQQDATAPBg0rBgEEAYGtIYIsAQEEMA0GCysGAQQBga0hgiweMD4GA1UdHwQ3MDUw
+M6AxoC+GLWh0dHA6Ly9wa2kwMzM2LnRlbGVzZWMuZGUvcmwvRFRfUk9PVF9DQV8yLmNybDB4
+BggrBgEFBQcBAQRsMGowLAYIKwYBBQUHMAGGIGh0dHA6Ly9vY3NwMDMzNi50ZWxlc2VjLmRl
+L29jc3ByMDoGCCsGAQUFBzAChi5odHRwOi8vcGtpMDMzNi50ZWxlc2VjLmRlL2NydC9EVF9S
+T09UX0NBXzIuY2VyMA0GCSqGSIb3DQEBCwUAA4IBAQBjICj9nCGGcr45Rlk5MiW8qQGbDczK
+fUGchm0KbiyzE1l1sTOSG2EnFv/DstU1gvuEKgFJvWa7Zi+ywgZdbj9u4wFaW8pDY1yVtuEx
+px/VB19N5mWCTjL5w3x6S81NXHTuIfJ1AuxSPtLJatOQI25JZzW+f01WpOzML8+3oZeocj7J
+vEDWWqQIPda8gsO3tzKOsSyOam23NQIZz/U5RFhjpyQAELC7/E6vbi84u6VXST/YblBvLJeW
+3B1GmmWJz67M8uXZn1OzPqEvkqnYC8aEHwTG6x7on321e6UC8STFJGMRNMxakyAqeYg6JUKQ
+qWU7fIbTEhUjKfws2sw5W1QXMIIGLTCCBRWgAwIBAgIHGg4nnKJgJTANBgkqhkiG9w0BAQsF
+ADCBozELMAkGA1UEBhMCREUxDzANBgNVBAgTBkJheWVybjERMA8GA1UEBxMIRXJsYW5nZW4x
+KDAmBgNVBAoTH1VuaXZlcnNpdGFldCBFcmxhbmdlbi1OdWVybmJlcmcxDTALBgNVBAsTBFJS
+WkUxDzANBgNVBAMTBkZBVS1DQTEmMCQGCSqGSIb3DQEJARYXY2FAcnJ6ZS51bmktZXJsYW5n
+ZW4uZGUwHhcNMTUwOTA4MDkyNzQwWhcNMTgwOTA3MDkyNzQwWjCBlTELMAkGA1UEBhMCREUx
+KDAmBgNVBAoMH1VuaXZlcnNpdGFldCBFcmxhbmdlbi1OdWVybmJlcmcxRDBCBgNVBAsMO0xl
+aHJzdHVobCBmdWVyIEluZm9ybWF0aWsgMSAoSVQtU2ljaGVyaGVpdHNpbmZyYXN0cnVrdHVy
+ZW4pMRYwFAYDVQQDDA1SYWxwaCBQYWx1dGtlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+CgKCAQEAxW1HYjFUTr3Owv56lCuSqmbAUelEAVxOcd7aaTAtXEAIGrPR1e7L6UBRXNUC3mkn
+5NXEg0plgRdlLKL2YmWTbtnQ5/bv6CfVFd2nzFLtuFzVb9QsLHxOn5S3vUOitsonDx1qg5mq
+SRpcA4Cz2ZQ27JqulItdT1HVw6WpheJwwXeb91iDor1xgl+BJN+JK0b3l0BUBFT6IDfDDSeC
+IwHeGKUWi0dR3c2cfLxe/8f1eV0CwV+KiWsgZIA4Cqv2ac8edTp3yaJoQVocVCunkXqWwTai
+ZugbN54+yfXes2mgye29x0ZPRL4hjl0V4d0wU5+aMBVfex4nGifi+ABc5Tt6jwIDAQABo4IC
+cDCCAmwwQAYDVR0gBDkwNzARBg8rBgEEAYGtIYIsAQEEAwMwEQYPKwYBBAGBrSGCLAIBBAMB
+MA8GDSsGAQQBga0hgiwBAQQwCQYDVR0TBAIwADALBgNVHQ8EBAMCBeAwHQYDVR0lBBYwFAYI
+KwYBBQUHAwIGCCsGAQUFBwMEMB0GA1UdDgQWBBQ3N2Qm4x3vXyqay7qfDT3GjxCEKTAfBgNV
+HSMEGDAWgBT0c/P6xkKzxlxpwFi+dDj5YSuOYjAfBgNVHREEGDAWgRRyYWxwaC5wYWx1dGtl
+QGZhdS5kZTCBnwYDVR0fBIGXMIGUMEigRqBEhkJodHRwOi8vY2RwMS5wY2EuZGZuLmRlL3Vu
+aS1lcmxhbmdlbi1udWVybmJlcmctY2EvcHViL2NybC9jYWNybC5jcmwwSKBGoESGQmh0dHA6
+Ly9jZHAyLnBjYS5kZm4uZGUvdW5pLWVybGFuZ2VuLW51ZXJuYmVyZy1jYS9wdWIvY3JsL2Nh
+Y3JsLmNybDCB7QYIKwYBBQUHAQEEgeAwgd0wMwYIKwYBBQUHMAGGJ2h0dHA6Ly9vY3NwLnBj
+YS5kZm4uZGUvT0NTUC1TZXJ2ZXIvT0NTUDBSBggrBgEFBQcwAoZGaHR0cDovL2NkcDEucGNh
+LmRmbi5kZS91bmktZXJsYW5nZW4tbnVlcm5iZXJnLWNhL3B1Yi9jYWNlcnQvY2FjZXJ0LmNy
+dDBSBggrBgEFBQcwAoZGaHR0cDovL2NkcDIucGNhLmRmbi5kZS91bmktZXJsYW5nZW4tbnVl
+cm5iZXJnLWNhL3B1Yi9jYWNlcnQvY2FjZXJ0LmNydDANBgkqhkiG9w0BAQsFAAOCAQEANffn
+v6GFCVoWcGOqdVmaXHoXSzRLPDouSflwa4GFUy6xDC9BnayAAWH67YsLpxIZewJbkqwNu/1Z
+5fwH/a2PQbgIlx6i45LB7c3X425gJcDTkmta0m4NkXSkYJxLy6lm3lbJSLpTLtfFodXrGCKU
+Kaq37xwueL/N9Vqo/AmZHQGcggVSXDsKWVK1hCFWXmOZ3k/niDBKOJ8c3FcPZvE0KQSbE4RI
+vGq+8imcUDTN4i8RbHz6Avt22ECPVTp7W4USuaodRp9yEAmQuDCZevBvoFqpu6WOuy9Ufhmz
+CUIGxtiwGLc4TQdiH1Qbwqm6H07R05s0Eq3XV6j8WohJOKo05zGCAsIwggK+AgEBMIGvMIGj
+MQswCQYDVQQGEwJERTEPMA0GA1UECBMGQmF5ZXJuMREwDwYDVQQHEwhFcmxhbmdlbjEoMCYG
+A1UEChMfVW5pdmVyc2l0YWV0IEVybGFuZ2VuLU51ZXJuYmVyZzENMAsGA1UECxMEUlJaRTEP
+MA0GA1UEAxMGRkFVLUNBMSYwJAYJKoZIhvcNAQkBFhdjYUBycnplLnVuaS1lcmxhbmdlbi5k
+ZQIHGg4nnKJgJTANBglghkgBZQMEAgEFAKCB5DAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcB
+MBwGCSqGSIb3DQEJBTEPFw0xNjA2MjIxMDA2MDZaMC8GCSqGSIb3DQEJBDEiBCAoaLRZPFOL
+z9u2E7xT8Mx4ua7klarhcoVL+BKyeBwSLDB5BgkqhkiG9w0BCQ8xbDBqMAsGCWCGSAFlAwQB
+KjALBglghkgBZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMA4GCCqGSIb3DQMCAgIA
+gDANBggqhkiG9w0DAgIBQDAHBgUrDgMCBzANBggqhkiG9w0DAgIBKDANBgkqhkiG9w0BAQEF
+AASCAQB/uimxuVzPrz+xHAv4xvILfuQy69hb5W0aFrpSliWZmMd6+PvqGb+fC5aGqnZeu3oC
+elTsFTJXqkcs1dZOCefIgbMFalOg1JIFO9mvMbZHF+KgBUoLcZzU3MNW1ke+/djzZQjFFDc3
+XNeF+aIb3I0W3vaa/tk3f6J9E8P1g9R/wyJOGwGb/2dm7nSdsWJL6Xg4hAHMMQPPej5xhNqD
+WJFd+qYLHnOwESM+8ZUrcn4B9sYPutMLEY8+L5fYLBzA325D+O9utcBsHwrIB4cE6dOvnNn5
+kZj5RcGRH+suB40d7fLqgPTIdJda1oiH18zJC1rSTYngpLJtO+VJ7R53tFnR
+
+--0F1p//8PRICkK4MW--
+
+--===============1241204105768835274==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1241204105768835274==--
