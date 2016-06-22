@@ -1,24 +1,29 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 0/3] arm64: Kill ESR_LNX_EXEC
-Date: Tue, 21 Jun 2016 17:09:09 +0100
-Message-ID: <20160621160908.GF14542@e104818-lin.cambridge.arm.com>
-References: <1464694383-31700-1-git-send-email-mark.rutland@arm.com>
+From: Itaru Kitayama <itaru.kitayama@riken.jp>
+Subject: Increase GICV size to 64KB so !4KB page-size kernels are able to
+ initialize KVM
+Date: Wed, 22 Jun 2016 15:48:57 +0900
+Message-ID: <8b9c3e26-97b1-307f-8227-5ca3a4966c84@riken.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 353B849B49
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2016 12:04:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C716149B3C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2016 02:44:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7OYxo0LCiJfG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Jun 2016 12:04:24 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 07E3C49B3D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2016 12:04:23 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <1464694383-31700-1-git-send-email-mark.rutland@arm.com>
+ with ESMTP id XqcZikERSQ9W for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jun 2016 02:44:07 -0400 (EDT)
+Received: from postman.riken.jp (postman1.riken.jp [134.160.33.83])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EFD2B49B2E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2016 02:44:06 -0400 (EDT)
+Received: from postman.riken.jp (localhost.localdomain [127.0.0.1])
+ by postman.riken.jp (Postfix) with SMTP id 0E33C6819C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2016 15:48:58 +0900 (JST)
+Received: from MacBook-Pro.local (KD111105169138.ppp-bb.dion.ne.jp
+ [111.105.169.138])
+ by postman.riken.jp (Postfix) with ESMTPA id E361F6A02B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2016 15:48:57 +0900 (JST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,33 +33,28 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: marc.zyngier@arm.com, will.deacon@arm.com, dave.martin@arm.com, shijie.huang@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 31, 2016 at 12:33:00PM +0100, Mark Rutland wrote:
-> Currently we (ab)use a reserved bit in ESR_ELx for our own purposes as
-> ESR_LNX_EXEC, which isn't ideal, especially as we're inconsistent with our
-> mnemonic usage. This series removes ESR_LNX_EXEC entirely, avoiding (ab)use of
-> reserved ESR_ELx bits, and makes things a little more consistent.
-> 
-> I've extracted this from my entry-deasm branch [1], and rebased to v4.7-rc1.
-> I've split the KVM changes as the KVM code is undergoing rapid change these
-> days, and it should be possible to take those as a subsequent cleanup rather
-> than forcing a painful merging process.
-> 
-> Thanks,
-> Mark.
-> 
-> [1] https://git.kernel.org/cgit/linux/kernel/git/mark/linux.git/log/?h=arm64/entry-deasm
-> 
-> 
-> Mark Rutland (3):
->   arm64: add macro to extract ESR_ELx.EC
->   arm64/kvm: use ESR_ELx_EC to extract EC
->   arm64: kill ESR_LNX_EXEC
+Against the tag v4.7-rc2 in the kvmtree.
 
-I queued these 3 patches for 4.8. Thanks.
+---
+  drivers/irqchip/irq-gic.c | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+index fbc4ae2..bd463a3 100644
+--- a/drivers/irqchip/irq-gic.c
++++ b/drivers/irqchip/irq-gic.c
+@@ -1425,7 +1425,7 @@ static bool __init gic_validate_dist(struct 
+acpi_subtable_header *header,
+  #define ACPI_GICV2_DIST_MEM_SIZE       (SZ_4K)
+  #define ACPI_GIC_CPU_IF_MEM_SIZE       (SZ_8K)
+  #define ACPI_GICV2_VCTRL_MEM_SIZE      (SZ_4K)
+-#define ACPI_GICV2_VCPU_MEM_SIZE       (SZ_8K)
++#define ACPI_GICV2_VCPU_MEM_SIZE       (SZ_64K)
+
+  static void __init gic_acpi_setup_kvm_info(void)
+  {
 -- 
-Catalin
+2.7.4
