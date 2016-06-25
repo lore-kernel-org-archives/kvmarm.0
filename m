@@ -1,26 +1,30 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: issues with emulated PCI MMIO backed by host memory under KVM
-Date: Fri, 24 Jun 2016 20:16:50 +0200
-Message-ID: <CAKv+Gu_f6yFhLhe6NcrYMeBNLHPmNrRMbTCAt=f-ERwfbdZdgA@mail.gmail.com>
-References: <CAKv+Gu8MWxUvySvsQW+DpohLLHSi8ZYm4o7gCE2a4q0iC=cuHA@mail.gmail.com>
+From: hiwu <hiwu@derytech.com.tw>
+Subject: ARM32 guest on ARM64 host
+Date: Sat, 25 Jun 2016 12:31:50 +0800
+Message-ID: <f47a31f2-3f61-e2c7-a7c0-43dadd93b765@derytech.com.tw>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 774C049B49
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jun 2016 14:11:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB92D49B4A
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Jun 2016 00:26:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hSEmD4PGu2oW for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Jun 2016 14:11:51 -0400 (EDT)
-Received: from mail-it0-f42.google.com (mail-it0-f42.google.com
- [209.85.214.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2CDC249B36
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jun 2016 14:11:50 -0400 (EDT)
-Received: by mail-it0-f42.google.com with SMTP id g127so21339640ith.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jun 2016 11:16:51 -0700 (PDT)
-In-Reply-To: <CAKv+Gu8MWxUvySvsQW+DpohLLHSi8ZYm4o7gCE2a4q0iC=cuHA@mail.gmail.com>
+ with ESMTP id YlsNZZzdHvNA for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 25 Jun 2016 00:26:32 -0400 (EDT)
+Received: from msr12.hinet.net (msr12.hinet.net [168.95.4.112])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B724A48529
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Jun 2016 00:26:31 -0400 (EDT)
+Received: from dns.derytech.com.tw (218-161-54-187.HINET-IP.hinet.net
+ [218.161.54.187])
+ by msr12.hinet.net (8.14.9/8.14.9) with ESMTP id u5P4VTSU012829
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO)
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Jun 2016 12:31:30 +0800 (CST)
+Received: from [192.168.0.102] (1-160-18-13.dynamic.hinet.net [1.160.18.13])
+ (Authenticated sender: hiwu@derytech.com.tw)
+ by dns.derytech.com.tw (Postfix) with ESMTPA id 3E9A0A601D0
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Jun 2016 12:31:28 +0800 (CST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,24 +34,15 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Alexander Graf <agraf@suse.de>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24 June 2016 at 16:04, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-[...]
-> Note that this issue not only affects framebuffers on PCI cards, it
-> also affects emulated USB host controllers (perhaps Alex can remind us
-> which one exactly?)
+Hi all :
 
-Actually, looking at the QEMU source code, I am not able to spot the
-USB hcd emulation code that backs a PCI MMIO BAR using host memory,
-and in fact, the only instance I *can* find is vga-pci.c
+1) Can Arm64 Linux host enable KVM support for Arm32 guest ?
+2) Can qemu-system-arm on Arm64 Linux host use the aarch32 KVM feature 
+on Arm64 host ?
 
-@Alex: could you please explain which exact issue with USB emulation
-is suspected to be caused by this?
+Thank you
 
-@team-RH: are there any other examples beyond VGA PCI where this is a problem?
-
-Thanks,
-Ard.
+-Jack
