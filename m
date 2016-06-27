@@ -1,27 +1,26 @@
-From: Marc Zyngier <maz@misterjones.org>
-Subject: Re: ARM32 guest on ARM64 host
-Date: Sat, 25 Jun 2016 14:09:06 +0100
-Message-ID: <3e90f50ac71c121f9421c702cb63a74f@www.loen.fr>
-References: <f47a31f2-3f61-e2c7-a7c0-43dadd93b765@derytech.com.tw>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: Android guest on KVM/ARM
+Date: Mon, 27 Jun 2016 08:28:23 +0200
+Message-ID: <20160627062823.GA26498@cbox>
+References: <20160622100606.GA6749@faubox.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D60849B4A
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Jun 2016 09:04:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4095B412ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 02:22:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Iqsr7Fnl-PtF for <kvmarm@lists.cs.columbia.edu>;
- Sat, 25 Jun 2016 09:04:06 -0400 (EDT)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 171BE49B1D
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Jun 2016 09:04:05 -0400 (EDT)
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@misterjones.org>) id 1bGnKc-0005zh-Mq
- for kvmarm@lists.cs.columbia.edu; Sat, 25 Jun 2016 15:09:06 +0200
-In-Reply-To: <f47a31f2-3f61-e2c7-a7c0-43dadd93b765@derytech.com.tw>
+ with ESMTP id qhzzBjZNmcyJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jun 2016 02:22:31 -0400 (EDT)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0EC5D412DD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 02:22:30 -0400 (EDT)
+Received: by mail-wm0-f51.google.com with SMTP id v199so86081438wmv.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Jun 2016 23:27:37 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20160622100606.GA6749@faubox.localdomain>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,23 +30,31 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+To: Ralph Palutke <ralph.palutke@fau.de>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2016-06-25 05:31, hiwu wrote:
-> Hi all :
->
-> 1) Can Arm64 Linux host enable KVM support for Arm32 guest ?
+On Wed, Jun 22, 2016 at 12:06:06PM +0200, Ralph Palutke wrote:
+> Hello everyone,
+> 
+> I try to virtualize an Android system via KVM/ARM. Currently I've
+> installed Linaro Debian 16.03 RBP on a Lemaker Hikey board. Now, is
+> there any Android build that would suite my needs? Since the usual way
+> to install Android on a board is via fastboot, I'm not sure how to
+> install it as a KVM/ARM guest. Because I run it on an ARM board, I would
+> have assumed I could run an unmodified Android guest.
+> Any suggestions how to proceed?
+> 
 
-Yes, assuming your CPU does support AArch32 at EL1 (IOW is not 64bit 
-only).
+If I were you I would build AOSP and use the system, data, etc. images
+provided by the build output and use that to generate some virtio
+images.
 
-> 2) Can qemu-system-arm on Arm64 Linux host use the aarch32 KVM
-> feature on Arm64 host ?
+I think emulating fastboot is a pretty hard way to go around things, but
+of course it depends on what you're overall trying to do: Just run
+Android or have a fully emulated Android compatible system...
 
-No. You need to use qemu-system-aarch64 and pass the "aarch64=off" 
-option to the -mach directive.
+Perhaps this will also help you:
+http://www.linaro.org/blog/core-dump/running-64bit-android-l-qemu/
 
-         M.
--- 
-Who you jivin' with that Cosmik Debris?
+-Christoffer
