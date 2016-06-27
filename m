@@ -1,27 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 01/15] arm64: KVM: Merged page tables documentation
-Date: Mon, 27 Jun 2016 15:28:15 +0200
-Message-ID: <20160627132815.GG26498@cbox>
+Subject: Re: [PATCH 00/15] arm/arm64: KVM: Merge boot and runtime page tables
+Date: Mon, 27 Jun 2016 15:29:23 +0200
+Message-ID: <20160627132923.GH26498@cbox>
 References: <1465297115-13091-1-git-send-email-marc.zyngier@arm.com>
- <1465297115-13091-2-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4163941390
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 09:22:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E6EC41390
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 09:23:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bRVpNMlAv21A for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jun 2016 09:22:21 -0400 (EDT)
-Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1699412D0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 09:22:20 -0400 (EDT)
-Received: by mail-wm0-f52.google.com with SMTP id v199so100294583wmv.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 06:27:28 -0700 (PDT)
+ with ESMTP id eIXKdbYLy4H2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jun 2016 09:23:29 -0400 (EDT)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3FC7E412D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 09:23:29 -0400 (EDT)
+Received: by mail-wm0-f51.google.com with SMTP id v199so100336655wmv.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 06:28:36 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1465297115-13091-2-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <1465297115-13091-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,100 +34,85 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jun 07, 2016 at 11:58:21AM +0100, Marc Zyngier wrote:
-> Since dealing with VA ranges tends to hurt my brain badly, let's
-> start with a bit of documentation that will hopefully help
-> understanding what comes next...
+On Tue, Jun 07, 2016 at 11:58:20AM +0100, Marc Zyngier wrote:
+> Until now, we've been setting up KVM using two sets of page tables:
+> one for the "boot" where we perform the basic MMU setup, and one for
+> the runtime.
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_mmu.h | 45 +++++++++++++++++++++++++++++++++++++---
->  1 file changed, 42 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index f05ac27..00bc277 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -29,10 +29,49 @@
->   *
->   * Instead, give the HYP mode its own VA region at a fixed offset from
->   * the kernel by just masking the top bits (which are all ones for a
-> - * kernel address).
-> + * kernel address). We need to find out how many bits to mask.
->   *
-> - * ARMv8.1 (using VHE) does have a TTBR1_EL2, and doesn't use these
-> - * macros (the entire kernel runs at EL2).
-> + * We want to build a set of page tables that cover both parts of the
-> + * idmap (the trampoline page used to initialize EL2), and our normal
-> + * runtime VA space, at the same time.
-> + *
-> + * Given that the kernel uses VA_BITS for its entire address space,
-> + * and that half of that space (VA_BITS - 1) is used for the linear
-> + * mapping, we can limit the EL2 space to the same size.
+> Switching between the two was though to be safe, but we've recently
+> realized that it is not: it is not enough to ensure that the VA->PA
+> mapping is consistent when switching TTBR0_EL2, but we also have to
+> ensure that the intermediate translations are the same as well. If the
+> TLB can return two different values for intermediate translations,
+> we're screwed (TLB conflicts).
 
-we can also limit the EL2 space to (VA_BITS - 1).
+Just a clarification: Intermediate Translations here means the
+page table levels of translations for a single stage of translation?
 
-> + *
-> + * The main question is "Within the VA_BITS space, does EL2 use the
-> + * top or the bottom half of that space to shadow the kernel's linear
-> + * mapping?". As we need to idmap the trampoline page, this is
-> + * determined by the range in which this page lives.
-> + *
-> + * If the page is in the bottom half, we have to use the top half. If
-> + * the page is in the top half, we have to use the bottom half:
-> + *
-> + * if (PA(T)[VA_BITS - 1] == 1)
-> + *	HYP_VA_RANGE = [0 ... (1 << (VA_BITS - 1)) - 1]
-> + * else
-> + *	HYP_VA_RANGE = [(1 << (VA_BITS - 1)) ... (1 << VA_BITS) - 1]
-
-Is this pseudo code or what am I looking at?  What is T?
-
-I don't understand what this is saying.
-
-Can this be written using known constructs such as hyp_idmap_end,
-PHYS_OFFSET etc.?
-
-And perhaps the pseudo code should define HYP_VA_SHIFT instead of the
-range to simplify it, at least I'm confused.
-
-> + *
-> + * In practice, the second case can be simplified to
-> + *	HYP_VA_RANGE = [0 ... (1 << VA_BITS) - 1]
-> + * because we'll never get anything in the bottom range.
-
-and now I'm more confused, are we not supposed to map the idmap in the
-bottom range?  Is this part of the comment necessary?
-
-> + *
-> + * This of course assumes that the trampoline page exists within the
-> + * VA_BITS range. If it doesn't, then it means we're in the odd case
-> + * where the kernel idmap (as well as HYP) uses more levels than the
-> + * kernel runtime page tables (as seen when the kernel is configured
-> + * for 4k pages, 39bits VA, and yet memory lives just above that
-> + * limit, forcing the idmap to use 4 levels of page tables while the
-> + * kernel itself only uses 3). In this particular case, it doesn't
-> + * matter which side of VA_BITS we use, as we're guaranteed not to
-> + * conflict with anything.
-> + *
-> + * An alternative would be to always use 4 levels of page tables for
-> + * EL2, no matter what the kernel does. But who wants more levels than
-> + * strictly necessary?
-> + *
-> + * Thankfully, ARMv8.1 (using VHE) does have a TTBR1_EL2, and doesn't
-> + * need any of this madness (the entire kernel runs at EL2).
-
-Not sure how these two last paragraphs helps understanding what this
-patch set is about to implement, as it seems to raise more questions
-than answer them, but I will proceed to trying to read the code...
-
+Is there a valid reference to the arhictecture specification for this?
 
 Thanks,
 -Christoffer
 
->   */
->  #define HYP_PAGE_OFFSET_SHIFT	VA_BITS
->  #define HYP_PAGE_OFFSET_MASK	((UL(1) << HYP_PAGE_OFFSET_SHIFT) - 1)
+
+> 
+> At that point, the only safe thing to do is to never change TTBR0_EL2,
+> which means that we need to make the idmap page part of the runtime
+> page tables.
+> 
+> The series starts with a bit of brain dumping explaining what we're
+> trying to do. This might not be useful as a merge candidate, but it
+> was useful for me to put this somewhere. It goes on revamping the
+> whole notion of HYP VA range, making it runtime patchable. It then
+> always merge idmap and runtime page table into one set, leading to
+> quite a lot of simplification in the init/teardown code. In the
+> process, 32bit KVM gains the ability to teardown the HYP page-tables
+> and vectors, which makes kexec a bit closer.
+> 
+> This has been tested on Seattle, Juno, the FVP model (both v8.0 and
+> v8.1), Cubietruck and Midway, and is based on 4.7-rc2.
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> Marc Zyngier (15):
+>   arm64: KVM: Merged page tables documentation
+>   arm64: KVM: Kill HYP_PAGE_OFFSET
+>   arm64: Add ARM64_HYP_OFFSET_LOW capability
+>   arm64: KVM: Define HYP offset masks
+>   arm64: KVM: Refactor kern_hyp_va/hyp_kern_va to deal with multiple
+>     offsets
+>   arm/arm64: KVM: Export __hyp_text_start/end symbols
+>   arm64: KVM: Runtime detection of lower HYP offset
+>   arm/arm64: KVM: Always have merged page tables
+>   arm64: KVM: Simplify HYP init/teardown
+>   arm/arm64: KVM: Drop boot_pgd
+>   arm/arm64: KVM: Kill free_boot_hyp_pgd
+>   arm: KVM: Simplify HYP init
+>   arm: KVM: Allow hyp teardown
+>   arm/arm64: KVM: Prune unused #defines
+>   arm/arm64: KVM: Check that IDMAP doesn't intersect with VA range
+> 
+>  arch/arm/include/asm/kvm_asm.h      |   2 +
+>  arch/arm/include/asm/kvm_host.h     |  25 +++-----
+>  arch/arm/include/asm/kvm_mmu.h      |  11 ----
+>  arch/arm/include/asm/virt.h         |   4 ++
+>  arch/arm/kvm/arm.c                  |  20 ++----
+>  arch/arm/kvm/init.S                 |  56 ++++++----------
+>  arch/arm/kvm/mmu.c                  | 125 ++++++++++++++++--------------------
+>  arch/arm64/include/asm/cpufeature.h |   3 +-
+>  arch/arm64/include/asm/kvm_host.h   |  17 ++---
+>  arch/arm64/include/asm/kvm_hyp.h    |  28 ++++----
+>  arch/arm64/include/asm/kvm_mmu.h    | 100 ++++++++++++++++++++++++-----
+>  arch/arm64/include/asm/virt.h       |   4 ++
+>  arch/arm64/kernel/cpufeature.c      |  19 ++++++
+>  arch/arm64/kvm/hyp-init.S           |  61 +++---------------
+>  arch/arm64/kvm/hyp/entry.S          |  19 ------
+>  arch/arm64/kvm/hyp/hyp-entry.S      |  15 +++++
+>  arch/arm64/kvm/reset.c              |  28 --------
+>  17 files changed, 240 insertions(+), 297 deletions(-)
+> 
 > -- 
 > 2.1.4
 > 
