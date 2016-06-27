@@ -1,28 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: issues with emulated PCI MMIO backed by host memory under KVM
-Date: Mon, 27 Jun 2016 12:34:21 +0200
-Message-ID: <20160627103421.GC26498@cbox>
-References: <CAKv+Gu8MWxUvySvsQW+DpohLLHSi8ZYm4o7gCE2a4q0iC=cuHA@mail.gmail.com>
- <20160627091619.GB26498@cbox>
- <CAKv+Gu9u2f6+HLYMzqtkq0z=Xk5gTq=_11QvAKMaBZj_oRMwTA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Stop leaking vcpu pid references
+Date: Mon, 27 Jun 2016 13:08:39 +0200
+Message-ID: <20160627110839.GD26498@cbox>
+References: <1465403085-2358-1-git-send-email-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 37421412DD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 06:28:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EB9C4998D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 07:02:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ei0cDOQCi7Y8 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jun 2016 06:28:29 -0400 (EDT)
-Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE93F411E3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 06:28:28 -0400 (EDT)
-Received: by mail-wm0-f51.google.com with SMTP id a66so108628390wme.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 03:33:36 -0700 (PDT)
+ with ESMTP id MhRsMho1Vizg for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jun 2016 07:02:46 -0400 (EDT)
+Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E18A41AF6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 07:02:46 -0400 (EDT)
+Received: by mail-wm0-f47.google.com with SMTP id r201so109828730wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 04:07:53 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu9u2f6+HLYMzqtkq0z=Xk5gTq=_11QvAKMaBZj_oRMwTA@mail.gmail.com>
+In-Reply-To: <1465403085-2358-1-git-send-email-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,109 +30,41 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: James Morse <james.morse@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jun 27, 2016 at 11:47:18AM +0200, Ard Biesheuvel wrote:
-> On 27 June 2016 at 11:16, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> > Hi,
-> >
-> > I'm going to ask some stupid questions here...
-> >
-> > On Fri, Jun 24, 2016 at 04:04:45PM +0200, Ard Biesheuvel wrote:
-> >> Hi all,
-> >>
-> >> This old subject came up again in a discussion related to PCIe support
-> >> for QEMU/KVM under Tianocore. The fact that we need to map PCI MMIO
-> >> regions as cacheable is preventing us from reusing a significant slice
-> >> of the PCIe support infrastructure, and so I'd like to bring this up
-> >> again, perhaps just to reiterate why we're simply out of luck.
-> >>
-> >> To refresh your memories, the issue is that on ARM, PCI MMIO regions
-> >> for emulated devices may be backed by memory that is mapped cacheable
-> >> by the host. Note that this has nothing to do with the device being
-> >> DMA coherent or not: in this case, we are dealing with regions that
-> >> are not memory from the POV of the guest, and it is reasonable for the
-> >> guest to assume that accesses to such a region are not visible to the
-> >> device before they hit the actual PCI MMIO window and are translated
-> >> into cycles on the PCI bus.
-> >
-> > For the sake of completeness, why is this reasonable?
-> >
+On Wed, Jun 08, 2016 at 05:24:45PM +0100, James Morse wrote:
+> kvm provides kvm_vcpu_uninit(), which amongst other things, releases the
+> last reference to the struct pid of the task that was last running the vcpu.
 > 
-> Because the whole point of accessing these regions is to communicate
-> with the device. It is common to use write combining mappings for
-> things like framebuffers to group writes before they hit the PCI bus,
-> but any caching just makes it more difficult for the driver state and
-> device state to remain synchronized.
+> On arm64 built with CONFIG_DEBUG_KMEMLEAK, starting a guest with kvmtool,
+> then killing it with SIGKILL results (after some considerable time) in:
+> > cat /sys/kernel/debug/kmemleak
+> > unreferenced object 0xffff80007d5ea080 (size 128):
+> >  comm "lkvm", pid 2025, jiffies 4294942645 (age 1107.776s)
+> >  hex dump (first 32 bytes):
+> >    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+> >    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+> >  backtrace:
+> >    [<ffff8000001b30ec>] create_object+0xfc/0x278
+> >    [<ffff80000071da34>] kmemleak_alloc+0x34/0x70
+> >    [<ffff80000019fa2c>] kmem_cache_alloc+0x16c/0x1d8
+> >    [<ffff8000000d0474>] alloc_pid+0x34/0x4d0
+> >    [<ffff8000000b5674>] copy_process.isra.6+0x79c/0x1338
+> >    [<ffff8000000b633c>] _do_fork+0x74/0x320
+> >    [<ffff8000000b66b0>] SyS_clone+0x18/0x20
+> >    [<ffff800000085cb0>] el0_svc_naked+0x24/0x28
+> >    [<ffffffffffffffff>] 0xffffffffffffffff
 > 
-> > Is this how any real ARM system implementing PCI would actually work?
-> >
+> On x86 kvm_vcpu_uninit() is called on the path from kvm_arch_destroy_vm(),
+> on arm no equivalent call is made. Add the call to kvm_arch_vcpu_free().
 > 
-> Yes.
-> 
-> >> That means that mapping such a region
-> >> cacheable is a strange thing to do, in fact, and it is unlikely that
-> >> patches implementing this against the generic PCI stack in Tianocore
-> >> will be accepted by the maintainers.
-> >>
-> >> Note that this issue not only affects framebuffers on PCI cards, it
-> >> also affects emulated USB host controllers (perhaps Alex can remind us
-> >> which one exactly?) and likely other emulated generic PCI devices as
-> >> well.
-> >>
-> >> Since the issue exists only for emulated PCI devices whose MMIO
-> >> regions are backed by host memory, is there any way we can already
-> >> distinguish such memslots from ordinary ones? If we can, is there
-> >> anything we could do to treat these specially? Perhaps something like
-> >> using read-only memslots so we can at least trap guest writes instead
-> >> of having main memory going out of sync with the caches unnoticed? I
-> >> am just brainstorming here ...
-> >
-> > I think the only sensible solution is to make sure that the guest and
-> > emulation mappings use the same memory type, either cached or
-> > non-cached, and we 'simply' have to find the best way to implement this.
-> >
-> > As Drew suggested, forcing some S2 mappings to be non-cacheable is the
-> > one way.
-> >
-> > The other way is to use something like what you once wrote that rewrites
-> > stage-1 mappings to be cacheable, does that apply here ?
-> >
-> > Do we have a clear picture of why we'd prefer one way over the other?
-> >
-> 
-> So first of all, let me reiterate that I could only find a single
-> instance in QEMU where a PCI MMIO region is backed by host memory,
-> which is vga-pci.c. I wonder of there are any other occurrences, but
-> if there aren't any, it makes much more sense to prohibit PCI BARs
-> backed by host memory rather than spend a lot of effort working around
-> it.
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Fixes: 749cf76c5a36 ("KVM: ARM: Initial skeleton to compile KVM support")
+> Cc: <stable@vger.kernel.org> # 3.10+
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Right, ok.  So Marc's point during his KVM Forum talk was basically,
-don't use the legacy VGA adapter on ARM and use virtio graphics, right?
+Applied, thanks.
 
-What is the proposed solution for someone shipping an ARM server and
-wishing to provide a graphical output for that server?
-
-It feels strange to work around supporting PCI VGA adapters in ARM VMs,
-if that's not a supported real hardware case.  However, I don't see what
-would prevent someone from plugging a VGA adapter into the PCI slot on
-an ARM server, and people selling ARM servers probably want this to
-happen, I'm guessing.
-
-> 
-> If we do decide to fix this, the best way would be to use uncached
-> attributes for the QEMU userland mapping, and force it uncached in the
-> guest via a stage 2 override (as Drews suggests). The only problem I
-> see here is that the host's kernel direct mapping has a cached alias
-> that we need to get rid of. 
-
-Do we have a way to accomplish that?
-
-Will we run into a bunch of other problems if we begin punching holes in
-the direct mapping for regular RAM?
-
-Thanks,
 -Christoffer
