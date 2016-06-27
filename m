@@ -1,24 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: issues with emulated PCI MMIO backed by host memory under KVM
-Date: Mon, 27 Jun 2016 09:11:31 +0100
-Message-ID: <5770DFB3.1090706@arm.com>
+Date: Mon, 27 Jun 2016 09:17:45 +0100
+Message-ID: <5770E129.10101@arm.com>
 References: <CAKv+Gu8MWxUvySvsQW+DpohLLHSi8ZYm4o7gCE2a4q0iC=cuHA@mail.gmail.com>
- <2698E29E-BEDE-4DCA-9DAC-732540B3BAC2@suse.de>
+ <20160624145748.e2uwqrdv2fik46wc@hawk.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 36EE7410D7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 04:06:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 684A4411BE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 04:12:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e+5eAYFSKCli for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jun 2016 04:06:28 -0400 (EDT)
+ with ESMTP id W2Ef1nuAqRNC for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jun 2016 04:12:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76404410B5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 04:06:28 -0400 (EDT)
-In-Reply-To: <2698E29E-BEDE-4DCA-9DAC-732540B3BAC2@suse.de>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 45917410EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2016 04:12:42 -0400 (EDT)
+In-Reply-To: <20160624145748.e2uwqrdv2fik46wc@hawk.localdomain>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,15 +28,17 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/06/16 08:19, Alexander Graf wrote:
+On 24/06/16 15:57, Andrew Jones wrote:
 > 
+> Hi Ard,
 > 
->> Am 24.06.2016 um 16:04 schrieb Ard Biesheuvel <ard.biesheuvel@linaro.org>:
->>
+> Thanks for bringing this back up again (I think :-)
+> 
+> On Fri, Jun 24, 2016 at 04:04:45PM +0200, Ard Biesheuvel wrote:
 >> Hi all,
 >>
 >> This old subject came up again in a discussion related to PCIe support
@@ -65,31 +67,36 @@ On 25/06/16 08:19, Alexander Graf wrote:
 >> Since the issue exists only for emulated PCI devices whose MMIO
 >> regions are backed by host memory, is there any way we can already
 >> distinguish such memslots from ordinary ones? If we can, is there
->> anything we could do to treat these specially? Perhaps something like
->> using read-only memslots so we can at least trap guest writes instead
->> of having main memory going out of sync with the caches unnoticed? I
->> am just brainstorming here ...
 > 
-> The "easiest" first step would be to simply not map host memory into
-> the guest when we're on arm. Unfortunately that would mean we trap on
-> everything as mmio accesses, including user space access from Xorg
-> for example. That in turn means we'd need to mmio emulate neon
-> instructions and all other sorts of things that can trigger mmio
-> exits without being emulated today.
+> When I was looking at this I didn't see any way to identify these
+> memslots. I wrote some patches to add a new flag, KVM_MEM_NONCACHEABLE,
+> allowing userspace to point them out. That was the easy part (although
+> I didn't like that userspace developers would have to go around finding
+> all memory regions that needed to be flagged, and new devices would
+> likely not be flagged when developed on non-arm architectures, so we'd
+> always be chasing it...) However what really slowed/stopped me was
+> trying to figure out what to do with those identified memslots.
+> 
+> My last idea, which had implementation issues (probably because I was
+> getting in over my head), was
+> 
+>  1) introduce PAGE_S2_NORMAL_NC and use it when mapping the guest's pages
+>  2) flush the userspace pages and update all PTEs to be NC
+> 
+> The reasoning was that, while we can't force a guest to use cacheable
+> memory, we can take advantage of the noncacheable precedence of the
+> architecture, forcing the memory accesses to be noncached by way of
+> S2 attributes. And of course userspace mappings also need to become NC
+> to finally have coherency.
 
-It is not possible to emulate these instructions (load/store multiple,
-whether they are GP or FP registers) other than with a "stop the world"
-approach (in order to close the race where you read the instruction from
-memory while another vcpu changes the pages tables).
+I think this is a sensible course of action, as long as you can identify
+a specific memblock on which to apply this. You may even not have to
+"repaint" the PTEs, but instead obtain a non-cacheable mapping from the
+kernel (at a different address).
 
-> Also, even with that working and maybe even coalesced mmio
-> implemented, I'd guess it'd still be too slow for real world
-> usage...
-
-And probably even slower than you think. There is no way around using
-the architecture as is should be used. Either the guest is using
-cacheable memory, or userspace is using non-cacheable memory. Everything
-else is bound to fail one way or another.
+I'm more worried if we end-up having both cacheable and non-cacheable
+pages inside the same VMA (and Alex seems to point at USB having weird
+requirements around this).
 
 Thanks,
 
