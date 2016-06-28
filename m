@@ -1,28 +1,33 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 05/15] arm64: KVM: Refactor kern_hyp_va/hyp_kern_va to
- deal with multiple offsets
-Date: Tue, 28 Jun 2016 14:42:10 +0200
-Message-ID: <20160628124210.GP26498@cbox>
-References: <1465297115-13091-1-git-send-email-marc.zyngier@arm.com>
- <1465297115-13091-6-git-send-email-marc.zyngier@arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: issues with emulated PCI MMIO backed by host memory under KVM
+Date: Tue, 28 Jun 2016 14:10:26 +0100
+Message-ID: <20160628131026.GB4585@e104818-lin.cambridge.arm.com>
+References: <CAKv+Gu8MWxUvySvsQW+DpohLLHSi8ZYm4o7gCE2a4q0iC=cuHA@mail.gmail.com>
+ <20160627091619.GB26498@cbox>
+ <CAKv+Gu9u2f6+HLYMzqtkq0z=Xk5gTq=_11QvAKMaBZj_oRMwTA@mail.gmail.com>
+ <20160627103421.GC26498@cbox>
+ <CAKv+Gu9uBow4FqmA701J76CZ9Npi2j6ADXEJhXAax5whiQkP1A@mail.gmail.com>
+ <20160627133508.GI26498@cbox>
+ <CAKv+Gu_zQErcMy6h0J71TfrkwRC0TqoQxmjRCNoeyJeD-zX7Kg@mail.gmail.com>
+ <20160628100405.GK26498@cbox>
+ <9fbfb578-2235-2f2a-4502-a285e9ba22e6@redhat.com>
+ <20160628122043.GO26498@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7A7149B32
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 08:36:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ABB549B46
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 09:05:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oU0aEzPWNejh for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Jun 2016 08:36:12 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6889449B2C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 08:36:12 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id r190so27027272wmr.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 05:41:22 -0700 (PDT)
+ with ESMTP id NOYnrUACvLcB for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Jun 2016 09:05:23 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D428249B32
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 09:05:22 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1465297115-13091-6-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <20160628122043.GO26498@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,152 +37,62 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jun 07, 2016 at 11:58:25AM +0100, Marc Zyngier wrote:
-> As we move towards a selectable HYP VA range, it is obvious that
-> we don't want to test a variable to find out if we need to use
-> the bottom VA range, the top VA range, or use the address as is
-> (for VHE).
+On Tue, Jun 28, 2016 at 02:20:43PM +0200, Christoffer Dall wrote:
+> On Tue, Jun 28, 2016 at 01:06:36PM +0200, Laszlo Ersek wrote:
+> > On 06/28/16 12:04, Christoffer Dall wrote:
+> > > On Mon, Jun 27, 2016 at 03:57:28PM +0200, Ard Biesheuvel wrote:
+> > >> So if vga-pci.c is the only problematic device, for which a reasonable
+> > >> alternative exists (virtio-gpu), I think the only feasible solution is
+> > >> to educate QEMU not to allow RAM memslots being exposed via PCI BARs
+> > >> when running under KVM/ARM.
+> > > 
+> > > It would be good if we could support vga-pci under KVM/ARM, but if
+> > > there's no other way than rewriting the arm64 kernel's memory mappings
+> > > completely, then probably we're stuck there, unfortunately.
+
+Just to be clear, the behaviour of mismatched memory attributes is
+defined in the ARM ARM and so far Linux worked fine with such cacheable
+vs non-cacheable (as long as only one of them is accessed *or* cache
+maintenance is performed accordingly). I don't think the arm64 kernel
+memory map needs to be rewritten.
+
+> > It's been mentioned earlier that the specific combination of S1 and S2
+> > mappings on aarch64 is actually an *architecture bug*. If we accept that
+> > qualification, then we should realize our efforts here target finding a
+> > *workaround*.
+
+I haven't read this thread in detail but I doubt it's an architecture
+bug. You may say a missing feature.
+
+> > In your blog post
+> > <http://www.linaro.org/blog/core-dump/on-the-performance-of-arm-virtualization/>,
+> > you mention VHE ("Virtualization Host Extensions"). That's clearly a
+> > sign of the architecture adapting to virt software needs.
+> > 
+> > Do you see any chance that the S1-S2 combinations too can be fixed in a
+> > new revision of the architecture?
 > 
-> Instead, we can expand our current helpers to generate the right
-> mask or nop with code patching. We default to using the top VA
-> space, with alternatives to switch to the bottom one or to nop
-> out the instructions.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_hyp.h | 27 ++++++++++++--------------
->  arch/arm64/include/asm/kvm_mmu.h | 42 +++++++++++++++++++++++++++++++++++++---
->  2 files changed, 51 insertions(+), 18 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 61d01a9..dd4904b 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -25,24 +25,21 @@
->  
->  #define __hyp_text __section(.hyp.text) notrace
->  
-> -static inline unsigned long __kern_hyp_va(unsigned long v)
-> -{
-> -	asm volatile(ALTERNATIVE("and %0, %0, %1",
-> -				 "nop",
-> -				 ARM64_HAS_VIRT_HOST_EXTN)
-> -		     : "+r" (v) : "i" (HYP_PAGE_OFFSET_MASK));
-> -	return v;
-> -}
-> -
-> -#define kern_hyp_va(v) (typeof(v))(__kern_hyp_va((unsigned long)(v)))
-> -
->  static inline unsigned long __hyp_kern_va(unsigned long v)
->  {
-> -	asm volatile(ALTERNATIVE("orr %0, %0, %1",
-> -				 "nop",
-> +	u64 mask;
-> +
-> +	asm volatile(ALTERNATIVE("mov %0, %1",
-> +				 "mov %0, %2",
-> +				 ARM64_HYP_OFFSET_LOW)
-> +		     : "=r" (mask)
-> +		     : "i" (~HYP_PAGE_OFFSET_HIGH_MASK),
-> +		       "i" (~HYP_PAGE_OFFSET_LOW_MASK));
-> +	asm volatile(ALTERNATIVE("nop",
-> +				 "mov %0, xzr",
->  				 ARM64_HAS_VIRT_HOST_EXTN)
-> -		     : "+r" (v) : "i" (~HYP_PAGE_OFFSET_MASK));
-> -	return v;
-> +		     : "+r" (mask));
-> +	return v | mask;
+> I really can't speculate about this, I assume there are reasons for why
+> the architecture is defined in this particular way, but I haven't
+> investigated this aspect in any depth.
 
-If mask is ~HYP_PAGE_OFFSET_LOW_MASK how can you be sure that setting
-bit (VA_BITS - 1) is always the right thing to do to generate a kernel
-address?
+In general, there are software issues with forcing cacheability at S2
+when S1 required non-cacheable transactions, with all the coherency
+assumptions. The problem becomes even more complicated when memory
+types, not just cacheability, are "upgraded". E.g. forcing S1 Device to
+S2 Normal with consequences on memory ordering that the guest is not
+aware of.
 
-This is kind of what I asked before only now there's an extra bit not
-guaranteed by the architecture to be set for the kernel range, I
-think.
+While there are potential, specific, hardware solutions, they can't be
+"back-ported" to existing CPU implementation, so we need a solution in
+software. *If* the only software solution has severe performance
+implications and it is on a critical path, the architecture might be
+improved in the future (like we did with VHE). But I don't think that's
+the case here.
 
->  }
->  
->  #define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index e45df1b..889330b 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -95,13 +95,33 @@
->  /*
->   * Convert a kernel VA into a HYP VA.
->   * reg: VA to be converted.
-> + *
-> + * This generates the following sequences:
-> + * - High mask:
-> + *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
-> + *		nop
-> + * - Low mask:
-> + *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
-> + *		and x0, x0, #HYP_PAGE_OFFSET_LOW_MASK
-> + * - VHE:
-> + *		nop
-> + *		nop
-> + *
-> + * The "low mask" version works because the mask is a strict subset of
-> + * the "high mask", hence performing the first mask for nothing.
-> + * Should be completely invisible on any viable CPU.
->   */
->  .macro kern_hyp_va	reg
-> -alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
-> -	and	\reg, \reg, #HYP_PAGE_OFFSET_MASK
-> +alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
-> +	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
->  alternative_else
->  	nop
->  alternative_endif
-> +alternative_if_not ARM64_HYP_OFFSET_LOW
-> +	nop
-> +alternative_else
-> +	and     \reg, \reg, #HYP_PAGE_OFFSET_LOW_MASK
-> +alternative_endif
->  .endm
->  
->  #else
-> @@ -112,7 +132,23 @@ alternative_endif
->  #include <asm/mmu_context.h>
->  #include <asm/pgtable.h>
->  
-> -#define KERN_TO_HYP(kva)	((unsigned long)kva & HYP_PAGE_OFFSET_MASK)
-> +static inline unsigned long __kern_hyp_va(unsigned long v)
-> +{
-> +	asm volatile(ALTERNATIVE("and %0, %0, %1",
-> +				 "nop",
-> +				 ARM64_HAS_VIRT_HOST_EXTN)
-> +		     : "+r" (v)
-> +		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
-> +	asm volatile(ALTERNATIVE("nop",
-> +				 "and %0, %0, %1",
-> +				 ARM64_HYP_OFFSET_LOW)
-> +		     : "+r" (v)
-> +		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
-
-how is the second operation a nop for VHE? Is this because
-ARM64_HYP_OFFSET_LOW will never be set for VHE?
-
-> +	return v;
-> +}
-> +
-> +#define kern_hyp_va(v) 	(typeof(v))(__kern_hyp_va((unsigned long)(v)))
-> +#define KERN_TO_HYP(v)	kern_hyp_va(v)
-
-looks like there's room for some unification/cleanup here as well.
-
->  
->  /*
->   * We currently only support a 40bit IPA.
-> -- 
-> 2.1.4
-> 
-
-Thanks,
--Christoffer
+-- 
+Catalin
