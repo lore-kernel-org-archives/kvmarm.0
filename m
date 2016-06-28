@@ -1,7 +1,7 @@
 From: Laszlo Ersek <lersek@redhat.com>
 Subject: Re: issues with emulated PCI MMIO backed by host memory under KVM
-Date: Tue, 28 Jun 2016 13:02:55 +0200
-Message-ID: <6fc9f102-0d73-68cc-592b-5d74479c0351@redhat.com>
+Date: Tue, 28 Jun 2016 13:06:36 +0200
+Message-ID: <9fbfb578-2235-2f2a-4502-a285e9ba22e6@redhat.com>
 References: <CAKv+Gu8MWxUvySvsQW+DpohLLHSi8ZYm4o7gCE2a4q0iC=cuHA@mail.gmail.com>
  <20160627091619.GB26498@cbox>
  <CAKv+Gu9u2f6+HLYMzqtkq0z=Xk5gTq=_11QvAKMaBZj_oRMwTA@mail.gmail.com>
@@ -9,22 +9,22 @@ References: <CAKv+Gu8MWxUvySvsQW+DpohLLHSi8ZYm4o7gCE2a4q0iC=cuHA@mail.gmail.com>
  <CAKv+Gu9uBow4FqmA701J76CZ9Npi2j6ADXEJhXAax5whiQkP1A@mail.gmail.com>
  <20160627133508.GI26498@cbox>
  <CAKv+Gu_zQErcMy6h0J71TfrkwRC0TqoQxmjRCNoeyJeD-zX7Kg@mail.gmail.com>
- <BFB29C33-2C3B-4C59-B38A-DACF6D13C2F9@suse.de>
+ <20160628100405.GK26498@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAAA849B4A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 06:57:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 979BD40F9B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 07:01:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qCmzv3YnDSwV for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Jun 2016 06:57:49 -0400 (EDT)
+ with ESMTP id rkJbsXRbEWtz for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Jun 2016 07:01:30 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A155049B46
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 06:57:49 -0400 (EDT)
-In-Reply-To: <BFB29C33-2C3B-4C59-B38A-DACF6D13C2F9@suse.de>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 815B740BDA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 07:01:30 -0400 (EDT)
+In-Reply-To: <20160628100405.GK26498@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,25 +34,22 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/27/16 16:29, Alexander Graf wrote:
-> 
-> 
->> Am 27.06.2016 um 15:57 schrieb Ard Biesheuvel <ard.biesheuvel@linaro.org>:
->>
->>> On 27 June 2016 at 15:35, Christoffer Dall <christoffer.dall@linaro.org> wrote:
->>>> On Mon, Jun 27, 2016 at 02:30:46PM +0200, Ard Biesheuvel wrote:
->>>>> On 27 June 2016 at 12:34, Christoffer Dall <christoffer.dall@linaro.org> wrote:
->>>>>> On Mon, Jun 27, 2016 at 11:47:18AM +0200, Ard Biesheuvel wrote:
->>>>>>> On 27 June 2016 at 11:16, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+On 06/28/16 12:04, Christoffer Dall wrote:
+> On Mon, Jun 27, 2016 at 03:57:28PM +0200, Ard Biesheuvel wrote:
+>> On 27 June 2016 at 15:35, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+>>> On Mon, Jun 27, 2016 at 02:30:46PM +0200, Ard Biesheuvel wrote:
+>>>> On 27 June 2016 at 12:34, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+>>>>> On Mon, Jun 27, 2016 at 11:47:18AM +0200, Ard Biesheuvel wrote:
+>>>>>> On 27 June 2016 at 11:16, Christoffer Dall <christoffer.dall@linaro.org> wrote:
 >>>>>>> Hi,
 >>>>>>>
 >>>>>>> I'm going to ask some stupid questions here...
 >>>>>>>
->>>>>>>> On Fri, Jun 24, 2016 at 04:04:45PM +0200, Ard Biesheuvel wrote:
+>>>>>>> On Fri, Jun 24, 2016 at 04:04:45PM +0200, Ard Biesheuvel wrote:
 >>>>>>>> Hi all,
 >>>>>>>>
 >>>>>>>> This old subject came up again in a discussion related to PCIe support
@@ -71,6 +68,7 @@ On 06/27/16 16:29, Alexander Graf wrote:
 >>>>>>>> into cycles on the PCI bus.
 >>>>>>>
 >>>>>>> For the sake of completeness, why is this reasonable?
+>>>>>>>
 >>>>>>
 >>>>>> Because the whole point of accessing these regions is to communicate
 >>>>>> with the device. It is common to use write combining mappings for
@@ -79,6 +77,7 @@ On 06/27/16 16:29, Alexander Graf wrote:
 >>>>>> device state to remain synchronized.
 >>>>>>
 >>>>>>> Is this how any real ARM system implementing PCI would actually work?
+>>>>>>>
 >>>>>>
 >>>>>> Yes.
 >>>>>>
@@ -111,6 +110,7 @@ On 06/27/16 16:29, Alexander Graf wrote:
 >>>>>>> stage-1 mappings to be cacheable, does that apply here ?
 >>>>>>>
 >>>>>>> Do we have a clear picture of why we'd prefer one way over the other?
+>>>>>>>
 >>>>>>
 >>>>>> So first of all, let me reiterate that I could only find a single
 >>>>>> instance in QEMU where a PCI MMIO region is backed by host memory,
@@ -121,6 +121,7 @@ On 06/27/16 16:29, Alexander Graf wrote:
 >>>>>
 >>>>> Right, ok.  So Marc's point during his KVM Forum talk was basically,
 >>>>> don't use the legacy VGA adapter on ARM and use virtio graphics, right?
+>>>>>
 >>>>
 >>>> Yes. But nothing is preventing you currently from using that, and I
 >>>> think we should prefer crappy performance but correct operation over
@@ -131,6 +132,7 @@ On 06/27/16 16:29, Alexander Graf wrote:
 >>> agreed, I just think that emulating accesses by trapping them is not
 >>> just slow, it's not really possible in practice and even if it is, it's
 >>> probably *unusably* slow.
+>>>
 >>
 >> Well, it would probably involve a lot of effort to implement emulation
 >> of instructions with multiple output registers, such as ldp/stp and
@@ -142,6 +144,7 @@ On 06/27/16 16:29, Alexander Graf wrote:
 >>>>
 >>>>> What is the proposed solution for someone shipping an ARM server and
 >>>>> wishing to provide a graphical output for that server?
+>>>>>
 >>>>
 >>>> The problem does not exist on bare metal. It is an implementation
 >>>> detail of KVM on ARM that guest PCI BAR mappings are incoherent with
@@ -152,6 +155,7 @@ On 06/27/16 16:29, Alexander Graf wrote:
 >>>>> would prevent someone from plugging a VGA adapter into the PCI slot on
 >>>>> an ARM server, and people selling ARM servers probably want this to
 >>>>> happen, I'm guessing.
+>>>>>
 >>>>
 >>>> As I said, the problem does not exist on bare metal.
 >>>>
@@ -166,6 +170,7 @@ On 06/27/16 16:29, Alexander Graf wrote:
 >>>>>
 >>>>> Will we run into a bunch of other problems if we begin punching holes in
 >>>>> the direct mapping for regular RAM?
+>>>>>
 >>>>
 >>>> I think the policy up until now has been not to remap regions in the
 >>>> kernel direct mapping for the purposes of DMA, and I think by the same
@@ -175,6 +180,7 @@ On 06/27/16 16:29, Alexander Graf wrote:
 >>> this is not DMA memory, but just regular RAM.  I just don't know enough
 >>> about the kernel's VM mappings to know what's involved here, but we
 >>> should find out somehow...
+>>>
 >>
 >> Whether it is DMA memory or not does not make a difference. The point
 >> is simply that arm64 maps all RAM owned by the kernel as cacheable,
@@ -185,36 +191,34 @@ On 06/27/16 16:29, Alexander Graf wrote:
 >> So instead, we'd have to reserve some system memory early on and
 >> remove it from the linear mapping, the complexity of which is more
 >> than we are probably prepared to put up with.
+> 
+> Don't we have any existing frameworks for such things, like ion or
+> other things like that?  Not sure if these systems export anything to
+> userspace or even serve the purpose we want, but thought I'd throw it
+> out there.
+> 
 >>
 >> So if vga-pci.c is the only problematic device, for which a reasonable
 >> alternative exists (virtio-gpu), I think the only feasible solution is
 >> to educate QEMU not to allow RAM memslots being exposed via PCI BARs
 >> when running under KVM/ARM.
 > 
-> That's ok, if there is a viable alternative. So if we had working virtio-gpu support in OVMF, we could just disable the legacy vga device with kvm on arm altogether - it'd either crash your guest (unhandled opcode in mmio emulation) or give you broken graphics.
-> 
-> But first, someone would need to sit down and make virtio-gpu work in OVMF.
+> It would be good if we could support vga-pci under KVM/ARM, but if
+> there's no other way than rewriting the arm64 kernel's memory mappings
+> completely, then probably we're stuck there, unfortunately.
 
-I've offered to (attempt to) implement a GOP driver for virtio-gpu, to
-be used by OvmfPkg and ArmVirtPkg, once the virtio-gpu bits become part
-of the official virtio specification.
+It's been mentioned earlier that the specific combination of S1 and S2
+mappings on aarch64 is actually an *architecture bug*. If we accept that
+qualification, then we should realize our efforts here target finding a
+*workaround*.
 
-However, as I mentioned elsewhere in this thread, a GOP driver for
-virtio-gpu could provide the Blt() kind of display output *only*.
-Virtio-gpu (the device model) lacks a linear framebuffer by design,
-hence no GOP can expose it. The GOP can only offer the Blt() member
-function, which would internally turn the block transfer requests into
-virtio-gpu request.
+In your blog post
+<http://www.linaro.org/blog/core-dump/on-the-performance-of-arm-virtualization/>,
+you mention VHE ("Virtualization Host Extensions"). That's clearly a
+sign of the architecture adapting to virt software needs.
 
-Unfortunately, offering Blt() *only* is not good enough. Some UEFI boot
-laoders (on x86 at least) depend on direct framebuffer access.
-
-Let me put it this way: the UEFI spec describes a possibility for the
-GOP implementor to expose a linear framebuffer for the display device if
-there is one. If there is one, great; if there isn't, that's fine too,
-the GOP specification allows it as well. It is the UEFI boot loaders
-(well, some of them) that ultimately depend on the linear framebuffer,
-which is what virtio-gpu (the device model) lacks.
+Do you see any chance that the S1-S2 combinations too can be fixed in a
+new revision of the architecture?
 
 Thanks
 Laszlo
