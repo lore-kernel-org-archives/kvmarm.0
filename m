@@ -1,158 +1,183 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v7 16/17] KVM: arm64: implement MSI injection in ITS emulation
-Date: Tue, 28 Jun 2016 13:32:29 +0100
-Message-ID: <20160628123230.26255-17-andre.przywara@arm.com>
-References: <20160628123230.26255-1-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160628123230.26255-1-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 05/15] arm64: KVM: Refactor kern_hyp_va/hyp_kern_va to
+ deal with multiple offsets
+Date: Tue, 28 Jun 2016 14:42:10 +0200
+Message-ID: <20160628124210.GP26498@cbox>
+References: <1465297115-13091-1-git-send-email-marc.zyngier@arm.com>
+ <1465297115-13091-6-git-send-email-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7A7149B32
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 08:36:13 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id oU0aEzPWNejh for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Jun 2016 08:36:12 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6889449B2C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 08:36:12 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id r190so27027272wmr.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 05:41:22 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1465297115-13091-6-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When userland wants to inject a MSI into the guest, it uses the
-KVM_SIGNAL_MSI ioctl, which carries the doorbell address along with
-the payload and the device ID.
-We convert this into an MMIO write to the ITS translation register,
-so we can use the knowledge of the kvm_io_bus framework about the
-different ITSes and magically end up in the right ITS.
-The device ID is combined with the payload into a 64-bit write.
-Inside the handler we use our wrapper functions to iterate the linked
-lists and find the proper Interrupt Translation Table Entry and thus
-the corresponding struct vgic_irq to finally set the pending bit.
-We provide a VGIC emulation model specific routine for the actual
-MSI injection. The wrapper functions return an error for models not
-(yet) implementing MSIs (like the GICv2 emulation).
-We also provide the handler for the ITS "INT" command, which allows a
-guest to trigger an MSI via the ITS command queue. Since this one knows
-about the right ITS already, we directly call the MMIO handler function
-without using the kvm_io_bus framework.
+On Tue, Jun 07, 2016 at 11:58:25AM +0100, Marc Zyngier wrote:
+> As we move towards a selectable HYP VA range, it is obvious that
+> we don't want to test a variable to find out if we need to use
+> the bottom VA range, the top VA range, or use the address as is
+> (for VHE).
+> 
+> Instead, we can expand our current helpers to generate the right
+> mask or nop with code patching. We default to using the top VA
+> space, with alternatives to switch to the bottom one or to nop
+> out the instructions.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_hyp.h | 27 ++++++++++++--------------
+>  arch/arm64/include/asm/kvm_mmu.h | 42 +++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 51 insertions(+), 18 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 61d01a9..dd4904b 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -25,24 +25,21 @@
+>  
+>  #define __hyp_text __section(.hyp.text) notrace
+>  
+> -static inline unsigned long __kern_hyp_va(unsigned long v)
+> -{
+> -	asm volatile(ALTERNATIVE("and %0, %0, %1",
+> -				 "nop",
+> -				 ARM64_HAS_VIRT_HOST_EXTN)
+> -		     : "+r" (v) : "i" (HYP_PAGE_OFFSET_MASK));
+> -	return v;
+> -}
+> -
+> -#define kern_hyp_va(v) (typeof(v))(__kern_hyp_va((unsigned long)(v)))
+> -
+>  static inline unsigned long __hyp_kern_va(unsigned long v)
+>  {
+> -	asm volatile(ALTERNATIVE("orr %0, %0, %1",
+> -				 "nop",
+> +	u64 mask;
+> +
+> +	asm volatile(ALTERNATIVE("mov %0, %1",
+> +				 "mov %0, %2",
+> +				 ARM64_HYP_OFFSET_LOW)
+> +		     : "=r" (mask)
+> +		     : "i" (~HYP_PAGE_OFFSET_HIGH_MASK),
+> +		       "i" (~HYP_PAGE_OFFSET_LOW_MASK));
+> +	asm volatile(ALTERNATIVE("nop",
+> +				 "mov %0, xzr",
+>  				 ARM64_HAS_VIRT_HOST_EXTN)
+> -		     : "+r" (v) : "i" (~HYP_PAGE_OFFSET_MASK));
+> -	return v;
+> +		     : "+r" (mask));
+> +	return v | mask;
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- virt/kvm/arm/vgic/vgic-its.c | 70 ++++++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h     |  6 ++++
- 2 files changed, 76 insertions(+)
+If mask is ~HYP_PAGE_OFFSET_LOW_MASK how can you be sure that setting
+bit (VA_BITS - 1) is always the right thing to do to generate a kernel
+address?
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 29c5ac6..f1e889b 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -423,6 +423,61 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
- 	return 0;
- }
- 
-+static void vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
-+				 u32 devid, u32 eventid)
-+{
-+	struct its_itte *itte;
-+
-+	if (!its->enabled)
-+		return;
-+
-+	mutex_lock(&its->its_lock);
-+
-+	itte = find_itte(its, devid, eventid);
-+	/* Triggering an unmapped IRQ gets silently dropped. */
-+	if (itte && its_is_collection_mapped(itte->collection)) {
-+		struct kvm_vcpu *vcpu;
-+
-+		vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
-+		if (vcpu && vcpu->arch.vgic_cpu.lpis_enabled) {
-+			spin_lock(&itte->irq->irq_lock);
-+			itte->irq->pending = true;
-+			vgic_queue_irq_unlock(kvm, itte->irq);
-+		}
-+	}
-+
-+	mutex_unlock(&its->its_lock);
-+}
-+
-+/*
-+ * Dispatches an incoming MSI request to the KVM IO bus, which will redirect
-+ * it for us to the proper ITS and the translation register write handler.
-+ */
-+int vits_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-+{
-+	u64 address;
-+	struct kvm_io_device *kvm_io_dev;
-+	struct vgic_io_device *iodev;
-+
-+	if (!vgic_has_its(kvm))
-+		return -ENODEV;
-+
-+	if (!(msi->flags & KVM_MSI_VALID_DEVID))
-+		return -EINVAL;
-+
-+	address = (u64)msi->address_hi << 32 | msi->address_lo;
-+	address -= SZ_64K;
-+
-+	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
-+	if (!kvm_io_dev)
-+		return -ENODEV;
-+
-+	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
-+	vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
-+
-+	return 0;
-+}
-+
- /* Requires the its_lock to be held. */
- static void its_free_itte(struct kvm *kvm, struct its_itte *itte)
- {
-@@ -853,6 +908,18 @@ static int vits_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
- 	return 0;
- }
- 
-+/* The INT command injects the LPI associated with that DevID/EvID pair. */
-+static int vits_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
-+			       u64 *its_cmd)
-+{
-+	u32 msi_data = its_cmd_get_id(its_cmd);
-+	u64 msi_devid = its_cmd_get_deviceid(its_cmd);
-+
-+	vgic_its_trigger_msi(kvm, its, msi_devid, msi_data);
-+
-+	return 0;
-+}
-+
- /*
-  * This function is called with the its_cmd lock held, but the ITS data
-  * structure lock dropped. It is within the responsibility of the actual
-@@ -889,6 +956,9 @@ static int vits_handle_command(struct kvm *kvm, struct vgic_its *its,
- 	case GITS_CMD_MOVALL:
- 		ret = vits_cmd_handle_movall(kvm, its, its_cmd);
- 		break;
-+	case GITS_CMD_INT:
-+		ret = vits_cmd_handle_int(kvm, its, its_cmd);
-+		break;
- 	case GITS_CMD_INV:
- 		ret = vits_cmd_handle_inv(kvm, its, its_cmd);
- 		break;
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 4a9165f..b775e10 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -81,6 +81,7 @@ bool vgic_has_its(struct kvm *kvm);
- int kvm_vgic_register_its_device(void);
- struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid);
- void vgic_enable_lpis(struct kvm_vcpu *vcpu);
-+int vits_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
- #else
- static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
- {
-@@ -151,6 +152,11 @@ static inline struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid)
- static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
- {
- }
-+
-+static inline int vits_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-+{
-+	return -ENODEV;
-+}
- #endif
- 
- int kvm_register_vgic_device(unsigned long type);
--- 
-2.9.0
+This is kind of what I asked before only now there's an extra bit not
+guaranteed by the architecture to be set for the kernel range, I
+think.
 
+>  }
+>  
+>  #define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index e45df1b..889330b 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -95,13 +95,33 @@
+>  /*
+>   * Convert a kernel VA into a HYP VA.
+>   * reg: VA to be converted.
+> + *
+> + * This generates the following sequences:
+> + * - High mask:
+> + *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
+> + *		nop
+> + * - Low mask:
+> + *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
+> + *		and x0, x0, #HYP_PAGE_OFFSET_LOW_MASK
+> + * - VHE:
+> + *		nop
+> + *		nop
+> + *
+> + * The "low mask" version works because the mask is a strict subset of
+> + * the "high mask", hence performing the first mask for nothing.
+> + * Should be completely invisible on any viable CPU.
+>   */
+>  .macro kern_hyp_va	reg
+> -alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
+> -	and	\reg, \reg, #HYP_PAGE_OFFSET_MASK
+> +alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+> +	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
+>  alternative_else
+>  	nop
+>  alternative_endif
+> +alternative_if_not ARM64_HYP_OFFSET_LOW
+> +	nop
+> +alternative_else
+> +	and     \reg, \reg, #HYP_PAGE_OFFSET_LOW_MASK
+> +alternative_endif
+>  .endm
+>  
+>  #else
+> @@ -112,7 +132,23 @@ alternative_endif
+>  #include <asm/mmu_context.h>
+>  #include <asm/pgtable.h>
+>  
+> -#define KERN_TO_HYP(kva)	((unsigned long)kva & HYP_PAGE_OFFSET_MASK)
+> +static inline unsigned long __kern_hyp_va(unsigned long v)
+> +{
+> +	asm volatile(ALTERNATIVE("and %0, %0, %1",
+> +				 "nop",
+> +				 ARM64_HAS_VIRT_HOST_EXTN)
+> +		     : "+r" (v)
+> +		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
+> +	asm volatile(ALTERNATIVE("nop",
+> +				 "and %0, %0, %1",
+> +				 ARM64_HYP_OFFSET_LOW)
+> +		     : "+r" (v)
+> +		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
+
+how is the second operation a nop for VHE? Is this because
+ARM64_HYP_OFFSET_LOW will never be set for VHE?
+
+> +	return v;
+> +}
+> +
+> +#define kern_hyp_va(v) 	(typeof(v))(__kern_hyp_va((unsigned long)(v)))
+> +#define KERN_TO_HYP(v)	kern_hyp_va(v)
+
+looks like there's room for some unification/cleanup here as well.
+
+>  
+>  /*
+>   * We currently only support a 40bit IPA.
+> -- 
+> 2.1.4
+> 
+
+Thanks,
+-Christoffer
