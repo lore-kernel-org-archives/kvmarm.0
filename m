@@ -1,27 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 08/15] arm/arm64: KVM: Always have merged page tables
-Date: Tue, 28 Jun 2016 23:43:19 +0200
-Message-ID: <20160628214319.GR26498@cbox>
+Subject: Re: [PATCH 12/15] arm: KVM: Simplify HYP init
+Date: Tue, 28 Jun 2016 23:50:37 +0200
+Message-ID: <20160628215037.GS26498@cbox>
 References: <1465297115-13091-1-git-send-email-marc.zyngier@arm.com>
- <1465297115-13091-9-git-send-email-marc.zyngier@arm.com>
+ <1465297115-13091-13-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF2CA49B2C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 17:37:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D5A949B2C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 17:44:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id b2D7m+EyGSIv for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Jun 2016 17:37:20 -0400 (EDT)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D61F49AF5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 17:37:19 -0400 (EDT)
-Received: by mail-wm0-f47.google.com with SMTP id v199so156461914wmv.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 14:42:31 -0700 (PDT)
+ with ESMTP id REhvyLZ1VIf3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Jun 2016 17:44:37 -0400 (EDT)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC61649B21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 17:44:37 -0400 (EDT)
+Received: by mail-wm0-f45.google.com with SMTP id a66so46501785wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2016 14:49:49 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1465297115-13091-9-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <1465297115-13091-13-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,147 +35,128 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jun 07, 2016 at 11:58:28AM +0100, Marc Zyngier wrote:
-> We're in a position where we can now always have "merged" page
-> tables, where both the runtime mapping and the idmap coexist.
-> 
-> This results in some code being removed, but there is more to come.
+On Tue, Jun 07, 2016 at 11:58:32AM +0100, Marc Zyngier wrote:
+> Just like for arm64, we can now make the HYP setup a lot simpler,
+> and we can now initialise it in one go (instead of the two
+> phases we currently have).
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm/kvm/mmu.c     | 74 +++++++++++++++++++++++---------------------------
->  arch/arm64/kvm/reset.c | 31 +++++----------------
->  2 files changed, 41 insertions(+), 64 deletions(-)
+>  arch/arm/include/asm/kvm_host.h | 15 +++++--------
+>  arch/arm/kvm/init.S             | 49 ++++++++---------------------------------
+>  2 files changed, 14 insertions(+), 50 deletions(-)
 > 
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index d6ecbf1..9a17e14 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -492,13 +492,12 @@ void free_boot_hyp_pgd(void)
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 020f4eb..eafbfd5 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -250,18 +250,13 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+>  	 * code. The init code doesn't need to preserve these
+>  	 * registers as r0-r3 are already callee saved according to
+>  	 * the AAPCS.
+> -	 * Note that we slightly misuse the prototype by casing the
+> +	 * Note that we slightly misuse the prototype by casting the
+>  	 * stack pointer to a void *.
+> -	 *
+> -	 * We don't have enough registers to perform the full init in
+> -	 * one go.  Install the boot PGD first, and then install the
+> -	 * runtime PGD, stack pointer and vectors. The PGDs are always
+> -	 * passed as the third argument, in order to be passed into
+> -	 * r2-r3 to the init code (yes, this is compliant with the
+> -	 * PCS!).
+> -	 */
 >  
->  	if (boot_hyp_pgd) {
->  		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
-> -		unmap_hyp_range(boot_hyp_pgd, TRAMPOLINE_VA, PAGE_SIZE);
->  		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
->  		boot_hyp_pgd = NULL;
->  	}
+> -	kvm_call_hyp(NULL, 0, boot_pgd_ptr);
+> +	 * The PGDs are always passed as the third argument, in order
+> +	 * to be passed into r2-r3 to the init code (yes, this is
+> +	 * compliant with the PCS!).
+> +	 */
 >  
->  	if (hyp_pgd)
-> -		unmap_hyp_range(hyp_pgd, TRAMPOLINE_VA, PAGE_SIZE);
-> +		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
->  
->  	mutex_unlock(&kvm_hyp_pgd_mutex);
+>  	kvm_call_hyp((void*)hyp_stack_ptr, vector_ptr, pgd_ptr);
 >  }
-> @@ -1690,7 +1689,7 @@ phys_addr_t kvm_mmu_get_boot_httbr(void)
->  	if (__kvm_cpu_uses_extended_idmap())
->  		return virt_to_phys(merged_hyp_pgd);
->  	else
-> -		return virt_to_phys(boot_hyp_pgd);
-> +		return virt_to_phys(hyp_pgd);
->  }
->  
->  phys_addr_t kvm_get_idmap_vector(void)
-> @@ -1703,6 +1702,22 @@ phys_addr_t kvm_get_idmap_start(void)
->  	return hyp_idmap_start;
->  }
->  
-> +static int kvm_map_idmap_text(pgd_t *pgd)
-> +{
-> +	int err;
-> +
-> +	/* Create the idmap in the boot page tables */
-> +	err = 	__create_hyp_mappings(pgd,
-> +				      hyp_idmap_start, hyp_idmap_end,
-> +				      __phys_to_pfn(hyp_idmap_start),
-> +				      PAGE_HYP);
-> +	if (err)
-> +		kvm_err("Failed to idmap %lx-%lx\n",
-> +			hyp_idmap_start, hyp_idmap_end);
-> +
-> +	return err;
-> +}
-> +
->  int kvm_mmu_init(void)
->  {
->  	int err;
-> @@ -1718,27 +1733,25 @@ int kvm_mmu_init(void)
->  	BUG_ON((hyp_idmap_start ^ (hyp_idmap_end - 1)) & PAGE_MASK);
->  
->  	hyp_pgd = (pgd_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, hyp_pgd_order);
-> -	boot_hyp_pgd = (pgd_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, hyp_pgd_order);
-> -
-> -	if (!hyp_pgd || !boot_hyp_pgd) {
-> +	if (!hyp_pgd) {
->  		kvm_err("Hyp mode PGD not allocated\n");
->  		err = -ENOMEM;
->  		goto out;
->  	}
->  
-> -	/* Create the idmap in the boot page tables */
-> -	err = 	__create_hyp_mappings(boot_hyp_pgd,
-> -				      hyp_idmap_start, hyp_idmap_end,
-> -				      __phys_to_pfn(hyp_idmap_start),
-> -				      PAGE_HYP);
-> +	if (__kvm_cpu_uses_extended_idmap()) {
-> +		boot_hyp_pgd = (pgd_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO,
-> +							 hyp_pgd_order);
-> +		if (!boot_hyp_pgd) {
-> +			kvm_err("Hyp boot PGD not allocated\n");
-> +			err = -ENOMEM;
-> +			goto out;
-> +		}
->  
-> -	if (err) {
-> -		kvm_err("Failed to idmap %lx-%lx\n",
-> -			hyp_idmap_start, hyp_idmap_end);
-> -		goto out;
-> -	}
-> +		err = kvm_map_idmap_text(boot_hyp_pgd);
-> +		if (err)
-> +			goto out;
->  
-> -	if (__kvm_cpu_uses_extended_idmap()) {
->  		merged_hyp_pgd = (pgd_t *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
->  		if (!merged_hyp_pgd) {
->  			kvm_err("Failed to allocate extra HYP pgd\n");
-> @@ -1746,29 +1759,10 @@ int kvm_mmu_init(void)
->  		}
->  		__kvm_extend_hypmap(boot_hyp_pgd, hyp_pgd, merged_hyp_pgd,
->  				    hyp_idmap_start);
-> -		return 0;
-> -	}
-> -
-> -	/* Map the very same page at the trampoline VA */
-> -	err = 	__create_hyp_mappings(boot_hyp_pgd,
-> -				      TRAMPOLINE_VA, TRAMPOLINE_VA + PAGE_SIZE,
-> -				      __phys_to_pfn(hyp_idmap_start),
-> -				      PAGE_HYP);
-> -	if (err) {
-> -		kvm_err("Failed to map trampoline @%lx into boot HYP pgd\n",
-> -			TRAMPOLINE_VA);
-> -		goto out;
-> -	}
-> -
-> -	/* Map the same page again into the runtime page tables */
-> -	err = 	__create_hyp_mappings(hyp_pgd,
-> -				      TRAMPOLINE_VA, TRAMPOLINE_VA + PAGE_SIZE,
-> -				      __phys_to_pfn(hyp_idmap_start),
-> -				      PAGE_HYP);
-> -	if (err) {
-> -		kvm_err("Failed to map trampoline @%lx into runtime HYP pgd\n",
-> -			TRAMPOLINE_VA);
-> -		goto out;
-> +	} else {
-> +		err = kvm_map_idmap_text(hyp_pgd);
-> +		if (err)
-> +			goto out;
+> diff --git a/arch/arm/kvm/init.S b/arch/arm/kvm/init.S
+> index 1f9ae17..b82a99d 100644
+> --- a/arch/arm/kvm/init.S
+> +++ b/arch/arm/kvm/init.S
+> @@ -32,23 +32,13 @@
+>   *       r2,r3 = Hypervisor pgd pointer
+>   *
+>   * The init scenario is:
+> - * - We jump in HYP with four parameters: boot HYP pgd, runtime HYP pgd,
+> - *   runtime stack, runtime vectors
+> - * - Enable the MMU with the boot pgd
+> - * - Jump to a target into the trampoline page (remember, this is the same
+> - *   physical page!)
+> - * - Now switch to the runtime pgd (same VA, and still the same physical
+> - *   page!)
+> + * - We jump in HYP with 3 parameters: runtime HYP pgd, runtime stack,
+> + *   runtime vectors
 
-Something I'm not clear on:
+probably just call this HYP pgd, HYP stack, and HYP vectors now
 
-how can we always have merged pgtables on 32-bit ARM at this point?
+>   * - Invalidate TLBs
+>   * - Set stack and vectors
+> + * - Setup the page tables
+> + * - Enable the MMU
+>   * - Profit! (or eret, if you only care about the code).
+> - *
+> - * As we only have four registers available to pass parameters (and we
+> - * need six), we split the init in two phases:
+> - * - Phase 1: r0 = 0, r1 = 0, r2,r3 contain the boot PGD.
+> - *   Provides the basic HYP init, and enable the MMU.
+> - * - Phase 2: r0 = ToS, r1 = vectors, r2,r3 contain the runtime PGD.
+> - *   Switches to the runtime PGD, set stack and vectors.
+>   */
+>  
+>  	.text
+> @@ -68,8 +58,11 @@ __kvm_hyp_init:
+>  	W(b)	.
+>  
+>  __do_hyp_init:
+> -	cmp	r0, #0			@ We have a SP?
+> -	bne	phase2			@ Yes, second stage init
+> +	@ Set stack pointer
+> +	mov	sp, r0
+> +
+> +	@ Set HVBAR to point to the HYP vectors
+> +	mcr	p15, 4, r1, c12, c0, 0	@ HVBAR
+>  
+>  	@ Set the HTTBR to point to the hypervisor PGD pointer passed
+>  	mcrr	p15, 4, rr_lo_hi(r2, r3), c2
+> @@ -114,33 +107,9 @@ __do_hyp_init:
+>   THUMB(	ldr	r2, =(HSCTLR_M | HSCTLR_A | HSCTLR_TE)		)
+>  	orr	r1, r1, r2
+>  	orr	r0, r0, r1
+> -	isb
+>  	mcr	p15, 4, r0, c1, c0, 0	@ HSCR
+> -
+> -	@ End of init phase-1
+> -	eret
+> -
+> -phase2:
+> -	@ Set stack pointer
+> -	mov	sp, r0
+> -
+> -	@ Set HVBAR to point to the HYP vectors
+> -	mcr	p15, 4, r1, c12, c0, 0	@ HVBAR
+> -
+> -	@ Jump to the trampoline page
+> -	ldr	r0, =TRAMPOLINE_VA
+> -	adr	r1, target
+> -	bfi	r0, r1, #0, #PAGE_SHIFT
+> -	ret	r0
+> -
+> -target:	@ We're now in the trampoline code, switch page tables
+> -	mcrr	p15, 4, rr_lo_hi(r2, r3), c2
+>  	isb
+>  
+> -	@ Invalidate the old TLBs
+> -	mcr	p15, 4, r0, c8, c7, 0	@ TLBIALLH
+> -	dsb	ish
 
-why is there not a potential conflict at this point in the series
-between the runtime hyp mappings and the idmaps?
+how are we sure there are no stale entries in the TLB beyond the idmap
+region?  Did we take care of this during kernel boot?  What about
+hotplug/suspend stuff?
 
 Thanks,
 -Christoffer
