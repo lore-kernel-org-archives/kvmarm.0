@@ -1,25 +1,25 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v7 02/17] KVM: arm/arm64: check return value for
- kvm_register_vgic_device
-Date: Wed, 29 Jun 2016 17:59:09 +0200
-Message-ID: <81dfab53-e6b9-0164-a8c9-a3730bf4a802@redhat.com>
+Subject: Re: [PATCH v7 08/17] KVM: arm64: handle ITS related GICv3
+ redistributor registers
+Date: Wed, 29 Jun 2016 18:21:29 +0200
+Message-ID: <a121d228-95ba-87bf-0224-e5db2eb40a5b@redhat.com>
 References: <20160628123230.26255-1-andre.przywara@arm.com>
- <20160628123230.26255-3-andre.przywara@arm.com>
+ <20160628123230.26255-9-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CDF649B63
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 11:54:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 054DB49B54
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 12:16:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fs9CUYR3nuXF for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Jun 2016 11:53:59 -0400 (EDT)
+ with ESMTP id fSfcKrSIaupn for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Jun 2016 12:16:20 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5310249B5D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 11:53:59 -0400 (EDT)
-In-Reply-To: <20160628123230.26255-3-andre.przywara@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C6EA49B35
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 12:16:19 -0400 (EDT)
+In-Reply-To: <20160628123230.26255-9-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,130 +33,277 @@ To: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
+Hi Andre,
 
 On 28/06/2016 14:32, Andre Przywara wrote:
-> kvm_register_device_ops() can return an error, so lets check its return
-returned
-> value and propagate this up the call chain.
+> In the GICv3 redistributor there are the PENDBASER and PROPBASER
+> registers which we did not emulate so far, as they only make sense
+> when having an ITS. In preparation for that emulate those MMIO
+> accesses by storing the 64-bit data written into it into a variable
+> which we later read in the ITS emulation.
+> We also sanitise the registers, making sure RES0 regions are respected
+> and checking for valid memory attributes.
 > 
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  virt/kvm/arm/vgic/vgic-kvm-device.c | 15 +++++++++------
->  virt/kvm/arm/vgic/vgic-v2.c         |  7 ++++++-
->  virt/kvm/arm/vgic/vgic-v3.c         | 15 +++++++++++++--
->  virt/kvm/arm/vgic/vgic.h            |  2 +-
->  4 files changed, 29 insertions(+), 10 deletions(-)
+>  include/kvm/vgic/vgic.h          |  13 ++++
+>  virt/kvm/arm/vgic-v3.c           |  11 ++-
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 143 ++++++++++++++++++++++++++++++++++++++-
+>  virt/kvm/arm/vgic/vgic-mmio.h    |   8 +++
+>  4 files changed, 171 insertions(+), 4 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> index 0130c4b..2f24f13 100644
-> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> @@ -210,20 +210,24 @@ static void vgic_destroy(struct kvm_device *dev)
->  	kfree(dev);
->  }
+> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+> index a296d94..c56331c 100644
+> --- a/include/kvm/vgic/vgic.h
+> +++ b/include/kvm/vgic/vgic.h
+> @@ -146,6 +146,14 @@ struct vgic_dist {
+>  	struct vgic_irq		*spis;
 >  
-> -void kvm_register_vgic_device(unsigned long type)
-> +int kvm_register_vgic_device(unsigned long type)
->  {
-> +	int ret = -ENODEV;
+>  	struct vgic_io_device	dist_iodev;
 > +
->  	switch (type) {
->  	case KVM_DEV_TYPE_ARM_VGIC_V2:
-> -		kvm_register_device_ops(&kvm_arm_vgic_v2_ops,
-> -					KVM_DEV_TYPE_ARM_VGIC_V2);
-> +		ret = kvm_register_device_ops(&kvm_arm_vgic_v2_ops,
-> +					      KVM_DEV_TYPE_ARM_VGIC_V2);
->  		break;
->  #ifdef CONFIG_KVM_ARM_VGIC_V3
->  	case KVM_DEV_TYPE_ARM_VGIC_V3:
-> -		kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
-> -					KVM_DEV_TYPE_ARM_VGIC_V3);
-> +		ret = kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
-> +					      KVM_DEV_TYPE_ARM_VGIC_V3);
->  		break;
->  #endif
->  	}
-> +
-> +	return ret;
->  }
->  
->  /** vgic_attr_regs_access: allows user space to read/write VGIC registers
-> @@ -428,4 +432,3 @@ struct kvm_device_ops kvm_arm_vgic_v3_ops = {
+> +	/*
+> +	 * Contains the address of the LPI configuration table.
+> +	 * Since we report GICR_TYPER.CommonLPIAff as 0b00, we can share
+> +	 * one address across all redistributors.
+> +	 * GICv3 spec: 6.1.2 "LPI Configuration tables"
+> +	 */
+> +	u64			propbaser;
 >  };
 >  
->  #endif /* CONFIG_KVM_ARM_VGIC_V3 */
-> -
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index e31405e..80313de 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -344,7 +344,12 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
->  	}
+>  struct vgic_v2_cpu_if {
+> @@ -200,6 +208,11 @@ struct vgic_cpu {
+>  	 */
+>  	struct vgic_io_device	rd_iodev;
+>  	struct vgic_io_device	sgi_iodev;
+> +
+> +	/* Points to the LPI pending tables for the redistributor */
+> +	u64 pendbaser;
+> +
+> +	bool lpis_enabled;
+>  };
 >  
->  	kvm_vgic_global_state.can_emulate_gicv2 = true;
-> -	kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
-> +	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
-> +	if (ret) {
-> +		kvm_err("Cannot register GICv2 KVM device\n");
-> +		iounmap(kvm_vgic_global_state.vctrl_base);
-Aren't we supposed to tear down things done in create_hyp_io_mapping
-(such as pud_alloc_one)?
+>  int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
+> diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+> index 75b02fa..5c8b2d1 100644
+> --- a/virt/kvm/arm/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic-v3.c
+> @@ -166,6 +166,11 @@ static void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
+>  }
+>  
+> +#define INITIAL_PENDBASER_VALUE						  \
+> +	(GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWb)		| \
+> +	GIC_BASER_CACHEABILITY(GICR_PENDBASER, OUTER, SameAsInner)	| \
+> +	GIC_BASER_SHAREABILITY(GICR_PENDBASER, InnerShareable))
+> +
+>  static void vgic_v3_enable(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
+> @@ -183,10 +188,12 @@ static void vgic_v3_enable(struct kvm_vcpu *vcpu)
+>  	 * way, so we force SRE to 1 to demonstrate this to the guest.
+>  	 * This goes with the spec allowing the value to be RAO/WI.
+>  	 */
+> -	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+>  		vgic_v3->vgic_sre = ICC_SRE_EL1_SRE;
+> -	else
+> +		vcpu->arch.vgic_cpu->pendbaser = INITIAL_PENDBASER_VALUE;
+this prevents the "old" VGIC from compiling.
+
+Cheers
 
 Eric
-> +		return ret;
+> +	} else {
+>  		vgic_v3->vgic_sre = 0;
 > +	}
 >  
->  	kvm_vgic_global_state.vcpu_base = info->vcpu.start;
->  	kvm_vgic_global_state.type = VGIC_V2;
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 346b4ad..e48a22e 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -296,6 +296,7 @@ out:
->  int vgic_v3_probe(const struct gic_kvm_info *info)
->  {
->  	u32 ich_vtr_el2 = kvm_call_hyp(__vgic_v3_get_ich_vtr_el2);
-> +	int ret;
->  
->  	/*
->  	 * The ListRegs field is 5 bits, but there is a architectural
-> @@ -319,12 +320,22 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
->  	} else {
->  		kvm_vgic_global_state.vcpu_base = info->vcpu.start;
->  		kvm_vgic_global_state.can_emulate_gicv2 = true;
-> -		kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
-> +		ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
-> +		if (ret) {
-> +			kvm_err("Cannot register GICv2 KVM device.\n");
-> +			return ret;
-> +		}
->  		kvm_info("vgic-v2@%llx\n", info->vcpu.start);
->  	}
-> +	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V3);
-> +	if (ret) {
-> +		kvm_err("Cannot register GICv3 KVM device.\n");
-> +		kvm_unregister_device_ops(KVM_DEV_TYPE_ARM_VGIC_V2);
-> +		return ret;
-> +	}
-> +
->  	if (kvm_vgic_global_state.vcpu_base == 0)
->  		kvm_info("disabling GICv2 emulation\n");
-> -	kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V3);
->  
->  	kvm_vgic_global_state.vctrl_base = NULL;
->  	kvm_vgic_global_state.type = VGIC_V3;
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 7b300ca..c752152 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -124,7 +124,7 @@ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
+>  	/* Get the show on the road... */
+>  	vgic_v3->vgic_hcr = ICH_HCR_EN;
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index 829909e..7268c61 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -29,6 +29,19 @@ static unsigned long extract_bytes(unsigned long data, unsigned int offset,
+>  	return (data >> (offset * 8)) & GENMASK_ULL(num * 8 - 1, 0);
 >  }
+>  
+> +/* allows updates of any half of a 64-bit register (or the whole thing) */
+> +static u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
+> +			    unsigned long val)
+> +{
+> +	int lower = (offset & 4) * 8;
+> +	int upper = lower + 8 * len - 1;
+> +
+> +	reg &= ~GENMASK_ULL(upper, lower);
+> +	val &= GENMASK_ULL(len * 8 - 1, 0);
+> +
+> +	return reg | ((u64)val << lower);
+> +}
+> +
+>  static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+>  					    gpa_t addr, unsigned int len)
+>  {
+> @@ -150,6 +163,132 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
+>  	return 0;
+>  }
+>  
+> +/* We want to avoid outer shareable. */
+> +u64 vgic_sanitise_shareability(u64 reg)
+> +{
+> +	switch (reg & GIC_BASER_SHAREABILITY_MASK) {
+> +	case GIC_BASER_OuterShareable:
+> +		return GIC_BASER_InnerShareable;
+> +	default:
+> +		return reg;
+> +	}
+> +}
+> +
+> +/* Non-cacheable or same-as-inner are OK. */
+> +u64 vgic_sanitise_outer_cacheability(u64 reg)
+> +{
+> +	switch (reg & GIC_BASER_CACHE_MASK) {
+> +	case GIC_BASER_CACHE_SameAsInner:
+> +	case GIC_BASER_CACHE_nC:
+> +		return reg;
+> +	default:
+> +		return GIC_BASER_CACHE_nC;
+> +	}
+> +}
+> +
+> +/* Avoid any inner non-cacheable mapping. */
+> +u64 vgic_sanitise_inner_cacheability(u64 reg)
+> +{
+> +	switch (reg & GIC_BASER_CACHE_MASK) {
+> +	case GIC_BASER_CACHE_nCnB:
+> +	case GIC_BASER_CACHE_nC:
+> +		return GIC_BASER_CACHE_RaWb;
+> +	default:
+> +		return reg;
+> +	}
+> +}
+> +
+> +u64 vgic_sanitise_field(u64 reg, int field_shift, u64 field_mask,
+> +			u64 (*sanitise_fn)(u64))
+> +{
+> +	u64 field = (reg >> field_shift) & field_mask;
+> +
+> +	field = sanitise_fn(field) << field_shift;
+> +	return (reg & ~(field_mask << field_shift)) | field;
+> +}
+> +
+> +static u64 vgic_sanitise_pendbaser(u64 reg)
+> +{
+> +	reg = vgic_sanitise_field(reg, GICR_PENDBASER_SHAREABILITY_SHIFT,
+> +				  GIC_BASER_SHAREABILITY_MASK,
+> +				  vgic_sanitise_shareability);
+> +	reg = vgic_sanitise_field(reg, GICR_PENDBASER_INNER_CACHEABILITY_SHIFT,
+> +				  GIC_BASER_CACHE_MASK,
+> +				  vgic_sanitise_inner_cacheability);
+> +	reg = vgic_sanitise_field(reg, GICR_PENDBASER_OUTER_CACHEABILITY_SHIFT,
+> +				  GIC_BASER_CACHE_MASK,
+> +				  vgic_sanitise_outer_cacheability);
+> +	return reg;
+> +}
+> +
+> +static u64 vgic_sanitise_propbaser(u64 reg)
+> +{
+> +	reg = vgic_sanitise_field(reg, GICR_PROPBASER_SHAREABILITY_SHIFT,
+> +				  GIC_BASER_SHAREABILITY_MASK,
+> +				  vgic_sanitise_shareability);
+> +	reg = vgic_sanitise_field(reg, GICR_PROPBASER_INNER_CACHEABILITY_SHIFT,
+> +				  GIC_BASER_CACHE_MASK,
+> +				  vgic_sanitise_inner_cacheability);
+> +	reg = vgic_sanitise_field(reg, GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT,
+> +				  GIC_BASER_CACHE_MASK,
+> +				  vgic_sanitise_outer_cacheability);
+> +	return reg;
+> +}
+> +
+> +#define PROPBASER_RES0_MASK						\
+> +	(GENMASK_ULL(63, 59) | GENMASK_ULL(55, 52) | GENMASK_ULL(6, 5))
+> +#define PENDBASER_RES0_MASK						\
+> +	(BIT_ULL(63) | GENMASK_ULL(61, 59) | GENMASK_ULL(55, 52) |	\
+> +	 GENMASK_ULL(15, 12) | GENMASK_ULL(6, 0))
+> +
+> +static unsigned long vgic_mmio_read_propbase(struct kvm_vcpu *vcpu,
+> +					     gpa_t addr, unsigned int len)
+> +{
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +
+> +	return extract_bytes(dist->propbaser, addr & 7, len);
+> +}
+> +
+> +static void vgic_mmio_write_propbase(struct kvm_vcpu *vcpu,
+> +				     gpa_t addr, unsigned int len,
+> +				     unsigned long val)
+> +{
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +
+> +	/* Storing a value with LPIs already enabled is undefined */
+> +	if (vgic_cpu->lpis_enabled)
+> +		return;
+> +
+> +	dist->propbaser = update_64bit_reg(dist->propbaser, addr & 4, len, val);
+> +	dist->propbaser &= ~PROPBASER_RES0_MASK;
+> +	dist->propbaser = vgic_sanitise_propbaser(dist->propbaser);
+> +}
+> +
+> +static unsigned long vgic_mmio_read_pendbase(struct kvm_vcpu *vcpu,
+> +					     gpa_t addr, unsigned int len)
+> +{
+> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +
+> +	return extract_bytes(vgic_cpu->pendbaser, addr & 7, len);
+> +}
+> +
+> +static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
+> +				     gpa_t addr, unsigned int len,
+> +				     unsigned long val)
+> +{
+> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +
+> +	/* Storing a value with LPIs already enabled is undefined */
+> +	if (vgic_cpu->lpis_enabled)
+> +		return;
+> +
+> +	vgic_cpu->pendbaser = update_64bit_reg(vgic_cpu->pendbaser,
+> +					       addr & 4, len, val);
+> +	vgic_cpu->pendbaser &= ~PENDBASER_RES0_MASK;
+> +	vgic_cpu->pendbaser = vgic_sanitise_pendbaser(vgic_cpu->pendbaser);
+> +}
+> +
+>  /*
+>   * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
+>   * redistributors, while SPIs are covered by registers in the distributor
+> @@ -230,10 +369,10 @@ static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
+>  		vgic_mmio_read_v3r_typer, vgic_mmio_write_wi, 8,
+>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH(GICR_PROPBASER,
+> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
+> +		vgic_mmio_read_propbase, vgic_mmio_write_propbase, 8,
+>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH(GICR_PENDBASER,
+> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
+> +		vgic_mmio_read_pendbase, vgic_mmio_write_pendbase, 8,
+>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH(GICR_IDREGS,
+>  		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+> index 8509014..e863ccc 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.h
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
+> @@ -147,4 +147,12 @@ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
+>  
+>  unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev);
+>  
+> +#ifdef CONFIG_KVM_ARM_VGIC_V3
+> +u64 vgic_sanitise_outer_cacheability(u64 reg);
+> +u64 vgic_sanitise_inner_cacheability(u64 reg);
+> +u64 vgic_sanitise_shareability(u64 reg);
+> +u64 vgic_sanitise_field(u64 reg, int field_shift, u64 field_mask,
+> +			u64 (*sanitise_fn)(u64));
+> +#endif
+> +
 >  #endif
->  
-> -void kvm_register_vgic_device(unsigned long type);
-> +int kvm_register_vgic_device(unsigned long type);
->  int vgic_lazy_init(struct kvm *kvm);
->  int vgic_init(struct kvm *kvm);
->  
 > 
