@@ -1,26 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 0/5] arm/arm64: KVM: Tighten memory protection flags
-Date: Wed, 29 Jun 2016 14:21:18 +0200
-Message-ID: <20160629122118.GU26498@cbox>
-References: <1465826449-14349-1-git-send-email-marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Check GICV address is placed at a 4Kb boundary
+Date: Wed, 29 Jun 2016 14:43:42 +0200
+Message-ID: <20160629124342.GV26498@cbox>
+References: <cb18ab2d-12d9-bdd2-8432-801af488e340@riken.jp>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72B6A49B1A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 08:15:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1467249B1A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 08:37:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9lkzIRBY2MqO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Jun 2016 08:15:17 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F72C49AF5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 08:15:16 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id a66so70989250wme.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 05:20:29 -0700 (PDT)
+ with ESMTP id eQ0zgbhlHdPV for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Jun 2016 08:37:40 -0400 (EDT)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 505D449AF5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 08:37:40 -0400 (EDT)
+Received: by mail-wm0-f41.google.com with SMTP id 187so33309270wmz.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 05:42:53 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1465826449-14349-1-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <cb18ab2d-12d9-bdd2-8432-801af488e340@riken.jp>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,35 +30,55 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Itaru Kitayama <itaru.kitayama@riken.jp>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Itaru,
 
-On Mon, Jun 13, 2016 at 03:00:44PM +0100, Marc Zyngier wrote:
-> So far, the HYP mappings have been fairly relaxed: everything is
-> RWX. Oddly enough, not everybody is fond of this kind of permissions
-> at the highest exception level.
+On Wed, Jun 29, 2016 at 03:22:45PM +0900, Itaru Kitayama wrote:
+> Make sure GICV physical address is placed at a 4Kb boundary as spec
+> says, not host kernel's page boundary. This prevents !4Kb kernels
+> from returning an ENXIO prematurely during the KVM init phase at
+> boot.
+> Tested on Overdrive 3000 with 64Kb page-size kernel with ACPI.
 > 
-> This small series tightens it a bit by making:
-> - the text mapping read-only
-> - the rodata mapping read-only + no-exec
-> - everything else read-write + no-exec
+> Signed-off-by: Itaru Kitayama <itaru.kitayama@riken.jp>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
 > 
-> Of course, that's only valid when VHE is not in action. Tested on
-> Seattle and Cubietruck, based on 4.7-rc2.
 > 
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index e31405e..0123e5d 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -309,17 +309,15 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+>                 return -ENXIO;
+>         }
+> 
+> -       if (!PAGE_ALIGNED(info->vcpu.start)) {
+> -               kvm_err("GICV physical address 0x%llx not page aligned\n",
+> +       if (!IS_ALIGNED(info->vcpu.start, SZ_4K)) {
+> +               kvm_err("GICV physical address 0x%llx not 4Kb aligned\n",
+>                         (unsigned long long)info->vcpu.start);
+>                 return -ENXIO;
+>         }
+> 
+> -       if (!PAGE_ALIGNED(resource_size(&info->vcpu))) {
+> -               kvm_err("GICV size 0x%llx not a multiple of page
+> size 0x%lx\n",
+> -                       (unsigned long long)resource_size(&info->vcpu),
+> +       if (!PAGE_ALIGNED(resource_size(&info->vcpu)))
+> +               kvm_warn("GICV size 0x%llx not a multiple of page
+> size 0x%lx, system may be unsafe\n", (unsigned long
+> long)resource_size(&info->vcpu),
+>                         PAGE_SIZE);
+> -               return -ENXIO;
+>         }
+> 
+>         kvm_vgic_global_state.vctrl_base = ioremap(info->vctrl.start,
 
-I have applied this to queue with a RB on all the patches.
+Doesn't this change carry the risk of KVM mapping a page (larger than
+4K) containing other things than the GICV interface into the guest,
+potentially breaking isolation of the VM from host hardware resources?
 
-It seems like this series applies on top of the merged page tables
-stuff, but since I think you're going to repost that, I have just
-applied this and fixed up the conflicts.
-
-Could you have a look at kvmarm/queue and let me know if you think it
-looks good?  (and possibly rebase the merge page tables stuff on top of
-there when you rework that series?)
-
-Thanks!
 -Christoffer
