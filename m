@@ -1,24 +1,24 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v7 01/17] KVM: arm/arm64: move redistributor kvm_io_devices
-Date: Wed, 29 Jun 2016 17:58:39 +0200
-Message-ID: <a0ff7bc8-deda-87d3-199f-9ff1dcfa49e4@redhat.com>
+Subject: Re: [PATCH v7 05/17] KVM: kvm_io_bus: add kvm_io_bus_get_dev() call
+Date: Wed, 29 Jun 2016 17:58:52 +0200
+Message-ID: <2bcfdbbb-6c63-63df-25e3-590f3867deb0@redhat.com>
 References: <20160628123230.26255-1-andre.przywara@arm.com>
- <20160628123230.26255-2-andre.przywara@arm.com>
+ <20160628123230.26255-6-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38E3249B5D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 11:53:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 042CA49B61
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 11:53:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ngnqyBy55aSZ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Jun 2016 11:53:30 -0400 (EDT)
+ with ESMTP id uJGr3C39BS6Z for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Jun 2016 11:53:43 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B133949B5C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 11:53:30 -0400 (EDT)
-In-Reply-To: <20160628123230.26255-2-andre.przywara@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 319DD49B5D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 11:53:42 -0400 (EDT)
+In-Reply-To: <20160628123230.26255-6-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,111 +32,71 @@ To: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+
 
 On 28/06/2016 14:32, Andre Przywara wrote:
-> Logically a GICv3 redistributor is assigned to a (v)CPU, so we should
-> aim to keep redistributor related variables out of our struct vgic_dist.
-> 
-> Let's start by replacing the redistributor related kvm_io_device array
-> with two members in our existing struct vgic_cpu, which are naturally
-> per-VCPU and thus don't require any allocation / freeing.
-> So apart from the better fit with the redistributor design this saves
-> some code as well.
+> The kvm_io_bus framework is a nice place of holding information about
+> various MMIO regions for kernel emulated devices.
+> Add a call to retrieve the kvm_io_device structure which is associated
+> with a certain MMIO address. This avoids to duplicate kvm_io_bus'
+> knowledge of MMIO regions without having to fake MMIO calls if a user
+> needs the device a certain MMIO address belongs to.
+> This will be used by the ITS emulation to get the associated ITS device
+> when someone triggers an MSI via an ioctl from userspace.
 > 
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  include/kvm/vgic/vgic.h          |  8 +++++++-
->  virt/kvm/arm/vgic/vgic-init.c    |  1 -
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 22 ++++++++--------------
->  3 files changed, 15 insertions(+), 16 deletions(-)
+>  include/linux/kvm_host.h |  2 ++
+>  virt/kvm/kvm_main.c      | 24 ++++++++++++++++++++++++
+>  2 files changed, 26 insertions(+)
 > 
-> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-> index 3fbd175..2f26f37 100644
-> --- a/include/kvm/vgic/vgic.h
-> +++ b/include/kvm/vgic/vgic.h
-> @@ -145,7 +145,6 @@ struct vgic_dist {
->  	struct vgic_irq		*spis;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 1c9c973..c87fe6f 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -164,6 +164,8 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+>  			    int len, struct kvm_io_device *dev);
+>  int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+>  			      struct kvm_io_device *dev);
+> +struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+> +					 gpa_t addr);
 >  
->  	struct vgic_io_device	dist_iodev;
-> -	struct vgic_io_device	*redist_iodevs;
->  };
+>  #ifdef CONFIG_KVM_ASYNC_PF
+>  struct kvm_async_pf {
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 37af230..f6b615b9 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3487,6 +3487,30 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+>  	return r;
+>  }
 >  
->  struct vgic_v2_cpu_if {
-> @@ -193,6 +192,13 @@ struct vgic_cpu {
->  	struct list_head ap_list_head;
->  
->  	u64 live_lrs;
+> +struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+> +					 gpa_t addr)
+> +{
+> +	struct kvm_io_bus *bus;
+> +	int dev_idx, srcu_idx;
+> +	struct kvm_io_device *iodev = NULL;
 > +
-> +	/*
-> +	 * Members below are used with GICv3 emulation only and represent
-> +	 * parts of the redistributor.
-> +	 */
-> +	struct vgic_io_device	rd_iodev;
-> +	struct vgic_io_device	sgi_iodev;
->  };
->  
->  int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index a1442f7..90cae48 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -271,7 +271,6 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
->  	dist->initialized = false;
->  
->  	kfree(dist->spis);
-> -	kfree(dist->redist_iodevs);
->  	dist->nr_spis = 0;
->  
->  	mutex_unlock(&kvm->lock);
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index a0c515a..fc7b6c9 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -285,21 +285,14 @@ unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev)
->  
->  int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
->  {
-> -	int nr_vcpus = atomic_read(&kvm->online_vcpus);
->  	struct kvm_vcpu *vcpu;
-> -	struct vgic_io_device *devices;
->  	int c, ret = 0;
->  
-> -	devices = kmalloc(sizeof(struct vgic_io_device) * nr_vcpus * 2,
-> -			  GFP_KERNEL);
-> -	if (!devices)
-> -		return -ENOMEM;
-> -
->  	kvm_for_each_vcpu(c, vcpu, kvm) {
->  		gpa_t rd_base = redist_base_address + c * SZ_64K * 2;
->  		gpa_t sgi_base = rd_base + SZ_64K;
-> -		struct vgic_io_device *rd_dev = &devices[c * 2];
-> -		struct vgic_io_device *sgi_dev = &devices[c * 2 + 1];
-> +		struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
-> +		struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
->  
->  		kvm_iodevice_init(&rd_dev->dev, &kvm_io_gic_ops);
->  		rd_dev->base_addr = rd_base;
-> @@ -335,14 +328,15 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
->  	if (ret) {
->  		/* The current c failed, so we start with the previous one. */
->  		for (c--; c >= 0; c--) {
-> +			struct vgic_cpu *vgic_cpu;
+> +	srcu_idx = srcu_read_lock(&kvm->srcu);
 > +
-> +			vcpu = kvm_get_vcpu(kvm, c);
-> +			vgic_cpu = &vcpu->arch.vgic_cpu;
->  			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
-> -						  &devices[c * 2].dev);
-> +						  &vgic_cpu->rd_iodev.dev);
->  			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
-> -						  &devices[c * 2 + 1].dev);
-> +						  &vgic_cpu->sgi_iodev.dev);
->  		}
-> -		kfree(devices);
-> -	} else {
-> -		kvm->arch.vgic.redist_iodevs = devices;
->  	}
->  
->  	return ret;
+> +	bus = srcu_dereference(kvm->buses[bus_idx], &kvm->srcu);
+> +
+> +	dev_idx = kvm_io_bus_get_first_dev(bus, addr, 1);
+> +	if (dev_idx < 0)
+> +		goto out_unlock;
+> +
+> +	iodev = bus->range[dev_idx].dev;
+> +
+> +out_unlock:
+> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
+> +
+> +	return iodev;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_io_bus_get_dev);
+> +
+>  static struct notifier_block kvm_cpu_notifier = {
+>  	.notifier_call = kvm_cpu_hotplug,
+>  };
 > 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
