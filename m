@@ -1,21 +1,29 @@
-From: Itaru Kitayama <itaru.kitayama@riken.jp>
-Subject: [PATCH] KVM: arm64: Check GICV address is placed at a 4Kb boundary
-Date: Wed, 29 Jun 2016 15:22:45 +0900
-Message-ID: <cb18ab2d-12d9-bdd2-8432-801af488e340@riken.jp>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: issues with emulated PCI MMIO backed by host memory under KVM
+Date: Wed, 29 Jun 2016 09:12:42 +0200
+Message-ID: <1467184362.15123.49.camel@redhat.com>
+References: <CAKv+Gu8MWxUvySvsQW+DpohLLHSi8ZYm4o7gCE2a4q0iC=cuHA@mail.gmail.com>
+ <20160627091619.GB26498@cbox>
+ <CAKv+Gu9u2f6+HLYMzqtkq0z=Xk5gTq=_11QvAKMaBZj_oRMwTA@mail.gmail.com>
+ <20160627103421.GC26498@cbox>
+ <52f1a2e2-63c9-a5d2-9b78-7264923e04c4@redhat.com>
+ <CAKv+Gu-5CffcgsWwOUpXukVQJaSxRtvHTFiQjf+OmG380iKWaA@mail.gmail.com>
+ <40f24dbe-06bd-cb73-ae8c-af20930cb360@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38E4149B4C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 02:17:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D860C49B4C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 03:07:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7XgKz0pUAlKg for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Jun 2016 02:17:35 -0400 (EDT)
-Received: from postman.riken.jp (postman1.riken.jp [134.160.33.83])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CAF749B2E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 02:17:35 -0400 (EDT)
+ with ESMTP id 5JXUaKLHfv3R for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Jun 2016 03:07:32 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3DEB49B2E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 03:07:32 -0400 (EDT)
+In-Reply-To: <40f24dbe-06bd-cb73-ae8c-af20930cb360@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,45 +33,43 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Make sure GICV physical address is placed at a 4Kb boundary as spec 
-says, not host kernel's page boundary. This prevents !4Kb kernels from 
-returning an ENXIO prematurely during the KVM init phase at boot.
-Tested on Overdrive 3000 with 64Kb page-size kernel with ACPI.
+On Di, 2016-06-28 at 15:32 +0200, Laszlo Ersek wrote:
+> (adding Gerd)
+> 
+> On 06/28/16 15:14, Ard Biesheuvel wrote:
+> 
+> > In any case, reconciling software that requires a framebuffer with a
+> > GPU emulation that does not expose one by design is going to be
+> > problematic even without this issue. How is this supposed to work on
+> > x86?
+> 
+> AFAIK:
+> 
+> "virtio-gpu-pci" is the device model without the framebuffer. It is good
+> for secondary displays (i.e. those that you don't boot with, only use
+> after the guest kernel starts up).
+> 
+> "virtio-vga" is the same, but it also has the legacy VGA framebuffer,
+> hence it can be used for accommodating boot loaders. (Except it won't
+> work for aarch64 KVM guests, because of $SUBJECT.)
 
-Signed-off-by: Itaru Kitayama <itaru.kitayama@riken.jp>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+Exactly.  virtio-vga is basically virtio-gpu-pci + stdvga combined.
+Power-on default is vga mode.  It switches into virtio mode when the
+guest configures a output using virtio commands.  It switches back to
+vga mode on reset.
 
+You can get a simple framebuffer by using the stdvga part of the device.
+QemuVideoDxe does exactly that.  The linux kernel switches from vga mode
+(efifb) to virtio mode when the virtio-gpu kms driver loads.
 
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index e31405e..0123e5d 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -309,17 +309,15 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
-                 return -ENXIO;
-         }
+Of course virtio-vga in vga mode has exactly the same cache coherency
+issues as stdvga on arm.  So, once the linux kernel with the virtio-gpu
+is up'n'running everything is fine, but how to handle early bootloader
+display isn't solved yet.
 
--       if (!PAGE_ALIGNED(info->vcpu.start)) {
--               kvm_err("GICV physical address 0x%llx not page aligned\n",
-+       if (!IS_ALIGNED(info->vcpu.start, SZ_4K)) {
-+               kvm_err("GICV physical address 0x%llx not 4Kb aligned\n",
-                         (unsigned long long)info->vcpu.start);
-                 return -ENXIO;
-         }
-
--       if (!PAGE_ALIGNED(resource_size(&info->vcpu))) {
--               kvm_err("GICV size 0x%llx not a multiple of page size 
-0x%lx\n",
--                       (unsigned long long)resource_size(&info->vcpu),
-+       if (!PAGE_ALIGNED(resource_size(&info->vcpu)))
-+               kvm_warn("GICV size 0x%llx not a multiple of page size 
-0x%lx, system may be unsafe\n", (unsigned long 
-long)resource_size(&info->vcpu),
-                         PAGE_SIZE);
--               return -ENXIO;
-         }
-
-         kvm_vgic_global_state.vctrl_base = ioremap(info->vctrl.start,
+cheers,
+  Gerd
