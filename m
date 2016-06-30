@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 07/18] arm64: KVM: Refactor kern_hyp_va to deal with
- multiple offsets
-Date: Thu, 30 Jun 2016 18:40:40 +0100
-Message-ID: <1467308451-13365-8-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 11/18] arm64: KVM: Simplify HYP init/teardown
+Date: Thu, 30 Jun 2016 18:40:44 +0100
+Message-ID: <1467308451-13365-12-git-send-email-marc.zyngier@arm.com>
 References: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F3E0D49BA3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 13:35:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09CED49B49
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 13:35:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5ie2hCSHrJZn for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jun 2016 13:35:50 -0400 (EDT)
+ with ESMTP id ehri8BHR-q6D for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jun 2016 13:35:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58E8449B99
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 13:35:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78BE849B80
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 13:35:53 -0400 (EDT)
 In-Reply-To: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,108 +31,220 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we move towards a selectable HYP VA range, it is obvious that
-we don't want to test a variable to find out if we need to use
-the bottom VA range, the top VA range, or use the address as is
-(for VHE).
-
-Instead, we can expand our current helper to generate the right
-mask or nop with code patching. We default to using the top VA
-space, with alternatives to switch to the bottom one or to nop
-out the instructions.
+Now that we only have the "merged page tables" case to deal with,
+there is a bunch of things we can simplify in the HYP code (both
+at init and teardown time).
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 11 -----------
- arch/arm64/include/asm/kvm_mmu.h | 42 +++++++++++++++++++++++++++++++++++++---
- 2 files changed, 39 insertions(+), 14 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 12 ++------
+ arch/arm64/kvm/hyp-init.S         | 61 +++++----------------------------------
+ arch/arm64/kvm/hyp/entry.S        | 19 ------------
+ arch/arm64/kvm/hyp/hyp-entry.S    | 15 ++++++++++
+ arch/arm64/kvm/reset.c            | 11 -------
+ 5 files changed, 26 insertions(+), 92 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 1d81f9a..cff5105 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -25,17 +25,6 @@
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 49095fc..88462c3 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -48,7 +48,6 @@
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+ int kvm_arch_dev_ioctl_check_extension(long ext);
+-unsigned long kvm_hyp_reset_entry(void);
+ void __extended_idmap_trampoline(phys_addr_t boot_pgd, phys_addr_t idmap_start);
  
- #define __hyp_text __section(.hyp.text) notrace
+ struct kvm_arch {
+@@ -357,19 +356,14 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
+ 	 * Call initialization code, and switch to the full blown
+ 	 * HYP code.
+ 	 */
+-	__kvm_call_hyp((void *)boot_pgd_ptr, pgd_ptr,
+-		       hyp_stack_ptr, vector_ptr);
++	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr);
+ }
  
--static inline unsigned long __kern_hyp_va(unsigned long v)
--{
--	asm volatile(ALTERNATIVE("and %0, %0, %1",
--				 "nop",
--				 ARM64_HAS_VIRT_HOST_EXTN)
--		     : "+r" (v) : "i" (HYP_PAGE_OFFSET_MASK));
--	return v;
--}
++void __kvm_hyp_teardown(void);
+ static inline void __cpu_reset_hyp_mode(phys_addr_t boot_pgd_ptr,
+ 					phys_addr_t phys_idmap_start)
+ {
+-	/*
+-	 * Call reset code, and switch back to stub hyp vectors.
+-	 * Uses __kvm_call_hyp() to avoid kaslr's kvm_ksym_ref() translation.
+-	 */
+-	__kvm_call_hyp((void *)kvm_hyp_reset_entry(),
+-		       boot_pgd_ptr, phys_idmap_start);
++	kvm_call_hyp(__kvm_hyp_teardown, phys_idmap_start);
+ }
+ 
+ static inline void kvm_arch_hardware_unsetup(void) {}
+diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
+index a873a6d..6b29d3d 100644
+--- a/arch/arm64/kvm/hyp-init.S
++++ b/arch/arm64/kvm/hyp-init.S
+@@ -53,10 +53,9 @@ __invalid:
+ 	b	.
+ 
+ 	/*
+-	 * x0: HYP boot pgd
+-	 * x1: HYP pgd
+-	 * x2: HYP stack
+-	 * x3: HYP vectors
++	 * x0: HYP pgd
++	 * x1: HYP stack
++	 * x2: HYP vectors
+ 	 */
+ __do_hyp_init:
+ 
+@@ -110,71 +109,27 @@ __do_hyp_init:
+ 	msr	sctlr_el2, x4
+ 	isb
+ 
+-	/* Skip the trampoline dance if we merged the boot and runtime PGDs */
+-	cmp	x0, x1
+-	b.eq	merged
 -
--#define kern_hyp_va(v) (typeof(v))(__kern_hyp_va((unsigned long)(v)))
+-	/* MMU is now enabled. Get ready for the trampoline dance */
+-	ldr	x4, =TRAMPOLINE_VA
+-	adr	x5, target
+-	bfi	x4, x5, #0, #PAGE_SHIFT
+-	br	x4
 -
- #define read_sysreg_elx(r,nvh,vh)					\
- 	({								\
- 		u64 reg;						\
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 5e54323..2970537 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -90,13 +90,33 @@
- /*
-  * Convert a kernel VA into a HYP VA.
-  * reg: VA to be converted.
-+ *
-+ * This generates the following sequences:
-+ * - High mask:
-+ *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
-+ *		nop
-+ * - Low mask:
-+ *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
-+ *		and x0, x0, #HYP_PAGE_OFFSET_LOW_MASK
-+ * - VHE:
-+ *		nop
-+ *		nop
-+ *
-+ * The "low mask" version works because the mask is a strict subset of
-+ * the "high mask", hence performing the first mask for nothing.
-+ * Should be completely invisible on any viable CPU.
-  */
- .macro kern_hyp_va	reg
--alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
--	and	\reg, \reg, #HYP_PAGE_OFFSET_MASK
-+alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
-+	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
- alternative_else
- 	nop
- alternative_endif
-+alternative_if_not ARM64_HYP_OFFSET_LOW
-+	nop
-+alternative_else
-+	and     \reg, \reg, #HYP_PAGE_OFFSET_LOW_MASK
-+alternative_endif
- .endm
+-target: /* We're now in the trampoline code, switch page tables */
+-	msr	ttbr0_el2, x1
+-	isb
+-
+-	/* Invalidate the old TLBs */
+-	tlbi	alle2
+-	dsb	sy
+-
+-merged:
+ 	/* Set the stack and new vectors */
++	kern_hyp_va	x1
++	mov	sp, x1
+ 	kern_hyp_va	x2
+-	mov	sp, x2
+-	kern_hyp_va	x3
+-	msr	vbar_el2, x3
++	msr	vbar_el2, x2
  
- #else
-@@ -107,7 +127,23 @@ alternative_endif
- #include <asm/mmu_context.h>
- #include <asm/pgtable.h>
+ 	/* Hello, World! */
+ 	eret
+ ENDPROC(__kvm_hyp_init)
  
--#define KERN_TO_HYP(kva)	((unsigned long)kva & HYP_PAGE_OFFSET_MASK)
-+static inline unsigned long __kern_hyp_va(unsigned long v)
-+{
-+	asm volatile(ALTERNATIVE("and %0, %0, %1",
-+				 "nop",
-+				 ARM64_HAS_VIRT_HOST_EXTN)
-+		     : "+r" (v)
-+		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
-+	asm volatile(ALTERNATIVE("nop",
-+				 "and %0, %0, %1",
-+				 ARM64_HYP_OFFSET_LOW)
-+		     : "+r" (v)
-+		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
-+	return v;
-+}
+ 	/*
+-	 * Reset kvm back to the hyp stub. This is the trampoline dance in
+-	 * reverse. If kvm used an extended idmap, __extended_idmap_trampoline
+-	 * calls this code directly in the idmap. In this case switching to the
+-	 * boot tables is a no-op.
+-	 *
+-	 * x0: HYP boot pgd
+-	 * x1: HYP phys_idmap_start
++	 * Reset kvm back to the hyp stub.
+ 	 */
+ ENTRY(__kvm_hyp_reset)
+-	/* We're in trampoline code in VA, switch back to boot page tables */
+-	msr	ttbr0_el2, x0
+-	isb
+-
+-	/* Ensure the PA branch doesn't find a stale tlb entry or stale code. */
+-	ic	iallu
+-	tlbi	alle2
+-	dsb	sy
+-	isb
+-
+-	/* Branch into PA space */
+-	adr	x0, 1f
+-	bfi	x1, x0, #0, #PAGE_SHIFT
+-	br	x1
+-
+ 	/* We're now in idmap, disable MMU */
+-1:	mrs	x0, sctlr_el2
++	mrs	x0, sctlr_el2
+ 	ldr	x1, =SCTLR_ELx_FLAGS
+ 	bic	x0, x0, x1		// Clear SCTL_M and etc
+ 	msr	sctlr_el2, x0
+ 	isb
+ 
+-	/* Invalidate the old TLBs */
+-	tlbi	alle2
+-	dsb	sy
+-
+ 	/* Install stub vectors */
+ 	adr_l	x0, __hyp_stub_vectors
+ 	msr	vbar_el2, x0
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 70254a6..ce9e5e5 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -164,22 +164,3 @@ alternative_endif
+ 
+ 	eret
+ ENDPROC(__fpsimd_guest_restore)
+-
+-/*
+- * When using the extended idmap, we don't have a trampoline page we can use
+- * while we switch pages tables during __kvm_hyp_reset. Accessing the idmap
+- * directly would be ideal, but if we're using the extended idmap then the
+- * idmap is located above HYP_PAGE_OFFSET, and the address will be masked by
+- * kvm_call_hyp using kern_hyp_va.
+- *
+- * x0: HYP boot pgd
+- * x1: HYP phys_idmap_start
+- */
+-ENTRY(__extended_idmap_trampoline)
+-	mov	x4, x1
+-	adr_l	x3, __kvm_hyp_reset
+-
+-	/* insert __kvm_hyp_reset()s offset into phys_idmap_start */
+-	bfi	x4, x3, #0, #PAGE_SHIFT
+-	br	x4
+-ENDPROC(__extended_idmap_trampoline)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 2d87f36..f6d9694 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -62,6 +62,21 @@ ENTRY(__vhe_hyp_call)
+ 	isb
+ 	ret
+ ENDPROC(__vhe_hyp_call)
 +
-+#define kern_hyp_va(v) 	(typeof(v))(__kern_hyp_va((unsigned long)(v)))
-+#define KERN_TO_HYP(v)	kern_hyp_va(v)
- 
- /*
-  * We currently only support a 40bit IPA.
++/*
++ * Compute the idmap address of __kvm_hyp_reset based on the idmap
++ * start passed as a parameter, and jump there.
++ *
++ * x0: HYP phys_idmap_start
++ */
++ENTRY(__kvm_hyp_teardown)
++	mov	x4, x0
++	adr_l	x3, __kvm_hyp_reset
++
++	/* insert __kvm_hyp_reset()s offset into phys_idmap_start */
++	bfi	x4, x3, #0, #PAGE_SHIFT
++	br	x4
++ENDPROC(__kvm_hyp_teardown)
+ 	
+ el1_sync:				// Guest trapped into EL2
+ 	save_x0_to_x3
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 8ed7e4a..79f3248 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -132,14 +132,3 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	/* Reset timer */
+ 	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+ }
+-
+-unsigned long kvm_hyp_reset_entry(void)
+-{
+-	/*
+-	 * KVM is running with merged page tables, which don't have the
+-	 * trampoline page mapped. We know the idmap is still mapped,
+-	 * but can't be called into directly. Use
+-	 * __extended_idmap_trampoline to do the call.
+-	 */
+-	return (unsigned long)kvm_ksym_ref(__extended_idmap_trampoline);
+-}
 -- 
 2.1.4
