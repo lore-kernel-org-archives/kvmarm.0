@@ -1,180 +1,129 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 05/15] arm64: KVM: Refactor kern_hyp_va/hyp_kern_va to
- deal with multiple offsets
-Date: Thu, 30 Jun 2016 10:22:22 +0100
-Message-ID: <5774E4CE.8020200@arm.com>
-References: <1465297115-13091-1-git-send-email-marc.zyngier@arm.com>
- <1465297115-13091-6-git-send-email-marc.zyngier@arm.com>
- <20160628124210.GP26498@cbox>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v7 00/17] KVM: arm64: GICv3 ITS emulation
+Date: Thu, 30 Jun 2016 11:09:30 +0100
+Message-ID: <eab8b632-1a00-9a0c-808d-55d5cc161c22@arm.com>
+References: <20160628123230.26255-1-andre.przywara@arm.com>
+ <DB5PR04MB0997B9A41C3C79F45CAC6C989A230@DB5PR04MB0997.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160628124210.GP26498@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A321A49B49
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 06:03:34 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id p96yilm8SIm9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jun 2016 06:03:33 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 040BC49B40
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 06:03:32 -0400 (EDT)
+In-Reply-To: <DB5PR04MB0997B9A41C3C79F45CAC6C989A230@DB5PR04MB0997.eurprd04.prod.outlook.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Bharat Bhushan <bharat.bhushan@nxp.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28/06/16 13:42, Christoffer Dall wrote:
-> On Tue, Jun 07, 2016 at 11:58:25AM +0100, Marc Zyngier wrote:
->> As we move towards a selectable HYP VA range, it is obvious that
->> we don't want to test a variable to find out if we need to use
->> the bottom VA range, the top VA range, or use the address as is
->> (for VHE).
+Hi,
+
+On 29/06/16 05:43, Bharat Bhushan wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: kvmarm-bounces@lists.cs.columbia.edu [mailto:kvmarm-
+>> bounces@lists.cs.columbia.edu] On Behalf Of Andre Przywara
+>> Sent: Tuesday, June 28, 2016 6:02 PM
+>> To: Marc Zyngier <marc.zyngier@arm.com>; Christoffer Dall
+>> <christoffer.dall@linaro.org>; Eric Auger <eric.auger@redhat.com>
+>> Cc: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+>> kvm@vger.kernel.org
+>> Subject: [PATCH v7 00/17] KVM: arm64: GICv3 ITS emulation
 >>
->> Instead, we can expand our current helpers to generate the right
->> mask or nop with code patching. We default to using the top VA
->> space, with alternatives to switch to the bottom one or to nop
->> out the instructions.
+>> Hi,
 >>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/include/asm/kvm_hyp.h | 27 ++++++++++++--------------
->>  arch/arm64/include/asm/kvm_mmu.h | 42 +++++++++++++++++++++++++++++++++++++---
->>  2 files changed, 51 insertions(+), 18 deletions(-)
+>> another try on the KVM ITS emulation support.
+>> It allows those KVM guests that use an emulated GICv3 to use LPIs as well,
+>> though in the moment this is limited to emulated PCI devices.
+>> This is based on kvm-arm-for-v4.7-rc2 and relies on the new VGIC
+>> implementation.
 >>
->> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
->> index 61d01a9..dd4904b 100644
->> --- a/arch/arm64/include/asm/kvm_hyp.h
->> +++ b/arch/arm64/include/asm/kvm_hyp.h
->> @@ -25,24 +25,21 @@
->>  
->>  #define __hyp_text __section(.hyp.text) notrace
->>  
->> -static inline unsigned long __kern_hyp_va(unsigned long v)
->> -{
->> -	asm volatile(ALTERNATIVE("and %0, %0, %1",
->> -				 "nop",
->> -				 ARM64_HAS_VIRT_HOST_EXTN)
->> -		     : "+r" (v) : "i" (HYP_PAGE_OFFSET_MASK));
->> -	return v;
->> -}
->> -
->> -#define kern_hyp_va(v) (typeof(v))(__kern_hyp_va((unsigned long)(v)))
->> -
->>  static inline unsigned long __hyp_kern_va(unsigned long v)
->>  {
->> -	asm volatile(ALTERNATIVE("orr %0, %0, %1",
->> -				 "nop",
->> +	u64 mask;
->> +
->> +	asm volatile(ALTERNATIVE("mov %0, %1",
->> +				 "mov %0, %2",
->> +				 ARM64_HYP_OFFSET_LOW)
->> +		     : "=r" (mask)
->> +		     : "i" (~HYP_PAGE_OFFSET_HIGH_MASK),
->> +		       "i" (~HYP_PAGE_OFFSET_LOW_MASK));
->> +	asm volatile(ALTERNATIVE("nop",
->> +				 "mov %0, xzr",
->>  				 ARM64_HAS_VIRT_HOST_EXTN)
->> -		     : "+r" (v) : "i" (~HYP_PAGE_OFFSET_MASK));
->> -	return v;
->> +		     : "+r" (mask));
->> +	return v | mask;
+>> Compared to the last drop there have been some changes to the code:
+>> The reference counting has been rewritten to use the kref infrastructure.
+>> This has some implications on the rest of the code, for instance the locking
+>> for the LPI list got changed. There is no RCU usage anymore, instead the LPI
+>> list is now protected by a spinlock. To overcome the problem where we need
+>> to access guest memory while holding the lock, we create a snapshot of the
+>> LPI list, so we can iterate over LPIs with the lock dropped.
+>> Also the base register sanitisation has been reworked completely, which
+>> includes some changes to the arm-gic-v3.h header file (as a separate patch
+>> 07/17). I hope I covered all the subtleties of those bits.
+>> Also the MMIO framework saw some changes, we now tag the different GIC
+>> regions explicitly and are able to call the different handlers explicitly.
+>> Also Patch 05/17 extends the kvm-io-bus framework with a small function to
+>> get the kvm_io_device structure for a given MMIO address. This allows us to
+>> keep the knowledge of all the ITSes in this framework, but still get the
+>> respective ITS pointer easily without reverting to "fake" MMIO accesses.
+>> Also all the smaller review comments have been addressed.
+>>
+>> You can find all of this code (and the prerequisites) in the
+>> its-emul/v7 branch of my repository [1].
+>> This has been briefly tested on the model and on GICv3 hardware.
+>> If you have GICv3 capable hardware, please test it on your setup.
 > 
-> If mask is ~HYP_PAGE_OFFSET_LOW_MASK how can you be sure that setting
-> bit (VA_BITS - 1) is always the right thing to do to generate a kernel
-> address?
+> We have GICv3 capable hardware and we can test these on that.
+> How you are testing these changes? QEMU side changes are also required, can you share those changes?
 
-It has taken be a while, but I think I finally see what you mean. We
-have no idea whether that bit was set or not.
+I don't have any QEMU patches, that is on Linaro's plate, as far as I
+can tell. I don't know what the status is there. For real patches we
+would need to agree on the userland interface, I guess.
+However hacking something in QEMU shouldn't be too hard, you basically
+have to inject the ITS DT node and reserve some space in the memory map.
+Then tell QEMU to use KVM_SIGNAL_MSI to trigger IRQs.
+You can look at the kvmtool patches to get an idea on what to cover.
 
-> This is kind of what I asked before only now there's an extra bit not
-> guaranteed by the architecture to be set for the kernel range, I
-> think.
+Further below I gave some hints on testing this series with kvmtool.
 
-Yeah, I finally connected the couple of neurons left up there (that's
-what remains after the whole brexit braindamage). This doesn't work (or
-rather it only works sometimes). The good new is that I also realized we
-don't need any of that crap.
+....
 
-The only case we currently use a HVA->KVA transformation is to pass the
-panic string down to panic(), and we can perfectly prevent
-__kvm_hyp_teardown from ever be evaluated as a HVA with a bit of
-asm-foo. This allows us to get rid of this whole function.
+>>
+>> For the time being this series gives us the ability to use emulated PCI devices
+>> that can use MSIs in the guest. Those have to be triggered by letting the
+>> userland device emulation simulate the MSI write with the
+>> KVM_SIGNAL_MSI ioctl. This will be translated into the proper LPI by the ITS
+>> emulation and injected into the guest in the usual way (just with a higher IRQ
+>> number).
+>>
+>> This series is based on kvm-arm-for-v4.7-rc2 and can be found at the
+>> its-emul/v7 branch of this repository [1].
+>> For this to be used you need a GICv3 host machine (a fast model would do),
+>> though it does not rely on any host ITS bits (neither in hardware or software).
+>>
+>> To test this you can use the kvmtool patches available in the "its-v6"
+>> branch here [2].
+>> Start a guest with: "$ lkvm run --irqchip=gicv3-its --force-pci"
+>> and see the ITS being used for instance by the virtio devices.
 
-> 
->>  }
->>  
->>  #define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
->> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
->> index e45df1b..889330b 100644
->> --- a/arch/arm64/include/asm/kvm_mmu.h
->> +++ b/arch/arm64/include/asm/kvm_mmu.h
->> @@ -95,13 +95,33 @@
->>  /*
->>   * Convert a kernel VA into a HYP VA.
->>   * reg: VA to be converted.
->> + *
->> + * This generates the following sequences:
->> + * - High mask:
->> + *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
->> + *		nop
->> + * - Low mask:
->> + *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
->> + *		and x0, x0, #HYP_PAGE_OFFSET_LOW_MASK
->> + * - VHE:
->> + *		nop
->> + *		nop
->> + *
->> + * The "low mask" version works because the mask is a strict subset of
->> + * the "high mask", hence performing the first mask for nothing.
->> + * Should be completely invisible on any viable CPU.
->>   */
->>  .macro kern_hyp_va	reg
->> -alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
->> -	and	\reg, \reg, #HYP_PAGE_OFFSET_MASK
->> +alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
->> +	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
->>  alternative_else
->>  	nop
->>  alternative_endif
->> +alternative_if_not ARM64_HYP_OFFSET_LOW
->> +	nop
->> +alternative_else
->> +	and     \reg, \reg, #HYP_PAGE_OFFSET_LOW_MASK
->> +alternative_endif
->>  .endm
->>  
->>  #else
->> @@ -112,7 +132,23 @@ alternative_endif
->>  #include <asm/mmu_context.h>
->>  #include <asm/pgtable.h>
->>  
->> -#define KERN_TO_HYP(kva)	((unsigned long)kva & HYP_PAGE_OFFSET_MASK)
->> +static inline unsigned long __kern_hyp_va(unsigned long v)
->> +{
->> +	asm volatile(ALTERNATIVE("and %0, %0, %1",
->> +				 "nop",
->> +				 ARM64_HAS_VIRT_HOST_EXTN)
->> +		     : "+r" (v)
->> +		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
->> +	asm volatile(ALTERNATIVE("nop",
->> +				 "and %0, %0, %1",
->> +				 ARM64_HYP_OFFSET_LOW)
->> +		     : "+r" (v)
->> +		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
-> 
-> how is the second operation a nop for VHE? Is this because
-> ARM64_HYP_OFFSET_LOW will never be set for VHE?
+^^^^ here you go.
 
-That's because VHE has no notion of an offset at all (we end up with two
-nops).
+Cheers,
+Andre.
 
->> +	return v;
->> +}
->> +
->> +#define kern_hyp_va(v) 	(typeof(v))(__kern_hyp_va((unsigned long)(v)))
->> +#define KERN_TO_HYP(v)	kern_hyp_va(v)
-> 
-> looks like there's room for some unification/cleanup here as well.
-
-Indeed. I'll queue up an additional patch at the end to clean the bulk
-of the code.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+>>
+>> [1]: git://linux-arm.org/linux-ap.git
+>>      http://www.linux-arm.org/git?p=linux-ap.git;a=log;h=refs/heads/its-
+>> emul/v7
+>> [2]: git://linux-arm.org/kvmtool.git
+>>      http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/its-v6
+>> [3]:
+>> http://arminfo.emea.arm.com/help/topic/com.arm.doc.ihi0069a/IHI0069A_g
+>> ic_architecture_specification.pdf
+>>
