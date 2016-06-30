@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 13/18] arm/arm64: KVM: Kill free_boot_hyp_pgd
-Date: Thu, 30 Jun 2016 18:40:46 +0100
-Message-ID: <1467308451-13365-14-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 10/18] arm/arm64: KVM: Always have merged page tables
+Date: Thu, 30 Jun 2016 18:40:43 +0100
+Message-ID: <1467308451-13365-11-git-send-email-marc.zyngier@arm.com>
 References: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
@@ -10,107 +10,184 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no way to free the boot PGD, because it doesn't exist
-anymore as a standalone entity.
+We're in a position where we can now always have "merged" page
+tables, where both the runtime mapping and the idmap coexist.
+
+This results in some code being removed, but there is more to come.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h   |  1 -
- arch/arm/kvm/arm.c               |  4 ----
- arch/arm/kvm/mmu.c               | 30 +++++++-----------------------
- arch/arm64/include/asm/kvm_mmu.h |  1 -
- 4 files changed, 7 insertions(+), 29 deletions(-)
+ arch/arm/kvm/mmu.c     | 74 +++++++++++++++++++++++---------------------------
+ arch/arm64/kvm/reset.c | 31 +++++----------------
+ 2 files changed, 41 insertions(+), 64 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 5d161d1..d5fd9fb 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -51,7 +51,6 @@
- 
- int create_hyp_mappings(void *from, void *to, pgprot_t prot);
- int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
--void free_boot_hyp_pgd(void);
- void free_hyp_pgds(void);
- 
- void stage2_unmap_vm(struct kvm *kvm);
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 0887cc1..9b8c537 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -1323,10 +1323,6 @@ static int init_hyp_mode(void)
- 		}
- 	}
- 
--#ifndef CONFIG_HOTPLUG_CPU
--	free_boot_hyp_pgd();
--#endif
--
- 	/* set size of VMID supported by CPU */
- 	kvm_vmid_bits = kvm_get_vmid_bits();
- 	kvm_info("%d-bit VMID\n", kvm_vmid_bits);
 diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index dd4ccc7..0b36dd52 100644
+index f004e70..80d3737 100644
 --- a/arch/arm/kvm/mmu.c
 +++ b/arch/arm/kvm/mmu.c
-@@ -482,27 +482,6 @@ static void unmap_hyp_range(pgd_t *pgdp, phys_addr_t start, u64 size)
+@@ -492,13 +492,12 @@ void free_boot_hyp_pgd(void)
+ 
+ 	if (boot_hyp_pgd) {
+ 		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
+-		unmap_hyp_range(boot_hyp_pgd, TRAMPOLINE_VA, PAGE_SIZE);
+ 		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
+ 		boot_hyp_pgd = NULL;
+ 	}
+ 
+ 	if (hyp_pgd)
+-		unmap_hyp_range(hyp_pgd, TRAMPOLINE_VA, PAGE_SIZE);
++		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
+ 
+ 	mutex_unlock(&kvm_hyp_pgd_mutex);
+ }
+@@ -1691,7 +1690,7 @@ phys_addr_t kvm_mmu_get_boot_httbr(void)
+ 	if (__kvm_cpu_uses_extended_idmap())
+ 		return virt_to_phys(merged_hyp_pgd);
+ 	else
+-		return virt_to_phys(boot_hyp_pgd);
++		return virt_to_phys(hyp_pgd);
  }
  
- /**
-- * free_boot_hyp_pgd - free HYP boot page tables
-- *
-- * Free the HYP boot page tables. The bounce page is also freed.
-- */
--void free_boot_hyp_pgd(void)
--{
--	mutex_lock(&kvm_hyp_pgd_mutex);
+ phys_addr_t kvm_get_idmap_vector(void)
+@@ -1704,6 +1703,22 @@ phys_addr_t kvm_get_idmap_start(void)
+ 	return hyp_idmap_start;
+ }
+ 
++static int kvm_map_idmap_text(pgd_t *pgd)
++{
++	int err;
++
++	/* Create the idmap in the boot page tables */
++	err = 	__create_hyp_mappings(pgd,
++				      hyp_idmap_start, hyp_idmap_end,
++				      __phys_to_pfn(hyp_idmap_start),
++				      PAGE_HYP_EXEC);
++	if (err)
++		kvm_err("Failed to idmap %lx-%lx\n",
++			hyp_idmap_start, hyp_idmap_end);
++
++	return err;
++}
++
+ int kvm_mmu_init(void)
+ {
+ 	int err;
+@@ -1719,27 +1734,25 @@ int kvm_mmu_init(void)
+ 	BUG_ON((hyp_idmap_start ^ (hyp_idmap_end - 1)) & PAGE_MASK);
+ 
+ 	hyp_pgd = (pgd_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, hyp_pgd_order);
+-	boot_hyp_pgd = (pgd_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, hyp_pgd_order);
 -
--	if (boot_hyp_pgd) {
--		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
--		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
--		boot_hyp_pgd = NULL;
+-	if (!hyp_pgd || !boot_hyp_pgd) {
++	if (!hyp_pgd) {
+ 		kvm_err("Hyp mode PGD not allocated\n");
+ 		err = -ENOMEM;
+ 		goto out;
+ 	}
+ 
+-	/* Create the idmap in the boot page tables */
+-	err = 	__create_hyp_mappings(boot_hyp_pgd,
+-				      hyp_idmap_start, hyp_idmap_end,
+-				      __phys_to_pfn(hyp_idmap_start),
+-				      PAGE_HYP_EXEC);
++	if (__kvm_cpu_uses_extended_idmap()) {
++		boot_hyp_pgd = (pgd_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO,
++							 hyp_pgd_order);
++		if (!boot_hyp_pgd) {
++			kvm_err("Hyp boot PGD not allocated\n");
++			err = -ENOMEM;
++			goto out;
++		}
+ 
+-	if (err) {
+-		kvm_err("Failed to idmap %lx-%lx\n",
+-			hyp_idmap_start, hyp_idmap_end);
+-		goto out;
+-	}
++		err = kvm_map_idmap_text(boot_hyp_pgd);
++		if (err)
++			goto out;
+ 
+-	if (__kvm_cpu_uses_extended_idmap()) {
+ 		merged_hyp_pgd = (pgd_t *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
+ 		if (!merged_hyp_pgd) {
+ 			kvm_err("Failed to allocate extra HYP pgd\n");
+@@ -1747,29 +1760,10 @@ int kvm_mmu_init(void)
+ 		}
+ 		__kvm_extend_hypmap(boot_hyp_pgd, hyp_pgd, merged_hyp_pgd,
+ 				    hyp_idmap_start);
+-		return 0;
 -	}
 -
--	if (hyp_pgd)
--		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
+-	/* Map the very same page at the trampoline VA */
+-	err = 	__create_hyp_mappings(boot_hyp_pgd,
+-				      TRAMPOLINE_VA, TRAMPOLINE_VA + PAGE_SIZE,
+-				      __phys_to_pfn(hyp_idmap_start),
+-				      PAGE_HYP_EXEC);
+-	if (err) {
+-		kvm_err("Failed to map trampoline @%lx into boot HYP pgd\n",
+-			TRAMPOLINE_VA);
+-		goto out;
+-	}
 -
--	mutex_unlock(&kvm_hyp_pgd_mutex);
--}
+-	/* Map the same page again into the runtime page tables */
+-	err = 	__create_hyp_mappings(hyp_pgd,
+-				      TRAMPOLINE_VA, TRAMPOLINE_VA + PAGE_SIZE,
+-				      __phys_to_pfn(hyp_idmap_start),
+-				      PAGE_HYP_EXEC);
+-	if (err) {
+-		kvm_err("Failed to map trampoline @%lx into runtime HYP pgd\n",
+-			TRAMPOLINE_VA);
+-		goto out;
++	} else {
++		err = kvm_map_idmap_text(hyp_pgd);
++		if (err)
++			goto out;
+ 	}
+ 
+ 	return 0;
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 7be24f2..8ed7e4a 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -133,30 +133,13 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+ }
+ 
+-extern char __hyp_idmap_text_start[];
 -
--/**
-  * free_hyp_pgds - free Hyp-mode page tables
-  *
-  * Assumes hyp_pgd is a page table used strictly in Hyp-mode and
-@@ -516,11 +495,16 @@ void free_hyp_pgds(void)
+ unsigned long kvm_hyp_reset_entry(void)
  {
- 	unsigned long addr;
- 
--	free_boot_hyp_pgd();
+-	if (!__kvm_cpu_uses_extended_idmap()) {
+-		unsigned long offset;
 -
- 	mutex_lock(&kvm_hyp_pgd_mutex);
- 
-+	if (boot_hyp_pgd) {
-+		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
-+		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
-+		boot_hyp_pgd = NULL;
-+	}
-+
- 	if (hyp_pgd) {
-+		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
- 		for (addr = PAGE_OFFSET; virt_addr_valid(addr); addr += PGDIR_SIZE)
- 			unmap_hyp_range(hyp_pgd, KERN_TO_HYP(addr), PGDIR_SIZE);
- 		for (addr = VMALLOC_START; is_vmalloc_addr((void*)addr); addr += PGDIR_SIZE)
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 390acab..b89122e 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -156,7 +156,6 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
- 
- int create_hyp_mappings(void *from, void *to, pgprot_t prot);
- int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
--void free_boot_hyp_pgd(void);
- void free_hyp_pgds(void);
- 
- void stage2_unmap_vm(struct kvm *kvm);
+-		/*
+-		 * Find the address of __kvm_hyp_reset() in the trampoline page.
+-		 * This is present in the running page tables, and the boot page
+-		 * tables, so we call the code here to start the trampoline
+-		 * dance in reverse.
+-		 */
+-		offset = (unsigned long)__kvm_hyp_reset
+-			 - ((unsigned long)__hyp_idmap_text_start & PAGE_MASK);
+-
+-		return TRAMPOLINE_VA + offset;
+-	} else {
+-		/*
+-		 * KVM is running with merged page tables, which don't have the
+-		 * trampoline page mapped. We know the idmap is still mapped,
+-		 * but can't be called into directly. Use
+-		 * __extended_idmap_trampoline to do the call.
+-		 */
+-		return (unsigned long)kvm_ksym_ref(__extended_idmap_trampoline);
+-	}
++	/*
++	 * KVM is running with merged page tables, which don't have the
++	 * trampoline page mapped. We know the idmap is still mapped,
++	 * but can't be called into directly. Use
++	 * __extended_idmap_trampoline to do the call.
++	 */
++	return (unsigned long)kvm_ksym_ref(__extended_idmap_trampoline);
+ }
 -- 
 2.1.4
 
