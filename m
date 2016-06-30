@@ -1,57 +1,180 @@
-From: Itaru Kitayama <itaru.kitayama@riken.jp>
-Subject: Re: [PATCH] KVM: arm64: Check GICV address is placed at a 4Kb boundary
-Date: Thu, 30 Jun 2016 12:23:17 +0900
-Message-ID: <7fc8cf5d-0df2-f585-9384-9282f58287a2@riken.jp>
-References: <cb18ab2d-12d9-bdd2-8432-801af488e340@riken.jp>
- <20160629124342.GV26498@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 05/15] arm64: KVM: Refactor kern_hyp_va/hyp_kern_va to
+ deal with multiple offsets
+Date: Thu, 30 Jun 2016 10:22:22 +0100
+Message-ID: <5774E4CE.8020200@arm.com>
+References: <1465297115-13091-1-git-send-email-marc.zyngier@arm.com>
+ <1465297115-13091-6-git-send-email-marc.zyngier@arm.com>
+ <20160628124210.GP26498@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0378549B5D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 23:18:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h7qG6pMKhnNB for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Jun 2016 23:18:05 -0400 (EDT)
-Received: from postman.riken.jp (postman4.riken.jp [134.160.33.86])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D15C49B54
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2016 23:18:04 -0400 (EDT)
-In-Reply-To: <20160629124342.GV26498@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160628124210.GP26498@cbox>
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Christoffer,
+On 28/06/16 13:42, Christoffer Dall wrote:
+> On Tue, Jun 07, 2016 at 11:58:25AM +0100, Marc Zyngier wrote:
+>> As we move towards a selectable HYP VA range, it is obvious that
+>> we don't want to test a variable to find out if we need to use
+>> the bottom VA range, the top VA range, or use the address as is
+>> (for VHE).
+>>
+>> Instead, we can expand our current helpers to generate the right
+>> mask or nop with code patching. We default to using the top VA
+>> space, with alternatives to switch to the bottom one or to nop
+>> out the instructions.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_hyp.h | 27 ++++++++++++--------------
+>>  arch/arm64/include/asm/kvm_mmu.h | 42 +++++++++++++++++++++++++++++++++++++---
+>>  2 files changed, 51 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+>> index 61d01a9..dd4904b 100644
+>> --- a/arch/arm64/include/asm/kvm_hyp.h
+>> +++ b/arch/arm64/include/asm/kvm_hyp.h
+>> @@ -25,24 +25,21 @@
+>>  
+>>  #define __hyp_text __section(.hyp.text) notrace
+>>  
+>> -static inline unsigned long __kern_hyp_va(unsigned long v)
+>> -{
+>> -	asm volatile(ALTERNATIVE("and %0, %0, %1",
+>> -				 "nop",
+>> -				 ARM64_HAS_VIRT_HOST_EXTN)
+>> -		     : "+r" (v) : "i" (HYP_PAGE_OFFSET_MASK));
+>> -	return v;
+>> -}
+>> -
+>> -#define kern_hyp_va(v) (typeof(v))(__kern_hyp_va((unsigned long)(v)))
+>> -
+>>  static inline unsigned long __hyp_kern_va(unsigned long v)
+>>  {
+>> -	asm volatile(ALTERNATIVE("orr %0, %0, %1",
+>> -				 "nop",
+>> +	u64 mask;
+>> +
+>> +	asm volatile(ALTERNATIVE("mov %0, %1",
+>> +				 "mov %0, %2",
+>> +				 ARM64_HYP_OFFSET_LOW)
+>> +		     : "=r" (mask)
+>> +		     : "i" (~HYP_PAGE_OFFSET_HIGH_MASK),
+>> +		       "i" (~HYP_PAGE_OFFSET_LOW_MASK));
+>> +	asm volatile(ALTERNATIVE("nop",
+>> +				 "mov %0, xzr",
+>>  				 ARM64_HAS_VIRT_HOST_EXTN)
+>> -		     : "+r" (v) : "i" (~HYP_PAGE_OFFSET_MASK));
+>> -	return v;
+>> +		     : "+r" (mask));
+>> +	return v | mask;
+> 
+> If mask is ~HYP_PAGE_OFFSET_LOW_MASK how can you be sure that setting
+> bit (VA_BITS - 1) is always the right thing to do to generate a kernel
+> address?
 
-On 6/29/16 9:43 PM, Christoffer Dall wrote:
-> Doesn't this change carry the risk of KVM mapping a page (larger than
-> 4K) containing other things than the GICV interface into the guest,
-> potentially breaking isolation of the VM from host hardware resources?
+It has taken be a while, but I think I finally see what you mean. We
+have no idea whether that bit was set or not.
 
-I still suspect the 64Kb long region is filled with 16 copies of first 
-4Kb of GICV, as Joel said in a thread two years ago when Marc introduced 
-sub-page alignment patch:
+> This is kind of what I asked before only now there's an extra bit not
+> guaranteed by the architecture to be set for the kernel range, I
+> think.
 
-https://patches.linaro.org/patch/32191/
+Yeah, I finally connected the couple of neurons left up there (that's
+what remains after the whole brexit braindamage). This doesn't work (or
+rather it only works sometimes). The good new is that I also realized we
+don't need any of that crap.
 
-. So with that patch applied, a VM always boots on a 64Kb page granular 
-host, thanks to the multiple copies of the first part of GICV, but it'll 
-have a problem accessing the GICV_DIR register that is
-placed at the second 4Kb of region mapped for GICV.
+The only case we currently use a HVA->KVA transformation is to pass the
+panic string down to panic(), and we can perfectly prevent
+__kvm_hyp_teardown from ever be evaluated as a HVA with a bit of
+asm-foo. This allows us to get rid of this whole function.
 
-For the ACPI enabled systems, the check of physical address of the 
-virtual cpu interface is page aligned only works for 4Kb page granular 
-kernels, so the patch is still required, though I need to come up with 
-another patch that does map GICV to guest's physical address space 
-taking care of the offset in the presence of the new VGIC code.
+> 
+>>  }
+>>  
+>>  #define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
+>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+>> index e45df1b..889330b 100644
+>> --- a/arch/arm64/include/asm/kvm_mmu.h
+>> +++ b/arch/arm64/include/asm/kvm_mmu.h
+>> @@ -95,13 +95,33 @@
+>>  /*
+>>   * Convert a kernel VA into a HYP VA.
+>>   * reg: VA to be converted.
+>> + *
+>> + * This generates the following sequences:
+>> + * - High mask:
+>> + *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
+>> + *		nop
+>> + * - Low mask:
+>> + *		and x0, x0, #HYP_PAGE_OFFSET_HIGH_MASK
+>> + *		and x0, x0, #HYP_PAGE_OFFSET_LOW_MASK
+>> + * - VHE:
+>> + *		nop
+>> + *		nop
+>> + *
+>> + * The "low mask" version works because the mask is a strict subset of
+>> + * the "high mask", hence performing the first mask for nothing.
+>> + * Should be completely invisible on any viable CPU.
+>>   */
+>>  .macro kern_hyp_va	reg
+>> -alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
+>> -	and	\reg, \reg, #HYP_PAGE_OFFSET_MASK
+>> +alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+>> +	and     \reg, \reg, #HYP_PAGE_OFFSET_HIGH_MASK
+>>  alternative_else
+>>  	nop
+>>  alternative_endif
+>> +alternative_if_not ARM64_HYP_OFFSET_LOW
+>> +	nop
+>> +alternative_else
+>> +	and     \reg, \reg, #HYP_PAGE_OFFSET_LOW_MASK
+>> +alternative_endif
+>>  .endm
+>>  
+>>  #else
+>> @@ -112,7 +132,23 @@ alternative_endif
+>>  #include <asm/mmu_context.h>
+>>  #include <asm/pgtable.h>
+>>  
+>> -#define KERN_TO_HYP(kva)	((unsigned long)kva & HYP_PAGE_OFFSET_MASK)
+>> +static inline unsigned long __kern_hyp_va(unsigned long v)
+>> +{
+>> +	asm volatile(ALTERNATIVE("and %0, %0, %1",
+>> +				 "nop",
+>> +				 ARM64_HAS_VIRT_HOST_EXTN)
+>> +		     : "+r" (v)
+>> +		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
+>> +	asm volatile(ALTERNATIVE("nop",
+>> +				 "and %0, %0, %1",
+>> +				 ARM64_HYP_OFFSET_LOW)
+>> +		     : "+r" (v)
+>> +		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
+> 
+> how is the second operation a nop for VHE? Is this because
+> ARM64_HYP_OFFSET_LOW will never be set for VHE?
+
+That's because VHE has no notion of an offset at all (we end up with two
+nops).
+
+>> +	return v;
+>> +}
+>> +
+>> +#define kern_hyp_va(v) 	(typeof(v))(__kern_hyp_va((unsigned long)(v)))
+>> +#define KERN_TO_HYP(v)	kern_hyp_va(v)
+> 
+> looks like there's room for some unification/cleanup here as well.
+
+Indeed. I'll queue up an additional patch at the end to clean the bulk
+of the code.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
