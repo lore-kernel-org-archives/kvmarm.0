@@ -1,78 +1,76 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 03/18] arm/arm64: KVM: Remove hyp_kern_va helper
-Date: Thu, 30 Jun 2016 18:40:36 +0100
-Message-ID: <1467308451-13365-4-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 01/18] arm64: KVM: Merged page tables documentation
+Date: Thu, 30 Jun 2016 18:40:34 +0100
+Message-ID: <1467308451-13365-2-git-send-email-marc.zyngier@arm.com>
 References: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08F0849B54
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 13:35:47 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Nnf4uY4-EDvP for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jun 2016 13:35:45 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34BF449B71
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 13:35:45 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-hyp_kern_va is now completely unused, so let's remove it entirely.
+Since dealing with VA ranges tends to hurt my brain badly, let's
+start with a bit of documentation that will hopefully help
+understanding what comes next...
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_hyp.h   |  1 -
- arch/arm64/include/asm/kvm_hyp.h | 12 ------------
- 2 files changed, 13 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h | 40 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 37 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
-index f0e8607..e38fce2 100644
---- a/arch/arm/include/asm/kvm_hyp.h
-+++ b/arch/arm/include/asm/kvm_hyp.h
-@@ -26,7 +26,6 @@
- #define __hyp_text __section(.hyp.text) notrace
- 
- #define kern_hyp_va(v) (v)
--#define hyp_kern_va(v) (v)
- 
- #define __ACCESS_CP15(CRn, Op1, CRm, Op2)	\
- 	"mrc", "mcr", __stringify(p15, Op1, %0, CRn, CRm, Op2), u32
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 44eaff7..1d81f9a 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -36,18 +36,6 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
- 
- #define kern_hyp_va(v) (typeof(v))(__kern_hyp_va((unsigned long)(v)))
- 
--static inline unsigned long __hyp_kern_va(unsigned long v)
--{
--	u64 offset = PAGE_OFFSET - HYP_PAGE_OFFSET;
--	asm volatile(ALTERNATIVE("add %0, %0, %1",
--				 "nop",
--				 ARM64_HAS_VIRT_HOST_EXTN)
--		     : "+r" (v) : "r" (offset));
--	return v;
--}
--
--#define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
--
- #define read_sysreg_elx(r,nvh,vh)					\
- 	({								\
- 		u64 reg;						\
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index fdfbddb..6149dfc 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -29,10 +29,44 @@
+  *
+  * Instead, give the HYP mode its own VA region at a fixed offset from
+  * the kernel by just masking the top bits (which are all ones for a
+- * kernel address).
++ * kernel address). We need to find out how many bits to mask.
+  *
+- * ARMv8.1 (using VHE) does have a TTBR1_EL2, and doesn't use these
+- * macros (the entire kernel runs at EL2).
++ * We want to build a set of page tables that cover both parts of the
++ * idmap (the trampoline page used to initialize EL2), and our normal
++ * runtime VA space, at the same time.
++ *
++ * Given that the kernel uses VA_BITS for its entire address space,
++ * and that half of that space (VA_BITS - 1) is used for the linear
++ * mapping, we can also limit the EL2 space to (VA_BITS - 1).
++ *
++ * The main question is "Within the VA_BITS space, does EL2 use the
++ * top or the bottom half of that space to shadow the kernel's linear
++ * mapping?". As we need to idmap the trampoline page, this is
++ * determined by the range in which this page lives.
++ *
++ * If the page is in the bottom half, we have to use the top half. If
++ * the page is in the top half, we have to use the bottom half:
++ *
++ * T = __virt_to_phys(__hyp_idmap_text_start)
++ * if (T & BIT(VA_BITS - 1))
++ *	HYP_VA_MIN = 0  //idmap in upper half
++ * else
++ *	HYP_VA_MIN = 1 << (VA_BITS - 1)
++ * HYP_VA_MAX = HYP_VA_MIN + (1 << (VA_BITS - 1)) - 1
++ *
++ * This of course assumes that the trampoline page exists within the
++ * VA_BITS range. If it doesn't, then it means we're in the odd case
++ * where the kernel idmap (as well as HYP) uses more levels than the
++ * kernel runtime page tables (as seen when the kernel is configured
++ * for 4k pages, 39bits VA, and yet memory lives just above that
++ * limit, forcing the idmap to use 4 levels of page tables while the
++ * kernel itself only uses 3). In this particular case, it doesn't
++ * matter which side of VA_BITS we use, as we're guaranteed not to
++ * conflict with anything.
++ *
++ * When using VHE, there are no separate hyp mappings and all KVM
++ * functionality is already mapped as part of the main kernel
++ * mappings, and none of this applies in that case.
+  */
+ #define HYP_PAGE_OFFSET_SHIFT	VA_BITS
+ #define HYP_PAGE_OFFSET_MASK	((UL(1) << HYP_PAGE_OFFSET_SHIFT) - 1)
 -- 
 2.1.4
+
