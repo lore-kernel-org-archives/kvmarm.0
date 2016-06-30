@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 14/18] arm: KVM: Simplify HYP init
-Date: Thu, 30 Jun 2016 18:40:47 +0100
-Message-ID: <1467308451-13365-15-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 12/18] arm/arm64: KVM: Drop boot_pgd
+Date: Thu, 30 Jun 2016 18:40:45 +0100
+Message-ID: <1467308451-13365-13-git-send-email-marc.zyngier@arm.com>
 References: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
@@ -10,124 +10,161 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Just like for arm64, we can now make the HYP setup a lot simpler,
-and we can now initialise it in one go (instead of the two
-phases we currently have).
+Since we now only have one set of page tables, the concept of
+boot_pgd is useless and can be removed. We still keep it as
+an element of the "extended idmap" thing.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h | 15 +++++--------
- arch/arm/kvm/init.S             | 49 ++++++++---------------------------------
- 2 files changed, 14 insertions(+), 50 deletions(-)
+ arch/arm/include/asm/kvm_host.h   |  8 +++-----
+ arch/arm/include/asm/kvm_mmu.h    |  1 -
+ arch/arm/kvm/arm.c                | 15 +++------------
+ arch/arm/kvm/mmu.c                |  8 --------
+ arch/arm64/include/asm/kvm_host.h |  6 ++----
+ arch/arm64/include/asm/kvm_mmu.h  |  1 -
+ 6 files changed, 8 insertions(+), 31 deletions(-)
 
 diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 020f4eb..eafbfd5 100644
+index 96387d4..020f4eb 100644
 --- a/arch/arm/include/asm/kvm_host.h
 +++ b/arch/arm/include/asm/kvm_host.h
-@@ -250,18 +250,13 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
- 	 * code. The init code doesn't need to preserve these
- 	 * registers as r0-r3 are already callee saved according to
- 	 * the AAPCS.
--	 * Note that we slightly misuse the prototype by casing the
-+	 * Note that we slightly misuse the prototype by casting the
- 	 * stack pointer to a void *.
--	 *
--	 * We don't have enough registers to perform the full init in
--	 * one go.  Install the boot PGD first, and then install the
--	 * runtime PGD, stack pointer and vectors. The PGDs are always
--	 * passed as the third argument, in order to be passed into
--	 * r2-r3 to the init code (yes, this is compliant with the
--	 * PCS!).
--	 */
+@@ -241,8 +241,7 @@ int kvm_arm_coproc_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
+ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		int exception_index);
  
--	kvm_call_hyp(NULL, 0, boot_pgd_ptr);
-+	 * The PGDs are always passed as the third argument, in order
-+	 * to be passed into r2-r3 to the init code (yes, this is
-+	 * compliant with the PCS!).
-+	 */
- 
- 	kvm_call_hyp((void*)hyp_stack_ptr, vector_ptr, pgd_ptr);
+-static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
+-				       phys_addr_t pgd_ptr,
++static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+ 				       unsigned long hyp_stack_ptr,
+ 				       unsigned long vector_ptr)
+ {
+@@ -272,12 +271,11 @@ static inline void __cpu_init_stage2(void)
+ 	kvm_call_hyp(__init_stage2_translation);
  }
-diff --git a/arch/arm/kvm/init.S b/arch/arm/kvm/init.S
-index 1f9ae17..b82a99d 100644
---- a/arch/arm/kvm/init.S
-+++ b/arch/arm/kvm/init.S
-@@ -32,23 +32,13 @@
-  *       r2,r3 = Hypervisor pgd pointer
-  *
-  * The init scenario is:
-- * - We jump in HYP with four parameters: boot HYP pgd, runtime HYP pgd,
-- *   runtime stack, runtime vectors
-- * - Enable the MMU with the boot pgd
-- * - Jump to a target into the trampoline page (remember, this is the same
-- *   physical page!)
-- * - Now switch to the runtime pgd (same VA, and still the same physical
-- *   page!)
-+ * - We jump in HYP with 3 parameters: runtime HYP pgd, runtime stack,
-+ *   runtime vectors
-  * - Invalidate TLBs
-  * - Set stack and vectors
-+ * - Setup the page tables
-+ * - Enable the MMU
-  * - Profit! (or eret, if you only care about the code).
-- *
-- * As we only have four registers available to pass parameters (and we
-- * need six), we split the init in two phases:
-- * - Phase 1: r0 = 0, r1 = 0, r2,r3 contain the boot PGD.
-- *   Provides the basic HYP init, and enable the MMU.
-- * - Phase 2: r0 = ToS, r1 = vectors, r2,r3 contain the runtime PGD.
-- *   Switches to the runtime PGD, set stack and vectors.
-  */
  
- 	.text
-@@ -68,8 +58,11 @@ __kvm_hyp_init:
- 	W(b)	.
+-static inline void __cpu_reset_hyp_mode(phys_addr_t boot_pgd_ptr,
+-					phys_addr_t phys_idmap_start)
++static inline void __cpu_reset_hyp_mode(phys_addr_t phys_idmap_start)
+ {
+ 	/*
+ 	 * TODO
+-	 * kvm_call_reset(boot_pgd_ptr, phys_idmap_start);
++	 * kvm_call_reset(phys_idmap_start);
+ 	 */
+ }
  
- __do_hyp_init:
--	cmp	r0, #0			@ We have a SP?
--	bne	phase2			@ Yes, second stage init
-+	@ Set stack pointer
-+	mov	sp, r0
-+
-+	@ Set HVBAR to point to the HYP vectors
-+	mcr	p15, 4, r1, c12, c0, 0	@ HVBAR
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 6cb4d4d..5d161d1 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -65,7 +65,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
  
- 	@ Set the HTTBR to point to the hypervisor PGD pointer passed
- 	mcrr	p15, 4, rr_lo_hi(r2, r3), c2
-@@ -114,33 +107,9 @@ __do_hyp_init:
-  THUMB(	ldr	r2, =(HSCTLR_M | HSCTLR_A | HSCTLR_TE)		)
- 	orr	r1, r1, r2
- 	orr	r0, r0, r1
--	isb
- 	mcr	p15, 4, r0, c1, c0, 0	@ HSCR
--
--	@ End of init phase-1
--	eret
--
--phase2:
--	@ Set stack pointer
--	mov	sp, r0
--
--	@ Set HVBAR to point to the HYP vectors
--	mcr	p15, 4, r1, c12, c0, 0	@ HVBAR
--
--	@ Jump to the trampoline page
--	ldr	r0, =TRAMPOLINE_VA
--	adr	r1, target
--	bfi	r0, r1, #0, #PAGE_SHIFT
--	ret	r0
--
--target:	@ We're now in the trampoline code, switch page tables
--	mcrr	p15, 4, rr_lo_hi(r2, r3), c2
- 	isb
+ phys_addr_t kvm_mmu_get_httbr(void);
+-phys_addr_t kvm_mmu_get_boot_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+ phys_addr_t kvm_get_idmap_start(void);
+ int kvm_mmu_init(void);
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index c74483f..0887cc1 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1038,7 +1038,6 @@ long kvm_arch_vm_ioctl(struct file *filp,
  
--	@ Invalidate the old TLBs
--	mcr	p15, 4, r0, c8, c7, 0	@ TLBIALLH
--	dsb	ish
--
- 	eret
+ static void cpu_init_hyp_mode(void *dummy)
+ {
+-	phys_addr_t boot_pgd_ptr;
+ 	phys_addr_t pgd_ptr;
+ 	unsigned long hyp_stack_ptr;
+ 	unsigned long stack_page;
+@@ -1047,13 +1046,12 @@ static void cpu_init_hyp_mode(void *dummy)
+ 	/* Switch from the HYP stub to our own HYP init vector */
+ 	__hyp_set_vectors(kvm_get_idmap_vector());
  
- 	.ltorg
+-	boot_pgd_ptr = kvm_mmu_get_boot_httbr();
+ 	pgd_ptr = kvm_mmu_get_httbr();
+ 	stack_page = __this_cpu_read(kvm_arm_hyp_stack_page);
+ 	hyp_stack_ptr = stack_page + PAGE_SIZE;
+ 	vector_ptr = (unsigned long)kvm_ksym_ref(__kvm_hyp_vector);
+ 
+-	__cpu_init_hyp_mode(boot_pgd_ptr, pgd_ptr, hyp_stack_ptr, vector_ptr);
++	__cpu_init_hyp_mode(pgd_ptr, hyp_stack_ptr, vector_ptr);
+ 	__cpu_init_stage2();
+ 
+ 	kvm_arm_init_debug();
+@@ -1075,15 +1073,8 @@ static void cpu_hyp_reinit(void)
+ 
+ static void cpu_hyp_reset(void)
+ {
+-	phys_addr_t boot_pgd_ptr;
+-	phys_addr_t phys_idmap_start;
+-
+-	if (!is_kernel_in_hyp_mode()) {
+-		boot_pgd_ptr = kvm_mmu_get_boot_httbr();
+-		phys_idmap_start = kvm_get_idmap_start();
+-
+-		__cpu_reset_hyp_mode(boot_pgd_ptr, phys_idmap_start);
+-	}
++	if (!is_kernel_in_hyp_mode())
++		__cpu_reset_hyp_mode(kvm_get_idmap_start());
+ }
+ 
+ static void _kvm_arch_hardware_enable(void *discard)
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 80d3737..dd4ccc7 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -1685,14 +1685,6 @@ phys_addr_t kvm_mmu_get_httbr(void)
+ 		return virt_to_phys(hyp_pgd);
+ }
+ 
+-phys_addr_t kvm_mmu_get_boot_httbr(void)
+-{
+-	if (__kvm_cpu_uses_extended_idmap())
+-		return virt_to_phys(merged_hyp_pgd);
+-	else
+-		return virt_to_phys(hyp_pgd);
+-}
+-
+ phys_addr_t kvm_get_idmap_vector(void)
+ {
+ 	return hyp_idmap_vector;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 88462c3..6731d4e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -347,8 +347,7 @@ int kvm_perf_teardown(void);
+ 
+ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+ 
+-static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
+-				       phys_addr_t pgd_ptr,
++static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+ 				       unsigned long hyp_stack_ptr,
+ 				       unsigned long vector_ptr)
+ {
+@@ -360,8 +359,7 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
+ }
+ 
+ void __kvm_hyp_teardown(void);
+-static inline void __cpu_reset_hyp_mode(phys_addr_t boot_pgd_ptr,
+-					phys_addr_t phys_idmap_start)
++static inline void __cpu_reset_hyp_mode(phys_addr_t phys_idmap_start)
+ {
+ 	kvm_call_hyp(__kvm_hyp_teardown, phys_idmap_start);
+ }
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 2970537..390acab 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -170,7 +170,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
+ 
+ phys_addr_t kvm_mmu_get_httbr(void);
+-phys_addr_t kvm_mmu_get_boot_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+ phys_addr_t kvm_get_idmap_start(void);
+ int kvm_mmu_init(void);
 -- 
 2.1.4
 
