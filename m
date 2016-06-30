@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 18/18] arm/arm64: Get rid of KERN_TO_HYP
-Date: Thu, 30 Jun 2016 18:40:51 +0100
-Message-ID: <1467308451-13365-19-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 16/18] arm/arm64: KVM: Prune unused #defines
+Date: Thu, 30 Jun 2016 18:40:49 +0100
+Message-ID: <1467308451-13365-17-git-send-email-marc.zyngier@arm.com>
 References: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B2AF49BA4
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D75C49B56
  for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 13:36:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3eSwJngPOAW7 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jun 2016 13:36:04 -0400 (EDT)
+ with ESMTP id NATLSKApqBYQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jun 2016 13:36:02 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2AB149B94
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 13:36:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2EA349BCB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2016 13:35:58 -0400 (EDT)
 In-Reply-To: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,106 +31,58 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We have both KERN_TO_HYP and kern_hyp_va, which do the exact same
-thing. Let's standardize on the latter.
+We can now remove a number of dead #defines, thanks to the trampoline
+code being gone.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_hyp.h   |  2 --
- arch/arm/include/asm/kvm_mmu.h   |  2 +-
- arch/arm/kvm/mmu.c               | 18 +++++++++---------
- arch/arm64/include/asm/kvm_mmu.h |  1 -
- 4 files changed, 10 insertions(+), 13 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   |  9 ---------
+ arch/arm64/include/asm/kvm_mmu.h | 10 ----------
+ 2 files changed, 19 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
-index e38fce2..6eaff28 100644
---- a/arch/arm/include/asm/kvm_hyp.h
-+++ b/arch/arm/include/asm/kvm_hyp.h
-@@ -25,8 +25,6 @@
- 
- #define __hyp_text __section(.hyp.text) notrace
- 
--#define kern_hyp_va(v) (v)
--
- #define __ACCESS_CP15(CRn, Op1, CRm, Op2)	\
- 	"mrc", "mcr", __stringify(p15, Op1, %0, CRn, CRm, Op2), u32
- #define __ACCESS_CP15_64(Op1, CRm)		\
 diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 73c2818..3bb803d 100644
+index d5fd9fb..73c2818 100644
 --- a/arch/arm/include/asm/kvm_mmu.h
 +++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -26,7 +26,7 @@
+@@ -26,18 +26,9 @@
   * We directly use the kernel VA for the HYP, as we can directly share
   * the mapping (HTTBR "covers" TTBR1).
   */
--#define KERN_TO_HYP(kva)	(kva)
-+#define kern_hyp_va(kva)	(kva)
+-#define HYP_PAGE_OFFSET_MASK	UL(~0)
+-#define HYP_PAGE_OFFSET		PAGE_OFFSET
+ #define KERN_TO_HYP(kva)	(kva)
  
  /*
+- * Our virtual mapping for the boot-time MMU-enable code. Must be
+- * shared across all the page-tables. Conveniently, we use the vectors
+- * page, where no kernel data will ever be shared with HYP.
+- */
+-#define TRAMPOLINE_VA		UL(CONFIG_VECTORS_BASE)
+-
+-/*
   * KVM_MMU_CACHE_MIN_PAGES is the number of stage2 page table translation levels.
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 8a0aa37..bda27b6 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -506,9 +506,9 @@ void free_hyp_pgds(void)
- 	if (hyp_pgd) {
- 		unmap_hyp_range(hyp_pgd, hyp_idmap_start, PAGE_SIZE);
- 		for (addr = PAGE_OFFSET; virt_addr_valid(addr); addr += PGDIR_SIZE)
--			unmap_hyp_range(hyp_pgd, KERN_TO_HYP(addr), PGDIR_SIZE);
-+			unmap_hyp_range(hyp_pgd, kern_hyp_va(addr), PGDIR_SIZE);
- 		for (addr = VMALLOC_START; is_vmalloc_addr((void*)addr); addr += PGDIR_SIZE)
--			unmap_hyp_range(hyp_pgd, KERN_TO_HYP(addr), PGDIR_SIZE);
-+			unmap_hyp_range(hyp_pgd, kern_hyp_va(addr), PGDIR_SIZE);
- 
- 		free_pages((unsigned long)hyp_pgd, hyp_pgd_order);
- 		hyp_pgd = NULL;
-@@ -670,8 +670,8 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
- {
- 	phys_addr_t phys_addr;
- 	unsigned long virt_addr;
--	unsigned long start = KERN_TO_HYP((unsigned long)from);
--	unsigned long end = KERN_TO_HYP((unsigned long)to);
-+	unsigned long start = kern_hyp_va((unsigned long)from);
-+	unsigned long end = kern_hyp_va((unsigned long)to);
- 
- 	if (is_kernel_in_hyp_mode())
- 		return 0;
-@@ -705,8 +705,8 @@ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
   */
- int create_hyp_io_mappings(void *from, void *to, phys_addr_t phys_addr)
- {
--	unsigned long start = KERN_TO_HYP((unsigned long)from);
--	unsigned long end = KERN_TO_HYP((unsigned long)to);
-+	unsigned long start = kern_hyp_va((unsigned long)from);
-+	unsigned long end = kern_hyp_va((unsigned long)to);
- 
- 	if (is_kernel_in_hyp_mode())
- 		return 0;
-@@ -1711,10 +1711,10 @@ int kvm_mmu_init(void)
- 
- 	kvm_info("IDMAP page: %lx\n", hyp_idmap_start);
- 	kvm_info("HYP VA range: %lx:%lx\n",
--		 KERN_TO_HYP(PAGE_OFFSET), KERN_TO_HYP(~0UL));
-+		 kern_hyp_va(PAGE_OFFSET), kern_hyp_va(~0UL));
- 
--	if (hyp_idmap_start >= KERN_TO_HYP(PAGE_OFFSET) &&
--	    hyp_idmap_start <  KERN_TO_HYP(~0UL)) {
-+	if (hyp_idmap_start >= kern_hyp_va(PAGE_OFFSET) &&
-+	    hyp_idmap_start <  kern_hyp_va(~0UL)) {
- 		/*
- 		 * The idmap page is intersecting with the VA space,
- 		 * it is not safe to continue further.
+ #define KVM_MMU_CACHE_MIN_PAGES	2
 diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 9226f8b..b6bb834 100644
+index b89122e..9226f8b 100644
 --- a/arch/arm64/include/asm/kvm_mmu.h
 +++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -133,7 +133,6 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
- }
+@@ -72,16 +72,6 @@
+ #define HYP_PAGE_OFFSET_HIGH_MASK	((UL(1) << VA_BITS) - 1)
+ #define HYP_PAGE_OFFSET_LOW_MASK	((UL(1) << (VA_BITS - 1)) - 1)
  
- #define kern_hyp_va(v) 	(typeof(v))(__kern_hyp_va((unsigned long)(v)))
--#define KERN_TO_HYP(v)	kern_hyp_va(v)
+-/* Temporary compat define */
+-#define HYP_PAGE_OFFSET_MASK		HYP_PAGE_OFFSET_HIGH_MASK
+-
+-/*
+- * Our virtual mapping for the idmap-ed MMU-enable code. Must be
+- * shared across all the page-tables. Conveniently, we use the last
+- * possible page, where no kernel mapping will ever exist.
+- */
+-#define TRAMPOLINE_VA		(HYP_PAGE_OFFSET_MASK & PAGE_MASK)
+-
+ #ifdef __ASSEMBLY__
  
- /*
-  * We currently only support a 40bit IPA.
+ #include <asm/alternative.h>
 -- 
 2.1.4
