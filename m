@@ -1,170 +1,223 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 12/18] arm/arm64: KVM: Drop boot_pgd
-Date: Thu, 30 Jun 2016 18:40:45 +0100
-Message-ID: <1467308451-13365-13-git-send-email-marc.zyngier@arm.com>
-References: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1467308451-13365-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+From: Itaru Kitayama <itaru.kitayama@riken.jp>
+Subject: [PATCH] updated: arm64: KVM: vgic: deal with GIC sub-page alignment
+Date: Fri, 1 Jul 2016 13:57:56 +0900
+Message-ID: <5775F854.3060306@riken.jp>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============7975415775139137475=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1801949B21
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jul 2016 00:51:57 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Vwe3q6RMN-0G for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Jul 2016 00:51:54 -0400 (EDT)
+Received: from postman.riken.jp (postman2.riken.jp [134.160.33.84])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D4E2412A2
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Jul 2016 00:51:53 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since we now only have one set of page tables, the concept of
-boot_pgd is useless and can be removed. We still keep it as
-an element of the "extended idmap" thing.
+This is a multi-part message in MIME format.
+--===============7975415775139137475==
+Content-Type: multipart/alternative;
+ boundary="------------000803000007060306040703"
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/include/asm/kvm_host.h   |  8 +++-----
- arch/arm/include/asm/kvm_mmu.h    |  1 -
- arch/arm/kvm/arm.c                | 15 +++------------
- arch/arm/kvm/mmu.c                |  8 --------
- arch/arm64/include/asm/kvm_host.h |  6 ++----
- arch/arm64/include/asm/kvm_mmu.h  |  1 -
- 6 files changed, 8 insertions(+), 31 deletions(-)
+This is a multi-part message in MIME format.
+--------------000803000007060306040703
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 96387d4..020f4eb 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -241,8 +241,7 @@ int kvm_arm_coproc_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
- int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		int exception_index);
- 
--static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
--				       phys_addr_t pgd_ptr,
-+static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
- 				       unsigned long hyp_stack_ptr,
- 				       unsigned long vector_ptr)
- {
-@@ -272,12 +271,11 @@ static inline void __cpu_init_stage2(void)
- 	kvm_call_hyp(__init_stage2_translation);
- }
- 
--static inline void __cpu_reset_hyp_mode(phys_addr_t boot_pgd_ptr,
--					phys_addr_t phys_idmap_start)
-+static inline void __cpu_reset_hyp_mode(phys_addr_t phys_idmap_start)
- {
- 	/*
- 	 * TODO
--	 * kvm_call_reset(boot_pgd_ptr, phys_idmap_start);
-+	 * kvm_call_reset(phys_idmap_start);
- 	 */
- }
- 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 6cb4d4d..5d161d1 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -65,7 +65,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
- void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
- 
- phys_addr_t kvm_mmu_get_httbr(void);
--phys_addr_t kvm_mmu_get_boot_httbr(void);
- phys_addr_t kvm_get_idmap_vector(void);
- phys_addr_t kvm_get_idmap_start(void);
- int kvm_mmu_init(void);
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index c74483f..0887cc1 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -1038,7 +1038,6 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 
- static void cpu_init_hyp_mode(void *dummy)
- {
--	phys_addr_t boot_pgd_ptr;
- 	phys_addr_t pgd_ptr;
- 	unsigned long hyp_stack_ptr;
- 	unsigned long stack_page;
-@@ -1047,13 +1046,12 @@ static void cpu_init_hyp_mode(void *dummy)
- 	/* Switch from the HYP stub to our own HYP init vector */
- 	__hyp_set_vectors(kvm_get_idmap_vector());
- 
--	boot_pgd_ptr = kvm_mmu_get_boot_httbr();
- 	pgd_ptr = kvm_mmu_get_httbr();
- 	stack_page = __this_cpu_read(kvm_arm_hyp_stack_page);
- 	hyp_stack_ptr = stack_page + PAGE_SIZE;
- 	vector_ptr = (unsigned long)kvm_ksym_ref(__kvm_hyp_vector);
- 
--	__cpu_init_hyp_mode(boot_pgd_ptr, pgd_ptr, hyp_stack_ptr, vector_ptr);
-+	__cpu_init_hyp_mode(pgd_ptr, hyp_stack_ptr, vector_ptr);
- 	__cpu_init_stage2();
- 
- 	kvm_arm_init_debug();
-@@ -1075,15 +1073,8 @@ static void cpu_hyp_reinit(void)
- 
- static void cpu_hyp_reset(void)
- {
--	phys_addr_t boot_pgd_ptr;
--	phys_addr_t phys_idmap_start;
--
--	if (!is_kernel_in_hyp_mode()) {
--		boot_pgd_ptr = kvm_mmu_get_boot_httbr();
--		phys_idmap_start = kvm_get_idmap_start();
--
--		__cpu_reset_hyp_mode(boot_pgd_ptr, phys_idmap_start);
--	}
-+	if (!is_kernel_in_hyp_mode())
-+		__cpu_reset_hyp_mode(kvm_get_idmap_start());
- }
- 
- static void _kvm_arch_hardware_enable(void *discard)
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 80d3737..dd4ccc7 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -1685,14 +1685,6 @@ phys_addr_t kvm_mmu_get_httbr(void)
- 		return virt_to_phys(hyp_pgd);
- }
- 
--phys_addr_t kvm_mmu_get_boot_httbr(void)
--{
--	if (__kvm_cpu_uses_extended_idmap())
--		return virt_to_phys(merged_hyp_pgd);
--	else
--		return virt_to_phys(hyp_pgd);
--}
--
- phys_addr_t kvm_get_idmap_vector(void)
- {
- 	return hyp_idmap_vector;
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 88462c3..6731d4e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -347,8 +347,7 @@ int kvm_perf_teardown(void);
- 
- struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
- 
--static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
--				       phys_addr_t pgd_ptr,
-+static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
- 				       unsigned long hyp_stack_ptr,
- 				       unsigned long vector_ptr)
- {
-@@ -360,8 +359,7 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
- }
- 
- void __kvm_hyp_teardown(void);
--static inline void __cpu_reset_hyp_mode(phys_addr_t boot_pgd_ptr,
--					phys_addr_t phys_idmap_start)
-+static inline void __cpu_reset_hyp_mode(phys_addr_t phys_idmap_start)
- {
- 	kvm_call_hyp(__kvm_hyp_teardown, phys_idmap_start);
- }
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 2970537..390acab 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -170,7 +170,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
- void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
- 
- phys_addr_t kvm_mmu_get_httbr(void);
--phys_addr_t kvm_mmu_get_boot_httbr(void);
- phys_addr_t kvm_get_idmap_vector(void);
- phys_addr_t kvm_get_idmap_start(void);
- int kvm_mmu_init(void);
--- 
-2.1.4
+This is merely an update to the patch Marc posted in 2014:
 
+https://lists.cs.columbia.edu/pipermail/kvmarm/2014-June/010055.html
+
+This updated patch is against today's current kvmarm git tree tag, 
+kvm-for-arm-v4.7-rc6.
+
+The GIC CPU interface is always 4k aligned. If the host is using
+64k pages, it is critical to place the guest's GICC interface at the
+same relative alignment as the host's GICV. Failure to do so results
+in an impossibility for the guest to deal with interrupts.
+
+Add a KVM_DEV_ARM_VGIC_GRP_ADDR_OFFSET attribute for the VGIC, allowing
+userspace to retrieve the GICV offset in a page. It becomes then trivial
+to adjust the GICC base address for the guest.
+
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>>
+Signed-off-by: Itaru Kitayama <itaru.kitayama@riken.jp>
+
+diff --git a/arch/arm64/include/uapi/asm/kvm.h 
+b/arch/arm64/include/uapi/asm/kvm.h
+index f209ea1..803b097 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -203,6 +203,7 @@ struct kvm_arch_memory_slot {
+  #define   KVM_DEV_ARM_VGIC_OFFSET_MASK (0xffffffffULL << 
+KVM_DEV_ARM_VGIC_OFFSET_SHIFT)
+  #define KVM_DEV_ARM_VGIC_GRP_NR_IRQS   3
+  #define KVM_DEV_ARM_VGIC_GRP_CTRL      4
++#define KVM_DEV_ARM_VGIC_GRP_ADDR_OFFSET 5
+  #define   KVM_DEV_ARM_VGIC_CTRL_INIT   0
+
+  /* Device Control API on vcpu fd */
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c 
+b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 850eb88..3e33778 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -196,8 +196,14 @@ static int vgic_get_common_attr(struct kvm_device *dev,
+                              VGIC_NR_PRIVATE_IRQS, uaddr);
+                 break;
+         }
++       case KVM_DEV_ARM_VGIC_GRP_ADDR_OFFSET: {
++               u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++               u32 val = kvm_vgic_global_state.vcpu_base & ~PAGE_MASK;
++               r = put_user(val, uaddr);
++               break;
+         }
+
++       }
+         return r;
+  }
+
+@@ -362,6 +368,7 @@ static int vgic_v2_has_attr(struct kvm_device *dev,
+         case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+                 return vgic_v2_has_attr_regs(dev, attr);
+         case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
++       case KVM_DEV_ARM_VGIC_GRP_ADDR_OFFSET:
+                 return 0;
+         case KVM_DEV_ARM_VGIC_GRP_CTRL:
+                 switch (attr->attr) {
+
+--------------000803000007060306040703
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+  <head>
+
+    <meta http-equiv=3D"content-type" content=3D"text/html; charset=3Dutf=
+-8">
+  </head>
+  <body bgcolor=3D"#FFFFFF" text=3D"#000000">
+    This is merely an update to the patch Marc posted in 2014:<br>
+    <br>
+    <a class=3D"moz-txt-link-freetext" href=3D"https://lists.cs.columbia.=
+edu/pipermail/kvmarm/2014-June/010055.html">https://lists.cs.columbia.edu=
+/pipermail/kvmarm/2014-June/010055.html</a><br>
+    <br>
+    This updated patch is against today's current kvmarm git tree tag,
+    kvm-for-arm-v4.7-rc6.<br>
+    <br>
+    <meta charset=3D"utf-8">
+    <pre style=3D"white-space: pre-wrap; color: rgb(0, 0, 0); font-style:=
+ normal; font-variant: normal; font-weight: normal; letter-spacing: norma=
+l; line-height: normal; orphans: auto; text-align: start; text-indent: 0p=
+x; text-transform: none; widows: 1; word-spacing: 0px; -webkit-text-strok=
+e-width: 0px;">The GIC CPU interface is always 4k aligned. If the host is=
+ using
+64k pages, it is critical to place the guest's GICC interface at the
+same relative alignment as the host's GICV. Failure to do so results
+in an impossibility for the guest to deal with interrupts.
+
+Add a KVM_DEV_ARM_VGIC_GRP_ADDR_OFFSET attribute for the VGIC, allowing
+userspace to retrieve the GICV offset in a page. It becomes then trivial
+to adjust the GICC base address for the guest.
+
+Signed-off-by: Marc Zyngier &lt;<a href=3D"https://lists.cs.columbia.edu/=
+mailman/listinfo/kvmarm">marc.zyngier@arm.com</a>&gt;
+Signed-off-by: Itaru Kitayama <a class=3D"moz-txt-link-rfc2396E" href=3D"=
+mailto:itaru.kitayama@riken.jp">&lt;itaru.kitayama@riken.jp&gt;</a>
+</pre>
+    diff --git a/arch/arm64/include/uapi/asm/kvm.h
+    b/arch/arm64/include/uapi/asm/kvm.h<br>
+    index f209ea1..803b097 100644<br>
+    --- a/arch/arm64/include/uapi/asm/kvm.h<br>
+    +++ b/arch/arm64/include/uapi/asm/kvm.h<br>
+    @@ -203,6 +203,7 @@ struct kvm_arch_memory_slot {<br>
+    =C2=A0#define=C2=A0=C2=A0 KVM_DEV_ARM_VGIC_OFFSET_MASK (0xffffffffULL=
+ &lt;&lt;
+    KVM_DEV_ARM_VGIC_OFFSET_SHIFT)<br>
+    =C2=A0#define KVM_DEV_ARM_VGIC_GRP_NR_IRQS=C2=A0=C2=A0 3<br>
+    =C2=A0#define KVM_DEV_ARM_VGIC_GRP_CTRL=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 4<br>
+    +#define KVM_DEV_ARM_VGIC_GRP_ADDR_OFFSET 5<br>
+    =C2=A0#define=C2=A0=C2=A0 KVM_DEV_ARM_VGIC_CTRL_INIT=C2=A0=C2=A0 0<br=
+>
+    =C2=A0<br>
+    =C2=A0/* Device Control API on vcpu fd */<br>
+    diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c
+    b/virt/kvm/arm/vgic/vgic-kvm-device.c<br>
+    index 850eb88..3e33778 100644<br>
+    --- a/virt/kvm/arm/vgic/vgic-kvm-device.c<br>
+    +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c<br>
+    @@ -196,8 +196,14 @@ static int vgic_get_common_attr(struct
+    kvm_device *dev,<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 VGIC_NR_PRIVATE_IRQS, uaddr);<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 break;<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }<br>
+    +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_DEV_ARM_VGIC_GRP_ADDR_=
+OFFSET: {<br>
+    +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 u32 __user *uaddr =3D (u32 __user
+    *)(long)attr-&gt;addr;<br>
+    +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 u32 val =3D kvm_vgic_global_state.vcpu_base &amp;
+    ~PAGE_MASK;<br>
+    +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 r =3D put_user(val, uaddr);<br>
+    +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 break;<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }<br>
+    =C2=A0<br>
+    +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return r;<br>
+    =C2=A0}<br>
+    =C2=A0<br>
+    @@ -362,6 +368,7 @@ static int vgic_v2_has_attr(struct kvm_device
+    *dev,<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_DEV_ARM_VGIC_GRP_=
+CPU_REGS:<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 return vgic_v2_has_attr_regs(dev, attr);<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_DEV_ARM_VGIC_GRP_=
+NR_IRQS:<br>
+    +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_DEV_ARM_VGIC_GRP_ADDR_=
+OFFSET:<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 return 0;<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_DEV_ARM_VGIC_GRP_=
+CTRL:<br>
+    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 switch (attr-&gt;attr) {
+  </body>
+</html>
+
+--------------000803000007060306040703--
+
+--===============7975415775139137475==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============7975415775139137475==--
