@@ -1,100 +1,136 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v7 10/17] KVM: arm64: introduce new KVM ITS device
-Date: Mon, 4 Jul 2016 17:00:02 +0200
-Message-ID: <2b712bbe-1534-0206-34e7-8df433ace7c2@redhat.com>
-References: <20160628123230.26255-1-andre.przywara@arm.com>
- <20160628123230.26255-11-andre.przywara@arm.com>
- <2525bd7b-5df1-54bc-1999-25c8c7fe88a3@redhat.com>
- <173c3704-180e-0385-623c-5dbcced2d762@arm.com>
- <da2ac9c4-e29b-e74f-a11e-b2736526bf8f@redhat.com>
- <CAFEAcA96DGzW=bShwz188O0BaDy34ccEG3921AxQCf3aAFgurg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [RFC v5 0/6] KVM: arm/arm64: gsi routing support
+Date: Mon,  4 Jul 2016 17:12:39 +0000
+Message-ID: <1467652365-4921-1-git-send-email-eric.auger@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <CAFEAcA96DGzW=bShwz188O0BaDy34ccEG3921AxQCf3aAFgurg@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>
+To: eric.auger@redhat.com, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: drjones@redhat.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Peter,
+With the advent of GICv3 ITS in-kernel emulation, KVM MSI routing
+becomes mandated for proper VIRTIO-PCI vhost integration.
 
-On 04/07/2016 16:32, Peter Maydell wrote:
-> On 4 July 2016 at 15:27, Auger Eric <eric.auger@redhat.com> wrote:
->> Andre,
->>
->> On 04/07/2016 16:05, Andre Przywara wrote:
->>> Hi,
->>>
->>> On 04/07/16 10:00, Auger Eric wrote:
->>>> From a QEMU integration point of view this means the init sequence used
->>>> for KVM GIC interrupt controllers cannot be reused for ITS and more
->>>> importantly this is not straightforward to have the proper sequence
->>>> ordering (hence the previously reported case).
->>>
->>> I am confused, can you please elaborate what the problem is?
->>> Or alternatively sketch what you ideally would the ITS init sequence to
->>> look like? I am totally open to any changes, just need to know what
->>> you/QEMU needs.
->>
->> in QEMU the address setting is done on a so-called qemu
->> "machine_init_done_notifier", ie. a callback that is registered at ITS
->> device init, to be called once the virt machine code has executed. This
->> callback calls  kvm_device_ioctl(kd->dev_fd, KVM_SET_DEVICE_ATTR, attr);
->>
->> In case the userspace needs to explicitly "init" the ITS (actually ~
->> map_resources) this must happen after the KVM_SET_DEVICE_ATTR. So you
->> also must register a callback in the same way. However there is a
->> framework existing to register kvm device addresses but this does not
->> exist to set other attributes than device addresses.
->>
->> This is feasible I think but this does not fit qemu nicely. So can't the
->> map_resources happen implicitly on the first VCPU run?
-> 
-> I'm not clear what you think the problem here for QEMU is.
-> We definitely want the API for the kernel to be:
->  create device
->  set attributes
->  explicitly complete init of the device
->  [attribute setting after this is illegal]
->  run CPUs
-> 
-> so I'm not sure why QEMU would care if the kernel does things at
-> "final init" rather than "run CPUs".
-> 
-> This is how the GICv3 init works and how the ITS should work too;
-The GICv3 explicit does not do the same as the ITS init.
-GICv3 init does not map the resources (KVM iodevice registration). This
-is done at 1st VCPU run.
-ITS init does map the resources. If we call the ITS init at the same
-place as we call the GICv3 init, in the realization function, the region
-mapping is not yet done so you will map resources at undefined location.
+In QEMU, when the VIRTIO-PCI device is programmed with the MSI message,
+we previously used direct_mapping trick: this consists in extracting the
+IRQ ID found in the MSI message and associating an irqfd to that IRQ ID.
+When vhost worker thread gets a new buffer it signals the irqfd and kvm
+then injects this IRQ ID on guest. That way although the guest uses MSIs,
+no MSI emulation is used.
 
-I am definitively not opposed to call the ITS init function explicitly
-from user side but this must happen after the KVM_SET_DEVICE_ATTR. So
-another machine_init_done function must be registered and the notifier
-must be called AFTER the notifier that calls the KVM_SET_DEVICE_ATTR
-ioctl. However you cannot easily master the machine init done notifier
-registration order because in target-arm/kvm.c there is a single
-notifier that calls all the KVM_SET_DEVICE_ATTR for all the KVM devices
-(kvm_arm_machine_init_done). So it is not possible to register the ITS
-init notifier before the "kvm_arm_set_device_addr" notifier.
+This worked fine with GICv2m but does not work anymore with GICV3 ITS.
+Indeed this latter implements IRQ translation: what is found in the MSI
+message no more is the target IRQ ID but is an intermediate event ID used
+in the translation process.
 
-So my understanding is one must do things outside of the existing framework?
+Hence true MSI routing is needed so that the vhost back channel irqfd is
+associated to a dummy gsi ID, routed towards the programmed MSI. When KVM
+injects the MSI through the in-kernel ITS emulation, the MSI is properly
+translated and eventually the LPI ID associated to the event ID is injected
+on guest.
 
-Hope this clarifies
+MSI routing also mandates to integrate irqchip routing. The initial
+implementation of irqfd on arm must be upgraded with the integration
+of kvm irqchip.c code and the implementation of its standard hooks
+in the architecture specific part.
 
-Thanks
+In case KVM_SET_GSI_ROUTING ioctl is not called, a default routing
+table with flat irqchip routing entries is built enabling to inject gsi
+corresponding to the SPI indexes seen by the guest.
 
-Eric
+As soon as KVM_SET_GSI_ROUTING is called, user-space overwrites this
+default routing table and is responsible for building the whole routing
+table.
 
+for arm/arm64 KVM_SET_GSI_ROUTING has a limited support:
+- only applies to KVM_IRQFD and not to KVM_IRQ_LINE
 
-> we don't want to extend the GICv2 mistake of "no explicit complete
-> init" to anything else, because then you end up with ad-hoc
-> "do this when we first run the vCPU; oh, but also do it if
-> userspace tries to write a register content; and also if...".
-> 
-> thanks
-> -- PMM
-> 
+- irqchip routing was tested on Calxeda midway (VFIO with irqfd)
+  with and without explicit routing
+- MSI routing without GICv3 ITS was tested on AMD Overdrive
+  (qemu VIRTIO-PCI vhost-net without gsi_direct_mapping).
+- MSI routing with GICv3 ITS is *NOT* tested.
+
+Code can be found at https:
+https://github.com/eauger/linux/tree/v4.7-rc6-its-emul-v7-gsi-routing-v5
+
+The series depends on
+
+[1]: [PATCH v7 00/12] KVM: arm64: GICv3 ITS emulation
+     http://www.spinics.net/lists/kvm/msg134737.html
+
+hence the RFC.
+
+GSI flat routing setup on QEMU can be found at:
+https://lists.nongnu.org/archive/html/qemu-devel/2015-07/msg06262.html
+
+History:
+V4 -> v5:
+- rebase on Andre's v7 + final new vgic code
+- check msi->data is within SPI range in vgic_v2m_inject_msi
+- squashed enable irq routing and default irqchip table patches
+- handle default irqchip table allocation failure
+- some rephrasing in doc & comment according to Christoffer's feedbacks
+- lock issue reported by Pavel seems to have disappear after 4.2 (MSI injection
+  fast path)
+
+v3 -> v4:
+- rebase on top of NEW-VGIC RFC and ITS emulation series v4. This is not
+  a stable foundation yet. Hence the revert to RFC. This v4 mostly is a
+  reflesh/reminder.
+- rewrite the cover letter
+
+v2 -> v3:
+- don't use KVM_IRQ_ROUTING_EXTENDED_MSI type at uapi and kernel level anymore;
+  use KVM_MSI_VALID_DEVID flag instead
+- propagate user flags downto the kernel to make sure the userspace
+  correctly set devid in GICv3 ITS case (still under discussion)
+
+v1 -> v2:
+- user API changed:
+  x devid id passed in kvm_irq_routing_msi
+  x kept the new routing entry type: KVM_IRQ_ROUTING_EXTENDED_MSI
+- kvm_host.h: adopt Andre's proposal to replace the msi_msg by a struct
+  composed of the msi_msg and devid in kvm_kernel_irq_routing_entry
+- Fix bug reported by Pavel: Added KVM_IRQ_ROUTING_EXTENDED_MSI handling
+  in eventfd.c
+- added vgic_v2m_inject_msi in vgic-v2-emul.c as suggested by Andre
+- fix bug reported by Andre: bad setting of msi.flags and msi.devid
+  in kvm_send_userspace_msi
+- avoid injecting reserved IRQ numbers in vgic_irqfd_set_irq
+
+RFC -> PATCH:
+- clearly state limited support on arm/arm64:
+  KVM_IRQ_LINE not impacted by GSI routing
+- add default routing table feature (new patch file)
+- changed uapi to use padding field area
+- reword api.txt
+
+Eric Auger (6):
+  KVM: api: pass the devid in the msi routing entry
+  KVM: kvm_host: add devid in kvm_kernel_irq_routing_entry
+  KVM: irqchip: convey devid to kvm_set_msi
+  KVM: arm/arm64: enable irqchip routing
+  KVM: arm/arm64: enable MSI routing
+  KVM: arm: enable KVM_SIGNAL_MSI and MSI routing
+
+ Documentation/virtual/kvm/api.txt | 36 +++++++++++++---
+ arch/arm/include/asm/kvm_host.h   |  2 +
+ arch/arm/kvm/Kconfig              |  3 ++
+ arch/arm/kvm/Makefile             |  1 +
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/Kconfig            |  2 +
+ arch/arm64/kvm/Makefile           |  1 +
+ include/linux/kvm_host.h          |  8 +++-
+ include/uapi/linux/kvm.h          |  5 ++-
+ virt/kvm/arm/vgic/vgic-init.c     | 27 ++++++++++++
+ virt/kvm/arm/vgic/vgic-irqfd.c    | 90 ++++++++++++++++++++++++++++++---------
+ virt/kvm/arm/vgic/vgic-v2.c       | 17 ++++++++
+ virt/kvm/arm/vgic/vgic.c          |  7 ---
+ virt/kvm/arm/vgic/vgic.h          |  1 +
+ virt/kvm/irqchip.c                |  8 +++-
+ 15 files changed, 173 insertions(+), 36 deletions(-)
+
+-- 
+1.9.1
+
