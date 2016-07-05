@@ -1,83 +1,79 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v8 04/17] KVM: arm/arm64: extend arch CAP checks to allow per-VM capabilities
-Date: Tue,  5 Jul 2016 12:22:56 +0100
-Message-ID: <20160705112309.28877-5-andre.przywara@arm.com>
+Subject: [PATCH v8 05/17] KVM: kvm_io_bus: add kvm_io_bus_get_dev() call
+Date: Tue,  5 Jul 2016 12:22:57 +0100
+Message-ID: <20160705112309.28877-6-andre.przywara@arm.com>
 References: <20160705112309.28877-1-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20160705112309.28877-1-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>
+Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM capabilities can be a per-VM property, though ARM/ARM64 currently
-does not pass on the VM pointer to the architecture specific
-capability handlers.
-Add a "struct kvm*" parameter to those function to later allow proper
-per-VM capability reporting.
+The kvm_io_bus framework is a nice place of holding information about
+various MMIO regions for kernel emulated devices.
+Add a call to retrieve the kvm_io_device structure which is associated
+with a certain MMIO address. This avoids to duplicate kvm_io_bus'
+knowledge of MMIO regions without having to fake MMIO calls if a user
+needs the device a certain MMIO address belongs to.
+This will be used by the ITS emulation to get the associated ITS device
+when someone triggers an MSI via an ioctl from userspace.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 2 +-
- arch/arm/kvm/arm.c                | 2 +-
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/reset.c            | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ include/linux/kvm_host.h |  2 ++
+ virt/kvm/kvm_main.c      | 24 ++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 96387d4..3c40facd 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -281,7 +281,7 @@ static inline void __cpu_reset_hyp_mode(phys_addr_t boot_pgd_ptr,
- 	 */
- }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 0640ee9..614a981 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -164,6 +164,8 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+ 			    int len, struct kvm_io_device *dev);
+ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+ 			      struct kvm_io_device *dev);
++struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
++					 gpa_t addr);
  
--static inline int kvm_arch_dev_ioctl_check_extension(long ext)
-+static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	return 0;
- }
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index c74483f..557e390 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -201,7 +201,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = KVM_MAX_VCPUS;
- 		break;
- 	default:
--		r = kvm_arch_dev_ioctl_check_extension(ext);
-+		r = kvm_arch_dev_ioctl_check_extension(kvm, ext);
- 		break;
- 	}
+ #ifdef CONFIG_KVM_ASYNC_PF
+ struct kvm_async_pf {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ef54b4c..bd2eb92 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3496,6 +3496,30 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
  	return r;
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 49095fc..ebe8904 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -47,7 +47,7 @@
+ }
  
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
--int kvm_arch_dev_ioctl_check_extension(long ext);
-+int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
- unsigned long kvm_hyp_reset_entry(void);
- void __extended_idmap_trampoline(phys_addr_t boot_pgd, phys_addr_t idmap_start);
- 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 7be24f2..3989833 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -65,7 +65,7 @@ static bool cpu_has_32bit_el1(void)
-  * We currently assume that the number of HW registers is uniform
-  * across all CPUs (see cpuinfo_sanity_check).
-  */
--int kvm_arch_dev_ioctl_check_extension(long ext)
-+int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	int r;
- 
++struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
++					 gpa_t addr)
++{
++	struct kvm_io_bus *bus;
++	int dev_idx, srcu_idx;
++	struct kvm_io_device *iodev = NULL;
++
++	srcu_idx = srcu_read_lock(&kvm->srcu);
++
++	bus = srcu_dereference(kvm->buses[bus_idx], &kvm->srcu);
++
++	dev_idx = kvm_io_bus_get_first_dev(bus, addr, 1);
++	if (dev_idx < 0)
++		goto out_unlock;
++
++	iodev = bus->range[dev_idx].dev;
++
++out_unlock:
++	srcu_read_unlock(&kvm->srcu, srcu_idx);
++
++	return iodev;
++}
++EXPORT_SYMBOL_GPL(kvm_io_bus_get_dev);
++
+ static struct notifier_block kvm_cpu_notifier = {
+ 	.notifier_call = kvm_cpu_hotplug,
+ };
 -- 
 2.9.0
 
