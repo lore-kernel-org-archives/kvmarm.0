@@ -1,649 +1,278 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v8 09/17] KVM: arm64: introduce ITS emulation file with MMIO framework
-Date: Tue,  5 Jul 2016 12:23:01 +0100
-Message-ID: <20160705112309.28877-10-andre.przywara@arm.com>
+Subject: [PATCH v8 12/17] KVM: arm64: connect LPIs to the VGIC emulation
+Date: Tue,  5 Jul 2016 12:23:04 +0100
+Message-ID: <20160705112309.28877-13-andre.przywara@arm.com>
 References: <20160705112309.28877-1-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A2A1412D0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2016 07:17:16 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Xg8fXhtqrJ4z for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jul 2016 07:17:14 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BBF749B5A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2016 07:17:14 -0400 (EDT)
 In-Reply-To: <20160705112309.28877-1-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARM GICv3 ITS emulation code goes into a separate file, but needs
-to be connected to the GICv3 emulation, of which it is an option.
-The ITS MMIO handlers require the respective ITS pointer to be passed in,
-so we amend the existing VGIC MMIO framework to let it cope with that.
-Also we introduce the basic ITS data structure and initialize it, but
-don't return any success yet, as we are not yet ready for the show.
+LPIs are dynamically created (mapped) at guest runtime and their
+actual number can be quite high, but is mostly assigned using a very
+sparse allocation scheme. So arrays are not an ideal data structure
+to hold the information.
+We use a spin-lock protected linked list to hold all mapped LPIs,
+represented by their struct vgic_irq. This lock is grouped between the
+ap_list_lock and the vgic_irq lock in our locking order.
+Also we store a pointer to that struct vgic_irq in our struct its_itte,
+so we can easily access it.
+Eventually we call our new vgic_its_get_lpi() from vgic_get_irq(), so
+the VGIC code gets transparently access to LPIs.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arch/arm64/kvm/Makefile          |   1 +
- include/kvm/arm_vgic.h           |  14 +++++-
- virt/kvm/arm/vgic/vgic-its.c     | 100 +++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-mmio-v2.c |  40 +++++++--------
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 104 ++++++++++++++++++++++++++-------------
- virt/kvm/arm/vgic/vgic-mmio.c    |  36 +++++++++++---
- virt/kvm/arm/vgic/vgic-mmio.h    |  31 +++++++++---
- virt/kvm/arm/vgic/vgic.h         |   7 +++
- 8 files changed, 266 insertions(+), 67 deletions(-)
- create mode 100644 virt/kvm/arm/vgic/vgic-its.c
+ include/kvm/arm_vgic.h        |  6 ++++++
+ virt/kvm/arm/vgic/vgic-init.c |  3 +++
+ virt/kvm/arm/vgic/vgic-its.c  | 32 +++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c   |  2 ++
+ virt/kvm/arm/vgic/vgic.c      | 48 +++++++++++++++++++++++++++++++++++--------
+ virt/kvm/arm/vgic/vgic.h      |  7 +++++++
+ 6 files changed, 90 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index f00b2cd..a5b9664 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -29,5 +29,6 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v2.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v3.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-kvm-device.o
-+kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-its.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
- kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index f6f860d..f606641 100644
+index 17d3929..5aff85c 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -108,15 +108,27 @@ struct vgic_irq {
+@@ -77,6 +77,7 @@ enum vgic_irq_config {
+ 
+ struct vgic_irq {
+ 	spinlock_t irq_lock;		/* Protects the content of the struct */
++	struct list_head lpi_entry;	/* Used to link all LPIs together */
+ 	struct list_head ap_list;
+ 
+ 	struct kvm_vcpu *vcpu;		/* SGIs and PPIs: The VCPU
+@@ -185,6 +186,11 @@ struct vgic_dist {
+ 	 * GICv3 spec: 6.1.2 "LPI Configuration tables"
+ 	 */
+ 	u64			propbaser;
++
++	/* Protects the lpi_list and the count value below. */
++	spinlock_t		lpi_list_lock;
++	struct list_head	lpi_list_head;
++	int			lpi_list_count;
  };
  
- struct vgic_register_region;
-+struct vgic_its;
+ struct vgic_v2_cpu_if {
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index ac3c1a5..535e713 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -157,6 +157,9 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
+ 	struct kvm_vcpu *vcpu0 = kvm_get_vcpu(kvm, 0);
+ 	int i;
  
- struct vgic_io_device {
- 	gpa_t base_addr;
--	struct kvm_vcpu *redist_vcpu;
-+	union {
-+		struct kvm_vcpu *redist_vcpu;
-+		struct vgic_its *its;
-+	};
- 	const struct vgic_register_region *regions;
- 	int nr_regions;
- 	struct kvm_io_device dev;
- };
- 
-+struct vgic_its {
-+	/* The base address of the ITS control register frame */
-+	gpa_t			vgic_its_base;
++	INIT_LIST_HEAD(&dist->lpi_list_head);
++	spin_lock_init(&dist->lpi_list_lock);
 +
-+	bool			enabled;
-+	struct vgic_io_device	iodev;
-+};
-+
- struct vgic_dist {
- 	bool			in_kernel;
- 	bool			ready;
+ 	dist->spis = kcalloc(nr_spis, sizeof(struct vgic_irq), GFP_KERNEL);
+ 	if (!dist->spis)
+ 		return  -ENOMEM;
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-new file mode 100644
-index 0000000..ab8d244
---- /dev/null
+index a9336a4..1e2e649 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -0,0 +1,100 @@
+@@ -33,6 +33,31 @@
+ #include "vgic.h"
+ #include "vgic-mmio.h"
+ 
 +/*
-+ * GICv3 ITS emulation
-+ *
-+ * Copyright (C) 2015,2016 ARM Ltd.
-+ * Author: Andre Przywara <andre.przywara@arm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ * Iterate over the VM's list of mapped LPIs to find the one with a
++ * matching interrupt ID and return a reference to the IRQ structure.
 + */
-+
-+#include <linux/cpu.h>
-+#include <linux/kvm.h>
-+#include <linux/kvm_host.h>
-+#include <linux/interrupt.h>
-+
-+#include <linux/irqchip/arm-gic-v3.h>
-+
-+#include <asm/kvm_emulate.h>
-+#include <asm/kvm_arm.h>
-+#include <asm/kvm_mmu.h>
-+
-+#include "vgic.h"
-+#include "vgic-mmio.h"
-+
-+#define REGISTER_ITS_DESC(off, rd, wr, length, acc)		\
-+{								\
-+	.reg_offset = off,					\
-+	.len = length,						\
-+	.access_flags = acc,					\
-+	.iodev_type = IODEV_ITS,				\
-+	.its_read = rd,						\
-+	.its_write = wr,					\
-+}
-+
-+static unsigned long its_mmio_read_raz(struct kvm *kvm, struct vgic_its *its,
-+				       gpa_t addr, unsigned int len)
-+{
-+	return 0;
-+}
-+
-+static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
-+			      gpa_t addr, unsigned int len, unsigned long val)
-+{
-+	/* Ignore */
-+}
-+
-+static struct vgic_register_region its_registers[] = {
-+	REGISTER_ITS_DESC(GITS_CTLR,
-+		its_mmio_read_raz, its_mmio_write_wi, 4,
-+		VGIC_ACCESS_32bit),
-+	REGISTER_ITS_DESC(GITS_IIDR,
-+		its_mmio_read_raz, its_mmio_write_wi, 4,
-+		VGIC_ACCESS_32bit),
-+	REGISTER_ITS_DESC(GITS_TYPER,
-+		its_mmio_read_raz, its_mmio_write_wi, 8,
-+		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
-+	REGISTER_ITS_DESC(GITS_CBASER,
-+		its_mmio_read_raz, its_mmio_write_wi, 8,
-+		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
-+	REGISTER_ITS_DESC(GITS_CWRITER,
-+		its_mmio_read_raz, its_mmio_write_wi, 8,
-+		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
-+	REGISTER_ITS_DESC(GITS_CREADR,
-+		its_mmio_read_raz, its_mmio_write_wi, 8,
-+		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
-+	REGISTER_ITS_DESC(GITS_BASER,
-+		its_mmio_read_raz, its_mmio_write_wi, 0x40,
-+		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
-+	REGISTER_ITS_DESC(GITS_IDREGS_BASE,
-+		its_mmio_read_raz, its_mmio_write_wi, 0x30,
-+		VGIC_ACCESS_32bit),
-+};
-+
-+int vits_register(struct kvm *kvm, struct vgic_its *its)
-+{
-+	struct vgic_io_device *iodev = &its->iodev;
-+	int ret;
-+
-+	iodev->regions = its_registers;
-+	iodev->nr_regions = ARRAY_SIZE(its_registers);
-+	kvm_iodevice_init(&iodev->dev, &kvm_io_gic_ops);
-+
-+	iodev->base_addr = its->vgic_its_base;
-+	iodev->its = its;
-+	mutex_lock(&kvm->slots_lock);
-+	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, iodev->base_addr,
-+				      SZ_64K, &iodev->dev);
-+	mutex_unlock(&kvm->slots_lock);
-+
-+	return ret;
-+}
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 4152348..bca5bf7 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -291,67 +291,67 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
- }
- 
- static const struct vgic_register_region vgic_v2_dist_registers[] = {
--	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
-+	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL, IODEV_DIST,
- 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP, IODEV_DIST,
- 		vgic_mmio_read_rao, vgic_mmio_write_wi, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET, IODEV_DIST,
- 		vgic_mmio_read_enable, vgic_mmio_write_senable, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_CLEAR,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_CLEAR, IODEV_DIST,
- 		vgic_mmio_read_enable, vgic_mmio_write_cenable, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET, IODEV_DIST,
- 		vgic_mmio_read_pending, vgic_mmio_write_spending, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR, IODEV_DIST,
- 		vgic_mmio_read_pending, vgic_mmio_write_cpending, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET, IODEV_DIST,
- 		vgic_mmio_read_active, vgic_mmio_write_sactive, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_CLEAR,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_CLEAR, IODEV_DIST,
- 		vgic_mmio_read_active, vgic_mmio_write_cactive, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI, IODEV_DIST,
- 		vgic_mmio_read_priority, vgic_mmio_write_priority, 8,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET, IODEV_DIST,
- 		vgic_mmio_read_target, vgic_mmio_write_target, 8,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG, IODEV_DIST,
- 		vgic_mmio_read_config, vgic_mmio_write_config, 2,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
-+	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT, IODEV_DIST,
- 		vgic_mmio_read_raz, vgic_mmio_write_sgir, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_CLEAR,
-+	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_CLEAR, IODEV_DIST,
- 		vgic_mmio_read_sgipend, vgic_mmio_write_sgipendc, 16,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
--	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_SET,
-+	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_SET, IODEV_DIST,
- 		vgic_mmio_read_sgipend, vgic_mmio_write_sgipends, 16,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
- };
- 
- static const struct vgic_register_region vgic_v2_cpu_registers[] = {
--	REGISTER_DESC_WITH_LENGTH(GIC_CPU_CTRL,
-+	REGISTER_DESC_WITH_LENGTH(GIC_CPU_CTRL, IODEV_CPUIF,
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GIC_CPU_PRIMASK,
-+	REGISTER_DESC_WITH_LENGTH(GIC_CPU_PRIMASK, IODEV_CPUIF,
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GIC_CPU_BINPOINT,
-+	REGISTER_DESC_WITH_LENGTH(GIC_CPU_BINPOINT, IODEV_CPUIF,
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ALIAS_BINPOINT,
-+	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ALIAS_BINPOINT, IODEV_CPUIF,
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ACTIVEPRIO,
-+	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ACTIVEPRIO, IODEV_CPUIF,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GIC_CPU_IDENT,
-+	REGISTER_DESC_WITH_LENGTH(GIC_CPU_IDENT, IODEV_CPUIF,
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
- 		VGIC_ACCESS_32bit),
- };
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 9dd8632..75e5728 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -42,6 +42,16 @@ static u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
- 	return reg | ((u64)val << lower);
- }
- 
-+bool vgic_has_its(struct kvm *kvm)
++struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid)
 +{
 +	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct vgic_irq *irq = NULL;
 +
-+	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
-+		return false;
++	spin_lock(&dist->lpi_list_lock);
++	list_for_each_entry(irq, &dist->lpi_list_head, lpi_entry) {
++		if (irq->intid != intid)
++			continue;
 +
-+	return false;
++		kref_get(&irq->refcount);
++		goto out_unlock;
++	}
++	irq = NULL;
++
++out_unlock:
++	spin_unlock(&dist->lpi_list_lock);
++
++	return irq;
 +}
 +
- static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
- 					    gpa_t addr, unsigned int len)
+ struct its_device {
+ 	struct list_head dev_list;
+ 
+@@ -56,11 +81,17 @@ struct its_collection {
+ struct its_itte {
+ 	struct list_head itte_list;
+ 
++	struct vgic_irq *irq;
+ 	struct its_collection *collection;
+ 	u32 lpi;
+ 	u32 event_id;
+ };
+ 
++/* To be used as an iterator this macro misses the enclosing parentheses */
++#define for_each_lpi_its(dev, itte, its) \
++	list_for_each_entry(dev, &(its)->device_list, dev_list) \
++		list_for_each_entry(itte, &(dev)->itt_head, itte_list)
++
+ #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
+ 
+ static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
+@@ -144,6 +175,7 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+ static void its_free_itte(struct kvm *kvm, struct its_itte *itte)
  {
-@@ -132,6 +142,32 @@ static void vgic_mmio_write_irouter(struct kvm_vcpu *vcpu,
- 	vgic_put_irq(vcpu->kvm, irq);
+ 	list_del(&itte->itte_list);
++	vgic_put_irq(kvm, itte->irq);
+ 	kfree(itte);
  }
  
-+static unsigned long vgic_mmio_read_v3r_ctlr(struct kvm_vcpu *vcpu,
-+					     gpa_t addr, unsigned int len)
-+{
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+
-+	return vgic_cpu->lpis_enabled ? GICR_CTLR_ENABLE_LPIS : 0;
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 6f8f31f..0506543 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -81,6 +81,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		else
+ 			intid = val & GICH_LR_VIRTUALID;
+ 		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
++		if (!irq)	/* An LPI could have been unmapped. */
++			continue;
+ 
+ 		spin_lock(&irq->irq_lock);
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index a5d9a10..72b2516 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -36,7 +36,8 @@ struct vgic_global __section(.hyp.text) kvm_vgic_global_state;
+  * its->cmd_lock (mutex)
+  *   its->its_lock (mutex)
+  *     vgic_cpu->ap_list_lock
+- *       vgic_irq->irq_lock
++ *       kvm->lpi_list_lock
++ *         vgic_irq->irq_lock
+  *
+  * If you need to take multiple locks, always take the upper lock first,
+  * then the lower ones, e.g. first take the its_lock, then the irq_lock.
+@@ -69,23 +70,54 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 		return irq;
+ 	}
+ 
+-	/* LPIs are not yet covered */
+-	if (intid >= VGIC_MIN_LPI)
++	if (intid < VGIC_MIN_LPI) {
++		WARN(1, "Looking up struct vgic_irq for reserved INTID");
+ 		return NULL;
++	}
+ 
+-	WARN(1, "Looking up struct vgic_irq for reserved INTID");
+-	return NULL;
++	/* LPIs */
++	return vgic_its_get_lpi(kvm, intid);
+ }
+ 
+-/* The refcount should never drop to 0 at the moment. */
++/*
++ * We can't do anything in here, because we lack the kvm pointer to
++ * lock and remove the item from the lpi_list. So we keep this function
++ * empty and use the return value of kref_put() to trigger the freeing.
++ */
+ static void vgic_irq_release(struct kref *ref)
+ {
+-	WARN_ON(1);
 +}
 +
-+
-+static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
-+				     gpa_t addr, unsigned int len,
-+				     unsigned long val)
++static void __vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq, bool locked)
 +{
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	bool was_enabled = vgic_cpu->lpis_enabled;
++	struct vgic_dist *dist;
 +
-+	if (!vgic_has_its(vcpu->kvm))
++	if (!kref_put(&irq->refcount, vgic_irq_release))
 +		return;
 +
-+	vgic_cpu->lpis_enabled = val & GICR_CTLR_ENABLE_LPIS;
++	if (irq->intid < VGIC_MIN_LPI)
++		return;
 +
-+	if (!was_enabled && vgic_cpu->lpis_enabled) {
-+		/* Eventually do something */
-+	}
++	dist = &kvm->arch.vgic;
++
++	if (!locked)
++		spin_lock(&dist->lpi_list_lock);
++	list_del(&irq->lpi_entry);
++	dist->lpi_list_count--;
++	if (!locked)
++		spin_unlock(&dist->lpi_list_lock);
++
++	kfree(irq);
 +}
 +
- static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
- 					      gpa_t addr, unsigned int len)
- {
-@@ -298,12 +334,13 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
-  * We take some special care here to fix the calculation of the register
-  * offset.
-  */
--#define REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(off, rd, wr, bpi, acc)	\
-+#define REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(off, type, rd, wr, bpi, acc) \
- 	{								\
- 		.reg_offset = off,					\
- 		.bits_per_irq = bpi,					\
- 		.len = (bpi * VGIC_NR_PRIVATE_IRQS) / 8,		\
- 		.access_flags = acc,					\
-+		.iodev_type = type,					\
- 		.read = vgic_mmio_read_raz,				\
- 		.write = vgic_mmio_write_wi,				\
- 	}, {								\
-@@ -311,108 +348,109 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
- 		.bits_per_irq = bpi,					\
- 		.len = (bpi * (1024 - VGIC_NR_PRIVATE_IRQS)) / 8,	\
- 		.access_flags = acc,					\
-+		.iodev_type = type,					\
- 		.read = rd,						\
- 		.write = wr,						\
- 	}
- 
- static const struct vgic_register_region vgic_v3_dist_registers[] = {
--	REGISTER_DESC_WITH_LENGTH(GICD_CTLR,
-+	REGISTER_DESC_WITH_LENGTH(GICD_CTLR, IODEV_DIST,
- 		vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc, 16,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR, IODEV_DIST,
- 		vgic_mmio_read_rao, vgic_mmio_write_wi, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISENABLER,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISENABLER, IODEV_DIST,
- 		vgic_mmio_read_enable, vgic_mmio_write_senable, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICENABLER,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICENABLER, IODEV_DIST,
- 		vgic_mmio_read_enable, vgic_mmio_write_cenable, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISPENDR,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISPENDR, IODEV_DIST,
- 		vgic_mmio_read_pending, vgic_mmio_write_spending, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICPENDR,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICPENDR, IODEV_DIST,
- 		vgic_mmio_read_pending, vgic_mmio_write_cpending, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISACTIVER,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISACTIVER, IODEV_DIST,
- 		vgic_mmio_read_active, vgic_mmio_write_sactive, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICACTIVER,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICACTIVER, IODEV_DIST,
- 		vgic_mmio_read_active, vgic_mmio_write_cactive, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IPRIORITYR,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IPRIORITYR, IODEV_DIST,
- 		vgic_mmio_read_priority, vgic_mmio_write_priority, 8,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ITARGETSR,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ITARGETSR, IODEV_DIST,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICFGR,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICFGR, IODEV_DIST,
- 		vgic_mmio_read_config, vgic_mmio_write_config, 2,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGRPMODR,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGRPMODR, IODEV_DIST,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
-+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER, IODEV_DIST,
- 		vgic_mmio_read_irouter, vgic_mmio_write_irouter, 64,
- 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
-+	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS, IODEV_DIST,
- 		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
- 		VGIC_ACCESS_32bit),
- };
- 
- static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
--	REGISTER_DESC_WITH_LENGTH(GICR_CTLR,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
-+	REGISTER_DESC_WITH_LENGTH(GICR_CTLR, IODEV_REDIST,
-+		vgic_mmio_read_v3r_ctlr, vgic_mmio_write_v3r_ctlr, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_IIDR,
-+	REGISTER_DESC_WITH_LENGTH(GICR_IIDR, IODEV_REDIST,
- 		vgic_mmio_read_v3r_iidr, vgic_mmio_write_wi, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_TYPER,
-+	REGISTER_DESC_WITH_LENGTH(GICR_TYPER, IODEV_REDIST,
- 		vgic_mmio_read_v3r_typer, vgic_mmio_write_wi, 8,
- 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_PROPBASER,
-+	REGISTER_DESC_WITH_LENGTH(GICR_PROPBASER, IODEV_REDIST,
- 		vgic_mmio_read_propbase, vgic_mmio_write_propbase, 8,
- 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_PENDBASER,
-+	REGISTER_DESC_WITH_LENGTH(GICR_PENDBASER, IODEV_REDIST,
- 		vgic_mmio_read_pendbase, vgic_mmio_write_pendbase, 8,
- 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_IDREGS,
-+	REGISTER_DESC_WITH_LENGTH(GICR_IDREGS, IODEV_REDIST,
- 		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
- 		VGIC_ACCESS_32bit),
- };
- 
- static const struct vgic_register_region vgic_v3_sgibase_registers[] = {
--	REGISTER_DESC_WITH_LENGTH(GICR_IGROUPR0,
-+	REGISTER_DESC_WITH_LENGTH(GICR_IGROUPR0, IODEV_REDIST,
- 		vgic_mmio_read_rao, vgic_mmio_write_wi, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_ISENABLER0,
-+	REGISTER_DESC_WITH_LENGTH(GICR_ISENABLER0, IODEV_REDIST,
- 		vgic_mmio_read_enable, vgic_mmio_write_senable, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_ICENABLER0,
-+	REGISTER_DESC_WITH_LENGTH(GICR_ICENABLER0, IODEV_REDIST,
- 		vgic_mmio_read_enable, vgic_mmio_write_cenable, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_ISPENDR0,
-+	REGISTER_DESC_WITH_LENGTH(GICR_ISPENDR0, IODEV_REDIST,
- 		vgic_mmio_read_pending, vgic_mmio_write_spending, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_ICPENDR0,
-+	REGISTER_DESC_WITH_LENGTH(GICR_ICPENDR0, IODEV_REDIST,
- 		vgic_mmio_read_pending, vgic_mmio_write_cpending, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_ISACTIVER0,
-+	REGISTER_DESC_WITH_LENGTH(GICR_ISACTIVER0, IODEV_REDIST,
- 		vgic_mmio_read_active, vgic_mmio_write_sactive, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_ICACTIVER0,
-+	REGISTER_DESC_WITH_LENGTH(GICR_ICACTIVER0, IODEV_REDIST,
- 		vgic_mmio_read_active, vgic_mmio_write_cactive, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_IPRIORITYR0,
-+	REGISTER_DESC_WITH_LENGTH(GICR_IPRIORITYR0, IODEV_REDIST,
- 		vgic_mmio_read_priority, vgic_mmio_write_priority, 32,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_ICFGR0,
-+	REGISTER_DESC_WITH_LENGTH(GICR_ICFGR0, IODEV_REDIST,
- 		vgic_mmio_read_config, vgic_mmio_write_config, 8,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_IGRPMODR0,
-+	REGISTER_DESC_WITH_LENGTH(GICR_IGRPMODR0, IODEV_REDIST,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_NSACR,
-+	REGISTER_DESC_WITH_LENGTH(GICR_NSACR, IODEV_REDIST,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
- 		VGIC_ACCESS_32bit),
- };
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 5e79e01..a097c1a 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -473,8 +473,7 @@ static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- {
- 	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
- 	const struct vgic_register_region *region;
--	struct kvm_vcpu *r_vcpu;
--	unsigned long data;
-+	unsigned long data = 0;
- 
- 	region = vgic_find_mmio_region(iodev->regions, iodev->nr_regions,
- 				       addr - iodev->base_addr);
-@@ -483,8 +482,20 @@ static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 		return 0;
- 	}
- 
--	r_vcpu = iodev->redist_vcpu ? iodev->redist_vcpu : vcpu;
--	data = region->read(r_vcpu, addr, len);
-+	switch (region->iodev_type) {
-+	case IODEV_CPUIF:
-+		return 1;
-+	case IODEV_DIST:
-+		data = region->read(vcpu, addr, len);
-+		break;
-+	case IODEV_REDIST:
-+		data = region->read(iodev->redist_vcpu, addr, len);
-+		break;
-+	case IODEV_ITS:
-+		data = region->its_read(vcpu->kvm, iodev->its, addr, len);
-+		break;
-+	}
-+
- 	vgic_data_host_to_mmio_bus(val, len, data);
- 	return 0;
- }
-@@ -494,7 +505,6 @@ static int dispatch_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- {
- 	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
- 	const struct vgic_register_region *region;
--	struct kvm_vcpu *r_vcpu;
- 	unsigned long data = vgic_data_mmio_bus_to_host(val, len);
- 
- 	region = vgic_find_mmio_region(iodev->regions, iodev->nr_regions,
-@@ -505,8 +515,20 @@ static int dispatch_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 	if (!check_region(region, addr, len))
- 		return 0;
- 
--	r_vcpu = iodev->redist_vcpu ? iodev->redist_vcpu : vcpu;
--	region->write(r_vcpu, addr, len, data);
-+	switch (region->iodev_type) {
-+	case IODEV_CPUIF:
-+		break;
-+	case IODEV_DIST:
-+		region->write(vcpu, addr, len, data);
-+		break;
-+	case IODEV_REDIST:
-+		region->write(iodev->redist_vcpu, addr, len, data);
-+		break;
-+	case IODEV_ITS:
-+		region->its_write(vcpu->kvm, iodev->its, addr, len, data);
-+		break;
-+	}
-+
- 	return 0;
++void vgic_put_irq_locked(struct kvm *kvm, struct vgic_irq *irq)
++{
++	__vgic_put_irq(kvm, irq, true);
  }
  
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index e863ccc..23e97a7 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -16,15 +16,32 @@
- #ifndef __KVM_ARM_VGIC_MMIO_H__
- #define __KVM_ARM_VGIC_MMIO_H__
+ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ {
+-	kref_put(&irq->refcount, vgic_irq_release);
++	__vgic_put_irq(kvm, irq, false);
+ }
  
-+enum iodev_type {
-+	IODEV_CPUIF,
-+	IODEV_DIST,
-+	IODEV_REDIST,
-+	IODEV_ITS
-+};
-+
- struct vgic_register_region {
- 	unsigned int reg_offset;
- 	unsigned int len;
- 	unsigned int bits_per_irq;
- 	unsigned int access_flags;
--	unsigned long (*read)(struct kvm_vcpu *vcpu, gpa_t addr,
--			      unsigned int len);
--	void (*write)(struct kvm_vcpu *vcpu, gpa_t addr, unsigned int len,
--		      unsigned long val);
-+	enum iodev_type iodev_type;
-+	union {
-+		unsigned long (*read)(struct kvm_vcpu *vcpu, gpa_t addr,
-+				      unsigned int len);
-+		unsigned long (*its_read)(struct kvm *kvm, struct vgic_its *its,
-+					  gpa_t addr, unsigned int len);
-+	};
-+	union {
-+		void (*write)(struct kvm_vcpu *vcpu, gpa_t addr,
-+			      unsigned int len, unsigned long val);
-+		void (*its_write)(struct kvm *kvm, struct vgic_its *its,
-+				  gpa_t addr, unsigned int len,
-+				  unsigned long val);
-+	};
- };
- 
- extern struct kvm_io_device_ops kvm_io_gic_ops;
-@@ -57,22 +74,24 @@ extern struct kvm_io_device_ops kvm_io_gic_ops;
-  * The _WITH_LENGTH version instantiates registers with a fixed length
-  * and is mutually exclusive with the _PER_IRQ version.
-  */
--#define REGISTER_DESC_WITH_BITS_PER_IRQ(off, rd, wr, bpi, acc)		\
-+#define REGISTER_DESC_WITH_BITS_PER_IRQ(off, type, rd, wr, bpi, acc)	\
- 	{								\
- 		.reg_offset = off,					\
- 		.bits_per_irq = bpi,					\
- 		.len = bpi * 1024 / 8,					\
- 		.access_flags = acc,					\
-+		.iodev_type = type,					\
- 		.read = rd,						\
- 		.write = wr,						\
- 	}
- 
--#define REGISTER_DESC_WITH_LENGTH(off, rd, wr, length, acc)		\
-+#define REGISTER_DESC_WITH_LENGTH(off, type, rd, wr, length, acc)	\
- 	{								\
- 		.reg_offset = off,					\
- 		.bits_per_irq = 0,					\
- 		.len = length,						\
- 		.access_flags = acc,					\
-+		.iodev_type = type,					\
- 		.read = rd,						\
- 		.write = wr,						\
- 	}
+ /**
 diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 5b79c34..31807c1 100644
+index 9dc7207..eef9ec1 100644
 --- a/virt/kvm/arm/vgic/vgic.h
 +++ b/virt/kvm/arm/vgic/vgic.h
-@@ -72,6 +72,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu);
- int vgic_v3_probe(const struct gic_kvm_info *info);
- int vgic_v3_map_resources(struct kvm *kvm);
+@@ -39,6 +39,7 @@ struct vgic_vmcr {
+ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 			      u32 intid);
+ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
++void vgic_put_irq_locked(struct kvm *kvm, struct vgic_irq *irq);
+ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
+ void vgic_kick_vcpus(struct kvm *kvm);
+ 
+@@ -77,6 +78,7 @@ int vgic_v3_map_resources(struct kvm *kvm);
  int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
-+bool vgic_has_its(struct kvm *kvm);
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
++struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid);
  #else
  static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
  {
-@@ -123,6 +124,12 @@ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
+@@ -138,6 +140,11 @@ static inline int kvm_vgic_register_its_device(void)
  {
  	return -ENODEV;
  }
 +
-+static inline bool vgic_has_its(struct kvm *kvm)
++static inline struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid)
 +{
-+	return false;
++	return NULL;
 +}
-+
  #endif
  
  int kvm_register_vgic_device(unsigned long type);
 -- 
 2.9.0
-
