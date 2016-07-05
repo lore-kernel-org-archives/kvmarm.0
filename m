@@ -1,115 +1,131 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH] KVM: arm/arm64: remove kvm_vgic_*early_init() functions
-Date: Tue, 5 Jul 2016 16:02:21 +0200
-Message-ID: <805f32fa-8080-a4d6-788a-b6085a70a5fb@redhat.com>
-References: <20160705135043.13780-1-andre.przywara@arm.com>
+From: vijay.kilari@gmail.com
+Subject: [RFC PATCH v1] arm/arm64: vgic-new: Create dist and redist iodevs
+ earlier
+Date: Tue,  5 Jul 2016 20:41:31 +0530
+Message-ID: <1467731491-6458-1-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160705135043.13780-1-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A17140B40
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2016 11:06:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3GLPmBMSlTqv for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jul 2016 11:06:28 -0400 (EDT)
+Received: from mail-pf0-f194.google.com (mail-pf0-f194.google.com
+ [209.85.192.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 54ABC409A2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2016 11:06:27 -0400 (EDT)
+Received: by mail-pf0-f194.google.com with SMTP id i123so19281986pfg.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jul 2016 08:11:58 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: Vijaya Kumar K <vijayak@caviumnetworks.com>, Prasun.Kapoor@cavium.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+From: Vijaya Kumar K <vijayak@caviumnetworks.com>
 
-On 05/07/2016 15:50, Andre Przywara wrote:
-> kvm_vgic_early_init() and kvm_vgic_vcpu_early_init() were only used
-> with the old VGIC, on the new VGIC these functions do nothing.
-> Follow the comment in vgic-init.c and remove those functions and
-> their calls.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  arch/arm/kvm/arm.c            |  2 --
->  include/kvm/arm_vgic.h        |  2 --
->  virt/kvm/arm/vgic/vgic-init.c | 30 +-----------------------------
->  3 files changed, 1 insertion(+), 33 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index c74483f..6aa0acd 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -126,7 +126,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	if (ret)
->  		goto out_free_stage2_pgd;
->  
-> -	kvm_vgic_early_init(kvm);
->  	kvm_timer_init(kvm);
->  
->  	/* Mark the initial VMID generation invalid */
-> @@ -254,7 +253,6 @@ out:
->  
->  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  {
-> -	kvm_vgic_vcpu_early_init(vcpu);
->  }
->  
->  void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 1264037..2c641cc 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -196,10 +196,8 @@ struct vgic_cpu {
->  };
->  
->  int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
-> -void kvm_vgic_early_init(struct kvm *kvm);
->  int kvm_vgic_create(struct kvm *kvm, u32 type);
->  void kvm_vgic_destroy(struct kvm *kvm);
-> -void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu);
->  void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu);
->  int kvm_vgic_map_resources(struct kvm *kvm);
->  int kvm_vgic_hyp_init(void);
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index a1442f7..c94dc55 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -23,40 +23,12 @@
->  #include "vgic.h"
->  
->  /*
-> - * Initialization rules: there are multiple stages to the vgic
-> - * initialization, both for the distributor and the CPU interfaces.
-> - *
-> - * Distributor:
-> - *
-> - * - kvm_vgic_early_init(): initialization of static data that doesn't
-> - *   depend on any sizing information or emulation type. No allocation
-> - *   is allowed there.
-> - *
-> + * Initialization rules for the distributor:
->   * - vgic_init(): allocation and initialization of the generic data
->   *   structures that depend on sizing information (number of CPUs,
->   *   number of interrupts). Also initializes the vcpu specific data
->   *   structures. Can be executed lazily for GICv2.
-> - *
-> - * CPU Interface:
-> - *
-> - * - kvm_vgic_cpu_early_init(): initialization of static data that
-> - *   doesn't depend on any sizing information or emulation type. No
-> - *   allocation is allowed there.
-> - */
-> -
-> -/* EARLY INIT */
-> -
-> -/*
-> - * Those 2 functions should not be needed anymore but they
-> - * still are called from arm.c
->   */
-> -void kvm_vgic_early_init(struct kvm *kvm)
-> -{
-> -}
-> -
-> -void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu)
-> -{
-> -}
->  
->  /* CREATION */
->  
-> 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+The dist and redist regions are created and registered in
+vgic_register_dist_iodevs() and vgic_v3_init_redist_iodev()
+calls for distributor and redistributor respectively when
+vgic_v3_map_resources() is called. This mapping of resources
+is done when vcpu run ioctl is called.
 
-Eric
+Below is the call stack of the same.
+
+[<ffff0000080b2e8c>] vgic_register_redist_iodevs+0x94/0x27c
+[<ffff0000080b0fd8>] vgic_v3_map_resources+0x138/0x188
+[<ffff0000080affa4>] kvm_vgic_map_resources+0xb0/0xb8
+[<ffff0000080a3888>] kvm_arch_vcpu_ioctl_run+0x4a8/0x550
+[<ffff00000809c218>] kvm_vcpu_ioctl+0x304/0x74c
+[<ffff000008232cac>] do_vfs_ioctl+0xc0/0x754
+[<ffff0000082333d0>] SyS_ioctl+0x90/0xa4
+[<ffff000008084af0>] el0_svc_naked+0x24/0x28
+
+During live migration, the destination VM first restores the all the
+GIC registers(dist, rdist and cpuif registers) using ioctl's before
+resuming the VM.So no vcpu run ioctl is called untill complete
+GIC context is restored.
+
+Hence, In case of live migration, when ioctls are called to write
+dist/rdist registers the ioctls fails as
+vcpu->kvm->arch.vgic.dist_iodev andkvm->arch.vgic.redist_iodevs
+are NULL.
+
+In this patch, the distributor and redistributor regions are created
+as and when KVM_VGIC_V3_ADDR_TYPE_{DIST|REDIST} ioctl is called.
+However the vgic_v3_map_resouces() is still called when vcpu is
+executed, which validates the distributor and redistributor addresses.
+Ex: Check for overlap.
+
+Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+---
+ virt/kvm/arm/vgic/vgic-kvm-device.c |   19 +++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c         |   12 ------------
+ 2 files changed, 19 insertions(+), 12 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 0130c4b..cc843fe 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -101,6 +101,25 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+ 		*addr = *addr_ptr;
+ 	}
+ 
++#ifdef CONFIG_KVM_ARM_VGIC_V3
++	switch (type) {
++	case KVM_VGIC_V3_ADDR_TYPE_DIST:
++		r = vgic_register_dist_iodev(kvm, vgic->vgic_dist_base, VGIC_V3);
++		if (r) {
++			kvm_err("Unable to register VGICv3 dist MMIO regions\n");
++			goto out;
++		}
++		break;
++	case KVM_VGIC_V3_ADDR_TYPE_REDIST:
++		r = vgic_register_redist_iodevs(kvm, vgic->vgic_redist_base);
++		if (r) {
++			kvm_err("Unable to register VGICv3 redist MMIO regions\n");
++			goto out;
++		}
++		break;
++	}
++#endif
++
+ out:
+ 	mutex_unlock(&kvm->lock);
+ 	return r;
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 346b4ad..a149b35 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -267,18 +267,6 @@ int vgic_v3_map_resources(struct kvm *kvm)
+ 		goto out;
+ 	}
+ 
+-	ret = vgic_register_dist_iodev(kvm, dist->vgic_dist_base, VGIC_V3);
+-	if (ret) {
+-		kvm_err("Unable to register VGICv3 dist MMIO regions\n");
+-		goto out;
+-	}
+-
+-	ret = vgic_register_redist_iodevs(kvm, dist->vgic_redist_base);
+-	if (ret) {
+-		kvm_err("Unable to register VGICv3 redist MMIO regions\n");
+-		goto out;
+-	}
+-
+ 	dist->ready = true;
+ 
+ out:
+-- 
+1.7.9.5
