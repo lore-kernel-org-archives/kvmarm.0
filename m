@@ -1,62 +1,119 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v7 10/17] KVM: arm64: introduce new KVM ITS device
-Date: Tue, 5 Jul 2016 10:55:56 +0100
-Message-ID: <CAFEAcA8LQPLBtB_H9oN8S8K5ZFZXt3s4trSwowgr-FD9U6DYKQ@mail.gmail.com>
-References: <20160628123230.26255-1-andre.przywara@arm.com>
- <20160628123230.26255-11-andre.przywara@arm.com> <2525bd7b-5df1-54bc-1999-25c8c7fe88a3@redhat.com>
- <173c3704-180e-0385-623c-5dbcced2d762@arm.com> <da2ac9c4-e29b-e74f-a11e-b2736526bf8f@redhat.com>
- <CAFEAcA96DGzW=bShwz188O0BaDy34ccEG3921AxQCf3aAFgurg@mail.gmail.com>
- <2b712bbe-1534-0206-34e7-8df433ace7c2@redhat.com> <fc201178-cfa4-221d-b36e-f5d959f89f74@arm.com>
- <081321b4-5bf2-29f7-018e-6d50ee74b95c@redhat.com> <95a09591-8915-9ebf-1edd-675e83a1a09b@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH v8 01/17] KVM: arm/arm64: move redistributor kvm_io_devices
+Date: Tue,  5 Jul 2016 12:22:53 +0100
+Message-ID: <20160705112309.28877-2-andre.przywara@arm.com>
+References: <20160705112309.28877-1-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <95a09591-8915-9ebf-1edd-675e83a1a09b@arm.com>
+In-Reply-To: <20160705112309.28877-1-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Auger Eric <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 5 July 2016 at 09:59, Andre Przywara <andre.przywara@arm.com> wrote:
-> Ah, OK, so you _do_ the address setup _after_ the INIT.
-> My understanding of the KVM API was that this isn't allowed, as with the
-> INIT _everything_ should have been setup. kvmtool works this way.
->
-> So we obviously can't change this for GICv3, but I wonder if we should
-> make this explicit with the ITS:
-> 1) Create the device
-> 2) setup _all_ parameters (address, number of ...)
-> 3) call INIT, any setup calls from here on are denied
->
-> That sounds like the proper setup sequence to me.
+Logically a GICv3 redistributor is assigned to a (v)CPU, so we should
+aim to keep redistributor related variables out of our struct vgic_dist.
 
-So we shouldn't necessarily let QEMU drive the kernel API
-design here, but:
+Let's start by replacing the redistributor related kvm_io_device array
+with two members in our existing struct vgic_cpu, which are naturally
+per-VCPU and thus don't require any allocation / freeing.
+So apart from the better fit with the redistributor design this saves
+some code as well.
 
-(1) consistency with GICv2-with-explicit-init and GICv3
-seems worth preserving
-(2) there is a coherent model here which maps onto QEMU's
-device model:
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+---
+ include/kvm/arm_vgic.h           |  8 +++++++-
+ virt/kvm/arm/vgic/vgic-init.c    |  1 -
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 22 ++++++++--------------
+ 3 files changed, 15 insertions(+), 16 deletions(-)
 
- (i) create device
- (ii) configure device
- (iii) explicitly finish init of device (in QEMU's
-   object model this is called "realize")
- (iv) wire completed device into the system, by
-   plugging in its IRQs, mapping its memory regions
-   into the address space, etc
- (v) at this point it is ok to either read/write registers
-   or to start vcpus
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 1264037..5142e2a 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -145,7 +145,6 @@ struct vgic_dist {
+ 	struct vgic_irq		*spis;
+ 
+ 	struct vgic_io_device	dist_iodev;
+-	struct vgic_io_device	*redist_iodevs;
+ };
+ 
+ struct vgic_v2_cpu_if {
+@@ -193,6 +192,13 @@ struct vgic_cpu {
+ 	struct list_head ap_list_head;
+ 
+ 	u64 live_lrs;
++
++	/*
++	 * Members below are used with GICv3 emulation only and represent
++	 * parts of the redistributor.
++	 */
++	struct vgic_io_device	rd_iodev;
++	struct vgic_io_device	sgi_iodev;
+ };
+ 
+ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index a1442f7..90cae48 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -271,7 +271,6 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+ 	dist->initialized = false;
+ 
+ 	kfree(dist->spis);
+-	kfree(dist->redist_iodevs);
+ 	dist->nr_spis = 0;
+ 
+ 	mutex_unlock(&kvm->lock);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index a0c515a..fc7b6c9 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -285,21 +285,14 @@ unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev)
+ 
+ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
+ {
+-	int nr_vcpus = atomic_read(&kvm->online_vcpus);
+ 	struct kvm_vcpu *vcpu;
+-	struct vgic_io_device *devices;
+ 	int c, ret = 0;
+ 
+-	devices = kmalloc(sizeof(struct vgic_io_device) * nr_vcpus * 2,
+-			  GFP_KERNEL);
+-	if (!devices)
+-		return -ENOMEM;
+-
+ 	kvm_for_each_vcpu(c, vcpu, kvm) {
+ 		gpa_t rd_base = redist_base_address + c * SZ_64K * 2;
+ 		gpa_t sgi_base = rd_base + SZ_64K;
+-		struct vgic_io_device *rd_dev = &devices[c * 2];
+-		struct vgic_io_device *sgi_dev = &devices[c * 2 + 1];
++		struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
++		struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
+ 
+ 		kvm_iodevice_init(&rd_dev->dev, &kvm_io_gic_ops);
+ 		rd_dev->base_addr = rd_base;
+@@ -335,14 +328,15 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
+ 	if (ret) {
+ 		/* The current c failed, so we start with the previous one. */
+ 		for (c--; c >= 0; c--) {
++			struct vgic_cpu *vgic_cpu;
++
++			vcpu = kvm_get_vcpu(kvm, c);
++			vgic_cpu = &vcpu->arch.vgic_cpu;
+ 			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
+-						  &devices[c * 2].dev);
++						  &vgic_cpu->rd_iodev.dev);
+ 			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
+-						  &devices[c * 2 + 1].dev);
++						  &vgic_cpu->sgi_iodev.dev);
+ 		}
+-		kfree(devices);
+-	} else {
+-		kvm->arch.vgic.redist_iodevs = devices;
+ 	}
+ 
+ 	return ret;
+-- 
+2.9.0
 
-Which I think is why "set register base addresses"
-looks like an odd-one-out from the kernel's point of view.
-
-So I think for the ITS we should continue to do the same
-thing we do for GICv2 and v3 (but not the GICv2
-"explicit completion of init is optional" part).
-
-I'd forgotten exactly how this worked; sorry for any
-confusion in my earlier email.
-
-thanks
--- PMM
