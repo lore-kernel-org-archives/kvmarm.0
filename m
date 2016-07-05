@@ -1,7 +1,7 @@
 From: Auger Eric <eric.auger@redhat.com>
 Subject: Re: [PATCH v7 10/17] KVM: arm64: introduce new KVM ITS device
-Date: Tue, 5 Jul 2016 09:40:36 +0200
-Message-ID: <081321b4-5bf2-29f7-018e-6d50ee74b95c@redhat.com>
+Date: Tue, 5 Jul 2016 10:34:33 +0200
+Message-ID: <4c7f0de5-a6e6-d637-9ccf-acf81d2c9c5a@redhat.com>
 References: <20160628123230.26255-1-andre.przywara@arm.com>
  <20160628123230.26255-11-andre.przywara@arm.com>
  <2525bd7b-5df1-54bc-1999-25c8c7fe88a3@redhat.com>
@@ -11,16 +11,35 @@ References: <20160628123230.26255-1-andre.przywara@arm.com>
  <2b712bbe-1534-0206-34e7-8df433ace7c2@redhat.com>
  <fc201178-cfa4-221d-b36e-f5d959f89f74@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F9B5412D0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2016 04:29:10 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id KP1OKQ2yz5xA for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jul 2016 04:29:08 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 67C6F412A6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2016 04:29:08 -0400 (EDT)
 In-Reply-To: <fc201178-cfa4-221d-b36e-f5d959f89f74@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Andre Przywara <andre.przywara@arm.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Andre,
+
 On 04/07/2016 19:40, Andre Przywara wrote:
 > Hi Eric,
 > 
@@ -79,25 +98,9 @@ On 04/07/2016 19:40, Andre Przywara wrote:
 >> mapping is not yet done so you will map resources at undefined location.
 > 
 > What do you mean with "region mapping"? QEMU's internal mapping?
-1st the device regions are created. 2d they are attached at some place
-in the guest memory PA address space. 2d is what I call "region
-mapping". and 3d you have the kvm_device_ioctl(kd->dev_fd,
-KVM_SET_DEVICE_ATTR, attr) called, setting the ITS base address on
-kernel side. This is done on the so-called machine_init_done_notifier.
-So if we follow that scheme the explicit INIT must happen after 3).
 > 
 > But you set the GICv3 redist/dist  addresses (or the ITS address, for
-> that matter) before calling CTRL_INIT, right?
-No similarly the GICv3 base addresses are provided to the kernel very
-late (at the same place as 3, on machine init notifier). for VGIC the
-CTRL_INIT is called at device creation 1), after freezing the number of
-SPIs. if you look at the vgic_init function that is called upon
-CTRL_INIT, it never uses base addresses. It just uses dimensionning
-parameters such as the number of SPIs. for VGIC, the map_resources is
-called implicitly on first vcpu run, ie. after 3). For ITS with current
-patch this needs to be done on a machine_init_done_notifier after 3).
-
- So are you concerned that
+> that matter) before calling CTRL_INIT, right? So are you concerned that
 > the kernel "maps" the region before QEMU connects the memory region? Is
 > that really a problem? This "map_resources" equivalent for the ITS just
 > creates a kvm_io_bus mapping, which would never fire without either a
@@ -127,14 +130,9 @@ patch this needs to be done on a machine_init_done_notifier after 3).
 > Is the current approach a leftover of the initial vGICv2 code, that was
 > just slightly adjusted to support GICv3?
 
-Well I don't think we need to devise the kernel API according to the
-QEMU framework. However from a kernel pov I wanted to shed the light on
-the difference between vgic_init and its_init which are not homogeneous
-in terms of actions and map_resources which in one case is called
-implicitly and in the other case must be called explicitly, with impact
-on qemu framework.
-
-Best Regards
+I have a solution to workaround the issue on qemu side and I can see the
+guest ITS properly initialized now so proceed according to your will &
+consensus.
 
 Eric
 > 
