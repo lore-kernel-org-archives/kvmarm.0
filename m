@@ -1,101 +1,104 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RESEND PATCH v4] KVM: arm/arm64: Add VGICv3 save/restore API documentation
-Date: Wed, 6 Jul 2016 13:03:18 +0100
-Message-ID: <CAFEAcA_OJh+sS-adVP9Z7TDZmPQfsNwfmS1Gxm5EzdVi2FjAwQ@mail.gmail.com>
-References: <20160706113725.32437-1-christoffer.dall@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v8 03/17] KVM: extend struct kvm_msi to hold a 32-bit
+ device ID
+Date: Wed, 6 Jul 2016 23:06:48 +0200
+Message-ID: <20160706210648.GD12608@cbox>
+References: <20160705112309.28877-1-andre.przywara@arm.com>
+ <20160705112309.28877-4-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160706113725.32437-1-christoffer.dall@linaro.org>
+Content-Disposition: inline
+In-Reply-To: <20160705112309.28877-4-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 6 July 2016 at 12:37, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> Factor out the GICv3-specific documentation into a separate
-> documentation file.  Add description for how to access distributor,
-> redistributor, and CPU interface registers for GICv3 in this new file,
-> and add a group for accessing level triggered IRQ information for GICv3
-> as well.
->
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-
-> +    Accesses (reads and writes) to the GICD_ISPENDR register region and
-> +    GICR_ISPENDR0 registers get/set the value of the latched pending state for
-> +    the interrupts.
+On Tue, Jul 05, 2016 at 12:22:55PM +0100, Andre Przywara wrote:
+> The ARM GICv3 ITS MSI controller requires a device ID to be able to
+> assign the proper interrupt vector. On real hardware, this ID is
+> sampled from the bus. To be able to emulate an ITS controller, extend
+> the KVM MSI interface to let userspace provide such a device ID. For
+> PCI devices, the device ID is simply the 16-bit bus-device-function
+> triplet, which should be easily available to the userland tool.
+> 
+> Also there is a new KVM capability which advertises whether the
+> current VM requires a device ID to be set along with the MSI data.
+> This flag is still reported as not available everywhere, later we will
+> enable it when ITS emulation is used.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Reviewed-by: Eric Auger <eric.auger@linaro.org>
+> ---
+>  Documentation/virtual/kvm/api.txt | 12 ++++++++++--
+>  include/uapi/linux/kvm.h          |  5 ++++-
+>  2 files changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index 09efa9e..6551311 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -2175,10 +2175,18 @@ struct kvm_msi {
+>  	__u32 address_hi;
+>  	__u32 data;
+>  	__u32 flags;
+> -	__u8  pad[16];
+> +	__u32 devid;
+> +	__u8  pad[12];
+>  };
+>  
+> -No flags are defined so far. The corresponding field must be 0.
+> +flags: KVM_MSI_VALID_DEVID: devid contains a valid value
+> +devid: If KVM_MSI_VALID_DEVID is set, contains a unique device identifier
+> +       for the device that wrote the MSI message.
+> +       For PCI, this is usually a BFD identifier in the lower 16 bits.
 > +
-> +    This is identical to the value read from ISPENDR for an edge triggered
-> +    interrupt, but may differ for level triggered interrupts. For edge triggered
-> +    interrupts, once an interrupt becomes pending (whether because of an edge
-> +    detected on the input line or because of a guest write to ISPENDR) this
-> +    state is "latched", and only cleared when either the interrupt is activated
-> +    or when the guest writes to ICPENDR. A level triggered interrupt may be
-> +    pending either because the level input is held high by a device, or because
-> +    of a guest write to the ISPENDR register. Only ISPENDR writes are latched;
-> +    if the device lowers the line level then the interrupt is no longer pending
-> +    unless the guest also wrote to ISPENDR, and conversely writes to ICPENDR or
-> +    activations of the interrupt do not clear the pending status if the line
-> +    level is still being held high.  (These rules are documented in the GICv3
-> +    specification descriptions of the ICPENDR and ISPENDR registers.)
-> +    For a level triggered interrupt the value accessed here
-> +    is that of the latch which is set by ISPENDR and cleared by ICPENDR or
-> +    interrupt activation, whereas the value read from ISPENDR is the logical OR
-> +    of the latch value and the input line level.
+> +The per-VM KVM_CAP_MSI_DEVID capability advertises the need to provide
+> +the device ID. If this capability is not set, userland cannot rely on
+> +the kernel to allow the KVM_MSI_VALID_DEVID flag being set.
 
-Rereading these paragraphs I think
- "This is identical to the value returned by a guest read from ISPENDR..."
-(in the first line) and
- "the value returned by a guest read from the ISPENDR register is the
-logical OR..."
-(at the end) would be clearer, just to make sure we're clear between
-when we're describing the behaviour of the hardware register as seen
-by the guest, and when we're describing the behaviour of a read/write
-through this API. I misread the intention the first time around
-even though  I wrote this text :-)
+If KVM_CAP_MSI_DEVID is set, is it an error to provide a struct kvm_msi
+without the KVM_MSI_VALID_DEVID flag set, or not necessarily?
 
-> +  KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
-> +  Attributes:
-> +    The attr field of kvm_device_attr encodes the following values:
-> +    bits:     | 63      ....       32 | 31   ....    10 | 9  ....  0 |
-> +    values:   |         mpidr         |      info       |   vINTID   |
-> +
-> +    The vINTID specifies which set of IRQs is reported on.
-> +
-> +    The info field specifies which information userspace wants to get or set
-> +    using this interface.  Currently we support two different pieces of
-> +    information:
-> +
-> +      VGIC_LEVEL_INFO_LINE_LEVEL:
-> +       Get/Set the input level of the IRQ line for a set of 32 contiguously
-> +       numbered interrupts.
-> +       vINTID must be a multiple of 32.
-> +
-> +        kvm_device_attr.addr points to a __u32 value which will contain a
+>  
+>  
+>  4.71 KVM_CREATE_PIT2
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 05ebf47..7de96f5 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -866,6 +866,7 @@ struct kvm_ppc_smmu_info {
+>  #define KVM_CAP_ARM_PMU_V3 126
+>  #define KVM_CAP_VCPU_ATTRIBUTES 127
+>  #define KVM_CAP_MAX_VCPU_ID 128
+> +#define KVM_CAP_MSI_DEVID 129
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> @@ -1024,12 +1025,14 @@ struct kvm_one_reg {
+>  	__u64 addr;
+>  };
+>  
+> +#define KVM_MSI_VALID_DEVID	(1U << 0)
+>  struct kvm_msi {
+>  	__u32 address_lo;
+>  	__u32 address_hi;
+>  	__u32 data;
+>  	__u32 flags;
+> -	__u8  pad[16];
+> +	__u32 devid;
+> +	__u8  pad[12];
+>  };
+>  
+>  struct kvm_arm_device_addr {
+> -- 
+> 2.9.0
+> 
 
-stray extra space at start of line?
+Looks good to me, but you probably need an ack from Paolo or Radim
+before we can queue this.
 
-> +       bitmap where a set bit means the interrupt level is asserted.
-> +
-> +       Bit[n] indicates the status for interrupt vINTID + n.
-> +
-> +    SGIs and any interrupt with a higher ID than the number of interrupts
-> +    supported, will be RAZ/WI.  LPIs are always edge-triggered and are
-> +    therefore not supported by this interface.
-> +
-> +    PPIs are reported per VCPU as specified in the mpidr field, and SPIs are
-> +    reported with the same value regardless of the mpidr specified.
-> +
-> +    The mpidr field encodes the CPU ID based on the affinity information in the
-> +    architecture defined MPIDR, and the field is encoded as follows:
-> +      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-> +      |    Aff3    |    Aff2    |    Aff1    |    Aff0   |
+FWIW: Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-Missing space -- ASCII art doesn't quite line up.
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-
-thanks
--- PMM
+-Christoffer
