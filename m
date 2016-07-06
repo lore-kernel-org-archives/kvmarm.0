@@ -1,25 +1,23 @@
-From: vijay.kilari@gmail.com
-Subject: [RFC PATCH v1] arm/arm64: vgic-new: Create dist and redist iodevs
- earlier
-Date: Tue,  5 Jul 2016 20:41:31 +0530
-Message-ID: <1467731491-6458-1-git-send-email-vijay.kilari@gmail.com>
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [RFC v6 1/6] KVM: api: pass the devid in the msi routing entry
+Date: Wed,  6 Jul 2016 10:47:50 +0200
+Message-ID: <1467794875-5237-2-git-send-email-eric.auger@redhat.com>
+References: <1467794875-5237-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A17140B40
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2016 11:06:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BAD540C9A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2016 04:42:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3GLPmBMSlTqv for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Jul 2016 11:06:28 -0400 (EDT)
-Received: from mail-pf0-f194.google.com (mail-pf0-f194.google.com
- [209.85.192.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 54ABC409A2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2016 11:06:27 -0400 (EDT)
-Received: by mail-pf0-f194.google.com with SMTP id i123so19281986pfg.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jul 2016 08:11:58 -0700 (PDT)
+ with ESMTP id KqgvTvfEhLae for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Jul 2016 04:42:53 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6FBE340FA6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2016 04:42:53 -0400 (EDT)
+In-Reply-To: <1467794875-5237-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,103 +27,91 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: Vijaya Kumar K <vijayak@caviumnetworks.com>, Prasun.Kapoor@cavium.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vijaya Kumar K <vijayak@caviumnetworks.com>
+On ARM, the MSI msg (address and data) comes along with
+out-of-band device ID information. The device ID encodes the
+device that writes the MSI msg. Let's convey the device id in
+kvm_irq_routing_msi and use KVM_MSI_VALID_DEVID flag value in
+kvm_irq_routing_entry to indicate the msi devid is populated.
 
-The dist and redist regions are created and registered in
-vgic_register_dist_iodevs() and vgic_v3_init_redist_iodev()
-calls for distributor and redistributor respectively when
-vgic_v3_map_resources() is called. This mapping of resources
-is done when vcpu run ioctl is called.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Below is the call stack of the same.
-
-[<ffff0000080b2e8c>] vgic_register_redist_iodevs+0x94/0x27c
-[<ffff0000080b0fd8>] vgic_v3_map_resources+0x138/0x188
-[<ffff0000080affa4>] kvm_vgic_map_resources+0xb0/0xb8
-[<ffff0000080a3888>] kvm_arch_vcpu_ioctl_run+0x4a8/0x550
-[<ffff00000809c218>] kvm_vcpu_ioctl+0x304/0x74c
-[<ffff000008232cac>] do_vfs_ioctl+0xc0/0x754
-[<ffff0000082333d0>] SyS_ioctl+0x90/0xa4
-[<ffff000008084af0>] el0_svc_naked+0x24/0x28
-
-During live migration, the destination VM first restores the all the
-GIC registers(dist, rdist and cpuif registers) using ioctl's before
-resuming the VM.So no vcpu run ioctl is called untill complete
-GIC context is restored.
-
-Hence, In case of live migration, when ioctls are called to write
-dist/rdist registers the ioctls fails as
-vcpu->kvm->arch.vgic.dist_iodev andkvm->arch.vgic.redist_iodevs
-are NULL.
-
-In this patch, the distributor and redistributor regions are created
-as and when KVM_VGIC_V3_ADDR_TYPE_{DIST|REDIST} ioctl is called.
-However the vgic_v3_map_resouces() is still called when vcpu is
-executed, which validates the distributor and redistributor addresses.
-Ex: Check for overlap.
-
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 ---
- virt/kvm/arm/vgic/vgic-kvm-device.c |   19 +++++++++++++++++++
- virt/kvm/arm/vgic/vgic-v3.c         |   12 ------------
- 2 files changed, 19 insertions(+), 12 deletions(-)
+v4 -> v5:
+- some rephrasing in api.txt according to Christoffer's comments
+v2 -> v3:
+- replace usage of KVM_IRQ_ROUTING_EXTENDED_MSI type by
+  usage of KVM_MSI_VALID_DEVID flag
+- add note about KVM_CAP_MSI_DEVID capability
 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 0130c4b..cc843fe 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -101,6 +101,25 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- 		*addr = *addr_ptr;
- 	}
+v1 -> v2:
+- devid id passed in kvm_irq_routing_msi instead of in
+  kvm_irq_routing_entry
+
+RFC -> PATCH
+- remove kvm_irq_routing_extended_msi and use union instead
+---
+ Documentation/virtual/kvm/api.txt | 19 +++++++++++++++++--
+ include/uapi/linux/kvm.h          |  5 ++++-
+ 2 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index f60b137..0065c8e 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -1468,7 +1468,11 @@ struct kvm_irq_routing_entry {
+ #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+ #define KVM_IRQ_ROUTING_HV_SINT 4
  
-+#ifdef CONFIG_KVM_ARM_VGIC_V3
-+	switch (type) {
-+	case KVM_VGIC_V3_ADDR_TYPE_DIST:
-+		r = vgic_register_dist_iodev(kvm, vgic->vgic_dist_base, VGIC_V3);
-+		if (r) {
-+			kvm_err("Unable to register VGICv3 dist MMIO regions\n");
-+			goto out;
-+		}
-+		break;
-+	case KVM_VGIC_V3_ADDR_TYPE_REDIST:
-+		r = vgic_register_redist_iodevs(kvm, vgic->vgic_redist_base);
-+		if (r) {
-+			kvm_err("Unable to register VGICv3 redist MMIO regions\n");
-+			goto out;
-+		}
-+		break;
-+	}
-+#endif
+-No flags are specified so far, the corresponding field must be set to zero.
++flags:
++- KVM_MSI_VALID_DEVID: used along with KVM_IRQ_ROUTING_MSI
++  routing entry type, specifies that the devid field contains
++  a valid value.
++- zero otherwise
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
+@@ -1479,9 +1483,20 @@ struct kvm_irq_routing_msi {
+ 	__u32 address_lo;
+ 	__u32 address_hi;
+ 	__u32 data;
+-	__u32 pad;
++	union {
++		__u32 pad;
++		__u32 devid;
++	};
+ };
+ 
++devid: If KVM_MSI_VALID_DEVID is set, contains a unique device identifier
++       for the device that wrote the MSI message.
++       For PCI, this is usually a BFD identifier in the lower 16 bits.
 +
- out:
- 	mutex_unlock(&kvm->lock);
- 	return r;
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 346b4ad..a149b35 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -267,18 +267,6 @@ int vgic_v3_map_resources(struct kvm *kvm)
- 		goto out;
- 	}
++The per-VM KVM_CAP_MSI_DEVID capability advertises the requirement to
++provide the device ID. If this capability is not set, userland cannot
++rely on the kernel to allow the KVM_MSI_VALID_DEVID flag being set.
++
+ struct kvm_irq_routing_s390_adapter {
+ 	__u64 ind_addr;
+ 	__u64 summary_addr;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d8c4c32..eb22208 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -879,7 +879,10 @@ struct kvm_irq_routing_msi {
+ 	__u32 address_lo;
+ 	__u32 address_hi;
+ 	__u32 data;
+-	__u32 pad;
++	union {
++		__u32 pad;
++		__u32 devid;
++	};
+ };
  
--	ret = vgic_register_dist_iodev(kvm, dist->vgic_dist_base, VGIC_V3);
--	if (ret) {
--		kvm_err("Unable to register VGICv3 dist MMIO regions\n");
--		goto out;
--	}
--
--	ret = vgic_register_redist_iodevs(kvm, dist->vgic_redist_base);
--	if (ret) {
--		kvm_err("Unable to register VGICv3 redist MMIO regions\n");
--		goto out;
--	}
--
- 	dist->ready = true;
- 
- out:
+ struct kvm_irq_routing_s390_adapter {
 -- 
-1.7.9.5
+2.5.5
