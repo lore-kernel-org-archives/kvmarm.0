@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v6 3/6] KVM: irqchip: convey devid to kvm_set_msi
-Date: Wed,  6 Jul 2016 10:47:52 +0200
-Message-ID: <1467794875-5237-4-git-send-email-eric.auger@redhat.com>
+Subject: [RFC v6 2/6] KVM: kvm_host: add devid in kvm_kernel_irq_routing_entry
+Date: Wed,  6 Jul 2016 10:47:51 +0200
+Message-ID: <1467794875-5237-3-git-send-email-eric.auger@redhat.com>
 References: <1467794875-5237-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA38E410B5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2016 04:42:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B006412DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2016 04:42:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U6PoqR2PIaFc for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Jul 2016 04:42:58 -0400 (EDT)
+ with ESMTP id Jc8nZzAV9CR2 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Jul 2016 04:42:56 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 48CB8412C2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2016 04:42:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 03439412C2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2016 04:42:56 -0400 (EDT)
 In-Reply-To: <1467794875-5237-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,45 +31,46 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-on ARM, a devid field is populated in kvm_msi struct in case the
-flag is set to KVM_MSI_VALID_DEVID. Let's propagate both flags and
-devid field in kvm_kernel_irq_routing_entry.
+Extend kvm_kernel_irq_routing_entry to transport the device id
+field, devid. A new flags field makes possible to indicate the
+devid is valid. Those additions are used for ARM GICv3 ITS MSI
+injection.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 
 ---
 v4 -> v5:
-- Add Christoffer's R-b
+- add Christoffer's R-b
 
 v2 -> v3:
-- do not set the type to KVM_IRQ_ROUTING_EXTENDED_MSI anymore as
-  suggested by Andre
-- correct msi->flags check
-- propagate the flags
----
- virt/kvm/irqchip.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+- add flags
 
-diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index 8db197b..32e5646 100644
---- a/virt/kvm/irqchip.c
-+++ b/virt/kvm/irqchip.c
-@@ -62,12 +62,14 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
- {
- 	struct kvm_kernel_irq_routing_entry route;
- 
--	if (!irqchip_in_kernel(kvm) || msi->flags != 0)
-+	if (!irqchip_in_kernel(kvm) || (msi->flags & ~KVM_MSI_VALID_DEVID))
- 		return -EINVAL;
- 
- 	route.msi.address_lo = msi->address_lo;
- 	route.msi.address_hi = msi->address_hi;
- 	route.msi.data = msi->data;
-+	route.flags = msi->flags;
-+	route.devid = msi->devid;
- 
- 	return kvm_set_msi(&route, kvm, KVM_USERSPACE_IRQ_SOURCE_ID, 1, false);
- }
+v1 -> v2:
+- replace msi_msg field by a struct composed of msi_msg and devid
+
+RFC -> PATCH:
+- reword the commit message after change in first patch (uapi)
+---
+ include/linux/kvm_host.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index c87fe6f..fffa299 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -317,7 +317,11 @@ struct kvm_kernel_irq_routing_entry {
+ 			unsigned irqchip;
+ 			unsigned pin;
+ 		} irqchip;
+-		struct msi_msg msi;
++		struct {
++			struct msi_msg msi;
++			u32 flags;
++			u32 devid;
++		};
+ 		struct kvm_s390_adapter_int adapter;
+ 		struct kvm_hv_sint hv_sint;
+ 	};
 -- 
 2.5.5
