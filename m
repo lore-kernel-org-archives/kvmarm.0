@@ -1,41 +1,20 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH v8 06/17] KVM: arm/arm64: VGIC: add refcounting for IRQs
-Date: Thu, 7 Jul 2016 15:13:57 +0200
-Message-ID: <20160707131357.GG12608@cbox>
+Date: Thu, 7 Jul 2016 16:00:41 +0100
+Message-ID: <577E6E99.9040003@arm.com>
 References: <20160705112309.28877-1-andre.przywara@arm.com>
  <20160705112309.28877-7-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4564840F90
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jul 2016 09:07:25 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 82BJqpVPIfUp for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Jul 2016 09:07:22 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6BABE40C9D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jul 2016 09:07:22 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id n127so15862331wme.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Jul 2016 06:12:57 -0700 (PDT)
-Content-Disposition: inline
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20160705112309.28877-7-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 05, 2016 at 12:22:58PM +0100, Andre Przywara wrote:
+On 05/07/16 12:22, Andre Przywara wrote:
 > In the moment our struct vgic_irq's are statically allocated at guest
 > creation time. So getting a pointer to an IRQ structure is trivial and
 > safe. LPIs are more dynamic, they can be mapped and unmapped at any time
@@ -396,19 +375,6 @@ On Tue, Jul 05, 2016 at 12:22:58PM +0100, Andre Przywara wrote:
 > +		kref_get(&irq->refcount);
 > +		return irq;
 > +	}
-
-It appears to me that this could be made nicer (the diff as well) by
-just setting the IRQ variable and at the end of the function do:
-
-if (irq)
-	kref_get(irq->refcount);
-return irq;
-
-Perhaps a later patch will do something like that or make it obvious why
-that's not a good idea.
-
-Again, not a reason for a respin on its own.
-
 >  
 >  	/* LPIs are not yet covered */
 >  	if (intid >= VGIC_MIN_LPI)
@@ -435,6 +401,12 @@ Again, not a reason for a respin on its own.
 >  	}
 >  
 > +	kref_get(&irq->refcount);
+
+Could you use vgic_get_irq() instead? I know it is slightly overkill,
+but I can already tell that we'll need to add some tracing in both the
+put and get helpers in order to do some debugging. Having straight
+kref_get/put is going to make this tracing difficult, so let's not go there.
+
 >  	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
 >  	irq->vcpu = vcpu;
 >  
@@ -525,8 +497,12 @@ Again, not a reason for a respin on its own.
 >  bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
 >  void vgic_kick_vcpus(struct kvm *kvm);
 >  
-> -- 
-> 2.9.0
 > 
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Otherwise looks good.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
