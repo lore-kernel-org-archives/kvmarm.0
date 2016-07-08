@@ -1,347 +1,46 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v8 08/17] KVM: arm64: handle ITS related GICv3
- redistributor registers
-Date: Fri, 8 Jul 2016 08:40:23 -0700
-Message-ID: <20160708154023.GA1305@lvm>
-References: <20160705112309.28877-1-andre.przywara@arm.com>
- <20160705112309.28877-9-andre.przywara@arm.com>
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [RFC v6 4/6] KVM: arm/arm64: enable irqchip routing
+Date: Fri, 8 Jul 2016 22:55:43 +0200
+Message-ID: <20160708205543.GC10741@potion>
+References: <1467794875-5237-1-git-send-email-eric.auger@redhat.com>
+ <1467794875-5237-5-git-send-email-eric.auger@redhat.com>
+ <20160707172052.5weyrjus3i3mgzik@hawk.localdomain>
+ <11b05e3b-f3fd-aae3-b1e7-6ca9836cfc97@redhat.com>
+ <20160708085233.qjptxd4qh7ukbgl3@hawk.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20160705112309.28877-9-andre.przywara@arm.com>
+In-Reply-To: <20160708085233.qjptxd4qh7ukbgl3@hawk.localdomain>
 Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 05, 2016 at 12:23:00PM +0100, Andre Przywara wrote:
-> In the GICv3 redistributor there are the PENDBASER and PROPBASER
-> registers which we did not emulate so far, as they only make sense
-> when having an ITS. In preparation for that emulate those MMIO
-> accesses by storing the 64-bit data written into it into a variable
-> which we later read in the ITS emulation.
-> We also sanitise the registers, making sure RES0 regions are respected
-> and checking for valid memory attributes.
+2016-07-08 10:52+0200, Andrew Jones:
+> On Fri, Jul 08, 2016 at 10:16:53AM +0200, Auger Eric wrote:
+>> On 07/07/2016 19:20, Andrew Jones wrote:
+>> > On Wed, Jul 06, 2016 at 10:47:53AM +0200, Eric Auger wrote:
+>> >> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+>> >> @@ -29,7 +29,9 @@
+>> >>  #include <linux/srcu.h>
+>> >>  #include <linux/export.h>
+>> >>  #include <trace/events/kvm.h>
+>> >> +#if !defined(CONFIG_ARM) && !defined(CONFIG_ARM64)
+>> >>  #include "irq.h"
+>> >> +#endif
+>> > 
+>> > Instead of doing this, shouldn't we add arch/arm[64]/kvm/irq.h files.
+>> > Probably a simple one like ./arch/s390/kvm/irq.h ?
+>> 
+>> Well I considered this solution in the past but I did not find much to
+>> put there (it was even void). typically irqchip_in_kernel is in
+>> include/kvm/arm_vgic.h since the macro can be shared between arm/arm64.
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/arm_vgic.h           |  13 ++++
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 143 ++++++++++++++++++++++++++++++++++++++-
->  virt/kvm/arm/vgic/vgic-mmio.h    |   8 +++
->  virt/kvm/arm/vgic/vgic-v3.c      |  11 ++-
->  4 files changed, 171 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 450b4da..f6f860d 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -146,6 +146,14 @@ struct vgic_dist {
->  	struct vgic_irq		*spis;
->  
->  	struct vgic_io_device	dist_iodev;
-> +
-> +	/*
-> +	 * Contains the address of the LPI configuration table.
+> I think I'd prefer a nearly empty file to the #ifdef's, but Paolo and
+> Radim should chime in.
 
-Is this field the address or the actual format of the GICR_PROPBASER ?
+I concur, hiding ugliness in header files is what we strive for.
 
-If the former, the type should potentially be gpa_t, if the latter, you
-shouldn't say that this is just the address :)
-
-> +	 * Since we report GICR_TYPER.CommonLPIAff as 0b00, we can share
-> +	 * one address across all redistributors.
-> +	 * GICv3 spec: 6.1.2 "LPI Configuration tables"
-> +	 */
-> +	u64			propbaser;
->  };
->  
->  struct vgic_v2_cpu_if {
-> @@ -200,6 +208,11 @@ struct vgic_cpu {
->  	 */
->  	struct vgic_io_device	rd_iodev;
->  	struct vgic_io_device	sgi_iodev;
-> +
-> +	/* Points to the LPI pending tables for the redistributor */
-> +	u64 pendbaser;
-
-ditto
-
-> +
-> +	bool lpis_enabled;
->  };
->  
->  int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index bfcafbd..9dd8632 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -29,6 +29,19 @@ static unsigned long extract_bytes(unsigned long data, unsigned int offset,
->  	return (data >> (offset * 8)) & GENMASK_ULL(num * 8 - 1, 0);
->  }
->  
-> +/* allows updates of any half of a 64-bit register (or the whole thing) */
-
-when I see this function I have to read the bit fiddling to understand
-the parameters and semantics.
-
-actually, I'm not sure I read this correctly, but could you mean:
-
-  /*
-   * Update @len bytes at @offset bytes offset in @reg from the least
-   * significant bytes in @val?
-   */
-
-Also, I don't get why this would be limited to either halfs or the whole
-of a 64-bit register, but maybe I'm reading the code wrong.
-
-Didn't we have a reviewed function for the vgic that was called
-update_bytes or inser_bytes before, that we could use or did we never
-actually review that?
-
-
-> +static u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
-> +			    unsigned long val)
-> +{
-> +	int lower = (offset & 4) * 8;
-> +	int upper = lower + 8 * len - 1;
-> +
-> +	reg &= ~GENMASK_ULL(upper, lower);
-> +	val &= GENMASK_ULL(len * 8 - 1, 0);
-> +
-> +	return reg | ((u64)val << lower);
-
-this casting is weird.  Why is val not either a u64 or a u32?  Or the
-whole lot could be unsigned long/unsigned int like extract_bytes.
-
-> +}
-> +
->  static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
->  					    gpa_t addr, unsigned int len)
->  {
-> @@ -152,6 +165,132 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +/* We want to avoid outer shareable. */
-> +u64 vgic_sanitise_shareability(u64 reg)
-> +{
-> +	switch (reg & GIC_BASER_SHAREABILITY_MASK) {
-> +	case GIC_BASER_OuterShareable:
-> +		return GIC_BASER_InnerShareable;
-> +	default:
-> +		return reg;
-> +	}
-> +}
-> +
-> +/* Non-cacheable or same-as-inner are OK. */
-> +u64 vgic_sanitise_outer_cacheability(u64 reg)
-> +{
-> +	switch (reg & GIC_BASER_CACHE_MASK) {
-> +	case GIC_BASER_CACHE_SameAsInner:
-> +	case GIC_BASER_CACHE_nC:
-> +		return reg;
-> +	default:
-> +		return GIC_BASER_CACHE_nC;
-> +	}
-> +}
-> +
-> +/* Avoid any inner non-cacheable mapping. */
-> +u64 vgic_sanitise_inner_cacheability(u64 reg)
-> +{
-> +	switch (reg & GIC_BASER_CACHE_MASK) {
-> +	case GIC_BASER_CACHE_nCnB:
-> +	case GIC_BASER_CACHE_nC:
-> +		return GIC_BASER_CACHE_RaWb;
-> +	default:
-> +		return reg;
-> +	}
-> +}
-
-nit: My OCD sets in here because the functions above are not ordered
-similarly to the calls below :)
-
-also, why do you need to apply the mask in the sanitize functions when
-you've just applied it in the callers?  It would make more sense to me
-if you didn't and named the parameters @field instead of @reg in the
-sanitize functions.
-
-> +
-> +u64 vgic_sanitise_field(u64 reg, int field_shift, u64 field_mask,
-> +			u64 (*sanitise_fn)(u64))
-> +{
-> +	u64 field = (reg >> field_shift) & field_mask;
-> +
-> +	field = sanitise_fn(field) << field_shift;
-> +	return (reg & ~(field_mask << field_shift)) | field;
-> +}
-> +
-> +static u64 vgic_sanitise_pendbaser(u64 reg)
-> +{
-> +	reg = vgic_sanitise_field(reg, GICR_PENDBASER_SHAREABILITY_SHIFT,
-> +				  GIC_BASER_SHAREABILITY_MASK,
-> +				  vgic_sanitise_shareability);
-> +	reg = vgic_sanitise_field(reg, GICR_PENDBASER_INNER_CACHEABILITY_SHIFT,
-> +				  GIC_BASER_CACHE_MASK,
-> +				  vgic_sanitise_inner_cacheability);
-> +	reg = vgic_sanitise_field(reg, GICR_PENDBASER_OUTER_CACHEABILITY_SHIFT,
-> +				  GIC_BASER_CACHE_MASK,
-> +				  vgic_sanitise_outer_cacheability);
-> +	return reg;
-> +}
-> +
-> +static u64 vgic_sanitise_propbaser(u64 reg)
-> +{
-> +	reg = vgic_sanitise_field(reg, GICR_PROPBASER_SHAREABILITY_SHIFT,
-> +				  GIC_BASER_SHAREABILITY_MASK,
-> +				  vgic_sanitise_shareability);
-> +	reg = vgic_sanitise_field(reg, GICR_PROPBASER_INNER_CACHEABILITY_SHIFT,
-> +				  GIC_BASER_CACHE_MASK,
-> +				  vgic_sanitise_inner_cacheability);
-> +	reg = vgic_sanitise_field(reg, GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT,
-> +				  GIC_BASER_CACHE_MASK,
-> +				  vgic_sanitise_outer_cacheability);
-> +	return reg;
-> +}
-
-assuming the defines themselves are correct (I didn't check) this looks
-good otherwise.
-
-> +
-> +#define PROPBASER_RES0_MASK						\
-> +	(GENMASK_ULL(63, 59) | GENMASK_ULL(55, 52) | GENMASK_ULL(6, 5))
-
-Why is the middle one for bits 55:52?  is it not 55:48?  Perhaps larger
-physical addresses compared to the revision of the GICv3 spec I have at
-hand?
-
-> +#define PENDBASER_RES0_MASK						\
-> +	(BIT_ULL(63) | GENMASK_ULL(61, 59) | GENMASK_ULL(55, 52) |	\
-> +	 GENMASK_ULL(15, 12) | GENMASK_ULL(6, 0))
-> +
-> +static unsigned long vgic_mmio_read_propbase(struct kvm_vcpu *vcpu,
-> +					     gpa_t addr, unsigned int len)
-> +{
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +
-> +	return extract_bytes(dist->propbaser, addr & 7, len);
-> +}
-> +
-> +static void vgic_mmio_write_propbase(struct kvm_vcpu *vcpu,
-> +				     gpa_t addr, unsigned int len,
-> +				     unsigned long val)
-> +{
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> +
-> +	/* Storing a value with LPIs already enabled is undefined */
-> +	if (vgic_cpu->lpis_enabled)
-> +		return;
-> +
-> +	dist->propbaser = update_64bit_reg(dist->propbaser, addr & 4, len, val);
-> +	dist->propbaser &= ~PROPBASER_RES0_MASK;
-> +	dist->propbaser = vgic_sanitise_propbaser(dist->propbaser);
-
-what prevents multiple writers messing with dist->propbaser or the
-lips_enabled being set in the middle of us fiddling with dist_propbaser?
-
-> +}
-> +
-> +static unsigned long vgic_mmio_read_pendbase(struct kvm_vcpu *vcpu,
-> +					     gpa_t addr, unsigned int len)
-> +{
-> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> +
-> +	return extract_bytes(vgic_cpu->pendbaser, addr & 7, len);
-> +}
-> +
-> +static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
-> +				     gpa_t addr, unsigned int len,
-> +				     unsigned long val)
-> +{
-> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> +
-> +	/* Storing a value with LPIs already enabled is undefined */
-> +	if (vgic_cpu->lpis_enabled)
-> +		return;
-> +
-> +	vgic_cpu->pendbaser = update_64bit_reg(vgic_cpu->pendbaser,
-> +					       addr & 4, len, val);
-> +	vgic_cpu->pendbaser &= ~PENDBASER_RES0_MASK;
-> +	vgic_cpu->pendbaser = vgic_sanitise_pendbaser(vgic_cpu->pendbaser);
-> +}
-> +
->  /*
->   * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
->   * redistributors, while SPIs are covered by registers in the distributor
-> @@ -232,10 +371,10 @@ static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
->  		vgic_mmio_read_v3r_typer, vgic_mmio_write_wi, 8,
->  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_LENGTH(GICR_PROPBASER,
-> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
-> +		vgic_mmio_read_propbase, vgic_mmio_write_propbase, 8,
->  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_LENGTH(GICR_PENDBASER,
-> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
-> +		vgic_mmio_read_pendbase, vgic_mmio_write_pendbase, 8,
->  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_LENGTH(GICR_IDREGS,
->  		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-> index 8509014..e863ccc 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.h
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
-> @@ -147,4 +147,12 @@ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
->  
->  unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev);
->  
-> +#ifdef CONFIG_KVM_ARM_VGIC_V3
-> +u64 vgic_sanitise_outer_cacheability(u64 reg);
-> +u64 vgic_sanitise_inner_cacheability(u64 reg);
-> +u64 vgic_sanitise_shareability(u64 reg);
-> +u64 vgic_sanitise_field(u64 reg, int field_shift, u64 field_mask,
-> +			u64 (*sanitise_fn)(u64));
-> +#endif
-> +
->  #endif
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index f0ac064..6f8f31f 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -191,6 +191,11 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
->  }
->  
-> +#define INITIAL_PENDBASER_VALUE						  \
-> +	(GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWb)		| \
-> +	GIC_BASER_CACHEABILITY(GICR_PENDBASER, OUTER, SameAsInner)	| \
-> +	GIC_BASER_SHAREABILITY(GICR_PENDBASER, InnerShareable))
-> +
->  void vgic_v3_enable(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
-> @@ -208,10 +213,12 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
->  	 * way, so we force SRE to 1 to demonstrate this to the guest.
->  	 * This goes with the spec allowing the value to be RAO/WI.
->  	 */
-> -	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
->  		vgic_v3->vgic_sre = ICC_SRE_EL1_SRE;
-> -	else
-> +		vcpu->arch.vgic_cpu.pendbaser = INITIAL_PENDBASER_VALUE;
-
-why is pendbaser initialized, but not propbaser?  Do I have an outdated
-spec?  Both seem to not have any predefined reset value.
-
-> +	} else {
->  		vgic_v3->vgic_sre = 0;
-> +	}
->  
->  	/* Get the show on the road... */
->  	vgic_v3->vgic_hcr = ICH_HCR_EN;
-> -- 
-> 2.9.0
-> 
-
-Thanks,
--Christoffer
+The files could #include <include/kvm/arm_vgic.h>, which might make
+their existence easier to understand.
