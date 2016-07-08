@@ -1,8 +1,8 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
 Subject: Re: [PATCH v8 09/17] KVM: arm64: introduce ITS emulation file with
  MMIO framework
-Date: Fri, 8 Jul 2016 14:55:37 +0100
-Message-ID: <577FB0D9.6090109@arm.com>
+Date: Fri, 8 Jul 2016 15:04:32 +0100
+Message-ID: <dbe1dcbe-c1b1-6ea2-4354-bd9a164b8fc9@arm.com>
 References: <20160705112309.28877-1-andre.przywara@arm.com>
  <20160705112309.28877-10-andre.przywara@arm.com> <577FABF2.30302@arm.com>
 Mime-Version: 1.0
@@ -11,7 +11,7 @@ Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <577FABF2.30302@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
@@ -140,192 +140,12 @@ On 08/07/16 14:34, Marc Zyngier wrote:
 > 
 > Smaller structures, smaller patch. Am I missing something?
 
-And for the record, here's what I've cooked on top of your patch:
+Looks possible. I think I tried something like this in the beginning and
+hit some wall - possibly the one in my head ;-). Also I found it saner
+to have the type associated with the declaration instead of adjusting
+this in the registration function.
+But looking again it seems indeed better to do it your way (TM).
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index c64db0f..95eab74 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -112,12 +112,20 @@ struct vgic_irq {
- struct vgic_register_region;
- struct vgic_its;
- 
-+enum iodev_type {
-+	IODEV_CPUIF,
-+	IODEV_DIST,
-+	IODEV_REDIST,
-+	IODEV_ITS,
-+};
-+
- struct vgic_io_device {
- 	gpa_t base_addr;
- 	union {
- 		struct kvm_vcpu *redist_vcpu;
- 		struct vgic_its *its;
- 	};
-+	enum iodev_type iodev_type;
- 	const struct vgic_register_region *regions;
- 	int nr_regions;
- 	struct kvm_io_device dev;
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4459a59..7c7d16b 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1162,7 +1162,6 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
- 	.reg_offset = off,					\
- 	.len = length,						\
- 	.access_flags = acc,					\
--	.iodev_type = IODEV_ITS,				\
- 	.its_read = rd,						\
- 	.its_write = wr,					\
- }
-@@ -1219,6 +1218,7 @@ static int vgic_its_register(struct kvm *kvm, struct vgic_its *its)
- 
- 	iodev->regions = its_registers;
- 	iodev->nr_regions = ARRAY_SIZE(its_registers);
-+	iodev->iodev_type = IODEV_ITS;
- 	kvm_iodevice_init(&iodev->dev, &kvm_io_gic_ops);
- 
- 	iodev->base_addr = its->vgic_its_base;
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index bca5bf7..52af312 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -360,6 +360,7 @@ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev)
- {
- 	dev->regions = vgic_v2_dist_registers;
- 	dev->nr_regions = ARRAY_SIZE(vgic_v2_dist_registers);
-+	dev->iodev_type = IODEV_DIST;
- 
- 	kvm_iodevice_init(&dev->dev, &kvm_io_gic_ops);
- 
-@@ -437,6 +438,7 @@ int vgic_v2_cpuif_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 	struct vgic_io_device dev = {
- 		.regions = vgic_v2_cpu_registers,
- 		.nr_regions = ARRAY_SIZE(vgic_v2_cpu_registers),
-+		.iodev_type = IODEV_CPUIF,
- 	};
- 
- 	return vgic_uaccess(vcpu, &dev, is_write, offset, val);
-@@ -448,6 +450,7 @@ int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 	struct vgic_io_device dev = {
- 		.regions = vgic_v2_dist_registers,
- 		.nr_regions = ARRAY_SIZE(vgic_v2_dist_registers),
-+		.iodev_type = IODEV_DIST,
- 	};
- 
- 	return vgic_uaccess(vcpu, &dev, is_write, offset, val);
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index c7c7a87..d1d2020 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -346,7 +346,6 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
- 		.bits_per_irq = bpi,					\
- 		.len = (bpi * VGIC_NR_PRIVATE_IRQS) / 8,		\
- 		.access_flags = acc,					\
--		.iodev_type = type,					\
- 		.read = vgic_mmio_read_raz,				\
- 		.write = vgic_mmio_write_wi,				\
- 	}, {								\
-@@ -354,7 +353,6 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
- 		.bits_per_irq = bpi,					\
- 		.len = (bpi * (1024 - VGIC_NR_PRIVATE_IRQS)) / 8,	\
- 		.access_flags = acc,					\
--		.iodev_type = type,					\
- 		.read = rd,						\
- 		.write = wr,						\
- 	}
-@@ -465,6 +463,7 @@ unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev)
- {
- 	dev->regions = vgic_v3_dist_registers;
- 	dev->nr_regions = ARRAY_SIZE(vgic_v3_dist_registers);
-+	dev->iodev_type = IODEV_DIST;
- 
- 	kvm_iodevice_init(&dev->dev, &kvm_io_gic_ops);
- 
-@@ -486,6 +485,7 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
- 		rd_dev->base_addr = rd_base;
- 		rd_dev->regions = vgic_v3_rdbase_registers;
- 		rd_dev->nr_regions = ARRAY_SIZE(vgic_v3_rdbase_registers);
-+		rd_dev->iodev_type = IODEV_REDIST;
- 		rd_dev->redist_vcpu = vcpu;
- 
- 		mutex_lock(&kvm->slots_lock);
-@@ -500,6 +500,7 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
- 		sgi_dev->base_addr = sgi_base;
- 		sgi_dev->regions = vgic_v3_sgibase_registers;
- 		sgi_dev->nr_regions = ARRAY_SIZE(vgic_v3_sgibase_registers);
-+		sgi_dev->iodev_type = IODEV_REDIST;
- 		sgi_dev->redist_vcpu = vcpu;
- 
- 		mutex_lock(&kvm->slots_lock);
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index a097c1a..97bf8e7 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -482,7 +482,7 @@ static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 		return 0;
- 	}
- 
--	switch (region->iodev_type) {
-+	switch (iodev->iodev_type) {
- 	case IODEV_CPUIF:
- 		return 1;
- 	case IODEV_DIST:
-@@ -515,7 +515,7 @@ static int dispatch_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 	if (!check_region(region, addr, len))
- 		return 0;
- 
--	switch (region->iodev_type) {
-+	switch (iodev->iodev_type) {
- 	case IODEV_CPUIF:
- 		break;
- 	case IODEV_DIST:
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index 513bb5c..b6950f3 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -16,19 +16,11 @@
- #ifndef __KVM_ARM_VGIC_MMIO_H__
- #define __KVM_ARM_VGIC_MMIO_H__
- 
--enum iodev_type {
--	IODEV_CPUIF,
--	IODEV_DIST,
--	IODEV_REDIST,
--	IODEV_ITS
--};
--
- struct vgic_register_region {
- 	unsigned int reg_offset;
- 	unsigned int len;
- 	unsigned int bits_per_irq;
- 	unsigned int access_flags;
--	enum iodev_type iodev_type;
- 	union {
- 		unsigned long (*read)(struct kvm_vcpu *vcpu, gpa_t addr,
- 				      unsigned int len);
-@@ -80,7 +72,6 @@ extern struct kvm_io_device_ops kvm_io_gic_ops;
- 		.bits_per_irq = bpi,					\
- 		.len = bpi * 1024 / 8,					\
- 		.access_flags = acc,					\
--		.iodev_type = type,					\
- 		.read = rd,						\
- 		.write = wr,						\
- 	}
-@@ -91,7 +82,6 @@ extern struct kvm_io_device_ops kvm_io_gic_ops;
- 		.bits_per_irq = 0,					\
- 		.len = length,						\
- 		.access_flags = acc,					\
--		.iodev_type = type,					\
- 		.read = rd,						\
- 		.write = wr,						\
- 	}
+Cheers,
+Andre
 
-It works exactly the same way, except that I don't have to type
-each and every register. I'll leave you to clean the rest of the
-patch! ;-)
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
