@@ -1,121 +1,144 @@
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Subject: Re: [PATCH v8 06/17] KVM: arm/arm64: VGIC: add refcounting for IRQs
-Date: Fri, 8 Jul 2016 14:14:43 +0100
-Message-ID: <dc178029-c6d2-32e3-b5a3-aef8cdf9eb33@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v8 09/17] KVM: arm64: introduce ITS emulation file with
+ MMIO framework
+Date: Fri, 8 Jul 2016 14:34:42 +0100
+Message-ID: <577FABF2.30302@arm.com>
 References: <20160705112309.28877-1-andre.przywara@arm.com>
- <20160705112309.28877-7-andre.przywara@arm.com> <577E6E99.9040003@arm.com>
- <da96b431-11ed-cd7d-fa77-0e261a8ad44c@arm.com> <577F8591.1090502@arm.com>
- <2d0ab9c8-1262-7a7e-fbb2-8f3c42abed66@arm.com> <577FA60A.9080502@arm.com>
+ <20160705112309.28877-10-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <577FA60A.9080502@arm.com>
+In-Reply-To: <20160705112309.28877-10-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/07/16 14:09, Marc Zyngier wrote:
-> On 08/07/16 13:54, Andr=E9 Przywara wrote:
->> On 08/07/16 11:50, Marc Zyngier wrote:
->>> On 08/07/16 11:28, Andre Przywara wrote:
->>>> Hi,
->>>>
->>>> On 07/07/16 16:00, Marc Zyngier wrote:
->>>>> On 05/07/16 12:22, Andre Przywara wrote:
+On 05/07/16 12:23, Andre Przywara wrote:
+> The ARM GICv3 ITS emulation code goes into a separate file, but needs
+> to be connected to the GICv3 emulation, of which it is an option.
+> The ITS MMIO handlers require the respective ITS pointer to be passed in,
+> so we amend the existing VGIC MMIO framework to let it cope with that.
+> Also we introduce the basic ITS data structure and initialize it, but
+> don't return any success yet, as we are not yet ready for the show.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arch/arm64/kvm/Makefile          |   1 +
+>  include/kvm/arm_vgic.h           |  14 +++++-
+>  virt/kvm/arm/vgic/vgic-its.c     | 100 +++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic-mmio-v2.c |  40 +++++++--------
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 104 ++++++++++++++++++++++++++-------------
+>  virt/kvm/arm/vgic/vgic-mmio.c    |  36 +++++++++++---
+>  virt/kvm/arm/vgic/vgic-mmio.h    |  31 +++++++++---
+>  virt/kvm/arm/vgic/vgic.h         |   7 +++
+>  8 files changed, 266 insertions(+), 67 deletions(-)
+>  create mode 100644 virt/kvm/arm/vgic/vgic-its.c
+> 
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index f00b2cd..a5b9664 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -29,5 +29,6 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v2.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v3.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-kvm-device.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-its.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index f6f860d..f606641 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -108,15 +108,27 @@ struct vgic_irq {
+>  };
+>  
+>  struct vgic_register_region;
+> +struct vgic_its;
+>  
+>  struct vgic_io_device {
+>  	gpa_t base_addr;
+> -	struct kvm_vcpu *redist_vcpu;
+> +	union {
+> +		struct kvm_vcpu *redist_vcpu;
+> +		struct vgic_its *its;
+> +	};
 
-=2E...
+The only question that springs to mind is...
 
->>>>>> @@ -236,6 +254,7 @@ retry:
->>>>>>  		goto retry;
->>>>>>  	}
->>>>>> =20
->>>>>> +	kref_get(&irq->refcount);
->>>>>
->>>>> Could you use vgic_get_irq() instead? I know it is slightly overk=
-ill,
->>>>> but I can already tell that we'll need to add some tracing in bot=
-h the
->>>>> put and get helpers in order to do some debugging. Having straigh=
-t
->>>>> kref_get/put is going to make this tracing difficult, so let's no=
-t go there.
->>>>
->>>> I'd rather not.
->>>> 1) Putting the IRQ on the ap_list is the "other user" of the
->>>> refcounting, I don't want to mix that unnecessarily with the
->>>> vgic_get_irq() (as in: get the struct by the number) use case. Tha=
-t may
->>>> actually help tracing, since we can have separate tracepoints to
->>>> distinguish them.
->>>
->>> And yet you end-up doing a vgic_put_irq() in the fold operation. Wh=
-ich
->>> is wrong, by the way, as the interrupt is still in in ap_list. This
->>> should be moved to the prune operation.
->>>
->>>> 2) This would violate the locking order, since we hold the irq_loc=
-k here
->>>> and possibly take the lpi_list_lock in vgic_get_irq().
->>>> I don't think we can or should drop the irq_lock and re-take it ju=
-st for
->>>> this.
->>>
->>> That's a much more convincing argument. And when you take the above=
- into
->>> account, you realize that your locking is not correct. You shouldn'=
-t be
->>> dropping the refcount in fold, but in prune, meaning that you're ho=
-lding
->>> the ap_lock and the irq_lock, same as when you inserted the interru=
-pt in
->>> the list.
->>>
->>> This is outlining an essential principle: if your locking/refcounti=
-ng is
->>> not symmetric, it is likely that you're doing something wrong, and =
-that
->>> should bother you really badly.
->>
->> Can you point me to the exact location where it's not symmetric?
->> I just looked at it again and can't find the issue.
->> I "put" it in v[23]_fold because we did a vgic_get_irq a few lines
->> before to translate the LR's intid into our struct vgic_irq pointer.
->=20
-> Right. I misread that one, apologies.
->=20
->> The vgic_get_irq() call isn't in this patch, because we used it alre=
-ady
->> before and this patch is just adding the respective puts.
->> The only asymmetry I could find is the expected one when it comes to=
- and
->> goes from the ap_list.
->=20
-> So I assume this is the pendent of the kref_get call?
+>  	const struct vgic_register_region *regions;
+>  	int nr_regions;
+>  	struct kvm_io_device dev;
+>  };
+>  
+> +struct vgic_its {
+> +	/* The base address of the ITS control register frame */
+> +	gpa_t			vgic_its_base;
+> +
+> +	bool			enabled;
+> +	struct vgic_io_device	iodev;
+> +};
+> +
+>  struct vgic_dist {
+>  	bool			in_kernel;
+>  	bool			ready;
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> new file mode 100644
+> index 0000000..ab8d244
+> --- /dev/null
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -0,0 +1,100 @@
+> +/*
+> + * GICv3 ITS emulation
+> + *
+> + * Copyright (C) 2015,2016 ARM Ltd.
+> + * Author: Andre Przywara <andre.przywara@arm.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/cpu.h>
+> +#include <linux/kvm.h>
+> +#include <linux/kvm_host.h>
+> +#include <linux/interrupt.h>
+> +
+> +#include <linux/irqchip/arm-gic-v3.h>
+> +
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_arm.h>
+> +#include <asm/kvm_mmu.h>
+> +
+> +#include "vgic.h"
+> +#include "vgic-mmio.h"
+> +
+> +#define REGISTER_ITS_DESC(off, rd, wr, length, acc)		\
+> +{								\
+> +	.reg_offset = off,					\
+> +	.len = length,						\
+> +	.access_flags = acc,					\
+> +	.iodev_type = IODEV_ITS,				\
 
-Yes.
+... why isn't this at the device level? It doesn't make much sense to
+have it at the register level (we never access a register in isolation,
+we always access it relatively to a device).
 
->=20
-> @@ -386,6 +412,7 @@ retry:
->  			list_del(&irq->ap_list);
->  			irq->vcpu =3D NULL;
->  			spin_unlock(&irq->irq_lock);
-> +			vgic_put_irq(vcpu->kvm, irq);
->  			continue;
->=20
-> If that's the case, please add a comment, because this is really hard=
- to
-> find out which vgic_put_irq() balances with a kref_get() and not a
-> vgic_get_irq().
+And given that the *only* time you actually evaluate this flag is in
+dispatch_mmio_read/write, there is zero benefit in duplicating it all
+over the place.
 
-Yes, that's what I thought as well just _after_ having hit the Send
-button ...
+Smaller structures, smaller patch. Am I missing something?
 
-I think much of the confusion stems from the fact that we used
-vgic_get_irq() before, only that it wasn't a "get" in the refcounting
-get-put sense.
-
-Cheers,
-Andre.
-
+	M.
+-- 
+Jazz is not dead. It just smells funny...
