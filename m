@@ -1,46 +1,62 @@
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [RFC v6 4/6] KVM: arm/arm64: enable irqchip routing
-Date: Fri, 8 Jul 2016 22:55:43 +0200
-Message-ID: <20160708205543.GC10741@potion>
-References: <1467794875-5237-1-git-send-email-eric.auger@redhat.com>
- <1467794875-5237-5-git-send-email-eric.auger@redhat.com>
- <20160707172052.5weyrjus3i3mgzik@hawk.localdomain>
- <11b05e3b-f3fd-aae3-b1e7-6ca9836cfc97@redhat.com>
- <20160708085233.qjptxd4qh7ukbgl3@hawk.localdomain>
+From: Itaru Kitayama <itaru.kitayama@riken.jp>
+Subject: Re: [PATCH] updated: arm64: KVM: vgic: deal with GIC sub-page
+ alignment
+Date: Sat, 9 Jul 2016 09:27:21 +0900
+Message-ID: <d91a1d8b-8a83-e676-0d5c-decad046662f@riken.jp>
+References: <5775F854.3060306@riken.jp> <57762C8A.8060105@arm.com>
+ <f2630ba4-1e97-ccfc-cfe2-525a21c215e6@riken.jp> <577635EE.1010002@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160708085233.qjptxd4qh7ukbgl3@hawk.localdomain>
-Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, pbonzini@redhat.com
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 51515499A1
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jul 2016 20:21:48 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id B41J2nVC8Vgs for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Jul 2016 20:21:46 -0400 (EDT)
+Received: from postman.riken.jp (postman4.riken.jp [134.160.33.86])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 84028412DD
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jul 2016 20:21:46 -0400 (EDT)
+In-Reply-To: <577635EE.1010002@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-2016-07-08 10:52+0200, Andrew Jones:
-> On Fri, Jul 08, 2016 at 10:16:53AM +0200, Auger Eric wrote:
->> On 07/07/2016 19:20, Andrew Jones wrote:
->> > On Wed, Jul 06, 2016 at 10:47:53AM +0200, Eric Auger wrote:
->> >> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
->> >> @@ -29,7 +29,9 @@
->> >>  #include <linux/srcu.h>
->> >>  #include <linux/export.h>
->> >>  #include <trace/events/kvm.h>
->> >> +#if !defined(CONFIG_ARM) && !defined(CONFIG_ARM64)
->> >>  #include "irq.h"
->> >> +#endif
->> > 
->> > Instead of doing this, shouldn't we add arch/arm[64]/kvm/irq.h files.
->> > Probably a simple one like ./arch/s390/kvm/irq.h ?
->> 
->> Well I considered this solution in the past but I did not find much to
->> put there (it was even void). typically irqchip_in_kernel is in
->> include/kvm/arm_vgic.h since the macro can be shared between arm/arm64.
-> 
-> I think I'd prefer a nearly empty file to the #ifdef's, but Paolo and
-> Radim should chime in.
+Marc,
 
-I concur, hiding ugliness in header files is what we strive for.
+I'm at the latest commit, fa9301d in the gicv-align branch at the 
+moment, with that an unmodified QEMU guest boots fine on a 64Kb page 
+granular host, thanks to the trapping you introduced.
+(I wanted to get some performance statistics of the new feature with 
+perf, but on arm64 most of them are unsupported)
 
-The files could #include <include/kvm/arm_vgic.h>, which might make
-their existence easier to understand.
+However, if I rebuild the kernel using defconfig with only the kernel 
+page size changed to 16Kb it does not boot at least on Overdrive 3000.
+
+
+On 7/1/16 6:20 PM, Marc Zyngier wrote:
+> On 01/07/16 09:59, Itaru Kitayama wrote:
+>> Marc,
+>> That's good news. Can I assume you'd keep the
+>> KVM_DEV_ARM_VGIC_GRP_ADDR_OFFSET attribute, or would you introduce new
+>> ones? I ask because either way we need the userland support, be it QEMU
+>> or kvmtool. I'm carrying the small QEMU patch at this moment.
+>
+> You can look at the kvm-arm64/gicv-align branch in my tree, which
+> contains some of the stuff. At the moment, the attribute is named
+> KVM_DEV_ARM_VGIC_GRP_GICC_OFFSET, but I don't mind changing the name.
+>
+> Thanks,
+>
+> 	M.
