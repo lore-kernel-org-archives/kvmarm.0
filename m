@@ -1,108 +1,70 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [RFC v6 1/6] KVM: api: pass the devid in the msi routing entry
-Date: Mon, 11 Jul 2016 17:24:05 +0100
-Message-ID: <33ff180f-4dca-1170-41f7-d7458e2e6407@arm.com>
+Subject: Re: [RFC v6 2/6] KVM: kvm_host: add devid in
+ kvm_kernel_irq_routing_entry
+Date: Mon, 11 Jul 2016 17:24:35 +0100
+Message-ID: <ec4005fb-1864-5165-7bec-364d3585f271@arm.com>
 References: <1467794875-5237-1-git-send-email-eric.auger@redhat.com>
- <1467794875-5237-2-git-send-email-eric.auger@redhat.com>
+ <1467794875-5237-3-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1467794875-5237-2-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1467794875-5237-3-git-send-email-eric.auger@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+Hi,
 
 On 06/07/16 09:47, Eric Auger wrote:
-> On ARM, the MSI msg (address and data) comes along with
-> out-of-band device ID information. The device ID encodes the
-> device that writes the MSI msg. Let's convey the device id in
-> kvm_irq_routing_msi and use KVM_MSI_VALID_DEVID flag value in
-> kvm_irq_routing_entry to indicate the msi devid is populated.
+> Extend kvm_kernel_irq_routing_entry to transport the device id
+> field, devid. A new flags field makes possible to indicate the
+> devid is valid. Those additions are used for ARM GICv3 ITS MSI
+> injection.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> ---
+> v4 -> v5:
+> - add Christoffer's R-b
+> 
+> v2 -> v3:
+> - add flags
+> 
+> v1 -> v2:
+> - replace msi_msg field by a struct composed of msi_msg and devid
+> 
+> RFC -> PATCH:
+> - reword the commit message after change in first patch (uapi)
+> ---
+>  include/linux/kvm_host.h | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index c87fe6f..fffa299 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -317,7 +317,11 @@ struct kvm_kernel_irq_routing_entry {
+>  			unsigned irqchip;
+>  			unsigned pin;
+>  		} irqchip;
+> -		struct msi_msg msi;
+> +		struct {
+> +			struct msi_msg msi;
+> +			u32 flags;
+> +			u32 devid;
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+I wonder if we should rename those two members to have an "msi_" prefix.
+Otherwise they turn into generic "route.flags" and "route.devid" (as
+seen in the next patch), which is a bit misleading.
 
 Cheers,
 Andre.
 
-> 
-> ---
-> v4 -> v5:
-> - some rephrasing in api.txt according to Christoffer's comments
-> v2 -> v3:
-> - replace usage of KVM_IRQ_ROUTING_EXTENDED_MSI type by
->   usage of KVM_MSI_VALID_DEVID flag
-> - add note about KVM_CAP_MSI_DEVID capability
-> 
-> v1 -> v2:
-> - devid id passed in kvm_irq_routing_msi instead of in
->   kvm_irq_routing_entry
-> 
-> RFC -> PATCH
-> - remove kvm_irq_routing_extended_msi and use union instead
-> ---
->  Documentation/virtual/kvm/api.txt | 19 +++++++++++++++++--
->  include/uapi/linux/kvm.h          |  5 ++++-
->  2 files changed, 21 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index f60b137..0065c8e 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -1468,7 +1468,11 @@ struct kvm_irq_routing_entry {
->  #define KVM_IRQ_ROUTING_S390_ADAPTER 3
->  #define KVM_IRQ_ROUTING_HV_SINT 4
->  
-> -No flags are specified so far, the corresponding field must be set to zero.
-> +flags:
-> +- KVM_MSI_VALID_DEVID: used along with KVM_IRQ_ROUTING_MSI
-> +  routing entry type, specifies that the devid field contains
-> +  a valid value.
-> +- zero otherwise
->  
->  struct kvm_irq_routing_irqchip {
->  	__u32 irqchip;
-> @@ -1479,9 +1483,20 @@ struct kvm_irq_routing_msi {
->  	__u32 address_lo;
->  	__u32 address_hi;
->  	__u32 data;
-> -	__u32 pad;
-> +	union {
-> +		__u32 pad;
-> +		__u32 devid;
-> +	};
->  };
->  
-> +devid: If KVM_MSI_VALID_DEVID is set, contains a unique device identifier
-> +       for the device that wrote the MSI message.
-> +       For PCI, this is usually a BFD identifier in the lower 16 bits.
-> +
-> +The per-VM KVM_CAP_MSI_DEVID capability advertises the requirement to
-> +provide the device ID. If this capability is not set, userland cannot
-> +rely on the kernel to allow the KVM_MSI_VALID_DEVID flag being set.
-> +
->  struct kvm_irq_routing_s390_adapter {
->  	__u64 ind_addr;
->  	__u64 summary_addr;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index d8c4c32..eb22208 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -879,7 +879,10 @@ struct kvm_irq_routing_msi {
->  	__u32 address_lo;
->  	__u32 address_hi;
->  	__u32 data;
-> -	__u32 pad;
-> +	union {
-> +		__u32 pad;
-> +		__u32 devid;
-> +	};
->  };
->  
->  struct kvm_irq_routing_s390_adapter {
+> +		};
+>  		struct kvm_s390_adapter_int adapter;
+>  		struct kvm_hv_sint hv_sint;
+>  	};
 > 
