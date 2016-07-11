@@ -1,135 +1,230 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v8 00/17] KVM: arm64: GICv3 ITS emulation
-Date: Mon, 11 Jul 2016 18:36:46 +0100
-Message-ID: <5783D92E.6060700@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v8 13/17] KVM: arm64: read initial LPI pending table
+Date: Mon, 11 Jul 2016 18:38:02 +0100
+Message-ID: <0d3b55a7-b116-2b92-1594-35598bdce208@arm.com>
 References: <20160705112309.28877-1-andre.przywara@arm.com>
+ <20160705112309.28877-14-andre.przywara@arm.com> <5783CE67.2070202@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160705112309.28877-1-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 242D349B78
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jul 2016 13:31:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id r0jB9tJLnkfQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Jul 2016 13:31:27 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B5249B77
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jul 2016 13:31:27 -0400 (EDT)
+In-Reply-To: <5783CE67.2070202@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/07/16 12:22, Andre Przywara wrote:
-> Hi,
-> 
-> this series allows those KVM guests that use an emulated GICv3 to use LPIs
-> as well, though in the moment this is limited to emulated PCI devices.
-> This is based on kvmarm/queue, which now only features the new VGIC
-> implementation.
-> 
-> This time only smaller corrections for the KVM ITS emulation support:
-> I addressed the review comments, which pointed out some vgic_put_irq()
-> omissions. Also the GICv2 init sequence has changed, so that we can now
-> bail out a KVM_DEVICE init without leaking a HYP mapping.
-> Also a bug in the MAPC emulation was fixed, which allowed multiple
-> mappings of the same collection ID.
-> The KVM_DEVICE init sequence has now some checks to ensure the right
-> order. The requirements are a bit stricter than for the GICv2/GICv3
-> devices: we need to setup the mapping address before calling the
-> INIT ioctl. This apparently has some implications on QEMU, I just need
-> to be convinced that we should follow QEMU's approach. It seems to look
-> a bit ugly to stash the ITS init into the existing GICv3 code, especially
-> since the ITS is a separate, optional device.
-> 
-> You can find all of this code (and the prerequisites) in the
-> its-emul/v8 branch of my repository [1].
-> This has been briefly tested on the model and on GICv3 hardware.
-> If you have GICv3 capable hardware, please test it on your setup.
-> Also of course any review comments are very welcome!
-> 
-> Cheers,
-> Andre.
-> 
-> Changelog v7..v8:
-> - rebase on old-VGIC removal patch
-> - add missing vgic_put_irq()s
-> - check and ensure proper ITS initialisation sequence
-> - avoid double collection mapping
-> - renaming vits_ function prefixes to vgic_its_
-> - properly setup PENDBASER (for new VGIC now)
-> - change vgic_v2_probe init order to allow clean exit
-> 
-> Changelog v6..v7:
-> - use kref reference counting
-> - remove RCU usage from lpi_list, use spinlock instead
-> - copy list of LPIs before accessing guest memory
-> - introduce kvm_io_bus_get_dev()
-> - refactor parts of arm-gic-v3.h header file
-> - provide proper initial values for redistributor and ITS base registers
-> - rework sanitisation of base registers
-> - rework VGIC MMIO dispatching to differentiate between VGIC parts
-> - smaller fixes, also comments and commit messages amended
-> 
-> Changelog v5..v6:
-> - remove its_list from VGIC code
-> - add lpi_list and accessor functions
-> - introduce reference counting to struct vgic_irq
-> - replace its_lock spinlock with its_cmd and its_lock mutexes
-> - simplify guest memory accesses (due to the new mutexes)
-> - avoid unnecessary affinity updates
-> - refine base register address masking
-> - introduce sanity checks for PROPBASER and PENDBASER
-> - implement BASER<n> registers
-> - pass struct vgic_its directly into the MMIO handlers
-> - convert KVM_SIGNAL_MSI ioctl into an MMIO write
-> - add explicit INIT ioctl to the ITS KVM device
-> - adjusting comments and commit messages
-> 
-> Changelog v4..v5:
-> - adapting to final new VGIC (MMIO handlers, etc.)
-> - new KVM device to model an ITS, multiple instances allowed
-> - move redistributor data into struct vgic_cpu
-> - separate distributor and ITS(es)
-> - various bug fixes and amended comments after review comments
-> 
-> Changelog v3..v4:
-> - adapting to new VGIC (changes in IRQ injection mechanism)
-> 
-> Changelog v2..v3:
-> - adapt to 4.3-rc and Christoffer's timer rework
-> - adapt spin locks on handling PROPBASER/PENDBASER registers
-> - rework locking in ITS command handling (dropping dist where needed)
-> - only clear LPI pending bit if LPI could actually be queued
-> - simplify GICR_CTLR handling
-> - properly free ITTEs (including our pending bitmap)
-> - fix corner cases with unmapped collections
-> - keep retire_lr() around
-> - rename vgic_handle_base_register to vgic_reg64_access()
-> - use kcalloc instead of kmalloc
-> - minor fixes, renames and added comments
-> 
-> Changelog v1..v2
-> - fix issues when using non-ITS GICv3 emulation
-> - streamline frame address initialization (new patch 05/15)
-> - preallocate buffer memory for reading from guest's memory
-> - move locking into the actual command handlers
-> -   preallocate memory for new structures if needed
-> - use non-atomic __set_bit() and __clear_bit() when under the lock
-> - add INT command handler to allow LPI injection from the guest
-> - rewrite CWRITER handler to align with new locking scheme
-> - remove unneeded CONFIG_HAVE_KVM_MSI #ifdefs
-> - check memory table size against our LPI limit (65536 interrupts)
-> - observe initial gap of 1024 interrupts in pending table
-> - use term "configuration table" to be in line with the spec
-> - clarify and extend documentation on API extensions
-> - introduce new KVM_CAP_MSI_DEVID capability to advertise device ID requirement
-> - update, fix and add many comments
-> - minor style changes as requested by reviewers
+Hi,
 
-I'm done for this round. Some issues are relatively cosmetic and can be
-fixed pretty quickly. Some others need more attention. Overall, you seem
-to leave crumbles of previous designs, which makes it hard to follow
-sometimes (I love SW archaeology as much as the next guy, but the GIC
-has stopped exciting me a while ago...).
+On 11/07/16 17:50, Marc Zyngier wrote:
+> On 05/07/16 12:23, Andre Przywara wrote:
+>> The LPI pending status for a GICv3 redistributor is held in a table
+>> in (guest) memory. To achieve reasonable performance, we cache this
+>> data in our struct vgic_irq. The initial pending state must be read
+>> from guest memory upon enabling LPIs for this redistributor.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 81 ++++++++++++++++++++++++++++++++++++++++++++
+>>  virt/kvm/arm/vgic/vgic.h     |  6 ++++
+>>  2 files changed, 87 insertions(+)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 1e2e649..29bb4fe 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -93,6 +93,81 @@ struct its_itte {
+>>  		list_for_each_entry(itte, &(dev)->itt_head, itte_list)
+>>  
+>>  #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
+>> +#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
+> 
+> 52 bits again. Pick a side!
 
-Looking forward to v9.
+Well, this is the architecturally described address field in the
+register. It's only used to mask the (ideally already) sanitised value.
+But you are right that I should clear bits 51:48 upon the guest writing
+the register (also true for the other registers). Will fix this.
 
-Thanks,
+>> +
+>> +static int vgic_its_copy_lpi_list(struct kvm *kvm, u32 **intid_ptr)
+>> +{
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>> +	struct vgic_irq *irq;
+>> +	u32 *intids;
+>> +	int irq_count = dist->lpi_list_count, i = 0;
+>> +
+>> +	/*
+>> +	 * We use the current value of the list length, which may change
+>> +	 * after the kmalloc. We don't care, because the guest shouldn't
+>> +	 * change anything while the command handling is still running,
+>> +	 * and in the worst case we would miss a new IRQ, which one wouldn't
+>> +	 * expect to be covered by this command anyway.
+>> +	 */
+>> +	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL);
+>> +	if (!intids)
+>> +		return -ENOMEM;
+>> +
+>> +	spin_lock(&dist->lpi_list_lock);
+>> +	list_for_each_entry(irq, &dist->lpi_list_head, lpi_entry) {
+>> +		if (kref_get_unless_zero(&irq->refcount)) {
+>> +			intids[i] = irq->intid;
+>> +			vgic_put_irq_locked(kvm, irq);
+> 
+> This is ugly. You know you're not going to free the irq, since it was at
+> least one when you did kref_get_unless_zero(). Why not doing a simple
+> kref_put (possibly in a macro so that you can hide the dummy release
+> function)?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Do I know that? What prevents another user (ap_list or ITTE) to remove
+its reference meanwhile? The lpi_list_lock does not help here, since
+that just protects the lpi_list, but not any references.
+But I am wondering whether I actually still need that unless_zero
+version, let me think about that.
+
+>> +		}
+>> +		if (i++ == irq_count)
+>> +			break;
+>> +	}
+>> +	spin_unlock(&dist->lpi_list_lock);
+>> +
+>> +	*intid_ptr = intids;
+>> +	return irq_count;
+>> +}
+>> +
+>> +/*
+>> + * Scan the whole LPI pending table and sync the pending bit in there
+>> + * with our own data structures. This relies on the LPI being
+>> + * mapped before.
+>> + */
+>> +static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+>> +{
+>> +	gpa_t pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
+>> +	struct vgic_irq *irq;
+>> +	u8 pendmask;
+>> +	int ret = 0;
+>> +	u32 *intids;
+>> +	int nr_irqs, i;
+>> +
+>> +	nr_irqs = vgic_its_copy_lpi_list(vcpu->kvm, &intids);
+>> +	if (nr_irqs < 0)
+>> +		return nr_irqs;
+>> +
+>> +	for (i = 0; i < nr_irqs; i++) {
+>> +		int byte_offset, bit_nr;
+>> +
+>> +		byte_offset = intids[i] / BITS_PER_BYTE;
+>> +		bit_nr = intids[i] % BITS_PER_BYTE;
+>> +
+>> +		ret = kvm_read_guest(vcpu->kvm, pendbase + byte_offset,
+>> +				     &pendmask, 1);
+> 
+> How about having a small cache of the last read offset and data? If LPIs
+> are contiguously allocated, you save yourself quite a few (expensive)
+> userspace accesses.
+
+Sounds good.
+
+> 
+>> +		if (ret) {
+>> +			kfree(intids);
+>> +			return ret;
+>> +		}
+>> +
+>> +		irq = vgic_get_irq(vcpu->kvm, NULL, intids[i]);
+>> +		spin_lock(&irq->irq_lock);
+>> +		irq->pending = pendmask & (1U << bit_nr);
+>> +		vgic_queue_irq_unlock(vcpu->kvm, irq);
+>> +		vgic_put_irq(vcpu->kvm, irq);
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>>  
+>>  static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
+>>  					     struct vgic_its *its,
+>> @@ -415,6 +490,12 @@ static struct vgic_register_region its_registers[] = {
+>>  		VGIC_ACCESS_32bit),
+>>  };
+>>  
+>> +/* This is called on setting the LPI enable bit in the redistributor. */
+>> +void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+>> +{
+>> +	its_sync_lpi_pending_table(vcpu);
+>> +}
+>> +
+>>  static int vgic_its_register(struct kvm *kvm, struct vgic_its *its)
+>>  {
+>>  	struct vgic_io_device *iodev = &its->iodev;
+>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+>> index eef9ec1..4a9165f 100644
+>> --- a/virt/kvm/arm/vgic/vgic.h
+>> +++ b/virt/kvm/arm/vgic/vgic.h
+>> @@ -25,6 +25,7 @@
+>>  #define IS_VGIC_ADDR_UNDEF(_x)  ((_x) == VGIC_ADDR_UNDEF)
+>>  
+>>  #define INTERRUPT_ID_BITS_SPIS	10
+>> +#define INTERRUPT_ID_BITS_ITS	16
+> 
+> Do we have plan for a userspace-accessible property for this? I can
+> imagine userspace willing to have bigger LPI space...
+
+The idea was to add an attribute later via the kvm_device API to set up
+LPI parameters. That's why I introduced the init call to signal that
+setup is finished and we can use those numbers (or defaults).
+Since we can check for the existence of attributes via the has_attr
+interface, we can add them at any time without breaking something.
+I can look how involved it is to add something for the number of LPI
+(bits) now.
+
+Cheers,
+Andre.
+
+
+>>  #define VGIC_PRI_BITS		5
+>>  
+>>  #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
+>> @@ -79,6 +80,7 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
+>>  bool vgic_has_its(struct kvm *kvm);
+>>  int kvm_vgic_register_its_device(void);
+>>  struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid);
+>> +void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+>>  #else
+>>  static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+>>  {
+>> @@ -145,6 +147,10 @@ static inline struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid)
+>>  {
+>>  	return NULL;
+>>  }
+>> +
+>> +static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+>> +{
+>> +}
+>>  #endif
+>>  
+>>  int kvm_register_vgic_device(unsigned long type);
+>>
+> 
+> Thanks,
+> 
+> 	M.
+> 
