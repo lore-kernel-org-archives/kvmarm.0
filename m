@@ -1,26 +1,25 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v8 15/17] KVM: arm64: implement ITS command queue command
- handlers
-Date: Mon, 11 Jul 2016 18:52:10 +0100
-Message-ID: <5783DCCA.6070208@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v8 13/17] KVM: arm64: read initial LPI pending table
+Date: Tue, 12 Jul 2016 12:33:34 +0100
+Message-ID: <152d1107-febf-3aa4-ab85-e6cc8c8aa840@arm.com>
 References: <20160705112309.28877-1-andre.przywara@arm.com>
- <20160705112309.28877-16-andre.przywara@arm.com> <5783D4AD.30206@arm.com>
- <3d954003-6fcd-5d2b-264b-c7eda68dadb0@arm.com>
+ <20160705112309.28877-14-andre.przywara@arm.com> <5783CE67.2070202@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D4FA49B81
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jul 2016 13:46:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 049C249B7B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 07:27:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n-S7-GDL+-RW for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Jul 2016 13:46:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30F8249B7F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jul 2016 13:46:26 -0400 (EDT)
-In-Reply-To: <3d954003-6fcd-5d2b-264b-c7eda68dadb0@arm.com>
+ with ESMTP id glhzdFZjiCTw for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Jul 2016 07:27:01 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 922FB49B58
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 07:27:01 -0400 (EDT)
+In-Reply-To: <5783CE67.2070202@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,160 +29,81 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Diana Madalina Craciun <diana.craciun@nxp.com>
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/07/16 18:47, Andre Przywara wrote:
-> Hi,
-> 
-> On 11/07/16 18:17, Marc Zyngier wrote:
->> On 05/07/16 12:23, Andre Przywara wrote:
->>> The connection between a device, an event ID, the LPI number and the
->>> allocated CPU is stored in in-memory tables in a GICv3, but their
->>> format is not specified by the spec. Instead software uses a command
->>> queue in a ring buffer to let the ITS implementation use their own
->>> format.
->>> Implement handlers for the various ITS commands and let them store
->>> the requested relation into our own data structures. Those data
->>> structures are protected by the its_lock mutex.
->>> Our internal ring buffer read and write pointers are protected by the
->>> its_cmd mutex, so that at most one VCPU per ITS can handle commands at
->>> any given time.
->>> Error handling is very basic at the moment, as we don't have a good
->>> way of communicating errors to the guest (usually a SError).
->>> The INT command handler is missing at this point, as we gain the
->>> capability of actually injecting MSIs into the guest only later on.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  virt/kvm/arm/vgic/vgic-its.c | 609 ++++++++++++++++++++++++++++++++++++++++++-
->>>  1 file changed, 605 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index 5de71bd..432daed 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -58,6 +58,43 @@ out_unlock:
->>>  	return irq;
->>>  }
->>>  
->>> +/*
->>> + * Creates a new (reference to a) struct vgic_irq for a given LPI.
->>> + * If this LPI is already mapped on another ITS, we increase its refcount
->>> + * and return a pointer to the existing structure.
->>> + * If this is a "new" LPI, we allocate and initialize a new struct vgic_irq.
->>> + * This function returns a pointer to the _unlocked_ structure.
->>> + */
->>> +static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid)
->>> +{
->>> +	struct vgic_dist *dist = &kvm->arch.vgic;
->>> +	struct vgic_irq *irq = vgic_its_get_lpi(kvm, intid);
->>
->> So this thing doesn't return with any lock held...
->>
->>> +
->>> +	/* In this case there is no put, since we keep the reference. */
->>> +	if (irq)
->>> +		return irq;
->>> +
->>> +	irq = kzalloc(sizeof(struct vgic_irq), GFP_KERNEL);
->>> +
->>> +	if (!irq)
->>> +		return NULL;
->>> +
->>> +	INIT_LIST_HEAD(&irq->lpi_entry);
->>> +	INIT_LIST_HEAD(&irq->ap_list);
->>> +	spin_lock_init(&irq->irq_lock);
->>> +
->>> +	irq->config = VGIC_CONFIG_EDGE;
->>> +	kref_init(&irq->refcount);
->>> +	irq->intid = intid;
->>
->> which means that two callers can allocate their own irq structure...
-> 
-> In practise this will never happen, because the only caller
-> (handle_mapi) takes the its_lock mutex. But I see that this is fragile
+Hi,
 
-Given that the its_lock is per ITS, and that we're dealing with global
-objects, this doesn't protect against anything. I can have two VCPUs
-firing MAPIs on two ITSs, and hit that path with reasonable chances of
-creating mayhem.
-
-> and not safe. I guess I can search the list again after having taken the
-> lock.
-
-Please do.
-
-> 
->>> +
->>> +	spin_lock(&dist->lpi_list_lock);
->>> +	list_add_tail(&irq->lpi_entry, &dist->lpi_list_head);
->>> +	dist->lpi_list_count++;
->>> +	spin_unlock(&dist->lpi_list_lock);
+On 11/07/16 17:50, Marc Zyngier wrote:
+> On 05/07/16 12:23, Andre Przywara wrote:
+>> The LPI pending status for a GICv3 redistributor is held in a table
+>> in (guest) memory. To achieve reasonable performance, we cache this
+>> data in our struct vgic_irq. The initial pending state must be read
+>> from guest memory upon enabling LPIs for this redistributor.
 >>
->> and insert it. Not too bad if they are different LPIs, but leading to
->> Armageddon if they are the same. You absolutely need to check for the
->> the presence of the interrupt in this list *while holding the lock*.
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 81 ++++++++++++++++++++++++++++++++++++++++++++
+>>  virt/kvm/arm/vgic/vgic.h     |  6 ++++
+>>  2 files changed, 87 insertions(+)
 >>
->>> +
->>> +	return irq;
->>> +}
->>> +
->>>  struct its_device {
->>>  	struct list_head dev_list;
->>>  
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 1e2e649..29bb4fe 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -93,6 +93,81 @@ struct its_itte {
+>>  		list_for_each_entry(itte, &(dev)->itt_head, itte_list)
+>>  
+>>  #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
+>> +#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
 > 
-> ....
+> 52 bits again. Pick a side!
 > 
->>> +/*
->>> + * The INVALL command requests flushing of all IRQ data in this collection.
->>> + * Find the VCPU mapped to that collection, then iterate over the VM's list
->>> + * of mapped LPIs and update the configuration for each IRQ which targets
->>> + * the specified vcpu. The configuration will be read from the in-memory
->>> + * configuration table.
->>> + */
->>> +static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
->>> +				  u64 *its_cmd)
->>> +{
->>> +	u32 coll_id = its_cmd_get_collection(its_cmd);
->>> +	struct its_collection *collection;
->>> +	struct kvm_vcpu *vcpu;
->>> +	struct vgic_irq *irq;
->>> +	u32 *intids;
->>> +	int irq_count, i;
->>> +
->>> +	mutex_lock(&its->its_lock);
->>> +
->>> +	collection = find_collection(its, coll_id);
->>> +	if (!its_is_collection_mapped(collection))
->>> +		return E_ITS_INVALL_UNMAPPED_COLLECTION;
->>> +
->>> +	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
->>> +
->>> +	irq_count = vgic_its_copy_lpi_list(kvm, &intids);
->>> +	if (irq_count < 0)
->>> +		return irq_count;
->>> +
->>> +	for (i = 0; i < irq_count; i++) {
->>> +		irq = vgic_get_irq(kvm, NULL, intids[i]);
->>> +		if (!irq)
->>> +			continue;
->>> +		update_lpi_config_filtered(kvm, irq, vcpu);
->>> +		vgic_put_irq_locked(kvm, irq);
->>
->> Where is the lpi_list_lock taken?
+>> +
+>> +static int vgic_its_copy_lpi_list(struct kvm *kvm, u32 **intid_ptr)
+>> +{
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>> +	struct vgic_irq *irq;
+>> +	u32 *intids;
+>> +	int irq_count = dist->lpi_list_count, i = 0;
+>> +
+>> +	/*
+>> +	 * We use the current value of the list length, which may change
+>> +	 * after the kmalloc. We don't care, because the guest shouldn't
+>> +	 * change anything while the command handling is still running,
+>> +	 * and in the worst case we would miss a new IRQ, which one wouldn't
+>> +	 * expect to be covered by this command anyway.
+>> +	 */
+>> +	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL);
+>> +	if (!intids)
+>> +		return -ENOMEM;
+>> +
+>> +	spin_lock(&dist->lpi_list_lock);
+>> +	list_for_each_entry(irq, &dist->lpi_list_head, lpi_entry) {
+>> +		if (kref_get_unless_zero(&irq->refcount)) {
+>> +			intids[i] = irq->intid;
+>> +			vgic_put_irq_locked(kvm, irq);
 > 
-> Argh, good catch!
-> 
->> And why would we need it since we've
->> copied everything already? By the look of it, this vgic_put_irq_locked
->> should not exist at all, as the only other use case is quite dubious.
-> 
-> Possibly, I don't like it either. Let me check if I can kill that sucker.
+> This is ugly. You know you're not going to free the irq, since it was at
+> least one when you did kref_get_unless_zero(). Why not doing a simple
+> kref_put (possibly in a macro so that you can hide the dummy release
+> function)?
 
-Thanks,
+I think I don't need the get and put at all, which would allow to
+totally drop the vgic_put_irq_locked version:
+1) We have the lpi_list_lock, so if we find the IRQ in the list, it's
+still valid (we free it only after having it removed).
+2) It can't be removed without dropping the lock.
+3) We just store the number, not the pointer.
+4) An LPI can be unmapped anyway after we dropped the lock and before we
+actually use the copy. We take care of that already by calling get again
+and coping with a NULL return.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+So is it feasible to remove the get and put here completely or is that
+dodgy since we technically use the reference?
+Shall I document that one doesn't need get and put if holding the
+lpi_list_lock?
+
+Cheers,
+Andre.
