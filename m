@@ -1,25 +1,24 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v9 06/17] KVM: arm/arm64: VGIC: add refcounting for IRQs
-Date: Wed, 13 Jul 2016 14:50:25 +0100
-Message-ID: <f9aeb32e-ff1a-ab2e-945c-0e8e531e43b9@arm.com>
-References: <20160713015909.28793-1-andre.przywara@arm.com>
- <20160713015909.28793-7-andre.przywara@arm.com> <578630E4.3000305@arm.com>
+From: Anna-Maria Gleixner <anna-maria@linutronix.de>
+Subject: [patch V2 44/67] arm/kvm/vgic: Convert to hotplug state machine
+Date: Wed, 13 Jul 2016 17:16:46 -0000
+Message-ID: <20160713153336.546953286@linutronix.de>
+References: <20160713153219.128052238@linutronix.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A39E1499A1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2016 09:43:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA03349B36
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2016 13:13:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dv48SCpez1Te for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Jul 2016 09:43:49 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1843A48531
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2016 09:43:47 -0400 (EDT)
-In-Reply-To: <578630E4.3000305@arm.com>
+ with ESMTP id lqU8-rsMjg60 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Jul 2016 13:13:33 -0400 (EDT)
+Received: from Galois.linutronix.de (www.linutronix.de [62.245.132.108])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C8C9A49B1D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2016 13:13:33 -0400 (EDT)
+Content-Disposition: inline;
+ filename=0043-arm-kvm-vgic-Convert-to-hotplug-state-machine.patch
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,162 +28,112 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, Richard Cochran <rcochran@linutronix.de>, kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Anna-Maria Gleixner <anna-maria@linutronix.de>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, kvmarm@lists.cs.columbia.edu, Gleb Natapov <gleb@kernel.org>, rt@linutronix.de, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+From: Richard Cochran <rcochran@linutronix.de>
 
-On 13/07/16 13:15, Marc Zyngier wrote:
-> On 13/07/16 02:58, Andre Przywara wrote:
->> In the moment our struct vgic_irq's are statically allocated at guest
->> creation time. So getting a pointer to an IRQ structure is trivial and
->> safe. LPIs are more dynamic, they can be mapped and unmapped at any time
->> during the guest's _runtime_.
->> In preparation for supporting LPIs we introduce reference counting for
->> those structures using the kernel's kref infrastructure.
->> Since private IRQs and SPIs are statically allocated, the refcount never
->> drops to 0 at the moment, but we increase it when an IRQ gets onto a VCPU
->> list and decrease it when it gets removed.
->> This introduces vgic_put_irq(), which wraps kref_put and hides the
->> release function from the callers.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>  include/kvm/arm_vgic.h           |  1 +
->>  virt/kvm/arm/vgic/vgic-init.c    |  2 ++
->>  virt/kvm/arm/vgic/vgic-mmio-v2.c |  8 ++++++
->>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 20 +++++++++------
->>  virt/kvm/arm/vgic/vgic-mmio.c    | 25 ++++++++++++++++++-
->>  virt/kvm/arm/vgic/vgic-v2.c      |  1 +
->>  virt/kvm/arm/vgic/vgic-v3.c      |  1 +
->>  virt/kvm/arm/vgic/vgic.c         | 53 ++++++++++++++++++++++++++++++++--------
->>  virt/kvm/arm/vgic/vgic.h         |  1 +
->>  9 files changed, 94 insertions(+), 18 deletions(-)
-> 
-> [...]
-> 
->> --- a/virt/kvm/arm/vgic/vgic.c
->> +++ b/virt/kvm/arm/vgic/vgic.c
->> @@ -48,13 +48,20 @@ struct vgic_global __section(.hyp.text) kvm_vgic_global_state;
->>  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->>  			      u32 intid)
->>  {
->> -	/* SGIs and PPIs */
->> -	if (intid <= VGIC_MAX_PRIVATE)
->> -		return &vcpu->arch.vgic_cpu.private_irqs[intid];
->> +	struct vgic_dist *dist = &kvm->arch.vgic;
->> +	struct vgic_irq *irq;
->>  
->> -	/* SPIs */
->> -	if (intid <= VGIC_MAX_SPI)
->> -		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
->> +	if (intid <= VGIC_MAX_PRIVATE) {        /* SGIs and PPIs */
->> +		irq = &vcpu->arch.vgic_cpu.private_irqs[intid];
->> +		kref_get(&irq->refcount);
->> +		return irq;
->> +	}
->> +
->> +	if (intid <= VGIC_MAX_SPI) {            /* SPIs */
->> +		irq = &dist->spis[intid - VGIC_NR_PRIVATE_IRQS];
->> +		kref_get(&irq->refcount);
->> +		return irq;
->> +	}
-> 
-> I'm a bit concerned by the fact that we perform the refcounting on 
-> objects that shouldn't be concerned by it. None of the static interrupts
-> should have to suffer from the overhead, as they cannot be freed. 
-> So I came up with the following patch:
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index c7cd1a3..6bbff9a 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -91,19 +91,12 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  			      u32 intid)
->  {
->  	struct vgic_dist *dist = &kvm->arch.vgic;
-> -	struct vgic_irq *irq;
->  
-> -	if (intid <= VGIC_MAX_PRIVATE) {        /* SGIs and PPIs */
-> -		irq = &vcpu->arch.vgic_cpu.private_irqs[intid];
-> -		kref_get(&irq->refcount);
-> -		return irq;
-> -	}
-> +	if (intid <= VGIC_MAX_PRIVATE)		/* SGIs and PPIs */
-> +		return &vcpu->arch.vgic_cpu.private_irqs[intid];
->  
-> -	if (intid <= VGIC_MAX_SPI) {            /* SPIs */
-> -		irq = &dist->spis[intid - VGIC_NR_PRIVATE_IRQS];
-> -		kref_get(&irq->refcount);
-> -		return irq;
-> -	}
-> +	if (intid <= VGIC_MAX_SPI)		/* SPIs */
-> +		return &dist->spis[intid - VGIC_NR_PRIVATE_IRQS];
->  
->  	if (intid >= VGIC_MIN_LPI)		/* LPIs */
->  		return vgic_get_lpi(kvm, intid);
-> @@ -112,6 +105,14 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  	return NULL;
->  }
->  
-> +static void vgic_get_irq_kref(struct vgic_irq *irq)
-> +{
-> +	if (irq->intid < VGIC_MIN_LPI)
-> +		return;
-> +
-> +	kref_get(&irq->refcount);
-> +}
-> +
->  /*
->   * We can't do anything in here, because we lack the kvm pointer to
->   * lock and remove the item from the lpi_list. So we keep this function
-> @@ -125,10 +126,10 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->  {
->  	struct vgic_dist *dist;
->  
-> -	if (!kref_put(&irq->refcount, vgic_irq_release))
-> +	if (irq->intid < VGIC_MIN_LPI)
->  		return;
->  
-> -	if (irq->intid < VGIC_MIN_LPI)
-> +	if (!kref_put(&irq->refcount, vgic_irq_release))
->  		return;
->  
->  	dist = &kvm->arch.vgic;
-> @@ -313,7 +314,11 @@ retry:
->  		goto retry;
->  	}
->  
-> -	kref_get(&irq->refcount);
-> +	/*
-> +	 * Grab a reference to the irq to reflect the fact that it is
-> +	 * now in the ap_list.
-> +	 */
-> +	vgic_get_irq_kref(irq);
->  	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
->  	irq->vcpu = vcpu;
->  
-> @@ -473,8 +478,11 @@ retry:
->  			spin_unlock(&irq->irq_lock);
->  
->  			/*
-> -			 * This put matches the get when we added the LPI to
-> -			 * the ap_list. We now drop the reference from the list.
-> +			 * This vgic_put_irq call matches the
-> +			 * vgic_get_irq_kref in vgic_queue_irq_unlock,
-> +			 * where we added the LPI to the ap_list. As
-> +			 * we remove the irq from the list, we drop
-> +			 * also drop the refcount.
->  			 */
->  			vgic_put_irq(vcpu->kvm, irq);
->  			continue;
-> 
-> Thoughts?
+Install the callbacks via the state machine and let the core invoke
+the callbacks on the already online CPUs.
+The VGIC callback is run after KVM's main callback since it reflects the
+makefile order.
 
-Looks good to me, I checked the code and quickly tested it as well,
-without any issues.
-I'd integrate this in next respin.
+Signed-off-by: Richard Cochran <rcochran@linutronix.de>
+Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Gleb Natapov <gleb@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Radim Krcmar <rkrcmar@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: kvm@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org
+Signed-off-by: Anna-Maria Gleixner <anna-maria@linutronix.de>
+---
+ include/linux/cpuhotplug.h |  1 +
+ virt/kvm/arm/vgic.c        | 39 ++++++++-------------------------------
+ 2 files changed, 9 insertions(+), 31 deletions(-)
 
-Thanks!
-Andre.
+diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+index ef7bfa6..80c15ce 100644
+--- a/include/linux/cpuhotplug.h
++++ b/include/linux/cpuhotplug.h
+@@ -43,6 +43,7 @@ enum cpuhp_state {
+ 	CPUHP_AP_QCOM_TIMER_STARTING,
+ 	CPUHP_AP_MIPS_GIC_TIMER_STARTING,
+ 	CPUHP_AP_KVM_STARTING,
++	CPUHP_AP_KVM_ARM_VGIC_STARTING,
+ 	CPUHP_AP_LEDTRIG_STARTING,
+ 	CPUHP_AP_NOTIFY_STARTING,
+ 	CPUHP_AP_ONLINE,
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index c3bfbb9..67cb5e9 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -2326,32 +2326,18 @@ int vgic_has_attr_regs(const struct vgic_io_range *ranges, phys_addr_t offset)
+ 		return -ENXIO;
+ }
+ 
+-static void vgic_init_maintenance_interrupt(void *info)
++static int vgic_starting_cpu(unsigned int cpu)
+ {
+ 	enable_percpu_irq(vgic->maint_irq, 0);
++	return 0;
+ }
+ 
+-static int vgic_cpu_notify(struct notifier_block *self,
+-			   unsigned long action, void *cpu)
++static int vgic_dying_cpu(unsigned int cpu)
+ {
+-	switch (action) {
+-	case CPU_STARTING:
+-	case CPU_STARTING_FROZEN:
+-		vgic_init_maintenance_interrupt(NULL);
+-		break;
+-	case CPU_DYING:
+-	case CPU_DYING_FROZEN:
+-		disable_percpu_irq(vgic->maint_irq);
+-		break;
+-	}
+-
+-	return NOTIFY_OK;
++	disable_percpu_irq(vgic->maint_irq);
++	return 0;
+ }
+ 
+-static struct notifier_block vgic_cpu_nb = {
+-	.notifier_call = vgic_cpu_notify,
+-};
+-
+ static int kvm_vgic_probe(void)
+ {
+ 	const struct gic_kvm_info *gic_kvm_info;
+@@ -2392,19 +2378,10 @@ int kvm_vgic_hyp_init(void)
+ 		return ret;
+ 	}
+ 
+-	ret = __register_cpu_notifier(&vgic_cpu_nb);
+-	if (ret) {
+-		kvm_err("Cannot register vgic CPU notifier\n");
+-		goto out_free_irq;
+-	}
+-
+-	on_each_cpu(vgic_init_maintenance_interrupt, NULL, 1);
+-
++	cpuhp_setup_state(CPUHP_AP_KVM_ARM_VGIC_STARTING,
++			  "AP_KVM_ARM_VGIC_STARTING", vgic_starting_cpu,
++			  vgic_dying_cpu);
+ 	return 0;
+-
+-out_free_irq:
+-	free_percpu_irq(vgic->maint_irq, kvm_get_running_vcpus());
+-	return ret;
+ }
+ 
+ int kvm_irq_map_gsi(struct kvm *kvm,
+-- 
+2.8.1
