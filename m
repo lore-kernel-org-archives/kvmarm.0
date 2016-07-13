@@ -1,24 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v9 06/17] KVM: arm/arm64: VGIC: add refcounting for IRQs
-Date: Wed, 13 Jul 2016 13:15:32 +0100
-Message-ID: <578630E4.3000305@arm.com>
+Subject: Re: [PATCH v9 07/17] irqchip: refactor and add GICv3 definitions
+Date: Wed, 13 Jul 2016 13:28:12 +0100
+Message-ID: <578633DC.4070806@arm.com>
 References: <20160713015909.28793-1-andre.przywara@arm.com>
- <20160713015909.28793-7-andre.przywara@arm.com>
+ <20160713015909.28793-8-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84BD849B2C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2016 08:09:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 789A949B2C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2016 08:22:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FoFZ7cODhXOy for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Jul 2016 08:09:44 -0400 (EDT)
+ with ESMTP id FDgEVDqzyVzq for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Jul 2016 08:22:24 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1557749B1D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2016 08:09:43 -0400 (EDT)
-In-Reply-To: <20160713015909.28793-7-andre.przywara@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5732449B1D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2016 08:22:23 -0400 (EDT)
+In-Reply-To: <20160713015909.28793-8-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,150 +33,95 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 13/07/16 02:58, Andre Przywara wrote:
-> In the moment our struct vgic_irq's are statically allocated at guest
-> creation time. So getting a pointer to an IRQ structure is trivial and
-> safe. LPIs are more dynamic, they can be mapped and unmapped at any time
-> during the guest's _runtime_.
-> In preparation for supporting LPIs we introduce reference counting for
-> those structures using the kernel's kref infrastructure.
-> Since private IRQs and SPIs are statically allocated, the refcount never
-> drops to 0 at the moment, but we increase it when an IRQ gets onto a VCPU
-> list and decrease it when it gets removed.
-> This introduces vgic_put_irq(), which wraps kref_put and hides the
-> release function from the callers.
+> arm-gic-v3.h contains bit and register definitions for the GICv3 and ITS,
+> at least for the bits the we currently care about.
+> The ITS emulation needs more definitions, so add them and refactor
+> the memory attribute #defines to be more universally usable.
+> To avoid changing all users, we still provide some of the old definitons
+> defined with the help of the new macros.
 > 
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  include/kvm/arm_vgic.h           |  1 +
->  virt/kvm/arm/vgic/vgic-init.c    |  2 ++
->  virt/kvm/arm/vgic/vgic-mmio-v2.c |  8 ++++++
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 20 +++++++++------
->  virt/kvm/arm/vgic/vgic-mmio.c    | 25 ++++++++++++++++++-
->  virt/kvm/arm/vgic/vgic-v2.c      |  1 +
->  virt/kvm/arm/vgic/vgic-v3.c      |  1 +
->  virt/kvm/arm/vgic/vgic.c         | 53 ++++++++++++++++++++++++++++++++--------
->  virt/kvm/arm/vgic/vgic.h         |  1 +
->  9 files changed, 94 insertions(+), 18 deletions(-)
-
-[...]
-
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -48,13 +48,20 @@ struct vgic_global __section(.hyp.text) kvm_vgic_global_state;
->  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  			      u32 intid)
->  {
-> -	/* SGIs and PPIs */
-> -	if (intid <= VGIC_MAX_PRIVATE)
-> -		return &vcpu->arch.vgic_cpu.private_irqs[intid];
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	struct vgic_irq *irq;
+>  include/linux/irqchip/arm-gic-v3.h | 174 ++++++++++++++++++++++++-------------
+>  1 file changed, 114 insertions(+), 60 deletions(-)
+> 
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index bfbd707..ed61647 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -112,34 +112,58 @@
+>  #define GICR_WAKER_ProcessorSleep	(1U << 1)
+>  #define GICR_WAKER_ChildrenAsleep	(1U << 2)
 >  
-> -	/* SPIs */
-> -	if (intid <= VGIC_MAX_SPI)
-> -		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
-> +	if (intid <= VGIC_MAX_PRIVATE) {        /* SGIs and PPIs */
-> +		irq = &vcpu->arch.vgic_cpu.private_irqs[intid];
-> +		kref_get(&irq->refcount);
-> +		return irq;
-> +	}
+> -#define GICR_PROPBASER_NonShareable	(0U << 10)
+> -#define GICR_PROPBASER_InnerShareable	(1U << 10)
+> -#define GICR_PROPBASER_OuterShareable	(2U << 10)
+> -#define GICR_PROPBASER_SHAREABILITY_MASK (3UL << 10)
+> -#define GICR_PROPBASER_nCnB		(0U << 7)
+> -#define GICR_PROPBASER_nC		(1U << 7)
+> -#define GICR_PROPBASER_RaWt		(2U << 7)
+> -#define GICR_PROPBASER_RaWb		(3U << 7)
+> -#define GICR_PROPBASER_WaWt		(4U << 7)
+> -#define GICR_PROPBASER_WaWb		(5U << 7)
+> -#define GICR_PROPBASER_RaWaWt		(6U << 7)
+> -#define GICR_PROPBASER_RaWaWb		(7U << 7)
+> -#define GICR_PROPBASER_CACHEABILITY_MASK (7U << 7)
+> -#define GICR_PROPBASER_IDBITS_MASK	(0x1f)
+> -
+> -#define GICR_PENDBASER_NonShareable	(0U << 10)
+> -#define GICR_PENDBASER_InnerShareable	(1U << 10)
+> -#define GICR_PENDBASER_OuterShareable	(2U << 10)
+> -#define GICR_PENDBASER_SHAREABILITY_MASK (3UL << 10)
+> -#define GICR_PENDBASER_nCnB		(0U << 7)
+> -#define GICR_PENDBASER_nC		(1U << 7)
+> -#define GICR_PENDBASER_RaWt		(2U << 7)
+> -#define GICR_PENDBASER_RaWb		(3U << 7)
+> -#define GICR_PENDBASER_WaWt		(4U << 7)
+> -#define GICR_PENDBASER_WaWb		(5U << 7)
+> -#define GICR_PENDBASER_RaWaWt		(6U << 7)
+> -#define GICR_PENDBASER_RaWaWb		(7U << 7)
+> -#define GICR_PENDBASER_CACHEABILITY_MASK (7U << 7)
+> +#define GIC_BASER_CACHE_nCnB		0ULL
+> +#define GIC_BASER_CACHE_SameAsInner	0ULL
+> +#define GIC_BASER_CACHE_nC		1ULL
+> +#define GIC_BASER_CACHE_RaWt		2ULL
+> +#define GIC_BASER_CACHE_RaWb		3ULL
+> +#define GIC_BASER_CACHE_WaWt		4ULL
+> +#define GIC_BASER_CACHE_WaWb		5ULL
+> +#define GIC_BASER_CACHE_RaWaWt		6ULL
+> +#define GIC_BASER_CACHE_RaWaWb		7ULL
+> +#define GIC_BASER_CACHE_MASK		7ULL
+> +#define GIC_BASER_NonShareable		0ULL
+> +#define GIC_BASER_InnerShareable	1ULL
+> +#define GIC_BASER_OuterShareable	2ULL
+> +#define GIC_BASER_SHAREABILITY_MASK	3ULL
 > +
-> +	if (intid <= VGIC_MAX_SPI) {            /* SPIs */
-> +		irq = &dist->spis[intid - VGIC_NR_PRIVATE_IRQS];
-> +		kref_get(&irq->refcount);
-> +		return irq;
-> +	}
+> +#define GIC_BASER_CACHEABILITY(reg, inner_outer, type)			\
+> +	(GIC_BASER_CACHE_##type << reg##_##inner_outer##_CACHEABILITY_SHIFT)
+> +
+> +#define GIC_BASER_SHAREABILITY(reg, type)				\
+> +	(GIC_BASER_##type << reg##_SHAREABILITY_SHIFT)
+> +
+> +#define GICR_PROPBASER_SHAREABILITY_SHIFT		(10)
+> +#define GICR_PROPBASER_INNER_CACHEABILITY_SHIFT		(7)
+> +#define GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT		(56)
+> +#define GICR_PROPBASER_SHAREABILITY_MASK				\
+> +	GIC_BASER_SHAREABILITY(GICR_PROPBASER, SHAREABILITY_MASK)
+> +#define GICR_PROPBASER_CACHEABILITY_MASK				\
+> +	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, MASK)
+> +#define GICR_PROPBASER_OUTER_CACHEABILITY_MASK				\
+> +	GIC_BASER_CACHEABILITY(GICR_PROPBASER, OUTER, MASK)
 
-I'm a bit concerned by the fact that we perform the refcounting on 
-objects that shouldn't be concerned by it. None of the static interrupts
-should have to suffer from the overhead, as they cannot be freed. 
-So I came up with the following patch:
+Inner Cacheability : GICR_PROPBASER_CACHEABILITY_MASK
+Outer Cacheability : GICR_PROPBASER_OUTER_CACHEABILITY_MASK
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index c7cd1a3..6bbff9a 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -91,19 +91,12 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
--	struct vgic_irq *irq;
- 
--	if (intid <= VGIC_MAX_PRIVATE) {        /* SGIs and PPIs */
--		irq = &vcpu->arch.vgic_cpu.private_irqs[intid];
--		kref_get(&irq->refcount);
--		return irq;
--	}
-+	if (intid <= VGIC_MAX_PRIVATE)		/* SGIs and PPIs */
-+		return &vcpu->arch.vgic_cpu.private_irqs[intid];
- 
--	if (intid <= VGIC_MAX_SPI) {            /* SPIs */
--		irq = &dist->spis[intid - VGIC_NR_PRIVATE_IRQS];
--		kref_get(&irq->refcount);
--		return irq;
--	}
-+	if (intid <= VGIC_MAX_SPI)		/* SPIs */
-+		return &dist->spis[intid - VGIC_NR_PRIVATE_IRQS];
- 
- 	if (intid >= VGIC_MIN_LPI)		/* LPIs */
- 		return vgic_get_lpi(kvm, intid);
-@@ -112,6 +105,14 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 	return NULL;
- }
- 
-+static void vgic_get_irq_kref(struct vgic_irq *irq)
-+{
-+	if (irq->intid < VGIC_MIN_LPI)
-+		return;
-+
-+	kref_get(&irq->refcount);
-+}
-+
- /*
-  * We can't do anything in here, because we lack the kvm pointer to
-  * lock and remove the item from the lpi_list. So we keep this function
-@@ -125,10 +126,10 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- {
- 	struct vgic_dist *dist;
- 
--	if (!kref_put(&irq->refcount, vgic_irq_release))
-+	if (irq->intid < VGIC_MIN_LPI)
- 		return;
- 
--	if (irq->intid < VGIC_MIN_LPI)
-+	if (!kref_put(&irq->refcount, vgic_irq_release))
- 		return;
- 
- 	dist = &kvm->arch.vgic;
-@@ -313,7 +314,11 @@ retry:
- 		goto retry;
- 	}
- 
--	kref_get(&irq->refcount);
-+	/*
-+	 * Grab a reference to the irq to reflect the fact that it is
-+	 * now in the ap_list.
-+	 */
-+	vgic_get_irq_kref(irq);
- 	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
- 	irq->vcpu = vcpu;
- 
-@@ -473,8 +478,11 @@ retry:
- 			spin_unlock(&irq->irq_lock);
- 
- 			/*
--			 * This put matches the get when we added the LPI to
--			 * the ap_list. We now drop the reference from the list.
-+			 * This vgic_put_irq call matches the
-+			 * vgic_get_irq_kref in vgic_queue_irq_unlock,
-+			 * where we added the LPI to the ap_list. As
-+			 * we remove the irq from the list, we drop
-+			 * also drop the refcount.
- 			 */
- 			vgic_put_irq(vcpu->kvm, irq);
- 			continue;
+Why don't we have a symmetric naming (GICR_PROPBASER_INNER_CACHEABILITY_MASK)?
 
-Thoughts?
+I'm all for having some backward compatibility, but given
+that you're adding a lot of those, you should make sure that
+the new stuff is not ambiguous.
+
+This applies throughout the file.
 
 Thanks,
 
