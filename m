@@ -1,23 +1,24 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v9 16/17] KVM: arm64: implement MSI injection in ITS emulation
-Date: Wed, 13 Jul 2016 02:59:08 +0100
-Message-ID: <20160713015909.28793-17-andre.przywara@arm.com>
+From: Diana Madalina Craciun <diana.craciun@nxp.com>
+Subject: Re: [PATCH v9 00/17] KVM: arm64: GICv3 ITS emulation
+Date: Wed, 13 Jul 2016 07:57:21 +0000
+Message-ID: <HE1PR04MB1321470CDA673EDB88B8930DFF310@HE1PR04MB1321.eurprd04.prod.outlook.com>
 References: <20160713015909.28793-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E33A49BB0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8419D49B40
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2016 03:51:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hnY1vwxzWqkf for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Jul 2016 21:53:26 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0BEF49B63
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:24 -0400 (EDT)
-In-Reply-To: <20160713015909.28793-1-andre.przywara@arm.com>
+ with ESMTP id ysJXcUfs9Go7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Jul 2016 03:51:33 -0400 (EDT)
+Received: from EUR03-DB5-obe.outbound.protection.outlook.com
+ (mail-eopbgr40056.outbound.protection.outlook.com [40.107.4.56])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9956C49B3C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2016 03:51:33 -0400 (EDT)
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,154 +28,25 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric
+ Auger <eric.auger@redhat.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When userland wants to inject an MSI into the guest, it uses the
-KVM_SIGNAL_MSI ioctl, which carries the doorbell address along with
-the payload and the device ID.
-With the help of the KVM IO bus framework we learn the corresponding
-ITS from the doorbell address. We then use our wrapper functions to
-iterate the linked lists and find the proper Interrupt Translation Table
-Entry (ITTE) and thus the corresponding struct vgic_irq to finally set
-the pending bit.
-We also provide the handler for the ITS "INT" command, which allows a
-guest to trigger an MSI via the ITS command queue. Since this one knows
-about the right ITS already, we directly call the MMIO handler function
-without using the kvm_io_bus framework.
+Hi Andre,
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- virt/kvm/arm/vgic/vgic-its.c | 77 ++++++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h     |  6 ++++
- 2 files changed, 83 insertions(+)
+On 07/13/2016 04:59 AM, Andre Przywara wrote:
+> To test this you can use the kvmtool patches available in the "its-v6"
+> branch here [2].
+> Start a guest with: "$ lkvm run --irqchip=gicv3-its --force-pci"
+> and see the ITS being used for instance by the virtio devices.
+>
+> [1]: git://linux-arm.org/linux-ap.git
+>      http://www.linux-arm.org/git?p=linux-ap.git;a=log;h=refs/heads/its-emul/v9
+> [2]: git://linux-arm.org/kvmtool.git
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 28abfcd..4713e33 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -425,6 +425,65 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
- 	return 0;
- }
- 
-+/*
-+ * Find the target VCPU and the LPI number for a given devid/eventid pair
-+ * and make this IRQ pending, possibly injecting it.
-+ * Must be called with the its_lock mutex held.
-+ */
-+static void vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
-+				 u32 devid, u32 eventid)
-+{
-+	struct its_itte *itte;
-+
-+	if (!its->enabled)
-+		return;
-+
-+	itte = find_itte(its, devid, eventid);
-+	/* Triggering an unmapped IRQ gets silently dropped. */
-+	if (itte && its_is_collection_mapped(itte->collection)) {
-+		struct kvm_vcpu *vcpu;
-+
-+		vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
-+		if (vcpu && vcpu->arch.vgic_cpu.lpis_enabled) {
-+			spin_lock(&itte->irq->irq_lock);
-+			itte->irq->pending = true;
-+			vgic_queue_irq_unlock(kvm, itte->irq);
-+		}
-+	}
-+}
-+
-+/*
-+ * Queries the KVM IO bus framework to get the ITS pointer from the given
-+ * doorbell address.
-+ * We then call vgic_its_trigger_msi() with the decoded data.
-+ */
-+int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-+{
-+	u64 address;
-+	struct kvm_io_device *kvm_io_dev;
-+	struct vgic_io_device *iodev;
-+
-+	if (!vgic_has_its(kvm))
-+		return -ENODEV;
-+
-+	if (!(msi->flags & KVM_MSI_VALID_DEVID))
-+		return -EINVAL;
-+
-+	address = (u64)msi->address_hi << 32 | msi->address_lo;
-+
-+	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
-+	if (!kvm_io_dev)
-+		return -ENODEV;
-+
-+	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
-+
-+	mutex_lock(&iodev->its->its_lock);
-+	vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
-+	mutex_unlock(&iodev->its->its_lock);
-+
-+	return 0;
-+}
-+
- /* Requires the its_lock to be held. */
- static void its_free_itte(struct kvm *kvm, struct its_itte *itte)
- {
-@@ -827,6 +886,21 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
- }
- 
- /*
-+ * The INT command injects the LPI associated with that DevID/EvID pair.
-+ * Must be called with the its_lock mutex held.
-+ */
-+static int vgic_its_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
-+				   u64 *its_cmd)
-+{
-+	u32 msi_data = its_cmd_get_id(its_cmd);
-+	u64 msi_devid = its_cmd_get_deviceid(its_cmd);
-+
-+	vgic_its_trigger_msi(kvm, its, msi_devid, msi_data);
-+
-+	return 0;
-+}
-+
-+/*
-  * This function is called with the its_cmd lock held, but the ITS data
-  * structure lock dropped.
-  */
-@@ -862,6 +936,9 @@ static int vgic_its_handle_command(struct kvm *kvm, struct vgic_its *its,
- 	case GITS_CMD_MOVALL:
- 		ret = vgic_its_cmd_handle_movall(kvm, its, its_cmd);
- 		break;
-+	case GITS_CMD_INT:
-+		ret = vgic_its_cmd_handle_int(kvm, its, its_cmd);
-+		break;
- 	case GITS_CMD_INV:
- 		ret = vgic_its_cmd_handle_inv(kvm, its, its_cmd);
- 		break;
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 32d8d82..9d40d7b 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -79,6 +79,7 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
- bool vgic_has_its(struct kvm *kvm);
- int kvm_vgic_register_its_device(void);
- void vgic_enable_lpis(struct kvm_vcpu *vcpu);
-+int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
- #else
- static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
- {
-@@ -144,6 +145,11 @@ static inline int kvm_vgic_register_its_device(void)
- static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
- {
- }
-+
-+static inline int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-+{
-+	return -ENODEV;
-+}
- #endif
- 
- int kvm_register_vgic_device(unsigned long type);
--- 
-2.9.0
+It seems that its/emul/v9 branch does not exist.
+
+Thanks,
+
+Diana
