@@ -1,22 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v9 14/17] KVM: arm64: allow updates of LPI configuration table
-Date: Wed, 13 Jul 2016 02:59:06 +0100
-Message-ID: <20160713015909.28793-15-andre.przywara@arm.com>
+Subject: [PATCH v9 16/17] KVM: arm64: implement MSI injection in ITS emulation
+Date: Wed, 13 Jul 2016 02:59:08 +0100
+Message-ID: <20160713015909.28793-17-andre.przywara@arm.com>
 References: <20160713015909.28793-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4972F49BAC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E33A49BB0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rNUspTcRzg2V for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Jul 2016 21:53:24 -0400 (EDT)
+ with ESMTP id hnY1vwxzWqkf for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Jul 2016 21:53:26 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0362949B6B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F0BEF49B63
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:24 -0400 (EDT)
 In-Reply-To: <20160713015909.28793-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,68 +31,150 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The (system-wide) LPI configuration table is held in a table in
-(guest) memory. To achieve reasonable performance, we cache this data
-in our struct vgic_irq. If the guest updates the configuration data
-(which consists of the enable bit and the priority value), it issues
-an INV or INVALL command to allow us to update our information.
-Provide functions that update that information for one LPI or all LPIs
-mapped to a specific collection.
+When userland wants to inject an MSI into the guest, it uses the
+KVM_SIGNAL_MSI ioctl, which carries the doorbell address along with
+the payload and the device ID.
+With the help of the KVM IO bus framework we learn the corresponding
+ITS from the doorbell address. We then use our wrapper functions to
+iterate the linked lists and find the proper Interrupt Translation Table
+Entry (ITTE) and thus the corresponding struct vgic_irq to finally set
+the pending bit.
+We also provide the handler for the ITS "INT" command, which allows a
+guest to trigger an MSI via the ITS command queue. Since this one knows
+about the right ITS already, we directly call the MMIO handler function
+without using the kvm_io_bus framework.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ virt/kvm/arm/vgic/vgic-its.c | 77 ++++++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h     |  6 ++++
+ 2 files changed, 83 insertions(+)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index f400ef1..60108f8 100644
+index 28abfcd..4713e33 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -64,6 +64,45 @@ struct its_itte {
+@@ -425,6 +425,65 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+ 	return 0;
+ }
  
- #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
- #define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
-+#define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
++/*
++ * Find the target VCPU and the LPI number for a given devid/eventid pair
++ * and make this IRQ pending, possibly injecting it.
++ * Must be called with the its_lock mutex held.
++ */
++static void vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
++				 u32 devid, u32 eventid)
++{
++	struct its_itte *itte;
 +
-+#define GIC_LPI_OFFSET 8192
++	if (!its->enabled)
++		return;
 +
-+#define LPI_PROP_ENABLE_BIT(p)	((p) & LPI_PROP_ENABLED)
-+#define LPI_PROP_PRIORITY(p)	((p) & 0xfc)
++	itte = find_itte(its, devid, eventid);
++	/* Triggering an unmapped IRQ gets silently dropped. */
++	if (itte && its_is_collection_mapped(itte->collection)) {
++		struct kvm_vcpu *vcpu;
++
++		vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
++		if (vcpu && vcpu->arch.vgic_cpu.lpis_enabled) {
++			spin_lock(&itte->irq->irq_lock);
++			itte->irq->pending = true;
++			vgic_queue_irq_unlock(kvm, itte->irq);
++		}
++	}
++}
 +
 +/*
-+ * Reads the configuration data for a given LPI from guest memory and
-+ * updates the fields in struct vgic_irq.
-+ * If filter_vcpu is not NULL, applies only if the IRQ is targeting this
-+ * VCPU. Unconditionally applies if filter_vcpu is NULL.
++ * Queries the KVM IO bus framework to get the ITS pointer from the given
++ * doorbell address.
++ * We then call vgic_its_trigger_msi() with the decoded data.
 + */
-+static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
-+			     struct kvm_vcpu *filter_vcpu)
++int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
 +{
-+	u64 propbase = PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
-+	u8 prop;
-+	int ret;
++	u64 address;
++	struct kvm_io_device *kvm_io_dev;
++	struct vgic_io_device *iodev;
 +
-+	ret = kvm_read_guest(kvm, propbase + irq->intid - GIC_LPI_OFFSET,
-+			     &prop, 1);
++	if (!vgic_has_its(kvm))
++		return -ENODEV;
 +
-+	if (ret)
-+		return ret;
++	if (!(msi->flags & KVM_MSI_VALID_DEVID))
++		return -EINVAL;
 +
-+	spin_lock(&irq->irq_lock);
++	address = (u64)msi->address_hi << 32 | msi->address_lo;
 +
-+	if (!filter_vcpu || filter_vcpu == irq->target_vcpu) {
-+		irq->priority = LPI_PROP_PRIORITY(prop);
-+		irq->enabled = LPI_PROP_ENABLE_BIT(prop);
++	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
++	if (!kvm_io_dev)
++		return -ENODEV;
 +
-+		vgic_queue_irq_unlock(kvm, irq);
-+	} else {
-+		spin_unlock(&irq->irq_lock);
-+	}
++	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
++
++	mutex_lock(&iodev->its->its_lock);
++	vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
++	mutex_unlock(&iodev->its->its_lock);
 +
 +	return 0;
 +}
++
+ /* Requires the its_lock to be held. */
+ static void its_free_itte(struct kvm *kvm, struct its_itte *itte)
+ {
+@@ -827,6 +886,21 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+ }
  
  /*
-  * Create a snapshot of the current LPI list, so that we can enumerate all
++ * The INT command injects the LPI associated with that DevID/EvID pair.
++ * Must be called with the its_lock mutex held.
++ */
++static int vgic_its_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
++				   u64 *its_cmd)
++{
++	u32 msi_data = its_cmd_get_id(its_cmd);
++	u64 msi_devid = its_cmd_get_deviceid(its_cmd);
++
++	vgic_its_trigger_msi(kvm, its, msi_devid, msi_data);
++
++	return 0;
++}
++
++/*
+  * This function is called with the its_cmd lock held, but the ITS data
+  * structure lock dropped.
+  */
+@@ -862,6 +936,9 @@ static int vgic_its_handle_command(struct kvm *kvm, struct vgic_its *its,
+ 	case GITS_CMD_MOVALL:
+ 		ret = vgic_its_cmd_handle_movall(kvm, its, its_cmd);
+ 		break;
++	case GITS_CMD_INT:
++		ret = vgic_its_cmd_handle_int(kvm, its, its_cmd);
++		break;
+ 	case GITS_CMD_INV:
+ 		ret = vgic_its_cmd_handle_inv(kvm, its, its_cmd);
+ 		break;
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 32d8d82..9d40d7b 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -79,6 +79,7 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
++int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
+ #else
+ static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+ {
+@@ -144,6 +145,11 @@ static inline int kvm_vgic_register_its_device(void)
+ static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+ {
+ }
++
++static inline int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
++{
++	return -ENODEV;
++}
+ #endif
+ 
+ int kvm_register_vgic_device(unsigned long type);
 -- 
 2.9.0
