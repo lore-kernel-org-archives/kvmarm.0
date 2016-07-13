@@ -1,98 +1,139 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v8 13/17] KVM: arm64: read initial LPI pending table
-Date: Tue, 12 Jul 2016 13:39:42 +0100
-Message-ID: <5784E50E.3050309@arm.com>
-References: <20160705112309.28877-1-andre.przywara@arm.com>
- <20160705112309.28877-14-andre.przywara@arm.com> <5783CE67.2070202@arm.com>
- <152d1107-febf-3aa4-ab85-e6cc8c8aa840@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH v9 01/17] KVM: arm/arm64: move redistributor kvm_io_devices
+Date: Wed, 13 Jul 2016 02:58:53 +0100
+Message-ID: <20160713015909.28793-2-andre.przywara@arm.com>
+References: <20160713015909.28793-1-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <152d1107-febf-3aa4-ab85-e6cc8c8aa840@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C9B5049B40
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:04 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id SoNo0PokhlVN for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Jul 2016 21:53:03 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 697CD41390
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:02 -0400 (EDT)
+In-Reply-To: <20160713015909.28793-1-andre.przywara@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/07/16 12:33, Andre Przywara wrote:
-> Hi,
-> 
-> On 11/07/16 17:50, Marc Zyngier wrote:
->> On 05/07/16 12:23, Andre Przywara wrote:
->>> The LPI pending status for a GICv3 redistributor is held in a table
->>> in (guest) memory. To achieve reasonable performance, we cache this
->>> data in our struct vgic_irq. The initial pending state must be read
->>> from guest memory upon enabling LPIs for this redistributor.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  virt/kvm/arm/vgic/vgic-its.c | 81 ++++++++++++++++++++++++++++++++++++++++++++
->>>  virt/kvm/arm/vgic/vgic.h     |  6 ++++
->>>  2 files changed, 87 insertions(+)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index 1e2e649..29bb4fe 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -93,6 +93,81 @@ struct its_itte {
->>>  		list_for_each_entry(itte, &(dev)->itt_head, itte_list)
->>>  
->>>  #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
->>> +#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
->>
->> 52 bits again. Pick a side!
->>
->>> +
->>> +static int vgic_its_copy_lpi_list(struct kvm *kvm, u32 **intid_ptr)
->>> +{
->>> +	struct vgic_dist *dist = &kvm->arch.vgic;
->>> +	struct vgic_irq *irq;
->>> +	u32 *intids;
->>> +	int irq_count = dist->lpi_list_count, i = 0;
->>> +
->>> +	/*
->>> +	 * We use the current value of the list length, which may change
->>> +	 * after the kmalloc. We don't care, because the guest shouldn't
->>> +	 * change anything while the command handling is still running,
->>> +	 * and in the worst case we would miss a new IRQ, which one wouldn't
->>> +	 * expect to be covered by this command anyway.
->>> +	 */
->>> +	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL);
->>> +	if (!intids)
->>> +		return -ENOMEM;
->>> +
->>> +	spin_lock(&dist->lpi_list_lock);
->>> +	list_for_each_entry(irq, &dist->lpi_list_head, lpi_entry) {
->>> +		if (kref_get_unless_zero(&irq->refcount)) {
->>> +			intids[i] = irq->intid;
->>> +			vgic_put_irq_locked(kvm, irq);
->>
->> This is ugly. You know you're not going to free the irq, since it was at
->> least one when you did kref_get_unless_zero(). Why not doing a simple
->> kref_put (possibly in a macro so that you can hide the dummy release
->> function)?
-> 
-> I think I don't need the get and put at all, which would allow to
-> totally drop the vgic_put_irq_locked version:
-> 1) We have the lpi_list_lock, so if we find the IRQ in the list, it's
-> still valid (we free it only after having it removed).
-> 2) It can't be removed without dropping the lock.
-> 3) We just store the number, not the pointer.
-> 4) An LPI can be unmapped anyway after we dropped the lock and before we
-> actually use the copy. We take care of that already by calling get again
-> and coping with a NULL return.
-> 
-> So is it feasible to remove the get and put here completely or is that
-> dodgy since we technically use the reference?
-> Shall I document that one doesn't need get and put if holding the
-> lpi_list_lock?
+Logically a GICv3 redistributor is assigned to a (v)CPU, so we should
+aim to keep redistributor related variables out of our struct vgic_dist.
 
-Yes please. Also put a comment in here, as this is the only place (I
-think) where we are iterating the list without using refcounts.
+Let's start by replacing the redistributor related kvm_io_device array
+with two members in our existing struct vgic_cpu, which are naturally
+per-VCPU and thus don't require any allocation / freeing.
+So apart from the better fit with the redistributor design this saves
+some code as well.
 
-Thanks,
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+---
+ include/kvm/arm_vgic.h           |  8 +++++++-
+ virt/kvm/arm/vgic/vgic-init.c    |  1 -
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 22 ++++++++--------------
+ 3 files changed, 15 insertions(+), 16 deletions(-)
 
-	M.
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 1264037..5142e2a 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -145,7 +145,6 @@ struct vgic_dist {
+ 	struct vgic_irq		*spis;
+ 
+ 	struct vgic_io_device	dist_iodev;
+-	struct vgic_io_device	*redist_iodevs;
+ };
+ 
+ struct vgic_v2_cpu_if {
+@@ -193,6 +192,13 @@ struct vgic_cpu {
+ 	struct list_head ap_list_head;
+ 
+ 	u64 live_lrs;
++
++	/*
++	 * Members below are used with GICv3 emulation only and represent
++	 * parts of the redistributor.
++	 */
++	struct vgic_io_device	rd_iodev;
++	struct vgic_io_device	sgi_iodev;
+ };
+ 
+ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index a1442f7..90cae48 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -271,7 +271,6 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+ 	dist->initialized = false;
+ 
+ 	kfree(dist->spis);
+-	kfree(dist->redist_iodevs);
+ 	dist->nr_spis = 0;
+ 
+ 	mutex_unlock(&kvm->lock);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index a0c515a..fc7b6c9 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -285,21 +285,14 @@ unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev)
+ 
+ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
+ {
+-	int nr_vcpus = atomic_read(&kvm->online_vcpus);
+ 	struct kvm_vcpu *vcpu;
+-	struct vgic_io_device *devices;
+ 	int c, ret = 0;
+ 
+-	devices = kmalloc(sizeof(struct vgic_io_device) * nr_vcpus * 2,
+-			  GFP_KERNEL);
+-	if (!devices)
+-		return -ENOMEM;
+-
+ 	kvm_for_each_vcpu(c, vcpu, kvm) {
+ 		gpa_t rd_base = redist_base_address + c * SZ_64K * 2;
+ 		gpa_t sgi_base = rd_base + SZ_64K;
+-		struct vgic_io_device *rd_dev = &devices[c * 2];
+-		struct vgic_io_device *sgi_dev = &devices[c * 2 + 1];
++		struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
++		struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
+ 
+ 		kvm_iodevice_init(&rd_dev->dev, &kvm_io_gic_ops);
+ 		rd_dev->base_addr = rd_base;
+@@ -335,14 +328,15 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
+ 	if (ret) {
+ 		/* The current c failed, so we start with the previous one. */
+ 		for (c--; c >= 0; c--) {
++			struct vgic_cpu *vgic_cpu;
++
++			vcpu = kvm_get_vcpu(kvm, c);
++			vgic_cpu = &vcpu->arch.vgic_cpu;
+ 			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
+-						  &devices[c * 2].dev);
++						  &vgic_cpu->rd_iodev.dev);
+ 			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
+-						  &devices[c * 2 + 1].dev);
++						  &vgic_cpu->sgi_iodev.dev);
+ 		}
+-		kfree(devices);
+-	} else {
+-		kvm->arch.vgic.redist_iodevs = devices;
+ 	}
+ 
+ 	return ret;
 -- 
-Jazz is not dead. It just smells funny...
+2.9.0
