@@ -1,22 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v9 07/17] irqchip: refactor and add GICv3 definitions
-Date: Wed, 13 Jul 2016 02:58:59 +0100
-Message-ID: <20160713015909.28793-8-andre.przywara@arm.com>
+Subject: [PATCH v9 08/17] KVM: arm64: handle ITS related GICv3 redistributor
+ registers
+Date: Wed, 13 Jul 2016 02:59:00 +0100
+Message-ID: <20160713015909.28793-9-andre.przywara@arm.com>
 References: <20160713015909.28793-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F08D049B7D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 738CD49B88
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PMEQ4oZ5GApX for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Jul 2016 21:53:11 -0400 (EDT)
+ with ESMTP id 7F9+icMK9lja for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Jul 2016 21:53:13 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 986CF49B51
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1ACDC49B7F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2016 21:53:13 -0400 (EDT)
 In-Reply-To: <20160713015909.28793-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,239 +32,280 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-arm-gic-v3.h contains bit and register definitions for the GICv3 and ITS,
-at least for the bits the we currently care about.
-The ITS emulation needs more definitions, so add them and refactor
-the memory attribute #defines to be more universally usable.
-To avoid changing all users, we still provide some of the old definitons
-defined with the help of the new macros.
+In the GICv3 redistributor there are the PENDBASER and PROPBASER
+registers which we did not emulate so far, as they only make sense
+when having an ITS. In preparation for that emulate those MMIO
+accesses by storing the 64-bit data written into it into a variable
+which we later read in the ITS emulation.
+We also sanitise the registers, making sure RES0 regions are respected
+and checking for valid memory attributes.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h | 174 ++++++++++++++++++++++++-------------
- 1 file changed, 114 insertions(+), 60 deletions(-)
+ include/kvm/arm_vgic.h           |  13 ++++
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 153 ++++++++++++++++++++++++++++++++++++++-
+ virt/kvm/arm/vgic/vgic-mmio.h    |   8 ++
+ virt/kvm/arm/vgic/vgic-v3.c      |  11 ++-
+ 4 files changed, 181 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index bfbd707..ed61647 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -112,34 +112,58 @@
- #define GICR_WAKER_ProcessorSleep	(1U << 1)
- #define GICR_WAKER_ChildrenAsleep	(1U << 2)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 450b4da..df2dec5 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -146,6 +146,14 @@ struct vgic_dist {
+ 	struct vgic_irq		*spis;
  
--#define GICR_PROPBASER_NonShareable	(0U << 10)
--#define GICR_PROPBASER_InnerShareable	(1U << 10)
--#define GICR_PROPBASER_OuterShareable	(2U << 10)
--#define GICR_PROPBASER_SHAREABILITY_MASK (3UL << 10)
--#define GICR_PROPBASER_nCnB		(0U << 7)
--#define GICR_PROPBASER_nC		(1U << 7)
--#define GICR_PROPBASER_RaWt		(2U << 7)
--#define GICR_PROPBASER_RaWb		(3U << 7)
--#define GICR_PROPBASER_WaWt		(4U << 7)
--#define GICR_PROPBASER_WaWb		(5U << 7)
--#define GICR_PROPBASER_RaWaWt		(6U << 7)
--#define GICR_PROPBASER_RaWaWb		(7U << 7)
--#define GICR_PROPBASER_CACHEABILITY_MASK (7U << 7)
--#define GICR_PROPBASER_IDBITS_MASK	(0x1f)
--
--#define GICR_PENDBASER_NonShareable	(0U << 10)
--#define GICR_PENDBASER_InnerShareable	(1U << 10)
--#define GICR_PENDBASER_OuterShareable	(2U << 10)
--#define GICR_PENDBASER_SHAREABILITY_MASK (3UL << 10)
--#define GICR_PENDBASER_nCnB		(0U << 7)
--#define GICR_PENDBASER_nC		(1U << 7)
--#define GICR_PENDBASER_RaWt		(2U << 7)
--#define GICR_PENDBASER_RaWb		(3U << 7)
--#define GICR_PENDBASER_WaWt		(4U << 7)
--#define GICR_PENDBASER_WaWb		(5U << 7)
--#define GICR_PENDBASER_RaWaWt		(6U << 7)
--#define GICR_PENDBASER_RaWaWb		(7U << 7)
--#define GICR_PENDBASER_CACHEABILITY_MASK (7U << 7)
-+#define GIC_BASER_CACHE_nCnB		0ULL
-+#define GIC_BASER_CACHE_SameAsInner	0ULL
-+#define GIC_BASER_CACHE_nC		1ULL
-+#define GIC_BASER_CACHE_RaWt		2ULL
-+#define GIC_BASER_CACHE_RaWb		3ULL
-+#define GIC_BASER_CACHE_WaWt		4ULL
-+#define GIC_BASER_CACHE_WaWb		5ULL
-+#define GIC_BASER_CACHE_RaWaWt		6ULL
-+#define GIC_BASER_CACHE_RaWaWb		7ULL
-+#define GIC_BASER_CACHE_MASK		7ULL
-+#define GIC_BASER_NonShareable		0ULL
-+#define GIC_BASER_InnerShareable	1ULL
-+#define GIC_BASER_OuterShareable	2ULL
-+#define GIC_BASER_SHAREABILITY_MASK	3ULL
+ 	struct vgic_io_device	dist_iodev;
 +
-+#define GIC_BASER_CACHEABILITY(reg, inner_outer, type)			\
-+	(GIC_BASER_CACHE_##type << reg##_##inner_outer##_CACHEABILITY_SHIFT)
-+
-+#define GIC_BASER_SHAREABILITY(reg, type)				\
-+	(GIC_BASER_##type << reg##_SHAREABILITY_SHIFT)
-+
-+#define GICR_PROPBASER_SHAREABILITY_SHIFT		(10)
-+#define GICR_PROPBASER_INNER_CACHEABILITY_SHIFT		(7)
-+#define GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT		(56)
-+#define GICR_PROPBASER_SHAREABILITY_MASK				\
-+	GIC_BASER_SHAREABILITY(GICR_PROPBASER, SHAREABILITY_MASK)
-+#define GICR_PROPBASER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, MASK)
-+#define GICR_PROPBASER_OUTER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GICR_PROPBASER, OUTER, MASK)
-+
-+#define GICR_PROPBASER_InnerShareable					\
-+	GIC_BASER_SHAREABILITY(GICR_PROPBASER, InnerShareable)
-+#define GICR_PROPBASER_nC GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, nC)
-+#define GICR_PROPBASER_WaWb GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, WaWb)
-+#define GICR_PROPBASER_IDBITS_MASK			(0x1f)
-+
-+#define GICR_PENDBASER_SHAREABILITY_SHIFT		(10)
-+#define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT		(7)
-+#define GICR_PENDBASER_OUTER_CACHEABILITY_SHIFT		(56)
-+#define GICR_PENDBASER_SHAREABILITY_MASK				\
-+	GIC_BASER_SHAREABILITY(GICR_PENDBASER, SHAREABILITY_MASK)
-+#define GICR_PENDBASER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, MASK)
-+#define GICR_PENDBASER_OUTER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GICR_PENDBASER, OUTER, MASK)
-+
-+#define GICR_PENDBASER_InnerShareable					\
-+	GIC_BASER_SHAREABILITY(GICR_PENDBASER, InnerShareable)
-+#define GICR_PENDBASER_nC GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, nC)
-+#define GICR_PENDBASER_WaWb GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, WaWb)
-+#define GICR_PENDBASER_PTZ				BIT_ULL(62)
++	/*
++	 * Contains the attributes and gpa of the LPI configuration table.
++	 * Since we report GICR_TYPER.CommonLPIAff as 0b00, we can share
++	 * one address across all redistributors.
++	 * GICv3 spec: 6.1.2 "LPI Configuration tables"
++	 */
++	u64			propbaser;
+ };
  
+ struct vgic_v2_cpu_if {
+@@ -200,6 +208,11 @@ struct vgic_cpu {
+ 	 */
+ 	struct vgic_io_device	rd_iodev;
+ 	struct vgic_io_device	sgi_iodev;
++
++	/* Contains the attributes and gpa of the LPI pending tables. */
++	u64 pendbaser;
++
++	bool lpis_enabled;
+ };
+ 
+ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index bfcafbd..ee299a7 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -29,6 +29,19 @@ static unsigned long extract_bytes(unsigned long data, unsigned int offset,
+ 	return (data >> (offset * 8)) & GENMASK_ULL(num * 8 - 1, 0);
+ }
+ 
++/* allows updates of any half of a 64-bit register (or the whole thing) */
++static u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
++			    unsigned long val)
++{
++	int lower = (offset & 4) * 8;
++	int upper = lower + 8 * len - 1;
++
++	reg &= ~GENMASK_ULL(upper, lower);
++	val &= GENMASK_ULL(len * 8 - 1, 0);
++
++	return reg | ((u64)val << lower);
++}
++
+ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 					    gpa_t addr, unsigned int len)
+ {
+@@ -152,6 +165,142 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
++/* We want to avoid outer shareable. */
++u64 vgic_sanitise_shareability(u64 field)
++{
++	switch (field) {
++	case GIC_BASER_OuterShareable:
++		return GIC_BASER_InnerShareable;
++	default:
++		return field;
++	}
++}
++
++/* Avoid any inner non-cacheable mapping. */
++u64 vgic_sanitise_inner_cacheability(u64 field)
++{
++	switch (field) {
++	case GIC_BASER_CACHE_nCnB:
++	case GIC_BASER_CACHE_nC:
++		return GIC_BASER_CACHE_RaWb;
++	default:
++		return field;
++	}
++}
++
++/* Non-cacheable or same-as-inner are OK. */
++u64 vgic_sanitise_outer_cacheability(u64 field)
++{
++	switch (field) {
++	case GIC_BASER_CACHE_SameAsInner:
++	case GIC_BASER_CACHE_nC:
++		return field;
++	default:
++		return GIC_BASER_CACHE_nC;
++	}
++}
++
++u64 vgic_sanitise_field(u64 reg, u64 field_mask, int field_shift,
++			u64 (*sanitise_fn)(u64))
++{
++	u64 field = (reg & field_mask) >> field_shift;
++
++	field = sanitise_fn(field) << field_shift;
++	return (reg & ~field_mask) | field;
++}
++
++#define PROPBASER_RES0_MASK						\
++	(GENMASK_ULL(63, 59) | GENMASK_ULL(55, 52) | GENMASK_ULL(6, 5))
++#define PENDBASER_RES0_MASK						\
++	(BIT_ULL(63) | GENMASK_ULL(61, 59) | GENMASK_ULL(55, 52) |	\
++	 GENMASK_ULL(15, 12) | GENMASK_ULL(6, 0))
++
++static u64 vgic_sanitise_pendbaser(u64 reg)
++{
++	reg = vgic_sanitise_field(reg, GICR_PENDBASER_SHAREABILITY_MASK,
++				  GICR_PENDBASER_SHAREABILITY_SHIFT,
++				  vgic_sanitise_shareability);
++	reg = vgic_sanitise_field(reg, GICR_PENDBASER_CACHEABILITY_MASK,
++				  GICR_PENDBASER_INNER_CACHEABILITY_SHIFT,
++				  vgic_sanitise_inner_cacheability);
++	reg = vgic_sanitise_field(reg, GICR_PENDBASER_OUTER_CACHEABILITY_MASK,
++				  GICR_PENDBASER_OUTER_CACHEABILITY_SHIFT,
++				  vgic_sanitise_outer_cacheability);
++
++	reg &= ~PENDBASER_RES0_MASK;
++	reg &= ~GENMASK_ULL(51, 48);
++
++	return reg;
++}
++
++static u64 vgic_sanitise_propbaser(u64 reg)
++{
++	reg = vgic_sanitise_field(reg, GICR_PROPBASER_SHAREABILITY_MASK,
++				  GICR_PROPBASER_SHAREABILITY_SHIFT,
++				  vgic_sanitise_shareability);
++	reg = vgic_sanitise_field(reg, GICR_PROPBASER_CACHEABILITY_MASK,
++				  GICR_PROPBASER_INNER_CACHEABILITY_SHIFT,
++				  vgic_sanitise_inner_cacheability);
++	reg = vgic_sanitise_field(reg, GICR_PROPBASER_OUTER_CACHEABILITY_MASK,
++				  GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT,
++				  vgic_sanitise_outer_cacheability);
++
++	reg &= ~PROPBASER_RES0_MASK;
++	reg &= ~GENMASK_ULL(51, 48);
++	return reg;
++}
++
++static unsigned long vgic_mmio_read_propbase(struct kvm_vcpu *vcpu,
++					     gpa_t addr, unsigned int len)
++{
++	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++
++	return extract_bytes(dist->propbaser, addr & 7, len);
++}
++
++static void vgic_mmio_write_propbase(struct kvm_vcpu *vcpu,
++				     gpa_t addr, unsigned int len,
++				     unsigned long val)
++{
++	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	u64 propbaser = dist->propbaser;
++
++	/* Storing a value with LPIs already enabled is undefined */
++	if (vgic_cpu->lpis_enabled)
++		return;
++
++	propbaser = update_64bit_reg(propbaser, addr & 4, len, val);
++	propbaser = vgic_sanitise_propbaser(propbaser);
++
++	dist->propbaser = propbaser;
++}
++
++static unsigned long vgic_mmio_read_pendbase(struct kvm_vcpu *vcpu,
++					     gpa_t addr, unsigned int len)
++{
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++
++	return extract_bytes(vgic_cpu->pendbaser, addr & 7, len);
++}
++
++static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
++				     gpa_t addr, unsigned int len,
++				     unsigned long val)
++{
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	u64 pendbaser = vgic_cpu->pendbaser;
++
++	/* Storing a value with LPIs already enabled is undefined */
++	if (vgic_cpu->lpis_enabled)
++		return;
++
++	pendbaser = update_64bit_reg(pendbaser, addr & 4, len, val);
++	pendbaser = vgic_sanitise_pendbaser(pendbaser);
++
++	vgic_cpu->pendbaser = pendbaser;
++}
++
  /*
-  * Re-Distributor registers, offsets from SGI_base
-@@ -175,53 +199,66 @@
- #define GITS_CWRITER			0x0088
- #define GITS_CREADR			0x0090
- #define GITS_BASER			0x0100
-+#define GITS_IDREGS_BASE		0xffd0
-+#define GITS_PIDR0			0xffe0
-+#define GITS_PIDR1			0xffe4
- #define GITS_PIDR2			GICR_PIDR2
-+#define GITS_PIDR4			0xffd0
-+#define GITS_CIDR0			0xfff0
-+#define GITS_CIDR1			0xfff4
-+#define GITS_CIDR2			0xfff8
-+#define GITS_CIDR3			0xfffc
+  * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
+  * redistributors, while SPIs are covered by registers in the distributor
+@@ -232,10 +381,10 @@ static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
+ 		vgic_mmio_read_v3r_typer, vgic_mmio_write_wi, 8,
+ 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GICR_PROPBASER,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
++		vgic_mmio_read_propbase, vgic_mmio_write_propbase, 8,
+ 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GICR_PENDBASER,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
++		vgic_mmio_read_pendbase, vgic_mmio_write_pendbase, 8,
+ 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GICR_IDREGS,
+ 		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 8509014..71aa39d 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -147,4 +147,12 @@ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
  
- #define GITS_TRANSLATER			0x10040
+ unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev);
  
- #define GITS_CTLR_ENABLE		(1U << 0)
- #define GITS_CTLR_QUIESCENT		(1U << 31)
- 
-+#define GITS_TYPER_PLPIS		(1UL << 0)
-+#define GITS_TYPER_IDBITS_SHIFT		8
- #define GITS_TYPER_DEVBITS_SHIFT	13
- #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
- #define GITS_TYPER_PTA			(1UL << 19)
--
--#define GITS_CBASER_VALID		(1UL << 63)
--#define GITS_CBASER_nCnB		(0UL << 59)
--#define GITS_CBASER_nC			(1UL << 59)
--#define GITS_CBASER_RaWt		(2UL << 59)
--#define GITS_CBASER_RaWb		(3UL << 59)
--#define GITS_CBASER_WaWt		(4UL << 59)
--#define GITS_CBASER_WaWb		(5UL << 59)
--#define GITS_CBASER_RaWaWt		(6UL << 59)
--#define GITS_CBASER_RaWaWb		(7UL << 59)
--#define GITS_CBASER_CACHEABILITY_MASK	(7UL << 59)
--#define GITS_CBASER_NonShareable	(0UL << 10)
--#define GITS_CBASER_InnerShareable	(1UL << 10)
--#define GITS_CBASER_OuterShareable	(2UL << 10)
--#define GITS_CBASER_SHAREABILITY_MASK	(3UL << 10)
-+#define GITS_TYPER_HWCOLLCNT_SHIFT	24
++#ifdef CONFIG_KVM_ARM_VGIC_V3
++u64 vgic_sanitise_outer_cacheability(u64 reg);
++u64 vgic_sanitise_inner_cacheability(u64 reg);
++u64 vgic_sanitise_shareability(u64 reg);
++u64 vgic_sanitise_field(u64 reg, u64 field_mask, int field_shift,
++			u64 (*sanitise_fn)(u64));
++#endif
 +
-+#define GITS_CBASER_VALID			(1UL << 63)
-+#define GITS_CBASER_SHAREABILITY_SHIFT		(10)
-+#define GITS_CBASER_INNER_CACHEABILITY_SHIFT	(59)
-+#define GITS_CBASER_OUTER_CACHEABILITY_SHIFT	(53)
-+#define GITS_CBASER_SHAREABILITY_MASK					\
-+	GIC_BASER_SHAREABILITY(GITS_CBASER, SHAREABILITY_MASK)
-+#define GITS_CBASER_CACHEABILITY_MASK					\
-+	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, MASK)
-+#define GITS_CBASER_OUTER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GITS_CBASER, OUTER, MASK)
-+
-+#define GITS_CBASER_InnerShareable					\
-+	GIC_BASER_SHAREABILITY(GITS_CBASER, InnerShareable)
-+#define GITS_CBASER_nC GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nC)
-+#define GITS_CBASER_WaWb GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWb)
+ #endif
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index f0ac064..6f8f31f 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -191,6 +191,11 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ 	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
+ }
  
- #define GITS_BASER_NR_REGS		8
- 
--#define GITS_BASER_VALID		(1UL << 63)
--#define GITS_BASER_nCnB			(0UL << 59)
--#define GITS_BASER_nC			(1UL << 59)
--#define GITS_BASER_RaWt			(2UL << 59)
--#define GITS_BASER_RaWb			(3UL << 59)
--#define GITS_BASER_WaWt			(4UL << 59)
--#define GITS_BASER_WaWb			(5UL << 59)
--#define GITS_BASER_RaWaWt		(6UL << 59)
--#define GITS_BASER_RaWaWb		(7UL << 59)
--#define GITS_BASER_CACHEABILITY_MASK	(7UL << 59)
--#define GITS_BASER_TYPE_SHIFT		(56)
-+#define GITS_BASER_VALID			(1UL << 63)
-+#define GITS_BASER_INDIRECT			(1ULL << 62)
-+#define GITS_BASER_INNER_CACHEABILITY_SHIFT	(59)
-+#define GITS_BASER_OUTER_CACHEABILITY_SHIFT	(53)
-+#define GITS_BASER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GITS_BASER, INNER, MASK)
-+#define GITS_BASER_OUTER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, MASK)
-+#define GITS_BASER_SHAREABILITY_MASK					\
-+	GIC_BASER_SHAREABILITY(GITS_BASER, SHAREABILITY_MASK)
++#define INITIAL_PENDBASER_VALUE						  \
++	(GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWb)		| \
++	GIC_BASER_CACHEABILITY(GICR_PENDBASER, OUTER, SameAsInner)	| \
++	GIC_BASER_SHAREABILITY(GICR_PENDBASER, InnerShareable))
 +
-+#define GITS_BASER_nC GIC_BASER_CACHEABILITY(GITS_BASER, INNER, nC)
-+#define GITS_BASER_WaWb GIC_BASER_CACHEABILITY(GITS_BASER, INNER, WaWb)
-+#define GITS_BASER_TYPE_SHIFT			(56)
- #define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
--#define GITS_BASER_ENTRY_SIZE_SHIFT	(48)
-+#define GITS_BASER_ENTRY_SIZE_SHIFT		(48)
- #define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0xff) + 1)
--#define GITS_BASER_NonShareable		(0UL << 10)
--#define GITS_BASER_InnerShareable	(1UL << 10)
--#define GITS_BASER_OuterShareable	(2UL << 10)
- #define GITS_BASER_SHAREABILITY_SHIFT	(10)
--#define GITS_BASER_SHAREABILITY_MASK	(3UL << GITS_BASER_SHAREABILITY_SHIFT)
-+#define GITS_BASER_InnerShareable					\
-+	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
- #define GITS_BASER_PAGE_SIZE_SHIFT	(8)
- #define GITS_BASER_PAGE_SIZE_4K		(0UL << GITS_BASER_PAGE_SIZE_SHIFT)
- #define GITS_BASER_PAGE_SIZE_16K	(1UL << GITS_BASER_PAGE_SIZE_SHIFT)
-@@ -243,7 +280,10 @@
-  */
- #define GITS_CMD_MAPD			0x08
- #define GITS_CMD_MAPC			0x09
--#define GITS_CMD_MAPVI			0x0a
-+#define GITS_CMD_MAPTI			0x0a
-+/* older GIC documentation used MAPVI for this command */
-+#define GITS_CMD_MAPVI			GITS_CMD_MAPTI
-+#define GITS_CMD_MAPI			0x0b
- #define GITS_CMD_MOVI			0x01
- #define GITS_CMD_DISCARD		0x0f
- #define GITS_CMD_INV			0x0c
-@@ -254,6 +294,20 @@
- #define GITS_CMD_SYNC			0x05
+ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
+@@ -208,10 +213,12 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+ 	 * way, so we force SRE to 1 to demonstrate this to the guest.
+ 	 * This goes with the spec allowing the value to be RAO/WI.
+ 	 */
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+ 		vgic_v3->vgic_sre = ICC_SRE_EL1_SRE;
+-	else
++		vcpu->arch.vgic_cpu.pendbaser = INITIAL_PENDBASER_VALUE;
++	} else {
+ 		vgic_v3->vgic_sre = 0;
++	}
  
- /*
-+ * ITS error numbers
-+ */
-+#define E_ITS_MOVI_UNMAPPED_INTERRUPT           0x010107
-+#define E_ITS_MOVI_UNMAPPED_COLLECTION          0x010109
-+#define E_ITS_CLEAR_UNMAPPED_INTERRUPT          0x010507
-+#define E_ITS_MAPC_PROCNUM_OOR                  0x010902
-+#define E_ITS_MAPTI_UNMAPPED_DEVICE             0x010a04
-+#define E_ITS_MAPTI_PHYSICALID_OOR              0x010a06
-+#define E_ITS_INV_UNMAPPED_INTERRUPT            0x010c07
-+#define E_ITS_INVALL_UNMAPPED_COLLECTION        0x010d09
-+#define E_ITS_MOVALL_PROCNUM_OOR                0x010e01
-+#define E_ITS_DISCARD_UNMAPPED_INTERRUPT        0x010f07
-+
-+/*
-  * CPU interface registers
-  */
- #define ICC_CTLR_EL1_EOImode_drop_dir	(0U << 1)
+ 	/* Get the show on the road... */
+ 	vgic_v3->vgic_hcr = ICH_HCR_EN;
 -- 
 2.9.0
