@@ -1,190 +1,64 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v9 13/17] KVM: arm64: read initial LPI pending table
-Date: Thu, 14 Jul 2016 10:34:10 +0100
-Message-ID: <57875C92.7000004@arm.com>
-References: <20160713015909.28793-1-andre.przywara@arm.com>
- <20160713015909.28793-14-andre.przywara@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC v6 4/6] KVM: arm/arm64: enable irqchip routing
+Date: Thu, 14 Jul 2016 11:36:12 +0200
+Message-ID: <ac188535-d3be-f732-891a-1d0a248349e6@redhat.com>
+References: <1467794875-5237-1-git-send-email-eric.auger@redhat.com>
+ <1467794875-5237-5-git-send-email-eric.auger@redhat.com>
+ <20160707172052.5weyrjus3i3mgzik@hawk.localdomain>
+ <11b05e3b-f3fd-aae3-b1e7-6ca9836cfc97@redhat.com>
+ <20160708085233.qjptxd4qh7ukbgl3@hawk.localdomain>
+ <20160708205543.GC10741@potion>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160713015909.28793-14-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D51BD49B1D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2016 05:30:23 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qjZ5BO1cSEIE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jul 2016 05:30:23 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E23E49B1A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2016 05:30:23 -0400 (EDT)
+In-Reply-To: <20160708205543.GC10741@potion>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/07/16 02:59, Andre Przywara wrote:
-> The LPI pending status for a GICv3 redistributor is held in a table
-> in (guest) memory. To achieve reasonable performance, we cache the
-> pending bit in our struct vgic_irq. The initial pending state must be
-> read from guest memory upon enabling LPIs for this redistributor.
-> As we can't access the guest memory while we hold the lpi_list spinlock,
-> we create a snapshot of the LPI list and iterate over that.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 91 ++++++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.h     |  6 +++
->  2 files changed, 97 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 4fc830c..f400ef1 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -63,6 +63,90 @@ struct its_itte {
->  };
->  
->  #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
-> +#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
-> +
-> +/*
-> + * Create a snapshot of the current LPI list, so that we can enumerate all
-> + * LPIs without holding any lock.
-> + * Returns the array length and puts the kmalloc'ed array into intid_ptr.
-> + */
-> +static int vgic_copy_lpi_list(struct kvm *kvm, u32 **intid_ptr)
-> +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	struct vgic_irq *irq;
-> +	u32 *intids;
-> +	int irq_count = dist->lpi_list_count, i = 0;
-> +
-> +	/*
-> +	 * We use the current value of the list length, which may change
-> +	 * after the kmalloc. We don't care, because the guest shouldn't
-> +	 * change anything while the command handling is still running,
-> +	 * and in the worst case we would miss a new IRQ, which one wouldn't
-> +	 * expect to be covered by this command anyway.
-> +	 */
-> +	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL);
-> +	if (!intids)
-> +		return -ENOMEM;
-> +
-> +	spin_lock(&dist->lpi_list_lock);
-> +	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-> +		/* We don't need to "get" the IRQ, as we hold the list lock. */
-> +		intids[i] = irq->intid;
-> +		if (i++ == irq_count)
-> +			break;
-
-So I can perfectly rewrite this as:
-
-		if (i == irq_count)
-			break;
-		i++;
-
-Do you now see the bug and how you are performing out of bound accesses?
-
-> +	}
-> +	spin_unlock(&dist->lpi_list_lock);
-> +
-> +	*intid_ptr = intids;
-> +	return irq_count;
-> +}
-> +
-> +/*
-> + * Scan the whole LPI pending table and sync the pending bit in there
-> + * with our own data structures. This relies on the LPI being
-> + * mapped before.
-> + */
-> +static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
-> +{
-> +	gpa_t pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-> +	struct vgic_irq *irq;
-> +	u8 pendmask;
-> +	int ret = 0;
-> +	u32 *intids;
-> +	int nr_irqs, i;
-> +
-> +	nr_irqs = vgic_copy_lpi_list(vcpu->kvm, &intids);
-> +	if (nr_irqs < 0)
-> +		return nr_irqs;
-> +
-> +	for (i = 0; i < nr_irqs; i++) {
-> +		int byte_offset, bit_nr;
-> +		int last_byte_offset = -1;
-
-Nice try. But by keeping the last_byte_offset inside the loop, you've
-made sure that it is reset to -1 on each iteration. Wall <- head.
-
-> +
-> +		byte_offset = intids[i] / BITS_PER_BYTE;
-> +		bit_nr = intids[i] % BITS_PER_BYTE;
-> +
-> +		if (byte_offset != last_byte_offset) {
-> +			ret = kvm_read_guest(vcpu->kvm, pendbase + byte_offset,
-> +					     &pendmask, 1);
-> +			if (ret) {
-> +				kfree(intids);
-> +				return ret;
-> +			}
-> +			last_byte_offset = byte_offset;
-> +		}
-> +
-> +		irq = vgic_get_irq(vcpu->kvm, NULL, intids[i]);
-> +		spin_lock(&irq->irq_lock);
-> +		irq->pending = pendmask & (1U << bit_nr);
-> +		vgic_queue_irq_unlock(vcpu->kvm, irq);
-> +		vgic_put_irq(vcpu->kvm, irq);
-> +	}
-> +
-> +	kfree(intids);
-> +
-> +	return ret;
-> +}
->  
->  static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
->  					     struct vgic_its *its,
-> @@ -406,6 +490,13 @@ static struct vgic_register_region its_registers[] = {
->  		VGIC_ACCESS_32bit),
->  };
->  
-> +/* This is called on setting the LPI enable bit in the redistributor. */
-> +void vgic_enable_lpis(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!(vcpu->arch.vgic_cpu.pendbaser & GICR_PENDBASER_PTZ))
-> +		its_sync_lpi_pending_table(vcpu);
-> +}
-> +
->  static int vgic_its_register(struct kvm *kvm, struct vgic_its *its)
->  {
->  	struct vgic_io_device *iodev = &its->iodev;
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 9dc7207..32d8d82 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -25,6 +25,7 @@
->  #define IS_VGIC_ADDR_UNDEF(_x)  ((_x) == VGIC_ADDR_UNDEF)
->  
->  #define INTERRUPT_ID_BITS_SPIS	10
-> +#define INTERRUPT_ID_BITS_ITS	16
->  #define VGIC_PRI_BITS		5
->  
->  #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
-> @@ -77,6 +78,7 @@ int vgic_v3_map_resources(struct kvm *kvm);
->  int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
->  bool vgic_has_its(struct kvm *kvm);
->  int kvm_vgic_register_its_device(void);
-> +void vgic_enable_lpis(struct kvm_vcpu *vcpu);
->  #else
->  static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
->  {
-> @@ -138,6 +140,10 @@ static inline int kvm_vgic_register_its_device(void)
->  {
->  	return -ENODEV;
->  }
-> +
-> +static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
-> +{
-> +}
->  #endif
->  
->  int kvm_register_vgic_device(unsigned long type);
-> 
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+SGkgRHJldywgUmFkaW0sCgpPbiAwOC8wNy8yMDE2IDIyOjU1LCBSYWRpbSBLcsSNbcOhxZkgd3Jv
+dGU6Cj4gMjAxNi0wNy0wOCAxMDo1MiswMjAwLCBBbmRyZXcgSm9uZXM6Cj4+IE9uIEZyaSwgSnVs
+IDA4LCAyMDE2IGF0IDEwOjE2OjUzQU0gKzAyMDAsIEF1Z2VyIEVyaWMgd3JvdGU6Cj4+PiBPbiAw
+Ny8wNy8yMDE2IDE5OjIwLCBBbmRyZXcgSm9uZXMgd3JvdGU6Cj4+Pj4gT24gV2VkLCBKdWwgMDYs
+IDIwMTYgYXQgMTA6NDc6NTNBTSArMDIwMCwgRXJpYyBBdWdlciB3cm90ZToKPj4+Pj4gZGlmZiAt
+LWdpdCBhL3ZpcnQva3ZtL2lycWNoaXAuYyBiL3ZpcnQva3ZtL2lycWNoaXAuYwo+Pj4+PiBAQCAt
+MjksNyArMjksOSBAQAo+Pj4+PiAgI2luY2x1ZGUgPGxpbnV4L3NyY3UuaD4KPj4+Pj4gICNpbmNs
+dWRlIDxsaW51eC9leHBvcnQuaD4KPj4+Pj4gICNpbmNsdWRlIDx0cmFjZS9ldmVudHMva3ZtLmg+
+Cj4+Pj4+ICsjaWYgIWRlZmluZWQoQ09ORklHX0FSTSkgJiYgIWRlZmluZWQoQ09ORklHX0FSTTY0
+KQo+Pj4+PiAgI2luY2x1ZGUgImlycS5oIgo+Pj4+PiArI2VuZGlmCj4+Pj4KPj4+PiBJbnN0ZWFk
+IG9mIGRvaW5nIHRoaXMsIHNob3VsZG4ndCB3ZSBhZGQgYXJjaC9hcm1bNjRdL2t2bS9pcnEuaCBm
+aWxlcy4KPj4+PiBQcm9iYWJseSBhIHNpbXBsZSBvbmUgbGlrZSAuL2FyY2gvczM5MC9rdm0vaXJx
+LmggPwo+Pj4KPj4+IFdlbGwgSSBjb25zaWRlcmVkIHRoaXMgc29sdXRpb24gaW4gdGhlIHBhc3Qg
+YnV0IEkgZGlkIG5vdCBmaW5kIG11Y2ggdG8KPj4+IHB1dCB0aGVyZSAoaXQgd2FzIGV2ZW4gdm9p
+ZCkuIHR5cGljYWxseSBpcnFjaGlwX2luX2tlcm5lbCBpcyBpbgo+Pj4gaW5jbHVkZS9rdm0vYXJt
+X3ZnaWMuaCBzaW5jZSB0aGUgbWFjcm8gY2FuIGJlIHNoYXJlZCBiZXR3ZWVuIGFybS9hcm02NC4K
+Pj4KPj4gSSB0aGluayBJJ2QgcHJlZmVyIGEgbmVhcmx5IGVtcHR5IGZpbGUgdG8gdGhlICNpZmRl
+ZidzLCBidXQgUGFvbG8gYW5kCj4+IFJhZGltIHNob3VsZCBjaGltZSBpbi4KPiAKPiBJIGNvbmN1
+ciwgaGlkaW5nIHVnbGluZXNzIGluIGhlYWRlciBmaWxlcyBpcyB3aGF0IHdlIHN0cml2ZSBmb3Iu
+Cj4gCj4gVGhlIGZpbGVzIGNvdWxkICNpbmNsdWRlIDxpbmNsdWRlL2t2bS9hcm1fdmdpYy5oPiwg
+d2hpY2ggbWlnaHQgbWFrZQo+IHRoZWlyIGV4aXN0ZW5jZSBlYXNpZXIgdG8gdW5kZXJzdGFuZC4K
+PiAKT2sgSSB3aWxsIGludHJvZHVjZSBpcnEuaCB3aGljaCBzdWNoIGluY2x1c2lvbiBvbiBBUk0v
+QVJNNjQuCgpUaGFua3MKCkVyaWMKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
+ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
+Cg==
