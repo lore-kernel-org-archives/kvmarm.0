@@ -1,91 +1,71 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
 Subject: Re: [PATCH v9 14/17] KVM: arm64: allow updates of LPI configuration
  table
-Date: Thu, 14 Jul 2016 10:46:50 +0100
-Message-ID: <57875F8A.2070009@arm.com>
+Date: Thu, 14 Jul 2016 11:00:04 +0100
+Message-ID: <478c84bd-46e8-5f73-45d1-82d8c6bf38c1@arm.com>
 References: <20160713015909.28793-1-andre.przywara@arm.com>
- <20160713015909.28793-15-andre.przywara@arm.com>
+ <20160713015909.28793-15-andre.przywara@arm.com> <57875F8A.2070009@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160713015909.28793-15-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0968649B1D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2016 05:53:22 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2gbNwvYL2QJG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jul 2016 05:53:21 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3C0B49B1A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2016 05:53:20 -0400 (EDT)
+In-Reply-To: <57875F8A.2070009@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/07/16 02:59, Andre Przywara wrote:
-> The (system-wide) LPI configuration table is held in a table in
-> (guest) memory. To achieve reasonable performance, we cache this data
-> in our struct vgic_irq. If the guest updates the configuration data
-> (which consists of the enable bit and the priority value), it issues
-> an INV or INVALL command to allow us to update our information.
-> Provide functions that update that information for one LPI or all LPIs
-> mapped to a specific collection.
+Hi,
+
+On 14/07/16 10:46, Marc Zyngier wrote:
+> On 13/07/16 02:59, Andre Przywara wrote:
+>> The (system-wide) LPI configuration table is held in a table in
+>> (guest) memory. To achieve reasonable performance, we cache this data
+>> in our struct vgic_irq. If the guest updates the configuration data
+>> (which consists of the enable bit and the priority value), it issues
+>> an INV or INVALL command to allow us to update our information.
+>> Provide functions that update that information for one LPI or all LPIs
+>> mapped to a specific collection.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 39 +++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 39 insertions(+)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index f400ef1..60108f8 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -64,6 +64,45 @@ struct its_itte {
+>>  
+>>  #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
+>>  #define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
+>> +#define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 39 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 39 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index f400ef1..60108f8 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -64,6 +64,45 @@ struct its_itte {
->  
->  #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
->  #define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
-> +#define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
+> Again, these masks are wrong as we limit the ITS to 48 bits PA.
 
-Again, these masks are wrong as we limit the ITS to 48 bits PA.
+Those masks match the architecture description of the register. We limit
+to 48 bits of PA when the guest writes to those registers. I'd like to
+keep this limitation in one place only.
 
-> +
-> +#define GIC_LPI_OFFSET 8192
-> +
-> +#define LPI_PROP_ENABLE_BIT(p)	((p) & LPI_PROP_ENABLED)
-> +#define LPI_PROP_PRIORITY(p)	((p) & 0xfc)
-> +
-> +/*
-> + * Reads the configuration data for a given LPI from guest memory and
-> + * updates the fields in struct vgic_irq.
-> + * If filter_vcpu is not NULL, applies only if the IRQ is targeting this
-> + * VCPU. Unconditionally applies if filter_vcpu is NULL.
-> + */
-> +static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
-> +			     struct kvm_vcpu *filter_vcpu)
-> +{
-> +	u64 propbase = PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
-> +	u8 prop;
-> +	int ret;
-> +
-> +	ret = kvm_read_guest(kvm, propbase + irq->intid - GIC_LPI_OFFSET,
-> +			     &prop, 1);
-> +
-> +	if (ret)
-> +		return ret;
-> +
-> +	spin_lock(&irq->irq_lock);
-> +
-> +	if (!filter_vcpu || filter_vcpu == irq->target_vcpu) {
-> +		irq->priority = LPI_PROP_PRIORITY(prop);
-> +		irq->enabled = LPI_PROP_ENABLE_BIT(prop);
-> +
-> +		vgic_queue_irq_unlock(kvm, irq);
-> +	} else {
-> +		spin_unlock(&irq->irq_lock);
-> +	}
-> +
-> +	return 0;
-> +}
->  
->  /*
->   * Create a snapshot of the current LPI list, so that we can enumerate all
-> 
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Cheers,
+Andre.
