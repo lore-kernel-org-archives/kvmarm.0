@@ -1,643 +1,439 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v9 11/17] KVM: arm64: implement basic ITS register
- handlers
-Date: Thu, 14 Jul 2016 10:13:12 +0100
-Message-ID: <578757A8.8010507@arm.com>
-References: <20160713015909.28793-1-andre.przywara@arm.com>
- <20160713015909.28793-12-andre.przywara@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC v6 4/6] KVM: arm/arm64: enable irqchip routing
+Date: Thu, 14 Jul 2016 11:33:38 +0200
+Message-ID: <c90a888b-dfdd-9714-15e8-ab06e27b200a@redhat.com>
+References: <1467794875-5237-1-git-send-email-eric.auger@redhat.com>
+ <1467794875-5237-5-git-send-email-eric.auger@redhat.com>
+ <93b250b3-7eba-8f16-4fe0-2979b277a355@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160713015909.28793-12-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 414B649B1D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2016 05:27:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Q70qRDKKWWQn for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jul 2016 05:27:49 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 595D449B1A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2016 05:27:49 -0400 (EDT)
+In-Reply-To: <93b250b3-7eba-8f16-4fe0-2979b277a355@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/07/16 02:59, Andre Przywara wrote:
-> Add emulation for some basic MMIO registers used in the ITS emulation.
-> This includes:
-> - GITS_{CTLR,TYPER,IIDR}
-> - ID registers
-> - GITS_{CBASER,CREADR,CWRITER}
->   (which implement the ITS command buffer handling)
-> - GITS_BASER<n>
+Hi Andre,
+
+On 11/07/2016 18:25, Andre Przywara wrote:
+> Hi Eric,
 > 
-> Most of the handlers are pretty straight forward, only the CWRITER
-> handler is a bit more involved by taking the new its_cmd mutex and
-> then iterating over the command buffer.
-> The registers holding base addresses and attributes are sanitised before
-> storing them.
+> On 06/07/16 09:47, Eric Auger wrote:
+>> This patch adds compilation and link against irqchip.
+>>
+>> Main motivation behind using irqchip code is to enable MSI
+>> routing code. In the future irqchip routing may also be useful
+>> when targeting multiple irqchips.
+>>
+>> Routing standard callbacks now are implemented in vgic-irqfd:
+>> - kvm_set_routing_entry
+>> - kvm_set_irq
+>> - kvm_set_msi
+>>
+>> They only are supported with new_vgic code.
+>>
+>> Both HAVE_KVM_IRQCHIP and HAVE_KVM_IRQ_ROUTING are defined.
+>> KVM_CAP_IRQ_ROUTING is advertised and KVM_SET_GSI_ROUTING is allowed.
+>>
+>> So from now on IRQCHIP routing is enabled and a routing table entry
+>> must exist for irqfd injection to succeed for a given SPI. This patch
+>> builds a default flat irqchip routing table (gsi=irqchip.pin) covering
+>> all the VGIC SPI indexes. This routing table is overwritten by the
+>> first first user-space call to KVM_SET_GSI_ROUTING ioctl.
+>>
+>> MSI routing setup is not yet allowed.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v5 -> v6:
+>> - rebase on top of Andre's v8 + removal of old vgic
+>>
+>> v4 -> v5:
+>> - vgic_irqfd.c was renamed into vgic-irqfd.c by Andre
+>> - minor comment changes
+>> - remove trace_kvm_set_irq since it is called in irqchip
+>> - remove CONFIG_HAVE_KVM_MSI setting (done in KVM section)
+>> - despite Christoffer's question, in kvm_set_msi, I kept the copy from
+>>   the input "struct kvm_kernel_irq_routing_entry *e" imposed by the
+>>   irqchip callback API into the struct kvm_msi * passed to
+>>   vits_inject_msi. Since vits_inject_msi is directly called by
+>>   kvm_send_userspace_msi which takes a struct kvm_msi*, makes sense
+>>   to me to keep the copy.
+>> - squash former [PATCH v4 5/7] KVM: arm/arm64: build a default routing
+>>   table into that patch
+>> - handle default routing table alloc failure
+>>
+>> v3 -> v4:
+>> - provide support only for new-vgic
+>> - code previously in vgic.c now in vgic_irqfd.c
+>>
+>> v2 -> v3:
+>> - unconditionally set devid and KVM_MSI_VALID_DEVID flag as suggested
+>>   by Andre (KVM_IRQ_ROUTING_EXTENDED_MSI type not used anymore)
+>> - vgic_irqfd_set_irq now is static
+>> - propagate flags
+>> - add comments
+>>
+>> v1 -> v2:
+>> - fix bug reported by Andre related to msi.flags and msi.devid setting
+>>   in kvm_send_userspace_msi
+>> - avoid injecting reserved IRQ numbers in vgic_irqfd_set_irq
+>>
+>> RFC -> PATCH
+>> - reword api.txt:
+>>   x move MSI routing comments in a subsequent patch,
+>>   x clearly state GSI routing does not apply to KVM_IRQ_LINE
+>> ---
+>>  Documentation/virtual/kvm/api.txt | 12 ++++--
+>>  arch/arm/include/asm/kvm_host.h   |  2 +
+>>  arch/arm/kvm/Kconfig              |  2 +
+>>  arch/arm/kvm/Makefile             |  1 +
+>>  arch/arm64/include/asm/kvm_host.h |  1 +
+>>  arch/arm64/kvm/Kconfig            |  2 +
+>>  arch/arm64/kvm/Makefile           |  1 +
+>>  virt/kvm/arm/vgic/vgic-init.c     | 27 +++++++++++++
+>>  virt/kvm/arm/vgic/vgic-irqfd.c    | 82 ++++++++++++++++++++++++++++++---------
+>>  virt/kvm/arm/vgic/vgic.c          |  7 ----
+>>  virt/kvm/irqchip.c                |  2 +
+>>  11 files changed, 109 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>> index 0065c8e..3bb60d3 100644
+>> --- a/Documentation/virtual/kvm/api.txt
+>> +++ b/Documentation/virtual/kvm/api.txt
+>> @@ -1433,13 +1433,16 @@ KVM_ASSIGN_DEV_IRQ. Partial deassignment of host or guest IRQ is allowed.
+>>  4.52 KVM_SET_GSI_ROUTING
+>>  
+>>  Capability: KVM_CAP_IRQ_ROUTING
+>> -Architectures: x86 s390
+>> +Architectures: x86 s390 arm arm64
+>>  Type: vm ioctl
+>>  Parameters: struct kvm_irq_routing (in)
+>>  Returns: 0 on success, -1 on error
+>>  
+>>  Sets the GSI routing table entries, overwriting any previously set entries.
+>>  
+>> +On arm/arm64, GSI routing has the following limitation:
+>> +- GSI routing does not apply to KVM_IRQ_LINE but only to KVM_IRQFD.
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/arm_vgic.h           |  16 ++
->  virt/kvm/arm/vgic/vgic-its.c     | 394 ++++++++++++++++++++++++++++++++++++++-
->  virt/kvm/arm/vgic/vgic-mmio-v3.c |   8 +-
->  virt/kvm/arm/vgic/vgic-mmio.h    |   6 +
->  virt/kvm/arm/vgic/vgic.c         |  12 +-
->  5 files changed, 419 insertions(+), 17 deletions(-)
+> Do you have an idea whether this is a limitation? Or something that
+> requires arch specific code in userland?
+No, currently I have not fully identified the consequences. I guess they
+will come when we will start really using GSI routing with several irqchips.
+
+> Or is there another issue with extending this to KVM_IRQ_LINE (ignoring
+> the fact that we don't need it)?
+The problem comes from the GSI semantic used originally for ARM which is
+really hardcoded:
+
+
+bits:  | 31 ... 24 | 23  ... 16 | 15    ...    0 |
+field: | irq_type  | vcpu_index |     irq_id     |
+
+userspace or kernel (default) would need to create routing entries for
+all the GSIs likely to be injected from userspace.
+
 > 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 8609fac..6186749 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -22,6 +22,7 @@
->  #include <linux/spinlock.h>
->  #include <linux/types.h>
->  #include <kvm/iodev.h>
-> +#include <linux/list.h>
->  
->  #define VGIC_V3_MAX_CPUS	255
->  #define VGIC_V2_MAX_CPUS	8
-> @@ -136,6 +137,21 @@ struct vgic_its {
->  	bool			enabled;
->  	bool			initialized;
->  	struct vgic_io_device	iodev;
-> +
-> +	/* These registers correspond to GITS_BASER{0,1} */
-> +	u64			baser_device_table;
-> +	u64			baser_coll_table;
-> +
-> +	/* Protects the command queue */
-> +	struct mutex		cmd_lock;
-> +	u64			cbaser;
-> +	u32			creadr;
-> +	u32			cwriter;
-> +
-> +	/* Protects the device and collection lists */
-> +	struct mutex		its_lock;
-> +	struct list_head	device_list;
-> +	struct list_head	collection_list;
->  };
->  
->  struct vgic_dist {
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 393ad3a..dc9a98f 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -21,6 +21,7 @@
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
->  #include <linux/interrupt.h>
-> +#include <linux/list.h>
->  #include <linux/uaccess.h>
->  
->  #include <linux/irqchip/arm-gic-v3.h>
-> @@ -32,6 +33,326 @@
->  #include "vgic.h"
->  #include "vgic-mmio.h"
->  
-> +struct its_device {
-> +	struct list_head dev_list;
-> +
-> +	/* the head for the list of ITTEs */
-> +	struct list_head itt_head;
-> +	u32 device_id;
-> +};
-> +
-> +#define COLLECTION_NOT_MAPPED ((u32)~0)
-> +
-> +struct its_collection {
-> +	struct list_head coll_list;
-> +
-> +	u32 collection_id;
-> +	u32 target_addr;
-> +};
-> +
-> +#define its_is_collection_mapped(coll) ((coll) && \
-> +				((coll)->target_addr != COLLECTION_NOT_MAPPED))
-> +
-> +struct its_itte {
-> +	struct list_head itte_list;
-> +
-> +	struct its_collection *collection;
-> +	u32 lpi;
-> +	u32 event_id;
-> +};
-> +
-> +#define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
-
-I thought we had agreed on sticking to 48bit all over the place?
-
-> +
-> +static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
-> +					     struct vgic_its *its,
-> +					     gpa_t addr, unsigned int len)
-> +{
-> +	u32 reg = 0;
-> +
-> +	mutex_lock(&its->cmd_lock);
-> +	if (its->creadr == its->cwriter)
-> +		reg |= GITS_CTLR_QUIESCENT;
-> +	if (its->enabled)
-> +		reg |= GITS_CTLR_ENABLE;
-> +	mutex_unlock(&its->cmd_lock);
-> +
-> +	return reg;
-> +}
-> +
-> +static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
-> +				     gpa_t addr, unsigned int len,
-> +				     unsigned long val)
-> +{
-> +	its->enabled = !!(val & GITS_CTLR_ENABLE);
-> +}
-> +
-> +static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
-> +					      struct vgic_its *its,
-> +					      gpa_t addr, unsigned int len)
-> +{
-> +	u64 reg = GITS_TYPER_PLPIS;
-> +
-> +	/*
-> +	 * We use linear CPU numbers for redistributor addressing,
-> +	 * so GITS_TYPER.PTA is 0.
-> +	 * Also we force all PROPBASER registers to be the same, so
-> +	 * CommonLPIAff is 0 as well.
-> +	 * To avoid memory waste in the guest, we keep the number of IDBits and
-> +	 * DevBits low - as least for the time being.
-> +	 */
-> +	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
-> +	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
-> +
-> +	return extract_bytes(reg, addr & 7, len);
-> +}
-> +
-> +static unsigned long vgic_mmio_read_its_iidr(struct kvm *kvm,
-> +					     struct vgic_its *its,
-> +					     gpa_t addr, unsigned int len)
-> +{
-> +	return (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-> +}
-> +
-> +static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
-> +					       struct vgic_its *its,
-> +					       gpa_t addr, unsigned int len)
-> +{
-> +	switch (addr & 0xffff) {
-> +	case GITS_PIDR0:
-> +		return 0x92;	/* part number, bits[7:0] */
-> +	case GITS_PIDR1:
-> +		return 0xb4;	/* part number, bits[11:8] */
-> +	case GITS_PIDR2:
-> +		return GIC_PIDR2_ARCH_GICv3 | 0x0b;
-> +	case GITS_PIDR4:
-> +		return 0x40;	/* This is a 64K software visible page */
-> +	/* The following are the ID registers for (any) GIC. */
-> +	case GITS_CIDR0:
-> +		return 0x0d;
-> +	case GITS_CIDR1:
-> +		return 0xf0;
-> +	case GITS_CIDR2:
-> +		return 0x05;
-> +	case GITS_CIDR3:
-> +		return 0xb1;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/* Requires the its_lock to be held. */
-> +static void its_free_itte(struct kvm *kvm, struct its_itte *itte)
-> +{
-> +	list_del(&itte->itte_list);
-> +	kfree(itte);
-> +}
-> +
-> +static int vgic_its_handle_command(struct kvm *kvm, struct vgic_its *its,
-> +				   u64 *its_cmd)
-> +{
-> +	return -ENODEV;
-> +}
-> +
-> +static u64 vgic_sanitise_its_baser(u64 reg)
-> +{
-> +	reg = vgic_sanitise_field(reg, GITS_BASER_SHAREABILITY_MASK,
-> +				  GITS_BASER_SHAREABILITY_SHIFT,
-> +				  vgic_sanitise_shareability);
-> +	reg = vgic_sanitise_field(reg, GITS_BASER_CACHEABILITY_MASK,
-> +				  GITS_BASER_INNER_CACHEABILITY_SHIFT,
-> +				  vgic_sanitise_inner_cacheability);
-> +	reg = vgic_sanitise_field(reg, GITS_BASER_OUTER_CACHEABILITY_MASK,
-> +				  GITS_BASER_OUTER_CACHEABILITY_SHIFT,
-> +				  vgic_sanitise_outer_cacheability);
-> +
-> +	/* When using 64K pages, we clear bits to limit the PA to 48 bits. */
-> +	if ((reg & GITS_BASER_PAGE_SIZE_MASK) == GITS_BASER_PAGE_SIZE_64K)
-
-Why that check? We were supposed to only support 64kB pages so that we
-could simplify the code. The page size field should be RO, and set to 64k.
-
-> +		reg &= ~GENMASK_ULL(15, 12);
-> +
-> +	return reg;
-> +}
-> +
-> +static u64 vgic_sanitise_its_cbaser(u64 reg)
-> +{
-> +	reg = vgic_sanitise_field(reg, GITS_CBASER_SHAREABILITY_MASK,
-> +				  GITS_CBASER_SHAREABILITY_SHIFT,
-> +				  vgic_sanitise_shareability);
-> +	reg = vgic_sanitise_field(reg, GITS_CBASER_CACHEABILITY_MASK,
-> +				  GITS_CBASER_INNER_CACHEABILITY_SHIFT,
-> +				  vgic_sanitise_inner_cacheability);
-> +	reg = vgic_sanitise_field(reg, GITS_CBASER_OUTER_CACHEABILITY_MASK,
-> +				  GITS_CBASER_OUTER_CACHEABILITY_SHIFT,
-> +				  vgic_sanitise_outer_cacheability);
-> +
-> +	/*
-> +	 * Sanitise the physical address to be 64k aligned (for 4K and 16K
-> +	 * pages), also limit the physical addresses to 48 bits.
-
-Please drop the remark about 4k and 16k pages, this is irrelevant here.
-
-> +	 */
-> +	reg &= ~(GENMASK_ULL(51, 48) | GENMASK_ULL(15, 12));
-> +
-> +	return reg;
-> +}
-> +
-> +static unsigned long vgic_mmio_read_its_cbaser(struct kvm *kvm,
-> +					       struct vgic_its *its,
-> +					       gpa_t addr, unsigned int len)
-> +{
-> +	return extract_bytes(its->cbaser, addr & 7, len);
-> +}
-> +
-> +static void vgic_mmio_write_its_cbaser(struct kvm *kvm, struct vgic_its *its,
-> +				       gpa_t addr, unsigned int len,
-> +				       unsigned long val)
-> +{
-> +	/* When GITS_CTLR.Enable is 1, this register is RO. */
-> +	if (its->enabled)
-> +		return;
-> +
-> +	mutex_lock(&its->cmd_lock);
-> +	its->cbaser = update_64bit_reg(its->cbaser, addr & 7, len, val);
-> +	its->cbaser = vgic_sanitise_its_cbaser(its->cbaser);
-> +	its->creadr = 0;
-> +	/*
-> +	 * CWRITER is architecturally UNKNOWN on reset, but we need to reset
-> +	 * it to CREADR to make sure we start with an empty command buffer.
-> +	 */
-> +	its->cwriter = its->creadr;
-> +	mutex_unlock(&its->cmd_lock);
-> +}
-> +
-> +#define ITS_CMD_BUFFER_SIZE(baser)	((((baser) & 0xff) + 1) << 12)
-> +#define ITS_CMD_SIZE			32
-> +
-> +/*
-> + * By writing to CWRITER the guest announces new commands to be processed.
-> + * To avoid any races in the first place, we take the its_cmd lock, which
-> + * protects our ring buffer variables, so that there is only one user
-> + * per ITS handling commands at a given time.
-> + */
-> +static void vgic_mmio_write_its_cwriter(struct kvm *kvm, struct vgic_its *its,
-> +					gpa_t addr, unsigned int len,
-> +					unsigned long val)
-> +{
-> +	gpa_t cbaser;
-> +	u64 cmd_buf[4];
-> +	u32 reg;
-> +
-> +	if (!its)
-> +		return;
-> +
-> +	cbaser = CBASER_ADDRESS(its->cbaser);
-> +
-> +	reg = update_64bit_reg(its->cwriter & 0xfffe0, addr & 7, len, val);
-> +	reg &= 0xfffe0;
-
-Why not use GENMASK to define the valid bits like we did everywhere
-else? Also, do you really need this mask in the call to update_64bit_reg?
-
-> +	if (reg > ITS_CMD_BUFFER_SIZE(its->cbaser))
-> +		return;
-> +
-> +	mutex_lock(&its->cmd_lock);
-> +
-> +	its->cwriter = reg;
-> +
-> +	while (its->cwriter != its->creadr) {
-> +		int ret = kvm_read_guest(kvm, cbaser + its->creadr,
-> +					 cmd_buf, ITS_CMD_SIZE);
-> +		/*
-> +		 * If kvm_read_guest() fails, this could be due to the guest
-> +		 * programming a bogus value in CBASER or something else going
-> +		 * wrong from which we cannot easily recover.
-> +		 * We just ignore that command then.
-
-It would be good to mention that this is consistent with the handling of
-command errors as described in section 6.3.2 of the architecture
-specification.
-
-> +		 */
-> +		if (!ret)
-> +			vgic_its_handle_command(kvm, its, cmd_buf);
-> +
-> +		its->creadr += ITS_CMD_SIZE;
-> +		if (its->creadr == ITS_CMD_BUFFER_SIZE(its->cbaser))
-> +			its->creadr = 0;
-> +	}
-> +
-> +	mutex_unlock(&its->cmd_lock);
-> +}
-> +
-> +static unsigned long vgic_mmio_read_its_cwriter(struct kvm *kvm,
-> +						struct vgic_its *its,
-> +						gpa_t addr, unsigned int len)
-> +{
-> +	return extract_bytes(its->cwriter & 0xfffe0, addr & 0x7, len);
-> +}
-> +
-> +static unsigned long vgic_mmio_read_its_creadr(struct kvm *kvm,
-> +					       struct vgic_its *its,
-> +					       gpa_t addr, unsigned int len)
-> +{
-> +	return extract_bytes(its->creadr & 0xfffe0, addr & 0x7, len);
-> +}
-> +
-> +#define BASER_INDEX(addr) (((addr) / sizeof(u64)) & 0x7)
-> +static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm,
-> +					      struct vgic_its *its,
-> +					      gpa_t addr, unsigned int len)
-> +{
-> +	u64 reg;
-> +
-> +	switch (BASER_INDEX(addr)) {
-> +	case 0:
-> +		reg = its->baser_device_table;
-> +		break;
-> +	case 1:
-> +		reg = its->baser_coll_table;
-> +		break;
-> +	default:
-> +		reg = 0;
-> +		break;
-> +	}
-> +
-> +	return extract_bytes(reg, addr & 7, len);
-> +}
-> +
-> +#define GITS_BASER_RO_MASK	(GENMASK_ULL(52, 48) | GENMASK_ULL(58, 56))
-> +static void vgic_mmio_write_its_baser(struct kvm *kvm,
-> +				      struct vgic_its *its,
-> +				      gpa_t addr, unsigned int len,
-> +				      unsigned long val)
-> +{
-> +	u64 entry_size, device_type;
-> +	u64 reg, *regptr, clearbits = 0;
-> +
-> +	/* When GITS_CTLR.Enable is 1, we ignore write accesses. */
-> +	if (its->enabled)
-> +		return;
-> +
-> +	switch (BASER_INDEX(addr)) {
-> +	case 0:
-> +		regptr = &its->baser_device_table;
-> +		entry_size = 8;
-> +		device_type = GITS_BASER_TYPE_DEVICE;
-> +		break;
-> +	case 1:
-> +		regptr = &its->baser_coll_table;
-> +		entry_size = 8;
-> +		device_type = GITS_BASER_TYPE_COLLECTION;
-> +		clearbits = GITS_BASER_INDIRECT;
-> +		break;
-> +	default:
-> +		return;
-> +	}
-> +
-> +	reg = update_64bit_reg(*regptr, addr & 7, len, val);
-> +	reg &= ~GITS_BASER_RO_MASK;
-> +	reg &= ~clearbits;
-> +
-> +	/*
-> +	 * When the guest wants to use 64K pages, bits 15:12 contain bits 51:48
-> +	 * of the PA, which we don't support. Clear them to emulate RAZ/WI.
-> +	 */
-> +	if (reg & GITS_BASER_PAGE_SIZE_64K)
-> +		reg &= ~GENMASK_ULL(15, 12);
-
-Again, this is not what I thought we had agreed on. What I'd like to see
-is an ITS that *only* supports 64kB pages, and nothing else. It
-simplifies the code, and is consistent with the rest of vgic where we
-choose a configuration.
-
-Please drop all support for 4k and 16k pages, and make the page size
-field RO.
-
-> +	reg |= (entry_size - 1) << GITS_BASER_ENTRY_SIZE_SHIFT;
-> +	reg |= device_type << GITS_BASER_TYPE_SHIFT;
-> +	reg = vgic_sanitise_its_baser(reg);
-> +
-> +	*regptr = reg;
-> +}
-> +
->  #define REGISTER_ITS_DESC(off, rd, wr, length, acc)		\
->  {								\
->  	.reg_offset = off,					\
-> @@ -41,8 +362,8 @@
->  	.its_write = wr,					\
->  }
->  
-> -static unsigned long its_mmio_read_raz(struct kvm *kvm, struct vgic_its *its,
-> -				       gpa_t addr, unsigned int len)
-> +unsigned long its_mmio_read_raz(struct kvm *kvm, struct vgic_its *its,
-> +				gpa_t addr, unsigned int len)
->  {
->  	return 0;
->  }
-> @@ -55,28 +376,28 @@ static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
->  
->  static struct vgic_register_region its_registers[] = {
->  	REGISTER_ITS_DESC(GITS_CTLR,
-> -		its_mmio_read_raz, its_mmio_write_wi, 4,
-> +		vgic_mmio_read_its_ctlr, vgic_mmio_write_its_ctlr, 4,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_ITS_DESC(GITS_IIDR,
-> -		its_mmio_read_raz, its_mmio_write_wi, 4,
-> +		vgic_mmio_read_its_iidr, its_mmio_write_wi, 4,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_ITS_DESC(GITS_TYPER,
-> -		its_mmio_read_raz, its_mmio_write_wi, 8,
-> +		vgic_mmio_read_its_typer, its_mmio_write_wi, 8,
->  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->  	REGISTER_ITS_DESC(GITS_CBASER,
-> -		its_mmio_read_raz, its_mmio_write_wi, 8,
-> +		vgic_mmio_read_its_cbaser, vgic_mmio_write_its_cbaser, 8,
->  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->  	REGISTER_ITS_DESC(GITS_CWRITER,
-> -		its_mmio_read_raz, its_mmio_write_wi, 8,
-> +		vgic_mmio_read_its_cwriter, vgic_mmio_write_its_cwriter, 8,
->  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->  	REGISTER_ITS_DESC(GITS_CREADR,
-> -		its_mmio_read_raz, its_mmio_write_wi, 8,
-> +		vgic_mmio_read_its_creadr, its_mmio_write_wi, 8,
->  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->  	REGISTER_ITS_DESC(GITS_BASER,
-> -		its_mmio_read_raz, its_mmio_write_wi, 0x40,
-> +		vgic_mmio_read_its_baser, vgic_mmio_write_its_baser, 0x40,
->  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->  	REGISTER_ITS_DESC(GITS_IDREGS_BASE,
-> -		its_mmio_read_raz, its_mmio_write_wi, 0x30,
-> +		vgic_mmio_read_its_idregs, its_mmio_write_wi, 0x30,
->  		VGIC_ACCESS_32bit),
->  };
->  
-> @@ -100,6 +421,18 @@ static int vgic_its_register(struct kvm *kvm, struct vgic_its *its)
->  	return ret;
->  }
->  
-> +#define INITIAL_BASER_VALUE						  \
-> +	(GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWb)		| \
-> +	 GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, SameAsInner)		| \
-> +	 GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)		| \
-> +	 ((8ULL - 1) << GITS_BASER_ENTRY_SIZE_SHIFT)			| \
-> +	 GITS_BASER_PAGE_SIZE_64K)
-> +
-> +#define INITIAL_PROPBASER_VALUE						  \
-> +	(GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWb)		| \
-> +	 GIC_BASER_CACHEABILITY(GICR_PROPBASER, OUTER, SameAsInner)	| \
-> +	 GIC_BASER_SHAREABILITY(GICR_PROPBASER, InnerShareable))
-> +
->  static int vgic_its_create(struct kvm_device *dev, u32 type)
->  {
->  	struct vgic_its *its;
-> @@ -111,12 +444,24 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
->  	if (!its)
->  		return -ENOMEM;
->  
-> +	mutex_init(&its->its_lock);
-> +	mutex_init(&its->cmd_lock);
-> +
->  	its->vgic_its_base = VGIC_ADDR_UNDEF;
->  
-> +	INIT_LIST_HEAD(&its->device_list);
-> +	INIT_LIST_HEAD(&its->collection_list);
-> +
->  	dev->kvm->arch.vgic.has_its = true;
->  	its->initialized = false;
->  	its->enabled = false;
->  
-> +	its->baser_device_table = INITIAL_BASER_VALUE			|
-> +		((u64)GITS_BASER_TYPE_DEVICE << GITS_BASER_TYPE_SHIFT);
-> +	its->baser_coll_table = INITIAL_BASER_VALUE |
-> +		((u64)GITS_BASER_TYPE_COLLECTION << GITS_BASER_TYPE_SHIFT);
-> +	dev->kvm->arch.vgic.propbaser = INITIAL_PROPBASER_VALUE;
-> +
->  	dev->private = its;
->  
->  	return 0;
-> @@ -124,7 +469,36 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
->  
->  static void vgic_its_destroy(struct kvm_device *kvm_dev)
->  {
-> +	struct kvm *kvm = kvm_dev->kvm;
->  	struct vgic_its *its = kvm_dev->private;
-> +	struct its_device *dev;
-> +	struct its_itte *itte;
-> +	struct list_head *dev_cur, *dev_temp;
-> +	struct list_head *cur, *temp;
-> +
-> +	/*
-> +	 * We may end up here without the lists ever having been initialized.
-> +	 * Check this and bail out early to avoid dereferencing a NULL pointer.
-> +	 */
-> +	if (!its->device_list.next)
-> +		return;
-> +
-> +	mutex_lock(&its->its_lock);
-> +	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
-> +		dev = container_of(dev_cur, struct its_device, dev_list);
-> +		list_for_each_safe(cur, temp, &dev->itt_head) {
-> +			itte = (container_of(cur, struct its_itte, itte_list));
-> +			its_free_itte(kvm, itte);
-> +		}
-> +		list_del(dev_cur);
-> +		kfree(dev);
-> +	}
-> +
-> +	list_for_each_safe(cur, temp, &its->collection_list) {
-> +		list_del(cur);
-> +		kfree(container_of(cur, struct its_collection, coll_list));
-> +	}
-> +	mutex_unlock(&its->its_lock);
->  
->  	kfree(its);
->  }
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index 6cb52dd..d98e009 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -23,15 +23,15 @@
->  #include "vgic-mmio.h"
->  
->  /* extract @num bytes at @offset bytes offset in data */
-> -static unsigned long extract_bytes(unsigned long data, unsigned int offset,
-> -				   unsigned int num)
-> +unsigned long extract_bytes(unsigned long data, unsigned int offset,
-> +			    unsigned int num)
->  {
->  	return (data >> (offset * 8)) & GENMASK_ULL(num * 8 - 1, 0);
->  }
->  
->  /* allows updates of any half of a 64-bit register (or the whole thing) */
-> -static u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
-> -			    unsigned long val)
-> +u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
-> +		     unsigned long val)
->  {
->  	int lower = (offset & 4) * 8;
->  	int upper = lower + 8 * len - 1;
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-> index 366d663..0b3ecf9 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.h
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
-> @@ -96,6 +96,12 @@ unsigned long vgic_data_mmio_bus_to_host(const void *val, unsigned int len);
->  void vgic_data_host_to_mmio_bus(void *buf, unsigned int len,
->  				unsigned long data);
->  
-> +unsigned long extract_bytes(unsigned long data, unsigned int offset,
-> +			    unsigned int num);
-> +
-> +u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
-> +		     unsigned long val);
-> +
->  unsigned long vgic_mmio_read_raz(struct kvm_vcpu *vcpu,
->  				 gpa_t addr, unsigned int len);
->  
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index 1fb2693..d7ea5df 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -33,10 +33,16 @@ struct vgic_global __section(.hyp.text) kvm_vgic_global_state;
->  
->  /*
->   * Locking order is always:
-> - *   vgic_cpu->ap_list_lock
-> - *     vgic_irq->irq_lock
-> + * its->cmd_lock (mutex)
-> + *   its->its_lock (mutex)
-> + *     vgic_cpu->ap_list_lock
-> + *       vgic_irq->irq_lock
->   *
-> - * (that is, always take the ap_list_lock before the struct vgic_irq lock).
-> + * If you need to take multiple locks, always take the upper lock first,
-> + * then the lower ones, e.g. first take the its_lock, then the irq_lock.
-> + * If you are already holding a lock and need to take a higher one, you
-> + * have to drop the lower ranking lock first and re-aquire it after having
-> + * taken the upper one.
->   *
->   * When taking more than one ap_list_lock at the same time, always take the
->   * lowest numbered VCPU's ap_list_lock first, so:
+>> +
+>>  struct kvm_irq_routing {
+>>  	__u32 nr;
+>>  	__u32 flags;
+>> @@ -2368,9 +2371,10 @@ Note that closing the resamplefd is not sufficient to disable the
+>>  irqfd.  The KVM_IRQFD_FLAG_RESAMPLE is only necessary on assignment
+>>  and need not be specified with KVM_IRQFD_FLAG_DEASSIGN.
+>>  
+>> -On ARM/ARM64, the gsi field in the kvm_irqfd struct specifies the Shared
+>> -Peripheral Interrupt (SPI) index, such that the GIC interrupt ID is
+>> -given by gsi + 32.
+>> +On arm/arm64, gsi routing being supported, the following can happen:
+>> +- in case no routing entry is associated to this gsi, injection fails
+>> +- in case the gsi is associated to an irqchip routing entry,
+>> +  irqchip.pin + 32 corresponds to the injected SPI ID.
+>>  
+>>  4.76 KVM_PPC_ALLOCATE_HTAB
+>>  
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index 3c40facd..161997e 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -37,6 +37,8 @@
+>>  
+>>  #define KVM_VCPU_MAX_FEATURES 2
+>>  
+>> +#define KVM_IRQCHIP_NUM_PINS 988 /* 1020 - 32 is the number of SPIs */
+>> +
+>>  #include <kvm/arm_vgic.h>
+>>  
+>>  #define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
+>> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+>> index 95a0005..3e1cd04 100644
+>> --- a/arch/arm/kvm/Kconfig
+>> +++ b/arch/arm/kvm/Kconfig
+>> @@ -32,6 +32,8 @@ config KVM
+>>  	select KVM_VFIO
+>>  	select HAVE_KVM_EVENTFD
+>>  	select HAVE_KVM_IRQFD
+>> +	select HAVE_KVM_IRQCHIP
+>> +	select HAVE_KVM_IRQ_ROUTING
+>>  	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+>>  	---help---
+>>  	  Support hosting virtualized guest machines.
+>> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+>> index 5e28df8..025d812 100644
+>> --- a/arch/arm/kvm/Makefile
+>> +++ b/arch/arm/kvm/Makefile
+>> @@ -29,4 +29,5 @@ obj-y += $(KVM)/arm/vgic/vgic-v2.o
+>>  obj-y += $(KVM)/arm/vgic/vgic-mmio.o
+>>  obj-y += $(KVM)/arm/vgic/vgic-mmio-v2.o
+>>  obj-y += $(KVM)/arm/vgic/vgic-kvm-device.o
+>> +obj-y += $(KVM)//irqchip.o
+>>  obj-y += $(KVM)/arm/arch_timer.o
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index ebe8904..58f4a60 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -34,6 +34,7 @@
+>>  #define KVM_PRIVATE_MEM_SLOTS 4
+>>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>>  #define KVM_HALT_POLL_NS_DEFAULT 500000
+>> +#define KVM_IRQCHIP_NUM_PINS 988 /* 1020 - 32 is the number of SPIs */
+>>  
+>>  #include <kvm/arm_vgic.h>
+>>  #include <kvm/arm_arch_timer.h>
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index 9d2eff0..9c9edc9 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -37,6 +37,8 @@ config KVM
+>>  	select KVM_ARM_VGIC_V3
+>>  	select KVM_ARM_PMU if HW_PERF_EVENTS
+>>  	select HAVE_KVM_MSI
+>> +	select HAVE_KVM_IRQCHIP
+>> +	select HAVE_KVM_IRQ_ROUTING
+>>  	---help---
+>>  	  Support hosting virtualized guest machines.
+>>  	  We don't support KVM with 16K page tables yet, due to the multiple
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index a5b9664..695eb3c 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -30,5 +30,6 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v2.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v3.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-kvm-device.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-its.o
+>> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+>>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+>> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+>> index 01a60dc..591571e 100644
+>> --- a/virt/kvm/arm/vgic/vgic-init.c
+>> +++ b/virt/kvm/arm/vgic/vgic-init.c
+>> @@ -264,6 +264,10 @@ int vgic_init(struct kvm *kvm)
+>>  	kvm_for_each_vcpu(i, vcpu, kvm)
+>>  		kvm_vgic_vcpu_init(vcpu);
+>>  
+>> +	ret = kvm_setup_default_irq_routing(kvm);
+>> +	if (ret)
+>> +		goto out;
+>> +
+>>  	dist->initialized = true;
+>>  out:
+>>  	return ret;
+>> @@ -457,3 +461,26 @@ out_free_irq:
+>>  			kvm_get_running_vcpus());
+>>  	return ret;
+>>  }
+>> +
+>> +int kvm_setup_default_irq_routing(struct kvm *kvm)
 > 
+> Can you make this static (and rename it to avoid the clash)? I see that
+> x86 also has it public, but there is no architecture agnostic code using
+> that, so I consider this just a leftover on their side.
 
-Thanks,
+OK. I think I will move the kvm_setup_default_irq_routing definition
+into vgic-irqfd and indeed I can propose to retire the declaration from
+kvm_host.h and move it to architecture folders.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks
+
+Eric
+> 
+> Cheers,
+> Andre.
+> 
+>> +{
+>> +	struct kvm_irq_routing_entry *entries;
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>> +	u32 nr = dist->nr_spis;
+>> +	int i, ret;
+>> +
+>> +	entries = kcalloc(nr, sizeof(struct kvm_kernel_irq_routing_entry),
+>> +			  GFP_KERNEL);
+>> +	if (!entries)
+>> +		return -ENOMEM;
+>> +
+>> +	for (i = 0; i < nr; i++) {
+>> +		entries[i].gsi = i;
+>> +		entries[i].type = KVM_IRQ_ROUTING_IRQCHIP;
+>> +		entries[i].u.irqchip.irqchip = 0;
+>> +		entries[i].u.irqchip.pin = i;
+>> +	}
+>> +	ret = kvm_set_irq_routing(kvm, entries, nr, 0);
+>> +	kfree(entries);
+>> +	return ret;
+>> +}
+>> diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
+>> index c675513..b03ab4e 100644
+>> --- a/virt/kvm/arm/vgic/vgic-irqfd.c
+>> +++ b/virt/kvm/arm/vgic/vgic-irqfd.c
+>> @@ -17,36 +17,80 @@
+>>  #include <linux/kvm.h>
+>>  #include <linux/kvm_host.h>
+>>  #include <trace/events/kvm.h>
+>> +#include <kvm/arm_vgic.h>
+>> +#include "vgic.h"
+>>  
+>> -int kvm_irq_map_gsi(struct kvm *kvm,
+>> -		    struct kvm_kernel_irq_routing_entry *entries,
+>> -		    int gsi)
+>> +/**
+>> + * vgic_irqfd_set_irq: inject the IRQ corresponding to the
+>> + * irqchip routing entry
+>> + *
+>> + * This is the entry point for irqfd IRQ injection
+>> + */
+>> +static int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
+>> +			struct kvm *kvm, int irq_source_id,
+>> +			int level, bool line_status)
+>>  {
+>> -	return 0;
+>> -}
+>> +	unsigned int spi_id = e->irqchip.pin + VGIC_NR_PRIVATE_IRQS;
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>>  
+>> -int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned int irqchip,
+>> -			 unsigned int pin)
+>> -{
+>> -	return pin;
+>> +	BUG_ON(!vgic_initialized(kvm));
+>> +
+>> +	if (spi_id > min(dist->nr_spis, 1020))
+>> +		return -EINVAL;
+>> +	return kvm_vgic_inject_irq(kvm, 0, spi_id, level);
+>>  }
+>>  
+>> -int kvm_set_irq(struct kvm *kvm, int irq_source_id,
+>> -		u32 irq, int level, bool line_status)
+>> +/**
+>> + * kvm_set_routing_entry: populate a kvm routing entry
+>> + * from a user routing entry
+>> + *
+>> + * @e: kvm kernel routing entry handle
+>> + * @ue: user api routing entry handle
+>> + * return 0 on success, -EINVAL on errors.
+>> + */
+>> +int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
+>> +			  const struct kvm_irq_routing_entry *ue)
+>>  {
+>> -	unsigned int spi = irq + VGIC_NR_PRIVATE_IRQS;
+>> +	int r = -EINVAL;
+>>  
+>> -	trace_kvm_set_irq(irq, level, irq_source_id);
+>> -
+>> -	BUG_ON(!vgic_initialized(kvm));
+>> -
+>> -	return kvm_vgic_inject_irq(kvm, 0, spi, level);
+>> +	switch (ue->type) {
+>> +	case KVM_IRQ_ROUTING_IRQCHIP:
+>> +		e->set = vgic_irqfd_set_irq;
+>> +		e->irqchip.irqchip = ue->u.irqchip.irqchip;
+>> +		e->irqchip.pin = ue->u.irqchip.pin;
+>> +		if ((e->irqchip.pin >= KVM_IRQCHIP_NUM_PINS) ||
+>> +		    (e->irqchip.irqchip >= KVM_NR_IRQCHIPS))
+>> +			goto out;
+>> +		break;
+>> +	default:
+>> +		goto out;
+>> +	}
+>> +	r = 0;
+>> +out:
+>> +	return r;
+>>  }
+>>  
+>> -/* MSI not implemented yet */
+>> +/**
+>> + * kvm_set_msi: inject the MSI corresponding to the
+>> + * MSI routing entry
+>> + *
+>> + * This is the entry point for irqfd MSI injection
+>> + * and userspace MSI injection.
+>> + */
+>>  int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>>  		struct kvm *kvm, int irq_source_id,
+>>  		int level, bool line_status)
+>>  {
+>> -	return 0;
+>> +	struct kvm_msi msi;
+>> +
+>> +	msi.address_lo = e->msi.address_lo;
+>> +	msi.address_hi = e->msi.address_hi;
+>> +	msi.data = e->msi.data;
+>> +	msi.flags = e->flags;
+>> +	msi.devid = e->devid;
+>> +
+>> +	if (!vgic_has_its(kvm))
+>> +		return -ENODEV;
+>> +
+>> +	return vgic_its_inject_msi(kvm, &msi);
+>>  }
+>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+>> index c4f3aba..b254833 100644
+>> --- a/virt/kvm/arm/vgic/vgic.c
+>> +++ b/virt/kvm/arm/vgic/vgic.c
+>> @@ -684,10 +684,3 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+>>  	return map_is_active;
+>>  }
+>>  
+>> -int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
+>> -{
+>> -	if (vgic_has_its(kvm))
+>> -		return vgic_its_inject_msi(kvm, msi);
+>> -	else
+>> -		return -ENODEV;
+>> -}
+>> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+>> index 32e5646..03632e3 100644
+>> --- a/virt/kvm/irqchip.c
+>> +++ b/virt/kvm/irqchip.c
+>> @@ -29,7 +29,9 @@
+>>  #include <linux/srcu.h>
+>>  #include <linux/export.h>
+>>  #include <trace/events/kvm.h>
+>> +#if !defined(CONFIG_ARM) && !defined(CONFIG_ARM64)
+>>  #include "irq.h"
+>> +#endif
+>>  
+>>  int kvm_irq_map_gsi(struct kvm *kvm,
+>>  		    struct kvm_kernel_irq_routing_entry *entries, int gsi)
+>>
