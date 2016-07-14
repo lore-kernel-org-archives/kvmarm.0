@@ -1,43 +1,49 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [patch V2 60/67] KVM/arm/arm64/vgic-new: Convert to hotplug state
- machine
-Date: Thu, 14 Jul 2016 14:08:03 +0100
-Message-ID: <57878EB3.3040606@arm.com>
-References: <20160713153219.128052238@linutronix.de>
- <20160713153337.900484868@linutronix.de>
+Subject: Re: [patch] arm64: KVM: clean up a condition
+Date: Thu, 14 Jul 2016 14:33:25 +0100
+Message-ID: <578794A5.3000701@arm.com>
+References: <20160714101934.GD18175@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160713153337.900484868@linutronix.de>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Anna-Maria Gleixner <anna-maria@linutronix.de>, LKML <linux-kernel@vger.kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, rt@linutronix.de, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, Linus Torvalds <torvalds@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, Radim Krcmar <rkrcmar@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160714101934.GD18175@mwanda>
+Sender: kvm-owner@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-janitors@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/07/16 18:17, Anna-Maria Gleixner wrote:
-> From: Anna-Maria Gleixner <anna-maria@linutronix.de>
+On 14/07/16 11:19, Dan Carpenter wrote:
+> My static checker complains that this condition looks like it should be
+> == instead of =.  This isn't a fast path, so we don't need to be fancy.
 > 
-> Install the callbacks via the state machine and let the core invoke
-> the callbacks on the already online CPUs.
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 > 
-> Signed-off-by: Anna-Maria Gleixner <anna-maria@linutronix.de>
-> Cc: Andre Przywara <andre.przywara@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Eric Auger <eric.auger@linaro.org>
-> Cc: Linus Torvalds <torvalds@linux-foundation.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Radim Krcmar <rkrcmar@redhat.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: kvm@vger.kernel.org
-> Cc: kvmarm@lists.cs.columbia.edu
-> Cc: linux-arm-kernel@lists.infradead.org
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index a57d650..b0b225c 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1546,7 +1546,7 @@ static void unhandled_cp_access(struct kvm_vcpu *vcpu,
+>  				struct sys_reg_params *params)
+>  {
+>  	u8 hsr_ec = kvm_vcpu_trap_get_class(vcpu);
+> -	int cp;
+> +	int cp = -1;
+>  
+>  	switch(hsr_ec) {
+>  	case ESR_ELx_EC_CP15_32:
+> @@ -1558,7 +1558,7 @@ static void unhandled_cp_access(struct kvm_vcpu *vcpu,
+>  		cp = 14;
+>  		break;
+>  	default:
+> -		WARN_ON((cp = -1));
+> +		WARN_ON(1);
+>  	}
+>  
+>  	kvm_err("Unsupported guest CP%d access at: %08lx\n",
+> 
 
-For patches 3, 4, 5, 6, 7, 44, 45 and 60:
-
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Indeed, that looks a bit dodgy. I'll queue it for 4.8.
 
 Thanks,
 
