@@ -1,21 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v10 00/17] KVM: arm64: GICv3 ITS emulation
-Date: Fri, 15 Jul 2016 12:43:21 +0100
-Message-ID: <20160715114338.10484-1-andre.przywara@arm.com>
+Subject: [PATCH v10 07/17] irqchip: refactor and add GICv3 definitions
+Date: Fri, 15 Jul 2016 12:43:28 +0100
+Message-ID: <20160715114338.10484-8-andre.przywara@arm.com>
+References: <20160715114338.10484-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A2F449B2E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:36:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4891049B6A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:37:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hMSMc7FMsoxW for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jul 2016 07:36:56 -0400 (EDT)
+ with ESMTP id bBqbgnEtcAig for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jul 2016 07:37:05 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 662DF49B21
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:36:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A96A349B7F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:37:04 -0400 (EDT)
+In-Reply-To: <20160715114338.10484-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,235 +31,251 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+arm-gic-v3.h contains bit and register definitions for the GICv3 and ITS,
+at least for the bits the we currently care about.
+The ITS emulation needs more definitions, so add them and refactor
+the memory attribute #defines to be more universally usable.
+To avoid changing all users, we still provide some of the old definitons
+defined with the help of the new macros.
 
-this series allows those KVM guests that use an emulated GICv3 to use LPIs
-as well, though in the moment this is limited to emulated PCI devices.
-This is based on kvmarm/queue, which now only features the new VGIC
-implementation.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ include/linux/irqchip/arm-gic-v3.h | 180 ++++++++++++++++++++++++-------------
+ 1 file changed, 120 insertions(+), 60 deletions(-)
 
-Another round of fixes:
-An optimization from Marc to only actually refcount LPIs. This avoids
-some churn on SPIs and private IRQs which don't need to be refcounted.
-Some bugs have been fixed in vgic_copy_lpi_list(), sync_pending_table(),
-and the CWRITER handler.
-Now we check for device IDs and collection IDs to be actually within
-the range the guest once advertised, also a check was added to make sure
-we don't try to propagate an unmapped collection to a struct vgic_irq.
->From now on we only support 64K sized pages for the ITS BASER tables.
-Some comments have been added or improved.
-The changelog below holds a more detailed list.
-
-You can find all of this code (and the prerequisites) in the
-its-emul/v10 branch of my repository [1].
-This has been briefly tested on the model and on GICv3 hardware, with
-lockdep debugging enabled. If you have GICv3 capable hardware, please
-test it on your setup.
-Also of course any review comments are very welcome!
-
-Cheers,
-Andre.
-
-Changelog v9..v10:
-- Don't actually refcount SPIs, PPIs, SGIs (only LPIs)
-- add vgic-its.c to the Makefile later (avoids warnings in between)
-- fix vgic_copy_lpi_list() counter overflow
-- fix sync_pending_table optimization to actually work
-- drop support for 4K and 16K BASER tables
-- use consistent naming for BASER_CACHEABILITY_MASK definitions
-- check device ID and collection IDs to fit into the tables
-- extra check for indirect device tables to contain valid pointers
-- check for collection being mapped before updating target_vcpu
-- add and refine some comments
-- fix CWRITER handling: rework masking, take lock earlier, fix comparison
-- move some ITS initialization bits into vgic_its_register and rename it
-
-Changelog v8..v9:
-- MMIO dispatching now no longer holds iodev type in each register
-- indirect bit is now cleared for collections
-- sanitisation functions reworked (no extra masking, taking
-  register specific masks)
-- make PROPBASER/PENDBASER updates atomic
-- move vgic_its_get_lpi to vgic.c
-- fix potential race in vgic_add_lpi
-- add comments on puts and gets if not obviously symmetric
-- simplify copy_lpi_list (no get/put anymore)
-- remove vgic_put_irq_locked()
-- remove update_lpi_config_filtered() wrapper
-- take its_lock in vgic_its_handle_command() already
-- move PENDBASER/PROPBASER RES0 masking into sanitise functions
-- properly mask *BASER registers to only support 48 bits
-- cache last read byte in its_sync_lpi_pending_table()
-
-Changelog v7..v8:
-- rebase on old-VGIC removal patch
-- add missing vgic_put_irq()s
-- check and ensure proper ITS initialisation sequence
-- avoid double collection mapping
-- renaming vits_ function prefixes to vgic_its_
-- properly setup PENDBASER (for new VGIC now)
-- change vgic_v2_probe init order to allow clean exit
-
-Changelog v6..v7:
-- use kref reference counting
-- remove RCU usage from lpi_list, use spinlock instead
-- copy list of LPIs before accessing guest memory
-- introduce kvm_io_bus_get_dev()
-- refactor parts of arm-gic-v3.h header file
-- provide proper initial values for redistributor and ITS base registers
-- rework sanitisation of base registers
-- rework VGIC MMIO dispatching to differentiate between VGIC parts
-- smaller fixes, also comments and commit messages amended
-
-Changelog v5..v6:
-- remove its_list from VGIC code
-- add lpi_list and accessor functions
-- introduce reference counting to struct vgic_irq
-- replace its_lock spinlock with its_cmd and its_lock mutexes
-- simplify guest memory accesses (due to the new mutexes)
-- avoid unnecessary affinity updates
-- refine base register address masking
-- introduce sanity checks for PROPBASER and PENDBASER
-- implement BASER<n> registers
-- pass struct vgic_its directly into the MMIO handlers
-- convert KVM_SIGNAL_MSI ioctl into an MMIO write
-- add explicit INIT ioctl to the ITS KVM device
-- adjusting comments and commit messages
-
-Changelog v4..v5:
-- adapting to final new VGIC (MMIO handlers, etc.)
-- new KVM device to model an ITS, multiple instances allowed
-- move redistributor data into struct vgic_cpu
-- separate distributor and ITS(es)
-- various bug fixes and amended comments after review comments
-
-Changelog v3..v4:
-- adapting to new VGIC (changes in IRQ injection mechanism)
-
-Changelog v2..v3:
-- adapt to 4.3-rc and Christoffer's timer rework
-- adapt spin locks on handling PROPBASER/PENDBASER registers
-- rework locking in ITS command handling (dropping dist where needed)
-- only clear LPI pending bit if LPI could actually be queued
-- simplify GICR_CTLR handling
-- properly free ITTEs (including our pending bitmap)
-- fix corner cases with unmapped collections
-- keep retire_lr() around
-- rename vgic_handle_base_register to vgic_reg64_access()
-- use kcalloc instead of kmalloc
-- minor fixes, renames and added comments
-
-Changelog v1..v2
-- fix issues when using non-ITS GICv3 emulation
-- streamline frame address initialization (new patch 05/15)
-- preallocate buffer memory for reading from guest's memory
-- move locking into the actual command handlers
--   preallocate memory for new structures if needed
-- use non-atomic __set_bit() and __clear_bit() when under the lock
-- add INT command handler to allow LPI injection from the guest
-- rewrite CWRITER handler to align with new locking scheme
-- remove unneeded CONFIG_HAVE_KVM_MSI #ifdefs
-- check memory table size against our LPI limit (65536 interrupts)
-- observe initial gap of 1024 interrupts in pending table
-- use term "configuration table" to be in line with the spec
-- clarify and extend documentation on API extensions
-- introduce new KVM_CAP_MSI_DEVID capability to advertise device ID requirement
-- update, fix and add many comments
-- minor style changes as requested by reviewers
-
----------------
-
-The GICv3 ITS (Interrupt Translation Service) is a part of the
-ARM GICv3 interrupt controller [3] used for implementing MSIs.
-It specifies a new kind of interrupts (LPIs), which are mapped to
-establish a connection between a device, its MSI payload value and
-the target processor the IRQ is eventually delivered to.
-In order to allow using MSIs in an ARM64 KVM guest, we emulate this
-ITS widget in the kernel.
-The ITS works by reading commands written by software (from the guest
-in our case) into a (guest allocated) memory region and establishing
-the mapping between a device, the MSI payload and the target CPU.
-We parse these commands and update our internal data structures to
-reflect those changes. On an MSI injection we iterate those
-structures to learn the LPI number we have to inject.
-For the time being we use simple lists to hold the data, this is
-good enough for the small number of entries each of the components
-currently have. Should this become a performance bottleneck in the
-future, those can be extended to arrays or trees if needed.
-
-Most of the code lives in a separate source file (vgic-its.c), though
-there are some changes necessary in the existing VGIC files.
-
-For the time being this series gives us the ability to use emulated
-PCI devices that can use MSIs in the guest. Those have to be
-triggered by letting the userland device emulation simulate the MSI
-write with the KVM_SIGNAL_MSI ioctl. This will be translated into
-the proper LPI by the ITS emulation and injected into the guest in
-the usual way (just with a higher IRQ number).
-
-This series is based on kvmarm/queue and can be found at the
-its-emul/v10 branch of this repository [1].
-For this to be used you need a GICv3 host machine (a fast model would
-do), though it does not rely on any host ITS bits (neither in hardware
-or software).
-
-To test this you can use the kvmtool patches available in the "its-v6"
-branch here [2].
-Start a guest with: "$ lkvm run --irqchip=gicv3-its --force-pci"
-and see the ITS being used for instance by the virtio devices.
-
-[1]: git://linux-arm.org/linux-ap.git
-     http://www.linux-arm.org/git?p=linux-ap.git;a=log;h=refs/heads/its-emul/v10
-[2]: git://linux-arm.org/kvmtool.git
-     http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/its-v6
-[3]: http://infocenter.arm.com/help/topic/com.arm.doc.ihi0069b/index.html
-
-Andre Przywara (17):
-  KVM: arm/arm64: move redistributor kvm_io_devices
-  KVM: arm/arm64: check return value for kvm_register_vgic_device
-  KVM: extend struct kvm_msi to hold a 32-bit device ID
-  KVM: arm/arm64: extend arch CAP checks to allow per-VM capabilities
-  KVM: kvm_io_bus: add kvm_io_bus_get_dev() call
-  KVM: arm/arm64: VGIC: add refcounting for IRQs
-  irqchip: refactor and add GICv3 definitions
-  KVM: arm64: handle ITS related GICv3 redistributor registers
-  KVM: arm64: introduce ITS emulation file with MMIO framework
-  KVM: arm64: introduce new KVM ITS device
-  KVM: arm64: implement basic ITS register handlers
-  KVM: arm64: connect LPIs to the VGIC emulation
-  KVM: arm64: read initial LPI pending table
-  KVM: arm64: allow updates of LPI configuration table
-  KVM: arm64: implement ITS command queue command handlers
-  KVM: arm64: implement MSI injection in ITS emulation
-  KVM: arm64: enable ITS emulation as a virtual MSI controller
-
- Documentation/virtual/kvm/api.txt              |   14 +-
- Documentation/virtual/kvm/devices/arm-vgic.txt |   25 +-
- arch/arm/include/asm/kvm_host.h                |    2 +-
- arch/arm/kvm/arm.c                             |    3 +-
- arch/arm64/include/asm/kvm_host.h              |    2 +-
- arch/arm64/include/uapi/asm/kvm.h              |    2 +
- arch/arm64/kvm/Kconfig                         |    1 +
- arch/arm64/kvm/Makefile                        |    1 +
- arch/arm64/kvm/reset.c                         |    8 +-
- include/kvm/arm_vgic.h                         |   74 +-
- include/linux/irqchip/arm-gic-v3.h             |  180 ++-
- include/linux/kvm_host.h                       |    2 +
- include/uapi/linux/kvm.h                       |    7 +-
- virt/kvm/arm/vgic/vgic-init.c                  |    9 +-
- virt/kvm/arm/vgic/vgic-its.c                   | 1484 ++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-kvm-device.c            |   22 +-
- virt/kvm/arm/vgic/vgic-mmio-v2.c               |    8 +
- virt/kvm/arm/vgic/vgic-mmio-v3.c               |  247 +++-
- virt/kvm/arm/vgic/vgic-mmio.c                  |   62 +-
- virt/kvm/arm/vgic/vgic-mmio.h                  |   31 +-
- virt/kvm/arm/vgic/vgic-v2.c                    |   12 +-
- virt/kvm/arm/vgic/vgic-v3.c                    |   29 +-
- virt/kvm/arm/vgic/vgic.c                       |  127 +-
- virt/kvm/arm/vgic/vgic.h                       |   30 +-
- virt/kvm/kvm_main.c                            |   24 +
- 25 files changed, 2265 insertions(+), 141 deletions(-)
- create mode 100644 virt/kvm/arm/vgic/vgic-its.c
-
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index bfbd707..9442be7 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -112,34 +112,60 @@
+ #define GICR_WAKER_ProcessorSleep	(1U << 1)
+ #define GICR_WAKER_ChildrenAsleep	(1U << 2)
+ 
+-#define GICR_PROPBASER_NonShareable	(0U << 10)
+-#define GICR_PROPBASER_InnerShareable	(1U << 10)
+-#define GICR_PROPBASER_OuterShareable	(2U << 10)
+-#define GICR_PROPBASER_SHAREABILITY_MASK (3UL << 10)
+-#define GICR_PROPBASER_nCnB		(0U << 7)
+-#define GICR_PROPBASER_nC		(1U << 7)
+-#define GICR_PROPBASER_RaWt		(2U << 7)
+-#define GICR_PROPBASER_RaWb		(3U << 7)
+-#define GICR_PROPBASER_WaWt		(4U << 7)
+-#define GICR_PROPBASER_WaWb		(5U << 7)
+-#define GICR_PROPBASER_RaWaWt		(6U << 7)
+-#define GICR_PROPBASER_RaWaWb		(7U << 7)
+-#define GICR_PROPBASER_CACHEABILITY_MASK (7U << 7)
+-#define GICR_PROPBASER_IDBITS_MASK	(0x1f)
+-
+-#define GICR_PENDBASER_NonShareable	(0U << 10)
+-#define GICR_PENDBASER_InnerShareable	(1U << 10)
+-#define GICR_PENDBASER_OuterShareable	(2U << 10)
+-#define GICR_PENDBASER_SHAREABILITY_MASK (3UL << 10)
+-#define GICR_PENDBASER_nCnB		(0U << 7)
+-#define GICR_PENDBASER_nC		(1U << 7)
+-#define GICR_PENDBASER_RaWt		(2U << 7)
+-#define GICR_PENDBASER_RaWb		(3U << 7)
+-#define GICR_PENDBASER_WaWt		(4U << 7)
+-#define GICR_PENDBASER_WaWb		(5U << 7)
+-#define GICR_PENDBASER_RaWaWt		(6U << 7)
+-#define GICR_PENDBASER_RaWaWb		(7U << 7)
+-#define GICR_PENDBASER_CACHEABILITY_MASK (7U << 7)
++#define GIC_BASER_CACHE_nCnB		0ULL
++#define GIC_BASER_CACHE_SameAsInner	0ULL
++#define GIC_BASER_CACHE_nC		1ULL
++#define GIC_BASER_CACHE_RaWt		2ULL
++#define GIC_BASER_CACHE_RaWb		3ULL
++#define GIC_BASER_CACHE_WaWt		4ULL
++#define GIC_BASER_CACHE_WaWb		5ULL
++#define GIC_BASER_CACHE_RaWaWt		6ULL
++#define GIC_BASER_CACHE_RaWaWb		7ULL
++#define GIC_BASER_CACHE_MASK		7ULL
++#define GIC_BASER_NonShareable		0ULL
++#define GIC_BASER_InnerShareable	1ULL
++#define GIC_BASER_OuterShareable	2ULL
++#define GIC_BASER_SHAREABILITY_MASK	3ULL
++
++#define GIC_BASER_CACHEABILITY(reg, inner_outer, type)			\
++	(GIC_BASER_CACHE_##type << reg##_##inner_outer##_CACHEABILITY_SHIFT)
++
++#define GIC_BASER_SHAREABILITY(reg, type)				\
++	(GIC_BASER_##type << reg##_SHAREABILITY_SHIFT)
++
++#define GICR_PROPBASER_SHAREABILITY_SHIFT		(10)
++#define GICR_PROPBASER_INNER_CACHEABILITY_SHIFT		(7)
++#define GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT		(56)
++#define GICR_PROPBASER_SHAREABILITY_MASK				\
++	GIC_BASER_SHAREABILITY(GICR_PROPBASER, SHAREABILITY_MASK)
++#define GICR_PROPBASER_INNER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, MASK)
++#define GICR_PROPBASER_OUTER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GICR_PROPBASER, OUTER, MASK)
++#define GICR_PROPBASER_CACHEABILITY_MASK GICR_PROPBASER_INNER_CACHEABILITY_MASK
++
++#define GICR_PROPBASER_InnerShareable					\
++	GIC_BASER_SHAREABILITY(GICR_PROPBASER, InnerShareable)
++#define GICR_PROPBASER_nC GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, nC)
++#define GICR_PROPBASER_WaWb GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, WaWb)
++#define GICR_PROPBASER_IDBITS_MASK			(0x1f)
++
++#define GICR_PENDBASER_SHAREABILITY_SHIFT		(10)
++#define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT		(7)
++#define GICR_PENDBASER_OUTER_CACHEABILITY_SHIFT		(56)
++#define GICR_PENDBASER_SHAREABILITY_MASK				\
++	GIC_BASER_SHAREABILITY(GICR_PENDBASER, SHAREABILITY_MASK)
++#define GICR_PENDBASER_INNER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, MASK)
++#define GICR_PENDBASER_OUTER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GICR_PENDBASER, OUTER, MASK)
++#define GICR_PENDBASER_CACHEABILITY_MASK GICR_PENDBASER_INNER_CACHEABILITY_MASK
++
++#define GICR_PENDBASER_InnerShareable					\
++	GIC_BASER_SHAREABILITY(GICR_PENDBASER, InnerShareable)
++#define GICR_PENDBASER_nC GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, nC)
++#define GICR_PENDBASER_WaWb GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, WaWb)
++#define GICR_PENDBASER_PTZ				BIT_ULL(62)
+ 
+ /*
+  * Re-Distributor registers, offsets from SGI_base
+@@ -175,59 +201,74 @@
+ #define GITS_CWRITER			0x0088
+ #define GITS_CREADR			0x0090
+ #define GITS_BASER			0x0100
++#define GITS_IDREGS_BASE		0xffd0
++#define GITS_PIDR0			0xffe0
++#define GITS_PIDR1			0xffe4
+ #define GITS_PIDR2			GICR_PIDR2
++#define GITS_PIDR4			0xffd0
++#define GITS_CIDR0			0xfff0
++#define GITS_CIDR1			0xfff4
++#define GITS_CIDR2			0xfff8
++#define GITS_CIDR3			0xfffc
+ 
+ #define GITS_TRANSLATER			0x10040
+ 
+ #define GITS_CTLR_ENABLE		(1U << 0)
+ #define GITS_CTLR_QUIESCENT		(1U << 31)
+ 
++#define GITS_TYPER_PLPIS		(1UL << 0)
++#define GITS_TYPER_IDBITS_SHIFT		8
+ #define GITS_TYPER_DEVBITS_SHIFT	13
+ #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
+ #define GITS_TYPER_PTA			(1UL << 19)
+-
+-#define GITS_CBASER_VALID		(1UL << 63)
+-#define GITS_CBASER_nCnB		(0UL << 59)
+-#define GITS_CBASER_nC			(1UL << 59)
+-#define GITS_CBASER_RaWt		(2UL << 59)
+-#define GITS_CBASER_RaWb		(3UL << 59)
+-#define GITS_CBASER_WaWt		(4UL << 59)
+-#define GITS_CBASER_WaWb		(5UL << 59)
+-#define GITS_CBASER_RaWaWt		(6UL << 59)
+-#define GITS_CBASER_RaWaWb		(7UL << 59)
+-#define GITS_CBASER_CACHEABILITY_MASK	(7UL << 59)
+-#define GITS_CBASER_NonShareable	(0UL << 10)
+-#define GITS_CBASER_InnerShareable	(1UL << 10)
+-#define GITS_CBASER_OuterShareable	(2UL << 10)
+-#define GITS_CBASER_SHAREABILITY_MASK	(3UL << 10)
++#define GITS_TYPER_HWCOLLCNT_SHIFT	24
++
++#define GITS_CBASER_VALID			(1UL << 63)
++#define GITS_CBASER_SHAREABILITY_SHIFT		(10)
++#define GITS_CBASER_INNER_CACHEABILITY_SHIFT	(59)
++#define GITS_CBASER_OUTER_CACHEABILITY_SHIFT	(53)
++#define GITS_CBASER_SHAREABILITY_MASK					\
++	GIC_BASER_SHAREABILITY(GITS_CBASER, SHAREABILITY_MASK)
++#define GITS_CBASER_INNER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, MASK)
++#define GITS_CBASER_OUTER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GITS_CBASER, OUTER, MASK)
++#define GITS_CBASER_CACHEABILITY_MASK GITS_CBASER_INNER_CACHEABILITY_MASK
++
++#define GITS_CBASER_InnerShareable					\
++	GIC_BASER_SHAREABILITY(GITS_CBASER, InnerShareable)
++#define GITS_CBASER_nC GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nC)
++#define GITS_CBASER_WaWb GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWb)
+ 
+ #define GITS_BASER_NR_REGS		8
+ 
+-#define GITS_BASER_VALID		(1UL << 63)
+-#define GITS_BASER_nCnB			(0UL << 59)
+-#define GITS_BASER_nC			(1UL << 59)
+-#define GITS_BASER_RaWt			(2UL << 59)
+-#define GITS_BASER_RaWb			(3UL << 59)
+-#define GITS_BASER_WaWt			(4UL << 59)
+-#define GITS_BASER_WaWb			(5UL << 59)
+-#define GITS_BASER_RaWaWt		(6UL << 59)
+-#define GITS_BASER_RaWaWb		(7UL << 59)
+-#define GITS_BASER_CACHEABILITY_MASK	(7UL << 59)
+-#define GITS_BASER_TYPE_SHIFT		(56)
++#define GITS_BASER_VALID			(1UL << 63)
++#define GITS_BASER_INDIRECT			(1ULL << 62)
++#define GITS_BASER_INNER_CACHEABILITY_SHIFT	(59)
++#define GITS_BASER_OUTER_CACHEABILITY_SHIFT	(53)
++#define GITS_BASER_INNER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GITS_BASER, INNER, MASK)
++#define GITS_BASER_OUTER_CACHEABILITY_MASK				\
++	GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, MASK)
++#define GITS_BASER_SHAREABILITY_MASK					\
++	GIC_BASER_SHAREABILITY(GITS_BASER, SHAREABILITY_MASK)
++
++#define GITS_BASER_nC GIC_BASER_CACHEABILITY(GITS_BASER, INNER, nC)
++#define GITS_BASER_WaWb GIC_BASER_CACHEABILITY(GITS_BASER, INNER, WaWb)
++#define GITS_BASER_TYPE_SHIFT			(56)
+ #define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
+-#define GITS_BASER_ENTRY_SIZE_SHIFT	(48)
++#define GITS_BASER_ENTRY_SIZE_SHIFT		(48)
+ #define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0xff) + 1)
+-#define GITS_BASER_NonShareable		(0UL << 10)
+-#define GITS_BASER_InnerShareable	(1UL << 10)
+-#define GITS_BASER_OuterShareable	(2UL << 10)
+ #define GITS_BASER_SHAREABILITY_SHIFT	(10)
+-#define GITS_BASER_SHAREABILITY_MASK	(3UL << GITS_BASER_SHAREABILITY_SHIFT)
++#define GITS_BASER_InnerShareable					\
++	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
+ #define GITS_BASER_PAGE_SIZE_SHIFT	(8)
+ #define GITS_BASER_PAGE_SIZE_4K		(0UL << GITS_BASER_PAGE_SIZE_SHIFT)
+ #define GITS_BASER_PAGE_SIZE_16K	(1UL << GITS_BASER_PAGE_SIZE_SHIFT)
+ #define GITS_BASER_PAGE_SIZE_64K	(2UL << GITS_BASER_PAGE_SIZE_SHIFT)
+ #define GITS_BASER_PAGE_SIZE_MASK	(3UL << GITS_BASER_PAGE_SIZE_SHIFT)
+ #define GITS_BASER_PAGES_MAX		256
++#define GITS_BASER_NR_PAGES(r)		(((r) & 0xff) + 1)
+ 
+ #define GITS_BASER_TYPE_NONE		0
+ #define GITS_BASER_TYPE_DEVICE		1
+@@ -243,7 +284,10 @@
+  */
+ #define GITS_CMD_MAPD			0x08
+ #define GITS_CMD_MAPC			0x09
+-#define GITS_CMD_MAPVI			0x0a
++#define GITS_CMD_MAPTI			0x0a
++/* older GIC documentation used MAPVI for this command */
++#define GITS_CMD_MAPVI			GITS_CMD_MAPTI
++#define GITS_CMD_MAPI			0x0b
+ #define GITS_CMD_MOVI			0x01
+ #define GITS_CMD_DISCARD		0x0f
+ #define GITS_CMD_INV			0x0c
+@@ -254,6 +298,22 @@
+ #define GITS_CMD_SYNC			0x05
+ 
+ /*
++ * ITS error numbers
++ */
++#define E_ITS_MOVI_UNMAPPED_INTERRUPT		0x010107
++#define E_ITS_MOVI_UNMAPPED_COLLECTION		0x010109
++#define E_ITS_CLEAR_UNMAPPED_INTERRUPT		0x010507
++#define E_ITS_MAPD_DEVICE_OOR			0x010801
++#define E_ITS_MAPC_PROCNUM_OOR			0x010902
++#define E_ITS_MAPC_COLLECTION_OOR		0x010903
++#define E_ITS_MAPTI_UNMAPPED_DEVICE		0x010a04
++#define E_ITS_MAPTI_PHYSICALID_OOR		0x010a06
++#define E_ITS_INV_UNMAPPED_INTERRUPT		0x010c07
++#define E_ITS_INVALL_UNMAPPED_COLLECTION	0x010d09
++#define E_ITS_MOVALL_PROCNUM_OOR		0x010e01
++#define E_ITS_DISCARD_UNMAPPED_INTERRUPT	0x010f07
++
++/*
+  * CPU interface registers
+  */
+ #define ICC_CTLR_EL1_EOImode_drop_dir	(0U << 1)
 -- 
 2.9.0
