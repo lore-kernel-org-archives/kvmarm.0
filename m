@@ -1,22 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v10 05/17] KVM: kvm_io_bus: add kvm_io_bus_get_dev() call
-Date: Fri, 15 Jul 2016 12:43:26 +0100
-Message-ID: <20160715114338.10484-6-andre.przywara@arm.com>
+Subject: [PATCH v10 15/17] KVM: arm64: implement ITS command queue command
+ handlers
+Date: Fri, 15 Jul 2016 12:43:36 +0100
+Message-ID: <20160715114338.10484-16-andre.przywara@arm.com>
 References: <20160715114338.10484-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7ACB49B21
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:37:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A97E49B5A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:37:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id APNk6YWA-QSM for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jul 2016 07:37:02 -0400 (EDT)
+ with ESMTP id OKof+vEojnq5 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jul 2016 07:37:16 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 02B4849B68
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:37:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D92A49B68
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:37:15 -0400 (EDT)
 In-Reply-To: <20160715114338.10484-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,71 +32,731 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The kvm_io_bus framework is a nice place of holding information about
-various MMIO regions for kernel emulated devices.
-Add a call to retrieve the kvm_io_device structure which is associated
-with a certain MMIO address. This avoids to duplicate kvm_io_bus'
-knowledge of MMIO regions without having to fake MMIO calls if a user
-needs the device a certain MMIO address belongs to.
-This will be used by the ITS emulation to get the associated ITS device
-when someone triggers an MSI via an ioctl from userspace.
+The connection between a device, an event ID, the LPI number and the
+associated CPU is stored in in-memory tables in a GICv3, but their
+format is not specified by the spec. Instead software uses a command
+queue in a ring buffer to let an ITS implementation use its own
+format.
+Implement handlers for the various ITS commands and let them store
+the requested relation into our own data structures. Those data
+structures are protected by the its_lock mutex.
+Our internal ring buffer read and write pointers are protected by the
+its_cmd mutex, so that only one VCPU per ITS can handle commands at
+any given time.
+Error handling is very basic at the moment, as we don't have a good
+way of communicating errors to the guest (usually an SError).
+The INT command handler is missing from this patch, as we gain the
+capability of actually injecting MSIs into the guest only later on.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/linux/kvm_host.h |  2 ++
- virt/kvm/kvm_main.c      | 24 ++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ virt/kvm/arm/vgic/vgic-its.c | 661 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 660 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 0640ee9..614a981 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -164,6 +164,8 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 			    int len, struct kvm_io_device *dev);
- int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
- 			      struct kvm_io_device *dev);
-+struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
-+					 gpa_t addr);
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 6f43b3b..1408c88 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -33,6 +33,67 @@
+ #include "vgic.h"
+ #include "vgic-mmio.h"
  
- #ifdef CONFIG_KVM_ASYNC_PF
- struct kvm_async_pf {
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index ef54b4c..bd2eb92 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3496,6 +3496,30 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
- 	return r;
- }
- 
-+struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
-+					 gpa_t addr)
++/*
++ * Creates a new (reference to a) struct vgic_irq for a given LPI.
++ * If this LPI is already mapped on another ITS, we increase its refcount
++ * and return a pointer to the existing structure.
++ * If this is a "new" LPI, we allocate and initialize a new struct vgic_irq.
++ * This function returns a pointer to the _unlocked_ structure.
++ */
++static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid)
 +{
-+	struct kvm_io_bus *bus;
-+	int dev_idx, srcu_idx;
-+	struct kvm_io_device *iodev = NULL;
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct vgic_irq *irq = vgic_get_irq(kvm, NULL, intid), *oldirq;
 +
-+	srcu_idx = srcu_read_lock(&kvm->srcu);
++	/* In this case there is no put, since we keep the reference. */
++	if (irq)
++		return irq;
 +
-+	bus = srcu_dereference(kvm->buses[bus_idx], &kvm->srcu);
++	irq = kzalloc(sizeof(struct vgic_irq), GFP_KERNEL);
++	if (!irq)
++		return NULL;
 +
-+	dev_idx = kvm_io_bus_get_first_dev(bus, addr, 1);
-+	if (dev_idx < 0)
++	INIT_LIST_HEAD(&irq->lpi_list);
++	INIT_LIST_HEAD(&irq->ap_list);
++	spin_lock_init(&irq->irq_lock);
++
++	irq->config = VGIC_CONFIG_EDGE;
++	kref_init(&irq->refcount);
++	irq->intid = intid;
++
++	spin_lock(&dist->lpi_list_lock);
++
++	/*
++	 * There could be a race with another vgic_add_lpi(), so we need to
++	 * check that we don't add a second list entry with the same LPI.
++	 */
++	list_for_each_entry(oldirq, &dist->lpi_list_head, lpi_list) {
++		if (oldirq->intid != intid)
++			continue;
++
++		/* Someone was faster with adding this LPI, lets use that. */
++		kfree(irq);
++		irq = oldirq;
++
++		/*
++		 * This increases the refcount, the caller is expected to
++		 * call vgic_put_irq() on the returned pointer once it's
++		 * finished with the IRQ.
++		 */
++		kref_get(&irq->refcount);
++
 +		goto out_unlock;
++	}
 +
-+	iodev = bus->range[dev_idx].dev;
++	list_add_tail(&irq->lpi_list, &dist->lpi_list_head);
++	dist->lpi_list_count++;
 +
 +out_unlock:
-+	srcu_read_unlock(&kvm->srcu, srcu_idx);
++	spin_unlock(&dist->lpi_list_lock);
 +
-+	return iodev;
++	return irq;
 +}
-+EXPORT_SYMBOL_GPL(kvm_io_bus_get_dev);
 +
- static struct notifier_block kvm_cpu_notifier = {
- 	.notifier_call = kvm_cpu_hotplug,
+ struct its_device {
+ 	struct list_head dev_list;
+ 
+@@ -63,15 +124,74 @@ struct its_itte {
  };
+ 
+ /*
++ * Find and returns a device in the device table for an ITS.
++ * Must be called with the its_lock mutex held.
++ */
++static struct its_device *find_its_device(struct vgic_its *its, u32 device_id)
++{
++	struct its_device *device;
++
++	list_for_each_entry(device, &its->device_list, dev_list)
++		if (device_id == device->device_id)
++			return device;
++
++	return NULL;
++}
++
++/*
++ * Find and returns an interrupt translation table entry (ITTE) for a given
++ * Device ID/Event ID pair on an ITS.
++ * Must be called with the its_lock mutex held.
++ */
++static struct its_itte *find_itte(struct vgic_its *its, u32 device_id,
++				  u32 event_id)
++{
++	struct its_device *device;
++	struct its_itte *itte;
++
++	device = find_its_device(its, device_id);
++	if (device == NULL)
++		return NULL;
++
++	list_for_each_entry(itte, &device->itt_head, itte_list)
++		if (itte->event_id == event_id)
++			return itte;
++
++	return NULL;
++}
++
++/* To be used as an iterator this macro misses the enclosing parentheses */
++#define for_each_lpi_its(dev, itte, its) \
++	list_for_each_entry(dev, &(its)->device_list, dev_list) \
++		list_for_each_entry(itte, &(dev)->itt_head, itte_list)
++
++/*
+  * We only implement 48 bits of PA at the moment, although the ITS
+  * supports more. Let's be restrictive here.
+  */
++#define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
+ #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
+ #define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
+ #define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
+ 
+ #define GIC_LPI_OFFSET 8192
+ 
++/*
++ * Finds and returns a collection in the ITS collection table.
++ * Must be called with the its_lock mutex held.
++ */
++static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
++{
++	struct its_collection *collection;
++
++	list_for_each_entry(collection, &its->collection_list, coll_list) {
++		if (coll_id == collection->collection_id)
++			return collection;
++	}
++
++	return NULL;
++}
++
+ #define LPI_PROP_ENABLE_BIT(p)	((p) & LPI_PROP_ENABLED)
+ #define LPI_PROP_PRIORITY(p)	((p) & 0xfc)
+ 
+@@ -145,6 +265,51 @@ static int vgic_copy_lpi_list(struct kvm *kvm, u32 **intid_ptr)
+ }
+ 
+ /*
++ * Promotes the ITS view of affinity of an ITTE (which redistributor this LPI
++ * is targeting) to the VGIC's view, which deals with target VCPUs.
++ * Needs to be called whenever either the collection for a LPIs has
++ * changed or the collection itself got retargeted.
++ */
++static void update_affinity_itte(struct kvm *kvm, struct its_itte *itte)
++{
++	struct kvm_vcpu *vcpu;
++
++	if (!its_is_collection_mapped(itte->collection))
++		return;
++
++	vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
++
++	spin_lock(&itte->irq->irq_lock);
++	itte->irq->target_vcpu = vcpu;
++	spin_unlock(&itte->irq->irq_lock);
++}
++
++/*
++ * Updates the target VCPU for every LPI targeting this collection.
++ * Must be called with the its_lock mutex held.
++ */
++static void update_affinity_collection(struct kvm *kvm, struct vgic_its *its,
++				       struct its_collection *coll)
++{
++	struct its_device *device;
++	struct its_itte *itte;
++
++	for_each_lpi_its(device, itte, its) {
++		if (!itte->collection || coll != itte->collection)
++			continue;
++
++		update_affinity_itte(kvm, itte);
++	}
++}
++
++static u32 max_lpis_propbaser(u64 propbaser)
++{
++	int nr_idbits = (propbaser & 0x1f) + 1;
++
++	return 1U << min(nr_idbits, INTERRUPT_ID_BITS_ITS);
++}
++
++/*
+  * Scan the whole LPI pending table and sync the pending bit in there
+  * with our own data structures. This relies on the LPI being
+  * mapped before.
+@@ -283,10 +448,504 @@ static void its_free_itte(struct kvm *kvm, struct its_itte *itte)
+ 	kfree(itte);
+ }
+ 
++static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
++{
++	return (le64_to_cpu(its_cmd[word]) >> shift) & (BIT_ULL(size) - 1);
++}
++
++#define its_cmd_get_command(cmd)	its_cmd_mask_field(cmd, 0,  0,  8)
++#define its_cmd_get_deviceid(cmd)	its_cmd_mask_field(cmd, 0, 32, 32)
++#define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
++#define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
++#define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
++#define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
++#define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
++
++/*
++ * The DISCARD command frees an Interrupt Translation Table Entry (ITTE).
++ * Must be called with the its_lock mutex held.
++ */
++static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
++				       u64 *its_cmd)
++{
++	u32 device_id = its_cmd_get_deviceid(its_cmd);
++	u32 event_id = its_cmd_get_id(its_cmd);
++	struct its_itte *itte;
++
++
++	itte = find_itte(its, device_id, event_id);
++	if (itte && itte->collection) {
++		/*
++		 * Though the spec talks about removing the pending state, we
++		 * don't bother here since we clear the ITTE anyway and the
++		 * pending state is a property of the ITTE struct.
++		 */
++		its_free_itte(kvm, itte);
++		return 0;
++	}
++
++	return E_ITS_DISCARD_UNMAPPED_INTERRUPT;
++}
++
++/*
++ * The MOVI command moves an ITTE to a different collection.
++ * Must be called with the its_lock mutex held.
++ */
++static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
++				    u64 *its_cmd)
++{
++	u32 device_id = its_cmd_get_deviceid(its_cmd);
++	u32 event_id = its_cmd_get_id(its_cmd);
++	u32 coll_id = its_cmd_get_collection(its_cmd);
++	struct kvm_vcpu *vcpu;
++	struct its_itte *itte;
++	struct its_collection *collection;
++
++	itte = find_itte(its, device_id, event_id);
++	if (!itte)
++		return E_ITS_MOVI_UNMAPPED_INTERRUPT;
++
++	if (!its_is_collection_mapped(itte->collection))
++		return E_ITS_MOVI_UNMAPPED_COLLECTION;
++
++	collection = find_collection(its, coll_id);
++	if (!its_is_collection_mapped(collection))
++		return E_ITS_MOVI_UNMAPPED_COLLECTION;
++
++	itte->collection = collection;
++	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
++
++	spin_lock(&itte->irq->irq_lock);
++	itte->irq->target_vcpu = vcpu;
++	spin_unlock(&itte->irq->irq_lock);
++
++	return 0;
++}
++
++static void vgic_its_init_collection(struct vgic_its *its,
++				     struct its_collection *collection,
++				     u32 coll_id)
++{
++	collection->collection_id = coll_id;
++	collection->target_addr = COLLECTION_NOT_MAPPED;
++
++	list_add_tail(&collection->coll_list, &its->collection_list);
++}
++
++/*
++ * The MAPTI and MAPI commands map LPIs to ITTEs.
++ * Must be called with its_lock mutex held.
++ */
++static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
++				    u64 *its_cmd, u8 subcmd)
++{
++	u32 device_id = its_cmd_get_deviceid(its_cmd);
++	u32 event_id = its_cmd_get_id(its_cmd);
++	u32 coll_id = its_cmd_get_collection(its_cmd);
++	struct its_itte *itte;
++	struct its_device *device;
++	struct its_collection *collection, *new_coll = NULL;
++	int lpi_nr;
++
++	device = find_its_device(its, device_id);
++	if (!device)
++		return E_ITS_MAPTI_UNMAPPED_DEVICE;
++
++	collection = find_collection(its, coll_id);
++	if (!collection) {
++		new_coll = kzalloc(sizeof(struct its_collection), GFP_KERNEL);
++		if (!new_coll)
++			return -ENOMEM;
++	}
++
++	if (subcmd == GITS_CMD_MAPTI)
++		lpi_nr = its_cmd_get_physical_id(its_cmd);
++	else
++		lpi_nr = event_id;
++	if (lpi_nr < GIC_LPI_OFFSET ||
++	    lpi_nr >= max_lpis_propbaser(kvm->arch.vgic.propbaser)) {
++		kfree(new_coll);
++		return E_ITS_MAPTI_PHYSICALID_OOR;
++	}
++
++	itte = find_itte(its, device_id, event_id);
++	if (!itte) {
++		itte = kzalloc(sizeof(struct its_itte), GFP_KERNEL);
++		if (!itte) {
++			kfree(new_coll);
++			return -ENOMEM;
++		}
++
++		itte->event_id	= event_id;
++		list_add_tail(&itte->itte_list, &device->itt_head);
++	}
++
++	if (!collection) {
++		collection = new_coll;
++		vgic_its_init_collection(its, collection, coll_id);
++	}
++
++	itte->collection = collection;
++	itte->lpi = lpi_nr;
++	itte->irq = vgic_add_lpi(kvm, lpi_nr);
++	update_affinity_itte(kvm, itte);
++
++	/*
++	 * We "cache" the configuration table entries in out struct vgic_irq's.
++	 * However we only have those structs for mapped IRQs, so we read in
++	 * the respective config data from memory here upon mapping the LPI.
++	 */
++	update_lpi_config(kvm, itte->irq, NULL);
++
++	return 0;
++}
++
++/* Requires the its_lock to be held. */
++static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
++{
++	struct its_itte *itte, *temp;
++
++	/*
++	 * The spec says that unmapping a device with still valid
++	 * ITTEs associated is UNPREDICTABLE. We remove all ITTEs,
++	 * since we cannot leave the memory unreferenced.
++	 */
++	list_for_each_entry_safe(itte, temp, &device->itt_head, itte_list)
++		its_free_itte(kvm, itte);
++
++	list_del(&device->dev_list);
++	kfree(device);
++}
++
++/*
++ * Check whether a device ID can be stored into the guest device tables.
++ * For a direct table this is pretty easy, but gets a bit nasty for
++ * indirect tables. We check whether the resulting guest physical address
++ * is actually valid (covered by a memslot and guest accessbible).
++ * For this we have to read the respective first level entry.
++ */
++static bool vgic_its_check_device_id(struct kvm *kvm, struct vgic_its *its,
++				     int device_id)
++{
++	u64 r = its->baser_device_table;
++	int nr_entries = GITS_BASER_NR_PAGES(r) * SZ_64K;
++	int index;
++	u64 indirect_ptr;
++	gfn_t gfn;
++
++
++	if (!(r & GITS_BASER_INDIRECT))
++		return device_id < (nr_entries / GITS_BASER_ENTRY_SIZE(r));
++
++	/* calculate and check the index into the 1st level */
++	index = device_id / (SZ_64K / GITS_BASER_ENTRY_SIZE(r));
++	if (index >= (nr_entries / sizeof(u64)))
++		return false;
++
++	/* Each 1st level entry is represented by a 64-bit value. */
++	if (!kvm_read_guest(kvm,
++			    BASER_ADDRESS(r) + index * sizeof(indirect_ptr),
++			    &indirect_ptr, sizeof(indirect_ptr)))
++		return false;
++
++	/* check the valid bit of the first level entry */
++	if (!(indirect_ptr & BIT_ULL(63)))
++		return false;
++
++	/*
++	 * Mask the guest physical address and calculate the frame number.
++	 * Any address beyond our supported 48 bits of PA will be caught
++	 * by the actual check in the final step.
++	 */
++	gfn = (indirect_ptr & GENMASK_ULL(51, 16)) >> PAGE_SHIFT;
++
++	return kvm_is_visible_gfn(kvm, gfn);
++}
++
++/*
++ * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
++ * Must be called with the its_lock mutex held.
++ */
++static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
++				    u64 *its_cmd)
++{
++	u32 device_id = its_cmd_get_deviceid(its_cmd);
++	bool valid = its_cmd_get_validbit(its_cmd);
++	struct its_device *device;
++
++	if (!vgic_its_check_device_id(kvm, its, device_id))
++		return E_ITS_MAPD_DEVICE_OOR;
++
++	device = find_its_device(its, device_id);
++
++	/*
++	 * The spec says that calling MAPD on an already mapped device
++	 * invalidates all cached data for this device. We implement this
++	 * by removing the mapping and re-establishing it.
++	 */
++	if (device)
++		vgic_its_unmap_device(kvm, device);
++
++	/*
++	 * The spec does not say whether unmapping a not-mapped device
++	 * is an error, so we are done in any case.
++	 */
++	if (!valid)
++		return 0;
++
++	device = kzalloc(sizeof(struct its_device), GFP_KERNEL);
++	if (!device)
++		return -ENOMEM;
++
++	device->device_id = device_id;
++	INIT_LIST_HEAD(&device->itt_head);
++
++	list_add_tail(&device->dev_list, &its->device_list);
++
++	return 0;
++}
++
++static int vgic_its_nr_collection_ids(struct vgic_its *its)
++{
++	u64 r = its->baser_coll_table;
++
++	return (GITS_BASER_NR_PAGES(r) * SZ_64K) / GITS_BASER_ENTRY_SIZE(r);
++}
++
++/*
++ * The MAPC command maps collection IDs to redistributors.
++ * Must be called with the its_lock mutex held.
++ */
++static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
++				    u64 *its_cmd)
++{
++	u16 coll_id;
++	u32 target_addr;
++	struct its_collection *collection;
++	bool valid;
++
++	valid = its_cmd_get_validbit(its_cmd);
++	coll_id = its_cmd_get_collection(its_cmd);
++	target_addr = its_cmd_get_target_addr(its_cmd);
++
++	if (target_addr >= atomic_read(&kvm->online_vcpus))
++		return E_ITS_MAPC_PROCNUM_OOR;
++
++	if (coll_id >= vgic_its_nr_collection_ids(its))
++		return E_ITS_MAPC_COLLECTION_OOR;
++
++	collection = find_collection(its, coll_id);
++
++	if (!valid) {
++		struct its_device *device;
++		struct its_itte *itte;
++		/*
++		 * Clearing the mapping for that collection ID removes the
++		 * entry from the list. If there wasn't any before, we can
++		 * go home early.
++		 */
++		if (!collection)
++			return 0;
++
++		for_each_lpi_its(device, itte, its)
++			if (itte->collection &&
++			    itte->collection->collection_id == coll_id)
++				itte->collection = NULL;
++
++		list_del(&collection->coll_list);
++		kfree(collection);
++	} else {
++		if (!collection) {
++			collection = kzalloc(sizeof(struct its_collection),
++					     GFP_KERNEL);
++			if (!collection)
++				return -ENOMEM;
++
++			vgic_its_init_collection(its, collection, coll_id);
++			collection->target_addr = target_addr;
++		} else {
++			collection->target_addr = target_addr;
++			update_affinity_collection(kvm, its, collection);
++		}
++	}
++
++	return 0;
++}
++
++/*
++ * The CLEAR command removes the pending state for a particular LPI.
++ * Must be called with the its_lock mutex held.
++ */
++static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
++				     u64 *its_cmd)
++{
++	u32 device_id = its_cmd_get_deviceid(its_cmd);
++	u32 event_id = its_cmd_get_id(its_cmd);
++	struct its_itte *itte;
++
++
++	itte = find_itte(its, device_id, event_id);
++	if (!itte)
++		return E_ITS_CLEAR_UNMAPPED_INTERRUPT;
++
++	itte->irq->pending = false;
++
++	return 0;
++}
++
++/*
++ * The INV command syncs the configuration bits from the memory table.
++ * Must be called with the its_lock mutex held.
++ */
++static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
++				   u64 *its_cmd)
++{
++	u32 device_id = its_cmd_get_deviceid(its_cmd);
++	u32 event_id = its_cmd_get_id(its_cmd);
++	struct its_itte *itte;
++
++
++	itte = find_itte(its, device_id, event_id);
++	if (!itte)
++		return E_ITS_INV_UNMAPPED_INTERRUPT;
++
++	return update_lpi_config(kvm, itte->irq, NULL);
++}
++
++/*
++ * The INVALL command requests flushing of all IRQ data in this collection.
++ * Find the VCPU mapped to that collection, then iterate over the VM's list
++ * of mapped LPIs and update the configuration for each IRQ which targets
++ * the specified vcpu. The configuration will be read from the in-memory
++ * configuration table.
++ * Must be called with the its_lock mutex held.
++ */
++static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
++				      u64 *its_cmd)
++{
++	u32 coll_id = its_cmd_get_collection(its_cmd);
++	struct its_collection *collection;
++	struct kvm_vcpu *vcpu;
++	struct vgic_irq *irq;
++	u32 *intids;
++	int irq_count, i;
++
++	collection = find_collection(its, coll_id);
++	if (!its_is_collection_mapped(collection))
++		return E_ITS_INVALL_UNMAPPED_COLLECTION;
++
++	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
++
++	irq_count = vgic_copy_lpi_list(kvm, &intids);
++	if (irq_count < 0)
++		return irq_count;
++
++	for (i = 0; i < irq_count; i++) {
++		irq = vgic_get_irq(kvm, NULL, intids[i]);
++		if (!irq)
++			continue;
++		update_lpi_config(kvm, irq, vcpu);
++		vgic_put_irq(kvm, irq);
++	}
++
++	kfree(intids);
++
++	return 0;
++}
++
++/*
++ * The MOVALL command moves the pending state of all IRQs targeting one
++ * redistributor to another. We don't hold the pending state in the VCPUs,
++ * but in the IRQs instead, so there is really not much to do for us here.
++ * However the spec says that no IRQ must target the old redistributor
++ * afterwards, so we make sure that no LPI is using the associated target_vcpu.
++ * This command affects all LPIs in the system that target that redistributor.
++ */
++static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
++				      u64 *its_cmd)
++{
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	u32 target1_addr = its_cmd_get_target_addr(its_cmd);
++	u32 target2_addr = its_cmd_mask_field(its_cmd, 3, 16, 32);
++	struct kvm_vcpu *vcpu1, *vcpu2;
++	struct vgic_irq *irq;
++
++	if (target1_addr >= atomic_read(&kvm->online_vcpus) ||
++	    target2_addr >= atomic_read(&kvm->online_vcpus))
++		return E_ITS_MOVALL_PROCNUM_OOR;
++
++	if (target1_addr == target2_addr)
++		return 0;
++
++	vcpu1 = kvm_get_vcpu(kvm, target1_addr);
++	vcpu2 = kvm_get_vcpu(kvm, target2_addr);
++
++	spin_lock(&dist->lpi_list_lock);
++
++	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
++		spin_lock(&irq->irq_lock);
++
++		if (irq->target_vcpu == vcpu1)
++			irq->target_vcpu = vcpu2;
++
++		spin_unlock(&irq->irq_lock);
++	}
++
++	spin_unlock(&dist->lpi_list_lock);
++
++	return 0;
++}
++
++/*
++ * This function is called with the its_cmd lock held, but the ITS data
++ * structure lock dropped.
++ */
+ static int vgic_its_handle_command(struct kvm *kvm, struct vgic_its *its,
+ 				   u64 *its_cmd)
+ {
+-	return -ENODEV;
++	u8 cmd = its_cmd_get_command(its_cmd);
++	int ret = -ENODEV;
++
++	mutex_lock(&its->its_lock);
++	switch (cmd) {
++	case GITS_CMD_MAPD:
++		ret = vgic_its_cmd_handle_mapd(kvm, its, its_cmd);
++		break;
++	case GITS_CMD_MAPC:
++		ret = vgic_its_cmd_handle_mapc(kvm, its, its_cmd);
++		break;
++	case GITS_CMD_MAPI:
++		ret = vgic_its_cmd_handle_mapi(kvm, its, its_cmd, cmd);
++		break;
++	case GITS_CMD_MAPTI:
++		ret = vgic_its_cmd_handle_mapi(kvm, its, its_cmd, cmd);
++		break;
++	case GITS_CMD_MOVI:
++		ret = vgic_its_cmd_handle_movi(kvm, its, its_cmd);
++		break;
++	case GITS_CMD_DISCARD:
++		ret = vgic_its_cmd_handle_discard(kvm, its, its_cmd);
++		break;
++	case GITS_CMD_CLEAR:
++		ret = vgic_its_cmd_handle_clear(kvm, its, its_cmd);
++		break;
++	case GITS_CMD_MOVALL:
++		ret = vgic_its_cmd_handle_movall(kvm, its, its_cmd);
++		break;
++	case GITS_CMD_INV:
++		ret = vgic_its_cmd_handle_inv(kvm, its, its_cmd);
++		break;
++	case GITS_CMD_INVALL:
++		ret = vgic_its_cmd_handle_invall(kvm, its, its_cmd);
++		break;
++	case GITS_CMD_SYNC:
++		/* we ignore this command: we are in sync all of the time */
++		ret = 0;
++		break;
++	}
++	mutex_unlock(&its->its_lock);
++
++	return ret;
+ }
+ 
+ static u64 vgic_sanitise_its_baser(u64 reg)
 -- 
 2.9.0
