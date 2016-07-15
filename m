@@ -1,8 +1,11 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v3 01/10] lib: xstr: allow multiple args
-Date: Fri, 15 Jul 2016 15:00:32 +0200
-Message-ID: <1468587641-7300-2-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v3 02/10] arm64: fix get_"sysreg32" and make MPIDR 64bit
+Date: Fri, 15 Jul 2016 15:00:33 +0200
+Message-ID: <1468587641-7300-3-git-send-email-drjones@redhat.com>
 References: <1468587641-7300-1-git-send-email-drjones@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1468587641-7300-1-git-send-email-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
@@ -10,28 +13,44 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, qemu
 Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Make implementation equivalent to Linux's include/linux/stringify.h
+mrs is always 64bit, so we should always use a 64bit register.
+Sometimes we'll only want to return the lower 32, but not for
+MPIDR, as that does define fields in the upper 32.
 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- lib/libcflat.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ lib/arm64/asm/processor.h | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/lib/libcflat.h b/lib/libcflat.h
-index 72b1bf9668ef1..82005f5d014fb 100644
---- a/lib/libcflat.h
-+++ b/lib/libcflat.h
-@@ -27,8 +27,8 @@
- 
- #define __unused __attribute__((__unused__))
- 
--#define xstr(s) xxstr(s)
--#define xxstr(s) #s
-+#define xstr(s...) xxstr(s)
-+#define xxstr(s...) #s
- 
- #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
- #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
--- 
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index 84d5c7ce752b0..9a208ff729b7e 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -66,14 +66,17 @@ static inline unsigned long current_level(void)
+ 	return el & 0xc;
+ }
+=20
+-#define DEFINE_GET_SYSREG32(reg)				\
+-static inline unsigned int get_##reg(void)			\
++#define DEFINE_GET_SYSREG(reg, type)				\
++static inline type get_##reg(void)				\
+ {								\
+-	unsigned int reg;					\
+-	asm volatile("mrs %0, " #reg "_el1" : "=3Dr" (reg));	\
+-	return reg;						\
++	unsigned long r;					\
++	asm volatile("mrs %0, " #reg "_el1" : "=3Dr" (r));	\
++	return (type)r;						\
+ }
+-DEFINE_GET_SYSREG32(mpidr)
++#define DEFINE_GET_SYSREG32(reg) DEFINE_GET_SYSREG(reg, unsigned int)
++#define DEFINE_GET_SYSREG64(reg) DEFINE_GET_SYSREG(reg, unsigned long)
++
++DEFINE_GET_SYSREG64(mpidr)
+=20
+ /* Only support Aff0 for now, gicv2 only */
+ #define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
+--=20
 2.7.4
 
