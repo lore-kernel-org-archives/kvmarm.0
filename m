@@ -1,22 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v10 01/17] KVM: arm/arm64: move redistributor kvm_io_devices
-Date: Fri, 15 Jul 2016 12:43:22 +0100
-Message-ID: <20160715114338.10484-2-andre.przywara@arm.com>
+Subject: [PATCH v10 04/17] KVM: arm/arm64: extend arch CAP checks to allow
+ per-VM capabilities
+Date: Fri, 15 Jul 2016 12:43:25 +0100
+Message-ID: <20160715114338.10484-5-andre.przywara@arm.com>
 References: <20160715114338.10484-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D996949B2F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:36:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D02C749B50
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:37:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P494pjo0dPS5 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jul 2016 07:36:56 -0400 (EDT)
+ with ESMTP id pBqINYqgUyP3 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jul 2016 07:37:00 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B11DB49B2E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:36:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A681649B21
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2016 07:37:00 -0400 (EDT)
 In-Reply-To: <20160715114338.10484-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,109 +32,73 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Logically a GICv3 redistributor is assigned to a (v)CPU, so we should
-aim to keep redistributor related variables out of our struct vgic_dist.
-
-Let's start by replacing the redistributor related kvm_io_device array
-with two members in our existing struct vgic_cpu, which are naturally
-per-VCPU and thus don't require any allocation / freeing.
-So apart from the better fit with the redistributor design this saves
-some code as well.
+KVM capabilities can be a per-VM property, though ARM/ARM64 currently
+does not pass on the VM pointer to the architecture specific
+capability handlers.
+Add a "struct kvm*" parameter to those function to later allow proper
+per-VM capability reporting.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/arm_vgic.h           |  8 +++++++-
- virt/kvm/arm/vgic/vgic-init.c    |  1 -
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 22 ++++++++--------------
- 3 files changed, 15 insertions(+), 16 deletions(-)
+ arch/arm/include/asm/kvm_host.h   | 2 +-
+ arch/arm/kvm/arm.c                | 2 +-
+ arch/arm64/include/asm/kvm_host.h | 2 +-
+ arch/arm64/kvm/reset.c            | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 1264037..5142e2a 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -145,7 +145,6 @@ struct vgic_dist {
- 	struct vgic_irq		*spis;
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 96387d4..3c40facd 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -281,7 +281,7 @@ static inline void __cpu_reset_hyp_mode(phys_addr_t boot_pgd_ptr,
+ 	 */
+ }
  
- 	struct vgic_io_device	dist_iodev;
--	struct vgic_io_device	*redist_iodevs;
- };
- 
- struct vgic_v2_cpu_if {
-@@ -193,6 +192,13 @@ struct vgic_cpu {
- 	struct list_head ap_list_head;
- 
- 	u64 live_lrs;
-+
-+	/*
-+	 * Members below are used with GICv3 emulation only and represent
-+	 * parts of the redistributor.
-+	 */
-+	struct vgic_io_device	rd_iodev;
-+	struct vgic_io_device	sgi_iodev;
- };
- 
- int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index a1442f7..90cae48 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -271,7 +271,6 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- 	dist->initialized = false;
- 
- 	kfree(dist->spis);
--	kfree(dist->redist_iodevs);
- 	dist->nr_spis = 0;
- 
- 	mutex_unlock(&kvm->lock);
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index a0c515a..fc7b6c9 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -285,21 +285,14 @@ unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev)
- 
- int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
+-static inline int kvm_arch_dev_ioctl_check_extension(long ext)
++static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
  {
--	int nr_vcpus = atomic_read(&kvm->online_vcpus);
- 	struct kvm_vcpu *vcpu;
--	struct vgic_io_device *devices;
- 	int c, ret = 0;
- 
--	devices = kmalloc(sizeof(struct vgic_io_device) * nr_vcpus * 2,
--			  GFP_KERNEL);
--	if (!devices)
--		return -ENOMEM;
--
- 	kvm_for_each_vcpu(c, vcpu, kvm) {
- 		gpa_t rd_base = redist_base_address + c * SZ_64K * 2;
- 		gpa_t sgi_base = rd_base + SZ_64K;
--		struct vgic_io_device *rd_dev = &devices[c * 2];
--		struct vgic_io_device *sgi_dev = &devices[c * 2 + 1];
-+		struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
-+		struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
- 
- 		kvm_iodevice_init(&rd_dev->dev, &kvm_io_gic_ops);
- 		rd_dev->base_addr = rd_base;
-@@ -335,14 +328,15 @@ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
- 	if (ret) {
- 		/* The current c failed, so we start with the previous one. */
- 		for (c--; c >= 0; c--) {
-+			struct vgic_cpu *vgic_cpu;
-+
-+			vcpu = kvm_get_vcpu(kvm, c);
-+			vgic_cpu = &vcpu->arch.vgic_cpu;
- 			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
--						  &devices[c * 2].dev);
-+						  &vgic_cpu->rd_iodev.dev);
- 			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
--						  &devices[c * 2 + 1].dev);
-+						  &vgic_cpu->sgi_iodev.dev);
- 		}
--		kfree(devices);
--	} else {
--		kvm->arch.vgic.redist_iodevs = devices;
+ 	return 0;
+ }
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index c74483f..557e390 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -201,7 +201,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = KVM_MAX_VCPUS;
+ 		break;
+ 	default:
+-		r = kvm_arch_dev_ioctl_check_extension(ext);
++		r = kvm_arch_dev_ioctl_check_extension(kvm, ext);
+ 		break;
  	}
+ 	return r;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 49095fc..ebe8904 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -47,7 +47,7 @@
  
- 	return ret;
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+-int kvm_arch_dev_ioctl_check_extension(long ext);
++int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
+ unsigned long kvm_hyp_reset_entry(void);
+ void __extended_idmap_trampoline(phys_addr_t boot_pgd, phys_addr_t idmap_start);
+ 
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 7be24f2..3989833 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -65,7 +65,7 @@ static bool cpu_has_32bit_el1(void)
+  * We currently assume that the number of HW registers is uniform
+  * across all CPUs (see cpuinfo_sanity_check).
+  */
+-int kvm_arch_dev_ioctl_check_extension(long ext)
++int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+ 	int r;
+ 
 -- 
 2.9.0
