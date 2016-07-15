@@ -1,11 +1,8 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v3 04/10] arm/arm64: add some delay routines
-Date: Fri, 15 Jul 2016 15:00:35 +0200
-Message-ID: <1468587641-7300-5-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v3 10/10] arm/arm64: gic: don't just use zero
+Date: Fri, 15 Jul 2016 15:00:41 +0200
+Message-ID: <1468587641-7300-11-git-send-email-drjones@redhat.com>
 References: <1468587641-7300-1-git-send-email-drjones@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1468587641-7300-1-git-send-email-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
@@ -13,154 +10,205 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, qemu
 Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Allow a thread to wait some specified amount of time. Can
-specify in cycles, usecs, and msecs.
+Allow user to select who sends ipis and with which irq,
+rather than just always sending irq=0 from cpu0.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- lib/arm/asm/processor.h   | 19 +++++++++++++++++++
- lib/arm/processor.c       | 15 +++++++++++++++
- lib/arm64/asm/processor.h | 19 +++++++++++++++++++
- lib/arm64/processor.c     | 15 +++++++++++++++
- 4 files changed, 68 insertions(+)
 
-diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-index d2048f5f5f7e6..afc903ca7d4ab 100644
---- a/lib/arm/asm/processor.h
-+++ b/lib/arm/asm/processor.h
-@@ -5,7 +5,9 @@
-  *
+---
+v2: actually check that the irq received was the irq sent,
+    and (for gicv2) that the sender is the expected one.
+---
+ arm/gic.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 64 insertions(+), 16 deletions(-)
+
+diff --git a/arm/gic.c b/arm/gic.c
+index fc7ef241de3e2..d3ab97d4ae470 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -11,6 +11,7 @@
   * This work is licensed under the terms of the GNU LGPL, version 2.
   */
-+#include <libcflat.h>
- #include <asm/ptrace.h>
-+#include <asm/barrier.h>
-=20
- enum vector {
- 	EXCPTN_RST,
-@@ -51,4 +53,21 @@ extern int mpidr_to_cpu(unsigned long mpidr);
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned lon=
-g sp_usr);
- extern bool is_user(void);
-=20
-+static inline u64 get_cntvct(void)
-+{
-+	u64 vct;
-+	isb();
-+	asm volatile("mrrc p15, 1, %Q0, %R0, c14" : "=3Dr" (vct));
-+	return vct;
-+}
-+
-+extern void delay(u64 cycles);
-+extern void udelay(unsigned long usecs);
-+
-+static inline void mdelay(unsigned long msecs)
-+{
-+	while (msecs--)
-+		udelay(1000);
-+}
-+
- #endif /* _ASMARM_PROCESSOR_H_ */
-diff --git a/lib/arm/processor.c b/lib/arm/processor.c
-index 54fdb87ef0196..c2ee360df6884 100644
---- a/lib/arm/processor.c
-+++ b/lib/arm/processor.c
-@@ -9,6 +9,7 @@
- #include <asm/ptrace.h>
+ #include <libcflat.h>
++#include <util.h>
+ #include <asm/setup.h>
  #include <asm/processor.h>
- #include <asm/thread_info.h>
-+#include <asm/barrier.h>
-=20
- static const char *processor_modes[] =3D {
- 	"USER_26", "FIQ_26" , "IRQ_26" , "SVC_26" ,
-@@ -141,3 +142,17 @@ bool is_user(void)
+ #include <asm/gic.h>
+@@ -33,6 +34,8 @@ static struct gic *gic;
+ static int gic_version;
+ static int acked[NR_CPUS], spurious[NR_CPUS];
+ static cpumask_t ready;
++static int sender;
++static u32 irq;
+ 
+ static void nr_cpu_check(int nr)
  {
- 	return current_thread_info()->flags & TIF_USER_MODE;
- }
-+
-+void delay(u64 cycles)
-+{
-+	u64 start =3D get_cntvct();
-+	while ((get_cntvct() - start) < cycles)
-+		cpu_relax();
-+}
-+
-+void udelay(unsigned long usec)
-+{
-+	unsigned int frq;
-+	asm volatile("mrc p15, 0, %0, c14, c0, 0" : "=3Dr" (frq));
-+	delay((u64)usec * frq / 1000000);
-+}
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 7e448dc81a6aa..94f7ce35b65c1 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -17,8 +17,10 @@
- #define SCTLR_EL1_M	(1 << 0)
-=20
- #ifndef __ASSEMBLY__
-+#include <libcflat.h>
- #include <asm/ptrace.h>
- #include <asm/esr.h>
-+#include <asm/barrier.h>
-=20
- enum vector {
- 	EL1T_SYNC,
-@@ -89,5 +91,22 @@ extern int mpidr_to_cpu(unsigned long mpidr);
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned lon=
-g sp_usr);
- extern bool is_user(void);
-=20
-+static inline u64 get_cntvct(void)
-+{
-+	u64 vct;
-+	isb();
-+	asm volatile("mrs %0, cntvct_el0" : "=3Dr" (vct));
-+	return vct;
-+}
-+
-+extern void delay(u64 cycles);
-+extern void udelay(unsigned long usecs);
-+
-+static inline void mdelay(unsigned long msecs)
-+{
-+	while (msecs--)
-+		udelay(1000);
-+}
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM64_PROCESSOR_H_ */
-diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-index deeab4ec9c8ac..50fa835c6f1e3 100644
---- a/lib/arm64/processor.c
-+++ b/lib/arm64/processor.c
-@@ -9,6 +9,7 @@
- #include <asm/ptrace.h>
- #include <asm/processor.h>
- #include <asm/thread_info.h>
-+#include <asm/barrier.h>
-=20
- static const char *vector_names[] =3D {
- 	"el1t_sync",
-@@ -253,3 +254,17 @@ bool is_user(void)
+@@ -85,7 +88,16 @@ static void check_acked(cpumask_t *mask)
+ 
+ static u32 gicv2_read_iar(void)
  {
- 	return current_thread_info()->flags & TIF_USER_MODE;
+-	return readl(gicv2_cpu_base() + GIC_CPU_INTACK);
++	u32 iar = readl(gicv2_cpu_base() + GIC_CPU_INTACK);
++	int src = (iar >> 10) & 7;
++
++	if (src != sender) {
++		report("cpu%d received IPI from unexpected source cpu%d "
++		       "(expected cpu%d)",
++		       false, smp_processor_id(), src, sender);
++	}
++
++	return iar & 0x3ff;
  }
-+
-+void delay(u64 cycles)
+ 
+ static void gicv2_write_eoi(u32 irq)
+@@ -99,9 +111,15 @@ static void ipi_handler(struct pt_regs *regs __unused)
+ 
+ 	if (iar != GICC_INT_SPURIOUS) {
+ 		gic->write_eoi(iar);
+-		smp_rmb(); /* pairs with wmb in ipi_test functions */
+-		++acked[smp_processor_id()];
+-		smp_wmb(); /* pairs with rmb in check_acked */
++		if (iar == irq) {
++			smp_rmb(); /* pairs with wmb in ipi_test functions */
++			++acked[smp_processor_id()];
++			smp_wmb(); /* pairs with rmb in check_acked */
++		} else {
++			report("cpu%d received unexpected irq %u "
++			       "(expected %u)",
++			       false, smp_processor_id(), iar, irq);
++		}
+ 	} else {
+ 		++spurious[smp_processor_id()];
+ 		smp_wmb();
+@@ -110,19 +128,19 @@ static void ipi_handler(struct pt_regs *regs __unused)
+ 
+ static void gicv2_ipi_send_self(void)
+ {
+-	writel(2 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	writel(2 << 24 | irq, gicv2_dist_base() + GIC_DIST_SOFTINT);
+ }
+ 
+ static void gicv2_ipi_send_tlist(cpumask_t *mask)
+ {
+ 	u8 tlist = (u8)cpumask_bits(mask)[0];
+ 
+-	writel(tlist << 16, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	writel(tlist << 16 | irq, gicv2_dist_base() + GIC_DIST_SOFTINT);
+ }
+ 
+ static void gicv2_ipi_send_broadcast(void)
+ {
+-	writel(1 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	writel(1 << 24 | irq, gicv2_dist_base() + GIC_DIST_SOFTINT);
+ }
+ 
+ #define ICC_SGI1R_AFFINITY_1_SHIFT	16
+@@ -165,7 +183,7 @@ static void gicv3_ipi_send_tlist(cpumask_t *mask)
+ 
+ 		sgi1r = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3)	|
+ 			 MPIDR_TO_SGI_AFFINITY(cluster_id, 2)	|
+-			 /* irq << 24				| */
++			 irq << 24				|
+ 			 MPIDR_TO_SGI_AFFINITY(cluster_id, 1)	|
+ 			 tlist);
+ 
+@@ -187,7 +205,7 @@ static void gicv3_ipi_send_self(void)
+ 
+ static void gicv3_ipi_send_broadcast(void)
+ {
+-	gicv3_write_sgi1r(1ULL << 40);
++	gicv3_write_sgi1r(1ULL << 40 | irq << 24);
+ 	isb();
+ }
+ 
+@@ -199,7 +217,7 @@ static void ipi_test_self(void)
+ 	memset(acked, 0, sizeof(acked));
+ 	smp_wmb();
+ 	cpumask_clear(&mask);
+-	cpumask_set_cpu(0, &mask);
++	cpumask_set_cpu(smp_processor_id(), &mask);
+ 	gic->ipi.send_self();
+ 	check_acked(&mask);
+ 	report_prefix_pop();
+@@ -214,7 +232,7 @@ static void ipi_test_smp(void)
+ 	memset(acked, 0, sizeof(acked));
+ 	smp_wmb();
+ 	cpumask_copy(&mask, &cpu_present_mask);
+-	for (i = 0; i < nr_cpus; i += 2)
++	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
+ 		cpumask_clear_cpu(i, &mask);
+ 	gic->ipi.send_tlist(&mask);
+ 	check_acked(&mask);
+@@ -224,7 +242,7 @@ static void ipi_test_smp(void)
+ 	memset(acked, 0, sizeof(acked));
+ 	smp_wmb();
+ 	cpumask_copy(&mask, &cpu_present_mask);
+-	cpumask_clear_cpu(0, &mask);
++	cpumask_clear_cpu(smp_processor_id(), &mask);
+ 	gic->ipi.send_broadcast();
+ 	check_acked(&mask);
+ 	report_prefix_pop();
+@@ -241,6 +259,15 @@ static void ipi_enable(void)
+ 	local_irq_enable();
+ }
+ 
++static void ipi_send(void)
 +{
-+	u64 start =3D get_cntvct();
-+	while ((get_cntvct() - start) < cycles)
-+		cpu_relax();
++	ipi_enable();
++	wait_on_ready();
++	ipi_test_self();
++	ipi_test_smp();
++	exit(report_summary());
 +}
 +
-+void udelay(unsigned long usec)
-+{
-+	unsigned int frq;
-+	asm volatile("mrs %0, cntfrq_el0" : "=3Dr" (frq));
-+	delay((u64)usec * frq / 1000000);
-+}
---=20
+ static void ipi_recv(void)
+ {
+ 	ipi_enable();
+@@ -300,19 +327,40 @@ int main(int argc, char **argv)
+ 		report_prefix_pop();
+ 
+ 	} else if (!strcmp(argv[1], "ipi")) {
++		int off, i = 1;
++		long val;
+ 
+ 		report_prefix_push(argv[1]);
++
++		while (--argc != 1) {
++			off = parse_keyval(argv[++i], &val);
++			if (off == -1)
++				continue;
++			argv[i][off] = '\0';
++			if (strcmp(argv[i], "sender") == 0)
++				sender = val;
++			else if (strcmp(argv[i], "irq") == 0)
++				irq = val;
++		}
++
+ 		nr_cpu_check(2);
+ 		ipi_enable();
+ 
+ 		for_each_present_cpu(cpu) {
+ 			if (cpu == 0)
+ 				continue;
+-			smp_boot_secondary(cpu, ipi_recv);
++			if (cpu == sender)
++				smp_boot_secondary(cpu, ipi_send);
++			else
++				smp_boot_secondary(cpu, ipi_recv);
++		}
++		if (sender == 0)  {
++			wait_on_ready();
++			ipi_test_self();
++			ipi_test_smp();
++		} else {
++			ipi_recv();
+ 		}
+-		wait_on_ready();
+-		ipi_test_self();
+-		ipi_test_smp();
+ 
+ 		smp_rmb();
+ 		for_each_present_cpu(cpu) {
+-- 
 2.7.4
 
