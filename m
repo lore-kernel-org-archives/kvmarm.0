@@ -1,8 +1,8 @@
 From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
 Subject: Re: [PATCH v10 15/17] KVM: arm64: implement ITS command queue command
  handlers
-Date: Mon, 18 Jul 2016 00:23:38 +0100
-Message-ID: <545f7c23-0146-ebd7-b173-be3440c29351@arm.com>
+Date: Mon, 18 Jul 2016 08:45:01 +0100
+Message-ID: <39d146e9-f234-0ea0-9cbf-a8b27f55c32f@arm.com>
 References: <20160715114338.10484-1-andre.przywara@arm.com>
  <20160715114338.10484-16-andre.przywara@arm.com>
  <20160716110815.35f8527e@arm.com>
@@ -18,8 +18,8 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Marc,
 
-[...]
-
+On 16/07/16 11:08, Marc Zyngier wrote:
+> On Fri, 15 Jul 2016 12:43:36 +0100
 >> +/*
 >> + * Check whether a device ID can be stored into the guest device tables.
 >> + * For a direct table this is pretty easy, but gets a bit nasty for
@@ -60,7 +60,6 @@ Hi Marc,
 
 Oh right, endianness. Thanks for pointing that out!
 
-> 
 >> +
 >> +	/* check the valid bit of the first level entry */
 >> +	if (!(indirect_ptr & BIT_ULL(63)))
@@ -83,6 +82,7 @@ Oh right, endianness. Thanks for pointing that out!
 > 
 > so that you check the presence of the actual location you're virtually
 > touching.
+>
 
 Right, that nasty case came to me as well after sending the patches.
 I had something like "gfn += ...." plus a comment in mind, but that's
