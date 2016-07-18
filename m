@@ -1,76 +1,93 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v7 4/7] KVM: move kvm_setup_default/empty_irq_routing
- declaration in arch specific header
-Date: Mon, 18 Jul 2016 13:25:54 +0000
-Message-ID: <1468848357-2331-5-git-send-email-eric.auger@redhat.com>
+Subject: [RFC v7 7/7] KVM: arm: enable KVM_SIGNAL_MSI and MSI routing
+Date: Mon, 18 Jul 2016 13:25:57 +0000
+Message-ID: <1468848357-2331-8-git-send-email-eric.auger@redhat.com>
 References: <1468848357-2331-1-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD90149B3F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 09:20:11 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gMGjWJlvXP19 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2016 09:20:10 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 25DCC49B43
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 09:20:10 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1468848357-2331-1-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: eric.auger@redhat.com, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com
-Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-kvm_setup_default_irq_routing and kvm_setup_empty_irq_routing are
-not used by generic code. So let's move the declarations in x86 irq.h
-header instead of kvm_host.h.
+If the ITS modality is not available, let's simply support MSI
+injection by transforming the MSI.data into an SPI ID.
+
+This becomes possible to use KVM_SIGNAL_MSI ioctl and MSI
+routing for arm too.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Suggested-by: Andre Przywara <andre.przywara@arm.com>
 
 ---
 
-- new patch in v7
----
- arch/x86/kvm/irq.h       | 3 +++
- include/linux/kvm_host.h | 2 --
- 2 files changed, 3 insertions(+), 2 deletions(-)
+v6 -> v7:
+- move vgic_v2m_inject_msi into vgic-irqfd
 
-diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
-index 61ebdc1..035731e 100644
---- a/arch/x86/kvm/irq.h
-+++ b/arch/x86/kvm/irq.h
-@@ -120,4 +120,7 @@ void __kvm_migrate_timers(struct kvm_vcpu *vcpu);
+v4 -> v5:
+- on vgic_v2m_inject_msi check the msi->data is within the SPI range
+- move KVM_HAVE_MSI in the KVM section (to be symetrical with ARM64)
+
+v2 -> v3:
+- reword the commit message
+- add sanity check about devid provision
+
+v1 -> v2:
+- introduce vgic_v2m_inject_msi in vgic-v2-emul.c following Andre's
+  advice
+---
+ arch/arm/kvm/Kconfig           |  1 +
+ virt/kvm/arm/vgic/vgic-irqfd.c | 19 ++++++++++++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 3e1cd04..90d0176 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -34,6 +34,7 @@ config KVM
+ 	select HAVE_KVM_IRQFD
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
++	select HAVE_KVM_MSI
+ 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
+index 4f0d7eb..28c96ad 100644
+--- a/virt/kvm/arm/vgic/vgic-irqfd.c
++++ b/virt/kvm/arm/vgic/vgic-irqfd.c
+@@ -77,6 +77,23 @@ out:
+ }
  
- int apic_has_pending_timer(struct kvm_vcpu *vcpu);
- 
-+int kvm_setup_default_irq_routing(struct kvm *kvm);
-+int kvm_setup_empty_irq_routing(struct kvm *kvm);
+ /**
++ * vgic_v2m_inject_msi: emulates GICv2M MSI injection by injecting
++ * the SPI ID matching the msi data
++ *
++ * @kvm: pointer to the kvm struct
++ * @msi: the msi struct handle
++ */
++static int vgic_v2m_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
++{
++	if (msi->flags & KVM_MSI_VALID_DEVID)
++		return -EINVAL;
++	if (!vgic_valid_spi(kvm, msi->data))
++		return -EINVAL;
 +
- #endif
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 3d2cbb4..dcdff5c2 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1042,8 +1042,6 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
- #define KVM_MAX_IRQ_ROUTES 1024
- #endif
++	return kvm_vgic_inject_irq(kvm, 0, msi->data, 1);
++}
++
++/**
+  * kvm_set_msi: inject the MSI corresponding to the
+  * MSI routing entry
+  *
+@@ -96,7 +113,7 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+ 	msi.devid = e->msi_devid;
  
--int kvm_setup_default_irq_routing(struct kvm *kvm);
--int kvm_setup_empty_irq_routing(struct kvm *kvm);
- int kvm_set_irq_routing(struct kvm *kvm,
- 			const struct kvm_irq_routing_entry *entries,
- 			unsigned nr,
+ 	if (!vgic_has_its(kvm))
+-		return -ENODEV;
++		return vgic_v2m_inject_msi(kvm, &msi);
+ 
+ 	return vgic_its_inject_msi(kvm, &msi);
+ }
 -- 
 1.9.1
+
