@@ -1,23 +1,21 @@
 From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH 5/7] ARM: move system register accessors to asm/cp15.h
-Date: Mon, 18 Jul 2016 11:48:17 +0100
-Message-ID: <1468838899-34909-6-git-send-email-vladimir.murzin@arm.com>
-References: <1468838899-34909-1-git-send-email-vladimir.murzin@arm.com>
+Subject: [PATCH 0/7] ARM: KVM: Support for vgic-v3
+Date: Mon, 18 Jul 2016 11:48:12 +0100
+Message-ID: <1468838899-34909-1-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E19D449B59
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 06:42:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3C5E49B37
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 06:42:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9QWDvcPcD5zA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2016 06:42:45 -0400 (EDT)
+ with ESMTP id thw262dLiDXW for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2016 06:42:38 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C53A49B37
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 06:42:42 -0400 (EDT)
-In-Reply-To: <1468838899-34909-1-git-send-email-vladimir.murzin@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D84349B32
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 06:42:37 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,164 +29,60 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Macro __ACCESS_CP15{_64} is defined in two headers (arch_gicv3.h and
-kvm_hyp.h) which are going to be requested by vgic-v3 altogether.
-GCC would not like it because it'd see that macro is redefined and (hey!)
-they are different.  So, let's put only single macro version under common
-place and use it everywhere.
+Hi,
 
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
----
- arch/arm/include/asm/arch_gicv3.h |   27 +++++++++++----------------
- arch/arm/include/asm/cp15.h       |   15 +++++++++++++++
- arch/arm/include/asm/kvm_hyp.h    |   15 +--------------
- 3 files changed, 27 insertions(+), 30 deletions(-)
+This is an attempt to make use vgic-v3 under arch/arm since save-restore
+functionality got re-written in C and can be shared between arm/arm64
+like it has already been done for vgic-v2 and timer.
 
-diff --git a/arch/arm/include/asm/arch_gicv3.h b/arch/arm/include/asm/arch_gicv3.h
-index e08d151..af25c32 100644
---- a/arch/arm/include/asm/arch_gicv3.h
-+++ b/arch/arm/include/asm/arch_gicv3.h
-@@ -22,9 +22,7 @@
- 
- #include <linux/io.h>
- #include <asm/barrier.h>
--
--#define __ACCESS_CP15(CRn, Op1, CRm, Op2)	p15, Op1, %0, CRn, CRm, Op2
--#define __ACCESS_CP15_64(Op1, CRm)		p15, Op1, %Q0, %R0, CRm
-+#include <asm/cp15.h>
- 
- #define ICC_EOIR1			__ACCESS_CP15(c12, 0, c12, 1)
- #define ICC_DIR				__ACCESS_CP15(c12, 0, c11, 1)
-@@ -102,58 +100,55 @@
- 
- static inline void gic_write_eoir(u32 irq)
- {
--	asm volatile("mcr " __stringify(ICC_EOIR1) : : "r" (irq));
-+	write_sysreg(irq, ICC_EOIR1);
- 	isb();
- }
- 
- static inline void gic_write_dir(u32 val)
- {
--	asm volatile("mcr " __stringify(ICC_DIR) : : "r" (val));
-+	write_sysreg(val, ICC_DIR);
- 	isb();
- }
- 
- static inline u32 gic_read_iar(void)
- {
--	u32 irqstat;
-+	u32 irqstat = read_sysreg(ICC_IAR1);
- 
--	asm volatile("mrc " __stringify(ICC_IAR1) : "=r" (irqstat));
- 	dsb(sy);
-+
- 	return irqstat;
- }
- 
- static inline void gic_write_pmr(u32 val)
- {
--	asm volatile("mcr " __stringify(ICC_PMR) : : "r" (val));
-+	write_sysreg(val, ICC_PMR);
- }
- 
- static inline void gic_write_ctlr(u32 val)
- {
--	asm volatile("mcr " __stringify(ICC_CTLR) : : "r" (val));
-+	write_sysreg(val, ICC_CTLR);
- 	isb();
- }
- 
- static inline void gic_write_grpen1(u32 val)
- {
--	asm volatile("mcr " __stringify(ICC_IGRPEN1) : : "r" (val));
-+	write_sysreg(val, ICC_IGRPEN1);
- 	isb();
- }
- 
- static inline void gic_write_sgi1r(u64 val)
- {
--	asm volatile("mcrr " __stringify(ICC_SGI1R) : : "r" (val));
-+	write_sysreg(val, ICC_SGI1R);
- }
- 
- static inline u32 gic_read_sre(void)
- {
--	u32 val;
--
--	asm volatile("mrc " __stringify(ICC_SRE) : "=r" (val));
--	return val;
-+	return read_sysreg(ICC_SRE);
- }
- 
- static inline void gic_write_sre(u32 val)
- {
--	asm volatile("mcr " __stringify(ICC_SRE) : : "r" (val));
-+	write_sysreg(val, ICC_SRE);
- 	isb();
- }
- 
-diff --git a/arch/arm/include/asm/cp15.h b/arch/arm/include/asm/cp15.h
-index c3f1152..f661732 100644
---- a/arch/arm/include/asm/cp15.h
-+++ b/arch/arm/include/asm/cp15.h
-@@ -47,6 +47,21 @@
- #define vectors_high()	(0)
- #endif
- 
-+#define __ACCESS_CP15(CRn, Op1, CRm, Op2)	\
-+	"mrc", "mcr", __stringify(p15, Op1, %0, CRn, CRm, Op2), u32
-+#define __ACCESS_CP15_64(Op1, CRm)		\
-+	"mrrc", "mcrr", __stringify(p15, Op1, %Q0, %R0, CRm), u64
-+
-+#define __read_sysreg(r, w, c, t) ({				\
-+	t __val;						\
-+	asm volatile(r " " c : "=r" (__val));			\
-+	__val;							\
-+})
-+#define read_sysreg(...)		__read_sysreg(__VA_ARGS__)
-+
-+#define __write_sysreg(v, r, w, c, t)	asm volatile(w " " c : : "r" ((t)(v)))
-+#define write_sysreg(v, ...)		__write_sysreg(v, __VA_ARGS__)
-+
- #ifdef CONFIG_CPU_CP15
- 
- extern unsigned long cr_alignment;	/* defined in entry-armv.S */
-diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
-index f0e8607..91a4ed9 100644
---- a/arch/arm/include/asm/kvm_hyp.h
-+++ b/arch/arm/include/asm/kvm_hyp.h
-@@ -20,6 +20,7 @@
- 
- #include <linux/compiler.h>
- #include <linux/kvm_host.h>
-+#include <asm/cp15.h>
- #include <asm/kvm_mmu.h>
- #include <asm/vfp.h>
- 
-@@ -28,23 +29,9 @@
- #define kern_hyp_va(v) (v)
- #define hyp_kern_va(v) (v)
- 
--#define __ACCESS_CP15(CRn, Op1, CRm, Op2)	\
--	"mrc", "mcr", __stringify(p15, Op1, %0, CRn, CRm, Op2), u32
--#define __ACCESS_CP15_64(Op1, CRm)		\
--	"mrrc", "mcrr", __stringify(p15, Op1, %Q0, %R0, CRm), u64
- #define __ACCESS_VFP(CRn)			\
- 	"mrc", "mcr", __stringify(p10, 7, %0, CRn, cr0, 0), u32
- 
--#define __write_sysreg(v, r, w, c, t)	asm volatile(w " " c : : "r" ((t)(v)))
--#define write_sysreg(v, ...)		__write_sysreg(v, __VA_ARGS__)
--
--#define __read_sysreg(r, w, c, t) ({				\
--	t __val;						\
--	asm volatile(r " " c : "=r" (__val));			\
--	__val;							\
--})
--#define read_sysreg(...)		__read_sysreg(__VA_ARGS__)
--
- #define write_special(v, r)					\
- 	asm volatile("msr " __stringify(r) ", %0" : : "r" (v))
- #define read_special(r) ({					\
+With this patches I'm able to get 32 core ARMv7 guest boot:
+
+...
+GICv3: CPU31: found redistributor 703 region 0:0x000000003ffd0000
+CPU31: thread -1, cpu 3, socket 7, mpidr 80000703
+Brought up 32 CPUs
+SMP: Total of 32 processors activated (768.00 BogoMIPS).
+CPU: All CPU(s) started in SVC mode.
+...
+
+Additionally, quite lightweight test based on Self IPI guest test[1]
+has been run with up to 255 cpus.
+
+[1] http://www.spinics.net/lists/kvm/msg128974.html
+
+Thanks!
+
+Vladimir Murzin (7):
+  arm64: KVM: Move GIC accessors to arch_gicv3.h
+  arm64: KVM: Move vgic-v3 save/restore to virt/kvm/arm/hyp
+  KVM: arm: vgic-new: improve compatibility with 32-bit
+  ARM: update MPIDR accessors macro
+  ARM: move system register accessors to asm/cp15.h
+  ARM: KVM: Get ready to use vgic-v3
+  ARM: KVM: Unlock vgic-v3 support
+
+ arch/arm/include/asm/arch_gicv3.h                 |   91 +++++++++++++++++----
+ arch/arm/include/asm/cp15.h                       |   15 ++++
+ arch/arm/include/asm/cputype.h                    |    3 +-
+ arch/arm/include/asm/kvm_asm.h                    |    3 +
+ arch/arm/include/asm/kvm_host.h                   |    4 +
+ arch/arm/include/asm/kvm_hyp.h                    |   20 ++---
+ arch/arm/include/uapi/asm/kvm.h                   |    7 ++
+ arch/arm/kvm/Makefile                             |    2 +
+ arch/arm/kvm/coproc.c                             |   36 ++++++++
+ arch/arm/kvm/hyp/Makefile                         |    1 +
+ arch/arm/kvm/hyp/switch.c                         |   20 ++++-
+ arch/arm64/include/asm/arch_gicv3.h               |   13 +++
+ arch/arm64/kvm/Kconfig                            |    4 -
+ arch/arm64/kvm/hyp/Makefile                       |    2 +-
+ include/kvm/arm_vgic.h                            |    8 --
+ {arch/arm64/kvm => virt/kvm/arm}/hyp/vgic-v3-sr.c |   13 ---
+ virt/kvm/arm/vgic/vgic-kvm-device.c               |    8 --
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                  |    6 +-
+ virt/kvm/arm/vgic/vgic-mmio.c                     |    2 -
+ virt/kvm/arm/vgic/vgic.h                          |   53 ------------
+ 20 files changed, 186 insertions(+), 125 deletions(-)
+ rename {arch/arm64/kvm => virt/kvm/arm}/hyp/vgic-v3-sr.c (96%)
+
 -- 
 1.7.9.5
