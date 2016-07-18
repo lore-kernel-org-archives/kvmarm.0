@@ -1,21 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 00/13] A bunch of vgic-its fixes
-Date: Mon, 18 Jul 2016 16:54:02 +0100
-Message-ID: <1468857255-9543-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 04/13] KVM: arm64: vgic-its: Fix handling of indirect tables
+Date: Mon, 18 Jul 2016 16:54:06 +0100
+Message-ID: <1468857255-9543-5-git-send-email-marc.zyngier@arm.com>
+References: <1468857255-9543-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E82EB412A6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 11:48:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80B6349B43
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 11:48:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QhmZtLoj3i8j for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2016 11:48:16 -0400 (EDT)
+ with ESMTP id GswX9F1Q7JIe for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2016 11:48:21 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFFAB411BE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 11:48:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC7EA49B55
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 11:48:20 -0400 (EDT)
+In-Reply-To: <1468857255-9543-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,52 +31,31 @@ To: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redha
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As the ITS series has been posted 10 times now, and we're still
-finding issues, I've decided to directly fix things rather than
-commenting on them and waiting for a respin, as we are getting way too
-close to the merge window. So I sat over the weekend and started doing
-"stuff".
+The current code will fail on valid indirect tables, and happily
+use the ones that are pointing out of the guest RAM. Funny what a
+small "!" can do for you...
 
-There is a bit of everything in there: some cosmetic things, but also
-some more severe bugs (indirect tables were completely foobar) and
-regressions (the cpuif stuff that Eric fixed).
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-its.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Unless someone shouts at me, I intend to put that on top of Andre's
-series, and put the whole thing into -next. I've tested it on a LS2085
-with kvmtool, using both flat and indirect device tables.
-
-Thanks,
-
-	M.
-
-Eric Auger (1):
-  KVM: arm/arm64: Fix vGICv2 KVM_DEV_ARM_VGIC_GRP_CPU/DIST_REGS
-
-Marc Zyngier (12):
-  irqchip/gicv3-its: Restore all cacheability attributes
-  KVM: arm64: vgic-its: Generalize use of vgic_get_irq_kref
-  KVM: arm64: vgic-its: Fix handling of indirect tables
-  KVM: arm64: vgic-its: Fix vgic_its_check_device_id BE handling
-  KVM: arm64: vgic-its: Fix misleading nr_entries in
-    vgic_its_check_device_id
-  KVM: arm64: vgic-its: Validate the device table L1 entry
-  KVM: arm64: vgic-its: Fix L2 entry validation for indirect tables
-  KVM: arm64: vgic-its: Add collection allocator/destructor
-  KVM: arm64: vgic-its: Add pointer to corresponding kvm_device
-  KVM: arm64: vgic-its: Turn device_id validation into generic ID
-    validation
-  KVM: arm64: vgic-its: Make vgic_its_cmd_handle_mapi similar to other
-    handlers
-  KVM: arm64: vgic-its: Simplify MAPI error handling
-
- include/kvm/arm_vgic.h             |   1 +
- include/linux/irqchip/arm-gic-v3.h |  48 ++++++--
- virt/kvm/arm/vgic/vgic-its.c       | 224 ++++++++++++++++++++-----------------
- virt/kvm/arm/vgic/vgic-mmio-v2.c   |   2 +
- virt/kvm/arm/vgic/vgic-mmio.c      |   4 +-
- virt/kvm/arm/vgic/vgic.c           |  10 +-
- virt/kvm/arm/vgic/vgic.h           |   8 ++
- 7 files changed, 175 insertions(+), 122 deletions(-)
-
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index f427fa2..d6697c4 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -702,9 +702,9 @@ static bool vgic_its_check_device_id(struct kvm *kvm, struct vgic_its *its,
+ 		return false;
+ 
+ 	/* Each 1st level entry is represented by a 64-bit value. */
+-	if (!kvm_read_guest(kvm,
+-			    BASER_ADDRESS(r) + index * sizeof(indirect_ptr),
+-			    &indirect_ptr, sizeof(indirect_ptr)))
++	if (kvm_read_guest(kvm,
++			   BASER_ADDRESS(r) + index * sizeof(indirect_ptr),
++			   &indirect_ptr, sizeof(indirect_ptr)))
+ 		return false;
+ 
+ 	/* check the valid bit of the first level entry */
 -- 
 2.1.4
