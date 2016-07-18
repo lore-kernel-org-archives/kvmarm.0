@@ -1,21 +1,23 @@
 From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH 0/7] ARM: KVM: Support for vgic-v3
-Date: Mon, 18 Jul 2016 11:48:12 +0100
-Message-ID: <1468838899-34909-1-git-send-email-vladimir.murzin@arm.com>
+Subject: [PATCH 1/7] arm64: KVM: Move GIC accessors to arch_gicv3.h
+Date: Mon, 18 Jul 2016 11:48:13 +0100
+Message-ID: <1468838899-34909-2-git-send-email-vladimir.murzin@arm.com>
+References: <1468838899-34909-1-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D3C5E49B37
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 06:42:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4323C49B32
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 06:42:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id thw262dLiDXW for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id B4muQcL1fGNB for <kvmarm@lists.cs.columbia.edu>;
  Mon, 18 Jul 2016 06:42:38 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D84349B32
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C54949B1D
  for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 06:42:37 -0400 (EDT)
+In-Reply-To: <1468838899-34909-1-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,60 +31,62 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Since we are going to share vgic-v3 save/restore code with ARM
+keep arch specific accessors separately.
 
-This is an attempt to make use vgic-v3 under arch/arm since save-restore
-functionality got re-written in C and can be shared between arm/arm64
-like it has already been done for vgic-v2 and timer.
+Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+---
+ arch/arm64/include/asm/arch_gicv3.h |   13 +++++++++++++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c     |   13 -------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
-With this patches I'm able to get 32 core ARMv7 guest boot:
-
-...
-GICv3: CPU31: found redistributor 703 region 0:0x000000003ffd0000
-CPU31: thread -1, cpu 3, socket 7, mpidr 80000703
-Brought up 32 CPUs
-SMP: Total of 32 processors activated (768.00 BogoMIPS).
-CPU: All CPU(s) started in SVC mode.
-...
-
-Additionally, quite lightweight test based on Self IPI guest test[1]
-has been run with up to 255 cpus.
-
-[1] http://www.spinics.net/lists/kvm/msg128974.html
-
-Thanks!
-
-Vladimir Murzin (7):
-  arm64: KVM: Move GIC accessors to arch_gicv3.h
-  arm64: KVM: Move vgic-v3 save/restore to virt/kvm/arm/hyp
-  KVM: arm: vgic-new: improve compatibility with 32-bit
-  ARM: update MPIDR accessors macro
-  ARM: move system register accessors to asm/cp15.h
-  ARM: KVM: Get ready to use vgic-v3
-  ARM: KVM: Unlock vgic-v3 support
-
- arch/arm/include/asm/arch_gicv3.h                 |   91 +++++++++++++++++----
- arch/arm/include/asm/cp15.h                       |   15 ++++
- arch/arm/include/asm/cputype.h                    |    3 +-
- arch/arm/include/asm/kvm_asm.h                    |    3 +
- arch/arm/include/asm/kvm_host.h                   |    4 +
- arch/arm/include/asm/kvm_hyp.h                    |   20 ++---
- arch/arm/include/uapi/asm/kvm.h                   |    7 ++
- arch/arm/kvm/Makefile                             |    2 +
- arch/arm/kvm/coproc.c                             |   36 ++++++++
- arch/arm/kvm/hyp/Makefile                         |    1 +
- arch/arm/kvm/hyp/switch.c                         |   20 ++++-
- arch/arm64/include/asm/arch_gicv3.h               |   13 +++
- arch/arm64/kvm/Kconfig                            |    4 -
- arch/arm64/kvm/hyp/Makefile                       |    2 +-
- include/kvm/arm_vgic.h                            |    8 --
- {arch/arm64/kvm => virt/kvm/arm}/hyp/vgic-v3-sr.c |   13 ---
- virt/kvm/arm/vgic/vgic-kvm-device.c               |    8 --
- virt/kvm/arm/vgic/vgic-mmio-v3.c                  |    6 +-
- virt/kvm/arm/vgic/vgic-mmio.c                     |    2 -
- virt/kvm/arm/vgic/vgic.h                          |   53 ------------
- 20 files changed, 186 insertions(+), 125 deletions(-)
- rename {arch/arm64/kvm => virt/kvm/arm}/hyp/vgic-v3-sr.c (96%)
-
+diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
+index 8ec88e5..ae7dbd7 100644
+--- a/arch/arm64/include/asm/arch_gicv3.h
++++ b/arch/arm64/include/asm/arch_gicv3.h
+@@ -79,6 +79,19 @@
+ #include <linux/stringify.h>
+ #include <asm/barrier.h>
+ 
++#define read_gicreg(r)							\
++	({								\
++		u64 reg;						\
++		asm volatile("mrs_s %0, " __stringify(r) : "=r" (reg));	\
++		reg;							\
++	})
++
++#define write_gicreg(v,r)						\
++	do {								\
++		u64 __val = (v);					\
++		asm volatile("msr_s " __stringify(r) ", %0" : : "r" (__val));\
++	} while (0)
++
+ /*
+  * Low-level accessors
+  *
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 5f8f80b..f2dbd2e 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -24,19 +24,6 @@
+ #define vtr_to_max_lr_idx(v)		((v) & 0xf)
+ #define vtr_to_nr_pri_bits(v)		(((u32)(v) >> 29) + 1)
+ 
+-#define read_gicreg(r)							\
+-	({								\
+-		u64 reg;						\
+-		asm volatile("mrs_s %0, " __stringify(r) : "=r" (reg));	\
+-		reg;							\
+-	})
+-
+-#define write_gicreg(v,r)						\
+-	do {								\
+-		u64 __val = (v);					\
+-		asm volatile("msr_s " __stringify(r) ", %0" : : "r" (__val));\
+-	} while (0)
+-
+ static u64 __hyp_text __gic_v3_get_lr(unsigned int lr)
+ {
+ 	switch (lr & 0xf) {
 -- 
 1.7.9.5
