@@ -1,81 +1,67 @@
-From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v11 10/10] genirq/msi: use the MSI doorbell's IOVA when
-	requested
-Date: Tue, 19 Jul 2016 13:02:47 +0000
-Message-ID: <1468933367-23159-11-git-send-email-eric.auger@redhat.com>
-References: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1468933367-23159-1-git-send-email-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, andre.przywara-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-Cc: drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, robert.richter-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, yehuday-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v11 1/8] vfio: introduce a vfio_dma type field
+Date: Tue, 19 Jul 2016 13:11:27 +0000
+Message-ID: <1468933894-23250-2-git-send-email-eric.auger@redhat.com>
+References: <1468933894-23250-1-git-send-email-eric.auger@redhat.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1468933894-23250-1-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: eric.auger@redhat.com, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, linux-arm-kernel@lists.infradead.org
+Cc: drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org, Bharat.Bhushan@freescale.com, pranav.sawargaonkar@gmail.com, p.fedin@samsung.com, iommu@lists.linux-foundation.org, Jean-Philippe.Brucker@arm.com, yehuday@marvell.com, Manish.Jaggi@caviumnetworks.com, robert.richter@caviumnetworks.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On MSI message composition we now use the MSI doorbell's IOVA in
-place of the doorbell's PA in case the device is upstream to an
-IOMMU that requires MSI addresses to be mapped. The doorbell's
-allocation and mapping happened on an early stage (pci_enable_msi).
+We introduce a vfio_dma type since we will need to discriminate
+different types of dma slots:
+- VFIO_IOVA_USER: IOVA region used to map user vaddr
+- VFIO_IOVA_RESERVED_MSI: IOVA region reserved to map MSI doorbells
 
-Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
-v8 -> v9:
-- Braces on both sides of the 'else' in msi_compose
-
-v7 -> v8:
-- use iommu_msi_msg_pa_to_va
-- add WARN_ON
+v9 -> v10:
+- renamed VFIO_IOVA_RESERVED into VFIO_IOVA_RESERVED_MSI
+- explicitly set type to VFIO_IOVA_USER on dma_map
 
 v6 -> v7:
-- allocation/mapping is done at an earlier stage. We now just perform
-  the iova lookup. So it is safe now to be called in a code that cannot
-  sleep. iommu_msi_set_doorbell_iova is moved in the dma-reserved-iommu
-  API: I think it cleans things up with respect to various #ifdef CONFIGS.
-
-v5:
-- use macros to increase the readability
-- add comments
-- fix a typo that caused a compilation error if CONFIG_IOMMU_API
-  is not set
+- add VFIO_IOVA_ANY
+- do not introduce yet any VFIO_IOVA_RESERVED handling
 ---
- kernel/irq/msi.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index 69b5b19..e375544 100644
---- a/kernel/irq/msi.c
-+++ b/kernel/irq/msi.c
-@@ -63,10 +63,18 @@ static int msi_compose(struct irq_data *irq_data,
- {
- 	int ret = 0;
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 2ba1942..a9f8b93 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -53,6 +53,12 @@ module_param_named(disable_hugepages,
+ MODULE_PARM_DESC(disable_hugepages,
+ 		 "Disable VFIO IOMMU support for IOMMU hugepages.");
  
--	if (erase)
-+	if (erase) {
- 		memset(msg, 0, sizeof(*msg));
--	else
-+	} else {
-+		struct device *dev;
++enum vfio_iova_type {
++	VFIO_IOVA_USER = 0,	/* standard IOVA used to map user vaddr */
++	VFIO_IOVA_RESERVED_MSI,	/* reserved to map MSI doorbells */
++	VFIO_IOVA_ANY,		/* matches any IOVA type */
++};
 +
- 		ret = irq_chip_compose_msi_msg(irq_data, msg);
-+		if (ret)
-+			return ret;
-+
-+		dev = msi_desc_to_dev(irq_data_get_msi_desc(irq_data));
-+		WARN_ON(iommu_msi_msg_pa_to_va(dev, msg));
-+	}
+ struct vfio_iommu {
+ 	struct list_head	domain_list;
+ 	struct mutex		lock;
+@@ -75,6 +81,7 @@ struct vfio_dma {
+ 	unsigned long		vaddr;		/* Process virtual addr */
+ 	size_t			size;		/* Map size (bytes) */
+ 	int			prot;		/* IOMMU_READ/WRITE */
++	enum vfio_iova_type	type;		/* type of IOVA */
+ };
  
- 	return ret;
- }
+ struct vfio_group {
+@@ -607,6 +614,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 	dma->iova = iova;
+ 	dma->vaddr = vaddr;
+ 	dma->prot = prot;
++	dma->type = VFIO_IOVA_USER;
+ 
+ 	/* Insert zero-sized and grow as we map chunks of it */
+ 	vfio_link_dma(iommu, dma);
 -- 
 1.9.1
+
