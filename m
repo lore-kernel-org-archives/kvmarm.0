@@ -1,48 +1,118 @@
-From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v11 01/10] genirq/msi: export msi_get_domain_info
-Date: Tue, 19 Jul 2016 13:02:38 +0000
-Message-ID: <1468933367-23159-2-git-send-email-eric.auger@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v11 02/10] genirq/msi: msi_compose wrapper
+Date: Tue, 19 Jul 2016 13:02:39 +0000
+Message-ID: <1468933367-23159-3-git-send-email-eric.auger@redhat.com>
 References: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1468933367-23159-1-git-send-email-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, andre.przywara-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-Cc: drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, robert.richter-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, yehuday-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A0D3149B2E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2016 08:56:59 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id i+Gy+UOVQ10G for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Jul 2016 08:56:58 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C82844011D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2016 08:56:58 -0400 (EDT)
+In-Reply-To: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger@redhat.com, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, robert.richter@caviumnetworks.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We plan to use msi_get_domain_info in VFIO module so let's export it.
+Currently the MSI message is composed by directly calling
+irq_chip_compose_msi_msg and erased by setting the memory to zero.
 
-Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+On some platforms, we will need to complexify this composition to
+properly handle MSI emission through IOMMU. Also we will need to track
+when the MSI message is erased.
+
+We propose to introduce a common wrapper for actual composition and
+erasure, msi_compose.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
+v4 -> v5:
+- just introduce the msi-compose wrapper without adding new
+  functionalities
+
+v3 -> v4:
+- that code was formely in irq-gic-common.c
+  "irqchip/gicv2m/v3-its-pci-msi: IOMMU map the MSI frame when needed"
+  also the [un]mapping was done in irq_write_msi_msg; now done on compose
 
 v2 -> v3:
-- remove static implementation in case CONFIG_PCI_MSI_IRQ_DOMAIN is not set
+- protect iova/addr manipulation with CONFIG_ARCH_DMA_ADDR_T_64BIT and
+  CONFIG_PHYS_ADDR_T_64BIT
+- only expose gic_pci_msi_domain_write_msg in case CONFIG_IOMMU_API &
+  CONFIG_PCI_MSI_IRQ_DOMAIN are set.
+- gic_set/unset_msi_addr duly become static
 ---
- kernel/irq/msi.c | 1 +
- 1 file changed, 1 insertion(+)
+ kernel/irq/msi.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
 diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index 38e89ce..9b0ba4a 100644
+index 9b0ba4a..72bf4d6 100644
 --- a/kernel/irq/msi.c
 +++ b/kernel/irq/msi.c
-@@ -400,5 +400,6 @@ struct msi_domain_info *msi_get_domain_info(struct irq_domain *domain)
- {
- 	return (struct msi_domain_info *)domain->host_data;
+@@ -55,6 +55,19 @@ static inline void irq_chip_write_msi_msg(struct irq_data *data,
+ 	data->chip->irq_write_msi_msg(data, msg);
  }
-+EXPORT_SYMBOL_GPL(msi_get_domain_info);
  
- #endif /* CONFIG_GENERIC_MSI_IRQ_DOMAIN */
++static int msi_compose(struct irq_data *irq_data,
++		       struct msi_msg *msg, bool erase)
++{
++	int ret = 0;
++
++	if (erase)
++		memset(msg, 0, sizeof(*msg));
++	else
++		ret = irq_chip_compose_msi_msg(irq_data, msg);
++
++	return ret;
++}
++
+ /**
+  * msi_domain_set_affinity - Generic affinity setter function for MSI domains
+  * @irq_data:	The irq data associated to the interrupt
+@@ -73,7 +86,7 @@ int msi_domain_set_affinity(struct irq_data *irq_data,
+ 
+ 	ret = parent->chip->irq_set_affinity(parent, mask, force);
+ 	if (ret >= 0 && ret != IRQ_SET_MASK_OK_DONE) {
+-		BUG_ON(irq_chip_compose_msi_msg(irq_data, &msg));
++		BUG_ON(msi_compose(irq_data, &msg, false));
+ 		irq_chip_write_msi_msg(irq_data, &msg);
+ 	}
+ 
+@@ -85,7 +98,7 @@ static void msi_domain_activate(struct irq_domain *domain,
+ {
+ 	struct msi_msg msg;
+ 
+-	BUG_ON(irq_chip_compose_msi_msg(irq_data, &msg));
++	BUG_ON(msi_compose(irq_data, &msg, false));
+ 	irq_chip_write_msi_msg(irq_data, &msg);
+ }
+ 
+@@ -94,7 +107,7 @@ static void msi_domain_deactivate(struct irq_domain *domain,
+ {
+ 	struct msi_msg msg;
+ 
+-	memset(&msg, 0, sizeof(msg));
++	msi_compose(irq_data, &msg, true);
+ 	irq_chip_write_msi_msg(irq_data, &msg);
+ }
+ 
 -- 
 1.9.1
