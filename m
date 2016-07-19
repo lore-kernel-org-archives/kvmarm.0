@@ -1,138 +1,78 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v11 8/8] iommu/arm-smmu: get/put the msi cookie
-Date: Tue, 19 Jul 2016 12:55:11 +0000
-Message-ID: <1468932911-23062-9-git-send-email-eric.auger@redhat.com>
-References: <1468932911-23062-1-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D2D0C49B37
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2016 08:49:58 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TnX+Ql4QHNGx for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Jul 2016 08:49:58 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6A0E49B45
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2016 08:49:57 -0400 (EDT)
-In-Reply-To: <1468932911-23062-1-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, robert.richter@caviumnetworks.com
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v2] arm64: KVM: VHE: Context switch MDSCR_EL1
+Date: Tue, 19 Jul 2016 13:56:54 +0100
+Message-ID: <1468933014-26966-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Tirumalesh Chalamarla <Tirumalesh.Chalamarla@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For IOMMU_DOMAIN_UNMANAGED type we now also get the msi
-cookie in both arm-smmu and arm-smmu-v3. This initializes
-resources for MSI doorbell mapping.
+The kprobe enablement work has uncovered that changes made by
+a guest to MDSCR_EL1 were propagated to the host when VHE was
+enabled, leading to unexpected exception being delivered.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Moving this register to the list of registers that are always
+context-switched fixes the issue.
+
+Fixes: 9c6c35683286 ("arm64: KVM: VHE: Split save/restore of registers shared between guest and host")
+Cc: stable@vger.kernel.org #4.6
+Reported-by: Tirumalesh Chalamarla <Tirumalesh.Chalamarla@cavium.com>
+Tested-by: Tirumalesh Chalamarla <Tirumalesh.Chalamarla@cavium.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/iommu/arm-smmu-v3.c | 16 ++++++++++++----
- drivers/iommu/arm-smmu.c    | 15 +++++++++++----
- 2 files changed, 23 insertions(+), 8 deletions(-)
+v2: added missing Fixes and Cc-stable tags
 
-diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 066d92c..960d377 100644
---- a/drivers/iommu/arm-smmu-v3.c
-+++ b/drivers/iommu/arm-smmu-v3.c
-@@ -22,6 +22,7 @@
+ arch/arm64/kvm/hyp/sysreg-sr.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 0f7c40e..9341376 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -27,8 +27,8 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+ /*
+  * Non-VHE: Both host and guest must save everything.
+  *
+- * VHE: Host must save tpidr*_el[01], actlr_el1, sp0, pc, pstate, and
+- * guest must save everything.
++ * VHE: Host must save tpidr*_el[01], actlr_el1, mdscr_el1, sp0, pc,
++ * pstate, and guest must save everything.
+  */
  
- #include <linux/delay.h>
- #include <linux/dma-iommu.h>
-+#include <linux/msi-iommu.h>
- #include <linux/err.h>
- #include <linux/interrupt.h>
- #include <linux/iommu.h>
-@@ -1412,15 +1413,21 @@ static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
- 		return NULL;
+ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+@@ -37,6 +37,7 @@ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+ 	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+ 	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
++	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+ 	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+ 	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
+ 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+@@ -61,7 +62,6 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->sys_regs[AMAIR_EL1]	= read_sysreg_el1(amair);
+ 	ctxt->sys_regs[CNTKCTL_EL1]	= read_sysreg_el1(cntkctl);
+ 	ctxt->sys_regs[PAR_EL1]		= read_sysreg(par_el1);
+-	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
  
- 	if (type == IOMMU_DOMAIN_DMA &&
--	    iommu_get_dma_cookie(&smmu_domain->domain)) {
--		kfree(smmu_domain);
--		return NULL;
--	}
-+	    iommu_get_dma_cookie(&smmu_domain->domain))
-+		goto err;
-+
-+	if (type == IOMMU_DOMAIN_UNMANAGED &&
-+		iommu_get_msi_cookie(&smmu_domain->domain))
-+		goto err;
-+
- 	smmu_domain->domain.msi_geometry = msi_geometry;
+ 	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
+ 	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
+@@ -90,6 +90,7 @@ static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctx
+ 	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
+ 	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
+ 	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
++	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
+ 	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pc,	  elr);
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pstate, spsr);
+@@ -114,7 +115,6 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el1(ctxt->sys_regs[AMAIR_EL1],	amair);
+ 	write_sysreg_el1(ctxt->sys_regs[CNTKCTL_EL1], 	cntkctl);
+ 	write_sysreg(ctxt->sys_regs[PAR_EL1],		par_el1);
+-	write_sysreg(ctxt->sys_regs[MDSCR_EL1],		mdscr_el1);
  
- 	mutex_init(&smmu_domain->init_mutex);
- 	spin_lock_init(&smmu_domain->pgtbl_lock);
- 	return &smmu_domain->domain;
-+err:
-+	kfree(smmu_domain);
-+	return NULL;
- }
- 
- static int arm_smmu_bitmap_alloc(unsigned long *map, int span)
-@@ -1446,6 +1453,7 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
- 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
- 	struct arm_smmu_device *smmu = smmu_domain->smmu;
- 
-+	iommu_put_msi_cookie(domain);
- 	iommu_put_dma_cookie(domain);
- 	free_io_pgtable_ops(smmu_domain->pgtbl_ops);
- 
-diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-index 9755a1b..867910b 100644
---- a/drivers/iommu/arm-smmu.c
-+++ b/drivers/iommu/arm-smmu.c
-@@ -30,6 +30,7 @@
- 
- #include <linux/delay.h>
- #include <linux/dma-iommu.h>
-+#include <linux/msi-iommu.h>
- #include <linux/dma-mapping.h>
- #include <linux/err.h>
- #include <linux/interrupt.h>
-@@ -1052,10 +1053,12 @@ static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
- 		return NULL;
- 
- 	if (type == IOMMU_DOMAIN_DMA &&
--	    iommu_get_dma_cookie(&smmu_domain->domain)) {
--		kfree(smmu_domain);
--		return NULL;
--	}
-+	    iommu_get_dma_cookie(&smmu_domain->domain))
-+		goto err;
-+
-+	if (type == IOMMU_DOMAIN_UNMANAGED &&
-+		iommu_get_msi_cookie(&smmu_domain->domain))
-+		goto err;
- 
- 	smmu_domain->domain.msi_geometry = msi_geometry;
- 
-@@ -1063,6 +1066,9 @@ static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
- 	spin_lock_init(&smmu_domain->pgtbl_lock);
- 
- 	return &smmu_domain->domain;
-+err:
-+	kfree(smmu_domain);
-+	return NULL;
- }
- 
- static void arm_smmu_domain_free(struct iommu_domain *domain)
-@@ -1073,6 +1079,7 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
- 	 * Free the domain resources. We assume that all devices have
- 	 * already been detached.
- 	 */
-+	iommu_put_msi_cookie(domain);
- 	iommu_put_dma_cookie(domain);
- 	arm_smmu_destroy_domain_context(domain);
- 	kfree(smmu_domain);
+ 	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
+ 	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
 -- 
-1.9.1
+2.1.4
+
