@@ -1,8 +1,7 @@
 From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v11 2/8] iommu/arm-smmu: initialize the msi geometry and
-	advertise iommu-msi support
-Date: Tue, 19 Jul 2016 12:55:05 +0000
-Message-ID: <1468932911-23062-3-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v11 3/8] iommu: introduce an msi cookie
+Date: Tue, 19 Jul 2016 12:55:06 +0000
+Message-ID: <1468932911-23062-4-git-send-email-eric.auger@redhat.com>
 References: <1468932911-23062-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -22,68 +21,33 @@ To: eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, eric.auger.pro-Re5JQEeQq
 Cc: drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, robert.richter-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, yehuday-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On ARM, MSI write transactions from device upstream to the smmu
-are conveyed through the iommu. Therefore target physical addresses
-must be mapped and DOMAIN_ATTR_MSI_GEOMETRY advertises the support of
-the IOMMU-MSI API.
+This opaque pointer will enable to store information about msi
+iommu mappings.
 
 Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
 ---
-v8 -> v9:
-- reword the title and patch description
-
 v7 -> v8:
-- use DOMAIN_ATTR_MSI_GEOMETRY
+remove spinlock and RB tree
 
-v4 -> v5:
-- don't handle fsl_pamu_domain anymore
-- handle arm-smmu-v3
+v5 -> v6:
+- initialize reserved_binding_list
+- use a spinlock instead of a mutex
 ---
- drivers/iommu/arm-smmu-v3.c | 2 ++
- drivers/iommu/arm-smmu.c    | 3 +++
- 2 files changed, 5 insertions(+)
+ include/linux/iommu.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 5f6b3bc..066d92c 100644
---- a/drivers/iommu/arm-smmu-v3.c
-+++ b/drivers/iommu/arm-smmu-v3.c
-@@ -1397,6 +1397,7 @@ static bool arm_smmu_capable(enum iommu_cap cap)
- static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
- {
- 	struct arm_smmu_domain *smmu_domain;
-+	struct iommu_domain_msi_geometry msi_geometry = {0, 0, true};
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index 1b553ee..f7a5d13 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -91,6 +91,7 @@ struct iommu_domain {
+ 	struct iommu_domain_geometry geometry;
+ 	struct iommu_domain_msi_geometry msi_geometry;
+ 	void *iova_cookie;
++	void *msi_cookie;
+ };
  
- 	if (type != IOMMU_DOMAIN_UNMANAGED && type != IOMMU_DOMAIN_DMA)
- 		return NULL;
-@@ -1415,6 +1416,7 @@ static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
- 		kfree(smmu_domain);
- 		return NULL;
- 	}
-+	smmu_domain->domain.msi_geometry = msi_geometry;
- 
- 	mutex_init(&smmu_domain->init_mutex);
- 	spin_lock_init(&smmu_domain->pgtbl_lock);
-diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-index 9345a3f..9755a1b 100644
---- a/drivers/iommu/arm-smmu.c
-+++ b/drivers/iommu/arm-smmu.c
-@@ -1038,6 +1038,7 @@ static void arm_smmu_destroy_domain_context(struct iommu_domain *domain)
- static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
- {
- 	struct arm_smmu_domain *smmu_domain;
-+	struct iommu_domain_msi_geometry msi_geometry = {0, 0, true};
- 
- 	if (type != IOMMU_DOMAIN_UNMANAGED && type != IOMMU_DOMAIN_DMA)
- 		return NULL;
-@@ -1056,6 +1057,8 @@ static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
- 		return NULL;
- 	}
- 
-+	smmu_domain->domain.msi_geometry = msi_geometry;
-+
- 	mutex_init(&smmu_domain->init_mutex);
- 	spin_lock_init(&smmu_domain->pgtbl_lock);
- 
+ enum iommu_cap {
 -- 
 1.9.1
