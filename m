@@ -1,101 +1,74 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 00/13] A bunch of vgic-its fixes
-Date: Mon, 18 Jul 2016 18:47:21 +0100
-Message-ID: <f2d8f9c9-9d0d-ee4a-8c24-c6e641488699@arm.com>
-References: <1468857255-9543-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C38249B37
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 13:40:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WvW66jK-IvzW for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2016 13:40:26 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E13A849B36
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2016 13:40:25 -0400 (EDT)
-In-Reply-To: <1468857255-9543-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH] arm64: KVM: VHE: Context switch MDSCR_EL1
+Date: Tue, 19 Jul 2016 09:57:44 +0100
+Message-ID: <1468918664-19130-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Tirumalesh Chalamarla <Tirumalesh.Chalamarla@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+The kprobe enablement work has uncovered that changes made by
+a guest to MDSCR_EL1 were propagated to the host when VHE was
+enabled, leading to unexpected exception being delivered.
 
-On 18/07/16 16:54, Marc Zyngier wrote:
-> As the ITS series has been posted 10 times now, and we're still
-> finding issues, I've decided to directly fix things rather than
-> commenting on them and waiting for a respin, as we are getting way too
-> close to the merge window. So I sat over the weekend and started doing
-> "stuff".
-> 
-> There is a bit of everything in there: some cosmetic things, but also
-> some more severe bugs (indirect tables were completely foobar) and
-> regressions (the cpuif stuff that Eric fixed).
+Moving this register to the list of registers that are always
+context-switched fixes the issue.
 
-I wonder if it's worth to squash:
-- 01/13 into 09/17
-- 02/13 into 07/17
-- 04/13 into 15/17
-with appropriate comments in the commit message to credit the bug fixes
-and their authors?
+Reported-by: Tirumalesh Chalamarla <Tirumalesh.Chalamarla@cavium.com>
+Tested-by: Tirumalesh Chalamarla <Tirumalesh.Chalamarla@cavium.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/hyp/sysreg-sr.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-That worked for me without further ado and would leave the git tree
-bisectable - both in terms of compilability (every single commit
-compiled for me with arm64/defconfig without warnings) and functionality
-(tested new commit 17/17 with direct and indirect tables on the
-model(ITS) and qemu and kvmtool on Juno).
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 0f7c40e..a327e35 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -27,8 +27,8 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+ /*
+  * Non-VHE: Both host and guest must save everything.
+  *
+- * VHE: Host must save tpidr*_el[01], actlr_el1, sp0, pc, pstate, and
+- * guest must save everything.
++ * VHE: Host must save tpidr*_el[01], actlr_el1, mdscr_el1, sp0, pc,
++ * pstate, and guest must save everything.
+  */
+ 
+ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+@@ -37,6 +37,7 @@ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+ 	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+ 	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
++	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+ 	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+ 	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
+ 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+@@ -61,7 +62,6 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->sys_regs[AMAIR_EL1]	= read_sysreg_el1(amair);
+ 	ctxt->sys_regs[CNTKCTL_EL1]	= read_sysreg_el1(cntkctl);
+ 	ctxt->sys_regs[PAR_EL1]		= read_sysreg(par_el1);
+-	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+ 
+ 	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
+ 	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
+@@ -90,6 +90,7 @@ static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctx
+ 	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
+ 	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
+ 	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
++	write_sysreg(ctxt->sys_regs[MDSCR_EL1],		mdscr_el1);
+ 	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pc,	  elr);
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pstate, spsr);
+@@ -114,7 +115,6 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el1(ctxt->sys_regs[AMAIR_EL1],	amair);
+ 	write_sysreg_el1(ctxt->sys_regs[CNTKCTL_EL1], 	cntkctl);
+ 	write_sysreg(ctxt->sys_regs[PAR_EL1],		par_el1);
+-	write_sysreg(ctxt->sys_regs[MDSCR_EL1],		mdscr_el1);
+ 
+ 	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
+ 	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
+-- 
+2.1.4
 
-It would be a pity if other people bisecting the kernel get punished for
-my silly mistakes.
-
-> Unless someone shouts at me, I intend to put that on top of Andre's
-> series, and put the whole thing into -next. I've tested it on a LS2085
-> with kvmtool, using both flat and indirect device tables.
-
-I am fine with all those.
-
-Thanks!
-Andre.
-
-> Eric Auger (1):
->   KVM: arm/arm64: Fix vGICv2 KVM_DEV_ARM_VGIC_GRP_CPU/DIST_REGS
-> 
-> Marc Zyngier (12):
->   irqchip/gicv3-its: Restore all cacheability attributes
->   KVM: arm64: vgic-its: Generalize use of vgic_get_irq_kref
->   KVM: arm64: vgic-its: Fix handling of indirect tables
->   KVM: arm64: vgic-its: Fix vgic_its_check_device_id BE handling
->   KVM: arm64: vgic-its: Fix misleading nr_entries in
->     vgic_its_check_device_id
->   KVM: arm64: vgic-its: Validate the device table L1 entry
->   KVM: arm64: vgic-its: Fix L2 entry validation for indirect tables
->   KVM: arm64: vgic-its: Add collection allocator/destructor
->   KVM: arm64: vgic-its: Add pointer to corresponding kvm_device
->   KVM: arm64: vgic-its: Turn device_id validation into generic ID
->     validation
->   KVM: arm64: vgic-its: Make vgic_its_cmd_handle_mapi similar to other
->     handlers
->   KVM: arm64: vgic-its: Simplify MAPI error handling
-> 
->  include/kvm/arm_vgic.h             |   1 +
->  include/linux/irqchip/arm-gic-v3.h |  48 ++++++--
->  virt/kvm/arm/vgic/vgic-its.c       | 224 ++++++++++++++++++++-----------------
->  virt/kvm/arm/vgic/vgic-mmio-v2.c   |   2 +
->  virt/kvm/arm/vgic/vgic-mmio.c      |   4 +-
->  virt/kvm/arm/vgic/vgic.c           |  10 +-
->  virt/kvm/arm/vgic/vgic.h           |   8 ++
->  7 files changed, 175 insertions(+), 122 deletions(-)
-> 
