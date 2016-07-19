@@ -1,99 +1,76 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v11 4/8] vfio/type1: handle unmap/unpin and replay for
- VFIO_IOVA_RESERVED slots
-Date: Tue, 19 Jul 2016 13:11:30 +0000
-Message-ID: <1468933894-23250-5-git-send-email-eric.auger@redhat.com>
+From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v11 7/8] iommu/arm-smmu: do not advertise IOMMU_CAP_INTR_REMAP
+Date: Tue, 19 Jul 2016 13:11:33 +0000
+Message-ID: <1468933894-23250-8-git-send-email-eric.auger@redhat.com>
 References: <1468933894-23250-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCE24409A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2016 09:06:02 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8oIhcMnAIw0y for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Jul 2016 09:05:57 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4F2B49B1D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2016 09:05:57 -0400 (EDT)
-In-Reply-To: <1468933894-23250-1-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, robert.richter@caviumnetworks.com
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1468933894-23250-1-git-send-email-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, andre.przywara-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Cc: drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, robert.richter-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, yehuday-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Before allowing the end-user to create VFIO_IOVA_RESERVED dma slots,
-let's implement the expected behavior for removal and replay.
+Do not advertise IOMMU_CAP_INTR_REMAP for arm-smmu(-v3). Indeed the
+irq_remapping capability is abstracted on irqchip side for ARM as
+opposed to Intel IOMMU featuring IRQ remapping HW.
 
-As opposed to user dma slots, reserved IOVAs are not systematically bound
-to PAs and PAs are not pinned. VFIO just initializes the IOVA "aperture".
-IOVAs are allocated outside of the VFIO framework, by the MSI layer which
-is responsible to free and unmap them. The MSI mapping resources are freeed
-by the IOMMU driver on domain destruction.
+So to check IRQ remapping capability, the msi domain needs to be
+checked instead.
 
-On the creation of a new domain, the "replay" of a reserved slot simply
-needs to set the MSI aperture on the new domain.
+This commit affects platform and PCIe device assignment use cases
+on any platform featuring an unsafe MSI controller (currently the
+ARM GICv2m). For those platforms the VFIO module must be loaded with
+allow_unsafe_interrupts set to 1.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
 ---
 
 v9 -> v10:
-- replay of a reserved slot sets the MSI aperture on the new domain
-- use VFIO_IOVA_RESERVED_MSI enum value instead of VFIO_IOVA_RESERVED
-
-v7 -> v8:
-- do no destroy anything anymore, just bypass unmap/unpin and iommu_map
-  on replay
+- reword the commit message (allow_unsafe_interrupts)
 ---
- drivers/vfio/vfio_iommu_type1.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ drivers/iommu/arm-smmu-v3.c | 3 ++-
+ drivers/iommu/arm-smmu.c    | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 65a4038..69c775e 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -36,6 +36,7 @@
- #include <linux/uaccess.h>
- #include <linux/vfio.h>
- #include <linux/workqueue.h>
-+#include <linux/msi-iommu.h>
- 
- #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-@@ -387,7 +388,7 @@ static void vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma)
- 	struct vfio_domain *domain, *d;
- 	long unlocked = 0;
- 
--	if (!dma->size)
-+	if (!dma->size || dma->type != VFIO_IOVA_USER)
- 		return;
- 	/*
- 	 * We use the IOMMU to track the physical addresses, otherwise we'd
-@@ -724,6 +725,14 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 		dma = rb_entry(n, struct vfio_dma, node);
- 		iova = dma->iova;
- 
-+		if (dma->type == VFIO_IOVA_RESERVED_MSI) {
-+			ret = iommu_msi_set_aperture(domain->domain,
-+						     dma->iova,
-+						     iova + dma->size - 1);
-+			WARN_ON(ret);
-+			continue;
-+		}
-+
- 		while (iova < dma->iova + dma->size) {
- 			phys_addr_t phys = iommu_iova_to_phys(d->domain, iova);
- 			size_t size;
+diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+index 960d377..a011eba 100644
+--- a/drivers/iommu/arm-smmu-v3.c
++++ b/drivers/iommu/arm-smmu-v3.c
+@@ -1387,7 +1387,8 @@ static bool arm_smmu_capable(enum iommu_cap cap)
+ 	case IOMMU_CAP_CACHE_COHERENCY:
+ 		return true;
+ 	case IOMMU_CAP_INTR_REMAP:
+-		return true; /* MSIs are just memory writes */
++		/* interrupt translation handled at MSI controller level */
++		return false;
+ 	case IOMMU_CAP_NOEXEC:
+ 		return true;
+ 	default:
+diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+index 867910b..b03a89b 100644
+--- a/drivers/iommu/arm-smmu.c
++++ b/drivers/iommu/arm-smmu.c
+@@ -1380,7 +1380,8 @@ static bool arm_smmu_capable(enum iommu_cap cap)
+ 		 */
+ 		return true;
+ 	case IOMMU_CAP_INTR_REMAP:
+-		return true; /* MSIs are just memory writes */
++		/* interrupt translation handled at MSI controller level */
++		return false;
+ 	case IOMMU_CAP_NOEXEC:
+ 		return true;
+ 	default:
 -- 
 1.9.1
