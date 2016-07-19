@@ -1,156 +1,65 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v11 2/8] vfio/type1: vfio_find_dma accepting a type argument
-Date: Tue, 19 Jul 2016 13:11:28 +0000
-Message-ID: <1468933894-23250-3-git-send-email-eric.auger@redhat.com>
+From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v11 3/8] vfio/type1: implement recursive
+	vfio_find_dma_from_node
+Date: Tue, 19 Jul 2016 13:11:29 +0000
+Message-ID: <1468933894-23250-4-git-send-email-eric.auger@redhat.com>
 References: <1468933894-23250-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5390F49B1D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2016 09:05:47 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wooKy7-tM7Pb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Jul 2016 09:05:46 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5022A49B34
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2016 09:05:46 -0400 (EDT)
-In-Reply-To: <1468933894-23250-1-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, robert.richter@caviumnetworks.com
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1468933894-23250-1-git-send-email-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, andre.przywara-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Cc: drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, robert.richter-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, yehuday-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In our RB-tree we get prepared to insert slots of different types
-(USER and RESERVED). It becomes useful to be able to search for dma
-slots of a specific type or any type.
+This patch handles the case where a node is encountered, matching
+@start and @size arguments but not matching the @type argument.
+In that case, we need to skip that node and pursue the search in the
+node's leaves. In case @start is inferior to the node's base, we
+resume the search on the left leaf. If the recursive search on the left
+leaves did not produce any match, we search the right leaves recursively.
 
-This patch introduces vfio_find_dma_from_node which starts the
-search from a given node and stops on the first node that matches
-the @start and @size parameters. If this node also matches the
-@type parameter, the node is returned else NULL is returned.
+Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-At the moment we only have USER SLOTS so the type will always match.
-
-In a separate patch, this function will be enhanced to pursue the
-search recursively in case a node with a different type is
-encountered.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 53 +++++++++++++++++++++++++++++++++--------
- 1 file changed, 43 insertions(+), 10 deletions(-)
+
+v10: creation
+---
+ drivers/vfio/vfio_iommu_type1.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index a9f8b93..cb7267a 100644
+index cb7267a..65a4038 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -94,25 +94,56 @@ struct vfio_group {
-  * into DMA'ble space using the IOMMU
-  */
+@@ -125,7 +125,17 @@ static struct vfio_dma *vfio_find_dma_from_node(struct rb_node *top,
+ 	if (type == VFIO_IOVA_ANY || dma->type == type)
+ 		return dma;
  
--static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
--				      dma_addr_t start, size_t size)
-+/**
-+ * vfio_find_dma_from_node: looks for a dma slot intersecting a window
-+ * from a given rb tree node
-+ * @top: top rb tree node where the search starts (including this node)
-+ * @start: window start
-+ * @size: window size
-+ * @type: window type
-+ */
-+static struct vfio_dma *vfio_find_dma_from_node(struct rb_node *top,
-+						dma_addr_t start, size_t size,
-+						enum vfio_iova_type type)
- {
--	struct rb_node *node = iommu->dma_list.rb_node;
-+	struct rb_node *node = top;
-+	struct vfio_dma *dma;
- 
- 	while (node) {
--		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
--
-+		dma = rb_entry(node, struct vfio_dma, node);
- 		if (start + size <= dma->iova)
- 			node = node->rb_left;
- 		else if (start >= dma->iova + dma->size)
- 			node = node->rb_right;
- 		else
--			return dma;
-+			break;
- 	}
-+	if (!node)
-+		return NULL;
-+
-+	/* a dma slot intersects our window, check the type also matches */
-+	if (type == VFIO_IOVA_ANY || dma->type == type)
-+		return dma;
- 
- 	return NULL;
+-	return NULL;
++	/* restart 2 searches skipping the current node */
++	if (start < dma->iova) {
++		dma = vfio_find_dma_from_node(node->rb_left, start,
++					      size, type);
++		if (dma)
++			return dma;
++	}
++	if (start + size > dma->iova + dma->size)
++		dma = vfio_find_dma_from_node(node->rb_right, start,
++					      size, type);
++	return dma;
  }
  
-+/**
-+ * vfio_find_dma: find a dma slot intersecting a given window
-+ * @iommu: vfio iommu handle
-+ * @start: window base iova
-+ * @size: window size
-+ * @type: window type
-+ */
-+static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
-+				      dma_addr_t start, size_t size,
-+				      enum vfio_iova_type type)
-+{
-+	struct rb_node *top_node = iommu->dma_list.rb_node;
-+
-+	return vfio_find_dma_from_node(top_node, start, size, type);
-+}
-+
- static void vfio_link_dma(struct vfio_iommu *iommu, struct vfio_dma *new)
- {
- 	struct rb_node **link = &iommu->dma_list.rb_node, *parent = NULL;
-@@ -484,19 +515,21 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 	 * mappings within the range.
- 	 */
- 	if (iommu->v2) {
--		dma = vfio_find_dma(iommu, unmap->iova, 0);
-+		dma = vfio_find_dma(iommu, unmap->iova, 0, VFIO_IOVA_USER);
- 		if (dma && dma->iova != unmap->iova) {
- 			ret = -EINVAL;
- 			goto unlock;
- 		}
--		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
-+		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0,
-+				    VFIO_IOVA_USER);
- 		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
- 			ret = -EINVAL;
- 			goto unlock;
- 		}
- 	}
- 
--	while ((dma = vfio_find_dma(iommu, unmap->iova, unmap->size))) {
-+	while ((dma = vfio_find_dma(iommu, unmap->iova, unmap->size,
-+				    VFIO_IOVA_USER))) {
- 		if (!iommu->v2 && unmap->iova > dma->iova)
- 			break;
- 		unmapped += dma->size;
-@@ -600,7 +633,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 
- 	mutex_lock(&iommu->lock);
- 
--	if (vfio_find_dma(iommu, iova, size)) {
-+	if (vfio_find_dma(iommu, iova, size, VFIO_IOVA_ANY)) {
- 		mutex_unlock(&iommu->lock);
- 		return -EEXIST;
- 	}
+ /**
 -- 
 1.9.1
