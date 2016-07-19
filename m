@@ -1,109 +1,132 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v11 03/10] genirq/irq: introduce msi_doorbell_info
-Date: Tue, 19 Jul 2016 13:02:40 +0000
-Message-ID: <1468933367-23159-4-git-send-email-eric.auger@redhat.com>
+From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v11 05/10] genirq/msi-doorbell: msi_doorbell_pages
+Date: Tue, 19 Jul 2016 13:02:42 +0000
+Message-ID: <1468933367-23159-6-git-send-email-eric.auger@redhat.com>
 References: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7857A4011D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2016 08:57:08 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UDh8P97W79t2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Jul 2016 08:57:04 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BB96411BE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2016 08:57:04 -0400 (EDT)
-In-Reply-To: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, robert.richter@caviumnetworks.com
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1468933367-23159-1-git-send-email-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, andre.przywara-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Cc: drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, robert.richter-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, yehuday-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@linaro.org>
+msi_doorbell_pages sum up the number of iommu pages of a given order
+requested to map all the registered doorbells. This function will allow
+to dimension the intermediate physical address (IPA) aperture requested
+to map the MSI doorbells.
 
-The purpose is to be able to retrieve the MSI doorbells of an irqchip.
-This is now needed since on some platforms those doorbells must be
-iommu mapped (in case the MSIs transit through an IOMMU that do not
-bypass those transactions).
-
-The assumption is there is a maximum of one doorbell region per cpu. The
-doorbell can be global or per cpu.
-
-A doorbell region is characterized by its physical address base, size,
-IOMMU protection flag and whether it implements IRQ remapping (aka.
-IRQ translation). Those characteristics are shared among all doorbells.
-
-irq_chip msi_doorbell_info callback enables to retrieve the doorbells of
-the irqchip.
-
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
 ---
-v10 -> v11:
-- disappeared in V10 and restored now. struct irq_chip_msi_doorbell_info
-  is identifical to the one in V10 (union, irq_remapping field).
 
-v7 -> v8:
-- size and prot now are shared among all doorbells
-- doorbells now directly points to a percpu phys_addr_t
-
-v7: creation
+v10: creation
 ---
- include/linux/irq.h | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ include/linux/msi-doorbell.h | 14 ++++++++++++
+ kernel/irq/msi-doorbell.c    | 52 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 66 insertions(+)
 
-diff --git a/include/linux/irq.h b/include/linux/irq.h
-index 4d758a7..2e355d5 100644
---- a/include/linux/irq.h
-+++ b/include/linux/irq.h
-@@ -312,6 +312,18 @@ static inline irq_hw_number_t irqd_to_hwirq(struct irq_data *d)
- 	return d->hwirq;
- }
+diff --git a/include/linux/msi-doorbell.h b/include/linux/msi-doorbell.h
+index c455e33..146bfbc 100644
+--- a/include/linux/msi-doorbell.h
++++ b/include/linux/msi-doorbell.h
+@@ -35,6 +35,14 @@ msi_doorbell_register_global(phys_addr_t base, size_t size,
+  */
+ void msi_doorbell_unregister_global(struct irq_chip_msi_doorbell_info *db);
  
-+/* Describe all the MSI doorbell regions for an irqchip */
-+struct irq_chip_msi_doorbell_info {
-+	union {
-+		phys_addr_t __percpu *percpu_doorbells;
-+		phys_addr_t global_doorbell;
-+	};
-+	bool doorbell_is_percpu;
-+	bool irq_remapping;	/* is irq_remapping implemented? */
-+	size_t size;				/* size of each doorbell */
-+	int prot;				/* iommu protection flag */
-+};
++/**
++ * msi_doorbell_pages: compute the number of iommu pages of size 1 << order
++ * requested to map all the registered doorbells
++ *
++ * @order: iommu page order
++ */
++int msi_doorbell_pages(unsigned int order);
 +
- /**
-  * struct irq_chip - hardware interrupt chip descriptor
-  *
-@@ -349,6 +361,7 @@ static inline irq_hw_number_t irqd_to_hwirq(struct irq_data *d)
-  * @irq_get_irqchip_state:	return the internal state of an interrupt
-  * @irq_set_irqchip_state:	set the internal state of a interrupt
-  * @irq_set_vcpu_affinity:	optional to target a vCPU in a virtual machine
-+ * @msi_doorbell_info:	return the MSI doorbell info
-  * @ipi_send_single:	send a single IPI to destination cpus
-  * @ipi_send_mask:	send an IPI to destination cpus in cpumask
-  * @flags:		chip specific flags
-@@ -394,7 +407,8 @@ struct irq_chip {
- 	int		(*irq_set_irqchip_state)(struct irq_data *data, enum irqchip_irq_state which, bool state);
+ #else
  
- 	int		(*irq_set_vcpu_affinity)(struct irq_data *data, void *vcpu_info);
--
-+	struct irq_chip_msi_doorbell_info *(*msi_doorbell_info)(
-+							struct irq_data *data);
- 	void		(*ipi_send_single)(struct irq_data *data, unsigned int cpu);
- 	void		(*ipi_send_mask)(struct irq_data *data, const struct cpumask *dest);
+ static inline struct irq_chip_msi_doorbell_info *
+@@ -47,6 +55,12 @@ msi_doorbell_register_global(phys_addr_t base, size_t size,
+ static inline void
+ msi_doorbell_unregister_global(struct irq_chip_msi_doorbell_info *db) {}
  
++static inline int
++msi_doorbell_pages(unsigned int order)
++{
++	return 0;
++}
++
+ #endif /* CONFIG_MSI_DOORBELL */
+ 
+ #endif
+diff --git a/kernel/irq/msi-doorbell.c b/kernel/irq/msi-doorbell.c
+index 0ff541e..a5bde37 100644
+--- a/kernel/irq/msi-doorbell.c
++++ b/kernel/irq/msi-doorbell.c
+@@ -60,3 +60,55 @@ void msi_doorbell_unregister_global(struct irq_chip_msi_doorbell_info *dbinfo)
+ 	mutex_unlock(&irqchip_doorbell_mutex);
+ }
+ EXPORT_SYMBOL_GPL(msi_doorbell_unregister_global);
++
++static int compute_db_mapping_requirements(phys_addr_t addr, size_t size,
++					   unsigned int order)
++{
++	phys_addr_t offset, granule;
++	unsigned int nb_pages;
++
++	granule = (uint64_t)(1 << order);
++	offset = addr & (granule - 1);
++	size = ALIGN(size + offset, granule);
++	nb_pages = size >> order;
++
++	return nb_pages;
++}
++
++static int
++compute_dbinfo_mapping_requirements(struct irq_chip_msi_doorbell_info *dbinfo,
++				    unsigned int order)
++{
++	int ret = 0;
++
++	if (!dbinfo->doorbell_is_percpu) {
++		ret = compute_db_mapping_requirements(dbinfo->global_doorbell,
++						      dbinfo->size, order);
++	} else {
++		phys_addr_t __percpu *pbase;
++		int cpu;
++
++		for_each_possible_cpu(cpu) {
++			pbase = per_cpu_ptr(dbinfo->percpu_doorbells, cpu);
++			ret += compute_db_mapping_requirements(*pbase,
++							       dbinfo->size,
++							       order);
++		}
++	}
++	return ret;
++}
++
++int msi_doorbell_pages(unsigned int order)
++{
++	struct irqchip_doorbell *db;
++	int ret = 0;
++
++	mutex_lock(&irqchip_doorbell_mutex);
++	list_for_each_entry(db, &irqchip_doorbell_list, next) {
++		ret += compute_dbinfo_mapping_requirements(&db->info, order);
++	}
++	mutex_unlock(&irqchip_doorbell_mutex);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(msi_doorbell_pages);
 -- 
 1.9.1
