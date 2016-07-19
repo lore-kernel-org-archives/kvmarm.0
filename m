@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v11 7/8] iommu/arm-smmu: do not advertise IOMMU_CAP_INTR_REMAP
-Date: Tue, 19 Jul 2016 13:11:33 +0000
-Message-ID: <1468933894-23250-8-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v11 6/8] vfio/type1: check doorbell safety
+Date: Tue, 19 Jul 2016 13:11:32 +0000
+Message-ID: <1468933894-23250-7-git-send-email-eric.auger@redhat.com>
 References: <1468933894-23250-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -21,56 +21,64 @@ To: eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, eric.auger.pro-Re5JQEeQq
 Cc: drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, robert.richter-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, yehuday-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Do not advertise IOMMU_CAP_INTR_REMAP for arm-smmu(-v3). Indeed the
-irq_remapping capability is abstracted on irqchip side for ARM as
-opposed to Intel IOMMU featuring IRQ remapping HW.
+On x86 IRQ remapping is abstracted by the IOMMU. On ARM this is abstracted
+by the msi controller.
 
-So to check IRQ remapping capability, the msi domain needs to be
-checked instead.
+Since we currently have no way to detect whether the MSI controller is
+upstream or downstream to the IOMMU we rely on the MSI doorbell information
+registered by the interrupt controllers. In case at least one doorbell
+does not implement proper isolation, we state the assignment is unsafe
+with regard to interrupts. This is a coase assessment but should allow to
+wait for a better system description.
 
-This commit affects platform and PCIe device assignment use cases
-on any platform featuring an unsafe MSI controller (currently the
-ARM GICv2m). For those platforms the VFIO module must be loaded with
-allow_unsafe_interrupts set to 1.
+At this point ARM sMMU still advertises IOMMU_CAP_INTR_REMAP. This is
+removed in next patch.
 
 Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
 ---
 
 v9 -> v10:
-- reword the commit message (allow_unsafe_interrupts)
----
- drivers/iommu/arm-smmu-v3.c | 3 ++-
- drivers/iommu/arm-smmu.c    | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+- coarse safety assessment based on MSI doorbell info
 
-diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 960d377..a011eba 100644
---- a/drivers/iommu/arm-smmu-v3.c
-+++ b/drivers/iommu/arm-smmu-v3.c
-@@ -1387,7 +1387,8 @@ static bool arm_smmu_capable(enum iommu_cap cap)
- 	case IOMMU_CAP_CACHE_COHERENCY:
- 		return true;
- 	case IOMMU_CAP_INTR_REMAP:
--		return true; /* MSIs are just memory writes */
-+		/* interrupt translation handled at MSI controller level */
-+		return false;
- 	case IOMMU_CAP_NOEXEC:
- 		return true;
- 	default:
-diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-index 867910b..b03a89b 100644
---- a/drivers/iommu/arm-smmu.c
-+++ b/drivers/iommu/arm-smmu.c
-@@ -1380,7 +1380,8 @@ static bool arm_smmu_capable(enum iommu_cap cap)
- 		 */
- 		return true;
- 	case IOMMU_CAP_INTR_REMAP:
--		return true; /* MSIs are just memory writes */
-+		/* interrupt translation handled at MSI controller level */
-+		return false;
- 	case IOMMU_CAP_NOEXEC:
- 		return true;
- 	default:
+v3 -> v4:
+- rename vfio_msi_parent_irq_remapping_capable into vfio_safe_irq_domain
+  and irq_remapping into safe_irq_domains
+
+v2 -> v3:
+- protect vfio_msi_parent_irq_remapping_capable with
+  CONFIG_GENERIC_MSI_IRQ_DOMAIN
+---
+ drivers/vfio/vfio_iommu_type1.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 14dc9ef..7daab53 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -37,6 +37,7 @@
+ #include <linux/vfio.h>
+ #include <linux/workqueue.h>
+ #include <linux/msi-iommu.h>
++#include <linux/msi-doorbell.h>
+ 
+ #define DRIVER_VERSION  "0.2"
+ #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>"
+@@ -922,8 +923,14 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	INIT_LIST_HEAD(&domain->group_list);
+ 	list_add(&group->next, &domain->group_list);
+ 
++	/*
++	 * to advertise safe interrupts either the IOMMU or the MSI controllers
++	 * must support IRQ remapping (aka. interrupt translation), property
++	 * exposed by their registered doorbells
++	 */
+ 	if (!allow_unsafe_interrupts &&
+-	    !iommu_capable(bus, IOMMU_CAP_INTR_REMAP)) {
++	    (!iommu_capable(bus, IOMMU_CAP_INTR_REMAP) &&
++	     !msi_doorbell_safe())) {
+ 		pr_warn("%s: No interrupt remapping support.  Use the module param \"allow_unsafe_interrupts\" to enable VFIO IOMMU support on this platform\n",
+ 		       __func__);
+ 		ret = -EPERM;
 -- 
 1.9.1
