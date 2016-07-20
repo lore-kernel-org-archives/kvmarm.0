@@ -1,22 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v7 01/15] FDT: introduce global phandle allocation
-Date: Wed, 20 Jul 2016 18:04:21 +0100
-Message-ID: <20160720170435.28090-2-andre.przywara@arm.com>
+Subject: [PATCH v7 11/15] PCI: inject PCI device ID on MSI injection
+Date: Wed, 20 Jul 2016 18:04:31 +0100
+Message-ID: <20160720170435.28090-12-andre.przywara@arm.com>
 References: <20160720170435.28090-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6709249B55
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EF2649B53
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id whI88WOeU6DE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2016 12:57:39 -0400 (EDT)
+ with ESMTP id 34hBwz-OhjF4 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jul 2016 12:57:53 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABBA049B32
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB3D949B3B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:52 -0400 (EDT)
 In-Reply-To: <20160720170435.28090-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,119 +31,51 @@ To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Allocating an FDT phandle (a unique identifier) using a static
-variable in a static inline function defined in a header file works
-only if all users are in the same source file. So trying to allocate
-a handle from two different compilation units fails.
-Introduce global phandle allocation and reference code to properly
-allocate unique phandles.
+The ITS emulation requires a unique device ID to be passed along the
+MSI payload when kvmtool wants to trigger an MSI in the guest.
+According to the proposed changes to the interface add the PCI
+bus/device/function triple to the structure passed with the ioctl.
+Check the respective capability before actually adding the device ID
+to the kvm_msi struct.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- Makefile          |  1 +
- arm/fdt.c         |  2 +-
- arm/gic.c         |  2 +-
- include/kvm/fdt.h | 10 +++++-----
- kvm-fdt.c         | 26 ++++++++++++++++++++++++++
- 5 files changed, 34 insertions(+), 7 deletions(-)
- create mode 100644 kvm-fdt.c
+ virtio/pci.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 1f0196f..e4a4002 100644
---- a/Makefile
-+++ b/Makefile
-@@ -98,6 +98,7 @@ OBJS	+= kvm-ipc.o
- OBJS	+= builtin-sandbox.o
- OBJS	+= virtio/mmio.o
- OBJS	+= hw/i8042.o
-+OBJS	+= kvm-fdt.o
- 
- # Translate uname -m into ARCH string
- ARCH ?= $(shell uname -m | sed -e s/i.86/i386/ -e s/ppc.*/powerpc/ \
-diff --git a/arm/fdt.c b/arm/fdt.c
-index 381d48f..8bcfffb 100644
---- a/arm/fdt.c
-+++ b/arm/fdt.c
-@@ -114,7 +114,7 @@ static int setup_fdt(struct kvm *kvm)
- {
- 	struct device_header *dev_hdr;
- 	u8 staging_fdt[FDT_MAX_SIZE];
--	u32 gic_phandle		= fdt__alloc_phandle();
-+	u32 gic_phandle		= fdt__get_phandle(PHANDLE_GIC);
- 	u64 mem_reg_prop[]	= {
- 		cpu_to_fdt64(kvm->arch.memory_guest_start),
- 		cpu_to_fdt64(kvm->ram_size),
-diff --git a/arm/gic.c b/arm/gic.c
-index d6d6dd0..b60437e 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -222,7 +222,7 @@ void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
- 	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
- 	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
- 	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
--	_FDT(fdt_property_cell(fdt, "phandle", phandle));
-+	_FDT(fdt_property_cell(fdt, "phandle", fdt__get_phandle(PHANDLE_GIC)));
- 	_FDT(fdt_end_node(fdt));
+diff --git a/virtio/pci.c b/virtio/pci.c
+index 604b9ec..e9f81f7 100644
+--- a/virtio/pci.c
++++ b/virtio/pci.c
+@@ -318,14 +318,28 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
+ 		update_msix_map(vpci, table, (addr - offset) / 16);
  }
  
-diff --git a/include/kvm/fdt.h b/include/kvm/fdt.h
-index 53d85a4..cd2bb72 100644
---- a/include/kvm/fdt.h
-+++ b/include/kvm/fdt.h
-@@ -8,6 +8,10 @@
- #include <linux/types.h>
+-static void virtio_pci__signal_msi(struct kvm *kvm, struct virtio_pci *vpci, int vec)
++static void virtio_pci__signal_msi(struct kvm *kvm, struct virtio_pci *vpci,
++				   int vec)
+ {
++	static int needs_devid = 0;
+ 	struct kvm_msi msi = {
+ 		.address_lo = vpci->msix_table[vec].msg.address_lo,
+ 		.address_hi = vpci->msix_table[vec].msg.address_hi,
+ 		.data = vpci->msix_table[vec].msg.data,
+ 	};
  
- #define FDT_MAX_SIZE	0x10000
-+#define FDT_INVALID_PHANDLE 0
-+#define FDT_IS_VALID_PHANDLE(phandle) ((phandle) != FDT_INVALID_PHANDLE)
-+
-+enum phandles {PHANDLE_GIC, PHANDLES_MAX};
- 
- /* Those definitions are generic FDT values for specifying IRQ
-  * types and are used in the Linux kernel internally as well as in
-@@ -33,10 +37,6 @@ enum irq_type {
- 		}							\
- 	} while (0)
- 
--static inline u32 fdt__alloc_phandle(void)
--{
--	static u32 phandle = 0;
--	return ++phandle;
--}
-+u32 fdt__get_phandle(enum phandles phandle);
- 
- #endif /* KVM__FDT_H */
-diff --git a/kvm-fdt.c b/kvm-fdt.c
-new file mode 100644
-index 0000000..d05f3fe
---- /dev/null
-+++ b/kvm-fdt.c
-@@ -0,0 +1,26 @@
-+/*
-+ * Commonly used FDT functions.
-+ */
-+
-+#include <stdio.h>
-+#include "kvm/fdt.h"
-+#include "kvm/util.h"
-+
-+u32 phandles[PHANDLES_MAX] = {};
-+u32 next_phandle = 1;
-+
-+u32 fdt__get_phandle(enum phandles phandle)
-+{
-+	u32 ret;
-+
-+	if (phandle >= PHANDLES_MAX)
-+		return FDT_INVALID_PHANDLE;
-+
-+	ret = phandles[phandle];
-+	if (ret == FDT_INVALID_PHANDLE) {
-+		ret = next_phandle++;
-+		phandles[phandle] = ret;
++	if (needs_devid == 0) {
++		if (kvm__supports_vm_extension(kvm, KVM_CAP_MSI_DEVID))
++			needs_devid = 1;
++		else
++			needs_devid = -1;
 +	}
 +
-+	return ret;
-+}
++	if (needs_devid > 0) {
++		msi.flags = KVM_MSI_VALID_DEVID;
++		msi.devid = vpci->dev_hdr.dev_num << 3;
++	}
++
+ 	ioctl(kvm->vm_fd, KVM_SIGNAL_MSI, &msi);
+ }
+ 
 -- 
 2.9.0
