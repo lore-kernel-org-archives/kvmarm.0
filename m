@@ -1,22 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v7 14/15] arm64: enable GICv3-ITS emulation
-Date: Wed, 20 Jul 2016 18:04:34 +0100
-Message-ID: <20160720170435.28090-15-andre.przywara@arm.com>
+Subject: [PATCH v7 15/15] arm: gic: allow 32-bit compilation
+Date: Wed, 20 Jul 2016 18:04:35 +0100
+Message-ID: <20160720170435.28090-16-andre.przywara@arm.com>
 References: <20160720170435.28090-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41C0A49B74
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:58:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AFFD049B78
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:58:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Oo0xhnHhDagu for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 4510XbCq4dLM for <kvmarm@lists.cs.columbia.edu>;
  Wed, 20 Jul 2016 12:58:05 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EB0E49B62
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ADBA49B74
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:58 -0400 (EDT)
 In-Reply-To: <20160720170435.28090-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,43 +31,37 @@ To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With everything in place for the ITS emulation add a new option to the
---irqchip parameter to allow the user to specify --irqchip=gicv3-its
-to enable the ITS emulation.
-This will trigger creating the FDT node and an ITS register frame to
-tell the kernel we want ITS emulation in the guest.
+The ARM GIC code is shared between ARM and arm64, though the header
+files from the Linux kernel are actually different, reflecting the
+different level of GIC emulation support between the two architectures.
+Since it is conceivable that ARM will gain GICv3 (and possibly ITS)
+emulation support too, lets conditionally define those missing
+symbols in the source file until an upcoming ARM header update eventually
+includes those.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/gic.c                                | 2 ++
- arm/include/arm-common/kvm-config-arch.h | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ arm/gic.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/arm/gic.c b/arm/gic.c
-index a0b392e..7fd0768 100644
+index 7fd0768..cd4f518 100644
 --- a/arm/gic.c
 +++ b/arm/gic.c
-@@ -35,6 +35,8 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
- 		*type = IRQCHIP_GICV2;
- 	} else if (!strcmp(arg, "gicv3")) {
- 		*type = IRQCHIP_GICV3;
-+	} else if (!strcmp(arg, "gicv3-its")) {
-+		*type = IRQCHIP_GICV3_ITS;
- 	} else {
- 		pr_err("irqchip: unknown type \"%s\"\n", arg);
- 		return -1;
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index ed626b5..b48e720 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -27,7 +27,7 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset);
- 		    "Force virtio devices to use PCI as their default "		\
- 		    "transport"),						\
-         OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
--		     "[gicv2|gicv3]",					\
-+		     "[gicv2|gicv3|gicv3-its]",					\
- 		     "Type of interrupt controller to emulate in the guest",	\
- 		     irqchip_parser, NULL),
+@@ -19,6 +19,14 @@
+ #define KVM_VGIC_V3_ADDR_TYPE_REDIST 3
+ #endif
  
++#ifndef KVM_VGIC_ITS_ADDR_TYPE
++#define KVM_VGIC_ITS_ADDR_TYPE 4
++#endif
++
++#ifndef KVM_VGIC_V3_ITS_SIZE
++#define KVM_VGIC_V3_ITS_SIZE (2 * SZ_64K)
++#endif
++
+ #define IRQCHIP_GIC 0
+ 
+ static int gic_fd = -1;
 -- 
 2.9.0
