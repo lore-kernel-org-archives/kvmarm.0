@@ -1,88 +1,183 @@
-From: Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v11 04/10] genirq/msi-doorbell: allow MSI doorbell
-	(un)registration
-Date: Wed, 20 Jul 2016 09:50:14 +0200
-Message-ID: <cfd24f24-a7ff-2657-f88b-43537f6316dd@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v11 05/10] genirq/msi-doorbell: msi_doorbell_pages
+Date: Wed, 20 Jul 2016 09:50:19 +0200
+Message-ID: <cb446d2e-2e8f-80a7-eac9-8eda188c3dbf@redhat.com>
 References: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
-	<1468933367-23159-5-git-send-email-eric.auger@redhat.com>
-	<alpine.DEB.2.11.1607191617071.3596@nanos>
+ <1468933367-23159-6-git-send-email-eric.auger@redhat.com>
+ <alpine.DEB.2.11.1607191624400.3596@nanos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <alpine.DEB.2.11.1607191617071.3596@nanos>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>
-Cc: kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, yehuday-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, robert.richter-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, andre.przywara-5wv7dgnIgG8@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A21C411BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 03:44:18 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WbPzlJ6ZDJTK for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jul 2016 03:44:17 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 83E2448531
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 03:44:16 -0400 (EDT)
+In-Reply-To: <alpine.DEB.2.11.1607191624400.3596@nanos>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com, joro@8bytes.org, robert.richter@caviumnetworks.com, jason@lakedaemon.net, marc.zyngier@arm.com, andre.przywara@arm.com, Manish.Jaggi@caviumnetworks.com, alex.williamson@redhat.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, pbonzini@redhat.com, robin.murphy@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Thomas,
-On 19/07/2016 16:22, Thomas Gleixner wrote:
+On 19/07/2016 16:38, Thomas Gleixner wrote:
 > On Tue, 19 Jul 2016, Eric Auger wrote:
->> +
->> +#include <linux/slab.h>
->> +#include <linux/irq.h>
->> +#include <linux/msi-doorbell.h>
->> +
->> +struct irqchip_doorbell {
->> +	struct irq_chip_msi_doorbell_info info;
->> +	struct list_head next;
+>> msi_doorbell_pages sum up the number of iommu pages of a given order
 > 
-> Again, please align the struct members.
+> adding () to the function name would make it immediately clear that
+> msi_doorbell_pages is a function.
 > 
->> +};
+>> +/**
+>> + * msi_doorbell_pages: compute the number of iommu pages of size 1 << order
+>> + * requested to map all the registered doorbells
+>> + *
+>> + * @order: iommu page order
+>> + */
+> 
+> Why are you adding the kernel doc to the header and not to the implementation?
+> 
+>> +int msi_doorbell_pages(unsigned int order);
 >> +
->> +static LIST_HEAD(irqchip_doorbell_list);
->> +static DEFINE_MUTEX(irqchip_doorbell_mutex);
+>>  #else
+>>  
+>>  static inline struct irq_chip_msi_doorbell_info *
+>> @@ -47,6 +55,12 @@ msi_doorbell_register_global(phys_addr_t base, size_t size,
+>>  static inline void
+>>  msi_doorbell_unregister_global(struct irq_chip_msi_doorbell_info *db) {}
+>>  
+>> +static inline int
+>> +msi_doorbell_pages(unsigned int order)
+> 
+> What's the point of this line break?
+
+> 
+>> +{
+>> +	return 0;
+>> +}
 >> +
->> +struct irq_chip_msi_doorbell_info *
->> +msi_doorbell_register_global(phys_addr_t base, size_t size,
->> +			     int prot, bool irq_remapping)
+>>  #endif /* CONFIG_MSI_DOORBELL */
+>>  
+>>  #endif
+>> diff --git a/kernel/irq/msi-doorbell.c b/kernel/irq/msi-doorbell.c
+>> index 0ff541e..a5bde37 100644
+>> --- a/kernel/irq/msi-doorbell.c
+>> +++ b/kernel/irq/msi-doorbell.c
+>> @@ -60,3 +60,55 @@ void msi_doorbell_unregister_global(struct irq_chip_msi_doorbell_info *dbinfo)
+>>  	mutex_unlock(&irqchip_doorbell_mutex);
+>>  }
+>>  EXPORT_SYMBOL_GPL(msi_doorbell_unregister_global);
+>> +
+>> +static int compute_db_mapping_requirements(phys_addr_t addr, size_t size,
+>> +					   unsigned int order)
+>> +{
+>> +	phys_addr_t offset, granule;
+>> +	unsigned int nb_pages;
+>> +
+>> +	granule = (uint64_t)(1 << order);
+>> +	offset = addr & (granule - 1);
+>> +	size = ALIGN(size + offset, granule);
+>> +	nb_pages = size >> order;
+>> +
+>> +	return nb_pages;
+>> +}
+>> +
+>> +static int
+>> +compute_dbinfo_mapping_requirements(struct irq_chip_msi_doorbell_info *dbinfo,
+>> +				    unsigned int order)
+> 
+> I'm sure you can find even longer function names which require more line
+> breaks.
+> 
+>> +{
+>> +	int ret = 0;
+>> +
+>> +	if (!dbinfo->doorbell_is_percpu) {
+>> +		ret = compute_db_mapping_requirements(dbinfo->global_doorbell,
+>> +						      dbinfo->size, order);
+>> +	} else {
+>> +		phys_addr_t __percpu *pbase;
+>> +		int cpu;
+>> +
+>> +		for_each_possible_cpu(cpu) {
+>> +			pbase = per_cpu_ptr(dbinfo->percpu_doorbells, cpu);
+>> +			ret += compute_db_mapping_requirements(*pbase,
+>> +							       dbinfo->size,
+>> +							       order);
+>> +		}
+>> +	}
+>> +	return ret;
+>> +}
+>> +
+>> +int msi_doorbell_pages(unsigned int order)
 >> +{
 >> +	struct irqchip_doorbell *db;
->> +
->> +	db = kmalloc(sizeof(*db), GFP_KERNEL);
->> +	if (!db)
->> +		return ERR_PTR(-ENOMEM);
->> +
->> +	db->info.doorbell_is_percpu = false;
-> 
-> Please use kzalloc and get rid of zero initialization. If you add stuff to the
-> struct then initialization will be automatically 0.
-OK
-> 
->> +void msi_doorbell_unregister_global(struct irq_chip_msi_doorbell_info *dbinfo)
->> +{
->> +	struct irqchip_doorbell *db, *tmp;
+>> +	int ret = 0;
 >> +
 >> +	mutex_lock(&irqchip_doorbell_mutex);
->> +	list_for_each_entry_safe(db, tmp, &irqchip_doorbell_list, next) {
+>> +	list_for_each_entry(db, &irqchip_doorbell_list, next) {
 > 
-> Why do you need that iterator? 
+> Pointless braces
 > 
->     db = container_of(dbinfo, struct ....., info);
+>> +		ret += compute_dbinfo_mapping_requirements(&db->info, order);
+>> +	}
+>> +	mutex_unlock(&irqchip_doorbell_mutex);
+>> +
+>> +	return ret;
+>> +}
+>> +EXPORT_SYMBOL_GPL(msi_doorbell_pages);
 > 
-> Hmm?
+> So here is a general rant about your naming choices.
+> 
+>    struct irqchip_doorbell
+>    struct irq_chip_msi_doorbell_info
+> 
+>    struct irq_chip {
+>    	  ....	  *(*msi_doorbell_info);
+>    }
+> 
+>    irqchip_doorbell_mutex
+> 
+>    msi_doorbell_register_global
+>    msi_doorbell_unregister_global
+> 
+>    msi_doorbell_pages
+> 
+> This really sucks. Your public functions start sensibly with msi_doorbell.
+> 
+> Though what is the _global postfix for the register/unregister functions for?
+> Are there _private functions in the pipeline?
+global is to be opposed to per-cpu (doorbell). Currently gicv2m and
+gicv3-its expose a single "global" doorbell and I have not yet coped
+with irqchips exposing per-cpu doorbells.
+> 
+> msi_doorbell_pages() is not telling me what it does. msi_calc_doorbell_pages()
+> would describe it right away.
+> 
+> You doorbell info structure can really do with:
+> 
+>     struct msi_doorbell_info;
+> 
+> And the wrapper struct around it is fine with:
+> 
+>     struct msi_doorbell;
+Yes you're right I will revisit the names and fix all style issues you
+reported.
 
-definitively
-> 
->> +		if (dbinfo == &db->info) {
->> +			list_del(&db->next);
->> +			kfree(db);
-> 
-> Please move the kfree() outside of the lock region. It does not matter much
-> here, but we really should stop doing random crap in locked regions.
-OK
-
-Thanks
+Thank you for your time
 
 Eric
 > 
