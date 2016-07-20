@@ -1,25 +1,23 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH v1 1/4] arm/arm64: vgic-new: Introduce 64-bit reg
- access support
-Date: Wed, 20 Jul 2016 15:02:30 +0100
-Message-ID: <578F8476.70805@arm.com>
-References: <1469019748-31005-1-git-send-email-vijay.kilari@gmail.com>
- <1469019748-31005-2-git-send-email-vijay.kilari@gmail.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH v7 08/15] arm: allow creation of an MSI register frame region
+Date: Wed, 20 Jul 2016 18:04:28 +0100
+Message-ID: <20160720170435.28090-9-andre.przywara@arm.com>
+References: <20160720170435.28090-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6412949B3C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 09:56:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B3E849B32
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BfegTA87syaO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2016 09:56:23 -0400 (EDT)
+ with ESMTP id uACptKHAByyd for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jul 2016 12:57:52 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0231449B36
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 09:56:22 -0400 (EDT)
-In-Reply-To: <1469019748-31005-2-git-send-email-vijay.kilari@gmail.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA13349B46
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:48 -0400 (EDT)
+In-Reply-To: <20160720170435.28090-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,115 +27,150 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: vijay.kilari@gmail.com, christoffer.dall@linaro.org
-Cc: Prasun.Kapoor@cavium.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 20/07/16 14:02, vijay.kilari@gmail.com wrote:
-> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> 
-> vgic_attr_regs_access() handles only 32-bit register
-> value. Introduce union ureg to handle both 32 and 64 bit
-> register size.
-> 
-> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> ---
->  virt/kvm/arm/vgic/vgic-kvm-device.c |   19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> index cc843fe..cace996 100644
-> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> @@ -19,6 +19,11 @@
->  #include <asm/kvm_mmu.h>
->  #include "vgic.h"
->  
-> +union ureg {
-> +	u32 reg32;
-> +	u64 reg64;
-> +};
-> +
+The GICv3 ITS expects a separate 64K page to hold ITS registers.
+Add a function to reserve such a page in the guest's I/O memory and
+use that for the ITS vGIC type.
 
-Please don't. That's pointlessly ugly, and creates type confusion. I
-want to see explicit types, all the time.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arm/gic.c                    | 63 ++++++++++++++++++++++++++++++++++++++++++++
+ arm/include/arm-common/gic.h |  1 +
+ 2 files changed, 64 insertions(+)
 
->  /* common helpers */
->  
->  static int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
-> @@ -255,7 +260,7 @@ void kvm_register_vgic_device(unsigned long type)
->   */
->  static int vgic_attr_regs_access(struct kvm_device *dev,
->  				 struct kvm_device_attr *attr,
-> -				 u32 *reg, bool is_write)
-> +				 union ureg *reg, bool is_write)
-
-Just pass a u64 pointer here...
-
->  {
->  	gpa_t addr;
->  	int cpuid, ret, c;
-> @@ -293,10 +298,10 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
-
-	u32 tmp32;
-
-	if (is_write)
-		tmp32 = *reg;
-		
->  
->  	switch (attr->group) {
->  	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
-> -		ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, reg);
-> +		ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, &reg->reg32);
-
-use tmp32 here.
-
->  		break;
->  	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
-> -		ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, reg);
-> +		ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, &reg->reg32);
->  		break;
->  	default:
->  		ret = -EINVAL;
-
-and in the epilogue:
-
-	if (!is_write)
-		*reg = tmp32;
-
-> @@ -328,9 +333,9 @@ static int vgic_v2_set_attr(struct kvm_device *dev,
->  	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
->  	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
->  		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-> -		u32 reg;
-> +		union ureg reg;
->  
-> -		if (get_user(reg, uaddr))
-> +		if (get_user(reg.reg32, uaddr))
->  			return -EFAULT;
->  
->  		return vgic_attr_regs_access(dev, attr, &reg, true);
-> @@ -353,12 +358,12 @@ static int vgic_v2_get_attr(struct kvm_device *dev,
->  	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
->  	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
->  		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-> -		u32 reg = 0;
-> +		union ureg reg;
->  
->  		ret = vgic_attr_regs_access(dev, attr, &reg, false);
->  		if (ret)
->  			return ret;
-> -		return put_user(reg, uaddr);
-> +		return put_user(reg.reg32, uaddr);
->  	}
->  	}
->  
-> 
-
-Same thing everywhere.
-
-Thanks,
-
-	M.
+diff --git a/arm/gic.c b/arm/gic.c
+index 2c1a547..3544211 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -8,6 +8,7 @@
+ #include <linux/byteorder.h>
+ #include <linux/kernel.h>
+ #include <linux/kvm.h>
++#include <linux/sizes.h>
+ 
+ /* Those names are not defined for ARM (yet) */
+ #ifndef KVM_VGIC_V3_ADDR_TYPE_DIST
+@@ -21,6 +22,8 @@
+ static int gic_fd = -1;
+ static u64 gic_redists_base;
+ static u64 gic_redists_size;
++static u64 gic_msi_base;
++static u64 gic_msi_size = 0;
+ 
+ int irqchip_parser(const struct option *opt, const char *arg, int unset)
+ {
+@@ -38,6 +41,56 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
+ 	return 0;
+ }
+ 
++static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr)
++{
++	struct kvm_create_device its_device = {
++		.type = KVM_DEV_TYPE_ARM_VGIC_ITS,
++		.flags	= 0,
++	};
++	struct kvm_device_attr its_attr = {
++		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
++		.attr	= KVM_VGIC_ITS_ADDR_TYPE,
++		.addr	= (u64)(unsigned long)&its_frame_addr,
++	};
++	struct kvm_device_attr its_init_attr = {
++		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
++		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
++	};
++	int err;
++
++	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &its_device);
++	if (err) {
++		fprintf(stderr,
++			"GICv3 ITS requested, but kernel does not support it.\n");
++		fprintf(stderr, "Try --irqchip=gicv3 instead\n");
++		return err;
++	}
++
++	err = ioctl(its_device.fd, KVM_HAS_DEVICE_ATTR, &its_attr);
++	if (err) {
++		close(its_device.fd);
++		its_device.fd = -1;
++		return err;
++	}
++
++	err = ioctl(its_device.fd, KVM_SET_DEVICE_ATTR, &its_attr);
++	if (err)
++		return err;
++
++	return ioctl(its_device.fd, KVM_SET_DEVICE_ATTR, &its_init_attr);
++}
++
++static int gic__create_msi_frame(struct kvm *kvm, enum irqchip_type type,
++				 u64 msi_frame_addr)
++{
++	switch (type) {
++	case IRQCHIP_GICV3_ITS:
++		return gic__create_its_frame(kvm, msi_frame_addr);
++	default:	/* No MSI frame needed */
++		return 0;
++	}
++}
++
+ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+ {
+ 	int err;
+@@ -67,6 +120,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+ 		dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
+ 		break;
+ 	case IRQCHIP_GICV3:
++	case IRQCHIP_GICV3_ITS:
+ 		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
+ 		dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
+ 		break;
+@@ -82,6 +136,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+ 	case IRQCHIP_GICV2:
+ 		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
+ 		break;
++	case IRQCHIP_GICV3_ITS:
+ 	case IRQCHIP_GICV3:
+ 		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
+ 		break;
+@@ -93,6 +148,10 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+ 	if (err)
+ 		goto out_err;
+ 
++	err = gic__create_msi_frame(kvm, type, gic_msi_base);
++	if (err)
++		goto out_err;
++
+ 	return 0;
+ 
+ out_err:
+@@ -136,9 +195,13 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
+ 	switch (type) {
+ 	case IRQCHIP_GICV2:
+ 		break;
++	case IRQCHIP_GICV3_ITS:
++		gic_msi_size = KVM_VGIC_V3_ITS_SIZE;
++		/* fall through */
+ 	case IRQCHIP_GICV3:
+ 		gic_redists_size = kvm->cfg.nrcpus * ARM_GIC_REDIST_SIZE;
+ 		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
++		gic_msi_base = gic_redists_base - gic_msi_size;
+ 		break;
+ 	default:
+ 		return -ENODEV;
+diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
+index b43a180..433dd23 100644
+--- a/arm/include/arm-common/gic.h
++++ b/arm/include/arm-common/gic.h
+@@ -24,6 +24,7 @@
+ enum irqchip_type {
+ 	IRQCHIP_GICV2,
+ 	IRQCHIP_GICV3,
++	IRQCHIP_GICV3_ITS,
+ };
+ 
+ struct kvm;
 -- 
-Jazz is not dead. It just smells funny...
+2.9.0
