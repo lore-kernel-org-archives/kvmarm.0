@@ -1,413 +1,169 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v7 03/15] irq: move IRQ routing into irq.c
-Date: Wed, 20 Jul 2016 18:04:23 +0100
-Message-ID: <20160720170435.28090-4-andre.przywara@arm.com>
+Subject: [PATCH v7 02/15] arm: use new phandle allocation functions
+Date: Wed, 20 Jul 2016 18:04:22 +0100
+Message-ID: <20160720170435.28090-3-andre.przywara@arm.com>
 References: <20160720170435.28090-1-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 773DD49B4E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:52 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M5eWoV4j0sKq for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2016 12:57:42 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C5F449B36
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:42 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20160720170435.28090-1-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The current IRQ routing code in x86/irq.c is mostly implementing a
-generic KVM interface which other architectures may use too.
-Move the code to set up an MSI route into the generic irq.c file and
-guard it with the KVM_CAP_IRQ_ROUTING capability to return an error
-if the kernel does not support interrupt routing.
-This also removes the dummy implementations for all other
-architectures and only leaves the x86 specific code in x86/irq.c.
+To refer to the GIC FDT node, we used to pass the GIC phandle to most
+of the functions dealing with FDT nodes.
+Since we now have a global phandle reference, use that to refer to the
+GIC handle in various places and get rid of the now unneeded parameter
+passing.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- Makefile          |  4 +--
- arm/irq.c         |  9 ------
- hw/pci-shmem.c    |  2 ++
- include/kvm/irq.h |  5 ++++
- irq.c             | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- mips/irq.c        | 10 -------
- powerpc/irq.c     | 31 ---------------------
- virtio/pci.c      | 21 +++++++++-----
- x86/irq.c         | 45 ++++--------------------------
- 9 files changed, 110 insertions(+), 100 deletions(-)
- delete mode 100644 arm/irq.c
- delete mode 100644 mips/irq.c
- delete mode 100644 powerpc/irq.c
+ arm/aarch32/arm-cpu.c                 | 4 ++--
+ arm/aarch64/arm-cpu.c                 | 5 +++--
+ arm/fdt.c                             | 6 +++---
+ arm/gic.c                             | 2 +-
+ arm/include/arm-common/gic.h          | 2 +-
+ arm/include/arm-common/kvm-cpu-arch.h | 3 +--
+ arm/include/arm-common/pci.h          | 2 +-
+ arm/pci.c                             | 3 ++-
+ 8 files changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index e4a4002..8ca887f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -138,7 +138,6 @@ ifeq ($(ARCH), powerpc)
- 	DEFINES += -DCONFIG_PPC
- 	OBJS	+= powerpc/boot.o
- 	OBJS	+= powerpc/ioport.o
--	OBJS	+= powerpc/irq.o
- 	OBJS	+= powerpc/kvm.o
- 	OBJS	+= powerpc/cpu_info.o
- 	OBJS	+= powerpc/kvm-cpu.o
-@@ -153,7 +152,7 @@ ifeq ($(ARCH), powerpc)
- endif
+diff --git a/arm/aarch32/arm-cpu.c b/arm/aarch32/arm-cpu.c
+index d8d6293..27a8e17 100644
+--- a/arm/aarch32/arm-cpu.c
++++ b/arm/aarch32/arm-cpu.c
+@@ -8,11 +8,11 @@
+ #include <linux/byteorder.h>
+ #include <linux/types.h>
  
- # ARM
--OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/ioport.o arm/irq.o \
-+OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/ioport.o \
- 			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o \
- 			   arm/pmu.o
- HDRS_ARM_COMMON		:= arm/include
-@@ -186,7 +185,6 @@ ifeq ($(ARCH),mips)
- 	ARCH_INCLUDE	:= mips/include
- 	OBJS		+= mips/kvm.o
- 	OBJS		+= mips/kvm-cpu.o
--	OBJS		+= mips/irq.o
- endif
- ###
- 
-diff --git a/arm/irq.c b/arm/irq.c
-deleted file mode 100644
-index d8f44df..0000000
---- a/arm/irq.c
-+++ /dev/null
-@@ -1,9 +0,0 @@
--#include "kvm/irq.h"
--#include "kvm/kvm.h"
--#include "kvm/util.h"
--
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
--{
--	die(__FUNCTION__);
--	return 0;
--}
-diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
-index a1c5ab7..7ce98cb 100644
---- a/hw/pci-shmem.c
-+++ b/hw/pci-shmem.c
-@@ -136,6 +136,8 @@ int pci_shmem__get_local_irqfd(struct kvm *kvm)
- 
- 		if (pci_shmem_pci_device.msix.ctrl & cpu_to_le16(PCI_MSIX_FLAGS_ENABLE)) {
- 			gsi = irq__add_msix_route(kvm, &msix_table[0].msg);
-+			if (gsi < 0)
-+				return gsi;
- 		} else {
- 			gsi = pci_shmem_pci_device.irq_line;
- 		}
-diff --git a/include/kvm/irq.h b/include/kvm/irq.h
-index 8a78e43..bb71521 100644
---- a/include/kvm/irq.h
-+++ b/include/kvm/irq.h
-@@ -10,11 +10,16 @@
- 
- struct kvm;
- 
-+extern struct kvm_irq_routing *irq_routing;
-+extern int next_gsi;
-+
- int irq__alloc_line(void);
- int irq__get_nr_allocated_lines(void);
- 
- int irq__init(struct kvm *kvm);
- int irq__exit(struct kvm *kvm);
-+
-+int irq__allocate_routing_entry(void);
- int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
- 
- #endif
-diff --git a/irq.c b/irq.c
-index 71eaa05..c4b481c 100644
---- a/irq.c
-+++ b/irq.c
-@@ -1,7 +1,19 @@
-+#include <stdlib.h>
-+#include <sys/ioctl.h>
-+#include <linux/types.h>
-+#include <linux/kvm.h>
-+#include <errno.h>
-+
-+#include "kvm/kvm.h"
- #include "kvm/irq.h"
- #include "kvm/kvm-arch.h"
- 
- static u8 next_line = KVM_IRQ_OFFSET;
-+static int allocated_gsis = 0;
-+
-+int next_gsi;
-+
-+struct kvm_irq_routing *irq_routing = NULL;
- 
- int irq__alloc_line(void)
+-static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
++static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
  {
-@@ -12,3 +24,74 @@ int irq__get_nr_allocated_lines(void)
- {
- 	return next_line - KVM_IRQ_OFFSET;
+ 	int timer_interrupts[4] = {13, 14, 11, 10};
+ 
+-	gic__generate_fdt_nodes(fdt, gic_phandle, IRQCHIP_GICV2);
++	gic__generate_fdt_nodes(fdt, IRQCHIP_GICV2);
+ 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
  }
-+
-+int irq__allocate_routing_entry(void)
-+{
-+	size_t table_size = sizeof(struct kvm_irq_routing);
-+	int nr_entries = 0;
-+
-+	if (irq_routing)
-+		nr_entries = irq_routing->nr;
-+
-+	if (nr_entries < allocated_gsis)
-+		return 0;
-+
-+	allocated_gsis = ALIGN(nr_entries + 1, 32);
-+	table_size += sizeof(struct kvm_irq_routing_entry) * allocated_gsis;
-+	irq_routing = realloc(irq_routing, table_size);
-+
-+	if (irq_routing == NULL)
-+		return ENOMEM;
-+
-+	irq_routing->nr = nr_entries;
-+
-+	return 0;
-+}
-+
-+static bool check_for_irq_routing(struct kvm *kvm)
-+{
-+	static int has_irq_routing = 0;
-+
-+	if (has_irq_routing == 0) {
-+		if (kvm__supports_extension(kvm, KVM_CAP_IRQ_ROUTING))
-+			has_irq_routing = 1;
-+		else
-+			has_irq_routing = -1;
-+	}
-+
-+	return has_irq_routing > 0;
-+}
-+
-+int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
-+{
-+	int r;
-+
-+	if (!check_for_irq_routing(kvm))
-+		return -ENXIO;
-+
-+	r = irq__allocate_routing_entry();
-+	if (r)
-+		return r;
-+
-+	irq_routing->entries[irq_routing->nr++] =
-+		(struct kvm_irq_routing_entry) {
-+			.gsi = next_gsi,
-+			.type = KVM_IRQ_ROUTING_MSI,
-+			.u.msi.address_hi = msg->address_hi,
-+			.u.msi.address_lo = msg->address_lo,
-+			.u.msi.data = msg->data,
-+		};
-+
-+	r = ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
-+	if (r)
-+		return r;
-+
-+	return next_gsi++;
-+}
-+
-+int __attribute__((weak)) irq__exit(struct kvm *kvm)
-+{
-+	free(irq_routing);
-+	return 0;
-+}
-+dev_base_exit(irq__exit);
-diff --git a/mips/irq.c b/mips/irq.c
-deleted file mode 100644
-index c1ff6bb..0000000
---- a/mips/irq.c
-+++ /dev/null
-@@ -1,10 +0,0 @@
--#include "kvm/irq.h"
--#include "kvm/kvm.h"
--
--#include <stdlib.h>
--
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
--{
--	pr_warning("irq__add_msix_route");
--	return 1;
--}
-diff --git a/powerpc/irq.c b/powerpc/irq.c
-deleted file mode 100644
-index 03f2fe7..0000000
---- a/powerpc/irq.c
-+++ /dev/null
-@@ -1,31 +0,0 @@
--/*
-- * PPC64 IRQ routines
-- *
-- * Copyright 2011 Matt Evans <matt@ozlabs.org>, IBM Corporation.
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms of the GNU General Public License version 2 as published
-- * by the Free Software Foundation.
-- */
--
--#include "kvm/devices.h"
--#include "kvm/irq.h"
--#include "kvm/kvm.h"
--#include "kvm/util.h"
--
--#include <linux/types.h>
--#include <linux/rbtree.h>
--#include <linux/list.h>
--#include <linux/kvm.h>
--#include <sys/ioctl.h>
--
--#include <stddef.h>
--#include <stdlib.h>
--
--#include "kvm/pci.h"
--
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
--{
--	die(__FUNCTION__);
--	return 0;
--}
-diff --git a/virtio/pci.c b/virtio/pci.c
-index 90fcd64..072e5b7 100644
---- a/virtio/pci.c
-+++ b/virtio/pci.c
-@@ -156,7 +156,8 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
- 					void *data, int size, int offset)
+ 
+diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+index c21c0bb..d7572b7 100644
+--- a/arm/aarch64/arm-cpu.c
++++ b/arm/aarch64/arm-cpu.c
+@@ -10,10 +10,11 @@
+ #include <linux/byteorder.h>
+ #include <linux/types.h>
+ 
+-static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
++static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
  {
- 	struct virtio_pci *vpci = vdev->virtio;
--	u32 config_offset, gsi, vec;
-+	u32 config_offset, vec;
-+	int gsi;
- 	int type = virtio__get_dev_specific_field(offset - 20, virtio_pci__msix_enabled(vpci),
- 							&config_offset);
- 	if (type == VIRTIO_PCI_O_MSIX) {
-@@ -166,21 +167,27 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
- 			if (vec == VIRTIO_MSI_NO_VECTOR)
- 				break;
+ 	int timer_interrupts[4] = {13, 14, 11, 10};
+-	gic__generate_fdt_nodes(fdt, gic_phandle, kvm->cfg.arch.irqchip);
++
++	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
+ 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
+ 	pmu__generate_fdt_nodes(fdt, kvm);
+ }
+diff --git a/arm/fdt.c b/arm/fdt.c
+index 8bcfffb..f6c8a4c 100644
+--- a/arm/fdt.c
++++ b/arm/fdt.c
+@@ -125,7 +125,7 @@ static int setup_fdt(struct kvm *kvm)
+ 						     kvm->arch.dtb_guest_start);
+ 	void (*generate_mmio_fdt_nodes)(void *, struct device_header *,
+ 					void (*)(void *, u8, enum irq_type));
+-	void (*generate_cpu_peripheral_fdt_nodes)(void *, struct kvm *, u32)
++	void (*generate_cpu_peripheral_fdt_nodes)(void *, struct kvm *)
+ 					= kvm->cpus[0]->generate_fdt_nodes;
  
--			gsi = irq__add_msix_route(kvm, &vpci->msix_table[vec].msg);
--
--			vpci->config_gsi = gsi;
-+			gsi = irq__add_msix_route(kvm,
-+						  &vpci->msix_table[vec].msg);
-+			if (gsi >= 0)
-+				vpci->config_gsi = gsi;
- 			break;
- 		case VIRTIO_MSI_QUEUE_VECTOR:
--			vec = vpci->vq_vector[vpci->queue_selector] = ioport__read16(data);
-+			vec = ioport__read16(data);
-+			vpci->vq_vector[vpci->queue_selector] = vec;
+ 	/* Create new tree without a reserve map */
+@@ -166,7 +166,7 @@ static int setup_fdt(struct kvm *kvm)
+ 	/* CPU and peripherals (interrupt controller, timers, etc) */
+ 	generate_cpu_nodes(fdt, kvm);
+ 	if (generate_cpu_peripheral_fdt_nodes)
+-		generate_cpu_peripheral_fdt_nodes(fdt, kvm, gic_phandle);
++		generate_cpu_peripheral_fdt_nodes(fdt, kvm);
  
- 			if (vec == VIRTIO_MSI_NO_VECTOR)
- 				break;
- 
--			gsi = irq__add_msix_route(kvm, &vpci->msix_table[vec].msg);
-+			gsi = irq__add_msix_route(kvm,
-+						  &vpci->msix_table[vec].msg);
-+			if (gsi < 0)
-+				break;
- 			vpci->gsis[vpci->queue_selector] = gsi;
- 			if (vdev->ops->notify_vq_gsi)
- 				vdev->ops->notify_vq_gsi(kvm, vpci->dev,
--							vpci->queue_selector, gsi);
-+							 vpci->queue_selector,
-+							 gsi);
- 			break;
- 		};
- 
-diff --git a/x86/irq.c b/x86/irq.c
-index 72177e7..db465a1 100644
---- a/x86/irq.c
-+++ b/x86/irq.c
-@@ -11,20 +11,15 @@
- #include <stddef.h>
- #include <stdlib.h>
- 
--#define IRQ_MAX_GSI			64
- #define IRQCHIP_MASTER			0
- #define IRQCHIP_SLAVE			1
- #define IRQCHIP_IOAPIC			2
- 
--/* First 24 GSIs are routed between IRQCHIPs and IOAPICs */
--static u32 gsi = 24;
--
--struct kvm_irq_routing *irq_routing;
--
- static int irq__add_routing(u32 gsi, u32 type, u32 irqchip, u32 pin)
- {
--	if (gsi >= IRQ_MAX_GSI)
--		return -ENOSPC;
-+	int r = irq__allocate_routing_entry();
-+	if (r)
-+		return r;
- 
- 	irq_routing->entries[irq_routing->nr++] =
- 		(struct kvm_irq_routing_entry) {
-@@ -41,11 +36,6 @@ int irq__init(struct kvm *kvm)
- {
- 	int i, r;
- 
--	irq_routing = calloc(sizeof(struct kvm_irq_routing) +
--			IRQ_MAX_GSI * sizeof(struct kvm_irq_routing_entry), 1);
--	if (irq_routing == NULL)
--		return -ENOMEM;
--
- 	/* Hook first 8 GSIs to master IRQCHIP */
- 	for (i = 0; i < 8; i++)
- 		if (i != 2)
-@@ -69,33 +59,8 @@ int irq__init(struct kvm *kvm)
- 		return errno;
+ 	/* Virtio MMIO devices */
+ 	dev_hdr = device__first_dev(DEVICE_BUS_MMIO);
+@@ -185,7 +185,7 @@ static int setup_fdt(struct kvm *kvm)
  	}
  
--	return 0;
--}
--dev_base_init(irq__init);
-+	next_gsi = i;
+ 	/* PCI host controller */
+-	pci__generate_fdt_nodes(fdt, gic_phandle);
++	pci__generate_fdt_nodes(fdt);
  
--int irq__exit(struct kvm *kvm)
--{
--	free(irq_routing);
- 	return 0;
+ 	/* PSCI firmware */
+ 	_FDT(fdt_begin_node(fdt, "psci"));
+diff --git a/arm/gic.c b/arm/gic.c
+index b60437e..2c1a547 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -194,7 +194,7 @@ static int gic__init_gic(struct kvm *kvm)
  }
--dev_base_exit(irq__exit);
--
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
--{
--	int r;
--
--	irq_routing->entries[irq_routing->nr++] =
--		(struct kvm_irq_routing_entry) {
--			.gsi = gsi,
--			.type = KVM_IRQ_ROUTING_MSI,
--			.u.msi.address_hi = msg->address_hi,
--			.u.msi.address_lo = msg->address_lo,
--			.u.msi.data = msg->data,
--		};
--
--	r = ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
--	if (r)
--		return r;
--
--	return gsi++;
--}
-+dev_base_init(irq__init);
+ late_init(gic__init_gic)
+ 
+-void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
++void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
+ {
+ 	const char *compatible;
+ 	u64 reg_prop[] = {
+diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
+index 4fde5ac..b43a180 100644
+--- a/arm/include/arm-common/gic.h
++++ b/arm/include/arm-common/gic.h
+@@ -30,6 +30,6 @@ struct kvm;
+ 
+ int gic__alloc_irqnum(void);
+ int gic__create(struct kvm *kvm, enum irqchip_type type);
+-void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type);
++void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type);
+ 
+ #endif /* ARM_COMMON__GIC_H */
+diff --git a/arm/include/arm-common/kvm-cpu-arch.h b/arm/include/arm-common/kvm-cpu-arch.h
+index 8a6a6e7..923d2c4 100644
+--- a/arm/include/arm-common/kvm-cpu-arch.h
++++ b/arm/include/arm-common/kvm-cpu-arch.h
+@@ -25,8 +25,7 @@ struct kvm_cpu {
+ 
+ 	struct kvm_coalesced_mmio_ring	*ring;
+ 
+-	void		(*generate_fdt_nodes)(void *fdt, struct kvm* kvm,
+-					      u32 gic_phandle);
++	void		(*generate_fdt_nodes)(void *fdt, struct kvm* kvm);
+ };
+ 
+ struct kvm_arm_target {
+diff --git a/arm/include/arm-common/pci.h b/arm/include/arm-common/pci.h
+index ee87725..9008a0e 100644
+--- a/arm/include/arm-common/pci.h
++++ b/arm/include/arm-common/pci.h
+@@ -1,6 +1,6 @@
+ #ifndef ARM_COMMON__PCI_H
+ #define ARM_COMMON__PCI_H
+ 
+-void pci__generate_fdt_nodes(void *fdt, u32 gic_phandle);
++void pci__generate_fdt_nodes(void *fdt);
+ 
+ #endif /* ARM_COMMON__PCI_H */
+diff --git a/arm/pci.c b/arm/pci.c
+index 99a8130..9630657 100644
+--- a/arm/pci.c
++++ b/arm/pci.c
+@@ -21,11 +21,12 @@ struct of_interrupt_map_entry {
+ 	struct of_gic_irq		gic_irq;
+ } __attribute__((packed));
+ 
+-void pci__generate_fdt_nodes(void *fdt, u32 gic_phandle)
++void pci__generate_fdt_nodes(void *fdt)
+ {
+ 	struct device_header *dev_hdr;
+ 	struct of_interrupt_map_entry irq_map[OF_PCI_IRQ_MAP_MAX];
+ 	unsigned nentries = 0;
++	u32 gic_phandle = fdt__get_phandle(PHANDLE_GIC);
+ 	/* Bus range */
+ 	u32 bus_range[] = { cpu_to_fdt32(0), cpu_to_fdt32(1), };
+ 	/* Configuration Space */
 -- 
 2.9.0
+
