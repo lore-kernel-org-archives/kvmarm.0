@@ -1,105 +1,110 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v7 12/15] arm: setup SPI IRQ routing tables
-Date: Wed, 20 Jul 2016 18:04:32 +0100
-Message-ID: <20160720170435.28090-13-andre.przywara@arm.com>
+Subject: [PATCH v7 07/15] TEMPORARY: update public headers for GICv3 ITS emulation
+Date: Wed, 20 Jul 2016 18:04:27 +0100
+Message-ID: <20160720170435.28090-8-andre.przywara@arm.com>
 References: <20160720170435.28090-1-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24FBA49B60
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:58:01 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id N+7e7TgGSX6Y for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2016 12:58:00 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3647049B3B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:54 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20160720170435.28090-1-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since we soon start using GSI routing on ARM platforms too, we have
-to setup the initial SPI routing table. Before the first call to
-KVM_SET_GSI_ROUTING, the kernel holds this table internally, but this
-is overwritten with the ioctl, so we have to explicitly set it up
-here.
-The routing is actually not used for IRQs triggered by KVM_IRQ_LINE,
-but it needs to be here anyway. We use a simple 1:1 mapping.
+This patch is preliminary and updates the headers from a kernel with
+ITS emulation and ARM GSI routing support. It should be replaced by a
+proper header update once the kernel patches have been merged and all
+merge conflict have been sorted out.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/gic.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ arm/aarch64/include/asm/kvm.h |  2 ++
+ include/linux/kvm.h           | 13 +++++++++++--
+ x86/include/asm/kvm.h         |  6 +++---
+ 3 files changed, 16 insertions(+), 5 deletions(-)
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 12139fe..a0b392e 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -19,6 +19,8 @@
- #define KVM_VGIC_V3_ADDR_TYPE_REDIST 3
- #endif
+diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
+index f209ea1..3051f86 100644
+--- a/arm/aarch64/include/asm/kvm.h
++++ b/arm/aarch64/include/asm/kvm.h
+@@ -87,9 +87,11 @@ struct kvm_regs {
+ /* Supported VGICv3 address types  */
+ #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+ #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
++#define KVM_VGIC_ITS_ADDR_TYPE		4
  
-+#define IRQCHIP_GIC 0
-+
- static int gic_fd = -1;
- static u64 gic_redists_base;
- static u64 gic_redists_size;
-@@ -41,6 +43,34 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
- 	return 0;
- }
+ #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+ #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
++#define KVM_VGIC_V3_ITS_SIZE		(2 * SZ_64K)
  
-+static int irq__routing_init(struct kvm *kvm)
-+{
-+	int r;
-+	int irqlines = ALIGN(irq__get_nr_allocated_lines(), 32);
-+
-+	/*
-+	 * This describes the default routing that the kernel uses without
-+	 * any routing explicitly set up via KVM_SET_GSI_ROUTING. So we
-+	 * don't need to commit these setting right now. The first actual
-+	 * user (MSI routing) will engage these mappings then.
-+	 */
-+	for (next_gsi = 0; next_gsi < irqlines; next_gsi++) {
-+		r = irq__allocate_routing_entry();
-+		if (r)
-+			return r;
-+
-+		irq_routing->entries[irq_routing->nr++] =
-+			(struct kvm_irq_routing_entry) {
-+				.gsi = next_gsi,
-+				.type = KVM_IRQ_ROUTING_IRQCHIP,
-+				.u.irqchip.irqchip = IRQCHIP_GIC,
-+				.u.irqchip.pin = next_gsi,
-+		};
-+	}
-+
-+	return 0;
-+}
-+
- static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr)
- {
- 	struct kvm_create_device its_device = {
-@@ -247,6 +277,8 @@ static int gic__init_gic(struct kvm *kvm)
- 			return ret;
- 	}
+ #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+ #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+index a7f1f80..91226f4 100644
+--- a/include/linux/kvm.h
++++ b/include/linux/kvm.h
+@@ -865,6 +865,8 @@ struct kvm_ppc_smmu_info {
+ #define KVM_CAP_SPAPR_TCE_64 125
+ #define KVM_CAP_ARM_PMU_V3 126
+ #define KVM_CAP_VCPU_ATTRIBUTES 127
++#define KVM_CAP_MAX_VCPU_ID 128
++#define KVM_CAP_MSI_DEVID 131
  
-+	irq__routing_init(kvm);
-+
- 	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &vgic_init_attr)) {
- 		ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &vgic_init_attr);
- 		if (ret)
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -877,7 +879,10 @@ struct kvm_irq_routing_msi {
+ 	__u32 address_lo;
+ 	__u32 address_hi;
+ 	__u32 data;
+-	__u32 pad;
++	union {
++		__u32 pad;
++		__u32 devid;
++	};
+ };
+ 
+ struct kvm_irq_routing_s390_adapter {
+@@ -1023,12 +1028,14 @@ struct kvm_one_reg {
+ 	__u64 addr;
+ };
+ 
++#define KVM_MSI_VALID_DEVID	(1U << 0)
+ struct kvm_msi {
+ 	__u32 address_lo;
+ 	__u32 address_hi;
+ 	__u32 data;
+ 	__u32 flags;
+-	__u8  pad[16];
++	__u32 devid;
++	__u8  pad[12];
+ };
+ 
+ struct kvm_arm_device_addr {
+@@ -1073,6 +1080,8 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_FLIC		KVM_DEV_TYPE_FLIC
+ 	KVM_DEV_TYPE_ARM_VGIC_V3,
+ #define KVM_DEV_TYPE_ARM_VGIC_V3	KVM_DEV_TYPE_ARM_VGIC_V3
++	KVM_DEV_TYPE_ARM_VGIC_ITS,
++#define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
+ 	KVM_DEV_TYPE_MAX,
+ };
+ 
+diff --git a/x86/include/asm/kvm.h b/x86/include/asm/kvm.h
+index cd54147..739c0c5 100644
+--- a/x86/include/asm/kvm.h
++++ b/x86/include/asm/kvm.h
+@@ -216,9 +216,9 @@ struct kvm_cpuid_entry2 {
+ 	__u32 padding[3];
+ };
+ 
+-#define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		BIT(0)
+-#define KVM_CPUID_FLAG_STATEFUL_FUNC		BIT(1)
+-#define KVM_CPUID_FLAG_STATE_READ_NEXT		BIT(2)
++#define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		(1 << 0)
++#define KVM_CPUID_FLAG_STATEFUL_FUNC		(1 << 1)
++#define KVM_CPUID_FLAG_STATE_READ_NEXT		(1 << 2)
+ 
+ /* for KVM_SET_CPUID2 */
+ struct kvm_cpuid2 {
 -- 
 2.9.0
+
