@@ -1,26 +1,25 @@
-From: vijay.kilari@gmail.com
-Subject: [RFC PATCH v1 3/4] arm/arm64: vgic-new: Introduce find_reg_by_id()
-Date: Wed, 20 Jul 2016 18:32:27 +0530
-Message-ID: <1469019748-31005-4-git-send-email-vijay.kilari@gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC PATCH v1 1/4] arm/arm64: vgic-new: Introduce 64-bit reg
+ access support
+Date: Wed, 20 Jul 2016 15:02:30 +0100
+Message-ID: <578F8476.70805@arm.com>
 References: <1469019748-31005-1-git-send-email-vijay.kilari@gmail.com>
+ <1469019748-31005-2-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 861FD49B35
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 08:56:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6412949B3C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 09:56:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id srhUtvVEDo-y for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2016 08:56:48 -0400 (EDT)
-Received: from mail-pa0-f67.google.com (mail-pa0-f67.google.com
- [209.85.220.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7DD4649B51
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 08:56:48 -0400 (EDT)
-Received: by mail-pa0-f67.google.com with SMTP id q2so3325765pap.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 06:02:59 -0700 (PDT)
-In-Reply-To: <1469019748-31005-1-git-send-email-vijay.kilari@gmail.com>
+ with ESMTP id BfegTA87syaO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jul 2016 09:56:23 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0231449B36
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 09:56:22 -0400 (EDT)
+In-Reply-To: <1469019748-31005-2-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,85 +29,115 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, christoffer.dall@linaro.org
+To: vijay.kilari@gmail.com, christoffer.dall@linaro.org
 Cc: Prasun.Kapoor@cavium.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+On 20/07/16 14:02, vijay.kilari@gmail.com wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> 
+> vgic_attr_regs_access() handles only 32-bit register
+> value. Introduce union ureg to handle both 32 and 64 bit
+> register size.
+> 
+> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-kvm-device.c |   19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> index cc843fe..cace996 100644
+> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> @@ -19,6 +19,11 @@
+>  #include <asm/kvm_mmu.h>
+>  #include "vgic.h"
+>  
+> +union ureg {
+> +	u32 reg32;
+> +	u64 reg64;
+> +};
+> +
 
-In order to implement vGICv3 CPU interface access, we will need to perform
-table lookup of system registers. We would need both index_to_params() and
-find_reg() exported for that purpose, but instead we export a single
-function which combines them both.
+Please don't. That's pointlessly ugly, and creates type confusion. I
+want to see explicit types, all the time.
 
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
----
- arch/arm64/kvm/sys_regs.c |   22 +++++++++++++++-------
- arch/arm64/kvm/sys_regs.h |    4 ++++
- 2 files changed, 19 insertions(+), 7 deletions(-)
+>  /* common helpers */
+>  
+>  static int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+> @@ -255,7 +260,7 @@ void kvm_register_vgic_device(unsigned long type)
+>   */
+>  static int vgic_attr_regs_access(struct kvm_device *dev,
+>  				 struct kvm_device_attr *attr,
+> -				 u32 *reg, bool is_write)
+> +				 union ureg *reg, bool is_write)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a57d650..16c33ca 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1802,6 +1802,17 @@ static bool index_to_params(u64 id, struct sys_reg_params *params)
- 	}
- }
- 
-+const struct sys_reg_desc *find_reg_by_id(u64 id,
-+					  struct sys_reg_params *params,
-+					  const struct sys_reg_desc table[],
-+					  unsigned int num)
-+{
-+	if (!index_to_params(id, params))
-+		return NULL;
-+
-+	return find_reg(params, table, num);
-+}
-+
- /* Decode an index value, and find the sys_reg_desc entry. */
- static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
- 						    u64 id)
-@@ -1929,10 +1940,8 @@ static int get_invariant_sys_reg(u64 id, void __user *uaddr)
- 	struct sys_reg_params params;
- 	const struct sys_reg_desc *r;
- 
--	if (!index_to_params(id, &params))
--		return -ENOENT;
--
--	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
-+	r = find_reg_by_id(id, &params, invariant_sys_regs,
-+			   ARRAY_SIZE(invariant_sys_regs));
- 	if (!r)
- 		return -ENOENT;
- 
-@@ -1946,9 +1955,8 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
- 	int err;
- 	u64 val = 0; /* Make sure high bits are 0 for 32-bit regs */
- 
--	if (!index_to_params(id, &params))
--		return -ENOENT;
--	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
-+	r = find_reg_by_id(id, &params, invariant_sys_regs,
-+			   ARRAY_SIZE(invariant_sys_regs));
- 	if (!r)
- 		return -ENOENT;
- 
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index dbbb01c..9c6ffd0 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -136,6 +136,10 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
- 	return i1->Op2 - i2->Op2;
- }
- 
-+const struct sys_reg_desc *find_reg_by_id(u64 id,
-+					  struct sys_reg_params *params,
-+					  const struct sys_reg_desc table[],
-+					  unsigned int num);
- 
- #define Op0(_x) 	.Op0 = _x
- #define Op1(_x) 	.Op1 = _x
+Just pass a u64 pointer here...
+
+>  {
+>  	gpa_t addr;
+>  	int cpuid, ret, c;
+> @@ -293,10 +298,10 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+
+	u32 tmp32;
+
+	if (is_write)
+		tmp32 = *reg;
+		
+>  
+>  	switch (attr->group) {
+>  	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+> -		ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, reg);
+> +		ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, &reg->reg32);
+
+use tmp32 here.
+
+>  		break;
+>  	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+> -		ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, reg);
+> +		ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, &reg->reg32);
+>  		break;
+>  	default:
+>  		ret = -EINVAL;
+
+and in the epilogue:
+
+	if (!is_write)
+		*reg = tmp32;
+
+> @@ -328,9 +333,9 @@ static int vgic_v2_set_attr(struct kvm_device *dev,
+>  	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+>  	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
+>  		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> -		u32 reg;
+> +		union ureg reg;
+>  
+> -		if (get_user(reg, uaddr))
+> +		if (get_user(reg.reg32, uaddr))
+>  			return -EFAULT;
+>  
+>  		return vgic_attr_regs_access(dev, attr, &reg, true);
+> @@ -353,12 +358,12 @@ static int vgic_v2_get_attr(struct kvm_device *dev,
+>  	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+>  	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
+>  		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> -		u32 reg = 0;
+> +		union ureg reg;
+>  
+>  		ret = vgic_attr_regs_access(dev, attr, &reg, false);
+>  		if (ret)
+>  			return ret;
+> -		return put_user(reg, uaddr);
+> +		return put_user(reg.reg32, uaddr);
+>  	}
+>  	}
+>  
+> 
+
+Same thing everywhere.
+
+Thanks,
+
+	M.
 -- 
-1.7.9.5
+Jazz is not dead. It just smells funny...
