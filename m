@@ -1,169 +1,149 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v7 02/15] arm: use new phandle allocation functions
-Date: Wed, 20 Jul 2016 18:04:22 +0100
-Message-ID: <20160720170435.28090-3-andre.przywara@arm.com>
+Subject: [PATCH v7 01/15] FDT: introduce global phandle allocation
+Date: Wed, 20 Jul 2016 18:04:21 +0100
+Message-ID: <20160720170435.28090-2-andre.przywara@arm.com>
 References: <20160720170435.28090-1-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6709249B55
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:52 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id whI88WOeU6DE for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jul 2016 12:57:39 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ABBA049B32
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2016 12:57:39 -0400 (EDT)
 In-Reply-To: <20160720170435.28090-1-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To refer to the GIC FDT node, we used to pass the GIC phandle to most
-of the functions dealing with FDT nodes.
-Since we now have a global phandle reference, use that to refer to the
-GIC handle in various places and get rid of the now unneeded parameter
-passing.
+Allocating an FDT phandle (a unique identifier) using a static
+variable in a static inline function defined in a header file works
+only if all users are in the same source file. So trying to allocate
+a handle from two different compilation units fails.
+Introduce global phandle allocation and reference code to properly
+allocate unique phandles.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/aarch32/arm-cpu.c                 | 4 ++--
- arm/aarch64/arm-cpu.c                 | 5 +++--
- arm/fdt.c                             | 6 +++---
- arm/gic.c                             | 2 +-
- arm/include/arm-common/gic.h          | 2 +-
- arm/include/arm-common/kvm-cpu-arch.h | 3 +--
- arm/include/arm-common/pci.h          | 2 +-
- arm/pci.c                             | 3 ++-
- 8 files changed, 14 insertions(+), 13 deletions(-)
+ Makefile          |  1 +
+ arm/fdt.c         |  2 +-
+ arm/gic.c         |  2 +-
+ include/kvm/fdt.h | 10 +++++-----
+ kvm-fdt.c         | 26 ++++++++++++++++++++++++++
+ 5 files changed, 34 insertions(+), 7 deletions(-)
+ create mode 100644 kvm-fdt.c
 
-diff --git a/arm/aarch32/arm-cpu.c b/arm/aarch32/arm-cpu.c
-index d8d6293..27a8e17 100644
---- a/arm/aarch32/arm-cpu.c
-+++ b/arm/aarch32/arm-cpu.c
-@@ -8,11 +8,11 @@
- #include <linux/byteorder.h>
- #include <linux/types.h>
+diff --git a/Makefile b/Makefile
+index 1f0196f..e4a4002 100644
+--- a/Makefile
++++ b/Makefile
+@@ -98,6 +98,7 @@ OBJS	+= kvm-ipc.o
+ OBJS	+= builtin-sandbox.o
+ OBJS	+= virtio/mmio.o
+ OBJS	+= hw/i8042.o
++OBJS	+= kvm-fdt.o
  
--static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
-+static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
- {
- 	int timer_interrupts[4] = {13, 14, 11, 10};
- 
--	gic__generate_fdt_nodes(fdt, gic_phandle, IRQCHIP_GICV2);
-+	gic__generate_fdt_nodes(fdt, IRQCHIP_GICV2);
- 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
- }
- 
-diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-index c21c0bb..d7572b7 100644
---- a/arm/aarch64/arm-cpu.c
-+++ b/arm/aarch64/arm-cpu.c
-@@ -10,10 +10,11 @@
- #include <linux/byteorder.h>
- #include <linux/types.h>
- 
--static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
-+static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
- {
- 	int timer_interrupts[4] = {13, 14, 11, 10};
--	gic__generate_fdt_nodes(fdt, gic_phandle, kvm->cfg.arch.irqchip);
-+
-+	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
- 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
- 	pmu__generate_fdt_nodes(fdt, kvm);
- }
+ # Translate uname -m into ARCH string
+ ARCH ?= $(shell uname -m | sed -e s/i.86/i386/ -e s/ppc.*/powerpc/ \
 diff --git a/arm/fdt.c b/arm/fdt.c
-index 8bcfffb..f6c8a4c 100644
+index 381d48f..8bcfffb 100644
 --- a/arm/fdt.c
 +++ b/arm/fdt.c
-@@ -125,7 +125,7 @@ static int setup_fdt(struct kvm *kvm)
- 						     kvm->arch.dtb_guest_start);
- 	void (*generate_mmio_fdt_nodes)(void *, struct device_header *,
- 					void (*)(void *, u8, enum irq_type));
--	void (*generate_cpu_peripheral_fdt_nodes)(void *, struct kvm *, u32)
-+	void (*generate_cpu_peripheral_fdt_nodes)(void *, struct kvm *)
- 					= kvm->cpus[0]->generate_fdt_nodes;
- 
- 	/* Create new tree without a reserve map */
-@@ -166,7 +166,7 @@ static int setup_fdt(struct kvm *kvm)
- 	/* CPU and peripherals (interrupt controller, timers, etc) */
- 	generate_cpu_nodes(fdt, kvm);
- 	if (generate_cpu_peripheral_fdt_nodes)
--		generate_cpu_peripheral_fdt_nodes(fdt, kvm, gic_phandle);
-+		generate_cpu_peripheral_fdt_nodes(fdt, kvm);
- 
- 	/* Virtio MMIO devices */
- 	dev_hdr = device__first_dev(DEVICE_BUS_MMIO);
-@@ -185,7 +185,7 @@ static int setup_fdt(struct kvm *kvm)
- 	}
- 
- 	/* PCI host controller */
--	pci__generate_fdt_nodes(fdt, gic_phandle);
-+	pci__generate_fdt_nodes(fdt);
- 
- 	/* PSCI firmware */
- 	_FDT(fdt_begin_node(fdt, "psci"));
-diff --git a/arm/gic.c b/arm/gic.c
-index b60437e..2c1a547 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -194,7 +194,7 @@ static int gic__init_gic(struct kvm *kvm)
- }
- late_init(gic__init_gic)
- 
--void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
-+void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
- {
- 	const char *compatible;
- 	u64 reg_prop[] = {
-diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
-index 4fde5ac..b43a180 100644
---- a/arm/include/arm-common/gic.h
-+++ b/arm/include/arm-common/gic.h
-@@ -30,6 +30,6 @@ struct kvm;
- 
- int gic__alloc_irqnum(void);
- int gic__create(struct kvm *kvm, enum irqchip_type type);
--void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type);
-+void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type);
- 
- #endif /* ARM_COMMON__GIC_H */
-diff --git a/arm/include/arm-common/kvm-cpu-arch.h b/arm/include/arm-common/kvm-cpu-arch.h
-index 8a6a6e7..923d2c4 100644
---- a/arm/include/arm-common/kvm-cpu-arch.h
-+++ b/arm/include/arm-common/kvm-cpu-arch.h
-@@ -25,8 +25,7 @@ struct kvm_cpu {
- 
- 	struct kvm_coalesced_mmio_ring	*ring;
- 
--	void		(*generate_fdt_nodes)(void *fdt, struct kvm* kvm,
--					      u32 gic_phandle);
-+	void		(*generate_fdt_nodes)(void *fdt, struct kvm* kvm);
- };
- 
- struct kvm_arm_target {
-diff --git a/arm/include/arm-common/pci.h b/arm/include/arm-common/pci.h
-index ee87725..9008a0e 100644
---- a/arm/include/arm-common/pci.h
-+++ b/arm/include/arm-common/pci.h
-@@ -1,6 +1,6 @@
- #ifndef ARM_COMMON__PCI_H
- #define ARM_COMMON__PCI_H
- 
--void pci__generate_fdt_nodes(void *fdt, u32 gic_phandle);
-+void pci__generate_fdt_nodes(void *fdt);
- 
- #endif /* ARM_COMMON__PCI_H */
-diff --git a/arm/pci.c b/arm/pci.c
-index 99a8130..9630657 100644
---- a/arm/pci.c
-+++ b/arm/pci.c
-@@ -21,11 +21,12 @@ struct of_interrupt_map_entry {
- 	struct of_gic_irq		gic_irq;
- } __attribute__((packed));
- 
--void pci__generate_fdt_nodes(void *fdt, u32 gic_phandle)
-+void pci__generate_fdt_nodes(void *fdt)
+@@ -114,7 +114,7 @@ static int setup_fdt(struct kvm *kvm)
  {
  	struct device_header *dev_hdr;
- 	struct of_interrupt_map_entry irq_map[OF_PCI_IRQ_MAP_MAX];
- 	unsigned nentries = 0;
-+	u32 gic_phandle = fdt__get_phandle(PHANDLE_GIC);
- 	/* Bus range */
- 	u32 bus_range[] = { cpu_to_fdt32(0), cpu_to_fdt32(1), };
- 	/* Configuration Space */
+ 	u8 staging_fdt[FDT_MAX_SIZE];
+-	u32 gic_phandle		= fdt__alloc_phandle();
++	u32 gic_phandle		= fdt__get_phandle(PHANDLE_GIC);
+ 	u64 mem_reg_prop[]	= {
+ 		cpu_to_fdt64(kvm->arch.memory_guest_start),
+ 		cpu_to_fdt64(kvm->ram_size),
+diff --git a/arm/gic.c b/arm/gic.c
+index d6d6dd0..b60437e 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -222,7 +222,7 @@ void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
+ 	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
+ 	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
+ 	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
+-	_FDT(fdt_property_cell(fdt, "phandle", phandle));
++	_FDT(fdt_property_cell(fdt, "phandle", fdt__get_phandle(PHANDLE_GIC)));
+ 	_FDT(fdt_end_node(fdt));
+ }
+ 
+diff --git a/include/kvm/fdt.h b/include/kvm/fdt.h
+index 53d85a4..cd2bb72 100644
+--- a/include/kvm/fdt.h
++++ b/include/kvm/fdt.h
+@@ -8,6 +8,10 @@
+ #include <linux/types.h>
+ 
+ #define FDT_MAX_SIZE	0x10000
++#define FDT_INVALID_PHANDLE 0
++#define FDT_IS_VALID_PHANDLE(phandle) ((phandle) != FDT_INVALID_PHANDLE)
++
++enum phandles {PHANDLE_GIC, PHANDLES_MAX};
+ 
+ /* Those definitions are generic FDT values for specifying IRQ
+  * types and are used in the Linux kernel internally as well as in
+@@ -33,10 +37,6 @@ enum irq_type {
+ 		}							\
+ 	} while (0)
+ 
+-static inline u32 fdt__alloc_phandle(void)
+-{
+-	static u32 phandle = 0;
+-	return ++phandle;
+-}
++u32 fdt__get_phandle(enum phandles phandle);
+ 
+ #endif /* KVM__FDT_H */
+diff --git a/kvm-fdt.c b/kvm-fdt.c
+new file mode 100644
+index 0000000..d05f3fe
+--- /dev/null
++++ b/kvm-fdt.c
+@@ -0,0 +1,26 @@
++/*
++ * Commonly used FDT functions.
++ */
++
++#include <stdio.h>
++#include "kvm/fdt.h"
++#include "kvm/util.h"
++
++u32 phandles[PHANDLES_MAX] = {};
++u32 next_phandle = 1;
++
++u32 fdt__get_phandle(enum phandles phandle)
++{
++	u32 ret;
++
++	if (phandle >= PHANDLES_MAX)
++		return FDT_INVALID_PHANDLE;
++
++	ret = phandles[phandle];
++	if (ret == FDT_INVALID_PHANDLE) {
++		ret = next_phandle++;
++		phandles[phandle] = ret;
++	}
++
++	return ret;
++}
 -- 
 2.9.0
-
