@@ -1,66 +1,399 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2] arm64: KVM: VHE: Context switch MDSCR_EL1
-Date: Thu, 21 Jul 2016 14:53:46 +0100
-Message-ID: <20160721145346.470fea00@arm.com>
-References: <1468933014-26966-1-git-send-email-marc.zyngier@arm.com>
- <20160721131720.GA32739@potion> <20160721142451.2ee990ce@arm.com>
- <20160721134937.GA4603@potion>
+Subject: Re: [RFC v7 5/7] KVM: arm/arm64: enable irqchip routing
+Date: Thu, 21 Jul 2016 16:33:37 +0100
+Message-ID: <5790EB51.3000507@arm.com>
+References: <1468848357-2331-1-git-send-email-eric.auger@redhat.com>
+ <1468848357-2331-6-git-send-email-eric.auger@redhat.com>
+ <578E3F88.4000709@arm.com> <d97871a4-20fb-b300-5ae9-c85be1285ea7@redhat.com>
+ <578E5242.1040604@arm.com> <3eadb35b-4d1c-1299-1e8f-d7514b4e63b3@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C56C49B36
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jul 2016 09:47:40 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tG3iuKfoJAPa for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Jul 2016 09:47:39 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 332144998D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jul 2016 09:47:38 -0400 (EDT)
-In-Reply-To: <20160721134937.GA4603@potion>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Tirumalesh Chalamarla <Tirumalesh.Chalamarla@cavium.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <3eadb35b-4d1c-1299-1e8f-d7514b4e63b3@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, eric.auger.pro@gmail.com, christoffer.dall@linaro.org, andre.przywara@arm.com, Radim <rkrcmar@redhat.com>
+Cc: drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gVGh1LCAyMSBKdWwgMjAxNiAxNTo0OTozOCArMDIwMApSYWRpbSBLcsSNbcOhxZkgPHJrcmNt
-YXJAcmVkaGF0LmNvbT4gd3JvdGU6Cgo+IDIwMTYtMDctMjEgMTQ6MjQrMDEwMCwgTWFyYyBaeW5n
-aWVyOgo+ID4gT24gVGh1LCAyMSBKdWwgMjAxNiAxNToxNzoyMCArMDIwMAo+ID4gUmFkaW0gS3LE
-jW3DocWZIDxya3JjbWFyQHJlZGhhdC5jb20+IHdyb3RlOgo+ID4gCj4gPiBIaSBSYWRpbSwKPiA+
-ICAgCj4gPj4gMjAxNi0wNy0xOSAxMzo1NiswMTAwLCBNYXJjIFp5bmdpZXI6ICAKPiA+PiA+IFRo
-ZSBrcHJvYmUgZW5hYmxlbWVudCB3b3JrIGhhcyB1bmNvdmVyZWQgdGhhdCBjaGFuZ2VzIG1hZGUg
-YnkKPiA+PiA+IGEgZ3Vlc3QgdG8gTURTQ1JfRUwxIHdlcmUgcHJvcGFnYXRlZCB0byB0aGUgaG9z
-dCB3aGVuIFZIRSB3YXMKPiA+PiA+IGVuYWJsZWQsIGxlYWRpbmcgdG8gdW5leHBlY3RlZCBleGNl
-cHRpb24gYmVpbmcgZGVsaXZlcmVkLgo+ID4+ID4gCj4gPj4gPiBNb3ZpbmcgdGhpcyByZWdpc3Rl
-ciB0byB0aGUgbGlzdCBvZiByZWdpc3RlcnMgdGhhdCBhcmUgYWx3YXlzCj4gPj4gPiBjb250ZXh0
-LXN3aXRjaGVkIGZpeGVzIHRoZSBpc3N1ZS4KPiA+PiA+IAo+ID4+ID4gRml4ZXM6IDljNmMzNTY4
-MzI4NiAoImFybTY0OiBLVk06IFZIRTogU3BsaXQgc2F2ZS9yZXN0b3JlIG9mIHJlZ2lzdGVycyBz
-aGFyZWQgYmV0d2VlbiBndWVzdCBhbmQgaG9zdCIpCj4gPj4gPiBDYzogc3RhYmxlQHZnZXIua2Vy
-bmVsLm9yZyAjNC42Cj4gPj4gPiBSZXBvcnRlZC1ieTogVGlydW1hbGVzaCBDaGFsYW1hcmxhIDxU
-aXJ1bWFsZXNoLkNoYWxhbWFybGFAY2F2aXVtLmNvbT4KPiA+PiA+IFRlc3RlZC1ieTogVGlydW1h
-bGVzaCBDaGFsYW1hcmxhIDxUaXJ1bWFsZXNoLkNoYWxhbWFybGFAY2F2aXVtLmNvbT4KPiA+PiA+
-IFNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Cj4gPj4g
-PiAtLS0gICAgCj4gPj4gCj4gPj4gSSB3b3VsZCB0YWtlIHRoaXMgcGF0Y2ggdG8gNC43IGRpcmVj
-dGx5IHRocm91Z2ggdGhlIG1haW4gdHJlZS4KPiA+PiBBcmUgeW91ciBwbGFucyBkaWZmZXJlbnQ/
-ICAKPiA+IAo+ID4gSWYgeW91J3JlIGhhcHB5IHRvIHRha2UgaXQgbm93LCB0aGF0IHdvcmtzIGZv
-ciBtZS4gIAo+IAo+IFRoZSBmaXggaXMgY2xlYXIsIHRlc3RlZCwgYW5kIHdvdWxkIGdvIHRvIDQu
-Ny5zdGFibGUuICBCZXR0ZXIgdG8gaGF2ZSBpdAo+IGluIDQuNywgSU1PLgoKQWdyZWVkLgoKPiA+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEkgY2Fu
-IGVpdGhlciBzZW5kIGEKPiA+IFBSIHJpZ2h0IGF3YXksIG9yIHlvdSBjYW4gYXBwbHkgaXQgZGly
-ZWN0bHksIHdoaWNoZXZlciB3b3JrcyBiZXN0IGZvcgo+ID4geW91LiAgCj4gCj4gSXQgaXMganVz
-dCBvbmUgcGF0Y2ggc28gSSdsbCBhcHBseSBpdCBhbmQgc2VuZCBhIHB1bGwgcmVxdWVzdCB0byBM
-aW51cwo+IG9uIFNhdHVyZGF5OyAgbGVzcyBjdW1tdWxhdGl2ZSB3b3JrIHRoYXQgd2F5LiA6KQoK
-QnJpbGxpYW50LiBUaGFua3MgUmFkaW0uCgoJTS4KLS0gCkphenogaXMgbm90IGRlYWQuIEl0IGp1
-c3Qgc21lbGxzIGZ1bm55LgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
-aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On 20/07/16 08:31, Auger Eric wrote:
+> Hi Marc,
+> 
+> On 19/07/2016 18:16, Marc Zyngier wrote:
+>> On 19/07/16 16:46, Paolo Bonzini wrote:
+>>>
+>>>
+>>> On 19/07/2016 16:56, Marc Zyngier wrote:
+>>>> On 18/07/16 14:25, Eric Auger wrote:
+>>>>> This patch adds compilation and link against irqchip.
+>>>>>
+>>>>> Main motivation behind using irqchip code is to enable MSI
+>>>>> routing code. In the future irqchip routing may also be useful
+>>>>> when targeting multiple irqchips.
+>>>>>
+>>>>> Routing standard callbacks now are implemented in vgic-irqfd:
+>>>>> - kvm_set_routing_entry
+>>>>> - kvm_set_irq
+>>>>> - kvm_set_msi
+>>>>>
+>>>>> They only are supported with new_vgic code.
+>>>>>
+>>>>> Both HAVE_KVM_IRQCHIP and HAVE_KVM_IRQ_ROUTING are defined.
+>>>>> KVM_CAP_IRQ_ROUTING is advertised and KVM_SET_GSI_ROUTING is allowed.
+>>>>>
+>>>>> So from now on IRQCHIP routing is enabled and a routing table entry
+>>>>> must exist for irqfd injection to succeed for a given SPI. This patch
+>>>>> builds a default flat irqchip routing table (gsi=irqchip.pin) covering
+>>>>> all the VGIC SPI indexes. This routing table is overwritten by the
+>>>>> first first user-space call to KVM_SET_GSI_ROUTING ioctl.
+>>>>>
+>>>>> MSI routing setup is not yet allowed.
+>>>>>
+>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>>
+>>>>> ---
+>>>>> v6 -> v7:
+>>>>> - re-introduce irq.h
+>>>>> - use kvm_kernel_irq_routing_entry renamed fields: msi_flags, msi_devid
+>>>>> - moved kvm_vgic_setup_default_irq_routing declaration in arm_vgic.h and
+>>>>>   definition in vgic-irqfd.c
+>>>>> - correct double / in Makefile
+>>>>> - remove BUG_ON(!vgic_initialized(kvm) in vgic_irqfd_set_irq since
+>>>>>   in any case we have a lazy_init in update_irq_pending
+>>>>> - move KVM_IRQCHIP_NUM_PINS in arm_vgic.h
+>>>>> - use VGIC_MAX_SPI
+>>>>>
+>>>>> v5 -> v6:
+>>>>> - rebase on top of Andre's v8 + removal of old vgic
+>>>>>
+>>>>> v4 -> v5:
+>>>>> - vgic_irqfd.c was renamed into vgic-irqfd.c by Andre
+>>>>> - minor comment changes
+>>>>> - remove trace_kvm_set_irq since it is called in irqchip
+>>>>> - remove CONFIG_HAVE_KVM_MSI setting (done in KVM section)
+>>>>> - despite Christoffer's question, in kvm_set_msi, I kept the copy from
+>>>>>   the input "struct kvm_kernel_irq_routing_entry *e" imposed by the
+>>>>>   irqchip callback API into the struct kvm_msi * passed to
+>>>>>   vits_inject_msi. Since vits_inject_msi is directly called by
+>>>>>   kvm_send_userspace_msi which takes a struct kvm_msi*, makes sense
+>>>>>   to me to keep the copy.
+>>>>> - squash former [PATCH v4 5/7] KVM: arm/arm64: build a default routing
+>>>>>   table into that patch
+>>>>> - handle default routing table alloc failure
+>>>>>
+>>>>> v3 -> v4:
+>>>>> - provide support only for new-vgic
+>>>>> - code previously in vgic.c now in vgic_irqfd.c
+>>>>>
+>>>>> v2 -> v3:
+>>>>> - unconditionally set devid and KVM_MSI_VALID_DEVID flag as suggested
+>>>>>   by Andre (KVM_IRQ_ROUTING_EXTENDED_MSI type not used anymore)
+>>>>> - vgic_irqfd_set_irq now is static
+>>>>> - propagate flags
+>>>>> - add comments
+>>>>>
+>>>>> v1 -> v2:
+>>>>> - fix bug reported by Andre related to msi.flags and msi.devid setting
+>>>>>   in kvm_send_userspace_msi
+>>>>> - avoid injecting reserved IRQ numbers in vgic_irqfd_set_irq
+>>>>>
+>>>>> RFC -> PATCH
+>>>>> - reword api.txt:
+>>>>>   x move MSI routing comments in a subsequent patch,
+>>>>>   x clearly state GSI routing does not apply to KVM_IRQ_LINE
+>>>>> ---
+>>>>>  Documentation/virtual/kvm/api.txt |  12 +++--
+>>>>>  arch/arm/kvm/Kconfig              |   2 +
+>>>>>  arch/arm/kvm/Makefile             |   1 +
+>>>>>  arch/arm/kvm/irq.h                |  19 +++++++
+>>>>>  arch/arm64/kvm/Kconfig            |   2 +
+>>>>>  arch/arm64/kvm/Makefile           |   1 +
+>>>>>  arch/arm64/kvm/irq.h              |  19 +++++++
+>>>>>  include/kvm/arm_vgic.h            |   7 +++
+>>>>>  virt/kvm/arm/vgic/vgic-init.c     |   4 ++
+>>>>>  virt/kvm/arm/vgic/vgic-irqfd.c    | 101 +++++++++++++++++++++++++++++++-------
+>>>>>  virt/kvm/arm/vgic/vgic.c          |   7 ---
+>>>>>  11 files changed, 146 insertions(+), 29 deletions(-)
+>>>>>  create mode 100644 arch/arm/kvm/irq.h
+>>>>>  create mode 100644 arch/arm64/kvm/irq.h
+>>>>>
+>>>>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>>>>> index 0065c8e..3bb60d3 100644
+>>>>> --- a/Documentation/virtual/kvm/api.txt
+>>>>> +++ b/Documentation/virtual/kvm/api.txt
+>>>>> @@ -1433,13 +1433,16 @@ KVM_ASSIGN_DEV_IRQ. Partial deassignment of host or guest IRQ is allowed.
+>>>>>  4.52 KVM_SET_GSI_ROUTING
+>>>>>  
+>>>>>  Capability: KVM_CAP_IRQ_ROUTING
+>>>>> -Architectures: x86 s390
+>>>>> +Architectures: x86 s390 arm arm64
+>>>>>  Type: vm ioctl
+>>>>>  Parameters: struct kvm_irq_routing (in)
+>>>>>  Returns: 0 on success, -1 on error
+>>>>>  
+>>>>>  Sets the GSI routing table entries, overwriting any previously set entries.
+>>>>>  
+>>>>> +On arm/arm64, GSI routing has the following limitation:
+>>>>> +- GSI routing does not apply to KVM_IRQ_LINE but only to KVM_IRQFD.
+>>>>> +
+>>>>>  struct kvm_irq_routing {
+>>>>>  	__u32 nr;
+>>>>>  	__u32 flags;
+>>>>> @@ -2368,9 +2371,10 @@ Note that closing the resamplefd is not sufficient to disable the
+>>>>>  irqfd.  The KVM_IRQFD_FLAG_RESAMPLE is only necessary on assignment
+>>>>>  and need not be specified with KVM_IRQFD_FLAG_DEASSIGN.
+>>>>>  
+>>>>> -On ARM/ARM64, the gsi field in the kvm_irqfd struct specifies the Shared
+>>>>> -Peripheral Interrupt (SPI) index, such that the GIC interrupt ID is
+>>>>> -given by gsi + 32.
+>>>>> +On arm/arm64, gsi routing being supported, the following can happen:
+>>>>> +- in case no routing entry is associated to this gsi, injection fails
+>>>>> +- in case the gsi is associated to an irqchip routing entry,
+>>>>> +  irqchip.pin + 32 corresponds to the injected SPI ID.
+>>>>>  
+>>>>>  4.76 KVM_PPC_ALLOCATE_HTAB
+>>>>>  
+>>>>> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+>>>>> index 95a0005..3e1cd04 100644
+>>>>> --- a/arch/arm/kvm/Kconfig
+>>>>> +++ b/arch/arm/kvm/Kconfig
+>>>>> @@ -32,6 +32,8 @@ config KVM
+>>>>>  	select KVM_VFIO
+>>>>>  	select HAVE_KVM_EVENTFD
+>>>>>  	select HAVE_KVM_IRQFD
+>>>>> +	select HAVE_KVM_IRQCHIP
+>>>>> +	select HAVE_KVM_IRQ_ROUTING
+>>>>>  	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+>>>>>  	---help---
+>>>>>  	  Support hosting virtualized guest machines.
+>>>>> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+>>>>> index 5e28df8..10d77a6 100644
+>>>>> --- a/arch/arm/kvm/Makefile
+>>>>> +++ b/arch/arm/kvm/Makefile
+>>>>> @@ -29,4 +29,5 @@ obj-y += $(KVM)/arm/vgic/vgic-v2.o
+>>>>>  obj-y += $(KVM)/arm/vgic/vgic-mmio.o
+>>>>>  obj-y += $(KVM)/arm/vgic/vgic-mmio-v2.o
+>>>>>  obj-y += $(KVM)/arm/vgic/vgic-kvm-device.o
+>>>>> +obj-y += $(KVM)/irqchip.o
+>>>>>  obj-y += $(KVM)/arm/arch_timer.o
+>>>>> diff --git a/arch/arm/kvm/irq.h b/arch/arm/kvm/irq.h
+>>>>> new file mode 100644
+>>>>> index 0000000..b74099b
+>>>>> --- /dev/null
+>>>>> +++ b/arch/arm/kvm/irq.h
+>>>>> @@ -0,0 +1,19 @@
+>>>>> +/*
+>>>>> + * irq.h: in kernel interrupt controller related definitions
+>>>>> + * Copyright (c) 2016 Red Hat, Inc.
+>>>>> + *
+>>>>> + * This program is free software; you can redistribute it and/or modify it
+>>>>> + * under the terms and conditions of the GNU General Public License,
+>>>>> + * version 2, as published by the Free Software Foundation.
+>>>>> + *
+>>>>> + * This header is included by irqchip.c. However, on ARM, interrupt
+>>>>> + * controller declarations are located in include/kvm/arm_vgic.h since
+>>>>> + * they are mostly shared between arm and arm64.
+>>>>> + */
+>>>>> +
+>>>>> +#ifndef __IRQ_H
+>>>>> +#define __IRQ_H
+>>>>> +
+>>>>> +#include <kvm/arm_vgic.h>
+>>>>> +
+>>>>> +#endif
+>>>>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>>>>> index 9d2eff0..9c9edc9 100644
+>>>>> --- a/arch/arm64/kvm/Kconfig
+>>>>> +++ b/arch/arm64/kvm/Kconfig
+>>>>> @@ -37,6 +37,8 @@ config KVM
+>>>>>  	select KVM_ARM_VGIC_V3
+>>>>>  	select KVM_ARM_PMU if HW_PERF_EVENTS
+>>>>>  	select HAVE_KVM_MSI
+>>>>> +	select HAVE_KVM_IRQCHIP
+>>>>> +	select HAVE_KVM_IRQ_ROUTING
+>>>>>  	---help---
+>>>>>  	  Support hosting virtualized guest machines.
+>>>>>  	  We don't support KVM with 16K page tables yet, due to the multiple
+>>>>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>>>>> index a5b9664..695eb3c 100644
+>>>>> --- a/arch/arm64/kvm/Makefile
+>>>>> +++ b/arch/arm64/kvm/Makefile
+>>>>> @@ -30,5 +30,6 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v2.o
+>>>>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v3.o
+>>>>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-kvm-device.o
+>>>>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-its.o
+>>>>> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
+>>>>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+>>>>>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+>>>>> diff --git a/arch/arm64/kvm/irq.h b/arch/arm64/kvm/irq.h
+>>>>> new file mode 100644
+>>>>> index 0000000..b74099b
+>>>>> --- /dev/null
+>>>>> +++ b/arch/arm64/kvm/irq.h
+>>>>> @@ -0,0 +1,19 @@
+>>>>> +/*
+>>>>> + * irq.h: in kernel interrupt controller related definitions
+>>>>> + * Copyright (c) 2016 Red Hat, Inc.
+>>>>> + *
+>>>>> + * This program is free software; you can redistribute it and/or modify it
+>>>>> + * under the terms and conditions of the GNU General Public License,
+>>>>> + * version 2, as published by the Free Software Foundation.
+>>>>> + *
+>>>>> + * This header is included by irqchip.c. However, on ARM, interrupt
+>>>>> + * controller declarations are located in include/kvm/arm_vgic.h since
+>>>>> + * they are mostly shared between arm and arm64.
+>>>>> + */
+>>>>> +
+>>>>> +#ifndef __IRQ_H
+>>>>> +#define __IRQ_H
+>>>>> +
+>>>>> +#include <kvm/arm_vgic.h>
+>>>>> +
+>>>>> +#endif
+>>>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>>>>> index 4e63a07..260c8e9 100644
+>>>>> --- a/include/kvm/arm_vgic.h
+>>>>> +++ b/include/kvm/arm_vgic.h
+>>>>> @@ -34,6 +34,7 @@
+>>>>>  #define VGIC_MAX_SPI		1019
+>>>>>  #define VGIC_MAX_RESERVED	1023
+>>>>>  #define VGIC_MIN_LPI		8192
+>>>>> +#define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
+>>>>>  
+>>>>>  enum vgic_type {
+>>>>>  	VGIC_V2,		/* Good ol' GICv2 */
+>>>>> @@ -313,4 +314,10 @@ static inline int kvm_vgic_get_max_vcpus(void)
+>>>>>  
+>>>>>  int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
+>>>>>  
+>>>>> +/**
+>>>>> + * kvm_vgic_setup_default_irq_routing:
+>>>>> + * Setup a default flat gsi routing table mapping all SPIs
+>>>>> + */
+>>>>> +int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
+>>>>> +
+>>>>>  #endif /* __KVM_ARM_VGIC_H */
+>>>>> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+>>>>> index 01a60dc..1aba785 100644
+>>>>> --- a/virt/kvm/arm/vgic/vgic-init.c
+>>>>> +++ b/virt/kvm/arm/vgic/vgic-init.c
+>>>>> @@ -264,6 +264,10 @@ int vgic_init(struct kvm *kvm)
+>>>>>  	kvm_for_each_vcpu(i, vcpu, kvm)
+>>>>>  		kvm_vgic_vcpu_init(vcpu);
+>>>>>  
+>>>>> +	ret = kvm_vgic_setup_default_irq_routing(kvm);
+>>>>> +	if (ret)
+>>>>> +		goto out;
+>>>>> +
+>>>>>  	dist->initialized = true;
+>>>>>  out:
+>>>>>  	return ret;
+>>>>> diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
+>>>>> index c675513..c4750b7 100644
+>>>>> --- a/virt/kvm/arm/vgic/vgic-irqfd.c
+>>>>> +++ b/virt/kvm/arm/vgic/vgic-irqfd.c
+>>>>> @@ -17,36 +17,101 @@
+>>>>>  #include <linux/kvm.h>
+>>>>>  #include <linux/kvm_host.h>
+>>>>>  #include <trace/events/kvm.h>
+>>>>> +#include <kvm/arm_vgic.h>
+>>>>> +#include "vgic.h"
+>>>>>  
+>>>>> -int kvm_irq_map_gsi(struct kvm *kvm,
+>>>>> -		    struct kvm_kernel_irq_routing_entry *entries,
+>>>>> -		    int gsi)
+>>>>> +/**
+>>>>> + * vgic_irqfd_set_irq: inject the IRQ corresponding to the
+>>>>> + * irqchip routing entry
+>>>>> + *
+>>>>> + * This is the entry point for irqfd IRQ injection
+>>>>> + */
+>>>>> +static int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
+>>>>> +			struct kvm *kvm, int irq_source_id,
+>>>>> +			int level, bool line_status)
+>>>>>  {
+>>>>> -	return 0;
+>>>>> +	unsigned int spi_id = e->irqchip.pin + VGIC_NR_PRIVATE_IRQS;
+>>>>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>>>>> +
+>>>>> +	if (spi_id > min(dist->nr_spis, VGIC_MAX_SPI))
+>>>>> +		return -EINVAL;
+>>>>> +	return kvm_vgic_inject_irq(kvm, 0, spi_id, level);
+>>>>>  }
+>>>>>  
+>>>>> -int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned int irqchip,
+>>>>> -			 unsigned int pin)
+>>>>> +/**
+>>>>> + * kvm_set_routing_entry: populate a kvm routing entry
+>>>>> + * from a user routing entry
+>>>>> + *
+>>>>> + * @e: kvm kernel routing entry handle
+>>>>> + * @ue: user api routing entry handle
+>>>>> + * return 0 on success, -EINVAL on errors.
+>>>>> + */
+>>>>> +int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
+>>>>> +			  const struct kvm_irq_routing_entry *ue)
+>>>>
+>>>> For the record, this fails to build with next, and I'm carrying the
+>>>> following fix:
+>>>>
+>>>> diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
+>>>> index 28c96ad..1cacdcf 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic-irqfd.c
+>>>> +++ b/virt/kvm/arm/vgic/vgic-irqfd.c
+>>>> @@ -42,11 +42,13 @@ static int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
+>>>>   * kvm_set_routing_entry: populate a kvm routing entry
+>>>>   * from a user routing entry
+>>>>   *
+>>>> + * @kvm: the associated VM struct
+>>>>   * @e: kvm kernel routing entry handle
+>>>>   * @ue: user api routing entry handle
+>>>>   * return 0 on success, -EINVAL on errors.
+>>>>   */
+>>>> -int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
+>>>> +int kvm_set_routing_entry(struct kvm *kvm,
+>>>> +			  struct kvm_kernel_irq_routing_entry *e,
+>>>>  			  const struct kvm_irq_routing_entry *ue)
+>>>>  {
+>>>>  	int r = -EINVAL;
+>>>
+>>> Thanks, please remind me when sending a pull request.
+> 
+> Thanks for pointing this. the conflict is with
+> 
+> "KVM: pass struct kvm to kvm_set_routing_entry"
+
+As I still need for this to compile on 4.7, but don't want to make
+-next explode, I'm about to add the following hack on top:
+
+diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
+index 28c96ad..b6e93d0 100644
+--- a/virt/kvm/arm/vgic/vgic-irqfd.c
++++ b/virt/kvm/arm/vgic/vgic-irqfd.c
+@@ -46,8 +46,15 @@ static int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
+  * @ue: user api routing entry handle
+  * return 0 on success, -EINVAL on errors.
+  */
++#ifdef KVM_CAP_X2APIC_API
++int kvm_set_routing_entry(struct kvm *kvm,
++			  struct kvm_kernel_irq_routing_entry *e,
++			  const struct kvm_irq_routing_entry *ue)
++#else
++/* Remove this version and the ifdefery once merged into 4.8 */
+ int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
+ 			  const struct kvm_irq_routing_entry *ue)
++#endif
+ {
+ 	int r = -EINVAL;
+ 
+which I find really horrible. The alternative would be to merge 
+c63cf538eb4b ("KVM: pass struct kvm to kvm_set_routing_entry")
+in the kvmarm tree.
+
+What do you people think?
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
