@@ -1,63 +1,58 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v11 06/10] genirq/msi-doorbell: msi_doorbell_safe
-Date: Thu, 21 Jul 2016 15:38:47 +0200
-Message-ID: <3f188661-1d68-199b-3fcc-4da432bae633@redhat.com>
-References: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
- <1468933367-23159-7-git-send-email-eric.auger@redhat.com>
- <alpine.DEB.2.11.1607201010350.3564@nanos>
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH v2] arm64: KVM: VHE: Context switch MDSCR_EL1
+Date: Thu, 21 Jul 2016 15:49:38 +0200
+Message-ID: <20160721134937.GA4603@potion>
+References: <1468933014-26966-1-git-send-email-marc.zyngier@arm.com>
+ <20160721131720.GA32739@potion>
+ <20160721142451.2ee990ce@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2ADA149B42
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jul 2016 09:32:41 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fDGNzjbapn7V for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Jul 2016 09:32:40 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 838DB4998D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jul 2016 09:32:40 -0400 (EDT)
-In-Reply-To: <alpine.DEB.2.11.1607201010350.3564@nanos>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: kvm@vger.kernel.org, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com, joro@8bytes.org, robert.richter@caviumnetworks.com, jason@lakedaemon.net, marc.zyngier@arm.com, andre.przywara@arm.com, Manish.Jaggi@caviumnetworks.com, alex.williamson@redhat.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, pbonzini@redhat.com, robin.murphy@arm.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20160721142451.2ee990ce@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Tirumalesh Chalamarla <Tirumalesh.Chalamarla@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+2016-07-21 14:24+0100, Marc Zyngier:
+> On Thu, 21 Jul 2016 15:17:20 +0200
+> Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com> wrote:
+>=20
+> Hi Radim,
+>=20
+>> 2016-07-19 13:56+0100, Marc Zyngier:
+>> > The kprobe enablement work has uncovered that changes made by
+>> > a guest to MDSCR_EL1 were propagated to the host when VHE was
+>> > enabled, leading to unexpected exception being delivered.
+>> >=20
+>> > Moving this register to the list of registers that are always
+>> > context-switched fixes the issue.
+>> >=20
+>> > Fixes: 9c6c35683286 ("arm64: KVM: VHE: Split save/restore of regis=
+ters shared between guest and host")
+>> > Cc: stable@vger.kernel.org #4.6
+>> > Reported-by: Tirumalesh Chalamarla <Tirumalesh.Chalamarla@cavium.c=
+om>
+>> > Tested-by: Tirumalesh Chalamarla <Tirumalesh.Chalamarla@cavium.com=
+>
+>> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> > --- =20
+>>=20
+>> I would take this patch to 4.7 directly through the main tree.
+>> Are your plans different?
+>=20
+> If you're happy to take it now, that works for me.
 
-On 20/07/2016 10:12, Thomas Gleixner wrote:
-> On Tue, 19 Jul 2016, Eric Auger wrote:
->> +bool msi_doorbell_safe(void)
->> +{
->> +	struct irqchip_doorbell *db;
->> +	bool irq_remapping = true;
->> +
->> +	mutex_lock(&irqchip_doorbell_mutex);
->> +	list_for_each_entry(db, &irqchip_doorbell_list, next) {
->> +		irq_remapping &= db->info.irq_remapping;
-> 
-> db->info.irq_remapping is set in msi_doorbell_register(). So you can keep book
-> about that there. No need to iterate here.
-Yes makes sense to store the info at registration time. Currently this
-function is not in any fast path but that's cleaner from a general
-perspective. I will need to do such iteration at un-registration though.
+The fix is clear, tested, and would go to 4.7.stable.  Better to have i=
+t
+in 4.7, IMO.
 
-Thanks
+>                                                    I can either send =
+a
+> PR right away, or you can apply it directly, whichever works best for
+> you.
 
-Eric
-> 
-> Thanks,
-> 
-> 	tglx
-> 
-> 
+It is just one patch so I'll apply it and send a pull request to Linus
+on Saturday;  less cummulative work that way. :)
