@@ -1,114 +1,153 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 28/55] KVM: Extend struct kvm_msi to hold a 32-bit device ID
-Date: Fri, 22 Jul 2016 18:28:45 +0100
-Message-ID: <1469208552-4155-29-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 27/55] KVM: arm/arm64: vgic: Check return value for kvm_register_vgic_device
+Date: Fri, 22 Jul 2016 18:28:44 +0100
+Message-ID: <1469208552-4155-28-git-send-email-marc.zyngier@arm.com>
 References: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DA3849BB9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 13:24:25 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ASaYpLbrOIOk for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jul 2016 13:24:24 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D1DB749B62
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 13:24:24 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Eric Auger <eric.auger@linaro.org>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Dan Carpenter <dan.carpenter@oracle.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Andre Przywara <andre.przywara@arm.com>
 
-The ARM GICv3 ITS MSI controller requires a device ID to be able to
-assign the proper interrupt vector. On real hardware, this ID is
-sampled from the bus. To be able to emulate an ITS controller, extend
-the KVM MSI interface to let userspace provide such a device ID. For
-PCI devices, the device ID is simply the 16-bit bus-device-function
-triplet, which should be easily available to the userland tool.
-
-Also there is a new KVM capability which advertises whether the
-current VM requires a device ID to be set along with the MSI data.
-This flag is still reported as not available everywhere, later we will
-enable it when ITS emulation is used.
+kvm_register_device_ops() can return an error, so lets check its return
+value and propagate this up the call chain.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Tested-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- Documentation/virtual/kvm/api.txt | 12 ++++++++++--
- include/uapi/linux/kvm.h          |  5 ++++-
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 15 +++++++++------
+ virt/kvm/arm/vgic/vgic-v2.c         | 11 ++++++++---
+ virt/kvm/arm/vgic/vgic-v3.c         | 15 +++++++++++++--
+ virt/kvm/arm/vgic/vgic.h            |  2 +-
+ 4 files changed, 31 insertions(+), 12 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 09efa9e..6551311 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -2175,10 +2175,18 @@ struct kvm_msi {
- 	__u32 address_hi;
- 	__u32 data;
- 	__u32 flags;
--	__u8  pad[16];
-+	__u32 devid;
-+	__u8  pad[12];
- };
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 0130c4b..2f24f13 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -210,20 +210,24 @@ static void vgic_destroy(struct kvm_device *dev)
+ 	kfree(dev);
+ }
  
--No flags are defined so far. The corresponding field must be 0.
-+flags: KVM_MSI_VALID_DEVID: devid contains a valid value
-+devid: If KVM_MSI_VALID_DEVID is set, contains a unique device identifier
-+       for the device that wrote the MSI message.
-+       For PCI, this is usually a BFD identifier in the lower 16 bits.
+-void kvm_register_vgic_device(unsigned long type)
++int kvm_register_vgic_device(unsigned long type)
+ {
++	int ret = -ENODEV;
 +
-+The per-VM KVM_CAP_MSI_DEVID capability advertises the need to provide
-+the device ID. If this capability is not set, userland cannot rely on
-+the kernel to allow the KVM_MSI_VALID_DEVID flag being set.
+ 	switch (type) {
+ 	case KVM_DEV_TYPE_ARM_VGIC_V2:
+-		kvm_register_device_ops(&kvm_arm_vgic_v2_ops,
+-					KVM_DEV_TYPE_ARM_VGIC_V2);
++		ret = kvm_register_device_ops(&kvm_arm_vgic_v2_ops,
++					      KVM_DEV_TYPE_ARM_VGIC_V2);
+ 		break;
+ #ifdef CONFIG_KVM_ARM_VGIC_V3
+ 	case KVM_DEV_TYPE_ARM_VGIC_V3:
+-		kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
+-					KVM_DEV_TYPE_ARM_VGIC_V3);
++		ret = kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
++					      KVM_DEV_TYPE_ARM_VGIC_V3);
+ 		break;
+ #endif
+ 	}
++
++	return ret;
+ }
  
- 
- 4.71 KVM_CREATE_PIT2
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 05ebf47..7de96f5 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -866,6 +866,7 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_ARM_PMU_V3 126
- #define KVM_CAP_VCPU_ATTRIBUTES 127
- #define KVM_CAP_MAX_VCPU_ID 128
-+#define KVM_CAP_MSI_DEVID 129
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1024,12 +1025,14 @@ struct kvm_one_reg {
- 	__u64 addr;
+ /** vgic_attr_regs_access: allows user space to read/write VGIC registers
+@@ -428,4 +432,3 @@ struct kvm_device_ops kvm_arm_vgic_v3_ops = {
  };
  
-+#define KVM_MSI_VALID_DEVID	(1U << 0)
- struct kvm_msi {
- 	__u32 address_lo;
- 	__u32 address_hi;
- 	__u32 data;
- 	__u32 flags;
--	__u8  pad[16];
-+	__u32 devid;
-+	__u8  pad[12];
- };
+ #endif /* CONFIG_KVM_ARM_VGIC_V3 */
+-
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index e31405e..079bf67 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -332,20 +332,25 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+ 	vtr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VTR);
+ 	kvm_vgic_global_state.nr_lr = (vtr & 0x3f) + 1;
  
- struct kvm_arm_device_addr {
++	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
++	if (ret) {
++		kvm_err("Cannot register GICv2 KVM device\n");
++		iounmap(kvm_vgic_global_state.vctrl_base);
++		return ret;
++	}
++
+ 	ret = create_hyp_io_mappings(kvm_vgic_global_state.vctrl_base,
+ 				     kvm_vgic_global_state.vctrl_base +
+ 					 resource_size(&info->vctrl),
+ 				     info->vctrl.start);
+-
+ 	if (ret) {
+ 		kvm_err("Cannot map VCTRL into hyp\n");
++		kvm_unregister_device_ops(KVM_DEV_TYPE_ARM_VGIC_V2);
+ 		iounmap(kvm_vgic_global_state.vctrl_base);
+ 		return ret;
+ 	}
+ 
+ 	kvm_vgic_global_state.can_emulate_gicv2 = true;
+-	kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
+-
+ 	kvm_vgic_global_state.vcpu_base = info->vcpu.start;
+ 	kvm_vgic_global_state.type = VGIC_V2;
+ 	kvm_vgic_global_state.max_gic_vcpus = VGIC_V2_MAX_CPUS;
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 346b4ad..e48a22e 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -296,6 +296,7 @@ out:
+ int vgic_v3_probe(const struct gic_kvm_info *info)
+ {
+ 	u32 ich_vtr_el2 = kvm_call_hyp(__vgic_v3_get_ich_vtr_el2);
++	int ret;
+ 
+ 	/*
+ 	 * The ListRegs field is 5 bits, but there is a architectural
+@@ -319,12 +320,22 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+ 	} else {
+ 		kvm_vgic_global_state.vcpu_base = info->vcpu.start;
+ 		kvm_vgic_global_state.can_emulate_gicv2 = true;
+-		kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
++		ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
++		if (ret) {
++			kvm_err("Cannot register GICv2 KVM device.\n");
++			return ret;
++		}
+ 		kvm_info("vgic-v2@%llx\n", info->vcpu.start);
+ 	}
++	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V3);
++	if (ret) {
++		kvm_err("Cannot register GICv3 KVM device.\n");
++		kvm_unregister_device_ops(KVM_DEV_TYPE_ARM_VGIC_V2);
++		return ret;
++	}
++
+ 	if (kvm_vgic_global_state.vcpu_base == 0)
+ 		kvm_info("disabling GICv2 emulation\n");
+-	kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V3);
+ 
+ 	kvm_vgic_global_state.vctrl_base = NULL;
+ 	kvm_vgic_global_state.type = VGIC_V3;
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 7b300ca..c752152 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -124,7 +124,7 @@ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
+ }
+ #endif
+ 
+-void kvm_register_vgic_device(unsigned long type);
++int kvm_register_vgic_device(unsigned long type);
+ int vgic_lazy_init(struct kvm *kvm);
+ int vgic_init(struct kvm *kvm);
+ 
 -- 
 2.8.1
+
