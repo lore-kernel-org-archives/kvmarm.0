@@ -1,39 +1,69 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH] arm64: kvm: set cpsr before spsr on fault injection
-Date: Fri, 22 Jul 2016 18:10:51 +0200
-Message-ID: <20160722161051.sboe75mlgg34xfm7@kamzik.localdomain>
-References: <1469198326-27345-1-git-send-email-drjones@redhat.com>
- <57923DBF.90003@arm.com>
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [RFC v9 2/6] KVM: Add devid in kvm_kernel_irq_routing_entry
+Date: Fri, 22 Jul 2016 16:20:38 +0000
+Message-ID: <1469204442-3220-3-git-send-email-eric.auger@redhat.com>
+References: <1469204442-3220-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <57923DBF.90003@arm.com>
+In-Reply-To: <1469204442-3220-1-git-send-email-eric.auger@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+To: eric.auger@redhat.com, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com
+Cc: drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jul 22, 2016 at 04:37:35PM +0100, Marc Zyngier wrote:
-> On 22/07/16 15:38, Andrew Jones wrote:
-> > We need to set cpsr before determining the spsr bank, as the bank
-> > depends on the target exception level of the injection, not the
-> > current mode of the vcpu. Normally this is one in the same (EL1),
-> > but not when we manage to trap an EL0 fault. It still doesn't really
-> > matter for the 64-bit EL0 case though, as vcpu_spsr() unconditionally
-> > uses the EL1 bank for that. However the 32-bit EL0 case gets fun, as
-> > that path will lead to the BUG() in vcpu_spsr32()
-> > 
-> > This patch fixes the assignment order and also modifies some white
-> > space in order to better group pairs of lines that have strict order.
-> > 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> 
-> Ouch. Nice catch. Can you find what's the earliest release this would
-> cleanly apply to? Definitely deserves a CC stable.
+Enhance kvm_kernel_irq_routing_entry to transport the device id
+field, devid. A new flags field makes possible to indicate the
+devid is valid. Those additions are used for ARM GICv3 ITS MSI
+injection. The original struct msi_msg msi field is replaced by
+a new custom structure that embeds the new fields.
 
-stable/linux-4.5.y, which is the first to contain 8fc153cda9c9 "arm64:
-KVM: Fix AArch64 guest userspace exception injection"
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Suggested-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
 
-Thanks,
-drew
+---
+v7 -> v8:
+- replace struct msi_msg by a new custom structure
+- removed Christoffer's A-b
+
+v6 -> v7:
+- added msi_ prefix to flags and dev_id fields
+
+v4 -> v5:
+- add Christoffer's R-b
+
+v2 -> v3:
+- add flags
+
+v1 -> v2:
+- replace msi_msg field by a struct composed of msi_msg and devid
+
+RFC -> PATCH:
+- reword the commit message after change in first patch (uapi)
+---
+ include/linux/kvm_host.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index c87fe6f..e33e85e 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -317,7 +317,13 @@ struct kvm_kernel_irq_routing_entry {
+ 			unsigned irqchip;
+ 			unsigned pin;
+ 		} irqchip;
+-		struct msi_msg msi;
++		struct {
++			u32 address_lo;
++			u32 address_hi;
++			u32 data;
++			u32 flags;
++			u32 devid;
++		} msi;
+ 		struct kvm_s390_adapter_int adapter;
+ 		struct kvm_hv_sint hv_sint;
+ 	};
+--=20
+1.9.1
+
