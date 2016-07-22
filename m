@@ -1,196 +1,111 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 38/55] KVM: arm64: vgic-its: Read initial LPI pending table
-Date: Fri, 22 Jul 2016 18:28:55 +0100
-Message-ID: <1469208552-4155-39-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 44/55] irqchip/gicv3-its: Restore all cacheability attributes
+Date: Fri, 22 Jul 2016 18:29:01 +0100
+Message-ID: <1469208552-4155-45-git-send-email-marc.zyngier@arm.com>
 References: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88C3249B61
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 13:24:46 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vCFAncyPgO70 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jul 2016 13:24:45 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BAA849BD5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 13:24:45 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Dan Carpenter <dan.carpenter@oracle.com>, Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
+Let's restore some of the #defines that have been savagely dropped
+by the introduction of the KVM ITS code, as pointlessly break
+other users (including series that are already in -next).
 
-The LPI pending status for a GICv3 redistributor is held in a table
-in (guest) memory. To achieve reasonable performance, we cache the
-pending bit in our struct vgic_irq. The initial pending state must be
-read from guest memory upon enabling LPIs for this redistributor.
-As we can't access the guest memory while we hold the lpi_list spinlock,
-we create a snapshot of the LPI list and iterate over that.
-
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 95 ++++++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h     |  5 +++
- 2 files changed, 100 insertions(+)
+ include/linux/irqchip/arm-gic-v3.h | 48 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 40 insertions(+), 8 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 14f91ff..2881b84 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -67,6 +67,94 @@ struct its_itte {
-  * supports more. Let's be restrictive here.
-  */
- #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
-+#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
-+
-+/*
-+ * Create a snapshot of the current LPI list, so that we can enumerate all
-+ * LPIs without holding any lock.
-+ * Returns the array length and puts the kmalloc'ed array into intid_ptr.
-+ */
-+static int vgic_copy_lpi_list(struct kvm *kvm, u32 **intid_ptr)
-+{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	struct vgic_irq *irq;
-+	u32 *intids;
-+	int irq_count = dist->lpi_list_count, i = 0;
-+
-+	/*
-+	 * We use the current value of the list length, which may change
-+	 * after the kmalloc. We don't care, because the guest shouldn't
-+	 * change anything while the command handling is still running,
-+	 * and in the worst case we would miss a new IRQ, which one wouldn't
-+	 * expect to be covered by this command anyway.
-+	 */
-+	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL);
-+	if (!intids)
-+		return -ENOMEM;
-+
-+	spin_lock(&dist->lpi_list_lock);
-+	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-+		/* We don't need to "get" the IRQ, as we hold the list lock. */
-+		intids[i] = irq->intid;
-+		if (++i == irq_count)
-+			break;
-+	}
-+	spin_unlock(&dist->lpi_list_lock);
-+
-+	*intid_ptr = intids;
-+	return irq_count;
-+}
-+
-+/*
-+ * Scan the whole LPI pending table and sync the pending bit in there
-+ * with our own data structures. This relies on the LPI being
-+ * mapped before.
-+ */
-+static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
-+{
-+	gpa_t pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+	struct vgic_irq *irq;
-+	int last_byte_offset = -1;
-+	int ret = 0;
-+	u32 *intids;
-+	int nr_irqs, i;
-+
-+	nr_irqs = vgic_copy_lpi_list(vcpu->kvm, &intids);
-+	if (nr_irqs < 0)
-+		return nr_irqs;
-+
-+	for (i = 0; i < nr_irqs; i++) {
-+		int byte_offset, bit_nr;
-+		u8 pendmask;
-+
-+		byte_offset = intids[i] / BITS_PER_BYTE;
-+		bit_nr = intids[i] % BITS_PER_BYTE;
-+
-+		/*
-+		 * For contiguously allocated LPIs chances are we just read
-+		 * this very same byte in the last iteration. Reuse that.
-+		 */
-+		if (byte_offset != last_byte_offset) {
-+			ret = kvm_read_guest(vcpu->kvm, pendbase + byte_offset,
-+					     &pendmask, 1);
-+			if (ret) {
-+				kfree(intids);
-+				return ret;
-+			}
-+			last_byte_offset = byte_offset;
-+		}
-+
-+		irq = vgic_get_irq(vcpu->kvm, NULL, intids[i]);
-+		spin_lock(&irq->irq_lock);
-+		irq->pending = pendmask & (1U << bit_nr);
-+		vgic_queue_irq_unlock(vcpu->kvm, irq);
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+
-+	kfree(intids);
-+
-+	return ret;
-+}
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 9442be7..700b421 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -146,8 +146,16 @@
  
- static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
- 					     struct vgic_its *its,
-@@ -403,6 +491,13 @@ static struct vgic_register_region its_registers[] = {
- 		VGIC_ACCESS_32bit),
- };
- 
-+/* This is called on setting the LPI enable bit in the redistributor. */
-+void vgic_enable_lpis(struct kvm_vcpu *vcpu)
-+{
-+	if (!(vcpu->arch.vgic_cpu.pendbaser & GICR_PENDBASER_PTZ))
-+		its_sync_lpi_pending_table(vcpu);
-+}
+ #define GICR_PROPBASER_InnerShareable					\
+ 	GIC_BASER_SHAREABILITY(GICR_PROPBASER, InnerShareable)
+-#define GICR_PROPBASER_nC GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, nC)
+-#define GICR_PROPBASER_WaWb GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, WaWb)
 +
- static int vgic_its_init_its(struct kvm *kvm, struct vgic_its *its)
- {
- 	struct vgic_io_device *iodev = &its->iodev;
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 8192a29..ee348de 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -25,6 +25,7 @@
- #define IS_VGIC_ADDR_UNDEF(_x)  ((_x) == VGIC_ADDR_UNDEF)
++#define GICR_PROPBASER_nCnB	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, nCnB)
++#define GICR_PROPBASER_nC 	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, nC)
++#define GICR_PROPBASER_RaWt	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWt)
++#define GICR_PROPBASER_RaWb	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWt)
++#define GICR_PROPBASER_WaWt	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, WaWt)
++#define GICR_PROPBASER_WaWb	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, WaWb)
++#define GICR_PROPBASER_RaWaWt	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWaWt)
++#define GICR_PROPBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWaWb)
++
+ #define GICR_PROPBASER_IDBITS_MASK			(0x1f)
  
- #define INTERRUPT_ID_BITS_SPIS	10
-+#define INTERRUPT_ID_BITS_ITS	16
- #define VGIC_PRI_BITS		5
+ #define GICR_PENDBASER_SHAREABILITY_SHIFT		(10)
+@@ -163,8 +171,16 @@
  
- #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
-@@ -76,6 +77,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info);
- int vgic_v3_map_resources(struct kvm *kvm);
- int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
- bool vgic_has_its(struct kvm *kvm);
-+void vgic_enable_lpis(struct kvm_vcpu *vcpu);
- #else
- static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
- {
-@@ -133,6 +135,9 @@ static inline bool vgic_has_its(struct kvm *kvm)
- 	return false;
- }
+ #define GICR_PENDBASER_InnerShareable					\
+ 	GIC_BASER_SHAREABILITY(GICR_PENDBASER, InnerShareable)
+-#define GICR_PENDBASER_nC GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, nC)
+-#define GICR_PENDBASER_WaWb GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, WaWb)
++
++#define GICR_PENDBASER_nCnB	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, nCnB)
++#define GICR_PENDBASER_nC 	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, nC)
++#define GICR_PENDBASER_RaWt	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWt)
++#define GICR_PENDBASER_RaWb	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWt)
++#define GICR_PENDBASER_WaWt	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, WaWt)
++#define GICR_PENDBASER_WaWb	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, WaWb)
++#define GICR_PENDBASER_RaWaWt	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWaWt)
++#define GICR_PENDBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWaWb)
++
+ #define GICR_PENDBASER_PTZ				BIT_ULL(62)
  
-+static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
-+{
-+}
- #endif
+ /*
+@@ -237,24 +253,40 @@
  
- int kvm_register_vgic_device(unsigned long type);
+ #define GITS_CBASER_InnerShareable					\
+ 	GIC_BASER_SHAREABILITY(GITS_CBASER, InnerShareable)
+-#define GITS_CBASER_nC GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nC)
+-#define GITS_CBASER_WaWb GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWb)
++
++#define GITS_CBASER_nCnB	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nCnB)
++#define GITS_CBASER_nC		GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nC)
++#define GITS_CBASER_RaWt	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWt)
++#define GITS_CBASER_RaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWt)
++#define GITS_CBASER_WaWt	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWt)
++#define GITS_CBASER_WaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWb)
++#define GITS_CBASER_RaWaWt	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWt)
++#define GITS_CBASER_RaWaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
+ 
+ #define GITS_BASER_NR_REGS		8
+ 
+ #define GITS_BASER_VALID			(1UL << 63)
+ #define GITS_BASER_INDIRECT			(1ULL << 62)
++
+ #define GITS_BASER_INNER_CACHEABILITY_SHIFT	(59)
+ #define GITS_BASER_OUTER_CACHEABILITY_SHIFT	(53)
+ #define GITS_BASER_INNER_CACHEABILITY_MASK				\
+ 	GIC_BASER_CACHEABILITY(GITS_BASER, INNER, MASK)
++#define GITS_BASER_CACHEABILITY_MASK		GITS_BASER_INNER_CACHEABILITY_MASK
+ #define GITS_BASER_OUTER_CACHEABILITY_MASK				\
+ 	GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, MASK)
+ #define GITS_BASER_SHAREABILITY_MASK					\
+ 	GIC_BASER_SHAREABILITY(GITS_BASER, SHAREABILITY_MASK)
+ 
+-#define GITS_BASER_nC GIC_BASER_CACHEABILITY(GITS_BASER, INNER, nC)
+-#define GITS_BASER_WaWb GIC_BASER_CACHEABILITY(GITS_BASER, INNER, WaWb)
++#define GITS_BASER_nCnB		GIC_BASER_CACHEABILITY(GITS_BASER, INNER, nCnB)
++#define GITS_BASER_nC		GIC_BASER_CACHEABILITY(GITS_BASER, INNER, nC)
++#define GITS_BASER_RaWt		GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWt)
++#define GITS_BASER_RaWb		GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWt)
++#define GITS_BASER_WaWt		GIC_BASER_CACHEABILITY(GITS_BASER, INNER, WaWt)
++#define GITS_BASER_WaWb		GIC_BASER_CACHEABILITY(GITS_BASER, INNER, WaWb)
++#define GITS_BASER_RaWaWt	GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWaWt)
++#define GITS_BASER_RaWaWb	GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWaWb)
++
+ #define GITS_BASER_TYPE_SHIFT			(56)
+ #define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
+ #define GITS_BASER_ENTRY_SIZE_SHIFT		(48)
 -- 
 2.8.1
+
