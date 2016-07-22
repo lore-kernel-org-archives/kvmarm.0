@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 46/55] KVM: arm64: vgic-its: Fix handling of indirect tables
-Date: Fri, 22 Jul 2016 18:29:03 +0100
-Message-ID: <1469208552-4155-47-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 49/55] KVM: arm64: vgic-its: Validate the device table L1 entry
+Date: Fri, 22 Jul 2016 18:29:06 +0100
+Message-ID: <1469208552-4155-50-git-send-email-marc.zyngier@arm.com>
 References: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C46949BF5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 13:25:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AECCE49BD3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 13:25:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O+XLoomlEwln for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jul 2016 13:25:01 -0400 (EDT)
+ with ESMTP id 3AVPqgOKLn4a for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jul 2016 13:25:09 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D007D49B9B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 13:25:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CFAD049BD4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 13:25:07 -0400 (EDT)
 In-Reply-To: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,31 +31,37 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, Dan Carpenter <dan.carpenter@oracle.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The current code will fail on valid indirect tables, and happily
-use the ones that are pointing out of the guest RAM. Funny what a
-small "!" can do for you...
+Checking that the device_id fits if the table, and we must make
+sure that the associated memory is also accessible.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index f427fa2..d6697c4 100644
+index 268a0c7..4943d6a 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -702,9 +702,9 @@ static bool vgic_its_check_device_id(struct kvm *kvm, struct vgic_its *its,
- 		return false;
+@@ -693,8 +693,17 @@ static bool vgic_its_check_device_id(struct kvm *kvm, struct vgic_its *its,
+ 	gfn_t gfn;
  
- 	/* Each 1st level entry is represented by a 64-bit value. */
--	if (!kvm_read_guest(kvm,
--			    BASER_ADDRESS(r) + index * sizeof(indirect_ptr),
--			    &indirect_ptr, sizeof(indirect_ptr)))
-+	if (kvm_read_guest(kvm,
-+			   BASER_ADDRESS(r) + index * sizeof(indirect_ptr),
-+			   &indirect_ptr, sizeof(indirect_ptr)))
- 		return false;
  
- 	/* check the valid bit of the first level entry */
+-	if (!(r & GITS_BASER_INDIRECT))
+-		return device_id < (l1_tbl_size / GITS_BASER_ENTRY_SIZE(r));
++	if (!(r & GITS_BASER_INDIRECT)) {
++		phys_addr_t addr;
++
++		if (device_id >= (l1_tbl_size / GITS_BASER_ENTRY_SIZE(r)))
++			return false;
++
++		addr = BASER_ADDRESS(r) + device_id * GITS_BASER_ENTRY_SIZE(r);
++		gfn = addr >> PAGE_SHIFT;
++
++		return kvm_is_visible_gfn(kvm, gfn);
++	}
+ 
+ 	/* calculate and check the index into the 1st level */
+ 	index = device_id / (SZ_64K / GITS_BASER_ENTRY_SIZE(r));
 -- 
 2.8.1
