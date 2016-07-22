@@ -1,100 +1,170 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH 1/2] arm64: add start_usr32
-Date: Fri, 22 Jul 2016 10:43:22 -0400
-Message-ID: <1469198603-27537-2-git-send-email-drjones@redhat.com>
+Subject: [PATCH 2/2] arm64: add pabt injection test
+Date: Fri, 22 Jul 2016 10:43:23 -0400
+Message-ID: <1469198603-27537-3-git-send-email-drjones@redhat.com>
 References: <1469198603-27537-1-git-send-email-drjones@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 708B749B44
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 10:37:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w7-LD7pXY7kh for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jul 2016 10:37:09 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E95149B59
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 10:37:09 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1469198603-27537-1-git-send-email-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com
+Cc: marc.zyngier@arm.com, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- lib/arm64/asm/processor.h |  1 +
- lib/arm64/processor.c     | 21 +++++++++++++++++----
- 2 files changed, 18 insertions(+), 4 deletions(-)
+ arm/Makefile.arm64 |  2 +-
+ arm/emul-abort.c   | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg  | 25 ++++++++++++++
+ 3 files changed, 121 insertions(+), 1 deletion(-)
+ create mode 100644 arm/emul-abort.c
 
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 84d5c7ce752b..22687851379a 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -79,6 +79,7 @@ DEFINE_GET_SYSREG32(mpidr)
- #define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index 0b0761c729c7..6a1a997bc26b 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -12,7 +12,7 @@ cflatobjs += lib/arm64/processor.o
+ cflatobjs += lib/arm64/spinlock.o
  
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
-+extern void start_usr32(void (*func)(void *arg), void *arg, unsigned long sp_usr);
- extern bool is_user(void);
+ # arm64 specific tests
+-tests =
++tests = $(TEST_DIR)/emul-abort.flat
  
- #endif /* !__ASSEMBLY__ */
-diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-index deeab4ec9c8a..a18a29e06dc4 100644
---- a/lib/arm64/processor.c
-+++ b/lib/arm64/processor.c
-@@ -192,6 +192,8 @@ void vector_handlers_default_init(vector_fn *handlers)
- 	handlers[EL1H_IRQ]	= default_vector_irq_handler;
- 	handlers[EL0_SYNC_64]	= default_vector_sync_handler;
- 	handlers[EL0_IRQ_64]	= default_vector_irq_handler;
-+	handlers[EL0_SYNC_32]	= default_vector_sync_handler;
-+	handlers[EL0_IRQ_32]	= default_vector_irq_handler;
- }
+ include $(TEST_DIR)/Makefile.common
  
- void do_handle_exception(enum vector v, struct pt_regs *regs, unsigned int esr)
-@@ -233,7 +235,8 @@ void thread_info_init(struct thread_info *ti, unsigned int flags)
- 	vector_handlers_default_init(ti->vector_handlers);
- }
- 
--void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr)
-+static void __start_usr(void (*func)(void *arg), void *arg,
-+			unsigned long sp_usr, unsigned int spsr)
- {
- 	sp_usr &= (~15UL); /* stack ptr needs 16-byte alignment */
- 
-@@ -243,10 +246,20 @@ void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr)
- 		"mov	x0, %0\n"
- 		"msr	sp_el0, %1\n"
- 		"msr	elr_el1, %2\n"
--		"mov	x3, xzr\n"	/* clear and "set" PSR_MODE_EL0t */
--		"msr	spsr_el1, x3\n"
-+		"msr	spsr_el1, %3\n"
-+		"isb\n"
- 		"eret\n"
--	:: "r" (arg), "r" (sp_usr), "r" (func) : "x0", "x3");
-+	:: "r" (arg), "r" (sp_usr), "r" (func), "r" (spsr) : "x0");
+diff --git a/arm/emul-abort.c b/arm/emul-abort.c
+new file mode 100644
+index 000000000000..cc2be586a422
+--- /dev/null
++++ b/arm/emul-abort.c
+@@ -0,0 +1,95 @@
++/*
++ * Test emulation of guest aborts
++ *
++ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.
++ */
++#include <libcflat.h>
++#include <asm/processor.h>
++#include <asm/thread_info.h>
++#include <asm/setup.h>
++
++#define USAGE "usage: emul-abort <subtest>\n"	\
++	"subtests:\n"				\
++	"   pabtinj-usr32-mem\n"		\
++	"   pabtinj-usr64-mem\n"		\
++	"   pabtinj-usr32-io\n"			\
++	"   pabtinj-usr64-io"
++
++#define UNMAPPED_MEM		(PHYS_END + 64*1024)
++#define UNMAPPED_IO		0xf010000
++
++typedef void (*func_t)(void *arg);
++
++static unsigned long do_pabt, mode, far;
++static bool pass;
++
++static void finish_pabt(void)
++{
++	report("bad_addr=0x%08lx far=0x%08lx", pass, do_pabt, far);
++	exit(report_summary());
 +}
 +
-+void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr)
++static void handle_pabt(struct pt_regs *regs, unsigned int esr)
 +{
-+	__start_usr(func, arg, sp_usr, 0);
++	bool far_valid;
++
++	if (esr >> ESR_EL1_EC_SHIFT != ESR_EL1_EC_IABT_EL0)
++		return;
++
++	far_valid = get_far(esr, &far);
++
++	pass = far_valid && far == do_pabt;
++	pass = pass && regs->pc == do_pabt;
++	pass = pass && (regs->pstate & (PSR_MODE32_BIT | PSR_MODE_MASK)) == mode;
++
++	regs->pstate &= ~PSR_MODE32_BIT;
++	regs->pc = (unsigned long)finish_pabt;
 +}
 +
-+void start_usr32(void (*func)(void *arg), void *arg, unsigned long sp_usr)
++static void pabtinj_test(bool is_64)
 +{
-+	__start_usr(func, arg, sp_usr, PSR_MODE32_BIT);
- }
- 
- bool is_user(void)
++	unsigned long sp = (unsigned long)thread_stack_alloc();
++
++	if (is_64) {
++		install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_IABT_EL0, handle_pabt);
++		start_usr((func_t)do_pabt, NULL, sp);
++	} else {
++		mode = PSR_MODE32_BIT;
++		install_exception_handler(EL0_SYNC_32, ESR_EL1_EC_IABT_EL0, handle_pabt);
++		start_usr32((func_t)do_pabt, NULL, sp);
++	}
++}
++
++void main(int ac, char **av)
++{
++	if (ac < 2)
++		report_abort(USAGE);
++
++	if (strncmp(av[1], "pabtinj-usr", 11) == 0) {
++
++		char *testname = av[1] + 11;
++		bool is_64 = false;
++
++		if (strncmp(testname, "32", 2) == 0)
++			is_64 = false;
++		else if (strncmp(testname, "64", 2) == 0)
++			is_64 = true;
++		else
++			report_abort(USAGE);
++
++		if (strcmp(testname + 2, "-mem") == 0)
++			do_pabt = UNMAPPED_MEM;
++		else if (strcmp(testname + 2, "-io") == 0)
++			do_pabt = UNMAPPED_IO;
++		else
++			report_abort(USAGE);
++
++		report_prefix_push(av[1]);
++		pabtinj_test(is_64);
++
++	} else {
++		report_abort(USAGE);
++	}
++}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index ffd12e5794aa..61c437f169c8 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -51,3 +51,28 @@ file = selftest.flat
+ smp = $MAX_SMP
+ extra_params = -append 'smp'
+ groups = selftest
++
++# Emulation tests
++[emul-pabt-injection-usr32-mem]
++file = emul-abort.flat
++extra_params = -append 'pabtinj-usr32-mem'
++arch = arm64
++groups = emulation mode32
++
++[emul-pabt-injection-usr64-mem]
++file = emul-abort.flat
++extra_params = -append 'pabtinj-usr64-mem'
++arch = arm64
++groups = emulation mode64
++
++[emul-pabt-injection-usr32-io]
++file = emul-abort.flat
++extra_params = -append 'pabtinj-usr32-io'
++arch = arm64
++groups = emulation mode32
++
++[emul-pabt-injection-usr64-io]
++file = emul-abort.flat
++extra_params = -append 'pabtinj-usr64-io'
++arch = arm64
++groups = emulation mode64
 -- 
 1.8.3.1
+
