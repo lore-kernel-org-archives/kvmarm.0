@@ -1,39 +1,88 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 02/55] arm64: Add PTE_HYP_XN page table flag
-Date: Fri, 22 Jul 2016 18:28:19 +0100
-Message-ID: <1469208552-4155-3-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 03/55] arm/arm64: KVM: Enforce HYP read-only mapping of the
+ kernel's rodata section
+Date: Fri, 22 Jul 2016 18:28:20 +0100
+Message-ID: <1469208552-4155-4-git-send-email-marc.zyngier@arm.com>
 References: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6992A49B7A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 13:23:35 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id yGeWr13HVFNH for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jul 2016 13:23:34 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7343649B81
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 13:23:34 -0400 (EDT)
 In-Reply-To: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Dan Carpenter <dan.carpenter@oracle.com>, Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, Dan Carpenter <dan.carpenter@oracle.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-EL2 page tables can be configured to deny code from being
-executed, which is done by setting bit 54 in the page descriptor.
+In order to be able to use C code in HYP, we're now mapping the kernel's
+rodata in HYP. It works absolutely fine, except that we're mapping it RWX,
+which is not what it should be.
 
-It is the same bit as PTE_UXN, but the "USER" reference felt odd
-in the hypervisor code.
+Add a new HYP_PAGE_RO protection, and pass it as the protection flags
+when mapping the rodata section.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/pgtable-hwdef.h | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm/include/asm/pgtable.h        | 1 +
+ arch/arm/kvm/arm.c                    | 2 +-
+ arch/arm64/include/asm/pgtable-prot.h | 1 +
+ 3 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index 2813748..c3ae239 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -164,6 +164,7 @@
- #define PTE_CONT		(_AT(pteval_t, 1) << 52)	/* Contiguous range */
- #define PTE_PXN			(_AT(pteval_t, 1) << 53)	/* Privileged XN */
- #define PTE_UXN			(_AT(pteval_t, 1) << 54)	/* User XN */
-+#define PTE_HYP_XN		(_AT(pteval_t, 1) << 54)	/* HYP XN */
+diff --git a/arch/arm/include/asm/pgtable.h b/arch/arm/include/asm/pgtable.h
+index 348caab..f332087 100644
+--- a/arch/arm/include/asm/pgtable.h
++++ b/arch/arm/include/asm/pgtable.h
+@@ -98,6 +98,7 @@ extern pgprot_t		pgprot_s2_device;
+ #define PAGE_KERNEL		_MOD_PROT(pgprot_kernel, L_PTE_XN)
+ #define PAGE_KERNEL_EXEC	pgprot_kernel
+ #define PAGE_HYP		_MOD_PROT(pgprot_kernel, L_PTE_HYP)
++#define PAGE_HYP_RO		_MOD_PROT(pgprot_kernel, L_PTE_HYP | L_PTE_RDONLY | L_PTE_XN)
+ #define PAGE_HYP_DEVICE		_MOD_PROT(pgprot_hyp_device, L_PTE_HYP)
+ #define PAGE_S2			_MOD_PROT(pgprot_s2, L_PTE_S2_RDONLY)
+ #define PAGE_S2_DEVICE		_MOD_PROT(pgprot_s2_device, L_PTE_S2_RDONLY)
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 45dd6df..b308976 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1300,7 +1300,7 @@ static int init_hyp_mode(void)
+ 	}
  
- /*
-  * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
+ 	err = create_hyp_mappings(kvm_ksym_ref(__start_rodata),
+-				  kvm_ksym_ref(__end_rodata), PAGE_HYP);
++				  kvm_ksym_ref(__end_rodata), PAGE_HYP_RO);
+ 	if (err) {
+ 		kvm_err("Cannot map rodata section\n");
+ 		goto out_err;
+diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+index 29fcb33..88db58c 100644
+--- a/arch/arm64/include/asm/pgtable-prot.h
++++ b/arch/arm64/include/asm/pgtable-prot.h
+@@ -56,6 +56,7 @@
+ #define PAGE_KERNEL_EXEC_CONT	__pgprot(_PAGE_DEFAULT | PTE_UXN | PTE_DIRTY | PTE_WRITE | PTE_CONT)
+ 
+ #define PAGE_HYP		__pgprot(_PAGE_DEFAULT | PTE_HYP)
++#define PAGE_HYP_RO		__pgprot(_PAGE_DEFAULT | PTE_HYP | PTE_RDONLY | PTE_HYP_XN)
+ #define PAGE_HYP_DEVICE		__pgprot(PROT_DEVICE_nGnRE | PTE_HYP)
+ 
+ #define PAGE_S2			__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_NORMAL) | PTE_S2_RDONLY)
 -- 
 2.8.1
-
