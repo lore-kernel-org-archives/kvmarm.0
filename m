@@ -1,67 +1,28 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH] arm64: kvm: set cpsr before spsr on fault injection
-Date: Fri, 22 Jul 2016 10:38:46 -0400
-Message-ID: <1469198326-27345-1-git-send-email-drjones@redhat.com>
+Subject: [PATCH 0/2] arm64: add pabt injection test
+Date: Fri, 22 Jul 2016 10:43:21 -0400
+Message-ID: <1469198603-27537-1-git-send-email-drjones@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
 Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: marc.zyngier@arm.com, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We need to set cpsr before determining the spsr bank, as the bank
-depends on the target exception level of the injection, not the
-current mode of the vcpu. Normally this is one in the same (EL1),
-but not when we manage to trap an EL0 fault. It still doesn't really
-matter for the 64-bit EL0 case though, as vcpu_spsr() unconditionally
-uses the EL1 bank for that. However the 32-bit EL0 case gets fun, as
-that path will lead to the BUG() in vcpu_spsr32()
+Get arm emulation tests kick started by adding a couple pabt injection
+tests.
 
-This patch fixes the assignment order and also modifies some white
-space in order to better group pairs of lines that have strict order.
+Andrew Jones (2):
+  arm64: add start_usr32
+  arm64: add pabt injection test
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arch/arm64/kvm/inject_fault.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ arm/Makefile.arm64        |  2 +-
+ arm/emul-abort.c          | 95 +++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg         | 25 +++++++++++++
+ lib/arm64/asm/processor.h |  1 +
+ lib/arm64/processor.c     | 21 +++++++++--
+ 5 files changed, 139 insertions(+), 5 deletions(-)
+ create mode 100644 arm/emul-abort.c
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index e9e0e6db73f6..898c0e6aedd4 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -132,16 +132,14 @@ static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
- static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
- {
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
--	bool is_aarch32;
-+	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
- 	u32 esr = 0;
- 
--	is_aarch32 = vcpu_mode_is_32bit(vcpu);
--
--	*vcpu_spsr(vcpu) = cpsr;
- 	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
--
- 	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
-+
- 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
-+	*vcpu_spsr(vcpu) = cpsr;
- 
- 	vcpu_sys_reg(vcpu, FAR_EL1) = addr;
- 
-@@ -172,11 +170,11 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
- 	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
- 
--	*vcpu_spsr(vcpu) = cpsr;
- 	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
--
- 	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
-+
- 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
-+	*vcpu_spsr(vcpu) = cpsr;
- 
- 	/*
- 	 * Build an unknown exception, depending on the instruction
 -- 
 1.8.3.1
 
