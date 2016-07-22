@@ -1,22 +1,23 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
 Subject: Re: KVM on ARM crashes with new VGIC v4.7-rc7
-Date: Fri, 22 Jul 2016 10:15:06 +0100
-Message-ID: <5791E41A.5040106@arm.com>
+Date: Fri, 22 Jul 2016 11:42:02 +0100
+Message-ID: <8b70c7e1-2e80-4366-97f6-505c0dc7cd64@arm.com>
 References: <e2f7196ca6c70c55463a45b490f6731a@agner.ch>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 649BA49B4E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 05:08:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6080F49B42
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 06:34:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lmuN+PocoTvs for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jul 2016 05:08:53 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAEB449B4C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 05:08:52 -0400 (EDT)
+ with ESMTP id 5NtTScXkaqYi for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jul 2016 06:34:54 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C64749B3F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 06:34:53 -0400 (EDT)
 In-Reply-To: <e2f7196ca6c70c55463a45b490f6731a@agner.ch>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -27,9 +28,11 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Stefan Agner <stefan@agner.ch>, christoffer.dall@linaro.org
+To: Stefan Agner <stefan@agner.ch>, marc.zyngier@arm.com, christoffer.dall@linaro.org
 Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
+
+Hi Stefan,
 
 On 22/07/16 06:57, Stefan Agner wrote:
 > Hi,
@@ -106,42 +109,12 @@ On 22/07/16 06:57, Stefan Agner wrote:
 > -nographic -serial stdio -kernel zImage).
 > 
 > Using a bit older Qemu version 2.4.0.
-> 
-> Is there something missing on my platform or is this a general KVM ARM
-> issue?
 
-Having compiled a 2.4.0 vintage QEMU, everything seems fine, and the
-guest comes up:
+I just tried with a self compiled QEMU 2.4.0 and the Ubuntu 14.04
+provided 2.0.0, it worked fine with Linus' current HEAD as a host kernel
+on a Midway (Cortex-A15).
 
-maz@big-leg-emma:~$ ./qemu/build/arm-softmmu/qemu-system-arm -enable-kvm -M virt -m 512 -cpu host -nographic -serial mon:stdio -kernel /boot/zImage-test
+Can you try to disable the new VGIC, just to see if that's a regression?
 
-(process:2867): GLib-WARNING **: /build/glib2.0-Ero3uS/glib2.0-2.48.0/./glib/gmem.c:483: custom memory allocation vtable not supported
-[    0.000000] Booting Linux on physical CPU 0x0
-[    0.000000] Linux version 4.7.0-rc7 (maz@approximate) (gcc version 5.2.1 20151005 (Linaro GCC 5.2-2015.11) ) #6281 SMP PREEMPT Fri Jul 22 10:01:56 BST 2016
-[    0.000000] CPU: ARMv7 Processor [410fc074] revision 4 (ARMv7), cr=30c5387d
-[    0.000000] CPU: div instructions available: patching division code
-[    0.000000] CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
-[    0.000000] Machine model: linux,dummy-virt
-[    0.000000] efi: Getting EFI parameters from FDT:
-[    0.000000] efi: UEFI not found.
-[    0.000000] Forcing write-allocate cache policy for SMP
-[    0.000000] Memory policy: Data cache writealloc
-[    0.000000] psci: probing for conduit method from DT.
-[    0.000000] psci: PSCIv0.2 detected in firmware.
-[    0.000000] psci: Using standard PSCI v0.2 function IDs
-[    0.000000] psci: Trusted OS migration not required
-[    0.000000] percpu: Embedded 14 pages/cpu @cfde4000 s27456 r8192 d21696 u57344
-[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 65024
-
-So something is amiss somewhere else. Are you sure about the qemu
-version? Built from source or packaged by a distro?
-
-Could you send me your config? Also, can you put some traces in 
-kvm_vgic_dist_init and kvm_vgic_vcpu_init, and see if they are
-getting called?
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Cheers,
+Andre.
