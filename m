@@ -1,24 +1,26 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: KVM on ARM crashes with new VGIC v4.7-rc7
-Date: Fri, 22 Jul 2016 11:42:02 +0100
-Message-ID: <8b70c7e1-2e80-4366-97f6-505c0dc7cd64@arm.com>
-References: <e2f7196ca6c70c55463a45b490f6731a@agner.ch>
+From: Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v11 06/10] genirq/msi-doorbell: msi_doorbell_safe
+Date: Fri, 22 Jul 2016 14:44:02 +0200 (CEST)
+Message-ID: <alpine.DEB.2.11.1607221443090.3906@nanos>
+References: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
+ <1468933367-23159-7-git-send-email-eric.auger@redhat.com>
+ <alpine.DEB.2.11.1607201010350.3564@nanos>
+ <3f188661-1d68-199b-3fcc-4da432bae633@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6080F49B42
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 06:34:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02C6849B34
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 08:40:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5NtTScXkaqYi for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jul 2016 06:34:54 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C64749B3F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 06:34:53 -0400 (EDT)
-In-Reply-To: <e2f7196ca6c70c55463a45b490f6731a@agner.ch>
+ with ESMTP id dU55MZ4yKIJQ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jul 2016 08:40:03 -0400 (EDT)
+Received: from Galois.linutronix.de (Galois.linutronix.de [146.0.238.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE9DD49B2C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2016 08:40:03 -0400 (EDT)
+In-Reply-To: <3f188661-1d68-199b-3fcc-4da432bae633@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,93 +30,35 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Stefan Agner <stefan@agner.ch>, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: kvmarm@lists.cs.columbia.edu
+To: Auger Eric <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com, joro@8bytes.org, robert.richter@caviumnetworks.com, jason@lakedaemon.net, marc.zyngier@arm.com, andre.przywara@arm.com, Manish.Jaggi@caviumnetworks.com, alex.williamson@redhat.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, pbonzini@redhat.com, robin.murphy@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Stefan,
+On Thu, 21 Jul 2016, Auger Eric wrote:
+> On 20/07/2016 10:12, Thomas Gleixner wrote:
+> > On Tue, 19 Jul 2016, Eric Auger wrote:
+> >> +bool msi_doorbell_safe(void)
+> >> +{
+> >> +	struct irqchip_doorbell *db;
+> >> +	bool irq_remapping = true;
+> >> +
+> >> +	mutex_lock(&irqchip_doorbell_mutex);
+> >> +	list_for_each_entry(db, &irqchip_doorbell_list, next) {
+> >> +		irq_remapping &= db->info.irq_remapping;
+> > 
+> > db->info.irq_remapping is set in msi_doorbell_register(). So you can keep book
+> > about that there. No need to iterate here.
+> Yes makes sense to store the info at registration time. Currently this
+> function is not in any fast path but that's cleaner from a general
+> perspective. I will need to do such iteration at un-registration though.
 
-On 22/07/16 06:57, Stefan Agner wrote:
-> Hi,
-> 
-> I tried KVM on a Cortex-A7 platform (i.MX 7Dual SoC) and encountered
-> this stack trace immediately after invoking qemu-system-arm:
-> 
-> Unable to handle kernel paging request at virtual address ffffffe4
-> pgd = 8ca52740
-> [ffffffe4] *pgd=80000080007003, *pmd=8ff7e003, *pte=00000000
-> Internal error: Oops: 207 [#1] SMP ARM
-> Modules linked in:  
-> CPU: 0 PID: 329 Comm: qemu-system-arm Tainted: G        W      
-> 4.7.0-rc7-00094-gea3ed2c #109
-> Hardware name: Freescale i.MX7 Dual (Device Tree)
-> task: 8ca3ee40 ti: 8d2b0000 task.ti: 8d2b0000
-> PC is at do_raw_spin_lock+0x8/0x1dc
-> LR is at kvm_vgic_flush_hwstate+0x8c/0x224
-> pc : [<8027c87c>]    lr : [<802172d4>]    psr: 60070013
-> sp : 8d2b1e38  ip : 8d2b0000  fp : 00000001
-> r10: 8d2b0000  r9 : 00010000  r8 : 8d2b8e54
-> fec 30be0000.ethernet eth0: MDIO read timeout
-> r7 : 8d2b8000  r6 : 8d2b8e74  r5 : 00000000  r4 : ffffffe0
-> r3 : 00004ead  r2 : 00000000  r1 : 00000000  r0 : ffffffe0
-> Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
-> Control: 30c5387d  Table: 8ca52740  DAC: fffffffd
-> Process qemu-system-arm (pid: 329, stack limit = 0x8d2b0210)
-> Stack: (0x8d2b1e38 to 0x8d2b2000)
-> 1e20:                                                       ffffffe0
-> 00000000
-> 1e40: 8d2b8e74 8d2b8000 8d2b8e54 00010000 8d2b0000 802172d4 8d2b8000
-> 810074f8
-> 1e60: 81007508 8ca5f800 8d284000 00010000 8d2b0000 8020fbd4 8ce9a000
-> 8ca5f800
-> 1e80: 00000000 00010000 00000000 00ff0000 8d284000 00000000 00000000
-> 7ffbfeff
-> 1ea0: fffffffe 00000000 8d28b780 00000000 755fec6c 00000000 00000000
-> ffffe000
-> 1ec0: 8d2b8000 00000000 8d28b780 00000000 755fec6c 8020af90 00000000
-> 8023f248
-> 1ee0: 0000000a 755fe98c 8d2b1f08 00000008 8021aa84 ffffe000 00000000
-> 00000000
-> 1f00: 8a00d860 8d28b780 80334f94 00000000 8d2b0000 80334748 00000000
-> 00000000
-> 1f20: 00000000 8d28b780 00004000 00000009 8d28b500 00000024 8104ebee
-> 80bc2ec4
-> 1f40: 80bafa24 8034138c 00000000 00000000 80341248 00000000 755fec6c
-> 007c1e70
-> 1f60: 00000009 00004258 0000ae80 8d28b781 00000009 8d28b780 0000ae80
-> 00000000
-> 1f80: 8d2b0000 00000000 755fec6c 80334f94 007c1e70 322a7400 00004258
-> 00000036
-> 1fa0: 8021aa84 8021a900 007c1e70 322a7400 00000009 0000ae80 00000000
-> 755feac0
-> 1fc0: 007c1e70 322a7400 00004258 00000036 7e9aff58 01151da4 76f8b4c0
-> 755fec6c
-> 1fe0: 0038192c 755fea9c 00048ae7 7697d66c 60070010 00000009 00000000
-> 00000000
-> [<8027c87c>] (do_raw_spin_lock) from [<802172d4>]
-> (kvm_vgic_flush_hwstate+0x8c/0x224)
-> [<802172d4>] (kvm_vgic_flush_hwstate) from [<8020fbd4>]
-> (kvm_arch_vcpu_ioctl_run+0x110/0x478)
-> [<8020fbd4>] (kvm_arch_vcpu_ioctl_run) from [<8020af90>]
-> (kvm_vcpu_ioctl+0x2e0/0x6d4)
-> [<8020af90>] (kvm_vcpu_ioctl) from [<80334748>]
-> (do_vfs_ioctl+0xa0/0x8b8)
-> [<80334748>] (do_vfs_ioctl) from [<80334f94>] (SyS_ioctl+0x34/0x5c)
-> [<80334f94>] (SyS_ioctl) from [<8021a900>] (ret_fast_syscall+0x0/0x1c)
-> Code: e49de004 ea09ea24 e92d47f0 e3043ead (e5902004)
-> ---[ end trace cb88537fdc8fa206 ]---
-> 
-> I use CONFIG_KVM_NEW_VGIC=y. This happens to me with a rather minimal
-> qemu invocation (qemu-system-arm -enable-kvm -M virt -cpu host
-> -nographic -serial stdio -kernel zImage).
-> 
-> Using a bit older Qemu version 2.4.0.
+Two simple counter should be sufficient.
 
-I just tried with a self compiled QEMU 2.4.0 and the Ubuntu 14.04
-provided 2.0.0, it worked fine with Linus' current HEAD as a host kernel
-on a Midway (Cortex-A15).
+  nr_registered_bells;
+  nr_remapped_bells;
 
-Can you try to disable the new VGIC, just to see if that's a regression?
+....
 
-Cheers,
-Andre.
+Thanks,
+
+	tglx
