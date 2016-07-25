@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: KVM on ARM crashes with new VGIC v4.7-rc7
-Date: Mon, 25 Jul 2016 15:39:13 +0100
-Message-ID: <57962491.2030107@arm.com>
+Date: Mon, 25 Jul 2016 16:07:20 +0100
+Message-ID: <57962B28.6030401@arm.com>
 References: <20160722173823.dcen33yyqqixmwkm@kamzik.localdomain>
  <57925CA0.7050904@arm.com> <762a6ad33268025f10b2198891e56d4d@agner.ch>
  <20160724132255.69ae1979@why.wild-wind.fr.eu.org>
@@ -15,15 +15,15 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4572349B37
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 10:32:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AAA249B54
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 11:00:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ndgtbC20sA32 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jul 2016 10:32:52 -0400 (EDT)
+ with ESMTP id nqxq2eJRxthA for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jul 2016 11:00:58 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31835411E3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 10:32:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 857E249B4C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 11:00:58 -0400 (EDT)
 In-Reply-To: <20160725142858.dtch3pbf2x54p3n6@kamzik.localdomain>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -48,8 +48,21 @@ On 25/07/16 15:28, Andrew Jones wrote:
 > on v7 with uboot (where it's present with 4k pages), and on v8
 > with UEFI (where it's not present with 4k pages, only 64k)
 
-Yup. Transplanting Mark's DT to my Seattle had finally triggered it.
-Time for some diff'ing...
+Here's what I get with Mark's DT:
+
+[    2.199618] kvm [1]: 8-bit VMID
+[    2.202756] kvm [1]: Hyp mode initialized successfully
+[    2.207907] kvm [1]: GICV size 0x2000 not a multiple of page size 0x10000
+[    2.214736] kvm [1]: virtual timer IRQ4
+
+Somehow, we fail to detect that we cannot run with 64k pages,
+because we cannot safely pass the 8kB region to the guest.
+KVM should fail to initialize, or at least report that there
+is no VGIC. Drew, is that what you have on your system as well?
+
+That doesn't explain Stefan's issue though.
+
+Thanks,
 
 	M.
 -- 
