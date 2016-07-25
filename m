@@ -1,89 +1,226 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: KVM on ARM crashes with new VGIC v4.7-rc7
-Date: Mon, 25 Jul 2016 16:38:19 +0100
-Message-ID: <5796326B.4090504@arm.com>
-References: <762a6ad33268025f10b2198891e56d4d@agner.ch>
- <20160724132255.69ae1979@why.wild-wind.fr.eu.org>
- <20160724133604.7a538c75@why.wild-wind.fr.eu.org>
- <fc490685f98356a6bcf68270c7b81e5e@agner.ch> <5795C9C6.6090409@arm.com>
- <5795CB18.3060705@arm.com> <49791c0c-3a73-a05d-6b68-cdd943c33b95@arm.com>
- <57961CBA.1010008@arm.com>
- <20160725142858.dtch3pbf2x54p3n6@kamzik.localdomain>
- <57962B28.6030401@arm.com>
- <20160725152937.g63qlcewf5h45pi4@kamzik.localdomain>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v11 09/10] genirq/msi: map/unmap the MSI doorbells on
+ msi_domain_alloc/free_irqs
+Date: Mon, 25 Jul 2016 18:21:45 +0200
+Message-ID: <75f5e846-6ca4-4178-e7aa-fed90e45e546@redhat.com>
+References: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
+ <1468933367-23159-10-git-send-email-eric.auger@redhat.com>
+ <alpine.DEB.2.11.1607201016060.3564@nanos>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 283C249B54
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 11:31:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2ZymRr0g-V3I for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jul 2016 11:31:58 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE36B49B4E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 11:31:57 -0400 (EDT)
-In-Reply-To: <20160725152937.g63qlcewf5h45pi4@kamzik.localdomain>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <alpine.DEB.2.11.1607201016060.3564@nanos>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, jason@lakedaemon.net, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org, Bharat.Bhushan@freescale.com, pranav.sawargaonkar@gmail.com, p.fedin@samsung.com, iommu@lists.linux-foundation.org, Jean-Philippe.Brucker@arm.com, yehuday@marvell.com, Manish.Jaggi@caviumnetworks.com, robert.richter@caviumnetworks.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/07/16 16:29, Andrew Jones wrote:
-> On Mon, Jul 25, 2016 at 04:07:20PM +0100, Marc Zyngier wrote:
->> On 25/07/16 15:28, Andrew Jones wrote:
->>> On Mon, Jul 25, 2016 at 03:05:46PM +0100, Marc Zyngier wrote:
->>>> News flash: Mark Rutland just saw it crashing on his Seattle using my
->>>> kernel that doesn't crash on mine. So we're looking at external factors
->>>> now. DT, firmware, whatever.
->>>
->>> Interesting, especially with the information that the bug is also
->>> on v7 with uboot (where it's present with 4k pages), and on v8
->>> with UEFI (where it's not present with 4k pages, only 64k)
->>
->> Here's what I get with Mark's DT:
->>
->> [    2.199618] kvm [1]: 8-bit VMID
->> [    2.202756] kvm [1]: Hyp mode initialized successfully
->> [    2.207907] kvm [1]: GICV size 0x2000 not a multiple of page size 0x10000
->> [    2.214736] kvm [1]: virtual timer IRQ4
->>
->> Somehow, we fail to detect that we cannot run with 64k pages,
->> because we cannot safely pass the 8kB region to the guest.
->> KVM should fail to initialize, or at least report that there
->> is no VGIC. Drew, is that what you have on your system as well?
+Hi Thomas,
+
+On 20/07/2016 11:04, Thomas Gleixner wrote:
+> On Tue, 19 Jul 2016, Eric Auger wrote:
+>>  /**
+>> + * msi_handle_doorbell_mappings: in case the irq data corresponds to an
+>> + * MSI that requires iommu mapping, traverse the irq domain hierarchy
+>> + * to retrieve the doorbells to handle and iommu_map/unmap them according
+>> + * to @map boolean.
+>> + *
+>> + * @data: irq data handle
+>> + * @map: mapping if true, unmapping if false
+>> + */
 > 
-> Yup, precisely. I wish I would have grepped and reported that before...
 > 
-> I also now see that when booting with old vgic and 64k pages I get an
-> additional message after the GICV... line
+> Please run that through the kernel doc generator. It does not work that way.
 > 
-> [    1.889241] kvm [1]: error: KVM vGIC probing failed
+> The format is:
 > 
-> So we should port that error message over.
+> /**
+>  * function_name - Short function description    
+>  * @arg1:	Description of arg1
+>  * @argument2:	Description of argument2
+>  *
+>  * Long explanation including documentation of the return values.
+>  */
+> 
+>> +static int msi_handle_doorbell_mappings(struct irq_data *data, bool map)
+>> +{
+>> +	const struct irq_chip_msi_doorbell_info *dbinfo;
+>> +	struct iommu_domain *domain;
+>> +	struct irq_chip *chip;
+>> +	struct device *dev;
+>> +	dma_addr_t iova;
+>> +	int ret = 0, cpu;
+>> +
+>> +	while (data) {
+>> +		dev = msi_desc_to_dev(irq_data_get_msi_desc(data));
+>> +		domain = iommu_msi_domain(dev);
+>> +		if (domain) {
+>> +			chip = irq_data_get_irq_chip(data);
+>> +			if (chip->msi_doorbell_info)
+>> +				break;
+>> +		}
+>> +		data = data->parent_data;
+>> +	}
+> 
+> Please split that out into a seperate function
+> 
+> struct irq_data *msi_get_doorbell_info(data)
+> {
+> 	.....
+> 		if (chip->msi_doorbell_info)
+> 			return chip->msi_get_doorbell_info(data);
+> 	}
+> 	return NULL;
+> }
+> 
+>        info = msi_get_doorbell_info(data);
+>        .....
+> 
+>> +	if (!data)
+>> +		return 0;
+>> +
+>> +	dbinfo = chip->msi_doorbell_info(data);
+>> +	if (!dbinfo)
+>> +		return -EINVAL;
+>> +
+>> +	if (!dbinfo->doorbell_is_percpu) {
+>> +		if (!map) {
+>> +			iommu_msi_put_doorbell_iova(domain,
+>> +						    dbinfo->global_doorbell);
+>> +			return 0;
+>> +		}
+>> +		return iommu_msi_get_doorbell_iova(domain,
+>> +						   dbinfo->global_doorbell,
+>> +						   dbinfo->size, dbinfo->prot,
+>> +						   &iova);
+>> +	}
+> 
+> You can spare an indentation level with a helper function
+> 
+>     	if (!dbinfo->doorbell_is_percpu)
+> 		return msi_map_global_doorbell(domain, dbinfo);
+> 
+>> +
+>> +	/* percpu doorbells */
+>> +	for_each_possible_cpu(cpu) {
+>> +		phys_addr_t __percpu *db_addr =
+>> +			per_cpu_ptr(dbinfo->percpu_doorbells, cpu);
+>> +
+>> +		if (!map) {
+>> +			iommu_msi_put_doorbell_iova(domain, *db_addr);
+>> +		} else {
+>> +
+>> +			ret = iommu_msi_get_doorbell_iova(domain, *db_addr,
+>> +							  dbinfo->size,
+>> +							  dbinfo->prot, &iova);
+>> +			if (ret)
+>> +				return ret;
+>> +		}
+>> +	}
+> 
+> Same here:
+> 
+> 	for_each_possible_cpu(cpu) {
+> 		ret = msi_map_percpu_doorbell(domain, cpu);
+> 		if (ret)
+> 			return ret;
+> 	}
+>      	return 0;
+>      
+> Hmm?
+> 
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +/**
+>>   * msi_domain_alloc_irqs - Allocate interrupts from a MSI interrupt domain
+>>   * @domain:	The domain to allocate from
+>>   * @dev:	Pointer to device struct of the device for which the interrupts
+>> @@ -352,17 +423,29 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
+>>  
+>>  		virq = __irq_domain_alloc_irqs(domain, virq, desc->nvec_used,
+>>  					       dev_to_node(dev), &arg, false);
+>> -		if (virq < 0) {
+>> -			ret = -ENOSPC;
+>> -			if (ops->handle_error)
+>> -				ret = ops->handle_error(domain, desc, ret);
+>> -			if (ops->msi_finish)
+>> -				ops->msi_finish(&arg, ret);
+>> -			return ret;
+>> -		}
+>> +		if (virq < 0)
+>> +			goto error;
+>>  
+>>  		for (i = 0; i < desc->nvec_used; i++)
+>>  			irq_set_msi_desc_off(virq, i, desc);
+>> +
+>> +		for (i = 0; i < desc->nvec_used; i++) {
+>> +			struct irq_data *d = irq_get_irq_data(virq + i);
+>> +
+>> +			ret = msi_handle_doorbell_mappings(d, true);
+>> +			if (ret)
+>> +				break;
+>> +		}
+>> +		if (ret) {
+>> +			for (; i >= 0; i--) {
+>> +				struct irq_data *d = irq_get_irq_data(virq + i);
+>> +
+>> +				msi_handle_doorbell_mappings(d, false);
+>> +			}
+>> +			irq_domain_free_irqs(virq, desc->nvec_used);
+>> +			desc->irq = 0;
+>> +			goto error;
+> 
+> How is that supposed to work? You clear desc->irq and then you call
+> ops->handle_error.
+if I don't clear the desc->irq I enter an infinite loop in pci_enable_msix_range.
+This happens because msix_capability_init and pcie_enable_msix returns 1.
 
-Not just the message. Somehow, the rest of KVM still thinks we have
-things up and running, while we won't be able to deliver an interrupt.
-Pretty shit.
+In msix_capability_init, at out_avail: we enumerate the msi_desc which have a non
+zero irq, hence the returned value equal to 1.
 
-Now, coming back to Stefan's issue, I see that his DT lacks a
-maintenance interrupt in the GIC node, which would be another failure
-mode. Except that he says that it works with the old vgic. That's weird.
+Currently the only handle_error ops I found, pci_msi_domain_handle_error does not
+use irq field so works although questionable.
 
-Basically, our error handling is bonkers and needs fixing.
+As for the irq_domain_free_irqs I think I can remove it since handled later.
 
-Thanks,
+How do you advise to handle the above situation?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks
+
+Eric
+
+> 
+> Why are you adding this extra stuff here? Look at the call sites of
+> msi_domain_alloc_irqs(). All of them use msi_domain_free_irqs() in case of
+> error. There is no reason why you can't do the same....
+> 
+>>  /**
+>> @@ -396,6 +486,9 @@ void msi_domain_free_irqs(struct irq_domain *domain, struct device *dev)
+>>  		 * entry. If that's the case, don't do anything.
+>>  		 */
+>>  		if (desc->irq) {
+>> +			msi_handle_doorbell_mappings(
+>> +				irq_get_irq_data(desc->irq),
+>> +				false);
+>>  			irq_domain_free_irqs(desc->irq, desc->nvec_used);
+>>  			desc->irq = 0;
+> 
+> Can you please restructure the code so it reads
+> 
+> 		if (desc->irq)
+> 			continue;
+> 
+> 		msi_handle_doorbell_mappings(irq_get_irq_data(desc->irq),
+> 					     false);	
+> 		irq_domain_free_irqs(desc->irq, desc->nvec_used);
+> 		desc->irq = 0;
+> 
+> Just blindly whacking stuff into the 80 char limit is not helping readability.
+> 
+> Thanks,
+> 
+> 	tglx
+> 
