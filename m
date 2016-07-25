@@ -1,226 +1,282 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v11 09/10] genirq/msi: map/unmap the MSI doorbells on
- msi_domain_alloc/free_irqs
-Date: Mon, 25 Jul 2016 18:21:45 +0200
-Message-ID: <75f5e846-6ca4-4178-e7aa-fed90e45e546@redhat.com>
-References: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
- <1468933367-23159-10-git-send-email-eric.auger@redhat.com>
- <alpine.DEB.2.11.1607201016060.3564@nanos>
+From: Stefan Agner <stefan@agner.ch>
+Subject: Re: KVM on ARM crashes with new VGIC v4.7-rc7
+Date: Mon, 25 Jul 2016 09:18:55 -0700
+Message-ID: <1a2112261a5d91b614f793494292a4eb@agner.ch>
+References: <e2f7196ca6c70c55463a45b490f6731a@agner.ch>
+ <8b70c7e1-2e80-4366-97f6-505c0dc7cd64@arm.com>
+ <20160722143551.llypjpouhxdvkonq@kamzik.localdomain>
+ <57923E5F.30709@arm.com>
+ <20160722173823.dcen33yyqqixmwkm@kamzik.localdomain>
+ <57925CA0.7050904@arm.com> <762a6ad33268025f10b2198891e56d4d@agner.ch>
+ <20160724132255.69ae1979@why.wild-wind.fr.eu.org>
+ <20160724133604.7a538c75@why.wild-wind.fr.eu.org>
+ <c2b5c9f6c99ca63b50f45f46ed52c7cc@agner.ch>
+ <27e9b553-5e6b-a68b-832e-cd8b7687debf@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <alpine.DEB.2.11.1607201016060.3564@nanos>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, jason@lakedaemon.net, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org, Bharat.Bhushan@freescale.com, pranav.sawargaonkar@gmail.com, p.fedin@samsung.com, iommu@lists.linux-foundation.org, Jean-Philippe.Brucker@arm.com, yehuday@marvell.com, Manish.Jaggi@caviumnetworks.com, robert.richter@caviumnetworks.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 45C5A4113E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 12:17:15 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8DFtp04QCLzO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jul 2016 12:17:13 -0400 (EDT)
+Received: from mail.kmu-office.ch (mail.kmu-office.ch [178.209.48.109])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F5D540C9D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 12:17:13 -0400 (EDT)
+In-Reply-To: <27e9b553-5e6b-a68b-832e-cd8b7687debf@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Thomas,
+On 2016-07-25 06:33, Andre Przywara wrote:
+> Hi Stefan,
+> 
+> On 25/07/16 07:36, Stefan Agner wrote:
+>> On 2016-07-24 05:36, Marc Zyngier wrote:
+>>> On Sun, 24 Jul 2016 13:22:55 +0100
+>>> Marc Zyngier <marc.zyngier@arm.com> wrote:
+>>>
+>>>> On Fri, 22 Jul 2016 10:56:44 -0700
+>>>> Stefan Agner <stefan@agner.ch> wrote:
+>>>>
+>>>>> On 2016-07-22 10:49, Marc Zyngier wrote:
+>>>>>> On 22/07/16 18:38, Andrew Jones wrote:
+>>>>>>> On Fri, Jul 22, 2016 at 04:40:15PM +0100, Marc Zyngier wrote:
+>>>>>>>> On 22/07/16 15:35, Andrew Jones wrote:
+>>>>>>>>> On Fri, Jul 22, 2016 at 11:42:02AM +0100, Andre Przywara wrote:
+>>>>>>>>>> Hi Stefan,
+>>>>>>>>>>
+>>>>>>>>>> On 22/07/16 06:57, Stefan Agner wrote:
+>>>>>>>>>>> Hi,
+>>>>>>>>>>>
+>>>>>>>>>>> I tried KVM on a Cortex-A7 platform (i.MX 7Dual SoC) and encountered
+>>>>>>>>>>> this stack trace immediately after invoking qemu-system-arm:
+>>>>>>>>>>>
+>>>>>>>>>>> Unable to handle kernel paging request at virtual address ffffffe4
+>>>>>>>>>>> pgd = 8ca52740
+>>>>>>>>>>> [ffffffe4] *pgd=80000080007003, *pmd=8ff7e003, *pte=00000000
+>>>>>>>>>>> Internal error: Oops: 207 [#1] SMP ARM
+>>>>>>>>>>> Modules linked in:
+>>>>>>>>>>> CPU: 0 PID: 329 Comm: qemu-system-arm Tainted: G        W
+>>>>>>>>>>> 4.7.0-rc7-00094-gea3ed2c #109
+>>>>>>>>>>> Hardware name: Freescale i.MX7 Dual (Device Tree)
+>>>>>>>>>>> task: 8ca3ee40 ti: 8d2b0000 task.ti: 8d2b0000
+>>>>>>>>>>> PC is at do_raw_spin_lock+0x8/0x1dc
+>>>>>>>>>>> LR is at kvm_vgic_flush_hwstate+0x8c/0x224
+>>>>>>>>>>> pc : [<8027c87c>]    lr : [<802172d4>]    psr: 60070013
+>>>>>>>>>>> sp : 8d2b1e38  ip : 8d2b0000  fp : 00000001
+>>>>>>>>>>> r10: 8d2b0000  r9 : 00010000  r8 : 8d2b8e54
+>>>>>>>>>>> fec 30be0000.ethernet eth0: MDIO read timeout
+>>>>>>>>>>> r7 : 8d2b8000  r6 : 8d2b8e74  r5 : 00000000  r4 : ffffffe0
+>>>>>>>>>>> r3 : 00004ead  r2 : 00000000  r1 : 00000000  r0 : ffffffe0
+>>>>>>>>>>> Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+>>>>>>>>>>> Control: 30c5387d  Table: 8ca52740  DAC: fffffffd
+>>>>>>>>>>> Process qemu-system-arm (pid: 329, stack limit = 0x8d2b0210)
+>>>>>>>>>>> Stack: (0x8d2b1e38 to 0x8d2b2000)
+>>>>>>>>>>> 1e20:                                                       ffffffe0
+>>>>>>>>>>> 00000000
+>>>>>>>>>>> 1e40: 8d2b8e74 8d2b8000 8d2b8e54 00010000 8d2b0000 802172d4 8d2b8000
+>>>>>>>>>>> 810074f8
+>>>>>>>>>>> 1e60: 81007508 8ca5f800 8d284000 00010000 8d2b0000 8020fbd4 8ce9a000
+>>>>>>>>>>> 8ca5f800
+>>>>>>>>>>> 1e80: 00000000 00010000 00000000 00ff0000 8d284000 00000000 00000000
+>>>>>>>>>>> 7ffbfeff
+>>>>>>>>>>> 1ea0: fffffffe 00000000 8d28b780 00000000 755fec6c 00000000 00000000
+>>>>>>>>>>> ffffe000
+>>>>>>>>>>> 1ec0: 8d2b8000 00000000 8d28b780 00000000 755fec6c 8020af90 00000000
+>>>>>>>>>>> 8023f248
+>>>>>>>>>>> 1ee0: 0000000a 755fe98c 8d2b1f08 00000008 8021aa84 ffffe000 00000000
+>>>>>>>>>>> 00000000
+>>>>>>>>>>> 1f00: 8a00d860 8d28b780 80334f94 00000000 8d2b0000 80334748 00000000
+>>>>>>>>>>> 00000000
+>>>>>>>>>>> 1f20: 00000000 8d28b780 00004000 00000009 8d28b500 00000024 8104ebee
+>>>>>>>>>>> 80bc2ec4
+>>>>>>>>>>> 1f40: 80bafa24 8034138c 00000000 00000000 80341248 00000000 755fec6c
+>>>>>>>>>>> 007c1e70
+>>>>>>>>>>> 1f60: 00000009 00004258 0000ae80 8d28b781 00000009 8d28b780 0000ae80
+>>>>>>>>>>> 00000000
+>>>>>>>>>>> 1f80: 8d2b0000 00000000 755fec6c 80334f94 007c1e70 322a7400 00004258
+>>>>>>>>>>> 00000036
+>>>>>>>>>>> 1fa0: 8021aa84 8021a900 007c1e70 322a7400 00000009 0000ae80 00000000
+>>>>>>>>>>> 755feac0
+>>>>>>>>>>> 1fc0: 007c1e70 322a7400 00004258 00000036 7e9aff58 01151da4 76f8b4c0
+>>>>>>>>>>> 755fec6c
+>>>>>>>>>>> 1fe0: 0038192c 755fea9c 00048ae7 7697d66c 60070010 00000009 00000000
+>>>>>>>>>>> 00000000
+>>>>>>>>>>> [<8027c87c>] (do_raw_spin_lock) from [<802172d4>]
+>>>>>>>>>>> (kvm_vgic_flush_hwstate+0x8c/0x224)
+>>>>>>>>>>> [<802172d4>] (kvm_vgic_flush_hwstate) from [<8020fbd4>]
+>>>>>>>>>>> (kvm_arch_vcpu_ioctl_run+0x110/0x478)
+>>>>>>>>>>> [<8020fbd4>] (kvm_arch_vcpu_ioctl_run) from [<8020af90>]
+>>>>>>>>>>> (kvm_vcpu_ioctl+0x2e0/0x6d4)
+>>>>>>>>>>> [<8020af90>] (kvm_vcpu_ioctl) from [<80334748>]
+>>>>>>>>>>> (do_vfs_ioctl+0xa0/0x8b8)
+>>>>>>>>>>> [<80334748>] (do_vfs_ioctl) from [<80334f94>] (SyS_ioctl+0x34/0x5c)
+>>>>>>>>>>> [<80334f94>] (SyS_ioctl) from [<8021a900>] (ret_fast_syscall+0x0/0x1c)
+>>>>>>>>>>> Code: e49de004 ea09ea24 e92d47f0 e3043ead (e5902004)
+>>>>>>>>>>> ---[ end trace cb88537fdc8fa206 ]---
+>>>>>>>>>>>
+>>>>>>>>>>> I use CONFIG_KVM_NEW_VGIC=y. This happens to me with a rather minimal
+>>>>>>>>>>> qemu invocation (qemu-system-arm -enable-kvm -M virt -cpu host
+>>>>>>>>>>> -nographic -serial stdio -kernel zImage).
+>>>>>>>>>>>
+>>>>>>>>>>> Using a bit older Qemu version 2.4.0.
+>>>>>>>>>>
+>>>>>>>>>> I just tried with a self compiled QEMU 2.4.0 and the Ubuntu 14.04
+>>>>>>>>>> provided 2.0.0, it worked fine with Linus' current HEAD as a host kernel
+>>>>>>>>>> on a Midway (Cortex-A15).
+>>>>>>>>>
+>>>>>>>>> I can reproduce the issue with a latest QEMU build on AMD Seattle
+>>>>>>>>> (I haven't tried anywhere else yet)
+>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> Can you try to disable the new VGIC, just to see if that's a regression?
+>>>>>>>>>
+>>>>>>>>> Disabling NEW_VGIC "fixes" guest boots.
+>>>>>>>>>
+>>>>>>>>> I'm not using defconfig for my host kernel. I'll do a couple more
+>>>>>>>>> tests and provide a comparison of my config vs. a defconfig in
+>>>>>>>>> a few minutes.
+>>>>>>>>
+>>>>>>>> Damn. It is not failing for me, so it has to be a kernel config thing...
+>>>>>>>> If you can narrow it down to the difference with defconfig, that'd be
+>>>>>>>> tremendously helpful.
+>>>>>>>
+>>>>>>> It's PAGE_SIZE; 64K doesn't work, 4K does, regardless of VA_BITS
+>>>>>>> selection.
+>>>>>>
+>>>>>> That definitely doesn't match Stefan's report (32bit only has 4k). I'll
+>>>>>
+>>>>> Hehe, was just plowing through code and came to that conclusion, glad I
+>>>>> got that right :-)
+>>>>>
+>>>>> What defconfig do you use? I could reproduce the issue also with
+>>>>> multi_v7_defconfig + ARM_LPAE + KVM.
+>>>>
+>>>> I'm now on -rc7 with multi_v7_defconfig + LPAE + KVM (and everything
+>>>> built-in to make my life simpler). The host works perfectly, and I can
+>>>> spawn VMs without any issue.
+>>>>
+>>>> I've tested with QEMU emulator version 2.2.0 (Debian 1:2.2+dfsg-5exp)
+>>>> as packaged with Jessie from a while ago. I've also upgraded the box to
+>>>> something more recent (2.5), same effect.
+>>>>
+>>>>>
+>>>>> Btw, I am not exactly on vanilla 4.7-rc7, I merged Shawns for-next +
+>>>>> clock next to get to the bits and pieces required for my board...
+>>>>>
+>>>>> That said, it works fine otherwise, and the stacktrace looks rather
+>>>>> platform independent...
+>>>>
+>>>> Indeed, and if these clocks were doing anything unsavoury, we'd
+>>>> probably see other things exploding. So we need to find out where we
+>>>> are diverging.
+>>>>
+>>>> What compiler are you using? I just noticed that my build
+>>>> infrastructure is a bit outdated for 32bit ARM (gcc 4.9.2), so I'm
+>>>> going to upgrade that to gcc 5.3 and retest.
+>>
+>> As you expected, the clock fix did not influence this problem. Still the
+>> same. I ran strace several times, the crash seems to happen always about
+>> the same time, maybe this gives you a hint?
+>>
+>> ioctl(9, KVM_CHECK_EXTENSION or LOGGER_GET_NEXT_ENTRY_LEN, 0x10) = 1
+>> mmap2(NULL, 2101248, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) =
+>> 0xa3bff000
+>> mmap2(0xa3c00000, 4096, PROT_READ|PROT_WRITE,
+>> MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0xa3c00000
+>> munmap(0xa3bff000, 4096)                = 0
+>> munmap(0xa3c02000, 2088960)             = 0
+>> madvise(0xa3c00000, 4096, MADV_MERGEABLE) = -1 EINVAL (Invalid argument)
+>> madvise(0xa3c00000, 4096, MADV_HUGEPAGE) = -1 EINVAL (Invalid argument)
+>> madvise(0xa3c00000, 4096, MADV_DONTFORK) = 0
+>> ioctl(9, KVM_CHECK_EXTENSION or LOGGER_GET_NEXT_ENTRY_LEN, 0x10) = 1
+>> futex(0x9afe3c, FUTEX_CMP_REQUEUE_PRIVATE, 1, 2147483647, 0x4957a8, 4) =
+>> 1
+>> tgkill(450, 452, SIGUSR1)               = 0
+>> futex(0x4957a8, FUTEX_WAKE_PRIVATE, 1)  = 1
+>> futex(0x4956a8, FUTEX_WAKE_PRIVATE, 1)  = 1
+>> futex(0x4956ac, FUTEX_WAIT_PRIVATE, 3, NULL) = -1 EAGAIN (Resource
+>> temporarily unavailable)
+>> ioctl(11, KVM_ARM_VCPU_INIT, 0xbe8be99c) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> ioctl(11, KVM_ARM_SET_DEVICE_ADDR or KVM_GET_ONE_REG, 0xbe8be998) = 0
+>> [   20.383970] Unable to handle kernel paging request at virtual address
+>> fffffffc
+> 
+> 
+> Did you run that strace with -f to catch the children's (VCPUs) ioctls
+> as well? If not, can you do this, please?
 
-On 20/07/2016 11:04, Thomas Gleixner wrote:
-> On Tue, 19 Jul 2016, Eric Auger wrote:
->>  /**
->> + * msi_handle_doorbell_mappings: in case the irq data corresponds to an
->> + * MSI that requires iommu mapping, traverse the irq domain hierarchy
->> + * to retrieve the doorbells to handle and iommu_map/unmap them according
->> + * to @map boolean.
->> + *
->> + * @data: irq data handle
->> + * @map: mapping if true, unmapping if false
->> + */
-> 
-> 
-> Please run that through the kernel doc generator. It does not work that way.
-> 
-> The format is:
-> 
-> /**
->  * function_name - Short function description    
->  * @arg1:	Description of arg1
->  * @argument2:	Description of argument2
->  *
->  * Long explanation including documentation of the return values.
->  */
-> 
->> +static int msi_handle_doorbell_mappings(struct irq_data *data, bool map)
->> +{
->> +	const struct irq_chip_msi_doorbell_info *dbinfo;
->> +	struct iommu_domain *domain;
->> +	struct irq_chip *chip;
->> +	struct device *dev;
->> +	dma_addr_t iova;
->> +	int ret = 0, cpu;
->> +
->> +	while (data) {
->> +		dev = msi_desc_to_dev(irq_data_get_msi_desc(data));
->> +		domain = iommu_msi_domain(dev);
->> +		if (domain) {
->> +			chip = irq_data_get_irq_chip(data);
->> +			if (chip->msi_doorbell_info)
->> +				break;
->> +		}
->> +		data = data->parent_data;
->> +	}
-> 
-> Please split that out into a seperate function
-> 
-> struct irq_data *msi_get_doorbell_info(data)
-> {
-> 	.....
-> 		if (chip->msi_doorbell_info)
-> 			return chip->msi_get_doorbell_info(data);
-> 	}
-> 	return NULL;
-> }
-> 
->        info = msi_get_doorbell_info(data);
->        .....
-> 
->> +	if (!data)
->> +		return 0;
->> +
->> +	dbinfo = chip->msi_doorbell_info(data);
->> +	if (!dbinfo)
->> +		return -EINVAL;
->> +
->> +	if (!dbinfo->doorbell_is_percpu) {
->> +		if (!map) {
->> +			iommu_msi_put_doorbell_iova(domain,
->> +						    dbinfo->global_doorbell);
->> +			return 0;
->> +		}
->> +		return iommu_msi_get_doorbell_iova(domain,
->> +						   dbinfo->global_doorbell,
->> +						   dbinfo->size, dbinfo->prot,
->> +						   &iova);
->> +	}
-> 
-> You can spare an indentation level with a helper function
-> 
->     	if (!dbinfo->doorbell_is_percpu)
-> 		return msi_map_global_doorbell(domain, dbinfo);
-> 
->> +
->> +	/* percpu doorbells */
->> +	for_each_possible_cpu(cpu) {
->> +		phys_addr_t __percpu *db_addr =
->> +			per_cpu_ptr(dbinfo->percpu_doorbells, cpu);
->> +
->> +		if (!map) {
->> +			iommu_msi_put_doorbell_iova(domain, *db_addr);
->> +		} else {
->> +
->> +			ret = iommu_msi_get_doorbell_iova(domain, *db_addr,
->> +							  dbinfo->size,
->> +							  dbinfo->prot, &iova);
->> +			if (ret)
->> +				return ret;
->> +		}
->> +	}
-> 
-> Same here:
-> 
-> 	for_each_possible_cpu(cpu) {
-> 		ret = msi_map_percpu_doorbell(domain, cpu);
-> 		if (ret)
-> 			return ret;
-> 	}
->      	return 0;
->      
-> Hmm?
-> 
->> +
->> +	return 0;
->> +}
->> +
->> +/**
->>   * msi_domain_alloc_irqs - Allocate interrupts from a MSI interrupt domain
->>   * @domain:	The domain to allocate from
->>   * @dev:	Pointer to device struct of the device for which the interrupts
->> @@ -352,17 +423,29 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
->>  
->>  		virq = __irq_domain_alloc_irqs(domain, virq, desc->nvec_used,
->>  					       dev_to_node(dev), &arg, false);
->> -		if (virq < 0) {
->> -			ret = -ENOSPC;
->> -			if (ops->handle_error)
->> -				ret = ops->handle_error(domain, desc, ret);
->> -			if (ops->msi_finish)
->> -				ops->msi_finish(&arg, ret);
->> -			return ret;
->> -		}
->> +		if (virq < 0)
->> +			goto error;
->>  
->>  		for (i = 0; i < desc->nvec_used; i++)
->>  			irq_set_msi_desc_off(virq, i, desc);
->> +
->> +		for (i = 0; i < desc->nvec_used; i++) {
->> +			struct irq_data *d = irq_get_irq_data(virq + i);
->> +
->> +			ret = msi_handle_doorbell_mappings(d, true);
->> +			if (ret)
->> +				break;
->> +		}
->> +		if (ret) {
->> +			for (; i >= 0; i--) {
->> +				struct irq_data *d = irq_get_irq_data(virq + i);
->> +
->> +				msi_handle_doorbell_mappings(d, false);
->> +			}
->> +			irq_domain_free_irqs(virq, desc->nvec_used);
->> +			desc->irq = 0;
->> +			goto error;
-> 
-> How is that supposed to work? You clear desc->irq and then you call
-> ops->handle_error.
-if I don't clear the desc->irq I enter an infinite loop in pci_enable_msix_range.
-This happens because msix_capability_init and pcie_enable_msix returns 1.
+I did not. This run is with -f:
 
-In msix_capability_init, at out_avail: we enumerate the msi_desc which have a non
-zero irq, hence the returned value equal to 1.
+http://pastebin.com/2sUi0P1k
 
-Currently the only handle_error ops I found, pci_msi_domain_handle_error does not
-use irq field so works although questionable.
+> I get this sequence here on my (non-crashing) system (4.7-rc7
+> defconfig+kvm running on a BananaPi (dual A7 Allwinner A20)):
+> http://pastebin.com/ayuZMAp9
+> This is with QEMU 2.5.0 and:
+> $ strace -e trace=ioctl -f -o /dev/shm/strace.log qemu-system-arm
+> -enable-kvm -M virt -cpu host -serial stdio -append
+> "console=ttyAMA0,115200n8" -kernel zImage-4.7-rc7
+> 
+> I think the interesting ioctls are from the VCPUs, so can you try to
+> catch them as well?
 
-As for the irq_domain_free_irqs I think I can remove it since handled later.
+After that trace, there is no more strace output, it seems that the
+thread gets killed by SIGSEGV.
 
-How do you advise to handle the above situation?
-
-Thanks
-
-Eric
-
-> 
-> Why are you adding this extra stuff here? Look at the call sites of
-> msi_domain_alloc_irqs(). All of them use msi_domain_free_irqs() in case of
-> error. There is no reason why you can't do the same....
-> 
->>  /**
->> @@ -396,6 +486,9 @@ void msi_domain_free_irqs(struct irq_domain *domain, struct device *dev)
->>  		 * entry. If that's the case, don't do anything.
->>  		 */
->>  		if (desc->irq) {
->> +			msi_handle_doorbell_mappings(
->> +				irq_get_irq_data(desc->irq),
->> +				false);
->>  			irq_domain_free_irqs(desc->irq, desc->nvec_used);
->>  			desc->irq = 0;
-> 
-> Can you please restructure the code so it reads
-> 
-> 		if (desc->irq)
-> 			continue;
-> 
-> 		msi_handle_doorbell_mappings(irq_get_irq_data(desc->irq),
-> 					     false);	
-> 		irq_domain_free_irqs(desc->irq, desc->nvec_used);
-> 		desc->irq = 0;
-> 
-> Just blindly whacking stuff into the 80 char limit is not helping readability.
-> 
-> Thanks,
-> 
-> 	tglx
-> 
+--
+Stefan
