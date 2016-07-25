@@ -1,37 +1,80 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC v9 0/6] KVM: arm/arm64: gsi routing support
-Date: Mon, 25 Jul 2016 09:22:41 +0200
-Message-ID: <ca233656-593e-6118-52f1-263363f99607@redhat.com>
-References: <1469204442-3220-1-git-send-email-eric.auger@redhat.com>
- <20160722171354.GC11512@potion> <57925900.8020104@arm.com>
+Subject: Re: [PATCH v11 4/8] vfio/type1: handle unmap/unpin and replay for
+ VFIO_IOVA_RESERVED slots
+Date: Mon, 25 Jul 2016 09:53:31 +0200
+Message-ID: <36bf6d43-2990-0b7f-7ccd-aaea4212a6a0@redhat.com>
+References: <201607240918.hP8YWSxI%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <57925900.8020104@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: eric.auger.pro@gmail.com, christoffer.dall@linaro.org, andre.przywara@arm.com, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F71F410EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 03:47:18 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id S+RUfk13W9FP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jul 2016 03:47:16 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A33164053F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 03:47:16 -0400 (EDT)
+In-Reply-To: <201607240918.hP8YWSxI%fengguang.wu@intel.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kbuild test robot <lkp@intel.com>
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com, joro@8bytes.org, robert.richter@caviumnetworks.com, jason@lakedaemon.net, marc.zyngier@arm.com, andre.przywara@arm.com, Manish.Jaggi@caviumnetworks.com, alex.williamson@redhat.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, kbuild-all@01.org, pbonzini@redhat.com, robin.murphy@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Radim, Marc,
-On 22/07/2016 19:33, Marc Zyngier wrote:
-> On 22/07/16 18:13, Radim Kr=C4=8Dm=C3=A1=C5=99 wrote:
->> 2016-07-22 16:20+0000, Eric Auger:
->>> With the advent of GICv3 ITS in-kernel emulation, KVM MSI routing
->>> becomes mandated for proper VIRTIO-PCI vhost integration.
->>
->> Changes to interfaces and common code look ok,
->>
->> Acked-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
->=20
-> I'll let it sink into -next for a few days, so that I can rerun my
-> non-reg stuff, and will send another PR if everything turns green.
->=20
-> Thanks you both for the quick turnaround!
-Thank you for your support!
+Hi,
+
+On 24/07/2016 03:41, kbuild test robot wrote:
+> Hi,
+> 
+> [auto build test ERROR on vfio/next]
+> [also build test ERROR on v4.7-rc7 next-20160722]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Eric-Auger/KVM-PCIe-MSI-passthrough-on-ARM-ARM64-kernel-part-3-3-vfio-changes/20160724-082318
+> base:   https://github.com/awilliam/linux-vfio.git next
+> config: x86_64-rhel (attached as .config)
+> compiler: gcc-6 (Debian 6.1.1-9) 6.1.1 20160705
+> reproduce:
+>         # save the attached .config to linux build tree
+>         make ARCH=x86_64 
+> 
+> All errors (new ones prefixed by >>):
+> 
+>>> drivers/vfio/vfio_iommu_type1.c:39:29: fatal error: linux/msi-iommu.h: No such file or directory
+>     #include <linux/msi-iommu.h>
+>                                 ^
+>    compilation terminated.
+> 
+> vim +39 drivers/vfio/vfio_iommu_type1.c
+> 
+>     33	#include <linux/rbtree.h>
+>     34	#include <linux/sched.h>
+>     35	#include <linux/slab.h>
+>     36	#include <linux/uaccess.h>
+>     37	#include <linux/vfio.h>
+>     38	#include <linux/workqueue.h>
+>   > 39	#include <linux/msi-iommu.h>
+Dependency on part I of this series.
+
+Thanks
 
 Eric
->=20
-> 	M.
->=20
+>     40	
+>     41	#define DRIVER_VERSION  "0.2"
+>     42	#define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
+> 
+> ---
+> 0-DAY kernel test infrastructure                Open Source Technology Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+> 
