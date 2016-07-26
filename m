@@ -1,24 +1,27 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: Re: usb keyboard and mouse can't work on QEMU ARM64 with KVM
-Date: Tue, 26 Jul 2016 16:39:54 +0800
-Message-ID: <579721DA.1000808@huawei.com>
-References: <57971270.1010008@huawei.com>
- <CAKv+Gu8jzjLjpC7FR4fq13H+4rThQsW=fpMZ0F3Qfc45Gj1XSw@mail.gmail.com>
+From: Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v11 09/10] genirq/msi: map/unmap the MSI doorbells on
+ msi_domain_alloc/free_irqs
+Date: Tue, 26 Jul 2016 11:00:21 +0200 (CEST)
+Message-ID: <alpine.DEB.2.11.1607261022330.19896@nanos>
+References: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
+ <1468933367-23159-10-git-send-email-eric.auger@redhat.com>
+ <alpine.DEB.2.11.1607201016060.3564@nanos>
+ <75f5e846-6ca4-4178-e7aa-fed90e45e546@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3F2149B46
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2016 04:37:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1C7049B6D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2016 04:56:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gX+qlCg4fkHY for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Jul 2016 04:37:24 -0400 (EDT)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [119.145.14.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C4F4E41AF6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2016 04:37:23 -0400 (EDT)
-In-Reply-To: <CAKv+Gu8jzjLjpC7FR4fq13H+4rThQsW=fpMZ0F3Qfc45Gj1XSw@mail.gmail.com>
+ with ESMTP id TZ79XKHXVpEi for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Jul 2016 04:56:13 -0400 (EDT)
+Received: from Galois.linutronix.de (Galois.linutronix.de [146.0.238.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F50949B6B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2016 04:56:13 -0400 (EDT)
+In-Reply-To: <75f5e846-6ca4-4178-e7aa-fed90e45e546@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,85 +31,55 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <shannon.zhao@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com, joro@8bytes.org, robert.richter@caviumnetworks.com, Jason Cooper <jason@lakedaemon.net>, Marc Zyngier <marc.zyngier@arm.com>, andre.przywara@arm.com, Manish.Jaggi@caviumnetworks.com, alex.williamson@redhat.com, Bjorn Helgaas <bhelgaas@google.com>, LAK <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, iommu@lists.linux-foundation.org, pbonzini@redhat.com, robin.murphy@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CgpPbiAyMDE2LzcvMjYgMTY6MDcsIEFyZCBCaWVzaGV1dmVsIHdyb3RlOgo+IE9uIDI2IEp1bHkg
-MjAxNiBhdCAwOTozNCwgU2hhbm5vbiBaaGFvIDx6aGFvc2hlbmdsb25nQGh1YXdlaS5jb20+IHdy
-b3RlOgo+PiA+IEhp77yMCj4+ID4KPj4gPiBSZWNlbnRseSBJJ20gdHJ5aW5nIHRvIHVzZSB1c2Ig
-a2V5Ym9hcmQgYW5kIG1vdXNlIHdpdGggUUVNVSBvbiBBUk02NC4gQmVsb3cgaXMgbXkgUUVNVSBj
-b21tYW5kIGxpbmUsCj4+ID4gaG9zdCBhbmQgZ3Vlc3Qga2VybmVsIGJvdGggYXJlIDQuNy4wLXJj
-NyssIGFuZCBJIHJhbiBpdCBvbiBIaWtleSBib2FyZC4KPj4gPgo+PiA+ICAgICBxZW11LXN5c3Rl
-bS1hYXJjaDY0IFwKPj4gPiAgICAgLXNtcCAxIC1jcHUgaG9zdCAtZW5hYmxlLWt2bSBcCj4+ID4g
-ICAgIC1tIDI1NiAtTSB2aXJ0IFwKPj4gPiAgICAgLWsgZW4tdXMgXAo+PiA+ICAgICAtbm9ncmFw
-aGljIFwKPj4gPiAgICAgLWRldmljZSB1c2ItZWhjaSAtZGV2aWNlIHVzYi1rYmQgLWRldmljZSB1
-c2ItbW91c2UgLXVzYlwKPj4gPiAgICAgLWtlcm5lbCBJbWFnZSBcCj4+ID4gICAgIC1pbml0cmQg
-Z3Vlc3Rmcy5jcGlvLmd6IFwKPj4gPiAgICAgLWFwcGVuZCAicmRpbml0PS9zYmluL2luaXQgY29u
-c29sZT10dHlBTUEwIHJvb3Q9L2Rldi9yYW0gZWFybHljb249cGwwMTEsMHg5MDAwMDAwIHJ3Igo+
-PiA+Cj4+ID4gVGhlIGZvbGxvd2luZyBndWVzdCBsb2cgc2hvd3MgdGhhdCB1c2IgY29udHJvbGxl
-ciBjYW4gYmUgcHJvYmVkIGJ1dCB0aGUga2V5Ym9hcmQgYW5kIG1vdXNlIGNhbid0IGJlCj4+ID4g
-Zm91bmQuCj4+ID4KPj4gPiBbICAgIDEuNTk3NDMzXSBlaGNpX2hjZDogVVNCIDIuMCAnRW5oYW5j
-ZWQnIEhvc3QgQ29udHJvbGxlciAoRUhDSSkgRHJpdmVyCj4+ID4gWyAgICAxLjU5OTU2Ml0gZWhj
-aS1wY2k6IEVIQ0kgUENJIHBsYXRmb3JtIGRyaXZlcgo+PiA+IFsgICAgMS42MDgwODJdIGVoY2kt
-cGNpIDAwMDA6MDA6MDMuMDogRUhDSSBIb3N0IENvbnRyb2xsZXIKPj4gPiBbICAgIDEuNjA5NDg1
-XSBlaGNpLXBjaSAwMDAwOjAwOjAzLjA6IG5ldyBVU0IgYnVzIHJlZ2lzdGVyZWQsIGFzc2lnbmVk
-IGJ1cyBudW1iZXIgMQo+PiA+IFsgICAgMS42MTE4MzNdIGVoY2ktcGNpIDAwMDA6MDA6MDMuMDog
-aXJxIDQ5LCBpbyBtZW0gMHgxMDA0MTAwMAo+PiA+IFsgICAgMS42MjM1OTldIGVoY2ktcGNpIDAw
-MDA6MDA6MDMuMDogVVNCIDIuMCBzdGFydGVkLCBFSENJIDEuMDAKPj4gPiBbICAgIDEuNjI1ODY3
-XSBodWIgMS0wOjEuMDogVVNCIGh1YiBmb3VuZAo+PiA+IFsgICAgMS42MjY5MDZdIGh1YiAxLTA6
-MS4wOiA2IHBvcnRzIGRldGVjdGVkCj4+ID4gWyAgICAxLjYyODY4NV0gZWhjaS1wbGF0Zm9ybTog
-RUhDSSBnZW5lcmljIHBsYXRmb3JtIGRyaXZlcgo+PiA+IFsgICAgMS42MzAyNjNdIGVoY2ktbXNt
-OiBRdWFsY29tbSBPbi1DaGlwIEVIQ0kgSG9zdCBDb250cm9sbGVyCj4+ID4gWyAgICAxLjYzMTk0
-N10gb2hjaV9oY2Q6IFVTQiAxLjEgJ09wZW4nIEhvc3QgQ29udHJvbGxlciAoT0hDSSkgRHJpdmVy
-Cj4+ID4gWyAgICAxLjYzMzU0N10gb2hjaS1wY2k6IE9IQ0kgUENJIHBsYXRmb3JtIGRyaXZlcgo+
-PiA+IFsgICAgMS42MzQ4MDddIG9oY2ktcGxhdGZvcm06IE9IQ0kgZ2VuZXJpYyBwbGF0Zm9ybSBk
-cml2ZXIKPj4gPiBbLi4uXQo+PiA+IFsgICAgMS45MzkwMDFdIHVzYiAxLTE6IG5ldyBoaWdoLXNw
-ZWVkIFVTQiBkZXZpY2UgbnVtYmVyIDIgdXNpbmcgZWhjaS1wY2kKPj4gPiBbICAgMTcuNDY3MDQw
-XSB1c2IgMS0xOiBkZXZpY2Ugbm90IGFjY2VwdGluZyBhZGRyZXNzIDIsIGVycm9yIC0xMTAKPj4g
-PiBbICAgMTcuNTc5MTY1XSB1c2IgMS0xOiBuZXcgaGlnaC1zcGVlZCBVU0IgZGV2aWNlIG51bWJl
-ciAzIHVzaW5nIGVoY2ktcGNpCj4+ID4gWyAgIDMyLjI4NzI0Ml0gcmFuZG9tOiBkZCB1cmFuZG9t
-IHJlYWQgd2l0aCA3IGJpdHMgb2YgZW50cm9weSBhdmFpbGFibGUKPj4gPiBbICAgMzMuMTEwOTcw
-XSB1c2IgMS0xOiBkZXZpY2Ugbm90IGFjY2VwdGluZyBhZGRyZXNzIDMsIGVycm9yIC0xMTAKPj4g
-PiBbICAgMzMuMjIzMDMwXSB1c2IgMS0xOiBuZXcgaGlnaC1zcGVlZCBVU0IgZGV2aWNlIG51bWJl
-ciA0IHVzaW5nIGVoY2ktcGNpCj4+ID4gWyAgIDQzLjYzNTE4NV0gdXNiIDEtMTogZGV2aWNlIG5v
-dCBhY2NlcHRpbmcgYWRkcmVzcyA0LCBlcnJvciAtMTEwCj4+ID4gWyAgIDQzLjc0NzAzM10gdXNi
-IDEtMTogbmV3IGhpZ2gtc3BlZWQgVVNCIGRldmljZSBudW1iZXIgNSB1c2luZyBlaGNpLXBjaQo+
-PiA+IFsgICA1NC4xNTkwNDNdIHVzYiAxLTE6IGRldmljZSBub3QgYWNjZXB0aW5nIGFkZHJlc3Mg
-NSwgZXJyb3IgLTExMAo+PiA+IFsgICA1NC4xNjA3NTJdIHVzYiB1c2IxLXBvcnQxOiB1bmFibGUg
-dG8gZW51bWVyYXRlIFVTQiBkZXZpY2UKPj4gPiBbICAgNTQuMzA3MjkwXSB1c2IgMS0yOiBuZXcg
-aGlnaC1zcGVlZCBVU0IgZGV2aWNlIG51bWJlciA2IHVzaW5nIGVoY2ktcGNpCj4+ID4gWyAgIDY5
-LjgzOTA1Ml0gdXNiIDEtMjogZGV2aWNlIG5vdCBhY2NlcHRpbmcgYWRkcmVzcyA2LCBlcnJvciAt
-MTEwCj4+ID4gWyAgIDY5Ljk1MTI0OV0gdXNiIDEtMjogbmV3IGhpZ2gtc3BlZWQgVVNCIGRldmlj
-ZSBudW1iZXIgNyB1c2luZyBlaGNpLXBjaQo+PiA+IFsgICA4NS40ODMxNzFdIHVzYiAxLTI6IGRl
-dmljZSBub3QgYWNjZXB0aW5nIGFkZHJlc3MgNywgZXJyb3IgLTExMAo+PiA+IFsgICA4NS41OTUw
-MzVdIHVzYiAxLTI6IG5ldyBoaWdoLXNwZWVkIFVTQiBkZXZpY2UgbnVtYmVyIDggdXNpbmcgZWhj
-aS1wY2kKPj4gPiBbICAgOTAuNjE5MjQ3XSB1c2IgMS0yOiBkZXZpY2UgZGVzY3JpcHRvciByZWFk
-LzgsIGVycm9yIC0xMTAKPj4gPiBbICAgOTUuNzQzNDgyXSB1c2IgMS0yOiBkZXZpY2UgZGVzY3Jp
-cHRvciByZWFkLzgsIGVycm9yIC0xMTAKPj4gPiBbICAgOTUuOTU5MTY1XSB1c2IgMS0yOiBuZXcg
-aGlnaC1zcGVlZCBVU0IgZGV2aWNlIG51bWJlciA5IHVzaW5nIGVoY2ktcGNpCj4+ID4gWyAgMTA2
-LjM3MTE3N10gdXNiIDEtMjogZGV2aWNlIG5vdCBhY2NlcHRpbmcgYWRkcmVzcyA5LCBlcnJvciAt
-MTEwCj4+ID4gWyAgMTA2LjM3Mjg5NF0gdXNiIHVzYjEtcG9ydDI6IHVuYWJsZSB0byBlbnVtZXJh
-dGUgVVNCIGRldmljZQo+PiA+Cj4+ID4gbHN1c2Igc2hvd3M6Cj4+ID4gcm9vdEBnZW5lcmljYXJt
-djg6fiMgbHN1c2IKPj4gPiBCdXMgMDAxIERldmljZSAwMDE6IElEIDFkNmI6MDAwMgo+PiA+Cj4+
-ID4gQmVzaWRlcywgSSBoYXZlIGFsc28gdHJpZWQgUUVNVSBUQ0cgd2l0aG91dCBLVk0uIFRoZSBn
-dWVzdCBjYW4gc3VjY2Vzc2Z1bGx5IHByb2JlIHVzYiBjb250cm9sbGVyLAo+PiA+IGtleWJvYXJk
-IGFuZCBtb3VzZS4KPj4gPiBsc3VzYiBzaG93czoKPj4gPiByb290QGdlbmVyaWNhcm12ODp+IyBs
-c3VzYgo+PiA+IEJ1cyAwMDEgRGV2aWNlIDAwMjogSUQgMDYyNzowMDAxCj4+ID4gQnVzIDAwMSBE
-ZXZpY2UgMDAzOiBJRCAwNjI3OjAwMDEKPj4gPiBCdXMgMDAxIERldmljZSAwMDE6IElEIDFkNmI6
-MDAwMgo+PiA+Cj4+ID4gU28gaXQgbG9va3MgbGlrZSB0aGF0IHVzYiBrZXlib2FyZCBhbmQgbW91
-c2UgZG9uJ3Qgd29yayB3aXRoIEtWTSBvbiBRRU1VIEFSTTY0IHdoaWxlIHRoZXkgY2FuIHdvcmsK
-Pj4gPiB3aXRoIFRDRy4gSUlVQywgYWxsIHRoZSB1c2IgZGV2aWNlcyBhcmUgZW11bGF0ZWQgYnkg
-UUVNVSwgaXQgaGFzIG5vdGhpbmcgd2l0aCBLVk0uIFNvIGl0IHJlYWxseQo+PiA+IGNvbmZ1c2Vk
-IG1lIGFuZCBJJ20gbm90IGZhbWlsaWFyIHdpdGggdXNiIGRldmljZXMuIEFsc28gSSBoYXZlIHNl
-ZW4gc29tZW9uZSBlbHNlIHJlcG9ydHMgdGhpcyBpc3N1ZQo+PiA+IGJlZm9yZVsxXS4KPj4gPgo+
-PiA+IFsxXWh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1hcm0vMjAxNi0w
-Ni9tc2cwMDExMC5odG1sCj4+ID4KPj4gPiBBbnkgY29tbWVudHMgYW5kIGhlbHAgYXJlIHdlbGNv
-bWUuIFRoYW5rcyBpbiBhZHZhbmNlLgo+PiA+Cj4gRG9lcyB5b3VyIFFFTVUgaGF2ZSB0aGlzIHBh
-dGNoPwo+IGh0dHA6Ly9naXQucWVtdS5vcmcvP3A9cWVtdS5naXQ7YT1jb21taXRkaWZmO2g9NWQ2
-MzZlMjFjNDRlY2Y5ODJhMjJhN2JjNGNhODkxODYwNzlhYzI4MwoKR3JlYXQhIEkgYXBwbGllZCB0
-aGlzIHBhdGNoIGFuZCB0aGUga2V5Ym9hcmQgYW5kIG1vdXNlIGNhbiB3b3JrIHdpdGggS1ZNCm5v
-dy4gVGhhbmtzIGEgbG90LCBBcmQuCgpUaGFua3MsCi0tIApTaGFubm9uCgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2
-bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUv
-bWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+B1;2802;0cEric,
+
+On Mon, 25 Jul 2016, Auger Eric wrote:
+> On 20/07/2016 11:04, Thomas Gleixner wrote:
+> > On Tue, 19 Jul 2016, Eric Auger wrote:
+> >> +		if (ret) {
+> >> +			for (; i >= 0; i--) {
+> >> +				struct irq_data *d = irq_get_irq_data(virq + i);
+> >> +
+> >> +				msi_handle_doorbell_mappings(d, false);
+> >> +			}
+> >> +			irq_domain_free_irqs(virq, desc->nvec_used);
+> >> +			desc->irq = 0;
+> >> +			goto error;
+> > 
+> > How is that supposed to work? You clear desc->irq and then you call
+> > ops->handle_error.
+>
+> if I don't clear the desc->irq I enter an infinite loop in
+> pci_enable_msix_range.
+>
+> This happens because msix_capability_init and pcie_enable_msix returns 1.
+> In msix_capability_init, at out_avail: we enumerate the msi_desc which have
+> a non zero irq, hence the returned value equal to 1.
+>
+> Currently the only handle_error ops I found, pci_msi_domain_handle_error
+> does not use irq field so works although questionable.
+
+The logic here is: If the allocation does not succeed for the requested number
+of interrupts, we tell the caller how many interrupts we were able to set up.
+So the caller can decide what to do.
+
+In your case you don't want to have a partial allocation, so instead of
+playing silly games with desc->irq you should add a flag which tells the PCI
+code that you are not interested in a partial allocation and that it should
+return an error code instead.
+
+Something like PCI_DEV_FLAGS_MSI_NO_PARTIAL_ALLOC should do the trick.
+
+> As for the irq_domain_free_irqs I think I can remove it since handled later.
+
+Not only the free_irqs(). You should let the teardown function handle
+everything including your doorbell mapping teardown. It's nothing special and
+free_msi_irqs() at the end of msix_capability_init() will take care of it.
+
+Thanks,
+
+	tglx
