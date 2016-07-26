@@ -1,31 +1,21 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: KVM on ARM crashes with new VGIC v4.7-rc7
-Date: Mon, 25 Jul 2016 18:06:07 +0100
-Message-ID: <579646FF.2060606@arm.com>
-References: <e2f7196ca6c70c55463a45b490f6731a@agner.ch>
- <8b70c7e1-2e80-4366-97f6-505c0dc7cd64@arm.com>
- <20160722143551.llypjpouhxdvkonq@kamzik.localdomain> <57923E5F.30709@arm.com>
- <20160722173823.dcen33yyqqixmwkm@kamzik.localdomain>
- <57925CA0.7050904@arm.com> <762a6ad33268025f10b2198891e56d4d@agner.ch>
- <20160724132255.69ae1979@why.wild-wind.fr.eu.org>
- <20160724133604.7a538c75@why.wild-wind.fr.eu.org>
- <fc490685f98356a6bcf68270c7b81e5e@agner.ch> <5795C9C6.6090409@arm.com>
- <398a46034db9f5bdcf85ff8e9c8523fb@agner.ch>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: usb keyboard and mouse can't work on QEMU ARM64 with KVM
+Date: Tue, 26 Jul 2016 15:34:08 +0800
+Message-ID: <57971270.1010008@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B2D3C49B4C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 12:59:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FD1C49B3C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2016 03:28:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4YSWKtwTDj1s for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jul 2016 12:59:45 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0C4949B45
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jul 2016 12:59:44 -0400 (EDT)
-In-Reply-To: <398a46034db9f5bdcf85ff8e9c8523fb@agner.ch>
+ with ESMTP id 6RLj+OBswI4N for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Jul 2016 03:28:34 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED70049AFA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2016 03:28:31 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,201 +25,73 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Stefan Agner <stefan@agner.ch>
-Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu
+To: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, qemu-devel <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/07/16 17:52, Stefan Agner wrote:
-> On 2016-07-25 01:11, Marc Zyngier wrote:
->> On 25/07/16 07:14, Stefan Agner wrote:
->>> On 2016-07-24 05:36, Marc Zyngier wrote:
->>>> On Sun, 24 Jul 2016 13:22:55 +0100
->>>> Marc Zyngier <marc.zyngier@arm.com> wrote:
->>>>
->>>>> On Fri, 22 Jul 2016 10:56:44 -0700
->>>>> Stefan Agner <stefan@agner.ch> wrote:
->>>>>
->>>>>> On 2016-07-22 10:49, Marc Zyngier wrote:
->>>>>>> On 22/07/16 18:38, Andrew Jones wrote:
->>>>>>>> On Fri, Jul 22, 2016 at 04:40:15PM +0100, Marc Zyngier wrote:
->>>>>>>>> On 22/07/16 15:35, Andrew Jones wrote:
->>>>>>>>>> On Fri, Jul 22, 2016 at 11:42:02AM +0100, Andre Przywara wrote:
->>>>>>>>>>> Hi Stefan,
->>>>>>>>>>>
->>>>>>>>>>> On 22/07/16 06:57, Stefan Agner wrote:
->>>>>>>>>>>> Hi,
->>>>>>>>>>>>
->>>>>>>>>>>> I tried KVM on a Cortex-A7 platform (i.MX 7Dual SoC) and encountered
->>>>>>>>>>>> this stack trace immediately after invoking qemu-system-arm:
->>>>>>>>>>>>
->>>>>>>>>>>> Unable to handle kernel paging request at virtual address ffffffe4
->>>>>>>>>>>> pgd = 8ca52740
->>>>>>>>>>>> [ffffffe4] *pgd=80000080007003, *pmd=8ff7e003, *pte=00000000
->>>>>>>>>>>> Internal error: Oops: 207 [#1] SMP ARM
->>>>>>>>>>>> Modules linked in:
->>>>>>>>>>>> CPU: 0 PID: 329 Comm: qemu-system-arm Tainted: G        W
->>>>>>>>>>>> 4.7.0-rc7-00094-gea3ed2c #109
->>>>>>>>>>>> Hardware name: Freescale i.MX7 Dual (Device Tree)
->>>>>>>>>>>> task: 8ca3ee40 ti: 8d2b0000 task.ti: 8d2b0000
->>>>>>>>>>>> PC is at do_raw_spin_lock+0x8/0x1dc
->>>>>>>>>>>> LR is at kvm_vgic_flush_hwstate+0x8c/0x224
->>>>>>>>>>>> pc : [<8027c87c>]    lr : [<802172d4>]    psr: 60070013
->>>>>>>>>>>> sp : 8d2b1e38  ip : 8d2b0000  fp : 00000001
->>>>>>>>>>>> r10: 8d2b0000  r9 : 00010000  r8 : 8d2b8e54
->>>>>>>>>>>> fec 30be0000.ethernet eth0: MDIO read timeout
->>>>>>>>>>>> r7 : 8d2b8000  r6 : 8d2b8e74  r5 : 00000000  r4 : ffffffe0
->>>>>>>>>>>> r3 : 00004ead  r2 : 00000000  r1 : 00000000  r0 : ffffffe0
->>>>>>>>>>>> Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
->>>>>>>>>>>> Control: 30c5387d  Table: 8ca52740  DAC: fffffffd
->>>>>>>>>>>> Process qemu-system-arm (pid: 329, stack limit = 0x8d2b0210)
->>>>>>>>>>>> Stack: (0x8d2b1e38 to 0x8d2b2000)
->>>>>>>>>>>> 1e20:                                                       ffffffe0
->>>>>>>>>>>> 00000000
->>>>>>>>>>>> 1e40: 8d2b8e74 8d2b8000 8d2b8e54 00010000 8d2b0000 802172d4 8d2b8000
->>>>>>>>>>>> 810074f8
->>>>>>>>>>>> 1e60: 81007508 8ca5f800 8d284000 00010000 8d2b0000 8020fbd4 8ce9a000
->>>>>>>>>>>> 8ca5f800
->>>>>>>>>>>> 1e80: 00000000 00010000 00000000 00ff0000 8d284000 00000000 00000000
->>>>>>>>>>>> 7ffbfeff
->>>>>>>>>>>> 1ea0: fffffffe 00000000 8d28b780 00000000 755fec6c 00000000 00000000
->>>>>>>>>>>> ffffe000
->>>>>>>>>>>> 1ec0: 8d2b8000 00000000 8d28b780 00000000 755fec6c 8020af90 00000000
->>>>>>>>>>>> 8023f248
->>>>>>>>>>>> 1ee0: 0000000a 755fe98c 8d2b1f08 00000008 8021aa84 ffffe000 00000000
->>>>>>>>>>>> 00000000
->>>>>>>>>>>> 1f00: 8a00d860 8d28b780 80334f94 00000000 8d2b0000 80334748 00000000
->>>>>>>>>>>> 00000000
->>>>>>>>>>>> 1f20: 00000000 8d28b780 00004000 00000009 8d28b500 00000024 8104ebee
->>>>>>>>>>>> 80bc2ec4
->>>>>>>>>>>> 1f40: 80bafa24 8034138c 00000000 00000000 80341248 00000000 755fec6c
->>>>>>>>>>>> 007c1e70
->>>>>>>>>>>> 1f60: 00000009 00004258 0000ae80 8d28b781 00000009 8d28b780 0000ae80
->>>>>>>>>>>> 00000000
->>>>>>>>>>>> 1f80: 8d2b0000 00000000 755fec6c 80334f94 007c1e70 322a7400 00004258
->>>>>>>>>>>> 00000036
->>>>>>>>>>>> 1fa0: 8021aa84 8021a900 007c1e70 322a7400 00000009 0000ae80 00000000
->>>>>>>>>>>> 755feac0
->>>>>>>>>>>> 1fc0: 007c1e70 322a7400 00004258 00000036 7e9aff58 01151da4 76f8b4c0
->>>>>>>>>>>> 755fec6c
->>>>>>>>>>>> 1fe0: 0038192c 755fea9c 00048ae7 7697d66c 60070010 00000009 00000000
->>>>>>>>>>>> 00000000
->>>>>>>>>>>> [<8027c87c>] (do_raw_spin_lock) from [<802172d4>]
->>>>>>>>>>>> (kvm_vgic_flush_hwstate+0x8c/0x224)
->>>>>>>>>>>> [<802172d4>] (kvm_vgic_flush_hwstate) from [<8020fbd4>]
->>>>>>>>>>>> (kvm_arch_vcpu_ioctl_run+0x110/0x478)
->>>>>>>>>>>> [<8020fbd4>] (kvm_arch_vcpu_ioctl_run) from [<8020af90>]
->>>>>>>>>>>> (kvm_vcpu_ioctl+0x2e0/0x6d4)
->>>>>>>>>>>> [<8020af90>] (kvm_vcpu_ioctl) from [<80334748>]
->>>>>>>>>>>> (do_vfs_ioctl+0xa0/0x8b8)
->>>>>>>>>>>> [<80334748>] (do_vfs_ioctl) from [<80334f94>] (SyS_ioctl+0x34/0x5c)
->>>>>>>>>>>> [<80334f94>] (SyS_ioctl) from [<8021a900>] (ret_fast_syscall+0x0/0x1c)
->>>>>>>>>>>> Code: e49de004 ea09ea24 e92d47f0 e3043ead (e5902004)
->>>>>>>>>>>> ---[ end trace cb88537fdc8fa206 ]---
->>>>>>>>>>>>
->>>>>>>>>>>> I use CONFIG_KVM_NEW_VGIC=y. This happens to me with a rather minimal
->>>>>>>>>>>> qemu invocation (qemu-system-arm -enable-kvm -M virt -cpu host
->>>>>>>>>>>> -nographic -serial stdio -kernel zImage).
->>>>>>>>>>>>
->>>>>>>>>>>> Using a bit older Qemu version 2.4.0.
->>>>>>>>>>>
->>>>>>>>>>> I just tried with a self compiled QEMU 2.4.0 and the Ubuntu 14.04
->>>>>>>>>>> provided 2.0.0, it worked fine with Linus' current HEAD as a host kernel
->>>>>>>>>>> on a Midway (Cortex-A15).
->>>>>>>>>>
->>>>>>>>>> I can reproduce the issue with a latest QEMU build on AMD Seattle
->>>>>>>>>> (I haven't tried anywhere else yet)
->>>>>>>>>>
->>>>>>>>>>>
->>>>>>>>>>> Can you try to disable the new VGIC, just to see if that's a regression?
->>>>>>>>>>
->>>>>>>>>> Disabling NEW_VGIC "fixes" guest boots.
->>>>>>>>>>
->>>>>>>>>> I'm not using defconfig for my host kernel. I'll do a couple more
->>>>>>>>>> tests and provide a comparison of my config vs. a defconfig in
->>>>>>>>>> a few minutes.
->>>>>>>>>
->>>>>>>>> Damn. It is not failing for me, so it has to be a kernel config thing...
->>>>>>>>> If you can narrow it down to the difference with defconfig, that'd be
->>>>>>>>> tremendously helpful.
->>>>>>>>
->>>>>>>> It's PAGE_SIZE; 64K doesn't work, 4K does, regardless of VA_BITS
->>>>>>>> selection.
->>>>>>>
->>>>>>> That definitely doesn't match Stefan's report (32bit only has 4k). I'll
->>>>>>
->>>>>> Hehe, was just plowing through code and came to that conclusion, glad I
->>>>>> got that right :-)
->>>>>>
->>>>>> What defconfig do you use? I could reproduce the issue also with
->>>>>> multi_v7_defconfig + ARM_LPAE + KVM.
->>>>>
->>>>> I'm now on -rc7 with multi_v7_defconfig + LPAE + KVM (and everything
->>>>> built-in to make my life simpler). The host works perfectly, and I can
->>>>> spawn VMs without any issue.
->>>>>
->>>>> I've tested with QEMU emulator version 2.2.0 (Debian 1:2.2+dfsg-5exp)
->>>>> as packaged with Jessie from a while ago. I've also upgraded the box to
->>>>> something more recent (2.5), same effect.
->>>>>
->>>>>>
->>>>>> Btw, I am not exactly on vanilla 4.7-rc7, I merged Shawns for-next +
->>>>>> clock next to get to the bits and pieces required for my board...
->>>>>>
->>>>>> That said, it works fine otherwise, and the stacktrace looks rather
->>>>>> platform independent...
->>>>>
->>>>> Indeed, and if these clocks were doing anything unsavoury, we'd
->>>>> probably see other things exploding. So we need to find out where we
->>>>> are diverging.
->>>>>
->>>>> What compiler are you using? I just noticed that my build
->>>>> infrastructure is a bit outdated for 32bit ARM (gcc 4.9.2), so I'm
->>>>> going to upgrade that to gcc 5.3 and retest.
->>>>
->>>> Same thing. The damn thing stubbornly works.
->>>>
->>>> Please send your full configuration, compiler version, exact QEMU
->>>> command line, and any other detail that could be vaguely relevant. As
->>>> the old VGIC gets removed in 4.8, we definitely need to nail that
->>>> sucker right now.
->>>
->>> I built the kernel with
->>> gcc-linaro-5.2-2015.11-2-x86_64_arm-linux-gnueabihf the binaries built
->>> by Linaro (full config attached). For the Rootfs (and Qemu) I did use
->>> the same compiler version, but built using OpenEmbedded.
->>>
->>> Running on a Colibri module using NXP i.MX 7Dual SoC, I haven't used it
->>> that much on mainline but it seems to be rather stable so far.
->>>
->>> I can reproduce the issue with a minimal command such as this:
->>> qemu-system-arm -enable-kvm -M virt -cpu host
->>>
->>> [  179.430694] Unable to handle kernel paging request at virtual address
->>> fffffffc
->>> What is puzzling me a bit that the address the kernel tries to access is
->>> constantly 0xfffffffc. This would be -4, which would be -EINTR? A
->>> unhandled error return?
->>
->> Your initial report had 0xffffffe4 instead. Which looks a bit like a
->> "container_of" operation on a NULL pointer. Do you always get the same
->> backtrace? If so, any chance you could run a
->>
-> 
-> For completeness here, after changing to the multi_v7_defconfig, the
-> stacktrace changed slightly. This is the stack trace using
-> multi_v7_defconfig + LPAE + KVM.
-
-For the record, and posterity:
-
-Stefan's issue turned out to be a broken DT, which KVM fails to
-gracefully handle, leaving the system pretty broken. Andrew's issue is
-fairly similar (GIC setup incompatible with the page size), and the same
-KVM issue hits.
-
-I'm working on a fix.
-
-Thanks all of you for all the traces and tests.
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+SGnvvIwKClJlY2VudGx5IEknbSB0cnlpbmcgdG8gdXNlIHVzYiBrZXlib2FyZCBhbmQgbW91c2Ug
+d2l0aCBRRU1VIG9uIEFSTTY0LiBCZWxvdyBpcyBteSBRRU1VIGNvbW1hbmQgbGluZSwKaG9zdCBh
+bmQgZ3Vlc3Qga2VybmVsIGJvdGggYXJlIDQuNy4wLXJjNyssIGFuZCBJIHJhbiBpdCBvbiBIaWtl
+eSBib2FyZC4KCiAgICBxZW11LXN5c3RlbS1hYXJjaDY0IFwKICAgIC1zbXAgMSAtY3B1IGhvc3Qg
+LWVuYWJsZS1rdm0gXAogICAgLW0gMjU2IC1NIHZpcnQgXAogICAgLWsgZW4tdXMgXAogICAgLW5v
+Z3JhcGhpYyBcCiAgICAtZGV2aWNlIHVzYi1laGNpIC1kZXZpY2UgdXNiLWtiZCAtZGV2aWNlIHVz
+Yi1tb3VzZSAtdXNiXAogICAgLWtlcm5lbCBJbWFnZSBcCiAgICAtaW5pdHJkIGd1ZXN0ZnMuY3Bp
+by5neiBcCiAgICAtYXBwZW5kICJyZGluaXQ9L3NiaW4vaW5pdCBjb25zb2xlPXR0eUFNQTAgcm9v
+dD0vZGV2L3JhbSBlYXJseWNvbj1wbDAxMSwweDkwMDAwMDAgcnciCgpUaGUgZm9sbG93aW5nIGd1
+ZXN0IGxvZyBzaG93cyB0aGF0IHVzYiBjb250cm9sbGVyIGNhbiBiZSBwcm9iZWQgYnV0IHRoZSBr
+ZXlib2FyZCBhbmQgbW91c2UgY2FuJ3QgYmUKZm91bmQuCgpbICAgIDEuNTk3NDMzXSBlaGNpX2hj
+ZDogVVNCIDIuMCAnRW5oYW5jZWQnIEhvc3QgQ29udHJvbGxlciAoRUhDSSkgRHJpdmVyClsgICAg
+MS41OTk1NjJdIGVoY2ktcGNpOiBFSENJIFBDSSBwbGF0Zm9ybSBkcml2ZXIKWyAgICAxLjYwODA4
+Ml0gZWhjaS1wY2kgMDAwMDowMDowMy4wOiBFSENJIEhvc3QgQ29udHJvbGxlcgpbICAgIDEuNjA5
+NDg1XSBlaGNpLXBjaSAwMDAwOjAwOjAzLjA6IG5ldyBVU0IgYnVzIHJlZ2lzdGVyZWQsIGFzc2ln
+bmVkIGJ1cyBudW1iZXIgMQpbICAgIDEuNjExODMzXSBlaGNpLXBjaSAwMDAwOjAwOjAzLjA6IGly
+cSA0OSwgaW8gbWVtIDB4MTAwNDEwMDAKWyAgICAxLjYyMzU5OV0gZWhjaS1wY2kgMDAwMDowMDow
+My4wOiBVU0IgMi4wIHN0YXJ0ZWQsIEVIQ0kgMS4wMApbICAgIDEuNjI1ODY3XSBodWIgMS0wOjEu
+MDogVVNCIGh1YiBmb3VuZApbICAgIDEuNjI2OTA2XSBodWIgMS0wOjEuMDogNiBwb3J0cyBkZXRl
+Y3RlZApbICAgIDEuNjI4Njg1XSBlaGNpLXBsYXRmb3JtOiBFSENJIGdlbmVyaWMgcGxhdGZvcm0g
+ZHJpdmVyClsgICAgMS42MzAyNjNdIGVoY2ktbXNtOiBRdWFsY29tbSBPbi1DaGlwIEVIQ0kgSG9z
+dCBDb250cm9sbGVyClsgICAgMS42MzE5NDddIG9oY2lfaGNkOiBVU0IgMS4xICdPcGVuJyBIb3N0
+IENvbnRyb2xsZXIgKE9IQ0kpIERyaXZlcgpbICAgIDEuNjMzNTQ3XSBvaGNpLXBjaTogT0hDSSBQ
+Q0kgcGxhdGZvcm0gZHJpdmVyClsgICAgMS42MzQ4MDddIG9oY2ktcGxhdGZvcm06IE9IQ0kgZ2Vu
+ZXJpYyBwbGF0Zm9ybSBkcml2ZXIKWy4uLl0KWyAgICAxLjkzOTAwMV0gdXNiIDEtMTogbmV3IGhp
+Z2gtc3BlZWQgVVNCIGRldmljZSBudW1iZXIgMiB1c2luZyBlaGNpLXBjaQpbICAgMTcuNDY3MDQw
+XSB1c2IgMS0xOiBkZXZpY2Ugbm90IGFjY2VwdGluZyBhZGRyZXNzIDIsIGVycm9yIC0xMTAKWyAg
+IDE3LjU3OTE2NV0gdXNiIDEtMTogbmV3IGhpZ2gtc3BlZWQgVVNCIGRldmljZSBudW1iZXIgMyB1
+c2luZyBlaGNpLXBjaQpbICAgMzIuMjg3MjQyXSByYW5kb206IGRkIHVyYW5kb20gcmVhZCB3aXRo
+IDcgYml0cyBvZiBlbnRyb3B5IGF2YWlsYWJsZQpbICAgMzMuMTEwOTcwXSB1c2IgMS0xOiBkZXZp
+Y2Ugbm90IGFjY2VwdGluZyBhZGRyZXNzIDMsIGVycm9yIC0xMTAKWyAgIDMzLjIyMzAzMF0gdXNi
+IDEtMTogbmV3IGhpZ2gtc3BlZWQgVVNCIGRldmljZSBudW1iZXIgNCB1c2luZyBlaGNpLXBjaQpb
+ICAgNDMuNjM1MTg1XSB1c2IgMS0xOiBkZXZpY2Ugbm90IGFjY2VwdGluZyBhZGRyZXNzIDQsIGVy
+cm9yIC0xMTAKWyAgIDQzLjc0NzAzM10gdXNiIDEtMTogbmV3IGhpZ2gtc3BlZWQgVVNCIGRldmlj
+ZSBudW1iZXIgNSB1c2luZyBlaGNpLXBjaQpbICAgNTQuMTU5MDQzXSB1c2IgMS0xOiBkZXZpY2Ug
+bm90IGFjY2VwdGluZyBhZGRyZXNzIDUsIGVycm9yIC0xMTAKWyAgIDU0LjE2MDc1Ml0gdXNiIHVz
+YjEtcG9ydDE6IHVuYWJsZSB0byBlbnVtZXJhdGUgVVNCIGRldmljZQpbICAgNTQuMzA3MjkwXSB1
+c2IgMS0yOiBuZXcgaGlnaC1zcGVlZCBVU0IgZGV2aWNlIG51bWJlciA2IHVzaW5nIGVoY2ktcGNp
+ClsgICA2OS44MzkwNTJdIHVzYiAxLTI6IGRldmljZSBub3QgYWNjZXB0aW5nIGFkZHJlc3MgNiwg
+ZXJyb3IgLTExMApbICAgNjkuOTUxMjQ5XSB1c2IgMS0yOiBuZXcgaGlnaC1zcGVlZCBVU0IgZGV2
+aWNlIG51bWJlciA3IHVzaW5nIGVoY2ktcGNpClsgICA4NS40ODMxNzFdIHVzYiAxLTI6IGRldmlj
+ZSBub3QgYWNjZXB0aW5nIGFkZHJlc3MgNywgZXJyb3IgLTExMApbICAgODUuNTk1MDM1XSB1c2Ig
+MS0yOiBuZXcgaGlnaC1zcGVlZCBVU0IgZGV2aWNlIG51bWJlciA4IHVzaW5nIGVoY2ktcGNpClsg
+ICA5MC42MTkyNDddIHVzYiAxLTI6IGRldmljZSBkZXNjcmlwdG9yIHJlYWQvOCwgZXJyb3IgLTEx
+MApbICAgOTUuNzQzNDgyXSB1c2IgMS0yOiBkZXZpY2UgZGVzY3JpcHRvciByZWFkLzgsIGVycm9y
+IC0xMTAKWyAgIDk1Ljk1OTE2NV0gdXNiIDEtMjogbmV3IGhpZ2gtc3BlZWQgVVNCIGRldmljZSBu
+dW1iZXIgOSB1c2luZyBlaGNpLXBjaQpbICAxMDYuMzcxMTc3XSB1c2IgMS0yOiBkZXZpY2Ugbm90
+IGFjY2VwdGluZyBhZGRyZXNzIDksIGVycm9yIC0xMTAKWyAgMTA2LjM3Mjg5NF0gdXNiIHVzYjEt
+cG9ydDI6IHVuYWJsZSB0byBlbnVtZXJhdGUgVVNCIGRldmljZQoKbHN1c2Igc2hvd3M6CnJvb3RA
+Z2VuZXJpY2FybXY4On4jIGxzdXNiCkJ1cyAwMDEgRGV2aWNlIDAwMTogSUQgMWQ2YjowMDAyCgpC
+ZXNpZGVzLCBJIGhhdmUgYWxzbyB0cmllZCBRRU1VIFRDRyB3aXRob3V0IEtWTS4gVGhlIGd1ZXN0
+IGNhbiBzdWNjZXNzZnVsbHkgcHJvYmUgdXNiIGNvbnRyb2xsZXIsCmtleWJvYXJkIGFuZCBtb3Vz
+ZS4KbHN1c2Igc2hvd3M6CnJvb3RAZ2VuZXJpY2FybXY4On4jIGxzdXNiCkJ1cyAwMDEgRGV2aWNl
+IDAwMjogSUQgMDYyNzowMDAxCkJ1cyAwMDEgRGV2aWNlIDAwMzogSUQgMDYyNzowMDAxCkJ1cyAw
+MDEgRGV2aWNlIDAwMTogSUQgMWQ2YjowMDAyCgpTbyBpdCBsb29rcyBsaWtlIHRoYXQgdXNiIGtl
+eWJvYXJkIGFuZCBtb3VzZSBkb24ndCB3b3JrIHdpdGggS1ZNIG9uIFFFTVUgQVJNNjQgd2hpbGUg
+dGhleSBjYW4gd29yawp3aXRoIFRDRy4gSUlVQywgYWxsIHRoZSB1c2IgZGV2aWNlcyBhcmUgZW11
+bGF0ZWQgYnkgUUVNVSwgaXQgaGFzIG5vdGhpbmcgd2l0aCBLVk0uIFNvIGl0IHJlYWxseQpjb25m
+dXNlZCBtZSBhbmQgSSdtIG5vdCBmYW1pbGlhciB3aXRoIHVzYiBkZXZpY2VzLiBBbHNvIEkgaGF2
+ZSBzZWVuIHNvbWVvbmUgZWxzZSByZXBvcnRzIHRoaXMgaXNzdWUKYmVmb3JlWzFdLgoKWzFdaHR0
+cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWFybS8yMDE2LTA2L21zZzAwMTEw
+Lmh0bWwKCkFueSBjb21tZW50cyBhbmQgaGVscCBhcmUgd2VsY29tZS4gVGhhbmtzIGluIGFkdmFu
+Y2UuCgpUaGFua3MsCi0tIApTaGFubm9uCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
+bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
+dm1hcm0K
