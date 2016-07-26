@@ -1,136 +1,84 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RESEND PATCH v4] KVM: arm/arm64: Add VGICv3 save/restore API
- documentation
-Date: Tue, 26 Jul 2016 11:57:13 +0200
-Message-ID: <20160726095713.GB17252@cbox>
-References: <20160706113725.32437-1-christoffer.dall@linaro.org>
- <CAFEAcA_OJh+sS-adVP9Z7TDZmPQfsNwfmS1Gxm5EzdVi2FjAwQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v11 10/10] genirq/msi: use the MSI doorbell's IOVA when
+ requested
+Date: Tue, 26 Jul 2016 12:02:28 +0200
+Message-ID: <33b72799-2408-054b-bbe6-2b7e3b67948f@redhat.com>
+References: <1468933367-23159-1-git-send-email-eric.auger@redhat.com>
+ <1468933367-23159-11-git-send-email-eric.auger@redhat.com>
+ <alpine.DEB.2.11.1607201105310.3564@nanos>
+ <08a930f2-8cc9-7d99-78c0-77d08ee40db3@redhat.com>
+ <alpine.DEB.2.11.1607261101340.19896@nanos>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6D3749B6F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2016 05:49:19 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 88UuJkpQ6QSv for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Jul 2016 05:49:18 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 48A2049B6D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2016 05:49:18 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id o80so8362324wme.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2016 02:55:45 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_OJh+sS-adVP9Z7TDZmPQfsNwfmS1Gxm5EzdVi2FjAwQ@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <alpine.DEB.2.11.1607261101340.19896@nanos>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, jason@lakedaemon.net, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org, Bharat.Bhushan@freescale.com, pranav.sawargaonkar@gmail.com, p.fedin@samsung.com, iommu@lists.linux-foundation.org, Jean-Philippe.Brucker@arm.com, yehuday@marvell.com, Manish.Jaggi@caviumnetworks.com, robert.richter@caviumnetworks.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 06, 2016 at 01:03:18PM +0100, Peter Maydell wrote:
-> On 6 July 2016 at 12:37, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> > Factor out the GICv3-specific documentation into a separate
-> > documentation file.  Add description for how to access distributor,
-> > redistributor, and CPU interface registers for GICv3 in this new file,
-> > and add a group for accessing level triggered IRQ information for GICv3
-> > as well.
-> >
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> 
-> > +    Accesses (reads and writes) to the GICD_ISPENDR register region and
-> > +    GICR_ISPENDR0 registers get/set the value of the latched pending state for
-> > +    the interrupts.
-> > +
-> > +    This is identical to the value read from ISPENDR for an edge triggered
-> > +    interrupt, but may differ for level triggered interrupts. For edge triggered
-> > +    interrupts, once an interrupt becomes pending (whether because of an edge
-> > +    detected on the input line or because of a guest write to ISPENDR) this
-> > +    state is "latched", and only cleared when either the interrupt is activated
-> > +    or when the guest writes to ICPENDR. A level triggered interrupt may be
-> > +    pending either because the level input is held high by a device, or because
-> > +    of a guest write to the ISPENDR register. Only ISPENDR writes are latched;
-> > +    if the device lowers the line level then the interrupt is no longer pending
-> > +    unless the guest also wrote to ISPENDR, and conversely writes to ICPENDR or
-> > +    activations of the interrupt do not clear the pending status if the line
-> > +    level is still being held high.  (These rules are documented in the GICv3
-> > +    specification descriptions of the ICPENDR and ISPENDR registers.)
-> > +    For a level triggered interrupt the value accessed here
-> > +    is that of the latch which is set by ISPENDR and cleared by ICPENDR or
-> > +    interrupt activation, whereas the value read from ISPENDR is the logical OR
-> > +    of the latch value and the input line level.
-> 
-> Rereading these paragraphs I think
->  "This is identical to the value returned by a guest read from ISPENDR..."
-> (in the first line) and
->  "the value returned by a guest read from the ISPENDR register is the
-> logical OR..."
-> (at the end) would be clearer, just to make sure we're clear between
-> when we're describing the behaviour of the hardware register as seen
-> by the guest, and when we're describing the behaviour of a read/write
-> through this API. I misread the intention the first time around
-> even though  I wrote this text :-)
+Hi Thomas,
 
-right, I've added the clarification.
-
-> > +  KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
-> > +  Attributes:
-> > +    The attr field of kvm_device_attr encodes the following values:
-> > +    bits:     | 63      ....       32 | 31   ....    10 | 9  ....  0 |
-> > +    values:   |         mpidr         |      info       |   vINTID   |
-> > +
-> > +    The vINTID specifies which set of IRQs is reported on.
-> > +
-> > +    The info field specifies which information userspace wants to get or set
-> > +    using this interface.  Currently we support two different pieces of
-> > +    information:
-> > +
-> > +      VGIC_LEVEL_INFO_LINE_LEVEL:
-> > +       Get/Set the input level of the IRQ line for a set of 32 contiguously
-> > +       numbered interrupts.
-> > +       vINTID must be a multiple of 32.
-> > +
-> > +        kvm_device_attr.addr points to a __u32 value which will contain a
+On 26/07/2016 11:04, Thomas Gleixner wrote:
+> Eric,
 > 
-> stray extra space at start of line?
+> On Mon, 25 Jul 2016, Auger Eric wrote:
+>> On 20/07/2016 11:09, Thomas Gleixner wrote:
+>>> On Tue, 19 Jul 2016, Eric Auger wrote:
+>>>> @@ -63,10 +63,18 @@ static int msi_compose(struct irq_data *irq_data,
+>>>>  {
+>>>>  	int ret = 0;
+>>>>  
+>>>> -	if (erase)
+>>>> +	if (erase) {
+>>>>  		memset(msg, 0, sizeof(*msg));
+>>>> -	else
+>>>> +	} else {
+>>>> +		struct device *dev;
+>>>> +
+>>>>  		ret = irq_chip_compose_msi_msg(irq_data, msg);
+>>>> +		if (ret)
+>>>> +			return ret;
+>>>> +
+>>>> +		dev = msi_desc_to_dev(irq_data_get_msi_desc(irq_data));
+>>>> +		WARN_ON(iommu_msi_msg_pa_to_va(dev, msg));
+>>>
+>>> What the heck is this call doing? And why is there only a WARN_ON and not a
+>>> proper error return code handling?
+>>
+>> iommu_msi_msg_pa_to_va is part of the new iommu-msi API introduced in PART I
+>> of this series. This helper function detects the physical address found in
+>> the MSI message has a corresponding allocated IOVA. This happens if the MSI
+>> doorbell is accessed through an IOMMU and this IOMMU do not bypass the MSI
+>> addresses (ARM case). Allocation of this IOVA was performed in the previous
+>> patch.
+>>
+>> So, if this is the case, the physical address is swapped with the IOVA
+>> address. That way the PCIe device will send the MSI with this IOVA and
+>> the address will be translated by the IOMMU into the target MSI doorbell PA.
+>>
+>> Hope this clarifies
 > 
+> No, it does not. You are explaining in great length what that function is
+> doing, but you are not explaining WHY your don't do a proper return code
+> handling and just do a WARN_ON() and happily proceed. If that function fails
+> then the interrupt will not be functional, so WHY on earth are you continuing?
+Oh sorry I focused on the function's goal. Originally I could not return an
+error since there is a BUG_ON(ret) afterwards. And typically the userspace can
+willingly omit to pass IPA range that map MSIs. But now we have this 2 phases where
+we first map the MSIs on pci_enable_msi_range and use the IOVA at compose time
+I need to analyze again if the userspace can induce a BUG_ON.
 
-It's actually because one of the lines was using a tab and the other
-spaces, but I've fixed them to both use tabs.
+Thanks
 
-> > +       bitmap where a set bit means the interrupt level is asserted.
-> > +
-> > +       Bit[n] indicates the status for interrupt vINTID + n.
-> > +
-> > +    SGIs and any interrupt with a higher ID than the number of interrupts
-> > +    supported, will be RAZ/WI.  LPIs are always edge-triggered and are
-> > +    therefore not supported by this interface.
-> > +
-> > +    PPIs are reported per VCPU as specified in the mpidr field, and SPIs are
-> > +    reported with the same value regardless of the mpidr specified.
-> > +
-> > +    The mpidr field encodes the CPU ID based on the affinity information in the
-> > +    architecture defined MPIDR, and the field is encoded as follows:
-> > +      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-> > +      |    Aff3    |    Aff2    |    Aff1    |    Aff0   |
+Eric
 > 
-> Missing space -- ASCII art doesn't quite line up.
-
-ack
-
+> Thanks,
 > 
-> Otherwise
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 	tglx
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
-> 
-
-Thanks!
--Christoffer
