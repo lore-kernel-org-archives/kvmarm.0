@@ -1,335 +1,207 @@
-From: Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v11 4/8] iommu/msi-iommu: initialization
-Date: Wed, 27 Jul 2016 22:38:45 +0200
-Message-ID: <f9309368-3c11-c2fc-d7c3-90df8fed1123@redhat.com>
-References: <1468932911-23062-1-git-send-email-eric.auger@redhat.com>
-	<1468932911-23062-5-git-send-email-eric.auger@redhat.com>
-	<20160720114337.GB1915@arm.com>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Subject: Re: [RFC v9 0/6] KVM: arm/arm64: gsi routing support
+Date: Thu, 28 Jul 2016 23:31:56 +0100
+Message-ID: <6ed49219-f9a7-e539-2bdb-920863299a4b@arm.com>
+References: <1469204442-3220-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20160720114337.GB1915-5wv7dgnIgG8@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Dennis Chen <dennis.chen-5wv7dgnIgG8@public.gmane.org>
-Cc: jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, andre.przywara-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, robert.richter-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, nd-5wv7dgnIgG8@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1469204442-3220-1-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dennis,
+Hi,
 
-On 20/07/2016 13:43, Dennis Chen wrote:
-> Hi Eric,
-> Some small questions/comments below:
+On 22/07/16 17:20, Eric Auger wrote:
+> With the advent of GICv3 ITS in-kernel emulation, KVM MSI routing
+> becomes mandated for proper VIRTIO-PCI vhost integration.
 > 
-> On Tue, Jul 19, 2016 at 12:55:07PM +0000, Eric Auger wrote:
->> iommu_get/put_msi_cookie allocates/frees the resource used to store
->> and ref count the MSI doorbell mappings. iommu_msi_set_aperture
->> initializes the iova domain used for MSI IOVA allocation and sets the
->> iommu domain's msi geometry.
->>
->> The implementation relies on dma-iommu API and iova API.
->>
->> New msi functions are fully implemented if CONFIG_IOMMU_MSI is set.
->>
->> Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>
->> ---
->> v10:
->> - split error management in iommu_msi_set_aperture
->>
->> v9:
->> - remove is_aperture_set and use iommu_domain_msi_aperture_valid helper
->>   instead
->> - set iommu domain's msi geometry
->>
->> v8:
->> - new design where msi-iommu relies on dma-iommu
->> - remove the iommu_domain * from the doorbell_mapping struct
->> - added is_aperture_set
->>
->> v7:
->> - fix locking
->> - add iova_cache_get/put
->> - static inline functions when CONFIG_IOMMU_DMA_RESERVED is not set
->> - introduce struct reserved_iova_domain to encapsulate prot info &
->>   add prot parameter in alloc_reserved_iova_domain
->>
->> v5 -> v6:
->> - use spin lock instead of mutex
->>
->> v3 -> v4:
->> - formerly in "iommu/arm-smmu: implement alloc/free_reserved_iova_domain" &
->>   "iommu: add alloc/free_reserved_iova_domain"
->>
->> v2 -> v3:
->> - remove iommu_alloc_reserved_iova_domain & iommu_free_reserved_iova_domain
->>   static implementation in case CONFIG_IOMMU_API is not set
->>
->> v1 -> v2:
->> - moved from vfio API to IOMMU API
->> ---
->>  drivers/iommu/Kconfig     |   7 ++++
->>  drivers/iommu/Makefile    |   1 +
->>  drivers/iommu/msi-iommu.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++
->>  include/linux/msi-iommu.h |  65 ++++++++++++++++++++++++++++++
->>  4 files changed, 173 insertions(+)
->>  create mode 100644 drivers/iommu/msi-iommu.c
->>  create mode 100644 include/linux/msi-iommu.h
->>
->> diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
->> index ad08603..5ea1610 100644
->> --- a/drivers/iommu/Kconfig
->> +++ b/drivers/iommu/Kconfig
->> @@ -74,6 +74,11 @@ config IOMMU_DMA
->>  	select IOMMU_IOVA
->>  	select NEED_SG_DMA_LENGTH
->>  
->> +# IOMMU MSI mapping
->> +config IOMMU_MSI
->> +	bool
->> +	select IOMMU_DMA
->> +
->>  config FSL_PAMU
->>  	bool "Freescale IOMMU support"
->>  	depends on PPC_E500MC || (COMPILE_TEST && PPC)
->> @@ -296,6 +301,7 @@ config SPAPR_TCE_IOMMU
->>  config ARM_SMMU
->>  	bool "ARM Ltd. System MMU (SMMU) Support"
->>  	depends on (ARM64 || ARM) && MMU
->> +	select IOMMU_MSI
->>  	select IOMMU_API
->>  	select IOMMU_IO_PGTABLE_LPAE
->>  	select ARM_DMA_USE_IOMMU if ARM
->> @@ -309,6 +315,7 @@ config ARM_SMMU
->>  config ARM_SMMU_V3
->>  	bool "ARM Ltd. System MMU Version 3 (SMMUv3) Support"
->>  	depends on ARM64 && PCI
->> +	select IOMMU_MSI
->>  	select IOMMU_API
->>  	select IOMMU_IO_PGTABLE_LPAE
->>  	select GENERIC_MSI_IRQ_DOMAIN
->> diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
->> index c6edb31..a381e66 100644
->> --- a/drivers/iommu/Makefile
->> +++ b/drivers/iommu/Makefile
->> @@ -2,6 +2,7 @@ obj-$(CONFIG_IOMMU_API) += iommu.o
->>  obj-$(CONFIG_IOMMU_API) += iommu-traces.o
->>  obj-$(CONFIG_IOMMU_API) += iommu-sysfs.o
->>  obj-$(CONFIG_IOMMU_DMA) += dma-iommu.o
->> +obj-$(CONFIG_IOMMU_MSI) += msi-iommu.o
->>  obj-$(CONFIG_IOMMU_IO_PGTABLE) += io-pgtable.o
->>  obj-$(CONFIG_IOMMU_IO_PGTABLE_ARMV7S) += io-pgtable-arm-v7s.o
->>  obj-$(CONFIG_IOMMU_IO_PGTABLE_LPAE) += io-pgtable-arm.o
->> diff --git a/drivers/iommu/msi-iommu.c b/drivers/iommu/msi-iommu.c
->> new file mode 100644
->> index 0000000..de02ede
->> --- /dev/null
->> +++ b/drivers/iommu/msi-iommu.c
->> @@ -0,0 +1,100 @@
->> +/*
->> + * Reserved IOVA Management
->> + *
->> + * Copyright (c) 2015 Linaro Ltd.
->> + *              www.linaro.org
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + */
->> +
->> +#include <linux/iommu.h>
->> +#include <linux/dma-iommu.h>
->> +#include <linux/msi-iommu.h>
->> +#include <linux/spinlock.h>
->> +#include <linux/iova.h>
->> +
->> +struct doorbell_mapping {
->> +	struct kref		kref;
->> +	struct list_head	next;
->> +	phys_addr_t		addr;
->> +	dma_addr_t		iova;
->> +	size_t			size;
->> +};
->> +
->> +struct doorbell_mapping_info {
->> +	struct list_head list; /* list of doorbell mapping entries */
->> +	spinlock_t lock;
->> +};
->> +
->> +int iommu_get_msi_cookie(struct iommu_domain *domain)
->> +{
->> +	struct doorbell_mapping_info *dmi;
->> +	int ret;
->> +
->> +	if (domain->msi_cookie || domain->iova_cookie)
->> +		return -EINVAL;
->> +
->> +	ret = iommu_get_dma_cookie(domain);
->> +	if (ret)
->> +		return ret;
->> +
->> +	dmi = kzalloc(sizeof(*dmi), GFP_KERNEL);
+> In QEMU, when the VIRTIO-PCI device is programmed with the MSI message,
+> we previously used direct_mapping trick: this consists in extracting the
+> IRQ ID found in the MSI message and associating an irqfd to that IRQ ID.
+> When vhost worker thread gets a new buffer it signals the irqfd and kvm
+> then injects this IRQ ID on guest. That way although the guest uses MSIs,
+> no MSI emulation is used.
 > 
-> if dmi == NULL here, 
+> This worked fine with GICv2m but does not work anymore with GICV3 ITS.
+> Indeed this latter implements IRQ translation: what is found in the MSI
+> message no more is the target IRQ ID but is an intermediate event ID used
+> in the translation process.
 > 
->> +
->> +	INIT_LIST_HEAD(&dmi->list);
->> +	spin_lock_init(&dmi->lock);
+> Hence true MSI routing is needed so that the vhost back channel irqfd is
+> associated to a dummy gsi ID, routed towards the programmed MSI. When KVM
+> injects the MSI through the in-kernel ITS emulation, the MSI is properly
+> translated and eventually the LPI ID associated to the event ID is injected
+> on guest.
 > 
-> will the above 2-line codes triger kernel NULL pointer dereference panic message?
-> if so why don't we check dmi immediately after the kzalloc call like this:
-Yes definitively. Thanks for spotting the oversight!
+> MSI routing also mandates to integrate irqchip routing. The initial
+> implementation of irqfd on arm must be upgraded with the integration
+> of kvm irqchip.c code and the implementation of its standard hooks
+> in the architecture specific part.
+> 
+> In case KVM_SET_GSI_ROUTING ioctl is not called, a default routing
+> table with flat irqchip routing entries is built enabling to inject gsi
+> corresponding to the SPI indexes seen by the guest.
+> 
+> As soon as KVM_SET_GSI_ROUTING is called, user-space overwrites this
+> default routing table and is responsible for building the whole routing
+> table.
+> 
+> for arm/arm64 KVM_SET_GSI_ROUTING has a limited support:
+> - only applies to KVM_IRQFD and not to KVM_IRQ_LINE
+> 
+> - irqchip routing was tested on Calxeda midway (VFIO with irqfd)
+>   with and without explicit routing
+> - MSI routing was tested on AMD Overdrive and Cavium ThunderX
+> 
+> Code + dependencies can be found at:
+> https://github.com/eauger/linux/tree/v4.7-rc7-its-emul-v10-gsi-routing-v9
+> 
+> The series depends on
+> 
+> [1]: [PATCH v10 00/17] KVM: arm64: GICv3 ITS emulation
+>      http://www.spinics.net/lists/kvm/msg135687.html
+>    + [PATCH] KVM: arm/arm64: fix vGICv2 KVM_DEV_ARM_VGIC_GRP_CPU/DIST_REGS
+> [2]: [PATCH] KVM: arm/arm64: The GIC is dead, long live the GIC
+> 
+> hence the RFC.
+> 
+> GSI flat routing setup on QEMU can be found at:
+> https://lists.nongnu.org/archive/html/qemu-devel/2015-07/msg06262.html
 
-Regards
+So I gave this series (as part of -next atm) some testing on a Freescale
+machine.
 
-Eric
+I quickly boot tested the following combinations of options:
+host kernel: next-20160728 and v4.7.0
+guest kernel: next-20160728 and v4.4.0
+QEMU: v2.6 and latest HEAD + Eric's ITS & GSI patches (from github)
+      gic-version=2 and gic-version=3
+      virtio-mmio and virtio-pci
+kvmtool: latest HEAD and vits-v7
+         --irqchip=gic-{v2,v3,v3-its}
+         --force-pci and without (virtio-mmio)
+
+That summed up to 68 combinations for me, all booting fine. If every
+part supported ITS and MSIs (host kernel, userland tool, virtio-pci) I
+saw the ITS emulation being used.
+I also ran three guests (two QEMU and one kvmtool) in parallel with some
+interrupt load for some hours.
+
+For the records I could easily trigger our infamous kvmtool virtio hang
+with SMP guests on this machine, but as that happened with older kernels
+and kvmtools as well, affects only SMP guests and is totally absent when
+running with QEMU, it's not a regression and unrelated to this series.
+
+So FWIW:
+
+Tested-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
+Andre
+
 > 
-> 	dmi = kzalloc(sizeof(*dmi), GFP_KERNEL);
-> 	domain->msi_cookie = dmi;
-> 	if (!dmi)
-> 		return -ENOMEM;
+> History:
+> v8 -> v9:
+> - remove "[RFC v8 7/7] KVM: arm: Enable KVM_SIGNAL_MSI and MSI routing"
+> - fix spi id check at IRQ injection
+> - use default in irqchip switch(ue->type)
 > 
->> +	iova_cache_get();
+> v7 -> v8:
+> - take into account Radim's comments:
+>   x rework kvm_kernel_irq_routing_entry and remove msi_msg now
+>     replaced by a custom struct
+>   x check user entry flags depending on user entry type
+>   x I kept last patch although challenged by Radim. It can be dropped
+>     according to the consensus.
 > 
-> 	return iova_cache_get();
->> +
->> +	domain->msi_cookie = dmi;
->> +
->> +	return dmi ? 0 : -ENOMEM;
->> +}
->> +EXPORT_SYMBOL(iommu_get_msi_cookie);
->> +
->> +void iommu_put_msi_cookie(struct iommu_domain *domain)
->> +{
->> +	struct doorbell_mapping_info *dmi = domain->msi_cookie;
->> +
->> +	if (!dmi)
->> +		return;
->> +
->> +	domain->msi_cookie = NULL;
->> +
->> +	WARN_ON(!list_empty(&dmi->list));
->> +
->> +	kfree(dmi);
->> +	iommu_put_dma_cookie(domain);
->> +	iova_cache_put();
->> +}
->> +EXPORT_SYMBOL(iommu_put_msi_cookie);
->> +
->> +int iommu_msi_set_aperture(struct iommu_domain *domain,
->> +			   dma_addr_t start, dma_addr_t end)
->> +{
->> +	struct doorbell_mapping_info *dmi = domain->msi_cookie;
->> +	int ret;
->> +
->> +	if (!dmi)
->> +		return -ENODEV;
->> +
->> +	if (iommu_domain_msi_aperture_valid(domain))
->> +		return -EINVAL;
->> +
->> +	ret = iommu_dma_init_domain(domain, start, end - start + 1);
->> +
->> +	if (!ret) {
->> +		domain->msi_geometry.aperture_start = start;
->> +		domain->msi_geometry.aperture_end = end;
->> +	}
->> +
->> +	return ret;
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_msi_set_aperture);
->> +
->> diff --git a/include/linux/msi-iommu.h b/include/linux/msi-iommu.h
->> new file mode 100644
->> index 0000000..392aa6f
->> --- /dev/null
->> +++ b/include/linux/msi-iommu.h
->> @@ -0,0 +1,65 @@
->> +/*
->> + * Copyright (c) 2015 Linaro Ltd.
->> + *              www.linaro.org
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + */
->> +#ifndef __MSI_IOMMU_H
->> +#define __MSI_IOMMU_H
->> +
->> +#include <linux/types.h>
->> +#include <linux/kernel.h>
->> +
->> +struct iommu_domain;
->> +
->> +#ifdef CONFIG_IOMMU_MSI
->> +
->> +/**
->> + * iommu_get_msi_cookie - Acquire MSI mapping resources for a domain
->> + * @domain: IOMMU domain to prepare for MSI mapping
->> + *
->> + * IOMMU drivers which require MSI mapping should normally call this
->> + * from their domain_alloc callback when domain->type ==
->> + * IOMMU_DOMAIN_UNMANAGED.
->> + */
->> +int iommu_get_msi_cookie(struct iommu_domain *domain);
->> +
->> +/**
->> + * iommu_put_msi_cookie - Release a domain's MSI mapping resources
->> + * @domain: IOMMU domain previously prepared by iommu_get_msi_cookie()
->> + *
->> + * IOMMU drivers requesting MSI mapping should normally call this from
->> + * their domain_free callback.
->> + */
->> +void iommu_put_msi_cookie(struct iommu_domain *domain);
->> +
->> +/**
->> + * iommu_msi_set_aperture: allocate the msi iova domain
->> + * according to the specified start/end IOVAs
->> + *
->> + * @domain: iommu domain handle
->> + * @start: MSI iova start address
->> + * @end: MSI iova end address
->> + */
->> +int iommu_msi_set_aperture(struct iommu_domain *domain,
->> +			   dma_addr_t start, dma_addr_t end);
->> +
->> +#else
->> +
->> +static inline int
->> +iommu_msi_set_aperture(struct iommu_domain *domain,
->> +		       dma_addr_t start, dma_addr_t end)
->> +{
->> +	return -ENOENT;
->> +}
->> +
->> +#endif	/* CONFIG_IOMMU_MSI */
->> +#endif	/* __MSI_IOMMU_H */
->> -- 
->> 1.9.1
->>
->> _______________________________________________
->> kvmarm mailing list
->> kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
->> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->>
+> v6 -> v7:
+> - take into account Drew's and Andre's comments
+> - new patch moving declarations of kvm_setup_default_irq_routing and
+>   kvm_setup_empty_irq_routing outside of kvm_host.h
+> - vgic_v2m_inject_msi moved in vgic-irqfd
+> - re-introduce irq.h
+> - add msi_ prefix to flags/devid kvm_kernel_irq_routing_entry fields
+> - move kvm_vgic_setup_default_irq_routing declaration in arm_vgic.h
+>   and definition in vgic-irqfd.c
+> - remove BUG_ON(!vgic_initialized(kvm) in vgic_irqfd_set_irq
+> - move KVM_IRQCHIP_NUM_PINS in arm_vgic.h and use VGIC_MAX_SPI instead
+>   of 1020
+> 
+> v5 -> v6:
+> - rebase on Andre's v8 + removal of old vgic
+> - tested on Cavium ThunderX
+> 
+> V4 -> v5:
+> - rebase on Andre's v7 + final new vgic code
+> - check msi->data is within SPI range in vgic_v2m_inject_msi
+> - squashed enable irq routing and default irqchip table patches
+> - handle default irqchip table allocation failure
+> - some rephrasing in doc & comment according to Christoffer's feedbacks
+> - lock issue reported by Pavel seems to have disappear after 4.2 (MSI injection
+>   fast path)
+> 
+> v3 -> v4:
+> - rebase on top of NEW-VGIC RFC and ITS emulation series v4. This is not
+>   a stable foundation yet. Hence the revert to RFC. This v4 mostly is a
+>   reflesh/reminder.
+> - rewrite the cover letter
+> 
+> v2 -> v3:
+> - don't use KVM_IRQ_ROUTING_EXTENDED_MSI type at uapi and kernel level anymore;
+>   use KVM_MSI_VALID_DEVID flag instead
+> - propagate user flags downto the kernel to make sure the userspace
+>   correctly set devid in GICv3 ITS case (still under discussion)
+> 
+> v1 -> v2:
+> - user API changed:
+>   x devid id passed in kvm_irq_routing_msi
+>   x kept the new routing entry type: KVM_IRQ_ROUTING_EXTENDED_MSI
+> - kvm_host.h: adopt Andre's proposal to replace the msi_msg by a struct
+>   composed of the msi_msg and devid in kvm_kernel_irq_routing_entry
+> - Fix bug reported by Pavel: Added KVM_IRQ_ROUTING_EXTENDED_MSI handling
+>   in eventfd.c
+> - added vgic_v2m_inject_msi in vgic-v2-emul.c as suggested by Andre
+> - fix bug reported by Andre: bad setting of msi.flags and msi.devid
+>   in kvm_send_userspace_msi
+> - avoid injecting reserved IRQ numbers in vgic_irqfd_set_irq
+> 
+> RFC -> PATCH:
+> - clearly state limited support on arm/arm64:
+>   KVM_IRQ_LINE not impacted by GSI routing
+> - add default routing table feature (new patch file)
+> - changed uapi to use padding field area
+> - reword api.txt
+> 
+> 
+> Eric Auger (6):
+>   KVM: api: Pass the devid in the msi routing entry
+>   KVM: Add devid in kvm_kernel_irq_routing_entry
+>   KVM: irqchip: Convey devid to kvm_set_msi
+>   KVM: Move kvm_setup_default/empty_irq_routing declaration in arch
+>     specific header
+>   KVM: arm/arm64: Enable irqchip routing
+>   KVM: arm/arm64: Enable MSI routing
+> 
+>  Documentation/virtual/kvm/api.txt |  34 +++++++++---
+>  arch/arm/kvm/Kconfig              |   2 +
+>  arch/arm/kvm/Makefile             |   1 +
+>  arch/arm/kvm/irq.h                |  19 +++++++
+>  arch/arm64/kvm/Kconfig            |   2 +
+>  arch/arm64/kvm/Makefile           |   1 +
+>  arch/arm64/kvm/irq.h              |  19 +++++++
+>  arch/x86/kvm/irq.h                |   3 ++
+>  include/kvm/arm_vgic.h            |   7 +++
+>  include/linux/kvm_host.h          |  12 +++--
+>  include/uapi/linux/kvm.h          |   5 +-
+>  virt/kvm/arm/vgic/vgic-init.c     |   4 ++
+>  virt/kvm/arm/vgic/vgic-irqfd.c    | 108 +++++++++++++++++++++++++++++++-------
+>  virt/kvm/arm/vgic/vgic.c          |   7 ---
+>  virt/kvm/irqchip.c                |  28 ++++++----
+>  15 files changed, 207 insertions(+), 45 deletions(-)
+>  create mode 100644 arch/arm/kvm/irq.h
+>  create mode 100644 arch/arm64/kvm/irq.h
 > 
