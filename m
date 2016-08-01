@@ -1,251 +1,197 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC v9 0/6] KVM: arm/arm64: gsi routing support
-Date: Fri, 29 Jul 2016 08:51:17 +0200
-Message-ID: <7637c5cb-76ab-a2ff-88f0-d7d63c3d8a74@redhat.com>
-References: <1469204442-3220-1-git-send-email-eric.auger@redhat.com>
- <6ed49219-f9a7-e539-2bdb-920863299a4b@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 41/55] KVM: arm64: vgic-its: Implement MSI injection in
+ ITS emulation
+Date: Mon, 1 Aug 2016 20:20:06 +0200
+Message-ID: <20160801182006.GB32244@cbox>
+References: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
+ <1469208552-4155-42-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <6ed49219-f9a7-e539-2bdb-920863299a4b@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A11E41AF6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Aug 2016 14:11:46 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qp1Zt6TeCs0Q for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Aug 2016 14:11:44 -0400 (EDT)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B0556412D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Aug 2016 14:11:44 -0400 (EDT)
+Received: by mail-wm0-f45.google.com with SMTP id q128so380441969wma.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 01 Aug 2016 11:18:29 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1469208552-4155-42-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, Dan Carpenter <dan.carpenter@oracle.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+On Fri, Jul 22, 2016 at 06:28:58PM +0100, Marc Zyngier wrote:
+> From: Andre Przywara <andre.przywara@arm.com>
+> 
+> When userland wants to inject an MSI into the guest, it uses the
+> KVM_SIGNAL_MSI ioctl, which carries the doorbell address along with
+> the payload and the device ID.
+> With the help of the KVM IO bus framework we learn the corresponding
+> ITS from the doorbell address. We then use our wrapper functions to
+> iterate the linked lists and find the proper Interrupt Translation Table
+> Entry (ITTE) and thus the corresponding struct vgic_irq to finally set
+> the pending bit.
+> We also provide the handler for the ITS "INT" command, which allows a
+> guest to trigger an MSI via the ITS command queue. Since this one knows
+> about the right ITS already, we directly call the MMIO handler function
+> without using the kvm_io_bus framework.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> Tested-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 77 ++++++++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h     |  6 ++++
+>  2 files changed, 83 insertions(+)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 1408c88..d8e8f14 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -437,6 +437,65 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+>  	return 0;
+>  }
+>  
+> +/*
+> + * Find the target VCPU and the LPI number for a given devid/eventid pair
+> + * and make this IRQ pending, possibly injecting it.
+> + * Must be called with the its_lock mutex held.
+> + */
+> +static void vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+> +				 u32 devid, u32 eventid)
+> +{
+> +	struct its_itte *itte;
+> +
+> +	if (!its->enabled)
+> +		return;
+> +
+> +	itte = find_itte(its, devid, eventid);
+> +	/* Triggering an unmapped IRQ gets silently dropped. */
+> +	if (itte && its_is_collection_mapped(itte->collection)) {
+> +		struct kvm_vcpu *vcpu;
+> +
+> +		vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
+> +		if (vcpu && vcpu->arch.vgic_cpu.lpis_enabled) {
+> +			spin_lock(&itte->irq->irq_lock);
+> +			itte->irq->pending = true;
+> +			vgic_queue_irq_unlock(kvm, itte->irq);
+> +		}
+> +	}
+> +}
+> +
+> +/*
+> + * Queries the KVM IO bus framework to get the ITS pointer from the given
+> + * doorbell address.
+> + * We then call vgic_its_trigger_msi() with the decoded data.
+> + */
+> +int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+> +{
+> +	u64 address;
+> +	struct kvm_io_device *kvm_io_dev;
+> +	struct vgic_io_device *iodev;
+> +
+> +	if (!vgic_has_its(kvm))
+> +		return -ENODEV;
+> +
+> +	if (!(msi->flags & KVM_MSI_VALID_DEVID))
+> +		return -EINVAL;
+> +
+> +	address = (u64)msi->address_hi << 32 | msi->address_lo;
+> +
+> +	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
+> +	if (!kvm_io_dev)
+> +		return -ENODEV;
+> +
+> +	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
+> +
+> +	mutex_lock(&iodev->its->its_lock);
+> +	vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
+> +	mutex_unlock(&iodev->its->its_lock);
+> +
+> +	return 0;
 
-On 29/07/2016 00:31, Andr=C3=A9 Przywara wrote:
-> Hi,
->=20
-> On 22/07/16 17:20, Eric Auger wrote:
->> With the advent of GICv3 ITS in-kernel emulation, KVM MSI routing
->> becomes mandated for proper VIRTIO-PCI vhost integration.
->>
->> In QEMU, when the VIRTIO-PCI device is programmed with the MSI messa=
-ge,
->> we previously used direct_mapping trick: this consists in extracting=
- the
->> IRQ ID found in the MSI message and associating an irqfd to that IRQ=
- ID.
->> When vhost worker thread gets a new buffer it signals the irqfd and =
-kvm
->> then injects this IRQ ID on guest. That way although the guest uses =
-MSIs,
->> no MSI emulation is used.
->>
->> This worked fine with GICv2m but does not work anymore with GICV3 IT=
-S.
->> Indeed this latter implements IRQ translation: what is found in the =
-MSI
->> message no more is the target IRQ ID but is an intermediate event ID=
- used
->> in the translation process.
->>
->> Hence true MSI routing is needed so that the vhost back channel irqf=
-d is
->> associated to a dummy gsi ID, routed towards the programmed MSI. Whe=
-n KVM
->> injects the MSI through the in-kernel ITS emulation, the MSI is prop=
-erly
->> translated and eventually the LPI ID associated to the event ID is i=
-njected
->> on guest.
->>
->> MSI routing also mandates to integrate irqchip routing. The initial
->> implementation of irqfd on arm must be upgraded with the integration
->> of kvm irqchip.c code and the implementation of its standard hooks
->> in the architecture specific part.
->>
->> In case KVM_SET_GSI_ROUTING ioctl is not called, a default routing
->> table with flat irqchip routing entries is built enabling to inject =
-gsi
->> corresponding to the SPI indexes seen by the guest.
->>
->> As soon as KVM_SET_GSI_ROUTING is called, user-space overwrites this
->> default routing table and is responsible for building the whole rout=
-ing
->> table.
->>
->> for arm/arm64 KVM_SET_GSI_ROUTING has a limited support:
->> - only applies to KVM_IRQFD and not to KVM_IRQ_LINE
->>
->> - irqchip routing was tested on Calxeda midway (VFIO with irqfd)
->>   with and without explicit routing
->> - MSI routing was tested on AMD Overdrive and Cavium ThunderX
->>
->> Code + dependencies can be found at:
->> https://github.com/eauger/linux/tree/v4.7-rc7-its-emul-v10-gsi-routi=
-ng-v9
->>
->> The series depends on
->>
->> [1]: [PATCH v10 00/17] KVM: arm64: GICv3 ITS emulation
->>      http://www.spinics.net/lists/kvm/msg135687.html
->>    + [PATCH] KVM: arm/arm64: fix vGICv2 KVM_DEV_ARM_VGIC_GRP_CPU/DIS=
-T_REGS
->> [2]: [PATCH] KVM: arm/arm64: The GIC is dead, long live the GIC
->>
->> hence the RFC.
->>
->> GSI flat routing setup on QEMU can be found at:
->> https://lists.nongnu.org/archive/html/qemu-devel/2015-07/msg06262.ht=
-ml
->=20
-> So I gave this series (as part of -next atm) some testing on a Freesc=
-ale
-> machine.
->=20
-> I quickly boot tested the following combinations of options:
-> host kernel: next-20160728 and v4.7.0
-> guest kernel: next-20160728 and v4.4.0
-> QEMU: v2.6 and latest HEAD + Eric's ITS & GSI patches (from github)
->       gic-version=3D2 and gic-version=3D3
->       virtio-mmio and virtio-pci
-> kvmtool: latest HEAD and vits-v7
->          --irqchip=3Dgic-{v2,v3,v3-its}
->          --force-pci and without (virtio-mmio)
->=20
-> That summed up to 68 combinations for me, all booting fine. If every
-> part supported ITS and MSIs (host kernel, userland tool, virtio-pci) =
-I
-> saw the ITS emulation being used.
-> I also ran three guests (two QEMU and one kvmtool) in parallel with s=
-ome
-> interrupt load for some hours.
->=20
-> For the records I could easily trigger our infamous kvmtool virtio ha=
-ng
-> with SMP guests on this machine, but as that happened with older kern=
-els
-> and kvmtools as well, affects only SMP guests and is totally absent w=
-hen
-> running with QEMU, it's not a regression and unrelated to this series=
-=2E
->=20
-> So FWIW:
->=20
-> Tested-by: Andre Przywara <andre.przywara@arm.com>
-Thank you very much for this testing time.
+According to KVM_SIGNAL_MSI this means that the guest blocked the MSI.
+Is this the intention, or is the return value translated somewhere
+higher in the call stack?
 
-Cheers
-
-Eric
->=20
-> Cheers,
-> Andre
->=20
->>
->> History:
->> v8 -> v9:
->> - remove "[RFC v8 7/7] KVM: arm: Enable KVM_SIGNAL_MSI and MSI routi=
-ng"
->> - fix spi id check at IRQ injection
->> - use default in irqchip switch(ue->type)
->>
->> v7 -> v8:
->> - take into account Radim's comments:
->>   x rework kvm_kernel_irq_routing_entry and remove msi_msg now
->>     replaced by a custom struct
->>   x check user entry flags depending on user entry type
->>   x I kept last patch although challenged by Radim. It can be droppe=
-d
->>     according to the consensus.
->>
->> v6 -> v7:
->> - take into account Drew's and Andre's comments
->> - new patch moving declarations of kvm_setup_default_irq_routing and
->>   kvm_setup_empty_irq_routing outside of kvm_host.h
->> - vgic_v2m_inject_msi moved in vgic-irqfd
->> - re-introduce irq.h
->> - add msi_ prefix to flags/devid kvm_kernel_irq_routing_entry fields
->> - move kvm_vgic_setup_default_irq_routing declaration in arm_vgic.h
->>   and definition in vgic-irqfd.c
->> - remove BUG_ON(!vgic_initialized(kvm) in vgic_irqfd_set_irq
->> - move KVM_IRQCHIP_NUM_PINS in arm_vgic.h and use VGIC_MAX_SPI inste=
-ad
->>   of 1020
->>
->> v5 -> v6:
->> - rebase on Andre's v8 + removal of old vgic
->> - tested on Cavium ThunderX
->>
->> V4 -> v5:
->> - rebase on Andre's v7 + final new vgic code
->> - check msi->data is within SPI range in vgic_v2m_inject_msi
->> - squashed enable irq routing and default irqchip table patches
->> - handle default irqchip table allocation failure
->> - some rephrasing in doc & comment according to Christoffer's feedba=
-cks
->> - lock issue reported by Pavel seems to have disappear after 4.2 (MS=
-I injection
->>   fast path)
->>
->> v3 -> v4:
->> - rebase on top of NEW-VGIC RFC and ITS emulation series v4. This is=
- not
->>   a stable foundation yet. Hence the revert to RFC. This v4 mostly i=
-s a
->>   reflesh/reminder.
->> - rewrite the cover letter
->>
->> v2 -> v3:
->> - don't use KVM_IRQ_ROUTING_EXTENDED_MSI type at uapi and kernel lev=
-el anymore;
->>   use KVM_MSI_VALID_DEVID flag instead
->> - propagate user flags downto the kernel to make sure the userspace
->>   correctly set devid in GICv3 ITS case (still under discussion)
->>
->> v1 -> v2:
->> - user API changed:
->>   x devid id passed in kvm_irq_routing_msi
->>   x kept the new routing entry type: KVM_IRQ_ROUTING_EXTENDED_MSI
->> - kvm_host.h: adopt Andre's proposal to replace the msi_msg by a str=
-uct
->>   composed of the msi_msg and devid in kvm_kernel_irq_routing_entry
->> - Fix bug reported by Pavel: Added KVM_IRQ_ROUTING_EXTENDED_MSI hand=
-ling
->>   in eventfd.c
->> - added vgic_v2m_inject_msi in vgic-v2-emul.c as suggested by Andre
->> - fix bug reported by Andre: bad setting of msi.flags and msi.devid
->>   in kvm_send_userspace_msi
->> - avoid injecting reserved IRQ numbers in vgic_irqfd_set_irq
->>
->> RFC -> PATCH:
->> - clearly state limited support on arm/arm64:
->>   KVM_IRQ_LINE not impacted by GSI routing
->> - add default routing table feature (new patch file)
->> - changed uapi to use padding field area
->> - reword api.txt
->>
->>
->> Eric Auger (6):
->>   KVM: api: Pass the devid in the msi routing entry
->>   KVM: Add devid in kvm_kernel_irq_routing_entry
->>   KVM: irqchip: Convey devid to kvm_set_msi
->>   KVM: Move kvm_setup_default/empty_irq_routing declaration in arch
->>     specific header
->>   KVM: arm/arm64: Enable irqchip routing
->>   KVM: arm/arm64: Enable MSI routing
->>
->>  Documentation/virtual/kvm/api.txt |  34 +++++++++---
->>  arch/arm/kvm/Kconfig              |   2 +
->>  arch/arm/kvm/Makefile             |   1 +
->>  arch/arm/kvm/irq.h                |  19 +++++++
->>  arch/arm64/kvm/Kconfig            |   2 +
->>  arch/arm64/kvm/Makefile           |   1 +
->>  arch/arm64/kvm/irq.h              |  19 +++++++
->>  arch/x86/kvm/irq.h                |   3 ++
->>  include/kvm/arm_vgic.h            |   7 +++
->>  include/linux/kvm_host.h          |  12 +++--
->>  include/uapi/linux/kvm.h          |   5 +-
->>  virt/kvm/arm/vgic/vgic-init.c     |   4 ++
->>  virt/kvm/arm/vgic/vgic-irqfd.c    | 108 +++++++++++++++++++++++++++=
-++++-------
->>  virt/kvm/arm/vgic/vgic.c          |   7 ---
->>  virt/kvm/irqchip.c                |  28 ++++++----
->>  15 files changed, 207 insertions(+), 45 deletions(-)
->>  create mode 100644 arch/arm/kvm/irq.h
->>  create mode 100644 arch/arm64/kvm/irq.h
->>
+> +}
+> +
+>  /* Requires the its_lock to be held. */
+>  static void its_free_itte(struct kvm *kvm, struct its_itte *itte)
+>  {
+> @@ -897,6 +956,21 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+>  }
+>  
+>  /*
+> + * The INT command injects the LPI associated with that DevID/EvID pair.
+> + * Must be called with the its_lock mutex held.
+> + */
+> +static int vgic_its_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
+> +				   u64 *its_cmd)
+> +{
+> +	u32 msi_data = its_cmd_get_id(its_cmd);
+> +	u64 msi_devid = its_cmd_get_deviceid(its_cmd);
+> +
+> +	vgic_its_trigger_msi(kvm, its, msi_devid, msi_data);
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+>   * This function is called with the its_cmd lock held, but the ITS data
+>   * structure lock dropped.
+>   */
+> @@ -932,6 +1006,9 @@ static int vgic_its_handle_command(struct kvm *kvm, struct vgic_its *its,
+>  	case GITS_CMD_MOVALL:
+>  		ret = vgic_its_cmd_handle_movall(kvm, its, its_cmd);
+>  		break;
+> +	case GITS_CMD_INT:
+> +		ret = vgic_its_cmd_handle_int(kvm, its, its_cmd);
+> +		break;
+>  	case GITS_CMD_INV:
+>  		ret = vgic_its_cmd_handle_inv(kvm, its, its_cmd);
+>  		break;
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index ee348de..9d557f2 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -78,6 +78,7 @@ int vgic_v3_map_resources(struct kvm *kvm);
+>  int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
+>  bool vgic_has_its(struct kvm *kvm);
+>  void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+> +int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
+>  #else
+>  static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+>  {
+> @@ -138,6 +139,11 @@ static inline bool vgic_has_its(struct kvm *kvm)
+>  static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+>  {
+>  }
+> +
+> +static inline int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+> +{
+> +	return -ENODEV;
+> +}
+>  #endif
+>  
+>  int kvm_register_vgic_device(unsigned long type);
+> -- 
+> 2.8.1
+> 
