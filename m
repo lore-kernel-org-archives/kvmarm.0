@@ -1,26 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 41/55] KVM: arm64: vgic-its: Implement MSI injection in
- ITS emulation
-Date: Tue, 2 Aug 2016 11:18:03 +0100
-Message-ID: <57A0735B.7060403@arm.com>
-References: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
- <1469208552-4155-42-git-send-email-marc.zyngier@arm.com>
- <20160801182006.GB32244@cbox>
+Subject: Re: [PATCH] KVM: arm64: vgic-its: Handle errors from vgic_add_lpi
+Date: Tue, 2 Aug 2016 11:35:27 +0100
+Message-ID: <57A0776F.5070401@arm.com>
+References: <20160801182952.3005-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F34F541AF6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 06:11:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E73E41AF6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 06:28:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3+VUDexURqjE for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Aug 2016 06:11:20 -0400 (EDT)
+ with ESMTP id wbknDybfRHvv for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Aug 2016 06:28:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 999D8412C2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 06:11:20 -0400 (EDT)
-In-Reply-To: <20160801182006.GB32244@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3842412C2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 06:28:43 -0400 (EDT)
+In-Reply-To: <20160801182952.3005-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,109 +27,133 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, Dan Carpenter <dan.carpenter@oracle.com>
+To: Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/08/16 19:20, Christoffer Dall wrote:
-> On Fri, Jul 22, 2016 at 06:28:58PM +0100, Marc Zyngier wrote:
->> From: Andre Przywara <andre.przywara@arm.com>
->>
->> When userland wants to inject an MSI into the guest, it uses the
->> KVM_SIGNAL_MSI ioctl, which carries the doorbell address along with
->> the payload and the device ID.
->> With the help of the KVM IO bus framework we learn the corresponding
->> ITS from the doorbell address. We then use our wrapper functions to
->> iterate the linked lists and find the proper Interrupt Translation Table
->> Entry (ITTE) and thus the corresponding struct vgic_irq to finally set
->> the pending bit.
->> We also provide the handler for the ITS "INT" command, which allows a
->> guest to trigger an MSI via the ITS command queue. Since this one knows
->> about the right ITS already, we directly call the MMIO handler function
->> without using the kvm_io_bus framework.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
->> Tested-by: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 77 ++++++++++++++++++++++++++++++++++++++++++++
->>  virt/kvm/arm/vgic/vgic.h     |  6 ++++
->>  2 files changed, 83 insertions(+)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 1408c88..d8e8f14 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -437,6 +437,65 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
->>  	return 0;
->>  }
->>  
->> +/*
->> + * Find the target VCPU and the LPI number for a given devid/eventid pair
->> + * and make this IRQ pending, possibly injecting it.
->> + * Must be called with the its_lock mutex held.
->> + */
->> +static void vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
->> +				 u32 devid, u32 eventid)
->> +{
->> +	struct its_itte *itte;
->> +
->> +	if (!its->enabled)
->> +		return;
->> +
->> +	itte = find_itte(its, devid, eventid);
->> +	/* Triggering an unmapped IRQ gets silently dropped. */
->> +	if (itte && its_is_collection_mapped(itte->collection)) {
->> +		struct kvm_vcpu *vcpu;
->> +
->> +		vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
->> +		if (vcpu && vcpu->arch.vgic_cpu.lpis_enabled) {
->> +			spin_lock(&itte->irq->irq_lock);
->> +			itte->irq->pending = true;
->> +			vgic_queue_irq_unlock(kvm, itte->irq);
->> +		}
->> +	}
->> +}
->> +
->> +/*
->> + * Queries the KVM IO bus framework to get the ITS pointer from the given
->> + * doorbell address.
->> + * We then call vgic_its_trigger_msi() with the decoded data.
->> + */
->> +int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
->> +{
->> +	u64 address;
->> +	struct kvm_io_device *kvm_io_dev;
->> +	struct vgic_io_device *iodev;
->> +
->> +	if (!vgic_has_its(kvm))
->> +		return -ENODEV;
->> +
->> +	if (!(msi->flags & KVM_MSI_VALID_DEVID))
->> +		return -EINVAL;
->> +
->> +	address = (u64)msi->address_hi << 32 | msi->address_lo;
->> +
->> +	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
->> +	if (!kvm_io_dev)
->> +		return -ENODEV;
->> +
->> +	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
->> +
->> +	mutex_lock(&iodev->its->its_lock);
->> +	vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
->> +	mutex_unlock(&iodev->its->its_lock);
->> +
->> +	return 0;
+On 01/08/16 19:29, Christoffer Dall wrote:
+> During low memory conditions, we could be dereferencing a NULL pointer
+> when vgic_add_lpi fails to allocate memory.
 > 
-> According to KVM_SIGNAL_MSI this means that the guest blocked the MSI.
-> Is this the intention, or is the return value translated somewhere
-> higher in the call stack?
+> Consider for example this call sequence:
+> 
+>   vgic_its_cmd_handle_mapi
+>       itte->irq = vgic_add_lpi(kvm, lpi_nr);
+>           update_lpi_config(kvm, itte->irq, NULL);
+>               ret = kvm_read_guest(kvm, propbase + irq->intid
+> 	                                             ^^^^
+> 						     kaboom?
+> 
+> Instead, return an error pointer from vgic_add_lpi and check the return
+> value from its single caller.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 42 +++++++++++++++++++++++++++++-------------
+>  1 file changed, 29 insertions(+), 13 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 07411cf..3515bdb 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -51,7 +51,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid)
+>  
+>  	irq = kzalloc(sizeof(struct vgic_irq), GFP_KERNEL);
+>  	if (!irq)
+> -		return NULL;
+> +		return ERR_PTR(-ENOMEM);
+>  
+>  	INIT_LIST_HEAD(&irq->lpi_list);
+>  	INIT_LIST_HEAD(&irq->ap_list);
+> @@ -697,24 +697,33 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>  	struct its_device *device;
+>  	struct its_collection *collection, *new_coll = NULL;
+>  	int lpi_nr;
+> -
+> -	device = find_its_device(its, device_id);
+> -	if (!device)
+> -		return E_ITS_MAPTI_UNMAPPED_DEVICE;
+> +	struct vgic_irq *irq = NULL;
+> +	int err = 0;
+>  
+>  	if (its_cmd_get_command(its_cmd) == GITS_CMD_MAPTI)
+>  		lpi_nr = its_cmd_get_physical_id(its_cmd);
+>  	else
+>  		lpi_nr = event_id;
+> +
+>  	if (lpi_nr < GIC_LPI_OFFSET ||
+>  	    lpi_nr >= max_lpis_propbaser(kvm->arch.vgic.propbaser))
+>  		return E_ITS_MAPTI_PHYSICALID_OOR;
+>  
+> +	irq = vgic_add_lpi(kvm, lpi_nr);
+> +	if (IS_ERR(irq))
+> +		return PTR_ERR(irq);
+> +
+> +	device = find_its_device(its, device_id);
+> +	if (!device) {
+> +		err = E_ITS_MAPTI_UNMAPPED_DEVICE;
+> +		goto out;
+> +	}
+> +
+>  	collection = find_collection(its, coll_id);
+>  	if (!collection) {
+> -		int ret = vgic_its_alloc_collection(its, &collection, coll_id);
+> -		if (ret)
+> -			return ret;
+> +		err = vgic_its_alloc_collection(its, &collection, coll_id);
+> +		if (err)
+> +			goto out;
+>  		new_coll = collection;
+>  	}
+>  
+> @@ -722,9 +731,8 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>  	if (!itte) {
+>  		itte = kzalloc(sizeof(struct its_itte), GFP_KERNEL);
+>  		if (!itte) {
+> -			if (new_coll)
+> -				vgic_its_free_collection(its, coll_id);
+> -			return -ENOMEM;
+> +			err = -ENOMEM;
+> +			goto out;
+>  		}
+>  
+>  		itte->event_id	= event_id;
+> @@ -733,7 +741,8 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>  
+>  	itte->collection = collection;
+>  	itte->lpi = lpi_nr;
+> -	itte->irq = vgic_add_lpi(kvm, lpi_nr);
+> +	vgic_get_irq_kref(irq);
+> +	itte->irq = irq;
+>  	update_affinity_itte(kvm, itte);
+>  
+>  	/*
+> @@ -742,8 +751,15 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>  	 * the respective config data from memory here upon mapping the LPI.
+>  	 */
+>  	update_lpi_config(kvm, itte->irq, NULL);
+> +	new_coll = NULL;
+> +	irq = NULL;
+>  
+> -	return 0;
+> +out:
+> +	if (new_coll)
+> +		vgic_its_free_collection(its, coll_id);
+> +	if (irq)
+> +		vgic_put_irq(kvm, irq);
 
-I'm afraid it is not, and this is definitely a bug. Andre, can you
-please address this one urgently, as this has a direct impact on the
-userspace API?
+Ah, it took me a moment to understand why you had the
+vgic_irq_get_kref() above. Maybe a small comment?
+
+> +	return err;
+>  }
+>  
+>  /* Requires the its_lock to be held. */
+> 
+
+Otherwise, looks pretty good to me.
+
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
 Thanks,
 
