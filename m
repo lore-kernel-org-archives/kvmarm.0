@@ -1,28 +1,27 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH v1 4/4] arm/arm64: vgic-new: Implement VGICv3 CPU
- interface access
-Date: Tue, 2 Aug 2016 16:46:27 +0200
-Message-ID: <20160802144627.GP32244@cbox>
-References: <1469019748-31005-1-git-send-email-vijay.kilari@gmail.com>
- <1469019748-31005-5-git-send-email-vijay.kilari@gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 33/55] KVM: arm64: vgic: Handle ITS related GICv3
+ redistributor registers
+Date: Tue, 2 Aug 2016 15:46:49 +0100
+Message-ID: <57A0B259.60408@arm.com>
+References: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
+ <1469208552-4155-34-git-send-email-marc.zyngier@arm.com>
+ <20160801182052.GC32244@cbox> <a4caed21-f9fc-9851-3cb6-75ed1088bc28@arm.com>
+ <57A0721E.7010905@arm.com> <20160802143345.GN32244@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12924411E3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 10:38:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67D5F411E3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 10:40:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pN92DKeI-7yz for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Aug 2016 10:38:03 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2466D410EB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 10:38:02 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id f65so412260700wmi.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Aug 2016 07:44:50 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1469019748-31005-5-git-send-email-vijay.kilari@gmail.com>
+ with ESMTP id h0U+0962VkBI for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Aug 2016 10:40:06 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB1A410EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 10:40:05 -0400 (EDT)
+In-Reply-To: <20160802143345.GN32244@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,453 +31,245 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: vijay.kilari@gmail.com
-Cc: Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, Dan Carpenter <dan.carpenter@oracle.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 20, 2016 at 06:32:28PM +0530, vijay.kilari@gmail.com wrote:
-> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+On 02/08/16 15:33, Christoffer Dall wrote:
+> On Tue, Aug 02, 2016 at 11:12:46AM +0100, Marc Zyngier wrote:
+>> On 02/08/16 10:40, Andre Przywara wrote:
+>>> Hi,
+>>>
+>>> On 01/08/16 19:20, Christoffer Dall wrote:
+>>>> On Fri, Jul 22, 2016 at 06:28:50PM +0100, Marc Zyngier wrote:
+>>>>> From: Andre Przywara <andre.przywara@arm.com>
+>>>>>
+>>>>> In the GICv3 redistributor there are the PENDBASER and PROPBASER
+>>>>> registers which we did not emulate so far, as they only make sense
+>>>>> when having an ITS. In preparation for that emulate those MMIO
+>>>>> accesses by storing the 64-bit data written into it into a variable
+>>>>> which we later read in the ITS emulation.
+>>>>> We also sanitise the registers, making sure RES0 regions are respected
+>>>>> and checking for valid memory attributes.
+>>>>>
+>>>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>>>>> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+>>>>> Tested-by: Eric Auger <eric.auger@redhat.com>
+>>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>>>> ---
+>>>>>  include/kvm/arm_vgic.h           |  13 ++++
+>>>>>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 153 ++++++++++++++++++++++++++++++++++++++-
+>>>>>  virt/kvm/arm/vgic/vgic-mmio.h    |   8 ++
+>>>>>  virt/kvm/arm/vgic/vgic-v3.c      |  11 ++-
+>>>>>  4 files changed, 181 insertions(+), 4 deletions(-)
+>>>>>
+>>>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>>>>> index 450b4da..df2dec5 100644
+>>>>> --- a/include/kvm/arm_vgic.h
+>>>>> +++ b/include/kvm/arm_vgic.h
+>>>>> @@ -146,6 +146,14 @@ struct vgic_dist {
+>>>>>  	struct vgic_irq		*spis;
+>>>>>  
+>>>>>  	struct vgic_io_device	dist_iodev;
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * Contains the attributes and gpa of the LPI configuration table.
+>>>>> +	 * Since we report GICR_TYPER.CommonLPIAff as 0b00, we can share
+>>>>> +	 * one address across all redistributors.
+>>>>> +	 * GICv3 spec: 6.1.2 "LPI Configuration tables"
+>>>>> +	 */
+>>>>> +	u64			propbaser;
+>>>>>  };
+>>>>>  
+>>>>>  struct vgic_v2_cpu_if {
+>>>>> @@ -200,6 +208,11 @@ struct vgic_cpu {
+>>>>>  	 */
+>>>>>  	struct vgic_io_device	rd_iodev;
+>>>>>  	struct vgic_io_device	sgi_iodev;
+>>>>> +
+>>>>> +	/* Contains the attributes and gpa of the LPI pending tables. */
+>>>>> +	u64 pendbaser;
+>>>>> +
+>>>>> +	bool lpis_enabled;
+>>>>>  };
+>>>>>  
+>>>>>  int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
+>>>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>>>> index bfcafbd..278bfbb 100644
+>>>>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>>>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>>>> @@ -29,6 +29,19 @@ static unsigned long extract_bytes(unsigned long data, unsigned int offset,
+>>>>>  	return (data >> (offset * 8)) & GENMASK_ULL(num * 8 - 1, 0);
+>>>>>  }
+>>>>>  
+>>>>> +/* allows updates of any half of a 64-bit register (or the whole thing) */
+>>>>> +static u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
+>>>>> +			    unsigned long val)
+>>>>> +{
+>>>>> +	int lower = (offset & 4) * 8;
+>>>>> +	int upper = lower + 8 * len - 1;
+>>>>> +
+>>>>> +	reg &= ~GENMASK_ULL(upper, lower);
+>>>>> +	val &= GENMASK_ULL(len * 8 - 1, 0);
+>>>>> +
+>>>>> +	return reg | ((u64)val << lower);
+>>>>> +}
+>>>>> +
+>>>>>  static unsined long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+>>>>>  					    gpa_t addr, unsigned int len)
+>>>>>  {
+>>>>> @@ -152,6 +165,142 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
+>>>>>  	return 0;
+>>>>>  }
+>>>>>  
+>>>>> +/* We want to avoid outer shareable. */
+>>>>> +u64 vgic_sanitise_shareability(u64 field)
+>>>>> +{
+>>>>> +	switch (field) {
+>>>>> +	case GIC_BASER_OuterShareable:
+>>>>> +		return GIC_BASER_InnerShareable;
+>>>>> +	default:
+>>>>> +		return field;
+>>>>> +	}
+>>>>> +}
+>>>>> +
+>>>>> +/* Avoid any inner non-cacheable mapping. */
+>>>>> +u64 vgic_sanitise_inner_cacheability(u64 field)
+>>>>> +{
+>>>>> +	switch (field) {
+>>>>> +	case GIC_BASER_CACHE_nCnB:
+>>>>> +	case GIC_BASER_CACHE_nC:
+>>>>> +		return GIC_BASER_CACHE_RaWb;
+>>>>> +	default:
+>>>>> +		return field;
+>>>>> +	}
+>>>>> +}
+>>>>> +
+>>>>> +/* Non-cacheable or same-as-inner are OK. */
+>>>>> +u64 vgic_sanitise_outer_cacheability(u64 field)
+>>>>> +{
+>>>>> +	switch (field) {
+>>>>> +	case GIC_BASER_CACHE_SameAsInner:
+>>>>> +	case GIC_BASER_CACHE_nC:
+>>>>> +		return field;
+>>>>> +	default:
+>>>>> +		return GIC_BASER_CACHE_nC;
+>>>>> +	}
+>>>>> +}
+>>>>> +
+>>>>> +u64 vgic_sanitise_field(u64 reg, u64 field_mask, int field_shift,
+>>>>> +			u64 (*sanitise_fn)(u64))
+>>>>> +{
+>>>>> +	u64 field = (reg & field_mask) >> field_shift;
+>>>>> +
+>>>>> +	field = sanitise_fn(field) << field_shift;
+>>>>> +	return (reg & ~field_mask) | field;
+>>>>> +}
+>>>>> +
+>>>>> +#define PROPBASER_RES0_MASK						\
+>>>>> +	(GENMASK_ULL(63, 59) | GENMASK_ULL(55, 52) | GENMASK_ULL(6, 5))
+>>>>> +#define PENDBASER_RES0_MASK						\
+>>>>> +	(BIT_ULL(63) | GENMASK_ULL(61, 59) | GENMASK_ULL(55, 52) |	\
+>>>>> +	 GENMASK_ULL(15, 12) | GENMASK_ULL(6, 0))
+>>>>> +
+>>>>> +static u64 vgic_sanitise_pendbaser(u64 reg)
+>>>>> +{
+>>>>> +	reg = vgic_sanitise_field(reg, GICR_PENDBASER_SHAREABILITY_MASK,
+>>>>> +				  GICR_PENDBASER_SHAREABILITY_SHIFT,
+>>>>> +				  vgic_sanitise_shareability);
+>>>>> +	reg = vgic_sanitise_field(reg, GICR_PENDBASER_INNER_CACHEABILITY_MASK,
+>>>>> +				  GICR_PENDBASER_INNER_CACHEABILITY_SHIFT,
+>>>>> +				  vgic_sanitise_inner_cacheability);
+>>>>> +	reg = vgic_sanitise_field(reg, GICR_PENDBASER_OUTER_CACHEABILITY_MASK,
+>>>>> +				  GICR_PENDBASER_OUTER_CACHEABILITY_SHIFT,
+>>>>> +				  vgic_sanitise_outer_cacheability);
+>>>>> +
+>>>>> +	reg &= ~PENDBASER_RES0_MASK;
+>>>>> +	reg &= ~GENMASK_ULL(51, 48);
+>>>>> +
+>>>>> +	return reg;
+>>>>> +}
+>>>>> +
+>>>>> +static u64 vgic_sanitise_propbaser(u64 reg)
+>>>>> +{
+>>>>> +	reg = vgic_sanitise_field(reg, GICR_PROPBASER_SHAREABILITY_MASK,
+>>>>> +				  GICR_PROPBASER_SHAREABILITY_SHIFT,
+>>>>> +				  vgic_sanitise_shareability);
+>>>>> +	reg = vgic_sanitise_field(reg, GICR_PROPBASER_INNER_CACHEABILITY_MASK,
+>>>>> +				  GICR_PROPBASER_INNER_CACHEABILITY_SHIFT,
+>>>>> +				  vgic_sanitise_inner_cacheability);
+>>>>> +	reg = vgic_sanitise_field(reg, GICR_PROPBASER_OUTER_CACHEABILITY_MASK,
+>>>>> +				  GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT,
+>>>>> +				  vgic_sanitise_outer_cacheability);
+>>>>> +
+>>>>> +	reg &= ~PROPBASER_RES0_MASK;
+>>>>> +	reg &= ~GENMASK_ULL(51, 48);
+>>>>> +	return reg;
+>>>>> +}
+>>>>> +
+>>>>> +static unsigned long vgic_mmio_read_propbase(struct kvm_vcpu *vcpu,
+>>>>> +					     gpa_t addr, unsigned int len)
+>>>>> +{
+>>>>> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>>>> +
+>>>>> +	return extract_bytes(dist->propbaser, addr & 7, len);
+>>>>> +}
+>>>>> +
+>>>>> +static void vgic_mmio_write_propbase(struct kvm_vcpu *vcpu,
+>>>>> +				     gpa_t addr, unsigned int len,
+>>>>> +				     unsigned long val)
+>>>>> +{
+>>>>> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>>>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>>>>> +	u64 propbaser = dist->propbaser;
+>>>>> +
+>>>>> +	/* Storing a value with LPIs already enabled is undefined */
+>>>>> +	if (vgic_cpu->lpis_enabled)
+>>>>> +		return;
+>>>>> +
+>>>>> +	propbaser = update_64bit_reg(propbaser, addr & 4, len, val);
+>>>>> +	propbaser = vgic_sanitise_propbaser(propbaser);
+>>>>> +
+>>>>> +	dist->propbaser = propbaser;
+>>>>
+>>>> Which guarantees do we have that this will always be a single atomic
+>>>> write?
+>>>
+>>> At least on arm64 - which is the only architecture this code is
+>>> compiling for at the moment - I don't see why this shouldn't be a single
+>>> write:
+>>> 	str     x19, [x22,#3544]
+>>> is what my setup here creates.
+>>>
+>>> Do we need something stronger? Do we want to postpone this to the point
+>>> when we get arm(32) support?
+>>
+>> This is a *device*. It shouldn't be affected by whatever drives it.
+>>
+>> Now, and more to the point: the write shouldn't have to be atomic. All
+>> 64bit registers should be able to cope with 32bit writes to it, as
+>> described in the architecture spec (IHI0069C 8.1.3).
 > 
-> CPU sysregs access size is always 64 bits. MPIDR value
-> passed along with reg id is used to identify the CPU.
+> That's not my concern.  My concern is that you have two CPUs updating
+> the propbaser, once after the other, and you end up with a mix of the
+> two updates.  If this C-code can ever become two 32-bit writes, for
+> example, and these can happen in parallel you can end up with something
+> like that.
+> 
+> If there is not valid expectation from guest software that a real device
+> stores either one or the other value, then it's fine to leave it as is.
+> 
+> Thinking about it, any sane guest would probably synchronize multiple
+> writes to this register itself?
 
-Please provide a decent commit message along with a 200+ lines patch.
+Ah, I finally clocked what you mean. Yes, we need to guarantee that the
+update to the register itself is atomic (architectural requirement).
+Which means we need to turn this in to an atomic access (atomic64_set).
+It will still be a normal store on arm64, and be a strd on arm, thanks
+to having LPAE on the host.
 
 Thanks,
--Christoffer
 
-> 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> ---
->  arch/arm64/include/uapi/asm/kvm.h   |    9 ++
->  arch/arm64/kvm/Makefile             |    1 +
->  include/linux/irqchip/arm-gic-v3.h  |    4 +
->  virt/kvm/arm/vgic/vgic-kvm-device.c |   31 +++++
->  virt/kvm/arm/vgic/vgic-mmio-v2.c    |    4 +-
->  virt/kvm/arm/vgic/vgic-mmio-v3.c    |    6 +
->  virt/kvm/arm/vgic/vgic-sys-reg-v3.c |  225 +++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.h            |    6 +
->  8 files changed, 284 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index a6b996e..35c4a99 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -206,7 +206,16 @@ struct kvm_arch_memory_slot {
->  #define KVM_DEV_ARM_VGIC_GRP_NR_IRQS	3
->  #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
->  #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
-> +#define KVM_DEV_ARM_VGIC_CPU_SYSREGS    6
-> +
->  #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
-> +#define   KVM_DEV_ARM_VGIC_SYSREG_MASK (KVM_REG_ARM64_SYSREG_OP0_MASK | \
-> +					KVM_REG_ARM64_SYSREG_OP1_MASK | \
-> +					KVM_REG_ARM64_SYSREG_CRN_MASK | \
-> +					KVM_REG_ARM64_SYSREG_CRM_MASK | \
-> +					KVM_REG_ARM64_SYSREG_OP2_MASK)
-> +#define   KVM_DEV_ARM_VGIC_SYSREG(op0, op1, crn, crm, op2) \
-> +					__ARM64_SYS_REG(op0, op1, crn, crm, op2)
->  
->  /* Device Control API on vcpu fd */
->  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index f00b2cd..53400c1 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -29,5 +29,6 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v2.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v3.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-kvm-device.o
-> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-sys-reg-v3.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
->  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index bfbd707..ae84cde 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -288,6 +288,10 @@
->  
->  #define ICH_VMCR_CTLR_SHIFT		0
->  #define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
-> +#define ICH_VMCR_ENG0_SHIFT		0
-> +#define ICH_VMCR_ENG0			(1 << ICH_VMCR_ENG0_SHIFT)
-> +#define ICH_VMCR_ENG1_SHIFT		1
-> +#define ICH_VMCR_ENG1			(1 << ICH_VMCR_ENG1_SHIFT)
->  #define ICH_VMCR_BPR1_SHIFT		18
->  #define ICH_VMCR_BPR1_MASK		(7 << ICH_VMCR_BPR1_SHIFT)
->  #define ICH_VMCR_BPR0_SHIFT		21
-> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> index 996a720..78c50cc 100644
-> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> @@ -266,6 +266,7 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
->  	int cpuid, ret, c;
->  	struct kvm_vcpu *vcpu, *tmp_vcpu;
->  	int vcpu_lock_idx = -1;
-> +	u64 regid;
->  	struct vgic_dist *vgic = &dev->kvm->arch.vgic;
->  
->  	if (vgic->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> @@ -322,6 +323,16 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
->  		else
->  			ret = -EINVAL;
->  		break;
-> +	case KVM_DEV_ARM_VGIC_CPU_SYSREGS:
-> +		if (vgic->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-> +			regid = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_MASK) |
-> +				KVM_REG_SIZE_U64;
-> +			ret = vgic_v3_cpu_sysregs_uaccess(vcpu, is_write,
-> +							  regid, &reg->reg64);
-> +		} else {
-> +			ret = -EINVAL;
-> +		}
-> +		break;
->  	default:
->  		ret = -EINVAL;
->  		break;
-> @@ -447,6 +458,15 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
->  
->  		return vgic_attr_regs_access(dev, attr, &reg, true);
->  	}
-> +	case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
-> +		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-> +		union ureg reg;
-> +
-> +		if (get_user(reg.reg64, uaddr))
-> +			return -EFAULT;
-> +
-> +		return vgic_attr_regs_access(dev, attr, &reg, true);
-> +	}
->  	}
->  	return -ENXIO;
->  }
-> @@ -472,6 +492,16 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
->  		ret = put_user(reg.reg32, uaddr);
->  		return ret;
->  	}
-> +	case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
-> +		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-> +		union ureg reg;
-> +
-> +		ret = vgic_attr_regs_access(dev, attr, &reg, false);
-> +		if (ret)
-> +			return ret;
-> +		ret = put_user(reg.reg64, uaddr);
-> +		return ret;
-> +	}
->  	}
->  
->  	return -ENXIO;
-> @@ -490,6 +520,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
->  		break;
->  	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
->  	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
-> +	case KVM_DEV_ARM_VGIC_CPU_SYSREGS:
->  		return vgic_v3_has_attr_regs(dev, attr);
->  	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
->  		return 0;
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> index a213936..97d94b2 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> @@ -204,7 +204,7 @@ static void vgic_mmio_write_sgipends(struct kvm_vcpu *vcpu,
->  	}
->  }
->  
-> -static void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-> +void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
->  {
->  	if (kvm_vgic_global_state.type == VGIC_V2)
->  		vgic_v2_set_vmcr(vcpu, vmcr);
-> @@ -212,7 +212,7 @@ static void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
->  		vgic_v3_set_vmcr(vcpu, vmcr);
->  }
->  
-> -static void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-> +void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
->  {
->  	if (kvm_vgic_global_state.type == VGIC_V2)
->  		vgic_v2_get_vmcr(vcpu, vmcr);
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index f6a4e97..aa63f39 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -23,6 +23,7 @@
->  
->  #include "vgic.h"
->  #include "vgic-mmio.h"
-> +#include "sys_regs.h"
->  
->  /* extract @num bytes at @offset bytes offset in data */
->  static unsigned long extract_bytes(unsigned long data, unsigned int offset,
-> @@ -382,6 +383,11 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
->  		nr_regions = rd_dev->nr_regions;
->  		break;
->  	}
-> +	case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
-> +		u64 reg;
-> +
-> +		return vgic_v3_has_cpu_sysregs_attr(vcpu, 0, cpuid, &reg);
-> +	}
->  	default:
->  		return -ENXIO;
->  	}
-> diff --git a/virt/kvm/arm/vgic/vgic-sys-reg-v3.c b/virt/kvm/arm/vgic/vgic-sys-reg-v3.c
-> new file mode 100644
-> index 0000000..d877cd8
-> --- /dev/null
-> +++ b/virt/kvm/arm/vgic/vgic-sys-reg-v3.c
-> @@ -0,0 +1,225 @@
-> +#include <linux/irqchip/arm-gic-v3.h>
-> +#include <linux/kvm.h>
-> +#include <linux/kvm_host.h>
-> +#include <kvm/iodev.h>
-> +#include <kvm/arm_vgic.h>
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_arm.h>
-> +#include <asm/kvm_mmu.h>
-> +
-> +#include "vgic.h"
-> +#include "vgic-mmio.h"
-> +#include "sys_regs.h"
-> +
-> +static bool access_gic_ctlr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *r)
-> +{
-> +	struct vgic_vmcr vmcr;
-> +
-> +	vgic_get_vmcr(vcpu, &vmcr);
-> +	if (p->is_write) {
-> +		vmcr.ctlr = (u32)p->regval;
-> +		vgic_set_vmcr(vcpu, &vmcr);
-> +	} else {
-> +		p->regval = vmcr.ctlr;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static bool access_gic_pmr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			   const struct sys_reg_desc *r)
-> +{
-> +	struct vgic_vmcr vmcr;
-> +
-> +	vgic_get_vmcr(vcpu, &vmcr);
-> +	if (p->is_write) {
-> +		vmcr.pmr = (u32)p->regval;
-> +		vgic_set_vmcr(vcpu, &vmcr);
-> +	} else {
-> +		p->regval = vmcr.pmr;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static bool access_gic_bpr0(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *r)
-> +{
-> +	struct vgic_vmcr vmcr;
-> +
-> +	vgic_get_vmcr(vcpu, &vmcr);
-> +	if (p->is_write) {
-> +		vmcr.bpr = (u32)p->regval;
-> +		vgic_set_vmcr(vcpu, &vmcr);
-> +	} else {
-> +		p->regval = vmcr.bpr;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static bool access_gic_bpr1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *r)
-> +{
-> +	struct vgic_vmcr vmcr;
-> +
-> +	vgic_get_vmcr(vcpu, &vmcr);
-> +	if (p->is_write) {
-> +		vmcr.abpr = (u32)p->regval;
-> +		vgic_set_vmcr(vcpu, &vmcr);
-> +	} else {
-> +		p->regval = vmcr.abpr;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static bool access_gic_grpen0(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			      const struct sys_reg_desc *r)
-> +{
-> +	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-> +
-> +	if (p->is_write) {
-> +		vgicv3->vgic_vmcr &= ~ICH_VMCR_ENG0;
-> +		vgicv3->vgic_vmcr |= (p->regval << ICH_VMCR_ENG0_SHIFT) &
-> +				      ICH_VMCR_ENG0;
-> +	} else {
-> +		p->regval = (vgicv3->vgic_vmcr & ICH_VMCR_ENG0) >>
-> +			     ICH_VMCR_ENG0_SHIFT;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static bool access_gic_grpen1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			      const struct sys_reg_desc *r)
-> +{
-> +	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-> +
-> +	if (p->is_write) {
-> +		vgicv3->vgic_vmcr &= ~ICH_VMCR_ENG1;
-> +		vgicv3->vgic_vmcr |= (p->regval << ICH_VMCR_ENG1_SHIFT) &
-> +				      ICH_VMCR_ENG1;
-> +	} else {
-> +		p->regval = (vgicv3->vgic_vmcr & ICH_VMCR_ENG1) >>
-> +			     ICH_VMCR_ENG1_SHIFT;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static bool access_gic_ap0r(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *r)
-> +{
-> +	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-> +	u8 idx = r->Op2 & 3;
-> +
-> +	if (p->is_write)
-> +		vgicv3->vgic_ap0r[idx] = p->regval;
-> +	else
-> +		p->regval = vgicv3->vgic_ap0r[idx];
-> +
-> +	return true;
-> +}
-> +
-> +static bool access_gic_ap1r(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *r)
-> +{
-> +	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-> +	u8 idx = r->Op2 & 3;
-> +
-> +	if (p->is_write)
-> +		vgicv3->vgic_ap1r[idx] = p->regval;
-> +	else
-> +		p->regval = vgicv3->vgic_ap1r[idx];
-> +
-> +	return true;
-> +}
-> +
-> +static const struct sys_reg_desc gic_v3_icc_reg_descs[] = {
-> +	/* ICC_PMR_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b0100), CRm(0b0110), Op2(0b000),
-> +	  access_gic_pmr },
-> +	/* ICC_BPR0_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1000), Op2(0b011),
-> +	  access_gic_bpr0 },
-> +	/* ICC_AP0R0_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1000), Op2(0b100),
-> +	  access_gic_ap0r },
-> +	/* ICC_AP0R1_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1000), Op2(0b101),
-> +	  access_gic_ap0r },
-> +	/* ICC_AP0R2_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1000), Op2(0b110),
-> +	  access_gic_ap0r },
-> +	/* ICC_AP0R3_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1000), Op2(0b111),
-> +	  access_gic_ap0r },
-> +	/* ICC_AP1R0_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1001), Op2(0b000),
-> +	  access_gic_ap1r },
-> +	/* ICC_AP1R1_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1001), Op2(0b001),
-> +	  access_gic_ap1r },
-> +	/* ICC_AP1R2_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1001), Op2(0b010),
-> +	  access_gic_ap1r },
-> +	/* ICC_AP1R3_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1001), Op2(0b011),
-> +	  access_gic_ap1r },
-> +	/* ICC_BPR1_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1100), Op2(0b011),
-> +	  access_gic_bpr1 },
-> +	/* ICC_CTLR_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1100), Op2(0b100),
-> +	  access_gic_ctlr },
-> +	/* ICC_IGRPEN0_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1100), Op2(0b110),
-> +	  access_gic_grpen0 },
-> +	/* ICC_GRPEN1_EL1 */
-> +	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1100), Op2(0b111),
-> +	  access_gic_grpen1 },
-> +};
-> +
-> +int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
-> +				u64 *reg)
-> +{
-> +	struct sys_reg_params params;
-> +
-> +	params.regval = le64_to_cpu(*reg);
-> +	params.is_write = is_write;
-> +	params.is_aarch32 = false;
-> +	params.is_32bit = false;
-> +
-> +	return find_reg_by_id(id, &params, gic_v3_icc_reg_descs,
-> +			      ARRAY_SIZE(gic_v3_icc_reg_descs)) ?
-> +		0 : -ENXIO;
-> +}
-> +
-> +int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write, u64 id,
-> +				u64 *reg)
-> +{
-> +	struct sys_reg_params params;
-> +	const struct sys_reg_desc *r;
-> +
-> +	if (is_write)
-> +		params.regval = le64_to_cpu(*reg);
-> +	params.is_write = is_write;
-> +	params.is_aarch32 = false;
-> +	params.is_32bit = false;
-> +
-> +	r = find_reg_by_id(id, &params, gic_v3_icc_reg_descs,
-> +			   ARRAY_SIZE(gic_v3_icc_reg_descs));
-> +	if (!r)
-> +		return -ENXIO;
-> +
-> +	if (!r->access(vcpu, &params, r))
-> +		return -EINVAL;
-> +
-> +	if (!is_write)
-> +		*reg = cpu_to_le64(params.regval);
-> +
-> +	return 0;
-> +}
-> +
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 8637690..23db38d 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -79,6 +79,10 @@ int vgic_v3_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
->  			 int offset, u32 *val);
->  int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
->  			 int offset, u32 *val);
-> +int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-> +			 u64 id, u64 *val);
-> +int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
-> +				u64 *reg);
->  #else
->  static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
->  {
-> @@ -132,6 +136,8 @@ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
->  }
->  #endif
->  
-> +void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-> +void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void kvm_register_vgic_device(unsigned long type);
->  int vgic_lazy_init(struct kvm *kvm);
->  int vgic_init(struct kvm *kvm);
-> -- 
-> 1.7.9.5
-> 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
