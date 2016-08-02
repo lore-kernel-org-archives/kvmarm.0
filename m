@@ -1,27 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: ITS: return 1 on successful MSI injection
-Date: Tue, 2 Aug 2016 15:57:40 +0200
-Message-ID: <20160802135740.GI32244@cbox>
-References: <20160802111058.31496-1-andre.przywara@arm.com>
- <20160802122309.GH32244@cbox> <57A091FC.9070607@arm.com>
+Subject: Re: [RFC PATCH v1] arm/arm64: vgic-new: Create dist and redist
+ iodevs earlier
+Date: Tue, 2 Aug 2016 16:04:21 +0200
+Message-ID: <20160802140421.GK32244@cbox>
+References: <1467731491-6458-1-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B426E49B1A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 09:49:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C47849B1A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 09:56:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3L62R4V1GfN3 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Aug 2016 09:49:15 -0400 (EDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5CB8C411E3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 09:49:14 -0400 (EDT)
-Received: by mail-wm0-f50.google.com with SMTP id f65so410358669wmi.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Aug 2016 06:56:02 -0700 (PDT)
+ with ESMTP id Sisfpd5lUK3K for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Aug 2016 09:55:56 -0400 (EDT)
+Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C5F5F411E3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Aug 2016 09:55:56 -0400 (EDT)
+Received: by mail-wm0-f43.google.com with SMTP id f65so410624007wmi.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Aug 2016 07:02:44 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <57A091FC.9070607@arm.com>
+In-Reply-To: <1467731491-6458-1-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,60 +31,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: vijay.kilari@gmail.com
+Cc: Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, Vijaya Kumar K <vijayak@caviumnetworks.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 02, 2016 at 01:28:44PM +0100, Marc Zyngier wrote:
-> On 02/08/16 13:23, Christoffer Dall wrote:
-> > On Tue, Aug 02, 2016 at 12:10:58PM +0100, Andre Przywara wrote:
-> >> According to the KVM API documentation a successful MSI injection
-> >> should return a value > 0 on success.
-> >> Since we pass the return value of vgic_its_inject_msi() directly on
-> >> to upper layers and userland, we need to use the same semantics here.
-> >> Briefly tested with QEMU and kvmtool on GICv3 hardware and the model.
-> >>
-> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> >> ---
-> >> Applies on top of next-20160728. Let me know if I should use a
-> >> different base.
-> >>
-> >> Cheers,
-> >> Andre.
-> >>
-> >>  virt/kvm/arm/vgic/vgic-its.c | 3 ++-
-> >>  1 file changed, 2 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> >> index 07411cf..3268250 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-its.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> >> @@ -468,6 +468,7 @@ static void vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
-> >>   * Queries the KVM IO bus framework to get the ITS pointer from the given
-> >>   * doorbell address.
-> >>   * We then call vgic_its_trigger_msi() with the decoded data.
-> >> + * According to the KVM_SIGNAL_MSI API description returns > 0 on success.
-> >>   */
-> >>  int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-> >>  {
-> >> @@ -493,7 +494,7 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-> >>  	vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
-> >>  	mutex_unlock(&iodev->its->its_lock);
-> >>  
-> >> -	return 0;
-> >> +	return 1;
-> >>  }
-> >>  
-> >>  /* Requires the its_lock to be held. */
-> > 
-> > Do we have a clear understanding of what 'guest blocked the MSI'
-> > constitutes in the ARM world?
-> 
-> I would define it as "the guest has not configured the ITS so that the
-> corresponding LPI could be successfully delivered". Which is any of the
-> conditions where the interrupt cannot make it into the pending table,
-> and is dropped on the floor.
-> 
-sounds good to me.
+Hi Vijaya,
 
+On Tue, Jul 05, 2016 at 08:41:31PM +0530, vijay.kilari@gmail.com wrote:
+> From: Vijaya Kumar K <vijayak@caviumnetworks.com>
+> 
+> The dist and redist regions are created and registered in
+> vgic_register_dist_iodevs() and vgic_v3_init_redist_iodev()
+> calls for distributor and redistributor respectively when
+> vgic_v3_map_resources() is called. This mapping of resources
+> is done when vcpu run ioctl is called.
+> 
+> Below is the call stack of the same.
+> 
+> [<ffff0000080b2e8c>] vgic_register_redist_iodevs+0x94/0x27c
+> [<ffff0000080b0fd8>] vgic_v3_map_resources+0x138/0x188
+> [<ffff0000080affa4>] kvm_vgic_map_resources+0xb0/0xb8
+> [<ffff0000080a3888>] kvm_arch_vcpu_ioctl_run+0x4a8/0x550
+> [<ffff00000809c218>] kvm_vcpu_ioctl+0x304/0x74c
+> [<ffff000008232cac>] do_vfs_ioctl+0xc0/0x754
+> [<ffff0000082333d0>] SyS_ioctl+0x90/0xa4
+> [<ffff000008084af0>] el0_svc_naked+0x24/0x28
+> 
+> During live migration, the destination VM first restores the all the
+> GIC registers(dist, rdist and cpuif registers) using ioctl's before
+> resuming the VM.So no vcpu run ioctl is called untill complete
+> GIC context is restored.
+> 
+> Hence, In case of live migration, when ioctls are called to write
+> dist/rdist registers the ioctls fails as
+> vcpu->kvm->arch.vgic.dist_iodev andkvm->arch.vgic.redist_iodevs
+> are NULL.
+> 
+
+Is this for GICv3 only?  Can you give me a more specific pointer to the
+place where this fails or a traceback?
+
+Definitely the approach of registering things early doesn't work,
+because it breaks all sorts of other things.
+
+So the trick is to make sure userspace accesses can work without a
+registers kvm iodev.  I will have a look at this, but some more conceret
+info as requested above will be helpful.
+
+Thanks,
 -Christoffer
