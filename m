@@ -1,7 +1,7 @@
 From: Matthias Brugger <mbrugger@suse.com>
-Subject: [PATCH 1/4] arm64: insn: Do not disable irqs during patching
-Date: Thu,  4 Aug 2016 11:15:14 +0200
-Message-ID: <1470302117-32296-2-git-send-email-mbrugger@suse.com>
+Subject: [PATCH 2/4] arm64: Implement IPI based TLB invalidation
+Date: Thu,  4 Aug 2016 11:15:15 +0200
+Message-ID: <1470302117-32296-3-git-send-email-mbrugger@suse.com>
 References: <1470302117-32296-1-git-send-email-mbrugger@suse.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1470302117-32296-1-git-send-email-mbrugger@suse.com>
@@ -10,55 +10,256 @@ To: pbonzini@redhat.com, rkrcmar@redhat.com, christoffer.dall@linaro.org, marc.z
 Cc: suzuki.poulose@arm.com, james.morse@arm.com, david.daney@cavium.com, rrichter@cavium.com, agraf@suse.de, mbrugger@suse.com, mark.rutland@arm.com, lorenzo.pieralisi@arm.com, dave.long@linaro.org, ard.biesheuvel@linaro.org, zlim.lnx@gmail.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Robert Richter <rrichter@cavium.com>
+Hardware may lack a sane implementation of TLB invalidation
+using broadcast TLBI command. Add a capability to enable TLB
+invalidation using IPI.
 
-__aarch64_insn_write() is always called with interrupts enabled. Thus,
-there is no need to use an irqsave variant for the spin lock.
-
-This change should also address the fix of:
-
-commit abffa6f3b157 ("arm64: convert patch_lock to raw lock")
-
-We need to enable interrupts to allow cpu sync for code patching
-using smp_call_function*().
-
+Signed-off-by: David Daney <david.daney@cavium.com>
 Signed-off-by: Robert Richter <rrichter@cavium.com>
+Signed-off-by: Alexander Graf <agraf@suse.de>
 Signed-off-by: Matthias Brugger <mbrugger@suse.com>
 ---
- arch/arm64/kernel/insn.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/cpufeature.h |  3 +-
+ arch/arm64/include/asm/tlbflush.h   | 94 ++++++++++++++++++++++++++++++++-----
+ arch/arm64/mm/flush.c               | 46 ++++++++++++++++++
+ 3 files changed, 129 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
-index 63f9432..138bd8a 100644
---- a/arch/arm64/kernel/insn.c
-+++ b/arch/arm64/kernel/insn.c
-@@ -86,7 +86,7 @@ bool aarch64_insn_is_branch_imm(u32 insn)
- 		aarch64_insn_is_bcond(insn));
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 49dd1bd..c4bf72b 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -36,8 +36,9 @@
+ #define ARM64_HAS_VIRT_HOST_EXTN		11
+ #define ARM64_WORKAROUND_CAVIUM_27456		12
+ #define ARM64_HAS_32BIT_EL0			13
++#define ARM64_HAS_NO_BCAST_TLBI			14
+ 
+-#define ARM64_NCAPS				14
++#define ARM64_NCAPS				15
+ 
+ #ifndef __ASSEMBLY__
+ 
+diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+index b460ae2..edc5495 100644
+--- a/arch/arm64/include/asm/tlbflush.h
++++ b/arch/arm64/include/asm/tlbflush.h
+@@ -71,7 +71,10 @@ static inline void local_flush_tlb_all(void)
+ 	isb();
  }
  
--static DEFINE_RAW_SPINLOCK(patch_lock);
-+static DEFINE_SPINLOCK(patch_lock);
- 
- static void __kprobes *patch_map(void *addr, int fixmap)
+-static inline void flush_tlb_all(void)
++void __flush_tlb_all_ipi(void);
++void __flush_tlb_mm_ipi(struct mm_struct *mm);
++
++static inline void __flush_tlb_all_tlbi(void)
  {
-@@ -129,16 +129,15 @@ int __kprobes aarch64_insn_read(void *addr, u32 *insnp)
- static int __kprobes __aarch64_insn_write(void *addr, u32 insn)
- {
- 	void *waddr = addr;
--	unsigned long flags = 0;
- 	int ret;
- 
--	raw_spin_lock_irqsave(&patch_lock, flags);
-+	spin_lock(&patch_lock);
- 	waddr = patch_map(addr, FIX_TEXT_POKE0);
- 
- 	ret = probe_kernel_write(waddr, &insn, AARCH64_INSN_SIZE);
- 
- 	patch_unmap(FIX_TEXT_POKE0);
--	raw_spin_unlock_irqrestore(&patch_lock, flags);
-+	spin_unlock(&patch_lock);
- 
- 	return ret;
+ 	dsb(ishst);
+ 	asm("tlbi	vmalle1is");
+@@ -79,7 +82,17 @@ static inline void flush_tlb_all(void)
+ 	isb();
  }
+ 
+-static inline void flush_tlb_mm(struct mm_struct *mm)
++static inline void flush_tlb_all(void)
++{
++	if (cpus_have_cap(ARM64_HAS_NO_BCAST_TLBI)) {
++		__flush_tlb_all_ipi();
++		return;
++	}
++
++	__flush_tlb_all_tlbi();
++}
++
++static inline void __flush_tlb_mm_tlbi(struct mm_struct *mm)
+ {
+ 	unsigned long asid = ASID(mm) << 48;
+ 
+@@ -88,8 +101,18 @@ static inline void flush_tlb_mm(struct mm_struct *mm)
+ 	dsb(ish);
+ }
+ 
+-static inline void flush_tlb_page(struct vm_area_struct *vma,
+-				  unsigned long uaddr)
++static inline void flush_tlb_mm(struct mm_struct *mm)
++{
++	if (cpus_have_cap(ARM64_HAS_NO_BCAST_TLBI)) {
++		__flush_tlb_mm_ipi(mm);
++		return;
++	}
++
++	__flush_tlb_mm_tlbi(mm);
++}
++
++static inline void __flush_tlb_page_tlbi(struct vm_area_struct *vma,
++		unsigned long uaddr)
+ {
+ 	unsigned long addr = uaddr >> 12 | (ASID(vma->vm_mm) << 48);
+ 
+@@ -98,15 +121,26 @@ static inline void flush_tlb_page(struct vm_area_struct *vma,
+ 	dsb(ish);
+ }
+ 
++static inline void flush_tlb_page(struct vm_area_struct *vma,
++		unsigned long uaddr)
++{
++	if (cpus_have_cap(ARM64_HAS_NO_BCAST_TLBI)) {
++		__flush_tlb_mm_ipi(vma->vm_mm);
++		return;
++	}
++
++	__flush_tlb_page_tlbi(vma, uaddr);
++}
++
+ /*
+  * This is meant to avoid soft lock-ups on large TLB flushing ranges and not
+  * necessarily a performance improvement.
+  */
+ #define MAX_TLB_RANGE	(1024UL << PAGE_SHIFT)
+ 
+-static inline void __flush_tlb_range(struct vm_area_struct *vma,
+-				     unsigned long start, unsigned long end,
+-				     bool last_level)
++static inline void __flush_tlb_range_tlbi(struct vm_area_struct *vma,
++		unsigned long start, unsigned long end,
++		bool last_level)
+ {
+ 	unsigned long asid = ASID(vma->vm_mm) << 48;
+ 	unsigned long addr;
+@@ -129,13 +163,26 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
+ 	dsb(ish);
+ }
+ 
++static inline void __flush_tlb_range(struct vm_area_struct *vma,
++		unsigned long start, unsigned long end,
++		bool last_level)
++{
++	if (cpus_have_cap(ARM64_HAS_NO_BCAST_TLBI)) {
++		__flush_tlb_mm_ipi(vma->vm_mm);
++		return;
++	}
++
++	__flush_tlb_range_tlbi(vma, start, end, last_level);
++}
++
+ static inline void flush_tlb_range(struct vm_area_struct *vma,
+-				   unsigned long start, unsigned long end)
++		unsigned long start, unsigned long end)
+ {
+ 	__flush_tlb_range(vma, start, end, false);
+ }
+ 
+-static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end)
++static inline void __flush_tlb_kernel_range_tlbi(unsigned long start,
++		unsigned long end)
+ {
+ 	unsigned long addr;
+ 
+@@ -154,17 +201,38 @@ static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end
+ 	isb();
+ }
+ 
++static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end)
++{
++	if (cpus_have_cap(ARM64_HAS_NO_BCAST_TLBI)) {
++		__flush_tlb_all_ipi();
++		return;
++	}
++
++	__flush_tlb_kernel_range_tlbi(start, end);
++}
++
++static inline void __flush_tlb_pgtable_tlbi(struct mm_struct *mm,
++		unsigned long uaddr)
++{
++	unsigned long addr = uaddr >> 12 | (ASID(mm) << 48);
++
++	asm("tlbi	vae1is, %0" : : "r" (addr));
++	dsb(ish);
++}
++
+ /*
+  * Used to invalidate the TLB (walk caches) corresponding to intermediate page
+  * table levels (pgd/pud/pmd).
+  */
+ static inline void __flush_tlb_pgtable(struct mm_struct *mm,
+-				       unsigned long uaddr)
++		unsigned long uaddr)
+ {
+-	unsigned long addr = uaddr >> 12 | (ASID(mm) << 48);
++	if (cpus_have_cap(ARM64_HAS_NO_BCAST_TLBI)) {
++		__flush_tlb_mm_ipi(mm);
++		return;
++	}
+ 
+-	asm("tlbi	vae1is, %0" : : "r" (addr));
+-	dsb(ish);
++	__flush_tlb_pgtable_tlbi(mm, uaddr);
+ }
+ 
+ #endif
+diff --git a/arch/arm64/mm/flush.c b/arch/arm64/mm/flush.c
+index 43a76b0..402036a 100644
+--- a/arch/arm64/mm/flush.c
++++ b/arch/arm64/mm/flush.c
+@@ -27,6 +27,24 @@
+ 
+ #include "mm.h"
+ 
++static void flush_tlb_local(void *info)
++{
++	local_flush_tlb_all();
++}
++
++static void flush_tlb_mm_local(void *info)
++{
++	unsigned long asid = (unsigned long)info;
++
++	asm volatile("\n"
++	"  dsb     nshst\n"
++	"  tlbi    aside1, %0\n"
++	"  dsb     nsh\n"
++	"  isb     sy"
++	: : "r" (asid)
++	);
++}
++
+ void flush_cache_range(struct vm_area_struct *vma, unsigned long start,
+ 		       unsigned long end)
+ {
+@@ -90,6 +108,34 @@ void flush_dcache_page(struct page *page)
+ }
+ EXPORT_SYMBOL(flush_dcache_page);
+ 
++void __flush_tlb_mm_ipi(struct mm_struct *mm)
++{
++	unsigned long asid;
++
++	if (!mm) {
++		flush_tlb_all();
++	} else {
++		asid = ASID(mm) << 48;
++		/* Make sure page table modifications are visible. */
++		dsb(ishst);
++		/* IPI to all CPUs to do local flush. */
++		on_each_cpu(flush_tlb_mm_local, (void *)asid, 1);
++	}
++}
++EXPORT_SYMBOL(__flush_tlb_mm_ipi);
++
++void __flush_tlb_all_ipi(void)
++{
++	/* Make sure page table modifications are visible. */
++	dsb(ishst);
++	if (num_online_cpus() <= 1)
++		local_flush_tlb_all();
++	else
++		/* IPI to all CPUs to do local flush. */
++		on_each_cpu(flush_tlb_local, NULL, 1);
++}
++EXPORT_SYMBOL(__flush_tlb_all_ipi);
++
+ /*
+  * Additional functions defined in assembly.
+  */
 -- 
 2.6.6
