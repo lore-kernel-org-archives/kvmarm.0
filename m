@@ -1,262 +1,113 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: initialize new VGIC even without host GIC
-Date: Thu, 4 Aug 2016 13:51:37 +0100
-Message-ID: <dda85147-d7a9-73b2-15bb-8de53782d1af@arm.com>
-References: <20160802143445.14005-1-andre.przywara@arm.com>
- <20160804112450.GC8211@lvm>
+From: Robert Richter <robert.richter@cavium.com>
+Subject: [PATCH] arm64: Add workaround for Cavium erratum 26026
+Date: Thu, 4 Aug 2016 22:57:07 +0200
+Message-ID: <20160804205707.GJ2151@rric.localdomain>
+References: <1470302117-32296-1-git-send-email-mbrugger@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A365E49B4A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Aug 2016 08:43:45 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vku8WB5h3QNj for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Aug 2016 08:43:44 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B9314998D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Aug 2016 08:43:43 -0400 (EDT)
-In-Reply-To: <20160804112450.GC8211@lvm>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <1470302117-32296-1-git-send-email-mbrugger@suse.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com
+Cc: mark.rutland@arm.com, Matthias Brugger <mbrugger@suse.com>, kvm@vger.kernel.org, suzuki.poulose@arm.com, zlim.lnx@gmail.com, rkrcmar@redhat.com, david.daney@cavium.com, agraf@suse.de, linux-kernel@vger.kernel.org, ard.biesheuvel@linaro.org, lorenzo.pieralisi@arm.com, james.morse@arm.com, dave.long@linaro.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+The patch below is on top of Matthias' patch series:
 
-On 04/08/16 12:24, Christoffer Dall wrote:
-> On Tue, Aug 02, 2016 at 03:34:45PM +0100, Andre Przywara wrote:
->> The new VGIC code is always in the VCPU entry/exit path, even when the
->> actual GIC hardware initialization found the VGIC unusable (due to
->> non-aligned base addresses or a missing maintenance interrupt, for
->> instance).
->> Since in this case the VGIC structures aren't initialized properly, the
->> host kernel crashes on a NULL pointer dereference.
->> Initialize each VCPU's ap_list even with the VGIC unavailable, so the
->> VGIC code now just iterates an empty list in that case and no longer
->> crashes the kernel.
->> Also take care of the arch timer (which becomes unusable as well without
->> a VGIC) by using a static key to prevent arch timer code to run in the
->> hot path.
->> Much of the code was inspired by Marc Zyngier.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> Reported-by: Stefan Agner <stefan@agner.ch>
->> ---
->> Hi Stefan, Drew,
->>
->> can you test this on your systems which showed the issue?
->>
->> Cheers,
->> Andre.
->>
->>  arch/arm/kvm/arm.c            | 14 ++++++++++----
->>  include/kvm/arm_arch_timer.h  |  2 ++
->>  virt/kvm/arm/arch_timer.c     | 11 +++++++++++
->>  virt/kvm/arm/vgic/vgic-init.c |  9 ++++-----
->>  4 files changed, 27 insertions(+), 9 deletions(-)
->>
->> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
->> index f1bde7c..cef35ce 100644
->> --- a/arch/arm/kvm/arm.c
->> +++ b/arch/arm/kvm/arm.c
->> @@ -294,7 +294,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
->>  	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
->>  
->>  	/* Set up the timer */
->> -	kvm_timer_vcpu_init(vcpu);
->> +	if (vgic_present)
->> +		kvm_timer_vcpu_init(vcpu);
->>  
->>  	kvm_arm_reset_debug_ptr(vcpu);
->>  
->> @@ -1208,6 +1209,7 @@ static int init_subsystems(void)
->>  		break;
->>  	case -ENODEV:
->>  	case -ENXIO:
->> +		kvm_err("No useable vgic detected\n");
->>  		vgic_present = false;
->>  		err = 0;
->>  		break;
->> @@ -1218,9 +1220,13 @@ static int init_subsystems(void)
->>  	/*
->>  	 * Init HYP architected timer support
->>  	 */
->> -	err = kvm_timer_hyp_init();
->> -	if (err)
->> -		goto out;
->> +	if (vgic_present) {
->> +		err = kvm_timer_hyp_init();
->> +		if (err)
->> +			goto out;
->> +	} else {
->> +		static_branch_enable(&kvm_arch_timer_disabled);
->> +	}
->>  
->>  	kvm_perf_init();
->>  	kvm_coproc_table_init();
->> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
->> index dda39d8..64f361f 100644
->> --- a/include/kvm/arm_arch_timer.h
->> +++ b/include/kvm/arm_arch_timer.h
->> @@ -23,6 +23,8 @@
->>  #include <linux/hrtimer.h>
->>  #include <linux/workqueue.h>
->>  
->> +extern struct static_key_false kvm_arch_timer_disabled;
->> +
->>  struct arch_timer_kvm {
->>  	/* Virtual offset */
->>  	cycle_t			cntvoff;
->> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->> index 4fde8c7..71fb04c 100644
->> --- a/virt/kvm/arm/arch_timer.c
->> +++ b/virt/kvm/arm/arch_timer.c
->> @@ -34,6 +34,8 @@ static struct timecounter *timecounter;
->>  static struct workqueue_struct *wqueue;
->>  static unsigned int host_vtimer_irq;
->>  
->> +DEFINE_STATIC_KEY_FALSE(kvm_arch_timer_disabled);
->> +
->>  void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->>  {
->>  	vcpu->arch.timer_cpu.active_cleared_last = false;
->> @@ -41,6 +43,9 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->>  
->>  static cycle_t kvm_phys_timer_read(void)
->>  {
->> +	if (static_branch_unlikely(&kvm_arch_timer_disabled))
->> +		return 0;
->> +
->>  	return timecounter->cc->read(timecounter->cc);
->>  }
->>  
->> @@ -104,6 +109,9 @@ static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
->>  {
->>  	cycle_t cval, now;
->>  
->> +	if (static_branch_unlikely(&kvm_arch_timer_disabled))
->> +		return 0;
->> +
->>  	cval = vcpu->arch.timer_cpu.cntv_cval;
->>  	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
->>  
->> @@ -148,6 +156,9 @@ static bool kvm_timer_irq_can_fire(struct kvm_vcpu *vcpu)
->>  {
->>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->>  
->> +	if (static_branch_unlikely(&kvm_arch_timer_disabled))
->> +		return false;
->> +
->>  	return !(timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
->>  		(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE);
->>  }
-> 
-> why do we have these hooks fairly deep into the arch timer static
-> functions?
-> 
-> I would think that it makes more sense to catch stuff in the early entry
-> points to the timer logic, which would be:
-> 
->   kvm_timer_should_fire
->   kvm_timer_schedule
->   kvm_timer_unschedule
->   kvm_arm_timer_set_reg
->   kvm_arm_timer_get_reg
-> 
-> Also, most of these don't seem to be in a general critical path, so I'm
-> not really sure why we're using static branches here?
+ arm64: Implement IPI based TLB invalidation
 
-To be honest I am not of fan of those sprinkled static branches either.
-They should be fairly cheap, though, as they are a NOP normally and
-AFAICS we need at least one anyway, so adding some more users didn't
-seem overly problematic to me.
-In a previous version I got along without most of those, by just letting
-timecounter always point to something legal, thus avoiding all but one
-explicit "vgic/arch_timer enabled" check at all.
-I fixed this up after some comments from Marc, but agree that now it's
-not nice.
+The series is used to enable a workaround for Cavium ThunderX pass 1.x
+systems.
 
-But see below for a possible better solution.
+-Robert
 
->> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
->> index 2c7f0d5..b92133c 100644
->> --- a/virt/kvm/arm/vgic/vgic-init.c
->> +++ b/virt/kvm/arm/vgic/vgic-init.c
->> @@ -56,6 +56,10 @@ void kvm_vgic_early_init(struct kvm *kvm)
->>  
->>  void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu)
->>  {
->> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->> +
->> +	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
->> +	spin_lock_init(&vgic_cpu->ap_list_lock);
->>  }
-> 
-> there are two pieces of comments above that needs to be tweaked now (or
-> just remove the remaining function and comment)
 
-TBH hooking into here was an easy solution, which I chose to allow
-fixing this easily, for instance for a 4.7 stable fix.
 
-Somehow I feel this is an abuse and we can find another solution.
-What about explicit "disable arch timer/vgic" function(s), which could
-set this list and spin_lock up, also make sure timecounter in
-arch_timer.c points to something and toggle the static branch.
-Then we would use something like:
-	if (vgic_present)
-		kvm_timer_hyp_init();
-	else
-		kvm_disable_arch_timer();
+>From abb99ee83473d9ecffb4fdaae9c69435ca670bc8 Mon Sep 17 00:00:00 2001
+From: Robert Richter <rrichter@cavium.com>
+Date: Fri, 29 Jul 2016 09:40:04 +0200
+Subject: [PATCH] arm64: Add workaround for Cavium erratum 26026
 
-and similar for the VGIC.
+STX may return a wrong status value if the store was successful.
 
-Does that sound useful or are we going totally off the tracks with this?
+This may happen on ThunderX T88 pass 1.x cpus if a broadcast TLBI is
+executed on another cpu in parallel to an STX. As a result atomic or
+non-blocking implementations can behave incorrectly. Use IPIs that
+call local TLBIs on other cpus to avoid this.
 
->>  
->>  /* CREATION */
->> @@ -392,11 +396,6 @@ int kvm_vgic_hyp_init(void)
->>  	if (!gic_kvm_info)
->>  		return -ENODEV;
->>  
->> -	if (!gic_kvm_info->maint_irq) {
->> -		kvm_err("No vgic maintenance irq\n");
->> -		return -ENXIO;
->> -	}
->> -
-> 
-> I don't understand why we can remove this chunk?
+Applies to ThunderX T88 pass 1.x cpus.
 
-This was in Marc's version of the fix originally and I didn't dare to
-question this ;-)
-Originally I was under the impression that we are reporting this
-condition in the host GIC driver already, but checking back this doesn't
-seem to be the case. In fact we just seem to report the unusable VGIC,
-without any further rationale.
+Signed-off-by: Robert Richter <rrichter@cavium.com>
+---
+ Documentation/arm64/silicon-errata.txt |  1 +
+ arch/arm64/Kconfig                     | 14 ++++++++++++++
+ arch/arm64/kernel/cpu_errata.c         |  8 ++++++++
+ 3 files changed, 23 insertions(+)
 
-So if Marc agrees, should we remove this hunk and keep the message?
-
-Cheers,
-Andre.
-
->>  	switch (gic_kvm_info->type) {
->>  	case GIC_V2:
->>  		ret = vgic_v2_probe(gic_kvm_info);
->> -- 
->> 2.9.0
->>
-> 
-> Thanks,
-> -Christoffer
-> 
+diff --git a/Documentation/arm64/silicon-errata.txt b/Documentation/arm64/silicon-errata.txt
+index 4da60b463995..0d870d934528 100644
+--- a/Documentation/arm64/silicon-errata.txt
++++ b/Documentation/arm64/silicon-errata.txt
+@@ -58,5 +58,6 @@ stable kernels.
+ | Cavium         | ThunderX ITS    | #22375, #24313  | CAVIUM_ERRATUM_22375    |
+ | Cavium         | ThunderX ITS    | #23144          | CAVIUM_ERRATUM_23144    |
+ | Cavium         | ThunderX GICv3  | #23154          | CAVIUM_ERRATUM_23154    |
++| Cavium         | ThunderX Core   | #26026          | CAVIUM_ERRATUM_26026    |
+ | Cavium         | ThunderX Core   | #27456          | CAVIUM_ERRATUM_27456    |
+ | Cavium         | ThunderX SMMUv2 | #27704          | N/A		       |
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 5a0a691d4220..8cbd9043ec6f 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -457,6 +457,20 @@ config CAVIUM_ERRATUM_23154
+ 
+ 	  If unsure, say Y.
+ 
++config CAVIUM_ERRATUM_26026
++	bool "Cavium erratum 26026: STX may return wrong status value"
++	default y
++	help
++	  STX may return a wrong status value if the store was
++	  successful. This may happen on ThunderX T88 pass 1.x cpus if
++	  a broadcast TLBI is executed on another cpu in parallel to
++	  an STX. As a result atomic or non-blocking implementations
++	  can behave incorrectly. Use IPIs that call local TLBIs on
++	  other cpus to avoid this.
++	  Applies to ThunderX T88 pass 1.x cpus.
++
++	  If unsure, say Y.
++
+ config CAVIUM_ERRATUM_27456
+ 	bool "Cavium erratum 27456: Broadcast TLBI instructions may cause icache corruption"
+ 	default y
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index af716b65110d..1e1753a6408e 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -90,6 +90,14 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 		MIDR_RANGE(MIDR_THUNDERX, 0x00, 0x01),
+ 	},
+ #endif
++#ifdef CONFIG_CAVIUM_ERRATUM_26026
++	{
++	/* Cavium ThunderX, pass 1.x */
++		.desc = "Cavium erratum 26026",
++		.capability = ARM64_HAS_NO_BCAST_TLBI,
++		MIDR_RANGE(MIDR_THUNDERX, 0x00, 0x01),
++	},
++#endif
+ #ifdef CONFIG_CAVIUM_ERRATUM_27456
+ 	{
+ 	/* Cavium ThunderX, T88 pass 1.x - 2.1 */
+-- 
+2.7.0.rc3
