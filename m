@@ -1,230 +1,114 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: ITS: move ITS registration into first VCPU run
-Date: Thu, 4 Aug 2016 12:26:57 +0200
-Message-ID: <79f68597-8be8-6795-874a-54bcf4f19a52@redhat.com>
-References: <20160803145745.7556-1-andre.przywara@arm.com>
- <8ef91ad8-d597-bcb7-db46-2a7194f79f32@redhat.com>
- <894b8d50-f073-1835-372f-1d90856cc8f5@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 41/55] KVM: arm64: vgic-its: Implement MSI injection in
+ ITS emulation
+Date: Thu, 4 Aug 2016 12:47:36 +0200
+Message-ID: <20160804104736.GA8211@lvm>
+References: <1469208552-4155-1-git-send-email-marc.zyngier@arm.com>
+ <1469208552-4155-42-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D342F49B2C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Aug 2016 06:20:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eDAHhlaBgaE1 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Aug 2016 06:20:09 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3ABF2412A2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Aug 2016 06:20:09 -0400 (EDT)
-In-Reply-To: <894b8d50-f073-1835-372f-1d90856cc8f5@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1469208552-4155-42-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, Dan Carpenter <dan.carpenter@oracle.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+Hi Andre and Marc,
 
-On 04/08/2016 12:17, Andre Przywara wrote:
-> Hi Eric,
+On Fri, Jul 22, 2016 at 06:28:58PM +0100, Marc Zyngier wrote:
+> From: Andre Przywara <andre.przywara@arm.com>
 > 
-> On 04/08/16 11:11, Auger Eric wrote:
->> Hi Andre,
->>
->> On 03/08/2016 16:57, Andre Przywara wrote:
->>> Currently we register ITS devices upon userland issuing the CTRL_INIT
->>> ioctl to mark initialization of the ITS as done.
->>> This deviates from the initialization sequence of the existing GIC
->>> devices and does not play well with the way QEMU handles things.
->>> To be more in line with what we are used to, register the ITS(es) just
->>> before the first VCPU is about to run, so in the map_resources() call.
->>> This involves iterating through the list of KVM devices and handle each
->>> ITS that we find.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>> Hi,
->>>
->>> this is based upon next-20160728 plus Christoffer's kvm_device locking
->>> fix from today. Please let me know what tree I should base upon and I
->>> will rebase.
->>> Eric, Christoffer: does that do what you expect? Can QEMU live with that?
->>>
->>> Cheers,
->>> Andre.
->>>
->>>  virt/kvm/arm/vgic/vgic-its.c | 56 ++++++++++++++++++++++++++++++++++++--------
->>>  virt/kvm/arm/vgic/vgic-v3.c  |  6 +++++
->>>  virt/kvm/arm/vgic/vgic.h     |  6 +++++
->>>  3 files changed, 58 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index 07411cf..e677a60 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -1288,13 +1288,13 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu)
->>>  		its_sync_lpi_pending_table(vcpu);
->>>  }
->>>  
->>> -static int vgic_its_init_its(struct kvm *kvm, struct vgic_its *its)
->>> +static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
->>>  {
->>>  	struct vgic_io_device *iodev = &its->iodev;
->>>  	int ret;
->>>  
->>> -	if (its->initialized)
->>> -		return 0;
->>> +	if (!its->initialized)
->>> +		return -EBUSY;
->>>  
->>>  	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base))
->>>  		return -ENXIO;
->>> @@ -1311,9 +1311,6 @@ static int vgic_its_init_its(struct kvm *kvm, struct vgic_its *its)
->>>  				      KVM_VGIC_V3_ITS_SIZE, &iodev->dev);
->>>  	mutex_unlock(&kvm->slots_lock);
->>>  
->>> -	if (!ret)
->>> -		its->initialized = true;
->>> -
->>>  	return ret;
->>>  }
->>>  
->>> @@ -1435,9 +1432,6 @@ static int vgic_its_set_attr(struct kvm_device *dev,
->>>  		if (type != KVM_VGIC_ITS_ADDR_TYPE)
->>>  			return -ENODEV;
->>>  
->>> -		if (its->initialized)
->>> -			return -EBUSY;
->>> -
->>>  		if (copy_from_user(&addr, uaddr, sizeof(addr)))
->>>  			return -EFAULT;
->>>  
->>> @@ -1453,7 +1447,9 @@ static int vgic_its_set_attr(struct kvm_device *dev,
->>>  	case KVM_DEV_ARM_VGIC_GRP_CTRL:
->>>  		switch (attr->attr) {
->>>  		case KVM_DEV_ARM_VGIC_CTRL_INIT:
->>> -			return vgic_its_init_its(dev->kvm, its);
->>> +			its->initialized = true;
->>> +
->>> +			return 0;
->>>  		}
->>>  		break;
->>>  	}
->>> @@ -1498,3 +1494,43 @@ int kvm_vgic_register_its_device(void)
->>>  	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
->>>  				       KVM_DEV_TYPE_ARM_VGIC_ITS);
->>>  }
->>> +
->>> +/*
->>> + * Registers all ITSes with the kvm_io_bus framework.
->>> + * To follow the existing VGIC initialization sequence, this has to be
->>> + * done as late as possible, just before the first VCPU runs.
->>> + */
->>> +int vgic_register_its_iodevs(struct kvm *kvm)
->>> +{
->>> +	struct kvm_device *dev;
->>> +	int ret = 0;
->>> +
->>> +	mutex_lock(&kvm->devices_lock);
->>> +
->>> +	list_for_each_entry(dev, &kvm->devices, vm_node) {
->>> +		if (dev->ops != &kvm_arm_vgic_its_ops)
->>> +			continue;
->>> +
->>> +		ret = vgic_register_its_iodev(kvm, dev->private);
->>> +		if (ret)
->>> +			break;
->>> +	}
->>> +
->>> +	if (ret) {
->>> +		/* Iterate backwards to roll back previous registrations. */
->>> +		for (dev = list_prev_entry(dev, vm_node);
->>> +		     &dev->vm_node != &kvm->devices;
->>> +		     dev = list_prev_entry(dev, vm_node)) {
->>> +			struct vgic_its *its = dev->private;
->>> +
->>> +			if (dev->ops != &kvm_arm_vgic_its_ops)
->>> +				continue;
->>> +
->>> +			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
->>> +						  &its->iodev.dev);
->>> +		}
->>> +	}
->>> +
->>> +	mutex_unlock(&kvm->devices_lock);
->>> +	return ret;
->>> +}
->>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
->>> index 0506543..f0d9b2b 100644
->>> --- a/virt/kvm/arm/vgic/vgic-v3.c
->>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
->>> @@ -289,6 +289,12 @@ int vgic_v3_map_resources(struct kvm *kvm)
->>>  		goto out;
->>>  	}
->>>  
->> don't you need to check vgic_has_its() first
+> When userland wants to inject an MSI into the guest, it uses the
+> KVM_SIGNAL_MSI ioctl, which carries the doorbell address along with
+> the payload and the device ID.
+> With the help of the KVM IO bus framework we learn the corresponding
+> ITS from the doorbell address. We then use our wrapper functions to
+> iterate the linked lists and find the proper Interrupt Translation Table
+> Entry (ITTE) and thus the corresponding struct vgic_irq to finally set
+> the pending bit.
+> We also provide the handler for the ITS "INT" command, which allows a
+> guest to trigger an MSI via the ITS command queue. Since this one knows
+> about the right ITS already, we directly call the MMIO handler function
+> without using the kvm_io_bus framework.
 > 
-> I guess it's nice to do so, though technically it's not necessary, since
-> we won't find any KVM devices which use the ITS ops if no ITS has been
-> created.
-> But since I respin this one anyway...
-agreed. that's not critical.
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> Tested-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 77 ++++++++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h     |  6 ++++
+>  2 files changed, 83 insertions(+)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 1408c88..d8e8f14 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -437,6 +437,65 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+>  	return 0;
+>  }
+>  
+> +/*
+> + * Find the target VCPU and the LPI number for a given devid/eventid pair
+> + * and make this IRQ pending, possibly injecting it.
+> + * Must be called with the its_lock mutex held.
+> + */
+> +static void vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+> +				 u32 devid, u32 eventid)
+> +{
+> +	struct its_itte *itte;
+> +
+> +	if (!its->enabled)
+> +		return;
+> +
+> +	itte = find_itte(its, devid, eventid);
+> +	/* Triggering an unmapped IRQ gets silently dropped. */
+> +	if (itte && its_is_collection_mapped(itte->collection)) {
+> +		struct kvm_vcpu *vcpu;
+> +
+> +		vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
+> +		if (vcpu && vcpu->arch.vgic_cpu.lpis_enabled) {
+> +			spin_lock(&itte->irq->irq_lock);
+> +			itte->irq->pending = true;
+> +			vgic_queue_irq_unlock(kvm, itte->irq);
+> +		}
+> +	}
+> +}
+> +
+> +/*
+> + * Queries the KVM IO bus framework to get the ITS pointer from the given
+> + * doorbell address.
+> + * We then call vgic_its_trigger_msi() with the decoded data.
+> + */
+> +int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+> +{
+> +	u64 address;
+> +	struct kvm_io_device *kvm_io_dev;
+> +	struct vgic_io_device *iodev;
+> +
+> +	if (!vgic_has_its(kvm))
+> +		return -ENODEV;
+> +
+> +	if (!(msi->flags & KVM_MSI_VALID_DEVID))
+> +		return -EINVAL;
+> +
+> +	address = (u64)msi->address_hi << 32 | msi->address_lo;
+> +
+> +	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
+> +	if (!kvm_io_dev)
+> +		return -ENODEV;
+> +
+> +	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
 
-Cheers
+This container_of bothers me; as far as I can tell, the address we use
+to look stuff up on the KVM_MMIO_BUS is purely given by userspace and we
+can have other stuff registered on the KVM_MMIO_BUS, which is not
+contained in a struct vgic_io_device (eventfd for example).
 
-Eric
-> 
-> Cheers,
-> Andre.
-> 
->> Eric
->>> +	ret = vgic_register_its_iodevs(kvm);
->>> +	if (ret) {
->>> +		kvm_err("Unable to register VGIC ITS MMIO regions\n");
->>> +		goto out;
->>> +	}
->>> +
->>>  	dist->ready = true;
->>>  
->>>  out:
->>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->>> index 1d8e21d..6c4625c 100644
->>> --- a/virt/kvm/arm/vgic/vgic.h
->>> +++ b/virt/kvm/arm/vgic/vgic.h
->>> @@ -84,6 +84,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu);
->>>  int vgic_v3_probe(const struct gic_kvm_info *info);
->>>  int vgic_v3_map_resources(struct kvm *kvm);
->>>  int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
->>> +int vgic_register_its_iodevs(struct kvm *kvm);
->>>  bool vgic_has_its(struct kvm *kvm);
->>>  int kvm_vgic_register_its_device(void);
->>>  void vgic_enable_lpis(struct kvm_vcpu *vcpu);
->>> @@ -140,6 +141,11 @@ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
->>>  	return -ENODEV;
->>>  }
->>>  
->>> +static inline int vgic_register_its_iodevs(struct kvm *kvm)
->>> +{
->>> +	return -ENODEV;
->>> +}
->>> +
->>>  static inline bool vgic_has_its(struct kvm *kvm)
->>>  {
->>>  	return false;
->>>
->>
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+This smells like something that could be exploited, so if I'm right, we
+should plug this for -rc2 in some way.
+
+Thanks,
+-Christoffer
