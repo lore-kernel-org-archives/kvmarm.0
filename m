@@ -1,27 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: initialize new VGIC even without host GIC
-Date: Thu, 4 Aug 2016 13:24:50 +0200
-Message-ID: <20160804112450.GC8211@lvm>
-References: <20160802143445.14005-1-andre.przywara@arm.com>
+Subject: [PULL 1/8] KVM: api: Pass the devid in the msi routing entry
+Date: Thu,  4 Aug 2016 13:40:29 +0200
+Message-ID: <1470310836-10371-2-git-send-email-christoffer.dall@linaro.org>
+References: <1470310836-10371-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAB7449B2C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Aug 2016 07:18:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EC24410B5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Aug 2016 07:33:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aJT+QksS5VSa for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Aug 2016 07:18:03 -0400 (EDT)
-Received: from mail-lf0-f42.google.com (mail-lf0-f42.google.com
- [209.85.215.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06F2D412A6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Aug 2016 07:18:02 -0400 (EDT)
-Received: by mail-lf0-f42.google.com with SMTP id l69so179982205lfg.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Aug 2016 04:24:55 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20160802143445.14005-1-andre.przywara@arm.com>
+ with ESMTP id 3ToM3HFlwg8v for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Aug 2016 07:33:52 -0400 (EDT)
+Received: from mail-lf0-f46.google.com (mail-lf0-f46.google.com
+ [209.85.215.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3493949B34
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Aug 2016 07:33:52 -0400 (EDT)
+Received: by mail-lf0-f46.google.com with SMTP id g62so180275549lfe.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Aug 2016 04:40:45 -0700 (PDT)
+In-Reply-To: <1470310836-10371-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,190 +30,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 02, 2016 at 03:34:45PM +0100, Andre Przywara wrote:
-> The new VGIC code is always in the VCPU entry/exit path, even when the
-> actual GIC hardware initialization found the VGIC unusable (due to
-> non-aligned base addresses or a missing maintenance interrupt, for
-> instance).
-> Since in this case the VGIC structures aren't initialized properly, the
-> host kernel crashes on a NULL pointer dereference.
-> Initialize each VCPU's ap_list even with the VGIC unavailable, so the
-> VGIC code now just iterates an empty list in that case and no longer
-> crashes the kernel.
-> Also take care of the arch timer (which becomes unusable as well without
-> a VGIC) by using a static key to prevent arch timer code to run in the
-> hot path.
-> Much of the code was inspired by Marc Zyngier.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> Reported-by: Stefan Agner <stefan@agner.ch>
-> ---
-> Hi Stefan, Drew,
-> 
-> can you test this on your systems which showed the issue?
-> 
-> Cheers,
-> Andre.
-> 
->  arch/arm/kvm/arm.c            | 14 ++++++++++----
->  include/kvm/arm_arch_timer.h  |  2 ++
->  virt/kvm/arm/arch_timer.c     | 11 +++++++++++
->  virt/kvm/arm/vgic/vgic-init.c |  9 ++++-----
->  4 files changed, 27 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index f1bde7c..cef35ce 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -294,7 +294,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
->  	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
->  
->  	/* Set up the timer */
-> -	kvm_timer_vcpu_init(vcpu);
-> +	if (vgic_present)
-> +		kvm_timer_vcpu_init(vcpu);
->  
->  	kvm_arm_reset_debug_ptr(vcpu);
->  
-> @@ -1208,6 +1209,7 @@ static int init_subsystems(void)
->  		break;
->  	case -ENODEV:
->  	case -ENXIO:
-> +		kvm_err("No useable vgic detected\n");
->  		vgic_present = false;
->  		err = 0;
->  		break;
-> @@ -1218,9 +1220,13 @@ static int init_subsystems(void)
->  	/*
->  	 * Init HYP architected timer support
->  	 */
-> -	err = kvm_timer_hyp_init();
-> -	if (err)
-> -		goto out;
-> +	if (vgic_present) {
-> +		err = kvm_timer_hyp_init();
-> +		if (err)
-> +			goto out;
-> +	} else {
-> +		static_branch_enable(&kvm_arch_timer_disabled);
-> +	}
->  
->  	kvm_perf_init();
->  	kvm_coproc_table_init();
-> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> index dda39d8..64f361f 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-> @@ -23,6 +23,8 @@
->  #include <linux/hrtimer.h>
->  #include <linux/workqueue.h>
->  
-> +extern struct static_key_false kvm_arch_timer_disabled;
-> +
->  struct arch_timer_kvm {
->  	/* Virtual offset */
->  	cycle_t			cntvoff;
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index 4fde8c7..71fb04c 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -34,6 +34,8 @@ static struct timecounter *timecounter;
->  static struct workqueue_struct *wqueue;
->  static unsigned int host_vtimer_irq;
->  
-> +DEFINE_STATIC_KEY_FALSE(kvm_arch_timer_disabled);
-> +
->  void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->  {
->  	vcpu->arch.timer_cpu.active_cleared_last = false;
-> @@ -41,6 +43,9 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->  
->  static cycle_t kvm_phys_timer_read(void)
->  {
-> +	if (static_branch_unlikely(&kvm_arch_timer_disabled))
-> +		return 0;
-> +
->  	return timecounter->cc->read(timecounter->cc);
->  }
->  
-> @@ -104,6 +109,9 @@ static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
->  {
->  	cycle_t cval, now;
->  
-> +	if (static_branch_unlikely(&kvm_arch_timer_disabled))
-> +		return 0;
-> +
->  	cval = vcpu->arch.timer_cpu.cntv_cval;
->  	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
->  
-> @@ -148,6 +156,9 @@ static bool kvm_timer_irq_can_fire(struct kvm_vcpu *vcpu)
->  {
->  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->  
-> +	if (static_branch_unlikely(&kvm_arch_timer_disabled))
-> +		return false;
-> +
->  	return !(timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
->  		(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE);
->  }
-
-why do we have these hooks fairly deep into the arch timer static
-functions?
-
-I would think that it makes more sense to catch stuff in the early entry
-points to the timer logic, which would be:
-
-  kvm_timer_should_fire
-  kvm_timer_schedule
-  kvm_timer_unschedule
-  kvm_arm_timer_set_reg
-  kvm_arm_timer_get_reg
-
-Also, most of these don't seem to be in a general critical path, so I'm
-not really sure why we're using static branches here?
-
-
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index 2c7f0d5..b92133c 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -56,6 +56,10 @@ void kvm_vgic_early_init(struct kvm *kvm)
->  
->  void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu)
->  {
-> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> +
-> +	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
-> +	spin_lock_init(&vgic_cpu->ap_list_lock);
->  }
-
-there are two pieces of comments above that needs to be tweaked now (or
-just remove the remaining function and comment)
-
->  
->  /* CREATION */
-> @@ -392,11 +396,6 @@ int kvm_vgic_hyp_init(void)
->  	if (!gic_kvm_info)
->  		return -ENODEV;
->  
-> -	if (!gic_kvm_info->maint_irq) {
-> -		kvm_err("No vgic maintenance irq\n");
-> -		return -ENXIO;
-> -	}
-> -
-
-I don't understand why we can remove this chunk?
-
->  	switch (gic_kvm_info->type) {
->  	case GIC_V2:
->  		ret = vgic_v2_probe(gic_kvm_info);
-> -- 
-> 2.9.0
-> 
-
-Thanks,
--Christoffer
+RnJvbTogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPgoKT24gQVJNLCB0aGUgTVNJ
+IG1zZyAoYWRkcmVzcyBhbmQgZGF0YSkgY29tZXMgYWxvbmcgd2l0aApvdXQtb2YtYmFuZCBkZXZp
+Y2UgSUQgaW5mb3JtYXRpb24uIFRoZSBkZXZpY2UgSUQgZW5jb2RlcyB0aGUKZGV2aWNlIHRoYXQg
+d3JpdGVzIHRoZSBNU0kgbXNnLiBMZXQncyBjb252ZXkgdGhlIGRldmljZSBpZCBpbgprdm1faXJx
+X3JvdXRpbmdfbXNpIGFuZCB1c2UgS1ZNX01TSV9WQUxJRF9ERVZJRCBmbGFnIHZhbHVlIGluCmt2
+bV9pcnFfcm91dGluZ19lbnRyeSB0byBpbmRpY2F0ZSB0aGUgbXNpIGRldmlkIGlzIHBvcHVsYXRl
+ZC4KClNpZ25lZC1vZmYtYnk6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KUmV2
+aWV3ZWQtYnk6IEFuZHJlIFByenl3YXJhIDxhbmRyZS5wcnp5d2FyYUBhcm0uY29tPgpBY2tlZC1i
+eTogUmFkaW0gS3LEjW3DocWZIDxya3JjbWFyQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IE1h
+cmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Ci0tLQogRG9jdW1lbnRhdGlvbi92aXJ0
+dWFsL2t2bS9hcGkudHh0IHwgMTkgKysrKysrKysrKysrKysrKystLQogaW5jbHVkZS91YXBpL2xp
+bnV4L2t2bS5oICAgICAgICAgIHwgIDUgKysrKy0KIDIgZmlsZXMgY2hhbmdlZCwgMjEgaW5zZXJ0
+aW9ucygrKSwgMyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL3ZpcnR1
+YWwva3ZtL2FwaS50eHQgYi9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FwaS50eHQKaW5kZXgg
+MDcwNDllYS4uNDE1Y2RlMSAxMDA2NDQKLS0tIGEvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9h
+cGkudHh0CisrKyBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dApAQCAtMTQ2OCw3
+ICsxNDY4LDExIEBAIHN0cnVjdCBrdm1faXJxX3JvdXRpbmdfZW50cnkgewogI2RlZmluZSBLVk1f
+SVJRX1JPVVRJTkdfUzM5MF9BREFQVEVSIDMKICNkZWZpbmUgS1ZNX0lSUV9ST1VUSU5HX0hWX1NJ
+TlQgNAogCi1ObyBmbGFncyBhcmUgc3BlY2lmaWVkIHNvIGZhciwgdGhlIGNvcnJlc3BvbmRpbmcg
+ZmllbGQgbXVzdCBiZSBzZXQgdG8gemVyby4KK2ZsYWdzOgorLSBLVk1fTVNJX1ZBTElEX0RFVklE
+OiB1c2VkIGFsb25nIHdpdGggS1ZNX0lSUV9ST1VUSU5HX01TSQorICByb3V0aW5nIGVudHJ5IHR5
+cGUsIHNwZWNpZmllcyB0aGF0IHRoZSBkZXZpZCBmaWVsZCBjb250YWlucworICBhIHZhbGlkIHZh
+bHVlLgorLSB6ZXJvIG90aGVyd2lzZQogCiBzdHJ1Y3Qga3ZtX2lycV9yb3V0aW5nX2lycWNoaXAg
+ewogCV9fdTMyIGlycWNoaXA7CkBAIC0xNDc5LDkgKzE0ODMsMjAgQEAgc3RydWN0IGt2bV9pcnFf
+cm91dGluZ19tc2kgewogCV9fdTMyIGFkZHJlc3NfbG87CiAJX191MzIgYWRkcmVzc19oaTsKIAlf
+X3UzMiBkYXRhOwotCV9fdTMyIHBhZDsKKwl1bmlvbiB7CisJCV9fdTMyIHBhZDsKKwkJX191MzIg
+ZGV2aWQ7CisJfTsKIH07CiAKK2RldmlkOiBJZiBLVk1fTVNJX1ZBTElEX0RFVklEIGlzIHNldCwg
+Y29udGFpbnMgYSB1bmlxdWUgZGV2aWNlIGlkZW50aWZpZXIKKyAgICAgICBmb3IgdGhlIGRldmlj
+ZSB0aGF0IHdyb3RlIHRoZSBNU0kgbWVzc2FnZS4KKyAgICAgICBGb3IgUENJLCB0aGlzIGlzIHVz
+dWFsbHkgYSBCRkQgaWRlbnRpZmllciBpbiB0aGUgbG93ZXIgMTYgYml0cy4KKworVGhlIHBlci1W
+TSBLVk1fQ0FQX01TSV9ERVZJRCBjYXBhYmlsaXR5IGFkdmVydGlzZXMgdGhlIHJlcXVpcmVtZW50
+IHRvCitwcm92aWRlIHRoZSBkZXZpY2UgSUQuIElmIHRoaXMgY2FwYWJpbGl0eSBpcyBub3Qgc2V0
+LCB1c2VybGFuZCBjYW5ub3QKK3JlbHkgb24gdGhlIGtlcm5lbCB0byBhbGxvdyB0aGUgS1ZNX01T
+SV9WQUxJRF9ERVZJRCBmbGFnIGJlaW5nIHNldC4KKwogc3RydWN0IGt2bV9pcnFfcm91dGluZ19z
+MzkwX2FkYXB0ZXIgewogCV9fdTY0IGluZF9hZGRyOwogCV9fdTY0IHN1bW1hcnlfYWRkcjsKZGlm
+ZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaCBiL2luY2x1ZGUvdWFwaS9saW51eC9r
+dm0uaAppbmRleCBkOGM0YzMyLi5lYjIyMjA4IDEwMDY0NAotLS0gYS9pbmNsdWRlL3VhcGkvbGlu
+dXgva3ZtLmgKKysrIGIvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCkBAIC04NzksNyArODc5LDEw
+IEBAIHN0cnVjdCBrdm1faXJxX3JvdXRpbmdfbXNpIHsKIAlfX3UzMiBhZGRyZXNzX2xvOwogCV9f
+dTMyIGFkZHJlc3NfaGk7CiAJX191MzIgZGF0YTsKLQlfX3UzMiBwYWQ7CisJdW5pb24geworCQlf
+X3UzMiBwYWQ7CisJCV9fdTMyIGRldmlkOworCX07CiB9OwogCiBzdHJ1Y3Qga3ZtX2lycV9yb3V0
+aW5nX3MzOTBfYWRhcHRlciB7Ci0tIAoxLjkuMQoKX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
+Zm8va3ZtYXJtCg==
