@@ -1,133 +1,159 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: vgic-its: Make updates to
- propbaser/pendbaser atomic
-Date: Mon, 8 Aug 2016 14:30:38 +0100
-Message-ID: <28496b0a-6ca3-4cba-ca53-d97aabfe9280@arm.com>
-References: <20160803161325.14933-1-christoffer.dall@linaro.org>
- <20160803161325.14933-4-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 234A249AFA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Aug 2016 09:22:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XVtkmNmIPqMo for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Aug 2016 09:22:28 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72997411E3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Aug 2016 09:22:27 -0400 (EDT)
-In-Reply-To: <20160803161325.14933-4-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Subject: [PATCH v2] KVM: arm64: ITS: move ITS registration into first VCPU run
+Date: Mon,  8 Aug 2016 16:45:43 +0100
+Message-ID: <20160808154543.23463-1-andre.przywara@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Currently we register an ITS device upon userland issuing the CTLR_INIT
+ioctl to mark initialization of the ITS as done.
+This deviates from the initialization sequence of the existing GIC
+devices and does not play well with the way QEMU handles things.
+To be more in line with what we are used to, register the ITS(es) just
+before the first VCPU is about to run, so in the map_resources() call.
+This involves iterating through the list of KVM devices and map each
+ITS that we find.
 
-On 03/08/16 17:13, Christoffer Dall wrote:
-> There are two problems with the current implementation of the MMIO
-> handlers for the propbaser and pendbaser:
-> 
-> First, the write to the value itself is not guaranteed to be an atomic
-> 64-bit write so two concurrent writes to the structure field could be
-> intermixed.
-> 
-> Second, because we do a read-modify-update operation without any
-> synchronization, if we have two 32-bit accesses to separate parts of the
-> register, we can loose one of them.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+Changelog v1 .. v2:
+- remove not yet upstreamed locking
+- remove pointless de-registration on rollback
 
-I am still not 100% convinced that this is necessary, but leave it up to
-the judgement of you senior guys.
+ virt/kvm/arm/vgic/vgic-its.c | 43 +++++++++++++++++++++++++++++++++----------
+ virt/kvm/arm/vgic/vgic-v3.c  |  8 ++++++++
+ virt/kvm/arm/vgic/vgic.h     |  6 ++++++
+ 3 files changed, 47 insertions(+), 10 deletions(-)
 
-> We can take the KVM mutex to synchronize accesses to these registers.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index ff668e0..e38b7a0 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -306,16 +306,19 @@ static void vgic_mmio_write_propbase(struct kvm_vcpu *vcpu,
->  {
->  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> -	u64 propbaser = dist->propbaser;
-> +	u64 propbaser;
->  
->  	/* Storing a value with LPIs already enabled is undefined */
->  	if (vgic_cpu->lpis_enabled)
->  		return;
->  
-> +	mutex_lock(&vcpu->kvm->lock);
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 07411cf..7180994 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1288,13 +1288,13 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+ 		its_sync_lpi_pending_table(vcpu);
+ }
+ 
+-static int vgic_its_init_its(struct kvm *kvm, struct vgic_its *its)
++static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
+ {
+ 	struct vgic_io_device *iodev = &its->iodev;
+ 	int ret;
+ 
+-	if (its->initialized)
+-		return 0;
++	if (!its->initialized)
++		return -EBUSY;
+ 
+ 	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base))
+ 		return -ENXIO;
+@@ -1311,9 +1311,6 @@ static int vgic_its_init_its(struct kvm *kvm, struct vgic_its *its)
+ 				      KVM_VGIC_V3_ITS_SIZE, &iodev->dev);
+ 	mutex_unlock(&kvm->slots_lock);
+ 
+-	if (!ret)
+-		its->initialized = true;
+-
+ 	return ret;
+ }
+ 
+@@ -1435,9 +1432,6 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+ 		if (type != KVM_VGIC_ITS_ADDR_TYPE)
+ 			return -ENODEV;
+ 
+-		if (its->initialized)
+-			return -EBUSY;
+-
+ 		if (copy_from_user(&addr, uaddr, sizeof(addr)))
+ 			return -EFAULT;
+ 
+@@ -1453,7 +1447,9 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+ 		switch (attr->attr) {
+ 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+-			return vgic_its_init_its(dev->kvm, its);
++			its->initialized = true;
++
++			return 0;
+ 		}
+ 		break;
+ 	}
+@@ -1498,3 +1494,30 @@ int kvm_vgic_register_its_device(void)
+ 	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
+ 				       KVM_DEV_TYPE_ARM_VGIC_ITS);
+ }
++
++/*
++ * Registers all ITSes with the kvm_io_bus framework.
++ * To follow the existing VGIC initialization sequence, this has to be
++ * done as late as possible, just before the first VCPU runs.
++ */
++int vgic_register_its_iodevs(struct kvm *kvm)
++{
++	struct kvm_device *dev;
++	int ret = 0;
++
++	list_for_each_entry(dev, &kvm->devices, vm_node) {
++		if (dev->ops != &kvm_arm_vgic_its_ops)
++			continue;
++
++		ret = vgic_register_its_iodev(kvm, dev->private);
++		if (ret)
++			return ret;
++		/*
++		 * We don't need to care about tearing down previously
++		 * registered ITSes, as the kvm_io_bus framework removes
++		 * them for us if the VM gets destroyed.
++		 */
++	}
++
++	return ret;
++}
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 0506543..9f0dae3 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -289,6 +289,14 @@ int vgic_v3_map_resources(struct kvm *kvm)
+ 		goto out;
+ 	}
+ 
++	if (vgic_has_its(kvm)) {
++		ret = vgic_register_its_iodevs(kvm);
++		if (ret) {
++			kvm_err("Unable to register VGIC ITS MMIO regions\n");
++			goto out;
++		}
++	}
++
+ 	dist->ready = true;
+ 
+ out:
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 1d8e21d..6c4625c 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -84,6 +84,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu);
+ int vgic_v3_probe(const struct gic_kvm_info *info);
+ int vgic_v3_map_resources(struct kvm *kvm);
+ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
++int vgic_register_its_iodevs(struct kvm *kvm);
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+@@ -140,6 +141,11 @@ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
+ 	return -ENODEV;
+ }
+ 
++static inline int vgic_register_its_iodevs(struct kvm *kvm)
++{
++	return -ENODEV;
++}
++
+ static inline bool vgic_has_its(struct kvm *kvm)
+ {
+ 	return false;
+-- 
+2.9.0
 
-I see that kvm->lock is becoming problematic in the future, since the
-userland save/restore path for GICv2 is taking this lock as well. So we
-have to come up with something better once we use migration on
-GICv3/ITS. I have the gut feeling we need an extra lock for those two
-registers.
-But this is not an issue for the purpose of this fix in the current code
-base.
-
-Do we need to add the kvm->lock to our locking order documentation?
-
-> +	propbaser = dist->propbaser;
->  	propbaser = update_64bit_reg(propbaser, addr & 4, len, val);
->  	propbaser = vgic_sanitise_propbaser(propbaser);
->  
->  	dist->propbaser = propbaser;
-> +	mutex_unlock(&vcpu->kvm->lock);
->  }
->  
->  static unsigned long vgic_mmio_read_pendbase(struct kvm_vcpu *vcpu,
-> @@ -331,16 +334,19 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
->  				     unsigned long val)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> -	u64 pendbaser = vgic_cpu->pendbaser;
-> +	u64 pendbaser;
->  
->  	/* Storing a value with LPIs already enabled is undefined */
->  	if (vgic_cpu->lpis_enabled)
->  		return;
->  
-> +	mutex_lock(&vcpu->kvm->lock);
-> +	pendbaser = vgic_cpu->pendbaser;
->  	pendbaser = update_64bit_reg(pendbaser, addr & 4, len, val);
->  	pendbaser = vgic_sanitise_pendbaser(pendbaser);
->  
->  	vgic_cpu->pendbaser = pendbaser;
-> +	mutex_unlock(&vcpu->kvm->lock);
->  }
->  
->  /*
-> 
-
-I checked all hits of 'git grep "kvm->lock"' (minus
-arch/<some_obscure_arch>), and apart from that above mentioned GICv2
-save/restore path couldn't find anything that looks prone to deadlocks
-(on the first glance).
-Also I enabled some locking checks in .config and am running three SMP
-guests with ITS emulation simultaneously at the moment: the kernel
-didn't complain so far.
-
-So this looks like a safe change to me.
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre.
