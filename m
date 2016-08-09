@@ -1,72 +1,86 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC PATCH v2 0/4] arm/arm64: vgic-new: Implement API for vGICv3
- live migration
-Date: Tue, 9 Aug 2016 12:52:54 +0100
-Message-ID: <CAFEAcA-z+iM+=p0riWreJCewPPxw9wtHgg+_4MDtxV=ccwe-tg@mail.gmail.com>
-References: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 3/3] KVM: arm64: vgic-its: Make updates to
+ propbaser/pendbaser atomic
+Date: Tue, 9 Aug 2016 13:56:36 +0200
+Message-ID: <20160809115636.GF9175@cbox>
+References: <20160803161325.14933-1-christoffer.dall@linaro.org>
+ <20160803161325.14933-4-christoffer.dall@linaro.org>
+ <28496b0a-6ca3-4cba-ca53-d97aabfe9280@arm.com>
+ <20160809103012.GD9175@cbox>
+ <35bd94e0-949f-d1bd-9014-1cd6bfb9e5ab@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C35149B65
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 07:46:13 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id C2bl51TWHTnr for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2016 07:46:09 -0400 (EDT)
-Received: from mail-ua0-f170.google.com (mail-ua0-f170.google.com
- [209.85.217.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C84A949B55
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 07:46:08 -0400 (EDT)
-Received: by mail-ua0-f170.google.com with SMTP id k90so15468236uak.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Aug 2016 04:53:15 -0700 (PDT)
-In-Reply-To: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: "prasun.kapoor" <Prasun.Kapoor@cavium.com>, Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <35bd94e0-949f-d1bd-9014-1cd6bfb9e5ab@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 9 August 2016 at 11:58,  <vijay.kilari@gmail.com> wrote:
-> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->
-> This patchset adds API for saving and restoring
-> of VGICv3 registers to support live migration with new vgic feature.
-> This API definition is as per version of VGICv3 specification
-> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
->
-> To test live migration with QEMU, use below patch series
-> https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg01444.html
->
-> The patch 3 & 4 are picked from the Pavel's previous implementation.
-> http://www.spinics.net/lists/kvm/msg122040.html
->
-> v1 => v2:
->  - The init sequence change patch is no more required.
->    Fixed in patch 2 by using static vgic_io_dev regions structure instead
->    of using dynamic allocation pointer.
->  - Updated commit message of patch 4.
->  - Dropped usage of union to manage 32-bit and 64-bit access in patch 1.
->    Used local variable for 32-bit access.
->  - Updated macro __ARM64_SYS_REG and ARM64_SYS_REG in
->    arch/arm64/include/uapi/asm/kvm.h as per qemu requirements.
+On Tue, Aug 09, 2016 at 12:19:53PM +0100, Andre Przywara wrote:
+> Hi,
+> 
+> On 09/08/16 11:30, Christoffer Dall wrote:
+> > On Mon, Aug 08, 2016 at 02:30:38PM +0100, Andre Przywara wrote:
+> >> Hi,
+> >>
+> >> On 03/08/16 17:13, Christoffer Dall wrote:
+> >>> There are two problems with the current implementation of the MMIO
+> >>> handlers for the propbaser and pendbaser:
+> >>>
+> >>> First, the write to the value itself is not guaranteed to be an atomic
+> >>> 64-bit write so two concurrent writes to the structure field could be
+> >>> intermixed.
+> >>>
+> >>> Second, because we do a read-modify-update operation without any
+> >>> synchronization, if we have two 32-bit accesses to separate parts of the
+> >>> register, we can loose one of them.
+> >>
+> >> I am still not 100% convinced that this is necessary, but leave it up to
+> >> the judgement of you senior guys.
+> > 
+> > ok, consider this case:
+> > 
+> >     reg = 0x55555555 55555555;
+> > 
+> >     CPU 0                CPU 1
+> >     -----                -----
+> >     tmp = reg;
+> >                          tmp = reg;
+> >     tmp[63:32] = ~0;
+> >                          tmp[31:0] = 0;
+> >     reg = tmp;
+> >                          reg = tmp;
+> > 
+> >     print("reg is %x", reg);
+> >       /* reg is 0x55555555 00000000 */
+> > 
+> > which is weird, because I think in hardware you'll get:
+> >     0xffffffff 00000000
+> > 
+> > no matter how you order the two 32-bit updates.
+> > 
+> > That is, unless the architecture tells us that you could observe the
+> > above behavior.
+> 
+> OK, I can see that this case is indeed broken. I was just wondering how
+> much software can expect if it allows unsynchronized accesses from
+> different CPUs to such a 64-bit register - even if it is for separate
+> halves of that register. I'd expect (guest) software to take a lock if
+> it can't atomically update prop/pendbaser and there are other agents
+> possibly chiming in.
+> And I hope we sanitize them enough now to avoid any bad things to happen
+> in the kernel ;-)
+> 
+I don't think it's 100% unreasonable to potentially imagine independent
+updates of parts of the register when the spec explicitly says this is
+allowed.
 
-I only scanned briefly through this patchset, but I didn't
-see any code implementing:
- * KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
- * the different behaviour for accesses to GICD_STATUSR, GICR_STATUSR,
-   GICD_ISPENDR, GICR_ISPENDR0, GICD_ICPENDR, and GICR_ICPENDR0, which
-   don't act the same via this API as for a guest access to the register
+I agree, that it would be a curious guest (and I raised this point once
+already), but I think relying on this is a terrible approach to
+emulating hardware and without any comment or anything in the kernel
+saying 'this is safe and reasonable because of so and so' it just looks
+too dodgy for me to live with.
 
-Did I miss something?
-
-thanks
--- PMM
+-Christoffer
