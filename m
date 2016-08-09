@@ -1,166 +1,175 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3] KVM: arm64: ITS: return 1 on successful MSI injection
-Date: Mon,  8 Aug 2016 17:29:28 +0100
-Message-ID: <20160808162928.26441-1-andre.przywara@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v2] KVM: arm64: ITS: move ITS registration into first VCPU
+ run
+Date: Tue, 9 Aug 2016 09:49:07 +0200
+Message-ID: <1d5b1c34-9baa-8bf7-f7c2-fe1c3c9c999b@redhat.com>
+References: <20160808154543.23463-1-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DD7249B37
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Aug 2016 12:21:24 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P4xVZ0iM6STA for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Aug 2016 12:21:23 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E9B254998D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Aug 2016 12:21:22 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160808154543.23463-1-andre.przywara@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, Peter Maydell <peter.maydell@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-According to the KVM API documentation a successful MSI injection
-should return a value > 0 on success.
-Return possible errors in vgic_its_trigger_msi() and report a
-successful injection back to userland, while also reporting the
-case where the MSI could not be delivered due to the guest not
-having the LPI mapped, for instance.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
-Changelog v2 .. v3:
-- return Linux errors to userland
+Hi Andre,
+On 08/08/2016 17:45, Andre Przywara wrote:
+> Currently we register an ITS device upon userland issuing the CTLR_INIT
+> ioctl to mark initialization of the ITS as done.
+> This deviates from the initialization sequence of the existing GIC
+> devices and does not play well with the way QEMU handles things.
+> To be more in line with what we are used to, register the ITS(es) just
+> before the first VCPU is about to run, so in the map_resources() call.
+> This involves iterating through the list of KVM devices and map each
+> ITS that we find.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+> Changelog v1 .. v2:
+> - remove not yet upstreamed locking
+> - remove pointless de-registration on rollback
+> 
+>  virt/kvm/arm/vgic/vgic-its.c | 43 +++++++++++++++++++++++++++++++++----------
+>  virt/kvm/arm/vgic/vgic-v3.c  |  8 ++++++++
+>  virt/kvm/arm/vgic/vgic.h     |  6 ++++++
+>  3 files changed, 47 insertions(+), 10 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 07411cf..7180994 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1288,13 +1288,13 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+>  		its_sync_lpi_pending_table(vcpu);
+>  }
+>  
+> -static int vgic_its_init_its(struct kvm *kvm, struct vgic_its *its)
+> +static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
+>  {
+>  	struct vgic_io_device *iodev = &its->iodev;
+>  	int ret;
+>  
+> -	if (its->initialized)
+> -		return 0;
+> +	if (!its->initialized)
+> +		return -EBUSY;
+>  
+>  	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base))
+>  		return -ENXIO;
+> @@ -1311,9 +1311,6 @@ static int vgic_its_init_its(struct kvm *kvm, struct vgic_its *its)
+>  				      KVM_VGIC_V3_ITS_SIZE, &iodev->dev);
+>  	mutex_unlock(&kvm->slots_lock);
+>  
+> -	if (!ret)
+> -		its->initialized = true;
+> -
+>  	return ret;
+>  }
+>  
+> @@ -1435,9 +1432,6 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+>  		if (type != KVM_VGIC_ITS_ADDR_TYPE)
+>  			return -ENODEV;
+>  
+> -		if (its->initialized)
+> -			return -EBUSY;
+> -
+>  		if (copy_from_user(&addr, uaddr, sizeof(addr)))
+>  			return -EFAULT;
+>  
+> @@ -1453,7 +1447,9 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+>  	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+>  		switch (attr->attr) {
+>  		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+> -			return vgic_its_init_its(dev->kvm, its);
+> +			its->initialized = true;
+> +
+> +			return 0;
+>  		}
+>  		break;
+>  	}
+> @@ -1498,3 +1494,30 @@ int kvm_vgic_register_its_device(void)
+>  	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
+>  				       KVM_DEV_TYPE_ARM_VGIC_ITS);
+>  }
+> +
+> +/*
+> + * Registers all ITSes with the kvm_io_bus framework.
+> + * To follow the existing VGIC initialization sequence, this has to be
+> + * done as late as possible, just before the first VCPU runs.
+> + */
+> +int vgic_register_its_iodevs(struct kvm *kvm)
+> +{
+> +	struct kvm_device *dev;
+> +	int ret = 0;
+> +
+> +	list_for_each_entry(dev, &kvm->devices, vm_node) {
+> +		if (dev->ops != &kvm_arm_vgic_its_ops)
+> +			continue;
+> +
+> +		ret = vgic_register_its_iodev(kvm, dev->private);
+> +		if (ret)
+> +			return ret;
+> +		/*
+> +		 * We don't need to care about tearing down previously
+> +		 * registered ITSes, as the kvm_io_bus framework removes
+> +		 * them for us if the VM gets destroyed.
+> +		 */
+> +	}
+> +
+> +	return ret;
+> +}
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 0506543..9f0dae3 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -289,6 +289,14 @@ int vgic_v3_map_resources(struct kvm *kvm)
+>  		goto out;
+>  	}
+>  
+> +	if (vgic_has_its(kvm)) {
+> +		ret = vgic_register_its_iodevs(kvm);
+> +		if (ret) {
+> +			kvm_err("Unable to register VGIC ITS MMIO regions\n");
+> +			goto out;
+> +		}
+> +	}
+> +
+>  	dist->ready = true;
+>  
+>  out:
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 1d8e21d..6c4625c 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -84,6 +84,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu);
+>  int vgic_v3_probe(const struct gic_kvm_info *info);
+>  int vgic_v3_map_resources(struct kvm *kvm);
+>  int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
+> +int vgic_register_its_iodevs(struct kvm *kvm);
+>  bool vgic_has_its(struct kvm *kvm);
+>  int kvm_vgic_register_its_device(void);
+>  void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+> @@ -140,6 +141,11 @@ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
+>  	return -ENODEV;
+>  }
+>  
+> +static inline int vgic_register_its_iodevs(struct kvm *kvm)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+>  static inline bool vgic_has_its(struct kvm *kvm)
+>  {
+>  	return false;
+> 
 
-Changelog v1 .. v2:
-- properly detect unmapped LPIs and report this to userland
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
 
- include/linux/irqchip/arm-gic-v3.h |  1 +
- virt/kvm/arm/vgic/vgic-its.c       | 56 +++++++++++++++++++++++++-------------
- 2 files changed, 38 insertions(+), 19 deletions(-)
+Tested on Cavium with QEMU (with accordingly modified init sequence)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 56b0b7e..99ac022 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -337,6 +337,7 @@
-  */
- #define E_ITS_MOVI_UNMAPPED_INTERRUPT		0x010107
- #define E_ITS_MOVI_UNMAPPED_COLLECTION		0x010109
-+#define E_ITS_INT_UNMAPPED_INTERRUPT		0x010307
- #define E_ITS_CLEAR_UNMAPPED_INTERRUPT		0x010507
- #define E_ITS_MAPD_DEVICE_OOR			0x010801
- #define E_ITS_MAPC_PROCNUM_OOR			0x010902
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 7180994..3c029cd 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -441,39 +441,48 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
-  * Find the target VCPU and the LPI number for a given devid/eventid pair
-  * and make this IRQ pending, possibly injecting it.
-  * Must be called with the its_lock mutex held.
-+ * Returns 0 on success, a positive error value for any ITS mapping
-+ * related errors and negative error values for generic errors.
-  */
--static void vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
--				 u32 devid, u32 eventid)
-+static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
-+				u32 devid, u32 eventid)
- {
-+	struct kvm_vcpu *vcpu;
- 	struct its_itte *itte;
- 
- 	if (!its->enabled)
--		return;
-+		return -EBUSY;
- 
- 	itte = find_itte(its, devid, eventid);
--	/* Triggering an unmapped IRQ gets silently dropped. */
--	if (itte && its_is_collection_mapped(itte->collection)) {
--		struct kvm_vcpu *vcpu;
--
--		vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
--		if (vcpu && vcpu->arch.vgic_cpu.lpis_enabled) {
--			spin_lock(&itte->irq->irq_lock);
--			itte->irq->pending = true;
--			vgic_queue_irq_unlock(kvm, itte->irq);
--		}
--	}
-+	if (!itte || !its_is_collection_mapped(itte->collection))
-+		return E_ITS_INT_UNMAPPED_INTERRUPT;
-+
-+	vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
-+	if (!vcpu)
-+		return E_ITS_INT_UNMAPPED_INTERRUPT;
-+
-+	if (!vcpu->arch.vgic_cpu.lpis_enabled)
-+		return -EBUSY;
-+
-+	spin_lock(&itte->irq->irq_lock);
-+	itte->irq->pending = true;
-+	vgic_queue_irq_unlock(kvm, itte->irq);
-+
-+	return 0;
- }
- 
- /*
-  * Queries the KVM IO bus framework to get the ITS pointer from the given
-  * doorbell address.
-  * We then call vgic_its_trigger_msi() with the decoded data.
-+ * According to the KVM_SIGNAL_MSI API description returns 1 on success.
-  */
- int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
- {
- 	u64 address;
- 	struct kvm_io_device *kvm_io_dev;
- 	struct vgic_io_device *iodev;
-+	int ret;
- 
- 	if (!vgic_has_its(kvm))
- 		return -ENODEV;
-@@ -490,10 +499,21 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
- 	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
- 
- 	mutex_lock(&iodev->its->its_lock);
--	vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
-+	ret = vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
- 	mutex_unlock(&iodev->its->its_lock);
- 
--	return 0;
-+	if (ret < 0)
-+		return ret;
-+
-+	/*
-+	 * KVM_SIGNAL_MSI demands a return value > 0 for success and 0
-+	 * if the guest has blocked the MSI. So we map any LPI mapping
-+	 * related error to that.
-+	 */
-+	if (ret)
-+		return 0;
-+	else
-+		return 1;
- }
- 
- /* Requires the its_lock to be held. */
-@@ -981,9 +1001,7 @@ static int vgic_its_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
- 	u32 msi_data = its_cmd_get_id(its_cmd);
- 	u64 msi_devid = its_cmd_get_deviceid(its_cmd);
- 
--	vgic_its_trigger_msi(kvm, its, msi_devid, msi_data);
--
--	return 0;
-+	return vgic_its_trigger_msi(kvm, its, msi_devid, msi_data);
- }
- 
- /*
--- 
-2.9.0
+Cheers
+
+Eric
