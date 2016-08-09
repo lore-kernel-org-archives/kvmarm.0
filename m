@@ -1,25 +1,27 @@
 From: vijay.kilari@gmail.com
-Subject: [RFC PATCH v2 0/4] arm/arm64: vgic-new: Implement API for vGICv3 live
- migration
-Date: Tue,  9 Aug 2016 16:28:42 +0530
-Message-ID: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
+Subject: [RFC PATCH v2 1/4] arm/arm64: vgic-new: Introduce 64-bit reg access
+ support
+Date: Tue,  9 Aug 2016 16:28:43 +0530
+Message-ID: <1470740326-27751-2-git-send-email-vijay.kilari@gmail.com>
+References: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C91CF49B49
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 06:52:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE77F49B55
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 06:52:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ifxoHGsY8VMF for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2016 06:52:10 -0400 (EDT)
-Received: from mail-pa0-f65.google.com (mail-pa0-f65.google.com
- [209.85.220.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D792949B3B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 06:52:09 -0400 (EDT)
-Received: by mail-pa0-f65.google.com with SMTP id hh10so788917pac.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Aug 2016 03:59:16 -0700 (PDT)
+ with ESMTP id t1iHg0yTA6cx for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2016 06:52:15 -0400 (EDT)
+Received: from mail-pf0-f193.google.com (mail-pf0-f193.google.com
+ [209.85.192.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 550CA49B49
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 06:52:13 -0400 (EDT)
+Received: by mail-pf0-f193.google.com with SMTP id g202so720924pfb.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Aug 2016 03:59:20 -0700 (PDT)
+In-Reply-To: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,46 +37,88 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-This patchset adds API for saving and restoring
-of VGICv3 registers to support live migration with new vgic feature.
-This API definition is as per version of VGICv3 specification
-http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
+vgic_attr_regs_access() handles only 32-bit register
+value. Pass u64 as parameter and locally handle 32-bit
+reads and writes depending on attribute group.
 
-To test live migration with QEMU, use below patch series
-https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg01444.html
+Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+---
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
 
-The patch 3 & 4 are picked from the Pavel's previous implementation.
-http://www.spinics.net/lists/kvm/msg122040.html
-
-v1 => v2:
- - The init sequence change patch is no more required.
-   Fixed in patch 2 by using static vgic_io_dev regions structure instead
-   of using dynamic allocation pointer.
- - Updated commit message of patch 4.
- - Dropped usage of union to manage 32-bit and 64-bit access in patch 1.
-   Used local variable for 32-bit access.
- - Updated macro __ARM64_SYS_REG and ARM64_SYS_REG in 
-   arch/arm64/include/uapi/asm/kvm.h as per qemu requirements.
-
-Vijaya Kumar K (4):
-  arm/arm64: vgic-new: Introduce 64-bit reg access support
-  arm/arm64: vgic-new: Add distributor and redistributor access
-  arm/arm64: vgic-new: Introduce find_reg_by_id()
-  arm/arm64: vgic-new: Implement VGICv3 CPU interface access
-
- arch/arm64/include/uapi/asm/kvm.h   |  18 ++-
- arch/arm64/kvm/Makefile             |   1 +
- arch/arm64/kvm/sys_regs.c           |  22 ++--
- arch/arm64/kvm/sys_regs.h           |   4 +
- include/linux/irqchip/arm-gic-v3.h  |   4 +
- virt/kvm/arm/vgic/vgic-kvm-device.c | 138 +++++++++++++++++++---
- virt/kvm/arm/vgic/vgic-mmio-v2.c    |   4 +-
- virt/kvm/arm/vgic/vgic-mmio-v3.c    | 119 +++++++++++++++++++
- virt/kvm/arm/vgic/vgic-mmio.c       |   2 +-
- virt/kvm/arm/vgic/vgic-sys-reg-v3.c | 225 ++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h            |  14 +++
- 11 files changed, 525 insertions(+), 26 deletions(-)
- create mode 100644 virt/kvm/arm/vgic/vgic-sys-reg-v3.c
-
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 0130c4b..06de322 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -236,12 +236,13 @@ void kvm_register_vgic_device(unsigned long type)
+  */
+ static int vgic_attr_regs_access(struct kvm_device *dev,
+ 				 struct kvm_device_attr *attr,
+-				 u32 *reg, bool is_write)
++				 u64 *reg, bool is_write)
+ {
+ 	gpa_t addr;
+ 	int cpuid, ret, c;
+ 	struct kvm_vcpu *vcpu, *tmp_vcpu;
+ 	int vcpu_lock_idx = -1;
++	u32 tmp32;
+ 
+ 	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
+ 		 KVM_DEV_ARM_VGIC_CPUID_SHIFT;
+@@ -272,12 +273,19 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+ 		vcpu_lock_idx = c;
+ 	}
+ 
++	if (is_write)
++		tmp32 = *reg;
++
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+-		ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, reg);
++		ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, &tmp32);
++		if (!is_write)
++			*reg = tmp32;
+ 		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+-		ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, reg);
++		ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, &tmp32);
++		if (!is_write)
++			*reg = tmp32;
+ 		break;
+ 	default:
+ 		ret = -EINVAL;
+@@ -309,11 +317,13 @@ static int vgic_v2_set_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
+ 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+-		u32 reg;
++		u32 tmp32;
++		u64 reg;
+ 
+-		if (get_user(reg, uaddr))
++		if (get_user(tmp32, uaddr))
+ 			return -EFAULT;
+ 
++		reg = tmp32;
+ 		return vgic_attr_regs_access(dev, attr, &reg, true);
+ 	}
+ 	}
+@@ -334,12 +344,14 @@ static int vgic_v2_get_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
+ 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+-		u32 reg = 0;
++		u32 tmp32;
++		u64 reg;
+ 
+ 		ret = vgic_attr_regs_access(dev, attr, &reg, false);
+ 		if (ret)
+ 			return ret;
+-		return put_user(reg, uaddr);
++		tmp32 = reg;
++		return put_user(tmp32, uaddr);
+ 	}
+ 	}
+ 
 -- 
 1.9.1
