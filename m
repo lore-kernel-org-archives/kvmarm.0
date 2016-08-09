@@ -1,25 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v2 3/3] KVM: arm64: vgic-its: Make updates to
- propbaser/pendbaser atomic
-Date: Tue,  9 Aug 2016 13:16:06 +0200
-Message-ID: <20160809111606.28744-4-christoffer.dall@linaro.org>
+Subject: [PATCH v2 1/3] KVM: arm64: vgic-its: Handle errors from vgic_add_lpi
+Date: Tue,  9 Aug 2016 13:16:04 +0200
+Message-ID: <20160809111606.28744-2-christoffer.dall@linaro.org>
 References: <20160809111606.28744-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7480849B4E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 07:07:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9751949B58
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 07:07:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e-LMNxfR4TGV for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2016 07:07:18 -0400 (EDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2F3FF49B59
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 07:07:17 -0400 (EDT)
-Received: by mail-wm0-f50.google.com with SMTP id i5so27419854wmg.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Aug 2016 04:14:24 -0700 (PDT)
+ with ESMTP id DMmByOVieACU for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2016 07:07:16 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A10749B4E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 07:07:15 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id o80so27307314wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Aug 2016 04:14:22 -0700 (PDT)
 In-Reply-To: <20160809111606.28744-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,80 +33,93 @@ To: kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Andre Prz
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There are two problems with the current implementation of the MMIO
-handlers for the propbaser and pendbaser:
+During low memory conditions, we could be dereferencing a NULL pointer
+when vgic_add_lpi fails to allocate memory.
 
-First, the write to the value itself is not guaranteed to be an atomic
-64-bit write so two concurrent writes to the structure field could be
-intermixed.
+Consider for example this call sequence:
 
-Second, because we do a read-modify-update operation without any
-synchronization, if we have two 32-bit accesses to separate parts of the
-register, we can loose one of them.
+  vgic_its_cmd_handle_mapi
+      itte->irq = vgic_add_lpi(kvm, lpi_nr);
+          update_lpi_config(kvm, itte->irq, NULL);
+              ret = kvm_read_guest(kvm, propbase + irq->intid
+	                                             ^^^^
+						     kaboom?
 
-By using the atomic cmpxchg64 we should cover both issues above.
+Instead, return an error pointer from vgic_add_lpi and check the return
+value from its single caller.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
 
 Notes:
     Changes since v1:
-     - Use atomic cmpxchg64 instead of taking a lock
+     - Stylistic changes
+     - Use its_free_itte to free new_itte on error path
 
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 24 ++++++++++++++----------
- 1 file changed, 14 insertions(+), 10 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index ff668e0..a50d5ba 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -306,16 +306,18 @@ static void vgic_mmio_write_propbase(struct kvm_vcpu *vcpu,
- {
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
--	u64 propbaser = dist->propbaser;
-+	u64 old_propbaser, propbaser;
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 07411cf..4e16880e 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -51,7 +51,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid)
  
- 	/* Storing a value with LPIs already enabled is undefined */
- 	if (vgic_cpu->lpis_enabled)
- 		return;
+ 	irq = kzalloc(sizeof(struct vgic_irq), GFP_KERNEL);
+ 	if (!irq)
+-		return NULL;
++		return ERR_PTR(-ENOMEM);
  
--	propbaser = update_64bit_reg(propbaser, addr & 4, len, val);
--	propbaser = vgic_sanitise_propbaser(propbaser);
--
--	dist->propbaser = propbaser;
-+	do {
-+		old_propbaser = dist->propbaser;
-+		propbaser = old_propbaser;
-+		propbaser = update_64bit_reg(propbaser, addr & 4, len, val);
-+		propbaser = vgic_sanitise_propbaser(propbaser);
-+	} while (cmpxchg64(&dist->propbaser, old_propbaser, propbaser));
+ 	INIT_LIST_HEAD(&irq->lpi_list);
+ 	INIT_LIST_HEAD(&irq->ap_list);
+@@ -502,7 +502,8 @@ static void its_free_itte(struct kvm *kvm, struct its_itte *itte)
+ 	list_del(&itte->itte_list);
+ 
+ 	/* This put matches the get in vgic_add_lpi. */
+-	vgic_put_irq(kvm, itte->irq);
++	if (itte->irq)
++		vgic_put_irq(kvm, itte->irq);
+ 
+ 	kfree(itte);
  }
+@@ -693,10 +694,11 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+ 	u32 device_id = its_cmd_get_deviceid(its_cmd);
+ 	u32 event_id = its_cmd_get_id(its_cmd);
+ 	u32 coll_id = its_cmd_get_collection(its_cmd);
+-	struct its_itte *itte;
++	struct its_itte *itte, *new_itte = NULL;
+ 	struct its_device *device;
+ 	struct its_collection *collection, *new_coll = NULL;
+ 	int lpi_nr;
++	struct vgic_irq *irq;
  
- static unsigned long vgic_mmio_read_pendbase(struct kvm_vcpu *vcpu,
-@@ -331,16 +333,18 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
- 				     unsigned long val)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
--	u64 pendbaser = vgic_cpu->pendbaser;
-+	u64 old_pendbaser, pendbaser;
+ 	device = find_its_device(its, device_id);
+ 	if (!device)
+@@ -727,13 +729,24 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+ 			return -ENOMEM;
+ 		}
  
- 	/* Storing a value with LPIs already enabled is undefined */
- 	if (vgic_cpu->lpis_enabled)
- 		return;
++		new_itte = itte;
+ 		itte->event_id	= event_id;
+ 		list_add_tail(&itte->itte_list, &device->itt_head);
+ 	}
  
--	pendbaser = update_64bit_reg(pendbaser, addr & 4, len, val);
--	pendbaser = vgic_sanitise_pendbaser(pendbaser);
--
--	vgic_cpu->pendbaser = pendbaser;
-+	do {
-+		old_pendbaser = vgic_cpu->pendbaser;
-+		pendbaser = old_pendbaser;
-+		pendbaser = update_64bit_reg(pendbaser, addr & 4, len, val);
-+		pendbaser = vgic_sanitise_pendbaser(pendbaser);
-+	} while (cmpxchg64(&vgic_cpu->pendbaser, old_pendbaser, pendbaser));
- }
+ 	itte->collection = collection;
+ 	itte->lpi = lpi_nr;
+-	itte->irq = vgic_add_lpi(kvm, lpi_nr);
++
++	irq = vgic_add_lpi(kvm, lpi_nr);
++	if (IS_ERR(irq)) {
++		if (new_coll)
++			vgic_its_free_collection(its, coll_id);
++		if (new_itte)
++			its_free_itte(kvm, new_itte);
++		return PTR_ERR(irq);
++	}
++	itte->irq = irq;
++
+ 	update_affinity_itte(kvm, itte);
  
- /*
+ 	/*
 -- 
 2.9.0
