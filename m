@@ -1,113 +1,80 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 3/3] KVM: arm64: vgic-its: Make updates to
- propbaser/pendbaser atomic
-Date: Tue, 9 Aug 2016 12:43:43 +0200
-Message-ID: <20160809104343.GE9175@cbox>
-References: <20160803161325.14933-1-christoffer.dall@linaro.org>
- <20160803161325.14933-4-christoffer.dall@linaro.org>
- <28496b0a-6ca3-4cba-ca53-d97aabfe9280@arm.com>
- <20160809103012.GD9175@cbox>
+From: vijay.kilari@gmail.com
+Subject: [RFC PATCH v2 0/4] arm/arm64: vgic-new: Implement API for vGICv3 live
+ migration
+Date: Tue,  9 Aug 2016 16:28:42 +0530
+Message-ID: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160809103012.GD9175@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C91CF49B49
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 06:52:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ifxoHGsY8VMF for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2016 06:52:10 -0400 (EDT)
+Received: from mail-pa0-f65.google.com (mail-pa0-f65.google.com
+ [209.85.220.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D792949B3B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 06:52:09 -0400 (EDT)
+Received: by mail-pa0-f65.google.com with SMTP id hh10so788917pac.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Aug 2016 03:59:16 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: Prasun.Kapoor@cavium.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 09, 2016 at 12:30:12PM +0200, Christoffer Dall wrote:
-> On Mon, Aug 08, 2016 at 02:30:38PM +0100, Andre Przywara wrote:
-> > Hi,
-> > 
-> > On 03/08/16 17:13, Christoffer Dall wrote:
-> > > There are two problems with the current implementation of the MMIO
-> > > handlers for the propbaser and pendbaser:
-> > > 
-> > > First, the write to the value itself is not guaranteed to be an atomic
-> > > 64-bit write so two concurrent writes to the structure field could be
-> > > intermixed.
-> > > 
-> > > Second, because we do a read-modify-update operation without any
-> > > synchronization, if we have two 32-bit accesses to separate parts of the
-> > > register, we can loose one of them.
-> > 
-> > I am still not 100% convinced that this is necessary, but leave it up to
-> > the judgement of you senior guys.
-> 
-> ok, consider this case:
-> 
->     reg = 0x55555555 55555555;
-> 
->     CPU 0                CPU 1
->     -----                -----
->     tmp = reg;
->                          tmp = reg;
->     tmp[63:32] = ~0;
->                          tmp[31:0] = 0;
->     reg = tmp;
->                          reg = tmp;
-> 
->     print("reg is %x", reg);
->       /* reg is 0x55555555 00000000 */
-> 
-> which is weird, because I think in hardware you'll get:
->     0xffffffff 00000000
-> 
-> no matter how you order the two 32-bit updates.
-> 
-> That is, unless the architecture tells us that you could observe the
-> above behavior.
-> 
-> 
-> > 
-> > > We can take the KVM mutex to synchronize accesses to these registers.
-> > > 
-> > > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > > ---
-> > >  virt/kvm/arm/vgic/vgic-mmio-v3.c | 10 ++++++++--
-> > >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> > > index ff668e0..e38b7a0 100644
-> > > --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> > > +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> > > @@ -306,16 +306,19 @@ static void vgic_mmio_write_propbase(struct kvm_vcpu *vcpu,
-> > >  {
-> > >  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> > >  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> > > -	u64 propbaser = dist->propbaser;
-> > > +	u64 propbaser;
-> > >  
-> > >  	/* Storing a value with LPIs already enabled is undefined */
-> > >  	if (vgic_cpu->lpis_enabled)
-> > >  		return;
-> > >  
-> > > +	mutex_lock(&vcpu->kvm->lock);
-> > 
-> > I see that kvm->lock is becoming problematic in the future, since the
-> > userland save/restore path for GICv2 is taking this lock as well. So we
-> > have to come up with something better once we use migration on
-> > GICv3/ITS. I have the gut feeling we need an extra lock for those two
-> > registers.
-> 
-> that's why I started with a distributor lock, but you talked my out of
-> it on IRC.  I'll just change this patch to introduce the distributor
-> lock.  It's ok to have that as long as we don't grab it all over, which
-> we won't.
-> 
-> > But this is not an issue for the purpose of this fix in the current code
-> > base.
-> > 
-> > Do we need to add the kvm->lock to our locking order documentation?
-> > 
-> 
-> I'll think about this.
-> 
-So I think Marc had the better intuition here, and by just using a
-cmpxchg64 we can get around introducing more locks etc. so I took at
-stab at this.
+From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-Thanks,
--Christoffer
+This patchset adds API for saving and restoring
+of VGICv3 registers to support live migration with new vgic feature.
+This API definition is as per version of VGICv3 specification
+http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
+
+To test live migration with QEMU, use below patch series
+https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg01444.html
+
+The patch 3 & 4 are picked from the Pavel's previous implementation.
+http://www.spinics.net/lists/kvm/msg122040.html
+
+v1 => v2:
+ - The init sequence change patch is no more required.
+   Fixed in patch 2 by using static vgic_io_dev regions structure instead
+   of using dynamic allocation pointer.
+ - Updated commit message of patch 4.
+ - Dropped usage of union to manage 32-bit and 64-bit access in patch 1.
+   Used local variable for 32-bit access.
+ - Updated macro __ARM64_SYS_REG and ARM64_SYS_REG in 
+   arch/arm64/include/uapi/asm/kvm.h as per qemu requirements.
+
+Vijaya Kumar K (4):
+  arm/arm64: vgic-new: Introduce 64-bit reg access support
+  arm/arm64: vgic-new: Add distributor and redistributor access
+  arm/arm64: vgic-new: Introduce find_reg_by_id()
+  arm/arm64: vgic-new: Implement VGICv3 CPU interface access
+
+ arch/arm64/include/uapi/asm/kvm.h   |  18 ++-
+ arch/arm64/kvm/Makefile             |   1 +
+ arch/arm64/kvm/sys_regs.c           |  22 ++--
+ arch/arm64/kvm/sys_regs.h           |   4 +
+ include/linux/irqchip/arm-gic-v3.h  |   4 +
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 138 +++++++++++++++++++---
+ virt/kvm/arm/vgic/vgic-mmio-v2.c    |   4 +-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c    | 119 +++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.c       |   2 +-
+ virt/kvm/arm/vgic/vgic-sys-reg-v3.c | 225 ++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h            |  14 +++
+ 11 files changed, 525 insertions(+), 26 deletions(-)
+ create mode 100644 virt/kvm/arm/vgic/vgic-sys-reg-v3.c
+
+-- 
+1.9.1
