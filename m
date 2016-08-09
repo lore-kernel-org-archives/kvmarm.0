@@ -1,63 +1,94 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 2/2] KVM: Protect device ops->create and list_add with
- kvm->lock
-Date: Tue, 9 Aug 2016 14:55:19 +0200
-Message-ID: <20160809125519.GG9175@cbox>
-References: <20160809122035.16196-1-christoffer.dall@linaro.org>
- <20160809122035.16196-3-christoffer.dall@linaro.org>
- <27023cbf-294f-b316-97ef-8da4e726cc98@redhat.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v2 2/3] KVM: arm64: vgic-its: Plug race in vgic_put_irq
+Date: Tue, 9 Aug 2016 14:04:22 +0100
+Message-ID: <7fa86f52-9010-be42-0090-54a9cbd540d2@arm.com>
+References: <20160809111606.28744-1-christoffer.dall@linaro.org>
+ <20160809111606.28744-3-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <27023cbf-294f-b316-97ef-8da4e726cc98@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, paulus@ozlabs.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ABA2412A6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 08:56:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id rlQQF2fpRtqr for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2016 08:56:10 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1312040B58
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 08:56:09 -0400 (EDT)
+In-Reply-To: <20160809111606.28744-3-christoffer.dall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 09, 2016 at 02:37:43PM +0200, Paolo Bonzini wrote:
+Hi,
+
+On 09/08/16 12:16, Christoffer Dall wrote:
+> Right now the following sequence of events can happen:
 > 
+>   1. Thread X calls vgic_put_irq
+>   2. Thread Y calls vgic_add_lpi
+>   3. Thread Y gets lpi_list_lock
+>   4. Thread X drops the ref count to 0 and blocks on lpi_list_lock
+>   5. Thread Y finds the irq via the lpi_list_lock, raises the ref
+>      count to 1, and release the lpi_list_lock.
+>   6. Thread X proceeds and frees the irq.
 > 
-> On 09/08/2016 14:20, Christoffer Dall wrote:
-> > KVM devices were manipulating list data structures without any form of
-> > synchronization, and some implementations of the create operations also
-> > suffered from a lack of synchronization.
-> > 
-> > Now when we've split the xics create operation into create and init, we
-> > can hold the kvm->lock mutex while calling the create operation and when
-> > manipulating the devices list.
-> > 
-> > The error path in the generic code gets slightly ugly because we have to
-> > take the mutex again and delete the device from the list, but holding
-> > the mutex during anon_inode_getfd or releasing/locking the mutex in the
-> > common non-error path seemed wrong.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Avoid this by holding the spinlock around the kref_put.
 > 
-> Very nice (and small), but please add a comment to the create member in
-> kvm_device_ops.
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-Like this?:
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d3c9b82..9c28b4d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1113,6 +1113,12 @@ struct kvm_device {
- /* create, destroy, and name are mandatory */
- struct kvm_device_ops {
- 	const char *name;
-+
-+	/*
-+	 * create is called holding kvm->lock and any operations not suitable
-+	 * to do while holding the lock should be deferred to init (see
-+	 * below).
-+	 */
- 	int (*create)(struct kvm_device *dev, u32 type);
- 
- 	/*
+Thanks!
+Andre
 
-
-Thanks,
--Christoffer
+> ---
+> 
+> Notes:
+>     Changes since v1:
+>      - Stylistic change: Don't use else branch
+> 
+>  virt/kvm/arm/vgic/vgic.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index e7aeac7..e83b7fe 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -117,17 +117,17 @@ static void vgic_irq_release(struct kref *ref)
+>  
+>  void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+>  {
+> -	struct vgic_dist *dist;
+> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>  
+>  	if (irq->intid < VGIC_MIN_LPI)
+>  		return;
+>  
+> -	if (!kref_put(&irq->refcount, vgic_irq_release))
+> +	spin_lock(&dist->lpi_list_lock);
+> +	if (!kref_put(&irq->refcount, vgic_irq_release)) {
+> +		spin_unlock(&dist->lpi_list_lock);
+>  		return;
+> +	};
+>  
+> -	dist = &kvm->arch.vgic;
+> -
+> -	spin_lock(&dist->lpi_list_lock);
+>  	list_del(&irq->lpi_list);
+>  	dist->lpi_list_count--;
+>  	spin_unlock(&dist->lpi_list_lock);
+> 
