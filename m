@@ -1,26 +1,21 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v2 2/2] KVM: Protect device ops->create and list_add with
- kvm->lock
-Date: Tue,  9 Aug 2016 19:13:01 +0200
-Message-ID: <20160809171301.24283-3-christoffer.dall@linaro.org>
-References: <20160809171301.24283-1-christoffer.dall@linaro.org>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: [PATCH] arm64: KVM: Save two instructions in __guest_enter()
+Date: Tue,  9 Aug 2016 20:15:36 -0500
+Message-ID: <1470791736-13949-1-git-send-email-shankerd@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E8A349B46
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 13:04:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F039449B32
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 21:08:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gbZTBPqtvynb for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2016 13:04:11 -0400 (EDT)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A415349B47
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 13:04:11 -0400 (EDT)
-Received: by mail-wm0-f45.google.com with SMTP id d196so6683430wmd.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Aug 2016 10:11:19 -0700 (PDT)
-In-Reply-To: <20160809171301.24283-1-christoffer.dall@linaro.org>
+ with ESMTP id hTN0voLnqFIo for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2016 21:08:44 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE4C549B2C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2016 21:08:44 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,178 +25,123 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org
-Cc: Andre Przywara <andre.przywara@arm.com>, paulus@ozlabs.org, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM devices were manipulating list data structures without any form of
-synchronization, and some implementations of the create operations also
-suffered from a lack of synchronization.
+We are doing an unnecessary stack push/pop operation when restoring
+the guest registers x0-x18 in __guest_enter(). This patch saves the
+two instructions by using x18 as a base register. No need to store
+the vcpu context pointer in stack because it is redundant and not
+being used anywhere, the same information is available in tpidr_el2.
 
-Now when we've split the xics create operation into create and init, we
-can hold the kvm->lock mutex while calling the create operation and when
-manipulating the devices list.
-
-The error path in the generic code gets slightly ugly because we have to
-take the mutex again and delete the device from the list, but holding
-the mutex during anon_inode_getfd or releasing/locking the mutex in the
-common non-error path seemed wrong.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
 ---
+ arch/arm64/kvm/hyp/entry.S | 66 ++++++++++++++++++++++------------------------
+ 1 file changed, 32 insertions(+), 34 deletions(-)
 
-Notes:
-    Changes since v1:
-     - Added comment to create op in struct kvm_device_ops
-
- arch/arm/kvm/arm.c             |  6 +++++-
- arch/powerpc/kvm/book3s_xics.c |  2 --
- include/linux/kvm_host.h       |  6 ++++++
- virt/kvm/arm/vgic/vgic-init.c  | 17 ++++-------------
- virt/kvm/kvm_main.c            | 13 ++++++++++++-
- 5 files changed, 27 insertions(+), 17 deletions(-)
-
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index d94bb90..75f130e 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -1009,9 +1009,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index ce9e5e5..d2e09a1 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -55,37 +55,32 @@
+  */
+ ENTRY(__guest_enter)
+ 	// x0: vcpu
+-	// x1: host/guest context
+-	// x2-x18: clobbered by macros
++	// x1: host context
++	// x2-x17: clobbered by macros
++	// x18: guest context
  
- 	switch (ioctl) {
- 	case KVM_CREATE_IRQCHIP: {
-+		int ret;
- 		if (!vgic_present)
- 			return -ENXIO;
--		return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
-+		mutex_lock(&kvm->lock);
-+		ret = kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
-+		mutex_unlock(&kvm->lock);
-+		return ret;
- 	}
- 	case KVM_ARM_SET_DEVICE_ADDR: {
- 		struct kvm_arm_device_addr dev_addr;
-diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
-index f2def8e..05aa113 100644
---- a/arch/powerpc/kvm/book3s_xics.c
-+++ b/arch/powerpc/kvm/book3s_xics.c
-@@ -1329,12 +1329,10 @@ static int kvmppc_xics_create(struct kvm_device *dev, u32 type)
- 	xics->kvm = kvm;
+ 	// Store the host regs
+ 	save_callee_saved_regs x1
  
- 	/* Already there ? */
--	mutex_lock(&kvm->lock);
- 	if (kvm->arch.xics)
- 		ret = -EEXIST;
- 	else
- 		kvm->arch.xics = xics;
--	mutex_unlock(&kvm->lock);
+-	// Preserve vcpu & host_ctxt for use at exit time
+-	stp	x0, x1, [sp, #-16]!
++	// Preserve the host_ctxt for use at exit time
++	str	x1, [sp, #-16]!
  
- 	if (ret) {
- 		kfree(xics);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d3c9b82..9c28b4d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1113,6 +1113,12 @@ struct kvm_device {
- /* create, destroy, and name are mandatory */
- struct kvm_device_ops {
- 	const char *name;
+-	add	x1, x0, #VCPU_CONTEXT
++	add	x18, x0, #VCPU_CONTEXT
+ 
+-	// Prepare x0-x1 for later restore by pushing them onto the stack
+-	ldp	x2, x3, [x1, #CPU_XREG_OFFSET(0)]
+-	stp	x2, x3, [sp, #-16]!
++	// Restore guest regs x19-x29, lr
++	restore_callee_saved_regs x18
+ 
+-	// x2-x18
+-	ldp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
+-	ldp	x4, x5,   [x1, #CPU_XREG_OFFSET(4)]
+-	ldp	x6, x7,   [x1, #CPU_XREG_OFFSET(6)]
+-	ldp	x8, x9,   [x1, #CPU_XREG_OFFSET(8)]
+-	ldp	x10, x11, [x1, #CPU_XREG_OFFSET(10)]
+-	ldp	x12, x13, [x1, #CPU_XREG_OFFSET(12)]
+-	ldp	x14, x15, [x1, #CPU_XREG_OFFSET(14)]
+-	ldp	x16, x17, [x1, #CPU_XREG_OFFSET(16)]
+-	ldr	x18,      [x1, #CPU_XREG_OFFSET(18)]
+-
+-	// x19-x29, lr
+-	restore_callee_saved_regs x1
+-
+-	// Last bits of the 64bit state
+-	ldp	x0, x1, [sp], #16
++	// Restore guest regs x0-x18
++	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
++	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
++	ldp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
++	ldp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
++	ldp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
++	ldp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
++	ldp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
++	ldp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
++	ldp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
++	ldr	x18,      [x18, #CPU_XREG_OFFSET(18)]
+ 
+ 	// Do not touch any register after this!
+ 	eret
+@@ -100,6 +95,16 @@ ENTRY(__guest_exit)
+ 
+ 	add	x2, x0, #VCPU_CONTEXT
+ 
++	// Store the guest regs x19-x29, lr
++	save_callee_saved_regs x2
 +
-+	/*
-+	 * create is called holding kvm->lock and any operations not suitable
-+	 * to do while holding the lock should be deferred to init (see
-+	 * below).
-+	 */
- 	int (*create)(struct kvm_device *dev, u32 type);
++	// Retrieve the guest regs x0-x3 from the stack
++	ldp	x21, x22, [sp], #16	// x2, x3
++	ldp	x19, x20, [sp], #16	// x0, x1
++
++	// Store the guest regs x0-x18
++	stp	x19, x20, [x2, #CPU_XREG_OFFSET(0)]
++	stp	x21, x22, [x2, #CPU_XREG_OFFSET(2)]
+ 	stp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)]
+ 	stp	x6, x7,   [x2, #CPU_XREG_OFFSET(6)]
+ 	stp	x8, x9,   [x2, #CPU_XREG_OFFSET(8)]
+@@ -109,20 +114,13 @@ ENTRY(__guest_exit)
+ 	stp	x16, x17, [x2, #CPU_XREG_OFFSET(16)]
+ 	str	x18,      [x2, #CPU_XREG_OFFSET(18)]
  
- 	/*
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index fb4b0a7..83777c1 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -73,12 +73,8 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 	int i, vcpu_lock_idx = -1, ret;
- 	struct kvm_vcpu *vcpu;
+-	ldp	x6, x7, [sp], #16	// x2, x3
+-	ldp	x4, x5, [sp], #16	// x0, x1
++	// Restore the host_ctxt from the stack
++	ldr	x2, [sp], #16
  
--	mutex_lock(&kvm->lock);
+-	stp	x4, x5, [x2, #CPU_XREG_OFFSET(0)]
+-	stp	x6, x7, [x2, #CPU_XREG_OFFSET(2)]
 -
--	if (irqchip_in_kernel(kvm)) {
--		ret = -EEXIST;
--		goto out;
--	}
-+	if (irqchip_in_kernel(kvm))
-+		return -EEXIST;
- 
- 	/*
- 	 * This function is also called by the KVM_CREATE_IRQCHIP handler,
-@@ -87,10 +83,8 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 	 * the proper checks already.
- 	 */
- 	if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
--		!kvm_vgic_global_state.can_emulate_gicv2) {
--		ret = -ENODEV;
--		goto out;
--	}
-+		!kvm_vgic_global_state.can_emulate_gicv2)
-+		return -ENODEV;
- 
- 	/*
- 	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
-@@ -138,9 +132,6 @@ out_unlock:
- 		vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
- 		mutex_unlock(&vcpu->mutex);
- 	}
+-	save_callee_saved_regs x2
 -
--out:
--	mutex_unlock(&kvm->lock);
- 	return ret;
- }
+-	// Restore vcpu & host_ctxt from the stack
+-	// (preserving return code in x1)
+-	ldp	x0, x2, [sp], #16
+ 	// Now restore the host regs
+ 	restore_callee_saved_regs x2
  
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index ae64245..1950782 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -696,6 +696,11 @@ static void kvm_destroy_devices(struct kvm *kvm)
- {
- 	struct kvm_device *dev, *tmp;
- 
-+	/*
-+	 * We do not need to take the kvm->lock here, because nobody else
-+	 * has a reference to the struct kvm at this point and therefore
-+	 * cannot access the devices list anyhow.
-+	 */
- 	list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
- 		list_del(&dev->vm_node);
- 		dev->ops->destroy(dev);
-@@ -2832,11 +2837,15 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
- 	dev->ops = ops;
- 	dev->kvm = kvm;
- 
-+	mutex_lock(&kvm->lock);
- 	ret = ops->create(dev, cd->type);
- 	if (ret < 0) {
-+		mutex_unlock(&kvm->lock);
- 		kfree(dev);
- 		return ret;
- 	}
-+	list_add(&dev->vm_node, &kvm->devices);
-+	mutex_unlock(&kvm->lock);
- 
- 	if (ops->init)
- 		ops->init(dev);
-@@ -2844,10 +2853,12 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
- 	ret = anon_inode_getfd(ops->name, &kvm_device_fops, dev, O_RDWR | O_CLOEXEC);
- 	if (ret < 0) {
- 		ops->destroy(dev);
-+		mutex_lock(&kvm->lock);
-+		list_del(&dev->vm_node);
-+		mutex_unlock(&kvm->lock);
- 		return ret;
- 	}
- 
--	list_add(&dev->vm_node, &kvm->devices);
- 	kvm_get_kvm(kvm);
- 	cd->fd = ret;
- 	return 0;
++	// Preserving return code (x1)
+ 	mov	x0, x1
+ 	ret
+ ENDPROC(__guest_exit)
 -- 
-2.9.0
+Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
