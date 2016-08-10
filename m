@@ -1,52 +1,25 @@
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH v2 2/2] KVM: Protect device ops->create and list_add with
- kvm->lock
-Date: Wed, 10 Aug 2016 12:28:41 +0200
-Message-ID: <209d8ccd-e53d-6fc8-e078-f4d48db5c8ca@de.ibm.com>
-References: <20160809171301.24283-1-christoffer.dall@linaro.org>
- <20160809171301.24283-3-christoffer.dall@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH] KVM: arm64: vgic-its: Grab kvm->lock when reading kvm->devices
+Date: Wed, 10 Aug 2016 12:39:14 +0200
+Message-ID: <20160810103914.30322-1-christoffer.dall@linaro.org>
+References: <20160808154543.23463-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 54572412A6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 06:21:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CABB412A6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 06:30:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OofDJMXn-9TD for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Aug 2016 06:21:38 -0400 (EDT)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
- [148.163.156.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B0B5410EB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 06:21:37 -0400 (EDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id
- u7AAO9FV085740
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 06:28:46 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
- by mx0a-001b2d01.pphosted.com with ESMTP id 24qm9sy37j-1
- (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 06:28:46 -0400
-Received: from localhost
- by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <kvmarm@lists.cs.columbia.edu> from <borntraeger@de.ibm.com>;
- Wed, 10 Aug 2016 11:28:44 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by d06dlp01.portsmouth.uk.ibm.com (Postfix) with ESMTP id 24DFA17D8042
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 11:30:22 +0100 (BST)
-Received: from d06av10.portsmouth.uk.ibm.com (d06av10.portsmouth.uk.ibm.com
- [9.149.37.251])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- u7AASgG721823740
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 10:28:42 GMT
-Received: from d06av10.portsmouth.uk.ibm.com (localhost [127.0.0.1])
- by d06av10.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
- u7A9SiuN022816
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 03:28:44 -0600
-In-Reply-To: <20160809171301.24283-3-christoffer.dall@linaro.org>
+ with ESMTP id AytXVabnQBOl for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Aug 2016 06:30:17 -0400 (EDT)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4561410EB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 06:30:17 -0400 (EDT)
+Received: by mail-wm0-f42.google.com with SMTP id o80so94050497wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 03:37:27 -0700 (PDT)
+In-Reply-To: <20160808154543.23463-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -56,26 +29,120 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org
-Cc: Andre Przywara <andre.przywara@arm.com>, paulus@ozlabs.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: kvm@vger.kernel.org, Eric Auger <eric.auger@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/09/2016 07:13 PM, Christoffer Dall wrote:
-> KVM devices were manipulating list data structures without any form of
-> synchronization, and some implementations of the create operations also
-> suffered from a lack of synchronization.
-> 
-> Now when we've split the xics create operation into create and init, we
-> can hold the kvm->lock mutex while calling the create operation and when
-> manipulating the devices list.
-> 
-> The error path in the generic code gets slightly ugly because we have to
-> take the mutex again and delete the device from the list, but holding
-> the mutex during anon_inode_getfd or releasing/locking the mutex in the
-> common non-error path seemed wrong.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Since we are about to synchronize all accesses to kvm->devices using the
+kvm->lock mutex, we should hold this mutex while iterating over the list
+of devices in the ITS code.
 
-Looks sane for s390.
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Also move the vgic_register_its_iodev function to where it's called and
+rename it to register_its_iodev to avoid having two almost identially
+named functions.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/vgic/vgic-its.c | 64 +++++++++++++++++++++++---------------------
+ 1 file changed, 34 insertions(+), 30 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 1cf9f59..4e76877 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1319,32 +1319,6 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+ 		its_sync_lpi_pending_table(vcpu);
+ }
+ 
+-static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
+-{
+-	struct vgic_io_device *iodev = &its->iodev;
+-	int ret;
+-
+-	if (!its->initialized)
+-		return -EBUSY;
+-
+-	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base))
+-		return -ENXIO;
+-
+-	iodev->regions = its_registers;
+-	iodev->nr_regions = ARRAY_SIZE(its_registers);
+-	kvm_iodevice_init(&iodev->dev, &kvm_io_gic_ops);
+-
+-	iodev->base_addr = its->vgic_its_base;
+-	iodev->iodev_type = IODEV_ITS;
+-	iodev->its = its;
+-	mutex_lock(&kvm->slots_lock);
+-	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, iodev->base_addr,
+-				      KVM_VGIC_V3_ITS_SIZE, &iodev->dev);
+-	mutex_unlock(&kvm->slots_lock);
+-
+-	return ret;
+-}
+-
+ #define INITIAL_BASER_VALUE						  \
+ 	(GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWb)		| \
+ 	 GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, SameAsInner)		| \
+@@ -1526,6 +1500,32 @@ int kvm_vgic_register_its_device(void)
+ 				       KVM_DEV_TYPE_ARM_VGIC_ITS);
+ }
+ 
++static int register_its_iodev(struct kvm *kvm, struct vgic_its *its)
++{
++	struct vgic_io_device *iodev = &its->iodev;
++	int ret;
++
++	if (!its->initialized)
++		return -EBUSY;
++
++	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base))
++		return -ENXIO;
++
++	iodev->regions = its_registers;
++	iodev->nr_regions = ARRAY_SIZE(its_registers);
++	kvm_iodevice_init(&iodev->dev, &kvm_io_gic_ops);
++
++	iodev->base_addr = its->vgic_its_base;
++	iodev->iodev_type = IODEV_ITS;
++	iodev->its = its;
++	mutex_lock(&kvm->slots_lock);
++	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, iodev->base_addr,
++				      KVM_VGIC_V3_ITS_SIZE, &iodev->dev);
++	mutex_unlock(&kvm->slots_lock);
++
++	return ret;
++}
++
+ /*
+  * Registers all ITSes with the kvm_io_bus framework.
+  * To follow the existing VGIC initialization sequence, this has to be
+@@ -1536,19 +1536,23 @@ int vgic_register_its_iodevs(struct kvm *kvm)
+ 	struct kvm_device *dev;
+ 	int ret = 0;
+ 
++	mutex_lock(&kvm->lock);
+ 	list_for_each_entry(dev, &kvm->devices, vm_node) {
+ 		if (dev->ops != &kvm_arm_vgic_its_ops)
+ 			continue;
+ 
+-		ret = vgic_register_its_iodev(kvm, dev->private);
++		ret = register_its_iodev(kvm, dev->private);
+ 		if (ret)
+-			return ret;
++			goto out;
++
+ 		/*
+ 		 * We don't need to care about tearing down previously
+-		 * registered ITSes, as the kvm_io_bus framework removes
+-		 * them for us if the VM gets destroyed.
++		 * registered ITSes on error, as the kvm_io_bus framework
++		 * removes them for us if the VM gets destroyed.
+ 		 */
+ 	}
+ 
++out:
++	mutex_unlock(&kvm->lock);
+ 	return ret;
+ }
+-- 
+2.9.0
