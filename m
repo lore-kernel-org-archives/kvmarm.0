@@ -1,29 +1,28 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: vgic-its: Grab kvm->lock when reading
- kvm->devices
-Date: Wed, 10 Aug 2016 16:34:29 +0200
-Message-ID: <20160810143429.GA11515@cbox>
-References: <20160808154543.23463-1-andre.przywara@arm.com>
- <20160810103914.30322-1-christoffer.dall@linaro.org>
- <d02583ed-d396-4431-ba91-903d04843fb3@redhat.com>
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Subject: Re: [RFC PATCH v2 0/4] arm/arm64: vgic-new: Implement API for vGICv3
+ live migration
+Date: Thu, 11 Aug 2016 10:59:52 +0530
+Message-ID: <CALicx6sdGgkf_neZ_F0OUu3cg36VBoWT581HAG=v2FecN6omJA@mail.gmail.com>
+References: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
+ <CAFEAcA-z+iM+=p0riWreJCewPPxw9wtHgg+_4MDtxV=ccwe-tg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F00A441390
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 10:25:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57F4849B3C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Aug 2016 01:22:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ibCsT16HOplU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Aug 2016 10:25:30 -0400 (EDT)
-Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F33F41145
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 10:25:29 -0400 (EDT)
-Received: by mail-wm0-f51.google.com with SMTP id i5so108410628wmg.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 07:32:39 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <d02583ed-d396-4431-ba91-903d04843fb3@redhat.com>
+ with ESMTP id erMvJApaXLpb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Aug 2016 01:22:42 -0400 (EDT)
+Received: from mail-oi0-f68.google.com (mail-oi0-f68.google.com
+ [209.85.218.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1530D412D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Aug 2016 01:22:42 -0400 (EDT)
+Received: by mail-oi0-f68.google.com with SMTP id e80so2121964oig.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2016 22:29:53 -0700 (PDT)
+In-Reply-To: <CAFEAcA-z+iM+=p0riWreJCewPPxw9wtHgg+_4MDtxV=ccwe-tg@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,129 +32,91 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, G@cbox
-Cc: kvm@vger.kernel.org, Eric Auger <eric.auger@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "prasun.kapoor" <Prasun.Kapoor@cavium.com>, Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 10, 2016 at 03:10:51PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 10/08/2016 12:39, Christoffer Dall wrote:
-> > Since we are about to synchronize all accesses to kvm->devices using the
-> > kvm->lock mutex, we should hold this mutex while iterating over the list
-> > of devices in the ITS code.
-> > 
-> > Also move the vgic_register_its_iodev function to where it's called and
-> > rename it to register_its_iodev to avoid having two almost identially
-> > named functions.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> >  virt/kvm/arm/vgic/vgic-its.c | 64 +++++++++++++++++++++++---------------------
-> >  1 file changed, 34 insertions(+), 30 deletions(-)
-> > 
-> > diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> > index 1cf9f59..4e76877 100644
-> > --- a/virt/kvm/arm/vgic/vgic-its.c
-> > +++ b/virt/kvm/arm/vgic/vgic-its.c
-> > @@ -1319,32 +1319,6 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu)
-> >  		its_sync_lpi_pending_table(vcpu);
-> >  }
-> >  
-> > -static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
-> > -{
-> > -	struct vgic_io_device *iodev = &its->iodev;
-> > -	int ret;
-> > -
-> > -	if (!its->initialized)
-> > -		return -EBUSY;
-> > -
-> > -	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base))
-> > -		return -ENXIO;
-> > -
-> > -	iodev->regions = its_registers;
-> > -	iodev->nr_regions = ARRAY_SIZE(its_registers);
-> > -	kvm_iodevice_init(&iodev->dev, &kvm_io_gic_ops);
-> > -
-> > -	iodev->base_addr = its->vgic_its_base;
-> > -	iodev->iodev_type = IODEV_ITS;
-> > -	iodev->its = its;
-> > -	mutex_lock(&kvm->slots_lock);
-> > -	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, iodev->base_addr,
-> > -				      KVM_VGIC_V3_ITS_SIZE, &iodev->dev);
-> > -	mutex_unlock(&kvm->slots_lock);
-> > -
-> > -	return ret;
-> > -}
-> > -
-> >  #define INITIAL_BASER_VALUE						  \
-> >  	(GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWb)		| \
-> >  	 GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, SameAsInner)		| \
-> > @@ -1526,6 +1500,32 @@ int kvm_vgic_register_its_device(void)
-> >  				       KVM_DEV_TYPE_ARM_VGIC_ITS);
-> >  }
-> >  
-> > +static int register_its_iodev(struct kvm *kvm, struct vgic_its *its)
-> > +{
-> > +	struct vgic_io_device *iodev = &its->iodev;
-> > +	int ret;
-> > +
-> > +	if (!its->initialized)
-> > +		return -EBUSY;
-> > +
-> > +	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base))
-> > +		return -ENXIO;
-> > +
-> > +	iodev->regions = its_registers;
-> > +	iodev->nr_regions = ARRAY_SIZE(its_registers);
-> > +	kvm_iodevice_init(&iodev->dev, &kvm_io_gic_ops);
-> > +
-> > +	iodev->base_addr = its->vgic_its_base;
-> > +	iodev->iodev_type = IODEV_ITS;
-> > +	iodev->its = its;
-> > +	mutex_lock(&kvm->slots_lock);
-> > +	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, iodev->base_addr,
-> > +				      KVM_VGIC_V3_ITS_SIZE, &iodev->dev);
-> > +	mutex_unlock(&kvm->slots_lock);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> >  /*
-> >   * Registers all ITSes with the kvm_io_bus framework.
-> >   * To follow the existing VGIC initialization sequence, this has to be
-> > @@ -1536,19 +1536,23 @@ int vgic_register_its_iodevs(struct kvm *kvm)
-> >  	struct kvm_device *dev;
-> >  	int ret = 0;
-> >  
-> > +	mutex_lock(&kvm->lock);
-> >  	list_for_each_entry(dev, &kvm->devices, vm_node) {
-> >  		if (dev->ops != &kvm_arm_vgic_its_ops)
-> >  			continue;
-> >  
-> > -		ret = vgic_register_its_iodev(kvm, dev->private);
-> > +		ret = register_its_iodev(kvm, dev->private);
-> >  		if (ret)
-> > -			return ret;
-> > +			goto out;
-> > +
-> >  		/*
-> >  		 * We don't need to care about tearing down previously
-> > -		 * registered ITSes, as the kvm_io_bus framework removes
-> > -		 * them for us if the VM gets destroyed.
-> > +		 * registered ITSes on error, as the kvm_io_bus framework
-> > +		 * removes them for us if the VM gets destroyed.
-> >  		 */
-> >  	}
-> >  
-> > +out:
-> > +	mutex_unlock(&kvm->lock);
-> >  	return ret;
-> >  }
-> > 
-> 
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+On Tue, Aug 9, 2016 at 5:22 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 9 August 2016 at 11:58,  <vijay.kilari@gmail.com> wrote:
+>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>
+>> This patchset adds API for saving and restoring
+>> of VGICv3 registers to support live migration with new vgic feature.
+>> This API definition is as per version of VGICv3 specification
+>> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
+>>
+>> To test live migration with QEMU, use below patch series
+>> https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg01444.html
+>>
+>> The patch 3 & 4 are picked from the Pavel's previous implementation.
+>> http://www.spinics.net/lists/kvm/msg122040.html
+>>
+>> v1 => v2:
+>>  - The init sequence change patch is no more required.
+>>    Fixed in patch 2 by using static vgic_io_dev regions structure instead
+>>    of using dynamic allocation pointer.
+>>  - Updated commit message of patch 4.
+>>  - Dropped usage of union to manage 32-bit and 64-bit access in patch 1.
+>>    Used local variable for 32-bit access.
+>>  - Updated macro __ARM64_SYS_REG and ARM64_SYS_REG in
+>>    arch/arm64/include/uapi/asm/kvm.h as per qemu requirements.
+>
+> I only scanned briefly through this patchset, but I didn't
+> see any code implementing:
+>  * KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
 
-Thanks Paolo!
+If irq->pending is updated by kernel based on irq->line_level when interrupt
+is asserted by device or guest. Do we still need to extract
+irq->line_level using
+this ioctl and while writing back GIC{D|R}_ISPENDR with line_level
++(OR) GIC{D|R}_ISPENDR?
 
--Christoffer
+>  * the different behaviour for accesses to GICD_STATUSR, GICR_STATUSR,
+
+QEMU is saving and restoring this register, but kernel implementation
+is missing. Kernel is silently returning zero. So could not catch. I
+will fix it.
+
+However, Specification says as below for STATUSR.
+
+"    The GICD_STATUSR and GICR_STATUSR registers are architecturally
+defined such
+     that a write of a clear bit has no effect, whereas a write with a set bit
+     clears that value.  To allow userspace to freely set the values
+of these two
+     registers, setting the attributes with the register offsets for these two
+     registers simply sets the non-reserved bits to the value written."
+
+Question is during restore, the set bit will clear the value STATUSR.
+So it will reset the STATUSR after migrating the VM.
+
+>    GICD_ISPENDR, GICR_ISPENDR0, GICD_ICPENDR, and GICR_ICPENDR0, which
+>    don't act the same via this API as for a guest access to the register
+>
+> Did I miss something?
+
+In kernel (as shown in below code snippet),
+ GICD_ISPENDR, GICR_ISPENDR0, GICD_ICPENDR, and GICR_ICPENDR0
+all register access using KVM_DEV_ARM_VGIC_GRP_{RE|DIST}_REGS ioctl
+is accessing irq->pending state.
+
+unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+                                     gpa_t addr, unsigned int len)
+{
+        u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+        u32 value = 0;
+        int i;
+
+        /* Loop over all IRQs affected by this read */
+        for (i = 0; i < len * 8; i++) {
+                struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+
+                if (irq->pending)
+                        value |= (1U << i);
+        }
+
+  ...
+}
+>
+> thanks
+> -- PMM
