@@ -1,29 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 2/2] KVM: arm/arm64: Rename vgic_attr_regs_access to
- vgic_attr_regs_access_v2
-Date: Tue, 16 Aug 2016 19:35:27 +0200
-Message-ID: <20160816173527.GG14088@cbox>
-References: <20160816151034.16930-1-christoffer.dall@linaro.org>
- <20160816151034.16930-3-christoffer.dall@linaro.org>
- <20160816160924.vaq7s3n3vjvx4uhg@kamzik.localdomain>
+Subject: Re: [RFC PATCH v2 0/4] arm/arm64: vgic-new: Implement API for vGICv3
+ live migration
+Date: Tue, 16 Aug 2016 19:37:47 +0200
+Message-ID: <20160816173747.GH14088@cbox>
+References: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAA82413E1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 13:26:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BF45413E1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 13:28:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e3a67wLSt1Fj for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Aug 2016 13:26:01 -0400 (EDT)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1506412A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 13:26:01 -0400 (EDT)
-Received: by mail-wm0-f47.google.com with SMTP id i5so183028688wmg.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 10:33:28 -0700 (PDT)
+ with ESMTP id lcwFs9CSHddW for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Aug 2016 13:28:22 -0400 (EDT)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 611E0412A2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 13:28:22 -0400 (EDT)
+Received: by mail-wm0-f48.google.com with SMTP id o80so183311863wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 10:35:49 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20160816160924.vaq7s3n3vjvx4uhg@kamzik.localdomain>
+In-Reply-To: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,97 +31,46 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: vijay.kilari@gmail.com
+Cc: Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 16, 2016 at 06:09:24PM +0200, Andrew Jones wrote:
-> On Tue, Aug 16, 2016 at 05:10:34PM +0200, Christoffer Dall wrote:
-> > Just a rename so we can implement a v3-specific function later.  No
-> > functional change.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> >  virt/kvm/arm/vgic/vgic-kvm-device.c | 27 ++++++++++++++-------------
-> >  1 file changed, 14 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> > index 22d7ab3..2e18f03 100644
-> > --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-> > +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> > @@ -296,17 +296,20 @@ static bool lock_all_vcpus(struct kvm *kvm)
-> >  	return true;
-> >  }
-> >  
-> > -/** vgic_attr_regs_access: allows user space to read/write VGIC registers
-> > - *
-> > - * @dev: kvm device handle
-> > - * @attr: kvm device attribute
-> > - * @reg: address the value is read or written
-> > - * @is_write: write flag
-> > +/* V2 ops */
-> > +
-> > +
-> 
-> Do we want 2 blank lines here? Do we need the 'V2 ops' comment at all?
-> 
-> > +/**
-> > + * vgic_attr_regs_access_v2 - allows user space to access VGIC v2 state
-> >   *
-> > + * @dev:      kvm device handle
-> > + * @attr:     kvm device attribute
-> > + * @reg:      address the value is read or written
-> > + * @is_write: true if userspace is writing a register
-> >   */
-> > -static int vgic_attr_regs_access(struct kvm_device *dev,
-> > -				 struct kvm_device_attr *attr,
-> > -				 u32 *reg, bool is_write)
-> > +static int vgic_attr_regs_access_v2(struct kvm_device *dev,
-> > +				    struct kvm_device_attr *attr,
-> > +				    u32 *reg, bool is_write)
-> >  {
-> >  	struct vgic_reg_attr reg_attr;
-> >  	gpa_t addr;
-> > @@ -349,8 +352,6 @@ out:
-> >  	return ret;
-> >  }
-> >  
-> > -/* V2 ops */
-> > -
-> >  static int vgic_v2_set_attr(struct kvm_device *dev,
-> >  			    struct kvm_device_attr *attr)
-> >  {
-> > @@ -369,7 +370,7 @@ static int vgic_v2_set_attr(struct kvm_device *dev,
-> >  		if (get_user(reg, uaddr))
-> >  			return -EFAULT;
-> >  
-> > -		return vgic_attr_regs_access(dev, attr, &reg, true);
-> > +		return vgic_attr_regs_access_v2(dev, attr, &reg, true);
-> >  	}
-> >  	}
-> >  
-> > @@ -391,7 +392,7 @@ static int vgic_v2_get_attr(struct kvm_device *dev,
-> >  		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-> >  		u32 reg = 0;
-> >  
-> > -		ret = vgic_attr_regs_access(dev, attr, &reg, false);
-> > +		ret = vgic_attr_regs_access_v2(dev, attr, &reg, false);
-> >  		if (ret)
-> >  			return ret;
-> >  		return put_user(reg, uaddr);
-> > -- 
-> > 2.9.0
-> >
-> 
-> No better way to attract reviewers than to advertise no functional
-> change :-)
-> 
-> Looks good to me.
-> 
-Thanks for the quick review!
+Hi Vijaya,
 
-v2 has been sent, hopefully Vijay can pick these up from here and
-include in his series.
+On Tue, Aug 09, 2016 at 04:28:42PM +0530, vijay.kilari@gmail.com wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> 
+> This patchset adds API for saving and restoring
+> of VGICv3 registers to support live migration with new vgic feature.
+> This API definition is as per version of VGICv3 specification
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
+> 
+> To test live migration with QEMU, use below patch series
+> https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg01444.html
+> 
+> The patch 3 & 4 are picked from the Pavel's previous implementation.
+> http://www.spinics.net/lists/kvm/msg122040.html
+> 
+> v1 => v2:
+>  - The init sequence change patch is no more required.
+>    Fixed in patch 2 by using static vgic_io_dev regions structure instead
+>    of using dynamic allocation pointer.
+>  - Updated commit message of patch 4.
+>  - Dropped usage of union to manage 32-bit and 64-bit access in patch 1.
+>    Used local variable for 32-bit access.
+>  - Updated macro __ARM64_SYS_REG and ARM64_SYS_REG in 
+>    arch/arm64/include/uapi/asm/kvm.h as per qemu requirements.
+> 
+I think you should have enough to go on by now for a new revision.  You
+can include the two patches I just sent with the series '[PATCH v2]
+Rework vgic_attr_regs_access' in the beginning of your series and then
+base your work on that, assuming nobody else screams about this.
+
+If you use that approach, and you address the missing soft pending state
+etc. that Peter pointed out, then we should be ready for a detailed
+review.
+
+Looking forward to the next version.
 
 Thanks,
 -Christoffer
