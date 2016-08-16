@@ -1,22 +1,22 @@
 From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH v2 3/7] KVM: arm: vgic-new: improve compatibility with 32-bit
-Date: Tue, 16 Aug 2016 11:46:54 +0100
-Message-ID: <1471344418-19568-4-git-send-email-vladimir.murzin@arm.com>
+Subject: [PATCH v2 5/7] ARM: move system register accessors to asm/cp15.h
+Date: Tue, 16 Aug 2016 11:46:56 +0100
+Message-ID: <1471344418-19568-6-git-send-email-vladimir.murzin@arm.com>
 References: <1471344418-19568-1-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 433F449B62
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 06:39:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C772749B30
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 06:39:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7wPOBnXXXzyH for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Aug 2016 06:39:48 -0400 (EDT)
+ with ESMTP id UDIG1umuwIO8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Aug 2016 06:39:50 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C77F49B44
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 06:39:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4A2A49B51
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 06:39:49 -0400 (EDT)
 In-Reply-To: <1471344418-19568-1-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,68 +31,162 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We have couple of 64-bit register defined in GICv3 architecture, so
-"unsigned long" kind of accessors wouldn't work for 32-bit. However,
-these registers can't be access as 64-bit in a one go if we run 32-bit
-host simply because KVM doesn't support multiple load/store on MMIO
-space.
-
-It means that 32-bit guest access these registers in 32-bit chunks, so
-the only thing we need to do is to ensure that extract_bytes() always
-takes 64-bit data.
-
-Since we are here fix couple of other width related issues by using
-ULL variants over UL.
+Macro __ACCESS_CP15{_64} is defined in two headers (arch_gicv3.h and
+kvm_hyp.h) which are going to be requested by vgic-v3 altogether.
+GCC would not like it because it'd see that macro is redefined and (hey!)
+they are different.  So, let's put only single macro version under common
+place and use it everywhere.
 
 Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio-v3.c |    6 +++---
- virt/kvm/arm/vgic/vgic-mmio.h    |    2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ arch/arm/include/asm/arch_gicv3.h |   27 +++++++++++----------------
+ arch/arm/include/asm/cp15.h       |   15 +++++++++++++++
+ arch/arm/include/asm/kvm_hyp.h    |   15 +--------------
+ 3 files changed, 27 insertions(+), 30 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index ff668e0..cc20b60 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -23,7 +23,7 @@
- #include "vgic-mmio.h"
+diff --git a/arch/arm/include/asm/arch_gicv3.h b/arch/arm/include/asm/arch_gicv3.h
+index e08d151..af25c32 100644
+--- a/arch/arm/include/asm/arch_gicv3.h
++++ b/arch/arm/include/asm/arch_gicv3.h
+@@ -22,9 +22,7 @@
  
- /* extract @num bytes at @offset bytes offset in data */
--unsigned long extract_bytes(unsigned long data, unsigned int offset,
-+unsigned long extract_bytes(u64 data, unsigned int offset,
- 			    unsigned int num)
+ #include <linux/io.h>
+ #include <asm/barrier.h>
+-
+-#define __ACCESS_CP15(CRn, Op1, CRm, Op2)	p15, Op1, %0, CRn, CRm, Op2
+-#define __ACCESS_CP15_64(Op1, CRm)		p15, Op1, %Q0, %R0, CRm
++#include <asm/cp15.h>
+ 
+ #define ICC_EOIR1			__ACCESS_CP15(c12, 0, c12, 1)
+ #define ICC_DIR				__ACCESS_CP15(c12, 0, c11, 1)
+@@ -102,58 +100,55 @@
+ 
+ static inline void gic_write_eoir(u32 irq)
  {
- 	return (data >> (offset * 8)) & GENMASK_ULL(num * 8 - 1, 0);
-@@ -179,7 +179,7 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
- 	int target_vcpu_id = vcpu->vcpu_id;
- 	u64 value;
+-	asm volatile("mcr " __stringify(ICC_EOIR1) : : "r" (irq));
++	write_sysreg(irq, ICC_EOIR1);
+ 	isb();
+ }
  
--	value = (mpidr & GENMASK(23, 0)) << 32;
-+	value = (mpidr & GENMASK_ULL(23, 0)) << 32;
- 	value |= ((target_vcpu_id & 0xffff) << 8);
- 	if (target_vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
- 		value |= GICR_TYPER_LAST;
-@@ -603,7 +603,7 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
- 	bool broadcast;
+ static inline void gic_write_dir(u32 val)
+ {
+-	asm volatile("mcr " __stringify(ICC_DIR) : : "r" (val));
++	write_sysreg(val, ICC_DIR);
+ 	isb();
+ }
  
- 	sgi = (reg & ICC_SGI1R_SGI_ID_MASK) >> ICC_SGI1R_SGI_ID_SHIFT;
--	broadcast = reg & BIT(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
-+	broadcast = reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
- 	target_cpus = (reg & ICC_SGI1R_TARGET_LIST_MASK) >> ICC_SGI1R_TARGET_LIST_SHIFT;
- 	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
- 	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index 0b3ecf9..80f92ce 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -96,7 +96,7 @@ unsigned long vgic_data_mmio_bus_to_host(const void *val, unsigned int len);
- void vgic_data_host_to_mmio_bus(void *buf, unsigned int len,
- 				unsigned long data);
+ static inline u32 gic_read_iar(void)
+ {
+-	u32 irqstat;
++	u32 irqstat = read_sysreg(ICC_IAR1);
  
--unsigned long extract_bytes(unsigned long data, unsigned int offset,
-+unsigned long extract_bytes(u64 data, unsigned int offset,
- 			    unsigned int num);
+-	asm volatile("mrc " __stringify(ICC_IAR1) : "=r" (irqstat));
+ 	dsb(sy);
++
+ 	return irqstat;
+ }
  
- u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
+ static inline void gic_write_pmr(u32 val)
+ {
+-	asm volatile("mcr " __stringify(ICC_PMR) : : "r" (val));
++	write_sysreg(val, ICC_PMR);
+ }
+ 
+ static inline void gic_write_ctlr(u32 val)
+ {
+-	asm volatile("mcr " __stringify(ICC_CTLR) : : "r" (val));
++	write_sysreg(val, ICC_CTLR);
+ 	isb();
+ }
+ 
+ static inline void gic_write_grpen1(u32 val)
+ {
+-	asm volatile("mcr " __stringify(ICC_IGRPEN1) : : "r" (val));
++	write_sysreg(val, ICC_IGRPEN1);
+ 	isb();
+ }
+ 
+ static inline void gic_write_sgi1r(u64 val)
+ {
+-	asm volatile("mcrr " __stringify(ICC_SGI1R) : : "r" (val));
++	write_sysreg(val, ICC_SGI1R);
+ }
+ 
+ static inline u32 gic_read_sre(void)
+ {
+-	u32 val;
+-
+-	asm volatile("mrc " __stringify(ICC_SRE) : "=r" (val));
+-	return val;
++	return read_sysreg(ICC_SRE);
+ }
+ 
+ static inline void gic_write_sre(u32 val)
+ {
+-	asm volatile("mcr " __stringify(ICC_SRE) : : "r" (val));
++	write_sysreg(val, ICC_SRE);
+ 	isb();
+ }
+ 
+diff --git a/arch/arm/include/asm/cp15.h b/arch/arm/include/asm/cp15.h
+index c3f1152..f661732 100644
+--- a/arch/arm/include/asm/cp15.h
++++ b/arch/arm/include/asm/cp15.h
+@@ -47,6 +47,21 @@
+ #define vectors_high()	(0)
+ #endif
+ 
++#define __ACCESS_CP15(CRn, Op1, CRm, Op2)	\
++	"mrc", "mcr", __stringify(p15, Op1, %0, CRn, CRm, Op2), u32
++#define __ACCESS_CP15_64(Op1, CRm)		\
++	"mrrc", "mcrr", __stringify(p15, Op1, %Q0, %R0, CRm), u64
++
++#define __read_sysreg(r, w, c, t) ({				\
++	t __val;						\
++	asm volatile(r " " c : "=r" (__val));			\
++	__val;							\
++})
++#define read_sysreg(...)		__read_sysreg(__VA_ARGS__)
++
++#define __write_sysreg(v, r, w, c, t)	asm volatile(w " " c : : "r" ((t)(v)))
++#define write_sysreg(v, ...)		__write_sysreg(v, __VA_ARGS__)
++
+ #ifdef CONFIG_CPU_CP15
+ 
+ extern unsigned long cr_alignment;	/* defined in entry-armv.S */
+diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
+index 6eaff28..e604ad68 100644
+--- a/arch/arm/include/asm/kvm_hyp.h
++++ b/arch/arm/include/asm/kvm_hyp.h
+@@ -20,28 +20,15 @@
+ 
+ #include <linux/compiler.h>
+ #include <linux/kvm_host.h>
++#include <asm/cp15.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/vfp.h>
+ 
+ #define __hyp_text __section(.hyp.text) notrace
+ 
+-#define __ACCESS_CP15(CRn, Op1, CRm, Op2)	\
+-	"mrc", "mcr", __stringify(p15, Op1, %0, CRn, CRm, Op2), u32
+-#define __ACCESS_CP15_64(Op1, CRm)		\
+-	"mrrc", "mcrr", __stringify(p15, Op1, %Q0, %R0, CRm), u64
+ #define __ACCESS_VFP(CRn)			\
+ 	"mrc", "mcr", __stringify(p10, 7, %0, CRn, cr0, 0), u32
+ 
+-#define __write_sysreg(v, r, w, c, t)	asm volatile(w " " c : : "r" ((t)(v)))
+-#define write_sysreg(v, ...)		__write_sysreg(v, __VA_ARGS__)
+-
+-#define __read_sysreg(r, w, c, t) ({				\
+-	t __val;						\
+-	asm volatile(r " " c : "=r" (__val));			\
+-	__val;							\
+-})
+-#define read_sysreg(...)		__read_sysreg(__VA_ARGS__)
+-
+ #define write_special(v, r)					\
+ 	asm volatile("msr " __stringify(r) ", %0" : : "r" (v))
+ #define read_special(r) ({					\
 -- 
 1.7.9.5
