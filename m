@@ -1,100 +1,105 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [RFC PATCH 0/7] Add support for monitoring guest TLB operations
-Date: Tue, 16 Aug 2016 11:45:05 +0100
-Message-ID: <1471344312-26685-1-git-send-email-punit.agrawal@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Subject: [RFC PATCH 1/7] perf/trace: Add notification for perf trace events
+Date: Tue, 16 Aug 2016 11:45:06 +0100
+Message-ID: <1471344312-26685-2-git-send-email-punit.agrawal@arm.com>
+References: <1471344312-26685-1-git-send-email-punit.agrawal@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1471344312-26685-1-git-send-email-punit.agrawal@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Punit Agrawal <punit.agrawal@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Add a mechanism to notify listeners about perf trace event state
+changes. This enables listeners to take actions requiring the event
+context (e.g., attached process).
 
-ARMv8 supports trapping guest TLB maintenance operations to the
-hypervisor. This trapping mechanism can be used to monitor the use of
-guest TLB instructions.
+The notification mechanism can be used to reduce trace point based
+profiling overhead by enabling/disabling hardware traps for specific
+contexts (e.g., virtual machines).
 
-As taking a trap for every TLB operation can have significant
-overhead, trapping should only be enabled -
+Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Ingo Molnar <mingo@redhat.com>
+---
+ include/linux/trace_events.h    |  3 +++
+ kernel/trace/trace_event_perf.c | 24 ++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-* on user request
-* for the VM of interest
-
-This patchset adds support to listen to perf trace event state change
-notifications. The notifications and associated context are then used
-to enable trapping of guest TLB operations when requested by the
-user. The trap handling generates trace events (kvm_tlb_invalidate)
-which can already be counted using existing perf trace
-functionality.
-
-Trapping of guest TLB operations is disabled when not being monitored
-(reducing profiling overhead).
-
-I would appreciate feedback on the approach to tie the control of TLB
-monitoring with perf trace events (Patch 1) especially if there are
-any suggestions on avoiding (or reducing) the overhead of "perf trace"
-notifications.
-
-I looked at using regfunc/unregfunc tracepoint hooks but they don't
-include the event context. But the bigger problem was that the
-callbacks are only called on the first instance of simultaneously
-executing perf stat invocations.
-
-The patchset is based on v4.8-rc2 and adds support for monitoring
-guest TLB operations on 64bit hosts. If the approach taken in the
-patches is acceptable, I'll add 32bit host support as well.
-
-With this patchset, 'perf' tool when attached to a VM process can be
-used to monitor the TLB operations. E.g., to monitor a VM with process
-id 4166 -
-
-# perf stat -e "kvm:kvm_tlb_invalidate" -p 4166
-
-Perform some operations in VM (running 'make -j 7' on the kernel
-sources in this instance). Breaking out of perf shows -
-
-Performance counter stats for process id '4166':
-
-         7,471,974      kvm:kvm_tlb_invalidate
-
-     374.235405282 seconds time elapsed
-
-All feedback welcome.
-
-Thanks,
-Punit
-
-Mark Rutland (2):
-  arm64: tlbflush.h: add __tlbi() macro
-  arm64/kvm: hyp: tlb: use __tlbi() helper
-
-Punit Agrawal (5):
-  perf/trace: Add notification for perf trace events
-  KVM: Track the pid of the VM process
-  KVM: arm/arm64: Register perf trace event notifier
-  arm64: KVM: Handle trappable TLB instructions
-  arm64: KVM: Enable selective trapping of TLB instructions
-
- arch/arm/include/asm/kvm_host.h   |   3 +
- arch/arm/kvm/arm.c                |   2 +
- arch/arm64/include/asm/kvm_asm.h  |   1 +
- arch/arm64/include/asm/kvm_host.h |   8 ++
- arch/arm64/include/asm/tlbflush.h |  31 ++++++--
- arch/arm64/kvm/Kconfig            |   4 +
- arch/arm64/kvm/Makefile           |   1 +
- arch/arm64/kvm/hyp/tlb.c          | 158 ++++++++++++++++++++++++++++++++++++--
- arch/arm64/kvm/perf_trace.c       | 154 +++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c         |  81 +++++++++++++++++++
- arch/arm64/kvm/trace.h            |  16 ++++
- include/linux/kvm_host.h          |   1 +
- include/linux/trace_events.h      |   3 +
- kernel/trace/trace_event_perf.c   |  24 ++++++
- virt/kvm/kvm_main.c               |   2 +
- 15 files changed, 475 insertions(+), 14 deletions(-)
- create mode 100644 arch/arm64/kvm/perf_trace.c
-
+diff --git a/include/linux/trace_events.h b/include/linux/trace_events.h
+index be00761..5924032 100644
+--- a/include/linux/trace_events.h
++++ b/include/linux/trace_events.h
+@@ -505,6 +505,9 @@ perf_trace_buf_submit(void *raw_data, int size, int rctx, u16 type,
+ {
+ 	perf_tp_event(type, count, raw_data, size, regs, head, rctx, task);
+ }
++
++extern int perf_trace_notifier_register(struct notifier_block *nb);
++extern int perf_trace_notifier_unregister(struct notifier_block *nb);
+ #endif
+ 
+ #endif /* _LINUX_TRACE_EVENT_H */
+diff --git a/kernel/trace/trace_event_perf.c b/kernel/trace/trace_event_perf.c
+index 562fa69..9aaaacf 100644
+--- a/kernel/trace/trace_event_perf.c
++++ b/kernel/trace/trace_event_perf.c
+@@ -6,10 +6,12 @@
+  */
+ 
+ #include <linux/module.h>
++#include <linux/notifier.h>
+ #include <linux/kprobes.h>
+ #include "trace.h"
+ 
+ static char __percpu *perf_trace_buf[PERF_NR_CONTEXTS];
++static RAW_NOTIFIER_HEAD(perf_trace_notifier_list);
+ 
+ /*
+  * Force it to be aligned to unsigned long to avoid misaligned accesses
+@@ -86,6 +88,26 @@ static int perf_trace_event_perm(struct trace_event_call *tp_event,
+ 	return 0;
+ }
+ 
++int perf_trace_notifier_register(struct notifier_block *nb)
++{
++	return raw_notifier_chain_register(&perf_trace_notifier_list, nb);
++}
++
++int perf_trace_notifier_unregister(struct notifier_block *nb)
++{
++	return raw_notifier_chain_unregister(&perf_trace_notifier_list, nb);
++}
++
++static void perf_trace_notify(enum trace_reg event, struct perf_event *p_event)
++{
++	/*
++	 * We use raw notifiers here as we are called with the
++	 * event_mutex held.
++	 */
++	raw_notifier_call_chain(&perf_trace_notifier_list,
++				     event, p_event);
++}
++
+ static int perf_trace_event_reg(struct trace_event_call *tp_event,
+ 				struct perf_event *p_event)
+ {
+@@ -176,6 +198,7 @@ out:
+ static int perf_trace_event_open(struct perf_event *p_event)
+ {
+ 	struct trace_event_call *tp_event = p_event->tp_event;
++	perf_trace_notify(TRACE_REG_PERF_OPEN, p_event);
+ 	return tp_event->class->reg(tp_event, TRACE_REG_PERF_OPEN, p_event);
+ }
+ 
+@@ -183,6 +206,7 @@ static void perf_trace_event_close(struct perf_event *p_event)
+ {
+ 	struct trace_event_call *tp_event = p_event->tp_event;
+ 	tp_event->class->reg(tp_event, TRACE_REG_PERF_CLOSE, p_event);
++	perf_trace_notify(TRACE_REG_PERF_CLOSE, p_event);
+ }
+ 
+ static int perf_trace_event_init(struct trace_event_call *tp_event,
 -- 
 2.8.1
+
