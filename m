@@ -1,76 +1,73 @@
-From: Robin Murphy <robin.murphy@arm.com>
-Subject: [PATCH v2] kvm: arm: Enforce some NS-SVC initialisation
-Date: Tue, 16 Aug 2016 18:49:18 +0100
-Message-ID: <6d030bee2db08c2fe1b7569e692e8f66800b1e4c.1471369569.git.robin.murphy@arm.com>
-References: <5322cdb9cb397741d15b60c6693ad39dbf74b6d5.1469101945.git.robin.murphy@arm.com>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Subject: Re: [PATCH] KVM: arm64: ITS: avoid re-mapping LPIs
+Date: Wed, 17 Aug 2016 00:45:17 +0100
+Message-ID: <a291bbd7-d8b4-2841-669b-721985eab81b@arm.com>
+References: <20160816165106.25057-1-andre.przywara@arm.com>
+ <20160816173038.GF14088@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F238413E1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 13:41:58 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qsIr3d27S848 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Aug 2016 13:41:57 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 820FB412A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2016 13:41:56 -0400 (EDT)
-In-Reply-To: <5322cdb9cb397741d15b60c6693ad39dbf74b6d5.1469101945.git.robin.murphy@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160816173038.GF14088@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since the non-secure copies of banked registers lack architecturally
-defined reset values, there is no actual guarantee when entering in Hyp
-from secure-only firmware that the Non-Secure PL1 state will look the
-way that kernel entry (in particular the decompressor stub) expects.
-So far, we've been getting away with it thanks to implementation details
-of ARMv7 cores and/or bootloader behaviour, but for the sake of forwards
-compatibility let's try to ensure that we have a minimally sane state
-before dropping down into it.
+On 16/08/16 18:30, Christoffer Dall wrote:
+> On Tue, Aug 16, 2016 at 05:51:06PM +0100, Andre Przywara wrote:
+>> When a guest wants to map a device-ID/event-ID combination that is
+>> already mapped, we may end up in a situation where an LPI is never
+>> "put", thus never being freed.
+>> Since the GICv3 spec says that mapping an already mapped LPI is
+>> UNPREDICTABLE, lets just bail out early in this situation to avoid
+>> any potential leaks.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 27 +++++++++++++--------------
+>>  1 file changed, 13 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 9533080..4660a7d 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -731,7 +731,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>>  	u32 device_id = its_cmd_get_deviceid(its_cmd);
+>>  	u32 event_id = its_cmd_get_id(its_cmd);
+>>  	u32 coll_id = its_cmd_get_collection(its_cmd);
+>> -	struct its_itte *itte, *new_itte = NULL;
+>> +	struct its_itte *itte;
+>>  	struct its_device *device;
+>>  	struct its_collection *collection, *new_coll = NULL;
+>>  	int lpi_nr;
+>> @@ -749,6 +749,10 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>>  	    lpi_nr >= max_lpis_propbaser(kvm->arch.vgic.propbaser))
+>>  		return E_ITS_MAPTI_PHYSICALID_OOR;
+>>  
+>> +	/* If there is an existing mapping, behavior is UNPREDICTABLE. */
+>> +	if (find_itte(its, device_id, event_id))
+>> +		return 0;
+>> +
+> 
+> By the way, this made me think how these errors are handled, and unless
+> I'm mistaken, the return value from vgic_its_handle_command() is simply
+> discarded, so even when we return things like -ENOMEM, this is just
+> ignored?  Is this really the intention?
 
-Signed-off-by: Robin Murphy <robin.murphy@arm.com>
----
+Yes, at least at the moment. The spec does not specify how ITS errors
+should be communicated (IMPLEMENTATION DEFINED), only that an error
+condition itself can be signaled via an SError - for which atm we lack
+any code to inject, if I am not mistaken.
+Still I wanted to assign those error codes: IMHO it improves readability
+and simplifies any later extension in that respect.
 
-v2: Initialise SED/ITD to safe values as well.
+For the Linux errors (like -ENOMEM): Due to the asynchronous nature of
+the ITS command handling and also the guest triggering the commands,
+there is really no better way to report those OoM conditions, for
+instance, so I treated them the same as "proper" ITS errors.
 
- arch/arm/kernel/hyp-stub.S | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Hope that helps.
+Cheers,
+Andre.
 
-diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
-index 0b1e4a93d67e..15d073ae5da2 100644
---- a/arch/arm/kernel/hyp-stub.S
-+++ b/arch/arm/kernel/hyp-stub.S
-@@ -142,6 +142,19 @@ ARM_BE8(orr	r7, r7, #(1 << 25))     @ HSCTLR.EE
- 	and	r7, #0x1f		@ Preserve HPMN
- 	mcr	p15, 4, r7, c1, c1, 1	@ HDCR
- 
-+	@ Make sure NS-SVC is initialised appropriately
-+	mrc	p15, 0, r7, c1, c0, 0	@ SCTLR
-+	orr	r7, #(1 << 5)		@ CP15 barriers enabled
-+	bic	r7, #(3 << 7)		@ Clear SED/ITD for v8 (RES0 for v7)
-+	bic	r7, #(3 << 19)		@ WXN and UWXN disabled
-+	mcr	p15, 0, r7, c1, c0, 0	@ SCTLR
-+
-+	mrc	p15, 0, r7, c0, c0, 0	@ MIDR
-+	mcr	p15, 4, r7, c0, c0, 0	@ VPIDR
-+
-+	mrc	p15, 0, r7, c0, c0, 5	@ MPIDR
-+	mcr	p15, 4, r7, c0, c0, 5	@ VMPIDR
-+
- #if !defined(ZIMAGE) && defined(CONFIG_ARM_ARCH_TIMER)
- 	@ make CNTP_* and CNTPCT accessible from PL1
- 	mrc	p15, 0, r7, c0, c1, 1	@ ID_PFR1
--- 
-2.8.1.dirty
