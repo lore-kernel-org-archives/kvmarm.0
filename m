@@ -1,47 +1,72 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 08/12] KVM: arm/arm64: Change misleading use of is_error_pfn
-Date: Wed, 17 Aug 2016 21:38:55 +0200
-Message-ID: <20160817193859.15726-9-christoffer.dall@linaro.org>
+Subject: [PULL 06/12] KVM: arm64: check for ITS device on MSI injection
+Date: Wed, 17 Aug 2016 21:38:53 +0200
+Message-ID: <20160817193859.15726-7-christoffer.dall@linaro.org>
 References: <20160817193859.15726-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20160817193859.15726-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When converting a gfn to a pfn, we call gfn_to_pfn_prot, which returns
-various kinds of error values.  It turns out that is_error_pfn() only
-returns true when the gfn was found in a memory slot and could somehow
-not be used, but it does not return true if the gfn does not belong to
-any memory slot.
+From: Andre Przywara <andre.przywara@arm.com>
 
-Change use to is_error_noslot_pfn() which covers both cases.
+When userspace provides the doorbell address for an MSI to be
+injected into the guest, we find a KVM device which feels responsible.
+Lets check that this device is really an emulated ITS before we make
+real use of the container_of-ed pointer.
 
-Note: Since we already check for kvm_is_error_hva(hva) explicitly in the
-caller of this function while holding the kvm->srcu lock protecting the
-memory slots, this should never be a problem, but nevertheless this
-change is warranted as it shows the intention of the code.
+  [ Moved NULL-pointer check to caller of static function
+    - Christoffer ]
 
-Reported-by: James Hogan <james.hogan@imgtec.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/kvm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-its.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index bda27b6..29d0b23 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -1309,7 +1309,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	smp_rmb();
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 1cf9f59..9533080 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -471,6 +471,21 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+ 	return 0;
+ }
  
- 	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
--	if (is_error_pfn(pfn))
-+	if (is_error_noslot_pfn(pfn))
- 		return -EFAULT;
++static struct vgic_io_device *vgic_get_its_iodev(struct kvm_io_device *dev)
++{
++	struct vgic_io_device *iodev;
++
++	if (dev->ops != &kvm_io_gic_ops)
++		return NULL;
++
++	iodev = container_of(dev, struct vgic_io_device, dev);
++
++	if (iodev->iodev_type != IODEV_ITS)
++		return NULL;
++
++	return iodev;
++}
++
+ /*
+  * Queries the KVM IO bus framework to get the ITS pointer from the given
+  * doorbell address.
+@@ -494,9 +509,11 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
  
- 	if (kvm_is_device_pfn(pfn)) {
+ 	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
+ 	if (!kvm_io_dev)
+-		return -ENODEV;
++		return -EINVAL;
+ 
+-	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
++	iodev = vgic_get_its_iodev(kvm_io_dev);
++	if (!iodev)
++		return -EINVAL;
+ 
+ 	mutex_lock(&iodev->its->its_lock);
+ 	ret = vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
 -- 
 2.9.0
 
