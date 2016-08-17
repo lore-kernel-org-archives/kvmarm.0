@@ -1,28 +1,25 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH v2 0/4] arm/arm64: vgic-new: Implement API for vGICv3
- live migration
-Date: Wed, 17 Aug 2016 13:55:44 +0200
-Message-ID: <20160817115544.GB5909@cbox>
-References: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
- <20160816173747.GH14088@cbox>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH 0/7] Add support for monitoring guest TLB operations
+Date: Wed, 17 Aug 2016 17:58:44 +0200
+Message-ID: <ed9ce98d-67d2-f01b-6bb0-5c5c842129a5@redhat.com>
+References: <1471344312-26685-1-git-send-email-punit.agrawal@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B82BC40F90
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2016 07:46:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A3B06410EB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2016 11:51:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aZmr1i6wkLuV for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Aug 2016 07:46:18 -0400 (EDT)
-Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5EF5D40F77
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2016 07:46:17 -0400 (EDT)
-Received: by mail-wm0-f48.google.com with SMTP id o80so227320032wme.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2016 04:53:46 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20160816173747.GH14088@cbox>
+ with ESMTP id 6MCHapYCYs39 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Aug 2016 11:51:18 -0400 (EDT)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C11C40C9D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2016 11:51:18 -0400 (EDT)
+Received: by mail-wm0-f68.google.com with SMTP id i138so25445990wmf.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2016 08:58:47 -0700 (PDT)
+In-Reply-To: <1471344312-26685-1-git-send-email-punit.agrawal@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,55 +29,69 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: vijay.kilari@gmail.com
-Cc: Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Punit Agrawal <punit.agrawal@arm.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Ingo Molnar <mingo@redhat.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 16, 2016 at 07:37:47PM +0200, Christoffer Dall wrote:
-> Hi Vijaya,
-> 
-> On Tue, Aug 09, 2016 at 04:28:42PM +0530, vijay.kilari@gmail.com wrote:
-> > From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> > 
-> > This patchset adds API for saving and restoring
-> > of VGICv3 registers to support live migration with new vgic feature.
-> > This API definition is as per version of VGICv3 specification
-> > http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
-> > 
-> > To test live migration with QEMU, use below patch series
-> > https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg01444.html
-> > 
-> > The patch 3 & 4 are picked from the Pavel's previous implementation.
-> > http://www.spinics.net/lists/kvm/msg122040.html
-> > 
-> > v1 => v2:
-> >  - The init sequence change patch is no more required.
-> >    Fixed in patch 2 by using static vgic_io_dev regions structure instead
-> >    of using dynamic allocation pointer.
-> >  - Updated commit message of patch 4.
-> >  - Dropped usage of union to manage 32-bit and 64-bit access in patch 1.
-> >    Used local variable for 32-bit access.
-> >  - Updated macro __ARM64_SYS_REG and ARM64_SYS_REG in 
-> >    arch/arm64/include/uapi/asm/kvm.h as per qemu requirements.
-> > 
-> I think you should have enough to go on by now for a new revision.  You
-> can include the two patches I just sent with the series '[PATCH v2]
-> Rework vgic_attr_regs_access' in the beginning of your series and then
-> base your work on that, assuming nobody else screams about this.
-> 
-> If you use that approach, and you address the missing soft pending state
-> etc. that Peter pointed out, then we should be ready for a detailed
-> review.
-> 
-> Looking forward to the next version.
-> 
-FYI: I pushed the API doc and the refactoring patches to the 'queue'
-branch of the kvmarm tree:
 
-git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
 
-It would be good if you could base your patches on there for the next
-revision.
+On 16/08/2016 12:45, Punit Agrawal wrote:
+> Hi,
+> 
+> ARMv8 supports trapping guest TLB maintenance operations to the
+> hypervisor. This trapping mechanism can be used to monitor the use of
+> guest TLB instructions.
+> 
+> As taking a trap for every TLB operation can have significant
+> overhead, trapping should only be enabled -
+> 
+> * on user request
+> * for the VM of interest
+> 
+> This patchset adds support to listen to perf trace event state change
+> notifications. The notifications and associated context are then used
+> to enable trapping of guest TLB operations when requested by the
+> user. The trap handling generates trace events (kvm_tlb_invalidate)
+> which can already be counted using existing perf trace
+> functionality.
+> 
+> Trapping of guest TLB operations is disabled when not being monitored
+> (reducing profiling overhead).
+> 
+> I would appreciate feedback on the approach to tie the control of TLB
+> monitoring with perf trace events (Patch 1) especially if there are
+> any suggestions on avoiding (or reducing) the overhead of "perf trace"
+> notifications.
+> 
+> I looked at using regfunc/unregfunc tracepoint hooks but they don't
+> include the event context. But the bigger problem was that the
+> callbacks are only called on the first instance of simultaneously
+> executing perf stat invocations.
+> 
+> The patchset is based on v4.8-rc2 and adds support for monitoring
+> guest TLB operations on 64bit hosts. If the approach taken in the
+> patches is acceptable, I'll add 32bit host support as well.
+> 
+> With this patchset, 'perf' tool when attached to a VM process can be
+> used to monitor the TLB operations. E.g., to monitor a VM with process
+> id 4166 -
+> 
+> # perf stat -e "kvm:kvm_tlb_invalidate" -p 4166
+> 
+> Perform some operations in VM (running 'make -j 7' on the kernel
+> sources in this instance). Breaking out of perf shows -
+> 
+> Performance counter stats for process id '4166':
+> 
+>          7,471,974      kvm:kvm_tlb_invalidate
+> 
+>      374.235405282 seconds time elapsed
+> 
+> All feedback welcome.
+
+Can you explain what this is used for?  In other words, why would this
+be used instead of just running perf in the guest?
 
 Thanks,
--Christoffer
+
+Paolo
