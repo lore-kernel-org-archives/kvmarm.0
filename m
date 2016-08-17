@@ -1,93 +1,47 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 07/12] KVM: arm64: ITS: avoid re-mapping LPIs
-Date: Wed, 17 Aug 2016 21:38:54 +0200
-Message-ID: <20160817193859.15726-8-christoffer.dall@linaro.org>
+Subject: [PULL 08/12] KVM: arm/arm64: Change misleading use of is_error_pfn
+Date: Wed, 17 Aug 2016 21:38:55 +0200
+Message-ID: <20160817193859.15726-9-christoffer.dall@linaro.org>
 References: <20160817193859.15726-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20160817193859.15726-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
+When converting a gfn to a pfn, we call gfn_to_pfn_prot, which returns
+various kinds of error values.  It turns out that is_error_pfn() only
+returns true when the gfn was found in a memory slot and could somehow
+not be used, but it does not return true if the gfn does not belong to
+any memory slot.
 
-When a guest wants to map a device-ID/event-ID combination that is
-already mapped, we may end up in a situation where an LPI is never
-"put", thus never being freed.
-Since the GICv3 spec says that mapping an already mapped LPI is
-UNPREDICTABLE, lets just bail out early in this situation to avoid
-any potential leaks.
+Change use to is_error_noslot_pfn() which covers both cases.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Note: Since we already check for kvm_is_error_hva(hva) explicitly in the
+caller of this function while holding the kvm->srcu lock protecting the
+memory slots, this should never be a problem, but nevertheless this
+change is warranted as it shows the intention of the code.
+
+Reported-by: James Hogan <james.hogan@imgtec.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ arch/arm/kvm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 9533080..4660a7d 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -731,7 +731,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	u32 device_id = its_cmd_get_deviceid(its_cmd);
- 	u32 event_id = its_cmd_get_id(its_cmd);
- 	u32 coll_id = its_cmd_get_collection(its_cmd);
--	struct its_itte *itte, *new_itte = NULL;
-+	struct its_itte *itte;
- 	struct its_device *device;
- 	struct its_collection *collection, *new_coll = NULL;
- 	int lpi_nr;
-@@ -749,6 +749,10 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	    lpi_nr >= max_lpis_propbaser(kvm->arch.vgic.propbaser))
- 		return E_ITS_MAPTI_PHYSICALID_OOR;
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index bda27b6..29d0b23 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -1309,7 +1309,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	smp_rmb();
  
-+	/* If there is an existing mapping, behavior is UNPREDICTABLE. */
-+	if (find_itte(its, device_id, event_id))
-+		return 0;
-+
- 	collection = find_collection(its, coll_id);
- 	if (!collection) {
- 		int ret = vgic_its_alloc_collection(its, &collection, coll_id);
-@@ -757,20 +761,16 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 		new_coll = collection;
- 	}
+ 	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
+-	if (is_error_pfn(pfn))
++	if (is_error_noslot_pfn(pfn))
+ 		return -EFAULT;
  
--	itte = find_itte(its, device_id, event_id);
-+	itte = kzalloc(sizeof(struct its_itte), GFP_KERNEL);
- 	if (!itte) {
--		itte = kzalloc(sizeof(struct its_itte), GFP_KERNEL);
--		if (!itte) {
--			if (new_coll)
--				vgic_its_free_collection(its, coll_id);
--			return -ENOMEM;
--		}
--
--		new_itte = itte;
--		itte->event_id	= event_id;
--		list_add_tail(&itte->itte_list, &device->itt_head);
-+		if (new_coll)
-+			vgic_its_free_collection(its, coll_id);
-+		return -ENOMEM;
- 	}
- 
-+	itte->event_id	= event_id;
-+	list_add_tail(&itte->itte_list, &device->itt_head);
-+
- 	itte->collection = collection;
- 	itte->lpi = lpi_nr;
- 
-@@ -778,8 +778,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	if (IS_ERR(irq)) {
- 		if (new_coll)
- 			vgic_its_free_collection(its, coll_id);
--		if (new_itte)
--			its_free_itte(kvm, new_itte);
-+		its_free_itte(kvm, itte);
- 		return PTR_ERR(irq);
- 	}
- 	itte->irq = irq;
+ 	if (kvm_is_device_pfn(pfn)) {
 -- 
 2.9.0
 
