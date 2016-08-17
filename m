@@ -1,75 +1,60 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 00/12] KVM/ARM Fixes for v4.8-rc3
-Date: Wed, 17 Aug 2016 21:38:47 +0200
-Message-ID: <20160817193859.15726-1-christoffer.dall@linaro.org>
+Subject: [PULL 03/12] KVM: arm64: vgic-its: Plug race in vgic_put_irq
+Date: Wed, 17 Aug 2016 21:38:50 +0200
+Message-ID: <20160817193859.15726-4-christoffer.dall@linaro.org>
+References: <20160817193859.15726-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160817193859.15726-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Paolo and Radim,
+Right now the following sequence of events can happen:
 
-Here's a set of KVM/ARM fixes for v4.8-rc3 or as soon as you can make
-it.  They address:
- - ITS init issues
- - ITS error handling issues
- - ITS IRQ leakage fix
- - Plug a couple of ITS race conditions
- - An erratum workaround for timers
- - Some removal of misleading use of errors and comments
- - A fix for GICv3 on 32-bit guests
+  1. Thread X calls vgic_put_irq
+  2. Thread Y calls vgic_add_lpi
+  3. Thread Y gets lpi_list_lock
+  4. Thread X drops the ref count to 0 and blocks on lpi_list_lock
+  5. Thread Y finds the irq via the lpi_list_lock, raises the ref
+     count to 1, and release the lpi_list_lock.
+  6. Thread X proceeds and frees the irq.
 
-Note that the patch previously submitted 'KVM: arm64: vgic-its: Grab
-kvm->lock when reading kvm->devices', was dropped from this series
-because we were already holding the kvm->lock in the call path to the
-ITS code.
+Avoid this by holding the spinlock around the kref_put.
 
-The following changes since commit 29b4817d4018df78086157ea3a55c1d9424a7cfc:
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/vgic/vgic.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-  Linux 4.8-rc1 (2016-08-07 18:18:00 -0700)
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index e7aeac7..e83b7fe 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -117,17 +117,17 @@ static void vgic_irq_release(struct kref *ref)
+ 
+ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ {
+-	struct vgic_dist *dist;
++	struct vgic_dist *dist = &kvm->arch.vgic;
+ 
+ 	if (irq->intid < VGIC_MIN_LPI)
+ 		return;
+ 
+-	if (!kref_put(&irq->refcount, vgic_irq_release))
++	spin_lock(&dist->lpi_list_lock);
++	if (!kref_put(&irq->refcount, vgic_irq_release)) {
++		spin_unlock(&dist->lpi_list_lock);
+ 		return;
++	};
+ 
+-	dist = &kvm->arch.vgic;
+-
+-	spin_lock(&dist->lpi_list_lock);
+ 	list_del(&irq->lpi_list);
+ 	dist->lpi_list_count--;
+ 	spin_unlock(&dist->lpi_list_lock);
+-- 
+2.9.0
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm-for-v4.8-rc3
-
-for you to fetch changes up to f7f6f2d94f0027242ddfd665289b107a873fde43:
-
-  arm64: KVM: report configured SRE value to 32-bit world (2016-08-17 12:46:23 +0200)
-
-Thanks,
--Christoffer
-
-----------------------------------------------------------------
-Andre Przywara (4):
-      KVM: arm64: ITS: return 1 on successful MSI injection
-      KVM: arm64: ITS: move ITS registration into first VCPU run
-      KVM: arm64: check for ITS device on MSI injection
-      KVM: arm64: ITS: avoid re-mapping LPIs
-
-Christoffer Dall (4):
-      KVM: arm64: vgic-its: Handle errors from vgic_add_lpi
-      KVM: arm64: vgic-its: Plug race in vgic_put_irq
-      KVM: arm64: vgic-its: Make updates to propbaser/pendbaser atomic
-      KVM: arm/arm64: Change misleading use of is_error_pfn
-
-Marc Zyngier (2):
-      arm64: Document workaround for Cortex-A72 erratum #853709
-      KVM: arm/arm64: timer: Workaround misconfigured timer interrupt
-
-Vladimir Murzin (2):
-      arm64: KVM: remove misleading comment on pmu status
-      arm64: KVM: report configured SRE value to 32-bit world
-
- Documentation/arm64/silicon-errata.txt |   1 +
- arch/arm/kvm/mmu.c                     |   2 +-
- arch/arm64/kvm/hyp/switch.c            |   2 +-
- arch/arm64/kvm/sys_regs.c              |  10 +--
- include/linux/irqchip/arm-gic-v3.h     |   1 +
- virt/kvm/arm/arch_timer.c              |  11 ++-
- virt/kvm/arm/vgic/vgic-its.c           | 158 ++++++++++++++++++++++++---------
- virt/kvm/arm/vgic/vgic-mmio-v3.c       |  26 +++---
- virt/kvm/arm/vgic/vgic-v3.c            |   8 ++
- virt/kvm/arm/vgic/vgic.c               |  10 +--
- virt/kvm/arm/vgic/vgic.h               |   6 ++
- 11 files changed, 164 insertions(+), 71 deletions(-)
