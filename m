@@ -1,48 +1,169 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 12/12] arm64: KVM: report configured SRE value to 32-bit world
-Date: Wed, 17 Aug 2016 21:38:59 +0200
-Message-ID: <20160817193859.15726-13-christoffer.dall@linaro.org>
+Subject: [PULL 01/12] KVM: arm64: ITS: return 1 on successful MSI injection
+Date: Wed, 17 Aug 2016 21:38:48 +0200
+Message-ID: <20160817193859.15726-2-christoffer.dall@linaro.org>
 References: <20160817193859.15726-1-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BBD64053F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2016 15:29:37 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id JOiuRdUUjqrS for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Aug 2016 15:29:32 -0400 (EDT)
+Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78C43407A5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2016 15:29:32 -0400 (EDT)
+Received: by mail-wm0-f43.google.com with SMTP id i5so2126812wmg.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2016 12:37:02 -0700 (PDT)
 In-Reply-To: <20160817193859.15726-1-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Vladimir Murzin <vladimir.murzin@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vladimir Murzin <vladimir.murzin@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
 
-After commit b34f2bc ("arm64: KVM: Make ICC_SRE_EL1 access return the
-configured SRE value") we report SRE value to 64-bit guest, but 32-bit
-one still handled as RAZ/WI what leads to funny promise we do not keep:
+According to the KVM API documentation a successful MSI injection
+should return a value > 0 on success.
+Return possible errors in vgic_its_trigger_msi() and report a
+successful injection back to userland, while also reporting the
+case where the MSI could not be delivered due to the guest not
+having the LPI mapped, for instance.
 
-"GICv3: GIC: unable to set SRE (disabled at EL2), panic ahead"
-
-Instead, return the actual value of the ICC_SRE_EL1 register that the
-guest should see.
-
- [ Tweaked commit message - Christoffer ]
-
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/irqchip/arm-gic-v3.h |  1 +
+ virt/kvm/arm/vgic/vgic-its.c       | 56 +++++++++++++++++++++++++-------------
+ 2 files changed, 38 insertions(+), 19 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index af5ea86..e51367d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1352,7 +1352,7 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn(10), CRm( 3), Op2( 1), access_vm_reg, NULL, c10_AMAIR1 },
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 56b0b7e..99ac022 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -337,6 +337,7 @@
+  */
+ #define E_ITS_MOVI_UNMAPPED_INTERRUPT		0x010107
+ #define E_ITS_MOVI_UNMAPPED_COLLECTION		0x010109
++#define E_ITS_INT_UNMAPPED_INTERRUPT		0x010307
+ #define E_ITS_CLEAR_UNMAPPED_INTERRUPT		0x010507
+ #define E_ITS_MAPD_DEVICE_OOR			0x010801
+ #define E_ITS_MAPC_PROCNUM_OOR			0x010902
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 07411cf..1bd8adb 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -441,39 +441,48 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+  * Find the target VCPU and the LPI number for a given devid/eventid pair
+  * and make this IRQ pending, possibly injecting it.
+  * Must be called with the its_lock mutex held.
++ * Returns 0 on success, a positive error value for any ITS mapping
++ * related errors and negative error values for generic errors.
+  */
+-static void vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+-				 u32 devid, u32 eventid)
++static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
++				u32 devid, u32 eventid)
+ {
++	struct kvm_vcpu *vcpu;
+ 	struct its_itte *itte;
  
- 	/* ICC_SRE */
--	{ Op1( 0), CRn(12), CRm(12), Op2( 5), trap_raz_wi },
-+	{ Op1( 0), CRn(12), CRm(12), Op2( 5), access_gic_sre },
+ 	if (!its->enabled)
+-		return;
++		return -EBUSY;
  
- 	{ Op1( 0), CRn(13), CRm( 0), Op2( 1), access_vm_reg, NULL, c13_CID },
+ 	itte = find_itte(its, devid, eventid);
+-	/* Triggering an unmapped IRQ gets silently dropped. */
+-	if (itte && its_is_collection_mapped(itte->collection)) {
+-		struct kvm_vcpu *vcpu;
+-
+-		vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
+-		if (vcpu && vcpu->arch.vgic_cpu.lpis_enabled) {
+-			spin_lock(&itte->irq->irq_lock);
+-			itte->irq->pending = true;
+-			vgic_queue_irq_unlock(kvm, itte->irq);
+-		}
+-	}
++	if (!itte || !its_is_collection_mapped(itte->collection))
++		return E_ITS_INT_UNMAPPED_INTERRUPT;
++
++	vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
++	if (!vcpu)
++		return E_ITS_INT_UNMAPPED_INTERRUPT;
++
++	if (!vcpu->arch.vgic_cpu.lpis_enabled)
++		return -EBUSY;
++
++	spin_lock(&itte->irq->irq_lock);
++	itte->irq->pending = true;
++	vgic_queue_irq_unlock(kvm, itte->irq);
++
++	return 0;
+ }
  
+ /*
+  * Queries the KVM IO bus framework to get the ITS pointer from the given
+  * doorbell address.
+  * We then call vgic_its_trigger_msi() with the decoded data.
++ * According to the KVM_SIGNAL_MSI API description returns 1 on success.
+  */
+ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+ {
+ 	u64 address;
+ 	struct kvm_io_device *kvm_io_dev;
+ 	struct vgic_io_device *iodev;
++	int ret;
+ 
+ 	if (!vgic_has_its(kvm))
+ 		return -ENODEV;
+@@ -490,10 +499,21 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+ 	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
+ 
+ 	mutex_lock(&iodev->its->its_lock);
+-	vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
++	ret = vgic_its_trigger_msi(kvm, iodev->its, msi->devid, msi->data);
+ 	mutex_unlock(&iodev->its->its_lock);
+ 
+-	return 0;
++	if (ret < 0)
++		return ret;
++
++	/*
++	 * KVM_SIGNAL_MSI demands a return value > 0 for success and 0
++	 * if the guest has blocked the MSI. So we map any LPI mapping
++	 * related error to that.
++	 */
++	if (ret)
++		return 0;
++	else
++		return 1;
+ }
+ 
+ /* Requires the its_lock to be held. */
+@@ -981,9 +1001,7 @@ static int vgic_its_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
+ 	u32 msi_data = its_cmd_get_id(its_cmd);
+ 	u64 msi_devid = its_cmd_get_deviceid(its_cmd);
+ 
+-	vgic_its_trigger_msi(kvm, its, msi_devid, msi_data);
+-
+-	return 0;
++	return vgic_its_trigger_msi(kvm, its, msi_devid, msi_data);
+ }
+ 
+ /*
 -- 
 2.9.0
-
