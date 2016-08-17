@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 03/12] KVM: arm64: vgic-its: Plug race in vgic_put_irq
-Date: Wed, 17 Aug 2016 21:38:50 +0200
-Message-ID: <20160817193859.15726-4-christoffer.dall@linaro.org>
+Subject: [PULL 10/12] KVM: arm/arm64: timer: Workaround misconfigured timer interrupt
+Date: Wed, 17 Aug 2016 21:38:57 +0200
+Message-ID: <20160817193859.15726-11-christoffer.dall@linaro.org>
 References: <20160817193859.15726-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20160817193859.15726-1-christoffer.dall@linaro.org>
@@ -10,51 +10,59 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Right now the following sequence of events can happen:
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-  1. Thread X calls vgic_put_irq
-  2. Thread Y calls vgic_add_lpi
-  3. Thread Y gets lpi_list_lock
-  4. Thread X drops the ref count to 0 and blocks on lpi_list_lock
-  5. Thread Y finds the irq via the lpi_list_lock, raises the ref
-     count to 1, and release the lpi_list_lock.
-  6. Thread X proceeds and frees the irq.
+Similarily to f005bd7e3b84 ("clocksource/arm_arch_timer: Force
+per-CPU interrupt to be level-triggered"), make sure we can
+survive an interrupt that has been misconfigured as edge-triggered
+by forcing it to be level-triggered (active low is assumed, but
+the GIC doesn't really care whether this is high or low).
 
-Avoid this by holding the spinlock around the kref_put.
+Hopefully, the amount of shouting in the kernel log will convince
+the user to do something about their firmware.
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ virt/kvm/arm/arch_timer.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index e7aeac7..e83b7fe 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -117,17 +117,17 @@ static void vgic_irq_release(struct kref *ref)
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 4fde8c7..77e6ccf 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -33,6 +33,7 @@
+ static struct timecounter *timecounter;
+ static struct workqueue_struct *wqueue;
+ static unsigned int host_vtimer_irq;
++static u32 host_vtimer_irq_flags;
  
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
  {
--	struct vgic_dist *dist;
-+	struct vgic_dist *dist = &kvm->arch.vgic;
+@@ -365,7 +366,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
  
- 	if (irq->intid < VGIC_MIN_LPI)
- 		return;
+ static void kvm_timer_init_interrupt(void *info)
+ {
+-	enable_percpu_irq(host_vtimer_irq, 0);
++	enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
+ }
  
--	if (!kref_put(&irq->refcount, vgic_irq_release))
-+	spin_lock(&dist->lpi_list_lock);
-+	if (!kref_put(&irq->refcount, vgic_irq_release)) {
-+		spin_unlock(&dist->lpi_list_lock);
- 		return;
-+	};
+ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+@@ -432,6 +433,14 @@ int kvm_timer_hyp_init(void)
+ 	}
+ 	host_vtimer_irq = info->virtual_irq;
  
--	dist = &kvm->arch.vgic;
--
--	spin_lock(&dist->lpi_list_lock);
- 	list_del(&irq->lpi_list);
- 	dist->lpi_list_count--;
- 	spin_unlock(&dist->lpi_list_lock);
++	host_vtimer_irq_flags = irq_get_trigger_type(host_vtimer_irq);
++	if (host_vtimer_irq_flags != IRQF_TRIGGER_HIGH &&
++	    host_vtimer_irq_flags != IRQF_TRIGGER_LOW) {
++		kvm_err("Invalid trigger for IRQ%d, assuming level low\n",
++			host_vtimer_irq);
++		host_vtimer_irq_flags = IRQF_TRIGGER_LOW;
++	}
++
+ 	err = request_percpu_irq(host_vtimer_irq, kvm_arch_timer_handler,
+ 				 "kvm guest timer", kvm_get_running_vcpus());
+ 	if (err) {
 -- 
 2.9.0
 
