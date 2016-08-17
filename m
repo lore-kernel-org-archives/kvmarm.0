@@ -1,68 +1,162 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 10/12] KVM: arm/arm64: timer: Workaround misconfigured timer interrupt
-Date: Wed, 17 Aug 2016 21:38:57 +0200
-Message-ID: <20160817193859.15726-11-christoffer.dall@linaro.org>
+Subject: [PULL 05/12] KVM: arm64: ITS: move ITS registration into first VCPU run
+Date: Wed, 17 Aug 2016 21:38:52 +0200
+Message-ID: <20160817193859.15726-6-christoffer.dall@linaro.org>
 References: <20160817193859.15726-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20160817193859.15726-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
 
-Similarily to f005bd7e3b84 ("clocksource/arm_arch_timer: Force
-per-CPU interrupt to be level-triggered"), make sure we can
-survive an interrupt that has been misconfigured as edge-triggered
-by forcing it to be level-triggered (active low is assumed, but
-the GIC doesn't really care whether this is high or low).
+Currently we register an ITS device upon userland issuing the CTLR_INIT
+ioctl to mark initialization of the ITS as done.
+This deviates from the initialization sequence of the existing GIC
+devices and does not play well with the way QEMU handles things.
+To be more in line with what we are used to, register the ITS(es) just
+before the first VCPU is about to run, so in the map_resources() call.
+This involves iterating through the list of KVM devices and map each
+ITS that we find.
 
-Hopefully, the amount of shouting in the kernel log will convince
-the user to do something about their firmware.
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/arch_timer.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-its.c | 43 +++++++++++++++++++++++++++++++++----------
+ virt/kvm/arm/vgic/vgic-v3.c  |  8 ++++++++
+ virt/kvm/arm/vgic/vgic.h     |  6 ++++++
+ 3 files changed, 47 insertions(+), 10 deletions(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 4fde8c7..77e6ccf 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -33,6 +33,7 @@
- static struct timecounter *timecounter;
- static struct workqueue_struct *wqueue;
- static unsigned int host_vtimer_irq;
-+static u32 host_vtimer_irq_flags;
- 
- void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- {
-@@ -365,7 +366,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 
- static void kvm_timer_init_interrupt(void *info)
- {
--	enable_percpu_irq(host_vtimer_irq, 0);
-+	enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index d06330a..1cf9f59 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1319,13 +1319,13 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+ 		its_sync_lpi_pending_table(vcpu);
  }
  
- int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
-@@ -432,6 +433,14 @@ int kvm_timer_hyp_init(void)
- 	}
- 	host_vtimer_irq = info->virtual_irq;
+-static int vgic_its_init_its(struct kvm *kvm, struct vgic_its *its)
++static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
+ {
+ 	struct vgic_io_device *iodev = &its->iodev;
+ 	int ret;
  
-+	host_vtimer_irq_flags = irq_get_trigger_type(host_vtimer_irq);
-+	if (host_vtimer_irq_flags != IRQF_TRIGGER_HIGH &&
-+	    host_vtimer_irq_flags != IRQF_TRIGGER_LOW) {
-+		kvm_err("Invalid trigger for IRQ%d, assuming level low\n",
-+			host_vtimer_irq);
-+		host_vtimer_irq_flags = IRQF_TRIGGER_LOW;
+-	if (its->initialized)
+-		return 0;
++	if (!its->initialized)
++		return -EBUSY;
+ 
+ 	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base))
+ 		return -ENXIO;
+@@ -1342,9 +1342,6 @@ static int vgic_its_init_its(struct kvm *kvm, struct vgic_its *its)
+ 				      KVM_VGIC_V3_ITS_SIZE, &iodev->dev);
+ 	mutex_unlock(&kvm->slots_lock);
+ 
+-	if (!ret)
+-		its->initialized = true;
+-
+ 	return ret;
+ }
+ 
+@@ -1466,9 +1463,6 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+ 		if (type != KVM_VGIC_ITS_ADDR_TYPE)
+ 			return -ENODEV;
+ 
+-		if (its->initialized)
+-			return -EBUSY;
+-
+ 		if (copy_from_user(&addr, uaddr, sizeof(addr)))
+ 			return -EFAULT;
+ 
+@@ -1484,7 +1478,9 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+ 		switch (attr->attr) {
+ 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+-			return vgic_its_init_its(dev->kvm, its);
++			its->initialized = true;
++
++			return 0;
+ 		}
+ 		break;
+ 	}
+@@ -1529,3 +1525,30 @@ int kvm_vgic_register_its_device(void)
+ 	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
+ 				       KVM_DEV_TYPE_ARM_VGIC_ITS);
+ }
++
++/*
++ * Registers all ITSes with the kvm_io_bus framework.
++ * To follow the existing VGIC initialization sequence, this has to be
++ * done as late as possible, just before the first VCPU runs.
++ */
++int vgic_register_its_iodevs(struct kvm *kvm)
++{
++	struct kvm_device *dev;
++	int ret = 0;
++
++	list_for_each_entry(dev, &kvm->devices, vm_node) {
++		if (dev->ops != &kvm_arm_vgic_its_ops)
++			continue;
++
++		ret = vgic_register_its_iodev(kvm, dev->private);
++		if (ret)
++			return ret;
++		/*
++		 * We don't need to care about tearing down previously
++		 * registered ITSes, as the kvm_io_bus framework removes
++		 * them for us if the VM gets destroyed.
++		 */
 +	}
 +
- 	err = request_percpu_irq(host_vtimer_irq, kvm_arch_timer_handler,
- 				 "kvm guest timer", kvm_get_running_vcpus());
- 	if (err) {
++	return ret;
++}
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 0506543..9f0dae3 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -289,6 +289,14 @@ int vgic_v3_map_resources(struct kvm *kvm)
+ 		goto out;
+ 	}
+ 
++	if (vgic_has_its(kvm)) {
++		ret = vgic_register_its_iodevs(kvm);
++		if (ret) {
++			kvm_err("Unable to register VGIC ITS MMIO regions\n");
++			goto out;
++		}
++	}
++
+ 	dist->ready = true;
+ 
+ out:
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 1d8e21d..6c4625c 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -84,6 +84,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu);
+ int vgic_v3_probe(const struct gic_kvm_info *info);
+ int vgic_v3_map_resources(struct kvm *kvm);
+ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
++int vgic_register_its_iodevs(struct kvm *kvm);
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+@@ -140,6 +141,11 @@ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
+ 	return -ENODEV;
+ }
+ 
++static inline int vgic_register_its_iodevs(struct kvm *kvm)
++{
++	return -ENODEV;
++}
++
+ static inline bool vgic_has_its(struct kvm *kvm)
+ {
+ 	return false;
 -- 
 2.9.0
 
