@@ -1,100 +1,48 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [RFC PATCH 4/7] arm64: tlbflush.h: add __tlbi() macro
-Date: Fri, 19 Aug 2016 14:34:56 +0100
-Message-ID: <87r39kswzj.fsf@e105922-lin.cambridge.arm.com>
-References: <1471344312-26685-1-git-send-email-punit.agrawal@arm.com>
- <1471344312-26685-5-git-send-email-punit.agrawal@arm.com>
- <20160819132427.GD9893@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 5/5] arm64: KVM: vgic-v2: Enable GICV access from HYP if
+ access from guest is unsafe
+Date: Fri, 19 Aug 2016 15:54:21 +0100
+Message-ID: <20160819155421.44355df9@arm.com>
+References: <1471610295-1456-1-git-send-email-marc.zyngier@arm.com>
+        <1471610295-1456-6-git-send-email-marc.zyngier@arm.com>
+        <CAFEAcA99RScdr+E39Q+03L5DyDLiQgQo9x1DeP1gE2-nJ1yUig@mail.gmail.com>
+        <57B7042D.1020702@arm.com>
+        <CAFEAcA9Q9U02KkgkYYT1O6qTHyYmBMW6ARi_bQPRjDNS+O0w7Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6686411E3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Aug 2016 09:27:32 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aC8NqOLKnerg for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Aug 2016 09:27:31 -0400 (EDT)
-Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
- [217.140.96.140])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D6A0411BE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Aug 2016 09:27:31 -0400 (EDT)
-In-Reply-To: <20160819132427.GD9893@arm.com> (Will Deacon's message of "Fri,
- 19 Aug 2016 14:24:28 +0100")
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <CAFEAcA9Q9U02KkgkYYT1O6qTHyYmBMW6ARi_bQPRjDNS+O0w7Q@mail.gmail.com>
+Sender: kvm-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Will Deacon <will.deacon@arm.com> writes:
+On Fri, 19 Aug 2016 14:31:12 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> On Tue, Aug 16, 2016 at 11:45:09AM +0100, Punit Agrawal wrote:
->> From: Mark Rutland <mark.rutland@arm.com>
->> 
->> As with dsb() and isb(), add a __tbli() helper so that we can avoid
->
-> Minor typo: s/__tbli/__tlbi/
+> On 19 August 2016 at 14:05, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> > On 19/08/16 13:53, Peter Maydell wrote:  
+> >> Is it worth specifically saying "performance will be worse", or do we
+> >> expect this to only happen on systems where the h/w can't permit direct
+> >> access (as opposed to those with bad dt info) ?  
+> >
+> > We cannot distinguish between the two, unfortunately. Even worse, ACPI
+> > only gives us a base address, and not the size of the region. So even if
+> > the HW was perfectly compliant with SBSA, we have to assume the worse case.  
+> 
+> Right, but if we expect this is mostly going to be "you just have
+> to live with it on this hardware" there's less point in printing
+> an alarming message, whereas if there's a significant subset of
+> "dt is just wrong" cases then the alarm might help in getting them
+> fixed, maybe...
 
-Thanks for spotting. I've fixed this locally now.
+That'd require some more infrastructure from the kernel's GIC driver
+(which now provides the various base addresses), but I guess that we
+can have a look as well.
 
->
->> distracting asm boilerplate every time we want a TLBI. As some TLBI
->> operations take an argument while others do not, some pre-processor is
->> used to handle these two cases with different assembly blocks.
->> 
->> The existing tlbflush.h code is moved over to use the helper.
->> 
->> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> [ rename helper to __tlbi, update commit log ]
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> ---
->>  arch/arm64/include/asm/tlbflush.h | 31 +++++++++++++++++++++++--------
->>  1 file changed, 23 insertions(+), 8 deletions(-)
->> 
->> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
->> index b460ae2..d57a0be 100644
->> --- a/arch/arm64/include/asm/tlbflush.h
->> +++ b/arch/arm64/include/asm/tlbflush.h
->> @@ -25,6 +25,21 @@
->>  #include <asm/cputype.h>
->>  
->>  /*
->> + * Raw TLBI operations. Drivers and most kernel code should use the TLB
->> + * management routines below in preference to these. Where necessary, these can
->> + * be used to avoid asm() boilerplate.
->> + *
->> + * Can be used as __tlbi(op) or __tlbi(op, arg), depending on whether a
->> + * particular TLBI op takes an argument or not. The macros below handle invoking
->> + * the asm with or without the register argument as appropriate.
->> + */
->> +#define TLBI_0(op, arg)		asm ("tlbi " #op)
->> +#define TLBI_1(op, arg)		asm ("tlbi " #op ", %0" : : "r" (arg))
->> +#define TLBI_N(op, arg, n, ...)	TLBI_##n(op, arg)
->
-> Should this be prefixed with underscores, too?
+Thanks,
 
-As these were only used in the definition of __tlbi() I didn't
-prefix them. I'll add them for the next posting.
-
-Thanks for taking a look.
-
-Punit
-
->
-> Will
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+	M.
+-- 
+Jazz is not dead. It just smells funny.
