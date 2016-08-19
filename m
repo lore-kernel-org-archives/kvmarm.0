@@ -1,180 +1,101 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 3/5] arm64: KVM: vgic-v2: Add the GICV emulation infrastructure
-Date: Fri, 19 Aug 2016 13:38:13 +0100
-Message-ID: <1471610295-1456-4-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 4/5] arm64: KVM: vgic-v2: Add GICV access from HYP
+Date: Fri, 19 Aug 2016 13:38:14 +0100
+Message-ID: <1471610295-1456-5-git-send-email-marc.zyngier@arm.com>
 References: <1471610295-1456-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA31F40FA6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Aug 2016 08:30:56 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6vOy45GX2iwJ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Aug 2016 08:30:54 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D49640F9B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Aug 2016 08:30:54 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1471610295-1456-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to efficiently perform the GICV access on behalf of the
-guest, we need to be able to do avoid going back all the way to
-the host kernel.
+Now that we have the necessary infrastructure to handle MMIO accesses
+in HYP, perform the GICV access on behalf of the guest. This requires
+checking that the access is strictly 32bit, properly aligned, and
+falls within the expected range.
 
-For this, we introduce a new hook in the world switch code,
-conveniently placed just after populating the fault info.
-At that point, we only have saved/restored the GP registers,
-and we can quickly perform all the required checks (data abort,
-translation fault, valid faulting syndrome, not an external
-abort, not a PTW).
-
-Coming back from the emulation code, we need to skip the emulated
-instruction. This involves an additional bit of save/restore in
-order to be able to access the guest's PC (and possibly CPSR if
-this is a 32bit guest).
-
-At this stage, no emulation code is provided.
+When all condition are satisfied, we perform the access and tell
+the rest of the HYP code that the instruction has been correctly
+emulated.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h |  1 +
- arch/arm64/kvm/hyp/switch.c      | 32 ++++++++++++++++++++++++++++++++
- include/kvm/arm_vgic.h           |  3 +++
- virt/kvm/arm/hyp/vgic-v2-sr.c    |  7 +++++++
- virt/kvm/arm/vgic/vgic-v2.c      |  2 ++
- 5 files changed, 45 insertions(+)
+ include/kvm/arm_vgic.h        |  3 +++
+ virt/kvm/arm/hyp/vgic-v2-sr.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index cff5105..88ec3ac 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -123,6 +123,7 @@ typeof(orig) * __hyp_text fname(void)					\
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 8eb1501..bb46c03 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -50,6 +50,9 @@ struct vgic_global {
+ 	/* Physical address of vgic virtual cpu interface */
+ 	phys_addr_t		vcpu_base;
  
- void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
- void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
-+bool __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
++	/* GICV mapping */
++	void __iomem		*vcpu_base_va;
++
+ 	/* virtual control interface mapping */
+ 	void __iomem		*vctrl_base;
  
- void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
- void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index ae7855f..0be1594 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -17,6 +17,7 @@
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index 3e2a62e..860fdc2 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -19,6 +19,7 @@
+ #include <linux/irqchip/arm-gic.h>
+ #include <linux/kvm_host.h>
  
- #include <linux/types.h>
- #include <asm/kvm_asm.h>
 +#include <asm/kvm_emulate.h>
  #include <asm/kvm_hyp.h>
  
- static bool __hyp_text __fpsimd_enabled_nvhe(void)
-@@ -232,6 +233,21 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static void __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
-+{
-+	vcpu->arch.ctxt.gp_regs.regs.pc	= read_sysreg_el2(elr);
-+
-+	if (vcpu_mode_is_32bit(vcpu)) {
-+		vcpu->arch.ctxt.gp_regs.regs.pstate = read_sysreg_el2(spsr);
-+		kvm_skip_aarch32_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+		write_sysreg_el2(vcpu->arch.ctxt.gp_regs.regs.pstate, spsr);
-+	} else {
-+		*vcpu_pc(vcpu) += 4;
-+	}
-+
-+	write_sysreg_el2(vcpu->arch.ctxt.gp_regs.regs.pc, elr);
-+}
-+
- static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu,
+@@ -171,6 +172,44 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+ #ifdef CONFIG_ARM64
+ bool __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_cpu_context *host_ctxt;
-@@ -270,6 +286,22 @@ again:
- 	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
- 		goto again;
- 
-+	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
-+	    exit_code == ARM_EXCEPTION_TRAP) {
-+		bool valid;
++	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
++	struct vgic_dist *vgic = &kvm->arch.vgic;
++	phys_addr_t fault_ipa;
++	void __iomem *addr;
++	int rd;
 +
-+		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
-+			kvm_vcpu_trap_get_fault_type(vcpu) == FSC_FAULT &&
-+			kvm_vcpu_dabt_isvalid(vcpu) &&
-+			!kvm_vcpu_dabt_isextabt(vcpu) &&
-+			!kvm_vcpu_dabt_iss1tw(vcpu);
++	/* Reject anything but a 32bit access */
++	if (kvm_vcpu_dabt_get_as(vcpu) != sizeof(u32))
+ 		return false;
 +
-+		if (valid &&  __vgic_v2_perform_cpuif_access(vcpu)) {
-+			__skip_instr(vcpu);
-+			goto again;
-+		}
++	/* Not aligned? Don't bother */
++	fault_ipa = kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++	if (fault_ipa & 3)
++		return false;
++
++	/* Build the full address */
++	fault_ipa |= kvm_vcpu_get_fault_ipa(vcpu);
++
++	/* If not for GICV, move on */
++	if (fault_ipa <  vgic->vgic_cpu_base ||
++	    fault_ipa >= (vgic->vgic_cpu_base + KVM_VGIC_V2_CPU_SIZE))
++		return false;
++
++	rd = kvm_vcpu_dabt_get_rd(vcpu);
++	addr  = kern_hyp_va((kern_hyp_va(&kvm_vgic_global_state))->vcpu_base_va);
++	addr += fault_ipa - vgic->vgic_cpu_base;
++
++	if (kvm_vcpu_dabt_iswrite(vcpu)) {
++		u32 data = vcpu_data_guest_to_host(vcpu,
++						   vcpu_get_reg(vcpu, rd),
++						   sizeof(u32));
++		writel_relaxed(data, addr);
++	} else {
++		u32 data = readl_relaxed(addr);
++		vcpu_set_reg(vcpu, rd, vcpu_data_host_to_guest(vcpu, data,
++							       sizeof(u32)));
 +	}
 +
- 	fp_enabled = __fpsimd_enabled();
- 
- 	__sysreg_save_guest_state(guest_ctxt);
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 19b698e..8eb1501 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -20,6 +20,7 @@
- #include <linux/kvm.h>
- #include <linux/irqreturn.h>
- #include <linux/spinlock.h>
-+#include <linux/static_key.h>
- #include <linux/types.h>
- #include <kvm/iodev.h>
- #include <linux/list.h>
-@@ -265,6 +266,8 @@ struct vgic_cpu {
- 	bool lpis_enabled;
- };
- 
-+extern struct static_key_false vgic_v2_cpuif_trap;
-+
- int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
- void kvm_vgic_early_init(struct kvm *kvm);
- int kvm_vgic_create(struct kvm *kvm, u32 type);
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-index 7cffd93..3e2a62e 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-@@ -167,3 +167,10 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
- 	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
- 	vcpu->arch.vgic_cpu.live_lrs = live_lrs;
++	return true;
  }
-+
-+#ifdef CONFIG_ARM64
-+bool __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
-+{
-+		return false;
-+}
-+#endif
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index 0bf6709..b8da901 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -294,6 +294,8 @@ out:
- 	return ret;
- }
- 
-+DEFINE_STATIC_KEY_FALSE(vgic_v2_cpuif_trap);
-+
- /**
-  * vgic_v2_probe - probe for a GICv2 compatible interrupt controller in DT
-  * @node:	pointer to the DT node
+ #endif
 -- 
 2.1.4
+
