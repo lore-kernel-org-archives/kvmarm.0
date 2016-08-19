@@ -1,90 +1,81 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 5/5] arm64: KVM: vgic-v2: Enable GICV access from HYP if
- access from guest is unsafe
-Date: Fri, 19 Aug 2016 14:05:49 +0100
-Message-ID: <57B7042D.1020702@arm.com>
-References: <1471610295-1456-1-git-send-email-marc.zyngier@arm.com>
- <1471610295-1456-6-git-send-email-marc.zyngier@arm.com>
- <CAFEAcA99RScdr+E39Q+03L5DyDLiQgQo9x1DeP1gE2-nJ1yUig@mail.gmail.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [RFC PATCH 4/7] arm64: tlbflush.h: add __tlbi() macro
+Date: Fri, 19 Aug 2016 14:24:28 +0100
+Message-ID: <20160819132427.GD9893@arm.com>
+References: <1471344312-26685-1-git-send-email-punit.agrawal@arm.com>
+ <1471344312-26685-5-git-send-email-punit.agrawal@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <CAFEAcA99RScdr+E39Q+03L5DyDLiQgQo9x1DeP1gE2-nJ1yUig@mail.gmail.com>
-Sender: kvm-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED7DE40FA2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Aug 2016 09:16:44 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id jls6I-vfkulV for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Aug 2016 09:16:43 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D06B140F9B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Aug 2016 09:16:43 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1471344312-26685-5-git-send-email-punit.agrawal@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Punit Agrawal <punit.agrawal@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Peter,
-
-On 19/08/16 13:53, Peter Maydell wrote:
-> On 19 August 2016 at 13:38, Marc Zyngier <marc.zyngier@arm.com> wrote:
->> So far, we've been disabling KVM on systems where the GICV region couldn't
->> be safely given to a guest. Now that we're able to handle this access
->> safely by emulating it in HYP, we can enable this feature when we detect
->> an unsafe configuration.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-v2.c | 69 +++++++++++++++++++++++++++------------------
->>  1 file changed, 42 insertions(+), 27 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
->> index b8da901..d1dcfc76 100644
->> --- a/virt/kvm/arm/vgic/vgic-v2.c
->> +++ b/virt/kvm/arm/vgic/vgic-v2.c
->> @@ -278,12 +278,14 @@ int vgic_v2_map_resources(struct kvm *kvm)
->>                 goto out;
->>         }
->>
->> -       ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
->> -                                   kvm_vgic_global_state.vcpu_base,
->> -                                   KVM_VGIC_V2_CPU_SIZE, true);
->> -       if (ret) {
->> -               kvm_err("Unable to remap VGIC CPU to VCPU\n");
->> -               goto out;
->> +       if (!static_branch_unlikely(&vgic_v2_cpuif_trap)) {
->> +               ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
->> +                                           kvm_vgic_global_state.vcpu_base,
->> +                                           KVM_VGIC_V2_CPU_SIZE, true);
->> +               if (ret) {
->> +                       kvm_err("Unable to remap VGIC CPU to VCPU\n");
->> +                       goto out;
->> +               }
->>         }
->>
->>         dist->ready = true;
->> @@ -312,45 +314,51 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
->>                 return -ENXIO;
->>         }
->>
->> -       if (!PAGE_ALIGNED(info->vcpu.start)) {
->> -               kvm_err("GICV physical address 0x%llx not page aligned\n",
->> -                       (unsigned long long)info->vcpu.start);
->> -               return -ENXIO;
->> -       }
->> +       if (!PAGE_ALIGNED(info->vcpu.start) ||
->> +           !PAGE_ALIGNED(resource_size(&info->vcpu))) {
->> +               kvm_info("GICV region size/alignement is unsafe, using trapping\n");
+On Tue, Aug 16, 2016 at 11:45:09AM +0100, Punit Agrawal wrote:
+> From: Mark Rutland <mark.rutland@arm.com>
 > 
-> "alignment".
+> As with dsb() and isb(), add a __tbli() helper so that we can avoid
 
-Ah, thanks. There's always a bit of French being stuck somewhere... ;-)
+Minor typo: s/__tbli/__tlbi/
 
+> distracting asm boilerplate every time we want a TLBI. As some TLBI
+> operations take an argument while others do not, some pre-processor is
+> used to handle these two cases with different assembly blocks.
 > 
-> Is it worth specifically saying "performance will be worse", or do we
-> expect this to only happen on systems where the h/w can't permit direct
-> access (as opposed to those with bad dt info) ?
+> The existing tlbflush.h code is moved over to use the helper.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> [ rename helper to __tlbi, update commit log ]
+> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> ---
+>  arch/arm64/include/asm/tlbflush.h | 31 +++++++++++++++++++++++--------
+>  1 file changed, 23 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+> index b460ae2..d57a0be 100644
+> --- a/arch/arm64/include/asm/tlbflush.h
+> +++ b/arch/arm64/include/asm/tlbflush.h
+> @@ -25,6 +25,21 @@
+>  #include <asm/cputype.h>
+>  
+>  /*
+> + * Raw TLBI operations. Drivers and most kernel code should use the TLB
+> + * management routines below in preference to these. Where necessary, these can
+> + * be used to avoid asm() boilerplate.
+> + *
+> + * Can be used as __tlbi(op) or __tlbi(op, arg), depending on whether a
+> + * particular TLBI op takes an argument or not. The macros below handle invoking
+> + * the asm with or without the register argument as appropriate.
+> + */
+> +#define TLBI_0(op, arg)		asm ("tlbi " #op)
+> +#define TLBI_1(op, arg)		asm ("tlbi " #op ", %0" : : "r" (arg))
+> +#define TLBI_N(op, arg, n, ...)	TLBI_##n(op, arg)
 
-We cannot distinguish between the two, unfortunately. Even worse, ACPI
-only gives us a base address, and not the size of the region. So even if
-the HW was perfectly compliant with SBSA, we have to assume the worse case.
+Should this be prefixed with underscores, too?
 
-I guess that a slightly more alarming message is in order indeed.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Will
