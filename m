@@ -1,30 +1,22 @@
-From: Vijay Kilari <vijay.kilari@gmail.com>
-Subject: Re: [RFC PATCH v2 0/4] arm/arm64: vgic-new: Implement API for vGICv3
- live migration
-Date: Mon, 22 Aug 2016 11:45:13 +0530
-Message-ID: <CALicx6sB=t46OFpb9OTdCRHi5uNRL4Ztf9B705SRc32dp-Yr9Q@mail.gmail.com>
-References: <1470740326-27751-1-git-send-email-vijay.kilari@gmail.com>
- <CAFEAcA-z+iM+=p0riWreJCewPPxw9wtHgg+_4MDtxV=ccwe-tg@mail.gmail.com>
- <CALicx6sdGgkf_neZ_F0OUu3cg36VBoWT581HAG=v2FecN6omJA@mail.gmail.com>
- <CAFEAcA-eAHaZio6xWtyDEDAGynXMEsAMBHMnPWx_B1DTQ+qGNQ@mail.gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v2] arm: KVM: Fix idmap overlap detection when the kernel is
+ idmap'ed
+Date: Mon, 22 Aug 2016 09:01:17 +0100
+Message-ID: <1471852877-17197-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64E1F40FA6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Aug 2016 02:07:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7A3140F90
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Aug 2016 03:53:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JwPZEoMdTZza for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Aug 2016 02:07:32 -0400 (EDT)
-Received: from mail-oi0-f68.google.com (mail-oi0-f68.google.com
- [209.85.218.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4106F40F77
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Aug 2016 02:07:32 -0400 (EDT)
-Received: by mail-oi0-f68.google.com with SMTP id t127so10887121oie.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Aug 2016 23:15:14 -0700 (PDT)
-In-Reply-To: <CAFEAcA-eAHaZio6xWtyDEDAGynXMEsAMBHMnPWx_B1DTQ+qGNQ@mail.gmail.com>
+ with ESMTP id AF4VQOutlVWO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Aug 2016 03:53:48 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC5D340F77
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Aug 2016 03:53:48 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,84 +26,38 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Aug 11, 2016 at 1:15 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 11 August 2016 at 06:29, Vijay Kilari <vijay.kilari@gmail.com> wrote:
->> On Tue, Aug 9, 2016 at 5:22 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->>> On 9 August 2016 at 11:58,  <vijay.kilari@gmail.com> wrote:
->>>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->>>>
->>>> This patchset adds API for saving and restoring
->>>> of VGICv3 registers to support live migration with new vgic feature.
->>>> This API definition is as per version of VGICv3 specification
->>>> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
->>>>
->>>> To test live migration with QEMU, use below patch series
->>>> https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg01444.html
->>>>
->>>> The patch 3 & 4 are picked from the Pavel's previous implementation.
->>>> http://www.spinics.net/lists/kvm/msg122040.html
->>>>
->>>> v1 => v2:
->>>>  - The init sequence change patch is no more required.
->>>>    Fixed in patch 2 by using static vgic_io_dev regions structure instead
->>>>    of using dynamic allocation pointer.
->>>>  - Updated commit message of patch 4.
->>>>  - Dropped usage of union to manage 32-bit and 64-bit access in patch 1.
->>>>    Used local variable for 32-bit access.
->>>>  - Updated macro __ARM64_SYS_REG and ARM64_SYS_REG in
->>>>    arch/arm64/include/uapi/asm/kvm.h as per qemu requirements.
->>>
->>> I only scanned briefly through this patchset, but I didn't
->>> see any code implementing:
->>>  * KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
->>
->> If irq->pending is updated by kernel based on irq->line_level when interrupt
->> is asserted by device or guest. Do we still need to extract
->> irq->line_level using
->> this ioctl and while writing back GIC{D|R}_ISPENDR with line_level
->> +(OR) GIC{D|R}_ISPENDR?
->
-> The level and the pending status are different things;
-> the API docs have an explanation of this. The API access
-> to the ISPENDR registers should return only the pending
-> latch status (which is not the same as what these registers
-> return if you read them from the guest).
->
+We're trying hard to detect when the HYP idmap overlaps with the
+HYP va, as it makes the teardown of a cpu dangerous. But there is
+one case where an overlap is completely safe, which is when the
+whole of the kernel is idmap'ed, which is likely to happen on 32bit
+when RAM is at 0x8000000 and we're using a 2G/2G VA split.
 
-OK. I have implemented separate api for ISPENDR userspace access to
-read soft_pending for level triggered interrupts. This needs kernel
-implementation
-to support separate api's for guest and userspace access.
+In that case, we can proceed safely.
 
->>>  * the different behaviour for accesses to GICD_STATUSR, GICR_STATUSR,
->>
->> QEMU is saving and restoring this register, but kernel implementation
->> is missing. Kernel is silently returning zero. So could not catch. I
->> will fix it.
->>
->> However, Specification says as below for STATUSR.
->>
->> "    The GICD_STATUSR and GICR_STATUSR registers are architecturally
->> defined such
->>      that a write of a clear bit has no effect, whereas a write with a set bit
->>      clears that value.  To allow userspace to freely set the values
->> of these two
->>      registers, setting the attributes with the register offsets for these two
->>      registers simply sets the non-reserved bits to the value written."
->>
->> Question is during restore, the set bit will clear the value STATUSR.
->> So it will reset the STATUSR after migrating the VM.
->
-> The text you quote above says that setting the attribute via
-> the API "sets the non-reserved bits to the value written".
-> This is the point -- it does not have the write-1-to-clear
-> behaviour that a guest access to the register does.
->
+Reported-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+v2: Fixed integer/pointer comparaison warning
 
- In the current implementation of vgic in kernel I could not find
-any implement/support for GICD_STATUSR register value.
-Should I leave this as RAZ / WI for now?.
+ arch/arm/kvm/mmu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index bda27b6..49149b9 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -1714,7 +1714,8 @@ int kvm_mmu_init(void)
+ 		 kern_hyp_va(PAGE_OFFSET), kern_hyp_va(~0UL));
+ 
+ 	if (hyp_idmap_start >= kern_hyp_va(PAGE_OFFSET) &&
+-	    hyp_idmap_start <  kern_hyp_va(~0UL)) {
++	    hyp_idmap_start <  kern_hyp_va(~0UL) &&
++	    hyp_idmap_start != (unsigned long)__hyp_idmap_text_start) {
+ 		/*
+ 		 * The idmap page is intersecting with the VA space,
+ 		 * it is not safe to continue further.
+-- 
+2.1.4
