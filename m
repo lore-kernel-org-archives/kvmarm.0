@@ -1,24 +1,27 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH] arm64: KVM: Enable support for Cortex-A72
-Date: Wed, 24 Aug 2016 11:19:06 +0100
-Message-ID: <c02d842a-2576-92f5-8b25-8802cd9876d4@arm.com>
-References: <1472023297-2756-1-git-send-email-zhaoshenglong@huawei.com>
- <ffda6889-5c31-1b56-942c-de65bbb1c16f@arm.com> <57BD679A.6060406@huawei.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [RFC PATCH 6/7] arm64: KVM: Handle trappable TLB instructions
+Date: Wed, 24 Aug 2016 11:40:39 +0100
+Message-ID: <87a8g2sb4o.fsf@e105922-lin.cambridge.arm.com>
+References: <1471344312-26685-1-git-send-email-punit.agrawal@arm.com>
+ <1471344312-26685-7-git-send-email-punit.agrawal@arm.com>
+ <20160819151846.GE9893@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD53B412ED
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2016 06:11:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3ABC412ED
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2016 06:32:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rzUbwF7i7mdA for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Aug 2016 06:11:21 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3F6240F90
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2016 06:11:21 -0400 (EDT)
-In-Reply-To: <57BD679A.6060406@huawei.com>
+ with ESMTP id AF3S+zERKKRT for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Aug 2016 06:32:58 -0400 (EDT)
+Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
+ [217.140.96.140])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7413940C9D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2016 06:32:57 -0400 (EDT)
+In-Reply-To: <20160819151846.GE9893@arm.com> (Will Deacon's message of "Fri,
+ 19 Aug 2016 16:18:47 +0100")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,39 +31,100 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: shannon.zhao@linaro.org, linux-arm-kernel@lists.infradead.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/08/16 10:23, Shannon Zhao wrote:
->
->
-> On 2016/8/24 16:57, Suzuki K Poulose wrote:
->> On 24/08/16 08:21, Shannon Zhao wrote:
->>> In order to allow KVM to run on Cortex-A72 physical cpus, enable KVM
->>> support for Cortex-A72.
->>
->> Do we really need this change ? Given that A72 is using the generic_v8
->> table,
->> it will automatically be supported via the GENERIC_V8 target. That was
->> added
->> just for this purpose. The pre-existing targets were preserved so that
->> we don't break the ABI for older user space.
->>
-> Yes, this works for qemu with "-cpu host". But if it specifies the cpu
-> type with "-cpu cortex-a72". It will fail without this patch.
+Will Deacon <will.deacon@arm.com> writes:
 
-Thats because you specify the expected target from the kernel in Qemu.
+> Hi Punit,
+>
+> On Tue, Aug 16, 2016 at 11:45:11AM +0100, Punit Agrawal wrote:
+>> The ARMv8 architecture allows trapping of TLB maintenane instructions
+>> from EL0/EL1 to higher exception levels. On encountering a trappable TLB
+>> instruction in a guest, an exception is taken to EL2.
+>> 
+>> Add functionality to handle emulating the TLB instructions.
+>> 
+>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>
+> [...]
+>
+>> +void __hyp_text
+>> +__kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 sys_op, u64 regval)
+>> +{
+>> +	kvm = kern_hyp_va(kvm);
+>> +
+>> +	/*
+>> +	 * Switch to the guest before performing any TLB operations to
+>> +	 * target the appropriate VMID
+>> +	 */
+>> +	__switch_to_guest_regime(kvm);
+>> +
+>> +	/*
+>> +	 *  TLB maintenance operations broadcast to inner-shareable
+>> +	 *  domain when HCR_FB is set (default for KVM).
+>> +	 */
+>> +	switch (sys_op) {
+>> +	case TLBIALL:
+>> +	case TLBIALLIS:
+>> +	case ITLBIALL:
+>> +	case DTLBIALL:
+>> +	case TLBI_VMALLE1:
+>> +	case TLBI_VMALLE1IS:
+>> +		__tlbi(vmalle1is);
+>> +		break;
+>> +	case TLBIMVA:
+>> +	case TLBIMVAIS:
+>> +	case ITLBIMVA:
+>> +	case DTLBIMVA:
+>> +	case TLBI_VAE1:
+>> +	case TLBI_VAE1IS:
+>> +		__tlbi(vae1is, regval);
+>
+> I'm pretty nervous about this. Although you've switched in the guest stage-2
+> page table before the TLB maintenance, we're still running on a host stage-1
+> and it's not clear to me that the stage-1 context is completely ignored for
+> the purposes of a stage-1 TLBI executed at EL2.
+>
+> For example, if TCR_EL1.TBI0 is set in the guest but cleared in the host,
+> my reading of the architecture is that it will be treated as zero when
+> we perform this invalidation operation. I worry that we have similar
+> problems with the granule size, where bits become RES0 in the TLBI VA
+> ops.
 
-I don't know what are the plans for Qemu. Are we going to add every single
-ARM CPU released to the target list both in Kernel and Qemu ? e.g, what about
-A35, A73 and others from the partners ?
+Some control bits seem to be explicitly called out to not affect TLB
+maintenance operations[0] but I hadn't considered the ones you highlight.
 
-Suzuki
+[0] ARMv8 ARM DDI 0487A.j D4.7, Pg D4-1814
 
 >
-> The corresponding qemu patches could be found at [1].
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03653.html
+> Finally, we should probably be masking out the RES0 bits in the TLBI
+> ops, just in case some future extension to the architecture defines them
+> in such a way where they have different meanings when executed at EL2
+> or EL1.
+
+Although, the RES0 bits for TLBI VA ops are currently ignored, I agree
+that masking them out based on granule size protects against future
+incompatible changes.
+
 >
-> Thanks,
+> The easiest thing to do is just TLBI VMALLE1IS for all trapped operations,
+> but you might want to see how that performs.
+
+That sounds reasonable for correctness. But I suspect we'll have to do
+more to claw back some performance. Let me run a few tests and come back
+on this.
+
+Thanks for having a look.
+
+Punit
+
 >
+> Will
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
