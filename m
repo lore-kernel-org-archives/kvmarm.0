@@ -1,22 +1,21 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2] arm: KVM: Fix idmap overlap detection when the kernel is
- idmap'ed
-Date: Mon, 22 Aug 2016 09:01:17 +0100
-Message-ID: <1471852877-17197-1-git-send-email-marc.zyngier@arm.com>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: [PATCH] arm64: KVM: Enable support for Cortex-A72
+Date: Wed, 24 Aug 2016 15:21:37 +0800
+Message-ID: <1472023297-2756-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7A3140F90
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Aug 2016 03:53:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 795E740BDA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2016 03:15:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AF4VQOutlVWO for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Aug 2016 03:53:48 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC5D340F77
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Aug 2016 03:53:48 -0400 (EDT)
+ with ESMTP id 1bzRDc7IL5uL for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Aug 2016 03:15:50 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 70D8140B58
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2016 03:15:47 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -26,38 +25,73 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: shannon.zhao@linaro.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We're trying hard to detect when the HYP idmap overlaps with the
-HYP va, as it makes the teardown of a cpu dangerous. But there is
-one case where an overlap is completely safe, which is when the
-whole of the kernel is idmap'ed, which is likely to happen on 32bit
-when RAM is at 0x8000000 and we're using a 2G/2G VA split.
+In order to allow KVM to run on Cortex-A72 physical cpus, enable KVM
+support for Cortex-A72.
 
-In that case, we can proceed safely.
-
-Reported-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
-v2: Fixed integer/pointer comparaison warning
+ arch/arm64/include/asm/cputype.h     | 1 +
+ arch/arm64/include/uapi/asm/kvm.h    | 3 ++-
+ arch/arm64/kvm/guest.c               | 2 ++
+ arch/arm64/kvm/sys_regs_generic_v8.c | 2 ++
+ 4 files changed, 7 insertions(+), 1 deletion(-)
 
- arch/arm/kvm/mmu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index bda27b6..49149b9 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -1714,7 +1714,8 @@ int kvm_mmu_init(void)
- 		 kern_hyp_va(PAGE_OFFSET), kern_hyp_va(~0UL));
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index 9d9fd4b..cf1f638 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -76,6 +76,7 @@
+ #define ARM_CPU_PART_FOUNDATION		0xD00
+ #define ARM_CPU_PART_CORTEX_A57		0xD07
+ #define ARM_CPU_PART_CORTEX_A53		0xD03
++#define ARM_CPU_PART_CORTEX_A72		0xD08
  
- 	if (hyp_idmap_start >= kern_hyp_va(PAGE_OFFSET) &&
--	    hyp_idmap_start <  kern_hyp_va(~0UL)) {
-+	    hyp_idmap_start <  kern_hyp_va(~0UL) &&
-+	    hyp_idmap_start != (unsigned long)__hyp_idmap_text_start) {
- 		/*
- 		 * The idmap page is intersecting with the VA space,
- 		 * it is not safe to continue further.
+ #define APM_CPU_PART_POTENZA		0x000
+ 
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index f209ea1..af8fbeb 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -65,8 +65,9 @@ struct kvm_regs {
+ #define KVM_ARM_TARGET_CORTEX_A53	4
+ /* Generic ARM v8 target */
+ #define KVM_ARM_TARGET_GENERIC_V8	5
++#define KVM_ARM_TARGET_CORTEX_A72	6
+ 
+-#define KVM_ARM_NUM_TARGETS		6
++#define KVM_ARM_NUM_TARGETS		7
+ 
+ /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
+ #define KVM_ARM_DEVICE_TYPE_SHIFT	0
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 32fad75..7eed92e 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -293,6 +293,8 @@ int __attribute_const__ kvm_target_cpu(void)
+ 			return KVM_ARM_TARGET_CORTEX_A53;
+ 		case ARM_CPU_PART_CORTEX_A57:
+ 			return KVM_ARM_TARGET_CORTEX_A57;
++		case ARM_CPU_PART_CORTEX_A72:
++			return KVM_ARM_TARGET_CORTEX_A72;
+ 		};
+ 		break;
+ 	case ARM_CPU_IMP_APM:
+diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
+index ed90578..cf823e1 100644
+--- a/arch/arm64/kvm/sys_regs_generic_v8.c
++++ b/arch/arm64/kvm/sys_regs_generic_v8.c
+@@ -92,6 +92,8 @@ static int __init sys_reg_genericv8_init(void)
+ 					  &genericv8_target_table);
+ 	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_CORTEX_A57,
+ 					  &genericv8_target_table);
++	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_CORTEX_A72,
++					  &genericv8_target_table);
+ 	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_XGENE_POTENZA,
+ 					  &genericv8_target_table);
+ 	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_GENERIC_V8,
 -- 
-2.1.4
+2.0.4
