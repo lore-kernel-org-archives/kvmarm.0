@@ -1,26 +1,23 @@
-From: vijay.kilari@gmail.com
-Subject: [RFC PATCH v3 3/5] arm/arm64: vgic-new: Introduce find_reg_by_id()
-Date: Wed, 24 Aug 2016 16:50:07 +0530
-Message-ID: <1472037609-4164-4-git-send-email-vijay.kilari@gmail.com>
-References: <1472037609-4164-1-git-send-email-vijay.kilari@gmail.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH] kvmtool: ARM: madvise mergeable and hugepage separately
+Date: Thu, 25 Aug 2016 12:01:25 +0100
+Message-ID: <17255e99-4f5e-1875-a7b8-b44cdc6ace26@arm.com>
+References: <20160808070144.17712-1-stefan@agner.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBF24413E1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2016 07:12:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 94E3D40F77
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2016 06:53:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iJLQMvk4hWlO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Aug 2016 07:12:52 -0400 (EDT)
-Received: from mail-pa0-f65.google.com (mail-pa0-f65.google.com
- [209.85.220.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D8FE40C9A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2016 07:12:51 -0400 (EDT)
-Received: by mail-pa0-f65.google.com with SMTP id vy10so1035929pac.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2016 04:20:40 -0700 (PDT)
-In-Reply-To: <1472037609-4164-1-git-send-email-vijay.kilari@gmail.com>
+ with ESMTP id Det7O-pxNLR8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Aug 2016 06:53:38 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D50840C9A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2016 06:53:37 -0400 (EDT)
+In-Reply-To: <20160808070144.17712-1-stefan@agner.ch>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,86 +27,37 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, christoffer.dall@linaro.org, peter.maydell@linaro.org
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Stefan Agner <stefan@agner.ch>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Marc.Zyngier@arm.com, penberg@kernel.org, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+On 08/08/16 08:01, Stefan Agner wrote:
+> The madvise behavior is not a bit field and hence can not be or'ed.
+> Also madvise_behavior_valid checks the flag using a case statement
+> hence only one behavior is supposed to be supplied. Call madvise
+> twice, once for MERGEABLE and once for HUGEPAGE.
+>
+> Signed-off-by: Stefan Agner <stefan@agner.ch>
+> ---
+>  arm/kvm.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/arm/kvm.c b/arm/kvm.c
+> index ce40897..3cfa90a 100644
+> --- a/arm/kvm.c
+> +++ b/arm/kvm.c
+> @@ -80,7 +80,10 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+>  					SZ_2M);
+>
+>  	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+> -		MADV_MERGEABLE | MADV_HUGEPAGE);
+> +		MADV_MERGEABLE);
+> +
+> +	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+> +		MADV_HUGEPAGE);
 
-In order to implement vGICv3 CPU interface access, we will need to perform
-table lookup of system registers. We would need both index_to_params() and
-find_reg() exported for that purpose, but instead we export a single
-function which combines them both.
+Should we also do a MADV_DONTDUMP for guest RAM pages ? This is a security option
+to strip off any guest data in case of crash in kvmtool. This could also help
+to reduce the size of the kvmtool core dumps. I think Qemu does this already.
 
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
----
- arch/arm64/kvm/sys_regs.c | 22 +++++++++++++++-------
- arch/arm64/kvm/sys_regs.h |  4 ++++
- 2 files changed, 19 insertions(+), 7 deletions(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b0b225c..2c9bd52 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1802,6 +1802,17 @@ static bool index_to_params(u64 id, struct sys_reg_params *params)
- 	}
- }
- 
-+const struct sys_reg_desc *find_reg_by_id(u64 id,
-+					  struct sys_reg_params *params,
-+					  const struct sys_reg_desc table[],
-+					  unsigned int num)
-+{
-+	if (!index_to_params(id, params))
-+		return NULL;
-+
-+	return find_reg(params, table, num);
-+}
-+
- /* Decode an index value, and find the sys_reg_desc entry. */
- static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
- 						    u64 id)
-@@ -1929,10 +1940,8 @@ static int get_invariant_sys_reg(u64 id, void __user *uaddr)
- 	struct sys_reg_params params;
- 	const struct sys_reg_desc *r;
- 
--	if (!index_to_params(id, &params))
--		return -ENOENT;
--
--	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
-+	r = find_reg_by_id(id, &params, invariant_sys_regs,
-+			   ARRAY_SIZE(invariant_sys_regs));
- 	if (!r)
- 		return -ENOENT;
- 
-@@ -1946,9 +1955,8 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
- 	int err;
- 	u64 val = 0; /* Make sure high bits are 0 for 32-bit regs */
- 
--	if (!index_to_params(id, &params))
--		return -ENOENT;
--	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
-+	r = find_reg_by_id(id, &params, invariant_sys_regs,
-+			   ARRAY_SIZE(invariant_sys_regs));
- 	if (!r)
- 		return -ENOENT;
- 
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index dbbb01c..9c6ffd0 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -136,6 +136,10 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
- 	return i1->Op2 - i2->Op2;
- }
- 
-+const struct sys_reg_desc *find_reg_by_id(u64 id,
-+					  struct sys_reg_params *params,
-+					  const struct sys_reg_desc table[],
-+					  unsigned int num);
- 
- #define Op0(_x) 	.Op0 = _x
- #define Op1(_x) 	.Op1 = _x
--- 
-1.9.1
+Suzuki
