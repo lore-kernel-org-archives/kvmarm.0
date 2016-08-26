@@ -1,28 +1,28 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2] arm: KVM: Fix idmap overlap detection when the kernel
- is idmap'ed
-Date: Thu, 25 Aug 2016 20:34:44 +0200
-Message-ID: <20160825183444.GA13095@lvm>
-References: <1471852877-17197-1-git-send-email-marc.zyngier@arm.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [RFC PATCH 6/7] arm64: KVM: Handle trappable TLB instructions
+Date: Fri, 26 Aug 2016 10:37:08 +0100
+Message-ID: <87h9a7rhvf.fsf@e105922-lin.cambridge.arm.com>
+References: <1471344312-26685-1-git-send-email-punit.agrawal@arm.com>
+ <1471344312-26685-7-git-send-email-punit.agrawal@arm.com>
+ <20160819151846.GE9893@arm.com>
+ <87a8g2sb4o.fsf@e105922-lin.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B1226411E3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2016 14:26:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7CA140C9A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Aug 2016 05:29:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R9hLf9MHNSKJ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Aug 2016 14:26:55 -0400 (EDT)
-Received: from mail-qk0-f176.google.com (mail-qk0-f176.google.com
- [209.85.220.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2795140C9A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2016 14:26:54 -0400 (EDT)
-Received: by mail-qk0-f176.google.com with SMTP id v123so54448722qkh.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2016 11:34:46 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1471852877-17197-1-git-send-email-marc.zyngier@arm.com>
+ with ESMTP id BcNzm69XJ7Fd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Aug 2016 05:29:29 -0400 (EDT)
+Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
+ [217.140.96.140])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C47140B58
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Aug 2016 05:29:28 -0400 (EDT)
+In-Reply-To: <87a8g2sb4o.fsf@e105922-lin.cambridge.arm.com> (Punit Agrawal's
+ message of "Wed, 24 Aug 2016 11:40:39 +0100")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,22 +32,115 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Will Deacon <will.deacon@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Aug 22, 2016 at 09:01:17AM +0100, Marc Zyngier wrote:
-> We're trying hard to detect when the HYP idmap overlaps with the
-> HYP va, as it makes the teardown of a cpu dangerous. But there is
-> one case where an overlap is completely safe, which is when the
-> whole of the kernel is idmap'ed, which is likely to happen on 32bit
-> when RAM is at 0x8000000 and we're using a 2G/2G VA split.
-> 
-> In that case, we can proceed safely.
-> 
-> Reported-by: Christoffer Dall <christoffer.dall@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Punit Agrawal <punit.agrawal@arm.com> writes:
 
-Thanks, applied.
+> Will Deacon <will.deacon@arm.com> writes:
+>
+>> Hi Punit,
+>>
+>> On Tue, Aug 16, 2016 at 11:45:11AM +0100, Punit Agrawal wrote:
+>>> The ARMv8 architecture allows trapping of TLB maintenane instructions
+>>> from EL0/EL1 to higher exception levels. On encountering a trappable TLB
+>>> instruction in a guest, an exception is taken to EL2.
+>>> 
+>>> Add functionality to handle emulating the TLB instructions.
+>>> 
+>>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+>>> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>>
+>> [...]
+>>
+>>> +void __hyp_text
+>>> +__kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 sys_op, u64 regval)
+>>> +{
+>>> +	kvm = kern_hyp_va(kvm);
+>>> +
+>>> +	/*
+>>> +	 * Switch to the guest before performing any TLB operations to
+>>> +	 * target the appropriate VMID
+>>> +	 */
+>>> +	__switch_to_guest_regime(kvm);
+>>> +
+>>> +	/*
+>>> +	 *  TLB maintenance operations broadcast to inner-shareable
+>>> +	 *  domain when HCR_FB is set (default for KVM).
+>>> +	 */
+>>> +	switch (sys_op) {
+>>> +	case TLBIALL:
+>>> +	case TLBIALLIS:
+>>> +	case ITLBIALL:
+>>> +	case DTLBIALL:
+>>> +	case TLBI_VMALLE1:
+>>> +	case TLBI_VMALLE1IS:
+>>> +		__tlbi(vmalle1is);
+>>> +		break;
+>>> +	case TLBIMVA:
+>>> +	case TLBIMVAIS:
+>>> +	case ITLBIMVA:
+>>> +	case DTLBIMVA:
+>>> +	case TLBI_VAE1:
+>>> +	case TLBI_VAE1IS:
+>>> +		__tlbi(vae1is, regval);
+>>
+>> I'm pretty nervous about this. Although you've switched in the guest stage-2
+>> page table before the TLB maintenance, we're still running on a host stage-1
+>> and it's not clear to me that the stage-1 context is completely ignored for
+>> the purposes of a stage-1 TLBI executed at EL2.
+>>
+>> For example, if TCR_EL1.TBI0 is set in the guest but cleared in the host,
+>> my reading of the architecture is that it will be treated as zero when
+>> we perform this invalidation operation. I worry that we have similar
+>> problems with the granule size, where bits become RES0 in the TLBI VA
+>> ops.
+>
+> Some control bits seem to be explicitly called out to not affect TLB
+> maintenance operations[0] but I hadn't considered the ones you highlight.
+>
+> [0] ARMv8 ARM DDI 0487A.j D4.7, Pg D4-1814
+>
+>>
+>> Finally, we should probably be masking out the RES0 bits in the TLBI
+>> ops, just in case some future extension to the architecture defines them
+>> in such a way where they have different meanings when executed at EL2
+>> or EL1.
+>
+> Although, the RES0 bits for TLBI VA ops are currently ignored, I agree
+> that masking them out based on granule size protects against future
+> incompatible changes.
+>
+>>
+>> The easiest thing to do is just TLBI VMALLE1IS for all trapped operations,
+>> but you might want to see how that performs.
+>
+> That sounds reasonable for correctness. But I suspect we'll have to do
+> more to claw back some performance. Let me run a few tests and come back
+> on this.
 
--Christoffer
+Assuming I've correctly switched in TCR and replacing the various TLB
+operations in this patch with TLBI VMALLE1IS, there is a drop in kernel
+build times of ~5% (384s vs 363s).
+
+For the next version, I'll use this as a starting point and try clawing
+back the loss by using the appropriate TLB instructions albeit with
+additional sanity checking based on context.
+
+>
+> Thanks for having a look.
+>
+> Punit
+>
+>>
+>> Will
+>> _______________________________________________
+>> kvmarm mailing list
+>> kvmarm@lists.cs.columbia.edu
+>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
