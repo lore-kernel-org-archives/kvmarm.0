@@ -1,27 +1,25 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH 6/7] arm64: KVM: Handle trappable TLB instructions
-Date: Fri, 26 Aug 2016 13:21:38 +0100
-Message-ID: <20160826132138.04abb500@arm.com>
-References: <1471344312-26685-1-git-send-email-punit.agrawal@arm.com>
- <1471344312-26685-7-git-send-email-punit.agrawal@arm.com>
- <20160819151846.GE9893@arm.com>
- <87a8g2sb4o.fsf@e105922-lin.cambridge.arm.com>
- <87h9a7rhvf.fsf@e105922-lin.cambridge.arm.com>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: Re: [PATCH] arm64: KVM: Save two instructions in __guest_enter()
+Date: Mon, 29 Aug 2016 10:22:06 -0500
+Message-ID: <daa6aa0c-27d0-25bd-02fd-4e87e9a908fe@codeaurora.org>
+References: <1470791736-13949-1-git-send-email-shankerd@codeaurora.org>
+ <20160825133122.GA8016@lvm>
+Reply-To: shankerd@codeaurora.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21E3C412C2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Aug 2016 08:13:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3644D40B40
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Aug 2016 11:14:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LwDo9LHCyekf for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Aug 2016 08:13:47 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9934941267
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Aug 2016 08:13:47 -0400 (EDT)
-In-Reply-To: <87h9a7rhvf.fsf@e105922-lin.cambridge.arm.com>
+ with ESMTP id UOtXnmbOgnjQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Aug 2016 11:14:10 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B923407A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Aug 2016 11:14:09 -0400 (EDT)
+In-Reply-To: <20160825133122.GA8016@lvm>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,112 +29,33 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Punit Agrawal <punit.agrawal@arm.com>
-Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 26 Aug 2016 10:37:08 +0100
-Punit Agrawal <punit.agrawal@arm.com> wrote:
+Hi Christoffer,
 
-> Punit Agrawal <punit.agrawal@arm.com> writes:
-> 
-> > Will Deacon <will.deacon@arm.com> writes:
-> >  
-> >> Hi Punit,
-> >>
-> >> On Tue, Aug 16, 2016 at 11:45:11AM +0100, Punit Agrawal wrote:  
-> >>> The ARMv8 architecture allows trapping of TLB maintenane instructions
-> >>> from EL0/EL1 to higher exception levels. On encountering a trappable TLB
-> >>> instruction in a guest, an exception is taken to EL2.
-> >>> 
-> >>> Add functionality to handle emulating the TLB instructions.
-> >>> 
-> >>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> >>> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> >>> Cc: Marc Zyngier <marc.zyngier@arm.com>  
-> >>
-> >> [...]
-> >>  
-> >>> +void __hyp_text
-> >>> +__kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 sys_op, u64 regval)
-> >>> +{
-> >>> +	kvm = kern_hyp_va(kvm);
-> >>> +
-> >>> +	/*
-> >>> +	 * Switch to the guest before performing any TLB operations to
-> >>> +	 * target the appropriate VMID
-> >>> +	 */
-> >>> +	__switch_to_guest_regime(kvm);
-> >>> +
-> >>> +	/*
-> >>> +	 *  TLB maintenance operations broadcast to inner-shareable
-> >>> +	 *  domain when HCR_FB is set (default for KVM).
-> >>> +	 */
-> >>> +	switch (sys_op) {
-> >>> +	case TLBIALL:
-> >>> +	case TLBIALLIS:
-> >>> +	case ITLBIALL:
-> >>> +	case DTLBIALL:
-> >>> +	case TLBI_VMALLE1:
-> >>> +	case TLBI_VMALLE1IS:
-> >>> +		__tlbi(vmalle1is);
-> >>> +		break;
-> >>> +	case TLBIMVA:
-> >>> +	case TLBIMVAIS:
-> >>> +	case ITLBIMVA:
-> >>> +	case DTLBIMVA:
-> >>> +	case TLBI_VAE1:
-> >>> +	case TLBI_VAE1IS:
-> >>> +		__tlbi(vae1is, regval);  
-> >>
-> >> I'm pretty nervous about this. Although you've switched in the guest stage-2
-> >> page table before the TLB maintenance, we're still running on a host stage-1
-> >> and it's not clear to me that the stage-1 context is completely ignored for
-> >> the purposes of a stage-1 TLBI executed at EL2.
-> >>
-> >> For example, if TCR_EL1.TBI0 is set in the guest but cleared in the host,
-> >> my reading of the architecture is that it will be treated as zero when
-> >> we perform this invalidation operation. I worry that we have similar
-> >> problems with the granule size, where bits become RES0 in the TLBI VA
-> >> ops.  
-> >
-> > Some control bits seem to be explicitly called out to not affect TLB
-> > maintenance operations[0] but I hadn't considered the ones you highlight.
-> >
-> > [0] ARMv8 ARM DDI 0487A.j D4.7, Pg D4-1814
-> >  
-> >>
-> >> Finally, we should probably be masking out the RES0 bits in the TLBI
-> >> ops, just in case some future extension to the architecture defines them
-> >> in such a way where they have different meanings when executed at EL2
-> >> or EL1.  
-> >
-> > Although, the RES0 bits for TLBI VA ops are currently ignored, I agree
-> > that masking them out based on granule size protects against future
-> > incompatible changes.
-> >  
-> >>
-> >> The easiest thing to do is just TLBI VMALLE1IS for all trapped operations,
-> >> but you might want to see how that performs.  
-> >
-> > That sounds reasonable for correctness. But I suspect we'll have to do
-> > more to claw back some performance. Let me run a few tests and come back
-> > on this.  
-> 
-> Assuming I've correctly switched in TCR and replacing the various TLB
-> operations in this patch with TLBI VMALLE1IS, there is a drop in kernel
-> build times of ~5% (384s vs 363s).
+This is change may not provide the measurable performance improvement, 
+but still we can
+save a few cpu cycles on vCPU context switch and also improves the code 
+readability.
 
-Note that if all you're doing is a VMALLE1IS, switching TCR_EL1 should
-not be necessary, as all that is required for this invalidation is the
-VMID.
 
-> For the next version, I'll use this as a starting point and try clawing
-> back the loss by using the appropriate TLB instructions albeit with
-> additional sanity checking based on context.
+On 08/25/2016 08:31 AM, Christoffer Dall wrote:
+> Hi Shanker,
+>
+> On Tue, Aug 09, 2016 at 08:15:36PM -0500, Shanker Donthineni wrote:
+>> We are doing an unnecessary stack push/pop operation when restoring
+>> the guest registers x0-x18 in __guest_enter(). This patch saves the
+>> two instructions by using x18 as a base register. No need to store
+>> the vcpu context pointer in stack because it is redundant and not
+>> being used anywhere, the same information is available in tpidr_el2.
+> Does this have any measureable benefit?
+>
+> Thanks,
+> -Christoffer
 
-Great, thanks!
-
-	M.
 -- 
-Jazz is not dead. It just smells funny.
+Shanker Donthineni
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
