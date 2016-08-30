@@ -1,234 +1,231 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH v3 1/5] arm/arm64: vgic-new: Implement support for
- userspace access
-Date: Tue, 30 Aug 2016 12:50:25 +0200
-Message-ID: <20160830105025.GG10162@cbox>
-References: <1472037609-4164-1-git-send-email-vijay.kilari@gmail.com>
- <1472037609-4164-2-git-send-email-vijay.kilari@gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2] arm64: KVM: Save four instructions in
+ __guest_enter/exit()
+Date: Tue, 30 Aug 2016 11:54:30 +0100
+Message-ID: <57C565E6.4020109@arm.com>
+References: <1472529074-19261-1-git-send-email-shankerd@codeaurora.org>
+ <20160830095534.GD10162@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BE6741267
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Aug 2016 06:40:05 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2IcIxpgNbydZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Aug 2016 06:40:03 -0400 (EDT)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9523B40FA2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Aug 2016 06:40:03 -0400 (EDT)
-Received: by mail-wm0-f45.google.com with SMTP id i5so28721274wmg.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Aug 2016 03:48:08 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1472037609-4164-2-git-send-email-vijay.kilari@gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: vijay.kilari@gmail.com
-Cc: marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20160830095534.GD10162@cbox>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, Shanker Donthineni <shankerd@codeaurora.org>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 24, 2016 at 04:50:05PM +0530, vijay.kilari@gmail.com wrote:
-> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+On 30/08/16 10:55, Christoffer Dall wrote:
+> On Mon, Aug 29, 2016 at 10:51:14PM -0500, Shanker Donthineni wrote:
+>> We are doing an unnecessary stack push/pop operation when restoring
+>> the guest registers x0-x18 in __guest_enter(). This patch saves the
+>> two instructions by using x18 as a base register. No need to store
+>> the vcpu context pointer in stack because it is redundant, the same
+>> information is available in tpidr_el2. The function __guest_exit()
+>> prototype is simplified and caller pushes the regs x0-x1 to stack
+>> instead of regs x0-x3.
+>>
+>> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
 > 
-> Read and write of some registers like ISPENDR and ICPENDR
-> from userspace requires special handling when compared to
-> guest access for these registers.
+> This looks reasonable to me:
 > 
-> Refer to Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> for handling of ISPENDR, ICPENDR registers handling.
+> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 > 
-> Add infrastructure to support guest and userspace read
-> and write for the required registers
-> 
-> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> ---
->  virt/kvm/arm/vgic/vgic-mmio-v2.c |  5 ++-
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 40 ++++++++++++++----
->  virt/kvm/arm/vgic/vgic-mmio.c    | 87 ++++++++++++++++++++++++++++++++++++----
->  virt/kvm/arm/vgic/vgic-mmio.h    | 25 ++++++++++++
->  4 files changed, 139 insertions(+), 18 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> index b44b359..cd37159 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> @@ -421,9 +421,10 @@ static int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
->  
->  	if (is_write) {
->  		vgic_data_host_to_mmio_bus(buf, len, *val);
-> -		ret = kvm_io_gic_ops.write(vcpu, &dev->dev, offset, len, buf);
-> +		ret = vgic_mmio_uaccess_write(vcpu, &dev->dev, offset,
-> +					      len, buf);
->  	} else {
-> -		ret = kvm_io_gic_ops.read(vcpu, &dev->dev, offset, len, buf);
-> +		ret = vgic_mmio_uaccess_read(vcpu, &dev->dev, offset, len, buf);
->  		if (!ret)
->  			*val = vgic_data_mmio_bus_to_host(buf, len);
->  	}
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index ff668e0..dd0d602 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -367,6 +367,26 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
->  		.write = wr,						\
->  	}
->  
-> +#define REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED_UACCESS(off, rd, wr, ur, \
-> +							uw, bpi, acc)	\
-> +	{								\
-> +		.reg_offset = off,					\
-> +		.bits_per_irq = bpi,					\
-> +		.len = (bpi * VGIC_NR_PRIVATE_IRQS) / 8,		\
-> +		.access_flags = acc,					\
-> +		.read = vgic_mmio_read_raz,				\
-> +		.write = vgic_mmio_write_wi,				\
-> +	}, {								\
-> +		.reg_offset = off + (bpi * VGIC_NR_PRIVATE_IRQS) / 8,	\
-> +		.bits_per_irq = bpi,					\
-> +		.len = (bpi * (1024 - VGIC_NR_PRIVATE_IRQS)) / 8,	\
-> +		.access_flags = acc,					\
-> +		.read = rd,						\
-> +		.write = wr,						\
-> +		.uaccess_read = ur,					\
-> +		.uaccess_write = uw,					\
-> +	}
-> +
->  static const struct vgic_register_region vgic_v3_dist_registers[] = {
->  	REGISTER_DESC_WITH_LENGTH(GICD_CTLR,
->  		vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc, 16,
-> @@ -380,11 +400,13 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
->  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICENABLER,
->  		vgic_mmio_read_enable, vgic_mmio_write_cenable, 1,
->  		VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISPENDR,
-> -		vgic_mmio_read_pending, vgic_mmio_write_spending, 1,
-> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED_UACCESS(GICD_ISPENDR,
-> +		vgic_mmio_read_pending, vgic_mmio_write_spending,
-> +		vgic_mmio_read_soft_pending, vgic_mmio_write_spending, 1,
->  		VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICPENDR,
-> -		vgic_mmio_read_pending, vgic_mmio_write_cpending, 1,
-> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED_UACCESS(GICD_ICPENDR,
-> +		vgic_mmio_read_pending, vgic_mmio_write_cpending,
-> +		vgic_mmio_read_soft_pending, vgic_mmio_write_cpending, 1,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISACTIVER,
->  		vgic_mmio_read_active, vgic_mmio_write_sactive, 1,
-> @@ -443,11 +465,13 @@ static const struct vgic_register_region vgic_v3_sgibase_registers[] = {
->  	REGISTER_DESC_WITH_LENGTH(GICR_ICENABLER0,
->  		vgic_mmio_read_enable, vgic_mmio_write_cenable, 4,
->  		VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICR_ISPENDR0,
-> -		vgic_mmio_read_pending, vgic_mmio_write_spending, 4,
-> +	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ISPENDR0,
-> +		vgic_mmio_read_pending, vgic_mmio_write_spending,
-> +		vgic_mmio_read_soft_pending, vgic_mmio_write_spending, 4,
->  		VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICR_ICPENDR0,
-> -		vgic_mmio_read_pending, vgic_mmio_write_cpending, 4,
-> +	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ICPENDR0,
-> +		vgic_mmio_read_pending, vgic_mmio_write_cpending,
-> +		vgic_mmio_read_soft_pending, vgic_mmio_write_cpending, 4,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_LENGTH(GICR_ISACTIVER0,
->  		vgic_mmio_read_active, vgic_mmio_write_sactive, 4,
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index 3bad3c5..dcf5d25 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -100,6 +100,26 @@ void vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
->  	}
->  }
->  
-> +unsigned long vgic_mmio_read_soft_pending(struct kvm_vcpu *vcpu,
-> +					  gpa_t addr, unsigned int len)
-> +{
-> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> +	u32 value = 0;
-> +	int i;
-> +
-> +	/* Loop over all IRQs affected by this read */
-> +	for (i = 0; i < len * 8; i++) {
-> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> +
-> +		if (irq->config == VGIC_CONFIG_LEVEL && irq->soft_pending)
-> +			value |= (1U << i);
-> +		if (irq->config != VGIC_CONFIG_LEVEL && irq->pending)
-> +			value |= (1U << i);
-> +	}
-> +
-> +	return value;
-> +}
-> +
->  unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
->  				     gpa_t addr, unsigned int len)
->  {
-> @@ -468,6 +488,62 @@ static bool check_region(const struct vgic_register_region *region,
->  	return false;
->  }
->  
-> +static const struct vgic_register_region *
-> +	vgic_get_mmio_region(struct vgic_io_device *iodev, gpa_t addr, int len)
-> +{
-> +	const struct vgic_register_region *region;
-> +
-> +	region = vgic_find_mmio_region(iodev->regions, iodev->nr_regions,
-> +				       addr - iodev->base_addr);
-> +	if (!region || !check_region(region, addr, len))
-> +		return NULL;
-> +
-> +	return region;
-> +}
-> +
-> +int vgic_mmio_uaccess_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
-> +			   gpa_t addr, int len, void *val)
-> +{
-> +	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
-> +	const struct vgic_register_region *region;
-> +	struct kvm_vcpu *r_vcpu;
-> +	unsigned long data;
-> +
-> +	region = vgic_get_mmio_region(iodev, addr, len);
-> +	if (!region) {
-> +		memset(val, 0, len);
-> +		return 0;
-> +	}
-> +
-> +	r_vcpu = iodev->redist_vcpu ? iodev->redist_vcpu : vcpu;
-> +	if (region->uaccess_read != NULL)
-> +		data = region->uaccess_read(r_vcpu, addr, len);
-> +	else
-> +		data = region->read(r_vcpu, addr, len);
-> +	vgic_data_host_to_mmio_bus(val, len, data);
-> +	return 0;
-> +}
-> +
-> +int vgic_mmio_uaccess_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
-> +			    gpa_t addr, int len, const void *val)
-> +{
-> +	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
-> +	const struct vgic_register_region *region;
-> +	struct kvm_vcpu *r_vcpu;
-> +	unsigned long data = vgic_data_mmio_bus_to_host(val, len);
-> +
-> +	region = vgic_get_mmio_region(iodev, addr, len);
-> +	if (!region)
-> +		return 0;
-> +
-> +	r_vcpu = iodev->redist_vcpu ? iodev->redist_vcpu : vcpu;
-> +	if (region->uaccess_write != NULL)
+> Unless Marc has any insight into this having a negative effect on ARM
+> CPUs, I'll go ahead an merge this.
 
-nit: we use the form if (!region->uaccess_write) most other places,
-please use this instead.
+I've given it a go on Seattle, and couldn't observe any difference with
+the original code, which is pretty good news!
+
+I have some comments below, though:
+
+> 
+> -Christoffer
+> 
+>> ---
+>> Changes since v1:
+>>   Incorporated Cristoffer suggestions.
+>>   __guest_exit prototype is changed to 'void __guest_exit(u64 reason, struct kvm_vcpu *vcpu)'.
+>>
+>>  arch/arm64/kvm/hyp/entry.S     | 101 +++++++++++++++++++++--------------------
+>>  arch/arm64/kvm/hyp/hyp-entry.S |  11 +++--
+>>  2 files changed, 57 insertions(+), 55 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+>> index ce9e5e5..f70489a 100644
+>> --- a/arch/arm64/kvm/hyp/entry.S
+>> +++ b/arch/arm64/kvm/hyp/entry.S
+>> @@ -55,75 +55,76 @@
+>>   */
+>>  ENTRY(__guest_enter)
+>>  	// x0: vcpu
+>> -	// x1: host/guest context
+>> -	// x2-x18: clobbered by macros
+>> +	// x1: host context
+>> +	// x2-x17: clobbered by macros
+>> +	// x18: guest context
+>>  
+>>  	// Store the host regs
+>>  	save_callee_saved_regs x1
+>>  
+>> -	// Preserve vcpu & host_ctxt for use at exit time
+>> -	stp	x0, x1, [sp, #-16]!
+>> +	// Store the host_ctxt for use at exit time
+>> +	str	x1, [sp, #-16]!
+>>  
+>> -	add	x1, x0, #VCPU_CONTEXT
+>> +	add	x18, x0, #VCPU_CONTEXT
+>>  
+>> -	// Prepare x0-x1 for later restore by pushing them onto the stack
+>> -	ldp	x2, x3, [x1, #CPU_XREG_OFFSET(0)]
+>> -	stp	x2, x3, [sp, #-16]!
+>> +	// Restore guest regs x0-x17
+>> +	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
+>> +	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
+>> +	ldp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
+>> +	ldp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
+>> +	ldp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
+>> +	ldp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
+>> +	ldp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
+>> +	ldp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
+>> +	ldp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
+>>  
+>> -	// x2-x18
+>> -	ldp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
+>> -	ldp	x4, x5,   [x1, #CPU_XREG_OFFSET(4)]
+>> -	ldp	x6, x7,   [x1, #CPU_XREG_OFFSET(6)]
+>> -	ldp	x8, x9,   [x1, #CPU_XREG_OFFSET(8)]
+>> -	ldp	x10, x11, [x1, #CPU_XREG_OFFSET(10)]
+>> -	ldp	x12, x13, [x1, #CPU_XREG_OFFSET(12)]
+>> -	ldp	x14, x15, [x1, #CPU_XREG_OFFSET(14)]
+>> -	ldp	x16, x17, [x1, #CPU_XREG_OFFSET(16)]
+>> -	ldr	x18,      [x1, #CPU_XREG_OFFSET(18)]
+>> +	// Restore guest regs x19-x29, lr
+>> +	restore_callee_saved_regs x18
+>>  
+>> -	// x19-x29, lr
+>> -	restore_callee_saved_regs x1
+>> -
+>> -	// Last bits of the 64bit state
+>> -	ldp	x0, x1, [sp], #16
+>> +	// Restore guest reg x18
+>> +	ldr	x18,      [x18, #CPU_XREG_OFFSET(18)]
+>>  
+>>  	// Do not touch any register after this!
+>>  	eret
+>>  ENDPROC(__guest_enter)
+>>  
+>> +/*
+>> + * void __guest_exit(u64 exit_reason, struct kvm_vcpu *vcpu);
+>> + */
+
+I'm not sure this comment makes much sense as it stands. This is not a C
+function by any stretch of the imagination, but the continuation of
+__guest_enter. The calling convention is not the C one at all (see how
+the stack is involved), and caller-saved registers are going to be
+clobbered.
+
+>>  ENTRY(__guest_exit)
+>> -	// x0: vcpu
+>> -	// x1: return code
+>> -	// x2-x3: free
+>> -	// x4-x29,lr: vcpu regs
+>> -	// vcpu x0-x3 on the stack
+>> -
+>> -	add	x2, x0, #VCPU_CONTEXT
+>> -
+>> -	stp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)]
+>> -	stp	x6, x7,   [x2, #CPU_XREG_OFFSET(6)]
+>> -	stp	x8, x9,   [x2, #CPU_XREG_OFFSET(8)]
+>> -	stp	x10, x11, [x2, #CPU_XREG_OFFSET(10)]
+>> -	stp	x12, x13, [x2, #CPU_XREG_OFFSET(12)]
+>> -	stp	x14, x15, [x2, #CPU_XREG_OFFSET(14)]
+>> -	stp	x16, x17, [x2, #CPU_XREG_OFFSET(16)]
+>> -	str	x18,      [x2, #CPU_XREG_OFFSET(18)]
+>> -
+>> -	ldp	x6, x7, [sp], #16	// x2, x3
+>> -	ldp	x4, x5, [sp], #16	// x0, x1
+>> -
+>> -	stp	x4, x5, [x2, #CPU_XREG_OFFSET(0)]
+>> -	stp	x6, x7, [x2, #CPU_XREG_OFFSET(2)]
+>> +	// x0: return code
+>> +	// x1: vcpu
+>> +	// x2-x29,lr: vcpu regs
+>> +	// vcpu x0-x1 on the stack
+>> +
+>> +	add	x1, x1, #VCPU_CONTEXT
+>> +
+>> +	// Store the guest regs x2 and x3
+>> +	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
+>> +
+>> +	// Retrieve the guest regs x0-x1 from the stack
+>> +	ldp	x2, x3, [sp], #16	// x0, x1
+>> +
+>> +	// Store the guest regs x0-x1 and x4-x18
+>> +	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(0)]
+>> +	stp	x4, x5,   [x1, #CPU_XREG_OFFSET(4)]
+>> +	stp	x6, x7,   [x1, #CPU_XREG_OFFSET(6)]
+>> +	stp	x8, x9,   [x1, #CPU_XREG_OFFSET(8)]
+>> +	stp	x10, x11, [x1, #CPU_XREG_OFFSET(10)]
+>> +	stp	x12, x13, [x1, #CPU_XREG_OFFSET(12)]
+>> +	stp	x14, x15, [x1, #CPU_XREG_OFFSET(14)]
+>> +	stp	x16, x17, [x1, #CPU_XREG_OFFSET(16)]
+>> +	str	x18,      [x1, #CPU_XREG_OFFSET(18)]
+>> +
+>> +	// Store the guest regs x19-x29, lr
+>> +	save_callee_saved_regs x1
+>>  
+>> -	save_callee_saved_regs x2
+>> +	// Restore the host_ctxt from the stack
+>> +	ldr	x2, [sp], #16
+>>  
+>> -	// Restore vcpu & host_ctxt from the stack
+>> -	// (preserving return code in x1)
+>> -	ldp	x0, x2, [sp], #16
+>>  	// Now restore the host regs
+>>  	restore_callee_saved_regs x2
+>>  
+>> -	mov	x0, x1
+>>  	ret
+>>  ENDPROC(__guest_exit)
+>>  
+>> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+>> index f6d9694..06e8b3b 100644
+>> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+>> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+>> @@ -121,14 +121,15 @@ el1_trap:
+>>  	cmp	x2, #ESR_ELx_EC_FP_ASIMD
+>>  	b.eq	__fpsimd_guest_restore
+>>  
+>> -	mrs	x0, tpidr_el2
+>> -	mov	x1, #ARM_EXCEPTION_TRAP
+>> +	ldp     x2, x3, [sp], #16
+>> +	mrs	x1, tpidr_el2
+>> +	mov	x0, #ARM_EXCEPTION_TRAP
+>>  	b	__guest_exit
+>>  
+>>  el1_irq:
+>> -	save_x0_to_x3
+
+So the save_x0_to_x3 macro now only has one single user (and so does
+restore_x0_to_x3).  Should we consider inline it?
+
+>> -	mrs	x0, tpidr_el2
+>> -	mov	x1, #ARM_EXCEPTION_IRQ
+>> +	stp     x0, x1, [sp, #-16]!
+>> +	mrs	x1, tpidr_el2
+>> +	mov	x0, #ARM_EXCEPTION_IRQ
+>>  	b	__guest_exit
+>>  
+>>  ENTRY(__hyp_do_panic)
+>> -- 
+>> Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
+>> Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+>>
+> 
 
 Thanks,
--Christoffer
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
