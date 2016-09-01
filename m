@@ -1,241 +1,289 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: Remove deprecated create_singlethread_workqueue
-Date: Thu, 1 Sep 2016 17:37:30 +0200
-Message-ID: <7249cf28-93db-0d7b-1492-7e0ebd3fec54@redhat.com>
-References: <20160830175950.GA5958@Karyakshetra>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v3 09/10] arm/arm64: gicv3:
+ add an IPI test
+Date: Thu, 1 Sep 2016 18:42:44 +0200
+Message-ID: <2979f1de-759b-bf5b-6bf8-c5dd3b0c721f@redhat.com>
+References: <1468587641-7300-1-git-send-email-drjones@redhat.com>
+ <1468587641-7300-10-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="7kVrwQ73302nUuCpsBmOXsHsCXKEujW99"
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160830175950.GA5958@Karyakshetra>
+In-Reply-To: <1468587641-7300-10-git-send-email-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Bhaktipriya Shridhar <bhaktipriya96@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: Tejun Heo <tj@kernel.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: marc.zyngier@arm.com, wei@redhat.com, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7kVrwQ73302nUuCpsBmOXsHsCXKEujW99
-Content-Type: multipart/mixed; boundary="BQP23ePBSVptRNuVDvBh1na4PefUQMHoG";
- protected-headers="v1"
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Bhaktipriya Shridhar <bhaktipriya96@gmail.com>,
- Christoffer Dall <christoffer.dall@linaro.org>,
- Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
- <rkrcmar@redhat.com>
-Cc: Tejun Heo <tj@kernel.org>, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-Message-ID: <7249cf28-93db-0d7b-1492-7e0ebd3fec54@redhat.com>
-Subject: Re: [PATCH] KVM: Remove deprecated create_singlethread_workqueue
-References: <20160830175950.GA5958@Karyakshetra>
-In-Reply-To: <20160830175950.GA5958@Karyakshetra>
+Hi Drew,
 
---BQP23ePBSVptRNuVDvBh1na4PefUQMHoG
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-
-
-On 30/08/2016 19:59, Bhaktipriya Shridhar wrote:
-> The workqueue "irqfd_cleanup_wq" queues a single work item
-> &irqfd->shutdown and hence doesn't require ordering. It is a host-wide
-> workqueue for issuing deferred shutdown requests aggregated from all
-> vm* instances. It is not being used on a memory reclaim path.
-> Hence, it has been converted to use system_wq.
-> The work item has been flushed in kvm_irqfd_release().
->=20
-> The workqueue "wqueue" queues a single work item &timer->expired
-> and hence doesn't require ordering. Also, it is not being used on
-> a memory reclaim path. Hence, it has been converted to use system_wq.
->=20
-> System workqueues have been able to handle high level of concurrency
-> for a long time now and hence it's not required to have a singlethreade=
-d
-> workqueue just to gain concurrency. Unlike a dedicated per-cpu workqueu=
-e
-> created with create_singlethread_workqueue(), system_wq allows multiple=
-
-> work items to overlap executions even on the same CPU; however, a
-> per-cpu workqueue doesn't have any CPU locality or global ordering
-> guarantee unless the target CPU is explicitly specified and thus the
-> increase of local concurrency shouldn't make any difference.
->=20
-> Signed-off-by: Bhaktipriya Shridhar <bhaktipriya96@gmail.com>
+On 15/07/2016 15:00, Andrew Jones wrote:
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> 
 > ---
->  virt/kvm/arm/arch_timer.c | 11 ++---------
->  virt/kvm/eventfd.c        | 22 +++-------------------
->  virt/kvm/kvm_main.c       |  6 ------
->  3 files changed, 5 insertions(+), 34 deletions(-)
->=20
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index e2d5b6f..56e0c15 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -31,7 +31,6 @@
->  #include "trace.h"
->=20
->  static struct timecounter *timecounter;
-> -static struct workqueue_struct *wqueue;
->  static unsigned int host_vtimer_irq;
->=20
->  void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
-> @@ -140,7 +139,7 @@ static enum hrtimer_restart kvm_timer_expire(struct=
- hrtimer *hrt)
->  		return HRTIMER_RESTART;
->  	}
->=20
-> -	queue_work(wqueue, &timer->expired);
-> +	schedule_work(&timer->expired);
->  	return HRTIMER_NORESTART;
+> v2: use IRM for gicv3 broadcast
+> ---
+>  arm/gic.c         | 157 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+>  arm/unittests.cfg |   6 +++
+>  2 files changed, 154 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arm/gic.c b/arm/gic.c
+> index cf7ec1c90413c..fc7ef241de3e2 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -3,6 +3,8 @@
+>   *
+>   * GICv2
+>   *   . test sending/receiving IPIs
+> + * GICv3
+> + *   . test sending/receiving IPIs
+>   *
+>   * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+>   *
+> @@ -16,6 +18,18 @@
+>  #include <asm/barrier.h>
+>  #include <asm/io.h>
+>  
+> +struct gic {
+> +	struct {
+> +		void (*enable)(void);
+> +		void (*send_self)(void);
+> +		void (*send_tlist)(cpumask_t *);
+> +		void (*send_broadcast)(void);
+> +	} ipi;
+> +	u32 (*read_iar)(void);
+> +	void (*write_eoi)(u32);
+> +};
+> +
+> +static struct gic *gic;
+>  static int gic_version;
+>  static int acked[NR_CPUS], spurious[NR_CPUS];
+>  static cpumask_t ready;
+> @@ -69,12 +83,22 @@ static void check_acked(cpumask_t *mask)
+>  	       false, missing, extra, unexpected);
 >  }
->=20
-> @@ -455,12 +454,6 @@ int kvm_timer_hyp_init(void)
->  		goto out_free;
->  	}
->=20
-> -	wqueue =3D create_singlethread_workqueue("kvm_arch_timer");
-> -	if (!wqueue) {
-> -		err =3D -ENOMEM;
-> -		goto out_free;
-> -	}
-> -
->  	kvm_info("virtual timer IRQ%d\n", host_vtimer_irq);
->  	on_each_cpu(kvm_timer_init_interrupt, NULL, 1);
->=20
-> @@ -522,7 +515,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->  	 * VCPUs have the enabled variable set, before entering the guest, if=
-
->  	 * the arch timers are enabled.
->  	 */
-> -	if (timecounter && wqueue)
-> +	if (timecounter)
->  		timer->enabled =3D 1;
->=20
->  	return 0;
-> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-> index e469b60..f397e9b 100644
-> --- a/virt/kvm/eventfd.c
-> +++ b/virt/kvm/eventfd.c
-> @@ -42,7 +42,6 @@
->=20
->  #ifdef CONFIG_HAVE_KVM_IRQFD
->=20
-> -static struct workqueue_struct *irqfd_cleanup_wq;
->=20
->  static void
->  irqfd_inject(struct work_struct *work)
-> @@ -168,7 +167,7 @@ irqfd_deactivate(struct kvm_kernel_irqfd *irqfd)
->=20
->  	list_del_init(&irqfd->list);
->=20
-> -	queue_work(irqfd_cleanup_wq, &irqfd->shutdown);
-> +	schedule_work(&irqfd->shutdown);
->  }
->=20
->  int __attribute__((weak)) kvm_arch_set_irq_inatomic(
-> @@ -555,7 +554,7 @@ kvm_irqfd_deassign(struct kvm *kvm, struct kvm_irqf=
-d *args)
->  	 * so that we guarantee there will not be any more interrupts on this=
-
->  	 * gsi once this deassign function returns.
->  	 */
-> -	flush_workqueue(irqfd_cleanup_wq);
-> +	flush_work(&irqfd->shutdown);
->=20
->  	return 0;
->  }
-> @@ -592,7 +591,7 @@ kvm_irqfd_release(struct kvm *kvm)
->  	 * Block until we know all outstanding shutdown jobs have completed
->  	 * since we do not take a kvm* reference.
->  	 */
-> -	flush_workqueue(irqfd_cleanup_wq);
-> +	flush_work(&irqfd->shutdown);
->=20
->  }
->=20
-> @@ -622,23 +621,8 @@ void kvm_irq_routing_update(struct kvm *kvm)
->  	spin_unlock_irq(&kvm->irqfds.lock);
->  }
->=20
-> -/*
-> - * create a host-wide workqueue for issuing deferred shutdown requests=
-
-> - * aggregated from all vm* instances. We need our own isolated single-=
-thread
-> - * queue to prevent deadlock against flushing the normal work-queue.
-> - */
-> -int kvm_irqfd_init(void)
-> -{
-> -	irqfd_cleanup_wq =3D create_singlethread_workqueue("kvm-irqfd-cleanup=
-");
-> -	if (!irqfd_cleanup_wq)
-> -		return -ENOMEM;
-> -
-> -	return 0;
-> -}
-> -
->  void kvm_irqfd_exit(void)
+>  
+> +static u32 gicv2_read_iar(void)
+> +{
+> +	return readl(gicv2_cpu_base() + GIC_CPU_INTACK);
+> +}
+> +
+> +static void gicv2_write_eoi(u32 irq)
+> +{
+> +	writel(irq, gicv2_cpu_base() + GIC_CPU_EOI);
+> +}
+> +
+>  static void ipi_handler(struct pt_regs *regs __unused)
 >  {
-> -	destroy_workqueue(irqfd_cleanup_wq);
+> -	u32 iar = readl(gicv2_cpu_base() + GIC_CPU_INTACK);
+> +	u32 iar = gic->read_iar();
+>  
+>  	if (iar != GICC_INT_SPURIOUS) {
+> -		writel(iar, gicv2_cpu_base() + GIC_CPU_EOI);
+> +		gic->write_eoi(iar);
+>  		smp_rmb(); /* pairs with wmb in ipi_test functions */
+>  		++acked[smp_processor_id()];
+>  		smp_wmb(); /* pairs with rmb in check_acked */
+> @@ -84,6 +108,89 @@ static void ipi_handler(struct pt_regs *regs __unused)
+>  	}
 >  }
->  #endif
->=20
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 02e98f3..93506d2 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3719,12 +3719,7 @@ int kvm_init(void *opaque, unsigned vcpu_size, u=
-nsigned vcpu_align,
->  	 * kvm_arch_init makes sure there's at most one caller
->  	 * for architectures that support multiple implementations,
->  	 * like intel and amd on x86.
-> -	 * kvm_arch_init must be called before kvm_irqfd_init to avoid creati=
-ng
-> -	 * conflicts in case kvm is already setup for another implementation.=
+>  
+> +static void gicv2_ipi_send_self(void)
+> +{
+> +	writel(2 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
+> +}
+> +
+> +static void gicv2_ipi_send_tlist(cpumask_t *mask)
+> +{
+> +	u8 tlist = (u8)cpumask_bits(mask)[0];
+> +
+> +	writel(tlist << 16, gicv2_dist_base() + GIC_DIST_SOFTINT);
+> +}
+> +
+> +static void gicv2_ipi_send_broadcast(void)
+> +{
+> +	writel(1 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
+> +}
+> +
+> +#define ICC_SGI1R_AFFINITY_1_SHIFT	16
+> +#define ICC_SGI1R_AFFINITY_2_SHIFT	32
+> +#define ICC_SGI1R_AFFINITY_3_SHIFT	48
+> +#define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
+> +	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level ## _SHIFT)
+> +
+> +static void gicv3_ipi_send_tlist(cpumask_t *mask)
+> +{
+This function really is indigestible to me. Can't we reuse the linux
+kernel gic_compute_target_list routine. Since the code looks similar why
+not trying to be as close as possible to the kernel?
 
->  	 */
-> -	r =3D kvm_irqfd_init();
-> -	if (r)
-> -		goto out_irqfd;
->=20
->  	if (!zalloc_cpumask_var(&cpus_hardware_enabled, GFP_KERNEL)) {
->  		r =3D -ENOMEM;
-> @@ -3805,7 +3800,6 @@ out_free_0a:
->  	free_cpumask_var(cpus_hardware_enabled);
->  out_free_0:
->  	kvm_irqfd_exit();
-> -out_irqfd:
->  	kvm_arch_exit();
->  out_fail:
->  	return r;
-> --
-> 2.1.4
->=20
+Thanks
 
-Rebased (the virt/kvm/arm part doesn't apply anymore due to the CPU
-notifier refactoring) and applied, thanks.
-
-Paolo
-
-
---BQP23ePBSVptRNuVDvBh1na4PefUQMHoG--
-
---7kVrwQ73302nUuCpsBmOXsHsCXKEujW99
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBCAAGBQJXyEs+AAoJEL/70l94x66DETYIAIg4MJ9DIFht/BSVORQOtJ3f
-cdCZXhvwhqCKSH6XWQgrizVxIc+YmoyGGlo5ICMQzujt/LX/xy5aN2YmzODJYZyI
-zRPiGN77iF4BSOfJ+xfWGKIN2v6Yii8yZCioq7vw2Z2ylr/8zL0EShmQ8IIrEB98
-EyhKVs6RD03DHtKaJOmfu0ovmnCmQu5UnwOjAgGGgUPfYFcuACZy+CJgBd3sBn68
-4Bay53pek4FAKZFTDc9zapkxMT0hgWJniS0O/jxhZm8Pos9qaPFJt4yNFAvZHIr9
-ZPu0gJDuEIUy292N184Njn25HHupL7KkANAnFQ2F8MEmbFOmaAILEcaoe6m6zlI=
-=qoZE
------END PGP SIGNATURE-----
-
---7kVrwQ73302nUuCpsBmOXsHsCXKEujW99--
+Eric
+> +	u16 tlist;
+> +	int cpu;
+> +
+> +	for_each_cpu(cpu, mask) {
+> +		u64 mpidr = cpus[cpu], sgi1r;
+> +		u64 cluster_id = mpidr & ~0xffUL;
+> +
+> +		tlist = 0;
+> +
+> +		while (cpu < nr_cpus) {
+> +			if ((mpidr & 0xff) >= 16) {
+> +				printf("cpu%d MPIDR:aff0 is %d (>= 16)!\n",
+> +					cpu, (int)(mpidr & 0xff));
+> +				break;
+> +			}
+> +
+> +			tlist |= 1 << (mpidr & 0xf);
+> +
+> +			cpu = cpumask_next(cpu, mask);
+> +			if (cpu >= nr_cpus)
+> +				break;
+> +
+> +			mpidr = cpus[cpu];
+> +
+> +			if (cluster_id != (mpidr & ~0xffUL)) {
+> +				--cpu;
+> +				break;
+> +			}
+> +		}
+> +
+> +		sgi1r = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3)	|
+> +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 2)	|
+> +			 /* irq << 24				| */
+> +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 1)	|
+> +			 tlist);
+> +
+> +		gicv3_write_sgi1r(sgi1r);
+> +	}
+> +
+> +	/* Force the above writes to ICC_SGI1R_EL1 to be executed */
+> +	isb();
+> +}
+> +
+> +static void gicv3_ipi_send_self(void)
+> +{
+> +	cpumask_t mask;
+> +
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(smp_processor_id(), &mask);
+> +	gicv3_ipi_send_tlist(&mask);
+> +}
+> +
+> +static void gicv3_ipi_send_broadcast(void)
+> +{
+> +	gicv3_write_sgi1r(1ULL << 40);
+> +	isb();
+> +}
+> +
+>  static void ipi_test_self(void)
+>  {
+>  	cpumask_t mask;
+> @@ -93,7 +200,7 @@ static void ipi_test_self(void)
+>  	smp_wmb();
+>  	cpumask_clear(&mask);
+>  	cpumask_set_cpu(0, &mask);
+> -	writel(2 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
+> +	gic->ipi.send_self();
+>  	check_acked(&mask);
+>  	report_prefix_pop();
+>  }
+> @@ -101,14 +208,15 @@ static void ipi_test_self(void)
+>  static void ipi_test_smp(void)
+>  {
+>  	cpumask_t mask;
+> -	unsigned long tlist;
+> +	int i;
+>  
+>  	report_prefix_push("target-list");
+>  	memset(acked, 0, sizeof(acked));
+>  	smp_wmb();
+> -	tlist = cpumask_bits(&cpu_present_mask)[0] & 0xaa;
+> -	cpumask_bits(&mask)[0] = tlist;
+> -	writel((u8)tlist << 16, gicv2_dist_base() + GIC_DIST_SOFTINT);
+> +	cpumask_copy(&mask, &cpu_present_mask);
+> +	for (i = 0; i < nr_cpus; i += 2)
+> +		cpumask_clear_cpu(i, &mask);
+> +	gic->ipi.send_tlist(&mask);
+>  	check_acked(&mask);
+>  	report_prefix_pop();
+>  
+> @@ -117,14 +225,14 @@ static void ipi_test_smp(void)
+>  	smp_wmb();
+>  	cpumask_copy(&mask, &cpu_present_mask);
+>  	cpumask_clear_cpu(0, &mask);
+> -	writel(1 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
+> +	gic->ipi.send_broadcast();
+>  	check_acked(&mask);
+>  	report_prefix_pop();
+>  }
+>  
+>  static void ipi_enable(void)
+>  {
+> -	gicv2_enable_defaults();
+> +	gic->ipi.enable();
+>  #ifdef __arm__
+>  	install_exception_handler(EXCPTN_IRQ, ipi_handler);
+>  #else
+> @@ -141,6 +249,28 @@ static void ipi_recv(void)
+>  		wfi();
+>  }
+>  
+> +struct gic gicv2 = {
+> +	.ipi = {
+> +		.enable = gicv2_enable_defaults,
+> +		.send_self = gicv2_ipi_send_self,
+> +		.send_tlist = gicv2_ipi_send_tlist,
+> +		.send_broadcast = gicv2_ipi_send_broadcast,
+> +	},
+> +	.read_iar = gicv2_read_iar,
+> +	.write_eoi = gicv2_write_eoi,
+> +};
+> +
+> +struct gic gicv3 = {
+> +	.ipi = {
+> +		.enable = gicv3_enable_defaults,
+> +		.send_self = gicv3_ipi_send_self,
+> +		.send_tlist = gicv3_ipi_send_tlist,
+> +		.send_broadcast = gicv3_ipi_send_broadcast,
+> +	},
+> +	.read_iar = gicv3_read_iar,
+> +	.write_eoi = gicv3_write_eoir,
+> +};
+> +
+>  int main(int argc, char **argv)
+>  {
+>  	char pfx[8];
+> @@ -153,6 +283,15 @@ int main(int argc, char **argv)
+>  	snprintf(pfx, 8, "gicv%d", gic_version);
+>  	report_prefix_push(pfx);
+>  
+> +	switch (gic_version) {
+> +	case 2:
+> +		gic = &gicv2;
+> +		break;
+> +	case 3:
+> +		gic = &gicv3;
+> +		break;
+> +	}
+> +
+>  	if (argc < 2) {
+>  
+>  		report_prefix_push("ipi");
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index bb364675043f0..043a20e26e98c 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -58,3 +58,9 @@ file = gic.flat
+>  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+>  extra_params = -machine gic-version=2 -append 'ipi'
+>  groups = gic
+> +
+> +[gicv3-ipi]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +extra_params = -machine gic-version=3 -append 'ipi'
+> +groups = gic
+> 
