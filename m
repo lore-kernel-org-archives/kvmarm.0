@@ -1,154 +1,62 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 3/5] arm64: KVM: vgic-v2: Add the GICV emulation
- infrastructure
-Date: Thu, 1 Sep 2016 15:28:36 +0100
-Message-ID: <57C83B14.6020501@arm.com>
-References: <1471610295-1456-1-git-send-email-marc.zyngier@arm.com>
- <1471610295-1456-4-git-send-email-marc.zyngier@arm.com>
- <20160901124629.GF10162@cbox>
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: [PATCH] arm64: KVM: VHE: reset PSTATE.PAN on entry to EL2
+Date: Thu,  1 Sep 2016 15:29:03 +0100
+Message-ID: <1472740143-40061-1-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160901124629.GF10162@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Alex Bennee <alex.bennee@linaro.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F3C940F9B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Sep 2016 10:21:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id avt4cXdvLxoD for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Sep 2016 10:21:10 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80D48407A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Sep 2016 10:21:10 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/09/16 13:46, Christoffer Dall wrote:
-> On Fri, Aug 19, 2016 at 01:38:13PM +0100, Marc Zyngier wrote:
->> In order to efficiently perform the GICV access on behalf of the
->> guest, we need to be able to do avoid going back all the way to
-> 
-> s/do//
-> 
->> the host kernel.
->>
->> For this, we introduce a new hook in the world switch code,
->> conveniently placed just after populating the fault info.
->> At that point, we only have saved/restored the GP registers,
->> and we can quickly perform all the required checks (data abort,
->> translation fault, valid faulting syndrome, not an external
->> abort, not a PTW).
->>
->> Coming back from the emulation code, we need to skip the emulated
->> instruction. This involves an additional bit of save/restore in
->> order to be able to access the guest's PC (and possibly CPSR if
->> this is a 32bit guest).
->>
->> At this stage, no emulation code is provided.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/include/asm/kvm_hyp.h |  1 +
->>  arch/arm64/kvm/hyp/switch.c      | 32 ++++++++++++++++++++++++++++++++
->>  include/kvm/arm_vgic.h           |  3 +++
->>  virt/kvm/arm/hyp/vgic-v2-sr.c    |  7 +++++++
->>  virt/kvm/arm/vgic/vgic-v2.c      |  2 ++
->>  5 files changed, 45 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
->> index cff5105..88ec3ac 100644
->> --- a/arch/arm64/include/asm/kvm_hyp.h
->> +++ b/arch/arm64/include/asm/kvm_hyp.h
->> @@ -123,6 +123,7 @@ typeof(orig) * __hyp_text fname(void)					\
->>  
->>  void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
->>  void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
->> +bool __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
->>  
->>  void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
->>  void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
->> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->> index ae7855f..0be1594 100644
->> --- a/arch/arm64/kvm/hyp/switch.c
->> +++ b/arch/arm64/kvm/hyp/switch.c
->> @@ -17,6 +17,7 @@
->>  
->>  #include <linux/types.h>
->>  #include <asm/kvm_asm.h>
->> +#include <asm/kvm_emulate.h>
->>  #include <asm/kvm_hyp.h>
->>  
->>  static bool __hyp_text __fpsimd_enabled_nvhe(void)
->> @@ -232,6 +233,21 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
->>  	return true;
->>  }
->>  
->> +static void __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
->> +{
->> +	vcpu->arch.ctxt.gp_regs.regs.pc	= read_sysreg_el2(elr);
->> +
->> +	if (vcpu_mode_is_32bit(vcpu)) {
->> +		vcpu->arch.ctxt.gp_regs.regs.pstate = read_sysreg_el2(spsr);
->> +		kvm_skip_aarch32_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
->> +		write_sysreg_el2(vcpu->arch.ctxt.gp_regs.regs.pstate, spsr);
->> +	} else {
->> +		*vcpu_pc(vcpu) += 4;
->> +	}
->> +
->> +	write_sysreg_el2(vcpu->arch.ctxt.gp_regs.regs.pc, elr);
->> +}
->> +
->>  static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
->>  {
->>  	struct kvm_cpu_context *host_ctxt;
->> @@ -270,6 +286,22 @@ again:
->>  	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
->>  		goto again;
->>  
->> +	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
->> +	    exit_code == ARM_EXCEPTION_TRAP) {
-> 
-> do you get the static branch benefit when the test contains an &&
-> clause?  (I haven't looked at the generated assembly, no)
+SCTLR_EL2.SPAN bit controls what happens with the PSTATE.PAN bit on an
+exception. However, this bit has no effect on the PSTATE.PAN when
+HCR_EL2.E2H or HCR_EL2.TGE is unset. Thus when VHE is used and
+exception taken from a guest PSTATE.PAN bit left unchanged and we
+continue with a value guest has set.
 
-You do, otherwise the C semantics would be broken. This is strictly
-equivalent to:
+To address that always reset PSTATE.PAN on entry from EL1.
 
-	if (static_branch_unlikely()) {
-		if (exit_code == ...) {
-			[...]
-		}
-	}
+Fixes: 1f364c8c48a0 ("arm64: VHE: Add support for running Linux in EL2 mode")
 
-> Also, if you flip this static branch for code both mapped in EL1 and
-> EL2, would you potentially need some form of additional icache
-> maintenance here?
-> 
-> Or are you relying on the static branch being set at boot time and hold
-> forever true/false?
+Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+Reviewed-by: James Morse <james.morse@arm.com>
+---
+ arch/arm64/kvm/hyp/entry.S |    2 ++
+ 1 file changed, 2 insertions(+)
 
-I asked myself this exact question when I did this, and became convinced
-that this was OK for two reasons:
-- we do it only once
-- when we do it, we haven't executed that code yet, so it cannot be in
-the cache yet
-
-> 
->> +		bool valid;
->> +
->> +		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
->> +			kvm_vcpu_trap_get_fault_type(vcpu) == FSC_FAULT &&
->> +			kvm_vcpu_dabt_isvalid(vcpu) &&
->> +			!kvm_vcpu_dabt_isextabt(vcpu) &&
->> +			!kvm_vcpu_dabt_iss1tw(vcpu);
->> +
->> +		if (valid &&  __vgic_v2_perform_cpuif_access(vcpu)) {
-> 
-> extra whitespace
-> 
->> +			__skip_instr(vcpu);
-> 
-> does this interact in any amusing way with single-step guest debugging?
-
-Ouch. Good point. Actually, nothing that uses kvm_skip_instr() works for
-singlestep/watchpoint either (trapped sysreg, WFx, spurious traps,
-MMIO). I guess that's something we need to fix overall.
-
-Thanks,
-
-	M.
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index ce9e5e5..eaf08d3 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -98,6 +98,8 @@ ENTRY(__guest_exit)
+ 	// x4-x29,lr: vcpu regs
+ 	// vcpu x0-x3 on the stack
+ 
++	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
++
+ 	add	x2, x0, #VCPU_CONTEXT
+ 
+ 	stp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)]
 -- 
-Jazz is not dead. It just smells funny...
+1.7.9.5
