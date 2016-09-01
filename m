@@ -1,184 +1,69 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH] KVM: arm/arm64: Get rid of exported aliases to static functions
-Date: Thu,  1 Sep 2016 13:18:06 +0200
-Message-ID: <20160901111806.14972-1-christoffer.dall@linaro.org>
+Subject: Re: [PATCH 1/5] arm/arm64: KVM: Don't BUG_ON if IT bits are set in
+ ARM mode
+Date: Thu, 1 Sep 2016 13:56:16 +0200
+Message-ID: <20160901115616.GD10162@cbox>
+References: <1471610295-1456-1-git-send-email-marc.zyngier@arm.com>
+ <1471610295-1456-2-git-send-email-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1471610295-1456-2-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When rewriting the assembly code to C code, it was useful to have
-exported aliases or static functions so that we could keep the existing
-common C code unmodified and at the same time rewrite arm64 from
-assembly to C code, and later do the arm part.
+On Fri, Aug 19, 2016 at 01:38:11PM +0100, Marc Zyngier wrote:
+> The ARM ARM asserts that having the IT bits set in ARM mode is
+> unpredictable. But should a CPU do that (and still be able to
+> run correctly), we shouldn't kill the system.
+> 
+> So let's drop the BUG_ON that checks for this, as it is not
+> very helpful.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Now when both are done, we really don't need this level of indirection
-anymore, and it's time to save a few lines and brain cells.
+not sure how this relates to the series, but looks fine otherwise:
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm/kvm/hyp/switch.c       |  4 +---
- arch/arm/kvm/hyp/tlb.c          | 15 ++++-----------
- arch/arm64/kvm/hyp/debug-sr.c   |  4 +---
- arch/arm64/kvm/hyp/switch.c     |  4 +---
- arch/arm64/kvm/hyp/tlb.c        | 13 +++----------
- arch/arm64/kvm/hyp/vgic-v3-sr.c |  4 +---
- 6 files changed, 11 insertions(+), 33 deletions(-)
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-index b13caa9..37b3365 100644
---- a/arch/arm/kvm/hyp/switch.c
-+++ b/arch/arm/kvm/hyp/switch.c
-@@ -134,7 +134,7 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
--static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
-+int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-@@ -191,8 +191,6 @@ again:
- 	return exit_code;
- }
- 
--__alias(__guest_run) int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
--
- static const char * const __hyp_panic_string[] = {
- 	[ARM_EXCEPTION_RESET]      = "\nHYP panic: RST   PC:%08x CPSR:%08x",
- 	[ARM_EXCEPTION_UNDEFINED]  = "\nHYP panic: UNDEF PC:%08x CPSR:%08x",
-diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
-index a263600..7296528 100644
---- a/arch/arm/kvm/hyp/tlb.c
-+++ b/arch/arm/kvm/hyp/tlb.c
-@@ -34,7 +34,7 @@
-  * As v7 does not support flushing per IPA, just nuke the whole TLB
-  * instead, ignoring the ipa value.
-  */
--static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
-+void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
- {
- 	dsb(ishst);
- 
-@@ -50,21 +50,14 @@ static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
- 	write_sysreg(0, VTTBR);
- }
- 
--__alias(__tlb_flush_vmid) void __kvm_tlb_flush_vmid(struct kvm *kvm);
--
--static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
-+void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
--	__tlb_flush_vmid(kvm);
-+	__kvm_tlb_flush_vmid(kvm);
- }
- 
--__alias(__tlb_flush_vmid_ipa) void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
--							    phys_addr_t ipa);
--
--static void __hyp_text __tlb_flush_vm_context(void)
-+void __hyp_text __kvm_flush_vm_context(void)
- {
- 	write_sysreg(0, TLBIALLNSNHIS);
- 	write_sysreg(0, ICIALLUIS);
- 	dsb(ish);
- }
--
--__alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index 33342a7..4ba5c90 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -131,9 +131,7 @@ void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
- 		vcpu->arch.debug_flags &= ~KVM_ARM64_DEBUG_DIRTY;
- }
- 
--static u32 __hyp_text __debug_read_mdcr_el2(void)
-+u32 __hyp_text __kvm_get_mdcr_el2(void)
- {
- 	return read_sysreg(mdcr_el2);
- }
--
--__alias(__debug_read_mdcr_el2) u32 __kvm_get_mdcr_el2(void);
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index ae7855f..70e07b8 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -232,7 +232,7 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
--static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
-+int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-@@ -293,8 +293,6 @@ again:
- 	return exit_code;
- }
- 
--__alias(__guest_run) int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
--
- static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
- 
- static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par)
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index be8177c..9cc0ea7 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -17,7 +17,7 @@
- 
- #include <asm/kvm_hyp.h>
- 
--static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
-+void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
- 	dsb(ishst);
- 
-@@ -48,10 +48,7 @@ static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	write_sysreg(0, vttbr_el2);
- }
- 
--__alias(__tlb_flush_vmid_ipa) void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
--							    phys_addr_t ipa);
--
--static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
-+void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
- {
- 	dsb(ishst);
- 
-@@ -67,14 +64,10 @@ static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
- 	write_sysreg(0, vttbr_el2);
- }
- 
--__alias(__tlb_flush_vmid) void __kvm_tlb_flush_vmid(struct kvm *kvm);
--
--static void __hyp_text __tlb_flush_vm_context(void)
-+void __hyp_text __kvm_flush_vm_context(void)
- {
- 	dsb(ishst);
- 	asm volatile("tlbi alle1is	\n"
- 		     "ic ialluis	  ": : );
- 	dsb(ish);
- }
--
--__alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 5f8f80b..ee1ea63 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -335,9 +335,7 @@ void __hyp_text __vgic_v3_init_lrs(void)
- 		__gic_v3_set_lr(0, i);
- }
- 
--static u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
-+u64 __hyp_text __vgic_v3_get_ich_vtr_el2(void)
- {
- 	return read_gicreg(ICH_VTR_EL2);
- }
--
--__alias(__vgic_v3_read_ich_vtr_el2) u64 __vgic_v3_get_ich_vtr_el2(void);
--- 
-2.9.0
-
+> ---
+>  arch/arm/kvm/emulate.c   | 4 +---
+>  arch/arm64/kvm/emulate.c | 4 +---
+>  2 files changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
+> index af93e3f..eda9ddd 100644
+> --- a/arch/arm/kvm/emulate.c
+> +++ b/arch/arm/kvm/emulate.c
+> @@ -221,9 +221,7 @@ static void kvm_adjust_itstate(struct kvm_vcpu *vcpu)
+>  	unsigned long cpsr = *vcpu_cpsr(vcpu);
+>  	bool is_arm = !(cpsr & PSR_T_BIT);
+>  
+> -	BUG_ON(is_arm && (cpsr & PSR_IT_MASK));
+> -
+> -	if (!(cpsr & PSR_IT_MASK))
+> +	if (is_arm || !(cpsr & PSR_IT_MASK))
+>  		return;
+>  
+>  	cond = (cpsr & 0xe000) >> 13;
+> diff --git a/arch/arm64/kvm/emulate.c b/arch/arm64/kvm/emulate.c
+> index f87d8fb..df76590 100644
+> --- a/arch/arm64/kvm/emulate.c
+> +++ b/arch/arm64/kvm/emulate.c
+> @@ -120,9 +120,7 @@ static void kvm_adjust_itstate(struct kvm_vcpu *vcpu)
+>  	unsigned long cpsr = *vcpu_cpsr(vcpu);
+>  	bool is_arm = !(cpsr & COMPAT_PSR_T_BIT);
+>  
+> -	BUG_ON(is_arm && (cpsr & COMPAT_PSR_IT_MASK));
+> -
+> -	if (!(cpsr & COMPAT_PSR_IT_MASK))
+> +	if (is_arm || !(cpsr & COMPAT_PSR_IT_MASK))
+>  		return;
+>  
+>  	cond = (cpsr & 0xe000) >> 13;
+> -- 
+> 2.1.4
+> 
