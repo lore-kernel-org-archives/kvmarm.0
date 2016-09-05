@@ -1,23 +1,23 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [RFC v2 PATCH 1/7] perf/trace: Add notification for perf trace events
-Date: Mon,  5 Sep 2016 17:31:31 +0100
-Message-ID: <1473093097-30932-2-git-send-email-punit.agrawal@arm.com>
+Subject: [RFC v2 PATCH 2/7] KVM: Track the pid of the VM process
+Date: Mon,  5 Sep 2016 17:31:32 +0100
+Message-ID: <1473093097-30932-3-git-send-email-punit.agrawal@arm.com>
 References: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C45D14998D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Sep 2016 12:23:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 38A8D49B3F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Sep 2016 12:23:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NN7T1f6guQQx for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Sep 2016 12:23:46 -0400 (EDT)
+ with ESMTP id 7v8kRds6Nsdz for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Sep 2016 12:23:54 -0400 (EDT)
 Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
  [217.140.96.140])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8FBC649B58
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Sep 2016 12:23:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63E5D49B32
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Sep 2016 12:23:53 -0400 (EDT)
 In-Reply-To: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,98 +29,39 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a mechanism to notify listeners about perf trace event state
-changes. This enables listeners to take actions requiring the event
-context (e.g., attached process).
-
-The notification mechanism can be used to reduce trace point based
-profiling overhead by enabling/disabling hardware traps for specific
-contexts (e.g., virtual machines).
-
-Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Ingo Molnar <mingo@redhat.com>
----
- include/linux/trace_events.h    |  3 +++
- kernel/trace/trace_event_perf.c | 24 ++++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
-
-diff --git a/include/linux/trace_events.h b/include/linux/trace_events.h
-index be00761..5924032 100644
---- a/include/linux/trace_events.h
-+++ b/include/linux/trace_events.h
-@@ -505,6 +505,9 @@ perf_trace_buf_submit(void *raw_data, int size, int rctx, u16 type,
- {
- 	perf_tp_event(type, count, raw_data, size, regs, head, rctx, task);
- }
-+
-+extern int perf_trace_notifier_register(struct notifier_block *nb);
-+extern int perf_trace_notifier_unregister(struct notifier_block *nb);
- #endif
- 
- #endif /* _LINUX_TRACE_EVENT_H */
-diff --git a/kernel/trace/trace_event_perf.c b/kernel/trace/trace_event_perf.c
-index 562fa69..9aaaacf 100644
---- a/kernel/trace/trace_event_perf.c
-+++ b/kernel/trace/trace_event_perf.c
-@@ -6,10 +6,12 @@
-  */
- 
- #include <linux/module.h>
-+#include <linux/notifier.h>
- #include <linux/kprobes.h>
- #include "trace.h"
- 
- static char __percpu *perf_trace_buf[PERF_NR_CONTEXTS];
-+static RAW_NOTIFIER_HEAD(perf_trace_notifier_list);
- 
- /*
-  * Force it to be aligned to unsigned long to avoid misaligned accesses
-@@ -86,6 +88,26 @@ static int perf_trace_event_perm(struct trace_event_call *tp_event,
- 	return 0;
- }
- 
-+int perf_trace_notifier_register(struct notifier_block *nb)
-+{
-+	return raw_notifier_chain_register(&perf_trace_notifier_list, nb);
-+}
-+
-+int perf_trace_notifier_unregister(struct notifier_block *nb)
-+{
-+	return raw_notifier_chain_unregister(&perf_trace_notifier_list, nb);
-+}
-+
-+static void perf_trace_notify(enum trace_reg event, struct perf_event *p_event)
-+{
-+	/*
-+	 * We use raw notifiers here as we are called with the
-+	 * event_mutex held.
-+	 */
-+	raw_notifier_call_chain(&perf_trace_notifier_list,
-+				     event, p_event);
-+}
-+
- static int perf_trace_event_reg(struct trace_event_call *tp_event,
- 				struct perf_event *p_event)
- {
-@@ -176,6 +198,7 @@ out:
- static int perf_trace_event_open(struct perf_event *p_event)
- {
- 	struct trace_event_call *tp_event = p_event->tp_event;
-+	perf_trace_notify(TRACE_REG_PERF_OPEN, p_event);
- 	return tp_event->class->reg(tp_event, TRACE_REG_PERF_OPEN, p_event);
- }
- 
-@@ -183,6 +206,7 @@ static void perf_trace_event_close(struct perf_event *p_event)
- {
- 	struct trace_event_call *tp_event = p_event->tp_event;
- 	tp_event->class->reg(tp_event, TRACE_REG_PERF_CLOSE, p_event);
-+	perf_trace_notify(TRACE_REG_PERF_CLOSE, p_event);
- }
- 
- static int perf_trace_event_init(struct trace_event_call *tp_event,
--- 
-2.8.1
+VXNlcnNwYWNlIHRvb2xzIHN1Y2ggYXMgcGVyZiBjYW4gYmUgdXNlZCB0byBwcm9maWxlIGluZGl2
+aWR1YWwKcHJvY2Vzc2VzLgoKVHJhY2sgdGhlIFBJRCBvZiB0aGUgdmlydHVhbCBtYWNoaW5lIHBy
+b2Nlc3MgdG8gbWF0Y2ggcHJvZmlsaW5nIHJlcXVlc3RzCnRhcmdldGVkIGF0IGl0LiBUaGlzIGNh
+biBiZSB1c2VkIHRvIHRha2UgYXBwcm9wcmlhdGUgYWN0aW9uIHRvIGVuYWJsZQp0aGUgcmVxdWVz
+dGVkIHByb2ZpbGluZyBvcGVyYXRpb25zIGZvciB0aGUgVk1zIG9mIGludGVyZXN0LgoKU2lnbmVk
+LW9mZi1ieTogUHVuaXQgQWdyYXdhbCA8cHVuaXQuYWdyYXdhbEBhcm0uY29tPgpDYzogUGFvbG8g
+Qm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KQ2M6ICJSYWRpbSBLcsSNbcOhxZkiIDxya3Jj
+bWFyQHJlZGhhdC5jb20+CkNjOiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGxp
+bmFyby5vcmc+CkNjOiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgotLS0KIGlu
+Y2x1ZGUvbGludXgva3ZtX2hvc3QuaCB8IDEgKwogdmlydC9rdm0va3ZtX21haW4uYyAgICAgIHwg
+MiArKwogMiBmaWxlcyBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9pbmNs
+dWRlL2xpbnV4L2t2bV9ob3N0LmggYi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgKaW5kZXggOWMy
+OGI0ZC4uN2M0MmM5NCAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oCisrKyBi
+L2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaApAQCAtMzc0LDYgKzM3NCw3IEBAIHN0cnVjdCBrdm1f
+bWVtc2xvdHMgewogc3RydWN0IGt2bSB7CiAJc3BpbmxvY2tfdCBtbXVfbG9jazsKIAlzdHJ1Y3Qg
+bXV0ZXggc2xvdHNfbG9jazsKKwlzdHJ1Y3QgcGlkICpwaWQ7CiAJc3RydWN0IG1tX3N0cnVjdCAq
+bW07IC8qIHVzZXJzcGFjZSB0aWVkIHRvIHRoaXMgdm0gKi8KIAlzdHJ1Y3Qga3ZtX21lbXNsb3Rz
+ICptZW1zbG90c1tLVk1fQUREUkVTU19TUEFDRV9OVU1dOwogCXN0cnVjdCBzcmN1X3N0cnVjdCBz
+cmN1OwpkaWZmIC0tZ2l0IGEvdmlydC9rdm0va3ZtX21haW4uYyBiL3ZpcnQva3ZtL2t2bV9tYWlu
+LmMKaW5kZXggMTk1MDc4Mi4uYWIyNTM1YSAxMDA2NDQKLS0tIGEvdmlydC9rdm0va3ZtX21haW4u
+YworKysgYi92aXJ0L2t2bS9rdm1fbWFpbi5jCkBAIC02MTMsNiArNjEzLDcgQEAgc3RhdGljIHN0
+cnVjdCBrdm0gKmt2bV9jcmVhdGVfdm0odW5zaWduZWQgbG9uZyB0eXBlKQogCXNwaW5fbG9ja19p
+bml0KCZrdm0tPm1tdV9sb2NrKTsKIAlhdG9taWNfaW5jKCZjdXJyZW50LT5tbS0+bW1fY291bnQp
+OwogCWt2bS0+bW0gPSBjdXJyZW50LT5tbTsKKwlrdm0tPnBpZCA9IGdldF90YXNrX3BpZChjdXJy
+ZW50LCBQSURUWVBFX1BJRCk7CiAJa3ZtX2V2ZW50ZmRfaW5pdChrdm0pOwogCW11dGV4X2luaXQo
+Jmt2bS0+bG9jayk7CiAJbXV0ZXhfaW5pdCgma3ZtLT5pcnFfbG9jayk7CkBAIC03MTIsNiArNzEz
+LDcgQEAgc3RhdGljIHZvaWQga3ZtX2Rlc3Ryb3lfdm0oc3RydWN0IGt2bSAqa3ZtKQogCWludCBp
+OwogCXN0cnVjdCBtbV9zdHJ1Y3QgKm1tID0ga3ZtLT5tbTsKIAorCXB1dF9waWQoa3ZtLT5waWQp
+OwogCWt2bV9kZXN0cm95X3ZtX2RlYnVnZnMoa3ZtKTsKIAlrdm1fYXJjaF9zeW5jX2V2ZW50cyhr
+dm0pOwogCXNwaW5fbG9jaygma3ZtX2xvY2spOwotLSAKMi44LjEKCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
+QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
+bWFuL2xpc3RpbmZvL2t2bWFybQo=
