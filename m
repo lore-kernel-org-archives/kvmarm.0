@@ -1,30 +1,31 @@
-From: Vijay Kilari <vijay.kilari@gmail.com>
-Subject: Re: [RFC PATCH v3 2/5] arm/arm64: vgic-new: Add distributor and
- redistributor access
-Date: Tue, 6 Sep 2016 19:44:15 +0530
-Message-ID: <CALicx6uv67B_S4Gd0zDS7Tag-cpZaqt-nNPQ8MchucnmD+BPUg@mail.gmail.com>
-References: <1472037609-4164-1-git-send-email-vijay.kilari@gmail.com>
- <1472037609-4164-3-git-send-email-vijay.kilari@gmail.com>
- <20160830123126.GH10162@cbox>
- <CALicx6tbUDCUe6SBr=HA1MnNdZa6L1+U67C3V_pT-Nw2RGjR6g@mail.gmail.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [RFC v2 PATCH 2/7] KVM: Track the pid of the VM process
+Date: Tue, 06 Sep 2016 16:22:17 +0100
+Message-ID: <87poohhx3q.fsf@e105922-lin.cambridge.arm.com>
+References: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
+ <1473093097-30932-3-git-send-email-punit.agrawal@arm.com>
+ <20160906062252.GA30513@cbox>
+ <87poohjqzk.fsf@e105922-lin.cambridge.arm.com>
+ <20160906102542.GG30513@cbox>
+ <877fapjng0.fsf@e105922-lin.cambridge.arm.com>
+ <20160906112203.GO30513@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6AD249B60
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 10:05:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DD98349B61
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 11:14:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ISen3Ccafd5O for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 10:05:52 -0400 (EDT)
-Received: from mail-oi0-f65.google.com (mail-oi0-f65.google.com
- [209.85.218.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3653240FA2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 10:05:52 -0400 (EDT)
-Received: by mail-oi0-f65.google.com with SMTP id 2so14721662oif.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2016 07:14:16 -0700 (PDT)
-In-Reply-To: <CALicx6tbUDCUe6SBr=HA1MnNdZa6L1+U67C3V_pT-Nw2RGjR6g@mail.gmail.com>
+ with ESMTP id Yjj4U73TQBEL for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 11:14:12 -0400 (EDT)
+Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
+ [217.140.96.140])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA74F49B60
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 11:14:10 -0400 (EDT)
+In-Reply-To: <20160906112203.GO30513@cbox> (Christoffer Dall's message of
+ "Tue, 6 Sep 2016 13:22:03 +0200")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,216 +36,93 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Resending in plain text mode
-
-On Tue, Sep 6, 2016 at 7:17 PM, Vijay Kilari <vijay.kilari@gmail.com> wrote:
->
->
-> On Tue, Aug 30, 2016 at 6:01 PM, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
->>
->> On Wed, Aug 24, 2016 at 04:50:06PM +0530, vijay.kilari@gmail.com wrote:
->> > From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->> >
->> > VGICv3 Distributor and Redistributor registers are accessed using
->> > KVM_DEV_ARM_VGIC_GRP_DIST_REGS and KVM_DEV_ARM_VGIC_GRP_DIST_REGS
->> > with KVM_SET_DEVICE_ATTR and KVM_GET_DEVICE_ATTR ioctls.
->> > These registers are accessed as 32-bit and cpu mpidr
->> > value passed along with register offset is used to identify the
->> > cpu for redistributor registers access.
->> >
->> > The version of VGIC v3 specification is define here
->> >
->> > http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
->> >
->> > Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->> > ---
->> >  arch/arm64/include/uapi/asm/kvm.h   |   3 +
->> >  virt/kvm/arm/vgic/vgic-kvm-device.c | 127
->> > +++++++++++++++++++++++++++++++++++-
->> >  virt/kvm/arm/vgic/vgic-mmio-v3.c    | 113
->> > ++++++++++++++++++++++++++++++++
->> >  virt/kvm/arm/vgic/vgic-mmio.c       |   2 +-
->> >  virt/kvm/arm/vgic/vgic.h            |   8 +++
->> >  5 files changed, 250 insertions(+), 3 deletions(-)
->> >
->> > diff --git a/arch/arm64/include/uapi/asm/kvm.h
->> > b/arch/arm64/include/uapi/asm/kvm.h
->> > index 3051f86..94ea676 100644
->> > --- a/arch/arm64/include/uapi/asm/kvm.h
->> > +++ b/arch/arm64/include/uapi/asm/kvm.h
->> > @@ -201,10 +201,13 @@ struct kvm_arch_memory_slot {
->> >  #define KVM_DEV_ARM_VGIC_GRP_CPU_REGS        2
->> >  #define   KVM_DEV_ARM_VGIC_CPUID_SHIFT       32
->> >  #define   KVM_DEV_ARM_VGIC_CPUID_MASK        (0xffULL <<
->> > KVM_DEV_ARM_VGIC_CPUID_SHIFT)
->> > +#define   KVM_DEV_ARM_VGIC_V3_CPUID_MASK \
->> > +                             (0xffffffffULL <<
->> > KVM_DEV_ARM_VGIC_CPUID_SHIFT)
->>
->> I think this should be KVM_DEV_ARM_VGIC_V3_MPIDR_MASK, and I would
->> probably define a V3 of the shift as well, since we're really talking
->> about two distinct APIs here.
->>
->> >  #define   KVM_DEV_ARM_VGIC_OFFSET_SHIFT      0
->> >  #define   KVM_DEV_ARM_VGIC_OFFSET_MASK       (0xffffffffULL <<
->> > KVM_DEV_ARM_VGIC_OFFSET_SHIFT)
->> >  #define KVM_DEV_ARM_VGIC_GRP_NR_IRQS 3
->> >  #define KVM_DEV_ARM_VGIC_GRP_CTRL    4
->> > +#define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
->> >  #define   KVM_DEV_ARM_VGIC_CTRL_INIT 0
->> >
->> >  /* Device Control API on vcpu fd */
->> > diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c
->> > b/virt/kvm/arm/vgic/vgic-kvm-device.c
->> > index 163b057..06f0158 100644
->> > --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
->> > +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
->> > @@ -433,16 +433,136 @@ struct kvm_device_ops kvm_arm_vgic_v2_ops = {
->> >
->> >  #ifdef CONFIG_KVM_ARM_VGIC_V3
->> >
->> > +static int parse_vgic_v3_attr(struct kvm_device *dev,
->> > +                           struct kvm_device_attr *attr,
->> > +                           struct vgic_reg_attr *reg_attr)
->> > +{
->> > +     int cpuid;
->> > +
->> > +     cpuid = (attr->attr & KVM_DEV_ARM_VGIC_V3_CPUID_MASK) >>
->> > +              KVM_DEV_ARM_VGIC_CPUID_SHIFT;
->> > +
->> > +     if (cpuid >= atomic_read(&dev->kvm->online_vcpus))
->> > +             return -EINVAL;
->>
->> huh?  it's an MPIDR, not a cpu id.
->>
->> just resolve it with kvm_mpidr_to_vcpu and check its return value.
->>
->>
->> > +
->> > +     reg_attr->vcpu = kvm_mpidr_to_vcpu(dev->kvm, cpuid);
->>
->> please check the return value of this function in any case...
->>
->> > +     reg_attr->addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
->> > +
->> > +     return 0;
->> > +}
->> > +
->> > +/**
->> > + * vgic_attr_regs_access_v3 - allows user space to access VGIC v3 state
->> > + *
->> > + * @dev:      kvm device handle
->> > + * @attr:     kvm device attribute
->> > + * @reg:      address the value is read or written
->> > + * @is_write: true if userspace is writing a register
->> > + */
->> > +static int vgic_attr_regs_access_v3(struct kvm_device *dev,
->> > +                                 struct kvm_device_attr *attr,
->> > +                                 u64 *reg, bool is_write)
->> > +{
->> > +     struct vgic_reg_attr reg_attr;
->> > +     gpa_t addr;
->> > +     struct kvm_vcpu *vcpu;
->> > +     int ret;
->> > +     u32 tmp32;
->> > +
->> > +     ret = parse_vgic_v3_attr(dev, attr, &reg_attr);
->> > +     if (ret)
->> > +             return ret;
->> > +
->> > +     vcpu = reg_attr.vcpu;
->> > +     addr = reg_attr.addr;
->> > +
->> > +     mutex_lock(&dev->kvm->lock);
->> > +
->> > +     ret = vgic_init(dev->kvm);
->> > +     if (ret)
->> > +             goto out;
->>
->> no, no, please no more auto-init at userspace access time.  This code
->> should instead check vgic_initialized() and return an error to userspace
->> if not initialized.
->>
->> Ok. I wil fix it. It is coming from v2 code.
->
->
->>
->> > +
->> > +     if (!lock_all_vcpus(dev->kvm)) {
->> > +             ret = -EBUSY;
->> > +             goto out;
->> > +     }
->> > +
->> > +     switch (attr->group) {
->> > +     case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
->> > +             tmp32 = *reg;
->>
->> why is this assignment not predicated on if (is_write) ?
->>
->> also, all this type conversion nonsense is probably unnecessary, see my
->> comment below.
->>
->> > +             ret = vgic_v3_dist_uaccess(vcpu, is_write, addr, &tmp32);
->> > +             if (!is_write)
->> > +                     *reg = tmp32;
->> > +             break;
->> > +     case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
->> > +             tmp32 = *reg;
->> > +             ret = vgic_v3_redist_uaccess(vcpu, is_write, addr,
->> > &tmp32);
->> > +             if (!is_write)
->> > +                     *reg = tmp32;
->> > +             break;
->> > +     default:
->> > +             ret = -EINVAL;
->> > +             break;
->> > +     }
->> > +
->> > +     unlock_all_vcpus(dev->kvm);
->> > +out:
->> > +     mutex_unlock(&dev->kvm->lock);
->> > +     return ret;
->> > +}
->> > +
->> >  static int vgic_v3_set_attr(struct kvm_device *dev,
->> >                           struct kvm_device_attr *attr)
->> >  {
->> > -     return vgic_set_common_attr(dev, attr);
->> > +     int ret;
->> > +
->> > +     ret = vgic_set_common_attr(dev, attr);
->> > +     if (ret != -ENXIO)
->> > +             return ret;
->> > +
->> > +     switch (attr->group) {
->> > +     case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
->> > +     case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS: {
->> > +             u32 __user *uaddr = (u32 __user *)(long)attr->addr;
->> > +             u32 tmp32;
->> > +             u64 reg;
->> > +
->> > +             if (get_user(tmp32, uaddr))
->> > +                     return -EFAULT;
->> > +
->> > +             reg = tmp32;
->> > +             return vgic_attr_regs_access_v3(dev, attr, &reg, true);
->>
->> oh, but wait, you already had a 32-bit value, which you convert into a
->> 64-bit value, just to convert it back again, to do some extra data
->> copies?
->>
->> I'm really confused as to why this has to be so complicated.
->>
->> Why not simply use u32 all the way?
->
->
->     vgic_attr_regs_access_v3() is used for handling both GICD/GICR and
-> SYSREGS. For this reason we convert u32 to 64 and vice versa.
-> To avoid these conversions, I can create separate vgic_attr_regs_access_v3()
-> functions for GICD and SYSREGS.
->
->
+Q2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPiB3cml0ZXM6Cgo+
+IE9uIFR1ZSwgU2VwIDA2LCAyMDE2IGF0IDEyOjA3OjU5UE0gKzAxMDAsIFB1bml0IEFncmF3YWwg
+d3JvdGU6Cj4+IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4g
+d3JpdGVzOgo+PiAKPj4gPiBPbiBUdWUsIFNlcCAwNiwgMjAxNiBhdCAxMDo1MToyN0FNICswMTAw
+LCBQdW5pdCBBZ3Jhd2FsIHdyb3RlOgo+PiA+PiBIaSBDaHJpc3RvZmZlciwKPj4gPj4gCj4+ID4+
+IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4gd3JpdGVzOgo+
+PiA+PiAKPj4gPj4gPiBPbiBNb24sIFNlcCAwNSwgMjAxNiBhdCAwNTozMTozMlBNICswMTAwLCBQ
+dW5pdCBBZ3Jhd2FsIHdyb3RlOgo+PiA+PiA+PiBVc2Vyc3BhY2UgdG9vbHMgc3VjaCBhcyBwZXJm
+IGNhbiBiZSB1c2VkIHRvIHByb2ZpbGUgaW5kaXZpZHVhbAo+PiA+PiA+PiBwcm9jZXNzZXMuCj4+
+ID4+ID4+IAo+PiA+PiA+PiBUcmFjayB0aGUgUElEIG9mIHRoZSB2aXJ0dWFsIG1hY2hpbmUgcHJv
+Y2VzcyB0byBtYXRjaCBwcm9maWxpbmcgcmVxdWVzdHMKPj4gPj4gPj4gdGFyZ2V0ZWQgYXQgaXQu
+IFRoaXMgY2FuIGJlIHVzZWQgdG8gdGFrZSBhcHByb3ByaWF0ZSBhY3Rpb24gdG8gZW5hYmxlCj4+
+ID4+ID4+IHRoZSByZXF1ZXN0ZWQgcHJvZmlsaW5nIG9wZXJhdGlvbnMgZm9yIHRoZSBWTXMgb2Yg
+aW50ZXJlc3QuCj4+ID4+ID4+IAo+PiA+PiA+PiBTaWduZWQtb2ZmLWJ5OiBQdW5pdCBBZ3Jhd2Fs
+IDxwdW5pdC5hZ3Jhd2FsQGFybS5jb20+Cj4+ID4+ID4+IENjOiBQYW9sbyBCb256aW5pIDxwYm9u
+emluaUByZWRoYXQuY29tPgo+PiA+PiA+PiBDYzogIlJhZGltIEtyxI1tw6HFmSIgPHJrcmNtYXJA
+cmVkaGF0LmNvbT4KPj4gPj4gPj4gQ2M6IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRh
+bGxAbGluYXJvLm9yZz4KPj4gPj4gPj4gQ2M6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFy
+bS5jb20+Cj4+ID4+ID4+IC0tLQo+PiA+PiA+PiAgaW5jbHVkZS9saW51eC9rdm1faG9zdC5oIHwg
+MSArCj4+ID4+ID4+ICB2aXJ0L2t2bS9rdm1fbWFpbi5jICAgICAgfCAyICsrCj4+ID4+ID4+ICAy
+IGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKQo+PiA+PiA+PiAKPj4gPj4gPj4gZGlmZiAt
+LWdpdCBhL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaCBiL2luY2x1ZGUvbGludXgva3ZtX2hvc3Qu
+aAo+PiA+PiA+PiBpbmRleCA5YzI4YjRkLi43YzQyYzk0IDEwMDY0NAo+PiA+PiA+PiAtLS0gYS9p
+bmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgKPj4gPj4gPj4gKysrIGIvaW5jbHVkZS9saW51eC9rdm1f
+aG9zdC5oCj4+ID4+ID4+IEBAIC0zNzQsNiArMzc0LDcgQEAgc3RydWN0IGt2bV9tZW1zbG90cyB7
+Cj4+ID4+ID4+ICBzdHJ1Y3Qga3ZtIHsKPj4gPj4gPj4gIAlzcGlubG9ja190IG1tdV9sb2NrOwo+
+PiA+PiA+PiAgCXN0cnVjdCBtdXRleCBzbG90c19sb2NrOwo+PiA+PiA+PiArCXN0cnVjdCBwaWQg
+KnBpZDsKPj4gPj4gPj4gIAlzdHJ1Y3QgbW1fc3RydWN0ICptbTsgLyogdXNlcnNwYWNlIHRpZWQg
+dG8gdGhpcyB2bSAqLwo+PiA+PiA+PiAgCXN0cnVjdCBrdm1fbWVtc2xvdHMgKm1lbXNsb3RzW0tW
+TV9BRERSRVNTX1NQQUNFX05VTV07Cj4+ID4+ID4+ICAJc3RydWN0IHNyY3Vfc3RydWN0IHNyY3U7
+Cj4+ID4+ID4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9rdm1fbWFpbi5jIGIvdmlydC9rdm0va3Zt
+X21haW4uYwo+PiA+PiA+PiBpbmRleCAxOTUwNzgyLi5hYjI1MzVhIDEwMDY0NAo+PiA+PiA+PiAt
+LS0gYS92aXJ0L2t2bS9rdm1fbWFpbi5jCj4+ID4+ID4+ICsrKyBiL3ZpcnQva3ZtL2t2bV9tYWlu
+LmMKPj4gPj4gPj4gQEAgLTYxMyw2ICs2MTMsNyBAQCBzdGF0aWMgc3RydWN0IGt2bSAqa3ZtX2Ny
+ZWF0ZV92bSh1bnNpZ25lZCBsb25nIHR5cGUpCj4+ID4+ID4+ICAJc3Bpbl9sb2NrX2luaXQoJmt2
+bS0+bW11X2xvY2spOwo+PiA+PiA+PiAgCWF0b21pY19pbmMoJmN1cnJlbnQtPm1tLT5tbV9jb3Vu
+dCk7Cj4+ID4+ID4+ICAJa3ZtLT5tbSA9IGN1cnJlbnQtPm1tOwo+PiA+PiA+PiArCWt2bS0+cGlk
+ID0gZ2V0X3Rhc2tfcGlkKGN1cnJlbnQsIFBJRFRZUEVfUElEKTsKPj4gPj4gPgo+PiA+PiA+IEhv
+dyBkb29lcyB0aGlzIGRlYWwgd2l0aCB0aHJlYWRpbmc/ICBJcyB0aGUgaWRlYSB0aGF0IHRoZSB1
+c2VyIGJ5Cj4+ID4+ID4gc3BlY2lmeWluZyB0aGUgbWFpbiB0aHJlYWQncyBwaWQgd2lsbCBlbmFi
+bGUgdHJhcHBpbmcgZm9yIGFsbCB2Y3B1Cj4+ID4+ID4gdGhyZWFkcyBiZWxvbmdpbmcgdG8gdGhh
+dCBWTT8KPj4gPj4gCj4+ID4+IFllcyB0aGF0J3MgY29ycmVjdCAtIHNwZWNpZnlpbmcgdGhlIG1h
+aW4gdGhyZWFkIFBJRCB3aWxsIGVuYWJsZSB0cmFwcGluZwo+PiA+PiBmb3IgdGhlIFZNIChhbGwg
+dmNwdXMpLgo+PiA+PiAKPj4gPj4gSSBhbSBoYXBweSB0byBtb3ZlIHRvIGEgbW9yZSBzdWl0YWJs
+ZSBpZGVudGlmaWVyIGlmIGF2YWlsYWJsZS4KPj4gPj4gCj4+ID4KPj4gPiBXaGF0IGlzIHRoZSAn
+bWFpbiB0aHJlYWQnID8KPj4gPgo+PiA+IERvZXMgc29tZXRoaW5nIG1hbmRhdGUgdGhhdCB0aGUg
+Vk0gaXMgY3JlYXRlZCBieSB0aGUgdGhyZWFkIGdyb3VwCj4+ID4gbGVhZGVyPyAgSWYgbm90LCBp
+cyBpdCBub3QgYSBiaXQgc3RyYW5nZSBmcm9tIGEgdXNlciBwZXJzcGVjdGl2ZSwgdGhhdAo+PiA+
+IHlvdSBoYXZlIHRvIGZpbmQgdGhlIHNwZWNpZmljIHN1YnRocmVhZCBwaWQgdGhhdCBjcmVhdGVk
+IHRoZSB2bSB0bwo+PiA+IGVuYWJsZSB0aGlzIHRyYWNpbmcgZm9yIGFsbCB2Y3B1IHRocmVhZHMg
+YW5kIHRoYXQgdGhlIHRnaWQgZG9lc24ndCB3b3JrCj4+ID4gaW4gdGhpcyBjYXNlPwo+PiAKPj4g
+TGV0IG1lIGNvcnJlY3QgbXkgdGVybWlub2xvZ3kgdXNhZ2UgLSB0aGUgdmFsdWUgcmVjb3JkZWQg
+YWJvdmUgKGFuZCB1c2VkCj4+IHRvIGlkZW50aWZ5IHRoZSBWTSkgc2hvdWxkIGJlIHRoZSB0Z2lk
+LiBJdCBpcyBjb25mdXNpbmcgYmVjYXVzZSAncHMnCj4+IHJlcG9ydHMgaXQgYXMgcGlkLgo+PiAK
+Pj4gSSBwaWNrZWQgdGhlIHZhbHVlIGFzIGV4aXN0aW5nIEtWTSBjb2RlIGFscmVhZHkgdXNlcyB0
+aGUgUElEIG9mIHRoZQo+PiBjcmVhdGluZyB0YXNrIChzZWUga3ZtX2NyZWF0ZV92bV9kZWJ1Z2Zz
+KSB0byBleHBvcnQgVk0gc3RhdGlzdGljcyBpbgo+PiBkZWJ1Z2ZzLgo+PiAKPj4gSWYgSSd2ZSBn
+b3QgdGhpcyB3cm9uZywgdGhlbiBrdm1fY3JlYXRlX3ZtX2RlYnVnZnMgYWxzbyBsaWtlbHkgbmVl
+ZHMgYW4KPj4gdXBkYXRlLgo+PiAKPj4gV2hhdCBkbyB5b3UgdGhpbms/Cj4+IAo+IFdoZW4geW91
+IGRvIGdldF90YXNrX3BpZChjdXJyZW50LCBQSURUWVBFX1BJRCkgaXQgYWN0dWFsbHkgZ2V0cyB0
+aGUKPiBrZXJuZWwgdmlldyBvZiBhIFBJRCB3aGljaCBpcyB0aGUgdGhlYWQtaWQgZnJvbSB1c2Vy
+c3BhY2UncyBwb2ludCBvZgo+IHZpZXcsIHJpZ2h0PwoKVGhhdCBtYWtlcyBzZW5zZS4gSXQgc2Vl
+bXMgdG8gd29ya3MgaGVyZSBiZWNhdXNlIHRoZSBwaWQgb2YgdGhlIGZpcnN0CnRhc2sgaXMgYWxz
+byB0aGUgdGdpZCBvZiB0aGUgZ3JvdXAuIEFuZCBJIHJlY2tvbiBpdCdzIHRoZSBzYW1lCmFzc3Vt
+cHRpb24gYmVpbmcgbWFkZSB3aXRoIGRlYnVnZnMgY29kZSAobW9yZSBiZWxvdykuCgpJJ3ZlIGNo
+YW5nZWQgdGhlIGZpcnN0IGFyZ3VtZW50IG9mIHRoZSBjYWxsIHRvIGdldF90YXNrX3BpZCB0bwpj
+dXJyZW50LT5ncm91cF9sZWFkZXIuCgo+Cj4gSSBkb24ndCBzZWUgd2h5IHRoaXMgaGFzIHRvIGJl
+IHRoZSBzYW1lIGFzIHRoZSBkZWJ1Z2ZzIGNvZGUsIGFzIHRoZXJlIGl0Cj4gbWFrZXMgcG90ZW50
+aWFsbHkgbW9yZSBzZW5zZSB0byB0aHJlYWQtc3BlY2lmaWMsIGJ1dCBmb3IgeW91ciBjYXNlLCBh
+cmUKPiB5b3Ugbm90IHRhcmdldGluZyB0aGUgYmVoYXZpb3IgdGhhdCBhIHVzZXIgY2FuIGRvICJw
+cyBhdXggfCBncmVwIHFlbXUiCj4gb3Igd2hhdGV2ZXIsIGFuZCB0aGVuIHNldCB0cmFjaW5nIGZv
+ciB0aGUgcmVwb3J0ZWQgUElEICh3aGljaCBpcwo+IGFjdHVhbGx5IGEgdGdpZCk/CgpUaGUgZGVi
+dWdmcyBzdGF0cyBhcmUgbm90IHRocmVhZCAodmNwdSkgc3BlY2lmaWMgYnV0IGZvciB0aGUgVk0u
+CgpCb3RoIHZhbHVlcywgZGVidWdmcyBhbmQgaGVyZSwgYXJlIGJlaW5nIHVzZWQgdG8gcmVwcmVz
+ZW50IHRoZSBWTSB0byB0aGUKdXNlci4gQSBtaXNtYXRjaCBpbiB0aGVzZSBpZGVudGlmaWVycyB3
+aWxsIGJlIHZlcnkgY29uZnVzaW5nLgoKSWYgeW91IGFncmVlLCBJIGNhbiBzZXBhcmF0ZWx5IHNl
+bmQgYSBwYXRjaCB0byBhZGRyZXNzIHRoaXMgZm9yIFZNCmRlYnVnZnMgZGlyZWN0b3J5IGFzIHdl
+bGwuCgo+Cj4gSWYgdGhpcyBpcyBpbmRlZWQgdGhlIGNhc2UsIHRoZW4gSSBkb24ndCB0aGluayB0
+aGUgY3VycmVudCBjb2RlIHN1cHBvcnRzCj4gdGhpcyBpZiBRRU1VIHdhcyBldmVyIGNoYW5nZWQg
+dG8gY3JlYXRlIHRoZSBWTSB3aXRoIGEgZGlmZmVyZW50IHRocmVhZAo+IHRoYW4gdGhlIHRnbC4K
+Pgo+IFRoYXQgYmVpbmcgc2FpZCwgSSdtIHR5cGljYWxseSB3cm9uZyB3aGVuIEkgdGFsayBhYm91
+dCB1c2Vyc3BhY2UuCj4KPiAtQ2hyaXN0b2ZmZXIKPiBfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwo+IGt2bWFybSBtYWlsaW5nIGxpc3QKPiBrdm1hcm1AbGlz
+dHMuY3MuY29sdW1iaWEuZWR1Cj4gaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1h
+bi9saXN0aW5mby9rdm1hcm0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
+Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
