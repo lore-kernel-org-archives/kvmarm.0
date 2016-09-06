@@ -1,73 +1,145 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 7/7] ARM: KVM: Unlock vgic-v3 support
-Date: Tue, 6 Sep 2016 18:55:27 +0200
-Message-ID: <20160906165527.GG23592@cbox>
-References: <1471344418-19568-1-git-send-email-vladimir.murzin@arm.com>
- <1471344418-19568-8-git-send-email-vladimir.murzin@arm.com>
- <20160905112927.GL26366@cbox> <57CEC344.7030706@arm.com>
+Subject: Re: [RFC v2 PATCH 2/7] KVM: Track the pid of the VM process
+Date: Tue, 6 Sep 2016 18:57:49 +0200
+Message-ID: <20160906165749.GH23592@cbox>
+References: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
+ <1473093097-30932-3-git-send-email-punit.agrawal@arm.com>
+ <20160906062252.GA30513@cbox>
+ <87poohjqzk.fsf@e105922-lin.cambridge.arm.com>
+ <20160906102542.GG30513@cbox>
+ <877fapjng0.fsf@e105922-lin.cambridge.arm.com>
+ <20160906112203.GO30513@cbox>
+ <87poohhx3q.fsf@e105922-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E97840B58
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:44:35 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qPNFc4IJgLkE for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 12:44:34 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C9E4407AD
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:44:33 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id b187so74711155wme.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2016 09:52:58 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <57CEC344.7030706@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <87poohhx3q.fsf@e105922-lin.cambridge.arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Punit Agrawal <punit.agrawal@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 06, 2016 at 02:23:16PM +0100, Vladimir Murzin wrote:
+On Tue, Sep 06, 2016 at 04:22:17PM +0100, Punit Agrawal wrote:
+> Christoffer Dall <christoffer.dall@linaro.org> writes:
 > 
-> Sorry, missed this one
+> > On Tue, Sep 06, 2016 at 12:07:59PM +0100, Punit Agrawal wrote:
+> >> Christoffer Dall <christoffer.dall@linaro.org> writes:
+> >> 
+> >> > On Tue, Sep 06, 2016 at 10:51:27AM +0100, Punit Agrawal wrote:
+> >> >> Hi Christoffer,
+> >> >> 
+> >> >> Christoffer Dall <christoffer.dall@linaro.org> writes:
+> >> >> 
+> >> >> > On Mon, Sep 05, 2016 at 05:31:32PM +0100, Punit Agrawal wrote:
+> >> >> >> Userspace tools such as perf can be used to profile individual
+> >> >> >> processes.
+> >> >> >> 
+> >> >> >> Track the PID of the virtual machine process to match profiling requests
+> >> >> >> targeted at it. This can be used to take appropriate action to enable
+> >> >> >> the requested profiling operations for the VMs of interest.
+> >> >> >> 
+> >> >> >> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> >> >> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >> >> >> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> >> >> >> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> >> >> >> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> >> >> >> ---
+> >> >> >>  include/linux/kvm_host.h | 1 +
+> >> >> >>  virt/kvm/kvm_main.c      | 2 ++
+> >> >> >>  2 files changed, 3 insertions(+)
+> >> >> >> 
+> >> >> >> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> >> >> >> index 9c28b4d..7c42c94 100644
+> >> >> >> --- a/include/linux/kvm_host.h
+> >> >> >> +++ b/include/linux/kvm_host.h
+> >> >> >> @@ -374,6 +374,7 @@ struct kvm_memslots {
+> >> >> >>  struct kvm {
+> >> >> >>  	spinlock_t mmu_lock;
+> >> >> >>  	struct mutex slots_lock;
+> >> >> >> +	struct pid *pid;
+> >> >> >>  	struct mm_struct *mm; /* userspace tied to this vm */
+> >> >> >>  	struct kvm_memslots *memslots[KVM_ADDRESS_SPACE_NUM];
+> >> >> >>  	struct srcu_struct srcu;
+> >> >> >> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> >> >> >> index 1950782..ab2535a 100644
+> >> >> >> --- a/virt/kvm/kvm_main.c
+> >> >> >> +++ b/virt/kvm/kvm_main.c
+> >> >> >> @@ -613,6 +613,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
+> >> >> >>  	spin_lock_init(&kvm->mmu_lock);
+> >> >> >>  	atomic_inc(&current->mm->mm_count);
+> >> >> >>  	kvm->mm = current->mm;
+> >> >> >> +	kvm->pid = get_task_pid(current, PIDTYPE_PID);
+> >> >> >
+> >> >> > How dooes this deal with threading?  Is the idea that the user by
+> >> >> > specifying the main thread's pid will enable trapping for all vcpu
+> >> >> > threads belonging to that VM?
+> >> >> 
+> >> >> Yes that's correct - specifying the main thread PID will enable trapping
+> >> >> for the VM (all vcpus).
+> >> >> 
+> >> >> I am happy to move to a more suitable identifier if available.
+> >> >> 
+> >> >
+> >> > What is the 'main thread' ?
+> >> >
+> >> > Does something mandate that the VM is created by the thread group
+> >> > leader?  If not, is it not a bit strange from a user perspective, that
+> >> > you have to find the specific subthread pid that created the vm to
+> >> > enable this tracing for all vcpu threads and that the tgid doesn't work
+> >> > in this case?
+> >> 
+> >> Let me correct my terminology usage - the value recorded above (and used
+> >> to identify the VM) should be the tgid. It is confusing because 'ps'
+> >> reports it as pid.
+> >> 
+> >> I picked the value as existing KVM code already uses the PID of the
+> >> creating task (see kvm_create_vm_debugfs) to export VM statistics in
+> >> debugfs.
+> >> 
+> >> If I've got this wrong, then kvm_create_vm_debugfs also likely needs an
+> >> update.
+> >> 
+> >> What do you think?
+> >> 
+> > When you do get_task_pid(current, PIDTYPE_PID) it actually gets the
+> > kernel view of a PID which is the thead-id from userspace's point of
+> > view, right?
 > 
-> On 05/09/16 12:29, Christoffer Dall wrote:
-> >>  
-> >> > +static bool __hyp_text __has_useable_gicv3_cpuif(void)
-> >> > +{
-> >> > +	if (IS_ENABLED(CONFIG_ARM_GIC_V3) && (read_sysreg(ID_PFR1) >> 28))
-> > Do we have a define for bit 28 we could use?
-> 
-> I'll check it.
-> 
-> > 
-> > Does this actually work on all v7 boards?  The v7 ARM ARM seems to state
-> > that this bitfield is Reserved, UNK.  Does that somehow mean 'is going
-> > to be zero'?
-> 
-> It is how v7ARM ARM I have defines UNK
-> 
-> An abbreviation indicating that software must treat a field as
-> containing an UNKNOWN value. Hardware must implement the bit as read as
-> 0, or all 0s for a bit field. Software must not rely on the field
-> reading as zero.
-> 
-> It seems goes under 'is going to be zero' case, no?
-> 
-The last sentence is disturbing to me, and feels slightly contradicting
-itself.  Reading the UNKNOWN description doesn't help much either.
+> That makes sense. It seems to works here because the pid of the first
+> task is also the tgid of the group. And I reckon it's the same
+> assumption being made with debugfs code (more below).
 
-Perhaps you can ask around internally and figure out what the precise
-answer to this is?
+That is probably the implementation of all QEMU versions and kvmtool
+versions out there.
 
-Thanks,
+> 
+> I've changed the first argument of the call to get_task_pid to
+> current->group_leader.
+> 
+> >
+> > I don't see why this has to be the same as the debugfs code, as there it
+> > makes potentially more sense to thread-specific, but for your case, are
+> > you not targeting the behavior that a user can do "ps aux | grep qemu"
+> > or whatever, and then set tracing for the reported PID (which is
+> > actually a tgid)?
+> 
+> The debugfs stats are not thread (vcpu) specific but for the VM.
+> 
+> Both values, debugfs and here, are being used to represent the VM to the
+> user. A mismatch in these identifiers will be very confusing.
+> 
+> If you agree, I can separately send a patch to address this for VM
+> debugfs directory as well.
+> 
+
+I don't know how the debugfs stuff is used or was intended, so I really
+can't speak for that.  It seems less weird to me with debugfs, because I
+imagine it can be used by simply looking at what exists in the debugfs
+directory and mapping that to a VM.
+
+In your case, there's a clear expectation from the user that using the
+tgid should cover this VM, and it will be weird if that's not the case.
+
 -Christoffer
