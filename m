@@ -1,28 +1,24 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [RFC v2 PATCH 7/7] arm64: KVM: Enable selective trapping of TLB
- instructions
-Date: Tue, 06 Sep 2016 12:33:29 +0100
-Message-ID: <871t0xjm9i.fsf@e105922-lin.cambridge.arm.com>
-References: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
- <1473093097-30932-8-git-send-email-punit.agrawal@arm.com>
- <20160906102404.GF30513@cbox>
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: Re: [PATCH v2 0/7] ARM: KVM: Support for vgic-v3
+Date: Tue, 6 Sep 2016 13:32:53 +0100
+Message-ID: <57CEB775.5060209@arm.com>
+References: <1471344418-19568-1-git-send-email-vladimir.murzin@arm.com>
+ <20160905112853.GF26366@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B6F8A49B54
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 07:25:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBAB149B56
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 08:24:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fiiEXuEcsmSY for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 07:25:11 -0400 (EDT)
-Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
- [217.140.96.140])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4B1F49B46
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 07:25:11 -0400 (EDT)
-In-Reply-To: <20160906102404.GF30513@cbox> (Christoffer Dall's message of
- "Tue, 6 Sep 2016 12:24:04 +0200")
+ with ESMTP id W188ssZc2koh for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 08:24:44 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C91A349B4A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 08:24:44 -0400 (EDT)
+In-Reply-To: <20160905112853.GF26366@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,97 +29,22 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Christoffer Dall <christoffer.dall@linaro.org> writes:
+On 05/09/16 12:28, Christoffer Dall wrote:
+> On Tue, Aug 16, 2016 at 11:46:51AM +0100, Vladimir Murzin wrote:
+>> Hi,
+>>
+>> This is an attempt to make use vgic-v3 under arch/arm since save-restore
+>> functionality got re-written in C and can be shared between arm/arm64
+>> like it has already been done for vgic-v2 and timer.
+>>
+>> With this patches I'm able to get 32 core ARMv7 guest boot:
+> 
+> Is it really an ARMv7 guest or an AArch32 ARMv8 guest?
+> 
 
-> On Mon, Sep 05, 2016 at 05:31:37PM +0100, Punit Agrawal wrote:
->> The TTLB bit of Hypervisor Control Register (HCR_EL2) controls the
->> trapping of guest TLB maintenance instructions. Taking the trap requires
->> a switch to the hypervisor and is an expensive operation.
->> 
->> Enable selective trapping of guest TLB instructions when the associated
->> perf trace event is enabled for a specific virtual machine.
->> 
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@linaro.org>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/kvm/perf_trace.c | 32 ++++++++++++++++++++++++++++++++
->>  1 file changed, 32 insertions(+)
->> 
->> diff --git a/arch/arm64/kvm/perf_trace.c b/arch/arm64/kvm/perf_trace.c
->> index 8bacd18..f26da1d 100644
->> --- a/arch/arm64/kvm/perf_trace.c
->> +++ b/arch/arm64/kvm/perf_trace.c
->> @@ -17,6 +17,8 @@
->>  #include <linux/kvm_host.h>
->>  #include <linux/trace_events.h>
->>  
->> +#include <asm/kvm_emulate.h>
->> +
->>  typedef int (*perf_trace_callback_fn)(struct kvm *kvm, bool enable);
->>  
->>  struct kvm_trace_hook {
->> @@ -24,7 +26,37 @@ struct kvm_trace_hook {
->>  	perf_trace_callback_fn setup_fn;
->>  };
->>  
->> +static int tlb_invalidate_trap(struct kvm *kvm, bool enable)
->> +{
->> +	int i;
->> +	struct kvm_vcpu *vcpu;
->> +
->> +	/*
->> +	 * Halt the VM to ensure atomic update across all vcpus (this
->> +	 * avoids racy behaviour against other modifications of
->> +	 * HCR_EL2 such as kvm_toggle_cache/kvm_set_way_flush).
->> +	 */
->> +	kvm_arm_halt_guest(kvm);
->> +	kvm_for_each_vcpu(i, vcpu, kvm) {
->> +		unsigned long hcr = vcpu_get_hcr(vcpu);
->> +
->> +		if (enable)
->> +			hcr |= HCR_TTLB;
->> +		else
->> +			hcr &= ~HCR_TTLB;
->> +
->> +		vcpu_set_hcr(vcpu, hcr);
->> +	}
->> +	kvm_arm_resume_guest(kvm);
->> +
->> +	return 0;
->> +}
->> +
->>  static struct kvm_trace_hook trace_hook[] = {
->> +	{
->> +		.key = "kvm_tlb_invalidate",
->
-> is this key defined elsewhere?  If not, I think the name is ambiguous,
-> because it's unclear if this means 'kvm the subsystem' or 'a kvm guest',
-> by looking purely at the string.
+It is an AArch32 ARMv8 guest.
 
-The key is the name of the tracepoint that the callback is executed
-against. Here it is the tracepoint defined in Patch 6/7.
-
-I've now added a comment to the definition of "struct kvm_trace_hook" to
-explain what the key is.
-
->
->> +		.setup_fn = tlb_invalidate_trap,
->> +	},
->>  	{ },
->>  };
->>  
->> -- 
->> 2.8.1
->> 
->
-> Otherwise looks ok to me.
->
-> -Christoffer
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Vladimir
