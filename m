@@ -1,25 +1,21 @@
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: Re: [PATCH v2 4/7] ARM: update MPIDR accessors macro
-Date: Tue, 6 Sep 2016 13:42:18 +0100
-Message-ID: <57CEB9AA.6080109@arm.com>
-References: <1471344418-19568-1-git-send-email-vladimir.murzin@arm.com>
- <1471344418-19568-5-git-send-email-vladimir.murzin@arm.com>
- <20160905112909.GI26366@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 00/19] Handle guest-generated SErrors/Aborts
+Date: Tue,  6 Sep 2016 14:01:58 +0100
+Message-ID: <1473166937-15271-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C5C049B4E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 08:33:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7756949B5B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 08:54:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3oXuy-WAsJgM for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 08:33:56 -0400 (EDT)
+ with ESMTP id FJtD9KCWbRV2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 08:54:00 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84BF449B4A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 08:33:56 -0400 (EDT)
-In-Reply-To: <20160905112909.GI26366@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AA6040B40
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 08:53:59 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,57 +26,79 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/09/16 12:29, Christoffer Dall wrote:
-> The title of this patch is quite generic, especially the 'update'.
-> Perhaps say: 
-> 
-> "ARM: Change MPIDR_AFFINITY_LEVEL to ignore Aff3"
-> 
+A little known "feature" of giving guest access to real memory mapped
+HW is that it could trigger asynchronous aborts (SError on ARMv8) if
+the guest accesses it in a non-conventional way (and depending on how
+HW and firmware have been integrated). So far, KVM lacks any support
+to handle this gracefully.
 
-Fixed.
+This series introduces a set of mechanisms to catch such a fault and
+deliver a vSError (or Virtual Abort for 32bit) to the offending vcpu.
 
-> On Tue, Aug 16, 2016 at 11:46:55AM +0100, Vladimir Murzin wrote:
->> vgic-v3 driver queries CPU affinity level up to Aff3, which is valid for arm64.
->> However, for arm up to Aff2 levels are supported, so querying for 3rd level
->> ends with upper bits of MPIDR are treated as valid affinity level which
->> is not true. So, report zero for any affinity level above 2.
->>
->> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
->> ---
->>  arch/arm/include/asm/cputype.h |    3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm/include/asm/cputype.h b/arch/arm/include/asm/cputype.h
->> index 1ee94c7..96cef49 100644
->> --- a/arch/arm/include/asm/cputype.h
->> +++ b/arch/arm/include/asm/cputype.h
->> @@ -55,9 +55,10 @@
->>  
->>  #define MPIDR_LEVEL_BITS 8
->>  #define MPIDR_LEVEL_MASK ((1 << MPIDR_LEVEL_BITS) - 1)
->> +#define MPIDR_LEVEL_SHIFT(level) (MPIDR_LEVEL_BITS * level)
->>  
->>  #define MPIDR_AFFINITY_LEVEL(mpidr, level) \
->> -	((mpidr >> (MPIDR_LEVEL_BITS * level)) & MPIDR_LEVEL_MASK)
->> +	((level < 3) ? ((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK) : 0)
-> 
-> Instead of using a conditional here, you could just apply the
-> MPIDR_HWID_BITMASK to the mpidr argument instead.
-> 
+These aborts can either trigger at EL1 (whilst the guest is running),
+or at EL2 (during the handling of an exit). The first case is pretty
+easy to handle (use the ad-hoc vectors on arm64, or decode the EA bit
+on arm), but the second one is a bit more fiddly, as we need to ensure
+that the exception is pending by the time we unmask it. This is
+achived by using some heavy DSBs on the hot path, with the following
+caveats:
 
-Fixed.
+- I've only been able to trigger the EL2 handling on A57 (Seatle,
+  Juno).
+- I've measured a 40/50 cycles hit on Juno (A57), but I haven't
+  measured the impact on bigger systems
 
-Thanks
-Vladimir
+The last patch of this series adds a missing feature to the
+GICV-proxying series, delivering a vSError to a guest that performed
+an illegal access to the GIC.
 
->>  
->>  #define ARM_CPU_IMP_ARM			0x41
->>  #define ARM_CPU_IMP_INTEL		0x69
->> -- 
->> 1.7.9.5
->>
-> 
-> 
+Patches on top of current kvmarm/queue + the GICV przying series.
+
+Marc Zyngier (19):
+  arm64: KVM: Rename HCR_VA to HCR_VSE
+  arm64: KVM: Preserve pending vSError in world switch
+  arm64: KVM: Add Virtual Abort injection helper
+  arm64: KVM: Add exception code to report EL1 asynchronous aborts
+  arm64: KVM: Add EL1 async abort handler
+  arm64: KVM: Route asynchronous aborts
+  arm64: KVM: Allow an exit code to be tagged with an SError
+  arm64: KVM: Inject a Virtual SError if it was pending
+  arm64: KVM: Handle async aborts delivered while at EL2
+  arm: KVM: Preserve pending Virtual Abort in world switch
+  arm: KVM: Add Virtual Abort injection helper
+  arm: KVM: Add HYP async abort handler
+  arm: KVM: Allow an exit code to be tagged with a Virtual Abort
+  arm: KVM: Handle async aborts delivered while at HYP
+  arm: KVM: Inject a Virtual Abort if it was pending
+  arm: KVM: Drop unreachable HYP abort handlers
+  arm/arm64: KVM: Inject virtual abort when guest exits on external
+    abort
+  arm/arm64: KVM: Remove external abort test from MMIO handling
+  arm64: KVM: Inject a vSerror if detecting a bad GICV access at EL2
+
+ arch/arm/include/asm/kvm_asm.h       |  4 +++
+ arch/arm/include/asm/kvm_emulate.h   |  1 +
+ arch/arm/kvm/emulate.c               | 12 +++++++++
+ arch/arm/kvm/handle_exit.c           | 49 ++++++++++++++++--------------------
+ arch/arm/kvm/hyp/entry.S             | 31 +++++++++++++++++++++++
+ arch/arm/kvm/hyp/hyp-entry.S         | 16 +++++++++++-
+ arch/arm/kvm/hyp/switch.c            |  9 +++++++
+ arch/arm/kvm/mmio.c                  |  6 -----
+ arch/arm/kvm/mmu.c                   |  5 ++++
+ arch/arm64/include/asm/kvm_arm.h     |  4 +--
+ arch/arm64/include/asm/kvm_asm.h     |  9 +++++--
+ arch/arm64/include/asm/kvm_emulate.h |  1 +
+ arch/arm64/include/asm/kvm_hyp.h     |  2 +-
+ arch/arm64/kvm/handle_exit.c         | 23 +++++++++++++++++
+ arch/arm64/kvm/hyp/entry.S           | 33 +++++++++++++++++++++++-
+ arch/arm64/kvm/hyp/hyp-entry.S       | 36 ++++++++++++++++++++++----
+ arch/arm64/kvm/hyp/switch.c          | 33 +++++++++++++++++++++---
+ arch/arm64/kvm/inject_fault.c        | 12 +++++++++
+ virt/kvm/arm/hyp/vgic-v2-sr.c        | 21 ++++++++++++----
+ 19 files changed, 254 insertions(+), 53 deletions(-)
+
+-- 
+2.1.4
