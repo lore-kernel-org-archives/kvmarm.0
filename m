@@ -1,29 +1,33 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2] kvm: arm: Enforce some NS-SVC initialisation
-Date: Tue, 6 Sep 2016 18:59:15 +0200
-Message-ID: <CAMJs5B_jHSZ7KA1h_aCWfscQ3axpVi1MM58QwrugT0mjp3hx=g@mail.gmail.com>
-References: <5322cdb9cb397741d15b60c6693ad39dbf74b6d5.1469101945.git.robin.murphy@arm.com>
- <6d030bee2db08c2fe1b7569e692e8f66800b1e4c.1471369569.git.robin.murphy@arm.com>
- <20160817113249.GA5909@cbox> <20160906164145.GD23592@cbox>
- <8e0b62de-63dd-4635-14b3-a70726bc1798@arm.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [RFC v2 PATCH 2/7] KVM: Track the pid of the VM process
+Date: Tue, 06 Sep 2016 18:03:39 +0100
+Message-ID: <878tv5hses.fsf@e105922-lin.cambridge.arm.com>
+References: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
+ <1473093097-30932-3-git-send-email-punit.agrawal@arm.com>
+ <20160906062252.GA30513@cbox>
+ <87poohjqzk.fsf@e105922-lin.cambridge.arm.com>
+ <20160906102542.GG30513@cbox>
+ <877fapjng0.fsf@e105922-lin.cambridge.arm.com>
+ <20160906112203.GO30513@cbox>
+ <87poohhx3q.fsf@e105922-lin.cambridge.arm.com>
+ <20160906165749.GH23592@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 035B140BDA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:50:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14185407AD
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:55:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iarbKHuhDOi0 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 12:50:51 -0400 (EDT)
-Received: from mail-yw0-f179.google.com (mail-yw0-f179.google.com
- [209.85.161.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA630407AD
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:50:51 -0400 (EDT)
-Received: by mail-yw0-f179.google.com with SMTP id j1so42184155ywb.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2016 09:59:16 -0700 (PDT)
-In-Reply-To: <8e0b62de-63dd-4635-14b3-a70726bc1798@arm.com>
+ with ESMTP id dhjhZNBdqfnE for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 12:55:25 -0400 (EDT)
+Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
+ [217.140.96.140])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B35FE48531
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:55:25 -0400 (EDT)
+In-Reply-To: <20160906165749.GH23592@cbox> (Christoffer Dall's message of
+ "Tue, 6 Sep 2016 18:57:49 +0200")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,40 +37,110 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: "marc.zyngier@arm.com" <marc.zyngier@arm.com>, Russell King <linux@armlinux.org.uk>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 6, 2016 at 6:44 PM, Robin Murphy <robin.murphy@arm.com> wrote:
-> Hi Christoffer,
->
-> On 06/09/16 17:41, Christoffer Dall wrote:
->> On Wed, Aug 17, 2016 at 01:32:49PM +0200, Christoffer Dall wrote:
->>> Hi Russell,
->>>
->>> On Tue, Aug 16, 2016 at 06:49:18PM +0100, Robin Murphy wrote:
->>>> Since the non-secure copies of banked registers lack architecturally
->>>> defined reset values, there is no actual guarantee when entering in Hyp
->>>> from secure-only firmware that the Non-Secure PL1 state will look the
->>>> way that kernel entry (in particular the decompressor stub) expects.
->>>> So far, we've been getting away with it thanks to implementation details
->>>> of ARMv7 cores and/or bootloader behaviour, but for the sake of forwards
->>>> compatibility let's try to ensure that we have a minimally sane state
->>>> before dropping down into it.
->>>>
->>>> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
->>>
->>> Can we have your acked-by on this patch to merge it via the KVM tree or
->>> do you prefer merging this one directly yourself?
->>>
->> I have queued this via the KVM/ARM tree.  If you have any objections,
->> please let me know asap.
->
-> Ah, I should have replied on this thread - I put this one into Russell's
-> patch system the other week, and it's in -next already.
->
-> Sorry for the lack of communication,
-
-No worries, I removed it from the queue again.
-
--Christoffer
+Q2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPiB3cml0ZXM6Cgo+
+IE9uIFR1ZSwgU2VwIDA2LCAyMDE2IGF0IDA0OjIyOjE3UE0gKzAxMDAsIFB1bml0IEFncmF3YWwg
+d3JvdGU6Cj4+IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4g
+d3JpdGVzOgo+PiAKPj4gPiBPbiBUdWUsIFNlcCAwNiwgMjAxNiBhdCAxMjowNzo1OVBNICswMTAw
+LCBQdW5pdCBBZ3Jhd2FsIHdyb3RlOgo+PiA+PiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZl
+ci5kYWxsQGxpbmFyby5vcmc+IHdyaXRlczoKPj4gPj4gCj4+ID4+ID4gT24gVHVlLCBTZXAgMDYs
+IDIwMTYgYXQgMTA6NTE6MjdBTSArMDEwMCwgUHVuaXQgQWdyYXdhbCB3cm90ZToKPj4gPj4gPj4g
+SGkgQ2hyaXN0b2ZmZXIsCj4+ID4+ID4+IAo+PiA+PiA+PiBDaHJpc3RvZmZlciBEYWxsIDxjaHJp
+c3RvZmZlci5kYWxsQGxpbmFyby5vcmc+IHdyaXRlczoKPj4gPj4gPj4gCj4+ID4+ID4+ID4gT24g
+TW9uLCBTZXAgMDUsIDIwMTYgYXQgMDU6MzE6MzJQTSArMDEwMCwgUHVuaXQgQWdyYXdhbCB3cm90
+ZToKPj4gPj4gPj4gPj4gVXNlcnNwYWNlIHRvb2xzIHN1Y2ggYXMgcGVyZiBjYW4gYmUgdXNlZCB0
+byBwcm9maWxlIGluZGl2aWR1YWwKPj4gPj4gPj4gPj4gcHJvY2Vzc2VzLgo+PiA+PiA+PiA+PiAK
+Pj4gPj4gPj4gPj4gVHJhY2sgdGhlIFBJRCBvZiB0aGUgdmlydHVhbCBtYWNoaW5lIHByb2Nlc3Mg
+dG8gbWF0Y2ggcHJvZmlsaW5nIHJlcXVlc3RzCj4+ID4+ID4+ID4+IHRhcmdldGVkIGF0IGl0LiBU
+aGlzIGNhbiBiZSB1c2VkIHRvIHRha2UgYXBwcm9wcmlhdGUgYWN0aW9uIHRvIGVuYWJsZQo+PiA+
+PiA+PiA+PiB0aGUgcmVxdWVzdGVkIHByb2ZpbGluZyBvcGVyYXRpb25zIGZvciB0aGUgVk1zIG9m
+IGludGVyZXN0Lgo+PiA+PiA+PiA+PiAKPj4gPj4gPj4gPj4gU2lnbmVkLW9mZi1ieTogUHVuaXQg
+QWdyYXdhbCA8cHVuaXQuYWdyYXdhbEBhcm0uY29tPgo+PiA+PiA+PiA+PiBDYzogUGFvbG8gQm9u
+emluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KPj4gPj4gPj4gPj4gQ2M6ICJSYWRpbSBLcsSNbcOh
+xZkiIDxya3JjbWFyQHJlZGhhdC5jb20+Cj4+ID4+ID4+ID4+IENjOiBDaHJpc3RvZmZlciBEYWxs
+IDxjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc+Cj4+ID4+ID4+ID4+IENjOiBNYXJjIFp5bmdp
+ZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgo+PiA+PiA+PiA+PiAtLS0KPj4gPj4gPj4gPj4gIGlu
+Y2x1ZGUvbGludXgva3ZtX2hvc3QuaCB8IDEgKwo+PiA+PiA+PiA+PiAgdmlydC9rdm0va3ZtX21h
+aW4uYyAgICAgIHwgMiArKwo+PiA+PiA+PiA+PiAgMiBmaWxlcyBjaGFuZ2VkLCAzIGluc2VydGlv
+bnMoKykKPj4gPj4gPj4gPj4gCj4+ID4+ID4+ID4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4
+L2t2bV9ob3N0LmggYi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgKPj4gPj4gPj4gPj4gaW5kZXgg
+OWMyOGI0ZC4uN2M0MmM5NCAxMDA2NDQKPj4gPj4gPj4gPj4gLS0tIGEvaW5jbHVkZS9saW51eC9r
+dm1faG9zdC5oCj4+ID4+ID4+ID4+ICsrKyBiL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaAo+PiA+
+PiA+PiA+PiBAQCAtMzc0LDYgKzM3NCw3IEBAIHN0cnVjdCBrdm1fbWVtc2xvdHMgewo+PiA+PiA+
+PiA+PiAgc3RydWN0IGt2bSB7Cj4+ID4+ID4+ID4+ICAJc3BpbmxvY2tfdCBtbXVfbG9jazsKPj4g
+Pj4gPj4gPj4gIAlzdHJ1Y3QgbXV0ZXggc2xvdHNfbG9jazsKPj4gPj4gPj4gPj4gKwlzdHJ1Y3Qg
+cGlkICpwaWQ7Cj4+ID4+ID4+ID4+ICAJc3RydWN0IG1tX3N0cnVjdCAqbW07IC8qIHVzZXJzcGFj
+ZSB0aWVkIHRvIHRoaXMgdm0gKi8KPj4gPj4gPj4gPj4gIAlzdHJ1Y3Qga3ZtX21lbXNsb3RzICpt
+ZW1zbG90c1tLVk1fQUREUkVTU19TUEFDRV9OVU1dOwo+PiA+PiA+PiA+PiAgCXN0cnVjdCBzcmN1
+X3N0cnVjdCBzcmN1Owo+PiA+PiA+PiA+PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0va3ZtX21haW4u
+YyBiL3ZpcnQva3ZtL2t2bV9tYWluLmMKPj4gPj4gPj4gPj4gaW5kZXggMTk1MDc4Mi4uYWIyNTM1
+YSAxMDA2NDQKPj4gPj4gPj4gPj4gLS0tIGEvdmlydC9rdm0va3ZtX21haW4uYwo+PiA+PiA+PiA+
+PiArKysgYi92aXJ0L2t2bS9rdm1fbWFpbi5jCj4+ID4+ID4+ID4+IEBAIC02MTMsNiArNjEzLDcg
+QEAgc3RhdGljIHN0cnVjdCBrdm0gKmt2bV9jcmVhdGVfdm0odW5zaWduZWQgbG9uZyB0eXBlKQo+
+PiA+PiA+PiA+PiAgCXNwaW5fbG9ja19pbml0KCZrdm0tPm1tdV9sb2NrKTsKPj4gPj4gPj4gPj4g
+IAlhdG9taWNfaW5jKCZjdXJyZW50LT5tbS0+bW1fY291bnQpOwo+PiA+PiA+PiA+PiAgCWt2bS0+
+bW0gPSBjdXJyZW50LT5tbTsKPj4gPj4gPj4gPj4gKwlrdm0tPnBpZCA9IGdldF90YXNrX3BpZChj
+dXJyZW50LCBQSURUWVBFX1BJRCk7Cj4+ID4+ID4+ID4KPj4gPj4gPj4gPiBIb3cgZG9vZXMgdGhp
+cyBkZWFsIHdpdGggdGhyZWFkaW5nPyAgSXMgdGhlIGlkZWEgdGhhdCB0aGUgdXNlciBieQo+PiA+
+PiA+PiA+IHNwZWNpZnlpbmcgdGhlIG1haW4gdGhyZWFkJ3MgcGlkIHdpbGwgZW5hYmxlIHRyYXBw
+aW5nIGZvciBhbGwgdmNwdQo+PiA+PiA+PiA+IHRocmVhZHMgYmVsb25naW5nIHRvIHRoYXQgVk0/
+Cj4+ID4+ID4+IAo+PiA+PiA+PiBZZXMgdGhhdCdzIGNvcnJlY3QgLSBzcGVjaWZ5aW5nIHRoZSBt
+YWluIHRocmVhZCBQSUQgd2lsbCBlbmFibGUgdHJhcHBpbmcKPj4gPj4gPj4gZm9yIHRoZSBWTSAo
+YWxsIHZjcHVzKS4KPj4gPj4gPj4gCj4+ID4+ID4+IEkgYW0gaGFwcHkgdG8gbW92ZSB0byBhIG1v
+cmUgc3VpdGFibGUgaWRlbnRpZmllciBpZiBhdmFpbGFibGUuCj4+ID4+ID4+IAo+PiA+PiA+Cj4+
+ID4+ID4gV2hhdCBpcyB0aGUgJ21haW4gdGhyZWFkJyA/Cj4+ID4+ID4KPj4gPj4gPiBEb2VzIHNv
+bWV0aGluZyBtYW5kYXRlIHRoYXQgdGhlIFZNIGlzIGNyZWF0ZWQgYnkgdGhlIHRocmVhZCBncm91
+cAo+PiA+PiA+IGxlYWRlcj8gIElmIG5vdCwgaXMgaXQgbm90IGEgYml0IHN0cmFuZ2UgZnJvbSBh
+IHVzZXIgcGVyc3BlY3RpdmUsIHRoYXQKPj4gPj4gPiB5b3UgaGF2ZSB0byBmaW5kIHRoZSBzcGVj
+aWZpYyBzdWJ0aHJlYWQgcGlkIHRoYXQgY3JlYXRlZCB0aGUgdm0gdG8KPj4gPj4gPiBlbmFibGUg
+dGhpcyB0cmFjaW5nIGZvciBhbGwgdmNwdSB0aHJlYWRzIGFuZCB0aGF0IHRoZSB0Z2lkIGRvZXNu
+J3Qgd29yawo+PiA+PiA+IGluIHRoaXMgY2FzZT8KPj4gPj4gCj4+ID4+IExldCBtZSBjb3JyZWN0
+IG15IHRlcm1pbm9sb2d5IHVzYWdlIC0gdGhlIHZhbHVlIHJlY29yZGVkIGFib3ZlIChhbmQgdXNl
+ZAo+PiA+PiB0byBpZGVudGlmeSB0aGUgVk0pIHNob3VsZCBiZSB0aGUgdGdpZC4gSXQgaXMgY29u
+ZnVzaW5nIGJlY2F1c2UgJ3BzJwo+PiA+PiByZXBvcnRzIGl0IGFzIHBpZC4KPj4gPj4gCj4+ID4+
+IEkgcGlja2VkIHRoZSB2YWx1ZSBhcyBleGlzdGluZyBLVk0gY29kZSBhbHJlYWR5IHVzZXMgdGhl
+IFBJRCBvZiB0aGUKPj4gPj4gY3JlYXRpbmcgdGFzayAoc2VlIGt2bV9jcmVhdGVfdm1fZGVidWdm
+cykgdG8gZXhwb3J0IFZNIHN0YXRpc3RpY3MgaW4KPj4gPj4gZGVidWdmcy4KPj4gPj4gCj4+ID4+
+IElmIEkndmUgZ290IHRoaXMgd3JvbmcsIHRoZW4ga3ZtX2NyZWF0ZV92bV9kZWJ1Z2ZzIGFsc28g
+bGlrZWx5IG5lZWRzIGFuCj4+ID4+IHVwZGF0ZS4KPj4gPj4gCj4+ID4+IFdoYXQgZG8geW91IHRo
+aW5rPwo+PiA+PiAKPj4gPiBXaGVuIHlvdSBkbyBnZXRfdGFza19waWQoY3VycmVudCwgUElEVFlQ
+RV9QSUQpIGl0IGFjdHVhbGx5IGdldHMgdGhlCj4+ID4ga2VybmVsIHZpZXcgb2YgYSBQSUQgd2hp
+Y2ggaXMgdGhlIHRoZWFkLWlkIGZyb20gdXNlcnNwYWNlJ3MgcG9pbnQgb2YKPj4gPiB2aWV3LCBy
+aWdodD8KPj4gCj4+IFRoYXQgbWFrZXMgc2Vuc2UuIEl0IHNlZW1zIHRvIHdvcmtzIGhlcmUgYmVj
+YXVzZSB0aGUgcGlkIG9mIHRoZSBmaXJzdAo+PiB0YXNrIGlzIGFsc28gdGhlIHRnaWQgb2YgdGhl
+IGdyb3VwLiBBbmQgSSByZWNrb24gaXQncyB0aGUgc2FtZQo+PiBhc3N1bXB0aW9uIGJlaW5nIG1h
+ZGUgd2l0aCBkZWJ1Z2ZzIGNvZGUgKG1vcmUgYmVsb3cpLgo+Cj4gVGhhdCBpcyBwcm9iYWJseSB0
+aGUgaW1wbGVtZW50YXRpb24gb2YgYWxsIFFFTVUgdmVyc2lvbnMgYW5kIGt2bXRvb2wKPiB2ZXJz
+aW9ucyBvdXQgdGhlcmUuCj4KPj4gCj4+IEkndmUgY2hhbmdlZCB0aGUgZmlyc3QgYXJndW1lbnQg
+b2YgdGhlIGNhbGwgdG8gZ2V0X3Rhc2tfcGlkIHRvCj4+IGN1cnJlbnQtPmdyb3VwX2xlYWRlci4K
+Pj4gCj4+ID4KPj4gPiBJIGRvbid0IHNlZSB3aHkgdGhpcyBoYXMgdG8gYmUgdGhlIHNhbWUgYXMg
+dGhlIGRlYnVnZnMgY29kZSwgYXMgdGhlcmUgaXQKPj4gPiBtYWtlcyBwb3RlbnRpYWxseSBtb3Jl
+IHNlbnNlIHRvIHRocmVhZC1zcGVjaWZpYywgYnV0IGZvciB5b3VyIGNhc2UsIGFyZQo+PiA+IHlv
+dSBub3QgdGFyZ2V0aW5nIHRoZSBiZWhhdmlvciB0aGF0IGEgdXNlciBjYW4gZG8gInBzIGF1eCB8
+IGdyZXAgcWVtdSIKPj4gPiBvciB3aGF0ZXZlciwgYW5kIHRoZW4gc2V0IHRyYWNpbmcgZm9yIHRo
+ZSByZXBvcnRlZCBQSUQgKHdoaWNoIGlzCj4+ID4gYWN0dWFsbHkgYSB0Z2lkKT8KPj4gCj4+IFRo
+ZSBkZWJ1Z2ZzIHN0YXRzIGFyZSBub3QgdGhyZWFkICh2Y3B1KSBzcGVjaWZpYyBidXQgZm9yIHRo
+ZSBWTS4KPj4gCj4+IEJvdGggdmFsdWVzLCBkZWJ1Z2ZzIGFuZCBoZXJlLCBhcmUgYmVpbmcgdXNl
+ZCB0byByZXByZXNlbnQgdGhlIFZNIHRvIHRoZQo+PiB1c2VyLiBBIG1pc21hdGNoIGluIHRoZXNl
+IGlkZW50aWZpZXJzIHdpbGwgYmUgdmVyeSBjb25mdXNpbmcuCj4+IAo+PiBJZiB5b3UgYWdyZWUs
+IEkgY2FuIHNlcGFyYXRlbHkgc2VuZCBhIHBhdGNoIHRvIGFkZHJlc3MgdGhpcyBmb3IgVk0KPj4g
+ZGVidWdmcyBkaXJlY3RvcnkgYXMgd2VsbC4KPj4gCj4KPiBJIGRvbid0IGtub3cgaG93IHRoZSBk
+ZWJ1Z2ZzIHN0dWZmIGlzIHVzZWQgb3Igd2FzIGludGVuZGVkLCBzbyBJIHJlYWxseQo+IGNhbid0
+IHNwZWFrIGZvciB0aGF0LiAgSXQgc2VlbXMgbGVzcyB3ZWlyZCB0byBtZSB3aXRoIGRlYnVnZnMs
+IGJlY2F1c2UgSQo+IGltYWdpbmUgaXQgY2FuIGJlIHVzZWQgYnkgc2ltcGx5IGxvb2tpbmcgYXQg
+d2hhdCBleGlzdHMgaW4gdGhlIGRlYnVnZnMKPiBkaXJlY3RvcnkgYW5kIG1hcHBpbmcgdGhhdCB0
+byBhIFZNLgoKT2ssIEknbGwgbGV0IGRlYnVnZnMgc3R1ZmYgYmUgYXMgaXMgdGhlbi4KCj4KPiBJ
+biB5b3VyIGNhc2UsIHRoZXJlJ3MgYSBjbGVhciBleHBlY3RhdGlvbiBmcm9tIHRoZSB1c2VyIHRo
+YXQgdXNpbmcgdGhlCj4gdGdpZCBzaG91bGQgY292ZXIgdGhpcyBWTSwgYW5kIGl0IHdpbGwgYmUg
+d2VpcmQgaWYgdGhhdCdzIG5vdCB0aGUKPiBjYXNlLgoKUmlnaHQuIFN3aXRjaGluZyBvdmVyIHRv
+IGN1cnJlbnQtPmdyb3VwX2xlYWRlciBzaG91bGQgYXZlcnQgcHJvYmxlbXMgaWYKdXNlcnNwYWNl
+IHRvb2xzIGRvIHRoaW5ncyBkaWZmZXJlbnRseS4KClRoYW5rcywKUHVuaXQKCj4KPiAtQ2hyaXN0
+b2ZmZXIKPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+
+IGt2bWFybSBtYWlsaW5nIGxpc3QKPiBrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cj4gaHR0
+cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0KX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcg
+bGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1i
+aWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
