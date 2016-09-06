@@ -1,28 +1,30 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [RFC v2 PATCH 3/7] KVM: arm/arm64: Register perf trace event
- notifier
-Date: Tue, 06 Sep 2016 17:10:39 +0100
-Message-ID: <87d1khhuv4.fsf@e105922-lin.cambridge.arm.com>
-References: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
- <1473093097-30932-4-git-send-email-punit.agrawal@arm.com>
- <20160906063620.GB30513@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 3/7] KVM: arm: vgic-new: improve compatibility with
+ 32-bit
+Date: Tue, 6 Sep 2016 18:31:08 +0200
+Message-ID: <20160906163108.GB23592@cbox>
+References: <1471344418-19568-1-git-send-email-vladimir.murzin@arm.com>
+ <1471344418-19568-4-git-send-email-vladimir.murzin@arm.com>
+ <20160905112904.GH26366@cbox> <57CEB981.6060600@arm.com>
+ <20160906132219.GA23592@cbox> <57CECA79.3040204@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BCBD49AF5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:02:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FA2040F9B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:20:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0adrq5Gi3V2e for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 12:02:36 -0400 (EDT)
-Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
- [217.140.96.140])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BDAF340B40
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:02:35 -0400 (EDT)
-In-Reply-To: <20160906063620.GB30513@cbox> (Christoffer Dall's message of
- "Tue, 6 Sep 2016 08:36:20 +0200")
+ with ESMTP id V-2DaLjE+TS2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 12:20:15 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE50D40B40
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:20:15 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id 1so199988435wmz.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2016 09:28:40 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <57CECA79.3040204@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,280 +34,123 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Christoffer Dall <christoffer.dall@linaro.org> writes:
+On Tue, Sep 06, 2016 at 02:54:01PM +0100, Vladimir Murzin wrote:
+> On 06/09/16 14:22, Christoffer Dall wrote:
+> > On Tue, Sep 06, 2016 at 01:41:37PM +0100, Vladimir Murzin wrote:
+> >> Hi Christoffer,
+> >>
+> >> On 05/09/16 12:29, Christoffer Dall wrote:
+> >>> Hi Vladimir,
+> >>>
+> >>> I think commit title is too vague, can you be more specific?
+> >>>
+> >>
+> >> KVM: arm: vgic-new: make extract_bytes to always work on 64-bit data
+> >>
+> >> is it better?
+> > 
+> > I would suggest:
+> > 
+> > KVM: arm: vgic: Support 64-bit data manipulation on 32-bit host systems
+> > 
+> >>
+> >>> On Tue, Aug 16, 2016 at 11:46:54AM +0100, Vladimir Murzin wrote:
+> >>>> We have couple of 64-bit register defined in GICv3 architecture, so
+> >>>
+> >>> 'a couple',  'registers' (plural)
+> >>>
+> >>>> "unsigned long" kind of accessors wouldn't work for 32-bit. However,
+> >>>
+> >>> 'wouldn't work for 32-bit' is kind of generic as well.  Perhaps you mean
+> >>> that unsigned long accesses to these registers will only access a single
+> >>> 32-bit work of that register.
+> >>>
+> >>>> these registers can't be access as 64-bit in a one go if we run 32-bit
+> >>>
+> >>> 'accessed', 's/in one go/with a single instruction/' ?
+> >>>
+> >>> 'a 32-bit host'
+> >>>
+> >>>> host simply because KVM doesn't support multiple load/store on MMIO
+> >>>
+> >>> by 'multiple load/store' you mean the 'load/store multiple' instructions
+> >>> specifically, right?  Not a sequence of multiple loads and stores.  I
+> >>> think you should be more specific here as well, for example, I think
+> >>> ldrd and strd are problematic as well.
+> >>>
+> >>>> space.
+> >>>>
+> >>>> It means that 32-bit guest access these registers in 32-bit chunks, so
+> >>>
+> >>> 'a 32-bit guest', 'accesses'
+> >>>
+> >>
+> >> all suggestions you've made above are true. I'll rework commit message
+> >> to be more precise.
+> >>
+> > 
+> > Thanks!
+> > 
+> >>>> the only thing we need to do is to ensure that extract_bytes() always
+> >>>> takes 64-bit data.
+> >>>>
+> >>>> Since we are here fix couple of other width related issues by using
+> >>>> ULL variants over UL.
+> >>>>
+> >>>> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> >>>> ---
+> >>>>  virt/kvm/arm/vgic/vgic-mmio-v3.c |    6 +++---
+> >>>>  virt/kvm/arm/vgic/vgic-mmio.h    |    2 +-
+> >>>>  2 files changed, 4 insertions(+), 4 deletions(-)
+> >>>>
+> >>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> >>>> index ff668e0..cc20b60 100644
+> >>>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> >>>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> >>>> @@ -23,7 +23,7 @@
+> >>>>  #include "vgic-mmio.h"
+> >>>>  
+> >>>>  /* extract @num bytes at @offset bytes offset in data */
+> >>>> -unsigned long extract_bytes(unsigned long data, unsigned int offset,
+> >>>> +unsigned long extract_bytes(u64 data, unsigned int offset,
+> >>>>  			    unsigned int num)
+> >>>>  {
+> >>>>  	return (data >> (offset * 8)) & GENMASK_ULL(num * 8 - 1, 0);
+> >>>> @@ -179,7 +179,7 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
+> >>>>  	int target_vcpu_id = vcpu->vcpu_id;
+> >>>>  	u64 value;
+> >>>>  
+> >>>> -	value = (mpidr & GENMASK(23, 0)) << 32;
+> >>>> +	value = (mpidr & GENMASK_ULL(23, 0)) << 32;
+> >>>
+> >>> why does this make a difference when mpidr is an unsigned long?
+> >>
+> >> because we access a little bit further than unsigned long can accommodate
+> >>
+> >>   CC      arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.o
+> >> arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.c: In function
+> >> 'vgic_mmio_read_v3r_typer':
+> >> arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.c:184:35: warning:
+> >> left shift count >= width of type [-Wshift-count-overflow]
+> >>   value = (mpidr & GENMASK(23, 0)) << 32;
+> >>                                    ^
+> >>
+> >> I can include this warning in commit message or maybe you want a
+> >> separate patch?
+> >>
+> > My point was that the code doesn't really make sense when compiled on a
+> > 32-bit platform without also modifing the type for the mpidr variable.
+> > Am I missing something?
+> 
+> I've not seen any difference in generated code, but for consistency I'll
+> update mpidr variable to u64.
+> 
 
-> On Mon, Sep 05, 2016 at 05:31:33PM +0100, Punit Agrawal wrote:
->> Register a notifier to track state changes of perf trace events.
->> 
->> The notifier will enable taking appropriate action for trace events
->> targeting VM.
->> 
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@linaro.org>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->
-> Overall this looks reasonable, but I'm wondering if most if this logic
-> should really go in virt/kvm/perf_trace.c and call into arch-specific
-> hooks, similar to the way it works for preempt notifiers.
->
-> On the other hand, if arm/arm64 are the only two architectures that are
-> going to use this, creating stubs for the other architectures could be a
-> bit tedious.
+That could be because you need to update kvm_vcpu_get_mpidr_aff() to
+return a u64 as well.
 
-If the series looks to be headed in the right direction, I'll be adding
-support for 32bit ARM host as well.
-
-Most of the code here can be shared between arm and arm64. At that
-point, it might be worth moving the logic here to a commong location
-with the architecture code responsible for registering it's
-kvm_trace_hooks as part of the initialisation (or something along those
-lines).
-
-I'll wait a bit for maintainer feedback on Patch 1 before re-spinning the
-series. Patch 1 ultimately decides what the user facing interface for
-this functionality looks like.
-
-Thanks for your feedback on the series.
-
-Punit
-
->
-> Thanks,
-> -Christoffer
->
->> ---
->>  arch/arm/include/asm/kvm_host.h   |   3 +
->>  arch/arm/kvm/arm.c                |   2 +
->>  arch/arm64/include/asm/kvm_host.h |   8 +++
->>  arch/arm64/kvm/Kconfig            |   4 ++
->>  arch/arm64/kvm/Makefile           |   1 +
->>  arch/arm64/kvm/perf_trace.c       | 122 ++++++++++++++++++++++++++++++++++++++
->>  6 files changed, 140 insertions(+)
->>  create mode 100644 arch/arm64/kvm/perf_trace.c
->> 
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->> index de338d9..609998e 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -280,6 +280,9 @@ static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
->>  int kvm_perf_init(void);
->>  int kvm_perf_teardown(void);
->>  
->> +static inline int kvm_perf_trace_init(void) { return 0; }
->> +static inline int kvm_perf_trace_teardown(void) { return 0; }
->> +
->>  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
->>  
->>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
->> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
->> index 75f130e..e1b99c4 100644
->> --- a/arch/arm/kvm/arm.c
->> +++ b/arch/arm/kvm/arm.c
->> @@ -1220,6 +1220,7 @@ static int init_subsystems(void)
->>  		goto out;
->>  
->>  	kvm_perf_init();
->> +	kvm_perf_trace_init();
->>  	kvm_coproc_table_init();
->>  
->>  out:
->> @@ -1411,6 +1412,7 @@ out_err:
->>  void kvm_arch_exit(void)
->>  {
->>  	kvm_perf_teardown();
->> +	kvm_perf_trace_teardown();
->>  }
->>  
->>  static int arm_init(void)
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 3eda975..f6ff8e5 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -345,6 +345,14 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
->>  int kvm_perf_init(void);
->>  int kvm_perf_teardown(void);
->>  
->> +#if !defined(CONFIG_KVM_PERF_TRACE)
->> +static inline int kvm_perf_trace_init(void) { return 0; }
->> +static inline int kvm_perf_trace_teardown(void) { return 0; }
->> +#else
->> +int kvm_perf_trace_init(void);
->> +int kvm_perf_trace_teardown(void);
->> +#endif
->> +
->>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
->>  
->>  static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
->> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->> index 9c9edc9..56e9537 100644
->> --- a/arch/arm64/kvm/Kconfig
->> +++ b/arch/arm64/kvm/Kconfig
->> @@ -19,6 +19,9 @@ if VIRTUALIZATION
->>  config KVM_ARM_VGIC_V3
->>  	bool
->>  
->> +config KVM_PERF_TRACE
->> +        bool
->> +
->>  config KVM
->>  	bool "Kernel-based Virtual Machine (KVM) support"
->>  	depends on OF
->> @@ -39,6 +42,7 @@ config KVM
->>  	select HAVE_KVM_MSI
->>  	select HAVE_KVM_IRQCHIP
->>  	select HAVE_KVM_IRQ_ROUTING
->> +	select KVM_PERF_TRACE if EVENT_TRACING && PERF_EVENTS
->>  	---help---
->>  	  Support hosting virtualized guest machines.
->>  	  We don't support KVM with 16K page tables yet, due to the multiple
->> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> index 695eb3c..7d175e4 100644
->> --- a/arch/arm64/kvm/Makefile
->> +++ b/arch/arm64/kvm/Makefile
->> @@ -19,6 +19,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/psci.o $(ARM)/perf.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += emulate.o inject_fault.o regmap.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
->> +kvm-$(CONFIG_KVM_PERF_TRACE) += perf_trace.o
->>  
->>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-init.o
->> diff --git a/arch/arm64/kvm/perf_trace.c b/arch/arm64/kvm/perf_trace.c
->> new file mode 100644
->> index 0000000..8bacd18
->> --- /dev/null
->> +++ b/arch/arm64/kvm/perf_trace.c
->> @@ -0,0 +1,122 @@
->> +/*
->> + * Copyright (C) 2016 ARM Ltd.
->> + * Author: Punit Agrawal <punit.agrawal@arm.com>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License
->> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +#include <linux/kvm_host.h>
->> +#include <linux/trace_events.h>
->> +
->> +typedef int (*perf_trace_callback_fn)(struct kvm *kvm, bool enable);
->> +
->> +struct kvm_trace_hook {
->> +	char *key;
->> +	perf_trace_callback_fn setup_fn;
->> +};
->> +
->> +static struct kvm_trace_hook trace_hook[] = {
->> +	{ },
->> +};
->> +
->> +static perf_trace_callback_fn find_trace_callback(const char *trace_key)
->> +{
->> +	int i;
->> +
->> +	for (i = 0; trace_hook[i].key; i++)
->> +		if (!strcmp(trace_key, trace_hook[i].key))
->> +			return trace_hook[i].setup_fn;
->> +
->> +	return NULL;
->> +}
->> +
->> +static int kvm_perf_trace_notifier(struct notifier_block *nb,
->> +				   unsigned long event, void *data)
->> +{
->> +	struct perf_event *p_event = data;
->> +	struct trace_event_call *tp_event = p_event->tp_event;
->> +	perf_trace_callback_fn setup_trace_fn;
->> +	struct kvm *kvm = NULL;
->> +	struct pid *pid;
->> +	bool found = false;
->> +
->> +	/*
->> +	 * Is this a trace point?
->> +	 */
->> +	if (!(tp_event->flags & TRACE_EVENT_FL_TRACEPOINT))
->> +		goto out;
->> +
->> +	/*
->> +	 * We'll get here for events we care to monitor for KVM. As we
->> +	 * only care about events attached to a VM, check that there
->> +	 * is a task associated with the perf event.
->> +	 */
->> +	if (p_event->attach_state != PERF_ATTACH_TASK)
->> +		goto out;
->> +
->> +	/*
->> +	 * This notifier gets called when perf trace event instance is
->> +	 * added or removed. Until we can restrict this to events of
->> +	 * interest in core, minimise the overhead below.
->> +	 *
->> +	 * Do we care about it? i.e., is there a callback for this
->> +	 * trace point?
->> +	 */
->> +	setup_trace_fn = find_trace_callback(tp_event->tp->name);
->> +	if (!setup_trace_fn)
->> +		goto out;
->> +
->> +	pid = get_task_pid(p_event->hw.target, PIDTYPE_PID);
->> +
->> +	/*
->> +	 * Does it match any of the VMs?
->> +	 */
->> +	spin_lock(&kvm_lock);
->> +	list_for_each_entry(kvm, &vm_list, vm_list) {
->> +		if (kvm->pid == pid) {
->> +			found = true;
->> +			break;
->> +		}
->> +	}
->> +	spin_unlock(&kvm_lock);
->> +
->> +	put_pid(pid);
->> +	if (!found)
->> +		goto out;
->> +
->> +	switch (event) {
->> +	case TRACE_REG_PERF_OPEN:
->> +		setup_trace_fn(kvm, true);
->> +		break;
->> +
->> +	case TRACE_REG_PERF_CLOSE:
->> +		setup_trace_fn(kvm, false);
->> +		break;
->> +	}
->> +
->> +out:
->> +	return 0;
->> +}
->> +
->> +static struct notifier_block kvm_perf_trace_notifier_block = {
->> +	.notifier_call = kvm_perf_trace_notifier,
->> +};
->> +
->> +int kvm_perf_trace_init(void)
->> +{
->> +	return perf_trace_notifier_register(&kvm_perf_trace_notifier_block);
->> +}
->> +
->> +int kvm_perf_trace_teardown(void)
->> +{
->> +	return perf_trace_notifier_unregister(&kvm_perf_trace_notifier_block);
->> +}
->> -- 
->> 2.8.1
->> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+-Christoffer
