@@ -1,27 +1,28 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [RFC v2 PATCH 6/7] arm64: KVM: Handle trappable TLB instructions
-Date: Tue, 06 Sep 2016 16:44:11 +0100
-Message-ID: <87inu9hw38.fsf@e105922-lin.cambridge.arm.com>
+Subject: Re: [RFC v2 PATCH 3/7] KVM: arm/arm64: Register perf trace event
+ notifier
+Date: Tue, 06 Sep 2016 17:10:39 +0100
+Message-ID: <87d1khhuv4.fsf@e105922-lin.cambridge.arm.com>
 References: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
- <1473093097-30932-7-git-send-email-punit.agrawal@arm.com>
- <20160906102113.GE30513@cbox>
+ <1473093097-30932-4-git-send-email-punit.agrawal@arm.com>
+ <20160906063620.GB30513@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E760409A2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 11:36:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BCBD49AF5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:02:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OOpGfh4RWA+m for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 11:36:17 -0400 (EDT)
+ with ESMTP id 0adrq5Gi3V2e for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 12:02:36 -0400 (EDT)
 Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
  [217.140.96.140])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4D5574011D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 11:36:16 -0400 (EDT)
-In-Reply-To: <20160906102113.GE30513@cbox> (Christoffer Dall's message of
- "Tue, 6 Sep 2016 12:21:13 +0200")
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BDAF340B40
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:02:35 -0400 (EDT)
+In-Reply-To: <20160906063620.GB30513@cbox> (Christoffer Dall's message of
+ "Tue, 6 Sep 2016 08:36:20 +0200")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,273 +33,275 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Christoffer Dall <christoffer.dall@linaro.org> writes:
 
-> On Mon, Sep 05, 2016 at 05:31:36PM +0100, Punit Agrawal wrote:
->> The ARMv8 architecture allows trapping of TLB maintenane instructions
->> from EL0/EL1 to higher exception levels. On encountering a trappable TLB
->> instruction in a guest, an exception is taken to EL2.
+> On Mon, Sep 05, 2016 at 05:31:33PM +0100, Punit Agrawal wrote:
+>> Register a notifier to track state changes of perf trace events.
 >> 
->> Add functionality to handle emulating the TLB instructions.
+>> The notifier will enable taking appropriate action for trace events
+>> targeting VM.
 >> 
 >> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
 >> Cc: Christoffer Dall <christoffer.dall@linaro.org>
 >> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/include/asm/kvm_asm.h |  1 +
->>  arch/arm64/kvm/hyp/tlb.c         | 69 ++++++++++++++++++++++++++++++++++
->>  arch/arm64/kvm/sys_regs.c        | 81 ++++++++++++++++++++++++++++++++++++++++
->>  arch/arm64/kvm/trace.h           | 16 ++++++++
->>  4 files changed, 167 insertions(+)
->> 
->> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
->> index 7561f63..1ac1cc3 100644
->> --- a/arch/arm64/include/asm/kvm_asm.h
->> +++ b/arch/arm64/include/asm/kvm_asm.h
->> @@ -49,6 +49,7 @@ extern char __kvm_hyp_vector[];
->>  extern void __kvm_flush_vm_context(void);
->>  extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
->>  extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
->> +extern void __kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 sysreg, u64 regval);
->>  
->>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
->>  
->> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
->> index 4cda100..1210f58 100644
->> --- a/arch/arm64/kvm/hyp/tlb.c
->> +++ b/arch/arm64/kvm/hyp/tlb.c
->> @@ -78,3 +78,72 @@ static void __hyp_text __tlb_flush_vm_context(void)
->>  }
->>  
->>  __alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
->> +
->> +/* Intentionally empty functions */
->> +static void __hyp_text __switch_to_hyp_role_nvhe(void) { }
->> +static void __hyp_text __switch_to_host_role_nvhe(void) { }
->> +
->> +static void __hyp_text __switch_to_hyp_role_vhe(void)
->> +{
->> +	u64 hcr = read_sysreg(hcr_el2);
->> +
->> +	hcr &= ~HCR_TGE;
->> +	write_sysreg(hcr, hcr_el2);
 >
-> why do we need to clear TGE for the TLB maintenance instructions to
-> work?
+> Overall this looks reasonable, but I'm wondering if most if this logic
+> should really go in virt/kvm/perf_trace.c and call into arch-specific
+> hooks, similar to the way it works for preempt notifiers.
 >
-> Perhaps this is worth explaining in a comment.
+> On the other hand, if arm/arm64 are the only two architectures that are
+> going to use this, creating stubs for the other architectures could be a
+> bit tedious.
 
-I've added the following comment before clearing TGE bit.
+If the series looks to be headed in the right direction, I'll be adding
+support for 32bit ARM host as well.
 
-"When VHE is enabled and HCR_EL2.TGE=1, EL1&0 TLB operations
-apply to EL2&0 translation regime. As we prepare to emulate
-guest TLB operation clear HCR_TGE to target TLB operations
-to EL1&0 (guest)."
+Most of the code here can be shared between arm and arm64. At that
+point, it might be worth moving the logic here to a commong location
+with the architecture code responsible for registering it's
+kvm_trace_hooks as part of the initialisation (or something along those
+lines).
 
->
-> Otherwise this looks ok to me.
+I'll wait a bit for maintainer feedback on Patch 1 before re-spinning the
+series. Patch 1 ultimately decides what the user facing interface for
+this functionality looks like.
 
-Thanks for taking a look.
+Thanks for your feedback on the series.
 
 Punit
 
 >
+> Thanks,
 > -Christoffer
 >
->> +}
+>> ---
+>>  arch/arm/include/asm/kvm_host.h   |   3 +
+>>  arch/arm/kvm/arm.c                |   2 +
+>>  arch/arm64/include/asm/kvm_host.h |   8 +++
+>>  arch/arm64/kvm/Kconfig            |   4 ++
+>>  arch/arm64/kvm/Makefile           |   1 +
+>>  arch/arm64/kvm/perf_trace.c       | 122 ++++++++++++++++++++++++++++++++++++++
+>>  6 files changed, 140 insertions(+)
+>>  create mode 100644 arch/arm64/kvm/perf_trace.c
+>> 
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index de338d9..609998e 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -280,6 +280,9 @@ static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  int kvm_perf_init(void);
+>>  int kvm_perf_teardown(void);
+>>  
+>> +static inline int kvm_perf_trace_init(void) { return 0; }
+>> +static inline int kvm_perf_trace_teardown(void) { return 0; }
 >> +
->> +static void __hyp_text __switch_to_host_role_vhe(void)
->> +{
->> +	u64 hcr = read_sysreg(hcr_el2);
->> +
->> +	hcr |= HCR_TGE;
->> +	write_sysreg(hcr, hcr_el2);
->> +}
->> +
->> +static hyp_alternate_select(__switch_to_hyp_role,
->> +			    __switch_to_hyp_role_nvhe,
->> +			    __switch_to_hyp_role_vhe,
->> +			    ARM64_HAS_VIRT_HOST_EXTN);
->> +
->> +static hyp_alternate_select(__switch_to_host_role,
->> +			    __switch_to_host_role_nvhe,
->> +			    __switch_to_host_role_vhe,
->> +			    ARM64_HAS_VIRT_HOST_EXTN);
->> +
->> +static void __hyp_text __switch_to_guest_regime(struct kvm *kvm)
->> +{
->> +	write_sysreg(kvm->arch.vttbr, vttbr_el2);
->> +	__switch_to_hyp_role();
->> +	isb();
->> +}
->> +
->> +static void __hyp_text __switch_to_host_regime(void)
->> +{
->> +	__switch_to_host_role();
->> +	write_sysreg(0, vttbr_el2);
->> +}
->> +
->> +void __hyp_text
->> +__kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 sys_op, u64 regval)
->> +{
->> +	kvm = kern_hyp_va(kvm);
->> +
->> +	/*
->> +	 * Switch to the guest before performing any TLB operations to
->> +	 * target the appropriate VMID
->> +	 */
->> +	__switch_to_guest_regime(kvm);
->> +
->> +	/*
->> +	 *  TLB maintenance operations are broadcast to
->> +	 *  inner-shareable domain when HCR_FB is set (default for
->> +	 *  KVM).
->> +	 *
->> +	 *  Nuke all Stage 1 TLB entries for the VM. This will kill
->> +	 *  performance but it's always safe to do as we don't leave
->> +	 *  behind any strays in the TLB
->> +	 */
->> +	__tlbi(vmalle1is);
->> +	isb();
->> +
->> +	__switch_to_host_regime();
->> +}
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index e51367d..0e70da9 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -790,6 +790,18 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->>  	return true;
+>>  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
+>>  
+>>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>> index 75f130e..e1b99c4 100644
+>> --- a/arch/arm/kvm/arm.c
+>> +++ b/arch/arm/kvm/arm.c
+>> @@ -1220,6 +1220,7 @@ static int init_subsystems(void)
+>>  		goto out;
+>>  
+>>  	kvm_perf_init();
+>> +	kvm_perf_trace_init();
+>>  	kvm_coproc_table_init();
+>>  
+>>  out:
+>> @@ -1411,6 +1412,7 @@ out_err:
+>>  void kvm_arch_exit(void)
+>>  {
+>>  	kvm_perf_teardown();
+>> +	kvm_perf_trace_teardown();
 >>  }
 >>  
->> +static bool emulate_tlb_invalidate(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->> +				  const struct sys_reg_desc *r)
+>>  static int arm_init(void)
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 3eda975..f6ff8e5 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -345,6 +345,14 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>>  int kvm_perf_init(void);
+>>  int kvm_perf_teardown(void);
+>>  
+>> +#if !defined(CONFIG_KVM_PERF_TRACE)
+>> +static inline int kvm_perf_trace_init(void) { return 0; }
+>> +static inline int kvm_perf_trace_teardown(void) { return 0; }
+>> +#else
+>> +int kvm_perf_trace_init(void);
+>> +int kvm_perf_trace_teardown(void);
+>> +#endif
+>> +
+>>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+>>  
+>>  static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index 9c9edc9..56e9537 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -19,6 +19,9 @@ if VIRTUALIZATION
+>>  config KVM_ARM_VGIC_V3
+>>  	bool
+>>  
+>> +config KVM_PERF_TRACE
+>> +        bool
+>> +
+>>  config KVM
+>>  	bool "Kernel-based Virtual Machine (KVM) support"
+>>  	depends on OF
+>> @@ -39,6 +42,7 @@ config KVM
+>>  	select HAVE_KVM_MSI
+>>  	select HAVE_KVM_IRQCHIP
+>>  	select HAVE_KVM_IRQ_ROUTING
+>> +	select KVM_PERF_TRACE if EVENT_TRACING && PERF_EVENTS
+>>  	---help---
+>>  	  Support hosting virtualized guest machines.
+>>  	  We don't support KVM with 16K page tables yet, due to the multiple
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 695eb3c..7d175e4 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -19,6 +19,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/psci.o $(ARM)/perf.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += emulate.o inject_fault.o regmap.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+>> +kvm-$(CONFIG_KVM_PERF_TRACE) += perf_trace.o
+>>  
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-init.o
+>> diff --git a/arch/arm64/kvm/perf_trace.c b/arch/arm64/kvm/perf_trace.c
+>> new file mode 100644
+>> index 0000000..8bacd18
+>> --- /dev/null
+>> +++ b/arch/arm64/kvm/perf_trace.c
+>> @@ -0,0 +1,122 @@
+>> +/*
+>> + * Copyright (C) 2016 ARM Ltd.
+>> + * Author: Punit Agrawal <punit.agrawal@arm.com>
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License
+>> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +#include <linux/kvm_host.h>
+>> +#include <linux/trace_events.h>
+>> +
+>> +typedef int (*perf_trace_callback_fn)(struct kvm *kvm, bool enable);
+>> +
+>> +struct kvm_trace_hook {
+>> +	char *key;
+>> +	perf_trace_callback_fn setup_fn;
+>> +};
+>> +
+>> +static struct kvm_trace_hook trace_hook[] = {
+>> +	{ },
+>> +};
+>> +
+>> +static perf_trace_callback_fn find_trace_callback(const char *trace_key)
 >> +{
->> +	u32 opcode = sys_reg(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+>> +	int i;
 >> +
->> +	kvm_call_hyp(__kvm_emulate_tlb_invalidate,
->> +		     vcpu->kvm, opcode, p->regval);
->> +	trace_kvm_tlb_invalidate(*vcpu_pc(vcpu), opcode);
+>> +	for (i = 0; trace_hook[i].key; i++)
+>> +		if (!strcmp(trace_key, trace_hook[i].key))
+>> +			return trace_hook[i].setup_fn;
 >> +
->> +	return true;
+>> +	return NULL;
 >> +}
 >> +
->>  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->>  	/* DBGBVRn_EL1 */						\
->> @@ -841,6 +853,35 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>  	{ Op0(0b01), Op1(0b000), CRn(0b0111), CRm(0b1110), Op2(0b010),
->>  	  access_dcsw },
->>  
+>> +static int kvm_perf_trace_notifier(struct notifier_block *nb,
+>> +				   unsigned long event, void *data)
+>> +{
+>> +	struct perf_event *p_event = data;
+>> +	struct trace_event_call *tp_event = p_event->tp_event;
+>> +	perf_trace_callback_fn setup_trace_fn;
+>> +	struct kvm *kvm = NULL;
+>> +	struct pid *pid;
+>> +	bool found = false;
+>> +
 >> +	/*
->> +	 * ARMv8 ARM: Table C5-4 TLB maintenance instructions
->> +	 * (Ref: ARMv8 ARM C5.1 version: ARM DDI 0487A.j)
+>> +	 * Is this a trace point?
 >> +	 */
->> +	/* TLBI VMALLE1IS */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(0), emulate_tlb_invalidate },
->> +	/* TLBI VAE1IS */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(1), emulate_tlb_invalidate },
->> +	/* TLBI ASIDE1IS */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(2), emulate_tlb_invalidate },
->> +	/* TLBI VAAE1IS */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(3), emulate_tlb_invalidate },
->> +	/* TLBI VALE1IS */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(5), emulate_tlb_invalidate },
->> +	/* TLBI VAALE1IS */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(7), emulate_tlb_invalidate },
->> +	/* TLBI VMALLE1 */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(0), emulate_tlb_invalidate },
->> +	/* TLBI VAE1 */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(1), emulate_tlb_invalidate },
->> +	/* TLBI ASIDE1 */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(2), emulate_tlb_invalidate },
->> +	/* TLBI VAAE1 */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(3), emulate_tlb_invalidate },
->> +	/* TLBI VALE1 */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(5), emulate_tlb_invalidate },
->> +	/* TLBI VAALE1 */
->> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(7), emulate_tlb_invalidate },
+>> +	if (!(tp_event->flags & TRACE_EVENT_FL_TRACEPOINT))
+>> +		goto out;
 >> +
->>  	DBG_BCR_BVR_WCR_WVR_EL1(0),
->>  	DBG_BCR_BVR_WCR_WVR_EL1(1),
->>  	/* MDCCINT_EL1 */
->> @@ -1329,6 +1370,46 @@ static const struct sys_reg_desc cp15_regs[] = {
->>  	{ Op1( 0), CRn( 7), CRm(10), Op2( 2), access_dcsw },
->>  	{ Op1( 0), CRn( 7), CRm(14), Op2( 2), access_dcsw },
->>  
 >> +	/*
->> +	 * TLB operations
+>> +	 * We'll get here for events we care to monitor for KVM. As we
+>> +	 * only care about events attached to a VM, check that there
+>> +	 * is a task associated with the perf event.
 >> +	 */
->> +	/* TLBIALLIS */
->> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 0), emulate_tlb_invalidate},
->> +	/* TLBIMVAIS */
->> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 1), emulate_tlb_invalidate},
->> +	/* TLBIASIDIS */
->> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 2), emulate_tlb_invalidate},
->> +	/* TLBIMVAAIS */
->> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 3), emulate_tlb_invalidate},
->> +	/* TLBIMVALIS */
->> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 5), emulate_tlb_invalidate},
->> +	/* TLBIMVAALIS */
->> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 7), emulate_tlb_invalidate},
->> +	/* ITLBIALL */
->> +	{ Op1( 0), CRn( 8), CRm( 5), Op2( 0), emulate_tlb_invalidate},
->> +	/* ITLBIMVA */
->> +	{ Op1( 0), CRn( 8), CRm( 5), Op2( 1), emulate_tlb_invalidate},
->> +	/* ITLBIASID */
->> +	{ Op1( 0), CRn( 8), CRm( 5), Op2( 2), emulate_tlb_invalidate},
->> +	/* DTLBIALL */
->> +	{ Op1( 0), CRn( 8), CRm( 6), Op2( 0), emulate_tlb_invalidate},
->> +	/* DTLBIMVA */
->> +	{ Op1( 0), CRn( 8), CRm( 6), Op2( 1), emulate_tlb_invalidate},
->> +	/* DTLBIASID */
->> +	{ Op1( 0), CRn( 8), CRm( 6), Op2( 2), emulate_tlb_invalidate},
->> +	/* TLBIALL */
->> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 0), emulate_tlb_invalidate},
->> +	/* TLBIMVA */
->> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 1), emulate_tlb_invalidate},
->> +	/* TLBIASID */
->> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 2), emulate_tlb_invalidate},
->> +	/* TLBIMVAA */
->> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 3), emulate_tlb_invalidate},
->> +	/* TLBIMVAL */
->> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 5), emulate_tlb_invalidate},
->> +	/* TLBIMVAAL */
->> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 7), emulate_tlb_invalidate},
+>> +	if (p_event->attach_state != PERF_ATTACH_TASK)
+>> +		goto out;
 >> +
->>  	/* PMU */
->>  	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmcr },
->>  	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmcnten },
->> diff --git a/arch/arm64/kvm/trace.h b/arch/arm64/kvm/trace.h
->> index 7fb0008..c4d577f 100644
->> --- a/arch/arm64/kvm/trace.h
->> +++ b/arch/arm64/kvm/trace.h
->> @@ -166,6 +166,22 @@ TRACE_EVENT(kvm_set_guest_debug,
->>  	TP_printk("vcpu: %p, flags: 0x%08x", __entry->vcpu, __entry->guest_debug)
->>  );
->>  
->> +TRACE_EVENT(kvm_tlb_invalidate,
->> +	TP_PROTO(unsigned long vcpu_pc, u32 opcode),
->> +	TP_ARGS(vcpu_pc, opcode),
+>> +	/*
+>> +	 * This notifier gets called when perf trace event instance is
+>> +	 * added or removed. Until we can restrict this to events of
+>> +	 * interest in core, minimise the overhead below.
+>> +	 *
+>> +	 * Do we care about it? i.e., is there a callback for this
+>> +	 * trace point?
+>> +	 */
+>> +	setup_trace_fn = find_trace_callback(tp_event->tp->name);
+>> +	if (!setup_trace_fn)
+>> +		goto out;
 >> +
->> +	TP_STRUCT__entry(
->> +		__field(unsigned long, vcpu_pc)
->> +		__field(u32, opcode)
->> +	),
+>> +	pid = get_task_pid(p_event->hw.target, PIDTYPE_PID);
 >> +
->> +	TP_fast_assign(
->> +		__entry->vcpu_pc = vcpu_pc;
->> +		__entry->opcode = opcode;
->> +	),
+>> +	/*
+>> +	 * Does it match any of the VMs?
+>> +	 */
+>> +	spin_lock(&kvm_lock);
+>> +	list_for_each_entry(kvm, &vm_list, vm_list) {
+>> +		if (kvm->pid == pid) {
+>> +			found = true;
+>> +			break;
+>> +		}
+>> +	}
+>> +	spin_unlock(&kvm_lock);
 >> +
->> +	TP_printk("vcpu_pc=0x%16lx opcode=%08x", __entry->vcpu_pc, __entry->opcode)
->> +);
->>  
->>  #endif /* _TRACE_ARM64_KVM_H */
->>  
+>> +	put_pid(pid);
+>> +	if (!found)
+>> +		goto out;
+>> +
+>> +	switch (event) {
+>> +	case TRACE_REG_PERF_OPEN:
+>> +		setup_trace_fn(kvm, true);
+>> +		break;
+>> +
+>> +	case TRACE_REG_PERF_CLOSE:
+>> +		setup_trace_fn(kvm, false);
+>> +		break;
+>> +	}
+>> +
+>> +out:
+>> +	return 0;
+>> +}
+>> +
+>> +static struct notifier_block kvm_perf_trace_notifier_block = {
+>> +	.notifier_call = kvm_perf_trace_notifier,
+>> +};
+>> +
+>> +int kvm_perf_trace_init(void)
+>> +{
+>> +	return perf_trace_notifier_register(&kvm_perf_trace_notifier_block);
+>> +}
+>> +
+>> +int kvm_perf_trace_teardown(void)
+>> +{
+>> +	return perf_trace_notifier_unregister(&kvm_perf_trace_notifier_block);
+>> +}
 >> -- 
 >> 2.8.1
 >> 
