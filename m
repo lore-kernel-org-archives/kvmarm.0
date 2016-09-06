@@ -1,27 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC v2 PATCH 2/7] KVM: Track the pid of the VM process
-Date: Tue, 6 Sep 2016 08:22:52 +0200
-Message-ID: <20160906062252.GA30513@cbox>
+Subject: Re: [RFC v2 PATCH 3/7] KVM: arm/arm64: Register perf trace event
+ notifier
+Date: Tue, 6 Sep 2016 08:36:20 +0200
+Message-ID: <20160906063620.GB30513@cbox>
 References: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
- <1473093097-30932-3-git-send-email-punit.agrawal@arm.com>
+ <1473093097-30932-4-git-send-email-punit.agrawal@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D21B49B1D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 02:12:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3997C49B1D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 02:25:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IDw9KcLtNPhe for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 02:12:01 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0FC7449AF5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 02:12:01 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id w12so72064795wmf.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 05 Sep 2016 23:20:24 -0700 (PDT)
+ with ESMTP id NSdFt-XcVWyw for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 02:25:29 -0400 (EDT)
+Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 85C3549AF5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 02:25:29 -0400 (EDT)
+Received: by mail-wm0-f54.google.com with SMTP id i204so16896246wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 05 Sep 2016 23:33:53 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1473093097-30932-3-git-send-email-punit.agrawal@arm.com>
+In-Reply-To: <1473093097-30932-4-git-send-email-punit.agrawal@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,42 +36,252 @@ To: Punit Agrawal <punit.agrawal@arm.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gTW9uLCBTZXAgMDUsIDIwMTYgYXQgMDU6MzE6MzJQTSArMDEwMCwgUHVuaXQgQWdyYXdhbCB3
-cm90ZToKPiBVc2Vyc3BhY2UgdG9vbHMgc3VjaCBhcyBwZXJmIGNhbiBiZSB1c2VkIHRvIHByb2Zp
-bGUgaW5kaXZpZHVhbAo+IHByb2Nlc3Nlcy4KPiAKPiBUcmFjayB0aGUgUElEIG9mIHRoZSB2aXJ0
-dWFsIG1hY2hpbmUgcHJvY2VzcyB0byBtYXRjaCBwcm9maWxpbmcgcmVxdWVzdHMKPiB0YXJnZXRl
-ZCBhdCBpdC4gVGhpcyBjYW4gYmUgdXNlZCB0byB0YWtlIGFwcHJvcHJpYXRlIGFjdGlvbiB0byBl
-bmFibGUKPiB0aGUgcmVxdWVzdGVkIHByb2ZpbGluZyBvcGVyYXRpb25zIGZvciB0aGUgVk1zIG9m
-IGludGVyZXN0Lgo+IAo+IFNpZ25lZC1vZmYtYnk6IFB1bml0IEFncmF3YWwgPHB1bml0LmFncmF3
-YWxAYXJtLmNvbT4KPiBDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KPiBD
-YzogIlJhZGltIEtyxI1tw6HFmSIgPHJrcmNtYXJAcmVkaGF0LmNvbT4KPiBDYzogQ2hyaXN0b2Zm
-ZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgo+IENjOiBNYXJjIFp5bmdpZXIg
-PG1hcmMuenluZ2llckBhcm0uY29tPgo+IC0tLQo+ICBpbmNsdWRlL2xpbnV4L2t2bV9ob3N0Lmgg
-fCAxICsKPiAgdmlydC9rdm0va3ZtX21haW4uYyAgICAgIHwgMiArKwo+ICAyIGZpbGVzIGNoYW5n
-ZWQsIDMgaW5zZXJ0aW9ucygrKQo+IAo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2t2bV9o
-b3N0LmggYi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgKPiBpbmRleCA5YzI4YjRkLi43YzQyYzk0
-IDEwMDY0NAo+IC0tLSBhL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaAo+ICsrKyBiL2luY2x1ZGUv
-bGludXgva3ZtX2hvc3QuaAo+IEBAIC0zNzQsNiArMzc0LDcgQEAgc3RydWN0IGt2bV9tZW1zbG90
-cyB7Cj4gIHN0cnVjdCBrdm0gewo+ICAJc3BpbmxvY2tfdCBtbXVfbG9jazsKPiAgCXN0cnVjdCBt
-dXRleCBzbG90c19sb2NrOwo+ICsJc3RydWN0IHBpZCAqcGlkOwo+ICAJc3RydWN0IG1tX3N0cnVj
-dCAqbW07IC8qIHVzZXJzcGFjZSB0aWVkIHRvIHRoaXMgdm0gKi8KPiAgCXN0cnVjdCBrdm1fbWVt
-c2xvdHMgKm1lbXNsb3RzW0tWTV9BRERSRVNTX1NQQUNFX05VTV07Cj4gIAlzdHJ1Y3Qgc3JjdV9z
-dHJ1Y3Qgc3JjdTsKPiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0va3ZtX21haW4uYyBiL3ZpcnQva3Zt
-L2t2bV9tYWluLmMKPiBpbmRleCAxOTUwNzgyLi5hYjI1MzVhIDEwMDY0NAo+IC0tLSBhL3ZpcnQv
-a3ZtL2t2bV9tYWluLmMKPiArKysgYi92aXJ0L2t2bS9rdm1fbWFpbi5jCj4gQEAgLTYxMyw2ICs2
-MTMsNyBAQCBzdGF0aWMgc3RydWN0IGt2bSAqa3ZtX2NyZWF0ZV92bSh1bnNpZ25lZCBsb25nIHR5
-cGUpCj4gIAlzcGluX2xvY2tfaW5pdCgma3ZtLT5tbXVfbG9jayk7Cj4gIAlhdG9taWNfaW5jKCZj
-dXJyZW50LT5tbS0+bW1fY291bnQpOwo+ICAJa3ZtLT5tbSA9IGN1cnJlbnQtPm1tOwo+ICsJa3Zt
-LT5waWQgPSBnZXRfdGFza19waWQoY3VycmVudCwgUElEVFlQRV9QSUQpOwoKSG93IGRvb2VzIHRo
-aXMgZGVhbCB3aXRoIHRocmVhZGluZz8gIElzIHRoZSBpZGVhIHRoYXQgdGhlIHVzZXIgYnkKc3Bl
-Y2lmeWluZyB0aGUgbWFpbiB0aHJlYWQncyBwaWQgd2lsbCBlbmFibGUgdHJhcHBpbmcgZm9yIGFs
-bCB2Y3B1CnRocmVhZHMgYmVsb25naW5nIHRvIHRoYXQgVk0/Cgo+ICAJa3ZtX2V2ZW50ZmRfaW5p
-dChrdm0pOwo+ICAJbXV0ZXhfaW5pdCgma3ZtLT5sb2NrKTsKPiAgCW11dGV4X2luaXQoJmt2bS0+
-aXJxX2xvY2spOwo+IEBAIC03MTIsNiArNzEzLDcgQEAgc3RhdGljIHZvaWQga3ZtX2Rlc3Ryb3lf
-dm0oc3RydWN0IGt2bSAqa3ZtKQo+ICAJaW50IGk7Cj4gIAlzdHJ1Y3QgbW1fc3RydWN0ICptbSA9
-IGt2bS0+bW07Cj4gIAo+ICsJcHV0X3BpZChrdm0tPnBpZCk7Cj4gIAlrdm1fZGVzdHJveV92bV9k
-ZWJ1Z2ZzKGt2bSk7Cj4gIAlrdm1fYXJjaF9zeW5jX2V2ZW50cyhrdm0pOwo+ICAJc3Bpbl9sb2Nr
-KCZrdm1fbG9jayk7Cj4gLS0gCj4gMi44LjEKPiAKX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
-Zm8va3ZtYXJtCg==
+On Mon, Sep 05, 2016 at 05:31:33PM +0100, Punit Agrawal wrote:
+> Register a notifier to track state changes of perf trace events.
+> 
+> The notifier will enable taking appropriate action for trace events
+> targeting VM.
+> 
+> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+
+Overall this looks reasonable, but I'm wondering if most if this logic
+should really go in virt/kvm/perf_trace.c and call into arch-specific
+hooks, similar to the way it works for preempt notifiers.
+
+On the other hand, if arm/arm64 are the only two architectures that are
+going to use this, creating stubs for the other architectures could be a
+bit tedious.
+
+Thanks,
+-Christoffer
+
+> ---
+>  arch/arm/include/asm/kvm_host.h   |   3 +
+>  arch/arm/kvm/arm.c                |   2 +
+>  arch/arm64/include/asm/kvm_host.h |   8 +++
+>  arch/arm64/kvm/Kconfig            |   4 ++
+>  arch/arm64/kvm/Makefile           |   1 +
+>  arch/arm64/kvm/perf_trace.c       | 122 ++++++++++++++++++++++++++++++++++++++
+>  6 files changed, 140 insertions(+)
+>  create mode 100644 arch/arm64/kvm/perf_trace.c
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index de338d9..609998e 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -280,6 +280,9 @@ static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+>  int kvm_perf_init(void);
+>  int kvm_perf_teardown(void);
+>  
+> +static inline int kvm_perf_trace_init(void) { return 0; }
+> +static inline int kvm_perf_trace_teardown(void) { return 0; }
+> +
+>  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
+>  
+>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 75f130e..e1b99c4 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -1220,6 +1220,7 @@ static int init_subsystems(void)
+>  		goto out;
+>  
+>  	kvm_perf_init();
+> +	kvm_perf_trace_init();
+>  	kvm_coproc_table_init();
+>  
+>  out:
+> @@ -1411,6 +1412,7 @@ out_err:
+>  void kvm_arch_exit(void)
+>  {
+>  	kvm_perf_teardown();
+> +	kvm_perf_trace_teardown();
+>  }
+>  
+>  static int arm_init(void)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 3eda975..f6ff8e5 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -345,6 +345,14 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>  int kvm_perf_init(void);
+>  int kvm_perf_teardown(void);
+>  
+> +#if !defined(CONFIG_KVM_PERF_TRACE)
+> +static inline int kvm_perf_trace_init(void) { return 0; }
+> +static inline int kvm_perf_trace_teardown(void) { return 0; }
+> +#else
+> +int kvm_perf_trace_init(void);
+> +int kvm_perf_trace_teardown(void);
+> +#endif
+> +
+>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+>  
+>  static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 9c9edc9..56e9537 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -19,6 +19,9 @@ if VIRTUALIZATION
+>  config KVM_ARM_VGIC_V3
+>  	bool
+>  
+> +config KVM_PERF_TRACE
+> +        bool
+> +
+>  config KVM
+>  	bool "Kernel-based Virtual Machine (KVM) support"
+>  	depends on OF
+> @@ -39,6 +42,7 @@ config KVM
+>  	select HAVE_KVM_MSI
+>  	select HAVE_KVM_IRQCHIP
+>  	select HAVE_KVM_IRQ_ROUTING
+> +	select KVM_PERF_TRACE if EVENT_TRACING && PERF_EVENTS
+>  	---help---
+>  	  Support hosting virtualized guest machines.
+>  	  We don't support KVM with 16K page tables yet, due to the multiple
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 695eb3c..7d175e4 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -19,6 +19,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/psci.o $(ARM)/perf.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += emulate.o inject_fault.o regmap.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+> +kvm-$(CONFIG_KVM_PERF_TRACE) += perf_trace.o
+>  
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-init.o
+> diff --git a/arch/arm64/kvm/perf_trace.c b/arch/arm64/kvm/perf_trace.c
+> new file mode 100644
+> index 0000000..8bacd18
+> --- /dev/null
+> +++ b/arch/arm64/kvm/perf_trace.c
+> @@ -0,0 +1,122 @@
+> +/*
+> + * Copyright (C) 2016 ARM Ltd.
+> + * Author: Punit Agrawal <punit.agrawal@arm.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +#include <linux/kvm_host.h>
+> +#include <linux/trace_events.h>
+> +
+> +typedef int (*perf_trace_callback_fn)(struct kvm *kvm, bool enable);
+> +
+> +struct kvm_trace_hook {
+> +	char *key;
+> +	perf_trace_callback_fn setup_fn;
+> +};
+> +
+> +static struct kvm_trace_hook trace_hook[] = {
+> +	{ },
+> +};
+> +
+> +static perf_trace_callback_fn find_trace_callback(const char *trace_key)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; trace_hook[i].key; i++)
+> +		if (!strcmp(trace_key, trace_hook[i].key))
+> +			return trace_hook[i].setup_fn;
+> +
+> +	return NULL;
+> +}
+> +
+> +static int kvm_perf_trace_notifier(struct notifier_block *nb,
+> +				   unsigned long event, void *data)
+> +{
+> +	struct perf_event *p_event = data;
+> +	struct trace_event_call *tp_event = p_event->tp_event;
+> +	perf_trace_callback_fn setup_trace_fn;
+> +	struct kvm *kvm = NULL;
+> +	struct pid *pid;
+> +	bool found = false;
+> +
+> +	/*
+> +	 * Is this a trace point?
+> +	 */
+> +	if (!(tp_event->flags & TRACE_EVENT_FL_TRACEPOINT))
+> +		goto out;
+> +
+> +	/*
+> +	 * We'll get here for events we care to monitor for KVM. As we
+> +	 * only care about events attached to a VM, check that there
+> +	 * is a task associated with the perf event.
+> +	 */
+> +	if (p_event->attach_state != PERF_ATTACH_TASK)
+> +		goto out;
+> +
+> +	/*
+> +	 * This notifier gets called when perf trace event instance is
+> +	 * added or removed. Until we can restrict this to events of
+> +	 * interest in core, minimise the overhead below.
+> +	 *
+> +	 * Do we care about it? i.e., is there a callback for this
+> +	 * trace point?
+> +	 */
+> +	setup_trace_fn = find_trace_callback(tp_event->tp->name);
+> +	if (!setup_trace_fn)
+> +		goto out;
+> +
+> +	pid = get_task_pid(p_event->hw.target, PIDTYPE_PID);
+> +
+> +	/*
+> +	 * Does it match any of the VMs?
+> +	 */
+> +	spin_lock(&kvm_lock);
+> +	list_for_each_entry(kvm, &vm_list, vm_list) {
+> +		if (kvm->pid == pid) {
+> +			found = true;
+> +			break;
+> +		}
+> +	}
+> +	spin_unlock(&kvm_lock);
+> +
+> +	put_pid(pid);
+> +	if (!found)
+> +		goto out;
+> +
+> +	switch (event) {
+> +	case TRACE_REG_PERF_OPEN:
+> +		setup_trace_fn(kvm, true);
+> +		break;
+> +
+> +	case TRACE_REG_PERF_CLOSE:
+> +		setup_trace_fn(kvm, false);
+> +		break;
+> +	}
+> +
+> +out:
+> +	return 0;
+> +}
+> +
+> +static struct notifier_block kvm_perf_trace_notifier_block = {
+> +	.notifier_call = kvm_perf_trace_notifier,
+> +};
+> +
+> +int kvm_perf_trace_init(void)
+> +{
+> +	return perf_trace_notifier_register(&kvm_perf_trace_notifier_block);
+> +}
+> +
+> +int kvm_perf_trace_teardown(void)
+> +{
+> +	return perf_trace_notifier_unregister(&kvm_perf_trace_notifier_block);
+> +}
+> -- 
+> 2.8.1
+> 
