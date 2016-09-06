@@ -1,119 +1,81 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 19/19] arm64: KVM: Inject a vSerror if detecting a bad GICV access at EL2
-Date: Tue,  6 Sep 2016 14:02:17 +0100
-Message-ID: <1473166937-15271-20-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 06/19] arm64: KVM: Route asynchronous aborts
+Date: Tue,  6 Sep 2016 14:02:04 +0100
+Message-ID: <1473166937-15271-7-git-send-email-marc.zyngier@arm.com>
 References: <1473166937-15271-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F8D040B58
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 08:54:14 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id jHjEWAeBgsLc for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 08:54:10 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5509749B6D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 08:54:05 -0400 (EDT)
 In-Reply-To: <1473166937-15271-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If, when proxying a GICV access at EL2, we detect that the guest is
-doing something silly, report an EL1 SError instead ofgnoring the
-access.
+As we now have some basic handling to EL1-triggered aborts, we can
+actually report them to KVM.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h |  2 +-
- arch/arm64/kvm/hyp/switch.c      | 18 +++++++++++++++---
- virt/kvm/arm/hyp/vgic-v2-sr.c    | 21 ++++++++++++++++-----
- 3 files changed, 32 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/hyp/hyp-entry.S | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 88ec3ac..b18e852 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -123,7 +123,7 @@ typeof(orig) * __hyp_text fname(void)					\
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index d6cae54..d2f6640 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -120,6 +120,12 @@ el1_irq:
+ 	mov	x0, #ARM_EXCEPTION_IRQ
+ 	b	__guest_exit
  
- void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
- void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
--bool __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
-+int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
- 
- void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
- void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 1233a55..194184c 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -311,9 +311,21 @@ again:
- 			!kvm_vcpu_dabt_isextabt(vcpu) &&
- 			!kvm_vcpu_dabt_iss1tw(vcpu);
- 
--		if (valid && __vgic_v2_perform_cpuif_access(vcpu)) {
--			__skip_instr(vcpu);
--			goto again;
-+		if (valid) {
-+			int ret = __vgic_v2_perform_cpuif_access(vcpu);
++el1_error:
++	stp     x0, x1, [sp, #-16]!
++	mrs	x1, tpidr_el2
++	mov	x0, #ARM_EXCEPTION_EL1_SERROR
++	b	__guest_exit
 +
-+			if (ret == 1) {
-+				__skip_instr(vcpu);
-+				goto again;
-+			}
-+
-+			if (ret == -1) {
-+				/* Promote an illegal access to an SError */
-+				__skip_instr(vcpu);
-+				exit_code = ARM_EXCEPTION_EL1_SERROR;
-+			}
-+
-+			/* 0 falls through to be handler out of EL2 */
- 		}
- 	}
+ ENTRY(__hyp_do_panic)
+ 	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
+ 		      PSR_MODE_EL1h)
+@@ -148,7 +154,6 @@ ENDPROC(\label)
+ 	invalid_vector	el1_sync_invalid
+ 	invalid_vector	el1_irq_invalid
+ 	invalid_vector	el1_fiq_invalid
+-	invalid_vector	el1_error_invalid
  
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-index a052f20..c8aeb7b 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-@@ -170,7 +170,18 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
- }
+ 	.ltorg
  
- #ifdef CONFIG_ARM64
--bool __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
-+/*
-+ * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
-+ *				     guest.
-+ *
-+ * @vcpu: the offending vcpu
-+ *
-+ * Returns:
-+ *  1: GICV access successfully performed
-+ *  0: Not a GICV access
-+ * -1: Illegal GICV access
-+ */
-+int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
- 	struct vgic_dist *vgic = &kvm->arch.vgic;
-@@ -185,15 +196,15 @@ bool __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 	/* If not for GICV, move on */
- 	if (fault_ipa <  vgic->vgic_cpu_base ||
- 	    fault_ipa >= (vgic->vgic_cpu_base + KVM_VGIC_V2_CPU_SIZE))
--		return false;
-+		return 0;
+@@ -168,10 +173,10 @@ ENTRY(__kvm_hyp_vector)
+ 	ventry	el1_sync			// Synchronous 64-bit EL1
+ 	ventry	el1_irq				// IRQ 64-bit EL1
+ 	ventry	el1_fiq_invalid			// FIQ 64-bit EL1
+-	ventry	el1_error_invalid		// Error 64-bit EL1
++	ventry	el1_error			// Error 64-bit EL1
  
- 	/* Reject anything but a 32bit access */
- 	if (kvm_vcpu_dabt_get_as(vcpu) != sizeof(u32))
--		return false;
-+		return -1;
- 
- 	/* Not aligned? Don't bother */
- 	if (fault_ipa & 3)
--		return false;
-+		return -1;
- 
- 	rd = kvm_vcpu_dabt_get_rd(vcpu);
- 	addr  = kern_hyp_va((kern_hyp_va(&kvm_vgic_global_state))->vcpu_base_va);
-@@ -210,6 +221,6 @@ bool __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 							       sizeof(u32)));
- 	}
- 
--	return true;
-+	return 1;
- }
- #endif
+ 	ventry	el1_sync			// Synchronous 32-bit EL1
+ 	ventry	el1_irq				// IRQ 32-bit EL1
+ 	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
+-	ventry	el1_error_invalid		// Error 32-bit EL1
++	ventry	el1_error			// Error 32-bit EL1
+ ENDPROC(__kvm_hyp_vector)
 -- 
 2.1.4
-
