@@ -1,28 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 5/7] ARM: move system register accessors to asm/cp15.h
-Date: Tue, 6 Sep 2016 18:34:34 +0200
-Message-ID: <20160906163434.GC23592@cbox>
-References: <1471344418-19568-1-git-send-email-vladimir.murzin@arm.com>
- <1471344418-19568-6-git-send-email-vladimir.murzin@arm.com>
- <20160905112916.GJ26366@cbox> <57CEBF1A.60506@arm.com>
+Subject: Re: [PATCH v2] kvm: arm: Enforce some NS-SVC initialisation
+Date: Tue, 6 Sep 2016 18:41:45 +0200
+Message-ID: <20160906164145.GD23592@cbox>
+References: <5322cdb9cb397741d15b60c6693ad39dbf74b6d5.1469101945.git.robin.murphy@arm.com>
+ <6d030bee2db08c2fe1b7569e692e8f66800b1e4c.1471369569.git.robin.murphy@arm.com>
+ <20160817113249.GA5909@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C32040C9A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:23:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EF9249B3F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:30:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Im--FaZg5EUC for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 12:23:41 -0400 (EDT)
-Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1105840B40
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:23:41 -0400 (EDT)
-Received: by mail-wm0-f52.google.com with SMTP id i204so44016278wma.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2016 09:32:05 -0700 (PDT)
+ with ESMTP id yeCLSwVebCXT for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 12:30:53 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA1B440B58
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 12:30:52 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id 1so200511254wmz.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2016 09:39:17 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <57CEBF1A.60506@arm.com>
+In-Reply-To: <20160817113249.GA5909@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,194 +32,30 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Russell King <linux@armlinux.org.uk>
+Cc: marc.zyngier@arm.com, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 06, 2016 at 02:05:30PM +0100, Vladimir Murzin wrote:
-> On 05/09/16 12:29, Christoffer Dall wrote:
-> > On Tue, Aug 16, 2016 at 11:46:56AM +0100, Vladimir Murzin wrote:
-> >> Macro __ACCESS_CP15{_64} is defined in two headers (arch_gicv3.h and
-> >> kvm_hyp.h) which are going to be requested by vgic-v3 altogether.
-> >> GCC would not like it because it'd see that macro is redefined and (hey!)
-> >> they are different.  So, let's put only single macro version under common
-> >> place and use it everywhere.
+On Wed, Aug 17, 2016 at 01:32:49PM +0200, Christoffer Dall wrote:
+> Hi Russell,
+> 
+> On Tue, Aug 16, 2016 at 06:49:18PM +0100, Robin Murphy wrote:
+> > Since the non-secure copies of banked registers lack architecturally
+> > defined reset values, there is no actual guarantee when entering in Hyp
+> > from secure-only firmware that the Non-Secure PL1 state will look the
+> > way that kernel entry (in particular the decompressor stub) expects.
+> > So far, we've been getting away with it thanks to implementation details
+> > of ARMv7 cores and/or bootloader behaviour, but for the sake of forwards
+> > compatibility let's try to ensure that we have a minimally sane state
+> > before dropping down into it.
 > > 
-> > I'm sorry, but I don't understand this commit text.
-> > 
+> > Signed-off-by: Robin Murphy <robin.murphy@arm.com>
 > 
-> Sorry for that :(
+> Can we have your acked-by on this patch to merge it via the KVM tree or
+> do you prefer merging this one directly yourself?
 > 
-> The issue the patch is trying to solve happens because
-> virt/kvm/arm/hyp/vgic-v3-sr.c has
-> 
-> #include <linux/irqchip/arm-gic-v3.h>
-> ...
-> #include <asm/kvm_hyp.h>
-> 
-> each of these headers defines it's own __ACCESS_CP15 macro:
-> 
-> asm/kvm_hyp.h
-> 
-> #define __ACCESS_CP15(CRn, Op1, CRm, Op2)	\
-> 	"mrc", "mcr", __stringify(p15, Op1, %0, CRn, CRm, Op2), u32
-> 
-> and linux/irqchip/arm-gic-v3.h via asm/arch_gicv3.h
-> 
-> #define __ACCESS_CP15(CRn, Op1, CRm, Op2) p15, Op1, %0, CRn, CRm, Op2
-> 
-> When these headers are used together conflict happens. The same applies
-> to __ACCESS_CP15_64 macro.
-> 
-> To address that only single set of macros is used and call sites updated.
-
-Thanks for the explanation!
-
-So a simpler way, IMHO, to explain this is to simply say that both
-linux/irqchip/arm-gic.v3.h and arch/arm/include/asm/kvm_hyp.h define a
-macro called __ACCESS_CP15, which obviously creates a conflict.
-
-Then you could explain if these are just different implementations of
-the same thing, or if they are semantically different, and finally how
-your patch solves this problem.
-
-> 
-> >>
-> >> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
-> >> ---
-> >>  arch/arm/include/asm/arch_gicv3.h |   27 +++++++++++----------------
-> >>  arch/arm/include/asm/cp15.h       |   15 +++++++++++++++
-> >>  arch/arm/include/asm/kvm_hyp.h    |   15 +--------------
-> >>  3 files changed, 27 insertions(+), 30 deletions(-)
-> >>
-> >> diff --git a/arch/arm/include/asm/arch_gicv3.h b/arch/arm/include/asm/arch_gicv3.h
-> >> index e08d151..af25c32 100644
-> >> --- a/arch/arm/include/asm/arch_gicv3.h
-> >> +++ b/arch/arm/include/asm/arch_gicv3.h
-> >> @@ -22,9 +22,7 @@
-> >>  
-> >>  #include <linux/io.h>
-> >>  #include <asm/barrier.h>
-> >> -
-> >> -#define __ACCESS_CP15(CRn, Op1, CRm, Op2)	p15, Op1, %0, CRn, CRm, Op2
-> >> -#define __ACCESS_CP15_64(Op1, CRm)		p15, Op1, %Q0, %R0, CRm
-> >> +#include <asm/cp15.h>
-> >>  
-> >>  #define ICC_EOIR1			__ACCESS_CP15(c12, 0, c12, 1)
-> >>  #define ICC_DIR				__ACCESS_CP15(c12, 0, c11, 1)
-> >> @@ -102,58 +100,55 @@
-> >>  
-> >>  static inline void gic_write_eoir(u32 irq)
-> >>  {
-> >> -	asm volatile("mcr " __stringify(ICC_EOIR1) : : "r" (irq));
-> >> +	write_sysreg(irq, ICC_EOIR1);
-> >>  	isb();
-> >>  }
-> >>  
-> >>  static inline void gic_write_dir(u32 val)
-> >>  {
-> >> -	asm volatile("mcr " __stringify(ICC_DIR) : : "r" (val));
-> >> +	write_sysreg(val, ICC_DIR);
-> >>  	isb();
-> >>  }
-> >>  
-> >>  static inline u32 gic_read_iar(void)
-> >>  {
-> >> -	u32 irqstat;
-> >> +	u32 irqstat = read_sysreg(ICC_IAR1);
-> >>  
-> >> -	asm volatile("mrc " __stringify(ICC_IAR1) : "=r" (irqstat));
-> >>  	dsb(sy);
-> >> +
-> >>  	return irqstat;
-> >>  }
-> >>  
-> >>  static inline void gic_write_pmr(u32 val)
-> >>  {
-> >> -	asm volatile("mcr " __stringify(ICC_PMR) : : "r" (val));
-> >> +	write_sysreg(val, ICC_PMR);
-> >>  }
-> >>  
-> >>  static inline void gic_write_ctlr(u32 val)
-> >>  {
-> >> -	asm volatile("mcr " __stringify(ICC_CTLR) : : "r" (val));
-> >> +	write_sysreg(val, ICC_CTLR);
-> >>  	isb();
-> >>  }
-> >>  
-> >>  static inline void gic_write_grpen1(u32 val)
-> >>  {
-> >> -	asm volatile("mcr " __stringify(ICC_IGRPEN1) : : "r" (val));
-> >> +	write_sysreg(val, ICC_IGRPEN1);
-> >>  	isb();
-> >>  }
-> >>  
-> >>  static inline void gic_write_sgi1r(u64 val)
-> >>  {
-> >> -	asm volatile("mcrr " __stringify(ICC_SGI1R) : : "r" (val));
-> >> +	write_sysreg(val, ICC_SGI1R);
-> >>  }
-> >>  
-> >>  static inline u32 gic_read_sre(void)
-> >>  {
-> >> -	u32 val;
-> >> -
-> >> -	asm volatile("mrc " __stringify(ICC_SRE) : "=r" (val));
-> >> -	return val;
-> >> +	return read_sysreg(ICC_SRE);
-> >>  }
-> >>  
-> >>  static inline void gic_write_sre(u32 val)
-> >>  {
-> >> -	asm volatile("mcr " __stringify(ICC_SRE) : : "r" (val));
-> >> +	write_sysreg(val, ICC_SRE);
-> >>  	isb();
-> >>  }
-> >>  
-> >> diff --git a/arch/arm/include/asm/cp15.h b/arch/arm/include/asm/cp15.h
-> >> index c3f1152..f661732 100644
-> >> --- a/arch/arm/include/asm/cp15.h
-> >> +++ b/arch/arm/include/asm/cp15.h
-> >> @@ -47,6 +47,21 @@
-> >>  #define vectors_high()	(0)
-> >>  #endif
-> >>  
-> >> +#define __ACCESS_CP15(CRn, Op1, CRm, Op2)	\
-> >> +	"mrc", "mcr", __stringify(p15, Op1, %0, CRn, CRm, Op2), u32
-> >> +#define __ACCESS_CP15_64(Op1, CRm)		\
-> >> +	"mrrc", "mcrr", __stringify(p15, Op1, %Q0, %R0, CRm), u64
-> >> +
-> >> +#define __read_sysreg(r, w, c, t) ({				\
-> >> +	t __val;						\
-> >> +	asm volatile(r " " c : "=r" (__val));			\
-> >> +	__val;							\
-> >> +})
-> >> +#define read_sysreg(...)		__read_sysreg(__VA_ARGS__)
-> >> +
-> >> +#define __write_sysreg(v, r, w, c, t)	asm volatile(w " " c : : "r" ((t)(v)))
-> >> +#define write_sysreg(v, ...)		__write_sysreg(v, __VA_ARGS__)
-> >> +
-> > 
-> > I feel a bit strange about adding this sort of stuff in a
-> > non-kvm-non-gic-specific ARM header file, without it being used (or
-> > planned to be used) in a broader sense.
-> > 
-> > Is there not a way to keep the required changes local to KVM and the
-> > gic?
-> > 
-> 
-> We could add prefixes to KVM and GIC version of macros so they won't
-> clash, but it'd introduce code duplication.
-> We could keep macro in, say, GIC header and include it in KVM one (or
-> vice versa), but such dependency would not look nicer, IMO.
-> 
-> The way arm64 handles this is via sysreg.h and the closest counterpart
-> under arch/arm is cp15.h
-> 
-> I'm open to suggestions.
-> 
-
-Hmm, I guess you're right, your approach does make sense.
+I have queued this via the KVM/ARM tree.  If you have any objections,
+please let me know asap.
 
 Thanks,
 -Christoffer
