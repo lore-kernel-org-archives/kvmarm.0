@@ -1,31 +1,27 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [RFC v2 PATCH 2/7] KVM: Track the pid of the VM process
-Date: Tue, 06 Sep 2016 16:22:17 +0100
-Message-ID: <87poohhx3q.fsf@e105922-lin.cambridge.arm.com>
+Subject: Re: [RFC v2 PATCH 6/7] arm64: KVM: Handle trappable TLB instructions
+Date: Tue, 06 Sep 2016 16:44:11 +0100
+Message-ID: <87inu9hw38.fsf@e105922-lin.cambridge.arm.com>
 References: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
- <1473093097-30932-3-git-send-email-punit.agrawal@arm.com>
- <20160906062252.GA30513@cbox>
- <87poohjqzk.fsf@e105922-lin.cambridge.arm.com>
- <20160906102542.GG30513@cbox>
- <877fapjng0.fsf@e105922-lin.cambridge.arm.com>
- <20160906112203.GO30513@cbox>
+ <1473093097-30932-7-git-send-email-punit.agrawal@arm.com>
+ <20160906102113.GE30513@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD98349B61
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 11:14:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E760409A2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 11:36:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yjj4U73TQBEL for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 11:14:12 -0400 (EDT)
+ with ESMTP id OOpGfh4RWA+m for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 11:36:17 -0400 (EDT)
 Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
  [217.140.96.140])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA74F49B60
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 11:14:10 -0400 (EDT)
-In-Reply-To: <20160906112203.GO30513@cbox> (Christoffer Dall's message of
- "Tue, 6 Sep 2016 13:22:03 +0200")
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4D5574011D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 11:36:16 -0400 (EDT)
+In-Reply-To: <20160906102113.GE30513@cbox> (Christoffer Dall's message of
+ "Tue, 6 Sep 2016 12:21:13 +0200")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,93 +32,277 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Q2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPiB3cml0ZXM6Cgo+
-IE9uIFR1ZSwgU2VwIDA2LCAyMDE2IGF0IDEyOjA3OjU5UE0gKzAxMDAsIFB1bml0IEFncmF3YWwg
-d3JvdGU6Cj4+IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4g
-d3JpdGVzOgo+PiAKPj4gPiBPbiBUdWUsIFNlcCAwNiwgMjAxNiBhdCAxMDo1MToyN0FNICswMTAw
-LCBQdW5pdCBBZ3Jhd2FsIHdyb3RlOgo+PiA+PiBIaSBDaHJpc3RvZmZlciwKPj4gPj4gCj4+ID4+
-IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4gd3JpdGVzOgo+
-PiA+PiAKPj4gPj4gPiBPbiBNb24sIFNlcCAwNSwgMjAxNiBhdCAwNTozMTozMlBNICswMTAwLCBQ
-dW5pdCBBZ3Jhd2FsIHdyb3RlOgo+PiA+PiA+PiBVc2Vyc3BhY2UgdG9vbHMgc3VjaCBhcyBwZXJm
-IGNhbiBiZSB1c2VkIHRvIHByb2ZpbGUgaW5kaXZpZHVhbAo+PiA+PiA+PiBwcm9jZXNzZXMuCj4+
-ID4+ID4+IAo+PiA+PiA+PiBUcmFjayB0aGUgUElEIG9mIHRoZSB2aXJ0dWFsIG1hY2hpbmUgcHJv
-Y2VzcyB0byBtYXRjaCBwcm9maWxpbmcgcmVxdWVzdHMKPj4gPj4gPj4gdGFyZ2V0ZWQgYXQgaXQu
-IFRoaXMgY2FuIGJlIHVzZWQgdG8gdGFrZSBhcHByb3ByaWF0ZSBhY3Rpb24gdG8gZW5hYmxlCj4+
-ID4+ID4+IHRoZSByZXF1ZXN0ZWQgcHJvZmlsaW5nIG9wZXJhdGlvbnMgZm9yIHRoZSBWTXMgb2Yg
-aW50ZXJlc3QuCj4+ID4+ID4+IAo+PiA+PiA+PiBTaWduZWQtb2ZmLWJ5OiBQdW5pdCBBZ3Jhd2Fs
-IDxwdW5pdC5hZ3Jhd2FsQGFybS5jb20+Cj4+ID4+ID4+IENjOiBQYW9sbyBCb256aW5pIDxwYm9u
-emluaUByZWRoYXQuY29tPgo+PiA+PiA+PiBDYzogIlJhZGltIEtyxI1tw6HFmSIgPHJrcmNtYXJA
-cmVkaGF0LmNvbT4KPj4gPj4gPj4gQ2M6IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRh
-bGxAbGluYXJvLm9yZz4KPj4gPj4gPj4gQ2M6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFy
-bS5jb20+Cj4+ID4+ID4+IC0tLQo+PiA+PiA+PiAgaW5jbHVkZS9saW51eC9rdm1faG9zdC5oIHwg
-MSArCj4+ID4+ID4+ICB2aXJ0L2t2bS9rdm1fbWFpbi5jICAgICAgfCAyICsrCj4+ID4+ID4+ICAy
-IGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKQo+PiA+PiA+PiAKPj4gPj4gPj4gZGlmZiAt
-LWdpdCBhL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaCBiL2luY2x1ZGUvbGludXgva3ZtX2hvc3Qu
-aAo+PiA+PiA+PiBpbmRleCA5YzI4YjRkLi43YzQyYzk0IDEwMDY0NAo+PiA+PiA+PiAtLS0gYS9p
-bmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgKPj4gPj4gPj4gKysrIGIvaW5jbHVkZS9saW51eC9rdm1f
-aG9zdC5oCj4+ID4+ID4+IEBAIC0zNzQsNiArMzc0LDcgQEAgc3RydWN0IGt2bV9tZW1zbG90cyB7
-Cj4+ID4+ID4+ICBzdHJ1Y3Qga3ZtIHsKPj4gPj4gPj4gIAlzcGlubG9ja190IG1tdV9sb2NrOwo+
-PiA+PiA+PiAgCXN0cnVjdCBtdXRleCBzbG90c19sb2NrOwo+PiA+PiA+PiArCXN0cnVjdCBwaWQg
-KnBpZDsKPj4gPj4gPj4gIAlzdHJ1Y3QgbW1fc3RydWN0ICptbTsgLyogdXNlcnNwYWNlIHRpZWQg
-dG8gdGhpcyB2bSAqLwo+PiA+PiA+PiAgCXN0cnVjdCBrdm1fbWVtc2xvdHMgKm1lbXNsb3RzW0tW
-TV9BRERSRVNTX1NQQUNFX05VTV07Cj4+ID4+ID4+ICAJc3RydWN0IHNyY3Vfc3RydWN0IHNyY3U7
-Cj4+ID4+ID4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9rdm1fbWFpbi5jIGIvdmlydC9rdm0va3Zt
-X21haW4uYwo+PiA+PiA+PiBpbmRleCAxOTUwNzgyLi5hYjI1MzVhIDEwMDY0NAo+PiA+PiA+PiAt
-LS0gYS92aXJ0L2t2bS9rdm1fbWFpbi5jCj4+ID4+ID4+ICsrKyBiL3ZpcnQva3ZtL2t2bV9tYWlu
-LmMKPj4gPj4gPj4gQEAgLTYxMyw2ICs2MTMsNyBAQCBzdGF0aWMgc3RydWN0IGt2bSAqa3ZtX2Ny
-ZWF0ZV92bSh1bnNpZ25lZCBsb25nIHR5cGUpCj4+ID4+ID4+ICAJc3Bpbl9sb2NrX2luaXQoJmt2
-bS0+bW11X2xvY2spOwo+PiA+PiA+PiAgCWF0b21pY19pbmMoJmN1cnJlbnQtPm1tLT5tbV9jb3Vu
-dCk7Cj4+ID4+ID4+ICAJa3ZtLT5tbSA9IGN1cnJlbnQtPm1tOwo+PiA+PiA+PiArCWt2bS0+cGlk
-ID0gZ2V0X3Rhc2tfcGlkKGN1cnJlbnQsIFBJRFRZUEVfUElEKTsKPj4gPj4gPgo+PiA+PiA+IEhv
-dyBkb29lcyB0aGlzIGRlYWwgd2l0aCB0aHJlYWRpbmc/ICBJcyB0aGUgaWRlYSB0aGF0IHRoZSB1
-c2VyIGJ5Cj4+ID4+ID4gc3BlY2lmeWluZyB0aGUgbWFpbiB0aHJlYWQncyBwaWQgd2lsbCBlbmFi
-bGUgdHJhcHBpbmcgZm9yIGFsbCB2Y3B1Cj4+ID4+ID4gdGhyZWFkcyBiZWxvbmdpbmcgdG8gdGhh
-dCBWTT8KPj4gPj4gCj4+ID4+IFllcyB0aGF0J3MgY29ycmVjdCAtIHNwZWNpZnlpbmcgdGhlIG1h
-aW4gdGhyZWFkIFBJRCB3aWxsIGVuYWJsZSB0cmFwcGluZwo+PiA+PiBmb3IgdGhlIFZNIChhbGwg
-dmNwdXMpLgo+PiA+PiAKPj4gPj4gSSBhbSBoYXBweSB0byBtb3ZlIHRvIGEgbW9yZSBzdWl0YWJs
-ZSBpZGVudGlmaWVyIGlmIGF2YWlsYWJsZS4KPj4gPj4gCj4+ID4KPj4gPiBXaGF0IGlzIHRoZSAn
-bWFpbiB0aHJlYWQnID8KPj4gPgo+PiA+IERvZXMgc29tZXRoaW5nIG1hbmRhdGUgdGhhdCB0aGUg
-Vk0gaXMgY3JlYXRlZCBieSB0aGUgdGhyZWFkIGdyb3VwCj4+ID4gbGVhZGVyPyAgSWYgbm90LCBp
-cyBpdCBub3QgYSBiaXQgc3RyYW5nZSBmcm9tIGEgdXNlciBwZXJzcGVjdGl2ZSwgdGhhdAo+PiA+
-IHlvdSBoYXZlIHRvIGZpbmQgdGhlIHNwZWNpZmljIHN1YnRocmVhZCBwaWQgdGhhdCBjcmVhdGVk
-IHRoZSB2bSB0bwo+PiA+IGVuYWJsZSB0aGlzIHRyYWNpbmcgZm9yIGFsbCB2Y3B1IHRocmVhZHMg
-YW5kIHRoYXQgdGhlIHRnaWQgZG9lc24ndCB3b3JrCj4+ID4gaW4gdGhpcyBjYXNlPwo+PiAKPj4g
-TGV0IG1lIGNvcnJlY3QgbXkgdGVybWlub2xvZ3kgdXNhZ2UgLSB0aGUgdmFsdWUgcmVjb3JkZWQg
-YWJvdmUgKGFuZCB1c2VkCj4+IHRvIGlkZW50aWZ5IHRoZSBWTSkgc2hvdWxkIGJlIHRoZSB0Z2lk
-LiBJdCBpcyBjb25mdXNpbmcgYmVjYXVzZSAncHMnCj4+IHJlcG9ydHMgaXQgYXMgcGlkLgo+PiAK
-Pj4gSSBwaWNrZWQgdGhlIHZhbHVlIGFzIGV4aXN0aW5nIEtWTSBjb2RlIGFscmVhZHkgdXNlcyB0
-aGUgUElEIG9mIHRoZQo+PiBjcmVhdGluZyB0YXNrIChzZWUga3ZtX2NyZWF0ZV92bV9kZWJ1Z2Zz
-KSB0byBleHBvcnQgVk0gc3RhdGlzdGljcyBpbgo+PiBkZWJ1Z2ZzLgo+PiAKPj4gSWYgSSd2ZSBn
-b3QgdGhpcyB3cm9uZywgdGhlbiBrdm1fY3JlYXRlX3ZtX2RlYnVnZnMgYWxzbyBsaWtlbHkgbmVl
-ZHMgYW4KPj4gdXBkYXRlLgo+PiAKPj4gV2hhdCBkbyB5b3UgdGhpbms/Cj4+IAo+IFdoZW4geW91
-IGRvIGdldF90YXNrX3BpZChjdXJyZW50LCBQSURUWVBFX1BJRCkgaXQgYWN0dWFsbHkgZ2V0cyB0
-aGUKPiBrZXJuZWwgdmlldyBvZiBhIFBJRCB3aGljaCBpcyB0aGUgdGhlYWQtaWQgZnJvbSB1c2Vy
-c3BhY2UncyBwb2ludCBvZgo+IHZpZXcsIHJpZ2h0PwoKVGhhdCBtYWtlcyBzZW5zZS4gSXQgc2Vl
-bXMgdG8gd29ya3MgaGVyZSBiZWNhdXNlIHRoZSBwaWQgb2YgdGhlIGZpcnN0CnRhc2sgaXMgYWxz
-byB0aGUgdGdpZCBvZiB0aGUgZ3JvdXAuIEFuZCBJIHJlY2tvbiBpdCdzIHRoZSBzYW1lCmFzc3Vt
-cHRpb24gYmVpbmcgbWFkZSB3aXRoIGRlYnVnZnMgY29kZSAobW9yZSBiZWxvdykuCgpJJ3ZlIGNo
-YW5nZWQgdGhlIGZpcnN0IGFyZ3VtZW50IG9mIHRoZSBjYWxsIHRvIGdldF90YXNrX3BpZCB0bwpj
-dXJyZW50LT5ncm91cF9sZWFkZXIuCgo+Cj4gSSBkb24ndCBzZWUgd2h5IHRoaXMgaGFzIHRvIGJl
-IHRoZSBzYW1lIGFzIHRoZSBkZWJ1Z2ZzIGNvZGUsIGFzIHRoZXJlIGl0Cj4gbWFrZXMgcG90ZW50
-aWFsbHkgbW9yZSBzZW5zZSB0byB0aHJlYWQtc3BlY2lmaWMsIGJ1dCBmb3IgeW91ciBjYXNlLCBh
-cmUKPiB5b3Ugbm90IHRhcmdldGluZyB0aGUgYmVoYXZpb3IgdGhhdCBhIHVzZXIgY2FuIGRvICJw
-cyBhdXggfCBncmVwIHFlbXUiCj4gb3Igd2hhdGV2ZXIsIGFuZCB0aGVuIHNldCB0cmFjaW5nIGZv
-ciB0aGUgcmVwb3J0ZWQgUElEICh3aGljaCBpcwo+IGFjdHVhbGx5IGEgdGdpZCk/CgpUaGUgZGVi
-dWdmcyBzdGF0cyBhcmUgbm90IHRocmVhZCAodmNwdSkgc3BlY2lmaWMgYnV0IGZvciB0aGUgVk0u
-CgpCb3RoIHZhbHVlcywgZGVidWdmcyBhbmQgaGVyZSwgYXJlIGJlaW5nIHVzZWQgdG8gcmVwcmVz
-ZW50IHRoZSBWTSB0byB0aGUKdXNlci4gQSBtaXNtYXRjaCBpbiB0aGVzZSBpZGVudGlmaWVycyB3
-aWxsIGJlIHZlcnkgY29uZnVzaW5nLgoKSWYgeW91IGFncmVlLCBJIGNhbiBzZXBhcmF0ZWx5IHNl
-bmQgYSBwYXRjaCB0byBhZGRyZXNzIHRoaXMgZm9yIFZNCmRlYnVnZnMgZGlyZWN0b3J5IGFzIHdl
-bGwuCgo+Cj4gSWYgdGhpcyBpcyBpbmRlZWQgdGhlIGNhc2UsIHRoZW4gSSBkb24ndCB0aGluayB0
-aGUgY3VycmVudCBjb2RlIHN1cHBvcnRzCj4gdGhpcyBpZiBRRU1VIHdhcyBldmVyIGNoYW5nZWQg
-dG8gY3JlYXRlIHRoZSBWTSB3aXRoIGEgZGlmZmVyZW50IHRocmVhZAo+IHRoYW4gdGhlIHRnbC4K
-Pgo+IFRoYXQgYmVpbmcgc2FpZCwgSSdtIHR5cGljYWxseSB3cm9uZyB3aGVuIEkgdGFsayBhYm91
-dCB1c2Vyc3BhY2UuCj4KPiAtQ2hyaXN0b2ZmZXIKPiBfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwo+IGt2bWFybSBtYWlsaW5nIGxpc3QKPiBrdm1hcm1AbGlz
-dHMuY3MuY29sdW1iaWEuZWR1Cj4gaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1h
-bi9saXN0aW5mby9rdm1hcm0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
-Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Christoffer Dall <christoffer.dall@linaro.org> writes:
+
+> On Mon, Sep 05, 2016 at 05:31:36PM +0100, Punit Agrawal wrote:
+>> The ARMv8 architecture allows trapping of TLB maintenane instructions
+>> from EL0/EL1 to higher exception levels. On encountering a trappable TLB
+>> instruction in a guest, an exception is taken to EL2.
+>> 
+>> Add functionality to handle emulating the TLB instructions.
+>> 
+>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_asm.h |  1 +
+>>  arch/arm64/kvm/hyp/tlb.c         | 69 ++++++++++++++++++++++++++++++++++
+>>  arch/arm64/kvm/sys_regs.c        | 81 ++++++++++++++++++++++++++++++++++++++++
+>>  arch/arm64/kvm/trace.h           | 16 ++++++++
+>>  4 files changed, 167 insertions(+)
+>> 
+>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+>> index 7561f63..1ac1cc3 100644
+>> --- a/arch/arm64/include/asm/kvm_asm.h
+>> +++ b/arch/arm64/include/asm/kvm_asm.h
+>> @@ -49,6 +49,7 @@ extern char __kvm_hyp_vector[];
+>>  extern void __kvm_flush_vm_context(void);
+>>  extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+>>  extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
+>> +extern void __kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 sysreg, u64 regval);
+>>  
+>>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>>  
+>> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+>> index 4cda100..1210f58 100644
+>> --- a/arch/arm64/kvm/hyp/tlb.c
+>> +++ b/arch/arm64/kvm/hyp/tlb.c
+>> @@ -78,3 +78,72 @@ static void __hyp_text __tlb_flush_vm_context(void)
+>>  }
+>>  
+>>  __alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
+>> +
+>> +/* Intentionally empty functions */
+>> +static void __hyp_text __switch_to_hyp_role_nvhe(void) { }
+>> +static void __hyp_text __switch_to_host_role_nvhe(void) { }
+>> +
+>> +static void __hyp_text __switch_to_hyp_role_vhe(void)
+>> +{
+>> +	u64 hcr = read_sysreg(hcr_el2);
+>> +
+>> +	hcr &= ~HCR_TGE;
+>> +	write_sysreg(hcr, hcr_el2);
+>
+> why do we need to clear TGE for the TLB maintenance instructions to
+> work?
+>
+> Perhaps this is worth explaining in a comment.
+
+I've added the following comment before clearing TGE bit.
+
+"When VHE is enabled and HCR_EL2.TGE=1, EL1&0 TLB operations
+apply to EL2&0 translation regime. As we prepare to emulate
+guest TLB operation clear HCR_TGE to target TLB operations
+to EL1&0 (guest)."
+
+>
+> Otherwise this looks ok to me.
+
+Thanks for taking a look.
+
+Punit
+
+>
+> -Christoffer
+>
+>> +}
+>> +
+>> +static void __hyp_text __switch_to_host_role_vhe(void)
+>> +{
+>> +	u64 hcr = read_sysreg(hcr_el2);
+>> +
+>> +	hcr |= HCR_TGE;
+>> +	write_sysreg(hcr, hcr_el2);
+>> +}
+>> +
+>> +static hyp_alternate_select(__switch_to_hyp_role,
+>> +			    __switch_to_hyp_role_nvhe,
+>> +			    __switch_to_hyp_role_vhe,
+>> +			    ARM64_HAS_VIRT_HOST_EXTN);
+>> +
+>> +static hyp_alternate_select(__switch_to_host_role,
+>> +			    __switch_to_host_role_nvhe,
+>> +			    __switch_to_host_role_vhe,
+>> +			    ARM64_HAS_VIRT_HOST_EXTN);
+>> +
+>> +static void __hyp_text __switch_to_guest_regime(struct kvm *kvm)
+>> +{
+>> +	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+>> +	__switch_to_hyp_role();
+>> +	isb();
+>> +}
+>> +
+>> +static void __hyp_text __switch_to_host_regime(void)
+>> +{
+>> +	__switch_to_host_role();
+>> +	write_sysreg(0, vttbr_el2);
+>> +}
+>> +
+>> +void __hyp_text
+>> +__kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 sys_op, u64 regval)
+>> +{
+>> +	kvm = kern_hyp_va(kvm);
+>> +
+>> +	/*
+>> +	 * Switch to the guest before performing any TLB operations to
+>> +	 * target the appropriate VMID
+>> +	 */
+>> +	__switch_to_guest_regime(kvm);
+>> +
+>> +	/*
+>> +	 *  TLB maintenance operations are broadcast to
+>> +	 *  inner-shareable domain when HCR_FB is set (default for
+>> +	 *  KVM).
+>> +	 *
+>> +	 *  Nuke all Stage 1 TLB entries for the VM. This will kill
+>> +	 *  performance but it's always safe to do as we don't leave
+>> +	 *  behind any strays in the TLB
+>> +	 */
+>> +	__tlbi(vmalle1is);
+>> +	isb();
+>> +
+>> +	__switch_to_host_regime();
+>> +}
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index e51367d..0e70da9 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -790,6 +790,18 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>>  	return true;
+>>  }
+>>  
+>> +static bool emulate_tlb_invalidate(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +				  const struct sys_reg_desc *r)
+>> +{
+>> +	u32 opcode = sys_reg(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
+>> +
+>> +	kvm_call_hyp(__kvm_emulate_tlb_invalidate,
+>> +		     vcpu->kvm, opcode, p->regval);
+>> +	trace_kvm_tlb_invalidate(*vcpu_pc(vcpu), opcode);
+>> +
+>> +	return true;
+>> +}
+>> +
+>>  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+>>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+>>  	/* DBGBVRn_EL1 */						\
+>> @@ -841,6 +853,35 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>  	{ Op0(0b01), Op1(0b000), CRn(0b0111), CRm(0b1110), Op2(0b010),
+>>  	  access_dcsw },
+>>  
+>> +	/*
+>> +	 * ARMv8 ARM: Table C5-4 TLB maintenance instructions
+>> +	 * (Ref: ARMv8 ARM C5.1 version: ARM DDI 0487A.j)
+>> +	 */
+>> +	/* TLBI VMALLE1IS */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(0), emulate_tlb_invalidate },
+>> +	/* TLBI VAE1IS */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(1), emulate_tlb_invalidate },
+>> +	/* TLBI ASIDE1IS */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(2), emulate_tlb_invalidate },
+>> +	/* TLBI VAAE1IS */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(3), emulate_tlb_invalidate },
+>> +	/* TLBI VALE1IS */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(5), emulate_tlb_invalidate },
+>> +	/* TLBI VAALE1IS */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(7), emulate_tlb_invalidate },
+>> +	/* TLBI VMALLE1 */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(0), emulate_tlb_invalidate },
+>> +	/* TLBI VAE1 */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(1), emulate_tlb_invalidate },
+>> +	/* TLBI ASIDE1 */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(2), emulate_tlb_invalidate },
+>> +	/* TLBI VAAE1 */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(3), emulate_tlb_invalidate },
+>> +	/* TLBI VALE1 */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(5), emulate_tlb_invalidate },
+>> +	/* TLBI VAALE1 */
+>> +	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(7), emulate_tlb_invalidate },
+>> +
+>>  	DBG_BCR_BVR_WCR_WVR_EL1(0),
+>>  	DBG_BCR_BVR_WCR_WVR_EL1(1),
+>>  	/* MDCCINT_EL1 */
+>> @@ -1329,6 +1370,46 @@ static const struct sys_reg_desc cp15_regs[] = {
+>>  	{ Op1( 0), CRn( 7), CRm(10), Op2( 2), access_dcsw },
+>>  	{ Op1( 0), CRn( 7), CRm(14), Op2( 2), access_dcsw },
+>>  
+>> +	/*
+>> +	 * TLB operations
+>> +	 */
+>> +	/* TLBIALLIS */
+>> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 0), emulate_tlb_invalidate},
+>> +	/* TLBIMVAIS */
+>> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 1), emulate_tlb_invalidate},
+>> +	/* TLBIASIDIS */
+>> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 2), emulate_tlb_invalidate},
+>> +	/* TLBIMVAAIS */
+>> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 3), emulate_tlb_invalidate},
+>> +	/* TLBIMVALIS */
+>> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 5), emulate_tlb_invalidate},
+>> +	/* TLBIMVAALIS */
+>> +	{ Op1( 0), CRn( 8), CRm( 3), Op2( 7), emulate_tlb_invalidate},
+>> +	/* ITLBIALL */
+>> +	{ Op1( 0), CRn( 8), CRm( 5), Op2( 0), emulate_tlb_invalidate},
+>> +	/* ITLBIMVA */
+>> +	{ Op1( 0), CRn( 8), CRm( 5), Op2( 1), emulate_tlb_invalidate},
+>> +	/* ITLBIASID */
+>> +	{ Op1( 0), CRn( 8), CRm( 5), Op2( 2), emulate_tlb_invalidate},
+>> +	/* DTLBIALL */
+>> +	{ Op1( 0), CRn( 8), CRm( 6), Op2( 0), emulate_tlb_invalidate},
+>> +	/* DTLBIMVA */
+>> +	{ Op1( 0), CRn( 8), CRm( 6), Op2( 1), emulate_tlb_invalidate},
+>> +	/* DTLBIASID */
+>> +	{ Op1( 0), CRn( 8), CRm( 6), Op2( 2), emulate_tlb_invalidate},
+>> +	/* TLBIALL */
+>> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 0), emulate_tlb_invalidate},
+>> +	/* TLBIMVA */
+>> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 1), emulate_tlb_invalidate},
+>> +	/* TLBIASID */
+>> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 2), emulate_tlb_invalidate},
+>> +	/* TLBIMVAA */
+>> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 3), emulate_tlb_invalidate},
+>> +	/* TLBIMVAL */
+>> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 5), emulate_tlb_invalidate},
+>> +	/* TLBIMVAAL */
+>> +	{ Op1( 0), CRn( 8), CRm( 7), Op2( 7), emulate_tlb_invalidate},
+>> +
+>>  	/* PMU */
+>>  	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmcr },
+>>  	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmcnten },
+>> diff --git a/arch/arm64/kvm/trace.h b/arch/arm64/kvm/trace.h
+>> index 7fb0008..c4d577f 100644
+>> --- a/arch/arm64/kvm/trace.h
+>> +++ b/arch/arm64/kvm/trace.h
+>> @@ -166,6 +166,22 @@ TRACE_EVENT(kvm_set_guest_debug,
+>>  	TP_printk("vcpu: %p, flags: 0x%08x", __entry->vcpu, __entry->guest_debug)
+>>  );
+>>  
+>> +TRACE_EVENT(kvm_tlb_invalidate,
+>> +	TP_PROTO(unsigned long vcpu_pc, u32 opcode),
+>> +	TP_ARGS(vcpu_pc, opcode),
+>> +
+>> +	TP_STRUCT__entry(
+>> +		__field(unsigned long, vcpu_pc)
+>> +		__field(u32, opcode)
+>> +	),
+>> +
+>> +	TP_fast_assign(
+>> +		__entry->vcpu_pc = vcpu_pc;
+>> +		__entry->opcode = opcode;
+>> +	),
+>> +
+>> +	TP_printk("vcpu_pc=0x%16lx opcode=%08x", __entry->vcpu_pc, __entry->opcode)
+>> +);
+>>  
+>>  #endif /* _TRACE_ARM64_KVM_H */
+>>  
+>> -- 
+>> 2.8.1
+>> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
