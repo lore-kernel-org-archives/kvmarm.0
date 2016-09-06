@@ -1,98 +1,50 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [RFC v2 PATCH 2/7] KVM: Track the pid of the VM process
-Date: Tue, 06 Sep 2016 12:07:59 +0100
-Message-ID: <877fapjng0.fsf@e105922-lin.cambridge.arm.com>
-References: <1473093097-30932-1-git-send-email-punit.agrawal@arm.com>
- <1473093097-30932-3-git-send-email-punit.agrawal@arm.com>
- <20160906062252.GA30513@cbox>
- <87poohjqzk.fsf@e105922-lin.cambridge.arm.com>
- <20160906102542.GG30513@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 0/7]  arm64: KVM: vgic-v2: Allow unsafe GICV accesses
+Date: Tue, 6 Sep 2016 13:14:50 +0200
+Message-ID: <20160906111450.GN30513@cbox>
+References: <1473150527-4729-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 705FA49B50
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 06:59:44 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CFM6dO63Cwjk for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 06:59:43 -0400 (EDT)
-Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
- [217.140.96.140])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19EE649B4C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 06:59:42 -0400 (EDT)
-In-Reply-To: <20160906102542.GG30513@cbox> (Christoffer Dall's message of
- "Tue, 6 Sep 2016 12:25:42 +0200")
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1473150527-4729-1-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Q2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPiB3cml0ZXM6Cgo+
-IE9uIFR1ZSwgU2VwIDA2LCAyMDE2IGF0IDEwOjUxOjI3QU0gKzAxMDAsIFB1bml0IEFncmF3YWwg
-d3JvdGU6Cj4+IEhpIENocmlzdG9mZmVyLAo+PiAKPj4gQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0
-b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPiB3cml0ZXM6Cj4+IAo+PiA+IE9uIE1vbiwgU2VwIDA1LCAy
-MDE2IGF0IDA1OjMxOjMyUE0gKzAxMDAsIFB1bml0IEFncmF3YWwgd3JvdGU6Cj4+ID4+IFVzZXJz
-cGFjZSB0b29scyBzdWNoIGFzIHBlcmYgY2FuIGJlIHVzZWQgdG8gcHJvZmlsZSBpbmRpdmlkdWFs
-Cj4+ID4+IHByb2Nlc3Nlcy4KPj4gPj4gCj4+ID4+IFRyYWNrIHRoZSBQSUQgb2YgdGhlIHZpcnR1
-YWwgbWFjaGluZSBwcm9jZXNzIHRvIG1hdGNoIHByb2ZpbGluZyByZXF1ZXN0cwo+PiA+PiB0YXJn
-ZXRlZCBhdCBpdC4gVGhpcyBjYW4gYmUgdXNlZCB0byB0YWtlIGFwcHJvcHJpYXRlIGFjdGlvbiB0
-byBlbmFibGUKPj4gPj4gdGhlIHJlcXVlc3RlZCBwcm9maWxpbmcgb3BlcmF0aW9ucyBmb3IgdGhl
-IFZNcyBvZiBpbnRlcmVzdC4KPj4gPj4gCj4+ID4+IFNpZ25lZC1vZmYtYnk6IFB1bml0IEFncmF3
-YWwgPHB1bml0LmFncmF3YWxAYXJtLmNvbT4KPj4gPj4gQ2M6IFBhb2xvIEJvbnppbmkgPHBib256
-aW5pQHJlZGhhdC5jb20+Cj4+ID4+IENjOiAiUmFkaW0gS3LEjW3DocWZIiA8cmtyY21hckByZWRo
-YXQuY29tPgo+PiA+PiBDYzogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5h
-cm8ub3JnPgo+PiA+PiBDYzogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPj4g
-Pj4gLS0tCj4+ID4+ICBpbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmggfCAxICsKPj4gPj4gIHZpcnQv
-a3ZtL2t2bV9tYWluLmMgICAgICB8IDIgKysKPj4gPj4gIDIgZmlsZXMgY2hhbmdlZCwgMyBpbnNl
-cnRpb25zKCspCj4+ID4+IAo+PiA+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9rdm1faG9z
-dC5oIGIvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oCj4+ID4+IGluZGV4IDljMjhiNGQuLjdjNDJj
-OTQgMTAwNjQ0Cj4+ID4+IC0tLSBhL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaAo+PiA+PiArKysg
-Yi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgKPj4gPj4gQEAgLTM3NCw2ICszNzQsNyBAQCBzdHJ1
-Y3Qga3ZtX21lbXNsb3RzIHsKPj4gPj4gIHN0cnVjdCBrdm0gewo+PiA+PiAgCXNwaW5sb2NrX3Qg
-bW11X2xvY2s7Cj4+ID4+ICAJc3RydWN0IG11dGV4IHNsb3RzX2xvY2s7Cj4+ID4+ICsJc3RydWN0
-IHBpZCAqcGlkOwo+PiA+PiAgCXN0cnVjdCBtbV9zdHJ1Y3QgKm1tOyAvKiB1c2Vyc3BhY2UgdGll
-ZCB0byB0aGlzIHZtICovCj4+ID4+ICAJc3RydWN0IGt2bV9tZW1zbG90cyAqbWVtc2xvdHNbS1ZN
-X0FERFJFU1NfU1BBQ0VfTlVNXTsKPj4gPj4gIAlzdHJ1Y3Qgc3JjdV9zdHJ1Y3Qgc3JjdTsKPj4g
-Pj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2t2bV9tYWluLmMgYi92aXJ0L2t2bS9rdm1fbWFpbi5j
-Cj4+ID4+IGluZGV4IDE5NTA3ODIuLmFiMjUzNWEgMTAwNjQ0Cj4+ID4+IC0tLSBhL3ZpcnQva3Zt
-L2t2bV9tYWluLmMKPj4gPj4gKysrIGIvdmlydC9rdm0va3ZtX21haW4uYwo+PiA+PiBAQCAtNjEz
-LDYgKzYxMyw3IEBAIHN0YXRpYyBzdHJ1Y3Qga3ZtICprdm1fY3JlYXRlX3ZtKHVuc2lnbmVkIGxv
-bmcgdHlwZSkKPj4gPj4gIAlzcGluX2xvY2tfaW5pdCgma3ZtLT5tbXVfbG9jayk7Cj4+ID4+ICAJ
-YXRvbWljX2luYygmY3VycmVudC0+bW0tPm1tX2NvdW50KTsKPj4gPj4gIAlrdm0tPm1tID0gY3Vy
-cmVudC0+bW07Cj4+ID4+ICsJa3ZtLT5waWQgPSBnZXRfdGFza19waWQoY3VycmVudCwgUElEVFlQ
-RV9QSUQpOwo+PiA+Cj4+ID4gSG93IGRvb2VzIHRoaXMgZGVhbCB3aXRoIHRocmVhZGluZz8gIElz
-IHRoZSBpZGVhIHRoYXQgdGhlIHVzZXIgYnkKPj4gPiBzcGVjaWZ5aW5nIHRoZSBtYWluIHRocmVh
-ZCdzIHBpZCB3aWxsIGVuYWJsZSB0cmFwcGluZyBmb3IgYWxsIHZjcHUKPj4gPiB0aHJlYWRzIGJl
-bG9uZ2luZyB0byB0aGF0IFZNPwo+PiAKPj4gWWVzIHRoYXQncyBjb3JyZWN0IC0gc3BlY2lmeWlu
-ZyB0aGUgbWFpbiB0aHJlYWQgUElEIHdpbGwgZW5hYmxlIHRyYXBwaW5nCj4+IGZvciB0aGUgVk0g
-KGFsbCB2Y3B1cykuCj4+IAo+PiBJIGFtIGhhcHB5IHRvIG1vdmUgdG8gYSBtb3JlIHN1aXRhYmxl
-IGlkZW50aWZpZXIgaWYgYXZhaWxhYmxlLgo+PiAKPgo+IFdoYXQgaXMgdGhlICdtYWluIHRocmVh
-ZCcgPwo+Cj4gRG9lcyBzb21ldGhpbmcgbWFuZGF0ZSB0aGF0IHRoZSBWTSBpcyBjcmVhdGVkIGJ5
-IHRoZSB0aHJlYWQgZ3JvdXAKPiBsZWFkZXI/ICBJZiBub3QsIGlzIGl0IG5vdCBhIGJpdCBzdHJh
-bmdlIGZyb20gYSB1c2VyIHBlcnNwZWN0aXZlLCB0aGF0Cj4geW91IGhhdmUgdG8gZmluZCB0aGUg
-c3BlY2lmaWMgc3VidGhyZWFkIHBpZCB0aGF0IGNyZWF0ZWQgdGhlIHZtIHRvCj4gZW5hYmxlIHRo
-aXMgdHJhY2luZyBmb3IgYWxsIHZjcHUgdGhyZWFkcyBhbmQgdGhhdCB0aGUgdGdpZCBkb2Vzbid0
-IHdvcmsKPiBpbiB0aGlzIGNhc2U/CgpMZXQgbWUgY29ycmVjdCBteSB0ZXJtaW5vbG9neSB1c2Fn
-ZSAtIHRoZSB2YWx1ZSByZWNvcmRlZCBhYm92ZSAoYW5kIHVzZWQKdG8gaWRlbnRpZnkgdGhlIFZN
-KSBzaG91bGQgYmUgdGhlIHRnaWQuIEl0IGlzIGNvbmZ1c2luZyBiZWNhdXNlICdwcycKcmVwb3J0
-cyBpdCBhcyBwaWQuCgpJIHBpY2tlZCB0aGUgdmFsdWUgYXMgZXhpc3RpbmcgS1ZNIGNvZGUgYWxy
-ZWFkeSB1c2VzIHRoZSBQSUQgb2YgdGhlCmNyZWF0aW5nIHRhc2sgKHNlZSBrdm1fY3JlYXRlX3Zt
-X2RlYnVnZnMpIHRvIGV4cG9ydCBWTSBzdGF0aXN0aWNzIGluCmRlYnVnZnMuCgpJZiBJJ3ZlIGdv
-dCB0aGlzIHdyb25nLCB0aGVuIGt2bV9jcmVhdGVfdm1fZGVidWdmcyBhbHNvIGxpa2VseSBuZWVk
-cyBhbgp1cGRhdGUuCgpXaGF0IGRvIHlvdSB0aGluaz8KCj4KPiBUaGFua3MsCj4gLUNocmlzdG9m
-ZmVyCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBr
-dm1hcm0gbWFpbGluZyBsaXN0Cj4ga3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQo+IGh0dHBz
-Oi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCl9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxp
-c3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlh
-LmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Tue, Sep 06, 2016 at 09:28:40AM +0100, Marc Zyngier wrote:
+> In a number of cases, KVM cannot give access direct access to the
+> GICv2 GICV region, either because GICV is not page aligned, or its
+> size is not a multiple of the page size. This is especially visible
+> with 16kB/64kB pages and the original GIC-400 layout where each region
+> is only 4k aligned.
+> 
+> Instead of disabling KVM altogether (which is the current behaviour),
+> there is some value in trapping each guest GICV access, performing the
+> access as quickly as possible at EL2, and resuming the guest. This
+> allows us to keep KVM enabled on this HW.
+> 
+> Implementation wise, this is done with a static key controlling the
+> workaround being enabled, hence coming at zero cost (well, an extra
+> nop on the exit hot path) for unaffected platforms. On the affected
+> HW, I've measured a 10 to 15% overhead for a self-IPI test, which is
+> pretty bad, but still much better than not having a GIC at all.
+> 
+> There is two pending issues:
+> 
+> - A failed write to GICV ends up being forwarded to userspace. This
+>   will be addressed in a follow-up series where we deal with injecting
+>   vSError in the guest
+> 
+> - Skipping instructions (as we do when emulating anything) breaks
+>   things like guest single-step and watchpoints. This is a long
+>   standing problem, and someone should probably have a look at
+>   it. Alex?
+> 
+> Tested on Juno-r1 with 64kB pages.
+
+I also tested this on TC2 to ensure we didn't regress the 32-bit side.
+
+Applied the series.
+-Christoffer
