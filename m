@@ -1,28 +1,21 @@
-From: Itaru Kitayama <itaru.kitayama@riken.jp>
-Subject: VM is unable to shutdown on Mustang
-Date: Tue, 6 Sep 2016 16:51:34 +0900
-Message-ID: <c2ba4c69-9936-f7ce-65ac-cf5d55ba4d07@riken.jp>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v2 0/7]  arm64: KVM: vgic-v2: Allow unsafe GICV accesses
+Date: Tue,  6 Sep 2016 09:28:40 +0100
+Message-ID: <1473150527-4729-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 698D449B44
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 03:43:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96CEC49B51
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 04:20:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LpjOinXNK2Zu for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 03:43:14 -0400 (EDT)
-Received: from postman.riken.jp (postman2.riken.jp [134.160.33.84])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E231249B2F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 03:43:13 -0400 (EDT)
-Received: from postman.riken.jp (localhost.localdomain [127.0.0.1])
- by postman.riken.jp (Postfix) with SMTP id AF7F43BC44D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 16:51:35 +0900 (JST)
-Received: from MacBook-Pro.local (KD111105169138.ppp-bb.dion.ne.jp
- [111.105.169.138])
- by postman.riken.jp (Postfix) with ESMTPA id 641E13BC44C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 16:51:35 +0900 (JST)
+ with ESMTP id pvIq-6NGKJ-q for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2016 04:20:34 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F3BD49B46
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 04:20:33 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,208 +25,70 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+In a number of cases, KVM cannot give access direct access to the
+GICv2 GICV region, either because GICV is not page aligned, or its
+size is not a multiple of the page size. This is especially visible
+with 16kB/64kB pages and the original GIC-400 layout where each region
+is only 4k aligned.
 
-Observed with kvm-arm-for-v4.8-rc3 when enabling memory debugging 
-options on top of defconfig. defconfig'ed kernel does not have
-such issue though.
+Instead of disabling KVM altogether (which is the current behaviour),
+there is some value in trapping each guest GICV access, performing the
+access as quickly as possible at EL2, and resuming the guest. This
+allows us to keep KVM enabled on this HW.
 
-Below is the console log:
+Implementation wise, this is done with a static key controlling the
+workaround being enabled, hence coming at zero cost (well, an extra
+nop on the exit hot path) for unaffected platforms. On the affected
+HW, I've measured a 10 to 15% overhead for a self-IPI test, which is
+pretty bad, but still much better than not having a GIC at all.
 
-[  757.644120] Unable to handle kernel paging request at virtual address 
-ffff800661e00000
-[  757.652046] pgd = ffff20000b1a2000
-[  757.655471] [ffff800661e00000] *pgd=00000047fffe3003, 
-*pud=00000047fcd8c003, *pmd=00000047fcc7c003, *pte=00e8004661e00712
-[  757.666492] Internal error: Oops: 96000147 [#3] PREEMPT SMP
-[  757.672041] Modules linked in:
-[  757.675100] CPU: 7 PID: 3630 Comm: qemu-system-aar Tainted: G      D 
-        4.8.0-rc1 #3
-[  757.683240] Hardware name: AppliedMicro X-Gene Mustang Board/X-Gene 
-Mustang Board, BIOS 3.06.15 Aug 19 2016
-[  757.692938] task: ffff80069cdd3580 task.stack: ffff8006adb7c000
-[  757.698840] PC is at __flush_dcache_area+0x1c/0x40
-[  757.703613] LR is at kvm_flush_dcache_pmd+0x60/0x70
-[  757.708469] pc : [<ffff20000809dbdc>] lr : [<ffff2000080b4a70>] 
-pstate: 20000145
-[  757.715830] sp : ffff8006adb7f8b0
-[  757.719130] x29: ffff8006adb7f8b0 x28: ffff200008cd6520
-[  757.724445] x27: ffff80069cce4568 x26: ffff80069cce4480
-[  757.729756] x25: 0000000000000000 x24: 0000000000000000
-[  757.735065] x23: ffff8006ac0f0000 x22: 000000000069fce8
-[  757.740376] x21: ffff80069fce8000 x20: ffff200009635000
-[  757.745690] x19: 0000000004661e00 x18: 0000000000000000
-[  757.751005] x17: 0000000000000000 x16: 000000007f02ac80
-[  757.756316] x15: 0000000000000000 x14: 0000000000000000
-[  757.761625] x13: 0000000000000000 x12: ffffffffffffffff
-[  757.766936] x11: 0000000000000040 x10: 1ffff000d5b6fefe
-[  757.772247] x9 : ffff8006adb7f650 x8 : dfff200000000000
-[  757.777558] x7 : ffff2000081665f8 x6 : 0000000000000000
-[  757.782870] x5 : 0000000000000003 x4 : 0000000000000000
-[  757.788181] x3 : 000000000000003f x2 : 0000000000000040
-[  757.793491] x1 : ffff800662000000 x0 : ffff800661e00000
-[  757.798800]
-[  757.800286] Process qemu-system-aar (pid: 3630, stack limit = 
-0xffff8006adb7c020)
-[  757.807735] Stack: (0xffff8006adb7f8b0 to 0xffff8006adb80000)
-[  757.813457] f8a0:                                   ffff8006adb7f8e0 
-ffff2000080b6748
-[  757.821253] f8c0: 0000000000200000 0000000040000000 ffff80069fce8000 
-0000004661e0077d
-[  757.829049] f8e0: ffff8006adb7f970 ffff2000080b708c ffff80069cce4480 
-ffff80069cce52e8
-[  757.836846] f900: ffff80069cce4480 ffff80069cce4480 ffff80069cce5170 
-ffff80069cce5538
-[  757.844643] f920: ffff8006b217a5d8 ffff80069cce5520 ffff80069cce4568 
-ffff200008cd6520
-[  757.852438] f940: 000000069fce8000 ffff20000826e9f0 ffff200009635b30 
-000000ffffffffff
-[  757.860234] f960: 0000010000000000 000000003fffffff ffff8006adb7f990 
-ffff2000080b2280
-[  757.868031] f980: ffff80069cce4898 ffff80069cce5090 ffff8006adb7f9c0 
-ffff2000080aa330
-[  757.875825] f9a0: ffff8006b205f2b0 ffff8006cc3ea880 0000000000000000 
-ffff2000080aa318
-[  757.883621] f9c0: ffff8006adb7fa30 ffff2000080aa524 ffff80069cce4480 
-ffff8006b217a5e8
-[  757.891416] f9e0: ffff8006d5878fc8 ffff8006b217a5e0 ffff8006b217a5d0 
-ffff8006b217a644
-[  757.899212] fa00: ffff8006b217a5d8 ffff200009653da0 ffff8007faaf11e0 
-ffff8006bb5a1268
-[  757.907008] fa20: ffff8006b217a5d0 ffff8006910e9300 ffff8006adb7fa50 
-ffff2000082ad234
-[  757.914802] fa40: ffff8006b217a5c0 ffff2000082ad220 ffff8006adb7fac0 
-ffff2000082ad46c
-[  757.922599] fa60: ffff8006b217f0c0 ffff8006b217f0c0 ffff80069cdd3c38 
-ffff80069cdd3580
-[  757.930397] fa80: ffff200009b11ac0 ffff200008ce8fe0 ffff8006c8b7d740 
-ffff8006adb7fbc0
-[  757.938193] faa0: ffff8006910e9300 ffff80069cdd38f8 ffff8006adb7fad0 
-000000030810466c
-[  757.945987] fac0: ffff8006adb7fad0 ffff200008104658 ffff8006adb7fb10 
-ffff2000080dc8ec
-[  757.953782] fae0: ffff80069cdd3580 ffff80069cdd39e8 ffff8006910e93b0 
-0000000000000001
-[  757.961579] fb00: ffff8006910e9300 00000000000391e7 ffff8006adb7fc00 
-ffff2000080dd5fc
-[  757.969374] fb20: ffff8006c8b7d740 0000000000000000 ffff8006adb7c000 
-ffff8006adb7c010
-[  757.977169] fb40: ffff8006c8b7d7ec ffff8006adb7c000 ffff8006adb7c010 
-ffff8006c6dc7148
-[  757.984966] fb60: ffff80069cdd3580 ffff8006adb7c010 ffff80069cdd3948 
-ffff80069cdd3ca0
-[  757.992763] fb80: ffff80069cdd3594 ffff8006910e93b0 00000000adb7c010 
-ffff80069cdd3be0
-[  758.000558] fba0: 0000000041b58ab3 ffff2000092484c8 ffff2000080dc460 
-ffff8006c6dc7148
-[  758.008355] fbc0: ffff8006adb7fbd0 ffff200008141efc ffff8006adb7fc10 
-ffff200008142210
-[  758.016153] fbe0: ffff8006c6dc7148 ffff8006adb7c000 ffff8006adb7fc00 
-ffff2000080dd5ec
-[  758.023950] fc00: ffff8006adb7fc50 ffff2000080ed924 ffff8006adb7c000 
-ffff8006adb7c000
-[  758.031747] fc20: ffff8006adb7c010 0000000000418004 ffff8006adb7fde0 
-ffff8006adb7c000
-[  758.039542] fc40: ffff8006adb7c010 ffff8006c6dc7148 ffff8006adb7fce0 
-ffff20000808a098
-[  758.047336] fc60: ffff8006adb7fec0 1ffff000d5b6ffb4 fffffffffffffdfc 
-ffff8006adb7fdc0
-[  758.055132] fc80: ffff8006adb7ffc0 0000ffffa287c87c 0000ffffa287c880 
-0000000000000062
-[  758.062926] fca0: ffff200008cc5000 ffff8006adb7c000 ffff8006b217cf10 
-ffff8006adb7fe80
-[  758.070720] fcc0: ffff8006adb7fdc0 ffff8006c8b7d7ec ffff8006c6dc6940 
-ffff8006c8b7d740
-[  758.078516] fce0: ffff8006adb7fea0 ffff20000808aad4 0000000000000009 
-0000000001359a30
-[  758.086313] fd00: ffffffffffffffff 0000ffffa287c880 0000000080000000 
-0000000000000015
-[  758.094107] fd20: 0000000000000120 0000000000000062 ffff200008cc5000 
-ffff8006adb7c000
-[  758.101903] fd40: ffff20000830a4e8 ffff2000082d97fc 0000000000000000 
-ffff2000084d74b0
-[  758.109699] fd60: ffff8006adb7fd90 ffff2000082aa0cc ffff8006b217cf00 
-ffff8006d5878fc8
-[  758.117495] fd80: ffff8006adb7fd90 ffff20000830ae18 0000000000000000 
-ffff2000082aa54c
-[  758.125290] fda0: 0000000041b58ab3 ffff200009244a38 ffff200008089f40 
-ffff2000081920b4
-[  758.133083] fdc0: 0000000000000000 ffff200008083730 0000000000000000 
-0000000001359a30
-[  758.140880] fde0: 0000000000000009 0000ffff00000000 0000000000000000 
-0000000000000015
-[  758.148677] fe00: 0000000000000120 0000000000000062 ffff200008cc5000 
-ffff8006adb7c000
-[  758.156472] fe20: 0000000041b58ab3 ffff20000924d370 ffff200008191f80 
-00000000013379f8
-[  758.164267] fe40: 1471ac4018a24538 0000ffffa287d77c 0000000080000000 
-0000000000000015
-[  758.172062] fe60: 0000000041b58ab3 ffff2000092545e0 ffff2000082ac160 
-0000000001359a30
-[  758.179857] fe80: 0000000057ce7428 0000000018eab538 0000000080000000 
-0000000020000145
-[  758.187650] fea0: 0000000000000000 ffff200008083624 0000000000000000 
-0000000001359a30
-[  758.195445] fec0: 0000000001359a30 0000000000000189 0000000000000000 
-0000ffff464db5a8
-[  758.203240] fee0: 0000000000000000 00000000ffffffff 0000000000000000 
-0000000000000000
-[  758.211035] ff00: 0000000000000062 003b9aca00000000 0000000057ce741e 
-00000000000660f3
-[  758.218829] ff20: 0000000000000018 00000003e8000000 0018b4b8057f6733 
-000035ff446e3784
-[  758.226623] ff40: 0000000000b11be8 0000ffffa287ca00 0000000000000001 
-0000ffff464db5a8
-[  758.234418] ff60: 0000000001359a30 0000000000000000 0000ffff464db530 
-0000000000000002
-[  758.242212] ff80: 0000000000000001 0000ffff464dbe30 0000000000000000 
-0000000000800000
-[  758.250007] ffa0: 0000ffff464dc520 0000ffff464db4c0 0000ffffa287c854 
-0000ffff464db4c0
-[  758.257802] ffc0: 0000ffffa287c87c 0000000080000000 0000000001359a30 
-ffffffffffffffff
-[  758.265596] ffe0: 0000000000000000 0000000000000000 0000000000000000 
-0000000000000000
-[  758.273388] Call trace:
-[  758.275825] Exception stack(0xffff8006adb7f680 to 0xffff8006adb7f7b0)
-[  758.282238] f680: 0000000004661e00 0001000000000000 ffff8006adb7f8b0 
-ffff20000809dbdc
-[  758.290033] f6a0: 0000000020000145 0000000000000025 0000000000000000 
-ffff80069cce4480
-[  758.297828] f6c0: 0000000041b58ab3 ffff200009244678 ffff200008081398 
-ffff200008145104
-[  758.305623] f6e0: ffff8006adb7f750 ffff2000081661e0 ffff8006adb7f7a0 
-ffff200008cae5a4
-[  758.313417] f700: ffff20000a7feb10 ffff20000a7feb90 ffff20000a7feb98 
-ffff20000a7feb80
-[  758.321212] f720: ffff20000a7feb88 ffff20000a7feb70 ffff20000a7feb78 
-ffff20000a7feb10
-[  758.329006] f740: ffff8006adb7f750 ffff200008141efc ffff8006adb7f790 
-ffff200008142210
-[  758.336801] f760: ffff20000a7feb10 ffff20000a7feb90 ffff20000a7feb98 
-ffff20000a7feb80
-[  758.344596] f780: ffff800661e00000 ffff800662000000 0000000000000040 
-000000000000003f
-[  758.352389] f7a0: 0000000000000000 0000000000000003
-[  758.357249] [<ffff20000809dbdc>] __flush_dcache_area+0x1c/0x40
-[  758.363059] [<ffff2000080b6748>] unmap_stage2_range+0x458/0x5f0
-[  758.368954] [<ffff2000080b708c>] kvm_free_stage2_pgd+0x34/0x60
-[  758.374761] [<ffff2000080b2280>] kvm_arch_destroy_vm+0x20/0x68
-[  758.380570] [<ffff2000080aa330>] kvm_put_kvm+0x210/0x358
-[  758.385860] [<ffff2000080aa524>] kvm_vm_release+0x2c/0x40
-[  758.391239] [<ffff2000082ad234>] __fput+0x114/0x2e8
-[  758.396096] [<ffff2000082ad46c>] ____fput+0xc/0x18
-[  758.400869] [<ffff200008104658>] task_work_run+0x108/0x138
-[  758.406332] [<ffff2000080dc8ec>] do_exit+0x48c/0x10e8
-[  758.411363] [<ffff2000080dd5fc>] do_group_exit+0x6c/0x130
-[  758.416739] [<ffff2000080ed924>] get_signal+0x284/0xa18
-[  758.421943] [<ffff20000808a098>] do_signal+0x158/0x860
-[  758.427060] [<ffff20000808aad4>] do_notify_resume+0x6c/0x88
-[  758.432608] [<ffff200008083624>] work_pending+0x10/0x14
-[  758.437812] Code: 9ac32042 8b010001 d1000443 8a230000 (d50b7e20)
-[  758.444093] ---[ end trace cdfa1c3f20ed57a1 ]---
-[  758.448709] Fixing recursive fault but reboot is needed!
-[  770.500031] xgene-enet 1f610000.ethernet eth3: Link is Up - 10Gbps
+There is two pending issues:
+
+- A failed write to GICV ends up being forwarded to userspace. This
+  will be addressed in a follow-up series where we deal with injecting
+  vSError in the guest
+
+- Skipping instructions (as we do when emulating anything) breaks
+  things like guest single-step and watchpoints. This is a long
+  standing problem, and someone should probably have a look at
+  it. Alex?
+
+Tested on Juno-r1 with 64kB pages.
+
+* From v1:
+  - Made the AArch32 conditional code common to both 32 and 64bit
+  ports, as well as accessible from EL2 (suggested by Christoffer)
+  - Made the workaround message a bit more scary
+
+Marc Zyngier (7):
+  arm64: KVM: Move kvm_vcpu_get_condition out of emulate.c
+  arm64: KVM: Move the AArch32 conditional execution to common code
+  arm: KVM: Use common AArch32 conditional execution code
+  arm64: KVM: Make kvm_skip_instr32 available to HYP
+  arm64: KVM: vgic-v2: Add the GICV emulation infrastructure
+  arm64: KVM: vgic-v2: Add GICV access from HYP
+  arm64: KVM: vgic-v2: Enable GICV access from HYP if access from guest
+    is unsafe
+
+ arch/arm/include/asm/kvm_emulate.h   |  34 ++++++--
+ arch/arm/kvm/Makefile                |   1 +
+ arch/arm/kvm/emulate.c               |  99 ----------------------
+ arch/arm64/include/asm/kvm_emulate.h |  10 +++
+ arch/arm64/include/asm/kvm_hyp.h     |   1 +
+ arch/arm64/kvm/Makefile              |   3 +-
+ arch/arm64/kvm/emulate.c             | 159 -----------------------------------
+ arch/arm64/kvm/hyp/switch.c          |  32 +++++++
+ include/kvm/arm_vgic.h               |   6 ++
+ virt/kvm/arm/aarch32.c               | 152 +++++++++++++++++++++++++++++++++
+ virt/kvm/arm/hyp/vgic-v2-sr.c        |  46 ++++++++++
+ virt/kvm/arm/vgic/vgic-v2.c          |  71 ++++++++++------
+ 12 files changed, 321 insertions(+), 293 deletions(-)
+ delete mode 100644 arch/arm64/kvm/emulate.c
+ create mode 100644 virt/kvm/arm/aarch32.c
+
+-- 
+2.1.4
