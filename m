@@ -1,31 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 7/7] ARM: KVM: Unlock vgic-v3 support
-Date: Wed, 7 Sep 2016 16:47:25 +0200
-Message-ID: <20160907144725.GS23592@cbox>
-References: <1471344418-19568-1-git-send-email-vladimir.murzin@arm.com>
- <1471344418-19568-8-git-send-email-vladimir.murzin@arm.com>
- <20160905112927.GL26366@cbox> <57CEC344.7030706@arm.com>
- <20160906165527.GG23592@cbox> <57CFF094.5000704@arm.com>
- <20160907125856.GP23592@cbox>
- <CAFEAcA9oXc6bO55p=vqgrzQLFGT+zvg+E2nucOvPvb7RetN3RQ@mail.gmail.com>
+Subject: Re: [PATCH 09/19] arm64: KVM: Handle async aborts delivered while at
+ EL2
+Date: Wed, 7 Sep 2016 19:03:04 +0200
+Message-ID: <20160907170304.GT23592@cbox>
+References: <1473166937-15271-1-git-send-email-marc.zyngier@arm.com>
+ <1473166937-15271-10-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AF3A49AF5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Sep 2016 10:36:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31FE1499A1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Sep 2016 12:52:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BHtEKRMWxHsY for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Sep 2016 10:36:29 -0400 (EDT)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B2D2D412A2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Sep 2016 10:36:29 -0400 (EDT)
-Received: by mail-wm0-f43.google.com with SMTP id b187so119936309wme.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Sep 2016 07:44:56 -0700 (PDT)
+ with ESMTP id tMJ+BF4lZTZi for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Sep 2016 12:52:07 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A9BB40FA2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Sep 2016 12:52:07 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id w12so44205599wmf.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Sep 2016 10:00:35 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA9oXc6bO55p=vqgrzQLFGT+zvg+E2nucOvPvb7RetN3RQ@mail.gmail.com>
+In-Reply-To: <1473166937-15271-10-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,68 +32,149 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 07, 2016 at 03:20:14PM +0100, Peter Maydell wrote:
-> On 7 September 2016 at 13:58, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
-> > On Wed, Sep 07, 2016 at 11:48:52AM +0100, Vladimir Murzin wrote:
-> >> On 06/09/16 17:55, Christoffer Dall wrote:
-> >> > On Tue, Sep 06, 2016 at 02:23:16PM +0100, Vladimir Murzin wrote:
-> >> >>
-> >> >> Sorry, missed this one
-> >> >>
-> >> >> On 05/09/16 12:29, Christoffer Dall wrote:
-> >> >>>>
-> >> >>>>> +static bool __hyp_text __has_useable_gicv3_cpuif(void)
-> >> >>>>> +{
-> >> >>>>> +       if (IS_ENABLED(CONFIG_ARM_GIC_V3) && (read_sysreg(ID_PFR1) >> 28))
-> >> >>> Do we have a define for bit 28 we could use?
-> >> >>
-> >> >> I'll check it.
-> >> >>
-> >> >>>
-> >> >>> Does this actually work on all v7 boards?  The v7 ARM ARM seems to state
-> >> >>> that this bitfield is Reserved, UNK.  Does that somehow mean 'is going
-> >> >>> to be zero'?
-> >> >>
-> >> >> It is how v7ARM ARM I have defines UNK
-> >> >>
-> >> >> An abbreviation indicating that software must treat a field as
-> >> >> containing an UNKNOWN value. Hardware must implement the bit as read as
-> >> >> 0, or all 0s for a bit field. Software must not rely on the field
-> >> >> reading as zero.
-> >> >>
-> >> >> It seems goes under 'is going to be zero' case, no?
-> >> >>
-> >> > The last sentence is disturbing to me, and feels slightly contradicting
-> >> > itself.  Reading the UNKNOWN description doesn't help much either.
-> >> >
-> >> > Perhaps you can ask around internally and figure out what the precise
-> >> > answer to this is?
-> >>
-> >> Since it is kind of implementation dependant thing the precise answer
-> >> from here hardly help, IMO. We still have non-zero chance to see
-> >> something scary.
-> >
-> > Well, if the precise answer is: This will actually always return 0
-> > because of X and Y, then your code is fine.
+On Tue, Sep 06, 2016 at 02:02:07PM +0100, Marc Zyngier wrote:
+> If EL1 generates an asynchronous abort and then traps into EL2
+> before the abort has been delivered, we may end-up with the
+> abort firing at the worse possible place: on the host.
 > 
-> I think the "must not rely on the field reading as zero" wording
-> in the case of the ID registers is intended to mean "in a
-> future rev of the architecture we may assign these bits,
-> and your code mustn't do something that will break if the
-> bits then read as something other than zero". (And indeed
-> in v8 bits 28..31 have an assigned meaning.) It doesn't
-> mean there'll be v7 hardware out there with non-zero
-> values, because that would be breaking the hardware's part
-> of the UNKNOWN contract ("must implement the bit as read as 0").
+> In order to avoid this, it is necessary to take the abort at EL2,
+> by clearing the PSTATE.A bit. In order to survive this abort,
+> we do it at a point where we're in a known state with respect
+> to the world switch, and handle the resulting exception,
+> overloading the exit code in the process.
 > 
-ok, that was the kind of answer I was hoping for.  In that case, this is
-a non-issue.
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/entry.S     | 33 ++++++++++++++++++++++++++++++++-
+>  arch/arm64/kvm/hyp/hyp-entry.S | 25 +++++++++++++++++++++++--
+>  arch/arm64/kvm/hyp/switch.c    |  6 ++++++
+>  3 files changed, 61 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index 3967c231..7662ef5 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -122,7 +122,38 @@ ENTRY(__guest_exit)
+>  	// Now restore the host regs
+>  	restore_callee_saved_regs x2
+>  
+> -	ret
+> +	// If we have a pending asynchronous abort, now is the
+> +	// time to find out. From your VAXorcist book, page 666:
+> +	// "Threaten me not, oh Evil one!  For I speak with
+> +	// the power of DEC, and I command thee to show thyself!"
+> +	mrs	x2, elr_el2
+> +	mrs	x3, esr_el2
+> +	mrs	x4, spsr_el2
+> +	mov	x5, x0
+> +
+> +	dsb	sy		// Synchronize against in-flight ld/st
+> +	msr	daifclr, #4	// Unmask aborts
+> +
+> +	// This is our single instruction exception window. A pending
+> +	// SError is guaranteed to occur at the earliest when we unmask
+> +	// it, and at the latest just after the ISB.
 
-Thanks for the clarification.
+Why is it guaranteed to to occur at the latest after the ISB?  I thought
+that asynchronous exceptions could in theory be deferred until forever,
+but I am probably wrong about this.
+
+
+Otherwise, this looks good!
 
 -Christoffer
+
+> +	.global	abort_guest_exit_start
+> +abort_guest_exit_start:
+> +
+> +	isb
+> +
+> +	.global	abort_guest_exit_end
+> +abort_guest_exit_end:
+> +
+> +	// If the exception took place, restore the EL1 exception
+> +	// context so that we can report some information.
+> +	// Merge the exception code with the SError pending bit.
+> +	tbz	x0, #ARM_EXIT_WITH_SERROR_BIT, 1f
+> +	msr	elr_el2, x2
+> +	msr	esr_el2, x3
+> +	msr	spsr_el2, x4
+> +	orr	x0, x0, x5
+> +1:	ret
+>  ENDPROC(__guest_exit)
+>  
+>  ENTRY(__fpsimd_guest_restore)
+> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> index d2f6640..4e92399 100644
+> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> @@ -126,6 +126,28 @@ el1_error:
+>  	mov	x0, #ARM_EXCEPTION_EL1_SERROR
+>  	b	__guest_exit
+>  
+> +el2_error:
+> +	/*
+> +	 * Only two possibilities:
+> +	 * 1) Either we come from the exit path, having just unmasked
+> +	 *    PSTATE.A: change the return code to an EL2 fault, and
+> +	 *    carry on, as we're already in a sane state to handle it.
+> +	 * 2) Or we come from anywhere else, and that's a bug: we panic.
+> +	 *
+> +	 * For (1), x0 contains the original return code and x1 doesn't
+> +	 * contain anything meaningful at that stage. We can reuse them
+> +	 * as temp registers.
+> +	 * For (2), who cares?
+> +	 */
+> +	mrs	x0, elr_el2
+> +	adr	x1, abort_guest_exit_start
+> +	cmp	x0, x1
+> +	adr	x1, abort_guest_exit_end
+> +	ccmp	x0, x1, #4, ne
+> +	b.ne	__hyp_panic
+> +	mov	x0, #(1 << ARM_EXIT_WITH_SERROR_BIT)
+> +	eret
+> +
+>  ENTRY(__hyp_do_panic)
+>  	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
+>  		      PSR_MODE_EL1h)
+> @@ -150,7 +172,6 @@ ENDPROC(\label)
+>  	invalid_vector	el2h_sync_invalid
+>  	invalid_vector	el2h_irq_invalid
+>  	invalid_vector	el2h_fiq_invalid
+> -	invalid_vector	el2h_error_invalid
+>  	invalid_vector	el1_sync_invalid
+>  	invalid_vector	el1_irq_invalid
+>  	invalid_vector	el1_fiq_invalid
+> @@ -168,7 +189,7 @@ ENTRY(__kvm_hyp_vector)
+>  	ventry	el2h_sync_invalid		// Synchronous EL2h
+>  	ventry	el2h_irq_invalid		// IRQ EL2h
+>  	ventry	el2h_fiq_invalid		// FIQ EL2h
+> -	ventry	el2h_error_invalid		// Error EL2h
+> +	ventry	el2_error			// Error EL2h
+>  
+>  	ventry	el1_sync			// Synchronous 64-bit EL1
+>  	ventry	el1_irq				// IRQ 64-bit EL1
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 5148b06..1233a55 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -292,6 +292,12 @@ again:
+>  	exit_code = __guest_enter(vcpu, host_ctxt);
+>  	/* And we're baaack! */
+>  
+> +	/*
+> +	 * We're using the raw exception code in order to only process
+> +	 * the trap if no SError is pending. We will come back to the
+> +	 * same PC once the SError has been injected, and replay the
+> +	 * trapping instruction.
+> +	 */
+>  	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
+>  		goto again;
+>  
+> -- 
+> 2.1.4
+> 
