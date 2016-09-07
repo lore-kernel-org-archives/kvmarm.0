@@ -1,30 +1,28 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH v3 5/5] arm/arm64: vgic-new: Implement
- KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO ioctl
-Date: Tue, 6 Sep 2016 21:20:32 +0200
-Message-ID: <20160906192032.GN23592@cbox>
-References: <1472037609-4164-1-git-send-email-vijay.kilari@gmail.com>
- <1472037609-4164-6-git-send-email-vijay.kilari@gmail.com>
- <20160830140034.GK10162@cbox>
- <CALicx6scWWykb9Zc45gVkKDo71nVMDRGoa0vo54xDC2FoLJZRg@mail.gmail.com>
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: Re: [PATCH v2 3/7] KVM: arm: vgic-new: improve compatibility with
+ 32-bit
+Date: Wed, 7 Sep 2016 10:06:33 +0100
+Message-ID: <57CFD899.5020805@arm.com>
+References: <1471344418-19568-1-git-send-email-vladimir.murzin@arm.com>
+ <1471344418-19568-4-git-send-email-vladimir.murzin@arm.com>
+ <20160905112904.GH26366@cbox> <57CEB981.6060600@arm.com>
+ <20160906132219.GA23592@cbox> <57CECA79.3040204@arm.com>
+ <20160906163108.GB23592@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B4D749B4C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 15:09:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 87B4849B34
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Sep 2016 04:58:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BXGYAV4AVPzO for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2016 15:09:39 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE77649B40
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2016 15:09:38 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id 1so207833740wmz.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2016 12:18:04 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <CALicx6scWWykb9Zc45gVkKDo71nVMDRGoa0vo54xDC2FoLJZRg@mail.gmail.com>
+ with ESMTP id SucYMPUhdsnJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Sep 2016 04:58:10 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B19848529
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Sep 2016 04:58:09 -0400 (EDT)
+In-Reply-To: <20160906163108.GB23592@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,97 +32,140 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 06, 2016 at 07:42:19PM +0530, Vijay Kilari wrote:
-> On Tue, Aug 30, 2016 at 7:30 PM, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
-> >
-> > On Wed, Aug 24, 2016 at 04:50:09PM +0530, vijay.kilari@gmail.com wrote:
-> > > From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> > >  }
-> > > diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> > > index 61abea0..fde1472 100644
-> > > --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> > > +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> > > @@ -789,3 +789,22 @@ int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-> > >
-> > >       return vgic_v3_uaccess(vcpu, dev, is_write, offset, val);
-> > >  }
-> > > +
-> > > +int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-> > > +                                 u32 intid, u32 *val)
-> > > +{
-> > > +     unsigned int len = 4;
-> > > +     u8 buf[4];
-> > > +     int ret;
-> > > +
-> > > +     if (is_write) {
-> > > +             vgic_data_host_to_mmio_bus(buf, len, *val);
-> >
-> > why do you involve the mmio bus in this?
+On 06/09/16 17:31, Christoffer Dall wrote:
+> On Tue, Sep 06, 2016 at 02:54:01PM +0100, Vladimir Murzin wrote:
+>> On 06/09/16 14:22, Christoffer Dall wrote:
+>>> On Tue, Sep 06, 2016 at 01:41:37PM +0100, Vladimir Murzin wrote:
+>>>> Hi Christoffer,
+>>>>
+>>>> On 05/09/16 12:29, Christoffer Dall wrote:
+>>>>> Hi Vladimir,
+>>>>>
+>>>>> I think commit title is too vague, can you be more specific?
+>>>>>
+>>>>
+>>>> KVM: arm: vgic-new: make extract_bytes to always work on 64-bit data
+>>>>
+>>>> is it better?
+>>>
+>>> I would suggest:
+>>>
+>>> KVM: arm: vgic: Support 64-bit data manipulation on 32-bit host systems
+>>>
+>>>>
+>>>>> On Tue, Aug 16, 2016 at 11:46:54AM +0100, Vladimir Murzin wrote:
+>>>>>> We have couple of 64-bit register defined in GICv3 architecture, so
+>>>>>
+>>>>> 'a couple',  'registers' (plural)
+>>>>>
+>>>>>> "unsigned long" kind of accessors wouldn't work for 32-bit. However,
+>>>>>
+>>>>> 'wouldn't work for 32-bit' is kind of generic as well.  Perhaps you mean
+>>>>> that unsigned long accesses to these registers will only access a single
+>>>>> 32-bit work of that register.
+>>>>>
+>>>>>> these registers can't be access as 64-bit in a one go if we run 32-bit
+>>>>>
+>>>>> 'accessed', 's/in one go/with a single instruction/' ?
+>>>>>
+>>>>> 'a 32-bit host'
+>>>>>
+>>>>>> host simply because KVM doesn't support multiple load/store on MMIO
+>>>>>
+>>>>> by 'multiple load/store' you mean the 'load/store multiple' instructions
+>>>>> specifically, right?  Not a sequence of multiple loads and stores.  I
+>>>>> think you should be more specific here as well, for example, I think
+>>>>> ldrd and strd are problematic as well.
+>>>>>
+>>>>>> space.
+>>>>>>
+>>>>>> It means that 32-bit guest access these registers in 32-bit chunks, so
+>>>>>
+>>>>> 'a 32-bit guest', 'accesses'
+>>>>>
+>>>>
+>>>> all suggestions you've made above are true. I'll rework commit message
+>>>> to be more precise.
+>>>>
+>>>
+>>> Thanks!
+>>>
+>>>>>> the only thing we need to do is to ensure that extract_bytes() always
+>>>>>> takes 64-bit data.
+>>>>>>
+>>>>>> Since we are here fix couple of other width related issues by using
+>>>>>> ULL variants over UL.
+>>>>>>
+>>>>>> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+>>>>>> ---
+>>>>>>  virt/kvm/arm/vgic/vgic-mmio-v3.c |    6 +++---
+>>>>>>  virt/kvm/arm/vgic/vgic-mmio.h    |    2 +-
+>>>>>>  2 files changed, 4 insertions(+), 4 deletions(-)
+>>>>>>
+>>>>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>>>>> index ff668e0..cc20b60 100644
+>>>>>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>>>>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>>>>>> @@ -23,7 +23,7 @@
+>>>>>>  #include "vgic-mmio.h"
+>>>>>>  
+>>>>>>  /* extract @num bytes at @offset bytes offset in data */
+>>>>>> -unsigned long extract_bytes(unsigned long data, unsigned int offset,
+>>>>>> +unsigned long extract_bytes(u64 data, unsigned int offset,
+>>>>>>  			    unsigned int num)
+>>>>>>  {
+>>>>>>  	return (data >> (offset * 8)) & GENMASK_ULL(num * 8 - 1, 0);
+>>>>>> @@ -179,7 +179,7 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
+>>>>>>  	int target_vcpu_id = vcpu->vcpu_id;
+>>>>>>  	u64 value;
+>>>>>>  
+>>>>>> -	value = (mpidr & GENMASK(23, 0)) << 32;
+>>>>>> +	value = (mpidr & GENMASK_ULL(23, 0)) << 32;
+>>>>>
+>>>>> why does this make a difference when mpidr is an unsigned long?
+>>>>
+>>>> because we access a little bit further than unsigned long can accommodate
+>>>>
+>>>>   CC      arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.o
+>>>> arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.c: In function
+>>>> 'vgic_mmio_read_v3r_typer':
+>>>> arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.c:184:35: warning:
+>>>> left shift count >= width of type [-Wshift-count-overflow]
+>>>>   value = (mpidr & GENMASK(23, 0)) << 32;
+>>>>                                    ^
+>>>>
+>>>> I can include this warning in commit message or maybe you want a
+>>>> separate patch?
+>>>>
+>>> My point was that the code doesn't really make sense when compiled on a
+>>> 32-bit platform without also modifing the type for the mpidr variable.
+>>> Am I missing something?
+>>
+>> I've not seen any difference in generated code, but for consistency I'll
+>> update mpidr variable to u64.
+>>
 > 
-> This is doing LE conversion. This is being done by vgic_uaccess function.
-> IRC, This sys register access in not following vgic_uaccess path. Hence
-> added it here.
+> That could be because you need to update kvm_vcpu_get_mpidr_aff() to
+> return a u64 as well.
 
-See my e-mail on the other patch.  I think this is all just legacy from
-the time where we didn't distinguish between uaccess and mmio
-dispatches.
+I think we don't need to update the type of mpidr. mpidr fits in
+"unsigned long" nicely and kvm_vcpu_get_mpidr_aff() applies
+MPIDR_HWID_BITMASK mask anyway.
 
-> >
-> >
-> > > +             ret = vgic_write_irq_line_level_info(vcpu, intid, len, buf);
-> > > +     } else {
-> > > +             ret = vgic_read_irq_line_level_info(vcpu, intid, len, buf);
-> > > +             if (!ret)
-> > > +                     *val = vgic_data_mmio_bus_to_host(buf, len);
-> > > +     }
-> > > +
-> > > +     return ret;
-> > > +}
-> > > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> > > index 38f2c75..74d0449 100644
-> > > --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> > > +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> > > @@ -391,6 +391,40 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
-> > >       }
-> > >  }
-> > >
-> > > +int vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
-> > > +                               unsigned int len, void *val)
-> > > +{
-> > > +     unsigned long data = 0;
-> > > +     int i;
-> > > +
-> > > +     for (i = 0; i < len * 8; i++) {
-> > > +             struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> > > +
-> > > +             if (irq->line_level)
-> > > +                     data |= (1U << i);
-> > > +     }
-> > > +     vgic_data_host_to_mmio_bus(val, len, data);
-> >
-> > why???
+In my patch I just abused GENMASK_ULL() and the proper fix for warning
+produced by gcc should be
+
++	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
+
+
+Cheers
+Vladimir
+
 > 
-> Same as above reason
-> >
-> >
-> > > +
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +int vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
-> > > +                                unsigned int len, const void *val)
-> > > +{
-> > > +     int i;
-> > > +     unsigned long data = vgic_data_mmio_bus_to_host(val, len);
-> >
-> > why???
+> -Christoffer
 > 
-> Same as above reason
-
-Thanks,
--Christoffer
+> 
