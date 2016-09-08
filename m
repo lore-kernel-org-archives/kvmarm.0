@@ -1,96 +1,131 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH] kvm-arm: Unmap shadow pagetables properly
-Date: Thu,  8 Sep 2016 16:25:49 +0100
-Message-ID: <1473348349-5011-1-git-send-email-suzuki.poulose@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: [PATCH v3 4/8] KVM: arm64: vgic-its: Introduce config option to guard
+ ITS specific code
+Date: Thu,  8 Sep 2016 17:06:46 +0100
+Message-ID: <1473350810-10857-5-git-send-email-vladimir.murzin@arm.com>
+References: <1473350810-10857-1-git-send-email-vladimir.murzin@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A4E4049B34
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Sep 2016 11:59:41 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id VCHwhbqimbS8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Sep 2016 11:59:40 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3C6749B40
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Sep 2016 11:59:40 -0400 (EDT)
+In-Reply-To: <1473350810-10857-1-git-send-email-vladimir.murzin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, james.morse@arm.com, itaru.kitayama@riken.jp, kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On arm/arm64, we depend on the kvm_unmap_hva* callbacks (via
-mmu_notifiers::invalidate_*) to unmap the stage2 pagetables when
-the userspace buffer gets unmapped. However, when the Hypervisor
-process exits without explicit unmap of the guest buffers, the only
-notifier we get is kvm_arch_flush_shadow_all() (via mmu_notifier::release
-) which does nothing on arm. Later this causes us to access pages that
-were already released [via exit_mmap() -> unmap_vmas()] when we actually
-get to unmap the stage2 pagetable [via kvm_arch_destroy_vm() ->
-kvm_free_stage2_pgd()]. This triggers crashes with CONFIG_DEBUG_PAGEALLOC,
-which unmaps any free'd pages from the linear map.
+By now ITS code guarded with KVM_ARM_VGIC_V3 config option which was
+introduced to hide everything specific to vgic-v3 from 32-bit world.
+We are going to support vgic-v3 in 32-bit world and KVM_ARM_VGIC_V3
+will gone, but we don't have support for ITS there yet and we need to
+continue keeping ITS away.
+Introduce the new config option to prevent ITS code being build in
+32-bit mode when support for vgic-v3 is done.
 
- [  757.644120] Unable to handle kernel paging request at virtual address
-  ffff800661e00000
- [  757.652046] pgd = ffff20000b1a2000
- [  757.655471] [ffff800661e00000] *pgd=00000047fffe3003, *pud=00000047fcd8c003,
-  *pmd=00000047fcc7c003, *pte=00e8004661e00712
- [  757.666492] Internal error: Oops: 96000147 [#3] PREEMPT SMP
- [  757.672041] Modules linked in:
- [  757.675100] CPU: 7 PID: 3630 Comm: qemu-system-aar Tainted: G      D
- 4.8.0-rc1 #3
- [  757.683240] Hardware name: AppliedMicro X-Gene Mustang Board/X-Gene Mustang Board,
-  BIOS 3.06.15 Aug 19 2016
- [  757.692938] task: ffff80069cdd3580 task.stack: ffff8006adb7c000
- [  757.698840] PC is at __flush_dcache_area+0x1c/0x40
- [  757.703613] LR is at kvm_flush_dcache_pmd+0x60/0x70
- [  757.708469] pc : [<ffff20000809dbdc>] lr : [<ffff2000080b4a70>] pstate: 20000145
- ...
- [  758.357249] [<ffff20000809dbdc>] __flush_dcache_area+0x1c/0x40
- [  758.363059] [<ffff2000080b6748>] unmap_stage2_range+0x458/0x5f0
- [  758.368954] [<ffff2000080b708c>] kvm_free_stage2_pgd+0x34/0x60
- [  758.374761] [<ffff2000080b2280>] kvm_arch_destroy_vm+0x20/0x68
- [  758.380570] [<ffff2000080aa330>] kvm_put_kvm+0x210/0x358
- [  758.385860] [<ffff2000080aa524>] kvm_vm_release+0x2c/0x40
- [  758.391239] [<ffff2000082ad234>] __fput+0x114/0x2e8
- [  758.396096] [<ffff2000082ad46c>] ____fput+0xc/0x18
- [  758.400869] [<ffff200008104658>] task_work_run+0x108/0x138
- [  758.406332] [<ffff2000080dc8ec>] do_exit+0x48c/0x10e8
- [  758.411363] [<ffff2000080dd5fc>] do_group_exit+0x6c/0x130
- [  758.416739] [<ffff2000080ed924>] get_signal+0x284/0xa18
- [  758.421943] [<ffff20000808a098>] do_signal+0x158/0x860
- [  758.427060] [<ffff20000808aad4>] do_notify_resume+0x6c/0x88
- [  758.432608] [<ffff200008083624>] work_pending+0x10/0x14
- [  758.437812] Code: 9ac32042 8b010001 d1000443 8a230000 (d50b7e20)
-
-This patch fixes the issue by moving the kvm_free_stage2_pgd() to
-kvm_arch_flush_shadow_all().
-
-Reported-by: Itaru Kitayama <itaru.kitayama@riken.jp>
-Reported-by: James Morse <james.morse@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 ---
- arch/arm/kvm/arm.c | 2 --
- arch/arm/kvm/mmu.c | 1 +
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ arch/arm64/kvm/Kconfig              |    4 ++++
+ virt/kvm/arm/vgic/vgic-kvm-device.c |    3 +++
+ virt/kvm/arm/vgic/vgic-mmio-v3.c    |    2 ++
+ virt/kvm/arm/vgic/vgic.h            |    4 ++++
+ 4 files changed, 13 insertions(+)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 75f130e..c94b90d 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -158,8 +158,6 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- {
- 	int i;
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 9c9edc9..7ba9164 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -16,6 +16,9 @@ menuconfig VIRTUALIZATION
  
--	kvm_free_stage2_pgd(kvm);
--
- 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
- 		if (kvm->vcpus[i]) {
- 			kvm_arch_vcpu_free(kvm->vcpus[i]);
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 29d0b23..d626d08 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -1893,6 +1893,7 @@ void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslots *slots)
+ if VIRTUALIZATION
  
- void kvm_arch_flush_shadow_all(struct kvm *kvm)
- {
-+	kvm_free_stage2_pgd(kvm);
++config KVM_ARM_VGIC_V3_ITS
++	bool
++
+ config KVM_ARM_VGIC_V3
+ 	bool
+ 
+@@ -35,6 +38,7 @@ config KVM
+ 	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_IRQFD
+ 	select KVM_ARM_VGIC_V3
++	select KVM_ARM_VGIC_V3_ITS
+ 	select KVM_ARM_PMU if HW_PERF_EVENTS
+ 	select HAVE_KVM_MSI
+ 	select HAVE_KVM_IRQCHIP
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 1813f93..f3811b3 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -223,9 +223,12 @@ int kvm_register_vgic_device(unsigned long type)
+ 	case KVM_DEV_TYPE_ARM_VGIC_V3:
+ 		ret = kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
+ 					      KVM_DEV_TYPE_ARM_VGIC_V3);
++
++#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
+ 		if (ret)
+ 			break;
+ 		ret = kvm_vgic_register_its_device();
++#endif
+ 		break;
+ #endif
+ 	}
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 90d8181..acbe691 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -42,6 +42,7 @@ u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
+ 	return reg | ((u64)val << lower);
  }
  
- void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
++#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
+ bool vgic_has_its(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+@@ -51,6 +52,7 @@ bool vgic_has_its(struct kvm *kvm)
+ 
+ 	return dist->has_its;
+ }
++#endif
+ 
+ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 					    gpa_t addr, unsigned int len)
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 6c4625c..100045f 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -84,11 +84,15 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu);
+ int vgic_v3_probe(const struct gic_kvm_info *info);
+ int vgic_v3_map_resources(struct kvm *kvm);
+ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
++
++#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
+ int vgic_register_its_iodevs(struct kvm *kvm);
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
++#endif
++
+ #else
+ static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+ {
 -- 
-2.7.4
-
+1.7.9.5
