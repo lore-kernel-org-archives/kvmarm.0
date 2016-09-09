@@ -1,27 +1,26 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 0/8] ARM: KVM: Support for vgic-v3
-Date: Fri, 9 Sep 2016 13:26:25 +0200
-Message-ID: <20160909112625.GC8624@cbox>
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: Re: [PATCH v3 1/8] arm64: KVM: Use static keys for selecting the GIC
+ backend
+Date: Fri, 9 Sep 2016 14:45:15 +0100
+Message-ID: <57D2BCEB.3030306@arm.com>
 References: <1473350810-10857-1-git-send-email-vladimir.murzin@arm.com>
- <57D26B9F.7050301@arm.com>
+ <1473350810-10857-2-git-send-email-vladimir.murzin@arm.com>
+ <57D27EA7.2040500@arm.com> <57D281F1.5000902@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EEBD40F90
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Sep 2016 07:15:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 012144113E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Sep 2016 09:36:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id C-AjIl41ukg7 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Sep 2016 07:15:21 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7600F40F77
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Sep 2016 07:15:21 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id b187so25814691wme.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 09 Sep 2016 04:23:53 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <57D26B9F.7050301@arm.com>
+ with ESMTP id lslf3tIutlqP for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Sep 2016 09:36:45 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B0D4840F9B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Sep 2016 09:36:45 -0400 (EDT)
+In-Reply-To: <57D281F1.5000902@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,16 +30,65 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 09, 2016 at 08:58:23AM +0100, Vladimir Murzin wrote:
-> +Christoffer
-> 
-> I should have checked my send-email command twice...
+On 09/09/16 10:33, Vladimir Murzin wrote:
+> Hi Marc,
+> =
 
-No worries, as long as you cc the kvmarm list, I'm happy.
+> On 09/09/16 10:19, Marc Zyngier wrote:
+>> > Hi Vladimir,
+>> > =
 
-Thanks,
--Christoffer
+> ...
+>>> >>  =
+
+>>> >> +extern struct static_key_false kvm_gicv3_cpuif;
+>> > =
+
+>> > I think we should follow the model set by kvm_vgic_global_state, which
+>> > is declared in arm_vgic.h. Even better, we should *embed* the static k=
+ey
+>> > in this structure. This will reduce the clutter and we wouldn't have to
+>> > deal with all the section stuff (the hyp_data thing is a good cleanup,
+>> > but I'd like to see it as a separate patch if possible).
+> Yes, it is what I was thinking about too, but was not sure about which
+> way to go, so hyp_data seemed me something we might reuse latter.
+> However, I agree that we can defer hyp_data thing...
+> =
+
+
+I've just tried it out and it seems that static keys are not happy to
+accept a key after kern_hyp_va is applied at &kvm_vgic_global_state:
+
+> In file included from ./include/linux/jump_label.h:105:0,
+>                  from arch/arm64/kvm/hyp/switch.c:19:
+> ./arch/arm64/include/asm/jump_label.h: In function =91__guest_run=92:
+> ./arch/arm64/include/asm/jump_label.h:31:2: warning: asm operand 0 probab=
+ly doesn=92t match constraints
+>   asm goto("1: nop\n\t"
+>   ^
+> ./arch/arm64/include/asm/jump_label.h:31:2: warning: asm operand 0 probab=
+ly doesn=92t match constraints
+>   asm goto("1: nop\n\t"
+>   ^
+> ./arch/arm64/include/asm/jump_label.h:31:2: error: impossible constraint =
+in =91asm=92
+>   asm goto("1: nop\n\t"
+>   ^
+> ./arch/arm64/include/asm/jump_label.h:31:2: error: impossible constraint =
+in =91asm=92
+>   asm goto("1: nop\n\t"
+>   ^
+> make[1]: *** [arch/arm64/kvm/hyp/switch.o] Error 1
+> make: *** [arch/arm64/kvm/hyp/switch.o] Error 2
+
+it looks like we cannot avoid hyp_data thing... if you don't mind I can
+do hyp_data clean-up in separate patch. Alternatively, we can do
+conversion to static keys for both architectures later as an
+optimisation step.
+
+Cheers
+Vladimir
