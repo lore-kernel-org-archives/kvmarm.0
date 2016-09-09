@@ -1,40 +1,43 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] kvm-arm: Unmap shadow pagetables properly
-Date: Fri, 9 Sep 2016 12:54:55 +0200
-Message-ID: <20160909105455.GB8624@cbox>
-References: <1473348349-5011-1-git-send-email-suzuki.poulose@arm.com>
- <20160909103844.GA8624@cbox>
- <8dd3078a-40ca-9f1f-e536-91e2dbd59907@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [PULL 0/2] KVM/ARM Fixes for v4.8 - round #2
+Date: Fri,  9 Sep 2016 12:54:54 +0200
+Message-ID: <20160909105456.8585-1-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <8dd3078a-40ca-9f1f-e536-91e2dbd59907@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, itaru.kitayama@riken.jp, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 09, 2016 at 11:43:42AM +0100, Suzuki K Poulose wrote:
-> On 09/09/16 11:38, Christoffer Dall wrote:
-> >Hi Suzuki,
-> >
-> >On Thu, Sep 08, 2016 at 04:25:49PM +0100, Suzuki K Poulose wrote:
-> 
-> >>This patch fixes the issue by moving the kvm_free_stage2_pgd() to
-> >>kvm_arch_flush_shadow_all().
-> >
-> >Awesome, thanks!
-> >
-> >I suppose this is a cc stable patch since as I can tell this bug has
-> >been here forever.
-> 
-> Yes, I think the code moved around a bit in the past. I will submit the
-> patches separately for each version once I get ack on this.
-> 
-I don't think that's necessary, I think we just CC stable and see which
-versions it applies to, and fix anything missing up at that time if
-required.
+Hi Paolo and Radim,
 
-Thanks,
+Here are a couple of fixes for KVM/ARM for v4.8-rc6 or -rc7, as soon as
+they can make it.
+
+They fix an idmap issue on 32-bit KVM on ARM, and fixes a memory
+unmapping issue that we've had forever on both arm and arm64.
+
+The following changes since commit 20218b86ad8adb4bf71db9425bb59680f345eafd:
+
+  Merge tag 'kvm-s390-master-4.8-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into kvm-master (2016-09-05 16:15:22 +0200)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-v4.8-round2
+
+for you to fetch changes up to 293f293637b55db4f9f522a5a72514e98a541076:
+
+  kvm-arm: Unmap shadow pagetables properly (2016-09-09 12:40:30 +0200)
+
+Thanks!
 -Christoffer
+
+---
+Marc Zyngier (1):
+      arm: KVM: Fix idmap overlap detection when the kernel is idmap'ed
+
+Suzuki K Poulose (1):
+      kvm-arm: Unmap shadow pagetables properly
+
+ arch/arm/kvm/arm.c | 2 --
+ arch/arm/kvm/mmu.c | 4 +++-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
