@@ -1,25 +1,26 @@
 From: vijay.kilari@gmail.com
-Subject: [PATCH v4 3/5] arm/arm64: vgic-new: Introduce find_reg_by_id()
-Date: Sat, 10 Sep 2016 17:52:16 +0530
-Message-ID: <1473510138-4719-4-git-send-email-vijay.kilari@gmail.com>
+Subject: [PATCH 5/5] arm/arm64: vgic-new: Implement
+ KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO ioctl
+Date: Sat, 10 Sep 2016 17:52:18 +0530
+Message-ID: <1473510138-4719-6-git-send-email-vijay.kilari@gmail.com>
 References: <1473510138-4719-1-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BF64412C2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2016 08:14:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 37A19412D0
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2016 08:14:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5mXdLkKxC63b for <kvmarm@lists.cs.columbia.edu>;
- Sat, 10 Sep 2016 08:14:11 -0400 (EDT)
-Received: from mail-pa0-f67.google.com (mail-pa0-f67.google.com
- [209.85.220.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B400412A6
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2016 08:14:10 -0400 (EDT)
-Received: by mail-pa0-f67.google.com with SMTP id bu8so505412pab.1
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2016 05:22:46 -0700 (PDT)
+ with ESMTP id UsTf2qOPZ9i8 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 10 Sep 2016 08:14:19 -0400 (EDT)
+Received: from mail-pa0-f66.google.com (mail-pa0-f66.google.com
+ [209.85.220.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2373C410EB
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2016 08:14:18 -0400 (EDT)
+Received: by mail-pa0-f66.google.com with SMTP id ez1so5162785pab.3
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2016 05:22:54 -0700 (PDT)
 In-Reply-To: <1473510138-4719-1-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,81 +37,210 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-In order to implement vGICv3 CPU interface access, we will need to perform
-table lookup of system registers. We would need both index_to_params() and
-find_reg() exported for that purpose, but instead we export a single
-function which combines them both.
+Userspace requires to store and restore of line_level for
+level triggered interrupts using ioctl KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO.
 
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 22 +++++++++++++++-------
- arch/arm64/kvm/sys_regs.h |  4 ++++
- 2 files changed, 19 insertions(+), 7 deletions(-)
+ arch/arm64/include/uapi/asm/kvm.h   |  6 +++++
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 48 ++++++++++++++++++++++++++++++++++++-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c    | 11 +++++++++
+ virt/kvm/arm/vgic/vgic-mmio.c       | 29 ++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.h       |  5 ++++
+ virt/kvm/arm/vgic/vgic.h            |  3 +++
+ 6 files changed, 101 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e51367d..87ebe35 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1794,6 +1794,17 @@ static bool index_to_params(u64 id, struct sys_reg_params *params)
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 91c7137..4100f8c 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -211,6 +211,12 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
+ #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
+ #define KVM_DEV_ARM_VGIC_CPU_SYSREGS    6
++#define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO 7
++#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
++#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
++			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
++#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK	0x3ff
++#define VGIC_LEVEL_INFO_LINE_LEVEL	0
+ 
+ #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index e580b6d..41de527 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -517,6 +517,23 @@ static int vgic_attr_regs_access_v3(struct kvm_device *dev,
+ 						  regid, reg);
+ 		break;
+ 	}
++	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
++		unsigned int info, intid;
++
++		info = (attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
++			KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT;
++		if (info == VGIC_LEVEL_INFO_LINE_LEVEL) {
++			intid = attr->attr &
++				KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK;
++			ret = vgic_v3_line_level_info_uaccess(vcpu, is_write,
++							      intid, &tmp32);
++			if (!is_write)
++				*reg = tmp32;
++		} else {
++			ret = -EINVAL;
++		}
++		break;
++	}
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
+@@ -559,6 +576,17 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+ 
+ 		return vgic_attr_regs_access_v3(dev, attr, &reg, true);
+ 	}
++	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++		u64 reg;
++		u32 tmp32;
++
++		if (get_user(tmp32, uaddr))
++			return -EFAULT;
++
++		reg = tmp32;
++		return vgic_attr_regs_access_v3(dev, attr, &reg, true);
++	}
+ 	}
+ 	return -ENXIO;
+ }
+@@ -595,8 +623,18 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
+ 			return ret;
+ 		return  put_user(reg, uaddr);
+ 	}
+-	}
++	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++		u64 reg;
++		u32 tmp32;
+ 
++		ret = vgic_attr_regs_access_v3(dev, attr, &reg, false);
++		if (ret)
++			return ret;
++		tmp32 = reg;
++		return put_user(tmp32, uaddr);
++	}
++	}
+ 	return -ENXIO;
+ }
+ 
+@@ -617,11 +655,19 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 		return vgic_v3_has_attr_regs(dev, attr);
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+ 		return 0;
++	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
++		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
++		      KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT) ==
++		      VGIC_LEVEL_INFO_LINE_LEVEL)
++			return 0;
++		break;
++	}
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+ 		switch (attr->attr) {
+ 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+ 			return 0;
+ 		}
++		break;
+ 	}
+ 	return -ENXIO;
+ }
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 04e0f2c..826c618 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -748,3 +748,14 @@ int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 		return vgic_uaccess(vcpu, &rd_dev, is_write,
+ 				    offset, val);
+ }
++
++int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
++				    u32 intid, u32 *val)
++{
++	if (is_write)
++		vgic_write_irq_line_level_info(vcpu, intid, *val);
++	else
++		*val = vgic_read_irq_line_level_info(vcpu, intid);
++
++	return 0;
++}
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 81d851c..9cc3900 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -425,6 +425,35 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
  	}
  }
  
-+const struct sys_reg_desc *find_reg_by_id(u64 id,
-+					  struct sys_reg_params *params,
-+					  const struct sys_reg_desc table[],
-+					  unsigned int num)
++unsigned long vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
 +{
-+	if (!index_to_params(id, params))
-+		return NULL;
++	int i;
++	unsigned long val = 0;
 +
-+	return find_reg(params, table, num);
++	for (i = 0; i < 32; i++) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++		if (irq->line_level)
++			val |= (1U << i);
++	}
++
++	return val;
 +}
 +
- /* Decode an index value, and find the sys_reg_desc entry. */
- static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
- 						    u64 id)
-@@ -1921,10 +1932,8 @@ static int get_invariant_sys_reg(u64 id, void __user *uaddr)
- 	struct sys_reg_params params;
- 	const struct sys_reg_desc *r;
++void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
++				    const unsigned long val)
++{
++	int i;
++
++	for_each_set_bit(i, &val, 32) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++		spin_lock(&irq->irq_lock);
++		irq->line_level = true;
++		spin_unlock(&irq->irq_lock);
++	}
++}
++
+ static int match_region(const void *key, const void *elt)
+ {
+ 	const unsigned int offset = (unsigned long)key;
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 9a0109b..83bf9f1 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -188,6 +188,11 @@ int vgic_validate_mmio_region_addr(struct kvm_device *dev,
+ 				   const struct vgic_register_region *regions,
+ 				   int nr_regions, gpa_t addr);
  
--	if (!index_to_params(id, &params))
--		return -ENOENT;
--
--	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
-+	r = find_reg_by_id(id, &params, invariant_sys_regs,
-+			   ARRAY_SIZE(invariant_sys_regs));
- 	if (!r)
- 		return -ENOENT;
++unsigned long vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid);
++
++void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
++				    const unsigned long val);
++
+ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
  
-@@ -1938,9 +1947,8 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
- 	int err;
- 	u64 val = 0; /* Make sure high bits are 0 for 32-bit regs */
- 
--	if (!index_to_params(id, &params))
--		return -ENOENT;
--	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
-+	r = find_reg_by_id(id, &params, invariant_sys_regs,
-+			   ARRAY_SIZE(invariant_sys_regs));
- 	if (!r)
- 		return -ENOENT;
- 
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index dbbb01c..9c6ffd0 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -136,6 +136,10 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
- 	return i1->Op2 - i2->Op2;
- }
- 
-+const struct sys_reg_desc *find_reg_by_id(u64 id,
-+					  struct sys_reg_params *params,
-+					  const struct sys_reg_desc table[],
-+					  unsigned int num);
- 
- #define Op0(_x) 	.Op0 = _x
- #define Op1(_x) 	.Op1 = _x
+ unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev);
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 04a397c..52f4f71 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -107,6 +107,9 @@ int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			 u64 id, u64 *val);
+ int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+ 				u64 *reg);
++int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
++				    u32 intid, u32 *val);
++
+ #else
+ static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+ {
 -- 
 1.9.1
