@@ -1,21 +1,24 @@
 From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH v4 00/10] ARM: KVM: Support for vgic-v3
-Date: Mon, 12 Sep 2016 15:49:14 +0100
-Message-ID: <1473691764-29424-1-git-send-email-vladimir.murzin@arm.com>
+Subject: [PATCH v4 04/10] KVM: arm64: vgic-its: Introduce config option to
+ guard ITS specific code
+Date: Mon, 12 Sep 2016 15:49:18 +0100
+Message-ID: <1473691764-29424-5-git-send-email-vladimir.murzin@arm.com>
+References: <1473691764-29424-1-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEB0F410EB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 10:41:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E1A040B58
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 10:41:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5yZdLFdE24if for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Sep 2016 10:41:06 -0400 (EDT)
+ with ESMTP id V7oO9KqE6J5J for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Sep 2016 10:41:11 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 557A340B58
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 10:41:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E0CA410EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 10:41:09 -0400 (EDT)
+In-Reply-To: <1473691764-29424-1-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,97 +32,101 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+By now ITS code guarded with KVM_ARM_VGIC_V3 config option which was
+introduced to hide everything specific to vgic-v3 from 32-bit world.
+We are going to support vgic-v3 in 32-bit world and KVM_ARM_VGIC_V3
+will gone, but we don't have support for ITS there yet and we need to
+continue keeping ITS away.
+Introduce the new config option to prevent ITS code being build in
+32-bit mode when support for vgic-v3 is done.
 
-This is an attempt to make use vgic-v3 under arch/arm since
-save-restore functionality got re-written in C and can be shared
-between arm/arm64 like it has already been done for vgic-v2 and timer.
+Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/Kconfig              |    4 ++++
+ virt/kvm/arm/vgic/vgic-kvm-device.c |    3 +++
+ virt/kvm/arm/vgic/vgic-mmio-v3.c    |    2 ++
+ virt/kvm/arm/vgic/vgic.h            |    4 ++++
+ 4 files changed, 13 insertions(+)
 
-With this patches I'm able to get 32 core an AArch32 ARMv8 guest boot:
-
-...
-GICv3: CPU31: found redistributor 703 region 0:0x000000003ffd0000
-CPU31: thread -1, cpu 3, socket 7, mpidr 80000703
-Brought up 32 CPUs
-SMP: Total of 32 processors activated (768.00 BogoMIPS).
-CPU: All CPU(s) started in SVC mode.
-...
-
-Additionally, quite lightweight test based on Self IPI guest test[1]
-has been run with up to 255 cpus.
-
-[1] http://www.spinics.net/lists/kvm/msg128974.html
-
-Changelog:
-
-    v3 -> v4   
-       - rebased on v4.8-rc6
-       - dropped hyp_data in preference to embedding the static key
-         in kvm_vgic_global_state
-       - GICv3 cpu sysreg mappings were moved out to separate patch
-       - vgic patch was split into two: changes extract_bytes() and
-         fixes for compiler's warnings
-       - change for MPIDR_AFFINITY_LEVEL was dropped
-       - 32-bit system register accessors were moved under
-         CONFIG_CPU_CP15
-
-    v2 -> v3
-       - rebased on v4.8-rc5
-       - commit messages are reworked to be more precise and clear (I
-         hope so)
-       - MPIDR_HWID_BITMASK is used to discard Aff3 in
-         MPIDR_AFFINITY_LEVEL macro
-       - cast to u64 is used instead of abuse of GENMASK_ULL while
-         building value for typer register
-       - static keys are used to select GIC backend
-       - config option to guard ITS code is moved to separate patch
-
-    v1 -> v2
-       - rebased on v4.8-rc2
-       - introduced guard for ITS code
-
-Thanks!
-
-Vladimir Murzin (10):
-  arm64: KVM: Use static keys for selecting the GIC backend
-  arm64: KVM: Move GIC accessors to arch_gicv3.h
-  arm64: KVM: Move vgic-v3 save/restore to virt/kvm/arm/hyp
-  KVM: arm64: vgic-its: Introduce config option to guard ITS specific
-    code
-  KVM: arm: vgic: Fix compiler warnings when built for 32-bit
-  KVM: arm: vgic: Support 64-bit data manipulation on 32-bit host
-    systems
-  ARM: Introduce MPIDR_LEVEL_SHIFT macro
-  ARM: Move system register accessors to asm/cp15.h
-  ARM: gic-v3: Introduce 32-to-64-bit mappings for GICv3 cpu registers
-  ARM: KVM: Support vgic-v3
-
- arch/arm/include/asm/arch_gicv3.h                 |   91 +++++++++++++++++----
- arch/arm/include/asm/cp15.h                       |   15 ++++
- arch/arm/include/asm/cputype.h                    |    1 +
- arch/arm/include/asm/kvm_asm.h                    |    3 +
- arch/arm/include/asm/kvm_host.h                   |    5 ++
- arch/arm/include/asm/kvm_hyp.h                    |   18 +---
- arch/arm/include/uapi/asm/kvm.h                   |    7 ++
- arch/arm/kvm/Makefile                             |    2 +
- arch/arm/kvm/coproc.c                             |   35 ++++++++
- arch/arm/kvm/hyp/Makefile                         |    1 +
- arch/arm/kvm/hyp/switch.c                         |   12 ++-
- arch/arm64/include/asm/arch_gicv3.h               |   13 +++
- arch/arm64/kvm/Kconfig                            |    4 +-
- arch/arm64/kvm/hyp/Makefile                       |    2 +-
- arch/arm64/kvm/hyp/switch.c                       |   21 ++---
- include/kvm/arm_vgic.h                            |   12 +--
- {arch/arm64/kvm => virt/kvm/arm}/hyp/vgic-v3-sr.c |   13 ---
- virt/kvm/arm/vgic/vgic-init.c                     |    4 +
- virt/kvm/arm/vgic/vgic-kvm-device.c               |   11 +--
- virt/kvm/arm/vgic/vgic-mmio-v3.c                  |    8 +-
- virt/kvm/arm/vgic/vgic-mmio.c                     |    2 -
- virt/kvm/arm/vgic/vgic-mmio.h                     |    4 +-
- virt/kvm/arm/vgic/vgic.c                          |    2 +-
- virt/kvm/arm/vgic/vgic.h                          |   54 +-----------
- 24 files changed, 205 insertions(+), 135 deletions(-)
- rename {arch/arm64/kvm => virt/kvm/arm}/hyp/vgic-v3-sr.c (96%)
-
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 9c9edc9..7ba9164 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -16,6 +16,9 @@ menuconfig VIRTUALIZATION
+ 
+ if VIRTUALIZATION
+ 
++config KVM_ARM_VGIC_V3_ITS
++	bool
++
+ config KVM_ARM_VGIC_V3
+ 	bool
+ 
+@@ -35,6 +38,7 @@ config KVM
+ 	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_IRQFD
+ 	select KVM_ARM_VGIC_V3
++	select KVM_ARM_VGIC_V3_ITS
+ 	select KVM_ARM_PMU if HW_PERF_EVENTS
+ 	select HAVE_KVM_MSI
+ 	select HAVE_KVM_IRQCHIP
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 1813f93..f3811b3 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -223,9 +223,12 @@ int kvm_register_vgic_device(unsigned long type)
+ 	case KVM_DEV_TYPE_ARM_VGIC_V3:
+ 		ret = kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
+ 					      KVM_DEV_TYPE_ARM_VGIC_V3);
++
++#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
+ 		if (ret)
+ 			break;
+ 		ret = kvm_vgic_register_its_device();
++#endif
+ 		break;
+ #endif
+ 	}
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 90d8181..acbe691 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -42,6 +42,7 @@ u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
+ 	return reg | ((u64)val << lower);
+ }
+ 
++#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
+ bool vgic_has_its(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+@@ -51,6 +52,7 @@ bool vgic_has_its(struct kvm *kvm)
+ 
+ 	return dist->has_its;
+ }
++#endif
+ 
+ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 					    gpa_t addr, unsigned int len)
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 6c4625c..100045f 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -84,11 +84,15 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu);
+ int vgic_v3_probe(const struct gic_kvm_info *info);
+ int vgic_v3_map_resources(struct kvm *kvm);
+ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
++
++#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
+ int vgic_register_its_iodevs(struct kvm *kvm);
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
++#endif
++
+ #else
+ static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+ {
 -- 
 1.7.9.5
