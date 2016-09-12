@@ -1,23 +1,22 @@
 From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH v4 04/10] KVM: arm64: vgic-its: Introduce config option to
- guard ITS specific code
-Date: Mon, 12 Sep 2016 15:49:18 +0100
-Message-ID: <1473691764-29424-5-git-send-email-vladimir.murzin@arm.com>
+Subject: [PATCH v4 02/10] arm64: KVM: Move GIC accessors to arch_gicv3.h
+Date: Mon, 12 Sep 2016 15:49:16 +0100
+Message-ID: <1473691764-29424-3-git-send-email-vladimir.murzin@arm.com>
 References: <1473691764-29424-1-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E1A040B58
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 10:41:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CE2A410EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 10:41:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V7oO9KqE6J5J for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Sep 2016 10:41:11 -0400 (EDT)
+ with ESMTP id gl7mC7FVd2qC for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Sep 2016 10:41:07 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E0CA410EB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 10:41:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CF51410B5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 10:41:07 -0400 (EDT)
 In-Reply-To: <1473691764-29424-1-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,101 +31,64 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-By now ITS code guarded with KVM_ARM_VGIC_V3 config option which was
-introduced to hide everything specific to vgic-v3 from 32-bit world.
-We are going to support vgic-v3 in 32-bit world and KVM_ARM_VGIC_V3
-will gone, but we don't have support for ITS there yet and we need to
-continue keeping ITS away.
-Introduce the new config option to prevent ITS code being build in
-32-bit mode when support for vgic-v3 is done.
+Since we are going to share vgic-v3 save/restore code with ARM keep
+arch specific accessors separately.
 
 Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/Kconfig              |    4 ++++
- virt/kvm/arm/vgic/vgic-kvm-device.c |    3 +++
- virt/kvm/arm/vgic/vgic-mmio-v3.c    |    2 ++
- virt/kvm/arm/vgic/vgic.h            |    4 ++++
- 4 files changed, 13 insertions(+)
+ arch/arm64/include/asm/arch_gicv3.h |   13 +++++++++++++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c     |   13 -------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 9c9edc9..7ba9164 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -16,6 +16,9 @@ menuconfig VIRTUALIZATION
+diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
+index 8ec88e5..ae7dbd7 100644
+--- a/arch/arm64/include/asm/arch_gicv3.h
++++ b/arch/arm64/include/asm/arch_gicv3.h
+@@ -79,6 +79,19 @@
+ #include <linux/stringify.h>
+ #include <asm/barrier.h>
  
- if VIRTUALIZATION
- 
-+config KVM_ARM_VGIC_V3_ITS
-+	bool
++#define read_gicreg(r)							\
++	({								\
++		u64 reg;						\
++		asm volatile("mrs_s %0, " __stringify(r) : "=r" (reg));	\
++		reg;							\
++	})
 +
- config KVM_ARM_VGIC_V3
- 	bool
- 
-@@ -35,6 +38,7 @@ config KVM
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	select KVM_ARM_VGIC_V3
-+	select KVM_ARM_VGIC_V3_ITS
- 	select KVM_ARM_PMU if HW_PERF_EVENTS
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_IRQCHIP
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 1813f93..f3811b3 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -223,9 +223,12 @@ int kvm_register_vgic_device(unsigned long type)
- 	case KVM_DEV_TYPE_ARM_VGIC_V3:
- 		ret = kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
- 					      KVM_DEV_TYPE_ARM_VGIC_V3);
++#define write_gicreg(v,r)						\
++	do {								\
++		u64 __val = (v);					\
++		asm volatile("msr_s " __stringify(r) ", %0" : : "r" (__val));\
++	} while (0)
 +
-+#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
- 		if (ret)
- 			break;
- 		ret = kvm_vgic_register_its_device();
-+#endif
- 		break;
- #endif
- 	}
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 90d8181..acbe691 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -42,6 +42,7 @@ u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
- 	return reg | ((u64)val << lower);
- }
+ /*
+  * Low-level accessors
+  *
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 5f8f80b..f2dbd2e 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -24,19 +24,6 @@
+ #define vtr_to_max_lr_idx(v)		((v) & 0xf)
+ #define vtr_to_nr_pri_bits(v)		(((u32)(v) >> 29) + 1)
  
-+#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
- bool vgic_has_its(struct kvm *kvm)
+-#define read_gicreg(r)							\
+-	({								\
+-		u64 reg;						\
+-		asm volatile("mrs_s %0, " __stringify(r) : "=r" (reg));	\
+-		reg;							\
+-	})
+-
+-#define write_gicreg(v,r)						\
+-	do {								\
+-		u64 __val = (v);					\
+-		asm volatile("msr_s " __stringify(r) ", %0" : : "r" (__val));\
+-	} while (0)
+-
+ static u64 __hyp_text __gic_v3_get_lr(unsigned int lr)
  {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
-@@ -51,6 +52,7 @@ bool vgic_has_its(struct kvm *kvm)
- 
- 	return dist->has_its;
- }
-+#endif
- 
- static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
- 					    gpa_t addr, unsigned int len)
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 6c4625c..100045f 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -84,11 +84,15 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu);
- int vgic_v3_probe(const struct gic_kvm_info *info);
- int vgic_v3_map_resources(struct kvm *kvm);
- int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
-+
-+#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
- int vgic_register_its_iodevs(struct kvm *kvm);
- bool vgic_has_its(struct kvm *kvm);
- int kvm_vgic_register_its_device(void);
- void vgic_enable_lpis(struct kvm_vcpu *vcpu);
- int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
-+#endif
-+
- #else
- static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
- {
+ 	switch (lr & 0xf) {
 -- 
 1.7.9.5
