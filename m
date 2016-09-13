@@ -1,28 +1,28 @@
-From: Vijay Kilari <vijay.kilari@gmail.com>
-Subject: Re: [PATCH v4 0/5] arm/arm64: vgic-new: Implement API for vGICv3 live
- migration
-Date: Mon, 12 Sep 2016 22:14:51 +0530
-Message-ID: <CALicx6sqSf1yS61-tOHCX58oQC7UT+H-R2K6ztH+p=9KZCX+3w@mail.gmail.com>
-References: <1473510138-4719-1-git-send-email-vijay.kilari@gmail.com>
- <57D6AA83.6060208@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 01/10] arm64: KVM: Use static keys for selecting the
+ GIC backend
+Date: Tue, 13 Sep 2016 10:20:19 +0200
+Message-ID: <20160913082019.GB5680@cbox>
+References: <1473691764-29424-1-git-send-email-vladimir.murzin@arm.com>
+ <1473691764-29424-2-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E8E1410B5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 12:36:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D618248531
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 04:09:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V4+ZDdyrHVEb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Sep 2016 12:36:11 -0400 (EDT)
-Received: from mail-oi0-f65.google.com (mail-oi0-f65.google.com
- [209.85.218.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 52C3F40F9B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 12:36:10 -0400 (EDT)
-Received: by mail-oi0-f65.google.com with SMTP id y2so18845866oie.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Sep 2016 09:44:52 -0700 (PDT)
-In-Reply-To: <57D6AA83.6060208@arm.com>
+ with ESMTP id LptmtJxC1VZG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Sep 2016 04:08:58 -0400 (EDT)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7052B412C2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 04:08:58 -0400 (EDT)
+Received: by mail-wm0-f50.google.com with SMTP id i130so18366819wmf.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 01:17:41 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1473691764-29424-2-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,31 +32,154 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Sep 12, 2016 at 6:45 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On 10/09/16 13:22, vijay.kilari@gmail.com wrote:
->> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->>
->> This patchset adds API for saving and restoring
->> of VGICv3 registers to support live migration with new vgic feature.
->> This API definition is as per version of VGICv3 specification
->> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
->>
->> Compatible live migration QEMU patches will be sent later.
->
-> Could you please point to the QEMU patches as well? I need to be able to
-> test the this infrastructure.
+On Mon, Sep 12, 2016 at 03:49:15PM +0100, Vladimir Murzin wrote:
+> Currently GIC backend is selected via alternative framework and this
+> is fine. We are going to introduce vgic-v3 to 32-bit world and there
+> we don't have patching framework in hand, so we can either check
+> support for GICv3 every time we need to choose which backend to use or
+> try to optimise it by using static keys. The later looks quite
+> promising because we can share logic involved in selecting GIC backend
+> between architectures if both uses static keys.
+> 
+> This patch moves arm64 from alternative to static keys framework for
+> selecting GIC backend. For that we embed static key into vgic_global
+> and enable the key during vgic initialisation based on what has
+> already been exposed by the host GIC driver.
+> 
+> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/switch.c   |   21 +++++++++++----------
+>  include/kvm/arm_vgic.h        |    4 ++++
+>  virt/kvm/arm/vgic/vgic-init.c |    4 ++++
+>  virt/kvm/arm/vgic/vgic.c      |    2 +-
+>  4 files changed, 20 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 5a84b45..d5c4cc5 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -16,6 +16,8 @@
+>   */
+>  
+>  #include <linux/types.h>
+> +#include <linux/jump_label.h>
+> +
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_hyp.h>
+>  
+> @@ -126,17 +128,13 @@ static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
+>  	write_sysreg(0, vttbr_el2);
+>  }
+>  
+> -static hyp_alternate_select(__vgic_call_save_state,
+> -			    __vgic_v2_save_state, __vgic_v3_save_state,
+> -			    ARM64_HAS_SYSREG_GIC_CPUIF);
+> -
+> -static hyp_alternate_select(__vgic_call_restore_state,
+> -			    __vgic_v2_restore_state, __vgic_v3_restore_state,
+> -			    ARM64_HAS_SYSREG_GIC_CPUIF);
+> -
+>  static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
+>  {
+> -	__vgic_call_save_state()(vcpu);
+> +	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
 
-I just sent you corresponding QEMU patches.
+It's a bit weird that we use _unlikely for GICv3 (at least if/when GICv3
+hardware becomes mainstream), but as we don't have another primitive for
+the 'default disabled' case, I suppose that's the best we can do.
 
-Thanks
-Vijay
->
-> Thanks,
->
->         M.
-> --
-> Jazz is not dead. It just smells funny...
+> +		__vgic_v3_save_state(vcpu);
+> +	else
+> +		__vgic_v2_save_state(vcpu);
+> +
+>  	write_sysreg(read_sysreg(hcr_el2) & ~HCR_INT_OVERRIDE, hcr_el2);
+>  }
+>  
+> @@ -149,7 +147,10 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+>  	val |= vcpu->arch.irq_lines;
+>  	write_sysreg(val, hcr_el2);
+>  
+> -	__vgic_call_restore_state()(vcpu);
+> +	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+> +		__vgic_v3_restore_state(vcpu);
+> +	else
+> +		__vgic_v2_restore_state(vcpu);
+>  }
+>  
+>  static bool __hyp_text __true_value(void)
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 19b698e..994665a 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -23,6 +23,7 @@
+>  #include <linux/types.h>
+>  #include <kvm/iodev.h>
+>  #include <linux/list.h>
+> +#include <linux/jump_label.h>
+>  
+>  #define VGIC_V3_MAX_CPUS	255
+>  #define VGIC_V2_MAX_CPUS	8
+> @@ -63,6 +64,9 @@ struct vgic_global {
+>  
+>  	/* Only needed for the legacy KVM_CREATE_IRQCHIP */
+>  	bool			can_emulate_gicv2;
+> +
+> +	/* GIC system register CPU interface */
+> +	struct static_key_false gicv3_cpuif;
+
+Documentation/static-keys.txt says that we are not supposed to use
+struct static_key_false directly.  This will obviously work quite
+nicely, but we could consider adding a pair of
+DECLARE_STATIC_KEY_TRUE/FALSE macros that don't have the assignments,
+but obviously this will need an ack from other maintainers.
+
+Thoughts?
+
+
+>  };
+>  
+>  extern struct vgic_global kvm_vgic_global_state;
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index 83777c1..14d6718 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -405,6 +405,10 @@ int kvm_vgic_hyp_init(void)
+>  		break;
+>  	case GIC_V3:
+>  		ret = vgic_v3_probe(gic_kvm_info);
+> +		if (!ret) {
+> +			static_branch_enable(&kvm_vgic_global_state.gicv3_cpuif);
+> +			kvm_info("GIC system register CPU interface\n");
+
+nit: add enabled to the info message?
+
+> +		}
+>  		break;
+>  	default:
+>  		ret = -ENODEV;
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index e83b7fe..8a529a7 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -29,7 +29,7 @@
+>  #define DEBUG_SPINLOCK_BUG_ON(p)
+>  #endif
+>  
+> -struct vgic_global __section(.hyp.text) kvm_vgic_global_state;
+> +struct vgic_global __section(.hyp.text) kvm_vgic_global_state = {.gicv3_cpuif = STATIC_KEY_FALSE_INIT,};
+>  
+>  /*
+>   * Locking order is always:
+> -- 
+> 1.7.9.5
+> 
+
+Overall this looks really nice, as long as we're clear on the static
+keys stuff.
+
+Thanks!
+-Christoffer
