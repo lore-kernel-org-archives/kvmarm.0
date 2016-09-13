@@ -1,29 +1,25 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 01/10] arm64: KVM: Use static keys for selecting the
- GIC backend
-Date: Tue, 13 Sep 2016 11:22:34 +0200
-Message-ID: <20160913092234.GA30056@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 07/10] ARM: Introduce MPIDR_LEVEL_SHIFT macro
+Date: Tue, 13 Sep 2016 11:12:16 +0100
+Message-ID: <57D7D100.3040908@arm.com>
 References: <1473691764-29424-1-git-send-email-vladimir.murzin@arm.com>
- <1473691764-29424-2-git-send-email-vladimir.murzin@arm.com>
- <20160913082019.GB5680@cbox> <57D7C2AE.908@arm.com>
+ <1473691764-29424-8-git-send-email-vladimir.murzin@arm.com>
+ <20160913083855.GC5680@cbox> <57D7C111.7000405@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 833BE49B71
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 05:11:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 850BA49B42
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 06:03:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a8rYQzNv8qq5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Sep 2016 05:11:13 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 02E1B49B68
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 05:11:12 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id 1so189388425wmz.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 02:19:56 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <57D7C2AE.908@arm.com>
+ with ESMTP id W-7WAieoP2de for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Sep 2016 06:03:36 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4564D49B3C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 06:03:35 -0400 (EDT)
+In-Reply-To: <57D7C111.7000405@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,169 +29,63 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Vladimir Murzin <vladimir.murzin@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: andre.przywara@arm.com, Russell King <rmk+kernel@armlinux.org.uk>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 13, 2016 at 10:11:10AM +0100, Marc Zyngier wrote:
-> On 13/09/16 09:20, Christoffer Dall wrote:
-> > On Mon, Sep 12, 2016 at 03:49:15PM +0100, Vladimir Murzin wrote:
-> >> Currently GIC backend is selected via alternative framework and this
-> >> is fine. We are going to introduce vgic-v3 to 32-bit world and there
-> >> we don't have patching framework in hand, so we can either check
-> >> support for GICv3 every time we need to choose which backend to use or
-> >> try to optimise it by using static keys. The later looks quite
-> >> promising because we can share logic involved in selecting GIC backend
-> >> between architectures if both uses static keys.
-> >>
-> >> This patch moves arm64 from alternative to static keys framework for
-> >> selecting GIC backend. For that we embed static key into vgic_global
-> >> and enable the key during vgic initialisation based on what has
-> >> already been exposed by the host GIC driver.
-> >>
-> >> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
-> >> ---
-> >>  arch/arm64/kvm/hyp/switch.c   |   21 +++++++++++----------
-> >>  include/kvm/arm_vgic.h        |    4 ++++
-> >>  virt/kvm/arm/vgic/vgic-init.c |    4 ++++
-> >>  virt/kvm/arm/vgic/vgic.c      |    2 +-
-> >>  4 files changed, 20 insertions(+), 11 deletions(-)
-> >>
-> >> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> >> index 5a84b45..d5c4cc5 100644
-> >> --- a/arch/arm64/kvm/hyp/switch.c
-> >> +++ b/arch/arm64/kvm/hyp/switch.c
-> >> @@ -16,6 +16,8 @@
-> >>   */
-> >>  
-> >>  #include <linux/types.h>
-> >> +#include <linux/jump_label.h>
-> >> +
-> >>  #include <asm/kvm_asm.h>
-> >>  #include <asm/kvm_hyp.h>
-> >>  
-> >> @@ -126,17 +128,13 @@ static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
-> >>  	write_sysreg(0, vttbr_el2);
-> >>  }
-> >>  
-> >> -static hyp_alternate_select(__vgic_call_save_state,
-> >> -			    __vgic_v2_save_state, __vgic_v3_save_state,
-> >> -			    ARM64_HAS_SYSREG_GIC_CPUIF);
-> >> -
-> >> -static hyp_alternate_select(__vgic_call_restore_state,
-> >> -			    __vgic_v2_restore_state, __vgic_v3_restore_state,
-> >> -			    ARM64_HAS_SYSREG_GIC_CPUIF);
-> >> -
-> >>  static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
-> >>  {
-> >> -	__vgic_call_save_state()(vcpu);
-> >> +	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-> > 
-> > It's a bit weird that we use _unlikely for GICv3 (at least if/when GICv3
-> > hardware becomes mainstream), but as we don't have another primitive for
-> > the 'default disabled' case, I suppose that's the best we can do.
+On 13/09/16 10:04, Vladimir Murzin wrote:
+> On 13/09/16 09:38, Christoffer Dall wrote:
+>> On Mon, Sep 12, 2016 at 03:49:21PM +0100, Vladimir Murzin wrote:
+>>> vgic-v3 driver uses architecture specific MPIDR_LEVEL_SHIFT macro to
+>>> encode the affinity in a form compatible with ICC_SGI* registers.
+>>> Unfortunately, that macro is missing on ARM, so let's add it.
+>>>
+>>> Cc: Russell King <rmk+kernel@armlinux.org.uk>
+>>> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+>>> ---
+>>>  arch/arm/include/asm/cputype.h |    1 +
+>>>  1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/arch/arm/include/asm/cputype.h b/arch/arm/include/asm/cputype.h
+>>> index 1ee94c7..e2d94c1 100644
+>>> --- a/arch/arm/include/asm/cputype.h
+>>> +++ b/arch/arm/include/asm/cputype.h
+>>> @@ -55,6 +55,7 @@
+>>>  
+>>>  #define MPIDR_LEVEL_BITS 8
+>>>  #define MPIDR_LEVEL_MASK ((1 << MPIDR_LEVEL_BITS) - 1)
+>>> +#define MPIDR_LEVEL_SHIFT(level) (MPIDR_LEVEL_BITS * level)
+>>>  
+>>
+>> I'm not sure I follow the correctness of this completely.
+>>
+>> This is called from vgic_v3_dispatch_sgi, which takes a u64 value, which
+>> may have something in the Aff3 field, which we now shift left 24 bits,
+>> but that is not the Aff3 field of AArch32's MPIDR.
+>>
+>> What is the rationale for this making sense again?
 > 
-> We could always revert the "likelihood" of that test once GICv3 has
-> conquered the world. Or start patching the 32bit kernel like we do for
-> 64bit...
+> IIUC, in such case we construct mpidr which won't match in match_mpidr()
+> with the value we get from kvm_vcpu_get_mpidr_aff() and no SGI will be
+> sent to the guest.
 > 
-> > 
-> >> +		__vgic_v3_save_state(vcpu);
-> >> +	else
-> >> +		__vgic_v2_save_state(vcpu);
-> >> +
-> >>  	write_sysreg(read_sysreg(hcr_el2) & ~HCR_INT_OVERRIDE, hcr_el2);
-> >>  }
-> >>  
-> >> @@ -149,7 +147,10 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
-> >>  	val |= vcpu->arch.irq_lines;
-> >>  	write_sysreg(val, hcr_el2);
-> >>  
-> >> -	__vgic_call_restore_state()(vcpu);
-> >> +	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-> >> +		__vgic_v3_restore_state(vcpu);
-> >> +	else
-> >> +		__vgic_v2_restore_state(vcpu);
-> >>  }
-> >>  
-> >>  static bool __hyp_text __true_value(void)
-> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> >> index 19b698e..994665a 100644
-> >> --- a/include/kvm/arm_vgic.h
-> >> +++ b/include/kvm/arm_vgic.h
-> >> @@ -23,6 +23,7 @@
-> >>  #include <linux/types.h>
-> >>  #include <kvm/iodev.h>
-> >>  #include <linux/list.h>
-> >> +#include <linux/jump_label.h>
-> >>  
-> >>  #define VGIC_V3_MAX_CPUS	255
-> >>  #define VGIC_V2_MAX_CPUS	8
-> >> @@ -63,6 +64,9 @@ struct vgic_global {
-> >>  
-> >>  	/* Only needed for the legacy KVM_CREATE_IRQCHIP */
-> >>  	bool			can_emulate_gicv2;
-> >> +
-> >> +	/* GIC system register CPU interface */
-> >> +	struct static_key_false gicv3_cpuif;
-> > 
-> > Documentation/static-keys.txt says that we are not supposed to use
-> > struct static_key_false directly.  This will obviously work quite
-> > nicely, but we could consider adding a pair of
-> > DECLARE_STATIC_KEY_TRUE/FALSE macros that don't have the assignments,
-> > but obviously this will need an ack from other maintainers.
-> > 
-> > Thoughts?
-> 
-> Grepping through the tree shows that we're not the only abusers of this
-> (dynamic debug is far worse!). Happy to write the additional macros and
-> submit them if nobody beats me to it.
-> 
-> > 
-> > 
-> >>  };
-> >>  
-> >>  extern struct vgic_global kvm_vgic_global_state;
-> >> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> >> index 83777c1..14d6718 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-init.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> >> @@ -405,6 +405,10 @@ int kvm_vgic_hyp_init(void)
-> >>  		break;
-> >>  	case GIC_V3:
-> >>  		ret = vgic_v3_probe(gic_kvm_info);
-> >> +		if (!ret) {
-> >> +			static_branch_enable(&kvm_vgic_global_state.gicv3_cpuif);
-> >> +			kvm_info("GIC system register CPU interface\n");
-> > 
-> > nit: add enabled to the info message?
-> > 
-> >> +		}
-> >>  		break;
-> >>  	default:
-> >>  		ret = -ENODEV;
-> >> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> >> index e83b7fe..8a529a7 100644
-> >> --- a/virt/kvm/arm/vgic/vgic.c
-> >> +++ b/virt/kvm/arm/vgic/vgic.c
-> >> @@ -29,7 +29,7 @@
-> >>  #define DEBUG_SPINLOCK_BUG_ON(p)
-> >>  #endif
-> >>  
-> >> -struct vgic_global __section(.hyp.text) kvm_vgic_global_state;
-> >> +struct vgic_global __section(.hyp.text) kvm_vgic_global_state = {.gicv3_cpuif = STATIC_KEY_FALSE_INIT,};
-> >>  
-> >>  /*
-> >>   * Locking order is always:
-> >> -- 
-> >> 1.7.9.5
-> >>
-> > 
-> > Overall this looks really nice, as long as we're clear on the static
-> > keys stuff.
-> 
-> Indeed, we should get this sorted, though I'm not sure this should be a
-> blocker for this code.
-> 
-Agreed, let's ship it!
--Christoffer
+> Since we get that u64 value from the guest, I'd think it is something
+> wrong is going on in the guest in case Aff3 is non-zero; however, we can
+> hide it by zeroing out SGI Aff3 bits in access_gic_sgi().
+
+I don't think zeroing Aff3 is the right move, as the spec doesn't say
+that Aff3 should be ignored in a write to ICC_SGI1R. On the other hand,
+the spec says (in the context of the target list): "If a bit is 1 and
+the bit does not correspond to a valid target PE, the bit must be
+ignored by the Distributor".
+
+This makes me think that, unless ICC_SGI1R.IMR is set, we should simply
+ignore that SGI because there is no way we can actually deliver it.
+
+Could you cook a small patch that would go on top of this series?
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
