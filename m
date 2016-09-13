@@ -1,23 +1,23 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [PATCH 1/7] perf/trace: Add notification for perf trace events
-Date: Tue, 13 Sep 2016 11:16:03 +0100
-Message-ID: <1473761769-30572-2-git-send-email-punit.agrawal@arm.com>
+Subject: [PATCH 4/7] arm64: tlbflush.h: add __tlbi() macro
+Date: Tue, 13 Sep 2016 11:16:06 +0100
+Message-ID: <1473761769-30572-5-git-send-email-punit.agrawal@arm.com>
 References: <1473761769-30572-1-git-send-email-punit.agrawal@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F051249B94
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 06:08:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0282949B35
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 06:08:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5dUY7ms9-oGk for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Sep 2016 06:08:11 -0400 (EDT)
+ with ESMTP id KgtqV1R03cVj for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Sep 2016 06:08:17 -0400 (EDT)
 Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
  [217.140.96.140])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D3F8A49B93
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 06:08:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C5195412A6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2016 06:08:17 -0400 (EDT)
 In-Reply-To: <1473761769-30572-1-git-send-email-punit.agrawal@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,98 +29,122 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a mechanism to notify listeners about perf trace event state
-changes. This enables listeners to take actions requiring the event
-context (e.g., attached process).
+From: Mark Rutland <mark.rutland@arm.com>
 
-The notification mechanism can be used to reduce trace point based
-profiling overhead by enabling/disabling hardware traps for specific
-contexts (e.g., virtual machines).
+As with dsb() and isb(), add a __tlbi() helper so that we can avoid
+distracting asm boilerplate every time we want a TLBI. As some TLBI
+operations take an argument while others do not, some pre-processor is
+used to handle these two cases with different assembly blocks.
 
+The existing tlbflush.h code is moved over to use the helper.
+
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+[ rename helper to __tlbi, update comment and commit log ]
 Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Ingo Molnar <mingo@redhat.com>
+Reviewed-by: Will Deacon <will.deacon@arm.com>
 ---
- include/linux/trace_events.h    |  3 +++
- kernel/trace/trace_event_perf.c | 24 ++++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ arch/arm64/include/asm/tlbflush.h | 34 ++++++++++++++++++++++++++--------
+ 1 file changed, 26 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/trace_events.h b/include/linux/trace_events.h
-index be00761..5924032 100644
---- a/include/linux/trace_events.h
-+++ b/include/linux/trace_events.h
-@@ -505,6 +505,9 @@ perf_trace_buf_submit(void *raw_data, int size, int rctx, u16 type,
- {
- 	perf_tp_event(type, count, raw_data, size, regs, head, rctx, task);
- }
-+
-+extern int perf_trace_notifier_register(struct notifier_block *nb);
-+extern int perf_trace_notifier_unregister(struct notifier_block *nb);
- #endif
- 
- #endif /* _LINUX_TRACE_EVENT_H */
-diff --git a/kernel/trace/trace_event_perf.c b/kernel/trace/trace_event_perf.c
-index 562fa69..9aaaacf 100644
---- a/kernel/trace/trace_event_perf.c
-+++ b/kernel/trace/trace_event_perf.c
-@@ -6,10 +6,12 @@
-  */
- 
- #include <linux/module.h>
-+#include <linux/notifier.h>
- #include <linux/kprobes.h>
- #include "trace.h"
- 
- static char __percpu *perf_trace_buf[PERF_NR_CONTEXTS];
-+static RAW_NOTIFIER_HEAD(perf_trace_notifier_list);
+diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+index b460ae2..deab523 100644
+--- a/arch/arm64/include/asm/tlbflush.h
++++ b/arch/arm64/include/asm/tlbflush.h
+@@ -25,6 +25,24 @@
+ #include <asm/cputype.h>
  
  /*
-  * Force it to be aligned to unsigned long to avoid misaligned accesses
-@@ -86,6 +88,26 @@ static int perf_trace_event_perm(struct trace_event_call *tp_event,
- 	return 0;
++ * Raw TLBI operations.
++ *
++ * Where necessary, use the __tlbi() macro to avoid asm()
++ * boilerplate. Drivers and most kernel code should use the TLB
++ * management routines in preference to the macro below.
++ *
++ * The macro can be used as __tlbi(op) or __tlbi(op, arg), depending
++ * on whether a particular TLBI operation takes an argument or
++ * not. The macros handles invoking the asm with or without the
++ * register argument as appropriate.
++ */
++#define __TLBI_0(op, arg)		asm ("tlbi " #op)
++#define __TLBI_1(op, arg)		asm ("tlbi " #op ", %0" : : "r" (arg))
++#define __TLBI_N(op, arg, n, ...)	__TLBI_##n(op, arg)
++
++#define __tlbi(op, ...)		__TLBI_N(op, ##__VA_ARGS__, 1, 0)
++
++/*
+  *	TLB Management
+  *	==============
+  *
+@@ -66,7 +84,7 @@
+ static inline void local_flush_tlb_all(void)
+ {
+ 	dsb(nshst);
+-	asm("tlbi	vmalle1");
++	__tlbi(vmalle1);
+ 	dsb(nsh);
+ 	isb();
+ }
+@@ -74,7 +92,7 @@ static inline void local_flush_tlb_all(void)
+ static inline void flush_tlb_all(void)
+ {
+ 	dsb(ishst);
+-	asm("tlbi	vmalle1is");
++	__tlbi(vmalle1is);
+ 	dsb(ish);
+ 	isb();
+ }
+@@ -84,7 +102,7 @@ static inline void flush_tlb_mm(struct mm_struct *mm)
+ 	unsigned long asid = ASID(mm) << 48;
+ 
+ 	dsb(ishst);
+-	asm("tlbi	aside1is, %0" : : "r" (asid));
++	__tlbi(aside1is, asid);
+ 	dsb(ish);
  }
  
-+int perf_trace_notifier_register(struct notifier_block *nb)
-+{
-+	return raw_notifier_chain_register(&perf_trace_notifier_list, nb);
-+}
-+
-+int perf_trace_notifier_unregister(struct notifier_block *nb)
-+{
-+	return raw_notifier_chain_unregister(&perf_trace_notifier_list, nb);
-+}
-+
-+static void perf_trace_notify(enum trace_reg event, struct perf_event *p_event)
-+{
-+	/*
-+	 * We use raw notifiers here as we are called with the
-+	 * event_mutex held.
-+	 */
-+	raw_notifier_call_chain(&perf_trace_notifier_list,
-+				     event, p_event);
-+}
-+
- static int perf_trace_event_reg(struct trace_event_call *tp_event,
- 				struct perf_event *p_event)
- {
-@@ -176,6 +198,7 @@ out:
- static int perf_trace_event_open(struct perf_event *p_event)
- {
- 	struct trace_event_call *tp_event = p_event->tp_event;
-+	perf_trace_notify(TRACE_REG_PERF_OPEN, p_event);
- 	return tp_event->class->reg(tp_event, TRACE_REG_PERF_OPEN, p_event);
+@@ -94,7 +112,7 @@ static inline void flush_tlb_page(struct vm_area_struct *vma,
+ 	unsigned long addr = uaddr >> 12 | (ASID(vma->vm_mm) << 48);
+ 
+ 	dsb(ishst);
+-	asm("tlbi	vale1is, %0" : : "r" (addr));
++	__tlbi(vale1is, addr);
+ 	dsb(ish);
  }
  
-@@ -183,6 +206,7 @@ static void perf_trace_event_close(struct perf_event *p_event)
+@@ -122,9 +140,9 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
+ 	dsb(ishst);
+ 	for (addr = start; addr < end; addr += 1 << (PAGE_SHIFT - 12)) {
+ 		if (last_level)
+-			asm("tlbi vale1is, %0" : : "r"(addr));
++			__tlbi(vale1is, addr);
+ 		else
+-			asm("tlbi vae1is, %0" : : "r"(addr));
++			__tlbi(vae1is, addr);
+ 	}
+ 	dsb(ish);
+ }
+@@ -149,7 +167,7 @@ static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end
+ 
+ 	dsb(ishst);
+ 	for (addr = start; addr < end; addr += 1 << (PAGE_SHIFT - 12))
+-		asm("tlbi vaae1is, %0" : : "r"(addr));
++		__tlbi(vaae1is, addr);
+ 	dsb(ish);
+ 	isb();
+ }
+@@ -163,7 +181,7 @@ static inline void __flush_tlb_pgtable(struct mm_struct *mm,
  {
- 	struct trace_event_call *tp_event = p_event->tp_event;
- 	tp_event->class->reg(tp_event, TRACE_REG_PERF_CLOSE, p_event);
-+	perf_trace_notify(TRACE_REG_PERF_CLOSE, p_event);
+ 	unsigned long addr = uaddr >> 12 | (ASID(mm) << 48);
+ 
+-	asm("tlbi	vae1is, %0" : : "r" (addr));
++	__tlbi(vae1is, addr);
+ 	dsb(ish);
  }
  
- static int perf_trace_event_init(struct trace_event_call *tp_event,
 -- 
 2.8.1
