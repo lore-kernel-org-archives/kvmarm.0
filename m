@@ -1,21 +1,21 @@
 From: Alexander Graf <agraf@suse.de>
 Subject: [PATCH v2] KVM: arm/arm64: Route vtimer events to user space
-Date: Fri, 16 Sep 2016 07:06:19 +0200
-Message-ID: <1474002379-29214-1-git-send-email-agraf@suse.de>
+Date: Fri, 16 Sep 2016 07:09:13 +0200
+Message-ID: <1474002553-30079-1-git-send-email-agraf@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3238840FA6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 00:58:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8923540FA6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 01:01:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3w1q4PeS29rV for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Sep 2016 00:58:24 -0400 (EDT)
+ with ESMTP id hPt7wPZiW2kI for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Sep 2016 01:01:16 -0400 (EDT)
 Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4FBE540F9B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 00:58:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1479040F9B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 01:01:16 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -51,15 +51,16 @@ A branch with WIP QEMU code can be found here:
 
 v1 -> v2:
 
-  - Add back curly brace that got lost
+  - Add back curly brace that got lost (and is very stubborn, sorry for
+    the resubmit to actually add it back for real)
 ---
  Documentation/virtual/kvm/api.txt |  28 ++++++++-
  arch/arm/include/asm/kvm_host.h   |   3 +
- arch/arm/kvm/arm.c                |  46 +++++++++++---
+ arch/arm/kvm/arm.c                |  47 +++++++++++---
  arch/arm64/include/asm/kvm_host.h |   3 +
  include/uapi/linux/kvm.h          |  14 +++++
  virt/kvm/arm/arch_timer.c         | 126 ++++++++++++++++++++++++++++----------
- 6 files changed, 177 insertions(+), 43 deletions(-)
+ 6 files changed, 178 insertions(+), 43 deletions(-)
 
 diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
 index 739db9a..6a64c53 100644
@@ -137,7 +138,7 @@ index de338d9..77d1f73 100644
  
  struct kvm_vm_stat {
 diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 75f130e..1b4b9a6 100644
+index 75f130e..57bdb71 100644
 --- a/arch/arm/kvm/arm.c
 +++ b/arch/arm/kvm/arm.c
 @@ -187,6 +187,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
@@ -207,10 +208,10 @@ index 75f130e..1b4b9a6 100644
  long kvm_arch_vcpu_ioctl(struct file *filp,
  			 unsigned int ioctl, unsigned long arg)
  {
-@@ -940,6 +965,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		if (copy_from_user(&attr, argp, sizeof(attr)))
+@@ -941,6 +966,14 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
  			return -EFAULT;
  		return kvm_arm_vcpu_has_attr(vcpu, &attr);
+ 	}
 +	case KVM_ENABLE_CAP:
 +	{
 +		struct kvm_enable_cap cap;
@@ -218,9 +219,10 @@ index 75f130e..1b4b9a6 100644
 +		if (copy_from_user(&cap, argp, sizeof(cap)))
 +			return -EFAULT;
 +		return kvm_vcpu_ioctl_enable_cap(vcpu, &cap);
- 	}
++	}
  	default:
  		return -EINVAL;
+ 	}
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
 index 3eda975..3d01481 100644
 --- a/arch/arm64/include/asm/kvm_host.h
