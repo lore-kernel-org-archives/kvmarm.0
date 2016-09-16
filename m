@@ -1,252 +1,68 @@
-From: vijay.kilari@gmail.com
-Subject: [PATCH v5 6/6] arm/arm64: vgic-new: Implement
- KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO ioctl
-Date: Fri, 16 Sep 2016 17:50:53 +0530
-Message-ID: <1474028453-29132-7-git-send-email-vijay.kilari@gmail.com>
-References: <1474028453-29132-1-git-send-email-vijay.kilari@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D71E41390
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 08:12:47 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IYJppxyuRREo for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Sep 2016 08:12:46 -0400 (EDT)
-Received: from mail-pf0-f195.google.com (mail-pf0-f195.google.com
- [209.85.192.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 686F449B30
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 08:12:44 -0400 (EDT)
-Received: by mail-pf0-f195.google.com with SMTP id 6so642308pfl.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 05:21:36 -0700 (PDT)
-In-Reply-To: <1474028453-29132-1-git-send-email-vijay.kilari@gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, christoffer.dall@linaro.org, peter.maydell@linaro.org
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+From: Alexander Graf <agraf@suse.de>
+Subject: Re: [PATCH v3 0/2] KVM: ARM: Enable vtimers with user space gic
+Date: Fri, 16 Sep 2016 14:25:01 +0200
+Message-ID: <060ADA14-786E-400E-9B11-61C34B7081B5@suse.de>
+References: <1474007187-18673-1-git-send-email-agraf@suse.de> <57DBC782.7080305@arm.com>
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8BIT
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <57DBC782.7080305@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-Userspace requires to store and restore of line_level for
-level triggered interrupts using ioctl KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO.
+> On 16 Sep 2016, at 12:20, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> 
+> Hi Alex,
+> 
+> On 16/09/16 07:26, Alexander Graf wrote:
+>> Some systems out there (well, one type in particular - the Raspberry Pi series)
+>> do have virtualization capabilities in the core, but no ARM GIC interrupt
+>> controller.
+>> 
+>> To run on these systems, the cleanest route is to just handle all
+>> interrupt delivery in user space and only deal with IRQ pins in the core
+>> side in KVM.
+>> 
+>> This works pretty well already, but breaks when the guest starts to use
+>> architected timers, as these are handled straight inside kernel space today.
+>> 
+>> This patch set allows user space to receive vtimer events as well as mask
+>> them, so that we can handle all vtimer related interrupt injection from user
+>> space, enabling us to use architected timer with user space gic emulation.
+> 
+> I have already voiced my concerns in the past, including face to face,
+> and I'm going to repeat it: I not keen at all on adding a new userspace
+> interface that is going to bitrot extremely quickly.
+> 
+> Let's face it, this new ABI will have a single user, with a limited
+> shelf life. I understand that the RPi is a popular product, but it looks
+> fairly obvious that this kind of sub-standard HW will eventually
+> disappear. We'll then be left with a userspace ABI that will break at
 
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
----
- arch/arm64/include/uapi/asm/kvm.h   |  6 +++++
- virt/kvm/arm/vgic/vgic-kvm-device.c | 50 ++++++++++++++++++++++++++++++++++++-
- virt/kvm/arm/vgic/vgic-mmio-v3.c    | 11 ++++++++
- virt/kvm/arm/vgic/vgic-mmio.c       | 33 ++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-mmio.h       |  5 ++++
- virt/kvm/arm/vgic/vgic.h            |  3 +++
- 6 files changed, 107 insertions(+), 1 deletion(-)
+I’m not 100% convinced that this is the case. Emulating the GIC in user space can have other interesting use cases. For example, it might come in handy for nesting. It may be useful for migrating a gicv2 VM to a gicv3 host without gicv2 emulation as well.
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 91c7137..4100f8c 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -211,6 +211,12 @@ struct kvm_arch_memory_slot {
- #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
- #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
- #define KVM_DEV_ARM_VGIC_CPU_SYSREGS    6
-+#define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO 7
-+#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
-+#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
-+			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
-+#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK	0x3ff
-+#define VGIC_LEVEL_INFO_LINE_LEVEL	0
- 
- #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
- 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index a48101f..de5d836 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -514,6 +514,25 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 						  regid, reg);
- 		break;
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
-+		unsigned int info, intid;
-+
-+		info = (attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
-+			KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT;
-+		if (info == VGIC_LEVEL_INFO_LINE_LEVEL) {
-+			if (is_write)
-+				tmp32 = *reg;
-+			intid = attr->attr &
-+				KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK;
-+			ret = vgic_v3_line_level_info_uaccess(vcpu, is_write,
-+							      intid, &tmp32);
-+			if (!is_write)
-+				*reg = tmp32;
-+		} else {
-+			ret = -EINVAL;
-+		}
-+		break;
-+	}
- 	default:
- 		ret = -EINVAL;
- 		break;
-@@ -556,6 +575,17 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
- 
- 		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
-+		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+		u64 reg;
-+		u32 tmp32;
-+
-+		if (get_user(tmp32, uaddr))
-+			return -EFAULT;
-+
-+		reg = tmp32;
-+		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
-+	}
- 	}
- 	return -ENXIO;
- }
-@@ -591,8 +621,18 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
- 			return ret;
- 		return put_user(reg, uaddr);
- 	}
--	}
-+	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
-+		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+		u64 reg;
-+		u32 tmp32;
- 
-+		ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
-+		if (ret)
-+			return ret;
-+		tmp32 = reg;
-+		return put_user(tmp32, uaddr);
-+	}
-+	}
- 	return -ENXIO;
- }
- 
-@@ -613,11 +653,19 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 		return vgic_v3_has_attr_regs(dev, attr);
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
- 		return 0;
-+	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
-+		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
-+		      KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT) ==
-+		      VGIC_LEVEL_INFO_LINE_LEVEL)
-+			return 0;
-+		break;
-+	}
- 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
- 		switch (attr->attr) {
- 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
- 			return 0;
- 		}
-+		break;
- 	}
- 	return -ENXIO;
- }
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index af748d7..9070412 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -806,3 +806,14 @@ int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 		return vgic_uaccess(vcpu, &rd_dev, is_write,
- 				    offset, val);
- }
-+
-+int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-+				    u32 intid, u32 *val)
-+{
-+	if (is_write)
-+		vgic_write_irq_line_level_info(vcpu, intid, *val);
-+	else
-+		*val = vgic_read_irq_line_level_info(vcpu, intid);
-+
-+	return 0;
-+}
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 173d6f0..fb018eb 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -371,6 +371,39 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
- 	}
- }
- 
-+unsigned long vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
-+{
-+	int i;
-+	unsigned long val = 0;
-+
-+	for (i = 0; i < 32; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		if (irq->line_level)
-+			val |= (1U << i);
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+
-+	return val;
-+}
-+
-+void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
-+				    const unsigned long val)
-+{
-+	int i;
-+
-+	for_each_set_bit(i, &val, 32) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		spin_lock(&irq->irq_lock);
-+		irq->line_level = true;
-+		spin_unlock(&irq->irq_lock);
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+}
-+
- static int match_region(const void *key, const void *elt)
- {
- 	const unsigned int offset = (unsigned long)key;
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index acbf99e..938702c 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -181,6 +181,11 @@ int vgic_validate_mmio_region_addr(struct kvm_device *dev,
- 				   const struct vgic_register_region *regions,
- 				   int nr_regions, gpa_t addr);
- 
-+unsigned long vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid);
-+
-+void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
-+				    const unsigned long val);
-+
- unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
- 
- unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev);
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 4c0076c..baf2edd 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -108,6 +108,9 @@ int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 			 u64 id, u64 *val);
- int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
- 				u64 *reg);
-+int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-+				    u32 intid, u32 *val);
-+
- #else
- static inline int vgic_register_its_iodevs(struct kvm *kvm)
- {
--- 
-1.9.1
+> every single release, given that nobody in the RPi community actually
+> uses a mainline kernel.
+
+I actually verified all of this patch on 4.8-rc5 upstream, which is the only 64bit kernel you can find for the RPi. So I’d expect the situation to change with 64bit.
+
+> And breaking this ABI will introduce userspace exploitable bugs, like
+> the one you've already shown. If anything, I would have loved to
+> completely kill the whole userspace GIC, because nobody cares. Yes, I
+> understand it is fun to have KVM running on the RPi. But the maintenance
+> costs far outweigh the fun aspect already.
+
+Having CPU pins accessible is very useful for use cases of KVM that are beyond your traditional VM.
+
+> You could still run KVM with an external emulated timer (not the arch
+> timer). No need for a new ABI for that.
+
+That’s what I thought too, but turns out that it’s not quite as simple as I hoped ;). Also, I much rather at least have a common notion of “arch timers are always available on arm64” than “kvm always uses the vgic”. The former has much more impact and much more reach.
+
+
+Alex
+
