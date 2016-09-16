@@ -1,94 +1,38 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [PATCH v3 0/2] KVM: ARM: Enable vtimers with user space gic
-Date: Fri, 16 Sep 2016 14:29:37 +0200
-Message-ID: <20160916122937.GA14140@cbox>
+Date: Fri, 16 Sep 2016 14:30:39 +0200
+Message-ID: <20160916123039.GB14140@cbox>
 References: <1474007187-18673-1-git-send-email-agraf@suse.de>
  <57DBC782.7080305@arm.com>
- <060ADA14-786E-400E-9B11-61C34B7081B5@suse.de>
+ <7beb406b-6194-8451-2d92-9a4394ef91dd@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 849AF413E1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 08:20:49 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s6xmupLLIjVN for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Sep 2016 08:20:48 -0400 (EDT)
-Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2205E41390
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 08:20:47 -0400 (EDT)
-Received: by mail-wm0-f48.google.com with SMTP id b187so34505889wme.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 05:29:40 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <060ADA14-786E-400E-9B11-61C34B7081B5@suse.de>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Graf <agraf@suse.de>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <7beb406b-6194-8451-2d92-9a4394ef91dd@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gRnJpLCBTZXAgMTYsIDIwMTYgYXQgMDI6MjU6MDFQTSArMDIwMCwgQWxleGFuZGVyIEdyYWYg
-d3JvdGU6Cj4gCj4gPiBPbiAxNiBTZXAgMjAxNiwgYXQgMTI6MjAsIE1hcmMgWnluZ2llciA8bWFy
-Yy56eW5naWVyQGFybS5jb20+IHdyb3RlOgo+ID4gCj4gPiBIaSBBbGV4LAo+ID4gCj4gPiBPbiAx
-Ni8wOS8xNiAwNzoyNiwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4gPj4gU29tZSBzeXN0ZW1zIG91
-dCB0aGVyZSAod2VsbCwgb25lIHR5cGUgaW4gcGFydGljdWxhciAtIHRoZSBSYXNwYmVycnkgUGkg
-c2VyaWVzKQo+ID4+IGRvIGhhdmUgdmlydHVhbGl6YXRpb24gY2FwYWJpbGl0aWVzIGluIHRoZSBj
-b3JlLCBidXQgbm8gQVJNIEdJQyBpbnRlcnJ1cHQKPiA+PiBjb250cm9sbGVyLgo+ID4+IAo+ID4+
-IFRvIHJ1biBvbiB0aGVzZSBzeXN0ZW1zLCB0aGUgY2xlYW5lc3Qgcm91dGUgaXMgdG8ganVzdCBo
-YW5kbGUgYWxsCj4gPj4gaW50ZXJydXB0IGRlbGl2ZXJ5IGluIHVzZXIgc3BhY2UgYW5kIG9ubHkg
-ZGVhbCB3aXRoIElSUSBwaW5zIGluIHRoZSBjb3JlCj4gPj4gc2lkZSBpbiBLVk0uCj4gPj4gCj4g
-Pj4gVGhpcyB3b3JrcyBwcmV0dHkgd2VsbCBhbHJlYWR5LCBidXQgYnJlYWtzIHdoZW4gdGhlIGd1
-ZXN0IHN0YXJ0cyB0byB1c2UKPiA+PiBhcmNoaXRlY3RlZCB0aW1lcnMsIGFzIHRoZXNlIGFyZSBo
-YW5kbGVkIHN0cmFpZ2h0IGluc2lkZSBrZXJuZWwgc3BhY2UgdG9kYXkuCj4gPj4gCj4gPj4gVGhp
-cyBwYXRjaCBzZXQgYWxsb3dzIHVzZXIgc3BhY2UgdG8gcmVjZWl2ZSB2dGltZXIgZXZlbnRzIGFz
-IHdlbGwgYXMgbWFzawo+ID4+IHRoZW0sIHNvIHRoYXQgd2UgY2FuIGhhbmRsZSBhbGwgdnRpbWVy
-IHJlbGF0ZWQgaW50ZXJydXB0IGluamVjdGlvbiBmcm9tIHVzZXIKPiA+PiBzcGFjZSwgZW5hYmxp
-bmcgdXMgdG8gdXNlIGFyY2hpdGVjdGVkIHRpbWVyIHdpdGggdXNlciBzcGFjZSBnaWMgZW11bGF0
-aW9uLgo+ID4gCj4gPiBJIGhhdmUgYWxyZWFkeSB2b2ljZWQgbXkgY29uY2VybnMgaW4gdGhlIHBh
-c3QsIGluY2x1ZGluZyBmYWNlIHRvIGZhY2UsCj4gPiBhbmQgSSdtIGdvaW5nIHRvIHJlcGVhdCBp
-dDogSSBub3Qga2VlbiBhdCBhbGwgb24gYWRkaW5nIGEgbmV3IHVzZXJzcGFjZQo+ID4gaW50ZXJm
-YWNlIHRoYXQgaXMgZ29pbmcgdG8gYml0cm90IGV4dHJlbWVseSBxdWlja2x5Lgo+ID4gCj4gPiBM
-ZXQncyBmYWNlIGl0LCB0aGlzIG5ldyBBQkkgd2lsbCBoYXZlIGEgc2luZ2xlIHVzZXIsIHdpdGgg
-YSBsaW1pdGVkCj4gPiBzaGVsZiBsaWZlLiBJIHVuZGVyc3RhbmQgdGhhdCB0aGUgUlBpIGlzIGEg
-cG9wdWxhciBwcm9kdWN0LCBidXQgaXQgbG9va3MKPiA+IGZhaXJseSBvYnZpb3VzIHRoYXQgdGhp
-cyBraW5kIG9mIHN1Yi1zdGFuZGFyZCBIVyB3aWxsIGV2ZW50dWFsbHkKPiA+IGRpc2FwcGVhci4g
-V2UnbGwgdGhlbiBiZSBsZWZ0IHdpdGggYSB1c2Vyc3BhY2UgQUJJIHRoYXQgd2lsbCBicmVhayBh
-dAo+IAo+IEnigJltIG5vdCAxMDAlIGNvbnZpbmNlZCB0aGF0IHRoaXMgaXMgdGhlIGNhc2UuIEVt
-dWxhdGluZyB0aGUgR0lDIGluIHVzZXIgc3BhY2UgY2FuIGhhdmUgb3RoZXIgaW50ZXJlc3Rpbmcg
-dXNlIGNhc2VzLiBGb3IgZXhhbXBsZSwgaXQgbWlnaHQgY29tZSBpbiBoYW5keSBmb3IgbmVzdGlu
-Zy4gSXQgbWF5IGJlIHVzZWZ1bCBmb3IgbWlncmF0aW5nIGEgZ2ljdjIgVk0gdG8gYSBnaWN2MyBo
-b3N0IHdpdGhvdXQgZ2ljdjIgZW11bGF0aW9uIGFzIHdlbGwuCj4gCgpJIGRvbid0IHNlZSB3aHkg
-eW91J2QgZG8gdGhpczsgdGhlIFZHSUMgaGFyZHdhcmUgY2FuIHBlcmZlY3RseSB3ZWxsIGJlCnVz
-ZWQgZm9yIG5lc3RpbmcgYXMgd2VsbCwgYW5kIHRoaXMgd29ya3MgcmF0aGVyIHdlbGwuCgo+ID4g
-ZXZlcnkgc2luZ2xlIHJlbGVhc2UsIGdpdmVuIHRoYXQgbm9ib2R5IGluIHRoZSBSUGkgY29tbXVu
-aXR5IGFjdHVhbGx5Cj4gPiB1c2VzIGEgbWFpbmxpbmUga2VybmVsLgo+IAo+IEkgYWN0dWFsbHkg
-dmVyaWZpZWQgYWxsIG9mIHRoaXMgcGF0Y2ggb24gNC44LXJjNSB1cHN0cmVhbSwgd2hpY2ggaXMg
-dGhlIG9ubHkgNjRiaXQga2VybmVsIHlvdSBjYW4gZmluZCBmb3IgdGhlIFJQaS4gU28gSeKAmWQg
-ZXhwZWN0IHRoZSBzaXR1YXRpb24gdG8gY2hhbmdlIHdpdGggNjRiaXQuCj4gCj4gPiBBbmQgYnJl
-YWtpbmcgdGhpcyBBQkkgd2lsbCBpbnRyb2R1Y2UgdXNlcnNwYWNlIGV4cGxvaXRhYmxlIGJ1Z3Ms
-IGxpa2UKPiA+IHRoZSBvbmUgeW91J3ZlIGFscmVhZHkgc2hvd24uIElmIGFueXRoaW5nLCBJIHdv
-dWxkIGhhdmUgbG92ZWQgdG8KPiA+IGNvbXBsZXRlbHkga2lsbCB0aGUgd2hvbGUgdXNlcnNwYWNl
-IEdJQywgYmVjYXVzZSBub2JvZHkgY2FyZXMuIFllcywgSQo+ID4gdW5kZXJzdGFuZCBpdCBpcyBm
-dW4gdG8gaGF2ZSBLVk0gcnVubmluZyBvbiB0aGUgUlBpLiBCdXQgdGhlIG1haW50ZW5hbmNlCj4g
-PiBjb3N0cyBmYXIgb3V0d2VpZ2ggdGhlIGZ1biBhc3BlY3QgYWxyZWFkeS4KPiAKPiBIYXZpbmcg
-Q1BVIHBpbnMgYWNjZXNzaWJsZSBpcyB2ZXJ5IHVzZWZ1bCBmb3IgdXNlIGNhc2VzIG9mIEtWTSB0
-aGF0IGFyZSBiZXlvbmQgeW91ciB0cmFkaXRpb25hbCBWTS4KPiAKPiA+IFlvdSBjb3VsZCBzdGls
-bCBydW4gS1ZNIHdpdGggYW4gZXh0ZXJuYWwgZW11bGF0ZWQgdGltZXIgKG5vdCB0aGUgYXJjaAo+
-ID4gdGltZXIpLiBObyBuZWVkIGZvciBhIG5ldyBBQkkgZm9yIHRoYXQuCj4gCj4gVGhhdOKAmXMg
-d2hhdCBJIHRob3VnaHQgdG9vLCBidXQgdHVybnMgb3V0IHRoYXQgaXTigJlzIG5vdCBxdWl0ZSBh
-cyBzaW1wbGUgYXMgSSBob3BlZCA7KS4KCldoeSBub3Q/ICBJIHRob3VnaHQgYSBmZXcgcGVvcGxl
-IGhhZCB0aGlzIHJ1bm5pbmcgcmVjZW50bHkuICBXaGF0IHdlcmUKdGhlIGlzc3Vlcz8gIFBlcmhh
-cHMgSSBjYW4gY29udmluY2Ugc29tZW9uZSB0byBzdWJtaXQgdGhlIHBhdGNoZXMgdGhleQp1c2Vk
-IGlmIHVzZWZ1bC4KClRoYW5rcywKLUNocmlzdG9mZmVyCl9fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3Rz
-LmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xp
-c3RpbmZvL2t2bWFybQo=
+On Fri, Sep 16, 2016 at 02:18:45PM +0200, Paolo Bonzini wrote:
+> 
+> 
+> On 16/09/2016 12:20, Marc Zyngier wrote:
+> > > This patch set allows user space to receive vtimer events as well as mask
+> > > them, so that we can handle all vtimer related interrupt injection from user
+> > > space, enabling us to use architected timer with user space gic emulation.
+> >
+> > I have already voiced my concerns in the past, including face to face,
+> > and I'm going to repeat it: I not keen at all on adding a new userspace
+> > interface that is going to bitrot extremely quickly.
+> 
+> You don't have automated tests set up?  It's not going to bitrot if you
+> test it, either with kvm-unit-tests or just by smoke-testing Linux.
+> It's _for_ the raspi, but it's not limited to it.
+> 
+
+Our automated testing situation is not great, no.  Something we're
+looking at, but have resource problems with.
+
+-Christoffer
