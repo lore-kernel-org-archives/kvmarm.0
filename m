@@ -1,11 +1,32 @@
 From: Alexander Graf <agraf@suse.de>
-Subject: [PATCH] KVM: arm/arm64: Route vtimer events to user space
-Date: Fri, 16 Sep 2016 01:15:20 +0200
-Message-ID: <1473981320-25387-1-git-send-email-agraf@suse.de>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PATCH v2] KVM: arm/arm64: Route vtimer events to user space
+Date: Fri, 16 Sep 2016 07:06:19 +0200
+Message-ID: <1474002379-29214-1-git-send-email-agraf@suse.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3238840FA6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 00:58:26 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3w1q4PeS29rV for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Sep 2016 00:58:24 -0400 (EDT)
+Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4FBE540F9B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 00:58:24 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 We have 2 modes for dealing with interrupts in the ARM world. We can either
@@ -27,6 +48,10 @@ Signed-off-by: Alexander Graf <agraf@suse.de>
 A branch with WIP QEMU code can be found here:
 
   https://github.com/agraf/qemu.git no-kvm-irqchip
+
+v1 -> v2:
+
+  - Add back curly brace that got lost
 ---
  Documentation/virtual/kvm/api.txt |  28 ++++++++-
  arch/arm/include/asm/kvm_host.h   |   3 +
@@ -434,4 +459,3 @@ index 4309b60..d0e999d 100644
  	 * There is a potential race here between VCPUs starting for the first
 -- 
 2.6.6
-
