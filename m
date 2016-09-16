@@ -1,63 +1,103 @@
 From: Alexander Graf <agraf@suse.de>
-Subject: [PATCH] KVM: arm/arm64: timer: Fix hw sync for user space irqchip path
-Date: Fri, 16 Sep 2016 07:16:11 +0200
-Message-ID: <1474002971-31434-1-git-send-email-agraf@suse.de>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PATCH v3 1/2] KVM: arm/arm64: Add vcpu ENABLE_CAP functionality
+Date: Fri, 16 Sep 2016 08:26:26 +0200
+Message-ID: <1474007187-18673-2-git-send-email-agraf@suse.de>
+References: <1474007187-18673-1-git-send-email-agraf@suse.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F0276412A2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 02:18:32 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id nF17SX9gYwHk for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Sep 2016 02:18:32 -0400 (EDT)
+Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C563140B40
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 02:18:31 -0400 (EDT)
+In-Reply-To: <1474007187-18673-1-git-send-email-agraf@suse.de>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, stable@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-While adding the new vgic implementation, apparently nobody tested
-the non-vgic path where user space controls the vgic, so two functions
-slipped through the cracks that get called in generic code but don't
-check whether hardware support is enabled.
+In a follow-up patch we will need to enable capabilities on demand for
+backwards compatibility. This patch adds the generic framework to handle
+vcpu cap enablement to the arm code base.
 
-This patch guards them with proper checks to ensure we only try to
-use vgic data structures if they are available. Without this, I get
-a stack trace:
-
-[   74.363037] Unable to handle kernel paging request at virtual address ffffffffffffffe8
-[...]
-[   74.929654] [<ffff000008824bcc>] _raw_spin_lock+0x1c/0x58
-[   74.935133] [<ffff0000080b7f20>] kvm_vgic_flush_hwstate+0x88/0x288
-[   74.941406] [<ffff0000080ab0b4>] kvm_arch_vcpu_ioctl_run+0xfc/0x630
-[   74.947766] [<ffff0000080a15bc>] kvm_vcpu_ioctl+0x2f4/0x710
-[   74.953420] [<ffff0000082788a8>] do_vfs_ioctl+0xb0/0x728
-[   74.958807] [<ffff000008278fb4>] SyS_ioctl+0x94/0xa8
-[   74.963844] [<ffff000008083744>] el0_svc_naked+0x38/0x3c
-
-Fixes: 0919e84c0
-Cc: stable@vger.kernel.org
 Signed-off-by: Alexander Graf <agraf@suse.de>
 ---
- virt/kvm/arm/vgic/vgic.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ Documentation/virtual/kvm/api.txt |  4 +++-
+ arch/arm/kvm/arm.c                | 25 +++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index e83b7fe..9f312ba 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -645,6 +645,9 @@ next:
- /* Sync back the hardware VGIC state into our emulation after a guest's run. */
- void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
-+	if (!vcpu->kvm->arch.vgic.enabled)
-+		return;
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 739db9a..23937e0 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -997,7 +997,9 @@ documentation when it pops into existence).
+ 
+ Capability: KVM_CAP_ENABLE_CAP, KVM_CAP_ENABLE_CAP_VM
+ Architectures: x86 (only KVM_CAP_ENABLE_CAP_VM),
+-	       mips (only KVM_CAP_ENABLE_CAP), ppc, s390
++	       mips (only KVM_CAP_ENABLE_CAP), ppc, s390,
++	       arm (only KVM_CAP_ENABLE_CAP),
++	       arm64 (only KVM_CAP_ENABLE_CAP)
+ Type: vcpu ioctl, vm ioctl (with KVM_CAP_ENABLE_CAP_VM)
+ Parameters: struct kvm_enable_cap (in)
+ Returns: 0 on success; -1 on error
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 75f130e..c84b6ad 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -878,6 +878,23 @@ static int kvm_arm_vcpu_has_attr(struct kvm_vcpu *vcpu,
+ 	return ret;
+ }
+ 
++static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
++				     struct kvm_enable_cap *cap)
++{
++	int r;
 +
- 	vgic_process_maintenance_interrupt(vcpu);
- 	vgic_fold_lr_state(vcpu);
- 	vgic_prune_ap_list(vcpu);
-@@ -653,6 +656,9 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- /* Flush our emulation state into the GIC hardware before entering the guest. */
- void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- {
-+	if (!vcpu->kvm->arch.vgic.enabled)
-+		return;
++	if (cap->flags)
++		return -EINVAL;
 +
- 	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
- 	vgic_flush_lr_state(vcpu);
- 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
++	switch (cap->cap) {
++	default:
++		r = -EINVAL;
++		break;
++	}
++
++	return r;
++}
++
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg)
+ {
+@@ -941,6 +958,14 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			return -EFAULT;
+ 		return kvm_arm_vcpu_has_attr(vcpu, &attr);
+ 	}
++	case KVM_ENABLE_CAP:
++	{
++		struct kvm_enable_cap cap;
++
++		if (copy_from_user(&cap, argp, sizeof(cap)))
++			return -EFAULT;
++		return kvm_vcpu_ioctl_enable_cap(vcpu, &cap);
++	}
+ 	default:
+ 		return -EINVAL;
+ 	}
 -- 
 2.6.6
-
