@@ -1,28 +1,31 @@
-From: Alexander Graf <agraf@suse.de>
-Subject: Re: [PATCH v3 0/2] KVM: ARM: Enable vtimers with user space gic
-Date: Fri, 16 Sep 2016 21:36:42 +0200
-Message-ID: <B88B95A5-3631-4AEF-80DC-7762C415A811@suse.de>
-References: <1474007187-18673-1-git-send-email-agraf@suse.de>
- <57DBC782.7080305@arm.com> <7beb406b-6194-8451-2d92-9a4394ef91dd@redhat.com>
- <20160916123039.GB14140@cbox>
- <da8191ca-6fb1-f960-872c-d6bc27172db8@redhat.com>
- <20160916133027.GA27036@cbox>
- <20160916134619.jjiaplhxgkkl5qri@kamzik.localdomain>
-Mime-Version: 1.0 (1.0)
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Subject: Re: [PATCH 5/6] arm/arm64: vgic-new: Implement VGICv3 CPU interface
+ access
+Date: Sat, 17 Sep 2016 11:58:48 +0530
+Message-ID: <CALicx6ucEH3w58Rhb8Urk0V5kRcqtUdwDYDtSLXrkas-Jatv=A@mail.gmail.com>
+References: <1474028453-29132-1-git-send-email-vijay.kilari@gmail.com>
+ <1474028453-29132-6-git-send-email-vijay.kilari@gmail.com>
+ <57DC0366.8060304@arm.com>
+ <CALicx6u-uYLY3DtDGMh3n6NbNH3kD9fn9aYHHJC=LVUQfFjTsQ@mail.gmail.com>
+ <57DC26C5.2060800@arm.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5892749AFA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 15:28:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07EBD49AF5
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Sep 2016 02:19:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UyX4oFOKvjDB for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Sep 2016 15:28:01 -0400 (EDT)
-Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30724412D0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 15:28:00 -0400 (EDT)
-In-Reply-To: <20160916134619.jjiaplhxgkkl5qri@kamzik.localdomain>
+ with ESMTP id tMiwa6mfPBVJ for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 17 Sep 2016 02:19:55 -0400 (EDT)
+Received: from mail-vk0-f67.google.com (mail-vk0-f67.google.com
+ [209.85.213.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DAF3448529
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Sep 2016 02:19:55 -0400 (EDT)
+Received: by mail-vk0-f67.google.com with SMTP id 16so2276986vko.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2016 23:28:49 -0700 (PDT)
+In-Reply-To: <57DC26C5.2060800@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,55 +35,99 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Fri, Sep 16, 2016 at 10:37 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> On 16/09/16 17:57, Vijay Kilari wrote:
+>> On Fri, Sep 16, 2016 at 8:06 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>>> On 16/09/16 13:20, vijay.kilari@gmail.com wrote:
+>>>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>>>
+>>>> VGICv3 CPU interface registers are accessed using
+>>>> KVM_DEV_ARM_VGIC_CPU_SYSREGS ioctl. These registers are accessed
+>>>> as 64-bit. The cpu MPIDR value is passed along with register id.
+>>>> is used to identify the cpu for registers access.
+>>>>
+>>>> The version of VGIC v3 specification is define here
+>>>> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
+>>>>
+>>>> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+>>>> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>>> ---
+>>>>  arch/arm64/include/uapi/asm/kvm.h   |   3 +
+>>>>  arch/arm64/kvm/Makefile             |   1 +
+>>>>  include/linux/irqchip/arm-gic-v3.h  |  30 ++++
+>>>>  virt/kvm/arm/vgic/vgic-kvm-device.c |  27 ++++
+>>>>  virt/kvm/arm/vgic/vgic-mmio-v3.c    |  18 +++
+>>>>  virt/kvm/arm/vgic/vgic-sys-reg-v3.c | 296 ++++++++++++++++++++++++++++++++++++
+>>>>  virt/kvm/arm/vgic/vgic.h            |  10 ++
+>>>>  7 files changed, 385 insertions(+)
+>
+> [...]
+>
+>>>> diff --git a/virt/kvm/arm/vgic/vgic-sys-reg-v3.c b/virt/kvm/arm/vgic/vgic-sys-reg-v3.c
+>>>> new file mode 100644
+>>>> index 0000000..8e4f403
+>>>> --- /dev/null
+>>>> +++ b/virt/kvm/arm/vgic/vgic-sys-reg-v3.c
+>>>> @@ -0,0 +1,296 @@
+>>>> +#include <linux/irqchip/arm-gic-v3.h>
+>>>> +#include <linux/kvm.h>
+>>>> +#include <linux/kvm_host.h>
+>>>> +#include <kvm/iodev.h>
+>>>> +#include <kvm/arm_vgic.h>
+>>>> +#include <asm/kvm_emulate.h>
+>>>> +#include <asm/kvm_arm.h>
+>>>> +#include <asm/kvm_mmu.h>
+>>>> +
+>>>> +#include "vgic.h"
+>>>> +#include "vgic-mmio.h"
+>>>> +#include "sys_regs.h"
+>>>> +
+>>>> +static bool access_gic_ctlr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>>>> +                         const struct sys_reg_desc *r)
+>>>> +{
+>>>> +     struct vgic_vmcr vmcr;
+>>>> +     u64 val;
+>>>> +     u32 ich_vtr;
+>>>> +
+>>>> +     vgic_get_vmcr(vcpu, &vmcr);
+>>>> +     if (p->is_write) {
+>>>> +             val = p->regval;
+>>>> +             vmcr.ctlr &= ~(ICH_VMCR_CBPR_MASK | ICH_VMCR_EOIM_MASK);
+>>>> +             vmcr.ctlr |= ((val & ICC_CTLR_EL1_CBPR_MASK) >>
+>>>> +                           ICC_CTLR_EL1_CBPR_SHIFT) << ICH_VMCR_CBPR_SHIFT;
+>>>> +             vmcr.ctlr |= ((val & ICC_CTLR_EL1_EOImode_MASK) >>
+>>>> +                          ICC_CTLR_EL1_EOImode_SHIFT) << ICH_VMCR_EOIM_SHIFT;
+>>>> +             vgic_set_vmcr(vcpu, &vmcr);
+>>>
+>>> You've ignored my comments again: "What if userspace writes something
+>>> that is incompatible with the current configuration? Wrong number of ID
+>>> bits, or number of priorities?"
+>>
+>> IMO, In case of incompatibility,
+>> If ID bits and PRI bits are less than HW supported, it is ok.
+>
+> Yes. But you also need to track of what the guest has programmed in
+> order to be able to migrate it back to its original configuration.
 
+You mean the vgic has to track/store the ID and PRI bits that guest
+has programmed
+and return the same when guest reads back instead of
+returning HW supported value for ICC_CTLR_EL1 reg access?.
 
-> Am 16.09.2016 um 15:46 schrieb Andrew Jones <drjones@redhat.com>:
-> 
->> On Fri, Sep 16, 2016 at 03:30:27PM +0200, Christoffer Dall wrote:
->>> On Fri, Sep 16, 2016 at 02:31:42PM +0200, Paolo Bonzini wrote:
->>> 
->>> 
->>> On 16/09/2016 14:30, Christoffer Dall wrote:
->>>>>>> This patch set allows user space to receive vtimer events as well as mask
->>>>>>> them, so that we can handle all vtimer related interrupt injection from user
->>>>>>> space, enabling us to use architected timer with user space gic emulation.
->>>>>> 
->>>>>> I have already voiced my concerns in the past, including face to face,
->>>>>> and I'm going to repeat it: I not keen at all on adding a new userspace
->>>>>> interface that is going to bitrot extremely quickly.
->>>>> 
->>>>> You don't have automated tests set up?  It's not going to bitrot if you
->>>>> test it, either with kvm-unit-tests or just by smoke-testing Linux.
->>>>> It's _for_ the raspi, but it's not limited to it.
->>>> 
->>>> Our automated testing situation is not great, no.  Something we're
->>>> looking at, but have resource problems with.
->>> 
->>> But it's not a good reason to hold back a feature...
->> 
->> I didn't say that exactly, but choosing not to merge something we cannot
->> maintain and which we're not paid to look after and where there's a
->> minimal interest, is not entirely unreasonable.
->> 
->> That being said, I'm not categorically against these patches, but I
->> share Marc's view that we've already seen that non-vgic support had been
->> broken for multiple versions without anyone complaining, and without
->> automated testing or substantial interest in the work, the patches
->> really are likely to bit-rot.
->> 
->> But I haven't even looked at the patches in detail, I was just replying
->> to the comment about testing.
-> 
-> This may be a great time to start encouraging feature writers to submit
-> kvm-unit-tests patches at the same time as the feature (Hi Alex :-)
-
-I actually started off implementing this with the help of kvm-unit-tests. It's awesome!
-
-I'm lacking actual irq support to make the test reasonable though and wanted to get the kernel bits out first :). But I'll sit down on that again soon I hope.
-
-
-Alex
+>
+>> If ID bits and PRI bits are greater than HW supported, then warn would be good
+>> enough. Please suggest the behaviour that you think it should be.
+>
+> No, it is an error, plain and simple. You cannot run in this condition.
+>
+[...]
+>
+> Thanks,
+>
+>         M.
+> --
+> Jazz is not dead. It just smells funny...
