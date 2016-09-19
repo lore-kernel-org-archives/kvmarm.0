@@ -1,67 +1,73 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 5/6] arm/arm64: vgic-new: Implement VGICv3 CPU interface
- access
-Date: Mon, 19 Sep 2016 11:11:25 +0100
-Message-ID: <CAFEAcA9aax2w4yUQ48fWxNCbrAZdyLNVxef5RgvrJ+CaQWF=ZQ@mail.gmail.com>
-References: <1474028453-29132-1-git-send-email-vijay.kilari@gmail.com>
- <1474028453-29132-6-git-send-email-vijay.kilari@gmail.com>
- <57DC0366.8060304@arm.com>
- <CALicx6u-uYLY3DtDGMh3n6NbNH3kD9fn9aYHHJC=LVUQfFjTsQ@mail.gmail.com>
- <57DC26C5.2060800@arm.com>
- <CALicx6ucEH3w58Rhb8Urk0V5kRcqtUdwDYDtSLXrkas-Jatv=A@mail.gmail.com>
- <20160917123756.0a05a904@arm.com>
- <CALicx6s=FOVv8t-6s4VJYwqUGaCfqMxrjXuop=JX6UYrYVj7Fg@mail.gmail.com>
+From: Alexander Graf <agraf@suse.de>
+Subject: Re: [PATCH v3 0/2] KVM: ARM: Enable vtimers with user space gic
+Date: Mon, 19 Sep 2016 12:51:46 +0200
+Message-ID: <43020f1f-6367-6f11-2534-b26ced13b540@suse.de>
+References: <1474007187-18673-1-git-send-email-agraf@suse.de>
+ <57DBC782.7080305@arm.com> <7beb406b-6194-8451-2d92-9a4394ef91dd@redhat.com>
+ <20160916123039.GB14140@cbox>
+ <da8191ca-6fb1-f960-872c-d6bc27172db8@redhat.com>
+ <20160916133027.GA27036@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C8144113E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 06:02:48 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5WKD+dGwmFUK for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Sep 2016 06:02:47 -0400 (EDT)
-Received: from mail-yw0-f171.google.com (mail-yw0-f171.google.com
- [209.85.161.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1696B40FA7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 06:02:46 -0400 (EDT)
-Received: by mail-yw0-f171.google.com with SMTP id u82so134431991ywc.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 03:11:46 -0700 (PDT)
-In-Reply-To: <CALicx6s=FOVv8t-6s4VJYwqUGaCfqMxrjXuop=JX6UYrYVj7Fg@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160916133027.GA27036@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 19 September 2016 at 08:36, Vijay Kilari <vijay.kilari@gmail.com> wrote:
-> In order to track the PRI and ID bits written by guest,
-> VGIC needs to store these values when ICC_CTRL_EL1 is updated.
-> However,  QEMU is reseting VGIC by writing 0's to all the
-> registers after VGIC initialization and hence the back up values are
-> always reset to 0 and hence when guest read back, VGIC returns wrong value.
->
-> One option is to drop VGIC reset from QEMU which is not doing much.
 
-No, if QEMU's reset is not resetting registers to the right value
-the correct thing to do is fix the reset code. The way device
-reset is supposed to work is that QEMU knows the right values
-to use and it writes them to the kernel.
 
-QEMU doesn't reset ICC_CTLR_EL1 to 0 for TCG:
-    cs->icc_ctlr_el1[GICV3_NS] = ICC_CTLR_EL1_A3V |
-        (1 << ICC_CTLR_EL1_IDBITS_SHIFT) |
-        (7 << ICC_CTLR_EL1_PRIBITS_SHIFT);
+On 16.09.16 15:30, Christoffer Dall wrote:
+> On Fri, Sep 16, 2016 at 02:31:42PM +0200, Paolo Bonzini wrote:
+>>
+>>
+>> On 16/09/2016 14:30, Christoffer Dall wrote:
+>>>>>> This patch set allows user space to receive vtimer events as well as mask
+>>>>>> them, so that we can handle all vtimer related interrupt injection from user
+>>>>>> space, enabling us to use architected timer with user space gic emulation.
+>>>>>
+>>>>> I have already voiced my concerns in the past, including face to face,
+>>>>> and I'm going to repeat it: I not keen at all on adding a new userspace
+>>>>> interface that is going to bitrot extremely quickly.
+>>>>
+>>>> You don't have automated tests set up?  It's not going to bitrot if you
+>>>> test it, either with kvm-unit-tests or just by smoke-testing Linux.
+>>>> It's _for_ the raspi, but it's not limited to it.
+>>>
+>>> Our automated testing situation is not great, no.  Something we're
+>>> looking at, but have resource problems with.
+>>
+>> But it's not a good reason to hold back a feature...
+>>
+> 
+> I didn't say that exactly, but choosing not to merge something we cannot
+> maintain and which we're not paid to look after and where there's a
+> minimal interest, is not entirely unreasonable.
+> 
+> That being said, I'm not categorically against these patches, but I
+> share Marc's view that we've already seen that non-vgic support had been
+> broken for multiple versions without anyone complaining, and without
+> automated testing or substantial interest in the work, the patches
+> really are likely to bit-rot.
 
-but I don't think that code gets run for the KVM VGIC.
+I know that it's very hard to grasp from an upstream maintainer
+perspective, but keep in mind where the bulk of execution of kernel code
+lies. The average life cycle of a "stable" Linux distribution's kernel
+is a few years.
 
-thanks
--- PMM
+So far all regressions in the user space gic code have been found within
+less than 1y of the respective code release. I'd say that counts for
+quite a well used feature.
+
+> But I haven't even looked at the patches in detail, I was just replying
+> to the comment about testing.
+
+Also keep in mind that without the architected timer support (and/or
+without qemu patches than enable user space timers) the user space gic
+support is pretty unusable to most people, so you obviously get less
+reports.
+
+
+Alex
