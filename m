@@ -1,73 +1,88 @@
 From: Alexander Graf <agraf@suse.de>
-Subject: Re: [PATCH v3 0/2] KVM: ARM: Enable vtimers with user space gic
-Date: Mon, 19 Sep 2016 12:51:46 +0200
-Message-ID: <43020f1f-6367-6f11-2534-b26ced13b540@suse.de>
-References: <1474007187-18673-1-git-send-email-agraf@suse.de>
- <57DBC782.7080305@arm.com> <7beb406b-6194-8451-2d92-9a4394ef91dd@redhat.com>
- <20160916123039.GB14140@cbox>
- <da8191ca-6fb1-f960-872c-d6bc27172db8@redhat.com>
- <20160916133027.GA27036@cbox>
+Subject: [PATCH v4 0/2] KVM: ARM: Enable vtimers with user space gic
+Date: Mon, 19 Sep 2016 13:14:53 +0200
+Message-ID: <1474283695-212421-1-git-send-email-agraf@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160916133027.GA27036@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FC58499A1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 07:05:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id URzlFTEvjH5n for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Sep 2016 07:05:52 -0400 (EDT)
+Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A45E412D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 07:05:51 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Some systems out there (well, one type in particular - the Raspberry Pi series)
+do have virtualization capabilities in the core, but no ARM GIC interrupt
+controller.
 
+To run on these systems, the cleanest route is to just handle all
+interrupt delivery in user space and only deal with IRQ pins in the core
+side in KVM.
 
-On 16.09.16 15:30, Christoffer Dall wrote:
-> On Fri, Sep 16, 2016 at 02:31:42PM +0200, Paolo Bonzini wrote:
->>
->>
->> On 16/09/2016 14:30, Christoffer Dall wrote:
->>>>>> This patch set allows user space to receive vtimer events as well as mask
->>>>>> them, so that we can handle all vtimer related interrupt injection from user
->>>>>> space, enabling us to use architected timer with user space gic emulation.
->>>>>
->>>>> I have already voiced my concerns in the past, including face to face,
->>>>> and I'm going to repeat it: I not keen at all on adding a new userspace
->>>>> interface that is going to bitrot extremely quickly.
->>>>
->>>> You don't have automated tests set up?  It's not going to bitrot if you
->>>> test it, either with kvm-unit-tests or just by smoke-testing Linux.
->>>> It's _for_ the raspi, but it's not limited to it.
->>>
->>> Our automated testing situation is not great, no.  Something we're
->>> looking at, but have resource problems with.
->>
->> But it's not a good reason to hold back a feature...
->>
-> 
-> I didn't say that exactly, but choosing not to merge something we cannot
-> maintain and which we're not paid to look after and where there's a
-> minimal interest, is not entirely unreasonable.
-> 
-> That being said, I'm not categorically against these patches, but I
-> share Marc's view that we've already seen that non-vgic support had been
-> broken for multiple versions without anyone complaining, and without
-> automated testing or substantial interest in the work, the patches
-> really are likely to bit-rot.
+This works pretty well already, but breaks when the guest starts to use
+architected timers, as these are handled straight inside kernel space today.
 
-I know that it's very hard to grasp from an upstream maintainer
-perspective, but keep in mind where the bulk of execution of kernel code
-lies. The average life cycle of a "stable" Linux distribution's kernel
-is a few years.
+This patch set allows user space to receive vtimer events as well as mask
+them, so that we can handle all vtimer related interrupt injection from user
+space, enabling us to use architected timer with user space gic emulation.
 
-So far all regressions in the user space gic code have been found within
-less than 1y of the respective code release. I'd say that counts for
-quite a well used feature.
+I have successfully run edk2 as well as Linux using these patches on a
+Raspberry Pi 3 system with acceptable speed.
 
-> But I haven't even looked at the patches in detail, I was just replying
-> to the comment about testing.
+A branch with WIP QEMU code can be found here:
 
-Also keep in mind that without the architected timer support (and/or
-without qemu patches than enable user space timers) the user space gic
-support is pretty unusable to most people, so you obviously get less
-reports.
+  https://github.com/agraf/qemu.git no-kvm-irqchip
 
+To use the user space irqchip, just run it with
 
-Alex
+  $ qemu-system-aarch64 -M virt ...
+
+if you're on a non-vgic host system. Or -M virt,kernel-irqchip=off if your
+host system has vgic support.
+
+v1 -> v2:
+
+  - Add back curly brace that got lost
+
+v2 -> v3:
+
+  - Fix "only only" in documentation
+  - Split patches
+  - Remove kvm_emulate.h include
+
+v3 -> v4:
+
+  - Improve documentation
+
+Alexander Graf (2):
+  KVM: arm/arm64: Add vcpu ENABLE_CAP functionality
+  KVM: arm/arm64: Route vtimer events to user space
+
+ Documentation/virtual/kvm/api.txt |  34 ++++++++++-
+ arch/arm/include/asm/kvm_host.h   |   3 +
+ arch/arm/kvm/arm.c                |  47 +++++++++++---
+ arch/arm64/include/asm/kvm_host.h |   3 +
+ include/uapi/linux/kvm.h          |  14 +++++
+ virt/kvm/arm/arch_timer.c         | 125 +++++++++++++++++++++++++++-----------
+ 6 files changed, 183 insertions(+), 43 deletions(-)
+
+-- 
+1.8.5.6
