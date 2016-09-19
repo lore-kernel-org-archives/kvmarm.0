@@ -1,168 +1,104 @@
 From: Alexander Graf <agraf@suse.de>
-Subject: [PATCH] arm: Add simple arch timer test
-Date: Mon, 19 Sep 2016 13:44:40 +0200
-Message-ID: <1474285480-215480-1-git-send-email-agraf@suse.de>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: kvm@vger.kernel.org
-Cc: kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+Subject: Re: [PATCH v3 0/2] KVM: ARM: Enable vtimers with user space gic
+Date: Mon, 19 Sep 2016 13:45:49 +0200
+Message-ID: <78bc5455-22e2-f914-5677-983af6a33d47@suse.de>
+References: <1474007187-18673-1-git-send-email-agraf@suse.de>
+ <57DBC782.7080305@arm.com> <7beb406b-6194-8451-2d92-9a4394ef91dd@redhat.com>
+ <20160916123039.GB14140@cbox>
+ <da8191ca-6fb1-f960-872c-d6bc27172db8@redhat.com>
+ <20160916133027.GA27036@cbox>
+ <20160916134619.jjiaplhxgkkl5qri@kamzik.localdomain>
+ <B88B95A5-3631-4AEF-80DC-7762C415A811@suse.de>
+ <20160919075217.nlxdmoicjhmc2hy6@kamzik.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 10FB5412A2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 07:36:55 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id RCyAhyAMItqH for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Sep 2016 07:36:54 -0400 (EDT)
+Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D5B4440FA6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 07:36:53 -0400 (EDT)
+In-Reply-To: <20160919075217.nlxdmoicjhmc2hy6@kamzik.localdomain>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-All virtualization capable ARM cores support the ARM architected virtual timer.
 
-This patch adds minimalistic checks whether we can fire a virtual timer event
-using them. It does not actually trigger an interrupt yet, as infrastructure
-for that is missing. However, it does check whether the timer pin is marked as
-pending on the GIC.
 
-Signed-off-by: Alexander Graf <agraf@suse.de>
----
- arm/Makefile.arm64 |   2 +-
- arm/vtimer-test.c  | 122 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 123 insertions(+), 1 deletion(-)
- create mode 100644 arm/vtimer-test.c
+On 19.09.16 09:52, Andrew Jones wrote:
+> On Fri, Sep 16, 2016 at 09:36:42PM +0200, Alexander Graf wrote:
+>>
+>>
+>>> Am 16.09.2016 um 15:46 schrieb Andrew Jones <drjones@redhat.com>:
+>>>
+>>>> On Fri, Sep 16, 2016 at 03:30:27PM +0200, Christoffer Dall wrote:
+>>>>> On Fri, Sep 16, 2016 at 02:31:42PM +0200, Paolo Bonzini wrote:
+>>>>>
+>>>>>
+>>>>> On 16/09/2016 14:30, Christoffer Dall wrote:
+>>>>>>>>> This patch set allows user space to receive vtimer events as well as mask
+>>>>>>>>> them, so that we can handle all vtimer related interrupt injection from user
+>>>>>>>>> space, enabling us to use architected timer with user space gic emulation.
+>>>>>>>>
+>>>>>>>> I have already voiced my concerns in the past, including face to face,
+>>>>>>>> and I'm going to repeat it: I not keen at all on adding a new userspace
+>>>>>>>> interface that is going to bitrot extremely quickly.
+>>>>>>>
+>>>>>>> You don't have automated tests set up?  It's not going to bitrot if you
+>>>>>>> test it, either with kvm-unit-tests or just by smoke-testing Linux.
+>>>>>>> It's _for_ the raspi, but it's not limited to it.
+>>>>>>
+>>>>>> Our automated testing situation is not great, no.  Something we're
+>>>>>> looking at, but have resource problems with.
+>>>>>
+>>>>> But it's not a good reason to hold back a feature...
+>>>>
+>>>> I didn't say that exactly, but choosing not to merge something we cannot
+>>>> maintain and which we're not paid to look after and where there's a
+>>>> minimal interest, is not entirely unreasonable.
+>>>>
+>>>> That being said, I'm not categorically against these patches, but I
+>>>> share Marc's view that we've already seen that non-vgic support had been
+>>>> broken for multiple versions without anyone complaining, and without
+>>>> automated testing or substantial interest in the work, the patches
+>>>> really are likely to bit-rot.
+>>>>
+>>>> But I haven't even looked at the patches in detail, I was just replying
+>>>> to the comment about testing.
+>>>
+>>> This may be a great time to start encouraging feature writers to submit
+>>> kvm-unit-tests patches at the same time as the feature (Hi Alex :-)
+>>
+>> I actually started off implementing this with the help of kvm-unit-tests. It's awesome!
+>>
+>> I'm lacking actual irq support to make the test reasonable though and wanted to get the kernel bits out first :). But I'll sit down on that again soon I hope.
+> 
+> I'm glad it looks like a good base for you. I need to get this series
+> https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic refreshed and
+> merged, and also it's time to start looking into adding interrupt
+> injection to chr-testdev. With those in place I hope it'll be an even
+> better base for you.
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 0b0761c..5b3fbe8 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -12,7 +12,7 @@ cflatobjs += lib/arm64/processor.o
- cflatobjs += lib/arm64/spinlock.o
- 
- # arm64 specific tests
--tests =
-+tests = $(TEST_DIR)/vtimer-test.flat
- 
- include $(TEST_DIR)/Makefile.common
- 
-diff --git a/arm/vtimer-test.c b/arm/vtimer-test.c
-new file mode 100644
-index 0000000..a3e24ce
---- /dev/null
-+++ b/arm/vtimer-test.c
-@@ -0,0 +1,122 @@
-+/*
-+ * Unit tests for the virtual timer on the ARM virt machine
-+ *
-+ * Copyright (C) 2016, Alexander Graf <agraf@suse.de>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include <libcflat.h>
-+#include <asm/io.h>
-+
-+#define VTIMER_CTL_ENABLE  (1 << 0)
-+#define VTIMER_CTL_IMASK   (1 << 1)
-+#define VTIMER_CTL_ISTATUS (1 << 2)
-+
-+#define VIRT_GIC_DIST_BASE 0x08000000
-+#define GIC_DIST_PENDING_SET            0x200
-+#define GIC_DIST_PENDING_CLEAR          0x280
-+#define GIC_DIST_ACTIVE_SET             0x300
-+#define GIC_DIST_ACTIVE_CLEAR           0x380
-+
-+#define VIRT_GIC_CPU_BASE  0x08010000
-+
-+#define ARCH_TIMER_VIRT_IRQ   11
-+#define ARCH_TIMER_S_EL1_IRQ  13
-+#define ARCH_TIMER_NS_EL1_IRQ 14
-+#define ARCH_TIMER_NS_EL2_IRQ 10
-+
-+static void write_vtimer_ctl(u64 val)
-+{
-+	asm volatile("msr cntv_ctl_el0, %0" : : "r" (val));
-+}
-+
-+static void write_vtimer_cval(u64 val)
-+{
-+	asm volatile("msr cntv_cval_el0, %0" : : "r" (val));
-+}
-+
-+static u64 read_vtimer_ctl(void)
-+{
-+	u64 val;
-+	asm volatile("mrs %0, cntv_ctl_el0" : "=r" (val));
-+	return val;
-+}
-+
-+static u64 read_vtimer_cval(void)
-+{
-+	u64 val;
-+	asm volatile("mrs %0, cntv_cval_el0" : "=r" (val));
-+	return val;
-+}
-+
-+static u64 read_vtimer_val(void)
-+{
-+	u64 val;
-+	asm volatile("mrs %0, cntvct_el0" : "=r" (val));
-+	return val;
-+}
-+
-+static u64 read_vtimer_freq(void)
-+{
-+	u64 val;
-+	asm volatile("mrs %0, cntfrq_el0" : "=r" (val));
-+	return val;
-+}
-+
-+static bool gic_vtimer_pending(void)
-+{
-+	u32 *pending = (u32*)(VIRT_GIC_DIST_BASE + GIC_DIST_PENDING_SET);
-+	return (readl(pending) & (1 << (ARCH_TIMER_VIRT_IRQ + 16)));
-+}
-+
-+static bool test_cval_10msec(void)
-+{
-+	u64 time_10ms = read_vtimer_freq() / 100;
-+	u64 time_1us = time_10ms / 10000;
-+	u64 before_timer = read_vtimer_val();
-+	u64 after_timer, latency;
-+
-+	/* Program timer to fire in 10ms */
-+	write_vtimer_cval(before_timer + time_10ms);
-+
-+	/* Wait for the timer to fire */
-+	while (!(read_vtimer_ctl() & VTIMER_CTL_ISTATUS)) ;
-+
-+	/* It fired, check how long it took */
-+	after_timer = read_vtimer_val();
-+
-+	latency = (after_timer - (before_timer + time_10ms));
-+	printf("After timer: 0x%lx\n", after_timer);
-+	printf("Expected   : 0x%lx\n", before_timer + time_10ms);
-+	printf("Latency    : %ld us\n", latency / time_1us);
-+
-+	return latency < time_10ms;
-+}
-+
-+static void test_vtimer(void)
-+{
-+	printf("\n=== vtimer with busy loop ===\n");
-+
-+	/* Enable the timer */
-+	write_vtimer_cval(-1);
-+	write_vtimer_ctl(VTIMER_CTL_ENABLE);
-+
-+	report("timer is not pending before", !gic_vtimer_pending());
-+	report("latency is within 10ms", test_cval_10msec());
-+	report("timer is pending after", gic_vtimer_pending());
-+
-+	/* Disable the timer again */
-+	write_vtimer_ctl(0);
-+}
-+
-+int main(void)
-+{
-+	printf("vtimer ctl:  0x%lx\n", read_vtimer_ctl());
-+	printf("vtimer cval: 0x%lx\n", read_vtimer_cval());
-+	printf("vtimer val:  0x%lx\n", read_vtimer_val());
-+	printf("vtimer freq: 0x%lx\n", read_vtimer_freq());
-+
-+	test_vtimer();
-+
-+	return report_summary();
-+}
--- 
-1.8.5.6
+Awesome. Let me know when you're further ahead with the gic work then so
+that we can actually trigger interrupts and measure irq latencies :).
 
+Until then, I sent the simplistic version that I used for bringup to the
+list.
+
+
+Alex
