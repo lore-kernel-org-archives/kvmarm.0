@@ -1,30 +1,24 @@
-From: Alexander Graf <agraf@suse.de>
-Subject: Re: [PATCH v3 0/2] KVM: ARM: Enable vtimers with user space gic
-Date: Mon, 19 Sep 2016 13:45:49 +0200
-Message-ID: <78bc5455-22e2-f914-5677-983af6a33d47@suse.de>
-References: <1474007187-18673-1-git-send-email-agraf@suse.de>
- <57DBC782.7080305@arm.com> <7beb406b-6194-8451-2d92-9a4394ef91dd@redhat.com>
- <20160916123039.GB14140@cbox>
- <da8191ca-6fb1-f960-872c-d6bc27172db8@redhat.com>
- <20160916133027.GA27036@cbox>
- <20160916134619.jjiaplhxgkkl5qri@kamzik.localdomain>
- <B88B95A5-3631-4AEF-80DC-7762C415A811@suse.de>
- <20160919075217.nlxdmoicjhmc2hy6@kamzik.localdomain>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 2/2] KVM: arm/arm64: Route vtimer events to user space
+Date: Mon, 19 Sep 2016 15:48:51 +0100
+Message-ID: <57DFFAD3.3080009@arm.com>
+References: <1474283695-212421-1-git-send-email-agraf@suse.de>
+ <1474283695-212421-3-git-send-email-agraf@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10FB5412A2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 07:36:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34797410D7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 10:40:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RCyAhyAMItqH for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Sep 2016 07:36:54 -0400 (EDT)
-Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D5B4440FA6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 07:36:53 -0400 (EDT)
-In-Reply-To: <20160919075217.nlxdmoicjhmc2hy6@kamzik.localdomain>
+ with ESMTP id zRbUR8amSNhC for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Sep 2016 10:39:54 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8456A40FA7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2016 10:39:54 -0400 (EDT)
+In-Reply-To: <1474283695-212421-3-git-send-email-agraf@suse.de>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,71 +28,443 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Alexander Graf <agraf@suse.de>, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 19.09.16 09:52, Andrew Jones wrote:
-> On Fri, Sep 16, 2016 at 09:36:42PM +0200, Alexander Graf wrote:
->>
->>
->>> Am 16.09.2016 um 15:46 schrieb Andrew Jones <drjones@redhat.com>:
->>>
->>>> On Fri, Sep 16, 2016 at 03:30:27PM +0200, Christoffer Dall wrote:
->>>>> On Fri, Sep 16, 2016 at 02:31:42PM +0200, Paolo Bonzini wrote:
->>>>>
->>>>>
->>>>> On 16/09/2016 14:30, Christoffer Dall wrote:
->>>>>>>>> This patch set allows user space to receive vtimer events as well as mask
->>>>>>>>> them, so that we can handle all vtimer related interrupt injection from user
->>>>>>>>> space, enabling us to use architected timer with user space gic emulation.
->>>>>>>>
->>>>>>>> I have already voiced my concerns in the past, including face to face,
->>>>>>>> and I'm going to repeat it: I not keen at all on adding a new userspace
->>>>>>>> interface that is going to bitrot extremely quickly.
->>>>>>>
->>>>>>> You don't have automated tests set up?  It's not going to bitrot if you
->>>>>>> test it, either with kvm-unit-tests or just by smoke-testing Linux.
->>>>>>> It's _for_ the raspi, but it's not limited to it.
->>>>>>
->>>>>> Our automated testing situation is not great, no.  Something we're
->>>>>> looking at, but have resource problems with.
->>>>>
->>>>> But it's not a good reason to hold back a feature...
->>>>
->>>> I didn't say that exactly, but choosing not to merge something we cannot
->>>> maintain and which we're not paid to look after and where there's a
->>>> minimal interest, is not entirely unreasonable.
->>>>
->>>> That being said, I'm not categorically against these patches, but I
->>>> share Marc's view that we've already seen that non-vgic support had been
->>>> broken for multiple versions without anyone complaining, and without
->>>> automated testing or substantial interest in the work, the patches
->>>> really are likely to bit-rot.
->>>>
->>>> But I haven't even looked at the patches in detail, I was just replying
->>>> to the comment about testing.
->>>
->>> This may be a great time to start encouraging feature writers to submit
->>> kvm-unit-tests patches at the same time as the feature (Hi Alex :-)
->>
->> I actually started off implementing this with the help of kvm-unit-tests. It's awesome!
->>
->> I'm lacking actual irq support to make the test reasonable though and wanted to get the kernel bits out first :). But I'll sit down on that again soon I hope.
+On 19/09/16 12:14, Alexander Graf wrote:
+> We have 2 modes for dealing with interrupts in the ARM world. We can either
+> handle them all using hardware acceleration through the vgic or we can emulate
+> a gic in user space and only drive CPU IRQ pins from there.
 > 
-> I'm glad it looks like a good base for you. I need to get this series
-> https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic refreshed and
-> merged, and also it's time to start looking into adding interrupt
-> injection to chr-testdev. With those in place I hope it'll be an even
-> better base for you.
+> Unfortunately, when driving IRQs from user space, we never tell user space
+> about timer events that may result in interrupt line state changes, so we
+> lose out on timer events if we run with user space gic emulation.
+> 
+> This patch fixes that by routing vtimer expiration events to user space.
+> With this patch I can successfully run edk2 and Linux with user space gic
+> emulation.
+> 
+> Signed-off-by: Alexander Graf <agraf@suse.de>
+> 
+> ---
+> 
+> v1 -> v2:
+> 
+>   - Add back curly brace that got lost
+> 
+> v2 -> v3:
+> 
+>   - Split into patch set
+> 
+> v3 -> v4:
+> 
+>   - Improve documentation
+> ---
+>  Documentation/virtual/kvm/api.txt |  30 ++++++++-
+>  arch/arm/include/asm/kvm_host.h   |   3 +
+>  arch/arm/kvm/arm.c                |  22 ++++---
+>  arch/arm64/include/asm/kvm_host.h |   3 +
+>  include/uapi/linux/kvm.h          |  14 +++++
+>  virt/kvm/arm/arch_timer.c         | 125 +++++++++++++++++++++++++++-----------
+>  6 files changed, 155 insertions(+), 42 deletions(-)
+> 
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index 23937e0..1c0bd86 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -3202,9 +3202,14 @@ struct kvm_run {
+>  	/* in */
+>  	__u8 request_interrupt_window;
+>  
+> -Request that KVM_RUN return when it becomes possible to inject external
+> +[x86] Request that KVM_RUN return when it becomes possible to inject external
+>  interrupts into the guest.  Useful in conjunction with KVM_INTERRUPT.
+>  
+> +[arm*] Bits set to 1 in here mask IRQ lines that would otherwise potentially
+> +trigger forever. These lines are available:
+> +
+> +    KVM_IRQWINDOW_VTIMER  -  Masks hw virtual timer irq while in guest
+> +
+>  	__u8 padding1[7];
+>  
+>  	/* out */
+> @@ -3519,6 +3524,18 @@ Hyper-V SynIC state change. Notification is used to remap SynIC
+>  event/message pages and to enable/disable SynIC messages/events processing
+>  in userspace.
+>  
+> +		/* KVM_EXIT_ARM_TIMER */
+> +		struct {
+> +			__u8 timesource;
+> +		} arm_timer;
+> +
+> +Indicates that a timer triggered that user space needs to handle and
+> +potentially mask with vcpu->run->request_interrupt_window to allow the
+> +guest to proceed. This only happens for timers that got enabled through
+> +KVM_CAP_ARM_TIMER. The following time sources are available:
+> +
+> +    KVM_ARM_TIMER_VTIMER  - virtual cpu timer
+> +
+>  		/* Fix the size of the union. */
+>  		char padding[256];
+>  	};
+> @@ -3739,6 +3756,17 @@ Once this is done the KVM_REG_MIPS_VEC_* and KVM_REG_MIPS_MSA_* registers can be
+>  accessed, and the Config5.MSAEn bit is accessible via the KVM API and also from
+>  the guest.
+>  
+> +6.11 KVM_CAP_ARM_TIMER
+> +
+> +Architectures: arm, arm64
+> +Target: vcpu
+> +Parameters: args[0] contains a bitmap of timers to select (see 5.)
+> +
+> +This capability allows to route per-core timers into user space. When it's
+> +enabled and no in-kernel interrupt controller is in use, the timers selected
+> +by args[0] trigger KVM_EXIT_ARM_TIMER guest exits when they are pending,
+> +unless masked by vcpu->run->request_interrupt_window (see 5.).
+> +
+>  7. Capabilities that can be enabled on VMs
+>  ------------------------------------------
+>  
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index de338d9..77d1f73 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -180,6 +180,9 @@ struct kvm_vcpu_arch {
+>  
+>  	/* Detect first run of a vcpu */
+>  	bool has_run_once;
+> +
+> +	/* User space wants timer notifications */
+> +	bool user_space_arm_timers;
 
-Awesome. Let me know when you're further ahead with the gic work then so
-that we can actually trigger interrupts and measure irq latencies :).
+Please move this to the timer structure.
 
-Until then, I sent the simplistic version that I used for bringup to the
-list.
+>  };
+>  
+>  struct kvm_vm_stat {
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index c84b6ad..57bdb71 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -187,6 +187,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_ARM_PSCI_0_2:
+>  	case KVM_CAP_READONLY_MEM:
+>  	case KVM_CAP_MP_STATE:
+> +	case KVM_CAP_ARM_TIMER:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_COALESCED_MMIO:
+> @@ -474,13 +475,7 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+>  			return ret;
+>  	}
+>  
+> -	/*
+> -	 * Enable the arch timers only if we have an in-kernel VGIC
+> -	 * and it has been properly initialized, since we cannot handle
+> -	 * interrupts from the virtual timer with a userspace gic.
+> -	 */
+> -	if (irqchip_in_kernel(kvm) && vgic_initialized(kvm))
+> -		ret = kvm_timer_enable(vcpu);
+> +	ret = kvm_timer_enable(vcpu);
+>  
+>  	return ret;
+>  }
+> @@ -601,6 +596,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  			run->exit_reason = KVM_EXIT_INTR;
+>  		}
+>  
+> +		if (kvm_check_request(KVM_REQ_PENDING_TIMER, vcpu)) {
 
+Since this is a very unlikely event (in the grand scheme of things), how
+about making this unlikely()?
 
-Alex
+> +			/* Tell user space about the pending vtimer */
+> +			ret = 0;
+> +			run->exit_reason = KVM_EXIT_ARM_TIMER;
+> +			run->arm_timer.timesource = KVM_ARM_TIMER_VTIMER;
+> +		}
+
+More importantly: why does it have to be indirected by a
+make_request/check_request, and not be handled as part of the
+kvm_timer_sync() call? We do update the state there, and you could
+directly find out whether an exit is required.
+
+> +
+>  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
+>  			vcpu->arch.power_off || vcpu->arch.pause) {
+>  			local_irq_enable();
+> @@ -887,6 +889,12 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>  		return -EINVAL;
+>  
+>  	switch (cap->cap) {
+> +	case KVM_CAP_ARM_TIMER:
+> +		r = 0;
+> +		if (cap->args[0] != KVM_ARM_TIMER_VTIMER)
+> +			return -EINVAL;
+> +		vcpu->arch.user_space_arm_timers = true;
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 3eda975..3d01481 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -270,6 +270,9 @@ struct kvm_vcpu_arch {
+>  
+>  	/* Detect first run of a vcpu */
+>  	bool has_run_once;
+> +
+> +	/* User space wants timer notifications */
+> +	bool user_space_arm_timers;
+>  };
+>  
+>  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 300ef25..00f4948 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -205,6 +205,7 @@ struct kvm_hyperv_exit {
+>  #define KVM_EXIT_S390_STSI        25
+>  #define KVM_EXIT_IOAPIC_EOI       26
+>  #define KVM_EXIT_HYPERV           27
+> +#define KVM_EXIT_ARM_TIMER        28
+>  
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -361,6 +362,10 @@ struct kvm_run {
+>  		} eoi;
+>  		/* KVM_EXIT_HYPERV */
+>  		struct kvm_hyperv_exit hyperv;
+> +		/* KVM_EXIT_ARM_TIMER */
+> +		struct {
+> +			__u8 timesource;
+> +		} arm_timer;
+>  		/* Fix the size of the union. */
+>  		char padding[256];
+>  	};
+> @@ -870,6 +875,7 @@ struct kvm_ppc_smmu_info {
+>  #define KVM_CAP_S390_USER_INSTR0 130
+>  #define KVM_CAP_MSI_DEVID 131
+>  #define KVM_CAP_PPC_HTM 132
+> +#define KVM_CAP_ARM_TIMER 133
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> @@ -1327,4 +1333,12 @@ struct kvm_assigned_msix_entry {
+>  #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+>  #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
+>  
+> +/* Available with KVM_CAP_ARM_TIMER */
+> +
+> +/* Bits for run->request_interrupt_window */
+> +#define KVM_IRQWINDOW_VTIMER		(1 << 0)
+> +
+> +/* Bits for run->arm_timer.timesource */
+> +#define KVM_ARM_TIMER_VTIMER		(1 << 0)
+> +
+>  #endif /* __LINUX_KVM_H */
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 4309b60..cbbb50dd 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -170,16 +170,45 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
+>  {
+>  	int ret;
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct kvm_run *run = vcpu->run;
+>  
+> -	BUG_ON(!vgic_initialized(vcpu->kvm));
+> +	BUG_ON(irqchip_in_kernel(vcpu->kvm) && !vgic_initialized(vcpu->kvm));
+>  
+>  	timer->active_cleared_last = false;
+>  	timer->irq.level = new_level;
+> -	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->irq.irq,
+> +	trace_kvm_timer_update_irq(vcpu->vcpu_id, host_vtimer_irq,
+>  				   timer->irq.level);
+> -	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
+> -					 timer->irq.irq,
+> -					 timer->irq.level);
+> +
+> +	if (irqchip_in_kernel(vcpu->kvm) && vgic_initialized(vcpu->kvm)) {
+
+Given how many times you repeat this idiom in this patch, you should
+have a single condition that encapsulate it once and for all.
+
+> +		/* Fire the timer in the VGIC */
+> +
+> +		ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
+> +						 timer->irq.irq,
+> +						 timer->irq.level);
+> +	} else if (!vcpu->arch.user_space_arm_timers) {
+> +		/* User space has not activated timer use */
+> +		ret = 0;
+> +	} else {
+> +		/*
+> +		 * Set PENDING_TIMER so that user space can handle the event if
+> +		 *
+> +		 *   1) Level is high
+> +		 *   2) The vtimer is not suppressed by user space
+> +		 *   3) We are not in the timer trigger exit path
+> +		 */
+> +		if (new_level &&
+> +		    !(run->request_interrupt_window & KVM_IRQWINDOW_VTIMER) &&
+> +		    (run->exit_reason != KVM_EXIT_ARM_TIMER)) {
+> +			/* KVM_REQ_PENDING_TIMER means vtimer triggered */
+> +			kvm_make_request(KVM_REQ_PENDING_TIMER, vcpu);
+> +		}
+> +
+> +		/* Force a new level high check on next entry */
+> +		timer->irq.level = 0;
+
+I think this could become a bit more simple if you follow the flow I
+mentioned earlier involving kvm_timer_sync(). Also, I only see how you
+flag the line as being high, but not how you lower it. Care to explain
+that flow?
+
+> +
+> +		ret = 0;
+> +	}
+> +
+>  	WARN_ON(ret);
+>  }
+>  
+> @@ -197,7 +226,8 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>  	 * because the guest would never see the interrupt.  Instead wait
+>  	 * until we call this function from kvm_timer_flush_hwstate.
+>  	 */
+> -	if (!vgic_initialized(vcpu->kvm) || !timer->enabled)
+> +	if ((irqchip_in_kernel(vcpu->kvm) && !vgic_initialized(vcpu->kvm)) ||
+> +	    !timer->enabled)
+>  		return -ENODEV;
+>  
+>  	if (kvm_timer_should_fire(vcpu) != timer->irq.level)
+> @@ -275,35 +305,57 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+>  	* to ensure that hardware interrupts from the timer triggers a guest
+>  	* exit.
+>  	*/
+> -	phys_active = timer->irq.level ||
+> -			kvm_vgic_map_is_active(vcpu, timer->irq.irq);
+> -
+> -	/*
+> -	 * We want to avoid hitting the (re)distributor as much as
+> -	 * possible, as this is a potentially expensive MMIO access
+> -	 * (not to mention locks in the irq layer), and a solution for
+> -	 * this is to cache the "active" state in memory.
+> -	 *
+> -	 * Things to consider: we cannot cache an "active set" state,
+> -	 * because the HW can change this behind our back (it becomes
+> -	 * "clear" in the HW). We must then restrict the caching to
+> -	 * the "clear" state.
+> -	 *
+> -	 * The cache is invalidated on:
+> -	 * - vcpu put, indicating that the HW cannot be trusted to be
+> -	 *   in a sane state on the next vcpu load,
+> -	 * - any change in the interrupt state
+> -	 *
+> -	 * Usage conditions:
+> -	 * - cached value is "active clear"
+> -	 * - value to be programmed is "active clear"
+> -	 */
+> -	if (timer->active_cleared_last && !phys_active)
+> -		return;
+> +	if (irqchip_in_kernel(vcpu->kvm) && vgic_initialized(vcpu->kvm)) {
+> +		phys_active = timer->irq.level ||
+> +				kvm_vgic_map_is_active(vcpu, timer->irq.irq);
+> +
+> +		/*
+> +		 * We want to avoid hitting the (re)distributor as much as
+> +		 * possible, as this is a potentially expensive MMIO access
+> +		 * (not to mention locks in the irq layer), and a solution for
+> +		 * this is to cache the "active" state in memory.
+> +		 *
+> +		 * Things to consider: we cannot cache an "active set" state,
+> +		 * because the HW can change this behind our back (it becomes
+> +		 * "clear" in the HW). We must then restrict the caching to
+> +		 * the "clear" state.
+> +		 *
+> +		 * The cache is invalidated on:
+> +		 * - vcpu put, indicating that the HW cannot be trusted to be
+> +		 *   in a sane state on the next vcpu load,
+> +		 * - any change in the interrupt state
+> +		 *
+> +		 * Usage conditions:
+> +		 * - cached value is "active clear"
+> +		 * - value to be programmed is "active clear"
+> +		 */
+> +		if (timer->active_cleared_last && !phys_active)
+> +			return;
+> +
+> +		ret = irq_set_irqchip_state(host_vtimer_irq,
+> +					    IRQCHIP_STATE_ACTIVE,
+> +					    phys_active);
+> +	} else {
+> +		/* User space tells us whether the timer is in active mode */
+> +		phys_active = vcpu->run->request_interrupt_window &
+> +			      KVM_IRQWINDOW_VTIMER;
+
+No, this just says "mask the interrupt". It doesn't say anything about
+the state of the timer. More importantly: you sample the shared page.
+What guarantees that the information there is preserved? Is userspace
+writing that bit each time the vcpu thread re-enters the kernel with
+this interrupt being in flight?
+
+> +
+> +		/* However if the line is high, we exit anyway, so we want
+> +		 * to keep the IRQ masked */
+> +		phys_active = phys_active || timer->irq.level;
+
+Why would you force the interrupt to be masked as soon as the timer is
+firing? If userspace hasn't masked it, I don't think you should paper
+over it.
+
+> +
+> +		/*
+> +		 * So we can just explicitly mask or unmask the IRQ, gaining
+> +		 * more compatibility with oddball irq controllers.
+> +		 */
+> +		if (phys_active)
+> +			disable_percpu_irq(host_vtimer_irq);
+> +		else
+> +			enable_percpu_irq(host_vtimer_irq, 0);
+
+Since you are now targeting random irqchips (as opposed to a GIC
+specifically), what guarantees that the timer is a per-cpu IRQ?
+
+> +
+> +		ret = 0;
+> +	}
+>  
+> -	ret = irq_set_irqchip_state(host_vtimer_irq,
+> -				    IRQCHIP_STATE_ACTIVE,
+> -				    phys_active);
+>  	WARN_ON(ret);
+>  
+>  	timer->active_cleared_last = !phys_active;
+> @@ -479,6 +531,10 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  	if (timer->enabled)
+>  		return 0;
+>  
+> +	/* No need to route physical IRQs when we don't use the vgic */
+> +	if (!irqchip_in_kernel(vcpu->kvm))
+> +		goto no_vgic;
+> +
+>  	/*
+>  	 * Find the physical IRQ number corresponding to the host_vtimer_irq
+>  	 */
+> @@ -502,6 +558,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  	if (ret)
+>  		return ret;
+>  
+> +no_vgic:
+>  
+>  	/*
+>  	 * There is a potential race here between VCPUs starting for the first
+> 
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
