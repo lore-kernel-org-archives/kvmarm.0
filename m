@@ -1,155 +1,145 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 2/2] KVM: arm/arm64: Route vtimer events to user space
-Date: Tue, 20 Sep 2016 17:42:33 +0100
-Message-ID: <57E166F9.8080109@arm.com>
-References: <1474283695-212421-1-git-send-email-agraf@suse.de>
- <1474283695-212421-3-git-send-email-agraf@suse.de> <57DFFAD3.3080009@arm.com>
- <0960d2a7-6100-3212-c544-d5377df34d57@suse.de> <57E0FF95.7040305@arm.com>
- <580a8a26-ca8f-a08a-a9da-d19d1a595cb6@suse.de> <57E103E8.7040506@arm.com>
- <57E109CF.8030705@suse.de> <57E10F37.3030002@arm.com>
- <57E12A02.7020907@suse.de> <57E12D98.6080008@arm.com>
- <57E14829.3060406@suse.de>
+Subject: Re: [PATCH] KVM: arm/arm64: timer: Fix hw sync for user space irqchip
+ path
+Date: Tue, 20 Sep 2016 18:28:15 +0100
+Message-ID: <57E171AF.1080903@arm.com>
+References: <1474002971-31434-1-git-send-email-agraf@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <57E14829.3060406@suse.de>
+In-Reply-To: <1474002971-31434-1-git-send-email-agraf@suse.de>
 Sender: kvm-owner@vger.kernel.org
 To: Alexander Graf <agraf@suse.de>, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, drjones@redhat.com, christoffer.dall@linaro.org, peter.maydell@linaro.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 20/09/16 15:31, Alexander Graf wrote:
-> On 09/20/2016 02:37 PM, Marc Zyngier wrote:
+Alex,
 
-[...]
-
->>>>> We also need to know "timer line low + timer line masked", as otherwise
->>>>> we might get spurious interrupts in the guest, no?
->>>> Yes. Though you can't really know about this one, and you'll have to
->>>> wait until the next natural exit to find out. As long as the spurious is
->>> We can provoke a special exit for it, no?
->> How? The guest decides to disable its timer. That doesn't trigger any
->> exit whatsoever. You'll have to wait until the next exit from the guest
->> to notice it.
+On 16/09/16 06:16, Alexander Graf wrote:
+> While adding the new vgic implementation, apparently nobody tested
+> the non-vgic path where user space controls the vgic, so two functions
+> slipped through the cracks that get called in generic code but don't
+> check whether hardware support is enabled.
 > 
-> Before we inject a timer interrupt, we can check whether the pending 
-> semantics of user space / kernel space match. If they don't match, we 
-> can exit before we inject the interrupt and allow user space to disable 
-> the pending state again.
-
-Let's rewind a bit, because I've long lost track of what you're trying
-to do to handle what.
-
-You need two signals:
-
-(1) TIMER_LEVEL: the output of the timer line, having accounted for the
-IMASK bit. This is conveniently the value of timer->irq.level.
-
-(2) TIMER_IRQ_MASK: an indication from userspace that a timer interrupt
-is pending, and that the physical line should be masked.
-
-You need a number of rules:
-
-(a) On exit to userspace, the kernel always exposes the value of
-TIMER_LEVEL.
-
-(b) On kernel entry, userspace always exposes the required
-TIMER_IRQ_MASK, depending on what has been exposed to it by TIMER_LEVEL.
-
-(c) If on guest exit, TIMER_LEVEL==1 and TIMER_IRQ_MASK==0, perform a
-userspace exit, because the emulated GIC needs to make the interrupt
-pending.
-
-(d) If on guest exit, TIMER_LEVEL==0 and TIMER_IRQ_MASK==1, perform a
-userspace exit, because the guest has disabled its timer before taking
-the interrupt, and the emulated GIC needs to retire the pending state.
-
-and that's it. Nothing else. The kernel tells userspace the state of the
-timer, and userspace drives the masking of the physical interrupt.
-Conveniently, this matches what the current code does.
-
+> This patch guards them with proper checks to ensure we only try to
+> use vgic data structures if they are available. Without this, I get
+> a stack trace:
 > 
->>
->>>> "spurious in the GIC sense" (hence returning 0x3ff) and not a spurious
->>>> timer interrupt being presented, you're fine.
->>> Imagine
->>>
->>>     * guest configures timer to fire
->>>     * kvm exits to user space because lines mismatch now
->> I suppose you mean timer fired + physical interrupt for the virtual enabled?
+> [   74.363037] Unable to handle kernel paging request at virtual address ffffffffffffffe8
+> [...]
+> [   74.929654] [<ffff000008824bcc>] _raw_spin_lock+0x1c/0x58
+> [   74.935133] [<ffff0000080b7f20>] kvm_vgic_flush_hwstate+0x88/0x288
+> [   74.941406] [<ffff0000080ab0b4>] kvm_arch_vcpu_ioctl_run+0xfc/0x630
+> [   74.947766] [<ffff0000080a15bc>] kvm_vcpu_ioctl+0x2f4/0x710
+> [   74.953420] [<ffff0000082788a8>] do_vfs_ioctl+0xb0/0x728
+> [   74.958807] [<ffff000008278fb4>] SyS_ioctl+0x94/0xa8
+> [   74.963844] [<ffff000008083744>] el0_svc_naked+0x38/0x3c
 > 
-> In this scheme, I would simply say "user space thinks it's pending" == 
-> "host vtimer irq is masked". So because user space thinks that no timer 
-> is pending and the guest managed to trigger a vtimer irq on the host, 
-> the guest exited on a physical vtimer irq. Kvm then checks whether the 
-> timer expired and sets the vcpu timer pending status to 1. User space 
-> status is still 0, so kvm exits to user space to update the status.
+> Fixes: 0919e84c0
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Alexander Graf <agraf@suse.de>
+> ---
+>  virt/kvm/arm/vgic/vgic.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
->>
->>>     * user space sets gic line up, setting vcpu irq line high
->>>     * guest runs, handles IRQ, calls EOI with IRQs disabled on the core
->> Same thing: you mean physical interrupt for the virtual timer disabled?
->> or something else?
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index e83b7fe..9f312ba 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -645,6 +645,9 @@ next:
+>  /* Sync back the hardware VGIC state into our emulation after a guest's run. */
+>  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>  {
+> +	if (!vcpu->kvm->arch.vgic.enabled)
+> +		return;
+> +
+>  	vgic_process_maintenance_interrupt(vcpu);
+>  	vgic_fold_lr_state(vcpu);
+>  	vgic_prune_ap_list(vcpu);
+> @@ -653,6 +656,9 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>  /* Flush our emulation state into the GIC hardware before entering the guest. */
+>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>  {
+> +	if (!vcpu->kvm->arch.vgic.enabled)
+> +		return;
+> +
+>  	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
+>  	vgic_flush_lr_state(vcpu);
+>  	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
 > 
-> I mean the guest sets pstate.I = 0.
 
-The I bit is a mask, just like any other exception bit in PSTATE. So
-you're *enabling* interrupts here. But let's assume the interrupts are
-disabled, as they are in an interrupt handler.
+I hate that fix, because it papers over the fact that we have uninitialized
+structures all over the shop, and that's not exactly great.
 
-> 
->>
->>>     * user space handles EOI, but still leaves the vcpu line high
->> If there is another pending interrupt, sure. Otherwise, that's a bug.
-> 
-> Why is that a bug? The line really is still pending at this point.
+How about the following instead:
 
-So what is this "vcpu line"? HCR_EL2.VI? The timer interrupt through the
-GIC? The timer output line?
-
-> 
->>
->>>     * guest runs, sets cval, enables IRQs on the core
->> What is that interrupt? Please name things, because that's very confusing.
-> 
-> The guest sets pstate.I=1.
-
-And?
-
-> 
->>
->>>     * kvm injects a timer interrupt into the guest
->> Why? Has the timer fired?
-> 
-> cntv.ctl.imask = 0 here, but user space doesn't know that yet. So the 
-> "pending" state is still active.
-
-Rule (a) should apply, always. Whether it is pending or not depends on
-what userspace decides to do. If userspace doesn't play ball, the guest
-will keep exiting.
-
-> 
->>
->>> At this point, the pending state from user space is bogus, as the line
->>> really isn't pending anymore. However, when the guest asks the GIC at
->>> that point what interrupt is pending, the line down state will have
->>> populated into user space before the mmio request gets processed. So you
->>> will see a 0x3ff return I guess.
->>>
->>> Is that reasonable?
->> I'm sorry, but you need to put names on things and precisely describe
->> the various events. because from the above script, I can derive twenty
->> different scenarios...
-> 
-> I'm sure one of them has to be racy? :)
-> 
-> (in fact, there are probably more than what I came up with that really 
-> are...)
-
-At this stage, I don't have any understanding of what you're trying to
-do. I've given you what I think needs to be implemented, please let me
-know if that matches your understanding.
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index c94b90d..0961128 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -472,6 +472,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 			return ret;
+ 	}
+ 
++	if (unlikely(!irqchip_in_kernel(kvm)))
++		kvm_no_vgic_init(kvm);
++
+ 	/*
+ 	 * Enable the arch timers only if we have an in-kernel VGIC
+ 	 * and it has been properly initialized, since we cannot handle
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index bb46c03..1b70b1e 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -327,4 +327,6 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
+  */
+ int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
+ 
++void kvm_no_vgic_init(struct kvm *kvm);
++
+ #endif /* __KVM_ARM_VGIC_H */
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 83777c1..7b8f12b 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -151,9 +151,11 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
+ 	INIT_LIST_HEAD(&dist->lpi_list_head);
+ 	spin_lock_init(&dist->lpi_list_lock);
+ 
+-	dist->spis = kcalloc(nr_spis, sizeof(struct vgic_irq), GFP_KERNEL);
+-	if (!dist->spis)
+-		return  -ENOMEM;
++	if (nr_spis) {
++		dist->spis = kcalloc(nr_spis, sizeof(struct vgic_irq), GFP_KERNEL);
++		if (!dist->spis)
++			return  -ENOMEM;
++	}
+ 
+ 	/*
+ 	 * In the following code we do not take the irq struct lock since
+@@ -325,6 +327,21 @@ int vgic_lazy_init(struct kvm *kvm)
+ 	return ret;
+ }
+ 
++void kvm_no_vgic_init(struct kvm *kvm)
++{
++	mutex_lock(&kvm->lock);
++	if (unlikely(!vgic_initialized(kvm))) {
++		struct kvm_vcpu *vcpu;
++		int i;
++
++		kvm_vgic_dist_init(kvm, 0);
++		kvm_for_each_vcpu(i, vcpu, kvm)
++			kvm_vgic_vcpu_init(vcpu);
++		kvm->arch.vgic.initialized = true;
++	}
++	mutex_unlock(&kvm->lock);
++}
++
+ /* RESOURCE MAPPING */
+ 
+ /**
 
 Thanks,
 
