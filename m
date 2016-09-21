@@ -1,28 +1,34 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: timer: Fix hw sync for user space
- irqchip path
-Date: Wed, 21 Sep 2016 12:23:26 +0200
-Message-ID: <20160921102326.GA9101@cbox>
-References: <1474002971-31434-1-git-send-email-agraf@suse.de>
- <57E171AF.1080903@arm.com>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH 1/2] config: move x86 kvm_guest.config to a common locaton
+Date: Wed, 21 Sep 2016 15:10:30 -0500
+Message-ID: <CAL_JsqKe=N=VLDfVNJbb2rLWcT+UVJP2JNcdk4tSkSua0FXU_Q@mail.gmail.com>
+References: <20160908184102.8592-1-robh@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73A2349B42
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2016 06:14:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE14149AFA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2016 16:01:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RZM64YEekwx9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Sep 2016 06:14:16 -0400 (EDT)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C51249B3D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2016 06:14:15 -0400 (EDT)
-Received: by mail-wm0-f45.google.com with SMTP id w84so184344723wmg.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2016 03:23:21 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <57E171AF.1080903@arm.com>
+ with ESMTP id oxcqLjfmOkCC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Sep 2016 16:01:49 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.136])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 294C440C9D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2016 16:01:49 -0400 (EDT)
+Received: from mail.kernel.org (localhost [127.0.0.1])
+ by mail.kernel.org (Postfix) with ESMTP id 4DAE12047C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2016 20:10:54 +0000 (UTC)
+Received: from mail-yb0-f169.google.com (mail-yb0-f169.google.com
+ [209.85.213.169])
+ (using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id ECE3F203AA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2016 20:10:51 +0000 (UTC)
+Received: by mail-yb0-f169.google.com with SMTP id 2so36626360ybv.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2016 13:10:51 -0700 (PDT)
+In-Reply-To: <20160908184102.8592-1-robh@kernel.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,183 +38,20 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 20, 2016 at 06:28:15PM +0100, Marc Zyngier wrote:
-> Alex,
-> 
-> On 16/09/16 06:16, Alexander Graf wrote:
-> > While adding the new vgic implementation, apparently nobody tested
-> > the non-vgic path where user space controls the vgic, so two functions
-> > slipped through the cracks that get called in generic code but don't
-> > check whether hardware support is enabled.
-> > 
-> > This patch guards them with proper checks to ensure we only try to
-> > use vgic data structures if they are available. Without this, I get
-> > a stack trace:
-> > 
-> > [   74.363037] Unable to handle kernel paging request at virtual address ffffffffffffffe8
-> > [...]
-> > [   74.929654] [<ffff000008824bcc>] _raw_spin_lock+0x1c/0x58
-> > [   74.935133] [<ffff0000080b7f20>] kvm_vgic_flush_hwstate+0x88/0x288
-> > [   74.941406] [<ffff0000080ab0b4>] kvm_arch_vcpu_ioctl_run+0xfc/0x630
-> > [   74.947766] [<ffff0000080a15bc>] kvm_vcpu_ioctl+0x2f4/0x710
-> > [   74.953420] [<ffff0000082788a8>] do_vfs_ioctl+0xb0/0x728
-> > [   74.958807] [<ffff000008278fb4>] SyS_ioctl+0x94/0xa8
-> > [   74.963844] [<ffff000008083744>] el0_svc_naked+0x38/0x3c
-> > 
-> > Fixes: 0919e84c0
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Alexander Graf <agraf@suse.de>
-> > ---
-> >  virt/kvm/arm/vgic/vgic.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> > index e83b7fe..9f312ba 100644
-> > --- a/virt/kvm/arm/vgic/vgic.c
-> > +++ b/virt/kvm/arm/vgic/vgic.c
-> > @@ -645,6 +645,9 @@ next:
-> >  /* Sync back the hardware VGIC state into our emulation after a guest's run. */
-> >  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
-> >  {
-> > +	if (!vcpu->kvm->arch.vgic.enabled)
-> > +		return;
-> > +
-> >  	vgic_process_maintenance_interrupt(vcpu);
-> >  	vgic_fold_lr_state(vcpu);
-> >  	vgic_prune_ap_list(vcpu);
-> > @@ -653,6 +656,9 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
-> >  /* Flush our emulation state into the GIC hardware before entering the guest. */
-> >  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
-> >  {
-> > +	if (!vcpu->kvm->arch.vgic.enabled)
-> > +		return;
-> > +
-
-this is not correct, because it checks if the distributor is enabled,
-not if the vgic as a thing in KVM is enabled.  (The distributor can be
-disabled, but a VCPU should still be able to EOI an active interrupt,
-for example).
-
-So this check should be
-    if (!vgic_initialized(vcpu->kvm))
-        return;
-
-
-> >  	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> >  	vgic_flush_lr_state(vcpu);
-> >  	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> > 
-> 
-> I hate that fix, because it papers over the fact that we have uninitialized
-> structures all over the shop, and that's not exactly great.
-
-I'm not completely convinced about this, because we have
-vgic_initialized() checks in the arch timer code as well, and I can't
-easily figure out if initializing all data structures etc. to a shim
-would work for all vgic interactions.
-
-Basically, I think we have a choice between
-
-(1) locate *all* entry points to the gic code, and make sure they're
-guarded with vgic_initialized(), or
-
-(2) do something like you suggest and still go through all interactions
-between the vgic and the rest of the system and ensure that whatever
-shim/empty data structures we've allocated, actually end up doing the
-right thing.
-
-My gut feeling is to lean towards (1), but I don't feel overly strongly
-about that.
-
-FWIW: A few comments on the patch below:
-
-> 
-> How about the following instead:
-> 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index c94b90d..0961128 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -472,6 +472,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
->  			return ret;
->  	}
->  
-> +	if (unlikely(!irqchip_in_kernel(kvm)))
-> +		kvm_no_vgic_init(kvm);
-> +
->  	/*
->  	 * Enable the arch timers only if we have an in-kernel VGIC
->  	 * and it has been properly initialized, since we cannot handle
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index bb46c03..1b70b1e 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -327,4 +327,6 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
->   */
->  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
->  
-> +void kvm_no_vgic_init(struct kvm *kvm);
-> +
->  #endif /* __KVM_ARM_VGIC_H */
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index 83777c1..7b8f12b 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -151,9 +151,11 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
->  	INIT_LIST_HEAD(&dist->lpi_list_head);
->  	spin_lock_init(&dist->lpi_list_lock);
->  
-> -	dist->spis = kcalloc(nr_spis, sizeof(struct vgic_irq), GFP_KERNEL);
-> -	if (!dist->spis)
-> -		return  -ENOMEM;
-> +	if (nr_spis) {
-> +		dist->spis = kcalloc(nr_spis, sizeof(struct vgic_irq), GFP_KERNEL);
-> +		if (!dist->spis)
-> +			return  -ENOMEM;
-> +	}
-
-Don't we still end up with dist->spis pointing to nothing if there
-hasn't been an init and nr_spis == 0 ?
-
-Perhaps that's not a problem, but I don't easily understand which parts
-of the vgic structure we must initialize and which we don't.
-
-
->  
->  	/*
->  	 * In the following code we do not take the irq struct lock since
-> @@ -325,6 +327,21 @@ int vgic_lazy_init(struct kvm *kvm)
->  	return ret;
->  }
->  
-> +void kvm_no_vgic_init(struct kvm *kvm)
-> +{
-> +	mutex_lock(&kvm->lock);
-> +	if (unlikely(!vgic_initialized(kvm))) {
-> +		struct kvm_vcpu *vcpu;
-> +		int i;
-> +
-> +		kvm_vgic_dist_init(kvm, 0);
-
-I think you need to check the return value here, unless the rationale is
-that when passing 0 as the second argument, it cannot fail.  That's a
-pretty brittle construct though, IMHO.
-
-> +		kvm_for_each_vcpu(i, vcpu, kvm)
-> +			kvm_vgic_vcpu_init(vcpu);
-> +		kvm->arch.vgic.initialized = true;
-> +	}
-> +	mutex_unlock(&kvm->lock);
-> +}
-> +
->  /* RESOURCE MAPPING */
->  
->  /**
-> 
-
-Thanks,
--Christoffer
+T24gVGh1LCBTZXAgOCwgMjAxNiBhdCAxOjQxIFBNLCBSb2IgSGVycmluZyA8cm9iaEBrZXJuZWwu
+b3JnPiB3cm90ZToKPiBrdm1fZ3Vlc3QuY29uZmlnIGlzIHVzZWZ1bCBmb3IgS1ZNIGd1ZXN0cyBv
+biBvdGhlciBhcmNoZXMsIGFuZCBub3RoaW5nCj4gaW4gaXQgYXBwZWFycyB0byBiZSB4ODYgc3Bl
+Y2lmaWMsIHNvIGp1c3QgbW92ZSB0aGUgd2hvbGUgZmlsZS4gS2J1aWxkCj4gd2lsbCBmaW5kIGl0
+IGluIGVpdGhlciBsb2NhdGlvbi4KPgo+IFNpZ25lZC1vZmYtYnk6IFJvYiBIZXJyaW5nIDxyb2Jo
+QGtlcm5lbC5vcmc+Cj4gQ2M6IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGlu
+YXJvLm9yZz4KPiBDYzogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPiBDYzog
+UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KPiBDYzogIlJhZGltIEtyxI1tw6HF
+mSIgPHJrcmNtYXJAcmVkaGF0LmNvbT4KPiBDYzoga3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVk
+dQo+IENjOiBrdm1Admdlci5rZXJuZWwub3JnCgpQaW5nPwoKUm9iCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
+QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
+bWFuL2xpc3RpbmZvL2t2bWFybQo=
