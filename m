@@ -1,25 +1,25 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 01/10] arm64: KVM: Use static keys for selecting the
- GIC backend
-Date: Thu, 22 Sep 2016 11:01:10 +0100
-Message-ID: <57E3ABE6.6000703@arm.com>
+Subject: Re: [PATCH v4 05/10] KVM: arm: vgic: Fix compiler warnings when built
+ for 32-bit
+Date: Thu, 22 Sep 2016 11:01:40 +0100
+Message-ID: <57E3AC04.1070101@arm.com>
 References: <1473691764-29424-1-git-send-email-vladimir.murzin@arm.com>
- <1473691764-29424-2-git-send-email-vladimir.murzin@arm.com>
+ <1473691764-29424-6-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01B9449B2E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2016 05:52:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 138E449B2E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2016 05:52:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zg9pcASiFVBe for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Sep 2016 05:52:05 -0400 (EDT)
+ with ESMTP id ocJfVqEy37vS for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Sep 2016 05:52:34 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D16F40F77
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2016 05:52:05 -0400 (EDT)
-In-Reply-To: <1473691764-29424-2-git-send-email-vladimir.murzin@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A54F40F77
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2016 05:52:34 -0400 (EDT)
+In-Reply-To: <1473691764-29424-6-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,26 +34,35 @@ Cc: andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 12/09/16 15:49, Vladimir Murzin wrote:
-> Currently GIC backend is selected via alternative framework and this
-> is fine. We are going to introduce vgic-v3 to 32-bit world and there
-> we don't have patching framework in hand, so we can either check
-> support for GICv3 every time we need to choose which backend to use or
-> try to optimise it by using static keys. The later looks quite
-> promising because we can share logic involved in selecting GIC backend
-> between architectures if both uses static keys.
+> Well, this patch is looking ahead of time, but we'll get following
+> compiler warnings as soon as we introduce vgic-v3 to 32-bit world
 > 
-> This patch moves arm64 from alternative to static keys framework for
-> selecting GIC backend. For that we embed static key into vgic_global
-> and enable the key during vgic initialisation based on what has
-> already been exposed by the host GIC driver.
+>   CC      arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.o
+> arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.c: In function 'vgic_mmio_read_v3r_typer':
+> arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.c:184:35: warning: left shift count >= width of type [-Wshift-count-overflow]
+>   value = (mpidr & GENMASK(23, 0)) << 32;
+>                                    ^
+> In file included from ./include/linux/kernel.h:10:0,
+>                  from ./include/asm-generic/bug.h:13,
+>                  from ./arch/arm/include/asm/bug.h:59,
+>                  from ./include/linux/bug.h:4,
+>                  from ./include/linux/io.h:23,
+>                  from ./arch/arm/include/asm/arch_gicv3.h:23,
+>                  from ./include/linux/irqchip/arm-gic-v3.h:411,
+>                  from arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.c:14:
+> arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.c: In function 'vgic_v3_dispatch_sgi':
+> ./include/linux/bitops.h:6:24: warning: left shift count >= width of type [-Wshift-count-overflow]
+>  #define BIT(nr)   (1UL << (nr))
+>                         ^
+> arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-mmio-v3.c:614:20: note: in expansion of macro 'BIT'
+>   broadcast = reg & BIT(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
+>                     ^
+> Let's fix them now.
 > 
 > Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 > ---
->  arch/arm64/kvm/hyp/switch.c   |   21 +++++++++++----------
->  include/kvm/arm_vgic.h        |    4 ++++
->  virt/kvm/arm/vgic/vgic-init.c |    4 ++++
->  virt/kvm/arm/vgic/vgic.c      |    2 +-
->  4 files changed, 20 insertions(+), 11 deletions(-)
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
