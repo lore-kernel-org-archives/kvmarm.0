@@ -1,386 +1,327 @@
-From: Alexander Graf <agraf@suse.de>
-Subject: [PATCH v5] KVM: arm/arm64: Route vtimer events to user space
-Date: Thu, 22 Sep 2016 14:52:49 +0200
-Message-ID: <1474548769-195643-1-git-send-email-agraf@suse.de>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, drjones@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Subject: Re: [PATCH v6 1/7] arm/arm64: vgic-new: Implement support for
+ userspace access
+Date: Thu, 22 Sep 2016 19:31:08 +0530
+Message-ID: <CALicx6uuL9xX3VxLCy+EZi0AqXrNM_O+F3MN+W4gbiriUyb7Ug@mail.gmail.com>
+References: <1474351965-11586-1-git-send-email-vijay.kilari@gmail.com>
+ <1474351965-11586-2-git-send-email-vijay.kilari@gmail.com>
+ <57E3C9D8.7070906@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85C9A40F77
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2016 09:52:04 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id dX9-9ZOb2Axz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Sep 2016 09:52:00 -0400 (EDT)
+Received: from mail-ua0-f196.google.com (mail-ua0-f196.google.com
+ [209.85.217.196])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 84AEF40C9D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2016 09:52:00 -0400 (EDT)
+Received: by mail-ua0-f196.google.com with SMTP id 15so22376uai.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2016 07:01:09 -0700 (PDT)
+In-Reply-To: <57E3C9D8.7070906@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We have 2 modes for dealing with interrupts in the ARM world. We can either
-handle them all using hardware acceleration through the vgic or we can emulate
-a gic in user space and only drive CPU IRQ pins from there.
+On Thu, Sep 22, 2016 at 5:38 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> On 20/09/16 07:12, vijay.kilari@gmail.com wrote:
+>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>
+>> Read and write of some registers like ISPENDR and ICPENDR
+>> from userspace requires special handling when compared to
+>> guest access for these registers.
+>>
+>> Refer to Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>> for handling of ISPENDR, ICPENDR registers handling.
+>>
+>> Add infrastructure to support guest and userspace read
+>> and write for the required registers
+>> Also moved vgic_uaccess from vgic-mmio-v2.c to vgic-mmio.c
+>>
+>> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>> ---
+>>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 25 ----------
+>>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 98 ++++++++++++++++++++++++++++++++--------
+>>  virt/kvm/arm/vgic/vgic-mmio.c    | 78 ++++++++++++++++++++++++++++----
+>>  virt/kvm/arm/vgic/vgic-mmio.h    | 19 ++++++++
+>>  4 files changed, 169 insertions(+), 51 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+>> index b44b359..0b32f40 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+>> @@ -406,31 +406,6 @@ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+>>       return -ENXIO;
+>>  }
+>>
+>> -/*
+>> - * When userland tries to access the VGIC register handlers, we need to
+>> - * create a usable struct vgic_io_device to be passed to the handlers and we
+>> - * have to set up a buffer similar to what would have happened if a guest MMIO
+>> - * access occurred, including doing endian conversions on BE systems.
+>> - */
+>> -static int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
+>> -                     bool is_write, int offset, u32 *val)
+>> -{
+>> -     unsigned int len = 4;
+>> -     u8 buf[4];
+>> -     int ret;
+>> -
+>> -     if (is_write) {
+>> -             vgic_data_host_to_mmio_bus(buf, len, *val);
+>> -             ret = kvm_io_gic_ops.write(vcpu, &dev->dev, offset, len, buf);
+>> -     } else {
+>> -             ret = kvm_io_gic_ops.read(vcpu, &dev->dev, offset, len, buf);
+>> -             if (!ret)
+>> -                     *val = vgic_data_mmio_bus_to_host(buf, len);
+>> -     }
+>> -
+>> -     return ret;
+>> -}
+>> -
+>>  int vgic_v2_cpuif_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>>                         int offset, u32 *val)
+>>  {
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> index 0d3c76a..ce2708d 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> @@ -209,6 +209,62 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
+>>       return 0;
+>>  }
+>>
+>> +static unsigned long vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
+>> +                                               gpa_t addr, unsigned int len)
+>> +{
+>> +     u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+>> +     u32 value = 0;
+>> +     int i;
+>> +
+>> +     /*
+>> +      * A level triggerred interrupt pending state is latched in both
+>> +      * "soft_pending" and "line_level" variables. Userspace will save
+>> +      * and restore soft_pending and line_level separately.
+>> +      * Refer to Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>> +      * handling of ISPENDR and ICPENDR.
+>> +      */
+>> +     for (i = 0; i < len * 8; i++) {
+>> +             struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>> +
+>> +             if (irq->config == VGIC_CONFIG_LEVEL && irq->soft_pending)
+>> +                     value |= (1U << i);
+>> +             if (irq->config == VGIC_CONFIG_EDGE && irq->pending)
+>> +                     value |= (1U << i);
+>> +
+>> +             vgic_put_irq(vcpu->kvm, irq);
+>> +     }
+>> +
+>> +     return value;
+>> +}
+>> +
+>> +static void vgic_v3_uaccess_write_pending(struct kvm_vcpu *vcpu,
+>> +                                       gpa_t addr, unsigned int len,
+>> +                                       unsigned long val)
+>> +{
+>> +     u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+>> +     int i;
+>> +
+>> +     for (i = 0; i < len * 8; i++) {
+>> +             struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>> +
+>> +             spin_lock(&irq->irq_lock);
+>> +             if (test_bit(i, &val)) {
+>> +                     irq->pending = true;
+>> +                     irq->soft_pending = true;
+>> +                     vgic_queue_irq_unlock(vcpu->kvm, irq);
+>> +             } else {
+>> +                     irq->soft_pending = false;
+>> +                     if (irq->config == VGIC_CONFIG_EDGE ||
+>> +                         (irq->config == VGIC_CONFIG_LEVEL &&
+>> +                         !irq->line_level))
+>> +                             irq->pending = false;
+>> +                     spin_unlock(&irq->irq_lock);
+>> +             }
+>> +
+>> +             vgic_put_irq(vcpu->kvm, irq);
+>> +     }
+>> +}
+>> +
+>>  /* We want to avoid outer shareable. */
+>>  u64 vgic_sanitise_shareability(u64 field)
+>>  {
+>> @@ -358,7 +414,7 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
+>>   * We take some special care here to fix the calculation of the register
+>>   * offset.
+>>   */
+>> -#define REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(off, rd, wr, bpi, acc)        \
+>> +#define REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(off, rd, wr, ur, uw, bpi, acc) \
+>>       {                                                               \
+>>               .reg_offset = off,                                      \
+>>               .bits_per_irq = bpi,                                    \
+>> @@ -373,6 +429,8 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
+>>               .access_flags = acc,                                    \
+>>               .read = rd,                                             \
+>>               .write = wr,                                            \
+>> +             .uaccess_read = ur,                                     \
+>> +             .uaccess_write = uw,                                    \
+>>       }
+>>
+>>  static const struct vgic_register_region vgic_v3_dist_registers[] = {
+>> @@ -380,40 +438,42 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+>>               vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc, 16,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR,
+>> -             vgic_mmio_read_rao, vgic_mmio_write_wi, 1,
+>> +             vgic_mmio_read_rao, vgic_mmio_write_wi, NULL, NULL, 1,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISENABLER,
+>> -             vgic_mmio_read_enable, vgic_mmio_write_senable, 1,
+>> +             vgic_mmio_read_enable, vgic_mmio_write_senable, NULL, NULL, 1,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICENABLER,
+>> -             vgic_mmio_read_enable, vgic_mmio_write_cenable, 1,
+>> +             vgic_mmio_read_enable, vgic_mmio_write_cenable, NULL, NULL, 1,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISPENDR,
+>> -             vgic_mmio_read_pending, vgic_mmio_write_spending, 1,
+>> +             vgic_mmio_read_pending, vgic_mmio_write_spending,
+>> +             vgic_v3_uaccess_read_pending, vgic_v3_uaccess_write_pending, 1,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICPENDR,
+>> -             vgic_mmio_read_pending, vgic_mmio_write_cpending, 1,
+>> +             vgic_mmio_read_pending, vgic_mmio_write_cpending,
+>> +             vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISACTIVER,
+>> -             vgic_mmio_read_active, vgic_mmio_write_sactive, 1,
+>> +             vgic_mmio_read_active, vgic_mmio_write_sactive, NULL, NULL, 1,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICACTIVER,
+>> -             vgic_mmio_read_active, vgic_mmio_write_cactive, 1,
+>> +             vgic_mmio_read_active, vgic_mmio_write_cactive, NULL, NULL, 1,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IPRIORITYR,
+>> -             vgic_mmio_read_priority, vgic_mmio_write_priority, 8,
+>> -             VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
+>> +             vgic_mmio_read_priority, vgic_mmio_write_priority, NULL, NULL,
+>> +             8, VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ITARGETSR,
+>> -             vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
+>> +             vgic_mmio_read_raz, vgic_mmio_write_wi, NULL, NULL, 8,
+>>               VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICFGR,
+>> -             vgic_mmio_read_config, vgic_mmio_write_config, 2,
+>> +             vgic_mmio_read_config, vgic_mmio_write_config, NULL, NULL, 2,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGRPMODR,
+>> -             vgic_mmio_read_raz, vgic_mmio_write_wi, 1,
+>> +             vgic_mmio_read_raz, vgic_mmio_write_wi, NULL, NULL, 1,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
+>> -             vgic_mmio_read_irouter, vgic_mmio_write_irouter, 64,
+>> +             vgic_mmio_read_irouter, vgic_mmio_write_irouter, NULL, NULL, 64,
+>>               VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
+>>               vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
+>> @@ -451,11 +511,13 @@ static const struct vgic_register_region vgic_v3_sgibase_registers[] = {
+>>       REGISTER_DESC_WITH_LENGTH(GICR_ICENABLER0,
+>>               vgic_mmio_read_enable, vgic_mmio_write_cenable, 4,
+>>               VGIC_ACCESS_32bit),
+>> -     REGISTER_DESC_WITH_LENGTH(GICR_ISPENDR0,
+>> -             vgic_mmio_read_pending, vgic_mmio_write_spending, 4,
+>> +     REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ISPENDR0,
+>> +             vgic_mmio_read_pending, vgic_mmio_write_spending,
+>> +             vgic_v3_uaccess_read_pending, vgic_v3_uaccess_write_pending, 4,
+>>               VGIC_ACCESS_32bit),
+>> -     REGISTER_DESC_WITH_LENGTH(GICR_ICPENDR0,
+>> -             vgic_mmio_read_pending, vgic_mmio_write_cpending, 4,
+>> +     REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ICPENDR0,
+>> +             vgic_mmio_read_pending, vgic_mmio_write_cpending,
+>> +             vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+>>               VGIC_ACCESS_32bit),
+>>       REGISTER_DESC_WITH_LENGTH(GICR_ISACTIVER0,
+>>               vgic_mmio_read_active, vgic_mmio_write_sactive, 4,
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+>> index e18b30d..31f85df 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+>> @@ -468,6 +468,73 @@ static bool check_region(const struct vgic_register_region *region,
+>>       return false;
+>>  }
+>>
+>> +static const struct vgic_register_region *
+>> +vgic_get_mmio_region(struct vgic_io_device *iodev, gpa_t addr, int len)
+>> +{
+>> +     const struct vgic_register_region *region;
+>> +
+>> +     region = vgic_find_mmio_region(iodev->regions, iodev->nr_regions,
+>> +                                    addr - iodev->base_addr);
+>> +     if (!region || !check_region(region, addr, len))
+>> +             return NULL;
+>> +
+>> +     return region;
+>> +}
+>> +
+>> +static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
+>> +                          gpa_t addr, u32 *val)
+>> +{
+>> +     struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
+>> +     const struct vgic_register_region *region;
+>> +     struct kvm_vcpu *r_vcpu;
+>> +
+>> +     region = vgic_get_mmio_region(iodev, addr, sizeof(u32));
+>> +     if (!region) {
+>> +             *val = 0;
+>> +             return 0;
+>
+> This is not the previous semantic of vgic_uaccess, and I cannot see why
+> blindly ignoring an access to an undefined region would be acceptable.
+> What am I missing?
 
-Unfortunately, when driving IRQs from user space, we never tell user space
-about timer events that may result in interrupt line state changes, so we
-lose out on timer events if we run with user space gic emulation.
+AFAIK, the vgic_uaccess is not making any check on undefined region/register.
+However, dispatch_mmio_read/write are returning 0 if check of region is failed
 
-This patch fixes that by syncing user space's view of the vtimer irq line
-with the kvm view of that same line.
-
-With this patch I can successfully run edk2 and Linux with user space gic
-emulation.
-
-Signed-off-by: Alexander Graf <agraf@suse.de>
-
----
-
-v1 -> v2:
-
-  - Add back curly brace that got lost
-
-v2 -> v3:
-
-  - Split into patch set
-
-v3 -> v4:
-
-  - Improve documentation
-
-v4 -> v5:
-
-  - Rewrite to use pending state sync in sregs (marc)
-  - Remove redundant checks of vgic_initialized()
-  - qemu tree to try this out: https://github.com/agraf/u-boot.git no-kvm-irqchip-for-v5
----
- Documentation/virtual/kvm/api.txt |  26 ++++++++
- arch/arm/include/uapi/asm/kvm.h   |   3 +
- arch/arm/kvm/arm.c                |  14 ++---
- arch/arm64/include/uapi/asm/kvm.h |   3 +
- include/kvm/arm_arch_timer.h      |   2 +-
- include/uapi/linux/kvm.h          |   6 ++
- virt/kvm/arm/arch_timer.c         | 129 ++++++++++++++++++++++++++------------
- 7 files changed, 134 insertions(+), 49 deletions(-)
-
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 739db9a..8049327 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -3928,3 +3928,29 @@ In order to use SynIC, it has to be activated by setting this
- capability via KVM_ENABLE_CAP ioctl on the vcpu fd. Note that this
- will disable the use of APIC hardware virtualization even if supported
- by the CPU, as it's incompatible with SynIC auto-EOI behavior.
-+
-+8.3 KVM_CAP_ARM_TIMER
-+
-+Architectures: arm, arm64
-+This capability, if KVM_CHECK_EXTENSION indicates that it is available and no
-+in-kernel interrupt controller is in use, means that that the kernel populates
-+the vcpu's run->s.regs.kernel_timer_pending field with timers that are currently
-+considered pending by kvm.
-+
-+If active, it also allows user space to propagate its own pending state of timer
-+interrupt lines using run->s.regs.user_timer_pending. If those two fields
-+mismatch during CPU execution, kvm will exit to user space to give it a chance
-+to update its own interrupt pending status. This usually involves triggering
-+an interrupt line on a user space emulated interrupt controller.
-+
-+The fields run->s.regs.kernel_timer_pending and run->s.regs.user_timer_pending
-+are available independent of run->kvm_valid_regs or run->kvm_dirty_regs bits.
-+If no in-kernel interrupt controller is used and the capability exists, they
-+will always be available and used.
-+
-+Currently the following bits are defined for both bitmaps:
-+
-+    KVM_ARM_TIMER_VTIMER  -  virtual timer
-+
-+Future versions of kvm may implement additional timer events. These will get
-+indicated by additional KVM_CAP extensions.
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index a2b3eb3..caad81d 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -105,6 +105,9 @@ struct kvm_debug_exit_arch {
- };
- 
- struct kvm_sync_regs {
-+	/* Used with KVM_CAP_ARM_TIMER */
-+	u8 kernel_timer_pending;
-+	u8 user_timer_pending;
- };
- 
- struct kvm_arch_memory_slot {
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 75f130e..dc19221 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -187,6 +187,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_PSCI_0_2:
- 	case KVM_CAP_READONLY_MEM:
- 	case KVM_CAP_MP_STATE:
-+	case KVM_CAP_ARM_TIMER:
- 		r = 1;
- 		break;
- 	case KVM_CAP_COALESCED_MMIO:
-@@ -474,13 +475,7 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- 			return ret;
- 	}
- 
--	/*
--	 * Enable the arch timers only if we have an in-kernel VGIC
--	 * and it has been properly initialized, since we cannot handle
--	 * interrupts from the virtual timer with a userspace gic.
--	 */
--	if (irqchip_in_kernel(kvm) && vgic_initialized(kvm))
--		ret = kvm_timer_enable(vcpu);
-+	ret = kvm_timer_enable(vcpu);
- 
- 	return ret;
- }
-@@ -588,7 +583,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 */
- 		preempt_disable();
- 		kvm_pmu_flush_hwstate(vcpu);
--		kvm_timer_flush_hwstate(vcpu);
-+		if (kvm_timer_flush_hwstate(vcpu)) {
-+			ret = -EINTR;
-+			run->exit_reason = KVM_EXIT_INTR;
-+		}
- 		kvm_vgic_flush_hwstate(vcpu);
- 
- 		local_irq_disable();
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 3051f86..9aac860 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -143,6 +143,9 @@ struct kvm_debug_exit_arch {
- #define KVM_GUESTDBG_USE_HW		(1 << 17)
- 
- struct kvm_sync_regs {
-+	/* Used with KVM_CAP_ARM_TIMER */
-+	u8 kernel_timer_pending;
-+	u8 user_timer_pending;
- };
- 
- struct kvm_arch_memory_slot {
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index dda39d8..8cd7240 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -63,7 +63,7 @@ void kvm_timer_init(struct kvm *kvm);
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 			 const struct kvm_irq_level *irq);
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
--void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
-+int kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
- void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu);
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 300ef25..1fc02d7 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -870,6 +870,7 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_S390_USER_INSTR0 130
- #define KVM_CAP_MSI_DEVID 131
- #define KVM_CAP_PPC_HTM 132
-+#define KVM_CAP_ARM_TIMER 133
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1327,4 +1328,9 @@ struct kvm_assigned_msix_entry {
- #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
- #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
- 
-+/* Available with KVM_CAP_ARM_TIMER */
-+
-+/* Bits for run->s.regs.{user,kernel}_timer_pending */
-+#define KVM_ARM_TIMER_VTIMER		(1 << 0)
-+
- #endif /* __LINUX_KVM_H */
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 4309b60..0c6fc38 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -166,21 +166,36 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
- 	return cval <= now;
- }
- 
-+/*
-+ * Synchronize the timer IRQ state with the interrupt controller.
-+ */
- static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
- {
- 	int ret;
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 
--	BUG_ON(!vgic_initialized(vcpu->kvm));
--
- 	timer->active_cleared_last = false;
- 	timer->irq.level = new_level;
--	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->irq.irq,
-+	trace_kvm_timer_update_irq(vcpu->vcpu_id, host_vtimer_irq,
- 				   timer->irq.level);
--	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
--					 timer->irq.irq,
--					 timer->irq.level);
--	WARN_ON(ret);
-+
-+	if (irqchip_in_kernel(vcpu->kvm)) {
-+		BUG_ON(!vgic_initialized(vcpu->kvm));
-+
-+		/* Fire the timer in the VGIC */
-+		ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
-+						 timer->irq.irq,
-+						 timer->irq.level);
-+
-+		WARN_ON(ret);
-+	} else {
-+		struct kvm_sync_regs *regs = &vcpu->run->s.regs;
-+
-+		/* Populate the timer bitmap for user space */
-+		regs->kernel_timer_pending &= ~KVM_ARM_TIMER_VTIMER;
-+		if (new_level)
-+			regs->kernel_timer_pending |= KVM_ARM_TIMER_VTIMER;
-+	}
- }
- 
- /*
-@@ -197,7 +212,8 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	 * because the guest would never see the interrupt.  Instead wait
- 	 * until we call this function from kvm_timer_flush_hwstate.
- 	 */
--	if (!vgic_initialized(vcpu->kvm) || !timer->enabled)
-+	if ((irqchip_in_kernel(vcpu->kvm) && !vgic_initialized(vcpu->kvm)) ||
-+	    !timer->enabled)
- 		return -ENODEV;
- 
- 	if (kvm_timer_should_fire(vcpu) != timer->irq.level)
-@@ -248,15 +264,20 @@ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
-  *
-  * Check if the virtual timer has expired while we were running in the host,
-  * and inject an interrupt if that was the case.
-+ *
-+ * Returns:
-+ *
-+ *    0  - success
-+ *    1  - need exit to user space
-  */
--void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
-+int kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	bool phys_active;
- 	int ret;
- 
- 	if (kvm_timer_update_state(vcpu))
--		return;
-+		return 0;
- 
- 	/*
- 	* If we enter the guest with the virtual input level to the VGIC
-@@ -275,38 +296,61 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	* to ensure that hardware interrupts from the timer triggers a guest
- 	* exit.
- 	*/
--	phys_active = timer->irq.level ||
--			kvm_vgic_map_is_active(vcpu, timer->irq.irq);
--
--	/*
--	 * We want to avoid hitting the (re)distributor as much as
--	 * possible, as this is a potentially expensive MMIO access
--	 * (not to mention locks in the irq layer), and a solution for
--	 * this is to cache the "active" state in memory.
--	 *
--	 * Things to consider: we cannot cache an "active set" state,
--	 * because the HW can change this behind our back (it becomes
--	 * "clear" in the HW). We must then restrict the caching to
--	 * the "clear" state.
--	 *
--	 * The cache is invalidated on:
--	 * - vcpu put, indicating that the HW cannot be trusted to be
--	 *   in a sane state on the next vcpu load,
--	 * - any change in the interrupt state
--	 *
--	 * Usage conditions:
--	 * - cached value is "active clear"
--	 * - value to be programmed is "active clear"
--	 */
--	if (timer->active_cleared_last && !phys_active)
--		return;
--
--	ret = irq_set_irqchip_state(host_vtimer_irq,
--				    IRQCHIP_STATE_ACTIVE,
--				    phys_active);
--	WARN_ON(ret);
-+	if (irqchip_in_kernel(vcpu->kvm)) {
-+		phys_active = timer->irq.level ||
-+				kvm_vgic_map_is_active(vcpu, timer->irq.irq);
-+
-+		/*
-+		 * We want to avoid hitting the (re)distributor as much as
-+		 * possible, as this is a potentially expensive MMIO access
-+		 * (not to mention locks in the irq layer), and a solution for
-+		 * this is to cache the "active" state in memory.
-+		 *
-+		 * Things to consider: we cannot cache an "active set" state,
-+		 * because the HW can change this behind our back (it becomes
-+		 * "clear" in the HW). We must then restrict the caching to
-+		 * the "clear" state.
-+		 *
-+		 * The cache is invalidated on:
-+		 * - vcpu put, indicating that the HW cannot be trusted to be
-+		 *   in a sane state on the next vcpu load,
-+		 * - any change in the interrupt state
-+		 *
-+		 * Usage conditions:
-+		 * - cached value is "active clear"
-+		 * - value to be programmed is "active clear"
-+		 */
-+		if (timer->active_cleared_last && !phys_active)
-+			return 0;
-+
-+		ret = irq_set_irqchip_state(host_vtimer_irq,
-+					    IRQCHIP_STATE_ACTIVE,
-+					    phys_active);
-+		WARN_ON(ret);
-+	} else {
-+		struct kvm_sync_regs *regs = &vcpu->run->s.regs;
-+
-+		/*
-+		 * User space handles timer events, so we need to check whether
-+		 * its view of the world is in sync with ours.
-+		 */
-+		if (regs->kernel_timer_pending != regs->user_timer_pending) {
-+			/* Return to user space */
-+			return 1;
-+		}
-+
-+		/*
-+		 * As long as user space is aware that the timer is pending,
-+		 * we do not need to get new host timer events.
-+		 */
-+		if (timer->irq.level)
-+			disable_percpu_irq(host_vtimer_irq);
-+		else
-+			enable_percpu_irq(host_vtimer_irq, 0);
-+	}
- 
- 	timer->active_cleared_last = !phys_active;
-+	return 0;
- }
- 
- /**
-@@ -479,6 +523,10 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 	if (timer->enabled)
- 		return 0;
- 
-+	/* No need to route physical IRQs when we don't use the vgic */
-+	if (!irqchip_in_kernel(vcpu->kvm))
-+		goto no_vgic;
-+
- 	/*
- 	 * Find the physical IRQ number corresponding to the host_vtimer_irq
- 	 */
-@@ -502,6 +550,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 	if (ret)
- 		return ret;
- 
-+no_vgic:
- 
- 	/*
- 	 * There is a potential race here between VCPUs starting for the first
--- 
-1.8.5.6
-
+>
+>> +     }
+>> +
+>> +     r_vcpu = iodev->redist_vcpu ? iodev->redist_vcpu : vcpu;
+>> +     if (region->uaccess_read)
+>> +             *val = region->uaccess_read(r_vcpu, addr, sizeof(u32));
+>> +     else
+>> +             *val = region->read(r_vcpu, addr, sizeof(u32));
+>> +
+>> +     return 0;
+>> +}
+>> +
+>> +static int vgic_uaccess_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
+>> +                           gpa_t addr, const u32 *val)
+>> +{
+>> +     struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
+>> +     const struct vgic_register_region *region;
+>> +     struct kvm_vcpu *r_vcpu;
+>> +
+>> +     region = vgic_get_mmio_region(iodev, addr, sizeof(u32));
+>> +     if (!region)
+>> +             return 0;
+>
+> Same here.
+[...]
+> Thanks,
+>
+>         M.
+> --
+> Jazz is not dead. It just smells funny...
