@@ -1,25 +1,27 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm/arm64: KVM: Add support for ARMv8 AArch32 execution
- state
-Date: Fri, 23 Sep 2016 10:30:46 +0100
-Message-ID: <57E4F646.1000204@arm.com>
-References: <1474614805-18629-1-git-send-email-b18965@freescale.com>
- <20160923092550.GG9101@cbox>
+Subject: Re: [PATCH v6 1/7] arm/arm64: vgic-new: Implement support for
+ userspace access
+Date: Fri, 23 Sep 2016 10:50:38 +0100
+Message-ID: <57E4FAEE.3070003@arm.com>
+References: <1474351965-11586-1-git-send-email-vijay.kilari@gmail.com>
+ <1474351965-11586-2-git-send-email-vijay.kilari@gmail.com>
+ <57E3C9D8.7070906@arm.com>
+ <CALicx6uuL9xX3VxLCy+EZi0AqXrNM_O+F3MN+W4gbiriUyb7Ug@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 488A34998D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2016 05:21:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C90849B34
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2016 05:41:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tU7De3ZA7LWM for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Sep 2016 05:21:39 -0400 (EDT)
+ with ESMTP id iuuQLZhZAtQj for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Sep 2016 05:41:30 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 02DA541267
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2016 05:21:38 -0400 (EDT)
-In-Reply-To: <20160923092550.GG9101@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF23249B1A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2016 05:41:30 -0400 (EDT)
+In-Reply-To: <CALicx6uuL9xX3VxLCy+EZi0AqXrNM_O+F3MN+W4gbiriUyb7Ug@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,54 +31,35 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Alison Wang <b18965@freescale.com>
-Cc: jason.jin@nxp.com, kvm@vger.kernel.org, alison.wang@nxp.com, linux-kernel@vger.kernel.org, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Vijay Kilari <vijay.kilari@gmail.com>
+Cc: Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 23/09/16 10:25, Christoffer Dall wrote:
-> On Fri, Sep 23, 2016 at 03:13:25PM +0800, Alison Wang wrote:
->> The ARMv8 architecture supports two execution state, AArch64 and
->> AArch32. To support KVM in AArch32 execution state for ARMv8, Cortex-A53
->> and Cortex-A72 need to be added for target-specific checks.
+On 22/09/16 15:01, Vijay Kilari wrote:
+> On Thu, Sep 22, 2016 at 5:38 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>> On 20/09/16 07:12, vijay.kilari@gmail.com wrote:
+>>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>> +static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
+>>> +                          gpa_t addr, u32 *val)
+>>> +{
+>>> +     struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
+>>> +     const struct vgic_register_region *region;
+>>> +     struct kvm_vcpu *r_vcpu;
+>>> +
+>>> +     region = vgic_get_mmio_region(iodev, addr, sizeof(u32));
+>>> +     if (!region) {
+>>> +             *val = 0;
+>>> +             return 0;
 >>
->> Signed-off-by: Alison Wang <alison.wang@nxp.com>
->> ---
->>  arch/arm/include/asm/cputype.h | 2 ++
->>  arch/arm/kvm/guest.c           | 2 ++
->>  2 files changed, 4 insertions(+)
->>
->> diff --git a/arch/arm/include/asm/cputype.h b/arch/arm/include/asm/cputype.h
->> index 754f86f..4f8c632 100644
->> --- a/arch/arm/include/asm/cputype.h
->> +++ b/arch/arm/include/asm/cputype.h
->> @@ -75,6 +75,8 @@
->>  #define ARM_CPU_PART_CORTEX_A12		0x4100c0d0
->>  #define ARM_CPU_PART_CORTEX_A17		0x4100c0e0
->>  #define ARM_CPU_PART_CORTEX_A15		0x4100c0f0
->> +#define ARM_CPU_PART_CORTEX_A53_AARCH32	0x4100d030
->> +#define ARM_CPU_PART_CORTEX_A72_AARCH32	0x4100d080
->>  #define ARM_CPU_PART_MASK		0xff00fff0
->>  
->>  /* DEC implemented cores */
->> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
->> index 9aca920..462a099 100644
->> --- a/arch/arm/kvm/guest.c
->> +++ b/arch/arm/kvm/guest.c
->> @@ -252,6 +252,8 @@ int __attribute_const__ kvm_target_cpu(void)
->>  {
->>  	switch (read_cpuid_part()) {
->>  	case ARM_CPU_PART_CORTEX_A7:
->> +	case ARM_CPU_PART_CORTEX_A53_AARCH32:
->> +	case ARM_CPU_PART_CORTEX_A72_AARCH32:
+>> This is not the previous semantic of vgic_uaccess, and I cannot see why
+>> blindly ignoring an access to an undefined region would be acceptable.
+>> What am I missing?
 > 
-> huh?  why are we mapping A53 and A72 cores to an A7 core?
+> AFAIK, the vgic_uaccess is not making any check on undefined region/register.
+> However, dispatch_mmio_read/write are returning 0 if check of region is failed
 
-Yeah, that's absolutely disgusting. The only sensible thing to do would
-be to implement something "generic", just like we have on the 64bit side.
-
-As it stands, this patch falls into the "No way" bucket.
-
-Thanks,
+Hmmm. Fair enough. I don't really like it, but that's something for
+another day.
 
 	M.
 -- 
