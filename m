@@ -1,26 +1,25 @@
 From: vijay.kilari@gmail.com
-Subject: [PATCH v7 5/7] arm/arm64: vgic: Introduce VENG0 and VENG1 fields to
- vmcr struct
-Date: Fri, 23 Sep 2016 21:14:40 +0530
-Message-ID: <1474645482-28131-6-git-send-email-vijay.kilari@gmail.com>
+Subject: [PATCH v7 3/7] arm/arm64: vgic: Introduce find_reg_by_id()
+Date: Fri, 23 Sep 2016 21:14:38 +0530
+Message-ID: <1474645482-28131-4-git-send-email-vijay.kilari@gmail.com>
 References: <1474645482-28131-1-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 07EC149B68
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2016 11:36:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B44449B36
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2016 11:36:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zJ+YHMzVfG4F for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Sep 2016 11:36:14 -0400 (EDT)
-Received: from mail-pf0-f193.google.com (mail-pf0-f193.google.com
- [209.85.192.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E54DE49B50
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2016 11:36:13 -0400 (EDT)
-Received: by mail-pf0-f193.google.com with SMTP id q2so5451226pfj.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2016 08:45:25 -0700 (PDT)
+ with ESMTP id 458lweWHJctQ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Sep 2016 11:36:08 -0400 (EDT)
+Received: from mail-pa0-f67.google.com (mail-pa0-f67.google.com
+ [209.85.220.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 871CA49B85
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2016 11:36:07 -0400 (EDT)
+Received: by mail-pa0-f67.google.com with SMTP id hi10so5235202pac.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2016 08:45:19 -0700 (PDT)
 In-Reply-To: <1474645482-28131-1-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -37,146 +36,81 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-ICC_VMCR_EL2 supports virtual access to ICC_IGRPEN1_EL1.Enable
-and ICC_IGRPEN0_EL1.Enable fields. Add grpen0 and grpen1 member
-variables to struct vmcr to support read and write of these fields.
+In order to implement vGICv3 CPU interface access, we will need to perform
+table lookup of system registers. We would need both index_to_params() and
+find_reg() exported for that purpose, but instead we export a single
+function which combines them both.
 
-Also refactor vgic_set_vmcr and vgic_get_vmcr() code.
-Drop ICH_VMCR_CTLR_SHIFT and ICH_VMCR_CTLR_MASK macros and instead
-use ICH_VMCR_EOI* and ICH_VMCR_CBPR* macros
-.
+Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/linux/irqchip/arm-gic-v3.h |  2 --
- virt/kvm/arm/vgic/vgic-mmio-v2.c   | 16 ----------------
- virt/kvm/arm/vgic/vgic-mmio.c      | 16 ++++++++++++++++
- virt/kvm/arm/vgic/vgic-v3.c        | 10 ++++++++--
- virt/kvm/arm/vgic/vgic.h           |  5 +++++
- 5 files changed, 29 insertions(+), 20 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 22 +++++++++++++++-------
+ arch/arm64/kvm/sys_regs.h |  4 ++++
+ 2 files changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 36402d4..0016002 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -404,8 +404,6 @@
- #define ICH_HCR_EN			(1 << 0)
- #define ICH_HCR_UIE			(1 << 1)
- 
--#define ICH_VMCR_CTLR_SHIFT		0
--#define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
- #define ICH_VMCR_CBPR_SHIFT		4
- #define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
- #define ICH_VMCR_EOIM_SHIFT		9
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 2cb04b7..ad353b5 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -212,22 +212,6 @@ static void vgic_mmio_write_sgipends(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index e51367d..87ebe35 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1794,6 +1794,17 @@ static bool index_to_params(u64 id, struct sys_reg_params *params)
  	}
  }
  
--static void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
--{
--	if (kvm_vgic_global_state.type == VGIC_V2)
--		vgic_v2_set_vmcr(vcpu, vmcr);
--	else
--		vgic_v3_set_vmcr(vcpu, vmcr);
--}
--
--static void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
--{
--	if (kvm_vgic_global_state.type == VGIC_V2)
--		vgic_v2_get_vmcr(vcpu, vmcr);
--	else
--		vgic_v3_get_vmcr(vcpu, vmcr);
--}
--
- #define GICC_ARCH_VERSION_V2	0x2
- 
- /* These are for userland accesses only, there is no guest-facing emulation. */
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 9939d1d..173d6f0 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -416,6 +416,22 @@ int vgic_validate_mmio_region_addr(struct kvm_device *dev,
- 	return -ENXIO;
- }
- 
-+void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
++const struct sys_reg_desc *find_reg_by_id(u64 id,
++					  struct sys_reg_params *params,
++					  const struct sys_reg_desc table[],
++					  unsigned int num)
 +{
-+	if (kvm_vgic_global_state.type == VGIC_V2)
-+		vgic_v2_set_vmcr(vcpu, vmcr);
-+	else
-+		vgic_v3_set_vmcr(vcpu, vmcr);
++	if (!index_to_params(id, params))
++		return NULL;
++
++	return find_reg(params, table, num);
 +}
 +
-+void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-+{
-+	if (kvm_vgic_global_state.type == VGIC_V2)
-+		vgic_v2_get_vmcr(vcpu, vmcr);
-+	else
-+		vgic_v3_get_vmcr(vcpu, vmcr);
-+}
-+
- /*
-  * kvm_mmio_read_buf() returns a value in a format where it can be converted
-  * to a byte array and be directly observed as the guest wanted it to appear
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 9f0dae3..967c295 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -175,10 +175,13 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
- {
- 	u32 vmcr;
+ /* Decode an index value, and find the sys_reg_desc entry. */
+ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
+ 						    u64 id)
+@@ -1921,10 +1932,8 @@ static int get_invariant_sys_reg(u64 id, void __user *uaddr)
+ 	struct sys_reg_params params;
+ 	const struct sys_reg_desc *r;
  
--	vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
-+	vmcr  = (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
-+	vmcr |= (vmcrp->ctlr << ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
- 	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
- 	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
- 	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
-+	vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
-+	vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
+-	if (!index_to_params(id, &params))
+-		return -ENOENT;
+-
+-	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
++	r = find_reg_by_id(id, &params, invariant_sys_regs,
++			   ARRAY_SIZE(invariant_sys_regs));
+ 	if (!r)
+ 		return -ENOENT;
  
- 	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
- }
-@@ -187,10 +190,13 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
- {
- 	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
+@@ -1938,9 +1947,8 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
+ 	int err;
+ 	u64 val = 0; /* Make sure high bits are 0 for 32-bit regs */
  
--	vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
-+	vmcrp->ctlr = (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
-+	vmcrp->ctlr |= (vmcr & ICH_VMCR_EOIM_MASK) >> ICH_VMCR_EOIM_SHIFT;
- 	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
- 	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
- 	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
-+	vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
-+	vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
+-	if (!index_to_params(id, &params))
+-		return -ENOENT;
+-	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
++	r = find_reg_by_id(id, &params, invariant_sys_regs,
++			   ARRAY_SIZE(invariant_sys_regs));
+ 	if (!r)
+ 		return -ENOENT;
+ 
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index dbbb01c..9c6ffd0 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -136,6 +136,10 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
+ 	return i1->Op2 - i2->Op2;
  }
  
- #define INITIAL_PENDBASER_VALUE						  \
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index d901b0c..c461f6b 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -63,6 +63,9 @@ struct vgic_vmcr {
- 	u32	abpr;
- 	u32	bpr;
- 	u32	pmr;
-+	/* Below member variable are valid only for GICv3 */
-+	u32	grpen0;
-+	u32	grpen1;
- };
++const struct sys_reg_desc *find_reg_by_id(u64 id,
++					  struct sys_reg_params *params,
++					  const struct sys_reg_desc table[],
++					  unsigned int num);
  
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-@@ -150,6 +153,8 @@ static inline int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
- #endif
- 
- int kvm_register_vgic_device(unsigned long type);
-+void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-+void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- int vgic_lazy_init(struct kvm *kvm);
- int vgic_init(struct kvm *kvm);
- 
+ #define Op0(_x) 	.Op0 = _x
+ #define Op1(_x) 	.Op1 = _x
 -- 
 1.9.1
