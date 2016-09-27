@@ -1,24 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 22/50] arm64: KVM: Route asynchronous aborts
-Date: Tue, 27 Sep 2016 20:05:30 +0200
-Message-ID: <20160927180558.14699-23-christoffer.dall@linaro.org>
+Subject: [PULL 09/50] arm64: KVM: VHE: reset PSTATE.PAN on entry to EL2
+Date: Tue, 27 Sep 2016 20:05:17 +0200
+Message-ID: <20160927180558.14699-10-christoffer.dall@linaro.org>
 References: <20160927180558.14699-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AECA49B4E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3B1A49B67
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6BlhCZr3NxlE for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2016 13:56:51 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1FD2A49BB0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:44 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id b130so27063904wmc.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:06:08 -0700 (PDT)
+ with ESMTP id 5X-vOFo696x2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2016 13:56:32 -0400 (EDT)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0D4449B62
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:32 -0400 (EDT)
+Received: by mail-wm0-f52.google.com with SMTP id b130so27053234wmc.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:05:56 -0700 (PDT)
 In-Reply-To: <20160927180558.14699-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,57 +30,42 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, "# v4 . 6+" <stable@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Vladimir Murzin <vladimir.murzin@arm.com>
 
-As we now have some basic handling to EL1-triggered aborts, we can
-actually report them to KVM.
+SCTLR_EL2.SPAN bit controls what happens with the PSTATE.PAN bit on an
+exception. However, this bit has no effect on the PSTATE.PAN when
+HCR_EL2.E2H or HCR_EL2.TGE is unset. Thus when VHE is used and
+exception taken from a guest PSTATE.PAN bit left unchanged and we
+continue with a value guest has set.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+To address that always reset PSTATE.PAN on entry from EL1.
+
+Fixes: 1f364c8c48a0 ("arm64: VHE: Add support for running Linux in EL2 mode")
+
+Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+Reviewed-by: James Morse <james.morse@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: <stable@vger.kernel.org> # v4.6+
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/hyp-entry.S | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/entry.S | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index d6cae54..d2f6640 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -120,6 +120,12 @@ el1_irq:
- 	mov	x0, #ARM_EXCEPTION_IRQ
- 	b	__guest_exit
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 3967c231..b5926ee 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -96,6 +96,8 @@ ENTRY(__guest_exit)
  
-+el1_error:
-+	stp     x0, x1, [sp, #-16]!
-+	mrs	x1, tpidr_el2
-+	mov	x0, #ARM_EXCEPTION_EL1_SERROR
-+	b	__guest_exit
+ 	add	x1, x1, #VCPU_CONTEXT
+ 
++	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
 +
- ENTRY(__hyp_do_panic)
- 	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
- 		      PSR_MODE_EL1h)
-@@ -148,7 +154,6 @@ ENDPROC(\label)
- 	invalid_vector	el1_sync_invalid
- 	invalid_vector	el1_irq_invalid
- 	invalid_vector	el1_fiq_invalid
--	invalid_vector	el1_error_invalid
+ 	// Store the guest regs x2 and x3
+ 	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
  
- 	.ltorg
- 
-@@ -168,10 +173,10 @@ ENTRY(__kvm_hyp_vector)
- 	ventry	el1_sync			// Synchronous 64-bit EL1
- 	ventry	el1_irq				// IRQ 64-bit EL1
- 	ventry	el1_fiq_invalid			// FIQ 64-bit EL1
--	ventry	el1_error_invalid		// Error 64-bit EL1
-+	ventry	el1_error			// Error 64-bit EL1
- 
- 	ventry	el1_sync			// Synchronous 32-bit EL1
- 	ventry	el1_irq				// IRQ 32-bit EL1
- 	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
--	ventry	el1_error_invalid		// Error 32-bit EL1
-+	ventry	el1_error			// Error 32-bit EL1
- ENDPROC(__kvm_hyp_vector)
 -- 
 2.9.0
