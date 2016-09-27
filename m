@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 04/50] arm64: KVM: Optimize __guest_enter/exit() to save a few
- instructions
-Date: Tue, 27 Sep 2016 20:05:12 +0200
-Message-ID: <20160927180558.14699-5-christoffer.dall@linaro.org>
+Subject: [PULL 02/50] KVM: arm/arm64: Factor out vgic_attr_regs_access
+ functionality
+Date: Tue, 27 Sep 2016 20:05:10 +0200
+Message-ID: <20160927180558.14699-3-christoffer.dall@linaro.org>
 References: <20160927180558.14699-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 37EAC49B4A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C480F499A1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oWwxMANZCJlr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2016 13:56:29 -0400 (EDT)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3FF22412D0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:28 -0400 (EDT)
-Received: by mail-wm0-f47.google.com with SMTP id l132so190629170wmf.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:05:51 -0700 (PDT)
+ with ESMTP id eY+y0u3Nwisy for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2016 13:56:25 -0400 (EDT)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF8C248531
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:25 -0400 (EDT)
+Received: by mail-wm0-f42.google.com with SMTP id l132so190626874wmf.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:05:49 -0700 (PDT)
 In-Reply-To: <20160927180558.14699-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,241 +31,158 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shanker Donthineni <shankerd@codeaurora.org>
+As we are about to deal with multiple data types and situations where
+the vgic should not be initialized when doing userspace accesses on the
+register attributes, factor out the functionality of
+vgic_attr_regs_access into smaller bits which can be reused by a new
+function later.
 
-We are doing an unnecessary stack push/pop operation when restoring
-the guest registers x0-x18 in __guest_enter(). This patch saves the
-two instructions by using x18 as a base register. No need to store
-the vcpu context pointer in stack because it is redundant, the same
-information is available in tpidr_el2. The function __guest_exit()
-calling convention is slightly modified, caller only pushes the regs
-x0-x1 to stack instead of regs x0-x3.
-
-Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- arch/arm64/kvm/hyp/entry.S     | 101 ++++++++++++++++++++---------------------
- arch/arm64/kvm/hyp/hyp-entry.S |  37 ++++++---------
- 2 files changed, 63 insertions(+), 75 deletions(-)
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 100 ++++++++++++++++++++++++++----------
+ 1 file changed, 73 insertions(+), 27 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index ce9e5e5..3967c231 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -55,79 +55,78 @@
-  */
- ENTRY(__guest_enter)
- 	// x0: vcpu
--	// x1: host/guest context
--	// x2-x18: clobbered by macros
-+	// x1: host context
-+	// x2-x17: clobbered by macros
-+	// x18: guest context
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 1813f93..19fa331 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -233,6 +233,67 @@ int kvm_register_vgic_device(unsigned long type)
+ 	return ret;
+ }
  
- 	// Store the host regs
- 	save_callee_saved_regs x1
- 
--	// Preserve vcpu & host_ctxt for use at exit time
--	stp	x0, x1, [sp, #-16]!
-+	// Store the host_ctxt for use at exit time
-+	str	x1, [sp, #-16]!
- 
--	add	x1, x0, #VCPU_CONTEXT
-+	add	x18, x0, #VCPU_CONTEXT
- 
--	// Prepare x0-x1 for later restore by pushing them onto the stack
--	ldp	x2, x3, [x1, #CPU_XREG_OFFSET(0)]
--	stp	x2, x3, [sp, #-16]!
-+	// Restore guest regs x0-x17
-+	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
-+	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
-+	ldp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
-+	ldp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
-+	ldp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
-+	ldp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
-+	ldp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
-+	ldp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
-+	ldp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
- 
--	// x2-x18
--	ldp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
--	ldp	x4, x5,   [x1, #CPU_XREG_OFFSET(4)]
--	ldp	x6, x7,   [x1, #CPU_XREG_OFFSET(6)]
--	ldp	x8, x9,   [x1, #CPU_XREG_OFFSET(8)]
--	ldp	x10, x11, [x1, #CPU_XREG_OFFSET(10)]
--	ldp	x12, x13, [x1, #CPU_XREG_OFFSET(12)]
--	ldp	x14, x15, [x1, #CPU_XREG_OFFSET(14)]
--	ldp	x16, x17, [x1, #CPU_XREG_OFFSET(16)]
--	ldr	x18,      [x1, #CPU_XREG_OFFSET(18)]
--
--	// x19-x29, lr
--	restore_callee_saved_regs x1
--
--	// Last bits of the 64bit state
--	ldp	x0, x1, [sp], #16
-+	// Restore guest regs x19-x29, lr
-+	restore_callee_saved_regs x18
++struct vgic_reg_attr {
++	struct kvm_vcpu *vcpu;
++	gpa_t addr;
++};
 +
-+	// Restore guest reg x18
-+	ldr	x18,      [x18, #CPU_XREG_OFFSET(18)]
- 
- 	// Do not touch any register after this!
- 	eret
- ENDPROC(__guest_enter)
- 
- ENTRY(__guest_exit)
--	// x0: vcpu
--	// x1: return code
--	// x2-x3: free
--	// x4-x29,lr: vcpu regs
--	// vcpu x0-x3 on the stack
--
--	add	x2, x0, #VCPU_CONTEXT
--
--	stp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)]
--	stp	x6, x7,   [x2, #CPU_XREG_OFFSET(6)]
--	stp	x8, x9,   [x2, #CPU_XREG_OFFSET(8)]
--	stp	x10, x11, [x2, #CPU_XREG_OFFSET(10)]
--	stp	x12, x13, [x2, #CPU_XREG_OFFSET(12)]
--	stp	x14, x15, [x2, #CPU_XREG_OFFSET(14)]
--	stp	x16, x17, [x2, #CPU_XREG_OFFSET(16)]
--	str	x18,      [x2, #CPU_XREG_OFFSET(18)]
--
--	ldp	x6, x7, [sp], #16	// x2, x3
--	ldp	x4, x5, [sp], #16	// x0, x1
--
--	stp	x4, x5, [x2, #CPU_XREG_OFFSET(0)]
--	stp	x6, x7, [x2, #CPU_XREG_OFFSET(2)]
-+	// x0: return code
-+	// x1: vcpu
-+	// x2-x29,lr: vcpu regs
-+	// vcpu x0-x1 on the stack
++static int parse_vgic_v2_attr(struct kvm_device *dev,
++			      struct kvm_device_attr *attr,
++			      struct vgic_reg_attr *reg_attr)
++{
++	int cpuid;
 +
-+	add	x1, x1, #VCPU_CONTEXT
++	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
++		 KVM_DEV_ARM_VGIC_CPUID_SHIFT;
 +
-+	// Store the guest regs x2 and x3
-+	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
++	if (cpuid >= atomic_read(&dev->kvm->online_vcpus))
++		return -EINVAL;
 +
-+	// Retrieve the guest regs x0-x1 from the stack
-+	ldp	x2, x3, [sp], #16	// x0, x1
++	reg_attr->vcpu = kvm_get_vcpu(dev->kvm, cpuid);
++	reg_attr->addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
 +
-+	// Store the guest regs x0-x1 and x4-x18
-+	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(0)]
-+	stp	x4, x5,   [x1, #CPU_XREG_OFFSET(4)]
-+	stp	x6, x7,   [x1, #CPU_XREG_OFFSET(6)]
-+	stp	x8, x9,   [x1, #CPU_XREG_OFFSET(8)]
-+	stp	x10, x11, [x1, #CPU_XREG_OFFSET(10)]
-+	stp	x12, x13, [x1, #CPU_XREG_OFFSET(12)]
-+	stp	x14, x15, [x1, #CPU_XREG_OFFSET(14)]
-+	stp	x16, x17, [x1, #CPU_XREG_OFFSET(16)]
-+	str	x18,      [x1, #CPU_XREG_OFFSET(18)]
++	return 0;
++}
 +
-+	// Store the guest regs x19-x29, lr
-+	save_callee_saved_regs x1
++/* unlocks vcpus from @vcpu_lock_idx and smaller */
++static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
++{
++	struct kvm_vcpu *tmp_vcpu;
++
++	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
++		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
++		mutex_unlock(&tmp_vcpu->mutex);
++	}
++}
++
++static void unlock_all_vcpus(struct kvm *kvm)
++{
++	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
++}
++
++/* Returns true if all vcpus were locked, false otherwise */
++static bool lock_all_vcpus(struct kvm *kvm)
++{
++	struct kvm_vcpu *tmp_vcpu;
++	int c;
++
++	/*
++	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
++	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
++	 * that no other VCPUs are run and fiddle with the vgic state while we
++	 * access it.
++	 */
++	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
++		if (!mutex_trylock(&tmp_vcpu->mutex)) {
++			unlock_vcpus(kvm, c - 1);
++			return false;
++		}
++	}
++
++	return true;
++}
++
+ /** vgic_attr_regs_access: allows user space to read/write VGIC registers
+  *
+  * @dev: kvm device handle
+@@ -245,15 +306,17 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+ 				 struct kvm_device_attr *attr,
+ 				 u32 *reg, bool is_write)
+ {
++	struct vgic_reg_attr reg_attr;
+ 	gpa_t addr;
+-	int cpuid, ret, c;
+-	struct kvm_vcpu *vcpu, *tmp_vcpu;
+-	int vcpu_lock_idx = -1;
++	struct kvm_vcpu *vcpu;
++	int ret;
  
--	save_callee_saved_regs x2
-+	// Restore the host_ctxt from the stack
-+	ldr	x2, [sp], #16
+-	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
+-		 KVM_DEV_ARM_VGIC_CPUID_SHIFT;
+-	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
+-	addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
++	ret = parse_vgic_v2_attr(dev, attr, &reg_attr);
++	if (ret)
++		return ret;
++
++	vcpu = reg_attr.vcpu;
++	addr = reg_attr.addr;
  
--	// Restore vcpu & host_ctxt from the stack
--	// (preserving return code in x1)
--	ldp	x0, x2, [sp], #16
- 	// Now restore the host regs
- 	restore_callee_saved_regs x2
+ 	mutex_lock(&dev->kvm->lock);
  
--	mov	x0, x1
- 	ret
- ENDPROC(__guest_exit)
+@@ -261,24 +324,11 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+ 	if (ret)
+ 		goto out;
  
- ENTRY(__fpsimd_guest_restore)
-+	stp	x2, x3, [sp, #-16]!
- 	stp	x4, lr, [sp, #-16]!
+-	if (cpuid >= atomic_read(&dev->kvm->online_vcpus)) {
+-		ret = -EINVAL;
++	if (!lock_all_vcpus(dev->kvm)) {
++		ret = -EBUSY;
+ 		goto out;
+ 	}
  
- alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index f6d9694..d6cae54 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -27,16 +27,6 @@
- 	.text
- 	.pushsection	.hyp.text, "ax"
- 
--.macro	save_x0_to_x3
--	stp	x0, x1, [sp, #-16]!
--	stp	x2, x3, [sp, #-16]!
--.endm
+-	/*
+-	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
+-	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
+-	 * that no other VCPUs are run and fiddle with the vgic state while we
+-	 * access it.
+-	 */
+-	ret = -EBUSY;
+-	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm) {
+-		if (!mutex_trylock(&tmp_vcpu->mutex))
+-			goto out;
+-		vcpu_lock_idx = c;
+-	}
 -
--.macro	restore_x0_to_x3
--	ldp	x2, x3, [sp], #16
--	ldp	x0, x1, [sp], #16
--.endm
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+ 		ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, reg);
+@@ -291,12 +341,8 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+ 		break;
+ 	}
+ 
++	unlock_all_vcpus(dev->kvm);
+ out:
+-	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+-		tmp_vcpu = kvm_get_vcpu(dev->kvm, vcpu_lock_idx);
+-		mutex_unlock(&tmp_vcpu->mutex);
+-	}
 -
- .macro do_el2_call
- 	/*
- 	 * Shuffle the parameters before calling the function
-@@ -79,23 +69,23 @@ ENTRY(__kvm_hyp_teardown)
- ENDPROC(__kvm_hyp_teardown)
- 	
- el1_sync:				// Guest trapped into EL2
--	save_x0_to_x3
-+	stp	x0, x1, [sp, #-16]!
- 
- alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
- 	mrs	x1, esr_el2
- alternative_else
- 	mrs	x1, esr_el1
- alternative_endif
--	lsr	x2, x1, #ESR_ELx_EC_SHIFT
-+	lsr	x0, x1, #ESR_ELx_EC_SHIFT
- 
--	cmp	x2, #ESR_ELx_EC_HVC64
-+	cmp	x0, #ESR_ELx_EC_HVC64
- 	b.ne	el1_trap
- 
--	mrs	x3, vttbr_el2		// If vttbr is valid, the 64bit guest
--	cbnz	x3, el1_trap		// called HVC
-+	mrs	x1, vttbr_el2		// If vttbr is valid, the 64bit guest
-+	cbnz	x1, el1_trap		// called HVC
- 
- 	/* Here, we're pretty sure the host called HVC. */
--	restore_x0_to_x3
-+	ldp	x0, x1, [sp], #16
- 
- 	cmp	x0, #HVC_GET_VECTORS
- 	b.ne	1f
-@@ -113,22 +103,21 @@ alternative_endif
- 
- el1_trap:
- 	/*
--	 * x1: ESR
--	 * x2: ESR_EC
-+	 * x0: ESR_EC
- 	 */
- 
- 	/* Guest accessed VFP/SIMD registers, save host, restore Guest */
--	cmp	x2, #ESR_ELx_EC_FP_ASIMD
-+	cmp	x0, #ESR_ELx_EC_FP_ASIMD
- 	b.eq	__fpsimd_guest_restore
- 
--	mrs	x0, tpidr_el2
--	mov	x1, #ARM_EXCEPTION_TRAP
-+	mrs	x1, tpidr_el2
-+	mov	x0, #ARM_EXCEPTION_TRAP
- 	b	__guest_exit
- 
- el1_irq:
--	save_x0_to_x3
--	mrs	x0, tpidr_el2
--	mov	x1, #ARM_EXCEPTION_IRQ
-+	stp     x0, x1, [sp, #-16]!
-+	mrs	x1, tpidr_el2
-+	mov	x0, #ARM_EXCEPTION_IRQ
- 	b	__guest_exit
- 
- ENTRY(__hyp_do_panic)
+ 	mutex_unlock(&dev->kvm->lock);
+ 	return ret;
+ }
 -- 
 2.9.0
