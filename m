@@ -1,24 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 13/50] arm64: KVM: Make kvm_skip_instr32 available to HYP
-Date: Tue, 27 Sep 2016 20:05:21 +0200
-Message-ID: <20160927180558.14699-14-christoffer.dall@linaro.org>
+Subject: [PULL 19/50] arm64: KVM: Add Virtual Abort injection helper
+Date: Tue, 27 Sep 2016 20:05:27 +0200
+Message-ID: <20160927180558.14699-20-christoffer.dall@linaro.org>
 References: <20160927180558.14699-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B1F949B1A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C245949B7D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aojqxHZglo3P for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2016 13:56:39 -0400 (EDT)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F92E4998D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:36 -0400 (EDT)
-Received: by mail-wm0-f43.google.com with SMTP id w84so190347843wmg.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:05:59 -0700 (PDT)
+ with ESMTP id AWhHvMaMWZZR for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2016 13:56:45 -0400 (EDT)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C77DE49B21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:41 -0400 (EDT)
+Received: by mail-wm0-f48.google.com with SMTP id l132so26941852wmf.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:06:05 -0700 (PDT)
 In-Reply-To: <20160927180558.14699-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,45 +35,47 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-As we plan to do some emulation at HYP, let's make kvm_skip_instr32
-as part of the hyp_text section. This doesn't preclude the kernel
-from using it.
+Now that we're able to context switch the HCR_EL2.VA bit, let's
+introduce a helper that injects an Abort into a vcpu.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/aarch32.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h |  1 +
+ arch/arm64/kvm/inject_fault.c        | 12 ++++++++++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/virt/kvm/arm/aarch32.c b/virt/kvm/arm/aarch32.c
-index ba4417b..528af4b 100644
---- a/virt/kvm/arm/aarch32.c
-+++ b/virt/kvm/arm/aarch32.c
-@@ -23,6 +23,7 @@
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index b336434d..fd9d5fd 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -38,6 +38,7 @@ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+ void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr);
  
- #include <linux/kvm_host.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_hyp.h>
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
++void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
  
- #ifndef CONFIG_ARM64
- #define COMPAT_PSR_T_BIT	PSR_T_BIT
-@@ -108,7 +109,7 @@ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu)
-  *
-  * IT[7:0] -> CPSR[26:25],CPSR[15:10]
-  */
--static void kvm_adjust_itstate(struct kvm_vcpu *vcpu)
-+static void __hyp_text kvm_adjust_itstate(struct kvm_vcpu *vcpu)
- {
- 	unsigned long itbits, cond;
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
-@@ -138,7 +139,7 @@ static void kvm_adjust_itstate(struct kvm_vcpu *vcpu)
-  * kvm_skip_instr - skip a trapped instruction and proceed to the next
-  * @vcpu: The vcpu pointer
-  */
--void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
-+void __hyp_text kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
- {
- 	bool is_thumb;
- 
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 898c0e6..da6a8cf 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -231,3 +231,15 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ 	else
+ 		inject_undef64(vcpu);
+ }
++
++/**
++ * kvm_inject_vabt - inject an async abort / SError into the guest
++ * @vcpu: The VCPU to receive the exception
++ *
++ * It is assumed that this code is called from the VCPU thread and that the
++ * VCPU therefore is not currently executing guest code.
++ */
++void kvm_inject_vabt(struct kvm_vcpu *vcpu)
++{
++	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
++}
 -- 
 2.9.0
