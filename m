@@ -1,24 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 09/50] arm64: KVM: VHE: reset PSTATE.PAN on entry to EL2
-Date: Tue, 27 Sep 2016 20:05:17 +0200
-Message-ID: <20160927180558.14699-10-christoffer.dall@linaro.org>
+Subject: [PULL 18/50] arm64: KVM: Preserve pending vSError in world switch
+Date: Tue, 27 Sep 2016 20:05:26 +0200
+Message-ID: <20160927180558.14699-19-christoffer.dall@linaro.org>
 References: <20160927180558.14699-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3B1A49B67
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B453249BA7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5X-vOFo696x2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2016 13:56:32 -0400 (EDT)
-Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0D4449B62
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:32 -0400 (EDT)
-Received: by mail-wm0-f52.google.com with SMTP id b130so27053234wmc.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:05:56 -0700 (PDT)
+ with ESMTP id Kb6y98YJhZhJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2016 13:56:42 -0400 (EDT)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 676F349B9A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:41 -0400 (EDT)
+Received: by mail-wm0-f45.google.com with SMTP id 197so30492590wmk.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:06:04 -0700 (PDT)
 In-Reply-To: <20160927180558.14699-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,42 +30,45 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, "# v4 . 6+" <stable@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vladimir Murzin <vladimir.murzin@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-SCTLR_EL2.SPAN bit controls what happens with the PSTATE.PAN bit on an
-exception. However, this bit has no effect on the PSTATE.PAN when
-HCR_EL2.E2H or HCR_EL2.TGE is unset. Thus when VHE is used and
-exception taken from a guest PSTATE.PAN bit left unchanged and we
-continue with a value guest has set.
+The HCR_EL2.VSE bit is used to signal an SError to a guest, and has
+the peculiar feature of getting cleared when the guest has taken
+the abort (this is the only bit that behaves as such in this register).
 
-To address that always reset PSTATE.PAN on entry from EL1.
+This means that if we signal such an abort, we must leave it
+in the guest context until it disappears from HCR_EL2, and at which
+point it must be cleared from the context. This is achieved by
+reading back from HCR_EL2 until the guest takes the fault.
 
-Fixes: 1f364c8c48a0 ("arm64: VHE: Add support for running Linux in EL2 mode")
-
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
-Reviewed-by: James Morse <james.morse@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Cc: <stable@vger.kernel.org> # v4.6+
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/entry.S | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/hyp/switch.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 3967c231..b5926ee 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -96,6 +96,8 @@ ENTRY(__guest_exit)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index b3a66c5..8246de2 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -110,6 +110,15 @@ static hyp_alternate_select(__deactivate_traps_arch,
  
- 	add	x1, x1, #VCPU_CONTEXT
- 
-+	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
+ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ {
++	/*
++	 * If we pended a virtual abort, preserve it until it gets
++	 * cleared. See D1.14.3 (Virtual Interrupts) for details, but
++	 * the crucial bit is "On taking a vSError interrupt,
++	 * HCR_EL2.VSE is cleared to 0."
++	 */
++	if (vcpu->arch.hcr_el2 & HCR_VSE)
++		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
 +
- 	// Store the guest regs x2 and x3
- 	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
- 
+ 	__deactivate_traps_arch()();
+ 	write_sysreg(0, hstr_el2);
+ 	write_sysreg(read_sysreg(mdcr_el2) & MDCR_EL2_HPMN_MASK, mdcr_el2);
 -- 
 2.9.0
