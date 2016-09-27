@@ -1,24 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 17/50] arm64: KVM: Rename HCR_VA to HCR_VSE
-Date: Tue, 27 Sep 2016 20:05:25 +0200
-Message-ID: <20160927180558.14699-18-christoffer.dall@linaro.org>
+Subject: [PULL 16/50] arm64: KVM: vgic-v2: Enable GICV access from HYP if
+ access from guest is unsafe
+Date: Tue, 27 Sep 2016 20:05:24 +0200
+Message-ID: <20160927180558.14699-17-christoffer.dall@linaro.org>
 References: <20160927180558.14699-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 633BB49B72
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82EE849B82
  for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p0aw3al7qF6U for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id o2ARUMOEaoam for <kvmarm@lists.cs.columbia.edu>;
  Tue, 27 Sep 2016 13:56:42 -0400 (EDT)
-Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B96A249B89
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:39 -0400 (EDT)
-Received: by mail-wm0-f48.google.com with SMTP id 197so30492455wmk.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:06:03 -0700 (PDT)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F047C49B85
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:38 -0400 (EDT)
+Received: by mail-wm0-f42.google.com with SMTP id l132so26939394wmf.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:06:02 -0700 (PDT)
 In-Reply-To: <20160927180558.14699-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,39 +36,127 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-HCR_VA is a leftover from ARMv7, On ARMv8, this is HCR_VSE
-(which stands for Virtual System Error), and has better
-defined semantics.
+So far, we've been disabling KVM on systems where the GICV region couldn't
+be safely given to a guest. Now that we're able to handle this access
+safely by emulating it in HYP, we can enable this feature when we detect
+an unsafe configuration.
 
-Let's rename the constant.
-
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_arm.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-v2.c | 69 +++++++++++++++++++++++++++------------------
+ 1 file changed, 42 insertions(+), 27 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 4b5c977..2a2752b 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -50,7 +50,7 @@
- #define HCR_BSU		(3 << 10)
- #define HCR_BSU_IS	(UL(1) << 10)
- #define HCR_FB		(UL(1) << 9)
--#define HCR_VA		(UL(1) << 8)
-+#define HCR_VSE		(UL(1) << 8)
- #define HCR_VI		(UL(1) << 7)
- #define HCR_VF		(UL(1) << 6)
- #define HCR_AMO		(UL(1) << 5)
-@@ -80,7 +80,7 @@
- #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
- 			 HCR_TVM | HCR_BSU_IS | HCR_FB | HCR_TAC | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
--#define HCR_VIRT_EXCP_MASK (HCR_VA | HCR_VI | HCR_VF)
-+#define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
- #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
- #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index b8da901..0a063af 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -278,12 +278,14 @@ int vgic_v2_map_resources(struct kvm *kvm)
+ 		goto out;
+ 	}
  
+-	ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
+-				    kvm_vgic_global_state.vcpu_base,
+-				    KVM_VGIC_V2_CPU_SIZE, true);
+-	if (ret) {
+-		kvm_err("Unable to remap VGIC CPU to VCPU\n");
+-		goto out;
++	if (!static_branch_unlikely(&vgic_v2_cpuif_trap)) {
++		ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
++					    kvm_vgic_global_state.vcpu_base,
++					    KVM_VGIC_V2_CPU_SIZE, true);
++		if (ret) {
++			kvm_err("Unable to remap VGIC CPU to VCPU\n");
++			goto out;
++		}
+ 	}
+ 
+ 	dist->ready = true;
+@@ -312,45 +314,51 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+ 		return -ENXIO;
+ 	}
+ 
+-	if (!PAGE_ALIGNED(info->vcpu.start)) {
+-		kvm_err("GICV physical address 0x%llx not page aligned\n",
+-			(unsigned long long)info->vcpu.start);
+-		return -ENXIO;
+-	}
++	if (!PAGE_ALIGNED(info->vcpu.start) ||
++	    !PAGE_ALIGNED(resource_size(&info->vcpu))) {
++		kvm_info("GICV region size/alignment is unsafe, using trapping (reduced performance)\n");
++		kvm_vgic_global_state.vcpu_base_va = ioremap(info->vcpu.start,
++							     resource_size(&info->vcpu));
++		if (!kvm_vgic_global_state.vcpu_base_va) {
++			kvm_err("Cannot ioremap GICV\n");
++			return -ENOMEM;
++		}
+ 
+-	if (!PAGE_ALIGNED(resource_size(&info->vcpu))) {
+-		kvm_err("GICV size 0x%llx not a multiple of page size 0x%lx\n",
+-			(unsigned long long)resource_size(&info->vcpu),
+-			PAGE_SIZE);
+-		return -ENXIO;
++		ret = create_hyp_io_mappings(kvm_vgic_global_state.vcpu_base_va,
++					     kvm_vgic_global_state.vcpu_base_va + resource_size(&info->vcpu),
++					     info->vcpu.start);
++		if (ret) {
++			kvm_err("Cannot map GICV into hyp\n");
++			goto out;
++		}
++
++		static_branch_enable(&vgic_v2_cpuif_trap);
+ 	}
+ 
+ 	kvm_vgic_global_state.vctrl_base = ioremap(info->vctrl.start,
+ 						   resource_size(&info->vctrl));
+ 	if (!kvm_vgic_global_state.vctrl_base) {
+ 		kvm_err("Cannot ioremap GICH\n");
+-		return -ENOMEM;
++		ret = -ENOMEM;
++		goto out;
+ 	}
+ 
+ 	vtr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VTR);
+ 	kvm_vgic_global_state.nr_lr = (vtr & 0x3f) + 1;
+ 
+-	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
+-	if (ret) {
+-		kvm_err("Cannot register GICv2 KVM device\n");
+-		iounmap(kvm_vgic_global_state.vctrl_base);
+-		return ret;
+-	}
+-
+ 	ret = create_hyp_io_mappings(kvm_vgic_global_state.vctrl_base,
+ 				     kvm_vgic_global_state.vctrl_base +
+ 					 resource_size(&info->vctrl),
+ 				     info->vctrl.start);
+ 	if (ret) {
+ 		kvm_err("Cannot map VCTRL into hyp\n");
+-		kvm_unregister_device_ops(KVM_DEV_TYPE_ARM_VGIC_V2);
+-		iounmap(kvm_vgic_global_state.vctrl_base);
+-		return ret;
++		goto out;
++	}
++
++	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
++	if (ret) {
++		kvm_err("Cannot register GICv2 KVM device\n");
++		goto out;
+ 	}
+ 
+ 	kvm_vgic_global_state.can_emulate_gicv2 = true;
+@@ -361,4 +369,11 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+ 	kvm_info("vgic-v2@%llx\n", info->vctrl.start);
+ 
+ 	return 0;
++out:
++	if (kvm_vgic_global_state.vctrl_base)
++		iounmap(kvm_vgic_global_state.vctrl_base);
++	if (kvm_vgic_global_state.vcpu_base_va)
++		iounmap(kvm_vgic_global_state.vcpu_base_va);
++
++	return ret;
+ }
 -- 
 2.9.0
