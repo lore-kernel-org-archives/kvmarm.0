@@ -1,24 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 06/50] arm/kvm: excise redundant cache maintenance
-Date: Tue, 27 Sep 2016 20:05:14 +0200
-Message-ID: <20160927180558.14699-7-christoffer.dall@linaro.org>
+Subject: [PULL 03/50] KVM: arm/arm64: Rename vgic_attr_regs_access to
+ vgic_attr_regs_access_v2
+Date: Tue, 27 Sep 2016 20:05:11 +0200
+Message-ID: <20160927180558.14699-4-christoffer.dall@linaro.org>
 References: <20160927180558.14699-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E9A2149B40
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C90CA49B43
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4x2vunlAQQIm for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2016 13:56:30 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9EAA641390
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:29 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id l132so26931399wmf.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:05:53 -0700 (PDT)
+ with ESMTP id E2fyAJntPP8K for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2016 13:56:26 -0400 (EDT)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E11A4998D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:26 -0400 (EDT)
+Received: by mail-wm0-f50.google.com with SMTP id b130so27048053wmc.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:05:49 -0700 (PDT)
 In-Reply-To: <20160927180558.14699-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,105 +31,87 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Mark Rutland <mark.rutland@arm.com>
+Just a rename so we can implement a v3-specific function later.
 
-When modifying Stage-2 page tables, we perform cache maintenance to
-account for non-coherent page table walks. However, this is unnecessary,
-as page table walks are guaranteed to be coherent in the presence of the
-virtualization extensions.
+We take the chance to get rid of the V2/V3 ops comments as well.
 
-Per ARM DDI 0406C.c, section B1.7 ("The Virtualization Extensions"), the
-virtualization extensions mandate the multiprocessing extensions.
+No functional change.
 
-Per ARM DDI 0406C.c, section B3.10.1 ("General TLB maintenance
-requirements"), as described in the sub-section titled "TLB maintenance
-operations and the memory order model", this maintenance is not required
-in the presence of the multiprocessing extensions.
-
-Hence, we need not perform this cache maintenance when modifying Stage-2
-entries.
-
-This patch removes the logic for performing the redundant maintenance.
-To ensure visibility and ordering of updates, a dsb(ishst) that was
-otherwise implicit in the maintenance is folded into kvm_set_pmd() and
-kvm_set_pte().
-
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- arch/arm/include/asm/kvm_mmu.h | 28 ++--------------------------
- arch/arm/kvm/mmu.c             |  2 --
- 2 files changed, 2 insertions(+), 28 deletions(-)
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 3bb803d..74a44727 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -63,37 +63,13 @@ void kvm_clear_hyp_idmap(void);
- static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 19fa331..163b057 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -294,17 +294,17 @@ static bool lock_all_vcpus(struct kvm *kvm)
+ 	return true;
+ }
+ 
+-/** vgic_attr_regs_access: allows user space to read/write VGIC registers
+- *
+- * @dev: kvm device handle
+- * @attr: kvm device attribute
+- * @reg: address the value is read or written
+- * @is_write: write flag
++/**
++ * vgic_attr_regs_access_v2 - allows user space to access VGIC v2 state
+  *
++ * @dev:      kvm device handle
++ * @attr:     kvm device attribute
++ * @reg:      address the value is read or written
++ * @is_write: true if userspace is writing a register
+  */
+-static int vgic_attr_regs_access(struct kvm_device *dev,
+-				 struct kvm_device_attr *attr,
+-				 u32 *reg, bool is_write)
++static int vgic_attr_regs_access_v2(struct kvm_device *dev,
++				    struct kvm_device_attr *attr,
++				    u32 *reg, bool is_write)
  {
- 	*pmd = new_pmd;
--	flush_pmd_entry(pmd);
-+	dsb(ishst);
+ 	struct vgic_reg_attr reg_attr;
+ 	gpa_t addr;
+@@ -347,8 +347,6 @@ out:
+ 	return ret;
  }
  
- static inline void kvm_set_pte(pte_t *pte, pte_t new_pte)
+-/* V2 ops */
+-
+ static int vgic_v2_set_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
  {
- 	*pte = new_pte;
--	/*
--	 * flush_pmd_entry just takes a void pointer and cleans the necessary
--	 * cache entries, so we can reuse the function for ptes.
--	 */
--	flush_pmd_entry(pte);
--}
--
--static inline void kvm_clean_pgd(pgd_t *pgd)
--{
--	clean_dcache_area(pgd, PTRS_PER_S2_PGD * sizeof(pgd_t));
--}
--
--static inline void kvm_clean_pmd(pmd_t *pmd)
--{
--	clean_dcache_area(pmd, PTRS_PER_PMD * sizeof(pmd_t));
--}
--
--static inline void kvm_clean_pmd_entry(pmd_t *pmd)
--{
--	clean_pmd_entry(pmd);
--}
--
--static inline void kvm_clean_pte(pte_t *pte)
--{
--	clean_pte_table(pte);
-+	dsb(ishst);
- }
+@@ -367,7 +365,7 @@ static int vgic_v2_set_attr(struct kvm_device *dev,
+ 		if (get_user(reg, uaddr))
+ 			return -EFAULT;
  
- static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 29d0b23..344755d 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -744,7 +744,6 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
- 	if (!pgd)
- 		return -ENOMEM;
- 
--	kvm_clean_pgd(pgd);
- 	kvm->arch.pgd = pgd;
- 	return 0;
- }
-@@ -936,7 +935,6 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
- 		if (!cache)
- 			return 0; /* ignore calls from kvm_set_spte_hva */
- 		pte = mmu_memory_cache_alloc(cache);
--		kvm_clean_pte(pte);
- 		pmd_populate_kernel(NULL, pmd, pte);
- 		get_page(virt_to_page(pmd));
+-		return vgic_attr_regs_access(dev, attr, &reg, true);
++		return vgic_attr_regs_access_v2(dev, attr, &reg, true);
  	}
+ 	}
+ 
+@@ -389,7 +387,7 @@ static int vgic_v2_get_attr(struct kvm_device *dev,
+ 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+ 		u32 reg = 0;
+ 
+-		ret = vgic_attr_regs_access(dev, attr, &reg, false);
++		ret = vgic_attr_regs_access_v2(dev, attr, &reg, false);
+ 		if (ret)
+ 			return ret;
+ 		return put_user(reg, uaddr);
+@@ -433,8 +431,6 @@ struct kvm_device_ops kvm_arm_vgic_v2_ops = {
+ 	.has_attr = vgic_v2_has_attr,
+ };
+ 
+-/* V3 ops */
+-
+ #ifdef CONFIG_KVM_ARM_VGIC_V3
+ 
+ static int vgic_v3_set_attr(struct kvm_device *dev,
 -- 
 2.9.0
