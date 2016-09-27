@@ -1,25 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 14/50] arm64: KVM: vgic-v2: Add the GICV emulation
- infrastructure
-Date: Tue, 27 Sep 2016 20:05:22 +0200
-Message-ID: <20160927180558.14699-15-christoffer.dall@linaro.org>
+Subject: [PULL 12/50] arm: KVM: Use common AArch32 conditional execution code
+Date: Tue, 27 Sep 2016 20:05:20 +0200
+Message-ID: <20160927180558.14699-13-christoffer.dall@linaro.org>
 References: <20160927180558.14699-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8688449B72
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 554C64998D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IXw0XJYSx26I for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2016 13:56:42 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 25CED49B62
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:37 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id l132so26937817wmf.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:06:00 -0700 (PDT)
+ with ESMTP id o27civznG4it for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2016 13:56:39 -0400 (EDT)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4D56B49B82
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:35 -0400 (EDT)
+Received: by mail-wm0-f48.google.com with SMTP id b130so27055453wmc.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:05:58 -0700 (PDT)
 In-Reply-To: <20160927180558.14699-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,152 +35,233 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-In order to efficiently perform the GICV access on behalf of the
-guest, we need to be able to avoid going back all the way to
-the host kernel.
-
-For this, we introduce a new hook in the world switch code,
-conveniently placed just after populating the fault info.
-At that point, we only have saved/restored the GP registers,
-and we can quickly perform all the required checks (data abort,
-translation fault, valid faulting syndrome, not an external
-abort, not a PTW).
-
-Coming back from the emulation code, we need to skip the emulated
-instruction. This involves an additional bit of save/restore in
-order to be able to access the guest's PC (and possibly CPSR if
-this is a 32bit guest).
-
-At this stage, no emulation code is provided.
+Add the bit of glue and const-ification that is required to use
+the code inherited from the arm64 port, and move over to it.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h |  1 +
- arch/arm64/kvm/hyp/switch.c      | 32 ++++++++++++++++++++++++++++++++
- include/kvm/arm_vgic.h           |  3 +++
- virt/kvm/arm/hyp/vgic-v2-sr.c    |  7 +++++++
- virt/kvm/arm/vgic/vgic-v2.c      |  2 ++
- 5 files changed, 45 insertions(+)
+ arch/arm/include/asm/kvm_emulate.h | 34 ++++++++++---
+ arch/arm/kvm/Makefile              |  1 +
+ arch/arm/kvm/emulate.c             | 97 --------------------------------------
+ virt/kvm/arm/aarch32.c             |  5 ++
+ 4 files changed, 33 insertions(+), 104 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index cff5105..88ec3ac 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -123,6 +123,7 @@ typeof(orig) * __hyp_text fname(void)					\
- 
- void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
- void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
-+bool __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
- 
- void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
- void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 35d2e09..b3a66c5 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -17,6 +17,7 @@
- 
- #include <linux/types.h>
- #include <asm/kvm_asm.h>
-+#include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- 
- static bool __hyp_text __fpsimd_enabled_nvhe(void)
-@@ -232,6 +233,21 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
- 	return true;
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index ee5328f..448d63c 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -40,18 +40,28 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+ 	*vcpu_reg(vcpu, reg_num) = val;
  }
  
-+static void __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+-bool kvm_condition_valid(struct kvm_vcpu *vcpu);
+-void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr);
++bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
++void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr);
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+ 
++static inline bool kvm_condition_valid(const struct kvm_vcpu *vcpu)
 +{
-+	*vcpu_pc(vcpu) = read_sysreg_el2(elr);
-+
-+	if (vcpu_mode_is_32bit(vcpu)) {
-+		vcpu->arch.ctxt.gp_regs.regs.pstate = read_sysreg_el2(spsr);
-+		kvm_skip_instr32(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+		write_sysreg_el2(vcpu->arch.ctxt.gp_regs.regs.pstate, spsr);
-+	} else {
-+		*vcpu_pc(vcpu) += 4;
-+	}
-+
-+	write_sysreg_el2(*vcpu_pc(vcpu), elr);
++	return kvm_condition_valid32(vcpu);
 +}
 +
- int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
++static inline void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr)
++{
++	kvm_skip_instr32(vcpu, is_wide_instr);
++}
++
+ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_cpu_context *host_ctxt;
-@@ -270,6 +286,22 @@ again:
- 	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
- 		goto again;
- 
-+	if (static_branch_unlikely(&vgic_v2_cpuif_trap) &&
-+	    exit_code == ARM_EXCEPTION_TRAP) {
-+		bool valid;
-+
-+		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
-+			kvm_vcpu_trap_get_fault_type(vcpu) == FSC_FAULT &&
-+			kvm_vcpu_dabt_isvalid(vcpu) &&
-+			!kvm_vcpu_dabt_isextabt(vcpu) &&
-+			!kvm_vcpu_dabt_iss1tw(vcpu);
-+
-+		if (valid && __vgic_v2_perform_cpuif_access(vcpu)) {
-+			__skip_instr(vcpu);
-+			goto again;
-+		}
-+	}
-+
- 	fp_enabled = __fpsimd_enabled();
- 
- 	__sysreg_save_guest_state(guest_ctxt);
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 19b698e..8eb1501 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -20,6 +20,7 @@
- #include <linux/kvm.h>
- #include <linux/irqreturn.h>
- #include <linux/spinlock.h>
-+#include <linux/static_key.h>
- #include <linux/types.h>
- #include <kvm/iodev.h>
- #include <linux/list.h>
-@@ -265,6 +266,8 @@ struct vgic_cpu {
- 	bool lpis_enabled;
- };
- 
-+extern struct static_key_false vgic_v2_cpuif_trap;
-+
- int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
- void kvm_vgic_early_init(struct kvm *kvm);
- int kvm_vgic_create(struct kvm *kvm, u32 type);
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-index 7cffd93..3e2a62e 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-@@ -167,3 +167,10 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
- 	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
- 	vcpu->arch.vgic_cpu.live_lrs = live_lrs;
+ 	vcpu->arch.hcr = HCR_GUEST_MASK;
  }
-+
-+#ifdef CONFIG_ARM64
-+bool __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 
+-static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
++static inline unsigned long vcpu_get_hcr(const struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.hcr;
+ }
+@@ -61,7 +71,7 @@ static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
+ 	vcpu->arch.hcr = hcr;
+ }
+ 
+-static inline bool vcpu_mode_is_32bit(struct kvm_vcpu *vcpu)
++static inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
+ {
+ 	return 1;
+ }
+@@ -71,9 +81,9 @@ static inline unsigned long *vcpu_pc(struct kvm_vcpu *vcpu)
+ 	return &vcpu->arch.ctxt.gp_regs.usr_regs.ARM_pc;
+ }
+ 
+-static inline unsigned long *vcpu_cpsr(struct kvm_vcpu *vcpu)
++static inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
+ {
+-	return &vcpu->arch.ctxt.gp_regs.usr_regs.ARM_cpsr;
++	return (unsigned long *)&vcpu->arch.ctxt.gp_regs.usr_regs.ARM_cpsr;
+ }
+ 
+ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
+@@ -93,11 +103,21 @@ static inline bool vcpu_mode_priv(struct kvm_vcpu *vcpu)
+ 	return cpsr_mode > USR_MODE;;
+ }
+ 
+-static inline u32 kvm_vcpu_get_hsr(struct kvm_vcpu *vcpu)
++static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.fault.hsr;
+ }
+ 
++static inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
 +{
-+		return false;
++	u32 hsr = kvm_vcpu_get_hsr(vcpu);
++
++	if (hsr & HSR_CV)
++		return (hsr & HSR_COND) >> HSR_COND_SHIFT;
++
++	return -1;
 +}
-+#endif
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index 0bf6709..b8da901 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -294,6 +294,8 @@ out:
- 	return ret;
++
+ static inline unsigned long kvm_vcpu_get_hfar(struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.fault.hxfar;
+diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+index 10d77a6..339ec88 100644
+--- a/arch/arm/kvm/Makefile
++++ b/arch/arm/kvm/Makefile
+@@ -21,6 +21,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+ obj-y += kvm-arm.o init.o interrupts.o
+ obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
+ obj-y += coproc.o coproc_a15.o coproc_a7.o mmio.o psci.o perf.o
++obj-y += $(KVM)/arm/aarch32.o
+ 
+ obj-y += $(KVM)/arm/vgic/vgic.o
+ obj-y += $(KVM)/arm/vgic/vgic-init.o
+diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
+index eda9ddd..ff9acd1 100644
+--- a/arch/arm/kvm/emulate.c
++++ b/arch/arm/kvm/emulate.c
+@@ -161,103 +161,6 @@ unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu)
+ 	}
  }
  
-+DEFINE_STATIC_KEY_FALSE(vgic_v2_cpuif_trap);
+-/*
+- * A conditional instruction is allowed to trap, even though it
+- * wouldn't be executed.  So let's re-implement the hardware, in
+- * software!
+- */
+-bool kvm_condition_valid(struct kvm_vcpu *vcpu)
+-{
+-	unsigned long cpsr, cond, insn;
+-
+-	/*
+-	 * Exception Code 0 can only happen if we set HCR.TGE to 1, to
+-	 * catch undefined instructions, and then we won't get past
+-	 * the arm_exit_handlers test anyway.
+-	 */
+-	BUG_ON(!kvm_vcpu_trap_get_class(vcpu));
+-
+-	/* Top two bits non-zero?  Unconditional. */
+-	if (kvm_vcpu_get_hsr(vcpu) >> 30)
+-		return true;
+-
+-	cpsr = *vcpu_cpsr(vcpu);
+-
+-	/* Is condition field valid? */
+-	if ((kvm_vcpu_get_hsr(vcpu) & HSR_CV) >> HSR_CV_SHIFT)
+-		cond = (kvm_vcpu_get_hsr(vcpu) & HSR_COND) >> HSR_COND_SHIFT;
+-	else {
+-		/* This can happen in Thumb mode: examine IT state. */
+-		unsigned long it;
+-
+-		it = ((cpsr >> 8) & 0xFC) | ((cpsr >> 25) & 0x3);
+-
+-		/* it == 0 => unconditional. */
+-		if (it == 0)
+-			return true;
+-
+-		/* The cond for this insn works out as the top 4 bits. */
+-		cond = (it >> 4);
+-	}
+-
+-	/* Shift makes it look like an ARM-mode instruction */
+-	insn = cond << 28;
+-	return arm_check_condition(insn, cpsr) != ARM_OPCODE_CONDTEST_FAIL;
+-}
+-
+-/**
+- * adjust_itstate - adjust ITSTATE when emulating instructions in IT-block
+- * @vcpu:	The VCPU pointer
+- *
+- * When exceptions occur while instructions are executed in Thumb IF-THEN
+- * blocks, the ITSTATE field of the CPSR is not advanced (updated), so we have
+- * to do this little bit of work manually. The fields map like this:
+- *
+- * IT[7:0] -> CPSR[26:25],CPSR[15:10]
+- */
+-static void kvm_adjust_itstate(struct kvm_vcpu *vcpu)
+-{
+-	unsigned long itbits, cond;
+-	unsigned long cpsr = *vcpu_cpsr(vcpu);
+-	bool is_arm = !(cpsr & PSR_T_BIT);
+-
+-	if (is_arm || !(cpsr & PSR_IT_MASK))
+-		return;
+-
+-	cond = (cpsr & 0xe000) >> 13;
+-	itbits = (cpsr & 0x1c00) >> (10 - 2);
+-	itbits |= (cpsr & (0x3 << 25)) >> 25;
+-
+-	/* Perform ITAdvance (see page A-52 in ARM DDI 0406C) */
+-	if ((itbits & 0x7) == 0)
+-		itbits = cond = 0;
+-	else
+-		itbits = (itbits << 1) & 0x1f;
+-
+-	cpsr &= ~PSR_IT_MASK;
+-	cpsr |= cond << 13;
+-	cpsr |= (itbits & 0x1c) << (10 - 2);
+-	cpsr |= (itbits & 0x3) << 25;
+-	*vcpu_cpsr(vcpu) = cpsr;
+-}
+-
+-/**
+- * kvm_skip_instr - skip a trapped instruction and proceed to the next
+- * @vcpu: The vcpu pointer
+- */
+-void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr)
+-{
+-	bool is_thumb;
+-
+-	is_thumb = !!(*vcpu_cpsr(vcpu) & PSR_T_BIT);
+-	if (is_thumb && !is_wide_instr)
+-		*vcpu_pc(vcpu) += 2;
+-	else
+-		*vcpu_pc(vcpu) += 4;
+-	kvm_adjust_itstate(vcpu);
+-}
+-
+-
+ /******************************************************************************
+  * Inject exceptions into the guest
+  */
+diff --git a/virt/kvm/arm/aarch32.c b/virt/kvm/arm/aarch32.c
+index cb02e56..ba4417b 100644
+--- a/virt/kvm/arm/aarch32.c
++++ b/virt/kvm/arm/aarch32.c
+@@ -24,6 +24,11 @@
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_emulate.h>
+ 
++#ifndef CONFIG_ARM64
++#define COMPAT_PSR_T_BIT	PSR_T_BIT
++#define COMPAT_PSR_IT_MASK	PSR_IT_MASK
++#endif
 +
- /**
-  * vgic_v2_probe - probe for a GICv2 compatible interrupt controller in DT
-  * @node:	pointer to the DT node
+ /*
+  * stolen from arch/arm/kernel/opcodes.c
+  *
 -- 
 2.9.0
