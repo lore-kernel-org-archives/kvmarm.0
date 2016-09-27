@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 03/50] KVM: arm/arm64: Rename vgic_attr_regs_access to
- vgic_attr_regs_access_v2
-Date: Tue, 27 Sep 2016 20:05:11 +0200
-Message-ID: <20160927180558.14699-4-christoffer.dall@linaro.org>
+Subject: [PULL 20/50] arm64: KVM: Add exception code to report EL1
+ asynchronous aborts
+Date: Tue, 27 Sep 2016 20:05:28 +0200
+Message-ID: <20160927180558.14699-21-christoffer.dall@linaro.org>
 References: <20160927180558.14699-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C90CA49B43
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 33B1D49B77
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E2fyAJntPP8K for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2016 13:56:26 -0400 (EDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E11A4998D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:26 -0400 (EDT)
-Received: by mail-wm0-f50.google.com with SMTP id b130so27048053wmc.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:05:49 -0700 (PDT)
+ with ESMTP id unAvJF6znhvG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2016 13:56:46 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0006149B3F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:42 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id l132so190642106wmf.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:06:06 -0700 (PDT)
 In-Reply-To: <20160927180558.14699-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,84 +34,33 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Just a rename so we can implement a v3-specific function later.
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-We take the chance to get rid of the V2/V3 ops comments as well.
+So far, we don't have a code to indicate that we've taken an
+asynchronous abort from EL1. Let's add one.
 
-No functional change.
-
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- virt/kvm/arm/vgic/vgic-kvm-device.c | 26 +++++++++++---------------
- 1 file changed, 11 insertions(+), 15 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 19fa331..163b057 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -294,17 +294,17 @@ static bool lock_all_vcpus(struct kvm *kvm)
- 	return true;
- }
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 7561f63..d177e7e 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -21,9 +21,10 @@
+ #include <asm/virt.h>
  
--/** vgic_attr_regs_access: allows user space to read/write VGIC registers
-- *
-- * @dev: kvm device handle
-- * @attr: kvm device attribute
-- * @reg: address the value is read or written
-- * @is_write: write flag
-+/**
-+ * vgic_attr_regs_access_v2 - allows user space to access VGIC v2 state
-  *
-+ * @dev:      kvm device handle
-+ * @attr:     kvm device attribute
-+ * @reg:      address the value is read or written
-+ * @is_write: true if userspace is writing a register
-  */
--static int vgic_attr_regs_access(struct kvm_device *dev,
--				 struct kvm_device_attr *attr,
--				 u32 *reg, bool is_write)
-+static int vgic_attr_regs_access_v2(struct kvm_device *dev,
-+				    struct kvm_device_attr *attr,
-+				    u32 *reg, bool is_write)
- {
- 	struct vgic_reg_attr reg_attr;
- 	gpa_t addr;
-@@ -347,8 +347,6 @@ out:
- 	return ret;
- }
+ #define ARM_EXCEPTION_IRQ	  0
+-#define ARM_EXCEPTION_TRAP	  1
++#define ARM_EXCEPTION_EL1_SERROR  1
++#define ARM_EXCEPTION_TRAP	  2
+ /* The hyp-stub will return this for any kvm_call_hyp() call */
+-#define ARM_EXCEPTION_HYP_GONE	  2
++#define ARM_EXCEPTION_HYP_GONE	  3
  
--/* V2 ops */
--
- static int vgic_v2_set_attr(struct kvm_device *dev,
- 			    struct kvm_device_attr *attr)
- {
-@@ -367,7 +365,7 @@ static int vgic_v2_set_attr(struct kvm_device *dev,
- 		if (get_user(reg, uaddr))
- 			return -EFAULT;
- 
--		return vgic_attr_regs_access(dev, attr, &reg, true);
-+		return vgic_attr_regs_access_v2(dev, attr, &reg, true);
- 	}
- 	}
- 
-@@ -389,7 +387,7 @@ static int vgic_v2_get_attr(struct kvm_device *dev,
- 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
- 		u32 reg = 0;
- 
--		ret = vgic_attr_regs_access(dev, attr, &reg, false);
-+		ret = vgic_attr_regs_access_v2(dev, attr, &reg, false);
- 		if (ret)
- 			return ret;
- 		return put_user(reg, uaddr);
-@@ -433,8 +431,6 @@ struct kvm_device_ops kvm_arm_vgic_v2_ops = {
- 	.has_attr = vgic_v2_has_attr,
- };
- 
--/* V3 ops */
--
- #ifdef CONFIG_KVM_ARM_VGIC_V3
- 
- static int vgic_v3_set_attr(struct kvm_device *dev,
+ #define KVM_ARM64_DEBUG_DIRTY_SHIFT	0
+ #define KVM_ARM64_DEBUG_DIRTY		(1 << KVM_ARM64_DEBUG_DIRTY_SHIFT)
 -- 
 2.9.0
