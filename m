@@ -1,24 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 32/50] arm: KVM: Drop unreachable HYP abort handlers
-Date: Tue, 27 Sep 2016 20:05:40 +0200
-Message-ID: <20160927180558.14699-33-christoffer.dall@linaro.org>
+Subject: [PULL 43/50] ARM: Introduce MPIDR_LEVEL_SHIFT macro
+Date: Tue, 27 Sep 2016 20:05:51 +0200
+Message-ID: <20160927180558.14699-44-christoffer.dall@linaro.org>
 References: <20160927180558.14699-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0929149BA9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8205549BC7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:57:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dcEfAKAFnKex for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2016 13:56:57 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0777D49B75
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:56:55 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id d66so30466159wmf.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:06:18 -0700 (PDT)
+ with ESMTP id pFiLC1KKcBkW for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2016 13:57:10 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F10E749BD1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 13:57:06 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id b130so27083978wmc.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2016 11:06:30 -0700 (PDT)
 In-Reply-To: <20160927180558.14699-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,75 +30,34 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Russell King <rmk+kernel@armlinux.org.uk>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Vladimir Murzin <vladimir.murzin@arm.com>
 
-Both data and prefetch aborts occuring in HYP lead to a well
-deserved panic. Let's get rid of these silly handlers.
+vgic-v3 driver uses architecture specific MPIDR_LEVEL_SHIFT macro to
+encode the affinity in a form compatible with ICC_SGI* registers.
+Unfortunately, that macro is missing on ARM, so let's add it.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Russell King <rmk+kernel@armlinux.org.uk>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/kvm/handle_exit.c | 27 ---------------------------
- 1 file changed, 27 deletions(-)
+ arch/arm/include/asm/cputype.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
-index 4eacb5c..4e40d19 100644
---- a/arch/arm/kvm/handle_exit.c
-+++ b/arch/arm/kvm/handle_exit.c
-@@ -28,14 +28,6 @@
+diff --git a/arch/arm/include/asm/cputype.h b/arch/arm/include/asm/cputype.h
+index 1ee94c7..e2d94c1 100644
+--- a/arch/arm/include/asm/cputype.h
++++ b/arch/arm/include/asm/cputype.h
+@@ -55,6 +55,7 @@
  
- typedef int (*exit_handle_fn)(struct kvm_vcpu *, struct kvm_run *);
+ #define MPIDR_LEVEL_BITS 8
+ #define MPIDR_LEVEL_MASK ((1 << MPIDR_LEVEL_BITS) - 1)
++#define MPIDR_LEVEL_SHIFT(level) (MPIDR_LEVEL_BITS * level)
  
--static int handle_svc_hyp(struct kvm_vcpu *vcpu, struct kvm_run *run)
--{
--	/* SVC called from Hyp mode should never get here */
--	kvm_debug("SVC called from Hyp mode shouldn't go here\n");
--	BUG();
--	return -EINVAL; /* Squash warning */
--}
--
- static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	int ret;
-@@ -59,22 +51,6 @@ static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	return 1;
- }
- 
--static int handle_pabt_hyp(struct kvm_vcpu *vcpu, struct kvm_run *run)
--{
--	/* The hypervisor should never cause aborts */
--	kvm_err("Prefetch Abort taken from Hyp mode at %#08lx (HSR: %#08x)\n",
--		kvm_vcpu_get_hfar(vcpu), kvm_vcpu_get_hsr(vcpu));
--	return -EFAULT;
--}
--
--static int handle_dabt_hyp(struct kvm_vcpu *vcpu, struct kvm_run *run)
--{
--	/* This is either an error in the ws. code or an external abort */
--	kvm_err("Data Abort taken from Hyp mode at %#08lx (HSR: %#08x)\n",
--		kvm_vcpu_get_hfar(vcpu), kvm_vcpu_get_hsr(vcpu));
--	return -EFAULT;
--}
--
- /**
-  * kvm_handle_wfx - handle a WFI or WFE instructions trapped in guests
-  * @vcpu:	the vcpu pointer
-@@ -112,13 +88,10 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[HSR_EC_CP14_64]	= kvm_handle_cp14_access,
- 	[HSR_EC_CP_0_13]	= kvm_handle_cp_0_13_access,
- 	[HSR_EC_CP10_ID]	= kvm_handle_cp10_id,
--	[HSR_EC_SVC_HYP]	= handle_svc_hyp,
- 	[HSR_EC_HVC]		= handle_hvc,
- 	[HSR_EC_SMC]		= handle_smc,
- 	[HSR_EC_IABT]		= kvm_handle_guest_abort,
--	[HSR_EC_IABT_HYP]	= handle_pabt_hyp,
- 	[HSR_EC_DABT]		= kvm_handle_guest_abort,
--	[HSR_EC_DABT_HYP]	= handle_dabt_hyp,
- };
- 
- static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+ #define MPIDR_AFFINITY_LEVEL(mpidr, level) \
+ 	((mpidr >> (MPIDR_LEVEL_BITS * level)) & MPIDR_LEVEL_MASK)
 -- 
 2.9.0
