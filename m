@@ -1,23 +1,25 @@
-From: Mark Rutland <mark.rutland@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [PATCH] arm64: KVM: Take S1 walks into account when determining
  S2 write faults
-Date: Thu, 29 Sep 2016 18:16:04 +0100
-Message-ID: <20160929171603.GB1742@remoulade>
+Date: Thu, 29 Sep 2016 21:14:32 +0200
+Message-ID: <20160929191432.GA7996@cbox>
 References: <1475149021-13288-1-git-send-email-will.deacon@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EED8410D7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2016 13:06:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 728B84113E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2016 15:04:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6HMTEbIsvJEP for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Sep 2016 13:06:39 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AA3B40C9A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2016 13:06:38 -0400 (EDT)
+ with ESMTP id Er58EglCINNp for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Sep 2016 15:04:46 -0400 (EDT)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53FAF49AF5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2016 15:04:46 -0400 (EDT)
+Received: by mail-wm0-f41.google.com with SMTP id w72so3000869wmf.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2016 12:14:15 -0700 (PDT)
 Content-Disposition: inline
 In-Reply-To: <1475149021-13288-1-git-send-email-will.deacon@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -32,10 +34,6 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Will Deacon <will.deacon@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
-
-[Adding Julien, who seemed to be missing from the real Cc list]
-
-Mark.
 
 On Thu, Sep 29, 2016 at 12:37:01PM +0100, Will Deacon wrote:
 > The WnR bit in the HSR/ESR_EL2 indicates whether a data abort was
@@ -66,44 +64,8 @@ On Thu, Sep 29, 2016 at 12:37:01PM +0100, Will Deacon wrote:
 > Cc: Christoffer Dall <christoffer.dall@linaro.org>
 > Cc: Julien Grall <julien.grall@arm.com>
 > Signed-off-by: Will Deacon <will.deacon@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 4cdeae3b17c6..948a9a8a9297 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -167,11 +167,6 @@ static inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
->  	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_ISV);
->  }
->  
-> -static inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
-> -{
-> -	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WNR);
-> -}
-> -
->  static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
->  {
->  	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SSE);
-> @@ -192,6 +187,12 @@ static inline bool kvm_vcpu_dabt_iss1tw(const struct kvm_vcpu *vcpu)
->  	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_S1PTW);
->  }
->  
-> +static inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
-> +{
-> +	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WNR) ||
-> +		kvm_vcpu_dabt_iss1tw(vcpu); /* AF/DBM update */
-> +}
-> +
->  static inline bool kvm_vcpu_dabt_is_cm(const struct kvm_vcpu *vcpu)
->  {
->  	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_CM);
-> -- 
-> 2.1.4
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+Applied,
+-Christoffer
