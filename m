@@ -1,90 +1,63 @@
-From: Matthias Brugger <mbrugger@suse.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
 Subject: Re: [PATCH 5/7] arm64/kvm: hyp: tlb: use __tlbi() helper
-Date: Wed, 5 Oct 2016 18:41:02 +0200
-Message-ID: <07921948-8692-67c1-8ae9-a68f0cc387c8@suse.com>
+Date: Thu, 06 Oct 2016 10:43:14 +0100
+Message-ID: <87eg3tyfrh.fsf@e105922-lin.cambridge.arm.com>
 References: <1473761769-30572-1-git-send-email-punit.agrawal@arm.com>
  <1473761769-30572-6-git-send-email-punit.agrawal@arm.com>
+ <07921948-8692-67c1-8ae9-a68f0cc387c8@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1473761769-30572-6-git-send-email-punit.agrawal@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Punit Agrawal <punit.agrawal@arm.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B85A49B7F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Oct 2016 05:33:35 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id keMhkErT0f7b for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Oct 2016 05:33:34 -0400 (EDT)
+Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
+ [217.140.96.140])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE54149B76
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Oct 2016 05:33:32 -0400 (EDT)
+In-Reply-To: <07921948-8692-67c1-8ae9-a68f0cc387c8@suse.com> (Matthias
+ Brugger's message of "Wed, 5 Oct 2016 18:41:02 +0200")
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Matthias Brugger <mbrugger@suse.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Matthias Brugger <mbrugger@suse.com> writes:
+
+> On 13/09/16 12:16, Punit Agrawal wrote:
+>> From: Mark Rutland <mark.rutland@arm.com>
+>>
+>> Now that we have a __tlbi() helper, make use of this in the arm64 KVM hyp
+>> code to get rid of asm() boilerplate. At the same time, we simplify
+>> __tlb_flush_vm_context by using __flush_icache_all(), as this has the
+>> appropriate instruction cache maintenance and barrier.
+>>
+>> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> [ rename tlbi -> __tlbi, convert additional sites, update commit log ]
+>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+>> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+>> ---
+>
+> Reviewed-by: Matthias Brugger <mbrugger@suse.com>
+
+Thanks for reviewing the patch. I'll re-spin a new version with the tag
+after the merge window.
+
+Punit
 
 
-On 13/09/16 12:16, Punit Agrawal wrote:
-> From: Mark Rutland <mark.rutland@arm.com>
->
-> Now that we have a __tlbi() helper, make use of this in the arm64 KVM hyp
-> code to get rid of asm() boilerplate. At the same time, we simplify
-> __tlb_flush_vm_context by using __flush_icache_all(), as this has the
-> appropriate instruction cache maintenance and barrier.
->
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> [ rename tlbi -> __tlbi, convert additional sites, update commit log ]
-> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
-
-Reviewed-by: Matthias Brugger <mbrugger@suse.com>
-
->  arch/arm64/kvm/hyp/tlb.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-> index be8177c..4cda100 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/tlb.c
-> @@ -16,6 +16,7 @@
->   */
->
->  #include <asm/kvm_hyp.h>
-> +#include <asm/tlbflush.h>
->
->  static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
->  {
-> @@ -32,7 +33,7 @@ static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
->  	 * whole of Stage-1. Weep...
->  	 */
->  	ipa >>= 12;
-> -	asm volatile("tlbi ipas2e1is, %0" : : "r" (ipa));
-> +	__tlbi(ipas2e1is, ipa);
->
->  	/*
->  	 * We have to ensure completion of the invalidation at Stage-2,
-> @@ -41,7 +42,7 @@ static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
->  	 * the Stage-1 invalidation happened first.
->  	 */
->  	dsb(ish);
-> -	asm volatile("tlbi vmalle1is" : : );
-> +	__tlbi(vmalle1is);
->  	dsb(ish);
->  	isb();
->
-> @@ -60,7 +61,7 @@ static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
->  	write_sysreg(kvm->arch.vttbr, vttbr_el2);
->  	isb();
->
-> -	asm volatile("tlbi vmalls12e1is" : : );
-> +	__tlbi(vmalls12e1is);
->  	dsb(ish);
->  	isb();
->
-> @@ -72,9 +73,8 @@ __alias(__tlb_flush_vmid) void __kvm_tlb_flush_vmid(struct kvm *kvm);
->  static void __hyp_text __tlb_flush_vm_context(void)
->  {
->  	dsb(ishst);
-> -	asm volatile("tlbi alle1is	\n"
-> -		     "ic ialluis	  ": : );
-> -	dsb(ish);
-> +	__tlbi(alle1is);
-> +	__flush_icache_all(); /* contains a dsb(ish) */
->  }
->
->  __alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
->
+[...]
