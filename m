@@ -1,181 +1,57 @@
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH V3 09/10] trace, ras: add ARM processor error trace event
-Date: Fri, 7 Oct 2016 17:39:59 -0400
-Message-ID: <20161007173959.5ff3fcfa@gandalf.local.home>
-References: <1475875882-2604-1-git-send-email-tbaicar@codeaurora.org>
- <1475875882-2604-10-git-send-email-tbaicar@codeaurora.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH] KVM: arm64: Correct trace exception name after SError handling
+Date: Sat,  8 Oct 2016 22:20:11 +0200
+Message-ID: <20161008202011.30835-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1475875882-2604-10-git-send-email-tbaicar@codeaurora.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Tyler Baicar <tbaicar@codeaurora.org>
-Cc: mark.rutland@arm.com, linux-efi@vger.kernel.org, rkrcmar@redhat.com, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, shijie.huang@arm.com, lenb@kernel.org, marc.zyngier@arm.com, tomasz.nowicki@linaro.org, sandeepa.s.prabhu@gmail.com, Dkvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, linux-kernel@vger.kernel.org, james.morse@arm.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, christoffer.dall@linaro.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82FC049B75
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Oct 2016 16:09:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kMBG3vOBQWSq for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  8 Oct 2016 16:09:50 -0400 (EDT)
+Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9C5549B74
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Oct 2016 16:09:49 -0400 (EDT)
+Received: by mail-wm0-f47.google.com with SMTP id k125so86924657wma.1
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 08 Oct 2016 13:19:44 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri,  7 Oct 2016 15:31:21 -0600
-Tyler Baicar <tbaicar@codeaurora.org> wrote:
+After commit 9aecafc8 introduced ARM_EXCEPTION_EL1_SERROR we should
+adjust the description of the exception type for trace events.
 
-> Currently there are trace events for the various RAS
-> errors with the exception of ARM processor type errors.
-> Add a new trace event for such errors so that the user
-> will know when they occur. These trace events are
-> consistent with the ARM processor error section type
-> defined in UEFI 2.6 spec section N.2.4.4.
-> 
-> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
-> ---
->  drivers/firmware/efi/cper.c |  9 ++++++
->  drivers/ras/ras.c           |  1 +
->  include/ras/ras_event.h     | 67 +++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 77 insertions(+)
-> 
-> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
-> index f9ffba6..21b8a6f 100644
-> --- a/drivers/firmware/efi/cper.c
-> +++ b/drivers/firmware/efi/cper.c
-> @@ -34,6 +34,7 @@
->  #include <linux/aer.h>
->  #include <linux/printk.h>
->  #include <linux/bcd.h>
-> +#include <ras/ras_event.h>
->  
->  #define INDENT_SP	" "
->  
-> @@ -256,6 +257,14 @@ static void cper_print_proc_armv8(const char *pfx,
->  		    CPER_ARMV8_INFO_VALID_PHYSICAL_ADDR)
->  			printk("%sphysical fault address: 0x%016llx\n",
->  				newpfx, err_info->physical_fault_addr);
-> +		trace_arm_event(proc->affinity_level, proc->mpidr, proc->midr,
-> +				proc->running_state, proc->psci_state,
-> +				err_info->version, err_info->type,
-> +				err_info->multiple_error,
-> +				err_info->validation_bits,
-> +				err_info->error_info,
-> +				err_info->virt_fault_addr,
-> +				err_info->physical_fault_addr);
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm64/include/asm/kvm_arm.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Why waste all the effort into passing each individual field. Why not
-just pass the structure in and sort it out in the TP_fast_assign()?
-
->  		err_info += 1;
->  	}
->  
-> diff --git a/drivers/ras/ras.c b/drivers/ras/ras.c
-> index fb2500b..8ba5a94 100644
-> --- a/drivers/ras/ras.c
-> +++ b/drivers/ras/ras.c
-> @@ -28,3 +28,4 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(extlog_mem_event);
->  #endif
->  EXPORT_TRACEPOINT_SYMBOL_GPL(mc_event);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(unknown_sec_event);
-> +EXPORT_TRACEPOINT_SYMBOL_GPL(arm_event);
-> diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
-> index 5861b6f..eb2719a 100644
-> --- a/include/ras/ras_event.h
-> +++ b/include/ras/ras_event.h
-> @@ -162,6 +162,73 @@ TRACE_EVENT(mc_event,
->  );
->  
->  /*
-> + * ARM Processor Events Report
-> + *
-> + * This event is generated when hardware detects an ARM processor error
-> + * has occurred. UEFI 2.6 spec section N.2.4.4.
-> + */
-> +TRACE_EVENT(arm_event,
-> +
-> +	TP_PROTO(const u8 affinity,
-> +		 const u64 mpidr,
-> +		 const u64 midr,
-> +		 const u32 running_state,
-> +		 const u32 psci_state,
-> +		 const u8 version,
-> +		 const u8 type,
-> +		 const u16 err_count,
-> +		 const u8 flags,
-> +		 const u64 info,
-> +		 const u64 virt_fault_addr,
-> +		 const u64 phys_fault_addr),
-> +
-> +	TP_ARGS(affinity, mpidr, midr, running_state, psci_state,
-> +		version, type, err_count, flags, info, virt_fault_addr,
-> +		phys_fault_addr),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(u8, affinity)
-> +		__field(u64, mpidr)
-> +		__field(u64, midr)
-> +		__field(u32, running_state)
-> +		__field(u32, psci_state)
-> +		__field(u8, version)
-> +		__field(u8, type)
-> +		__field(u16, err_count)
-> +		__field(u8, flags)
-> +		__field(u64, info)
-> +		__field(u64, virt_fault_addr)
-> +		__field(u64, phys_fault_addr)
-
-The above creates a structure with lots of holes in it. Pack it better.
-You want something like:
-
-	__field(u64, mpidr)
-	__field(u64, midr)
-	__field(u64, info)
-	__field(u64, virt_fault_addr)
-	__field(u64, phys_fault_addr)
-	__field(u32, running_state)
-	__field(u32, psci_state)
-	__field(u16, err_count)
-	__field(u8, affinity)
-	__field(u8, version)
-	__field(u8, type)
-	__field(u8, flags)
-
-The above is a total of 54 bytes. Your original was at a minimum, 64
-bytes.
-
--- Steve
-
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->affinity = affinity;
-> +		__entry->mpidr = mpidr;
-> +		__entry->midr = midr;
-> +		__entry->running_state = running_state;
-> +		__entry->psci_state = psci_state;
-> +		__entry->version = version;
-> +		__entry->type = type;
-> +		__entry->err_count = err_count;
-> +		__entry->flags = flags;
-> +		__entry->info = info;
-> +		__entry->virt_fault_addr = virt_fault_addr;
-> +		__entry->phys_fault_addr = phys_fault_addr;
-> +	),
-> +
-> +	TP_printk("affinity level: %d; MPIDR: %016llx; MIDR: %016llx; "
-> +		  "running state: %d; PSCI state: %d; version: %d; type: %d; "
-> +		  "error count: 0x%04x; flags: 0x%02x; info: %016llx; "
-> +		  "virtual fault address: %016llx; "
-> +		  "physical fault address: %016llx",
-> +		  __entry->affinity, __entry->mpidr, __entry->midr,
-> +		  __entry->running_state, __entry->psci_state, __entry->version,
-> +		  __entry->type, __entry->err_count, __entry->flags,
-> +		  __entry->info, __entry->virt_fault_addr,
-> +		  __entry->phys_fault_addr)
-> +);
-> +
-> +/*
->   * Unknown Section Report
->   *
->   * This event is generated when hardware detected a hardware
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 4b5c977..b942ce4 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -207,7 +207,8 @@
+ 
+ #define kvm_arm_exception_type	\
+ 	{0, "IRQ" }, 		\
+-	{1, "TRAP" }
++	{1, "SError" }, 	\
++	{2, "TRAP" }
+ 
+ #define ECN(x) { ESR_ELx_EC_##x, #x }
+ 
+-- 
+2.9.0
