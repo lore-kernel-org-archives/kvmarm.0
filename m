@@ -1,28 +1,26 @@
-From: Eugene Bagdasaryan <eb693@cornell.edu>
-Subject: Re: development guide for installing KVMARM kernel
-Date: Wed, 12 Oct 2016 06:45:14 +0000
-Message-ID: <934F2AEF-A7A2-49DE-BDC5-3A90F3D81EC0@cornell.edu>
-References: <CY1PR0401MB1629013D592E886EF2332C80EEC50@CY1PR0401MB1629.namprd04.prod.outlook.com>
- <8a3d33a861d6dc90ef2da82ad3f1950c@www.loen.fr>
- <CY1PR0401MB16290C3826BFA5ED46E3F81BEEC70@CY1PR0401MB1629.namprd04.prod.outlook.com>
- <bd6adc0e4698903a5bc986e88f4ab9dd@www.loen.fr>
- <77b4ee22-a823-07e1-e4f8-9677efb839f9@suse.de>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [PATCH V3 01/10] acpi: apei: read ack upon ghes record consumption
+Date: Wed, 12 Oct 2016 16:39:25 +0100
+Message-ID: <8760oxtw42.fsf@e105922-lin.cambridge.arm.com>
+References: <1475875882-2604-1-git-send-email-tbaicar@codeaurora.org>
+ <1475875882-2604-2-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============6433680799392985741=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB5154113E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Oct 2016 02:35:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BB22412A2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Oct 2016 11:31:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xV92LNA6iJ1H for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Oct 2016 02:35:14 -0400 (EDT)
-Received: from limerock04.mail.cornell.edu (limerock04.mail.cornell.edu
- [128.84.13.244])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B195410D7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Oct 2016 02:35:13 -0400 (EDT)
-In-Reply-To: <77b4ee22-a823-07e1-e4f8-9677efb839f9@suse.de>
-Content-Language: en-US
+ with ESMTP id T4zYz5vHjc+X for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Oct 2016 11:31:02 -0400 (EDT)
+Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
+ [217.140.96.140])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD86F41145
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Oct 2016 11:31:02 -0400 (EDT)
+In-Reply-To: <1475875882-2604-2-git-send-email-tbaicar@codeaurora.org> (Tyler
+ Baicar's message of "Fri, 7 Oct 2016 15:31:13 -0600")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,285 +30,188 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Graf <agraf@suse.de>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, shijie.huang@arm.com, lenb@kernel.org, marc.zyngier@arm.com, tomasz.nowicki@linaro.org, Naveen Kaje <nkaje@codeaurora.org>, rostedt@goodmis.org, sandeepa.s.prabhu@gmail.com, Dkvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, linux-kernel@vger.kernel.org, Richard Ruigrok <rruigrok@codeaurora.org>, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============6433680799392985741==
-Content-Language: en-US
-Content-Type: multipart/alternative;
-	boundary="_000_934F2AEFA7A249DEBDC53A90F3D81EC0cornelledu_"
+Hi Tyler,
 
---_000_934F2AEFA7A249DEBDC53A90F3D81EC0cornelledu_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+A few comments below.
 
-Alex
+Tyler Baicar <tbaicar@codeaurora.org> writes:
 
-Thanks a lot for this info will let you know about progress!
-
-
-Eugene
-On Oct 11, 2016, at 16:11, Alexander Graf <agraf@suse.de<mailto:agraf@suse.=
-de>> wrote:
-
-
-
-On 10.10.16 15:50, Marc Zyngier wrote:
-On 2016-10-06 19:54, Eugene Bagdasaryan wrote:
-Hey Marc
-
-I basically want to try and install OpenStack on RPi, which I guess
-is possible.
-
-Sounds pretty ambitious, but I guess someone has to try...
-
-(1) For the 64-bit arm OS, what would you suggest?
-
-I'll defer that to the local RPi zealot (Alex, cc'd), because I've
-stopped caring about this platform long before it even existed.
-
-Alex, would you mind letting Eugene know how to run a full 64bit
-mainline kernel + userspace on a RPi3?
-
-Sure! If everything works (and if it doesn't, please report to the
-mailing list), just follow the description below:
-
-
-https://en.opensuse.org/HCL:Raspberry_Pi3#Installing_the_64-bit_non-upstrea=
-m_openSUSE_Tumbleweed_image
-
-Get the image, put it on an SD card, boot it up (it takes ~5 minutes for
-the first boot), then install your own upstream kernel on it and run it.
-4.8 should work just fine.
-
-If you also want KVM, make sure you have the user space irqchip fixes in
-your kernel.
-
-
-Alex
-
-
---_000_934F2AEFA7A249DEBDC53A90F3D81EC0cornelledu_
-Content-Type: text/html; charset="us-ascii"
-Content-ID: <A442161EFF185341A48F55EE60D1BACE@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+> A RAS (Reliability, Availability, Serviceability) controller
+> may be a separate processor running in parallel with OS
+> execution, and may generate error records for consumption by
+> the OS. If the RAS controller produces multiple error records,
+> then they may be overwritten before the OS has consumed them.
 >
-</head>
-<body style=3D"word-wrap: break-word; -webkit-nbsp-mode: space; -webkit-lin=
-e-break: after-white-space;" class=3D"">
-Alex&nbsp;
-<div class=3D""><br class=3D"">
-</div>
-<div class=3D"">Thanks a lot for this info will let you know about progress=
-!</div>
-<div class=3D""><br class=3D"">
-</div>
-<div class=3D""><br class=3D"">
-</div>
-<div class=3D"">Eugene<br class=3D"">
-<div>
-<blockquote type=3D"cite" class=3D"">
-<div class=3D"">On Oct 11, 2016, at 16:11, Alexander Graf &lt;<a href=3D"ma=
-ilto:agraf@suse.de" class=3D"">agraf@suse.de</a>&gt; wrote:</div>
-<br class=3D"Apple-interchange-newline">
-<div class=3D""><br style=3D"font-family: Helvetica; font-size: 12px; font-=
-style: normal; font-variant-caps: normal; font-weight: normal; letter-spaci=
-ng: normal; orphans: auto; text-align: start; text-indent: 0px; text-transf=
-orm: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-te=
-xt-stroke-width: 0px;" class=3D"">
-<br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; f=
-ont-variant-caps: normal; font-weight: normal; letter-spacing: normal; orph=
-ans: auto; text-align: start; text-indent: 0px; text-transform: none; white=
--space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width:=
- 0px;" class=3D"">
-<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
- font-variant-caps: normal; font-weight: normal; letter-spacing: normal; or=
-phans: auto; text-align: start; text-indent: 0px; text-transform: none; whi=
-te-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-widt=
-h: 0px; float: none; display: inline !important;" class=3D"">On
- 10.10.16 15:50, Marc Zyngier wrote:</span><br style=3D"font-family: Helvet=
-ica; font-size: 12px; font-style: normal; font-variant-caps: normal; font-w=
-eight: normal; letter-spacing: normal; orphans: auto; text-align: start; te=
-xt-indent: 0px; text-transform: none; white-space: normal; widows: auto; wo=
-rd-spacing: 0px; -webkit-text-stroke-width: 0px;" class=3D"">
-<blockquote type=3D"cite" style=3D"font-family: Helvetica; font-size: 12px;=
- font-style: normal; font-variant-caps: normal; font-weight: normal; letter=
--spacing: normal; orphans: auto; text-align: start; text-indent: 0px; text-=
-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -web=
-kit-text-size-adjust: auto; -webkit-text-stroke-width: 0px;" class=3D"">
-On 2016-10-06 19:54, Eugene Bagdasaryan wrote:<br class=3D"">
-<blockquote type=3D"cite" class=3D"">Hey Marc<br class=3D"">
-<br class=3D"">
-I basically want to try and install OpenStack on RPi, which I guess<br clas=
-s=3D"">
-is possible.<br class=3D"">
-</blockquote>
-<br class=3D"">
-Sounds pretty ambitious, but I guess someone has to try...<br class=3D"">
-<br class=3D"">
-<blockquote type=3D"cite" class=3D"">(1) For the 64-bit arm OS, what would =
-you suggest?<br class=3D"">
-</blockquote>
-<br class=3D"">
-I'll defer that to the local RPi zealot (Alex, cc'd), because I've<br class=
-=3D"">
-stopped caring about this platform long before it even existed.<br class=3D=
-"">
-<br class=3D"">
-Alex, would you mind letting Eugene know how to run a full 64bit<br class=
-=3D"">
-mainline kernel &#43; userspace on a RPi3?<br class=3D"">
-</blockquote>
-<br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; f=
-ont-variant-caps: normal; font-weight: normal; letter-spacing: normal; orph=
-ans: auto; text-align: start; text-indent: 0px; text-transform: none; white=
--space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width:=
- 0px;" class=3D"">
-<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
- font-variant-caps: normal; font-weight: normal; letter-spacing: normal; or=
-phans: auto; text-align: start; text-indent: 0px; text-transform: none; whi=
-te-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-widt=
-h: 0px; float: none; display: inline !important;" class=3D"">Sure!
- If everything works (and if it doesn't, please report to the</span><br sty=
-le=3D"font-family: Helvetica; font-size: 12px; font-style: normal; font-var=
-iant-caps: normal; font-weight: normal; letter-spacing: normal; orphans: au=
-to; text-align: start; text-indent: 0px; text-transform: none; white-space:=
- normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;" =
-class=3D"">
-<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
- font-variant-caps: normal; font-weight: normal; letter-spacing: normal; or=
-phans: auto; text-align: start; text-indent: 0px; text-transform: none; whi=
-te-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-widt=
-h: 0px; float: none; display: inline !important;" class=3D"">mailing
- list), just follow the description below:</span><br style=3D"font-family: =
-Helvetica; font-size: 12px; font-style: normal; font-variant-caps: normal; =
-font-weight: normal; letter-spacing: normal; orphans: auto; text-align: sta=
-rt; text-indent: 0px; text-transform: none; white-space: normal; widows: au=
-to; word-spacing: 0px; -webkit-text-stroke-width: 0px;" class=3D"">
-<br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; f=
-ont-variant-caps: normal; font-weight: normal; letter-spacing: normal; orph=
-ans: auto; text-align: start; text-indent: 0px; text-transform: none; white=
--space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width:=
- 0px;" class=3D"">
-<br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; f=
-ont-variant-caps: normal; font-weight: normal; letter-spacing: normal; orph=
-ans: auto; text-align: start; text-indent: 0px; text-transform: none; white=
--space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width:=
- 0px;" class=3D"">
-<a href=3D"https://en.opensuse.org/HCL:Raspberry_Pi3#Installing_the_64-bit_=
-non-upstream_openSUSE_Tumbleweed_image" style=3D"font-family: Helvetica; fo=
-nt-size: 12px; font-style: normal; font-variant-caps: normal; font-weight: =
-normal; letter-spacing: normal; orphans: auto; text-align: start; text-inde=
-nt: 0px; text-transform: none; white-space: normal; widows: auto; word-spac=
-ing: 0px; -webkit-text-size-adjust: auto; -webkit-text-stroke-width: 0px;" =
-class=3D"">https://en.opensuse.org/HCL:Raspberry_Pi3#Installing_the_64-bit_=
-non-upstream_openSUSE_Tumbleweed_image</a><br style=3D"font-family: Helveti=
-ca; font-size: 12px; font-style: normal; font-variant-caps: normal; font-we=
-ight: normal; letter-spacing: normal; orphans: auto; text-align: start; tex=
-t-indent: 0px; text-transform: none; white-space: normal; widows: auto; wor=
-d-spacing: 0px; -webkit-text-stroke-width: 0px;" class=3D"">
-<br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; f=
-ont-variant-caps: normal; font-weight: normal; letter-spacing: normal; orph=
-ans: auto; text-align: start; text-indent: 0px; text-transform: none; white=
--space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width:=
- 0px;" class=3D"">
-<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
- font-variant-caps: normal; font-weight: normal; letter-spacing: normal; or=
-phans: auto; text-align: start; text-indent: 0px; text-transform: none; whi=
-te-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-widt=
-h: 0px; float: none; display: inline !important;" class=3D"">Get
- the image, put it on an SD card, boot it up (it takes ~5 minutes for</span=
-><br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; =
-font-variant-caps: normal; font-weight: normal; letter-spacing: normal; orp=
-hans: auto; text-align: start; text-indent: 0px; text-transform: none; whit=
-e-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width=
-: 0px;" class=3D"">
-<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
- font-variant-caps: normal; font-weight: normal; letter-spacing: normal; or=
-phans: auto; text-align: start; text-indent: 0px; text-transform: none; whi=
-te-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-widt=
-h: 0px; float: none; display: inline !important;" class=3D"">the
- first boot), then install your own upstream kernel on it and run it.</span=
-><br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; =
-font-variant-caps: normal; font-weight: normal; letter-spacing: normal; orp=
-hans: auto; text-align: start; text-indent: 0px; text-transform: none; whit=
-e-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width=
-: 0px;" class=3D"">
-<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
- font-variant-caps: normal; font-weight: normal; letter-spacing: normal; or=
-phans: auto; text-align: start; text-indent: 0px; text-transform: none; whi=
-te-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-widt=
-h: 0px; float: none; display: inline !important;" class=3D"">4.8
- should work just fine.</span><br style=3D"font-family: Helvetica; font-siz=
-e: 12px; font-style: normal; font-variant-caps: normal; font-weight: normal=
-; letter-spacing: normal; orphans: auto; text-align: start; text-indent: 0p=
-x; text-transform: none; white-space: normal; widows: auto; word-spacing: 0=
-px; -webkit-text-stroke-width: 0px;" class=3D"">
-<br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; f=
-ont-variant-caps: normal; font-weight: normal; letter-spacing: normal; orph=
-ans: auto; text-align: start; text-indent: 0px; text-transform: none; white=
--space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width:=
- 0px;" class=3D"">
-<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
- font-variant-caps: normal; font-weight: normal; letter-spacing: normal; or=
-phans: auto; text-align: start; text-indent: 0px; text-transform: none; whi=
-te-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-widt=
-h: 0px; float: none; display: inline !important;" class=3D"">If
- you also want KVM, make sure you have the user space irqchip fixes in</spa=
-n><br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
- font-variant-caps: normal; font-weight: normal; letter-spacing: normal; or=
-phans: auto; text-align: start; text-indent: 0px; text-transform: none; whi=
-te-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-widt=
-h: 0px;" class=3D"">
-<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
- font-variant-caps: normal; font-weight: normal; letter-spacing: normal; or=
-phans: auto; text-align: start; text-indent: 0px; text-transform: none; whi=
-te-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-widt=
-h: 0px; float: none; display: inline !important;" class=3D"">your
- kernel.</span><br style=3D"font-family: Helvetica; font-size: 12px; font-s=
-tyle: normal; font-variant-caps: normal; font-weight: normal; letter-spacin=
-g: normal; orphans: auto; text-align: start; text-indent: 0px; text-transfo=
-rm: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-tex=
-t-stroke-width: 0px;" class=3D"">
-<br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; f=
-ont-variant-caps: normal; font-weight: normal; letter-spacing: normal; orph=
-ans: auto; text-align: start; text-indent: 0px; text-transform: none; white=
--space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width:=
- 0px;" class=3D"">
-<br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; f=
-ont-variant-caps: normal; font-weight: normal; letter-spacing: normal; orph=
-ans: auto; text-align: start; text-indent: 0px; text-transform: none; white=
--space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width:=
- 0px;" class=3D"">
-<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
- font-variant-caps: normal; font-weight: normal; letter-spacing: normal; or=
-phans: auto; text-align: start; text-indent: 0px; text-transform: none; whi=
-te-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-widt=
-h: 0px; float: none; display: inline !important;" class=3D"">Alex</span></d=
-iv>
-</blockquote>
-</div>
-<br class=3D"">
-</div>
-</body>
-</html>
+> The Generic Hardware Error Source (GHES) v2 structure
+> introduces the capability for the OS to acknowledge the
+> consumption of the error record generated by the RAS
+> controller. A RAS controller supporting GHESv2 shall wait for
+> the acknowledgment before writing a new error record, thus
+> eliminating the race condition.
+>
+> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+> Signed-off-by: Richard Ruigrok <rruigrok@codeaurora.org>
+> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+> Signed-off-by: Naveen Kaje <nkaje@codeaurora.org>
+> ---
+>  drivers/acpi/apei/ghes.c | 41 +++++++++++++++++++++++++++++++++++++++++
+>  drivers/acpi/apei/hest.c |  7 +++++--
+>  include/acpi/ghes.h      |  1 +
+>  3 files changed, 47 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 60746ef..3021f0e 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -45,6 +45,7 @@
+>  #include <linux/aer.h>
+>  #include <linux/nmi.h>
+>  
+> +#include <acpi/actbl1.h>
+>  #include <acpi/ghes.h>
+>  #include <acpi/apei.h>
+>  #include <asm/tlbflush.h>
+> @@ -244,10 +245,22 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+>  	struct ghes *ghes;
+>  	unsigned int error_block_length;
+>  	int rc;
+> +	struct acpi_hest_header *hest_hdr;
+>  
+>  	ghes = kzalloc(sizeof(*ghes), GFP_KERNEL);
+>  	if (!ghes)
+>  		return ERR_PTR(-ENOMEM);
+> +
+> +	hest_hdr = (struct acpi_hest_header *)generic;
+> +	if (hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR_V2) {
+> +		ghes->generic_v2 = (struct acpi_hest_generic_v2 *)generic;
+> +		rc = apei_map_generic_address(
+> +			&ghes->generic_v2->read_ack_register);
+> +		if (rc)
+> +			goto err_unmap;
+> +	} else
+> +		ghes->generic_v2 = NULL;
 
---_000_934F2AEFA7A249DEBDC53A90F3D81EC0cornelledu_--
+Since you kzalloc ghes, shouldn't ghes->generic_v2 be NULL already?
 
---===============6433680799392985741==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> +
+>  	ghes->generic = generic;
+>  	rc = apei_map_generic_address(&generic->error_status_address);
+>  	if (rc)
+> @@ -270,6 +283,9 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+>  
+>  err_unmap:
+>  	apei_unmap_generic_address(&generic->error_status_address);
+> +	if (ghes->generic_v2)
+> +		apei_unmap_generic_address(
+> +			&ghes->generic_v2->read_ack_register);
+>  err_free:
+>  	kfree(ghes);
+>  	return ERR_PTR(rc);
+> @@ -279,6 +295,9 @@ static void ghes_fini(struct ghes *ghes)
+>  {
+>  	kfree(ghes->estatus);
+>  	apei_unmap_generic_address(&ghes->generic->error_status_address);
+> +	if (ghes->generic_v2)
+> +		apei_unmap_generic_address(
+> +			&ghes->generic_v2->read_ack_register);
+>  }
+>  
+>  static inline int ghes_severity(int severity)
+> @@ -648,6 +667,22 @@ static void ghes_estatus_cache_add(
+>  	rcu_read_unlock();
+>  }
+>  
+> +static int ghes_do_read_ack(struct acpi_hest_generic_v2 *generic_v2)
+> +{
+> +	int rc;
+> +	u64 val = 0;
+> +
+> +	rc = apei_read(&val, &generic_v2->read_ack_register);
+> +	if (rc)
+> +		return rc;
+> +	val &= generic_v2->read_ack_preserve <<
+> +		generic_v2->read_ack_register.bit_offset;
+> +	val |= generic_v2->read_ack_write;
 
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Reading the spec, it is not clear whether you need the left shift
+above.
 
---===============6433680799392985741==--
+Having said that, if you do it for read_ack_preserve, do you also need
+to left shift read_ack_write by read_ack_register.bit_offset?
+
+> +	rc = apei_write(val, &generic_v2->read_ack_register);
+> +
+> +	return rc;
+> +}
+> +
+>  static int ghes_proc(struct ghes *ghes)
+>  {
+>  	int rc;
+> @@ -660,6 +695,12 @@ static int ghes_proc(struct ghes *ghes)
+>  			ghes_estatus_cache_add(ghes->generic, ghes->estatus);
+>  	}
+>  	ghes_do_proc(ghes, ghes->estatus);
+> +
+> +	if (ghes->generic_v2) {
+> +		rc = ghes_do_read_ack(ghes->generic_v2);
+> +		if (rc)
+> +			return rc;
+> +	}
+>  out:
+>  	ghes_clear_estatus(ghes);
+>  	return 0;
+> diff --git a/drivers/acpi/apei/hest.c b/drivers/acpi/apei/hest.c
+> index 792a0d9..ef725a9 100644
+> --- a/drivers/acpi/apei/hest.c
+> +++ b/drivers/acpi/apei/hest.c
+> @@ -52,6 +52,7 @@ static const int hest_esrc_len_tab[ACPI_HEST_TYPE_RESERVED] = {
+>  	[ACPI_HEST_TYPE_AER_ENDPOINT] = sizeof(struct acpi_hest_aer),
+>  	[ACPI_HEST_TYPE_AER_BRIDGE] = sizeof(struct acpi_hest_aer_bridge),
+>  	[ACPI_HEST_TYPE_GENERIC_ERROR] = sizeof(struct acpi_hest_generic),
+> +	[ACPI_HEST_TYPE_GENERIC_ERROR_V2] = sizeof(struct acpi_hest_generic_v2),
+>  };
+>  
+>  static int hest_esrc_len(struct acpi_hest_header *hest_hdr)
+> @@ -146,7 +147,8 @@ static int __init hest_parse_ghes_count(struct acpi_hest_header *hest_hdr, void
+>  {
+>  	int *count = data;
+>  
+> -	if (hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR)
+> +	if (hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR ||
+> +	    hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR_V2)
+>  		(*count)++;
+>  	return 0;
+>  }
+> @@ -157,7 +159,8 @@ static int __init hest_parse_ghes(struct acpi_hest_header *hest_hdr, void *data)
+>  	struct ghes_arr *ghes_arr = data;
+>  	int rc, i;
+>  
+> -	if (hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR)
+> +	if (hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR &&
+> +	    hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR_V2)
+>  		return 0;
+>  
+>  	if (!((struct acpi_hest_generic *)hest_hdr)->enabled)
+> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+> index 720446c..d0108b6 100644
+> --- a/include/acpi/ghes.h
+> +++ b/include/acpi/ghes.h
+> @@ -14,6 +14,7 @@
+>  
+>  struct ghes {
+>  	struct acpi_hest_generic *generic;
+> +	struct acpi_hest_generic_v2 *generic_v2;
+
+You either have a GHES or a GHESv2 structure. Instead of duplication,
+could this be represented as a union?
+
+Thanks,
+Punit
+
+>  	struct acpi_hest_generic_status *estatus;
+>  	u64 buffer_paddr;
+>  	unsigned long flags;
