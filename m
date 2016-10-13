@@ -1,27 +1,27 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH V3 02/10] ras: acpi/apei: cper: generic error data entry
- v3 per ACPI 6.1
-Date: Thu, 13 Oct 2016 09:50:15 +0100
-Message-ID: <064dca7d-0625-c0d0-09ae-72ef7abdc63f@arm.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [PATCH V3 08/10] ras: acpi / apei: generate trace event for
+ unrecognized CPER section
+Date: Thu, 13 Oct 2016 11:54:11 +0100
+Message-ID: <87mvi8seng.fsf@e105922-lin.cambridge.arm.com>
 References: <1475875882-2604-1-git-send-email-tbaicar@codeaurora.org>
- <1475875882-2604-3-git-send-email-tbaicar@codeaurora.org>
- <3f17d0a8-6b63-5792-903a-341effaae432@arm.com>
- <c17a0c03-5037-d88d-f096-4cc72dbfcb99@codeaurora.org>
+ <1475875882-2604-9-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; Format="flowed"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DD1941390
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2016 04:40:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 291C7412D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2016 06:44:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rhu8k4MZJxHW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Oct 2016 04:40:16 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 291DF4113E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2016 04:40:16 -0400 (EDT)
-In-Reply-To: <c17a0c03-5037-d88d-f096-4cc72dbfcb99@codeaurora.org>
+ with ESMTP id mw8oj-uh+PwN for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Oct 2016 06:44:39 -0400 (EDT)
+Received: from cam-smtp0.cambridge.arm.com (fw-tnat.cambridge.arm.com
+ [217.140.96.140])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE6AE40FA7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2016 06:44:37 -0400 (EDT)
+In-Reply-To: <1475875882-2604-9-git-send-email-tbaicar@codeaurora.org> (Tyler
+ Baicar's message of "Fri, 7 Oct 2016 15:31:20 -0600")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,93 +31,76 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Baicar, Tyler" <tbaicar@codeaurora.org>, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, sandeepa.s.prabhu@gmail.com, shijie.huang@arm.com, paul.gortmaker@windriver.com, tomasz.nowicki@linaro.org, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Dkvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, devel@acpica.org
-Cc: Naveen Kaje <nkaje@codeaurora.org>, Richard Ruigrok <rruigrok@codeaurora.org>, "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, shijie.huang@arm.com, lenb@kernel.org, marc.zyngier@arm.com, tomasz.nowicki@linaro.org, rostedt@goodmis.org, sandeepa.s.prabhu@gmail.com, Dkvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/10/16 23:10, Baicar, Tyler wrote:
-> Hello Suzuki,
+Hi Tyler,
+
+One last comment...
+
+Tyler Baicar <tbaicar@codeaurora.org> writes:
+
+> UEFI spec allows for non-standard section in Common Platform Error
+> Record. This is defined in section N.2.3 of UEFI version 2.5.
 >
-> Thank you for the feedback! Responses below.
+> Currently if the CPER section's type (UUID) does not match with
+> any section type that the kernel knows how to parse, trace event
+> is not generated for such section. And thus user is not able to know
+> happening of such hardware error, including error record of
+> non-standard section.
 >
+> This commit generates a trace event which contains raw error data
+> for unrecognized CPER section.
 >
-> On 10/11/2016 11:28 AM, Suzuki K Poulose wrote:
->> On 07/10/16 22:31, Tyler Baicar wrote:
->>> Currently when a RAS error is reported it is not timestamped.
->>> The ACPI 6.1 spec adds the timestamp field to the generic error
->>> data entry v3 structure. The timestamp of when the firmware
->>> generated the error is now being reported.
->>>
->>> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
->>> Signed-off-by: Richard Ruigrok <rruigrok@codeaurora.org>
->>> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
->>> Signed-off-by: Naveen Kaje <nkaje@codeaurora.org>
->>
->> Please could you keep the people who reviewed/commented on your series i=
-n the past,
->> whenever you post a new version ?
-> Do you mean to just send the new version to their e-mail directly in addi=
-tion to the lists? If so, I will do that next time.
-
-If you send a new version of a series to the list, it is a good idea to keep
-the people who commented (significantly) on your previous version in Cc, es=
-pecially
-when you have addressed their feedback. That will help them to keep track o=
-f the
-series. People can always see the new version in the list, but then it is s=
-o easy
-to miss something in the 100s of emails you get each day. I am sure people =
-have
-special filters for the emails based on if they are in Cc/To etc.
-
+> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+> ---
+>  drivers/acpi/apei/ghes.c | 18 +++++++++++++++++-
+>  drivers/ras/ras.c        |  1 +
+>  include/ras/ras_event.h  | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 63 insertions(+), 1 deletion(-)
 >
-> I know you provided good feedback on the previous patchset, but I did not=
- have anyone specifically respond to add "reviewed-by:...". I don't think I=
- should add reviewed-by for someone unless they specifically add it in a re=
-sponse :)
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 36894c8..cb4c7f4 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -49,6 +49,7 @@
+>  #include <acpi/ghes.h>
+>  #include <acpi/apei.h>
+>  #include <asm/tlbflush.h>
+> +#include <ras/ras_event.h>
+>  
+>  #ifdef CONFIG_HAVE_ACPI_APEI_SEA
+>  #include <asm/system_misc.h>
+> @@ -468,12 +469,21 @@ static void ghes_do_proc(struct ghes *ghes,
+>  	int sev, sec_sev;
+>  	struct acpi_hest_generic_data *gdata;
+>  	uuid_le sec_type;
+> +	uuid_le *fru_id;
+> +	char *fru_text = "";
+>  
+>  	sev = ghes_severity(estatus->error_severity);
+>  	apei_estatus_for_each_section(estatus, gdata) {
+>  		sec_sev = ghes_severity(gdata->error_severity);
+>  		sec_type = *(uuid_le *)gdata->section_type;
+>  
+> +		if (gdata->validation_bits & CPER_SEC_VALID_FRU_ID)
+> +			fru_id = (uuid_le *)gdata->fru_id;
+> +		else
+> +			fru_id = &NULL_UUID_LE;
 
-No, I haven't yet "Reviewed-by" your patches. I had some comments on it, wh=
-ich means
-I expected it to be addressed as you committed in your response.
+fru_id can be initialised at declaration and drop the else here. The
+same is already being done for fru_text.
 
->>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
->>> index 3021f0e..c8488f1 100644
->>> --- a/drivers/acpi/apei/ghes.c
->>> +++ b/drivers/acpi/apei/ghes.c
->>> @@ -80,6 +80,10 @@
+Thanks,
+Punit
 
-> I think that should work to avoid duplication. I will move them to a head=
-er file in the next patchset.
->>> +
->>> +static void cper_estatus_print_section_v300(const char *pfx,
->>> +    const struct acpi_hest_generic_data_v300 *gdata)
->>> +{
->>> +    __u8 hour, min, sec, day, mon, year, century, *timestamp;
->>> +
->>> +    if (gdata->validation_bits & ACPI_HEST_GEN_VALID_TIMESTAMP) {
->>> +        timestamp =3D (__u8 *)&(gdata->time_stamp);
->>> +        memcpy(&sec, timestamp, 1);
->>> +        memcpy(&min, timestamp + 1, 1);
->>> +        memcpy(&hour, timestamp + 2, 1);
->>> +        memcpy(&day, timestamp + 4, 1);
->>> +        memcpy(&mon, timestamp + 5, 1);
->>> +        memcpy(&year, timestamp + 6, 1);
->>> +        memcpy(&century, timestamp + 7, 1);
->>> +        printk("%stime: ", pfx);
->>> +        printk("%7s", 0x01 & *(timestamp + 3) ? "precise" : "");
->>
->> What format is the (timestamp + 3) stored in ? Does it need conversion ?
-> The third byte of the timestamp is currently only used to determine if th=
-e time is precise or not. Bit 0 is used to specify that and the other bits =
-in this byte are marked as reserved. This is shown in table 247 of the UEFI=
- spec 2.6:
->
-> Byte 3:
->   Bit 0 =96 Timestamp is precise if this bit is set and correlates to the=
- time of the error event.
->   Bit 7:1 =96 Reserved
+> +		if (gdata->validation_bits & CPER_SEC_VALID_FRU_TEXT)
+> +			fru_text = gdata->fru_text;
+> +
+>  		if (!uuid_le_cmp(sec_type,
+>  				 CPER_SEC_PLATFORM_MEM)) {
+>  			struct cper_sec_mem_err *mem_err;
 
-Is it always the same endianness as that of the CPU ?
-
-Cheers
-Suzuki
+[...]
