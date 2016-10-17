@@ -1,95 +1,76 @@
-From: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Subject: Re: [PATCH V3 10/10] arm64: KVM: add guest SEA support
-Date: Fri, 14 Oct 2016 14:58:18 -0700
-Message-ID: <4f99e989-cb7b-2bf3-a947-6f6713e55b6f@codeaurora.org>
-References: <1475875882-2604-1-git-send-email-tbaicar@codeaurora.org>
- <1475875882-2604-11-git-send-email-tbaicar@codeaurora.org>
- <87h98gs853.fsf@e105922-lin.cambridge.arm.com>
- <afa9a3c6-7516-cf5c-2366-f826f914d582@codeaurora.org>
- <878ttrs22f.fsf@e105922-lin.cambridge.arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH] arm64: KVM: Take S1 walks into account when determining
+ S2 write faults
+Date: Mon, 17 Oct 2016 11:20:22 +0100
+Message-ID: <20161017102022.GB1442@arm.com>
+References: <1475149021-13288-1-git-send-email-will.deacon@arm.com>
+ <20160929191432.GA7996@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <878ttrs22f.fsf@e105922-lin.cambridge.arm.com>
-Sender: linux-acpi-owner@vger.kernel.org
-To: Punit Agrawal <punit.agrawal@arm.com>
-Cc: linux-efi@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, shijie.huang@arm.com, lenb@kernel.org, marc.zyngier@arm.com, tomasz.nowicki@linaro.org, rostedt@goodmis.org, sandeepa.s.prabhu@gmail.com, Dkvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, linux-kernel@vger.kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DCC0040FA2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2016 06:10:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kJ1VcFdiyQMF for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Oct 2016 06:10:04 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C615B40C9D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2016 06:10:04 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20160929191432.GA7996@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/14/2016 2:38 AM, Punit Agrawal wrote:
-> "Baicar, Tyler" <tbaicar@codeaurora.org> writes:
->
->> Hello Punit,
->>
->> On 10/13/2016 7:14 AM, Punit Agrawal wrote:
->>> Hi Tyler,
->>>
->>> I know I've had my last comment already ;), but I thought I'd rather
->>> raise the question than stay confused...
->>>
->>> Tyler Baicar <tbaicar@codeaurora.org> writes:
->>>
->>>> Currently external aborts are unsupported by the guest abort
->>>> handling. Add handling for SEAs so that the host kernel reports
->>>> SEAs which occur in the guest kernel.
->>>>
->>>> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
->>>> ---
->>>>    arch/arm/include/asm/kvm_arm.h       |  1 +
->>>>    arch/arm/include/asm/system_misc.h   |  5 +++++
->>>>    arch/arm/kvm/mmu.c                   | 15 +++++++++++++--
->>>>    arch/arm64/include/asm/kvm_arm.h     |  1 +
->>>>    arch/arm64/include/asm/system_misc.h |  2 ++
->>>>    arch/arm64/mm/fault.c                | 13 +++++++++++++
->>>>    6 files changed, 35 insertions(+), 2 deletions(-)
-[...]
->>>> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
->>>> index 81cb7ad..d714432 100644
->>>> --- a/arch/arm64/mm/fault.c
->>>> +++ b/arch/arm64/mm/fault.c
->>>> @@ -597,6 +597,19 @@ static const char *fault_name(unsigned int esr)
->>>>    }
->>>>      /*
->>>> + * Handle Synchronous External Aborts that occur in a guest kernel.
->>>> + */
->>>> +int handle_guest_sea(unsigned long addr, unsigned int esr)
->>>> +{
->>>> +	atomic_notifier_call_chain(&sea_handler_chain, 0, NULL);
->>>> +
->>>> +	pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
->>>> +		fault_name(esr), esr, addr);
->>>> +
->>>> +	return 0;
->>>> +}
->>> Don't we need to pass the abort to the guest?
->> This requires some infrastructure to implement virtual "ACPI platform
->> error interface" to expose the details of the abort to the guest. This
->> patchset does not cover that and focuses on feature parity with other
->> architectures that support APEI. There are discussions among Linaro
->> partners about how this can be achieved in the long term, but that
->> work is outside the scope of this patchset. This patch will ensure
->> that if a guest encounters one of these errors then it will be
->> reported before getting killed. Before this patch we would just get an
->> unsupported FSC print out and then the guest would be killed.
-> OK.
->
-> I think we might be talking about different things though.
->
-> I am referring to the injection of the synchronous external abort into
-> the guest - similar to what's been done for prefetch abort in the
-> kvm_guest_handle_abort.
->
-> Maybe there is no benefit in passing the abort to the guest. In that
-> case, can you please add a comment where you handle external abort
-> (FSC_EXTABT) in kvm_guest_handle_abort.
-Yes, I will add a comment there in the next version.
+On Thu, Sep 29, 2016 at 09:14:32PM +0200, Christoffer Dall wrote:
+> On Thu, Sep 29, 2016 at 12:37:01PM +0100, Will Deacon wrote:
+> > The WnR bit in the HSR/ESR_EL2 indicates whether a data abort was
+> > generated by a read or a write instruction. For stage 2 data aborts
+> > generated by a stage 1 translation table walk (i.e. the actual page
+> > table access faults at EL2), the WnR bit therefore reports whether the
+> > instruction generating the walk was a load or a store, *not* whether the
+> > page table walker was reading or writing the entry.
+> > 
+> > For page tables marked as read-only at stage 2 (e.g. due to KSM merging
+> > them with the tables from another guest), this could result in livelock,
+> > where a page table walk generated by a load instruction attempts to
+> > set the access flag in the stage 1 descriptor, but fails to trigger
+> > CoW in the host since only a read fault is reported.
+> > 
+> > This patch modifies the arm64 kvm_vcpu_dabt_iswrite function to
+> > take into account stage 2 faults in stage 1 walks. Since DBM cannot be
+> > disabled at EL2 for CPUs that implement it, we assume that these faults
+> > are always causes by writes, avoiding the livelock situation at the
+> > expense of occasional, spurious CoWs.
+> > 
+> > We could, in theory, do a bit better by checking the guest TCR
+> > configuration and inspecting the page table to see why the PTE faulted.
+> > However, I doubt this is measurable in practice, and the threat of
+> > livelock is real.
+> > 
+> > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> > Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> > Cc: Julien Grall <julien.grall@arm.com>
+> > Signed-off-by: Will Deacon <will.deacon@arm.com>
+> 
+> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> Applied,
 
-Thanks,
-Tyler
+This doesn't seem to be in 4.9-rc1. Could you please dig it up?
 
--- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+Ta,
 
+Will
