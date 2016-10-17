@@ -1,27 +1,27 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v3 03/10] arm/arm64: smp:
- support more than 8 cpus
-Date: Mon, 17 Oct 2016 14:24:43 +0200
-Message-ID: <20161017122443.2v5r5xtqhi7ekgmw@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v3 06/10] arm/arm64: add
+ initial gicv2 support
+Date: Mon, 17 Oct 2016 15:14:48 +0200
+Message-ID: <20161017131448.ktjewnx7zgq3zreq@kamzik.brq.redhat.com>
 References: <1468587641-7300-1-git-send-email-drjones@redhat.com>
- <1468587641-7300-4-git-send-email-drjones@redhat.com>
- <11a885eb-d43e-528e-235a-13358edc6ea6@redhat.com>
+ <1468587641-7300-7-git-send-email-drjones@redhat.com>
+ <9132b290-4d09-057c-a3d0-c3fc208b4811@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6531409A2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2016 08:14:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F35740F77
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2016 09:04:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LELu9RjTaWEQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Oct 2016 08:14:31 -0400 (EDT)
+ with ESMTP id OCfqLScyEQxU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Oct 2016 09:04:36 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E383407AD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2016 08:14:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4D9A140C9D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2016 09:04:36 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <11a885eb-d43e-528e-235a-13358edc6ea6@redhat.com>
+In-Reply-To: <9132b290-4d09-057c-a3d0-c3fc208b4811@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,227 +35,299 @@ To: Auger Eric <eric.auger@redhat.com>
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 30, 2016 at 04:28:52PM +0200, Auger Eric wrote:
-> Hi Drew,
-> =
-
-> Proper commit message?
-> ... also selects the vgic model corresponding to the host
-
-Sure
-
-> > Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+On Thu, Sep 01, 2016 at 12:20:06PM +0200, Auger Eric wrote:
+> 
+> 
+> On 15/07/2016 15:00, Andrew Jones wrote:
+> > Add some gicv2 support. This just adds init and enable
+> > functions, allowing unit tests to start messing with it.
+> > 
 > > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > > ---
-> >  arm/run                   | 19 ++++++++++++-------
-> >  arm/selftest.c            |  5 ++++-
-> >  lib/arm/asm/processor.h   |  9 +++++++--
-> >  lib/arm/asm/setup.h       |  4 ++--
-> >  lib/arm/setup.c           | 12 +++++++++++-
-> >  lib/arm64/asm/processor.h |  9 +++++++--
-> >  6 files changed, 43 insertions(+), 15 deletions(-)
-> > =
-
-> > diff --git a/arm/run b/arm/run
-> > index a2f35ef6a7e63..2d0698619606e 100755
-> > --- a/arm/run
-> > +++ b/arm/run
-> > @@ -31,13 +31,6 @@ if [ -z "$ACCEL" ]; then
-> >  	fi
-> >  fi
-> >  =
-
-> > -if [ "$HOST" =3D "aarch64" ] && [ "$ACCEL" =3D "kvm" ]; then
-> > -	processor=3D"host"
-> > -	if [ "$ARCH" =3D "arm" ]; then
-> > -		processor+=3D",aarch64=3Doff"
-> > -	fi
-> > -fi
-> > -
-> >  qemu=3D"${QEMU:-qemu-system-$ARCH_NAME}"
-> >  qpath=3D$(which $qemu 2>/dev/null)
-> >  =
-
-> > @@ -53,6 +46,18 @@ fi
-> >  =
-
-> >  M=3D'-machine virt'
-> >  =
-
-> > +if [ "$ACCEL" =3D "kvm" ]; then
-> > +	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
-> > +		M+=3D',gic-version=3Dhost'
-> > +	fi
-> > +	if [ "$HOST" =3D "aarch64" ]; then
-> > +		processor=3D"host"
-> > +		if [ "$ARCH" =3D "arm" ]; then
-> > +			processor+=3D",aarch64=3Doff"
-> > +		fi
-> > +	fi
-> > +fi
+> >  arm/Makefile.common    |  1 +
+> >  lib/arm/asm/gic-v2.h   | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  lib/arm/asm/gic.h      | 20 ++++++++++++++
+> >  lib/arm/gic.c          | 69 ++++++++++++++++++++++++++++++++++++++++++++++
+> >  lib/arm64/asm/gic-v2.h |  1 +
+> >  lib/arm64/asm/gic.h    |  1 +
+> >  6 files changed, 166 insertions(+)
+> >  create mode 100644 lib/arm/asm/gic-v2.h
+> >  create mode 100644 lib/arm/asm/gic.h
+> >  create mode 100644 lib/arm/gic.c
+> >  create mode 100644 lib/arm64/asm/gic-v2.h
+> >  create mode 100644 lib/arm64/asm/gic.h
+> > 
+> > diff --git a/arm/Makefile.common b/arm/Makefile.common
+> > index ccb554d9251a4..41239c37e0920 100644
+> > --- a/arm/Makefile.common
+> > +++ b/arm/Makefile.common
+> > @@ -42,6 +42,7 @@ cflatobjs += lib/arm/mmu.o
+> >  cflatobjs += lib/arm/bitops.o
+> >  cflatobjs += lib/arm/psci.o
+> >  cflatobjs += lib/arm/smp.o
+> > +cflatobjs += lib/arm/gic.o
+> >  
+> >  libeabi = lib/arm/libeabi.a
+> >  eabiobjs = lib/arm/eabi_compat.o
+> > diff --git a/lib/arm/asm/gic-v2.h b/lib/arm/asm/gic-v2.h
+> > new file mode 100644
+> > index 0000000000000..973c2bf3cc796
+> > --- /dev/null
+> > +++ b/lib/arm/asm/gic-v2.h
+> > @@ -0,0 +1,74 @@
+> > +/*
+> > + * All GIC* defines are lifted from include/linux/irqchip/arm-gic.h
+> > + *
+> > + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#ifndef _ASMARM_GIC_V2_H_
+> > +#define _ASMARM_GIC_V2_H_
 > > +
-> >  if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
-> >  	echo "$qpath doesn't support virtio-console for chr-testdev. Exiting."
-> >  	exit 2
-> > diff --git a/arm/selftest.c b/arm/selftest.c
-> > index 196164f5313de..2f117f795d2dc 100644
-> > --- a/arm/selftest.c
-> > +++ b/arm/selftest.c
-> > @@ -312,9 +312,10 @@ static bool psci_check(void)
-> >  static cpumask_t smp_reported;
-> >  static void cpu_report(void)
-> >  {
-> > +	unsigned long mpidr =3D get_mpidr();
-> >  	int cpu =3D smp_processor_id();
-> >  =
-
-> > -	report("CPU%d online", true, cpu);
-> > +	report("CPU(%3d) mpidr=3D%lx", mpidr_to_cpu(mpidr) =3D=3D cpu, cpu, m=
-pidr);
-> >  	cpumask_set_cpu(cpu, &smp_reported);
-> >  	halt();
-> >  }
-> > @@ -343,6 +344,7 @@ int main(int argc, char **argv)
-> >  =
-
-> >  	} else if (strcmp(argv[1], "smp") =3D=3D 0) {
-> >  =
-
-> > +		unsigned long mpidr =3D get_mpidr();
-> >  		int cpu;
-> >  =
-
-> >  		report("PSCI version", psci_check());
-> > @@ -353,6 +355,7 @@ int main(int argc, char **argv)
-> >  			smp_boot_secondary(cpu, cpu_report);
-> >  		}
-> >  =
-
-> > +		report("CPU(%3d) mpidr=3D%lx", mpidr_to_cpu(mpidr) =3D=3D 0, 0, mpid=
-r);
-> >  		cpumask_set_cpu(0, &smp_reported);
-> >  		while (!cpumask_full(&smp_reported))
-> >  			cpu_relax();
-> > diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-> > index f25e7eee3666c..d2048f5f5f7e6 100644
-> > --- a/lib/arm/asm/processor.h
-> > +++ b/lib/arm/asm/processor.h
-> > @@ -40,8 +40,13 @@ static inline unsigned int get_mpidr(void)
-> >  	return mpidr;
-> >  }
-> >  =
-
-> > -/* Only support Aff0 for now, up to 4 cpus */
-> > -#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
-> > +#define MPIDR_HWID_BITMASK 0xffffff
-> > +extern int mpidr_to_cpu(unsigned long mpidr);
+> > +#define GIC_CPU_CTRL			0x00
+> > +#define GIC_CPU_PRIMASK			0x04
+> > +#define GIC_CPU_BINPOINT		0x08
+> > +#define GIC_CPU_INTACK			0x0c
+> > +#define GIC_CPU_EOI			0x10
+> > +#define GIC_CPU_RUNNINGPRI		0x14
+> > +#define GIC_CPU_HIGHPRI			0x18
+> > +#define GIC_CPU_ALIAS_BINPOINT		0x1c
+> > +#define GIC_CPU_ACTIVEPRIO		0xd0
+> > +#define GIC_CPU_IDENT			0xfc
+> > +#define GIC_CPU_DEACTIVATE		0x1000
 > > +
-> > +#define MPIDR_LEVEL_SHIFT(level) \
-> > +	(((1 << level) >> 1) << 3)
-> can't we have level << 3?
-> > +#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-> > +	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
-> >  =
+> > +#define GICC_ENABLE			0x1
+> > +#define GICC_INT_PRI_THRESHOLD		0xf0
+> > +
+> > +#define GIC_CPU_CTRL_EOImodeNS		(1 << 9)
+> > +
+> > +#define GICC_IAR_INT_ID_MASK		0x3ff
+> > +#define GICC_INT_SPURIOUS		1023
+> > +#define GICC_DIS_BYPASS_MASK		0x1e0
+> > +
+> > +#define GIC_DIST_CTRL			0x000
+> > +#define GIC_DIST_CTR			0x004
+> you could add #define GIC_DIST_IIDR			0x008
+> which can be found in arm-gic.h
 
-> >  extern void start_usr(void (*func)(void *arg), void *arg, unsigned lon=
-g sp_usr);
-> >  extern bool is_user(void);
-> > diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-> > index cb8fdbd38dd5d..c501c6ddd8657 100644
-> > --- a/lib/arm/asm/setup.h
-> > +++ b/lib/arm/asm/setup.h
-> > @@ -10,8 +10,8 @@
-> >  #include <asm/page.h>
-> >  #include <asm/pgtable-hwdef.h>
-> >  =
+I'll resync with the latest kernel headers.
 
-> > -#define NR_CPUS			8
-> > -extern u32 cpus[NR_CPUS];
-> > +#define NR_CPUS			255
-> 256?
+> > +#define GIC_DIST_IGROUP			0x080
+> > +#define GIC_DIST_ENABLE_SET		0x100
+> > +#define GIC_DIST_ENABLE_CLEAR		0x180
+> > +#define GIC_DIST_PENDING_SET		0x200
+> > +#define GIC_DIST_PENDING_CLEAR		0x280
+> > +#define GIC_DIST_ACTIVE_SET		0x300
+> > +#define GIC_DIST_ACTIVE_CLEAR		0x380
+> > +#define GIC_DIST_PRI			0x400
+> > +#define GIC_DIST_TARGET			0x800
+> > +#define GIC_DIST_CONFIG			0xc00
+> > +#define GIC_DIST_SOFTINT		0xf00
+> > +#define GIC_DIST_SGI_PENDING_CLEAR	0xf10
+> > +#define GIC_DIST_SGI_PENDING_SET	0xf20
+> > +
+> > +#define GICD_ENABLE			0x1
+> > +#define GICD_DISABLE			0x0
+> > +#define GICD_INT_ACTLOW_LVLTRIG		0x0
+> > +#define GICD_INT_EN_CLR_X32		0xffffffff
+> > +#define GICD_INT_EN_SET_SGI		0x0000ffff
+> > +#define GICD_INT_EN_CLR_PPI		0xffff0000
+> > +#define GICD_INT_DEF_PRI		0xa0
+> > +#define GICD_INT_DEF_PRI_X4		((GICD_INT_DEF_PRI << 24) |\
+> > +					(GICD_INT_DEF_PRI << 16) |\
+> > +					(GICD_INT_DEF_PRI << 8) |\
+> > +					GICD_INT_DEF_PRI)
+> > +#ifndef __ASSEMBLY__
+> > +
+> > +struct gicv2_data {
+> > +	void *dist_base;
+> > +	void *cpu_base;
+> > +};
+> > +extern struct gicv2_data gicv2_data;
+> > +
+> > +#define gicv2_dist_base()		(gicv2_data.dist_base)
+> > +#define gicv2_cpu_base()		(gicv2_data.cpu_base)
+> > +
+> > +extern int gicv2_init(void);
+> > +extern void gicv2_enable_defaults(void);
+> > +
+> > +#endif /* !__ASSEMBLY__ */
+> > +#endif /* _ASMARM_GIC_V2_H_ */
+> > diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> > new file mode 100644
+> > index 0000000000000..b1237d1c5ef22
+> > --- /dev/null
+> > +++ b/lib/arm/asm/gic.h
+> > @@ -0,0 +1,20 @@
+> > +/*
+> > + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#ifndef _ASMARM_GIC_H_
+> > +#define _ASMARM_GIC_H_
+> > +
+> > +#include <asm/gic-v2.h>
+> to be moved in gic.c?
 
-The kernel defines KVM_MAX_VCPUS as VGIC_V3_MAX_CPUS, which is
-currently defined as 255. I was just being consistent.
+The idea is that we can strive to create a common interface for basic
+gic features, as some unit tests will use such a minimal feature set
+of the gic that it won't matter if it's a v2 or v3. Those unit tests
+would then just include the generic 'asm/gic.h' and use generic
+functions only. This series doesn't introduce any generic functions,
+except gic_init, but going forward we may.
 
-> > +extern u64 cpus[NR_CPUS];
-> maybe worth commenting the semantic of cpus[i]?
+> > +
+> > +/*
+> > + * gic_init will try to find all known gics, and then
+> > + * initialize the gic data for the one found.
+> > + * returns
+> > + *  0   : no gic was found
+> > + *  > 0 : the gic version of the gic found
+> > + */
+> > +extern int gic_init(void);
+> > +
+> > +#endif /* _ASMARM_GIC_H_ */
+> > diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> > new file mode 100644
+> > index 0000000000000..64a3049c9e8ce
+> > --- /dev/null
+> > +++ b/lib/arm/gic.c
+> > @@ -0,0 +1,69 @@
+> > +/*
+> > + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#include <libcflat.h>
+> > +#include <devicetree.h>
+> > +#include <asm/gic.h>
+> gic-v2.h?
 
-sure
+We'll need both -v2 and -v3, and gic.h does that for us. In the future
+we may need gic.h too, so just gic.h seems like the better choice from
+the start.
 
-> >  extern int nr_cpus;
-> what about MAX_CPUS instead of NR_CPUS?
-
-kernel uses NR_CPUS, I want to be consistent.
-
-> >  =
-
-> >  #define NR_MEM_REGIONS		8
-> > diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> > index 7e7b39f11dde1..b6e2d5815e723 100644
-> > --- a/lib/arm/setup.c
-> > +++ b/lib/arm/setup.c
-> > @@ -24,12 +24,22 @@ extern unsigned long stacktop;
-> >  extern void io_init(void);
-> >  extern void setup_args_progname(const char *args);
-> >  =
-
-> > -u32 cpus[NR_CPUS] =3D { [0 ... NR_CPUS-1] =3D (~0U) };
-> > +u64 cpus[NR_CPUS] =3D { [0 ... NR_CPUS-1] =3D (~0U) };
-> >  int nr_cpus;
-> >  =
-
-> >  struct mem_region mem_regions[NR_MEM_REGIONS];
-> >  phys_addr_t __phys_offset, __phys_end;
-> >  =
-
-> > +int mpidr_to_cpu(unsigned long mpidr)
+> > +#include <asm/smp.h>
+> > +#include <asm/io.h>
+> > +
+> > +struct gicv2_data gicv2_data;
+> > +
+> > +/*
+> > + * Documentation/devicetree/bindings/interrupt-controller/arm,gic.txt
+> > + */
+> > +static bool
+> > +gic_get_dt_bases(const char *compatible, void **base1, void **base2)
 > > +{
-> > +	int i;
+> > +	struct dt_pbus_reg reg;
+> > +	struct dt_device gic;
+> > +	struct dt_bus bus;
+> > +	int node, ret;
 > > +
-> > +	for (i =3D 0; i < nr_cpus; ++i)
-> > +		if (cpus[i] =3D=3D (mpidr & MPIDR_HWID_BITMASK))
-> > +			return i;
-> > +	return -1;
+> > +	dt_bus_init_defaults(&bus);
+> > +	dt_device_init(&gic, &bus, NULL);
+> > +
+> > +	node = dt_device_find_compatible(&gic, compatible);
+> > +	assert(node >= 0 || node == -FDT_ERR_NOTFOUND);
+> > +
+> > +	if (node == -FDT_ERR_NOTFOUND)
+> > +		return false;
+> > +
+> > +	dt_device_bind_node(&gic, node);
+> > +
+> > +	ret = dt_pbus_translate(&gic, 0, &reg);
+> > +	assert(ret == 0);
+> > +	*base1 = ioremap(reg.addr, reg.size);
+> > +
+> > +	ret = dt_pbus_translate(&gic, 1, &reg);
+> > +	assert(ret == 0);
+> > +	*base2 = ioremap(reg.addr, reg.size);
+> > +
+> > +	return true;
 > > +}
 > > +
-> >  static void cpu_set(int fdtnode __unused, u32 regval, void *info __unu=
-sed)
-> >  {
-> >  	int cpu =3D nr_cpus++;
-> > diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> > index 9a208ff729b7e..7e448dc81a6aa 100644
-> > --- a/lib/arm64/asm/processor.h
-> > +++ b/lib/arm64/asm/processor.h
-> > @@ -78,8 +78,13 @@ static inline type get_##reg(void)				\
-> >  =
+> > +int gicv2_init(void)
+> > +{
+> > +	return gic_get_dt_bases("arm,cortex-a15-gic",
+> > +			&gicv2_data.dist_base, &gicv2_data.cpu_base);
+> what about the other possible compat strings. Is it safe to look only
+> for that one?
 
-> >  DEFINE_GET_SYSREG64(mpidr)
-> >  =
+Currently, yes. Currently we only care about mach-virt, and thus far
+mach-virt uses only this. Let's only add new compat strings as we test
+models that use them.
 
-> > -/* Only support Aff0 for now, gicv2 only */
-> > -#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
-> > +#define MPIDR_HWID_BITMASK 0xff00ffffff
-> > +extern int mpidr_to_cpu(unsigned long mpidr);
+> > +}
 > > +
-> > +#define MPIDR_LEVEL_SHIFT(level) \
-> > +	(((1 << level) >> 1) << 3)
-> what about level 3? the macro would fail fetching affinity level 3.
-> =
+> > +int gic_init(void)
+> > +{
+> > +	if (gicv2_init())
+> > +		return 2;
+> > +	return 0;
+> > +}
+> > +
+> > +void gicv2_enable_defaults(void)
+> > +{
+> > +	if (smp_processor_id() == 0) {
+> > +		writel(GICD_INT_DEF_PRI_X4, gicv2_dist_base() + GIC_DIST_PRI);
+> I don't get this. There are (8*(GICD_TYPER.ITLinesNumber+1)) such
+> registers. See irq-gic-common.c/gic_dist_config
+> 
+> More generally shouldn't we implement something like gic_dist_config and
+> gic_cpu_config
 
-> Thanks
-> =
+So the gic*_enable_defaults functions are certainly places I could have
+messed up. I appreciate the review trying to get it right. In the least
+I should have commented my intentions better, because I hardly remember
+them now myself... Here's what I was trying to achieve
 
-> Eric
-> > +#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-> > +	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
-> >  =
+1) Create an enable function for unit tests which don't really care about
+   what's enabled, i.e. provide a functioning, but minimally configured,
+   gic.
+2) While using gic_dist_config and gic_cpu_config as inspiration, cut
+   it down to just a handful of register writes in order to make it
+   easy for unit test writers to understand on a quick read.
+3) Only one cpu sets up the distributor.
 
-> >  extern void start_usr(void (*func)(void *arg), void *arg, unsigned lon=
-g sp_usr);
-> >  extern bool is_user(void);
-> > =
+I think you're right that I screwed up on gicv2's enable. I should have
+an irq_nr, like I do for gicv3, in order to set all registers.
 
->
+Also, in both the v2 and v3 cases I should probably improve how I
+determine by whom and when the distributor is set up. Rather than
+requiring only cpu0 to do the setup, and the secondaries to not even
+try until it's done, I can probably let any cpu do it, and force the
+others to wait until it's ready to setup the cpu interfaces.
+
+I'll give this another pass...
 
 Thanks,
 drew
+
+> 
+> Thanks
+> 
+> Eric
+> 
+> > +		writel(GICD_INT_EN_SET_SGI, gicv2_dist_base() + GIC_DIST_ENABLE_SET);
+> > +		writel(GICD_ENABLE, gicv2_dist_base() + GIC_DIST_CTRL);
+> > +	}
+> > +	writel(GICC_INT_PRI_THRESHOLD, gicv2_cpu_base() + GIC_CPU_PRIMASK);
+> > +	writel(GICC_ENABLE, gicv2_cpu_base() + GIC_CPU_CTRL);
+> > +}
+> > diff --git a/lib/arm64/asm/gic-v2.h b/lib/arm64/asm/gic-v2.h
+> > new file mode 100644
+> > index 0000000000000..52226624a2092
+> > --- /dev/null
+> > +++ b/lib/arm64/asm/gic-v2.h
+> > @@ -0,0 +1 @@
+> > +#include "../../arm/asm/gic-v2.h"
+> > diff --git a/lib/arm64/asm/gic.h b/lib/arm64/asm/gic.h
+> > new file mode 100644
+> > index 0000000000000..e5eb302a31b4d
+> > --- /dev/null
+> > +++ b/lib/arm64/asm/gic.h
+> > @@ -0,0 +1 @@
+> > +#include "../../arm/asm/gic.h"
+> > 
+> 
