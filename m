@@ -1,22 +1,22 @@
 From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [RFC PATCH 5/8] ARM: gic-v3-its: Add 32bit support to GICv3 ITS
-Date: Fri, 21 Oct 2016 10:36:38 +0100
-Message-ID: <1477042601-15227-6-git-send-email-vladimir.murzin@arm.com>
+Subject: [RFC PATCH 8/8] ARM: KVM: Support vGICv3 ITS
+Date: Fri, 21 Oct 2016 10:36:41 +0100
+Message-ID: <1477042601-15227-9-git-send-email-vladimir.murzin@arm.com>
 References: <1477042601-15227-1-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4627149B5D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Oct 2016 05:26:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8234149B4A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Oct 2016 05:26:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eowqPAWs2teo for <kvmarm@lists.cs.columbia.edu>;
- Fri, 21 Oct 2016 05:26:46 -0400 (EDT)
+ with ESMTP id b0sluMw4RuPV for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 21 Oct 2016 05:26:48 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90B1049B5B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Oct 2016 05:26:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40D2849B66
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Oct 2016 05:26:48 -0400 (EDT)
 In-Reply-To: <1477042601-15227-1-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,102 +31,207 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kbuild-all@01.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Wire-up flush_dcache, readq- and writeq-like gic-v3-its assessors, so
-GICv3 ITS gets all it needs to be built and run.
+This patch allows to build and use vGICv3 ITS in 32-bit mode.
 
 Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 ---
- arch/arm/include/asm/arch_gicv3.h |   59 ++++++++++++++++++++++++++++++++-----
- 1 file changed, 52 insertions(+), 7 deletions(-)
+ Documentation/virtual/kvm/api.txt   |    2 +-
+ arch/arm/include/uapi/asm/kvm.h     |    2 ++
+ arch/arm/kvm/Kconfig                |    1 +
+ arch/arm/kvm/Makefile               |    1 +
+ arch/arm/kvm/arm.c                  |    6 ++++++
+ arch/arm64/kvm/Kconfig              |    4 ----
+ arch/arm64/kvm/reset.c              |    6 ------
+ virt/kvm/arm/vgic/vgic-kvm-device.c |    2 --
+ virt/kvm/arm/vgic/vgic-mmio-v3.c    |    2 --
+ virt/kvm/arm/vgic/vgic.h            |   26 --------------------------
+ 10 files changed, 11 insertions(+), 41 deletions(-)
 
-diff --git a/arch/arm/include/asm/arch_gicv3.h b/arch/arm/include/asm/arch_gicv3.h
-index a808829..35a1e35 100644
---- a/arch/arm/include/asm/arch_gicv3.h
-+++ b/arch/arm/include/asm/arch_gicv3.h
-@@ -22,6 +22,7 @@
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 739db9a..2feeae6 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -2198,7 +2198,7 @@ after pausing the vcpu, but before it is resumed.
+ 4.71 KVM_SIGNAL_MSI
  
- #include <linux/io.h>
- #include <asm/barrier.h>
-+#include <asm/cacheflush.h>
- #include <asm/cp15.h>
+ Capability: KVM_CAP_SIGNAL_MSI
+-Architectures: x86 arm64
++Architectures: x86 arm arm64
+ Type: vm ioctl
+ Parameters: struct kvm_msi (in)
+ Returns: >0 on delivery, 0 if guest blocked the MSI, and -1 on error
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index b38c10c..af05f8e 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -87,9 +87,11 @@ struct kvm_regs {
+ /* Supported VGICv3 address types  */
+ #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+ #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
++#define KVM_VGIC_ITS_ADDR_TYPE		4
  
- #define ICC_EOIR1			__ACCESS_CP15(c12, 0, c12, 1)
-@@ -230,19 +231,14 @@ static inline void gic_write_bpr1(u32 val)
-  * AArch32, since the syndrome register doesn't provide any information for
-  * them.
-  * Consequently, the following IO helpers use 32bit accesses.
-- *
-- * There are only two registers that need 64bit accesses in this driver:
-- * - GICD_IROUTERn, contain the affinity values associated to each interrupt.
-- *   The upper-word (aff3) will always be 0, so there is no need for a lock.
-- * - GICR_TYPER is an ID register and doesn't need atomicity.
-  */
--static inline void gic_write_irouter(u64 val, volatile void __iomem *addr)
-+static inline void __gic_writeq_nonatomic(u64 val, volatile void __iomem *addr)
- {
- 	writel_relaxed((u32)val, addr);
- 	writel_relaxed((u32)(val >> 32), addr + 4);
+ #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+ #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
++#define KVM_VGIC_V3_ITS_SIZE		(2 * SZ_64K)
+ 
+ #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+ #define KVM_ARM_VCPU_PSCI_0_2		1 /* CPU uses PSCI v0.2 */
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 3e1cd04..90d0176 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -34,6 +34,7 @@ config KVM
+ 	select HAVE_KVM_IRQFD
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
++	select HAVE_KVM_MSI
+ 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+index f19842e..d571243 100644
+--- a/arch/arm/kvm/Makefile
++++ b/arch/arm/kvm/Makefile
+@@ -32,5 +32,6 @@ obj-y += $(KVM)/arm/vgic/vgic-mmio.o
+ obj-y += $(KVM)/arm/vgic/vgic-mmio-v2.o
+ obj-y += $(KVM)/arm/vgic/vgic-mmio-v3.o
+ obj-y += $(KVM)/arm/vgic/vgic-kvm-device.o
++obj-y += $(KVM)/arm/vgic/vgic-its.o
+ obj-y += $(KVM)/irqchip.o
+ obj-y += $(KVM)/arm/arch_timer.o
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 03e9273..8b13448 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -209,6 +209,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_MAX_VCPUS:
+ 		r = KVM_MAX_VCPUS;
+ 		break;
++	case KVM_CAP_MSI_DEVID:
++		if (!kvm)
++			r = -EINVAL;
++		else
++			r = kvm->arch.vgic.msis_require_devid;
++		break;
+ 	default:
+ 		r = kvm_arch_dev_ioctl_check_extension(kvm, ext);
+ 		break;
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 6eaf12c..52cb7ad 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -16,9 +16,6 @@ menuconfig VIRTUALIZATION
+ 
+ if VIRTUALIZATION
+ 
+-config KVM_ARM_VGIC_V3_ITS
+-	bool
+-
+ config KVM
+ 	bool "Kernel-based Virtual Machine (KVM) support"
+ 	depends on OF
+@@ -34,7 +31,6 @@ config KVM
+ 	select KVM_VFIO
+ 	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_IRQFD
+-	select KVM_ARM_VGIC_V3_ITS
+ 	select KVM_ARM_PMU if HW_PERF_EVENTS
+ 	select HAVE_KVM_MSI
+ 	select HAVE_KVM_IRQCHIP
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 5bc4608..e95d4f6 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -86,12 +86,6 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 		r = 1;
+ 		break;
+-	case KVM_CAP_MSI_DEVID:
+-		if (!kvm)
+-			r = -EINVAL;
+-		else
+-			r = kvm->arch.vgic.msis_require_devid;
+-		break;
+ 	default:
+ 		r = 0;
+ 	}
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index ce1f4ed..fbe87a6 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -221,11 +221,9 @@ int kvm_register_vgic_device(unsigned long type)
+ 		ret = kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
+ 					      KVM_DEV_TYPE_ARM_VGIC_V3);
+ 
+-#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
+ 		if (ret)
+ 			break;
+ 		ret = kvm_vgic_register_its_device();
+-#endif
+ 		break;
+ 	}
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 0d3c76a..50f42f0 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -42,7 +42,6 @@ u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
+ 	return reg | ((u64)val << lower);
  }
  
--static inline u64 gic_read_typer(const volatile void __iomem *addr)
-+static inline u64 __gic_readq_nonatomic(const volatile void __iomem *addr)
+-#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
+ bool vgic_has_its(struct kvm *kvm)
  {
- 	u64 val;
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+@@ -52,7 +51,6 @@ bool vgic_has_its(struct kvm *kvm)
  
-@@ -251,5 +247,54 @@ static inline u64 gic_read_typer(const volatile void __iomem *addr)
- 	return val;
+ 	return dist->has_its;
  }
+-#endif
  
-+#define gic_flush_dcache_to_poc(a,l)    __cpuc_flush_dcache_area((a), (l))
-+
-+/*
-+ *  GICD_IROUTERn, contain the affinity values associated to each interrupt.
-+ *  The upper-word (aff3) will always be 0, so there is no need for a lock.
-+ */
-+#define gic_write_irouter(v, c)		__gic_writeq_nonatomic(v, c)
-+
-+/*
-+ * GICR_TYPER is an ID register and doesn't need atomicity.
-+ */
-+#define gic_read_typer(c)		__gic_readq_nonatomic(c)
-+
-+/*
-+ * GITS_BASER - hi and lo bits may be accessed independently.
-+ */
-+#define gits_read_baser(c)		__gic_readq_nonatomic(c)
-+#define gits_write_baser(v, c)		__gic_writeq_nonatomic(v, c)
-+
-+/*
-+ * GITS_TYPER is an ID register and doesn't need atomicity.
-+ */
-+#define gits_read_typer(c)		__gic_readq_nonatomic(c)
-+
-+/*
-+ * GICR_PENDBASER and GICR_PROPBASE are changed with LPIs disabled, so they
-+ * won't be being used during any updates and can be changed non-atomically
-+ */
-+#define gicr_read_propbaser(c)		__gic_readq_nonatomic(c)
-+#define gicr_write_propbaser(v, c)	__gic_writeq_nonatomic(v, c)
-+#define gicr_read_pendbaser(c)		__gic_readq_nonatomic(c)
-+#define gicr_write_pendbaser(v, c)	__gic_writeq_nonatomic(v, c)
-+
-+/*
-+ * GITS_TYPER is an ID register and doesn't need atomicity.
-+ */
-+#define gits_read_typer(c)		__gic_readq_nonatomic(c)
-+
-+/*
-+ * GITS_CBASER - hi and lo bits may be accessed independently.
-+ */
-+#define gits_read_cbaser(c)		__gic_readq_nonatomic(c)
-+#define gits_write_cbaser(v, c)		__gic_writeq_nonatomic(v, c)
-+
-+/*
-+ * GITS_CWRITER - hi and lo bits may be accessed independently.
-+ */
-+#define gits_write_cwriter(v, c)	__gic_writeq_nonatomic(v, c)
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* !__ASM_ARCH_GICV3_H */
+ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 					    gpa_t addr, unsigned int len)
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 9d9e014..859f65c 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -84,37 +84,11 @@ static inline void vgic_get_irq_kref(struct vgic_irq *irq)
+ int vgic_v3_map_resources(struct kvm *kvm);
+ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
+ 
+-#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
+ int vgic_register_its_iodevs(struct kvm *kvm);
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
+-#else
+-static inline int vgic_register_its_iodevs(struct kvm *kvm)
+-{
+-	return -ENODEV;
+-}
+-
+-static inline bool vgic_has_its(struct kvm *kvm)
+-{
+-	return false;
+-}
+-
+-static inline int kvm_vgic_register_its_device(void)
+-{
+-	return -ENODEV;
+-}
+-
+-static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+-{
+-}
+-
+-static inline int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+-{
+-	return -ENODEV;
+-}
+-#endif
+ 
+ int kvm_register_vgic_device(unsigned long type);
+ int vgic_lazy_init(struct kvm *kvm);
 -- 
 1.7.9.5
