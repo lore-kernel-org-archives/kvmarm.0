@@ -1,22 +1,22 @@
 From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [RFC PATCH 7/8] KVM: arm64: vgic-its: fix compatability with 32-bit
-Date: Fri, 21 Oct 2016 10:36:40 +0100
-Message-ID: <1477042601-15227-8-git-send-email-vladimir.murzin@arm.com>
+Subject: [RFC PATCH 3/8] irqchip/gicv3-its: specialise flush_dcache operation
+Date: Fri, 21 Oct 2016 10:36:36 +0100
+Message-ID: <1477042601-15227-4-git-send-email-vladimir.murzin@arm.com>
 References: <1477042601-15227-1-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49FD949B67
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Oct 2016 05:26:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2446149B40
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Oct 2016 05:26:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oBoIUG3LPRZe for <kvmarm@lists.cs.columbia.edu>;
- Fri, 21 Oct 2016 05:26:47 -0400 (EDT)
+ with ESMTP id UYYCyN31yGZP for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 21 Oct 2016 05:26:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0894A49B5C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Oct 2016 05:26:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A03B49B3D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Oct 2016 05:26:42 -0400 (EDT)
 In-Reply-To: <1477042601-15227-1-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,78 +31,117 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kbuild-all@01.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Evaluate GITS_BASER_ENTRY_SIZE once as an int data (GITS_BASER<n>'s
-Entry Size is 5-bit wide only), so when used as divider no reference
-to __aeabi_uldivmod is generated when build for AArch32.
-
-Use unsigned long long for GITS_BASER_PAGE_SIZE_* since they are
-used in conjunction with 64-bit data.
+It'd be better to switch to CMA... but before that done redirect
+flush_dcache operation, so 32-bit implementation could be wired
+latter.
 
 Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h |    8 ++++----
- virt/kvm/arm/vgic/vgic-its.c       |   11 ++++++-----
- 2 files changed, 10 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/arch_gicv3.h |    3 +++
+ drivers/irqchip/irq-gic-v3-its.c    |   17 ++++++++---------
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 5118d3a..e808f8a 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -295,10 +295,10 @@
- #define GITS_BASER_InnerShareable					\
- 	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
- #define GITS_BASER_PAGE_SIZE_SHIFT	(8)
--#define GITS_BASER_PAGE_SIZE_4K		(0UL << GITS_BASER_PAGE_SIZE_SHIFT)
--#define GITS_BASER_PAGE_SIZE_16K	(1UL << GITS_BASER_PAGE_SIZE_SHIFT)
--#define GITS_BASER_PAGE_SIZE_64K	(2UL << GITS_BASER_PAGE_SIZE_SHIFT)
--#define GITS_BASER_PAGE_SIZE_MASK	(3UL << GITS_BASER_PAGE_SIZE_SHIFT)
-+#define GITS_BASER_PAGE_SIZE_4K		(0ULL << GITS_BASER_PAGE_SIZE_SHIFT)
-+#define GITS_BASER_PAGE_SIZE_16K	(1ULL << GITS_BASER_PAGE_SIZE_SHIFT)
-+#define GITS_BASER_PAGE_SIZE_64K	(2ULL << GITS_BASER_PAGE_SIZE_SHIFT)
-+#define GITS_BASER_PAGE_SIZE_MASK	(3ULL << GITS_BASER_PAGE_SIZE_SHIFT)
- #define GITS_BASER_PAGES_MAX		256
- #define GITS_BASER_PAGES_SHIFT		(0)
- #define GITS_BASER_NR_PAGES(r)		(((r) & 0xff) + 1)
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4660a7d..8c2b3cd 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -632,21 +632,22 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
- 	int index;
- 	u64 indirect_ptr;
- 	gfn_t gfn;
-+	int esz = GITS_BASER_ENTRY_SIZE(baser);
+diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
+index f8ae6d6..4f0402a 100644
+--- a/arch/arm64/include/asm/arch_gicv3.h
++++ b/arch/arm64/include/asm/arch_gicv3.h
+@@ -79,6 +79,7 @@
  
- 	if (!(baser & GITS_BASER_INDIRECT)) {
- 		phys_addr_t addr;
+ #include <linux/stringify.h>
+ #include <asm/barrier.h>
++#include <asm/cacheflush.h>
  
--		if (id >= (l1_tbl_size / GITS_BASER_ENTRY_SIZE(baser)))
-+		if (id >= (l1_tbl_size / esz))
- 			return false;
+ #define read_gicreg(r)							\
+ 	({								\
+@@ -187,5 +188,7 @@ static inline void gic_write_bpr1(u32 val)
+ #define gic_read_typer(c)		readq_relaxed(c)
+ #define gic_write_irouter(v, c)		writeq_relaxed(v, c)
  
--		addr = BASER_ADDRESS(baser) + id * GITS_BASER_ENTRY_SIZE(baser);
-+		addr = BASER_ADDRESS(baser) + id * esz;
- 		gfn = addr >> PAGE_SHIFT;
++#define gic_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
++
+ #endif /* __ASSEMBLY__ */
+ #endif /* __ASM_ARCH_GICV3_H */
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index e992b01..86efa6e 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -37,7 +37,6 @@
+ #include <linux/irqchip.h>
+ #include <linux/irqchip/arm-gic-v3.h>
  
- 		return kvm_is_visible_gfn(its->dev->kvm, gfn);
+-#include <asm/cacheflush.h>
+ #include <asm/cputype.h>
+ #include <asm/exception.h>
+ 
+@@ -433,7 +432,7 @@ static void its_flush_cmd(struct its_node *its, struct its_cmd_block *cmd)
+ 	 * the ITS.
+ 	 */
+ 	if (its->flags & ITS_FLAGS_CMDQ_NEEDS_FLUSHING)
+-		__flush_dcache_area(cmd, sizeof(*cmd));
++		gic_flush_dcache_to_poc(cmd, sizeof(*cmd));
+ 	else
+ 		dsb(ishst);
+ }
+@@ -602,7 +601,7 @@ static void lpi_set_config(struct irq_data *d, bool enable)
+ 	 * Humpf...
+ 	 */
+ 	if (gic_rdists->flags & RDIST_FLAGS_PROPBASE_NEEDS_FLUSHING)
+-		__flush_dcache_area(cfg, sizeof(*cfg));
++		gic_flush_dcache_to_poc(cfg, sizeof(*cfg));
+ 	else
+ 		dsb(ishst);
+ 	its_send_inv(its_dev, id);
+@@ -817,7 +816,7 @@ static int __init its_alloc_lpi_tables(void)
+ 	       LPI_PROPBASE_SZ);
+ 
+ 	/* Make sure the GIC will observe the written configuration */
+-	__flush_dcache_area(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
++	gic_flush_dcache_to_poc(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
+ 
+ 	return 0;
+ }
+@@ -910,7 +909,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+ 		shr = tmp & GITS_BASER_SHAREABILITY_MASK;
+ 		if (!shr) {
+ 			cache = GITS_BASER_nC;
+-			__flush_dcache_area(base, PAGE_ORDER_TO_SIZE(order));
++			gic_flush_dcache_to_poc(base, PAGE_ORDER_TO_SIZE(order));
+ 		}
+ 		goto retry_baser;
+ 	}
+@@ -1102,7 +1101,7 @@ static void its_cpu_init_lpis(void)
+ 		}
+ 
+ 		/* Make sure the GIC will observe the zero-ed page */
+-		__flush_dcache_area(page_address(pend_page), LPI_PENDBASE_SZ);
++		gic_flush_dcache_to_poc(page_address(pend_page), LPI_PENDBASE_SZ);
+ 
+ 		paddr = page_to_phys(pend_page);
+ 		pr_info("CPU%d: using LPI pending table @%pa\n",
+@@ -1287,13 +1286,13 @@ static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
+ 
+ 		/* Flush Lvl2 table to PoC if hw doesn't support coherency */
+ 		if (!(baser->val & GITS_BASER_SHAREABILITY_MASK))
+-			__flush_dcache_area(page_address(page), baser->psz);
++			gic_flush_dcache_to_poc(page_address(page), baser->psz);
+ 
+ 		table[idx] = cpu_to_le64(page_to_phys(page) | GITS_BASER_VALID);
+ 
+ 		/* Flush Lvl1 entry to PoC if hw doesn't support coherency */
+ 		if (!(baser->val & GITS_BASER_SHAREABILITY_MASK))
+-			__flush_dcache_area(table + idx, GITS_LVL1_ENTRY_SIZE);
++			gic_flush_dcache_to_poc(table + idx, GITS_LVL1_ENTRY_SIZE);
+ 
+ 		/* Ensure updated table contents are visible to ITS hardware */
+ 		dsb(sy);
+@@ -1340,7 +1339,7 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+ 		return NULL;
  	}
  
- 	/* calculate and check the index into the 1st level */
--	index = id / (SZ_64K / GITS_BASER_ENTRY_SIZE(baser));
-+	index = id / (SZ_64K / esz);
- 	if (index >= (l1_tbl_size / sizeof(u64)))
- 		return false;
+-	__flush_dcache_area(itt, sz);
++	gic_flush_dcache_to_poc(itt, sz);
  
-@@ -670,8 +671,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
- 	indirect_ptr &= GENMASK_ULL(51, 16);
- 
- 	/* Find the address of the actual entry */
--	index = id % (SZ_64K / GITS_BASER_ENTRY_SIZE(baser));
--	indirect_ptr += index * GITS_BASER_ENTRY_SIZE(baser);
-+	index = id % (SZ_64K / esz);
-+	indirect_ptr += index * esz;
- 	gfn = indirect_ptr >> PAGE_SHIFT;
- 
- 	return kvm_is_visible_gfn(its->dev->kvm, gfn);
+ 	dev->its = its;
+ 	dev->itt = itt;
 -- 
 1.7.9.5
