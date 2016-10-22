@@ -1,15 +1,13 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH 4/8] irqchip/gicv3-its: specialise readq and writeq
- accesses
-Date: Sat, 22 Oct 2016 16:43:49 +0100
-Message-ID: <20161022164349.18fe5d5a@arm.com>
+Subject: Re: [RFC PATCH 0/8] Support GICv3 ITS and vITS in 32-bit mode
+Date: Sat, 22 Oct 2016 16:55:51 +0100
+Message-ID: <20161022165551.07680200@arm.com>
 References: <1477042601-15227-1-git-send-email-vladimir.murzin@arm.com>
- <1477042601-15227-5-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1477042601-15227-5-git-send-email-vladimir.murzin@arm.com>
+In-Reply-To: <1477042601-15227-1-git-send-email-vladimir.murzin@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -23,84 +21,89 @@ To: Vladimir Murzin <vladimir.murzin@arm.com>
 Cc: christoffer.dall@linaro.org, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kbuild-all@01.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 21 Oct 2016 10:36:37 +0100
+On Fri, 21 Oct 2016 10:36:33 +0100
 Vladimir Murzin <vladimir.murzin@arm.com> wrote:
 
 Hi Vladimir,
 
-> readq and writeq type of assessors are not supported in AArch32, so we
-> need to specialise them and glue later with series of 32-bit accesses
-> on AArch32 side.
+> Hi,
 > 
-> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
-> ---
->  arch/arm64/include/asm/arch_gicv3.h |   16 ++++++++++++++++
->  drivers/irqchip/irq-gic-v3-its.c    |   30 +++++++++++++++---------------
->  2 files changed, 31 insertions(+), 15 deletions(-)
+> This series introduces GICv3 ITS and vITS to 32-bit world. The first
+> six patches make it possible to use ITS in a 32-bit guest with vITS on
+> 64-bit host. The last two patches extend vITS to 32-bit host.
+
+I quite like this series, mostly because it deletes a bit of code and
+fixes a number of shortcomings. My only gripes are than it doesn't
+apply to my current tree (see my comment on patch 4), and that this
+should effectively be split in two series: one enabling the ITS on
+32bit, and the other switching on ITS emulation for 32bit KVM.
+Effectively, these series are completely independent.
+
+It also makes it easier for me to merge things as I don't have to
+coordinate the merging strategy with... myself. ;-)
+
+Please repost this once the GIC fixes have reached mainline, and this
+should be in good shape for a quick merge.
+
+> I used Andrea's its/v8 branch at [1] for testing with the following
+> diff on top
 > 
-> diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
-> index 4f0402a..e0ada98 100644
-> --- a/arch/arm64/include/asm/arch_gicv3.h
-> +++ b/arch/arm64/include/asm/arch_gicv3.h
-> @@ -190,5 +190,21 @@ static inline void gic_write_bpr1(u32 val)
->  
->  #define gic_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
->  
-> +#define gits_read_typer(c)		readq_relaxed(c)
-> +
-> +#define gits_read_baser(c)		readq_relaxed(c)
-> +#define gits_write_baser(v, c)		writeq_relaxed(v, c)
-> +
-> +#define gits_read_cbaser(c)		readq_relaxed(c)
-> +#define gits_write_cbaser(v, c)		writeq_relaxed(v, c)
-> +
-> +#define gits_write_cwriter(v, c)	writeq_relaxed(v, c)
-> +
-> +#define gicr_read_propbaser(c)		readq_relaxed(c)
-> +#define gicr_write_propbaser(v, c)	writeq_relaxed(v, c)
-> +
-> +#define gicr_write_pendbaser(v, c)	writeq_relaxed(v, c)
-> +#define gicr_read_pendbaser(c)		readq_relaxed(c)
-> +
->  #endif /* __ASSEMBLY__ */
->  #endif /* __ASM_ARCH_GICV3_H */
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 86efa6e..9f74abc 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -835,7 +835,7 @@ static u64 its_read_baser(struct its_node *its, struct its_baser *baser)
+> diff --git a/arm/aarch32/arm-cpu.c b/arm/aarch32/arm-cpu.c
+> index 27a8e17..16bba55 100644
+> --- a/arm/aarch32/arm-cpu.c
+> +++ b/arm/aarch32/arm-cpu.c
+> @@ -12,7 +12,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
 >  {
->  	u32 idx = baser - its->tables;
+>  	int timer_interrupts[4] = {13, 14, 11, 10};
 >  
-> -	return readq_relaxed(its->base + GITS_BASER + (idx << 3));
-> +	return gits_read_baser(its->base + GITS_BASER + (idx << 3));
+> -	gic__generate_fdt_nodes(fdt, IRQCHIP_GICV2);
+> +	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
+>  	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
 >  }
 >  
->  static void its_write_baser(struct its_node *its, struct its_baser *baser,
-> @@ -843,7 +843,7 @@ static void its_write_baser(struct its_node *its, struct its_baser *baser,
->  {
->  	u32 idx = baser - its->tables;
+> diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+> index 1632e3c..99231f6 100644
+> --- a/arm/aarch32/include/kvm/kvm-arch.h
+> +++ b/arm/aarch32/include/kvm/kvm-arch.h
+> @@ -1,8 +1,8 @@
+>  #ifndef KVM__KVM_ARCH_H
+>  #define KVM__KVM_ARCH_H
 >  
-> -	writeq_relaxed(val, its->base + GITS_BASER + (idx << 3));
-> +	gits_write_baser(val, its->base + GITS_BASER + (idx << 3));
->  	baser->val = its_read_baser(its, baser);
->  }
+> -#define ARM_GIC_DIST_SIZE	0x1000
+> -#define ARM_GIC_CPUI_SIZE	0x2000
+> +#define ARM_GIC_DIST_SIZE	0x100000
+> +#define ARM_GIC_CPUI_SIZE	0x200000
 >  
-> @@ -1022,7 +1022,7 @@ static void its_free_tables(struct its_node *its)
+>  #define ARM_KERN_OFFSET(...)	0x8000
 >  
->  static int its_alloc_tables(struct its_node *its)
->  {
-> -	u64 typer = readq_relaxed(its->base + GITS_TYPER);
-> +	u64 typer = gits_read_typer(its->base + GITS_TYPER);
+> 
+> After passing --irqchip=gicv3-its --force-pci to kvmtool I can see
+> that MSI is used:
+> 
+> # cat /proc/interrupts
+>            CPU0       
+>  18:       1251     GICv3  27 Level     arch_timer
+>  28:          0   ITS-MSI 49152 Edge      virtio3-config
+>  29:          0   ITS-MSI 49153 Edge      virtio3-input
+>  30:          0   ITS-MSI 49154 Edge      virtio3-output
+>  31:          0   ITS-MSI 32768 Edge      virtio2-config
+>  32:          2   ITS-MSI 32769 Edge      virtio2-input.0
+>  33:          1   ITS-MSI 32770 Edge      virtio2-output.0
+>  34:          0   ITS-MSI   0 Edge      virtio0-config
+>  35:        303   ITS-MSI   1 Edge      virtio0-requests
+>  36:          0   ITS-MSI 16384 Edge      virtio1-config
+>  37:        218   ITS-MSI 16385 Edge      virtio1-requests
+> IPI0:          0  CPU wakeup interrupts
+> IPI1:          0  Timer broadcast interrupts
+> IPI2:          0  Rescheduling interrupts
+> IPI3:          0  Function call interrupts
+> IPI4:          0  CPU stop interrupts
+> IPI5:          0  IRQ work interrupts
+> IPI6:          0  completion interrupts
+> Err:          0
 
-This is going to conflict with the irq/irq-fixes-4.9 branch, which is
-already on its way to mainline (and will hopefully hit -rc2) Could you
-please rebase it once these patches are in mainline?
-
-You'll notice that I didn't bother distinguishing between the various
-GI*_TYPER registers, as they all have the same behaviour.
-
-Otherwise looks good to me.
+Please also post these patches (I may try it in a model if I feel brave
+enough...)!
 
 Thanks,
 
