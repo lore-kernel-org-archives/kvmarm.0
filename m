@@ -1,112 +1,62 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH 0/8] Support GICv3 ITS and vITS in 32-bit mode
-Date: Sat, 22 Oct 2016 16:55:51 +0100
-Message-ID: <20161022165551.07680200@arm.com>
-References: <1477042601-15227-1-git-send-email-vladimir.murzin@arm.com>
+From: Hanjun Guo <guohanjun@huawei.com>
+Subject: Re: [PATCH V3 05/10] acpi: apei: handle SEA notification type for
+ ARMv8
+Date: Sun, 23 Oct 2016 17:13:28 +0800
+Message-ID: <580C7F38.4010301@huawei.com>
+References: <1475875882-2604-1-git-send-email-tbaicar@codeaurora.org>
+ <1475875882-2604-6-git-send-email-tbaicar@codeaurora.org>
+ <496ddac3-a220-fd42-5ca1-3d0fb0238907@linaro.org>
+ <1941586c-4c51-60d8-a77a-ad56fe5f3e3f@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1477042601-15227-1-git-send-email-vladimir.murzin@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: christoffer.dall@linaro.org, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kbuild-all@01.org
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <1941586c-4c51-60d8-a77a-ad56fe5f3e3f@codeaurora.org>
+Sender: linux-acpi-owner@vger.kernel.org
+To: "Abdulhamid, Harb" <harba@codeaurora.org>, Hanjun Guo <hanjun.guo@linaro.org>, Tyler Baicar <tbaicar@codeaurora.org>, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, sandeepa.s.prabhu@gmail.com, shijie.huang@arm.com, paul.gortmaker@windriver.com, tomasz.nowicki@linaro.org, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Dkvm@vger.kernel.org, linux-kernel
+Cc: Naveen Kaje <nkaje@codeaurora.org>, "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 21 Oct 2016 10:36:33 +0100
-Vladimir Murzin <vladimir.murzin@arm.com> wrote:
+Hi Harb,
 
-Hi Vladimir,
+On 2016/10/20 0:59, Abdulhamid, Harb wrote:
+> On 10/18/2016 8:44 AM, Hanjun Guo wrote:
+>> Hi Tyler,
+>>
+>> On 2016/10/8 5:31, Tyler Baicar wrote:
+>>> ARM APEI extension proposal added SEA (Synchrounous External
+>>> Abort) notification type for ARMv8.
+>>> Add a new GHES error source handling function for SEA. If an error
+>>> source's notification type is SEA, then this function can be registered
+>>> into the SEA exception handler. That way GHES will parse and report
+>>> SEA exceptions when they occur.
+>> Does this SEA is replayed by the firmware (firmware first handling)
+>> or directly triggered by the hardware when error is happened?
+> Architecturally, an SEA must be synchronous and *precise*, so if you
+> take an SEA on a particular load instruction, firmware/hardware should
+> not be corrupting the context/state of the PE to allow software to
+> determine which thread/process encountered the abort.  GHES error status
 
-> Hi,
-> 
-> This series introduces GICv3 ITS and vITS to 32-bit world. The first
-> six patches make it possible to use ITS in a 32-bit guest with vITS on
-> 64-bit host. The last two patches extend vITS to 32-bit host.
+That's my concern too, and that's why I raised my question :)
 
-I quite like this series, mostly because it deletes a bit of code and
-fixes a number of shortcomings. My only gripes are than it doesn't
-apply to my current tree (see my comment on patch 4), and that this
-should effectively be split in two series: one enabling the ITS on
-32bit, and the other switching on ITS emulation for 32bit KVM.
-Effectively, these series are completely independent.
+> block will be expose to software with information about the type,
+> severity, physical address impacted.
+>
+> Generally the error status block is populated by firmware.  However, as
+> long as the above requirement is met, I don't think the spec precludes
+> error status block being populated by hardware.  Those details must be
+> completely transparent to software.
+>
+> Finally, to answer your more specific question:  If the implementation
+> of firmware-first involves trapping the SEA in EL3 to do some firmware
+> first handling, firmware must maintain the context of the offending ELx,
+> generate an error record, and then "replay" the exception to normal
+> (non-secure) software at the appropriate vector base address.
+>
 
-It also makes it easier for me to merge things as I don't have to
-coordinate the merging strategy with... myself. ;-)
+Thank you for your answer, it clears my confusion now, I will try something
+similar on ARM64 platform, will get back to you if I get blocks.
 
-Please repost this once the GIC fixes have reached mainline, and this
-should be in good shape for a quick merge.
+Thanks
+Hanjun
 
-> I used Andrea's its/v8 branch at [1] for testing with the following
-> diff on top
-> 
-> diff --git a/arm/aarch32/arm-cpu.c b/arm/aarch32/arm-cpu.c
-> index 27a8e17..16bba55 100644
-> --- a/arm/aarch32/arm-cpu.c
-> +++ b/arm/aarch32/arm-cpu.c
-> @@ -12,7 +12,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  {
->  	int timer_interrupts[4] = {13, 14, 11, 10};
->  
-> -	gic__generate_fdt_nodes(fdt, IRQCHIP_GICV2);
-> +	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
->  	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
->  }
->  
-> diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
-> index 1632e3c..99231f6 100644
-> --- a/arm/aarch32/include/kvm/kvm-arch.h
-> +++ b/arm/aarch32/include/kvm/kvm-arch.h
-> @@ -1,8 +1,8 @@
->  #ifndef KVM__KVM_ARCH_H
->  #define KVM__KVM_ARCH_H
->  
-> -#define ARM_GIC_DIST_SIZE	0x1000
-> -#define ARM_GIC_CPUI_SIZE	0x2000
-> +#define ARM_GIC_DIST_SIZE	0x100000
-> +#define ARM_GIC_CPUI_SIZE	0x200000
->  
->  #define ARM_KERN_OFFSET(...)	0x8000
->  
-> 
-> After passing --irqchip=gicv3-its --force-pci to kvmtool I can see
-> that MSI is used:
-> 
-> # cat /proc/interrupts
->            CPU0       
->  18:       1251     GICv3  27 Level     arch_timer
->  28:          0   ITS-MSI 49152 Edge      virtio3-config
->  29:          0   ITS-MSI 49153 Edge      virtio3-input
->  30:          0   ITS-MSI 49154 Edge      virtio3-output
->  31:          0   ITS-MSI 32768 Edge      virtio2-config
->  32:          2   ITS-MSI 32769 Edge      virtio2-input.0
->  33:          1   ITS-MSI 32770 Edge      virtio2-output.0
->  34:          0   ITS-MSI   0 Edge      virtio0-config
->  35:        303   ITS-MSI   1 Edge      virtio0-requests
->  36:          0   ITS-MSI 16384 Edge      virtio1-config
->  37:        218   ITS-MSI 16385 Edge      virtio1-requests
-> IPI0:          0  CPU wakeup interrupts
-> IPI1:          0  Timer broadcast interrupts
-> IPI2:          0  Rescheduling interrupts
-> IPI3:          0  Function call interrupts
-> IPI4:          0  CPU stop interrupts
-> IPI5:          0  IRQ work interrupts
-> IPI6:          0  completion interrupts
-> Err:          0
-
-Please also post these patches (I may try it in a model if I feel brave
-enough...)!
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny.
