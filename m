@@ -1,131 +1,58 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH] arm/arm64: KVM: Perform local TLB invalidation when
- multiplexing vcpus on a single CPU
-Date: Mon, 24 Oct 2016 17:16:56 +0100
-Message-ID: <20161024161656.GM15620@leverpostej>
-References: <1477323088-18768-1-git-send-email-marc.zyngier@arm.com>
+From: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Subject: Re: [PATCH V4 09/10] trace, ras: add ARM processor error trace event
+Date: Mon, 24 Oct 2016 11:21:21 -0600
+Message-ID: <7a8c62a7-c2f4-0cae-ce0a-24cbf827bd4f@codeaurora.org>
+References: <1477071013-29563-1-git-send-email-tbaicar@codeaurora.org>
+ <1477071013-29563-10-git-send-email-tbaicar@codeaurora.org>
+ <20161021163410.0a827eab@gandalf.local.home>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1477323088-18768-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Will Deacon <will.deacon@arm.com>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD5F40C8F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2016 13:21:28 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id dIe1ZNuhe6po for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Oct 2016 13:21:27 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5ABEF40C63
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2016 13:21:26 -0400 (EDT)
+In-Reply-To: <20161021163410.0a827eab@gandalf.local.home>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, lenb@kernel.org, harba@codeaurora.org, marc.zyngier@arm.com, punit.agrawal@arm.com, tomasz.nowicki@linaro.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On 10/21/2016 2:34 PM, Steven Rostedt wrote:
+> On Fri, 21 Oct 2016 11:30:12 -0600
+> Tyler Baicar <tbaicar@codeaurora.org> wrote:
+>
+>> Currently there are trace events for the various RAS
+>> errors with the exception of ARM processor type errors.
+>> Add a new trace event for such errors so that the user
+>> will know when they occur. These trace events are
+>> consistent with the ARM processor error section type
+>> defined in UEFI 2.6 spec section N.2.4.4.
+>>
+>> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+> Tracing part looks fine to me.
+>
+> Acked-by: Steven Rostedt <rostedt@goodmis.org>
+>
+> -- Steve
+Thank you Steve!
 
-On Mon, Oct 24, 2016 at 04:31:28PM +0100, Marc Zyngier wrote:
-> Architecturally, TLBs are private to the (physical) CPU they're
-> associated with. But when multiple vcpus from the same VM are
-> being multiplexed on the same CPU, the TLBs are not private
-> to the vcpus (and are actually shared across the VMID).
-> 
-> Let's consider the following scenario:
-> 
-> - vcpu-0 maps PA to VA
-> - vcpu-1 maps PA' to VA
-> 
-> If run on the same physical CPU, vcpu-1 can hit TLB entries generated
-> by vcpu-0 accesses, and access the wrong physical page.
-
-It might be worth noting that this could also lead to TLB conflicts and
-other such fun usually associated with missing TLB maintenance,
-depending on the two mappings (or the intermediate stages thereof).
-
-> The solution to this is to keep a per-VM map of which vcpu ran last
-> on each given physical CPU, and invalidate local TLBs when switching
-> to a different vcpu from the same VM.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Modulo my comment on preemptiblity of kvm_arch_sched_in, everything
-below is a nit. Assuming that's not preemptible, this looks right to me.
-
-FWIW, with or without the other comments considered:
-
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-
-> ---
->  arch/arm/include/asm/kvm_host.h   |  5 +++++
->  arch/arm/include/asm/kvm_hyp.h    |  1 +
->  arch/arm/kvm/arm.c                | 35 ++++++++++++++++++++++++++++++++++-
->  arch/arm/kvm/hyp/switch.c         |  9 +++++++++
->  arch/arm64/include/asm/kvm_host.h |  6 +++++-
->  arch/arm64/kvm/hyp/switch.c       |  8 ++++++++
->  6 files changed, 62 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 2d19e02..035e744 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -57,6 +57,8 @@ struct kvm_arch {
->  	/* VTTBR value associated with below pgd and vmid */
->  	u64    vttbr;
->  
-> +	int __percpu *last_vcpu_ran;
-> +
->  	/* Timer */
->  	struct arch_timer_kvm	timer;
->  
-> @@ -174,6 +176,9 @@ struct kvm_vcpu_arch {
->  	/* vcpu power-off state */
->  	bool power_off;
->  
-> +	/* TLBI required */
-> +	bool requires_tlbi;
-
-A bit of a nit, but it's not clear which class of TLBI is required, or
-why. It's probably worth a comment (and perhaps a bikeshed), like:
-
-	/*
-	 * Local TLBs potentially contain conflicting entries from
-	 * another vCPU within this VMID. All entries for this VMID must
-	 * be invalidated from (local) TLBs before we run this vCPU.
-	 */
-	bool tlb_vmid_stale;
-
-[...]
-
-> +void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +	int *last_ran;
-> +
-> +	last_ran = per_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran, cpu);
-> +
-> +	/*
-> +	 * If we're very unlucky and get preempted before having ran
-> +	 * this vcpu for real, we'll end-up in a situation where any
-> +	 * vcpu that gets scheduled will perform an invalidation (this
-> +	 * vcpu explicitely requires it, and all the others will have
-> +	 * a different vcpu_id).
-> +	 */
-
-Nit: s/explicitely/explicitly/
-
-To bikeshed a little further, perhaps:
-
-	/*
-	 * We might get preempted before the vCPU actually runs, but
-	 * this is fine. Our TLBI stays pending until we actually make
-	 * it to __activate_vm, so we won't miss a TLBI. If another vCPU
-	 * gets scheduled, it will see our vcpu_id in last_ran, and pend
-	 * a TLBI for itself.
-	 */
-
-> +	if (*last_ran != vcpu->vcpu_id) {
-> +		if (*last_ran != -1)
-> +			vcpu->arch.requires_tlbi = true;
-> +
-> +		*last_ran = vcpu->vcpu_id;
-> +	}
-> +}
-
-I take it this function is run in some non-preemptible context; if so,
-this looks correct to me.
-
-If this is preemptible, then this looks racy.
-
-Thanks,
-Mark.
+-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
