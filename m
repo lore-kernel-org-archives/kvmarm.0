@@ -1,25 +1,25 @@
 From: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Subject: Re: [PATCH V4 09/10] trace, ras: add ARM processor error trace event
-Date: Mon, 24 Oct 2016 11:21:21 -0600
-Message-ID: <7a8c62a7-c2f4-0cae-ce0a-24cbf827bd4f@codeaurora.org>
+Subject: Re: [PATCH V4 01/10] acpi: apei: read ack upon ghes record consumption
+Date: Mon, 24 Oct 2016 14:28:09 -0600
+Message-ID: <768254df-7b4a-65a4-81bf-665f63780073@codeaurora.org>
 References: <1477071013-29563-1-git-send-email-tbaicar@codeaurora.org>
- <1477071013-29563-10-git-send-email-tbaicar@codeaurora.org>
- <20161021163410.0a827eab@gandalf.local.home>
+ <1477071013-29563-2-git-send-email-tbaicar@codeaurora.org>
+ <b4b69d66-ae37-a528-d64c-ee9b3fe7b02c@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD5F40C8F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2016 13:21:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C178140DF2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2016 16:28:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dIe1ZNuhe6po for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Oct 2016 13:21:27 -0400 (EDT)
+ with ESMTP id 52Qenc6zsFaB for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Oct 2016 16:28:15 -0400 (EDT)
 Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5ABEF40C63
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2016 13:21:26 -0400 (EDT)
-In-Reply-To: <20161021163410.0a827eab@gandalf.local.home>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7323F40DEE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2016 16:28:15 -0400 (EDT)
+In-Reply-To: <b4b69d66-ae37-a528-d64c-ee9b3fe7b02c@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,28 +29,149 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, lenb@kernel.org, harba@codeaurora.org, marc.zyngier@arm.com, punit.agrawal@arm.com, tomasz.nowicki@linaro.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
+To: Suzuki K Poulose <Suzuki.Poulose@arm.com>, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tomasz.nowicki@linaro.org, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, punit.agrawal@arm.com, astone@redhat.com, harba@codeaurora.org, hanjun.guo@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/21/2016 2:34 PM, Steven Rostedt wrote:
-> On Fri, 21 Oct 2016 11:30:12 -0600
-> Tyler Baicar <tbaicar@codeaurora.org> wrote:
->
->> Currently there are trace events for the various RAS
->> errors with the exception of ARM processor type errors.
->> Add a new trace event for such errors so that the user
->> will know when they occur. These trace events are
->> consistent with the ARM processor error section type
->> defined in UEFI 2.6 spec section N.2.4.4.
+On 10/24/2016 2:51 AM, Suzuki K Poulose wrote:
+> On 21/10/16 18:30, Tyler Baicar wrote:
+>> A RAS (Reliability, Availability, Serviceability) controller
+>> may be a separate processor running in parallel with OS
+>> execution, and may generate error records for consumption by
+>> the OS. If the RAS controller produces multiple error records,
+>> then they may be overwritten before the OS has consumed them.
 >>
+>> The Generic Hardware Error Source (GHES) v2 structure
+>> introduces the capability for the OS to acknowledge the
+>> consumption of the error record generated by the RAS
+>> controller. A RAS controller supporting GHESv2 shall wait for
+>> the acknowledgment before writing a new error record, thus
+>> eliminating the race condition.
+>>
+>> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+>> Signed-off-by: Richard Ruigrok <rruigrok@codeaurora.org>
 >> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
-> Tracing part looks fine to me.
+>> Signed-off-by: Naveen Kaje <nkaje@codeaurora.org>
+>> ---
+>>  drivers/acpi/apei/ghes.c | 42 
+>> ++++++++++++++++++++++++++++++++++++++++++
+>>  drivers/acpi/apei/hest.c |  7 +++++--
+>>  include/acpi/ghes.h      |  5 ++++-
+>>  3 files changed, 51 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+>> index 60746ef..7d020b0 100644
+>> --- a/drivers/acpi/apei/ghes.c
+>> +++ b/drivers/acpi/apei/ghes.c
+>> @@ -45,6 +45,7 @@
+>>  #include <linux/aer.h>
+>>  #include <linux/nmi.h>
+>>
+>> +#include <acpi/actbl1.h>
+>>  #include <acpi/ghes.h>
+>>  #include <acpi/apei.h>
+>>  #include <asm/tlbflush.h>
+>> @@ -79,6 +80,10 @@
+>>      ((struct acpi_hest_generic_status *)                \
+>>       ((struct ghes_estatus_node *)(estatus_node) + 1))
+>>
+>> +#define HEST_TYPE_GENERIC_V2(ghes)                \
+>> +    ((struct acpi_hest_header *)ghes->generic)->type ==    \
+>> +     ACPI_HEST_TYPE_GENERIC_ERROR_V2
+>> +
+>>  /*
+>>   * This driver isn't really modular, however for the time being,
+>>   * continuing to use module_param is the easiest way to remain
+>> @@ -248,7 +253,15 @@ static struct ghes *ghes_new(struct 
+>> acpi_hest_generic *generic)
+>>      ghes = kzalloc(sizeof(*ghes), GFP_KERNEL);
+>>      if (!ghes)
+>>          return ERR_PTR(-ENOMEM);
+>> +
+>>      ghes->generic = generic;
+>> +    if (HEST_TYPE_GENERIC_V2(ghes)) {
+>> +        rc = apei_map_generic_address(
+>> +            &ghes->generic_v2->read_ack_register);
+>> +        if (rc)
+>> +            goto err_unmap;
 >
-> Acked-by: Steven Rostedt <rostedt@goodmis.org>
+> I think should be goto err_free, see more below.
 >
-> -- Steve
-Thank you Steve!
+>> +    }
+>> +
+>>      rc = apei_map_generic_address(&generic->error_status_address);
+>>      if (rc)
+>>          goto err_free;
+>> @@ -270,6 +283,9 @@ static struct ghes *ghes_new(struct 
+>> acpi_hest_generic *generic)
+>>
+>>  err_unmap:
+>> apei_unmap_generic_address(&generic->error_status_address);
+>> +    if (HEST_TYPE_GENERIC_V2(ghes))
+>> +        apei_unmap_generic_address(
+>> +            &ghes->generic_v2->read_ack_register);
+>
+> We might end up trying to unmap (error_status_address) which is not 
+> mapped
+> if we hit the error in mapping read_ack_register. The 
+> read_ack_register unmap
+> hunk should be moved below to err_free.
+>
+This needs to be changed, I'll add a separate label for unmapping 
+read_ack_register and error_status_address for the case that the 
+read_ack_register map succeeds but the error_status_address map fails.
+
+err_unmap_status_addr:
+apei_unmap_generic_address(&generic->error_status_address);
+err_unmap_read_ack_addr:
+         if (HEST_TYPE_GENERIC_V2(ghes))
+                 apei_unmap_generic_address(
+&ghes->generic_v2->read_ack_register);
+err_free:
+         kfree(ghes);
+         return ERR_PTR(rc);
+
+If mapping read_ack_register fails, goto err_free.
+If mapping read_ack_register is successful but mapping 
+error_status_address fails, goto err_unmap_read_ack_addr.
+And if both mappings succeed but the kmalloc fails, then goto 
+err_unmap_status_addr.
+
+>
+>>  err_free:
+>>      kfree(ghes);
+>>      return ERR_PTR(rc);
+>> @@ -279,6 +295,9 @@ static void ghes_fini(struct ghes *ghes)
+>>  {
+>>      kfree(ghes->estatus);
+>> apei_unmap_generic_address(&ghes->generic->error_status_address);
+>> +    if (HEST_TYPE_GENERIC_V2(ghes))
+>> +        apei_unmap_generic_address(
+>> +            &ghes->generic_v2->read_ack_register);
+>>  }
+>>
+>>  static inline int ghes_severity(int severity)
+>> @@ -648,6 +667,23 @@ static void ghes_estatus_cache_add(
+>>      rcu_read_unlock();
+>>  }
+>>
+>
+>> +static int ghes_do_read_ack(struct acpi_hest_generic_v2 *generic_v2)
+>
+> nit: We are actually writing something to the read_ack_register. The 
+> names
+> read_ack_register (which may be as per standard) and more importantly the
+> function name (ghes_do_read_ack) sounds a bit misleading.
+It is called "Read Ack Register" in the spec (ACPI 6.1 table 18-344), 
+but I agree the function name can be improved.
+Maybe ghes_acknowledge_error or ghes_ack_error.
+
+Thanks,
+Tyler
+>
+> Rest looks fine to me.
+>
+> Suzuki
+>
 
 -- 
 Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
