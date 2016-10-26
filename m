@@ -1,22 +1,22 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [PATCH v2 2/8] KVM: Track the pid of the VM process
-Date: Wed, 26 Oct 2016 18:41:42 +0100
-Message-ID: <20161026174148.17172-3-punit.agrawal@arm.com>
+Subject: [PATCH v2 6/8] arm: KVM: Handle trappable TLB instructions
+Date: Wed, 26 Oct 2016 18:41:46 +0100
+Message-ID: <20161026174148.17172-7-punit.agrawal@arm.com>
 References: <20161026174148.17172-1-punit.agrawal@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7458D40421
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Oct 2016 13:42:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E852240421
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Oct 2016 13:42:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dEgfSk6anUjs for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Oct 2016 13:42:17 -0400 (EDT)
+ with ESMTP id qhDkbQzjEMdo for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Oct 2016 13:42:44 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71F61402A3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Oct 2016 13:42:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 871AA40699
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Oct 2016 13:42:44 -0400 (EDT)
 In-Reply-To: <20161026174148.17172-1-punit.agrawal@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,39 +28,150 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VXNlcnNwYWNlIHRvb2xzIHN1Y2ggYXMgcGVyZiBjYW4gYmUgdXNlZCB0byBwcm9maWxlIGluZGl2
-aWR1YWwKcHJvY2Vzc2VzLgoKVHJhY2sgdGhlIFBJRCBvZiB0aGUgdmlydHVhbCBtYWNoaW5lIHBy
-b2Nlc3MgdG8gbWF0Y2ggcHJvZmlsaW5nIHJlcXVlc3RzCnRhcmdldGVkIGF0IGl0LiBUaGlzIGNh
-biBiZSB1c2VkIHRvIHRha2UgYXBwcm9wcmlhdGUgYWN0aW9uIHRvIGVuYWJsZQp0aGUgcmVxdWVz
-dGVkIHByb2ZpbGluZyBvcGVyYXRpb25zIGZvciB0aGUgVk1zIG9mIGludGVyZXN0LgoKU2lnbmVk
-LW9mZi1ieTogUHVuaXQgQWdyYXdhbCA8cHVuaXQuYWdyYXdhbEBhcm0uY29tPgpDYzogUGFvbG8g
-Qm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KQ2M6ICJSYWRpbSBLcsSNbcOhxZkiIDxya3Jj
-bWFyQHJlZGhhdC5jb20+CkNjOiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGxp
-bmFyby5vcmc+CkNjOiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgotLS0KIGlu
-Y2x1ZGUvbGludXgva3ZtX2hvc3QuaCB8IDEgKwogdmlydC9rdm0va3ZtX21haW4uYyAgICAgIHwg
-MiArKwogMiBmaWxlcyBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9pbmNs
-dWRlL2xpbnV4L2t2bV9ob3N0LmggYi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgKaW5kZXggMDFj
-MGI5Yy4uNGNhZmYyMCAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oCisrKyBi
-L2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaApAQCAtMzc1LDYgKzM3NSw3IEBAIHN0cnVjdCBrdm1f
-bWVtc2xvdHMgewogc3RydWN0IGt2bSB7CiAJc3BpbmxvY2tfdCBtbXVfbG9jazsKIAlzdHJ1Y3Qg
-bXV0ZXggc2xvdHNfbG9jazsKKwlzdHJ1Y3QgcGlkICpwaWQ7CiAJc3RydWN0IG1tX3N0cnVjdCAq
-bW07IC8qIHVzZXJzcGFjZSB0aWVkIHRvIHRoaXMgdm0gKi8KIAlzdHJ1Y3Qga3ZtX21lbXNsb3Rz
-ICptZW1zbG90c1tLVk1fQUREUkVTU19TUEFDRV9OVU1dOwogCXN0cnVjdCBzcmN1X3N0cnVjdCBz
-cmN1OwpkaWZmIC0tZ2l0IGEvdmlydC9rdm0va3ZtX21haW4uYyBiL3ZpcnQva3ZtL2t2bV9tYWlu
-LmMKaW5kZXggMjg1MTBlNy4uZWQzODIzYyAxMDA2NDQKLS0tIGEvdmlydC9rdm0va3ZtX21haW4u
-YworKysgYi92aXJ0L2t2bS9rdm1fbWFpbi5jCkBAIC02MTUsNiArNjE1LDcgQEAgc3RhdGljIHN0
-cnVjdCBrdm0gKmt2bV9jcmVhdGVfdm0odW5zaWduZWQgbG9uZyB0eXBlKQogCXNwaW5fbG9ja19p
-bml0KCZrdm0tPm1tdV9sb2NrKTsKIAlhdG9taWNfaW5jKCZjdXJyZW50LT5tbS0+bW1fY291bnQp
-OwogCWt2bS0+bW0gPSBjdXJyZW50LT5tbTsKKwlrdm0tPnBpZCA9IGdldF90YXNrX3BpZChjdXJy
-ZW50LT5ncm91cF9sZWFkZXIsIFBJRFRZUEVfUElEKTsKIAlrdm1fZXZlbnRmZF9pbml0KGt2bSk7
-CiAJbXV0ZXhfaW5pdCgma3ZtLT5sb2NrKTsKIAltdXRleF9pbml0KCZrdm0tPmlycV9sb2NrKTsK
-QEAgLTcxNCw2ICs3MTUsNyBAQCBzdGF0aWMgdm9pZCBrdm1fZGVzdHJveV92bShzdHJ1Y3Qga3Zt
-ICprdm0pCiAJaW50IGk7CiAJc3RydWN0IG1tX3N0cnVjdCAqbW0gPSBrdm0tPm1tOwogCisJcHV0
-X3BpZChrdm0tPnBpZCk7CiAJa3ZtX2Rlc3Ryb3lfdm1fZGVidWdmcyhrdm0pOwogCWt2bV9hcmNo
-X3N5bmNfZXZlbnRzKGt2bSk7CiAJc3Bpbl9sb2NrKCZrdm1fbG9jayk7Ci0tIAoyLjkuMwoKX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
-bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
-dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+It is possible to enable selective trapping of guest TLB maintenance
+instructions executed in lower privilege levels to HYP mode. This
+feature can be used to monitor guest TLB operations.
+
+Add support to emulate the TLB instructions when their execution traps
+to hyp mode.
+
+Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/include/asm/kvm_asm.h |  1 +
+ arch/arm/kvm/coproc.c          | 55 ++++++++++++++++++++++++++++++++++++++++++
+ arch/arm/kvm/hyp/tlb.c         | 33 +++++++++++++++++++++++++
+ 3 files changed, 89 insertions(+)
+
+diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+index d7ea6bc..00a6511 100644
+--- a/arch/arm/include/asm/kvm_asm.h
++++ b/arch/arm/include/asm/kvm_asm.h
+@@ -66,6 +66,7 @@ extern char __kvm_hyp_vector[];
+ extern void __kvm_flush_vm_context(void);
+ extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+ extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
++extern void __kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 opcode, u64 regval);
+ 
+ extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+ 
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index 3e5e419..593edeb 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -205,6 +205,23 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++static bool emulate_tlb_invalidate(struct kvm_vcpu *vcpu,
++				   const struct coproc_params *p,
++				   const struct coproc_reg *r)
++{
++	/*
++	 * Based on system register encoding from ARM v8 ARM
++	 * (DDI 0487A.k F5.1.103)
++	 */
++	u32 opcode = p->Op1 << 21 | p->CRn << 16 | p->Op2 << 5 | p->CRm << 0;
++
++	kvm_call_hyp(__kvm_emulate_tlb_invalidate,
++		     vcpu->kvm, opcode, p->Rt1);
++	trace_kvm_tlb_invalidate(*vcpu_pc(vcpu), opcode);
++
++	return true;
++}
++
+ /*
+  * Generic accessor for VM registers. Only called as long as HCR_TVM
+  * is set.  If the guest enables the MMU, we stop trapping the VM
+@@ -354,6 +371,44 @@ static const struct coproc_reg cp15_regs[] = {
+ 	{ CRn( 7), CRm( 6), Op1( 0), Op2( 2), is32, access_dcsw},
+ 	{ CRn( 7), CRm(10), Op1( 0), Op2( 2), is32, access_dcsw},
+ 	{ CRn( 7), CRm(14), Op1( 0), Op2( 2), is32, access_dcsw},
++
++	/* TLBIALLIS */
++	{ CRn( 8), CRm( 3), Op1( 0), Op2( 0), is32, emulate_tlb_invalidate},
++	/* TLBIMVAIS */
++	{ CRn( 8), CRm( 3), Op1( 0), Op2( 1), is32, emulate_tlb_invalidate},
++	/* TLBIASIDIS */
++	{ CRn( 8), CRm( 3), Op1( 0), Op2( 2), is32, emulate_tlb_invalidate},
++	/* TLBIMVAAIS */
++	{ CRn( 8), CRm( 3), Op1( 0), Op2( 3), is32, emulate_tlb_invalidate},
++	/* TLBIMVALIS */
++	{ CRn( 8), CRm( 3), Op1( 0), Op2( 5), is32, emulate_tlb_invalidate},
++	/* TLBIMVAALIS */
++	{ CRn( 8), CRm( 3), Op1( 0), Op2( 7), is32, emulate_tlb_invalidate},
++	/* ITLBIALL */
++	{ CRn( 8), CRm( 5), Op1( 0), Op2( 0), is32, emulate_tlb_invalidate},
++	/* ITLBIMVA */
++	{ CRn( 8), CRm( 5), Op1( 0), Op2( 1), is32, emulate_tlb_invalidate},
++	/* ITLBIASID */
++	{ CRn( 8), CRm( 5), Op1( 0), Op2( 2), is32, emulate_tlb_invalidate},
++	/* DTLBIALL */
++	{ CRn( 8), CRm( 6), Op1( 0), Op2( 0), is32, emulate_tlb_invalidate},
++	/* DTLBIMVA */
++	{ CRn( 8), CRm( 6), Op1( 0), Op2( 1), is32, emulate_tlb_invalidate},
++	/* DTLBIASID */
++	{ CRn( 8), CRm( 6), Op1( 0), Op2( 2), is32, emulate_tlb_invalidate},
++	/* TLBIALL */
++	{ CRn( 8), CRm( 7), Op1( 0), Op2( 0), is32, emulate_tlb_invalidate},
++	/* TLBIMVA */
++	{ CRn( 8), CRm( 7), Op1( 0), Op2( 1), is32, emulate_tlb_invalidate},
++	/* TLBIASID */
++	{ CRn( 8), CRm( 7), Op1( 0), Op2( 2), is32, emulate_tlb_invalidate},
++	/* TLBIMVAA */
++	{ CRn( 8), CRm( 7), Op1( 0), Op2( 3), is32, emulate_tlb_invalidate},
++	/* TLBIMVAL */
++	{ CRn( 8), CRm( 7), Op1( 0), Op2( 5), is32, emulate_tlb_invalidate},
++	/* TLBIMVAAL */
++	{ CRn( 8), CRm( 7), Op1( 0), Op2( 7), is32, emulate_tlb_invalidate},
++
+ 	/*
+ 	 * L2CTLR access (guest wants to know #CPUs).
+ 	 */
+diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
+index 7296528..cfa7cf6 100644
+--- a/arch/arm/kvm/hyp/tlb.c
++++ b/arch/arm/kvm/hyp/tlb.c
+@@ -61,3 +61,36 @@ void __hyp_text __kvm_flush_vm_context(void)
+ 	write_sysreg(0, ICIALLUIS);
+ 	dsb(ish);
+ }
++
++static void __hyp_text __switch_to_guest_regime(struct kvm *kvm)
++{
++	write_sysreg(kvm->arch.vttbr, VTTBR);
++	isb();
++}
++
++static void __hyp_text __switch_to_host_regime(void)
++{
++	write_sysreg(0, VTTBR);
++}
++
++void __hyp_text
++__kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 opcode, u64 regval)
++{
++	kvm = kern_hyp_va(kvm);
++
++	__switch_to_guest_regime(kvm);
++
++	/*
++	 *  TLB maintenance operations are broadcast to
++	 *  inner-shareable domain when HCR_FB is set (default for
++	 *  KVM).
++	 *
++	 *  Nuke all Stage 1 TLB entries for the VM. This will kill
++	 *  performance but it's always safe to do as we don't leave
++	 *  behind any strays in the TLB
++	 */
++	write_sysreg(0, TLBIALLIS);
++	isb();
++
++	__switch_to_host_regime();
++}
+-- 
+2.9.3
