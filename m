@@ -1,23 +1,28 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [PATCH v2 7/8] arm64: KVM: Handle trappable TLB instructions
-Date: Wed, 26 Oct 2016 18:41:47 +0100
-Message-ID: <20161026174148.17172-8-punit.agrawal@arm.com>
-References: <20161026174148.17172-1-punit.agrawal@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] arm/arm64: KVM: Perform local TLB invalidation when
+ multiplexing vcpus on a single CPU
+Date: Thu, 27 Oct 2016 11:19:06 +0200
+Message-ID: <20161027091906.GA14734@cbox>
+References: <1477323088-18768-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 834F140497
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Oct 2016 13:42:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56812403FC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 05:19:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id khKFe7ifJu1G for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Oct 2016 13:42:49 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B69B440423
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Oct 2016 13:42:48 -0400 (EDT)
-In-Reply-To: <20161026174148.17172-1-punit.agrawal@arm.com>
+ with ESMTP id Wukqf3CfowZM for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Oct 2016 05:19:07 -0400 (EDT)
+Received: from mail-lf0-f41.google.com (mail-lf0-f41.google.com
+ [209.85.215.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0970640421
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 05:19:06 -0400 (EDT)
+Received: by mail-lf0-f41.google.com with SMTP id b75so25508462lfg.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 02:19:11 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1477323088-18768-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,225 +32,224 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARMv8 architecture allows trapping of TLB maintenane instructions
-from EL0/EL1 to higher exception levels. On encountering a trappable TLB
-instruction in a guest, an exception is taken to EL2.
+On Mon, Oct 24, 2016 at 04:31:28PM +0100, Marc Zyngier wrote:
+> Architecturally, TLBs are private to the (physical) CPU they're
+> associated with. But when multiple vcpus from the same VM are
+> being multiplexed on the same CPU, the TLBs are not private
+> to the vcpus (and are actually shared across the VMID).
+> 
+> Let's consider the following scenario:
+> 
+> - vcpu-0 maps PA to VA
+> - vcpu-1 maps PA' to VA
+> 
+> If run on the same physical CPU, vcpu-1 can hit TLB entries generated
+> by vcpu-0 accesses, and access the wrong physical page.
+> 
+> The solution to this is to keep a per-VM map of which vcpu ran last
+> on each given physical CPU, and invalidate local TLBs when switching
+> to a different vcpu from the same VM.
 
-Add support to handle emulating the TLB instructions.
+Just making sure I understand this:  The reason you cannot rely on the
+guest doing the necessary distinction with ASIDs or invalidating the TLB
+is that a guest (which assumes it's running on hardware) can validly
+defer any neccessary invalidation until it starts running on other
+physical CPUs, but we do this transparently in KVM?
 
-Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/include/asm/kvm_asm.h |  1 +
- arch/arm64/kvm/hyp/tlb.c         | 75 +++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c        | 81 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 157 insertions(+)
+Thanks,
+-Christoffer
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 18f7465..f3619f3 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -54,6 +54,7 @@ extern char __kvm_hyp_vector[];
- extern void __kvm_flush_vm_context(void);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
- extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
-+extern void __kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 opcode, u64 regval);
- 
- extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 74eb562..4818ef9 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -71,3 +71,78 @@ void __hyp_text __kvm_flush_vm_context(void)
- 	__tlbi(alle1is);
- 	__flush_icache_all(); /* contains a dsb(ish) */
- }
-+
-+/* Intentionally empty functions */
-+static void __hyp_text __switch_to_hyp_role_nvhe(void) { }
-+static void __hyp_text __switch_to_host_role_nvhe(void) { }
-+
-+static void __hyp_text __switch_to_hyp_role_vhe(void)
-+{
-+	u64 hcr = read_sysreg(hcr_el2);
-+
-+	/*
-+	 * When VHE is enabled and HCR_EL2.TGE=1, EL1&0 TLB operations
-+	 * apply to EL2&0 translation regime. As we prepare to emulate
-+	 * guest TLB operation clear HCR_TGE to target TLB operations
-+	 * to EL1&0 (guest).
-+	 */
-+	hcr &= ~HCR_TGE;
-+	write_sysreg(hcr, hcr_el2);
-+}
-+
-+static void __hyp_text __switch_to_host_role_vhe(void)
-+{
-+	u64 hcr = read_sysreg(hcr_el2);
-+
-+	hcr |= HCR_TGE;
-+	write_sysreg(hcr, hcr_el2);
-+}
-+
-+static hyp_alternate_select(__switch_to_hyp_role,
-+			    __switch_to_hyp_role_nvhe,
-+			    __switch_to_hyp_role_vhe,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
-+
-+static hyp_alternate_select(__switch_to_host_role,
-+			    __switch_to_host_role_nvhe,
-+			    __switch_to_host_role_vhe,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
-+
-+static void __hyp_text __switch_to_guest_regime(struct kvm *kvm)
-+{
-+	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-+	__switch_to_hyp_role();
-+	isb();
-+}
-+
-+static void __hyp_text __switch_to_host_regime(void)
-+{
-+	__switch_to_host_role();
-+	write_sysreg(0, vttbr_el2);
-+}
-+
-+void __hyp_text
-+__kvm_emulate_tlb_invalidate(struct kvm *kvm, u32 opcode, u64 regval)
-+{
-+	kvm = kern_hyp_va(kvm);
-+
-+	/*
-+	 * Switch to the guest before performing any TLB operations to
-+	 * target the appropriate VMID
-+	 */
-+	__switch_to_guest_regime(kvm);
-+
-+	/*
-+	 *  TLB maintenance operations are broadcast to
-+	 *  inner-shareable domain when HCR_FB is set (default for
-+	 *  KVM).
-+	 *
-+	 *  Nuke all Stage 1 TLB entries for the VM. This will kill
-+	 *  performance but it's always safe to do as we don't leave
-+	 *  behind any strays in the TLB
-+	 */
-+	__tlbi(vmalle1is);
-+	isb();
-+
-+	__switch_to_host_regime();
-+}
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f302fdb..2a2846c 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -785,6 +785,18 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return true;
- }
- 
-+static bool emulate_tlb_invalidate(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+				  const struct sys_reg_desc *r)
-+{
-+	u32 opcode = sys_reg(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+
-+	kvm_call_hyp(__kvm_emulate_tlb_invalidate,
-+		     vcpu->kvm, opcode, p->regval);
-+	trace_kvm_tlb_invalidate(*vcpu_pc(vcpu), opcode);
-+
-+	return true;
-+}
-+
- /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
- #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
- 	/* DBGBVRn_EL1 */						\
-@@ -836,6 +848,35 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ Op0(0b01), Op1(0b000), CRn(0b0111), CRm(0b1110), Op2(0b010),
- 	  access_dcsw },
- 
-+	/*
-+	 * ARMv8 ARM: Table C5-4 TLB maintenance instructions
-+	 * (Ref: ARMv8 ARM C5.1 version: ARM DDI 0487A.j)
-+	 */
-+	/* TLBI VMALLE1IS */
-+	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(0), emulate_tlb_invalidate },
-+	/* TLBI VAE1IS */
-+	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(1), emulate_tlb_invalidate },
-+	/* TLBI ASIDE1IS */
-+	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(2), emulate_tlb_invalidate },
-+	/* TLBI VAAE1IS */
-+	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(3), emulate_tlb_invalidate },
-+	/* TLBI VALE1IS */
-+	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(5), emulate_tlb_invalidate },
-+	/* TLBI VAALE1IS */
-+	{ Op0(1), Op1(0), CRn(8), CRm(3), Op2(7), emulate_tlb_invalidate },
-+	/* TLBI VMALLE1 */
-+	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(0), emulate_tlb_invalidate },
-+	/* TLBI VAE1 */
-+	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(1), emulate_tlb_invalidate },
-+	/* TLBI ASIDE1 */
-+	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(2), emulate_tlb_invalidate },
-+	/* TLBI VAAE1 */
-+	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(3), emulate_tlb_invalidate },
-+	/* TLBI VALE1 */
-+	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(5), emulate_tlb_invalidate },
-+	/* TLBI VAALE1 */
-+	{ Op0(1), Op1(0), CRn(8), CRm(7), Op2(7), emulate_tlb_invalidate },
-+
- 	DBG_BCR_BVR_WCR_WVR_EL1(0),
- 	DBG_BCR_BVR_WCR_WVR_EL1(1),
- 	/* MDCCINT_EL1 */
-@@ -1324,6 +1365,46 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 7), CRm(10), Op2( 2), access_dcsw },
- 	{ Op1( 0), CRn( 7), CRm(14), Op2( 2), access_dcsw },
- 
-+	/*
-+	 * TLB operations
-+	 */
-+	/* TLBIALLIS */
-+	{ Op1( 0), CRn( 8), CRm( 3), Op2( 0), emulate_tlb_invalidate},
-+	/* TLBIMVAIS */
-+	{ Op1( 0), CRn( 8), CRm( 3), Op2( 1), emulate_tlb_invalidate},
-+	/* TLBIASIDIS */
-+	{ Op1( 0), CRn( 8), CRm( 3), Op2( 2), emulate_tlb_invalidate},
-+	/* TLBIMVAAIS */
-+	{ Op1( 0), CRn( 8), CRm( 3), Op2( 3), emulate_tlb_invalidate},
-+	/* TLBIMVALIS */
-+	{ Op1( 0), CRn( 8), CRm( 3), Op2( 5), emulate_tlb_invalidate},
-+	/* TLBIMVAALIS */
-+	{ Op1( 0), CRn( 8), CRm( 3), Op2( 7), emulate_tlb_invalidate},
-+	/* ITLBIALL */
-+	{ Op1( 0), CRn( 8), CRm( 5), Op2( 0), emulate_tlb_invalidate},
-+	/* ITLBIMVA */
-+	{ Op1( 0), CRn( 8), CRm( 5), Op2( 1), emulate_tlb_invalidate},
-+	/* ITLBIASID */
-+	{ Op1( 0), CRn( 8), CRm( 5), Op2( 2), emulate_tlb_invalidate},
-+	/* DTLBIALL */
-+	{ Op1( 0), CRn( 8), CRm( 6), Op2( 0), emulate_tlb_invalidate},
-+	/* DTLBIMVA */
-+	{ Op1( 0), CRn( 8), CRm( 6), Op2( 1), emulate_tlb_invalidate},
-+	/* DTLBIASID */
-+	{ Op1( 0), CRn( 8), CRm( 6), Op2( 2), emulate_tlb_invalidate},
-+	/* TLBIALL */
-+	{ Op1( 0), CRn( 8), CRm( 7), Op2( 0), emulate_tlb_invalidate},
-+	/* TLBIMVA */
-+	{ Op1( 0), CRn( 8), CRm( 7), Op2( 1), emulate_tlb_invalidate},
-+	/* TLBIASID */
-+	{ Op1( 0), CRn( 8), CRm( 7), Op2( 2), emulate_tlb_invalidate},
-+	/* TLBIMVAA */
-+	{ Op1( 0), CRn( 8), CRm( 7), Op2( 3), emulate_tlb_invalidate},
-+	/* TLBIMVAL */
-+	{ Op1( 0), CRn( 8), CRm( 7), Op2( 5), emulate_tlb_invalidate},
-+	/* TLBIMVAAL */
-+	{ Op1( 0), CRn( 8), CRm( 7), Op2( 7), emulate_tlb_invalidate},
-+
- 	/* PMU */
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmcr },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmcnten },
--- 
-2.9.3
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h   |  5 +++++
+>  arch/arm/include/asm/kvm_hyp.h    |  1 +
+>  arch/arm/kvm/arm.c                | 35 ++++++++++++++++++++++++++++++++++-
+>  arch/arm/kvm/hyp/switch.c         |  9 +++++++++
+>  arch/arm64/include/asm/kvm_host.h |  6 +++++-
+>  arch/arm64/kvm/hyp/switch.c       |  8 ++++++++
+>  6 files changed, 62 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 2d19e02..035e744 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -57,6 +57,8 @@ struct kvm_arch {
+>  	/* VTTBR value associated with below pgd and vmid */
+>  	u64    vttbr;
+>  
+> +	int __percpu *last_vcpu_ran;
+> +
+>  	/* Timer */
+>  	struct arch_timer_kvm	timer;
+>  
+> @@ -174,6 +176,9 @@ struct kvm_vcpu_arch {
+>  	/* vcpu power-off state */
+>  	bool power_off;
+>  
+> +	/* TLBI required */
+> +	bool requires_tlbi;
+> +
+>  	 /* Don't run the guest (internal implementation need) */
+>  	bool pause;
+>  
+> diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
+> index 343135e..5850890 100644
+> --- a/arch/arm/include/asm/kvm_hyp.h
+> +++ b/arch/arm/include/asm/kvm_hyp.h
+> @@ -71,6 +71,7 @@
+>  #define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
+>  #define ATS1CPR		__ACCESS_CP15(c7, 0, c8, 0)
+>  #define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
+> +#define TLBIALL		__ACCESS_CP15(c8, 0, c7, 0)
+>  #define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
+>  #define PRRR		__ACCESS_CP15(c10, 0, c2, 0)
+>  #define NMRR		__ACCESS_CP15(c10, 0, c2, 1)
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 03e9273..09942f0 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -114,11 +114,18 @@ void kvm_arch_check_processor_compat(void *rtn)
+>   */
+>  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  {
+> -	int ret = 0;
+> +	int ret, cpu;
+>  
+>  	if (type)
+>  		return -EINVAL;
+>  
+> +	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
+> +	if (!kvm->arch.last_vcpu_ran)
+> +		return -ENOMEM;
+> +
+> +	for_each_possible_cpu(cpu)
+> +		*per_cpu_ptr(kvm->arch.last_vcpu_ran, cpu) = -1;
+> +
+>  	ret = kvm_alloc_stage2_pgd(kvm);
+>  	if (ret)
+>  		goto out_fail_alloc;
+> @@ -141,6 +148,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  out_free_stage2_pgd:
+>  	kvm_free_stage2_pgd(kvm);
+>  out_fail_alloc:
+> +	free_percpu(kvm->arch.last_vcpu_ran);
+> +	kvm->arch.last_vcpu_ran = NULL;
+>  	return ret;
+>  }
+>  
+> @@ -168,6 +177,9 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>  {
+>  	int i;
+>  
+> +	free_percpu(kvm->arch.last_vcpu_ran);
+> +	kvm->arch.last_vcpu_ran = NULL;
+> +
+>  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+>  		if (kvm->vcpus[i]) {
+>  			kvm_arch_vcpu_free(kvm->vcpus[i]);
+> @@ -310,6 +322,27 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
+> +{
+> +	int *last_ran;
+> +
+> +	last_ran = per_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran, cpu);
+> +
+> +	/*
+> +	 * If we're very unlucky and get preempted before having ran
+> +	 * this vcpu for real, we'll end-up in a situation where any
+> +	 * vcpu that gets scheduled will perform an invalidation (this
+> +	 * vcpu explicitely requires it, and all the others will have
+> +	 * a different vcpu_id).
+> +	 */
+> +	if (*last_ran != vcpu->vcpu_id) {
+> +		if (*last_ran != -1)
+> +			vcpu->arch.requires_tlbi = true;
+> +
+> +		*last_ran = vcpu->vcpu_id;
+> +	}
+> +}
+> +
+>  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  {
+>  	vcpu->cpu = cpu;
+> diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+> index 92678b7..ab8ee3b 100644
+> --- a/arch/arm/kvm/hyp/switch.c
+> +++ b/arch/arm/kvm/hyp/switch.c
+> @@ -75,6 +75,15 @@ static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+>  	write_sysreg(kvm->arch.vttbr, VTTBR);
+> +	if (vcpu->arch.requires_tlbi) {
+> +		/* Force vttbr to be written */
+> +		isb();
+> +		/* Local invalidate only for this VMID */
+> +		write_sysreg(0, TLBIALL);
+> +		dsb(nsh);
+> +		vcpu->arch.requires_tlbi = false;
+> +	}
+> +
+>  	write_sysreg(vcpu->arch.midr, VPIDR);
+>  }
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bd94e67..5b42010 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -62,6 +62,8 @@ struct kvm_arch {
+>  	/* VTTBR value associated with above pgd and vmid */
+>  	u64    vttbr;
+>  
+> +	int __percpu *last_vcpu_ran;
+> +
+>  	/* The maximum number of vCPUs depends on the used GIC model */
+>  	int max_vcpus;
+>  
+> @@ -252,6 +254,9 @@ struct kvm_vcpu_arch {
+>  	/* vcpu power-off state */
+>  	bool power_off;
+>  
+> +	/* TLBI required */
+> +	bool requires_tlbi;
+> +
+>  	/* Don't run the guest (internal implementation need) */
+>  	bool pause;
+>  
+> @@ -368,7 +373,6 @@ static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+>  static inline void kvm_arch_hardware_unsetup(void) {}
+>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+> -static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>  static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+>  
+>  void kvm_arm_init_debug(void);
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 83037cd..8d9c3eb 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -131,6 +131,14 @@ static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+>  	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+> +	if (vcpu->arch.requires_tlbi) {
+> +		/* Force vttbr_el2 to be written */
+> +		isb();
+> +		/* Local invalidate only for this VMID */
+> +		asm volatile("tlbi vmalle1" : : );
+> +		dsb(nsh);
+> +		vcpu->arch.requires_tlbi = false;
+> +	}
+>  }
+>  
+>  static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
+> -- 
+> 2.1.4
+> 
