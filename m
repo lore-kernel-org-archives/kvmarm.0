@@ -1,127 +1,65 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] arm/arm64: KVM: Perform local TLB invalidation when
- multiplexing vcpus on a single CPU
-Date: Thu, 27 Oct 2016 14:27:57 +0200
-Message-ID: <20161027122757.GA19614@cbox>
-References: <1477323088-18768-1-git-send-email-marc.zyngier@arm.com>
- <20161027091906.GA14734@cbox>
- <7541af85-05c4-25f9-2fa8-2eb7a0afbe84@arm.com>
- <20161027100428.GA17829@cbox>
- <f00b6e69-7b45-5238-4d3a-af8d77e85670@arm.com>
+From: Shih-Wei Li <shihwei@cs.columbia.edu>
+Subject: [PATCH] KVM: arm/arm64: Kick VCPUs when queueing already pending IRQs
+Date: Thu, 27 Oct 2016 15:08:13 +0000
+Message-ID: <1477580893-3479-1-git-send-email-shihwei@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A15640457
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 08:27:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yBenFEXysrOX for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Oct 2016 08:27:57 -0400 (EDT)
-Received: from mail-lf0-f54.google.com (mail-lf0-f54.google.com
- [209.85.215.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7B59B40430
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 08:27:57 -0400 (EDT)
-Received: by mail-lf0-f54.google.com with SMTP id b75so29326189lfg.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 05:28:02 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <f00b6e69-7b45-5238-4d3a-af8d77e85670@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: marc.zyngier@arm.com, Shih-Wei Li <shihwei@cs.columbia.edu>, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 27, 2016 at 11:40:00AM +0100, Marc Zyngier wrote:
-> On 27/10/16 11:04, Christoffer Dall wrote:
-> > On Thu, Oct 27, 2016 at 10:49:00AM +0100, Marc Zyngier wrote:
-> >> Hi Christoffer,
-> >>
-> >> On 27/10/16 10:19, Christoffer Dall wrote:
-> >>> On Mon, Oct 24, 2016 at 04:31:28PM +0100, Marc Zyngier wrote:
-> >>>> Architecturally, TLBs are private to the (physical) CPU they're
-> >>>> associated with. But when multiple vcpus from the same VM are
-> >>>> being multiplexed on the same CPU, the TLBs are not private
-> >>>> to the vcpus (and are actually shared across the VMID).
-> >>>>
-> >>>> Let's consider the following scenario:
-> >>>>
-> >>>> - vcpu-0 maps PA to VA
-> >>>> - vcpu-1 maps PA' to VA
-> >>>>
-> >>>> If run on the same physical CPU, vcpu-1 can hit TLB entries generated
-> >>>> by vcpu-0 accesses, and access the wrong physical page.
-> >>>>
-> >>>> The solution to this is to keep a per-VM map of which vcpu ran last
-> >>>> on each given physical CPU, and invalidate local TLBs when switching
-> >>>> to a different vcpu from the same VM.
-> >>>
-> >>> Just making sure I understand this:  The reason you cannot rely on the
-> >>> guest doing the necessary distinction with ASIDs or invalidating the TLB
-> >>> is that a guest (which assumes it's running on hardware) can validly
-> >>> defer any neccessary invalidation until it starts running on other
-> >>> physical CPUs, but we do this transparently in KVM?
-> >>
-> >> The guest wouldn't have to do any invalidation at all on real HW,
-> >> because the TLBs are strictly private to a physical CPU (only the
-> >> invalidation can be broadcast to the Inner Shareable domain). But when
-> >> we multiplex two vcpus on the same physical CPU, we break the private
-> >> semantics, and a vcpu could hit in the TLB entries populated by the
-> >> another one.
-> > 
-> > Such a guest would be using a mapping of the same VA with the same ASID
-> > on two separate CPUs, each pointing to a separate PA.  If it ever were
-> > to, say, migrate a task, it would have to do invalidations then.  Right?
-> 
-> This doesn't have to be ASID tagged. Actually, it is more likely to
-> affect global mappings. Imagine for example that the kernel (which uses
-> global mappings for its own page tables) decides to create per-cpu
-> variable using this trick (all the CPUs have the same VA, but use
-> different PAs). No invalidation at all, everything looks perfectly fine,
-> until you start virtualizing it.
-> 
-> > Does Linux or other guests actually do this?
-> 
-> Linux may hit it with CPU hotplug, which uses global mappings (which a
-> vcpu using an ASID tagged mapping could then hit if the VAs overlap).
-> 
+In cases like IPI, we could be queueing an interrupt for a VCPU
+that is already running and is not about to exit, because the
+VCPU has entered the VM with the interrupt pending and would
+not trap on EOI'ing that interrupt. This could result to delays
+in interrupt deliveries or even loss of interrupts.
+To guarantee prompt interrupt injection, here we have to try to
+kick the VCPU.
 
-Right, ok, it's more threatening than I first thought.  Thanks for the
-explanation.
+Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+---
 
-> > 
-> > I would suspect Linux has to eventually invalidate those mappins if it
-> > wants the scheduler to be allowed to freely move things around.
-> > 
-> >>
-> >> As we cannot segregate the TLB entries per vcpu (but only per VMID), the
-> >> workaround is to nuke all the TLBs for this VMID (locally only - no
-> >> broadcast) each time we find that two vcpus are sharing the same
-> >> physical CPU.
-> >>
-> >> Is that clearer?
-> > 
-> > Yes, the fix is clear, just want to make sure I understand that it's a
-> > valid circumstance where this actually happens.  But in either case, we
-> > probably have to fix this to emulate the hardware correctly.
-> > 
-> > Another fix would be to allocate a VMID per VCPU I suppose, just to
-> > introduce a terrible TLB hit ratio :)
-> 
-> But that would break TLB invalidations that are broadcast in the Inner
-> Shareable domain. To do so, you'd have to trap every TBLI, and issue
-> corresponding invalidations for all the vcpus. I'm not sure I want to
-> see the performance number of that solution... ;-)
-> 
-Ah, yeah, that's ridiculous.  Forget what I said.
+I've tested the code with an IPI test built on kvm-unit-test, which
+measures the cycles spent between one VCPU sending IPI to a target
+VCPU that busy loops in the VM, until the target VCPU ACKs and EOIs
+the IPI. The patch here can improve the performance in such case by
+more than 5000 cycles.
 
-Thanks,
--Christoffer
+ virt/kvm/arm/vgic/vgic.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index b419a11..07cf239 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -273,6 +273,17 @@ retry:
+ 		 * no more work for us to do.
+ 		 */
+ 		spin_unlock(&irq->irq_lock);
++
++		/*
++		 * If the VCPU is not NULL, we could be queueing an
++		 * edge-triggered interrupt for a VCPU which is already
++		 * running and is not about to exit, because the VCPU has
++		 * entered the VM with the interrupt pending and it wouldn't
++		 * trap on EOI. To ensure prompt delivery of that interrupt,
++		 * we have to try to kick the VCPU.
++		 */
++		if (vcpu)
++			kvm_vcpu_kick(vcpu);
+ 		return false;
+ 	}
+ 
+-- 
+1.9.1
