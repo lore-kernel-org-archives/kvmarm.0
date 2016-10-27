@@ -1,27 +1,25 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: guest get stuck on stable 4.1.32
-Date: Thu, 27 Oct 2016 11:28:12 +0200
-Message-ID: <20161027092812.GB14734@cbox>
-References: <580DF895.1030701@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] arm/arm64: KVM: Perform local TLB invalidation when
+ multiplexing vcpus on a single CPU
+Date: Thu, 27 Oct 2016 10:49:00 +0100
+Message-ID: <7541af85-05c4-25f9-2fa8-2eb7a0afbe84@arm.com>
+References: <1477323088-18768-1-git-send-email-marc.zyngier@arm.com>
+ <20161027091906.GA14734@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F89D40419
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 05:28:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9349D40419
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 05:49:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id djoocTGw+Wyw for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Oct 2016 05:28:13 -0400 (EDT)
-Received: from mail-lf0-f51.google.com (mail-lf0-f51.google.com
- [209.85.215.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 248E740402
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 05:28:13 -0400 (EDT)
-Received: by mail-lf0-f51.google.com with SMTP id x79so25784408lff.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 02:28:17 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <580DF895.1030701@huawei.com>
+ with ESMTP id hXSFCIuJCWKA for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Oct 2016 05:48:59 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E5D440402
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2016 05:48:59 -0400 (EDT)
+In-Reply-To: <20161027091906.GA14734@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,75 +29,53 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 24, 2016 at 08:03:33PM +0800, Shannon Zhao wrote:
-> Hi,
-> 
-> I have a testcase which fails on host linux kernel 4.1.32. The testcase
-> is that resetting the guest outside while rebooting inside at the same time.
-> 
-> By the way, the guest kernel is linux 4.4 with debian filesystem.
-> 
-> Here is the qemu command line:
-> 
-> qemu-kvm \
->     -smp 4 \
->     -enable-kvm \
->     -m 1024 -M virt,gic-version=2 \
->     -monitor telnet::5444,server,nowait \
->     -cpu host -nographic \
->     -device virtio-net-device,netdev=net0,mac="52:54:00:12:34:55" \
->     -netdev type=tap,id=net0,script=./qemu-ifup,downscript=no \
->     -drive file=debian.raw,if=none,id=drive-virtio-disk0,format=raw \
->     -device virtio-blk-device,drive=drive-virtio-disk0,id=virtio-disk0 \
->     -kernel Image-4.4 \
->     -append "console=ttyAMA0 root=/dev/vda1 earlycon=pl011,0x9000000 rw
-> dhcp"
-> 
-> And the test command is:
-> 
-> # ssh guest_ip reboot;echo system_reset|nc host_ip 5444
-> 
-> After executing above command several times, the guest gets stuck. The
-> guest log as follow:
-> 
-> ...
-> Architected cp15 timer(s) running at 66.00MHz (virt).
-> clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles:
-> 0xf38bc32cd, max_idle_ns: 440795204298 ns
-> sched_clock: 56 bits at 66MHz, resolution 15ns, wraps every 2199023255548ns
-> Console: colour dummy device 80x25
-> Calibrating delay loop (skipped), value calculated using timer
-> frequency.. 132.00 BogoMIPS (lpj=264000)
-> pid_max: default: 32768 minimum: 301
-> Security Framework initialized
-> Mount-cache hash table entries: 2048 (order: 2, 16384 bytes)
-> Mountpoint-cache hash table entries: 2048 (order: 2, 16384 bytes)
-> Initializing cgroup subsys memory
-> Initializing cgroup subsys hugetlb
-> EFI services will not be available.
-> ASID allocator initialised with 65536 entries
-> 
-> I found the guest is stuck at
-> while ((now = jiffies) == j) in the function do_xor_speed(). Looks like
-> there is no timer interrupt injected to guest any more.
-> 
-> And the kernel 4.6 has fixed this bug, but I'm not sure if there is some
-> way to fix this in stable 4.1.
-> 
+Hi Christoffer,
 
-Hmmm, v4.1 still used edge-triggered semantics for the timer, which was
-causing reset issues with UEFI, so I wonder if that's related?
+On 27/10/16 10:19, Christoffer Dall wrote:
+> On Mon, Oct 24, 2016 at 04:31:28PM +0100, Marc Zyngier wrote:
+>> Architecturally, TLBs are private to the (physical) CPU they're
+>> associated with. But when multiple vcpus from the same VM are
+>> being multiplexed on the same CPU, the TLBs are not private
+>> to the vcpus (and are actually shared across the VMID).
+>>
+>> Let's consider the following scenario:
+>>
+>> - vcpu-0 maps PA to VA
+>> - vcpu-1 maps PA' to VA
+>>
+>> If run on the same physical CPU, vcpu-1 can hit TLB entries generated
+>> by vcpu-0 accesses, and access the wrong physical page.
+>>
+>> The solution to this is to keep a per-VM map of which vcpu ran last
+>> on each given physical CPU, and invalidate local TLBs when switching
+>> to a different vcpu from the same VM.
+> 
+> Just making sure I understand this:  The reason you cannot rely on the
+> guest doing the necessary distinction with ASIDs or invalidating the TLB
+> is that a guest (which assumes it's running on hardware) can validly
+> defer any neccessary invalidation until it starts running on other
+> physical CPUs, but we do this transparently in KVM?
 
-You could attempt at backporting the rework of the timers:
-https://lists.cs.columbia.edu/pipermail/kvmarm/2015-September/016588.html
+The guest wouldn't have to do any invalidation at all on real HW,
+because the TLBs are strictly private to a physical CPU (only the
+invalidation can be broadcast to the Inner Shareable domain). But when
+we multiplex two vcpus on the same physical CPU, we break the private
+semantics, and a vcpu could hit in the TLB entries populated by the
+another one.
 
-You might also need these commits on top:
-0e3dfda91d9fe8e2c4d0b5d21434b173a241eeaf
-1c5631c73fc2261a5df64a72c155cb53dcdc0c45
+As we cannot segregate the TLB entries per vcpu (but only per VMID), the
+workaround is to nuke all the TLBs for this VMID (locally only - no
+broadcast) each time we find that two vcpus are sharing the same
+physical CPU.
+
+Is that clearer?
 
 Thanks,
--Christoffer
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
