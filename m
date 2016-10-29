@@ -1,30 +1,23 @@
 From: Alexander Graf <agraf@suse.de>
-Subject: Re: [PATCH 0/3] Support userspace irqchip with arch timers
-Date: Sat, 29 Oct 2016 20:55:11 +0200
-Message-ID: <5D593F44-F76B-4E2C-B2F8-CA08DFE2D87F@suse.de>
-References: <20160927190806.22988-1-christoffer.dall@linaro.org>
- <3e85d538-2539-f190-0d17-a2ecfe7b48ce@suse.de> <20160930154335.GB7996@cbox>
- <71b0ae9d-baea-1f65-3c01-5d87f4f4746f@suse.de>
- <3928feee-cb23-8635-20bd-4c068b649a1d@arm.com>
- <7500DEDE-EC21-4287-9B11-04C058A48747@suse.de>
- <56812724-4bac-8265-b6f6-b1ff00308ec0@arm.com>
- <554F7514-1900-41B4-8DDC-36C00B903164@suse.de>
- <1154342410.9324183.1477747141878.JavaMail.zimbra@redhat.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Subject: [RFC 2/2] ARM: KVM: Enable in-kernel timers with user space gic
+Date: Sat, 29 Oct 2016 23:10:49 +0200
+Message-ID: <1477775449-115472-2-git-send-email-agraf@suse.de>
+References: <1477775449-115472-1-git-send-email-agraf@suse.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 337D7404AC
- for <kvmarm@lists.cs.columbia.edu>; Sat, 29 Oct 2016 14:55:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AF44B405BA
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 29 Oct 2016 17:10:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id URFr9-xjXkxw for <kvmarm@lists.cs.columbia.edu>;
- Sat, 29 Oct 2016 14:55:12 -0400 (EDT)
+ with ESMTP id quKC-ginK-Bu for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 29 Oct 2016 17:10:37 -0400 (EDT)
 Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D64F640430
- for <kvmarm@lists.cs.columbia.edu>; Sat, 29 Oct 2016 14:55:11 -0400 (EDT)
-In-Reply-To: <1154342410.9324183.1477747141878.JavaMail.zimbra@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E57D40541
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 29 Oct 2016 17:10:37 -0400 (EDT)
+In-Reply-To: <1477775449-115472-1-git-send-email-agraf@suse.de>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,52 +27,90 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Cj4gT24gMjkgT2N0IDIwMTYsIGF0IDE1OjE5LCBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRo
-YXQuY29tPiB3cm90ZToKPiAKPj4+Pj4gV2hhdCB0aGUgc3RhdHVzIG9mIHVzZXJzcGFjZSBmb3Ig
-dGhpcyB0aGluZz8gQXJlIFFFTVUgcGF0Y2hlcyBiZWluZwo+Pj4+PiBwb3N0ZWQgYW5kIHJldmll
-d2VkPwo+Pj4+IAo+Pj4+IEkgZGlkbid0IHNlZSBhIG5vdGlmaWNhdGlvbiB0aGF0IHRoZSBwYXRj
-aGVzIHdlcmUgbWVyZ2VkLiBBcmUgdGhleSBpbgo+Pj4+IExpbnVzJyB0cmVlIHlldD8gVGhlbiBJ
-IGNhbiBwb3N0IGVuYWJsZW1lbnQgdG8gcWVtdS1kZXZlbC4KPj4+IAo+Pj4gSSB0aGluayB5b3Ug
-Z290IGl0IGJhY2t3YXJkLiBJIGhhdmUgbm8gaW50ZW50aW9uIG9mIG1lcmdpbmcgdGhlbSB1bnRp
-bCBJCj4+PiBzZWUgYSB2YWd1ZSBjb25zZW5zdXMgb24gdGhlIHVzZXJzcGFjZSBBUEksIGFuZCBh
-IHNldCBvZiBwYXRjaGVzIHJlYWR5Cj4+PiB0byBiZSBtZXJnZWQgaW4gUUVNVS4KPj4gCj4+IFRo
-YXQncyBub3QgaG93IGt2bSBhcGlzIGFyZSBtYWRlLgo+IAo+IEFjdHVhbGx5IEkgdGhpbmsgaXQn
-cyBhbHdheXMgYmVlbiBsaWtlIHRoaXMsIGRlcGVuZGluZyBvbiB3aGF0IE1hcmMgbWVhbnQgZm9y
-Cj4gInJlYWR5IHRvIGJlIG1lcmdlZCBpbiBRRU1VIi4gIEl0IGRvZXNuJ3QgbWFrZSBzZW5zZSB0
-byBtZXJnZSBLVk0gQVBJcyB3aXRob3V0Cj4gaGF2aW5nIHVzZXJzcGFjZSBwYXRjaGVzIGF0IGxl
-YXN0IHBvc3RlZCBhcyBSRkMgdG8gcWVtdS1kZXZlbCwgYW5kIHdpdGhvdXQKPiBoYXZpbmcgYXQg
-bGVhc3QgYSBwb3NpdGl2ZSByZXNwb25zZSBmcm9tIHRoZSBRRU1VIGFyY2hpdGVjdHVyZSBtYWlu
-dGFpbmVyLgoKSSBoYWxmd2F5IGFncmVlLiBJIGRvIGFncmVlIHRoYXQgdGhlcmUgbmVlZHMgdG8g
-YmUgYSByZWZlcmVuY2UgaW1wbGVtZW50YXRpb24gdGhhdCBwcm92ZXMgdGhlIEFQSSB0byBtYWtl
-IHNlbnNlLiBUaGF0IGJpdCBpcyByZWZlcmVuY2VkIGluIHRoZSBjb3ZlciBsZXR0ZXIgb2YgdGhl
-IHBhdGNoIHNldC4KClBldGVyIGFzIHRoZSBRRU1VIGFyY2hpdGVjdHVyZSBtYWludGFpbmVyIGhh
-cyBiZWVuIHBhcnQgb2YgdGhlIHJldmlldyBwcm9jZXNzIGFuZCBpbnZvbHZlZCBmcm9tIHRoZSBi
-ZWdpbm5pbmcuIEluIGZhY3QsIHRoZSBjdXJyZW50IGFwcHJvYWNoIHdhcyBoaXMgaWRlYS4KCkRv
-IHdlIG5lZWQgdG8gZmx5IHRoZSBsb29wIG92ZXIgcWVtdS1kZXZlbD8gSSBkb3VidCBpdCwgYnV0
-IGlmIGl0IG1ha2VzIHlvdSBoYXBweSBJIGNhbiBwb3N0IGFuIFJGQyB0aGVyZSB0b28uCgo+IEFS
-TSBkb2VzIHJlcXVpcmUgYSBiaXQgbW9yZSBjYXJlIGJlY2F1c2UgdGhlcmUncyBubyBvdmVybGFw
-IGJldHdlZW4ga2VybmVsCj4gYW5kIHVzZXJzcGFjZSBtYWludGFpbmVycywgc28gcGVyaGFwcyB0
-aGF0J3MgdGhlIHNvdXJjZSBvZiB0aGUgY29uZnVzaW9uPwo+IAo+IE5vdywgb2YgY291cnNlIG1l
-cmdpbmcgdGhlIHBhdGNoZXMgaW4gUUVNVSBtYXkgdGFrZSBhIG1vbnRoIG9yIHR3byBkZXBlbmRp
-bmcKPiBvbiB0aGUgdGltaW5nIChiZWNhdXNlIHlvdSBoYXZlIHRvIHdhaXQgZm9yIHRoZSBwYXRj
-aGVzIHRvIGJlIG1lcmdlZCBpbnRvCj4gTGludXMncyB0cmVlIGFuZCBmb3IgdGhlIEtWTSBoZWFk
-ZXJzIHRvIGJlIHVwZGF0ZWQgaW4gUUVNVS0tLXdoaWNoIGlzIG5vdAo+IGdvaW5nIHRvIGhhcHBl
-biBkdXJpbmcgZnJlZXplIG9mIGNvdXJzZSkuICBTbyBvZiBjb3Vyc2UgdGhlIEtWTSBwYXRjaCB0
-aHVzCj4gY2FuIGJlIGNvbW1pdHRlZCBldmVuIGlmIFFFTVUgaXMgaW4gZnJlZXplLCBhcyBsb25n
-IGFzIHRoZSBRRU1VIGFyY2hpdGVjdHVyZQo+IG1haW50YWluZXIgZ2l2ZXMgYW4gb3ZlcmFsbCBn
-cmVlbiBsaWdodC4KClJpZ2h0LiBNeSBwbGFuIHdhcyB0byBtYWtlIHN1cmUgdGhhdCBwZW9wbGUg
-YWdyZWUgb24gdGhlIEtWTSBpbnRlcmZhY2UuIFRoZW4gZGlyZWN0bHkgc2VuZCBub24tUkZDIHBh
-dGNoZXMgdG8gcWVtdS1kZXZlbCwgd2hpY2ggY2FuIG9ubHkgaGFwcGVuIHdoZW4gdGhlIEtWTSBw
-YXRjaGVzIGFyZSBtZXJnZWQuIEkgZGlkbuKAmXQgc2VlIGFueSByZWFzb24gd2h5IHRoYXQgYXBw
-cm9hY2ggd291bGQgYmUgY29udHJvdmVyc2lhbCwgc2luY2UgZXZlcnlvbmUgd2hvIHJlYWxseSBj
-YXJlZCB3YXMgaW52b2x2ZWQuCgpCdXQgYWdhaW4sIEkgZG9u4oCZdCBjYXJlIHN0cm9uZ2x5IGVu
-b3VnaCB0byBtYWtlIGEgZnVzcy4gSWYgcGVvcGxlIGFyZSBoYXBwaWVyIHdpdGggUkZDIHBhdGNo
-ZXMgb24gdGhlIE1MIHJhdGhlciB0aGFuIGEgZ2l0aHViIGxpbmsgdG8gUkZDIHBhdGNoZXMsIEni
-gJlsbCBzZW5kIHRoZW0uCgoKQWxleAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
-aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
-YXJtCg==
+When running with KVM enabled, you can choose between emulating the
+gic in kernel or user space. If the kernel supports in-kernel virtualization
+of the interrupt controller, it will default to that. If not, if will
+default to user space emulation.
+
+Unfortunately when running in user mode gic emulation, we miss out on
+timer events which are only available from kernel space. This patch leverages
+the new kernel/user space pending line synchronization for those timer events.
+
+Signed-off-by: Alexander Graf <agraf@suse.de>
+---
+ hw/arm/virt.c    | 10 ++++++++++
+ target-arm/cpu.h |  3 +++
+ target-arm/kvm.c | 19 +++++++++++++++++++
+ 3 files changed, 32 insertions(+)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 070bbf8..8ac81e3 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -622,6 +622,16 @@ static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic, int type,
+     } else if (type == 2) {
+         create_v2m(vbi, pic);
+     }
++
++#ifdef CONFIG_KVM
++    if (kvm_enabled() && !kvm_irqchip_in_kernel()) {
++        if (!kvm_check_extension(kvm_state, KVM_CAP_ARM_TIMER)) {
++            error_report("KVM with user space irqchip only works when the "
++                         "host kernel supports KVM_CAP_ARM_TIMER");
++            exit(1);
++        }
++    }
++#endif
+ }
+ 
+ static void create_uart(const VirtBoardInfo *vbi, qemu_irq *pic, int uart,
+diff --git a/target-arm/cpu.h b/target-arm/cpu.h
+index 19d967b..7686082 100644
+--- a/target-arm/cpu.h
++++ b/target-arm/cpu.h
+@@ -659,6 +659,9 @@ struct ARMCPU {
+ 
+     ARMELChangeHook *el_change_hook;
+     void *el_change_hook_opaque;
++
++    /* Used to synchronize KVM and QEMU timer levels */
++    uint8_t timer_irq_level;
+ };
+ 
+ static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
+diff --git a/target-arm/kvm.c b/target-arm/kvm.c
+index c00b94e..0d8b642 100644
+--- a/target-arm/kvm.c
++++ b/target-arm/kvm.c
+@@ -527,6 +527,25 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
+ 
+ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+ {
++    ARMCPU *cpu;
++
++    if (kvm_irqchip_in_kernel()) {
++        /*
++         * We only need to sync timer states with user-space interrupt
++         * controllers, so return early and save cycles if we don't.
++         */
++        return MEMTXATTRS_UNSPECIFIED;
++    }
++
++    cpu = ARM_CPU(cs);
++
++    /* Synchronize our internal vtimer irq line with the kvm one */
++    if (run->s.regs.timer_irq_level != cpu->timer_irq_level) {
++        qemu_set_irq(ARM_CPU(cs)->gt_timer_outputs[GTIMER_VIRT],
++                     run->s.regs.timer_irq_level & KVM_ARM_TIMER_VTIMER);
++        cpu->timer_irq_level = run->s.regs.timer_irq_level;
++    }
++
+     return MEMTXATTRS_UNSPECIFIED;
+ }
+ 
+-- 
+1.8.5.6
