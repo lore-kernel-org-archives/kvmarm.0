@@ -1,116 +1,68 @@
 From: Alexander Graf <agraf@suse.de>
-Subject: [RFC 2/2] ARM: KVM: Enable in-kernel timers with user space gic
-Date: Sat, 29 Oct 2016 23:10:49 +0200
-Message-ID: <1477775449-115472-2-git-send-email-agraf@suse.de>
-References: <1477775449-115472-1-git-send-email-agraf@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF44B405BA
- for <kvmarm@lists.cs.columbia.edu>; Sat, 29 Oct 2016 17:10:38 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id quKC-ginK-Bu for <kvmarm@lists.cs.columbia.edu>;
- Sat, 29 Oct 2016 17:10:37 -0400 (EDT)
-Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E57D40541
- for <kvmarm@lists.cs.columbia.edu>; Sat, 29 Oct 2016 17:10:37 -0400 (EDT)
-In-Reply-To: <1477775449-115472-1-git-send-email-agraf@suse.de>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [RFC 1/2] linux-headers: update
+Date: Sat, 29 Oct 2016 23:10:48 +0200
+Message-ID: <1477775449-115472-1-git-send-email-agraf@suse.de>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, kvm@vger.kernel.org, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When running with KVM enabled, you can choose between emulating the
-gic in kernel or user space. If the kernel supports in-kernel virtualization
-of the interrupt controller, it will default to that. If not, if will
-default to user space emulation.
-
-Unfortunately when running in user mode gic emulation, we miss out on
-timer events which are only available from kernel space. This patch leverages
-the new kernel/user space pending line synchronization for those timer events.
-
-Signed-off-by: Alexander Graf <agraf@suse.de>
+This patch updates the Linux headers to include the in-progress user
+space ARM timer patches. It is explicitly RFC, as the patches are not
+merged yet.
 ---
- hw/arm/virt.c    | 10 ++++++++++
- target-arm/cpu.h |  3 +++
- target-arm/kvm.c | 19 +++++++++++++++++++
- 3 files changed, 32 insertions(+)
+ linux-headers/asm-arm/kvm.h   | 1 +
+ linux-headers/asm-arm64/kvm.h | 1 +
+ linux-headers/linux/kvm.h     | 6 ++++++
+ 3 files changed, 8 insertions(+)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 070bbf8..8ac81e3 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -622,6 +622,16 @@ static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic, int type,
-     } else if (type == 2) {
-         create_v2m(vbi, pic);
-     }
-+
-+#ifdef CONFIG_KVM
-+    if (kvm_enabled() && !kvm_irqchip_in_kernel()) {
-+        if (!kvm_check_extension(kvm_state, KVM_CAP_ARM_TIMER)) {
-+            error_report("KVM with user space irqchip only works when the "
-+                         "host kernel supports KVM_CAP_ARM_TIMER");
-+            exit(1);
-+        }
-+    }
-+#endif
- }
- 
- static void create_uart(const VirtBoardInfo *vbi, qemu_irq *pic, int uart,
-diff --git a/target-arm/cpu.h b/target-arm/cpu.h
-index 19d967b..7686082 100644
---- a/target-arm/cpu.h
-+++ b/target-arm/cpu.h
-@@ -659,6 +659,9 @@ struct ARMCPU {
- 
-     ARMELChangeHook *el_change_hook;
-     void *el_change_hook_opaque;
-+
-+    /* Used to synchronize KVM and QEMU timer levels */
-+    uint8_t timer_irq_level;
+diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
+index 541268c..5d58ec2 100644
+--- a/linux-headers/asm-arm/kvm.h
++++ b/linux-headers/asm-arm/kvm.h
+@@ -105,6 +105,7 @@ struct kvm_debug_exit_arch {
  };
  
- static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
-diff --git a/target-arm/kvm.c b/target-arm/kvm.c
-index c00b94e..0d8b642 100644
---- a/target-arm/kvm.c
-+++ b/target-arm/kvm.c
-@@ -527,6 +527,25 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
+ struct kvm_sync_regs {
++	__u8 timer_irq_level;
+ };
  
- MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
- {
-+    ARMCPU *cpu;
-+
-+    if (kvm_irqchip_in_kernel()) {
-+        /*
-+         * We only need to sync timer states with user-space interrupt
-+         * controllers, so return early and save cycles if we don't.
-+         */
-+        return MEMTXATTRS_UNSPECIFIED;
-+    }
-+
-+    cpu = ARM_CPU(cs);
-+
-+    /* Synchronize our internal vtimer irq line with the kvm one */
-+    if (run->s.regs.timer_irq_level != cpu->timer_irq_level) {
-+        qemu_set_irq(ARM_CPU(cs)->gt_timer_outputs[GTIMER_VIRT],
-+                     run->s.regs.timer_irq_level & KVM_ARM_TIMER_VTIMER);
-+        cpu->timer_irq_level = run->s.regs.timer_irq_level;
-+    }
-+
-     return MEMTXATTRS_UNSPECIFIED;
- }
+ struct kvm_arch_memory_slot {
+diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
+index fd5a276..0e1cbd1 100644
+--- a/linux-headers/asm-arm64/kvm.h
++++ b/linux-headers/asm-arm64/kvm.h
+@@ -143,6 +143,7 @@ struct kvm_debug_exit_arch {
+ #define KVM_GUESTDBG_USE_HW		(1 << 17)
  
+ struct kvm_sync_regs {
++	__u8 timer_irq_level;
+ };
+ 
+ struct kvm_arch_memory_slot {
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 4806e06..737113c 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -870,6 +870,7 @@ struct kvm_ppc_smmu_info {
+ #define KVM_CAP_S390_USER_INSTR0 130
+ #define KVM_CAP_MSI_DEVID 131
+ #define KVM_CAP_PPC_HTM 132
++#define KVM_CAP_ARM_TIMER 133
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1327,4 +1328,9 @@ struct kvm_assigned_msix_entry {
+ #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+ #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
+ 
++/* Available with KVM_CAP_ARM_TIMER */
++
++/* Bits for run->arm_timer.timesource */
++#define KVM_ARM_TIMER_VTIMER           (1 << 0)
++
+ #endif /* __LINUX_KVM_H */
 -- 
 1.8.5.6
+
