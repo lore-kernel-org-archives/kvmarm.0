@@ -1,68 +1,61 @@
-From: Alexander Graf <agraf@suse.de>
-Subject: [RFC 1/2] linux-headers: update
-Date: Sat, 29 Oct 2016 23:10:48 +0200
-Message-ID: <1477775449-115472-1-git-send-email-agraf@suse.de>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, pbonzini@redhat.com, kvm@vger.kernel.org, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH V4 10/10] arm64: KVM: add guest SEA support
+Date: Mon, 31 Oct 2016 10:02:07 +0000
+Message-ID: <20161031100206.GX1041@n2100.armlinux.org.uk>
+References: <1477071013-29563-1-git-send-email-tbaicar@codeaurora.org>
+ <1477071013-29563-11-git-send-email-tbaicar@codeaurora.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E676E40416
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Oct 2016 06:02:40 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Yw9iTwOZWOCu for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Oct 2016 06:02:39 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77D75402A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Oct 2016 06:02:39 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1477071013-29563-11-git-send-email-tbaicar@codeaurora.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, robert.moore@intel.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, lenb@kernel.org, harba@codeaurora.org, marc.zyngier@arm.com, punit.agrawal@arm.com, tomasz.nowicki@linaro.org, nkaje@codeaurora.org, rostedt@goodmis.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch updates the Linux headers to include the in-progress user
-space ARM timer patches. It is explicitly RFC, as the patches are not
-merged yet.
----
- linux-headers/asm-arm/kvm.h   | 1 +
- linux-headers/asm-arm64/kvm.h | 1 +
- linux-headers/linux/kvm.h     | 6 ++++++
- 3 files changed, 8 insertions(+)
+The subject line on this patch is misleading - it's not only ARM64
+specific...
 
-diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
-index 541268c..5d58ec2 100644
---- a/linux-headers/asm-arm/kvm.h
-+++ b/linux-headers/asm-arm/kvm.h
-@@ -105,6 +105,7 @@ struct kvm_debug_exit_arch {
- };
- 
- struct kvm_sync_regs {
-+	__u8 timer_irq_level;
- };
- 
- struct kvm_arch_memory_slot {
-diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
-index fd5a276..0e1cbd1 100644
---- a/linux-headers/asm-arm64/kvm.h
-+++ b/linux-headers/asm-arm64/kvm.h
-@@ -143,6 +143,7 @@ struct kvm_debug_exit_arch {
- #define KVM_GUESTDBG_USE_HW		(1 << 17)
- 
- struct kvm_sync_regs {
-+	__u8 timer_irq_level;
- };
- 
- struct kvm_arch_memory_slot {
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 4806e06..737113c 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -870,6 +870,7 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_S390_USER_INSTR0 130
- #define KVM_CAP_MSI_DEVID 131
- #define KVM_CAP_PPC_HTM 132
-+#define KVM_CAP_ARM_TIMER 133
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1327,4 +1328,9 @@ struct kvm_assigned_msix_entry {
- #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
- #define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
- 
-+/* Available with KVM_CAP_ARM_TIMER */
-+
-+/* Bits for run->arm_timer.timesource */
-+#define KVM_ARM_TIMER_VTIMER           (1 << 0)
-+
- #endif /* __LINUX_KVM_H */
+On Fri, Oct 21, 2016 at 11:30:13AM -0600, Tyler Baicar wrote:
+> diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
+> index a3d61ad..86e1faa 100644
+> --- a/arch/arm/include/asm/system_misc.h
+> +++ b/arch/arm/include/asm/system_misc.h
+> @@ -24,4 +24,9 @@ extern unsigned int user_debug;
+>  
+>  #endif /* !__ASSEMBLY__ */
+>  
+> +inline int handle_guest_sea(unsigned long addr, unsigned int esr)
+
+This needs to be static.
+
+> +{
+> +	return -1;
+> +}
+> +
+>  #endif /* __ASM_ARM_SYSTEM_MISC_H */
+
 -- 
-1.8.5.6
-
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
