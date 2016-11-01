@@ -1,26 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2] arm/arm64: KVM: Perform local TLB invalidation when
- multiplexing vcpus on a single CPU
-Date: Tue, 01 Nov 2016 16:39:29 +0000
-Message-ID: <86ins7kvcu.fsf@arm.com>
-References: <1477650470-19104-1-git-send-email-marc.zyngier@arm.com>
- <20161101090408.GA13677@cbox>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: vgic: Prevent VGIC_ADDR_TO_INTID from
+ emiting divisions
+Date: Tue, 1 Nov 2016 16:50:26 +0000
+Message-ID: <a0336267-4180-5c1d-2122-d76e23120939@arm.com>
+References: <20161029111901.16668-1-marc.zyngier@arm.com>
+ <20161101152849.GC13677@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6480B40288
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2016 12:39:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09D674029D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2016 12:49:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H42onznZFJVJ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Nov 2016 12:39:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5B6B40286
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2016 12:39:26 -0400 (EDT)
-In-Reply-To: <20161101090408.GA13677@cbox> (Christoffer Dall's message of
- "Tue, 1 Nov 2016 10:04:08 +0100")
+ with ESMTP id JwY35tW0ATLd for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Nov 2016 12:49:46 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B5B1C40286
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2016 12:49:46 -0400 (EDT)
+In-Reply-To: <20161101152849.GC13677@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,124 +30,115 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[messed up my initial reply, resending]
+Hej,
 
-On Tue, Nov 01 2016 at 09:04:08 AM, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> On Fri, Oct 28, 2016 at 11:27:50AM +0100, Marc Zyngier wrote:
->> Architecturally, TLBs are private to the (physical) CPU they're
->> associated with. But when multiple vcpus from the same VM are
->> being multiplexed on the same CPU, the TLBs are not private
->> to the vcpus (and are actually shared across the VMID).
->> 
->> Let's consider the following scenario:
->> 
->> - vcpu-0 maps PA to VA
->> - vcpu-1 maps PA' to VA
->> 
->> If run on the same physical CPU, vcpu-1 can hit TLB entries generated
->> by vcpu-0 accesses, and access the wrong physical page.
->> 
->> The solution to this is to keep a per-VM map of which vcpu ran last
->> on each given physical CPU, and invalidate local TLBs when switching
->> to a different vcpu from the same VM.
->> 
->> Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+On 01/11/16 15:28, Christoffer Dall wrote:
+> On Sat, Oct 29, 2016 at 12:19:01PM +0100, Marc Zyngier wrote:
+>> Using non-constant number of bits for VGIC_ADDR_TO_INTID() leads
+>> to gcc 6.1 emiting calls to __aeabi_uldivmod, which the kernel
+>> does not implement.
+>>
+>> As we really don't want to implement complex division in the kernel,
+>> the only other option is to prove to the compiler that there is only
+>> a few values that are possible for the number of bits per IRQ, and
+>> that they are all power of 2.
+>>
+>> We turn the VGIC_ADDR_TO_INTID macro into a switch that looks for
+>> the supported set of values (1, 2, 8, 64), and perform the computation
+>> accordingly. When "bits" is a constant, the compiler optimizes
+>> away the other cases. If not, we end-up with a small number of cases
+>> that GCC optimises reasonably well. Out of range values are detected
+>> both at build time (constants) and at run time (variables).
+>>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->> Fixed comments, added Mark's RB.
->> 
->>  arch/arm/include/asm/kvm_host.h   | 11 ++++++++++-
->>  arch/arm/include/asm/kvm_hyp.h    |  1 +
->>  arch/arm/kvm/arm.c                | 35 ++++++++++++++++++++++++++++++++++-
->>  arch/arm/kvm/hyp/switch.c         |  9 +++++++++
->>  arch/arm64/include/asm/kvm_host.h | 11 ++++++++++-
->>  arch/arm64/kvm/hyp/switch.c       |  8 ++++++++
->>  6 files changed, 72 insertions(+), 3 deletions(-)
->> 
+>> This should be applied *before* Andre's patch fixing out of bound SPIs.
+>>
+>>  virt/kvm/arm/vgic/vgic-mmio.h | 33 ++++++++++++++++++++++++++++++++-
+>>  1 file changed, 32 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+>> index 4c34d39..a457282 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio.h
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
+>> @@ -57,10 +57,41 @@ extern struct kvm_io_device_ops kvm_io_gic_ops;
+>>   * multiplication with the inverted fraction, and scale up both the
+>>   * numerator and denominator with 8 to support at most 64 bits per IRQ:
+>>   */
+>> -#define VGIC_ADDR_TO_INTID(addr, bits)  (((addr) & VGIC_ADDR_IRQ_MASK(bits)) * \
+>> +#define __VGIC_ADDR_INTID(addr, bits)  (((addr) & VGIC_ADDR_IRQ_MASK(bits)) * \
+>>  					64 / (bits) / 8)
 
-[...]
+I remember we discussed this in length some months ago, but I was
+wondering if this isn't simply:
+	((addr & mask) * 8) / bits
+and thus can be written as:
+	((addr & mask) * 8) >> ilog2(bits)
+We require <bits> to be a power of two anyway for the MASK macro.
 
->> @@ -310,6 +322,27 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
->>  	return 0;
->>  }
+ilog2(constant) is nicely optimized at compile time, but even at runtime
+on both ARM variants it boils down to "31 - clz(bits)", which are two or
+three instructions AFAICS.
+
+Does that make sense or am I missing something here?
+
+I changed this in my patch and adjusted the comment, quick testing seems
+to be fine on Midway and Juno.
+
+Will send it out in a minute, if no-one objects.
+
+Cheers,
+Andre.
+
 >>  
->> +void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
->> +{
->
-> why is calling this from here sufficient?
->
-> You only get a notification from preempt notifiers if you were preempted
-> while running (or rather while the vcpu was loaded).  I think this
-> needs
-
-Arghh. I completely miss-read the code when writing that patch.
-
-> to go in kvm_arch_vcpu_load, but be aware that the vcpu_load gets called
-> for other vcpu ioctls and doesn't necessarily imply that the vcpu will
-> actually run, which is also the case for the sched_in notification, btw.
-> The worst that will happen in that case is a bit of extra TLB
-> invalidation, so sticking with kvm_arch_vcpu_load is probably fine.
-
-Indeed. I don't mind the extra invalidation, as long as it is rare
-enough. Another possibility would be to do this test on the entry path,
-once preemption is disabled.
-
->
->> +	int *last_ran;
+>>  /*
+>> + * Perform the same computation, but also handle non-constant number
+>> + * of bits. We only care about the few cases that are required by
+>> + * GICv2/v3.
+>> + */
+>> +#define VGIC_ADDR_TO_INTID(addr, bits)				\
+>> +	({							\
+>> +		u32 __v;					\
+>> +		switch((bits)) {				\
+>> +		case 1:						\
+>> +			__v = __VGIC_ADDR_INTID((addr), 1);	\
+>> +			break;					\
+>> +		case 2:						\
+>> +			__v = __VGIC_ADDR_INTID((addr), 2);	\
+>> +			break;					\
+>> +		case 8:						\
+>> +			__v = __VGIC_ADDR_INTID((addr), 8);	\
+>> +			break;					\
+>> +		case 64:					\
+>> +			__v = __VGIC_ADDR_INTID((addr), 64);	\
+>> +			break;					\
+>> +		default:					\
+>> +			if (__builtin_constant_p((bits)))	\
+>> +				BUILD_BUG();			\
+>> +			else					\
+>> +				BUG();				\
+>> +		}						\
+>> +								\
+>> +		__v;						\
+>> +	})
 >> +
->> +	last_ran = per_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran, cpu);
->> +
->> +	/*
->> +	 * We might get preempted before the vCPU actually runs, but
->> +	 * this is fine. Our TLBI stays pending until we actually make
->> +	 * it to __activate_vm, so we won't miss a TLBI. If another
->> +	 * vCPU gets scheduled, it will see our vcpu_id in last_ran,
->> +	 * and pend a TLBI for itself.
->> +	 */
->> +	if (*last_ran != vcpu->vcpu_id) {
->> +		if (*last_ran != -1)
->> +			vcpu->arch.tlb_vmid_stale = true;
->> +
->> +		*last_ran = vcpu->vcpu_id;
->> +	}
->> +}
->> +
->>  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>  {
->>  	vcpu->cpu = cpu;
->> diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
->> index 92678b7..a411762 100644
->> --- a/arch/arm/kvm/hyp/switch.c
->> +++ b/arch/arm/kvm/hyp/switch.c
->> @@ -75,6 +75,15 @@ static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
->>  {
->>  	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
->>  	write_sysreg(kvm->arch.vttbr, VTTBR);
->> +	if (vcpu->arch.tlb_vmid_stale) {
->> +		/* Force vttbr to be written */
->> +		isb();
->> +		/* Local invalidate only for this VMID */
->> +		write_sysreg(0, TLBIALL);
->> +		dsb(nsh);
->> +		vcpu->arch.tlb_vmid_stale = false;
->> +	}
->> +
->
-> why not call this directly when you notice it via kvm_call_hyp as
-> opposed to adding another conditional in the critical path?
-
-Because the cost of a hypercall is very likely to be a lot higher than
-that of testing a variable. Not to mention that at this point we're
-absolutely sure that we're going to run the guest, while the hook in
-vcpu_load is only probabilistic.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny.
+>> +/*
+>>   * Some VGIC registers store per-IRQ information, with a different number
+>>   * of bits per IRQ. For those registers this macro is used.
+>>   * The _WITH_LENGTH version instantiates registers with a fixed length
+>> -- 
+>> 2.9.3
+>>
+> 
+> Looks functionally correct, just wondering if it's cleaner to turn the
+> whole thing into a static inline, or if it can be rewritten to use
+> shifts with any benefit.
+> 
+> In any case, if you like this version:
+> 
+> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
