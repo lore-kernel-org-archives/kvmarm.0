@@ -1,54 +1,85 @@
-From: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Subject: Re: [PATCH V4 10/10] arm64: KVM: add guest SEA support
-Date: Mon, 31 Oct 2016 16:36:33 -0600
-Message-ID: <85443ee1-9981-c7e8-fe88-a3aac48c3e80@codeaurora.org>
-References: <1477071013-29563-1-git-send-email-tbaicar@codeaurora.org>
- <1477071013-29563-11-git-send-email-tbaicar@codeaurora.org>
- <20161031100206.GX1041@n2100.armlinux.org.uk>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2] KVM: arm/arm64: vgic: Prevent access to invalid SPIs
+Date: Tue, 01 Nov 2016 00:02:38 +0000
+Message-ID: <864m3sm5i9.fsf@arm.com>
+References: <20161031172137.30807-1-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20161031100206.GX1041@n2100.armlinux.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tomasz.nowicki@linaro.org, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, Suzuki.Poulose@arm.com, punit.agrawal@arm.com, astone@redhat.comha
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00DAC402EF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Oct 2016 20:02:32 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id HIVWnEvwLkDR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Oct 2016 20:02:30 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBDEB402EC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Oct 2016 20:02:30 -0400 (EDT)
+In-Reply-To: <20161031172137.30807-1-andre.przywara@arm.com> (Andre Przywara's
+ message of "Mon, 31 Oct 2016 17:21:37 +0000")
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hello Russell,
+Hi Andre,
 
-On 10/31/2016 4:02 AM, Russell King - ARM Linux wrote:
-> The subject line on this patch is misleading - it's not only ARM64
-> specific...
-Thank you for the feedback!
+On Mon, Oct 31 2016 at 05:21:37 PM, Andre Przywara <andre.przywara@arm.com> wrote:
+> In our VGIC implementation we limit the number of SPIs to a number
+> that the userland application told us. Accordingly we limit the
+> allocation of memory for virtual IRQs to that number.
+> However in our MMIO dispatcher we didn't check if we ever access an
+> IRQ beyond that limit, leading to out-of-bound accesses.
+> Add a test against the number of allocated SPIs in check_region().
+> Adjust the VGIC_ADDR_TO_INTID macro to avoid an actual division, which
+> is not implemented on ARM(32).
+>
+> [maz: cleaned-up original patch]
+>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+> Hi Marc,
+>
+> does the last hunk fix the GCC issue that your recent fix addresses
+> as well? ilog2 seems to be pretty cheap on ARM and ARM64, so I wonder
+> if this version of the fix is better, since smaller?
 
-I only put ARM64 in the subject line because this patch only really adds 
-guest SEA support for the ARM64 KVM code. The ARM code had to be edited 
-since both the ARM and ARM64 KVM code use arch/arm/kvm/mmu.c. I can 
-change the subject line to "arm/arm64: KVM: add guest SEA support" if 
-you think that is better.
-> On Fri, Oct 21, 2016 at 11:30:13AM -0600, Tyler Baicar wrote:
->> diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
->> index a3d61ad..86e1faa 100644
->> --- a/arch/arm/include/asm/system_misc.h
->> +++ b/arch/arm/include/asm/system_misc.h
->> @@ -24,4 +24,9 @@ extern unsigned int user_debug;
->>   
->>   #endif /* !__ASSEMBLY__ */
->>   
->> +inline int handle_guest_sea(unsigned long addr, unsigned int esr)
-> This needs to be static.
-I'll make this static.
+Thanks for looking into this. That seems to solve it for me (with GCC
+6.1.1).
+
+[...]
+
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+> index 4c34d39..dacd1155 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.h
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
+> @@ -58,7 +58,7 @@ extern struct kvm_io_device_ops kvm_io_gic_ops;
+>   * numerator and denominator with 8 to support at most 64 bits per IRQ:
+>   */
+>  #define VGIC_ADDR_TO_INTID(addr, bits)  (((addr) & VGIC_ADDR_IRQ_MASK(bits)) * \
+> -					64 / (bits) / 8)
+> +					64 >> (ilog2(bits) + 3))
+
+Given that it's taken me the best of 10 minutes to convince myself that
+this was correct, can you please save everybody some time by updating
+the comment above the #define?
+
+Please respin this as soon as you can.
 
 Thanks,
-Tyler
->> +{
->> +	return -1;
->> +}
->> +
->>   #endif /* __ASM_ARM_SYSTEM_MISC_H */
 
+	M.
 -- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+Jazz is not dead. It just smells funny.
