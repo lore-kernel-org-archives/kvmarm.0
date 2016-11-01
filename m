@@ -1,27 +1,27 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC 2/2] ARM: KVM: Enable in-kernel timers with user space gic
-Date: Tue, 1 Nov 2016 11:35:42 +0000
-Message-ID: <CAFEAcA9ABvy52WDX++ACUQNo+UiRJkyC+X_mT+QhMxqE154Nqw@mail.gmail.com>
-References: <1477775449-115472-1-git-send-email-agraf@suse.de>
- <1477775449-115472-2-git-send-email-agraf@suse.de>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2 1/3] arm64: crypto/aes-ce-ccm: Cleanup hwcap check
+Date: Tue, 1 Nov 2016 14:03:56 +0000
+Message-ID: <CAKv+Gu9Y4Y2g66hQFFpsNxpwoKyfgrsqD5JstdEDUEUBykjO4g@mail.gmail.com>
+References: <1477929825-5907-1-git-send-email-suzuki.poulose@arm.com>
+ <1477929825-5907-2-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 891D2402EF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2016 07:35:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B6B14029B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2016 10:03:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e+lT6O+pQ84u for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Nov 2016 07:35:52 -0400 (EDT)
-Received: from mail-ua0-f173.google.com (mail-ua0-f173.google.com
- [209.85.217.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63B604028D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2016 07:35:51 -0400 (EDT)
-Received: by mail-ua0-f173.google.com with SMTP id 20so110274264uak.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Nov 2016 04:36:03 -0700 (PDT)
-In-Reply-To: <1477775449-115472-2-git-send-email-agraf@suse.de>
+ with ESMTP id 1U-AOI2bJWpX for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Nov 2016 10:03:46 -0400 (EDT)
+Received: from mail-oi0-f52.google.com (mail-oi0-f52.google.com
+ [209.85.218.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 40A4B40293
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2016 10:03:45 -0400 (EDT)
+Received: by mail-oi0-f52.google.com with SMTP id i127so295464494oia.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Nov 2016 07:03:57 -0700 (PDT)
+In-Reply-To: <1477929825-5907-2-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,112 +31,58 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Graf <agraf@suse.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 29 October 2016 at 22:10, Alexander Graf <agraf@suse.de> wrote:
-> When running with KVM enabled, you can choose between emulating the
-> gic in kernel or user space. If the kernel supports in-kernel virtualization
-> of the interrupt controller, it will default to that. If not, if will
-> default to user space emulation.
+Hi Suzuki,
+
+On 31 October 2016 at 16:03, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> Use the module_cpu_feature_match to make sure the system has
+> HWCAP_AES to use the module.
 >
-> Unfortunately when running in user mode gic emulation, we miss out on
-> timer events which are only available from kernel space. This patch leverages
-> the new kernel/user space pending line synchronization for those timer events.
->
-> Signed-off-by: Alexander Graf <agraf@suse.de>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
->  hw/arm/virt.c    | 10 ++++++++++
->  target-arm/cpu.h |  3 +++
->  target-arm/kvm.c | 19 +++++++++++++++++++
->  3 files changed, 32 insertions(+)
+>  arch/arm64/crypto/aes-ce-ccm-glue.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 070bbf8..8ac81e3 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -622,6 +622,16 @@ static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic, int type,
->      } else if (type == 2) {
->          create_v2m(vbi, pic);
->      }
-> +
-> +#ifdef CONFIG_KVM
-> +    if (kvm_enabled() && !kvm_irqchip_in_kernel()) {
-> +        if (!kvm_check_extension(kvm_state, KVM_CAP_ARM_TIMER)) {
-> +            error_report("KVM with user space irqchip only works when the "
-> +                         "host kernel supports KVM_CAP_ARM_TIMER");
-> +            exit(1);
-> +        }
-> +    }
-> +#endif
-
-I think this belongs somewhere in target-arm/kvm.c rather
-than in hw/arm/virt.c -- it's not the only board model that
-supports KVM.
-
->  }
+> diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+> index f4bf2f2..fa82eaa 100644
+> --- a/arch/arm64/crypto/aes-ce-ccm-glue.c
+> +++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+> @@ -14,6 +14,7 @@
+>  #include <crypto/algapi.h>
+>  #include <crypto/scatterwalk.h>
+>  #include <crypto/internal/aead.h>
+> +#include <linux/cpufeature.h>
+>  #include <linux/module.h>
 >
->  static void create_uart(const VirtBoardInfo *vbi, qemu_irq *pic, int uart,
-> diff --git a/target-arm/cpu.h b/target-arm/cpu.h
-> index 19d967b..7686082 100644
-> --- a/target-arm/cpu.h
-> +++ b/target-arm/cpu.h
-> @@ -659,6 +659,9 @@ struct ARMCPU {
+>  #include "aes-ce-setkey.h"
+> @@ -296,8 +297,6 @@ static struct aead_alg ccm_aes_alg = {
 >
->      ARMELChangeHook *el_change_hook;
->      void *el_change_hook_opaque;
-> +
-> +    /* Used to synchronize KVM and QEMU timer levels */
-> +    uint8_t timer_irq_level;
->  };
->
->  static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
-> diff --git a/target-arm/kvm.c b/target-arm/kvm.c
-> index c00b94e..0d8b642 100644
-> --- a/target-arm/kvm.c
-> +++ b/target-arm/kvm.c
-> @@ -527,6 +527,25 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
->
->  MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+>  static int __init aes_mod_init(void)
 >  {
-> +    ARMCPU *cpu;
-> +
-> +    if (kvm_irqchip_in_kernel()) {
-> +        /*
-> +         * We only need to sync timer states with user-space interrupt
-> +         * controllers, so return early and save cycles if we don't.
-> +         */
-> +        return MEMTXATTRS_UNSPECIFIED;
-> +    }
-> +
-> +    cpu = ARM_CPU(cs);
-> +
-> +    /* Synchronize our internal vtimer irq line with the kvm one */
-> +    if (run->s.regs.timer_irq_level != cpu->timer_irq_level) {
-> +        qemu_set_irq(ARM_CPU(cs)->gt_timer_outputs[GTIMER_VIRT],
-
-You just set up a local variable, so you don't need to inline "ARM_CPU(cs)".
-
-> +                     run->s.regs.timer_irq_level & KVM_ARM_TIMER_VTIMER);
-
-This is setting a bear trap for the person who comes along later
-to add the next interrupt, because the level argument to qemu_set_irq()
-should be 0 or 1. That happens to be true for the KVM_ARM_TIMER_VTIMER
-bit but won't be for the cut-n-pasted version with the next bit name...
-
-> +        cpu->timer_irq_level = run->s.regs.timer_irq_level;
-> +    }
-> +
->      return MEMTXATTRS_UNSPECIFIED;
+> -       if (!(elf_hwcap & HWCAP_AES))
+> -               return -ENODEV;
+>         return crypto_register_aead(&ccm_aes_alg);
 >  }
-
-Does this code do the right thing across a vcpu reset or
-a full-system reset?
-
 >
-> --
-> 1.8.5.6
+> @@ -306,7 +305,7 @@ static void __exit aes_mod_exit(void)
+>         crypto_unregister_aead(&ccm_aes_alg);
+>  }
+>
+> -module_init(aes_mod_init);
+> +module_cpu_feature_match(AES, aes_mod_init);
 
-thanks
--- PMM
+I don't think this change is correct. This will result in the AES
+instruction dependency to be exposed via the module alias, causing the
+module to be loaded automatically as soon as udev detects that the CPU
+implements those instructions. For plain AES, that makes sense, but
+AES in CCM mode is specific to CCMP (WPA2) on mac80211 controllers
+that have no hardware AES support, and to IPsec VPN. For this reason,
+the algo type is exposed via the module alias instead (i.e,
+'ccm(aes)'), which will result in the module being loaded as soon as
+the crypto algo manager instantiates the transform. On CPUs that don't
+implement the AES instructions, this will fail, and it will fall back
+to the generic CCM driver instead.
