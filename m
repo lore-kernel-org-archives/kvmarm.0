@@ -1,46 +1,102 @@
 From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC 1/2] linux-headers: update
-Date: Tue, 1 Nov 2016 10:19:05 +0000
-Message-ID: <CAFEAcA96Cqfk4QEok-nEV28wnv6BJavgc9XWJVTWmJxi2RbrCw@mail.gmail.com>
-References: <1477775449-115472-1-git-send-email-agraf@suse.de>
+Subject: Re: [PATCH 2/3] KVM: arm/arm64: Add ARM arch timer interrupts ABI
+Date: Tue, 1 Nov 2016 11:26:54 +0000
+Message-ID: <CAFEAcA8x9Rt7SwXfqC8QOuXUEysrGBvYZW_=9ZA+pNgYu7HbTA@mail.gmail.com>
+References: <20160927190806.22988-1-christoffer.dall@linaro.org> <20160927190806.22988-3-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB88C40284
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2016 06:19:16 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zirCJZP+fQzj for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Nov 2016 06:19:15 -0400 (EDT)
-Received: from mail-vk0-f46.google.com (mail-vk0-f46.google.com
- [209.85.213.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9653E401E7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2016 06:19:14 -0400 (EDT)
-Received: by mail-vk0-f46.google.com with SMTP id d65so98124036vkg.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Nov 2016 03:19:26 -0700 (PDT)
-In-Reply-To: <1477775449-115472-1-git-send-email-agraf@suse.de>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Graf <agraf@suse.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=UTF-8
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160927190806.22988-3-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Alexander Graf <agraf@suse.de>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 29 October 2016 at 22:10, Alexander Graf <agraf@suse.de> wrote:
-> This patch updates the Linux headers to include the in-progress user
-> space ARM timer patches. It is explicitly RFC, as the patches are not
-> merged yet.
+On 27 September 2016 at 20:08, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> From: Alexander Graf <agraf@suse.de>
+>
+> We have 2 modes for dealing with interrupts in the ARM world. We can
+> either handle them all using hardware acceleration through the vgic or
+> we can emulate a gic in user space and only drive CPU IRQ pins from
+> there.
+>
+> Unfortunately, when driving IRQs from user space, we never tell user
+> space about timer events that may result in interrupt line state
+> changes, so we lose out on timer events if we run with user space gic
+> emulation.
+>
+> Define an ABI to publish the timer output level to userspace.
+>
+> Signed-off-by: Alexander Graf <agraf@suse.de>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
+>  Documentation/virtual/kvm/api.txt | 29 +++++++++++++++++++++++++++++
+>  arch/arm/include/uapi/asm/kvm.h   |  2 ++
+>  arch/arm64/include/uapi/asm/kvm.h |  2 ++
+>  include/uapi/linux/kvm.h          |  6 ++++++
+>  4 files changed, 39 insertions(+)
+>
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index 739db9a..2adf600 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -3928,3 +3928,32 @@ In order to use SynIC, it has to be activated by setting this
+>  capability via KVM_ENABLE_CAP ioctl on the vcpu fd. Note that this
+>  will disable the use of APIC hardware virtualization even if supported
+>  by the CPU, as it's incompatible with SynIC auto-EOI behavior.
+> +
+> +8.3 KVM_CAP_ARM_TIMER
+> +
+> +Architectures: arm, arm64
+> +This capability, if KVM_CHECK_EXTENSION indicates that it is available, means
+> +that if userspace creates a VM without an in-kernel interrupt controller, it
+> +will be notified of changes to the output level of ARM architected timers
+> +presented to the VM.  For such VMs, on every return to userspace, the kernel
+> +updates the vcpu's run->s.regs.timer_irq_level field to represent the actual
+> +output level of the timers.
+> +
+> +Whenever kvm detects a change in the timer output level, kvm guarantees at
+> +least one return to userspace before running the VM.  This exit could either
+> +be a KVM_EXIT_INTR or any other exit event, like KVM_EXIT_MMIO. This way,
+> +userspace can always sample the timer output level and re-compute the state of
+> +the userspace interrupt controller.  Userspace should always check the state
+> +of run->s.regs.timer_irq_level on every kvm exit.  The value in
+> +run->s.regs.timer_irq_level should be considered a level triggered interrupt
+> +signal.
+> +
+> +The field run->s.regs.timer_irq_level is available independent of
+> +run->kvm_valid_regs or run->kvm_dirty_regs bits.
+> +
+> +Currently the following bits are defined for the timer_irq_level bitmap:
+> +
+> +    KVM_ARM_TIMER_VTIMER  -  virtual timer
+> +
+> +Future versions of kvm may implement additional timer events. These will get
+> +indicated by additional KVM_CAP extensions.
 
-Is there a cover letter email for this series ?
+This API looks good to me generally. My only question is whether we
+want to name the struct fields so they're not specifically talking
+about timer interrupts. For instance we probably want to expose the
+vPMU interrupt line to userspace too. We could do that by adding another
+struct field pmu_irq_level, but we could equally just assign it a bit
+in the existing irq_level field.
+
+Possible current and future outbound interrupt lines (some of these
+would only show up in some unlikely or lots-of-implementation-needed
+cases, I'm just trying to produce an exhaustive list):
+ * virtual timer
+ * physical timer
+ * hyp timer (nested virtualization case)
+ * secure timer (unlikely but maybe if EL3 is ever supported inside a VM)
+ * gic maintenance interrupt (nested virt again)
+ * PMU interrupt
+
+The kernel doesn't know which interrupt number these would be wired
+up to, so they're all just arbitrary outputs, and you could put them
+in one field or split them up into multiple fields, it doesn't make
+much difference.
 
 thanks
 -- PMM
