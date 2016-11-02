@@ -1,30 +1,21 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v7 0/7] arm/arm64: vgic: Implement API for vGICv3 live
- migration
-Date: Wed, 2 Nov 2016 17:22:48 +0100
-Message-ID: <20161102162248.GB11122@cbox>
-References: <1474645482-28131-1-git-send-email-vijay.kilari@gmail.com>
- <CALicx6uFBF=J5J4L6sVspqMx-sjGCjoAgONHAe5Q4msonfVYEA@mail.gmail.com>
- <CAMJs5B8aLZCDeAVhJN7Cajt4PL4HBtXc3BiNzMyjK1tOSjMwmg@mail.gmail.com>
+From: Wei Huang <wei@redhat.com>
+Subject: [PATCH 1/1] KVM: ARM64: Fix the issues when PMCCFILTR is configured
+Date: Wed,  2 Nov 2016 15:55:32 -0500
+Message-ID: <1478120132-9928-1-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D713C40421
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2016 12:22:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26DC74041A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2016 16:55:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sj+2lEUrnmRq for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2016 12:22:44 -0400 (EDT)
-Received: from mail-lf0-f51.google.com (mail-lf0-f51.google.com
- [209.85.215.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE06740290
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2016 12:22:43 -0400 (EDT)
-Received: by mail-lf0-f51.google.com with SMTP id t196so17395856lff.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2016 09:22:56 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <CAMJs5B8aLZCDeAVhJN7Cajt4PL4HBtXc3BiNzMyjK1tOSjMwmg@mail.gmail.com>
+ with ESMTP id n5eN2Jw1M3Dp for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2016 16:55:23 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 40DE6401E8
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2016 16:55:23 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,30 +25,48 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Vijay,
+KVM calls kvm_pmu_set_counter_event_type() when PMCCFILTR is configured.
+But this function can't deals with PMCCFILTR correctly because the evtCount
+bit of PMCCFILTR, which is reserved 0, conflits with the SW_INCR event
+type of other PMXEVTYPER<n> registers. To fix it, when eventsel == 0, KVM
+shouldn't return immediately, but instead it needs to check further if
+select_idx is ARMV8_PMU_CYCLE_IDX.
 
-On Thu, Oct 06, 2016 at 02:14:13PM +0200, Christoffer Dall wrote:
-> Hi Vijay,
-> 
-> On Wed, Oct 5, 2016 at 4:33 PM, Vijay Kilari <vijay.kilari@gmail.com> wrote:
-> > Hi Marc, Christoffer,
-> >
-> >   Do you have any review comments on this patch set?.
-> >
-> Since we missed the 4.9 merge window there is no urgency just yet, and
-> I'm tied up with other things for a while, and Marc is away this week
-> on holiday.  I'm sure he'll have a look when he's back and I'll follow
-> up later.
-> 
-I think it would be useful for you to post a v7 of your patch set
-rebased v4.9-rcX and addressing the issue you found yourself with a
-wrong parameter.
+Another issue is that KVM shouldn't copy the eventsel bits of PMCCFILTER
+directly to attr.config. Istead it shoudl convert the request to
+perf_event of type 0x11 (i.e. the "cpu cycle" event type).
 
-Then I'll have another look.
+Signed-off-by: Wei Huang <wei@redhat.com>
+---
+ virt/kvm/arm/pmu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Thanks,
--Christoffer
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 6e9c40e..13cc812 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -379,7 +379,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
+ 
+ 	/* Software increment event does't need to be backed by a perf event */
+-	if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
++	if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR &&
++	    select_idx != ARMV8_PMU_CYCLE_IDX)
+ 		return;
+ 
+ 	memset(&attr, 0, sizeof(struct perf_event_attr));
+@@ -391,7 +392,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
+ 	attr.exclude_hv = 1; /* Don't count EL2 events */
+ 	attr.exclude_host = 1; /* Don't count host events */
+-	attr.config = eventsel;
++	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ? 0x011 : eventsel;
+ 
+ 	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+ 	/* The initial sample period (overflow count) of an event. */
+-- 
+2.7.4
