@@ -1,162 +1,87 @@
-From: Wei Huang <wei@redhat.com>
-Subject: [kvm-unit-tests PATCHv7 3/3] arm: pmu: Add CPI checking
-Date: Wed,  2 Nov 2016 17:22:17 -0500
-Message-ID: <1478125337-11770-4-git-send-email-wei@redhat.com>
-References: <1478125337-11770-1-git-send-email-wei@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1478125337-11770-1-git-send-email-wei@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: cov@codeaurora.org
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org, alistair.francis@xilinx.com, croberts@codeaurora.org, alindsay@codeaurora.org, drjones@redhat.com
+From: cov@codeaurora.org
+Subject: Re: [PATCH 1/1] KVM: ARM64: Fix the issues when PMCCFILTR is
+ configured
+Date: Wed, 02 Nov 2016 22:11:16 -0600
+Message-ID: <db2cdc7caf7dc40b0895e1b6f91c7758@codeaurora.org>
+References: <1478120132-9928-1-git-send-email-wei@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D70104027C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2016 00:11:05 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id hOWinzTl-9Uc for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2016 00:11:04 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D74B14025C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2016 00:11:04 -0400 (EDT)
+In-Reply-To: <1478120132-9928-1-git-send-email-wei@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Wei Huang <wei@redhat.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Calculate the numbers of cycles per instruction (CPI) implied by ARM
-PMU cycle counter values.
+Hi Wei,
 
-Signed-off-by: Christopher Covington <cov@codeaurora.org>
----
- arm/pmu.c | 109 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 108 insertions(+), 1 deletion(-)
+On 2016-11-02 14:55, Wei Huang wrote:
+> KVM calls kvm_pmu_set_counter_event_type() when PMCCFILTR is 
+> configured.
+> But this function can't deals with PMCCFILTR correctly because the 
+> evtCount
+> bit of PMCCFILTR, which is reserved 0, conflits with the SW_INCR event
+> type of other PMXEVTYPER<n> registers. To fix it, when eventsel == 0, 
+> KVM
+> shouldn't return immediately, but instead it needs to check further if
+> select_idx is ARMV8_PMU_CYCLE_IDX.
+> 
+> Another issue is that KVM shouldn't copy the eventsel bits of 
+> PMCCFILTER
+> directly to attr.config. Istead it shoudl convert the request to
+> perf_event of type 0x11 (i.e. the "cpu cycle" event type).
+> 
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> ---
+>  virt/kvm/arm/pmu.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 6e9c40e..13cc812 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -379,7 +379,8 @@ void kvm_pmu_set_counter_event_type(struct
+> kvm_vcpu *vcpu, u64 data,
+>  	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
+> 
+>  	/* Software increment event does't need to be backed by a perf event 
+> */
+> -	if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
+> +	if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR &&
+> +	    select_idx != ARMV8_PMU_CYCLE_IDX)
+>  		return;
+> 
+>  	memset(&attr, 0, sizeof(struct perf_event_attr));
+> @@ -391,7 +392,7 @@ void kvm_pmu_set_counter_event_type(struct
+> kvm_vcpu *vcpu, u64 data,
+>  	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
+>  	attr.exclude_hv = 1; /* Don't count EL2 events */
+>  	attr.exclude_host = 1; /* Don't count host events */
+> -	attr.config = eventsel;
+> +	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ? 0x011 : eventsel;
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 65b7df1..ca00422 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -62,6 +62,23 @@ static inline void disable_counter(uint32_t idx)
- {
- 	asm volatile("mrc p15, 0, %0, c9, c12, 1" : : "r" (1 << idx));
- }
-+
-+/*
-+ * Extra instructions inserted by the compiler would be difficult to compensate
-+ * for, so hand assemble everything between, and including, the PMCR accesses
-+ * to start and stop counting.
-+ */
-+static inline void loop(int i, uint32_t pmcr)
-+{
-+	asm volatile(
-+	"	mcr	p15, 0, %[pmcr], c9, c12, 0\n"
-+	"1:	subs	%[i], %[i], #1\n"
-+	"	bgt	1b\n"
-+	"	mcr	p15, 0, %[z], c9, c12, 0\n"
-+	: [i] "+r" (i)
-+	: [pmcr] "r" (pmcr), [z] "r" (0)
-+	: "cc");
-+}
- #elif defined(__aarch64__)
- static inline uint32_t get_pmcr(void)
- {
-@@ -98,6 +115,23 @@ static inline void disable_counter(uint32_t idx)
- {
- 	asm volatile("msr pmcntensclr_el0, %0" : : "r" (1 << idx));
- }
-+
-+/*
-+ * Extra instructions inserted by the compiler would be difficult to compensate
-+ * for, so hand assemble everything between, and including, the PMCR accesses
-+ * to start and stop counting.
-+ */
-+static inline void loop(int i, uint32_t pmcr)
-+{
-+	asm volatile(
-+	"	msr	pmcr_el0, %[pmcr]\n"
-+	"1:	subs	%[i], %[i], #1\n"
-+	"	b.gt	1b\n"
-+	"	msr	pmcr_el0, xzr\n"
-+	: [i] "+r" (i)
-+	: [pmcr] "r" (pmcr)
-+	: "cc");
-+}
- #endif
- 
- struct pmu_data {
-@@ -171,12 +205,85 @@ static bool check_cycles_increase(void)
- 	return true;
- }
- 
--int main(void)
-+/*
-+ * Execute a known number of guest instructions. Only odd instruction counts
-+ * greater than or equal to 3 are supported by the in-line assembly code. The
-+ * control register (PMCR_EL0) is initialized with the provided value (allowing
-+ * for example for the cycle counter or event counters to be reset). At the end
-+ * of the exact instruction loop, zero is written to PMCR_EL0 to disable
-+ * counting, allowing the cycle counter or event counters to be read at the
-+ * leisure of the calling code.
-+ */
-+static void measure_instrs(int num, uint32_t pmcr)
-+{
-+	int i = (num - 1) / 2;
-+
-+	assert(num >= 3 && ((num - 1) % 2 == 0));
-+	loop(i, pmcr);
-+}
-+
-+/*
-+ * Measure cycle counts for various known instruction counts. Ensure that the
-+ * cycle counter progresses (similar to check_cycles_increase() but with more
-+ * instructions and using reset and stop controls). If supplied a positive,
-+ * nonzero CPI parameter, also strictly check that every measurement matches
-+ * it. Strict CPI checking is used to test -icount mode.
-+ */
-+static bool check_cpi(int cpi)
-+{
-+	struct pmu_data pmu = {{0}};
-+
-+	enable_counter(ARMV8_PMU_CYCLE_IDX);
-+	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-+
-+	pmu.cycle_counter_reset = 1;
-+	pmu.enable = 1;
-+
-+	if (cpi > 0)
-+		printf("Checking for CPI=%d.\n", cpi);
-+	printf("instrs : cycles0 cycles1 ...\n");
-+
-+	for (int i = 3; i < 300; i += 32) {
-+		int avg, sum = 0;
-+
-+		printf("%d :", i);
-+		for (int j = 0; j < NR_SAMPLES; j++) {
-+			int cycles;
-+
-+			measure_instrs(i, pmu.pmcr_el0);
-+			cycles = get_pmccntr();
-+			printf(" %d", cycles);
-+
-+			if (!cycles || (cpi > 0 && cycles != i * cpi)) {
-+				printf("\n");
-+				return false;
-+			}
-+
-+			sum += cycles;
-+		}
-+		avg = sum / NR_SAMPLES;
-+		printf(" sum=%d avg=%d avg_ipc=%d avg_cpi=%d\n",
-+			sum, avg, i / avg, avg / i);
-+	}
-+
-+	pmu.enable = 0;
-+	set_pmcr(pmu.pmcr_el0);
-+
-+	return true;
-+}
-+
-+int main(int argc, char *argv[])
- {
-+	int cpi = 0;
-+
-+	if (argc >= 1)
-+		cpi = atol(argv[0]);
-+
- 	report_prefix_push("pmu");
- 
- 	report("Control register", check_pmcr());
- 	report("Monotonically increasing cycle count", check_cycles_increase());
-+	report("Cycle/instruction ratio", check_cpi(cpi));
- 
- 	return report_summary();
- }
--- 
-1.8.3.1
+Nit: Is there some way you could use ARMV8_PMUV3_PERFCTR_CPU_CYCLES 
+currently
+defined in arch/arm64/kernel/perf_event.c?
 
+Thanks,
+Cov
