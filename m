@@ -1,27 +1,27 @@
-From: cov@codeaurora.org
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCHv7 1/3] arm: Add PMU test
-Date: Thu, 03 Nov 2016 09:31:37 -0600
-Message-ID: <7eecb08975cc130808a7d84f705f0329@codeaurora.org>
-References: <1478125337-11770-1-git-send-email-wei@redhat.com>
- <1478125337-11770-2-git-send-email-wei@redhat.com>
- <20161103101427.2ze2x4yrvo32znk5@kamzik.brq.redhat.com>
- <afe0852cc9a29565c4d891df86f146b7@codeaurora.org>
- <20161103150413.c2y4wdq2rmqkjrsq@kamzik.brq.redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/1] KVM: ARM64: Fix the issues when PMCCFILTR is
+ configured
+Date: Thu, 03 Nov 2016 15:41:02 +0000
+Message-ID: <86wpgkh8q9.fsf@arm.com>
+References: <1478120132-9928-1-git-send-email-wei@redhat.com>
+ <db2cdc7caf7dc40b0895e1b6f91c7758@codeaurora.org>
+ <c083c21c-1395-6674-8c66-3fe7d0aa4917@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D1254022C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2016 11:31:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE93C4025C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2016 11:40:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ej6YDTGItvEm for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2016 11:31:25 -0400 (EDT)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2BDED401E8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2016 11:31:24 -0400 (EDT)
-In-Reply-To: <20161103150413.c2y4wdq2rmqkjrsq@kamzik.brq.redhat.com>
+ with ESMTP id W2fFAzNX4rN7 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2016 11:40:50 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 909764022C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2016 11:40:50 -0400 (EDT)
+In-Reply-To: <c083c21c-1395-6674-8c66-3fe7d0aa4917@redhat.com> (Wei Huang's
+ message of "Thu, 3 Nov 2016 09:29:26 -0500")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,204 +31,77 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+To: Wei Huang <wei@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2016-11-03 09:04, Andrew Jones wrote:
-> On Thu, Nov 03, 2016 at 08:29:57AM -0600, cov@codeaurora.org wrote:
->> On 2016-11-03 04:14, Andrew Jones wrote:
->> > On Wed, Nov 02, 2016 at 05:22:15PM -0500, Wei Huang wrote:
->> >
->> > Missing
->> >  From: Christopher Covington <cov@codeaurora.org>
->> >
->> >
->> > > Beginning with a simple sanity check of the control register, add
->> > > a unit test for the ARM Performance Monitors Unit (PMU).
->> > >
->> > > Signed-off-by: Christopher Covington <cov@codeaurora.org>
->> >
->> > Missing
->> >   Signed-off-by: Wei Huang <wei@redhat.com>
->> >
->> > > ---
->> > >  arm/Makefile.common |  3 +-
->> > >  arm/pmu.c           | 82
->> > > +++++++++++++++++++++++++++++++++++++++++++++++++++++
->> > >  arm/unittests.cfg   | 20 +++++++++++++
->> > >  3 files changed, 104 insertions(+), 1 deletion(-)
->> > >  create mode 100644 arm/pmu.c
->> > >
->> > > diff --git a/arm/Makefile.common b/arm/Makefile.common
->> > > index ccb554d..f98f422 100644
->> > > --- a/arm/Makefile.common
->> > > +++ b/arm/Makefile.common
->> > > @@ -11,7 +11,8 @@ endif
->> > >
->> > >  tests-common = \
->> > >  	$(TEST_DIR)/selftest.flat \
->> > > -	$(TEST_DIR)/spinlock-test.flat
->> > > +	$(TEST_DIR)/spinlock-test.flat \
->> > > +	$(TEST_DIR)/pmu.flat
->> > >
->> > >  all: test_cases
->> > >
->> > > diff --git a/arm/pmu.c b/arm/pmu.c
->> > > new file mode 100644
->> > > index 0000000..42d0ee1
->> > > --- /dev/null
->> > > +++ b/arm/pmu.c
->> > > @@ -0,0 +1,82 @@
->> > > +/*
->> > > + * Test the ARM Performance Monitors Unit (PMU).
->> > > + *
->> > > + * Copyright 2015 The Linux Foundation. All rights reserved.
->> >
->> > Is the Linux Foundation correct for codeaurora patches? Should bump
->> > the year to 2016.
->> >
->> > > + *
->> > > + * This program is free software; you can redistribute it and/or
->> > > modify it
->> > > + * under the terms of the GNU Lesser General Public License version
->> > > 2.1 and
->> > > + * only version 2.1 as published by the Free Software Foundation.
->> > > + *
->> > > + * This program is distributed in the hope that it will be useful,
->> > > but WITHOUT
->> > > + * ANY WARRANTY; without even the implied warranty of
->> > > MERCHANTABILITY or
->> > > + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
->> > > Public License
->> > > + * for more details.
->> > > + */
->> > > +#include "libcflat.h"
->> > > +
->> > > +#if defined(__arm__)
->> > > +static inline uint32_t get_pmcr(void)
->> > > +{
->> > > +	uint32_t ret;
->> > > +
->> > > +	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
->> > > +	return ret;
->> > > +}
->> > > +#elif defined(__aarch64__)
->> > > +static inline uint32_t get_pmcr(void)
->> > > +{
->> > > +	uint32_t ret;
->> > > +
->> > > +	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
->> > > +	return ret;
->> > > +}
->> > > +#endif
->> > > +
->> > > +struct pmu_data {
->> > > +	union {
->> > > +		uint32_t pmcr_el0;
->> > > +		struct {
->> > > +			uint32_t enable:1;
->> > > +			uint32_t event_counter_reset:1;
->> > > +			uint32_t cycle_counter_reset:1;
->> > > +			uint32_t cycle_counter_clock_divider:1;
->> > > +			uint32_t event_counter_export:1;
->> > > +			uint32_t cycle_counter_disable_when_prohibited:1;
->> > > +			uint32_t cycle_counter_long:1;
->> > > +			uint32_t reserved:4;
->> > > +			uint32_t counters:5;
->> > > +			uint32_t identification_code:8;
->> > > +			uint32_t implementer:8;
->> > > +		};
->> > > +	};
->> > > +};
->> >
->> > I know I already reviewed/agreed to this bitfield, but I'm having second
->> > thoughts. I think I'd prefer a bunch of defined shifts like the kernel
->> > uses.
->> >
->> > > +
->> > > +/*
->> > > + * As a simple sanity check on the PMCR_EL0, ensure the implementer
->> > > field isn't
->> > > + * null. Also print out a couple other interesting fields for
->> > > diagnostic
->> > > + * purposes. For example, as of fall 2015, QEMU TCG mode doesn't
->> > > implement
->> >
->> > s/2015/2016/   how time flies...
->> >
->> > > + * event counters and therefore reports zero event counters, but
->> > > hopefully
->> > > + * support for at least the instructions event will be added in the
->> > > future and
->> > > + * the reported number of event counters will become nonzero.
->> > > + */
->> > > +static bool check_pmcr(void)
->> > > +{
->> > > +	struct pmu_data pmu;
->> > > +
->> > > +	pmu.pmcr_el0 = get_pmcr();
->> > > +
->> > > +	printf("PMU implementer:     %c\n", pmu.implementer);
->> > > +	printf("Identification code: 0x%x\n", pmu.identification_code);
->> > > +	printf("Event counters:      %d\n", pmu.counters);
->> > > +
->> > > +	return pmu.implementer != 0;
->> > > +}
->> > > +
->> > > +int main(void)
->> > > +{
->> > > +	report_prefix_push("pmu");
->> > > +
->> > > +	report("Control register", check_pmcr());
->> > > +
->> > > +	return report_summary();
->> > > +}
->> > > diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> > > index 3f6fa45..b647b69 100644
->> > > --- a/arm/unittests.cfg
->> > > +++ b/arm/unittests.cfg
->> > > @@ -54,3 +54,23 @@ file = selftest.flat
->> > >  smp = $MAX_SMP
->> > >  extra_params = -append 'smp'
->> > >  groups = selftest
->> > > +
->> > > +# Test PMU support (KVM)
->> > > +[pmu-kvm]
->> > > +file = pmu.flat
->> > > +groups = pmu
->> > > +accel = kvm
->> >
->> > No need to specify kvm when it works for both. Both is assumed.
->> > tcg-only or kvm-only tests are exceptions requiring the 'accel'
->> > parameter and a comment explaining why it doesn't work on the
->> > other.
->> >
->> > > +
->> > > +# Test PMU support (TCG) with -icount IPC=1
->> > > +[pmu-tcg-icount-1]
->> > > +file = pmu.flat
->> > > +extra_params = -icount 0 -append '1'
->> > > +groups = pmu
->> > > +accel = tcg
->> > > +
->> > > +# Test PMU support (TCG) with -icount IPC=256
->> > > +[pmu-tcg-icount-256]
->> > > +file = pmu.flat
->> > > +extra_params = -icount 8 -append '256'
->> > > +groups = pmu
->> > > +accel = tcg
->> >
->> > Why are these entries added now. These tests aren't yet implemented.
+On Thu, Nov 03 2016 at 02:29:26 PM, Wei Huang <wei@redhat.com> wrote:
+> On 11/02/2016 11:11 PM, cov@codeaurora.org wrote:
+>> Hi Wei,
 >> 
->> What makes you say they aren't implemented? They're running the
->> same binary with a different command line arguments (that turns on
->> stricter TCG-specific checking).
-> 
-> Not in this patch, they're not. 'int main(void)' <-- arguments are
-> ignored. Please only introduce unittests.cfg blocks with the patch
-> that implements them.
+>> On 2016-11-02 14:55, Wei Huang wrote:
+>>> KVM calls kvm_pmu_set_counter_event_type() when PMCCFILTR is configured.
+>>> But this function can't deals with PMCCFILTR correctly because the
+>>> evtCount
+>>> bit of PMCCFILTR, which is reserved 0, conflits with the SW_INCR event
+>>> type of other PMXEVTYPER<n> registers. To fix it, when eventsel == 0, KVM
+>>> shouldn't return immediately, but instead it needs to check further if
+>>> select_idx is ARMV8_PMU_CYCLE_IDX.
+>>>
+>>> Another issue is that KVM shouldn't copy the eventsel bits of PMCCFILTER
+>>> directly to attr.config. Istead it shoudl convert the request to
+>>> perf_event of type 0x11 (i.e. the "cpu cycle" event type).
+>>>
+>>> Signed-off-by: Wei Huang <wei@redhat.com>
+>>> ---
+>>>  virt/kvm/arm/pmu.c | 5 +++--
+>>>  1 file changed, 3 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+>>> index 6e9c40e..13cc812 100644
+>>> --- a/virt/kvm/arm/pmu.c
+>>> +++ b/virt/kvm/arm/pmu.c
+>>> @@ -379,7 +379,8 @@ void kvm_pmu_set_counter_event_type(struct
+>>> kvm_vcpu *vcpu, u64 data,
+>>>      eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
+>>>
+>>>      /* Software increment event does't need to be backed by a perf
+>>> event */
+>>> -    if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
+>>> +    if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR &&
+>>> +        select_idx != ARMV8_PMU_CYCLE_IDX)
+>>>          return;
+>>>
+>>>      memset(&attr, 0, sizeof(struct perf_event_attr));
+>>> @@ -391,7 +392,7 @@ void kvm_pmu_set_counter_event_type(struct
+>>> kvm_vcpu *vcpu, u64 data,
+>>>      attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
+>>>      attr.exclude_hv = 1; /* Don't count EL2 events */
+>>>      attr.exclude_host = 1; /* Don't count host events */
+>>> -    attr.config = eventsel;
+>>> +    attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ? 0x011 :
+>>> eventsel;
+>> 
+>> Nit: Is there some way you could use ARMV8_PMUV3_PERFCTR_CPU_CYCLES
+>> currently
+>> defined in arch/arm64/kernel/perf_event.c?
+>
+> The event definitions in perf_event.c are local to this file. To use
+> them, I have to re-factor them out to a header file, which is bigger
+> than this patch intended. How about adding the following line to
+> arch/arm64/include/asm/perf_event.h (i.e. the same file of
+> ARMV8_PMU_EVTYPE_EVENT_SW_INCR)?
+>
+> #define ARMV8_PMU_EVTYPE_EVENT_CPU_CYCLES  0x11
 
-Whoops, that's a rebase error. Sorry about that.
+Patch size is not relevant, and I'd rather avoid both magic numbers and
+duplicate definitions. It would make sense to me to move all the
+required events to this header file, and fix the SW_INCR duplication.
 
-Cov
+Please CC the ARM perf maintainers when you repost this patch.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny.
