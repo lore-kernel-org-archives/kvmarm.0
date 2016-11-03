@@ -1,69 +1,189 @@
-From: Alexander Graf <agraf@suse.de>
-Subject: Re: [RFC 2/2] ARM: KVM: Enable in-kernel timers with user space gic
-Date: Thu, 3 Nov 2016 10:06:54 +0100
-Message-ID: <581AFE2E.2040008@suse.de>
-References: <1477775449-115472-1-git-send-email-agraf@suse.de>
- <1477775449-115472-2-git-send-email-agraf@suse.de>
- <CAFEAcA9ABvy52WDX++ACUQNo+UiRJkyC+X_mT+QhMxqE154Nqw@mail.gmail.com>
- <581A08F3.1050501@suse.de> <20161102161943.GA11122@cbox>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCHv7 1/3] arm: Add PMU test
+Date: Thu, 3 Nov 2016 11:14:27 +0100
+Message-ID: <20161103101427.2ze2x4yrvo32znk5@kamzik.brq.redhat.com>
+References: <1478125337-11770-1-git-send-email-wei@redhat.com>
+ <1478125337-11770-2-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20161102161943.GA11122@cbox>
+Content-Disposition: inline
+In-Reply-To: <1478125337-11770-2-git-send-email-wei@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Wei Huang <wei@redhat.com>
+Cc: cov@codeaurora.org, alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/02/2016 05:19 PM, Christoffer Dall wrote:
-> On Wed, Nov 02, 2016 at 04:40:35PM +0100, Alexander Graf wrote:
->> On 11/01/2016 12:35 PM, Peter Maydell wrote:
->>> On 29 October 2016 at 22:10, Alexander Graf <agraf@suse.de> wrote:
-> [...]
->
->>>> +        cpu->timer_irq_level = run->s.regs.timer_irq_level;
->>>> +    }
->>>> +
->>>>       return MEMTXATTRS_UNSPECIFIED;
->>>>   }
->>> Does this code do the right thing across a vcpu reset or
->>> a full-system reset?
->> Good question. I'm not 100% sure - but I don't know for sure whether
->> it's guaranteed without user space irqchip even.
->>
->> In essence, the code above merely synchronizes kvm state to qemu
->> state and is fully unaffected from any reset sequence. This is good,
->> as the line status is transient. So from a QEMU pov, we really only
->> copy the state of the vcpu interrupt line into the QEMU interrupt
->> line. Pulling that line down would be responsibility of the
->> KVM_ARM_VCPU_INIT ioctl if it also clears the timer registers I
->> guess.
->>
->> However, I don't see any clearing of cntv_ctrl inside KVM or from
->> QEMU. How do we ensure that the irq active bit is off on reset?
->
-> In kvm_timer_vcpu_reset we cset cntv_ctl = 0, and that function gets
-> called from the PSCI handler or whenever userspace calls the set target
-> ioctl thingy.
+On Wed, Nov 02, 2016 at 05:22:15PM -0500, Wei Huang wrote:
 
-Ah, ok, that should pull the "run" line down automatically.
-
->
->> The other part that could get in the way of working system reset is
->> the interrupt controller emulation itself which resets all internal
->> irq line state. So on reset we'd always end up with the irq line
->> down from a gic pov, but with the vtimer line pending or not pending
->> depending on previous state. I doubt it's really going to hurt
->> though.
-> I suppose it should resample the line, but if the GIC clears everything
-> and the arch timer line goes down, you're in the right starting state
-> again.  Right?
-
-Yup, I don't see any reason it wouldn't work :). Even if the GIC didn't 
-clear everything things should still just work as long as the timer 
-reset function gets called, as it unconditionally synchronizes the state.
+Missing
+ From: Christopher Covington <cov@codeaurora.org>
 
 
-Alex
+> Beginning with a simple sanity check of the control register, add
+> a unit test for the ARM Performance Monitors Unit (PMU).
+> 
+> Signed-off-by: Christopher Covington <cov@codeaurora.org>
 
+Missing
+  Signed-off-by: Wei Huang <wei@redhat.com>
+
+> ---
+>  arm/Makefile.common |  3 +-
+>  arm/pmu.c           | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg   | 20 +++++++++++++
+>  3 files changed, 104 insertions(+), 1 deletion(-)
+>  create mode 100644 arm/pmu.c
+> 
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index ccb554d..f98f422 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -11,7 +11,8 @@ endif
+>  
+>  tests-common = \
+>  	$(TEST_DIR)/selftest.flat \
+> -	$(TEST_DIR)/spinlock-test.flat
+> +	$(TEST_DIR)/spinlock-test.flat \
+> +	$(TEST_DIR)/pmu.flat
+>  
+>  all: test_cases
+>  
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> new file mode 100644
+> index 0000000..42d0ee1
+> --- /dev/null
+> +++ b/arm/pmu.c
+> @@ -0,0 +1,82 @@
+> +/*
+> + * Test the ARM Performance Monitors Unit (PMU).
+> + *
+> + * Copyright 2015 The Linux Foundation. All rights reserved.
+
+Is the Linux Foundation correct for codeaurora patches? Should bump
+the year to 2016.
+
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU Lesser General Public License version 2.1 and
+> + * only version 2.1 as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+> + * for more details.
+> + */
+> +#include "libcflat.h"
+> +
+> +#if defined(__arm__)
+> +static inline uint32_t get_pmcr(void)
+> +{
+> +	uint32_t ret;
+> +
+> +	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
+> +	return ret;
+> +}
+> +#elif defined(__aarch64__)
+> +static inline uint32_t get_pmcr(void)
+> +{
+> +	uint32_t ret;
+> +
+> +	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
+> +	return ret;
+> +}
+> +#endif
+> +
+> +struct pmu_data {
+> +	union {
+> +		uint32_t pmcr_el0;
+> +		struct {
+> +			uint32_t enable:1;
+> +			uint32_t event_counter_reset:1;
+> +			uint32_t cycle_counter_reset:1;
+> +			uint32_t cycle_counter_clock_divider:1;
+> +			uint32_t event_counter_export:1;
+> +			uint32_t cycle_counter_disable_when_prohibited:1;
+> +			uint32_t cycle_counter_long:1;
+> +			uint32_t reserved:4;
+> +			uint32_t counters:5;
+> +			uint32_t identification_code:8;
+> +			uint32_t implementer:8;
+> +		};
+> +	};
+> +};
+
+I know I already reviewed/agreed to this bitfield, but I'm having second
+thoughts. I think I'd prefer a bunch of defined shifts like the kernel uses.
+
+> +
+> +/*
+> + * As a simple sanity check on the PMCR_EL0, ensure the implementer field isn't
+> + * null. Also print out a couple other interesting fields for diagnostic
+> + * purposes. For example, as of fall 2015, QEMU TCG mode doesn't implement
+
+s/2015/2016/   how time flies...
+
+> + * event counters and therefore reports zero event counters, but hopefully
+> + * support for at least the instructions event will be added in the future and
+> + * the reported number of event counters will become nonzero.
+> + */
+> +static bool check_pmcr(void)
+> +{
+> +	struct pmu_data pmu;
+> +
+> +	pmu.pmcr_el0 = get_pmcr();
+> +
+> +	printf("PMU implementer:     %c\n", pmu.implementer);
+> +	printf("Identification code: 0x%x\n", pmu.identification_code);
+> +	printf("Event counters:      %d\n", pmu.counters);
+> +
+> +	return pmu.implementer != 0;
+> +}
+> +
+> +int main(void)
+> +{
+> +	report_prefix_push("pmu");
+> +
+> +	report("Control register", check_pmcr());
+> +
+> +	return report_summary();
+> +}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 3f6fa45..b647b69 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -54,3 +54,23 @@ file = selftest.flat
+>  smp = $MAX_SMP
+>  extra_params = -append 'smp'
+>  groups = selftest
+> +
+> +# Test PMU support (KVM)
+> +[pmu-kvm]
+> +file = pmu.flat
+> +groups = pmu
+> +accel = kvm
+
+No need to specify kvm when it works for both. Both is assumed.
+tcg-only or kvm-only tests are exceptions requiring the 'accel'
+parameter and a comment explaining why it doesn't work on the
+other.
+
+> +
+> +# Test PMU support (TCG) with -icount IPC=1
+> +[pmu-tcg-icount-1]
+> +file = pmu.flat
+> +extra_params = -icount 0 -append '1'
+> +groups = pmu
+> +accel = tcg
+> +
+> +# Test PMU support (TCG) with -icount IPC=256
+> +[pmu-tcg-icount-256]
+> +file = pmu.flat
+> +extra_params = -icount 8 -append '256'
+> +groups = pmu
+> +accel = tcg
+
+Why are these entries added now. These tests aren't yet implemented.
+
+Thanks,
+drew
