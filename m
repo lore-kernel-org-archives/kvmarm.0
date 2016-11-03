@@ -1,24 +1,24 @@
 From: cov@codeaurora.org
-Subject: Re: [PATCH 1/1] KVM: ARM64: Fix the issues when PMCCFILTR is
- configured
-Date: Wed, 02 Nov 2016 22:11:16 -0600
-Message-ID: <db2cdc7caf7dc40b0895e1b6f91c7758@codeaurora.org>
-References: <1478120132-9928-1-git-send-email-wei@redhat.com>
+Subject: Re: [kvm-unit-tests PATCHv7 2/3] arm: pmu: Check cycle count increases
+Date: Wed, 02 Nov 2016 22:51:04 -0600
+Message-ID: <ee003ec02b20b23d27710a0275b0569c@codeaurora.org>
+References: <1478125337-11770-1-git-send-email-wei@redhat.com>
+ <1478125337-11770-3-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D70104027C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2016 00:11:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E49144042C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2016 00:50:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hOWinzTl-9Uc for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2016 00:11:04 -0400 (EDT)
+ with ESMTP id YkTJbZ2RbRxK for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2016 00:50:52 -0400 (EDT)
 Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D74B14025C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2016 00:11:04 -0400 (EDT)
-In-Reply-To: <1478120132-9928-1-git-send-email-wei@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A1FCF4025C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2016 00:50:52 -0400 (EDT)
+In-Reply-To: <1478125337-11770-3-git-send-email-wei@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,59 +29,143 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Wei Huang <wei@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
+Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Wei,
 
-On 2016-11-02 14:55, Wei Huang wrote:
-> KVM calls kvm_pmu_set_counter_event_type() when PMCCFILTR is 
-> configured.
-> But this function can't deals with PMCCFILTR correctly because the 
-> evtCount
-> bit of PMCCFILTR, which is reserved 0, conflits with the SW_INCR event
-> type of other PMXEVTYPER<n> registers. To fix it, when eventsel == 0, 
-> KVM
-> shouldn't return immediately, but instead it needs to check further if
-> select_idx is ARMV8_PMU_CYCLE_IDX.
+Thanks for your work on this.
+
+On 2016-11-02 16:22, Wei Huang wrote:
+> Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
+> even for the smallest delta of two subsequent reads.
 > 
-> Another issue is that KVM shouldn't copy the eventsel bits of 
-> PMCCFILTER
-> directly to attr.config. Istead it shoudl convert the request to
-> perf_event of type 0x11 (i.e. the "cpu cycle" event type).
-> 
+> Signed-off-by: Christopher Covington <cov@codeaurora.org>
 > Signed-off-by: Wei Huang <wei@redhat.com>
 > ---
->  virt/kvm/arm/pmu.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  arm/pmu.c | 100 
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 100 insertions(+)
 > 
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index 6e9c40e..13cc812 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -379,7 +379,8 @@ void kvm_pmu_set_counter_event_type(struct
-> kvm_vcpu *vcpu, u64 data,
->  	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index 42d0ee1..65b7df1 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -14,6 +14,9 @@
+>   */
+>  #include "libcflat.h"
 > 
->  	/* Software increment event does't need to be backed by a perf event 
-> */
-> -	if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
-> +	if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR &&
-> +	    select_idx != ARMV8_PMU_CYCLE_IDX)
->  		return;
-> 
->  	memset(&attr, 0, sizeof(struct perf_event_attr));
-> @@ -391,7 +392,7 @@ void kvm_pmu_set_counter_event_type(struct
-> kvm_vcpu *vcpu, u64 data,
->  	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
->  	attr.exclude_hv = 1; /* Don't count EL2 events */
->  	attr.exclude_host = 1; /* Don't count host events */
-> -	attr.config = eventsel;
-> +	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ? 0x011 : eventsel;
+> +#define NR_SAMPLES 10
+> +#define ARMV8_PMU_CYCLE_IDX 31
+> +
+>  #if defined(__arm__)
+>  static inline uint32_t get_pmcr(void)
+>  {
+> @@ -22,6 +25,43 @@ static inline uint32_t get_pmcr(void)
+>  	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
+>  	return ret;
+>  }
+> +
+> +static inline void set_pmcr(uint32_t pmcr)
+> +{
+> +	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (pmcr));
+> +}
+> +
+> +static inline void set_pmccfiltr(uint32_t filter)
+> +{
+> +	uint32_t cycle_idx = ARMV8_PMU_CYCLE_IDX;
+> +
+> +	asm volatile("mcr p15, 0, %0, c9, c12, 5" : : "r" (cycle_idx));
+> +	asm volatile("mcr p15, 0, %0, c9, c13, 1" : : "r" (filter));
+> +}
 
-Nit: Is there some way you could use ARMV8_PMUV3_PERFCTR_CPU_CYCLES 
-currently
-defined in arch/arm64/kernel/perf_event.c?
+Down the road I'd like to add tests for the regular events. What if you 
+added
+separate PMSELR and PMXEVTYPER accessors now and used them (with 
+PMSELR.SEL = 31)
+for setting PMCCFILTR? Then we wouldn't need a specialized set_pmccfiltr
+function for the cycle counter versus PMSELR and PMXEVTYPER for the 
+regular events.
+
+> +/*
+> + * While PMCCNTR can be accessed as a 64 bit coprocessor register, 
+> returning 64
+> + * bits doesn't seem worth the trouble when differential usage of the 
+> result is
+> + * expected (with differences that can easily fit in 32 bits). So just 
+> return
+> + * the lower 32 bits of the cycle count in AArch32.
+> + */
+> +static inline unsigned long get_pmccntr(void)
+> +{
+> +	unsigned long cycles;
+> +
+> +	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
+> +	return cycles;
+> +}
+> +
+> +static inline void enable_counter(uint32_t idx)
+> +{
+> +	asm volatile("mcr p15, 0, %0, c9, c12, 1" : : "r" (1 << idx));
+> +}
+
+My personal preference, that I think would make this function look and
+act like the other system register accessor functions, would be to
+name the function "set_pmcntenset" and do a plain write of the input
+parameter without a shift, letting the shift be done in the C code.
+(As we scale up, the system register accessor functions should probably
+be generated by macros from a concise table.)
+
+> +static inline void disable_counter(uint32_t idx)
+> +{
+> +	asm volatile("mrc p15, 0, %0, c9, c12, 1" : : "r" (1 << idx));
+> +}
+
+This function doesn't seem to be used yet. Consider whether it might
+make sense to defer introducing it until there is a user.
+
+>  #elif defined(__aarch64__)
+>  static inline uint32_t get_pmcr(void)
+>  {
+> @@ -30,6 +70,34 @@ static inline uint32_t get_pmcr(void)
+>  	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
+>  	return ret;
+>  }
+> +
+> +static inline void set_pmcr(uint32_t pmcr)
+> +{
+> +	asm volatile("msr pmcr_el0, %0" : : "r" (pmcr));
+> +}
+> 
+> +static inline void set_pmccfiltr(uint32_t filter)
+> +{
+> +	asm volatile("msr pmccfiltr_el0, %0" : : "r" (filter));
+> +}
+
+As above, consider whether using PMSELR and PMXEVTYPER might be a more
+reusable pair of accessors.
+
+> +static inline unsigned long get_pmccntr(void)
+> +{
+> +	unsigned long cycles;
+> +
+> +	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
+> +	return cycles;
+> +}
+> +
+> +static inline void enable_counter(uint32_t idx)
+> +{
+> +	asm volatile("msr pmcntenset_el0, %0" : : "r" (1 << idx));
+> +}
+
+Same thought as above about uniformity and generatability.
+
+> +static inline void disable_counter(uint32_t idx)
+> +{
+> +	asm volatile("msr pmcntensclr_el0, %0" : : "r" (1 << idx));
+> +}
+
+As above, this function doesn't seem to be used yet.
 
 Thanks,
 Cov
