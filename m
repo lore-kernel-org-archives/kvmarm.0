@@ -1,189 +1,194 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCHv7 1/3] arm: Add PMU test
-Date: Thu, 3 Nov 2016 11:14:27 +0100
-Message-ID: <20161103101427.2ze2x4yrvo32znk5@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCHv7 2/3] arm: pmu: Check cycle
+ count increases
+Date: Thu, 3 Nov 2016 11:35:07 +0100
+Message-ID: <20161103103507.qg65rruprmm6drzk@kamzik.brq.redhat.com>
 References: <1478125337-11770-1-git-send-email-wei@redhat.com>
- <1478125337-11770-2-git-send-email-wei@redhat.com>
+ <1478125337-11770-3-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1478125337-11770-2-git-send-email-wei@redhat.com>
+In-Reply-To: <1478125337-11770-3-git-send-email-wei@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 To: Wei Huang <wei@redhat.com>
 Cc: cov@codeaurora.org, alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Nov 02, 2016 at 05:22:15PM -0500, Wei Huang wrote:
+On Wed, Nov 02, 2016 at 05:22:16PM -0500, Wei Huang wrote:
 
-Missing
- From: Christopher Covington <cov@codeaurora.org>
+Missing From: Christopher
 
-
-> Beginning with a simple sanity check of the control register, add
-> a unit test for the ARM Performance Monitors Unit (PMU).
+> Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
+> even for the smallest delta of two subsequent reads.
 > 
 > Signed-off-by: Christopher Covington <cov@codeaurora.org>
-
-Missing
-  Signed-off-by: Wei Huang <wei@redhat.com>
-
+> Signed-off-by: Wei Huang <wei@redhat.com>
 > ---
->  arm/Makefile.common |  3 +-
->  arm/pmu.c           | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg   | 20 +++++++++++++
->  3 files changed, 104 insertions(+), 1 deletion(-)
->  create mode 100644 arm/pmu.c
+>  arm/pmu.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 100 insertions(+)
 > 
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index ccb554d..f98f422 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -11,7 +11,8 @@ endif
->  
->  tests-common = \
->  	$(TEST_DIR)/selftest.flat \
-> -	$(TEST_DIR)/spinlock-test.flat
-> +	$(TEST_DIR)/spinlock-test.flat \
-> +	$(TEST_DIR)/pmu.flat
->  
->  all: test_cases
->  
 > diff --git a/arm/pmu.c b/arm/pmu.c
-> new file mode 100644
-> index 0000000..42d0ee1
-> --- /dev/null
+> index 42d0ee1..65b7df1 100644
+> --- a/arm/pmu.c
 > +++ b/arm/pmu.c
-> @@ -0,0 +1,82 @@
-> +/*
-> + * Test the ARM Performance Monitors Unit (PMU).
-> + *
-> + * Copyright 2015 The Linux Foundation. All rights reserved.
+> @@ -14,6 +14,9 @@
+>   */
+>  #include "libcflat.h"
+>  
+> +#define NR_SAMPLES 10
+> +#define ARMV8_PMU_CYCLE_IDX 31
 
-Is the Linux Foundation correct for codeaurora patches? Should bump
-the year to 2016.
+Now I'd really like to drop the bitfields and go to bit defines if we're
+going to start mixing them anyway...
 
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU Lesser General Public License version 2.1 and
-> + * only version 2.1 as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
-> + * for more details.
-> + */
-> +#include "libcflat.h"
 > +
-> +#if defined(__arm__)
-> +static inline uint32_t get_pmcr(void)
+>  #if defined(__arm__)
+>  static inline uint32_t get_pmcr(void)
+>  {
+> @@ -22,6 +25,43 @@ static inline uint32_t get_pmcr(void)
+>  	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
+>  	return ret;
+>  }
+> +
+> +static inline void set_pmcr(uint32_t pmcr)
 > +{
-> +	uint32_t ret;
-> +
-> +	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
-> +	return ret;
+> +	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (pmcr));
 > +}
-> +#elif defined(__aarch64__)
-> +static inline uint32_t get_pmcr(void)
+> +
+> +static inline void set_pmccfiltr(uint32_t filter)
 > +{
-> +	uint32_t ret;
+> +	uint32_t cycle_idx = ARMV8_PMU_CYCLE_IDX;
 > +
-> +	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
-> +	return ret;
+> +	asm volatile("mcr p15, 0, %0, c9, c12, 5" : : "r" (cycle_idx));
+> +	asm volatile("mcr p15, 0, %0, c9, c13, 1" : : "r" (filter));
 > +}
-> +#endif
-> +
-> +struct pmu_data {
-> +	union {
-> +		uint32_t pmcr_el0;
-> +		struct {
-> +			uint32_t enable:1;
-> +			uint32_t event_counter_reset:1;
-> +			uint32_t cycle_counter_reset:1;
-> +			uint32_t cycle_counter_clock_divider:1;
-> +			uint32_t event_counter_export:1;
-> +			uint32_t cycle_counter_disable_when_prohibited:1;
-> +			uint32_t cycle_counter_long:1;
-> +			uint32_t reserved:4;
-> +			uint32_t counters:5;
-> +			uint32_t identification_code:8;
-> +			uint32_t implementer:8;
-> +		};
-> +	};
-> +};
 
-I know I already reviewed/agreed to this bitfield, but I'm having second
-thoughts. I think I'd prefer a bunch of defined shifts like the kernel uses.
+I agree with Chistopher that we should create per-register accessors.
+Enabling the test code the flexibility to do what it wants but without
+requiring a bunch of armv7/armv8 sysreg clutter.
 
 > +
 > +/*
-> + * As a simple sanity check on the PMCR_EL0, ensure the implementer field isn't
-> + * null. Also print out a couple other interesting fields for diagnostic
-> + * purposes. For example, as of fall 2015, QEMU TCG mode doesn't implement
+> + * While PMCCNTR can be accessed as a 64 bit coprocessor register, returning 64
+> + * bits doesn't seem worth the trouble when differential usage of the result is
+> + * expected (with differences that can easily fit in 32 bits). So just return
 
-s/2015/2016/   how time flies...
+Except for the fact this is a test and we should confirm those upper bits
+are whatever we expect, even if we expect zero.
 
-> + * event counters and therefore reports zero event counters, but hopefully
-> + * support for at least the instructions event will be added in the future and
-> + * the reported number of event counters will become nonzero.
+> + * the lower 32 bits of the cycle count in AArch32.
 > + */
-> +static bool check_pmcr(void)
+> +static inline unsigned long get_pmccntr(void)
 > +{
-> +	struct pmu_data pmu;
+> +	unsigned long cycles;
 > +
-> +	pmu.pmcr_el0 = get_pmcr();
-> +
-> +	printf("PMU implementer:     %c\n", pmu.implementer);
-> +	printf("Identification code: 0x%x\n", pmu.identification_code);
-> +	printf("Event counters:      %d\n", pmu.counters);
-> +
-> +	return pmu.implementer != 0;
+> +	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
+> +	return cycles;
 > +}
 > +
-> +int main(void)
+> +static inline void enable_counter(uint32_t idx)
 > +{
-> +	report_prefix_push("pmu");
-> +
-> +	report("Control register", check_pmcr());
-> +
-> +	return report_summary();
+> +	asm volatile("mcr p15, 0, %0, c9, c12, 1" : : "r" (1 << idx));
 > +}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 3f6fa45..b647b69 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -54,3 +54,23 @@ file = selftest.flat
->  smp = $MAX_SMP
->  extra_params = -append 'smp'
->  groups = selftest
 > +
-> +# Test PMU support (KVM)
-> +[pmu-kvm]
-> +file = pmu.flat
-> +groups = pmu
-> +accel = kvm
+> +static inline void disable_counter(uint32_t idx)
+> +{
+> +	asm volatile("mrc p15, 0, %0, c9, c12, 1" : : "r" (1 << idx));
+> +}
 
-No need to specify kvm when it works for both. Both is assumed.
-tcg-only or kvm-only tests are exceptions requiring the 'accel'
-parameter and a comment explaining why it doesn't work on the
-other.
+I'll echo Chistopher here as well with the opinion that the test
+should supply the shifted value and the accessor should just be a
+simply read or write.
 
+Please name the accessors <regname>_read/write
+
+>  #elif defined(__aarch64__)
+>  static inline uint32_t get_pmcr(void)
+>  {
+> @@ -30,6 +70,34 @@ static inline uint32_t get_pmcr(void)
+>  	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
+>  	return ret;
+>  }
 > +
-> +# Test PMU support (TCG) with -icount IPC=1
-> +[pmu-tcg-icount-1]
-> +file = pmu.flat
-> +extra_params = -icount 0 -append '1'
-> +groups = pmu
-> +accel = tcg
+> +static inline void set_pmcr(uint32_t pmcr)
+> +{
+> +	asm volatile("msr pmcr_el0, %0" : : "r" (pmcr));
+> +}
 > +
-> +# Test PMU support (TCG) with -icount IPC=256
-> +[pmu-tcg-icount-256]
-> +file = pmu.flat
-> +extra_params = -icount 8 -append '256'
-> +groups = pmu
-> +accel = tcg
+> +static inline void set_pmccfiltr(uint32_t filter)
+> +{
+> +	asm volatile("msr pmccfiltr_el0, %0" : : "r" (filter));
+> +}
+> +
+> +static inline unsigned long get_pmccntr(void)
+> +{
+> +	unsigned long cycles;
+> +
+> +	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
+> +	return cycles;
+> +}
+> +
+> +static inline void enable_counter(uint32_t idx)
+> +{
+> +	asm volatile("msr pmcntenset_el0, %0" : : "r" (1 << idx));
+> +}
+> +
+> +static inline void disable_counter(uint32_t idx)
+> +{
+> +	asm volatile("msr pmcntensclr_el0, %0" : : "r" (1 << idx));
+> +}
+>  #endif
+>  
+>  struct pmu_data {
+> @@ -72,11 +140,43 @@ static bool check_pmcr(void)
+>  	return pmu.implementer != 0;
+>  }
+>  
+> +/*
+> + * Ensure that the cycle counter progresses between back-to-back reads.
+> + */
+> +static bool check_cycles_increase(void)
+> +{
+> +	struct pmu_data pmu = {{0}};
+> +
+> +	enable_counter(ARMV8_PMU_CYCLE_IDX);
+> +	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+> +
+> +	pmu.enable = 1;
+> +	set_pmcr(pmu.pmcr_el0);
+> +
+> +	for (int i = 0; i < NR_SAMPLES; i++) {
+> +		unsigned long a, b;
+> +
+> +		a = get_pmccntr();
+> +		b = get_pmccntr();
+> +
+> +		if (a >= b) {
+> +			printf("Read %ld then %ld.\n", a, b);
+> +			return false;
+> +		}
+> +	}
+> +
+> +	pmu.enable = 0;
+> +	set_pmcr(pmu.pmcr_el0);
+> +
+> +	return true;
+> +}
+> +
+>  int main(void)
+>  {
+>  	report_prefix_push("pmu");
+>  
+>  	report("Control register", check_pmcr());
+> +	report("Monotonically increasing cycle count", check_cycles_increase());
+>  
+>  	return report_summary();
+>  }
 
-Why are these entries added now. These tests aren't yet implemented.
+What happens with this test running on tcg? Do we just fail? Does it
+explode? Is there a register we can probe and when it indicates things
+won't work we can invoke a report_skip?
 
 Thanks,
 drew
