@@ -1,176 +1,132 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v8 09/16] arm: allow creation of an MSI register frame region
-Date: Fri,  4 Nov 2016 17:31:56 +0000
-Message-ID: <20161104173203.21168-10-andre.przywara@arm.com>
+Subject: [PATCH v8 14/16] extend GSI IRQ routing to take a device ID
+Date: Fri,  4 Nov 2016 17:32:01 +0000
+Message-ID: <20161104173203.21168-15-andre.przywara@arm.com>
 References: <20161104173203.21168-1-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 014BD40448
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2016 13:31:37 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uYiAqrsB+HdT for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2016 13:31:35 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3018B40497
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2016 13:31:34 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20161104173203.21168-1-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Will Deacon <will.deacon@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Vladimir Murzin <vladimir.murzin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICv3 ITS expects a separate 64K page to hold ITS registers.
-Add a function to reserve such a page in the guest's I/O memory and
-use that for the ITS vGIC type.
+For ITS emulation we need the device ID along with the MSI payload
+and doorbell address to identify an MSI, so we need to put it in the
+GSI IRQ routing table too.
+There is a per-VM capability by which the kernel signals the need for
+a device ID, so check this and put the device ID into the routing
+table if needed.
+For PCI devices we take the bus/device/function triplet and and that
+to the routing setup call.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/gic.c                    | 63 ++++++++++++++++++++++++++++++++++++++++++++
- arm/include/arm-common/gic.h |  1 +
- 2 files changed, 64 insertions(+)
+ hw/pci-shmem.c    |  3 ++-
+ include/kvm/irq.h |  2 +-
+ irq.c             | 24 ++++++++++++++++++++++--
+ virtio/pci.c      |  6 ++++--
+ 4 files changed, 29 insertions(+), 6 deletions(-)
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 4d12f31..ed9016d 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -8,6 +8,7 @@
- #include <linux/byteorder.h>
- #include <linux/kernel.h>
- #include <linux/kvm.h>
-+#include <linux/sizes.h>
+diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
+index 7ce98cb..512b5b0 100644
+--- a/hw/pci-shmem.c
++++ b/hw/pci-shmem.c
+@@ -135,7 +135,8 @@ int pci_shmem__get_local_irqfd(struct kvm *kvm)
+ 			return fd;
  
- /* Those names are not defined for ARM (yet) */
- #ifndef KVM_VGIC_V3_ADDR_TYPE_DIST
-@@ -29,6 +30,8 @@
- static int gic_fd = -1;
- static u64 gic_redists_base;
- static u64 gic_redists_size;
-+static u64 gic_msi_base;
-+static u64 gic_msi_size = 0;
+ 		if (pci_shmem_pci_device.msix.ctrl & cpu_to_le16(PCI_MSIX_FLAGS_ENABLE)) {
+-			gsi = irq__add_msix_route(kvm, &msix_table[0].msg);
++			gsi = irq__add_msix_route(kvm, &msix_table[0].msg,
++						  pci_shmem_device.dev_num << 3);
+ 			if (gsi < 0)
+ 				return gsi;
+ 		} else {
+diff --git a/include/kvm/irq.h b/include/kvm/irq.h
+index f35eb7e..ee059e3 100644
+--- a/include/kvm/irq.h
++++ b/include/kvm/irq.h
+@@ -20,7 +20,7 @@ int irq__init(struct kvm *kvm);
+ int irq__exit(struct kvm *kvm);
  
- int irqchip_parser(const struct option *opt, const char *arg, int unset)
- {
-@@ -46,6 +49,56 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
- 	return 0;
+ int irq__allocate_routing_entry(void);
+-int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
++int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg, u32 device_id);
+ void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
+ 
+ #endif
+diff --git a/irq.c b/irq.c
+index 895e5eb..4c2721a 100644
+--- a/irq.c
++++ b/irq.c
+@@ -66,7 +66,21 @@ static bool check_for_irq_routing(struct kvm *kvm)
+ 	return has_irq_routing > 0;
  }
  
-+static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr)
+-int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
++static bool check_for_msi_devid(struct kvm *kvm)
 +{
-+	struct kvm_create_device its_device = {
-+		.type = KVM_DEV_TYPE_ARM_VGIC_ITS,
-+		.flags	= 0,
-+	};
-+	struct kvm_device_attr its_attr = {
-+		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
-+		.attr	= KVM_VGIC_ITS_ADDR_TYPE,
-+		.addr	= (u64)(unsigned long)&its_frame_addr,
-+	};
-+	struct kvm_device_attr its_init_attr = {
-+		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
-+		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
-+	};
-+	int err;
++	static int needs_devid = 0;
 +
-+	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &its_device);
-+	if (err) {
-+		fprintf(stderr,
-+			"GICv3 ITS requested, but kernel does not support it.\n");
-+		fprintf(stderr, "Try --irqchip=gicv3 instead\n");
-+		return err;
++	if (needs_devid == 0) {
++		if (kvm__supports_vm_extension(kvm, KVM_CAP_MSI_DEVID))
++			needs_devid = 1;
++		else
++			needs_devid = -1;
 +	}
 +
-+	err = ioctl(its_device.fd, KVM_HAS_DEVICE_ATTR, &its_attr);
-+	if (err) {
-+		close(its_device.fd);
-+		its_device.fd = -1;
-+		return err;
-+	}
-+
-+	err = ioctl(its_device.fd, KVM_SET_DEVICE_ATTR, &its_attr);
-+	if (err)
-+		return err;
-+
-+	return ioctl(its_device.fd, KVM_SET_DEVICE_ATTR, &its_init_attr);
++	return needs_devid > 0;
 +}
 +
-+static int gic__create_msi_frame(struct kvm *kvm, enum irqchip_type type,
-+				 u64 msi_frame_addr)
-+{
-+	switch (type) {
-+	case IRQCHIP_GICV3_ITS:
-+		return gic__create_its_frame(kvm, msi_frame_addr);
-+	default:	/* No MSI frame needed */
-+		return 0;
-+	}
-+}
-+
- static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
++int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg, u32 device_id)
  {
- 	int err;
-@@ -75,6 +128,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- 		dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
- 		break;
- 	case IRQCHIP_GICV3:
-+	case IRQCHIP_GICV3_ITS:
- 		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
- 		dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
- 		break;
-@@ -90,6 +144,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- 	case IRQCHIP_GICV2:
- 		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
- 		break;
-+	case IRQCHIP_GICV3_ITS:
- 	case IRQCHIP_GICV3:
- 		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
- 		break;
-@@ -101,6 +156,10 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- 	if (err)
- 		goto out_err;
+ 	int r;
  
-+	err = gic__create_msi_frame(kvm, type, gic_msi_base);
-+	if (err)
-+		goto out_err;
+@@ -77,7 +91,7 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
+ 	if (r)
+ 		return r;
+ 
+-	irq_routing->entries[irq_routing->nr++] =
++	irq_routing->entries[irq_routing->nr] =
+ 		(struct kvm_irq_routing_entry) {
+ 			.gsi = next_gsi,
+ 			.type = KVM_IRQ_ROUTING_MSI,
+@@ -86,6 +100,12 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
+ 			.u.msi.data = msg->data,
+ 		};
+ 
++	if (check_for_msi_devid(kvm)) {
++		irq_routing->entries[irq_routing->nr].flags = KVM_MSI_VALID_DEVID;
++		irq_routing->entries[irq_routing->nr].u.msi.devid = device_id;
++	}
++	irq_routing->nr++;
 +
- 	return 0;
+ 	r = ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
+ 	if (r)
+ 		return r;
+diff --git a/virtio/pci.c b/virtio/pci.c
+index e9f81f7..da9a555 100644
+--- a/virtio/pci.c
++++ b/virtio/pci.c
+@@ -192,7 +192,8 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
+ 				break;
  
- out_err:
-@@ -144,9 +203,13 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
- 	switch (type) {
- 	case IRQCHIP_GICV2:
- 		break;
-+	case IRQCHIP_GICV3_ITS:
-+		gic_msi_size = KVM_VGIC_V3_ITS_SIZE;
-+		/* fall through */
- 	case IRQCHIP_GICV3:
- 		gic_redists_size = kvm->cfg.nrcpus * ARM_GIC_REDIST_SIZE;
- 		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
-+		gic_msi_base = gic_redists_base - gic_msi_size;
- 		break;
- 	default:
- 		return -ENODEV;
-diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
-index b43a180..433dd23 100644
---- a/arm/include/arm-common/gic.h
-+++ b/arm/include/arm-common/gic.h
-@@ -24,6 +24,7 @@
- enum irqchip_type {
- 	IRQCHIP_GICV2,
- 	IRQCHIP_GICV3,
-+	IRQCHIP_GICV3_ITS,
- };
+ 			gsi = irq__add_msix_route(kvm,
+-						  &vpci->msix_table[vec].msg);
++						  &vpci->msix_table[vec].msg,
++						  vpci->dev_hdr.dev_num << 3);
+ 			if (gsi >= 0) {
+ 				vpci->config_gsi = gsi;
+ 				break;
+@@ -210,7 +211,8 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
+ 				break;
  
- struct kvm;
+ 			gsi = irq__add_msix_route(kvm,
+-						  &vpci->msix_table[vec].msg);
++						  &vpci->msix_table[vec].msg,
++						  vpci->dev_hdr.dev_num << 3);
+ 			if (gsi < 0) {
+ 				if (gsi == -ENXIO &&
+ 				    vpci->features & VIRTIO_PCI_F_SIGNAL_MSI)
 -- 
 2.9.0
+
