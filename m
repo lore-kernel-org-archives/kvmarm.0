@@ -1,26 +1,25 @@
 From: vijay.kilari@gmail.com
-Subject: [PATCH v8 4/7] irqchip/gic-v3: Add missing system register definitions
-Date: Fri,  4 Nov 2016 16:43:30 +0530
-Message-ID: <1478258013-6669-5-git-send-email-vijay.kilari@gmail.com>
-References: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
+Subject: [PATCH v8 0/7] arm/arm64: vgic: Implement API for vGICv3 live
+ migration
+Date: Fri,  4 Nov 2016 16:43:26 +0530
+Message-ID: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 215B9402A2
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2016 07:14:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8CBF4029D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2016 07:14:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uyvP4ZBqPaLg for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2016 07:14:12 -0400 (EDT)
-Received: from mail-pf0-f195.google.com (mail-pf0-f195.google.com
- [209.85.192.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B8629404BA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2016 07:14:11 -0400 (EDT)
-Received: by mail-pf0-f195.google.com with SMTP id a136so7683913pfa.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2016 04:14:27 -0700 (PDT)
-In-Reply-To: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
+ with ESMTP id 2PzBPc8d+bSs for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Nov 2016 07:14:01 -0400 (EDT)
+Received: from mail-pf0-f194.google.com (mail-pf0-f194.google.com
+ [209.85.192.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9971D4029B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2016 07:14:01 -0400 (EDT)
+Received: by mail-pf0-f194.google.com with SMTP id n85so7657549pfi.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2016 04:14:16 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,80 +35,92 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-Define register definitions for ICH_VMCR_EL2, ICC_CTLR_EL1 and
-ICH_VTR_EL2, ICC_BPR0_EL1, ICC_BPR1_EL1 registers.
+This patchset adds API for saving and restoring
+of VGICv3 registers to support live migration with new vgic feature.
+This API definition is as per version of VGICv3 specification
+http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
 
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
----
- include/linux/irqchip/arm-gic-v3.h | 43 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 41 insertions(+), 2 deletions(-)
+The patch 3 & 4 are picked from the Pavel's previous implementation.
+http://www.spinics.net/lists/kvm/msg122040.html
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index b7e3431..d48d886 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -352,8 +352,30 @@
- /*
-  * CPU interface registers
-  */
--#define ICC_CTLR_EL1_EOImode_drop_dir	(0U << 1)
--#define ICC_CTLR_EL1_EOImode_drop	(1U << 1)
-+#define ICC_CTLR_EL1_EOImode_SHIFT	(1)
-+#define ICC_CTLR_EL1_EOImode_drop_dir	(0U << ICC_CTLR_EL1_EOImode_SHIFT)
-+#define ICC_CTLR_EL1_EOImode_drop	(1U << ICC_CTLR_EL1_EOImode_SHIFT)
-+#define ICC_CTLR_EL1_EOImode_MASK	(1 << ICC_CTLR_EL1_EOImode_SHIFT)
-+#define ICC_CTLR_EL1_CBPR_SHIFT		0
-+#define ICC_CTLR_EL1_CBPR_MASK		(1 << ICC_CTLR_EL1_CBPR_SHIFT)
-+#define ICC_CTLR_EL1_PRI_BITS_SHIFT	8
-+#define ICC_CTLR_EL1_PRI_BITS_MASK	(0x7 << ICC_CTLR_EL1_PRI_BITS_SHIFT)
-+#define ICC_CTLR_EL1_ID_BITS_SHIFT	11
-+#define ICC_CTLR_EL1_ID_BITS_MASK	(0x7 << ICC_CTLR_EL1_ID_BITS_SHIFT)
-+#define ICC_CTLR_EL1_SEIS_SHIFT		14
-+#define ICC_CTLR_EL1_SEIS_MASK		(0x1 << ICC_CTLR_EL1_SEIS_SHIFT)
-+#define ICC_CTLR_EL1_A3V_SHIFT		15
-+#define ICC_CTLR_EL1_A3V_MASK		(0x1 << ICC_CTLR_EL1_A3V_SHIFT)
-+#define ICC_PMR_EL1_SHIFT		0
-+#define ICC_PMR_EL1_MASK		(0xff << ICC_PMR_EL1_SHIFT)
-+#define ICC_BPR0_EL1_SHIFT		0
-+#define ICC_BPR0_EL1_MASK		(0x7 << ICC_BPR0_EL1_SHIFT)
-+#define ICC_BPR1_EL1_SHIFT		0
-+#define ICC_BPR1_EL1_MASK		(0x7 << ICC_BPR1_EL1_SHIFT)
-+#define ICC_IGRPEN0_EL1_SHIFT		0
-+#define ICC_IGRPEN0_EL1_MASK		(1 << ICC_IGRPEN0_EL1_SHIFT)
-+#define ICC_IGRPEN1_EL1_SHIFT		0
-+#define ICC_IGRPEN1_EL1_MASK		(1 << ICC_IGRPEN1_EL1_SHIFT)
- #define ICC_SRE_EL1_SRE			(1U << 0)
- 
- /*
-@@ -384,12 +406,29 @@
- 
- #define ICH_VMCR_CTLR_SHIFT		0
- #define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
-+#define ICH_VMCR_CBPR_SHIFT		4
-+#define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
-+#define ICH_VMCR_EOIM_SHIFT		9
-+#define ICH_VMCR_EOIM_MASK		(1 << ICH_VMCR_EOIM_SHIFT)
- #define ICH_VMCR_BPR1_SHIFT		18
- #define ICH_VMCR_BPR1_MASK		(7 << ICH_VMCR_BPR1_SHIFT)
- #define ICH_VMCR_BPR0_SHIFT		21
- #define ICH_VMCR_BPR0_MASK		(7 << ICH_VMCR_BPR0_SHIFT)
- #define ICH_VMCR_PMR_SHIFT		24
- #define ICH_VMCR_PMR_MASK		(0xffUL << ICH_VMCR_PMR_SHIFT)
-+#define ICH_VMCR_ENG0_SHIFT		0
-+#define ICH_VMCR_ENG0_MASK		(1 << ICH_VMCR_ENG0_SHIFT)
-+#define ICH_VMCR_ENG1_SHIFT		1
-+#define ICH_VMCR_ENG1_MASK		(1 << ICH_VMCR_ENG1_SHIFT)
-+
-+#define ICH_VTR_PRI_BITS_SHIFT		29
-+#define ICH_VTR_PRI_BITS_MASK		(7 << ICH_VTR_PRI_BITS_SHIFT)
-+#define ICH_VTR_ID_BITS_SHIFT		23
-+#define ICH_VTR_ID_BITS_MASK		(7 << ICH_VTR_ID_BITS_SHIFT)
-+#define ICH_VTR_SEIS_SHIFT		22
-+#define ICH_VTR_SEIS_MASK		(1 << ICH_VTR_SEIS_SHIFT)
-+#define ICH_VTR_A3V_SHIFT		21
-+#define ICH_VTR_A3V_MASK		(1 << ICH_VTR_A3V_SHIFT)
- 
- #define ICC_IAR1_EL1_SPURIOUS		0x3ff
- 
+v7 => v8:
+ - Rebased to 4.9-rc3
+ - Fixed wrong parameter to VGIC_TO_MPIDR
+v6 => v7:
+ - Rename all patches heading from vgic-new to vgic
+ - Moved caching of priority and ID bits from vgic global struct
+   to vgic_cpu struct.
+
+v5 => v6:
+ - Collated all register definitions to single patch (4)
+ - Introduce macro to convert userspace MPIDR format to MPIDR reg format
+ - Check on ICC_CTLR_EL1.CBPR value is made while accessing ICC_BPR1_EL1
+ - Cached ich_vtr_el2 and guests priority and ID bits
+ - Check on number of priority and ID bits when ICC_CTRL_EL1 write is made
+ - Check is made on SRE bit for ICC_SRE_EL1 write
+
+v4 => v5:
+ - ICC_CTLR_EL1 access is updated to reflect HW values
+ - Updated ICC reg access mask and shift macros
+ - Introduced patch 4 for VMCR changes
+ - Other minor fixes.
+v3 => v4:
+ - Rebased to latest code base
+ - Moved vgic_uaccess() from vgic-mmio-v2.c to vgic-mmio.c
+ - Dropped macro REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED_UACCESS
+ - Dropped LE conversion for userspace access
+ - Introduced vgic_uaccess_write_pending() for ISPENDR write
+ - Change macro KVM_DEV_ARM_VGIC_V3_CPUID_MASK to KVM_DEV_ARM_VGIC_V3_MIDR_MASK
+ - Refactored some code as common code.
+ - Changed handing of ICC_* registers
+ - Allowed ICC_SRE_EL1 read by userspace
+ - Fixed KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_* macros
+
+v2 => v3:
+ - Implemented separate API for ISPENDR and ICPENDR to
+   read soft_pending instead of pending for level triggerred interrupts
+ - Implemented ioctl KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO to access line level
+ - Rebased on top of Christoffer's patch set
+   http://www.spinics.net/lists/kvm/msg136840.html
+
+ NOTE: GICD_STATUSR and GICR_STATUSR are implemented as RAZ/WI.
+
+v1 => v2:
+ - The init sequence change patch is no more required.
+   Fixed in patch 2 by using static vgic_io_dev regions structure instead
+   of using dynamic allocation pointer.
+ - Updated commit message of patch 4.
+ - Dropped usage of union to manage 32-bit and 64-bit access in patch 1.
+   Used local variable for 32-bit access.
+ - Updated macro __ARM64_SYS_REG and ARM64_SYS_REG in
+   arch/arm64/include/uapi/asm/kvm.h as per qemu requirements.
+*** BLURB HERE ***
+
+Vijaya Kumar K (7):
+  arm/arm64: vgic: Implement support for userspace access
+  arm/arm64: vgic: Add distributor and redistributor access
+  arm/arm64: vgic: Introduce find_reg_by_id()
+  irqchip/gic-v3: Add missing system register definitions
+  arm/arm64: vgic: Introduce VENG0 and VENG1 fields to vmcr struct
+  arm/arm64: vgic: Implement VGICv3 CPU interface access
+  arm/arm64: vgic: Implement KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO ioctl
+
+ arch/arm64/include/uapi/asm/kvm.h   |  13 ++
+ arch/arm64/kvm/Makefile             |   1 +
+ arch/arm64/kvm/sys_regs.c           |  22 ++-
+ arch/arm64/kvm/sys_regs.h           |   4 +
+ include/kvm/arm_vgic.h              |   9 +
+ include/linux/irqchip/arm-gic-v3.h  |  45 ++++-
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 224 +++++++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-mmio-v2.c    |  57 +------
+ virt/kvm/arm/vgic/vgic-mmio-v3.c    | 200 ++++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-mmio.c       | 149 ++++++++++++++++-
+ virt/kvm/arm/vgic/vgic-mmio.h       |  28 ++++
+ virt/kvm/arm/vgic/vgic-sys-reg-v3.c | 324 ++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c         |  18 +-
+ virt/kvm/arm/vgic/vgic.h            |  45 +++++
+ 14 files changed, 1035 insertions(+), 104 deletions(-)
+ create mode 100644 virt/kvm/arm/vgic/vgic-sys-reg-v3.c
+
 -- 
 1.9.1
