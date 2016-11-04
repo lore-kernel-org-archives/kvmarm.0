@@ -1,182 +1,51 @@
-From: vijay.kilari@gmail.com
-Subject: [PATCH v8 5/7] arm/arm64: vgic: Introduce VENG0 and VENG1 fields to
- vmcr struct
-Date: Fri,  4 Nov 2016 16:43:31 +0530
-Message-ID: <1478258013-6669-6-git-send-email-vijay.kilari@gmail.com>
-References: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: v4.9-rc1 fails booting as a guest on ARM64 Cavium ThunderX
+Date: Fri, 4 Nov 2016 14:30:33 +0100
+Message-ID: <c21b0af4-09e0-64c4-cf75-4d4846f4c876@redhat.com>
+References: <924fd627-329a-54e0-694c-a9bdf979f696@redhat.com>
+ <de2acaca-f694-be1a-5d2c-93fcf3b25011@arm.com>
+ <99c7d3b5-0495-083f-b4b7-b58b20cf859e@redhat.com>
+ <20161103180127.GX25086@rric.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FC45401D0
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2016 07:14:17 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T3TKUO2dj6zL for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2016 07:14:16 -0400 (EDT)
-Received: from mail-pf0-f193.google.com (mail-pf0-f193.google.com
- [209.85.192.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 032ED4042E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2016 07:14:14 -0400 (EDT)
-Received: by mail-pf0-f193.google.com with SMTP id i88so7656148pfk.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2016 04:14:30 -0700 (PDT)
-In-Reply-To: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, christoffer.dall@linaro.org, peter.maydell@linaro.org
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20161103180127.GX25086@rric.localdomain>
+Sender: kvm-owner@vger.kernel.org
+To: Robert Richter <rric@kernel.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Andrew Jones <drjones@redhat.com>, daniel.thompson@linaro.org, Robert Richter <robert.richter@caviumnetworks.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Hi Robert,
 
-ICC_VMCR_EL2 supports virtual access to ICC_IGRPEN1_EL1.Enable
-and ICC_IGRPEN0_EL1.Enable fields. Add grpen0 and grpen1 member
-variables to struct vmcr to support read and write of these fields.
+On 03/11/2016 19:01, Robert Richter wrote:
+> Eric,
+> 
+> On 21.10.16 11:05:01, Auger Eric wrote:
+>> On 21/10/2016 10:45, Marc Zyngier wrote:
+> 
+>>> What is the failure syndrome? Do you see it crashing? Locking up? What
+>>> is the PC at that stage?
+>> No guest crash. the guest just locks up. No traces output.
+> 
+> I am trying to reproduce this but could boot a 4.9-rc3 kernel as
+> guest. Are there any special settings? Here my command line:
+> 
+>  qemu-system-aarch64 -name qemu.test -enable-kvm -smp 8 -m 16G -cpu host -nographic -kernel /boot/vmlinuz-4.9.0-rc3.0.vanilla10-00002-gcfd8c2cee6ac -initrd /boot/initrd.img-4.9.0-rc3.0.vanilla10-00002-gcfd8c2cee6ac -M virt,gic_version=3 -hdb /dev/sdb -append "root=/dev/vda3"
+> 
+> Thanks,
 
-Also refactor vgic_set_vmcr and vgic_get_vmcr() code.
-Drop ICH_VMCR_CTLR_SHIFT and ICH_VMCR_CTLR_MASK macros and instead
-use ICH_VMCR_EOI* and ICH_VMCR_CBPR* macros
-.
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
----
- include/linux/irqchip/arm-gic-v3.h |  2 --
- virt/kvm/arm/vgic/vgic-mmio-v2.c   | 16 ----------------
- virt/kvm/arm/vgic/vgic-mmio.c      | 16 ++++++++++++++++
- virt/kvm/arm/vgic/vgic-v3.c        | 10 ++++++++--
- virt/kvm/arm/vgic/vgic.h           |  5 +++++
- 5 files changed, 29 insertions(+), 20 deletions(-)
+no, nothing special. I checked again with a 4.9-rc3 host and guest and
+the guest fails booting except if I comment the gic_write_bpr1(0) call.
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index d48d886..61646aa 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -404,8 +404,6 @@
- #define ICH_HCR_EN			(1 << 0)
- #define ICH_HCR_UIE			(1 << 1)
- 
--#define ICH_VMCR_CTLR_SHIFT		0
--#define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
- #define ICH_VMCR_CBPR_SHIFT		4
- #define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
- #define ICH_VMCR_EOIM_SHIFT		9
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 2cb04b7..ad353b5 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -212,22 +212,6 @@ static void vgic_mmio_write_sgipends(struct kvm_vcpu *vcpu,
- 	}
- }
- 
--static void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
--{
--	if (kvm_vgic_global_state.type == VGIC_V2)
--		vgic_v2_set_vmcr(vcpu, vmcr);
--	else
--		vgic_v3_set_vmcr(vcpu, vmcr);
--}
--
--static void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
--{
--	if (kvm_vgic_global_state.type == VGIC_V2)
--		vgic_v2_get_vmcr(vcpu, vmcr);
--	else
--		vgic_v3_get_vmcr(vcpu, vmcr);
--}
--
- #define GICC_ARCH_VERSION_V2	0x2
- 
- /* These are for userland accesses only, there is no guest-facing emulation. */
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 9939d1d..173d6f0 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -416,6 +416,22 @@ int vgic_validate_mmio_region_addr(struct kvm_device *dev,
- 	return -ENXIO;
- }
- 
-+void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-+{
-+	if (kvm_vgic_global_state.type == VGIC_V2)
-+		vgic_v2_set_vmcr(vcpu, vmcr);
-+	else
-+		vgic_v3_set_vmcr(vcpu, vmcr);
-+}
-+
-+void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-+{
-+	if (kvm_vgic_global_state.type == VGIC_V2)
-+		vgic_v2_get_vmcr(vcpu, vmcr);
-+	else
-+		vgic_v3_get_vmcr(vcpu, vmcr);
-+}
-+
- /*
-  * kvm_mmio_read_buf() returns a value in a format where it can be converted
-  * to a byte array and be directly observed as the guest wanted it to appear
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 9f0dae3..967c295 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -175,10 +175,13 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
- {
- 	u32 vmcr;
- 
--	vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
-+	vmcr  = (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
-+	vmcr |= (vmcrp->ctlr << ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
- 	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
- 	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
- 	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
-+	vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
-+	vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
- 
- 	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
- }
-@@ -187,10 +190,13 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
- {
- 	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
- 
--	vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
-+	vmcrp->ctlr = (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
-+	vmcrp->ctlr |= (vmcr & ICH_VMCR_EOIM_MASK) >> ICH_VMCR_EOIM_SHIFT;
- 	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
- 	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
- 	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
-+	vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
-+	vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
- }
- 
- #define INITIAL_PENDBASER_VALUE						  \
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index d901b0c..c461f6b 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -63,6 +63,9 @@ struct vgic_vmcr {
- 	u32	abpr;
- 	u32	bpr;
- 	u32	pmr;
-+	/* Below member variable are valid only for GICv3 */
-+	u32	grpen0;
-+	u32	grpen1;
- };
- 
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-@@ -150,6 +153,8 @@ static inline int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
- #endif
- 
- int kvm_register_vgic_device(unsigned long type);
-+void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-+void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- int vgic_lazy_init(struct kvm *kvm);
- int vgic_init(struct kvm *kvm);
- 
--- 
-1.9.1
+Thanks
+
+Eric
+
+> 
+> -Robert
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
