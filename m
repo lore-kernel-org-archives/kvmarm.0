@@ -1,190 +1,307 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v4 03/11] arm/arm64: smp: support more than 8 cpus
-Date: Tue,  8 Nov 2016 21:21:31 +0100
-Message-ID: <1478636499-14339-4-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v4 07/11] arm/arm64: gicv2: add an IPI test
+Date: Tue,  8 Nov 2016 21:21:35 +0100
+Message-ID: <1478636499-14339-8-git-send-email-drjones@redhat.com>
 References: <1478636499-14339-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F5FB40284
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Nov 2016 15:21:44 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 72Cs-za8-yEx for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Nov 2016 15:21:43 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE44840199
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Nov 2016 15:21:41 -0500 (EST)
 In-Reply-To: <1478636499-14339-1-git-send-email-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: pbonzini@redhat.com, andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, christoffer.dall@linaro.org, Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-By adding support for launching with gicv3 we can break the 8 vcpu
-limit. This patch adds support to smp code and also selects the
-vgic model corresponding to the host. The vgic model may also be
-manually selected by adding e.g. -machine gic-version=3 to
-extra_params.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
-
 ---
-v4: improved commit message
+v4: properly mask irqnr in ipi_handler
+v2: add more details in the output if a test fails,
+    report spurious interrupts if we get them
 ---
- arm/run                   | 19 ++++++++++++-------
- arm/selftest.c            |  5 ++++-
- lib/arm/asm/processor.h   |  9 +++++++--
- lib/arm/asm/setup.h       |  4 ++--
- lib/arm/setup.c           | 12 +++++++++++-
- lib/arm64/asm/processor.h |  9 +++++++--
- 6 files changed, 43 insertions(+), 15 deletions(-)
+ arm/Makefile.common |   6 +-
+ arm/gic.c           | 195 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg   |   7 ++
+ lib/arm/asm/gic.h   |   6 ++
+ 4 files changed, 211 insertions(+), 3 deletions(-)
+ create mode 100644 arm/gic.c
 
-diff --git a/arm/run b/arm/run
-index a2f35ef6a7e6..2d0698619606 100755
---- a/arm/run
-+++ b/arm/run
-@@ -31,13 +31,6 @@ if [ -z "$ACCEL" ]; then
- 	fi
- fi
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index 41239c37e092..bc38183ab86e 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -9,9 +9,9 @@ ifeq ($(LOADADDR),)
+ 	LOADADDR = 0x40000000
+ endif
  
--if [ "$HOST" = "aarch64" ] && [ "$ACCEL" = "kvm" ]; then
--	processor="host"
--	if [ "$ARCH" = "arm" ]; then
--		processor+=",aarch64=off"
--	fi
--fi
--
- qemu="${QEMU:-qemu-system-$ARCH_NAME}"
- qpath=$(which $qemu 2>/dev/null)
+-tests-common = \
+-	$(TEST_DIR)/selftest.flat \
+-	$(TEST_DIR)/spinlock-test.flat
++tests-common  = $(TEST_DIR)/selftest.flat
++tests-common += $(TEST_DIR)/spinlock-test.flat
++tests-common += $(TEST_DIR)/gic.flat
  
-@@ -53,6 +46,18 @@ fi
+ all: test_cases
  
- M='-machine virt'
- 
-+if [ "$ACCEL" = "kvm" ]; then
-+	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
-+		M+=',gic-version=host'
-+	fi
-+	if [ "$HOST" = "aarch64" ]; then
-+		processor="host"
-+		if [ "$ARCH" = "arm" ]; then
-+			processor+=",aarch64=off"
-+		fi
-+	fi
-+fi
+diff --git a/arm/gic.c b/arm/gic.c
+new file mode 100644
+index 000000000000..efefab7296d4
+--- /dev/null
++++ b/arm/gic.c
+@@ -0,0 +1,195 @@
++/*
++ * GIC tests
++ *
++ * GICv2
++ *   + test sending/receiving IPIs
++ *
++ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.
++ */
++#include <libcflat.h>
++#include <asm/setup.h>
++#include <asm/processor.h>
++#include <asm/gic.h>
++#include <asm/smp.h>
++#include <asm/barrier.h>
++#include <asm/io.h>
 +
- if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
- 	echo "$qpath doesn't support virtio-console for chr-testdev. Exiting."
- 	exit 2
-diff --git a/arm/selftest.c b/arm/selftest.c
-index 196164f5313d..2f117f795d2d 100644
---- a/arm/selftest.c
-+++ b/arm/selftest.c
-@@ -312,9 +312,10 @@ static bool psci_check(void)
- static cpumask_t smp_reported;
- static void cpu_report(void)
- {
-+	unsigned long mpidr = get_mpidr();
- 	int cpu = smp_processor_id();
- 
--	report("CPU%d online", true, cpu);
-+	report("CPU(%3d) mpidr=%lx", mpidr_to_cpu(mpidr) == cpu, cpu, mpidr);
- 	cpumask_set_cpu(cpu, &smp_reported);
- 	halt();
- }
-@@ -343,6 +344,7 @@ int main(int argc, char **argv)
- 
- 	} else if (strcmp(argv[1], "smp") == 0) {
- 
-+		unsigned long mpidr = get_mpidr();
- 		int cpu;
- 
- 		report("PSCI version", psci_check());
-@@ -353,6 +355,7 @@ int main(int argc, char **argv)
- 			smp_boot_secondary(cpu, cpu_report);
- 		}
- 
-+		report("CPU(%3d) mpidr=%lx", mpidr_to_cpu(mpidr) == 0, 0, mpidr);
- 		cpumask_set_cpu(0, &smp_reported);
- 		while (!cpumask_full(&smp_reported))
- 			cpu_relax();
-diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-index f25e7eee3666..d2048f5f5f7e 100644
---- a/lib/arm/asm/processor.h
-+++ b/lib/arm/asm/processor.h
-@@ -40,8 +40,13 @@ static inline unsigned int get_mpidr(void)
- 	return mpidr;
- }
- 
--/* Only support Aff0 for now, up to 4 cpus */
--#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
-+#define MPIDR_HWID_BITMASK 0xffffff
-+extern int mpidr_to_cpu(unsigned long mpidr);
++static int gic_version;
++static int acked[NR_CPUS], spurious[NR_CPUS];
++static cpumask_t ready;
 +
-+#define MPIDR_LEVEL_SHIFT(level) \
-+	(((1 << level) >> 1) << 3)
-+#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-+	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
- 
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
- extern bool is_user(void);
-diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-index cb8fdbd38dd5..b0d51f5f0721 100644
---- a/lib/arm/asm/setup.h
-+++ b/lib/arm/asm/setup.h
-@@ -10,8 +10,8 @@
- #include <asm/page.h>
- #include <asm/pgtable-hwdef.h>
- 
--#define NR_CPUS			8
--extern u32 cpus[NR_CPUS];
-+#define NR_CPUS			255
-+extern u64 cpus[NR_CPUS];	/* per-cpu IDs (MPIDRs) */
- extern int nr_cpus;
- 
- #define NR_MEM_REGIONS		8
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 7e7b39f11dde..b6e2d5815e72 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -24,12 +24,22 @@ extern unsigned long stacktop;
- extern void io_init(void);
- extern void setup_args_progname(const char *args);
- 
--u32 cpus[NR_CPUS] = { [0 ... NR_CPUS-1] = (~0U) };
-+u64 cpus[NR_CPUS] = { [0 ... NR_CPUS-1] = (~0U) };
- int nr_cpus;
- 
- struct mem_region mem_regions[NR_MEM_REGIONS];
- phys_addr_t __phys_offset, __phys_end;
- 
-+int mpidr_to_cpu(unsigned long mpidr)
++static void nr_cpu_check(int nr)
 +{
-+	int i;
-+
-+	for (i = 0; i < nr_cpus; ++i)
-+		if (cpus[i] == (mpidr & MPIDR_HWID_BITMASK))
-+			return i;
-+	return -1;
++	if (nr_cpus < nr)
++		report_abort("At least %d cpus required", nr);
 +}
 +
- static void cpu_set(int fdtnode __unused, u32 regval, void *info __unused)
- {
- 	int cpu = nr_cpus++;
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 9a208ff729b7..7e448dc81a6a 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -78,8 +78,13 @@ static inline type get_##reg(void)				\
- 
- DEFINE_GET_SYSREG64(mpidr)
- 
--/* Only support Aff0 for now, gicv2 only */
--#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
-+#define MPIDR_HWID_BITMASK 0xff00ffffff
-+extern int mpidr_to_cpu(unsigned long mpidr);
++static void wait_on_ready(void)
++{
++	cpumask_set_cpu(smp_processor_id(), &ready);
++	while (!cpumask_full(&ready))
++		cpu_relax();
++}
 +
-+#define MPIDR_LEVEL_SHIFT(level) \
-+	(((1 << level) >> 1) << 3)
-+#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-+	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
++static void check_acked(cpumask_t *mask)
++{
++	int missing = 0, extra = 0, unexpected = 0;
++	int nr_pass, cpu, i;
++
++	/* Wait up to 5s for all interrupts to be delivered */
++	for (i = 0; i < 50; ++i) {
++		mdelay(100);
++		nr_pass = 0;
++		for_each_present_cpu(cpu) {
++			smp_rmb();
++			nr_pass += cpumask_test_cpu(cpu, mask) ?
++				acked[cpu] == 1 : acked[cpu] == 0;
++		}
++		if (nr_pass == nr_cpus) {
++			report("Completed in %d ms", true, ++i * 100);
++			return;
++		}
++	}
++
++	for_each_present_cpu(cpu) {
++		if (cpumask_test_cpu(cpu, mask)) {
++			if (!acked[cpu])
++				++missing;
++			else if (acked[cpu] > 1)
++				++extra;
++		} else {
++			if (acked[cpu])
++				++unexpected;
++		}
++	}
++
++	report("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
++	       false, missing, extra, unexpected);
++}
++
++static void ipi_handler(struct pt_regs *regs __unused)
++{
++	u32 irqstat = readl(gicv2_cpu_base() + GIC_CPU_INTACK);
++	u32 irqnr = irqstat & GICC_IAR_INT_ID_MASK;
++
++	if (irqnr != GICC_INT_SPURIOUS) {
++		writel(irqstat, gicv2_cpu_base() + GIC_CPU_EOI);
++		smp_rmb(); /* pairs with wmb in ipi_test functions */
++		++acked[smp_processor_id()];
++		smp_wmb(); /* pairs with rmb in check_acked */
++	} else {
++		++spurious[smp_processor_id()];
++		smp_wmb();
++	}
++}
++
++static void ipi_test_self(void)
++{
++	cpumask_t mask;
++
++	report_prefix_push("self");
++	memset(acked, 0, sizeof(acked));
++	smp_wmb();
++	cpumask_clear(&mask);
++	cpumask_set_cpu(0, &mask);
++	writel(2 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	check_acked(&mask);
++	report_prefix_pop();
++}
++
++static void ipi_test_smp(void)
++{
++	cpumask_t mask;
++	unsigned long tlist;
++
++	report_prefix_push("target-list");
++	memset(acked, 0, sizeof(acked));
++	smp_wmb();
++	tlist = cpumask_bits(&cpu_present_mask)[0] & 0xaa;
++	cpumask_bits(&mask)[0] = tlist;
++	writel((u8)tlist << 16, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	check_acked(&mask);
++	report_prefix_pop();
++
++	report_prefix_push("broadcast");
++	memset(acked, 0, sizeof(acked));
++	smp_wmb();
++	cpumask_copy(&mask, &cpu_present_mask);
++	cpumask_clear_cpu(0, &mask);
++	writel(1 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	check_acked(&mask);
++	report_prefix_pop();
++}
++
++static void ipi_enable(void)
++{
++	gicv2_enable_defaults();
++#ifdef __arm__
++	install_exception_handler(EXCPTN_IRQ, ipi_handler);
++#else
++	install_irq_handler(EL1H_IRQ, ipi_handler);
++#endif
++	local_irq_enable();
++}
++
++static void ipi_recv(void)
++{
++	ipi_enable();
++	cpumask_set_cpu(smp_processor_id(), &ready);
++	while (1)
++		wfi();
++}
++
++int main(int argc, char **argv)
++{
++	char pfx[8];
++	int cpu;
++
++	gic_version = gic_init();
++	if (!gic_version)
++		report_abort("No gic present!");
++
++	snprintf(pfx, 8, "gicv%d", gic_version);
++	report_prefix_push(pfx);
++
++	if (argc < 2) {
++
++		report_prefix_push("ipi");
++		ipi_enable();
++		ipi_test_self();
++		report_prefix_pop();
++
++	} else if (!strcmp(argv[1], "ipi")) {
++
++		report_prefix_push(argv[1]);
++		nr_cpu_check(2);
++
++		for_each_present_cpu(cpu) {
++			if (cpu == 0)
++				continue;
++			smp_boot_secondary(cpu, ipi_recv);
++		}
++		ipi_enable();
++		wait_on_ready();
++		ipi_test_self();
++		ipi_test_smp();
++
++		smp_rmb();
++		for_each_present_cpu(cpu) {
++			if (spurious[cpu]) {
++				printf("ipi: WARN: cpu%d got %d spurious "
++				       "interrupts\n",
++				       spurious[cpu], smp_processor_id());
++			}
++		}
++
++		report_prefix_pop();
++
++	} else {
++		report_abort("Unknown subtest '%s'", argv[1]);
++	}
++
++	return report_summary();
++}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 3f6fa45c587e..68bf5cd6008f 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -54,3 +54,10 @@ file = selftest.flat
+ smp = $MAX_SMP
+ extra_params = -append 'smp'
+ groups = selftest
++
++# Test GIC emulation
++[gicv2-ipi]
++file = gic.flat
++smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
++extra_params = -machine gic-version=2 -append 'ipi'
++groups = gic
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index ec92f1064dc0..328e078a9ae1 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -10,14 +10,20 @@
  
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
- extern bool is_user(void);
+ #define GIC_CPU_CTRL			0x00
+ #define GIC_CPU_PRIMASK			0x04
++#define GIC_CPU_INTACK			0x0c
++#define GIC_CPU_EOI			0x10
+ 
+ #define GICC_ENABLE			0x1
+ #define GICC_INT_PRI_THRESHOLD		0xf0
+ 
++#define GICC_IAR_INT_ID_MASK		0x3ff
++#define GICC_INT_SPURIOUS		1023
++
+ #define GIC_DIST_CTRL			0x000
+ #define GIC_DIST_CTR			0x004
+ #define GIC_DIST_ENABLE_SET		0x100
+ #define GIC_DIST_PRI			0x400
++#define GIC_DIST_SOFTINT		0xf00
+ 
+ #define GICD_ENABLE			0x1
+ #define GICD_INT_EN_SET_SGI		0x0000ffff
 -- 
 2.7.4
-
