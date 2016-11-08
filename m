@@ -1,7 +1,7 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v4 09/11] arm/arm64: add initial gicv3 support
-Date: Tue,  8 Nov 2016 21:21:37 +0100
-Message-ID: <1478636499-14339-10-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v4 10/11] arm/arm64: gicv3: add an IPI test
+Date: Tue,  8 Nov 2016 21:21:38 +0100
+Message-ID: <1478636499-14339-11-git-send-email-drjones@redhat.com>
 References: <1478636499-14339-1-git-send-email-drjones@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1478636499-14339-1-git-send-email-drjones@redhat.com>
@@ -14,375 +14,399 @@ Signed-off-by: Andrew Jones <drjones@redhat.com>
 
 ---
 v4:
- - only take defines from kernel we need now [Andre]
- - simplify enable by not caring if we reinit the distributor [drew]
+ - heavily comment gicv3_ipi_send_tlist() [Eric]
+ - changes needed for gicv2 iar/irqstat fix to other patch
 v2:
- - configure irqs as NS GRP1
+ - use IRM for gicv3 broadcast
 ---
- lib/arm/asm/arch_gicv3.h   | 42 +++++++++++++++++++++
- lib/arm/asm/gic-v3.h       | 92 ++++++++++++++++++++++++++++++++++++++++++++++
- lib/arm/asm/gic.h          |  1 +
- lib/arm/gic.c              | 56 ++++++++++++++++++++++++++++
- lib/arm64/asm/arch_gicv3.h | 44 ++++++++++++++++++++++
- lib/arm64/asm/gic-v3.h     |  1 +
- lib/arm64/asm/sysreg.h     | 44 ++++++++++++++++++++++
- 7 files changed, 280 insertions(+)
- create mode 100644 lib/arm/asm/arch_gicv3.h
- create mode 100644 lib/arm/asm/gic-v3.h
- create mode 100644 lib/arm64/asm/arch_gicv3.h
- create mode 100644 lib/arm64/asm/gic-v3.h
- create mode 100644 lib/arm64/asm/sysreg.h
+ arm/gic.c                  | 195 ++++++++++++++++++++++++++++++++++++++++++---
+ arm/unittests.cfg          |   6 ++
+ lib/arm/asm/arch_gicv3.h   |  23 ++++++
+ lib/arm64/asm/arch_gicv3.h |  22 +++++
+ 4 files changed, 236 insertions(+), 10 deletions(-)
 
-diff --git a/lib/arm/asm/arch_gicv3.h b/lib/arm/asm/arch_gicv3.h
-new file mode 100644
-index 000000000000..81a1e5f6c29c
---- /dev/null
-+++ b/lib/arm/asm/arch_gicv3.h
-@@ -0,0 +1,42 @@
-+/*
-+ * All ripped off from arch/arm/include/asm/arch_gicv3.h
-+ *
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM_ARCH_GICV3_H_
-+#define _ASMARM_ARCH_GICV3_H_
-+
-+#ifndef __ASSEMBLY__
-+#include <libcflat.h>
-+#include <asm/barrier.h>
-+#include <asm/io.h>
-+
-+#define __stringify xstr
-+
-+#define __ACCESS_CP15(CRn, Op1, CRm, Op2)	p15, Op1, %0, CRn, CRm, Op2
-+
-+#define ICC_PMR				__ACCESS_CP15(c4, 0, c6, 0)
-+#define ICC_IGRPEN1			__ACCESS_CP15(c12, 0, c12, 7)
-+
-+static inline void gicv3_write_pmr(u32 val)
-+{
-+	asm volatile("mcr " __stringify(ICC_PMR) : : "r" (val));
-+}
-+
-+static inline void gicv3_write_grpen1(u32 val)
-+{
-+	asm volatile("mcr " __stringify(ICC_IGRPEN1) : : "r" (val));
-+	isb();
-+}
-+
-+static inline u64 gicv3_read_typer(const volatile void __iomem *addr)
-+{
-+	u64 val = readl(addr);
-+	val |= (u64)readl(addr + 4) << 32;
-+	return val;
-+}
-+
-+#endif /* !__ASSEMBLY__ */
-+#endif /* _ASMARM_ARCH_GICV3_H_ */
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-new file mode 100644
-index 000000000000..03321f8c860f
---- /dev/null
-+++ b/lib/arm/asm/gic-v3.h
-@@ -0,0 +1,92 @@
-+/*
-+ * All GIC* defines are lifted from include/linux/irqchip/arm-gic-v3.h
-+ *
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM_GIC_V3_H_
-+#define _ASMARM_GIC_V3_H_
-+
-+#ifndef _ASMARM_GIC_H_
-+#error Do not directly include <asm/gic-v3.h>. Include <asm/gic.h>
-+#endif
-+
-+#define GICD_CTLR			0x0000
-+#define GICD_TYPER			0x0004
-+#define GICD_IGROUPR			0x0080
-+
-+#define GICD_CTLR_RWP			(1U << 31)
-+#define GICD_CTLR_ARE_NS		(1U << 4)
-+#define GICD_CTLR_ENABLE_G1A		(1U << 1)
-+#define GICD_CTLR_ENABLE_G1		(1U << 0)
-+
-+#define GICR_TYPER			0x0008
-+#define GICR_IGROUPR0			GICD_IGROUPR
-+#define GICR_TYPER_LAST			(1U << 4)
-+
-+
-+#include <asm/arch_gicv3.h>
-+
-+#ifndef __ASSEMBLY__
-+#include <asm/setup.h>
-+#include <asm/smp.h>
-+#include <asm/processor.h>
-+#include <asm/io.h>
-+
-+struct gicv3_data {
-+	void *dist_base;
-+	void *redist_base[NR_CPUS];
-+	unsigned int irq_nr;
-+};
-+extern struct gicv3_data gicv3_data;
-+
-+#define gicv3_dist_base()		(gicv3_data.dist_base)
-+#define gicv3_redist_base()		(gicv3_data.redist_base[smp_processor_id()])
-+#define gicv3_sgi_base()		(gicv3_data.redist_base[smp_processor_id()] + SZ_64K)
-+
-+extern int gicv3_init(void);
-+extern void gicv3_enable_defaults(void);
-+
-+static inline void gicv3_do_wait_for_rwp(void *base)
-+{
-+	int count = 100000;	/* 1s */
-+
-+	while (readl(base + GICD_CTLR) & GICD_CTLR_RWP) {
-+		if (!--count) {
-+			printf("GICv3: RWP timeout!\n");
-+			abort();
-+		}
-+		cpu_relax();
-+		udelay(10);
-+	};
-+}
-+
-+static inline void gicv3_dist_wait_for_rwp(void)
-+{
-+	gicv3_do_wait_for_rwp(gicv3_dist_base());
-+}
-+
-+static inline void gicv3_redist_wait_for_rwp(void)
-+{
-+	gicv3_do_wait_for_rwp(gicv3_redist_base());
-+}
-+
-+static inline u32 mpidr_compress(u64 mpidr)
-+{
-+	u64 compressed = mpidr & MPIDR_HWID_BITMASK;
-+
-+	compressed = (((compressed >> 32) & 0xff) << 24) | compressed;
-+	return compressed;
-+}
-+
-+static inline u64 mpidr_uncompress(u32 compressed)
-+{
-+	u64 mpidr = ((u64)compressed >> 24) << 32;
-+
-+	mpidr |= compressed & MPIDR_HWID_BITMASK;
-+	return mpidr;
-+}
-+
-+#endif /* !__ASSEMBLY__ */
-+#endif /* _ASMARM_GIC_V3_H_ */
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 328e078a9ae1..4897bc592cdd 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -7,6 +7,7 @@
- #define _ASMARM_GIC_H_
- 
- #include <asm/gic-v2.h>
-+#include <asm/gic-v3.h>
- 
- #define GIC_CPU_CTRL			0x00
- #define GIC_CPU_PRIMASK			0x04
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index 91d78c9a0cc2..af58a11ea13e 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -8,9 +8,11 @@
+diff --git a/arm/gic.c b/arm/gic.c
+index efefab7296d4..d98ca6b9efd5 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -3,6 +3,8 @@
+  *
+  * GICv2
+  *   + test sending/receiving IPIs
++ * GICv3
++ *   + test sending/receiving IPIs
+  *
+  * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+  *
+@@ -16,6 +18,19 @@
+ #include <asm/barrier.h>
  #include <asm/io.h>
  
- struct gicv2_data gicv2_data;
-+struct gicv3_data gicv3_data;
- 
- /*
-  * Documentation/devicetree/bindings/interrupt-controller/arm,gic.txt
-+ * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
-  */
- static bool
- gic_get_dt_bases(const char *compatible, void **base1, void **base2)
-@@ -48,10 +50,18 @@ int gicv2_init(void)
- 			&gicv2_data.dist_base, &gicv2_data.cpu_base);
++struct gic {
++	struct {
++		void (*enable)(void);
++		void (*send_self)(void);
++		void (*send_tlist)(cpumask_t *);
++		void (*send_broadcast)(void);
++	} ipi;
++	u32 (*read_iar)(void);
++	u32 (*irqnr)(u32 iar);
++	void (*write_eoi)(u32);
++};
++
++static struct gic *gic;
+ static int gic_version;
+ static int acked[NR_CPUS], spurious[NR_CPUS];
+ static cpumask_t ready;
+@@ -69,13 +84,33 @@ static void check_acked(cpumask_t *mask)
+ 	       false, missing, extra, unexpected);
  }
  
-+int gicv3_init(void)
++static u32 gicv2_read_iar(void)
 +{
-+	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
-+			&gicv3_data.redist_base[0]);
++	return readl(gicv2_cpu_base() + GIC_CPU_INTACK);
 +}
 +
- int gic_init(void)
++static u32 gicv2_irqnr(u32 iar)
++{
++	return iar & GICC_IAR_INT_ID_MASK;
++}
++
++static void gicv2_write_eoi(u32 irqstat)
++{
++	writel(irqstat, gicv2_cpu_base() + GIC_CPU_EOI);
++}
++
++static u32 gicv3_irqnr(u32 iar)
++{
++	return iar;
++}
++
+ static void ipi_handler(struct pt_regs *regs __unused)
  {
- 	if (gicv2_init())
- 		return 2;
-+	else if (gicv3_init())
-+		return 3;
- 	return 0;
+-	u32 irqstat = readl(gicv2_cpu_base() + GIC_CPU_INTACK);
+-	u32 irqnr = irqstat & GICC_IAR_INT_ID_MASK;
++	u32 irqstat = gic->read_iar();
++	u32 irqnr = gic->irqnr(irqstat);
+ 
+ 	if (irqnr != GICC_INT_SPURIOUS) {
+-		writel(irqstat, gicv2_cpu_base() + GIC_CPU_EOI);
++		gic->write_eoi(irqstat);
+ 		smp_rmb(); /* pairs with wmb in ipi_test functions */
+ 		++acked[smp_processor_id()];
+ 		smp_wmb(); /* pairs with rmb in check_acked */
+@@ -85,6 +120,112 @@ static void ipi_handler(struct pt_regs *regs __unused)
+ 	}
  }
  
-@@ -73,3 +83,49 @@ void gicv2_enable_defaults(void)
- 	writel(GICC_INT_PRI_THRESHOLD, cpu_base + GIC_CPU_PRIMASK);
- 	writel(GICC_ENABLE, cpu_base + GIC_CPU_CTRL);
- }
-+
-+void gicv3_set_redist_base(void)
++static void gicv2_ipi_send_self(void)
 +{
-+	u32 aff = mpidr_compress(get_mpidr());
-+	void *ptr = gicv3_data.redist_base[0];
-+	u64 typer;
++	writel(2 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
++}
 +
-+	do {
-+		typer = gicv3_read_typer(ptr + GICR_TYPER);
-+		if ((typer >> 32) == aff) {
-+			gicv3_redist_base() = ptr;
-+			return;
++static void gicv2_ipi_send_tlist(cpumask_t *mask)
++{
++	u8 tlist = (u8)cpumask_bits(mask)[0];
++
++	writel(tlist << 16, gicv2_dist_base() + GIC_DIST_SOFTINT);
++}
++
++static void gicv2_ipi_send_broadcast(void)
++{
++	writel(1 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
++}
++
++#define ICC_SGI1R_AFFINITY_1_SHIFT	16
++#define ICC_SGI1R_AFFINITY_2_SHIFT	32
++#define ICC_SGI1R_AFFINITY_3_SHIFT	48
++#define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
++	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level ## _SHIFT)
++
++static void gicv3_ipi_send_tlist(cpumask_t *mask)
++{
++	u16 tlist;
++	int cpu;
++
++	/*
++	 * For each cpu in the mask collect its peers, which are also in
++	 * the mask, in order to form target lists.
++	 */
++	for_each_cpu(cpu, mask) {
++		u64 mpidr = cpus[cpu], sgi1r;
++		u64 cluster_id;
++
++		/*
++		 * GICv3 can send IPIs to up 16 peer cpus with a single
++		 * write to ICC_SGI1R_EL1 (using the target list). Peers
++		 * are cpus that have nearly identical MPIDRs, the only
++		 * difference being Aff0. The matching upper affinity
++		 * levels form the cluster ID.
++		 */
++		cluster_id = mpidr & ~0xffUL;
++		tlist = 0;
++
++		/*
++		 * Sort of open code for_each_cpu in order to have a
++		 * nested for_each_cpu loop.
++		 */
++		while (cpu < nr_cpus) {
++			if ((mpidr & 0xff) >= 16) {
++				printf("cpu%d MPIDR:aff0 is %d (>= 16)!\n",
++					cpu, (int)(mpidr & 0xff));
++				break;
++			}
++
++			tlist |= 1 << (mpidr & 0xf);
++
++			cpu = cpumask_next(cpu, mask);
++			if (cpu >= nr_cpus)
++				break;
++
++			mpidr = cpus[cpu];
++
++			if (cluster_id != (mpidr & ~0xffUL)) {
++				/*
++				 * The next cpu isn't in our cluster. Roll
++				 * back the cpu index allowing the outer
++				 * for_each_cpu to find it again with
++				 * cpumask_next
++				 */
++				--cpu;
++				break;
++			}
 +		}
-+		ptr += SZ_64K * 2; /* skip RD_base and SGI_base */
-+	} while (!(typer & GICR_TYPER_LAST));
-+	assert(0);
-+}
 +
-+void gicv3_enable_defaults(void)
-+{
-+	void *dist = gicv3_dist_base();
-+	void *sgi_base;
-+	unsigned int i;
++		/* Send the IPIs for the target list of this cluster */
++		sgi1r = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3)	|
++			 MPIDR_TO_SGI_AFFINITY(cluster_id, 2)	|
++			 /* irq << 24				| */
++			 MPIDR_TO_SGI_AFFINITY(cluster_id, 1)	|
++			 tlist);
 +
-+	gicv3_data.irq_nr = GICD_TYPER_IRQS(readl(dist + GICD_TYPER));
-+	if (gicv3_data.irq_nr > 1020)
-+		gicv3_data.irq_nr = 1020;
++		gicv3_write_sgi1r(sgi1r);
++	}
 +
-+	writel(GICD_CTLR_ARE_NS | GICD_CTLR_ENABLE_G1A | GICD_CTLR_ENABLE_G1,
-+	       dist + GICD_CTLR);
-+	gicv3_dist_wait_for_rwp();
-+
-+	if (!gicv3_redist_base())
-+		gicv3_set_redist_base();
-+	sgi_base = gicv3_sgi_base();
-+
-+	writel(~0, sgi_base + GICR_IGROUPR0);
-+	writel(GICD_INT_EN_SET_SGI, sgi_base + GIC_DIST_ENABLE_SET);
-+
-+	for (i = 0; i < 32; i += 4)
-+		writel(GICD_INT_DEF_PRI_X4, sgi_base + GIC_DIST_PRI + i);
-+	gicv3_redist_wait_for_rwp();
-+
-+	gicv3_write_pmr(0xf0);
-+	gicv3_write_grpen1(1);
-+}
-diff --git a/lib/arm64/asm/arch_gicv3.h b/lib/arm64/asm/arch_gicv3.h
-new file mode 100644
-index 000000000000..6d353567f56a
---- /dev/null
-+++ b/lib/arm64/asm/arch_gicv3.h
-@@ -0,0 +1,44 @@
-+/*
-+ * All ripped off from arch/arm64/include/asm/arch_gicv3.h
-+ *
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM64_ARCH_GICV3_H_
-+#define _ASMARM64_ARCH_GICV3_H_
-+
-+#include <asm/sysreg.h>
-+
-+#define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
-+#define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
-+
-+#ifndef __ASSEMBLY__
-+
-+#include <libcflat.h>
-+#include <asm/barrier.h>
-+
-+#define __stringify xstr
-+
-+/*
-+ * Low-level accessors
-+ *
-+ * These system registers are 32 bits, but we make sure that the compiler
-+ * sets the GP register's most significant bits to 0 with an explicit cast.
-+ */
-+
-+static inline void gicv3_write_pmr(u32 val)
-+{
-+	asm volatile("msr_s " __stringify(ICC_PMR_EL1) ", %0" : : "r" ((u64)val));
-+}
-+
-+static inline void gicv3_write_grpen1(u32 val)
-+{
-+	asm volatile("msr_s " __stringify(ICC_GRPEN1_EL1) ", %0" : : "r" ((u64)val));
++	/* Force the above writes to ICC_SGI1R_EL1 to be executed */
 +	isb();
 +}
 +
-+#define gicv3_read_typer(c)		readq(c)
++static void gicv3_ipi_send_self(void)
++{
++	cpumask_t mask;
 +
-+#endif /* __ASSEMBLY__ */
-+#endif /* _ASMARM64_ARCH_GICV3_H_ */
-diff --git a/lib/arm64/asm/gic-v3.h b/lib/arm64/asm/gic-v3.h
-new file mode 100644
-index 000000000000..8ee5d4d9c181
---- /dev/null
-+++ b/lib/arm64/asm/gic-v3.h
-@@ -0,0 +1 @@
-+#include "../../arm/asm/gic-v3.h"
-diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-new file mode 100644
-index 000000000000..544a46cb8cc5
---- /dev/null
-+++ b/lib/arm64/asm/sysreg.h
-@@ -0,0 +1,44 @@
-+/*
-+ * Ripped off from arch/arm64/include/asm/sysreg.h
-+ *
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM64_SYSREG_H_
-+#define _ASMARM64_SYSREG_H_
++	cpumask_clear(&mask);
++	cpumask_set_cpu(smp_processor_id(), &mask);
++	gicv3_ipi_send_tlist(&mask);
++}
 +
-+#define sys_reg(op0, op1, crn, crm, op2) \
-+	((((op0)&3)<<19)|((op1)<<16)|((crn)<<12)|((crm)<<8)|((op2)<<5))
++static void gicv3_ipi_send_broadcast(void)
++{
++	gicv3_write_sgi1r(1ULL << 40);
++	isb();
++}
 +
-+#ifdef __ASSEMBLY__
-+	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
-+	.equ	.L__reg_num_x\num, \num
-+	.endr
-+	.equ	.L__reg_num_xzr, 31
+ static void ipi_test_self(void)
+ {
+ 	cpumask_t mask;
+@@ -94,7 +235,7 @@ static void ipi_test_self(void)
+ 	smp_wmb();
+ 	cpumask_clear(&mask);
+ 	cpumask_set_cpu(0, &mask);
+-	writel(2 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	gic->ipi.send_self();
+ 	check_acked(&mask);
+ 	report_prefix_pop();
+ }
+@@ -102,14 +243,15 @@ static void ipi_test_self(void)
+ static void ipi_test_smp(void)
+ {
+ 	cpumask_t mask;
+-	unsigned long tlist;
++	int i;
+ 
+ 	report_prefix_push("target-list");
+ 	memset(acked, 0, sizeof(acked));
+ 	smp_wmb();
+-	tlist = cpumask_bits(&cpu_present_mask)[0] & 0xaa;
+-	cpumask_bits(&mask)[0] = tlist;
+-	writel((u8)tlist << 16, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	cpumask_copy(&mask, &cpu_present_mask);
++	for (i = 0; i < nr_cpus; i += 2)
++		cpumask_clear_cpu(i, &mask);
++	gic->ipi.send_tlist(&mask);
+ 	check_acked(&mask);
+ 	report_prefix_pop();
+ 
+@@ -118,14 +260,14 @@ static void ipi_test_smp(void)
+ 	smp_wmb();
+ 	cpumask_copy(&mask, &cpu_present_mask);
+ 	cpumask_clear_cpu(0, &mask);
+-	writel(1 << 24, gicv2_dist_base() + GIC_DIST_SOFTINT);
++	gic->ipi.send_broadcast();
+ 	check_acked(&mask);
+ 	report_prefix_pop();
+ }
+ 
+ static void ipi_enable(void)
+ {
+-	gicv2_enable_defaults();
++	gic->ipi.enable();
+ #ifdef __arm__
+ 	install_exception_handler(EXCPTN_IRQ, ipi_handler);
+ #else
+@@ -142,6 +284,30 @@ static void ipi_recv(void)
+ 		wfi();
+ }
+ 
++struct gic gicv2 = {
++	.ipi = {
++		.enable = gicv2_enable_defaults,
++		.send_self = gicv2_ipi_send_self,
++		.send_tlist = gicv2_ipi_send_tlist,
++		.send_broadcast = gicv2_ipi_send_broadcast,
++	},
++	.read_iar = gicv2_read_iar,
++	.irqnr = gicv2_irqnr,
++	.write_eoi = gicv2_write_eoi,
++};
 +
-+	.macro	mrs_s, rt, sreg
-+	.inst	0xd5200000|(\sreg)|(.L__reg_num_\rt)
-+	.endm
++struct gic gicv3 = {
++	.ipi = {
++		.enable = gicv3_enable_defaults,
++		.send_self = gicv3_ipi_send_self,
++		.send_tlist = gicv3_ipi_send_tlist,
++		.send_broadcast = gicv3_ipi_send_broadcast,
++	},
++	.read_iar = gicv3_read_iar,
++	.irqnr = gicv3_irqnr,
++	.write_eoi = gicv3_write_eoir,
++};
 +
-+	.macro	msr_s, sreg, rt
-+	.inst	0xd5000000|(\sreg)|(.L__reg_num_\rt)
-+	.endm
-+#else
-+asm(
-+"	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\n"
-+"	.equ	.L__reg_num_x\\num, \\num\n"
-+"	.endr\n"
-+"	.equ	.L__reg_num_xzr, 31\n"
-+"\n"
-+"	.macro	mrs_s, rt, sreg\n"
-+"	.inst	0xd5200000|(\\sreg)|(.L__reg_num_\\rt)\n"
-+"	.endm\n"
-+"\n"
-+"	.macro	msr_s, sreg, rt\n"
-+"	.inst	0xd5000000|(\\sreg)|(.L__reg_num_\\rt)\n"
-+"	.endm\n"
-+);
-+#endif
+ int main(int argc, char **argv)
+ {
+ 	char pfx[8];
+@@ -154,6 +320,15 @@ int main(int argc, char **argv)
+ 	snprintf(pfx, 8, "gicv%d", gic_version);
+ 	report_prefix_push(pfx);
+ 
++	switch (gic_version) {
++	case 2:
++		gic = &gicv2;
++		break;
++	case 3:
++		gic = &gicv3;
++		break;
++	}
 +
-+#endif /* _ASMARM64_SYSREG_H_ */
+ 	if (argc < 2) {
+ 
+ 		report_prefix_push("ipi");
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 68bf5cd6008f..ce3cee73c4bf 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -61,3 +61,9 @@ file = gic.flat
+ smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+ extra_params = -machine gic-version=2 -append 'ipi'
+ groups = gic
++
++[gicv3-ipi]
++file = gic.flat
++smp = $MAX_SMP
++extra_params = -machine gic-version=3 -append 'ipi'
++groups = gic
+diff --git a/lib/arm/asm/arch_gicv3.h b/lib/arm/asm/arch_gicv3.h
+index 81a1e5f6c29c..cbcec024a2a6 100644
+--- a/lib/arm/asm/arch_gicv3.h
++++ b/lib/arm/asm/arch_gicv3.h
+@@ -16,10 +16,28 @@
+ #define __stringify xstr
+ 
+ #define __ACCESS_CP15(CRn, Op1, CRm, Op2)	p15, Op1, %0, CRn, CRm, Op2
++#define __ACCESS_CP15_64(Op1, CRm)		p15, Op1, %Q0, %R0, CRm
+ 
++#define ICC_EOIR1			__ACCESS_CP15(c12, 0, c12, 1)
++#define ICC_IAR1			__ACCESS_CP15(c12, 0, c12, 0)
++#define ICC_SGI1R			__ACCESS_CP15_64(0, c12)
+ #define ICC_PMR				__ACCESS_CP15(c4, 0, c6, 0)
+ #define ICC_IGRPEN1			__ACCESS_CP15(c12, 0, c12, 7)
+ 
++static inline void gicv3_write_eoir(u32 irq)
++{
++	asm volatile("mcr " __stringify(ICC_EOIR1) : : "r" (val));
++	isb();
++}
++
++static inline u32 gicv3_read_iar(void)
++{
++	u32 irqstat;
++	asm volatile("mrc " __stringify(ICC_IAR1) : "=r" (irqstat));
++	dsb(sy);
++	return irqstat;
++}
++
+ static inline void gicv3_write_pmr(u32 val)
+ {
+ 	asm volatile("mcr " __stringify(ICC_PMR) : : "r" (val));
+@@ -31,6 +49,11 @@ static inline void gicv3_write_grpen1(u32 val)
+ 	isb();
+ }
+ 
++static inline void gicv3_write_sgi1r(u64 val)
++{
++	asm volatile("mcrr " __stringify(ICC_SGI1R) : : "r" (val));
++}
++
+ static inline u64 gicv3_read_typer(const volatile void __iomem *addr)
+ {
+ 	u64 val = readl(addr);
+diff --git a/lib/arm64/asm/arch_gicv3.h b/lib/arm64/asm/arch_gicv3.h
+index 6d353567f56a..874775828016 100644
+--- a/lib/arm64/asm/arch_gicv3.h
++++ b/lib/arm64/asm/arch_gicv3.h
+@@ -10,6 +10,9 @@
+ 
+ #include <asm/sysreg.h>
+ 
++#define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
++#define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
++#define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
+ #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+ #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
+ 
+@@ -27,6 +30,20 @@
+  * sets the GP register's most significant bits to 0 with an explicit cast.
+  */
+ 
++static inline void gicv3_write_eoir(u32 irq)
++{
++	asm volatile("msr_s " __stringify(ICC_EOIR1_EL1) ", %0" : : "r" ((u64)irq));
++	isb();
++}
++
++static inline u32 gicv3_read_iar(void)
++{
++	u64 irqstat;
++	asm volatile("mrs_s %0, " __stringify(ICC_IAR1_EL1) : "=r" (irqstat));
++	dsb(sy);
++	return (u64)irqstat;
++}
++
+ static inline void gicv3_write_pmr(u32 val)
+ {
+ 	asm volatile("msr_s " __stringify(ICC_PMR_EL1) ", %0" : : "r" ((u64)val));
+@@ -38,6 +55,11 @@ static inline void gicv3_write_grpen1(u32 val)
+ 	isb();
+ }
+ 
++static inline void gicv3_write_sgi1r(u64 val)
++{
++	asm volatile("msr_s " __stringify(ICC_SGI1R_EL1) ", %0" : : "r" (val));
++}
++
+ #define gicv3_read_typer(c)		readq(c)
+ 
+ #endif /* __ASSEMBLY__ */
 -- 
 2.7.4
 
