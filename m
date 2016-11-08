@@ -1,155 +1,150 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3 1/2] arm64: Add hypervisor safe helper for checking constant capabilities
-Date: Tue,  8 Nov 2016 13:56:20 +0000
-Message-ID: <1478613381-5718-2-git-send-email-suzuki.poulose@arm.com>
-References: <1478613381-5718-1-git-send-email-suzuki.poulose@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1478613381-5718-1-git-send-email-suzuki.poulose@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, ard.biesheuvel@linaro.org, will.deacon@arm.com, catalin.marinas@arm.com, mark.rutland@arm.com, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, Suzuki K Poulose <suzuki.poulose@arm.com>, Robert Ritcher <rritcher@cavium.com>, Tirumalesh Chalamarla <tchalamarla@cavium.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [PATCH v2 0/8] Add support for monitoring guest TLB operations
+Date: Tue, 08 Nov 2016 17:19:47 +0000
+Message-ID: <87vavx51os.fsf@e105922-lin.cambridge.arm.com>
+References: <20161026174148.17172-1-punit.agrawal@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20161026174148.17172-1-punit.agrawal@arm.com> (Punit Agrawal's
+        message of "Wed, 26 Oct 2016 18:41:40 +0100")
+Sender: kvm-owner@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The hypervisor may not have full access to the kernel data structures
-and hence cannot safely use cpus_have_cap() helper for checking the
-system capability. Add a safe helper for hypervisors to check a constant
-system capability, which *doesn't* fall back to checking the bitmap
-maintained by the kernel. With this, make the cpus_have_cap() only
-check the bitmask and force constant cap checks to use the new API
-for quicker checks.
+[ +PeterZ who should've been cc'd but doesn't show up in get_maintainers ]
 
-Cc: Robert Ritcher <rritcher@cavium.com>
-Cc: Tirumalesh Chalamarla <tchalamarla@cavium.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/include/asm/cpufeature.h | 19 ++++++++++++-------
- arch/arm64/kernel/cpufeature.c      |  2 +-
- arch/arm64/kernel/process.c         |  2 +-
- drivers/irqchip/irq-gic-v3.c        | 13 +------------
- 4 files changed, 15 insertions(+), 21 deletions(-)
+Punit Agrawal <punit.agrawal@arm.com> writes:
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 0bc0b1d..9890d20 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -9,8 +9,6 @@
- #ifndef __ASM_CPUFEATURE_H
- #define __ASM_CPUFEATURE_H
- 
--#include <linux/jump_label.h>
--
- #include <asm/cpucaps.h>
- #include <asm/hwcap.h>
- #include <asm/sysreg.h>
-@@ -27,6 +25,8 @@
- 
- #ifndef __ASSEMBLY__
- 
-+#include <linux/bug.h>
-+#include <linux/jump_label.h>
- #include <linux/kernel.h>
- 
- /* CPU feature register tracking */
-@@ -104,14 +104,19 @@ static inline bool cpu_have_feature(unsigned int num)
- 	return elf_hwcap & (1UL << num);
- }
- 
-+/* System capability check for constant caps */
-+static inline bool cpus_have_const_cap(int num)
-+{
-+	if (num >= ARM64_NCAPS)
-+		return false;
-+	return static_branch_unlikely(&cpu_hwcap_keys[num]);
-+}
-+
- static inline bool cpus_have_cap(unsigned int num)
- {
- 	if (num >= ARM64_NCAPS)
- 		return false;
--	if (__builtin_constant_p(num))
--		return static_branch_unlikely(&cpu_hwcap_keys[num]);
--	else
--		return test_bit(num, cpu_hwcaps);
-+	return test_bit(num, cpu_hwcaps);
- }
- 
- static inline void cpus_set_cap(unsigned int num)
-@@ -200,7 +205,7 @@ static inline bool cpu_supports_mixed_endian_el0(void)
- 
- static inline bool system_supports_32bit_el0(void)
- {
--	return cpus_have_cap(ARM64_HAS_32BIT_EL0);
-+	return cpus_have_const_cap(ARM64_HAS_32BIT_EL0);
- }
- 
- static inline bool system_supports_mixed_endian_el0(void)
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index c02504e..fc2bd19 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1102,5 +1102,5 @@ void __init setup_cpu_features(void)
- static bool __maybe_unused
- cpufeature_pan_not_uao(const struct arm64_cpu_capabilities *entry, int __unused)
- {
--	return (cpus_have_cap(ARM64_HAS_PAN) && !cpus_have_cap(ARM64_HAS_UAO));
-+	return (cpus_have_const_cap(ARM64_HAS_PAN) && !cpus_have_const_cap(ARM64_HAS_UAO));
- }
-diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-index 01753cd..18354f3 100644
---- a/arch/arm64/kernel/process.c
-+++ b/arch/arm64/kernel/process.c
-@@ -282,7 +282,7 @@ int copy_thread(unsigned long clone_flags, unsigned long stack_start,
- 		memset(childregs, 0, sizeof(struct pt_regs));
- 		childregs->pstate = PSR_MODE_EL1h;
- 		if (IS_ENABLED(CONFIG_ARM64_UAO) &&
--		    cpus_have_cap(ARM64_HAS_UAO))
-+		    cpus_have_const_cap(ARM64_HAS_UAO))
- 			childregs->pstate |= PSR_UAO_BIT;
- 		p->thread.cpu_context.x19 = stack_start;
- 		p->thread.cpu_context.x20 = stk_sz;
-diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-index 19d642e..26e1d7f 100644
---- a/drivers/irqchip/irq-gic-v3.c
-+++ b/drivers/irqchip/irq-gic-v3.c
-@@ -120,11 +120,10 @@ static void gic_redist_wait_for_rwp(void)
- }
- 
- #ifdef CONFIG_ARM64
--static DEFINE_STATIC_KEY_FALSE(is_cavium_thunderx);
- 
- static u64 __maybe_unused gic_read_iar(void)
- {
--	if (static_branch_unlikely(&is_cavium_thunderx))
-+	if (cpus_have_const_cap(ARM64_WORKAROUND_CAVIUM_23154))
- 		return gic_read_iar_cavium_thunderx();
- 	else
- 		return gic_read_iar_common();
-@@ -905,14 +904,6 @@ static const struct irq_domain_ops partition_domain_ops = {
- 	.select = gic_irq_domain_select,
- };
- 
--static void gicv3_enable_quirks(void)
--{
--#ifdef CONFIG_ARM64
--	if (cpus_have_cap(ARM64_WORKAROUND_CAVIUM_23154))
--		static_branch_enable(&is_cavium_thunderx);
--#endif
--}
--
- static int __init gic_init_bases(void __iomem *dist_base,
- 				 struct redist_region *rdist_regs,
- 				 u32 nr_redist_regions,
-@@ -935,8 +926,6 @@ static int __init gic_init_bases(void __iomem *dist_base,
- 	gic_data.nr_redist_regions = nr_redist_regions;
- 	gic_data.redist_stride = redist_stride;
- 
--	gicv3_enable_quirks();
--
- 	/*
- 	 * Find out how many interrupts are supported.
- 	 * The GIC only supports up to 1020 interrupt sources (SGI+PPI+SPI)
--- 
-2.7.4
+> Hi,
+>
+> This is the fourth posting of this series. The biggest change compared
+> to previous vesion is the addition of support for ARM hosts. With the
+> addition of ARM support, the patchset is now more complete. Prior
+> versions can be found at [0][1][2].
+>
+> I would particularly appreciate feedback from maintainers on the
+> approach to tie the control of TLB monitoring with perf trace events
+> (Patch 3 and 4) especially if there are any suggestions on avoiding
+> (or reducing) the overhead of "perf trace" notifications.
+>
+> I looked at using regfunc/unregfunc tracepoint hooks but they don't
+> include the event context. But the bigger problem was that the
+> callbacks are only called on the first instance of simultaneously
+> executing perf stat invocations.
+
+I had a chance to discuss this patchset with SteveR and PeterZ at LPC
+and both don't like the idea of introducing notifications on perf trace
+event [un]registration.
+
+Peter suggested using the PMU interface to expose this functionality. As
+we want to monitor TLB instructions for for each VM, this will require
+creating a PMU per-VM. The PMU events can be extended in the future if
+monitoring of additional operations is supported and required.
+
+I'll post the next version with the above changes - please chime-in if
+you disagrees with this approach.
+
+Thanks,
+Punit
+
+>
+> Changelog and previous cover-letter follows.
+>
+> Changes:
+>
+> v1 -> v2
+>
+> * New (Patch 6) - Add support for trapping and emulating TLB
+>   operations to ARM hosts
+> * Move common code to handle perf trace notifications to virt/kvm/arm
+> * Move tracepoint to include/trace/events/kvm.h
+> * Drop patch to introduce __tlbi helper as it is now merged
+> * Reorder patches
+>
+> RFC v2 -> v1
+> * Dropped the RFC tag
+> * Patch 2 - Use VM thread group id for identification
+> * Patch 4 - Update comment for clarity
+> * Patch 6 - Add comment explaining switch to hype-role when VHE is enabled
+> * Patch 7 - Add comment to clarify struct kvm_trace_hook
+>
+> RFC -> RFC v2
+> * Patch 4 - Rename left-over TLBI macro to __TLBI
+> * Patch 6 - Replace individual TLB operation emulation with
+>   invalidating all stage 1 TLB for the VM. TLB monitoring is expected
+>   to be a debug feature and performance is not critical.
+>
+> Although there are no PMU events to monitor TLB operations, ARMv8
+> supports trapping guest TLB maintenance operations to the
+> hypervisor. This trapping mechanism can be used to monitor the use of
+> guest TLB instructions.
+>
+> As taking a trap for every TLB operation can have significant
+> overhead, trapping should only be enabled -
+>
+> * on user request
+> * for the VM of interest
+>
+> This patchset adds support to listen to perf trace event state change
+> notifications. The notifications and associated context are then used
+> to enable trapping of guest TLB operations when requested by the
+> user. The trap handling generates trace events (kvm_tlb_invalidate)
+> which can already be counted using existing perf trace functionality.
+>
+> With this patchset, 'perf' tool when attached to a VM process can be
+> used to monitor the TLB operations. E.g., to monitor a VM with process
+> id 4166 -
+>
+> # perf stat -e "kvm:kvm_tlb_invalidate" -p 4166
+>
+> Perform some operations in VM (running 'make -j 7' on the kernel
+> sources in this instance). Breaking out of perf shows -
+>
+> Performance counter stats for process id '4166':
+>
+>          7,471,974      kvm:kvm_tlb_invalidate
+>
+>      374.235405282 seconds time elapsed
+>
+> Thanks,
+> Punit
+>
+> [0] http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1210715.html
+> [1] http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1224353.html
+> [2] https://marc.info/?l=linux-kernel&m=147376184208258&w=2
+>
+> Mark Rutland (1):
+>   arm64/kvm: hyp: tlb: use __tlbi() helper
+>
+> Punit Agrawal (7):
+>   KVM: Track the pid of the VM process
+>   perf/trace: Add notification for perf trace events
+>   KVM: arm/arm64: Register perf trace event notifier
+>   KVM: Add event to trace tlb invalidations
+>   arm: KVM: Handle trappable TLB instructions
+>   arm64: KVM: Handle trappable TLB instructions
+>   KVM: arm/arm64: Enable selective trapping of TLB instructions
+>
+>  arch/arm/include/asm/kvm_asm.h    |   1 +
+>  arch/arm/include/asm/kvm_host.h   |   8 ++
+>  arch/arm/kvm/Kconfig              |   4 +
+>  arch/arm/kvm/Makefile             |   1 +
+>  arch/arm/kvm/arm.c                |   2 +
+>  arch/arm/kvm/coproc.c             |  55 ++++++++++++++
+>  arch/arm/kvm/hyp/tlb.c            |  33 ++++++++
+>  arch/arm64/include/asm/kvm_asm.h  |   1 +
+>  arch/arm64/include/asm/kvm_host.h |   8 ++
+>  arch/arm64/kvm/Kconfig            |   4 +
+>  arch/arm64/kvm/Makefile           |   1 +
+>  arch/arm64/kvm/hyp/tlb.c          |  87 +++++++++++++++++++--
+>  arch/arm64/kvm/sys_regs.c         |  81 ++++++++++++++++++++
+>  include/linux/kvm_host.h          |   1 +
+>  include/linux/trace_events.h      |   3 +
+>  include/trace/events/kvm.h        |  17 +++++
+>  kernel/trace/trace_event_perf.c   |  24 ++++++
+>  virt/kvm/arm/perf_trace.c         | 154 ++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/kvm_main.c               |   2 +
+>  19 files changed, 481 insertions(+), 6 deletions(-)
+>  create mode 100644 virt/kvm/arm/perf_trace.c
