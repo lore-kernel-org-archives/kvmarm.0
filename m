@@ -1,101 +1,69 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [kvm-unit-tests PATCH v4 03/11] arm/arm64: smp: support more than
- 8 cpus
-Date: Wed, 9 Nov 2016 12:01:42 +0000
-Message-ID: <33e2c904-cea1-6d21-4be9-b3fbd037c563@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v4 06/11] arm/arm64: add
+ initial gicv2 support
+Date: Wed, 9 Nov 2016 13:06:21 +0100
+Message-ID: <20161109120621.yqombz6gdemyhm4c@kamzik.brq.redhat.com>
 References: <1478636499-14339-1-git-send-email-drjones@redhat.com>
- <1478636499-14339-4-git-send-email-drjones@redhat.com>
- <f5509dd7-594b-04c8-20b0-2986fe1bcc41@arm.com>
- <20161109115732.hpiaiigtgfgnrybt@kamzik.brq.redhat.com>
+ <1478636499-14339-7-git-send-email-drjones@redhat.com>
+ <4d741c3b-a4b4-39e5-232e-99ba9f19dd65@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBF824025C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2016 07:00:55 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8-9Uxxj9u5HJ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Nov 2016 07:00:54 -0500 (EST)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E46A401C7
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2016 07:00:52 -0500 (EST)
-In-Reply-To: <20161109115732.hpiaiigtgfgnrybt@kamzik.brq.redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <4d741c3b-a4b4-39e5-232e-99ba9f19dd65@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Wed, Nov 09, 2016 at 11:53:39AM +0000, Andre Przywara wrote:
+[...]
+> > diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> > new file mode 100644
+> > index 000000000000..ec92f1064dc0
+> > --- /dev/null
+> > +++ b/lib/arm/asm/gic.h
+> > @@ -0,0 +1,44 @@
+> > +/*
+> > + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#ifndef _ASMARM_GIC_H_
+> > +#define _ASMARM_GIC_H_
+> > +
+> > +#include <asm/gic-v2.h>
+> > +
+> > +#define GIC_CPU_CTRL			0x00
+> > +#define GIC_CPU_PRIMASK			0x04
+> > +
+> > +#define GICC_ENABLE			0x1
+> > +#define GICC_INT_PRI_THRESHOLD		0xf0
+> > +
+> > +#define GIC_DIST_CTRL			0x000
+> > +#define GIC_DIST_CTR			0x004
+> 
+> I think we shouldn't copy this old name here, which stems from pre-GICv2
+> times (PL390?), IIUC. Both GIC specs talk of TYPER here.
+> 
+> Also if we now use the same defines for both the GICv2 and GICv3
+> distributor, we should really stick with the (modern) spec naming, which
+> is GICD_CTRL, GICD_TYPER and so on. Same for the CPU interface (GICC_CTRL).
+> In the kernel these names are used for GICv3, but we didn't bother to
+> adjust the existing GICv2 names to avoid pointless churn.
+> Also that would line up with the bit field defines below.
+>
 
-On 09/11/16 11:57, Andrew Jones wrote:
-> On Wed, Nov 09, 2016 at 11:12:03AM +0000, Andre Przywara wrote:
-> [...]
->>> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
->>> index 7e7b39f11dde..b6e2d5815e72 100644
->>> --- a/lib/arm/setup.c
->>> +++ b/lib/arm/setup.c
->>> @@ -24,12 +24,22 @@ extern unsigned long stacktop;
->>>  extern void io_init(void);
->>>  extern void setup_args_progname(const char *args);
->>>  
->>> -u32 cpus[NR_CPUS] = { [0 ... NR_CPUS-1] = (~0U) };
->>> +u64 cpus[NR_CPUS] = { [0 ... NR_CPUS-1] = (~0U) };
->>
->> This should be ~0UL.
-> 
-> Indeed. Thanks.
-> 
->> Also I think the type should be unsigned long to match the types used
->> everywhere else.
-> 
-> I'll change mpidr_to_cpu to return u64 instead of unsigned long.
+Yeah, I noticed the CTR vs. TYPER naming weirdness. I considered
+exclusively defining the gicv3/modern/better name, but wasn't sure
+I should deviate from the kernel names. Keeping the names consistent
+is nice for grepping kernel sources, which needs to be done when a
+test fails and we want to find the bug.
 
-I am not sure this is the right direction. unsigned long is really the
-natural type for MPIDR, since this is a system register with exactly the
-native register size.
-I think we use it this way in the kernel.
+I'd personally prefer "pointless" churn in the kernel to get it
+straightened out there. If it ever is, then I'd obviously update
+this code too. Until then, I think maintaining easy greppability
+is the better choice.
 
-Cheers,
-Andre
-
-> Actually I think Alex suggested that. I'm not sure why I haven't
-> done it...
-> 
->>
->>>  int nr_cpus;
->>>  
->>>  struct mem_region mem_regions[NR_MEM_REGIONS];
->>>  phys_addr_t __phys_offset, __phys_end;
->>>  
->>> +int mpidr_to_cpu(unsigned long mpidr)
->>> +{
->>> +	int i;
->>> +
->>> +	for (i = 0; i < nr_cpus; ++i)
->>> +		if (cpus[i] == (mpidr & MPIDR_HWID_BITMASK))
->>> +			return i;
->>> +	return -1;
->>> +}
->>> +
->>>  static void cpu_set(int fdtnode __unused, u32 regval, void *info __unused)
->>
->> I guess this needs to be extended as well, including
->> dt_for_each_cpu_node() to cope with 64-bit reg properties in the CPU
->> node (where the upper word is not 0).
->> But this is not really crucial atm, so can be fixed in a follow-up patch.
-> 
-> Yeah, I'll do it as a followup series, because it'll affect powerpc too.
-> 
-> drew
-> 
+Thanks,
+drew
