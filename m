@@ -1,54 +1,46 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [kvm-unit-tests PATCH v4 08/11] libcflat: add IS_ALIGNED() macro,
- and page sizes
-Date: Wed, 9 Nov 2016 14:59:44 +0000
-Message-ID: <fc87f8e4-7746-734d-49e1-a3294c493920@arm.com>
+From: Peter Xu <peterx@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v4 08/11] libcflat: add IS_ALIGNED()
+ macro, and page sizes
+Date: Wed, 9 Nov 2016 10:07:05 -0500
+Message-ID: <20161109150705.GA3762@pxdev.xzpeter.org>
 References: <1478636499-14339-1-git-send-email-drjones@redhat.com>
  <1478636499-14339-9-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36E3D4029B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2016 10:06:49 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2STXnyzDJHfq for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Nov 2016 10:06:48 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7160540293
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2016 10:06:46 -0500 (EST)
+Content-Disposition: inline
 In-Reply-To: <1478636499-14339-9-git-send-email-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: pbonzini@redhat.com, peter.maydell@linaro.org, alex.bennee@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, christoffer.dall@linaro.org, Peter Xu <peterx@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 08/11/16 20:21, Andrew Jones wrote:
+On Tue, Nov 08, 2016 at 09:21:36PM +0100, Andrew Jones wrote:
 > From: Peter Xu <peterx@redhat.com>
 > 
 > These macros will be useful to do page alignment checks.
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre.
-
+> 
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 > [drew: also added SZ_64K]
 > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  lib/libcflat.h | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/lib/libcflat.h b/lib/libcflat.h
-> index 82005f5d014f..143fc53061fe 100644
-> --- a/lib/libcflat.h
-> +++ b/lib/libcflat.h
-> @@ -33,6 +33,12 @@
->  #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
->  #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
->  #define ALIGN(x, a)		__ALIGN((x), (a))
-> +#define IS_ALIGNED(x, a)	(((x) & ((typeof(x))(a) - 1)) == 0)
-> +
-> +#define SZ_4K			(0x1000)
-> +#define SZ_64K			(0x10000)
-> +#define SZ_2M			(0x200000)
-> +#define SZ_1G			(0x40000000)
->  
->  typedef uint8_t		u8;
->  typedef int8_t		s8;
-> 
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
