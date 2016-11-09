@@ -1,50 +1,53 @@
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Subject: [PATCH] arm/arm64: KVM: clean up useless code in kvm_timer_enable
-Date: Wed, 9 Nov 2016 10:50:14 +0800
-Message-ID: <1478659814-364872-1-git-send-email-longpeng2@huawei.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v4 10/11] arm/arm64: gicv3: add an IPI test
+Date: Wed, 9 Nov 2016 09:33:49 +0100
+Message-ID: <20161109083349.fhomosnrnj7wkmm7@kamzik.brq.redhat.com>
+References: <1478636499-14339-1-git-send-email-drjones@redhat.com>
+ <1478636499-14339-11-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1478636499-14339-11-git-send-email-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: pbonzini@redhat.com, rkrcmar@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, zhaoshenglong@huawei.com, wu.wubin@huawei.com, "Longpeng(Mike)" <longpeng2@huawei.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: pbonzini@redhat.com, andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-1) Since commit:41a54482 changed timer enabled variable to per-vcpu,
-   the correlative comment in kvm_timer_enable is useless now.
 
-2) After the kvm module init successfully, the timecounter is always
-   non-null, so we can remove the checking of timercounter.
+Argh. I forgot to compile/test arm32/gicv3... Just did now and found
+a copy+paste error.
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
----
- virt/kvm/arm/arch_timer.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
+On Tue, Nov 08, 2016 at 09:21:38PM +0100, Andrew Jones wrote:
+[...]
+> diff --git a/lib/arm/asm/arch_gicv3.h b/lib/arm/asm/arch_gicv3.h
+> index 81a1e5f6c29c..cbcec024a2a6 100644
+> --- a/lib/arm/asm/arch_gicv3.h
+> +++ b/lib/arm/asm/arch_gicv3.h
+> @@ -16,10 +16,28 @@
+>  #define __stringify xstr
+>  
+>  #define __ACCESS_CP15(CRn, Op1, CRm, Op2)	p15, Op1, %0, CRn, CRm, Op2
+> +#define __ACCESS_CP15_64(Op1, CRm)		p15, Op1, %Q0, %R0, CRm
+>  
+> +#define ICC_EOIR1			__ACCESS_CP15(c12, 0, c12, 1)
+> +#define ICC_IAR1			__ACCESS_CP15(c12, 0, c12, 0)
+> +#define ICC_SGI1R			__ACCESS_CP15_64(0, c12)
+>  #define ICC_PMR				__ACCESS_CP15(c4, 0, c6, 0)
+>  #define ICC_IGRPEN1			__ACCESS_CP15(c12, 0, c12, 7)
+>  
+> +static inline void gicv3_write_eoir(u32 irq)
+> +{
+> +	asm volatile("mcr " __stringify(ICC_EOIR1) : : "r" (val));
+                                              should be irq ^^
+> +	isb();
+> +}
+> +
+[...]
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 27a1f63..17b8fa5 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -498,17 +498,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 	if (ret)
- 		return ret;
- 
--
--	/*
--	 * There is a potential race here between VCPUs starting for the first
--	 * time, which may be enabling the timer multiple times.  That doesn't
--	 * hurt though, because we're just setting a variable to the same
--	 * variable that it already was.  The important thing is that all
--	 * VCPUs have the enabled variable set, before entering the guest, if
--	 * the arch timers are enabled.
--	 */
--	if (timecounter)
--		timer->enabled = 1;
-+	timer->enabled = 1;
- 
- 	return 0;
- }
--- 
-1.8.3.1
+I've pushed an arm/gic-v5 branch[*] to github, and removed the broken
+arm/gic-v4 branch.
 
+[*] https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic-v5
 
+drew
