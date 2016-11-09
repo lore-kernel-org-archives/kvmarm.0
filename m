@@ -1,366 +1,85 @@
 From: Wei Huang <wei@redhat.com>
-Subject: [PATCH 1/2] arm64: perf: Move ARMv8 PMU perf event definitions to asm/perf_event.h
-Date: Wed,  9 Nov 2016 13:57:59 -0600
-Message-ID: <1478721480-24852-1-git-send-email-wei@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Subject: [PATCH 2/2] KVM: ARM64: Fix the issues when guest PMCCFILTR is
+ configured
+Date: Wed,  9 Nov 2016 13:58:00 -0600
+Message-ID: <1478721480-24852-2-git-send-email-wei@redhat.com>
+References: <1478721480-24852-1-git-send-email-wei@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A58C4401B9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2016 14:57:44 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 9q3tcF9USj82 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Nov 2016 14:57:43 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C711440448
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2016 14:57:43 -0500 (EST)
+In-Reply-To: <1478721480-24852-1-git-send-email-wei@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, cov@codeaurora.org, will.deacon@arm.com, mark.rutland@arm.com, catalin.marinas@arm.com, linux-kernel@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch moves ARMv8-related perf event definitions from perf_event.c
-to asm/perf_event.h; so KVM code can use them directly. This also help
-remove a duplicated definition of SW_INCR in perf_event.h.
+KVM calls kvm_pmu_set_counter_event_type() when PMCCFILTR is configured.
+But this function can't deals with PMCCFILTR correctly because the evtCount
+bit of PMCCFILTR, which is reserved 0, conflits with the SW_INCR event
+type of other PMXEVTYPER<n> registers. To fix it, when eventsel == 0, this
+function shouldn't return immediately; instead it needs to check further
+if select_idx is ARMV8_PMU_CYCLE_IDX.
+
+Another issue is that KVM shouldn't copy the eventsel bits of PMCCFILTER
+blindly to attr.config. Instead it ought to convert the request to the
+"cpu cycle" event type (i.e. 0x11).
 
 Signed-off-by: Wei Huang <wei@redhat.com>
 ---
- arch/arm64/include/asm/perf_event.h | 161 +++++++++++++++++++++++++++++++++++-
- arch/arm64/kernel/perf_event.c      | 161 ------------------------------------
- 2 files changed, 160 insertions(+), 162 deletions(-)
+ virt/kvm/arm/pmu.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
-index 2065f46..6c7b18b 100644
---- a/arch/arm64/include/asm/perf_event.h
-+++ b/arch/arm64/include/asm/perf_event.h
-@@ -46,7 +46,166 @@
- #define	ARMV8_PMU_EVTYPE_MASK	0xc800ffff	/* Mask for writable bits */
- #define	ARMV8_PMU_EVTYPE_EVENT	0xffff		/* Mask for EVENT bits */
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 6e9c40e..69ccce3 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -305,7 +305,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+ 			continue;
+ 		type = vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i)
+ 		       & ARMV8_PMU_EVTYPE_EVENT;
+-		if ((type == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
++		if ((type == ARMV8_PMUV3_PERFCTR_SW_INCR)
+ 		    && (enable & BIT(i))) {
+ 			reg = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
+ 			reg = lower_32_bits(reg);
+@@ -379,7 +379,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
  
--#define ARMV8_PMU_EVTYPE_EVENT_SW_INCR	0	/* Software increment event */
-+/*
-+ * ARMv8 PMUv3 Performance Events handling code.
-+ * Common event types.
-+ */
-+
-+/* Required events. */
-+#define ARMV8_PMUV3_PERFCTR_SW_INCR				0x00
-+#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_REFILL			0x03
-+#define ARMV8_PMUV3_PERFCTR_L1D_CACHE				0x04
-+#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED				0x10
-+#define ARMV8_PMUV3_PERFCTR_CPU_CYCLES				0x11
-+#define ARMV8_PMUV3_PERFCTR_BR_PRED				0x12
-+
-+/* At least one of the following is required. */
-+#define ARMV8_PMUV3_PERFCTR_INST_RETIRED			0x08
-+#define ARMV8_PMUV3_PERFCTR_INST_SPEC				0x1B
-+
-+/* Common architectural events. */
-+#define ARMV8_PMUV3_PERFCTR_LD_RETIRED				0x06
-+#define ARMV8_PMUV3_PERFCTR_ST_RETIRED				0x07
-+#define ARMV8_PMUV3_PERFCTR_EXC_TAKEN				0x09
-+#define ARMV8_PMUV3_PERFCTR_EXC_RETURN				0x0A
-+#define ARMV8_PMUV3_PERFCTR_CID_WRITE_RETIRED			0x0B
-+#define ARMV8_PMUV3_PERFCTR_PC_WRITE_RETIRED			0x0C
-+#define ARMV8_PMUV3_PERFCTR_BR_IMMED_RETIRED			0x0D
-+#define ARMV8_PMUV3_PERFCTR_BR_RETURN_RETIRED			0x0E
-+#define ARMV8_PMUV3_PERFCTR_UNALIGNED_LDST_RETIRED		0x0F
-+#define ARMV8_PMUV3_PERFCTR_TTBR_WRITE_RETIRED			0x1C
-+#define ARMV8_PMUV3_PERFCTR_CHAIN				0x1E
-+#define ARMV8_PMUV3_PERFCTR_BR_RETIRED				0x21
-+
-+/* Common microarchitectural events. */
-+#define ARMV8_PMUV3_PERFCTR_L1I_CACHE_REFILL			0x01
-+#define ARMV8_PMUV3_PERFCTR_L1I_TLB_REFILL			0x02
-+#define ARMV8_PMUV3_PERFCTR_L1D_TLB_REFILL			0x05
-+#define ARMV8_PMUV3_PERFCTR_MEM_ACCESS				0x13
-+#define ARMV8_PMUV3_PERFCTR_L1I_CACHE				0x14
-+#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_WB			0x15
-+#define ARMV8_PMUV3_PERFCTR_L2D_CACHE				0x16
-+#define ARMV8_PMUV3_PERFCTR_L2D_CACHE_REFILL			0x17
-+#define ARMV8_PMUV3_PERFCTR_L2D_CACHE_WB			0x18
-+#define ARMV8_PMUV3_PERFCTR_BUS_ACCESS				0x19
-+#define ARMV8_PMUV3_PERFCTR_MEMORY_ERROR			0x1A
-+#define ARMV8_PMUV3_PERFCTR_BUS_CYCLES				0x1D
-+#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_ALLOCATE			0x1F
-+#define ARMV8_PMUV3_PERFCTR_L2D_CACHE_ALLOCATE			0x20
-+#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED_RETIRED			0x22
-+#define ARMV8_PMUV3_PERFCTR_STALL_FRONTEND			0x23
-+#define ARMV8_PMUV3_PERFCTR_STALL_BACKEND			0x24
-+#define ARMV8_PMUV3_PERFCTR_L1D_TLB				0x25
-+#define ARMV8_PMUV3_PERFCTR_L1I_TLB				0x26
-+#define ARMV8_PMUV3_PERFCTR_L2I_CACHE				0x27
-+#define ARMV8_PMUV3_PERFCTR_L2I_CACHE_REFILL			0x28
-+#define ARMV8_PMUV3_PERFCTR_L3D_CACHE_ALLOCATE			0x29
-+#define ARMV8_PMUV3_PERFCTR_L3D_CACHE_REFILL			0x2A
-+#define ARMV8_PMUV3_PERFCTR_L3D_CACHE				0x2B
-+#define ARMV8_PMUV3_PERFCTR_L3D_CACHE_WB			0x2C
-+#define ARMV8_PMUV3_PERFCTR_L2D_TLB_REFILL			0x2D
-+#define ARMV8_PMUV3_PERFCTR_L2I_TLB_REFILL			0x2E
-+#define ARMV8_PMUV3_PERFCTR_L2D_TLB				0x2F
-+#define ARMV8_PMUV3_PERFCTR_L2I_TLB				0x30
-+
-+/* ARMv8 recommended implementation defined event types */
-+#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_RD			0x40
-+#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR			0x41
-+#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_RD		0x42
-+#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR		0x43
-+#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_INNER		0x44
-+#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_OUTER		0x45
-+#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WB_VICTIM		0x46
-+#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WB_CLEAN			0x47
-+#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_INVAL			0x48
-+
-+#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD			0x4C
-+#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR			0x4D
-+#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD				0x4E
-+#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR				0x4F
-+#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_RD			0x50
-+#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_WR			0x51
-+#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_REFILL_RD		0x52
-+#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_REFILL_WR		0x53
-+
-+#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_WB_VICTIM		0x56
-+#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_WB_CLEAN			0x57
-+#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_INVAL			0x58
-+
-+#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_REFILL_RD			0x5C
-+#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_REFILL_WR			0x5D
-+#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_RD				0x5E
-+#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_WR				0x5F
-+
-+#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD			0x60
-+#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR			0x61
-+#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_SHARED			0x62
-+#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_NOT_SHARED		0x63
-+#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_NORMAL			0x64
-+#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_PERIPH			0x65
-+
-+#define ARMV8_IMPDEF_PERFCTR_MEM_ACCESS_RD			0x66
-+#define ARMV8_IMPDEF_PERFCTR_MEM_ACCESS_WR			0x67
-+#define ARMV8_IMPDEF_PERFCTR_UNALIGNED_LD_SPEC			0x68
-+#define ARMV8_IMPDEF_PERFCTR_UNALIGNED_ST_SPEC			0x69
-+#define ARMV8_IMPDEF_PERFCTR_UNALIGNED_LDST_SPEC		0x6A
-+
-+#define ARMV8_IMPDEF_PERFCTR_LDREX_SPEC				0x6C
-+#define ARMV8_IMPDEF_PERFCTR_STREX_PASS_SPEC			0x6D
-+#define ARMV8_IMPDEF_PERFCTR_STREX_FAIL_SPEC			0x6E
-+#define ARMV8_IMPDEF_PERFCTR_STREX_SPEC				0x6F
-+#define ARMV8_IMPDEF_PERFCTR_LD_SPEC				0x70
-+#define ARMV8_IMPDEF_PERFCTR_ST_SPEC				0x71
-+#define ARMV8_IMPDEF_PERFCTR_LDST_SPEC				0x72
-+#define ARMV8_IMPDEF_PERFCTR_DP_SPEC				0x73
-+#define ARMV8_IMPDEF_PERFCTR_ASE_SPEC				0x74
-+#define ARMV8_IMPDEF_PERFCTR_VFP_SPEC				0x75
-+#define ARMV8_IMPDEF_PERFCTR_PC_WRITE_SPEC			0x76
-+#define ARMV8_IMPDEF_PERFCTR_CRYPTO_SPEC			0x77
-+#define ARMV8_IMPDEF_PERFCTR_BR_IMMED_SPEC			0x78
-+#define ARMV8_IMPDEF_PERFCTR_BR_RETURN_SPEC			0x79
-+#define ARMV8_IMPDEF_PERFCTR_BR_INDIRECT_SPEC			0x7A
-+
-+#define ARMV8_IMPDEF_PERFCTR_ISB_SPEC				0x7C
-+#define ARMV8_IMPDEF_PERFCTR_DSB_SPEC				0x7D
-+#define ARMV8_IMPDEF_PERFCTR_DMB_SPEC				0x7E
-+
-+#define ARMV8_IMPDEF_PERFCTR_EXC_UNDEF				0x81
-+#define ARMV8_IMPDEF_PERFCTR_EXC_SVC				0x82
-+#define ARMV8_IMPDEF_PERFCTR_EXC_PABORT				0x83
-+#define ARMV8_IMPDEF_PERFCTR_EXC_DABORT				0x84
-+
-+#define ARMV8_IMPDEF_PERFCTR_EXC_IRQ				0x86
-+#define ARMV8_IMPDEF_PERFCTR_EXC_FIQ				0x87
-+#define ARMV8_IMPDEF_PERFCTR_EXC_SMC				0x88
-+
-+#define ARMV8_IMPDEF_PERFCTR_EXC_HVC				0x8A
-+#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_PABORT			0x8B
-+#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_DABORT			0x8C
-+#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_OTHER			0x8D
-+#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_IRQ			0x8E
-+#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_FIQ			0x8F
-+#define ARMV8_IMPDEF_PERFCTR_RC_LD_SPEC				0x90
-+#define ARMV8_IMPDEF_PERFCTR_RC_ST_SPEC				0x91
-+
-+#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_RD			0xA0
-+#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_WR			0xA1
-+#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_REFILL_RD		0xA2
-+#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_REFILL_WR		0xA3
-+
-+#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_WB_VICTIM		0xA6
-+#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_WB_CLEAN			0xA7
-+#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_INVAL			0xA8
-+
-+/* ARMv8 Cortex-A53 specific event types. */
-+#define ARMV8_A53_PERFCTR_PREF_LINEFILL				0xC2
-+
-+/* ARMv8 Cavium ThunderX specific event types. */
-+#define ARMV8_THUNDER_PERFCTR_L1D_CACHE_MISS_ST			0xE9
-+#define ARMV8_THUNDER_PERFCTR_L1D_CACHE_PREF_ACCESS		0xEA
-+#define ARMV8_THUNDER_PERFCTR_L1D_CACHE_PREF_MISS		0xEB
-+#define ARMV8_THUNDER_PERFCTR_L1I_CACHE_PREF_ACCESS		0xEC
-+#define ARMV8_THUNDER_PERFCTR_L1I_CACHE_PREF_MISS		0xED
+ 	/* Software increment event does't need to be backed by a perf event */
+-	if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
++	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR &&
++	    select_idx != ARMV8_PMU_CYCLE_IDX)
+ 		return;
  
- /*
-  * Event filters for PMUv3
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index a9310a6..108ba40 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -29,167 +29,6 @@
- #include <linux/perf/arm_pmu.h>
- #include <linux/platform_device.h>
+ 	memset(&attr, 0, sizeof(struct perf_event_attr));
+@@ -391,7 +392,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
+ 	attr.exclude_hv = 1; /* Don't count EL2 events */
+ 	attr.exclude_host = 1; /* Don't count host events */
+-	attr.config = eventsel;
++	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ?
++		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
  
--/*
-- * ARMv8 PMUv3 Performance Events handling code.
-- * Common event types.
-- */
--
--/* Required events. */
--#define ARMV8_PMUV3_PERFCTR_SW_INCR				0x00
--#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_REFILL			0x03
--#define ARMV8_PMUV3_PERFCTR_L1D_CACHE				0x04
--#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED				0x10
--#define ARMV8_PMUV3_PERFCTR_CPU_CYCLES				0x11
--#define ARMV8_PMUV3_PERFCTR_BR_PRED				0x12
--
--/* At least one of the following is required. */
--#define ARMV8_PMUV3_PERFCTR_INST_RETIRED			0x08
--#define ARMV8_PMUV3_PERFCTR_INST_SPEC				0x1B
--
--/* Common architectural events. */
--#define ARMV8_PMUV3_PERFCTR_LD_RETIRED				0x06
--#define ARMV8_PMUV3_PERFCTR_ST_RETIRED				0x07
--#define ARMV8_PMUV3_PERFCTR_EXC_TAKEN				0x09
--#define ARMV8_PMUV3_PERFCTR_EXC_RETURN				0x0A
--#define ARMV8_PMUV3_PERFCTR_CID_WRITE_RETIRED			0x0B
--#define ARMV8_PMUV3_PERFCTR_PC_WRITE_RETIRED			0x0C
--#define ARMV8_PMUV3_PERFCTR_BR_IMMED_RETIRED			0x0D
--#define ARMV8_PMUV3_PERFCTR_BR_RETURN_RETIRED			0x0E
--#define ARMV8_PMUV3_PERFCTR_UNALIGNED_LDST_RETIRED		0x0F
--#define ARMV8_PMUV3_PERFCTR_TTBR_WRITE_RETIRED			0x1C
--#define ARMV8_PMUV3_PERFCTR_CHAIN				0x1E
--#define ARMV8_PMUV3_PERFCTR_BR_RETIRED				0x21
--
--/* Common microarchitectural events. */
--#define ARMV8_PMUV3_PERFCTR_L1I_CACHE_REFILL			0x01
--#define ARMV8_PMUV3_PERFCTR_L1I_TLB_REFILL			0x02
--#define ARMV8_PMUV3_PERFCTR_L1D_TLB_REFILL			0x05
--#define ARMV8_PMUV3_PERFCTR_MEM_ACCESS				0x13
--#define ARMV8_PMUV3_PERFCTR_L1I_CACHE				0x14
--#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_WB			0x15
--#define ARMV8_PMUV3_PERFCTR_L2D_CACHE				0x16
--#define ARMV8_PMUV3_PERFCTR_L2D_CACHE_REFILL			0x17
--#define ARMV8_PMUV3_PERFCTR_L2D_CACHE_WB			0x18
--#define ARMV8_PMUV3_PERFCTR_BUS_ACCESS				0x19
--#define ARMV8_PMUV3_PERFCTR_MEMORY_ERROR			0x1A
--#define ARMV8_PMUV3_PERFCTR_BUS_CYCLES				0x1D
--#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_ALLOCATE			0x1F
--#define ARMV8_PMUV3_PERFCTR_L2D_CACHE_ALLOCATE			0x20
--#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED_RETIRED			0x22
--#define ARMV8_PMUV3_PERFCTR_STALL_FRONTEND			0x23
--#define ARMV8_PMUV3_PERFCTR_STALL_BACKEND			0x24
--#define ARMV8_PMUV3_PERFCTR_L1D_TLB				0x25
--#define ARMV8_PMUV3_PERFCTR_L1I_TLB				0x26
--#define ARMV8_PMUV3_PERFCTR_L2I_CACHE				0x27
--#define ARMV8_PMUV3_PERFCTR_L2I_CACHE_REFILL			0x28
--#define ARMV8_PMUV3_PERFCTR_L3D_CACHE_ALLOCATE			0x29
--#define ARMV8_PMUV3_PERFCTR_L3D_CACHE_REFILL			0x2A
--#define ARMV8_PMUV3_PERFCTR_L3D_CACHE				0x2B
--#define ARMV8_PMUV3_PERFCTR_L3D_CACHE_WB			0x2C
--#define ARMV8_PMUV3_PERFCTR_L2D_TLB_REFILL			0x2D
--#define ARMV8_PMUV3_PERFCTR_L2I_TLB_REFILL			0x2E
--#define ARMV8_PMUV3_PERFCTR_L2D_TLB				0x2F
--#define ARMV8_PMUV3_PERFCTR_L2I_TLB				0x30
--
--/* ARMv8 recommended implementation defined event types */
--#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_RD			0x40
--#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR			0x41
--#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_RD		0x42
--#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR		0x43
--#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_INNER		0x44
--#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_OUTER		0x45
--#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WB_VICTIM		0x46
--#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WB_CLEAN			0x47
--#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_INVAL			0x48
--
--#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD			0x4C
--#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR			0x4D
--#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD				0x4E
--#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR				0x4F
--#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_RD			0x50
--#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_WR			0x51
--#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_REFILL_RD		0x52
--#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_REFILL_WR		0x53
--
--#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_WB_VICTIM		0x56
--#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_WB_CLEAN			0x57
--#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_INVAL			0x58
--
--#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_REFILL_RD			0x5C
--#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_REFILL_WR			0x5D
--#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_RD				0x5E
--#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_WR				0x5F
--
--#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD			0x60
--#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR			0x61
--#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_SHARED			0x62
--#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_NOT_SHARED		0x63
--#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_NORMAL			0x64
--#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_PERIPH			0x65
--
--#define ARMV8_IMPDEF_PERFCTR_MEM_ACCESS_RD			0x66
--#define ARMV8_IMPDEF_PERFCTR_MEM_ACCESS_WR			0x67
--#define ARMV8_IMPDEF_PERFCTR_UNALIGNED_LD_SPEC			0x68
--#define ARMV8_IMPDEF_PERFCTR_UNALIGNED_ST_SPEC			0x69
--#define ARMV8_IMPDEF_PERFCTR_UNALIGNED_LDST_SPEC		0x6A
--
--#define ARMV8_IMPDEF_PERFCTR_LDREX_SPEC				0x6C
--#define ARMV8_IMPDEF_PERFCTR_STREX_PASS_SPEC			0x6D
--#define ARMV8_IMPDEF_PERFCTR_STREX_FAIL_SPEC			0x6E
--#define ARMV8_IMPDEF_PERFCTR_STREX_SPEC				0x6F
--#define ARMV8_IMPDEF_PERFCTR_LD_SPEC				0x70
--#define ARMV8_IMPDEF_PERFCTR_ST_SPEC				0x71
--#define ARMV8_IMPDEF_PERFCTR_LDST_SPEC				0x72
--#define ARMV8_IMPDEF_PERFCTR_DP_SPEC				0x73
--#define ARMV8_IMPDEF_PERFCTR_ASE_SPEC				0x74
--#define ARMV8_IMPDEF_PERFCTR_VFP_SPEC				0x75
--#define ARMV8_IMPDEF_PERFCTR_PC_WRITE_SPEC			0x76
--#define ARMV8_IMPDEF_PERFCTR_CRYPTO_SPEC			0x77
--#define ARMV8_IMPDEF_PERFCTR_BR_IMMED_SPEC			0x78
--#define ARMV8_IMPDEF_PERFCTR_BR_RETURN_SPEC			0x79
--#define ARMV8_IMPDEF_PERFCTR_BR_INDIRECT_SPEC			0x7A
--
--#define ARMV8_IMPDEF_PERFCTR_ISB_SPEC				0x7C
--#define ARMV8_IMPDEF_PERFCTR_DSB_SPEC				0x7D
--#define ARMV8_IMPDEF_PERFCTR_DMB_SPEC				0x7E
--
--#define ARMV8_IMPDEF_PERFCTR_EXC_UNDEF				0x81
--#define ARMV8_IMPDEF_PERFCTR_EXC_SVC				0x82
--#define ARMV8_IMPDEF_PERFCTR_EXC_PABORT				0x83
--#define ARMV8_IMPDEF_PERFCTR_EXC_DABORT				0x84
--
--#define ARMV8_IMPDEF_PERFCTR_EXC_IRQ				0x86
--#define ARMV8_IMPDEF_PERFCTR_EXC_FIQ				0x87
--#define ARMV8_IMPDEF_PERFCTR_EXC_SMC				0x88
--
--#define ARMV8_IMPDEF_PERFCTR_EXC_HVC				0x8A
--#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_PABORT			0x8B
--#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_DABORT			0x8C
--#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_OTHER			0x8D
--#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_IRQ			0x8E
--#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_FIQ			0x8F
--#define ARMV8_IMPDEF_PERFCTR_RC_LD_SPEC				0x90
--#define ARMV8_IMPDEF_PERFCTR_RC_ST_SPEC				0x91
--
--#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_RD			0xA0
--#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_WR			0xA1
--#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_REFILL_RD		0xA2
--#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_REFILL_WR		0xA3
--
--#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_WB_VICTIM		0xA6
--#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_WB_CLEAN			0xA7
--#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_INVAL			0xA8
--
--/* ARMv8 Cortex-A53 specific event types. */
--#define ARMV8_A53_PERFCTR_PREF_LINEFILL				0xC2
--
--/* ARMv8 Cavium ThunderX specific event types. */
--#define ARMV8_THUNDER_PERFCTR_L1D_CACHE_MISS_ST			0xE9
--#define ARMV8_THUNDER_PERFCTR_L1D_CACHE_PREF_ACCESS		0xEA
--#define ARMV8_THUNDER_PERFCTR_L1D_CACHE_PREF_MISS		0xEB
--#define ARMV8_THUNDER_PERFCTR_L1I_CACHE_PREF_ACCESS		0xEC
--#define ARMV8_THUNDER_PERFCTR_L1I_CACHE_PREF_MISS		0xED
--
- /* PMUv3 HW events mapping. */
- 
- /*
+ 	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+ 	/* The initial sample period (overflow count) of an event. */
 -- 
 2.7.4
