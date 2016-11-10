@@ -1,22 +1,23 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v4 04/11] arm/arm64: add some delay routines
-Date: Thu, 10 Nov 2016 17:07:57 +0100
-Message-ID: <1478794084-5273-5-git-send-email-drjones@redhat.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [kvm-unit-tests PATCH v4 00/11] arm/arm64: add gic framework
+Date: Thu, 10 Nov 2016 16:52:30 +0000
+Message-ID: <77355b5b-9e26-16f9-4243-e11ef4d4c8ce@arm.com>
 References: <1478794084-5273-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E03FA404F1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 11:07:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B7F64042E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 11:51:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JKm4p8SI1g7l for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2016 11:07:57 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5A64F4053F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 11:07:56 -0500 (EST)
+ with ESMTP id dkrP1hLVeqgC for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Nov 2016 11:51:34 -0500 (EST)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DF64400E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 11:51:33 -0500 (EST)
 In-Reply-To: <1478794084-5273-1-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -27,75 +28,136 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
+To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: marc.zyngier@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-QWxsb3cgYSB0aHJlYWQgdG8gd2FpdCBzb21lIHNwZWNpZmllZCBhbW91bnQgb2YgdGltZS4gQ2Fu
-CnNwZWNpZnkgaW4gY3ljbGVzLCB1c2VjcywgYW5kIG1zZWNzLgoKUmV2aWV3ZWQtYnk6IEFsZXgg
-QmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KUmV2aWV3ZWQtYnk6IEVyaWMgQXVnZXIg
-PGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KU2lnbmVkLW9mZi1ieTogQW5kcmV3IEpvbmVzIDxkcmpv
-bmVzQHJlZGhhdC5jb20+Ci0tLQogbGliL2FybS9hc20vcHJvY2Vzc29yLmggICB8IDE5ICsrKysr
-KysrKysrKysrKysrKysKIGxpYi9hcm0vcHJvY2Vzc29yLmMgICAgICAgfCAxNSArKysrKysrKysr
-KysrKysKIGxpYi9hcm02NC9hc20vcHJvY2Vzc29yLmggfCAxOSArKysrKysrKysrKysrKysrKysr
-CiBsaWIvYXJtNjQvcHJvY2Vzc29yLmMgICAgIHwgMTUgKysrKysrKysrKysrKysrCiA0IGZpbGVz
-IGNoYW5nZWQsIDY4IGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9saWIvYXJtL2FzbS9wcm9j
-ZXNzb3IuaCBiL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oCmluZGV4IGQyMDQ4ZjVmNWY3ZS4uYWZj
-OTAzY2E3ZDRhIDEwMDY0NAotLS0gYS9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaAorKysgYi9saWIv
-YXJtL2FzbS9wcm9jZXNzb3IuaApAQCAtNSw3ICs1LDkgQEAKICAqCiAgKiBUaGlzIHdvcmsgaXMg
-bGljZW5zZWQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZSBHTlUgTEdQTCwgdmVyc2lvbiAyLgogICov
-CisjaW5jbHVkZSA8bGliY2ZsYXQuaD4KICNpbmNsdWRlIDxhc20vcHRyYWNlLmg+CisjaW5jbHVk
-ZSA8YXNtL2JhcnJpZXIuaD4KIAogZW51bSB2ZWN0b3IgewogCUVYQ1BUTl9SU1QsCkBAIC01MSw0
-ICs1MywyMSBAQCBleHRlcm4gaW50IG1waWRyX3RvX2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsK
-IGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgqZnVuYykodm9pZCAqYXJnKSwgdm9pZCAqYXJn
-LCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7CiBleHRlcm4gYm9vbCBpc191c2VyKHZvaWQpOwogCitz
-dGF0aWMgaW5saW5lIHU2NCBnZXRfY250dmN0KHZvaWQpCit7CisJdTY0IHZjdDsKKwlpc2IoKTsK
-Kwlhc20gdm9sYXRpbGUoIm1ycmMgcDE1LCAxLCAlUTAsICVSMCwgYzE0IiA6ICI9ciIgKHZjdCkp
-OworCXJldHVybiB2Y3Q7Cit9CisKK2V4dGVybiB2b2lkIGRlbGF5KHU2NCBjeWNsZXMpOworZXh0
-ZXJuIHZvaWQgdWRlbGF5KHVuc2lnbmVkIGxvbmcgdXNlY3MpOworCitzdGF0aWMgaW5saW5lIHZv
-aWQgbWRlbGF5KHVuc2lnbmVkIGxvbmcgbXNlY3MpCit7CisJd2hpbGUgKG1zZWNzLS0pCisJCXVk
-ZWxheSgxMDAwKTsKK30KKwogI2VuZGlmIC8qIF9BU01BUk1fUFJPQ0VTU09SX0hfICovCmRpZmYg
-LS1naXQgYS9saWIvYXJtL3Byb2Nlc3Nvci5jIGIvbGliL2FybS9wcm9jZXNzb3IuYwppbmRleCA1
-NGZkYjg3ZWYwMTkuLmMyZWUzNjBkZjY4OCAxMDA2NDQKLS0tIGEvbGliL2FybS9wcm9jZXNzb3Iu
-YworKysgYi9saWIvYXJtL3Byb2Nlc3Nvci5jCkBAIC05LDYgKzksNyBAQAogI2luY2x1ZGUgPGFz
-bS9wdHJhY2UuaD4KICNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+CiAjaW5jbHVkZSA8YXNtL3Ro
-cmVhZF9pbmZvLmg+CisjaW5jbHVkZSA8YXNtL2JhcnJpZXIuaD4KIAogc3RhdGljIGNvbnN0IGNo
-YXIgKnByb2Nlc3Nvcl9tb2Rlc1tdID0gewogCSJVU0VSXzI2IiwgIkZJUV8yNiIgLCAiSVJRXzI2
-IiAsICJTVkNfMjYiICwKQEAgLTE0MSwzICsxNDIsMTcgQEAgYm9vbCBpc191c2VyKHZvaWQpCiB7
-CiAJcmV0dXJuIGN1cnJlbnRfdGhyZWFkX2luZm8oKS0+ZmxhZ3MgJiBUSUZfVVNFUl9NT0RFOwog
-fQorCit2b2lkIGRlbGF5KHU2NCBjeWNsZXMpCit7CisJdTY0IHN0YXJ0ID0gZ2V0X2NudHZjdCgp
-OworCXdoaWxlICgoZ2V0X2NudHZjdCgpIC0gc3RhcnQpIDwgY3ljbGVzKQorCQljcHVfcmVsYXgo
-KTsKK30KKwordm9pZCB1ZGVsYXkodW5zaWduZWQgbG9uZyB1c2VjKQoreworCXVuc2lnbmVkIGlu
-dCBmcnE7CisJYXNtIHZvbGF0aWxlKCJtcmMgcDE1LCAwLCAlMCwgYzE0LCBjMCwgMCIgOiAiPXIi
-IChmcnEpKTsKKwlkZWxheSgodTY0KXVzZWMgKiBmcnEgLyAxMDAwMDAwKTsKK30KZGlmZiAtLWdp
-dCBhL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmggYi9saWIvYXJtNjQvYXNtL3Byb2Nlc3Nvci5o
-CmluZGV4IDdlNDQ4ZGM4MWE2YS4uOTRmN2NlMzViNjVjIDEwMDY0NAotLS0gYS9saWIvYXJtNjQv
-YXNtL3Byb2Nlc3Nvci5oCisrKyBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKQEAgLTE3LDgg
-KzE3LDEwIEBACiAjZGVmaW5lIFNDVExSX0VMMV9NCSgxIDw8IDApCiAKICNpZm5kZWYgX19BU1NF
-TUJMWV9fCisjaW5jbHVkZSA8bGliY2ZsYXQuaD4KICNpbmNsdWRlIDxhc20vcHRyYWNlLmg+CiAj
-aW5jbHVkZSA8YXNtL2Vzci5oPgorI2luY2x1ZGUgPGFzbS9iYXJyaWVyLmg+CiAKIGVudW0gdmVj
-dG9yIHsKIAlFTDFUX1NZTkMsCkBAIC04OSw1ICs5MSwyMiBAQCBleHRlcm4gaW50IG1waWRyX3Rv
-X2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsKIGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgq
-ZnVuYykodm9pZCAqYXJnKSwgdm9pZCAqYXJnLCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7CiBleHRl
-cm4gYm9vbCBpc191c2VyKHZvaWQpOwogCitzdGF0aWMgaW5saW5lIHU2NCBnZXRfY250dmN0KHZv
-aWQpCit7CisJdTY0IHZjdDsKKwlpc2IoKTsKKwlhc20gdm9sYXRpbGUoIm1ycyAlMCwgY250dmN0
-X2VsMCIgOiAiPXIiICh2Y3QpKTsKKwlyZXR1cm4gdmN0OworfQorCitleHRlcm4gdm9pZCBkZWxh
-eSh1NjQgY3ljbGVzKTsKK2V4dGVybiB2b2lkIHVkZWxheSh1bnNpZ25lZCBsb25nIHVzZWNzKTsK
-Kworc3RhdGljIGlubGluZSB2b2lkIG1kZWxheSh1bnNpZ25lZCBsb25nIG1zZWNzKQoreworCXdo
-aWxlIChtc2Vjcy0tKQorCQl1ZGVsYXkoMTAwMCk7Cit9CisKICNlbmRpZiAvKiAhX19BU1NFTUJM
-WV9fICovCiAjZW5kaWYgLyogX0FTTUFSTTY0X1BST0NFU1NPUl9IXyAqLwpkaWZmIC0tZ2l0IGEv
-bGliL2FybTY0L3Byb2Nlc3Nvci5jIGIvbGliL2FybTY0L3Byb2Nlc3Nvci5jCmluZGV4IGRlZWFi
-NGVjOWM4YS4uNTBmYTgzNWM2ZjFlIDEwMDY0NAotLS0gYS9saWIvYXJtNjQvcHJvY2Vzc29yLmMK
-KysrIGIvbGliL2FybTY0L3Byb2Nlc3Nvci5jCkBAIC05LDYgKzksNyBAQAogI2luY2x1ZGUgPGFz
-bS9wdHJhY2UuaD4KICNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+CiAjaW5jbHVkZSA8YXNtL3Ro
-cmVhZF9pbmZvLmg+CisjaW5jbHVkZSA8YXNtL2JhcnJpZXIuaD4KIAogc3RhdGljIGNvbnN0IGNo
-YXIgKnZlY3Rvcl9uYW1lc1tdID0gewogCSJlbDF0X3N5bmMiLApAQCAtMjUzLDMgKzI1NCwxNyBA
-QCBib29sIGlzX3VzZXIodm9pZCkKIHsKIAlyZXR1cm4gY3VycmVudF90aHJlYWRfaW5mbygpLT5m
-bGFncyAmIFRJRl9VU0VSX01PREU7CiB9CisKK3ZvaWQgZGVsYXkodTY0IGN5Y2xlcykKK3sKKwl1
-NjQgc3RhcnQgPSBnZXRfY250dmN0KCk7CisJd2hpbGUgKChnZXRfY250dmN0KCkgLSBzdGFydCkg
-PCBjeWNsZXMpCisJCWNwdV9yZWxheCgpOworfQorCit2b2lkIHVkZWxheSh1bnNpZ25lZCBsb25n
-IHVzZWMpCit7CisJdW5zaWduZWQgaW50IGZycTsKKwlhc20gdm9sYXRpbGUoIm1ycyAlMCwgY250
-ZnJxX2VsMCIgOiAiPXIiIChmcnEpKTsKKwlkZWxheSgodTY0KXVzZWMgKiBmcnEgLyAxMDAwMDAw
-KTsKK30KLS0gCjIuNy40CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
-aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi,
+
+so is this actually v4 just resent?
+Or is this is a new version with s/5/4/?
+I can't spot any of the key changes quickly ...
+
+Cheers,
+Andre.
+
+On 10/11/16 16:07, Andrew Jones wrote:
+> v4:
+>  - Eric's r-b's
+>  - Andre's suggestion to only take defines we need
+>  - several other changes listed in individual patches
+> 
+> v3:
+>  - Rebased on latest master
+>  - Added Alex's r-b's
+> 
+> v2:
+>  Rebased on latest master + my "populate argv[0]" series (will
+>  send a REPOST for that shortly. Additionally a few patches got
+>  fixes/features;
+>  07/10 got same fix as kernel 7c9b973061 "irqchip/gic-v3: Configure
+>        all interrupts as non-secure Group-1" in order to continue
+>        working over TCG, as the gicv3 code for TCG removed a hack
+>        it had there to make Linux happy.
+>  08/10 added more output for when things fail (if they fail)
+>  09/10 switched gicv3 broadcast implementation to using IRM. This
+>        found a bug in a recent (but not tip) kernel, which I was
+>        about to fix, but then I saw MarcZ beat me to it.
+>  10/10 actually check that the input irq is the received irq
+> 
+> 
+> Import defines, and steal enough helper functions, from Linux to
+> enable programming of the gic (v2 and v3). Then use the framework
+> to add an initial test (an ipi test; self, target-list, broadcast).
+> 
+> It's my hope that this framework will be a suitable base on which
+> more tests may be easily added, particularly because we have
+> vgic-new and tcg gicv3 emulation getting close to merge. (v3 UPDATE:
+> vgic-new and tcg gicv3 are merged now)
+> 
+> To run it, along with other tests, just do
+> 
+>  ./configure [ --arch=[arm|arm64] --cross-prefix=$PREFIX ]
+>  make
+>  export QEMU=$PATH_TO_QEMU
+>  ./run_tests.sh
+> 
+> To run it separately do, e.g.
+> 
+> $QEMU -machine virt,accel=tcg -cpu cortex-a57 \
+>  -device virtio-serial-device \
+>  -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+>  -display none -serial stdio \
+>  -kernel arm/gic.flat \
+>  -smp 123 -machine gic-version=3 -append ipi
+>       ^^ note, we can go nuts with nr-cpus on TCG :-)
+> 
+> Or, a KVM example using a different "sender" cpu and irq (other than zero)
+> 
+> $QEMU -machine virt,accel=kvm -cpu host \
+>  -device virtio-serial-device \
+>  -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+>  -display none -serial stdio \
+>  -kernel arm/gic.flat \
+>  -smp 48 -machine gic-version=3 -append 'ipi sender=42 irq=1'
+> 
+> 
+> Patches:
+> 01-05: fixes and functionality needed by the later gic patches
+> 06-07: enable gicv2 and gicv2 IPI test
+> 08-10: enable gicv3 and gicv3 IPI test
+>    11: extend the IPI tests to take variable sender and irq
+> 
+> Available here: https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic-v4
+> 
+> 
+> Andrew Jones (10):
+>   lib: xstr: allow multiple args
+>   arm64: fix get_"sysreg32" and make MPIDR 64bit
+>   arm/arm64: smp: support more than 8 cpus
+>   arm/arm64: add some delay routines
+>   arm/arm64: irq enable/disable
+>   arm/arm64: add initial gicv2 support
+>   arm/arm64: gicv2: add an IPI test
+>   arm/arm64: add initial gicv3 support
+>   arm/arm64: gicv3: add an IPI test
+>   arm/arm64: gic: don't just use zero
+> 
+> Peter Xu (1):
+>   libcflat: add IS_ALIGNED() macro, and page sizes
+> 
+>  arm/Makefile.common        |   7 +-
+>  arm/gic.c                  | 417 +++++++++++++++++++++++++++++++++++++++++++++
+>  arm/run                    |  19 ++-
+>  arm/selftest.c             |   5 +-
+>  arm/unittests.cfg          |  13 ++
+>  lib/arm/asm/arch_gicv3.h   |  65 +++++++
+>  lib/arm/asm/gic-v2.h       |  28 +++
+>  lib/arm/asm/gic-v3.h       |  92 ++++++++++
+>  lib/arm/asm/gic.h          |  51 ++++++
+>  lib/arm/asm/processor.h    |  38 ++++-
+>  lib/arm/asm/setup.h        |   4 +-
+>  lib/arm/gic.c              | 131 ++++++++++++++
+>  lib/arm/processor.c        |  15 ++
+>  lib/arm/setup.c            |  12 +-
+>  lib/arm64/asm/arch_gicv3.h |  66 +++++++
+>  lib/arm64/asm/gic-v2.h     |   1 +
+>  lib/arm64/asm/gic-v3.h     |   1 +
+>  lib/arm64/asm/gic.h        |   1 +
+>  lib/arm64/asm/processor.h  |  53 +++++-
+>  lib/arm64/asm/sysreg.h     |  44 +++++
+>  lib/arm64/processor.c      |  15 ++
+>  lib/libcflat.h             |  10 +-
+>  22 files changed, 1062 insertions(+), 26 deletions(-)
+>  create mode 100644 arm/gic.c
+>  create mode 100644 lib/arm/asm/arch_gicv3.h
+>  create mode 100644 lib/arm/asm/gic-v2.h
+>  create mode 100644 lib/arm/asm/gic-v3.h
+>  create mode 100644 lib/arm/asm/gic.h
+>  create mode 100644 lib/arm/gic.c
+>  create mode 100644 lib/arm64/asm/arch_gicv3.h
+>  create mode 100644 lib/arm64/asm/gic-v2.h
+>  create mode 100644 lib/arm64/asm/gic-v3.h
+>  create mode 100644 lib/arm64/asm/gic.h
+>  create mode 100644 lib/arm64/asm/sysreg.h
+> 
