@@ -1,126 +1,68 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v4 03/11] arm/arm64: smp: support more than 8
- cpus
-Date: Thu, 10 Nov 2016 17:07:56 +0100
-Message-ID: <1478794084-5273-4-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v4 05/11] arm/arm64: irq enable/disable
+Date: Thu, 10 Nov 2016 17:07:58 +0100
+Message-ID: <1478794084-5273-6-git-send-email-drjones@redhat.com>
 References: <1478794084-5273-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A1E7740460
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 11:07:55 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w7hfMEvsAdFr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2016 11:07:54 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB79340665
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 11:07:53 -0500 (EST)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1478794084-5273-1-git-send-email-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
+Cc: pbonzini@redhat.com, andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-QnkgYWRkaW5nIHN1cHBvcnQgZm9yIGxhdW5jaGluZyB3aXRoIGdpY3YzIHdlIGNhbiBicmVhayB0
-aGUgOCB2Y3B1CmxpbWl0LiBUaGlzIHBhdGNoIGFkZHMgc3VwcG9ydCB0byBzbXAgY29kZSBhbmQg
-YWxzbyBzZWxlY3RzIHRoZQp2Z2ljIG1vZGVsIGNvcnJlc3BvbmRpbmcgdG8gdGhlIGhvc3QuIFRo
-ZSB2Z2ljIG1vZGVsIG1heSBhbHNvIGJlCm1hbnVhbGx5IHNlbGVjdGVkIGJ5IGFkZGluZyBlLmcu
-IC1tYWNoaW5lIGdpYy12ZXJzaW9uPTMgdG8KZXh0cmFfcGFyYW1zLgoKUmV2aWV3ZWQtYnk6IEFs
-ZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KU2lnbmVkLW9mZi1ieTogQW5kcmV3
-IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+CgotLS0KdjQ6IGltcHJvdmVkIGNvbW1pdCBtZXNz
-YWdlCi0tLQogYXJtL3J1biAgICAgICAgICAgICAgICAgICB8IDE5ICsrKysrKysrKysrKy0tLS0t
-LS0KIGFybS9zZWxmdGVzdC5jICAgICAgICAgICAgfCAgNSArKysrLQogbGliL2FybS9hc20vcHJv
-Y2Vzc29yLmggICB8ICA5ICsrKysrKystLQogbGliL2FybS9hc20vc2V0dXAuaCAgICAgICB8ICA0
-ICsrLS0KIGxpYi9hcm0vc2V0dXAuYyAgICAgICAgICAgfCAxMiArKysrKysrKysrKy0KIGxpYi9h
-cm02NC9hc20vcHJvY2Vzc29yLmggfCAgOSArKysrKysrLS0KIDYgZmlsZXMgY2hhbmdlZCwgNDMg
-aW5zZXJ0aW9ucygrKSwgMTUgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJtL3J1biBiL2Fy
-bS9ydW4KaW5kZXggYTJmMzVlZjZhN2U2Li4yZDA2OTg2MTk2MDYgMTAwNzU1Ci0tLSBhL2FybS9y
-dW4KKysrIGIvYXJtL3J1bgpAQCAtMzEsMTMgKzMxLDYgQEAgaWYgWyAteiAiJEFDQ0VMIiBdOyB0
-aGVuCiAJZmkKIGZpCiAKLWlmIFsgIiRIT1NUIiA9ICJhYXJjaDY0IiBdICYmIFsgIiRBQ0NFTCIg
-PSAia3ZtIiBdOyB0aGVuCi0JcHJvY2Vzc29yPSJob3N0IgotCWlmIFsgIiRBUkNIIiA9ICJhcm0i
-IF07IHRoZW4KLQkJcHJvY2Vzc29yKz0iLGFhcmNoNjQ9b2ZmIgotCWZpCi1maQotCiBxZW11PSIk
-e1FFTVU6LXFlbXUtc3lzdGVtLSRBUkNIX05BTUV9IgogcXBhdGg9JCh3aGljaCAkcWVtdSAyPi9k
-ZXYvbnVsbCkKIApAQCAtNTMsNiArNDYsMTggQEAgZmkKIAogTT0nLW1hY2hpbmUgdmlydCcKIAor
-aWYgWyAiJEFDQ0VMIiA9ICJrdm0iIF07IHRoZW4KKwlpZiAkcWVtdSAkTSxcPyAyPiYxIHwgZ3Jl
-cCBnaWMtdmVyc2lvbiA+IC9kZXYvbnVsbDsgdGhlbgorCQlNKz0nLGdpYy12ZXJzaW9uPWhvc3Qn
-CisJZmkKKwlpZiBbICIkSE9TVCIgPSAiYWFyY2g2NCIgXTsgdGhlbgorCQlwcm9jZXNzb3I9Imhv
-c3QiCisJCWlmIFsgIiRBUkNIIiA9ICJhcm0iIF07IHRoZW4KKwkJCXByb2Nlc3Nvcis9IixhYXJj
-aDY0PW9mZiIKKwkJZmkKKwlmaQorZmkKKwogaWYgISAkcWVtdSAkTSAtZGV2aWNlICc/JyAyPiYx
-IHwgZ3JlcCB2aXJ0Y29uc29sZSA+IC9kZXYvbnVsbDsgdGhlbgogCWVjaG8gIiRxcGF0aCBkb2Vz
-bid0IHN1cHBvcnQgdmlydGlvLWNvbnNvbGUgZm9yIGNoci10ZXN0ZGV2LiBFeGl0aW5nLiIKIAll
-eGl0IDIKZGlmZiAtLWdpdCBhL2FybS9zZWxmdGVzdC5jIGIvYXJtL3NlbGZ0ZXN0LmMKaW5kZXgg
-MTk2MTY0ZjUzMTNkLi4yZjExN2Y3OTVkMmQgMTAwNjQ0Ci0tLSBhL2FybS9zZWxmdGVzdC5jCisr
-KyBiL2FybS9zZWxmdGVzdC5jCkBAIC0zMTIsOSArMzEyLDEwIEBAIHN0YXRpYyBib29sIHBzY2lf
-Y2hlY2sodm9pZCkKIHN0YXRpYyBjcHVtYXNrX3Qgc21wX3JlcG9ydGVkOwogc3RhdGljIHZvaWQg
-Y3B1X3JlcG9ydCh2b2lkKQogeworCXVuc2lnbmVkIGxvbmcgbXBpZHIgPSBnZXRfbXBpZHIoKTsK
-IAlpbnQgY3B1ID0gc21wX3Byb2Nlc3Nvcl9pZCgpOwogCi0JcmVwb3J0KCJDUFUlZCBvbmxpbmUi
-LCB0cnVlLCBjcHUpOworCXJlcG9ydCgiQ1BVKCUzZCkgbXBpZHI9JWx4IiwgbXBpZHJfdG9fY3B1
-KG1waWRyKSA9PSBjcHUsIGNwdSwgbXBpZHIpOwogCWNwdW1hc2tfc2V0X2NwdShjcHUsICZzbXBf
-cmVwb3J0ZWQpOwogCWhhbHQoKTsKIH0KQEAgLTM0Myw2ICszNDQsNyBAQCBpbnQgbWFpbihpbnQg
-YXJnYywgY2hhciAqKmFyZ3YpCiAKIAl9IGVsc2UgaWYgKHN0cmNtcChhcmd2WzFdLCAic21wIikg
-PT0gMCkgewogCisJCXVuc2lnbmVkIGxvbmcgbXBpZHIgPSBnZXRfbXBpZHIoKTsKIAkJaW50IGNw
-dTsKIAogCQlyZXBvcnQoIlBTQ0kgdmVyc2lvbiIsIHBzY2lfY2hlY2soKSk7CkBAIC0zNTMsNiAr
-MzU1LDcgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQogCQkJc21wX2Jvb3Rfc2Vj
-b25kYXJ5KGNwdSwgY3B1X3JlcG9ydCk7CiAJCX0KIAorCQlyZXBvcnQoIkNQVSglM2QpIG1waWRy
-PSVseCIsIG1waWRyX3RvX2NwdShtcGlkcikgPT0gMCwgMCwgbXBpZHIpOwogCQljcHVtYXNrX3Nl
-dF9jcHUoMCwgJnNtcF9yZXBvcnRlZCk7CiAJCXdoaWxlICghY3B1bWFza19mdWxsKCZzbXBfcmVw
-b3J0ZWQpKQogCQkJY3B1X3JlbGF4KCk7CmRpZmYgLS1naXQgYS9saWIvYXJtL2FzbS9wcm9jZXNz
-b3IuaCBiL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oCmluZGV4IGYyNWU3ZWVlMzY2Ni4uZDIwNDhm
-NWY1ZjdlIDEwMDY0NAotLS0gYS9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaAorKysgYi9saWIvYXJt
-L2FzbS9wcm9jZXNzb3IuaApAQCAtNDAsOCArNDAsMTMgQEAgc3RhdGljIGlubGluZSB1bnNpZ25l
-ZCBpbnQgZ2V0X21waWRyKHZvaWQpCiAJcmV0dXJuIG1waWRyOwogfQogCi0vKiBPbmx5IHN1cHBv
-cnQgQWZmMCBmb3Igbm93LCB1cCB0byA0IGNwdXMgKi8KLSNkZWZpbmUgbXBpZHJfdG9fY3B1KG1w
-aWRyKSAoKGludCkoKG1waWRyKSAmIDB4ZmYpKQorI2RlZmluZSBNUElEUl9IV0lEX0JJVE1BU0sg
-MHhmZmZmZmYKK2V4dGVybiBpbnQgbXBpZHJfdG9fY3B1KHVuc2lnbmVkIGxvbmcgbXBpZHIpOwor
-CisjZGVmaW5lIE1QSURSX0xFVkVMX1NISUZUKGxldmVsKSBcCisJKCgoMSA8PCBsZXZlbCkgPj4g
-MSkgPDwgMykKKyNkZWZpbmUgTVBJRFJfQUZGSU5JVFlfTEVWRUwobXBpZHIsIGxldmVsKSBcCisJ
-KChtcGlkciA+PiBNUElEUl9MRVZFTF9TSElGVChsZXZlbCkpICYgMHhmZikKIAogZXh0ZXJuIHZv
-aWQgc3RhcnRfdXNyKHZvaWQgKCpmdW5jKSh2b2lkICphcmcpLCB2b2lkICphcmcsIHVuc2lnbmVk
-IGxvbmcgc3BfdXNyKTsKIGV4dGVybiBib29sIGlzX3VzZXIodm9pZCk7CmRpZmYgLS1naXQgYS9s
-aWIvYXJtL2FzbS9zZXR1cC5oIGIvbGliL2FybS9hc20vc2V0dXAuaAppbmRleCBjYjhmZGJkMzhk
-ZDUuLmIwZDUxZjVmMDcyMSAxMDA2NDQKLS0tIGEvbGliL2FybS9hc20vc2V0dXAuaAorKysgYi9s
-aWIvYXJtL2FzbS9zZXR1cC5oCkBAIC0xMCw4ICsxMCw4IEBACiAjaW5jbHVkZSA8YXNtL3BhZ2Uu
-aD4KICNpbmNsdWRlIDxhc20vcGd0YWJsZS1od2RlZi5oPgogCi0jZGVmaW5lIE5SX0NQVVMJCQk4
-Ci1leHRlcm4gdTMyIGNwdXNbTlJfQ1BVU107CisjZGVmaW5lIE5SX0NQVVMJCQkyNTUKK2V4dGVy
-biB1NjQgY3B1c1tOUl9DUFVTXTsJLyogcGVyLWNwdSBJRHMgKE1QSURScykgKi8KIGV4dGVybiBp
-bnQgbnJfY3B1czsKIAogI2RlZmluZSBOUl9NRU1fUkVHSU9OUwkJOApkaWZmIC0tZ2l0IGEvbGli
-L2FybS9zZXR1cC5jIGIvbGliL2FybS9zZXR1cC5jCmluZGV4IDdlN2IzOWYxMWRkZS4uYjZlMmQ1
-ODE1ZTcyIDEwMDY0NAotLS0gYS9saWIvYXJtL3NldHVwLmMKKysrIGIvbGliL2FybS9zZXR1cC5j
-CkBAIC0yNCwxMiArMjQsMjIgQEAgZXh0ZXJuIHVuc2lnbmVkIGxvbmcgc3RhY2t0b3A7CiBleHRl
-cm4gdm9pZCBpb19pbml0KHZvaWQpOwogZXh0ZXJuIHZvaWQgc2V0dXBfYXJnc19wcm9nbmFtZShj
-b25zdCBjaGFyICphcmdzKTsKIAotdTMyIGNwdXNbTlJfQ1BVU10gPSB7IFswIC4uLiBOUl9DUFVT
-LTFdID0gKH4wVSkgfTsKK3U2NCBjcHVzW05SX0NQVVNdID0geyBbMCAuLi4gTlJfQ1BVUy0xXSA9
-ICh+MFUpIH07CiBpbnQgbnJfY3B1czsKIAogc3RydWN0IG1lbV9yZWdpb24gbWVtX3JlZ2lvbnNb
-TlJfTUVNX1JFR0lPTlNdOwogcGh5c19hZGRyX3QgX19waHlzX29mZnNldCwgX19waHlzX2VuZDsK
-IAoraW50IG1waWRyX3RvX2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKQoreworCWludCBpOworCisJ
-Zm9yIChpID0gMDsgaSA8IG5yX2NwdXM7ICsraSkKKwkJaWYgKGNwdXNbaV0gPT0gKG1waWRyICYg
-TVBJRFJfSFdJRF9CSVRNQVNLKSkKKwkJCXJldHVybiBpOworCXJldHVybiAtMTsKK30KKwogc3Rh
-dGljIHZvaWQgY3B1X3NldChpbnQgZmR0bm9kZSBfX3VudXNlZCwgdTMyIHJlZ3ZhbCwgdm9pZCAq
-aW5mbyBfX3VudXNlZCkKIHsKIAlpbnQgY3B1ID0gbnJfY3B1cysrOwpkaWZmIC0tZ2l0IGEvbGli
-L2FybTY0L2FzbS9wcm9jZXNzb3IuaCBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKaW5kZXgg
-OWEyMDhmZjcyOWI3Li43ZTQ0OGRjODFhNmEgMTAwNjQ0Ci0tLSBhL2xpYi9hcm02NC9hc20vcHJv
-Y2Vzc29yLmgKKysrIGIvbGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaApAQCAtNzgsOCArNzgsMTMg
-QEAgc3RhdGljIGlubGluZSB0eXBlIGdldF8jI3JlZyh2b2lkKQkJCQlcCiAKIERFRklORV9HRVRf
-U1lTUkVHNjQobXBpZHIpCiAKLS8qIE9ubHkgc3VwcG9ydCBBZmYwIGZvciBub3csIGdpY3YyIG9u
-bHkgKi8KLSNkZWZpbmUgbXBpZHJfdG9fY3B1KG1waWRyKSAoKGludCkoKG1waWRyKSAmIDB4ZmYp
-KQorI2RlZmluZSBNUElEUl9IV0lEX0JJVE1BU0sgMHhmZjAwZmZmZmZmCitleHRlcm4gaW50IG1w
-aWRyX3RvX2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsKKworI2RlZmluZSBNUElEUl9MRVZFTF9T
-SElGVChsZXZlbCkgXAorCSgoKDEgPDwgbGV2ZWwpID4+IDEpIDw8IDMpCisjZGVmaW5lIE1QSURS
-X0FGRklOSVRZX0xFVkVMKG1waWRyLCBsZXZlbCkgXAorCSgobXBpZHIgPj4gTVBJRFJfTEVWRUxf
-U0hJRlQobGV2ZWwpKSAmIDB4ZmYpCiAKIGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgqZnVu
-Yykodm9pZCAqYXJnKSwgdm9pZCAqYXJnLCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7CiBleHRlcm4g
-Ym9vbCBpc191c2VyKHZvaWQpOwotLSAKMi43LjQKCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
-LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
-bmZvL2t2bWFybQo=
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ lib/arm/asm/processor.h   | 10 ++++++++++
+ lib/arm64/asm/processor.h | 10 ++++++++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+index afc903ca7d4a..75a8d08b8933 100644
+--- a/lib/arm/asm/processor.h
++++ b/lib/arm/asm/processor.h
+@@ -35,6 +35,16 @@ static inline unsigned long current_cpsr(void)
+ 
+ #define current_mode() (current_cpsr() & MODE_MASK)
+ 
++static inline void local_irq_enable(void)
++{
++	asm volatile("cpsie i" : : : "memory", "cc");
++}
++
++static inline void local_irq_disable(void)
++{
++	asm volatile("cpsid i" : : : "memory", "cc");
++}
++
+ static inline unsigned int get_mpidr(void)
+ {
+ 	unsigned int mpidr;
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index 94f7ce35b65c..d54a4ed1c187 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -68,6 +68,16 @@ static inline unsigned long current_level(void)
+ 	return el & 0xc;
+ }
+ 
++static inline void local_irq_enable(void)
++{
++	asm volatile("msr daifclr, #2" : : : "memory");
++}
++
++static inline void local_irq_disable(void)
++{
++	asm volatile("msr daifset, #2" : : : "memory");
++}
++
+ #define DEFINE_GET_SYSREG(reg, type)				\
+ static inline type get_##reg(void)				\
+ {								\
+-- 
+2.7.4
+
