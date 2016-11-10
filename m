@@ -1,61 +1,44 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v5 05/11] arm/arm64: irq enable/disable
-Date: Thu, 10 Nov 2016 18:21:15 +0100
-Message-ID: <1478798481-25030-6-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v5 08/11] libcflat: add IS_ALIGNED() macro, and page sizes
+Date: Thu, 10 Nov 2016 18:21:18 +0100
+Message-ID: <1478798481-25030-9-git-send-email-drjones@redhat.com>
 References: <1478798481-25030-1-git-send-email-drjones@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B499404E2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 12:21:16 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I8KouXzXtNzs for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2016 12:21:15 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 89EFE402A6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 12:21:15 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1478798481-25030-1-git-send-email-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
+Cc: pbonzini@redhat.com, andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, christoffer.dall@linaro.org, Peter Xu <peterx@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-UmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KUmV2aWV3
-ZWQtYnk6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KU2lnbmVkLW9mZi1ieTog
-QW5kcmV3IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+Ci0tLQogbGliL2FybS9hc20vcHJvY2Vz
-c29yLmggICB8IDEwICsrKysrKysrKysKIGxpYi9hcm02NC9hc20vcHJvY2Vzc29yLmggfCAxMCAr
-KysrKysrKysrCiAyIGZpbGVzIGNoYW5nZWQsIDIwIGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQg
-YS9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaCBiL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oCmluZGV4
-IGJjNDZkMWY5ODBlZS4uOTU5ZWNkYTVkY2VkIDEwMDY0NAotLS0gYS9saWIvYXJtL2FzbS9wcm9j
-ZXNzb3IuaAorKysgYi9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaApAQCAtMzUsNiArMzUsMTYgQEAg
-c3RhdGljIGlubGluZSB1bnNpZ25lZCBsb25nIGN1cnJlbnRfY3Bzcih2b2lkKQogCiAjZGVmaW5l
-IGN1cnJlbnRfbW9kZSgpIChjdXJyZW50X2Nwc3IoKSAmIE1PREVfTUFTSykKIAorc3RhdGljIGlu
-bGluZSB2b2lkIGxvY2FsX2lycV9lbmFibGUodm9pZCkKK3sKKwlhc20gdm9sYXRpbGUoImNwc2ll
-IGkiIDogOiA6ICJtZW1vcnkiLCAiY2MiKTsKK30KKworc3RhdGljIGlubGluZSB2b2lkIGxvY2Fs
-X2lycV9kaXNhYmxlKHZvaWQpCit7CisJYXNtIHZvbGF0aWxlKCJjcHNpZCBpIiA6IDogOiAibWVt
-b3J5IiwgImNjIik7Cit9CisKIHN0YXRpYyBpbmxpbmUgdW5zaWduZWQgbG9uZyBnZXRfbXBpZHIo
-dm9pZCkKIHsKIAl1bnNpZ25lZCBsb25nIG1waWRyOwpkaWZmIC0tZ2l0IGEvbGliL2FybTY0L2Fz
-bS9wcm9jZXNzb3IuaCBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKaW5kZXggOTRmN2NlMzVi
-NjVjLi5kNTRhNGVkMWMxODcgMTAwNjQ0Ci0tLSBhL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgK
-KysrIGIvbGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaApAQCAtNjgsNiArNjgsMTYgQEAgc3RhdGlj
-IGlubGluZSB1bnNpZ25lZCBsb25nIGN1cnJlbnRfbGV2ZWwodm9pZCkKIAlyZXR1cm4gZWwgJiAw
-eGM7CiB9CiAKK3N0YXRpYyBpbmxpbmUgdm9pZCBsb2NhbF9pcnFfZW5hYmxlKHZvaWQpCit7CisJ
-YXNtIHZvbGF0aWxlKCJtc3IgZGFpZmNsciwgIzIiIDogOiA6ICJtZW1vcnkiKTsKK30KKworc3Rh
-dGljIGlubGluZSB2b2lkIGxvY2FsX2lycV9kaXNhYmxlKHZvaWQpCit7CisJYXNtIHZvbGF0aWxl
-KCJtc3IgZGFpZnNldCwgIzIiIDogOiA6ICJtZW1vcnkiKTsKK30KKwogI2RlZmluZSBERUZJTkVf
-R0VUX1NZU1JFRyhyZWcsIHR5cGUpCQkJCVwKIHN0YXRpYyBpbmxpbmUgdHlwZSBnZXRfIyNyZWco
-dm9pZCkJCQkJXAogewkJCQkJCQkJXAotLSAKMi43LjQKCl9fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3Rz
-LmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xp
-c3RpbmZvL2t2bWFybQo=
+From: Peter Xu <peterx@redhat.com>
+
+These macros will be useful to do page alignment checks.
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+[drew: also added SZ_64K]
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ lib/libcflat.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/lib/libcflat.h b/lib/libcflat.h
+index 82005f5d014f..143fc53061fe 100644
+--- a/lib/libcflat.h
++++ b/lib/libcflat.h
+@@ -33,6 +33,12 @@
+ #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
+ #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
+ #define ALIGN(x, a)		__ALIGN((x), (a))
++#define IS_ALIGNED(x, a)	(((x) & ((typeof(x))(a) - 1)) == 0)
++
++#define SZ_4K			(0x1000)
++#define SZ_64K			(0x10000)
++#define SZ_2M			(0x200000)
++#define SZ_1G			(0x40000000)
+ 
+ typedef uint8_t		u8;
+ typedef int8_t		s8;
+-- 
+2.7.4
+
