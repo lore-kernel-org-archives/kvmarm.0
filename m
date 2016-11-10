@@ -1,80 +1,152 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/2] arm64: perf: Move ARMv8 PMU perf event definitions to
- asm/perf_event.h
-Date: Thu, 10 Nov 2016 15:32:12 +0000
-Message-ID: <733f067d-7f3b-df28-eab7-a15abba947fc@arm.com>
-References: <1478721480-24852-1-git-send-email-wei@redhat.com>
- <aa5b2275-374f-4d74-d9d9-0959d90454ca@arm.com>
- <d9ef10b9-44f2-b02e-9d90-02cf348aa49c@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v4 00/11] arm/arm64: add gic framework
+Date: Thu, 10 Nov 2016 17:07:53 +0100
+Message-ID: <1478794084-5273-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <d9ef10b9-44f2-b02e-9d90-02cf348aa49c@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Wei Huang <wei@redhat.com>, kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, drjones@redhat.com, cov@codeaurora.org, will.deacon@arm.com, mark.rutland@arm.com, catalin.marinas@arm.com, linux-kernel@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE6E940499
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 11:07:50 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 1lDO9PnAF-Sz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Nov 2016 11:07:46 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E45C40430
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 11:07:46 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/11/16 15:12, Wei Huang wrote:
-> 
-> 
-> On 11/10/2016 03:10 AM, Marc Zyngier wrote:
->> Hi Wei,
->>
->> On 09/11/16 19:57, Wei Huang wrote:
->>> This patch moves ARMv8-related perf event definitions from perf_event.c
->>> to asm/perf_event.h; so KVM code can use them directly. This also help
->>> remove a duplicated definition of SW_INCR in perf_event.h.
->>>
->>> Signed-off-by: Wei Huang <wei@redhat.com>
->>> ---
->>>  arch/arm64/include/asm/perf_event.h | 161 +++++++++++++++++++++++++++++++++++-
->>>  arch/arm64/kernel/perf_event.c      | 161 ------------------------------------
->>>  2 files changed, 160 insertions(+), 162 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
->>> index 2065f46..6c7b18b 100644
->>> --- a/arch/arm64/include/asm/perf_event.h
->>> +++ b/arch/arm64/include/asm/perf_event.h
->>> @@ -46,7 +46,166 @@
->>>  #define	ARMV8_PMU_EVTYPE_MASK	0xc800ffff	/* Mask for writable bits */
->>>  #define	ARMV8_PMU_EVTYPE_EVENT	0xffff		/* Mask for EVENT bits */
->>>  
->>> -#define ARMV8_PMU_EVTYPE_EVENT_SW_INCR	0	/* Software increment event */
->>> +/*
->>> + * ARMv8 PMUv3 Performance Events handling code.
->>> + * Common event types.
->>> + */
->>> +
->>> +/* Required events. */
->>> +#define ARMV8_PMUV3_PERFCTR_SW_INCR				0x00
->>> +#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_REFILL			0x03
->>> +#define ARMV8_PMUV3_PERFCTR_L1D_CACHE				0x04
->>> +#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED				0x10
->>> +#define ARMV8_PMUV3_PERFCTR_CPU_CYCLES				0x11
->>> +#define ARMV8_PMUV3_PERFCTR_BR_PRED				0x12
->>
->> In my initial review, I asked for the "required" events to be moved to a
->> shared location. What's the rational for moving absolutely everything?
-> 
-> I did notice the phrase "required" in the original email. However I
-> think it is weird to have two places for a same set of PMU definitions.
-> Other developers might think these two are missing if they don't search
-> kernel files carefully.
-> 
-> If Will Deacon and you insist, I can move only two defs to perf_event.h,
-> consolidated with the 2nd patch into a single one.
+v4:
+ - Eric's r-b's
+ - Andre's suggestion to only take defines we need
+ - several other changes listed in individual patches
 
-My personal feeling is that only architected events should be in a
-public header. The CPU-specific ones are probably better kept private,
-as it is doubtful that other users would appear).
+v3:
+ - Rebased on latest master
+ - Added Alex's r-b's
 
-I'll leave it up to Will to decide, as all I want to avoid is the
-duplication of constants between the PMU and KVM code bases.
+v2:
+ Rebased on latest master + my "populate argv[0]" series (will
+ send a REPOST for that shortly. Additionally a few patches got
+ fixes/features;
+ 07/10 got same fix as kernel 7c9b973061 "irqchip/gic-v3: Configure
+       all interrupts as non-secure Group-1" in order to continue
+       working over TCG, as the gicv3 code for TCG removed a hack
+       it had there to make Linux happy.
+ 08/10 added more output for when things fail (if they fail)
+ 09/10 switched gicv3 broadcast implementation to using IRM. This
+       found a bug in a recent (but not tip) kernel, which I was
+       about to fix, but then I saw MarcZ beat me to it.
+ 10/10 actually check that the input irq is the received irq
 
-Thanks,
 
-	M.
+Import defines, and steal enough helper functions, from Linux to
+enable programming of the gic (v2 and v3). Then use the framework
+to add an initial test (an ipi test; self, target-list, broadcast).
+
+It's my hope that this framework will be a suitable base on which
+more tests may be easily added, particularly because we have
+vgic-new and tcg gicv3 emulation getting close to merge. (v3 UPDATE:
+vgic-new and tcg gicv3 are merged now)
+
+To run it, along with other tests, just do
+
+ ./configure [ --arch=[arm|arm64] --cross-prefix=$PREFIX ]
+ make
+ export QEMU=$PATH_TO_QEMU
+ ./run_tests.sh
+
+To run it separately do, e.g.
+
+$QEMU -machine virt,accel=tcg -cpu cortex-a57 \
+ -device virtio-serial-device \
+ -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+ -display none -serial stdio \
+ -kernel arm/gic.flat \
+ -smp 123 -machine gic-version=3 -append ipi
+      ^^ note, we can go nuts with nr-cpus on TCG :-)
+
+Or, a KVM example using a different "sender" cpu and irq (other than zero)
+
+$QEMU -machine virt,accel=kvm -cpu host \
+ -device virtio-serial-device \
+ -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+ -display none -serial stdio \
+ -kernel arm/gic.flat \
+ -smp 48 -machine gic-version=3 -append 'ipi sender=42 irq=1'
+
+
+Patches:
+01-05: fixes and functionality needed by the later gic patches
+06-07: enable gicv2 and gicv2 IPI test
+08-10: enable gicv3 and gicv3 IPI test
+   11: extend the IPI tests to take variable sender and irq
+
+Available here: https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic-v4
+
+
+Andrew Jones (10):
+  lib: xstr: allow multiple args
+  arm64: fix get_"sysreg32" and make MPIDR 64bit
+  arm/arm64: smp: support more than 8 cpus
+  arm/arm64: add some delay routines
+  arm/arm64: irq enable/disable
+  arm/arm64: add initial gicv2 support
+  arm/arm64: gicv2: add an IPI test
+  arm/arm64: add initial gicv3 support
+  arm/arm64: gicv3: add an IPI test
+  arm/arm64: gic: don't just use zero
+
+Peter Xu (1):
+  libcflat: add IS_ALIGNED() macro, and page sizes
+
+ arm/Makefile.common        |   7 +-
+ arm/gic.c                  | 417 +++++++++++++++++++++++++++++++++++++++++++++
+ arm/run                    |  19 ++-
+ arm/selftest.c             |   5 +-
+ arm/unittests.cfg          |  13 ++
+ lib/arm/asm/arch_gicv3.h   |  65 +++++++
+ lib/arm/asm/gic-v2.h       |  28 +++
+ lib/arm/asm/gic-v3.h       |  92 ++++++++++
+ lib/arm/asm/gic.h          |  51 ++++++
+ lib/arm/asm/processor.h    |  38 ++++-
+ lib/arm/asm/setup.h        |   4 +-
+ lib/arm/gic.c              | 131 ++++++++++++++
+ lib/arm/processor.c        |  15 ++
+ lib/arm/setup.c            |  12 +-
+ lib/arm64/asm/arch_gicv3.h |  66 +++++++
+ lib/arm64/asm/gic-v2.h     |   1 +
+ lib/arm64/asm/gic-v3.h     |   1 +
+ lib/arm64/asm/gic.h        |   1 +
+ lib/arm64/asm/processor.h  |  53 +++++-
+ lib/arm64/asm/sysreg.h     |  44 +++++
+ lib/arm64/processor.c      |  15 ++
+ lib/libcflat.h             |  10 +-
+ 22 files changed, 1062 insertions(+), 26 deletions(-)
+ create mode 100644 arm/gic.c
+ create mode 100644 lib/arm/asm/arch_gicv3.h
+ create mode 100644 lib/arm/asm/gic-v2.h
+ create mode 100644 lib/arm/asm/gic-v3.h
+ create mode 100644 lib/arm/asm/gic.h
+ create mode 100644 lib/arm/gic.c
+ create mode 100644 lib/arm64/asm/arch_gicv3.h
+ create mode 100644 lib/arm64/asm/gic-v2.h
+ create mode 100644 lib/arm64/asm/gic-v3.h
+ create mode 100644 lib/arm64/asm/gic.h
+ create mode 100644 lib/arm64/asm/sysreg.h
+
 -- 
-Jazz is not dead. It just smells funny...
+2.7.4
