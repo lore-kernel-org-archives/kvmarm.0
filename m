@@ -1,22 +1,23 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v5 10/11] arm/arm64: gicv3: add an IPI test
-Date: Thu, 10 Nov 2016 18:21:20 +0100
-Message-ID: <1478798481-25030-11-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v5 03/11] arm/arm64: smp: support more than 8
+ cpus
+Date: Thu, 10 Nov 2016 18:21:13 +0100
+Message-ID: <1478798481-25030-4-git-send-email-drjones@redhat.com>
 References: <1478798481-25030-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BBC1405C4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 12:21:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62CF1405B0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 12:21:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zNs3ZDbGHnhp for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2016 12:21:30 -0500 (EST)
+ with ESMTP id TzS3Jpf0w6cO for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Nov 2016 12:21:10 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A86BC4068E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 12:21:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 609D1404DE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 12:21:10 -0500 (EST)
 In-Reply-To: <1478798481-25030-1-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,405 +32,93 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qe
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-
----
-v5:
- - fix copy+paste error in gicv3_write_eoir [drew]
- - use modern register names [Andre]
-v4:
- - heavily comment gicv3_ipi_send_tlist() [Eric]
- - changes needed for gicv2 iar/irqstat fix to other patch
-v2:
- - use IRM for gicv3 broadcast
----
- arm/gic.c                  | 195 ++++++++++++++++++++++++++++++++++++++++++---
- arm/unittests.cfg          |   6 ++
- lib/arm/asm/arch_gicv3.h   |  23 ++++++
- lib/arm64/asm/arch_gicv3.h |  22 +++++
- 4 files changed, 236 insertions(+), 10 deletions(-)
-
-diff --git a/arm/gic.c b/arm/gic.c
-index 06092aec7c08..ca68f8ad1cb9 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -3,6 +3,8 @@
-  *
-  * GICv2
-  *   + test sending/receiving IPIs
-+ * GICv3
-+ *   + test sending/receiving IPIs
-  *
-  * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-  *
-@@ -16,6 +18,19 @@
- #include <asm/barrier.h>
- #include <asm/io.h>
- 
-+struct gic {
-+	struct {
-+		void (*enable)(void);
-+		void (*send_self)(void);
-+		void (*send_tlist)(cpumask_t *);
-+		void (*send_broadcast)(void);
-+	} ipi;
-+	u32 (*read_iar)(void);
-+	u32 (*irqnr)(u32 iar);
-+	void (*write_eoi)(u32);
-+};
-+
-+static struct gic *gic;
- static int gic_version;
- static int acked[NR_CPUS], spurious[NR_CPUS];
- static cpumask_t ready;
-@@ -69,13 +84,33 @@ static void check_acked(cpumask_t *mask)
- 	       false, missing, extra, unexpected);
- }
- 
-+static u32 gicv2_read_iar(void)
-+{
-+	return readl(gicv2_cpu_base() + GICC_IAR);
-+}
-+
-+static u32 gicv2_irqnr(u32 iar)
-+{
-+	return iar & GICC_IAR_INT_ID_MASK;
-+}
-+
-+static void gicv2_write_eoi(u32 irqstat)
-+{
-+	writel(irqstat, gicv2_cpu_base() + GICC_EOIR);
-+}
-+
-+static u32 gicv3_irqnr(u32 iar)
-+{
-+	return iar;
-+}
-+
- static void ipi_handler(struct pt_regs *regs __unused)
- {
--	u32 irqstat = readl(gicv2_cpu_base() + GICC_IAR);
--	u32 irqnr = irqstat & GICC_IAR_INT_ID_MASK;
-+	u32 irqstat = gic->read_iar();
-+	u32 irqnr = gic->irqnr(irqstat);
- 
- 	if (irqnr != GICC_INT_SPURIOUS) {
--		writel(irqstat, gicv2_cpu_base() + GICC_EOIR);
-+		gic->write_eoi(irqstat);
- 		smp_rmb(); /* pairs with wmb in ipi_test functions */
- 		++acked[smp_processor_id()];
- 		smp_wmb(); /* pairs with rmb in check_acked */
-@@ -85,6 +120,112 @@ static void ipi_handler(struct pt_regs *regs __unused)
- 	}
- }
- 
-+static void gicv2_ipi_send_self(void)
-+{
-+	writel(2 << 24, gicv2_dist_base() + GICD_SGIR);
-+}
-+
-+static void gicv2_ipi_send_tlist(cpumask_t *mask)
-+{
-+	u8 tlist = (u8)cpumask_bits(mask)[0];
-+
-+	writel(tlist << 16, gicv2_dist_base() + GICD_SGIR);
-+}
-+
-+static void gicv2_ipi_send_broadcast(void)
-+{
-+	writel(1 << 24, gicv2_dist_base() + GICD_SGIR);
-+}
-+
-+#define ICC_SGI1R_AFFINITY_1_SHIFT	16
-+#define ICC_SGI1R_AFFINITY_2_SHIFT	32
-+#define ICC_SGI1R_AFFINITY_3_SHIFT	48
-+#define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
-+	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level ## _SHIFT)
-+
-+static void gicv3_ipi_send_tlist(cpumask_t *mask)
-+{
-+	u16 tlist;
-+	int cpu;
-+
-+	/*
-+	 * For each cpu in the mask collect its peers, which are also in
-+	 * the mask, in order to form target lists.
-+	 */
-+	for_each_cpu(cpu, mask) {
-+		u64 mpidr = cpus[cpu], sgi1r;
-+		u64 cluster_id;
-+
-+		/*
-+		 * GICv3 can send IPIs to up 16 peer cpus with a single
-+		 * write to ICC_SGI1R_EL1 (using the target list). Peers
-+		 * are cpus that have nearly identical MPIDRs, the only
-+		 * difference being Aff0. The matching upper affinity
-+		 * levels form the cluster ID.
-+		 */
-+		cluster_id = mpidr & ~0xffUL;
-+		tlist = 0;
-+
-+		/*
-+		 * Sort of open code for_each_cpu in order to have a
-+		 * nested for_each_cpu loop.
-+		 */
-+		while (cpu < nr_cpus) {
-+			if ((mpidr & 0xff) >= 16) {
-+				printf("cpu%d MPIDR:aff0 is %d (>= 16)!\n",
-+					cpu, (int)(mpidr & 0xff));
-+				break;
-+			}
-+
-+			tlist |= 1 << (mpidr & 0xf);
-+
-+			cpu = cpumask_next(cpu, mask);
-+			if (cpu >= nr_cpus)
-+				break;
-+
-+			mpidr = cpus[cpu];
-+
-+			if (cluster_id != (mpidr & ~0xffUL)) {
-+				/*
-+				 * The next cpu isn't in our cluster. Roll
-+				 * back the cpu index allowing the outer
-+				 * for_each_cpu to find it again with
-+				 * cpumask_next
-+				 */
-+				--cpu;
-+				break;
-+			}
-+		}
-+
-+		/* Send the IPIs for the target list of this cluster */
-+		sgi1r = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3)	|
-+			 MPIDR_TO_SGI_AFFINITY(cluster_id, 2)	|
-+			 /* irq << 24				| */
-+			 MPIDR_TO_SGI_AFFINITY(cluster_id, 1)	|
-+			 tlist);
-+
-+		gicv3_write_sgi1r(sgi1r);
-+	}
-+
-+	/* Force the above writes to ICC_SGI1R_EL1 to be executed */
-+	isb();
-+}
-+
-+static void gicv3_ipi_send_self(void)
-+{
-+	cpumask_t mask;
-+
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(smp_processor_id(), &mask);
-+	gicv3_ipi_send_tlist(&mask);
-+}
-+
-+static void gicv3_ipi_send_broadcast(void)
-+{
-+	gicv3_write_sgi1r(1ULL << 40);
-+	isb();
-+}
-+
- static void ipi_test_self(void)
- {
- 	cpumask_t mask;
-@@ -94,7 +235,7 @@ static void ipi_test_self(void)
- 	smp_wmb();
- 	cpumask_clear(&mask);
- 	cpumask_set_cpu(0, &mask);
--	writel(2 << 24, gicv2_dist_base() + GICD_SGIR);
-+	gic->ipi.send_self();
- 	check_acked(&mask);
- 	report_prefix_pop();
- }
-@@ -102,14 +243,15 @@ static void ipi_test_self(void)
- static void ipi_test_smp(void)
- {
- 	cpumask_t mask;
--	unsigned long tlist;
-+	int i;
- 
- 	report_prefix_push("target-list");
- 	memset(acked, 0, sizeof(acked));
- 	smp_wmb();
--	tlist = cpumask_bits(&cpu_present_mask)[0] & 0xaa;
--	cpumask_bits(&mask)[0] = tlist;
--	writel((u8)tlist << 16, gicv2_dist_base() + GICD_SGIR);
-+	cpumask_copy(&mask, &cpu_present_mask);
-+	for (i = 0; i < nr_cpus; i += 2)
-+		cpumask_clear_cpu(i, &mask);
-+	gic->ipi.send_tlist(&mask);
- 	check_acked(&mask);
- 	report_prefix_pop();
- 
-@@ -118,14 +260,14 @@ static void ipi_test_smp(void)
- 	smp_wmb();
- 	cpumask_copy(&mask, &cpu_present_mask);
- 	cpumask_clear_cpu(0, &mask);
--	writel(1 << 24, gicv2_dist_base() + GICD_SGIR);
-+	gic->ipi.send_broadcast();
- 	check_acked(&mask);
- 	report_prefix_pop();
- }
- 
- static void ipi_enable(void)
- {
--	gicv2_enable_defaults();
-+	gic->ipi.enable();
- #ifdef __arm__
- 	install_exception_handler(EXCPTN_IRQ, ipi_handler);
- #else
-@@ -142,6 +284,30 @@ static void ipi_recv(void)
- 		wfi();
- }
- 
-+struct gic gicv2 = {
-+	.ipi = {
-+		.enable = gicv2_enable_defaults,
-+		.send_self = gicv2_ipi_send_self,
-+		.send_tlist = gicv2_ipi_send_tlist,
-+		.send_broadcast = gicv2_ipi_send_broadcast,
-+	},
-+	.read_iar = gicv2_read_iar,
-+	.irqnr = gicv2_irqnr,
-+	.write_eoi = gicv2_write_eoi,
-+};
-+
-+struct gic gicv3 = {
-+	.ipi = {
-+		.enable = gicv3_enable_defaults,
-+		.send_self = gicv3_ipi_send_self,
-+		.send_tlist = gicv3_ipi_send_tlist,
-+		.send_broadcast = gicv3_ipi_send_broadcast,
-+	},
-+	.read_iar = gicv3_read_iar,
-+	.irqnr = gicv3_irqnr,
-+	.write_eoi = gicv3_write_eoir,
-+};
-+
- int main(int argc, char **argv)
- {
- 	char pfx[8];
-@@ -154,6 +320,15 @@ int main(int argc, char **argv)
- 	snprintf(pfx, 8, "gicv%d", gic_version);
- 	report_prefix_push(pfx);
- 
-+	switch (gic_version) {
-+	case 2:
-+		gic = &gicv2;
-+		break;
-+	case 3:
-+		gic = &gicv3;
-+		break;
-+	}
-+
- 	if (argc < 2) {
- 
- 		report_prefix_push("ipi");
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 68bf5cd6008f..ce3cee73c4bf 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -61,3 +61,9 @@ file = gic.flat
- smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
- extra_params = -machine gic-version=2 -append 'ipi'
- groups = gic
-+
-+[gicv3-ipi]
-+file = gic.flat
-+smp = $MAX_SMP
-+extra_params = -machine gic-version=3 -append 'ipi'
-+groups = gic
-diff --git a/lib/arm/asm/arch_gicv3.h b/lib/arm/asm/arch_gicv3.h
-index 81a1e5f6c29c..615a3393e439 100644
---- a/lib/arm/asm/arch_gicv3.h
-+++ b/lib/arm/asm/arch_gicv3.h
-@@ -16,10 +16,28 @@
- #define __stringify xstr
- 
- #define __ACCESS_CP15(CRn, Op1, CRm, Op2)	p15, Op1, %0, CRn, CRm, Op2
-+#define __ACCESS_CP15_64(Op1, CRm)		p15, Op1, %Q0, %R0, CRm
- 
-+#define ICC_EOIR1			__ACCESS_CP15(c12, 0, c12, 1)
-+#define ICC_IAR1			__ACCESS_CP15(c12, 0, c12, 0)
-+#define ICC_SGI1R			__ACCESS_CP15_64(0, c12)
- #define ICC_PMR				__ACCESS_CP15(c4, 0, c6, 0)
- #define ICC_IGRPEN1			__ACCESS_CP15(c12, 0, c12, 7)
- 
-+static inline void gicv3_write_eoir(u32 irq)
-+{
-+	asm volatile("mcr " __stringify(ICC_EOIR1) : : "r" (irq));
-+	isb();
-+}
-+
-+static inline u32 gicv3_read_iar(void)
-+{
-+	u32 irqstat;
-+	asm volatile("mrc " __stringify(ICC_IAR1) : "=r" (irqstat));
-+	dsb(sy);
-+	return irqstat;
-+}
-+
- static inline void gicv3_write_pmr(u32 val)
- {
- 	asm volatile("mcr " __stringify(ICC_PMR) : : "r" (val));
-@@ -31,6 +49,11 @@ static inline void gicv3_write_grpen1(u32 val)
- 	isb();
- }
- 
-+static inline void gicv3_write_sgi1r(u64 val)
-+{
-+	asm volatile("mcrr " __stringify(ICC_SGI1R) : : "r" (val));
-+}
-+
- static inline u64 gicv3_read_typer(const volatile void __iomem *addr)
- {
- 	u64 val = readl(addr);
-diff --git a/lib/arm64/asm/arch_gicv3.h b/lib/arm64/asm/arch_gicv3.h
-index 6d353567f56a..874775828016 100644
---- a/lib/arm64/asm/arch_gicv3.h
-+++ b/lib/arm64/asm/arch_gicv3.h
-@@ -10,6 +10,9 @@
- 
- #include <asm/sysreg.h>
- 
-+#define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
-+#define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
-+#define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
- #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
- #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
- 
-@@ -27,6 +30,20 @@
-  * sets the GP register's most significant bits to 0 with an explicit cast.
-  */
- 
-+static inline void gicv3_write_eoir(u32 irq)
-+{
-+	asm volatile("msr_s " __stringify(ICC_EOIR1_EL1) ", %0" : : "r" ((u64)irq));
-+	isb();
-+}
-+
-+static inline u32 gicv3_read_iar(void)
-+{
-+	u64 irqstat;
-+	asm volatile("mrs_s %0, " __stringify(ICC_IAR1_EL1) : "=r" (irqstat));
-+	dsb(sy);
-+	return (u64)irqstat;
-+}
-+
- static inline void gicv3_write_pmr(u32 val)
- {
- 	asm volatile("msr_s " __stringify(ICC_PMR_EL1) ", %0" : : "r" ((u64)val));
-@@ -38,6 +55,11 @@ static inline void gicv3_write_grpen1(u32 val)
- 	isb();
- }
- 
-+static inline void gicv3_write_sgi1r(u64 val)
-+{
-+	asm volatile("msr_s " __stringify(ICC_SGI1R_EL1) ", %0" : : "r" (val));
-+}
-+
- #define gicv3_read_typer(c)		readq(c)
- 
- #endif /* __ASSEMBLY__ */
--- 
-2.7.4
+QnkgYWRkaW5nIHN1cHBvcnQgZm9yIGxhdW5jaGluZyB3aXRoIGdpY3YzIHdlIGNhbiBicmVhayB0
+aGUgOCB2Y3B1CmxpbWl0LiBUaGlzIHBhdGNoIGFkZHMgc3VwcG9ydCB0byBzbXAgY29kZSBhbmQg
+YWxzbyBzZWxlY3RzIHRoZQp2Z2ljIG1vZGVsIGNvcnJlc3BvbmRpbmcgdG8gdGhlIGhvc3QuIFRo
+ZSB2Z2ljIG1vZGVsIG1heSBhbHNvIGJlCm1hbnVhbGx5IHNlbGVjdGVkIGJ5IGFkZGluZyBlLmcu
+IC1tYWNoaW5lIGdpYy12ZXJzaW9uPTMgdG8KZXh0cmFfcGFyYW1zLgoKUmV2aWV3ZWQtYnk6IEFs
+ZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KU2lnbmVkLW9mZi1ieTogQW5kcmV3
+IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+CgotLS0KdjU6IGxlZnQgY3B1cyBhIHUzMiBmb3Ig
+bm93LiBDaGFuZ2luZyB0byB1NjQgcmVxdWlyZXMgYSBjaGFuZ2UgdG8KICAgIGRldmljZXRyZWUu
+IFdpbGwgZG8gaXQgbGF0ZXIuIFtBbmRyZV0KdjQ6IGltcHJvdmVkIGNvbW1pdCBtZXNzYWdlCi0t
+LQogYXJtL3J1biAgICAgICAgICAgICAgICAgICB8IDE5ICsrKysrKysrKysrKy0tLS0tLS0KIGFy
+bS9zZWxmdGVzdC5jICAgICAgICAgICAgfCAgNSArKysrLQogbGliL2FybS9hc20vcHJvY2Vzc29y
+LmggICB8ICA5ICsrKysrKystLQogbGliL2FybS9hc20vc2V0dXAuaCAgICAgICB8ICA0ICsrLS0K
+IGxpYi9hcm0vc2V0dXAuYyAgICAgICAgICAgfCAxMCArKysrKysrKysrCiBsaWIvYXJtNjQvYXNt
+L3Byb2Nlc3Nvci5oIHwgIDkgKysrKysrKy0tCiA2IGZpbGVzIGNoYW5nZWQsIDQyIGluc2VydGlv
+bnMoKyksIDE0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FybS9ydW4gYi9hcm0vcnVuCmlu
+ZGV4IGEyZjM1ZWY2YTdlNi4uMmQwNjk4NjE5NjA2IDEwMDc1NQotLS0gYS9hcm0vcnVuCisrKyBi
+L2FybS9ydW4KQEAgLTMxLDEzICszMSw2IEBAIGlmIFsgLXogIiRBQ0NFTCIgXTsgdGhlbgogCWZp
+CiBmaQogCi1pZiBbICIkSE9TVCIgPSAiYWFyY2g2NCIgXSAmJiBbICIkQUNDRUwiID0gImt2bSIg
+XTsgdGhlbgotCXByb2Nlc3Nvcj0iaG9zdCIKLQlpZiBbICIkQVJDSCIgPSAiYXJtIiBdOyB0aGVu
+Ci0JCXByb2Nlc3Nvcis9IixhYXJjaDY0PW9mZiIKLQlmaQotZmkKLQogcWVtdT0iJHtRRU1VOi1x
+ZW11LXN5c3RlbS0kQVJDSF9OQU1FfSIKIHFwYXRoPSQod2hpY2ggJHFlbXUgMj4vZGV2L251bGwp
+CiAKQEAgLTUzLDYgKzQ2LDE4IEBAIGZpCiAKIE09Jy1tYWNoaW5lIHZpcnQnCiAKK2lmIFsgIiRB
+Q0NFTCIgPSAia3ZtIiBdOyB0aGVuCisJaWYgJHFlbXUgJE0sXD8gMj4mMSB8IGdyZXAgZ2ljLXZl
+cnNpb24gPiAvZGV2L251bGw7IHRoZW4KKwkJTSs9JyxnaWMtdmVyc2lvbj1ob3N0JworCWZpCisJ
+aWYgWyAiJEhPU1QiID0gImFhcmNoNjQiIF07IHRoZW4KKwkJcHJvY2Vzc29yPSJob3N0IgorCQlp
+ZiBbICIkQVJDSCIgPSAiYXJtIiBdOyB0aGVuCisJCQlwcm9jZXNzb3IrPSIsYWFyY2g2ND1vZmYi
+CisJCWZpCisJZmkKK2ZpCisKIGlmICEgJHFlbXUgJE0gLWRldmljZSAnPycgMj4mMSB8IGdyZXAg
+dmlydGNvbnNvbGUgPiAvZGV2L251bGw7IHRoZW4KIAllY2hvICIkcXBhdGggZG9lc24ndCBzdXBw
+b3J0IHZpcnRpby1jb25zb2xlIGZvciBjaHItdGVzdGRldi4gRXhpdGluZy4iCiAJZXhpdCAyCmRp
+ZmYgLS1naXQgYS9hcm0vc2VsZnRlc3QuYyBiL2FybS9zZWxmdGVzdC5jCmluZGV4IDE5NjE2NGY1
+MzEzZC4uMmYxMTdmNzk1ZDJkIDEwMDY0NAotLS0gYS9hcm0vc2VsZnRlc3QuYworKysgYi9hcm0v
+c2VsZnRlc3QuYwpAQCAtMzEyLDkgKzMxMiwxMCBAQCBzdGF0aWMgYm9vbCBwc2NpX2NoZWNrKHZv
+aWQpCiBzdGF0aWMgY3B1bWFza190IHNtcF9yZXBvcnRlZDsKIHN0YXRpYyB2b2lkIGNwdV9yZXBv
+cnQodm9pZCkKIHsKKwl1bnNpZ25lZCBsb25nIG1waWRyID0gZ2V0X21waWRyKCk7CiAJaW50IGNw
+dSA9IHNtcF9wcm9jZXNzb3JfaWQoKTsKIAotCXJlcG9ydCgiQ1BVJWQgb25saW5lIiwgdHJ1ZSwg
+Y3B1KTsKKwlyZXBvcnQoIkNQVSglM2QpIG1waWRyPSVseCIsIG1waWRyX3RvX2NwdShtcGlkcikg
+PT0gY3B1LCBjcHUsIG1waWRyKTsKIAljcHVtYXNrX3NldF9jcHUoY3B1LCAmc21wX3JlcG9ydGVk
+KTsKIAloYWx0KCk7CiB9CkBAIC0zNDMsNiArMzQ0LDcgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNo
+YXIgKiphcmd2KQogCiAJfSBlbHNlIGlmIChzdHJjbXAoYXJndlsxXSwgInNtcCIpID09IDApIHsK
+IAorCQl1bnNpZ25lZCBsb25nIG1waWRyID0gZ2V0X21waWRyKCk7CiAJCWludCBjcHU7CiAKIAkJ
+cmVwb3J0KCJQU0NJIHZlcnNpb24iLCBwc2NpX2NoZWNrKCkpOwpAQCAtMzUzLDYgKzM1NSw3IEBA
+IGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikKIAkJCXNtcF9ib290X3NlY29uZGFyeShj
+cHUsIGNwdV9yZXBvcnQpOwogCQl9CiAKKwkJcmVwb3J0KCJDUFUoJTNkKSBtcGlkcj0lbHgiLCBt
+cGlkcl90b19jcHUobXBpZHIpID09IDAsIDAsIG1waWRyKTsKIAkJY3B1bWFza19zZXRfY3B1KDAs
+ICZzbXBfcmVwb3J0ZWQpOwogCQl3aGlsZSAoIWNwdW1hc2tfZnVsbCgmc21wX3JlcG9ydGVkKSkK
+IAkJCWNwdV9yZWxheCgpOwpkaWZmIC0tZ2l0IGEvbGliL2FybS9hc20vcHJvY2Vzc29yLmggYi9s
+aWIvYXJtL2FzbS9wcm9jZXNzb3IuaAppbmRleCAwMmY5MTJmOTk5NzQuLmVjZjViYmUxODI0YSAx
+MDA2NDQKLS0tIGEvbGliL2FybS9hc20vcHJvY2Vzc29yLmgKKysrIGIvbGliL2FybS9hc20vcHJv
+Y2Vzc29yLmgKQEAgLTQwLDggKzQwLDEzIEBAIHN0YXRpYyBpbmxpbmUgdW5zaWduZWQgbG9uZyBn
+ZXRfbXBpZHIodm9pZCkKIAlyZXR1cm4gbXBpZHI7CiB9CiAKLS8qIE9ubHkgc3VwcG9ydCBBZmYw
+IGZvciBub3csIHVwIHRvIDQgY3B1cyAqLwotI2RlZmluZSBtcGlkcl90b19jcHUobXBpZHIpICgo
+aW50KSgobXBpZHIpICYgMHhmZikpCisjZGVmaW5lIE1QSURSX0hXSURfQklUTUFTSyAweGZmZmZm
+ZgorZXh0ZXJuIGludCBtcGlkcl90b19jcHUodW5zaWduZWQgbG9uZyBtcGlkcik7CisKKyNkZWZp
+bmUgTVBJRFJfTEVWRUxfU0hJRlQobGV2ZWwpIFwKKwkoKCgxIDw8IGxldmVsKSA+PiAxKSA8PCAz
+KQorI2RlZmluZSBNUElEUl9BRkZJTklUWV9MRVZFTChtcGlkciwgbGV2ZWwpIFwKKwkoKG1waWRy
+ID4+IE1QSURSX0xFVkVMX1NISUZUKGxldmVsKSkgJiAweGZmKQogCiBleHRlcm4gdm9pZCBzdGFy
+dF91c3Iodm9pZCAoKmZ1bmMpKHZvaWQgKmFyZyksIHZvaWQgKmFyZywgdW5zaWduZWQgbG9uZyBz
+cF91c3IpOwogZXh0ZXJuIGJvb2wgaXNfdXNlcih2b2lkKTsKZGlmZiAtLWdpdCBhL2xpYi9hcm0v
+YXNtL3NldHVwLmggYi9saWIvYXJtL2FzbS9zZXR1cC5oCmluZGV4IGNiOGZkYmQzOGRkNS4uMWRl
+OTlkZDE4NGQxIDEwMDY0NAotLS0gYS9saWIvYXJtL2FzbS9zZXR1cC5oCisrKyBiL2xpYi9hcm0v
+YXNtL3NldHVwLmgKQEAgLTEwLDggKzEwLDggQEAKICNpbmNsdWRlIDxhc20vcGFnZS5oPgogI2lu
+Y2x1ZGUgPGFzbS9wZ3RhYmxlLWh3ZGVmLmg+CiAKLSNkZWZpbmUgTlJfQ1BVUwkJCTgKLWV4dGVy
+biB1MzIgY3B1c1tOUl9DUFVTXTsKKyNkZWZpbmUgTlJfQ1BVUwkJCTI1NQorZXh0ZXJuIHUzMiBj
+cHVzW05SX0NQVVNdOwkvKiBwZXItY3B1IElEcyAoTVBJRFJzKSAqLwogZXh0ZXJuIGludCBucl9j
+cHVzOwogCiAjZGVmaW5lIE5SX01FTV9SRUdJT05TCQk4CmRpZmYgLS1naXQgYS9saWIvYXJtL3Nl
+dHVwLmMgYi9saWIvYXJtL3NldHVwLmMKaW5kZXggN2U3YjM5ZjExZGRlLi4yNDFiZjk0MTA0NDcg
+MTAwNjQ0Ci0tLSBhL2xpYi9hcm0vc2V0dXAuYworKysgYi9saWIvYXJtL3NldHVwLmMKQEAgLTMw
+LDYgKzMwLDE2IEBAIGludCBucl9jcHVzOwogc3RydWN0IG1lbV9yZWdpb24gbWVtX3JlZ2lvbnNb
+TlJfTUVNX1JFR0lPTlNdOwogcGh5c19hZGRyX3QgX19waHlzX29mZnNldCwgX19waHlzX2VuZDsK
+IAoraW50IG1waWRyX3RvX2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKQoreworCWludCBpOworCisJ
+Zm9yIChpID0gMDsgaSA8IG5yX2NwdXM7ICsraSkKKwkJaWYgKGNwdXNbaV0gPT0gKG1waWRyICYg
+TVBJRFJfSFdJRF9CSVRNQVNLKSkKKwkJCXJldHVybiBpOworCXJldHVybiAtMTsKK30KKwogc3Rh
+dGljIHZvaWQgY3B1X3NldChpbnQgZmR0bm9kZSBfX3VudXNlZCwgdTMyIHJlZ3ZhbCwgdm9pZCAq
+aW5mbyBfX3VudXNlZCkKIHsKIAlpbnQgY3B1ID0gbnJfY3B1cysrOwpkaWZmIC0tZ2l0IGEvbGli
+L2FybTY0L2FzbS9wcm9jZXNzb3IuaCBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKaW5kZXgg
+OWEyMDhmZjcyOWI3Li43ZTQ0OGRjODFhNmEgMTAwNjQ0Ci0tLSBhL2xpYi9hcm02NC9hc20vcHJv
+Y2Vzc29yLmgKKysrIGIvbGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaApAQCAtNzgsOCArNzgsMTMg
+QEAgc3RhdGljIGlubGluZSB0eXBlIGdldF8jI3JlZyh2b2lkKQkJCQlcCiAKIERFRklORV9HRVRf
+U1lTUkVHNjQobXBpZHIpCiAKLS8qIE9ubHkgc3VwcG9ydCBBZmYwIGZvciBub3csIGdpY3YyIG9u
+bHkgKi8KLSNkZWZpbmUgbXBpZHJfdG9fY3B1KG1waWRyKSAoKGludCkoKG1waWRyKSAmIDB4ZmYp
+KQorI2RlZmluZSBNUElEUl9IV0lEX0JJVE1BU0sgMHhmZjAwZmZmZmZmCitleHRlcm4gaW50IG1w
+aWRyX3RvX2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsKKworI2RlZmluZSBNUElEUl9MRVZFTF9T
+SElGVChsZXZlbCkgXAorCSgoKDEgPDwgbGV2ZWwpID4+IDEpIDw8IDMpCisjZGVmaW5lIE1QSURS
+X0FGRklOSVRZX0xFVkVMKG1waWRyLCBsZXZlbCkgXAorCSgobXBpZHIgPj4gTVBJRFJfTEVWRUxf
+U0hJRlQobGV2ZWwpKSAmIDB4ZmYpCiAKIGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgqZnVu
+Yykodm9pZCAqYXJnKSwgdm9pZCAqYXJnLCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7CiBleHRlcm4g
+Ym9vbCBpc191c2VyKHZvaWQpOwotLSAKMi43LjQKCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
+LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
+bmZvL2t2bWFybQo=
