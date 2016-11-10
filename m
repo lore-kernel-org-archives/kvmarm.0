@@ -1,157 +1,165 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v5 00/11] arm/arm64: add gic framework
-Date: Thu, 10 Nov 2016 18:21:10 +0100
-Message-ID: <1478798481-25030-1-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v5 04/11] arm/arm64: add some delay routines
+Date: Thu, 10 Nov 2016 18:21:14 +0100
+Message-ID: <1478798481-25030-5-git-send-email-drjones@redhat.com>
+References: <1478798481-25030-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE8F14042E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 12:21:03 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r5zYIN8BdA59 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2016 12:21:03 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC55E402A6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2016 12:21:02 -0500 (EST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1478798481-25030-1-git-send-email-drjones@redhat.com>
+Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
+Cc: pbonzini@redhat.com, andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-v5:
- - fix arm32/gicv3 compile [drew]
- - use modern register names [Andre]
- - one Andre r-b
+Allow a thread to wait some specified amount of time. Can
+specify in cycles, usecs, and msecs.
 
-v4:
- - Eric's r-b's
- - Andre's suggestion to only take defines we need
- - several other changes listed in individual patches
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ lib/arm/asm/processor.h   | 19 +++++++++++++++++++
+ lib/arm/processor.c       | 15 +++++++++++++++
+ lib/arm64/asm/processor.h | 19 +++++++++++++++++++
+ lib/arm64/processor.c     | 15 +++++++++++++++
+ 4 files changed, 68 insertions(+)
 
-v3:
- - Rebased on latest master
- - Added Alex's r-b's
-
-v2:
- Rebased on latest master + my "populate argv[0]" series (will
- send a REPOST for that shortly. Additionally a few patches got
- fixes/features;
- 07/10 got same fix as kernel 7c9b973061 "irqchip/gic-v3: Configure
-       all interrupts as non-secure Group-1" in order to continue
-       working over TCG, as the gicv3 code for TCG removed a hack
-       it had there to make Linux happy.
- 08/10 added more output for when things fail (if they fail)
- 09/10 switched gicv3 broadcast implementation to using IRM. This
-       found a bug in a recent (but not tip) kernel, which I was
-       about to fix, but then I saw MarcZ beat me to it.
- 10/10 actually check that the input irq is the received irq
-
-
-Import defines, and steal enough helper functions, from Linux to
-enable programming of the gic (v2 and v3). Then use the framework
-to add an initial test (an ipi test; self, target-list, broadcast).
-
-It's my hope that this framework will be a suitable base on which
-more tests may be easily added, particularly because we have
-vgic-new and tcg gicv3 emulation getting close to merge. (v3 UPDATE:
-vgic-new and tcg gicv3 are merged now)
-
-To run it, along with other tests, just do
-
- ./configure [ --arch=[arm|arm64] --cross-prefix=$PREFIX ]
- make
- export QEMU=$PATH_TO_QEMU
- ./run_tests.sh
-
-To run it separately do, e.g.
-
-$QEMU -machine virt,accel=tcg -cpu cortex-a57 \
- -device virtio-serial-device \
- -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
- -display none -serial stdio \
- -kernel arm/gic.flat \
- -smp 123 -machine gic-version=3 -append ipi
-      ^^ note, we can go nuts with nr-cpus on TCG :-)
-
-Or, a KVM example using a different "sender" cpu and irq (other than zero)
-
-$QEMU -machine virt,accel=kvm -cpu host \
- -device virtio-serial-device \
- -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
- -display none -serial stdio \
- -kernel arm/gic.flat \
- -smp 48 -machine gic-version=3 -append 'ipi sender=42 irq=1'
-
-
-Patches:
-01-05: fixes and functionality needed by the later gic patches
-06-07: enable gicv2 and gicv2 IPI test
-08-10: enable gicv3 and gicv3 IPI test
-   11: extend the IPI tests to take variable sender and irq
-
-Available here: https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic-v5
-
-
-Andrew Jones (10):
-  lib: xstr: allow multiple args
-  arm64: fix get_"sysreg32" and make MPIDR 64bit
-  arm/arm64: smp: support more than 8 cpus
-  arm/arm64: add some delay routines
-  arm/arm64: irq enable/disable
-  arm/arm64: add initial gicv2 support
-  arm/arm64: gicv2: add an IPI test
-  arm/arm64: add initial gicv3 support
-  arm/arm64: gicv3: add an IPI test
-  arm/arm64: gic: don't just use zero
-
-Peter Xu (1):
-  libcflat: add IS_ALIGNED() macro, and page sizes
-
- arm/Makefile.common        |   7 +-
- arm/gic.c                  | 417 +++++++++++++++++++++++++++++++++++++++++++++
- arm/run                    |  19 ++-
- arm/selftest.c             |   5 +-
- arm/unittests.cfg          |  13 ++
- lib/arm/asm/arch_gicv3.h   |  65 +++++++
- lib/arm/asm/gic-v2.h       |  36 ++++
- lib/arm/asm/gic-v3.h       |  94 ++++++++++
- lib/arm/asm/gic.h          |  43 +++++
- lib/arm/asm/processor.h    |  42 ++++-
- lib/arm/asm/setup.h        |   4 +-
- lib/arm/gic.c              | 141 +++++++++++++++
- lib/arm/processor.c        |  15 ++
- lib/arm/setup.c            |  10 ++
- lib/arm64/asm/arch_gicv3.h |  66 +++++++
- lib/arm64/asm/gic-v2.h     |   1 +
- lib/arm64/asm/gic-v3.h     |   1 +
- lib/arm64/asm/gic.h        |   1 +
- lib/arm64/asm/processor.h  |  53 +++++-
- lib/arm64/asm/sysreg.h     |  44 +++++
- lib/arm64/processor.c      |  15 ++
- lib/libcflat.h             |  10 +-
- 22 files changed, 1075 insertions(+), 27 deletions(-)
- create mode 100644 arm/gic.c
- create mode 100644 lib/arm/asm/arch_gicv3.h
- create mode 100644 lib/arm/asm/gic-v2.h
- create mode 100644 lib/arm/asm/gic-v3.h
- create mode 100644 lib/arm/asm/gic.h
- create mode 100644 lib/arm/gic.c
- create mode 100644 lib/arm64/asm/arch_gicv3.h
- create mode 100644 lib/arm64/asm/gic-v2.h
- create mode 100644 lib/arm64/asm/gic-v3.h
- create mode 100644 lib/arm64/asm/gic.h
- create mode 100644 lib/arm64/asm/sysreg.h
-
+diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+index ecf5bbe1824a..bc46d1f980ee 100644
+--- a/lib/arm/asm/processor.h
++++ b/lib/arm/asm/processor.h
+@@ -5,7 +5,9 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
++#include <libcflat.h>
+ #include <asm/ptrace.h>
++#include <asm/barrier.h>
+ 
+ enum vector {
+ 	EXCPTN_RST,
+@@ -51,4 +53,21 @@ extern int mpidr_to_cpu(unsigned long mpidr);
+ extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+ extern bool is_user(void);
+ 
++static inline u64 get_cntvct(void)
++{
++	u64 vct;
++	isb();
++	asm volatile("mrrc p15, 1, %Q0, %R0, c14" : "=r" (vct));
++	return vct;
++}
++
++extern void delay(u64 cycles);
++extern void udelay(unsigned long usecs);
++
++static inline void mdelay(unsigned long msecs)
++{
++	while (msecs--)
++		udelay(1000);
++}
++
+ #endif /* _ASMARM_PROCESSOR_H_ */
+diff --git a/lib/arm/processor.c b/lib/arm/processor.c
+index 54fdb87ef019..c2ee360df688 100644
+--- a/lib/arm/processor.c
++++ b/lib/arm/processor.c
+@@ -9,6 +9,7 @@
+ #include <asm/ptrace.h>
+ #include <asm/processor.h>
+ #include <asm/thread_info.h>
++#include <asm/barrier.h>
+ 
+ static const char *processor_modes[] = {
+ 	"USER_26", "FIQ_26" , "IRQ_26" , "SVC_26" ,
+@@ -141,3 +142,17 @@ bool is_user(void)
+ {
+ 	return current_thread_info()->flags & TIF_USER_MODE;
+ }
++
++void delay(u64 cycles)
++{
++	u64 start = get_cntvct();
++	while ((get_cntvct() - start) < cycles)
++		cpu_relax();
++}
++
++void udelay(unsigned long usec)
++{
++	unsigned int frq;
++	asm volatile("mrc p15, 0, %0, c14, c0, 0" : "=r" (frq));
++	delay((u64)usec * frq / 1000000);
++}
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index 7e448dc81a6a..94f7ce35b65c 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -17,8 +17,10 @@
+ #define SCTLR_EL1_M	(1 << 0)
+ 
+ #ifndef __ASSEMBLY__
++#include <libcflat.h>
+ #include <asm/ptrace.h>
+ #include <asm/esr.h>
++#include <asm/barrier.h>
+ 
+ enum vector {
+ 	EL1T_SYNC,
+@@ -89,5 +91,22 @@ extern int mpidr_to_cpu(unsigned long mpidr);
+ extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+ extern bool is_user(void);
+ 
++static inline u64 get_cntvct(void)
++{
++	u64 vct;
++	isb();
++	asm volatile("mrs %0, cntvct_el0" : "=r" (vct));
++	return vct;
++}
++
++extern void delay(u64 cycles);
++extern void udelay(unsigned long usecs);
++
++static inline void mdelay(unsigned long msecs)
++{
++	while (msecs--)
++		udelay(1000);
++}
++
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM64_PROCESSOR_H_ */
+diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
+index deeab4ec9c8a..50fa835c6f1e 100644
+--- a/lib/arm64/processor.c
++++ b/lib/arm64/processor.c
+@@ -9,6 +9,7 @@
+ #include <asm/ptrace.h>
+ #include <asm/processor.h>
+ #include <asm/thread_info.h>
++#include <asm/barrier.h>
+ 
+ static const char *vector_names[] = {
+ 	"el1t_sync",
+@@ -253,3 +254,17 @@ bool is_user(void)
+ {
+ 	return current_thread_info()->flags & TIF_USER_MODE;
+ }
++
++void delay(u64 cycles)
++{
++	u64 start = get_cntvct();
++	while ((get_cntvct() - start) < cycles)
++		cpu_relax();
++}
++
++void udelay(unsigned long usec)
++{
++	unsigned int frq;
++	asm volatile("mrs %0, cntfrq_el0" : "=r" (frq));
++	delay((u64)usec * frq / 1000000);
++}
 -- 
 2.7.4
+
