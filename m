@@ -1,122 +1,59 @@
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v5 10/11] arm/arm64: gicv3: add an IPI test
-Date: Fri, 11 Nov 2016 14:53:42 +0000
-Message-ID: <87twbe6pah.fsf@linaro.org>
-References: <1478798481-25030-1-git-send-email-drjones@redhat.com> <1478798481-25030-11-git-send-email-drjones@redhat.com> <874m3f8621.fsf@linaro.org> <20161110203713.4idzgs5u2xm7ms4o@hawk.localdomain> <871syi8hbg.fsf@linaro.org> <20161111135421.5oxdkfqynkgipgom@hawk.localdomain>
+Subject: Re: [kvm-unit-tests PATCH v5 08/11] libcflat: add IS_ALIGNED() macro, and page sizes
+Date: Fri, 11 Nov 2016 15:02:42 +0000
+Message-ID: <87shqy6ovh.fsf@linaro.org>
+References: <1478798481-25030-1-git-send-email-drjones@redhat.com> <1478798481-25030-9-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20161111135421.5oxdkfqynkgipgom@hawk.localdomain>
+In-reply-to: <1478798481-25030-9-git-send-email-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andrew Jones <drjones@redhat.com>
-Cc: peter.maydell@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, eric.auger@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, andre.przywara@arm.com, peter.maydell@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, christoffer.dall@linaro.org, Peter Xu <peterx@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 Andrew Jones <drjones@redhat.com> writes:
 
-> On Fri, Nov 11, 2016 at 10:02:59AM +0000, Alex Bennée wrote:
->>
->> Andrew Jones <drjones@redhat.com> writes:
->>
->> > On Thu, Nov 10, 2016 at 07:53:58PM +0000, Alex Bennée wrote:
->> > [...]
->> >> > +struct gic gicv2 = {
->> >> > +	.ipi = {
->> >> > +		.enable = gicv2_enable_defaults,
->> >> > +		.send_self = gicv2_ipi_send_self,
->> >> > +		.send_tlist = gicv2_ipi_send_tlist,
->> >> > +		.send_broadcast = gicv2_ipi_send_broadcast,
->> >> > +	},
->> >> > +	.read_iar = gicv2_read_iar,
->> >> > +	.irqnr = gicv2_irqnr,
->> >> > +	.write_eoi = gicv2_write_eoi,
->> >> > +};
->> >> > +
->> >> > +struct gic gicv3 = {
->> >> > +	.ipi = {
->> >> > +		.enable = gicv3_enable_defaults,
->> >> > +		.send_self = gicv3_ipi_send_self,
->> >> > +		.send_tlist = gicv3_ipi_send_tlist,
->> >> > +		.send_broadcast = gicv3_ipi_send_broadcast,
->> >> > +	},
->> >> > +	.read_iar = gicv3_read_iar,
->> >> > +	.irqnr = gicv3_irqnr,
->> >> > +	.write_eoi = gicv3_write_eoir,
->> >> > +};
->> >> > +
->> >>
->> >> So I was re-basing my kvm-unit-tests against your GIC rework and found
->> >> myself copy and pasting a bunch of this into my tests that fire IRQs.
->> >> That makes me think the abstraction should be in the library code so
->> >> other tests can fiddle with sending IRQs.
->> >>
->> >> What do you think?
->> >>
->> >
->> > I guess you mean moving the above two structs and their corresponding
->> > functions (all which aren't already common) to lib/arm/ ? Or do you
->> > just mean the one non-trivial function gicv3_ipi_send_tlist? I think
->> > agree with gicv3_ipi_send_tlist getting shared, but the others are
->> > mostly one-liners, so I'm not sure. I guess I'd have to see how you're
->> > using them first.
->>
->> So it looked like there were some functions in the common code for one
->> GIC which had local test defined functions for the other. They should at
->> least be consistent.
+> From: Peter Xu <peterx@redhat.com>
 >
-> gicv3_read_iar and gicv3_write_eoir being common already is a product of
-> being sysreg wrappers, allowing for both arm32 and arm64 to use functions
-> of the same names, not because I wanted gicv3 to be inconsistent with
-> gicv2 (which uses MMIO and thus doesn't need wrappers)
+> These macros will be useful to do page alignment checks.
 >
->>
->> For my use case I could do with a common:
->>
->>   gic_enable
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> [drew: also added SZ_64K]
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  lib/libcflat.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
 >
-> OK, I can extend gic_init() to initialize a 'struct gic_common_ops' that
-> includes an enable -> *_enable_defaults(void), ipi_send(int cpu),
-> read_iar(void), iar_irqnr(u32 iar), and write_eoi(u32 irqstat). And also
-> provide the wrappers gic_enable, gic_ipi_send(cpu), ...
->
->>   gic_send_spi(cpu, irq)
->
-> I'll let you add this one to the new common ops struct :-)
->
->>   gic_irq_ack() which returns the iar.
->
-> This one will be called read_iar.
->
-> Would that work for you, Alex?
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index 82005f5d014f..143fc53061fe 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -33,6 +33,12 @@
+>  #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
+>  #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
+>  #define ALIGN(x, a)		__ALIGN((x), (a))
+> +#define IS_ALIGNED(x, a)	(((x) & ((typeof(x))(a) - 1)) == 0)
+> +
+> +#define SZ_4K			(0x1000)
+> +#define SZ_64K			(0x10000)
+> +#define SZ_2M			(0x200000)
+> +#define SZ_1G			(0x40000000)
 
-Sounds good to me :-)
+We don't seem to use IS_ALIGNED, or in fact anything apart from SZ_64K
+(which is multiplied by 2 anyway) so I'm not sure if this patch is worth
+it for this series.
+
+Stylistically I thought (1 << foo) was preferred for setting of
+individual bits? Otherwise I'd be tempted to line the values up with
+zero padding to make it easier to read the bit position.
 
 >
-> Andre,
->
-> Would this also satisfy your needs for more common code?
->
-> Thanks,
-> drew
->
->>
->> See:
->>
->>   https://github.com/stsquad/kvm-unit-tests/blob/mttcg/current-tests-v6/arm/tcg-test.c#L113
->>
->> >
->> > Thanks,
->> > drew
->>
->>
->> --
->> Alex Bennée
->> --
->> To unsubscribe from this list: send the line "unsubscribe kvm" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  typedef uint8_t		u8;
+>  typedef int8_t		s8;
 
 
 --
