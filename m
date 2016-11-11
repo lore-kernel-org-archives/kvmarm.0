@@ -1,83 +1,66 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v5 07/11] arm/arm64: gicv2:
- add an IPI test
-Date: Fri, 11 Nov 2016 14:13:31 +0100
-Message-ID: <20161111131331.hndvzivzej2mzxiq@hawk.localdomain>
-References: <1478798481-25030-1-git-send-email-drjones@redhat.com>
- <1478798481-25030-8-git-send-email-drjones@redhat.com>
- <53d2bd86-61c6-5717-7bfd-1c6594e3dd43@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 0/2] arm64: Support systems without FP/ASIMD
+Date: Fri, 11 Nov 2016 13:41:37 +0000
+Message-ID: <d9b41cca-9a9c-ab92-d3e5-ee1870bb70d4@arm.com>
+References: <1478613381-5718-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EFFD403F8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Nov 2016 08:13:14 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sKu+MKmayO2U for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Nov 2016 08:13:12 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C731340354
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Nov 2016 08:13:12 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <53d2bd86-61c6-5717-7bfd-1c6594e3dd43@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1478613381-5718-1-git-send-email-suzuki.poulose@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, catalin.marinas@arm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ard.biesheuvel@linaro.org, will.deacon@arm.com, mark.rutland@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 11, 2016 at 11:13:46AM +0000, Andre Przywara wrote:
-> Hi,
+On 08/11/16 13:56, Suzuki K Poulose wrote:
+> This series adds supports to the kernel and KVM hyp to handle
+> systems without FP/ASIMD properly. At the moment the kernel
+> doesn't check if the FP unit is available before accessing
+> the registers (e.g during context switch). Also for KVM,
+> we trap the FP/ASIMD accesses and handle it by injecting an
+> undefined instruction into the VM on systems without FP.
 > 
-> more a comment loosely related to this patch ...
+> Tested on a FVP_Base-AEM-v8A model by disabling VFP on at
+> least one CPU ( -C clusterX.cpuY.vfp-present=0 ).
 > 
-> > diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> > index 3f6fa45c587e..68bf5cd6008f 100644
-> > --- a/arm/unittests.cfg
-> > +++ b/arm/unittests.cfg
-> > @@ -54,3 +54,10 @@ file = selftest.flat
-> >  smp = $MAX_SMP
-> >  extra_params = -append 'smp'
-> >  groups = selftest
-> > +
-> > +# Test GIC emulation
-> > +[gicv2-ipi]
-> > +file = gic.flat
-> > +smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+> Changes since V2:
+>  - Dropped cleanup patch for arm64/crypto/aes-ce-ccm-glue.c
+>  - Removed static_key check from cpus_have_cap. All users with
+>    constant caps should use the new API to make use of static_keys.
+>  - Removed a dedicated static_key used in irqchip-gic-v3.c for
+>    Cavium errata with the new API.
 > 
-> So here we always go with the maximum number of VCPUs in the guest.
-> However (as you also noted in your cover-letter) running with a
-> different number of CPUs might be interesting, for instance with less
-> than 8 CPUs on a GICv2 (the ITARGETSR register must be masked) or in
-> general with an odd number (both literally and in the broader sense). I
-> have a test case with passes with 8 VCPUs but fails with less.
+> Applies on v4.9-rc4 + [1] (which is pushed for rc5)
 > 
-> Is there any good way to run some tests multiple times with different
-> numbers of VCPUS?
-> Shall we add some "set" functionality to the smp parameter, so that we
-> can specify a list of desired test points?
->
+> [1] http://marc.info/?l=linux-arm-kernel&m=147819889813214&w=2
+> 
+> 
+> Suzuki K Poulose (2):
+>   arm64: Add hypervisor safe helper for checking constant capabilities
+>   arm64: Support systems without FP/ASIMD
+> 
+>  arch/arm64/include/asm/cpucaps.h    |  3 ++-
+>  arch/arm64/include/asm/cpufeature.h | 24 +++++++++++++++++-------
+>  arch/arm64/include/asm/neon.h       |  3 ++-
+>  arch/arm64/kernel/cpufeature.c      | 17 ++++++++++++++++-
+>  arch/arm64/kernel/fpsimd.c          | 14 ++++++++++++++
+>  arch/arm64/kernel/process.c         |  2 +-
+>  arch/arm64/kvm/handle_exit.c        | 11 +++++++++++
+>  arch/arm64/kvm/hyp/hyp-entry.S      |  9 ++++++++-
+>  arch/arm64/kvm/hyp/switch.c         |  5 ++++-
+>  drivers/irqchip/irq-gic-v3.c        | 13 +------------
+>  10 files changed, 76 insertions(+), 25 deletions(-)
+> 
 
-We can just add multiple entries, e.g.
+For the series:
 
-[gicv2-ipi]
-file = gic.flat
-smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
-[gicv2-ipi-3]
-file = gic.flat
-smp = $((($MAX_SMP > 3)?3:$MAX_SMP))
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
-or whatever. But we need to always consider MAX_SMP, since some
-machines may less than 8.
+How do we plan on merging this? Catalin, are you willing to take it all?
 
 Thanks,
-drew
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
