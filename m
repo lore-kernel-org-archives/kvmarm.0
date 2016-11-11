@@ -1,38 +1,38 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [kvm-unit-tests PATCH v5 03/11] arm/arm64: smp: support more than
- 8 cpus
-Date: Fri, 11 Nov 2016 15:27:38 +0000
-Message-ID: <caf9e57a-a8f7-8595-2004-3be0d3224ce6@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v5 06/11] arm/arm64: add
+ initial gicv2 support
+Date: Fri, 11 Nov 2016 16:30:56 +0100
+Message-ID: <20161111153056.2jl5vvixb33jsmoe@hawk.localdomain>
 References: <1478798481-25030-1-git-send-email-drjones@redhat.com>
- <1478798481-25030-4-git-send-email-drjones@redhat.com>
+ <1478798481-25030-7-git-send-email-drjones@redhat.com>
+ <87vavu6pc7.fsf@linaro.org>
+ <2400d95c-02c3-5621-8cc1-32a61d3795e8@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1478798481-25030-4-git-send-email-drjones@redhat.com>
+Content-Disposition: inline
+In-Reply-To: <2400d95c-02c3-5621-8cc1-32a61d3795e8@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: pbonzini@redhat.com, peter.maydell@linaro.org, alex.bennee@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, christoffer.dall@linaro.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, qemu-devel@nongnu.org, eric.auger@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 10/11/16 17:21, Andrew Jones wrote:
-> By adding support for launching with gicv3 we can break the 8 vcpu
-> limit. This patch adds support to smp code and also selects the
-> vgic model corresponding to the host. The vgic model may also be
-> manually selected by adding e.g. -machine gic-version=3 to
-> extra_params.
+On Fri, Nov 11, 2016 at 03:17:25PM +0000, Andre Przywara wrote:
+> > 
+> > This doesn't seem to be used and I'm not sure what GICD_TYPER_IRQS it is
+> > trying to achieve.
 > 
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> 
-> ---
-> v5: left cpus a u32 for now. Changing to u64 requires a change to
->     devicetree. Will do it later. [Andre]
+> The idea is to calculate the number of implemented SPIs. But I am not a
+> big fan of copying a macro from the emulation code base to the test code.
+>
 
-Given that we address this in the future:
+Consider it rewritten then :-) I did review the spec while copying
+over stuff from Linux, so Linux has been getting a review at the
+same time. I agree that we should be cautious with copy+paste and
+we should probably not bring over super complex macros that are hard
+to understand, because we want kvm-unit-tests to be easy to read.
+Let's not say "no macros from Linux", but rather case-by-case it.
+I think this macro is a nice addition to our little API.
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-
+Thanks,
+drew
