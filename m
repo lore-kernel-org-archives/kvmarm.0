@@ -1,54 +1,57 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PULL 0/3] KVM/ARM updates for v4.9-rc4
-Date: Fri, 11 Nov 2016 10:23:20 +0000
-Message-ID: <8ba4f486-e9f8-ae85-6647-29b1ffb31c97@arm.com>
-References: <20161104183638.28137-1-marc.zyngier@arm.com>
- <09984771-dfe4-1811-7d2e-29eaf34d99a9@redhat.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [kvm-unit-tests PATCH v5 07/11] arm/arm64: gicv2:
+ add an IPI test
+Date: Fri, 11 Nov 2016 11:13:46 +0000
+Message-ID: <53d2bd86-61c6-5717-7bfd-1c6594e3dd43@arm.com>
+References: <1478798481-25030-1-git-send-email-drjones@redhat.com>
+	<1478798481-25030-8-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CA54404BA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Nov 2016 05:23:00 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 07-A3qtOrb6Z for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Nov 2016 05:22:59 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 62A9A403F8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Nov 2016 05:22:58 -0500 (EST)
-In-Reply-To: <09984771-dfe4-1811-7d2e-29eaf34d99a9@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
+In-Reply-To: <1478798481-25030-8-git-send-email-drjones@redhat.com>
+List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
+List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel/>
+List-Post: <mailto:qemu-devel@nongnu.org>
+List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
+List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+Sender: "Qemu-devel" <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
+To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/11/16 10:14, Paolo Bonzini wrote:
-> 
-> 
-> On 04/11/2016 19:36, Marc Zyngier wrote:
->>   git://git.kernel.org:/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.9-rc4
-> 
-> What is the extra colon after "org"? :)
+Hi,
 
-That's obviously me screwing up when hacking the .git/config to have
-different fetch and push URLs. The odd thing is that git (2.10.1)
-doesn't even complain and happily pulls the branch... Did you get an
-error? Anyway, I'll fix that in my local config.
+more a comment loosely related to this patch ...
 
-> Pulled now, and I will send it in time for rc5.
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 3f6fa45c587e..68bf5cd6008f 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -54,3 +54,10 @@ file = selftest.flat
+>  smp = $MAX_SMP
+>  extra_params = -append 'smp'
+>  groups = selftest
+> +
+> +# Test GIC emulation
+> +[gicv2-ipi]
+> +file = gic.flat
+> +smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
 
-Thanks,
+So here we always go with the maximum number of VCPUs in the guest.
+However (as you also noted in your cover-letter) running with a
+different number of CPUs might be interesting, for instance with less
+than 8 CPUs on a GICv2 (the ITARGETSR register must be masked) or in
+general with an odd number (both literally and in the broader sense). I
+have a test case with passes with 8 VCPUs but fails with less.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Is there any good way to run some tests multiple times with different
+numbers of VCPUS?
+Shall we add some "set" functionality to the smp parameter, so that we
+can specify a list of desired test points?
+
+Cheers,
+Andre.
