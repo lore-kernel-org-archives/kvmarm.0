@@ -1,211 +1,116 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v8 2/3] arm: pmu: Check cycle
- count increases
-Date: Mon, 14 Nov 2016 11:05:10 +0100
-Message-ID: <20161114100510.k3pkhnyzqfraago2@kamzik.brq.redhat.com>
-References: <1478629035-12938-1-git-send-email-wei@redhat.com>
- <1478629035-12938-3-git-send-email-wei@redhat.com>
- <20161111074321.5ayzmy4w7w73x4fi@hawk.localdomain>
- <cdc283e2-8905-5344-ac91-2b20e5c4980b@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v1 1/2] KVM: arm64: vgic-its: Fix compatability with 32-bit
+Date: Mon, 14 Nov 2016 10:16:27 +0000
+Message-ID: <d8ff3bc8-e577-8ed5-be27-feb55ec95fa8@arm.com>
+References: <1478087734-15401-1-git-send-email-vladimir.murzin@arm.com>
+ <1478087734-15401-2-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <cdc283e2-8905-5344-ac91-2b20e5c4980b@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Wei Huang <wei@redhat.com>
-Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, cov@codeaurora.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A590D40354
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2016 05:16:02 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id I2inLUZ++Z54 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Nov 2016 05:16:01 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F289402EF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2016 05:16:01 -0500 (EST)
+In-Reply-To: <1478087734-15401-2-git-send-email-vladimir.murzin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Vladimir Murzin <vladimir.murzin@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: andre.przywara@arm.com, kbuild-all@01.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 11, 2016 at 01:55:49PM -0600, Wei Huang wrote:
+On 02/11/16 11:55, Vladimir Murzin wrote:
+> Evaluate GITS_BASER_ENTRY_SIZE once as an int data (GITS_BASER<n>'s
+> Entry Size is 5-bit wide only), so when used as divider no reference
+> to __aeabi_uldivmod is generated when build for AArch32.
 > 
+> Use unsigned long long for GITS_BASER_PAGE_SIZE_* since they are
+> used in conjunction with 64-bit data.
 > 
-> On 11/11/2016 01:43 AM, Andrew Jones wrote:
-> > On Tue, Nov 08, 2016 at 12:17:14PM -0600, Wei Huang wrote:
-> >> From: Christopher Covington <cov@codeaurora.org>
-> >>
-> >> Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
-> >> even for the smallest delta of two subsequent reads.
-> >>
-> >> Signed-off-by: Christopher Covington <cov@codeaurora.org>
-> >> Signed-off-by: Wei Huang <wei@redhat.com>
-> >> ---
-> >>  arm/pmu.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  1 file changed, 98 insertions(+)
-> >>
-> >> diff --git a/arm/pmu.c b/arm/pmu.c
-> >> index 0b29088..d5e3ac3 100644
-> >> --- a/arm/pmu.c
-> >> +++ b/arm/pmu.c
-> >> @@ -14,6 +14,7 @@
-> >>   */
-> >>  #include "libcflat.h"
-> >>  
-> >> +#define PMU_PMCR_E         (1 << 0)
-> >>  #define PMU_PMCR_N_SHIFT   11
-> >>  #define PMU_PMCR_N_MASK    0x1f
-> >>  #define PMU_PMCR_ID_SHIFT  16
-> >> @@ -21,6 +22,10 @@
-> >>  #define PMU_PMCR_IMP_SHIFT 24
-> >>  #define PMU_PMCR_IMP_MASK  0xff
-> >>  
-> >> +#define PMU_CYCLE_IDX      31
-> >> +
-> >> +#define NR_SAMPLES 10
-> >> +
-> >>  #if defined(__arm__)
-> >>  static inline uint32_t pmcr_read(void)
-> >>  {
-> >> @@ -29,6 +34,47 @@ static inline uint32_t pmcr_read(void)
-> >>  	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
-> >>  	return ret;
-> >>  }
-> >> +
-> >> +static inline void pmcr_write(uint32_t value)
-> >> +{
-> >> +	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (value));
-> >> +}
-> >> +
-> >> +static inline void pmselr_write(uint32_t value)
-> >> +{
-> >> +	asm volatile("mcr p15, 0, %0, c9, c12, 5" : : "r" (value));
-> >> +}
-> >> +
-> >> +static inline void pmxevtyper_write(uint32_t value)
-> >> +{
-> >> +	asm volatile("mcr p15, 0, %0, c9, c13, 1" : : "r" (value));
-> >> +}
-> >> +
-> >> +/*
-> >> + * While PMCCNTR can be accessed as a 64 bit coprocessor register, returning 64
-> >> + * bits doesn't seem worth the trouble when differential usage of the result is
-> >> + * expected (with differences that can easily fit in 32 bits). So just return
-> >> + * the lower 32 bits of the cycle count in AArch32.
-> > 
-> > Like I said in the last review, I'd rather we not do this. We should
-> > return the full value and then the test case should confirm the upper
-> > 32 bits are zero.
-> > 
+> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  include/linux/irqchip/arm-gic-v3.h |    8 ++++----
+>  virt/kvm/arm/vgic/vgic-its.c       |   11 ++++++-----
+>  2 files changed, 10 insertions(+), 9 deletions(-)
 > 
-> Unless I miss something in ARM documentation, ARMv7 PMCCNTR is a 32-bit
-> register. We can force it to a more coarse-grained cycle counter with
-> PMCR.D bit=1 (see below). But it is still not a 64-bit register. ARMv8
-> PMCCNTR_EL0 is a 64-bit register.
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index 5118d3a..e808f8a 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -295,10 +295,10 @@
+>  #define GITS_BASER_InnerShareable					\
+>  	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
+>  #define GITS_BASER_PAGE_SIZE_SHIFT	(8)
+> -#define GITS_BASER_PAGE_SIZE_4K		(0UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> -#define GITS_BASER_PAGE_SIZE_16K	(1UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> -#define GITS_BASER_PAGE_SIZE_64K	(2UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> -#define GITS_BASER_PAGE_SIZE_MASK	(3UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_4K		(0ULL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_16K	(1ULL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_64K	(2ULL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_MASK	(3ULL << GITS_BASER_PAGE_SIZE_SHIFT)
+>  #define GITS_BASER_PAGES_MAX		256
+>  #define GITS_BASER_PAGES_SHIFT		(0)
+>  #define GITS_BASER_NR_PAGES(r)		(((r) & 0xff) + 1)
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 4660a7d..8c2b3cd 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -632,21 +632,22 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
+>  	int index;
+>  	u64 indirect_ptr;
+>  	gfn_t gfn;
+> +	int esz = GITS_BASER_ENTRY_SIZE(baser);
+>  
+>  	if (!(baser & GITS_BASER_INDIRECT)) {
+>  		phys_addr_t addr;
+>  
+> -		if (id >= (l1_tbl_size / GITS_BASER_ENTRY_SIZE(baser)))
+> +		if (id >= (l1_tbl_size / esz))
+>  			return false;
+>  
+> -		addr = BASER_ADDRESS(baser) + id * GITS_BASER_ENTRY_SIZE(baser);
+> +		addr = BASER_ADDRESS(baser) + id * esz;
+>  		gfn = addr >> PAGE_SHIFT;
+>  
+>  		return kvm_is_visible_gfn(its->dev->kvm, gfn);
+>  	}
+>  
+>  	/* calculate and check the index into the 1st level */
+> -	index = id / (SZ_64K / GITS_BASER_ENTRY_SIZE(baser));
+> +	index = id / (SZ_64K / esz);
+>  	if (index >= (l1_tbl_size / sizeof(u64)))
+>  		return false;
+>  
+> @@ -670,8 +671,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
+>  	indirect_ptr &= GENMASK_ULL(51, 16);
+>  
+>  	/* Find the address of the actual entry */
+> -	index = id % (SZ_64K / GITS_BASER_ENTRY_SIZE(baser));
+> -	indirect_ptr += index * GITS_BASER_ENTRY_SIZE(baser);
+> +	index = id % (SZ_64K / esz);
+> +	indirect_ptr += index * esz;
+>  	gfn = indirect_ptr >> PAGE_SHIFT;
+>  
+>  	return kvm_is_visible_gfn(its->dev->kvm, gfn);
 > 
-> "The PMCR.D bit configures whether PMCCNTR increments once every clock
-> cycle, or once every 64 clock cycles. "
-> 
-> So I think the comment above in the code is an overstatement, which
-> should be deleted or moved down to ARMv8 pmccntr_read() below.
 
-OK, please fix as appropriate, but for the v8 64-bit register, please
-don't drop the upper bits until after a unit test has a chance to check
-them.
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Thanks,
-drew
-
-> 
-> >> + */
-> >> +static inline uint32_t pmccntr_read(void)
-> >> +{
-> >> +	uint32_t cycles;
-> >> +
-> >> +	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
-> >> +	return cycles;
-> >> +}
-> >> +
-> >> +static inline void pmcntenset_write(uint32_t value)
-> >> +{
-> >> +	asm volatile("mcr p15, 0, %0, c9, c12, 1" : : "r" (value));
-> >> +}
-> >> +
-> >> +/* PMCCFILTR is an obsolete name for PMXEVTYPER31 in ARMv7 */
-> >> +static inline void pmccfiltr_write(uint32_t value)
-> >> +{
-> >> +	pmselr_write(PMU_CYCLE_IDX);
-> >> +	pmxevtyper_write(value);
-> >> +}
-> >>  #elif defined(__aarch64__)
-> >>  static inline uint32_t pmcr_read(void)
-> >>  {
-> >> @@ -37,6 +83,29 @@ static inline uint32_t pmcr_read(void)
-> >>  	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
-> >>  	return ret;
-> >>  }
-> >> +
-> >> +static inline void pmcr_write(uint32_t value)
-> >> +{
-> >> +	asm volatile("msr pmcr_el0, %0" : : "r" (value));
-> >> +}
-> >> +
-> >> +static inline uint32_t pmccntr_read(void)
-> >> +{
-> >> +	uint32_t cycles;
-> >> +
-> >> +	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
-> >> +	return cycles;
-> >> +}
-> >> +
-> >> +static inline void pmcntenset_write(uint32_t value)
-> >> +{
-> >> +	asm volatile("msr pmcntenset_el0, %0" : : "r" (value));
-> >> +}
-> >> +
-> >> +static inline void pmccfiltr_write(uint32_t value)
-> >> +{
-> >> +	asm volatile("msr pmccfiltr_el0, %0" : : "r" (value));
-> >> +}
-> >>  #endif
-> >>  
-> >>  /*
-> >> @@ -63,11 +132,40 @@ static bool check_pmcr(void)
-> >>  	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
-> >>  }
-> >>  
-> >> +/*
-> >> + * Ensure that the cycle counter progresses between back-to-back reads.
-> >> + */
-> >> +static bool check_cycles_increase(void)
-> >> +{
-> >> +	pmcr_write(pmcr_read() | PMU_PMCR_E);
-> >> +
-> >> +	for (int i = 0; i < NR_SAMPLES; i++) {
-> >> +		unsigned long a, b;
-> >> +
-> >> +		a = pmccntr_read();
-> >> +		b = pmccntr_read();
-> >> +
-> >> +		if (a >= b) {
-> >> +			printf("Read %ld then %ld.\n", a, b);
-> >> +			return false;
-> >> +		}
-> >> +	}
-> >> +
-> >> +	pmcr_write(pmcr_read() & ~PMU_PMCR_E);
-> >> +
-> >> +	return true;
-> >> +}
-> >> +
-> >>  int main(void)
-> >>  {
-> >>  	report_prefix_push("pmu");
-> >>  
-> >> +	/* init for PMU event access, right now only care about cycle count */
-> >> +	pmcntenset_write(1 << PMU_CYCLE_IDX);
-> >> +	pmccfiltr_write(0); /* count cycles in EL0, EL1, but not EL2 */
-> >> +
-> >>  	report("Control register", check_pmcr());
-> >> +	report("Monotonically increasing cycle count", check_cycles_increase());
-> >>  
-> >>  	return report_summary();
-> >>  }
-> >> -- 
-> >> 1.8.3.1
-> > 
-> > Besides needing to use u64's for registers that return u64's, it
-> > looks good to me.
-> > 
-> > drew
-> > 
-> 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
