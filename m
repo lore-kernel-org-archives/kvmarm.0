@@ -1,22 +1,22 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v6 11/11] arm/arm64: gic: don't just use zero
-Date: Mon, 14 Nov 2016 22:08:39 +0100
-Message-ID: <1479157719-31021-12-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v6 04/11] arm/arm64: add some delay routines
+Date: Mon, 14 Nov 2016 22:08:32 +0100
+Message-ID: <1479157719-31021-5-git-send-email-drjones@redhat.com>
 References: <1479157719-31021-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FAD5401D0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2016 16:08:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6A5740286
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2016 16:08:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JzkBlcWZYotC for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Nov 2016 16:08:44 -0500 (EST)
+ with ESMTP id fQv8nA9wcMKQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Nov 2016 16:08:27 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5ACFF40194
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2016 16:08:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 26B65401E7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2016 16:08:26 -0500 (EST)
 In-Reply-To: <1479157719-31021-1-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,280 +31,71 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qe
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Allow user to select who sends ipis and with which irq,
-rather than just always sending irq=0 from cpu0.
-
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-
----
-v6:
- - make sender/irq names more future-proof [drew]
- - sanity check inputs [drew]
- - introduce check_sender/irq and bad_sender/irq to more
-   cleanly do checks [drew]
- - default sender and irq to 1, instead of still zero [drew]
-v4: improve structure and make sure spurious checking is
-    done even when the sender isn't cpu0
-v2: actually check that the irq received was the irq sent,
-    and (for gicv2) that the sender is the expected one.
----
- arm/gic.c | 124 +++++++++++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 99 insertions(+), 25 deletions(-)
-
-diff --git a/arm/gic.c b/arm/gic.c
-index d954a3775c26..638b8b140c96 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -11,6 +11,7 @@
-  * This work is licensed under the terms of the GNU LGPL, version 2.
-  */
- #include <libcflat.h>
-+#include <util.h>
- #include <asm/setup.h>
- #include <asm/processor.h>
- #include <asm/gic.h>
-@@ -28,6 +29,8 @@ struct gic {
- 
- static struct gic *gic;
- static int acked[NR_CPUS], spurious[NR_CPUS];
-+static int bad_sender[NR_CPUS], bad_irq[NR_CPUS];
-+static int cmdl_sender = 1, cmdl_irq = 1;
- static cpumask_t ready;
- 
- static void nr_cpu_check(int nr)
-@@ -43,10 +46,23 @@ static void wait_on_ready(void)
- 		cpu_relax();
- }
- 
-+static void stats_reset(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < nr_cpus; ++i) {
-+		acked[i] = 0;
-+		bad_sender[i] = -1;
-+		bad_irq[i] = -1;
-+	}
-+	smp_wmb();
-+}
-+
- static void check_acked(cpumask_t *mask)
- {
- 	int missing = 0, extra = 0, unexpected = 0;
- 	int nr_pass, cpu, i;
-+	bool bad = false;
- 
- 	/* Wait up to 5s for all interrupts to be delivered */
- 	for (i = 0; i < 50; ++i) {
-@@ -56,9 +72,21 @@ static void check_acked(cpumask_t *mask)
- 			smp_rmb();
- 			nr_pass += cpumask_test_cpu(cpu, mask) ?
- 				acked[cpu] == 1 : acked[cpu] == 0;
-+
-+			if (bad_sender[cpu] != -1) {
-+				printf("cpu%d received IPI from wrong sender %d\n",
-+					cpu, bad_sender[cpu]);
-+				bad = true;
-+			}
-+
-+			if (bad_irq[cpu] != -1) {
-+				printf("cpu%d received wrong irq %d\n",
-+					cpu, bad_irq[cpu]);
-+				bad = true;
-+			}
- 		}
- 		if (nr_pass == nr_cpus) {
--			report("Completed in %d ms", true, ++i * 100);
-+			report("Completed in %d ms", !bad, ++i * 100);
- 			return;
- 		}
- 	}
-@@ -91,6 +119,22 @@ static void check_spurious(void)
- 	}
- }
- 
-+static void check_ipi_sender(u32 irqstat)
-+{
-+	if (gic_version() == 2) {
-+		int src = (irqstat >> 10) & 7;
-+
-+		if (src != cmdl_sender)
-+			bad_sender[smp_processor_id()] = src;
-+	}
-+}
-+
-+static void check_irqnr(u32 irqnr)
-+{
-+	if (irqnr != (u32)cmdl_irq)
-+		bad_irq[smp_processor_id()] = irqnr;
-+}
-+
- static void ipi_handler(struct pt_regs *regs __unused)
- {
- 	u32 irqstat = gic_read_iar();
-@@ -98,8 +142,10 @@ static void ipi_handler(struct pt_regs *regs __unused)
- 
- 	if (irqnr != GICC_INT_SPURIOUS) {
- 		gic_write_eoir(irqstat);
--		smp_rmb(); /* pairs with wmb in ipi_test functions */
-+		smp_rmb(); /* pairs with wmb in stats_reset */
- 		++acked[smp_processor_id()];
-+		check_ipi_sender(irqstat);
-+		check_irqnr(irqnr);
- 		smp_wmb(); /* pairs with rmb in check_acked */
- 	} else {
- 		++spurious[smp_processor_id()];
-@@ -109,19 +155,19 @@ static void ipi_handler(struct pt_regs *regs __unused)
- 
- static void gicv2_ipi_send_self(void)
- {
--	writel(2 << 24, gicv2_dist_base() + GICD_SGIR);
-+	writel(2 << 24 | cmdl_irq, gicv2_dist_base() + GICD_SGIR);
- }
- 
--static void gicv2_ipi_send_tlist(cpumask_t *mask, int irq __unused)
-+static void gicv2_ipi_send_tlist(cpumask_t *mask, int irq)
- {
- 	u8 tlist = (u8)cpumask_bits(mask)[0];
- 
--	writel(tlist << 16, gicv2_dist_base() + GICD_SGIR);
-+	writel(tlist << 16 | irq, gicv2_dist_base() + GICD_SGIR);
- }
- 
- static void gicv2_ipi_send_broadcast(void)
- {
--	writel(1 << 24, gicv2_dist_base() + GICD_SGIR);
-+	writel(1 << 24 | cmdl_irq, gicv2_dist_base() + GICD_SGIR);
- }
- 
- static void gicv3_ipi_send_self(void)
-@@ -130,12 +176,12 @@ static void gicv3_ipi_send_self(void)
- 
- 	cpumask_clear(&mask);
- 	cpumask_set_cpu(smp_processor_id(), &mask);
--	gicv3_ipi_send_tlist(&mask, 0);
-+	gicv3_ipi_send_tlist(&mask, cmdl_irq);
- }
- 
- static void gicv3_ipi_send_broadcast(void)
- {
--	gicv3_write_sgi1r(1ULL << 40);
-+	gicv3_write_sgi1r(1ULL << 40 | cmdl_irq << 24);
- 	isb();
- }
- 
-@@ -144,10 +190,9 @@ static void ipi_test_self(void)
- 	cpumask_t mask;
- 
- 	report_prefix_push("self");
--	memset(acked, 0, sizeof(acked));
--	smp_wmb();
-+	stats_reset();
- 	cpumask_clear(&mask);
--	cpumask_set_cpu(0, &mask);
-+	cpumask_set_cpu(smp_processor_id(), &mask);
- 	gic->ipi.send_self();
- 	check_acked(&mask);
- 	report_prefix_pop();
-@@ -159,20 +204,18 @@ static void ipi_test_smp(void)
- 	int i;
- 
- 	report_prefix_push("target-list");
--	memset(acked, 0, sizeof(acked));
--	smp_wmb();
-+	stats_reset();
- 	cpumask_copy(&mask, &cpu_present_mask);
--	for (i = 0; i < nr_cpus; i += 2)
-+	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
- 		cpumask_clear_cpu(i, &mask);
--	gic->ipi.send_tlist(&mask, 0);
-+	gic->ipi.send_tlist(&mask, cmdl_irq);
- 	check_acked(&mask);
- 	report_prefix_pop();
- 
- 	report_prefix_push("broadcast");
--	memset(acked, 0, sizeof(acked));
--	smp_wmb();
-+	stats_reset();
- 	cpumask_copy(&mask, &cpu_present_mask);
--	cpumask_clear_cpu(0, &mask);
-+	cpumask_clear_cpu(smp_processor_id(), &mask);
- 	gic->ipi.send_broadcast();
- 	check_acked(&mask);
- 	report_prefix_pop();
-@@ -189,6 +232,16 @@ static void ipi_enable(void)
- 	local_irq_enable();
- }
- 
-+static void ipi_send(void)
-+{
-+	ipi_enable();
-+	wait_on_ready();
-+	ipi_test_self();
-+	ipi_test_smp();
-+	check_spurious();
-+	exit(report_summary());
-+}
-+
- static void ipi_recv(void)
- {
- 	ipi_enable();
-@@ -197,6 +250,14 @@ static void ipi_recv(void)
- 		wfi();
- }
- 
-+static void ipi_test(void)
-+{
-+	if (smp_processor_id() == cmdl_sender)
-+		ipi_send();
-+	else
-+		ipi_recv();
-+}
-+
- static struct gic gicv2 = {
- 	.ipi = {
- 		.send_self = gicv2_ipi_send_self,
-@@ -242,21 +303,34 @@ int main(int argc, char **argv)
- 		report_prefix_pop();
- 
- 	} else if (strcmp(argv[1], "ipi") == 0) {
-+		int off, i = 1;
-+		long val;
- 
- 		report_prefix_push(argv[1]);
- 		nr_cpu_check(2);
- 
-+		while (--argc != 1) {
-+			off = parse_keyval(argv[++i], &val);
-+			if (off == -1)
-+				continue;
-+			argv[i][off] = '\0';
-+			if (strcmp(argv[i], "sender") == 0) {
-+				if (val >= nr_cpus)
-+					report_abort("invalid sender %d, nr_cpus=%d", val, nr_cpus);
-+				cmdl_sender = val;
-+			} else if (strcmp(argv[i], "irq") == 0) {
-+				if (val > 15)
-+					report_abort("irq (SGI) must be < 16");
-+				cmdl_irq = val;
-+			}
-+		}
-+
- 		for_each_present_cpu(cpu) {
- 			if (cpu == 0)
- 				continue;
--			smp_boot_secondary(cpu, ipi_recv);
-+			smp_boot_secondary(cpu, ipi_test);
- 		}
--		ipi_enable();
--		wait_on_ready();
--		ipi_test_self();
--		ipi_test_smp();
--		check_spurious();
--		report_prefix_pop();
-+		ipi_test();
- 
- 	} else {
- 		report_abort("Unknown subtest '%s'", argv[1]);
--- 
-2.7.4
+QWxsb3cgYSB0aHJlYWQgdG8gd2FpdCBzb21lIHNwZWNpZmllZCBhbW91bnQgb2YgdGltZS4gQ2Fu
+CnNwZWNpZnkgaW4gY3ljbGVzLCB1c2VjcywgYW5kIG1zZWNzLgoKUmV2aWV3ZWQtYnk6IEFsZXgg
+QmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KUmV2aWV3ZWQtYnk6IEVyaWMgQXVnZXIg
+PGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KU2lnbmVkLW9mZi1ieTogQW5kcmV3IEpvbmVzIDxkcmpv
+bmVzQHJlZGhhdC5jb20+Ci0tLQogbGliL2FybS9hc20vcHJvY2Vzc29yLmggICB8IDE5ICsrKysr
+KysrKysrKysrKysrKysKIGxpYi9hcm0vcHJvY2Vzc29yLmMgICAgICAgfCAxNSArKysrKysrKysr
+KysrKysKIGxpYi9hcm02NC9hc20vcHJvY2Vzc29yLmggfCAxOSArKysrKysrKysrKysrKysrKysr
+CiBsaWIvYXJtNjQvcHJvY2Vzc29yLmMgICAgIHwgMTUgKysrKysrKysrKysrKysrCiA0IGZpbGVz
+IGNoYW5nZWQsIDY4IGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9saWIvYXJtL2FzbS9wcm9j
+ZXNzb3IuaCBiL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oCmluZGV4IGVjZjViYmUxODI0YS4uYmM0
+NmQxZjk4MGVlIDEwMDY0NAotLS0gYS9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaAorKysgYi9saWIv
+YXJtL2FzbS9wcm9jZXNzb3IuaApAQCAtNSw3ICs1LDkgQEAKICAqCiAgKiBUaGlzIHdvcmsgaXMg
+bGljZW5zZWQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZSBHTlUgTEdQTCwgdmVyc2lvbiAyLgogICov
+CisjaW5jbHVkZSA8bGliY2ZsYXQuaD4KICNpbmNsdWRlIDxhc20vcHRyYWNlLmg+CisjaW5jbHVk
+ZSA8YXNtL2JhcnJpZXIuaD4KIAogZW51bSB2ZWN0b3IgewogCUVYQ1BUTl9SU1QsCkBAIC01MSw0
+ICs1MywyMSBAQCBleHRlcm4gaW50IG1waWRyX3RvX2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsK
+IGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgqZnVuYykodm9pZCAqYXJnKSwgdm9pZCAqYXJn
+LCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7CiBleHRlcm4gYm9vbCBpc191c2VyKHZvaWQpOwogCitz
+dGF0aWMgaW5saW5lIHU2NCBnZXRfY250dmN0KHZvaWQpCit7CisJdTY0IHZjdDsKKwlpc2IoKTsK
+Kwlhc20gdm9sYXRpbGUoIm1ycmMgcDE1LCAxLCAlUTAsICVSMCwgYzE0IiA6ICI9ciIgKHZjdCkp
+OworCXJldHVybiB2Y3Q7Cit9CisKK2V4dGVybiB2b2lkIGRlbGF5KHU2NCBjeWNsZXMpOworZXh0
+ZXJuIHZvaWQgdWRlbGF5KHVuc2lnbmVkIGxvbmcgdXNlY3MpOworCitzdGF0aWMgaW5saW5lIHZv
+aWQgbWRlbGF5KHVuc2lnbmVkIGxvbmcgbXNlY3MpCit7CisJd2hpbGUgKG1zZWNzLS0pCisJCXVk
+ZWxheSgxMDAwKTsKK30KKwogI2VuZGlmIC8qIF9BU01BUk1fUFJPQ0VTU09SX0hfICovCmRpZmYg
+LS1naXQgYS9saWIvYXJtL3Byb2Nlc3Nvci5jIGIvbGliL2FybS9wcm9jZXNzb3IuYwppbmRleCA1
+NGZkYjg3ZWYwMTkuLmMyZWUzNjBkZjY4OCAxMDA2NDQKLS0tIGEvbGliL2FybS9wcm9jZXNzb3Iu
+YworKysgYi9saWIvYXJtL3Byb2Nlc3Nvci5jCkBAIC05LDYgKzksNyBAQAogI2luY2x1ZGUgPGFz
+bS9wdHJhY2UuaD4KICNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+CiAjaW5jbHVkZSA8YXNtL3Ro
+cmVhZF9pbmZvLmg+CisjaW5jbHVkZSA8YXNtL2JhcnJpZXIuaD4KIAogc3RhdGljIGNvbnN0IGNo
+YXIgKnByb2Nlc3Nvcl9tb2Rlc1tdID0gewogCSJVU0VSXzI2IiwgIkZJUV8yNiIgLCAiSVJRXzI2
+IiAsICJTVkNfMjYiICwKQEAgLTE0MSwzICsxNDIsMTcgQEAgYm9vbCBpc191c2VyKHZvaWQpCiB7
+CiAJcmV0dXJuIGN1cnJlbnRfdGhyZWFkX2luZm8oKS0+ZmxhZ3MgJiBUSUZfVVNFUl9NT0RFOwog
+fQorCit2b2lkIGRlbGF5KHU2NCBjeWNsZXMpCit7CisJdTY0IHN0YXJ0ID0gZ2V0X2NudHZjdCgp
+OworCXdoaWxlICgoZ2V0X2NudHZjdCgpIC0gc3RhcnQpIDwgY3ljbGVzKQorCQljcHVfcmVsYXgo
+KTsKK30KKwordm9pZCB1ZGVsYXkodW5zaWduZWQgbG9uZyB1c2VjKQoreworCXVuc2lnbmVkIGlu
+dCBmcnE7CisJYXNtIHZvbGF0aWxlKCJtcmMgcDE1LCAwLCAlMCwgYzE0LCBjMCwgMCIgOiAiPXIi
+IChmcnEpKTsKKwlkZWxheSgodTY0KXVzZWMgKiBmcnEgLyAxMDAwMDAwKTsKK30KZGlmZiAtLWdp
+dCBhL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmggYi9saWIvYXJtNjQvYXNtL3Byb2Nlc3Nvci5o
+CmluZGV4IDdlNDQ4ZGM4MWE2YS4uOTRmN2NlMzViNjVjIDEwMDY0NAotLS0gYS9saWIvYXJtNjQv
+YXNtL3Byb2Nlc3Nvci5oCisrKyBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKQEAgLTE3LDgg
+KzE3LDEwIEBACiAjZGVmaW5lIFNDVExSX0VMMV9NCSgxIDw8IDApCiAKICNpZm5kZWYgX19BU1NF
+TUJMWV9fCisjaW5jbHVkZSA8bGliY2ZsYXQuaD4KICNpbmNsdWRlIDxhc20vcHRyYWNlLmg+CiAj
+aW5jbHVkZSA8YXNtL2Vzci5oPgorI2luY2x1ZGUgPGFzbS9iYXJyaWVyLmg+CiAKIGVudW0gdmVj
+dG9yIHsKIAlFTDFUX1NZTkMsCkBAIC04OSw1ICs5MSwyMiBAQCBleHRlcm4gaW50IG1waWRyX3Rv
+X2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsKIGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgq
+ZnVuYykodm9pZCAqYXJnKSwgdm9pZCAqYXJnLCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7CiBleHRl
+cm4gYm9vbCBpc191c2VyKHZvaWQpOwogCitzdGF0aWMgaW5saW5lIHU2NCBnZXRfY250dmN0KHZv
+aWQpCit7CisJdTY0IHZjdDsKKwlpc2IoKTsKKwlhc20gdm9sYXRpbGUoIm1ycyAlMCwgY250dmN0
+X2VsMCIgOiAiPXIiICh2Y3QpKTsKKwlyZXR1cm4gdmN0OworfQorCitleHRlcm4gdm9pZCBkZWxh
+eSh1NjQgY3ljbGVzKTsKK2V4dGVybiB2b2lkIHVkZWxheSh1bnNpZ25lZCBsb25nIHVzZWNzKTsK
+Kworc3RhdGljIGlubGluZSB2b2lkIG1kZWxheSh1bnNpZ25lZCBsb25nIG1zZWNzKQoreworCXdo
+aWxlIChtc2Vjcy0tKQorCQl1ZGVsYXkoMTAwMCk7Cit9CisKICNlbmRpZiAvKiAhX19BU1NFTUJM
+WV9fICovCiAjZW5kaWYgLyogX0FTTUFSTTY0X1BST0NFU1NPUl9IXyAqLwpkaWZmIC0tZ2l0IGEv
+bGliL2FybTY0L3Byb2Nlc3Nvci5jIGIvbGliL2FybTY0L3Byb2Nlc3Nvci5jCmluZGV4IGRlZWFi
+NGVjOWM4YS4uNTBmYTgzNWM2ZjFlIDEwMDY0NAotLS0gYS9saWIvYXJtNjQvcHJvY2Vzc29yLmMK
+KysrIGIvbGliL2FybTY0L3Byb2Nlc3Nvci5jCkBAIC05LDYgKzksNyBAQAogI2luY2x1ZGUgPGFz
+bS9wdHJhY2UuaD4KICNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+CiAjaW5jbHVkZSA8YXNtL3Ro
+cmVhZF9pbmZvLmg+CisjaW5jbHVkZSA8YXNtL2JhcnJpZXIuaD4KIAogc3RhdGljIGNvbnN0IGNo
+YXIgKnZlY3Rvcl9uYW1lc1tdID0gewogCSJlbDF0X3N5bmMiLApAQCAtMjUzLDMgKzI1NCwxNyBA
+QCBib29sIGlzX3VzZXIodm9pZCkKIHsKIAlyZXR1cm4gY3VycmVudF90aHJlYWRfaW5mbygpLT5m
+bGFncyAmIFRJRl9VU0VSX01PREU7CiB9CisKK3ZvaWQgZGVsYXkodTY0IGN5Y2xlcykKK3sKKwl1
+NjQgc3RhcnQgPSBnZXRfY250dmN0KCk7CisJd2hpbGUgKChnZXRfY250dmN0KCkgLSBzdGFydCkg
+PCBjeWNsZXMpCisJCWNwdV9yZWxheCgpOworfQorCit2b2lkIHVkZWxheSh1bnNpZ25lZCBsb25n
+IHVzZWMpCit7CisJdW5zaWduZWQgaW50IGZycTsKKwlhc20gdm9sYXRpbGUoIm1ycyAlMCwgY250
+ZnJxX2VsMCIgOiAiPXIiIChmcnEpKTsKKwlkZWxheSgodTY0KXVzZWMgKiBmcnEgLyAxMDAwMDAw
+KTsKK30KLS0gCjIuNy40CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
