@@ -1,146 +1,125 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v6 00/11] arm/arm64: add gic framework
-Date: Mon, 14 Nov 2016 22:08:28 +0100
-Message-ID: <1479157719-31021-1-git-send-email-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v6 03/11] arm/arm64: smp: support more than 8
+ cpus
+Date: Mon, 14 Nov 2016 22:08:31 +0100
+Message-ID: <1479157719-31021-4-git-send-email-drjones@redhat.com>
+References: <1479157719-31021-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C439401E7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2016 16:08:24 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bynjiZIaaKtb for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Nov 2016 16:08:23 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8982840596
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2016 16:08:23 -0500 (EST)
+In-Reply-To: <1479157719-31021-1-git-send-email-drjones@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: pbonzini@redhat.com, andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, christoffer.dall@linaro.org
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-v6:
- - rebased to latest master
- - several other changes thanks to Andre and Alex, changes in
-   individual patch change logs
- - some code cleanups
-
-v5:
- - fix arm32/gicv3 compile [drew]
- - use modern register names [Andre]
- - one Andre r-b
-
-v4:
- - Eric's r-b's
- - Andre's suggestion to only take defines we need
- - several other changes listed in individual patches
-
-v3:
- - Rebased on latest master
- - Added Alex's r-b's
-
-v2:
- Rebased on latest master + my "populate argv[0]" series (will
- send a REPOST for that shortly. Additionally a few patches got
- fixes/features;
- 07/10 got same fix as kernel 7c9b973061 "irqchip/gic-v3: Configure
-       all interrupts as non-secure Group-1" in order to continue
-       working over TCG, as the gicv3 code for TCG removed a hack
-       it had there to make Linux happy.
- 08/10 added more output for when things fail (if they fail)
- 09/10 switched gicv3 broadcast implementation to using IRM. This
-       found a bug in a recent (but not tip) kernel, which I was
-       about to fix, but then I saw MarcZ beat me to it.
- 10/10 actually check that the input irq is the received irq
-
-
-Import defines, and steal enough helper functions, from Linux to
-enable programming of the gic (v2 and v3). Then use the framework
-to add an initial test (an ipi test; self, target-list, broadcast).
-
-It's my hope that this framework will be a suitable base on which
-more tests may be easily added, particularly because we have
-vgic-new and tcg gicv3 emulation getting close to merge. (v3 UPDATE:
-vgic-new and tcg gicv3 are merged now)
-
-To run it, along with other tests, just do
-
- ./configure [ --arch=[arm|arm64] --cross-prefix=$PREFIX ]
- make
- export QEMU=$PATH_TO_QEMU
- ./run_tests.sh
-
-To run it separately do, e.g.
-
-$QEMU -machine virt,accel=tcg -cpu cortex-a57 \
- -device virtio-serial-device \
- -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
- -display none -serial stdio \
- -kernel arm/gic.flat \
- -smp 123 -machine gic-version=3 -append ipi
-      ^^ note, we can go nuts with nr-cpus on TCG :-)
-
-Or, a KVM example using a different "sender" cpu and irq (other than zero)
-
-$QEMU -machine virt,accel=kvm -cpu host \
- -device virtio-serial-device \
- -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
- -display none -serial stdio \
- -kernel arm/gic.flat \
- -smp 48 -machine gic-version=3 -append 'ipi sender=42 irq=1'
-
-
-Patches:
-01-05: fixes and functionality needed by the later gic patches
-06-07: enable gicv2 and gicv2 IPI test
-08-10: enable gicv3 and gicv3 IPI test
-   11: extend the IPI tests to take variable sender and irq
-
-Available here: https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic-v6
-
-
-Andrew Jones (10):
-  lib: xstr: allow multiple args
-  arm64: fix get_"sysreg32" and make MPIDR 64bit
-  arm/arm64: smp: support more than 8 cpus
-  arm/arm64: add some delay routines
-  arm/arm64: irq enable/disable
-  arm/arm64: add initial gicv2 support
-  arm/arm64: gicv2: add an IPI test
-  arm/arm64: add initial gicv3 support
-  arm/arm64: gicv3: add an IPI test
-  arm/arm64: gic: don't just use zero
-
-Peter Xu (1):
-  libcflat: add IS_ALIGNED() macro, and page sizes
-
- arm/Makefile.common        |   9 +-
- arm/gic.c                  | 340 +++++++++++++++++++++++++++++++++++++++++++++
- arm/run                    |  19 ++-
- arm/selftest.c             |   5 +-
- arm/unittests.cfg          |  14 ++
- lib/arm/asm/arch_gicv3.h   |  70 ++++++++++
- lib/arm/asm/gic-v2.h       |  36 +++++
- lib/arm/asm/gic-v3.h       | 112 +++++++++++++++
- lib/arm/asm/gic.h          | 106 ++++++++++++++
- lib/arm/asm/processor.h    |  42 +++++-
- lib/arm/asm/setup.h        |   4 +-
- lib/arm/gic.c              | 267 +++++++++++++++++++++++++++++++++++
- lib/arm/processor.c        |  15 ++
- lib/arm/setup.c            |  10 ++
- lib/arm64/asm/arch_gicv3.h |  66 +++++++++
- lib/arm64/asm/gic-v2.h     |   1 +
- lib/arm64/asm/gic-v3.h     |   1 +
- lib/arm64/asm/gic.h        |   1 +
- lib/arm64/asm/processor.h  |  53 +++++--
- lib/arm64/asm/sysreg.h     |  44 ++++++
- lib/arm64/processor.c      |  15 ++
- lib/libcflat.h             |  10 +-
- 22 files changed, 1212 insertions(+), 28 deletions(-)
- create mode 100644 arm/gic.c
- create mode 100644 lib/arm/asm/arch_gicv3.h
- create mode 100644 lib/arm/asm/gic-v2.h
- create mode 100644 lib/arm/asm/gic-v3.h
- create mode 100644 lib/arm/asm/gic.h
- create mode 100644 lib/arm/gic.c
- create mode 100644 lib/arm64/asm/arch_gicv3.h
- create mode 100644 lib/arm64/asm/gic-v2.h
- create mode 100644 lib/arm64/asm/gic-v3.h
- create mode 100644 lib/arm64/asm/gic.h
- create mode 100644 lib/arm64/asm/sysreg.h
-
--- 
-2.7.4
-
+QnkgYWRkaW5nIHN1cHBvcnQgZm9yIGxhdW5jaGluZyB3aXRoIGdpY3YzIHdlIGNhbiBicmVhayB0
+aGUgOCB2Y3B1CmxpbWl0LiBUaGlzIHBhdGNoIGFkZHMgc3VwcG9ydCB0byBzbXAgY29kZSBhbmQg
+YWxzbyBzZWxlY3RzIHRoZQp2Z2ljIG1vZGVsIGNvcnJlc3BvbmRpbmcgdG8gdGhlIGhvc3QuIFRo
+ZSB2Z2ljIG1vZGVsIG1heSBhbHNvIGJlCm1hbnVhbGx5IHNlbGVjdGVkIGJ5IGFkZGluZyBlLmcu
+IC1tYWNoaW5lIGdpYy12ZXJzaW9uPTMgdG8KZXh0cmFfcGFyYW1zLgoKUmV2aWV3ZWQtYnk6IEFs
+ZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KUmV2aWV3ZWQtYnk6IEFuZHJlIFBy
+enl3YXJhIDxhbmRyZS5wcnp5d2FyYUBhcm0uY29tPgpTaWduZWQtb2ZmLWJ5OiBBbmRyZXcgSm9u
+ZXMgPGRyam9uZXNAcmVkaGF0LmNvbT4KCi0tLQp2NTogbGVmdCBjcHVzIGEgdTMyIGZvciBub3cu
+IENoYW5naW5nIHRvIHU2NCByZXF1aXJlcyBhIGNoYW5nZSB0bwogICAgZGV2aWNldHJlZS4gV2ls
+bCBkbyBpdCBsYXRlci4gW0FuZHJlXQp2NDogaW1wcm92ZWQgY29tbWl0IG1lc3NhZ2UKLS0tCiBh
+cm0vcnVuICAgICAgICAgICAgICAgICAgIHwgMTkgKysrKysrKysrKysrLS0tLS0tLQogYXJtL3Nl
+bGZ0ZXN0LmMgICAgICAgICAgICB8ICA1ICsrKystCiBsaWIvYXJtL2FzbS9wcm9jZXNzb3IuaCAg
+IHwgIDkgKysrKysrKy0tCiBsaWIvYXJtL2FzbS9zZXR1cC5oICAgICAgIHwgIDQgKystLQogbGli
+L2FybS9zZXR1cC5jICAgICAgICAgICB8IDEwICsrKysrKysrKysKIGxpYi9hcm02NC9hc20vcHJv
+Y2Vzc29yLmggfCAgOSArKysrKysrLS0KIDYgZmlsZXMgY2hhbmdlZCwgNDIgaW5zZXJ0aW9ucygr
+KSwgMTQgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJtL3J1biBiL2FybS9ydW4KaW5kZXgg
+MWVlNjIzMTU5OWQ2Li5hMzU5NTJiMjhiNDYgMTAwNzU1Ci0tLSBhL2FybS9ydW4KKysrIGIvYXJt
+L3J1bgpAQCAtMzEsMTMgKzMxLDYgQEAgaWYgWyAteiAiJEFDQ0VMIiBdOyB0aGVuCiAJZmkKIGZp
+CiAKLWlmIFsgIiRIT1NUIiA9ICJhYXJjaDY0IiBdICYmIFsgIiRBQ0NFTCIgPSAia3ZtIiBdOyB0
+aGVuCi0JcHJvY2Vzc29yPSJob3N0IgotCWlmIFsgIiRBUkNIIiA9ICJhcm0iIF07IHRoZW4KLQkJ
+cHJvY2Vzc29yKz0iLGFhcmNoNjQ9b2ZmIgotCWZpCi1maQotCiBxZW11PSIke1FFTVU6LXFlbXUt
+c3lzdGVtLSRBUkNIX05BTUV9IgogcXBhdGg9JCh3aGljaCAkcWVtdSAyPi9kZXYvbnVsbCkKIApA
+QCAtNTMsNiArNDYsMTggQEAgZmkKIAogTT0nLW1hY2hpbmUgdmlydCcKIAoraWYgWyAiJEFDQ0VM
+IiA9ICJrdm0iIF07IHRoZW4KKwlpZiAkcWVtdSAkTSxcPyAyPiYxIHwgZ3JlcCBnaWMtdmVyc2lv
+biA+IC9kZXYvbnVsbDsgdGhlbgorCQlNKz0nLGdpYy12ZXJzaW9uPWhvc3QnCisJZmkKKwlpZiBb
+ICIkSE9TVCIgPSAiYWFyY2g2NCIgXTsgdGhlbgorCQlwcm9jZXNzb3I9Imhvc3QiCisJCWlmIFsg
+IiRBUkNIIiA9ICJhcm0iIF07IHRoZW4KKwkJCXByb2Nlc3Nvcis9IixhYXJjaDY0PW9mZiIKKwkJ
+ZmkKKwlmaQorZmkKKwogaWYgISAkcWVtdSAkTSAtZGV2aWNlICc/JyAyPiYxIHwgZ3JlcCB2aXJ0
+Y29uc29sZSA+IC9kZXYvbnVsbDsgdGhlbgogCWVjaG8gIiRxcGF0aCBkb2Vzbid0IHN1cHBvcnQg
+dmlydGlvLWNvbnNvbGUgZm9yIGNoci10ZXN0ZGV2LiBFeGl0aW5nLiIKIAlleGl0IDIKZGlmZiAt
+LWdpdCBhL2FybS9zZWxmdGVzdC5jIGIvYXJtL3NlbGZ0ZXN0LmMKaW5kZXggMTk2MTY0ZjUzMTNk
+Li4yZjExN2Y3OTVkMmQgMTAwNjQ0Ci0tLSBhL2FybS9zZWxmdGVzdC5jCisrKyBiL2FybS9zZWxm
+dGVzdC5jCkBAIC0zMTIsOSArMzEyLDEwIEBAIHN0YXRpYyBib29sIHBzY2lfY2hlY2sodm9pZCkK
+IHN0YXRpYyBjcHVtYXNrX3Qgc21wX3JlcG9ydGVkOwogc3RhdGljIHZvaWQgY3B1X3JlcG9ydCh2
+b2lkKQogeworCXVuc2lnbmVkIGxvbmcgbXBpZHIgPSBnZXRfbXBpZHIoKTsKIAlpbnQgY3B1ID0g
+c21wX3Byb2Nlc3Nvcl9pZCgpOwogCi0JcmVwb3J0KCJDUFUlZCBvbmxpbmUiLCB0cnVlLCBjcHUp
+OworCXJlcG9ydCgiQ1BVKCUzZCkgbXBpZHI9JWx4IiwgbXBpZHJfdG9fY3B1KG1waWRyKSA9PSBj
+cHUsIGNwdSwgbXBpZHIpOwogCWNwdW1hc2tfc2V0X2NwdShjcHUsICZzbXBfcmVwb3J0ZWQpOwog
+CWhhbHQoKTsKIH0KQEAgLTM0Myw2ICszNDQsNyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
+KmFyZ3YpCiAKIAl9IGVsc2UgaWYgKHN0cmNtcChhcmd2WzFdLCAic21wIikgPT0gMCkgewogCisJ
+CXVuc2lnbmVkIGxvbmcgbXBpZHIgPSBnZXRfbXBpZHIoKTsKIAkJaW50IGNwdTsKIAogCQlyZXBv
+cnQoIlBTQ0kgdmVyc2lvbiIsIHBzY2lfY2hlY2soKSk7CkBAIC0zNTMsNiArMzU1LDcgQEAgaW50
+IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQogCQkJc21wX2Jvb3Rfc2Vjb25kYXJ5KGNwdSwg
+Y3B1X3JlcG9ydCk7CiAJCX0KIAorCQlyZXBvcnQoIkNQVSglM2QpIG1waWRyPSVseCIsIG1waWRy
+X3RvX2NwdShtcGlkcikgPT0gMCwgMCwgbXBpZHIpOwogCQljcHVtYXNrX3NldF9jcHUoMCwgJnNt
+cF9yZXBvcnRlZCk7CiAJCXdoaWxlICghY3B1bWFza19mdWxsKCZzbXBfcmVwb3J0ZWQpKQogCQkJ
+Y3B1X3JlbGF4KCk7CmRpZmYgLS1naXQgYS9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaCBiL2xpYi9h
+cm0vYXNtL3Byb2Nlc3Nvci5oCmluZGV4IDAyZjkxMmY5OTk3NC4uZWNmNWJiZTE4MjRhIDEwMDY0
+NAotLS0gYS9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaAorKysgYi9saWIvYXJtL2FzbS9wcm9jZXNz
+b3IuaApAQCAtNDAsOCArNDAsMTMgQEAgc3RhdGljIGlubGluZSB1bnNpZ25lZCBsb25nIGdldF9t
+cGlkcih2b2lkKQogCXJldHVybiBtcGlkcjsKIH0KIAotLyogT25seSBzdXBwb3J0IEFmZjAgZm9y
+IG5vdywgdXAgdG8gNCBjcHVzICovCi0jZGVmaW5lIG1waWRyX3RvX2NwdShtcGlkcikgKChpbnQp
+KChtcGlkcikgJiAweGZmKSkKKyNkZWZpbmUgTVBJRFJfSFdJRF9CSVRNQVNLIDB4ZmZmZmZmCitl
+eHRlcm4gaW50IG1waWRyX3RvX2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsKKworI2RlZmluZSBN
+UElEUl9MRVZFTF9TSElGVChsZXZlbCkgXAorCSgoKDEgPDwgbGV2ZWwpID4+IDEpIDw8IDMpCisj
+ZGVmaW5lIE1QSURSX0FGRklOSVRZX0xFVkVMKG1waWRyLCBsZXZlbCkgXAorCSgobXBpZHIgPj4g
+TVBJRFJfTEVWRUxfU0hJRlQobGV2ZWwpKSAmIDB4ZmYpCiAKIGV4dGVybiB2b2lkIHN0YXJ0X3Vz
+cih2b2lkICgqZnVuYykodm9pZCAqYXJnKSwgdm9pZCAqYXJnLCB1bnNpZ25lZCBsb25nIHNwX3Vz
+cik7CiBleHRlcm4gYm9vbCBpc191c2VyKHZvaWQpOwpkaWZmIC0tZ2l0IGEvbGliL2FybS9hc20v
+c2V0dXAuaCBiL2xpYi9hcm0vYXNtL3NldHVwLmgKaW5kZXggY2I4ZmRiZDM4ZGQ1Li4xZGU5OWRk
+MTg0ZDEgMTAwNjQ0Ci0tLSBhL2xpYi9hcm0vYXNtL3NldHVwLmgKKysrIGIvbGliL2FybS9hc20v
+c2V0dXAuaApAQCAtMTAsOCArMTAsOCBAQAogI2luY2x1ZGUgPGFzbS9wYWdlLmg+CiAjaW5jbHVk
+ZSA8YXNtL3BndGFibGUtaHdkZWYuaD4KIAotI2RlZmluZSBOUl9DUFVTCQkJOAotZXh0ZXJuIHUz
+MiBjcHVzW05SX0NQVVNdOworI2RlZmluZSBOUl9DUFVTCQkJMjU1CitleHRlcm4gdTMyIGNwdXNb
+TlJfQ1BVU107CS8qIHBlci1jcHUgSURzIChNUElEUnMpICovCiBleHRlcm4gaW50IG5yX2NwdXM7
+CiAKICNkZWZpbmUgTlJfTUVNX1JFR0lPTlMJCTgKZGlmZiAtLWdpdCBhL2xpYi9hcm0vc2V0dXAu
+YyBiL2xpYi9hcm0vc2V0dXAuYwppbmRleCA3ZTdiMzlmMTFkZGUuLjI0MWJmOTQxMDQ0NyAxMDA2
+NDQKLS0tIGEvbGliL2FybS9zZXR1cC5jCisrKyBiL2xpYi9hcm0vc2V0dXAuYwpAQCAtMzAsNiAr
+MzAsMTYgQEAgaW50IG5yX2NwdXM7CiBzdHJ1Y3QgbWVtX3JlZ2lvbiBtZW1fcmVnaW9uc1tOUl9N
+RU1fUkVHSU9OU107CiBwaHlzX2FkZHJfdCBfX3BoeXNfb2Zmc2V0LCBfX3BoeXNfZW5kOwogCitp
+bnQgbXBpZHJfdG9fY3B1KHVuc2lnbmVkIGxvbmcgbXBpZHIpCit7CisJaW50IGk7CisKKwlmb3Ig
+KGkgPSAwOyBpIDwgbnJfY3B1czsgKytpKQorCQlpZiAoY3B1c1tpXSA9PSAobXBpZHIgJiBNUElE
+Ul9IV0lEX0JJVE1BU0spKQorCQkJcmV0dXJuIGk7CisJcmV0dXJuIC0xOworfQorCiBzdGF0aWMg
+dm9pZCBjcHVfc2V0KGludCBmZHRub2RlIF9fdW51c2VkLCB1MzIgcmVndmFsLCB2b2lkICppbmZv
+IF9fdW51c2VkKQogewogCWludCBjcHUgPSBucl9jcHVzKys7CmRpZmYgLS1naXQgYS9saWIvYXJt
+NjQvYXNtL3Byb2Nlc3Nvci5oIGIvbGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaAppbmRleCA5YTIw
+OGZmNzI5YjcuLjdlNDQ4ZGM4MWE2YSAxMDA2NDQKLS0tIGEvbGliL2FybTY0L2FzbS9wcm9jZXNz
+b3IuaAorKysgYi9saWIvYXJtNjQvYXNtL3Byb2Nlc3Nvci5oCkBAIC03OCw4ICs3OCwxMyBAQCBz
+dGF0aWMgaW5saW5lIHR5cGUgZ2V0XyMjcmVnKHZvaWQpCQkJCVwKIAogREVGSU5FX0dFVF9TWVNS
+RUc2NChtcGlkcikKIAotLyogT25seSBzdXBwb3J0IEFmZjAgZm9yIG5vdywgZ2ljdjIgb25seSAq
+LwotI2RlZmluZSBtcGlkcl90b19jcHUobXBpZHIpICgoaW50KSgobXBpZHIpICYgMHhmZikpCisj
+ZGVmaW5lIE1QSURSX0hXSURfQklUTUFTSyAweGZmMDBmZmZmZmYKK2V4dGVybiBpbnQgbXBpZHJf
+dG9fY3B1KHVuc2lnbmVkIGxvbmcgbXBpZHIpOworCisjZGVmaW5lIE1QSURSX0xFVkVMX1NISUZU
+KGxldmVsKSBcCisJKCgoMSA8PCBsZXZlbCkgPj4gMSkgPDwgMykKKyNkZWZpbmUgTVBJRFJfQUZG
+SU5JVFlfTEVWRUwobXBpZHIsIGxldmVsKSBcCisJKChtcGlkciA+PiBNUElEUl9MRVZFTF9TSElG
+VChsZXZlbCkpICYgMHhmZikKIAogZXh0ZXJuIHZvaWQgc3RhcnRfdXNyKHZvaWQgKCpmdW5jKSh2
+b2lkICphcmcpLCB2b2lkICphcmcsIHVuc2lnbmVkIGxvbmcgc3BfdXNyKTsKIGV4dGVybiBib29s
+IGlzX3VzZXIodm9pZCk7Ci0tIAoyLjcuNAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29s
+dW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8v
+a3ZtYXJtCg==
