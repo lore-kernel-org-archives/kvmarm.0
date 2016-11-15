@@ -1,97 +1,151 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH] arm/arm64: KVM: VGIC: limit ITARGETSR bits to number of
- VCPUs
-Date: Tue, 15 Nov 2016 15:34:37 +0000
-Message-ID: <06bef5c6-1a12-ed13-3bc6-3e9d98a71bee@arm.com>
-References: <20161115142749.19955-1-andre.przywara@arm.com>
- <061bf473-4597-22fe-664a-b83dbe6b39e1@arm.com>
+From: Wei Huang <wei@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v8 2/3] arm: pmu: Check cycle
+ count increases
+Date: Tue, 15 Nov 2016 16:50:53 -0600
+Message-ID: <8e5d194e-ae4c-3a0d-b9f8-5ea1fa3d1921@redhat.com>
+References: <1478629035-12938-1-git-send-email-wei@redhat.com>
+ <1478629035-12938-3-git-send-email-wei@redhat.com>
+ <20161111074321.5ayzmy4w7w73x4fi@hawk.localdomain>
+ <cdc283e2-8905-5344-ac91-2b20e5c4980b@redhat.com>
+ <20161114100510.k3pkhnyzqfraago2@kamzik.brq.redhat.com>
+ <527cb90a-1c72-43df-7149-7058e988f562@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EAAE40190
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Nov 2016 10:33:35 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qSCSrFdWbBVZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Nov 2016 10:33:30 -0500 (EST)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CBD74011D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Nov 2016 10:33:29 -0500 (EST)
-In-Reply-To: <061bf473-4597-22fe-664a-b83dbe6b39e1@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <527cb90a-1c72-43df-7149-7058e988f562@codeaurora.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christopher Covington <cov@codeaurora.org>, Andrew Jones <drjones@redhat.com>
+Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
 
-On 15/11/16 14:41, Marc Zyngier wrote:
-> Hi Andre,
+
+On 11/14/2016 09:12 AM, Christopher Covington wrote:
+> Hi Drew, Wei,
 > 
-> On 15/11/16 14:27, Andre Przywara wrote:
->> The GICv2 spec says in section 4.3.12 that a "CPU targets field bit that
->> corresponds to an unimplemented CPU interface is RAZ/WI."
->> Currently we allow the guest to write any value in there and it can
->> read that back.
->> Mask the written value with the proper CPU mask to be spec compliant.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> index b44b359..e59d4c7 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> @@ -129,6 +129,7 @@ static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
->>  				   unsigned long val)
->>  {
->>  	u32 intid = VGIC_ADDR_TO_INTID(addr, 8);
->> +	u8 cpu_mask = (1 << atomic_read(&vcpu->kvm->online_vcpus)) - 1;
+> On 11/14/2016 05:05 AM, Andrew Jones wrote:
+>> On Fri, Nov 11, 2016 at 01:55:49PM -0600, Wei Huang wrote:
+>>>
+>>>
+>>> On 11/11/2016 01:43 AM, Andrew Jones wrote:
+>>>> On Tue, Nov 08, 2016 at 12:17:14PM -0600, Wei Huang wrote:
+>>>>> From: Christopher Covington <cov@codeaurora.org>
+>>>>>
+>>>>> Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
+>>>>> even for the smallest delta of two subsequent reads.
+>>>>>
+>>>>> Signed-off-by: Christopher Covington <cov@codeaurora.org>
+>>>>> Signed-off-by: Wei Huang <wei@redhat.com>
+>>>>> ---
+>>>>>  arm/pmu.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>>  1 file changed, 98 insertions(+)
+>>>>>
+>>>>> diff --git a/arm/pmu.c b/arm/pmu.c
+>>>>> index 0b29088..d5e3ac3 100644
+>>>>> --- a/arm/pmu.c
+>>>>> +++ b/arm/pmu.c
+>>>>> @@ -14,6 +14,7 @@
+>>>>>   */
+>>>>>  #include "libcflat.h"
+>>>>>  
+>>>>> +#define PMU_PMCR_E         (1 << 0)
+>>>>>  #define PMU_PMCR_N_SHIFT   11
+>>>>>  #define PMU_PMCR_N_MASK    0x1f
+>>>>>  #define PMU_PMCR_ID_SHIFT  16
+>>>>> @@ -21,6 +22,10 @@
+>>>>>  #define PMU_PMCR_IMP_SHIFT 24
+>>>>>  #define PMU_PMCR_IMP_MASK  0xff
+>>>>>  
+>>>>> +#define PMU_CYCLE_IDX      31
+>>>>> +
+>>>>> +#define NR_SAMPLES 10
+>>>>> +
+>>>>>  #if defined(__arm__)
+>>>>>  static inline uint32_t pmcr_read(void)
+>>>>>  {
+>>>>> @@ -29,6 +34,47 @@ static inline uint32_t pmcr_read(void)
+>>>>>  	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
+>>>>>  	return ret;
+>>>>>  }
+>>>>> +
+>>>>> +static inline void pmcr_write(uint32_t value)
+>>>>> +{
+>>>>> +	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (value));
+>>>>> +}
+>>>>> +
+>>>>> +static inline void pmselr_write(uint32_t value)
+>>>>> +{
+>>>>> +	asm volatile("mcr p15, 0, %0, c9, c12, 5" : : "r" (value));
+>>>>> +}
+>>>>> +
+>>>>> +static inline void pmxevtyper_write(uint32_t value)
+>>>>> +{
+>>>>> +	asm volatile("mcr p15, 0, %0, c9, c13, 1" : : "r" (value));
+>>>>> +}
+>>>>> +
+>>>>> +/*
+>>>>> + * While PMCCNTR can be accessed as a 64 bit coprocessor register, returning 64
+>>>>> + * bits doesn't seem worth the trouble when differential usage of the result is
+>>>>> + * expected (with differences that can easily fit in 32 bits). So just return
+>>>>> + * the lower 32 bits of the cycle count in AArch32.
+>>>>
+>>>> Like I said in the last review, I'd rather we not do this. We should
+>>>> return the full value and then the test case should confirm the upper
+>>>> 32 bits are zero.
+>>>
+>>> Unless I miss something in ARM documentation, ARMv7 PMCCNTR is a 32-bit
+>>> register. We can force it to a more coarse-grained cycle counter with
+>>> PMCR.D bit=1 (see below). But it is still not a 64-bit register.
 > 
-> For the sake of avoiding open-coding things, how about using GENMASK?
-
-Yes.
-
+> AArch32 System Register Descriptions
+> Performance Monitors registers
+> PMCCNTR, Performance Monitors Cycle Count Register
 > 
->>  	int i;
->>  
->>  	/* GICD_ITARGETSR[0-7] are read-only */
->> @@ -141,7 +142,7 @@ static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
->>  
->>  		spin_lock(&irq->irq_lock);
->>  
->> -		irq->targets = (val >> (i * 8)) & 0xff;
->> +		irq->targets = ((val >> (i * 8)) & 0xff) & cpu_mask;
+> To access the PMCCNTR when accessing as a 32-bit register:
+> MRC p15,0,<Rt>,c9,c13,0 ; Read PMCCNTR[31:0] into Rt
+> MCR p15,0,<Rt>,c9,c13,0 ; Write Rt to PMCCNTR[31:0]. PMCCNTR[63:32] are unchanged
 > 
-> Can't you just drop the '& 0xff' part, since cpu_mask is guaranteed to
-> be more restrictive?
-
-Well, and also irq->targets is an u8 ...
-
-Fixed both.
-
-Thanks!
-Andre.
-
->>  		target = irq->targets ? __ffs(irq->targets) : 0;
->>  		irq->target_vcpu = kvm_get_vcpu(vcpu->kvm, target);
->>  
->>
+> To access the PMCCNTR when accessing as a 64-bit register:
+> MRRC p15,0,<Rt>,<Rt2>,c9 ; Read PMCCNTR[31:0] into Rt and PMCCNTR[63:32] into Rt2
+> MCRR p15,0,<Rt>,<Rt2>,c9 ; Write Rt to PMCCNTR[31:0] and Rt2 to PMCCNTR[63:32]
 > 
-> Thanks,
-> 
-> 	M.
+
+Thanks. I did some research based on your info and came back with the
+following proposals (Cov, correct me if I am wrong):
+
+By comparing A57 TRM (page 394 in [1]) with A15 TRM (page 273 in [2]), I
+think this 64-bit cycle register is only available when running under
+aarch32 compatibility mode on ARMv8 because it is not specified in A15
+TRM. To further verify it, I tested 32-bit pmu code on QEMU with TCG
+mode. The result is: accessing 64-bit PMCCNTR using the following
+assembly failed on A15:
+
+   volatile("mrrc p15, 0, %0, %1, c9" : "=r" (lo), "=r" (hi));
+or
+   volatile("mrrc p15, 0, %Q0, %R0, c9" : "=r" (val));
+
+Given this difference, I think there are two solutions for 64-bit
+AArch32 pmccntr_read, as requested by Drew:
+
+1) The PMU unit testing code tells if it is running under ARMv7 or under
+AArch32-compability mode. When it is running ARMv7, such as A15, let us
+use "MRC p15,0,<Rt>,c9,c13,0" and clear the upper 32-bit as 0. Otherwise
+use "MRRC p15,0,<Rt>,<Rt2>,c9".
+
+2) Returns 64-bit results for ARM pmccntr_read(). But we only uses "MRC
+p15,0,<Rt>,c9,c13,0" and always clear the upper 32-bit as 0. This will
+be the same as the original code.
+
+Thoughts?
+
+-Wei
+
+[1] A57 TRM,
+http://infocenter.arm.com/help/topic/com.arm.doc.ddi0488c/DDI0488C_cortex_a57_mpcore_r1p0_trm.pdf
+[2] A15 TRM,
+http://infocenter.arm.com/help/topic/com.arm.doc.ddi0438c/DDI0438C_cortex_a15_r2p0_trm.pdf
+
+> Regards,
+> Cov
 > 
