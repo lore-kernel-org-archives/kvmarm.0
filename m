@@ -1,72 +1,35 @@
-From: Andre Przywara <andre.przywara@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [kvm-unit-tests PATCH] arm/arm64: introduce is_aarch32
-Date: Wed, 16 Nov 2016 17:42:08 +0000
-Message-ID: <dd65516e-4f61-969f-ee58-9e1357f530f0@arm.com>
+Date: Wed, 16 Nov 2016 17:46:08 +0000
+Message-ID: <38d079b9-c693-65ea-1e32-4e3c9ea7b91c@arm.com>
 References: <1479307116-6355-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 770CB40223
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 12:41:00 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vdu4b0CzbLAd for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Nov 2016 12:40:59 -0500 (EST)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23244401BF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 12:40:58 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1479307116-6355-1-git-send-email-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com, shannon.zhao@linaro.org
+Cc: wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.maydell@linaro.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
-
-Hi Drew,
 
 On 16/11/16 14:38, Andrew Jones wrote:
 > ARMv7-A isn't exactly the same as ARMv8-A32 (AArch32). This
 > function allows unit tests to make the distinction.
 
-So the big question here is why you would like to know this?
-If it is for a certain feature, you should check for that instead.
+Hi Drew,
 
+Overall, having to find out about the architecture is a bad idea most of
+the time. We have feature registers for most things, and it definitely
+makes more sense to check for those than trying to cast a wider net.
+
+> 
 > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > 
 > ---
 > I'm actually unsure if there's a feature bit or not that I could
 > probe instead. It'd be nice if somebody can confirm. Thanks, drew
-
-Probing for a Cortex-A15 is definitely not the right thing. I think
-under KVM you'd see Cortex-A7 and Cortex-A12/A17 if you run on one of those.
-
-So there does not seem to be a dedicated feature bit, however you could
-look for some ISA features that ARMv8 AA32 gained over ARMv7.
-So one thing you could check for is ID_ISAR5[3:0] (SEVL).
-The ARMv7 ARM says that this whole register is "Reserved, UNK", which
-technically doesn't give you a lot to check for. But I guess it just
-reads as zero on ARMv7 ;-)
-The ARMv8 ARM on the other hands puts ARMv8 features in there, among the
-new crypto instructions (which are optional), there is the SEVL
-instruction, which the architecture mandates:
-"In ARMv8-A the only permitted value is 0001."
-
-So I guess the closest you could come to is to check for the lowest 4
-bits of ID_ISAR5 to read as '0001'.
-
-HTH,
-Andre.
-
+> 
 >  lib/arm/asm/processor.h   | 20 ++++++++++++++++++++
 >  lib/arm64/asm/processor.h |  5 +++++
 >  2 files changed, 25 insertions(+)
@@ -92,6 +55,9 @@ Andre.
 > + * function allows unit tests to make the distinction.
 > + */
 > +static inline bool is_aarch32(void)
+
+I'm really worried that you're not considering v7-A as AArch32.
+
 > +{
 > +	/*
 > +	 * XXX: Unfortunately there's no feature bit we can probe for
@@ -104,6 +70,9 @@ Andre.
 > +	midr &= GENMASK(31, 24) | GENMASK(15, 4);
 > +
 > +	return midr != ((0x41 << 24) | (0xc0f << 4));
+
+And what about A7, A12, A17? They all are v7's.
+
 > +}
 > +
 >  #endif /* _ASMARM_PROCESSOR_H_ */
@@ -123,3 +92,11 @@ Andre.
 >  #endif /* !__ASSEMBLY__ */
 >  #endif /* _ASMARM64_PROCESSOR_H_ */
 > 
+
+So the real question is: what are you trying to check for?
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
