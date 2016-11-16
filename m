@@ -1,210 +1,237 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v8 3/3] arm: pmu: Add CPI
- checking
-Date: Wed, 16 Nov 2016 16:45:00 +0100
-Message-ID: <20161116154500.derl37k3orgf47jj@kamzik.brq.redhat.com>
-References: <1478629035-12938-1-git-send-email-wei@redhat.com>
- <1478629035-12938-4-git-send-email-wei@redhat.com>
+Subject: Re: [PATCH] arm: Add simple arch timer test
+Date: Wed, 16 Nov 2016 16:54:43 +0100
+Message-ID: <20161116155443.qctinqychwhl5zxk@kamzik.brq.redhat.com>
+References: <1474285480-215480-1-git-send-email-agraf@suse.de>
+ <20160919145201.64o2a4hkxhx3u55u@kamzik.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1478629035-12938-4-git-send-email-wei@redhat.com>
+In-Reply-To: <20160919145201.64o2a4hkxhx3u55u@kamzik.localdomain>
 Sender: kvm-owner@vger.kernel.org
-To: Wei Huang <wei@redhat.com>
-Cc: cov@codeaurora.org, alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+To: Alexander Graf <agraf@suse.de>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Nov 08, 2016 at 12:17:15PM -0600, Wei Huang wrote:
-> From: Christopher Covington <cov@codeaurora.org>
+On Mon, Sep 19, 2016 at 04:52:01PM +0200, Andrew Jones wrote:
+> On Mon, Sep 19, 2016 at 01:44:40PM +0200, Alexander Graf wrote:
+> > All virtualization capable ARM cores support the ARM architected virtual timer.
+> > 
+> > This patch adds minimalistic checks whether we can fire a virtual timer event
+> > using them. It does not actually trigger an interrupt yet, as infrastructure
+> > for that is missing. However, it does check whether the timer pin is marked as
+> > pending on the GIC.
+> > 
+> > Signed-off-by: Alexander Graf <agraf@suse.de>
+> > ---
+> >  arm/Makefile.arm64 |   2 +-
+> >  arm/vtimer-test.c  | 122 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 123 insertions(+), 1 deletion(-)
+> >  create mode 100644 arm/vtimer-test.c
+> > 
+> > diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> > index 0b0761c..5b3fbe8 100644
+> > --- a/arm/Makefile.arm64
+> > +++ b/arm/Makefile.arm64
+> > @@ -12,7 +12,7 @@ cflatobjs += lib/arm64/processor.o
+> >  cflatobjs += lib/arm64/spinlock.o
+> >  
+> >  # arm64 specific tests
+> > -tests =
+> > +tests = $(TEST_DIR)/vtimer-test.flat
+> >  
+> >  include $(TEST_DIR)/Makefile.common
+> >  
+> > diff --git a/arm/vtimer-test.c b/arm/vtimer-test.c
+> > new file mode 100644
+> > index 0000000..a3e24ce
+> > --- /dev/null
+> > +++ b/arm/vtimer-test.c
+> > @@ -0,0 +1,122 @@
+> > +/*
+> > + * Unit tests for the virtual timer on the ARM virt machine
+> > + *
+> > + * Copyright (C) 2016, Alexander Graf <agraf@suse.de>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#include <libcflat.h>
+> > +#include <asm/io.h>
+> > +
+> > +#define VTIMER_CTL_ENABLE  (1 << 0)
+> > +#define VTIMER_CTL_IMASK   (1 << 1)
+> > +#define VTIMER_CTL_ISTATUS (1 << 2)
+> > +
+> > +#define VIRT_GIC_DIST_BASE 0x08000000
+> > +#define GIC_DIST_PENDING_SET            0x200
+> > +#define GIC_DIST_PENDING_CLEAR          0x280
+> > +#define GIC_DIST_ACTIVE_SET             0x300
+> > +#define GIC_DIST_ACTIVE_CLEAR           0x380
+> > +
+> > +#define VIRT_GIC_CPU_BASE  0x08010000
 > 
-> Calculate the numbers of cycles per instruction (CPI) implied by ARM
-> PMU cycle counter values. The code includes a strict checking facility
-> intended for the -icount option in TCG mode in the configuration file.
+> Once I get my arm/gic series in we won't need to hard code
+> the gic base addresses and these gic register offsets will
+> also be provided.
 > 
-> Signed-off-by: Christopher Covington <cov@codeaurora.org>
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> ---
->  arm/pmu.c         | 101 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  arm/unittests.cfg |  14 ++++++++
->  2 files changed, 114 insertions(+), 1 deletion(-)
+> > +
+> > +#define ARCH_TIMER_VIRT_IRQ   11
+> > +#define ARCH_TIMER_S_EL1_IRQ  13
+> > +#define ARCH_TIMER_NS_EL1_IRQ 14
+> > +#define ARCH_TIMER_NS_EL2_IRQ 10
 > 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index d5e3ac3..09aff89 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -15,6 +15,7 @@
->  #include "libcflat.h"
->  
->  #define PMU_PMCR_E         (1 << 0)
-> +#define PMU_PMCR_C         (1 << 2)
->  #define PMU_PMCR_N_SHIFT   11
->  #define PMU_PMCR_N_MASK    0x1f
->  #define PMU_PMCR_ID_SHIFT  16
-> @@ -75,6 +76,23 @@ static inline void pmccfiltr_write(uint32_t value)
->  	pmselr_write(PMU_CYCLE_IDX);
->  	pmxevtyper_write(value);
->  }
-> +
-> +/*
-> + * Extra instructions inserted by the compiler would be difficult to compensate
-> + * for, so hand assemble everything between, and including, the PMCR accesses
-> + * to start and stop counting.
-> + */
-> +static inline void loop(int i, uint32_t pmcr)
-> +{
-> +	asm volatile(
-> +	"	mcr	p15, 0, %[pmcr], c9, c12, 0\n"
-
-isb
-
-> +	"1:	subs	%[i], %[i], #1\n"
-> +	"	bgt	1b\n"
-> +	"	mcr	p15, 0, %[z], c9, c12, 0\n"
-
-isb
-
-> +	: [i] "+r" (i)
-> +	: [pmcr] "r" (pmcr), [z] "r" (0)
-> +	: "cc");
-> +}
->  #elif defined(__aarch64__)
->  static inline uint32_t pmcr_read(void)
->  {
-> @@ -106,6 +124,23 @@ static inline void pmccfiltr_write(uint32_t value)
->  {
->  	asm volatile("msr pmccfiltr_el0, %0" : : "r" (value));
->  }
-> +
-> +/*
-> + * Extra instructions inserted by the compiler would be difficult to compensate
-> + * for, so hand assemble everything between, and including, the PMCR accesses
-> + * to start and stop counting.
-> + */
-> +static inline void loop(int i, uint32_t pmcr)
-> +{
-> +	asm volatile(
-> +	"	msr	pmcr_el0, %[pmcr]\n"
-
-isb
-
-> +	"1:	subs	%[i], %[i], #1\n"
-> +	"	b.gt	1b\n"
-> +	"	msr	pmcr_el0, xzr\n"
-
-isb
-
-> +	: [i] "+r" (i)
-> +	: [pmcr] "r" (pmcr)
-> +	: "cc");
-> +}
->  #endif
->  
->  /*
-> @@ -156,8 +191,71 @@ static bool check_cycles_increase(void)
->  	return true;
->  }
->  
-> -int main(void)
-> +/*
-> + * Execute a known number of guest instructions. Only odd instruction counts
-> + * greater than or equal to 3 are supported by the in-line assembly code. The
-> + * control register (PMCR_EL0) is initialized with the provided value (allowing
-> + * for example for the cycle counter or event counters to be reset). At the end
-> + * of the exact instruction loop, zero is written to PMCR_EL0 to disable
-> + * counting, allowing the cycle counter or event counters to be read at the
-> + * leisure of the calling code.
-> + */
-> +static void measure_instrs(int num, uint32_t pmcr)
-> +{
-> +	int i = (num - 1) / 2;
-> +
-> +	assert(num >= 3 && ((num - 1) % 2 == 0));
-> +	loop(i, pmcr);
-> +}
-> +
-> +/*
-> + * Measure cycle counts for various known instruction counts. Ensure that the
-> + * cycle counter progresses (similar to check_cycles_increase() but with more
-> + * instructions and using reset and stop controls). If supplied a positive,
-> + * nonzero CPI parameter, also strictly check that every measurement matches
-> + * it. Strict CPI checking is used to test -icount mode.
-> + */
-> +static bool check_cpi(int cpi)
-> +{
-> +	uint32_t pmcr = pmcr_read() | PMU_PMCR_C | PMU_PMCR_E;
-> +	
-> +	if (cpi > 0)
-> +		printf("Checking for CPI=%d.\n", cpi);
-> +	printf("instrs : cycles0 cycles1 ...\n");
-> +
-> +	for (int i = 3; i < 300; i += 32) {
-> +		int avg, sum = 0;
-> +
-> +		printf("%d :", i);
-> +		for (int j = 0; j < NR_SAMPLES; j++) {
-> +			int cycles;
-> +
-> +			measure_instrs(i, pmcr);
-> +			cycles =pmccntr_read();
-> +			printf(" %d", cycles);
-> +
-> +			if (!cycles || (cpi > 0 && cycles != i * cpi)) {
-> +				printf("\n");
-> +				return false;
-> +			}
-> +
-> +			sum += cycles;
-> +		}
-> +		avg = sum / NR_SAMPLES;
-> +		printf(" sum=%d avg=%d avg_ipc=%d avg_cpi=%d\n",
-> +			sum, avg, i / avg, avg / i);
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +int main(int argc, char *argv[])
->  {
-> +	int cpi = 0;
-> +
-> +	if (argc >= 1)
-> +		cpi = atol(argv[0]);
-> +
->  	report_prefix_push("pmu");
->  
->  	/* init for PMU event access, right now only care about cycle count */
-> @@ -166,6 +264,7 @@ int main(void)
->  
->  	report("Control register", check_pmcr());
->  	report("Monotonically increasing cycle count", check_cycles_increase());
-> +	report("Cycle/instruction ratio", check_cpi(cpi));
->  
->  	return report_summary();
->  }
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 7645180..2050dc8 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -59,3 +59,17 @@ groups = selftest
->  [pmu]
->  file = pmu.flat
->  groups = pmu
-> +
-> +# Test PMU support (TCG) with -icount IPC=1
-> +[pmu-tcg-icount-1]
-> +file = pmu.flat
-> +extra_params = -icount 0 -append '1'
-> +groups = pmu
-> +accel = tcg
-> +
-> +# Test PMU support (TCG) with -icount IPC=256
-> +[pmu-tcg-icount-256]
-> +file = pmu.flat
-> +extra_params = -icount 8 -append '256'
-> +groups = pmu
-> +accel = tcg
-> -- 
-> 1.8.3.1
+> We can pull these out of the DT.
 > 
+> > +
+> > +static void write_vtimer_ctl(u64 val)
+> > +{
+> > +	asm volatile("msr cntv_ctl_el0, %0" : : "r" (val));
+> > +}
+> > +
+> > +static void write_vtimer_cval(u64 val)
+> > +{
+> > +	asm volatile("msr cntv_cval_el0, %0" : : "r" (val));
+> > +}
+> > +
+> > +static u64 read_vtimer_ctl(void)
+> > +{
+> > +	u64 val;
+> > +	asm volatile("mrs %0, cntv_ctl_el0" : "=r" (val));
+> > +	return val;
+> > +}
+> > +
+> > +static u64 read_vtimer_cval(void)
+> > +{
+> > +	u64 val;
+> > +	asm volatile("mrs %0, cntv_cval_el0" : "=r" (val));
+> > +	return val;
+> > +}
+> > +
+> > +static u64 read_vtimer_val(void)
+> > +{
+> > +	u64 val;
+> > +	asm volatile("mrs %0, cntvct_el0" : "=r" (val));
+> > +	return val;
+> > +}
+> > +
+> > +static u64 read_vtimer_freq(void)
+> > +{
+> > +	u64 val;
+> > +	asm volatile("mrs %0, cntfrq_el0" : "=r" (val));
+> > +	return val;
+> > +}
+> > +
+> > +static bool gic_vtimer_pending(void)
+> > +{
+> > +	u32 *pending = (u32*)(VIRT_GIC_DIST_BASE + GIC_DIST_PENDING_SET);
+> > +	return (readl(pending) & (1 << (ARCH_TIMER_VIRT_IRQ + 16)));
 > 
+> nit: don't need the outer ()
+> 
+> I think I'd like to add the PPI(irq) macro we added to QEMU for
+> the +16's.
+> 
+> > +}
+> > +
+> > +static bool test_cval_10msec(void)
+> > +{
+> > +	u64 time_10ms = read_vtimer_freq() / 100;
+> > +	u64 time_1us = time_10ms / 10000;
+> > +	u64 before_timer = read_vtimer_val();
+> > +	u64 after_timer, latency;
+> > +
+> > +	/* Program timer to fire in 10ms */
+> > +	write_vtimer_cval(before_timer + time_10ms);
+> > +
+> > +	/* Wait for the timer to fire */
+> > +	while (!(read_vtimer_ctl() & VTIMER_CTL_ISTATUS)) ;
+> 
+> If emulation fails to set the status bit then we'll spin forever.
+> That's OK if we set the test timeout (arm/unittests.cfg:timeout
+> for this test appropriately) Or, maybe can add a trial count here
+> that's sufficiently large?
+> 
+> > +
+> > +	/* It fired, check how long it took */
+> > +	after_timer = read_vtimer_val();
+> > +
+> > +	latency = (after_timer - (before_timer + time_10ms));
+> 
+> nit: don't need the outer ()
+> 
+> Shouldn't latency be signed so we can see if the status bit was
+> set too soon? Or just compare time_10ms with after - before?
+> 
+> > +	printf("After timer: 0x%lx\n", after_timer);
+> > +	printf("Expected   : 0x%lx\n", before_timer + time_10ms);
+> > +	printf("Latency    : %ld us\n", latency / time_1us);
+> > +
+> > +	return latency < time_10ms;
+> 
+> Does this mean that the threshold for success is 10ms? If so,
+> then that's not too large?
+> 
+> > +}
+> > +
+> > +static void test_vtimer(void)
+> > +{
+> > +	printf("\n=== vtimer with busy loop ===\n");
+> 
+> I guess this is a subtest header, i.e. this file will get
+> other subtests and headers like this one will divide up
+> the test output. That's fine, but new, at least for arm tests.
+> Currently we're dividing subtests with report prefixes. In
+> this case, instead of the above printf, we'd do
+> 
+>  report_prefix_push("busy-loop");
+> 
+> or whatever the prefix should be. At the end of the function
+> we'd pop the prefix. I prefer the prefix style as it makes
+> grepping test logs easier.
+> 
+> > +
+> > +	/* Enable the timer */
+> > +	write_vtimer_cval(-1);
+> 
+> nit: I prefer ~0
+> 
+> > +	write_vtimer_ctl(VTIMER_CTL_ENABLE);
+> > +
+> > +	report("timer is not pending before", !gic_vtimer_pending());
+> > +	report("latency is within 10ms", test_cval_10msec());
+> > +	report("timer is pending after", gic_vtimer_pending());
+> > +
+> > +	/* Disable the timer again */
+> > +	write_vtimer_ctl(0);
+> > +}
+> > +
+> > +int main(void)
+> > +{
+> > +	printf("vtimer ctl:  0x%lx\n", read_vtimer_ctl());
+> > +	printf("vtimer cval: 0x%lx\n", read_vtimer_cval());
+> > +	printf("vtimer val:  0x%lx\n", read_vtimer_val());
+> > +	printf("vtimer freq: 0x%lx\n", read_vtimer_freq());
+> > +
+> > +	test_vtimer();
+> > +
+> > +	return report_summary();
+> > +}
+> > -- 
+> > 1.8.5.6
+> >
+> 
+> Thanks for submitting this Alex. I'll bump the arm/gic patches up in my
+> priority queue.
+>
+
+Hi Alex,
+
+Just checking on this. Do you plan to resubmit based on the gic series?
+If so, then you may want to grab v6[*], which is hopefully pretty much
+the last revision, as your base.
+
+[*] https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic-v6
+
+Thanks,
+drew
