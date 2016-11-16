@@ -1,49 +1,45 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2] arm/arm64: KVM: VGIC: limit ITARGETSR bits to number of VCPUs
-Date: Wed, 16 Nov 2016 17:57:16 +0000
-Message-ID: <20161116175716.31578-1-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 0/2] arm64: Support systems without FP/ASIMD
+Date: Wed, 16 Nov 2016 18:11:34 +0000
+Message-ID: <20161116181133.GC3224@e104818-lin.cambridge.arm.com>
+References: <1478613381-5718-1-git-send-email-suzuki.poulose@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1478613381-5718-1-git-send-email-suzuki.poulose@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICv2 spec says in section 4.3.12 that a "CPU targets field bit that
-corresponds to an unimplemented CPU interface is RAZ/WI."
-Currently we allow the guest to write any value in there and it can
-read that back.
-Mask the written value with the proper CPU mask to be spec compliant.
+On Tue, Nov 08, 2016 at 01:56:19PM +0000, Suzuki K. Poulose wrote:
+> This series adds supports to the kernel and KVM hyp to handle
+> systems without FP/ASIMD properly. At the moment the kernel
+> doesn't check if the FP unit is available before accessing
+> the registers (e.g during context switch). Also for KVM,
+> we trap the FP/ASIMD accesses and handle it by injecting an
+> undefined instruction into the VM on systems without FP.
+> 
+> Tested on a FVP_Base-AEM-v8A model by disabling VFP on at
+> least one CPU ( -C clusterX.cpuY.vfp-present=0 ).
+> 
+> Changes since V2:
+>  - Dropped cleanup patch for arm64/crypto/aes-ce-ccm-glue.c
+>  - Removed static_key check from cpus_have_cap. All users with
+>    constant caps should use the new API to make use of static_keys.
+>  - Removed a dedicated static_key used in irqchip-gic-v3.c for
+>    Cavium errata with the new API.
+> 
+> Applies on v4.9-rc4 + [1] (which is pushed for rc5)
+> 
+> [1] http://marc.info/?l=linux-arm-kernel&m=147819889813214&w=2
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
-Changes v1 .. v2:
-- use GENMASK() instead of open-coding mask
-- drop explicit 0xff masking, since cpu_mask is stronger anyway
+I queued the patches for 4.10 with a slight modification as I haven't
+cherry-picked the patch above. I'll push the for-next/core branch out
+once I've done some testing.
 
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Thanks.
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index b44b359..78e34bc 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -129,6 +129,7 @@ static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
- 				   unsigned long val)
- {
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 8);
-+	u8 cpu_mask = GENMASK(atomic_read(&vcpu->kvm->online_vcpus) - 1, 0);
- 	int i;
- 
- 	/* GICD_ITARGETSR[0-7] are read-only */
-@@ -141,7 +142,7 @@ static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
- 
- 		spin_lock(&irq->irq_lock);
- 
--		irq->targets = (val >> (i * 8)) & 0xff;
-+		irq->targets = (val >> (i * 8)) & cpu_mask;
- 		target = irq->targets ? __ffs(irq->targets) : 0;
- 		irq->target_vcpu = kvm_get_vcpu(vcpu->kvm, target);
- 
 -- 
-2.9.0
-
+Catalin
