@@ -1,111 +1,125 @@
-From: Wei Huang <wei@redhat.com>
-Subject: [PATCH v3 1/1] KVM: ARM64: Fix the issues when guest PMCCFILTR is configured
-Date: Wed, 16 Nov 2016 11:09:20 -0600
-Message-ID: <1479316160-8567-1-git-send-email-wei@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, cov@codeaurora.org, will.deacon@arm.com, mark.rutland@arm.com, catalin.marinas@arm.com, linux-kernel@vger.kernel.org
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [kvm-unit-tests PATCH] arm/arm64: introduce is_aarch32
+Date: Wed, 16 Nov 2016 17:42:08 +0000
+Message-ID: <dd65516e-4f61-969f-ee58-9e1357f530f0@arm.com>
+References: <1479307116-6355-1-git-send-email-drjones@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 770CB40223
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 12:41:00 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id vdu4b0CzbLAd for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Nov 2016 12:40:59 -0500 (EST)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 23244401BF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 12:40:58 -0500 (EST)
+In-Reply-To: <1479307116-6355-1-git-send-email-drjones@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, pbonzini@redhat.com, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM calls kvm_pmu_set_counter_event_type() when PMCCFILTR is configured.
-But this function can't deals with PMCCFILTR correctly because the evtCount
-bits of PMCCFILTR, which is reserved 0, conflits with the SW_INCR event
-type of other PMXEVTYPER<n> registers. To fix it, when eventsel == 0, this
-function shouldn't return immediately; instead it needs to check further
-if select_idx is ARMV8_PMU_CYCLE_IDX.
+Hi Drew,
 
-Another issue is that KVM shouldn't copy the eventsel bits of PMCCFILTER
-blindly to attr.config. Instead it ought to convert the request to the
-"cpu cycle" event type (i.e. 0x11).
+On 16/11/16 14:38, Andrew Jones wrote:
+> ARMv7-A isn't exactly the same as ARMv8-A32 (AArch32). This
+> function allows unit tests to make the distinction.
 
-To support this patch and to prevent duplicated definitions, a limited
-set of ARMv8 perf event types were relocated from perf_event.c to
-asm/perf_event.h.
+So the big question here is why you would like to know this?
+If it is for a certain feature, you should check for that instead.
 
-Signed-off-by: Wei Huang <wei@redhat.com>
----
- arch/arm64/include/asm/perf_event.h | 10 +++++++++-
- arch/arm64/kernel/perf_event.c      | 10 +---------
- virt/kvm/arm/pmu.c                  |  8 +++++---
- 3 files changed, 15 insertions(+), 13 deletions(-)
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> 
+> ---
+> I'm actually unsure if there's a feature bit or not that I could
+> probe instead. It'd be nice if somebody can confirm. Thanks, drew
 
-diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
-index 2065f46..38b6a2b 100644
---- a/arch/arm64/include/asm/perf_event.h
-+++ b/arch/arm64/include/asm/perf_event.h
-@@ -46,7 +46,15 @@
- #define	ARMV8_PMU_EVTYPE_MASK	0xc800ffff	/* Mask for writable bits */
- #define	ARMV8_PMU_EVTYPE_EVENT	0xffff		/* Mask for EVENT bits */
- 
--#define ARMV8_PMU_EVTYPE_EVENT_SW_INCR	0	/* Software increment event */
-+/*
-+ * PMUv3 event types: required events
-+ */
-+#define ARMV8_PMUV3_PERFCTR_SW_INCR				0x00
-+#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_REFILL			0x03
-+#define ARMV8_PMUV3_PERFCTR_L1D_CACHE				0x04
-+#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED				0x10
-+#define ARMV8_PMUV3_PERFCTR_CPU_CYCLES				0x11
-+#define ARMV8_PMUV3_PERFCTR_BR_PRED				0x12
- 
- /*
-  * Event filters for PMUv3
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index a9310a6..57ae9d9 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -31,17 +31,9 @@
- 
- /*
-  * ARMv8 PMUv3 Performance Events handling code.
-- * Common event types.
-+ * Common event types (some are defined in asm/perf_event.h).
-  */
- 
--/* Required events. */
--#define ARMV8_PMUV3_PERFCTR_SW_INCR				0x00
--#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_REFILL			0x03
--#define ARMV8_PMUV3_PERFCTR_L1D_CACHE				0x04
--#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED				0x10
--#define ARMV8_PMUV3_PERFCTR_CPU_CYCLES				0x11
--#define ARMV8_PMUV3_PERFCTR_BR_PRED				0x12
--
- /* At least one of the following is required. */
- #define ARMV8_PMUV3_PERFCTR_INST_RETIRED			0x08
- #define ARMV8_PMUV3_PERFCTR_INST_SPEC				0x1B
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 6e9c40e..69ccce3 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -305,7 +305,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
- 			continue;
- 		type = vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i)
- 		       & ARMV8_PMU_EVTYPE_EVENT;
--		if ((type == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
-+		if ((type == ARMV8_PMUV3_PERFCTR_SW_INCR)
- 		    && (enable & BIT(i))) {
- 			reg = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
- 			reg = lower_32_bits(reg);
-@@ -379,7 +379,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- 	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
- 
- 	/* Software increment event does't need to be backed by a perf event */
--	if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
-+	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR &&
-+	    select_idx != ARMV8_PMU_CYCLE_IDX)
- 		return;
- 
- 	memset(&attr, 0, sizeof(struct perf_event_attr));
-@@ -391,7 +392,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- 	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
- 	attr.exclude_hv = 1; /* Don't count EL2 events */
- 	attr.exclude_host = 1; /* Don't count host events */
--	attr.config = eventsel;
-+	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ?
-+		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
- 
- 	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
- 	/* The initial sample period (overflow count) of an event. */
--- 
-2.7.4
+Probing for a Cortex-A15 is definitely not the right thing. I think
+under KVM you'd see Cortex-A7 and Cortex-A12/A17 if you run on one of those.
+
+So there does not seem to be a dedicated feature bit, however you could
+look for some ISA features that ARMv8 AA32 gained over ARMv7.
+So one thing you could check for is ID_ISAR5[3:0] (SEVL).
+The ARMv7 ARM says that this whole register is "Reserved, UNK", which
+technically doesn't give you a lot to check for. But I guess it just
+reads as zero on ARMv7 ;-)
+The ARMv8 ARM on the other hands puts ARMv8 features in there, among the
+new crypto instructions (which are optional), there is the SEVL
+instruction, which the architecture mandates:
+"In ARMv8-A the only permitted value is 0001."
+
+So I guess the closest you could come to is to check for the lowest 4
+bits of ID_ISAR5 to read as '0001'.
+
+HTH,
+Andre.
+
+>  lib/arm/asm/processor.h   | 20 ++++++++++++++++++++
+>  lib/arm64/asm/processor.h |  5 +++++
+>  2 files changed, 25 insertions(+)
+> 
+> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+> index f25e7eee3666..223e54beb72a 100644
+> --- a/lib/arm/asm/processor.h
+> +++ b/lib/arm/asm/processor.h
+> @@ -5,6 +5,7 @@
+>   *
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+> +#include <bitops.h>
+>  #include <asm/ptrace.h>
+>  
+>  enum vector {
+> @@ -46,4 +47,23 @@ static inline unsigned int get_mpidr(void)
+>  extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+>  extern bool is_user(void);
+>  
+> +/*
+> + * ARMv7-A isn't exactly the same as ARMv8-A32 (AArch32). This
+> + * function allows unit tests to make the distinction.
+> + */
+> +static inline bool is_aarch32(void)
+> +{
+> +	/*
+> +	 * XXX: Unfortunately there's no feature bit we can probe for
+> +	 * this, so we do a hacky check for the processor type not being
+> +	 * a Cortex-A15, which is the only v7 type we currently use.
+> +	 */
+> +	unsigned long midr;
+> +
+> +	asm volatile("MRC p15, 0, %0, c0, c0, 0" : "=r" (midr));
+> +	midr &= GENMASK(31, 24) | GENMASK(15, 4);
+> +
+> +	return midr != ((0x41 << 24) | (0xc0f << 4));
+> +}
+> +
+>  #endif /* _ASMARM_PROCESSOR_H_ */
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 84d5c7ce752b..b602e1fbbc2d 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -81,5 +81,10 @@ DEFINE_GET_SYSREG32(mpidr)
+>  extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+>  extern bool is_user(void);
+>  
+> +static inline bool is_aarch32(void)
+> +{
+> +	return false;
+> +}
+> +
+>  #endif /* !__ASSEMBLY__ */
+>  #endif /* _ASMARM64_PROCESSOR_H_ */
+> 
