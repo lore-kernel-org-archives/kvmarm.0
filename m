@@ -1,164 +1,111 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v8 2/3] arm: pmu: Check cycle
- count increases
-Date: Wed, 16 Nov 2016 11:41:11 -0500
-Message-ID: <630ef130-0beb-2e5b-e9ef-8e032800a01c@codeaurora.org>
-References: <1478629035-12938-1-git-send-email-wei@redhat.com>
- <1478629035-12938-3-git-send-email-wei@redhat.com>
- <20161111074321.5ayzmy4w7w73x4fi@hawk.localdomain>
- <cdc283e2-8905-5344-ac91-2b20e5c4980b@redhat.com>
- <20161114100510.k3pkhnyzqfraago2@kamzik.brq.redhat.com>
- <527cb90a-1c72-43df-7149-7058e988f562@codeaurora.org>
- <8e5d194e-ae4c-3a0d-b9f8-5ea1fa3d1921@redhat.com>
- <20161116130145.3x52rdlyytknclpy@kamzik.brq.redhat.com>
- <ea798994-fdb0-88b7-6097-c070ec22b8ba@codeaurora.org>
- <20161116162537.wyxo4c22uietxmz4@kamzik.brq.redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F403D4022C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 11:40:44 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8hCSHHywqCPg for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Nov 2016 11:40:43 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B29D34019A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 11:40:43 -0500 (EST)
-In-Reply-To: <20161116162537.wyxo4c22uietxmz4@kamzik.brq.redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+From: Wei Huang <wei@redhat.com>
+Subject: [PATCH v3 1/1] KVM: ARM64: Fix the issues when guest PMCCFILTR is configured
+Date: Wed, 16 Nov 2016 11:09:20 -0600
+Message-ID: <1479316160-8567-1-git-send-email-wei@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, cov@codeaurora.org, will.deacon@arm.com, mark.rutland@arm.com, catalin.marinas@arm.com, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/16/2016 11:25 AM, Andrew Jones wrote:
-> On Wed, Nov 16, 2016 at 11:08:42AM -0500, Christopher Covington wrote:
->> On 11/16/2016 08:01 AM, Andrew Jones wrote:
->>> On Tue, Nov 15, 2016 at 04:50:53PM -0600, Wei Huang wrote:
->>>>
->>>>
->>>> On 11/14/2016 09:12 AM, Christopher Covington wrote:
->>>>> Hi Drew, Wei,
->>>>>
->>>>> On 11/14/2016 05:05 AM, Andrew Jones wrote:
->>>>>> On Fri, Nov 11, 2016 at 01:55:49PM -0600, Wei Huang wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 11/11/2016 01:43 AM, Andrew Jones wrote:
->>>>>>>> On Tue, Nov 08, 2016 at 12:17:14PM -0600, Wei Huang wrote:
->>>>>>>>> From: Christopher Covington <cov@codeaurora.org>
->>>>>>>>>
->>>>>>>>> Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
->>>>>>>>> even for the smallest delta of two subsequent reads.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Christopher Covington <cov@codeaurora.org>
->>>>>>>>> Signed-off-by: Wei Huang <wei@redhat.com>
->>>>>>>>> ---
->>>>>>>>>  arm/pmu.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>>>>>>  1 file changed, 98 insertions(+)
->>>>>>>>>
->>>>>>>>> diff --git a/arm/pmu.c b/arm/pmu.c
->>>>>>>>> index 0b29088..d5e3ac3 100644
->>>>>>>>> --- a/arm/pmu.c
->>>>>>>>> +++ b/arm/pmu.c
->>>>>>>>> @@ -14,6 +14,7 @@
->>>>>>>>>   */
->>>>>>>>>  #include "libcflat.h"
->>>>>>>>>  
->>>>>>>>> +#define PMU_PMCR_E         (1 << 0)
->>>>>>>>>  #define PMU_PMCR_N_SHIFT   11
->>>>>>>>>  #define PMU_PMCR_N_MASK    0x1f
->>>>>>>>>  #define PMU_PMCR_ID_SHIFT  16
->>>>>>>>> @@ -21,6 +22,10 @@
->>>>>>>>>  #define PMU_PMCR_IMP_SHIFT 24
->>>>>>>>>  #define PMU_PMCR_IMP_MASK  0xff
->>>>>>>>>  
->>>>>>>>> +#define PMU_CYCLE_IDX      31
->>>>>>>>> +
->>>>>>>>> +#define NR_SAMPLES 10
->>>>>>>>> +
->>>>>>>>>  #if defined(__arm__)
->>>>>>>>>  static inline uint32_t pmcr_read(void)
->>>>>>>>>  {
->>>>>>>>> @@ -29,6 +34,47 @@ static inline uint32_t pmcr_read(void)
->>>>>>>>>  	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
->>>>>>>>>  	return ret;
->>>>>>>>>  }
->>>>>>>>> +
->>>>>>>>> +static inline void pmcr_write(uint32_t value)
->>>>>>>>> +{
->>>>>>>>> +	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (value));
->>>>>>>>> +}
->>>>>>>>> +
->>>>>>>>> +static inline void pmselr_write(uint32_t value)
->>>>>>>>> +{
->>>>>>>>> +	asm volatile("mcr p15, 0, %0, c9, c12, 5" : : "r" (value));
->>>>>>>>> +}
->>>>>>>>> +
->>>>>>>>> +static inline void pmxevtyper_write(uint32_t value)
->>>>>>>>> +{
->>>>>>>>> +	asm volatile("mcr p15, 0, %0, c9, c13, 1" : : "r" (value));
->>>>>>>>> +}
->>>>>>>>> +
->>>>>>>>> +/*
->>>>>>>>> + * While PMCCNTR can be accessed as a 64 bit coprocessor register, returning 64
->>>>>>>>> + * bits doesn't seem worth the trouble when differential usage of the result is
->>>>>>>>> + * expected (with differences that can easily fit in 32 bits). So just return
->>>>>>>>> + * the lower 32 bits of the cycle count in AArch32.
->>>>>>>>
->>>>>>>> Like I said in the last review, I'd rather we not do this. We should
->>>>>>>> return the full value and then the test case should confirm the upper
->>>>>>>> 32 bits are zero.
->>>>>>>
->>>>>>> Unless I miss something in ARM documentation, ARMv7 PMCCNTR is a 32-bit
->>>>>>> register. We can force it to a more coarse-grained cycle counter with
->>>>>>> PMCR.D bit=1 (see below). But it is still not a 64-bit register.
->>>>>
->>>>> AArch32 System Register Descriptions
->>>>> Performance Monitors registers
->>>>> PMCCNTR, Performance Monitors Cycle Count Register
->>>>>
->>>>> To access the PMCCNTR when accessing as a 32-bit register:
->>>>> MRC p15,0,<Rt>,c9,c13,0 ; Read PMCCNTR[31:0] into Rt
->>>>> MCR p15,0,<Rt>,c9,c13,0 ; Write Rt to PMCCNTR[31:0]. PMCCNTR[63:32] are unchanged
->>>>>
->>>>> To access the PMCCNTR when accessing as a 64-bit register:
->>>>> MRRC p15,0,<Rt>,<Rt2>,c9 ; Read PMCCNTR[31:0] into Rt and PMCCNTR[63:32] into Rt2
->>>>> MCRR p15,0,<Rt>,<Rt2>,c9 ; Write Rt to PMCCNTR[31:0] and Rt2 to PMCCNTR[63:32]
->>>>>
->>>>
->>>> Thanks. I did some research based on your info and came back with the
->>>> following proposals (Cov, correct me if I am wrong):
->>>>
->>>> By comparing A57 TRM (page 394 in [1]) with A15 TRM (page 273 in [2]), I
->>>> think this 64-bit cycle register is only available when running under
->>>> aarch32 compatibility mode on ARMv8 because it is not specified in A15
->>>> TRM.
->>
->> That interpretation sounds really strange to me. My recollection is that the
->> cycle counter was available as a 64 bit register in ARMv7 as well. I would
->> expect the Cortex TRMs to omit such details. The ARMv7 Architecture Reference
->> Manual is the complete and authoritative source.
-> 
-> Yes, the v7 ARM ARM is the authoritative source, and it says 32-bit.
-> Whereas the v8 ARM ARM wrt to AArch32 mode says it's both 32 and 64.
+KVM calls kvm_pmu_set_counter_event_type() when PMCCFILTR is configured.
+But this function can't deals with PMCCFILTR correctly because the evtCount
+bits of PMCCFILTR, which is reserved 0, conflits with the SW_INCR event
+type of other PMXEVTYPER<n> registers. To fix it, when eventsel == 0, this
+function shouldn't return immediately; instead it needs to check further
+if select_idx is ARMV8_PMU_CYCLE_IDX.
 
-Just looked it up as well in the good old ARM DDI 0406C.c and you're absolutely
-right. Sorry for the bad recollection.
+Another issue is that KVM shouldn't copy the eventsel bits of PMCCFILTER
+blindly to attr.config. Instead it ought to convert the request to the
+"cpu cycle" event type (i.e. 0x11).
 
-Cov
+To support this patch and to prevent duplicated definitions, a limited
+set of ARMv8 perf event types were relocated from perf_event.c to
+asm/perf_event.h.
 
+Signed-off-by: Wei Huang <wei@redhat.com>
+---
+ arch/arm64/include/asm/perf_event.h | 10 +++++++++-
+ arch/arm64/kernel/perf_event.c      | 10 +---------
+ virt/kvm/arm/pmu.c                  |  8 +++++---
+ 3 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
+index 2065f46..38b6a2b 100644
+--- a/arch/arm64/include/asm/perf_event.h
++++ b/arch/arm64/include/asm/perf_event.h
+@@ -46,7 +46,15 @@
+ #define	ARMV8_PMU_EVTYPE_MASK	0xc800ffff	/* Mask for writable bits */
+ #define	ARMV8_PMU_EVTYPE_EVENT	0xffff		/* Mask for EVENT bits */
+ 
+-#define ARMV8_PMU_EVTYPE_EVENT_SW_INCR	0	/* Software increment event */
++/*
++ * PMUv3 event types: required events
++ */
++#define ARMV8_PMUV3_PERFCTR_SW_INCR				0x00
++#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_REFILL			0x03
++#define ARMV8_PMUV3_PERFCTR_L1D_CACHE				0x04
++#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED				0x10
++#define ARMV8_PMUV3_PERFCTR_CPU_CYCLES				0x11
++#define ARMV8_PMUV3_PERFCTR_BR_PRED				0x12
+ 
+ /*
+  * Event filters for PMUv3
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index a9310a6..57ae9d9 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -31,17 +31,9 @@
+ 
+ /*
+  * ARMv8 PMUv3 Performance Events handling code.
+- * Common event types.
++ * Common event types (some are defined in asm/perf_event.h).
+  */
+ 
+-/* Required events. */
+-#define ARMV8_PMUV3_PERFCTR_SW_INCR				0x00
+-#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_REFILL			0x03
+-#define ARMV8_PMUV3_PERFCTR_L1D_CACHE				0x04
+-#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED				0x10
+-#define ARMV8_PMUV3_PERFCTR_CPU_CYCLES				0x11
+-#define ARMV8_PMUV3_PERFCTR_BR_PRED				0x12
+-
+ /* At least one of the following is required. */
+ #define ARMV8_PMUV3_PERFCTR_INST_RETIRED			0x08
+ #define ARMV8_PMUV3_PERFCTR_INST_SPEC				0x1B
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 6e9c40e..69ccce3 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -305,7 +305,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+ 			continue;
+ 		type = vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i)
+ 		       & ARMV8_PMU_EVTYPE_EVENT;
+-		if ((type == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
++		if ((type == ARMV8_PMUV3_PERFCTR_SW_INCR)
+ 		    && (enable & BIT(i))) {
+ 			reg = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
+ 			reg = lower_32_bits(reg);
+@@ -379,7 +379,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
+ 
+ 	/* Software increment event does't need to be backed by a perf event */
+-	if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
++	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR &&
++	    select_idx != ARMV8_PMU_CYCLE_IDX)
+ 		return;
+ 
+ 	memset(&attr, 0, sizeof(struct perf_event_attr));
+@@ -391,7 +392,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
+ 	attr.exclude_hv = 1; /* Don't count EL2 events */
+ 	attr.exclude_host = 1; /* Don't count host events */
+-	attr.config = eventsel;
++	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ?
++		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
+ 
+ 	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+ 	/* The initial sample period (overflow count) of an event. */
 -- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
-Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code
-Aurora Forum, a Linux Foundation Collaborative Project.
+2.7.4
