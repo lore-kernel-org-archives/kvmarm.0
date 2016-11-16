@@ -1,21 +1,28 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH] arm/arm64: introduce is_aarch32
-Date: Wed, 16 Nov 2016 15:38:36 +0100
-Message-ID: <1479307116-6355-1-git-send-email-drjones@redhat.com>
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Subject: Re: [PATCH v8 0/7] arm/arm64: vgic: Implement API for vGICv3 live
+ migration
+Date: Wed, 16 Nov 2016 20:24:16 +0530
+Message-ID: <CALicx6t=0sRYG1jn_=hqod+Kca9-8fWbtwL_-HXE3HvrA_h7PQ@mail.gmail.com>
+References: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
+ <20161116114722.GB3811@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00641401B9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 09:38:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26CAF40354
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 09:53:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rs3yTC9udo-H for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Nov 2016 09:38:10 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DFAA940190
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 09:38:10 -0500 (EST)
+ with ESMTP id E5c9qSMWhh8N for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Nov 2016 09:53:46 -0500 (EST)
+Received: from mail-vk0-f67.google.com (mail-vk0-f67.google.com
+ [209.85.213.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A67340286
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 09:53:45 -0500 (EST)
+Received: by mail-vk0-f67.google.com with SMTP id p9so12018374vkd.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 06:54:17 -0800 (PST)
+In-Reply-To: <20161116114722.GB3811@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,73 +32,28 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com, shannon.zhao@linaro.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-ARMv7-A isn't exactly the same as ARMv8-A32 (AArch32). This
-function allows unit tests to make the distinction.
+On Wed, Nov 16, 2016 at 5:17 PM, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Fri, Nov 04, 2016 at 04:43:26PM +0530, vijay.kilari@gmail.com wrote:
+>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>
+>> This patchset adds API for saving and restoring
+>> of VGICv3 registers to support live migration with new vgic feature.
+>> This API definition is as per version of VGICv3 specification
+>> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
+>>
+>> The patch 3 & 4 are picked from the Pavel's previous implementation.
+>> http://www.spinics.net/lists/kvm/msg122040.html
+>
+> Do we have QEMU/kvmtool patches somewhere at this point so that I can
+> test this?
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
+I will send you next revision of QEMU patches tomorrow.
 
----
-I'm actually unsure if there's a feature bit or not that I could
-probe instead. It'd be nice if somebody can confirm. Thanks, drew
-
- lib/arm/asm/processor.h   | 20 ++++++++++++++++++++
- lib/arm64/asm/processor.h |  5 +++++
- 2 files changed, 25 insertions(+)
-
-diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-index f25e7eee3666..223e54beb72a 100644
---- a/lib/arm/asm/processor.h
-+++ b/lib/arm/asm/processor.h
-@@ -5,6 +5,7 @@
-  *
-  * This work is licensed under the terms of the GNU LGPL, version 2.
-  */
-+#include <bitops.h>
- #include <asm/ptrace.h>
- 
- enum vector {
-@@ -46,4 +47,23 @@ static inline unsigned int get_mpidr(void)
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
- extern bool is_user(void);
- 
-+/*
-+ * ARMv7-A isn't exactly the same as ARMv8-A32 (AArch32). This
-+ * function allows unit tests to make the distinction.
-+ */
-+static inline bool is_aarch32(void)
-+{
-+	/*
-+	 * XXX: Unfortunately there's no feature bit we can probe for
-+	 * this, so we do a hacky check for the processor type not being
-+	 * a Cortex-A15, which is the only v7 type we currently use.
-+	 */
-+	unsigned long midr;
-+
-+	asm volatile("MRC p15, 0, %0, c0, c0, 0" : "=r" (midr));
-+	midr &= GENMASK(31, 24) | GENMASK(15, 4);
-+
-+	return midr != ((0x41 << 24) | (0xc0f << 4));
-+}
-+
- #endif /* _ASMARM_PROCESSOR_H_ */
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 84d5c7ce752b..b602e1fbbc2d 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -81,5 +81,10 @@ DEFINE_GET_SYSREG32(mpidr)
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
- extern bool is_user(void);
- 
-+static inline bool is_aarch32(void)
-+{
-+	return false;
-+}
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM64_PROCESSOR_H_ */
--- 
-2.7.4
+>
+> Thanks,
+> -Christoffer
