@@ -1,29 +1,29 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v8 5/7] arm/arm64: vgic: Introduce VENG0 and VENG1 fields
- to vmcr struct
-Date: Wed, 16 Nov 2016 19:52:27 +0100
-Message-ID: <20161116185227.GE3811@cbox>
+Subject: Re: [PATCH v8 7/7] arm/arm64: vgic: Implement
+ KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO ioctl
+Date: Wed, 16 Nov 2016 19:52:38 +0100
+Message-ID: <20161116185238.GG3811@cbox>
 References: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
- <1478258013-6669-6-git-send-email-vijay.kilari@gmail.com>
+ <1478258013-6669-8-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B52D0402A5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 13:52:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39AA9404E4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 13:52:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FI+2f+GC33oB for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Nov 2016 13:52:00 -0500 (EST)
-Received: from mail-qt0-f171.google.com (mail-qt0-f171.google.com
- [209.85.216.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A996040187
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 13:52:00 -0500 (EST)
-Received: by mail-qt0-f171.google.com with SMTP id w33so113165435qtc.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 10:52:32 -0800 (PST)
+ with ESMTP id qeFiCPbUoN9t for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Nov 2016 13:52:11 -0500 (EST)
+Received: from mail-qt0-f170.google.com (mail-qt0-f170.google.com
+ [209.85.216.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 20C7F4044D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 13:52:11 -0500 (EST)
+Received: by mail-qt0-f170.google.com with SMTP id c47so113298539qtc.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Nov 2016 10:52:43 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1478258013-6669-6-git-send-email-vijay.kilari@gmail.com>
+In-Reply-To: <1478258013-6669-8-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,163 +37,240 @@ To: vijay.kilari@gmail.com
 Cc: marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 04, 2016 at 04:43:31PM +0530, vijay.kilari@gmail.com wrote:
+On Fri, Nov 04, 2016 at 04:43:33PM +0530, vijay.kilari@gmail.com wrote:
 > From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 > 
-> ICC_VMCR_EL2 supports virtual access to ICC_IGRPEN1_EL1.Enable
-> and ICC_IGRPEN0_EL1.Enable fields. Add grpen0 and grpen1 member
-> variables to struct vmcr to support read and write of these fields.
+> Userspace requires to store and restore of line_level for
+> level triggered interrupts using ioctl KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO.
 > 
-> Also refactor vgic_set_vmcr and vgic_get_vmcr() code.
-> Drop ICH_VMCR_CTLR_SHIFT and ICH_VMCR_CTLR_MASK macros and instead
-> use ICH_VMCR_EOI* and ICH_VMCR_CBPR* macros
-> .
 > Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 > ---
->  include/linux/irqchip/arm-gic-v3.h |  2 --
->  virt/kvm/arm/vgic/vgic-mmio-v2.c   | 16 ----------------
->  virt/kvm/arm/vgic/vgic-mmio.c      | 16 ++++++++++++++++
->  virt/kvm/arm/vgic/vgic-v3.c        | 10 ++++++++--
->  virt/kvm/arm/vgic/vgic.h           |  5 +++++
->  5 files changed, 29 insertions(+), 20 deletions(-)
+>  arch/arm64/include/uapi/asm/kvm.h   |  6 +++++
+>  virt/kvm/arm/vgic/vgic-kvm-device.c | 50 ++++++++++++++++++++++++++++++++++++-
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c    | 11 ++++++++
+>  virt/kvm/arm/vgic/vgic-mmio.c       | 33 ++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic-mmio.h       |  5 ++++
+>  virt/kvm/arm/vgic/vgic.h            |  3 +++
+>  6 files changed, 107 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index d48d886..61646aa 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -404,8 +404,6 @@
->  #define ICH_HCR_EN			(1 << 0)
->  #define ICH_HCR_UIE			(1 << 1)
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 91c7137..4100f8c 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -211,6 +211,12 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
+>  #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
+>  #define KVM_DEV_ARM_VGIC_CPU_SYSREGS    6
+> +#define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO 7
+> +#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+> +#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+> +			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+> +#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK	0x3ff
+> +#define VGIC_LEVEL_INFO_LINE_LEVEL	0
 >  
-> -#define ICH_VMCR_CTLR_SHIFT		0
-> -#define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
->  #define ICH_VMCR_CBPR_SHIFT		4
->  #define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
->  #define ICH_VMCR_EOIM_SHIFT		9
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> index 2cb04b7..ad353b5 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> @@ -212,22 +212,6 @@ static void vgic_mmio_write_sgipends(struct kvm_vcpu *vcpu,
+>  #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
+>  
+> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> index da532d1..0f82a91 100644
+> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> @@ -512,6 +512,25 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+>  						  regid, reg);
+>  		break;
 >  	}
+> +	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+> +		unsigned int info, intid;
+> +
+> +		info = (attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
+> +			KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT;
+> +		if (info == VGIC_LEVEL_INFO_LINE_LEVEL) {
+> +			if (is_write)
+> +				tmp32 = *reg;
+> +			intid = attr->attr &
+> +				KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK;
+> +			ret = vgic_v3_line_level_info_uaccess(vcpu, is_write,
+> +							      intid, &tmp32);
+> +			if (!is_write)
+> +				*reg = tmp32;
+
+I think you can avoid the indirection with tmp32 here by just making the
+line level interface use an unsigned long.
+
+> +		} else {
+> +			ret = -EINVAL;
+> +		}
+> +		break;
+> +	}
+>  	default:
+>  		ret = -EINVAL;
+>  		break;
+> @@ -554,6 +573,17 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+>  
+>  		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+>  	}
+> +	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+> +		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> +		u64 reg;
+> +		u32 tmp32;
+> +
+> +		if (get_user(tmp32, uaddr))
+> +			return -EFAULT;
+> +
+> +		reg = tmp32;
+> +		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+> +	}
+>  	}
+>  	return -ENXIO;
 >  }
+> @@ -589,8 +619,18 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
+>  			return ret;
+>  		return put_user(reg, uaddr);
+>  	}
+> -	}
+> +	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+> +		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> +		u64 reg;
+> +		u32 tmp32;
 >  
-> -static void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-> -{
-> -	if (kvm_vgic_global_state.type == VGIC_V2)
-> -		vgic_v2_set_vmcr(vcpu, vmcr);
-> -	else
-> -		vgic_v3_set_vmcr(vcpu, vmcr);
-> -}
-> -
-> -static void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-> -{
-> -	if (kvm_vgic_global_state.type == VGIC_V2)
-> -		vgic_v2_get_vmcr(vcpu, vmcr);
-> -	else
-> -		vgic_v3_get_vmcr(vcpu, vmcr);
-> -}
-> -
->  #define GICC_ARCH_VERSION_V2	0x2
->  
->  /* These are for userland accesses only, there is no guest-facing emulation. */
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index 9939d1d..173d6f0 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -416,6 +416,22 @@ int vgic_validate_mmio_region_addr(struct kvm_device *dev,
+> +		ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
+> +		if (ret)
+> +			return ret;
+> +		tmp32 = reg;
+> +		return put_user(tmp32, uaddr);
+> +	}
+> +	}
 >  	return -ENXIO;
 >  }
 >  
-> +void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-> +{
-> +	if (kvm_vgic_global_state.type == VGIC_V2)
-> +		vgic_v2_set_vmcr(vcpu, vmcr);
-> +	else
-> +		vgic_v3_set_vmcr(vcpu, vmcr);
-> +}
-> +
-> +void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-> +{
-> +	if (kvm_vgic_global_state.type == VGIC_V2)
-> +		vgic_v2_get_vmcr(vcpu, vmcr);
-> +	else
-> +		vgic_v3_get_vmcr(vcpu, vmcr);
-> +}
-> +
->  /*
->   * kvm_mmio_read_buf() returns a value in a format where it can be converted
->   * to a byte array and be directly observed as the guest wanted it to appear
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 9f0dae3..967c295 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -175,10 +175,13 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  {
->  	u32 vmcr;
->  
-> -	vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
-> +	vmcr  = (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
-> +	vmcr |= (vmcrp->ctlr << ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
+> @@ -611,11 +651,19 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+>  		return vgic_v3_has_attr_regs(dev, attr);
+>  	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+>  		return 0;
+> +	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+> +		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
+> +		      KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT) ==
+> +		      VGIC_LEVEL_INFO_LINE_LEVEL)
+> +			return 0;
+> +		break;
+> +	}
+>  	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+>  		switch (attr->attr) {
+>  		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+>  			return 0;
+>  		}
+> +		break;
 
-This looks weird:  The EOImode field is bit[2] in the CTLR, and VEOIM is
-bit[9] in the ICH_VMCR, but you're just shifting the ctlr field left by
-9 and then masking off everything by bit 9, so you'll end with never
-being able to set VEOIM I think...
+spurious change?
 
-Also, we do we now forget about VFIQEn and VAckCtl?  The latter I can
-understand because it's deprecated, but why the first?  This particular
-piece of information would be very nice to have in the commit message.
-
->  	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
->  	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
->  	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
-> +	vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
-> +	vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
->  
->  	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
+>  	}
+>  	return -ENXIO;
 >  }
-> @@ -187,10 +190,13 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  {
->  	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
->  
-> -	vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
-> +	vmcrp->ctlr = (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
-> +	vmcrp->ctlr |= (vmcr & ICH_VMCR_EOIM_MASK) >> ICH_VMCR_EOIM_SHIFT;
->  	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
->  	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
->  	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
-> +	vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
-> +	vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index 519b919..38b481c 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -807,3 +807,14 @@ int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>  		return vgic_uaccess(vcpu, &rd_dev, is_write,
+>  				    offset, val);
+>  }
+> +
+> +int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+> +				    u32 intid, u32 *val)
+> +{
+> +	if (is_write)
+> +		vgic_write_irq_line_level_info(vcpu, intid, *val);
+> +	else
+> +		*val = vgic_read_irq_line_level_info(vcpu, intid);
+> +
+> +	return 0;
+> +}
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index 173d6f0..fb018eb 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -371,6 +371,39 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
+>  	}
 >  }
 >  
->  #define INITIAL_PENDBASER_VALUE						  \
+> +unsigned long vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
+> +{
+> +	int i;
+> +	unsigned long val = 0;
+> +
+> +	for (i = 0; i < 32; i++) {
+> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> +
+> +		if (irq->line_level)
+> +			val |= (1U << i);
+> +
+> +		vgic_put_irq(vcpu->kvm, irq);
+> +	}
+> +
+> +	return val;
+> +}
+> +
+> +void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
+> +				    const unsigned long val)
+> +{
+> +	int i;
+> +
+> +	for_each_set_bit(i, &val, 32) {
+
+I think you misunderstood this part of the API.  Userspace should be
+able to both set an asserted and deasserted line level, regardless of
+what the value was before.  So you need to loop through all of them and
+set the level as nneded.
+
+> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> +
+> +		spin_lock(&irq->irq_lock);
+> +		irq->line_level = true;
+
+why don't you have to set pending as well and potentially queue the interrupt?
+
+> +		spin_unlock(&irq->irq_lock);
+> +
+> +		vgic_put_irq(vcpu->kvm, irq);
+> +	}
+> +}
+> +
+>  static int match_region(const void *key, const void *elt)
+>  {
+>  	const unsigned int offset = (unsigned long)key;
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+> index acbf99e..938702c 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.h
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
+> @@ -181,6 +181,11 @@ int vgic_validate_mmio_region_addr(struct kvm_device *dev,
+>  				   const struct vgic_register_region *regions,
+>  				   int nr_regions, gpa_t addr);
+>  
+> +unsigned long vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid);
+> +
+> +void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
+> +				    const unsigned long val);
+> +
+>  unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
+>  
+>  unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev);
 > diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index d901b0c..c461f6b 100644
+> index 0e632d0..77d3d84 100644
 > --- a/virt/kvm/arm/vgic/vgic.h
 > +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -63,6 +63,9 @@ struct vgic_vmcr {
->  	u32	abpr;
->  	u32	bpr;
->  	u32	pmr;
-> +	/* Below member variable are valid only for GICv3 */
-> +	u32	grpen0;
-> +	u32	grpen1;
->  };
->  
->  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-> @@ -150,6 +153,8 @@ static inline int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
->  #endif
->  
->  int kvm_register_vgic_device(unsigned long type);
-> +void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-> +void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  int vgic_lazy_init(struct kvm *kvm);
->  int vgic_init(struct kvm *kvm);
->  
+> @@ -130,6 +130,9 @@ int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>  			 u64 id, u64 *val);
+>  int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+>  				u64 *reg);
+> +int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+> +				    u32 intid, u32 *val);
+> +
+>  #else
+>  static inline int vgic_register_its_iodevs(struct kvm *kvm)
+>  {
 > -- 
 > 1.9.1
 > 
+
 
 Thanks,
 -Christoffer
