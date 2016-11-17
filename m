@@ -1,31 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v8 1/7] arm/arm64: vgic: Implement support for userspace
- access
-Date: Thu, 17 Nov 2016 12:40:16 +0100
-Message-ID: <20161117114016.GA22231@cbox>
+Subject: Re: [PATCH v8 0/7] arm/arm64: vgic: Implement API for vGICv3 live
+ migration
+Date: Thu, 17 Nov 2016 12:41:16 +0100
+Message-ID: <20161117114116.GB22231@cbox>
 References: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
- <1478258013-6669-2-git-send-email-vijay.kilari@gmail.com>
- <20161116185215.GC3811@cbox>
- <CALicx6vbFj3aoSiqc4n_92rZgONeQVhp-GtTkEhW3=pt9P1hGQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84B014041A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 06:39:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 33E604041A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 06:40:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sXYxPZPEa2Sl for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Nov 2016 06:39:52 -0500 (EST)
-Received: from mail-qk0-f175.google.com (mail-qk0-f175.google.com
- [209.85.220.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE1A0401E7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 06:39:50 -0500 (EST)
-Received: by mail-qk0-f175.google.com with SMTP id n204so215069718qke.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 03:40:23 -0800 (PST)
+ with ESMTP id 7ZGvSG-TbIPS for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Nov 2016 06:40:50 -0500 (EST)
+Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC07C401E7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 06:40:49 -0500 (EST)
+Received: by mail-wm0-f54.google.com with SMTP id f82so140159212wmf.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 03:41:22 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <CALicx6vbFj3aoSiqc4n_92rZgONeQVhp-GtTkEhW3=pt9P1hGQ@mail.gmail.com>
+In-Reply-To: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,140 +31,29 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: vijay.kilari@gmail.com
+Cc: marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 17, 2016 at 04:56:53PM +0530, Vijay Kilari wrote:
-> On Thu, Nov 17, 2016 at 12:22 AM, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
-> > On Fri, Nov 04, 2016 at 04:43:27PM +0530, vijay.kilari@gmail.com wrote:
-> >> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> >>
-> >> Read and write of some registers like ISPENDR and ICPENDR
-> >> from userspace requires special handling when compared to
-> >> guest access for these registers.
-> >>
-> >> Refer to Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> >> for handling of ISPENDR, ICPENDR registers handling.
-> >>
-> >> Add infrastructure to support guest and userspace read
-> >> and write for the required registers
-> >> Also moved vgic_uaccess from vgic-mmio-v2.c to vgic-mmio.c
-> >>
-> >> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> >> ---
-> >>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 25 ----------
-> >>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 98 ++++++++++++++++++++++++++++++++--------
-> >>  virt/kvm/arm/vgic/vgic-mmio.c    | 78 ++++++++++++++++++++++++++++----
-> >>  virt/kvm/arm/vgic/vgic-mmio.h    | 19 ++++++++
-> >>  4 files changed, 169 insertions(+), 51 deletions(-)
-> >>
-> >> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> >> index b44b359..0b32f40 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> >> @@ -406,31 +406,6 @@ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
-> >>       return -ENXIO;
-> >>  }
-> >>
-> >> -/*
-> >> - * When userland tries to access the VGIC register handlers, we need to
-> >> - * create a usable struct vgic_io_device to be passed to the handlers and we
-> >> - * have to set up a buffer similar to what would have happened if a guest MMIO
-> >> - * access occurred, including doing endian conversions on BE systems.
-> >> - */
-> >> -static int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
-> >> -                     bool is_write, int offset, u32 *val)
-> >> -{
-> >> -     unsigned int len = 4;
-> >> -     u8 buf[4];
-> >> -     int ret;
-> >> -
-> >> -     if (is_write) {
-> >> -             vgic_data_host_to_mmio_bus(buf, len, *val);
-> >> -             ret = kvm_io_gic_ops.write(vcpu, &dev->dev, offset, len, buf);
-> >> -     } else {
-> >> -             ret = kvm_io_gic_ops.read(vcpu, &dev->dev, offset, len, buf);
-> >> -             if (!ret)
-> >> -                     *val = vgic_data_mmio_bus_to_host(buf, len);
-> >> -     }
-> >> -
-> >> -     return ret;
-> >> -}
-> >> -
-> >>  int vgic_v2_cpuif_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-> >>                         int offset, u32 *val)
-> >>  {
-> >> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> >> index 0d3c76a..ce2708d 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> >> @@ -209,6 +209,62 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
-> >>       return 0;
-> >>  }
-> >>
-> >> +static unsigned long vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
-> >> +                                               gpa_t addr, unsigned int len)
-> >> +{
-> >> +     u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> >> +     u32 value = 0;
-> >> +     int i;
-> >> +
-> >> +     /*
-> >> +      * A level triggerred interrupt pending state is latched in both
-> >> +      * "soft_pending" and "line_level" variables. Userspace will save
-> >> +      * and restore soft_pending and line_level separately.
-> >> +      * Refer to Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> >> +      * handling of ISPENDR and ICPENDR.
-> >> +      */
-> >> +     for (i = 0; i < len * 8; i++) {
-> >> +             struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> >> +
-> >> +             if (irq->config == VGIC_CONFIG_LEVEL && irq->soft_pending)
-> >> +                     value |= (1U << i);
-> >> +             if (irq->config == VGIC_CONFIG_EDGE && irq->pending)
-> >> +                     value |= (1U << i);
-> >> +
-> >> +             vgic_put_irq(vcpu->kvm, irq);
-> >> +     }
-> >> +
-> >> +     return value;
-> >> +}
-> >> +
-> >> +static void vgic_v3_uaccess_write_pending(struct kvm_vcpu *vcpu,
-> >> +                                       gpa_t addr, unsigned int len,
-> >> +                                       unsigned long val)
-> >> +{
-> >> +     u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> >> +     int i;
-> >> +
-> >> +     for (i = 0; i < len * 8; i++) {
-> >> +             struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> >> +
-> >> +             spin_lock(&irq->irq_lock);
-> >> +             if (test_bit(i, &val)) {
-> >> +                     irq->pending = true;
-> >> +                     irq->soft_pending = true;
-> >
-> > In the vgic_mmio_write_spending function we only set the soft_pending
-> > state to true if the interrupt is a level-triggered interrupt.
-> >
-> > Should we check if that's the case here as well before setting the
-> > soft_pending state?
+Hi Vijaya,
+
+On Fri, Nov 04, 2016 at 04:43:26PM +0530, vijay.kilari@gmail.com wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 > 
-> Yes, can be done. But it puts hard requirement that irq config should
-> be restored
-> before updating pending state.
-
-Ah, I see.
-
-ok, I think you should keep it the way it is then, but please add a
-comment to that effect.
-
-> In any case, the soft_pending is used only if interrupt is level-triggered.
+> This patchset adds API for saving and restoring
+> of VGICv3 registers to support live migration with new vgic feature.
+> This API definition is as per version of VGICv3 specification
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
 > 
-Yes, indeed.
+> The patch 3 & 4 are picked from the Pavel's previous implementation.
+> http://www.spinics.net/lists/kvm/msg122040.html
+> 
+> v7 => v8:
+>  - Rebased to 4.9-rc3
+
+I noticed when looking at this series that there are quite a few
+conflicts when applying to kvmarm/queue, so if you could rebase the next
+verson on kvmarm/queue, then you'll make Marc's life a bit easier.
 
 Thanks,
 -Christoffer
