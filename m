@@ -1,29 +1,25 @@
-From: Vijay Kilari <vijay.kilari@gmail.com>
-Subject: Re: [PATCH v8 5/7] arm/arm64: vgic: Introduce VENG0 and VENG1 fields
- to vmcr struct
-Date: Thu, 17 Nov 2016 18:12:39 +0530
-Message-ID: <CALicx6vP8FyaGa3f=T6RdC+Qd0iYMWiQ5g+g0_KQG6kzoJtzFA@mail.gmail.com>
-References: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
- <1478258013-6669-6-git-send-email-vijay.kilari@gmail.com>
- <20161116185227.GE3811@cbox>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v3 1/1] KVM: ARM64: Fix the issues when guest PMCCFILTR
+ is configured
+Date: Thu, 17 Nov 2016 13:30:39 +0000
+Message-ID: <20161117133039.GH22855@arm.com>
+References: <1479316160-8567-1-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DA234029B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 07:42:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 422274022C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 08:30:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id F2Boe6mydCVd for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Nov 2016 07:42:07 -0500 (EST)
-Received: from mail-ua0-f196.google.com (mail-ua0-f196.google.com
- [209.85.217.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A50B0401BF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 07:42:07 -0500 (EST)
-Received: by mail-ua0-f196.google.com with SMTP id 12so14361560uas.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 04:42:40 -0800 (PST)
-In-Reply-To: <20161116185227.GE3811@cbox>
+ with ESMTP id iHJLk0dMz8yz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Nov 2016 08:30:08 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 05B72401E8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 08:30:07 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1479316160-8567-1-git-send-email-wei@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,123 +29,35 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Wei Huang <wei@redhat.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 17, 2016 at 12:22 AM, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> On Fri, Nov 04, 2016 at 04:43:31PM +0530, vijay.kilari@gmail.com wrote:
->> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->>
->> ICC_VMCR_EL2 supports virtual access to ICC_IGRPEN1_EL1.Enable
->> and ICC_IGRPEN0_EL1.Enable fields. Add grpen0 and grpen1 member
->> variables to struct vmcr to support read and write of these fields.
->>
->> Also refactor vgic_set_vmcr and vgic_get_vmcr() code.
->> Drop ICH_VMCR_CTLR_SHIFT and ICH_VMCR_CTLR_MASK macros and instead
->> use ICH_VMCR_EOI* and ICH_VMCR_CBPR* macros
->> .
->> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->> ---
->>  include/linux/irqchip/arm-gic-v3.h |  2 --
->>  virt/kvm/arm/vgic/vgic-mmio-v2.c   | 16 ----------------
->>  virt/kvm/arm/vgic/vgic-mmio.c      | 16 ++++++++++++++++
->>  virt/kvm/arm/vgic/vgic-v3.c        | 10 ++++++++--
->>  virt/kvm/arm/vgic/vgic.h           |  5 +++++
->>  5 files changed, 29 insertions(+), 20 deletions(-)
->>
->> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
->> index d48d886..61646aa 100644
->> --- a/include/linux/irqchip/arm-gic-v3.h
->> +++ b/include/linux/irqchip/arm-gic-v3.h
->> @@ -404,8 +404,6 @@
->>  #define ICH_HCR_EN                   (1 << 0)
->>  #define ICH_HCR_UIE                  (1 << 1)
->>
->> -#define ICH_VMCR_CTLR_SHIFT          0
->> -#define ICH_VMCR_CTLR_MASK           (0x21f << ICH_VMCR_CTLR_SHIFT)
->>  #define ICH_VMCR_CBPR_SHIFT          4
->>  #define ICH_VMCR_CBPR_MASK           (1 << ICH_VMCR_CBPR_SHIFT)
->>  #define ICH_VMCR_EOIM_SHIFT          9
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> index 2cb04b7..ad353b5 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->> @@ -212,22 +212,6 @@ static void vgic_mmio_write_sgipends(struct kvm_vcpu *vcpu,
->>       }
->>  }
->>
->> -static void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
->> -{
->> -     if (kvm_vgic_global_state.type == VGIC_V2)
->> -             vgic_v2_set_vmcr(vcpu, vmcr);
->> -     else
->> -             vgic_v3_set_vmcr(vcpu, vmcr);
->> -}
->> -
->> -static void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
->> -{
->> -     if (kvm_vgic_global_state.type == VGIC_V2)
->> -             vgic_v2_get_vmcr(vcpu, vmcr);
->> -     else
->> -             vgic_v3_get_vmcr(vcpu, vmcr);
->> -}
->> -
->>  #define GICC_ARCH_VERSION_V2 0x2
->>
->>  /* These are for userland accesses only, there is no guest-facing emulation. */
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
->> index 9939d1d..173d6f0 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->> @@ -416,6 +416,22 @@ int vgic_validate_mmio_region_addr(struct kvm_device *dev,
->>       return -ENXIO;
->>  }
->>
->> +void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
->> +{
->> +     if (kvm_vgic_global_state.type == VGIC_V2)
->> +             vgic_v2_set_vmcr(vcpu, vmcr);
->> +     else
->> +             vgic_v3_set_vmcr(vcpu, vmcr);
->> +}
->> +
->> +void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
->> +{
->> +     if (kvm_vgic_global_state.type == VGIC_V2)
->> +             vgic_v2_get_vmcr(vcpu, vmcr);
->> +     else
->> +             vgic_v3_get_vmcr(vcpu, vmcr);
->> +}
->> +
->>  /*
->>   * kvm_mmio_read_buf() returns a value in a format where it can be converted
->>   * to a byte array and be directly observed as the guest wanted it to appear
->> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
->> index 9f0dae3..967c295 100644
->> --- a/virt/kvm/arm/vgic/vgic-v3.c
->> +++ b/virt/kvm/arm/vgic/vgic-v3.c
->> @@ -175,10 +175,13 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->>  {
->>       u32 vmcr;
->>
->> -     vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
->> +     vmcr  = (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
->> +     vmcr |= (vmcrp->ctlr << ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
->
-> This looks weird:  The EOImode field is bit[2] in the CTLR, and VEOIM is
-> bit[9] in the ICH_VMCR, but you're just shifting the ctlr field left by
-> 9 and then masking off everything by bit 9, so you'll end with never
-> being able to set VEOIM I think...
->
-OK
-> Also, we do we now forget about VFIQEn and VAckCtl?  The latter I can
-> understand because it's deprecated, but why the first?  This particular
-> piece of information would be very nice to have in the commit message.
+On Wed, Nov 16, 2016 at 11:09:20AM -0600, Wei Huang wrote:
+> KVM calls kvm_pmu_set_counter_event_type() when PMCCFILTR is configured.
+> But this function can't deals with PMCCFILTR correctly because the evtCount
+> bits of PMCCFILTR, which is reserved 0, conflits with the SW_INCR event
+> type of other PMXEVTYPER<n> registers. To fix it, when eventsel == 0, this
+> function shouldn't return immediately; instead it needs to check further
+> if select_idx is ARMV8_PMU_CYCLE_IDX.
+> 
+> Another issue is that KVM shouldn't copy the eventsel bits of PMCCFILTER
+> blindly to attr.config. Instead it ought to convert the request to the
+> "cpu cycle" event type (i.e. 0x11).
+> 
+> To support this patch and to prevent duplicated definitions, a limited
+> set of ARMv8 perf event types were relocated from perf_event.c to
+> asm/perf_event.h.
+> 
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> ---
+>  arch/arm64/include/asm/perf_event.h | 10 +++++++++-
+>  arch/arm64/kernel/perf_event.c      | 10 +---------
+>  virt/kvm/arm/pmu.c                  |  8 +++++---
+>  3 files changed, 15 insertions(+), 13 deletions(-)
 
-I understand that group 0 interrupts are not handled. So vFIQEn can be ignored.
-Spec says, if SRE=1 (non-secure) this bit is RES1 also it is alias to
-ICC_CTLR_EL1
-if SRE is 1. However there is no bit in ICC_CTLR_EL1 for FIQen. It is defined
-only in GICV_CTLR which is used when SRE=0.
+Acked-by: Will Deacon <will.deacon@arm.com>
+
+I'm assuming this will go via kvm-arm.
+
+Will
