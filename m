@@ -1,63 +1,38 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] arm/arm64: introduce is_aarch32
-Date: Fri, 18 Nov 2016 11:57:43 +0100
-Message-ID: <20161118105743.szrsnahvvhuavfc2@kamzik.brq.redhat.com>
-References: <1479307116-6355-1-git-send-email-drjones@redhat.com>
- <20161116174544.GE11228@leverpostej>
- <20161117164541.uwmearukm3zcwahh@hawk.localdomain>
- <20161117174751.GD21742@leverpostej>
+From: Itaru Kitayama <itaru.kitayama@riken.jp>
+Subject: RE: [kvm-unit-tests PATCH 0/4] kvm-unit-tests: add first GIC MMIO
+ tests
+Date: Fri, 18 Nov 2016 21:18:17 +0900
+Message-ID: <f9d430e1-f31f-9449-5589-55032779b26e@riken.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20161117174751.GD21742@leverpostej>
-Sender: kvm-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, pbonzini@redhat.com, shannon.zhao@linaro.org, wei@redhat.com
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 286DF40293
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2016 07:17:48 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Mpg7rpvtn+w4 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Nov 2016 07:17:46 -0500 (EST)
+Received: from postman.riken.jp (postman3.riken.jp [134.160.33.85])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B25D4022C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2016 07:17:46 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: andre.przywara@arm.com
+Cc: ", Marc Zyngier" <marc.zyngier@arm.com>, =?UTF-8?B?LOKAnHFlbXUtZGV2ZWxAbm9uZ251Lm9yZ+KAnQ==?= <qemu-devel@nongnu.org>, =?UTF-8?B?4oCca3ZtQHZnZXIua2VybmVsLm9yZ+KAnQ==?= <kvm@vger.kernel.org>, =?UTF-8?B?LOKAnGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHXigJ0=?= <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 17, 2016 at 05:47:51PM +0000, Mark Rutland wrote:
-> On Thu, Nov 17, 2016 at 05:45:41PM +0100, Andrew Jones wrote:
-> > Hi Mark,
-> > 
-> > On Wed, Nov 16, 2016 at 05:45:44PM +0000, Mark Rutland wrote:
-> > > So I don't think we should try to distinguish ARMv8-A AArch32 from
-> > > ARMv7-A. We should test individual features, or if that's not possible,
-> > > group them in the same bucket.
-> > 
-> > Perhaps I was too quick to look for a general way to approach the first
-> > place I saw the need, which is
-> > 
-> >  check_cntr(read_pmccntr());
-> >  if (is_aarch64())
-> >      check_cntr(read_pmccntr64());
-> > 
-> > Is PMCCNTR the only "weird" difference?
-> 
-> Define "weird". ;)
-> 
-> I believe the extension of PMCCNTR to 64 bits is part of PMUv3. So you
-> should be able to check ID_DFR0.PerfMon == 0b0011. For overflow you'll
-> also need to configure PMCR.LC.
+Hi Andre,
 
-Thanks Mark,
+I've verified tests you proposed to the lists finish without an
+issue with the kvm-arm-for-4.9-rc6 kernel.
 
-checking for ID_DFR0.PerfMon == 0b0011 for this case does indeed look
-like the right thing to do.
-
-Wei,
-
-when you respin the PMU test can you add the additional 64-bit read,
-when a PMUv3 is present?
-
-Thanks,
-drew
-
-
-> 
-> Thanks,
-> Mark.
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Itaru
