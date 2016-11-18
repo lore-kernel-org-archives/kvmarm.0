@@ -1,120 +1,47 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvm-unit-tests PATCH 4/4] arm/arm64: GICv3: add TYPER test
-Date: Thu, 17 Nov 2016 17:57:52 +0000
-Message-ID: <20161117175752.16475-5-andre.przywara@arm.com>
-References: <20161117175752.16475-1-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EA94404BA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 12:56:52 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SDrr-oyzuOEP for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Nov 2016 12:56:51 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5300B404EC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2016 12:56:50 -0500 (EST)
-In-Reply-To: <20161117175752.16475-1-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PULL] KVM/ARM updates for 4.9-rc6
+Date: Fri, 18 Nov 2016 09:39:24 +0000
+Message-ID: <1479461966-20136-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Wei Huang <wei@redhat.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a simple test for the GICv3 TYPER test, which does only one basic
-check to ensure we have actually enough interrupt IDs if we support
-LPIs.
-Allow a GICv3 guest to do the common MMIO checks as well, where the
-register semantics are shared with a GICv2.
+Paolo, Radim,
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/gic.c         | 34 +++++++++++++++++++++++++++++++---
- arm/unittests.cfg |  6 ++++++
- 2 files changed, 37 insertions(+), 3 deletions(-)
+Please find below the pull request for a couple of fixes for the
+PMU emulation, courtesy of Wei. Both patches are candidates for stable.
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 02b1be1..7de0e47 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -327,6 +327,30 @@ static bool test_typer_v2(uint32_t reg)
- 	return true;
- }
- 
-+static bool test_typer_v3(uint32_t reg)
-+{
-+	int nr_intids;
-+
-+	report("GIC emulation %ssupport%s MBIs", 1,
-+	       reg & BIT(16) ? "" : "does not ",
-+	       reg & BIT(16) ? "s" : "");
-+	report("GIC emulation %ssupport%s LPIs", 1,
-+	       reg & BIT(17) ? "" : "does not ",
-+	       reg & BIT(17) ? "s" : "");
-+	report("GIC emulation %ssupport%s Aff3", 1,
-+	       reg & BIT(24) ? "" : "does not ",
-+	       reg & BIT(24) ? "s" : "");
-+
-+	nr_intids = BIT(((reg >> 19) & 0x1f) + 1);
-+	report("%d interrupt IDs implemented", 1, nr_intids);
-+
-+	if (reg & BIT(17))
-+		report("%d LPIs supported", nr_intids > 8192,
-+		       nr_intids > 8192 ? nr_intids - 8192 : 0);
-+
-+	return true;
-+}
-+
- #define BYTE(reg32, byte) (((reg32) >> ((byte) * 8)) & 0xff)
- #define REPLACE_BYTE(reg32, byte, new) (((reg32) & ~(0xff << ((byte) * 8))) |\
- 					((new) << ((byte) * 8)))
-@@ -460,8 +484,9 @@ static int gic_test_mmio(int gic_version)
- 		idreg = gic_dist_base + 0xfe8;
- 		break;
- 	case 0x3:
--		report_abort("GICv3 MMIO tests NYI");
--		return -1;
-+		gic_dist_base = gicv3_dist_base();
-+		idreg = gic_dist_base + 0xffe8;
-+		break;
- 	default:
- 		report_abort("GIC version %d not supported", gic_version);
- 		return 0;
-@@ -471,7 +496,10 @@ static int gic_test_mmio(int gic_version)
- 	nr_irqs = 32 * ((reg & 0x1f) + 1);
- 	report("number of implemented SPIs: %d", 1, nr_irqs - 32);
- 
--	test_typer_v2(reg);
-+	if (gic_version == 2)
-+		test_typer_v2(reg);
-+	else
-+		test_typer_v3(reg);
- 
- 	report("IIDR: 0x%x", 1, readl(gic_dist_base + GICD_IIDR));
- 
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 0162e5a..b432346 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -78,3 +78,9 @@ file = gic.flat
- smp = $MAX_SMP
- extra_params = -machine gic-version=3 -append 'ipi'
- groups = gic
-+
-+[gicv3-mmio]
-+file = gic.flat
-+smp = $MAX_SMP
-+extra_params = -machine gic-version=3 -append 'mmio'
-+groups = gic
--- 
-2.9.0
+Thanks,
+
+	M.
+
+The following changes since commit d42c79701a3ee5c38fbbc82f98a140420bd40134:
+
+  KVM: arm/arm64: vgic: Kick VCPUs when queueing already pending IRQs (2016-11-04 17:56:56 +0000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.9-rc6
+
+for you to fetch changes up to b112c84a6ff035271d41d548c10215f18443d6a6:
+
+  KVM: arm64: Fix the issues when guest PMCCFILTR is configured (2016-11-18 09:06:58 +0000)
+
+----------------------------------------------------------------
+KVM/ARM updates for v4.9-rc6
+
+- Fix handling of the 32bit cycle counter
+- Fix cycle counter filtering
+
+----------------------------------------------------------------
+Wei Huang (2):
+      arm64: KVM: pmu: Fix AArch32 cycle counter access
+      KVM: arm64: Fix the issues when guest PMCCFILTR is configured
+
+ arch/arm64/include/asm/perf_event.h | 10 +++++++++-
+ arch/arm64/kernel/perf_event.c      | 10 +---------
+ arch/arm64/kvm/sys_regs.c           | 10 ++++++++--
+ virt/kvm/arm/pmu.c                  |  8 +++++---
+ 4 files changed, 23 insertions(+), 15 deletions(-)
