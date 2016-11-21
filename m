@@ -1,57 +1,246 @@
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] configure: honour $ARCH and $CROSS_COMPILE
-Date: Mon, 21 Nov 2016 20:22:16 +0100
-Message-ID: <20161121192215.GA12949@potion>
-References: <20161121182250.13186-1-andre.przywara@arm.com>
+From: Wei Huang <wei@redhat.com>
+Subject: [kvm-unit-tests PATCH v10 2/3] arm: pmu: Check cycle count increases
+Date: Mon, 21 Nov 2016 14:24:54 -0600
+Message-ID: <1479759895-10042-3-git-send-email-wei@redhat.com>
+References: <1479759895-10042-1-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20161121182250.13186-1-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF9A94055D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 15:24:23 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Nc2etzefZ6WD for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Nov 2016 15:24:22 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C0EF2404AC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 15:24:22 -0500 (EST)
+In-Reply-To: <1479759895-10042-1-git-send-email-wei@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-2016-11-21 18:22+0000, Andre Przywara:
-> Both environment variables seem to be standard in cross-compilation
-> environments, especially with Linux.
-> Let the configure script take those into account when setting the default
-> values for --arch and --cross-prefix. Explicitly specifying the latter
-> on the configure command line still works as expected.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
-> Hi,
-> 
-> this maybe a personal itch to scratch here, since I set these two
-> variables in my environment via a (sourced) script here and never have
-> to care about the particular cross-compiler prefix, for instance.
-> It looks rather generic, though, so I was wondering if this is useful
-> upstream as well.
+From: Christopher Covington <cov@codeaurora.org>
 
-Definitely useful, thanks.
+Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
+even for the smallest delta of two subsequent reads.
 
-> diff --git a/configure b/configure
-> @@ -8,8 +8,9 @@ objdump=objdump
->  ar=ar
->  addr2line=addr2line
->  arch=`uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/'`
-> +[ -n "$ARCH" ] && arch="$ARCH"
->  host=$arch
+Signed-off-by: Christopher Covington <cov@codeaurora.org>
+Signed-off-by: Wei Huang <wei@redhat.com>
+---
+ arm/pmu.c | 156 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 156 insertions(+)
 
-Host should be set before we override arch, though.
-
-I can swap those two lines when applying, but would prefer something
-like:
-
-  host=`uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/'`
-  arch=${ARCH:-$host}
-
-> -cross_prefix=
-> +cross_prefix=${CROSS_COMPILE}
->  endian=""
->  pretty_print_stacks=yes
-
-(And --help is not printing the default value for cross_prefix, which
- would be nice to change when we can have a non-empty one now.)
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 9d9c53b..176b070 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -15,6 +15,9 @@
+ #include "libcflat.h"
+ #include "asm/barrier.h"
+ 
++#define PMU_PMCR_E         (1 << 0)
++#define PMU_PMCR_C         (1 << 2)
++#define PMU_PMCR_LC        (1 << 6)
+ #define PMU_PMCR_N_SHIFT   11
+ #define PMU_PMCR_N_MASK    0x1f
+ #define PMU_PMCR_ID_SHIFT  16
+@@ -22,6 +25,14 @@
+ #define PMU_PMCR_IMP_SHIFT 24
+ #define PMU_PMCR_IMP_MASK  0xff
+ 
++#define ID_DFR0_PERFMON_SHIFT 24
++#define ID_DFR0_PERFMON_MASK  0xf
++
++#define PMU_CYCLE_IDX         31
++
++#define NR_SAMPLES 10
++
++static unsigned int pmu_version;
+ #if defined(__arm__)
+ static inline uint32_t pmcr_read(void)
+ {
+@@ -30,6 +41,69 @@ static inline uint32_t pmcr_read(void)
+ 	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
+ 	return ret;
+ }
++
++static inline void pmcr_write(uint32_t value)
++{
++	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (value));
++	isb();
++}
++
++static inline void pmselr_write(uint32_t value)
++{
++	asm volatile("mcr p15, 0, %0, c9, c12, 5" : : "r" (value));
++	isb();
++}
++
++static inline void pmxevtyper_write(uint32_t value)
++{
++	asm volatile("mcr p15, 0, %0, c9, c13, 1" : : "r" (value));
++}
++
++static inline uint64_t pmccntr_read(void)
++{
++	uint32_t lo, hi = 0;
++
++	if (pmu_version == 0x3)
++		asm volatile("mrrc p15, 0, %0, %1, c9" : "=r" (lo), "=r" (hi));
++	else
++		asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (lo));
++
++	return ((uint64_t)hi << 32) | lo;
++}
++
++static inline void pmccntr_write(uint64_t value)
++{
++	uint32_t lo, hi;
++
++	lo = value & 0xffffffff;
++	hi = (value >> 32) & 0xffffffff;
++
++	if (pmu_version == 0x3)
++		asm volatile("mcrr p15, 0, %0, %1, c9" : : "r" (lo), "r" (hi));
++	else
++		asm volatile("mcr p15, 0, %0, c9, c13, 0" : : "r" (lo));
++}
++
++static inline void pmcntenset_write(uint32_t value)
++{
++	asm volatile("mcr p15, 0, %0, c9, c12, 1" : : "r" (value));
++}
++
++/* PMCCFILTR is an obsolete name for PMXEVTYPER31 in ARMv7 */
++static inline void pmccfiltr_write(uint32_t value)
++{
++	pmselr_write(PMU_CYCLE_IDX);
++	pmxevtyper_write(value);
++	isb();
++}
++
++static inline uint32_t id_dfr0_read(void)
++{
++	uint32_t val;
++
++	asm volatile("mrc p15, 0, %0, c0, c1, 2" : "=r" (val));
++	return val;
++}
+ #elif defined(__aarch64__)
+ static inline uint32_t pmcr_read(void)
+ {
+@@ -38,6 +112,44 @@ static inline uint32_t pmcr_read(void)
+ 	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
+ 	return ret;
+ }
++
++static inline void pmcr_write(uint32_t value)
++{
++	asm volatile("msr pmcr_el0, %0" : : "r" (value));
++	isb();
++}
++
++static inline uint64_t pmccntr_read(void)
++{
++	uint64_t cycles;
++
++	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
++	return cycles;
++}
++
++static inline void pmccntr_write(uint64_t value)
++{
++	asm volatile("msr pmccntr_el0, %0" : : "r" (value));
++}
++
++static inline void pmcntenset_write(uint32_t value)
++{
++	asm volatile("msr pmcntenset_el0, %0" : : "r" (value));
++}
++
++static inline void pmccfiltr_write(uint32_t value)
++{
++	asm volatile("msr pmccfiltr_el0, %0" : : "r" (value));
++	isb();
++}
++
++static inline uint32_t id_dfr0_read(void)
++{
++	uint32_t id;
++
++	asm volatile("mrs %0, id_dfr0_el1" : "=r" (id));
++	return id;
++}
+ #endif
+ 
+ /*
+@@ -64,11 +176,55 @@ static bool check_pmcr(void)
+ 	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
+ }
+ 
++/*
++ * Ensure that the cycle counter progresses between back-to-back reads.
++ */
++static bool check_cycles_increase(void)
++{
++	bool success = true;
++
++	/* init before event access, this test only cares about cycle count */
++	pmcntenset_write(1 << PMU_CYCLE_IDX);
++	pmccfiltr_write(0); /* count cycles in EL0, EL1, but not EL2 */
++	pmccntr_write(0);
++
++	pmcr_write(pmcr_read() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
++
++	for (int i = 0; i < NR_SAMPLES; i++) {
++		uint64_t a, b;
++
++		a = pmccntr_read();
++		b = pmccntr_read();
++
++		if (a >= b) {
++			printf("Read %"PRId64" then %"PRId64".\n", a, b);
++			success = false;
++			break;
++		}
++	}
++
++	pmcr_write(pmcr_read() & ~PMU_PMCR_E);
++
++	return success;
++}
++
++void pmu_init(void)
++{
++	uint32_t dfr0;
++
++	/* probe pmu version */
++	dfr0 = id_dfr0_read();
++	pmu_version = (dfr0 >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
++	printf("PMU version: %d\n", pmu_version);
++}
++
+ int main(void)
+ {
+ 	report_prefix_push("pmu");
+ 
++	pmu_init();
+ 	report("Control register", check_pmcr());
++	report("Monotonically increasing cycle count", check_cycles_increase());
+ 
+ 	return report_summary();
+ }
+-- 
+1.8.3.1
