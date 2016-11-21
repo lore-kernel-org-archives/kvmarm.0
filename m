@@ -1,34 +1,34 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [PATCH v8 6/7] arm/arm64: vgic: Implement VGICv3 CPU interface
  access
-Date: Mon, 21 Nov 2016 14:41:13 +0100
-Message-ID: <20161121134113.GE23588@cbox>
+Date: Mon, 21 Nov 2016 14:43:11 +0100
+Message-ID: <20161121134311.GF23588@cbox>
 References: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
  <1478258013-6669-7-git-send-email-vijay.kilari@gmail.com>
  <20161116185232.GF3811@cbox>
  <CALicx6t5D5n3dDQzeKZNUWdS-q5LNiSq-UrP4HdmbdUCj1tF1g@mail.gmail.com>
  <20161117160951.GB23588@cbox>
- <CALicx6uxU8nC+gayWAxf_BX7JrZ9twsFr4YfMr64bNUSneqZow@mail.gmail.com>
- <20161120132005.GC23588@cbox>
- <CALicx6sxchAbDJ2rioTytwFG1C0tD-Fnr4HC-DweSdkkCF7BFw@mail.gmail.com>
+ <CALicx6uia5_H5Zg_x6GP0nKgZi_513w97igCuDdezySOUNQtBw@mail.gmail.com>
+ <20161121101930.GD23588@cbox>
+ <CALicx6snqsSbaKYcj9kt0nt8y2wdTbrY1PKOq-SrGTepCfSZSg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D29F403F4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 08:40:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D87A1402A2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 08:42:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I05nOys8VnIF for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Nov 2016 08:40:44 -0500 (EST)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CCD1E40293
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 08:40:43 -0500 (EST)
-Received: by mail-wm0-f49.google.com with SMTP id f82so145632482wmf.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 05:41:21 -0800 (PST)
+ with ESMTP id V1FnTvF-lb1f for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Nov 2016 08:42:42 -0500 (EST)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 266AD40295
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 08:42:41 -0500 (EST)
+Received: by mail-wm0-f44.google.com with SMTP id g23so147843244wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 05:43:20 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <CALicx6sxchAbDJ2rioTytwFG1C0tD-Fnr4HC-DweSdkkCF7BFw@mail.gmail.com>
+In-Reply-To: <CALicx6snqsSbaKYcj9kt0nt8y2wdTbrY1PKOq-SrGTepCfSZSg@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -42,10 +42,10 @@ To: Vijay Kilari <vijay.kilari@gmail.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Nov 21, 2016 at 07:02:36PM +0530, Vijay Kilari wrote:
-> On Sun, Nov 20, 2016 at 6:50 PM, Christoffer Dall
+On Mon, Nov 21, 2016 at 06:56:08PM +0530, Vijay Kilari wrote:
+> On Mon, Nov 21, 2016 at 3:49 PM, Christoffer Dall
 > <christoffer.dall@linaro.org> wrote:
-> > On Sat, Nov 19, 2016 at 12:18:53AM +0530, Vijay Kilari wrote:
+> > On Fri, Nov 18, 2016 at 10:28:34PM +0530, Vijay Kilari wrote:
 > >> On Thu, Nov 17, 2016 at 9:39 PM, Christoffer Dall
 > >> <christoffer.dall@linaro.org> wrote:
 > >> > On Thu, Nov 17, 2016 at 09:25:59PM +0530, Vijay Kilari wrote:
@@ -124,27 +124,225 @@ On Mon, Nov 21, 2016 at 07:02:36PM +0530, Vijay Kilari wrote:
 > >> > I just tried to do a v7 compile with your patches, and it results in an
 > >> > epic failure, so there's something for you to look at.
 > >> >
+> >> >> >
+> >> >> >>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+> >> >> >>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+> >> >> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> >> >> >> index 002f092..730a18a 100644
+> >> >> >> --- a/include/kvm/arm_vgic.h
+> >> >> >> +++ b/include/kvm/arm_vgic.h
+> >> >> >> @@ -71,6 +71,9 @@ struct vgic_global {
+> >> >> >>
+> >> >> >>       /* GIC system register CPU interface */
+> >> >> >>       struct static_key_false gicv3_cpuif;
+> >> >> >> +
+> >> >> >> +     /* Cache ICH_VTR_EL2 reg value */
+> >> >> >> +     u32                     ich_vtr_el2;
+> >> >> >>  };
+> >> >> >>
+> >> >> >>  extern struct vgic_global kvm_vgic_global_state;
+> >> >> >> @@ -269,6 +272,12 @@ struct vgic_cpu {
+> >> >> >>       u64 pendbaser;
+> >> >> >>
+> >> >> >>       bool lpis_enabled;
+> >> >> >> +
+> >> >> >> +     /* Cache guest priority bits */
+> >> >> >> +     u32 num_pri_bits;
+> >> >> >> +
+> >> >> >> +     /* Cache guest interrupt ID bits */
+> >> >> >> +     u32 num_id_bits;
+> >> >> >>  };
+> >> >> >>
+> >> >> >>  extern struct static_key_false vgic_v2_cpuif_trap;
+> >> >> >> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> >> >> >> index 6c7d30c..da532d1 100644
+> >> >> >> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> >> >> >> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> >> >> >> @@ -504,6 +504,14 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+> >> >> >>               if (!is_write)
+> >> >> >>                       *reg = tmp32;
+> >> >> >>               break;
+> >> >> >> +     case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
+> >> >> >> +             u64 regid;
+> >> >> >> +
+> >> >> >> +             regid = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_INSTR_MASK);
+> >> >> >> +             ret = vgic_v3_cpu_sysregs_uaccess(vcpu, is_write,
+> >> >> >> +                                               regid, reg);
+> >> >> >> +             break;
+> >> >> >> +     }
+> >> >> >>       default:
+> >> >> >>               ret = -EINVAL;
+> >> >> >>               break;
+> >> >> >> @@ -537,6 +545,15 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+> >> >> >>               reg = tmp32;
+> >> >> >>               return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+> >> >> >>       }
+> >> >> >> +     case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
+> >> >> >> +             u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> >> >> >> +             u64 reg;
+> >> >> >> +
+> >> >> >> +             if (get_user(reg, uaddr))
+> >> >> >> +                     return -EFAULT;
+> >> >> >> +
+> >> >> >> +             return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+> >> >> >> +     }
+> >> >> >>       }
+> >> >> >>       return -ENXIO;
+> >> >> >>  }
+> >> >> >> @@ -563,6 +580,15 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
+> >> >> >>               tmp32 = reg;
+> >> >> >>               return put_user(tmp32, uaddr);
+> >> >> >>       }
+> >> >> >> +     case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
+> >> >> >> +             u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> >> >> >> +             u64 reg;
+> >> >> >> +
+> >> >> >> +             ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
+> >> >> >> +             if (ret)
+> >> >> >> +                     return ret;
+> >> >> >> +             return put_user(reg, uaddr);
+> >> >> >> +     }
+> >> >> >>       }
+> >> >> >>
+> >> >> >>       return -ENXIO;
+> >> >> >> @@ -581,6 +607,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+> >> >> >>               break;
+> >> >> >>       case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+> >> >> >>       case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
+> >> >> >> +     case KVM_DEV_ARM_VGIC_CPU_SYSREGS:
+> >> >> >>               return vgic_v3_has_attr_regs(dev, attr);
+> >> >> >>       case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+> >> >> >>               return 0;
+> >> >> >> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> >> >> >> index b35fb83..519b919 100644
+> >> >> >> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> >> >> >> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> >> >> >> @@ -23,6 +23,7 @@
+> >> >> >>
+> >> >> >>  #include "vgic.h"
+> >> >> >>  #include "vgic-mmio.h"
+> >> >> >> +#include "sys_regs.h"
+> >> >> >>
+> >> >> >>  /* extract @num bytes at @offset bytes offset in data */
+> >> >> >>  unsigned long extract_bytes(u64 data, unsigned int offset,
+> >> >> >> @@ -639,6 +640,24 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+> >> >> >>               nr_regions = ARRAY_SIZE(vgic_v3_rdbase_registers);
+> >> >> >>               break;
+> >> >> >>       }
+> >> >> >> +     case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
+> >> >> >> +             u64 reg, id;
+> >> >> >> +             unsigned long vgic_mpidr, mpidr_reg;
+> >> >> >> +             struct kvm_vcpu *vcpu;
+> >> >> >> +
+> >> >> >> +             vgic_mpidr = (attr->attr & KVM_DEV_ARM_VGIC_V3_MPIDR_MASK) >>
+> >> >> >> +                           KVM_DEV_ARM_VGIC_V3_MPIDR_SHIFT;
+> >> >> >> +
+> >> >> >> +             /* Convert plain mpidr value to MPIDR reg format */
+> >> >> >> +             mpidr_reg = VGIC_TO_MPIDR(vgic_mpidr);
+> >> >> >> +
+> >> >> >> +             vcpu = kvm_mpidr_to_vcpu(dev->kvm, mpidr_reg);
+> >> >> >> +             if (!vcpu)
+> >> >> >> +                     return -EINVAL;
+> >> >> >> +
+> >> >> >> +             id = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_INSTR_MASK);
+> >> >> >> +             return vgic_v3_has_cpu_sysregs_attr(vcpu, 0, id, &reg);
+> >> >> >> +     }
+> >> >> >>       default:
+> >> >> >>               return -ENXIO;
+> >> >> >>       }
+> >> >> >> diff --git a/virt/kvm/arm/vgic/vgic-sys-reg-v3.c b/virt/kvm/arm/vgic/vgic-sys-reg-v3.c
+> >> >> >> new file mode 100644
+> >> >> >> index 0000000..69d8597
+> >> >> >> --- /dev/null
+> >> >> >> +++ b/virt/kvm/arm/vgic/vgic-sys-reg-v3.c
+> >> >> >
+> >> >> > Shouldn't we have a GPL header here?
+> >> >> >
+> >> >> >> @@ -0,0 +1,324 @@
+> >> >> >> +#include <linux/irqchip/arm-gic-v3.h>
+> >> >> >> +#include <linux/kvm.h>
+> >> >> >> +#include <linux/kvm_host.h>
+> >> >> >> +#include <kvm/iodev.h>
+> >> >> >> +#include <kvm/arm_vgic.h>
+> >> >> >> +#include <asm/kvm_emulate.h>
+> >> >> >> +#include <asm/kvm_arm.h>
+> >> >> >> +#include <asm/kvm_mmu.h>
+> >> >> >> +
+> >> >> >> +#include "vgic.h"
+> >> >> >> +#include "vgic-mmio.h"
+> >> >> >> +#include "sys_regs.h"
+> >> >> >> +
+> >> >> >> +static bool access_gic_ctlr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> >> >> >> +                         const struct sys_reg_desc *r)
+> >> >> >> +{
+> >> >> >> +     struct vgic_cpu *vgic_v3_cpu = &vcpu->arch.vgic_cpu;
+> >> >> >> +     struct vgic_vmcr vmcr;
+> >> >> >> +     u64 val;
+> >> >> >> +     u32 num_pri_bits, num_id_bits;
+> >> >> >> +
+> >> >> >> +     vgic_get_vmcr(vcpu, &vmcr);
+> >> >> >> +     if (p->is_write) {
+> >> >> >> +             val = p->regval;
+> >> >> >> +
+> >> >> >> +             /*
+> >> >> >> +              * Does not allow update of ICC_CTLR_EL1 if HW does not support
+> >> >> >> +              * guest programmed ID and PRI bits
+> >> >> >> +              */
+> >> >> >
+> >> >> > I would suggest rewording this comment:
+> >> >> > Disallow restoring VM state not supported by this hardware.
+> >> >> >
+> >> >> >> +             num_pri_bits = ((val & ICC_CTLR_EL1_PRI_BITS_MASK) >>
+> >> >> >> +                             ICC_CTLR_EL1_PRI_BITS_SHIFT) + 1;
+> >> >> >> +             if (num_pri_bits > vgic_v3_cpu->num_pri_bits)
+> >> >> >> +                     return false;
+> >> >> >> +
+> >> >> >> +             vgic_v3_cpu->num_pri_bits = num_pri_bits;
+> >> >> >
+> >> >> > hmmm, this looks weird to me, because vgic_v3_cpu->num_pri_bits I don't
+> >> >> > understand which effect this is intended to have?
+> >> >> >
+> >> >> > Sure, it may limit what you do with other registers later, but since
+> >> >> > there's no ordering requirement that the ctlr be restored first, I'm not
+> >> >> > sure it makes sense.
+> >> >> >
+> >> >> > Also, since this field is RO in the ICH_VTR, we'll have a strange
+> >> >> > situation during runtime after a GICv3 restore where the
+> >> >> > vgic_v3_cpu->num_pri_its differs from the hardware's ICH_VTR_EL2 field,
+> >> >> > which is never the case if you didn't do a save/restore.
+> >> >>
+> >> >> Yes, but in any case, vgic_v3_cpu->num_pri_bits will be always less
+> >> >> than HW supported
+> >> >> value.
+> >> >>
+> >> >
+> >> > So answer my question:  What is the intended effect of writing this
+> >> > value?  Is it just so that if you migrate this platform back again, then
+> >> > you're checking compatibility with what the guest would potentially do,
 > >>
-> >> Could you please share you config file?. I tried with multi_v7 defconfig with
-> >> CONFIG KVM and CONFIG_KVM_ARM_HOST enabled. it compiled for me.
+> >> Yes
 > >
-> > I think this has to do with which branch you apply your patches to.
-> > When applied to kvmarm/next, it fails.
+> > Then add a comment explaining that
 > >
-> > Here's the integration I did:
-> > https://git.linaro.org/people/christoffer.dall/linux-kvm-arm.git tmp-gicv3-migrate-v8
+> >> and also to limit the valid aprn registers access as you said above.
+> >> But that has ordering restriction. Which I think we should follow.
+> >>
 > >
-> > Here's the config:
-> > https://transfer.sh/xkAxp/.config
-> >
+> > I'm sorry, now I'm confused.  Is there an ordering requirement in the
+> > API, or how should we follow this?
 > 
-> Thanks for shareing the details, I could reproduce them.
-> However virt/kvm/arm/vgic/vgic-sys-reg-v3.c is written with
-> sys_regs_desc for AArch64.
-> For AArch32/v7, it has be to coproc_reg. I propose to add separate file for arm
-> which handles ICC* reg save/restore using coproc_reg.
+> There is  no ordering requirement mentioned in the API doc.
+> However the APRn registers depends on num_pri_bits. Hence first
+> ICC_CTLR_EL1 should be restored  before APRn restore.
+> 
+> If ordering is not followed then APRn registers restore is allowed
+> as per hw supported num_pri_bits.
+> 
+> This should be mentioned in doc.
 
-That might make sense.  In that case they want to be moved into
-arch/arm/kvm/ and arch/arm64/kvm/
+How about just having a consistency check function that you call from
+uaccess updates to both functions, and in that way avoid requireing any
+ordering which is likely to not be followed etc.?
 
+Thanks,
 -Christoffer
