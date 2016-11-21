@@ -1,33 +1,33 @@
 From: Vijay Kilari <vijay.kilari@gmail.com>
 Subject: Re: [PATCH v8 6/7] arm/arm64: vgic: Implement VGICv3 CPU interface
  access
-Date: Mon, 21 Nov 2016 18:56:08 +0530
-Message-ID: <CALicx6snqsSbaKYcj9kt0nt8y2wdTbrY1PKOq-SrGTepCfSZSg@mail.gmail.com>
+Date: Mon, 21 Nov 2016 19:02:36 +0530
+Message-ID: <CALicx6sxchAbDJ2rioTytwFG1C0tD-Fnr4HC-DweSdkkCF7BFw@mail.gmail.com>
 References: <1478258013-6669-1-git-send-email-vijay.kilari@gmail.com>
  <1478258013-6669-7-git-send-email-vijay.kilari@gmail.com>
  <20161116185232.GF3811@cbox>
  <CALicx6t5D5n3dDQzeKZNUWdS-q5LNiSq-UrP4HdmbdUCj1tF1g@mail.gmail.com>
  <20161117160951.GB23588@cbox>
- <CALicx6uia5_H5Zg_x6GP0nKgZi_513w97igCuDdezySOUNQtBw@mail.gmail.com>
- <20161121101930.GD23588@cbox>
+ <CALicx6uxU8nC+gayWAxf_BX7JrZ9twsFr4YfMr64bNUSneqZow@mail.gmail.com>
+ <20161120132005.GC23588@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E54B040284
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 08:25:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 91EB140460
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 08:32:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JmRvUWO0Z02b for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Nov 2016 08:25:33 -0500 (EST)
+ with ESMTP id K3NifgmTlPgH for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Nov 2016 08:32:00 -0500 (EST)
 Received: from mail-oi0-f68.google.com (mail-oi0-f68.google.com
  [209.85.218.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E85E4027C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 08:25:32 -0500 (EST)
-Received: by mail-oi0-f68.google.com with SMTP id f201so18384445oib.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 05:26:11 -0800 (PST)
-In-Reply-To: <20161121101930.GD23588@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F224440293
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 08:31:59 -0500 (EST)
+Received: by mail-oi0-f68.google.com with SMTP id v84so22110018oie.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 05:32:38 -0800 (PST)
+In-Reply-To: <20161120132005.GC23588@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -41,299 +41,220 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Nov 21, 2016 at 3:49 PM, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> On Fri, Nov 18, 2016 at 10:28:34PM +0530, Vijay Kilari wrote:
->> On Thu, Nov 17, 2016 at 9:39 PM, Christoffer Dall
->> <christoffer.dall@linaro.org> wrote:
->> > On Thu, Nov 17, 2016 at 09:25:59PM +0530, Vijay Kilari wrote:
->> >> On Thu, Nov 17, 2016 at 12:22 AM, Christoffer Dall
->> >> <christoffer.dall@linaro.org> wrote:
->> >> > On Fri, Nov 04, 2016 at 04:43:32PM +0530, vijay.kilari@gmail.com wrote:
->> >> >> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->> >> >>
->> >> >> VGICv3 CPU interface registers are accessed using
->> >> >> KVM_DEV_ARM_VGIC_CPU_SYSREGS ioctl. These registers are accessed
->> >> >> as 64-bit. The cpu MPIDR value is passed along with register id.
->> >> >> is used to identify the cpu for registers access.
->> >> >>
->> >> >> The version of VGIC v3 specification is define here
->> >> >> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-July/445611.html
->> >> >>
->> >> >> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
->> >> >> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->> >> >> ---
->> >> >>  arch/arm64/include/uapi/asm/kvm.h   |   3 +
->> >> >>  arch/arm64/kvm/Makefile             |   1 +
->> >> >>  include/kvm/arm_vgic.h              |   9 +
->> >> >>  virt/kvm/arm/vgic/vgic-kvm-device.c |  27 +++
->> >> >>  virt/kvm/arm/vgic/vgic-mmio-v3.c    |  19 +++
->> >> >>  virt/kvm/arm/vgic/vgic-sys-reg-v3.c | 324 ++++++++++++++++++++++++++++++++++++
->> >> >>  virt/kvm/arm/vgic/vgic-v3.c         |   8 +
->> >> >>  virt/kvm/arm/vgic/vgic.h            |   4 +
->> >> >>  8 files changed, 395 insertions(+)
->> >> >>
->> >> >> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->> >> >> index 56dc08d..91c7137 100644
->> >> >> --- a/arch/arm64/include/uapi/asm/kvm.h
->> >> >> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> >> >> @@ -206,9 +206,12 @@ struct kvm_arch_memory_slot {
->> >> >>                       (0xffffffffULL << KVM_DEV_ARM_VGIC_V3_MPIDR_SHIFT)
->> >> >>  #define   KVM_DEV_ARM_VGIC_OFFSET_SHIFT      0
->> >> >>  #define   KVM_DEV_ARM_VGIC_OFFSET_MASK       (0xffffffffULL << KVM_DEV_ARM_VGIC_OFFSET_SHIFT)
->> >> >> +#define   KVM_DEV_ARM_VGIC_SYSREG_INSTR_MASK (0xffff)
->> >> >>  #define KVM_DEV_ARM_VGIC_GRP_NR_IRQS 3
->> >> >>  #define KVM_DEV_ARM_VGIC_GRP_CTRL    4
->> >> >>  #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
->> >> >> +#define KVM_DEV_ARM_VGIC_CPU_SYSREGS    6
->> >> >> +
->> >> >>  #define   KVM_DEV_ARM_VGIC_CTRL_INIT 0
->> >> >>
->> >> >>  /* Device Control API on vcpu fd */
->> >> >> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> >> >> index d50a82a..1a14e29 100644
->> >> >> --- a/arch/arm64/kvm/Makefile
->> >> >> +++ b/arch/arm64/kvm/Makefile
->> >> >> @@ -32,5 +32,6 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v3.o
->> >> >>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-kvm-device.o
->> >> >>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-its.o
->> >> >>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
->> >> >> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-sys-reg-v3.o
->> >> >
->> >> > Thi is making me wonder:  Are we properly handling GICv3 save/restore
->> >> > for AArch32 now that we have GICv3 support for AArch32?  By properly I
->> >> > mean that either it is clearly only supported on AArch64 systems or it's
->> >> > supported on both AArch64 and AArch32, but it shouldn't break randomly
->> >> > on AArch32.
->> >>
->> >> It supports both AArch64 and AArch64 in handling of system registers
->> >> save/restore.
->> >> All system registers that we save/restore are 32-bit for both aarch64
->> >> and aarch32.
->> >> Though opcode op0 should be zero for aarch32, the remaining Op and CRn codes
->> >> are same. However the codes sent by qemu is matched and register
->> >> are handled properly irrespective of AArch32 or AArch64.
->> >>
->> >> I don't have platform which support AArch32 guests to verify.
->> >
->> > Actually this is not about the guest, it's about an ARMv8 AArch32 host
->> > that has a GICv3.
->> >
->> > I just tried to do a v7 compile with your patches, and it results in an
->> > epic failure, so there's something for you to look at.
->> >
->> >> >
->> >> >>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
->> >> >>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
->> >> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> >> >> index 002f092..730a18a 100644
->> >> >> --- a/include/kvm/arm_vgic.h
->> >> >> +++ b/include/kvm/arm_vgic.h
->> >> >> @@ -71,6 +71,9 @@ struct vgic_global {
->> >> >>
->> >> >>       /* GIC system register CPU interface */
->> >> >>       struct static_key_false gicv3_cpuif;
->> >> >> +
->> >> >> +     /* Cache ICH_VTR_EL2 reg value */
->> >> >> +     u32                     ich_vtr_el2;
->> >> >>  };
->> >> >>
->> >> >>  extern struct vgic_global kvm_vgic_global_state;
->> >> >> @@ -269,6 +272,12 @@ struct vgic_cpu {
->> >> >>       u64 pendbaser;
->> >> >>
->> >> >>       bool lpis_enabled;
->> >> >> +
->> >> >> +     /* Cache guest priority bits */
->> >> >> +     u32 num_pri_bits;
->> >> >> +
->> >> >> +     /* Cache guest interrupt ID bits */
->> >> >> +     u32 num_id_bits;
->> >> >>  };
->> >> >>
->> >> >>  extern struct static_key_false vgic_v2_cpuif_trap;
->> >> >> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
->> >> >> index 6c7d30c..da532d1 100644
->> >> >> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
->> >> >> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
->> >> >> @@ -504,6 +504,14 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
->> >> >>               if (!is_write)
->> >> >>                       *reg = tmp32;
->> >> >>               break;
->> >> >> +     case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
->> >> >> +             u64 regid;
->> >> >> +
->> >> >> +             regid = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_INSTR_MASK);
->> >> >> +             ret = vgic_v3_cpu_sysregs_uaccess(vcpu, is_write,
->> >> >> +                                               regid, reg);
->> >> >> +             break;
->> >> >> +     }
->> >> >>       default:
->> >> >>               ret = -EINVAL;
->> >> >>               break;
->> >> >> @@ -537,6 +545,15 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
->> >> >>               reg = tmp32;
->> >> >>               return vgic_v3_attr_regs_access(dev, attr, &reg, true);
->> >> >>       }
->> >> >> +     case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
->> >> >> +             u64 __user *uaddr = (u64 __user *)(long)attr->addr;
->> >> >> +             u64 reg;
->> >> >> +
->> >> >> +             if (get_user(reg, uaddr))
->> >> >> +                     return -EFAULT;
->> >> >> +
->> >> >> +             return vgic_v3_attr_regs_access(dev, attr, &reg, true);
->> >> >> +     }
->> >> >>       }
->> >> >>       return -ENXIO;
->> >> >>  }
->> >> >> @@ -563,6 +580,15 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
->> >> >>               tmp32 = reg;
->> >> >>               return put_user(tmp32, uaddr);
->> >> >>       }
->> >> >> +     case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
->> >> >> +             u64 __user *uaddr = (u64 __user *)(long)attr->addr;
->> >> >> +             u64 reg;
->> >> >> +
->> >> >> +             ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
->> >> >> +             if (ret)
->> >> >> +                     return ret;
->> >> >> +             return put_user(reg, uaddr);
->> >> >> +     }
->> >> >>       }
->> >> >>
->> >> >>       return -ENXIO;
->> >> >> @@ -581,6 +607,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
->> >> >>               break;
->> >> >>       case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
->> >> >>       case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
->> >> >> +     case KVM_DEV_ARM_VGIC_CPU_SYSREGS:
->> >> >>               return vgic_v3_has_attr_regs(dev, attr);
->> >> >>       case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
->> >> >>               return 0;
->> >> >> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> >> >> index b35fb83..519b919 100644
->> >> >> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> >> >> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> >> >> @@ -23,6 +23,7 @@
->> >> >>
->> >> >>  #include "vgic.h"
->> >> >>  #include "vgic-mmio.h"
->> >> >> +#include "sys_regs.h"
->> >> >>
->> >> >>  /* extract @num bytes at @offset bytes offset in data */
->> >> >>  unsigned long extract_bytes(u64 data, unsigned int offset,
->> >> >> @@ -639,6 +640,24 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
->> >> >>               nr_regions = ARRAY_SIZE(vgic_v3_rdbase_registers);
->> >> >>               break;
->> >> >>       }
->> >> >> +     case KVM_DEV_ARM_VGIC_CPU_SYSREGS: {
->> >> >> +             u64 reg, id;
->> >> >> +             unsigned long vgic_mpidr, mpidr_reg;
->> >> >> +             struct kvm_vcpu *vcpu;
->> >> >> +
->> >> >> +             vgic_mpidr = (attr->attr & KVM_DEV_ARM_VGIC_V3_MPIDR_MASK) >>
->> >> >> +                           KVM_DEV_ARM_VGIC_V3_MPIDR_SHIFT;
->> >> >> +
->> >> >> +             /* Convert plain mpidr value to MPIDR reg format */
->> >> >> +             mpidr_reg = VGIC_TO_MPIDR(vgic_mpidr);
->> >> >> +
->> >> >> +             vcpu = kvm_mpidr_to_vcpu(dev->kvm, mpidr_reg);
->> >> >> +             if (!vcpu)
->> >> >> +                     return -EINVAL;
->> >> >> +
->> >> >> +             id = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_INSTR_MASK);
->> >> >> +             return vgic_v3_has_cpu_sysregs_attr(vcpu, 0, id, &reg);
->> >> >> +     }
->> >> >>       default:
->> >> >>               return -ENXIO;
->> >> >>       }
->> >> >> diff --git a/virt/kvm/arm/vgic/vgic-sys-reg-v3.c b/virt/kvm/arm/vgic/vgic-sys-reg-v3.c
->> >> >> new file mode 100644
->> >> >> index 0000000..69d8597
->> >> >> --- /dev/null
->> >> >> +++ b/virt/kvm/arm/vgic/vgic-sys-reg-v3.c
->> >> >
->> >> > Shouldn't we have a GPL header here?
->> >> >
->> >> >> @@ -0,0 +1,324 @@
->> >> >> +#include <linux/irqchip/arm-gic-v3.h>
->> >> >> +#include <linux/kvm.h>
->> >> >> +#include <linux/kvm_host.h>
->> >> >> +#include <kvm/iodev.h>
->> >> >> +#include <kvm/arm_vgic.h>
->> >> >> +#include <asm/kvm_emulate.h>
->> >> >> +#include <asm/kvm_arm.h>
->> >> >> +#include <asm/kvm_mmu.h>
->> >> >> +
->> >> >> +#include "vgic.h"
->> >> >> +#include "vgic-mmio.h"
->> >> >> +#include "sys_regs.h"
->> >> >> +
->> >> >> +static bool access_gic_ctlr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->> >> >> +                         const struct sys_reg_desc *r)
->> >> >> +{
->> >> >> +     struct vgic_cpu *vgic_v3_cpu = &vcpu->arch.vgic_cpu;
->> >> >> +     struct vgic_vmcr vmcr;
->> >> >> +     u64 val;
->> >> >> +     u32 num_pri_bits, num_id_bits;
->> >> >> +
->> >> >> +     vgic_get_vmcr(vcpu, &vmcr);
->> >> >> +     if (p->is_write) {
->> >> >> +             val = p->regval;
->> >> >> +
->> >> >> +             /*
->> >> >> +              * Does not allow update of ICC_CTLR_EL1 if HW does not support
->> >> >> +              * guest programmed ID and PRI bits
->> >> >> +              */
->> >> >
->> >> > I would suggest rewording this comment:
->> >> > Disallow restoring VM state not supported by this hardware.
->> >> >
->> >> >> +             num_pri_bits = ((val & ICC_CTLR_EL1_PRI_BITS_MASK) >>
->> >> >> +                             ICC_CTLR_EL1_PRI_BITS_SHIFT) + 1;
->> >> >> +             if (num_pri_bits > vgic_v3_cpu->num_pri_bits)
->> >> >> +                     return false;
->> >> >> +
->> >> >> +             vgic_v3_cpu->num_pri_bits = num_pri_bits;
->> >> >
->> >> > hmmm, this looks weird to me, because vgic_v3_cpu->num_pri_bits I don't
->> >> > understand which effect this is intended to have?
->> >> >
->> >> > Sure, it may limit what you do with other registers later, but since
->> >> > there's no ordering requirement that the ctlr be restored first, I'm not
->> >> > sure it makes sense.
->> >> >
->> >> > Also, since this field is RO in the ICH_VTR, we'll have a strange
->> >> > situation during runtime after a GICv3 restore where the
->> >> > vgic_v3_cpu->num_pri_its differs from the hardware's ICH_VTR_EL2 field,
->> >> > which is never the case if you didn't do a save/restore.
->> >>
->> >> Yes, but in any case, vgic_v3_cpu->num_pri_bits will be always less
->> >> than HW supported
->> >> value.
->> >>
->> >
->> > So answer my question:  What is the intended effect of writing this
->> > value?  Is it just so that if you migrate this platform back again, then
->> > you're checking compatibility with what the guest would potentially do,
->>
->> Yes
->
-> Then add a comment explaining that
->
->> and also to limit the valid aprn registers access as you said above.
->> But that has ordering restriction. Which I think we should follow.
->>
->
-> I'm sorry, now I'm confused.  Is there an ordering requirement in the
-> API, or how should we follow this?
-
-There is  no ordering requirement mentioned in the API doc.
-However the APRn registers depends on num_pri_bits. Hence first
-ICC_CTLR_EL1 should be restored  before APRn restore.
-
-If ordering is not followed then APRn registers restore is allowed
-as per hw supported num_pri_bits.
-
-This should be mentioned in doc.
+T24gU3VuLCBOb3YgMjAsIDIwMTYgYXQgNjo1MCBQTSwgQ2hyaXN0b2ZmZXIgRGFsbAo8Y2hyaXN0
+b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPiB3cm90ZToKPiBPbiBTYXQsIE5vdiAxOSwgMjAxNiBhdCAx
+MjoxODo1M0FNICswNTMwLCBWaWpheSBLaWxhcmkgd3JvdGU6Cj4+IE9uIFRodSwgTm92IDE3LCAy
+MDE2IGF0IDk6MzkgUE0sIENocmlzdG9mZmVyIERhbGwKPj4gPGNocmlzdG9mZmVyLmRhbGxAbGlu
+YXJvLm9yZz4gd3JvdGU6Cj4+ID4gT24gVGh1LCBOb3YgMTcsIDIwMTYgYXQgMDk6MjU6NTlQTSAr
+MDUzMCwgVmlqYXkgS2lsYXJpIHdyb3RlOgo+PiA+PiBPbiBUaHUsIE5vdiAxNywgMjAxNiBhdCAx
+MjoyMiBBTSwgQ2hyaXN0b2ZmZXIgRGFsbAo+PiA+PiA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8u
+b3JnPiB3cm90ZToKPj4gPj4gPiBPbiBGcmksIE5vdiAwNCwgMjAxNiBhdCAwNDo0MzozMlBNICsw
+NTMwLCB2aWpheS5raWxhcmlAZ21haWwuY29tIHdyb3RlOgo+PiA+PiA+PiBGcm9tOiBWaWpheWEg
+S3VtYXIgSyA8VmlqYXlhLkt1bWFyQGNhdml1bS5jb20+Cj4+ID4+ID4+Cj4+ID4+ID4+IFZHSUN2
+MyBDUFUgaW50ZXJmYWNlIHJlZ2lzdGVycyBhcmUgYWNjZXNzZWQgdXNpbmcKPj4gPj4gPj4gS1ZN
+X0RFVl9BUk1fVkdJQ19DUFVfU1lTUkVHUyBpb2N0bC4gVGhlc2UgcmVnaXN0ZXJzIGFyZSBhY2Nl
+c3NlZAo+PiA+PiA+PiBhcyA2NC1iaXQuIFRoZSBjcHUgTVBJRFIgdmFsdWUgaXMgcGFzc2VkIGFs
+b25nIHdpdGggcmVnaXN0ZXIgaWQuCj4+ID4+ID4+IGlzIHVzZWQgdG8gaWRlbnRpZnkgdGhlIGNw
+dSBmb3IgcmVnaXN0ZXJzIGFjY2Vzcy4KPj4gPj4gPj4KPj4gPj4gPj4gVGhlIHZlcnNpb24gb2Yg
+VkdJQyB2MyBzcGVjaWZpY2F0aW9uIGlzIGRlZmluZSBoZXJlCj4+ID4+ID4+IGh0dHA6Ly9saXN0
+cy5pbmZyYWRlYWQub3JnL3BpcGVybWFpbC9saW51eC1hcm0ta2VybmVsLzIwMTYtSnVseS80NDU2
+MTEuaHRtbAo+PiA+PiA+Pgo+PiA+PiA+PiBTaWduZWQtb2ZmLWJ5OiBQYXZlbCBGZWRpbiA8cC5m
+ZWRpbkBzYW1zdW5nLmNvbT4KPj4gPj4gPj4gU2lnbmVkLW9mZi1ieTogVmlqYXlhIEt1bWFyIEsg
+PFZpamF5YS5LdW1hckBjYXZpdW0uY29tPgo+PiA+PiA+PiAtLS0KPj4gPj4gPj4gIGFyY2gvYXJt
+NjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaCAgIHwgICAzICsKPj4gPj4gPj4gIGFyY2gvYXJtNjQv
+a3ZtL01ha2VmaWxlICAgICAgICAgICAgIHwgICAxICsKPj4gPj4gPj4gIGluY2x1ZGUva3ZtL2Fy
+bV92Z2ljLmggICAgICAgICAgICAgIHwgICA5ICsKPj4gPj4gPj4gIHZpcnQva3ZtL2FybS92Z2lj
+L3ZnaWMta3ZtLWRldmljZS5jIHwgIDI3ICsrKwo+PiA+PiA+PiAgdmlydC9rdm0vYXJtL3ZnaWMv
+dmdpYy1tbWlvLXYzLmMgICAgfCAgMTkgKysrCj4+ID4+ID4+ICB2aXJ0L2t2bS9hcm0vdmdpYy92
+Z2ljLXN5cy1yZWctdjMuYyB8IDMyNCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysKPj4gPj4gPj4gIHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMuYyAgICAgICAgIHwgICA4ICsK
+Pj4gPj4gPj4gIHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMuaCAgICAgICAgICAgIHwgICA0ICsKPj4g
+Pj4gPj4gIDggZmlsZXMgY2hhbmdlZCwgMzk1IGluc2VydGlvbnMoKykKPj4gPj4gPj4KPj4gPj4g
+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaCBiL2FyY2gv
+YXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+PiA+PiA+PiBpbmRleCA1NmRjMDhkLi45MWM3
+MTM3IDEwMDY0NAo+PiA+PiA+PiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20va3Zt
+LmgKPj4gPj4gPj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCj4+ID4+
+ID4+IEBAIC0yMDYsOSArMjA2LDEyIEBAIHN0cnVjdCBrdm1fYXJjaF9tZW1vcnlfc2xvdCB7Cj4+
+ID4+ID4+ICAgICAgICAgICAgICAgICAgICAgICAoMHhmZmZmZmZmZlVMTCA8PCBLVk1fREVWX0FS
+TV9WR0lDX1YzX01QSURSX1NISUZUKQo+PiA+PiA+PiAgI2RlZmluZSAgIEtWTV9ERVZfQVJNX1ZH
+SUNfT0ZGU0VUX1NISUZUICAgICAgMAo+PiA+PiA+PiAgI2RlZmluZSAgIEtWTV9ERVZfQVJNX1ZH
+SUNfT0ZGU0VUX01BU0sgICAgICAgKDB4ZmZmZmZmZmZVTEwgPDwgS1ZNX0RFVl9BUk1fVkdJQ19P
+RkZTRVRfU0hJRlQpCj4+ID4+ID4+ICsjZGVmaW5lICAgS1ZNX0RFVl9BUk1fVkdJQ19TWVNSRUdf
+SU5TVFJfTUFTSyAoMHhmZmZmKQo+PiA+PiA+PiAgI2RlZmluZSBLVk1fREVWX0FSTV9WR0lDX0dS
+UF9OUl9JUlFTIDMKPj4gPj4gPj4gICNkZWZpbmUgS1ZNX0RFVl9BUk1fVkdJQ19HUlBfQ1RSTCAg
+ICA0Cj4+ID4+ID4+ICAjZGVmaW5lIEtWTV9ERVZfQVJNX1ZHSUNfR1JQX1JFRElTVF9SRUdTIDUK
+Pj4gPj4gPj4gKyNkZWZpbmUgS1ZNX0RFVl9BUk1fVkdJQ19DUFVfU1lTUkVHUyAgICA2Cj4+ID4+
+ID4+ICsKPj4gPj4gPj4gICNkZWZpbmUgICBLVk1fREVWX0FSTV9WR0lDX0NUUkxfSU5JVCAwCj4+
+ID4+ID4+Cj4+ID4+ID4+ICAvKiBEZXZpY2UgQ29udHJvbCBBUEkgb24gdmNwdSBmZCAqLwo+PiA+
+PiA+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vTWFrZWZpbGUgYi9hcmNoL2FybTY0L2t2
+bS9NYWtlZmlsZQo+PiA+PiA+PiBpbmRleCBkNTBhODJhLi4xYTE0ZTI5IDEwMDY0NAo+PiA+PiA+
+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9NYWtlZmlsZQo+PiA+PiA+PiArKysgYi9hcmNoL2FybTY0
+L2t2bS9NYWtlZmlsZQo+PiA+PiA+PiBAQCAtMzIsNSArMzIsNiBAQCBrdm0tJChDT05GSUdfS1ZN
+X0FSTV9IT1NUKSArPSAkKEtWTSkvYXJtL3ZnaWMvdmdpYy1tbWlvLXYzLm8KPj4gPj4gPj4gIGt2
+bS0kKENPTkZJR19LVk1fQVJNX0hPU1QpICs9ICQoS1ZNKS9hcm0vdmdpYy92Z2ljLWt2bS1kZXZp
+Y2Uubwo+PiA+PiA+PiAga3ZtLSQoQ09ORklHX0tWTV9BUk1fSE9TVCkgKz0gJChLVk0pL2FybS92
+Z2ljL3ZnaWMtaXRzLm8KPj4gPj4gPj4gIGt2bS0kKENPTkZJR19LVk1fQVJNX0hPU1QpICs9ICQo
+S1ZNKS9pcnFjaGlwLm8KPj4gPj4gPj4gK2t2bS0kKENPTkZJR19LVk1fQVJNX0hPU1QpICs9ICQo
+S1ZNKS9hcm0vdmdpYy92Z2ljLXN5cy1yZWctdjMubwo+PiA+PiA+Cj4+ID4+ID4gVGhpIGlzIG1h
+a2luZyBtZSB3b25kZXI6ICBBcmUgd2UgcHJvcGVybHkgaGFuZGxpbmcgR0lDdjMgc2F2ZS9yZXN0
+b3JlCj4+ID4+ID4gZm9yIEFBcmNoMzIgbm93IHRoYXQgd2UgaGF2ZSBHSUN2MyBzdXBwb3J0IGZv
+ciBBQXJjaDMyPyAgQnkgcHJvcGVybHkgSQo+PiA+PiA+IG1lYW4gdGhhdCBlaXRoZXIgaXQgaXMg
+Y2xlYXJseSBvbmx5IHN1cHBvcnRlZCBvbiBBQXJjaDY0IHN5c3RlbXMgb3IgaXQncwo+PiA+PiA+
+IHN1cHBvcnRlZCBvbiBib3RoIEFBcmNoNjQgYW5kIEFBcmNoMzIsIGJ1dCBpdCBzaG91bGRuJ3Qg
+YnJlYWsgcmFuZG9tbHkKPj4gPj4gPiBvbiBBQXJjaDMyLgo+PiA+Pgo+PiA+PiBJdCBzdXBwb3J0
+cyBib3RoIEFBcmNoNjQgYW5kIEFBcmNoNjQgaW4gaGFuZGxpbmcgb2Ygc3lzdGVtIHJlZ2lzdGVy
+cwo+PiA+PiBzYXZlL3Jlc3RvcmUuCj4+ID4+IEFsbCBzeXN0ZW0gcmVnaXN0ZXJzIHRoYXQgd2Ug
+c2F2ZS9yZXN0b3JlIGFyZSAzMi1iaXQgZm9yIGJvdGggYWFyY2g2NAo+PiA+PiBhbmQgYWFyY2gz
+Mi4KPj4gPj4gVGhvdWdoIG9wY29kZSBvcDAgc2hvdWxkIGJlIHplcm8gZm9yIGFhcmNoMzIsIHRo
+ZSByZW1haW5pbmcgT3AgYW5kIENSbiBjb2Rlcwo+PiA+PiBhcmUgc2FtZS4gSG93ZXZlciB0aGUg
+Y29kZXMgc2VudCBieSBxZW11IGlzIG1hdGNoZWQgYW5kIHJlZ2lzdGVyCj4+ID4+IGFyZSBoYW5k
+bGVkIHByb3Blcmx5IGlycmVzcGVjdGl2ZSBvZiBBQXJjaDMyIG9yIEFBcmNoNjQuCj4+ID4+Cj4+
+ID4+IEkgZG9uJ3QgaGF2ZSBwbGF0Zm9ybSB3aGljaCBzdXBwb3J0IEFBcmNoMzIgZ3Vlc3RzIHRv
+IHZlcmlmeS4KPj4gPgo+PiA+IEFjdHVhbGx5IHRoaXMgaXMgbm90IGFib3V0IHRoZSBndWVzdCwg
+aXQncyBhYm91dCBhbiBBUk12OCBBQXJjaDMyIGhvc3QKPj4gPiB0aGF0IGhhcyBhIEdJQ3YzLgo+
+PiA+Cj4+ID4gSSBqdXN0IHRyaWVkIHRvIGRvIGEgdjcgY29tcGlsZSB3aXRoIHlvdXIgcGF0Y2hl
+cywgYW5kIGl0IHJlc3VsdHMgaW4gYW4KPj4gPiBlcGljIGZhaWx1cmUsIHNvIHRoZXJlJ3Mgc29t
+ZXRoaW5nIGZvciB5b3UgdG8gbG9vayBhdC4KPj4gPgo+Pgo+PiBDb3VsZCB5b3UgcGxlYXNlIHNo
+YXJlIHlvdSBjb25maWcgZmlsZT8uIEkgdHJpZWQgd2l0aCBtdWx0aV92NyBkZWZjb25maWcgd2l0
+aAo+PiBDT05GSUcgS1ZNIGFuZCBDT05GSUdfS1ZNX0FSTV9IT1NUIGVuYWJsZWQuIGl0IGNvbXBp
+bGVkIGZvciBtZS4KPgo+IEkgdGhpbmsgdGhpcyBoYXMgdG8gZG8gd2l0aCB3aGljaCBicmFuY2gg
+eW91IGFwcGx5IHlvdXIgcGF0Y2hlcyB0by4KPiBXaGVuIGFwcGxpZWQgdG8ga3ZtYXJtL25leHQs
+IGl0IGZhaWxzLgo+Cj4gSGVyZSdzIHRoZSBpbnRlZ3JhdGlvbiBJIGRpZDoKPiBodHRwczovL2dp
+dC5saW5hcm8ub3JnL3Blb3BsZS9jaHJpc3RvZmZlci5kYWxsL2xpbnV4LWt2bS1hcm0uZ2l0IHRt
+cC1naWN2My1taWdyYXRlLXY4Cj4KPiBIZXJlJ3MgdGhlIGNvbmZpZzoKPiBodHRwczovL3RyYW5z
+ZmVyLnNoL3hrQXhwLy5jb25maWcKPgoKVGhhbmtzIGZvciBzaGFyZWluZyB0aGUgZGV0YWlscywg
+SSBjb3VsZCByZXByb2R1Y2UgdGhlbS4KSG93ZXZlciB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLXN5
+cy1yZWctdjMuYyBpcyB3cml0dGVuIHdpdGgKc3lzX3JlZ3NfZGVzYyBmb3IgQUFyY2g2NC4KRm9y
+IEFBcmNoMzIvdjcsIGl0IGhhcyBiZSB0byBjb3Byb2NfcmVnLiBJIHByb3Bvc2UgdG8gYWRkIHNl
+cGFyYXRlIGZpbGUgZm9yIGFybQp3aGljaCBoYW5kbGVzIElDQyogcmVnIHNhdmUvcmVzdG9yZSB1
+c2luZyBjb3Byb2NfcmVnLgoKPiBIZXJlJ3MgdGhlIGNvbXBpbGUgb3V0cHV0Ogo+Cj4gL2hvbWUv
+Y2hyaXN0b2ZmZXIvc3JjL2t2bWFybS9saW51eC9hcmNoL2FybS9rdm0vLi4vLi4vLi4vdmlydC9r
+dm0vYXJtL3ZnaWMvdmdpYy1tbWlvLXYzLmM6MjY6MjI6IGZhdGFsIGVycm9yOiBzeXNfcmVncy5o
+OiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5Cj4gICNpbmNsdWRlICJzeXNfcmVncy5oIgo+ICAg
+ICAgICAgICAgICAgICAgICAgICBeCj4gY29tcGlsYXRpb24gdGVybWluYXRlZC4KPiBtYWtlWzJd
+OiAqKiogW2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLW1taW8t
+djMub10gRXJyb3IgMQo+IG1ha2VbMl06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMu
+Li4uCj4gL2hvbWUvY2hyaXN0b2ZmZXIvc3JjL2t2bWFybS9saW51eC9hcmNoL2FybS9rdm0vLi4v
+Li4vLi4vdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1rdm0tZGV2aWNlLmM6IEluIGZ1bmN0aW9uIOKA
+mHZnaWNfdjNfcGFyc2VfYXR0cuKAmToKPiAvaG9tZS9jaHJpc3RvZmZlci9zcmMva3ZtYXJtL2xp
+bnV4L2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWt2bS1kZXZp
+Y2UuYzo0Mzg6Mjk6IGVycm9yOiDigJhLVk1fREVWX0FSTV9WR0lDX1YzX01QSURSX01BU0vigJkg
+dW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCj4gICB2Z2ljX21waWRyID0g
+KGF0dHItPmF0dHIgJiBLVk1fREVWX0FSTV9WR0lDX1YzX01QSURSX01BU0spID4+Cj4gICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBeCj4gL2hvbWUvY2hyaXN0b2ZmZXIvc3JjL2t2bWFybS9s
+aW51eC9hcmNoL2FybS9rdm0vLi4vLi4vLi4vdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1rdm0tZGV2
+aWNlLmM6NDM4OjI5OiBub3RlOiBlYWNoIHVuZGVjbGFyZWQgaWRlbnRpZmllciBpcyByZXBvcnRl
+ZCBvbmx5IG9uY2UgZm9yIGVhY2ggZnVuY3Rpb24gaXQgYXBwZWFycyBpbgo+IC9ob21lL2Nocmlz
+dG9mZmVyL3NyYy9rdm1hcm0vbGludXgvYXJjaC9hcm0va3ZtLy4uLy4uLy4uL3ZpcnQva3ZtL2Fy
+bS92Z2ljL3ZnaWMta3ZtLWRldmljZS5jOjQzOTo5OiBlcnJvcjog4oCYS1ZNX0RFVl9BUk1fVkdJ
+Q19WM19NUElEUl9TSElGVOKAmSB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlv
+bikKPiAgICAgICAgICBLVk1fREVWX0FSTV9WR0lDX1YzX01QSURSX1NISUZUOwo+ICAgICAgICAg
+IF4KPiAvaG9tZS9jaHJpc3RvZmZlci9zcmMva3ZtYXJtL2xpbnV4L2FyY2gvYXJtL2t2bS8uLi8u
+Li8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWt2bS1kZXZpY2UuYzo0NDE6MjogZXJyb3I6IGlt
+cGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uIOKAmE1QSURSX0xFVkVMX1NISUZU4oCZIFst
+V2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQo+ICAgbXBpZHJfcmVnID0gVkdJ
+Q19UT19NUElEUih2Z2ljX21waWRyKTsKPiAgIF4KPiAvaG9tZS9jaHJpc3RvZmZlci9zcmMva3Zt
+YXJtL2xpbnV4L2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWt2
+bS1kZXZpY2UuYzogSW4gZnVuY3Rpb24g4oCYdmdpY192M19hdHRyX3JlZ3NfYWNjZXNz4oCZOgo+
+IC9ob21lL2NocmlzdG9mZmVyL3NyYy9rdm1hcm0vbGludXgvYXJjaC9hcm0va3ZtLy4uLy4uLy4u
+L3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMta3ZtLWRldmljZS5jOjQ5Nzo3OiBlcnJvcjog4oCYS1ZN
+X0RFVl9BUk1fVkdJQ19HUlBfUkVESVNUX1JFR1PigJkgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGlu
+IHRoaXMgZnVuY3Rpb24pCj4gICBjYXNlIEtWTV9ERVZfQVJNX1ZHSUNfR1JQX1JFRElTVF9SRUdT
+Ogo+ICAgICAgICBeCj4gL2hvbWUvY2hyaXN0b2ZmZXIvc3JjL2t2bWFybS9saW51eC9hcmNoL2Fy
+bS9rdm0vLi4vLi4vLi4vdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1rdm0tZGV2aWNlLmM6NTA1Ojc6
+IGVycm9yOiDigJhLVk1fREVWX0FSTV9WR0lDX0NQVV9TWVNSRUdT4oCZIHVuZGVjbGFyZWQgKGZp
+cnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQo+ICAgY2FzZSBLVk1fREVWX0FSTV9WR0lDX0NQVV9T
+WVNSRUdTOiB7Cj4gICAgICAgIF4KPiAvaG9tZS9jaHJpc3RvZmZlci9zcmMva3ZtYXJtL2xpbnV4
+L2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWt2bS1kZXZpY2Uu
+Yzo1MDg6MjU6IGVycm9yOiDigJhLVk1fREVWX0FSTV9WR0lDX1NZU1JFR19JTlNUUl9NQVNL4oCZ
+IHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQo+ICAgIHJlZ2lkID0gKGF0
+dHItPmF0dHIgJiBLVk1fREVWX0FSTV9WR0lDX1NZU1JFR19JTlNUUl9NQVNLKTsKPiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXgo+IC9ob21lL2NocmlzdG9mZmVyL3NyYy9rdm1hcm0vbGludXgv
+YXJjaC9hcm0va3ZtLy4uLy4uLy4uL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMta3ZtLWRldmljZS5j
+OjUxMzo3OiBlcnJvcjog4oCYS1ZNX0RFVl9BUk1fVkdJQ19HUlBfTEVWRUxfSU5GT+KAmSB1bmRl
+Y2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKPiAgIGNhc2UgS1ZNX0RFVl9BUk1f
+VkdJQ19HUlBfTEVWRUxfSU5GTzogewo+ICAgICAgICBeCj4gL2hvbWUvY2hyaXN0b2ZmZXIvc3Jj
+L2t2bWFybS9saW51eC9hcmNoL2FybS9rdm0vLi4vLi4vLi4vdmlydC9rdm0vYXJtL3ZnaWMvdmdp
+Yy1rdm0tZGV2aWNlLmM6NTE2OjI0OiBlcnJvcjog4oCYS1ZNX0RFVl9BUk1fVkdJQ19MSU5FX0xF
+VkVMX0lORk9fTUFTS+KAmSB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikK
+PiAgICBpbmZvID0gKGF0dHItPmF0dHIgJiBLVk1fREVWX0FSTV9WR0lDX0xJTkVfTEVWRUxfSU5G
+T19NQVNLKSA+Pgo+ICAgICAgICAgICAgICAgICAgICAgICAgIF4KPiAvaG9tZS9jaHJpc3RvZmZl
+ci9zcmMva3ZtYXJtL2xpbnV4L2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdp
+Yy92Z2ljLWt2bS1kZXZpY2UuYzo1MTc6NDogZXJyb3I6IOKAmEtWTV9ERVZfQVJNX1ZHSUNfTElO
+RV9MRVZFTF9JTkZPX1NISUZU4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0
+aW9uKQo+ICAgICBLVk1fREVWX0FSTV9WR0lDX0xJTkVfTEVWRUxfSU5GT19TSElGVDsKPiAgICAg
+Xgo+IC9ob21lL2NocmlzdG9mZmVyL3NyYy9rdm1hcm0vbGludXgvYXJjaC9hcm0va3ZtLy4uLy4u
+Ly4uL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMta3ZtLWRldmljZS5jOjUxODoxNTogZXJyb3I6IOKA
+mFZHSUNfTEVWRUxfSU5GT19MSU5FX0xFVkVM4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0
+aGlzIGZ1bmN0aW9uKQo+ICAgIGlmIChpbmZvID09IFZHSUNfTEVWRUxfSU5GT19MSU5FX0xFVkVM
+KSB7Cj4gICAgICAgICAgICAgICAgXgo+IC9ob21lL2NocmlzdG9mZmVyL3NyYy9rdm1hcm0vbGlu
+dXgvYXJjaC9hcm0va3ZtLy4uLy4uLy4uL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMta3ZtLWRldmlj
+ZS5jOjUyMjo1OiBlcnJvcjog4oCYS1ZNX0RFVl9BUk1fVkdJQ19MSU5FX0xFVkVMX0lOVElEX01B
+U0vigJkgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCj4gICAgICBLVk1f
+REVWX0FSTV9WR0lDX0xJTkVfTEVWRUxfSU5USURfTUFTSzsKPiAgICAgIF4KPiAvaG9tZS9jaHJp
+c3RvZmZlci9zcmMva3ZtYXJtL2xpbnV4L2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9h
+cm0vdmdpYy92Z2ljLWt2bS1kZXZpY2UuYzogSW4gZnVuY3Rpb24g4oCYdmdpY192M19zZXRfYXR0
+cuKAmToKPiAvaG9tZS9jaHJpc3RvZmZlci9zcmMva3ZtYXJtL2xpbnV4L2FyY2gvYXJtL2t2bS8u
+Li8uLi8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWt2bS1kZXZpY2UuYzo1NTQ6NzogZXJyb3I6
+IOKAmEtWTV9ERVZfQVJNX1ZHSUNfR1JQX1JFRElTVF9SRUdT4oCZIHVuZGVjbGFyZWQgKGZpcnN0
+IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQo+ICAgY2FzZSBLVk1fREVWX0FSTV9WR0lDX0dSUF9SRURJ
+U1RfUkVHUzogewo+ICAgICAgICBeCj4gL2hvbWUvY2hyaXN0b2ZmZXIvc3JjL2t2bWFybS9saW51
+eC9hcmNoL2FybS9rdm0vLi4vLi4vLi4vdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1rdm0tZGV2aWNl
+LmM6NTY1Ojc6IGVycm9yOiDigJhLVk1fREVWX0FSTV9WR0lDX0NQVV9TWVNSRUdT4oCZIHVuZGVj
+bGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQo+ICAgY2FzZSBLVk1fREVWX0FSTV9W
+R0lDX0NQVV9TWVNSRUdTOiB7Cj4gICAgICAgIF4KPiAvaG9tZS9jaHJpc3RvZmZlci9zcmMva3Zt
+YXJtL2xpbnV4L2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWt2
+bS1kZXZpY2UuYzo1NzQ6NzogZXJyb3I6IOKAmEtWTV9ERVZfQVJNX1ZHSUNfR1JQX0xFVkVMX0lO
+Rk/igJkgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCj4gICBjYXNlIEtW
+TV9ERVZfQVJNX1ZHSUNfR1JQX0xFVkVMX0lORk86IHsKPiAgICAgICAgXgo+IC9ob21lL2Nocmlz
+dG9mZmVyL3NyYy9rdm1hcm0vbGludXgvYXJjaC9hcm0va3ZtLy4uLy4uLy4uL3ZpcnQva3ZtL2Fy
+bS92Z2ljL3ZnaWMta3ZtLWRldmljZS5jOiBJbiBmdW5jdGlvbiDigJh2Z2ljX3YzX2dldF9hdHRy
+4oCZOgo+IC9ob21lL2NocmlzdG9mZmVyL3NyYy9rdm1hcm0vbGludXgvYXJjaC9hcm0va3ZtLy4u
+Ly4uLy4uL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMta3ZtLWRldmljZS5jOjYwMDo3OiBlcnJvcjog
+4oCYS1ZNX0RFVl9BUk1fVkdJQ19HUlBfUkVESVNUX1JFR1PigJkgdW5kZWNsYXJlZCAoZmlyc3Qg
+dXNlIGluIHRoaXMgZnVuY3Rpb24pCj4gICBjYXNlIEtWTV9ERVZfQVJNX1ZHSUNfR1JQX1JFRElT
+VF9SRUdTOiB7Cj4gICAgICAgIF4KPiAvaG9tZS9jaHJpc3RvZmZlci9zcmMva3ZtYXJtL2xpbnV4
+L2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWt2bS1kZXZpY2Uu
+Yzo2MTE6NzogZXJyb3I6IOKAmEtWTV9ERVZfQVJNX1ZHSUNfQ1BVX1NZU1JFR1PigJkgdW5kZWNs
+YXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCj4gICBjYXNlIEtWTV9ERVZfQVJNX1ZH
+SUNfQ1BVX1NZU1JFR1M6IHsKPiAgICAgICAgXgo+IC9ob21lL2NocmlzdG9mZmVyL3NyYy9rdm1h
+cm0vbGludXgvYXJjaC9hcm0va3ZtLy4uLy4uLy4uL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMta3Zt
+LWRldmljZS5jOjYyMDo3OiBlcnJvcjog4oCYS1ZNX0RFVl9BUk1fVkdJQ19HUlBfTEVWRUxfSU5G
+T+KAmSB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKPiAgIGNhc2UgS1ZN
+X0RFVl9BUk1fVkdJQ19HUlBfTEVWRUxfSU5GTzogewo+ICAgICAgICBeCj4gL2hvbWUvY2hyaXN0
+b2ZmZXIvc3JjL2t2bWFybS9saW51eC9hcmNoL2FybS9rdm0vLi4vLi4vLi4vdmlydC9rdm0vYXJt
+L3ZnaWMvdmdpYy1rdm0tZGV2aWNlLmM6IEluIGZ1bmN0aW9uIOKAmHZnaWNfdjNfaGFzX2F0dHLi
+gJk6Cj4gL2hvbWUvY2hyaXN0b2ZmZXIvc3JjL2t2bWFybS9saW51eC9hcmNoL2FybS9rdm0vLi4v
+Li4vLi4vdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1rdm0tZGV2aWNlLmM6NjQ3Ojc6IGVycm9yOiDi
+gJhLVk1fREVWX0FSTV9WR0lDX0dSUF9SRURJU1RfUkVHU+KAmSB1bmRlY2xhcmVkIChmaXJzdCB1
+c2UgaW4gdGhpcyBmdW5jdGlvbikKPiAgIGNhc2UgS1ZNX0RFVl9BUk1fVkdJQ19HUlBfUkVESVNU
+X1JFR1M6Cj4gICAgICAgIF4KPiAvaG9tZS9jaHJpc3RvZmZlci9zcmMva3ZtYXJtL2xpbnV4L2Fy
+Y2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWt2bS1kZXZpY2UuYzo2
+NDg6NzogZXJyb3I6IOKAmEtWTV9ERVZfQVJNX1ZHSUNfQ1BVX1NZU1JFR1PigJkgdW5kZWNsYXJl
+ZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCj4gICBjYXNlIEtWTV9ERVZfQVJNX1ZHSUNf
+Q1BVX1NZU1JFR1M6Cj4gICAgICAgIF4KPiAvaG9tZS9jaHJpc3RvZmZlci9zcmMva3ZtYXJtL2xp
+bnV4L2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWt2bS1kZXZp
+Y2UuYzo2NTI6NzogZXJyb3I6IOKAmEtWTV9ERVZfQVJNX1ZHSUNfR1JQX0xFVkVMX0lORk/igJkg
+dW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCj4gICBjYXNlIEtWTV9ERVZf
+QVJNX1ZHSUNfR1JQX0xFVkVMX0lORk86IHsKPiAgICAgICAgXgo+IC9ob21lL2NocmlzdG9mZmVy
+L3NyYy9rdm1hcm0vbGludXgvYXJjaC9hcm0va3ZtLy4uLy4uLy4uL3ZpcnQva3ZtL2FybS92Z2lj
+L3ZnaWMta3ZtLWRldmljZS5jOjY1MzoyMjogZXJyb3I6IOKAmEtWTV9ERVZfQVJNX1ZHSUNfTElO
+RV9MRVZFTF9JTkZPX01BU0vigJkgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rp
+b24pCj4gICAgaWYgKCgoYXR0ci0+YXR0ciAmIEtWTV9ERVZfQVJNX1ZHSUNfTElORV9MRVZFTF9J
+TkZPX01BU0spID4+Cj4gICAgICAgICAgICAgICAgICAgICAgIF4KPiAvaG9tZS9jaHJpc3RvZmZl
+ci9zcmMva3ZtYXJtL2xpbnV4L2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdp
+Yy92Z2ljLWt2bS1kZXZpY2UuYzo2NTQ6OTogZXJyb3I6IOKAmEtWTV9ERVZfQVJNX1ZHSUNfTElO
+RV9MRVZFTF9JTkZPX1NISUZU4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0
+aW9uKQo+ICAgICAgICAgIEtWTV9ERVZfQVJNX1ZHSUNfTElORV9MRVZFTF9JTkZPX1NISUZUKSA9
+PQo+ICAgICAgICAgIF4KPiAvaG9tZS9jaHJpc3RvZmZlci9zcmMva3ZtYXJtL2xpbnV4L2FyY2gv
+YXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWt2bS1kZXZpY2UuYzo2NTU6
+OTogZXJyb3I6IOKAmFZHSUNfTEVWRUxfSU5GT19MSU5FX0xFVkVM4oCZIHVuZGVjbGFyZWQgKGZp
+cnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQo+ICAgICAgICAgIFZHSUNfTEVWRUxfSU5GT19MSU5F
+X0xFVkVMKQo+ICAgICAgICAgIF4KPiBjYzE6IHNvbWUgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBh
+cyBlcnJvcnMKPiBtYWtlWzJdOiAqKiogW2FyY2gvYXJtL2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9h
+cm0vdmdpYy92Z2ljLWt2bS1kZXZpY2Uub10gRXJyb3IgMQo+IG1ha2VbMV06ICoqKiBbYXJjaC9h
+cm0va3ZtXSBFcnJvciAyCj4gbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
+cy4uLi4KPiBtYWtlOiAqKiogW3N1Yi1tYWtlXSBFcnJvciAyCj4KPiBUaGFua3MsCj4gLUNocmlz
+dG9mZmVyCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
+bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
+c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
