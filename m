@@ -1,277 +1,230 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v9 2/3] arm: pmu: Check cycle count
- increases
-Date: Mon, 21 Nov 2016 10:14:31 +0100
-Message-ID: <20161121091431.a2bdabm7gzqx6vad@kamzik.brq.redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v9 3/3] arm: pmu: Add CPI checking
+Date: Mon, 21 Nov 2016 10:41:15 +0100
+Message-ID: <20161121094115.j6kqkhubzabclfm2@kamzik.brq.redhat.com>
 References: <1479528942-21866-1-git-send-email-wei@redhat.com>
- <1479528942-21866-3-git-send-email-wei@redhat.com>
+ <1479528942-21866-4-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63CA4402EF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 04:14:01 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dJE5mSpeOLZN for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Nov 2016 04:14:00 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 178CF401E8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 04:13:59 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1479528942-21866-3-git-send-email-wei@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <1479528942-21866-4-git-send-email-wei@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
 To: Wei Huang <wei@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, cov@codeaurora.org, will.deacon@arm.com, mark.rutland@arm.com, catalin.marinas@arm.com, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 18, 2016 at 10:15:41PM -0600, Wei Huang wrote:
+On Fri, Nov 18, 2016 at 10:15:42PM -0600, Wei Huang wrote:
 > From: Christopher Covington <cov@codeaurora.org>
 > 
-> Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
-> even for the smallest delta of two subsequent reads.
+> Calculate the numbers of cycles per instruction (CPI) implied by ARM
+> PMU cycle counter values. The code includes a strict checking facility
+> intended for the -icount option in TCG mode in the configuration file.
 > 
 > Signed-off-by: Christopher Covington <cov@codeaurora.org>
 > Signed-off-by: Wei Huang <wei@redhat.com>
 > ---
->  arm/pmu.c | 156 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 156 insertions(+)
+>  arm/pmu.c         | 111 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  arm/unittests.cfg |  14 +++++++
+>  2 files changed, 124 insertions(+), 1 deletion(-)
 > 
 > diff --git a/arm/pmu.c b/arm/pmu.c
-> index 9d9c53b..fa87de4 100644
+> index fa87de4..b36c4fb 100644
 > --- a/arm/pmu.c
 > +++ b/arm/pmu.c
-> @@ -15,6 +15,9 @@
->  #include "libcflat.h"
->  #include "asm/barrier.h"
->  
-> +#define PMU_PMCR_E         (1 << 0)
-> +#define PMU_PMCR_C         (1 << 2)
-> +#define PMU_PMCR_LC        (1 << 6)
->  #define PMU_PMCR_N_SHIFT   11
->  #define PMU_PMCR_N_MASK    0x1f
->  #define PMU_PMCR_ID_SHIFT  16
-> @@ -22,6 +25,14 @@
->  #define PMU_PMCR_IMP_SHIFT 24
->  #define PMU_PMCR_IMP_MASK  0xff
->  
-> +#define ID_DFR0_PERFMON_SHIFT 24
-> +#define ID_DFR0_PERFMON_MASK  0xf
-> +
-> +#define PMU_CYCLE_IDX         31
-> +
-> +#define NR_SAMPLES 10
-> +
-> +static unsigned int pmu_version;
->  #if defined(__arm__)
->  static inline uint32_t pmcr_read(void)
->  {
-> @@ -30,6 +41,69 @@ static inline uint32_t pmcr_read(void)
->  	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
->  	return ret;
+> @@ -104,6 +104,25 @@ static inline uint32_t id_dfr0_read(void)
+>  	asm volatile("mrc p15, 0, %0, c0, c1, 2" : "=r" (val));
+>  	return val;
 >  }
 > +
-> +static inline void pmcr_write(uint32_t value)
-> +{
-> + 	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (value));
-> +	isb();
-> +}
-> +
-> +static inline void pmselr_write(uint32_t value)
-> +{
-> +	asm volatile("mcr p15, 0, %0, c9, c12, 5" : : "r" (value));
-> +	isb();
-> +}
-> +
-> +static inline void pmxevtyper_write(uint32_t value)
-> +{
-> +	asm volatile("mcr p15, 0, %0, c9, c13, 1" : : "r" (value));
-> +}
-> +
-> +static inline uint64_t pmccntr_read(void)
-> +{
-> +	uint32_t lo, hi = 0;
-> +
-> +	if (pmu_version == 0x3)
-> +		asm volatile("mrrc p15, 0, %0, %1, c9" : "=r" (lo), "=r" (hi));
-> +	else
-> +		asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (lo));
+> +/*
+> + * Extra instructions inserted by the compiler would be difficult to compensate
+> + * for, so hand assemble everything between, and including, the PMCR accesses
+> + * to start and stop counting.
+> + */
+> +static inline void loop(int i, uint32_t pmcr)
 
-This is fine for this single test, but I was actually thinking we'd
-implement both the 32-bit and 64-bit accessors separately, allowing
-us to add an additional test that tries both on AArch32 (PMUv3). I.e.
+Thought you were going to rename this function.
 
- report_prefix_push("pmccntr");
-
- report("32-bit read", pmccntr_read() != 0); /* test mrc access */
-
- if (pmu_version == 0x3) {
-     u64 cntr64 = pmccntr_read64(); /* test mrrc access */
-     report("64-bit read", (cntr64 >> 32) == 0 && (u32)cntr64 != 0);
- } else {
-     report_skip("64-bit read, PMUv3 required");
- }
-
-We can refactor when we add that test later though.
-
-> +
-> +	return ((uint64_t)hi << 32) | lo;
-> +}
-> +
-> +static inline void pmccntr_write(uint64_t value)
 > +{
-> +	uint32_t lo, hi;
-> +
-> +	lo = value & 0xffffffff;
-> +	hi = (value >> 32) & 0xffffffff;
-> +
-> +	if (pmu_version == 0x3)
-> +		asm volatile("mcrr p15, 0, %0, %1, c9" : : "r" (lo), "r" (hi));
-> +	else
-> +		asm volatile("mcr p15, 0, %0, c9, c13, 0" : : "r" (lo));
-> +}
-> +
-> +static inline void pmcntenset_write(uint32_t value)
-> +{
-> +	asm volatile("mcr p15, 0, %0, c9, c12, 1" : : "r" (value));
-> +}
-> +
-> +/* PMCCFILTR is an obsolete name for PMXEVTYPER31 in ARMv7 */
-> +static inline void pmccfiltr_write(uint32_t value)
-> +{
-> +	pmselr_write(PMU_CYCLE_IDX);
-> +	pmxevtyper_write(value);
-> +	isb();
-> +}
-> +
-> +static inline uint32_t id_dfr0_read(void)
-> +{
-> +	uint32_t val;
-> +
-> +	asm volatile("mrc p15, 0, %0, c0, c1, 2" : "=r" (val));
-> +	return val;
+> +	asm volatile(
+> +	"	mcr	p15, 0, %[pmcr], c9, c12, 0\n"
+> +	"	isb\n"
+> +	"1:	subs	%[i], %[i], #1\n"
+> +	"	bgt	1b\n"
+> +	"	mcr	p15, 0, %[z], c9, c12, 0\n"
+> +	"	isb\n"
+> +	: [i] "+r" (i)
+> +	: [pmcr] "r" (pmcr), [z] "r" (0)
+> +	: "cc");
 > +}
 >  #elif defined(__aarch64__)
 >  static inline uint32_t pmcr_read(void)
 >  {
-> @@ -38,6 +112,44 @@ static inline uint32_t pmcr_read(void)
->  	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
->  	return ret;
+> @@ -150,6 +169,25 @@ static inline uint32_t id_dfr0_read(void)
+>  	asm volatile("mrs %0, id_dfr0_el1" : "=r" (id));
+>  	return id;
 >  }
 > +
-> +static inline void pmcr_write(uint32_t value)
+> +/*
+> + * Extra instructions inserted by the compiler would be difficult to compensate
+> + * for, so hand assemble everything between, and including, the PMCR accesses
+> + * to start and stop counting.
+> + */
+> +static inline void loop(int i, uint32_t pmcr)
 > +{
-> +	asm volatile("msr pmcr_el0, %0" : : "r" (value));
-> +	isb();
-> +}
-> +
-> +static inline uint64_t pmccntr_read(void)
-> +{
-> +	uint64_t cycles;
-> +
-> +	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
-> +	return cycles;
-> +}
-> +
-> +static inline void pmccntr_write(uint64_t value)
-> +{
-> +	asm volatile("msr pmccntr_el0, %0" : : "r" (value));
-> +}
-> +
-> +static inline void pmcntenset_write(uint32_t value)
-> +{
-> +	asm volatile("msr pmcntenset_el0, %0" : : "r" (value));
-> +}
-> +
-> +static inline void pmccfiltr_write(uint32_t value)
-> +{
-> +	asm volatile("msr pmccfiltr_el0, %0" : : "r" (value));
-> +	isb();
-> +}
-> +
-> +static inline uint32_t id_dfr0_read(void)
-> +{
-> +	uint32_t id;
-> +
-> +	asm volatile("mrs %0, id_dfr0_el1" : "=r" (id));
-> +	return id;
+> +	asm volatile(
+> +	"	msr	pmcr_el0, %[pmcr]\n"
+> +	"	isb\n"
+> +	"1:	subs	%[i], %[i], #1\n"
+> +	"	b.gt	1b\n"
+> +	"	msr	pmcr_el0, xzr\n"
+> +	"	isb\n"
+> +	: [i] "+r" (i)
+> +	: [pmcr] "r" (pmcr)
+> +	: "cc");
 > +}
 >  #endif
 >  
 >  /*
-> @@ -64,11 +176,55 @@ static bool check_pmcr(void)
->  	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
+> @@ -204,6 +242,71 @@ static bool check_cycles_increase(void)
+>  	return success;
 >  }
 >  
 > +/*
-> + * Ensure that the cycle counter progresses between back-to-back reads.
+> + * Execute a known number of guest instructions. Only odd instruction counts
+> + * greater than or equal to 3 are supported by the in-line assembly code. The
+> + * control register (PMCR_EL0) is initialized with the provided value (allowing
+> + * for example for the cycle counter or event counters to be reset). At the end
+> + * of the exact instruction loop, zero is written to PMCR_EL0 to disable
+> + * counting, allowing the cycle counter or event counters to be read at the
+> + * leisure of the calling code.
 > + */
-> +static bool check_cycles_increase(void)
+> +static void measure_instrs(int num, uint32_t pmcr)
 > +{
-> +	bool success = true;
+> +	int i = (num - 1) / 2;
 > +
-> +	pmccntr_write(0);
-> +	pmcr_write(pmcr_read() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
+> +	assert(num >= 3 && ((num - 1) % 2 == 0));
+> +	loop(i, pmcr);
+> +}
 > +
-> +	for (int i = 0; i < NR_SAMPLES; i++) {
-> +		uint64_t a, b;
+> +/*
+> + * Measure cycle counts for various known instruction counts. Ensure that the
+> + * cycle counter progresses (similar to check_cycles_increase() but with more
+> + * instructions and using reset and stop controls). If supplied a positive,
+> + * nonzero CPI parameter, also strictly check that every measurement matches
+> + * it. Strict CPI checking is used to test -icount mode.
+> + */
+> +static bool check_cpi(int cpi)
+> +{
+> +	uint32_t pmcr = pmcr_read() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
+> +	
+> +	if (cpi > 0)
+> +		printf("Checking for CPI=%d.\n", cpi);
+> +	printf("instrs : cycles0 cycles1 ...\n");
 > +
-> +		a = pmccntr_read();
-> +		b = pmccntr_read();
+> +	for (unsigned int i = 3; i < 300; i += 32) {
+> +		uint64_t avg, sum = 0;
 > +
-> +		if (a >= b) {
-> +			printf("Read %"PRId64" then %"PRId64".\n", a, b);
-> +			success = false;
-> +			break;
+> +		printf("%d :", i);
+> +		for (int j = 0; j < NR_SAMPLES; j++) {
+> +			uint64_t cycles;
+> +
+> +			pmccntr_write(0);
+> +			measure_instrs(i, pmcr);
+> +			cycles = pmccntr_read();
+> +			printf(" %"PRId64"", cycles);
+> +
+> +			/*
+> +			 * The cycles taken by the loop above should fit in
+> +			 * 32 bits easily. We check the upper 32 bits of the
+> +			 * cycle counter to make sure there is no supprise.
+> +			 */
+> +			if (!cycles || (cpi > 0 && cycles != i * cpi) ||
+> +			    (cycles & 0xffffffff00000000)) {
+
+ (cycles >> 32) != 0 would look better.
+
+> +				printf("\n");
+
+We have 3 cases where we return false here. How about doing the tests
+separately and adding descriptive print statements for each?
+
+ if (!cycles) {
+     printf("\ncycles not incrementing!\n");
+     return false;
+ } else if (cpi > 0 && cycles != i * cpi) {
+     ...
+ } else if ((cycles >> 32) != 0) {
+     ...
+ }
+
+> +				return false;
+> +			}
+> +
+> +			sum += cycles;
 > +		}
+> +		avg = sum / NR_SAMPLES;
+> +		printf(" sum=%"PRId64" avg=%"PRId64" avg_ipc=%"PRId64" "
+> +		       "avg_cpi=%"PRId64"\n", sum, avg, i / avg, avg / i);
 > +	}
 > +
-> +	pmcr_write(pmcr_read() & ~PMU_PMCR_E);
-> +
-> +	return success;
+> +	return true;
 > +}
 > +
-> +void pmu_init(void)
-> +{
-> +	uint32_t dfr0;
-> +
-> +	/* probe pmu version */
-> +	dfr0 = id_dfr0_read();
-> +	pmu_version = (dfr0 >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
-> +	printf("PMU version: %d\n", pmu_version);
-> +	
-> +	/* init for PMU event access, right now only care about cycle count */
-> +	pmcntenset_write(1 << PMU_CYCLE_IDX);
-> +	pmccfiltr_write(0); /* count cycles in EL0, EL1, but not EL2 */
-
-These last two register writes are specific to the cycle count test, so
-I don't think they belong in a common pmu_init function. I'd keep them
-at the top of check_cycles_increase.
-
-> +}
-> +
->  int main(void)
+>  void pmu_init(void)
 >  {
+>  	uint32_t dfr0;
+> @@ -218,13 +321,19 @@ void pmu_init(void)
+>  	pmccfiltr_write(0); /* count cycles in EL0, EL1, but not EL2 */
+>  }
+>  
+> -int main(void)
+> +int main(int argc, char *argv[])
+>  {
+> +	int cpi = 0;
+> +
+> +	if (argc >= 1)
+                  ^ this '=' shouldn't be here
+> +		cpi = atol(argv[0]);
+                                ^ sigh, this is still zero...
+
+Looks like you forgot all my comments from the last review round...
+
+> +
 >  	report_prefix_push("pmu");
 >  
-> +	pmu_init();
+>  	pmu_init();
 >  	report("Control register", check_pmcr());
-> +	report("Monotonically increasing cycle count", check_cycles_increase());
+>  	report("Monotonically increasing cycle count", check_cycles_increase());
+> +	report("Cycle/instruction ratio", check_cpi(cpi));
 >  
 >  	return report_summary();
 >  }
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 7645180..2050dc8 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -59,3 +59,17 @@ groups = selftest
+>  [pmu]
+>  file = pmu.flat
+>  groups = pmu
+> +
+> +# Test PMU support (TCG) with -icount IPC=1
+> +[pmu-tcg-icount-1]
+> +file = pmu.flat
+> +extra_params = -icount 0 -append '1'
+> +groups = pmu
+> +accel = tcg
+> +
+> +# Test PMU support (TCG) with -icount IPC=256
+> +[pmu-tcg-icount-256]
+> +file = pmu.flat
+> +extra_params = -icount 8 -append '256'
+> +groups = pmu
+> +accel = tcg
 > -- 
 > 1.8.3.1
 >
 
-Thanks,
-drew 
+drew
