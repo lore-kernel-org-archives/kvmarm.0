@@ -1,23 +1,25 @@
-From: Tyler Baicar <tbaicar@codeaurora.org>
-Subject: [PATCH V5 09/10] trace, ras: add ARM processor error trace event
-Date: Mon, 21 Nov 2016 15:36:02 -0700
-Message-ID: <1479767763-27532-10-git-send-email-tbaicar@codeaurora.org>
-References: <1479767763-27532-1-git-send-email-tbaicar@codeaurora.org>
+From: Wei Huang <wei@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v10 3/3] arm: pmu: Add CPI checking
+Date: Mon, 21 Nov 2016 16:49:20 -0600
+Message-ID: <5263e77a-b987-c955-c328-040a11543c94@redhat.com>
+References: <1479759895-10042-1-git-send-email-wei@redhat.com>
+ <1479759895-10042-4-git-send-email-wei@redhat.com>
+ <13b86440-3b37-ff24-3080-f0deece175fa@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D21D405C4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 17:36:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72066405C4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 17:48:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PKXuxWrzRVV4 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Nov 2016 17:36:53 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 549A14057D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 17:36:53 -0500 (EST)
-In-Reply-To: <1479767763-27532-1-git-send-email-tbaicar@codeaurora.org>
+ with ESMTP id Eqg3xWvSnBMN for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Nov 2016 17:48:46 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 856A6405A7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Nov 2016 17:48:46 -0500 (EST)
+In-Reply-To: <13b86440-3b37-ff24-3080-f0deece175fa@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,134 +29,85 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tomasz.nowicki@linaro.org, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, Suzuki.Poulose@arm.com, punit.agrawal@arm.com, astone@redhat.com, harba@codeaurora.org, hanjun.guo@linaro.org
-Cc: Tyler Baicar <tbaicar@codeaurora.org>
+To: Christopher Covington <cov@codeaurora.org>, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently there are trace events for the various RAS
-errors with the exception of ARM processor type errors.
-Add a new trace event for such errors so that the user
-will know when they occur. These trace events are
-consistent with the ARM processor error section type
-defined in UEFI 2.6 spec section N.2.4.4.
 
-Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
-Acked-by: Steven Rostedt <rostedt@goodmis.org>
----
- drivers/acpi/apei/ghes.c    |  9 +++++++-
- drivers/firmware/efi/cper.c |  1 +
- drivers/ras/ras.c           |  1 +
- include/ras/ras_event.h     | 55 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 65 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index c7fbbc1..1147e17 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -516,7 +516,14 @@ static void ghes_do_proc(struct ghes *ghes,
- 
- 		}
- #endif
--		else {
-+		else if (!uuid_le_cmp(sec_type, CPER_SEC_PROC_ARMV8)) {
-+			struct cper_sec_proc_armv8 *armv8_err;
-+			struct cper_armv8_err_info *err_info;
-+
-+			armv8_err = acpi_hest_generic_data_payload(gdata);
-+			err_info = (void *)(armv8_err +1);
-+			trace_arm_event(armv8_err, err_info);
-+		} else {
- 			void *unknown_err = acpi_hest_generic_data_payload(gdata);
- 			trace_unknown_sec_event(&sec_type,
- 					fru_id, fru_text, sec_sev,
-diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
-index bbb576e..0a0cd74 100644
---- a/drivers/firmware/efi/cper.c
-+++ b/drivers/firmware/efi/cper.c
-@@ -35,6 +35,7 @@
- #include <linux/printk.h>
- #include <linux/bcd.h>
- #include <acpi/ghes.h>
-+#include <ras/ras_event.h>
- 
- #define INDENT_SP	" "
- 
-diff --git a/drivers/ras/ras.c b/drivers/ras/ras.c
-index fb2500b..8ba5a94 100644
---- a/drivers/ras/ras.c
-+++ b/drivers/ras/ras.c
-@@ -28,3 +28,4 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(extlog_mem_event);
- #endif
- EXPORT_TRACEPOINT_SYMBOL_GPL(mc_event);
- EXPORT_TRACEPOINT_SYMBOL_GPL(unknown_sec_event);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(arm_event);
-diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
-index 5861b6f..0060bba 100644
---- a/include/ras/ras_event.h
-+++ b/include/ras/ras_event.h
-@@ -162,6 +162,61 @@ TRACE_EVENT(mc_event,
- );
- 
- /*
-+ * ARM Processor Events Report
-+ *
-+ * This event is generated when hardware detects an ARM processor error
-+ * has occurred. UEFI 2.6 spec section N.2.4.4.
-+ */
-+TRACE_EVENT(arm_event,
-+
-+	TP_PROTO(const struct cper_sec_proc_armv8 *proc,
-+		 struct cper_armv8_err_info *err_info),
-+
-+	TP_ARGS(proc, err_info),
-+
-+	TP_STRUCT__entry(
-+		__field(u64, mpidr)
-+		__field(u64, midr)
-+		__field(u64, info)
-+		__field(u64, virt_fault_addr)
-+		__field(u64, phys_fault_addr)
-+		__field(u32, running_state)
-+		__field(u32, psci_state)
-+		__field(u16, err_count)
-+		__field(u8, affinity)
-+		__field(u8, version)
-+		__field(u8, type)
-+		__field(u8, flags)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->affinity = proc->affinity_level;
-+		__entry->mpidr = proc->mpidr;
-+		__entry->midr = proc->midr;
-+		__entry->running_state = proc->running_state;
-+		__entry->psci_state = proc->psci_state;
-+		__entry->version = err_info->version;
-+		__entry->type = err_info->type;
-+		__entry->err_count = err_info->multiple_error;
-+		__entry->flags = err_info->flags;
-+		__entry->info = err_info->error_info;
-+		__entry->virt_fault_addr = err_info->virt_fault_addr;
-+		__entry->phys_fault_addr = err_info->physical_fault_addr;
-+	),
-+
-+	TP_printk("affinity level: %d; MPIDR: %016llx; MIDR: %016llx; "
-+		  "running state: %d; PSCI state: %d; version: %d; type: %d; "
-+		  "error count: 0x%04x; flags: 0x%02x; info: %016llx; "
-+		  "virtual fault address: %016llx; "
-+		  "physical fault address: %016llx",
-+		  __entry->affinity, __entry->mpidr, __entry->midr,
-+		  __entry->running_state, __entry->psci_state, __entry->version,
-+		  __entry->type, __entry->err_count, __entry->flags,
-+		  __entry->info, __entry->virt_fault_addr,
-+		  __entry->phys_fault_addr)
-+);
-+
-+/*
-  * Unknown Section Report
-  *
-  * This event is generated when hardware detected a hardware
--- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+On 11/21/2016 03:40 PM, Christopher Covington wrote:
+> Hi Wei,
+> 
+> On 11/21/2016 03:24 PM, Wei Huang wrote:
+>> From: Christopher Covington <cov@codeaurora.org>
+> 
+> I really appreciate your work on these patches. If for any or all of these
+> you have more lines added/modified than me (or using any other better
+> metric), please make sure to change the author to be you with
+> `git commit --amend --reset-author` or equivalent.
+
+Sure, I will if needed. Regarding your comments below, I will fix the
+patch series after Drew's comments, if any.
+
+> 
+>> Calculate the numbers of cycles per instruction (CPI) implied by ARM
+>> PMU cycle counter values. The code includes a strict checking facility
+>> intended for the -icount option in TCG mode in the configuration file.
+>>
+>> Signed-off-by: Christopher Covington <cov@codeaurora.org>
+>> Signed-off-by: Wei Huang <wei@redhat.com>
+>> ---
+>>  arm/pmu.c         | 119 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  arm/unittests.cfg |  14 +++++++
+>>  2 files changed, 132 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arm/pmu.c b/arm/pmu.c
+>> index 176b070..129ef1e 100644
+>> --- a/arm/pmu.c
+>> +++ b/arm/pmu.c
+>> @@ -104,6 +104,25 @@ static inline uint32_t id_dfr0_read(void)
+>>  	asm volatile("mrc p15, 0, %0, c0, c1, 2" : "=r" (val));
+>>  	return val;
+>>  }
+>> +
+>> +/*
+>> + * Extra instructions inserted by the compiler would be difficult to compensate
+>> + * for, so hand assemble everything between, and including, the PMCR accesses
+>> + * to start and stop counting. Total cycles = isb + mcr + 2*loop = 2 + 2*loop.
+                                   ^^^^^^^^^^^^
+I will change the comment above to "Total instrs".
+
+>> + */
+>> +static inline void precise_cycles_loop(int loop, uint32_t pmcr)
+> 
+> Nit: I would call this precise_instrs_loop. How many cycles it takes is
+> IMPLEMENTATION DEFINED.
+
+You are right. The cycle indeed depends on the design. Will fix.
+
+> 
+>> +{
+>> +	asm volatile(
+>> +	"	mcr	p15, 0, %[pmcr], c9, c12, 0\n"
+>> +	"	isb\n"
+>> +	"1:	subs	%[loop], %[loop], #1\n"
+>> +	"	bgt	1b\n"
+> 
+> Is there any chance we might need an isb here, to prevent the stop from happening
+> before or during the loop? Where ISBs are required, the Linux best practice is to
+
+In theory, I think this can happen when mcr is executed before all loop
+instructions completed, causing pmccntr_read() to miss some cycles. But
+QEMU TCG mode doesn't support out-order-execution. So the test
+condition, "cpi > 0 && cycles != i * cpi", will never be TRUE. Because
+cpi==0 in KVM, this same test condition won't be TRUE under KVM mode either.
+
+> diligently comment why they are needed. Perhaps it would be a good habit to
+> carry over into kvm-unit-tests.
+
+Agreed. Most isb() instructions were added following CP15 writes (not
+all CP15 writes, but at limited locations). We tried to follow what
+Linux kernel does in perf_event.c. If you feel that any isb() place
+needs special comment, I will be more than happy to add it.
+
+<snip>
