@@ -1,247 +1,161 @@
-From: Wei Huang <wei@redhat.com>
-Subject: [kvm-unit-tests PATCH v11 2/3] arm: pmu: Check cycle count increases
-Date: Tue, 22 Nov 2016 12:29:13 -0600
-Message-ID: <1479839354-22061-3-git-send-email-wei@redhat.com>
-References: <1479839354-22061-1-git-send-email-wei@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v6 00/11] arm/arm64: add gic
+ framework
+Date: Tue, 22 Nov 2016 19:45:11 +0100
+Message-ID: <20161122184511.w5tlxxjphq5fo25b@kamzik.brq.redhat.com>
+References: <1479157719-31021-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C83F40866
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Nov 2016 13:28:42 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7njp3tMwCsDy for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Nov 2016 13:28:41 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 777074078F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Nov 2016 13:28:40 -0500 (EST)
-In-Reply-To: <1479839354-22061-1-git-send-email-wei@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: cov@codeaurora.org
-Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1479157719-31021-1-git-send-email-drjones@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christopher Covington <cov@codeaurora.org>
 
-Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
-even for the smallest delta of two subsequent reads.
+Andre, Alex, Eric, anybody,
 
-Signed-off-by: Christopher Covington <cov@codeaurora.org>
-Signed-off-by: Wei Huang <wei@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- arm/pmu.c | 156 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 156 insertions(+)
+Any more comments on this? If not, I'll send a pull request
+to Radim and Paolo to finally get this merged.
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 9d9c53b..176b070 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -15,6 +15,9 @@
- #include "libcflat.h"
- #include "asm/barrier.h"
- 
-+#define PMU_PMCR_E         (1 << 0)
-+#define PMU_PMCR_C         (1 << 2)
-+#define PMU_PMCR_LC        (1 << 6)
- #define PMU_PMCR_N_SHIFT   11
- #define PMU_PMCR_N_MASK    0x1f
- #define PMU_PMCR_ID_SHIFT  16
-@@ -22,6 +25,14 @@
- #define PMU_PMCR_IMP_SHIFT 24
- #define PMU_PMCR_IMP_MASK  0xff
- 
-+#define ID_DFR0_PERFMON_SHIFT 24
-+#define ID_DFR0_PERFMON_MASK  0xf
-+
-+#define PMU_CYCLE_IDX         31
-+
-+#define NR_SAMPLES 10
-+
-+static unsigned int pmu_version;
- #if defined(__arm__)
- static inline uint32_t pmcr_read(void)
- {
-@@ -30,6 +41,69 @@ static inline uint32_t pmcr_read(void)
- 	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
- 	return ret;
- }
-+
-+static inline void pmcr_write(uint32_t value)
-+{
-+	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (value));
-+	isb();
-+}
-+
-+static inline void pmselr_write(uint32_t value)
-+{
-+	asm volatile("mcr p15, 0, %0, c9, c12, 5" : : "r" (value));
-+	isb();
-+}
-+
-+static inline void pmxevtyper_write(uint32_t value)
-+{
-+	asm volatile("mcr p15, 0, %0, c9, c13, 1" : : "r" (value));
-+}
-+
-+static inline uint64_t pmccntr_read(void)
-+{
-+	uint32_t lo, hi = 0;
-+
-+	if (pmu_version == 0x3)
-+		asm volatile("mrrc p15, 0, %0, %1, c9" : "=r" (lo), "=r" (hi));
-+	else
-+		asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (lo));
-+
-+	return ((uint64_t)hi << 32) | lo;
-+}
-+
-+static inline void pmccntr_write(uint64_t value)
-+{
-+	uint32_t lo, hi;
-+
-+	lo = value & 0xffffffff;
-+	hi = (value >> 32) & 0xffffffff;
-+
-+	if (pmu_version == 0x3)
-+		asm volatile("mcrr p15, 0, %0, %1, c9" : : "r" (lo), "r" (hi));
-+	else
-+		asm volatile("mcr p15, 0, %0, c9, c13, 0" : : "r" (lo));
-+}
-+
-+static inline void pmcntenset_write(uint32_t value)
-+{
-+	asm volatile("mcr p15, 0, %0, c9, c12, 1" : : "r" (value));
-+}
-+
-+/* PMCCFILTR is an obsolete name for PMXEVTYPER31 in ARMv7 */
-+static inline void pmccfiltr_write(uint32_t value)
-+{
-+	pmselr_write(PMU_CYCLE_IDX);
-+	pmxevtyper_write(value);
-+	isb();
-+}
-+
-+static inline uint32_t id_dfr0_read(void)
-+{
-+	uint32_t val;
-+
-+	asm volatile("mrc p15, 0, %0, c0, c1, 2" : "=r" (val));
-+	return val;
-+}
- #elif defined(__aarch64__)
- static inline uint32_t pmcr_read(void)
- {
-@@ -38,6 +112,44 @@ static inline uint32_t pmcr_read(void)
- 	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
- 	return ret;
- }
-+
-+static inline void pmcr_write(uint32_t value)
-+{
-+	asm volatile("msr pmcr_el0, %0" : : "r" (value));
-+	isb();
-+}
-+
-+static inline uint64_t pmccntr_read(void)
-+{
-+	uint64_t cycles;
-+
-+	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
-+	return cycles;
-+}
-+
-+static inline void pmccntr_write(uint64_t value)
-+{
-+	asm volatile("msr pmccntr_el0, %0" : : "r" (value));
-+}
-+
-+static inline void pmcntenset_write(uint32_t value)
-+{
-+	asm volatile("msr pmcntenset_el0, %0" : : "r" (value));
-+}
-+
-+static inline void pmccfiltr_write(uint32_t value)
-+{
-+	asm volatile("msr pmccfiltr_el0, %0" : : "r" (value));
-+	isb();
-+}
-+
-+static inline uint32_t id_dfr0_read(void)
-+{
-+	uint32_t id;
-+
-+	asm volatile("mrs %0, id_dfr0_el1" : "=r" (id));
-+	return id;
-+}
- #endif
- 
- /*
-@@ -64,11 +176,55 @@ static bool check_pmcr(void)
- 	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
- }
- 
-+/*
-+ * Ensure that the cycle counter progresses between back-to-back reads.
-+ */
-+static bool check_cycles_increase(void)
-+{
-+	bool success = true;
-+
-+	/* init before event access, this test only cares about cycle count */
-+	pmcntenset_write(1 << PMU_CYCLE_IDX);
-+	pmccfiltr_write(0); /* count cycles in EL0, EL1, but not EL2 */
-+	pmccntr_write(0);
-+
-+	pmcr_write(pmcr_read() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
-+
-+	for (int i = 0; i < NR_SAMPLES; i++) {
-+		uint64_t a, b;
-+
-+		a = pmccntr_read();
-+		b = pmccntr_read();
-+
-+		if (a >= b) {
-+			printf("Read %"PRId64" then %"PRId64".\n", a, b);
-+			success = false;
-+			break;
-+		}
-+	}
-+
-+	pmcr_write(pmcr_read() & ~PMU_PMCR_E);
-+
-+	return success;
-+}
-+
-+void pmu_init(void)
-+{
-+	uint32_t dfr0;
-+
-+	/* probe pmu version */
-+	dfr0 = id_dfr0_read();
-+	pmu_version = (dfr0 >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
-+	printf("PMU version: %d\n", pmu_version);
-+}
-+
- int main(void)
- {
- 	report_prefix_push("pmu");
- 
-+	pmu_init();
- 	report("Control register", check_pmcr());
-+	report("Monotonically increasing cycle count", check_cycles_increase());
- 
- 	return report_summary();
- }
--- 
-1.8.3.1
+Thanks,
+drew
+
+
+On Mon, Nov 14, 2016 at 10:08:28PM +0100, Andrew Jones wrote:
+> v6:
+>  - rebased to latest master
+>  - several other changes thanks to Andre and Alex, changes in
+>    individual patch change logs
+>  - some code cleanups
+> 
+> v5:
+>  - fix arm32/gicv3 compile [drew]
+>  - use modern register names [Andre]
+>  - one Andre r-b
+> 
+> v4:
+>  - Eric's r-b's
+>  - Andre's suggestion to only take defines we need
+>  - several other changes listed in individual patches
+> 
+> v3:
+>  - Rebased on latest master
+>  - Added Alex's r-b's
+> 
+> v2:
+>  Rebased on latest master + my "populate argv[0]" series (will
+>  send a REPOST for that shortly. Additionally a few patches got
+>  fixes/features;
+>  07/10 got same fix as kernel 7c9b973061 "irqchip/gic-v3: Configure
+>        all interrupts as non-secure Group-1" in order to continue
+>        working over TCG, as the gicv3 code for TCG removed a hack
+>        it had there to make Linux happy.
+>  08/10 added more output for when things fail (if they fail)
+>  09/10 switched gicv3 broadcast implementation to using IRM. This
+>        found a bug in a recent (but not tip) kernel, which I was
+>        about to fix, but then I saw MarcZ beat me to it.
+>  10/10 actually check that the input irq is the received irq
+> 
+> 
+> Import defines, and steal enough helper functions, from Linux to
+> enable programming of the gic (v2 and v3). Then use the framework
+> to add an initial test (an ipi test; self, target-list, broadcast).
+> 
+> It's my hope that this framework will be a suitable base on which
+> more tests may be easily added, particularly because we have
+> vgic-new and tcg gicv3 emulation getting close to merge. (v3 UPDATE:
+> vgic-new and tcg gicv3 are merged now)
+> 
+> To run it, along with other tests, just do
+> 
+>  ./configure [ --arch=[arm|arm64] --cross-prefix=$PREFIX ]
+>  make
+>  export QEMU=$PATH_TO_QEMU
+>  ./run_tests.sh
+> 
+> To run it separately do, e.g.
+> 
+> $QEMU -machine virt,accel=tcg -cpu cortex-a57 \
+>  -device virtio-serial-device \
+>  -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+>  -display none -serial stdio \
+>  -kernel arm/gic.flat \
+>  -smp 123 -machine gic-version=3 -append ipi
+>       ^^ note, we can go nuts with nr-cpus on TCG :-)
+> 
+> Or, a KVM example using a different "sender" cpu and irq (other than zero)
+> 
+> $QEMU -machine virt,accel=kvm -cpu host \
+>  -device virtio-serial-device \
+>  -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+>  -display none -serial stdio \
+>  -kernel arm/gic.flat \
+>  -smp 48 -machine gic-version=3 -append 'ipi sender=42 irq=1'
+> 
+> 
+> Patches:
+> 01-05: fixes and functionality needed by the later gic patches
+> 06-07: enable gicv2 and gicv2 IPI test
+> 08-10: enable gicv3 and gicv3 IPI test
+>    11: extend the IPI tests to take variable sender and irq
+> 
+> Available here: https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic-v6
+> 
+> 
+> Andrew Jones (10):
+>   lib: xstr: allow multiple args
+>   arm64: fix get_"sysreg32" and make MPIDR 64bit
+>   arm/arm64: smp: support more than 8 cpus
+>   arm/arm64: add some delay routines
+>   arm/arm64: irq enable/disable
+>   arm/arm64: add initial gicv2 support
+>   arm/arm64: gicv2: add an IPI test
+>   arm/arm64: add initial gicv3 support
+>   arm/arm64: gicv3: add an IPI test
+>   arm/arm64: gic: don't just use zero
+> 
+> Peter Xu (1):
+>   libcflat: add IS_ALIGNED() macro, and page sizes
+> 
+>  arm/Makefile.common        |   9 +-
+>  arm/gic.c                  | 340 +++++++++++++++++++++++++++++++++++++++++++++
+>  arm/run                    |  19 ++-
+>  arm/selftest.c             |   5 +-
+>  arm/unittests.cfg          |  14 ++
+>  lib/arm/asm/arch_gicv3.h   |  70 ++++++++++
+>  lib/arm/asm/gic-v2.h       |  36 +++++
+>  lib/arm/asm/gic-v3.h       | 112 +++++++++++++++
+>  lib/arm/asm/gic.h          | 106 ++++++++++++++
+>  lib/arm/asm/processor.h    |  42 +++++-
+>  lib/arm/asm/setup.h        |   4 +-
+>  lib/arm/gic.c              | 267 +++++++++++++++++++++++++++++++++++
+>  lib/arm/processor.c        |  15 ++
+>  lib/arm/setup.c            |  10 ++
+>  lib/arm64/asm/arch_gicv3.h |  66 +++++++++
+>  lib/arm64/asm/gic-v2.h     |   1 +
+>  lib/arm64/asm/gic-v3.h     |   1 +
+>  lib/arm64/asm/gic.h        |   1 +
+>  lib/arm64/asm/processor.h  |  53 +++++--
+>  lib/arm64/asm/sysreg.h     |  44 ++++++
+>  lib/arm64/processor.c      |  15 ++
+>  lib/libcflat.h             |  10 +-
+>  22 files changed, 1212 insertions(+), 28 deletions(-)
+>  create mode 100644 arm/gic.c
+>  create mode 100644 lib/arm/asm/arch_gicv3.h
+>  create mode 100644 lib/arm/asm/gic-v2.h
+>  create mode 100644 lib/arm/asm/gic-v3.h
+>  create mode 100644 lib/arm/asm/gic.h
+>  create mode 100644 lib/arm/gic.c
+>  create mode 100644 lib/arm64/asm/arch_gicv3.h
+>  create mode 100644 lib/arm64/asm/gic-v2.h
+>  create mode 100644 lib/arm64/asm/gic-v3.h
+>  create mode 100644 lib/arm64/asm/gic.h
+>  create mode 100644 lib/arm64/asm/sysreg.h
+> 
+> -- 
+> 2.7.4
+> 
+> 
