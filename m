@@ -1,73 +1,187 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v7 02/11] arm64: fix get_"sysreg32" and make
- MPIDR 64bit
-Date: Wed, 23 Nov 2016 17:53:57 +0100
-Message-ID: <20161123165406.32661-3-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v7 03/11] arm/arm64: smp: support more than 8 cpus
+Date: Wed, 23 Nov 2016 17:53:58 +0100
+Message-ID: <20161123165406.32661-4-drjones@redhat.com>
 References: <20161123165406.32661-1-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7325C40C49
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 11:53:36 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ary5jDmbj2EU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Nov 2016 11:53:35 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF10140C4B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 11:53:35 -0500 (EST)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20161123165406.32661-1-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-bXJzIGlzIGFsd2F5cyA2NGJpdCwgc28gd2Ugc2hvdWxkIGFsd2F5cyB1c2UgYSA2NGJpdCByZWdp
-c3Rlci4KU29tZXRpbWVzIHdlJ2xsIG9ubHkgd2FudCB0byByZXR1cm4gdGhlIGxvd2VyIDMyLCBi
-dXQgbm90IGZvcgpNUElEUiwgYXMgdGhhdCBkb2VzIGRlZmluZSBmaWVsZHMgaW4gdGhlIHVwcGVy
-IDMyLgoKUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4K
-UmV2aWV3ZWQtYnk6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KU2lnbmVkLW9m
-Zi1ieTogQW5kcmV3IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+CgotLS0KdjU6IHN3aXRjaCBh
-cm0zMidzIGdldF9tcGlkciB0byAndW5zaWduZWQgbG9uZycgdG9vLCB0byBiZQogICAgY29uc2lz
-dGVudCB3aXRoIGFybTY0IFtBbmRyZV0KLS0tCiBsaWIvYXJtL2FzbS9wcm9jZXNzb3IuaCAgIHwg
-IDQgKystLQogbGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaCB8IDE1ICsrKysrKysrKy0tLS0tLQog
-MiBmaWxlcyBjaGFuZ2VkLCAxMSBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQoKZGlmZiAt
-LWdpdCBhL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oIGIvbGliL2FybS9hc20vcHJvY2Vzc29yLmgK
-aW5kZXggZjI1ZTdlZWUzNjY2Li4wMmY5MTJmOTk5NzQgMTAwNjQ0Ci0tLSBhL2xpYi9hcm0vYXNt
-L3Byb2Nlc3Nvci5oCisrKyBiL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oCkBAIC0zMyw5ICszMyw5
-IEBAIHN0YXRpYyBpbmxpbmUgdW5zaWduZWQgbG9uZyBjdXJyZW50X2Nwc3Iodm9pZCkKIAogI2Rl
-ZmluZSBjdXJyZW50X21vZGUoKSAoY3VycmVudF9jcHNyKCkgJiBNT0RFX01BU0spCiAKLXN0YXRp
-YyBpbmxpbmUgdW5zaWduZWQgaW50IGdldF9tcGlkcih2b2lkKQorc3RhdGljIGlubGluZSB1bnNp
-Z25lZCBsb25nIGdldF9tcGlkcih2b2lkKQogewotCXVuc2lnbmVkIGludCBtcGlkcjsKKwl1bnNp
-Z25lZCBsb25nIG1waWRyOwogCWFzbSB2b2xhdGlsZSgibXJjIHAxNSwgMCwgJTAsIGMwLCBjMCwg
-NSIgOiAiPXIiIChtcGlkcikpOwogCXJldHVybiBtcGlkcjsKIH0KZGlmZiAtLWdpdCBhL2xpYi9h
-cm02NC9hc20vcHJvY2Vzc29yLmggYi9saWIvYXJtNjQvYXNtL3Byb2Nlc3Nvci5oCmluZGV4IDg0
-ZDVjN2NlNzUyYi4uOWEyMDhmZjcyOWI3IDEwMDY0NAotLS0gYS9saWIvYXJtNjQvYXNtL3Byb2Nl
-c3Nvci5oCisrKyBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKQEAgLTY2LDE0ICs2NiwxNyBA
-QCBzdGF0aWMgaW5saW5lIHVuc2lnbmVkIGxvbmcgY3VycmVudF9sZXZlbCh2b2lkKQogCXJldHVy
-biBlbCAmIDB4YzsKIH0KIAotI2RlZmluZSBERUZJTkVfR0VUX1NZU1JFRzMyKHJlZykJCQkJXAot
-c3RhdGljIGlubGluZSB1bnNpZ25lZCBpbnQgZ2V0XyMjcmVnKHZvaWQpCQkJXAorI2RlZmluZSBE
-RUZJTkVfR0VUX1NZU1JFRyhyZWcsIHR5cGUpCQkJCVwKK3N0YXRpYyBpbmxpbmUgdHlwZSBnZXRf
-IyNyZWcodm9pZCkJCQkJXAogewkJCQkJCQkJXAotCXVuc2lnbmVkIGludCByZWc7CQkJCQlcCi0J
-YXNtIHZvbGF0aWxlKCJtcnMgJTAsICIgI3JlZyAiX2VsMSIgOiAiPXIiIChyZWcpKTsJXAotCXJl
-dHVybiByZWc7CQkJCQkJXAorCXVuc2lnbmVkIGxvbmcgcjsJCQkJCVwKKwlhc20gdm9sYXRpbGUo
-Im1ycyAlMCwgIiAjcmVnICJfZWwxIiA6ICI9ciIgKHIpKTsJXAorCXJldHVybiAodHlwZSlyOwkJ
-CQkJCVwKIH0KLURFRklORV9HRVRfU1lTUkVHMzIobXBpZHIpCisjZGVmaW5lIERFRklORV9HRVRf
-U1lTUkVHMzIocmVnKSBERUZJTkVfR0VUX1NZU1JFRyhyZWcsIHVuc2lnbmVkIGludCkKKyNkZWZp
-bmUgREVGSU5FX0dFVF9TWVNSRUc2NChyZWcpIERFRklORV9HRVRfU1lTUkVHKHJlZywgdW5zaWdu
-ZWQgbG9uZykKKworREVGSU5FX0dFVF9TWVNSRUc2NChtcGlkcikKIAogLyogT25seSBzdXBwb3J0
-IEFmZjAgZm9yIG5vdywgZ2ljdjIgb25seSAqLwogI2RlZmluZSBtcGlkcl90b19jcHUobXBpZHIp
-ICgoaW50KSgobXBpZHIpICYgMHhmZikpCi0tIAoyLjkuMwoKX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
-dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
-bGlzdGluZm8va3ZtYXJtCg==
+By adding support for launching with gicv3 we can break the 8 vcpu
+limit. This patch adds support to smp code and also selects the
+vgic model corresponding to the host. The vgic model may also be
+manually selected by adding e.g. -machine gic-version=3 to
+extra_params.
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+
+---
+v5: left cpus a u32 for now. Changing to u64 requires a change to
+    devicetree. Will do it later. [Andre]
+v4: improved commit message
+---
+ arm/run                   | 19 ++++++++++++-------
+ arm/selftest.c            |  5 ++++-
+ lib/arm/asm/processor.h   |  9 +++++++--
+ lib/arm/asm/setup.h       |  4 ++--
+ lib/arm/setup.c           | 10 ++++++++++
+ lib/arm64/asm/processor.h |  9 +++++++--
+ 6 files changed, 42 insertions(+), 14 deletions(-)
+
+diff --git a/arm/run b/arm/run
+index f1b04af614dc..1c40ab02eb57 100755
+--- a/arm/run
++++ b/arm/run
+@@ -31,13 +31,6 @@ if [ -z "$ACCEL" ]; then
+ 	fi
+ fi
+ 
+-if [ "$HOST" = "aarch64" ] && [ "$ACCEL" = "kvm" ]; then
+-	processor="host"
+-	if [ "$ARCH" = "arm" ]; then
+-		processor+=",aarch64=off"
+-	fi
+-fi
+-
+ qemu="${QEMU:-qemu-system-$ARCH_NAME}"
+ qpath=$(which $qemu 2>/dev/null)
+ 
+@@ -53,6 +46,18 @@ fi
+ 
+ M='-machine virt'
+ 
++if [ "$ACCEL" = "kvm" ]; then
++	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
++		M+=',gic-version=host'
++	fi
++	if [ "$HOST" = "aarch64" ]; then
++		processor="host"
++		if [ "$ARCH" = "arm" ]; then
++			processor+=",aarch64=off"
++		fi
++	fi
++fi
++
+ if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
+ 	echo "$qpath doesn't support virtio-console for chr-testdev. Exiting."
+ 	exit 2
+diff --git a/arm/selftest.c b/arm/selftest.c
+index 196164f5313d..2f117f795d2d 100644
+--- a/arm/selftest.c
++++ b/arm/selftest.c
+@@ -312,9 +312,10 @@ static bool psci_check(void)
+ static cpumask_t smp_reported;
+ static void cpu_report(void)
+ {
++	unsigned long mpidr = get_mpidr();
+ 	int cpu = smp_processor_id();
+ 
+-	report("CPU%d online", true, cpu);
++	report("CPU(%3d) mpidr=%lx", mpidr_to_cpu(mpidr) == cpu, cpu, mpidr);
+ 	cpumask_set_cpu(cpu, &smp_reported);
+ 	halt();
+ }
+@@ -343,6 +344,7 @@ int main(int argc, char **argv)
+ 
+ 	} else if (strcmp(argv[1], "smp") == 0) {
+ 
++		unsigned long mpidr = get_mpidr();
+ 		int cpu;
+ 
+ 		report("PSCI version", psci_check());
+@@ -353,6 +355,7 @@ int main(int argc, char **argv)
+ 			smp_boot_secondary(cpu, cpu_report);
+ 		}
+ 
++		report("CPU(%3d) mpidr=%lx", mpidr_to_cpu(mpidr) == 0, 0, mpidr);
+ 		cpumask_set_cpu(0, &smp_reported);
+ 		while (!cpumask_full(&smp_reported))
+ 			cpu_relax();
+diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+index 02f912f99974..ecf5bbe1824a 100644
+--- a/lib/arm/asm/processor.h
++++ b/lib/arm/asm/processor.h
+@@ -40,8 +40,13 @@ static inline unsigned long get_mpidr(void)
+ 	return mpidr;
+ }
+ 
+-/* Only support Aff0 for now, up to 4 cpus */
+-#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
++#define MPIDR_HWID_BITMASK 0xffffff
++extern int mpidr_to_cpu(unsigned long mpidr);
++
++#define MPIDR_LEVEL_SHIFT(level) \
++	(((1 << level) >> 1) << 3)
++#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
++	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
+ 
+ extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+ extern bool is_user(void);
+diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+index cb8fdbd38dd5..1de99dd184d1 100644
+--- a/lib/arm/asm/setup.h
++++ b/lib/arm/asm/setup.h
+@@ -10,8 +10,8 @@
+ #include <asm/page.h>
+ #include <asm/pgtable-hwdef.h>
+ 
+-#define NR_CPUS			8
+-extern u32 cpus[NR_CPUS];
++#define NR_CPUS			255
++extern u32 cpus[NR_CPUS];	/* per-cpu IDs (MPIDRs) */
+ extern int nr_cpus;
+ 
+ #define NR_MEM_REGIONS		8
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 7e7b39f11dde..241bf9410447 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -30,6 +30,16 @@ int nr_cpus;
+ struct mem_region mem_regions[NR_MEM_REGIONS];
+ phys_addr_t __phys_offset, __phys_end;
+ 
++int mpidr_to_cpu(unsigned long mpidr)
++{
++	int i;
++
++	for (i = 0; i < nr_cpus; ++i)
++		if (cpus[i] == (mpidr & MPIDR_HWID_BITMASK))
++			return i;
++	return -1;
++}
++
+ static void cpu_set(int fdtnode __unused, u32 regval, void *info __unused)
+ {
+ 	int cpu = nr_cpus++;
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index 9a208ff729b7..7e448dc81a6a 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -78,8 +78,13 @@ static inline type get_##reg(void)				\
+ 
+ DEFINE_GET_SYSREG64(mpidr)
+ 
+-/* Only support Aff0 for now, gicv2 only */
+-#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
++#define MPIDR_HWID_BITMASK 0xff00ffffff
++extern int mpidr_to_cpu(unsigned long mpidr);
++
++#define MPIDR_LEVEL_SHIFT(level) \
++	(((1 << level) >> 1) << 3)
++#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
++	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
+ 
+ extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+ extern bool is_user(void);
+-- 
+2.9.3
+
