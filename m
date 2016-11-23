@@ -1,223 +1,208 @@
-From: vijay.kilari@gmail.com
-Subject: [PATCH v9 11/11] arm: vgic: Save and restore GICv3 CPU interface regs
- for AArch32
-Date: Wed, 23 Nov 2016 18:31:58 +0530
-Message-ID: <1479906118-15832-12-git-send-email-vijay.kilari@gmail.com>
-References: <1479906118-15832-1-git-send-email-vijay.kilari@gmail.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v6 00/11] arm/arm64: add gic
+ framework
+Date: Wed, 23 Nov 2016 14:08:04 +0100
+Message-ID: <20161123130804.vurlcbwfv35thdfa@kamzik.brq.redhat.com>
+References: <1479157719-31021-1-git-send-email-drjones@redhat.com>
+ <20161122184511.w5tlxxjphq5fo25b@kamzik.brq.redhat.com>
+ <87shqio6c0.fsf@linaro.org>
+ <cf9a0aab-90cd-c350-d078-9a6bc3ea9fd1@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23451409C6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 08:02:02 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZdZ4Wiv5ysoE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Nov 2016 08:02:01 -0500 (EST)
-Received: from mail-pg0-f67.google.com (mail-pg0-f67.google.com [74.125.83.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8EEE40C35
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 08:02:00 -0500 (EST)
-Received: by mail-pg0-f67.google.com with SMTP id e9so1089843pgc.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 05:02:41 -0800 (PST)
-In-Reply-To: <1479906118-15832-1-git-send-email-vijay.kilari@gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, christoffer.dall@linaro.org, peter.maydell@linaro.org
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <cf9a0aab-90cd-c350-d078-9a6bc3ea9fd1@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+On Wed, Nov 23, 2016 at 12:33:53PM +0100, Auger Eric wrote:
+> Hi,
+> On 23/11/2016 11:09, Alex Bennée wrote:
+> > 
+> > Andrew Jones <drjones@redhat.com> writes:
+> > 
+> >> Andre, Alex, Eric, anybody,
+> >>
+> >> Any more comments on this? If not, I'll send a pull request
+> >> to Radim and Paolo to finally get this merged.
+> > 
+> > Looks good to me. I successfully re-based my TCG tests on top and they
+> > work fine ;-)
+> no blocking point for me either. That's already a huge work and when
+> adding new tests we may end up rationalizing things in separate v2/v3
+> lib files and ops.
+> 
+> Tested on Cavium ThunderX
+> 
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Tested-by: Eric Auger <eric.auger@redhat.com>
 
-Use coproc_reg infrastructure to save and restore CPU
-interface register of GICv3 for AArch32 host.
+Thanks Eric!
 
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
----
- arch/arm/kvm/Makefile                  |   2 +
- virt/kvm/arm/vgic/vgic-coproc-reg-v3.c | 155 +++++++++++++++++++++++++++++++++
- 2 files changed, 157 insertions(+)
+I like your suggestions for "gicv3: add an IPI test", so I'll
+spin a v7.
 
-diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-index d571243..451e666 100644
---- a/arch/arm/kvm/Makefile
-+++ b/arch/arm/kvm/Makefile
-@@ -32,6 +32,8 @@ obj-y += $(KVM)/arm/vgic/vgic-mmio.o
- obj-y += $(KVM)/arm/vgic/vgic-mmio-v2.o
- obj-y += $(KVM)/arm/vgic/vgic-mmio-v3.o
- obj-y += $(KVM)/arm/vgic/vgic-kvm-device.o
-+obj-y += $(KVM)/arm/vgic/vgic-sys-reg-common.o
-+obj-y += $(KVM)/arm/vgic/vgic-coproc-reg-v3.o
- obj-y += $(KVM)/arm/vgic/vgic-its.o
- obj-y += $(KVM)/irqchip.o
- obj-y += $(KVM)/arm/arch_timer.o
-diff --git a/virt/kvm/arm/vgic/vgic-coproc-reg-v3.c b/virt/kvm/arm/vgic/vgic-coproc-reg-v3.c
-new file mode 100644
-index 0000000..25d00e5
---- /dev/null
-+++ b/virt/kvm/arm/vgic/vgic-coproc-reg-v3.c
-@@ -0,0 +1,155 @@
-+/*
-+ * VGIC system registers handling functions
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ */
-+
-+#include <linux/kvm.h>
-+#include <linux/kvm_host.h>
-+#include <kvm/arm_vgic.h>
-+#include <asm/kvm_emulate.h>
-+#include <asm/kvm_arm.h>
-+
-+#include "vgic.h"
-+#include "coproc.h"
-+
-+#define ACCESS_COPROC_REG(REG)						\
-+static bool access_gic_##REG##_coproc_reg(struct kvm_vcpu *vcpu,	\
-+				   struct coproc_params *p,		\
-+				   const struct coproc_reg *r)		\
-+{									\
-+	return  access_gic_##REG##_reg(vcpu, p->is_write, &p->Rt1);	\
-+}
-+
-+ACCESS_COPROC_REG(ctlr)
-+ACCESS_COPROC_REG(pmr)
-+ACCESS_COPROC_REG(bpr0)
-+ACCESS_COPROC_REG(bpr1)
-+ACCESS_COPROC_REG(sre)
-+ACCESS_COPROC_REG(grpen0)
-+ACCESS_COPROC_REG(grpen1)
-+
-+#define ACCESS_COPROC_APNR_REG(REG)					\
-+static bool access_gic_##REG##_coproc_reg(struct kvm_vcpu *vcpu,	\
-+				   struct coproc_params *p,		\
-+				   const struct coproc_reg *r)		\
-+{									\
-+	u8 idx = p->Op2 & 3;						\
-+									\
-+	return access_gic_##REG##_reg(vcpu, p->is_write, idx, &p->Rt1);	\
-+}
-+
-+ACCESS_COPROC_APNR_REG(ap0r)
-+ACCESS_COPROC_APNR_REG(ap1r)
-+
-+static const struct coproc_reg gic_v3_icc_coproc_reg_descs[] = {
-+	/* ICC_PMR_EL1 */
-+	{ CRn(0), CRm(6), Op1(0), Op2(0), is32, access_gic_pmr_coproc_reg },
-+	/* ICC_BPR0_EL1 */
-+	{ CRn(12), CRm(8), Op1(0), Op2(3), is32, access_gic_bpr0_coproc_reg },
-+	/* ICC_AP0R0_EL1 */
-+	{ CRn(12), CRm(8), Op1(0), Op2(4), is32, access_gic_ap0r_coproc_reg },
-+	/* ICC_AP0R1_EL1 */
-+	{ CRn(12), CRm(8), Op1(0), Op2(5), is32, access_gic_ap0r_coproc_reg },
-+	/* ICC_AP0R2_EL1 */
-+	{ CRn(12), CRm(8), Op1(0), Op2(6), is32, access_gic_ap0r_coproc_reg },
-+	/* ICC_AP0R3_EL1 */
-+	{ CRn(12), CRm(8), Op1(0), Op2(7), is32, access_gic_ap0r_coproc_reg },
-+	/* ICC_AP1R0_EL1 */
-+	{ CRn(12), CRm(9), Op1(0), Op2(0), is32, access_gic_ap1r_coproc_reg },
-+	/* ICC_AP1R1_EL1 */
-+	{ CRn(12), CRm(9), Op1(0), Op2(1), is32, access_gic_ap1r_coproc_reg },
-+	/* ICC_AP1R2_EL1 */
-+	{ CRn(12), CRm(9), Op1(0), Op2(2), is32, access_gic_ap1r_coproc_reg },
-+	/* ICC_AP1R3_EL1 */
-+	{ CRn(12), CRm(9), Op1(0), Op2(3), is32, access_gic_ap1r_coproc_reg },
-+	/* ICC_BPR1_EL1 */
-+	{ CRn(12), CRm(12), Op1(0), Op2(3), is32, access_gic_bpr1_coproc_reg },
-+	/* ICC_CTLR_EL1 */
-+	{ CRn(12), CRm(12), Op1(0), Op2(4), is32, access_gic_ctlr_coproc_reg },
-+	/* ICC_SRE_EL1 */
-+	{ CRn(12), CRm(12), Op1(0), Op2(5), is32, access_gic_sre_coproc_reg },
-+	/* ICC_IGRPEN0_EL1 */
-+	{ CRn(12), CRm(12), Op1(0), Op2(6), is32,
-+	  access_gic_grpen0_coproc_reg },
-+	/* ICC_GRPEN1_EL1 */
-+	{ CRn(12), CRm(12), Op1(0), Op2(7), is32,
-+	  access_gic_grpen1_coproc_reg },
-+};
-+
-+
-+#define KVM_DEV_ARM_VGIC_COPROC_MASK 0x3fff
-+
-+/* As per Documentation/virtual/kvm/devices/arm-vgic-v3.txt,
-+ * CPUREGs id is passed in AArch64 system register encoding format.
-+ * Format to COPROC register format for AArch32 mode before using.
-+ */
-+static u64 vgic_to_cpreg(u64 id)
-+{
-+	u64 cpreg = 0;
-+
-+	id = id & KVM_DEV_ARM_VGIC_COPROC_MASK;
-+	cpreg = ((id & KVM_REG_ARM_VGIC_SYSREG_OP2_MASK) >>
-+		  KVM_REG_ARM_VGIC_SYSREG_OP2_SHIFT) <<
-+		  KVM_REG_ARM_32_OPC2_SHIFT;
-+	cpreg |= ((id & KVM_REG_ARM_VGIC_SYSREG_CRM_MASK) >>
-+		  KVM_REG_ARM_VGIC_SYSREG_CRM_SHIFT) << KVM_REG_ARM_CRM_SHIFT;
-+	cpreg |= ((id & KVM_REG_ARM_VGIC_SYSREG_CRN_MASK) >>
-+		   KVM_REG_ARM_VGIC_SYSREG_CRN_SHIFT) <<
-+		   KVM_REG_ARM_32_CRN_SHIFT;
-+	cpreg |= ((id & KVM_REG_ARM_VGIC_SYSREG_OP1_MASK) >>
-+		   KVM_REG_ARM_VGIC_SYSREG_OP1_SHIFT) << KVM_REG_ARM_OPC1_SHIFT;
-+	id |= (KVM_REG_ARM_COPROC_MASK | KVM_REG_SIZE_U32);
-+
-+	return cpreg;
-+}
-+
-+int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
-+				 u64 *reg)
-+{
-+	struct coproc_params params;
-+	u64 cpreg = vgic_to_cpreg(id);
-+
-+	params.Rt1 = *reg;
-+	params.is_write = is_write;
-+	params.is_64bit = false;
-+
-+	if (find_coproc_reg_by_id(cpreg, &params, gic_v3_icc_coproc_reg_descs,
-+				  ARRAY_SIZE(gic_v3_icc_coproc_reg_descs)))
-+		return 0;
-+
-+	return -ENOENT;
-+}
-+
-+int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write, u64 id,
-+				u64 *reg)
-+{
-+	struct coproc_params params;
-+	const struct coproc_reg *r;
-+	u64 cpreg = vgic_to_cpreg(id);
-+
-+	if (is_write)
-+		params.Rt1 = *reg;
-+	params.is_write = is_write;
-+	params.is_64bit = false;
-+
-+	r = find_coproc_reg_by_id(cpreg, &params, gic_v3_icc_coproc_reg_descs,
-+				  ARRAY_SIZE(gic_v3_icc_coproc_reg_descs));
-+	if (!r)
-+		return -ENXIO;
-+
-+	if (!r->access(vcpu, &params, r))
-+		return -EINVAL;
-+
-+	if (!is_write)
-+		*reg = params.Rt1;
-+
-+	return 0;
-+}
--- 
-1.9.1
+drew
+
+> 
+> Thanks
+> 
+> Eric
+> 
+> 
+> > 
+> > Tested-by: Alex Bennée <alex.bennee@linaro.org>
+> > 
+> >>
+> >> Thanks,
+> >> drew
+> >>
+> >>
+> >> On Mon, Nov 14, 2016 at 10:08:28PM +0100, Andrew Jones wrote:
+> >>> v6:
+> >>>  - rebased to latest master
+> >>>  - several other changes thanks to Andre and Alex, changes in
+> >>>    individual patch change logs
+> >>>  - some code cleanups
+> >>>
+> >>> v5:
+> >>>  - fix arm32/gicv3 compile [drew]
+> >>>  - use modern register names [Andre]
+> >>>  - one Andre r-b
+> >>>
+> >>> v4:
+> >>>  - Eric's r-b's
+> >>>  - Andre's suggestion to only take defines we need
+> >>>  - several other changes listed in individual patches
+> >>>
+> >>> v3:
+> >>>  - Rebased on latest master
+> >>>  - Added Alex's r-b's
+> >>>
+> >>> v2:
+> >>>  Rebased on latest master + my "populate argv[0]" series (will
+> >>>  send a REPOST for that shortly. Additionally a few patches got
+> >>>  fixes/features;
+> >>>  07/10 got same fix as kernel 7c9b973061 "irqchip/gic-v3: Configure
+> >>>        all interrupts as non-secure Group-1" in order to continue
+> >>>        working over TCG, as the gicv3 code for TCG removed a hack
+> >>>        it had there to make Linux happy.
+> >>>  08/10 added more output for when things fail (if they fail)
+> >>>  09/10 switched gicv3 broadcast implementation to using IRM. This
+> >>>        found a bug in a recent (but not tip) kernel, which I was
+> >>>        about to fix, but then I saw MarcZ beat me to it.
+> >>>  10/10 actually check that the input irq is the received irq
+> >>>
+> >>>
+> >>> Import defines, and steal enough helper functions, from Linux to
+> >>> enable programming of the gic (v2 and v3). Then use the framework
+> >>> to add an initial test (an ipi test; self, target-list, broadcast).
+> >>>
+> >>> It's my hope that this framework will be a suitable base on which
+> >>> more tests may be easily added, particularly because we have
+> >>> vgic-new and tcg gicv3 emulation getting close to merge. (v3 UPDATE:
+> >>> vgic-new and tcg gicv3 are merged now)
+> >>>
+> >>> To run it, along with other tests, just do
+> >>>
+> >>>  ./configure [ --arch=[arm|arm64] --cross-prefix=$PREFIX ]
+> >>>  make
+> >>>  export QEMU=$PATH_TO_QEMU
+> >>>  ./run_tests.sh
+> >>>
+> >>> To run it separately do, e.g.
+> >>>
+> >>> $QEMU -machine virt,accel=tcg -cpu cortex-a57 \
+> >>>  -device virtio-serial-device \
+> >>>  -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+> >>>  -display none -serial stdio \
+> >>>  -kernel arm/gic.flat \
+> >>>  -smp 123 -machine gic-version=3 -append ipi
+> >>>       ^^ note, we can go nuts with nr-cpus on TCG :-)
+> >>>
+> >>> Or, a KVM example using a different "sender" cpu and irq (other than zero)
+> >>>
+> >>> $QEMU -machine virt,accel=kvm -cpu host \
+> >>>  -device virtio-serial-device \
+> >>>  -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+> >>>  -display none -serial stdio \
+> >>>  -kernel arm/gic.flat \
+> >>>  -smp 48 -machine gic-version=3 -append 'ipi sender=42 irq=1'
+> >>>
+> >>>
+> >>> Patches:
+> >>> 01-05: fixes and functionality needed by the later gic patches
+> >>> 06-07: enable gicv2 and gicv2 IPI test
+> >>> 08-10: enable gicv3 and gicv3 IPI test
+> >>>    11: extend the IPI tests to take variable sender and irq
+> >>>
+> >>> Available here: https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic-v6
+> >>>
+> >>>
+> >>> Andrew Jones (10):
+> >>>   lib: xstr: allow multiple args
+> >>>   arm64: fix get_"sysreg32" and make MPIDR 64bit
+> >>>   arm/arm64: smp: support more than 8 cpus
+> >>>   arm/arm64: add some delay routines
+> >>>   arm/arm64: irq enable/disable
+> >>>   arm/arm64: add initial gicv2 support
+> >>>   arm/arm64: gicv2: add an IPI test
+> >>>   arm/arm64: add initial gicv3 support
+> >>>   arm/arm64: gicv3: add an IPI test
+> >>>   arm/arm64: gic: don't just use zero
+> >>>
+> >>> Peter Xu (1):
+> >>>   libcflat: add IS_ALIGNED() macro, and page sizes
+> >>>
+> >>>  arm/Makefile.common        |   9 +-
+> >>>  arm/gic.c                  | 340 +++++++++++++++++++++++++++++++++++++++++++++
+> >>>  arm/run                    |  19 ++-
+> >>>  arm/selftest.c             |   5 +-
+> >>>  arm/unittests.cfg          |  14 ++
+> >>>  lib/arm/asm/arch_gicv3.h   |  70 ++++++++++
+> >>>  lib/arm/asm/gic-v2.h       |  36 +++++
+> >>>  lib/arm/asm/gic-v3.h       | 112 +++++++++++++++
+> >>>  lib/arm/asm/gic.h          | 106 ++++++++++++++
+> >>>  lib/arm/asm/processor.h    |  42 +++++-
+> >>>  lib/arm/asm/setup.h        |   4 +-
+> >>>  lib/arm/gic.c              | 267 +++++++++++++++++++++++++++++++++++
+> >>>  lib/arm/processor.c        |  15 ++
+> >>>  lib/arm/setup.c            |  10 ++
+> >>>  lib/arm64/asm/arch_gicv3.h |  66 +++++++++
+> >>>  lib/arm64/asm/gic-v2.h     |   1 +
+> >>>  lib/arm64/asm/gic-v3.h     |   1 +
+> >>>  lib/arm64/asm/gic.h        |   1 +
+> >>>  lib/arm64/asm/processor.h  |  53 +++++--
+> >>>  lib/arm64/asm/sysreg.h     |  44 ++++++
+> >>>  lib/arm64/processor.c      |  15 ++
+> >>>  lib/libcflat.h             |  10 +-
+> >>>  22 files changed, 1212 insertions(+), 28 deletions(-)
+> >>>  create mode 100644 arm/gic.c
+> >>>  create mode 100644 lib/arm/asm/arch_gicv3.h
+> >>>  create mode 100644 lib/arm/asm/gic-v2.h
+> >>>  create mode 100644 lib/arm/asm/gic-v3.h
+> >>>  create mode 100644 lib/arm/asm/gic.h
+> >>>  create mode 100644 lib/arm/gic.c
+> >>>  create mode 100644 lib/arm64/asm/arch_gicv3.h
+> >>>  create mode 100644 lib/arm64/asm/gic-v2.h
+> >>>  create mode 100644 lib/arm64/asm/gic-v3.h
+> >>>  create mode 100644 lib/arm64/asm/gic.h
+> >>>  create mode 100644 lib/arm64/asm/sysreg.h
+> >>>
+> >>> --
+> >>> 2.7.4
+> >>>
+> >>>
+> > 
+> > 
+> > --
+> > Alex Bennée
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe kvm" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> > 
+> 
