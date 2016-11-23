@@ -1,207 +1,159 @@
-From: Wei Huang <wei@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v11 1/3] arm: Add PMU test
-Date: Wed, 23 Nov 2016 09:47:27 -0600
-Message-ID: <193adbc7-d76b-e2c7-e30b-40b4ff9694fd@redhat.com>
-References: <1479839354-22061-1-git-send-email-wei@redhat.com>
- <1479839354-22061-2-git-send-email-wei@redhat.com>
- <576a5d79-874a-e5fe-6a0d-7af2a3ea4d46@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v7 00/11] arm/arm64: add gic framework
+Date: Wed, 23 Nov 2016 17:53:55 +0100
+Message-ID: <20161123165406.32661-1-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B6FF40A66
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 10:46:54 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2AhjEHlPBYSV for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Nov 2016 10:46:51 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C00140A53
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 10:46:51 -0500 (EST)
-In-Reply-To: <576a5d79-874a-e5fe-6a0d-7af2a3ea4d46@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, cov@codeaurora.org
-Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+v7:
+ - biggest change is splitting lib/arm/gic.c into lib/arm/gic.c,
+   lib/arm/gic-v2.c, lib/arm/gic-v3.c
+ - second biggest change, which probably affects Alex, is that
+   gic_ipi_send(cpu, irq) changed to gic_ipi_send_single(irq, cpu),
+   note the swapping of cpu and irq!
+ - other changes thanks to Eric are noted in individual patches
+ - also rebased to latest master
+
+v6:
+ - rebased to latest master
+ - several other changes thanks to Andre and Alex, changes in
+   individual patch change logs
+ - some code cleanups
+
+v5:
+ - fix arm32/gicv3 compile [drew]
+ - use modern register names [Andre]
+ - one Andre r-b
+
+v4:
+ - Eric's r-b's
+ - Andre's suggestion to only take defines we need
+ - several other changes listed in individual patches
+
+v3:
+ - Rebased on latest master
+ - Added Alex's r-b's
+
+v2:
+ Rebased on latest master + my "populate argv[0]" series (will
+ send a REPOST for that shortly. Additionally a few patches got
+ fixes/features;
+ 07/10 got same fix as kernel 7c9b973061 "irqchip/gic-v3: Configure
+       all interrupts as non-secure Group-1" in order to continue
+       working over TCG, as the gicv3 code for TCG removed a hack
+       it had there to make Linux happy.
+ 08/10 added more output for when things fail (if they fail)
+ 09/10 switched gicv3 broadcast implementation to using IRM. This
+       found a bug in a recent (but not tip) kernel, which I was
+       about to fix, but then I saw MarcZ beat me to it.
+ 10/10 actually check that the input irq is the received irq
 
 
-On 11/23/2016 07:16 AM, Andre Przywara wrote:
-> Hi,
-> 
-> On 22/11/16 18:29, Wei Huang wrote:
->> From: Christopher Covington <cov@codeaurora.org>
->>
->> Beginning with a simple sanity check of the control register, add
->> a unit test for the ARM Performance Monitors Unit (PMU).
-> 
-> Mmh, the output of this is a bit confusing. How about to join some
-> information? I changed it to give me:
-> INFO: pmu: PMU implementer/ID code:     "A"(0x41)/0x0
-> INFO: pmu: Event counters:      0
-> PASS: pmu: Control register
-> 
-> ... by using the newly introduced report_info() to make it look nicer.
-> 
->>
->> Signed-off-by: Christopher Covington <cov@codeaurora.org>
->> Signed-off-by: Wei Huang <wei@redhat.com>
->> Reviewed-by: Andrew Jones <drjones@redhat.com>
->> ---
->>  arm/Makefile.common |  3 ++-
->>  arm/pmu.c           | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  arm/unittests.cfg   |  5 ++++
->>  3 files changed, 81 insertions(+), 1 deletion(-)
->>  create mode 100644 arm/pmu.c
->>
->> diff --git a/arm/Makefile.common b/arm/Makefile.common
->> index f37b5c2..5da2fdd 100644
->> --- a/arm/Makefile.common
->> +++ b/arm/Makefile.common
->> @@ -12,7 +12,8 @@ endif
->>  tests-common = \
->>  	$(TEST_DIR)/selftest.flat \
->>  	$(TEST_DIR)/spinlock-test.flat \
->> -	$(TEST_DIR)/pci-test.flat
->> +	$(TEST_DIR)/pci-test.flat \
->> +	$(TEST_DIR)/pmu.flat
->>  
->>  all: test_cases
->>  
->> diff --git a/arm/pmu.c b/arm/pmu.c
->> new file mode 100644
->> index 0000000..9d9c53b
->> --- /dev/null
->> +++ b/arm/pmu.c
->> @@ -0,0 +1,74 @@
->> +/*
->> + * Test the ARM Performance Monitors Unit (PMU).
->> + *
->> + * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
->> + *
->> + * This program is free software; you can redistribute it and/or modify it
->> + * under the terms of the GNU Lesser General Public License version 2.1 and
->> + * only version 2.1 as published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful, but WITHOUT
->> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
->> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
->> + * for more details.
->> + */
->> +#include "libcflat.h"
->> +#include "asm/barrier.h"
->> +
->> +#define PMU_PMCR_N_SHIFT   11
->> +#define PMU_PMCR_N_MASK    0x1f
->> +#define PMU_PMCR_ID_SHIFT  16
->> +#define PMU_PMCR_ID_MASK   0xff
->> +#define PMU_PMCR_IMP_SHIFT 24
->> +#define PMU_PMCR_IMP_MASK  0xff
->> +
->> +#if defined(__arm__)
-> 
-> I guess you should use the arch specific header files we have in place
-> for that (lib/arm{.64}/asm/processor.h). Also there are sysreg read
-> wrappers (at least for arm64) in there already, can't we base this
-> function on them: DEFINE_GET_SYSREG32(pmcr, el0)?
-> (Requires a small change to get rid of the forced "_el1" suffix)
-> 
-> We should wait for the GIC series to be merged, as this contains some
-> changes in this area.
+Import defines, and steal enough helper functions, from Linux to
+enable programming of the gic (v2 and v3). Then use the framework
+to add an initial test (an ipi test; self, target-list, broadcast).
 
-We planned to add it after this series is merged. However if GIC series
-has a similar support, we can piggy-back on it.
+It's my hope that this framework will be a suitable base on which
+more tests may be easily added, particularly because we have
+vgic-new and tcg gicv3 emulation getting close to merge. (v3 UPDATE:
+vgic-new and tcg gicv3 are merged now)
 
-> 
->> +static inline uint32_t pmcr_read(void)
->> +{
->> +	uint32_t ret;
->> +
->> +	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
->> +	return ret;
->> +}
->> +#elif defined(__aarch64__)
->> +static inline uint32_t pmcr_read(void)
->> +{
->> +	uint32_t ret;
->> +
->> +	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
->> +	return ret;
->> +}
->> +#endif
->> +
->> +/*
->> + * As a simple sanity check on the PMCR_EL0, ensure the implementer field isn't
->> + * null. Also print out a couple other interesting fields for diagnostic
->> + * purposes. For example, as of fall 2016, QEMU TCG mode doesn't implement
->> + * event counters and therefore reports zero event counters, but hopefully
->> + * support for at least the instructions event will be added in the future and
->> + * the reported number of event counters will become nonzero.
->> + */
->> +static bool check_pmcr(void)
->> +{
->> +	uint32_t pmcr;
->> +
->> +	pmcr = pmcr_read();
->> +
->> +	printf("PMU implementer:     %c\n",
->> +	       (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK);
-> 
-> If this register reads as zero, the output is mangled (since it cuts off
-> the string before the newline):
-> =====
-> PMU implementer:     Identification code: 0x0
-> =====
-> 
-> I guess you need something like:
-> (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK ?: ' '
-> 
->> +	printf("Identification code: 0x%x\n",
->> +	       (pmcr >> PMU_PMCR_ID_SHIFT) & PMU_PMCR_ID_MASK);
-> 
-> As mentioned above this should use report_info() now, also it would be
-> nice to merge this with the message above into one line of output.
+To run it, along with other tests, just do
 
-I will take them into consideration. Thanks.
+ ./configure [ --arch=[arm|arm64] --cross-prefix=$PREFIX ]
+ make
+ export QEMU=$PATH_TO_QEMU
+ ./run_tests.sh
 
-> 
-> Cheers,
-> Andre
-> 
->> +	printf("Event counters:      %d\n",
->> +	       (pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK);
->> +
->> +	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
->> +}
->> +
->> +int main(void)
->> +{
->> +	report_prefix_push("pmu");
->> +
->> +	report("Control register", check_pmcr());
->> +
->> +	return report_summary();
->> +}
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index ae32a42..816f494 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -58,3 +58,8 @@ groups = selftest
->>  [pci-test]
->>  file = pci-test.flat
->>  groups = pci
->> +
->> +# Test PMU support
->> +[pmu]
->> +file = pmu.flat
->> +groups = pmu
->>
+To run it separately do, e.g.
+
+$QEMU -machine virt,accel=tcg -cpu cortex-a57 \
+ -device virtio-serial-device \
+ -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+ -display none -serial stdio \
+ -kernel arm/gic.flat \
+ -smp 123 -machine gic-version=3 -append ipi
+      ^^ note, we can go nuts with nr-cpus on TCG :-)
+
+Or, a KVM example using a different "sender" cpu and irq (other than zero)
+
+$QEMU -machine virt,accel=kvm -cpu host \
+ -device virtio-serial-device \
+ -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+ -display none -serial stdio \
+ -kernel arm/gic.flat \
+ -smp 48 -machine gic-version=3 -append 'ipi sender=42 irq=1'
+
+
+Patches:
+01-05: fixes and functionality needed by the later gic patches
+06-07: enable gicv2 and gicv2 IPI test
+08-10: enable gicv3 and gicv3 IPI test
+   11: extend the IPI tests to take variable sender and irq
+
+Available here: https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic-v7
+
+
+Andrew Jones (10):
+  lib: xstr: allow multiple args
+  arm64: fix get_"sysreg32" and make MPIDR 64bit
+  arm/arm64: smp: support more than 8 cpus
+  arm/arm64: add some delay routines
+  arm/arm64: irq enable/disable
+  arm/arm64: add initial gicv2 support
+  arm/arm64: gicv2: add an IPI test
+  arm/arm64: add initial gicv3 support
+  arm/arm64: gicv3: add an IPI test
+  arm/arm64: gic: don't just use zero
+
+Peter Xu (1):
+  libcflat: add IS_ALIGNED() macro, and page sizes
+
+ arm/Makefile.common        |   9 +-
+ arm/gic.c                  | 349 +++++++++++++++++++++++++++++++++++++++++++++
+ arm/run                    |  19 ++-
+ arm/selftest.c             |   5 +-
+ arm/unittests.cfg          |  14 ++
+ lib/arm/asm/arch_gicv3.h   |  70 +++++++++
+ lib/arm/asm/gic-v2.h       |  38 +++++
+ lib/arm/asm/gic-v3.h       | 114 +++++++++++++++
+ lib/arm/asm/gic.h          | 109 ++++++++++++++
+ lib/arm/asm/processor.h    |  42 +++++-
+ lib/arm/asm/setup.h        |   4 +-
+ lib/arm/gic-v2.c           |  67 +++++++++
+ lib/arm/gic-v3.c           | 155 ++++++++++++++++++++
+ lib/arm/gic.c              |  71 +++++++++
+ lib/arm/processor.c        |  15 ++
+ lib/arm/setup.c            |  10 ++
+ lib/arm64/asm/arch_gicv3.h |  66 +++++++++
+ lib/arm64/asm/gic-v2.h     |   1 +
+ lib/arm64/asm/gic-v3.h     |   1 +
+ lib/arm64/asm/gic.h        |   1 +
+ lib/arm64/asm/processor.h  |  53 +++++--
+ lib/arm64/asm/sysreg.h     |  44 ++++++
+ lib/arm64/processor.c      |  15 ++
+ lib/libcflat.h             |  10 +-
+ 24 files changed, 1254 insertions(+), 28 deletions(-)
+ create mode 100644 arm/gic.c
+ create mode 100644 lib/arm/asm/arch_gicv3.h
+ create mode 100644 lib/arm/asm/gic-v2.h
+ create mode 100644 lib/arm/asm/gic-v3.h
+ create mode 100644 lib/arm/asm/gic.h
+ create mode 100644 lib/arm/gic-v2.c
+ create mode 100644 lib/arm/gic-v3.c
+ create mode 100644 lib/arm/gic.c
+ create mode 100644 lib/arm64/asm/arch_gicv3.h
+ create mode 100644 lib/arm64/asm/gic-v2.h
+ create mode 100644 lib/arm64/asm/gic-v3.h
+ create mode 100644 lib/arm64/asm/gic.h
+ create mode 100644 lib/arm64/asm/sysreg.h
+
+-- 
+2.9.3
+
