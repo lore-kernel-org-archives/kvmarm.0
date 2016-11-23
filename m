@@ -1,29 +1,25 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH 3/4] arm/arm64: GICv2: add
- GICD_ITARGETSR testing
-Date: Wed, 23 Nov 2016 15:57:45 +0100
-Message-ID: <09a765df-16fd-0161-2b04-833aa8b18521@redhat.com>
-References: <20161117175752.16475-1-andre.przywara@arm.com>
- <20161117175752.16475-4-andre.przywara@arm.com>
- <20161118142008.osvculf5y3tfxvdv@kamzik.brq.redhat.com>
- <d2ff98ec-7bf0-46b5-35e1-6d41ef11996f@redhat.com>
- <2df007cd-bfde-e79a-46c8-f0a399cd7bd9@redhat.com>
- <fe1c40e7-9edb-51e2-5963-76f4ee955415@arm.com>
+From: Wei Huang <wei@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v11 1/3] arm: Add PMU test
+Date: Wed, 23 Nov 2016 09:47:27 -0600
+Message-ID: <193adbc7-d76b-e2c7-e30b-40b4ff9694fd@redhat.com>
+References: <1479839354-22061-1-git-send-email-wei@redhat.com>
+ <1479839354-22061-2-git-send-email-wei@redhat.com>
+ <576a5d79-874a-e5fe-6a0d-7af2a3ea4d46@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D8E5240C2D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 09:57:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B6FF40A66
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 10:46:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yu1lcpOiXYUL for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Nov 2016 09:57:09 -0500 (EST)
+ with ESMTP id 2AhjEHlPBYSV for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Nov 2016 10:46:51 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3AAE40C2A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 09:57:09 -0500 (EST)
-In-Reply-To: <fe1c40e7-9edb-51e2-5963-76f4ee955415@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C00140A53
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 10:46:51 -0500 (EST)
+In-Reply-To: <576a5d79-874a-e5fe-6a0d-7af2a3ea4d46@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,175 +29,179 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>, cov@codeaurora.org
+Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
-On 23/11/2016 15:13, Andre Przywara wrote:
-> Hi Eric,
+
+
+On 11/23/2016 07:16 AM, Andre Przywara wrote:
+> Hi,
 > 
-> thanks for having such a close look (as always!).
-> 
-> On 23/11/16 13:51, Auger Eric wrote:
->> Hi Andre,
+> On 22/11/16 18:29, Wei Huang wrote:
+>> From: Christopher Covington <cov@codeaurora.org>
 >>
->> On 23/11/2016 14:24, Auger Eric wrote:
->>> Hi,
->>>
->>> On 18/11/2016 15:20, Andrew Jones wrote:
->>>> On Thu, Nov 17, 2016 at 05:57:51PM +0000, Andre Przywara wrote:
->>>>> Some tests for the ITARGETS registers.
->>>>> Bits corresponding to non-existent CPUs must be RAZ/WI.
->>>>> These registers must be byte-accessible, also check that accesses beyond
->>>>> the implemented IRQ limit are actually read-as-zero/write-ignore.
->>>>>
->>>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>>>> ---
->>>>>  arm/gic.c         | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>>  lib/arm/asm/gic.h |  1 +
->>>>>  2 files changed, 55 insertions(+)
->>>>>
->>>>> diff --git a/arm/gic.c b/arm/gic.c
->>>>> index a27da2c..02b1be1 100644
->>>>> --- a/arm/gic.c
->>>>> +++ b/arm/gic.c
->>>>> @@ -397,6 +397,57 @@ static bool test_priorities(int nr_irqs, void *priptr)
->>>>>  	return true;
->>>>>  }
->>>>>  
->>>>> +static bool test_targets(int nr_irqs)
->>>>> +{
->>>>> +	void *targetsptr = gicv2_dist_base() + GICD_ITARGETSR;
->>>>> +	u32 orig_targets;
->>>>> +	u32 cpu_mask;
->>>>> +	u32 pattern, reg;
->>>>> +
->>>>> +	orig_targets = readl(targetsptr + 32);
->>>>> +	report_prefix_push("ITARGETSR");
->>>>> +
->>>>> +	cpu_mask = (1 << nr_cpus) - 1;
->>>>
->>>> Shouldn't this be 1 << (nr_cpus - 1) ?
->>> original looks correct to me.
->>>>
->>>> Is this test always going to be gicv2-only? We should probably comment it,
->>>> if so. We don't want to risk this being run when nr_cpus can be larger
->>>> than 8.
->>>>
->>>>> +	cpu_mask |= cpu_mask << 8;
+>> Beginning with a simple sanity check of the control register, add
+>> a unit test for the ARM Performance Monitors Unit (PMU).
 > 
-> So this instruction is supposed to copy bits[7:0] into bits[15:8] (not
-> caring about the other bits, which are zero anyway).
+> Mmh, the output of this is a bit confusing. How about to join some
+> information? I changed it to give me:
+> INFO: pmu: PMU implementer/ID code:     "A"(0x41)/0x0
+> INFO: pmu: Event counters:      0
+> PASS: pmu: Control register
 > 
->>>>> +	cpu_mask |= cpu_mask << 16;
+> ... by using the newly introduced report_info() to make it look nicer.
 > 
-> And this one copies bits[15:0] into bits[31:16].
-> 
->>> Don't we miss the 4th byte mask?
-> 
-> I don't think so, the idea is just to copy the lowest byte into all the
-> other three bytes of that word and thus to propagate the byte mask for
-> one IRQ into a word covering four interrupts. Does that make sense?
-
-Hum yes that's fully correct. Sorry for the noise.
-> I take it this deserves a comment then ...
-> 
->>>>> +
->>>>> +	/* Check that bits for non implemented CPUs are RAZ/WI. */
->>>>> +	if (nr_cpus < 8) {
->>>>> +		writel(0xffffffff, targetsptr + 32);
->>>>> +		report("bits for %d non-existent CPUs masked",
->>>>> +		       !(readl(targetsptr + 32) & ~cpu_mask), 8 - nr_cpus);
 >>
->> yep on AMD overdrive with smp=4 I get:
+>> Signed-off-by: Christopher Covington <cov@codeaurora.org>
+>> Signed-off-by: Wei Huang <wei@redhat.com>
+>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>> ---
+>>  arm/Makefile.common |  3 ++-
+>>  arm/pmu.c           | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  arm/unittests.cfg   |  5 ++++
+>>  3 files changed, 81 insertions(+), 1 deletion(-)
+>>  create mode 100644 arm/pmu.c
 >>
->> FAIL: gicv2: mmio: ITARGETSR: bits for 4 non-existent CPUs masked
+>> diff --git a/arm/Makefile.common b/arm/Makefile.common
+>> index f37b5c2..5da2fdd 100644
+>> --- a/arm/Makefile.common
+>> +++ b/arm/Makefile.common
+>> @@ -12,7 +12,8 @@ endif
+>>  tests-common = \
+>>  	$(TEST_DIR)/selftest.flat \
+>>  	$(TEST_DIR)/spinlock-test.flat \
+>> -	$(TEST_DIR)/pci-test.flat
+>> +	$(TEST_DIR)/pci-test.flat \
+>> +	$(TEST_DIR)/pmu.flat
+>>  
+>>  all: test_cases
+>>  
+>> diff --git a/arm/pmu.c b/arm/pmu.c
+>> new file mode 100644
+>> index 0000000..9d9c53b
+>> --- /dev/null
+>> +++ b/arm/pmu.c
+>> @@ -0,0 +1,74 @@
+>> +/*
+>> + * Test the ARM Performance Monitors Unit (PMU).
+>> + *
+>> + * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify it
+>> + * under the terms of the GNU Lesser General Public License version 2.1 and
+>> + * only version 2.1 as published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful, but WITHOUT
+>> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+>> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+>> + * for more details.
+>> + */
+>> +#include "libcflat.h"
+>> +#include "asm/barrier.h"
+>> +
+>> +#define PMU_PMCR_N_SHIFT   11
+>> +#define PMU_PMCR_N_MASK    0x1f
+>> +#define PMU_PMCR_ID_SHIFT  16
+>> +#define PMU_PMCR_ID_MASK   0xff
+>> +#define PMU_PMCR_IMP_SHIFT 24
+>> +#define PMU_PMCR_IMP_MASK  0xff
+>> +
+>> +#if defined(__arm__)
 > 
-> I guess because you don't have
-> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-November/468296.html
-> in your host kernel?
-> This was one of the two genuine bugs I spotted with this.
+> I guess you should use the arch specific header files we have in place
+> for that (lib/arm{.64}/asm/processor.h). Also there are sysreg read
+> wrappers (at least for arm64) in there already, can't we base this
+> function on them: DEFINE_GET_SYSREG32(pmcr, el0)?
+> (Requires a small change to get rid of the forced "_el1" suffix)
+> 
+> We should wait for the GIC series to be merged, as this contains some
+> changes in this area.
 
-Ah ok cool!
+We planned to add it after this series is merged. However if GIC series
+has a similar support, we can piggy-back on it.
 
-Cheers
+> 
+>> +static inline uint32_t pmcr_read(void)
+>> +{
+>> +	uint32_t ret;
+>> +
+>> +	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
+>> +	return ret;
+>> +}
+>> +#elif defined(__aarch64__)
+>> +static inline uint32_t pmcr_read(void)
+>> +{
+>> +	uint32_t ret;
+>> +
+>> +	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
+>> +	return ret;
+>> +}
+>> +#endif
+>> +
+>> +/*
+>> + * As a simple sanity check on the PMCR_EL0, ensure the implementer field isn't
+>> + * null. Also print out a couple other interesting fields for diagnostic
+>> + * purposes. For example, as of fall 2016, QEMU TCG mode doesn't implement
+>> + * event counters and therefore reports zero event counters, but hopefully
+>> + * support for at least the instructions event will be added in the future and
+>> + * the reported number of event counters will become nonzero.
+>> + */
+>> +static bool check_pmcr(void)
+>> +{
+>> +	uint32_t pmcr;
+>> +
+>> +	pmcr = pmcr_read();
+>> +
+>> +	printf("PMU implementer:     %c\n",
+>> +	       (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK);
+> 
+> If this register reads as zero, the output is mangled (since it cuts off
+> the string before the newline):
+> =====
+> PMU implementer:     Identification code: 0x0
+> =====
+> 
+> I guess you need something like:
+> (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK ?: ' '
+> 
+>> +	printf("Identification code: 0x%x\n",
+>> +	       (pmcr >> PMU_PMCR_ID_SHIFT) & PMU_PMCR_ID_MASK);
+> 
+> As mentioned above this should use report_info() now, also it would be
+> nice to merge this with the message above into one line of output.
 
-Eric
+I will take them into consideration. Thanks.
+
 > 
 > Cheers,
-> Andre.
+> Andre
 > 
->>>>> +	} else {
->>>>> +		report_skip("CPU masking (all CPUs implemented)");
->>>>> +	}
->>>>> +
->>>>> +	report("accesses beyond limit RAZ/WI",
->>>>> +	       test_readonly_32(targetsptr + nr_irqs, true));
->>>>> +
->>>>> +	pattern = 0x0103020f;
->>>>> +	writel(pattern, targetsptr + 32);
->>>>> +	reg = readl(targetsptr + 32);
->>>>> +	report("register content preserved (%08x => %08x)",
->>>>> +	       reg == (pattern & cpu_mask), pattern & cpu_mask, reg);
->>>>> +
->>>>> +	/*
->>>>> +	 * The TARGETS registers are byte accessible, do a byte-wide
->>>>> +	 * read and write of known content to check for this.
->>>>> +	 */
->>>>> +	reg = readb(targetsptr + 33);
->>>>> +	report("byte reads successful (0x%08x => 0x%02x)",
->>>>> +	       reg == (BYTE(pattern, 1) & cpu_mask),
->>>>> +	       pattern & cpu_mask, reg);
->>>>> +
->>>>> +	pattern = REPLACE_BYTE(pattern, 2, 0x04);
->>>>> +	writeb(BYTE(pattern, 2), targetsptr + 34);
->>>>> +	reg = readl(targetsptr + 32);
->>>>> +	report("byte writes successful (0x%02x => 0x%08x)",
->>>>> +	       reg == (pattern & cpu_mask), BYTE(pattern, 2), reg);
->>>>
->>>> Last patch also had a byte addressability test. Maybe we should make
->>>> a helper function?
->>>>
->>>>> +
->>>>> +	writel(orig_targets, targetsptr + 32);
->>>>> +	return true;
->>>>
->>>> Function can/should be void.
->>>>
->>>>> +}
->>>>> +
->>>>>  static int gic_test_mmio(int gic_version)
->>>>>  {
->>>>>  	u32 reg;
->>>>> @@ -436,6 +487,9 @@ static int gic_test_mmio(int gic_version)
->>>>>  
->>>>>  	test_priorities(nr_irqs, gic_dist_base + GICD_IPRIORITYR);
->>>>>  
->>>>> +	if (gic_version == 2)
->>>>> +		test_targets(nr_irqs);
->>>>> +
->>>>>  	return 0;
->>>>>  }
->>>>>  
->>>>> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
->>>>> index cef748d..6f170cb 100644
->>>>> --- a/lib/arm/asm/gic.h
->>>>> +++ b/lib/arm/asm/gic.h
->>>>> @@ -14,6 +14,7 @@
->>>>>  #define GICD_IGROUPR			0x0080
->>>>>  #define GICD_ISENABLER			0x0100
->>>>>  #define GICD_IPRIORITYR			0x0400
->>>>> +#define GICD_ITARGETSR			0x0800
->>>>>  #define GICD_SGIR			0x0f00
->>>>>  #define GICD_ICPIDR2			0x0fe8
->>>>>  
->>>>> -- 
->>>>> 2.9.0
->>>>>
->>>>>
->>>>
->>>> Thanks,
->>>> drew
->>>>
-> 
+>> +	printf("Event counters:      %d\n",
+>> +	       (pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK);
+>> +
+>> +	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
+>> +}
+>> +
+>> +int main(void)
+>> +{
+>> +	report_prefix_push("pmu");
+>> +
+>> +	report("Control register", check_pmcr());
+>> +
+>> +	return report_summary();
+>> +}
+>> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+>> index ae32a42..816f494 100644
+>> --- a/arm/unittests.cfg
+>> +++ b/arm/unittests.cfg
+>> @@ -58,3 +58,8 @@ groups = selftest
+>>  [pci-test]
+>>  file = pci-test.flat
+>>  groups = pci
+>> +
+>> +# Test PMU support
+>> +[pmu]
+>> +file = pmu.flat
+>> +groups = pmu
+>>
