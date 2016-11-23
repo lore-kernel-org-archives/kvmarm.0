@@ -1,27 +1,25 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v6 00/11] arm/arm64: add gic
- framework
-Date: Wed, 23 Nov 2016 10:09:51 +0000
-Message-ID: <87shqio6c0.fsf@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v6 08/11] libcflat: add IS_ALIGNED() macro,
+ and page sizes
+Date: Wed, 23 Nov 2016 11:38:11 +0100
+Message-ID: <23d97150-4eb6-db78-9a18-9af79c3c5597@redhat.com>
 References: <1479157719-31021-1-git-send-email-drjones@redhat.com>
- <20161122184511.w5tlxxjphq5fo25b@kamzik.brq.redhat.com>
+ <1479157719-31021-9-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E67740985
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 05:09:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B9211409B6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 05:37:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L9Siu9NVcSJA for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Nov 2016 05:09:13 -0500 (EST)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23E7340982
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 05:09:13 -0500 (EST)
-Received: by mail-wm0-f45.google.com with SMTP id t79so16269642wmt.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 02:09:53 -0800 (PST)
-In-reply-to: <20161122184511.w5tlxxjphq5fo25b@kamzik.brq.redhat.com>
+ with ESMTP id dES7oM2BG1-D for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Nov 2016 05:37:36 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 776FD403F8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 05:37:35 -0500 (EST)
+In-Reply-To: <1479157719-31021-9-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,105 +29,45 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IEFuZHJlLCBBbGV4
-LCBFcmljLCBhbnlib2R5LAo+Cj4gQW55IG1vcmUgY29tbWVudHMgb24gdGhpcz8gSWYgbm90LCBJ
-J2xsIHNlbmQgYSBwdWxsIHJlcXVlc3QKPiB0byBSYWRpbSBhbmQgUGFvbG8gdG8gZmluYWxseSBn
-ZXQgdGhpcyBtZXJnZWQuCgpMb29rcyBnb29kIHRvIG1lLiBJIHN1Y2Nlc3NmdWxseSByZS1iYXNl
-ZCBteSBUQ0cgdGVzdHMgb24gdG9wIGFuZCB0aGV5CndvcmsgZmluZSA7LSkKClRlc3RlZC1ieTog
-QWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKPgo+IFRoYW5rcywKPiBkcmV3
-Cj4KPgo+IE9uIE1vbiwgTm92IDE0LCAyMDE2IGF0IDEwOjA4OjI4UE0gKzAxMDAsIEFuZHJldyBK
-b25lcyB3cm90ZToKPj4gdjY6Cj4+ICAtIHJlYmFzZWQgdG8gbGF0ZXN0IG1hc3Rlcgo+PiAgLSBz
-ZXZlcmFsIG90aGVyIGNoYW5nZXMgdGhhbmtzIHRvIEFuZHJlIGFuZCBBbGV4LCBjaGFuZ2VzIGlu
-Cj4+ICAgIGluZGl2aWR1YWwgcGF0Y2ggY2hhbmdlIGxvZ3MKPj4gIC0gc29tZSBjb2RlIGNsZWFu
-dXBzCj4+Cj4+IHY1Ogo+PiAgLSBmaXggYXJtMzIvZ2ljdjMgY29tcGlsZSBbZHJld10KPj4gIC0g
-dXNlIG1vZGVybiByZWdpc3RlciBuYW1lcyBbQW5kcmVdCj4+ICAtIG9uZSBBbmRyZSByLWIKPj4K
-Pj4gdjQ6Cj4+ICAtIEVyaWMncyByLWIncwo+PiAgLSBBbmRyZSdzIHN1Z2dlc3Rpb24gdG8gb25s
-eSB0YWtlIGRlZmluZXMgd2UgbmVlZAo+PiAgLSBzZXZlcmFsIG90aGVyIGNoYW5nZXMgbGlzdGVk
-IGluIGluZGl2aWR1YWwgcGF0Y2hlcwo+Pgo+PiB2MzoKPj4gIC0gUmViYXNlZCBvbiBsYXRlc3Qg
-bWFzdGVyCj4+ICAtIEFkZGVkIEFsZXgncyByLWIncwo+Pgo+PiB2MjoKPj4gIFJlYmFzZWQgb24g
-bGF0ZXN0IG1hc3RlciArIG15ICJwb3B1bGF0ZSBhcmd2WzBdIiBzZXJpZXMgKHdpbGwKPj4gIHNl
-bmQgYSBSRVBPU1QgZm9yIHRoYXQgc2hvcnRseS4gQWRkaXRpb25hbGx5IGEgZmV3IHBhdGNoZXMg
-Z290Cj4+ICBmaXhlcy9mZWF0dXJlczsKPj4gIDA3LzEwIGdvdCBzYW1lIGZpeCBhcyBrZXJuZWwg
-N2M5Yjk3MzA2MSAiaXJxY2hpcC9naWMtdjM6IENvbmZpZ3VyZQo+PiAgICAgICAgYWxsIGludGVy
-cnVwdHMgYXMgbm9uLXNlY3VyZSBHcm91cC0xIiBpbiBvcmRlciB0byBjb250aW51ZQo+PiAgICAg
-ICAgd29ya2luZyBvdmVyIFRDRywgYXMgdGhlIGdpY3YzIGNvZGUgZm9yIFRDRyByZW1vdmVkIGEg
-aGFjawo+PiAgICAgICAgaXQgaGFkIHRoZXJlIHRvIG1ha2UgTGludXggaGFwcHkuCj4+ICAwOC8x
-MCBhZGRlZCBtb3JlIG91dHB1dCBmb3Igd2hlbiB0aGluZ3MgZmFpbCAoaWYgdGhleSBmYWlsKQo+
-PiAgMDkvMTAgc3dpdGNoZWQgZ2ljdjMgYnJvYWRjYXN0IGltcGxlbWVudGF0aW9uIHRvIHVzaW5n
-IElSTS4gVGhpcwo+PiAgICAgICAgZm91bmQgYSBidWcgaW4gYSByZWNlbnQgKGJ1dCBub3QgdGlw
-KSBrZXJuZWwsIHdoaWNoIEkgd2FzCj4+ICAgICAgICBhYm91dCB0byBmaXgsIGJ1dCB0aGVuIEkg
-c2F3IE1hcmNaIGJlYXQgbWUgdG8gaXQuCj4+ICAxMC8xMCBhY3R1YWxseSBjaGVjayB0aGF0IHRo
-ZSBpbnB1dCBpcnEgaXMgdGhlIHJlY2VpdmVkIGlycQo+Pgo+Pgo+PiBJbXBvcnQgZGVmaW5lcywg
-YW5kIHN0ZWFsIGVub3VnaCBoZWxwZXIgZnVuY3Rpb25zLCBmcm9tIExpbnV4IHRvCj4+IGVuYWJs
-ZSBwcm9ncmFtbWluZyBvZiB0aGUgZ2ljICh2MiBhbmQgdjMpLiBUaGVuIHVzZSB0aGUgZnJhbWV3
-b3JrCj4+IHRvIGFkZCBhbiBpbml0aWFsIHRlc3QgKGFuIGlwaSB0ZXN0OyBzZWxmLCB0YXJnZXQt
-bGlzdCwgYnJvYWRjYXN0KS4KPj4KPj4gSXQncyBteSBob3BlIHRoYXQgdGhpcyBmcmFtZXdvcmsg
-d2lsbCBiZSBhIHN1aXRhYmxlIGJhc2Ugb24gd2hpY2gKPj4gbW9yZSB0ZXN0cyBtYXkgYmUgZWFz
-aWx5IGFkZGVkLCBwYXJ0aWN1bGFybHkgYmVjYXVzZSB3ZSBoYXZlCj4+IHZnaWMtbmV3IGFuZCB0
-Y2cgZ2ljdjMgZW11bGF0aW9uIGdldHRpbmcgY2xvc2UgdG8gbWVyZ2UuICh2MyBVUERBVEU6Cj4+
-IHZnaWMtbmV3IGFuZCB0Y2cgZ2ljdjMgYXJlIG1lcmdlZCBub3cpCj4+Cj4+IFRvIHJ1biBpdCwg
-YWxvbmcgd2l0aCBvdGhlciB0ZXN0cywganVzdCBkbwo+Pgo+PiAgLi9jb25maWd1cmUgWyAtLWFy
-Y2g9W2FybXxhcm02NF0gLS1jcm9zcy1wcmVmaXg9JFBSRUZJWCBdCj4+ICBtYWtlCj4+ICBleHBv
-cnQgUUVNVT0kUEFUSF9UT19RRU1VCj4+ICAuL3J1bl90ZXN0cy5zaAo+Pgo+PiBUbyBydW4gaXQg
-c2VwYXJhdGVseSBkbywgZS5nLgo+Pgo+PiAkUUVNVSAtbWFjaGluZSB2aXJ0LGFjY2VsPXRjZyAt
-Y3B1IGNvcnRleC1hNTcgXAo+PiAgLWRldmljZSB2aXJ0aW8tc2VyaWFsLWRldmljZSBcCj4+ICAt
-ZGV2aWNlIHZpcnRjb25zb2xlLGNoYXJkZXY9Y3RkIC1jaGFyZGV2IHRlc3RkZXYsaWQ9Y3RkIFwK
-Pj4gIC1kaXNwbGF5IG5vbmUgLXNlcmlhbCBzdGRpbyBcCj4+ICAta2VybmVsIGFybS9naWMuZmxh
-dCBcCj4+ICAtc21wIDEyMyAtbWFjaGluZSBnaWMtdmVyc2lvbj0zIC1hcHBlbmQgaXBpCj4+ICAg
-ICAgIF5eIG5vdGUsIHdlIGNhbiBnbyBudXRzIHdpdGggbnItY3B1cyBvbiBUQ0cgOi0pCj4+Cj4+
-IE9yLCBhIEtWTSBleGFtcGxlIHVzaW5nIGEgZGlmZmVyZW50ICJzZW5kZXIiIGNwdSBhbmQgaXJx
-IChvdGhlciB0aGFuIHplcm8pCj4+Cj4+ICRRRU1VIC1tYWNoaW5lIHZpcnQsYWNjZWw9a3ZtIC1j
-cHUgaG9zdCBcCj4+ICAtZGV2aWNlIHZpcnRpby1zZXJpYWwtZGV2aWNlIFwKPj4gIC1kZXZpY2Ug
-dmlydGNvbnNvbGUsY2hhcmRldj1jdGQgLWNoYXJkZXYgdGVzdGRldixpZD1jdGQgXAo+PiAgLWRp
-c3BsYXkgbm9uZSAtc2VyaWFsIHN0ZGlvIFwKPj4gIC1rZXJuZWwgYXJtL2dpYy5mbGF0IFwKPj4g
-IC1zbXAgNDggLW1hY2hpbmUgZ2ljLXZlcnNpb249MyAtYXBwZW5kICdpcGkgc2VuZGVyPTQyIGly
-cT0xJwo+Pgo+Pgo+PiBQYXRjaGVzOgo+PiAwMS0wNTogZml4ZXMgYW5kIGZ1bmN0aW9uYWxpdHkg
-bmVlZGVkIGJ5IHRoZSBsYXRlciBnaWMgcGF0Y2hlcwo+PiAwNi0wNzogZW5hYmxlIGdpY3YyIGFu
-ZCBnaWN2MiBJUEkgdGVzdAo+PiAwOC0xMDogZW5hYmxlIGdpY3YzIGFuZCBnaWN2MyBJUEkgdGVz
-dAo+PiAgICAxMTogZXh0ZW5kIHRoZSBJUEkgdGVzdHMgdG8gdGFrZSB2YXJpYWJsZSBzZW5kZXIg
-YW5kIGlycQo+Pgo+PiBBdmFpbGFibGUgaGVyZTogaHR0cHM6Ly9naXRodWIuY29tL3JoZHJqb25l
-cy9rdm0tdW5pdC10ZXN0cy9jb21taXRzL2FybS9naWMtdjYKPj4KPj4KPj4gQW5kcmV3IEpvbmVz
-ICgxMCk6Cj4+ICAgbGliOiB4c3RyOiBhbGxvdyBtdWx0aXBsZSBhcmdzCj4+ICAgYXJtNjQ6IGZp
-eCBnZXRfInN5c3JlZzMyIiBhbmQgbWFrZSBNUElEUiA2NGJpdAo+PiAgIGFybS9hcm02NDogc21w
-OiBzdXBwb3J0IG1vcmUgdGhhbiA4IGNwdXMKPj4gICBhcm0vYXJtNjQ6IGFkZCBzb21lIGRlbGF5
-IHJvdXRpbmVzCj4+ICAgYXJtL2FybTY0OiBpcnEgZW5hYmxlL2Rpc2FibGUKPj4gICBhcm0vYXJt
-NjQ6IGFkZCBpbml0aWFsIGdpY3YyIHN1cHBvcnQKPj4gICBhcm0vYXJtNjQ6IGdpY3YyOiBhZGQg
-YW4gSVBJIHRlc3QKPj4gICBhcm0vYXJtNjQ6IGFkZCBpbml0aWFsIGdpY3YzIHN1cHBvcnQKPj4g
-ICBhcm0vYXJtNjQ6IGdpY3YzOiBhZGQgYW4gSVBJIHRlc3QKPj4gICBhcm0vYXJtNjQ6IGdpYzog
-ZG9uJ3QganVzdCB1c2UgemVybwo+Pgo+PiBQZXRlciBYdSAoMSk6Cj4+ICAgbGliY2ZsYXQ6IGFk
-ZCBJU19BTElHTkVEKCkgbWFjcm8sIGFuZCBwYWdlIHNpemVzCj4+Cj4+ICBhcm0vTWFrZWZpbGUu
-Y29tbW9uICAgICAgICB8ICAgOSArLQo+PiAgYXJtL2dpYy5jICAgICAgICAgICAgICAgICAgfCAz
-NDAgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCj4+ICBhcm0v
-cnVuICAgICAgICAgICAgICAgICAgICB8ICAxOSArKy0KPj4gIGFybS9zZWxmdGVzdC5jICAgICAg
-ICAgICAgIHwgICA1ICstCj4+ICBhcm0vdW5pdHRlc3RzLmNmZyAgICAgICAgICB8ICAxNCArKwo+
-PiAgbGliL2FybS9hc20vYXJjaF9naWN2My5oICAgfCAgNzAgKysrKysrKysrKwo+PiAgbGliL2Fy
-bS9hc20vZ2ljLXYyLmggICAgICAgfCAgMzYgKysrKysKPj4gIGxpYi9hcm0vYXNtL2dpYy12My5o
-ICAgICAgIHwgMTEyICsrKysrKysrKysrKysrKwo+PiAgbGliL2FybS9hc20vZ2ljLmggICAgICAg
-ICAgfCAxMDYgKysrKysrKysrKysrKysKPj4gIGxpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oICAgIHwg
-IDQyICsrKysrLQo+PiAgbGliL2FybS9hc20vc2V0dXAuaCAgICAgICAgfCAgIDQgKy0KPj4gIGxp
-Yi9hcm0vZ2ljLmMgICAgICAgICAgICAgIHwgMjY3ICsrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrCj4+ICBsaWIvYXJtL3Byb2Nlc3Nvci5jICAgICAgICB8ICAxNSArKwo+PiAgbGli
-L2FybS9zZXR1cC5jICAgICAgICAgICAgfCAgMTAgKysKPj4gIGxpYi9hcm02NC9hc20vYXJjaF9n
-aWN2My5oIHwgIDY2ICsrKysrKysrKwo+PiAgbGliL2FybTY0L2FzbS9naWMtdjIuaCAgICAgfCAg
-IDEgKwo+PiAgbGliL2FybTY0L2FzbS9naWMtdjMuaCAgICAgfCAgIDEgKwo+PiAgbGliL2FybTY0
-L2FzbS9naWMuaCAgICAgICAgfCAgIDEgKwo+PiAgbGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaCAg
-fCAgNTMgKysrKystLQo+PiAgbGliL2FybTY0L2FzbS9zeXNyZWcuaCAgICAgfCAgNDQgKysrKysr
-Cj4+ICBsaWIvYXJtNjQvcHJvY2Vzc29yLmMgICAgICB8ICAxNSArKwo+PiAgbGliL2xpYmNmbGF0
-LmggICAgICAgICAgICAgfCAgMTAgKy0KPj4gIDIyIGZpbGVzIGNoYW5nZWQsIDEyMTIgaW5zZXJ0
-aW9ucygrKSwgMjggZGVsZXRpb25zKC0pCj4+ICBjcmVhdGUgbW9kZSAxMDA2NDQgYXJtL2dpYy5j
-Cj4+ICBjcmVhdGUgbW9kZSAxMDA2NDQgbGliL2FybS9hc20vYXJjaF9naWN2My5oCj4+ICBjcmVh
-dGUgbW9kZSAxMDA2NDQgbGliL2FybS9hc20vZ2ljLXYyLmgKPj4gIGNyZWF0ZSBtb2RlIDEwMDY0
-NCBsaWIvYXJtL2FzbS9naWMtdjMuaAo+PiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGxpYi9hcm0vYXNt
-L2dpYy5oCj4+ICBjcmVhdGUgbW9kZSAxMDA2NDQgbGliL2FybS9naWMuYwo+PiAgY3JlYXRlIG1v
-ZGUgMTAwNjQ0IGxpYi9hcm02NC9hc20vYXJjaF9naWN2My5oCj4+ICBjcmVhdGUgbW9kZSAxMDA2
-NDQgbGliL2FybTY0L2FzbS9naWMtdjIuaAo+PiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGxpYi9hcm02
-NC9hc20vZ2ljLXYzLmgKPj4gIGNyZWF0ZSBtb2RlIDEwMDY0NCBsaWIvYXJtNjQvYXNtL2dpYy5o
-Cj4+ICBjcmVhdGUgbW9kZSAxMDA2NDQgbGliL2FybTY0L2FzbS9zeXNyZWcuaAo+Pgo+PiAtLQo+
-PiAyLjcuNAo+Pgo+PgoKCi0tCkFsZXggQmVubsOpZQpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5j
-cy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0
-aW5mby9rdm1hcm0K
+Hi,
+On 14/11/2016 22:08, Andrew Jones wrote:
+> From: Peter Xu <peterx@redhat.com>
+> 
+> These macros will be useful to do page alignment checks.
+> 
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> [drew: also added SZ_64K and changed to shifts]
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> 
+> ---
+> v6: change to shifts [Alex]
+> ---
+>  lib/libcflat.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index 82005f5d014f..244e40a724be 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -33,6 +33,12 @@
+>  #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
+>  #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
+>  #define ALIGN(x, a)		__ALIGN((x), (a))
+> +#define IS_ALIGNED(x, a)	(((x) & ((typeof(x))(a) - 1)) == 0)
+> +
+> +#define SZ_4K			(1 << 12)
+> +#define SZ_64K			(1 << 16)
+> +#define SZ_2M			(1 << 21)
+> +#define SZ_1G			(1 << 30)
+>  
+>  typedef uint8_t		u8;
+>  typedef int8_t		s8;
+> 
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Eric
