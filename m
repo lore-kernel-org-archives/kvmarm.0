@@ -1,22 +1,22 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v7 04/11] arm/arm64: add some delay routines
-Date: Wed, 23 Nov 2016 17:53:59 +0100
-Message-ID: <20161123165406.32661-5-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v7 07/11] arm/arm64: gicv2: add an IPI test
+Date: Wed, 23 Nov 2016 17:54:02 +0100
+Message-ID: <20161123165406.32661-8-drjones@redhat.com>
 References: <20161123165406.32661-1-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DF5440CD8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 11:53:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D0A740C4F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 11:53:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Toxh0l+8SvX0 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Nov 2016 11:53:41 -0500 (EST)
+ with ESMTP id B8oFtp5e2Inz for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Nov 2016 11:53:49 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA12740D08
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 11:53:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE67940CA7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 11:53:48 -0500 (EST)
 In-Reply-To: <20161123165406.32661-1-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,71 +31,303 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qe
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-QWxsb3cgYSB0aHJlYWQgdG8gd2FpdCBzb21lIHNwZWNpZmllZCBhbW91bnQgb2YgdGltZS4gQ2Fu
-CnNwZWNpZnkgaW4gY3ljbGVzLCB1c2VjcywgYW5kIG1zZWNzLgoKUmV2aWV3ZWQtYnk6IEFsZXgg
-QmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KUmV2aWV3ZWQtYnk6IEVyaWMgQXVnZXIg
-PGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KU2lnbmVkLW9mZi1ieTogQW5kcmV3IEpvbmVzIDxkcmpv
-bmVzQHJlZGhhdC5jb20+Ci0tLQogbGliL2FybS9hc20vcHJvY2Vzc29yLmggICB8IDE5ICsrKysr
-KysrKysrKysrKysrKysKIGxpYi9hcm0vcHJvY2Vzc29yLmMgICAgICAgfCAxNSArKysrKysrKysr
-KysrKysKIGxpYi9hcm02NC9hc20vcHJvY2Vzc29yLmggfCAxOSArKysrKysrKysrKysrKysrKysr
-CiBsaWIvYXJtNjQvcHJvY2Vzc29yLmMgICAgIHwgMTUgKysrKysrKysrKysrKysrCiA0IGZpbGVz
-IGNoYW5nZWQsIDY4IGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9saWIvYXJtL2FzbS9wcm9j
-ZXNzb3IuaCBiL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oCmluZGV4IGVjZjViYmUxODI0YS4uYmM0
-NmQxZjk4MGVlIDEwMDY0NAotLS0gYS9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaAorKysgYi9saWIv
-YXJtL2FzbS9wcm9jZXNzb3IuaApAQCAtNSw3ICs1LDkgQEAKICAqCiAgKiBUaGlzIHdvcmsgaXMg
-bGljZW5zZWQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZSBHTlUgTEdQTCwgdmVyc2lvbiAyLgogICov
-CisjaW5jbHVkZSA8bGliY2ZsYXQuaD4KICNpbmNsdWRlIDxhc20vcHRyYWNlLmg+CisjaW5jbHVk
-ZSA8YXNtL2JhcnJpZXIuaD4KIAogZW51bSB2ZWN0b3IgewogCUVYQ1BUTl9SU1QsCkBAIC01MSw0
-ICs1MywyMSBAQCBleHRlcm4gaW50IG1waWRyX3RvX2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsK
-IGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgqZnVuYykodm9pZCAqYXJnKSwgdm9pZCAqYXJn
-LCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7CiBleHRlcm4gYm9vbCBpc191c2VyKHZvaWQpOwogCitz
-dGF0aWMgaW5saW5lIHU2NCBnZXRfY250dmN0KHZvaWQpCit7CisJdTY0IHZjdDsKKwlpc2IoKTsK
-Kwlhc20gdm9sYXRpbGUoIm1ycmMgcDE1LCAxLCAlUTAsICVSMCwgYzE0IiA6ICI9ciIgKHZjdCkp
-OworCXJldHVybiB2Y3Q7Cit9CisKK2V4dGVybiB2b2lkIGRlbGF5KHU2NCBjeWNsZXMpOworZXh0
-ZXJuIHZvaWQgdWRlbGF5KHVuc2lnbmVkIGxvbmcgdXNlY3MpOworCitzdGF0aWMgaW5saW5lIHZv
-aWQgbWRlbGF5KHVuc2lnbmVkIGxvbmcgbXNlY3MpCit7CisJd2hpbGUgKG1zZWNzLS0pCisJCXVk
-ZWxheSgxMDAwKTsKK30KKwogI2VuZGlmIC8qIF9BU01BUk1fUFJPQ0VTU09SX0hfICovCmRpZmYg
-LS1naXQgYS9saWIvYXJtL3Byb2Nlc3Nvci5jIGIvbGliL2FybS9wcm9jZXNzb3IuYwppbmRleCA1
-NGZkYjg3ZWYwMTkuLmMyZWUzNjBkZjY4OCAxMDA2NDQKLS0tIGEvbGliL2FybS9wcm9jZXNzb3Iu
-YworKysgYi9saWIvYXJtL3Byb2Nlc3Nvci5jCkBAIC05LDYgKzksNyBAQAogI2luY2x1ZGUgPGFz
-bS9wdHJhY2UuaD4KICNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+CiAjaW5jbHVkZSA8YXNtL3Ro
-cmVhZF9pbmZvLmg+CisjaW5jbHVkZSA8YXNtL2JhcnJpZXIuaD4KIAogc3RhdGljIGNvbnN0IGNo
-YXIgKnByb2Nlc3Nvcl9tb2Rlc1tdID0gewogCSJVU0VSXzI2IiwgIkZJUV8yNiIgLCAiSVJRXzI2
-IiAsICJTVkNfMjYiICwKQEAgLTE0MSwzICsxNDIsMTcgQEAgYm9vbCBpc191c2VyKHZvaWQpCiB7
-CiAJcmV0dXJuIGN1cnJlbnRfdGhyZWFkX2luZm8oKS0+ZmxhZ3MgJiBUSUZfVVNFUl9NT0RFOwog
-fQorCit2b2lkIGRlbGF5KHU2NCBjeWNsZXMpCit7CisJdTY0IHN0YXJ0ID0gZ2V0X2NudHZjdCgp
-OworCXdoaWxlICgoZ2V0X2NudHZjdCgpIC0gc3RhcnQpIDwgY3ljbGVzKQorCQljcHVfcmVsYXgo
-KTsKK30KKwordm9pZCB1ZGVsYXkodW5zaWduZWQgbG9uZyB1c2VjKQoreworCXVuc2lnbmVkIGlu
-dCBmcnE7CisJYXNtIHZvbGF0aWxlKCJtcmMgcDE1LCAwLCAlMCwgYzE0LCBjMCwgMCIgOiAiPXIi
-IChmcnEpKTsKKwlkZWxheSgodTY0KXVzZWMgKiBmcnEgLyAxMDAwMDAwKTsKK30KZGlmZiAtLWdp
-dCBhL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmggYi9saWIvYXJtNjQvYXNtL3Byb2Nlc3Nvci5o
-CmluZGV4IDdlNDQ4ZGM4MWE2YS4uOTRmN2NlMzViNjVjIDEwMDY0NAotLS0gYS9saWIvYXJtNjQv
-YXNtL3Byb2Nlc3Nvci5oCisrKyBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKQEAgLTE3LDgg
-KzE3LDEwIEBACiAjZGVmaW5lIFNDVExSX0VMMV9NCSgxIDw8IDApCiAKICNpZm5kZWYgX19BU1NF
-TUJMWV9fCisjaW5jbHVkZSA8bGliY2ZsYXQuaD4KICNpbmNsdWRlIDxhc20vcHRyYWNlLmg+CiAj
-aW5jbHVkZSA8YXNtL2Vzci5oPgorI2luY2x1ZGUgPGFzbS9iYXJyaWVyLmg+CiAKIGVudW0gdmVj
-dG9yIHsKIAlFTDFUX1NZTkMsCkBAIC04OSw1ICs5MSwyMiBAQCBleHRlcm4gaW50IG1waWRyX3Rv
-X2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsKIGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgq
-ZnVuYykodm9pZCAqYXJnKSwgdm9pZCAqYXJnLCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7CiBleHRl
-cm4gYm9vbCBpc191c2VyKHZvaWQpOwogCitzdGF0aWMgaW5saW5lIHU2NCBnZXRfY250dmN0KHZv
-aWQpCit7CisJdTY0IHZjdDsKKwlpc2IoKTsKKwlhc20gdm9sYXRpbGUoIm1ycyAlMCwgY250dmN0
-X2VsMCIgOiAiPXIiICh2Y3QpKTsKKwlyZXR1cm4gdmN0OworfQorCitleHRlcm4gdm9pZCBkZWxh
-eSh1NjQgY3ljbGVzKTsKK2V4dGVybiB2b2lkIHVkZWxheSh1bnNpZ25lZCBsb25nIHVzZWNzKTsK
-Kworc3RhdGljIGlubGluZSB2b2lkIG1kZWxheSh1bnNpZ25lZCBsb25nIG1zZWNzKQoreworCXdo
-aWxlIChtc2Vjcy0tKQorCQl1ZGVsYXkoMTAwMCk7Cit9CisKICNlbmRpZiAvKiAhX19BU1NFTUJM
-WV9fICovCiAjZW5kaWYgLyogX0FTTUFSTTY0X1BST0NFU1NPUl9IXyAqLwpkaWZmIC0tZ2l0IGEv
-bGliL2FybTY0L3Byb2Nlc3Nvci5jIGIvbGliL2FybTY0L3Byb2Nlc3Nvci5jCmluZGV4IGRlZWFi
-NGVjOWM4YS4uNTBmYTgzNWM2ZjFlIDEwMDY0NAotLS0gYS9saWIvYXJtNjQvcHJvY2Vzc29yLmMK
-KysrIGIvbGliL2FybTY0L3Byb2Nlc3Nvci5jCkBAIC05LDYgKzksNyBAQAogI2luY2x1ZGUgPGFz
-bS9wdHJhY2UuaD4KICNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+CiAjaW5jbHVkZSA8YXNtL3Ro
-cmVhZF9pbmZvLmg+CisjaW5jbHVkZSA8YXNtL2JhcnJpZXIuaD4KIAogc3RhdGljIGNvbnN0IGNo
-YXIgKnZlY3Rvcl9uYW1lc1tdID0gewogCSJlbDF0X3N5bmMiLApAQCAtMjUzLDMgKzI1NCwxNyBA
-QCBib29sIGlzX3VzZXIodm9pZCkKIHsKIAlyZXR1cm4gY3VycmVudF90aHJlYWRfaW5mbygpLT5m
-bGFncyAmIFRJRl9VU0VSX01PREU7CiB9CisKK3ZvaWQgZGVsYXkodTY0IGN5Y2xlcykKK3sKKwl1
-NjQgc3RhcnQgPSBnZXRfY250dmN0KCk7CisJd2hpbGUgKChnZXRfY250dmN0KCkgLSBzdGFydCkg
-PCBjeWNsZXMpCisJCWNwdV9yZWxheCgpOworfQorCit2b2lkIHVkZWxheSh1bnNpZ25lZCBsb25n
-IHVzZWMpCit7CisJdW5zaWduZWQgaW50IGZycTsKKwlhc20gdm9sYXRpbGUoIm1ycyAlMCwgY250
-ZnJxX2VsMCIgOiAiPXIiIChmcnEpKTsKKwlkZWxheSgodTY0KXVzZWMgKiBmcnEgLyAxMDAwMDAw
-KTsKK30KLS0gCjIuOS4zCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
-aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+v6: move the spurious check to its own check_ function [drew]
+v5: use modern registers [Andre]
+v4: properly mask irqnr in ipi_handler
+v2: add more details in the output if a test fails,
+    report spurious interrupts if we get them
+---
+ arm/Makefile.common  |   8 +--
+ arm/gic.c            | 199 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg    |   8 +++
+ lib/arm/asm/gic-v2.h |   2 +
+ lib/arm/asm/gic.h    |   4 ++
+ 5 files changed, 217 insertions(+), 4 deletions(-)
+ create mode 100644 arm/gic.c
+
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index 6f56015c43c4..2fe7aeeca6d4 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -9,10 +9,10 @@ ifeq ($(LOADADDR),)
+ 	LOADADDR = 0x40000000
+ endif
+ 
+-tests-common = \
+-	$(TEST_DIR)/selftest.flat \
+-	$(TEST_DIR)/spinlock-test.flat \
+-	$(TEST_DIR)/pci-test.flat
++tests-common  = $(TEST_DIR)/selftest.flat
++tests-common += $(TEST_DIR)/spinlock-test.flat
++tests-common += $(TEST_DIR)/pci-test.flat
++tests-common += $(TEST_DIR)/gic.flat
+ 
+ all: test_cases
+ 
+diff --git a/arm/gic.c b/arm/gic.c
+new file mode 100644
+index 000000000000..b42c2b1ca1e1
+--- /dev/null
++++ b/arm/gic.c
+@@ -0,0 +1,199 @@
++/*
++ * GIC tests
++ *
++ * GICv2
++ *   + test sending/receiving IPIs
++ *
++ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.
++ */
++#include <libcflat.h>
++#include <asm/setup.h>
++#include <asm/processor.h>
++#include <asm/gic.h>
++#include <asm/smp.h>
++#include <asm/barrier.h>
++#include <asm/io.h>
++
++static int gic_version;
++static int acked[NR_CPUS], spurious[NR_CPUS];
++static cpumask_t ready;
++
++static void nr_cpu_check(int nr)
++{
++	if (nr_cpus < nr)
++		report_abort("At least %d cpus required", nr);
++}
++
++static void wait_on_ready(void)
++{
++	cpumask_set_cpu(smp_processor_id(), &ready);
++	while (!cpumask_full(&ready))
++		cpu_relax();
++}
++
++static void check_acked(cpumask_t *mask)
++{
++	int missing = 0, extra = 0, unexpected = 0;
++	int nr_pass, cpu, i;
++
++	/* Wait up to 5s for all interrupts to be delivered */
++	for (i = 0; i < 50; ++i) {
++		mdelay(100);
++		nr_pass = 0;
++		for_each_present_cpu(cpu) {
++			smp_rmb();
++			nr_pass += cpumask_test_cpu(cpu, mask) ?
++				acked[cpu] == 1 : acked[cpu] == 0;
++		}
++		if (nr_pass == nr_cpus) {
++			report("Completed in %d ms", true, ++i * 100);
++			return;
++		}
++	}
++
++	for_each_present_cpu(cpu) {
++		if (cpumask_test_cpu(cpu, mask)) {
++			if (!acked[cpu])
++				++missing;
++			else if (acked[cpu] > 1)
++				++extra;
++		} else {
++			if (acked[cpu])
++				++unexpected;
++		}
++	}
++
++	report("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
++	       false, missing, extra, unexpected);
++}
++
++static void check_spurious(void)
++{
++	int cpu;
++
++	smp_rmb();
++	for_each_present_cpu(cpu) {
++		if (spurious[cpu])
++			printf("ipi: WARN: cpu%d got %d spurious interrupts\n",
++				spurious[cpu], smp_processor_id());
++	}
++}
++
++static void ipi_handler(struct pt_regs *regs __unused)
++{
++	u32 irqstat = readl(gicv2_cpu_base() + GICC_IAR);
++	u32 irqnr = irqstat & GICC_IAR_INT_ID_MASK;
++
++	if (irqnr != GICC_INT_SPURIOUS) {
++		writel(irqstat, gicv2_cpu_base() + GICC_EOIR);
++		smp_rmb(); /* pairs with wmb in ipi_test functions */
++		++acked[smp_processor_id()];
++		smp_wmb(); /* pairs with rmb in check_acked */
++	} else {
++		++spurious[smp_processor_id()];
++		smp_wmb();
++	}
++}
++
++static void ipi_test_self(void)
++{
++	cpumask_t mask;
++
++	report_prefix_push("self");
++	memset(acked, 0, sizeof(acked));
++	smp_wmb();
++	cpumask_clear(&mask);
++	cpumask_set_cpu(0, &mask);
++	writel(2 << 24, gicv2_dist_base() + GICD_SGIR);
++	check_acked(&mask);
++	report_prefix_pop();
++}
++
++static void ipi_test_smp(void)
++{
++	cpumask_t mask;
++	unsigned long tlist;
++
++	report_prefix_push("target-list");
++	memset(acked, 0, sizeof(acked));
++	smp_wmb();
++	tlist = cpumask_bits(&cpu_present_mask)[0] & 0xaa;
++	cpumask_bits(&mask)[0] = tlist;
++	writel((u8)tlist << 16, gicv2_dist_base() + GICD_SGIR);
++	check_acked(&mask);
++	report_prefix_pop();
++
++	report_prefix_push("broadcast");
++	memset(acked, 0, sizeof(acked));
++	smp_wmb();
++	cpumask_copy(&mask, &cpu_present_mask);
++	cpumask_clear_cpu(0, &mask);
++	writel(1 << 24, gicv2_dist_base() + GICD_SGIR);
++	check_acked(&mask);
++	report_prefix_pop();
++}
++
++static void ipi_enable(void)
++{
++	gicv2_enable_defaults();
++#ifdef __arm__
++	install_exception_handler(EXCPTN_IRQ, ipi_handler);
++#else
++	install_irq_handler(EL1H_IRQ, ipi_handler);
++#endif
++	local_irq_enable();
++}
++
++static void ipi_recv(void)
++{
++	ipi_enable();
++	cpumask_set_cpu(smp_processor_id(), &ready);
++	while (1)
++		wfi();
++}
++
++int main(int argc, char **argv)
++{
++	char pfx[8];
++	int cpu;
++
++	gic_version = gic_init();
++	if (!gic_version)
++		report_abort("No gic present!");
++
++	snprintf(pfx, sizeof(pfx), "gicv%d", gic_version);
++	report_prefix_push(pfx);
++
++	if (argc < 2) {
++
++		report_prefix_push("ipi");
++		ipi_enable();
++		ipi_test_self();
++		check_spurious();
++		report_prefix_pop();
++
++	} else if (strcmp(argv[1], "ipi") == 0) {
++
++		report_prefix_push(argv[1]);
++		nr_cpu_check(2);
++
++		for_each_present_cpu(cpu) {
++			if (cpu == 0)
++				continue;
++			smp_boot_secondary(cpu, ipi_recv);
++		}
++		ipi_enable();
++		wait_on_ready();
++		ipi_test_self();
++		ipi_test_smp();
++		check_spurious();
++		report_prefix_pop();
++
++	} else {
++		report_abort("Unknown subtest '%s'", argv[1]);
++	}
++
++	return report_summary();
++}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index ae32a42a91c3..e631c35e2bbb 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -55,6 +55,14 @@ smp = $MAX_SMP
+ extra_params = -append 'smp'
+ groups = selftest
+ 
++# pci-testdev
+ [pci-test]
+ file = pci-test.flat
+ groups = pci
++
++# Test GIC emulation
++[gicv2-ipi]
++file = gic.flat
++smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
++extra_params = -machine gic-version=2 -append 'ipi'
++groups = gic
+diff --git a/lib/arm/asm/gic-v2.h b/lib/arm/asm/gic-v2.h
+index c2d5fecd4886..8b3f7ed6790c 100644
+--- a/lib/arm/asm/gic-v2.h
++++ b/lib/arm/asm/gic-v2.h
+@@ -13,7 +13,9 @@
+ #endif
+ 
+ #define GICD_ENABLE			0x1
++
+ #define GICC_ENABLE			0x1
++#define GICC_IAR_INT_ID_MASK		0x3ff
+ 
+ #ifndef __ASSEMBLY__
+ 
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index e3580bd1d42d..d816b96e46b4 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -13,6 +13,7 @@
+ #define GICD_TYPER			0x0004
+ #define GICD_ISENABLER			0x0100
+ #define GICD_IPRIORITYR			0x0400
++#define GICD_SGIR			0x0f00
+ 
+ #define GICD_TYPER_IRQS(typer)		((((typer) & 0x1f) + 1) * 32)
+ #define GICD_INT_EN_SET_SGI		0x0000ffff
+@@ -21,8 +22,11 @@
+ /* CPU interface registers */
+ #define GICC_CTLR			0x0000
+ #define GICC_PMR			0x0004
++#define GICC_IAR			0x000c
++#define GICC_EOIR			0x0010
+ 
+ #define GICC_INT_PRI_THRESHOLD		0xf0
++#define GICC_INT_SPURIOUS		0x3ff
+ 
+ #ifndef __ASSEMBLY__
+ 
+-- 
+2.9.3
