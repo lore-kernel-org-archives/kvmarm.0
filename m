@@ -1,11 +1,8 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v7 03/11] arm/arm64: smp: support more than 8 cpus
-Date: Wed, 23 Nov 2016 17:53:58 +0100
-Message-ID: <20161123165406.32661-4-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v7 06/11] arm/arm64: add initial gicv2 support
+Date: Wed, 23 Nov 2016 17:54:01 +0100
+Message-ID: <20161123165406.32661-7-drjones@redhat.com>
 References: <20161123165406.32661-1-drjones@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20161123165406.32661-1-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
@@ -13,175 +10,228 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qe
 Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-By adding support for launching with gicv3 we can break the 8 vcpu
-limit. This patch adds support to smp code and also selects the
-vgic model corresponding to the host. The vgic model may also be
-manually selected by adding e.g. -machine gic-version=3 to
-extra_params.
+Add some gicv2 support. This just adds init and enable
+functions, allowing unit tests to start messing with it.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 
 ---
-v5: left cpus a u32 for now. Changing to u64 requires a change to
-    devicetree. Will do it later. [Andre]
-v4: improved commit message
+v6: added comments (register offset headers) [Alex]
+v5: share/use only the modern register names [Andre]
+v4:
+ - only take defines from kernel we need now [Andre]
+ - moved defines to asm/gic.h so they'll be shared with v3 [drew]
+ - simplify enable by not caring if we reinit the distributor [drew]
+ - init all GICD_INT_DEF_PRI_X4 registers [Eric]
 ---
- arm/run                   | 19 ++++++++++++-------
- arm/selftest.c            |  5 ++++-
- lib/arm/asm/processor.h   |  9 +++++++--
- lib/arm/asm/setup.h       |  4 ++--
- lib/arm/setup.c           | 10 ++++++++++
- lib/arm64/asm/processor.h |  9 +++++++--
- 6 files changed, 42 insertions(+), 14 deletions(-)
+ arm/Makefile.common    |  1 +
+ lib/arm/asm/gic-v2.h   | 34 ++++++++++++++++++++++
+ lib/arm/asm/gic.h      | 39 ++++++++++++++++++++++++++
+ lib/arm/gic.c          | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/arm64/asm/gic-v2.h |  1 +
+ lib/arm64/asm/gic.h    |  1 +
+ 6 files changed, 152 insertions(+)
+ create mode 100644 lib/arm/asm/gic-v2.h
+ create mode 100644 lib/arm/asm/gic.h
+ create mode 100644 lib/arm/gic.c
+ create mode 100644 lib/arm64/asm/gic-v2.h
+ create mode 100644 lib/arm64/asm/gic.h
 
-diff --git a/arm/run b/arm/run
-index f1b04af614dc..1c40ab02eb57 100755
---- a/arm/run
-+++ b/arm/run
-@@ -31,13 +31,6 @@ if [ -z "$ACCEL" ]; then
- 	fi
- fi
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index f37b5c2a3de4..6f56015c43c4 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -46,6 +46,7 @@ cflatobjs += lib/arm/mmu.o
+ cflatobjs += lib/arm/bitops.o
+ cflatobjs += lib/arm/psci.o
+ cflatobjs += lib/arm/smp.o
++cflatobjs += lib/arm/gic.o
  
--if [ "$HOST" = "aarch64" ] && [ "$ACCEL" = "kvm" ]; then
--	processor="host"
--	if [ "$ARCH" = "arm" ]; then
--		processor+=",aarch64=off"
--	fi
--fi
--
- qemu="${QEMU:-qemu-system-$ARCH_NAME}"
- qpath=$(which $qemu 2>/dev/null)
- 
-@@ -53,6 +46,18 @@ fi
- 
- M='-machine virt'
- 
-+if [ "$ACCEL" = "kvm" ]; then
-+	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
-+		M+=',gic-version=host'
-+	fi
-+	if [ "$HOST" = "aarch64" ]; then
-+		processor="host"
-+		if [ "$ARCH" = "arm" ]; then
-+			processor+=",aarch64=off"
-+		fi
-+	fi
-+fi
+ libeabi = lib/arm/libeabi.a
+ eabiobjs = lib/arm/eabi_compat.o
+diff --git a/lib/arm/asm/gic-v2.h b/lib/arm/asm/gic-v2.h
+new file mode 100644
+index 000000000000..c2d5fecd4886
+--- /dev/null
++++ b/lib/arm/asm/gic-v2.h
+@@ -0,0 +1,34 @@
++/*
++ * All GIC* defines are lifted from include/linux/irqchip/arm-gic.h
++ *
++ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.
++ */
++#ifndef _ASMARM_GIC_V2_H_
++#define _ASMARM_GIC_V2_H_
 +
- if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
- 	echo "$qpath doesn't support virtio-console for chr-testdev. Exiting."
- 	exit 2
-diff --git a/arm/selftest.c b/arm/selftest.c
-index 196164f5313d..2f117f795d2d 100644
---- a/arm/selftest.c
-+++ b/arm/selftest.c
-@@ -312,9 +312,10 @@ static bool psci_check(void)
- static cpumask_t smp_reported;
- static void cpu_report(void)
- {
-+	unsigned long mpidr = get_mpidr();
- 	int cpu = smp_processor_id();
- 
--	report("CPU%d online", true, cpu);
-+	report("CPU(%3d) mpidr=%lx", mpidr_to_cpu(mpidr) == cpu, cpu, mpidr);
- 	cpumask_set_cpu(cpu, &smp_reported);
- 	halt();
- }
-@@ -343,6 +344,7 @@ int main(int argc, char **argv)
- 
- 	} else if (strcmp(argv[1], "smp") == 0) {
- 
-+		unsigned long mpidr = get_mpidr();
- 		int cpu;
- 
- 		report("PSCI version", psci_check());
-@@ -353,6 +355,7 @@ int main(int argc, char **argv)
- 			smp_boot_secondary(cpu, cpu_report);
- 		}
- 
-+		report("CPU(%3d) mpidr=%lx", mpidr_to_cpu(mpidr) == 0, 0, mpidr);
- 		cpumask_set_cpu(0, &smp_reported);
- 		while (!cpumask_full(&smp_reported))
- 			cpu_relax();
-diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-index 02f912f99974..ecf5bbe1824a 100644
---- a/lib/arm/asm/processor.h
-+++ b/lib/arm/asm/processor.h
-@@ -40,8 +40,13 @@ static inline unsigned long get_mpidr(void)
- 	return mpidr;
- }
- 
--/* Only support Aff0 for now, up to 4 cpus */
--#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
-+#define MPIDR_HWID_BITMASK 0xffffff
-+extern int mpidr_to_cpu(unsigned long mpidr);
++#ifndef _ASMARM_GIC_H_
++#error Do not directly include <asm/gic-v2.h>. Include <asm/gic.h>
++#endif
 +
-+#define MPIDR_LEVEL_SHIFT(level) \
-+	(((1 << level) >> 1) << 3)
-+#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-+	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
- 
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
- extern bool is_user(void);
-diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-index cb8fdbd38dd5..1de99dd184d1 100644
---- a/lib/arm/asm/setup.h
-+++ b/lib/arm/asm/setup.h
-@@ -10,8 +10,8 @@
- #include <asm/page.h>
- #include <asm/pgtable-hwdef.h>
- 
--#define NR_CPUS			8
--extern u32 cpus[NR_CPUS];
-+#define NR_CPUS			255
-+extern u32 cpus[NR_CPUS];	/* per-cpu IDs (MPIDRs) */
- extern int nr_cpus;
- 
- #define NR_MEM_REGIONS		8
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 7e7b39f11dde..241bf9410447 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -30,6 +30,16 @@ int nr_cpus;
- struct mem_region mem_regions[NR_MEM_REGIONS];
- phys_addr_t __phys_offset, __phys_end;
- 
-+int mpidr_to_cpu(unsigned long mpidr)
++#define GICD_ENABLE			0x1
++#define GICC_ENABLE			0x1
++
++#ifndef __ASSEMBLY__
++
++struct gicv2_data {
++	void *dist_base;
++	void *cpu_base;
++	unsigned int irq_nr;
++};
++extern struct gicv2_data gicv2_data;
++
++#define gicv2_dist_base()		(gicv2_data.dist_base)
++#define gicv2_cpu_base()		(gicv2_data.cpu_base)
++
++extern int gicv2_init(void);
++extern void gicv2_enable_defaults(void);
++
++#endif /* !__ASSEMBLY__ */
++#endif /* _ASMARM_GIC_V2_H_ */
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+new file mode 100644
+index 000000000000..e3580bd1d42d
+--- /dev/null
++++ b/lib/arm/asm/gic.h
+@@ -0,0 +1,39 @@
++/*
++ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.
++ */
++#ifndef _ASMARM_GIC_H_
++#define _ASMARM_GIC_H_
++
++#include <asm/gic-v2.h>
++
++/* Distributor registers */
++#define GICD_CTLR			0x0000
++#define GICD_TYPER			0x0004
++#define GICD_ISENABLER			0x0100
++#define GICD_IPRIORITYR			0x0400
++
++#define GICD_TYPER_IRQS(typer)		((((typer) & 0x1f) + 1) * 32)
++#define GICD_INT_EN_SET_SGI		0x0000ffff
++#define GICD_INT_DEF_PRI_X4		0xa0a0a0a0
++
++/* CPU interface registers */
++#define GICC_CTLR			0x0000
++#define GICC_PMR			0x0004
++
++#define GICC_INT_PRI_THRESHOLD		0xf0
++
++#ifndef __ASSEMBLY__
++
++/*
++ * gic_init will try to find all known gics, and then
++ * initialize the gic data for the one found.
++ * returns
++ *  0   : no gic was found
++ *  > 0 : the gic version of the gic found
++ */
++extern int gic_init(void);
++
++#endif /* !__ASSEMBLY__ */
++#endif /* _ASMARM_GIC_H_ */
+diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+new file mode 100644
+index 000000000000..d655105e058b
+--- /dev/null
++++ b/lib/arm/gic.c
+@@ -0,0 +1,76 @@
++/*
++ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.
++ */
++#include <devicetree.h>
++#include <asm/gic.h>
++#include <asm/io.h>
++
++struct gicv2_data gicv2_data;
++
++/*
++ * Documentation/devicetree/bindings/interrupt-controller/arm,gic.txt
++ */
++static bool
++gic_get_dt_bases(const char *compatible, void **base1, void **base2)
 +{
-+	int i;
++	struct dt_pbus_reg reg;
++	struct dt_device gic;
++	struct dt_bus bus;
++	int node, ret;
 +
-+	for (i = 0; i < nr_cpus; ++i)
-+		if (cpus[i] == (mpidr & MPIDR_HWID_BITMASK))
-+			return i;
-+	return -1;
++	dt_bus_init_defaults(&bus);
++	dt_device_init(&gic, &bus, NULL);
++
++	node = dt_device_find_compatible(&gic, compatible);
++	assert(node >= 0 || node == -FDT_ERR_NOTFOUND);
++
++	if (node == -FDT_ERR_NOTFOUND)
++		return false;
++
++	dt_device_bind_node(&gic, node);
++
++	ret = dt_pbus_translate(&gic, 0, &reg);
++	assert(ret == 0);
++	*base1 = ioremap(reg.addr, reg.size);
++
++	ret = dt_pbus_translate(&gic, 1, &reg);
++	assert(ret == 0);
++	*base2 = ioremap(reg.addr, reg.size);
++
++	return true;
 +}
 +
- static void cpu_set(int fdtnode __unused, u32 regval, void *info __unused)
- {
- 	int cpu = nr_cpus++;
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 9a208ff729b7..7e448dc81a6a 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -78,8 +78,13 @@ static inline type get_##reg(void)				\
- 
- DEFINE_GET_SYSREG64(mpidr)
- 
--/* Only support Aff0 for now, gicv2 only */
--#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
-+#define MPIDR_HWID_BITMASK 0xff00ffffff
-+extern int mpidr_to_cpu(unsigned long mpidr);
++int gicv2_init(void)
++{
++	return gic_get_dt_bases("arm,cortex-a15-gic",
++			&gicv2_data.dist_base, &gicv2_data.cpu_base);
++}
 +
-+#define MPIDR_LEVEL_SHIFT(level) \
-+	(((1 << level) >> 1) << 3)
-+#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-+	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
- 
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
- extern bool is_user(void);
++int gic_init(void)
++{
++	if (gicv2_init())
++		return 2;
++	return 0;
++}
++
++void gicv2_enable_defaults(void)
++{
++	void *dist = gicv2_dist_base();
++	void *cpu_base = gicv2_cpu_base();
++	unsigned int i;
++
++	gicv2_data.irq_nr = GICD_TYPER_IRQS(readl(dist + GICD_TYPER));
++	if (gicv2_data.irq_nr > 1020)
++		gicv2_data.irq_nr = 1020;
++
++	for (i = 0; i < gicv2_data.irq_nr; i += 4)
++		writel(GICD_INT_DEF_PRI_X4, dist + GICD_IPRIORITYR + i);
++
++	writel(GICD_INT_EN_SET_SGI, dist + GICD_ISENABLER + 0);
++	writel(GICD_ENABLE, dist + GICD_CTLR);
++
++	writel(GICC_INT_PRI_THRESHOLD, cpu_base + GICC_PMR);
++	writel(GICC_ENABLE, cpu_base + GICC_CTLR);
++}
+diff --git a/lib/arm64/asm/gic-v2.h b/lib/arm64/asm/gic-v2.h
+new file mode 100644
+index 000000000000..52226624a209
+--- /dev/null
++++ b/lib/arm64/asm/gic-v2.h
+@@ -0,0 +1 @@
++#include "../../arm/asm/gic-v2.h"
+diff --git a/lib/arm64/asm/gic.h b/lib/arm64/asm/gic.h
+new file mode 100644
+index 000000000000..e5eb302a31b4
+--- /dev/null
++++ b/lib/arm64/asm/gic.h
+@@ -0,0 +1 @@
++#include "../../arm/asm/gic.h"
 -- 
 2.9.3
 
