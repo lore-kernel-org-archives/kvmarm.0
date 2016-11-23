@@ -1,25 +1,24 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v6 03/11] arm/arm64: smp: support more than
- 8 cpus
-Date: Wed, 23 Nov 2016 11:38:47 +0100
-Message-ID: <e612ddc5-cf5b-045c-a781-b9c1e0da5b63@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v6 10/11] arm/arm64: gicv3: add an IPI test
+Date: Wed, 23 Nov 2016 12:05:42 +0100
+Message-ID: <87635f19-cbe5-a432-f2f9-47844ff9e7f4@redhat.com>
 References: <1479157719-31021-1-git-send-email-drjones@redhat.com>
- <1479157719-31021-4-git-send-email-drjones@redhat.com>
+ <1479157719-31021-11-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DC04409C8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 05:38:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B98E409C4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 06:05:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B3FLqEjl0wLu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Nov 2016 05:38:11 -0500 (EST)
+ with ESMTP id NOj+gb55NC6g for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Nov 2016 06:05:08 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 593F340968
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 05:38:11 -0500 (EST)
-In-Reply-To: <1479157719-31021-4-git-send-email-drjones@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EFB640977
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 06:05:07 -0500 (EST)
+In-Reply-To: <1479157719-31021-11-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,101 +32,596 @@ To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.colu
 Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgRHJldywKCk9uIDE0LzExLzIwMTYgMjI6MDgsIEFuZHJldyBKb25lcyB3cm90ZToKPiBCeSBh
-ZGRpbmcgc3VwcG9ydCBmb3IgbGF1bmNoaW5nIHdpdGggZ2ljdjMgd2UgY2FuIGJyZWFrIHRoZSA4
-IHZjcHUKPiBsaW1pdC4gVGhpcyBwYXRjaCBhZGRzIHN1cHBvcnQgdG8gc21wIGNvZGUgYW5kIGFs
-c28gc2VsZWN0cyB0aGUKPiB2Z2ljIG1vZGVsIGNvcnJlc3BvbmRpbmcgdG8gdGhlIGhvc3QuIFRo
-ZSB2Z2ljIG1vZGVsIG1heSBhbHNvIGJlCj4gbWFudWFsbHkgc2VsZWN0ZWQgYnkgYWRkaW5nIGUu
-Zy4gLW1hY2hpbmUgZ2ljLXZlcnNpb249MyB0bwo+IGV4dHJhX3BhcmFtcy4KPiAKPiBSZXZpZXdl
-ZC1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+IFJldmlld2VkLWJ5
-OiBBbmRyZSBQcnp5d2FyYSA8YW5kcmUucHJ6eXdhcmFAYXJtLmNvbT4KPiBTaWduZWQtb2ZmLWJ5
-OiBBbmRyZXcgSm9uZXMgPGRyam9uZXNAcmVkaGF0LmNvbT4KPiAKPiAtLS0KPiB2NTogbGVmdCBj
-cHVzIGEgdTMyIGZvciBub3cuIENoYW5naW5nIHRvIHU2NCByZXF1aXJlcyBhIGNoYW5nZSB0bwo+
-ICAgICBkZXZpY2V0cmVlLiBXaWxsIGRvIGl0IGxhdGVyLiBbQW5kcmVdCj4gdjQ6IGltcHJvdmVk
-IGNvbW1pdCBtZXNzYWdlCj4gLS0tCj4gIGFybS9ydW4gICAgICAgICAgICAgICAgICAgfCAxOSAr
-KysrKysrKysrKystLS0tLS0tCj4gIGFybS9zZWxmdGVzdC5jICAgICAgICAgICAgfCAgNSArKysr
-LQo+ICBsaWIvYXJtL2FzbS9wcm9jZXNzb3IuaCAgIHwgIDkgKysrKysrKy0tCj4gIGxpYi9hcm0v
-YXNtL3NldHVwLmggICAgICAgfCAgNCArKy0tCj4gIGxpYi9hcm0vc2V0dXAuYyAgICAgICAgICAg
-fCAxMCArKysrKysrKysrCj4gIGxpYi9hcm02NC9hc20vcHJvY2Vzc29yLmggfCAgOSArKysrKysr
-LS0KPiAgNiBmaWxlcyBjaGFuZ2VkLCA0MiBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlvbnMoLSkK
-PiAKPiBkaWZmIC0tZ2l0IGEvYXJtL3J1biBiL2FybS9ydW4KPiBpbmRleCAxZWU2MjMxNTk5ZDYu
-LmEzNTk1MmIyOGI0NiAxMDA3NTUKPiAtLS0gYS9hcm0vcnVuCj4gKysrIGIvYXJtL3J1bgo+IEBA
-IC0zMSwxMyArMzEsNiBAQCBpZiBbIC16ICIkQUNDRUwiIF07IHRoZW4KPiAgCWZpCj4gIGZpCj4g
-IAo+IC1pZiBbICIkSE9TVCIgPSAiYWFyY2g2NCIgXSAmJiBbICIkQUNDRUwiID0gImt2bSIgXTsg
-dGhlbgo+IC0JcHJvY2Vzc29yPSJob3N0Igo+IC0JaWYgWyAiJEFSQ0giID0gImFybSIgXTsgdGhl
-bgo+IC0JCXByb2Nlc3Nvcis9IixhYXJjaDY0PW9mZiIKPiAtCWZpCj4gLWZpCj4gLQo+ICBxZW11
-PSIke1FFTVU6LXFlbXUtc3lzdGVtLSRBUkNIX05BTUV9Igo+ICBxcGF0aD0kKHdoaWNoICRxZW11
-IDI+L2Rldi9udWxsKQo+ICAKPiBAQCAtNTMsNiArNDYsMTggQEAgZmkKPiAgCj4gIE09Jy1tYWNo
-aW5lIHZpcnQnCj4gIAo+ICtpZiBbICIkQUNDRUwiID0gImt2bSIgXTsgdGhlbgo+ICsJaWYgJHFl
-bXUgJE0sXD8gMj4mMSB8IGdyZXAgZ2ljLXZlcnNpb24gPiAvZGV2L251bGw7IHRoZW4KPiArCQlN
-Kz0nLGdpYy12ZXJzaW9uPWhvc3QnCj4gKwlmaQo+ICsJaWYgWyAiJEhPU1QiID0gImFhcmNoNjQi
-IF07IHRoZW4KPiArCQlwcm9jZXNzb3I9Imhvc3QiCj4gKwkJaWYgWyAiJEFSQ0giID0gImFybSIg
-XTsgdGhlbgo+ICsJCQlwcm9jZXNzb3IrPSIsYWFyY2g2ND1vZmYiCj4gKwkJZmkKPiArCWZpCj4g
-K2ZpCj4gKwo+ICBpZiAhICRxZW11ICRNIC1kZXZpY2UgJz8nIDI+JjEgfCBncmVwIHZpcnRjb25z
-b2xlID4gL2Rldi9udWxsOyB0aGVuCj4gIAllY2hvICIkcXBhdGggZG9lc24ndCBzdXBwb3J0IHZp
-cnRpby1jb25zb2xlIGZvciBjaHItdGVzdGRldi4gRXhpdGluZy4iCj4gIAlleGl0IDIKPiBkaWZm
-IC0tZ2l0IGEvYXJtL3NlbGZ0ZXN0LmMgYi9hcm0vc2VsZnRlc3QuYwo+IGluZGV4IDE5NjE2NGY1
-MzEzZC4uMmYxMTdmNzk1ZDJkIDEwMDY0NAo+IC0tLSBhL2FybS9zZWxmdGVzdC5jCj4gKysrIGIv
-YXJtL3NlbGZ0ZXN0LmMKPiBAQCAtMzEyLDkgKzMxMiwxMCBAQCBzdGF0aWMgYm9vbCBwc2NpX2No
-ZWNrKHZvaWQpCj4gIHN0YXRpYyBjcHVtYXNrX3Qgc21wX3JlcG9ydGVkOwo+ICBzdGF0aWMgdm9p
-ZCBjcHVfcmVwb3J0KHZvaWQpCj4gIHsKPiArCXVuc2lnbmVkIGxvbmcgbXBpZHIgPSBnZXRfbXBp
-ZHIoKTsKPiAgCWludCBjcHUgPSBzbXBfcHJvY2Vzc29yX2lkKCk7Cj4gIAo+IC0JcmVwb3J0KCJD
-UFUlZCBvbmxpbmUiLCB0cnVlLCBjcHUpOwo+ICsJcmVwb3J0KCJDUFUoJTNkKSBtcGlkcj0lbHgi
-LCBtcGlkcl90b19jcHUobXBpZHIpID09IGNwdSwgY3B1LCBtcGlkcik7Cj4gIAljcHVtYXNrX3Nl
-dF9jcHUoY3B1LCAmc21wX3JlcG9ydGVkKTsKPiAgCWhhbHQoKTsKPiAgfQo+IEBAIC0zNDMsNiAr
-MzQ0LDcgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQo+ICAKPiAgCX0gZWxzZSBp
-ZiAoc3RyY21wKGFyZ3ZbMV0sICJzbXAiKSA9PSAwKSB7Cj4gIAo+ICsJCXVuc2lnbmVkIGxvbmcg
-bXBpZHIgPSBnZXRfbXBpZHIoKTsKPiAgCQlpbnQgY3B1Owo+ICAKPiAgCQlyZXBvcnQoIlBTQ0kg
-dmVyc2lvbiIsIHBzY2lfY2hlY2soKSk7Cj4gQEAgLTM1Myw2ICszNTUsNyBAQCBpbnQgbWFpbihp
-bnQgYXJnYywgY2hhciAqKmFyZ3YpCj4gIAkJCXNtcF9ib290X3NlY29uZGFyeShjcHUsIGNwdV9y
-ZXBvcnQpOwo+ICAJCX0KPiAgCj4gKwkJcmVwb3J0KCJDUFUoJTNkKSBtcGlkcj0lbHgiLCBtcGlk
-cl90b19jcHUobXBpZHIpID09IDAsIDAsIG1waWRyKTsKPiAgCQljcHVtYXNrX3NldF9jcHUoMCwg
-JnNtcF9yZXBvcnRlZCk7Cj4gIAkJd2hpbGUgKCFjcHVtYXNrX2Z1bGwoJnNtcF9yZXBvcnRlZCkp
-Cj4gIAkJCWNwdV9yZWxheCgpOwo+IGRpZmYgLS1naXQgYS9saWIvYXJtL2FzbS9wcm9jZXNzb3Iu
-aCBiL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oCj4gaW5kZXggMDJmOTEyZjk5OTc0Li5lY2Y1YmJl
-MTgyNGEgMTAwNjQ0Cj4gLS0tIGEvbGliL2FybS9hc20vcHJvY2Vzc29yLmgKPiArKysgYi9saWIv
-YXJtL2FzbS9wcm9jZXNzb3IuaAo+IEBAIC00MCw4ICs0MCwxMyBAQCBzdGF0aWMgaW5saW5lIHVu
-c2lnbmVkIGxvbmcgZ2V0X21waWRyKHZvaWQpCj4gIAlyZXR1cm4gbXBpZHI7Cj4gIH0KPiAgCj4g
-LS8qIE9ubHkgc3VwcG9ydCBBZmYwIGZvciBub3csIHVwIHRvIDQgY3B1cyAqLwo+IC0jZGVmaW5l
-IG1waWRyX3RvX2NwdShtcGlkcikgKChpbnQpKChtcGlkcikgJiAweGZmKSkKPiArI2RlZmluZSBN
-UElEUl9IV0lEX0JJVE1BU0sgMHhmZmZmZmYKPiArZXh0ZXJuIGludCBtcGlkcl90b19jcHUodW5z
-aWduZWQgbG9uZyBtcGlkcik7Cj4gKwo+ICsjZGVmaW5lIE1QSURSX0xFVkVMX1NISUZUKGxldmVs
-KSBcCj4gKwkoKCgxIDw8IGxldmVsKSA+PiAxKSA8PCAzKQo+ICsjZGVmaW5lIE1QSURSX0FGRklO
-SVRZX0xFVkVMKG1waWRyLCBsZXZlbCkgXAo+ICsJKChtcGlkciA+PiBNUElEUl9MRVZFTF9TSElG
-VChsZXZlbCkpICYgMHhmZikKPiAgCj4gIGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgqZnVu
-Yykodm9pZCAqYXJnKSwgdm9pZCAqYXJnLCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7Cj4gIGV4dGVy
-biBib29sIGlzX3VzZXIodm9pZCk7Cj4gZGlmZiAtLWdpdCBhL2xpYi9hcm0vYXNtL3NldHVwLmgg
-Yi9saWIvYXJtL2FzbS9zZXR1cC5oCj4gaW5kZXggY2I4ZmRiZDM4ZGQ1Li4xZGU5OWRkMTg0ZDEg
-MTAwNjQ0Cj4gLS0tIGEvbGliL2FybS9hc20vc2V0dXAuaAo+ICsrKyBiL2xpYi9hcm0vYXNtL3Nl
-dHVwLmgKPiBAQCAtMTAsOCArMTAsOCBAQAo+ICAjaW5jbHVkZSA8YXNtL3BhZ2UuaD4KPiAgI2lu
-Y2x1ZGUgPGFzbS9wZ3RhYmxlLWh3ZGVmLmg+Cj4gIAo+IC0jZGVmaW5lIE5SX0NQVVMJCQk4Cj4g
-LWV4dGVybiB1MzIgY3B1c1tOUl9DUFVTXTsKPiArI2RlZmluZSBOUl9DUFVTCQkJMjU1Cj4gK2V4
-dGVybiB1MzIgY3B1c1tOUl9DUFVTXTsJLyogcGVyLWNwdSBJRHMgKE1QSURScykgKi8KPiAgZXh0
-ZXJuIGludCBucl9jcHVzOwo+ICAKPiAgI2RlZmluZSBOUl9NRU1fUkVHSU9OUwkJOAo+IGRpZmYg
-LS1naXQgYS9saWIvYXJtL3NldHVwLmMgYi9saWIvYXJtL3NldHVwLmMKPiBpbmRleCA3ZTdiMzlm
-MTFkZGUuLjI0MWJmOTQxMDQ0NyAxMDA2NDQKPiAtLS0gYS9saWIvYXJtL3NldHVwLmMKPiArKysg
-Yi9saWIvYXJtL3NldHVwLmMKPiBAQCAtMzAsNiArMzAsMTYgQEAgaW50IG5yX2NwdXM7Cj4gIHN0
-cnVjdCBtZW1fcmVnaW9uIG1lbV9yZWdpb25zW05SX01FTV9SRUdJT05TXTsKPiAgcGh5c19hZGRy
-X3QgX19waHlzX29mZnNldCwgX19waHlzX2VuZDsKPiAgCj4gK2ludCBtcGlkcl90b19jcHUodW5z
-aWduZWQgbG9uZyBtcGlkcikKPiArewo+ICsJaW50IGk7Cj4gKwo+ICsJZm9yIChpID0gMDsgaSA8
-IG5yX2NwdXM7ICsraSkKPiArCQlpZiAoY3B1c1tpXSA9PSAobXBpZHIgJiBNUElEUl9IV0lEX0JJ
-VE1BU0spKQo+ICsJCQlyZXR1cm4gaTsKPiArCXJldHVybiAtMTsKPiArfQo+ICsKPiAgc3RhdGlj
-IHZvaWQgY3B1X3NldChpbnQgZmR0bm9kZSBfX3VudXNlZCwgdTMyIHJlZ3ZhbCwgdm9pZCAqaW5m
-byBfX3VudXNlZCkKPiAgewo+ICAJaW50IGNwdSA9IG5yX2NwdXMrKzsKPiBkaWZmIC0tZ2l0IGEv
-bGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaCBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKPiBp
-bmRleCA5YTIwOGZmNzI5YjcuLjdlNDQ4ZGM4MWE2YSAxMDA2NDQKPiAtLS0gYS9saWIvYXJtNjQv
-YXNtL3Byb2Nlc3Nvci5oCj4gKysrIGIvbGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaAo+IEBAIC03
-OCw4ICs3OCwxMyBAQCBzdGF0aWMgaW5saW5lIHR5cGUgZ2V0XyMjcmVnKHZvaWQpCQkJCVwKPiAg
-Cj4gIERFRklORV9HRVRfU1lTUkVHNjQobXBpZHIpCj4gIAo+IC0vKiBPbmx5IHN1cHBvcnQgQWZm
-MCBmb3Igbm93LCBnaWN2MiBvbmx5ICovCj4gLSNkZWZpbmUgbXBpZHJfdG9fY3B1KG1waWRyKSAo
-KGludCkoKG1waWRyKSAmIDB4ZmYpKQo+ICsjZGVmaW5lIE1QSURSX0hXSURfQklUTUFTSyAweGZm
-MDBmZmZmZmYKPiArZXh0ZXJuIGludCBtcGlkcl90b19jcHUodW5zaWduZWQgbG9uZyBtcGlkcik7
-Cj4gKwo+ICsjZGVmaW5lIE1QSURSX0xFVkVMX1NISUZUKGxldmVsKSBcCj4gKwkoKCgxIDw8IGxl
-dmVsKSA+PiAxKSA8PCAzKQo+ICsjZGVmaW5lIE1QSURSX0FGRklOSVRZX0xFVkVMKG1waWRyLCBs
-ZXZlbCkgXAo+ICsJKChtcGlkciA+PiBNUElEUl9MRVZFTF9TSElGVChsZXZlbCkpICYgMHhmZikK
-PiAgCj4gIGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgqZnVuYykodm9pZCAqYXJnKSwgdm9p
-ZCAqYXJnLCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7Cj4gIGV4dGVybiBib29sIGlzX3VzZXIodm9p
-ZCk7Cj4gClJldmlld2VkLWJ5OiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+CgpU
-aGFua3MKCkVyaWMKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBz
-Oi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Drew,
+
+On 14/11/2016 22:08, Andrew Jones wrote:
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> 
+> ---
+> v6: move most gicv2/gicv3 wrappers to common code [Alex]
+> v5:
+>  - fix copy+paste error in gicv3_write_eoir [drew]
+>  - use modern register names [Andre]
+> v4:
+>  - heavily comment gicv3_ipi_send_tlist() [Eric]
+>  - changes needed for gicv2 iar/irqstat fix to other patch
+> v2:
+>  - use IRM for gicv3 broadcast
+> ---
+>  arm/gic.c                  |  97 +++++++++++++++++++++++++-----
+>  arm/unittests.cfg          |   6 ++
+>  lib/arm/asm/arch_gicv3.h   |  23 +++++++
+>  lib/arm/asm/gic-v3.h       |  10 +++-
+>  lib/arm/asm/gic.h          |  60 +++++++++++++++++++
+>  lib/arm/gic.c              | 145 ++++++++++++++++++++++++++++++++++++++++++---
+>  lib/arm64/asm/arch_gicv3.h |  22 +++++++
+>  7 files changed, 338 insertions(+), 25 deletions(-)
+> 
+> diff --git a/arm/gic.c b/arm/gic.c
+> index b42c2b1ca1e1..d954a3775c26 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -3,6 +3,8 @@
+>   *
+>   * GICv2
+>   *   + test sending/receiving IPIs
+> + * GICv3
+> + *   + test sending/receiving IPIs
+>   *
+>   * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+>   *
+> @@ -16,7 +18,15 @@
+>  #include <asm/barrier.h>
+>  #include <asm/io.h>
+>  
+> -static int gic_version;
+> +struct gic {
+> +	struct {
+> +		void (*send_self)(void);
+> +		void (*send_tlist)(cpumask_t *mask, int irq);
+> +		void (*send_broadcast)(void);
+> +	} ipi;
+> +};
+what is the rationale behind not putting this into common_ops?
+> +
+> +static struct gic *gic;
+>  static int acked[NR_CPUS], spurious[NR_CPUS];
+>  static cpumask_t ready;
+>  
+> @@ -83,11 +93,11 @@ static void check_spurious(void)
+>  
+>  static void ipi_handler(struct pt_regs *regs __unused)
+>  {
+> -	u32 irqstat = readl(gicv2_cpu_base() + GICC_IAR);
+> -	u32 irqnr = irqstat & GICC_IAR_INT_ID_MASK;
+> +	u32 irqstat = gic_read_iar();
+> +	u32 irqnr = gic_iar_irqnr(irqstat);
+>  
+>  	if (irqnr != GICC_INT_SPURIOUS) {
+> -		writel(irqstat, gicv2_cpu_base() + GICC_EOIR);
+> +		gic_write_eoir(irqstat);
+>  		smp_rmb(); /* pairs with wmb in ipi_test functions */
+>  		++acked[smp_processor_id()];
+>  		smp_wmb(); /* pairs with rmb in check_acked */
+> @@ -97,6 +107,38 @@ static void ipi_handler(struct pt_regs *regs __unused)
+>  	}
+>  }
+>  
+> +static void gicv2_ipi_send_self(void)
+> +{
+> +	writel(2 << 24, gicv2_dist_base() + GICD_SGIR);
+> +}
+> +
+> +static void gicv2_ipi_send_tlist(cpumask_t *mask, int irq __unused)
+> +{
+> +	u8 tlist = (u8)cpumask_bits(mask)[0];
+> +
+> +	writel(tlist << 16, gicv2_dist_base() + GICD_SGIR);
+> +}
+> +
+> +static void gicv2_ipi_send_broadcast(void)
+> +{
+> +	writel(1 << 24, gicv2_dist_base() + GICD_SGIR);
+> +}
+> +
+> +static void gicv3_ipi_send_self(void)
+> +{
+> +	cpumask_t mask;
+> +
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(smp_processor_id(), &mask);
+> +	gicv3_ipi_send_tlist(&mask, 0);
+> +}
+> +
+> +static void gicv3_ipi_send_broadcast(void)
+> +{
+> +	gicv3_write_sgi1r(1ULL << 40);
+> +	isb();
+> +}
+> +
+>  static void ipi_test_self(void)
+>  {
+>  	cpumask_t mask;
+> @@ -106,7 +148,7 @@ static void ipi_test_self(void)
+>  	smp_wmb();
+>  	cpumask_clear(&mask);
+>  	cpumask_set_cpu(0, &mask);
+> -	writel(2 << 24, gicv2_dist_base() + GICD_SGIR);
+> +	gic->ipi.send_self();
+>  	check_acked(&mask);
+>  	report_prefix_pop();
+>  }
+> @@ -114,14 +156,15 @@ static void ipi_test_self(void)
+>  static void ipi_test_smp(void)
+>  {
+>  	cpumask_t mask;
+> -	unsigned long tlist;
+> +	int i;
+>  
+>  	report_prefix_push("target-list");
+>  	memset(acked, 0, sizeof(acked));
+>  	smp_wmb();
+> -	tlist = cpumask_bits(&cpu_present_mask)[0] & 0xaa;
+> -	cpumask_bits(&mask)[0] = tlist;
+> -	writel((u8)tlist << 16, gicv2_dist_base() + GICD_SGIR);
+> +	cpumask_copy(&mask, &cpu_present_mask);
+> +	for (i = 0; i < nr_cpus; i += 2)
+> +		cpumask_clear_cpu(i, &mask);
+> +	gic->ipi.send_tlist(&mask, 0);
+>  	check_acked(&mask);
+>  	report_prefix_pop();
+>  
+> @@ -130,14 +173,14 @@ static void ipi_test_smp(void)
+>  	smp_wmb();
+>  	cpumask_copy(&mask, &cpu_present_mask);
+>  	cpumask_clear_cpu(0, &mask);
+> -	writel(1 << 24, gicv2_dist_base() + GICD_SGIR);
+> +	gic->ipi.send_broadcast();
+>  	check_acked(&mask);
+>  	report_prefix_pop();
+>  }
+>  
+>  static void ipi_enable(void)
+>  {
+> -	gicv2_enable_defaults();
+> +	gic_enable_defaults();
+>  #ifdef __arm__
+>  	install_exception_handler(EXCPTN_IRQ, ipi_handler);
+>  #else
+> @@ -154,18 +197,42 @@ static void ipi_recv(void)
+>  		wfi();
+>  }
+>  
+> +static struct gic gicv2 = {
+> +	.ipi = {
+> +		.send_self = gicv2_ipi_send_self,
+> +		.send_tlist = gicv2_ipi_send_tlist,
+> +		.send_broadcast = gicv2_ipi_send_broadcast,
+> +	},
+> +};
+> +
+> +static struct gic gicv3 = {
+> +	.ipi = {
+> +		.send_self = gicv3_ipi_send_self,
+> +		.send_tlist = gicv3_ipi_send_tlist,
+> +		.send_broadcast = gicv3_ipi_send_broadcast,
+> +	},
+> +};
+> +
+>  int main(int argc, char **argv)
+>  {
+>  	char pfx[8];
+>  	int cpu;
+>  
+> -	gic_version = gic_init();
+> -	if (!gic_version)
+> -		report_abort("No gic present!");
+> +	if (!gic_init())
+> +		report_abort("No supported gic present!");
+>  
+> -	snprintf(pfx, sizeof(pfx), "gicv%d", gic_version);
+> +	snprintf(pfx, sizeof(pfx), "gicv%d", gic_version());
+>  	report_prefix_push(pfx);
+>  
+> +	switch (gic_version()) {
+> +	case 2:
+> +		gic = &gicv2;
+> +		break;
+> +	case 3:
+> +		gic = &gicv3;
+> +		break;
+> +	}
+> +
+>  	if (argc < 2) {
+>  
+>  		report_prefix_push("ipi");
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index e631c35e2bbb..c7392c747f98 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -66,3 +66,9 @@ file = gic.flat
+>  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+>  extra_params = -machine gic-version=2 -append 'ipi'
+>  groups = gic
+> +
+> +[gicv3-ipi]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +extra_params = -machine gic-version=3 -append 'ipi'
+> +groups = gic
+> diff --git a/lib/arm/asm/arch_gicv3.h b/lib/arm/asm/arch_gicv3.h
+> index 276577452a14..b47cd2e0090b 100644
+> --- a/lib/arm/asm/arch_gicv3.h
+> +++ b/lib/arm/asm/arch_gicv3.h
+> @@ -16,10 +16,28 @@
+>  #define __stringify xstr
+>  
+>  #define __ACCESS_CP15(CRn, Op1, CRm, Op2)	p15, Op1, %0, CRn, CRm, Op2
+> +#define __ACCESS_CP15_64(Op1, CRm)		p15, Op1, %Q0, %R0, CRm
+>  
+> +#define ICC_EOIR1			__ACCESS_CP15(c12, 0, c12, 1)
+> +#define ICC_IAR1			__ACCESS_CP15(c12, 0, c12, 0)
+> +#define ICC_SGI1R			__ACCESS_CP15_64(0, c12)
+>  #define ICC_PMR				__ACCESS_CP15(c4, 0, c6, 0)
+>  #define ICC_IGRPEN1			__ACCESS_CP15(c12, 0, c12, 7)
+>  
+> +static inline void gicv3_write_eoir(u32 irq)
+> +{
+> +	asm volatile("mcr " __stringify(ICC_EOIR1) : : "r" (irq));
+> +	isb();
+> +}
+> +
+> +static inline u32 gicv3_read_iar(void)
+> +{
+> +	u32 irqstat;
+> +	asm volatile("mrc " __stringify(ICC_IAR1) : "=r" (irqstat));
+> +	dsb(sy);
+> +	return irqstat;
+> +}
+> +
+>  static inline void gicv3_write_pmr(u32 val)
+>  {
+>  	asm volatile("mcr " __stringify(ICC_PMR) : : "r" (val));
+> @@ -31,6 +49,11 @@ static inline void gicv3_write_grpen1(u32 val)
+>  	isb();
+>  }
+>  
+> +static inline void gicv3_write_sgi1r(u64 val)
+> +{
+> +	asm volatile("mcrr " __stringify(ICC_SGI1R) : : "r" (val));
+> +}
+> +
+>  /*
+>   * We may access GICR_TYPER and GITS_TYPER by reading both the TYPER
+>   * offset and the following offset (+ 4) and then combining them to
+> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+> index 73ade4681d21..43f9ffce56de 100644
+> --- a/lib/arm/asm/gic-v3.h
+> +++ b/lib/arm/asm/gic-v3.h
+> @@ -33,12 +33,19 @@
+>  #define GICR_ISENABLER0			GICD_ISENABLER
+>  #define GICR_IPRIORITYR0		GICD_IPRIORITYR
+>  
+> +#define ICC_SGI1R_AFFINITY_1_SHIFT	16
+> +#define ICC_SGI1R_AFFINITY_2_SHIFT	32
+> +#define ICC_SGI1R_AFFINITY_3_SHIFT	48
+> +#define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
+> +	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level ## _SHIFT)
+> +
+>  #include <asm/arch_gicv3.h>
+>  
+>  #ifndef __ASSEMBLY__
+>  #include <asm/setup.h>
+> -#include <asm/smp.h>
+>  #include <asm/processor.h>
+> +#include <asm/cpumask.h>
+> +#include <asm/smp.h>
+>  #include <asm/io.h>
+>  
+>  struct gicv3_data {
+> @@ -55,6 +62,7 @@ extern struct gicv3_data gicv3_data;
+>  extern int gicv3_init(void);
+>  extern void gicv3_enable_defaults(void);
+>  extern void gicv3_set_redist_base(size_t stride);
+> +extern void gicv3_ipi_send_tlist(cpumask_t *mask, int irq);
+>  
+>  static inline void gicv3_do_wait_for_rwp(void *base)
+>  {
+> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> index 21511997f2a9..c2267b6b3937 100644
+> --- a/lib/arm/asm/gic.h
+> +++ b/lib/arm/asm/gic.h
+> @@ -42,5 +42,65 @@
+>   */
+>  extern int gic_init(void);
+>  
+> +/*
+> + * gic_common_ops collects some functions that we provide unit
+> + * tests that don't care which gic version they're using.
+nit: wording?
+> + */
+> +struct gic_common_ops {
+> +	int gic_version;
+> +	u32 (*read_iar)(void);
+> +	u32 (*iar_irqnr)(u32 iar);
+> +	void (*write_eoir)(u32 irqstat);
+> +	void (*ipi_send)(int cpu, int irq);
+what is the rationale behind not putting enable_defaults here?
+
+lib/arm/gic.c becomes bigger and bigger. Woudn't it make sense to have
+separate lib/arm/gic-v2/v3.c and arm/gic.c only call generic ops?
+
+Typically ipi functions could go in lib
+
+But nethertheless this can be changed later.
+
+Thanks
+
+Eric
+> +};
+> +
+> +extern struct gic_common_ops *gic_common_ops;
+> +
+> +static inline int gic_version(void)
+> +{
+> +	assert(gic_common_ops);
+> +	return gic_common_ops->gic_version;
+> +}
+> +
+> +static inline u32 gic_read_iar(void)
+> +{
+> +	assert(gic_common_ops && gic_common_ops->read_iar);
+> +	return gic_common_ops->read_iar();
+> +}
+> +
+> +static inline u32 gic_iar_irqnr(u32 iar)
+> +{
+> +	assert(gic_common_ops && gic_common_ops->iar_irqnr);
+> +	return gic_common_ops->iar_irqnr(iar);
+> +}
+> +
+> +static inline void gic_write_eoir(u32 irqstat)
+> +{
+> +	assert(gic_common_ops && gic_common_ops->write_eoir);
+> +	gic_common_ops->write_eoir(irqstat);
+> +}
+> +
+> +static inline void gic_ipi_send(int cpu, int irq)
+> +{
+> +	assert(gic_common_ops && gic_common_ops->ipi_send);
+> +	gic_common_ops->ipi_send(cpu, irq);
+> +}
+> +
+> +static inline void gic_enable_defaults(void)
+> +{
+> +	switch (gic_version()) {
+> +	case 2:
+> +		gicv2_enable_defaults();
+> +		break;
+> +	case 3:
+> +		gicv3_enable_defaults();
+> +		break;
+> +	default:
+> +		printf("%s: Unknown gic version %d\n", __func__,
+> +			gic_version());
+> +		abort();
+> +	}
+> +}
+> +
+>  #endif /* !__ASSEMBLY__ */
+>  #endif /* _ASMARM_GIC_H_ */
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index d703ad96a37e..4f67363e073b 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -56,15 +56,6 @@ int gicv3_init(void)
+>  			&gicv3_data.redist_base[0]);
+>  }
+>  
+> -int gic_init(void)
+> -{
+> -	if (gicv2_init())
+> -		return 2;
+> -	else if (gicv3_init())
+> -		return 3;
+> -	return 0;
+> -}
+> -
+>  void gicv2_enable_defaults(void)
+>  {
+>  	void *dist = gicv2_dist_base();
+> @@ -85,6 +76,28 @@ void gicv2_enable_defaults(void)
+>  	writel(GICC_ENABLE, cpu_base + GICC_CTLR);
+>  }
+>  
+> +static u32 gicv2_read_iar(void)
+> +{
+> +	return readl(gicv2_cpu_base() + GICC_IAR);
+> +}
+> +
+> +static u32 gicv2_iar_irqnr(u32 iar)
+> +{
+> +	return iar & GICC_IAR_INT_ID_MASK;
+> +}
+> +
+> +static void gicv2_write_eoir(u32 irqstat)
+> +{
+> +	writel(irqstat, gicv2_cpu_base() + GICC_EOIR);
+> +}
+> +
+> +static void gicv2_ipi_send(int cpu, int irq)
+> +{
+> +	assert(cpu < 8);
+> +	assert(irq < 16);
+> +	writel(1 << (cpu + 16) | irq, gicv2_dist_base() + GICD_SGIR);
+> +}
+> +
+>  void gicv3_set_redist_base(size_t stride)
+>  {
+>  	u32 aff = mpidr_compress(get_mpidr());
+> @@ -138,3 +151,117 @@ void gicv3_enable_defaults(void)
+>  	gicv3_write_pmr(GICC_INT_PRI_THRESHOLD);
+>  	gicv3_write_grpen1(1);
+>  }
+> +
+> +static u32 gicv3_iar_irqnr(u32 iar)
+> +{
+> +	return iar;
+> +}
+> +
+> +void gicv3_ipi_send_tlist(cpumask_t *mask, int irq)
+> +{
+> +	u16 tlist;
+> +	int cpu;
+> +
+> +	assert(irq < 16);
+> +
+> +	/*
+> +	 * For each cpu in the mask collect its peers, which are also in
+> +	 * the mask, in order to form target lists.
+> +	 */
+> +	for_each_cpu(cpu, mask) {
+> +		u64 mpidr = cpus[cpu], sgi1r;
+> +		u64 cluster_id;
+> +
+> +		/*
+> +		 * GICv3 can send IPIs to up 16 peer cpus with a single
+> +		 * write to ICC_SGI1R_EL1 (using the target list). Peers
+> +		 * are cpus that have nearly identical MPIDRs, the only
+> +		 * difference being Aff0. The matching upper affinity
+> +		 * levels form the cluster ID.
+> +		 */
+> +		cluster_id = mpidr & ~0xffUL;
+> +		tlist = 0;
+> +
+> +		/*
+> +		 * Sort of open code for_each_cpu in order to have a
+> +		 * nested for_each_cpu loop.
+> +		 */
+> +		while (cpu < nr_cpus) {
+> +			if ((mpidr & 0xff) >= 16) {
+> +				printf("cpu%d MPIDR:aff0 is %d (>= 16)!\n",
+> +					cpu, (int)(mpidr & 0xff));
+> +				break;
+> +			}
+> +
+> +			tlist |= 1 << (mpidr & 0xf);
+> +
+> +			cpu = cpumask_next(cpu, mask);
+> +			if (cpu >= nr_cpus)
+> +				break;
+> +
+> +			mpidr = cpus[cpu];
+> +
+> +			if (cluster_id != (mpidr & ~0xffUL)) {
+> +				/*
+> +				 * The next cpu isn't in our cluster. Roll
+> +				 * back the cpu index allowing the outer
+> +				 * for_each_cpu to find it again with
+> +				 * cpumask_next
+> +				 */
+> +				--cpu;
+> +				break;
+> +			}
+> +		}
+> +
+> +		/* Send the IPIs for the target list of this cluster */
+> +		sgi1r = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3)	|
+> +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 2)	|
+> +			 irq << 24				|
+> +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 1)	|
+> +			 tlist);
+> +
+> +		gicv3_write_sgi1r(sgi1r);
+> +	}
+> +
+> +	/* Force the above writes to ICC_SGI1R_EL1 to be executed */
+> +	isb();
+> +}
+> +
+> +static void gicv3_ipi_send(int cpu, int irq)
+> +{
+> +	cpumask_t mask;
+> +
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(cpu, &mask);
+> +	gicv3_ipi_send_tlist(&mask, irq);
+> +}
+> +
+> +static struct gic_common_ops gicv2_common_ops = {
+> +	.gic_version = 2,
+> +	.read_iar = gicv2_read_iar,
+> +	.iar_irqnr = gicv2_iar_irqnr,
+> +	.write_eoir = gicv2_write_eoir,
+> +	.ipi_send = gicv2_ipi_send,
+> +};
+> +
+> +static struct gic_common_ops gicv3_common_ops = {
+> +	.gic_version = 3,
+> +	.read_iar = gicv3_read_iar,
+> +	.iar_irqnr = gicv3_iar_irqnr,
+> +	.write_eoir = gicv3_write_eoir,
+> +	.ipi_send = gicv3_ipi_send,
+> +};
+> +
+> +struct gic_common_ops *gic_common_ops;
+> +
+> +int gic_init(void)
+> +{
+> +	if (gicv2_init()) {
+> +		gic_common_ops = &gicv2_common_ops;
+> +		return 2;
+> +	} else if (gicv3_init()) {
+> +		gic_common_ops = &gicv3_common_ops;
+> +		return 3;
+> +	}
+> +	return 0;
+> +}
+> diff --git a/lib/arm64/asm/arch_gicv3.h b/lib/arm64/asm/arch_gicv3.h
+> index 6d353567f56a..874775828016 100644
+> --- a/lib/arm64/asm/arch_gicv3.h
+> +++ b/lib/arm64/asm/arch_gicv3.h
+> @@ -10,6 +10,9 @@
+>  
+>  #include <asm/sysreg.h>
+>  
+> +#define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
+> +#define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
+> +#define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
+>  #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+>  #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
+>  
+> @@ -27,6 +30,20 @@
+>   * sets the GP register's most significant bits to 0 with an explicit cast.
+>   */
+>  
+> +static inline void gicv3_write_eoir(u32 irq)
+> +{
+> +	asm volatile("msr_s " __stringify(ICC_EOIR1_EL1) ", %0" : : "r" ((u64)irq));
+> +	isb();
+> +}
+> +
+> +static inline u32 gicv3_read_iar(void)
+> +{
+> +	u64 irqstat;
+> +	asm volatile("mrs_s %0, " __stringify(ICC_IAR1_EL1) : "=r" (irqstat));
+> +	dsb(sy);
+> +	return (u64)irqstat;
+> +}
+> +
+>  static inline void gicv3_write_pmr(u32 val)
+>  {
+>  	asm volatile("msr_s " __stringify(ICC_PMR_EL1) ", %0" : : "r" ((u64)val));
+> @@ -38,6 +55,11 @@ static inline void gicv3_write_grpen1(u32 val)
+>  	isb();
+>  }
+>  
+> +static inline void gicv3_write_sgi1r(u64 val)
+> +{
+> +	asm volatile("msr_s " __stringify(ICC_SGI1R_EL1) ", %0" : : "r" (val));
+> +}
+> +
+>  #define gicv3_read_typer(c)		readq(c)
+>  
+>  #endif /* __ASSEMBLY__ */
+> 
