@@ -1,29 +1,27 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v6 11/11] arm/arm64: gic: don't just use
- zero
-Date: Wed, 23 Nov 2016 14:46:27 +0100
-Message-ID: <20161123134627.gox25oqshkrrqsgv@kamzik.brq.redhat.com>
-References: <1479157719-31021-1-git-send-email-drjones@redhat.com>
- <1479157719-31021-12-git-send-email-drjones@redhat.com>
- <90b580c8-e797-9da7-ebe7-e76719427535@redhat.com>
- <20161123130102.rplq3d3ejipcytnw@kamzik.brq.redhat.com>
- <fb04266a-47fd-48b4-3773-1b171c4bd325@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH 3/4] arm/arm64: GICv2: add
+ GICD_ITARGETSR testing
+Date: Wed, 23 Nov 2016 14:51:04 +0100
+Message-ID: <2df007cd-bfde-e79a-46c8-f0a399cd7bd9@redhat.com>
+References: <20161117175752.16475-1-andre.przywara@arm.com>
+ <20161117175752.16475-4-andre.przywara@arm.com>
+ <20161118142008.osvculf5y3tfxvdv@kamzik.brq.redhat.com>
+ <d2ff98ec-7bf0-46b5-35e1-6d41ef11996f@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E326B40C42
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 08:45:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2232540C27
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 08:50:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n13yKMHLJGSt for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Nov 2016 08:45:53 -0500 (EST)
+ with ESMTP id T1j9TNUvs+2k for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Nov 2016 08:50:28 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A075D40878
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 08:45:52 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <fb04266a-47fd-48b4-3773-1b171c4bd325@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A3AC40C25
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 08:50:27 -0500 (EST)
+In-Reply-To: <d2ff98ec-7bf0-46b5-35e1-6d41ef11996f@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,314 +31,146 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>, Andre Przywara <andre.przywara@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Nov 23, 2016 at 02:33:31PM +0100, Auger Eric wrote:
-> 
-> 
-> On 23/11/2016 14:01, Andrew Jones wrote:
-> > On Wed, Nov 23, 2016 at 12:28:34PM +0100, Auger Eric wrote:
-> >> Hi,
-> >>
-> >> On 14/11/2016 22:08, Andrew Jones wrote:
-> >>> Allow user to select who sends ipis and with which irq,
-> >>> rather than just always sending irq=0 from cpu0.
-> >> From a user point of view is there a way to know the list of available
-> >> tests and their arg?
-> > 
-> > Not at the moment. I could change the arg-less run and/or add
-> > a '-h' though that would provide a usage. So far unit tests
-> > have never had -h's, but it's not a bad idea.
-> 
-> OK thanks for the info
-> > 
-> >>>
-> >>> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> >>>
-> >>> ---
-> >>> v6:
-> >>>  - make sender/irq names more future-proof [drew]
-> >>>  - sanity check inputs [drew]
-> >>>  - introduce check_sender/irq and bad_sender/irq to more
-> >>>    cleanly do checks [drew]
-> >>>  - default sender and irq to 1, instead of still zero [drew]
-> >>> v4: improve structure and make sure spurious checking is
-> >>>     done even when the sender isn't cpu0
-> >>> v2: actually check that the irq received was the irq sent,
-> >>>     and (for gicv2) that the sender is the expected one.
-> >>> ---
-> >>>  arm/gic.c | 124 +++++++++++++++++++++++++++++++++++++++++++++++++-------------
-> >>>  1 file changed, 99 insertions(+), 25 deletions(-)
-> >>>
-> >>> diff --git a/arm/gic.c b/arm/gic.c
-> >>> index d954a3775c26..638b8b140c96 100644
-> >>> --- a/arm/gic.c
-> >>> +++ b/arm/gic.c
-> >>> @@ -11,6 +11,7 @@
-> >>>   * This work is licensed under the terms of the GNU LGPL, version 2.
-> >>>   */
-> >>>  #include <libcflat.h>
-> >>> +#include <util.h>
-> >>>  #include <asm/setup.h>
-> >>>  #include <asm/processor.h>
-> >>>  #include <asm/gic.h>
-> >>> @@ -28,6 +29,8 @@ struct gic {
-> >>>  
-> >>>  static struct gic *gic;
-> >>>  static int acked[NR_CPUS], spurious[NR_CPUS];
-> >>> +static int bad_sender[NR_CPUS], bad_irq[NR_CPUS];
-> >>> +static int cmdl_sender = 1, cmdl_irq = 1;
-> >>>  static cpumask_t ready;
-> >>>  
-> >>>  static void nr_cpu_check(int nr)
-> >>> @@ -43,10 +46,23 @@ static void wait_on_ready(void)
-> >>>  		cpu_relax();
-> >>>  }
-> >>>  
-> >>> +static void stats_reset(void)
-> >>> +{
-> >>> +	int i;
-> >>> +
-> >>> +	for (i = 0; i < nr_cpus; ++i) {
-> >>> +		acked[i] = 0;
-> >>> +		bad_sender[i] = -1;
-> >>> +		bad_irq[i] = -1;
-> >>> +	}
-> >>> +	smp_wmb();
-> >>> +}
-> >>> +
-> >>>  static void check_acked(cpumask_t *mask)
-> >>>  {
-> >>>  	int missing = 0, extra = 0, unexpected = 0;
-> >>>  	int nr_pass, cpu, i;
-> >>> +	bool bad = false;
-> >>>  
-> >>>  	/* Wait up to 5s for all interrupts to be delivered */
-> >>>  	for (i = 0; i < 50; ++i) {
-> >>> @@ -56,9 +72,21 @@ static void check_acked(cpumask_t *mask)
-> >>>  			smp_rmb();
-> >>>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
-> >>>  				acked[cpu] == 1 : acked[cpu] == 0;
-> >>> +
-> >>> +			if (bad_sender[cpu] != -1) {
-> >>> +				printf("cpu%d received IPI from wrong sender %d\n",
-> >>> +					cpu, bad_sender[cpu]);
-> >>> +				bad = true;
-> >>> +			}
-> >>> +
-> >>> +			if (bad_irq[cpu] != -1) {
-> >>> +				printf("cpu%d received wrong irq %d\n",
-> >>> +					cpu, bad_irq[cpu]);
-> >>> +				bad = true;
-> >>> +			}
-> >>>  		}
-> >>>  		if (nr_pass == nr_cpus) {
-> >>> -			report("Completed in %d ms", true, ++i * 100);
-> >>> +			report("Completed in %d ms", !bad, ++i * 100);
-> >>>  			return;
-> >>>  		}
-> >>>  	}
-> >>> @@ -91,6 +119,22 @@ static void check_spurious(void)
-> >>>  	}
-> >>>  }
-> >>>  
-> >>> +static void check_ipi_sender(u32 irqstat)
-> >>> +{
-> >>> +	if (gic_version() == 2) {
-> >>> +		int src = (irqstat >> 10) & 7;
-> >>> +
-> >>> +		if (src != cmdl_sender)
-> >>> +			bad_sender[smp_processor_id()] = src;
-> >>> +	}
-> >>> +}
-> >>> +
-> >>> +static void check_irqnr(u32 irqnr)
-> >>> +{
-> >>> +	if (irqnr != (u32)cmdl_irq)
-> >>> +		bad_irq[smp_processor_id()] = irqnr;
-> >>> +}
-> >>> +
-> >>>  static void ipi_handler(struct pt_regs *regs __unused)
-> >>>  {
-> >>>  	u32 irqstat = gic_read_iar();
-> >>> @@ -98,8 +142,10 @@ static void ipi_handler(struct pt_regs *regs __unused)
-> >>>  
-> >>>  	if (irqnr != GICC_INT_SPURIOUS) {
-> >>>  		gic_write_eoir(irqstat);
-> >>> -		smp_rmb(); /* pairs with wmb in ipi_test functions */
-> >>> +		smp_rmb(); /* pairs with wmb in stats_reset */
-> >>>  		++acked[smp_processor_id()];
-> >>> +		check_ipi_sender(irqstat);
-> >>> +		check_irqnr(irqnr);
-> >>>  		smp_wmb(); /* pairs with rmb in check_acked */
-> >>>  	} else {
-> >>>  		++spurious[smp_processor_id()];
-> >>> @@ -109,19 +155,19 @@ static void ipi_handler(struct pt_regs *regs __unused)
-> >>>  
-> >>>  static void gicv2_ipi_send_self(void)
-> >>>  {
-> >>> -	writel(2 << 24, gicv2_dist_base() + GICD_SGIR);
-> >>> +	writel(2 << 24 | cmdl_irq, gicv2_dist_base() + GICD_SGIR);
-> >>>  }
-> >>>  
-> >>> -static void gicv2_ipi_send_tlist(cpumask_t *mask, int irq __unused)
-> >>> +static void gicv2_ipi_send_tlist(cpumask_t *mask, int irq)
-> >>>  {
-> >>>  	u8 tlist = (u8)cpumask_bits(mask)[0];
-> >>>  
-> >>> -	writel(tlist << 16, gicv2_dist_base() + GICD_SGIR);
-> >>> +	writel(tlist << 16 | irq, gicv2_dist_base() + GICD_SGIR);
-> >>>  }
-> >>>  
-> >>>  static void gicv2_ipi_send_broadcast(void)
-> >>>  {
-> >>> -	writel(1 << 24, gicv2_dist_base() + GICD_SGIR);
-> >>> +	writel(1 << 24 | cmdl_irq, gicv2_dist_base() + GICD_SGIR);
-> >>>  }
-> >>>  
-> >>>  static void gicv3_ipi_send_self(void)
-> >>> @@ -130,12 +176,12 @@ static void gicv3_ipi_send_self(void)
-> >>>  
-> >>>  	cpumask_clear(&mask);
-> >>>  	cpumask_set_cpu(smp_processor_id(), &mask);
-> >>> -	gicv3_ipi_send_tlist(&mask, 0);
-> >>> +	gicv3_ipi_send_tlist(&mask, cmdl_irq);
-> >>>  }
-> >>>  
-> >>>  static void gicv3_ipi_send_broadcast(void)
-> >>>  {
-> >>> -	gicv3_write_sgi1r(1ULL << 40);
-> >>> +	gicv3_write_sgi1r(1ULL << 40 | cmdl_irq << 24);
-> >>>  	isb();
-> >>>  }
-> >>>  
-> >>> @@ -144,10 +190,9 @@ static void ipi_test_self(void)
-> >>>  	cpumask_t mask;
-> >>>  
-> >>>  	report_prefix_push("self");
-> >>> -	memset(acked, 0, sizeof(acked));
-> >>> -	smp_wmb();
-> >>> +	stats_reset();
-> >>>  	cpumask_clear(&mask);
-> >>> -	cpumask_set_cpu(0, &mask);
-> >>> +	cpumask_set_cpu(smp_processor_id(), &mask);
-> >>>  	gic->ipi.send_self();
-> >>>  	check_acked(&mask);
-> >>>  	report_prefix_pop();
-> >>> @@ -159,20 +204,18 @@ static void ipi_test_smp(void)
-> >>>  	int i;
-> >>>  
-> >>>  	report_prefix_push("target-list");
-> >>> -	memset(acked, 0, sizeof(acked));
-> >>> -	smp_wmb();
-> >>> +	stats_reset();
-> >>>  	cpumask_copy(&mask, &cpu_present_mask);
-> >>> -	for (i = 0; i < nr_cpus; i += 2)
-> >>> +	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
-> >>>  		cpumask_clear_cpu(i, &mask);
-> >>> -	gic->ipi.send_tlist(&mask, 0);
-> >>> +	gic->ipi.send_tlist(&mask, cmdl_irq);
-> >>>  	check_acked(&mask);
-> >>>  	report_prefix_pop();
-> >>>  
-> >>>  	report_prefix_push("broadcast");
-> >>> -	memset(acked, 0, sizeof(acked));
-> >>> -	smp_wmb();
-> >>> +	stats_reset();
-> >>>  	cpumask_copy(&mask, &cpu_present_mask);
-> >>> -	cpumask_clear_cpu(0, &mask);
-> >>> +	cpumask_clear_cpu(smp_processor_id(), &mask);
-> >>>  	gic->ipi.send_broadcast();
-> >>>  	check_acked(&mask);
-> >>>  	report_prefix_pop();
-> >>> @@ -189,6 +232,16 @@ static void ipi_enable(void)
-> >>>  	local_irq_enable();
-> >>>  }
-> >>>  
-> >>> +static void ipi_send(void)
-> >>> +{
-> >>> +	ipi_enable();
-> >>> +	wait_on_ready();
-> >>> +	ipi_test_self();
-> >>> +	ipi_test_smp();
-> >>> +	check_spurious();
-> >>> +	exit(report_summary());
-> >>> +}
-> >>> +
-> >>>  static void ipi_recv(void)
-> >>>  {
-> >>>  	ipi_enable();
-> >>> @@ -197,6 +250,14 @@ static void ipi_recv(void)
-> >>>  		wfi();
-> >>>  }
-> >>>  
-> >>> +static void ipi_test(void)
-> >>> +{
-> >>> +	if (smp_processor_id() == cmdl_sender)
-> >>> +		ipi_send();
-> >>> +	else
-> >>> +		ipi_recv();
-> >>> +}
-> >>> +
-> >>>  static struct gic gicv2 = {
-> >>>  	.ipi = {
-> >>>  		.send_self = gicv2_ipi_send_self,
-> >>> @@ -242,21 +303,34 @@ int main(int argc, char **argv)
-> >>>  		report_prefix_pop();
-> >>>  
-> >>>  	} else if (strcmp(argv[1], "ipi") == 0) {
-> >>> +		int off, i = 1;
-> >>> +		long val;
-> >>>  
-> >>>  		report_prefix_push(argv[1]);
-> >>>  		nr_cpu_check(2);
-> >>>  
-> >>> +		while (--argc != 1) {
-> >>> +			off = parse_keyval(argv[++i], &val);
-> >>> +			if (off == -1)
-> >>> +				continue;
-> >>> +			argv[i][off] = '\0';
-> >>> +			if (strcmp(argv[i], "sender") == 0) {
-> >>> +				if (val >= nr_cpus)
-> >>> +					report_abort("invalid sender %d, nr_cpus=%d", val, nr_cpus);
-> >>> +				cmdl_sender = val;
-> >>> +			} else if (strcmp(argv[i], "irq") == 0) {
-> >>> +				if (val > 15)
-> >>> +					report_abort("irq (SGI) must be < 16");
-> >>> +				cmdl_irq = val;
-> >>> +			}
-> >> wrong arg could potentially be tested.
-> > 
-> > What do you mean by 'wrong arg'? Can you give me an example?
-> I meant bad option, ie if the tester makes a typo such as sende=3, this
-> gets ignored, right?.
+Hi Andre,
 
-Right, it just gets ignored. I can check for that and add a usage output
-here.
-
-Thanks,
-drew
-
+On 23/11/2016 14:24, Auger Eric wrote:
+> Hi,
+> 
+> On 18/11/2016 15:20, Andrew Jones wrote:
+>> On Thu, Nov 17, 2016 at 05:57:51PM +0000, Andre Przywara wrote:
+>>> Some tests for the ITARGETS registers.
+>>> Bits corresponding to non-existent CPUs must be RAZ/WI.
+>>> These registers must be byte-accessible, also check that accesses beyond
+>>> the implemented IRQ limit are actually read-as-zero/write-ignore.
+>>>
+>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>>> ---
+>>>  arm/gic.c         | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  lib/arm/asm/gic.h |  1 +
+>>>  2 files changed, 55 insertions(+)
+>>>
+>>> diff --git a/arm/gic.c b/arm/gic.c
+>>> index a27da2c..02b1be1 100644
+>>> --- a/arm/gic.c
+>>> +++ b/arm/gic.c
+>>> @@ -397,6 +397,57 @@ static bool test_priorities(int nr_irqs, void *priptr)
+>>>  	return true;
+>>>  }
+>>>  
+>>> +static bool test_targets(int nr_irqs)
+>>> +{
+>>> +	void *targetsptr = gicv2_dist_base() + GICD_ITARGETSR;
+>>> +	u32 orig_targets;
+>>> +	u32 cpu_mask;
+>>> +	u32 pattern, reg;
+>>> +
+>>> +	orig_targets = readl(targetsptr + 32);
+>>> +	report_prefix_push("ITARGETSR");
+>>> +
+>>> +	cpu_mask = (1 << nr_cpus) - 1;
+>>
+>> Shouldn't this be 1 << (nr_cpus - 1) ?
+> original looks correct to me.
+>>
+>> Is this test always going to be gicv2-only? We should probably comment it,
+>> if so. We don't want to risk this being run when nr_cpus can be larger
+>> than 8.
+>>
+>>> +	cpu_mask |= cpu_mask << 8;
+>>> +	cpu_mask |= cpu_mask << 16;
+> Don't we miss the 4th byte mask?
 > 
 > Thanks
 > 
 > Eric
-> > 
-> >>
-> >> Besides
-> >> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > 
-> > Thanks!
-> > 
-> > drew
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe kvm" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>> +
+>>> +	/* Check that bits for non implemented CPUs are RAZ/WI. */
+>>> +	if (nr_cpus < 8) {
+>>> +		writel(0xffffffff, targetsptr + 32);
+>>> +		report("bits for %d non-existent CPUs masked",
+>>> +		       !(readl(targetsptr + 32) & ~cpu_mask), 8 - nr_cpus);
+
+yep on AMD overdrive with smp=4 I get:
+
+FAIL: gicv2: mmio: ITARGETSR: bits for 4 non-existent CPUs masked
+
+Thanks
+
+Eric
+
+>>> +	} else {
+>>> +		report_skip("CPU masking (all CPUs implemented)");
+>>> +	}
+>>> +
+>>> +	report("accesses beyond limit RAZ/WI",
+>>> +	       test_readonly_32(targetsptr + nr_irqs, true));
+>>> +
+>>> +	pattern = 0x0103020f;
+>>> +	writel(pattern, targetsptr + 32);
+>>> +	reg = readl(targetsptr + 32);
+>>> +	report("register content preserved (%08x => %08x)",
+>>> +	       reg == (pattern & cpu_mask), pattern & cpu_mask, reg);
+>>> +
+>>> +	/*
+>>> +	 * The TARGETS registers are byte accessible, do a byte-wide
+>>> +	 * read and write of known content to check for this.
+>>> +	 */
+>>> +	reg = readb(targetsptr + 33);
+>>> +	report("byte reads successful (0x%08x => 0x%02x)",
+>>> +	       reg == (BYTE(pattern, 1) & cpu_mask),
+>>> +	       pattern & cpu_mask, reg);
+>>> +
+>>> +	pattern = REPLACE_BYTE(pattern, 2, 0x04);
+>>> +	writeb(BYTE(pattern, 2), targetsptr + 34);
+>>> +	reg = readl(targetsptr + 32);
+>>> +	report("byte writes successful (0x%02x => 0x%08x)",
+>>> +	       reg == (pattern & cpu_mask), BYTE(pattern, 2), reg);
+>>
+>> Last patch also had a byte addressability test. Maybe we should make
+>> a helper function?
+>>
+>>> +
+>>> +	writel(orig_targets, targetsptr + 32);
+>>> +	return true;
+>>
+>> Function can/should be void.
+>>
+>>> +}
+>>> +
+>>>  static int gic_test_mmio(int gic_version)
+>>>  {
+>>>  	u32 reg;
+>>> @@ -436,6 +487,9 @@ static int gic_test_mmio(int gic_version)
+>>>  
+>>>  	test_priorities(nr_irqs, gic_dist_base + GICD_IPRIORITYR);
+>>>  
+>>> +	if (gic_version == 2)
+>>> +		test_targets(nr_irqs);
+>>> +
+>>>  	return 0;
+>>>  }
+>>>  
+>>> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+>>> index cef748d..6f170cb 100644
+>>> --- a/lib/arm/asm/gic.h
+>>> +++ b/lib/arm/asm/gic.h
+>>> @@ -14,6 +14,7 @@
+>>>  #define GICD_IGROUPR			0x0080
+>>>  #define GICD_ISENABLER			0x0100
+>>>  #define GICD_IPRIORITYR			0x0400
+>>> +#define GICD_ITARGETSR			0x0800
+>>>  #define GICD_SGIR			0x0f00
+>>>  #define GICD_ICPIDR2			0x0fe8
+>>>  
+>>> -- 
+>>> 2.9.0
+>>>
+>>>
+>>
+>> Thanks,
+>> drew
+>>
