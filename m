@@ -1,237 +1,101 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v7 06/11] arm/arm64: add initial gicv2 support
-Date: Wed, 23 Nov 2016 17:54:01 +0100
-Message-ID: <20161123165406.32661-7-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v7 04/11] arm/arm64: add some delay routines
+Date: Wed, 23 Nov 2016 17:53:59 +0100
+Message-ID: <20161123165406.32661-5-drjones@redhat.com>
 References: <20161123165406.32661-1-drjones@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DF5440CD8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 11:53:42 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Toxh0l+8SvX0 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Nov 2016 11:53:41 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA12740D08
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 11:53:40 -0500 (EST)
 In-Reply-To: <20161123165406.32661-1-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add some gicv2 support. This just adds init and enable
-functions, allowing unit tests to start messing with it.
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-
----
-v6: added comments (register offset headers) [Alex]
-v5: share/use only the modern register names [Andre]
-v4:
- - only take defines from kernel we need now [Andre]
- - moved defines to asm/gic.h so they'll be shared with v3 [drew]
- - simplify enable by not caring if we reinit the distributor [drew]
- - init all GICD_INT_DEF_PRI_X4 registers [Eric]
----
- arm/Makefile.common    |  1 +
- lib/arm/asm/gic-v2.h   | 34 ++++++++++++++++++++++
- lib/arm/asm/gic.h      | 39 ++++++++++++++++++++++++++
- lib/arm/gic.c          | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++
- lib/arm64/asm/gic-v2.h |  1 +
- lib/arm64/asm/gic.h    |  1 +
- 6 files changed, 152 insertions(+)
- create mode 100644 lib/arm/asm/gic-v2.h
- create mode 100644 lib/arm/asm/gic.h
- create mode 100644 lib/arm/gic.c
- create mode 100644 lib/arm64/asm/gic-v2.h
- create mode 100644 lib/arm64/asm/gic.h
-
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index f37b5c2a3de4..6f56015c43c4 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -46,6 +46,7 @@ cflatobjs += lib/arm/mmu.o
- cflatobjs += lib/arm/bitops.o
- cflatobjs += lib/arm/psci.o
- cflatobjs += lib/arm/smp.o
-+cflatobjs += lib/arm/gic.o
- 
- libeabi = lib/arm/libeabi.a
- eabiobjs = lib/arm/eabi_compat.o
-diff --git a/lib/arm/asm/gic-v2.h b/lib/arm/asm/gic-v2.h
-new file mode 100644
-index 000000000000..c2d5fecd4886
---- /dev/null
-+++ b/lib/arm/asm/gic-v2.h
-@@ -0,0 +1,34 @@
-+/*
-+ * All GIC* defines are lifted from include/linux/irqchip/arm-gic.h
-+ *
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM_GIC_V2_H_
-+#define _ASMARM_GIC_V2_H_
-+
-+#ifndef _ASMARM_GIC_H_
-+#error Do not directly include <asm/gic-v2.h>. Include <asm/gic.h>
-+#endif
-+
-+#define GICD_ENABLE			0x1
-+#define GICC_ENABLE			0x1
-+
-+#ifndef __ASSEMBLY__
-+
-+struct gicv2_data {
-+	void *dist_base;
-+	void *cpu_base;
-+	unsigned int irq_nr;
-+};
-+extern struct gicv2_data gicv2_data;
-+
-+#define gicv2_dist_base()		(gicv2_data.dist_base)
-+#define gicv2_cpu_base()		(gicv2_data.cpu_base)
-+
-+extern int gicv2_init(void);
-+extern void gicv2_enable_defaults(void);
-+
-+#endif /* !__ASSEMBLY__ */
-+#endif /* _ASMARM_GIC_V2_H_ */
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-new file mode 100644
-index 000000000000..e3580bd1d42d
---- /dev/null
-+++ b/lib/arm/asm/gic.h
-@@ -0,0 +1,39 @@
-+/*
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM_GIC_H_
-+#define _ASMARM_GIC_H_
-+
-+#include <asm/gic-v2.h>
-+
-+/* Distributor registers */
-+#define GICD_CTLR			0x0000
-+#define GICD_TYPER			0x0004
-+#define GICD_ISENABLER			0x0100
-+#define GICD_IPRIORITYR			0x0400
-+
-+#define GICD_TYPER_IRQS(typer)		((((typer) & 0x1f) + 1) * 32)
-+#define GICD_INT_EN_SET_SGI		0x0000ffff
-+#define GICD_INT_DEF_PRI_X4		0xa0a0a0a0
-+
-+/* CPU interface registers */
-+#define GICC_CTLR			0x0000
-+#define GICC_PMR			0x0004
-+
-+#define GICC_INT_PRI_THRESHOLD		0xf0
-+
-+#ifndef __ASSEMBLY__
-+
-+/*
-+ * gic_init will try to find all known gics, and then
-+ * initialize the gic data for the one found.
-+ * returns
-+ *  0   : no gic was found
-+ *  > 0 : the gic version of the gic found
-+ */
-+extern int gic_init(void);
-+
-+#endif /* !__ASSEMBLY__ */
-+#endif /* _ASMARM_GIC_H_ */
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-new file mode 100644
-index 000000000000..d655105e058b
---- /dev/null
-+++ b/lib/arm/gic.c
-@@ -0,0 +1,76 @@
-+/*
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include <devicetree.h>
-+#include <asm/gic.h>
-+#include <asm/io.h>
-+
-+struct gicv2_data gicv2_data;
-+
-+/*
-+ * Documentation/devicetree/bindings/interrupt-controller/arm,gic.txt
-+ */
-+static bool
-+gic_get_dt_bases(const char *compatible, void **base1, void **base2)
-+{
-+	struct dt_pbus_reg reg;
-+	struct dt_device gic;
-+	struct dt_bus bus;
-+	int node, ret;
-+
-+	dt_bus_init_defaults(&bus);
-+	dt_device_init(&gic, &bus, NULL);
-+
-+	node = dt_device_find_compatible(&gic, compatible);
-+	assert(node >= 0 || node == -FDT_ERR_NOTFOUND);
-+
-+	if (node == -FDT_ERR_NOTFOUND)
-+		return false;
-+
-+	dt_device_bind_node(&gic, node);
-+
-+	ret = dt_pbus_translate(&gic, 0, &reg);
-+	assert(ret == 0);
-+	*base1 = ioremap(reg.addr, reg.size);
-+
-+	ret = dt_pbus_translate(&gic, 1, &reg);
-+	assert(ret == 0);
-+	*base2 = ioremap(reg.addr, reg.size);
-+
-+	return true;
-+}
-+
-+int gicv2_init(void)
-+{
-+	return gic_get_dt_bases("arm,cortex-a15-gic",
-+			&gicv2_data.dist_base, &gicv2_data.cpu_base);
-+}
-+
-+int gic_init(void)
-+{
-+	if (gicv2_init())
-+		return 2;
-+	return 0;
-+}
-+
-+void gicv2_enable_defaults(void)
-+{
-+	void *dist = gicv2_dist_base();
-+	void *cpu_base = gicv2_cpu_base();
-+	unsigned int i;
-+
-+	gicv2_data.irq_nr = GICD_TYPER_IRQS(readl(dist + GICD_TYPER));
-+	if (gicv2_data.irq_nr > 1020)
-+		gicv2_data.irq_nr = 1020;
-+
-+	for (i = 0; i < gicv2_data.irq_nr; i += 4)
-+		writel(GICD_INT_DEF_PRI_X4, dist + GICD_IPRIORITYR + i);
-+
-+	writel(GICD_INT_EN_SET_SGI, dist + GICD_ISENABLER + 0);
-+	writel(GICD_ENABLE, dist + GICD_CTLR);
-+
-+	writel(GICC_INT_PRI_THRESHOLD, cpu_base + GICC_PMR);
-+	writel(GICC_ENABLE, cpu_base + GICC_CTLR);
-+}
-diff --git a/lib/arm64/asm/gic-v2.h b/lib/arm64/asm/gic-v2.h
-new file mode 100644
-index 000000000000..52226624a209
---- /dev/null
-+++ b/lib/arm64/asm/gic-v2.h
-@@ -0,0 +1 @@
-+#include "../../arm/asm/gic-v2.h"
-diff --git a/lib/arm64/asm/gic.h b/lib/arm64/asm/gic.h
-new file mode 100644
-index 000000000000..e5eb302a31b4
---- /dev/null
-+++ b/lib/arm64/asm/gic.h
-@@ -0,0 +1 @@
-+#include "../../arm/asm/gic.h"
--- 
-2.9.3
-
+QWxsb3cgYSB0aHJlYWQgdG8gd2FpdCBzb21lIHNwZWNpZmllZCBhbW91bnQgb2YgdGltZS4gQ2Fu
+CnNwZWNpZnkgaW4gY3ljbGVzLCB1c2VjcywgYW5kIG1zZWNzLgoKUmV2aWV3ZWQtYnk6IEFsZXgg
+QmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KUmV2aWV3ZWQtYnk6IEVyaWMgQXVnZXIg
+PGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KU2lnbmVkLW9mZi1ieTogQW5kcmV3IEpvbmVzIDxkcmpv
+bmVzQHJlZGhhdC5jb20+Ci0tLQogbGliL2FybS9hc20vcHJvY2Vzc29yLmggICB8IDE5ICsrKysr
+KysrKysrKysrKysrKysKIGxpYi9hcm0vcHJvY2Vzc29yLmMgICAgICAgfCAxNSArKysrKysrKysr
+KysrKysKIGxpYi9hcm02NC9hc20vcHJvY2Vzc29yLmggfCAxOSArKysrKysrKysrKysrKysrKysr
+CiBsaWIvYXJtNjQvcHJvY2Vzc29yLmMgICAgIHwgMTUgKysrKysrKysrKysrKysrCiA0IGZpbGVz
+IGNoYW5nZWQsIDY4IGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9saWIvYXJtL2FzbS9wcm9j
+ZXNzb3IuaCBiL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oCmluZGV4IGVjZjViYmUxODI0YS4uYmM0
+NmQxZjk4MGVlIDEwMDY0NAotLS0gYS9saWIvYXJtL2FzbS9wcm9jZXNzb3IuaAorKysgYi9saWIv
+YXJtL2FzbS9wcm9jZXNzb3IuaApAQCAtNSw3ICs1LDkgQEAKICAqCiAgKiBUaGlzIHdvcmsgaXMg
+bGljZW5zZWQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZSBHTlUgTEdQTCwgdmVyc2lvbiAyLgogICov
+CisjaW5jbHVkZSA8bGliY2ZsYXQuaD4KICNpbmNsdWRlIDxhc20vcHRyYWNlLmg+CisjaW5jbHVk
+ZSA8YXNtL2JhcnJpZXIuaD4KIAogZW51bSB2ZWN0b3IgewogCUVYQ1BUTl9SU1QsCkBAIC01MSw0
+ICs1MywyMSBAQCBleHRlcm4gaW50IG1waWRyX3RvX2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsK
+IGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgqZnVuYykodm9pZCAqYXJnKSwgdm9pZCAqYXJn
+LCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7CiBleHRlcm4gYm9vbCBpc191c2VyKHZvaWQpOwogCitz
+dGF0aWMgaW5saW5lIHU2NCBnZXRfY250dmN0KHZvaWQpCit7CisJdTY0IHZjdDsKKwlpc2IoKTsK
+Kwlhc20gdm9sYXRpbGUoIm1ycmMgcDE1LCAxLCAlUTAsICVSMCwgYzE0IiA6ICI9ciIgKHZjdCkp
+OworCXJldHVybiB2Y3Q7Cit9CisKK2V4dGVybiB2b2lkIGRlbGF5KHU2NCBjeWNsZXMpOworZXh0
+ZXJuIHZvaWQgdWRlbGF5KHVuc2lnbmVkIGxvbmcgdXNlY3MpOworCitzdGF0aWMgaW5saW5lIHZv
+aWQgbWRlbGF5KHVuc2lnbmVkIGxvbmcgbXNlY3MpCit7CisJd2hpbGUgKG1zZWNzLS0pCisJCXVk
+ZWxheSgxMDAwKTsKK30KKwogI2VuZGlmIC8qIF9BU01BUk1fUFJPQ0VTU09SX0hfICovCmRpZmYg
+LS1naXQgYS9saWIvYXJtL3Byb2Nlc3Nvci5jIGIvbGliL2FybS9wcm9jZXNzb3IuYwppbmRleCA1
+NGZkYjg3ZWYwMTkuLmMyZWUzNjBkZjY4OCAxMDA2NDQKLS0tIGEvbGliL2FybS9wcm9jZXNzb3Iu
+YworKysgYi9saWIvYXJtL3Byb2Nlc3Nvci5jCkBAIC05LDYgKzksNyBAQAogI2luY2x1ZGUgPGFz
+bS9wdHJhY2UuaD4KICNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+CiAjaW5jbHVkZSA8YXNtL3Ro
+cmVhZF9pbmZvLmg+CisjaW5jbHVkZSA8YXNtL2JhcnJpZXIuaD4KIAogc3RhdGljIGNvbnN0IGNo
+YXIgKnByb2Nlc3Nvcl9tb2Rlc1tdID0gewogCSJVU0VSXzI2IiwgIkZJUV8yNiIgLCAiSVJRXzI2
+IiAsICJTVkNfMjYiICwKQEAgLTE0MSwzICsxNDIsMTcgQEAgYm9vbCBpc191c2VyKHZvaWQpCiB7
+CiAJcmV0dXJuIGN1cnJlbnRfdGhyZWFkX2luZm8oKS0+ZmxhZ3MgJiBUSUZfVVNFUl9NT0RFOwog
+fQorCit2b2lkIGRlbGF5KHU2NCBjeWNsZXMpCit7CisJdTY0IHN0YXJ0ID0gZ2V0X2NudHZjdCgp
+OworCXdoaWxlICgoZ2V0X2NudHZjdCgpIC0gc3RhcnQpIDwgY3ljbGVzKQorCQljcHVfcmVsYXgo
+KTsKK30KKwordm9pZCB1ZGVsYXkodW5zaWduZWQgbG9uZyB1c2VjKQoreworCXVuc2lnbmVkIGlu
+dCBmcnE7CisJYXNtIHZvbGF0aWxlKCJtcmMgcDE1LCAwLCAlMCwgYzE0LCBjMCwgMCIgOiAiPXIi
+IChmcnEpKTsKKwlkZWxheSgodTY0KXVzZWMgKiBmcnEgLyAxMDAwMDAwKTsKK30KZGlmZiAtLWdp
+dCBhL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmggYi9saWIvYXJtNjQvYXNtL3Byb2Nlc3Nvci5o
+CmluZGV4IDdlNDQ4ZGM4MWE2YS4uOTRmN2NlMzViNjVjIDEwMDY0NAotLS0gYS9saWIvYXJtNjQv
+YXNtL3Byb2Nlc3Nvci5oCisrKyBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKQEAgLTE3LDgg
+KzE3LDEwIEBACiAjZGVmaW5lIFNDVExSX0VMMV9NCSgxIDw8IDApCiAKICNpZm5kZWYgX19BU1NF
+TUJMWV9fCisjaW5jbHVkZSA8bGliY2ZsYXQuaD4KICNpbmNsdWRlIDxhc20vcHRyYWNlLmg+CiAj
+aW5jbHVkZSA8YXNtL2Vzci5oPgorI2luY2x1ZGUgPGFzbS9iYXJyaWVyLmg+CiAKIGVudW0gdmVj
+dG9yIHsKIAlFTDFUX1NZTkMsCkBAIC04OSw1ICs5MSwyMiBAQCBleHRlcm4gaW50IG1waWRyX3Rv
+X2NwdSh1bnNpZ25lZCBsb25nIG1waWRyKTsKIGV4dGVybiB2b2lkIHN0YXJ0X3Vzcih2b2lkICgq
+ZnVuYykodm9pZCAqYXJnKSwgdm9pZCAqYXJnLCB1bnNpZ25lZCBsb25nIHNwX3Vzcik7CiBleHRl
+cm4gYm9vbCBpc191c2VyKHZvaWQpOwogCitzdGF0aWMgaW5saW5lIHU2NCBnZXRfY250dmN0KHZv
+aWQpCit7CisJdTY0IHZjdDsKKwlpc2IoKTsKKwlhc20gdm9sYXRpbGUoIm1ycyAlMCwgY250dmN0
+X2VsMCIgOiAiPXIiICh2Y3QpKTsKKwlyZXR1cm4gdmN0OworfQorCitleHRlcm4gdm9pZCBkZWxh
+eSh1NjQgY3ljbGVzKTsKK2V4dGVybiB2b2lkIHVkZWxheSh1bnNpZ25lZCBsb25nIHVzZWNzKTsK
+Kworc3RhdGljIGlubGluZSB2b2lkIG1kZWxheSh1bnNpZ25lZCBsb25nIG1zZWNzKQoreworCXdo
+aWxlIChtc2Vjcy0tKQorCQl1ZGVsYXkoMTAwMCk7Cit9CisKICNlbmRpZiAvKiAhX19BU1NFTUJM
+WV9fICovCiAjZW5kaWYgLyogX0FTTUFSTTY0X1BST0NFU1NPUl9IXyAqLwpkaWZmIC0tZ2l0IGEv
+bGliL2FybTY0L3Byb2Nlc3Nvci5jIGIvbGliL2FybTY0L3Byb2Nlc3Nvci5jCmluZGV4IGRlZWFi
+NGVjOWM4YS4uNTBmYTgzNWM2ZjFlIDEwMDY0NAotLS0gYS9saWIvYXJtNjQvcHJvY2Vzc29yLmMK
+KysrIGIvbGliL2FybTY0L3Byb2Nlc3Nvci5jCkBAIC05LDYgKzksNyBAQAogI2luY2x1ZGUgPGFz
+bS9wdHJhY2UuaD4KICNpbmNsdWRlIDxhc20vcHJvY2Vzc29yLmg+CiAjaW5jbHVkZSA8YXNtL3Ro
+cmVhZF9pbmZvLmg+CisjaW5jbHVkZSA8YXNtL2JhcnJpZXIuaD4KIAogc3RhdGljIGNvbnN0IGNo
+YXIgKnZlY3Rvcl9uYW1lc1tdID0gewogCSJlbDF0X3N5bmMiLApAQCAtMjUzLDMgKzI1NCwxNyBA
+QCBib29sIGlzX3VzZXIodm9pZCkKIHsKIAlyZXR1cm4gY3VycmVudF90aHJlYWRfaW5mbygpLT5m
+bGFncyAmIFRJRl9VU0VSX01PREU7CiB9CisKK3ZvaWQgZGVsYXkodTY0IGN5Y2xlcykKK3sKKwl1
+NjQgc3RhcnQgPSBnZXRfY250dmN0KCk7CisJd2hpbGUgKChnZXRfY250dmN0KCkgLSBzdGFydCkg
+PCBjeWNsZXMpCisJCWNwdV9yZWxheCgpOworfQorCit2b2lkIHVkZWxheSh1bnNpZ25lZCBsb25n
+IHVzZWMpCit7CisJdW5zaWduZWQgaW50IGZycTsKKwlhc20gdm9sYXRpbGUoIm1ycyAlMCwgY250
+ZnJxX2VsMCIgOiAiPXIiIChmcnEpKTsKKwlkZWxheSgodTY0KXVzZWMgKiBmcnEgLyAxMDAwMDAw
+KTsKK30KLS0gCjIuOS4zCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
