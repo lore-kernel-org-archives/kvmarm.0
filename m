@@ -1,38 +1,73 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v7 01/11] lib: xstr: allow multiple args
-Date: Wed, 23 Nov 2016 17:53:56 +0100
-Message-ID: <20161123165406.32661-2-drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v7 02/11] arm64: fix get_"sysreg32" and make
+ MPIDR 64bit
+Date: Wed, 23 Nov 2016 17:53:57 +0100
+Message-ID: <20161123165406.32661-3-drjones@redhat.com>
 References: <20161123165406.32661-1-drjones@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7325C40C49
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 11:53:36 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Ary5jDmbj2EU for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Nov 2016 11:53:35 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF10140C4B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2016 11:53:35 -0500 (EST)
 In-Reply-To: <20161123165406.32661-1-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Make implementation equivalent to Linux's include/linux/stringify.h
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- lib/libcflat.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/lib/libcflat.h b/lib/libcflat.h
-index c622198677c1..c3fa4f24c499 100644
---- a/lib/libcflat.h
-+++ b/lib/libcflat.h
-@@ -27,8 +27,8 @@
- 
- #define __unused __attribute__((__unused__))
- 
--#define xstr(s) xxstr(s)
--#define xxstr(s) #s
-+#define xstr(s...) xxstr(s)
-+#define xxstr(s...) #s
- 
- #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
- #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
--- 
-2.9.3
-
+bXJzIGlzIGFsd2F5cyA2NGJpdCwgc28gd2Ugc2hvdWxkIGFsd2F5cyB1c2UgYSA2NGJpdCByZWdp
+c3Rlci4KU29tZXRpbWVzIHdlJ2xsIG9ubHkgd2FudCB0byByZXR1cm4gdGhlIGxvd2VyIDMyLCBi
+dXQgbm90IGZvcgpNUElEUiwgYXMgdGhhdCBkb2VzIGRlZmluZSBmaWVsZHMgaW4gdGhlIHVwcGVy
+IDMyLgoKUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4K
+UmV2aWV3ZWQtYnk6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KU2lnbmVkLW9m
+Zi1ieTogQW5kcmV3IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+CgotLS0KdjU6IHN3aXRjaCBh
+cm0zMidzIGdldF9tcGlkciB0byAndW5zaWduZWQgbG9uZycgdG9vLCB0byBiZQogICAgY29uc2lz
+dGVudCB3aXRoIGFybTY0IFtBbmRyZV0KLS0tCiBsaWIvYXJtL2FzbS9wcm9jZXNzb3IuaCAgIHwg
+IDQgKystLQogbGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaCB8IDE1ICsrKysrKysrKy0tLS0tLQog
+MiBmaWxlcyBjaGFuZ2VkLCAxMSBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQoKZGlmZiAt
+LWdpdCBhL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oIGIvbGliL2FybS9hc20vcHJvY2Vzc29yLmgK
+aW5kZXggZjI1ZTdlZWUzNjY2Li4wMmY5MTJmOTk5NzQgMTAwNjQ0Ci0tLSBhL2xpYi9hcm0vYXNt
+L3Byb2Nlc3Nvci5oCisrKyBiL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oCkBAIC0zMyw5ICszMyw5
+IEBAIHN0YXRpYyBpbmxpbmUgdW5zaWduZWQgbG9uZyBjdXJyZW50X2Nwc3Iodm9pZCkKIAogI2Rl
+ZmluZSBjdXJyZW50X21vZGUoKSAoY3VycmVudF9jcHNyKCkgJiBNT0RFX01BU0spCiAKLXN0YXRp
+YyBpbmxpbmUgdW5zaWduZWQgaW50IGdldF9tcGlkcih2b2lkKQorc3RhdGljIGlubGluZSB1bnNp
+Z25lZCBsb25nIGdldF9tcGlkcih2b2lkKQogewotCXVuc2lnbmVkIGludCBtcGlkcjsKKwl1bnNp
+Z25lZCBsb25nIG1waWRyOwogCWFzbSB2b2xhdGlsZSgibXJjIHAxNSwgMCwgJTAsIGMwLCBjMCwg
+NSIgOiAiPXIiIChtcGlkcikpOwogCXJldHVybiBtcGlkcjsKIH0KZGlmZiAtLWdpdCBhL2xpYi9h
+cm02NC9hc20vcHJvY2Vzc29yLmggYi9saWIvYXJtNjQvYXNtL3Byb2Nlc3Nvci5oCmluZGV4IDg0
+ZDVjN2NlNzUyYi4uOWEyMDhmZjcyOWI3IDEwMDY0NAotLS0gYS9saWIvYXJtNjQvYXNtL3Byb2Nl
+c3Nvci5oCisrKyBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKQEAgLTY2LDE0ICs2NiwxNyBA
+QCBzdGF0aWMgaW5saW5lIHVuc2lnbmVkIGxvbmcgY3VycmVudF9sZXZlbCh2b2lkKQogCXJldHVy
+biBlbCAmIDB4YzsKIH0KIAotI2RlZmluZSBERUZJTkVfR0VUX1NZU1JFRzMyKHJlZykJCQkJXAot
+c3RhdGljIGlubGluZSB1bnNpZ25lZCBpbnQgZ2V0XyMjcmVnKHZvaWQpCQkJXAorI2RlZmluZSBE
+RUZJTkVfR0VUX1NZU1JFRyhyZWcsIHR5cGUpCQkJCVwKK3N0YXRpYyBpbmxpbmUgdHlwZSBnZXRf
+IyNyZWcodm9pZCkJCQkJXAogewkJCQkJCQkJXAotCXVuc2lnbmVkIGludCByZWc7CQkJCQlcCi0J
+YXNtIHZvbGF0aWxlKCJtcnMgJTAsICIgI3JlZyAiX2VsMSIgOiAiPXIiIChyZWcpKTsJXAotCXJl
+dHVybiByZWc7CQkJCQkJXAorCXVuc2lnbmVkIGxvbmcgcjsJCQkJCVwKKwlhc20gdm9sYXRpbGUo
+Im1ycyAlMCwgIiAjcmVnICJfZWwxIiA6ICI9ciIgKHIpKTsJXAorCXJldHVybiAodHlwZSlyOwkJ
+CQkJCVwKIH0KLURFRklORV9HRVRfU1lTUkVHMzIobXBpZHIpCisjZGVmaW5lIERFRklORV9HRVRf
+U1lTUkVHMzIocmVnKSBERUZJTkVfR0VUX1NZU1JFRyhyZWcsIHVuc2lnbmVkIGludCkKKyNkZWZp
+bmUgREVGSU5FX0dFVF9TWVNSRUc2NChyZWcpIERFRklORV9HRVRfU1lTUkVHKHJlZywgdW5zaWdu
+ZWQgbG9uZykKKworREVGSU5FX0dFVF9TWVNSRUc2NChtcGlkcikKIAogLyogT25seSBzdXBwb3J0
+IEFmZjAgZm9yIG5vdywgZ2ljdjIgb25seSAqLwogI2RlZmluZSBtcGlkcl90b19jcHUobXBpZHIp
+ICgoaW50KSgobXBpZHIpICYgMHhmZikpCi0tIAoyLjkuMwoKX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
+dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
+bGlzdGluZm8va3ZtYXJtCg==
