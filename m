@@ -1,159 +1,38 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v7 00/11] arm/arm64: add gic framework
-Date: Wed, 23 Nov 2016 17:53:55 +0100
-Message-ID: <20161123165406.32661-1-drjones@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [kvm-unit-tests PATCH v7 01/11] lib: xstr: allow multiple args
+Date: Wed, 23 Nov 2016 17:53:56 +0100
+Message-ID: <20161123165406.32661-2-drjones@redhat.com>
+References: <20161123165406.32661-1-drjones@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20161123165406.32661-1-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-v7:
- - biggest change is splitting lib/arm/gic.c into lib/arm/gic.c,
-   lib/arm/gic-v2.c, lib/arm/gic-v3.c
- - second biggest change, which probably affects Alex, is that
-   gic_ipi_send(cpu, irq) changed to gic_ipi_send_single(irq, cpu),
-   note the swapping of cpu and irq!
- - other changes thanks to Eric are noted in individual patches
- - also rebased to latest master
+Make implementation equivalent to Linux's include/linux/stringify.h
 
-v6:
- - rebased to latest master
- - several other changes thanks to Andre and Alex, changes in
-   individual patch change logs
- - some code cleanups
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ lib/libcflat.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-v5:
- - fix arm32/gicv3 compile [drew]
- - use modern register names [Andre]
- - one Andre r-b
-
-v4:
- - Eric's r-b's
- - Andre's suggestion to only take defines we need
- - several other changes listed in individual patches
-
-v3:
- - Rebased on latest master
- - Added Alex's r-b's
-
-v2:
- Rebased on latest master + my "populate argv[0]" series (will
- send a REPOST for that shortly. Additionally a few patches got
- fixes/features;
- 07/10 got same fix as kernel 7c9b973061 "irqchip/gic-v3: Configure
-       all interrupts as non-secure Group-1" in order to continue
-       working over TCG, as the gicv3 code for TCG removed a hack
-       it had there to make Linux happy.
- 08/10 added more output for when things fail (if they fail)
- 09/10 switched gicv3 broadcast implementation to using IRM. This
-       found a bug in a recent (but not tip) kernel, which I was
-       about to fix, but then I saw MarcZ beat me to it.
- 10/10 actually check that the input irq is the received irq
-
-
-Import defines, and steal enough helper functions, from Linux to
-enable programming of the gic (v2 and v3). Then use the framework
-to add an initial test (an ipi test; self, target-list, broadcast).
-
-It's my hope that this framework will be a suitable base on which
-more tests may be easily added, particularly because we have
-vgic-new and tcg gicv3 emulation getting close to merge. (v3 UPDATE:
-vgic-new and tcg gicv3 are merged now)
-
-To run it, along with other tests, just do
-
- ./configure [ --arch=[arm|arm64] --cross-prefix=$PREFIX ]
- make
- export QEMU=$PATH_TO_QEMU
- ./run_tests.sh
-
-To run it separately do, e.g.
-
-$QEMU -machine virt,accel=tcg -cpu cortex-a57 \
- -device virtio-serial-device \
- -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
- -display none -serial stdio \
- -kernel arm/gic.flat \
- -smp 123 -machine gic-version=3 -append ipi
-      ^^ note, we can go nuts with nr-cpus on TCG :-)
-
-Or, a KVM example using a different "sender" cpu and irq (other than zero)
-
-$QEMU -machine virt,accel=kvm -cpu host \
- -device virtio-serial-device \
- -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
- -display none -serial stdio \
- -kernel arm/gic.flat \
- -smp 48 -machine gic-version=3 -append 'ipi sender=42 irq=1'
-
-
-Patches:
-01-05: fixes and functionality needed by the later gic patches
-06-07: enable gicv2 and gicv2 IPI test
-08-10: enable gicv3 and gicv3 IPI test
-   11: extend the IPI tests to take variable sender and irq
-
-Available here: https://github.com/rhdrjones/kvm-unit-tests/commits/arm/gic-v7
-
-
-Andrew Jones (10):
-  lib: xstr: allow multiple args
-  arm64: fix get_"sysreg32" and make MPIDR 64bit
-  arm/arm64: smp: support more than 8 cpus
-  arm/arm64: add some delay routines
-  arm/arm64: irq enable/disable
-  arm/arm64: add initial gicv2 support
-  arm/arm64: gicv2: add an IPI test
-  arm/arm64: add initial gicv3 support
-  arm/arm64: gicv3: add an IPI test
-  arm/arm64: gic: don't just use zero
-
-Peter Xu (1):
-  libcflat: add IS_ALIGNED() macro, and page sizes
-
- arm/Makefile.common        |   9 +-
- arm/gic.c                  | 349 +++++++++++++++++++++++++++++++++++++++++++++
- arm/run                    |  19 ++-
- arm/selftest.c             |   5 +-
- arm/unittests.cfg          |  14 ++
- lib/arm/asm/arch_gicv3.h   |  70 +++++++++
- lib/arm/asm/gic-v2.h       |  38 +++++
- lib/arm/asm/gic-v3.h       | 114 +++++++++++++++
- lib/arm/asm/gic.h          | 109 ++++++++++++++
- lib/arm/asm/processor.h    |  42 +++++-
- lib/arm/asm/setup.h        |   4 +-
- lib/arm/gic-v2.c           |  67 +++++++++
- lib/arm/gic-v3.c           | 155 ++++++++++++++++++++
- lib/arm/gic.c              |  71 +++++++++
- lib/arm/processor.c        |  15 ++
- lib/arm/setup.c            |  10 ++
- lib/arm64/asm/arch_gicv3.h |  66 +++++++++
- lib/arm64/asm/gic-v2.h     |   1 +
- lib/arm64/asm/gic-v3.h     |   1 +
- lib/arm64/asm/gic.h        |   1 +
- lib/arm64/asm/processor.h  |  53 +++++--
- lib/arm64/asm/sysreg.h     |  44 ++++++
- lib/arm64/processor.c      |  15 ++
- lib/libcflat.h             |  10 +-
- 24 files changed, 1254 insertions(+), 28 deletions(-)
- create mode 100644 arm/gic.c
- create mode 100644 lib/arm/asm/arch_gicv3.h
- create mode 100644 lib/arm/asm/gic-v2.h
- create mode 100644 lib/arm/asm/gic-v3.h
- create mode 100644 lib/arm/asm/gic.h
- create mode 100644 lib/arm/gic-v2.c
- create mode 100644 lib/arm/gic-v3.c
- create mode 100644 lib/arm/gic.c
- create mode 100644 lib/arm64/asm/arch_gicv3.h
- create mode 100644 lib/arm64/asm/gic-v2.h
- create mode 100644 lib/arm64/asm/gic-v3.h
- create mode 100644 lib/arm64/asm/gic.h
- create mode 100644 lib/arm64/asm/sysreg.h
-
+diff --git a/lib/libcflat.h b/lib/libcflat.h
+index c622198677c1..c3fa4f24c499 100644
+--- a/lib/libcflat.h
++++ b/lib/libcflat.h
+@@ -27,8 +27,8 @@
+ 
+ #define __unused __attribute__((__unused__))
+ 
+-#define xstr(s) xxstr(s)
+-#define xxstr(s) #s
++#define xstr(s...) xxstr(s)
++#define xxstr(s...) #s
+ 
+ #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
+ #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
 -- 
 2.9.3
 
