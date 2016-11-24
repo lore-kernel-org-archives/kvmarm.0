@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [kvm-unit-tests PATCH v7 05/11] lib: add isaac prng library from CCAN
-Date: Thu, 24 Nov 2016 16:10:27 +0000
-Message-ID: <20161124161033.11456-6-alex.bennee@linaro.org>
+Subject: [kvm-unit-tests PATCH v7 09/11] arm/locking-tests: add comprehensive locking test
+Date: Thu, 24 Nov 2016 16:10:31 +0000
+Message-ID: <20161124161033.11456-10-alex.bennee@linaro.org>
 References: <20161124161033.11456-1-alex.bennee@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -10,303 +10,415 @@ Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20161124161033.11456-1-alex.bennee@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "Timothy B . Terriberry" <tterribe@xiph.org>
+Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-It's often useful to introduce some sort of random variation when
-testing several racing CPU conditions. Instead of each test implementing
-some half-arsed PRNG bring in a a decent one which has good statistical
-randomness. Obviously it is deterministic for a given seed value which
-is likely the behaviour you want.
+This test has been written mainly to stress multi-threaded TCG behaviour
+but will demonstrate failure by default on real hardware. The test takes
+the following parameters:
 
-I've pulled in the ISAAC library from CCAN:
+  - "lock" use GCC's locking semantics
+  - "atomic" use GCC's __atomic primitives
+  - "wfelock" use WaitForEvent sleep
+  - "excl" use load/store exclusive semantics
 
-    http://ccodearchive.net/info/isaac.html
+Also two more options allow the test to be tweaked
 
-I shaved off the float related stuff which is less useful for unit
-testing and re-indented to fit the style. The original license was
-CC0 (Public Domain) which is compatible with the LGPL v2 of
-kvm-unit-tests.
+  - "noshuffle" disables the memory shuffling
+  - "count=%ld" set your own per-CPU increment count
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-CC: Timothy B. Terriberry <tterribe@xiph.org>
-Acked-by: Andrew Jones <drjones@redhat.com>
+
 ---
- arm/Makefile.common |   1 +
- lib/prng.c          | 162 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- lib/prng.h          |  82 ++++++++++++++++++++++++++
- 3 files changed, 245 insertions(+)
- create mode 100644 lib/prng.c
- create mode 100644 lib/prng.h
+v2
+  - Don't use thumb style strexeq stuff
+  - Add atomic and wfelock tests
+  - Add count/noshuffle test controls
+  - Move barrier tests to separate test file
+v4
+  - fix up unitests.cfg to use correct test name
+  - move into "locking" group, remove barrier tests
+  - use a table to add tests, mark which are expected to work
+  - correctly report XFAIL
+v5
+  - max out at -smp 4 in unittest.cfg
+v7
+  - make test control flags bools
+  - default the count to 100000 (so it doesn't timeout)
+---
+ arm/Makefile.common |   2 +
+ arm/locking-test.c  | 302 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg   |  34 ++++++
+ 3 files changed, 338 insertions(+)
+ create mode 100644 arm/locking-test.c
 
 diff --git a/arm/Makefile.common b/arm/Makefile.common
-index 6c0898f..52f7440 100644
+index 528166d..eb4cfdf 100644
 --- a/arm/Makefile.common
 +++ b/arm/Makefile.common
-@@ -40,6 +40,7 @@ cflatobjs += lib/pci-testdev.o
- cflatobjs += lib/virtio.o
- cflatobjs += lib/virtio-mmio.o
- cflatobjs += lib/chr-testdev.o
-+cflatobjs += lib/prng.o
- cflatobjs += lib/arm/io.o
- cflatobjs += lib/arm/setup.o
- cflatobjs += lib/arm/mmu.o
-diff --git a/lib/prng.c b/lib/prng.c
+@@ -15,6 +15,7 @@ tests-common += $(TEST_DIR)/pci-test.flat
+ tests-common += $(TEST_DIR)/gic.flat
+ tests-common += $(TEST_DIR)/tlbflush-code.flat
+ tests-common += $(TEST_DIR)/tlbflush-data.flat
++tests-common += $(TEST_DIR)/locking-test.flat
+ 
+ all: test_cases
+ 
+@@ -85,3 +86,4 @@ test_cases: $(generated_files) $(tests-common) $(tests)
+ $(TEST_DIR)/selftest.o $(cstart.o): $(asm-offsets)
+ $(TEST_DIR)/tlbflush-code.elf: $(cstart.o) $(TEST_DIR)/tlbflush-code.o
+ $(TEST_DIR)/tlbflush-data.elf: $(cstart.o) $(TEST_DIR)/tlbflush-data.o
++$(TEST_DIR)/locking-test.elf: $(cstart.o) $(TEST_DIR)/locking-test.o
+diff --git a/arm/locking-test.c b/arm/locking-test.c
 new file mode 100644
-index 0000000..ebd6df7
+index 0000000..f10c61b
 --- /dev/null
-+++ b/lib/prng.c
-@@ -0,0 +1,162 @@
-+/*
-+ * Pseudo Random Number Generator
++++ b/arm/locking-test.c
+@@ -0,0 +1,302 @@
++#include <libcflat.h>
++#include <asm/smp.h>
++#include <asm/cpumask.h>
++#include <asm/barrier.h>
++#include <asm/mmu.h>
++
++#include <prng.h>
++
++#define MAX_CPUS 8
++
++/* Test definition structure
 + *
-+ * Lifted from ccan modules ilog/isaac under CC0
-+ *   - http://ccodearchive.net/info/isaac.html
-+ *   - http://ccodearchive.net/info/ilog.html
-+ *
-+ * And lightly hacked to compile under the KVM unit test environment.
-+ * This provides a handy RNG for torture tests that want to vary
-+ * delays and the like.
-+ *
++ * A simple structure that describes the test name, expected pass and
++ * increment function.
 + */
 +
-+/*Written by Timothy B. Terriberry (tterribe@xiph.org) 1999-2009.
-+  CC0 (Public domain) - see LICENSE file for details
-+  Based on the public domain implementation by Robert J. Jenkins Jr.*/
++/* Function pointers for test */
++typedef void (*inc_fn)(int cpu);
 +
-+#include "libcflat.h"
++typedef struct {
++	const char *test_name;
++	bool  should_pass;
++	inc_fn main_fn;
++} test_descr_t;
 +
-+#include <string.h>
-+#include "prng.h"
++/* How many increments to do */
++static int increment_count = 1000000;
++static bool do_shuffle = true;
 +
-+#define ISAAC_MASK        (0xFFFFFFFFU)
-+
-+/* Extract ISAAC_SZ_LOG bits (starting at bit 2). */
-+static inline uint32_t lower_bits(uint32_t x)
-+{
-+	return (x & ((ISAAC_SZ-1) << 2)) >> 2;
-+}
-+
-+/* Extract next ISAAC_SZ_LOG bits (starting at bit ISAAC_SZ_LOG+2). */
-+static inline uint32_t upper_bits(uint32_t y)
-+{
-+	return (y >> (ISAAC_SZ_LOG+2)) & (ISAAC_SZ-1);
-+}
-+
-+static void isaac_update(isaac_ctx *_ctx){
-+	uint32_t *m;
-+	uint32_t *r;
-+	uint32_t  a;
-+	uint32_t  b;
-+	uint32_t  x;
-+	uint32_t  y;
-+	int       i;
-+	m=_ctx->m;
-+	r=_ctx->r;
-+	a=_ctx->a;
-+	b=_ctx->b+(++_ctx->c);
-+	for(i=0;i<ISAAC_SZ/2;i++){
-+		x=m[i];
-+		a=(a^a<<13)+m[i+ISAAC_SZ/2];
-+		m[i]=y=m[lower_bits(x)]+a+b;
-+		r[i]=b=m[upper_bits(y)]+x;
-+		x=m[++i];
-+		a=(a^a>>6)+m[i+ISAAC_SZ/2];
-+		m[i]=y=m[lower_bits(x)]+a+b;
-+		r[i]=b=m[upper_bits(y)]+x;
-+		x=m[++i];
-+		a=(a^a<<2)+m[i+ISAAC_SZ/2];
-+		m[i]=y=m[lower_bits(x)]+a+b;
-+		r[i]=b=m[upper_bits(y)]+x;
-+		x=m[++i];
-+		a=(a^a>>16)+m[i+ISAAC_SZ/2];
-+		m[i]=y=m[lower_bits(x)]+a+b;
-+		r[i]=b=m[upper_bits(y)]+x;
-+	}
-+	for(i=ISAAC_SZ/2;i<ISAAC_SZ;i++){
-+		x=m[i];
-+		a=(a^a<<13)+m[i-ISAAC_SZ/2];
-+		m[i]=y=m[lower_bits(x)]+a+b;
-+		r[i]=b=m[upper_bits(y)]+x;
-+		x=m[++i];
-+		a=(a^a>>6)+m[i-ISAAC_SZ/2];
-+		m[i]=y=m[lower_bits(x)]+a+b;
-+		r[i]=b=m[upper_bits(y)]+x;
-+		x=m[++i];
-+		a=(a^a<<2)+m[i-ISAAC_SZ/2];
-+		m[i]=y=m[lower_bits(x)]+a+b;
-+		r[i]=b=m[upper_bits(y)]+x;
-+		x=m[++i];
-+		a=(a^a>>16)+m[i-ISAAC_SZ/2];
-+		m[i]=y=m[lower_bits(x)]+a+b;
-+		r[i]=b=m[upper_bits(y)]+x;
-+	}
-+	_ctx->b=b;
-+	_ctx->a=a;
-+	_ctx->n=ISAAC_SZ;
-+}
-+
-+static void isaac_mix(uint32_t _x[8]){
-+	static const unsigned char SHIFT[8]={11,2,8,16,10,4,8,9};
-+	int i;
-+	for(i=0;i<8;i++){
-+		_x[i]^=_x[(i+1)&7]<<SHIFT[i];
-+		_x[(i+3)&7]+=_x[i];
-+		_x[(i+1)&7]+=_x[(i+2)&7];
-+		i++;
-+		_x[i]^=_x[(i+1)&7]>>SHIFT[i];
-+		_x[(i+3)&7]+=_x[i];
-+		_x[(i+1)&7]+=_x[(i+2)&7];
-+	}
-+}
-+
-+
-+void isaac_init(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed){
-+	_ctx->a=_ctx->b=_ctx->c=0;
-+	memset(_ctx->r,0,sizeof(_ctx->r));
-+	isaac_reseed(_ctx,_seed,_nseed);
-+}
-+
-+void isaac_reseed(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed){
-+	uint32_t *m;
-+	uint32_t *r;
-+	uint32_t  x[8];
-+	int       i;
-+	int       j;
-+	m=_ctx->m;
-+	r=_ctx->r;
-+	if(_nseed>ISAAC_SEED_SZ_MAX)_nseed=ISAAC_SEED_SZ_MAX;
-+	for(i=0;i<_nseed>>2;i++){
-+		r[i]^=(uint32_t)_seed[i<<2|3]<<24|(uint32_t)_seed[i<<2|2]<<16|
-+			(uint32_t)_seed[i<<2|1]<<8|_seed[i<<2];
-+	}
-+	_nseed-=i<<2;
-+	if(_nseed>0){
-+		uint32_t ri;
-+		ri=_seed[i<<2];
-+		for(j=1;j<_nseed;j++)ri|=(uint32_t)_seed[i<<2|j]<<(j<<3);
-+		r[i++]^=ri;
-+	}
-+	x[0]=x[1]=x[2]=x[3]=x[4]=x[5]=x[6]=x[7]=0x9E3779B9U;
-+	for(i=0;i<4;i++)isaac_mix(x);
-+	for(i=0;i<ISAAC_SZ;i+=8){
-+		for(j=0;j<8;j++)x[j]+=r[i+j];
-+		isaac_mix(x);
-+		memcpy(m+i,x,sizeof(x));
-+	}
-+	for(i=0;i<ISAAC_SZ;i+=8){
-+		for(j=0;j<8;j++)x[j]+=m[i+j];
-+		isaac_mix(x);
-+		memcpy(m+i,x,sizeof(x));
-+	}
-+	isaac_update(_ctx);
-+}
-+
-+uint32_t isaac_next_uint32(isaac_ctx *_ctx){
-+	if(!_ctx->n)isaac_update(_ctx);
-+	return _ctx->r[--_ctx->n];
-+}
-+
-+uint32_t isaac_next_uint(isaac_ctx *_ctx,uint32_t _n){
-+	uint32_t r;
-+	uint32_t v;
-+	uint32_t d;
-+	do{
-+		r=isaac_next_uint32(_ctx);
-+		v=r%_n;
-+		d=r-v;
-+	}
-+	while(((d+_n-1)&ISAAC_MASK)<d);
-+	return v;
-+}
-diff --git a/lib/prng.h b/lib/prng.h
-new file mode 100644
-index 0000000..bf5776d
---- /dev/null
-+++ b/lib/prng.h
-@@ -0,0 +1,82 @@
-+/*
-+ * PRNG Header
++/* Shared value all the tests attempt to safely increment using
++ * various forms of atomic locking and exclusive behaviour.
 + */
-+#ifndef __PRNG_H__
-+#define __PRNG_H__
++static unsigned int shared_value;
 +
-+# include <stdint.h>
++/* PAGE_SIZE * uint32_t means we span several pages */
++__attribute__((aligned(PAGE_SIZE))) static uint32_t memory_array[PAGE_SIZE];
++
++/* We use the alignment of the following to ensure accesses to locking
++ * and synchronisation primatives don't interfere with the page of the
++ * shared value
++ */
++__attribute__((aligned(PAGE_SIZE))) static unsigned int per_cpu_value[MAX_CPUS];
++__attribute__((aligned(PAGE_SIZE))) static cpumask_t smp_test_complete;
++__attribute__((aligned(PAGE_SIZE))) struct isaac_ctx prng_context[MAX_CPUS];
++
++/* Some of the approaches use a global lock to prevent contention. */
++static int global_lock;
++
++/* In any SMP setting this *should* fail due to cores stepping on
++ * each other updating the shared variable
++ */
++static void increment_shared(int cpu)
++{
++	(void)cpu;
++
++	shared_value++;
++}
++
++/* GCC __sync primitives are deprecated in favour of __atomic */
++static void increment_shared_with_lock(int cpu)
++{
++	(void)cpu;
++
++	while (__sync_lock_test_and_set(&global_lock, 1));
++	shared_value++;
++	__sync_lock_release(&global_lock);
++}
++
++/* In practice even __ATOMIC_RELAXED uses ARM's ldxr/stex exclusive
++ * semantics */
++static void increment_shared_with_atomic(int cpu)
++{
++	(void)cpu;
++
++	__atomic_add_fetch(&shared_value, 1, __ATOMIC_SEQ_CST);
++}
 +
 +
++/*
++ * Load/store exclusive with WFE (wait-for-event)
++ *
++ * See ARMv8 ARM examples:
++ *   Use of Wait For Event (WFE) and Send Event (SEV) with locks
++ */
 +
-+typedef struct isaac_ctx isaac_ctx;
++static void increment_shared_with_wfelock(int cpu)
++{
++	(void)cpu;
++
++#if defined(__aarch64__)
++	asm volatile(
++	"	mov     w1, #1\n"
++	"       sevl\n"
++	"       prfm PSTL1KEEP, [%[lock]]\n"
++	"1:     wfe\n"
++	"	ldaxr	w0, [%[lock]]\n"
++	"	cbnz    w0, 1b\n"
++	"	stxr    w0, w1, [%[lock]]\n"
++	"	cbnz	w0, 1b\n"
++	/* lock held */
++	"	ldr	w0, [%[sptr]]\n"
++	"	add	w0, w0, #0x1\n"
++	"	str	w0, [%[sptr]]\n"
++	/* now release */
++	"	stlr	wzr, [%[lock]]\n"
++	: /* out */
++	: [lock] "r" (&global_lock), [sptr] "r" (&shared_value) /* in */
++	: "w0", "w1", "cc");
++#else
++	asm volatile(
++	"	mov     r1, #1\n"
++	"1:	ldrex	r0, [%[lock]]\n"
++	"	cmp     r0, #0\n"
++	"	wfene\n"
++	"	strexeq r0, r1, [%[lock]]\n"
++	"	cmpeq	r0, #0\n"
++	"	bne	1b\n"
++	"	dmb\n"
++	/* lock held */
++	"	ldr	r0, [%[sptr]]\n"
++	"	add	r0, r0, #0x1\n"
++	"	str	r0, [%[sptr]]\n"
++	/* now release */
++	"	mov	r0, #0\n"
++	"	dmb\n"
++	"	str	r0, [%[lock]]\n"
++	"	dsb\n"
++	"	sev\n"
++	: /* out */
++	: [lock] "r" (&global_lock), [sptr] "r" (&shared_value) /* in */
++	: "r0", "r1", "cc");
++#endif
++}
 +
 +
++/*
++ * Hand-written version of the load/store exclusive
++ */
++static void increment_shared_with_excl(int cpu)
++{
++	(void)cpu;
 +
-+/*This value may be lowered to reduce memory usage on embedded platforms, at
-+  the cost of reducing security and increasing bias.
-+  Quoting Bob Jenkins: "The current best guess is that bias is detectable after
-+  2**37 values for [ISAAC_SZ_LOG]=3, 2**45 for 4, 2**53 for 5, 2**61 for 6,
-+  2**69 for 7, and 2**77 values for [ISAAC_SZ_LOG]=8."*/
-+#define ISAAC_SZ_LOG      (8)
-+#define ISAAC_SZ          (1<<ISAAC_SZ_LOG)
-+#define ISAAC_SEED_SZ_MAX (ISAAC_SZ<<2)
++#if defined(__aarch64__)
++        asm volatile(
++	"1:	ldxr	w0, [%[sptr]]\n"
++	"	add     w0, w0, #0x1\n"
++	"	stxr	w1, w0, [%[sptr]]\n"
++	"	cbnz	w1, 1b\n"
++	: /* out */
++	: [sptr] "r" (&shared_value) /* in */
++	: "w0", "w1", "cc");
++#else
++	asm volatile(
++	"1:	ldrex	r0, [%[sptr]]\n"
++	"	add     r0, r0, #0x1\n"
++	"	strex	r1, r0, [%[sptr]]\n"
++	"	cmp	r1, #0\n"
++	"	bne	1b\n"
++	: /* out */
++	: [sptr] "r" (&shared_value) /* in */
++	: "r0", "r1", "cc");
++#endif
++}
 +
-+
-+
-+/*ISAAC is the most advanced of a series of pseudo-random number generators
-+  designed by Robert J. Jenkins Jr. in 1996.
-+  http://www.burtleburtle.net/bob/rand/isaac.html
-+  To quote:
-+  No efficient method is known for deducing their internal states.
-+  ISAAC requires an amortized 18.75 instructions to produce a 32-bit value.
-+  There are no cycles in ISAAC shorter than 2**40 values.
-+  The expected cycle length is 2**8295 values.*/
-+struct isaac_ctx{
-+	unsigned n;
-+	uint32_t r[ISAAC_SZ];
-+	uint32_t m[ISAAC_SZ];
-+	uint32_t a;
-+	uint32_t b;
-+	uint32_t c;
++/* Test array */
++static test_descr_t tests[] = {
++	{ "none", false, increment_shared },
++	{ "lock", true, increment_shared_with_lock },
++	{ "atomic", true, increment_shared_with_atomic },
++	{ "wfelock", true, increment_shared_with_wfelock },
++	{ "excl", true, increment_shared_with_excl }
 +};
 +
++/* The idea of this is just to generate some random load/store
++ * activity which may or may not race with an un-barried incremented
++ * of the shared counter
++ */
++static void shuffle_memory(int cpu)
++{
++	int i;
++	uint32_t lspat = isaac_next_uint32(&prng_context[cpu]);
++	uint32_t seq = isaac_next_uint32(&prng_context[cpu]);
++	int count = seq & 0x1f;
++	uint32_t val=0;
 +
-+/**
-+ * isaac_init - Initialize an instance of the ISAAC random number generator.
-+ * @_ctx:   The instance to initialize.
-+ * @_seed:  The specified seed bytes.
-+ *          This may be NULL if _nseed is less than or equal to zero.
-+ * @_nseed: The number of bytes to use for the seed.
-+ *          If this is greater than ISAAC_SEED_SZ_MAX, the extra bytes are
-+ *           ignored.
-+ */
-+void isaac_init(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed);
++	seq >>= 5;
 +
-+/**
-+ * isaac_reseed - Mix a new batch of entropy into the current state.
-+ * To reset ISAAC to a known state, call isaac_init() again instead.
-+ * @_ctx:   The instance to reseed.
-+ * @_seed:  The specified seed bytes.
-+ *          This may be NULL if _nseed is zero.
-+ * @_nseed: The number of bytes to use for the seed.
-+ *          If this is greater than ISAAC_SEED_SZ_MAX, the extra bytes are
-+ *           ignored.
-+ */
-+void isaac_reseed(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed);
-+/**
-+ * isaac_next_uint32 - Return the next random 32-bit value.
-+ * @_ctx: The ISAAC instance to generate the value with.
-+ */
-+uint32_t isaac_next_uint32(isaac_ctx *_ctx);
-+/**
-+ * isaac_next_uint - Uniform random integer less than the given value.
-+ * @_ctx: The ISAAC instance to generate the value with.
-+ * @_n:   The upper bound on the range of numbers returned (not inclusive).
-+ *        This must be greater than zero and less than 2**32.
-+ *        To return integers in the full range 0...2**32-1, use
-+ *         isaac_next_uint32() instead.
-+ * Return: An integer uniformly distributed between 0 and _n-1 (inclusive).
-+ */
-+uint32_t isaac_next_uint(isaac_ctx *_ctx,uint32_t _n);
++	for (i=0; i<count; i++) {
++		int index = seq & ~PAGE_MASK;
++		if (lspat & 1) {
++			val ^= memory_array[index];
++		} else {
++			memory_array[index] = val;
++		}
++		seq >>= PAGE_SHIFT;
++		seq ^= lspat;
++		lspat >>= 1;
++	}
 +
-+#endif
++}
++
++static inc_fn increment_function;
++
++static void do_increment(void)
++{
++	int i;
++	int cpu = smp_processor_id();
++
++	printf("CPU%d: online and ++ing\n", cpu);
++
++	for (i=0; i < increment_count; i++) {
++		per_cpu_value[cpu]++;
++		increment_function(cpu);
++
++		if (do_shuffle)
++			shuffle_memory(cpu);
++	}
++
++	printf("CPU%d: Done, %d incs\n", cpu, per_cpu_value[cpu]);
++
++	cpumask_set_cpu(cpu, &smp_test_complete);
++	if (cpu != 0)
++		halt();
++}
++
++static void setup_and_run_test(test_descr_t *test)
++{
++	unsigned int i, sum = 0;
++	int cpu, cpu_cnt = 0;
++
++	increment_function = test->main_fn;
++
++	/* fill our random page */
++        for (i=0; i<PAGE_SIZE; i++) {
++		memory_array[i] = isaac_next_uint32(&prng_context[0]);
++	}
++
++	for_each_present_cpu(cpu) {
++		uint32_t seed2 = isaac_next_uint32(&prng_context[0]);
++		cpu_cnt++;
++		if (cpu == 0)
++			continue;
++
++		isaac_init(&prng_context[cpu], (unsigned char *) &seed2, sizeof(seed2));
++		smp_boot_secondary(cpu, do_increment);
++	}
++
++	do_increment();
++
++	while (!cpumask_full(&smp_test_complete))
++		cpu_relax();
++
++	/* All CPUs done, do we add up */
++	for_each_present_cpu(cpu) {
++		sum += per_cpu_value[cpu];
++	}
++
++	if (test->should_pass) {
++		report("total incs %d", sum == shared_value, shared_value);
++	} else {
++		report_xfail("total incs %d", true, sum == shared_value, shared_value);
++	}
++}
++
++int main(int argc, char **argv)
++{
++	static const unsigned char seed[] = "myseed";
++	test_descr_t *test = &tests[0];
++	int i;
++	unsigned int j;
++
++	isaac_init(&prng_context[0], &seed[0], sizeof(seed));
++
++	for (i=0; i<argc; i++) {
++		char *arg = argv[i];
++
++		/* Check for test name */
++		for (j = 0; j < ARRAY_SIZE(tests); j++) {
++			if (strcmp(arg, tests[j].test_name) == 0)
++				test = &tests[j];
++		}
++
++		/* Test modifiers */
++		if (strcmp(arg, "noshuffle") == 0) {
++			do_shuffle = false;
++			report_prefix_push("noshuffle");
++		} else if (strstr(arg, "count=") != NULL) {
++			char *p = strstr(arg, "=");
++			increment_count = atol(p+1);
++		} else {
++			isaac_reseed(&prng_context[0], (unsigned char *) arg, strlen(arg));
++		}
++	}
++
++	if (test) {
++		setup_and_run_test(test);
++	} else {
++		report("Unknown test", false);
++	}
++
++	return report_summary();
++}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 7dc7799..abbfe79 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -108,3 +108,37 @@ smp = $(($MAX_SMP>4?4:$MAX_SMP))
+ extra_params = -append "page"
+ groups = tlbflush
+ 
++# Locking tests
++[locking::none]
++file = locking-test.flat
++smp = $(($MAX_SMP>4?4:$MAX_SMP))
++groups = locking
++accel = tcg
++
++[locking::lock]
++file = locking-test.flat
++smp = $(($MAX_SMP>4?4:$MAX_SMP))
++extra_params = -append 'lock'
++groups = locking
++accel = tcg
++
++[locking::atomic]
++file = locking-test.flat
++smp = $(($MAX_SMP>4?4:$MAX_SMP))
++extra_params = -append 'atomic'
++groups = locking
++accel = tcg
++
++[locking::wfelock]
++file = locking-test.flat
++smp = $(($MAX_SMP>4?4:$MAX_SMP))
++extra_params = -append 'wfelock'
++groups = locking
++accel = tcg
++
++[locking::excl]
++file = locking-test.flat
++smp = $(($MAX_SMP>4?4:$MAX_SMP))
++extra_params = -append 'excl'
++groups = locking
++accel = tcg
 -- 
 2.10.1
 
