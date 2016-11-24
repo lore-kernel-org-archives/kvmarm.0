@@ -1,313 +1,584 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v7 11/11] arm/arm64: gic: don't just use
- zero
-Date: Thu, 24 Nov 2016 10:57:01 +0100
-Message-ID: <2f88f60c-f7a2-3916-cd1f-5a86453d9ba9@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v7 09/11] arm/arm64: add initial gicv3
+ support
+Date: Thu, 24 Nov 2016 14:58:09 +0100
+Message-ID: <20161124135809.fq4cuk6r2yexocze@kamzik.brq.redhat.com>
 References: <20161123165406.32661-1-drjones@redhat.com>
- <20161123165406.32661-12-drjones@redhat.com>
+ <20161123165406.32661-10-drjones@redhat.com>
+ <917541a7-ec68-4d2f-bdd6-aa9252acb1cc@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20161123165406.32661-12-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA2E34089B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Nov 2016 08:57:35 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kkEAEkehvXpL for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Nov 2016 08:57:34 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E558540866
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Nov 2016 08:57:33 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <917541a7-ec68-4d2f-bdd6-aa9252acb1cc@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Auger Eric <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Thu, Nov 24, 2016 at 10:54:35AM +0100, Auger Eric wrote:
+> Hi Drew,
+> =
 
-On 23/11/2016 17:54, Andrew Jones wrote:
-> Allow user to select who sends ipis and with which irq,
-> rather than just always sending irq=0 from cpu0.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> On 23/11/2016 17:54, Andrew Jones wrote:
+> > Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > =
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
+> > ---
+> > v7: split lib/arm/gic.c into gic-v2/3.c [Eric]
+> > v6:
+> >  - added comments [Alex]
+> >  - added stride parameter to gicv3_set_redist_base [Andre]
+> >  - redist-wait s/rwp/uwp/ and comment [Andre]
+> >  - removed unnecessary wait-for-rwps [Andre]
+> > v5: use modern register names [Andre]
+> > v4:
+> >  - only take defines from kernel we need now [Andre]
+> >  - simplify enable by not caring if we reinit the distributor [drew]
+> > v2:
+> >  - configure irqs as NS GRP1
+> > ---
+> >  arm/Makefile.common        |   2 +-
+> >  lib/arm/asm/arch_gicv3.h   |  47 ++++++++++++++++++++
+> >  lib/arm/asm/gic-v3.h       | 104 +++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  lib/arm/asm/gic.h          |   5 ++-
+> >  lib/arm/gic-v2.c           |  27 ++++++++++++
+> >  lib/arm/gic-v3.c           |  61 ++++++++++++++++++++++++++
+> >  lib/arm/gic.c              |  30 +++++--------
+> >  lib/arm64/asm/arch_gicv3.h |  44 +++++++++++++++++++
+> >  lib/arm64/asm/gic-v3.h     |   1 +
+> >  lib/arm64/asm/sysreg.h     |  44 +++++++++++++++++++
+> >  10 files changed, 343 insertions(+), 22 deletions(-)
+> >  create mode 100644 lib/arm/asm/arch_gicv3.h
+> >  create mode 100644 lib/arm/asm/gic-v3.h
+> >  create mode 100644 lib/arm/gic-v2.c
+> >  create mode 100644 lib/arm/gic-v3.c
+> >  create mode 100644 lib/arm64/asm/arch_gicv3.h
+> >  create mode 100644 lib/arm64/asm/gic-v3.h
+> >  create mode 100644 lib/arm64/asm/sysreg.h
+> > =
 
-Eric
+> > diff --git a/arm/Makefile.common b/arm/Makefile.common
+> > index 2fe7aeeca6d4..6c0898f28be1 100644
+> > --- a/arm/Makefile.common
+> > +++ b/arm/Makefile.common
+> > @@ -46,7 +46,7 @@ cflatobjs +=3D lib/arm/mmu.o
+> >  cflatobjs +=3D lib/arm/bitops.o
+> >  cflatobjs +=3D lib/arm/psci.o
+> >  cflatobjs +=3D lib/arm/smp.o
+> > -cflatobjs +=3D lib/arm/gic.o
+> > +cflatobjs +=3D lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
+> >  =
 
+> >  libeabi =3D lib/arm/libeabi.a
+> >  eabiobjs =3D lib/arm/eabi_compat.o
+> > diff --git a/lib/arm/asm/arch_gicv3.h b/lib/arm/asm/arch_gicv3.h
+> > new file mode 100644
+> > index 000000000000..276577452a14
+> > --- /dev/null
+> > +++ b/lib/arm/asm/arch_gicv3.h
+> > @@ -0,0 +1,47 @@
+> > +/*
+> > + * All ripped off from arch/arm/include/asm/arch_gicv3.h
+> > + *
+> > + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#ifndef _ASMARM_ARCH_GICV3_H_
+> > +#define _ASMARM_ARCH_GICV3_H_
+> > +
+> > +#ifndef __ASSEMBLY__
+> > +#include <libcflat.h>
+> > +#include <asm/barrier.h>
+> > +#include <asm/io.h>
+> > +
+> > +#define __stringify xstr
+> > +
+> > +#define __ACCESS_CP15(CRn, Op1, CRm, Op2)	p15, Op1, %0, CRn, CRm, Op2
+> > +
+> > +#define ICC_PMR				__ACCESS_CP15(c4, 0, c6, 0)
+> > +#define ICC_IGRPEN1			__ACCESS_CP15(c12, 0, c12, 7)
+> > +
+> > +static inline void gicv3_write_pmr(u32 val)
+> > +{
+> > +	asm volatile("mcr " __stringify(ICC_PMR) : : "r" (val));
+> > +}
+> > +
+> > +static inline void gicv3_write_grpen1(u32 val)
+> > +{
+> > +	asm volatile("mcr " __stringify(ICC_IGRPEN1) : : "r" (val));
+> > +	isb();
+> > +}
+> > +
+> > +/*
+> > + * We may access GICR_TYPER and GITS_TYPER by reading both the TYPER
+> > + * offset and the following offset (+ 4) and then combining them to
+> > + * form a 64-bit address.
+> > + */
+> > +static inline u64 gicv3_read_typer(const volatile void __iomem *addr)
+> > +{
+> > +	u64 val =3D readl(addr);
+> > +	val |=3D (u64)readl(addr + 4) << 32;
+> > +	return val;
+> > +}
+> > +
+> > +#endif /* !__ASSEMBLY__ */
+> > +#endif /* _ASMARM_ARCH_GICV3_H_ */
+> > diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+> > new file mode 100644
+> > index 000000000000..73ade4681d21
+> > --- /dev/null
+> > +++ b/lib/arm/asm/gic-v3.h
+> > @@ -0,0 +1,104 @@
+> > +/*
+> > + * All GIC* defines are lifted from include/linux/irqchip/arm-gic-v3.h
+> > + *
+> > + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#ifndef _ASMARM_GIC_V3_H_
+> > +#define _ASMARM_GIC_V3_H_
+> > +
+> > +#ifndef _ASMARM_GIC_H_
+> > +#error Do not directly include <asm/gic-v3.h>. Include <asm/gic.h>
+> > +#endif
+> > +
+> > +/*
+> > + * Distributor registers
+> > + *
+> > + * We expect to be run in Non-secure mode, thus we define the
+> > + * group1 enable bits with respect to that view.
+> > + */
+> > +#define GICD_CTLR_RWP			(1U << 31)
+> > +#define GICD_CTLR_ARE_NS		(1U << 4)
+> > +#define GICD_CTLR_ENABLE_G1A		(1U << 1)
+> > +#define GICD_CTLR_ENABLE_G1		(1U << 0)
+> > +
+> > +/* Re-Distributor registers, offsets from RD_base */
+> > +#define GICR_TYPER			0x0008
+> > +
+> > +#define GICR_TYPER_LAST			(1U << 4)
+> > +
+> > +/* Re-Distributor registers, offsets from SGI_base */
+> > +#define GICR_IGROUPR0			GICD_IGROUPR
+> > +#define GICR_ISENABLER0			GICD_ISENABLER
+> > +#define GICR_IPRIORITYR0		GICD_IPRIORITYR
+> > +
+> > +#include <asm/arch_gicv3.h>
+> > +
+> > +#ifndef __ASSEMBLY__
+> > +#include <asm/setup.h>
+> > +#include <asm/smp.h>
+> > +#include <asm/processor.h>
+> > +#include <asm/io.h>
+> > +
+> > +struct gicv3_data {
+> > +	void *dist_base;
+> > +	void *redist_base[NR_CPUS];
+> > +	unsigned int irq_nr;
+> > +};
+> > +extern struct gicv3_data gicv3_data;
+> > +
+> > +#define gicv3_dist_base()		(gicv3_data.dist_base)
+> > +#define gicv3_redist_base()		(gicv3_data.redist_base[smp_processor_id(=
+)])
+> > +#define gicv3_sgi_base()		(gicv3_data.redist_base[smp_processor_id()] =
++ SZ_64K)
+> > +
+> > +extern int gicv3_init(void);
+> > +extern void gicv3_enable_defaults(void);
+> > +extern void gicv3_set_redist_base(size_t stride);
+> > +
+> > +static inline void gicv3_do_wait_for_rwp(void *base)
+> > +{
+> > +	int count =3D 100000;	/* 1s */
+> > +
+> > +	while (readl(base + GICD_CTLR) & GICD_CTLR_RWP) {
+> > +		if (!--count) {
+> > +			printf("GICv3: RWP timeout!\n");
+> > +			abort();
+> > +		}
+> > +		cpu_relax();
+> > +		udelay(10);
+> > +	};
+> > +}
+> > +
+> > +static inline void gicv3_dist_wait_for_rwp(void)
+> > +{
+> > +	gicv3_do_wait_for_rwp(gicv3_dist_base());
+> > +}
+> > +
+> > +static inline void gicv3_redist_wait_for_uwp(void)
+> > +{
+> > +	/*
+> > +	 * We can build on gic_do_wait_for_rwp, which uses GICD_ registers
+> > +	 * because GICD_CTLR =3D=3D GICR_CTLR and GICD_CTLR_RWP =3D=3D GICR_C=
+TLR_UWP
+> > +	 */
+> > +	gicv3_do_wait_for_rwp(gicv3_redist_base());
+> > +}
+> > +
+> > +static inline u32 mpidr_compress(u64 mpidr)
+> > +{
+> > +	u64 compressed =3D mpidr & MPIDR_HWID_BITMASK;
+> > +
+> > +	compressed =3D (((compressed >> 32) & 0xff) << 24) | compressed;
+> > +	return compressed;
+> > +}
+> > +
+> > +static inline u64 mpidr_uncompress(u32 compressed)
+> > +{
+> > +	u64 mpidr =3D ((u64)compressed >> 24) << 32;
+> > +
+> > +	mpidr |=3D compressed & MPIDR_HWID_BITMASK;
+> > +	return mpidr;
+> > +}
+> > +
+> > +#endif /* !__ASSEMBLY__ */
+> > +#endif /* _ASMARM_GIC_V3_H_ */
+> > diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> > index d816b96e46b4..21511997f2a9 100644
+> > --- a/lib/arm/asm/gic.h
+> > +++ b/lib/arm/asm/gic.h
+> > @@ -6,11 +6,11 @@
+> >  #ifndef _ASMARM_GIC_H_
+> >  #define _ASMARM_GIC_H_
+> >  =
 
-> 
-> ---
-> v7: cleanup cmdline parsing and add complain on bad args [Eric]
-> v6:
->  - make sender/irq names more future-proof [drew]
->  - sanity check inputs [drew]
->  - introduce check_sender/irq and bad_sender/irq to more
->    cleanly do checks [drew]
->  - default sender and irq to 1, instead of still zero [drew]
-> v4: improve structure and make sure spurious checking is
->     done even when the sender isn't cpu0
-> v2: actually check that the irq received was the irq sent,
->     and (for gicv2) that the sender is the expected one.
-> ---
->  arm/gic.c | 143 ++++++++++++++++++++++++++++++++++++++++++++++++++++----------
->  1 file changed, 120 insertions(+), 23 deletions(-)
-> 
-> diff --git a/arm/gic.c b/arm/gic.c
-> index 23c1860a49d9..88c5f49d807d 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -11,6 +11,7 @@
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
->  #include <libcflat.h>
-> +#include <util.h>
->  #include <asm/setup.h>
->  #include <asm/processor.h>
->  #include <asm/gic.h>
-> @@ -27,6 +28,8 @@ struct gic {
->  
->  static struct gic *gic;
->  static int acked[NR_CPUS], spurious[NR_CPUS];
-> +static int bad_sender[NR_CPUS], bad_irq[NR_CPUS];
-> +static int cmdl_sender = 1, cmdl_irq = 1;
->  static cpumask_t ready;
->  
->  static void nr_cpu_check(int nr)
-> @@ -42,10 +45,23 @@ static void wait_on_ready(void)
->  		cpu_relax();
->  }
->  
-> +static void stats_reset(void)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < nr_cpus; ++i) {
-> +		acked[i] = 0;
-> +		bad_sender[i] = -1;
-> +		bad_irq[i] = -1;
-> +	}
-> +	smp_wmb();
-> +}
-> +
->  static void check_acked(cpumask_t *mask)
->  {
->  	int missing = 0, extra = 0, unexpected = 0;
->  	int nr_pass, cpu, i;
-> +	bool bad = false;
->  
->  	/* Wait up to 5s for all interrupts to be delivered */
->  	for (i = 0; i < 50; ++i) {
-> @@ -55,9 +71,21 @@ static void check_acked(cpumask_t *mask)
->  			smp_rmb();
->  			nr_pass += cpumask_test_cpu(cpu, mask) ?
->  				acked[cpu] == 1 : acked[cpu] == 0;
-> +
-> +			if (bad_sender[cpu] != -1) {
-> +				printf("cpu%d received IPI from wrong sender %d\n",
-> +					cpu, bad_sender[cpu]);
-> +				bad = true;
-> +			}
-> +
-> +			if (bad_irq[cpu] != -1) {
-> +				printf("cpu%d received wrong irq %d\n",
-> +					cpu, bad_irq[cpu]);
-> +				bad = true;
-> +			}
->  		}
->  		if (nr_pass == nr_cpus) {
-> -			report("Completed in %d ms", true, ++i * 100);
-> +			report("Completed in %d ms", !bad, ++i * 100);
->  			return;
->  		}
->  	}
-> @@ -90,6 +118,22 @@ static void check_spurious(void)
->  	}
->  }
->  
-> +static void check_ipi_sender(u32 irqstat)
-> +{
-> +	if (gic_version() == 2) {
-> +		int src = (irqstat >> 10) & 7;
-> +
-> +		if (src != cmdl_sender)
-> +			bad_sender[smp_processor_id()] = src;
-> +	}
-> +}
-> +
-> +static void check_irqnr(u32 irqnr)
-> +{
-> +	if (irqnr != (u32)cmdl_irq)
-> +		bad_irq[smp_processor_id()] = irqnr;
-> +}
-> +
->  static void ipi_handler(struct pt_regs *regs __unused)
->  {
->  	u32 irqstat = gic_read_iar();
-> @@ -97,8 +141,10 @@ static void ipi_handler(struct pt_regs *regs __unused)
->  
->  	if (irqnr != GICC_INT_SPURIOUS) {
->  		gic_write_eoir(irqstat);
-> -		smp_rmb(); /* pairs with wmb in ipi_test functions */
-> +		smp_rmb(); /* pairs with wmb in stats_reset */
->  		++acked[smp_processor_id()];
-> +		check_ipi_sender(irqstat);
-> +		check_irqnr(irqnr);
->  		smp_wmb(); /* pairs with rmb in check_acked */
->  	} else {
->  		++spurious[smp_processor_id()];
-> @@ -108,22 +154,22 @@ static void ipi_handler(struct pt_regs *regs __unused)
->  
->  static void gicv2_ipi_send_self(void)
->  {
-> -	writel(2 << 24, gicv2_dist_base() + GICD_SGIR);
-> +	writel(2 << 24 | cmdl_irq, gicv2_dist_base() + GICD_SGIR);
->  }
->  
->  static void gicv2_ipi_send_broadcast(void)
->  {
-> -	writel(1 << 24, gicv2_dist_base() + GICD_SGIR);
-> +	writel(1 << 24 | cmdl_irq, gicv2_dist_base() + GICD_SGIR);
->  }
->  
->  static void gicv3_ipi_send_self(void)
->  {
-> -	gic_ipi_send_single(0, smp_processor_id());
-> +	gic_ipi_send_single(cmdl_irq, smp_processor_id());
->  }
->  
->  static void gicv3_ipi_send_broadcast(void)
->  {
-> -	gicv3_write_sgi1r(1ULL << 40);
-> +	gicv3_write_sgi1r(1ULL << 40 | cmdl_irq << 24);
->  	isb();
->  }
->  
-> @@ -132,10 +178,9 @@ static void ipi_test_self(void)
->  	cpumask_t mask;
->  
->  	report_prefix_push("self");
-> -	memset(acked, 0, sizeof(acked));
-> -	smp_wmb();
-> +	stats_reset();
->  	cpumask_clear(&mask);
-> -	cpumask_set_cpu(0, &mask);
-> +	cpumask_set_cpu(smp_processor_id(), &mask);
->  	gic->ipi.send_self();
->  	check_acked(&mask);
->  	report_prefix_pop();
-> @@ -147,20 +192,18 @@ static void ipi_test_smp(void)
->  	int i;
->  
->  	report_prefix_push("target-list");
-> -	memset(acked, 0, sizeof(acked));
-> -	smp_wmb();
-> +	stats_reset();
->  	cpumask_copy(&mask, &cpu_present_mask);
-> -	for (i = 0; i < nr_cpus; i += 2)
-> +	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
->  		cpumask_clear_cpu(i, &mask);
-> -	gic_ipi_send_mask(0, &mask);
-> +	gic_ipi_send_mask(cmdl_irq, &mask);
->  	check_acked(&mask);
->  	report_prefix_pop();
->  
->  	report_prefix_push("broadcast");
-> -	memset(acked, 0, sizeof(acked));
-> -	smp_wmb();
-> +	stats_reset();
->  	cpumask_copy(&mask, &cpu_present_mask);
-> -	cpumask_clear_cpu(0, &mask);
-> +	cpumask_clear_cpu(smp_processor_id(), &mask);
->  	gic->ipi.send_broadcast();
->  	check_acked(&mask);
->  	report_prefix_pop();
-> @@ -177,6 +220,16 @@ static void ipi_enable(void)
->  	local_irq_enable();
->  }
->  
-> +static void ipi_send(void)
-> +{
-> +	ipi_enable();
-> +	wait_on_ready();
-> +	ipi_test_self();
-> +	ipi_test_smp();
-> +	check_spurious();
-> +	exit(report_summary());
-> +}
-> +
->  static void ipi_recv(void)
->  {
->  	ipi_enable();
-> @@ -185,6 +238,54 @@ static void ipi_recv(void)
->  		wfi();
->  }
->  
-> +static void ipi_test(void)
-> +{
-> +	if (smp_processor_id() == cmdl_sender)
-> +		ipi_send();
-> +	else
-> +		ipi_recv();
-> +}
-> +
-> +#define CMDL_IPI_USAGE "usage: gic ipi [sender=<cpu#>] [irq=<sgi#>]"
-> +
-> +static void cmdl_ipi_set_sender(int sender)
-> +{
-> +	if (sender < nr_cpus) {
-> +		cmdl_sender = sender;
-> +		return;
-> +	}
-> +	report_abort("invalid sender %d, nr_cpus=%d", sender, nr_cpus);
-> +}
-> +
-> +static void cmdl_ipi_set_irq(int irq)
-> +{
-> +	if (irq < 16) {
-> +		cmdl_irq = irq;
-> +		return;
-> +	}
-> +	report_abort("invalid irq %d, SGI must be < 16", irq);
-> +}
-> +
-> +static void cmdl_ipi_get_inputs(int argc, char **argv)
-> +{
-> +	int off, i = 1;
-> +	long val;
-> +
-> +	while (--argc != 1) {
-> +		off = parse_keyval(argv[++i], &val);
-> +		if (off == -1)
-> +			report_abort(CMDL_IPI_USAGE);
-> +		argv[i][off] = '\0';
-> +
-> +		if (strcmp(argv[i], "sender") == 0)
-> +			cmdl_ipi_set_sender(val);
-> +		else if (strcmp(argv[i], "irq") == 0)
-> +			cmdl_ipi_set_irq(val);
-> +		else
-> +			report_abort(CMDL_IPI_USAGE);
-> +	}
-> +}
-> +
->  static struct gic gicv2 = {
->  	.ipi = {
->  		.send_self = gicv2_ipi_send_self,
-> @@ -230,19 +331,15 @@ int main(int argc, char **argv)
->  	} else if (strcmp(argv[1], "ipi") == 0) {
->  
->  		report_prefix_push(argv[1]);
-> +		cmdl_ipi_get_inputs(argc, argv);
->  		nr_cpu_check(2);
->  
->  		for_each_present_cpu(cpu) {
->  			if (cpu == 0)
->  				continue;
-> -			smp_boot_secondary(cpu, ipi_recv);
-> +			smp_boot_secondary(cpu, ipi_test);
->  		}
-> -		ipi_enable();
-> -		wait_on_ready();
-> -		ipi_test_self();
-> -		ipi_test_smp();
-> -		check_spurious();
-> -		report_prefix_pop();
-> +		ipi_test();
->  
->  	} else {
->  		report_abort("Unknown subtest '%s'", argv[1]);
-> 
+> > -#include <asm/gic-v2.h>
+> nit: spare empty line
+> >  =
+
+> >  /* Distributor registers */
+> >  #define GICD_CTLR			0x0000
+> >  #define GICD_TYPER			0x0004
+> > +#define GICD_IGROUPR			0x0080
+> >  #define GICD_ISENABLER			0x0100
+> >  #define GICD_IPRIORITYR			0x0400
+> >  #define GICD_SGIR			0x0f00
+> > @@ -28,6 +28,9 @@
+> >  #define GICC_INT_PRI_THRESHOLD		0xf0
+> >  #define GICC_INT_SPURIOUS		0x3ff
+> >  =
+
+> > +#include <asm/gic-v2.h>
+> > +#include <asm/gic-v3.h>
+> > +
+> >  #ifndef __ASSEMBLY__
+> >  =
+
+> >  /*
+> > diff --git a/lib/arm/gic-v2.c b/lib/arm/gic-v2.c
+> > new file mode 100644
+> > index 000000000000..e80eb8f29488
+> > --- /dev/null
+> > +++ b/lib/arm/gic-v2.c
+> > @@ -0,0 +1,27 @@
+> > +/*
+> > + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#include <asm/gic.h>
+> > +#include <asm/io.h>
+> > +
+> > +void gicv2_enable_defaults(void)
+> > +{
+> > +	void *dist =3D gicv2_dist_base();
+> > +	void *cpu_base =3D gicv2_cpu_base();
+> > +	unsigned int i;
+> > +
+> > +	gicv2_data.irq_nr =3D GICD_TYPER_IRQS(readl(dist + GICD_TYPER));
+> > +	if (gicv2_data.irq_nr > 1020)
+> > +		gicv2_data.irq_nr =3D 1020;
+> > +
+> > +	for (i =3D 0; i < gicv2_data.irq_nr; i +=3D 4)
+> > +		writel(GICD_INT_DEF_PRI_X4, dist + GICD_IPRIORITYR + i);
+> > +
+> > +	writel(GICD_INT_EN_SET_SGI, dist + GICD_ISENABLER + 0);
+> > +	writel(GICD_ENABLE, dist + GICD_CTLR);
+> > +
+> > +	writel(GICC_INT_PRI_THRESHOLD, cpu_base + GICC_PMR);
+> > +	writel(GICC_ENABLE, cpu_base + GICC_CTLR);
+> > +}
+> > diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+> > new file mode 100644
+> > index 000000000000..c46d16e11782
+> > --- /dev/null
+> > +++ b/lib/arm/gic-v3.c
+> > @@ -0,0 +1,61 @@
+> > +/*
+> > + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#include <asm/gic.h>
+> > +#include <asm/io.h>
+> > +
+> > +void gicv3_set_redist_base(size_t stride)
+> > +{
+> > +	u32 aff =3D mpidr_compress(get_mpidr());
+> > +	void *ptr =3D gicv3_data.redist_base[0];
+> > +	u64 typer;
+> > +
+> > +	do {
+> > +		typer =3D gicv3_read_typer(ptr + GICR_TYPER);
+> > +		if ((typer >> 32) =3D=3D aff) {
+> > +			gicv3_redist_base() =3D ptr;
+> > +			return;
+> > +		}
+> > +		ptr +=3D stride; /* skip RD_base, SGI_base, etc. */
+> > +	} while (!(typer & GICR_TYPER_LAST));
+> > +
+> > +	/* should never reach here */
+> > +	assert(0);
+> > +}
+> > +
+> > +void gicv3_enable_defaults(void)
+> > +{
+> > +	void *dist =3D gicv3_dist_base();
+> > +	void *sgi_base;
+> > +	unsigned int i;
+> > +
+> > +	gicv3_data.irq_nr =3D GICD_TYPER_IRQS(readl(dist + GICD_TYPER));
+> > +	if (gicv3_data.irq_nr > 1020)
+> > +		gicv3_data.irq_nr =3D 1020;
+> > +
+> > +	writel(0, dist + GICD_CTLR);
+> > +	gicv3_dist_wait_for_rwp();
+> > +
+> > +	writel(GICD_CTLR_ARE_NS | GICD_CTLR_ENABLE_G1A | GICD_CTLR_ENABLE_G1,
+> > +	       dist + GICD_CTLR);
+> > +	gicv3_dist_wait_for_rwp();
+> > +
+> > +	for (i =3D 0; i < gicv3_data.irq_nr; i +=3D 4)
+> > +		writel(~0, dist + GICD_IGROUPR + i);
+> > +
+> > +	if (!gicv3_redist_base())
+> > +		gicv3_set_redist_base(SZ_64K * 2);
+> > +	sgi_base =3D gicv3_sgi_base();
+> > +
+> > +	writel(~0, sgi_base + GICR_IGROUPR0);
+> > +
+> > +	for (i =3D 0; i < 16; i +=3D 4)
+> > +		writel(GICD_INT_DEF_PRI_X4, sgi_base + GICR_IPRIORITYR0 + i);
+> > +
+> > +	writel(GICD_INT_EN_SET_SGI, sgi_base + GICR_ISENABLER0);
+> > +
+> > +	gicv3_write_pmr(GICC_INT_PRI_THRESHOLD);
+> > +	gicv3_write_grpen1(1);
+> > +}
+> > diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> > index d655105e058b..4d3ddd9722b1 100644
+> > --- a/lib/arm/gic.c
+> > +++ b/lib/arm/gic.c
+> > @@ -8,9 +8,11 @@
+> >  #include <asm/io.h>
+> >  =
+
+> >  struct gicv2_data gicv2_data;
+> > +struct gicv3_data gicv3_data;
+> >  =
+
+> >  /*
+> >   * Documentation/devicetree/bindings/interrupt-controller/arm,gic.txt
+> > + * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.t=
+xt
+> >   */
+> >  static bool
+> >  gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+> > @@ -48,29 +50,17 @@ int gicv2_init(void)
+> >  			&gicv2_data.dist_base, &gicv2_data.cpu_base);
+> >  }
+> >  =
+
+> > +int gicv3_init(void)
+> > +{
+> > +	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
+> > +			&gicv3_data.redist_base[0]);
+> > +}
+> nit: if gicv2_init and gicv3_init stay in lib/arm/gic.c they can become
+> static and do not need to be exposed in lib/arm/asm/gic-v2/v3.h.
+> Or they shall be moved to respective v2/v3 lib implementation with
+> gicv2/v3_data.
+
+I deciced exposing gic_get_dt_bases was less useful than gicv2/3_init,
+so left them in lib/arm/gic.c. And I think gicv2/3_init may be useful
+for unit tests that only care about one type of gic.
+
+Thanks,
+drew
+
+> =
+
+> Thanks
+> =
+
+> Eric
+> > +
+> >  int gic_init(void)
+> >  {
+> >  	if (gicv2_init())
+> >  		return 2;
+> > +	else if (gicv3_init())
+> > +		return 3;
+> >  	return 0;
+> >  }
+> > -
+> > -void gicv2_enable_defaults(void)
+> > -{
+> > -	void *dist =3D gicv2_dist_base();
+> > -	void *cpu_base =3D gicv2_cpu_base();
+> > -	unsigned int i;
+> > -
+> > -	gicv2_data.irq_nr =3D GICD_TYPER_IRQS(readl(dist + GICD_TYPER));
+> > -	if (gicv2_data.irq_nr > 1020)
+> > -		gicv2_data.irq_nr =3D 1020;
+> > -
+> > -	for (i =3D 0; i < gicv2_data.irq_nr; i +=3D 4)
+> > -		writel(GICD_INT_DEF_PRI_X4, dist + GICD_IPRIORITYR + i);
+> > -
+> > -	writel(GICD_INT_EN_SET_SGI, dist + GICD_ISENABLER + 0);
+> > -	writel(GICD_ENABLE, dist + GICD_CTLR);
+> > -
+> > -	writel(GICC_INT_PRI_THRESHOLD, cpu_base + GICC_PMR);
+> > -	writel(GICC_ENABLE, cpu_base + GICC_CTLR);
+> > -}
+> > diff --git a/lib/arm64/asm/arch_gicv3.h b/lib/arm64/asm/arch_gicv3.h
+> > new file mode 100644
+> > index 000000000000..6d353567f56a
+> > --- /dev/null
+> > +++ b/lib/arm64/asm/arch_gicv3.h
+> > @@ -0,0 +1,44 @@
+> > +/*
+> > + * All ripped off from arch/arm64/include/asm/arch_gicv3.h
+> > + *
+> > + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#ifndef _ASMARM64_ARCH_GICV3_H_
+> > +#define _ASMARM64_ARCH_GICV3_H_
+> > +
+> > +#include <asm/sysreg.h>
+> > +
+> > +#define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+> > +#define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
+> > +
+> > +#ifndef __ASSEMBLY__
+> > +
+> > +#include <libcflat.h>
+> > +#include <asm/barrier.h>
+> > +
+> > +#define __stringify xstr
+> > +
+> > +/*
+> > + * Low-level accessors
+> > + *
+> > + * These system registers are 32 bits, but we make sure that the compi=
+ler
+> > + * sets the GP register's most significant bits to 0 with an explicit =
+cast.
+> > + */
+> > +
+> > +static inline void gicv3_write_pmr(u32 val)
+> > +{
+> > +	asm volatile("msr_s " __stringify(ICC_PMR_EL1) ", %0" : : "r" ((u64)v=
+al));
+> > +}
+> > +
+> > +static inline void gicv3_write_grpen1(u32 val)
+> > +{
+> > +	asm volatile("msr_s " __stringify(ICC_GRPEN1_EL1) ", %0" : : "r" ((u6=
+4)val));
+> > +	isb();
+> > +}
+> > +
+> > +#define gicv3_read_typer(c)		readq(c)
+> > +
+> > +#endif /* __ASSEMBLY__ */
+> > +#endif /* _ASMARM64_ARCH_GICV3_H_ */
+> > diff --git a/lib/arm64/asm/gic-v3.h b/lib/arm64/asm/gic-v3.h
+> > new file mode 100644
+> > index 000000000000..8ee5d4d9c181
+> > --- /dev/null
+> > +++ b/lib/arm64/asm/gic-v3.h
+> > @@ -0,0 +1 @@
+> > +#include "../../arm/asm/gic-v3.h"
+> > diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> > new file mode 100644
+> > index 000000000000..544a46cb8cc5
+> > --- /dev/null
+> > +++ b/lib/arm64/asm/sysreg.h
+> > @@ -0,0 +1,44 @@
+> > +/*
+> > + * Ripped off from arch/arm64/include/asm/sysreg.h
+> > + *
+> > + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU LGPL, version 2.
+> > + */
+> > +#ifndef _ASMARM64_SYSREG_H_
+> > +#define _ASMARM64_SYSREG_H_
+> > +
+> > +#define sys_reg(op0, op1, crn, crm, op2) \
+> > +	((((op0)&3)<<19)|((op1)<<16)|((crn)<<12)|((crm)<<8)|((op2)<<5))
+> > +
+> > +#ifdef __ASSEMBLY__
+> > +	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,2=
+3,24,25,26,27,28,29,30
+> > +	.equ	.L__reg_num_x\num, \num
+> > +	.endr
+> > +	.equ	.L__reg_num_xzr, 31
+> > +
+> > +	.macro	mrs_s, rt, sreg
+> > +	.inst	0xd5200000|(\sreg)|(.L__reg_num_\rt)
+> > +	.endm
+> > +
+> > +	.macro	msr_s, sreg, rt
+> > +	.inst	0xd5000000|(\sreg)|(.L__reg_num_\rt)
+> > +	.endm
+> > +#else
+> > +asm(
+> > +"	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,=
+23,24,25,26,27,28,29,30\n"
+> > +"	.equ	.L__reg_num_x\\num, \\num\n"
+> > +"	.endr\n"
+> > +"	.equ	.L__reg_num_xzr, 31\n"
+> > +"\n"
+> > +"	.macro	mrs_s, rt, sreg\n"
+> > +"	.inst	0xd5200000|(\\sreg)|(.L__reg_num_\\rt)\n"
+> > +"	.endm\n"
+> > +"\n"
+> > +"	.macro	msr_s, sreg, rt\n"
+> > +"	.inst	0xd5000000|(\\sreg)|(.L__reg_num_\\rt)\n"
+> > +"	.endm\n"
+> > +);
+> > +#endif
+> > +
+> > +#endif /* _ASMARM64_SYSREG_H_ */
+> > =
