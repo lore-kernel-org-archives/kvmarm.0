@@ -1,457 +1,233 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v11 1/3] arm: Add PMU test
-Date: Fri, 25 Nov 2016 14:39:52 +0000
-Message-ID: <392be1f7-5d6d-5359-450a-a48fbc75fcc7@arm.com>
-References: <20161123171551.qfvdcxvys2pphzs3@kamzik.brq.redhat.com>
- <20161125123224.3267-1-andre.przywara@arm.com>
- <20161125142625.43mytkuk5vrwzq6j@kamzik.brq.redhat.com>
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH V5 01/10] acpi: apei: read ack upon ghes record consumption
+Date: Fri, 25 Nov 2016 18:19:03 +0000
+Message-ID: <58388097.9000106@arm.com>
+References: <1479767763-27532-1-git-send-email-tbaicar@codeaurora.org> <1479767763-27532-2-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76565406D0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Nov 2016 09:38:30 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qg02mz66aEoC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Nov 2016 09:38:28 -0500 (EST)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B8AA405C4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Nov 2016 09:38:27 -0500 (EST)
-In-Reply-To: <20161125142625.43mytkuk5vrwzq6j@kamzik.brq.redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1479767763-27532-2-git-send-email-tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Cc: marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tomasz.nowicki-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Suzuki.Poulose-5wv7dgnIgG8@public.gmane.org, punit.agrawal-5wv7dgnIgG8@public.gmane.org, astone-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Tyler,
 
-On 25/11/16 14:26, Andrew Jones wrote:
-> On Fri, Nov 25, 2016 at 12:32:24PM +0000, Andre Przywara wrote:
->> Hi Drew,
->>
->> ....
->>
->> On 23/11/16 17:15, Andrew Jones wrote:
->>>>> +
->>>>> +#if defined(__arm__)
->>>>
->>>> I guess you should use the arch specific header files we have in place
->>>> for that (lib/arm{.64}/asm/processor.h). Also there are sysreg read
->>>> wrappers (at least for arm64) in there already, can't we base this
->>>> function on them: DEFINE_GET_SYSREG32(pmcr, el0)?
->>>> (Requires a small change to get rid of the forced "_el1" suffix)
->>>>
->>>> We should wait for the GIC series to be merged, as this contains some
->>>> changes in this area.
->>>
->>> As this unit test is the only consumer of PMC registers so far, then
->>> I'd prefer the defines and accessors stay here for now. Once we see
->>> a use in other unit tests then we can move some of it out.
->>
->> Well, I was more thinking of something like below.
->> I am fine with keeping the PMU sysregs private to pmu.c, but we can still
->> use the sysreg wrappers, can't we?
->> This is on top of Wei's series, so doesn't have your SYSREG32/64
->> unification, but I leave this as an exercise to the reader.
->> There is some churn in pmu.c below due to the change of <sysreg>_write to
->> set_<sysreg>, but the rest looks like simplification to me.
->>
->> Does that make sense?
+On 21/11/16 22:35, Tyler Baicar wrote:
+> A RAS (Reliability, Availability, Serviceability) controller
+> may be a separate processor running in parallel with OS
+> execution, and may generate error records for consumption by
+> the OS. If the RAS controller produces multiple error records,
+> then they may be overwritten before the OS has consumed them.
 > 
-> Ah, now I see what you mean, and I think I like that. The question is
-> whether or not I like my SYSREG macros :-) I see value in having the
-> asm's easy to read (open-coded),
+> The Generic Hardware Error Source (GHES) v2 structure
+> introduces the capability for the OS to acknowledge the
+> consumption of the error record generated by the RAS
+> controller. A RAS controller supporting GHESv2 shall wait for
+> the acknowledgment before writing a new error record, thus
+> eliminating the race condition.
 
-Mmh, where is this easy to read? Especially the v7 syntax is really
-error prone and hard to grasp with all these c9s, c12s and friends, in
-addition to the weird ordering and mixing in of register names in the
-(inline) assembly syntax. Blame the company that came up with this
-architecture ;-)
+This patch also adds support for parsing GHESv2 sub-tables.
+Before they would be rejected as an unknown hardware error source.
 
-Compare:
-mrc p15, 0, %0, c9, c12, 0
-with:
-DEFINE_GET_SYSREG32(pmcr, 0, c9, c12, 0)
 
-The "0, %0" in there always kills me when reading this.
+> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
 
-On top of this a list of one-line-per-sysreg declarations is much easier
-to compare with the manual than the open coded versions.
+Nit: the patch author's Sign-off should come first, you either need a 'From:
+Jonathan (Zhixiong) Zhang ...' on this patch, or re-order these Signed-off-by's.
 
-Another benefit is that we don't need to encode versions for both
-bitnesses in each test. For shared sysregs we could put the definitions
-in processor.h, the code then just uses one architecture agnostic version.
 
-But I leave it up to you guys to decide on this, you don't break my
-heart if you stick with inline assembly ;-)
-
-Cheers,
-Andre.
-
- as well as value in making sure we
-> only have to review sysreg functions once. Let's ask for Wei's and
-> Cov's votes. If they like the SYSREG direction, then they can vote
-> with another version of this series :-)
+> Signed-off-by: Richard Ruigrok <rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> Signed-off-by: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> Signed-off-by: Naveen Kaje <nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> ---
+>  drivers/acpi/apei/ghes.c | 49 +++++++++++++++++++++++++++++++++++++++++++++---
+>  drivers/acpi/apei/hest.c |  7 +++++--
+>  include/acpi/ghes.h      |  5 ++++-
+>  3 files changed, 55 insertions(+), 6 deletions(-)
 > 
-> Thanks,
-> drew
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 60746ef..b79abc5 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -45,6 +45,7 @@
+>  #include <linux/aer.h>
+>  #include <linux/nmi.h>
+>  
+> +#include <acpi/actbl1.h>
+>  #include <acpi/ghes.h>
+>  #include <acpi/apei.h>
+>  #include <asm/tlbflush.h>
+> @@ -79,6 +80,10 @@
+>  	((struct acpi_hest_generic_status *)				\
+>  	 ((struct ghes_estatus_node *)(estatus_node) + 1))
+>  
+> +#define HEST_TYPE_GENERIC_V2(ghes)				\
+> +	((struct acpi_hest_header *)ghes->generic)->type ==	\
+> +	 ACPI_HEST_TYPE_GENERIC_ERROR_V2
+> +
+
+IS_ HEST_TYPE_GENERIC_V2() ? (for the sake of readability)
+
+
+>  /*
+>   * This driver isn't really modular, however for the time being,
+>   * continuing to use module_param is the easiest way to remain
+> @@ -248,10 +253,18 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+>  	ghes = kzalloc(sizeof(*ghes), GFP_KERNEL);
+>  	if (!ghes)
+>  		return ERR_PTR(-ENOMEM);
+> +
+>  	ghes->generic = generic;
+> +	if (HEST_TYPE_GENERIC_V2(ghes)) {
+> +		rc = apei_map_generic_address(
+> +			&ghes->generic_v2->read_ack_register);
+> +		if (rc)
+> +			goto err_free;
+> +	}
+> +
+>  	rc = apei_map_generic_address(&generic->error_status_address);
+>  	if (rc)
+> -		goto err_free;
+> +		goto err_unmap_read_ack_addr;
+>  	error_block_length = generic->error_block_length;
+>  	if (error_block_length > GHES_ESTATUS_MAX_SIZE) {
+>  		pr_warning(FW_WARN GHES_PFX
+> @@ -263,13 +276,17 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+>  	ghes->estatus = kmalloc(error_block_length, GFP_KERNEL);
+>  	if (!ghes->estatus) {
+>  		rc = -ENOMEM;
+> -		goto err_unmap;
+> +		goto err_unmap_status_addr;
+>  	}
+>  
+>  	return ghes;
+>  
+> -err_unmap:
+> +err_unmap_status_addr:
+>  	apei_unmap_generic_address(&generic->error_status_address);
+> +err_unmap_read_ack_addr:
+> +	if (HEST_TYPE_GENERIC_V2(ghes))
+> +		apei_unmap_generic_address(
+> +			&ghes->generic_v2->read_ack_register);
+>  err_free:
+>  	kfree(ghes);
+>  	return ERR_PTR(rc);
+> @@ -279,6 +296,9 @@ static void ghes_fini(struct ghes *ghes)
+>  {
+>  	kfree(ghes->estatus);
+>  	apei_unmap_generic_address(&ghes->generic->error_status_address);
+> +	if (HEST_TYPE_GENERIC_V2(ghes))
+> +		apei_unmap_generic_address(
+> +			&ghes->generic_v2->read_ack_register);
+>  }
+>  
+>  static inline int ghes_severity(int severity)
+> @@ -648,6 +668,23 @@ static void ghes_estatus_cache_add(
+>  	rcu_read_unlock();
+>  }
+>  
+> +static int ghes_ack_error(struct acpi_hest_generic_v2 *generic_v2)
+> +{
+> +	int rc;
+> +	u64 val = 0;
+> +
+> +	rc = apei_read(&val, &generic_v2->read_ack_register);
+> +	if (rc)
+> +		return rc;
+> +	val &= generic_v2->read_ack_preserve <<
+> +		generic_v2->read_ack_register.bit_offset;
+> +	val |= generic_v2->read_ack_write <<
+> +		generic_v2->read_ack_register.bit_offset;
+
+Is this bit_offset shifting needed in case the read_ack_register is in the
+'system io' (or embedded controller) address space and shares a register with
+some other stuff?
+
+The read_ack_{preserve,write} values are u64, so if bit_offset is non-zero the
+high order bits get lost, but both ends of this are in the firmware's control.
+
+(I assumed this thing would always be in memory and these fields would never be
+used - but I guess that isn't true!)
+
+
+> +	rc = apei_write(val, &generic_v2->read_ack_register);
+> +
+> +	return rc;
+> +}
+> +
+>  static int ghes_proc(struct ghes *ghes)
+>  {
+>  	int rc;
+> @@ -660,6 +697,12 @@ static int ghes_proc(struct ghes *ghes)
+>  			ghes_estatus_cache_add(ghes->generic, ghes->estatus);
+>  	}
+>  	ghes_do_proc(ghes, ghes->estatus);
+> +
+> +	if (HEST_TYPE_GENERIC_V2(ghes)) {
+> +		rc = ghes_ack_error(ghes->generic_v2);
+> +		if (rc)
+> +			return rc;
+> +	}
+>  out:
+>  	ghes_clear_estatus(ghes);
+>  	return 0;
+> diff --git a/drivers/acpi/apei/hest.c b/drivers/acpi/apei/hest.c
+> index 792a0d9..ef725a9 100644
+> --- a/drivers/acpi/apei/hest.c
+> +++ b/drivers/acpi/apei/hest.c
+> @@ -52,6 +52,7 @@ static const int hest_esrc_len_tab[ACPI_HEST_TYPE_RESERVED] = {
+>  	[ACPI_HEST_TYPE_AER_ENDPOINT] = sizeof(struct acpi_hest_aer),
+>  	[ACPI_HEST_TYPE_AER_BRIDGE] = sizeof(struct acpi_hest_aer_bridge),
+>  	[ACPI_HEST_TYPE_GENERIC_ERROR] = sizeof(struct acpi_hest_generic),
+> +	[ACPI_HEST_TYPE_GENERIC_ERROR_V2] = sizeof(struct acpi_hest_generic_v2),
+>  };
+>  
+>  static int hest_esrc_len(struct acpi_hest_header *hest_hdr)
+> @@ -146,7 +147,8 @@ static int __init hest_parse_ghes_count(struct acpi_hest_header *hest_hdr, void
+>  {
+>  	int *count = data;
+>  
+> -	if (hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR)
+> +	if (hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR ||
+> +	    hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR_V2)
+>  		(*count)++;
+>  	return 0;
+>  }
+> @@ -157,7 +159,8 @@ static int __init hest_parse_ghes(struct acpi_hest_header *hest_hdr, void *data)
+>  	struct ghes_arr *ghes_arr = data;
+>  	int rc, i;
+>  
+> -	if (hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR)
+> +	if (hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR &&
+> +	    hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR_V2)
+>  		return 0;
+>  
+>  	if (!((struct acpi_hest_generic *)hest_hdr)->enabled)
+> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+> index 720446c..68f088a 100644
+> --- a/include/acpi/ghes.h
+> +++ b/include/acpi/ghes.h
+> @@ -13,7 +13,10 @@
+>  #define GHES_EXITING		0x0002
+>  
+>  struct ghes {
+> -	struct acpi_hest_generic *generic;
+> +	union {
+> +		struct acpi_hest_generic *generic;
+> +		struct acpi_hest_generic_v2 *generic_v2;
+> +	};
+>  	struct acpi_hest_generic_status *estatus;
+>  	u64 buffer_paddr;
+>  	unsigned long flags;
 > 
->>
->> Cheers,
->> Andre.
->>
->> ---
->>  arm/pmu.c                 | 159 +++++++++++++---------------------------------
->>  lib/arm/asm/processor.h   |  34 ++++++++--
->>  lib/arm64/asm/processor.h |  23 ++++++-
->>  3 files changed, 92 insertions(+), 124 deletions(-)
->>
->> diff --git a/arm/pmu.c b/arm/pmu.c
->> index f667676..f0ad02a 100644
->> --- a/arm/pmu.c
->> +++ b/arm/pmu.c
->> @@ -14,6 +14,7 @@
->>   */
->>  #include "libcflat.h"
->>  #include "asm/barrier.h"
->> +#include "asm/processor.h"
->>  
->>  #define PMU_PMCR_E         (1 << 0)
->>  #define PMU_PMCR_C         (1 << 2)
->> @@ -33,78 +34,42 @@
->>  #define NR_SAMPLES 10
->>  
->>  static unsigned int pmu_version;
->> -#if defined(__arm__)
->> -static inline uint32_t pmcr_read(void)
->> -{
->> -	uint32_t ret;
->> -
->> -	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
->> -	return ret;
->> -}
->> -
->> -static inline void pmcr_write(uint32_t value)
->> -{
->> -	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (value));
->> -	isb();
->> -}
->>  
->> -static inline void pmselr_write(uint32_t value)
->> -{
->> -	asm volatile("mcr p15, 0, %0, c9, c12, 5" : : "r" (value));
->> -	isb();
->> -}
->> -
->> -static inline void pmxevtyper_write(uint32_t value)
->> -{
->> -	asm volatile("mcr p15, 0, %0, c9, c13, 1" : : "r" (value));
->> -}
->> -
->> -static inline uint64_t pmccntr_read(void)
->> +#if defined(__arm__)
->> +DEFINE_GET_SYSREG32(pmcr, 0, c9, c12, 0)
->> +DEFINE_SET_SYSREG32(pmcr, 0, c9, c12, 0)
->> +DEFINE_GET_SYSREG32(id_dfr0, 0, c0, c1, 2)
->> +DEFINE_SET_SYSREG32(pmselr, 0, c9, c12, 5)
->> +DEFINE_SET_SYSREG32(pmxevtyper, 0, c9, c13, 1)
->> +DEFINE_GET_SYSREG32(pmccntr32, 0, c9, c13, 0)
->> +DEFINE_SET_SYSREG32(pmccntr32, 0, c9, c13, 0)
->> +DEFINE_GET_SYSREG64(pmccntr64, 0, c9)
->> +DEFINE_SET_SYSREG64(pmccntr64, 0, c9)
->> +DEFINE_SET_SYSREG32(pmcntenset, 0, c9, c12, 1)
->> +
->> +static inline uint64_t get_pmccntr(void)
->>  {
->> -	uint32_t lo, hi = 0;
->> -
->>  	if (pmu_version == 0x3)
->> -		asm volatile("mrrc p15, 0, %0, %1, c9" : "=r" (lo), "=r" (hi));
->> +		return get_pmccntr32();
->>  	else
->> -		asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (lo));
->> -
->> -	return ((uint64_t)hi << 32) | lo;
->> +		return get_pmccntr64();
->>  }
->>  
->> -static inline void pmccntr_write(uint64_t value)
->> +static inline void set_pmccntr(uint64_t value)
->>  {
->> -	uint32_t lo, hi;
->> -
->> -	lo = value & 0xffffffff;
->> -	hi = (value >> 32) & 0xffffffff;
->> -
->>  	if (pmu_version == 0x3)
->> -		asm volatile("mcrr p15, 0, %0, %1, c9" : : "r" (lo), "r" (hi));
->> +		set_pmccntr64(value);
->>  	else
->> -		asm volatile("mcr p15, 0, %0, c9, c13, 0" : : "r" (lo));
->> +		set_pmccntr64(value & 0xffffffff);
->>  }
->> -
->> -static inline void pmcntenset_write(uint32_t value)
->> -{
->> -	asm volatile("mcr p15, 0, %0, c9, c12, 1" : : "r" (value));
->> -}
->> -
->>  /* PMCCFILTR is an obsolete name for PMXEVTYPER31 in ARMv7 */
->> -static inline void pmccfiltr_write(uint32_t value)
->> +static inline void set_pmccfiltr(uint32_t value)
->>  {
->> -	pmselr_write(PMU_CYCLE_IDX);
->> -	pmxevtyper_write(value);
->> +	set_pmselr(PMU_CYCLE_IDX);
->> +	set_pmxevtyper(value);
->>  	isb();
->>  }
->>  
->> -static inline uint32_t id_dfr0_read(void)
->> -{
->> -	uint32_t val;
->> -
->> -	asm volatile("mrc p15, 0, %0, c0, c1, 2" : "=r" (val));
->> -	return val;
->> -}
->> -
->>  /*
->>   * Extra instructions inserted by the compiler would be difficult to compensate
->>   * for, so hand assemble everything between, and including, the PMCR accesses
->> @@ -126,51 +91,13 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
->>  	: "cc");
->>  }
->>  #elif defined(__aarch64__)
->> -static inline uint32_t pmcr_read(void)
->> -{
->> -	uint32_t ret;
->> -
->> -	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
->> -	return ret;
->> -}
->> -
->> -static inline void pmcr_write(uint32_t value)
->> -{
->> -	asm volatile("msr pmcr_el0, %0" : : "r" (value));
->> -	isb();
->> -}
->> -
->> -static inline uint64_t pmccntr_read(void)
->> -{
->> -	uint64_t cycles;
->> -
->> -	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
->> -	return cycles;
->> -}
->> -
->> -static inline void pmccntr_write(uint64_t value)
->> -{
->> -	asm volatile("msr pmccntr_el0, %0" : : "r" (value));
->> -}
->> -
->> -static inline void pmcntenset_write(uint32_t value)
->> -{
->> -	asm volatile("msr pmcntenset_el0, %0" : : "r" (value));
->> -}
->> -
->> -static inline void pmccfiltr_write(uint32_t value)
->> -{
->> -	asm volatile("msr pmccfiltr_el0, %0" : : "r" (value));
->> -	isb();
->> -}
->> -
->> -static inline uint32_t id_dfr0_read(void)
->> -{
->> -	uint32_t id;
->> -
->> -	asm volatile("mrs %0, id_dfr0_el1" : "=r" (id));
->> -	return id;
->> -}
->> +DEFINE_GET_SYSREG32(pmcr, el0)
->> +DEFINE_SET_SYSREG32(pmcr, el0)
->> +DEFINE_GET_SYSREG32(id_dfr0, el1)
->> +DEFINE_GET_SYSREG64(pmccntr, el0);
->> +DEFINE_SET_SYSREG64(pmccntr, el0);
->> +DEFINE_SET_SYSREG32(pmcntenset, el0);
->> +DEFINE_SET_SYSREG32(pmccfiltr, el0);
->>  
->>  /*
->>   * Extra instructions inserted by the compiler would be difficult to compensate
->> @@ -206,7 +133,7 @@ static bool check_pmcr(void)
->>  {
->>  	uint32_t pmcr;
->>  
->> -	pmcr = pmcr_read();
->> +	pmcr = get_pmcr();
->>  
->>  	printf("PMU implementer:     %c\n",
->>  	       (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK);
->> @@ -226,17 +153,17 @@ static bool check_cycles_increase(void)
->>  	bool success = true;
->>  
->>  	/* init before event access, this test only cares about cycle count */
->> -	pmcntenset_write(1 << PMU_CYCLE_IDX);
->> -	pmccfiltr_write(0); /* count cycles in EL0, EL1, but not EL2 */
->> -	pmccntr_write(0);
->> +	set_pmcntenset(1 << PMU_CYCLE_IDX);
->> +	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
->> +	set_pmccntr(0);
->>  
->> -	pmcr_write(pmcr_read() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
->> +	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
->>  
->>  	for (int i = 0; i < NR_SAMPLES; i++) {
->>  		uint64_t a, b;
->>  
->> -		a = pmccntr_read();
->> -		b = pmccntr_read();
->> +		a = get_pmccntr();
->> +		b = get_pmccntr();
->>  
->>  		if (a >= b) {
->>  			printf("Read %"PRId64" then %"PRId64".\n", a, b);
->> @@ -245,7 +172,7 @@ static bool check_cycles_increase(void)
->>  		}
->>  	}
->>  
->> -	pmcr_write(pmcr_read() & ~PMU_PMCR_E);
->> +	set_pmcr(get_pmcr() & ~PMU_PMCR_E);
->>  
->>  	return success;
->>  }
->> @@ -276,11 +203,11 @@ static void measure_instrs(int num, uint32_t pmcr)
->>   */
->>  static bool check_cpi(int cpi)
->>  {
->> -	uint32_t pmcr = pmcr_read() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
->> +	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
->>  
->>  	/* init before event access, this test only cares about cycle count */
->> -	pmcntenset_write(1 << PMU_CYCLE_IDX);
->> -	pmccfiltr_write(0); /* count cycles in EL0, EL1, but not EL2 */
->> +	set_pmcntenset(1 << PMU_CYCLE_IDX);
->> +	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
->>  
->>  	if (cpi > 0)
->>  		printf("Checking for CPI=%d.\n", cpi);
->> @@ -293,9 +220,9 @@ static bool check_cpi(int cpi)
->>  		for (int j = 0; j < NR_SAMPLES; j++) {
->>  			uint64_t cycles;
->>  
->> -			pmccntr_write(0);
->> +			set_pmccntr(0);
->>  			measure_instrs(i, pmcr);
->> -			cycles = pmccntr_read();
->> +			cycles = get_pmccntr();
->>  			printf(" %"PRId64"", cycles);
->>  
->>  			if (!cycles) {
->> @@ -328,7 +255,7 @@ void pmu_init(void)
->>  	uint32_t dfr0;
->>  
->>  	/* probe pmu version */
->> -	dfr0 = id_dfr0_read();
->> +	dfr0 = get_id_dfr0();
->>  	pmu_version = (dfr0 >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
->>  	printf("PMU version: %d\n", pmu_version);
->>  }
->> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
->> index f25e7ee..6e7ffa3 100644
->> --- a/lib/arm/asm/processor.h
->> +++ b/lib/arm/asm/processor.h
->> @@ -33,12 +33,36 @@ static inline unsigned long current_cpsr(void)
->>  
->>  #define current_mode() (current_cpsr() & MODE_MASK)
->>  
->> -static inline unsigned int get_mpidr(void)
->> -{
->> -	unsigned int mpidr;
->> -	asm volatile("mrc p15, 0, %0, c0, c0, 5" : "=r" (mpidr));
->> -	return mpidr;
->> +#define DEFINE_GET_SYSREG32(name, opc1, crn, crm, opc2)			\
->> +static inline unsigned long get_##name(void)				\
->> +{									\
->> +	unsigned long reg;						\
->> +	asm volatile("mrc p15, " #opc1 ", %0, " #crn ", " #crm ", " #opc2  \
->> +		     : "=r" (reg));					\
->> +	return reg;							\
->> +}
->> +#define DEFINE_SET_SYSREG32(name, opc1, crn, crm, opc2)			\
->> +static inline void set_##name(unsigned int value)			\
->> +{									\
->> +	asm volatile("mcr p15, " #opc1 ", %0, " #crn ", " #crm ", " #opc2  \
->> +		     :: "r" (value));					\
->> +}
->> +#define DEFINE_GET_SYSREG64(name, opc1, crm)				\
->> +static inline uint64_t get_##name(void)					\
->> +{									\
->> +	uint32_t lo, hi;						\
->> +	asm volatile("mrrc p15, " #opc1 ", %0, %1, " #crm		\
->> +		     : "=r" (lo), "=r" (hi));				\
->> +	return lo | (uint64_t)hi << 32;					\
->>  }
->> +#define DEFINE_SET_SYSREG64(name, opc1, crm)				\
->> +static inline void set_##name(uint64_t value)				\
->> +{									\
->> +	asm volatile("mcrr p15, " #opc1 ", %0, %1, " #crm		\
->> +		     :: "r" (value & 0xffffffff), "r" (value >> 32));	\
->> +}
->> +
->> +DEFINE_GET_SYSREG32(mpidr, 0, c0, c0, 5)
->>  
->>  /* Only support Aff0 for now, up to 4 cpus */
->>  #define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
->> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
->> index 84d5c7c..cf06c41 100644
->> --- a/lib/arm64/asm/processor.h
->> +++ b/lib/arm64/asm/processor.h
->> @@ -66,14 +66,31 @@ static inline unsigned long current_level(void)
->>  	return el & 0xc;
->>  }
->>  
->> -#define DEFINE_GET_SYSREG32(reg)				\
->> +#define DEFINE_GET_SYSREG32(reg, el)				\
->>  static inline unsigned int get_##reg(void)			\
->>  {								\
->>  	unsigned int reg;					\
->> -	asm volatile("mrs %0, " #reg "_el1" : "=r" (reg));	\
->> +	asm volatile("mrs %0, " #reg "_" #el : "=r" (reg));	\
->>  	return reg;						\
->>  }
->> -DEFINE_GET_SYSREG32(mpidr)
->> +#define DEFINE_SET_SYSREG32(reg, el)				\
->> +static inline void set_##reg(unsigned int value)		\
->> +{								\
->> +	asm volatile("msr " #reg "_" #el ", %0" :: "r" (value));\
->> +}
->> +#define DEFINE_GET_SYSREG64(reg, el)				\
->> +static inline uint64_t get_##reg(void)				\
->> +{								\
->> +	uint64_t reg;						\
->> +	asm volatile("mrs %0, " #reg "_" #el : "=r" (reg));	\
->> +	return reg;						\
->> +}
->> +#define DEFINE_SET_SYSREG64(reg, el)				\
->> +static inline void set_##reg(uint64_t value)			\
->> +{								\
->> +	asm volatile("msr " #reg "_" #el ", %0" :: "r" (value));\
->> +}
->> +DEFINE_GET_SYSREG32(mpidr, el1)
->>  
->>  /* Only support Aff0 for now, gicv2 only */
->>  #define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
->> -- 
->> 2.9.0
->>
->>
+
+Looks good to me, for what its worth:
+Reviewed-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+
+
+Thanks,
+
+James
