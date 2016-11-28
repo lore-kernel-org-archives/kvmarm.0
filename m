@@ -1,141 +1,269 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Access CNTHCTL_EL2 bit fields correctly
-Date: Mon, 28 Nov 2016 18:39:04 +0000
-Message-ID: <799d03f5-a929-9547-1ae7-94026b76f116@arm.com>
-References: <1480351570-11648-1-git-send-email-jintack@cs.columbia.edu>
- <d04fd17e-9157-07fe-4daa-9dbab149b5e6@arm.com>
+From: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Subject: Re: [PATCH V5 02/10] ras: acpi/apei: cper: generic error data entry
+ v3 per ACPI 6.1
+Date: Mon, 28 Nov 2016 11:55:14 -0700
+Message-ID: <ba3c08e4-72b5-d05d-e44f-65d11240da28@codeaurora.org>
+References: <1479767763-27532-1-git-send-email-tbaicar@codeaurora.org>
+ <1479767763-27532-3-git-send-email-tbaicar@codeaurora.org>
+ <583880E0.8080705@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <d04fd17e-9157-07fe-4daa-9dbab149b5e6@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Jintack Lim <jintack@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, christoffer.dall@linaro.org, will.deacon@arm.com, catalin.marinas@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, julien.grall@arm.com, andre.przywara@arm.com, kvm@vger.kernel.org
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <583880E0.8080705@arm.com>
+Sender: linux-acpi-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>
+Cc: marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tomasz.nowicki@linaro.org, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, Suzuki.Poulose@arm.com, punit.agrawal@arm.com, astone@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28/11/16 17:43, Marc Zyngier wrote:
-> Hi Jintack,
-> 
-> On 28/11/16 16:46, Jintack Lim wrote:
->> Bit positions of CNTHCTL_EL2 are changing depending on HCR_EL2.E2H bit.
->> EL1PCEN and EL1PCTEN are 1st and 0th bits when E2H is not set, but they
->> are 11th and 10th bits respectively when E2H is set.  Current code is
->> unintentionally setting wrong bits to CNTHCTL_EL2 with E2H set, which
->> may allow guest OS to access physical timer. So, fix it.
->>
->> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
->> ---
->>  arch/arm/include/asm/kvm_timer.h     | 33 +++++++++++++++++++
->>  arch/arm64/include/asm/kvm_timer.h   | 62 ++++++++++++++++++++++++++++++++++++
->>  include/clocksource/arm_arch_timer.h |  6 ++--
->>  virt/kvm/arm/hyp/timer-sr.c          |  8 ++---
->>  4 files changed, 103 insertions(+), 6 deletions(-)
->>  create mode 100644 arch/arm/include/asm/kvm_timer.h
->>  create mode 100644 arch/arm64/include/asm/kvm_timer.h
->>
+Hello James,
 
-[...]
+On 11/25/2016 11:20 AM, James Morse wrote:
+> Hi Tyler,
+>
+> On 21/11/16 22:35, Tyler Baicar wrote:
+>> Currently when a RAS error is reported it is not timestamped.
+>> The ACPI 6.1 spec adds the timestamp field to the generic error
+>> data entry v3 structure. The timestamp of when the firmware
+>> generated the error is now being reported.
+>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+>> index b79abc5..9063d68 100644
+>> --- a/drivers/acpi/apei/ghes.c
+>> +++ b/drivers/acpi/apei/ghes.c
+>> @@ -420,7 +420,8 @@ static void ghes_handle_memory_failure(struct acpi_hest_generic_data *gdata, int
+>>   	int flags = -1;
+>>   	int sec_sev = ghes_severity(gdata->error_severity);
+>>   	struct cper_sec_mem_err *mem_err;
+>> -	mem_err = (struct cper_sec_mem_err *)(gdata + 1);
+>> +
+>> +	mem_err = acpi_hest_generic_data_payload(gdata);
+>>   
+>>   	if (!(mem_err->validation_bits & CPER_MEM_VALID_PA))
+>>   		return;
+>> @@ -450,14 +451,18 @@ static void ghes_do_proc(struct ghes *ghes,
+>>   {
+>>   	int sev, sec_sev;
+>>   	struct acpi_hest_generic_data *gdata;
+>> +	uuid_le sec_type;
+> ghes.c doesn't include <linux/uuid.h>, but I see it already uses uuid_le_cmp().
+> Worth fixing as part of this patch?
 
-> We could make it nicer (read "faster") by introducing a
-> hyp_alternate_select construct that only returns a value instead
-> of calling a function. I remember writing something like that
-> at some point, and dropping it...
+I can add it here, but it shouldn't be needed. ghes.c includes 
+<linux/cper.h> and that header
+includes <linux/uuid.h>. Should it be added just to make the dependency 
+more clear?
 
-So here's what this could look like (warning, wacky code ahead,
-though I fixed a stupid bug that was present in the previous patch).
-The generated code is quite nice (no branch, only an extra mov
-instruction on the default path)... Of course, completely untested!
+>>   
+>>   	sev = ghes_severity(estatus->error_severity);
+>>   	apei_estatus_for_each_section(estatus, gdata) {
+>>   		sec_sev = ghes_severity(gdata->error_severity);
+>> -		if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
+>> +		sec_type = *(uuid_le *)gdata->section_type;
+>> +
+> You don't use sec_type again here, why change this?
+> (should it be in a later patch?)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index b18e852..d173902 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -121,6 +121,17 @@ typeof(orig) * __hyp_text fname(void)					\
- 	return val;							\
- }
- 
-+#define hyp_alternate_select_const(fname, orig, alt, cond)		\
-+inline const typeof(orig) __hyp_text fname(void)			\
-+{									\
-+	typeof(alt) val = orig;						\
-+	asm volatile(ALTERNATIVE("nop		\n",			\
-+				 "mov	%0, %1	\n",			\
-+				 cond)					\
-+		     : "+r" (val) : "r" (alt));				\
-+	return val;							\
-+}
-+
- void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
- void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
- int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
-index 798866a..7a783af 100644
---- a/virt/kvm/arm/hyp/timer-sr.c
-+++ b/virt/kvm/arm/hyp/timer-sr.c
-@@ -21,11 +21,29 @@
- 
- #include <asm/kvm_hyp.h>
- 
-+#ifdef CONFIG_ARM64
-+static hyp_alternate_select_const(cnthclt_shift, 0, 10,
-+				  ARM64_HAS_VIRT_HOST_EXTN)
-+
-+#else
-+#define cnthclt_shift()		(0)
-+#endif
-+
-+static inline void __hyp_text cnthctl_rmw(u32 clr, u32 set)
-+{
-+	u32 val;
-+	int shift = cnthclt_shift();
-+
-+	val = read_sysreg(cnthctl_el2);
-+	val &= ~(clr << shift);
-+	val |= set << shift;
-+	write_sysreg(val, cnthctl_el2);
-+}
-+
- /* vcpu is already in the HYP VA space */
- void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--	u64 val;
- 
- 	if (timer->enabled) {
- 		timer->cntv_ctl = read_sysreg_el0(cntv_ctl);
-@@ -36,9 +54,7 @@ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
- 	write_sysreg_el0(0, cntv_ctl);
- 
- 	/* Allow physical timer/counter access for the host */
--	val = read_sysreg(cnthctl_el2);
--	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
--	write_sysreg(val, cnthctl_el2);
-+	cnthctl_rmw(0, CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN);
- 
- 	/* Clear cntvoff for the host */
- 	write_sysreg(0, cntvoff_el2);
-@@ -48,16 +64,12 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--	u64 val;
- 
- 	/*
- 	 * Disallow physical timer access for the guest
- 	 * Physical counter access is allowed
- 	 */
--	val = read_sysreg(cnthctl_el2);
--	val &= ~CNTHCTL_EL1PCEN;
--	val |= CNTHCTL_EL1PCTEN;
--	write_sysreg(val, cnthctl_el2);
-+	cnthctl_rmw(CNTHCTL_EL1PCEN, CNTHCTL_EL1PCTEN);
- 
- 	if (timer->enabled) {
- 		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
+Ah, yes, this change should be moved to patch 8 in this patchset.
 
-Thanks,
+>> +		if (!uuid_le_cmp(sec_type,
+>>   				 CPER_SEC_PLATFORM_MEM)) {
+>>   			struct cper_sec_mem_err *mem_err;
+>> -			mem_err = (struct cper_sec_mem_err *)(gdata+1);
+>> +
+>> +			mem_err = acpi_hest_generic_data_payload(gdata);
+>>   			ghes_edac_report_mem_error(ghes, sev, mem_err);
+>>   
+>>   			arch_apei_report_mem_error(sev, mem_err);
+>> @@ -467,7 +472,8 @@ static void ghes_do_proc(struct ghes *ghes,
+>>   		else if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
+>>   				      CPER_SEC_PCIE)) {
+>>   			struct cper_sec_pcie *pcie_err;
+>> -			pcie_err = (struct cper_sec_pcie *)(gdata+1);
+>> +
+>> +			pcie_err = acpi_hest_generic_data_payload(gdata);
+>>   			if (sev == GHES_SEV_RECOVERABLE &&
+>>   			    sec_sev == GHES_SEV_RECOVERABLE &&
+>>   			    pcie_err->validation_bits & CPER_PCIE_VALID_DEVICE_ID &&
+>> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
+>> index d425374..7e2439e 100644
+>> --- a/drivers/firmware/efi/cper.c
+>> +++ b/drivers/firmware/efi/cper.c
+>> @@ -32,6 +32,9 @@
+>>   #include <linux/acpi.h>
+>>   #include <linux/pci.h>
+>>   #include <linux/aer.h>
+>> +#include <linux/printk.h>
+>> +#include <linux/bcd.h>
+>> +#include <acpi/ghes.h>
+>>   
+>>   #define INDENT_SP	" "
+>>   
+>> @@ -386,13 +389,37 @@ static void cper_print_pcie(const char *pfx, const struct cper_sec_pcie *pcie,
+>>   	pfx, pcie->bridge.secondary_status, pcie->bridge.control);
+>>   }
+>>   
+>> +static void cper_estatus_print_section_v300(const char *pfx,
+>> +	const struct acpi_hest_generic_data_v300 *gdata)
+>> +{
+>> +	__u8 hour, min, sec, day, mon, year, century, *timestamp;
+>> +
+>> +	if (gdata->validation_bits & ACPI_HEST_GEN_VALID_TIMESTAMP) {
+>> +		timestamp = (__u8 *)&(gdata->time_stamp);
+>> +		sec = bcd2bin(timestamp[0]);
+>> +		min = bcd2bin(timestamp[1]);
+>> +		hour = bcd2bin(timestamp[2]);
+>> +		day = bcd2bin(timestamp[4]);
+>> +		mon = bcd2bin(timestamp[5]);
+>> +		year = bcd2bin(timestamp[6]);
+>> +		century = bcd2bin(timestamp[7]);
+>> +		printk("%stime: %7s %02d%02d-%02d-%02d %02d:%02d:%02d\n", pfx,
+>> +			0x01 & *(timestamp + 3) ? "precise" : "", century,
+>> +			year, mon, day, hour, min, sec);
+>> +	}
+>> +}
+>> +
+>>   static void cper_estatus_print_section(
+>> -	const char *pfx, const struct acpi_hest_generic_data *gdata, int sec_no)
+>> +	const char *pfx, struct acpi_hest_generic_data *gdata, int sec_no)
+>>   {
+>>   	uuid_le *sec_type = (uuid_le *)gdata->section_type;
+>>   	__u16 severity;
+>>   	char newpfx[64];
+>>   
+>> +	if (acpi_hest_generic_data_version(gdata) >= 3)
+>> +		cper_estatus_print_section_v300(pfx,
+>> +			(const struct acpi_hest_generic_data_v300 *)gdata);
+>> +
+>>   	severity = gdata->error_severity;
+>>   	printk("%s""Error %d, type: %s\n", pfx, sec_no,
+>>   	       cper_severity_str(severity));
+>> @@ -403,14 +430,18 @@ static void cper_estatus_print_section(
+>>   
+>>   	snprintf(newpfx, sizeof(newpfx), "%s%s", pfx, INDENT_SP);
+>>   	if (!uuid_le_cmp(*sec_type, CPER_SEC_PROC_GENERIC)) {
+>> -		struct cper_sec_proc_generic *proc_err = (void *)(gdata + 1);
+>> +		struct cper_sec_proc_generic *proc_err;
+>> +
+>> +		proc_err = acpi_hest_generic_data_payload(gdata);
+>>   		printk("%s""section_type: general processor error\n", newpfx);
+>>   		if (gdata->error_data_length >= sizeof(*proc_err))
+>>   			cper_print_proc_generic(newpfx, proc_err);
+>>   		else
+>>   			goto err_section_too_small;
+>>   	} else if (!uuid_le_cmp(*sec_type, CPER_SEC_PLATFORM_MEM)) {
+>> -		struct cper_sec_mem_err *mem_err = (void *)(gdata + 1);
+>> +		struct cper_sec_mem_err *mem_err;
+>> +
+>> +		mem_err = acpi_hest_generic_data_payload(gdata);
+>>   		printk("%s""section_type: memory error\n", newpfx);
+>>   		if (gdata->error_data_length >=
+>>   		    sizeof(struct cper_sec_mem_err_old))
+>> @@ -419,7 +450,9 @@ static void cper_estatus_print_section(
+>>   		else
+>>   			goto err_section_too_small;
+>>   	} else if (!uuid_le_cmp(*sec_type, CPER_SEC_PCIE)) {
+>> -		struct cper_sec_pcie *pcie = (void *)(gdata + 1);
+>> +		struct cper_sec_pcie *pcie;
+>> +
+>> +		pcie = acpi_hest_generic_data_payload(gdata);
+>>   		printk("%s""section_type: PCIe error\n", newpfx);
+>>   		if (gdata->error_data_length >= sizeof(*pcie))
+>>   			cper_print_pcie(newpfx, pcie, gdata);
+>> @@ -438,7 +471,7 @@ void cper_estatus_print(const char *pfx,
+>>   			const struct acpi_hest_generic_status *estatus)
+>>   {
+>>   	struct acpi_hest_generic_data *gdata;
+>> -	unsigned int data_len, gedata_len;
+>> +	unsigned int data_len;
+>>   	int sec_no = 0;
+>>   	char newpfx[64];
+>>   	__u16 severity;
+>> @@ -451,12 +484,12 @@ void cper_estatus_print(const char *pfx,
+>>   	printk("%s""event severity: %s\n", pfx, cper_severity_str(severity));
+>>   	data_len = estatus->data_length;
+>>   	gdata = (struct acpi_hest_generic_data *)(estatus + 1);
+>> +
+>>   	snprintf(newpfx, sizeof(newpfx), "%s%s", pfx, INDENT_SP);
+>> -	while (data_len >= sizeof(*gdata)) {
+>> -		gedata_len = gdata->error_data_length;
+>> +
+>> +	while (data_len >= acpi_hest_generic_data_size(gdata)) {
+>>   		cper_estatus_print_section(newpfx, gdata, sec_no);
+>> -		data_len -= gedata_len + sizeof(*gdata);
+>> -		gdata = (void *)(gdata + 1) + gedata_len;
+>> +		gdata = acpi_hest_generic_data_next(gdata);
+>>   		sec_no++;
+>>   	}
+>>   }
+>> @@ -486,12 +519,13 @@ int cper_estatus_check(const struct acpi_hest_generic_status *estatus)
+>>   		return rc;
+>>   	data_len = estatus->data_length;
+>>   	gdata = (struct acpi_hest_generic_data *)(estatus + 1);
+>> -	while (data_len >= sizeof(*gdata)) {
+>> -		gedata_len = gdata->error_data_length;
+>> -		if (gedata_len > data_len - sizeof(*gdata))
+>> +
+>> +	while (data_len >= acpi_hest_generic_data_size(gdata)) {
+>> +		gedata_len = acpi_hest_generic_data_error_length(gdata);
+>> +		if (gedata_len > data_len - acpi_hest_generic_data_size(gdata))
+>>   			return -EINVAL;
+>> -		data_len -= gedata_len + sizeof(*gdata);
+>> -		gdata = (void *)(gdata + 1) + gedata_len;
+>> +		data_len -= gedata_len + acpi_hest_generic_data_size(gdata);
+>> +		gdata = acpi_hest_generic_data_next(gdata);
+>>   	}
+>>   	if (data_len)
+>>   		return -EINVAL;
+>> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+>> index 68f088a..56b9679 100644
+>> --- a/include/acpi/ghes.h
+>> +++ b/include/acpi/ghes.h
+>> @@ -73,3 +73,13 @@ static inline void ghes_edac_unregister(struct ghes *ghes)
+>>   {
+>>   }
+>>   #endif
+>> +
+>> +#define acpi_hest_generic_data_version(gdata)			\
+>> +	(gdata->revision >> 8)
+>> +
+>> +static inline void *acpi_hest_generic_data_payload(struct acpi_hest_generic_data *gdata)
+>> +{
+>> +	return acpi_hest_generic_data_version(gdata) >= 3 ?
+>> +		(void *)(((struct acpi_hest_generic_data_v300 *)(gdata)) + 1) :
+>> +		gdata + 1;
+>> +}
+>> diff --git a/include/linux/cper.h b/include/linux/cper.h
+>> index dcacb1a..13ea41c 100644
+>> --- a/include/linux/cper.h
+>> +++ b/include/linux/cper.h
+>> @@ -255,6 +255,18 @@ enum {
+>>   
+>>   #define CPER_PCIE_SLOT_SHIFT			3
+>>   
+>> +#define acpi_hest_generic_data_error_length(gdata)	\
+>> +	(((struct acpi_hest_generic_data *)(gdata))->error_data_length)
+>> +#define acpi_hest_generic_data_size(gdata)		\
+>> +	((acpi_hest_generic_data_version(gdata) >= 3) ?	\
+>> +	sizeof(struct acpi_hest_generic_data_v300) :	\
+>> +	sizeof(struct acpi_hest_generic_data))
+>> +#define acpi_hest_generic_data_record_size(gdata)	\
+>> +	(acpi_hest_generic_data_size(gdata) +		\
+>> +	acpi_hest_generic_data_error_length(gdata))
+>> +#define acpi_hest_generic_data_next(gdata)		\
+>> +	((void *)(gdata) + acpi_hest_generic_data_record_size(gdata))
+>> +
+> How come these aren't in ghes.h?
 
-	M.
+It probably does make more sense to add these in ghes.h, I'll move them 
+there in the next set.
+
+> Reviewed-by: James Morse <james.morse@arm.com>
+>
+Thanks!
+Tyler
+
 -- 
-Jazz is not dead. It just smells funny...
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
+
