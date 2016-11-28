@@ -1,38 +1,38 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
 Subject: [PATCH] arm64: head.S: Fix CNTHCTL_EL2 access on VHE system
-Date: Mon, 28 Nov 2016 11:37:39 -0500
-Message-ID: <1480351059-11370-1-git-send-email-jintack@cs.columbia.edu>
+Date: Mon, 28 Nov 2016 11:43:58 -0500
+Message-ID: <1480351438-11548-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 904D4405C4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:37:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41DDE405C4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:44:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nHqd03XMtlf4 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Nov 2016 11:37:18 -0500 (EST)
+ with ESMTP id KqBWcl0YQRbu for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Nov 2016 11:44:11 -0500 (EST)
 Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
  [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4D85C40537
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:37:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 24ED240537
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:44:11 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uASGXnvN045463
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:38:05 -0500
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uASGe4WZ050101
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:44:58 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id D7FD492
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:38:05 -0500 (EST)
-Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
- [128.59.72.13]) by hazelnut (Postfix) with ESMTP id 41985AE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:38:04 -0500 (EST)
-Received: from mail-qk0-f200.google.com (mail-qk0-f200.google.com
- [209.85.220.200])
- by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uASGc4fW049822
+ by hazelnut (Postfix) with ESMTP id 8C92484
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:44:58 -0500 (EST)
+Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
+ [128.59.72.14]) by hazelnut (Postfix) with ESMTP id 1E89281
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:44:58 -0500 (EST)
+Received: from mail-qk0-f198.google.com (mail-qk0-f198.google.com
+ [209.85.220.198])
+ by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uASGivRc026850
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:38:04 -0500
-Received: by mail-qk0-f200.google.com with SMTP id h201so114337535qke.7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 08:38:04 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 11:44:58 -0500
+Received: by mail-qk0-f198.google.com with SMTP id x190so114612853qkb.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 08:44:58 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -42,8 +42,8 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Jintack <jintack@cs.columbia.edu>
