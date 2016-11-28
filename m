@@ -1,24 +1,26 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH V5 03/10] efi: parse ARMv8 processor error
-Date: Fri, 25 Nov 2016 18:23:15 +0000
-Message-ID: <58388193.6000202@arm.com>
-References: <1479767763-27532-1-git-send-email-tbaicar@codeaurora.org>
- <1479767763-27532-4-git-send-email-tbaicar@codeaurora.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v7 01/11] run_tests: allow forcing of
+ acceleration mode
+Date: Mon, 28 Nov 2016 09:51:28 +0100
+Message-ID: <20161128085128.sqr7nmfc7hzugdis@kamzik.brq.redhat.com>
+References: <20161124161033.11456-1-alex.bennee@linaro.org>
+ <20161124161033.11456-2-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 127464089B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Nov 2016 13:23:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 244F84069B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 03:50:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3Tq2qKwPeJi0 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Nov 2016 13:23:21 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 983D840624
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Nov 2016 13:23:21 -0500 (EST)
-In-Reply-To: <1479767763-27532-4-git-send-email-tbaicar@codeaurora.org>
+ with ESMTP id bWoouoadEZhL for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Nov 2016 03:50:49 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0FD74066D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 03:50:48 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20161124161033.11456-2-alex.bennee@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,161 +30,84 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, lenb@kernel.org, harba@codeaurora.org, marc.zyngier@arm.com, punit.agrawal@arm.com, tomasz.nowicki@linaro.org, nkaje@codeaurora.org, rostedt@goodmis.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: mttcg@greensocs.com, nikunj@linux.vnet.ibm.com, kvm@vger.kernel.org, marc.zyngier@arm.com, jan.kiszka@siemens.com, mark.burton@greensocs.com, qemu-devel@nongnu.org, cota@braap.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, serge.fdrv@gmail.com, bobby.prani@gmail.com, kvmarm@lists.cs.columbia.edu, rth@twiddle.net
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Tyler,
+On Thu, Nov 24, 2016 at 04:10:23PM +0000, Alex Benn=E9e wrote:
+> While tests can be pegged to tcg it is useful to override this from time
+> to time, especially when testing correctness on real systems.
+> ---
+>  run_tests.sh         | 8 ++++++--
+>  scripts/runtime.bash | 4 ++++
+>  2 files changed, 10 insertions(+), 2 deletions(-)
+> =
 
-On 21/11/16 22:35, Tyler Baicar wrote:
-> Add support for ARMv8 Common Platform Error Record (CPER).
-> UEFI 2.6 specification adds support for ARMv8 specific
-> processor error information to be reported as part of the
-> CPER records. This provides more detail on for processor error logs.
+> diff --git a/run_tests.sh b/run_tests.sh
+> index 254129d..b88c36f 100755
+> --- a/run_tests.sh
+> +++ b/run_tests.sh
+> @@ -13,9 +13,10 @@ function usage()
+>  {
+>  cat <<EOF
+>  =
 
-I think I'm missing a big part of the puzzle here, I will come back to this next
-week. I can't quite line up some of the masks and shifts with the table
-descriptions in the UEFI spec[0].
+> -Usage: $0 [-g group] [-h] [-v]
+> +Usage: $0 [-g group] [-a accel] [-h] [-v]
+>  =
 
+>      -g: Only execute tests in the given group
+> +    -a: Force acceleration mode (tcg/kvm)
+>      -h: Output this help text
+>      -v: Enables verbose mode
+>  =
 
-> diff --git a/include/linux/cper.h b/include/linux/cper.h
-> index 13ea41c..2a9d553 100644
-> --- a/include/linux/cper.h
-> +++ b/include/linux/cper.h
+> @@ -28,11 +29,14 @@ EOF
+>  RUNTIME_arch_run=3D"./$TEST_DIR/run"
+>  source scripts/runtime.bash
+>  =
 
-> @@ -180,6 +185,10 @@ enum {
->  #define CPER_SEC_PROC_IPF						\
->  	UUID_LE(0xE429FAF1, 0x3CB7, 0x11D4, 0x0B, 0xCA, 0x07, 0x00,	\
->  		0x80, 0xC7, 0x3C, 0x88, 0x81)
-> +/* Processor Specific: ARMv8 */
-> +#define CPER_SEC_PROC_ARMV8						\
-> +	UUID_LE(0xE19E3D16, 0xBC11, 0x11E4, 0x9C, 0xAA, 0xC2, 0x05,	\
-> +		0x1D, 0x5D, 0x46, 0xB0)
+> -while getopts "g:hv" opt; do
+> +while getopts "g:a:hv" opt; do
+>      case $opt in
+>          g)
+>              only_group=3D$OPTARG
+>              ;;
+> +        a)
+> +            force_accel=3D$OPTARG
+> +            ;;
+>          h)
+>              usage
+>              exit
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index 11a40a9..578cf32 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -75,6 +75,10 @@ function run()
+>          return;
+>      fi
+>  =
 
-Nit: UEFI v2.6 N.2.2 (table 249) describes this as 'ARM' not 'ARMV8' (which is
-an architectural version).
-
-
->  /* Platform Memory */
->  #define CPER_SEC_PLATFORM_MEM						\
->  	UUID_LE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83,	\
-> @@ -255,6 +264,34 @@ enum {
->  
->  #define CPER_PCIE_SLOT_SHIFT			3
->  
-> +#define CPER_ARMV8_ERR_INFO_NUM_MASK		0x00000000000000FF
-> +#define CPER_ARMV8_CTX_INFO_NUM_MASK		0x0000000000FFFF00
-
-Table 260 describes both ERR_INFO_NUM and CONTEXT_INFO_NUM for as both being
-2bytes long, as does your struct cper_sec_proc_armv8 below. Are these for
-something else? Do these correspond with one of the four bitfield formats
-described in Table 262->265?
-
-I can't see where they are used, and they look like they are reaching across
-multiple fields in a struct.
-
-
-> +#define CPER_ARMV8_CTX_INFO_NUM_SHIFT		8
+> +    if [ -n "$force_accel" ]; then
+> +        accel=3D$force_accel
+> +    fi
 > +
-> +#define CPER_ARMV8_VALID_MPIDR			0x00000001
-> +#define CPER_ARMV8_VALID_AFFINITY_LEVEL		0x00000002
-> +#define CPER_ARMV8_VALID_RUNNING_STATE		0x00000004
-> +#define CPER_ARMV8_VALID_VENDOR_INFO		0x00000008
-> +
-> +#define CPER_ARMV8_INFO_VALID_MULTI_ERR		0x0001
-> +#define CPER_ARMV8_INFO_VALID_FLAGS		0x0002
-> +#define CPER_ARMV8_INFO_VALID_ERR_INFO		0x0004
-> +#define CPER_ARMV8_INFO_VALID_VIRT_ADDR		0x0008
-> +#define CPER_ARMV8_INFO_VALID_PHYSICAL_ADDR	0x0010
-> +
-> +#define CPER_ARMV8_INFO_FLAGS_FIRST		0x0001
-> +#define CPER_ARMV8_INFO_FLAGS_LAST		0x0002
-> +#define CPER_ARMV8_INFO_FLAGS_PROPAGATED	0x0004
-> +
-> +#define CPER_AARCH64_CTX_LEN			368
-> +#define CPER_AARCH32_CTX_LEN			256
+>      if [ -n "$arch" ] && [ "$arch" !=3D "$ARCH" ]; then
+>          echo "`SKIP` $1 ($arch only)"
+>          return 2
+> -- =
 
-Are these the worst case sizes for combinations of the structures in N2.4.4.2?
-(Tables 266 to 273)
+> 2.10.1
 
-If so is there any chance they could be sizeof(<some union of structs>), even if
-the structs are things like:
-> /* ARMv8 AArch64 GPRs (Type 4) - defined in UEFI Spec N2.4.4.2 */
-> struct cper_armv8_aarch64_gprs {
-> 	u64 regs[32];
-> }
+We can already do 'ACCEL=3Dtcg ./run_tests.sh' to force, for example, tcg.
+Additionally, you can add any env you want to the config.mak after running
+configure,
 
-This way its easier to check the number is correct, and if a new type is added
-this won't get forgotten.
+ echo ACCEL=3Dtcg >> config.mak
 
-
-> +#define CPER_ARMV8_CTX_TYPE_MASK		0x000000000000000F
-> +#define CPER_ARMV8_CTX_EL_MASK			0x0000000000000070
-> +#define CPER_ARMV8_CTX_NS_MASK			0x0000000000000080
-> +#define CPER_ARMV8_CTX_EL_SHIFT			4
-> +#define CPER_ARMV8_CTX_NS_SHIFT			7
-> +
-
-Again, I can't work out what these correspond to. I can't see a secure bit or EL
-field in any of those UEFI tables.
-
-Is this one of the 'ARM Vendor Specific Micro-Architecture Error Structure's? If
-so we should have some infrastructure for picking the correct (or unknown)
-decode function based on a range of MIDRs.
-
-
->  #define acpi_hest_generic_data_error_length(gdata)	\
->  	(((struct acpi_hest_generic_data *)(gdata))->error_data_length)
->  #define acpi_hest_generic_data_size(gdata)		\
-> @@ -352,6 +389,41 @@ struct cper_ia_proc_ctx {
->  	__u64	mm_reg_addr;
->  };
->  
-> +/* ARMv8 Processor Error Section */
-> +struct cper_sec_proc_armv8 {
-> +	__u32	validation_bits;
-> +	__u16	err_info_num; /* Number of Processor Error Info */
-> +	__u16	context_info_num; /* Number of Processor Context Info Records*/
-> +	__u32	section_length;
-> +	__u8	affinity_level;
-> +	__u8	reserved[3];	/* must be zero */
-> +	__u64	mpidr;
-> +	__u64	midr;
-> +	__u32	running_state; /* Bit 0 set - Processor running. PSCI = 0 */
-> +	__u32	psci_state;
-> +};
-> +
-> +/* ARMv8 Processor Error Information Structure */
-> +struct cper_armv8_err_info {
-> +	__u8	version;
-> +	__u8	length;
-> +	__u16	validation_bits;
-> +	__u8	type;
-> +	__u16	multiple_error;
-> +	__u8	flags;
-> +	__u64	error_info;
-> +	__u64	virt_fault_addr;
-> +	__u64	physical_fault_addr;
-> +};
-
-
-> +/* ARMv8 AARCH64 Processor Context Information Structure */
-> +struct cper_armv8_aarch64_ctx {
-> +	__u8	type_el_ns;
-> +	__u8	reserved[7];	/* must be zero */
-> +	__u8	gpr[288];
-> +	__u8	spr[68];
-> +};
-
-Is this:
-"Table 265. ARM Processor Error Context Information Header Structure"?
-
-
-Sorry if I've missed something blindingly obvious!
-
+If you still prefer a cmdline parameter, then I'd suggest a boolean
+instead, with the default being KVM. So the param would be '-tcg', or
+something.
 
 Thanks,
-
-James
-
-[0] http://www.uefi.org/sites/default/files/resources/UEFI%20Spec%202_6.pdf
+drew
