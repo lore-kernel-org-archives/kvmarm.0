@@ -1,298 +1,557 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Access CNTHCTL_EL2 bit fields correctly
-Date: Mon, 28 Nov 2016 17:43:15 +0000
-Message-ID: <d04fd17e-9157-07fe-4daa-9dbab149b5e6@arm.com>
-References: <1480351570-11648-1-git-send-email-jintack@cs.columbia.edu>
+From: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Subject: Re: [PATCH V5 01/10] acpi: apei: read ack upon ghes record consumption
+Date: Mon, 28 Nov 2016 11:34:56 -0700
+Message-ID: <f2aaa324-6bba-bb1b-f8b8-ef7d9efa2a64@codeaurora.org>
+References: <1479767763-27532-1-git-send-email-tbaicar@codeaurora.org>
+ <1479767763-27532-2-git-send-email-tbaicar@codeaurora.org>
+ <58388097.9000106@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1480351570-11648-1-git-send-email-jintack@cs.columbia.edu>
-Sender: kvm-owner@vger.kernel.org
-To: Jintack Lim <jintack@cs.columbia.edu>, kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, christoffer.dall@linaro.org, will.deacon@arm.com, catalin.marinas@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, julien.grall@arm.com, andre.przywara@arm.com, kvm@vger.kernel.org
+Content-Type: multipart/mixed; boundary="===============8656977185912611613=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 87B0C404E2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 13:34:18 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id vqc32mpYpU+R for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Nov 2016 13:34:16 -0500 (EST)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFEA4404DE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 13:34:15 -0500 (EST)
+In-Reply-To: <58388097.9000106@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, lenb@kernel.org, harba@codeaurora.org, marc.zyngier@arm.com, punit.agrawal@arm.com, tomasz.nowicki@linaro.org, nkaje@codeaurora.org, rostedt@goodmis.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jintack,
+This is a multi-part message in MIME format.
+--===============8656977185912611613==
+Content-Type: multipart/alternative;
+ boundary="------------17E7D77F7011E4C3285C1028"
 
-On 28/11/16 16:46, Jintack Lim wrote:
-> Bit positions of CNTHCTL_EL2 are changing depending on HCR_EL2.E2H bit.
-> EL1PCEN and EL1PCTEN are 1st and 0th bits when E2H is not set, but they
-> are 11th and 10th bits respectively when E2H is set.  Current code is
-> unintentionally setting wrong bits to CNTHCTL_EL2 with E2H set, which
-> may allow guest OS to access physical timer. So, fix it.
-> 
-> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-> ---
->  arch/arm/include/asm/kvm_timer.h     | 33 +++++++++++++++++++
->  arch/arm64/include/asm/kvm_timer.h   | 62 ++++++++++++++++++++++++++++++++++++
->  include/clocksource/arm_arch_timer.h |  6 ++--
->  virt/kvm/arm/hyp/timer-sr.c          |  8 ++---
->  4 files changed, 103 insertions(+), 6 deletions(-)
->  create mode 100644 arch/arm/include/asm/kvm_timer.h
->  create mode 100644 arch/arm64/include/asm/kvm_timer.h
-> 
-> diff --git a/arch/arm/include/asm/kvm_timer.h b/arch/arm/include/asm/kvm_timer.h
-> new file mode 100644
-> index 0000000..d19d4b3
-> --- /dev/null
-> +++ b/arch/arm/include/asm/kvm_timer.h
-> @@ -0,0 +1,33 @@
-> +/*
-> + * Copyright (C) 2016 - Columbia University
-> + * Author: Jintack Lim <jintack@cs.columbia.edu>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef __ARM_KVM_TIMER_H__
-> +#define __ARM_KVM_TIMER_H__
-> +
-> +#include <clocksource/arm_arch_timer.h>
-> +
-> +static inline u32 __hyp_text get_el1pcten(void)
-> +{
-> +	return CNTHCTL_EL1PCTEN_NVHE;
-> +}
-> +
-> +static inline u32 __hyp_text get_el1pcen(void)
-> +{
-> +	return CNTHCTL_EL1PCEN_NVHE;
-> +}
-> +
-> +#endif	/* __ARM_KVM_TIMER_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_timer.h b/arch/arm64/include/asm/kvm_timer.h
-> new file mode 100644
-> index 0000000..153f3da
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_timer.h
-> @@ -0,0 +1,62 @@
-> +/*
-> + * Copyright (C) 2016 - Columbia University
-> + * Author: Jintack Lim <jintack@cs.columbia.edu>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef __ARM64_KVM_TIMER_H__
-> +#define __ARM64_KVM_TIMER_H__
-> +
-> +#include <asm/kvm_hyp.h>
-> +#include <clocksource/arm_arch_timer.h>
-> +
-> +static inline u32 __hyp_text get_el1pcten_vhe(void)
-> +{
-> +	return CNTHCTL_EL1PCTEN_VHE;
-> +}
-> +
-> +static inline u32 __hyp_text get_el1pcten_nvhe(void)
-> +{
-> +	return CNTHCTL_EL1PCTEN_NVHE;
-> +}
-> +
-> +static hyp_alternate_select(get_el1pcten_arch,
-> +			    get_el1pcten_nvhe, get_el1pcten_vhe,
-> +			    ARM64_HAS_VIRT_HOST_EXTN);
+This is a multi-part message in MIME format.
+--------------17E7D77F7011E4C3285C1028
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This is pretty horrid ;-)
+Hello James,
 
-First, the inline qualifier doesn't apply here, as the whole 
-hyp_alternate_select hack relies on thing not being inlined (it 
-actually creates a function pointer).
+Thank you for your feedback!
 
-Then, this gets potentially instantiated in any compilation unit that 
-will include this file. GCC is probably clever enough to eliminate it 
-if not used, but not without a well deserved warning.
+On 11/25/2016 11:19 AM, James Morse wrote:
+> Hi Tyler,
+>
+> On 21/11/16 22:35, Tyler Baicar wrote:
+>> A RAS (Reliability, Availability, Serviceability) controller
+>> may be a separate processor running in parallel with OS
+>> execution, and may generate error records for consumption by
+>> the OS. If the RAS controller produces multiple error records,
+>> then they may be overwritten before the OS has consumed them.
+>>
+>> The Generic Hardware Error Source (GHES) v2 structure
+>> introduces the capability for the OS to acknowledge the
+>> consumption of the error record generated by the RAS
+>> controller. A RAS controller supporting GHESv2 shall wait for
+>> the acknowledgment before writing a new error record, thus
+>> eliminating the race condition.
+> This patch also adds support for parsing GHESv2 sub-tables.
+> Before they would be rejected as an unknown hardware error source.
+Yes, I will add that to the text.
+>> Signed-off-by: Jonathan (Zhixiong) Zhang<zjzhang@codeaurora.org>
+> Nit: the patch author's Sign-off should come first, you either need a 'From:
+> Jonathan (Zhixiong) Zhang ...' on this patch, or re-order these Signed-off-by's.
+I'll reorder them in the next set.
+>> Signed-off-by: Richard Ruigrok<rruigrok@codeaurora.org>
+>> Signed-off-by: Tyler Baicar<tbaicar@codeaurora.org>
+>> Signed-off-by: Naveen Kaje<nkaje@codeaurora.org>
+>> ---
+>>   drivers/acpi/apei/ghes.c | 49 +++++++++++++++++++++++++++++++++++++++++++++---
+>>   drivers/acpi/apei/hest.c |  7 +++++--
+>>   include/acpi/ghes.h      |  5 ++++-
+>>   3 files changed, 55 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+>> index 60746ef..b79abc5 100644
+>> --- a/drivers/acpi/apei/ghes.c
+>> +++ b/drivers/acpi/apei/ghes.c
+>> @@ -45,6 +45,7 @@
+>>   #include <linux/aer.h>
+>>   #include <linux/nmi.h>
+>>   
+>> +#include <acpi/actbl1.h>
+>>   #include <acpi/ghes.h>
+>>   #include <acpi/apei.h>
+>>   #include <asm/tlbflush.h>
+>> @@ -79,6 +80,10 @@
+>>   	((struct acpi_hest_generic_status *)				\
+>>   	 ((struct ghes_estatus_node *)(estatus_node) + 1))
+>>   
+>> +#define HEST_TYPE_GENERIC_V2(ghes)				\
+>> +	((struct acpi_hest_header *)ghes->generic)->type ==	\
+>> +	 ACPI_HEST_TYPE_GENERIC_ERROR_V2
+>> +
+> IS_ HEST_TYPE_GENERIC_V2() ? (for the sake of readability)
+>
+Will do.
+>>   /*
+>>    * This driver isn't really modular, however for the time being,
+>>    * continuing to use module_param is the easiest way to remain
+>> @@ -248,10 +253,18 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+>>   	ghes = kzalloc(sizeof(*ghes), GFP_KERNEL);
+>>   	if (!ghes)
+>>   		return ERR_PTR(-ENOMEM);
+>> +
+>>   	ghes->generic = generic;
+>> +	if (HEST_TYPE_GENERIC_V2(ghes)) {
+>> +		rc = apei_map_generic_address(
+>> +			&ghes->generic_v2->read_ack_register);
+>> +		if (rc)
+>> +			goto err_free;
+>> +	}
+>> +
+>>   	rc = apei_map_generic_address(&generic->error_status_address);
+>>   	if (rc)
+>> -		goto err_free;
+>> +		goto err_unmap_read_ack_addr;
+>>   	error_block_length = generic->error_block_length;
+>>   	if (error_block_length > GHES_ESTATUS_MAX_SIZE) {
+>>   		pr_warning(FW_WARN GHES_PFX
+>> @@ -263,13 +276,17 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+>>   	ghes->estatus = kmalloc(error_block_length, GFP_KERNEL);
+>>   	if (!ghes->estatus) {
+>>   		rc = -ENOMEM;
+>> -		goto err_unmap;
+>> +		goto err_unmap_status_addr;
+>>   	}
+>>   
+>>   	return ghes;
+>>   
+>> -err_unmap:
+>> +err_unmap_status_addr:
+>>   	apei_unmap_generic_address(&generic->error_status_address);
+>> +err_unmap_read_ack_addr:
+>> +	if (HEST_TYPE_GENERIC_V2(ghes))
+>> +		apei_unmap_generic_address(
+>> +			&ghes->generic_v2->read_ack_register);
+>>   err_free:
+>>   	kfree(ghes);
+>>   	return ERR_PTR(rc);
+>> @@ -279,6 +296,9 @@ static void ghes_fini(struct ghes *ghes)
+>>   {
+>>   	kfree(ghes->estatus);
+>>   	apei_unmap_generic_address(&ghes->generic->error_status_address);
+>> +	if (HEST_TYPE_GENERIC_V2(ghes))
+>> +		apei_unmap_generic_address(
+>> +			&ghes->generic_v2->read_ack_register);
+>>   }
+>>   
+>>   static inline int ghes_severity(int severity)
+>> @@ -648,6 +668,23 @@ static void ghes_estatus_cache_add(
+>>   	rcu_read_unlock();
+>>   }
+>>   
+>> +static int ghes_ack_error(struct acpi_hest_generic_v2 *generic_v2)
+>> +{
+>> +	int rc;
+>> +	u64 val = 0;
+>> +
+>> +	rc = apei_read(&val, &generic_v2->read_ack_register);
+>> +	if (rc)
+>> +		return rc;
+>> +	val &= generic_v2->read_ack_preserve <<
+>> +		generic_v2->read_ack_register.bit_offset;
+>> +	val |= generic_v2->read_ack_write <<
+>> +		generic_v2->read_ack_register.bit_offset;
+> Is this bit_offset shifting needed in case the read_ack_register is in the
+> 'system io' (or embedded controller) address space and shares a register with
+> some other stuff?
+>
+> The read_ack_{preserve,write} values are u64, so if bit_offset is non-zero the
+> high order bits get lost, but both ends of this are in the firmware's control.
+>
+> (I assumed this thing would always be in memory and these fields would never be
+> used - but I guess that isn't true!)
+>
+Yeah, we are not using these values, but they are defined this way in 
+the ACPI 6.1 spec (Table 18-344).
+read_ack_register is defined as a Generic Address Structure which has 
+this offset defined in
+Table 5-26.
 
-> +
-> +static inline u32 __hyp_text get_el1pten_vhe(void)
-> +{
-> +	return CNTHCTL_EL1PTEN_VHE;
-> +}
-> +
-> +static inline u32 __hyp_text get_el1pcen_nvhe(void)
-> +{
-> +	return CNTHCTL_EL1PCEN_NVHE;
-> +}
-> +
-> +static hyp_alternate_select(get_el1pcen_arch,
-> +			    get_el1pcen_nvhe, get_el1pten_vhe,
-> +			    ARM64_HAS_VIRT_HOST_EXTN);
-> +
-> +static inline u32 __hyp_text get_el1pcten(void)
-> +{
-> +	return get_el1pcten_arch()();
-> +}
-> +
-> +static inline u32 __hyp_text get_el1pcen(void)
-> +{
-> +	return get_el1pcen_arch()();
-> +}
-> +
-> +#endif	/* __ARM64_KVM_TIMER_H__ */
-> diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
-> index caedb74..4094529 100644
-> --- a/include/clocksource/arm_arch_timer.h
-> +++ b/include/clocksource/arm_arch_timer.h
-> @@ -23,8 +23,10 @@
->  #define ARCH_TIMER_CTRL_IT_MASK		(1 << 1)
->  #define ARCH_TIMER_CTRL_IT_STAT		(1 << 2)
->  
-> -#define CNTHCTL_EL1PCTEN		(1 << 0)
-> -#define CNTHCTL_EL1PCEN			(1 << 1)
-> +#define CNTHCTL_EL1PCTEN_NVHE		(1 << 0)
-> +#define CNTHCTL_EL1PCEN_NVHE		(1 << 1)
-> +#define CNTHCTL_EL1PCTEN_VHE		(1 << 10)
-> +#define CNTHCTL_EL1PTEN_VHE		(1 << 11)
->  #define CNTHCTL_EVNTEN			(1 << 2)
->  #define CNTHCTL_EVNTDIR			(1 << 3)
->  #define CNTHCTL_EVNTI			(0xF << 4)
-> diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
-> index 798866a..f3feee0 100644
-> --- a/virt/kvm/arm/hyp/timer-sr.c
-> +++ b/virt/kvm/arm/hyp/timer-sr.c
-> @@ -15,11 +15,11 @@
->   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->   */
->  
-> -#include <clocksource/arm_arch_timer.h>
->  #include <linux/compiler.h>
->  #include <linux/kvm_host.h>
->  
->  #include <asm/kvm_hyp.h>
-> +#include <asm/kvm_timer.h>
->  
->  /* vcpu is already in the HYP VA space */
->  void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
-> @@ -37,7 +37,7 @@ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
->  
->  	/* Allow physical timer/counter access for the host */
->  	val = read_sysreg(cnthctl_el2);
-> -	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
-> +	val |= get_el1pcten() | get_el1pcen();
->  	write_sysreg(val, cnthctl_el2);
->  
->  	/* Clear cntvoff for the host */
-> @@ -55,8 +55,8 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
->  	 * Physical counter access is allowed
->  	 */
->  	val = read_sysreg(cnthctl_el2);
-> -	val &= ~CNTHCTL_EL1PCEN;
-> -	val |= CNTHCTL_EL1PCTEN;
-> +	val &= ~get_el1pcen();
-> +	val |= get_el1pcten();
->  	write_sysreg(val, cnthctl_el2);
->  
->  	if (timer->enabled) {
-> 
+I assume it is defined this way for shared registers as you mentioned 
+though. With this
+flexibility the firmware is able to specify exactly what to write.
+>> +	rc = apei_write(val, &generic_v2->read_ack_register);
+>> +
+>> +	return rc;
+>> +}
+>> +
+>>   static int ghes_proc(struct ghes *ghes)
+>>   {
+>>   	int rc;
+>> @@ -660,6 +697,12 @@ static int ghes_proc(struct ghes *ghes)
+>>   			ghes_estatus_cache_add(ghes->generic, ghes->estatus);
+>>   	}
+>>   	ghes_do_proc(ghes, ghes->estatus);
+>> +
+>> +	if (HEST_TYPE_GENERIC_V2(ghes)) {
+>> +		rc = ghes_ack_error(ghes->generic_v2);
+>> +		if (rc)
+>> +			return rc;
+>> +	}
+>>   out:
+>>   	ghes_clear_estatus(ghes);
+>>   	return 0;
+>> diff --git a/drivers/acpi/apei/hest.c b/drivers/acpi/apei/hest.c
+>> index 792a0d9..ef725a9 100644
+>> --- a/drivers/acpi/apei/hest.c
+>> +++ b/drivers/acpi/apei/hest.c
+>> @@ -52,6 +52,7 @@ static const int hest_esrc_len_tab[ACPI_HEST_TYPE_RESERVED] = {
+>>   	[ACPI_HEST_TYPE_AER_ENDPOINT] = sizeof(struct acpi_hest_aer),
+>>   	[ACPI_HEST_TYPE_AER_BRIDGE] = sizeof(struct acpi_hest_aer_bridge),
+>>   	[ACPI_HEST_TYPE_GENERIC_ERROR] = sizeof(struct acpi_hest_generic),
+>> +	[ACPI_HEST_TYPE_GENERIC_ERROR_V2] = sizeof(struct acpi_hest_generic_v2),
+>>   };
+>>   
+>>   static int hest_esrc_len(struct acpi_hest_header *hest_hdr)
+>> @@ -146,7 +147,8 @@ static int __init hest_parse_ghes_count(struct acpi_hest_header *hest_hdr, void
+>>   {
+>>   	int *count = data;
+>>   
+>> -	if (hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR)
+>> +	if (hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR ||
+>> +	    hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR_V2)
+>>   		(*count)++;
+>>   	return 0;
+>>   }
+>> @@ -157,7 +159,8 @@ static int __init hest_parse_ghes(struct acpi_hest_header *hest_hdr, void *data)
+>>   	struct ghes_arr *ghes_arr = data;
+>>   	int rc, i;
+>>   
+>> -	if (hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR)
+>> +	if (hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR &&
+>> +	    hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR_V2)
+>>   		return 0;
+>>   
+>>   	if (!((struct acpi_hest_generic *)hest_hdr)->enabled)
+>> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+>> index 720446c..68f088a 100644
+>> --- a/include/acpi/ghes.h
+>> +++ b/include/acpi/ghes.h
+>> @@ -13,7 +13,10 @@
+>>   #define GHES_EXITING		0x0002
+>>   
+>>   struct ghes {
+>> -	struct acpi_hest_generic *generic;
+>> +	union {
+>> +		struct acpi_hest_generic *generic;
+>> +		struct acpi_hest_generic_v2 *generic_v2;
+>> +	};
+>>   	struct acpi_hest_generic_status *estatus;
+>>   	u64 buffer_paddr;
+>>   	unsigned long flags;
+>>
+> Looks good to me, for what its worth:
+> Reviewed-by: James Morse<james.morse@arm.com>
+Thanks!
+Tyler
 
-Trying to solve this myself, I came up with an alternative approach,
-which is ugly in its own way (#define in common code, random shifts):
-
-diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
-index 798866a..5cacfa8 100644
---- a/virt/kvm/arm/hyp/timer-sr.c
-+++ b/virt/kvm/arm/hyp/timer-sr.c
-@@ -21,11 +21,41 @@
- 
- #include <asm/kvm_hyp.h>
- 
-+#ifdef CONFIG_ARM64
-+static unsigned int __hyp_text get_cnthclt_shift_nvhe(void)
-+{
-+	return 0;
-+}
-+
-+static unsigned int __hyp_text get_cnthclt_shift_vhe(void)
-+{
-+	return 10;
-+}
-+
-+static hyp_alternate_select(__get_cnthclt_shift,
-+			    get_cnthclt_shift_nvhe, get_cnthclt_shift_vhe,
-+			    ARM64_HAS_VIRT_HOST_EXTN)
-+
-+#define cnthclt_shift()		__get_cnthclt_shift()()
-+#else
-+#define cnthclt_shift()		(0)
-+#endif
-+
-+static inline void __hyp_text cnthctl_rmw(u32 clr, u32 set)
-+{
-+	u32 val;
-+	int shift = cnthclt_shift();
-+
-+	val = read_sysreg(cnthctl_el2);
-+	val &= ~clr << shift;
-+	val |= set << shift;
-+	write_sysreg(val, cnthctl_el2);
-+}
-+
- /* vcpu is already in the HYP VA space */
- void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--	u64 val;
- 
- 	if (timer->enabled) {
- 		timer->cntv_ctl = read_sysreg_el0(cntv_ctl);
-@@ -36,9 +66,7 @@ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
- 	write_sysreg_el0(0, cntv_ctl);
- 
- 	/* Allow physical timer/counter access for the host */
--	val = read_sysreg(cnthctl_el2);
--	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
--	write_sysreg(val, cnthctl_el2);
-+	cnthctl_rmw(0, CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN);
- 
- 	/* Clear cntvoff for the host */
- 	write_sysreg(0, cntvoff_el2);
-@@ -48,16 +76,12 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--	u64 val;
- 
- 	/*
- 	 * Disallow physical timer access for the guest
- 	 * Physical counter access is allowed
- 	 */
--	val = read_sysreg(cnthctl_el2);
--	val &= ~CNTHCTL_EL1PCEN;
--	val |= CNTHCTL_EL1PCTEN;
--	write_sysreg(val, cnthctl_el2);
-+	cnthctl_rmw(CNTHCTL_EL1PCEN, CNTHCTL_EL1PCTEN);
- 
- 	if (timer->enabled) {
- 		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
-
-We could make it nicer (read "faster") by introducing a
-hyp_alternate_select construct that only returns a value instead
-of calling a function. I remember writing something like that
-at some point, and dropping it...
-
-Thoughts?
-
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
+
+
+--------------17E7D77F7011E4C3285C1028
+Content-Type: text/html; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+
+<html>
+  <head>
+    <meta content="text/html; charset=windows-1252"
+      http-equiv="Content-Type">
+  </head>
+  <body bgcolor="#FFFFFF" text="#000000">
+    Hello James,<br>
+    <br>
+    Thank you for your feedback!<br>
+    <br>
+    <div class="moz-cite-prefix">On 11/25/2016 11:19 AM, James Morse
+      wrote:<br>
+    </div>
+    <blockquote cite="mid:58388097.9000106@arm.com" type="cite">
+      <pre wrap="">Hi Tyler,
+
+On 21/11/16 22:35, Tyler Baicar wrote:
+</pre>
+      <blockquote type="cite">
+        <pre wrap="">A RAS (Reliability, Availability, Serviceability) controller
+may be a separate processor running in parallel with OS
+execution, and may generate error records for consumption by
+the OS. If the RAS controller produces multiple error records,
+then they may be overwritten before the OS has consumed them.
+
+The Generic Hardware Error Source (GHES) v2 structure
+introduces the capability for the OS to acknowledge the
+consumption of the error record generated by the RAS
+controller. A RAS controller supporting GHESv2 shall wait for
+the acknowledgment before writing a new error record, thus
+eliminating the race condition.
+</pre>
+      </blockquote>
+      <pre wrap="">This patch also adds support for parsing GHESv2 sub-tables.
+Before they would be rejected as an unknown hardware error source.
+</pre>
+    </blockquote>
+    Yes, I will add that to the text.<br>
+    <blockquote cite="mid:58388097.9000106@arm.com" type="cite">
+      <blockquote type="cite">
+        <pre wrap="">Signed-off-by: Jonathan (Zhixiong) Zhang <a class="moz-txt-link-rfc2396E" href="mailto:zjzhang@codeaurora.org">&lt;zjzhang@codeaurora.org&gt;</a>
+</pre>
+      </blockquote>
+      <pre wrap="">Nit: the patch author's Sign-off should come first, you either need a 'From:
+Jonathan (Zhixiong) Zhang ...' on this patch, or re-order these Signed-off-by's.
+</pre>
+    </blockquote>
+    I'll reorder them in the next set.<br>
+    <blockquote cite="mid:58388097.9000106@arm.com" type="cite">
+      <blockquote type="cite">
+        <pre wrap="">Signed-off-by: Richard Ruigrok <a class="moz-txt-link-rfc2396E" href="mailto:rruigrok@codeaurora.org">&lt;rruigrok@codeaurora.org&gt;</a>
+Signed-off-by: Tyler Baicar <a class="moz-txt-link-rfc2396E" href="mailto:tbaicar@codeaurora.org">&lt;tbaicar@codeaurora.org&gt;</a>
+Signed-off-by: Naveen Kaje <a class="moz-txt-link-rfc2396E" href="mailto:nkaje@codeaurora.org">&lt;nkaje@codeaurora.org&gt;</a>
+---
+ drivers/acpi/apei/ghes.c | 49 +++++++++++++++++++++++++++++++++++++++++++++---
+ drivers/acpi/apei/hest.c |  7 +++++--
+ include/acpi/ghes.h      |  5 ++++-
+ 3 files changed, 55 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+index 60746ef..b79abc5 100644
+--- a/drivers/acpi/apei/ghes.c
++++ b/drivers/acpi/apei/ghes.c
+@@ -45,6 +45,7 @@
+ #include &lt;linux/aer.h&gt;
+ #include &lt;linux/nmi.h&gt;
+ 
++#include &lt;acpi/actbl1.h&gt;
+ #include &lt;acpi/ghes.h&gt;
+ #include &lt;acpi/apei.h&gt;
+ #include &lt;asm/tlbflush.h&gt;
+@@ -79,6 +80,10 @@
+ 	((struct acpi_hest_generic_status *)				\
+ 	 ((struct ghes_estatus_node *)(estatus_node) + 1))
+ 
++#define HEST_TYPE_GENERIC_V2(ghes)				\
++	((struct acpi_hest_header *)ghes-&gt;generic)-&gt;type ==	\
++	 ACPI_HEST_TYPE_GENERIC_ERROR_V2
++
+</pre>
+      </blockquote>
+      <pre wrap="">IS_ HEST_TYPE_GENERIC_V2() ? (for the sake of readability)
+
+</pre>
+    </blockquote>
+    Will do.<br>
+    <blockquote cite="mid:58388097.9000106@arm.com" type="cite">
+      <blockquote type="cite">
+        <pre wrap=""> /*
+  * This driver isn't really modular, however for the time being,
+  * continuing to use module_param is the easiest way to remain
+@@ -248,10 +253,18 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+ 	ghes = kzalloc(sizeof(*ghes), GFP_KERNEL);
+ 	if (!ghes)
+ 		return ERR_PTR(-ENOMEM);
++
+ 	ghes-&gt;generic = generic;
++	if (HEST_TYPE_GENERIC_V2(ghes)) {
++		rc = apei_map_generic_address(
++			&amp;ghes-&gt;generic_v2-&gt;read_ack_register);
++		if (rc)
++			goto err_free;
++	}
++
+ 	rc = apei_map_generic_address(&amp;generic-&gt;error_status_address);
+ 	if (rc)
+-		goto err_free;
++		goto err_unmap_read_ack_addr;
+ 	error_block_length = generic-&gt;error_block_length;
+ 	if (error_block_length &gt; GHES_ESTATUS_MAX_SIZE) {
+ 		pr_warning(FW_WARN GHES_PFX
+@@ -263,13 +276,17 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+ 	ghes-&gt;estatus = kmalloc(error_block_length, GFP_KERNEL);
+ 	if (!ghes-&gt;estatus) {
+ 		rc = -ENOMEM;
+-		goto err_unmap;
++		goto err_unmap_status_addr;
+ 	}
+ 
+ 	return ghes;
+ 
+-err_unmap:
++err_unmap_status_addr:
+ 	apei_unmap_generic_address(&amp;generic-&gt;error_status_address);
++err_unmap_read_ack_addr:
++	if (HEST_TYPE_GENERIC_V2(ghes))
++		apei_unmap_generic_address(
++			&amp;ghes-&gt;generic_v2-&gt;read_ack_register);
+ err_free:
+ 	kfree(ghes);
+ 	return ERR_PTR(rc);
+@@ -279,6 +296,9 @@ static void ghes_fini(struct ghes *ghes)
+ {
+ 	kfree(ghes-&gt;estatus);
+ 	apei_unmap_generic_address(&amp;ghes-&gt;generic-&gt;error_status_address);
++	if (HEST_TYPE_GENERIC_V2(ghes))
++		apei_unmap_generic_address(
++			&amp;ghes-&gt;generic_v2-&gt;read_ack_register);
+ }
+ 
+ static inline int ghes_severity(int severity)
+@@ -648,6 +668,23 @@ static void ghes_estatus_cache_add(
+ 	rcu_read_unlock();
+ }
+ 
++static int ghes_ack_error(struct acpi_hest_generic_v2 *generic_v2)
++{
++	int rc;
++	u64 val = 0;
++
++	rc = apei_read(&amp;val, &amp;generic_v2-&gt;read_ack_register);
++	if (rc)
++		return rc;
++	val &amp;= generic_v2-&gt;read_ack_preserve &lt;&lt;
++		generic_v2-&gt;read_ack_register.bit_offset;
++	val |= generic_v2-&gt;read_ack_write &lt;&lt;
++		generic_v2-&gt;read_ack_register.bit_offset;
+</pre>
+      </blockquote>
+      <pre wrap="">Is this bit_offset shifting needed in case the read_ack_register is in the
+'system io' (or embedded controller) address space and shares a register with
+some other stuff?
+
+The read_ack_{preserve,write} values are u64, so if bit_offset is non-zero the
+high order bits get lost, but both ends of this are in the firmware's control.
+
+(I assumed this thing would always be in memory and these fields would never be
+used - but I guess that isn't true!)
+
+</pre>
+    </blockquote>
+    Yeah, we are not using these values, but they are defined this way
+    in the ACPI 6.1 spec (Table 18-344).<br>
+    read_ack_register is defined as a Generic Address Structure which
+    has this offset defined in<br>
+    Table 5-26.<br>
+    <br>
+    I assume it is defined this way for shared registers as you
+    mentioned though. With this<br>
+    flexibility the firmware is able to specify exactly what to write.<br>
+    <blockquote cite="mid:58388097.9000106@arm.com" type="cite">
+      <blockquote type="cite">
+        <pre wrap="">+	rc = apei_write(val, &amp;generic_v2-&gt;read_ack_register);
++
++	return rc;
++}
++
+ static int ghes_proc(struct ghes *ghes)
+ {
+ 	int rc;
+@@ -660,6 +697,12 @@ static int ghes_proc(struct ghes *ghes)
+ 			ghes_estatus_cache_add(ghes-&gt;generic, ghes-&gt;estatus);
+ 	}
+ 	ghes_do_proc(ghes, ghes-&gt;estatus);
++
++	if (HEST_TYPE_GENERIC_V2(ghes)) {
++		rc = ghes_ack_error(ghes-&gt;generic_v2);
++		if (rc)
++			return rc;
++	}
+ out:
+ 	ghes_clear_estatus(ghes);
+ 	return 0;
+diff --git a/drivers/acpi/apei/hest.c b/drivers/acpi/apei/hest.c
+index 792a0d9..ef725a9 100644
+--- a/drivers/acpi/apei/hest.c
++++ b/drivers/acpi/apei/hest.c
+@@ -52,6 +52,7 @@ static const int hest_esrc_len_tab[ACPI_HEST_TYPE_RESERVED] = {
+ 	[ACPI_HEST_TYPE_AER_ENDPOINT] = sizeof(struct acpi_hest_aer),
+ 	[ACPI_HEST_TYPE_AER_BRIDGE] = sizeof(struct acpi_hest_aer_bridge),
+ 	[ACPI_HEST_TYPE_GENERIC_ERROR] = sizeof(struct acpi_hest_generic),
++	[ACPI_HEST_TYPE_GENERIC_ERROR_V2] = sizeof(struct acpi_hest_generic_v2),
+ };
+ 
+ static int hest_esrc_len(struct acpi_hest_header *hest_hdr)
+@@ -146,7 +147,8 @@ static int __init hest_parse_ghes_count(struct acpi_hest_header *hest_hdr, void
+ {
+ 	int *count = data;
+ 
+-	if (hest_hdr-&gt;type == ACPI_HEST_TYPE_GENERIC_ERROR)
++	if (hest_hdr-&gt;type == ACPI_HEST_TYPE_GENERIC_ERROR ||
++	    hest_hdr-&gt;type == ACPI_HEST_TYPE_GENERIC_ERROR_V2)
+ 		(*count)++;
+ 	return 0;
+ }
+@@ -157,7 +159,8 @@ static int __init hest_parse_ghes(struct acpi_hest_header *hest_hdr, void *data)
+ 	struct ghes_arr *ghes_arr = data;
+ 	int rc, i;
+ 
+-	if (hest_hdr-&gt;type != ACPI_HEST_TYPE_GENERIC_ERROR)
++	if (hest_hdr-&gt;type != ACPI_HEST_TYPE_GENERIC_ERROR &amp;&amp;
++	    hest_hdr-&gt;type != ACPI_HEST_TYPE_GENERIC_ERROR_V2)
+ 		return 0;
+ 
+ 	if (!((struct acpi_hest_generic *)hest_hdr)-&gt;enabled)
+diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+index 720446c..68f088a 100644
+--- a/include/acpi/ghes.h
++++ b/include/acpi/ghes.h
+@@ -13,7 +13,10 @@
+ #define GHES_EXITING		0x0002
+ 
+ struct ghes {
+-	struct acpi_hest_generic *generic;
++	union {
++		struct acpi_hest_generic *generic;
++		struct acpi_hest_generic_v2 *generic_v2;
++	};
+ 	struct acpi_hest_generic_status *estatus;
+ 	u64 buffer_paddr;
+ 	unsigned long flags;
+
+</pre>
+      </blockquote>
+      <pre wrap="">Looks good to me, for what its worth:
+Reviewed-by: James Morse <a class="moz-txt-link-rfc2396E" href="mailto:james.morse@arm.com">&lt;james.morse@arm.com&gt;</a>
+</pre>
+    </blockquote>
+    Thanks!<br>
+    Tyler<br>
+    <pre class="moz-signature" cols="72">-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.</pre>
+  </body>
+</html>
+
+--------------17E7D77F7011E4C3285C1028--
+
+--===============8656977185912611613==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============8656977185912611613==--
