@@ -1,31 +1,106 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v7 00/11] QEMU MTTCG Test cases
-Date: Mon, 28 Nov 2016 11:14:48 +0000
-Message-ID: <CAFEAcA9JUOHnJL59EuhQ_dEWjt+YjEcu8LGiJ3CSk_7R4J5Efg@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v7 03/11] run_tests: allow
+ passing of options to QEMU
+Date: Mon, 28 Nov 2016 11:22:46 +0000
+Message-ID: <877f7nu9vd.fsf@linaro.org>
 References: <20161124161033.11456-1-alex.bennee@linaro.org>
- <20161128103744.s3wq53xzsxvu5uus@kamzik.brq.redhat.com> <878ts3uac6.fsf@linaro.org>
+ <20161124161033.11456-4-alex.bennee@linaro.org>
+ <20161128091051.zvtsvoow34b2nd5w@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <878ts3uac6.fsf@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, MTTCG Devel <mttcg@greensocs.com>, Claudio Fontana <claudio.fontana@huawei.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Jan Kiszka <jan.kiszka@siemens.com>, Mark Burton <mark.burton@greensocs.com>, Alvise Rigo <a.rigo@virtualopensystems.com>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fedorov Sergey <serge.fdrv@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Pranith Kumar <bobby.prani@gmail.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?S
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 910B6405DA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 06:22:04 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bgHblW0jQHE6 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Nov 2016 06:22:03 -0500 (EST)
+Received: from mail-wj0-f176.google.com (mail-wj0-f176.google.com
+ [209.85.210.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E597B405B9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 06:22:02 -0500 (EST)
+Received: by mail-wj0-f176.google.com with SMTP id xy5so112754550wjc.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 03:22:49 -0800 (PST)
+In-reply-to: <20161128091051.zvtsvoow34b2nd5w@kamzik.brq.redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: mttcg@greensocs.com, nikunj@linux.vnet.ibm.com, kvm@vger.kernel.org, mark.burton@greensocs.com, marc.zyngier@arm.com, jan.kiszka@siemens.com, qemu-devel@nongnu.org, cota@braap.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, serge.fdrv@gmail.com, bobby.prani@gmail.com, kvmarm@lists.cs.columbia.edu, rth@twiddle.net
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28 November 2016 at 11:12, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> Andrew Jones <drjones@redhat.com> writes:
->> I've skimmed over everything looking at it from a framwork/sytle
->> perspective. I didn't dig in trying to understand the tests though.
->> One general comment, I see many tests introduce MAX_CPUS 8. Why do
->> that? Why not allow all cpus by using NR_CPUS for the array sizes?
->
-> Yeah - I can fix those. I wonder what the maximum is with GIC V3?
-
-So large that you don't want to hardcode it as an array size...
-
-thanks
--- PMM
+CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IE9uIFRodSwgTm92
+IDI0LCAyMDE2IGF0IDA0OjEwOjI1UE0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gVGhp
+cyBpbnRyb2R1Y2VzIGEgdGhlIG9wdGlvbiAtbyBmb3IgcGFzc2luZyBvZiBvcHRpb25zIGRpcmVj
+dGx5IHRvIFFFTVUKPj4gd2hpY2ggaXMgdXNlZnVsLiBJbiBteSBjYXNlIEknbSB1c2luZyBpdCB0
+byB0b2dnbGUgTVRUQ0cgb24gYW4gb2ZmOgo+Pgo+PiAgIC4vcnVuX3Rlc3RzLnNoIC10IC1vICIt
+dGNnIG10dGNnPW9uIgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVu
+bmVlQGxpbmFyby5vcmc+Cj4+IC0tLQo+PiAgcnVuX3Rlc3RzLnNoICAgICAgICAgICB8IDEwICsr
+KysrKystLS0KPj4gIHNjcmlwdHMvZnVuY3Rpb25zLmJhc2ggfCAxMyArKysrKysrLS0tLS0tCj4+
+ICAyIGZpbGVzIGNoYW5nZWQsIDE0IGluc2VydGlvbnMoKyksIDkgZGVsZXRpb25zKC0pCj4+Cj4+
+IGRpZmYgLS1naXQgYS9ydW5fdGVzdHMuc2ggYi9ydW5fdGVzdHMuc2gKPj4gaW5kZXggNGYyZTVj
+Yi4uMDVjYzdmYiAxMDA3NTUKPj4gLS0tIGEvcnVuX3Rlc3RzLnNoCj4+ICsrKyBiL3J1bl90ZXN0
+cy5zaAo+PiBAQCAtMTMsMTAgKzEzLDExIEBAIGZ1bmN0aW9uIHVzYWdlKCkKPj4gIHsKPj4gIGNh
+dCA8PEVPRgo+Pgo+PiAtVXNhZ2U6ICQwIFstZyBncm91cF0gWy1hIGFjY2VsXSBbLXRdIFstaF0g
+Wy12XQo+PiArVXNhZ2U6ICQwIFstZyBncm91cF0gWy1hIGFjY2VsXSBbLW8gcWVtdV9vcHRzXSBb
+LXRdIFstaF0gWy12XQo+Pgo+PiAgICAgIC1nOiBPbmx5IGV4ZWN1dGUgdGVzdHMgaW4gdGhlIGdp
+dmVuIGdyb3VwCj4+ICAgICAgLWE6IEZvcmNlIGFjY2VsZXJhdGlvbiBtb2RlICh0Y2cva3ZtKQo+
+PiArICAgIC1vOiBhZGRpdGlvbmFsIG9wdGlvbnMgZm9yIFFFTVUgY29tbWFuZCBsaW5lCj4+ICAg
+ICAgLXQ6IGRpc2FibGUgdGltZW91dHMKPj4gICAgICAtaDogT3V0cHV0IHRoaXMgaGVscCB0ZXh0
+Cj4+ICAgICAgLXY6IEVuYWJsZXMgdmVyYm9zZSBtb2RlCj4+IEBAIC0zMCw3ICszMSw3IEBAIEVP
+Rgo+PiAgUlVOVElNRV9hcmNoX3J1bj0iLi8kVEVTVF9ESVIvcnVuIgo+PiAgc291cmNlIHNjcmlw
+dHMvcnVudGltZS5iYXNoCj4+Cj4+IC13aGlsZSBnZXRvcHRzICJnOmE6dGh2IiBvcHQ7IGRvCj4+
+ICt3aGlsZSBnZXRvcHRzICJnOmE6bzp0aHYiIG9wdDsgZG8KPj4gICAgICBjYXNlICRvcHQgaW4K
+Pj4gICAgICAgICAgZykKPj4gICAgICAgICAgICAgIG9ubHlfZ3JvdXA9JE9QVEFSRwo+PiBAQCAt
+MzgsNiArMzksOSBAQCB3aGlsZSBnZXRvcHRzICJnOmE6dGh2IiBvcHQ7IGRvCj4+ICAgICAgICAg
+IGEpCj4+ICAgICAgICAgICAgICBmb3JjZV9hY2NlbD0kT1BUQVJHCj4+ICAgICAgICAgICAgICA7
+Owo+PiArICAgICAgICBvKQo+PiArICAgICAgICAgICAgZXh0cmFfb3B0cz0kT1BUQVJHCj4+ICsg
+ICAgICAgICAgICA7Owo+PiAgICAgICAgICB0KQo+PiAgICAgICAgICAgICAgbm9fdGltZW91dD0i
+eWVzIgo+PiAgICAgICAgICAgICAgOzsKPj4gQEAgLTY3LDQgKzcxLDQgQEAgUlVOVElNRV9sb2df
+c3Rkb3V0ICgpIHsKPj4gIGNvbmZpZz0kVEVTVF9ESVIvdW5pdHRlc3RzLmNmZwo+PiAgcm0gLWYg
+dGVzdC5sb2cKPj4gIHByaW50ZiAiQlVJTERfSEVBRD0kKGNhdCBidWlsZC1oZWFkKVxuXG4iID4g
+dGVzdC5sb2cKPj4gLWZvcl9lYWNoX3VuaXR0ZXN0ICRjb25maWcgcnVuCj4+ICtmb3JfZWFjaF91
+bml0dGVzdCAkY29uZmlnIHJ1biAiJGV4dHJhX29wdHMiCj4+IGRpZmYgLS1naXQgYS9zY3JpcHRz
+L2Z1bmN0aW9ucy5iYXNoIGIvc2NyaXB0cy9mdW5jdGlvbnMuYmFzaAo+PiBpbmRleCBlZTkxNDNj
+Li5kMzhhNjllIDEwMDY0NAo+PiAtLS0gYS9zY3JpcHRzL2Z1bmN0aW9ucy5iYXNoCj4+ICsrKyBi
+L3NjcmlwdHMvZnVuY3Rpb25zLmJhc2gKPj4gQEAgLTIsMTEgKzIsMTIgQEAKPj4gIGZ1bmN0aW9u
+IGZvcl9lYWNoX3VuaXR0ZXN0KCkKPj4gIHsKPj4gIAlsb2NhbCB1bml0dGVzdHM9IiQxIgo+PiAt
+CWxvY2FsIGNtZD0iJDIiCj4+IC0JbG9jYWwgdGVzdG5hbWUKPj4gKyAgICAgICAgbG9jYWwgY21k
+PSIkMiIKPj4gKyAgICAgICAgbG9jYWwgZXh0cmFfb3B0cz0kMwo+PiArICAgICAgICBsb2NhbCB0
+ZXN0bmFtZQo+Cj4gV2UgdXNlIHRhYnMgaW4gdGhpcyBmaWxlLiBOb3Qgc3VyZSB3aHkgY21kIGFu
+ZCB0ZXN0bmFtZSBnb3QKPiBjaGFuZ2VkIHRvby4uLgo+Cj4+ICAJbG9jYWwgc21wCj4+ICAJbG9j
+YWwga2VybmVsCj4+IC0JbG9jYWwgb3B0cwo+PiArICAgICAgICBsb2NhbCBvcHRzPSRleHRyYV9v
+cHRzCj4+ICAJbG9jYWwgZ3JvdXBzCj4+ICAJbG9jYWwgYXJjaAo+PiAgCWxvY2FsIGNoZWNrCj4+
+IEBAIC0yMSw3ICsyMiw3IEBAIGZ1bmN0aW9uIGZvcl9lYWNoX3VuaXR0ZXN0KCkKPj4gIAkJCXRl
+c3RuYW1lPSR7QkFTSF9SRU1BVENIWzFdfQo+PiAgCQkJc21wPTEKPj4gIAkJCWtlcm5lbD0iIgo+
+PiAtCQkJb3B0cz0iIgo+PiArICAgICAgICAgICAgICAgICAgICAgICAgb3B0cz0kZXh0cmFfb3B0
+cwo+PiAgCQkJZ3JvdXBzPSIiCj4+ICAJCQlhcmNoPSIiCj4+ICAJCQljaGVjaz0iIgo+PiBAQCAt
+MzIsNyArMzMsNyBAQCBmdW5jdGlvbiBmb3JfZWFjaF91bml0dGVzdCgpCj4+ICAJCWVsaWYgW1sg
+JGxpbmUgPX4gXnNtcFwgKj1cICooLiopJCBdXTsgdGhlbgo+PiAgCQkJc21wPSR7QkFTSF9SRU1B
+VENIWzFdfQo+PiAgCQllbGlmIFtbICRsaW5lID1+IF5leHRyYV9wYXJhbXNcICo9XCAqKC4qKSQg
+XV07IHRoZW4KPj4gLQkJCW9wdHM9JHtCQVNIX1JFTUFUQ0hbMV19Cj4+ICsgICAgICAgICAgICAg
+ICAgICAgICAgICBvcHRzPSIkb3B0cyAke0JBU0hfUkVNQVRDSFsxXX0iCj4+ICAJCWVsaWYgW1sg
+JGxpbmUgPX4gXmdyb3Vwc1wgKj1cICooLiopJCBdXTsgdGhlbgo+PiAgCQkJZ3JvdXBzPSR7QkFT
+SF9SRU1BVENIWzFdfQo+PiAgCQllbGlmIFtbICRsaW5lID1+IF5hcmNoXCAqPVwgKiguKikkIF1d
+OyB0aGVuCj4+IEBAIC00NSw2ICs0Niw2IEBAIGZ1bmN0aW9uIGZvcl9lYWNoX3VuaXR0ZXN0KCkK
+Pj4gIAkJCXRpbWVvdXQ9JHtCQVNIX1JFTUFUQ0hbMV19Cj4+ICAJCWZpCj4+ICAJZG9uZQo+PiAt
+CSIkY21kIiAiJHRlc3RuYW1lIiAiJGdyb3VwcyIgIiRzbXAiICIka2VybmVsIiAiJG9wdHMiICIk
+YXJjaCIgIiRjaGVjayIgIiRhY2NlbCIgIiR0aW1lb3V0Igo+PiArICAgICAgICAiJGNtZCIgIiR0
+ZXN0bmFtZSIgIiRncm91cHMiICIkc21wIiAiJGtlcm5lbCIgIiRvcHRzIiAiJGFyY2giICIkY2hl
+Y2siICIkYWNjZWwiICIkdGltZW91dCIKPj4gIAlleGVjIHtmZH08Ji0KPj4gIH0KPj4gLS0KPj4g
+Mi4xMC4xCj4+Cj4+Cj4KPiBUaGlzIGlzIGEgcHJldHR5IGdvb2QgaWRlYSwgYnV0IEkgdGhpbmsg
+SSBtaWdodCBsaWtlIHRoZSBleHRyYSBvcHRpb25zCj4gdG8gYmUgZ2l2ZW4gbGlrZSB0aGlzIGlu
+c3RlYWQKPgo+ICAgLi9ydW5fdGVzdHMuc2ggW3J1bl90ZXN0cy5zaCBvcHRpb25zXSAtLSBbcWVt
+dSBvcHRpb25zXQo+Cj4gVGhhbmtzLAo+IGRyZXcKClRoYXQgc291bmRzIGxpa2UgYSBiZXR0ZXIg
+d2F5LCBJJ2xsIGZpeCB0aGF0LgoKLS0KQWxleCBCZW5uw6llCl9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
+c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
+L2xpc3RpbmZvL2t2bWFybQo=
