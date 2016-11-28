@@ -1,33 +1,29 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v7 00/11] QEMU MTTCG Test cases
-Date: Mon, 28 Nov 2016 14:09:26 +0000
-Message-ID: <CAFEAcA9WBbYeOeWfAt9dtosW=n+Zi1waF0EtckeoJHs7FsjGOQ@mail.gmail.com>
-References: <20161124161033.11456-1-alex.bennee@linaro.org>
- <20161128103744.s3wq53xzsxvu5uus@kamzik.brq.redhat.com>
- <878ts3uac6.fsf@linaro.org>
- <CAFEAcA9JUOHnJL59EuhQ_dEWjt+YjEcu8LGiJ3CSk_7R4J5Efg@mail.gmail.com>
- <20161128115824.hrofgivt2mlfk7fh@kamzik.brq.redhat.com>
- <CAFEAcA8-3qHnp1T4bAiUL3NT8fHWik7-8zruyQKGgfADn5xF9w@mail.gmail.com>
- <20161128140445.j336ksd7vqhi4ivz@kamzik.brq.redhat.com>
- <20161128140705.caqpoiuvxy3mg2zk@kamzik.brq.redhat.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v9 05/11] arm/arm64: vgic: Introduce VENG0 and VENG1
+ fields to vmcr struct
+Date: Mon, 28 Nov 2016 15:28:36 +0100
+Message-ID: <20161128142836.GE18170@cbox>
+References: <1479906118-15832-1-git-send-email-vijay.kilari@gmail.com>
+ <1479906118-15832-6-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5BCC40543
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 09:09:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 806D8405D2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 09:27:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Hzh2+Nbz-ATC for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Nov 2016 09:09:00 -0500 (EST)
-Received: from mail-vk0-f51.google.com (mail-vk0-f51.google.com
- [209.85.213.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A3D54049A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 09:08:59 -0500 (EST)
-Received: by mail-vk0-f51.google.com with SMTP id p9so73733581vkd.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 06:09:47 -0800 (PST)
-In-Reply-To: <20161128140705.caqpoiuvxy3mg2zk@kamzik.brq.redhat.com>
+ with ESMTP id CxzNuEdZ5e4W for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Nov 2016 09:27:54 -0500 (EST)
+Received: from mail-lf0-f43.google.com (mail-lf0-f43.google.com
+ [209.85.215.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15419405C4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 09:27:53 -0500 (EST)
+Received: by mail-lf0-f43.google.com with SMTP id o141so97564544lff.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 06:28:41 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1479906118-15832-6-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,16 +33,179 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: MTTCG Devel <mttcg@greensocs.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Jan Kiszka <jan.kiszka@siemens.com>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fedorov Sergey <serge.fdrv@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Pranith Kumar <bobby.prani@gmail.com>, Richard Henderson <rth@twiddle.net>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: vijay.kilari@gmail.com
+Cc: marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28 November 2016 at 14:07, Andrew Jones <drjones@redhat.com> wrote:
-> Er... actually mach-virt is 123, as we only allocate 123 redistributors.
+On Wed, Nov 23, 2016 at 06:31:52PM +0530, vijay.kilari@gmail.com wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> 
+> ICC_VMCR_EL2 supports virtual access to ICC_IGRPEN1_EL1.Enable
+> and ICC_IGRPEN0_EL1.Enable fields. Add grpen0 and grpen1 member
+> variables to struct vmcr to support read and write of these fields.
+> 
+> Also refactor vgic_set_vmcr and vgic_get_vmcr() code.
+> Drop ICH_VMCR_CTLR_SHIFT and ICH_VMCR_CTLR_MASK macros and instead
+> use ICH_VMCR_EOI* and ICH_VMCR_CBPR* macros
+> .
+> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> ---
+>  include/linux/irqchip/arm-gic-v3.h |  2 --
+>  virt/kvm/arm/vgic/vgic-mmio-v2.c   | 16 ----------------
+>  virt/kvm/arm/vgic/vgic-mmio.c      | 16 ++++++++++++++++
+>  virt/kvm/arm/vgic/vgic-v3.c        | 22 ++++++++++++++++++++--
+>  virt/kvm/arm/vgic/vgic.h           |  5 +++++
+>  5 files changed, 41 insertions(+), 20 deletions(-)
+> 
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index b4f8287..406fc3e 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -404,8 +404,6 @@
+>  #define ICH_HCR_EN			(1 << 0)
+>  #define ICH_HCR_UIE			(1 << 1)
+>  
+> -#define ICH_VMCR_CTLR_SHIFT		0
+> -#define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
+>  #define ICH_VMCR_CBPR_SHIFT		4
+>  #define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
+>  #define ICH_VMCR_EOIM_SHIFT		9
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> index 2cb04b7..ad353b5 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> @@ -212,22 +212,6 @@ static void vgic_mmio_write_sgipends(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> -static void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+> -{
+> -	if (kvm_vgic_global_state.type == VGIC_V2)
+> -		vgic_v2_set_vmcr(vcpu, vmcr);
+> -	else
+> -		vgic_v3_set_vmcr(vcpu, vmcr);
+> -}
+> -
+> -static void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+> -{
+> -	if (kvm_vgic_global_state.type == VGIC_V2)
+> -		vgic_v2_get_vmcr(vcpu, vmcr);
+> -	else
+> -		vgic_v3_get_vmcr(vcpu, vmcr);
+> -}
+> -
+>  #define GICC_ARCH_VERSION_V2	0x2
+>  
+>  /* These are for userland accesses only, there is no guest-facing emulation. */
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index 0d1bc98..f81e0e5 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -416,6 +416,22 @@ int vgic_validate_mmio_region_addr(struct kvm_device *dev,
+>  	return -ENXIO;
+>  }
+>  
+> +void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+> +{
+> +	if (kvm_vgic_global_state.type == VGIC_V2)
+> +		vgic_v2_set_vmcr(vcpu, vmcr);
+> +	else
+> +		vgic_v3_set_vmcr(vcpu, vmcr);
+> +}
+> +
+> +void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+> +{
+> +	if (kvm_vgic_global_state.type == VGIC_V2)
+> +		vgic_v2_get_vmcr(vcpu, vmcr);
+> +	else
+> +		vgic_v3_get_vmcr(vcpu, vmcr);
+> +}
+> +
+>  /*
+>   * kvm_mmio_read_buf() returns a value in a format where it can be converted
+>   * to a byte array and be directly observed as the guest wanted it to appear
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 9f0dae3..a3ff04b 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -175,10 +175,19 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  {
+>  	u32 vmcr;
+>  
+> -	vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
+> +	/*
+> +	 * Ignore the FIQen bit, because GIC emulation always implies
+> +	 * SRE=1 which means the vFIQEn bit is also RES1.
+> +	 */
+> +	vmcr = (vmcrp->ctlr & ICC_CTLR_EL1_EOImode_MASK) >>
+> +		ICC_CTLR_EL1_EOImode_SHIFT;
+> +	vmcr = (vmcr << ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
 
-Oh yes, I'd forgotten about that limit. We'd need to add
-a KVM API for allocating redistributors in non-contiguous
-bits of memory if we wanted to raise that.
+Nit: I think this can be written more nicely as:
+	vmcr = ((vmcrp->ctlr >> ICC_CTLR_EL1_EOImode_SHIFT)
+		<< ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
 
-thanks
--- PMM
+> +	vmcr |= (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
+>  	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
+>  	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
+>  	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
+> +	vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
+> +	vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
+>  
+>  	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
+>  }
+> @@ -187,10 +196,19 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  {
+>  	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
+>  
+> -	vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
+> +	/*
+> +	 * Ignore the FIQen bit, because GIC emulation always implies
+> +	 * SRE=1 which means the vFIQEn bit is also RES1.
+> +	 */
+> +	vmcrp->ctlr = (vmcr & ICH_VMCR_EOIM_MASK) >> ICH_VMCR_EOIM_SHIFT;
+> +	vmcrp->ctlr = (vmcrp->ctlr << ICC_CTLR_EL1_EOImode_SHIFT) &
+> +		       ICC_CTLR_EL1_EOImode_MASK;
+
+similarly, this could be written as:
+	vmcrp->ctlr = ((vmcr >> ICH_VMCR_EOIM_SHIFT) <<
+			ICC_CTLR_EL1_EOImode_SHIFT) & ICC_CTLR_EL1_EOImode_MASK;
+
+> +	vmcrp->ctlr |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
+>  	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
+>  	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
+>  	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
+> +	vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
+> +	vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
+>  }
+>  
+>  #define INITIAL_PENDBASER_VALUE						  \
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 91f58b2..9232791 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -78,6 +78,9 @@ struct vgic_vmcr {
+>  	u32	abpr;
+>  	u32	bpr;
+>  	u32	pmr;
+> +	/* Below member variable are valid only for GICv3 */
+> +	u32	grpen0;
+> +	u32	grpen1;
+>  };
+>  
+>  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+> @@ -138,6 +141,8 @@ int vgic_v3_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>  int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>  			 int offset, u32 *val);
+>  int kvm_register_vgic_device(unsigned long type);
+> +void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+> +void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  int vgic_lazy_init(struct kvm *kvm);
+>  int vgic_init(struct kvm *kvm);
+>  
+> -- 
+> 1.9.1
+> 
+My comments on style above notwithstanding:
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
