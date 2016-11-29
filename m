@@ -1,24 +1,26 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2] arm64: head.S: Fix CNTHCTL_EL2 access on VHE system
-Date: Tue, 29 Nov 2016 11:37:32 +0000
-Message-ID: <20161129113732.GC13725@e104818-lin.cambridge.arm.com>
-References: <1480385582-24176-1-git-send-email-jintack@cs.columbia.edu>
+From: Shiju Jose <shiju.jose@huawei.com>
+Subject: RE: [PATCH V5 02/10] ras: acpi/apei: cper: generic error data entry
+ v3 per ACPI 6.1
+Date: Tue, 29 Nov 2016 11:29:20 +0000
+Message-ID: <86258A5CC0A3704780874CF6004BA8A62DC87D66__38983.7940260351$1480421003$gmane$org@lhreml502-mbb>
+References: <1479767763-27532-1-git-send-email-tbaicar@codeaurora.org>
+ <1479767763-27532-3-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 20D2B407D1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 06:36:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08EF5407D1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 06:31:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Efq7tXamyP9k for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Nov 2016 06:36:48 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49F38406A0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 06:36:47 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <1480385582-24176-1-git-send-email-jintack@cs.columbia.edu>
+ with ESMTP id WM8jjkqjLGcY for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Nov 2016 06:31:09 -0500 (EST)
+Received: from lhrrgout.huawei.com (lhrrgout.huawei.com [194.213.3.17])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3816406A0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 06:31:08 -0500 (EST)
+In-Reply-To: <1479767763-27532-3-git-send-email-tbaicar@codeaurora.org>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,30 +30,278 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: marc.zyngier@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Tyler Baicar <tbaicar@codeaurora.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "lenb@kernel.org" <lenb@kernel.org>, "matt@codeblueprint.co.uk" <matt@codeblueprint.co.uk>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "nkaje@codeaurora.org" <nkaje@codeaurora.org>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "james.morse@arm.com" <james.morse@arm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "eun.taik.lee@samsung.com" <eun.taik.lee@samsung.com>"sandeepa.s.prabhu@gmail.com" <s>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Nov 28, 2016 at 09:13:02PM -0500, Jintack Lim wrote:
-> From: Jintack <jintack@cs.columbia.edu>
+> -----Original Message-----
+> From: linux-acpi-owner@vger.kernel.org [mailto:linux-acpi-
+> owner@vger.kernel.org] On Behalf Of Tyler Baicar
+> Sent: 21 November 2016 22:36
+> To: marc.zyngier@arm.com; pbonzini@redhat.com; rkrcmar@redhat.com;
+> linux@armlinux.org.uk; catalin.marinas@arm.com; will.deacon@arm.com;
+> rjw@rjwysocki.net; lenb@kernel.org; matt@codeblueprint.co.uk;
+> robert.moore@intel.com; lv.zheng@intel.com; nkaje@codeaurora.org;
+> zjzhang@codeaurora.org; mark.rutland@arm.com; james.morse@arm.com;
+> akpm@linux-foundation.org; eun.taik.lee@samsung.com;
+> sandeepa.s.prabhu@gmail.com; shijie.huang@arm.com;
+> rruigrok@codeaurora.org; paul.gortmaker@windriver.com;
+> tomasz.nowicki@linaro.org; fu.wei@linaro.org; rostedt@goodmis.org;
+> bristot@redhat.com; linux-arm-kernel@lists.infradead.org;
+> kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; linux-
+> kernel@vger.kernel.org; linux-acpi@vger.kernel.org; linux-
+> efi@vger.kernel.org; Suzuki.Poulose@arm.com; punit.agrawal@arm.com;
+> astone@redhat.com; harba@codeaurora.org; hanjun.guo@linaro.org
+> Cc: Tyler Baicar
+> Subject: [PATCH V5 02/10] ras: acpi/apei: cper: generic error data
+> entry v3 per ACPI 6.1
 > 
-> Bit positions of CNTHCTL_EL2 are changing depending on HCR_EL2.E2H bit.
-> EL1PCEN and EL1PCTEN are 1st and 0th bits when E2H is not set, but they
-> are 11th and 10th bits respectively when E2H is set.  Current code is
-> unintentionally setting wrong bits to CNTHCTL_EL2 with E2H set.
+> Currently when a RAS error is reported it is not timestamped.
+> The ACPI 6.1 spec adds the timestamp field to the generic error data
+> entry v3 structure. The timestamp of when the firmware generated the
+> error is now being reported.
 > 
-> In fact, we don't need to set those two bits, which allow EL1 and EL0 to
-> access physical timer and counter respectively, if E2H and TGE are set
-> for the host kernel. They will be configured later as necessary. First,
-> we don't need to configure those bits for EL1, since the host kernel
-> runs in EL2.  It is a hypervisor's responsibility to configure them
-> before entering a VM, which runs in EL0 and EL1. Second, EL0 accesses
-> are configured in the later stage of boot process.
+> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+> Signed-off-by: Richard Ruigrok <rruigrok@codeaurora.org>
+> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+> Signed-off-by: Naveen Kaje <nkaje@codeaurora.org>
+> ---
+>  drivers/acpi/apei/ghes.c    | 14 +++++++---
+>  drivers/firmware/efi/cper.c | 62 +++++++++++++++++++++++++++++++++++--
+> --------
+>  include/acpi/ghes.h         | 10 ++++++++
+>  include/linux/cper.h        | 12 +++++++++
+>  4 files changed, 80 insertions(+), 18 deletions(-)
 > 
-> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Queued for 4.10. Thanks.
-
--- 
-Catalin
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c index
+> b79abc5..9063d68 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -420,7 +420,8 @@ static void ghes_handle_memory_failure(struct
+> acpi_hest_generic_data *gdata, int
+>  	int flags = -1;
+>  	int sec_sev = ghes_severity(gdata->error_severity);
+>  	struct cper_sec_mem_err *mem_err;
+> -	mem_err = (struct cper_sec_mem_err *)(gdata + 1);
+> +
+> +	mem_err = acpi_hest_generic_data_payload(gdata);
+> 
+>  	if (!(mem_err->validation_bits & CPER_MEM_VALID_PA))
+>  		return;
+> @@ -450,14 +451,18 @@ static void ghes_do_proc(struct ghes *ghes,  {
+>  	int sev, sec_sev;
+>  	struct acpi_hest_generic_data *gdata;
+> +	uuid_le sec_type;
+> 
+>  	sev = ghes_severity(estatus->error_severity);
+>  	apei_estatus_for_each_section(estatus, gdata) {
+>  		sec_sev = ghes_severity(gdata->error_severity);
+> -		if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
+> +		sec_type = *(uuid_le *)gdata->section_type;
+> +
+> +		if (!uuid_le_cmp(sec_type,
+>  				 CPER_SEC_PLATFORM_MEM)) {
+>  			struct cper_sec_mem_err *mem_err;
+> -			mem_err = (struct cper_sec_mem_err *)(gdata+1);
+> +
+> +			mem_err = acpi_hest_generic_data_payload(gdata);
+>  			ghes_edac_report_mem_error(ghes, sev, mem_err);
+> 
+>  			arch_apei_report_mem_error(sev, mem_err); @@ -467,7
+> +472,8 @@ static void ghes_do_proc(struct ghes *ghes,
+>  		else if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
+>  				      CPER_SEC_PCIE)) {
+>  			struct cper_sec_pcie *pcie_err;
+> -			pcie_err = (struct cper_sec_pcie *)(gdata+1);
+> +
+> +			pcie_err = acpi_hest_generic_data_payload(gdata);
+>  			if (sev == GHES_SEV_RECOVERABLE &&
+>  			    sec_sev == GHES_SEV_RECOVERABLE &&
+>  			    pcie_err->validation_bits &
+> CPER_PCIE_VALID_DEVICE_ID && diff --git a/drivers/firmware/efi/cper.c
+> b/drivers/firmware/efi/cper.c index d425374..7e2439e 100644
+> --- a/drivers/firmware/efi/cper.c
+> +++ b/drivers/firmware/efi/cper.c
+> @@ -32,6 +32,9 @@
+>  #include <linux/acpi.h>
+>  #include <linux/pci.h>
+>  #include <linux/aer.h>
+> +#include <linux/printk.h>
+> +#include <linux/bcd.h>
+> +#include <acpi/ghes.h>
+> 
+>  #define INDENT_SP	" "
+> 
+> @@ -386,13 +389,37 @@ static void cper_print_pcie(const char *pfx,
+> const struct cper_sec_pcie *pcie,
+>  	pfx, pcie->bridge.secondary_status, pcie->bridge.control);  }
+> 
+> +static void cper_estatus_print_section_v300(const char *pfx,
+> +	const struct acpi_hest_generic_data_v300 *gdata) {
+> +	__u8 hour, min, sec, day, mon, year, century, *timestamp;
+> +
+> +	if (gdata->validation_bits & ACPI_HEST_GEN_VALID_TIMESTAMP) {
+> +		timestamp = (__u8 *)&(gdata->time_stamp);
+> +		sec = bcd2bin(timestamp[0]);
+> +		min = bcd2bin(timestamp[1]);
+> +		hour = bcd2bin(timestamp[2]);
+> +		day = bcd2bin(timestamp[4]);
+> +		mon = bcd2bin(timestamp[5]);
+> +		year = bcd2bin(timestamp[6]);
+> +		century = bcd2bin(timestamp[7]);
+> +		printk("%stime: %7s %02d%02d-%02d-%02d %02d:%02d:%02d\n",
+> pfx,
+> +			0x01 & *(timestamp + 3) ? "precise" : "", century,
+> +			year, mon, day, hour, min, sec);
+> +	}
+> +}
+> +
+>  static void cper_estatus_print_section(
+> -	const char *pfx, const struct acpi_hest_generic_data *gdata, int
+> sec_no)
+> +	const char *pfx, struct acpi_hest_generic_data *gdata, int sec_no)
+>  {
+>  	uuid_le *sec_type = (uuid_le *)gdata->section_type;
+>  	__u16 severity;
+>  	char newpfx[64];
+> 
+> +	if (acpi_hest_generic_data_version(gdata) >= 3)
+> +		cper_estatus_print_section_v300(pfx,
+> +			(const struct acpi_hest_generic_data_v300 *)gdata);
+> +
+>  	severity = gdata->error_severity;
+>  	printk("%s""Error %d, type: %s\n", pfx, sec_no,
+>  	       cper_severity_str(severity));
+> @@ -403,14 +430,18 @@ static void cper_estatus_print_section(
+> 
+>  	snprintf(newpfx, sizeof(newpfx), "%s%s", pfx, INDENT_SP);
+>  	if (!uuid_le_cmp(*sec_type, CPER_SEC_PROC_GENERIC)) {
+> -		struct cper_sec_proc_generic *proc_err = (void *)(gdata +
+> 1);
+> +		struct cper_sec_proc_generic *proc_err;
+> +
+> +		proc_err = acpi_hest_generic_data_payload(gdata);
+>  		printk("%s""section_type: general processor error\n",
+> newpfx);
+>  		if (gdata->error_data_length >= sizeof(*proc_err))
+>  			cper_print_proc_generic(newpfx, proc_err);
+>  		else
+>  			goto err_section_too_small;
+>  	} else if (!uuid_le_cmp(*sec_type, CPER_SEC_PLATFORM_MEM)) {
+> -		struct cper_sec_mem_err *mem_err = (void *)(gdata + 1);
+> +		struct cper_sec_mem_err *mem_err;
+> +
+> +		mem_err = acpi_hest_generic_data_payload(gdata);
+>  		printk("%s""section_type: memory error\n", newpfx);
+>  		if (gdata->error_data_length >=
+>  		    sizeof(struct cper_sec_mem_err_old)) @@ -419,7 +450,9
+> @@ static void cper_estatus_print_section(
+>  		else
+>  			goto err_section_too_small;
+>  	} else if (!uuid_le_cmp(*sec_type, CPER_SEC_PCIE)) {
+> -		struct cper_sec_pcie *pcie = (void *)(gdata + 1);
+> +		struct cper_sec_pcie *pcie;
+> +
+> +		pcie = acpi_hest_generic_data_payload(gdata);
+>  		printk("%s""section_type: PCIe error\n", newpfx);
+>  		if (gdata->error_data_length >= sizeof(*pcie))
+>  			cper_print_pcie(newpfx, pcie, gdata); @@ -438,7
+> +471,7 @@ void cper_estatus_print(const char *pfx,
+>  			const struct acpi_hest_generic_status *estatus)  {
+>  	struct acpi_hest_generic_data *gdata;
+> -	unsigned int data_len, gedata_len;
+> +	unsigned int data_len;
+>  	int sec_no = 0;
+>  	char newpfx[64];
+>  	__u16 severity;
+> @@ -451,12 +484,12 @@ void cper_estatus_print(const char *pfx,
+>  	printk("%s""event severity: %s\n", pfx,
+> cper_severity_str(severity));
+>  	data_len = estatus->data_length;
+>  	gdata = (struct acpi_hest_generic_data *)(estatus + 1);
+> +
+>  	snprintf(newpfx, sizeof(newpfx), "%s%s", pfx, INDENT_SP);
+> -	while (data_len >= sizeof(*gdata)) {
+> -		gedata_len = gdata->error_data_length;
+> +
+> +	while (data_len >= acpi_hest_generic_data_size(gdata)) {
+>  		cper_estatus_print_section(newpfx, gdata, sec_no);
+> -		data_len -= gedata_len + sizeof(*gdata);
+> -		gdata = (void *)(gdata + 1) + gedata_len;
+> +		gdata = acpi_hest_generic_data_next(gdata);
+>  		sec_no++;
+>  	}
+>  }
+Hi Tyler,
+Will the above while loop does not come out because data_len is not getting updated as it did in V4 patch?
+This is the behaviour seen when we tested on our platform. It worked fine when we update the data_len.     
+> @@ -486,12 +519,13 @@ int cper_estatus_check(const struct
+> acpi_hest_generic_status *estatus)
+>  		return rc;
+>  	data_len = estatus->data_length;
+>  	gdata = (struct acpi_hest_generic_data *)(estatus + 1);
+> -	while (data_len >= sizeof(*gdata)) {
+> -		gedata_len = gdata->error_data_length;
+> -		if (gedata_len > data_len - sizeof(*gdata))
+> +
+> +	while (data_len >= acpi_hest_generic_data_size(gdata)) {
+> +		gedata_len = acpi_hest_generic_data_error_length(gdata);
+> +		if (gedata_len > data_len -
+> acpi_hest_generic_data_size(gdata))
+>  			return -EINVAL;
+> -		data_len -= gedata_len + sizeof(*gdata);
+> -		gdata = (void *)(gdata + 1) + gedata_len;
+> +		data_len -= gedata_len + acpi_hest_generic_data_size(gdata);
+> +		gdata = acpi_hest_generic_data_next(gdata);
+>  	}
+>  	if (data_len)
+>  		return -EINVAL;
+> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h index
+> 68f088a..56b9679 100644
+> --- a/include/acpi/ghes.h
+> +++ b/include/acpi/ghes.h
+> @@ -73,3 +73,13 @@ static inline void ghes_edac_unregister(struct ghes
+> *ghes)  {  }  #endif
+> +
+> +#define acpi_hest_generic_data_version(gdata)			\
+> +	(gdata->revision >> 8)
+> +
+> +static inline void *acpi_hest_generic_data_payload(struct
+> +acpi_hest_generic_data *gdata) {
+> +	return acpi_hest_generic_data_version(gdata) >= 3 ?
+> +		(void *)(((struct acpi_hest_generic_data_v300 *)(gdata)) +
+> 1) :
+> +		gdata + 1;
+> +}
+> diff --git a/include/linux/cper.h b/include/linux/cper.h index
+> dcacb1a..13ea41c 100644
+> --- a/include/linux/cper.h
+> +++ b/include/linux/cper.h
+> @@ -255,6 +255,18 @@ enum {
+> 
+>  #define CPER_PCIE_SLOT_SHIFT			3
+> 
+> +#define acpi_hest_generic_data_error_length(gdata)	\
+> +	(((struct acpi_hest_generic_data *)(gdata))->error_data_length)
+> +#define acpi_hest_generic_data_size(gdata)		\
+> +	((acpi_hest_generic_data_version(gdata) >= 3) ?	\
+> +	sizeof(struct acpi_hest_generic_data_v300) :	\
+> +	sizeof(struct acpi_hest_generic_data))
+> +#define acpi_hest_generic_data_record_size(gdata)	\
+> +	(acpi_hest_generic_data_size(gdata) +		\
+> +	acpi_hest_generic_data_error_length(gdata))
+> +#define acpi_hest_generic_data_next(gdata)		\
+> +	((void *)(gdata) + acpi_hest_generic_data_record_size(gdata))
+> +
+>  /*
+>   * All tables and structs must be byte-packed to match CPER
+>   * specification, since the tables are provided by the system BIOS
+> --
+> Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
+> Technologies, Inc.
+> Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a
+> Linux Foundation Collaborative Project.
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-acpi"
+> in the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
