@@ -1,102 +1,152 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [PATCH v2] arm64: head.S: Fix CNTHCTL_EL2 access on VHE system
-Date: Mon, 28 Nov 2016 21:13:02 -0500
-Message-ID: <1480385582-24176-1-git-send-email-jintack@cs.columbia.edu>
+Subject: Re: [PATCH] KVM: arm/arm64: Access CNTHCTL_EL2 bit fields correctly
+Date: Mon, 28 Nov 2016 22:28:18 -0500
+Message-ID: <CAHyh4xhXoFWsbnNNePthWp2-ZAOtCuUVmLn-JKRe4sc=nqrYNw@mail.gmail.com>
+References: <1480351570-11648-1-git-send-email-jintack@cs.columbia.edu>
+ <d04fd17e-9157-07fe-4daa-9dbab149b5e6@arm.com> <799d03f5-a929-9547-1ae7-94026b76f116@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ACD840665
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 21:22:00 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QHxldOSroVQU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Nov 2016 21:21:59 -0500 (EST)
-Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
- [128.59.72.39])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3D2B405E6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 21:21:59 -0500 (EST)
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uAT2IuM8053137
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 21:22:48 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 1CEBB6D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 21:22:48 -0500 (EST)
-Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
- [128.59.72.14]) by hazelnut (Postfix) with ESMTP id CF58F6D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 21:22:47 -0500 (EST)
-Received: from mail-qk0-f197.google.com (mail-qk0-f197.google.com
- [209.85.220.197])
- by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uAT2MlNI044302
- (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 21:22:47 -0500
-Received: by mail-qk0-f197.google.com with SMTP id g193so124135482qke.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Nov 2016 18:22:47 -0800 (PST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <799d03f5-a929-9547-1ae7-94026b76f116@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>, will.deacon@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com, linux@armlinux.org.uk, julien.grall@arm.com, andre.przywara@arm.com, KVM General <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jintack <jintack@cs.columbia.edu>
+On Mon, Nov 28, 2016 at 1:39 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> On 28/11/16 17:43, Marc Zyngier wrote:
+>> Hi Jintack,
 
-Bit positions of CNTHCTL_EL2 are changing depending on HCR_EL2.E2H bit.
-EL1PCEN and EL1PCTEN are 1st and 0th bits when E2H is not set, but they
-are 11th and 10th bits respectively when E2H is set.  Current code is
-unintentionally setting wrong bits to CNTHCTL_EL2 with E2H set.
+Hi Marc,
 
-In fact, we don't need to set those two bits, which allow EL1 and EL0 to
-access physical timer and counter respectively, if E2H and TGE are set
-for the host kernel. They will be configured later as necessary. First,
-we don't need to configure those bits for EL1, since the host kernel
-runs in EL2.  It is a hypervisor's responsibility to configure them
-before entering a VM, which runs in EL0 and EL1. Second, EL0 accesses
-are configured in the later stage of boot process.
+>>
+>> On 28/11/16 16:46, Jintack Lim wrote:
+>>> Bit positions of CNTHCTL_EL2 are changing depending on HCR_EL2.E2H bit.
+>>> EL1PCEN and EL1PCTEN are 1st and 0th bits when E2H is not set, but they
+>>> are 11th and 10th bits respectively when E2H is set.  Current code is
+>>> unintentionally setting wrong bits to CNTHCTL_EL2 with E2H set, which
+>>> may allow guest OS to access physical timer. So, fix it.
+>>>
+>>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+>>> ---
+>>>  arch/arm/include/asm/kvm_timer.h     | 33 +++++++++++++++++++
+>>>  arch/arm64/include/asm/kvm_timer.h   | 62 ++++++++++++++++++++++++++++++++++++
+>>>  include/clocksource/arm_arch_timer.h |  6 ++--
+>>>  virt/kvm/arm/hyp/timer-sr.c          |  8 ++---
+>>>  4 files changed, 103 insertions(+), 6 deletions(-)
+>>>  create mode 100644 arch/arm/include/asm/kvm_timer.h
+>>>  create mode 100644 arch/arm64/include/asm/kvm_timer.h
+>>>
+>
+> [...]
+>
+>> We could make it nicer (read "faster") by introducing a
+>> hyp_alternate_select construct that only returns a value instead
+>> of calling a function. I remember writing something like that
+>> at some point, and dropping it...
+>
+> So here's what this could look like (warning, wacky code ahead,
+> though I fixed a stupid bug that was present in the previous patch).
+> The generated code is quite nice (no branch, only an extra mov
+> instruction on the default path)... Of course, completely untested!
 
-Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+This looks much cleaner than my patch.
+While we are at it, is it worth to consider that we just need to set
+those bits once for VHE case, not for every world switch as an
+optimization?
 
----
-v2: Add comments about accessing CNTHCTL_EL2 when HCR_EL2.ECH == 1
+>
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index b18e852..d173902 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -121,6 +121,17 @@ typeof(orig) * __hyp_text fname(void)                                      \
+>         return val;                                                     \
+>  }
+>
+> +#define hyp_alternate_select_const(fname, orig, alt, cond)             \
+> +inline const typeof(orig) __hyp_text fname(void)                       \
+> +{                                                                      \
+> +       typeof(alt) val = orig;                                         \
+> +       asm volatile(ALTERNATIVE("nop           \n",                    \
+> +                                "mov   %0, %1  \n",                    \
+> +                                cond)                                  \
+> +                    : "+r" (val) : "r" (alt));                         \
+> +       return val;                                                     \
+> +}
+> +
+>  void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
+>  void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
+>  int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
+> index 798866a..7a783af 100644
+> --- a/virt/kvm/arm/hyp/timer-sr.c
+> +++ b/virt/kvm/arm/hyp/timer-sr.c
+> @@ -21,11 +21,29 @@
+>
+>  #include <asm/kvm_hyp.h>
+>
+> +#ifdef CONFIG_ARM64
+> +static hyp_alternate_select_const(cnthclt_shift, 0, 10,
+> +                                 ARM64_HAS_VIRT_HOST_EXTN)
+> +
+> +#else
+> +#define cnthclt_shift()                (0)
+> +#endif
+> +
+> +static inline void __hyp_text cnthctl_rmw(u32 clr, u32 set)
+> +{
+> +       u32 val;
+> +       int shift = cnthclt_shift();
+> +
+> +       val = read_sysreg(cnthctl_el2);
+> +       val &= ~(clr << shift);
+> +       val |= set << shift;
+> +       write_sysreg(val, cnthctl_el2);
+> +}
+> +
+>  /* vcpu is already in the HYP VA space */
+>  void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
+>  {
+>         struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> -       u64 val;
+>
+>         if (timer->enabled) {
+>                 timer->cntv_ctl = read_sysreg_el0(cntv_ctl);
+> @@ -36,9 +54,7 @@ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
+>         write_sysreg_el0(0, cntv_ctl);
+>
+>         /* Allow physical timer/counter access for the host */
+> -       val = read_sysreg(cnthctl_el2);
+> -       val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
+> -       write_sysreg(val, cnthctl_el2);
+> +       cnthctl_rmw(0, CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN);
+>
+>         /* Clear cntvoff for the host */
+>         write_sysreg(0, cntvoff_el2);
+> @@ -48,16 +64,12 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
+>  {
+>         struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+>         struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> -       u64 val;
+>
+>         /*
+>          * Disallow physical timer access for the guest
+>          * Physical counter access is allowed
+>          */
+> -       val = read_sysreg(cnthctl_el2);
+> -       val &= ~CNTHCTL_EL1PCEN;
+> -       val |= CNTHCTL_EL1PCTEN;
+> -       write_sysreg(val, cnthctl_el2);
+> +       cnthctl_rmw(CNTHCTL_EL1PCEN, CNTHCTL_EL1PCTEN);
+>
+>         if (timer->enabled) {
+>                 write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
+>
+> Thanks,
+>
+>         M.
+> --
+> Jazz is not dead. It just smells funny...
+>
 
----
- arch/arm64/kernel/head.S | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 332e331..136cb0d 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -524,10 +524,21 @@ set_hcr:
- 	msr	hcr_el2, x0
- 	isb
- 
--	/* Generic timers. */
-+	/*
-+	 * Allow Non-secure EL1 and EL0 to access physical timer and counter.
-+	 * This is not necessary for VHE, since the host kernel runs in EL2,
-+	 * and EL0 accesses are configured in the later stage of boot process.
-+	 * Note that when HCR_EL2.E2H == 1, CNTHCTL_EL2 has the same bit layout
-+	 * as CNTKCTL_EL1, and CNTKCTL_EL1 accessing instructions are redefined
-+	 * to access CNTHCTL_EL2. This allows the kernel designed to run at EL1
-+	 * to transparently mess with the EL0 bits via CNTKCTL_EL1 access in
-+	 * EL2.
-+	 */
-+	cbnz	x2, 1f
- 	mrs	x0, cnthctl_el2
- 	orr	x0, x0, #3			// Enable EL1 physical timers
- 	msr	cnthctl_el2, x0
-+1:
- 	msr	cntvoff_el2, xzr		// Clear virtual offset
- 
- #ifdef CONFIG_ARM_GIC_V3
--- 
-1.9.1
