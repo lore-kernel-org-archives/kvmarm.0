@@ -1,8 +1,8 @@
 From: Shiju Jose <shiju.jose@huawei.com>
 Subject: RE: [PATCH V5 02/10] ras: acpi/apei: cper: generic error data entry
  v3 per ACPI 6.1
-Date: Tue, 29 Nov 2016 11:29:20 +0000
-Message-ID: <86258A5CC0A3704780874CF6004BA8A62DC87D66__38983.7940260351$1480421003$gmane$org@lhreml502-mbb>
+Date: Tue, 29 Nov 2016 12:26:24 +0000
+Message-ID: <86258A5CC0A3704780874CF6004BA8A62DC87E3A@lhreml502-mbb>
 References: <1479767763-27532-1-git-send-email-tbaicar@codeaurora.org>
  <1479767763-27532-3-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
@@ -10,15 +10,15 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08EF5407D1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 06:31:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E0F440692
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 07:27:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WM8jjkqjLGcY for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Nov 2016 06:31:09 -0500 (EST)
+ with ESMTP id VZMV9iXif8sO for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Nov 2016 07:27:30 -0500 (EST)
 Received: from lhrrgout.huawei.com (lhrrgout.huawei.com [194.213.3.17])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3816406A0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 06:31:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A7AEE405E6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 07:27:29 -0500 (EST)
 In-Reply-To: <1479767763-27532-3-git-send-email-tbaicar@codeaurora.org>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -30,30 +30,17 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "lenb@kernel.org" <lenb@kernel.org>, "matt@codeblueprint.co.uk" <matt@codeblueprint.co.uk>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "nkaje@codeaurora.org" <nkaje@codeaurora.org>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "james.morse@arm.com" <james.morse@arm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "eun.taik.lee@samsung.com" <eun.taik.lee@samsung.com>"sandeepa.s.prabhu@gmail.com" <s>
+To: Tyler Baicar <tbaicar@codeaurora.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "lenb@kernel.org" <lenb@kernel.org>, "matt@codeblueprint.co.uk" <matt@codeblueprint.co.uk>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "nkaje@codeaurora.org" <nkaje@codeaurora.org>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "james.morse@arm.com" <james.morse@arm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "eun.taik.lee@samsung.com" <eun.taik.lee@samsung.com>
+Cc: Gabriele Paoloni <gabriele.paoloni@huawei.com>, John Garry <john.garry@huawei.com>, Linuxarm <linuxarm@huawei.com>, "xuwei (O)" <xuwei5@hisilicon.com>, Anurup m <anurup.m@huawei.com>, Shiju Jose <shiju.jose@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-> -----Original Message-----
-> From: linux-acpi-owner@vger.kernel.org [mailto:linux-acpi-
-> owner@vger.kernel.org] On Behalf Of Tyler Baicar
-> Sent: 21 November 2016 22:36
-> To: marc.zyngier@arm.com; pbonzini@redhat.com; rkrcmar@redhat.com;
-> linux@armlinux.org.uk; catalin.marinas@arm.com; will.deacon@arm.com;
-> rjw@rjwysocki.net; lenb@kernel.org; matt@codeblueprint.co.uk;
-> robert.moore@intel.com; lv.zheng@intel.com; nkaje@codeaurora.org;
-> zjzhang@codeaurora.org; mark.rutland@arm.com; james.morse@arm.com;
-> akpm@linux-foundation.org; eun.taik.lee@samsung.com;
-> sandeepa.s.prabhu@gmail.com; shijie.huang@arm.com;
-> rruigrok@codeaurora.org; paul.gortmaker@windriver.com;
-> tomasz.nowicki@linaro.org; fu.wei@linaro.org; rostedt@goodmis.org;
-> bristot@redhat.com; linux-arm-kernel@lists.infradead.org;
-> kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linux-acpi@vger.kernel.org; linux-
-> efi@vger.kernel.org; Suzuki.Poulose@arm.com; punit.agrawal@arm.com;
-> astone@redhat.com; harba@codeaurora.org; hanjun.guo@linaro.org
-> Cc: Tyler Baicar
-> Subject: [PATCH V5 02/10] ras: acpi/apei: cper: generic error data
-> entry v3 per ACPI 6.1
+Hi Tyler,
+
+Please find the following comment.
+
+Thanks,
+Shiju 
+
 > 
 > Currently when a RAS error is reported it is not timestamped.
 > The ACPI 6.1 spec adds the timestamp field to the generic error data
@@ -231,7 +218,6 @@ List-Id: kvmarm@lists.cs.columbia.edu
 >  		sec_no++;
 >  	}
 >  }
-Hi Tyler,
 Will the above while loop does not come out because data_len is not getting updated as it did in V4 patch?
 This is the behaviour seen when we tested on our platform. It worked fine when we update the data_len.     
 > @@ -486,12 +519,13 @@ int cper_estatus_check(const struct
