@@ -1,25 +1,31 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Access CNTHCTL_EL2 bit fields correctly
-Date: Tue, 29 Nov 2016 09:37:07 +0000
-Message-ID: <c75fe6ae-8ae0-285d-6f47-3e28c7e8f431@arm.com>
-References: <1480351570-11648-1-git-send-email-jintack@cs.columbia.edu>
- <d04fd17e-9157-07fe-4daa-9dbab149b5e6@arm.com>
- <799d03f5-a929-9547-1ae7-94026b76f116@arm.com> <20161128194221.GG18170@cbox>
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Subject: Re: [PATCH v9 06/11] arm/arm64: vgic: Implement VGICv3 CPU interface
+ access
+Date: Tue, 29 Nov 2016 15:31:44 +0530
+Message-ID: <CALicx6uK9kQ5fuW=SGnny7oerPbhGbVDw=MMi0Tna_B4XdJqeg@mail.gmail.com>
+References: <1479906118-15832-1-git-send-email-vijay.kilari@gmail.com>
+ <1479906118-15832-7-git-send-email-vijay.kilari@gmail.com>
+ <20161128193938.GF18170@cbox>
+ <CALicx6s4E0-VJMm6Ff5qu=sZgXu-mUnJdDCmaiZO0i3yzF8wxA@mail.gmail.com>
+ <20161129083747.GA9838@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3739C40798
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 04:36:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EE0C40692
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 05:00:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ICulKRMS9E3L for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Nov 2016 04:36:22 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 712F540796
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 04:36:22 -0500 (EST)
-In-Reply-To: <20161128194221.GG18170@cbox>
+ with ESMTP id S25cVWuKNWKq for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Nov 2016 05:00:58 -0500 (EST)
+Received: from mail-oi0-f68.google.com (mail-oi0-f68.google.com
+ [209.85.218.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB03F405D5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 05:00:57 -0500 (EST)
+Received: by mail-oi0-f68.google.com with SMTP id v84so17533846oie.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2016 02:01:46 -0800 (PST)
+In-Reply-To: <20161129083747.GA9838@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,62 +36,297 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28/11/16 19:42, Christoffer Dall wrote:
-> On Mon, Nov 28, 2016 at 06:39:04PM +0000, Marc Zyngier wrote:
->> On 28/11/16 17:43, Marc Zyngier wrote:
->>> Hi Jintack,
->>>
->>> On 28/11/16 16:46, Jintack Lim wrote:
->>>> Bit positions of CNTHCTL_EL2 are changing depending on HCR_EL2.E2H bit.
->>>> EL1PCEN and EL1PCTEN are 1st and 0th bits when E2H is not set, but they
->>>> are 11th and 10th bits respectively when E2H is set.  Current code is
->>>> unintentionally setting wrong bits to CNTHCTL_EL2 with E2H set, which
->>>> may allow guest OS to access physical timer. So, fix it.
->>>>
->>>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
->>>> ---
->>>>  arch/arm/include/asm/kvm_timer.h     | 33 +++++++++++++++++++
->>>>  arch/arm64/include/asm/kvm_timer.h   | 62 ++++++++++++++++++++++++++++++++++++
->>>>  include/clocksource/arm_arch_timer.h |  6 ++--
->>>>  virt/kvm/arm/hyp/timer-sr.c          |  8 ++---
->>>>  4 files changed, 103 insertions(+), 6 deletions(-)
->>>>  create mode 100644 arch/arm/include/asm/kvm_timer.h
->>>>  create mode 100644 arch/arm64/include/asm/kvm_timer.h
->>>>
+On Tue, Nov 29, 2016 at 2:07 PM, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Tue, Nov 29, 2016 at 01:08:26PM +0530, Vijay Kilari wrote:
+>> On Tue, Nov 29, 2016 at 1:09 AM, Christoffer Dall
+>> <christoffer.dall@linaro.org> wrote:
+>> > On Wed, Nov 23, 2016 at 06:31:53PM +0530, vijay.kilari@gmail.com wrote:
+>> >> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>> >>
+>> >> VGICv3 CPU interface registers are accessed using
+>> >> KVM_DEV_ARM_VGIC_CPU_SYSREGS ioctl. These registers are accessed
+>> >> as 64-bit. The cpu MPIDR value is passed along with register id.
+>> >> is used to identify the cpu for registers access.
+>> >>
+>> >> The VM that supports SEIs expect it on destination machine to handle
+>> >> guest aborts and hence checked for ICC_CTLR_EL1.SEIS compatibility.
+>> >> Similarly, VM that supports Affinity Level 3 that is required for AArch64
+>> >> mode, is required to be supported on destination machine. Hence checked
+>> >> for ICC_CTLR_EL1.A3V compatibility.
+>> >>
+>> >> The CPU system register handling is spitted into two files
+>> >
+>> > spitted?  Did you mean 'split into' ?
+>> >
+>> >> vgic-sys-reg-common.c and vgic-sys-reg-v3.c.
+>> >> The vgic-sys-reg-common.c handles read and write of VGIC CPU registers
+>> >
+>> > So this is weird because everything in virt/kvm/arm/ is exactly supposed
+>> > to be common between arm and arm64 already.
+>> >
+>> > I would rather that you had a copy of vgic-sys-reg-v3.c in arch/arm/kvm/
+>> > and in arch/arm64/kvm/ each taking care of its own architecture.
+>> >
+>> > But note that I didn't actually require that you implemented support for
+>> > GICv3 migration on AArch32 hosts for these patches, I just didn't want
+>> > thigns to silently break.
+>> >
+>> > If we cannot test the AArch32 implementation, we should potentially just
+>> > make sure that is not supported yet, return a proper error to userspace
+>> > and get the AArch64 host implementation correct.
+>> >
+>> > I suggest you move your:
+>> >   virt/kvm/arm/vgic/vgic-sys-reg-v3.c to
+>> >   arch/arm64/kvm/vgic-sys-reg-v3.c
+>> >
+>> > and rename
+>> >   virt/kvm/arm/vgic/vgic-sys-reg-common.c to
+>> >   virt/kvm/arm/vgic/vgic-sys-reg-v3.c
+>> >
+>> > And then wait with the AArch32 host side for now, but just make sure it
+>> > compiles and returns an error as opposed to crashing the system if
+>> > someone tries to excercise this interface on an AArch32 host.
 >>
+>> I will add arch/arm/kvm/vgic-coproc-v3.c (pls check if file name is ok or not?)
+>
+> I would call it vgic-v3-coproc.c
+>
+>> and return -ENXIO as shown below and update document accordingly.
+>>
+>> int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+>>                                u64 *reg)
+>> {
+>>        /*
+>>         * TODO: Implement for AArch32
+>>         */
+>>        return -ENXIO;
+>> }
+>>
+>> int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+>>                                u64 *reg)
+>> {
+>>        /*
+>>         * TODO: Implement for AArch32
+>>         */
+>>        return -ENXIO;
+>> }
+>
+>
+>>
+>> >
+>> >> for both AArch64 and AArch32 mode. The vgic-sys-reg-v3.c handles AArch64
+>> >> mode and is compiled only for AArch64 mode.
+>> >>
+>> >> Updated arch/arm/include/uapi/asm/kvm.h with new definitions
+>> >> required to compile for AArch32.
+>> >>
+>> >> The version of VGIC v3 specification is define here
+>> >> Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>> >>
+>> >> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+>> >> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>> >> ---
 >> [...]
+>> >> +static bool access_gic_aprn(struct kvm_vcpu *vcpu, bool is_write, u8 apr,
+>> >> +                         u8 idx, unsigned long *reg)
+>> >> +{
+>> >> +     struct vgic_cpu *vgic_v3_cpu = &vcpu->arch.vgic_cpu;
+>> >> +
+>> >> +     /* num_pri_bits are initialized with HW supported values.
+>> >> +      * We can rely safely on num_pri_bits even if VM has not
+>> >> +      * restored ICC_CTLR_EL1 before restoring APnR registers.
+>> >> +      */
+>> >
+>> > nit: commenting style
+>> ok
+>> >
+>> >> +     switch (vgic_v3_cpu->num_pri_bits) {
+>> >> +     case 7:
+>> >> +             vgic_v3_access_apr_reg(vcpu, is_write, apr, idx, reg);
+>> >> +             break;
+>> >> +     case 6:
+>> >> +             if (idx > 1)
+>> >> +                     goto err;
+>> >> +             vgic_v3_access_apr_reg(vcpu, is_write, apr, idx, reg);
+>> >> +             break;
+>> >> +     default:
+>> >> +             if (idx > 0)
+>> >> +                     goto err;
+>> >> +             vgic_v3_access_apr_reg(vcpu, is_write, apr, idx, reg);
+>> >> +     }
+>> >
+>> > It looks to me like userspace can then program active priorities with
+>> > higher numbers than what it will program num_pri_bits to later.  Is that
+>> > not weird, or am I missing something?
 >>
->>> We could make it nicer (read "faster") by introducing a
->>> hyp_alternate_select construct that only returns a value instead
->>> of calling a function. I remember writing something like that
->>> at some point, and dropping it...
+>> As long as it is within HW supported priorities it is safe.
+>
+> I know that it is safe on the hardware, but it is weird to define a VM
+> with some max priority and still be able to set a higher active priority
+> is it not?
+
+In that case, we need to cache the highest active priorities updated
+by a VM in a variable
+when APnR is restored and later check against num_pri_bits when
+ICC_CTLR_EL1 is updated.
+If the value cached is greater than num_pri_bits restored then reject
+ICC_CTLR_EL1 restore.
+
+This variable should be initialized with value 5 ( min priority)
+
+>
+> On the other hand, if we cannot enforce this at runtime, it may not
+> matter?
+
+At VM runtime irrespective of VM's num_pri_bits all the APnR registers that
+HW supports are saved and restored.
+
+>
+> Hint: I'd like for you to actually think about these constraints and
+> make sure the sematics of the emulated VM environment remain intact
+> across migrations.
+>
+>> >
+>> >> +
+>> >> +     return true;
+>> >> +err:
+>> >> +     if (!is_write)
+>> >> +             *reg = 0;
+>> >> +
+>> >> +     return false;
+>> >> +}
+>> >> +
+>> >> +bool access_gic_ap0r_reg(struct kvm_vcpu *vcpu, bool is_write, u8 idx,
+>> >> +                      unsigned long *reg)
+>> >> +{
+>> >> +     return access_gic_aprn(vcpu, is_write, 0, idx, reg);
+>> >> +}
+>> >> +
+>> >> +bool access_gic_ap1r_reg(struct kvm_vcpu *vcpu, bool is_write, u8 idx,
+>> >> +                      unsigned long *reg)
+>> >> +{
+>> >> +     return access_gic_aprn(vcpu, is_write, 1, idx, reg);
+>> >> +}
+>> >> +
+>> >> +bool access_gic_sre_reg(struct kvm_vcpu *vcpu, bool is_write,
+>> >> +                     unsigned long *reg)
+>> >> +{
+>> >> +     struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
+>> >> +
+>> >> +     /* Validate SRE bit */
+>> >> +     if (is_write) {
+>> >> +             if (!(*reg & ICC_SRE_EL1_SRE))
+>> >> +                     return false;
+>> >> +     } else {
+>> >> +             *reg = vgicv3->vgic_sre;
+>> >> +     }
+>> >> +
+>> >> +     return true;
+>> >> +}
+>> >> diff --git a/virt/kvm/arm/vgic/vgic-sys-reg-v3.c b/virt/kvm/arm/vgic/vgic-sys-reg-v3.c
+>> >> new file mode 100644
+>> >> index 0000000..82c2f02
+>> >> --- /dev/null
+>> >> +++ b/virt/kvm/arm/vgic/vgic-sys-reg-v3.c
+>> >> @@ -0,0 +1,142 @@
+>> >> +/*
+>> >> + * VGIC system registers handling functions
+>> >> + *
+>> >> + * This program is free software; you can redistribute it and/or modify
+>> >> + * it under the terms of the GNU General Public License version 2 as
+>> >> + * published by the Free Software Foundation.
+>> >> + *
+>> >> + * This program is distributed in the hope that it will be useful,
+>> >> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> >> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> >> + * GNU General Public License for more details.
+>> >> + */
+>> >> +
+>> >> +#include <linux/kvm.h>
+>> >> +#include <linux/kvm_host.h>
+>> >> +#include <asm/kvm_emulate.h>
+>> >> +#include "vgic.h"
+>> >> +#include "sys_regs.h"
+>> >> +
+>> >> +#define ACCESS_SYS_REG(REG)                                          \
+>> >> +static bool access_gic_##REG##_sys_reg(struct kvm_vcpu *vcpu,                \
+>> >> +                                 struct sys_reg_params *p,           \
+>> >> +                                 const struct sys_reg_desc *r)       \
+>> >> +{                                                                    \
+>> >> +     unsigned long tmp;                                              \
+>> >> +     bool ret;                                                       \
+>> >> +                                                                     \
+>> >> +     if (p->is_write)                                                \
+>> >> +             tmp = p->regval;                                        \
+>> >> +     ret = access_gic_##REG##_reg(vcpu, p->is_write, &tmp);          \
+>> >> +     if (!p->is_write)                                               \
+>> >> +             p->regval = tmp;                                        \
+>> >> +                                                                     \
+>> >> +     return ret;                                                     \
+>> >> +}
+>> >> +
+>> >> +ACCESS_SYS_REG(ctlr)
+>> >> +ACCESS_SYS_REG(pmr)
+>> >> +ACCESS_SYS_REG(bpr0)
+>> >> +ACCESS_SYS_REG(bpr1)
+>> >> +ACCESS_SYS_REG(sre)
+>> >> +ACCESS_SYS_REG(grpen0)
+>> >> +ACCESS_SYS_REG(grpen1)
+>> >> +
+>> >> +#define ACCESS_APNR_SYS_REG(REG)                                     \
+>> >> +static bool access_gic_##REG##_sys_reg(struct kvm_vcpu *vcpu,                \
+>> >> +                                 struct sys_reg_params *p,           \
+>> >> +                                 const struct sys_reg_desc *r)       \
+>> >> +{                                                                    \
+>> >> +     unsigned long tmp;                                              \
+>> >> +     u8 idx = p->Op2 & 3;                                            \
+>> >> +     bool ret;                                                       \
+>> >> +                                                                     \
+>> >> +     if (p->is_write)                                                \
+>> >> +             tmp = p->regval;                                        \
+>> >> +     ret = access_gic_##REG##_reg(vcpu, p->is_write, idx, &tmp);     \
+>> >> +     if (!p->is_write)                                               \
+>> >> +             p->regval = tmp;                                        \
+>> >> +                                                                     \
+>> >> +     return ret;                                                     \
+>> >> +}
+>> >> +
+>> >> +ACCESS_APNR_SYS_REG(ap0r)
+>> >> +ACCESS_APNR_SYS_REG(ap1r)
+>> >
+>> > I don't get these indirections.  Why can't you call the functions
+>> > directly?
 >>
->> So here's what this could look like (warning, wacky code ahead,
->> though I fixed a stupid bug that was present in the previous patch).
->> The generated code is quite nice (no branch, only an extra mov
->> instruction on the default path)... Of course, completely untested!
-> 
-> Isn't this all about determining which bitmask to use, statically, once,
-> after the system has booted?
-> 
-> How about a good old fashioned static variable, or global struct like
-> the global one we use for the VGIC, which sets the proper mit mask
-> during kvm init, and the world-switch code just uses a variable?
+>> The code is same for accessing the registers hence added this indirection.
+>>
+>
+> That's not answering my question.
+>
+> What is the benefit of adding this indirection as opposed to having the
+> functions called directly?
 
-We could indeed do that (I've been carried away with my tendency for
-weird and wonderful hacks).
+In sys_reg_desc the access function is of type
 
-But as Jintack mentioned, there is a much better approach, which is to
-do nothing at all on the VHE path (we can set the permission bits once
-and for all). cntvoff_el2 also falls into the same category of things we
-should be able to only restore and not bother resetting (as it doesn't
-affect the EL2 virtual counter).
+        bool (*access)(struct kvm_vcpu *,
+                       struct sys_reg_params *,
+                       const struct sys_reg_desc *);
 
-Thoughts?
+Where as the each register access function is of type below to support
+access to AArch32(later if not now).
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+bool access_gic_xxx(struct kvm_vcpu *vcpu, bool is_write, unsigned long *reg);
+
+I can drop this macro and make function calls for each reg access.
+
+>
+> To make my point clear:  I hate this kind of preprocessor macro fun, and
+> I think it should only ever be used when there's a huge benefit in terms
+> of code reuse or simplicity of some sort.  I don't see anything like
+> that in this case.
+>
+> Thanks,
+> -Christoffer
