@@ -1,65 +1,96 @@
-From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: Re: [PATCH] KVM: arm/arm64: Access CNTHCTL_EL2 bit fields correctly
-Date: Wed, 30 Nov 2016 08:41:43 -0500
-Message-ID: <CAHyh4xjibTX4ESxtxXk0+Z-q6JOXH9=Xcpopd+4FgYHsAZQ=RA@mail.gmail.com>
-References: <1480351570-11648-1-git-send-email-jintack@cs.columbia.edu>
- <d04fd17e-9157-07fe-4daa-9dbab149b5e6@arm.com> <799d03f5-a929-9547-1ae7-94026b76f116@arm.com>
- <CAHyh4xhXoFWsbnNNePthWp2-ZAOtCuUVmLn-JKRe4sc=nqrYNw@mail.gmail.com>
- <0a475329-6f50-42ae-3244-f0767c56ce09@arm.com> <ee2dacff-691c-7548-ff71-3a992f399333@arm.com>
- <CAHyh4xi2oq8m2B_3oZu+BNeyk-++L2ziMY66+XZ+SDRjOHDN6A@mail.gmail.com> <129e316b-0a05-9114-f29f-c8935144720c@arm.com>
+From: Wei Huang <wei@redhat.com>
+Subject: Re: Unable to use perf in VM
+Date: Wed, 30 Nov 2016 13:17:55 -0600
+Message-ID: <56fd35f8-76ba-3d5d-f1e0-7df5ff8d396a@redhat.com>
+References: <70374841-ecb1-a6c3-ed43-0f39e2d5fec2@riken.jp>
+ <8b2a3cfd-57a0-70ac-ef50-672f8040291d@arm.com>
+ <a81f82da-322a-a52b-de0e-316b7ce5f463@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <129e316b-0a05-9114-f29f-c8935144720c@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, KVM General <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40A7840665
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2016 14:17:10 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id mcc5tLtE8oel for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Nov 2016 14:17:09 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8D5640286
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2016 14:17:08 -0500 (EST)
+In-Reply-To: <a81f82da-322a-a52b-de0e-316b7ce5f463@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Itaru Kitayama <itaru.kitayama@riken.jp>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel@lists.infradead.org, Shannon Zhao <shannon.zhao@linaro.org>
+Cc: Hoan Tran <hotran@apm.com>, Tai Tri Nguyen <ttnguyen@apm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Nov 30, 2016 at 8:31 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On 29/11/16 21:05, Jintack Lim wrote:
->> On Tue, Nov 29, 2016 at 11:53 AM, Suzuki K Poulose
->> <suzuki.poulose@arm.com> wrote:
->>> On 29/11/16 09:36, Marc Zyngier wrote:
->>>>
->>>> On 29/11/16 03:28, Jintack Lim wrote:
->>>>>
->>>>> On Mon, Nov 28, 2016 at 1:39 PM, Marc Zyngier <marc.zyngier@arm.com>
->>>>> wrote:
->>>>>>
->>>>>> On 28/11/16 17:43, Marc Zyngier wrote:
->>>>>
->>>>> This looks much cleaner than my patch.
->>>>> While we are at it, is it worth to consider that we just need to set
->>>>> those bits once for VHE case, not for every world switch as an
->>>>> optimization?
->>>>
->>>>
->>>> Ah! That's a much better idea indeed! And we could stop messing with
->>>> cntvoff_el2 as well, as it doesn't need to be restored to zero on exit.
->>>> Could you try and respin something along those lines?
->>>>
+
+
+On 11/30/2016 07:37 AM, Marc Zyngier wrote:
+> On 30/11/16 11:48, Marc Zyngier wrote:
+>> + Shannon
+>>
+>> On 29/11/16 22:04, Itaru Kitayama wrote:
+>>> Hi,
 >>>
->>> fyi, we have a static_key based cpus_have_const_cap() for Constant cap
->>> checking (like this case) available in linux-next. May be you could make use
->>> of that instead of alternatives.
+>>> In a VM (virsh controlled, KVM acceleration enabled) on a recent
+>>> kvmarm kernel host, I find I am unable to use perf to obtain
+>>> performance statistics for a complex task like kernel build.
+>>> (I've verified this is seen with a Fedora 25 VM and host combination
+>>> as well)
+>>> APM folks CC'ed think this might be caused by a bug in the core PMU 
+>>> framework code, thus I'd like to have experts opinion on this issue.
+>>>
+>>> [root@localhost linux]# perf stat -B make
+>>>    CHK     include/config/kernel.release
+>>> [  119.617684] git[1144]: undefined instruction: pc=fffffc000808ff30
+>>> [  119.623040] Code: 51000442 92401042 d51b9ca2 d5033fdf (d53b9d40)
+>>> [  119.627607] Internal error: undefined instruction: 0 [#1] SMP
 >>
->> Thanks Suzuki. This looks very useful.
+>> [...]
 >>
->> Marc, can I write a patch based on linux-next? The commit which has
->> cpus_have_const_cap() is not in master and next branch in kvm/arm
->> repo.
->
-> You can. It is just that I won't be able to apply it immediately (I'll
-> wait for -rc1 to be out, and send it as a fix).
+>> In a VM running mainline hosted on an AMD Seattle box:
+>>
+>>  Performance counter stats for 'make':
+>>
+>>     1526089.499304      task-clock:u (msec)       #    0.932 CPUs utilized          
+>>                  0      context-switches:u        #    0.000 K/sec                  
+>>                  0      cpu-migrations:u          #    0.000 K/sec                  
+>>           29527793      page-faults:u             #    0.019 M/sec                  
+>>      2913174122673      cycles:u                  #    1.909 GHz                    
+>>      2365040892322      instructions:u            #    0.81  insn per cycle         
+>>    <not supported>      branches:u                                                  
+>>        32049215378      branch-misses:u           #    0.00% of all branches        
+>>
+>>     1637.531444837 seconds time elapsed
+>>
+>> Running the same host kernel on a Mustang system, the guest explodes
+>> in the way you reported. The failing instruction always seems to be
+>> an access to pmxevcntr_el0 (I've seen both reads and writes).
+>>
+>> Funnily enough, it dies if you try any HW event other than cycles
+>> ("perf stat -e cycles ls" works, and "perf stat -e instructions ls"
+>> explodes). Which would tend to indicate that we're screwing up
+>> the counter selection, but I have no proof of that (specially that
+>> the Seattle guest is working just as expected).
+> 
+> It turns out that we *don't* inject an undef. It seems to be generated
+> locally at EL1.
+> 
+> Still digging.
 
-Ok. Thanks!. I'll send out v2.
+Just FYI: I saw it on Mustang before. My initial thought was HW related,
+but without proof. I am interested to see your findings...
 
->
-> Thanks,
->
->         M.
-> --
-> Jazz is not dead. It just smells funny...
->
-
+> 
+> 	M.
+> 
