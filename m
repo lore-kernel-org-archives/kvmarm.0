@@ -1,33 +1,23 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v9 07/11] arm/arm64: vgic: Implement
- KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO ioctl
-Date: Wed, 30 Nov 2016 08:29:11 +0000
-Message-ID: <CAFEAcA-z=+K2ceRhLFMt7VXWD=RQyDKzS68SsO_pG3p=578wTg@mail.gmail.com>
-References: <1479906118-15832-1-git-send-email-vijay.kilari@gmail.com>
- <1479906118-15832-8-git-send-email-vijay.kilari@gmail.com>
- <20161128195028.GH18170@cbox>
- <CALicx6uW5RmjsPPBKB5wLW4TzNmcdc9ZADqp=M2ZJe9Cd+keZg@mail.gmail.com>
- <20161129210901.GC15346@cbox>
- <CAFEAcA_1i7-ti_H_RZrTbCW2DmFPvYudKn_WFs=_XRoyKKsnbQ@mail.gmail.com>
- <20161130082411.GA6647@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: Unable to use perf in VM
+Date: Wed, 30 Nov 2016 11:48:37 +0000
+Message-ID: <8b2a3cfd-57a0-70ac-ef50-672f8040291d@arm.com>
+References: <70374841-ecb1-a6c3-ed43-0f39e2d5fec2@riken.jp>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AA0140596
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2016 03:28:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 541FD40501
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2016 06:47:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9qSX4twB9YRt for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Nov 2016 03:28:43 -0500 (EST)
-Received: from mail-ua0-f182.google.com (mail-ua0-f182.google.com
- [209.85.217.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DC8040543
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2016 03:28:42 -0500 (EST)
-Received: by mail-ua0-f182.google.com with SMTP id 51so205784360uai.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2016 00:29:32 -0800 (PST)
-In-Reply-To: <20161130082411.GA6647@cbox>
+ with ESMTP id fRDwB7YTcWuE for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Nov 2016 06:47:51 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15614404DE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2016 06:47:50 -0500 (EST)
+In-Reply-To: <70374841-ecb1-a6c3-ed43-0f39e2d5fec2@riken.jp>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,18 +27,60 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Itaru Kitayama <itaru.kitayama@riken.jp>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel@lists.infradead.org, Shannon Zhao <shannon.zhao@linaro.org>
+Cc: Hoan Tran <hotran@apm.com>, Tai Tri Nguyen <ttnguyen@apm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 30 November 2016 at 08:24, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> (Peter, I thought you once argued that it was important for user space
-> to be able to save/restore the state without any ordering requirements,
-> but I may have misunderstood.  It is still the option to add something
-> like the above to the docs but also do our best to allow any ordering of
-> level/config, but it becomes slightly more invasive.)
++ Shannon
 
-Hmm; perhaps I should think about this a bit more.
+On 29/11/16 22:04, Itaru Kitayama wrote:
+> Hi,
+> 
+> In a VM (virsh controlled, KVM acceleration enabled) on a recent
+> kvmarm kernel host, I find I am unable to use perf to obtain
+> performance statistics for a complex task like kernel build.
+> (I've verified this is seen with a Fedora 25 VM and host combination
+> as well)
+> APM folks CC'ed think this might be caused by a bug in the core PMU 
+> framework code, thus I'd like to have experts opinion on this issue.
+> 
+> [root@localhost linux]# perf stat -B make
+>    CHK     include/config/kernel.release
+> [  119.617684] git[1144]: undefined instruction: pc=fffffc000808ff30
+> [  119.623040] Code: 51000442 92401042 d51b9ca2 d5033fdf (d53b9d40)
+> [  119.627607] Internal error: undefined instruction: 0 [#1] SMP
 
--- PMM
+[...]
+
+In a VM running mainline hosted on an AMD Seattle box:
+
+ Performance counter stats for 'make':
+
+    1526089.499304      task-clock:u (msec)       #    0.932 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+          29527793      page-faults:u             #    0.019 M/sec                  
+     2913174122673      cycles:u                  #    1.909 GHz                    
+     2365040892322      instructions:u            #    0.81  insn per cycle         
+   <not supported>      branches:u                                                  
+       32049215378      branch-misses:u           #    0.00% of all branches        
+
+    1637.531444837 seconds time elapsed
+
+Running the same host kernel on a Mustang system, the guest explodes
+in the way you reported. The failing instruction always seems to be
+an access to pmxevcntr_el0 (I've seen both reads and writes).
+
+Funnily enough, it dies if you try any HW event other than cycles
+("perf stat -e cycles ls" works, and "perf stat -e instructions ls"
+explodes). Which would tend to indicate that we're screwing up
+the counter selection, but I have no proof of that (specially that
+the Seattle guest is working just as expected).
+
+Shannon, any idea?
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
