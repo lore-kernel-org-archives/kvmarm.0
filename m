@@ -1,195 +1,45 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v13 3/4] arm: pmu: Check
- cycle count increases
-Date: Thu, 1 Dec 2016 10:18:48 +0100
-Message-ID: <20161201091848.vrr7ojk5snmz6gv3@kamzik.brq.redhat.com>
-References: <1480569402-8848-1-git-send-email-wei@redhat.com>
- <1480569402-8848-4-git-send-email-wei@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 408A740497
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 04:18:04 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i3c0Fu-k4DFr for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Dec 2016 04:18:03 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63BED40457
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 04:18:02 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <1480569402-8848-4-git-send-email-wei@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Wei Huang <wei@redhat.com>
-Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, andre.przywara@arm.com, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PULL] KVM/ARM updates for 4.9-rc7
+Date: Thu,  1 Dec 2016 09:25:40 +0000
+Message-ID: <1480584341-32340-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Nov 30, 2016 at 11:16:41PM -0600, Wei Huang wrote:
-> From: Christopher Covington <cov@codeaurora.org>
-> 
-> Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
-> even for the smallest delta of two subsequent reads.
-> 
-> Signed-off-by: Christopher Covington <cov@codeaurora.org>
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> ---
->  arm/pmu.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 94 insertions(+)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 1fe2b1a..3566a27 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -16,6 +16,9 @@
->  #include "asm/barrier.h"
->  #include "asm/processor.h"
->  
-> +#define PMU_PMCR_E         (1 << 0)
-> +#define PMU_PMCR_C         (1 << 2)
-> +#define PMU_PMCR_LC        (1 << 6)
->  #define PMU_PMCR_N_SHIFT   11
->  #define PMU_PMCR_N_MASK    0x1f
->  #define PMU_PMCR_ID_SHIFT  16
-> @@ -23,10 +26,57 @@
->  #define PMU_PMCR_IMP_SHIFT 24
->  #define PMU_PMCR_IMP_MASK  0xff
->  
-> +#define ID_DFR0_PERFMON_SHIFT 24
-> +#define ID_DFR0_PERFMON_MASK  0xf
-> +
-> +#define PMU_CYCLE_IDX         31
-> +
-> +#define NR_SAMPLES 10
-> +
-> +static unsigned int pmu_version;
->  #if defined(__arm__)
->  DEFINE_GET_SYSREG32(pmcr, 0, c9, c12, 0)
-> +DEFINE_SET_SYSREG32(pmcr, 0, c9, c12, 0)
-> +DEFINE_GET_SYSREG32(id_dfr0, 0, c0, c1, 2)
-> +DEFINE_SET_SYSREG32(pmselr, 0, c9, c12, 5)
-> +DEFINE_SET_SYSREG32(pmxevtyper, 0, c9, c13, 1)
-> +DEFINE_GET_SYSREG32(pmccntr32, 0, c9, c13, 0)
-> +DEFINE_SET_SYSREG32(pmccntr32, 0, c9, c13, 0)
-> +DEFINE_GET_SYSREG64(pmccntr64, 0, c9)
-> +DEFINE_SET_SYSREG64(pmccntr64, 0, c9)
-> +DEFINE_SET_SYSREG32(pmcntenset, 0, c9, c12, 1)
+Paolo, Radim,
 
-Seeing how we get lots of redundant looking lines, I think instead
-of defining DEFINE_SET/GET_SYSREG32/64, we should instead have
+Hopefully, this is the last update for 4.9. This time, a single patch
+that prevents bogus acknoledgement of interrupts.
 
-DEFINE_SYSREG32/64      ... creates both get_<reg> and set_<reg>
-DEFINE_SYSREG32/64_RO   ... creates just get_<reg>
+It'd be great if this could make it into v4.9-final
 
-> +
-> +static inline uint64_t get_pmccntr(void)
-> +{
-> +	if (pmu_version == 0x3)
-> +		return get_pmccntr64();
-> +	else
-> +		return get_pmccntr32();
-> +}
-> +
-> +static inline void set_pmccntr(uint64_t value)
-> +{
-> +	if (pmu_version == 0x3)
-> +		set_pmccntr64(value);
-> +	else
-> +		set_pmccntr32(value & 0xffffffff);
-> +}
+Thanks,
 
-So the two accessors above are exceptional, which is why we don't
-use SYSREG for them. These can have uint64_t for there external
-interface. We can't require 'unsigned long' or 'unsigned long long'
+	M.
 
-> +
-> +/* PMCCFILTR is an obsolete name for PMXEVTYPER31 in ARMv7 */
-> +static inline void set_pmccfiltr(uint32_t value)
-> +{
-> +	set_pmselr(PMU_CYCLE_IDX);
-> +	set_pmxevtyper(value);
-> +	isb();
-> +}
->  #elif defined(__aarch64__)
->  DEFINE_GET_SYSREG32(pmcr, el0)
-> +DEFINE_SET_SYSREG32(pmcr, el0)
-> +DEFINE_GET_SYSREG32(id_dfr0, el1)
-> +DEFINE_GET_SYSREG64(pmccntr, el0);
-> +DEFINE_SET_SYSREG64(pmccntr, el0);
-> +DEFINE_SET_SYSREG32(pmcntenset, el0);
-> +DEFINE_SET_SYSREG32(pmccfiltr, el0);
->  #endif
->  
->  /*
-> @@ -52,11 +102,55 @@ static bool check_pmcr(void)
->  	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
->  }
->  
-> +/*
-> + * Ensure that the cycle counter progresses between back-to-back reads.
-> + */
-> +static bool check_cycles_increase(void)
-> +{
-> +	bool success = true;
-> +
-> +	/* init before event access, this test only cares about cycle count */
-> +	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> +	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> +	set_pmccntr(0);
-> +
-> +	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
-> +
-> +	for (int i = 0; i < NR_SAMPLES; i++) {
-> +		uint64_t a, b;
-> +
-> +		a = get_pmccntr();
-> +		b = get_pmccntr();
-> +
-> +		if (a >= b) {
-> +			printf("Read %"PRId64" then %"PRId64".\n", a, b);
-> +			success = false;
-> +			break;
-> +		}
-> +	}
-> +
-> +	set_pmcr(get_pmcr() & ~PMU_PMCR_E);
-> +
-> +	return success;
-> +}
-> +
-> +void pmu_init(void)
-> +{
-> +	uint32_t dfr0;
-> +
-> +	/* probe pmu version */
-> +	dfr0 = get_id_dfr0();
-> +	pmu_version = (dfr0 >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
-> +	report_info("PMU version: %d", pmu_version);
-> +}
-> +
->  int main(void)
->  {
->  	report_prefix_push("pmu");
->  
-> +	pmu_init();
->  	report("Control register", check_pmcr());
-> +	report("Monotonically increasing cycle count", check_cycles_increase());
->  
->  	return report_summary();
->  }
-> -- 
-> 1.8.3.1
-> 
->
+The following changes since commit b112c84a6ff035271d41d548c10215f18443d6a6:
 
-drew 
+  KVM: arm64: Fix the issues when guest PMCCFILTR is configured (2016-11-18 09:06:58 +0000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.9-rc7
+
+for you to fetch changes up to 8ca18eec2b2276b449c1dc86b98bf083c5fe4e09:
+
+  KVM: arm/arm64: vgic: Don't notify EOI for non-SPIs (2016-11-24 13:12:07 +0000)
+
+----------------------------------------------------------------
+KVM/ARM updates for v4.9-rc7
+
+- Do not call kvm_notify_acked for PPIs
+
+----------------------------------------------------------------
+Marc Zyngier (1):
+      KVM: arm/arm64: vgic: Don't notify EOI for non-SPIs
+
+ virt/kvm/arm/vgic/vgic-v2.c | 6 ++++--
+ virt/kvm/arm/vgic/vgic-v3.c | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
