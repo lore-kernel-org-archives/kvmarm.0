@@ -1,23 +1,39 @@
-From: Wei Huang <wei@redhat.com>
+From: Christopher Covington <cov@codeaurora.org>
 Subject: Re: [kvm-unit-tests PATCH v13 4/4] arm: pmu: Add CPI checking
-Date: Thu, 1 Dec 2016 15:12:39 -0600
-Message-ID: <17fae7e0-86e4-12ec-55dd-880cb80859ae@redhat.com>
+Date: Thu, 1 Dec 2016 16:18:23 -0500
+Message-ID: <1b3b7bd6-3e53-9d71-d177-933c5a606c16@codeaurora.org>
 References: <1480569402-8848-1-git-send-email-wei@redhat.com>
  <1480569402-8848-5-git-send-email-wei@redhat.com>
  <0ff887b9-3e72-87aa-e077-7c78b3073dbe@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3921A404FF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 16:17:38 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id NYAY6fUJuL9g for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Dec 2016 16:17:36 -0500 (EST)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C58694047D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 16:17:36 -0500 (EST)
 In-Reply-To: <0ff887b9-3e72-87aa-e077-7c78b3073dbe@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, cov@codeaurora.org
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org, alistair.francis@xilinx.com, croberts@codeaurora.org, alindsay@codeaurora.org, drjones@redhat.com
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>, Wei Huang <wei@redhat.com>
+Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 12/01/2016 02:27 PM, Andre Przywara wrote:
+On 12/01/2016 03:27 PM, Andre Przywara wrote:
 > Hi,
 > 
 > On 01/12/16 05:16, Wei Huang wrote:
@@ -140,10 +156,6 @@ On 12/01/2016 02:27 PM, Andre Przywara wrote:
 > In general I find the output quite confusing, actually distracting from
 > the other, actual tests. To make it more readable, I tweaked it a bit to
 > look like:
-
-Formatting the output can be useful and it indeed makes the output
-easier to read.
-
 >   4: 9996  173  222  122  118  119  120  212  240  233 avg=1155: 288 cpi
 >  36:  773  282  291  314  291  335  315  264  162  308 avg= 333:   9 cpi
 >  68:  229  356  400  339  203  201  335  233  201  372 avg= 286:   4 cpi
@@ -196,78 +208,31 @@ easier to read.
 > 
 > In general I question the usefulness of the cpi/ipc output, it didn't
 > seem meaningful in any way to me, neither in KVM or in TCG.
-
-For KVM, CPI is useful for (vaguely) figuring out the total time spent
-on emulation: KVM exit, perf_event calls, returning results. This
-especially is true when i is small. For TCG, CPI is related to the cpi
-parameter passed from main() function. The average CPI in check_cpi()
-should always be the same as the one from main() under TCG mode;
-otherwise QEMU is wrong. So I think CPI is still useful. But I agree
-that IPC can be removed.
-
 > See the last line (68: ...) in the example above, we shouldn't use an
 > average with that deviation for statistical purposes.
 > For KVM I get values ranging from 60 to 4383 cpi, which doesn't convey
 > any real information to me, in fact the actual cycles look like constant
 > to me, probably due to emulation overhead.
-
-Constants should only happen under TCG modes, which is expected.
-
 > 
 > So what are we supposed to learn from those numbers?
-> 
-> Cheers,
-> Andre.
-> 
->> +	}
->> +
->> +	return true;
->> +}
->> +
->>  void pmu_init(void)
->>  {
->>  	uint32_t dfr0;
->> @@ -144,13 +259,19 @@ void pmu_init(void)
->>  	report_info("PMU version: %d", pmu_version);
->>  }
->>  
->> -int main(void)
->> +int main(int argc, char *argv[])
->>  {
->> +	int cpi = 0;
->> +
->> +	if (argc > 1)
->> +		cpi = atol(argv[1]);
->> +
->>  	report_prefix_push("pmu");
->>  
->>  	pmu_init();
->>  	report("Control register", check_pmcr());
->>  	report("Monotonically increasing cycle count", check_cycles_increase());
->> +	report("Cycle/instruction ratio", check_cpi(cpi));
->>  
->>  	return report_summary();
->>  }
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index 816f494..044d97c 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -63,3 +63,17 @@ groups = pci
->>  [pmu]
->>  file = pmu.flat
->>  groups = pmu
->> +
->> +# Test PMU support (TCG) with -icount IPC=1
->> +[pmu-tcg-icount-1]
->> +file = pmu.flat
->> +extra_params = -icount 0 -append '1'
->> +groups = pmu
->> +accel = tcg
->> +
->> +# Test PMU support (TCG) with -icount IPC=256
->> +[pmu-tcg-icount-256]
->> +file = pmu.flat
->> +extra_params = -icount 8 -append '256'
->> +groups = pmu
->> +accel = tcg
->>
+
+I think they were mostly useful in debugging the checking of TCG's
+-icount mode, where the numbers are precise.
+
+I think seeing variable numbers from TCG when -icount is off illustrates
+why -icount is useful. But justifying TCG best practices is a non-goal of
+kvm-unit-tests.
+
+I'd like to think is possible to see anomalies in the KVM info which are
+due to bugs, but perhaps that's unrealistic or unlikely.
+
+Feel free to drop the prints, or only print in -icount mode, or only print
+when there's error in -icount mode.
+
+Regards,
+Cov
+
+-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
+Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code
+Aurora Forum, a Linux Foundation Collaborative Project.
