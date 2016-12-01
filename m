@@ -1,236 +1,253 @@
-From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [PATCH v3] KVM: arm/arm64: Access CNTHCTL_EL2 bit fields correctly
-Date: Thu,  1 Dec 2016 14:32:05 -0500
-Message-ID: <1480620725-9864-1-git-send-email-jintack@cs.columbia.edu>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [kvm-unit-tests PATCH v13 4/4] arm: pmu: Add CPI checking
+Date: Thu, 1 Dec 2016 20:27:33 +0000
+Message-ID: <0ff887b9-3e72-87aa-e077-7c78b3073dbe@arm.com>
+References: <1480569402-8848-1-git-send-email-wei@redhat.com>
+ <1480569402-8848-5-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D9E5406F1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 14:31:24 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8YNp3O-PmkOd for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Dec 2016 14:31:23 -0500 (EST)
-Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
- [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 187E140499
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 14:31:22 -0500 (EST)
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uB1JS5su026997
- for <kvmarm@lists.cs.columbia.edu>; Thu, 1 Dec 2016 14:32:14 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id AC10688
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 14:32:14 -0500 (EST)
-Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
- [128.59.72.16]) by hazelnut (Postfix) with ESMTP id 5E82088
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 14:32:14 -0500 (EST)
-Received: from mail-qt0-f199.google.com (mail-qt0-f199.google.com
- [209.85.216.199])
- by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uB1JWE4L027720
- (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Thu, 1 Dec 2016 14:32:14 -0500
-Received: by mail-qt0-f199.google.com with SMTP id 41so157584532qtn.7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Dec 2016 11:32:14 -0800 (PST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, geoff@infradead.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, pbonzini@redhat.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1480569402-8848-5-git-send-email-wei@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Wei Huang <wei@redhat.com>, cov@codeaurora.org
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org, alistair.francis@xilinx.com, croberts@codeaurora.org, alindsay@codeaurora.org, drjones@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Current KVM world switch code is unintentionally setting wrong bits to
-CNTHCTL_EL2 when E2H == 1, which may allow guest OS to access physical
-timer.  Bit positions of CNTHCTL_EL2 are changing depending on
-HCR_EL2.E2H bit.  EL1PCEN and EL1PCTEN are 1st and 0th bits when E2H is
-not set, but they are 11th and 10th bits respectively when E2H is set.
+Hi,
 
-In fact, on VHE we only need to set those bits once, not for every world
-switch. This is because the host kernel runs in EL2 with HCR_EL2.TGE ==
-1, which makes those bits have no effect for the host kernel execution.
-So we just set those bits once for guests, and that's it.
+On 01/12/16 05:16, Wei Huang wrote:
+> From: Christopher Covington <cov@codeaurora.org>
+> 
+> Calculate the numbers of cycles per instruction (CPI) implied by ARM
+> PMU cycle counter values. The code includes a strict checking facility
+> intended for the -icount option in TCG mode in the configuration file.
+> 
+> Signed-off-by: Christopher Covington <cov@codeaurora.org>
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arm/pmu.c         | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  arm/unittests.cfg |  14 +++++++
+>  2 files changed, 136 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index 3566a27..29d7c2c 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -69,6 +69,27 @@ static inline void set_pmccfiltr(uint32_t value)
+>  	set_pmxevtyper(value);
+>  	isb();
+>  }
+> +
+> +/*
+> + * Extra instructions inserted by the compiler would be difficult to compensate
+> + * for, so hand assemble everything between, and including, the PMCR accesses
+> + * to start and stop counting. isb instructions were inserted to make sure
+> + * pmccntr read after this function returns the exact instructions executed in
+> + * the controlled block. Total instrs = isb + mcr + 2*loop = 2 + 2*loop.
+> + */
+> +static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+> +{
+> +	asm volatile(
+> +	"	mcr	p15, 0, %[pmcr], c9, c12, 0\n"
+> +	"	isb\n"
+> +	"1:	subs	%[loop], %[loop], #1\n"
+> +	"	bgt	1b\n"
+> +	"	mcr	p15, 0, %[z], c9, c12, 0\n"
+> +	"	isb\n"
+> +	: [loop] "+r" (loop)
+> +	: [pmcr] "r" (pmcr), [z] "r" (0)
+> +	: "cc");
+> +}
+>  #elif defined(__aarch64__)
+>  DEFINE_GET_SYSREG32(pmcr, el0)
+>  DEFINE_SET_SYSREG32(pmcr, el0)
+> @@ -77,6 +98,27 @@ DEFINE_GET_SYSREG64(pmccntr, el0);
+>  DEFINE_SET_SYSREG64(pmccntr, el0);
+>  DEFINE_SET_SYSREG32(pmcntenset, el0);
+>  DEFINE_SET_SYSREG32(pmccfiltr, el0);
+> +
+> +/*
+> + * Extra instructions inserted by the compiler would be difficult to compensate
+> + * for, so hand assemble everything between, and including, the PMCR accesses
+> + * to start and stop counting. isb instructions are inserted to make sure
+> + * pmccntr read after this function returns the exact instructions executed
+> + * in the controlled block. Total instrs = isb + msr + 2*loop = 2 + 2*loop.
+> + */
+> +static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+> +{
+> +	asm volatile(
+> +	"	msr	pmcr_el0, %[pmcr]\n"
+> +	"	isb\n"
+> +	"1:	subs	%[loop], %[loop], #1\n"
+> +	"	b.gt	1b\n"
+> +	"	msr	pmcr_el0, xzr\n"
+> +	"	isb\n"
+> +	: [loop] "+r" (loop)
+> +	: [pmcr] "r" (pmcr)
+> +	: "cc");
+> +}
+>  #endif
+>  
+>  /*
+> @@ -134,6 +176,79 @@ static bool check_cycles_increase(void)
+>  	return success;
+>  }
+>  
+> +/*
+> + * Execute a known number of guest instructions. Only even instruction counts
+> + * greater than or equal to 4 are supported by the in-line assembly code. The
+> + * control register (PMCR_EL0) is initialized with the provided value (allowing
+> + * for example for the cycle counter or event counters to be reset). At the end
+> + * of the exact instruction loop, zero is written to PMCR_EL0 to disable
+> + * counting, allowing the cycle counter or event counters to be read at the
+> + * leisure of the calling code.
+> + */
+> +static void measure_instrs(int num, uint32_t pmcr)
+> +{
+> +	int loop = (num - 2) / 2;
+> +
+> +	assert(num >= 4 && ((num - 2) % 2 == 0));
+> +	precise_instrs_loop(loop, pmcr);
+> +}
+> +
+> +/*
+> + * Measure cycle counts for various known instruction counts. Ensure that the
+> + * cycle counter progresses (similar to check_cycles_increase() but with more
+> + * instructions and using reset and stop controls). If supplied a positive,
+> + * nonzero CPI parameter, also strictly check that every measurement matches
+> + * it. Strict CPI checking is used to test -icount mode.
+> + */
+> +static bool check_cpi(int cpi)
+> +{
+> +	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
+> +
+> +	/* init before event access, this test only cares about cycle count */
+> +	set_pmcntenset(1 << PMU_CYCLE_IDX);
+> +	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+> +
+> +	if (cpi > 0)
+> +		printf("Checking for CPI=%d.\n", cpi);
+> +	printf("instrs : cycles0 cycles1 ...\n");
 
-Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
----
-v2->v3: 
-- Perform the initialization including CPU hotplug case.
-- Move has_vhe() to asm/virt.h
+Do we really need this line?
 
-v1->v2: 
-- Skip configuring cnthctl_el2 in world switch path on VHE system.
-- Write patch based on linux-next.
----
- arch/arm/include/asm/virt.h   |  5 +++++
- arch/arm/kvm/arm.c            |  3 +++
- arch/arm64/include/asm/virt.h | 10 ++++++++++
- include/kvm/arm_arch_timer.h  |  1 +
- virt/kvm/arm/arch_timer.c     | 23 +++++++++++++++++++++++
- virt/kvm/arm/hyp/timer-sr.c   | 33 +++++++++++++++++++++------------
- 6 files changed, 63 insertions(+), 12 deletions(-)
+In general I find the output quite confusing, actually distracting from
+the other, actual tests. To make it more readable, I tweaked it a bit to
+look like:
+  4: 9996  173  222  122  118  119  120  212  240  233 avg=1155: 288 cpi
+ 36:  773  282  291  314  291  335  315  264  162  308 avg= 333:   9 cpi
+ 68:  229  356  400  339  203  201  335  233  201  372 avg= 286:   4 cpi
+....
+with some padding hints and limiting the line to at most 80 characters, by:
 
-diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
-index a2e75b8..6dae195 100644
---- a/arch/arm/include/asm/virt.h
-+++ b/arch/arm/include/asm/virt.h
-@@ -80,6 +80,11 @@ static inline bool is_kernel_in_hyp_mode(void)
- 	return false;
- }
- 
-+static inline bool has_vhe(void)
-+{
-+	return false;
-+}
-+
- /* The section containing the hypervisor idmap text */
- extern char __hyp_idmap_text_start[];
- extern char __hyp_idmap_text_end[];
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 8f92efa..13e54e8 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -1099,6 +1099,9 @@ static void cpu_init_hyp_mode(void *dummy)
- 	__cpu_init_hyp_mode(pgd_ptr, hyp_stack_ptr, vector_ptr);
- 	__cpu_init_stage2();
- 
-+	if (is_kernel_in_hyp_mode())
-+		kvm_timer_init_vhe();
-+
- 	kvm_arm_init_debug();
- }
- 
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index fea1073..b043cfd 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -47,6 +47,7 @@
- #include <asm/ptrace.h>
- #include <asm/sections.h>
- #include <asm/sysreg.h>
-+#include <asm/cpufeature.h>
- 
- /*
-  * __boot_cpu_mode records what mode CPUs were booted in.
-@@ -80,6 +81,15 @@ static inline bool is_kernel_in_hyp_mode(void)
- 	return read_sysreg(CurrentEL) == CurrentEL_EL2;
- }
- 
-+static inline bool has_vhe(void)
-+{
-+#ifdef CONFIG_ARM64_VHE
-+	if (cpus_have_const_cap(ARM64_HAS_VIRT_HOST_EXTN))
-+		return true;
-+#endif
-+	return false;
-+}
-+
- #ifdef CONFIG_ARM64_VHE
- extern void verify_cpu_run_el(void);
- #else
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index dda39d8..2d54903 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -76,4 +76,5 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 
- void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
- 
-+void kvm_timer_init_vhe(void);
- #endif
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 17b8fa5..c7c3bfd 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -24,6 +24,7 @@
- 
- #include <clocksource/arm_arch_timer.h>
- #include <asm/arch_timer.h>
-+#include <asm/kvm_hyp.h>
- 
- #include <kvm/arm_vgic.h>
- #include <kvm/arm_arch_timer.h>
-@@ -507,3 +508,25 @@ void kvm_timer_init(struct kvm *kvm)
- {
- 	kvm->arch.timer.cntvoff = kvm_phys_timer_read();
- }
-+
-+/*
-+ * On VHE system, we only need to configure trap on physical timer and counter
-+ * accesses in EL0 and EL1 once, not for every world switch.
-+ * The host kernel runs at EL2 with HCR_EL2.TGE == 1,
-+ * and this makes those bits have no effect for the host kernel execution.
-+ */
-+void kvm_timer_init_vhe(void)
-+{
-+	/* When HCR_EL2.E2H ==1, EL1PCEN and EL1PCTEN are shifted by 10 */
-+	u32 cnthctl_shift = 10;
-+	u64 val;
-+
-+	/*
-+	 * Disallow physical timer access for the guest.
-+	 * Physical counter access is allowed.
-+	 */
-+	val = read_sysreg(cnthctl_el2);
-+	val &= ~(CNTHCTL_EL1PCEN << cnthctl_shift);
-+	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
-+	write_sysreg(val, cnthctl_el2);
-+}
-diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
-index 798866a..63e28dd 100644
---- a/virt/kvm/arm/hyp/timer-sr.c
-+++ b/virt/kvm/arm/hyp/timer-sr.c
-@@ -35,10 +35,16 @@ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
- 	/* Disable the virtual timer */
- 	write_sysreg_el0(0, cntv_ctl);
- 
--	/* Allow physical timer/counter access for the host */
--	val = read_sysreg(cnthctl_el2);
--	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
--	write_sysreg(val, cnthctl_el2);
-+	/*
-+	 * We don't need to do this for VHE since the host kernel runs in EL2
-+	 * with HCR_EL2.TGE ==1, which makes those bits have no impact.
-+	 */
-+	if (!has_vhe()) {
-+		/* Allow physical timer/counter access for the host */
-+		val = read_sysreg(cnthctl_el2);
-+		val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
-+		write_sysreg(val, cnthctl_el2);
-+	}
- 
- 	/* Clear cntvoff for the host */
- 	write_sysreg(0, cntvoff_el2);
-@@ -50,14 +56,17 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	u64 val;
- 
--	/*
--	 * Disallow physical timer access for the guest
--	 * Physical counter access is allowed
--	 */
--	val = read_sysreg(cnthctl_el2);
--	val &= ~CNTHCTL_EL1PCEN;
--	val |= CNTHCTL_EL1PCTEN;
--	write_sysreg(val, cnthctl_el2);
-+	/* Those bits are already configured at boot on VHE-system */
-+	if (!has_vhe()) {
-+		/*
-+		 * Disallow physical timer access for the guest
-+		 * Physical counter access is allowed
-+		 */
-+		val = read_sysreg(cnthctl_el2);
-+		val &= ~CNTHCTL_EL1PCEN;
-+		val |= CNTHCTL_EL1PCTEN;
-+		write_sysreg(val, cnthctl_el2);
-+	}
- 
- 	if (timer->enabled) {
- 		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
--- 
-1.9.1
+> +
+> +	for (unsigned int i = 4; i < 300; i += 32) {
+> +		uint64_t avg, sum = 0;
+> +
+> +		printf("%d :", i);
+
+                printf("%3d: ", i);
+
+> +		for (int j = 0; j < NR_SAMPLES; j++) {
+> +			uint64_t cycles;
+> +
+> +			set_pmccntr(0);
+> +			measure_instrs(i, pmcr);
+> +			cycles = get_pmccntr();
+> +			printf(" %"PRId64"", cycles);
+
+                        printf(" %4"PRId64"", cycles);
+
+> +
+> +			if (!cycles) {
+> +				printf("\ncycles not incrementing!\n");
+> +				return false;
+> +			} else if (cpi > 0 && cycles != i * cpi) {
+> +				printf("\nunexpected cycle count received!\n");
+> +				return false;
+> +			} else if ((cycles >> 32) != 0) {
+> +				/* The cycles taken by the loop above should
+> +				 * fit in 32 bits easily. We check the upper
+> +				 * 32 bits of the cycle counter to make sure
+> +				 * there is no supprise. */
+> +				printf("\ncycle count bigger than 32bit!\n");
+> +				return false;
+> +			}
+> +
+> +			sum += cycles;
+> +		}
+> +		avg = sum / NR_SAMPLES;
+> +		printf(" sum=%"PRId64" avg=%"PRId64" avg_ipc=%"PRId64" "
+> +		       "avg_cpi=%"PRId64"\n", sum, avg, i / avg, avg / i);
+
+                printf(" avg=%4"PRId64": %3"PRId64" %s\n",
+                       sum / NR_SAMPLES, i > avg ? i / avg : avg / i,
+                       i > avg ? "ipc" : "cpi");
+
+In general I question the usefulness of the cpi/ipc output, it didn't
+seem meaningful in any way to me, neither in KVM or in TCG.
+See the last line (68: ...) in the example above, we shouldn't use an
+average with that deviation for statistical purposes.
+For KVM I get values ranging from 60 to 4383 cpi, which doesn't convey
+any real information to me, in fact the actual cycles look like constant
+to me, probably due to emulation overhead.
+
+So what are we supposed to learn from those numbers?
+
+Cheers,
+Andre.
+
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  void pmu_init(void)
+>  {
+>  	uint32_t dfr0;
+> @@ -144,13 +259,19 @@ void pmu_init(void)
+>  	report_info("PMU version: %d", pmu_version);
+>  }
+>  
+> -int main(void)
+> +int main(int argc, char *argv[])
+>  {
+> +	int cpi = 0;
+> +
+> +	if (argc > 1)
+> +		cpi = atol(argv[1]);
+> +
+>  	report_prefix_push("pmu");
+>  
+>  	pmu_init();
+>  	report("Control register", check_pmcr());
+>  	report("Monotonically increasing cycle count", check_cycles_increase());
+> +	report("Cycle/instruction ratio", check_cpi(cpi));
+>  
+>  	return report_summary();
+>  }
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 816f494..044d97c 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -63,3 +63,17 @@ groups = pci
+>  [pmu]
+>  file = pmu.flat
+>  groups = pmu
+> +
+> +# Test PMU support (TCG) with -icount IPC=1
+> +[pmu-tcg-icount-1]
+> +file = pmu.flat
+> +extra_params = -icount 0 -append '1'
+> +groups = pmu
+> +accel = tcg
+> +
+> +# Test PMU support (TCG) with -icount IPC=256
+> +[pmu-tcg-icount-256]
+> +file = pmu.flat
+> +extra_params = -icount 8 -append '256'
+> +groups = pmu
+> +accel = tcg
+> 
