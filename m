@@ -1,25 +1,27 @@
 From: Wei Huang <wei@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v13 3/4] arm: pmu: Check cycle
- count increases
-Date: Thu, 1 Dec 2016 11:36:55 -0600
-Message-ID: <cb8f7b58-504a-d70f-a74e-a520b0d3d5c1@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v13 3/4] arm: pmu: Check cycle count
+ increases
+Date: Thu, 1 Dec 2016 11:39:20 -0600
+Message-ID: <04f420f1-666e-07e9-3c97-fab4acf0ebcf@redhat.com>
 References: <1480569402-8848-1-git-send-email-wei@redhat.com>
  <1480569402-8848-4-git-send-email-wei@redhat.com>
- <20161201091848.vrr7ojk5snmz6gv3@kamzik.brq.redhat.com>
+ <b19abcd1-c59d-5b72-4cd5-9fcefc493a1e@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20161201091848.vrr7ojk5snmz6gv3@kamzik.brq.redhat.com>
+In-Reply-To: <b19abcd1-c59d-5b72-4cd5-9fcefc493a1e@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: cov@codeaurora.org, alindsay@codeaurora.org, kvm@vger.kernel.org, andre.przywara@arm.com, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>, cov@codeaurora.org
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org, alistair.francis@xilinx.com, croberts@codeaurora.org, alindsay@codeaurora.org, drjones@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 12/01/2016 03:18 AM, Andrew Jones wrote:
-> On Wed, Nov 30, 2016 at 11:16:41PM -0600, Wei Huang wrote:
+On 12/01/2016 05:27 AM, Andre Przywara wrote:
+> Hi,
+> 
+> On 01/12/16 05:16, Wei Huang wrote:
 >> From: Christopher Covington <cov@codeaurora.org>
 >>
 >> Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
@@ -69,18 +71,6 @@ On 12/01/2016 03:18 AM, Andrew Jones wrote:
 >> +DEFINE_GET_SYSREG64(pmccntr64, 0, c9)
 >> +DEFINE_SET_SYSREG64(pmccntr64, 0, c9)
 >> +DEFINE_SET_SYSREG32(pmcntenset, 0, c9, c12, 1)
-> 
-> Seeing how we get lots of redundant looking lines, I think instead
-> of defining DEFINE_SET/GET_SYSREG32/64, we should instead have
-> 
-> DEFINE_SYSREG32/64      ... creates both get_<reg> and set_<reg>
-> DEFINE_SYSREG32/64_RO   ... creates just get_<reg>
-
-Don't like the naming. I think we can create a new macro, named
-DEFINE_GET_SET_SYSREG32/64. I know it is boring, but readers should get
-the idea easily.
-
-> 
 >> +
 >> +static inline uint64_t get_pmccntr(void)
 >> +{
@@ -97,11 +87,6 @@ the idea easily.
 >> +	else
 >> +		set_pmccntr32(value & 0xffffffff);
 >> +}
-> 
-> So the two accessors above are exceptional, which is why we don't
-> use SYSREG for them. These can have uint64_t for there external
-> interface. We can't require 'unsigned long' or 'unsigned long long'
-> 
 >> +
 >> +/* PMCCFILTR is an obsolete name for PMXEVTYPER31 in ARMv7 */
 >> +static inline void set_pmccfiltr(uint32_t value)
@@ -136,6 +121,12 @@ the idea easily.
 >> +	set_pmcntenset(1 << PMU_CYCLE_IDX);
 >> +	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
 >> +	set_pmccntr(0);
+> 
+> Why do we need this? Shouldn't PMU_PMCR_C below take care of that?
+
+PMU_PMCR_C does reset cycle counter, I can remove this one.
+
+> 
 >> +
 >> +	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
 >> +
@@ -158,6 +149,23 @@ the idea easily.
 >> +}
 >> +
 >> +void pmu_init(void)
+> 
+> Mmh, this function doesn't really initialize anything, does it?
+> Should it be named pmu_available() or pmu_version() or the like?
+> 
+
+This function used to contain cycle counter configuration code. It sets
+up PMCCNFILTR, PMCNTENSET, etc. Since then, the configuration code has
+been moved to sub-unit tests. We can change its name to something like
+pmu_probe().
+
+> And should we bail out early here (or rather at the caller) if this
+> register reports that no PMU is available? For instance by making it
+> return a boolean?
+
+This could do.
+
+> 
 >> +{
 >> +	uint32_t dfr0;
 >> +
@@ -174,13 +182,13 @@ the idea easily.
 >> +	pmu_init();
 >>  	report("Control register", check_pmcr());
 >> +	report("Monotonically increasing cycle count", check_cycles_increase());
->>  
->>  	return report_summary();
->>  }
->> -- 
->> 1.8.3.1
->>
->>
 > 
-> drew 
+> I wonder if we should skip this test if check_pmcr() has returned false
+> before? We let it return a boolean, so it seems quite natural to use
+> this information here.
+> This would avoid a lot of false FAILs due to the PMU not being available
+> (because QEMU is too old, for instance).
+> 
+> Cheers,
+> Andre.
 > 
