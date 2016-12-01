@@ -1,25 +1,21 @@
 From: Wei Huang <wei@redhat.com>
-Subject: Re: Unable to use perf in VM
-Date: Wed, 30 Nov 2016 13:17:55 -0600
-Message-ID: <56fd35f8-76ba-3d5d-f1e0-7df5ff8d396a@redhat.com>
-References: <70374841-ecb1-a6c3-ed43-0f39e2d5fec2@riken.jp>
- <8b2a3cfd-57a0-70ac-ef50-672f8040291d@arm.com>
- <a81f82da-322a-a52b-de0e-316b7ce5f463@arm.com>
+Subject: [kvm-unit-tests PATCH v13 0/4] ARM PMU tests
+Date: Wed, 30 Nov 2016 23:16:38 -0600
+Message-ID: <1480569402-8848-1-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40A7840665
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2016 14:17:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 42CAB404FF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 00:15:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mcc5tLtE8oel for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Nov 2016 14:17:09 -0500 (EST)
+ with ESMTP id hFEHEo-Dwc0i for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Dec 2016 00:15:57 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8D5640286
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2016 14:17:08 -0500 (EST)
-In-Reply-To: <a81f82da-322a-a52b-de0e-316b7ce5f463@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F0CD4047D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 00:15:56 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,68 +25,39 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Itaru Kitayama <itaru.kitayama@riken.jp>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel@lists.infradead.org, Shannon Zhao <shannon.zhao@linaro.org>
-Cc: Hoan Tran <hotran@apm.com>, Tai Tri Nguyen <ttnguyen@apm.com>
+To: cov@codeaurora.org
+Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, andre.przywara@arm.com, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Changes from v12:
+* Define macros for system register accessors
+* Re-write PMU code using the newly-defined macros
+* Code tested under both AArch32 and AArch64 modes
 
+Note:
+1) Current KVM code has bugs in handling PMCCFILTR write. A fix (see
+below) is required for this unit testing code to work correctly under
+KVM mode.
+https://lists.cs.columbia.edu/pipermail/kvmarm/2016-November/022134.html.
 
-On 11/30/2016 07:37 AM, Marc Zyngier wrote:
-> On 30/11/16 11:48, Marc Zyngier wrote:
->> + Shannon
->>
->> On 29/11/16 22:04, Itaru Kitayama wrote:
->>> Hi,
->>>
->>> In a VM (virsh controlled, KVM acceleration enabled) on a recent
->>> kvmarm kernel host, I find I am unable to use perf to obtain
->>> performance statistics for a complex task like kernel build.
->>> (I've verified this is seen with a Fedora 25 VM and host combination
->>> as well)
->>> APM folks CC'ed think this might be caused by a bug in the core PMU 
->>> framework code, thus I'd like to have experts opinion on this issue.
->>>
->>> [root@localhost linux]# perf stat -B make
->>>    CHK     include/config/kernel.release
->>> [  119.617684] git[1144]: undefined instruction: pc=fffffc000808ff30
->>> [  119.623040] Code: 51000442 92401042 d51b9ca2 d5033fdf (d53b9d40)
->>> [  119.627607] Internal error: undefined instruction: 0 [#1] SMP
->>
->> [...]
->>
->> In a VM running mainline hosted on an AMD Seattle box:
->>
->>  Performance counter stats for 'make':
->>
->>     1526089.499304      task-clock:u (msec)       #    0.932 CPUs utilized          
->>                  0      context-switches:u        #    0.000 K/sec                  
->>                  0      cpu-migrations:u          #    0.000 K/sec                  
->>           29527793      page-faults:u             #    0.019 M/sec                  
->>      2913174122673      cycles:u                  #    1.909 GHz                    
->>      2365040892322      instructions:u            #    0.81  insn per cycle         
->>    <not supported>      branches:u                                                  
->>        32049215378      branch-misses:u           #    0.00% of all branches        
->>
->>     1637.531444837 seconds time elapsed
->>
->> Running the same host kernel on a Mustang system, the guest explodes
->> in the way you reported. The failing instruction always seems to be
->> an access to pmxevcntr_el0 (I've seen both reads and writes).
->>
->> Funnily enough, it dies if you try any HW event other than cycles
->> ("perf stat -e cycles ls" works, and "perf stat -e instructions ls"
->> explodes). Which would tend to indicate that we're screwing up
->> the counter selection, but I have no proof of that (specially that
->> the Seattle guest is working just as expected).
-> 
-> It turns out that we *don't* inject an undef. It seems to be generated
-> locally at EL1.
-> 
-> Still digging.
+Thanks,
+-Wei
 
-Just FYI: I saw it on Mustang before. My initial thought was HW related,
-but without proof. I am interested to see your findings...
+Christopher Covington (3):
+  arm: Add PMU test
+  arm: pmu: Check cycle count increases
+  arm: pmu: Add CPI checking
 
-> 
-> 	M.
-> 
+Wei Huang (1):
+  arm: Define macros for accessing system registers
+
+ arm/Makefile.common       |   3 +-
+ arm/pmu.c                 | 277 ++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg         |  19 ++++
+ lib/arm/asm/processor.h   |  37 ++++++-
+ lib/arm64/asm/processor.h |  35 ++++--
+ 5 files changed, 358 insertions(+), 13 deletions(-)
+ create mode 100644 arm/pmu.c
+
+-- 
+1.8.3.1
