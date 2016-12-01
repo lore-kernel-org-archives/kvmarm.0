@@ -1,22 +1,22 @@
 From: Wei Huang <wei@redhat.com>
-Subject: [kvm-unit-tests PATCH v13 2/4] arm: Add PMU test
-Date: Wed, 30 Nov 2016 23:16:40 -0600
-Message-ID: <1480569402-8848-3-git-send-email-wei@redhat.com>
+Subject: [kvm-unit-tests PATCH v13 3/4] arm: pmu: Check cycle count increases
+Date: Wed, 30 Nov 2016 23:16:41 -0600
+Message-ID: <1480569402-8848-4-git-send-email-wei@redhat.com>
 References: <1480569402-8848-1-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF26F40693
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 00:16:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 81D7940783
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 00:16:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FXiNTIAwkLtX for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Dec 2016 00:16:04 -0500 (EST)
+ with ESMTP id n+li5+yRX2yd for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Dec 2016 00:16:07 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 22B0A404E7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 00:16:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A6FE404FF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 00:16:07 -0500 (EST)
 In-Reply-To: <1480569402-8848-1-git-send-email-wei@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,114 +33,143 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christopher Covington <cov@codeaurora.org>
 
-Beginning with a simple sanity check of the control register, add
-a unit test for the ARM Performance Monitors Unit (PMU). PMU register
-was read using the newly defined macros.
+Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
+even for the smallest delta of two subsequent reads.
 
 Signed-off-by: Christopher Covington <cov@codeaurora.org>
 Signed-off-by: Wei Huang <wei@redhat.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- arm/Makefile.common |  3 ++-
- arm/pmu.c           | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg   |  5 +++++
- 3 files changed, 69 insertions(+), 1 deletion(-)
- create mode 100644 arm/pmu.c
+ arm/pmu.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 94 insertions(+)
 
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index f37b5c2..5da2fdd 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -12,7 +12,8 @@ endif
- tests-common = \
- 	$(TEST_DIR)/selftest.flat \
- 	$(TEST_DIR)/spinlock-test.flat \
--	$(TEST_DIR)/pci-test.flat
-+	$(TEST_DIR)/pci-test.flat \
-+	$(TEST_DIR)/pmu.flat
- 
- all: test_cases
- 
 diff --git a/arm/pmu.c b/arm/pmu.c
-new file mode 100644
-index 0000000..1fe2b1a
---- /dev/null
+index 1fe2b1a..3566a27 100644
+--- a/arm/pmu.c
 +++ b/arm/pmu.c
-@@ -0,0 +1,62 @@
-+/*
-+ * Test the ARM Performance Monitors Unit (PMU).
-+ *
-+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU Lesser General Public License version 2.1 and
-+ * only version 2.1 as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
-+ * for more details.
-+ */
-+#include "libcflat.h"
-+#include "asm/barrier.h"
-+#include "asm/processor.h"
+@@ -16,6 +16,9 @@
+ #include "asm/barrier.h"
+ #include "asm/processor.h"
+ 
++#define PMU_PMCR_E         (1 << 0)
++#define PMU_PMCR_C         (1 << 2)
++#define PMU_PMCR_LC        (1 << 6)
+ #define PMU_PMCR_N_SHIFT   11
+ #define PMU_PMCR_N_MASK    0x1f
+ #define PMU_PMCR_ID_SHIFT  16
+@@ -23,10 +26,57 @@
+ #define PMU_PMCR_IMP_SHIFT 24
+ #define PMU_PMCR_IMP_MASK  0xff
+ 
++#define ID_DFR0_PERFMON_SHIFT 24
++#define ID_DFR0_PERFMON_MASK  0xf
 +
-+#define PMU_PMCR_N_SHIFT   11
-+#define PMU_PMCR_N_MASK    0x1f
-+#define PMU_PMCR_ID_SHIFT  16
-+#define PMU_PMCR_ID_MASK   0xff
-+#define PMU_PMCR_IMP_SHIFT 24
-+#define PMU_PMCR_IMP_MASK  0xff
++#define PMU_CYCLE_IDX         31
 +
-+#if defined(__arm__)
-+DEFINE_GET_SYSREG32(pmcr, 0, c9, c12, 0)
-+#elif defined(__aarch64__)
-+DEFINE_GET_SYSREG32(pmcr, el0)
-+#endif
++#define NR_SAMPLES 10
 +
-+/*
-+ * As a simple sanity check on the PMCR_EL0, ensure the implementer field isn't
-+ * null. Also print out a couple other interesting fields for diagnostic
-+ * purposes. For example, as of fall 2016, QEMU TCG mode doesn't implement
-+ * event counters and therefore reports zero event counters, but hopefully
-+ * support for at least the instructions event will be added in the future and
-+ * the reported number of event counters will become nonzero.
-+ */
-+static bool check_pmcr(void)
++static unsigned int pmu_version;
+ #if defined(__arm__)
+ DEFINE_GET_SYSREG32(pmcr, 0, c9, c12, 0)
++DEFINE_SET_SYSREG32(pmcr, 0, c9, c12, 0)
++DEFINE_GET_SYSREG32(id_dfr0, 0, c0, c1, 2)
++DEFINE_SET_SYSREG32(pmselr, 0, c9, c12, 5)
++DEFINE_SET_SYSREG32(pmxevtyper, 0, c9, c13, 1)
++DEFINE_GET_SYSREG32(pmccntr32, 0, c9, c13, 0)
++DEFINE_SET_SYSREG32(pmccntr32, 0, c9, c13, 0)
++DEFINE_GET_SYSREG64(pmccntr64, 0, c9)
++DEFINE_SET_SYSREG64(pmccntr64, 0, c9)
++DEFINE_SET_SYSREG32(pmcntenset, 0, c9, c12, 1)
++
++static inline uint64_t get_pmccntr(void)
 +{
-+	uint32_t pmcr;
-+
-+	pmcr = get_pmcr();
-+
-+	report_info("PMU implementer/ID code/counters: 0x%x(\"%c\")/0x%x/%d",
-+		    (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK,
-+		    ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) ? : ' ',
-+		    (pmcr >> PMU_PMCR_ID_SHIFT) & PMU_PMCR_ID_MASK,
-+		    (pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK);
-+
-+	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
++	if (pmu_version == 0x3)
++		return get_pmccntr64();
++	else
++		return get_pmccntr32();
 +}
 +
-+int main(void)
++static inline void set_pmccntr(uint64_t value)
 +{
-+	report_prefix_push("pmu");
-+
-+	report("Control register", check_pmcr());
-+
-+	return report_summary();
++	if (pmu_version == 0x3)
++		set_pmccntr64(value);
++	else
++		set_pmccntr32(value & 0xffffffff);
 +}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index ae32a42..816f494 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -58,3 +58,8 @@ groups = selftest
- [pci-test]
- file = pci-test.flat
- groups = pci
 +
-+# Test PMU support
-+[pmu]
-+file = pmu.flat
-+groups = pmu
++/* PMCCFILTR is an obsolete name for PMXEVTYPER31 in ARMv7 */
++static inline void set_pmccfiltr(uint32_t value)
++{
++	set_pmselr(PMU_CYCLE_IDX);
++	set_pmxevtyper(value);
++	isb();
++}
+ #elif defined(__aarch64__)
+ DEFINE_GET_SYSREG32(pmcr, el0)
++DEFINE_SET_SYSREG32(pmcr, el0)
++DEFINE_GET_SYSREG32(id_dfr0, el1)
++DEFINE_GET_SYSREG64(pmccntr, el0);
++DEFINE_SET_SYSREG64(pmccntr, el0);
++DEFINE_SET_SYSREG32(pmcntenset, el0);
++DEFINE_SET_SYSREG32(pmccfiltr, el0);
+ #endif
+ 
+ /*
+@@ -52,11 +102,55 @@ static bool check_pmcr(void)
+ 	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
+ }
+ 
++/*
++ * Ensure that the cycle counter progresses between back-to-back reads.
++ */
++static bool check_cycles_increase(void)
++{
++	bool success = true;
++
++	/* init before event access, this test only cares about cycle count */
++	set_pmcntenset(1 << PMU_CYCLE_IDX);
++	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
++	set_pmccntr(0);
++
++	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
++
++	for (int i = 0; i < NR_SAMPLES; i++) {
++		uint64_t a, b;
++
++		a = get_pmccntr();
++		b = get_pmccntr();
++
++		if (a >= b) {
++			printf("Read %"PRId64" then %"PRId64".\n", a, b);
++			success = false;
++			break;
++		}
++	}
++
++	set_pmcr(get_pmcr() & ~PMU_PMCR_E);
++
++	return success;
++}
++
++void pmu_init(void)
++{
++	uint32_t dfr0;
++
++	/* probe pmu version */
++	dfr0 = get_id_dfr0();
++	pmu_version = (dfr0 >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
++	report_info("PMU version: %d", pmu_version);
++}
++
+ int main(void)
+ {
+ 	report_prefix_push("pmu");
+ 
++	pmu_init();
+ 	report("Control register", check_pmcr());
++	report("Monotonically increasing cycle count", check_cycles_increase());
+ 
+ 	return report_summary();
+ }
 -- 
 1.8.3.1
