@@ -1,153 +1,167 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v13 2/4] arm: Add PMU test
-Date: Thu, 1 Dec 2016 11:28:47 +0000
-Message-ID: <369668b9-d158-45dd-562d-cf25cdaaa749@arm.com>
-References: <1480569402-8848-1-git-send-email-wei@redhat.com>
- <1480569402-8848-3-git-send-email-wei@redhat.com>
- <20161201090303.6vdo7iqlj2lfqqvv@kamzik.brq.redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+From: Jintack Lim <jintack@cs.columbia.edu>
+Subject: [PATCH v2] KVM: arm/arm64: Access CNTHCTL_EL2 bit fields correctly
+Date: Thu,  1 Dec 2016 06:38:30 -0500
+Message-ID: <1480592310-26079-1-git-send-email-jintack@cs.columbia.edu>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20161201090303.6vdo7iqlj2lfqqvv@kamzik.brq.redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
-Cc: cov@codeaurora.org, alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, andre.przywara@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Jintack Lim <jintack@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Current KVM world switch code is unintentionally setting wrong bits to
+CNTHCTL_EL2 when E2H == 1, which may allow guest OS to access physical
+timer.  Bit positions of CNTHCTL_EL2 are changing depending on
+HCR_EL2.E2H bit.  EL1PCEN and EL1PCTEN are 1st and 0th bits when E2H is
+not set, but they are 11th and 10th bits respectively when E2H is set.
 
-On 01/12/16 09:03, Andrew Jones wrote:
-> On Wed, Nov 30, 2016 at 11:16:40PM -0600, Wei Huang wrote:
->> From: Christopher Covington <cov@codeaurora.org>
->>
->> Beginning with a simple sanity check of the control register, add
->> a unit test for the ARM Performance Monitors Unit (PMU). PMU register
->> was read using the newly defined macros.
->>
->> Signed-off-by: Christopher Covington <cov@codeaurora.org>
->> Signed-off-by: Wei Huang <wei@redhat.com>
->> Reviewed-by: Andrew Jones <drjones@redhat.com>
->> ---
->>  arm/Makefile.common |  3 ++-
->>  arm/pmu.c           | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  arm/unittests.cfg   |  5 +++++
->>  3 files changed, 69 insertions(+), 1 deletion(-)
->>  create mode 100644 arm/pmu.c
->>
->> diff --git a/arm/Makefile.common b/arm/Makefile.common
->> index f37b5c2..5da2fdd 100644
->> --- a/arm/Makefile.common
->> +++ b/arm/Makefile.common
->> @@ -12,7 +12,8 @@ endif
->>  tests-common = \
->>  	$(TEST_DIR)/selftest.flat \
->>  	$(TEST_DIR)/spinlock-test.flat \
->> -	$(TEST_DIR)/pci-test.flat
->> +	$(TEST_DIR)/pci-test.flat \
->> +	$(TEST_DIR)/pmu.flat
->>  
->>  all: test_cases
->>  
->> diff --git a/arm/pmu.c b/arm/pmu.c
->> new file mode 100644
->> index 0000000..1fe2b1a
->> --- /dev/null
->> +++ b/arm/pmu.c
->> @@ -0,0 +1,62 @@
->> +/*
->> + * Test the ARM Performance Monitors Unit (PMU).
->> + *
->> + * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
->> + *
->> + * This program is free software; you can redistribute it and/or modify it
->> + * under the terms of the GNU Lesser General Public License version 2.1 and
->> + * only version 2.1 as published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful, but WITHOUT
->> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
->> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
->> + * for more details.
->> + */
->> +#include "libcflat.h"
->> +#include "asm/barrier.h"
->> +#include "asm/processor.h"
->> +
->> +#define PMU_PMCR_N_SHIFT   11
->> +#define PMU_PMCR_N_MASK    0x1f
->> +#define PMU_PMCR_ID_SHIFT  16
->> +#define PMU_PMCR_ID_MASK   0xff
->> +#define PMU_PMCR_IMP_SHIFT 24
->> +#define PMU_PMCR_IMP_MASK  0xff
->> +
->> +#if defined(__arm__)
->> +DEFINE_GET_SYSREG32(pmcr, 0, c9, c12, 0)
->> +#elif defined(__aarch64__)
->> +DEFINE_GET_SYSREG32(pmcr, el0)
->> +#endif
->> +
->> +/*
->> + * As a simple sanity check on the PMCR_EL0, ensure the implementer field isn't
->> + * null. Also print out a couple other interesting fields for diagnostic
->> + * purposes. For example, as of fall 2016, QEMU TCG mode doesn't implement
->> + * event counters and therefore reports zero event counters, but hopefully
->> + * support for at least the instructions event will be added in the future and
->> + * the reported number of event counters will become nonzero.
->> + */
->> +static bool check_pmcr(void)
->> +{
->> +	uint32_t pmcr;
-> 
-> So based on my comments from the previous patch, pmcr should be
-> 'unsigned int'
+In fact, on VHE we only need to set those bits once, not for every world
+switch. This is because the host kernel runs in EL2 with HCR_EL2.TGE ==
+1, which makes those bits have no effect for the host kernel execution.
+So we just set those bits once for guests, and that's it.
 
-I don't think so. At least here as a _variable_ type uint32_t is
-probably the right one, as the ARMv8 ARM explicitly says that PMCR is a
-32-bit register, for both bitnesses. I find it only natural to express
-it here accordingly.
-I believe this is a different (though related) discussion from the
-return type of the accessor functions.
+Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+---
+v2: Skip configuring cnthctl_el2 in world switch path on VHE system.
+This patch is based on linux-next.
 
-Cheers,
-Andre.
+---
+ arch/arm/kvm/arm.c           |  1 +
+ include/kvm/arm_arch_timer.h |  1 +
+ virt/kvm/arm/arch_timer.c    | 23 ++++++++++++++++++++++
+ virt/kvm/arm/hyp/timer-sr.c  | 45 ++++++++++++++++++++++++++++++++------------
+ 4 files changed, 58 insertions(+), 12 deletions(-)
 
->> +
->> +	pmcr = get_pmcr();
->> +
->> +	report_info("PMU implementer/ID code/counters: 0x%x(\"%c\")/0x%x/%d",
->> +		    (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK,
->> +		    ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) ? : ' ',
->> +		    (pmcr >> PMU_PMCR_ID_SHIFT) & PMU_PMCR_ID_MASK,
->> +		    (pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK);
->> +
->> +	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
->> +}
->> +
->> +int main(void)
->> +{
->> +	report_prefix_push("pmu");
->> +
->> +	report("Control register", check_pmcr());
->> +
->> +	return report_summary();
->> +}
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index ae32a42..816f494 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -58,3 +58,8 @@ groups = selftest
->>  [pci-test]
->>  file = pci-test.flat
->>  groups = pci
->> +
->> +# Test PMU support
->> +[pmu]
->> +file = pmu.flat
->> +groups = pmu
->> -- 
->> 1.8.3.1
->>
->>
-> 
-> drew 
-> 
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 8f92efa..38c0645 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1286,6 +1286,7 @@ static void teardown_hyp_mode(void)
+ 
+ static int init_vhe_mode(void)
+ {
++	on_each_cpu(kvm_timer_init_vhe, NULL, 1);
+ 	kvm_info("VHE mode initialized successfully\n");
+ 	return 0;
+ }
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index dda39d8..5853399 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -76,4 +76,5 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+ 
+ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
+ 
++void kvm_timer_init_vhe(void *dummy);
+ #endif
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 17b8fa5..7a0d85d7 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -24,6 +24,7 @@
+ 
+ #include <clocksource/arm_arch_timer.h>
+ #include <asm/arch_timer.h>
++#include <asm/kvm_hyp.h>
+ 
+ #include <kvm/arm_vgic.h>
+ #include <kvm/arm_arch_timer.h>
+@@ -507,3 +508,25 @@ void kvm_timer_init(struct kvm *kvm)
+ {
+ 	kvm->arch.timer.cntvoff = kvm_phys_timer_read();
+ }
++
++/*
++ * On VHE system, we only need to configure trap on physical timer and counter
++ * accesses in EL0 and EL1 once, not for every world switch.
++ * The host kernel runs at EL2 with HCR_EL2.TGE == 1,
++ * and this makes those bits have no effect for the host kernel execution.
++ */
++void kvm_timer_init_vhe(void *dummy)
++{
++	/* When HCR_EL2.E2H ==1, EL1PCEN and EL1PCTEN are shifted by 10 */
++	u32 cnthctl_shift = 10;
++	u64 val;
++
++	/*
++	 * Disallow physical timer access for the guest.
++	 * Physical counter access is allowed.
++	 */
++	val = read_sysreg(cnthctl_el2);
++	val &= ~(CNTHCTL_EL1PCEN << cnthctl_shift);
++	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
++	write_sysreg(val, cnthctl_el2);
++}
+diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
+index 798866a..f7fc957 100644
+--- a/virt/kvm/arm/hyp/timer-sr.c
++++ b/virt/kvm/arm/hyp/timer-sr.c
+@@ -21,6 +21,18 @@
+ 
+ #include <asm/kvm_hyp.h>
+ 
++#ifdef CONFIG_ARM64
++static inline bool has_vhe(void)
++{
++	if (cpus_have_const_cap(ARM64_HAS_VIRT_HOST_EXTN))
++		return true;
++
++	return false;
++}
++#else
++#define has_vhe()	false
++#endif
++
+ /* vcpu is already in the HYP VA space */
+ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
+ {
+@@ -35,10 +47,16 @@ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
+ 	/* Disable the virtual timer */
+ 	write_sysreg_el0(0, cntv_ctl);
+ 
+-	/* Allow physical timer/counter access for the host */
+-	val = read_sysreg(cnthctl_el2);
+-	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
+-	write_sysreg(val, cnthctl_el2);
++	/*
++	 * We don't need to do this for VHE since the host kernel runs in EL2
++	 * with HCR_EL2.TGE ==1, which makes those bits have no impact.
++	 */
++	if (!has_vhe()) {
++		/* Allow physical timer/counter access for the host */
++		val = read_sysreg(cnthctl_el2);
++		val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
++		write_sysreg(val, cnthctl_el2);
++	}
+ 
+ 	/* Clear cntvoff for the host */
+ 	write_sysreg(0, cntvoff_el2);
+@@ -50,14 +68,17 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	u64 val;
+ 
+-	/*
+-	 * Disallow physical timer access for the guest
+-	 * Physical counter access is allowed
+-	 */
+-	val = read_sysreg(cnthctl_el2);
+-	val &= ~CNTHCTL_EL1PCEN;
+-	val |= CNTHCTL_EL1PCTEN;
+-	write_sysreg(val, cnthctl_el2);
++	/* Those bits are already configured at boot on VHE-system */
++	if (!has_vhe()) {
++		/*
++		 * Disallow physical timer access for the guest
++		 * Physical counter access is allowed
++		 */
++		val = read_sysreg(cnthctl_el2);
++		val &= ~CNTHCTL_EL1PCEN;
++		val |= CNTHCTL_EL1PCTEN;
++		write_sysreg(val, cnthctl_el2);
++	}
+ 
+ 	if (timer->enabled) {
+ 		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
+-- 
+1.9.1
+
+
