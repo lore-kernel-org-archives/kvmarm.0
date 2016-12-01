@@ -1,25 +1,26 @@
-From: vijay.kilari@gmail.com
-Subject: [PATCH v10 8/8] arm/arm64: Documentation: Update arm-vgic-v3.txt
-Date: Thu,  1 Dec 2016 12:39:47 +0530
-Message-ID: <1480576187-5012-9-git-send-email-vijay.kilari@gmail.com>
-References: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v13 1/4] arm: Define macros
+ for accessing system registers
+Date: Thu, 1 Dec 2016 09:59:03 +0100
+Message-ID: <20161201085903.gcc5g7x6ixxgxofl@kamzik.brq.redhat.com>
+References: <1480569402-8848-1-git-send-email-wei@redhat.com>
+ <1480569402-8848-2-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9571340286
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 02:09:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A37940449
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 03:58:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bNGQEYSWPQyf for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Dec 2016 02:09:43 -0500 (EST)
-Received: from mail-pg0-f66.google.com (mail-pg0-f66.google.com [74.125.83.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1892E40674
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 02:09:43 -0500 (EST)
-Received: by mail-pg0-f66.google.com with SMTP id x23so3748595pgx.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2016 23:10:34 -0800 (PST)
-In-Reply-To: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
+ with ESMTP id BzBqAHalJF3C for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Dec 2016 03:58:18 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C4C04042E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 03:58:18 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1480569402-8848-2-git-send-email-wei@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,49 +30,145 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, christoffer.dall@linaro.org, peter.maydell@linaro.org
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Wei Huang <wei@redhat.com>
+Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, andre.przywara@arm.com, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-Update error code returned for Invalid CPU interface register
-value and access in AArch32 mode.
+Should this be From: Andre?
 
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
----
- Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+On Wed, Nov 30, 2016 at 11:16:39PM -0600, Wei Huang wrote:
+> This patch defines four macros to assist creating system register
+> accessors under both ARMv7 and AArch64:
+>    * DEFINE_GET_SYSREG32(name, ...)
+>    * DEFINE_SET_SYSREG32(name, ...)
+>    * DEFINE_GET_SYSREG64(name, ...)
+>    * DEFINE_SET_SYSREG64(name, ...)
+> These macros are translated to inline functions with consistent naming,
+> get_##name() and set_##name(), which can be used by C code directly.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> ---
+>  lib/arm/asm/processor.h   | 37 ++++++++++++++++++++++++++++++++-----
+>  lib/arm64/asm/processor.h | 35 ++++++++++++++++++++++++++++-------
+>  2 files changed, 60 insertions(+), 12 deletions(-)
+> 
+> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+> index f25e7ee..3ca6b42 100644
+> --- a/lib/arm/asm/processor.h
+> +++ b/lib/arm/asm/processor.h
+> @@ -33,13 +33,40 @@ static inline unsigned long current_cpsr(void)
+>  
+>  #define current_mode() (current_cpsr() & MODE_MASK)
+>  
+> -static inline unsigned int get_mpidr(void)
+> -{
+> -	unsigned int mpidr;
+> -	asm volatile("mrc p15, 0, %0, c0, c0, 5" : "=r" (mpidr));
+> -	return mpidr;
+> +#define DEFINE_GET_SYSREG32(name, opc1, crn, crm, opc2)			\
+> +static inline uint32_t get_##name(void)					\
+> +{									\
+> +	uint32_t reg;							\
+> +	asm volatile("mrc p15, " #opc1 ", %0, " #crn ", " #crm ", "	\
+> +		     #opc2 : "=r" (reg));				\
+> +	return reg;							\
+> +}
+> +
+> +#define DEFINE_SET_SYSREG32(name, opc1, crn, crm, opc2)			\
+> +static inline void set_##name(uint32_t value)				\
+> +{									\
+> +	asm volatile("mcr p15, " #opc1 ", %0, " #crn ", " #crm ", "	\
+> +		     #opc2 :: "r" (value));				\
+                           ^ nit: no space here, checkpatch would complain
+> +}
+> +
+> +#define DEFINE_GET_SYSREG64(name, opc, crm)				\
+> +static inline uint64_t get_##name(void)					\
+> +{									\
+> +	uint32_t lo, hi;						\
+> +	asm volatile("mrrc p15, " #opc ", %0, %1, " #crm		\
+> +		     : "=r" (lo), "=r" (hi));				\
+> +	return (uint64_t)hi << 32 | lo;					\
+> +}
+> +
+> +#define DEFINE_SET_SYSREG64(name, opc, crm)				\
+> +static inline void set_##name(uint64_t value)				\
+> +{									\
+> +	asm volatile("mcrr p15, " #opc ", %0, %1, " #crm		\
+> +		     :: "r" (value & 0xffffffff), "r" (value >> 32));	\
+>  }
+>  
+> +DEFINE_GET_SYSREG32(mpidr, 0, c0, c0, 5)
+> +
+>  /* Only support Aff0 for now, up to 4 cpus */
+>  #define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
+>  
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 84d5c7c..dfa75eb 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -66,14 +66,35 @@ static inline unsigned long current_level(void)
+>  	return el & 0xc;
+>  }
+>  
+> -#define DEFINE_GET_SYSREG32(reg)				\
+> -static inline unsigned int get_##reg(void)			\
+> -{								\
+> -	unsigned int reg;					\
+> -	asm volatile("mrs %0, " #reg "_el1" : "=r" (reg));	\
+> -	return reg;						\
+> +#define DEFINE_GET_SYSREG32(reg, el)					\
+> +static inline uint32_t get_##reg(void)					\
+> +{									\
+> +	uint32_t reg;							\
+> +	asm volatile("mrs %0, " #reg "_" #el : "=r" (reg));		\
+> +	return reg;							\
+>  }
+> -DEFINE_GET_SYSREG32(mpidr)
+> +
+> +#define DEFINE_SET_SYSREG32(reg, el)					\
+> +static inline void set_##reg(uint32_t value)				\
+> +{									\
+> +	asm volatile("msr " #reg "_" #el ", %0" :: "r" (value));	\
+> +}
+> +
+> +#define DEFINE_GET_SYSREG64(reg, el)					\
+> +static inline uint64_t get_##reg(void)					\
+> +{									\
+> +	uint64_t reg;							\
+> +	asm volatile("mrs %0, " #reg "_" #el : "=r" (reg));		\
+> +	return reg;							\
+> +}
+> +
+> +#define DEFINE_SET_SYSREG64(reg, el)					\
+> +static inline void set_##reg(uint64_t value)				\
+> +{									\
+> +	asm volatile("msr " #reg "_" #el ", %0" :: "r" (value));	\
+> +}
+> +
+> +DEFINE_GET_SYSREG32(mpidr, el1)
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-index 9348b3c..0f29850 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-@@ -142,10 +142,12 @@ Groups:
-     KVM_DEV_ARM_VGIC_CPU_SYSREGS accesses the CPU interface registers for the
-     CPU specified by the mpidr field.
- 
-+    CPU interface registers access is not implemented for AArch32 mode.
-+    Error -ENXIO is returned when accessed in AArch32 mode.
-   Errors:
-     -ENXIO: Getting or setting this register is not yet supported
-     -EBUSY: VCPU is running
--    -EINVAL: Invalid mpidr supplied
-+    -EINVAL: Invalid mpidr or register value supplied
- 
- 
-   KVM_DEV_ARM_VGIC_GRP_NR_IRQS
-@@ -193,6 +195,11 @@ Groups:
- 
- 	Bit[n] indicates the status for interrupt vINTID + n.
- 
-+	Getting or setting the level info for an edge-triggered interrupt is
-+	not guaranteed to work.  To restore the complete state of the VGIC, the
-+	configuration (edge/level) of interrupts must be restored before
-+	restoring the level.
-+
-     SGIs and any interrupt with a higher ID than the number of interrupts
-     supported, will be RAZ/WI.  LPIs are always edge-triggered and are
-     therefore not supported by this interface.
--- 
-1.9.1
+32-bit mpidr for arm64 isn't right, and it's changed by [1] in the
+gic series. However changing it to 64-bit with this patch would result
+in a get_mpidr() call that returns uint64_t on arm64 and uint32_t on
+arm32, which won't be nice for common code. Andre brought up during the
+review of [1] that we should be using the architectural types for register
+accessors. That means, that while internally all the above functions can
+know what's 32-bit and what's 64-bit, using uint32/64_t appropriately,
+the external interfaces should be 'unsigned long', 'unsigned int',
+'unsigned long long'.
+
+[1] https://github.com/rhdrjones/kvm-unit-tests/commit/57e48b8e6dc2ddf4b2e4eb1ceb5a5f87f2dd074b
+
+Thanks,
+drew
+
+>  
+>  /* Only support Aff0 for now, gicv2 only */
+>  #define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
+> -- 
+> 1.8.3.1
+> 
+> 
