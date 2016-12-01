@@ -1,26 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: Unable to use perf in VM
-Date: Thu, 1 Dec 2016 09:16:44 +0000
-Message-ID: <d2ede07c-d987-467f-79ad-4de7b33ed6d9@arm.com>
-References: <70374841-ecb1-a6c3-ed43-0f39e2d5fec2@riken.jp>
- <8b2a3cfd-57a0-70ac-ef50-672f8040291d@arm.com>
- <a81f82da-322a-a52b-de0e-316b7ce5f463@arm.com>
- <56fd35f8-76ba-3d5d-f1e0-7df5ff8d396a@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v13 3/4] arm: pmu: Check
+ cycle count increases
+Date: Thu, 1 Dec 2016 10:18:48 +0100
+Message-ID: <20161201091848.vrr7ojk5snmz6gv3@kamzik.brq.redhat.com>
+References: <1480569402-8848-1-git-send-email-wei@redhat.com>
+ <1480569402-8848-4-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D8E940497
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 04:16:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 408A740497
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 04:18:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 14aQxY5pEuDR for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Dec 2016 04:15:57 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0878040457
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 04:15:56 -0500 (EST)
-In-Reply-To: <56fd35f8-76ba-3d5d-f1e0-7df5ff8d396a@redhat.com>
+ with ESMTP id i3c0Fu-k4DFr for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Dec 2016 04:18:03 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63BED40457
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2016 04:18:02 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1480569402-8848-4-git-send-email-wei@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,76 +30,166 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Wei Huang <wei@redhat.com>, Itaru Kitayama <itaru.kitayama@riken.jp>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel@lists.infradead.org, Shannon Zhao <shannon.zhao@linaro.org>
-Cc: Hoan Tran <hotran@apm.com>, Tai Tri Nguyen <ttnguyen@apm.com>
+To: Wei Huang <wei@redhat.com>
+Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, andre.przywara@arm.com, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 30/11/16 19:17, Wei Huang wrote:
+On Wed, Nov 30, 2016 at 11:16:41PM -0600, Wei Huang wrote:
+> From: Christopher Covington <cov@codeaurora.org>
 > 
+> Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
+> even for the smallest delta of two subsequent reads.
 > 
-> On 11/30/2016 07:37 AM, Marc Zyngier wrote:
->> On 30/11/16 11:48, Marc Zyngier wrote:
->>> + Shannon
->>>
->>> On 29/11/16 22:04, Itaru Kitayama wrote:
->>>> Hi,
->>>>
->>>> In a VM (virsh controlled, KVM acceleration enabled) on a recent
->>>> kvmarm kernel host, I find I am unable to use perf to obtain
->>>> performance statistics for a complex task like kernel build.
->>>> (I've verified this is seen with a Fedora 25 VM and host combination
->>>> as well)
->>>> APM folks CC'ed think this might be caused by a bug in the core PMU 
->>>> framework code, thus I'd like to have experts opinion on this issue.
->>>>
->>>> [root@localhost linux]# perf stat -B make
->>>>    CHK     include/config/kernel.release
->>>> [  119.617684] git[1144]: undefined instruction: pc=fffffc000808ff30
->>>> [  119.623040] Code: 51000442 92401042 d51b9ca2 d5033fdf (d53b9d40)
->>>> [  119.627607] Internal error: undefined instruction: 0 [#1] SMP
->>>
->>> [...]
->>>
->>> In a VM running mainline hosted on an AMD Seattle box:
->>>
->>>  Performance counter stats for 'make':
->>>
->>>     1526089.499304      task-clock:u (msec)       #    0.932 CPUs utilized          
->>>                  0      context-switches:u        #    0.000 K/sec                  
->>>                  0      cpu-migrations:u          #    0.000 K/sec                  
->>>           29527793      page-faults:u             #    0.019 M/sec                  
->>>      2913174122673      cycles:u                  #    1.909 GHz                    
->>>      2365040892322      instructions:u            #    0.81  insn per cycle         
->>>    <not supported>      branches:u                                                  
->>>        32049215378      branch-misses:u           #    0.00% of all branches        
->>>
->>>     1637.531444837 seconds time elapsed
->>>
->>> Running the same host kernel on a Mustang system, the guest explodes
->>> in the way you reported. The failing instruction always seems to be
->>> an access to pmxevcntr_el0 (I've seen both reads and writes).
->>>
->>> Funnily enough, it dies if you try any HW event other than cycles
->>> ("perf stat -e cycles ls" works, and "perf stat -e instructions ls"
->>> explodes). Which would tend to indicate that we're screwing up
->>> the counter selection, but I have no proof of that (specially that
->>> the Seattle guest is working just as expected).
->>
->> It turns out that we *don't* inject an undef. It seems to be generated
->> locally at EL1.
->>
->> Still digging.
+> Signed-off-by: Christopher Covington <cov@codeaurora.org>
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arm/pmu.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 94 insertions(+)
 > 
-> Just FYI: I saw it on Mustang before. My initial thought was HW related,
-> but without proof. I am interested to see your findings...
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index 1fe2b1a..3566a27 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -16,6 +16,9 @@
+>  #include "asm/barrier.h"
+>  #include "asm/processor.h"
+>  
+> +#define PMU_PMCR_E         (1 << 0)
+> +#define PMU_PMCR_C         (1 << 2)
+> +#define PMU_PMCR_LC        (1 << 6)
+>  #define PMU_PMCR_N_SHIFT   11
+>  #define PMU_PMCR_N_MASK    0x1f
+>  #define PMU_PMCR_ID_SHIFT  16
+> @@ -23,10 +26,57 @@
+>  #define PMU_PMCR_IMP_SHIFT 24
+>  #define PMU_PMCR_IMP_MASK  0xff
+>  
+> +#define ID_DFR0_PERFMON_SHIFT 24
+> +#define ID_DFR0_PERFMON_MASK  0xf
+> +
+> +#define PMU_CYCLE_IDX         31
+> +
+> +#define NR_SAMPLES 10
+> +
+> +static unsigned int pmu_version;
+>  #if defined(__arm__)
+>  DEFINE_GET_SYSREG32(pmcr, 0, c9, c12, 0)
+> +DEFINE_SET_SYSREG32(pmcr, 0, c9, c12, 0)
+> +DEFINE_GET_SYSREG32(id_dfr0, 0, c0, c1, 2)
+> +DEFINE_SET_SYSREG32(pmselr, 0, c9, c12, 5)
+> +DEFINE_SET_SYSREG32(pmxevtyper, 0, c9, c13, 1)
+> +DEFINE_GET_SYSREG32(pmccntr32, 0, c9, c13, 0)
+> +DEFINE_SET_SYSREG32(pmccntr32, 0, c9, c13, 0)
+> +DEFINE_GET_SYSREG64(pmccntr64, 0, c9)
+> +DEFINE_SET_SYSREG64(pmccntr64, 0, c9)
+> +DEFINE_SET_SYSREG32(pmcntenset, 0, c9, c12, 1)
 
-It would have been good to report it earlier. Anyway, I've identified
-the root issue, which seems to boil down to how you interpret a small
-corner of the PMU architecture. I've raised it with the architecture
-team here, and I should have a workaround/fix shortly.
+Seeing how we get lots of redundant looking lines, I think instead
+of defining DEFINE_SET/GET_SYSREG32/64, we should instead have
 
-Thanks,
+DEFINE_SYSREG32/64      ... creates both get_<reg> and set_<reg>
+DEFINE_SYSREG32/64_RO   ... creates just get_<reg>
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> +
+> +static inline uint64_t get_pmccntr(void)
+> +{
+> +	if (pmu_version == 0x3)
+> +		return get_pmccntr64();
+> +	else
+> +		return get_pmccntr32();
+> +}
+> +
+> +static inline void set_pmccntr(uint64_t value)
+> +{
+> +	if (pmu_version == 0x3)
+> +		set_pmccntr64(value);
+> +	else
+> +		set_pmccntr32(value & 0xffffffff);
+> +}
+
+So the two accessors above are exceptional, which is why we don't
+use SYSREG for them. These can have uint64_t for there external
+interface. We can't require 'unsigned long' or 'unsigned long long'
+
+> +
+> +/* PMCCFILTR is an obsolete name for PMXEVTYPER31 in ARMv7 */
+> +static inline void set_pmccfiltr(uint32_t value)
+> +{
+> +	set_pmselr(PMU_CYCLE_IDX);
+> +	set_pmxevtyper(value);
+> +	isb();
+> +}
+>  #elif defined(__aarch64__)
+>  DEFINE_GET_SYSREG32(pmcr, el0)
+> +DEFINE_SET_SYSREG32(pmcr, el0)
+> +DEFINE_GET_SYSREG32(id_dfr0, el1)
+> +DEFINE_GET_SYSREG64(pmccntr, el0);
+> +DEFINE_SET_SYSREG64(pmccntr, el0);
+> +DEFINE_SET_SYSREG32(pmcntenset, el0);
+> +DEFINE_SET_SYSREG32(pmccfiltr, el0);
+>  #endif
+>  
+>  /*
+> @@ -52,11 +102,55 @@ static bool check_pmcr(void)
+>  	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
+>  }
+>  
+> +/*
+> + * Ensure that the cycle counter progresses between back-to-back reads.
+> + */
+> +static bool check_cycles_increase(void)
+> +{
+> +	bool success = true;
+> +
+> +	/* init before event access, this test only cares about cycle count */
+> +	set_pmcntenset(1 << PMU_CYCLE_IDX);
+> +	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+> +	set_pmccntr(0);
+> +
+> +	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
+> +
+> +	for (int i = 0; i < NR_SAMPLES; i++) {
+> +		uint64_t a, b;
+> +
+> +		a = get_pmccntr();
+> +		b = get_pmccntr();
+> +
+> +		if (a >= b) {
+> +			printf("Read %"PRId64" then %"PRId64".\n", a, b);
+> +			success = false;
+> +			break;
+> +		}
+> +	}
+> +
+> +	set_pmcr(get_pmcr() & ~PMU_PMCR_E);
+> +
+> +	return success;
+> +}
+> +
+> +void pmu_init(void)
+> +{
+> +	uint32_t dfr0;
+> +
+> +	/* probe pmu version */
+> +	dfr0 = get_id_dfr0();
+> +	pmu_version = (dfr0 >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
+> +	report_info("PMU version: %d", pmu_version);
+> +}
+> +
+>  int main(void)
+>  {
+>  	report_prefix_push("pmu");
+>  
+> +	pmu_init();
+>  	report("Control register", check_pmcr());
+> +	report("Monotonically increasing cycle count", check_cycles_increase());
+>  
+>  	return report_summary();
+>  }
+> -- 
+> 1.8.3.1
+> 
+>
+
+drew 
