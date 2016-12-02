@@ -1,22 +1,22 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 2/2] arm64: PMU: Reset PMSELR_EL0 to a sane value at boot time
-Date: Fri,  2 Dec 2016 15:50:59 +0000
-Message-ID: <1480693859-27249-3-git-send-email-marc.zyngier@arm.com>
+From: Itaru Kitayama <itaru.kitayama@riken.jp>
+Subject: Re: [PATCH 0/2] arm64: PMU: Sanitize usage of PMSELR_EL0.SEL
+Date: Sat, 3 Dec 2016 06:28:07 +0900
+Message-ID: <d27d50ad-c61e-28a6-c8e5-5714b1530c4d@riken.jp>
 References: <1480693859-27249-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12A0F40796
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2016 10:50:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BF29405E6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2016 16:27:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8KcLRNzuONHj for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Dec 2016 10:50:31 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1235740798
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2016 10:50:31 -0500 (EST)
+ with ESMTP id RgVODWwm0C84 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Dec 2016 16:27:17 -0500 (EST)
+Received: from postman.riken.jp (postman3.riken.jp [134.160.33.85])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 597A64053F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2016 16:27:17 -0500 (EST)
 In-Reply-To: <1480693859-27249-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -27,39 +27,31 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: Itaru Kitayama <itaru.kitayama@riken.jp>, Catalin Marinas <catalin.marinas@arm.com>, Hoan Tran <hotran@apm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Tai Tri Nguyen <ttnguyen@apm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Hoan Tran <hotran@apm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Tai Tri Nguyen <ttnguyen@apm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to avoid any ugly surprise, let's reset PMSELR_EL0 to the
-first valid value (avoiding the cycle counter which has been proven
-to be troublesome) at CPU boot time. This ensures that no guest will
-be faced with some odd value which it cannot modify (due to
-MDCR_EL2.TPM being set).
+Successfully verified them on a Rev B0 CPU. Thank you for quickly 
+providing the fix.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/kernel/perf_event.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index a65b757..42d1840 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -910,6 +910,14 @@ static void armv8pmu_reset(void *info)
- 	 */
- 	armv8pmu_pmcr_write(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C |
- 			    ARMV8_PMU_PMCR_LC);
-+
-+	/*
-+	 * If we have at least one available counter, reset to that
-+	 * one so that no illegal value is left in PMSELR_EL0, which
-+	 * could have an impact on a guest.
-+	 */
-+	if (armv8pmu_counter_valid(cpu_pmu, ARMV8_IDX_COUNTER0))
-+		armv8pmu_select_counter(ARMV8_IDX_COUNTER0);
- }
- 
- static int armv8_pmuv3_map_event(struct perf_event *event)
--- 
-2.1.4
+On 2016/12/03 0:50, Marc Zyngier wrote:
+> An ugly interaction between the use of PMSELR_EL0 in a host kernel and
+> the use of PMXEVCNTR_EL0 in a guest has recently come to light [1],
+> leading to the guest taking an UNDEF exception in EL1 when using the
+> PMU.
+>
+> The fix is pretty simple ("don't do that!"), making the PMU useable on
+> X-Gene, which seems to have a stricter (but nonetheless valid)
+> interpretation of the architecture.
+>
+> Patches against 4.9-rc6.
+>
+> [1] https://lists.cs.columbia.edu/pipermail/kvmarm/2016-November/022545.html
+>
+> Marc Zyngier (2):
+>   arm64: PMU: Do not use PMSELR_EL0 to access PMCCFILTR_EL0
+>   arm64: PMU: Reset PMSELR_EL0 to a sane value at boot time
+>
+>  arch/arm64/kernel/perf_event.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+>
