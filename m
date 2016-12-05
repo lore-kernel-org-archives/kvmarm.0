@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [kvm-unit-tests RFC 10/15] arm/arm64: ITS: its_enable_defaults
-Date: Mon,  5 Dec 2016 22:46:41 +0100
-Message-ID: <1480974406-29345-11-git-send-email-eric.auger@redhat.com>
+Subject: [kvm-unit-tests RFC 11/15] arm/arm64: ITS: create device
+Date: Mon,  5 Dec 2016 22:46:42 +0100
+Message-ID: <1480974406-29345-12-git-send-email-eric.auger@redhat.com>
 References: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CEEB40296
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2016 16:46:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 596984027C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2016 16:46:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ynLyA84NZc-C for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Dec 2016 16:46:44 -0500 (EST)
+ with ESMTP id hJWNMOza1kNV for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Dec 2016 16:46:48 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 821AF402A3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2016 16:46:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 69957401F2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2016 16:46:48 -0500 (EST)
 In-Reply-To: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,120 +31,105 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, kvm@vger.kernel.org, kvmarm
 Cc: andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-its_enable_defaults() is the top init function that allocates all
-the requested tables (device, collection, lpi config and pending
-tables), enable LPIs at distributor level and ITS level.
-
-gicv3_enable_defaults must be called before.
+Introduce an helper function that registers a new device candidate to
+send MSIs on the ITS. The device is characterized by its device id,
+the number of event ids. This dimensions the associated interrupt
+translation table (ITT), allocated by this function.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- lib/arm/asm/gic-v3-its.h | 10 ++++++++++
- lib/arm/gic-v3-its.c     | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+)
+ lib/arm/asm/gic-v3-its.h | 11 +++++++++++
+ lib/arm/gic-v3-its.c     | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
 diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-index 353db6f..b73736c 100644
+index b73736c..31589d6 100644
 --- a/lib/arm/asm/gic-v3-its.h
 +++ b/lib/arm/asm/gic-v3-its.h
-@@ -33,6 +33,7 @@
- #define GICR_PROPBASER_InnerShareable                                   \
- 	GIC_BASER_SHAREABILITY(GICR_PROPBASER, InnerShareable)
+@@ -124,6 +124,8 @@
  
-+#define GITS_CTLR                       0x0000
- #define GITS_TYPER                      0x0008
- #define GITS_CBASER                     0x0080
- #define GITS_CWRITER                    0x0088
-@@ -46,6 +47,8 @@
- #define GITS_TYPER_PTA                  (1UL << 19)
- #define GITS_TYPER_HWCOLLCNT_SHIFT      24
+ #define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
  
-+#define GITS_CTLR_ENABLE                (1U << 0)
++#define GITS_MAX_DEVICES		8
 +
- #define GITS_CBASER_VALID                       (1UL << 63)
- #define GITS_CBASER_SHAREABILITY_SHIFT          (10)
- #define GITS_CBASER_INNER_CACHEABILITY_SHIFT    (59)
-@@ -151,6 +154,11 @@ struct its_typer {
+ struct its_baser {
+ 	unsigned int index;
+ 	int type;
+@@ -154,6 +156,12 @@ struct its_typer {
  	bool virt_lpi;
  };
  
-+struct its_collection {
-+	u64 target_address;
-+	u16 col_id;
++struct its_device {
++	u32 device_id;
++	u32 nr_ites;
++	void *itt;
 +};
 +
- struct its_data {
- 	void *base;
+ struct its_collection {
+ 	u64 target_address;
+ 	u16 col_id;
+@@ -164,9 +172,11 @@ struct its_data {
  	struct its_cmd_block *cmd_base;
-@@ -158,6 +166,7 @@ struct its_data {
+ 	struct its_cmd_block *cmd_write;
  	struct its_cmd_block *cmd_readr;
++	struct its_device devices[GITS_MAX_DEVICES];
  	struct its_baser baser[GITS_BASER_NR_REGS];
  	struct its_typer typer;
-+	struct its_collection *collections;
+ 	struct its_collection *collections;
++	u32 nb_devices;
  	u64 flags;
  };
  
-@@ -169,6 +178,7 @@ extern void its_parse_typer(void);
- extern int its_parse_baser(int i, struct its_baser *baser);
+@@ -179,6 +189,7 @@ extern int its_parse_baser(int i, struct its_baser *baser);
  extern void its_setup_baser(int i, struct its_baser *baser);
  extern void enable_lpi(u32 redist);
-+extern void its_enable_defaults(void);
+ extern void its_enable_defaults(void);
++extern struct its_device *its_create_device(u32 dev_id, int nvecs);
  
  
  #endif /* !__ASSEMBLY__ */
 diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-index c8ffa53..ecb8f98 100644
+index ecb8f98..c230959 100644
 --- a/lib/arm/gic-v3-its.c
 +++ b/lib/arm/gic-v3-its.c
-@@ -212,3 +212,49 @@ void enable_lpi(u32 redist)
- 	val |= GICR_CTLR_ENABLE_LPIS;
- 	writel(val,  ptr + GICR_CTLR);
+@@ -80,6 +80,19 @@ int its_parse_baser(int i, struct its_baser *baser)
+ 	return 0;
  }
-+
-+void its_enable_defaults(void)
+ 
++static struct its_baser *its_lookup_baser(int type)
 +{
-+	unsigned int i;
++	int i;
 +
-+	its_parse_typer();
-+
-+	/* Allocate BASER tables (device and collection tables) */
 +	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
 +		struct its_baser *baser = &its_data.baser[i];
-+		int ret;
 +
-+		ret = its_parse_baser(i, baser);
-+		if (ret)
-+			continue;
-+
-+		switch (baser->type) {
-+		case GITS_BASER_TYPE_DEVICE:
-+			if (baser->valid)
-+				continue;
-+			baser->cache = GITS_BASER_nCnB;
-+			its_setup_baser(i, baser);
-+			break;
-+		case GITS_BASER_TYPE_COLLECTION:
-+			if (baser->valid)
-+				continue;
-+			its_setup_baser(i, baser);
-+			break;
-+		default:
-+			break;
-+		}
++		if (baser->type == type)
++			return baser;
 +	}
++	return NULL;
++}
 +
-+	/* Allocate LPI config and pending tables */
-+	alloc_lpi_tables();
+ void its_setup_baser(int i, struct its_baser *baser)
+ {
+ 	void *reg_addr = gicv3_its_base() + GITS_BASER + i * 8;
+@@ -258,3 +271,18 @@ void its_enable_defaults(void)
+ 
+ 	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
+ }
 +
-+	its_data.collections = malloc(gicv3_data.cpu_count *
-+			       sizeof(struct its_collection));
++struct its_device *its_create_device(u32 device_id, int nvecs)
++{
++	struct its_device *new = &its_data.devices[its_data.nb_devices];
++	struct its_baser *baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
 +
-+	init_cmd_queue();
++	if (!baser)
++		return NULL;
 +
-+	for (i = 0; i < gicv3_data.cpu_count; i++)
-+		enable_lpi(i);
-+
-+	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
++	new->device_id = device_id;
++	new->nr_ites = nvecs;
++	new->itt = (void *)phys_zalloc(new->nr_ites * baser->esz);
++	its_data.nb_devices++;
++	return new;
 +}
 -- 
 2.5.5
