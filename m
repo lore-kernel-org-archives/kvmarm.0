@@ -1,23 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [kvm-unit-tests RFC 02/15] arm/arm64: gicv3: Add some re-distributor
- defines
-Date: Mon,  5 Dec 2016 22:46:33 +0100
-Message-ID: <1480974406-29345-3-git-send-email-eric.auger@redhat.com>
+Subject: [kvm-unit-tests RFC 01/15] libcflat: Add other size defines
+Date: Mon,  5 Dec 2016 22:46:32 +0100
+Message-ID: <1480974406-29345-2-git-send-email-eric.auger@redhat.com>
 References: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD651405A7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2016 16:46:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1039240572
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2016 16:46:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EN2RrtwgZshX for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Dec 2016 16:46:11 -0500 (EST)
+ with ESMTP id 9nmF2-Hq0FpH for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Dec 2016 16:46:07 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 129464053F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2016 16:46:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F090B40421
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2016 16:46:06 -0500 (EST)
 In-Reply-To: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,36 +31,28 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, kvm@vger.kernel.org, kvmarm
 Cc: andre.przywara@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-PROPBASER, PENDBASE and GICR_CTRL will be used for LPI management.
+Introduce additional SZ_256, SZ_8K, SZ_16K macros that will
+be used by ITS tests.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- lib/arm/asm/gic-v3.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ lib/libcflat.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index 22deb4b..ed330af 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -18,6 +18,7 @@
-  * We expect to be run in Non-secure mode, thus we define the
-  * group1 enable bits with respect to that view.
-  */
-+#define GICD_CTLR			0x0000
- #define GICD_CTLR_RWP			(1U << 31)
- #define GICD_CTLR_ARE_NS		(1U << 4)
- #define GICD_CTLR_ENABLE_G1A		(1U << 1)
-@@ -33,6 +34,11 @@
- #define GICR_ISENABLER0			GICD_ISENABLER
- #define GICR_IPRIORITYR0		GICD_IPRIORITYR
+diff --git a/lib/libcflat.h b/lib/libcflat.h
+index bdcc561..880810a 100644
+--- a/lib/libcflat.h
++++ b/lib/libcflat.h
+@@ -35,7 +35,10 @@
+ #define ALIGN(x, a)		__ALIGN((x), (a))
+ #define IS_ALIGNED(x, a)	(((x) & ((typeof(x))(a) - 1)) == 0)
  
-+#define GICR_PROPBASER                  0x0070
-+#define GICR_PENDBASER                  0x0078
-+#define GICR_CTLR			GICD_CTLR
-+#define GICR_CTLR_ENABLE_LPIS		(1UL << 0)
-+
- #define ICC_SGI1R_AFFINITY_1_SHIFT	16
- #define ICC_SGI1R_AFFINITY_2_SHIFT	32
- #define ICC_SGI1R_AFFINITY_3_SHIFT	48
++#define SZ_256			(1 << 8)
+ #define SZ_4K			(1 << 12)
++#define SZ_8K			(1 << 13)
++#define SZ_16K			(1 << 14)
+ #define SZ_64K			(1 << 16)
+ #define SZ_2M			(1 << 21)
+ #define SZ_1G			(1 << 30)
 -- 
 2.5.5
