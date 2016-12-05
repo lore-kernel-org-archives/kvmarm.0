@@ -1,23 +1,12 @@
 From: Maninder Singh <maninder1.s@samsung.com>
 Subject: [PATCH 1/1] arm64: Correcting format specifier for printing 64 bit
  addresses
-Date: Mon, 05 Dec 2016 13:36:54 +0530
-Message-ID: <1480925214-1597-1-git-send-email-maninder1.s@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Date: Mon, 05 Dec 2016 13:39:53 +0530
+Message-ID: <1480925393-8386-1-git-send-email-maninder1.s@samsung.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 To: catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, cmetcalf@mellanox.com, panand@redhat.com, mark.rutland@arm.com, maninder1.s@samsung.com, james.morse@arm.com, akpm@linux-foundation.org, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, ard.biesheuvel@linaro.org, wangkefeng.wang@huawei.com
-Cc: Vaneet Narang <v.narang@samsung.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, ajeet.y@samsung.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, pankaj.m@samsung.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pankaj.m@samsung.com, ajeet.y@samsung.com, cpgs@samsung.com, Vaneet Narang <v.narang@samsung.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 This patch corrects format specifier for printing 64 bit addresses.
