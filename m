@@ -1,57 +1,123 @@
-From: Itaru Kitayama <itaru.kitayama@riken.jp>
-Subject: Re: [PATCH 0/2] arm64: PMU: Sanitize usage of PMSELR_EL0.SEL
-Date: Sat, 3 Dec 2016 06:28:07 +0900
-Message-ID: <d27d50ad-c61e-28a6-c8e5-5714b1530c4d@riken.jp>
-References: <1480693859-27249-1-git-send-email-marc.zyngier@arm.com>
+From: Maninder Singh <maninder1.s@samsung.com>
+Subject: [PATCH 1/1] arm64: Correcting format specifier for printing 64 bit
+ addresses
+Date: Mon, 05 Dec 2016 13:36:54 +0530
+Message-ID: <1480925214-1597-1-git-send-email-maninder1.s@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BF29405E6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2016 16:27:19 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RgVODWwm0C84 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Dec 2016 16:27:17 -0500 (EST)
-Received: from postman.riken.jp (postman3.riken.jp [134.160.33.85])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 597A64053F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2016 16:27:17 -0500 (EST)
-In-Reply-To: <1480693859-27249-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Hoan Tran <hotran@apm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Tai Tri Nguyen <ttnguyen@apm.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, cmetcalf@mellanox.com, panand@redhat.com, mark.rutland@arm.com, maninder1.s@samsung.com, james.morse@arm.com, akpm@linux-foundation.org, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, ard.biesheuvel@linaro.org, wangkefeng.wang@huawei.com
+Cc: Vaneet Narang <v.narang@samsung.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, ajeet.y@samsung.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, pankaj.m@samsung.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Successfully verified them on a Rev B0 CPU. Thank you for quickly 
-providing the fix.
+This patch corrects format specifier for printing 64 bit addresses.
 
-On 2016/12/03 0:50, Marc Zyngier wrote:
-> An ugly interaction between the use of PMSELR_EL0 in a host kernel and
-> the use of PMXEVCNTR_EL0 in a guest has recently come to light [1],
-> leading to the guest taking an UNDEF exception in EL1 when using the
-> PMU.
->
-> The fix is pretty simple ("don't do that!"), making the PMU useable on
-> X-Gene, which seems to have a stricter (but nonetheless valid)
-> interpretation of the architecture.
->
-> Patches against 4.9-rc6.
->
-> [1] https://lists.cs.columbia.edu/pipermail/kvmarm/2016-November/022545.html
->
-> Marc Zyngier (2):
->   arm64: PMU: Do not use PMSELR_EL0 to access PMCCFILTR_EL0
->   arm64: PMU: Reset PMSELR_EL0 to a sane value at boot time
->
->  arch/arm64/kernel/perf_event.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
->
+Signed-off-by: Maninder Singh <maninder1.s@samsung.com>
+Signed-off-by: Vaneet Narang <v.narang@samsung.com>
+---
+ arch/arm64/kernel/signal.c |  2 +-
+ arch/arm64/kvm/sys_regs.c  |  8 ++++++--
+ arch/arm64/mm/fault.c      | 15 ++++++++++-----
+ arch/arm64/mm/mmu.c        |  4 ++--
+ 4 files changed, 19 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
+index c7b6de6..c89d5fd 100644
+--- a/arch/arm64/kernel/signal.c
++++ b/arch/arm64/kernel/signal.c
+@@ -155,7 +155,7 @@ asmlinkage long sys_rt_sigreturn(struct pt_regs *regs)
+ 
+ badframe:
+ 	if (show_unhandled_signals)
+-		pr_info_ratelimited("%s[%d]: bad frame in %s: pc=%08llx sp=%08llx\n",
++		pr_info_ratelimited("%s[%d]: bad frame in %s: pc=%016llx sp=%016llx\n",
+ 				    current->comm, task_pid_nr(current), __func__,
+ 				    regs->pc, regs->sp);
+ 	force_sig(SIGSEGV, current);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 87e7e66..89bf5c1 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1554,8 +1554,12 @@ static void unhandled_cp_access(struct kvm_vcpu *vcpu,
+ 		WARN_ON(1);
+ 	}
+ 
+-	kvm_err("Unsupported guest CP%d access at: %08lx\n",
+-		cp, *vcpu_pc(vcpu));
++	if (params->is_32bit)
++		kvm_err("Unsupported guest CP%d access at: %08lx\n",
++			cp, *vcpu_pc(vcpu));
++	else
++		kvm_err("Unsupported guest CP%d access at: %016lx\n",
++			cp, *vcpu_pc(vcpu));
+ 	print_sys_reg_instr(params);
+ 	kvm_inject_undefined(vcpu);
+ }
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index a78a5c4..d96a42a 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -77,7 +77,7 @@ void show_pte(struct mm_struct *mm, unsigned long addr)
+ 
+ 	pr_alert("pgd = %p\n", mm->pgd);
+ 	pgd = pgd_offset(mm, addr);
+-	pr_alert("[%08lx] *pgd=%016llx", addr, pgd_val(*pgd));
++	pr_alert("[%016lx] *pgd=%016llx", addr, pgd_val(*pgd));
+ 
+ 	do {
+ 		pud_t *pud;
+@@ -177,7 +177,7 @@ static void __do_kernel_fault(struct mm_struct *mm, unsigned long addr,
+ 	 * No handler, we'll have to terminate things with extreme prejudice.
+ 	 */
+ 	bust_spinlocks(1);
+-	pr_alert("Unable to handle kernel %s at virtual address %08lx\n",
++	pr_alert("Unable to handle kernel %s at virtual address %016lx\n",
+ 		 (addr < PAGE_SIZE) ? "NULL pointer dereference" :
+ 		 "paging request", addr);
+ 
+@@ -198,9 +198,14 @@ static void __do_user_fault(struct task_struct *tsk, unsigned long addr,
+ 	struct siginfo si;
+ 
+ 	if (unhandled_signal(tsk, sig) && show_unhandled_signals_ratelimited()) {
+-		pr_info("%s[%d]: unhandled %s (%d) at 0x%08lx, esr 0x%03x\n",
+-			tsk->comm, task_pid_nr(tsk), fault_name(esr), sig,
+-			addr, esr);
++		if (compat_user_mode(regs))
++			pr_info("%s[%d]: unhandled %s (%d) at 0x%08lx, esr 0x%03x\n",
++				tsk->comm, task_pid_nr(tsk), fault_name(esr), sig,
++				addr, esr);
++		else
++			pr_info("%s[%d]: unhandled %s (%d) at 0x%016lx, esr 0x%03x\n",
++				tsk->comm, task_pid_nr(tsk), fault_name(esr), sig,
++				addr, esr);
+ 		show_pte(tsk->mm, addr);
+ 		show_regs(regs);
+ 	}
+diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+index 17243e4..cbf444c 100644
+--- a/arch/arm64/mm/mmu.c
++++ b/arch/arm64/mm/mmu.c
+@@ -683,9 +683,9 @@ void __init early_fixmap_init(void)
+ 		pr_warn("pmd %p != %p, %p\n",
+ 			pmd, fixmap_pmd(fix_to_virt(FIX_BTMAP_BEGIN)),
+ 			fixmap_pmd(fix_to_virt(FIX_BTMAP_END)));
+-		pr_warn("fix_to_virt(FIX_BTMAP_BEGIN): %08lx\n",
++		pr_warn("fix_to_virt(FIX_BTMAP_BEGIN): %016lx\n",
+ 			fix_to_virt(FIX_BTMAP_BEGIN));
+-		pr_warn("fix_to_virt(FIX_BTMAP_END):   %08lx\n",
++		pr_warn("fix_to_virt(FIX_BTMAP_END):   %016lx\n",
+ 			fix_to_virt(FIX_BTMAP_END));
+ 
+ 		pr_warn("FIX_BTMAP_END:       %d\n", FIX_BTMAP_END);
+-- 
+1.9.1
