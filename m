@@ -1,112 +1,66 @@
-From: Maninder Singh <maninder1.s@samsung.com>
-Subject: [PATCH 1/1] arm64: Correcting format specifier for printing 64 bit
- addresses
-Date: Mon, 05 Dec 2016 13:39:53 +0530
-Message-ID: <1480925393-8386-1-git-send-email-maninder1.s@samsung.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, cmetcalf@mellanox.com, panand@redhat.com, mark.rutland@arm.com, maninder1.s@samsung.com, james.morse@arm.com, akpm@linux-foundation.org, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, ard.biesheuvel@linaro.org, wangkefeng.wang@huawei.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pankaj.m@samsung.com, ajeet.y@samsung.com, cpgs@samsung.com, Vaneet Narang <v.narang@samsung.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH] arm/arm64: KVM: Check for properly initialized timer on init
+Date: Mon,  5 Dec 2016 10:32:11 +0100
+Message-ID: <20161205093211.11870-1-christoffer.dall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E42E0401E7
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2016 04:31:14 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id XfkQ2gT81Yf4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Dec 2016 04:31:13 -0500 (EST)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD3934005E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2016 04:31:13 -0500 (EST)
+Received: by mail-wm0-f41.google.com with SMTP id f82so82993399wmf.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 05 Dec 2016 01:32:10 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch corrects format specifier for printing 64 bit addresses.
+When the arch timer code fails to initialize (for example because the
+memory mapped timer doesn't work, which is currently seen with the AEM
+model), then KVM just continues happily with a final result that KVM
+eventually does a NULL pointer dereference of the uninitialized cycle
+counter.
 
-Signed-off-by: Maninder Singh <maninder1.s@samsung.com>
-Signed-off-by: Vaneet Narang <v.narang@samsung.com>
+Check directly for this in the init path and give the user a reasonable
+error in this case.
+
+Cc: Shih-Wei Li <shihwei@cs.columbia.edu>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kernel/signal.c |  2 +-
- arch/arm64/kvm/sys_regs.c  |  8 ++++++--
- arch/arm64/mm/fault.c      | 15 ++++++++++-----
- arch/arm64/mm/mmu.c        |  4 ++--
- 4 files changed, 19 insertions(+), 10 deletions(-)
+ virt/kvm/arm/arch_timer.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
-index c7b6de6..c89d5fd 100644
---- a/arch/arm64/kernel/signal.c
-+++ b/arch/arm64/kernel/signal.c
-@@ -155,7 +155,7 @@ asmlinkage long sys_rt_sigreturn(struct pt_regs *regs)
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 27a1f63..5c12f53 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -425,6 +425,11 @@ int kvm_timer_hyp_init(void)
+ 	info = arch_timer_get_kvm_info();
+ 	timecounter = &info->timecounter;
  
- badframe:
- 	if (show_unhandled_signals)
--		pr_info_ratelimited("%s[%d]: bad frame in %s: pc=%08llx sp=%08llx\n",
-+		pr_info_ratelimited("%s[%d]: bad frame in %s: pc=%016llx sp=%016llx\n",
- 				    current->comm, task_pid_nr(current), __func__,
- 				    regs->pc, regs->sp);
- 	force_sig(SIGSEGV, current);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 87e7e66..89bf5c1 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1554,8 +1554,12 @@ static void unhandled_cp_access(struct kvm_vcpu *vcpu,
- 		WARN_ON(1);
- 	}
- 
--	kvm_err("Unsupported guest CP%d access at: %08lx\n",
--		cp, *vcpu_pc(vcpu));
-+	if (params->is_32bit)
-+		kvm_err("Unsupported guest CP%d access at: %08lx\n",
-+			cp, *vcpu_pc(vcpu));
-+	else
-+		kvm_err("Unsupported guest CP%d access at: %016lx\n",
-+			cp, *vcpu_pc(vcpu));
- 	print_sys_reg_instr(params);
- 	kvm_inject_undefined(vcpu);
- }
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index a78a5c4..d96a42a 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -77,7 +77,7 @@ void show_pte(struct mm_struct *mm, unsigned long addr)
- 
- 	pr_alert("pgd = %p\n", mm->pgd);
- 	pgd = pgd_offset(mm, addr);
--	pr_alert("[%08lx] *pgd=%016llx", addr, pgd_val(*pgd));
-+	pr_alert("[%016lx] *pgd=%016llx", addr, pgd_val(*pgd));
- 
- 	do {
- 		pud_t *pud;
-@@ -177,7 +177,7 @@ static void __do_kernel_fault(struct mm_struct *mm, unsigned long addr,
- 	 * No handler, we'll have to terminate things with extreme prejudice.
- 	 */
- 	bust_spinlocks(1);
--	pr_alert("Unable to handle kernel %s at virtual address %08lx\n",
-+	pr_alert("Unable to handle kernel %s at virtual address %016lx\n",
- 		 (addr < PAGE_SIZE) ? "NULL pointer dereference" :
- 		 "paging request", addr);
- 
-@@ -198,9 +198,14 @@ static void __do_user_fault(struct task_struct *tsk, unsigned long addr,
- 	struct siginfo si;
- 
- 	if (unhandled_signal(tsk, sig) && show_unhandled_signals_ratelimited()) {
--		pr_info("%s[%d]: unhandled %s (%d) at 0x%08lx, esr 0x%03x\n",
--			tsk->comm, task_pid_nr(tsk), fault_name(esr), sig,
--			addr, esr);
-+		if (compat_user_mode(regs))
-+			pr_info("%s[%d]: unhandled %s (%d) at 0x%08lx, esr 0x%03x\n",
-+				tsk->comm, task_pid_nr(tsk), fault_name(esr), sig,
-+				addr, esr);
-+		else
-+			pr_info("%s[%d]: unhandled %s (%d) at 0x%016lx, esr 0x%03x\n",
-+				tsk->comm, task_pid_nr(tsk), fault_name(esr), sig,
-+				addr, esr);
- 		show_pte(tsk->mm, addr);
- 		show_regs(regs);
- 	}
-diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index 17243e4..cbf444c 100644
---- a/arch/arm64/mm/mmu.c
-+++ b/arch/arm64/mm/mmu.c
-@@ -683,9 +683,9 @@ void __init early_fixmap_init(void)
- 		pr_warn("pmd %p != %p, %p\n",
- 			pmd, fixmap_pmd(fix_to_virt(FIX_BTMAP_BEGIN)),
- 			fixmap_pmd(fix_to_virt(FIX_BTMAP_END)));
--		pr_warn("fix_to_virt(FIX_BTMAP_BEGIN): %08lx\n",
-+		pr_warn("fix_to_virt(FIX_BTMAP_BEGIN): %016lx\n",
- 			fix_to_virt(FIX_BTMAP_BEGIN));
--		pr_warn("fix_to_virt(FIX_BTMAP_END):   %08lx\n",
-+		pr_warn("fix_to_virt(FIX_BTMAP_END):   %016lx\n",
- 			fix_to_virt(FIX_BTMAP_END));
- 
- 		pr_warn("FIX_BTMAP_END:       %d\n", FIX_BTMAP_END);
++	if (!timecounter->cc) {
++		kvm_err("arch_timer: uninitialized timecounter\n");
++		return -ENODEV;
++	}
++
+ 	if (info->virtual_irq <= 0) {
+ 		kvm_err("kvm_arch_timer: invalid virtual timer IRQ: %d\n",
+ 			info->virtual_irq);
 -- 
-1.9.1
+2.9.0
