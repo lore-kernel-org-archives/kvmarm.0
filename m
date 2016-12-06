@@ -1,24 +1,21 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH 1/2] arm64: KVM: vgic-v3: Add the missing resetting LRs at
- boot time
-Date: Tue, 6 Dec 2016 14:41:43 +0800
-Message-ID: <1481006504-25460-2-git-send-email-zhaoshenglong@huawei.com>
-References: <1481006504-25460-1-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH 0/2] Add the missing resetting LRs at boot time for new-vgic
+Date: Tue, 6 Dec 2016 14:41:42 +0800
+Message-ID: <1481006504-25460-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 112F9402A3
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24C6C40419
  for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 01:43:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VvNXHUxd3FWB for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id zcMyCV7Xnnfw for <kvmarm@lists.cs.columbia.edu>;
  Tue,  6 Dec 2016 01:43:26 -0500 (EST)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D68640223
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 01:43:25 -0500 (EST)
-In-Reply-To: <1481006504-25460-1-git-send-email-zhaoshenglong@huawei.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECE30402A5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 01:43:23 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,37 +30,48 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-This is the corresponding part of commit 0d98d00(arm64: KVM:
-vgic-v3: Reset LRs at boot time) which is missed for new-vgic.
+Commit 50926d8(KVM: arm/arm64: The GIC is dead, long live the GIC)
+removes the old vgic and commit 9097773(KVM: arm/arm64: vgic-new: 
+vgic_init: implement kvm_vgic_hyp_init) doesn't reset LRs for new-vgic
+when probing GIC. These two patches add the missing part.
 
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
----
- virt/kvm/arm/vgic/vgic-v3.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+BTW, here is a strange problem on Huawei D03 board when using
+upstream kernel that android guest with a goldfish_fb will hang with
+rcu_stall and interrupt timeout for goldfish_fb. We apply these patches
+but the problem still exists, while if we revert the commit
+b40c489(arm64: KVM: vgic-v3: Only wipe LRs on vcpu exit) the guest runs
+well.
 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 5c9f974..7262f3b 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -307,6 +307,11 @@ int vgic_v3_map_resources(struct kvm *kvm)
- 	return ret;
- }
- 
-+static void vgic_cpu_init_lrs(void *params)
-+{
-+	kvm_call_hyp(__vgic_v3_init_lrs);
-+}
-+
- /**
-  * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
-  * @node:	pointer to the DT node
-@@ -361,5 +366,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
- 	kvm_vgic_global_state.type = VGIC_V3;
- 	kvm_vgic_global_state.max_gic_vcpus = VGIC_V3_MAX_CPUS;
- 
-+	on_each_cpu(vgic_cpu_init_lrs, NULL, 1);
-+
- 	return 0;
- }
+We add a trace in kvm_vgic_flush_hwstate() to print the value of 
+compute_ap_list_depth(vcpu) and the value of vgic_lr before calling
+vgic_flush_lr_state(). The first output shows that the ap_list_depth is zero
+but the first one in vgic_lr is 10a0000000002001. I don't understand why
+there is a valued one in vgic_lr since the memory of vgic_lr is zero
+allocated. I think It should be zero when the vcpu first run and first
+call kvm_vgic_flush_hwstate().
+
+qemu-system-aar-6673  [016] ....   501.969251: kvm_vgic_flush_hwstate: VCPU: 0, lits-count: 0, LR: 10a0000000002001, 0, 0, 0
+
+I also add a trace at the end of vgic_flush_lr_state() which shows the
+kvm_vgic_global_state.nr_lr is 4, used_lrs is 0 and all LRs in vgic_lr
+are zero.
+
+qemu-system-aar-6673  [016] ....   501.969254: vgic_flush_lr_state_nuke: kvm_vgic_global_state.nr_lr is :4, irq1:0, irq2:0, irq3:0, irq4:0
+
+But the trace at the beginning of kvm_vgic_sync_hwstate() shows the
+first one of vgic_lr is 10a0000000002001.
+
+qemu-system-aar-6673  [016] ....   501.969261: kvm_vgic_sync_hwstate_vgic_lr: VCPU: 0, used_lrs: 0, LR: 10a0000000002001, 0, 0, 0
+
+The above three trace outputs are printed by the first KVM_ENTRY/EXIT of VCPU 0.
+
+Shannon Zhao (2):
+  arm64: KVM: vgic-v3: Add the missing resetting LRs at boot time
+  KVM: arm/arm64: vgic-v2: Add the missing resetting LRs at boot time
+
+ virt/kvm/arm/vgic/vgic-v2.c | 11 +++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c |  7 +++++++
+ 2 files changed, 18 insertions(+)
+
 -- 
 2.0.4
