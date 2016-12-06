@@ -1,77 +1,189 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH 0/2] Add the missing resetting LRs at boot time for new-vgic
-Date: Tue, 6 Dec 2016 14:41:42 +0800
-Message-ID: <1481006504-25460-1-git-send-email-zhaoshenglong@huawei.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests RFC 03/15] arm/arm64: ITS skeleton
+Date: Tue, 6 Dec 2016 10:23:03 +0100
+Message-ID: <20161206092303.tq6gisapxierpwlx@kamzik.brq.redhat.com>
+References: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
+ <1480974406-29345-4-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24C6C40419
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 01:43:30 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zcMyCV7Xnnfw for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Dec 2016 01:43:26 -0500 (EST)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECE30402A5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 01:43:23 -0500 (EST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1480974406-29345-4-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, pbonzini@redhat.com, alex.bennee@linaro.org, peter.maydell@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shannon Zhao <shannon.zhao@linaro.org>
+On Mon, Dec 05, 2016 at 10:46:34PM +0100, Eric Auger wrote:
+> At the moment we just detect the presence of ITS as part of the
+> GICv3 init routine and initialize its base address.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  arm/Makefile.common        |  1 +
+>  lib/arm/asm/gic-v3-its.h   | 22 ++++++++++++++++++++++
+>  lib/arm/asm/gic.h          |  1 +
+>  lib/arm/gic-v3-its.c       |  9 +++++++++
+>  lib/arm/gic.c              | 30 +++++++++++++++++++++++++-----
+>  lib/arm64/asm/gic-v3-its.h |  1 +
+>  6 files changed, 59 insertions(+), 5 deletions(-)
+>  create mode 100644 lib/arm/asm/gic-v3-its.h
+>  create mode 100644 lib/arm/gic-v3-its.c
+>  create mode 100644 lib/arm64/asm/gic-v3-its.h
+> 
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index 6c0898f..070f349 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -47,6 +47,7 @@ cflatobjs += lib/arm/bitops.o
+>  cflatobjs += lib/arm/psci.o
+>  cflatobjs += lib/arm/smp.o
+>  cflatobjs += lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
+> +cflatobjs += lib/arm/gic-v3-its.o
+>  
+>  libeabi = lib/arm/libeabi.a
+>  eabiobjs = lib/arm/eabi_compat.o
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..2044565
+> --- /dev/null
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -0,0 +1,22 @@
+> +/*
+> + * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
+> + *
+> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
 
-Commit 50926d8(KVM: arm/arm64: The GIC is dead, long live the GIC)
-removes the old vgic and commit 9097773(KVM: arm/arm64: vgic-new: 
-vgic_init: implement kvm_vgic_hyp_init) doesn't reset LRs for new-vgic
-when probing GIC. These two patches add the missing part.
+s/Andrew/Eric/
 
-BTW, here is a strange problem on Huawei D03 board when using
-upstream kernel that android guest with a goldfish_fb will hang with
-rcu_stall and interrupt timeout for goldfish_fb. We apply these patches
-but the problem still exists, while if we revert the commit
-b40c489(arm64: KVM: vgic-v3: Only wipe LRs on vcpu exit) the guest runs
-well.
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#ifndef _ASMARM_GIC_V3_ITS_H_
+> +#define _ASMARM_GIC_V3_ITS_H_
+> +
+> +#ifndef __ASSEMBLY__
+> +
+> +struct its_data {
+> +	void *base;
+> +};
+> +
+> +extern struct its_data its_data;
+> +
+> +#define gicv3_its_base()		(its_data.base)
 
-We add a trace in kvm_vgic_flush_hwstate() to print the value of 
-compute_ap_list_depth(vcpu) and the value of vgic_lr before calling
-vgic_flush_lr_state(). The first output shows that the ap_list_depth is zero
-but the first one in vgic_lr is 10a0000000002001. I don't understand why
-there is a valued one in vgic_lr since the memory of vgic_lr is zero
-allocated. I think It should be zero when the vcpu first run and first
-call kvm_vgic_flush_hwstate().
+Can't we just add the ITS base address to the current gicv3_data struct?
 
-qemu-system-aar-6673  [016] ....   501.969251: kvm_vgic_flush_hwstate: VCPU: 0, lits-count: 0, LR: 10a0000000002001, 0, 0, 0
+> +
+> +#endif /* !__ASSEMBLY__ */
+> +#endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> index ea5fde9..73d4502 100644
+> --- a/lib/arm/asm/gic.h
+> +++ b/lib/arm/asm/gic.h
+> @@ -30,6 +30,7 @@
+>  
+>  #include <asm/gic-v2.h>
+>  #include <asm/gic-v3.h>
+> +#include <asm/gic-v3-its.h>
+>  
+>  #ifndef __ASSEMBLY__
+>  #include <asm/cpumask.h>
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> new file mode 100644
+> index 0000000..e382b80
+> --- /dev/null
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -0,0 +1,9 @@
+> +/*
+> + * Copyright (C) 2016, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <asm/gic.h>
+> +
+> +struct its_data its_data;
+> +
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index 957a146..e551abd 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -6,6 +6,7 @@
+>  #include <devicetree.h>
+>  #include <asm/gic.h>
+>  #include <asm/io.h>
+> +#include <asm/gic-v3-its.h>
+>  
+>  struct gic_common_ops *gic_common_ops;
+>  
+> @@ -17,12 +18,14 @@ struct gicv3_data gicv3_data;
+>   * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
+>   */
+>  static bool
+> -gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+> +gic_get_dt_bases(const char *compatible, void **base1, void **base2,
+> +		 void **base3)
+>  {
+>  	struct dt_pbus_reg reg;
+> -	struct dt_device gic;
+> +	struct dt_device gic, its;
+>  	struct dt_bus bus;
+> -	int node, ret;
+> +	int node, subnode, ret, len;
+> +	const void *fdt = dt_fdt();
+>  
+>  	dt_bus_init_defaults(&bus);
+>  	dt_device_init(&gic, &bus, NULL);
+> @@ -43,19 +46,36 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+>  	assert(ret == 0);
+>  	*base2 = ioremap(reg.addr, reg.size);
+>  
+> +	if (base3 && !strcmp(compatible, "arm,gic-v3")) {
+> +		dt_for_each_subnode(node, subnode) {
+> +			const struct fdt_property *prop;
+> +
+> +			prop = fdt_get_property(fdt, subnode,
+> +						"compatible", &len);
+> +			if (!strcmp((char *)prop->data, "arm,gic-v3-its")) {
+> +				dt_device_bind_node(&its, subnode);
+> +				ret = dt_pbus_translate(&its, 0, &reg);
+> +				assert(ret == 0);
+> +				*base3 = ioremap(reg.addr, reg.size);
+> +				break;
+> +			}
+> +		}
+> +
+> +	}
+> +
+>  	return true;
+>  }
+>  
+>  int gicv2_init(void)
+>  {
+>  	return gic_get_dt_bases("arm,cortex-a15-gic",
+> -			&gicv2_data.dist_base, &gicv2_data.cpu_base);
+> +			&gicv2_data.dist_base, &gicv2_data.cpu_base, NULL);
+>  }
+>  
+>  int gicv3_init(void)
+>  {
+>  	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
+> -			&gicv3_data.redist_base[0]);
+> +			&gicv3_data.redist_base[0], &its_data.base);
+>  }
+>  
+>  int gic_init(void)
+> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..083cba4
+> --- /dev/null
+> +++ b/lib/arm64/asm/gic-v3-its.h
+> @@ -0,0 +1 @@
+> +#include "../../arm/asm/gic-v3-its.h"
+> -- 
+> 2.5.5
+> 
+>
 
-I also add a trace at the end of vgic_flush_lr_state() which shows the
-kvm_vgic_global_state.nr_lr is 4, used_lrs is 0 and all LRs in vgic_lr
-are zero.
-
-qemu-system-aar-6673  [016] ....   501.969254: vgic_flush_lr_state_nuke: kvm_vgic_global_state.nr_lr is :4, irq1:0, irq2:0, irq3:0, irq4:0
-
-But the trace at the beginning of kvm_vgic_sync_hwstate() shows the
-first one of vgic_lr is 10a0000000002001.
-
-qemu-system-aar-6673  [016] ....   501.969261: kvm_vgic_sync_hwstate_vgic_lr: VCPU: 0, used_lrs: 0, LR: 10a0000000002001, 0, 0, 0
-
-The above three trace outputs are printed by the first KVM_ENTRY/EXIT of VCPU 0.
-
-Shannon Zhao (2):
-  arm64: KVM: vgic-v3: Add the missing resetting LRs at boot time
-  KVM: arm/arm64: vgic-v2: Add the missing resetting LRs at boot time
-
- virt/kvm/arm/vgic/vgic-v2.c | 11 +++++++++++
- virt/kvm/arm/vgic/vgic-v3.c |  7 +++++++
- 2 files changed, 18 insertions(+)
-
--- 
-2.0.4
+Thanks,
+drew 
