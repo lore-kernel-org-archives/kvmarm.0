@@ -1,26 +1,25 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH 1/2] arm64: PMU: Do not use PMSELR_EL0 to access
- PMCCFILTR_EL0
-Date: Tue, 6 Dec 2016 13:50:20 +0000
-Message-ID: <20161206135020.GI2498@arm.com>
-References: <1480693859-27249-1-git-send-email-marc.zyngier@arm.com>
- <1480693859-27249-2-git-send-email-marc.zyngier@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v9 04/11] irqchip/gic-v3: Add missing system register
+ definitions
+Date: Tue, 6 Dec 2016 14:53:17 +0100
+Message-ID: <09831c41-3421-0c35-9d62-0ad7c92916d0@redhat.com>
+References: <1479906118-15832-1-git-send-email-vijay.kilari@gmail.com>
+ <1479906118-15832-5-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 760F6401BF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 08:49:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D56EF401E7
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 08:52:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CQWsUb+YuMal for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Dec 2016 08:49:22 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 327BA4005E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 08:49:21 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <1480693859-27249-2-git-send-email-marc.zyngier@arm.com>
+ with ESMTP id 6dfGFbUwCTZb for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Dec 2016 08:52:25 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2576401BF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 08:52:24 -0500 (EST)
+In-Reply-To: <1479906118-15832-5-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,56 +29,96 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Itaru Kitayama <itaru.kitayama@riken.jp>, Catalin Marinas <catalin.marinas@arm.com>, Hoan Tran <hotran@apm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Tai Tri Nguyen <ttnguyen@apm.com>
+To: vijay.kilari@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, peter.maydell@linaro.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 02, 2016 at 03:50:58PM +0000, Marc Zyngier wrote:
-> The ARMv8 architecture allows the cycle counter to be configured
-> by setting PMSELR_EL0.SEL==0x1f and then accessing PMXEVTYPER_EL0,
-> hence accessing PMCCFILTR_EL0. But it disallows the use of
-> PMSELR_EL0.SEL==0x1f to access the cycle counter itself through
-> PMXEVCNTR_EL0.
+Hi,
+On 23/11/2016 14:01, vijay.kilari@gmail.com wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 > 
-> Linux itself doesn't violate this rule, but we may end up with
-> PMSELR_EL0.SEL being set to 0x1f when we enter a guest. If that
-> guest accesses PMXEVCNTR_EL0, the access may UNDEF at EL1,
-> despite the guest not having done anything wrong.
+> Define register definitions for ICH_VMCR_EL2, ICC_CTLR_EL1 and
+> ICH_VTR_EL2, ICC_BPR0_EL1, ICC_BPR1_EL1 registers.
 > 
-> In order to avoid this unfortunate course of events (haha!), let's
-> apply the same method armv8pmu_write_counter and co are using,
-> explicitely checking for the cycle counter and writing to
-> PMCCFILTR_EL0 directly. This prevents writing 0x1f to PMSELR_EL0,
-> and saves a Linux guest an extra trap.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+
 > ---
->  arch/arm64/kernel/perf_event.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  include/linux/irqchip/arm-gic-v3.h | 43 ++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 41 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-> index 57ae9d9..a65b757 100644
-> --- a/arch/arm64/kernel/perf_event.c
-> +++ b/arch/arm64/kernel/perf_event.c
-> @@ -632,7 +632,10 @@ static inline void armv8pmu_write_counter(struct perf_event *event, u32 value)
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index 0deea34..b4f8287 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -352,8 +352,30 @@
+>  /*
+>   * CPU interface registers
+>   */
+> -#define ICC_CTLR_EL1_EOImode_drop_dir	(0U << 1)
+> -#define ICC_CTLR_EL1_EOImode_drop	(1U << 1)
+> +#define ICC_CTLR_EL1_EOImode_SHIFT	(1)
+> +#define ICC_CTLR_EL1_EOImode_drop_dir	(0U << ICC_CTLR_EL1_EOImode_SHIFT)
+> +#define ICC_CTLR_EL1_EOImode_drop	(1U << ICC_CTLR_EL1_EOImode_SHIFT)
+> +#define ICC_CTLR_EL1_EOImode_MASK	(1 << ICC_CTLR_EL1_EOImode_SHIFT)
+> +#define ICC_CTLR_EL1_CBPR_SHIFT		0
+> +#define ICC_CTLR_EL1_CBPR_MASK		(1 << ICC_CTLR_EL1_CBPR_SHIFT)
+> +#define ICC_CTLR_EL1_PRI_BITS_SHIFT	8
+> +#define ICC_CTLR_EL1_PRI_BITS_MASK	(0x7 << ICC_CTLR_EL1_PRI_BITS_SHIFT)
+> +#define ICC_CTLR_EL1_ID_BITS_SHIFT	11
+> +#define ICC_CTLR_EL1_ID_BITS_MASK	(0x7 << ICC_CTLR_EL1_ID_BITS_SHIFT)
+> +#define ICC_CTLR_EL1_SEIS_SHIFT		14
+> +#define ICC_CTLR_EL1_SEIS_MASK		(0x1 << ICC_CTLR_EL1_SEIS_SHIFT)
+> +#define ICC_CTLR_EL1_A3V_SHIFT		15
+> +#define ICC_CTLR_EL1_A3V_MASK		(0x1 << ICC_CTLR_EL1_A3V_SHIFT)
+> +#define ICC_PMR_EL1_SHIFT		0
+> +#define ICC_PMR_EL1_MASK		(0xff << ICC_PMR_EL1_SHIFT)
+> +#define ICC_BPR0_EL1_SHIFT		0
+> +#define ICC_BPR0_EL1_MASK		(0x7 << ICC_BPR0_EL1_SHIFT)
+> +#define ICC_BPR1_EL1_SHIFT		0
+> +#define ICC_BPR1_EL1_MASK		(0x7 << ICC_BPR1_EL1_SHIFT)
+> +#define ICC_IGRPEN0_EL1_SHIFT		0
+> +#define ICC_IGRPEN0_EL1_MASK		(1 << ICC_IGRPEN0_EL1_SHIFT)
+> +#define ICC_IGRPEN1_EL1_SHIFT		0
+> +#define ICC_IGRPEN1_EL1_MASK		(1 << ICC_IGRPEN1_EL1_SHIFT)
+>  #define ICC_SRE_EL1_SRE			(1U << 0)
 >  
->  static inline void armv8pmu_write_evtype(int idx, u32 val)
->  {
-> -	if (armv8pmu_select_counter(idx) == idx) {
-> +	if (idx == ARMV8_IDX_CYCLE_COUNTER) {
-> +		val &= ARMV8_PMU_EVTYPE_MASK & ~ARMV8_PMU_EVTYPE_EVENT;
-> +		write_sysreg(val, pmccfiltr_el0);
-> +	} else if (armv8pmu_select_counter(idx) == idx) {
+>  /*
+> @@ -384,12 +406,29 @@
+>  
+>  #define ICH_VMCR_CTLR_SHIFT		0
+>  #define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
+> +#define ICH_VMCR_CBPR_SHIFT		4
+> +#define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
+> +#define ICH_VMCR_EOIM_SHIFT		9
+> +#define ICH_VMCR_EOIM_MASK		(1 << ICH_VMCR_EOIM_SHIFT)
+>  #define ICH_VMCR_BPR1_SHIFT		18
+>  #define ICH_VMCR_BPR1_MASK		(7 << ICH_VMCR_BPR1_SHIFT)
+>  #define ICH_VMCR_BPR0_SHIFT		21
+>  #define ICH_VMCR_BPR0_MASK		(7 << ICH_VMCR_BPR0_SHIFT)
+>  #define ICH_VMCR_PMR_SHIFT		24
+>  #define ICH_VMCR_PMR_MASK		(0xffUL << ICH_VMCR_PMR_SHIFT)
+> +#define ICH_VMCR_ENG0_SHIFT		0
+> +#define ICH_VMCR_ENG0_MASK		(1 << ICH_VMCR_ENG0_SHIFT)
+> +#define ICH_VMCR_ENG1_SHIFT		1
+> +#define ICH_VMCR_ENG1_MASK		(1 << ICH_VMCR_ENG1_SHIFT)
+Besides the fact the V* was omitted (for instance VENG0) this looks good
+to me.
+> +
+> +#define ICH_VTR_PRI_BITS_SHIFT		29
+> +#define ICH_VTR_PRI_BITS_MASK		(7 << ICH_VTR_PRI_BITS_SHIFT)
+> +#define ICH_VTR_ID_BITS_SHIFT		23
+> +#define ICH_VTR_ID_BITS_MASK		(7 << ICH_VTR_ID_BITS_SHIFT)
+> +#define ICH_VTR_SEIS_SHIFT		22
+> +#define ICH_VTR_SEIS_MASK		(1 << ICH_VTR_SEIS_SHIFT)
+> +#define ICH_VTR_A3V_SHIFT		21
+> +#define ICH_VTR_A3V_MASK		(1 << ICH_VTR_A3V_SHIFT)
+Some fields are omitted but I guess they are not used.
 
-If we go down this route, then we also have to "fix" the 32-bit code,
-which uses PMSELR in a similar way. However, neither of the perf drivers
-are actually doing anything wrong here -- the problem comes about because
-the architecture doesn't guarantee that PMU accesses trap to EL2 unless
-both MDCR.TPM=1 *and* PMSELR_EL0 is valid. So I think that this should
-be handled together, in the KVM code that enables PMU traps.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Given that the perf callbacks tend to run with preemption disabled, I
-think you should be fine nuking PMSELR_EL0 to zero (i.e. no need to
-save/restore).
+Eric
 
-Will
+>  
+>  #define ICC_IAR1_EL1_SPURIOUS		0x3ff
+>  
+> 
