@@ -1,26 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/2] arm64: PMU: Do not use PMSELR_EL0 to access
- PMCCFILTR_EL0
-Date: Tue, 6 Dec 2016 14:32:17 +0000
-Message-ID: <00b75c67-9d94-e9c3-6ae3-a706087bdd26@arm.com>
-References: <1480693859-27249-1-git-send-email-marc.zyngier@arm.com>
- <1480693859-27249-2-git-send-email-marc.zyngier@arm.com>
- <20161206135020.GI2498@arm.com>
+Subject: [PATCH v2] arm64: KVM: pmu: Reset PMSELR_EL0.SEL to a sane value
+ before entering the guest
+Date: Tue,  6 Dec 2016 14:56:50 +0000
+Message-ID: <1481036210-31816-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4671B40354
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 09:31:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9420A401E8
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 09:56:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xeEdQwZjNbjG for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Dec 2016 09:31:23 -0500 (EST)
+ with ESMTP id j51VUVPSCgQe for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Dec 2016 09:56:01 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F63F402EF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 09:31:22 -0500 (EST)
-In-Reply-To: <20161206135020.GI2498@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7929940199
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 09:56:01 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,63 +26,53 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: Itaru Kitayama <itaru.kitayama@riken.jp>, Catalin Marinas <catalin.marinas@arm.com>, Hoan Tran <hotran@apm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Tai Tri Nguyen <ttnguyen@apm.com>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Itaru Kitayama <itaru.kitayama@riken.jp>, Catalin Marinas <catalin.marinas@arm.com>, Hoan Tran <hotran@apm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Tai Tri Nguyen <ttnguyen@apm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/12/16 13:50, Will Deacon wrote:
-> On Fri, Dec 02, 2016 at 03:50:58PM +0000, Marc Zyngier wrote:
->> The ARMv8 architecture allows the cycle counter to be configured
->> by setting PMSELR_EL0.SEL==0x1f and then accessing PMXEVTYPER_EL0,
->> hence accessing PMCCFILTR_EL0. But it disallows the use of
->> PMSELR_EL0.SEL==0x1f to access the cycle counter itself through
->> PMXEVCNTR_EL0.
->>
->> Linux itself doesn't violate this rule, but we may end up with
->> PMSELR_EL0.SEL being set to 0x1f when we enter a guest. If that
->> guest accesses PMXEVCNTR_EL0, the access may UNDEF at EL1,
->> despite the guest not having done anything wrong.
->>
->> In order to avoid this unfortunate course of events (haha!), let's
->> apply the same method armv8pmu_write_counter and co are using,
->> explicitely checking for the cycle counter and writing to
->> PMCCFILTR_EL0 directly. This prevents writing 0x1f to PMSELR_EL0,
->> and saves a Linux guest an extra trap.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/kernel/perf_event.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
->> index 57ae9d9..a65b757 100644
->> --- a/arch/arm64/kernel/perf_event.c
->> +++ b/arch/arm64/kernel/perf_event.c
->> @@ -632,7 +632,10 @@ static inline void armv8pmu_write_counter(struct perf_event *event, u32 value)
->>  
->>  static inline void armv8pmu_write_evtype(int idx, u32 val)
->>  {
->> -	if (armv8pmu_select_counter(idx) == idx) {
->> +	if (idx == ARMV8_IDX_CYCLE_COUNTER) {
->> +		val &= ARMV8_PMU_EVTYPE_MASK & ~ARMV8_PMU_EVTYPE_EVENT;
->> +		write_sysreg(val, pmccfiltr_el0);
->> +	} else if (armv8pmu_select_counter(idx) == idx) {
-> 
-> If we go down this route, then we also have to "fix" the 32-bit code,
-> which uses PMSELR in a similar way. However, neither of the perf drivers
-> are actually doing anything wrong here -- the problem comes about because
-> the architecture doesn't guarantee that PMU accesses trap to EL2 unless
-> both MDCR.TPM=1 *and* PMSELR_EL0 is valid. So I think that this should
-> be handled together, in the KVM code that enables PMU traps.
-> 
-> Given that the perf callbacks tend to run with preemption disabled, I
-> think you should be fine nuking PMSELR_EL0 to zero (i.e. no need to
-> save/restore).
+The ARMv8 architecture allows the cycle counter to be configured
+by setting PMSELR_EL0.SEL==0x1f and then accessing PMXEVTYPER_EL0,
+hence accessing PMCCFILTR_EL0. But it disallows the use of
+PMSELR_EL0.SEL==0x1f to access the cycle counter itself through
+PMXEVCNTR_EL0.
 
-Fair enough. I'll respin another patch in a bit.
+Linux itself doesn't violate this rule, but we may end up with
+PMSELR_EL0.SEL being set to 0x1f when we enter a guest. If that
+guest accesses PMXEVCNTR_EL0, the access may UNDEF at EL1,
+despite the guest not having done anything wrong.
 
-Thanks,
+In order to avoid this unfortunate course of events (haha!), let's
+sanitize PMSELR_EL0 on guest entry. This ensures that the guest
+won't explode unexpectedly.
 
-	M.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+This is another approach to fix this issue, this time nuking PMSELR_EL0
+on guest entry instead of relying on perf not to clobber the register.
+
+Tested on v4.9-rc8 with a Rev A3 X-Gene.
+
+ arch/arm64/kvm/hyp/switch.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 83037cd..3b7cfbd 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -85,7 +85,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 	write_sysreg(val, hcr_el2);
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+-	/* Make sure we trap PMU access from EL0 to EL2 */
++	/*
++	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
++	 * PMSELR_EL0 to make sure it never contains the cycle
++	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF.
++	 */
++	if (vcpu->arch.mdcr_el2 & MDCR_EL2_HPMN_MASK)
++		write_sysreg(0, pmselr_el0);
+ 	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+ 	__activate_traps_arch()();
 -- 
-Jazz is not dead. It just smells funny...
+2.1.4
