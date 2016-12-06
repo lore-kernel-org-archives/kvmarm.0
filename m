@@ -1,24 +1,25 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm/arm64: KVM: Check for properly initialized timer on
- init
-Date: Tue, 6 Dec 2016 11:25:42 +0000
-Message-ID: <1ed187ba-965b-6087-f74f-68627f0d0504@arm.com>
-References: <20161205093211.11870-1-christoffer.dall@linaro.org>
+Subject: Re: [PATCH 1/2] arm64: KVM: vgic-v3: Add the missing resetting LRs at
+ boot time
+Date: Tue, 6 Dec 2016 11:38:35 +0000
+Message-ID: <1025ed4f-4e79-8d9b-e99a-2b583ab1788f@arm.com>
+References: <1481006504-25460-1-git-send-email-zhaoshenglong@huawei.com>
+ <1481006504-25460-2-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5723A40598
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 06:24:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B4C9F402A3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 06:37:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v1wQ9WlF7Ru3 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Dec 2016 06:24:47 -0500 (EST)
+ with ESMTP id xVPAReIaR3ek for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Dec 2016 06:37:40 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 97A1940428
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 06:24:47 -0500 (EST)
-In-Reply-To: <20161205093211.11870-1-christoffer.dall@linaro.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E236B40296
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 06:37:39 -0500 (EST)
+In-Reply-To: <1481006504-25460-2-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,49 +29,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Shih-Wei Li <shihwei@cs.columbia.edu>
+To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/12/16 09:32, Christoffer Dall wrote:
-> When the arch timer code fails to initialize (for example because the
-> memory mapped timer doesn't work, which is currently seen with the AEM
-> model), then KVM just continues happily with a final result that KVM
-> eventually does a NULL pointer dereference of the uninitialized cycle
-> counter.
+Hi Shannon,
+
+On 06/12/16 06:41, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> Check directly for this in the init path and give the user a reasonable
-> error in this case.
+> This is the corresponding part of commit 0d98d00(arm64: KVM:
+> vgic-v3: Reset LRs at boot time) which is missed for new-vgic.
 > 
-> Cc: Shih-Wei Li <shihwei@cs.columbia.edu>
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 > ---
->  virt/kvm/arm/arch_timer.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  virt/kvm/arm/vgic/vgic-v3.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index 27a1f63..5c12f53 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -425,6 +425,11 @@ int kvm_timer_hyp_init(void)
->  	info = arch_timer_get_kvm_info();
->  	timecounter = &info->timecounter;
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 5c9f974..7262f3b 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -307,6 +307,11 @@ int vgic_v3_map_resources(struct kvm *kvm)
+>  	return ret;
+>  }
 >  
-> +	if (!timecounter->cc) {
-> +		kvm_err("arch_timer: uninitialized timecounter\n");
-
-For consistency, I'll change the error message to say "kvm_arch_timer",
-just like the below case.
-
-> +		return -ENODEV;
-> +	}
+> +static void vgic_cpu_init_lrs(void *params)
+> +{
+> +	kvm_call_hyp(__vgic_v3_init_lrs);
+> +}
 > +
->  	if (info->virtual_irq <= 0) {
->  		kvm_err("kvm_arch_timer: invalid virtual timer IRQ: %d\n",
->  			info->virtual_irq);
-> 
+>  /**
+>   * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
+>   * @node:	pointer to the DT node
+> @@ -361,5 +366,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+>  	kvm_vgic_global_state.type = VGIC_V3;
+>  	kvm_vgic_global_state.max_gic_vcpus = VGIC_V3_MAX_CPUS;
+>  
+> +	on_each_cpu(vgic_cpu_init_lrs, NULL, 1);
 
-Otherwise looks good to me. I'll queue it now.
+I don't think that's enough. If you have CPU hotplug, your CPU will come
+up with reset values long after boot. I think you need something that is
+triggered from cpu_init_hyp_mode/cpu_hyp_reinit.
+
+> +
+>  	return 0;
+>  }
+> 
 
 Thanks,
 
