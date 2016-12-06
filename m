@@ -1,67 +1,101 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests RFC 05/15] arm/arm64: GICv3: add
- cpu count
-Date: Tue, 6 Dec 2016 10:29:25 +0100
-Message-ID: <20161206092925.mk4gwx7jbomzxsfz@kamzik.brq.redhat.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests RFC 05/15] arm/arm64: GICv3: add cpu
+ count
+Date: Tue, 6 Dec 2016 09:32:55 +0000
+Message-ID: <b7ba4a79-0a8d-3520-ba19-1afd6f2de4c1@arm.com>
 References: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
  <1480974406-29345-6-git-send-email-eric.auger@redhat.com>
+ <20161206092925.mk4gwx7jbomzxsfz@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1480974406-29345-6-git-send-email-eric.auger@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, pbonzini@redhat.com, alex.bennee@linaro.org, peter.maydell@linaro.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DCCDE40223
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 04:31:10 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id vGqkuNe94R7I for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Dec 2016 04:31:09 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B099401F2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 04:31:09 -0500 (EST)
+In-Reply-To: <20161206092925.mk4gwx7jbomzxsfz@kamzik.brq.redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>, Eric Auger <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 05, 2016 at 10:46:36PM +0100, Eric Auger wrote:
-> Add a new cpu_count field in gicv3_data indicating the
-> number of redistributors. This will be useful for enumeration
-> of their resources such as LPI pending tables.
+Hi,
 
-I'm fine with the additional state, but just curious, will it
-ever be possible for gicv3.cpu_count != nr_cpus?
+On 06/12/16 09:29, Andrew Jones wrote:
+> On Mon, Dec 05, 2016 at 10:46:36PM +0100, Eric Auger wrote:
+>> Add a new cpu_count field in gicv3_data indicating the
+>> number of redistributors. This will be useful for enumeration
+>> of their resources such as LPI pending tables.
+> 
+> I'm fine with the additional state, but just curious, will it
+> ever be possible for gicv3.cpu_count != nr_cpus?
 
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  lib/arm/asm/gic-v3.h | 1 +
->  lib/arm/gic-v3.c     | 2 ++
->  2 files changed, 3 insertions(+)
-> 
-> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-> index ed330af..039b7c2 100644
-> --- a/lib/arm/asm/gic-v3.h
-> +++ b/lib/arm/asm/gic-v3.h
-> @@ -58,6 +58,7 @@ struct gicv3_data {
->  	void *dist_base;
->  	void *redist_base[NR_CPUS];
->  	unsigned int irq_nr;
-> +	unsigned int cpu_count;
->  };
->  extern struct gicv3_data gicv3_data;
->  
-> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
-> index 6246221..9921f4d 100644
-> --- a/lib/arm/gic-v3.c
-> +++ b/lib/arm/gic-v3.c
-> @@ -12,12 +12,14 @@ void gicv3_set_redist_base(size_t stride)
->  	void *ptr = gicv3_data.redist_base[0];
->  	u64 typer;
->  
-> +	gicv3_data.cpu_count = 0;
->  	do {
->  		typer = gicv3_read_typer(ptr + GICR_TYPER);
->  		if ((typer >> 32) == aff) {
->  			gicv3_redist_base() = ptr;
->  			return;
->  		}
-> +		gicv3_data.cpu_count++;
->  		ptr += stride; /* skip RD_base, SGI_base, etc. */
->  	} while (!(typer & GICR_TYPER_LAST));
->  
-> -- 
-> 2.5.5
-> 
-> 
+If not you are in trouble, so that should in fact be one test.
+
+Which brings me to my comment ...
+
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  lib/arm/asm/gic-v3.h | 1 +
+>>  lib/arm/gic-v3.c     | 2 ++
+>>  2 files changed, 3 insertions(+)
+>>
+>> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+>> index ed330af..039b7c2 100644
+>> --- a/lib/arm/asm/gic-v3.h
+>> +++ b/lib/arm/asm/gic-v3.h
+>> @@ -58,6 +58,7 @@ struct gicv3_data {
+>>  	void *dist_base;
+>>  	void *redist_base[NR_CPUS];
+>>  	unsigned int irq_nr;
+>> +	unsigned int cpu_count;
+
+Should that be called "nr_redists" or the like?
+Since this is what it counts in the code below.
+Later we can then compare this with nr_cpus to check for a match.
+
+Cheers,
+Andre.
+
+>>  };
+>>  extern struct gicv3_data gicv3_data;
+>>  
+>> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+>> index 6246221..9921f4d 100644
+>> --- a/lib/arm/gic-v3.c
+>> +++ b/lib/arm/gic-v3.c
+>> @@ -12,12 +12,14 @@ void gicv3_set_redist_base(size_t stride)
+>>  	void *ptr = gicv3_data.redist_base[0];
+>>  	u64 typer;
+>>  
+>> +	gicv3_data.cpu_count = 0;
+>>  	do {
+>>  		typer = gicv3_read_typer(ptr + GICR_TYPER);
+>>  		if ((typer >> 32) == aff) {
+>>  			gicv3_redist_base() = ptr;
+>>  			return;
+>>  		}
+>> +		gicv3_data.cpu_count++;
+>>  		ptr += stride; /* skip RD_base, SGI_base, etc. */
+>>  	} while (!(typer & GICR_TYPER_LAST));
+>>  
+>> -- 
+>> 2.5.5
+>>
+>>
