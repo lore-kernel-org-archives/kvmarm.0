@@ -1,31 +1,26 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v9 01/11] arm/arm64: vgic: Implement support for
- userspace access
-Date: Tue, 6 Dec 2016 15:30:48 +0100
-Message-ID: <20161206143048.GC4816@cbox>
-References: <1479906118-15832-1-git-send-email-vijay.kilari@gmail.com>
- <1479906118-15832-2-git-send-email-vijay.kilari@gmail.com>
- <20161128130512.GC18170@cbox>
- <20c63256-48f7-692c-1c6c-c4fcdb82f401@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/2] arm64: PMU: Do not use PMSELR_EL0 to access
+ PMCCFILTR_EL0
+Date: Tue, 6 Dec 2016 14:32:17 +0000
+Message-ID: <00b75c67-9d94-e9c3-6ae3-a706087bdd26@arm.com>
+References: <1480693859-27249-1-git-send-email-marc.zyngier@arm.com>
+ <1480693859-27249-2-git-send-email-marc.zyngier@arm.com>
+ <20161206135020.GI2498@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 51FDB40354
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 09:29:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4671B40354
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 09:31:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nd82E6IBaXAI for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Dec 2016 09:29:44 -0500 (EST)
-Received: from mail-wj0-f178.google.com (mail-wj0-f178.google.com
- [209.85.210.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 04072402EF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 09:29:43 -0500 (EST)
-Received: by mail-wj0-f178.google.com with SMTP id xy5so323302336wjc.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Dec 2016 06:30:41 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <20c63256-48f7-692c-1c6c-c4fcdb82f401@redhat.com>
+ with ESMTP id xeEdQwZjNbjG for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Dec 2016 09:31:23 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F63F402EF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 09:31:22 -0500 (EST)
+In-Reply-To: <20161206135020.GI2498@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,151 +30,63 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>
-Cc: marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Itaru Kitayama <itaru.kitayama@riken.jp>, Catalin Marinas <catalin.marinas@arm.com>, Hoan Tran <hotran@apm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Tai Tri Nguyen <ttnguyen@apm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Dec 06, 2016 at 12:42:09PM +0100, Auger Eric wrote:
-> Hi,
+On 06/12/16 13:50, Will Deacon wrote:
+> On Fri, Dec 02, 2016 at 03:50:58PM +0000, Marc Zyngier wrote:
+>> The ARMv8 architecture allows the cycle counter to be configured
+>> by setting PMSELR_EL0.SEL==0x1f and then accessing PMXEVTYPER_EL0,
+>> hence accessing PMCCFILTR_EL0. But it disallows the use of
+>> PMSELR_EL0.SEL==0x1f to access the cycle counter itself through
+>> PMXEVCNTR_EL0.
+>>
+>> Linux itself doesn't violate this rule, but we may end up with
+>> PMSELR_EL0.SEL being set to 0x1f when we enter a guest. If that
+>> guest accesses PMXEVCNTR_EL0, the access may UNDEF at EL1,
+>> despite the guest not having done anything wrong.
+>>
+>> In order to avoid this unfortunate course of events (haha!), let's
+>> apply the same method armv8pmu_write_counter and co are using,
+>> explicitely checking for the cycle counter and writing to
+>> PMCCFILTR_EL0 directly. This prevents writing 0x1f to PMSELR_EL0,
+>> and saves a Linux guest an extra trap.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm64/kernel/perf_event.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+>> index 57ae9d9..a65b757 100644
+>> --- a/arch/arm64/kernel/perf_event.c
+>> +++ b/arch/arm64/kernel/perf_event.c
+>> @@ -632,7 +632,10 @@ static inline void armv8pmu_write_counter(struct perf_event *event, u32 value)
+>>  
+>>  static inline void armv8pmu_write_evtype(int idx, u32 val)
+>>  {
+>> -	if (armv8pmu_select_counter(idx) == idx) {
+>> +	if (idx == ARMV8_IDX_CYCLE_COUNTER) {
+>> +		val &= ARMV8_PMU_EVTYPE_MASK & ~ARMV8_PMU_EVTYPE_EVENT;
+>> +		write_sysreg(val, pmccfiltr_el0);
+>> +	} else if (armv8pmu_select_counter(idx) == idx) {
 > 
-> On 28/11/2016 14:05, Christoffer Dall wrote:
-> > On Wed, Nov 23, 2016 at 06:31:48PM +0530, vijay.kilari@gmail.com wrote:
-> >> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> >>
-> >> Read and write of some registers like ISPENDR and ICPENDR
-> >> from userspace requires special handling when compared to
-> >> guest access for these registers.
-> >>
-> >> Refer to Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> >> for handling of ISPENDR, ICPENDR registers handling.
-> >>
-> >> Add infrastructure to support guest and userspace read
-> >> and write for the required registers
-> >> Also moved vgic_uaccess from vgic-mmio-v2.c to vgic-mmio.c
-> >>
-> >> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> >> ---
-> >>  virt/kvm/arm/vgic/vgic-mmio-v2.c |  25 ----------
-> >>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 102 ++++++++++++++++++++++++++++++++-------
-> >>  virt/kvm/arm/vgic/vgic-mmio.c    |  78 +++++++++++++++++++++++++++---
-> >>  virt/kvm/arm/vgic/vgic-mmio.h    |  19 ++++++++
-> >>  4 files changed, 175 insertions(+), 49 deletions(-)
-> >>
-> >> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> >> index b44b359..0b32f40 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> >> @@ -406,31 +406,6 @@ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
-> >>  	return -ENXIO;
-> >>  }
-> >>  
-> >> -/*
-> >> - * When userland tries to access the VGIC register handlers, we need to
-> >> - * create a usable struct vgic_io_device to be passed to the handlers and we
-> >> - * have to set up a buffer similar to what would have happened if a guest MMIO
-> >> - * access occurred, including doing endian conversions on BE systems.
-> >> - */
-> >> -static int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
-> >> -			bool is_write, int offset, u32 *val)
-> >> -{
-> >> -	unsigned int len = 4;
-> >> -	u8 buf[4];
-> >> -	int ret;
-> >> -
-> >> -	if (is_write) {
-> >> -		vgic_data_host_to_mmio_bus(buf, len, *val);
-> >> -		ret = kvm_io_gic_ops.write(vcpu, &dev->dev, offset, len, buf);
-> >> -	} else {
-> >> -		ret = kvm_io_gic_ops.read(vcpu, &dev->dev, offset, len, buf);
-> >> -		if (!ret)
-> >> -			*val = vgic_data_mmio_bus_to_host(buf, len);
-> >> -	}
-> >> -
-> >> -	return ret;
-> >> -}
-> >> -
-> >>  int vgic_v2_cpuif_uaccess(struct kvm_vcpu *vcpu, bool is_write,
-> >>  			  int offset, u32 *val)
-> >>  {
-> >> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> >> index 50f42f0..8e76d04 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> >> @@ -207,6 +207,66 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
-> >>  	return 0;
-> >>  }
-> >>  
-> >> +static unsigned long vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
-> >> +						  gpa_t addr, unsigned int len)
-> >> +{
-> >> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> >> +	u32 value = 0;
-> >> +	int i;
-> >> +
-> >> +	/*
-> >> +	 * A level triggerred interrupt pending state is latched in both
-> >> +	 * "soft_pending" and "line_level" variables. Userspace will save
-> >> +	 * and restore soft_pending and line_level separately.
-> >> +	 * Refer to Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> >> +	 * handling of ISPENDR and ICPENDR.
-> >> +	 */
-> >> +	for (i = 0; i < len * 8; i++) {
-> >> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> >> +
-> >> +		if (irq->config == VGIC_CONFIG_LEVEL && irq->soft_pending)
-> >> +			value |= (1U << i);
-> >> +		if (irq->config == VGIC_CONFIG_EDGE && irq->pending)
-> >> +			value |= (1U << i);
-> >> +
-> >> +		vgic_put_irq(vcpu->kvm, irq);
-> >> +	}
-> >> +
-> >> +	return value;
-> >> +}
-> >> +
-> >> +static void vgic_v3_uaccess_write_pending(struct kvm_vcpu *vcpu,
-> >> +					  gpa_t addr, unsigned int len,
-> >> +					  unsigned long val)
-> >> +{
-> >> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> >> +	int i;
-> >> +
-> >> +	for (i = 0; i < len * 8; i++) {
-> >> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> >> +
-> >> +		spin_lock(&irq->irq_lock);
-> >> +		if (test_bit(i, &val)) {
-> >> +			/* soft_pending is set irrespective of irq type
-> >> +			 * (level or edge) to avoid dependency that VM should
-> >> +			 * restore irq config before pending info.
-> >> +			 */
-> > 
-> > nit: kernel commenting style
-> > 
-> >> +			irq->pending = true;
-> >> +			irq->soft_pending = true;
-> >> +			vgic_queue_irq_unlock(vcpu->kvm, irq);
-> >> +		} else {
-> >> +			irq->soft_pending = false;
-> >> +			if (irq->config == VGIC_CONFIG_EDGE ||
-> >> +			    (irq->config == VGIC_CONFIG_LEVEL &&
-> >> +			    !irq->line_level))
-> >> +				irq->pending = false;
-> I am confused by the comment above. Since we test the irq config here
-> don't we assume the config was restored before the pending state?
+> If we go down this route, then we also have to "fix" the 32-bit code,
+> which uses PMSELR in a similar way. However, neither of the perf drivers
+> are actually doing anything wrong here -- the problem comes about because
+> the architecture doesn't guarantee that PMU accesses trap to EL2 unless
+> both MDCR.TPM=1 *and* PMSELR_EL0 is valid. So I think that this should
+> be handled together, in the KVM code that enables PMU traps.
+> 
+> Given that the perf callbacks tend to run with preemption disabled, I
+> think you should be fine nuking PMSELR_EL0 to zero (i.e. no need to
+> save/restore).
 
-THe idea here was that if you're setting the value, then if you later
-set the config to level, then the soft_pending state has already been
-set properly, and if the irq stays an edge, then it doesn't matter what
-that field is.
-
-If you read the value, the assumption is that you're reading a
-consistently configured GIC, if not, then all bets are off anyhow.
-
-Does that make sense?
-
-Perhaps only the comment should be adjusted or do you think the logic is
-flawed?
+Fair enough. I'll respin another patch in a bit.
 
 Thanks,
--Christoffer
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
