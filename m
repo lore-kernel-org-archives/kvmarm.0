@@ -1,122 +1,119 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 03/11] arm/arm64: vgic: Introduce find_reg_by_id()
-Date: Tue, 6 Dec 2016 14:27:01 +0100
-Message-ID: <f8e4e42e-e298-f4ca-a958-3be48fb39736@redhat.com>
-References: <1479906118-15832-1-git-send-email-vijay.kilari@gmail.com>
- <1479906118-15832-4-git-send-email-vijay.kilari@gmail.com>
+From: Jintack Lim <jintack@cs.columbia.edu>
+Subject: Re: [PATCH v3] KVM: arm/arm64: Access CNTHCTL_EL2 bit fields correctly
+Date: Tue, 6 Dec 2016 08:28:13 -0500
+Message-ID: <CAHyh4xj4=EMkMUJfBCazhThDrNkWt9zZeEbs8X8-NfxG5UX7wg@mail.gmail.com>
+References: <1480620725-9864-1-git-send-email-jintack@cs.columbia.edu>
+ <49451f06-10a6-4921-eae6-c37a5510197a@arm.com> <20161206121221.GA3681@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D0E440419
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 08:26:09 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 83bsnHlfwWVI for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Dec 2016 08:26:08 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 689D2403F8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 08:26:08 -0500 (EST)
-In-Reply-To: <1479906118-15832-4-git-send-email-vijay.kilari@gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: vijay.kilari@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, peter.maydell@linaro.org
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Content-Type: text/plain; charset=UTF-8
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20161206121221.GA3681@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com, linux@armlinux.org.uk, andre.przywara@arm.com, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, james.morse@arm.com, geoff@infradead.org, Suzuki K Poulose <suzuki.poulose@arm.com>, mark.rutland@arm.com, KVM General <kvm@vger.kernel.org>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Vijay,
-On 23/11/2016 14:01, vijay.kilari@gmail.com wrote:
-> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> 
-> In order to implement vGICv3 CPU interface access, we will need to perform
-> table lookup of system registers. We would need both index_to_params() and
-> find_reg() exported for that purpose, but instead we export a single
-> function which combines them both.
-> 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 22 +++++++++++++++-------
->  arch/arm64/kvm/sys_regs.h |  4 ++++
->  2 files changed, 19 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f302fdb..1330d4c 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1789,6 +1789,17 @@ static bool index_to_params(u64 id, struct sys_reg_params *params)
->  	}
->  }
->  
-> +const struct sys_reg_desc *find_reg_by_id(u64 id,
-> +					  struct sys_reg_params *params,
-> +					  const struct sys_reg_desc table[],
-> +					  unsigned int num)
-> +{
-> +	if (!index_to_params(id, params))
-> +		return NULL;
-> +
-> +	return find_reg(params, table, num);
-> +}
-> +
-Can't you use find_reg_by_id in index_to_sys_reg_desc too?
+Hi Christoffer,
+Thanks for the review.
 
-Besides Reviewed-by: Eric Auger <eric.auger@redhat.com>
+On Tue, Dec 6, 2016 at 7:12 AM, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Tue, Dec 06, 2016 at 11:17:40AM +0000, Marc Zyngier wrote:
+>> On 01/12/16 19:32, Jintack Lim wrote:
+>> > Current KVM world switch code is unintentionally setting wrong bits to
+>> > CNTHCTL_EL2 when E2H == 1, which may allow guest OS to access physical
+>> > timer.  Bit positions of CNTHCTL_EL2 are changing depending on
+>> > HCR_EL2.E2H bit.  EL1PCEN and EL1PCTEN are 1st and 0th bits when E2H is
+>> > not set, but they are 11th and 10th bits respectively when E2H is set.
+>> >
+>> > In fact, on VHE we only need to set those bits once, not for every world
+>> > switch. This is because the host kernel runs in EL2 with HCR_EL2.TGE ==
+>> > 1, which makes those bits have no effect for the host kernel execution.
+>> > So we just set those bits once for guests, and that's it.
+>> >
+>> > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+>> > ---
+>> > v2->v3:
+>> > - Perform the initialization including CPU hotplug case.
+>> > - Move has_vhe() to asm/virt.h
+>> >
+>> > v1->v2:
+>> > - Skip configuring cnthctl_el2 in world switch path on VHE system.
+>> > - Write patch based on linux-next.
+>> > ---
+>> >  arch/arm/include/asm/virt.h   |  5 +++++
+>> >  arch/arm/kvm/arm.c            |  3 +++
+>> >  arch/arm64/include/asm/virt.h | 10 ++++++++++
+>> >  include/kvm/arm_arch_timer.h  |  1 +
+>> >  virt/kvm/arm/arch_timer.c     | 23 +++++++++++++++++++++++
+>> >  virt/kvm/arm/hyp/timer-sr.c   | 33 +++++++++++++++++++++------------
+>> >  6 files changed, 63 insertions(+), 12 deletions(-)
+>> >
+>> > diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
+>> > index a2e75b8..6dae195 100644
+>> > --- a/arch/arm/include/asm/virt.h
+>> > +++ b/arch/arm/include/asm/virt.h
+>> > @@ -80,6 +80,11 @@ static inline bool is_kernel_in_hyp_mode(void)
+>> >     return false;
+>> >  }
+>> >
+>> > +static inline bool has_vhe(void)
+>> > +{
+>> > +   return false;
+>> > +}
 
-Thanks
+This is the one called on 32-bit arm.
 
-Eric
->  /* Decode an index value, and find the sys_reg_desc entry. */
->  static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
->  						    u64 id)
-> @@ -1912,10 +1923,8 @@ static int get_invariant_sys_reg(u64 id, void __user *uaddr)
->  	struct sys_reg_params params;
->  	const struct sys_reg_desc *r;
->  
-> -	if (!index_to_params(id, &params))
-> -		return -ENOENT;
-> -
-> -	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
-> +	r = find_reg_by_id(id, &params, invariant_sys_regs,
-> +			   ARRAY_SIZE(invariant_sys_regs));
->  	if (!r)
->  		return -ENOENT;
->  
-> @@ -1929,9 +1938,8 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
->  	int err;
->  	u64 val = 0; /* Make sure high bits are 0 for 32-bit regs */
->  
-> -	if (!index_to_params(id, &params))
-> -		return -ENOENT;
-> -	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
-> +	r = find_reg_by_id(id, &params, invariant_sys_regs,
-> +			   ARRAY_SIZE(invariant_sys_regs));
->  	if (!r)
->  		return -ENOENT;
->  
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index dbbb01c..9c6ffd0 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -136,6 +136,10 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
->  	return i1->Op2 - i2->Op2;
->  }
->  
-> +const struct sys_reg_desc *find_reg_by_id(u64 id,
-> +					  struct sys_reg_params *params,
-> +					  const struct sys_reg_desc table[],
-> +					  unsigned int num);
->  
->  #define Op0(_x) 	.Op0 = _x
->  #define Op1(_x) 	.Op1 = _x
-> 
+>> > +
+>> >  /* The section containing the hypervisor idmap text */
+>> >  extern char __hyp_idmap_text_start[];
+>> >  extern char __hyp_idmap_text_end[];
+>> > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>> > index 8f92efa..13e54e8 100644
+>> > --- a/arch/arm/kvm/arm.c
+>> > +++ b/arch/arm/kvm/arm.c
+>> > @@ -1099,6 +1099,9 @@ static void cpu_init_hyp_mode(void *dummy)
+>> >     __cpu_init_hyp_mode(pgd_ptr, hyp_stack_ptr, vector_ptr);
+>> >     __cpu_init_stage2();
+>> >
+>> > +   if (is_kernel_in_hyp_mode())
+>> > +           kvm_timer_init_vhe();
+>> > +
+>> >     kvm_arm_init_debug();
+>> >  }
+>> >
+>> > diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+>> > index fea1073..b043cfd 100644
+>> > --- a/arch/arm64/include/asm/virt.h
+>> > +++ b/arch/arm64/include/asm/virt.h
+>> > @@ -47,6 +47,7 @@
+>> >  #include <asm/ptrace.h>
+>> >  #include <asm/sections.h>
+>> >  #include <asm/sysreg.h>
+>> > +#include <asm/cpufeature.h>
+>> >
+>> >  /*
+>> >   * __boot_cpu_mode records what mode CPUs were booted in.
+>> > @@ -80,6 +81,15 @@ static inline bool is_kernel_in_hyp_mode(void)
+>> >     return read_sysreg(CurrentEL) == CurrentEL_EL2;
+>> >  }
+>> >
+>> > +static inline bool has_vhe(void)
+>> > +{
+>> > +#ifdef CONFIG_ARM64_VHE
+>>
+>> Is there a particular reason why this should be guarded by a #ifdef? All
+>> the symbols should always be available, and since this is a static key,
+>> the overhead should be really insignificant (provided that you use a
+>> non-prehistoric compiler...).
+>>
+>
+> Isn't this code called from a file shared between 32-bit arm and arm64?
+
+This code is only for ARM64. See above for 32-bit arm.
+
+> Does the cpus_have_const_cap work on ARM64?
+>
+> -Christoffer
+>
+
