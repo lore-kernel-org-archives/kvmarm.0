@@ -1,101 +1,56 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2] arm64: KVM: pmu: Reset PMSELR_EL0.SEL to a sane value
- before entering the guest
-Date: Tue, 6 Dec 2016 17:17:52 +0000
-Message-ID: <3b083cff-c031-0f1e-8281-cf7cf082945f@arm.com>
-References: <1481036210-31816-1-git-send-email-marc.zyngier@arm.com>
- <20161206162918.GE4816@cbox>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F20FA40354
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 12:16:58 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZEXJtxril6CL for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Dec 2016 12:16:58 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBE4240102
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2016 12:16:57 -0500 (EST)
-In-Reply-To: <20161206162918.GE4816@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Itaru Kitayama <itaru.kitayama@riken.jp>, Catalin Marinas <catalin.marinas@arm.com>, Hoan Tran <hotran@apm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Tai Tri Nguyen <ttnguyen@apm.com>
+From: Wei Huang <wei@redhat.com>
+Subject: [kvm-unit-tests PATCH v14 0/5] ARM PMU tests
+Date: Tue,  6 Dec 2016 12:05:23 -0600
+Message-ID: <1481047528-16180-1-git-send-email-wei@redhat.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: cov@codeaurora.org
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org, alistair.francis@xilinx.com, croberts@codeaurora.org, alindsay@codeaurora.org, drjones@redhat.com, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/12/16 16:29, Christoffer Dall wrote:
-> On Tue, Dec 06, 2016 at 02:56:50PM +0000, Marc Zyngier wrote:
->> The ARMv8 architecture allows the cycle counter to be configured
->> by setting PMSELR_EL0.SEL==0x1f and then accessing PMXEVTYPER_EL0,
->> hence accessing PMCCFILTR_EL0. But it disallows the use of
->> PMSELR_EL0.SEL==0x1f to access the cycle counter itself through
->> PMXEVCNTR_EL0.
->>
->> Linux itself doesn't violate this rule, but we may end up with
->> PMSELR_EL0.SEL being set to 0x1f when we enter a guest. If that
->> guest accesses PMXEVCNTR_EL0, the access may UNDEF at EL1,
->> despite the guest not having done anything wrong.
->>
->> In order to avoid this unfortunate course of events (haha!), let's
-> 
-> I actually did find this funny.
-> 
->> sanitize PMSELR_EL0 on guest entry. This ensures that the guest
->> won't explode unexpectedly.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->> This is another approach to fix this issue, this time nuking PMSELR_EL0
->> on guest entry instead of relying on perf not to clobber the register.
->>
->> Tested on v4.9-rc8 with a Rev A3 X-Gene.
->>
->>  arch/arm64/kvm/hyp/switch.c | 8 +++++++-
->>  1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->> index 83037cd..3b7cfbd 100644
->> --- a/arch/arm64/kvm/hyp/switch.c
->> +++ b/arch/arm64/kvm/hyp/switch.c
->> @@ -85,7 +85,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
->>  	write_sysreg(val, hcr_el2);
->>  	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
->>  	write_sysreg(1 << 15, hstr_el2);
->> -	/* Make sure we trap PMU access from EL0 to EL2 */
->> +	/*
->> +	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
->> +	 * PMSELR_EL0 to make sure it never contains the cycle
->> +	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF.
->> +	 */
->> +	if (vcpu->arch.mdcr_el2 & MDCR_EL2_HPMN_MASK)
->> +		write_sysreg(0, pmselr_el0);
-> 
-> I'm a bit confused about how we use the HPMN field.  This value is
-> always set to the full number of counters available on the system and
-> never modified by the guest, right?  So this is in essence a check that
-> says 'do you have any performance counters, then make sure accesses
-> don't undef to el1 instead of trapping to el2', but then my question is,
-> why not just set pmselr_el0 to zero unconditionally, because in the case
-> where (vcpu->arch.mdcr_el2 & MDCR_EL2_HPMN_MASK) == 0, it means we have
-> no counters, which we'll have exposed to the guest anyhow, and we should
-> undef at el1 in the guest, or did I get this completely wrong (like
-> everything else today)?
+Changes from v13:
+* Rename cp15.h to sysreg.h for ARMv7 and add a new file sysreg.h for ARMv8
+* Add macros for read_sysreg() and write_sysreg(). CP15 registers can be
+  defined with __ACCESS_CP15() or __ACCESS_CP15_64(). sysreg.h (ARMv8) was
+  from Drew's GIC testing code, which can be leveraged when his GIC testing
+  code is imported.
+* Rewrite PMU testing code based on new macros. All get_xxx() and set_xxx()
+  functions are defined in pmu.c based on read_sysreg() and write_sysreg().
+  So the code parsing tool, like cscope, can parse them easily.
+* Minor fixes inside pmu.c, printf formatting, pmu_probe() func, based on
+  Andre's comments.
 
-Yeah, that's probably the best course of action. If the guest does
-something silly, tough. I'll drop the test and repost the thing.
+Note:
+Current KVM code has bugs in handling PMCCFILTR write. A fix (see below) is
+required for this unit testing code to work correctly under KVM mode.
+Link: https://lists.cs.columbia.edu/pipermail/kvmarm/2016-November/022134.html.
 
 Thanks,
+-Wei
 
-	M.
+Christopher Covington (3):
+  arm: Add PMU test
+  arm: pmu: Check cycle count increases
+  arm: pmu: Add CPI checking
+
+Wei Huang (2):
+  arm: rename cp15.h to sysreg.h
+  arm: Add support for read_sysreg() and write_sysreg()
+
+ arm/Makefile.common              |   3 +-
+ arm/cstart.S                     |   2 +-
+ arm/pmu.c                        | 290 +++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg                |  19 +++
+ lib/arm/asm/processor.h          |   6 +-
+ lib/arm/asm/{cp15.h => sysreg.h} |  25 +++-
+ lib/arm64/asm/processor.h        |  11 +-
+ lib/arm64/asm/sysreg.h           |  26 ++++
+ lib/libcflat.h                   |   4 +-
+ 9 files changed, 369 insertions(+), 17 deletions(-)
+ create mode 100644 arm/pmu.c
+ rename lib/arm/asm/{cp15.h => sysreg.h} (68%)
+ create mode 100644 lib/arm64/asm/sysreg.h
+
 -- 
-Jazz is not dead. It just smells funny...
+1.8.3.1
+
