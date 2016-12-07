@@ -1,141 +1,181 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: Re: [PATCH 0/2] Add the missing resetting LRs at boot time for
- new-vgic
-Date: Wed, 7 Dec 2016 19:00:35 +0800
-Message-ID: <5847EBD3.9000504@huawei.com>
-References: <1481006504-25460-1-git-send-email-zhaoshenglong@huawei.com>
- <cc4193be-c66e-f40a-7be4-f8f775abcd63@arm.com> <5847BE30.9050701@huawei.com>
- <76456b16-0ec2-fae9-6c7b-acb637d9629e@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v14 2/5] arm: Add support for
+ read_sysreg() and write_sysreg()
+Date: Wed, 7 Dec 2016 17:52:20 +0100
+Message-ID: <20161207165220.6k2zpatqxtzfxcvp@kamzik.brq.redhat.com>
+References: <1481047528-16180-1-git-send-email-wei@redhat.com>
+ <1481047528-16180-3-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C10E40102
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Dec 2016 06:07:54 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JXW+r6E9c20y for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Dec 2016 06:07:50 -0500 (EST)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 999C4400FC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Dec 2016 06:07:36 -0500 (EST)
-In-Reply-To: <76456b16-0ec2-fae9-6c7b-acb637d9629e@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1481047528-16180-3-git-send-email-wei@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Wei Huang <wei@redhat.com>
+Cc: cov@codeaurora.org, alindsay@codeaurora.org, kvm@vger.kernel.org, andre.przywara@arm.com, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 2016/12/7 16:10, Marc Zyngier wrote:
-> On 07/12/16 07:45, Shannon Zhao wrote:
->>
->>
->> On 2016/12/6 19:47, Marc Zyngier wrote:
->>> On 06/12/16 06:41, Shannon Zhao wrote:
->>>> From: Shannon Zhao <shannon.zhao@linaro.org>
->>>>
->>>> Commit 50926d8(KVM: arm/arm64: The GIC is dead, long live the GIC)
->>>> removes the old vgic and commit 9097773(KVM: arm/arm64: vgic-new: 
->>>> vgic_init: implement kvm_vgic_hyp_init) doesn't reset LRs for new-vgic
->>>> when probing GIC. These two patches add the missing part.
->>>>
->>>> BTW, here is a strange problem on Huawei D03 board when using
->>>> upstream kernel that android guest with a goldfish_fb will hang with
->>>> rcu_stall and interrupt timeout for goldfish_fb. We apply these patches
->>>> but the problem still exists, while if we revert the commit
->>>> b40c489(arm64: KVM: vgic-v3: Only wipe LRs on vcpu exit) the guest runs
->>>> well.
->>>>
->>>> We add a trace in kvm_vgic_flush_hwstate() to print the value of 
->>>> compute_ap_list_depth(vcpu) and the value of vgic_lr before calling
->>>> vgic_flush_lr_state(). The first output shows that the ap_list_depth is zero
->>>> but the first one in vgic_lr is 10a0000000002001. I don't understand why
->>>> there is a valued one in vgic_lr since the memory of vgic_lr is zero
->>>> allocated. I think It should be zero when the vcpu first run and first
->>>> call kvm_vgic_flush_hwstate().
->>>>
->>>> qemu-system-aar-6673  [016] ....   501.969251: kvm_vgic_flush_hwstate: VCPU: 0, lits-count: 0, LR: 10a0000000002001, 0, 0, 0
->>>>
->>>> I also add a trace at the end of vgic_flush_lr_state() which shows the
->>>> kvm_vgic_global_state.nr_lr is 4, used_lrs is 0 and all LRs in vgic_lr
->>>> are zero.
->>>>
->>>> qemu-system-aar-6673  [016] ....   501.969254: vgic_flush_lr_state_nuke: kvm_vgic_global_state.nr_lr is :4, irq1:0, irq2:0, irq3:0, irq4:0
->>>>
->>>> But the trace at the beginning of kvm_vgic_sync_hwstate() shows the
->>>> first one of vgic_lr is 10a0000000002001.
->>>>
->>>> qemu-system-aar-6673  [016] ....   501.969261: kvm_vgic_sync_hwstate_vgic_lr: VCPU: 0, used_lrs: 0, LR: 10a0000000002001, 0, 0, 0
->>>>
->>>> The above three trace outputs are printed by the first KVM_ENTRY/EXIT of VCPU 0.
->>>
->>> Decoding this LR value is interesting:
->>>
->>> 10a0000000002001
->>> | |         | LPI 8193
->>> | |
->>> | Priority 0xa0
->>> |
->>> Group1
->>>
->>> Someone is injecting an LPI behind your back. If nobody populates this,
->>> then you may want to investigate what is happening on the host side. Is
->>> there anyone using this interrupt?
->>>
->>
->> For this guest, I think nobody populates this LR, but on the host, there
->> is a LPI interrupt 8193. It's a interrupt of eth2
->>
->> MBIGEN-V2 8193 Edge      eth2-tx0
->>
->> It's a little confused to me that the LR registers should only be used
->> for VM, right? Why does the interrupt on host would affect the LRs?
+On Tue, Dec 06, 2016 at 12:05:25PM -0600, Wei Huang wrote:
+> This patch adds two new macros to support read/write operations of ARMv7
+> and ARMv8 system registers. As part of the change, xstr() is revised to
+> support variable arguments. With it, ARMv7 system register can be defined
+> with __ACCESS_CP15() or __ACCESS_CP15_64() depending if it is 32-bit or
+> 64-bit. get_mpidr() is re-written with new macros.
 > 
-> It should never have an impact, but I'm worried that this could be a HW
-> bug where the physical side of the ITS leaks into the virtual one. You
-> have a GICv4, right?
-Yes, the hardware supports GICv4 but I think current kernel doesn't
-enable it.
-
+> Suggested-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> ---
+>  lib/arm/asm/processor.h   |  6 +++---
+>  lib/arm/asm/sysreg.h      | 19 +++++++++++++++++++
+>  lib/arm64/asm/processor.h | 11 ++++-------
+>  lib/arm64/asm/sysreg.h    | 26 ++++++++++++++++++++++++++
+>  lib/libcflat.h            |  4 ++--
+>  5 files changed, 54 insertions(+), 12 deletions(-)
+>  create mode 100644 lib/arm64/asm/sysreg.h
 > 
-> It'd be interesting to find out what happens if you leave this interrupt
-> disabled (don't enable eth2) and see if that interrupt magically appears
-> or not.
+> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+> index f25e7ee..c831749 100644
+> --- a/lib/arm/asm/processor.h
+> +++ b/lib/arm/asm/processor.h
+> @@ -6,6 +6,7 @@
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+>  #include <asm/ptrace.h>
+> +#include <asm/sysreg.h>
+>  
+>  enum vector {
+>  	EXCPTN_RST,
+> @@ -33,11 +34,10 @@ static inline unsigned long current_cpsr(void)
+>  
+>  #define current_mode() (current_cpsr() & MODE_MASK)
+>  
+> +#define MPIDR __ACCESS_CP15(c0, 0, c0, 5)
+>  static inline unsigned int get_mpidr(void)
+
+I'll change the get_mpidr functions to u64 after the gic series
+is merged, as we've discussed previously.
+
+>  {
+> -	unsigned int mpidr;
+> -	asm volatile("mrc p15, 0, %0, c0, c0, 5" : "=r" (mpidr));
+> -	return mpidr;
+> +	return read_sysreg(MPIDR);
+>  }
+>  
+>  /* Only support Aff0 for now, up to 4 cpus */
+> diff --git a/lib/arm/asm/sysreg.h b/lib/arm/asm/sysreg.h
+> index 3e1ad3a..02dbe3d 100644
+> --- a/lib/arm/asm/sysreg.h
+> +++ b/lib/arm/asm/sysreg.h
+> @@ -34,4 +34,23 @@
+>  #define CR_AFE	(1 << 29)	/* Access flag enable			*/
+>  #define CR_TE	(1 << 30)	/* Thumb exception enable		*/
+>  
+> +#ifndef __ASSEMBLY__
+> +#include <libcflat.h>
+> +
+> +#define __ACCESS_CP15(CRn, Op1, CRm, Op2)			\
+> +	"mrc", "mcr", xstr(p15, Op1, %0, CRn, CRm, Op2), u32
+> +#define __ACCESS_CP15_64(Op1, CRm)					\
+> +	"mrrc", "mcrr", xstr(p15, Op1, %Q0, %R0, CRm), u64
+> +
+> +#define __read_sysreg(r, w, c, t) ({				\
+> +			t __val;				\
+> +			asm volatile(r " " c : "=r" (__val));	\
+> +			__val;					\
+> +		})
+> +#define read_sysreg(...)                 __read_sysreg(__VA_ARGS__)
+> +
+> +#define __write_sysreg(v, r, w, c, t)   asm volatile(w " " c : : "r" ((t)(v)))
+> +#define write_sysreg(v, ...)            __write_sysreg(v, __VA_ARGS__)
+> +#endif /* !__ASSEMBLY__ */
+> +
+>  #endif /* _ASMARM_SYSREG_H_ */
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 84d5c7c..ed59ad2 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -19,6 +19,7 @@
+>  #ifndef __ASSEMBLY__
+>  #include <asm/ptrace.h>
+>  #include <asm/esr.h>
+> +#include <asm/sysreg.h>
+>  
+>  enum vector {
+>  	EL1T_SYNC,
+> @@ -66,14 +67,10 @@ static inline unsigned long current_level(void)
+>  	return el & 0xc;
+>  }
+>  
+> -#define DEFINE_GET_SYSREG32(reg)				\
+> -static inline unsigned int get_##reg(void)			\
+> -{								\
+> -	unsigned int reg;					\
+> -	asm volatile("mrs %0, " #reg "_el1" : "=r" (reg));	\
+> -	return reg;						\
+> +static inline unsigned int get_mpidr(void)
+> +{
+> +	return read_sysreg(mpidr_el1);
+>  }
+> -DEFINE_GET_SYSREG32(mpidr)
+>  
+>  /* Only support Aff0 for now, gicv2 only */
+>  #define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
+> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> new file mode 100644
+> index 0000000..05b9fcb
+> --- /dev/null
+> +++ b/lib/arm64/asm/sysreg.h
+> @@ -0,0 +1,26 @@
+> +/*
+> + * Ripped off from arch/arm64/include/asm/sysreg.h
+> + *
+> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#ifndef _ASMARM64_SYSREG_H_
+> +#define _ASMARM64_SYSREG_H_
+> +
+> +#ifndef __ASSEMBLY__
+> +#include <libcflat.h>
+> +
+> +#define read_sysreg(r) ({					\
+> +	u64 __val;						\
+> +	asm volatile("mrs %0, " xstr(r) : "=r" (__val));	\
+> +	__val;							\
+> +})
+> +
+> +#define write_sysreg(v, r) do {					\
+> +	u64 __val = (u64)v;					\
+> +	asm volatile("msr " xstr(r) ", %x0" : : "rZ" (__val));	\
+> +} while (0)
+
+I'd prefer using the ({}) syntax here to the do-while, but it doesn't
+matter.
+
+> +
+> +#endif /* !__ASSEMBLY__ */
+> +#endif /* _ASMARM64_SYSREG_H_ */
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index c622198..c3fa4f2 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -27,8 +27,8 @@
+>  
+>  #define __unused __attribute__((__unused__))
+>  
+> -#define xstr(s) xxstr(s)
+> -#define xxstr(s) #s
+> +#define xstr(s...) xxstr(s)
+> +#define xxstr(s...) #s
+>  
+>  #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
+>  #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
+> -- 
+> 1.8.3.1
 > 
-Ah, I found the guest uses ITS and there is a irq number 8193. If I use
-a qemu without ITS feature then there is no such irq in trace output.
-
-But there is still unexpected LR in vgic_lr[] array of irq 27. Nobody
-calls vgic_update_irq_pending for irq 27 before below trace outputs.
-
- qemu-system-aar-6681  [021] ....  1081.718849: kvm_vgic_flush_hwstate:
-VCPU: 0, lits-count: 0, LR: 0, 0, 0
- qemu-system-aar-6681  [021] ....  1081.718849: vgic_flush_lr_state:
-used lr count is :0, irq1:0, irq2:0, irq3:0, irq4:0
- qemu-system-aar-6681  [021] d...  1081.718850: kvm_entry: PC:
-0xffffff8008432940
- qemu-system-aar-6681  [021] ....  1081.718852: kvm_exit: TRAP: HSR_EC:
-0x0024 (DABT_LOW), PC: 0xffffff8008432954
- qemu-system-aar-6681  [021] ....  1081.718852:
-kvm_vgic_sync_hwstate_vgic_lr: VCPU: 0, used_lrs: 0, LR: 0, 0, 0, 0
- qemu-system-aar-6681  [021] ....  1081.718855: kvm_vgic_flush_hwstate:
-VCPU: 0, lits-count: 0, LR: 50a002000000001b, 0, 0, 0
- qemu-system-aar-6681  [021] ....  1081.718855: vgic_flush_lr_state:
-used lr count is :0, irq1:0, irq2:0, irq3:0, irq4:0
- qemu-system-aar-6681  [021] d...  1081.718856: kvm_entry: PC:
-0xffffff8008432958
- qemu-system-aar-6681  [021] ....  1081.718858: kvm_exit: TRAP: HSR_EC:
-0x0024 (DABT_LOW), PC: 0xffffff800843291c
+> 
 
 Thanks,
--- 
-Shannon
+drew
