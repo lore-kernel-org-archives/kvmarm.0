@@ -1,181 +1,73 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v14 2/5] arm: Add support for
- read_sysreg() and write_sysreg()
-Date: Wed, 7 Dec 2016 17:52:20 +0100
-Message-ID: <20161207165220.6k2zpatqxtzfxcvp@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v14 0/5] ARM PMU tests
+Date: Wed, 7 Dec 2016 17:59:56 +0100
+Message-ID: <20161207165956.ehw4buztnzqiie2v@kamzik.brq.redhat.com>
 References: <1481047528-16180-1-git-send-email-wei@redhat.com>
- <1481047528-16180-3-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1481047528-16180-3-git-send-email-wei@redhat.com>
+In-Reply-To: <1481047528-16180-1-git-send-email-wei@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 To: Wei Huang <wei@redhat.com>
 Cc: cov@codeaurora.org, alindsay@codeaurora.org, kvm@vger.kernel.org, andre.przywara@arm.com, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Dec 06, 2016 at 12:05:25PM -0600, Wei Huang wrote:
-> This patch adds two new macros to support read/write operations of ARMv7
-> and ARMv8 system registers. As part of the change, xstr() is revised to
-> support variable arguments. With it, ARMv7 system register can be defined
-> with __ACCESS_CP15() or __ACCESS_CP15_64() depending if it is 32-bit or
-> 64-bit. get_mpidr() is re-written with new macros.
+On Tue, Dec 06, 2016 at 12:05:23PM -0600, Wei Huang wrote:
+> Changes from v13:
+> * Rename cp15.h to sysreg.h for ARMv7 and add a new file sysreg.h for ARMv8
+> * Add macros for read_sysreg() and write_sysreg(). CP15 registers can be
+>   defined with __ACCESS_CP15() or __ACCESS_CP15_64(). sysreg.h (ARMv8) was
+>   from Drew's GIC testing code, which can be leveraged when his GIC testing
+>   code is imported.
+> * Rewrite PMU testing code based on new macros. All get_xxx() and set_xxx()
+>   functions are defined in pmu.c based on read_sysreg() and write_sysreg().
+>   So the code parsing tool, like cscope, can parse them easily.
+> * Minor fixes inside pmu.c, printf formatting, pmu_probe() func, based on
+>   Andre's comments.
+
+Thanks for this Wei. I like the sysreg framework. It should address
+Andre's concerns with asm-maintainability, plus maintain code analysis
+tool (cscope) support.
+
+The series looks good to me, so I'll apply it to arm/next and rebase the
+gic series on it, using the new sysreg framework everywhere needed.
+
+drew
+
 > 
-> Suggested-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> ---
->  lib/arm/asm/processor.h   |  6 +++---
->  lib/arm/asm/sysreg.h      | 19 +++++++++++++++++++
->  lib/arm64/asm/processor.h | 11 ++++-------
->  lib/arm64/asm/sysreg.h    | 26 ++++++++++++++++++++++++++
->  lib/libcflat.h            |  4 ++--
->  5 files changed, 54 insertions(+), 12 deletions(-)
+> Note:
+> Current KVM code has bugs in handling PMCCFILTR write. A fix (see below) is
+> required for this unit testing code to work correctly under KVM mode.
+> Link: https://lists.cs.columbia.edu/pipermail/kvmarm/2016-November/022134.html.
+> 
+> Thanks,
+> -Wei
+> 
+> Christopher Covington (3):
+>   arm: Add PMU test
+>   arm: pmu: Check cycle count increases
+>   arm: pmu: Add CPI checking
+> 
+> Wei Huang (2):
+>   arm: rename cp15.h to sysreg.h
+>   arm: Add support for read_sysreg() and write_sysreg()
+> 
+>  arm/Makefile.common              |   3 +-
+>  arm/cstart.S                     |   2 +-
+>  arm/pmu.c                        | 290 +++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg                |  19 +++
+>  lib/arm/asm/processor.h          |   6 +-
+>  lib/arm/asm/{cp15.h => sysreg.h} |  25 +++-
+>  lib/arm64/asm/processor.h        |  11 +-
+>  lib/arm64/asm/sysreg.h           |  26 ++++
+>  lib/libcflat.h                   |   4 +-
+>  9 files changed, 369 insertions(+), 17 deletions(-)
+>  create mode 100644 arm/pmu.c
+>  rename lib/arm/asm/{cp15.h => sysreg.h} (68%)
 >  create mode 100644 lib/arm64/asm/sysreg.h
 > 
-> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-> index f25e7ee..c831749 100644
-> --- a/lib/arm/asm/processor.h
-> +++ b/lib/arm/asm/processor.h
-> @@ -6,6 +6,7 @@
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
->  #include <asm/ptrace.h>
-> +#include <asm/sysreg.h>
->  
->  enum vector {
->  	EXCPTN_RST,
-> @@ -33,11 +34,10 @@ static inline unsigned long current_cpsr(void)
->  
->  #define current_mode() (current_cpsr() & MODE_MASK)
->  
-> +#define MPIDR __ACCESS_CP15(c0, 0, c0, 5)
->  static inline unsigned int get_mpidr(void)
-
-I'll change the get_mpidr functions to u64 after the gic series
-is merged, as we've discussed previously.
-
->  {
-> -	unsigned int mpidr;
-> -	asm volatile("mrc p15, 0, %0, c0, c0, 5" : "=r" (mpidr));
-> -	return mpidr;
-> +	return read_sysreg(MPIDR);
->  }
->  
->  /* Only support Aff0 for now, up to 4 cpus */
-> diff --git a/lib/arm/asm/sysreg.h b/lib/arm/asm/sysreg.h
-> index 3e1ad3a..02dbe3d 100644
-> --- a/lib/arm/asm/sysreg.h
-> +++ b/lib/arm/asm/sysreg.h
-> @@ -34,4 +34,23 @@
->  #define CR_AFE	(1 << 29)	/* Access flag enable			*/
->  #define CR_TE	(1 << 30)	/* Thumb exception enable		*/
->  
-> +#ifndef __ASSEMBLY__
-> +#include <libcflat.h>
-> +
-> +#define __ACCESS_CP15(CRn, Op1, CRm, Op2)			\
-> +	"mrc", "mcr", xstr(p15, Op1, %0, CRn, CRm, Op2), u32
-> +#define __ACCESS_CP15_64(Op1, CRm)					\
-> +	"mrrc", "mcrr", xstr(p15, Op1, %Q0, %R0, CRm), u64
-> +
-> +#define __read_sysreg(r, w, c, t) ({				\
-> +			t __val;				\
-> +			asm volatile(r " " c : "=r" (__val));	\
-> +			__val;					\
-> +		})
-> +#define read_sysreg(...)                 __read_sysreg(__VA_ARGS__)
-> +
-> +#define __write_sysreg(v, r, w, c, t)   asm volatile(w " " c : : "r" ((t)(v)))
-> +#define write_sysreg(v, ...)            __write_sysreg(v, __VA_ARGS__)
-> +#endif /* !__ASSEMBLY__ */
-> +
->  #endif /* _ASMARM_SYSREG_H_ */
-> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> index 84d5c7c..ed59ad2 100644
-> --- a/lib/arm64/asm/processor.h
-> +++ b/lib/arm64/asm/processor.h
-> @@ -19,6 +19,7 @@
->  #ifndef __ASSEMBLY__
->  #include <asm/ptrace.h>
->  #include <asm/esr.h>
-> +#include <asm/sysreg.h>
->  
->  enum vector {
->  	EL1T_SYNC,
-> @@ -66,14 +67,10 @@ static inline unsigned long current_level(void)
->  	return el & 0xc;
->  }
->  
-> -#define DEFINE_GET_SYSREG32(reg)				\
-> -static inline unsigned int get_##reg(void)			\
-> -{								\
-> -	unsigned int reg;					\
-> -	asm volatile("mrs %0, " #reg "_el1" : "=r" (reg));	\
-> -	return reg;						\
-> +static inline unsigned int get_mpidr(void)
-> +{
-> +	return read_sysreg(mpidr_el1);
->  }
-> -DEFINE_GET_SYSREG32(mpidr)
->  
->  /* Only support Aff0 for now, gicv2 only */
->  #define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
-> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-> new file mode 100644
-> index 0000000..05b9fcb
-> --- /dev/null
-> +++ b/lib/arm64/asm/sysreg.h
-> @@ -0,0 +1,26 @@
-> +/*
-> + * Ripped off from arch/arm64/include/asm/sysreg.h
-> + *
-> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#ifndef _ASMARM64_SYSREG_H_
-> +#define _ASMARM64_SYSREG_H_
-> +
-> +#ifndef __ASSEMBLY__
-> +#include <libcflat.h>
-> +
-> +#define read_sysreg(r) ({					\
-> +	u64 __val;						\
-> +	asm volatile("mrs %0, " xstr(r) : "=r" (__val));	\
-> +	__val;							\
-> +})
-> +
-> +#define write_sysreg(v, r) do {					\
-> +	u64 __val = (u64)v;					\
-> +	asm volatile("msr " xstr(r) ", %x0" : : "rZ" (__val));	\
-> +} while (0)
-
-I'd prefer using the ({}) syntax here to the do-while, but it doesn't
-matter.
-
-> +
-> +#endif /* !__ASSEMBLY__ */
-> +#endif /* _ASMARM64_SYSREG_H_ */
-> diff --git a/lib/libcflat.h b/lib/libcflat.h
-> index c622198..c3fa4f2 100644
-> --- a/lib/libcflat.h
-> +++ b/lib/libcflat.h
-> @@ -27,8 +27,8 @@
->  
->  #define __unused __attribute__((__unused__))
->  
-> -#define xstr(s) xxstr(s)
-> -#define xxstr(s) #s
-> +#define xstr(s...) xxstr(s)
-> +#define xxstr(s...) #s
->  
->  #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
->  #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
 > -- 
 > 1.8.3.1
 > 
 > 
-
-Thanks,
-drew
