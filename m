@@ -1,259 +1,169 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: [PATCH] arm64: Work around Falkor erratum 1009
-Date: Wed,  7 Dec 2016 15:04:31 -0500
-Message-ID: <20161207200431.4587-1-cov@codeaurora.org>
-References: <20161207200028.4420-1-cov@codeaurora.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20161207200028.4420-1-cov@codeaurora.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Shanker Donthineni <shankerd@codeaurora.org>, Christopher Covington <cov@codeaurora.org>
+From: Tyler Baicar <tbaicar@codeaurora.org>
+Subject: [PATCH V6 00/10] Add UEFI 2.6 and ACPI 6.1 updates for RAS on ARM64
+Date: Wed,  7 Dec 2016 14:48:13 -0700
+Message-ID: <1481147303-7979-1-git-send-email-tbaicar@codeaurora.org>
+Return-path: <linux-acpi-owner@vger.kernel.org>
+Sender: linux-acpi-owner@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org
+Cc: Tyler Baicar <tbaicar@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shanker Donthineni <shankerd@codeaurora.org>
+When a memory error, CPU error, PCIe error, or other type of hardware error
+that's covered by RAS occurs, firmware should populate the shared GHES memory
+location with the proper GHES structures to notify the OS of the error.
+For example, platforms that implement firmware first handling may implement
+separate GHES sources for corrected errors and uncorrected errors. If the
+error is an uncorrectable error, then the firmware will notify the OS
+immediately since the error needs to be handled ASAP. The OS will then be able
+to take the appropriate action needed such as offlining a page. If the error
+is a corrected error, then the firmware will not interrupt the OS immediately.
+Instead, the OS will see and report the error the next time it's GHES timer
+expires. The kernel will first parse the GHES structures and report the errors
+through the kernel logs and then notify the user space through RAS trace
+events. This allows user space applications such as RAS Daemon to see the
+errors and report them however the user desires. This patchset extends the
+kernel functionality for RAS errors based on updates in the UEFI 2.6 and
+ACPI 6.1 specifications.
 
-During a TLB invalidate sequence targeting the inner shareable
-domain, Falkor may prematurely complete the DSB before all loads
-and stores using the old translation are observed; instruction
-fetches are not subject to the conditions of this erratum.
+An example flow from firmware to user space could be:
 
-Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
-Signed-off-by: Christopher Covington <cov@codeaurora.org>
----
- arch/arm64/Kconfig                | 10 +++++++++
- arch/arm64/include/asm/cpucaps.h  |  3 ++-
- arch/arm64/include/asm/tlbflush.h | 43 +++++++++++++++++++++++++++++++++++++++
- arch/arm64/kernel/cpu_errata.c    |  7 +++++++
- arch/arm64/kvm/hyp/tlb.c          | 39 ++++++++++++++++++++++++++++++-----
- 5 files changed, 96 insertions(+), 6 deletions(-)
+                 +---------------+
+       +-------->|               |
+       |         |  GHES polling |--+
++-------------+  |    source     |  |   +---------------+   +------------+
+|             |  +---------------+  |   |  Kernel GHES  |   |            |
+|  Firmware   |                     +-->|  CPER AER and |-->|  RAS trace |
+|             |  +---------------+  |   |  EDAC drivers |   |   event    |
++-------------+  |               |  |   +---------------+   +------------+
+       |         |  GHES sci     |--+
+       +-------->|   source      |
+                 +---------------+
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 1004a3d..125440f 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -485,6 +485,16 @@ config QCOM_FALKOR_ERRATUM_E1003
- 
- 	  If unsure, say Y.
- 
-+config QCOM_FALKOR_ERRATUM_E1009
-+	bool "Falkor E1009: Prematurely complete a DSB after a TLBI"
-+	default y
-+	help
-+	  Falkor CPU may prematurely complete a DSB following a TLBI xxIS
-+	  invalidate maintenance operations. Repeat the TLBI operation one
-+	  more time to fix the issue.
-+
-+	  If unsure, say Y.
-+
- endmenu
- 
- 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index cb6a8c2..5357d7f 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -35,7 +35,8 @@
- #define ARM64_HYP_OFFSET_LOW			14
- #define ARM64_MISMATCHED_CACHE_LINE_SIZE	15
- #define ARM64_WORKAROUND_QCOM_FALKOR_E1003	16
-+#define ARM64_WORKAROUND_QCOM_FALKOR_E1009	17
- 
--#define ARM64_NCAPS				17
-+#define ARM64_NCAPS				18
- 
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index deab523..03bafc5 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -23,6 +23,7 @@
- 
- #include <linux/sched.h>
- #include <asm/cputype.h>
-+#include <asm/alternative.h>
- 
- /*
-  * Raw TLBI operations.
-@@ -94,6 +95,13 @@ static inline void flush_tlb_all(void)
- 	dsb(ishst);
- 	__tlbi(vmalle1is);
- 	dsb(ish);
-+	asm volatile(ALTERNATIVE(
-+		     "nop \n"
-+		     "nop \n",
-+		     "tlbi vmalle1is \n"
-+		     "dsb ish \n",
-+		     ARM64_WORKAROUND_QCOM_FALKOR_E1009)
-+		     : :);
- 	isb();
- }
- 
-@@ -104,6 +112,13 @@ static inline void flush_tlb_mm(struct mm_struct *mm)
- 	dsb(ishst);
- 	__tlbi(aside1is, asid);
- 	dsb(ish);
-+	asm volatile(ALTERNATIVE(
-+		     "nop \n"
-+		     "nop \n",
-+		     "tlbi aside1is, %0 \n"
-+		     "dsb ish \n",
-+		     ARM64_WORKAROUND_QCOM_FALKOR_E1009)
-+		     : : "r" (asid));
- }
- 
- static inline void flush_tlb_page(struct vm_area_struct *vma,
-@@ -114,6 +129,13 @@ static inline void flush_tlb_page(struct vm_area_struct *vma,
- 	dsb(ishst);
- 	__tlbi(vale1is, addr);
- 	dsb(ish);
-+	asm volatile(ALTERNATIVE(
-+		     "nop \n"
-+		     "nop \n",
-+		     "tlbi vale1is, %0 \n"
-+		     "dsb ish \n",
-+		     ARM64_WORKAROUND_QCOM_FALKOR_E1009)
-+		     : : "r" (addr));
- }
- 
- /*
-@@ -145,6 +167,13 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
- 			__tlbi(vae1is, addr);
- 	}
- 	dsb(ish);
-+	asm volatile(ALTERNATIVE(
-+		     "nop \n"
-+		     "nop \n",
-+		     "tlbi vae1is, %0 \n"
-+		     "dsb ish \n",
-+		     ARM64_WORKAROUND_QCOM_FALKOR_E1009)
-+		     : : "r" (end));
- }
- 
- static inline void flush_tlb_range(struct vm_area_struct *vma,
-@@ -169,6 +198,13 @@ static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end
- 	for (addr = start; addr < end; addr += 1 << (PAGE_SHIFT - 12))
- 		__tlbi(vaae1is, addr);
- 	dsb(ish);
-+	asm volatile(ALTERNATIVE(
-+		     "nop \n"
-+		     "nop \n",
-+		     "tlbi vaae1is, %0 \n"
-+		     "dsb ish \n",
-+		     ARM64_WORKAROUND_QCOM_FALKOR_E1009)
-+		     : : "r" (end));
- 	isb();
- }
- 
-@@ -183,6 +219,13 @@ static inline void __flush_tlb_pgtable(struct mm_struct *mm,
- 
- 	__tlbi(vae1is, addr);
- 	dsb(ish);
-+	asm volatile(ALTERNATIVE(
-+		     "nop \n"
-+		     "nop \n",
-+		     "tlbi vae1is, %0 \n"
-+		     "dsb ish \n",
-+		     ARM64_WORKAROUND_QCOM_FALKOR_E1009)
-+		     : : "r" (addr));
- }
- 
- #endif
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 3789e2f..8013579 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -137,6 +137,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		MIDR_RANGE(MIDR_QCOM_FALKOR_V1, 0x00, 0x00),
- 	},
- #endif
-+#ifdef CONFIG_QCOM_FALKOR_ERRATUM_E1009
-+	{
-+		.desc = "Qualcomm Falkor erratum E1009",
-+		.capability = ARM64_WORKAROUND_QCOM_FALKOR_E1009,
-+		MIDR_RANGE(MIDR_QCOM_FALKOR_V1, 0x00, 0x00),
-+	},
-+#endif
- 	{
- 	}
- };
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 88e2f2b..dfd3a77 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -16,6 +16,7 @@
-  */
- 
- #include <asm/kvm_hyp.h>
-+#include <asm/alternative.h>
- 
- void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
-@@ -32,7 +33,14 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	 * whole of Stage-1. Weep...
- 	 */
- 	ipa >>= 12;
--	asm volatile("tlbi ipas2e1is, %0" : : "r" (ipa));
-+	asm volatile("tlbi ipas2e1is, %0 \n"
-+		     ALTERNATIVE(
-+		     "nop \n"
-+		     "nop \n",
-+		     "dsb ish \n"
-+		     "tlbi ipas2e1is, %0 \n",
-+		     ARM64_WORKAROUND_QCOM_FALKOR_E1009)
-+		     : : "r" (ipa));
- 
- 	/*
- 	 * We have to ensure completion of the invalidation at Stage-2,
-@@ -41,7 +49,14 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	 * the Stage-1 invalidation happened first.
- 	 */
- 	dsb(ish);
--	asm volatile("tlbi vmalle1is" : : );
-+	asm volatile("tlbi vmalle1is \n"
-+		     ALTERNATIVE(
-+		     "nop \n"
-+		     "nop \n",
-+		     "dsb ish \n"
-+		     "tlbi vmalle1is \n",
-+		     ARM64_WORKAROUND_QCOM_FALKOR_E1009)
-+		     : : );
- 	dsb(ish);
- 	isb();
- 
-@@ -57,7 +72,14 @@ void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
- 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
- 	isb();
- 
--	asm volatile("tlbi vmalls12e1is" : : );
-+	asm volatile("tlbi vmalls12e1is \n"
-+		     ALTERNATIVE(
-+		     "nop \n"
-+		     "nop \n",
-+		     "dsb ish \n"
-+		     "tlbi vmalls12e1is \n",
-+		     ARM64_WORKAROUND_QCOM_FALKOR_E1009)
-+		     : : );
- 	dsb(ish);
- 	isb();
- 
-@@ -82,7 +104,14 @@ void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
- void __hyp_text __kvm_flush_vm_context(void)
- {
- 	dsb(ishst);
--	asm volatile("tlbi alle1is	\n"
--		     "ic ialluis	  ": : );
-+	asm volatile("tlbi alle1is \n"
-+		     ALTERNATIVE(
-+		     "nop \n"
-+		     "nop \n",
-+		     "dsb ish \n"
-+		     "tlbi alle1is \n",
-+		     ARM64_WORKAROUND_QCOM_FALKOR_E1009)
-+		     "ic ialluis \n"
-+		     : : );
- 	dsb(ish);
- }
+Add support for Generic Hardware Error Source (GHES) v2, which introduces the
+capability for the OS to acknowledge the consumption of the error record
+generated by the Reliability, Availability and Serviceability (RAS) controller.
+This eliminates potential race conditions between the OS and the RAS controller.
+
+Add support for the timestamp field added to the Generic Error Data Entry v3,
+allowing the OS to log the time that the error is generated by the firmware,
+rather than the time the error is consumed. This improves the correctness of
+event sequences when analyzing error logs. The timestamp is added in
+ACPI 6.1, reference Table 18-343 Generic Error Data Entry.
+
+Add support for ARMv8 Common Platform Error Record (CPER) per UEFI 2.6
+specification. ARMv8 specific processor error information is reported as part of
+the CPER records.  This provides more detail on for processor error logs. This
+can help describe ARMv8 cache, tlb, and bus errors.
+
+Synchronous External Abort (SEA) represents a specific processor error condition
+in ARM systems. A handler is added to recognize SEA errors, and a notifier is
+added to parse and report the errors before the process is killed. Refer to
+section N.2.1.1 in the Common Platform Error Record appendix of the UEFI 2.6
+specification.
+
+Currently the kernel ignores CPER records that are unrecognized.
+On the other hand, UEFI spec allows for non-standard (eg. vendor
+proprietary) error section type in CPER (Common Platform Error Record),
+as defined in section N2.3 of UEFI version 2.5. Therefore, user
+is not able to see hardware error data of non-standard section.
+
+If section Type field of Generic Error Data Entry is unrecognized,
+prints out the raw data in dmesg buffer, and also adds a tracepoint
+for reporting such hardware errors.
+
+Currently even if an error status block's severity is fatal, the kernel
+does not honor the severity level and panic. With the firmware first
+model, the platform could inform the OS about a fatal hardware error
+through the non-NMI GHES notification type. The OS should panic when a
+hardware error record is received with this severity.
+
+Add support to handle SEAs that occur while a KVM guest kernel is
+running. Currently these are unsupported by the guest abort handling.
+
+Depends on: [PATCH v15] acpi, apei, arm64: APEI initial support for aarch64.
+            https://lkml.org/lkml/2016/12/1/312
+
+V6: Change HEST_TYPE_GENERIC_V2 to IS_HEST_TYPE_GENERIC_V2 for readability
+    Move APEI helper defines from cper.h to ghes.h
+    Add data_len decrement back into print loop
+    Change references to ARMv8 to just ARM
+    Rewrite ARM processor context info parsing
+    Check valid bit of ARM error info field before printing it
+    Add include of linux/uuid.h in ghes.c
+
+V5: Fix GHES goto logic for error conditions
+    Change ghes_do_read_ack to ghes_ack_error
+    Make sure data version check is >= 3
+    Use CPER helper functions in print functions
+    Make handle_guest_sea() dummy function static for arm
+    Add arm to subject line for KVM patch
+
+V4: Add bit offset left shift to read_ack_write value
+    Make HEST generic and generic_v2 structures a union in the ghes structure
+    Move gdata v3 helper functions into ghes.h to avoid duplication
+    Reorder the timestamp print and avoid memcpy
+    Add helper functions for gdata size checking
+    Rename the SEA functions
+    Add helper function for GHES panics
+    Set fru_id to NULL UUID at variable declaration
+    Limit ARM trace event parameters to the needed structures
+    Reorder the ARM trace event variables to save space
+    Add comment for why we don't pass SEAs to the guest when it aborts
+    Move ARM trace event call into GHES driver instead of CPER
+
+V3: Fix unmapped address to the read_ack_register in ghes.c
+    Add helper function to get the proper payload based on generic data entry
+     version
+    Move timestamp print to avoid changing function calls in cper.c
+    Remove patch "arm64: exception: handle instruction abort at current EL"
+     since the el1_ia handler is already added in 4.8
+    Add EFI and ARM64 dependencies for HAVE_ACPI_APEI_SEA
+    Add a new trace event for ARM type errors
+    Add support to handle KVM guest SEAs
+
+V2: Add PSCI state print for the ARMv8 error type.
+    Separate timestamp year into year and century using BCD format.
+    Rebase on top of ACPICA 20160318 release and remove header file changes
+     in include/acpi/actbl1.h.
+    Add panic OS with fatal error status block patch.
+    Add processing of unrecognized CPER error section patches with updates
+     from previous comments. Original patches: https://lkml.org/lkml/2015/9/8/646
+
+V1: https://lkml.org/lkml/2016/2/5/544
+
+Jonathan (Zhixiong) Zhang (1):
+  acpi: apei: panic OS with fatal error status block
+
+Tyler Baicar (9):
+  acpi: apei: read ack upon ghes record consumption
+  ras: acpi/apei: cper: generic error data entry v3 per ACPI 6.1
+  efi: parse ARM processor error
+  arm64: exception: handle Synchronous External Abort
+  acpi: apei: handle SEA notification type for ARMv8
+  efi: print unrecognized CPER section
+  ras: acpi / apei: generate trace event for unrecognized CPER section
+  trace, ras: add ARM processor error trace event
+  arm/arm64: KVM: add guest SEA support
+
+ arch/arm/include/asm/kvm_arm.h       |   1 +
+ arch/arm/include/asm/system_misc.h   |   5 +
+ arch/arm/kvm/mmu.c                   |  18 +++-
+ arch/arm64/Kconfig                   |   1 +
+ arch/arm64/include/asm/kvm_arm.h     |   1 +
+ arch/arm64/include/asm/system_misc.h |  15 +++
+ arch/arm64/mm/fault.c                |  71 ++++++++++--
+ drivers/acpi/apei/Kconfig            |  14 +++
+ drivers/acpi/apei/ghes.c             | 189 +++++++++++++++++++++++++++++---
+ drivers/acpi/apei/hest.c             |   7 +-
+ drivers/firmware/efi/cper.c          | 204 ++++++++++++++++++++++++++++++++---
+ drivers/ras/ras.c                    |   2 +
+ include/acpi/ghes.h                  |  27 ++++-
+ include/linux/cper.h                 |  53 +++++++++
+ include/ras/ras_event.h              | 100 +++++++++++++++++
+ 15 files changed, 664 insertions(+), 44 deletions(-)
+
 -- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
-Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code Aurora
-Forum, a Linux Foundation Collaborative Project.
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
+
