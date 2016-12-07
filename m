@@ -1,110 +1,60 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 0/2] Add the missing resetting LRs at boot time for
- new-vgic
-Date: Wed, 7 Dec 2016 08:10:03 +0000
-Message-ID: <76456b16-0ec2-fae9-6c7b-acb637d9629e@arm.com>
-References: <1481006504-25460-1-git-send-email-zhaoshenglong@huawei.com>
- <cc4193be-c66e-f40a-7be4-f8f775abcd63@arm.com> <5847BE30.9050701@huawei.com>
+Subject: Re: [PATCH] arm/arm64: KVM: Check for properly initialized timer on
+ init
+Date: Wed, 7 Dec 2016 11:06:16 +0000
+Message-ID: <f66ed076-cd38-6eb4-40d6-e1ec031fc1ef@arm.com>
+References: <20161205093211.11870-1-christoffer.dall@linaro.org>
+ <1ed187ba-965b-6087-f74f-68627f0d0504@arm.com> <20161206195652.GF4816@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A88E5402A5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Dec 2016 03:09:08 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0NzAoKdfxjgR for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Dec 2016 03:09:07 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AE2A401BF
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Dec 2016 03:09:06 -0500 (EST)
-In-Reply-To: <5847BE30.9050701@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20161206195652.GF4816@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/12/16 07:45, Shannon Zhao wrote:
-> 
-> 
-> On 2016/12/6 19:47, Marc Zyngier wrote:
->> On 06/12/16 06:41, Shannon Zhao wrote:
->>> From: Shannon Zhao <shannon.zhao@linaro.org>
+On 06/12/16 19:56, Christoffer Dall wrote:
+> On Tue, Dec 06, 2016 at 11:25:42AM +0000, Marc Zyngier wrote:
+>> On 05/12/16 09:32, Christoffer Dall wrote:
+>>> When the arch timer code fails to initialize (for example because the
+>>> memory mapped timer doesn't work, which is currently seen with the AEM
+>>> model), then KVM just continues happily with a final result that KVM
+>>> eventually does a NULL pointer dereference of the uninitialized cycle
+>>> counter.
 >>>
->>> Commit 50926d8(KVM: arm/arm64: The GIC is dead, long live the GIC)
->>> removes the old vgic and commit 9097773(KVM: arm/arm64: vgic-new: 
->>> vgic_init: implement kvm_vgic_hyp_init) doesn't reset LRs for new-vgic
->>> when probing GIC. These two patches add the missing part.
+>>> Check directly for this in the init path and give the user a reasonable
+>>> error in this case.
 >>>
->>> BTW, here is a strange problem on Huawei D03 board when using
->>> upstream kernel that android guest with a goldfish_fb will hang with
->>> rcu_stall and interrupt timeout for goldfish_fb. We apply these patches
->>> but the problem still exists, while if we revert the commit
->>> b40c489(arm64: KVM: vgic-v3: Only wipe LRs on vcpu exit) the guest runs
->>> well.
+>>> Cc: Shih-Wei Li <shihwei@cs.columbia.edu>
+>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>>> ---
+>>>  virt/kvm/arm/arch_timer.c | 5 +++++
+>>>  1 file changed, 5 insertions(+)
 >>>
->>> We add a trace in kvm_vgic_flush_hwstate() to print the value of 
->>> compute_ap_list_depth(vcpu) and the value of vgic_lr before calling
->>> vgic_flush_lr_state(). The first output shows that the ap_list_depth is zero
->>> but the first one in vgic_lr is 10a0000000002001. I don't understand why
->>> there is a valued one in vgic_lr since the memory of vgic_lr is zero
->>> allocated. I think It should be zero when the vcpu first run and first
->>> call kvm_vgic_flush_hwstate().
->>>
->>> qemu-system-aar-6673  [016] ....   501.969251: kvm_vgic_flush_hwstate: VCPU: 0, lits-count: 0, LR: 10a0000000002001, 0, 0, 0
->>>
->>> I also add a trace at the end of vgic_flush_lr_state() which shows the
->>> kvm_vgic_global_state.nr_lr is 4, used_lrs is 0 and all LRs in vgic_lr
->>> are zero.
->>>
->>> qemu-system-aar-6673  [016] ....   501.969254: vgic_flush_lr_state_nuke: kvm_vgic_global_state.nr_lr is :4, irq1:0, irq2:0, irq3:0, irq4:0
->>>
->>> But the trace at the beginning of kvm_vgic_sync_hwstate() shows the
->>> first one of vgic_lr is 10a0000000002001.
->>>
->>> qemu-system-aar-6673  [016] ....   501.969261: kvm_vgic_sync_hwstate_vgic_lr: VCPU: 0, used_lrs: 0, LR: 10a0000000002001, 0, 0, 0
->>>
->>> The above three trace outputs are printed by the first KVM_ENTRY/EXIT of VCPU 0.
+>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>>> index 27a1f63..5c12f53 100644
+>>> --- a/virt/kvm/arm/arch_timer.c
+>>> +++ b/virt/kvm/arm/arch_timer.c
+>>> @@ -425,6 +425,11 @@ int kvm_timer_hyp_init(void)
+>>>  	info = arch_timer_get_kvm_info();
+>>>  	timecounter = &info->timecounter;
+>>>  
+>>> +	if (!timecounter->cc) {
+>>> +		kvm_err("arch_timer: uninitialized timecounter\n");
 >>
->> Decoding this LR value is interesting:
->>
->> 10a0000000002001
->> | |         | LPI 8193
->> | |
->> | Priority 0xa0
->> |
->> Group1
->>
->> Someone is injecting an LPI behind your back. If nobody populates this,
->> then you may want to investigate what is happening on the host side. Is
->> there anyone using this interrupt?
+>> For consistency, I'll change the error message to say "kvm_arch_timer",
+>> just like the below case.
 >>
 > 
-> For this guest, I think nobody populates this LR, but on the host, there
-> is a LPI interrupt 8193. It's a interrupt of eth2
-> 
-> MBIGEN-V2 8193 Edge      eth2-tx0
-> 
-> It's a little confused to me that the LR registers should only be used
-> for VM, right? Why does the interrupt on host would affect the LRs?
+> No objections, only problem is that the patch you queued uses
+> kcm_arch_timer ;)
 
-It should never have an impact, but I'm worried that this could be a HW
-bug where the physical side of the ITS leaks into the virtual one. You
-have a GICv4, right?
+Yeah, that's the new and upgraded version: Kernel Cryogenic Machine, it
+freezes time ;-).
 
-It'd be interesting to find out what happens if you leave this interrupt
-disabled (don't enable eth2) and see if that interrupt magically appears
-or not.
-
-Thanks,
+I'll fix that shortly, thanks for the heads up!
 
 	M.
 -- 
