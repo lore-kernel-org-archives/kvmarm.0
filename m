@@ -1,8 +1,11 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH kvm-unit-tests v8 01/10] arm/arm64: yield on cpu_relax
-Date: Thu,  8 Dec 2016 18:50:21 +0100
-Message-ID: <20161208175030.12269-2-drjones@redhat.com>
+Subject: [PATCH kvm-unit-tests v8 02/10] arm/arm64: smp: support more than 8 cpus
+Date: Thu,  8 Dec 2016 18:50:22 +0100
+Message-ID: <20161208175030.12269-3-drjones@redhat.com>
 References: <20161208175030.12269-1-drjones@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20161208175030.12269-1-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
@@ -10,68 +13,180 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qe
 Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In many tests one or more cpus wait for events from other cpus. However,
-with TCG, if the event triggering cpus then continue without first
-informing TCG it should schedule other cpus, then those other cpus may
-never get scheduled, and never see their events. This is because the
-TCG scheduler relies on either the currently running cpu to invoke an
-instruction that results in scheduling or for some I/O event to occur,
-and then to do scheduling while handling the I/O. kvm-unit-tests do not
-have external I/O events, so we must invoke a yielding instruction
-wherever needed. cpu_relax() is almost always a place it's needed.
+By adding support for launching with gicv3 we can break the 8 vcpu
+limit. This patch adds support to smp code and also selects the
+vgic model corresponding to the host. The vgic model may also be
+manually selected by adding e.g. -machine gic-version=3 to
+extra_params.
 
-While this change is mostly for TCG, it's fine to do for KVM as well.
-The Linux kernel made the same change with 1baa82f4803 for armv8. As
-the yield instruction is also available on armv7, we make the change
-for both.
-
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 
 ---
-
-v8: new patch that drastically speeds up the tests with tcg,
-    actually allowing it to complete at all after adding
-    -nodefaults to the qemu command line...
+v8: in anticipation of get_mpidr() returning a u64 (patches will
+    be in a future series), make sure we use that type everywhere
+    get_mpidr is used
+v5: left cpus a u32 for now. Changing to u64 requires a change to
+    devicetree. Will do it later. [Andre]
+v4: improved commit message
 ---
- lib/arm/asm/barrier.h   | 5 +++--
- lib/arm64/asm/barrier.h | 3 ++-
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ arm/run                   | 19 ++++++++++++-------
+ lib/arm/asm/processor.h   |  9 +++++++--
+ lib/arm/asm/setup.h       |  4 ++--
+ lib/arm64/asm/processor.h |  9 +++++++--
+ arm/selftest.c            |  7 ++++++-
+ lib/arm/setup.c           | 10 ++++++++++
+ 6 files changed, 44 insertions(+), 14 deletions(-)
 
-diff --git a/lib/arm/asm/barrier.h b/lib/arm/asm/barrier.h
-index 394a4a2da26f..927cd3801dfb 100644
---- a/lib/arm/asm/barrier.h
-+++ b/lib/arm/asm/barrier.h
-@@ -1,13 +1,14 @@
- #ifndef _ASMARM_BARRIER_H_
- #define _ASMARM_BARRIER_H_
- /*
-- * Adapted form arch/arm/include/asm/barrier.h
-+ * Adapted from arch/arm/include/asm/barrier.h
-  */
+diff --git a/arm/run b/arm/run
+index f1b04af614dc..1c40ab02eb57 100755
+--- a/arm/run
++++ b/arm/run
+@@ -31,13 +31,6 @@ if [ -z "$ACCEL" ]; then
+ 	fi
+ fi
  
- #define sev()		asm volatile("sev" : : : "memory")
- #define wfe()		asm volatile("wfe" : : : "memory")
- #define wfi()		asm volatile("wfi" : : : "memory")
--#define cpu_relax()	asm volatile(""    : : : "memory")
-+#define yield()		asm volatile("yield" : : : "memory")
-+#define cpu_relax()	yield()
+-if [ "$HOST" = "aarch64" ] && [ "$ACCEL" = "kvm" ]; then
+-	processor="host"
+-	if [ "$ARCH" = "arm" ]; then
+-		processor+=",aarch64=off"
+-	fi
+-fi
+-
+ qemu="${QEMU:-qemu-system-$ARCH_NAME}"
+ qpath=$(which $qemu 2>/dev/null)
  
- #define isb(option) __asm__ __volatile__ ("isb " #option : : : "memory")
- #define dsb(option) __asm__ __volatile__ ("dsb " #option : : : "memory")
-diff --git a/lib/arm64/asm/barrier.h b/lib/arm64/asm/barrier.h
-index dbdac9d339c7..4f7bb97c2279 100644
---- a/lib/arm64/asm/barrier.h
-+++ b/lib/arm64/asm/barrier.h
-@@ -7,7 +7,8 @@
- #define sev()		asm volatile("sev" : : : "memory")
- #define wfe()		asm volatile("wfe" : : : "memory")
- #define wfi()		asm volatile("wfi" : : : "memory")
--#define cpu_relax()	asm volatile(""    : : : "memory")
-+#define yield()		asm volatile("yield" : : : "memory")
-+#define cpu_relax()	yield()
+@@ -53,6 +46,18 @@ fi
  
- #define isb()		asm volatile("isb" : : : "memory")
- #define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
+ M='-machine virt'
+ 
++if [ "$ACCEL" = "kvm" ]; then
++	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
++		M+=',gic-version=host'
++	fi
++	if [ "$HOST" = "aarch64" ]; then
++		processor="host"
++		if [ "$ARCH" = "arm" ]; then
++			processor+=",aarch64=off"
++		fi
++	fi
++fi
++
+ if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
+ 	echo "$qpath doesn't support virtio-console for chr-testdev. Exiting."
+ 	exit 2
+diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+index c831749e04de..6b0d36b87817 100644
+--- a/lib/arm/asm/processor.h
++++ b/lib/arm/asm/processor.h
+@@ -40,8 +40,13 @@ static inline unsigned int get_mpidr(void)
+ 	return read_sysreg(MPIDR);
+ }
+ 
+-/* Only support Aff0 for now, up to 4 cpus */
+-#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
++#define MPIDR_HWID_BITMASK 0xffffff
++extern int mpidr_to_cpu(uint64_t mpidr);
++
++#define MPIDR_LEVEL_SHIFT(level) \
++	(((1 << level) >> 1) << 3)
++#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
++	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
+ 
+ extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+ extern bool is_user(void);
+diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+index cb8fdbd38dd5..1de99dd184d1 100644
+--- a/lib/arm/asm/setup.h
++++ b/lib/arm/asm/setup.h
+@@ -10,8 +10,8 @@
+ #include <asm/page.h>
+ #include <asm/pgtable-hwdef.h>
+ 
+-#define NR_CPUS			8
+-extern u32 cpus[NR_CPUS];
++#define NR_CPUS			255
++extern u32 cpus[NR_CPUS];	/* per-cpu IDs (MPIDRs) */
+ extern int nr_cpus;
+ 
+ #define NR_MEM_REGIONS		8
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index ed59ad25007b..48abf2c9e358 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -72,8 +72,13 @@ static inline unsigned int get_mpidr(void)
+ 	return read_sysreg(mpidr_el1);
+ }
+ 
+-/* Only support Aff0 for now, gicv2 only */
+-#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
++#define MPIDR_HWID_BITMASK 0xff00ffffff
++extern int mpidr_to_cpu(uint64_t mpidr);
++
++#define MPIDR_LEVEL_SHIFT(level) \
++	(((1 << level) >> 1) << 3)
++#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
++	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
+ 
+ extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+ extern bool is_user(void);
+diff --git a/arm/selftest.c b/arm/selftest.c
+index 196164f5313d..750e90893141 100644
+--- a/arm/selftest.c
++++ b/arm/selftest.c
+@@ -312,9 +312,11 @@ static bool psci_check(void)
+ static cpumask_t smp_reported;
+ static void cpu_report(void)
+ {
++	uint64_t mpidr = get_mpidr();
+ 	int cpu = smp_processor_id();
+ 
+-	report("CPU%d online", true, cpu);
++	report("CPU(%3d) mpidr=%010" PRIx64,
++		mpidr_to_cpu(mpidr) == cpu, cpu, mpidr);
+ 	cpumask_set_cpu(cpu, &smp_reported);
+ 	halt();
+ }
+@@ -343,6 +345,7 @@ int main(int argc, char **argv)
+ 
+ 	} else if (strcmp(argv[1], "smp") == 0) {
+ 
++		uint64_t mpidr = get_mpidr();
+ 		int cpu;
+ 
+ 		report("PSCI version", psci_check());
+@@ -353,6 +356,8 @@ int main(int argc, char **argv)
+ 			smp_boot_secondary(cpu, cpu_report);
+ 		}
+ 
++		report("CPU(%3d) mpidr=%010" PRIx64,
++			mpidr_to_cpu(mpidr) == 0, 0, mpidr);
+ 		cpumask_set_cpu(0, &smp_reported);
+ 		while (!cpumask_full(&smp_reported))
+ 			cpu_relax();
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 7e7b39f11dde..e52a25abd722 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -30,6 +30,16 @@ int nr_cpus;
+ struct mem_region mem_regions[NR_MEM_REGIONS];
+ phys_addr_t __phys_offset, __phys_end;
+ 
++int mpidr_to_cpu(uint64_t mpidr)
++{
++	int i;
++
++	for (i = 0; i < nr_cpus; ++i)
++		if (cpus[i] == (mpidr & MPIDR_HWID_BITMASK))
++			return i;
++	return -1;
++}
++
+ static void cpu_set(int fdtnode __unused, u32 regval, void *info __unused)
+ {
+ 	int cpu = nr_cpus++;
 -- 
 2.9.3
 
