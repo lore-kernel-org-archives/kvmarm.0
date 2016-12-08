@@ -1,7 +1,7 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH kvm-unit-tests v8 03/10] arm/arm64: add some delay routines
-Date: Thu,  8 Dec 2016 18:50:23 +0100
-Message-ID: <20161208175030.12269-4-drjones@redhat.com>
+Subject: [PATCH kvm-unit-tests v8 01/10] arm/arm64: yield on cpu_relax
+Date: Thu,  8 Dec 2016 18:50:21 +0100
+Message-ID: <20161208175030.12269-2-drjones@redhat.com>
 References: <20161208175030.12269-1-drjones@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20161208175030.12269-1-drjones@redhat.com>
@@ -10,160 +10,68 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qe
 Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Allow a thread to wait some specified amount of time. Can
-specify in cycles, usecs, and msecs.
+In many tests one or more cpus wait for events from other cpus. However,
+with TCG, if the event triggering cpus then continue without first
+informing TCG it should schedule other cpus, then those other cpus may
+never get scheduled, and never see their events. This is because the
+TCG scheduler relies on either the currently running cpu to invoke an
+instruction that results in scheduling or for some I/O event to occur,
+and then to do scheduling while handling the I/O. kvm-unit-tests do not
+have external I/O events, so we must invoke a yielding instruction
+wherever needed. cpu_relax() is almost always a place it's needed.
+
+While this change is mostly for TCG, it's fine to do for KVM as well.
+The Linux kernel made the same change with 1baa82f4803 for armv8. As
+the yield instruction is also available on armv7, we make the change
+for both.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 
 ---
-v8: rewrote basing on new sysreg framework. Also decided delay
-    functions warrant their own files (delay.[ch])
----
- arm/Makefile.common       |  1 +
- lib/arm/asm/delay.h       | 14 ++++++++++++++
- lib/arm/asm/processor.h   | 15 +++++++++++++++
- lib/arm64/asm/delay.h     |  1 +
- lib/arm64/asm/processor.h | 12 ++++++++++++
- lib/arm/delay.c           | 29 +++++++++++++++++++++++++++++
- 6 files changed, 72 insertions(+)
- create mode 100644 lib/arm/asm/delay.h
- create mode 100644 lib/arm64/asm/delay.h
- create mode 100644 lib/arm/delay.c
 
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index b2c0fc8a2fdc..89fe3f69eb44 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -48,6 +48,7 @@ cflatobjs += lib/arm/mmu.o
- cflatobjs += lib/arm/bitops.o
- cflatobjs += lib/arm/psci.o
- cflatobjs += lib/arm/smp.o
-+cflatobjs += lib/arm/delay.o
- 
- libeabi = lib/arm/libeabi.a
- eabiobjs = lib/arm/eabi_compat.o
-diff --git a/lib/arm/asm/delay.h b/lib/arm/asm/delay.h
-new file mode 100644
-index 000000000000..2436b28c77ae
---- /dev/null
-+++ b/lib/arm/asm/delay.h
-@@ -0,0 +1,14 @@
-+#ifndef _ASMARM_DELAY_H_
-+#define _ASMARM_DELAY_H_
-+/*
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include <libcflat.h>
-+
-+extern void delay(u64 cycles);
-+extern void udelay(unsigned long usecs);
-+extern void mdelay(unsigned long msecs);
-+
-+#endif /* _ASMARM_DELAY_H_ */
-diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-index 6b0d36b87817..857bdd96a3cc 100644
---- a/lib/arm/asm/processor.h
-+++ b/lib/arm/asm/processor.h
-@@ -7,6 +7,7 @@
+v8: new patch that drastically speeds up the tests with tcg,
+    actually allowing it to complete at all after adding
+    -nodefaults to the qemu command line...
+---
+ lib/arm/asm/barrier.h   | 5 +++--
+ lib/arm64/asm/barrier.h | 3 ++-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/lib/arm/asm/barrier.h b/lib/arm/asm/barrier.h
+index 394a4a2da26f..927cd3801dfb 100644
+--- a/lib/arm/asm/barrier.h
++++ b/lib/arm/asm/barrier.h
+@@ -1,13 +1,14 @@
+ #ifndef _ASMARM_BARRIER_H_
+ #define _ASMARM_BARRIER_H_
+ /*
+- * Adapted form arch/arm/include/asm/barrier.h
++ * Adapted from arch/arm/include/asm/barrier.h
   */
- #include <asm/ptrace.h>
- #include <asm/sysreg.h>
-+#include <asm/barrier.h>
  
- enum vector {
- 	EXCPTN_RST,
-@@ -51,4 +52,18 @@ extern int mpidr_to_cpu(uint64_t mpidr);
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
- extern bool is_user(void);
+ #define sev()		asm volatile("sev" : : : "memory")
+ #define wfe()		asm volatile("wfe" : : : "memory")
+ #define wfi()		asm volatile("wfi" : : : "memory")
+-#define cpu_relax()	asm volatile(""    : : : "memory")
++#define yield()		asm volatile("yield" : : : "memory")
++#define cpu_relax()	yield()
  
-+#define CNTVCT		__ACCESS_CP15_64(1, c14)
-+#define CNTFRQ		__ACCESS_CP15(c14, 0, c0, 0)
-+
-+static inline u64 get_cntvct(void)
-+{
-+	isb();
-+	return read_sysreg(CNTVCT);
-+}
-+
-+static inline u32 get_cntfrq(void)
-+{
-+	return read_sysreg(CNTFRQ);
-+}
-+
- #endif /* _ASMARM_PROCESSOR_H_ */
-diff --git a/lib/arm64/asm/delay.h b/lib/arm64/asm/delay.h
-new file mode 100644
-index 000000000000..288e4b3fe610
---- /dev/null
-+++ b/lib/arm64/asm/delay.h
-@@ -0,0 +1 @@
-+#include "../../arm/asm/delay.h"
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 48abf2c9e358..0898d89f9761 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -20,6 +20,7 @@
- #include <asm/ptrace.h>
- #include <asm/esr.h>
- #include <asm/sysreg.h>
-+#include <asm/barrier.h>
+ #define isb(option) __asm__ __volatile__ ("isb " #option : : : "memory")
+ #define dsb(option) __asm__ __volatile__ ("dsb " #option : : : "memory")
+diff --git a/lib/arm64/asm/barrier.h b/lib/arm64/asm/barrier.h
+index dbdac9d339c7..4f7bb97c2279 100644
+--- a/lib/arm64/asm/barrier.h
++++ b/lib/arm64/asm/barrier.h
+@@ -7,7 +7,8 @@
+ #define sev()		asm volatile("sev" : : : "memory")
+ #define wfe()		asm volatile("wfe" : : : "memory")
+ #define wfi()		asm volatile("wfi" : : : "memory")
+-#define cpu_relax()	asm volatile(""    : : : "memory")
++#define yield()		asm volatile("yield" : : : "memory")
++#define cpu_relax()	yield()
  
- enum vector {
- 	EL1T_SYNC,
-@@ -83,5 +84,16 @@ extern int mpidr_to_cpu(uint64_t mpidr);
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
- extern bool is_user(void);
- 
-+static inline u64 get_cntvct(void)
-+{
-+	isb();
-+	return read_sysreg(cntvct_el0);
-+}
-+
-+static inline u32 get_cntfrq(void)
-+{
-+	return read_sysreg(cntfrq_el0);
-+}
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM64_PROCESSOR_H_ */
-diff --git a/lib/arm/delay.c b/lib/arm/delay.c
-new file mode 100644
-index 000000000000..fa65e2dc9e35
---- /dev/null
-+++ b/lib/arm/delay.c
-@@ -0,0 +1,29 @@
-+/*
-+ * Delay loops
-+ *
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include <libcflat.h>
-+#include <asm/processor.h>
-+#include <asm/barrier.h>
-+
-+void delay(u64 cycles)
-+{
-+	u64 start = get_cntvct();
-+
-+	while ((get_cntvct() - start) < cycles)
-+		cpu_relax();
-+}
-+
-+void udelay(unsigned long usec)
-+{
-+	delay((u64)usec * get_cntfrq() / 1000000);
-+}
-+
-+void mdelay(unsigned long msecs)
-+{
-+	while (msecs--)
-+		udelay(1000);
-+}
+ #define isb()		asm volatile("isb" : : : "memory")
+ #define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
 -- 
 2.9.3
 
