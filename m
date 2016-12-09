@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 1/6] KVM: arm64: vgic-its: Fix compatibility with 32-bit
-Date: Fri,  9 Dec 2016 15:53:26 +0000
-Message-ID: <1481298811-30798-2-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 4/6] KVM: arm/arm64: vgic-v2: Limit ITARGETSR bits to number of VCPUs
+Date: Fri,  9 Dec 2016 15:53:29 +0000
+Message-ID: <1481298811-30798-5-git-send-email-marc.zyngier@arm.com>
 References: <1481298811-30798-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1481298811-30798-1-git-send-email-marc.zyngier@arm.com>
@@ -10,84 +10,41 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>, Will Deacon <will.deacon@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, Andre Przywara <andre.przywara@arm.com>, Longpeng <longpeng2@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vladimir Murzin <vladimir.murzin@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
 
-Evaluate GITS_BASER_ENTRY_SIZE once as an int data (GITS_BASER<n>'s
-Entry Size is 5-bit wide only), so when used as divider no reference
-to __aeabi_uldivmod is generated when build for AArch32.
+The GICv2 spec says in section 4.3.12 that a "CPU targets field bit that
+corresponds to an unimplemented CPU interface is RAZ/WI."
+Currently we allow the guest to write any value in there and it can
+read that back.
+Mask the written value with the proper CPU mask to be spec compliant.
 
-Use unsigned long long for GITS_BASER_PAGE_SIZE_* since they are
-used in conjunction with 64-bit data.
-
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h |  8 ++++----
- virt/kvm/arm/vgic/vgic-its.c       | 11 ++++++-----
- 2 files changed, 10 insertions(+), 9 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index b7e3431..0deea34 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -295,10 +295,10 @@
- #define GITS_BASER_InnerShareable					\
- 	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
- #define GITS_BASER_PAGE_SIZE_SHIFT	(8)
--#define GITS_BASER_PAGE_SIZE_4K		(0UL << GITS_BASER_PAGE_SIZE_SHIFT)
--#define GITS_BASER_PAGE_SIZE_16K	(1UL << GITS_BASER_PAGE_SIZE_SHIFT)
--#define GITS_BASER_PAGE_SIZE_64K	(2UL << GITS_BASER_PAGE_SIZE_SHIFT)
--#define GITS_BASER_PAGE_SIZE_MASK	(3UL << GITS_BASER_PAGE_SIZE_SHIFT)
-+#define GITS_BASER_PAGE_SIZE_4K		(0ULL << GITS_BASER_PAGE_SIZE_SHIFT)
-+#define GITS_BASER_PAGE_SIZE_16K	(1ULL << GITS_BASER_PAGE_SIZE_SHIFT)
-+#define GITS_BASER_PAGE_SIZE_64K	(2ULL << GITS_BASER_PAGE_SIZE_SHIFT)
-+#define GITS_BASER_PAGE_SIZE_MASK	(3ULL << GITS_BASER_PAGE_SIZE_SHIFT)
- #define GITS_BASER_PAGES_MAX		256
- #define GITS_BASER_PAGES_SHIFT		(0)
- #define GITS_BASER_NR_PAGES(r)		(((r) & 0xff) + 1)
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4660a7d..8c2b3cd 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -632,21 +632,22 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
- 	int index;
- 	u64 indirect_ptr;
- 	gfn_t gfn;
-+	int esz = GITS_BASER_ENTRY_SIZE(baser);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index b44b359..78e34bc 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -129,6 +129,7 @@ static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
+ 				   unsigned long val)
+ {
+ 	u32 intid = VGIC_ADDR_TO_INTID(addr, 8);
++	u8 cpu_mask = GENMASK(atomic_read(&vcpu->kvm->online_vcpus) - 1, 0);
+ 	int i;
  
- 	if (!(baser & GITS_BASER_INDIRECT)) {
- 		phys_addr_t addr;
+ 	/* GICD_ITARGETSR[0-7] are read-only */
+@@ -141,7 +142,7 @@ static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
  
--		if (id >= (l1_tbl_size / GITS_BASER_ENTRY_SIZE(baser)))
-+		if (id >= (l1_tbl_size / esz))
- 			return false;
+ 		spin_lock(&irq->irq_lock);
  
--		addr = BASER_ADDRESS(baser) + id * GITS_BASER_ENTRY_SIZE(baser);
-+		addr = BASER_ADDRESS(baser) + id * esz;
- 		gfn = addr >> PAGE_SHIFT;
+-		irq->targets = (val >> (i * 8)) & 0xff;
++		irq->targets = (val >> (i * 8)) & cpu_mask;
+ 		target = irq->targets ? __ffs(irq->targets) : 0;
+ 		irq->target_vcpu = kvm_get_vcpu(vcpu->kvm, target);
  
- 		return kvm_is_visible_gfn(its->dev->kvm, gfn);
- 	}
- 
- 	/* calculate and check the index into the 1st level */
--	index = id / (SZ_64K / GITS_BASER_ENTRY_SIZE(baser));
-+	index = id / (SZ_64K / esz);
- 	if (index >= (l1_tbl_size / sizeof(u64)))
- 		return false;
- 
-@@ -670,8 +671,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
- 	indirect_ptr &= GENMASK_ULL(51, 16);
- 
- 	/* Find the address of the actual entry */
--	index = id % (SZ_64K / GITS_BASER_ENTRY_SIZE(baser));
--	indirect_ptr += index * GITS_BASER_ENTRY_SIZE(baser);
-+	index = id % (SZ_64K / esz);
-+	indirect_ptr += index * esz;
- 	gfn = indirect_ptr >> PAGE_SHIFT;
- 
- 	return kvm_is_visible_gfn(its->dev->kvm, gfn);
 -- 
 2.1.4
 
