@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 3/6] arm/arm64: KVM: Clean up useless code in kvm_timer_enable
-Date: Fri,  9 Dec 2016 15:53:28 +0000
-Message-ID: <1481298811-30798-4-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 5/6] KVM: arm/arm64: timer: Check for properly initialized timer on init
+Date: Fri,  9 Dec 2016 15:53:30 +0000
+Message-ID: <1481298811-30798-6-git-send-email-marc.zyngier@arm.com>
 References: <1481298811-30798-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1481298811-30798-1-git-send-email-marc.zyngier@arm.com>
@@ -10,44 +10,40 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>, Will Deacon <will.deacon@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, Andre Przywara <andre.przywara@arm.com>, Longpeng <longpeng2@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-1) Since commit:41a54482 changed timer enabled variable to per-vcpu,
-   the correlative comment in kvm_timer_enable is useless now.
+When the arch timer code fails to initialize (for example because the
+memory mapped timer doesn't work, which is currently seen with the AEM
+model), then KVM just continues happily with a final result that KVM
+eventually does a NULL pointer dereference of the uninitialized cycle
+counter.
 
-2) After the kvm module init successfully, the timecounter is always
-   non-null, so we can remove the checking of timercounter.
+Check directly for this in the init path and give the user a reasonable
+error in this case.
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Shih-Wei Li <shihwei@cs.columbia.edu>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/arch_timer.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
+ virt/kvm/arm/arch_timer.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 27a1f63..17b8fa5 100644
+index 17b8fa5..ae95fc0 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -498,17 +498,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 	if (ret)
- 		return ret;
+@@ -425,6 +425,11 @@ int kvm_timer_hyp_init(void)
+ 	info = arch_timer_get_kvm_info();
+ 	timecounter = &info->timecounter;
  
--
--	/*
--	 * There is a potential race here between VCPUs starting for the first
--	 * time, which may be enabling the timer multiple times.  That doesn't
--	 * hurt though, because we're just setting a variable to the same
--	 * variable that it already was.  The important thing is that all
--	 * VCPUs have the enabled variable set, before entering the guest, if
--	 * the arch timers are enabled.
--	 */
--	if (timecounter)
--		timer->enabled = 1;
-+	timer->enabled = 1;
- 
- 	return 0;
- }
++	if (!timecounter->cc) {
++		kvm_err("kvm_arch_timer: uninitialized timecounter\n");
++		return -ENODEV;
++	}
++
+ 	if (info->virtual_irq <= 0) {
+ 		kvm_err("kvm_arch_timer: invalid virtual timer IRQ: %d\n",
+ 			info->virtual_irq);
 -- 
 2.1.4
 
