@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 4/6] KVM: arm/arm64: vgic-v2: Limit ITARGETSR bits to number of VCPUs
-Date: Fri,  9 Dec 2016 15:53:29 +0000
-Message-ID: <1481298811-30798-5-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 3/6] arm/arm64: KVM: Clean up useless code in kvm_timer_enable
+Date: Fri,  9 Dec 2016 15:53:28 +0000
+Message-ID: <1481298811-30798-4-git-send-email-marc.zyngier@arm.com>
 References: <1481298811-30798-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1481298811-30798-1-git-send-email-marc.zyngier@arm.com>
@@ -10,41 +10,44 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>, Will Deacon <will.deacon@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, Andre Przywara <andre.przywara@arm.com>, Longpeng <longpeng2@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-The GICv2 spec says in section 4.3.12 that a "CPU targets field bit that
-corresponds to an unimplemented CPU interface is RAZ/WI."
-Currently we allow the guest to write any value in there and it can
-read that back.
-Mask the written value with the proper CPU mask to be spec compliant.
+1) Since commit:41a54482 changed timer enabled variable to per-vcpu,
+   the correlative comment in kvm_timer_enable is useless now.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+2) After the kvm module init successfully, the timecounter is always
+   non-null, so we can remove the checking of timercounter.
+
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ virt/kvm/arm/arch_timer.c | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index b44b359..78e34bc 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -129,6 +129,7 @@ static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
- 				   unsigned long val)
- {
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 8);
-+	u8 cpu_mask = GENMASK(atomic_read(&vcpu->kvm->online_vcpus) - 1, 0);
- 	int i;
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 27a1f63..17b8fa5 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -498,17 +498,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 	if (ret)
+ 		return ret;
  
- 	/* GICD_ITARGETSR[0-7] are read-only */
-@@ -141,7 +142,7 @@ static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
+-
+-	/*
+-	 * There is a potential race here between VCPUs starting for the first
+-	 * time, which may be enabling the timer multiple times.  That doesn't
+-	 * hurt though, because we're just setting a variable to the same
+-	 * variable that it already was.  The important thing is that all
+-	 * VCPUs have the enabled variable set, before entering the guest, if
+-	 * the arch timers are enabled.
+-	 */
+-	if (timecounter)
+-		timer->enabled = 1;
++	timer->enabled = 1;
  
- 		spin_lock(&irq->irq_lock);
- 
--		irq->targets = (val >> (i * 8)) & 0xff;
-+		irq->targets = (val >> (i * 8)) & cpu_mask;
- 		target = irq->targets ? __ffs(irq->targets) : 0;
- 		irq->target_vcpu = kvm_get_vcpu(vcpu->kvm, target);
- 
+ 	return 0;
+ }
 -- 
 2.1.4
 
