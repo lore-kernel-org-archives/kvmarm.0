@@ -1,23 +1,24 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 2/6] ARM: KVM: Support vGICv3 ITS
-Date: Fri,  9 Dec 2016 15:53:27 +0000
-Message-ID: <1481298811-30798-3-git-send-email-marc.zyngier@arm.com>
-References: <1481298811-30798-1-git-send-email-marc.zyngier@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH kvm-unit-tests v8 09/10] arm/arm64: gicv3: add an IPI test
+Date: Fri, 9 Dec 2016 16:08:00 +0000
+Message-ID: <2fc872dd-ee19-f2fb-7444-cf701871fbeb@arm.com>
+References: <20161208175030.12269-1-drjones@redhat.com>
+ <20161208175030.12269-10-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC91740501
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 10:52:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A13B4402A3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 11:06:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bneO4LgcTi84 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Dec 2016 10:52:41 -0500 (EST)
+ with ESMTP id wgCI3Ekf4KVr for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Dec 2016 11:06:08 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 096D6402EF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 10:52:41 -0500 (EST)
-In-Reply-To: <1481298811-30798-1-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 46BD54028D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 11:06:07 -0500 (EST)
+In-Reply-To: <20161208175030.12269-10-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,216 +28,306 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Longpeng <longpeng2@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: marc.zyngier@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vladimir Murzin <vladimir.murzin@arm.com>
+Hi,
 
-This patch allows to build and use vGICv3 ITS in 32-bit mode.
+On 08/12/16 17:50, Andrew Jones wrote:
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> 
+> ---
+> v8:
+>  - keep the gic_common_ops concept completely local to
+>    lib/arm/gic.c by instead exposing the more useful
+>    concept of gic-specific functions
+>  - sysreg rebase changes
+>  - ordered ICC registers in spec-order (OCD kicked in...)
+> v7:
+>  - add common ipi_send_single/mask (replacing ipi_send).
+>    Note, the arg order irq,cpu got swapped. [Eric]
+>  - comment rewording [Eric]
+>  - make enable_defaults a common op [Eric]
+>  - gic_enable_defaults() will now invoke gic_init if
+>    necessary [drew]
+>  - split lib/arm/gic.c into gic-v2/3.c [Eric]
+> v6: move most gicv2/gicv3 wrappers to common code [Alex]
+> v5:
+>  - fix copy+paste error in gicv3_write_eoir [drew]
+>  - use modern register names [Andre]
+> v4:
+>  - heavily comment gicv3_ipi_send_tlist() [Eric]
+>  - changes needed for gicv2 iar/irqstat fix to other patch
+> v2:
+>  - use IRM for gicv3 broadcast
+> ---
+>  arm/unittests.cfg          |  6 ++++
+>  lib/arm/asm/arch_gicv3.h   | 21 ++++++++++++
+>  lib/arm/asm/gic-v2.h       |  6 ++++
+>  lib/arm/asm/gic-v3.h       | 12 +++++++
+>  lib/arm/asm/gic.h          | 19 +++++++++++
+>  lib/arm64/asm/arch_gicv3.h | 22 ++++++++++++
+>  arm/gic.c                  | 81 +++++++++++++++++++++++++++++++++++--------
+>  lib/arm/gic-v2.c           | 30 ++++++++++++++++
+>  lib/arm/gic-v3.c           | 84 +++++++++++++++++++++++++++++++++++++++++++++
+>  lib/arm/gic.c              | 85 ++++++++++++++++++++++++++++++++++++++++++++--
+>  10 files changed, 350 insertions(+), 16 deletions(-)
 
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+....
+
+> diff --git a/lib/arm/gic-v2.c b/lib/arm/gic-v2.c
+> index e80eb8f29488..dc6a97c600ec 100644
+> --- a/lib/arm/gic-v2.c
+> +++ b/lib/arm/gic-v2.c
+> @@ -25,3 +25,33 @@ void gicv2_enable_defaults(void)
+>  	writel(GICC_INT_PRI_THRESHOLD, cpu_base + GICC_PMR);
+>  	writel(GICC_ENABLE, cpu_base + GICC_CTLR);
+>  }
+> +
+> +u32 gicv2_read_iar(void)
+> +{
+> +	return readl(gicv2_cpu_base() + GICC_IAR);
+> +}
+> +
+> +u32 gicv2_iar_irqnr(u32 iar)
+> +{
+> +	return iar & GICC_IAR_INT_ID_MASK;
+> +}
+> +
+> +void gicv2_write_eoir(u32 irqstat)
+> +{
+> +	writel(irqstat, gicv2_cpu_base() + GICC_EOIR);
+> +}
+> +
+> +void gicv2_ipi_send_single(int irq, int cpu)
+> +{
+> +	assert(cpu < 8);
+> +	assert(irq < 16);
+> +	writel(1 << (cpu + 16) | irq, gicv2_dist_base() + GICD_SGIR);
+> +}
+> +
+> +void gicv2_ipi_send_mask(int irq, const cpumask_t *dest)
+> +{
+> +	u8 tlist = (u8)cpumask_bits(dest)[0];
+> +
+> +	assert(irq < 16);
+> +	writel(tlist << 16 | irq, gicv2_dist_base() + GICD_SGIR);
+> +}
+> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+> index c46d16e11782..9682fc96b631 100644
+> --- a/lib/arm/gic-v3.c
+> +++ b/lib/arm/gic-v3.c
+> @@ -59,3 +59,87 @@ void gicv3_enable_defaults(void)
+>  	gicv3_write_pmr(GICC_INT_PRI_THRESHOLD);
+>  	gicv3_write_grpen1(1);
+>  }
+> +
+> +u32 gicv3_iar_irqnr(u32 iar)
+> +{
+> +	return iar;
+
+I am probably a bit paranoid here, but the spec says that the interrupt
+ID is in bits[23:0] only (at most).
+
+> +}
+> +
+> +void gicv3_ipi_send_mask(int irq, const cpumask_t *dest)
+> +{
+> +	u16 tlist;
+> +	int cpu;
+> +
+> +	assert(irq < 16);
+> +
+> +	/*
+> +	 * For each cpu in the mask collect its peers, which are also in
+> +	 * the mask, in order to form target lists.
+> +	 */
+> +	for_each_cpu(cpu, dest) {
+> +		u64 mpidr = cpus[cpu], sgi1r;
+> +		u64 cluster_id;
+> +
+> +		/*
+> +		 * GICv3 can send IPIs to up 16 peer cpus with a single
+> +		 * write to ICC_SGI1R_EL1 (using the target list). Peers
+> +		 * are cpus that have nearly identical MPIDRs, the only
+> +		 * difference being Aff0. The matching upper affinity
+> +		 * levels form the cluster ID.
+> +		 */
+> +		cluster_id = mpidr & ~0xffUL;
+> +		tlist = 0;
+> +
+> +		/*
+> +		 * Sort of open code for_each_cpu in order to have a
+> +		 * nested for_each_cpu loop.
+> +		 */
+> +		while (cpu < nr_cpus) {
+> +			if ((mpidr & 0xff) >= 16) {
+> +				printf("cpu%d MPIDR:aff0 is %d (>= 16)!\n",
+> +					cpu, (int)(mpidr & 0xff));
+> +				break;
+> +			}
+> +
+> +			tlist |= 1 << (mpidr & 0xf);
+> +
+> +			cpu = cpumask_next(cpu, dest);
+> +			if (cpu >= nr_cpus)
+> +				break;
+> +
+> +			mpidr = cpus[cpu];
+> +
+> +			if (cluster_id != (mpidr & ~0xffUL)) {
+> +				/*
+> +				 * The next cpu isn't in our cluster. Roll
+> +				 * back the cpu index allowing the outer
+> +				 * for_each_cpu to find it again with
+> +				 * cpumask_next
+> +				 */
+> +				--cpu;
+> +				break;
+> +			}
+> +		}
+> +
+> +		/* Send the IPIs for the target list of this cluster */
+> +		sgi1r = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3)	|
+> +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 2)	|
+> +			 irq << 24				|
+> +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 1)	|
+> +			 tlist);
+> +
+> +		gicv3_write_sgi1r(sgi1r);
+> +	}
+> +
+> +	/* Force the above writes to ICC_SGI1R_EL1 to be executed */
+> +	isb();
+> +}
+
+Wow, this is really heavy stuff, especially for a Friday afternoon ;-)
+But I convinced myself that it's correct. The only issue is that it's
+sub-optimal if the MPIDRs of the VCPUs are not in order, say: 0x000,
+0x100, 0x001.
+In this case we do three register writes instead of the minimal two.
+But it's still correct, so it's actually a minor nit just to prove that
+I checked the algorithm ;-)
+
+So apart from the minor comment above:
+
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- Documentation/virtual/kvm/api.txt   |  2 +-
- arch/arm/include/uapi/asm/kvm.h     |  2 ++
- arch/arm/kvm/Kconfig                |  1 +
- arch/arm/kvm/Makefile               |  1 +
- arch/arm/kvm/arm.c                  |  6 ++++++
- arch/arm64/kvm/Kconfig              |  4 ----
- arch/arm64/kvm/reset.c              |  6 ------
- virt/kvm/arm/vgic/vgic-kvm-device.c |  2 --
- virt/kvm/arm/vgic/vgic-mmio-v3.c    |  2 --
- virt/kvm/arm/vgic/vgic.h            | 26 --------------------------
- 10 files changed, 11 insertions(+), 41 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 739db9a..2feeae6 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -2198,7 +2198,7 @@ after pausing the vcpu, but before it is resumed.
- 4.71 KVM_SIGNAL_MSI
- 
- Capability: KVM_CAP_SIGNAL_MSI
--Architectures: x86 arm64
-+Architectures: x86 arm arm64
- Type: vm ioctl
- Parameters: struct kvm_msi (in)
- Returns: >0 on delivery, 0 if guest blocked the MSI, and -1 on error
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index b38c10c..af05f8e 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -87,9 +87,11 @@ struct kvm_regs {
- /* Supported VGICv3 address types  */
- #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
- #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
-+#define KVM_VGIC_ITS_ADDR_TYPE		4
- 
- #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
- #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
-+#define KVM_VGIC_V3_ITS_SIZE		(2 * SZ_64K)
- 
- #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
- #define KVM_ARM_VCPU_PSCI_0_2		1 /* CPU uses PSCI v0.2 */
-diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-index 3e1cd04..90d0176 100644
---- a/arch/arm/kvm/Kconfig
-+++ b/arch/arm/kvm/Kconfig
-@@ -34,6 +34,7 @@ config KVM
- 	select HAVE_KVM_IRQFD
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_IRQ_ROUTING
-+	select HAVE_KVM_MSI
- 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
- 	---help---
- 	  Support hosting virtualized guest machines.
-diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-index f19842e..d571243 100644
---- a/arch/arm/kvm/Makefile
-+++ b/arch/arm/kvm/Makefile
-@@ -32,5 +32,6 @@ obj-y += $(KVM)/arm/vgic/vgic-mmio.o
- obj-y += $(KVM)/arm/vgic/vgic-mmio-v2.o
- obj-y += $(KVM)/arm/vgic/vgic-mmio-v3.o
- obj-y += $(KVM)/arm/vgic/vgic-kvm-device.o
-+obj-y += $(KVM)/arm/vgic/vgic-its.o
- obj-y += $(KVM)/irqchip.o
- obj-y += $(KVM)/arm/arch_timer.o
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 19b5f5c..8f92efa 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -221,6 +221,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_MAX_VCPUS:
- 		r = KVM_MAX_VCPUS;
- 		break;
-+	case KVM_CAP_MSI_DEVID:
-+		if (!kvm)
-+			r = -EINVAL;
-+		else
-+			r = kvm->arch.vgic.msis_require_devid;
-+		break;
- 	default:
- 		r = kvm_arch_dev_ioctl_check_extension(kvm, ext);
- 		break;
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 6eaf12c..52cb7ad 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -16,9 +16,6 @@ menuconfig VIRTUALIZATION
- 
- if VIRTUALIZATION
- 
--config KVM_ARM_VGIC_V3_ITS
--	bool
--
- config KVM
- 	bool "Kernel-based Virtual Machine (KVM) support"
- 	depends on OF
-@@ -34,7 +31,6 @@ config KVM
- 	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
--	select KVM_ARM_VGIC_V3_ITS
- 	select KVM_ARM_PMU if HW_PERF_EVENTS
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_IRQCHIP
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 5bc4608..e95d4f6 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -86,12 +86,6 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 		r = 1;
- 		break;
--	case KVM_CAP_MSI_DEVID:
--		if (!kvm)
--			r = -EINVAL;
--		else
--			r = kvm->arch.vgic.msis_require_devid;
--		break;
- 	default:
- 		r = 0;
- 	}
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index ce1f4ed..fbe87a6 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -221,11 +221,9 @@ int kvm_register_vgic_device(unsigned long type)
- 		ret = kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
- 					      KVM_DEV_TYPE_ARM_VGIC_V3);
- 
--#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
- 		if (ret)
- 			break;
- 		ret = kvm_vgic_register_its_device();
--#endif
- 		break;
- 	}
- 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 0d3c76a..50f42f0 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -42,7 +42,6 @@ u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
- 	return reg | ((u64)val << lower);
- }
- 
--#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
- bool vgic_has_its(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
-@@ -52,7 +51,6 @@ bool vgic_has_its(struct kvm *kvm)
- 
- 	return dist->has_its;
- }
--#endif
- 
- static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
- 					    gpa_t addr, unsigned int len)
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 9d9e014..859f65c 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -84,37 +84,11 @@ int vgic_v3_probe(const struct gic_kvm_info *info);
- int vgic_v3_map_resources(struct kvm *kvm);
- int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
- 
--#ifdef CONFIG_KVM_ARM_VGIC_V3_ITS
- int vgic_register_its_iodevs(struct kvm *kvm);
- bool vgic_has_its(struct kvm *kvm);
- int kvm_vgic_register_its_device(void);
- void vgic_enable_lpis(struct kvm_vcpu *vcpu);
- int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
--#else
--static inline int vgic_register_its_iodevs(struct kvm *kvm)
--{
--	return -ENODEV;
--}
--
--static inline bool vgic_has_its(struct kvm *kvm)
--{
--	return false;
--}
--
--static inline int kvm_vgic_register_its_device(void)
--{
--	return -ENODEV;
--}
--
--static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
--{
--}
--
--static inline int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
--{
--	return -ENODEV;
--}
--#endif
- 
- int kvm_register_vgic_device(unsigned long type);
- int vgic_lazy_init(struct kvm *kvm);
--- 
-2.1.4
+Cheers,
+Andre.
+
+> +
+> +void gicv3_ipi_send_single(int irq, int cpu)
+> +{
+> +	cpumask_t dest;
+> +
+> +	cpumask_clear(&dest);
+> +	cpumask_set_cpu(cpu, &dest);
+> +	gicv3_ipi_send_mask(irq, &dest);
+> +}
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index 4d3ddd9722b1..3ed539727f8c 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -10,6 +10,38 @@
+>  struct gicv2_data gicv2_data;
+>  struct gicv3_data gicv3_data;
+>  
+> +struct gic_common_ops {
+> +	int gic_version;
+> +	void (*enable_defaults)(void);
+> +	u32 (*read_iar)(void);
+> +	u32 (*iar_irqnr)(u32 iar);
+> +	void (*write_eoir)(u32 irqstat);
+> +	void (*ipi_send_single)(int irq, int cpu);
+> +	void (*ipi_send_mask)(int irq, const cpumask_t *dest);
+> +};
+> +
+> +static const struct gic_common_ops *gic_common_ops;
+> +
+> +static const struct gic_common_ops gicv2_common_ops = {
+> +	.gic_version = 2,
+> +	.enable_defaults = gicv2_enable_defaults,
+> +	.read_iar = gicv2_read_iar,
+> +	.iar_irqnr = gicv2_iar_irqnr,
+> +	.write_eoir = gicv2_write_eoir,
+> +	.ipi_send_single = gicv2_ipi_send_single,
+> +	.ipi_send_mask = gicv2_ipi_send_mask,
+> +};
+> +
+> +static const struct gic_common_ops gicv3_common_ops = {
+> +	.gic_version = 3,
+> +	.enable_defaults = gicv3_enable_defaults,
+> +	.read_iar = gicv3_read_iar,
+> +	.iar_irqnr = gicv3_iar_irqnr,
+> +	.write_eoir = gicv3_write_eoir,
+> +	.ipi_send_single = gicv3_ipi_send_single,
+> +	.ipi_send_mask = gicv3_ipi_send_mask,
+> +};
+> +
+>  /*
+>   * Documentation/devicetree/bindings/interrupt-controller/arm,gic.txt
+>   * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
+> @@ -58,9 +90,58 @@ int gicv3_init(void)
+>  
+>  int gic_init(void)
+>  {
+> -	if (gicv2_init())
+> +	if (gicv2_init()) {
+> +		gic_common_ops = &gicv2_common_ops;
+>  		return 2;
+> -	else if (gicv3_init())
+> +	} else if (gicv3_init()) {
+> +		gic_common_ops = &gicv3_common_ops;
+>  		return 3;
+> +	}
+>  	return 0;
+>  }
+> +
+> +void gic_enable_defaults(void)
+> +{
+> +	if (!gic_common_ops) {
+> +		int ret = gic_init();
+> +		assert(ret != 0);
+> +	} else
+> +		assert(gic_common_ops->enable_defaults);
+> +	gic_common_ops->enable_defaults();
+> +}
+> +
+> +int gic_version(void)
+> +{
+> +	assert(gic_common_ops);
+> +	return gic_common_ops->gic_version;
+> +}
+> +
+> +u32 gic_read_iar(void)
+> +{
+> +	assert(gic_common_ops && gic_common_ops->read_iar);
+> +	return gic_common_ops->read_iar();
+> +}
+> +
+> +u32 gic_iar_irqnr(u32 iar)
+> +{
+> +	assert(gic_common_ops && gic_common_ops->iar_irqnr);
+> +	return gic_common_ops->iar_irqnr(iar);
+> +}
+> +
+> +void gic_write_eoir(u32 irqstat)
+> +{
+> +	assert(gic_common_ops && gic_common_ops->write_eoir);
+> +	gic_common_ops->write_eoir(irqstat);
+> +}
+> +
+> +void gic_ipi_send_single(int irq, int cpu)
+> +{
+> +	assert(gic_common_ops && gic_common_ops->ipi_send_single);
+> +	gic_common_ops->ipi_send_single(irq, cpu);
+> +}
+> +
+> +void gic_ipi_send_mask(int irq, const cpumask_t *dest)
+> +{
+> +	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
+> +	gic_common_ops->ipi_send_mask(irq, dest);
+> +}
+> 
