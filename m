@@ -1,122 +1,75 @@
 From: Wei Huang <wei@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests v2 1/2] arm/pmu: fix probe on AArch64
-Date: Fri, 9 Dec 2016 10:43:48 -0600
-Message-ID: <0c81a8a2-63be-4ca8-725c-59fcf5a1eef8@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests v2 2/2] arm/pmu: don't run tcg tests
+Date: Fri, 9 Dec 2016 10:51:44 -0600
+Message-ID: <33dc3758-2d3f-c207-8df2-46785af7c47e@redhat.com>
 References: <20161208170549.8793-1-drjones@redhat.com>
- <20161208170549.8793-2-drjones@redhat.com>
+ <20161208170549.8793-3-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20161208170549.8793-2-drjones@redhat.com>
+In-Reply-To: <20161208170549.8793-3-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: cov@codeaurora.org, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Reviewed-by: Wei Huang <wei@redhat.com>. I also tested on real machine
-and it was working.
+
+
+On 12/08/2016 11:05 AM, Andrew Jones wrote:
+> The TCG PMU is barely implemented for ARM and not at all implemented
+> for AArch64. Let's not bother running the TCG-only tests yet. We'll
+> likely move them to a new TCG-only unittests.cfg at some point before
+> re-enabling them too.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+
+It is always safe to disable TCG tests, as proposed in this patch.
+However I don't think we need it because PMU will behave correctly after
+your PATCH 1:
+
+1. Under TCG AArch32 mode, get_pmu_version() returns 2. This is
+acceptable for pmu-tcg-icount-1 and pmu-tcg-icount-256. We should allow
+the tests to proceed.
+2. Under TCG AArch64, get_pmu_version() returns 0. pmu-tcg-icount-1 and
+pmu-tcg-icount-256 will skip because pmu_probe() returns FALSE. As long
+as there isn't an error, most people will be OK to see SKIP message.
 
 Thanks,
 -Wei
 
-On 12/08/2016 11:05 AM, Andrew Jones wrote:
-> The spec for ID_DFR0_EL1 says "In an AArch64-only implementation,
-> this register is UNKNOWN." Indeed ThunderX just returns zero when
-> that register is read. This means we can't rely on a non-zero
-> value to determine if we can test the PMU. For AArch64 we need to
-> read ID_AA64DFR0_EL1. This patch has the side effect of no longer
-> running PMU tests on TCG for AArch64. That's actually another fix,
-> though, as TCG chooses not to implement a PMU for AArch64 at this
-> time. The only way it worked before was probing the wrong register
-> and proceeding even though the version was 2, which is not a valid
-> version for AArch64. When TCG eventually implements a PMU things
-> should "just work".
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  arm/pmu.c | 37 ++++++++++++++++++++++---------------
->  1 file changed, 22 insertions(+), 15 deletions(-)
+>  arm/unittests.cfg | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index a39dae43c99e..c4d5c97dbf87 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -28,15 +28,15 @@
->  #define PMU_PMCR_IMP_SHIFT 24
->  #define PMU_PMCR_IMP_MASK  0xff
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 044d97c9e73d..65f9c4c0b9eb 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -65,15 +65,15 @@ file = pmu.flat
+>  groups = pmu
 >  
-> -#define ID_DFR0_PERFMON_SHIFT 24
-> -#define ID_DFR0_PERFMON_MASK  0xf
-> -
-> -#define PMU_CYCLE_IDX         31
-> +#define PMU_CYCLE_IDX      31
+>  # Test PMU support (TCG) with -icount IPC=1
+> -[pmu-tcg-icount-1]
+> -file = pmu.flat
+> -extra_params = -icount 0 -append '1'
+> -groups = pmu
+> -accel = tcg
+> +#[pmu-tcg-icount-1]
+> +#file = pmu.flat
+> +#extra_params = -icount 0 -append '1'
+> +#groups = pmu
+> +#accel = tcg
 >  
->  #define NR_SAMPLES 10
->  
->  static unsigned int pmu_version;
->  #if defined(__arm__)
-> +#define ID_DFR0_PERFMON_SHIFT 24
-> +#define ID_DFR0_PERFMON_MASK  0xf
-> +
->  #define PMCR         __ACCESS_CP15(c9, 0, c12, 0)
->  #define ID_DFR0      __ACCESS_CP15(c0, 0, c1, 2)
->  #define PMSELR       __ACCESS_CP15(c9, 0, c12, 5)
-> @@ -50,6 +50,11 @@ static inline uint32_t get_pmcr(void) { return read_sysreg(PMCR); }
->  static inline void set_pmcr(uint32_t v) { write_sysreg(v, PMCR); }
->  static inline void set_pmcntenset(uint32_t v) { write_sysreg(v, PMCNTENSET); }
->  
-> +static inline uint8_t get_pmu_version(void)
-> +{
-> +	return (get_id_dfr0() >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
-> +}
-> +
->  static inline uint64_t get_pmccntr(void)
->  {
->  	if (pmu_version == 0x3)
-> @@ -95,7 +100,10 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
->  	: "cc");
->  }
->  #elif defined(__aarch64__)
-> -static inline uint32_t get_id_dfr0(void) { return read_sysreg(id_dfr0_el1); }
-> +#define ID_AA64DFR0_PERFMON_SHIFT 8
-> +#define ID_AA64DFR0_PERFMON_MASK  0xf
-> +
-> +static inline uint32_t get_id_aa64dfr0(void) { return read_sysreg(id_aa64dfr0_el1); }
->  static inline uint32_t get_pmcr(void) { return read_sysreg(pmcr_el0); }
->  static inline void set_pmcr(uint32_t v) { write_sysreg(v, pmcr_el0); }
->  static inline uint64_t get_pmccntr(void) { return read_sysreg(pmccntr_el0); }
-> @@ -103,6 +111,12 @@ static inline void set_pmccntr(uint64_t v) { write_sysreg(v, pmccntr_el0); }
->  static inline void set_pmcntenset(uint32_t v) { write_sysreg(v, pmcntenset_el0); }
->  static inline void set_pmccfiltr(uint32_t v) { write_sysreg(v, pmccfiltr_el0); }
->  
-> +static inline uint8_t get_pmu_version(void)
-> +{
-> +	uint8_t ver = (get_id_aa64dfr0() >> ID_AA64DFR0_PERFMON_SHIFT) & ID_AA64DFR0_PERFMON_MASK;
-> +	return ver == 1 ? 3 : ver;
-> +}
-> +
->  /*
->   * Extra instructions inserted by the compiler would be difficult to compensate
->   * for, so hand assemble everything between, and including, the PMCR accesses
-> @@ -256,16 +270,9 @@ static bool check_cpi(int cpi)
->  /* Return FALSE if no PMU found, otherwise return TRUE */
->  bool pmu_probe(void)
->  {
-> -	uint32_t dfr0;
-> -
-> -	/* probe pmu version */
-> -	dfr0 = get_id_dfr0();
-> -	pmu_version = (dfr0 >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
-> -
-> -	if (pmu_version)
-> -		report_info("PMU version: %d", pmu_version);
-> -
-> -	return pmu_version;
-> +	pmu_version = get_pmu_version();
-> +	report_info("PMU version: %d", pmu_version);
-> +	return pmu_version != 0 && pmu_version != 0xf;
->  }
->  
->  int main(int argc, char *argv[])
+>  # Test PMU support (TCG) with -icount IPC=256
+> -[pmu-tcg-icount-256]
+> -file = pmu.flat
+> -extra_params = -icount 8 -append '256'
+> -groups = pmu
+> -accel = tcg
+> +#[pmu-tcg-icount-256]
+> +#file = pmu.flat
+> +#extra_params = -icount 8 -append '256'
+> +#groups = pmu
+> +#accel = tcg
 > 
