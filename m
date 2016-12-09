@@ -1,53 +1,115 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: Re: [PATCH kvm-unit-tests v2 2/2] arm/pmu: don't run tcg tests
-Date: Fri, 9 Dec 2016 12:22:33 -0500
-Message-ID: <dd08b360-a0e9-1d98-a703-c54adb50e4a2@codeaurora.org>
-References: <20161208170549.8793-1-drjones@redhat.com>
- <20161208170549.8793-3-drjones@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests v8 09/10] arm/arm64: gicv3: add an IPI test
+Date: Fri, 9 Dec 2016 18:28:27 +0100
+Message-ID: <20161209172827.xmzcxxc7xxvlheia@hawk.localdomain>
+References: <20161208175030.12269-1-drjones@redhat.com>
+ <20161208175030.12269-10-drjones@redhat.com>
+ <2fc872dd-ee19-f2fb-7444-cf701871fbeb@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E91C940423
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 12:21:34 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mp++T7aC05Kl for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Dec 2016 12:21:34 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F34C640197
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 12:21:33 -0500 (EST)
-In-Reply-To: <20161208170549.8793-3-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: andre.przywara@arm.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <2fc872dd-ee19-f2fb-7444-cf701871fbeb@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/08/2016 12:05 PM, Andrew Jones wrote:
-> The TCG PMU is barely implemented for ARM and not at all implemented
-> for AArch64. Let's not bother running the TCG-only tests yet. We'll
-> likely move them to a new TCG-only unittests.cfg at some point before
-> re-enabling them too.
+On Fri, Dec 09, 2016 at 04:08:00PM +0000, Andre Przywara wrote:
+> On 08/12/16 17:50, Andrew Jones wrote:
+> > +u32 gicv3_iar_irqnr(u32 iar)
+> > +{
+> > +	return iar;
+> 
+> I am probably a bit paranoid here, but the spec says that the interrupt
+> ID is in bits[23:0] only (at most).
 
-ID_AA64DFR0_EL1 isn't implemented in TCG, which should be first fixed
-and then tested. I think and hope we're in agreement on that.
+Indeed, I'll add '& ((1 << 24) - 1' here.
 
-However the cycle counter, PMCCNTR, is very much implemented on AArch64
-TCG. We've been successfully testing it for months.
+> 
+> > +}
+> > +
+> > +void gicv3_ipi_send_mask(int irq, const cpumask_t *dest)
+> > +{
+> > +	u16 tlist;
+> > +	int cpu;
+> > +
+> > +	assert(irq < 16);
+> > +
+> > +	/*
+> > +	 * For each cpu in the mask collect its peers, which are also in
+> > +	 * the mask, in order to form target lists.
+> > +	 */
+> > +	for_each_cpu(cpu, dest) {
+> > +		u64 mpidr = cpus[cpu], sgi1r;
+> > +		u64 cluster_id;
+> > +
+> > +		/*
+> > +		 * GICv3 can send IPIs to up 16 peer cpus with a single
+> > +		 * write to ICC_SGI1R_EL1 (using the target list). Peers
+> > +		 * are cpus that have nearly identical MPIDRs, the only
+> > +		 * difference being Aff0. The matching upper affinity
+> > +		 * levels form the cluster ID.
+> > +		 */
+> > +		cluster_id = mpidr & ~0xffUL;
+> > +		tlist = 0;
+> > +
+> > +		/*
+> > +		 * Sort of open code for_each_cpu in order to have a
+> > +		 * nested for_each_cpu loop.
+> > +		 */
+> > +		while (cpu < nr_cpus) {
+> > +			if ((mpidr & 0xff) >= 16) {
+> > +				printf("cpu%d MPIDR:aff0 is %d (>= 16)!\n",
+> > +					cpu, (int)(mpidr & 0xff));
+> > +				break;
+> > +			}
+> > +
+> > +			tlist |= 1 << (mpidr & 0xf);
+> > +
+> > +			cpu = cpumask_next(cpu, dest);
+> > +			if (cpu >= nr_cpus)
+> > +				break;
+> > +
+> > +			mpidr = cpus[cpu];
+> > +
+> > +			if (cluster_id != (mpidr & ~0xffUL)) {
+> > +				/*
+> > +				 * The next cpu isn't in our cluster. Roll
+> > +				 * back the cpu index allowing the outer
+> > +				 * for_each_cpu to find it again with
+> > +				 * cpumask_next
+> > +				 */
+> > +				--cpu;
+> > +				break;
+> > +			}
+> > +		}
+> > +
+> > +		/* Send the IPIs for the target list of this cluster */
+> > +		sgi1r = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3)	|
+> > +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 2)	|
+> > +			 irq << 24				|
+> > +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 1)	|
+> > +			 tlist);
+> > +
+> > +		gicv3_write_sgi1r(sgi1r);
+> > +	}
+> > +
+> > +	/* Force the above writes to ICC_SGI1R_EL1 to be executed */
+> > +	isb();
+> > +}
+> 
+> Wow, this is really heavy stuff, especially for a Friday afternoon ;-)
+> But I convinced myself that it's correct. The only issue is that it's
+> sub-optimal if the MPIDRs of the VCPUs are not in order, say: 0x000,
+> 0x100, 0x001.
+> In this case we do three register writes instead of the minimal two.
+> But it's still correct, so it's actually a minor nit just to prove that
+> I checked the algorithm ;-)
+> 
+> So apart from the minor comment above:
+> 
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-Thanks,
-Cov
-
--- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
-Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code
-Aurora Forum, a Linux Foundation Collaborative Project.
+Thanks!
+drew
