@@ -1,26 +1,22 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests v2 2/2] arm/pmu: don't run tcg tests
-Date: Fri, 9 Dec 2016 18:45:50 +0100
-Message-ID: <20161209174550.adauvogh3bbw25er@hawk.localdomain>
-References: <20161208170549.8793-1-drjones@redhat.com>
- <20161208170549.8793-3-drjones@redhat.com>
- <dd08b360-a0e9-1d98-a703-c54adb50e4a2@codeaurora.org>
+From: Caraman Mihai Claudiu-B02008 <mike.caraman@nxp.com>
+Subject: [RFC] arm64: KVM: Honor guest device memory type mappings
+Date: Fri, 9 Dec 2016 22:59:24 +0200
+Message-ID: <1481317164-2511-1-git-send-email-mike.caraman@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CAB0403F8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 12:44:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F30B44022C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 16:00:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LPNkfD20r+iO for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Dec 2016 12:44:53 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B38E1401C7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 12:44:53 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <dd08b360-a0e9-1d98-a703-c54adb50e4a2@codeaurora.org>
+ with ESMTP id j8-DOy+gQ8fy for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Dec 2016 16:00:15 -0500 (EST)
+Received: from NAM03-BY2-obe.outbound.protection.outlook.com
+ (mail-by2nam03on0081.outbound.protection.outlook.com [104.47.42.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D39D40430
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 16:00:15 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,62 +26,50 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christopher Covington <cov@codeaurora.org>
-Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: david.lapp@nxp.com, roy.pledge@nxp.com, stuart.yoder@nxp.com, Mihai Caraman <mike.caraman@nxp.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 09, 2016 at 12:22:33PM -0500, Christopher Covington wrote:
-> On 12/08/2016 12:05 PM, Andrew Jones wrote:
-> > The TCG PMU is barely implemented for ARM and not at all implemented
-> > for AArch64. Let's not bother running the TCG-only tests yet. We'll
-> > likely move them to a new TCG-only unittests.cfg at some point before
-> > re-enabling them too.
-> 
-> ID_AA64DFR0_EL1 isn't implemented in TCG, which should be first fixed
-> and then tested. I think and hope we're in agreement on that.
+From: Mihai Caraman <mike.caraman@nxp.com>
 
-It is implemented in TCG. The v8_idregs table has this
+Stage 2 non-Gathering and non-Reordering memory attributes have precedence over stage 1
+Gathering and Reordering attributes. Honor guest device memory type mappings using GRE
+memory type at stage 2.
 
-  { .name = "ID_AA64DFR0_EL1", .state = ARM_CP_STATE_AA64,
-    .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 5, .opc2 = 0,
-    .access = PL1_R, .type = ARM_CP_CONST,
-    /* We mask out the PMUVer field, because we don't currently
-     * implement the PMU. Not advertising it prevents the guest
-     * from trying to use it and getting UNDEFs on registers we
-     * don't implement.
-     */
-    .resetvalue = cpu->id_aa64dfr0 & ~0xf00 },
+This is a preamble for a bigger change that will honor guest normal memory mappings for
+targets connected to HN-F interfaces.
 
-Notice the big comment stating PMUVer is zero on purpose.
+Signed-off-by: Mihai Caraman <mike.caraman@nxp.com>
+---
+ arch/arm64/include/asm/memory.h       | 2 +-
+ arch/arm64/include/asm/pgtable-prot.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-> 
-> However the cycle counter, PMCCNTR, is very much implemented on AArch64
-> TCG. We've been successfully testing it for months.
-
-It's working, yes, but not because the PMU is fully implemented. Any
-guest that first probes (correctly) and then uses won't even try. The
-only probe that succeeds (arm32 ID_DFR0) returns 2, which is invalid
-for AArch64.
-
-Since we're not a real kernel, but a unit testing framework, we can
-bypass probes when appropriate and just test to see what happens.
-I'm not sure it's worth it for testing TCG, which states it's not
-implemented yet though. If this is something you need now, then
-maybe we should add a command line option to this test that allows
-the probe to be skipped.
-
-Thanks,
-drew
-
-> 
-> Thanks,
-> Cov
-> 
-> -- 
-> Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
-> Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code
-> Aurora Forum, a Linux Foundation Collaborative Project.
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+index b71086d..d4834ba 100644
+--- a/arch/arm64/include/asm/memory.h
++++ b/arch/arm64/include/asm/memory.h
+@@ -134,7 +134,7 @@
+  * Memory types for Stage-2 translation
+  */
+ #define MT_S2_NORMAL		0xf
+-#define MT_S2_DEVICE_nGnRE	0x1
++#define MT_S2_DEVICE_GRE	0x3
+ 
+ #ifdef CONFIG_ARM64_4K_PAGES
+ #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
+diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+index 2142c77..11b43f7 100644
+--- a/arch/arm64/include/asm/pgtable-prot.h
++++ b/arch/arm64/include/asm/pgtable-prot.h
+@@ -61,7 +61,7 @@
+ #define PAGE_HYP_DEVICE		__pgprot(PROT_DEVICE_nGnRE | PTE_HYP)
+ 
+ #define PAGE_S2			__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_NORMAL) | PTE_S2_RDONLY)
+-#define PAGE_S2_DEVICE		__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_UXN)
++#define PAGE_S2_DEVICE		__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_DEVICE_GRE) | PTE_S2_RDONLY | PTE_UXN)
+ 
+ #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_PXN | PTE_UXN)
+ #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
+-- 
+1.9.3
