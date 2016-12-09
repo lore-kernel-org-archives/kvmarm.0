@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH v8 01/16] FDT: introduce global phandle allocation
-Date: Fri, 9 Dec 2016 11:55:50 +0000
-Message-ID: <be44a9ad-f820-9a62-9a5d-682867674e91@arm.com>
+Date: Fri, 9 Dec 2016 12:03:44 +0000
+Message-ID: <d1dc4e68-66e1-85d1-f5d1-5743e5172409@arm.com>
 References: <20161104173203.21168-1-andre.przywara@arm.com>
  <20161104173203.21168-2-andre.przywara@arm.com>
 Mime-Version: 1.0
@@ -13,8 +13,6 @@ Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Vladimir Murzin <vladimir.murzin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
-
-Hi Andre,
 
 On 04/11/16 17:31, Andre Przywara wrote:
 > Allocating an FDT phandle (a unique identifier) using a static
@@ -84,66 +82,10 @@ On 04/11/16 17:31, Andre Przywara wrote:
 > +#define FDT_IS_VALID_PHANDLE(phandle) ((phandle) != FDT_INVALID_PHANDLE)
 > +
 > +enum phandles {PHANDLE_GIC, PHANDLES_MAX};
->  
->  /* Those definitions are generic FDT values for specifying IRQ
->   * types and are used in the Linux kernel internally as well as in
-> @@ -33,10 +37,6 @@ enum irq_type {
->  		}							\
->  	} while (0)
->  
-> -static inline u32 fdt__alloc_phandle(void)
-> -{
-> -	static u32 phandle = 0;
-> -	return ++phandle;
-> -}
-> +u32 fdt__get_phandle(enum phandles phandle);
->  
->  #endif /* KVM__FDT_H */
-> diff --git a/kvm-fdt.c b/kvm-fdt.c
-> new file mode 100644
-> index 0000000..d05f3fe
-> --- /dev/null
-> +++ b/kvm-fdt.c
-> @@ -0,0 +1,26 @@
-> +/*
-> + * Commonly used FDT functions.
-> + */
-> +
-> +#include <stdio.h>
-> +#include "kvm/fdt.h"
-> +#include "kvm/util.h"
-> +
-> +u32 phandles[PHANDLES_MAX] = {};
 
-It is a bit weird that you're initializing this to zero...
-
-> +u32 next_phandle = 1;
-> +
-> +u32 fdt__get_phandle(enum phandles phandle)
-> +{
-> +	u32 ret;
-> +
-> +	if (phandle >= PHANDLES_MAX)
-> +		return FDT_INVALID_PHANDLE;
-> +
-> +	ret = phandles[phandle];
-> +	if (ret == FDT_INVALID_PHANDLE) {
-
-and yet test against a #define that isn't the initializer.
-
-Also, given that fdt__get_phandle() can now fail by returning
-FDT_INVALID_HANDLE, maybe we should abort instead of returning something
-that is definitely wrong and use it blindly (which is going to be fun to
-debug...).
-
-
-> +		ret = next_phandle++;
-> +		phandles[phandle] = ret;
-> +	}
-> +
-> +	return ret;
-> +}
-> 
+Another nit here: PHANDLE_GIC is pretty much ARM-specific, while FDT is
+supposed to be generic. Can't we move the enum to be architecture
+specific and not put this in an architecture agnostic one?
 
 Thanks,
 
