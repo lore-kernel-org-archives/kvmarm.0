@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 5/6] KVM: arm/arm64: timer: Check for properly initialized timer on init
-Date: Fri,  9 Dec 2016 15:53:30 +0000
-Message-ID: <1481298811-30798-6-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 6/6] arm64: KVM: pmu: Reset PMSELR_EL0.SEL to a sane value before entering the guest
+Date: Fri,  9 Dec 2016 15:53:31 +0000
+Message-ID: <1481298811-30798-7-git-send-email-marc.zyngier@arm.com>
 References: <1481298811-30798-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1481298811-30798-1-git-send-email-marc.zyngier@arm.com>
@@ -10,40 +10,47 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>, Will Deacon <will.deacon@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, Andre Przywara <andre.przywara@arm.com>, Longpeng <longpeng2@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+The ARMv8 architecture allows the cycle counter to be configured
+by setting PMSELR_EL0.SEL==0x1f and then accessing PMXEVTYPER_EL0,
+hence accessing PMCCFILTR_EL0. But it disallows the use of
+PMSELR_EL0.SEL==0x1f to access the cycle counter itself through
+PMXEVCNTR_EL0.
 
-When the arch timer code fails to initialize (for example because the
-memory mapped timer doesn't work, which is currently seen with the AEM
-model), then KVM just continues happily with a final result that KVM
-eventually does a NULL pointer dereference of the uninitialized cycle
-counter.
+Linux itself doesn't violate this rule, but we may end up with
+PMSELR_EL0.SEL being set to 0x1f when we enter a guest. If that
+guest accesses PMXEVCNTR_EL0, the access may UNDEF at EL1,
+despite the guest not having done anything wrong.
 
-Check directly for this in the init path and give the user a reasonable
-error in this case.
+In order to avoid this unfortunate course of events (haha!), let's
+sanitize PMSELR_EL0 on guest entry. This ensures that the guest
+won't explode unexpectedly.
 
-Cc: Shih-Wei Li <shihwei@cs.columbia.edu>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: stable@vger.kernel.org #4.6+
+Acked-by: Will Deacon <will.deacon@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/arch_timer.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/kvm/hyp/switch.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 17b8fa5..ae95fc0 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -425,6 +425,11 @@ int kvm_timer_hyp_init(void)
- 	info = arch_timer_get_kvm_info();
- 	timecounter = &info->timecounter;
- 
-+	if (!timecounter->cc) {
-+		kvm_err("kvm_arch_timer: uninitialized timecounter\n");
-+		return -ENODEV;
-+	}
-+
- 	if (info->virtual_irq <= 0) {
- 		kvm_err("kvm_arch_timer: invalid virtual timer IRQ: %d\n",
- 			info->virtual_irq);
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 83037cd..0c848c1 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -85,7 +85,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 	write_sysreg(val, hcr_el2);
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+-	/* Make sure we trap PMU access from EL0 to EL2 */
++	/*
++	 * Make sure we trap PMU access from EL0 to EL2. Also sanitize
++	 * PMSELR_EL0 to make sure it never contains the cycle
++	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
++	 * EL1 instead of being trapped to EL2.
++	 */
++	write_sysreg(0, pmselr_el0);
+ 	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+ 	__activate_traps_arch()();
 -- 
 2.1.4
 
