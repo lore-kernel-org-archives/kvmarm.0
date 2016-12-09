@@ -1,115 +1,40 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests v8 09/10] arm/arm64: gicv3: add an IPI test
-Date: Fri, 9 Dec 2016 18:28:27 +0100
-Message-ID: <20161209172827.xmzcxxc7xxvlheia@hawk.localdomain>
-References: <20161208175030.12269-1-drjones@redhat.com>
- <20161208175030.12269-10-drjones@redhat.com>
- <2fc872dd-ee19-f2fb-7444-cf701871fbeb@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH kvm-unit-tests v2 2/2] arm/pmu: don't run tcg tests
+Date: Fri, 9 Dec 2016 17:33:17 +0000
+Message-ID: <CAFEAcA_GtiyVNwGbFKykPjwYNRbupe2xLYpFOjZA25JGUuxbtQ@mail.gmail.com>
+References: <20161208170549.8793-1-drjones@redhat.com> <20161208170549.8793-3-drjones@redhat.com>
+ <dd08b360-a0e9-1d98-a703-c54adb50e4a2@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <2fc872dd-ee19-f2fb-7444-cf701871fbeb@arm.com>
+In-Reply-To: <dd08b360-a0e9-1d98-a703-c54adb50e4a2@codeaurora.org>
 Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
+To: Christopher Covington <cov@codeaurora.org>
+Cc: Andrew Jones <drjones@redhat.com>, kvm-devel <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 09, 2016 at 04:08:00PM +0000, Andre Przywara wrote:
-> On 08/12/16 17:50, Andrew Jones wrote:
-> > +u32 gicv3_iar_irqnr(u32 iar)
-> > +{
-> > +	return iar;
-> 
-> I am probably a bit paranoid here, but the spec says that the interrupt
-> ID is in bits[23:0] only (at most).
+On 9 December 2016 at 17:22, Christopher Covington <cov@codeaurora.org> wrote:
+> On 12/08/2016 12:05 PM, Andrew Jones wrote:
+>> The TCG PMU is barely implemented for ARM and not at all implemented
+>> for AArch64. Let's not bother running the TCG-only tests yet. We'll
+>> likely move them to a new TCG-only unittests.cfg at some point before
+>> re-enabling them too.
+>
+> ID_AA64DFR0_EL1 isn't implemented in TCG, which should be first fixed
+> and then tested. I think and hope we're in agreement on that.
 
-Indeed, I'll add '& ((1 << 24) - 1' here.
+Hmm? We have
+            { .name = "ID_AA64DFR0_EL1", .state = ARM_CP_STATE_AA64,
+              .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 5, .opc2 = 0,
+              .access = PL1_R, .type = ARM_CP_CONST,
+              /* We mask out the PMUVer field, because we don't currently
+               * implement the PMU. Not advertising it prevents the guest
+               * from trying to use it and getting UNDEFs on registers we
+               * don't implement.
+               */
+              .resetvalue = cpu->id_aa64dfr0 & ~0xf00 },
 
-> 
-> > +}
-> > +
-> > +void gicv3_ipi_send_mask(int irq, const cpumask_t *dest)
-> > +{
-> > +	u16 tlist;
-> > +	int cpu;
-> > +
-> > +	assert(irq < 16);
-> > +
-> > +	/*
-> > +	 * For each cpu in the mask collect its peers, which are also in
-> > +	 * the mask, in order to form target lists.
-> > +	 */
-> > +	for_each_cpu(cpu, dest) {
-> > +		u64 mpidr = cpus[cpu], sgi1r;
-> > +		u64 cluster_id;
-> > +
-> > +		/*
-> > +		 * GICv3 can send IPIs to up 16 peer cpus with a single
-> > +		 * write to ICC_SGI1R_EL1 (using the target list). Peers
-> > +		 * are cpus that have nearly identical MPIDRs, the only
-> > +		 * difference being Aff0. The matching upper affinity
-> > +		 * levels form the cluster ID.
-> > +		 */
-> > +		cluster_id = mpidr & ~0xffUL;
-> > +		tlist = 0;
-> > +
-> > +		/*
-> > +		 * Sort of open code for_each_cpu in order to have a
-> > +		 * nested for_each_cpu loop.
-> > +		 */
-> > +		while (cpu < nr_cpus) {
-> > +			if ((mpidr & 0xff) >= 16) {
-> > +				printf("cpu%d MPIDR:aff0 is %d (>= 16)!\n",
-> > +					cpu, (int)(mpidr & 0xff));
-> > +				break;
-> > +			}
-> > +
-> > +			tlist |= 1 << (mpidr & 0xf);
-> > +
-> > +			cpu = cpumask_next(cpu, dest);
-> > +			if (cpu >= nr_cpus)
-> > +				break;
-> > +
-> > +			mpidr = cpus[cpu];
-> > +
-> > +			if (cluster_id != (mpidr & ~0xffUL)) {
-> > +				/*
-> > +				 * The next cpu isn't in our cluster. Roll
-> > +				 * back the cpu index allowing the outer
-> > +				 * for_each_cpu to find it again with
-> > +				 * cpumask_next
-> > +				 */
-> > +				--cpu;
-> > +				break;
-> > +			}
-> > +		}
-> > +
-> > +		/* Send the IPIs for the target list of this cluster */
-> > +		sgi1r = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3)	|
-> > +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 2)	|
-> > +			 irq << 24				|
-> > +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 1)	|
-> > +			 tlist);
-> > +
-> > +		gicv3_write_sgi1r(sgi1r);
-> > +	}
-> > +
-> > +	/* Force the above writes to ICC_SGI1R_EL1 to be executed */
-> > +	isb();
-> > +}
-> 
-> Wow, this is really heavy stuff, especially for a Friday afternoon ;-)
-> But I convinced myself that it's correct. The only issue is that it's
-> sub-optimal if the MPIDRs of the VCPUs are not in order, say: 0x000,
-> 0x100, 0x001.
-> In this case we do three register writes instead of the minimal two.
-> But it's still correct, so it's actually a minor nit just to prove that
-> I checked the algorithm ;-)
-> 
-> So apart from the minor comment above:
-> 
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+which strongly suggests that we implement it... is that buggy somehow?
 
-Thanks!
-drew
+thanks
+-- PMM
