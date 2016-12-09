@@ -1,333 +1,122 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH kvm-unit-tests v8 09/10] arm/arm64: gicv3: add an IPI test
-Date: Fri, 9 Dec 2016 16:08:00 +0000
-Message-ID: <2fc872dd-ee19-f2fb-7444-cf701871fbeb@arm.com>
-References: <20161208175030.12269-1-drjones@redhat.com>
- <20161208175030.12269-10-drjones@redhat.com>
+From: Wei Huang <wei@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests v2 1/2] arm/pmu: fix probe on AArch64
+Date: Fri, 9 Dec 2016 10:43:48 -0600
+Message-ID: <0c81a8a2-63be-4ca8-725c-59fcf5a1eef8@redhat.com>
+References: <20161208170549.8793-1-drjones@redhat.com>
+ <20161208170549.8793-2-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A13B4402A3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 11:06:09 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wgCI3Ekf4KVr for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Dec 2016 11:06:08 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46BD54028D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2016 11:06:07 -0500 (EST)
-In-Reply-To: <20161208175030.12269-10-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20161208170549.8793-2-drjones@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: cov@codeaurora.org, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Reviewed-by: Wei Huang <wei@redhat.com>. I also tested on real machine
+and it was working.
 
-On 08/12/16 17:50, Andrew Jones wrote:
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+Thanks,
+-Wei
+
+On 12/08/2016 11:05 AM, Andrew Jones wrote:
+> The spec for ID_DFR0_EL1 says "In an AArch64-only implementation,
+> this register is UNKNOWN." Indeed ThunderX just returns zero when
+> that register is read. This means we can't rely on a non-zero
+> value to determine if we can test the PMU. For AArch64 we need to
+> read ID_AA64DFR0_EL1. This patch has the side effect of no longer
+> running PMU tests on TCG for AArch64. That's actually another fix,
+> though, as TCG chooses not to implement a PMU for AArch64 at this
+> time. The only way it worked before was probing the wrong register
+> and proceeding even though the version was 2, which is not a valid
+> version for AArch64. When TCG eventually implements a PMU things
+> should "just work".
 > 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
-> v8:
->  - keep the gic_common_ops concept completely local to
->    lib/arm/gic.c by instead exposing the more useful
->    concept of gic-specific functions
->  - sysreg rebase changes
->  - ordered ICC registers in spec-order (OCD kicked in...)
-> v7:
->  - add common ipi_send_single/mask (replacing ipi_send).
->    Note, the arg order irq,cpu got swapped. [Eric]
->  - comment rewording [Eric]
->  - make enable_defaults a common op [Eric]
->  - gic_enable_defaults() will now invoke gic_init if
->    necessary [drew]
->  - split lib/arm/gic.c into gic-v2/3.c [Eric]
-> v6: move most gicv2/gicv3 wrappers to common code [Alex]
-> v5:
->  - fix copy+paste error in gicv3_write_eoir [drew]
->  - use modern register names [Andre]
-> v4:
->  - heavily comment gicv3_ipi_send_tlist() [Eric]
->  - changes needed for gicv2 iar/irqstat fix to other patch
-> v2:
->  - use IRM for gicv3 broadcast
-> ---
->  arm/unittests.cfg          |  6 ++++
->  lib/arm/asm/arch_gicv3.h   | 21 ++++++++++++
->  lib/arm/asm/gic-v2.h       |  6 ++++
->  lib/arm/asm/gic-v3.h       | 12 +++++++
->  lib/arm/asm/gic.h          | 19 +++++++++++
->  lib/arm64/asm/arch_gicv3.h | 22 ++++++++++++
->  arm/gic.c                  | 81 +++++++++++++++++++++++++++++++++++--------
->  lib/arm/gic-v2.c           | 30 ++++++++++++++++
->  lib/arm/gic-v3.c           | 84 +++++++++++++++++++++++++++++++++++++++++++++
->  lib/arm/gic.c              | 85 ++++++++++++++++++++++++++++++++++++++++++++--
->  10 files changed, 350 insertions(+), 16 deletions(-)
-
-....
-
-> diff --git a/lib/arm/gic-v2.c b/lib/arm/gic-v2.c
-> index e80eb8f29488..dc6a97c600ec 100644
-> --- a/lib/arm/gic-v2.c
-> +++ b/lib/arm/gic-v2.c
-> @@ -25,3 +25,33 @@ void gicv2_enable_defaults(void)
->  	writel(GICC_INT_PRI_THRESHOLD, cpu_base + GICC_PMR);
->  	writel(GICC_ENABLE, cpu_base + GICC_CTLR);
->  }
-> +
-> +u32 gicv2_read_iar(void)
-> +{
-> +	return readl(gicv2_cpu_base() + GICC_IAR);
-> +}
-> +
-> +u32 gicv2_iar_irqnr(u32 iar)
-> +{
-> +	return iar & GICC_IAR_INT_ID_MASK;
-> +}
-> +
-> +void gicv2_write_eoir(u32 irqstat)
-> +{
-> +	writel(irqstat, gicv2_cpu_base() + GICC_EOIR);
-> +}
-> +
-> +void gicv2_ipi_send_single(int irq, int cpu)
-> +{
-> +	assert(cpu < 8);
-> +	assert(irq < 16);
-> +	writel(1 << (cpu + 16) | irq, gicv2_dist_base() + GICD_SGIR);
-> +}
-> +
-> +void gicv2_ipi_send_mask(int irq, const cpumask_t *dest)
-> +{
-> +	u8 tlist = (u8)cpumask_bits(dest)[0];
-> +
-> +	assert(irq < 16);
-> +	writel(tlist << 16 | irq, gicv2_dist_base() + GICD_SGIR);
-> +}
-> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
-> index c46d16e11782..9682fc96b631 100644
-> --- a/lib/arm/gic-v3.c
-> +++ b/lib/arm/gic-v3.c
-> @@ -59,3 +59,87 @@ void gicv3_enable_defaults(void)
->  	gicv3_write_pmr(GICC_INT_PRI_THRESHOLD);
->  	gicv3_write_grpen1(1);
->  }
-> +
-> +u32 gicv3_iar_irqnr(u32 iar)
-> +{
-> +	return iar;
-
-I am probably a bit paranoid here, but the spec says that the interrupt
-ID is in bits[23:0] only (at most).
-
-> +}
-> +
-> +void gicv3_ipi_send_mask(int irq, const cpumask_t *dest)
-> +{
-> +	u16 tlist;
-> +	int cpu;
-> +
-> +	assert(irq < 16);
-> +
-> +	/*
-> +	 * For each cpu in the mask collect its peers, which are also in
-> +	 * the mask, in order to form target lists.
-> +	 */
-> +	for_each_cpu(cpu, dest) {
-> +		u64 mpidr = cpus[cpu], sgi1r;
-> +		u64 cluster_id;
-> +
-> +		/*
-> +		 * GICv3 can send IPIs to up 16 peer cpus with a single
-> +		 * write to ICC_SGI1R_EL1 (using the target list). Peers
-> +		 * are cpus that have nearly identical MPIDRs, the only
-> +		 * difference being Aff0. The matching upper affinity
-> +		 * levels form the cluster ID.
-> +		 */
-> +		cluster_id = mpidr & ~0xffUL;
-> +		tlist = 0;
-> +
-> +		/*
-> +		 * Sort of open code for_each_cpu in order to have a
-> +		 * nested for_each_cpu loop.
-> +		 */
-> +		while (cpu < nr_cpus) {
-> +			if ((mpidr & 0xff) >= 16) {
-> +				printf("cpu%d MPIDR:aff0 is %d (>= 16)!\n",
-> +					cpu, (int)(mpidr & 0xff));
-> +				break;
-> +			}
-> +
-> +			tlist |= 1 << (mpidr & 0xf);
-> +
-> +			cpu = cpumask_next(cpu, dest);
-> +			if (cpu >= nr_cpus)
-> +				break;
-> +
-> +			mpidr = cpus[cpu];
-> +
-> +			if (cluster_id != (mpidr & ~0xffUL)) {
-> +				/*
-> +				 * The next cpu isn't in our cluster. Roll
-> +				 * back the cpu index allowing the outer
-> +				 * for_each_cpu to find it again with
-> +				 * cpumask_next
-> +				 */
-> +				--cpu;
-> +				break;
-> +			}
-> +		}
-> +
-> +		/* Send the IPIs for the target list of this cluster */
-> +		sgi1r = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3)	|
-> +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 2)	|
-> +			 irq << 24				|
-> +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 1)	|
-> +			 tlist);
-> +
-> +		gicv3_write_sgi1r(sgi1r);
-> +	}
-> +
-> +	/* Force the above writes to ICC_SGI1R_EL1 to be executed */
-> +	isb();
-> +}
-
-Wow, this is really heavy stuff, especially for a Friday afternoon ;-)
-But I convinced myself that it's correct. The only issue is that it's
-sub-optimal if the MPIDRs of the VCPUs are not in order, say: 0x000,
-0x100, 0x001.
-In this case we do three register writes instead of the minimal two.
-But it's still correct, so it's actually a minor nit just to prove that
-I checked the algorithm ;-)
-
-So apart from the minor comment above:
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre.
-
-> +
-> +void gicv3_ipi_send_single(int irq, int cpu)
-> +{
-> +	cpumask_t dest;
-> +
-> +	cpumask_clear(&dest);
-> +	cpumask_set_cpu(cpu, &dest);
-> +	gicv3_ipi_send_mask(irq, &dest);
-> +}
-> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-> index 4d3ddd9722b1..3ed539727f8c 100644
-> --- a/lib/arm/gic.c
-> +++ b/lib/arm/gic.c
-> @@ -10,6 +10,38 @@
->  struct gicv2_data gicv2_data;
->  struct gicv3_data gicv3_data;
+>  arm/pmu.c | 37 ++++++++++++++++++++++---------------
+>  1 file changed, 22 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index a39dae43c99e..c4d5c97dbf87 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -28,15 +28,15 @@
+>  #define PMU_PMCR_IMP_SHIFT 24
+>  #define PMU_PMCR_IMP_MASK  0xff
 >  
-> +struct gic_common_ops {
-> +	int gic_version;
-> +	void (*enable_defaults)(void);
-> +	u32 (*read_iar)(void);
-> +	u32 (*iar_irqnr)(u32 iar);
-> +	void (*write_eoir)(u32 irqstat);
-> +	void (*ipi_send_single)(int irq, int cpu);
-> +	void (*ipi_send_mask)(int irq, const cpumask_t *dest);
-> +};
+> -#define ID_DFR0_PERFMON_SHIFT 24
+> -#define ID_DFR0_PERFMON_MASK  0xf
+> -
+> -#define PMU_CYCLE_IDX         31
+> +#define PMU_CYCLE_IDX      31
+>  
+>  #define NR_SAMPLES 10
+>  
+>  static unsigned int pmu_version;
+>  #if defined(__arm__)
+> +#define ID_DFR0_PERFMON_SHIFT 24
+> +#define ID_DFR0_PERFMON_MASK  0xf
 > +
-> +static const struct gic_common_ops *gic_common_ops;
+>  #define PMCR         __ACCESS_CP15(c9, 0, c12, 0)
+>  #define ID_DFR0      __ACCESS_CP15(c0, 0, c1, 2)
+>  #define PMSELR       __ACCESS_CP15(c9, 0, c12, 5)
+> @@ -50,6 +50,11 @@ static inline uint32_t get_pmcr(void) { return read_sysreg(PMCR); }
+>  static inline void set_pmcr(uint32_t v) { write_sysreg(v, PMCR); }
+>  static inline void set_pmcntenset(uint32_t v) { write_sysreg(v, PMCNTENSET); }
+>  
+> +static inline uint8_t get_pmu_version(void)
+> +{
+> +	return (get_id_dfr0() >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
+> +}
 > +
-> +static const struct gic_common_ops gicv2_common_ops = {
-> +	.gic_version = 2,
-> +	.enable_defaults = gicv2_enable_defaults,
-> +	.read_iar = gicv2_read_iar,
-> +	.iar_irqnr = gicv2_iar_irqnr,
-> +	.write_eoir = gicv2_write_eoir,
-> +	.ipi_send_single = gicv2_ipi_send_single,
-> +	.ipi_send_mask = gicv2_ipi_send_mask,
-> +};
+>  static inline uint64_t get_pmccntr(void)
+>  {
+>  	if (pmu_version == 0x3)
+> @@ -95,7 +100,10 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  	: "cc");
+>  }
+>  #elif defined(__aarch64__)
+> -static inline uint32_t get_id_dfr0(void) { return read_sysreg(id_dfr0_el1); }
+> +#define ID_AA64DFR0_PERFMON_SHIFT 8
+> +#define ID_AA64DFR0_PERFMON_MASK  0xf
 > +
-> +static const struct gic_common_ops gicv3_common_ops = {
-> +	.gic_version = 3,
-> +	.enable_defaults = gicv3_enable_defaults,
-> +	.read_iar = gicv3_read_iar,
-> +	.iar_irqnr = gicv3_iar_irqnr,
-> +	.write_eoir = gicv3_write_eoir,
-> +	.ipi_send_single = gicv3_ipi_send_single,
-> +	.ipi_send_mask = gicv3_ipi_send_mask,
-> +};
+> +static inline uint32_t get_id_aa64dfr0(void) { return read_sysreg(id_aa64dfr0_el1); }
+>  static inline uint32_t get_pmcr(void) { return read_sysreg(pmcr_el0); }
+>  static inline void set_pmcr(uint32_t v) { write_sysreg(v, pmcr_el0); }
+>  static inline uint64_t get_pmccntr(void) { return read_sysreg(pmccntr_el0); }
+> @@ -103,6 +111,12 @@ static inline void set_pmccntr(uint64_t v) { write_sysreg(v, pmccntr_el0); }
+>  static inline void set_pmcntenset(uint32_t v) { write_sysreg(v, pmcntenset_el0); }
+>  static inline void set_pmccfiltr(uint32_t v) { write_sysreg(v, pmccfiltr_el0); }
+>  
+> +static inline uint8_t get_pmu_version(void)
+> +{
+> +	uint8_t ver = (get_id_aa64dfr0() >> ID_AA64DFR0_PERFMON_SHIFT) & ID_AA64DFR0_PERFMON_MASK;
+> +	return ver == 1 ? 3 : ver;
+> +}
 > +
 >  /*
->   * Documentation/devicetree/bindings/interrupt-controller/arm,gic.txt
->   * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
-> @@ -58,9 +90,58 @@ int gicv3_init(void)
->  
->  int gic_init(void)
+>   * Extra instructions inserted by the compiler would be difficult to compensate
+>   * for, so hand assemble everything between, and including, the PMCR accesses
+> @@ -256,16 +270,9 @@ static bool check_cpi(int cpi)
+>  /* Return FALSE if no PMU found, otherwise return TRUE */
+>  bool pmu_probe(void)
 >  {
-> -	if (gicv2_init())
-> +	if (gicv2_init()) {
-> +		gic_common_ops = &gicv2_common_ops;
->  		return 2;
-> -	else if (gicv3_init())
-> +	} else if (gicv3_init()) {
-> +		gic_common_ops = &gicv3_common_ops;
->  		return 3;
-> +	}
->  	return 0;
+> -	uint32_t dfr0;
+> -
+> -	/* probe pmu version */
+> -	dfr0 = get_id_dfr0();
+> -	pmu_version = (dfr0 >> ID_DFR0_PERFMON_SHIFT) & ID_DFR0_PERFMON_MASK;
+> -
+> -	if (pmu_version)
+> -		report_info("PMU version: %d", pmu_version);
+> -
+> -	return pmu_version;
+> +	pmu_version = get_pmu_version();
+> +	report_info("PMU version: %d", pmu_version);
+> +	return pmu_version != 0 && pmu_version != 0xf;
 >  }
-> +
-> +void gic_enable_defaults(void)
-> +{
-> +	if (!gic_common_ops) {
-> +		int ret = gic_init();
-> +		assert(ret != 0);
-> +	} else
-> +		assert(gic_common_ops->enable_defaults);
-> +	gic_common_ops->enable_defaults();
-> +}
-> +
-> +int gic_version(void)
-> +{
-> +	assert(gic_common_ops);
-> +	return gic_common_ops->gic_version;
-> +}
-> +
-> +u32 gic_read_iar(void)
-> +{
-> +	assert(gic_common_ops && gic_common_ops->read_iar);
-> +	return gic_common_ops->read_iar();
-> +}
-> +
-> +u32 gic_iar_irqnr(u32 iar)
-> +{
-> +	assert(gic_common_ops && gic_common_ops->iar_irqnr);
-> +	return gic_common_ops->iar_irqnr(iar);
-> +}
-> +
-> +void gic_write_eoir(u32 irqstat)
-> +{
-> +	assert(gic_common_ops && gic_common_ops->write_eoir);
-> +	gic_common_ops->write_eoir(irqstat);
-> +}
-> +
-> +void gic_ipi_send_single(int irq, int cpu)
-> +{
-> +	assert(gic_common_ops && gic_common_ops->ipi_send_single);
-> +	gic_common_ops->ipi_send_single(irq, cpu);
-> +}
-> +
-> +void gic_ipi_send_mask(int irq, const cpumask_t *dest)
-> +{
-> +	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
-> +	gic_common_ops->ipi_send_mask(irq, dest);
-> +}
+>  
+>  int main(int argc, char *argv[])
 > 
