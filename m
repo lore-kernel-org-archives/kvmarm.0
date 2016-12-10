@@ -1,62 +1,91 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH] ARM: dts: vexpress: Support GICC_DIR operations
-Date: Sat, 10 Dec 2016 21:13:51 +0100
-Message-ID: <20161210201351.25894-1-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 97463401B9
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Dec 2016 15:12:43 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WERI-t43SkNY for <kvmarm@lists.cs.columbia.edu>;
- Sat, 10 Dec 2016 15:12:42 -0500 (EST)
-Received: from mail-lf0-f53.google.com (mail-lf0-f53.google.com
- [209.85.215.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4AAC4401A1
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Dec 2016 15:12:42 -0500 (EST)
-Received: by mail-lf0-f53.google.com with SMTP id c13so21502572lfg.0
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Dec 2016 12:13:45 -0800 (PST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: lorenzo.pieralisi@arm.com, Marc Zyngier <marc.zyngier@arm.com>, liviu.dudau@arm.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu
+Subject: [RFC PATCH 0/7] KVM: arm/arm64: Optimize arch timer register handling
+Date: Sat, 10 Dec 2016 21:47:05 +0100
+Message-ID: <20161210204712.21830-1-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICv2 CPU interface registers span across 8K, not 4K as indicated in
-the DT.  Only the GICC_DIR register is located after the initial 4K
-boundary, leaving a functional system but without support for separately
-EOI'ing and deactivating interrupts.
+We currently spend around ~400 cycles on each entry/exit to the guest
+dealing with arch timer registers, even when the timer is not pending
+and not doing anything.
 
-After this change the system support split priority drop and interrupt
-deactivation.
+We can do much better by moving the arch timer save/restore to the
+vcpu_load and vcpu_put functions, but this means that if we don't read
+back the timer state on every exit from the guest, then we have to be
+able to start taking timer interrupts for the virtual timer in KVM and
+handle that properly.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+That has a number of funny consequences, such as having to make sure we
+don't deadlock between any of the vgic code and interrupt injection
+happening from an ISR.  On the plus side, being able to inject
+virtual interrupts corresponding to a physical interrupt directly from
+an ISR is probably a good system design change.
 
-diff --git a/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts b/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts
-index 0205c97..2e0cf39 100644
---- a/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts
-+++ b/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts
-@@ -126,7 +126,7 @@
- 		#address-cells = <0>;
- 		interrupt-controller;
- 		reg = <0 0x2c001000 0 0x1000>,
--		      <0 0x2c002000 0 0x1000>,
-+		      <0 0x2c002000 0 0x2000>,
- 		      <0 0x2c004000 0 0x2000>,
- 		      <0 0x2c006000 0 0x2000>;
- 		interrupts = <1 9 0xf04>;
+We also have to change the use of the physical vs. virtual counter in
+the arm64 kernel to avoid having to save/restore the CNTVOFF_EL2
+register on every return to the hypervisor.  The only reason I could
+find for using the virtual counter for the kernel on systems with access
+to the physical counter is to detect if firmware did not properly clear
+CNTVOFF_EL2, and this change has to weighed against the existing check
+(assuming I got this right).
+
+On a non-VHE system (AMD Seattle) I have measured this to improve the
+world-switch time by about ~100 cycles, but on an EL2 kernel (emulating
+VHE behavior on the same hardware) this gives us around ~250 cycles
+worth of improvement, because we can avoid the extra configuration of
+trapping accesses to the physical timer from EL1 on every switch.
+
+I'm not sure if the benefits outweigh the complexity of this patch set,
+nor am I sure if I'm missing an overall better approach, hence the RFC
+tag on the series.
+
+I'm looking forward to overall comments on the approach.
+
+These patches are based on arm64/for-next/core as of a few days ago with
+Jintacks CNTHCTL_EL2 patch on top, because they give us has_vhe() in the
+hyp code using static keys.
+
+Code is also available here:
+git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git timer-optimize-rfc
+
+Thanks,
+  Christoffer
+
+Christoffer Dall (7):
+  arm64: Use physical counter for in-kernel reads
+  KVM: arm/arm64: Move kvm_vgic_flush_hwstate under disabled irq
+  KVM: arm/arm64: Support calling vgic_update_irq_pending from irq
+    context
+  KVM: arm/arm64: Check that system supports split eoi/deactivate
+  KVM: arm/arm64: Move timer save/restore out of hyp code where possible
+  KVM: arm/arm64: Remove unnecessary timer BUG_ON operations
+  KVM: arm/arm64: Guard kvm_vgic_map_is_active against !vgic_initialized
+
+ arch/arm/include/asm/kvm_asm.h       |   2 +
+ arch/arm/include/asm/kvm_hyp.h       |   4 +-
+ arch/arm/kvm/arm.c                   |  17 ++-
+ arch/arm/kvm/hyp/switch.c            |   5 +-
+ arch/arm64/include/asm/arch_timer.h  |   6 +-
+ arch/arm64/include/asm/kvm_asm.h     |   2 +
+ arch/arm64/include/asm/kvm_hyp.h     |   4 +-
+ arch/arm64/kvm/hyp/switch.c          |   4 +-
+ drivers/clocksource/arm_arch_timer.c |   2 +-
+ include/kvm/arm_arch_timer.h         |   7 +-
+ virt/kvm/arm/arch_timer.c            | 222 ++++++++++++++++++++++++-----------
+ virt/kvm/arm/hyp/timer-sr.c          |  32 ++---
+ virt/kvm/arm/vgic/vgic-its.c         |  17 +--
+ virt/kvm/arm/vgic/vgic-mmio-v2.c     |  22 ++--
+ virt/kvm/arm/vgic/vgic-mmio-v3.c     |  10 +-
+ virt/kvm/arm/vgic/vgic-mmio.c        |  38 +++---
+ virt/kvm/arm/vgic/vgic-v2.c          |   5 +-
+ virt/kvm/arm/vgic/vgic-v3.c          |   5 +-
+ virt/kvm/arm/vgic/vgic.c             |  59 ++++++----
+ virt/kvm/arm/vgic/vgic.h             |   3 +-
+ 20 files changed, 292 insertions(+), 174 deletions(-)
+
 -- 
 2.9.0
+
