@@ -1,25 +1,25 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH] ARM: soft-reboot into same mode that we entered the kernel
-Date: Tue, 13 Dec 2016 11:11:15 +0000
-Message-ID: <20161213111115.GX14217@n2100.armlinux.org.uk>
-References: <E1cFRAn-0003ob-HH@rmk-PC.armlinux.org.uk>
- <20161213105410.GB19985@leverpostej>
+From: Shiju Jose <shiju.jose@huawei.com>
+Subject: RE: [PATCH V6 00/10] Add UEFI 2.6 and ACPI 6.1 updates for RAS on
+ ARM64
+Date: Tue, 13 Dec 2016 11:10:06 +0000
+Message-ID: <86258A5CC0A3704780874CF6004BA8A62DC9A081@lhreml502-mbs>
+References: <1481147303-7979-1-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 141AB405D2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2016 06:10:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F6A540425
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2016 06:11:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uMHPyo331tLb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Dec 2016 06:10:22 -0500 (EST)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 654154053F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2016 06:10:22 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20161213105410.GB19985@leverpostej>
+ with ESMTP id vRxaYT+JmOWD for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Dec 2016 06:11:40 -0500 (EST)
+Received: from lhrrgout.huawei.com (lhrrgout.huawei.com [194.213.3.17])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5451040423
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2016 06:11:39 -0500 (EST)
+In-Reply-To: <1481147303-7979-1-git-send-email-tbaicar@codeaurora.org>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,203 +29,215 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, dave.martin@arm.com, linux-arm-kernel@lists.infradead.org
+To: 'Tyler Baicar' <tbaicar@codeaurora.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "rjw@rjwysocki.net" <rjw@rjwysocki.net>, "lenb@kernel.org" <lenb@kernel.org>, "matt@codeblueprint.co.uk" <matt@codeblueprint.co.uk>, "robert.moore@intel.com" <robert.moore@intel.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "nkaje@codeaurora.org" <nkaje@codeaurora.org>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "james.morse@arm.com" <james.morse@arm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, eun.taik.lee@samsung.c
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Dec 13, 2016 at 10:54:11AM +0000, Mark Rutland wrote:
-> Hi,
+Hi Tyler,
+
+We have tested V6 patch set on our platform. It worked fine. 
+
+Thanks,
+Shiju
+
+> -----Original Message-----
+> From: Tyler Baicar [mailto:tbaicar@codeaurora.org]
+> Sent: 07 December 2016 21:48
+> To: christoffer.dall@linaro.org; marc.zyngier@arm.com;
+> pbonzini@redhat.com; rkrcmar@redhat.com; linux@armlinux.org.uk;
+> catalin.marinas@arm.com; will.deacon@arm.com; rjw@rjwysocki.net;
+> lenb@kernel.org; matt@codeblueprint.co.uk; robert.moore@intel.com;
+> lv.zheng@intel.com; nkaje@codeaurora.org; zjzhang@codeaurora.org;
+> mark.rutland@arm.com; james.morse@arm.com; akpm@linux-foundation.org;
+> eun.taik.lee@samsung.com; sandeepa.s.prabhu@gmail.com;
+> labbott@redhat.com; shijie.huang@arm.com; rruigrok@codeaurora.org;
+> paul.gortmaker@windriver.com; tn@semihalf.com; fu.wei@linaro.org;
+> rostedt@goodmis.org; bristot@redhat.com; linux-arm-
+> kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> kvm@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
+> acpi@vger.kernel.org; linux-efi@vger.kernel.org; devel@acpica.org;
+> Suzuki.Poulose@arm.com; punit.agrawal@arm.com; astone@redhat.com;
+> harba@codeaurora.org; hanjun.guo@linaro.org; John Garry; Shiju Jose
+> Cc: Tyler Baicar
+> Subject: [PATCH V6 00/10] Add UEFI 2.6 and ACPI 6.1 updates for RAS on
+> ARM64
 > 
-> On Fri, Dec 09, 2016 at 07:49:37PM +0000, Russell King wrote:
-> > When we soft-reboot (eg, kexec) from one kernel into the next, we need
-> > to ensure that we enter the new kernel in the same processor mode as
-> > when we were entered, so that (eg) the new kernel can install its own
-> > hypervisor - the old kernel's hypervisor will have been overwritten.
-> > 
-> > In order to do this, we need to pass a flag to cpu_reset() so it knows
-> > what to do, and we need to modify the kernel's own hypervisor stub to
-> > allow it to handle a soft-reboot.
-> > 
-> > As we are always guaranteed to install our own hypervisor if we're
-> > entered in HYP32 mode, and KVM will have moved itself out of the way
-> > on kexec/normal reboot, we can assume that our hypervisor is in place
-> > when we want to kexec, so changing our hypervisor API should not be a
-> > problem.
-> > 
-> > Tested-by: Keerthy <j-keerthy@ti.com>
-> > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-> > ---
-> > Mark,
-> > 
-> > Any opinions on this?
-> > 
-> > Thanks.
+> When a memory error, CPU error, PCIe error, or other type of hardware
+> error that's covered by RAS occurs, firmware should populate the shared
+> GHES memory location with the proper GHES structures to notify the OS
+> of the error.
+> For example, platforms that implement firmware first handling may
+> implement separate GHES sources for corrected errors and uncorrected
+> errors. If the error is an uncorrectable error, then the firmware will
+> notify the OS immediately since the error needs to be handled ASAP. The
+> OS will then be able to take the appropriate action needed such as
+> offlining a page. If the error is a corrected error, then the firmware
+> will not interrupt the OS immediately.
+> Instead, the OS will see and report the error the next time it's GHES
+> timer expires. The kernel will first parse the GHES structures and
+> report the errors through the kernel logs and then notify the user
+> space through RAS trace events. This allows user space applications
+> such as RAS Daemon to see the errors and report them however the user
+> desires. This patchset extends the kernel functionality for RAS errors
+> based on updates in the UEFI 2.6 and ACPI 6.1 specifications.
 > 
-> The above sounds like the right thing to do, but I'm not familiar enough
-> with the 32-bit hyp + kvm code to say much about the implementation.
+> An example flow from firmware to user space could be:
 > 
-> Hopefully Dave, Marc, or Christoffer have thoughts.
+>                  +---------------+
+>        +-------->|               |
+>        |         |  GHES polling |--+
+> +-------------+  |    source     |  |   +---------------+   +----------
+> --+
+> |             |  +---------------+  |   |  Kernel GHES  |   |
+> |
+> |  Firmware   |                     +-->|  CPER AER and |-->|  RAS
+> trace |
+> |             |  +---------------+  |   |  EDAC drivers |   |   event
+> |
+> +-------------+  |               |  |   +---------------+   +----------
+> --+
+>        |         |  GHES sci     |--+
+>        +-------->|   source      |
+>                  +---------------+
 > 
-> Otherwise, I only have a couple of minor comments below.
+> Add support for Generic Hardware Error Source (GHES) v2, which
+> introduces the capability for the OS to acknowledge the consumption of
+> the error record generated by the Reliability, Availability and
+> Serviceability (RAS) controller.
+> This eliminates potential race conditions between the OS and the RAS
+> controller.
 > 
-> > 
-> >  arch/arm/include/asm/proc-fns.h |  4 ++--
-> >  arch/arm/kernel/hyp-stub.S      | 36 ++++++++++++++++++++++++++++++------
-> >  arch/arm/kernel/reboot.c        | 12 ++++++++++--
-> >  arch/arm/mm/proc-v7.S           | 12 ++++++++----
-> >  4 files changed, 50 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/arch/arm/include/asm/proc-fns.h b/arch/arm/include/asm/proc-fns.h
-> > index 8877ad5ffe10..f2e1af45bd6f 100644
-> > --- a/arch/arm/include/asm/proc-fns.h
-> > +++ b/arch/arm/include/asm/proc-fns.h
-> > @@ -43,7 +43,7 @@ extern struct processor {
-> >  	/*
-> >  	 * Special stuff for a reset
-> >  	 */
-> > -	void (*reset)(unsigned long addr) __attribute__((noreturn));
-> > +	void (*reset)(unsigned long addr, bool hvc) __attribute__((noreturn));
-> >  	/*
-> >  	 * Idle the processor
-> >  	 */
-> > @@ -88,7 +88,7 @@ extern void cpu_set_pte_ext(pte_t *ptep, pte_t pte);
-> >  #else
-> >  extern void cpu_set_pte_ext(pte_t *ptep, pte_t pte, unsigned int ext);
-> >  #endif
-> > -extern void cpu_reset(unsigned long addr) __attribute__((noreturn));
-> > +extern void cpu_reset(unsigned long addr, bool hvc) __attribute__((noreturn));
-> >  
-> >  /* These three are private to arch/arm/kernel/suspend.c */
-> >  extern void cpu_do_suspend(void *);
-> > diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
-> > index 15d073ae5da2..cab1ac36939d 100644
-> > --- a/arch/arm/kernel/hyp-stub.S
-> > +++ b/arch/arm/kernel/hyp-stub.S
-> > @@ -22,6 +22,9 @@
-> >  #include <asm/assembler.h>
-> >  #include <asm/virt.h>
-> >  
-> > +#define HVC_GET_VECTORS -1
-> > +#define HVC_SOFT_RESTART 1
-> > +
-> >  #ifndef ZIMAGE
-> >  /*
-> >   * For the kernel proper, we need to find out the CPU boot mode long after
-> > @@ -202,9 +205,18 @@ ARM_BE8(orr	r7, r7, #(1 << 25))     @ HSCTLR.EE
-> >  ENDPROC(__hyp_stub_install_secondary)
-> >  
-> >  __hyp_stub_do_trap:
-> > -	cmp	r0, #-1
-> > -	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
-> > -	mcrne	p15, 4, r0, c12, c0, 0	@ set HVBAR
-> > +	cmp	r0, #HVC_GET_VECTORS
-> > +	bne	1f
-> > +	mrc	p15, 4, r0, c12, c0, 0	@ get HVBAR
-> > +	b	__hyp_stub_exit
-> > +
-> > +1:	teq	r0, #HVC_SOFT_RESTART
-> > +	bne	1f
-> > +	mov	r0, r3
-> > +	bx	r0
-> > +
-> > +1:	mcrne	p15, 4, r0, c12, c0, 0	@ set HVBAR
-> > +__hyp_stub_exit:
-> >  	__ERET
-> >  ENDPROC(__hyp_stub_do_trap)
-> >  
-> > @@ -231,14 +243,26 @@ ENDPROC(__hyp_stub_do_trap)
-> >   * initialisation entry point.
-> >   */
-> >  ENTRY(__hyp_get_vectors)
-> > -	mov	r0, #-1
-> > +	mov	r0, #HVC_GET_VECTORS
-> > +	__HVC(0)
-> > +	ret	lr
-> >  ENDPROC(__hyp_get_vectors)
-> > -	@ fall through
-> > +
-> >  ENTRY(__hyp_set_vectors)
-> > +	tst	r0, #31
-> > +	bne	1f
-> >  	__HVC(0)
-> > -	ret	lr
-> > +1:	ret	lr
-> >  ENDPROC(__hyp_set_vectors)
+> Add support for the timestamp field added to the Generic Error Data
+> Entry v3, allowing the OS to log the time that the error is generated
+> by the firmware, rather than the time the error is consumed. This
+> improves the correctness of event sequences when analyzing error logs.
+> The timestamp is added in ACPI 6.1, reference Table 18-343 Generic
+> Error Data Entry.
 > 
-> Why the new check? This looks unrelated to the rest of the patch.
-
-It's not unrelated.  The ARM32 hyp-stub has a total crap ABI:
-
-- r0 = -1 => read VBAR
-- r0 != -1 => write r0 to VBAR
-
-So, this check is there to ensure that you can't do something stupid
-like:
-	__hyp_set_vectors(1)
-
-and inadvertently end up invoking the restart method - the check is
-there to "make room" for the new hyp call in the ABI.
-
-It hasn't been clear what the scope of the API, or the stub ABI actually
-is - nothing about that is really documented, so I didn't want to
-radically redesign the stub ABI to be more sensible and risk breakage
-elsewhere - especially as I'm reliant on others to test this.  (All my
-32-bit platforms enter the kernel in SVC mode from the boot loader, even
-those which are virtualisation-capable.)
-
-> > +ENTRY(__hyp_soft_restart)
-> > +	mov	r3, r0
-> > +	mov	r0, #HVC_SOFT_RESTART
-> > +	__HVC(0)
-> > +	mov	r0, r3
-> > +	ret	lr
-> > +ENDPROC(__hyp_soft_restart)
-> > +
-> >  #ifndef ZIMAGE
-> >  .align 2
-> >  .L__boot_cpu_mode_offset:
-> > diff --git a/arch/arm/kernel/reboot.c b/arch/arm/kernel/reboot.c
-> > index 3fa867a2aae6..f0e3c7f1ea21 100644
-> > --- a/arch/arm/kernel/reboot.c
-> > +++ b/arch/arm/kernel/reboot.c
-> > @@ -12,10 +12,11 @@
-> >  
-> >  #include <asm/cacheflush.h>
-> >  #include <asm/idmap.h>
-> > +#include <asm/virt.h>
-> >  
-> >  #include "reboot.h"
-> >  
-> > -typedef void (*phys_reset_t)(unsigned long);
-> > +typedef void (*phys_reset_t)(unsigned long, bool);
-> >  
-> >  /*
-> >   * Function pointers to optional machine specific functions
-> > @@ -36,6 +37,7 @@ static u64 soft_restart_stack[16];
-> >  static void __soft_restart(void *addr)
-> >  {
-> >  	phys_reset_t phys_reset;
-> > +	bool hvc = false;
-> >  
-> >  	/* Take out a flat memory mapping. */
-> >  	setup_mm_for_reboot();
-> > @@ -51,7 +53,13 @@ static void __soft_restart(void *addr)
-> >  
-> >  	/* Switch to the identity mapping. */
-> >  	phys_reset = (phys_reset_t)virt_to_idmap(cpu_reset);
-> > -	phys_reset((unsigned long)addr);
-> > +
-> > +#ifdef CONFIG_ARM_VIRT_EXT
-> > +	/* original stub should be restored by kvm */
-> > +	hvc = is_hyp_mode_available();
-> > +#endif
+> Add support for ARMv8 Common Platform Error Record (CPER) per UEFI 2.6
+> specification. ARMv8 specific processor error information is reported
+> as part of the CPER records.  This provides more detail on for
+> processor error logs. This can help describe ARMv8 cache, tlb, and bus
+> errors.
 > 
-> When !CONFIG_ARM_VIRT_EXT, is_hyp_mode_available() is defined so as to
-> always be false, so we can drop the ifdef here.
-
-Ok.
-
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+> Synchronous External Abort (SEA) represents a specific processor error
+> condition in ARM systems. A handler is added to recognize SEA errors,
+> and a notifier is added to parse and report the errors before the
+> process is killed. Refer to section N.2.1.1 in the Common Platform
+> Error Record appendix of the UEFI 2.6 specification.
+> 
+> Currently the kernel ignores CPER records that are unrecognized.
+> On the other hand, UEFI spec allows for non-standard (eg. vendor
+> proprietary) error section type in CPER (Common Platform Error Record),
+> as defined in section N2.3 of UEFI version 2.5. Therefore, user is not
+> able to see hardware error data of non-standard section.
+> 
+> If section Type field of Generic Error Data Entry is unrecognized,
+> prints out the raw data in dmesg buffer, and also adds a tracepoint for
+> reporting such hardware errors.
+> 
+> Currently even if an error status block's severity is fatal, the kernel
+> does not honor the severity level and panic. With the firmware first
+> model, the platform could inform the OS about a fatal hardware error
+> through the non-NMI GHES notification type. The OS should panic when a
+> hardware error record is received with this severity.
+> 
+> Add support to handle SEAs that occur while a KVM guest kernel is
+> running. Currently these are unsupported by the guest abort handling.
+> 
+> Depends on: [PATCH v15] acpi, apei, arm64: APEI initial support for
+> aarch64.
+>             https://lkml.org/lkml/2016/12/1/312
+> 
+> V6: Change HEST_TYPE_GENERIC_V2 to IS_HEST_TYPE_GENERIC_V2 for
+> readability
+>     Move APEI helper defines from cper.h to ghes.h
+>     Add data_len decrement back into print loop
+>     Change references to ARMv8 to just ARM
+>     Rewrite ARM processor context info parsing
+>     Check valid bit of ARM error info field before printing it
+>     Add include of linux/uuid.h in ghes.c
+> 
+> V5: Fix GHES goto logic for error conditions
+>     Change ghes_do_read_ack to ghes_ack_error
+>     Make sure data version check is >= 3
+>     Use CPER helper functions in print functions
+>     Make handle_guest_sea() dummy function static for arm
+>     Add arm to subject line for KVM patch
+> 
+> V4: Add bit offset left shift to read_ack_write value
+>     Make HEST generic and generic_v2 structures a union in the ghes
+> structure
+>     Move gdata v3 helper functions into ghes.h to avoid duplication
+>     Reorder the timestamp print and avoid memcpy
+>     Add helper functions for gdata size checking
+>     Rename the SEA functions
+>     Add helper function for GHES panics
+>     Set fru_id to NULL UUID at variable declaration
+>     Limit ARM trace event parameters to the needed structures
+>     Reorder the ARM trace event variables to save space
+>     Add comment for why we don't pass SEAs to the guest when it aborts
+>     Move ARM trace event call into GHES driver instead of CPER
+> 
+> V3: Fix unmapped address to the read_ack_register in ghes.c
+>     Add helper function to get the proper payload based on generic data
+> entry
+>      version
+>     Move timestamp print to avoid changing function calls in cper.c
+>     Remove patch "arm64: exception: handle instruction abort at current
+> EL"
+>      since the el1_ia handler is already added in 4.8
+>     Add EFI and ARM64 dependencies for HAVE_ACPI_APEI_SEA
+>     Add a new trace event for ARM type errors
+>     Add support to handle KVM guest SEAs
+> 
+> V2: Add PSCI state print for the ARMv8 error type.
+>     Separate timestamp year into year and century using BCD format.
+>     Rebase on top of ACPICA 20160318 release and remove header file
+> changes
+>      in include/acpi/actbl1.h.
+>     Add panic OS with fatal error status block patch.
+>     Add processing of unrecognized CPER error section patches with
+> updates
+>      from previous comments. Original patches:
+> https://lkml.org/lkml/2015/9/8/646
+> 
+> V1: https://lkml.org/lkml/2016/2/5/544
+> 
+> Jonathan (Zhixiong) Zhang (1):
+>   acpi: apei: panic OS with fatal error status block
+> 
+> Tyler Baicar (9):
+>   acpi: apei: read ack upon ghes record consumption
+>   ras: acpi/apei: cper: generic error data entry v3 per ACPI 6.1
+>   efi: parse ARM processor error
+>   arm64: exception: handle Synchronous External Abort
+>   acpi: apei: handle SEA notification type for ARMv8
+>   efi: print unrecognized CPER section
+>   ras: acpi / apei: generate trace event for unrecognized CPER section
+>   trace, ras: add ARM processor error trace event
+>   arm/arm64: KVM: add guest SEA support
+> 
+>  arch/arm/include/asm/kvm_arm.h       |   1 +
+>  arch/arm/include/asm/system_misc.h   |   5 +
+>  arch/arm/kvm/mmu.c                   |  18 +++-
+>  arch/arm64/Kconfig                   |   1 +
+>  arch/arm64/include/asm/kvm_arm.h     |   1 +
+>  arch/arm64/include/asm/system_misc.h |  15 +++
+>  arch/arm64/mm/fault.c                |  71 ++++++++++--
+>  drivers/acpi/apei/Kconfig            |  14 +++
+>  drivers/acpi/apei/ghes.c             | 189
+> +++++++++++++++++++++++++++++---
+>  drivers/acpi/apei/hest.c             |   7 +-
+>  drivers/firmware/efi/cper.c          | 204
+> ++++++++++++++++++++++++++++++++---
+>  drivers/ras/ras.c                    |   2 +
+>  include/acpi/ghes.h                  |  27 ++++-
+>  include/linux/cper.h                 |  53 +++++++++
+>  include/ras/ras_event.h              | 100 +++++++++++++++++
+>  15 files changed, 664 insertions(+), 44 deletions(-)
+> 
+> --
+> Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
+> Technologies, Inc.
+> Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a
+> Linux Foundation Collaborative Project.
