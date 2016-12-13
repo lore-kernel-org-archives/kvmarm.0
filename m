@@ -1,25 +1,27 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] ARM: dts: vexpress: Support GICC_DIR operations
-Date: Tue, 13 Dec 2016 13:00:36 +0000
-Message-ID: <dda80db0-b683-d0a6-f4ab-9dd23fd6903a@arm.com>
-References: <20161210201351.25894-1-christoffer.dall@linaro.org>
- <9d9198a1-ba56-46e5-6226-89eb3825aac3@arm.com>
- <903fb243-7ab1-211f-e29f-27ab00a4aa01@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH kvm-unit-tests v8 03/10] arm/arm64: add some delay routines
+Date: Tue, 13 Dec 2016 16:41:57 +0000
+Message-ID: <8760mnu6ga.fsf@linaro.org>
+References: <20161208175030.12269-1-drjones@redhat.com>
+ <20161208175030.12269-4-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99E7640430
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2016 07:59:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E03AE40284
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2016 11:40:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vzEMYymjcgOd for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Dec 2016 07:59:32 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBDA54028D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2016 07:59:32 -0500 (EST)
-In-Reply-To: <903fb243-7ab1-211f-e29f-27ab00a4aa01@arm.com>
+ with ESMTP id cBa-hvn9H9jr for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Dec 2016 11:40:52 -0500 (EST)
+Received: from mail-wj0-f182.google.com (mail-wj0-f182.google.com
+ [209.85.210.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 54798401C7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2016 11:40:52 -0500 (EST)
+Received: by mail-wj0-f182.google.com with SMTP id xy5so105655478wjc.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2016 08:41:59 -0800 (PST)
+In-reply-to: <20161208175030.12269-4-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,65 +31,88 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Sudeep Holla <sudeep.holla@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: lorenzo.pieralisi@arm.com, liviu.dudau@arm.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/12/16 12:16, Sudeep Holla wrote:
-> 
-> 
-> On 12/12/16 17:35, Marc Zyngier wrote:
->> [+Sudeep]
->>
->> On 10/12/16 20:13, Christoffer Dall wrote:
->>> The GICv2 CPU interface registers span across 8K, not 4K as indicated in
->>> the DT.  Only the GICC_DIR register is located after the initial 4K
->>> boundary, leaving a functional system but without support for separately
->>> EOI'ing and deactivating interrupts.
->>>
->>> After this change the system support split priority drop and interrupt
->>> deactivation.
->>>
->>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->>> ---
->>>  arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts b/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts
->>> index 0205c97..2e0cf39 100644
->>> --- a/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts
->>> +++ b/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts
->>> @@ -126,7 +126,7 @@
->>>  		#address-cells = <0>;
->>>  		interrupt-controller;
->>>  		reg = <0 0x2c001000 0 0x1000>,
->>> -		      <0 0x2c002000 0 0x1000>,
->>> +		      <0 0x2c002000 0 0x2000>,
->>>  		      <0 0x2c004000 0 0x2000>,
->>>  		      <0 0x2c006000 0 0x2000>;
->>>  		interrupts = <1 9 0xf04>;
->>>
->>
->> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
->>
-> 
-> Thanks Marc, I see couple of other instances of this like tc2 and rtsm
-> model on arm64. Do they need to be fixed too ? I guess so. If so I will
-> fixup this to patch add tc1. And add another one for rtsm.
-
-Yes, that'd be good.
-
-> Also I see loads of gic-400 compatible dts(mainly rockchip and renasas)
-> having just 4k. Are they left like this intentionally ? I remember you
-> fixing most of the DTS when you found this issue initially.
-
-I still have these patches stashed somewhere (I remember sunxi being one
-of the offender as well). I also need to come up with a software
-workaround enabling the 8kB region with the old DT (because it is likely
-that KVM will stop working on them if we merge Christoffer's timer patches).
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IEFsbG93IGEgdGhy
+ZWFkIHRvIHdhaXQgc29tZSBzcGVjaWZpZWQgYW1vdW50IG9mIHRpbWUuIENhbgo+IHNwZWNpZnkg
+aW4gY3ljbGVzLCB1c2VjcywgYW5kIG1zZWNzLgo+Cj4gU2lnbmVkLW9mZi1ieTogQW5kcmV3IEpv
+bmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+Cj4KPiAtLS0KPiB2ODogcmV3cm90ZSBiYXNpbmcgb24g
+bmV3IHN5c3JlZyBmcmFtZXdvcmsuIEFsc28gZGVjaWRlZCBkZWxheQo+ICAgICBmdW5jdGlvbnMg
+d2FycmFudCB0aGVpciBvd24gZmlsZXMgKGRlbGF5LltjaF0pCj4gLS0tCj4gIGFybS9NYWtlZmls
+ZS5jb21tb24gICAgICAgfCAgMSArCj4gIGxpYi9hcm0vYXNtL2RlbGF5LmggICAgICAgfCAxNCAr
+KysrKysrKysrKysrKwo+ICBsaWIvYXJtL2FzbS9wcm9jZXNzb3IuaCAgIHwgMTUgKysrKysrKysr
+KysrKysrCj4gIGxpYi9hcm02NC9hc20vZGVsYXkuaCAgICAgfCAgMSArCj4gIGxpYi9hcm02NC9h
+c20vcHJvY2Vzc29yLmggfCAxMiArKysrKysrKysrKysKPiAgbGliL2FybS9kZWxheS5jICAgICAg
+ICAgICB8IDI5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrCj4gIDYgZmlsZXMgY2hhbmdl
+ZCwgNzIgaW5zZXJ0aW9ucygrKQo+ICBjcmVhdGUgbW9kZSAxMDA2NDQgbGliL2FybS9hc20vZGVs
+YXkuaAo+ICBjcmVhdGUgbW9kZSAxMDA2NDQgbGliL2FybTY0L2FzbS9kZWxheS5oCj4gIGNyZWF0
+ZSBtb2RlIDEwMDY0NCBsaWIvYXJtL2RlbGF5LmMKPgo+IGRpZmYgLS1naXQgYS9hcm0vTWFrZWZp
+bGUuY29tbW9uIGIvYXJtL01ha2VmaWxlLmNvbW1vbgo+IGluZGV4IGIyYzBmYzhhMmZkYy4uODlm
+ZTNmNjllYjQ0IDEwMDY0NAo+IC0tLSBhL2FybS9NYWtlZmlsZS5jb21tb24KPiArKysgYi9hcm0v
+TWFrZWZpbGUuY29tbW9uCj4gQEAgLTQ4LDYgKzQ4LDcgQEAgY2ZsYXRvYmpzICs9IGxpYi9hcm0v
+bW11Lm8KPiAgY2ZsYXRvYmpzICs9IGxpYi9hcm0vYml0b3BzLm8KPiAgY2ZsYXRvYmpzICs9IGxp
+Yi9hcm0vcHNjaS5vCj4gIGNmbGF0b2JqcyArPSBsaWIvYXJtL3NtcC5vCj4gK2NmbGF0b2JqcyAr
+PSBsaWIvYXJtL2RlbGF5Lm8KPgo+ICBsaWJlYWJpID0gbGliL2FybS9saWJlYWJpLmEKPiAgZWFi
+aW9ianMgPSBsaWIvYXJtL2VhYmlfY29tcGF0Lm8KPiBkaWZmIC0tZ2l0IGEvbGliL2FybS9hc20v
+ZGVsYXkuaCBiL2xpYi9hcm0vYXNtL2RlbGF5LmgKPiBuZXcgZmlsZSBtb2RlIDEwMDY0NAo+IGlu
+ZGV4IDAwMDAwMDAwMDAwMC4uMjQzNmIyOGM3N2FlCj4gLS0tIC9kZXYvbnVsbAo+ICsrKyBiL2xp
+Yi9hcm0vYXNtL2RlbGF5LmgKPiBAQCAtMCwwICsxLDE0IEBACj4gKyNpZm5kZWYgX0FTTUFSTV9E
+RUxBWV9IXwo+ICsjZGVmaW5lIF9BU01BUk1fREVMQVlfSF8KPiArLyoKPiArICogQ29weXJpZ2h0
+IChDKSAyMDE2LCBSZWQgSGF0IEluYywgQW5kcmV3IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+
+Cj4gKyAqCj4gKyAqIFRoaXMgd29yayBpcyBsaWNlbnNlZCB1bmRlciB0aGUgdGVybXMgb2YgdGhl
+IEdOVSBMR1BMLCB2ZXJzaW9uIDIuCj4gKyAqLwo+ICsjaW5jbHVkZSA8bGliY2ZsYXQuaD4KPiAr
+Cj4gK2V4dGVybiB2b2lkIGRlbGF5KHU2NCBjeWNsZXMpOwo+ICtleHRlcm4gdm9pZCB1ZGVsYXko
+dW5zaWduZWQgbG9uZyB1c2Vjcyk7Cj4gK2V4dGVybiB2b2lkIG1kZWxheSh1bnNpZ25lZCBsb25n
+IG1zZWNzKTsKPiArCj4gKyNlbmRpZiAvKiBfQVNNQVJNX0RFTEFZX0hfICovCj4gZGlmZiAtLWdp
+dCBhL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oIGIvbGliL2FybS9hc20vcHJvY2Vzc29yLmgKPiBp
+bmRleCA2YjBkMzZiODc4MTcuLjg1N2JkZDk2YTNjYyAxMDA2NDQKPiAtLS0gYS9saWIvYXJtL2Fz
+bS9wcm9jZXNzb3IuaAo+ICsrKyBiL2xpYi9hcm0vYXNtL3Byb2Nlc3Nvci5oCj4gQEAgLTcsNiAr
+Nyw3IEBACj4gICAqLwo+ICAjaW5jbHVkZSA8YXNtL3B0cmFjZS5oPgo+ICAjaW5jbHVkZSA8YXNt
+L3N5c3JlZy5oPgo+ICsjaW5jbHVkZSA8YXNtL2JhcnJpZXIuaD4KCkhtbSB0aGlzIGZhaWxzIHRv
+IGFwcGx5IGNsZWFubHkgdG8gbWFzdGVyIGFuZCBkb2Vzbid0IGJ1aWxkIGFzIHN5c3JlZy5oCmlz
+bid0IGluIG15IHRyZWUuIFdoYXQgaGFwcGVuZWQgdG8gaXQ/Cgo+Cj4gIGVudW0gdmVjdG9yIHsK
+PiAgCUVYQ1BUTl9SU1QsCj4gQEAgLTUxLDQgKzUyLDE4IEBAIGV4dGVybiBpbnQgbXBpZHJfdG9f
+Y3B1KHVpbnQ2NF90IG1waWRyKTsKPiAgZXh0ZXJuIHZvaWQgc3RhcnRfdXNyKHZvaWQgKCpmdW5j
+KSh2b2lkICphcmcpLCB2b2lkICphcmcsIHVuc2lnbmVkIGxvbmcgc3BfdXNyKTsKPiAgZXh0ZXJu
+IGJvb2wgaXNfdXNlcih2b2lkKTsKPgo+ICsjZGVmaW5lIENOVFZDVAkJX19BQ0NFU1NfQ1AxNV82
+NCgxLCBjMTQpCj4gKyNkZWZpbmUgQ05URlJRCQlfX0FDQ0VTU19DUDE1KGMxNCwgMCwgYzAsIDAp
+Cj4gKwo+ICtzdGF0aWMgaW5saW5lIHU2NCBnZXRfY250dmN0KHZvaWQpCj4gK3sKPiArCWlzYigp
+Owo+ICsJcmV0dXJuIHJlYWRfc3lzcmVnKENOVFZDVCk7Cj4gK30KPiArCj4gK3N0YXRpYyBpbmxp
+bmUgdTMyIGdldF9jbnRmcnEodm9pZCkKPiArewo+ICsJcmV0dXJuIHJlYWRfc3lzcmVnKENOVEZS
+USk7Cj4gK30KPiArCj4gICNlbmRpZiAvKiBfQVNNQVJNX1BST0NFU1NPUl9IXyAqLwo+IGRpZmYg
+LS1naXQgYS9saWIvYXJtNjQvYXNtL2RlbGF5LmggYi9saWIvYXJtNjQvYXNtL2RlbGF5LmgKPiBu
+ZXcgZmlsZSBtb2RlIDEwMDY0NAo+IGluZGV4IDAwMDAwMDAwMDAwMC4uMjg4ZTRiM2ZlNjEwCj4g
+LS0tIC9kZXYvbnVsbAo+ICsrKyBiL2xpYi9hcm02NC9hc20vZGVsYXkuaAo+IEBAIC0wLDAgKzEg
+QEAKPiArI2luY2x1ZGUgIi4uLy4uL2FybS9hc20vZGVsYXkuaCIKPiBkaWZmIC0tZ2l0IGEvbGli
+L2FybTY0L2FzbS9wcm9jZXNzb3IuaCBiL2xpYi9hcm02NC9hc20vcHJvY2Vzc29yLmgKPiBpbmRl
+eCA0OGFiZjJjOWUzNTguLjA4OThkODlmOTc2MSAxMDA2NDQKPiAtLS0gYS9saWIvYXJtNjQvYXNt
+L3Byb2Nlc3Nvci5oCj4gKysrIGIvbGliL2FybTY0L2FzbS9wcm9jZXNzb3IuaAo+IEBAIC0yMCw2
+ICsyMCw3IEBACj4gICNpbmNsdWRlIDxhc20vcHRyYWNlLmg+Cj4gICNpbmNsdWRlIDxhc20vZXNy
+Lmg+Cj4gICNpbmNsdWRlIDxhc20vc3lzcmVnLmg+Cj4gKyNpbmNsdWRlIDxhc20vYmFycmllci5o
+Pgo+Cj4gIGVudW0gdmVjdG9yIHsKPiAgCUVMMVRfU1lOQywKPiBAQCAtODMsNSArODQsMTYgQEAg
+ZXh0ZXJuIGludCBtcGlkcl90b19jcHUodWludDY0X3QgbXBpZHIpOwo+ICBleHRlcm4gdm9pZCBz
+dGFydF91c3Iodm9pZCAoKmZ1bmMpKHZvaWQgKmFyZyksIHZvaWQgKmFyZywgdW5zaWduZWQgbG9u
+ZyBzcF91c3IpOwo+ICBleHRlcm4gYm9vbCBpc191c2VyKHZvaWQpOwo+Cj4gK3N0YXRpYyBpbmxp
+bmUgdTY0IGdldF9jbnR2Y3Qodm9pZCkKPiArewo+ICsJaXNiKCk7Cj4gKwlyZXR1cm4gcmVhZF9z
+eXNyZWcoY250dmN0X2VsMCk7Cj4gK30KPiArCj4gK3N0YXRpYyBpbmxpbmUgdTMyIGdldF9jbnRm
+cnEodm9pZCkKPiArewo+ICsJcmV0dXJuIHJlYWRfc3lzcmVnKGNudGZycV9lbDApOwo+ICt9Cj4g
+Kwo+ICAjZW5kaWYgLyogIV9fQVNTRU1CTFlfXyAqLwo+ICAjZW5kaWYgLyogX0FTTUFSTTY0X1BS
+T0NFU1NPUl9IXyAqLwo+IGRpZmYgLS1naXQgYS9saWIvYXJtL2RlbGF5LmMgYi9saWIvYXJtL2Rl
+bGF5LmMKPiBuZXcgZmlsZSBtb2RlIDEwMDY0NAo+IGluZGV4IDAwMDAwMDAwMDAwMC4uZmE2NWUy
+ZGM5ZTM1Cj4gLS0tIC9kZXYvbnVsbAo+ICsrKyBiL2xpYi9hcm0vZGVsYXkuYwo+IEBAIC0wLDAg
+KzEsMjkgQEAKPiArLyoKPiArICogRGVsYXkgbG9vcHMKPiArICoKPiArICogQ29weXJpZ2h0IChD
+KSAyMDE2LCBSZWQgSGF0IEluYywgQW5kcmV3IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+Cj4g
+KyAqCj4gKyAqIFRoaXMgd29yayBpcyBsaWNlbnNlZCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdO
+VSBMR1BMLCB2ZXJzaW9uIDIuCj4gKyAqLwo+ICsjaW5jbHVkZSA8bGliY2ZsYXQuaD4KPiArI2lu
+Y2x1ZGUgPGFzbS9wcm9jZXNzb3IuaD4KPiArI2luY2x1ZGUgPGFzbS9iYXJyaWVyLmg+Cj4gKwo+
+ICt2b2lkIGRlbGF5KHU2NCBjeWNsZXMpCj4gK3sKPiArCXU2NCBzdGFydCA9IGdldF9jbnR2Y3Qo
+KTsKPiArCj4gKwl3aGlsZSAoKGdldF9jbnR2Y3QoKSAtIHN0YXJ0KSA8IGN5Y2xlcykKPiArCQlj
+cHVfcmVsYXgoKTsKPiArfQo+ICsKPiArdm9pZCB1ZGVsYXkodW5zaWduZWQgbG9uZyB1c2VjKQo+
+ICt7Cj4gKwlkZWxheSgodTY0KXVzZWMgKiBnZXRfY250ZnJxKCkgLyAxMDAwMDAwKTsKPiArfQo+
+ICsKPiArdm9pZCBtZGVsYXkodW5zaWduZWQgbG9uZyBtc2VjcykKPiArewo+ICsJd2hpbGUgKG1z
+ZWNzLS0pCj4gKwkJdWRlbGF5KDEwMDApOwo+ICt9CgoKLS0KQWxleCBCZW5uw6llCl9fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxp
+c3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlh
+LmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
