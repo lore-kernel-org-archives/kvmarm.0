@@ -1,25 +1,26 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 1/2] ARM: hyp-stub: improve ABI
-Date: Wed, 14 Dec 2016 11:49:54 +0000
-Message-ID: <20161214114954.GF17982@leverpostej>
+Subject: Re: [PATCH 2/2] ARM: soft-reboot into same mode that we entered the
+ kernel
+Date: Wed, 14 Dec 2016 11:56:49 +0000
+Message-ID: <20161214115648.GG17982@leverpostej>
 References: <20161213113044.GC19985@leverpostej>
- <E1cH74w-0003ke-Qp@rmk-PC.armlinux.org.uk>
+ <E1cH751-0003kk-Ts@rmk-PC.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82BF74027C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2016 06:49:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 804294027C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2016 06:56:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z2DnVGf1Nd9D for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Dec 2016 06:49:35 -0500 (EST)
+ with ESMTP id swoJ1QcLsIO4 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Dec 2016 06:56:30 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 578C9401E8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2016 06:49:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C0284022C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2016 06:56:29 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <E1cH74w-0003ke-Qp@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1cH751-0003kk-Ts@rmk-PC.armlinux.org.uk>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,79 +34,43 @@ To: Russell King <rmk+kernel@armlinux.org.uk>
 Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, dave.martin@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Dec 14, 2016 at 10:46:30AM +0000, Russell King wrote:
-> Improve the hyp-stub ABI to allow it to do more than just get/set the
-> vectors.  We follow the example in ARM64, where r0 is used as an opcode
-> with the other registers as an argument.
+On Wed, Dec 14, 2016 at 10:46:35AM +0000, Russell King wrote:
+> When we soft-reboot (eg, kexec) from one kernel into the next, we need
+> to ensure that we enter the new kernel in the same processor mode as
+> when we were entered, so that (eg) the new kernel can install its own
+> hypervisor - the old kernel's hypervisor will have been overwritten.
 > 
-> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> In order to do this, we need to pass a flag to cpu_reset() so it knows
+> what to do, and we need to modify the kernel's own hypervisor stub to
+> allow it to handle a soft-reboot.
+> 
+> As we are always guaranteed to install our own hypervisor if we're
+> entered in HYP32 mode, and KVM will have moved itself out of the way
+> on kexec/normal reboot, we can assume that our hypervisor is in place
+> when we want to kexec, so changing our hypervisor API should not be a
+> problem.
 
-This looks good to me, though I'd suggest s/ABI/calling convention/, as
-this isn't strictly speaking an ABI. So FWIW:
+Just to check, does that also hold true for kdump?
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
+I haven't gone digging yet, but it looks like KVM might still be
+installed, rather than the hyp stub, and we might need some logic to
+ensure that it's torn down...
+ 
+[...]
+
+> @@ -51,7 +52,9 @@ static void __soft_restart(void *addr)
+>  
+>  	/* Switch to the identity mapping. */
+>  	phys_reset = (phys_reset_t)virt_to_idmap(cpu_reset);
+> -	phys_reset((unsigned long)addr);
+> +
+> +	/* original stub should be restored by kvm */
+> +	phys_reset((unsigned long)addr, is_hyp_mode_available());
+
+... otherwise here we'd call into the KVM hyp code in a potentially
+confusing manner.
+
+Otherwise, this looks fine to me.
 
 Thanks,
 Mark.
-
-> ---
->  arch/arm/kernel/hyp-stub.S | 27 ++++++++++++++++++++++-----
->  1 file changed, 22 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
-> index 15d073ae5da2..f3e9ba5fb642 100644
-> --- a/arch/arm/kernel/hyp-stub.S
-> +++ b/arch/arm/kernel/hyp-stub.S
-> @@ -22,6 +22,9 @@
->  #include <asm/assembler.h>
->  #include <asm/virt.h>
->  
-> +#define HVC_GET_VECTORS 0
-> +#define HVC_SET_VECTORS 1
-> +
->  #ifndef ZIMAGE
->  /*
->   * For the kernel proper, we need to find out the CPU boot mode long after
-> @@ -202,9 +205,19 @@ ARM_BE8(orr	r7, r7, #(1 << 25))     @ HSCTLR.EE
->  ENDPROC(__hyp_stub_install_secondary)
->  
->  __hyp_stub_do_trap:
-> -	cmp	r0, #-1
-> -	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
-> -	mcrne	p15, 4, r0, c12, c0, 0	@ set HVBAR
-> +	teq	r0, #HVC_GET_VECTORS
-> +	bne	1f
-> +	mrc	p15, 4, r0, c12, c0, 0	@ get HVBAR
-> +	b	__hyp_stub_exit
-> +
-> +1:	teq	r0, #HVC_SET_VECTORS
-> +	bne	1f
-> +	mcr	p15, 4, r1, c12, c0, 0	@ set HVBAR
-> +	b	__hyp_stub_exit
-> +
-> +1:	mov	r0, #-1
-> +
-> +__hyp_stub_exit:
->  	__ERET
->  ENDPROC(__hyp_stub_do_trap)
->  
-> @@ -231,10 +244,14 @@ ENDPROC(__hyp_stub_do_trap)
->   * initialisation entry point.
->   */
->  ENTRY(__hyp_get_vectors)
-> -	mov	r0, #-1
-> +	mov	r0, #HVC_GET_VECTORS
-> +	__HVC(0)
-> +	ret	lr
->  ENDPROC(__hyp_get_vectors)
-> -	@ fall through
-> +
->  ENTRY(__hyp_set_vectors)
-> +	mov	r1, r0
-> +	mov	r0, #HVC_SET_VECTORS
->  	__HVC(0)
->  	ret	lr
->  ENDPROC(__hyp_set_vectors)
-> -- 
-> 2.7.4
-> 
