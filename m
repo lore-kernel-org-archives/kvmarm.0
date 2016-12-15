@@ -1,26 +1,24 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: Re: [PATCH 2/2] KVM: arm/arm64: vgic-v2: Add the missing resetting
- LRs at boot time
-Date: Thu, 15 Dec 2016 17:09:13 +0800
-Message-ID: <58525DB9.40806@huawei.com>
-References: <1481006504-25460-1-git-send-email-zhaoshenglong@huawei.com>
- <1481006504-25460-3-git-send-email-zhaoshenglong@huawei.com>
- <7f920e65-a82c-e05d-1d19-8b71e06ac770@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/2] ARM: hyp-stub: improve ABI
+Date: Thu, 15 Dec 2016 11:18:48 +0000
+Message-ID: <72f93940-cf87-fd91-90f2-760b7ff050fb@arm.com>
+References: <20161213113044.GC19985@leverpostej>
+ <E1cH74w-0003ke-Qp@rmk-PC.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C2C5402EC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2016 04:09:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 388FE402A3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2016 06:17:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G547TC0ryALU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Dec 2016 04:09:17 -0500 (EST)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AD77402A5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2016 04:09:13 -0500 (EST)
-In-Reply-To: <7f920e65-a82c-e05d-1d19-8b71e06ac770@arm.com>
+ with ESMTP id UUinkpk5DKmj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Dec 2016 06:17:43 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EEAFC401E8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2016 06:17:42 -0500 (EST)
+In-Reply-To: <E1cH74w-0003ke-Qp@rmk-PC.armlinux.org.uk>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,44 +28,117 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+To: Russell King <rmk+kernel@armlinux.org.uk>, Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, dave.martin@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On 14/12/16 10:46, Russell King wrote:
+> Improve the hyp-stub ABI to allow it to do more than just get/set the
+> vectors.  We follow the example in ARM64, where r0 is used as an opcode
+> with the other registers as an argument.
+> 
+> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> ---
+>  arch/arm/kernel/hyp-stub.S | 27 ++++++++++++++++++++++-----
+>  1 file changed, 22 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
+> index 15d073ae5da2..f3e9ba5fb642 100644
+> --- a/arch/arm/kernel/hyp-stub.S
+> +++ b/arch/arm/kernel/hyp-stub.S
+> @@ -22,6 +22,9 @@
+>  #include <asm/assembler.h>
+>  #include <asm/virt.h>
+>  
+> +#define HVC_GET_VECTORS 0
+> +#define HVC_SET_VECTORS 1
+> +
+>  #ifndef ZIMAGE
+>  /*
+>   * For the kernel proper, we need to find out the CPU boot mode long after
+> @@ -202,9 +205,19 @@ ARM_BE8(orr	r7, r7, #(1 << 25))     @ HSCTLR.EE
+>  ENDPROC(__hyp_stub_install_secondary)
+>  
+>  __hyp_stub_do_trap:
+> -	cmp	r0, #-1
+> -	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
+> -	mcrne	p15, 4, r0, c12, c0, 0	@ set HVBAR
+> +	teq	r0, #HVC_GET_VECTORS
+> +	bne	1f
+> +	mrc	p15, 4, r0, c12, c0, 0	@ get HVBAR
+> +	b	__hyp_stub_exit
+> +
+> +1:	teq	r0, #HVC_SET_VECTORS
+> +	bne	1f
+> +	mcr	p15, 4, r1, c12, c0, 0	@ set HVBAR
+> +	b	__hyp_stub_exit
+> +
+> +1:	mov	r0, #-1
+> +
+> +__hyp_stub_exit:
+>  	__ERET
+>  ENDPROC(__hyp_stub_do_trap)
+>  
+> @@ -231,10 +244,14 @@ ENDPROC(__hyp_stub_do_trap)
+>   * initialisation entry point.
+>   */
+>  ENTRY(__hyp_get_vectors)
+> -	mov	r0, #-1
+> +	mov	r0, #HVC_GET_VECTORS
 
-On 2016/12/6 19:39, Marc Zyngier wrote:
-> On 06/12/16 06:41, Shannon Zhao wrote:
->> From: Shannon Zhao <shannon.zhao@linaro.org>
->>
->> This is the corresponding part of commit d6400d7(KVM: arm/arm64:
->> vgic-v2: Reset LRs at boot time) which is missed for new-vgic.
->>
->> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->> ---
->>  virt/kvm/arm/vgic/vgic-v2.c | 11 +++++++++++
->>  1 file changed, 11 insertions(+)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
->> index 9bab867..c636a19 100644
->> --- a/virt/kvm/arm/vgic/vgic-v2.c
->> +++ b/virt/kvm/arm/vgic/vgic-v2.c
->> @@ -300,6 +300,15 @@ int vgic_v2_map_resources(struct kvm *kvm)
->>  
->>  DEFINE_STATIC_KEY_FALSE(vgic_v2_cpuif_trap);
->>  
->> +static void vgic_cpu_init_lrs(void *params)
->> +{
->> +	int i;
->> +
->> +	for (i = 0; i < kvm_vgic_global_state.nr_lr; i++)
->> +		writel_relaxed(0, kvm_vgic_global_state.vctrl_base +
->> +				  GICH_LR0 + (i * 4));
->> +}
-Since this function will use kvm_vgic_global_state which is initialized
-by kvm_vgic_hyp_init, if we call it in cpu_hyp_reinit/cpu_init_hyp_mode,
-the kvm_vgic_global_state is not initialized for now. Is that fine to
-move kvm_vgic_hyp_init to the first place in init_subsystems?
+This breaks the KVM implementation of __hyp_get_vectors, easily fixed
+with the following patchlet:
+
+diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
+index a2e75b8..0fe637e 100644
+--- a/arch/arm/include/asm/virt.h
++++ b/arch/arm/include/asm/virt.h
+@@ -89,6 +89,14 @@ extern char __hyp_text_start[];
+ extern char __hyp_text_end[];
+ #endif
+ 
++#else
++
++/* Only assembly code should need those */
++
++#define HVC_GET_VECTORS 0
++#define HVC_SET_VECTORS 1
++#define HVC_SOFT_RESTART 2
++
+ #endif /* __ASSEMBLY__ */
+ 
+ #endif /* ! VIRT_H */
+diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
+index ebc26f8..1c6888f 100644
+--- a/arch/arm/kernel/hyp-stub.S
++++ b/arch/arm/kernel/hyp-stub.S
+@@ -22,10 +22,6 @@
+ #include <asm/assembler.h>
+ #include <asm/virt.h>
+ 
+-#define HVC_GET_VECTORS 0
+-#define HVC_SET_VECTORS 1
+-#define HVC_SOFT_RESTART 2
+-
+ #ifndef ZIMAGE
+ /*
+  * For the kernel proper, we need to find out the CPU boot mode long after
+diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
+index 96beb53..1f8db7d 100644
+--- a/arch/arm/kvm/hyp/hyp-entry.S
++++ b/arch/arm/kvm/hyp/hyp-entry.S
+@@ -127,7 +127,7 @@ hyp_hvc:
+ 	pop	{r0, r1, r2}
+ 
+ 	/* Check for __hyp_get_vectors */
+-	cmp	r0, #-1
++	cmp	r0, #HVC_GET_VECTORS
+ 	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
+ 	beq	1f
+ 
 
 Thanks,
+
+	M.
 -- 
-Shannon
+Jazz is not dead. It just smells funny...
