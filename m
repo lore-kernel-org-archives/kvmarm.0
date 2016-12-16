@@ -1,35 +1,30 @@
-From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Date: Fri, 16 Dec 2016 18:00:43 +0100
-Message-ID: <20161216170043.taaanbg5objnxjlh@breakpoint.cc>
-References: <20161216105634.235457-1-arnd@arndb.de>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 04/13] vfio-pci: use 32-bit comparisons for register address for gcc-4.5
+Date: Fri, 16 Dec 2016 20:50:33 +0100
+Message-ID: <3673393.CH4rJCRAcf@wuerfel>
+References: <20161216105634.235457-1-arnd@arndb.de> <20161216105634.235457-5-arnd@arndb.de> <20161216083056.33ea0fa9@t450s.home>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
+In-Reply-To: <20161216083056.33ea0fa9@t450s.home>
 Sender: linux-arch-owner@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu, Geert Uytterhoeven <geert@linux-m68k.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2016-12-16 11:56:21 [+0100], Arnd Bergmann wrote:
-> The original gcc-4.3 release was in early 2008. If we decide to still
-> support that, we probably want the first 10 quirks in this series,
-> while gcc-4.6 (released in 2011) requires none of them.
+On Friday, December 16, 2016 8:30:56 AM CET Alex Williamson wrote:
+> 
+> Acked-by: Alex Williamson <alex.williamson@redhat.com>
+> 
+> Would you like me to pull this one patch in through the vfio tree?
+> Thanks,
 
-It this min gcc thingy ARM only?
-The current minimium (documented) is gcc v3.2. With the -fno-PIE patches
-I was going to raise the bar to at least v3.4 but did not get around to
-it yet. hpa said that everything < 3.4 is broken on x86 [0].
-Gert is getting code compiled on gcc v4.1 not sure if it is some kind of
-gcc limitation or just for fun.
-Unless people are stuck with some enterprise distro I don't see a reason
-why one should not try a gcc-4.6 which is 5 years old. I had problems to
-verify that the current kernel compiles with gcc v3.2 on x86 (it did
-with a bunch of warnings with gcc 3.4 and booted).
+If you think the patch is appropriate, please merge it.
 
-[0] https://lkml.kernel.org/r/63c356a8-58a3-bc7e-88db-5c8071db15e1@zytor.com
-> 	Arnd
+I originally just posted this as illustration to raise the
+question of whether we actually want to support gcc-4.5,
+from the feedback so far it does seem like the answer is yes,
+and we will need it.
 
-Sebastian
+	Arnd
