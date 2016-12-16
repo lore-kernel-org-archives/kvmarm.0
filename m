@@ -1,21 +1,23 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Date: Fri, 16 Dec 2016 11:56:21 +0100
-Message-ID: <20161216105634.235457-1-arnd@arndb.de>
+Subject: [PATCH 12/13] KVM: arm: avoid binary number literals for gcc-4.2
+Date: Fri, 16 Dec 2016 11:56:33 +0100
+Message-ID: <20161216105634.235457-13-arnd@arndb.de>
+References: <20161216105634.235457-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84F42405D2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A6E5407EF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CNWG0hJXF9cv for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Dec 2016 05:55:39 -0500 (EST)
+ with ESMTP id BLEAnJMaSEi5 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Dec 2016 05:55:41 -0500 (EST)
 Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2505B4044B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C266406F1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:41 -0500 (EST)
+In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,103 +31,30 @@ To: linux-arch@vger.kernel.org
 Cc: Arnd Bergmann <arnd@arndb.de>, kernel-build-reports@lists.linaro.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-I had some fun doing build testing with older gcc versions, building
-every release from 4.0 through 7.0 and running that on my randconfig
-setup to see what comes out.
+Old gcc versions prior to 4.3 don't understand the 0b... syntax for
+numbers, and this seems to be the only instance in the kernel, so better
+use hexadecimal instead.
 
-First of all, gcc-4.9 and higher is basically warning-free everywhere,
-although gcc-7 introduces some interesting new warnings (I have started
-doing patches for those as well). gcc-4.8 is probably good, too, and
-gcc-4.6 and 4.7 at least don't produce build failures in general, though
-the level of false-positive warnings increases (we could decide to turn
-those off for older compilers for build test purposes).
+arch/arm/include/asm/kvm_mmu.h:127:38: error: invalid suffix "b101" on integer constant
 
-In gcc-4.5 and below, dead code elimination is not as good as later,
-causing a couple of link errors, and some of them have no good workaround
-(see patch 1). It would be nice to declare that version too old, but
-several older distros that are still in wide use ship with compilers
-earlier than 4.6:
+Fixes: 159793001d7d ("ARM: KVM: force cache clean on page fault when caches are off")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ arch/arm/include/asm/kvm_mmu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- RHEL6:		gcc-4.4
- Debian 6:	gcc-4.4
- Ubuntu 10.04:	gcc-4.4
- SLES11:	gcc-4.3
-
-With gcc-4.3, we need a couple of workaround patches beyond the problem
-mentioned above, more configuration options are unavailable and we get
-a significant number of false-positive warnings, but it's not much worse
-than gcc-4.5 otherwise.
-
-These are the options I had to disable to get gcc-4.3 randconfig builds
-working:
-
- CONFIG_HAVE_GCC_PLUGINS
- CONFIG_CC_STACKPROTECTOR_STRONG
- CONFIG_ARM_SINGLE_ARMV7M
- CONFIG_THUMB2_KERNEL
- CONFIG_KERNEL_MODE_NEON
- CONFIG_VDSO
- CONFIG_FUNCTION_TRACER (with CONFIG_FRAME_POINTER=n)
-
-I have not checked in detail which version is required for
-each of the above.
-
-Specifically on ARM, going further makes things rather useless especially
-for build testing: with gcc-4.2, we lose support for ARMv7, EABI, and
-effectively ARMv6 (as it relies on EABI for building reliably). Also,
-the number of false-positive build warnings is so high that it is useless
-for finding actual bugs from the warnings.
-
-See the replies to this mail for 13 patches I needed to work around
-issues for each of the releases before 4.6. I have also submitted
-some separate patches for issues that I considered actual bugs
-uncovered by the older compilers and that should be applied regardless.
-
-The original gcc-4.3 release was in early 2008. If we decide to still
-support that, we probably want the first 10 quirks in this series,
-while gcc-4.6 (released in 2011) requires none of them.
-
-	Arnd
-
-Arnd Bergmann (13):
-  [HACK] gcc-4.5: avoid  link errors for unused function pointers
-  KVM: arm: fix gcc-4.5 build
-  ARM: div64: fix building with gcc-4.5 and lower
-  vfio-pci: use 32-bit comparisons for register address for gcc-4.5
-  clk: pxa: fix gcc-4.4 build
-  ARM: atomic: fix gcc-4.4 build
-  watchdog: kempld: fix gcc-4.3 build
-  arm/arm64: xen: avoid gcc-4.4 warning
-  ARM: mark cmpxchg and xchg __always_inline for gcc-4.3
-  asm-generic: mark cmpxchg as __always_inline for gcc-4.3
-  fs: fix unsigned enum warning with gcc-4.2
-  KVM: arm: avoid binary number literals for gcc-4.2
-  ARM: avoid 'Q' asm constraint for gcc-4.1 and earlier
-
- arch/arm/include/asm/atomic.h        | 10 ++++++++--
- arch/arm/include/asm/cmpxchg.h       | 12 ++++++------
- arch/arm/include/asm/div64.h         | 17 +++--------------
- arch/arm/include/asm/io.h            |  8 ++++++++
- arch/arm/include/asm/kvm_mmu.h       |  2 +-
- arch/arm/include/asm/percpu.h        |  5 ++++-
- arch/arm/mach-imx/pm-imx5.c          | 20 ++++++++++++++++----
- arch/arm/mach-sa1100/pm.c            |  2 ++
- arch/arm/plat-samsung/pm.c           |  4 ++++
- drivers/clk/pxa/clk-pxa.c            |  3 +--
- drivers/dma/ti-dma-crossbar.c        |  4 ++++
- drivers/firmware/psci_checker.c      |  3 +++
- drivers/iio/adc/exynos_adc.c         |  3 +++
- drivers/net/ethernet/via/via-rhine.c |  6 ++++++
- drivers/vfio/pci/vfio_pci_rdwr.c     |  5 ++++-
- drivers/watchdog/kempld_wdt.c        |  9 ++++++++-
- include/asm-generic/cmpxchg-local.h  |  7 ++++---
- include/linux/fs.h                   |  2 +-
- include/xen/arm/page.h               |  1 +
- virt/kvm/arm/vgic/vgic-its.c         |  4 ++--
- virt/kvm/arm/vgic/vgic-mmio-v3.c     |  8 ++++----
- virt/kvm/arm/vgic/vgic-mmio.c        | 16 ++++++++--------
- virt/kvm/arm/vgic/vgic-mmio.h        | 12 ++++++------
- 23 files changed, 107 insertions(+), 56 deletions(-)
-
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 74a44727f8e1..61121300174f 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -124,7 +124,7 @@ struct kvm;
+ 
+ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+ {
+-	return (vcpu_cp15(vcpu, c1_SCTLR) & 0b101) == 0b101;
++	return (vcpu_cp15(vcpu, c1_SCTLR) & 0x5) == 0x5;
+ }
+ 
+ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
 -- 
 2.9.0
