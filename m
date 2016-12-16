@@ -1,61 +1,35 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Date: Fri, 16 Dec 2016 16:54:33 +0100
-Message-ID: <CAMuHMdUa4j8nxrW=fSJQZok3=mW-FWZWHR=cYS2R0gQUeGHgmQ@mail.gmail.com>
+Date: Fri, 16 Dec 2016 18:00:43 +0100
+Message-ID: <20161216170043.taaanbg5objnxjlh@breakpoint.cc>
 References: <20161216105634.235457-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88C0440457
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 10:53:24 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id b927tlePYTSF for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Dec 2016 10:53:23 -0500 (EST)
-Received: from mail-io0-f195.google.com (mail-io0-f195.google.com
- [209.85.223.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F71E40455
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 10:53:23 -0500 (EST)
-Received: by mail-io0-f195.google.com with SMTP id p13so12351163ioi.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 07:54:34 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
 In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-arch-owner@vger.kernel.org
 To: Arnd Bergmann <arnd@arndb.de>
-Cc: Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, kernel-build-reports@lists.linaro.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@vger.kernel.org
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu, Geert Uytterhoeven <geert@linux-m68k.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Arnd,
+On 2016-12-16 11:56:21 [+0100], Arnd Bergmann wrote:
+> The original gcc-4.3 release was in early 2008. If we decide to still
+> support that, we probably want the first 10 quirks in this series,
+> while gcc-4.6 (released in 2011) requires none of them.
 
-On Fri, Dec 16, 2016 at 11:56 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> Specifically on ARM, going further makes things rather useless especially
-> for build testing: with gcc-4.2, we lose support for ARMv7, EABI, and
-> effectively ARMv6 (as it relies on EABI for building reliably). Also,
-> the number of false-positive build warnings is so high that it is useless
-> for finding actual bugs from the warnings.
+It this min gcc thingy ARM only?
+The current minimium (documented) is gcc v3.2. With the -fno-PIE patches
+I was going to raise the bar to at least v3.4 but did not get around to
+it yet. hpa said that everything < 3.4 is broken on x86 [0].
+Gert is getting code compiled on gcc v4.1 not sure if it is some kind of
+gcc limitation or just for fun.
+Unless people are stuck with some enterprise distro I don't see a reason
+why one should not try a gcc-4.6 which is 5 years old. I had problems to
+verify that the current kernel compiles with gcc v3.2 on x86 (it did
+with a bunch of warnings with gcc 3.4 and booted).
 
-If you start with that activity now, there's indeed a massive amount of
-warnings to look into.
-However, I've been build testing various configs with m68k-linux-gnu-gcc-4.1.2
-and looking at the compiler warnings for years, so I only have to look
-at new warnings.
+[0] https://lkml.kernel.org/r/63c356a8-58a3-bc7e-88db-5c8071db15e1@zytor.com
+> 	Arnd
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Sebastian
