@@ -1,30 +1,23 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH 1/2] ARM: hyp-stub: improve ABI
-Date: Thu, 15 Dec 2016 18:57:18 +0000
-Message-ID: <20161215185717.GM14217@n2100.armlinux.org.uk>
-References: <20161213113044.GC19985@leverpostej>
- <E1cH74w-0003ke-Qp@rmk-PC.armlinux.org.uk>
- <72f93940-cf87-fd91-90f2-760b7ff050fb@arm.com>
- <20161215113539.GK14217@n2100.armlinux.org.uk>
- <06fca797-da5d-f7f2-eecb-9b1b33b7e83f@arm.com>
- <20161215151548.GL14217@n2100.armlinux.org.uk>
- <c21d6514-44a2-ba88-0fe5-d14d5897cc48@arm.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 02/13] KVM: arm: fix gcc-4.5 build
+Date: Fri, 16 Dec 2016 11:56:23 +0100
+Message-ID: <20161216105634.235457-3-arnd@arndb.de>
+References: <20161216105634.235457-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA3364041B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2016 13:56:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 758B7405E2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jXW5k8gyXlBG for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Dec 2016 13:56:17 -0500 (EST)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 119FD4019C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2016 13:56:16 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <c21d6514-44a2-ba88-0fe5-d14d5897cc48@arm.com>
+ with ESMTP id 73mynTeqi8mR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Dec 2016 05:55:39 -0500 (EST)
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 264C740457
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:39 -0500 (EST)
+In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,89 +27,157 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, dave.martin@arm.com, kvmarm@lists.cs.columbia.edu
+To: linux-arch@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, kernel-build-reports@lists.linaro.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Dec 15, 2016 at 03:37:15PM +0000, Marc Zyngier wrote:
-> On 15/12/16 15:15, Russell King - ARM Linux wrote:
-> > On Thu, Dec 15, 2016 at 11:46:41AM +0000, Marc Zyngier wrote:
-> >> On 15/12/16 11:35, Russell King - ARM Linux wrote:
-> >>> On Thu, Dec 15, 2016 at 11:18:48AM +0000, Marc Zyngier wrote:
-> >>>> On 14/12/16 10:46, Russell King wrote:
-> >>>>> @@ -231,10 +244,14 @@ ENDPROC(__hyp_stub_do_trap)
-> >>>>>   * initialisation entry point.
-> >>>>>   */
-> >>>>>  ENTRY(__hyp_get_vectors)
-> >>>>> -	mov	r0, #-1
-> >>>>> +	mov	r0, #HVC_GET_VECTORS
-> >>>>
-> >>>> This breaks the KVM implementation of __hyp_get_vectors, easily fixed
-> >>>> with the following patchlet:
-> >>>
-> >>> Right, so what Mark said is wrong:
-> >>>
-> >>> "The hyp-stub is part of the kernel image, and the API is private to
-> >>>  that particular image, so we can change things -- there's no ABI to
-> >>>  worry about."
-> >>
-> >> I think Mark is right. The API *is* private to the kernel, and KVM being
-> >> the only in-kernel hypervisor on ARM, this is not an ABI.
-> > 
-> > Again, that's wrong.
-> > 
-> > We have two hypervisors in the kernel.  One is KVM, the other is the
-> > stub.  Sure, the stub isn't a full implementation of a hypervisor, but
-> > it is nevertheless, for the purposes of _this_ discussion, a hypervisor
-> > of sorts.
-> > 
-> > The reason that both are included is because they both appear to share
-> > a common interface (although that's totally not documented anywhere.)
-> 
-> And this interface exists for the sole purpose of enabling KVM. Call it
-> a hypervisor if you wish, but its usefulness is doubtful on its own.
-> 
-> >>> So no, I'm going with my original patch (which TI has tested) which is
-> >>> the minimal change, and if we _then_ want to rework the HYP mode
-> >>> interfaces, that's the time to do the other changes when more people
-> >>> (such as KVM folk) are paying attention and we can come to a cross-
-> >>> hypervisor agreement on what the interface should be.
-> >>
-> >> Given that there is a single in-kernel hypervisor, I can't really see
-> >> who we're going to agree anything with...
-> > 
-> > As far as I can see, the hyp-stub falls under ARM arch maintanence.
-> > KVM falls under KVM people.  Two different groups, we need agreement
-> > between them what a sane API for both "hypervisors" should be.
-> 
-> Well, I though we had the right level of discussion by reviewing your
-> patches and coming up with improvements. If you're after something else,
-> please let me know.
+Old gcc versions cannot used named initializers for anonymous
+unions, leading to a build failure here. This replaces the anonymous
+union with a named one, which allows us to build with at least gcc-4.3
+through 4.5. Versions 4.6 and higher are fine without this.
 
-What I'm after is a meaningful discussion between ARM arch maintainers
-and KVM maintainers - so far all I see are people on the ARM side of
-things.
+virt/kvm/arm/vgic/vgic-mmio-v2.c:295: error: unknown field 'read' specified in initializer
+virt/kvm/arm/vgic/vgic-mmio-v2.c:295: warning: missing braces around initializer
+virt/kvm/arm/vgic/vgic-mmio-v2.c:295: warning: (near initialization for 'vgic_v2_dist_registers[0].<anonymous>')
+virt/kvm/arm/vgic/vgic-mmio-v2.c:295: error: unknown field 'write' specified in initializer
+virt/kvm/arm/vgic/vgic-mmio-v2.c:298: error: unknown field 'read' specified in initializer
 
-I've also yet to have any response on some of the KVM questions I raised
-earlier in this thread - again, silence from KVM people.
+Fixes: 59c5ab40989a ("KVM: arm64: vgic-its: Introduce ITS emulation file with MMIO framework")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ virt/kvm/arm/vgic/vgic-its.c     |  4 ++--
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |  8 ++++----
+ virt/kvm/arm/vgic/vgic-mmio.c    | 16 ++++++++--------
+ virt/kvm/arm/vgic/vgic-mmio.h    | 12 ++++++------
+ 4 files changed, 20 insertions(+), 20 deletions(-)
 
-What's also coming clear is that there's very few people who understand
-all the interactions here, and the whole thing seems to be an undocumented
-mess.  Something needs to change there - people need to stop shovelling
-half baked crap into the kernel.  KVM have the privilege of being able to
-push ARM stuff directly, I now see that was a very big mistake.
-
-So, I want KVM further changes to come through my tree once this merge
-window is over - and I want to see some documentation about how things
-hang together, because hardly anyone understands it right now, and that's
-_really_ bad.
-
-Let's start with some documentation on the KVM hypervisor interfaces on
-32-bit ARM.  Documentation/virtual/kvm/hypercalls.txt already contains
-some for x86, s390 and PPC, so that would be a good place to document
-the ARM side.  Arguably, that should have already been done.
-
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 8c2b3cdcb2c5..922d820e2646 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1292,8 +1292,8 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+ 	.reg_offset = off,					\
+ 	.len = length,						\
+ 	.access_flags = acc,					\
+-	.its_read = rd,						\
+-	.its_write = wr,					\
++	.r.its_read = rd,						\
++	.w.its_write = wr,					\
+ }
+ 
+ static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 50f42f0f8c4f..aa31110e4ebd 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -362,15 +362,15 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
+ 		.bits_per_irq = bpi,					\
+ 		.len = (bpi * VGIC_NR_PRIVATE_IRQS) / 8,		\
+ 		.access_flags = acc,					\
+-		.read = vgic_mmio_read_raz,				\
+-		.write = vgic_mmio_write_wi,				\
++		.r.read = vgic_mmio_read_raz,				\
++		.w.write = vgic_mmio_write_wi,				\
+ 	}, {								\
+ 		.reg_offset = off + (bpi * VGIC_NR_PRIVATE_IRQS) / 8,	\
+ 		.bits_per_irq = bpi,					\
+ 		.len = (bpi * (1024 - VGIC_NR_PRIVATE_IRQS)) / 8,	\
+ 		.access_flags = acc,					\
+-		.read = rd,						\
+-		.write = wr,						\
++		.r.read = rd,						\
++		.w.write = wr,						\
+ 	}
+ 
+ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index ebe1b9fa3c4d..6690922bc6b0 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -500,16 +500,16 @@ static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
+ 
+ 	switch (iodev->iodev_type) {
+ 	case IODEV_CPUIF:
+-		data = region->read(vcpu, addr, len);
++		data = region->r.read(vcpu, addr, len);
+ 		break;
+ 	case IODEV_DIST:
+-		data = region->read(vcpu, addr, len);
++		data = region->r.read(vcpu, addr, len);
+ 		break;
+ 	case IODEV_REDIST:
+-		data = region->read(iodev->redist_vcpu, addr, len);
++		data = region->r.read(iodev->redist_vcpu, addr, len);
+ 		break;
+ 	case IODEV_ITS:
+-		data = region->its_read(vcpu->kvm, iodev->its, addr, len);
++		data = region->r.its_read(vcpu->kvm, iodev->its, addr, len);
+ 		break;
+ 	}
+ 
+@@ -531,16 +531,16 @@ static int dispatch_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
+ 
+ 	switch (iodev->iodev_type) {
+ 	case IODEV_CPUIF:
+-		region->write(vcpu, addr, len, data);
++		region->w.write(vcpu, addr, len, data);
+ 		break;
+ 	case IODEV_DIST:
+-		region->write(vcpu, addr, len, data);
++		region->w.write(vcpu, addr, len, data);
+ 		break;
+ 	case IODEV_REDIST:
+-		region->write(iodev->redist_vcpu, addr, len, data);
++		region->w.write(iodev->redist_vcpu, addr, len, data);
+ 		break;
+ 	case IODEV_ITS:
+-		region->its_write(vcpu->kvm, iodev->its, addr, len, data);
++		region->w.its_write(vcpu->kvm, iodev->its, addr, len, data);
+ 		break;
+ 	}
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 84961b4e4422..7f7da7239612 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -26,14 +26,14 @@ struct vgic_register_region {
+ 				      unsigned int len);
+ 		unsigned long (*its_read)(struct kvm *kvm, struct vgic_its *its,
+ 					  gpa_t addr, unsigned int len);
+-	};
++	} r;
+ 	union {
+ 		void (*write)(struct kvm_vcpu *vcpu, gpa_t addr,
+ 			      unsigned int len, unsigned long val);
+ 		void (*its_write)(struct kvm *kvm, struct vgic_its *its,
+ 				  gpa_t addr, unsigned int len,
+ 				  unsigned long val);
+-	};
++	} w;
+ };
+ 
+ extern struct kvm_io_device_ops kvm_io_gic_ops;
+@@ -72,8 +72,8 @@ extern struct kvm_io_device_ops kvm_io_gic_ops;
+ 		.bits_per_irq = bpi,					\
+ 		.len = bpi * 1024 / 8,					\
+ 		.access_flags = acc,					\
+-		.read = rd,						\
+-		.write = wr,						\
++		.r.read = rd,						\
++		.w.write = wr,						\
+ 	}
+ 
+ #define REGISTER_DESC_WITH_LENGTH(off, rd, wr, length, acc)		\
+@@ -82,8 +82,8 @@ extern struct kvm_io_device_ops kvm_io_gic_ops;
+ 		.bits_per_irq = 0,					\
+ 		.len = length,						\
+ 		.access_flags = acc,					\
+-		.read = rd,						\
+-		.write = wr,						\
++		.r.read = rd,						\
++		.w.write = wr,						\
+ 	}
+ 
+ int kvm_vgic_register_mmio_region(struct kvm *kvm, struct kvm_vcpu *vcpu,
 -- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+2.9.0
