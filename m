@@ -1,78 +1,57 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v10 7/8] arm/arm64: vgic: Implement
- KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO ioctl
-Date: Fri, 16 Dec 2016 12:44:18 +0000
-Message-ID: <CAFEAcA-Ev4_949mRvagAa0wtMnUZBuQmMssWsMs3JPTBw_FviQ@mail.gmail.com>
-References: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
- <1480576187-5012-8-git-send-email-vijay.kilari@gmail.com>
- <4272e489-7aa4-b77d-ec09-22b58af78336@redhat.com>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH 04/13] vfio-pci: use 32-bit comparisons for register
+ address for gcc-4.5
+Date: Fri, 16 Dec 2016 08:30:56 -0700
+Message-ID: <20161216083056.33ea0fa9@t450s.home>
+References: <20161216105634.235457-1-arnd@arndb.de>
+        <20161216105634.235457-5-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7211D402AF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 07:43:30 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VKMXaG9-8qK8 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Dec 2016 07:43:29 -0500 (EST)
-Received: from mail-ua0-f180.google.com (mail-ua0-f180.google.com
- [209.85.217.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 505BD4028D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 07:43:28 -0500 (EST)
-Received: by mail-ua0-f180.google.com with SMTP id 12so36874589uas.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 04:44:40 -0800 (PST)
-In-Reply-To: <4272e489-7aa4-b77d-ec09-22b58af78336@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <20161216105634.235457-5-arnd@arndb.de>
+Sender: linux-arch-owner@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16 December 2016 at 12:07, Auger Eric <eric.auger@redhat.com> wrote:
-> Hi Vijaya,
->
-> On 01/12/2016 08:09, vijay.kilari@gmail.com wrote:
->> +void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
->> +                                 const u64 val)
->> +{
->> +     int i;
->> +
->> +     for (i = 0; i < 32; i++) {
->> +             struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->> +
-> same as above.
->> +             spin_lock(&irq->irq_lock);
->> +             if (val & (1U << i)) {
->> +                     if (irq->config == VGIC_CONFIG_LEVEL) {
->> +                             irq->line_level = true;
->> +                             irq->pending = true;
->> +                             vgic_queue_irq_unlock(vcpu->kvm, irq);
->> +                     } else {
->> +                             spin_unlock(&irq->irq_lock);
->> +                     }
->> +             } else {
->> +                     if (irq->config == VGIC_CONFIG_EDGE ||
-> can't we just ignore VGIC_CONFIG_EDGE case for which line_level is not
-> modeled?
->> +                         (irq->config == VGIC_CONFIG_LEVEL &&
->> +                         !irq->soft_pending))
->> +                             irq->line_level = false;
-> To me the line level does not depend on the soft_pending bit. The
-> pending state depends on both.
+On Fri, 16 Dec 2016 11:56:25 +0100
+Arnd Bergmann <arnd@arndb.de> wrote:
 
-Without having looked at the details, it seems surprising to
-me that the implementation of "set line level to X" is not
-"set irq->line_level to X; figure out consequences and update
-other state as necessary"...
+> Using ancient compilers (gcc-4.5 or older) on ARM, we get a link
+> failure with the vfio-pci driver:
+> 
+> ERROR: "__aeabi_lcmp" [drivers/vfio/pci/vfio-pci.ko] undefined!
+> 
+> The reason is that the compiler tries to do a comparison of
+> a 64-bit range. This changes it to convert to a 32-bit number
+> explicitly first, as newer compilers do for themselves.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/vfio/pci/vfio_pci_rdwr.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+> index 5ffd1d9ad4bd..357243d76f10 100644
+> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
+> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+> @@ -193,7 +193,10 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+>  	if (!vdev->has_vga)
+>  		return -EINVAL;
+>  
+> -	switch (pos) {
+> +	if (pos > 0xbfffful)
+> +		return -EINVAL;
+> +
+> +	switch ((u32)pos) {
+>  	case 0xa0000 ... 0xbffff:
+>  		count = min(count, (size_t)(0xc0000 - pos));
+>  		iomem = ioremap_nocache(0xa0000, 0xbffff - 0xa0000 + 1);
 
-thanks
--- PMM
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+
+Would you like me to pull this one patch in through the vfio tree?
+Thanks,
+
+Alex
