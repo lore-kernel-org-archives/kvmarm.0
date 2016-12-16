@@ -1,23 +1,25 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Date: Fri, 16 Dec 2016 12:14:45 +0100
-Message-ID: <3302470.IDcDrWa0u6@wuerfel>
-References: <20161216105634.235457-1-arnd@arndb.de>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v10 7/8] arm/arm64: vgic: Implement
+ KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO ioctl
+Date: Fri, 16 Dec 2016 13:07:21 +0100
+Message-ID: <4272e489-7aa4-b77d-ec09-22b58af78336@redhat.com>
+References: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
+ <1480576187-5012-8-git-send-email-vijay.kilari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C821F404BA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 06:13:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAF6540428
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 07:06:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9UnpHLuIJGdb for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Dec 2016 06:13:40 -0500 (EST)
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7B336401F2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 06:13:40 -0500 (EST)
-In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
+ with ESMTP id AKGbeMQc99G1 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Dec 2016 07:06:15 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 372BE40354
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 07:06:15 -0500 (EST)
+In-Reply-To: <1480576187-5012-8-git-send-email-vijay.kilari@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,111 +29,258 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arch@vger.kernel.org
-Cc: kernel-build-reports@lists.linaro.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: vijay.kilari@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, peter.maydell@linaro.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[Fixed linux-arm-kernel mailing list address, sorry for the duplicate,
- I'm not reposting all the ugly patches though, unless someone really
- wants them, https://lkml.org/lkml/2016/12/16/174 has a copy]
+Hi Vijaya,
 
-On Friday, December 16, 2016 11:56:21 AM CET Arnd Bergmann wrote:
-> I had some fun doing build testing with older gcc versions, building
-> every release from 4.0 through 7.0 and running that on my randconfig
-> setup to see what comes out.
+On 01/12/2016 08:09, vijay.kilari@gmail.com wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 > 
-> First of all, gcc-4.9 and higher is basically warning-free everywhere,
-> although gcc-7 introduces some interesting new warnings (I have started
-> doing patches for those as well). gcc-4.8 is probably good, too, and
-> gcc-4.6 and 4.7 at least don't produce build failures in general, though
-> the level of false-positive warnings increases (we could decide to turn
-> those off for older compilers for build test purposes).
+> Userspace requires to store and restore of line_level for
+> level triggered interrupts using ioctl KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO.
 > 
-> In gcc-4.5 and below, dead code elimination is not as good as later,
-> causing a couple of link errors, and some of them have no good workaround
-> (see patch 1). It would be nice to declare that version too old, but
-> several older distros that are still in wide use ship with compilers
-> earlier than 4.6:
+> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> ---
+>  arch/arm/include/uapi/asm/kvm.h     |  7 ++++++
+>  arch/arm64/include/uapi/asm/kvm.h   |  6 +++++
+>  virt/kvm/arm/vgic/vgic-kvm-device.c | 45 +++++++++++++++++++++++++++++++++++-
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c    | 11 +++++++++
+>  virt/kvm/arm/vgic/vgic-mmio.c       | 46 +++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic-mmio.h       |  5 ++++
+>  virt/kvm/arm/vgic/vgic.h            |  2 ++
+>  7 files changed, 121 insertions(+), 1 deletion(-)
 > 
->  RHEL6:		gcc-4.4
->  Debian 6:	gcc-4.4
->  Ubuntu 10.04:	gcc-4.4
->  SLES11:	gcc-4.3
-> 
-> With gcc-4.3, we need a couple of workaround patches beyond the problem
-> mentioned above, more configuration options are unavailable and we get
-> a significant number of false-positive warnings, but it's not much worse
-> than gcc-4.5 otherwise.
-> 
-> These are the options I had to disable to get gcc-4.3 randconfig builds
-> working:
-> 
->  CONFIG_HAVE_GCC_PLUGINS
->  CONFIG_CC_STACKPROTECTOR_STRONG
->  CONFIG_ARM_SINGLE_ARMV7M
->  CONFIG_THUMB2_KERNEL
->  CONFIG_KERNEL_MODE_NEON
->  CONFIG_VDSO
->  CONFIG_FUNCTION_TRACER (with CONFIG_FRAME_POINTER=n)
-> 
-> I have not checked in detail which version is required for
-> each of the above.
-> 
-> Specifically on ARM, going further makes things rather useless especially
-> for build testing: with gcc-4.2, we lose support for ARMv7, EABI, and
-> effectively ARMv6 (as it relies on EABI for building reliably). Also,
-> the number of false-positive build warnings is so high that it is useless
-> for finding actual bugs from the warnings.
-> 
-> See the replies to this mail for 13 patches I needed to work around
-> issues for each of the releases before 4.6. I have also submitted
-> some separate patches for issues that I considered actual bugs
-> uncovered by the older compilers and that should be applied regardless.
-> 
-> The original gcc-4.3 release was in early 2008. If we decide to still
-> support that, we probably want the first 10 quirks in this series,
-> while gcc-4.6 (released in 2011) requires none of them.
-> 
-> 	Arnd
-> 
-> Arnd Bergmann (13):
->   [HACK] gcc-4.5: avoid  link errors for unused function pointers
->   KVM: arm: fix gcc-4.5 build
->   ARM: div64: fix building with gcc-4.5 and lower
->   vfio-pci: use 32-bit comparisons for register address for gcc-4.5
->   clk: pxa: fix gcc-4.4 build
->   ARM: atomic: fix gcc-4.4 build
->   watchdog: kempld: fix gcc-4.3 build
->   arm/arm64: xen: avoid gcc-4.4 warning
->   ARM: mark cmpxchg and xchg __always_inline for gcc-4.3
->   asm-generic: mark cmpxchg as __always_inline for gcc-4.3
->   fs: fix unsigned enum warning with gcc-4.2
->   KVM: arm: avoid binary number literals for gcc-4.2
->   ARM: avoid 'Q' asm constraint for gcc-4.1 and earlier
-> 
->  arch/arm/include/asm/atomic.h        | 10 ++++++++--
->  arch/arm/include/asm/cmpxchg.h       | 12 ++++++------
->  arch/arm/include/asm/div64.h         | 17 +++--------------
->  arch/arm/include/asm/io.h            |  8 ++++++++
->  arch/arm/include/asm/kvm_mmu.h       |  2 +-
->  arch/arm/include/asm/percpu.h        |  5 ++++-
->  arch/arm/mach-imx/pm-imx5.c          | 20 ++++++++++++++++----
->  arch/arm/mach-sa1100/pm.c            |  2 ++
->  arch/arm/plat-samsung/pm.c           |  4 ++++
->  drivers/clk/pxa/clk-pxa.c            |  3 +--
->  drivers/dma/ti-dma-crossbar.c        |  4 ++++
->  drivers/firmware/psci_checker.c      |  3 +++
->  drivers/iio/adc/exynos_adc.c         |  3 +++
->  drivers/net/ethernet/via/via-rhine.c |  6 ++++++
->  drivers/vfio/pci/vfio_pci_rdwr.c     |  5 ++++-
->  drivers/watchdog/kempld_wdt.c        |  9 ++++++++-
->  include/asm-generic/cmpxchg-local.h  |  7 ++++---
->  include/linux/fs.h                   |  2 +-
->  include/xen/arm/page.h               |  1 +
->  virt/kvm/arm/vgic/vgic-its.c         |  4 ++--
->  virt/kvm/arm/vgic/vgic-mmio-v3.c     |  8 ++++----
->  virt/kvm/arm/vgic/vgic-mmio.c        | 16 ++++++++--------
->  virt/kvm/arm/vgic/vgic-mmio.h        | 12 ++++++------
->  23 files changed, 107 insertions(+), 56 deletions(-)
-> 
+> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> index 98658d9d..f347779 100644
+> --- a/arch/arm/include/uapi/asm/kvm.h
+> +++ b/arch/arm/include/uapi/asm/kvm.h
+> @@ -191,6 +191,13 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_GRP_CTRL       4
+>  #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
+>  #define KVM_DEV_ARM_VGIC_CPU_SYSREGS    6
+> +#define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO 7
+> +#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+> +#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+> +			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+> +#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK	0x3ff
+> +#define VGIC_LEVEL_INFO_LINE_LEVEL	0
+> +
+>  #define   KVM_DEV_ARM_VGIC_CTRL_INIT    0
+>  
+>  /* KVM_IRQ_LINE irq field index values */
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 91c7137..4100f8c 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -211,6 +211,12 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
+>  #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
+>  #define KVM_DEV_ARM_VGIC_CPU_SYSREGS    6
+> +#define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO 7
+> +#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+> +#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+> +			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+> +#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK	0x3ff
+> +#define VGIC_LEVEL_INFO_LINE_LEVEL	0
+>  
+>  #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
+>  
+> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> index b6266fe..d5f7197 100644
+> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> @@ -510,6 +510,21 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+>  						  regid, reg);
+>  		break;
+>  	}
+> +	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+> +		unsigned int info, intid;
+> +
+> +		info = (attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
+> +			KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT;
+> +		if (info == VGIC_LEVEL_INFO_LINE_LEVEL) {
+> +			intid = attr->attr &
+> +				KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK;
+> +			ret = vgic_v3_line_level_info_uaccess(vcpu, is_write,
+> +							      intid, reg);
+> +		} else {
+> +			ret = -EINVAL;
+> +		}
+> +		break;
+> +	}
+>  	default:
+>  		ret = -EINVAL;
+>  		break;
+> @@ -552,6 +567,17 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+>  
+>  		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+>  	}
+> +	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+> +		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> +		u64 reg;
+> +		u32 tmp32;
+> +
+> +		if (get_user(tmp32, uaddr))
+> +			return -EFAULT;
+> +
+> +		reg = tmp32;
+> +		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+> +	}
+>  	}
+>  	return -ENXIO;
+>  }
+> @@ -587,8 +613,18 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
+>  			return ret;
+>  		return put_user(reg, uaddr);
+>  	}
+> -	}
+> +	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+> +		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> +		u64 reg;
+> +		u32 tmp32;
+>  
+> +		ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
+> +		if (ret)
+> +			return ret;
+> +		tmp32 = reg;
+> +		return put_user(tmp32, uaddr);
+> +	}
+> +	}
+>  	return -ENXIO;
+>  }
+>  
+> @@ -609,6 +645,13 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+>  		return vgic_v3_has_attr_regs(dev, attr);
+>  	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+>  		return 0;
+> +	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+> +		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
+> +		      KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT) ==
+> +		      VGIC_LEVEL_INFO_LINE_LEVEL)
+> +			return 0;
+> +		break;
+> +	}
+>  	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+>  		switch (attr->attr) {
+>  		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index 51439c9..9491d72 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -809,3 +809,14 @@ int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>  		return vgic_uaccess(vcpu, &rd_dev, is_write,
+>  				    offset, val);
+>  }
+> +
+> +int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+> +				    u32 intid, u64 *val)
+> +{
+I don't see anyone checking vINTID is multiple of 32 as emphasized in
+Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> +	if (is_write)
+> +		vgic_write_irq_line_level_info(vcpu, intid, *val);
+> +	else
+> +		*val = vgic_read_irq_line_level_info(vcpu, intid);
+> +
+> +	return 0;
+> +}
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index f81e0e5..28fef92b 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -371,6 +371,52 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> +u64 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
+> +{
+> +	int i;
+> +	u64 val = 0;
+> +
+> +	for (i = 0; i < 32; i++) {
+> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> +
+> +		if (irq->line_level)
+> +			val |= (1U << i);
+what about SGIs and higher ID than the number of interrupts supported.
+Spec says RAZ/WI.
+> +
+> +		vgic_put_irq(vcpu->kvm, irq);
+> +	}
+> +
+> +	return val;
+> +}
+> +
+> +void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
+> +				    const u64 val)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < 32; i++) {
+> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> +
+same as above.
+> +		spin_lock(&irq->irq_lock);
+> +		if (val & (1U << i)) {
+> +			if (irq->config == VGIC_CONFIG_LEVEL) {
+> +				irq->line_level = true;
+> +				irq->pending = true;
+> +				vgic_queue_irq_unlock(vcpu->kvm, irq);
+> +			} else {
+> +				spin_unlock(&irq->irq_lock);
+> +			}
+> +		} else {
+> +			if (irq->config == VGIC_CONFIG_EDGE ||
+can't we just ignore VGIC_CONFIG_EDGE case for which line_level is not
+modeled?
+> +			    (irq->config == VGIC_CONFIG_LEVEL &&
+> +			    !irq->soft_pending))
+> +				irq->line_level = false;
+To me the line level does not depend on the soft_pending bit. The
+pending state depends on both.
+
+Thanks
+
+Eric
+> +			spin_unlock(&irq->irq_lock);
+> +		}
+> +
+> +		vgic_put_irq(vcpu->kvm, irq);
+> +	}
+> +}
+> +
+>  static int match_region(const void *key, const void *elt)
+>  {
+>  	const unsigned int offset = (unsigned long)key;
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+> index 1cc7faf..b9423b4 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.h
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
+> @@ -181,6 +181,11 @@ int vgic_validate_mmio_region_addr(struct kvm_device *dev,
+>  				   const struct vgic_register_region *regions,
+>  				   int nr_regions, gpa_t addr);
+>  
+> +u64 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid);
+> +
+> +void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
+> +				    const u64 val);
+> +
+>  unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
+>  
+>  unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev);
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index eac272c..60d4350 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -144,6 +144,8 @@ int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>  			 u64 id, u64 *val);
+>  int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+>  				u64 *reg);
+> +int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+> +				    u32 intid, u64 *val);
+>  int kvm_register_vgic_device(unsigned long type);
+>  void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
 > 
