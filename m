@@ -1,21 +1,21 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 06/13] ARM: atomic: fix gcc-4.4 build
-Date: Fri, 16 Dec 2016 11:56:27 +0100
-Message-ID: <20161216105634.235457-7-arnd@arndb.de>
+Subject: [PATCH 07/13] watchdog: kempld: fix gcc-4.3 build
+Date: Fri, 16 Dec 2016 11:56:28 +0100
+Message-ID: <20161216105634.235457-8-arnd@arndb.de>
 References: <20161216105634.235457-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F037405D2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F01E405D6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0gPYrNK6JPfS for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Dec 2016 05:55:39 -0500 (EST)
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D5DA404EF
+ with ESMTP id nD2SCYrW9oBV for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Dec 2016 05:55:40 -0500 (EST)
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4066405E6
  for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:39 -0500 (EST)
 In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -31,45 +31,47 @@ To: linux-arch@vger.kernel.org
 Cc: Arnd Bergmann <arnd@arndb.de>, kernel-build-reports@lists.linaro.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-gcc-4.4 fails to build some files with this constraint, which was
-added to help out with gcc-4.6 and higher:
+gcc-4.3 can't decide whether the constant value in
+kempld_prescaler[PRESCALER_21] is built-time constant or
+not, and gets confused by the logic in do_div():
 
-fs/btrfs/delayed-ref.c: In function 'add_delayed_tree_ref':
-arch/arm/include/asm/atomic.h:280: error: 'asm' operand requires impossible reload
+drivers/watchdog/kempld_wdt.o: In function `kempld_wdt_set_stage_timeout':
+kempld_wdt.c:(.text.kempld_wdt_set_stage_timeout+0x130): undefined reference to `__aeabi_uldivmod'
 
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=44492
+This adds a call to ACCESS_ONCE() to force it to not consider
+it to be constant, and leaves the more efficient normal case
+in place for modern compilers, using an #ifdef to annotate
+why we do this hack.
+
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/arm/include/asm/atomic.h | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ drivers/watchdog/kempld_wdt.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/include/asm/atomic.h b/arch/arm/include/asm/atomic.h
-index 66d0e215a773..65d5b843831a 100644
---- a/arch/arm/include/asm/atomic.h
-+++ b/arch/arm/include/asm/atomic.h
-@@ -280,7 +280,10 @@ static inline long long atomic64_read(const atomic64_t *v)
- 	__asm__ __volatile__("@ atomic64_read\n"
- "	ldrd	%0, %H0, [%1]"
- 	: "=&r" (result)
--	: "r" (&v->counter), "Qo" (v->counter)
-+	: "r" (&v->counter)
-+#if GCC_VERSION >= 40600
-+	, "Qo" (v->counter)
-+#endif
- 	);
+diff --git a/drivers/watchdog/kempld_wdt.c b/drivers/watchdog/kempld_wdt.c
+index 8e302d0e346c..3efa295ac627 100644
+--- a/drivers/watchdog/kempld_wdt.c
++++ b/drivers/watchdog/kempld_wdt.c
+@@ -140,12 +140,19 @@ static int kempld_wdt_set_stage_timeout(struct kempld_wdt_data *wdt_data,
+ 					unsigned int timeout)
+ {
+ 	struct kempld_device_data *pld = wdt_data->pld;
+-	u32 prescaler = kempld_prescaler[PRESCALER_21];
++	u32 prescaler;
+ 	u64 stage_timeout64;
+ 	u32 stage_timeout;
+ 	u32 remainder;
+ 	u8 stage_cfg;
  
- 	return result;
-@@ -302,7 +305,10 @@ static inline long long atomic64_read(const atomic64_t *v)
- 	__asm__ __volatile__("@ atomic64_read\n"
- "	ldrexd	%0, %H0, [%1]"
- 	: "=&r" (result)
--	: "r" (&v->counter), "Qo" (v->counter)
-+	: "r" (&v->counter)
-+#if GCC_VERSION >= 40600
-+	, "Qo" (v->counter)
++#if GCC_VERSION < 40400
++	/* work around a bug compiling do_div() */
++	prescaler = READ_ONCE(kempld_prescaler[PRESCALER_21]);
++#else
++	prescaler = kempld_prescaler[PRESCALER_21];
 +#endif
- 	);
++
+ 	if (!stage)
+ 		return -EINVAL;
  
- 	return result;
 -- 
 2.9.0
