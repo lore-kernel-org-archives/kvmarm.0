@@ -1,22 +1,23 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 11/13] fs: fix unsigned enum warning with gcc-4.2
-Date: Fri, 16 Dec 2016 11:56:32 +0100
-Message-ID: <20161216105634.235457-12-arnd@arndb.de>
+Subject: [PATCH 04/13] vfio-pci: use 32-bit comparisons for register address
+ for gcc-4.5
+Date: Fri, 16 Dec 2016 11:56:25 +0100
+Message-ID: <20161216105634.235457-5-arnd@arndb.de>
 References: <20161216105634.235457-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0100B40797
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14D384078F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A0qbn+EHIxdn for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Dec 2016 05:55:41 -0500 (EST)
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9B9540697
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:40 -0500 (EST)
+ with ESMTP id 9qT1qqAhjwYR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Dec 2016 05:55:40 -0500 (EST)
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D41AD40625
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Dec 2016 05:55:39 -0500 (EST)
 In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,31 +32,35 @@ To: linux-arch@vger.kernel.org
 Cc: Arnd Bergmann <arnd@arndb.de>, kernel-build-reports@lists.linaro.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With arm-linux-gcc-4.2, almost every file we build in the kernel ends
-up with this warning:
+Using ancient compilers (gcc-4.5 or older) on ARM, we get a link
+failure with the vfio-pci driver:
 
-include/linux/fs.h:2648: warning: comparison of unsigned expression < 0 is always false
+ERROR: "__aeabi_lcmp" [drivers/vfio/pci/vfio-pci.ko] undefined!
 
-Later versions don't have this problem, but it's easy enough to
-work around.
+The reason is that the compiler tries to do a comparison of
+a 64-bit range. This changes it to convert to a 32-bit number
+explicitly first, as newer compilers do for themselves.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- include/linux/fs.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/vfio/pci/vfio_pci_rdwr.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 398cf20a706d..782c2a292fd7 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2645,7 +2645,7 @@ static const char * const kernel_read_file_str[] = {
+diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+index 5ffd1d9ad4bd..357243d76f10 100644
+--- a/drivers/vfio/pci/vfio_pci_rdwr.c
++++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+@@ -193,7 +193,10 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+ 	if (!vdev->has_vga)
+ 		return -EINVAL;
  
- static inline const char *kernel_read_file_id_str(enum kernel_read_file_id id)
- {
--	if (id < 0 || id >= READING_MAX_ID)
-+	if ((unsigned)id >= READING_MAX_ID)
- 		return kernel_read_file_str[READING_UNKNOWN];
- 
- 	return kernel_read_file_str[id];
+-	switch (pos) {
++	if (pos > 0xbfffful)
++		return -EINVAL;
++
++	switch ((u32)pos) {
+ 	case 0xa0000 ... 0xbffff:
+ 		count = min(count, (size_t)(0xc0000 - pos));
+ 		iomem = ioremap_nocache(0xa0000, 0xbffff - 0xa0000 + 1);
 -- 
 2.9.0
