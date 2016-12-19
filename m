@@ -1,25 +1,25 @@
 From: Andre Przywara <andre.przywara@arm.com>
 Subject: Re: [PATCH v8 01/16] FDT: introduce global phandle allocation
-Date: Mon, 19 Dec 2016 18:43:29 +0000
-Message-ID: <80430161-b363-4740-0eef-8cb73bc2ecbd@arm.com>
+Date: Mon, 19 Dec 2016 18:43:58 +0000
+Message-ID: <f9d35ab9-57a1-737d-c513-05506cae095b@arm.com>
 References: <20161104173203.21168-1-andre.przywara@arm.com>
  <20161104173203.21168-2-andre.przywara@arm.com>
- <be44a9ad-f820-9a62-9a5d-682867674e91@arm.com>
+ <d1dc4e68-66e1-85d1-f5d1-5743e5172409@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B23340295
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 13:41:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 01A0540295
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 13:41:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id skwmuyjYOu30 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Dec 2016 13:41:17 -0500 (EST)
+ with ESMTP id jIlHXmbtQDxA for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Dec 2016 13:41:46 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FCCA4028D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 13:41:17 -0500 (EST)
-In-Reply-To: <be44a9ad-f820-9a62-9a5d-682867674e91@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 23E4C4028D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 13:41:46 -0500 (EST)
+In-Reply-To: <d1dc4e68-66e1-85d1-f5d1-5743e5172409@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,9 +35,7 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Marc,
 
-On 09/12/16 11:55, Marc Zyngier wrote:
-> Hi Andre,
-> 
+On 09/12/16 12:03, Marc Zyngier wrote:
 > On 04/11/16 17:31, Andre Przywara wrote:
 >> Allocating an FDT phandle (a unique identifier) using a static
 >> variable in a static inline function defined in a header file works
@@ -106,90 +104,13 @@ On 09/12/16 11:55, Marc Zyngier wrote:
 >> +#define FDT_IS_VALID_PHANDLE(phandle) ((phandle) != FDT_INVALID_PHANDLE)
 >> +
 >> +enum phandles {PHANDLE_GIC, PHANDLES_MAX};
->>  
->>  /* Those definitions are generic FDT values for specifying IRQ
->>   * types and are used in the Linux kernel internally as well as in
->> @@ -33,10 +37,6 @@ enum irq_type {
->>  		}							\
->>  	} while (0)
->>  
->> -static inline u32 fdt__alloc_phandle(void)
->> -{
->> -	static u32 phandle = 0;
->> -	return ++phandle;
->> -}
->> +u32 fdt__get_phandle(enum phandles phandle);
->>  
->>  #endif /* KVM__FDT_H */
->> diff --git a/kvm-fdt.c b/kvm-fdt.c
->> new file mode 100644
->> index 0000000..d05f3fe
->> --- /dev/null
->> +++ b/kvm-fdt.c
->> @@ -0,0 +1,26 @@
->> +/*
->> + * Commonly used FDT functions.
->> + */
->> +
->> +#include <stdio.h>
->> +#include "kvm/fdt.h"
->> +#include "kvm/util.h"
->> +
->> +u32 phandles[PHANDLES_MAX] = {};
 > 
-> It is a bit weird that you're initializing this to zero...
-> 
->> +u32 next_phandle = 1;
->> +
->> +u32 fdt__get_phandle(enum phandles phandle)
->> +{
->> +	u32 ret;
->> +
->> +	if (phandle >= PHANDLES_MAX)
->> +		return FDT_INVALID_PHANDLE;
->> +
->> +	ret = phandles[phandle];
->> +	if (ret == FDT_INVALID_PHANDLE) {
-> 
-> and yet test against a #define that isn't the initializer.
+> Another nit here: PHANDLE_GIC is pretty much ARM-specific, while FDT is
+> supposed to be generic. Can't we move the enum to be architecture
+> specific and not put this in an architecture agnostic one?
 
-Well, yes. The problem is that AFAIK you cannot initialize an array
-easily with all the values getting set to something other than zero.
-So I could write
-	u32 phandles[PHANDLES_MAX] = {FDT_INVALID_PHANDLE};
-above, but as that would only set the first member to
-FDT_INVALID_PHANDLE (and all the others to 0), so it would rely on the
-define actually being zero to work reliably. So my thought was to avoid
-readers falling into this trap by not specifying the reset value
-explicitly. Also that's the reason that 0 is the invalid value, which I
-don't like too much, tbh.
-
-So shall I make this a comment then?
-
-Or do I miss something here?
-
-> Also, given that fdt__get_phandle() can now fail by returning
-> FDT_INVALID_HANDLE, maybe we should abort instead of returning something
-> that is definitely wrong and use it blindly (which is going to be fun to
-> debug...).
-
-Yes, good point. Given that this hints at an internal error, die() seems
-to be the appropriate action here.
+Yes, that indeed makes sense.
+This requires an include file for every architecture, but well ...
 
 Cheers,
 Andre.
-
-> 
-> 
->> +		ret = next_phandle++;
->> +		phandles[phandle] = ret;
->> +	}
->> +
->> +	return ret;
->> +}
->>
-> 
-> Thanks,
-> 
-> 	M.
-> 
