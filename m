@@ -1,31 +1,29 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 1/2] ARM: hyp-stub: improve ABI
-Date: Sat, 17 Dec 2016 12:07:11 +0000
-Message-ID: <20161217120707.GA72718@MBP.local>
-References: <20161213113044.GC19985@leverpostej>
- <E1cH74w-0003ke-Qp@rmk-PC.armlinux.org.uk>
- <72f93940-cf87-fd91-90f2-760b7ff050fb@arm.com>
- <20161215113539.GK14217@n2100.armlinux.org.uk>
- <06fca797-da5d-f7f2-eecb-9b1b33b7e83f@arm.com>
- <20161215151548.GL14217@n2100.armlinux.org.uk>
- <c21d6514-44a2-ba88-0fe5-d14d5897cc48@arm.com>
- <20161215185717.GM14217@n2100.armlinux.org.uk>
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Subject: Re: [PATCH v10 6/8] arm/arm64: vgic: Implement VGICv3 CPU interface
+ access
+Date: Mon, 19 Dec 2016 15:17:37 +0530
+Message-ID: <CALicx6spkmp4ipvCA_TUfzaJ0K38tpWHsV9CGU4MEQzTwa00sw@mail.gmail.com>
+References: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
+ <1480576187-5012-7-git-send-email-vijay.kilari@gmail.com>
+ <af6f17a5-f20a-91f7-c280-1669e9b805a4@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 16A95401B9
- for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Dec 2016 07:06:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1035401B9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 04:46:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RgKad1ohnguW for <kvmarm@lists.cs.columbia.edu>;
- Sat, 17 Dec 2016 07:06:03 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9F9740199
- for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Dec 2016 07:06:03 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20161215185717.GM14217@n2100.armlinux.org.uk>
+ with ESMTP id 0ckTq50R00KD for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Dec 2016 04:46:24 -0500 (EST)
+Received: from mail-oi0-f68.google.com (mail-oi0-f68.google.com
+ [209.85.218.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA96C4019C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 04:46:23 -0500 (EST)
+Received: by mail-oi0-f68.google.com with SMTP id u15so18792734oie.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 01:47:38 -0800 (PST)
+In-Reply-To: <af6f17a5-f20a-91f7-c280-1669e9b805a4@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,101 +33,451 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, dave.martin@arm.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Russell,
+On Fri, Dec 16, 2016 at 5:55 PM, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi Vijaya,
+>
+> On 01/12/2016 08:09, vijay.kilari@gmail.com wrote:
+>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>
+>> VGICv3 CPU interface registers are accessed using
+>> KVM_DEV_ARM_VGIC_CPU_SYSREGS ioctl. These registers are accessed
+>> as 64-bit. The cpu MPIDR value is passed along with register id.
+>> is used to identify the cpu for registers access.
+> s/is/It is
+>>
+>> The VM that supports SEIs expect it on destination machine to handle
+>> guest aborts and hence checked for ICC_CTLR_EL1.SEIS compatibility.
+>> Similarly, VM that supports Affinity Level 3 that is required for AArch64
+>> mode, is required to be supported on destination machine. Hence checked
+>> for ICC_CTLR_EL1.A3V compatibility.
+> We make sure ICC_CTLR_EL1 SEIS and A3V are compatible on source and target?
+>>
+>> The arch/arm64/kvm/vgic-sys-reg-v3.c handles read and write of VGIC
+>> CPU registers for AArch64.
+>>
+>> For AArch32 mode, arch/arm/kvm/vgic-v3-coproc.c file is created but
+>> APIs are not implemented.
+>>
+>> Updated arch/arm/include/uapi/asm/kvm.h with new definitions
+>> required to compile for AArch32.
+>>
+>> The version of VGIC v3 specification is define here
+> s/define/defined
+>> Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>>
+>> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+>> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>> ---
+>> --- /dev/null
+>> +++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
+>> @@ -0,0 +1,338 @@
+>> +/*
+>> + * VGIC system registers handling functions for AArch64 mode
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + */
+>> +
+>> +#include <linux/irqchip/arm-gic-v3.h>
+>> +#include <linux/kvm.h>
+>> +#include <linux/kvm_host.h>
+>> +#include <asm/kvm_emulate.h>
+>> +#include "vgic.h"
+>> +#include "sys_regs.h"
+>> +
+>> +static bool access_gic_ctlr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +                         const struct sys_reg_desc *r)
+>> +{
+>> +     u32 host_pri_bits, host_id_bits, host_seis, host_a3v, seis, a3v;
+>> +     struct vgic_cpu *vgic_v3_cpu = &vcpu->arch.vgic_cpu;
+>> +     struct vgic_vmcr vmcr;
+>> +     u64 val;
+>> +
+>> +     vgic_get_vmcr(vcpu, &vmcr);
+>> +     if (p->is_write) {
+>> +             val = p->regval;
+>> +
+>> +             /*
+>> +              * Disallow restoring VM state if not supported by this
+>> +              * hardware.
+>> +              */
+>> +             host_pri_bits = ((val & ICC_CTLR_EL1_PRI_BITS_MASK) >>
+>> +                              ICC_CTLR_EL1_PRI_BITS_SHIFT) + 1;
+> I am confused by the "host" terminology. Those are the "source" values
+> we want to restore and we compare with the destination current value, right?
 
-Just a quick reply expressing my opinion on the ABI and KVM maintenance
-topics. Sorry I won't be able to follow up until the new year as I go on
-holiday soon.
+yes
 
-On Thu, Dec 15, 2016 at 06:57:18PM +0000, Russell King - ARM Linux wrote:
-> On Thu, Dec 15, 2016 at 03:37:15PM +0000, Marc Zyngier wrote:
-> > On 15/12/16 15:15, Russell King - ARM Linux wrote:
-> > > On Thu, Dec 15, 2016 at 11:46:41AM +0000, Marc Zyngier wrote:
-> > >> On 15/12/16 11:35, Russell King - ARM Linux wrote:
-> > >>> On Thu, Dec 15, 2016 at 11:18:48AM +0000, Marc Zyngier wrote:
-> > >>>> On 14/12/16 10:46, Russell King wrote:
-> > >>>>> @@ -231,10 +244,14 @@ ENDPROC(__hyp_stub_do_trap)
-> > >>>>>   * initialisation entry point.
-> > >>>>>   */
-> > >>>>>  ENTRY(__hyp_get_vectors)
-> > >>>>> -	mov	r0, #-1
-> > >>>>> +	mov	r0, #HVC_GET_VECTORS
-> > >>>>
-> > >>>> This breaks the KVM implementation of __hyp_get_vectors, easily fixed
-> > >>>> with the following patchlet:
-> > >>>
-> > >>> Right, so what Mark said is wrong:
-> > >>>
-> > >>> "The hyp-stub is part of the kernel image, and the API is private to
-> > >>>  that particular image, so we can change things -- there's no ABI to
-> > >>>  worry about."
-> > >>
-> > >> I think Mark is right. The API *is* private to the kernel, and KVM being
-> > >> the only in-kernel hypervisor on ARM, this is not an ABI.
-> > > 
-> > > Again, that's wrong.
-> > > 
-> > > We have two hypervisors in the kernel.  One is KVM, the other is the
-> > > stub.  Sure, the stub isn't a full implementation of a hypervisor, but
-> > > it is nevertheless, for the purposes of _this_ discussion, a hypervisor
-> > > of sorts.
-> > > 
-> > > The reason that both are included is because they both appear to share
-> > > a common interface (although that's totally not documented anywhere.)
-> > 
-> > And this interface exists for the sole purpose of enabling KVM. Call it
-> > a hypervisor if you wish, but its usefulness is doubtful on its own.
+>> +             if (host_pri_bits > vgic_v3_cpu->num_pri_bits)
+>> +                     return false;
+> I am lost. Who did set num_pri_bits and num_id_bits we compare with?
 
-IMO, the interface between EL1 and EL2 _is_ ABI. However, it should not
-be confused with a *stable* ABI like the one we expose to user. Since
-all users of the EL2 ABI live inside the kernel (either on the EL1 or
-EL2 side), we are free to change it as long as everything is updated
-simultaneously. I don't see this any different from other in-kernel ABI
-like that exposed to loadable modules (for the latter, we have the
-advantage of a partly self-documenting ABI as part of the C language).
+In vgic_v3_enable()  these values are computed
 
-I would welcome some documentation for the EL2 ABI as well, especially
-since head.S and the KVM counterpart is maintained by different people.
+> Seis and a3v I get this is computed on probe
+>> +
+>> +             vgic_v3_cpu->num_pri_bits = host_pri_bits;
+>> +
+>> +             host_id_bits = (val & ICC_CTLR_EL1_ID_BITS_MASK) >>
+>> +                             ICC_CTLR_EL1_ID_BITS_SHIFT;
+>> +             if (host_id_bits > vgic_v3_cpu->num_id_bits)
+>> +                     return false;
+>> +
+>> +             vgic_v3_cpu->num_id_bits = host_id_bits;
+>> +
+>> +             host_seis = ((kvm_vgic_global_state.ich_vtr_el2 &
+>> +                          ICH_VTR_SEIS_MASK) >> ICH_VTR_SEIS_SHIFT);
+>> +             seis = (val & ICC_CTLR_EL1_SEIS_MASK) >>
+>> +                     ICC_CTLR_EL1_SEIS_SHIFT;
+>> +             if (host_seis != seis)
+>> +                     return false;
+>> +
+>> +             host_a3v = ((kvm_vgic_global_state.ich_vtr_el2 &
+>> +                         ICH_VTR_A3V_MASK) >> ICH_VTR_A3V_SHIFT);
+>> +             a3v = (val & ICC_CTLR_EL1_A3V_MASK) >> ICC_CTLR_EL1_A3V_SHIFT;
+>> +             if (host_a3v != a3v)
+>> +                     return false;
+>> +
+>> +             vmcr.ctlr = val & ICC_CTLR_EL1_CBPR_MASK;
+>> +             vmcr.ctlr |= val & ICC_CTLR_EL1_EOImode_MASK;
+> nit: I still don't get why the vmcr has CPBR and EOImode set with the
+> ICC_CTLR_EL1 layout and then this gets transformed in the proper vmcr
+> format by vgic_set_vmcr. This is confusing to me and would at least
+> deserve a comment attached to struct vgic_vmcr definition.
 
-> What's also coming clear is that there's very few people who understand
-> all the interactions here, and the whole thing seems to be an undocumented
-> mess.  Something needs to change there - people need to stop shovelling
-> half baked crap into the kernel.  KVM have the privilege of being able to
-> push ARM stuff directly, I now see that was a very big mistake.
-> 
-> So, I want KVM further changes to come through my tree once this merge
-> window is over -
+I will add a comment
+>
+> Why don't we set the vmcr.ctlr directly in its ICH_VMCR format? In
+> set/get_vmcr all the other struct vgic_vmcr fields are handled in
+> ICH_VMCR native layout except the ctrl field.
 
-I'm afraid I strongly disagree. There are a few reasons neither you nor
-me gatekeep the KVM port: (a) the ARM KVM maintainers know a lot more
-about KVM than either of us, (b) the KVM code under arch/arm is reused
-by arm64 and (c) you or I would certainly become a bottleneck. There is
-a lot more to KVM support on ARM than the hyp stub and realistically you
-won't have the time to review all the stuff that comes your way.
+None of the fields of struct vgic_vmcr are in ICH_VMCR native layout.
+Except ctlr all the other fields are registers having single field value.
+Ex: pmr, bpr0 etc.,
 
-Just because there is an interface between two or more pieces of code,
-it is not a strong enough argument for them to have the same gatekeeper
-(I wouldn't say maintainer since IMO this implies a lot more). That
-said, you can always advise other maintainers on how to do things right,
-ask for proper documentation (as you did), review how things are defined
-and implemented, especially when they touch code _you_ maintain.
-
-> Let's start with some documentation on the KVM hypervisor interfaces on
-> 32-bit ARM.  Documentation/virtual/kvm/hypercalls.txt already contains
-> some for x86, s390 and PPC, so that would be a good place to document
-> the ARM side.  Arguably, that should have already been done.
-
-I'm all for documenting the interface.
-
-(even though Will and I co-maintain arch/arm64, I deliberately kept his
-name out of the above as I haven't had the chance to ask for his
-opinion on this matter, which may as well differ)
-
-I have to go and pack now. Merry Christmas!
-
--- 
-Catalin
+>
+>> +             vgic_set_vmcr(vcpu, &vmcr);
+>> +     } else {
+>> +             val = 0;
+>> +             val |= (vgic_v3_cpu->num_pri_bits - 1) <<
+>> +                     ICC_CTLR_EL1_PRI_BITS_SHIFT;
+>> +             val |= vgic_v3_cpu->num_id_bits << ICC_CTLR_EL1_ID_BITS_SHIFT;
+>> +             val |= ((kvm_vgic_global_state.ich_vtr_el2 &
+>> +                     ICH_VTR_SEIS_MASK) >> ICH_VTR_SEIS_SHIFT) <<
+>> +                     ICC_CTLR_EL1_SEIS_SHIFT;
+>> +             val |= ((kvm_vgic_global_state.ich_vtr_el2 &
+>> +                     ICH_VTR_A3V_MASK) >> ICH_VTR_A3V_SHIFT) <<
+>> +                     ICC_CTLR_EL1_A3V_SHIFT;
+>> +             val |= vmcr.ctlr & ICC_CTLR_EL1_CBPR_MASK;
+>> +             val |= vmcr.ctlr & ICC_CTLR_EL1_EOImode_MASK;
+>> +
+>> +             p->regval = val;
+>> +     }
+>> +
+>> +     return true;
+>> +}
+>> +
+>> +static bool access_gic_pmr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +                        const struct sys_reg_desc *r)
+>> +{
+>> +     struct vgic_vmcr vmcr;
+>> +
+>> +     vgic_get_vmcr(vcpu, &vmcr);
+>> +     if (p->is_write) {
+>> +             vmcr.pmr = (p->regval & ICC_PMR_EL1_MASK) >> ICC_PMR_EL1_SHIFT;
+>> +             vgic_set_vmcr(vcpu, &vmcr);
+>> +     } else {
+>> +             p->regval = (vmcr.pmr << ICC_PMR_EL1_SHIFT) & ICC_PMR_EL1_MASK;
+>> +     }
+>> +
+>> +     return true;
+>> +}
+>> +
+>> +static bool access_gic_bpr0(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +                         const struct sys_reg_desc *r)
+>> +{
+>> +     struct vgic_vmcr vmcr;
+>> +
+>> +     vgic_get_vmcr(vcpu, &vmcr);
+>> +     if (p->is_write) {
+>> +             vmcr.bpr = (p->regval & ICC_BPR0_EL1_MASK) >>
+>> +                         ICC_BPR0_EL1_SHIFT;
+>> +             vgic_set_vmcr(vcpu, &vmcr);
+>> +     } else {
+>> +             p->regval = (vmcr.bpr << ICC_BPR0_EL1_SHIFT) &
+>> +                          ICC_BPR0_EL1_MASK;
+>> +     }
+>> +
+>> +     return true;
+>> +}
+>> +
+>> +static bool access_gic_bpr1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +                         const struct sys_reg_desc *r)
+>> +{
+>> +     struct vgic_vmcr vmcr;
+>> +
+>> +     if (!p->is_write)
+>> +             p->regval = 0;
+>> +
+>> +     vgic_get_vmcr(vcpu, &vmcr);
+>> +     if (!((vmcr.ctlr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT)) {
+>> +             if (p->is_write) {
+>> +                     vmcr.abpr = (p->regval & ICC_BPR1_EL1_MASK) >>
+>> +                                  ICC_BPR1_EL1_SHIFT;
+>> +                     vgic_set_vmcr(vcpu, &vmcr);
+>> +             } else {
+>> +                     p->regval = (vmcr.abpr << ICC_BPR1_EL1_SHIFT) &
+>> +                                  ICC_BPR1_EL1_MASK;
+>> +             }
+>> +     } else {
+>> +             if (!p->is_write)
+>> +                     p->regval = min((vmcr.bpr + 1), 7U);
+>> +     }
+>> +
+>> +     return true;
+>> +}
+>> +
+>> +static bool access_gic_grpen0(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +                           const struct sys_reg_desc *r)
+>> +{
+>> +     struct vgic_vmcr vmcr;
+>> +
+>> +     vgic_get_vmcr(vcpu, &vmcr);
+>> +     if (p->is_write) {
+>> +             vmcr.grpen0 = (p->regval & ICC_IGRPEN0_EL1_MASK) >>
+>> +                            ICC_IGRPEN0_EL1_SHIFT;
+>> +             vgic_set_vmcr(vcpu, &vmcr);
+>> +     } else {
+>> +             p->regval = (vmcr.grpen0 << ICC_IGRPEN0_EL1_SHIFT) &
+>> +                          ICC_IGRPEN0_EL1_MASK;
+>> +     }
+>> +
+>> +     return true;
+>> +}
+>> +
+>> +static bool access_gic_grpen1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +                           const struct sys_reg_desc *r)
+>> +{
+>> +     struct vgic_vmcr vmcr;
+>> +
+>> +     vgic_get_vmcr(vcpu, &vmcr);
+>> +     if (p->is_write) {
+>> +             vmcr.grpen1 = (p->regval & ICC_IGRPEN1_EL1_MASK) >>
+>> +                            ICC_IGRPEN1_EL1_SHIFT;
+>> +             vgic_set_vmcr(vcpu, &vmcr);
+>> +     } else {
+>> +             p->regval = (vmcr.grpen1 << ICC_IGRPEN1_EL1_SHIFT) &
+>> +                          ICC_IGRPEN1_EL1_MASK;
+>> +     }
+>> +
+>> +     return true;
+>> +}
+>> +
+>> +static void vgic_v3_access_apr_reg(struct kvm_vcpu *vcpu,
+>> +                                struct sys_reg_params *p, u8 apr, u8 idx)
+>> +{
+>> +     struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +     uint32_t *ap_reg;
+>> +
+>> +     if (apr)
+>> +             ap_reg = &vgicv3->vgic_ap1r[idx];
+>> +     else
+>> +             ap_reg = &vgicv3->vgic_ap0r[idx];
+>> +
+>> +     if (p->is_write)
+>> +             *ap_reg = p->regval;
+>> +     else
+>> +             p->regval = *ap_reg;
+>> +}
+>> +
+>> +static bool access_gic_aprn(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +                         const struct sys_reg_desc *r, u8 apr)
+>> +{
+>> +     struct vgic_cpu *vgic_v3_cpu = &vcpu->arch.vgic_cpu;
+>> +     u8 idx = r->Op2 & 3;
+>> +
+>> +     /*
+>> +      * num_pri_bits are initialized with HW supported values.
+>> +      * We can rely safely on num_pri_bits even if VM has not
+>> +      * restored ICC_CTLR_EL1 before restoring APnR registers.
+>> +      */
+>> +     switch (vgic_v3_cpu->num_pri_bits) {
+>> +     case 7:
+>> +             vgic_v3_access_apr_reg(vcpu, p, apr, idx);
+>> +             break;
+>> +     case 6:
+>> +             if (idx > 1)
+>> +                     goto err;
+>> +             vgic_v3_access_apr_reg(vcpu, p, apr, idx);
+>> +             break;
+>> +     default:
+>> +             if (idx > 0)
+>> +                     goto err;
+>> +             vgic_v3_access_apr_reg(vcpu, p, apr, idx);
+>> +     }
+>> +
+>> +     return true;
+>> +err:
+>> +     if (!p->is_write)
+>> +             p->regval = 0;
+>> +
+>> +     return false;
+>> +}
+>> +
+>> +static bool access_gic_ap0r(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +                         const struct sys_reg_desc *r)
+>> +
+>> +{
+>> +     return access_gic_aprn(vcpu, p, r, 0);
+>> +}
+>> +
+>> +static bool access_gic_ap1r(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +                         const struct sys_reg_desc *r)
+>> +{
+>> +     return access_gic_aprn(vcpu, p, r, 1);
+>> +}
+>> +
+>> +static bool access_gic_sre(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> +                        const struct sys_reg_desc *r)
+>> +{
+>> +     struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +
+>> +     /* Validate SRE bit */
+>> +     if (p->is_write) {
+>> +             if (!(p->regval & ICC_SRE_EL1_SRE))
+>> +                     return false;
+>> +     } else {
+>> +             p->regval = vgicv3->vgic_sre;
+>> +     }
+>> +
+>> +     return true;
+>> +}
+>> +static const struct sys_reg_desc gic_v3_icc_reg_descs[] = {
+>> +     /* ICC_PMR_EL1 */
+>> +     { Op0(3), Op1(0), CRn(4), CRm(6), Op2(0), access_gic_pmr },
+>> +     /* ICC_BPR0_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(8), Op2(3), access_gic_bpr0 },
+>> +     /* ICC_AP0R0_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(8), Op2(4), access_gic_ap0r },
+>> +     /* ICC_AP0R1_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(8), Op2(5), access_gic_ap0r },
+>> +     /* ICC_AP0R2_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(8), Op2(6), access_gic_ap0r },
+>> +     /* ICC_AP0R3_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(8), Op2(7), access_gic_ap0r },
+>> +     /* ICC_AP1R0_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(9), Op2(0), access_gic_ap1r },
+>> +     /* ICC_AP1R1_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(9), Op2(1), access_gic_ap1r },
+>> +     /* ICC_AP1R2_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(9), Op2(2), access_gic_ap1r },
+>> +     /* ICC_AP1R3_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(9), Op2(3), access_gic_ap1r },
+>> +     /* ICC_BPR1_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(12), Op2(3), access_gic_bpr1 },
+>> +     /* ICC_CTLR_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(12), Op2(4), access_gic_ctlr },
+>> +     /* ICC_SRE_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(12), Op2(5), access_gic_sre },
+>> +     /* ICC_IGRPEN0_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(12), Op2(6), access_gic_grpen0 },
+>> +     /* ICC_GRPEN1_EL1 */
+>> +     { Op0(3), Op1(0), CRn(12), CRm(12), Op2(7), access_gic_grpen1 },
+>> +};
+>> +
+>> +int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+>> +                             u64 *reg)
+>> +{
+>> +     struct sys_reg_params params;
+>> +     u64 sysreg = (id & KVM_DEV_ARM_VGIC_SYSREG_MASK) | KVM_REG_SIZE_U64;
+> At the beginning I asked myself why we did not OR with KVM_REG_ARM64 as
+> stated in include/uapi/linux/kvm.h but then looking at
+> index_to_params() implementation it looks it is not used.
+>> +
+>> +     params.regval = *reg;
+>> +     params.is_write = is_write;
+>> +     params.is_aarch32 = false;
+>> +     params.is_32bit = false;
+>> +
+>> +     if (find_reg_by_id(sysreg, &params, gic_v3_icc_reg_descs,
+>> +                           ARRAY_SIZE(gic_v3_icc_reg_descs)))
+>> +             return 0;
+>> +
+>> +     return -ENXIO;
+>> +}
+>> +
+>> +int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+>> +                             u64 *reg)
+>> +{
+>> +     struct sys_reg_params params;
+>> +     const struct sys_reg_desc *r;
+>> +     u64 sysreg = (id & KVM_DEV_ARM_VGIC_SYSREG_MASK) | KVM_REG_SIZE_U64;
+>> +
+>> +     if (is_write)
+>> +             params.regval = *reg;
+>> +     params.is_write = is_write;
+>> +     params.is_aarch32 = false;
+>> +     params.is_32bit = false;
+>> +
+>> +     r = find_reg_by_id(sysreg, &params, gic_v3_icc_reg_descs,
+>> +                        ARRAY_SIZE(gic_v3_icc_reg_descs));
+>> +     if (!r)
+>> +             return -ENXIO;
+>> +
+>> +     if (!r->access(vcpu, &params, r))
+>> +             return -EINVAL;
+>> +
+>> +     if (!is_write)
+>> +             *reg = params.regval;
+>> +
+>> +     return 0;
+>> +}
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index 002f092..730a18a 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -71,6 +71,9 @@ struct vgic_global {
+>>
+>>       /* GIC system register CPU interface */
+>>       struct static_key_false gicv3_cpuif;
+>> +
+>> +     /* Cache ICH_VTR_EL2 reg value */
+> nit: comment does not bring much value I think
+>> +     u32                     ich_vtr_el2;
+>>  };
+>>
+>>  extern struct vgic_global kvm_vgic_global_state;
+>> @@ -269,6 +272,12 @@ struct vgic_cpu {
+>>       u64 pendbaser;
+>>
+>>       bool lpis_enabled;
+>> +
+>> +     /* Cache guest priority bits */
+>> +     u32 num_pri_bits;
+>> +
+>> +     /* Cache guest interrupt ID bits */
+>> +     u32 num_id_bits;
+>>  };
+>>
+>>  extern struct static_key_false vgic_v2_cpuif_trap;
+>> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+>> index bc7de95..b6266fe 100644
+>> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+>> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+>> @@ -16,6 +16,7 @@
+>>  #include <linux/kvm_host.h>
+>>  #include <kvm/arm_vgic.h>
+>>  #include <linux/uaccess.h>
+>> +#include <asm/kvm_emulate.h>
+> not needed I think
+OK.
