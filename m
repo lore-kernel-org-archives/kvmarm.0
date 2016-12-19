@@ -1,25 +1,26 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v8 01/16] FDT: introduce global phandle allocation
-Date: Mon, 19 Dec 2016 18:43:58 +0000
-Message-ID: <f9d35ab9-57a1-737d-c513-05506cae095b@arm.com>
+Subject: Re: [PATCH v8 04/16] MSI-X: update GSI routing after changed MSI-X
+ configuration
+Date: Mon, 19 Dec 2016 18:44:33 +0000
+Message-ID: <db8ea8bd-499f-bac5-6ac9-47ceaa469de3@arm.com>
 References: <20161104173203.21168-1-andre.przywara@arm.com>
- <20161104173203.21168-2-andre.przywara@arm.com>
- <d1dc4e68-66e1-85d1-f5d1-5743e5172409@arm.com>
+ <20161104173203.21168-5-andre.przywara@arm.com>
+ <da4e554a-ebd1-fa59-3e94-0e0190ddade3@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01A0540295
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 13:41:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D12240295
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 13:42:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jIlHXmbtQDxA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Dec 2016 13:41:46 -0500 (EST)
+ with ESMTP id qECCumIssXTH for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Dec 2016 13:42:21 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23E4C4028D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 13:41:46 -0500 (EST)
-In-Reply-To: <d1dc4e68-66e1-85d1-f5d1-5743e5172409@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B2F44028D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2016 13:42:20 -0500 (EST)
+In-Reply-To: <da4e554a-ebd1-fa59-3e94-0e0190ddade3@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,84 +34,160 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+Hi,
 
-On 09/12/16 12:03, Marc Zyngier wrote:
+On 09/12/16 17:13, Marc Zyngier wrote:
 > On 04/11/16 17:31, Andre Przywara wrote:
->> Allocating an FDT phandle (a unique identifier) using a static
->> variable in a static inline function defined in a header file works
->> only if all users are in the same source file. So trying to allocate
->> a handle from two different compilation units fails.
->> Introduce global phandle allocation and reference code to properly
->> allocate unique phandles.
+>> When we set up GSI routing to map MSIs to KVM's GSI numbers, we
+>> write the current device's MSI setup into the kernel routing table.
+>> However the device driver in the guest can use PCI configuration space
+>> accesses to change the MSI configuration (address and/or payload data).
+>> Whenever this happens after we have setup the routing table already,
+>> we must amend the previously sent data.
+>> So when MSI-X PCI config space accesses write address or payload,
+>> find the associated GSI number and the matching routing table entry
+>> and update the kernel routing table (only if the data has changed).
+>>
+>> This fixes vhost-net, where the queue's IRQFD was setup before the
+>> MSI vectors.
 >>
 >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 >> ---
->>  Makefile          |  1 +
->>  arm/fdt.c         |  2 +-
->>  arm/gic.c         |  2 +-
->>  include/kvm/fdt.h | 10 +++++-----
->>  kvm-fdt.c         | 26 ++++++++++++++++++++++++++
->>  5 files changed, 34 insertions(+), 7 deletions(-)
->>  create mode 100644 kvm-fdt.c
+>>  include/kvm/irq.h |  1 +
+>>  irq.c             | 31 +++++++++++++++++++++++++++++++
+>>  virtio/pci.c      | 36 +++++++++++++++++++++++++++++++++---
+>>  3 files changed, 65 insertions(+), 3 deletions(-)
 >>
->> diff --git a/Makefile b/Makefile
->> index 1f0196f..e4a4002 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -98,6 +98,7 @@ OBJS	+= kvm-ipc.o
->>  OBJS	+= builtin-sandbox.o
->>  OBJS	+= virtio/mmio.o
->>  OBJS	+= hw/i8042.o
->> +OBJS	+= kvm-fdt.o
+>> diff --git a/include/kvm/irq.h b/include/kvm/irq.h
+>> index bb71521..f35eb7e 100644
+>> --- a/include/kvm/irq.h
+>> +++ b/include/kvm/irq.h
+>> @@ -21,5 +21,6 @@ int irq__exit(struct kvm *kvm);
 >>  
->>  # Translate uname -m into ARCH string
->>  ARCH ?= $(shell uname -m | sed -e s/i.86/i386/ -e s/ppc.*/powerpc/ \
->> diff --git a/arm/fdt.c b/arm/fdt.c
->> index 381d48f..8bcfffb 100644
->> --- a/arm/fdt.c
->> +++ b/arm/fdt.c
->> @@ -114,7 +114,7 @@ static int setup_fdt(struct kvm *kvm)
->>  {
->>  	struct device_header *dev_hdr;
->>  	u8 staging_fdt[FDT_MAX_SIZE];
->> -	u32 gic_phandle		= fdt__alloc_phandle();
->> +	u32 gic_phandle		= fdt__get_phandle(PHANDLE_GIC);
->>  	u64 mem_reg_prop[]	= {
->>  		cpu_to_fdt64(kvm->arch.memory_guest_start),
->>  		cpu_to_fdt64(kvm->ram_size),
->> diff --git a/arm/gic.c b/arm/gic.c
->> index d6d6dd0..b60437e 100644
->> --- a/arm/gic.c
->> +++ b/arm/gic.c
->> @@ -222,7 +222,7 @@ void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
->>  	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
->>  	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
->>  	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
->> -	_FDT(fdt_property_cell(fdt, "phandle", phandle));
->> +	_FDT(fdt_property_cell(fdt, "phandle", fdt__get_phandle(PHANDLE_GIC)));
->>  	_FDT(fdt_end_node(fdt));
+>>  int irq__allocate_routing_entry(void);
+>>  int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
+>> +void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
+>>  
+>>  #endif
+>> diff --git a/irq.c b/irq.c
+>> index a742aa2..895e5eb 100644
+>> --- a/irq.c
+>> +++ b/irq.c
+>> @@ -93,6 +93,37 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
+>>  	return next_gsi++;
 >>  }
 >>  
->> diff --git a/include/kvm/fdt.h b/include/kvm/fdt.h
->> index 53d85a4..cd2bb72 100644
->> --- a/include/kvm/fdt.h
->> +++ b/include/kvm/fdt.h
->> @@ -8,6 +8,10 @@
->>  #include <linux/types.h>
->>  
->>  #define FDT_MAX_SIZE	0x10000
->> +#define FDT_INVALID_PHANDLE 0
->> +#define FDT_IS_VALID_PHANDLE(phandle) ((phandle) != FDT_INVALID_PHANDLE)
+>> +static bool update_data(u32 *ptr, u32 newdata)
+>> +{
+>> +	if (*ptr == newdata)
+>> +		return false;
 >> +
->> +enum phandles {PHANDLE_GIC, PHANDLES_MAX};
+>> +	*ptr = newdata;
+>> +	return true;
+>> +}
+>> +
+>> +void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg)
+>> +{
+>> +	struct kvm_irq_routing_msi *entry;
+>> +	unsigned int i;
+>> +	bool changed;
+>> +
+>> +	for (i = 0; i < irq_routing->nr; i++)
+>> +		if (gsi == irq_routing->entries[i].gsi)
+>> +			break;
+>> +	if (i == irq_routing->nr)
+>> +		return;
+>> +
+>> +	entry = &irq_routing->entries[i].u.msi;
+>> +
+>> +	changed  = update_data(&entry->address_hi, msg->address_hi);
+>> +	changed |= update_data(&entry->address_lo, msg->address_lo);
+>> +	changed |= update_data(&entry->data, msg->data);
+>> +
+>> +	if (changed)
+>> +		ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
 > 
-> Another nit here: PHANDLE_GIC is pretty much ARM-specific, while FDT is
-> supposed to be generic. Can't we move the enum to be architecture
-> specific and not put this in an architecture agnostic one?
+> Check the return value and let the caller know if something has failed?
 
-Yes, that indeed makes sense.
-This requires an include file for every architecture, but well ...
+As the caller is a void function and the call chain for this originates
+in an MMIO access triggered by the guest (update MSI information in the
+PCI config space), I guess again die() would be the appropriate action here?
+
+> 
+>> +}
+>> +
+>>  int __attribute__((weak)) irq__exit(struct kvm *kvm)
+>>  {
+>>  	free(irq_routing);
+>> diff --git a/virtio/pci.c b/virtio/pci.c
+>> index 072e5b7..b3b4aac 100644
+>> --- a/virtio/pci.c
+>> +++ b/virtio/pci.c
+>> @@ -152,6 +152,30 @@ static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 p
+>>  	return ret;
+>>  }
+>>  
+>> +static void update_msix_map(struct virtio_pci *vpci,
+>> +			    struct msix_table *msix_entry, u32 vecnum)
+>> +{
+>> +	u32 gsi, i;
+>> +
+>> +	/* Find the GSI number used for that vector */
+>> +	if (vecnum == vpci->config_vector) {
+>> +		gsi = vpci->config_gsi;
+>> +	} else {
+>> +		for (i = 0; i < VIRTIO_PCI_MAX_VQ; i++)
+>> +			if (vpci->vq_vector[i] == vecnum)
+>> +				break;
+>> +		if (i == VIRTIO_PCI_MAX_VQ)
+>> +			return;
+>> +		gsi = vpci->gsis[i];
+>> +	}
+>> +
+>> +	if (gsi == 0)
+>> +		return;
+>> +
+>> +	msix_entry = &msix_entry[vecnum];
+>> +	irq__update_msix_route(vpci->kvm, gsi, &msix_entry->msg);
+>> +}
+>> +
+>>  static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *vdev, u16 port,
+>>  					void *data, int size, int offset)
+>>  {
+>> @@ -270,10 +294,16 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
+>>  		offset	= vpci->msix_io_block;
+>>  	}
+>>  
+>> -	if (is_write)
+>> -		memcpy(table + addr - offset, data, len);
+>> -	else
+>> +	if (!is_write) {
+>>  		memcpy(data, table + addr - offset, len);
+>> +		return;
+>> +	}
+>> +
+>> +	memcpy(table + addr - offset, data, len);
+>> +
+>> +	/* Did we just update the address or payload? */
+>> +	if (addr % 0x10 < 0xc)
+>> +		update_msix_map(vpci, table, (addr - offset) / 16);
+> 
+> Where are these constants coming from? Please stick to either decimal or
+> hex...
+
+Sure, seems to be a leftover from my initial hacking approach. Thanks
+for spotting that.
 
 Cheers,
 Andre.
+
+> 
+>>  }
+>>  
+>>  static void virtio_pci__signal_msi(struct kvm *kvm, struct virtio_pci *vpci, int vec)
+>>
+> 
+> Thanks,
+> 
+> 	M.
+> 
