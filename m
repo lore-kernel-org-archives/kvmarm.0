@@ -1,80 +1,66 @@
-From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH V6 05/10] acpi: apei: handle SEA notification type for
- ARMv8
-Date: Tue, 20 Dec 2016 15:29:38 +0000
-Message-ID: <58594E62.3050003@arm.com>
-References: <1481147303-7979-1-git-send-email-tbaicar@codeaurora.org> <1481147303-7979-6-git-send-email-tbaicar@codeaurora.org>
+From: Riku Voipio <riku.voipio@linaro.org>
+Subject: Aarch64 vm-spec validation tools
+Date: Wed, 21 Dec 2016 13:25:14 +0200
+Message-ID: <CAAqcGHmj5PgCgLJzhQmO0oCzyitGA83415ALrXbvoGQdyJYKRg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1481147303-7979-6-git-send-email-tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Cc: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devel-E0kO6a4B6psdnm+yROfE0A@public.gmane.org, Suzuki.Po
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7941A404CC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2016 06:24:00 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id EWRtqprIyYAT for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Dec 2016 06:23:59 -0500 (EST)
+Received: from mail-lf0-f45.google.com (mail-lf0-f45.google.com
+ [209.85.215.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 313A5404BA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2016 06:23:58 -0500 (EST)
+Received: by mail-lf0-f45.google.com with SMTP id t196so95759979lff.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2016 03:25:16 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: "cross-distro@lists.linaro.org" <cross-distro@lists.linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Tyler,
+Hi,
 
-On 07/12/16 21:48, Tyler Baicar wrote:
-> ARM APEI extension proposal added SEA (Synchrounous External
-> Abort) notification type for ARMv8.
-> Add a new GHES error source handling function for SEA. If an error
-> source's notification type is SEA, then this function can be registered
-> into the SEA exception handler. That way GHES will parse and report
-> SEA exceptions when they occur.
+Some time ago we drafted a specification[1] for AArch64 virtual
+machines. Now we are launching verification tools that let everyone
+verify that the whole stack (host hypervisor, guest firmware and guest
+OS image) implements the spec:
 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index 2acbc60..66ab3fd 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -767,6 +771,62 @@ static struct notifier_block ghes_notifier_sci = {
->  	.notifier_call = ghes_notify_sci,
->  };
->  
-> +#ifdef CONFIG_HAVE_ACPI_APEI_SEA
-> +static LIST_HEAD(ghes_sea);
-> +
-> +static int ghes_notify_sea(struct notifier_block *this,
-> +				  unsigned long event, void *data)
-> +{
-> +	struct ghes *ghes;
-> +	int ret = NOTIFY_DONE;
-> +
-> +	rcu_read_lock();
-> +	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
-> +		if (!ghes_proc(ghes))
-> +			ret = NOTIFY_OK;
-> +	}
-> +	rcu_read_unlock();
-> +
-> +	return ret;
-> +}
+https://github.com/linaro/vmspec-tools
 
-What stops this from being re-entrant?
+For some extra background see the blog post on vmspec:
 
-ghes_copy_tofrom_phs() takes the ghes_ioremap_lock_irq spinlock, but there is
-nothing to stop a subsequent instruction fetch or memory access causing another
-(maybe different) Synchronous External Abort which deadlocks trying to take the
-same lock.
+http://www.linaro.org/blog/core-dump/ensuring-bootable-arm-vm-images/
 
-ghes_notify_sea() looks to be based on ghes_notify_sci(), which (if I've found
-the right part of the ACPI spec) is a level-low interrupt. spin_lock_irqsave()
-would mask interrupts so there is no risk of a different notification firing on
-the same CPU, (it looks like they are almost all ultimately an irq).
+>From the cross-distro point of view, we are interested in finding out if
 
-NMI is the odd one out because its not maskable like this, but ghes_notify_nmi()
-has:
->	if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
-> 		return ret;
+- QEMU shipped is new enough (2.6+)
+- a compatible EFI for arm64 guests is available
+- a vmspec compatible cloud guest image is available
 
-To ensure there is only ever one thread poking around in this code.
+If the image comes with cloud-init, vmspec-boot can be used directly
+to verify compliance. Without cloud-init, one can run vmspec-verify
+inside the guest to verify manually.
 
-What happens if a system describes two GHES sources, one using an irq the other
-SEA? The SEA error can interrupt the irq error while its holding the above lock.
-I guess this is also why all the NMI code in that file is separate.
+The tools are still under development, for example the ACPI test
+returns a failure even if the guest would support ACPI if forced.
+Feedback and patches are always welcome.
 
+The README.md lists a handful of guest images that have been used in
+testing. I'd be most happy to add more links to the list!
 
-Thanks,
+Riku
 
-James
+[1] http://www.linaro.org/app/resources/WhitePaper/VMSystemSpecificationForARM-v2.0.pdf
