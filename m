@@ -1,39 +1,39 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC 5/8] KVM: arm64: Add the EL1 physical timer access handler
-Date: Mon, 26 Dec 2016 12:12:03 -0500
-Message-ID: <1482772326-29110-6-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC 8/8] KVM: arm/arm64: Emulate the EL1 phys timer register access
+Date: Mon, 26 Dec 2016 12:12:06 -0500
+Message-ID: <1482772326-29110-9-git-send-email-jintack@cs.columbia.edu>
 References: <1482772326-29110-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F2F63405D2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:23:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80F6A40625
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:23:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G9d4FnYb4M+k for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Dec 2016 12:22:58 -0500 (EST)
+ with ESMTP id x6H6wA98rF9H for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Dec 2016 12:23:01 -0500 (EST)
 Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
  [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2F033401B9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:22:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 17550405DA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:23:00 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uBQHM5fJ032477
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:21 -0500
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uBQHM5fR032477
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:24 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id DA09684
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:21 -0500 (EST)
+ by hazelnut (Postfix) with ESMTP id B363D80
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:24 -0500 (EST)
 Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
- [128.59.72.14]) by hazelnut (Postfix) with ESMTP id 9D0E582
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:21 -0500 (EST)
-Received: from mail-qt0-f200.google.com (mail-qt0-f200.google.com
- [209.85.216.200])
- by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uBQHOLhK015318
+ [128.59.72.14]) by hazelnut (Postfix) with ESMTP id 9833380
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:24 -0500 (EST)
+Received: from mail-qk0-f199.google.com (mail-qk0-f199.google.com
+ [209.85.220.199])
+ by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uBQHOO3L015362
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:21 -0500
-Received: by mail-qt0-f200.google.com with SMTP id d45so234721083qta.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 09:24:21 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:24 -0500
+Received: by mail-qk0-f199.google.com with SMTP id q128so144242055qkd.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 09:24:24 -0800 (PST)
 In-Reply-To: <1482772326-29110-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -48,67 +48,111 @@ To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.
 Cc: kvm@vger.kernel.org, andre.przywara@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM traps on the EL1 phys timer accesses from VMs, but it doesn't handle
-those traps. This results in terminating VMs. Instead, set a handler for
-the EL1 phys timer access, and inject an undefined exception as an
-intermediate step.
+Emulate read and write operations to CNTP_TVAL, CNTP_CVAL and CNTP_CTL.
+Now the VM is able to use the EL1 physical timer.
 
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- arch/arm64/kvm/sys_regs.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ arch/arm64/kvm/sys_regs.c    | 35 ++++++++++++++++++++++++++++++++---
+ include/kvm/arm_arch_timer.h |  3 +++
+ virt/kvm/arm/arch_timer.c    |  4 ++--
+ 3 files changed, 37 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 87e7e66..fd9e747 100644
+index fd9e747..7cef94f 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -820,6 +820,30 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
- 	  access_pmu_evtyper, reset_unknown, (PMEVTYPER0_EL0 + n), }
+@@ -824,7 +824,15 @@ static bool access_cntp_tval(struct kvm_vcpu *vcpu,
+ 		struct sys_reg_params *p,
+ 		const struct sys_reg_desc *r)
+ {
+-	kvm_inject_undefined(vcpu);
++	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
++	cycle_t now = kvm_phys_timer_read();
++
++	if (p->is_write) {
++		ptimer->cnt_cval = p->regval + now;
++		kvm_timer_emulate(vcpu, ptimer);
++	} else
++		p->regval = ptimer->cnt_cval - now;
++
+ 	return true;
+ }
  
-+static bool access_cntp_tval(struct kvm_vcpu *vcpu,
-+		struct sys_reg_params *p,
-+		const struct sys_reg_desc *r)
-+{
-+	kvm_inject_undefined(vcpu);
-+	return true;
-+}
+@@ -832,7 +840,21 @@ static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
+ 		struct sys_reg_params *p,
+ 		const struct sys_reg_desc *r)
+ {
+-	kvm_inject_undefined(vcpu);
++	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
 +
-+static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
-+		struct sys_reg_params *p,
-+		const struct sys_reg_desc *r)
-+{
-+	kvm_inject_undefined(vcpu);
-+	return true;
-+}
++	if (p->is_write) {
++		/* ISTATUS bit is read-only */
++		ptimer->cnt_ctl = p->regval & ~ARCH_TIMER_CTRL_IT_STAT;
++		kvm_timer_emulate(vcpu, ptimer);
++	} else {
++		cycle_t now = kvm_phys_timer_read();
 +
-+static bool access_cntp_cval(struct kvm_vcpu *vcpu,
-+		struct sys_reg_params *p,
-+		const struct sys_reg_desc *r)
-+{
-+	kvm_inject_undefined(vcpu);
-+	return true;
-+}
++		p->regval = ptimer->cnt_ctl;
++		/* Set ISTATUS bit if it's expired */
++		if (ptimer->cnt_cval <= now)
++			p->regval |= ARCH_TIMER_CTRL_IT_STAT;
++	}
 +
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -1029,6 +1053,16 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b011),
- 	  NULL, reset_unknown, TPIDRRO_EL0 },
+ 	return true;
+ }
  
-+	/* CNTP_TVAL_EL0 */
-+	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b000),
-+	  access_cntp_tval },
-+	/* CNTP_CTL_EL0 */
-+	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b001),
-+	  access_cntp_ctl },
-+	/* CNTP_CVAL_EL0 */
-+	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b010),
-+	  access_cntp_cval },
+@@ -840,7 +862,14 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+ 		struct sys_reg_params *p,
+ 		const struct sys_reg_desc *r)
+ {
+-	kvm_inject_undefined(vcpu);
++	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
 +
- 	/* PMEVCNTRn_EL0 */
- 	PMU_PMEVCNTR_EL0(0),
- 	PMU_PMEVCNTR_EL0(1),
++	if (p->is_write) {
++		ptimer->cnt_cval = p->regval;
++		kvm_timer_emulate(vcpu, ptimer);
++	} else
++		p->regval = ptimer->cnt_cval;
++
+ 	return true;
+ }
+ 
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 04ed9c1..776579b 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -75,6 +75,9 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu,
+ 			   struct arch_timer_context *timer_ctx);
+ void kvm_timer_schedule(struct kvm_vcpu *vcpu);
+ void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
++void kvm_timer_emulate(struct kvm_vcpu *vcpu, struct arch_timer_context *timer);
++
++cycle_t kvm_phys_timer_read(void);
+ 
+ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
+ 
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index be8d953..7a161f8 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -39,7 +39,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ 	vcpu_vtimer(vcpu)->active_cleared_last = false;
+ }
+ 
+-static cycle_t kvm_phys_timer_read(void)
++cycle_t kvm_phys_timer_read(void)
+ {
+ 	return timecounter->cc->read(timecounter->cc);
+ }
+@@ -258,7 +258,7 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
+  * Schedule the background timer for the emulated timer. The background timer
+  * runs whenever vcpu is runnable and the timer is not expired.
+  */
+-static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
++void kvm_timer_emulate(struct kvm_vcpu *vcpu,
+ 		       struct arch_timer_context *timer_ctx)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
 -- 
 1.9.1
