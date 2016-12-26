@@ -1,39 +1,40 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC 8/8] KVM: arm/arm64: Emulate the EL1 phys timer register access
-Date: Mon, 26 Dec 2016 12:12:06 -0500
-Message-ID: <1482772326-29110-9-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC 7/8] KVM: arm/arm64: Set up a background timer for the physical
+ timer emulation
+Date: Mon, 26 Dec 2016 12:12:05 -0500
+Message-ID: <1482772326-29110-8-git-send-email-jintack@cs.columbia.edu>
 References: <1482772326-29110-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 80F6A40625
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:23:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C133F40455
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:23:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x6H6wA98rF9H for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Dec 2016 12:23:01 -0500 (EST)
-Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
- [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 17550405DA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:23:00 -0500 (EST)
+ with ESMTP id px99-6mD7EiP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Dec 2016 12:22:59 -0500 (EST)
+Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
+ [128.59.72.39])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5989540696
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:22:59 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uBQHM5fR032477
+ by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uBQHM5nx062061
  for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:24 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id B363D80
+ by hazelnut (Postfix) with ESMTP id 12D8A84
  for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:24 -0500 (EST)
-Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
- [128.59.72.14]) by hazelnut (Postfix) with ESMTP id 9833380
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:24 -0500 (EST)
-Received: from mail-qk0-f199.google.com (mail-qk0-f199.google.com
- [209.85.220.199])
- by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uBQHOO3L015362
+Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
+ [128.59.72.15]) by hazelnut (Postfix) with ESMTP id DE4F580
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:23 -0500 (EST)
+Received: from mail-qt0-f198.google.com (mail-qt0-f198.google.com
+ [209.85.216.198])
+ by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id uBQHONBX047661
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:24 -0500
-Received: by mail-qk0-f199.google.com with SMTP id q128so144242055qkd.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 09:24:24 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 12:24:23 -0500
+Received: by mail-qt0-f198.google.com with SMTP id j29so104131056qtc.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2016 09:24:23 -0800 (PST)
 In-Reply-To: <1482772326-29110-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -48,111 +49,125 @@ To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.
 Cc: kvm@vger.kernel.org, andre.przywara@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Emulate read and write operations to CNTP_TVAL, CNTP_CVAL and CNTP_CTL.
-Now the VM is able to use the EL1 physical timer.
+Set a background timer for the EL1 physical timer emulation while VMs are
+running, so that VMs get interrupts for the physical timer in a timely
+manner.
+
+We still use just one background timer. When a VM is runnable, we use
+the background timer for the physical timer emulation.  When the VM is
+about to be blocked, we use the background timer to wake up the vcpu at
+the earliest timer expiration among timers the VM is using.
+
+As a result, the assumption that the background timer is not armed while
+VMs are running does not hold any more. So, remove BUG_ON()s and
+WARN_ON()s accordingly.
 
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- arch/arm64/kvm/sys_regs.c    | 35 ++++++++++++++++++++++++++++++++---
- include/kvm/arm_arch_timer.h |  3 +++
- virt/kvm/arm/arch_timer.c    |  4 ++--
- 3 files changed, 37 insertions(+), 5 deletions(-)
+ virt/kvm/arm/arch_timer.c | 42 +++++++++++++++++++++++++++++++-----------
+ 1 file changed, 31 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index fd9e747..7cef94f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -824,7 +824,15 @@ static bool access_cntp_tval(struct kvm_vcpu *vcpu,
- 		struct sys_reg_params *p,
- 		const struct sys_reg_desc *r)
- {
--	kvm_inject_undefined(vcpu);
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-+	cycle_t now = kvm_phys_timer_read();
-+
-+	if (p->is_write) {
-+		ptimer->cnt_cval = p->regval + now;
-+		kvm_timer_emulate(vcpu, ptimer);
-+	} else
-+		p->regval = ptimer->cnt_cval - now;
-+
- 	return true;
- }
- 
-@@ -832,7 +840,21 @@ static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
- 		struct sys_reg_params *p,
- 		const struct sys_reg_desc *r)
- {
--	kvm_inject_undefined(vcpu);
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-+
-+	if (p->is_write) {
-+		/* ISTATUS bit is read-only */
-+		ptimer->cnt_ctl = p->regval & ~ARCH_TIMER_CTRL_IT_STAT;
-+		kvm_timer_emulate(vcpu, ptimer);
-+	} else {
-+		cycle_t now = kvm_phys_timer_read();
-+
-+		p->regval = ptimer->cnt_ctl;
-+		/* Set ISTATUS bit if it's expired */
-+		if (ptimer->cnt_cval <= now)
-+			p->regval |= ARCH_TIMER_CTRL_IT_STAT;
-+	}
-+
- 	return true;
- }
- 
-@@ -840,7 +862,14 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
- 		struct sys_reg_params *p,
- 		const struct sys_reg_desc *r)
- {
--	kvm_inject_undefined(vcpu);
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-+
-+	if (p->is_write) {
-+		ptimer->cnt_cval = p->regval;
-+		kvm_timer_emulate(vcpu, ptimer);
-+	} else
-+		p->regval = ptimer->cnt_cval;
-+
- 	return true;
- }
- 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 04ed9c1..776579b 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -75,6 +75,9 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu,
- 			   struct arch_timer_context *timer_ctx);
- void kvm_timer_schedule(struct kvm_vcpu *vcpu);
- void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
-+void kvm_timer_emulate(struct kvm_vcpu *vcpu, struct arch_timer_context *timer);
-+
-+cycle_t kvm_phys_timer_read(void);
- 
- void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
- 
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index be8d953..7a161f8 100644
+index aa7e243..be8d953 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -39,7 +39,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 	vcpu_vtimer(vcpu)->active_cleared_last = false;
+@@ -91,9 +91,6 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+ 	vcpu = container_of(work, struct kvm_vcpu, arch.timer_cpu.expired);
+ 	vcpu->arch.timer_cpu.armed = false;
+ 
+-	WARN_ON(!kvm_timer_should_fire(vcpu, vcpu_vtimer(vcpu)) &&
+-		!kvm_timer_should_fire(vcpu, vcpu_ptimer(vcpu)));
+-
+ 	/*
+ 	 * If the vcpu is blocked we want to wake it up so that it will see
+ 	 * the timer has expired when entering the guest.
+@@ -139,7 +136,6 @@ static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx)
+ 
+ /*
+  * Returns minimal timer expiration time in ns among guest timers.
+- * Note that it will return inf time if none of timers can fire.
+  */
+ static u64 kvm_timer_min_block(struct kvm_vcpu *vcpu)
+ {
+@@ -153,7 +149,9 @@ static u64 kvm_timer_min_block(struct kvm_vcpu *vcpu)
+ 	if (kvm_timer_irq_can_fire(ptimer))
+ 		min_phys = kvm_timer_compute_delta(vcpu, ptimer);
+ 
+-	WARN_ON((min_virt == ULLONG_MAX) && (min_phys == ULLONG_MAX));
++	/* If none of timers can fire, then return 0 */
++	if ((min_virt == ULLONG_MAX) && (min_phys == ULLONG_MAX))
++		return 0;
+ 
+ 	return min(min_virt, min_phys);
+ }
+@@ -257,6 +255,26 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
  }
  
--static cycle_t kvm_phys_timer_read(void)
-+cycle_t kvm_phys_timer_read(void)
- {
- 	return timecounter->cc->read(timecounter->cc);
+ /*
++ * Schedule the background timer for the emulated timer. The background timer
++ * runs whenever vcpu is runnable and the timer is not expired.
++ */
++static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
++		       struct arch_timer_context *timer_ctx)
++{
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++
++	if (kvm_timer_should_fire(vcpu, timer_ctx))
++		return;
++
++	if (!kvm_timer_irq_can_fire(timer_ctx))
++		return;
++
++	/*  The timer has not yet expired, schedule a background timer */
++	timer_disarm(timer);
++	timer_arm(timer, kvm_timer_compute_delta(vcpu, timer_ctx));
++}
++
++/*
+  * Schedule the background timer before calling kvm_vcpu_block, so that this
+  * thread is removed from its waitqueue and made runnable when there's a timer
+  * interrupt to handle.
+@@ -267,8 +285,6 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 
+-	BUG_ON(timer_is_armed(timer));
+-
+ 	/*
+ 	 * No need to schedule a background timer if any guest timer has
+ 	 * already expired, because kvm_vcpu_block will return before putting
+@@ -290,13 +306,21 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+ 	 * The guest timers have not yet expired, schedule a background timer.
+ 	 * Pick smaller expiration time between phys and virt timer.
+ 	 */
++	timer_disarm(timer);
+ 	timer_arm(timer, kvm_timer_min_block(vcpu));
  }
-@@ -258,7 +258,7 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
-  * Schedule the background timer for the emulated timer. The background timer
-  * runs whenever vcpu is runnable and the timer is not expired.
-  */
--static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
-+void kvm_timer_emulate(struct kvm_vcpu *vcpu,
- 		       struct arch_timer_context *timer_ctx)
+ 
+ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
  {
  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++
+ 	timer_disarm(timer);
++
++	/*
++	 * Now we return from the blocking. If we have any timer to emulate,
++	 * and it's not expired, set the background timer for it.
++	 */
++	kvm_timer_emulate(vcpu, vcpu_ptimer(vcpu));
+ }
+ 
+ /**
+@@ -375,10 +399,6 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+  */
+ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+-	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+-
+-	BUG_ON(timer_is_armed(timer));
+-
+ 	/*
+ 	 * The guest could have modified the timer registers or the timer
+ 	 * could have expired, update the timer state.
 -- 
 1.9.1
