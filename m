@@ -1,22 +1,22 @@
 From: Christopher Covington <cov@codeaurora.org>
-Subject: [PATCH v2 5/5] arm64: Work around Falkor erratum 1009
-Date: Thu, 29 Dec 2016 17:43:35 -0500
-Message-ID: <20161229224335.13531-5-cov@codeaurora.org>
+Subject: [PATCH v2 4/5] arm64: Use __tlbi_dsb() macros in KVM code
+Date: Thu, 29 Dec 2016 17:43:34 -0500
+Message-ID: <20161229224335.13531-4-cov@codeaurora.org>
 References: <20161229224335.13531-1-cov@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E8755405C4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Dec 2016 17:42:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8059840197
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Dec 2016 17:42:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7AdSKazleeNq for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Dec 2016 17:42:24 -0500 (EST)
+ with ESMTP id KwD1bqojevNE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Dec 2016 17:42:22 -0500 (EST)
 Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 176CF405DA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Dec 2016 17:42:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C2E5405D5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Dec 2016 17:42:21 -0500 (EST)
 In-Reply-To: <20161229224335.13531-1-cov@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -27,103 +27,80 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, shankerd@codeaurora.org, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, shankerd@codeaurora.org, timur@codeaurora.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-During a TLB invalidate sequence targeting the inner shareable
-domain, Falkor may prematurely complete the DSB before all loads
-and stores using the old translation are observed; instruction
-fetches are not subject to the conditions of this erratum.
+Refactor the KVM code to use the newly introduced __tlbi_dsb macros, which
+will allow an errata workaround that repeats tlbi dsb sequences to only
+change one location. This is not intended to change the generated assembly
+and comparing before and after vmlinux objdump shows no functional changes.
 
 Signed-off-by: Christopher Covington <cov@codeaurora.org>
-
-Change-Id: I25e86b068addd68cdfba5a11142b9fc37312b1ee
 ---
- Documentation/arm64/silicon-errata.txt |  1 +
- arch/arm64/Kconfig                     | 10 ++++++++++
- arch/arm64/include/asm/cpucaps.h       |  3 ++-
- arch/arm64/include/asm/tlbflush.h      |  5 ++++-
- arch/arm64/kernel/cpu_errata.c         |  7 +++++++
- 5 files changed, 24 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/tlb.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/arm64/silicon-errata.txt b/Documentation/arm64/silicon-errata.txt
-index 7151aed..98bef2a 100644
---- a/Documentation/arm64/silicon-errata.txt
-+++ b/Documentation/arm64/silicon-errata.txt
-@@ -64,3 +64,4 @@ stable kernels.
- |               |                 |                 |                          |
- | Freescale/NXP | LS2080A/LS1043A | A-008585        | FSL_ERRATUM_A008585      |
- | Qualcomm      | Falkor v1       | E1003           | QCOM_FALKOR_ERRATUM_1003 |
-+| Qualcomm      | Falkor v1       | E1009           | QCOM_FALKOR_ERRATUM_1009 |
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 7ce4a4b..567651b 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -495,6 +495,16 @@ config QCOM_FALKOR_E1003_RESERVED_ASID
- 	default 1
- 	depends on QCOM_FALKOR_ERRATUM_1003
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index 88e2f2b..66e3f72 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -16,6 +16,7 @@
+  */
  
-+config QCOM_FALKOR_ERRATUM_1009
-+	bool "Falkor E1009: Prematurely complete a DSB after a TLBI"
-+	default y
-+	help
-+	  Falkor CPU may prematurely complete a DSB following a TLBI xxIS
-+	  invalidate maintenance operations. Repeat the TLBI operation one
-+	  more time to fix the issue.
-+
-+	  If unsure, say Y.
-+
- endmenu
+ #include <asm/kvm_hyp.h>
++#include <asm/tlbflush.h>
  
+ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ {
+@@ -32,7 +33,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ 	 * whole of Stage-1. Weep...
+ 	 */
+ 	ipa >>= 12;
+-	asm volatile("tlbi ipas2e1is, %0" : : "r" (ipa));
++	__tlbi_dsb(ipas2e1is, ish, ipa);
  
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 5aaf7ee..55bcd02 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -36,7 +36,8 @@
- #define ARM64_MISMATCHED_CACHE_LINE_SIZE	15
- #define ARM64_HAS_NO_FPSIMD			16
- #define ARM64_WORKAROUND_QCOM_FALKOR_E1003	17
-+#define ARM64_WORKAROUND_REPEAT_TLBI		18
+ 	/*
+ 	 * We have to ensure completion of the invalidation at Stage-2,
+@@ -40,9 +41,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ 	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
+ 	 * the Stage-1 invalidation happened first.
+ 	 */
+-	dsb(ish);
+-	asm volatile("tlbi vmalle1is" : : );
+-	dsb(ish);
++	__tlbi_dsb(vmalle1is, ish);
+ 	isb();
  
--#define ARM64_NCAPS				18
-+#define ARM64_NCAPS				19
+ 	write_sysreg(0, vttbr_el2);
+@@ -57,8 +56,7 @@ void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
+ 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+ 	isb();
  
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index f28813c..7313cd3 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -85,7 +85,10 @@
- 			asm (__TLBI_INSTR(op, ##__VA_ARGS__)		       \
- 			__TLBI_IO(op, ##__VA_ARGS__));			       \
- 		asm volatile (	     as			"\ndsb " #attr "\n"    \
--		: : : "memory"); } while (0)
-+			ALTERNATIVE("nop"		"\nnop"	       "\n",   \
-+			__TLBI_INSTR(op, ##__VA_ARGS__)	"\ndsb " #attr "\n",   \
-+			ARM64_WORKAROUND_REPEAT_TLBI)			       \
-+		__TLBI_IO(op, ##__VA_ARGS__) : "memory"); } while (0)
+-	asm volatile("tlbi vmalls12e1is" : : );
+-	dsb(ish);
++	__tlbi_dsb(vmalls12e1is, ish);
+ 	isb();
  
- #define __tlbi_dsb(...)	__tlbi_asm_dsb("", ##__VA_ARGS__)
+ 	write_sysreg(0, vttbr_el2);
+@@ -72,8 +70,7 @@ void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
+ 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+ 	isb();
  
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 787b542..e644364 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -137,6 +137,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		MIDR_RANGE(MIDR_QCOM_FALKOR_V1, 0x00, 0x00),
- 	},
- #endif
-+#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1009
-+	{
-+		.desc = "Qualcomm Falkor erratum 1009",
-+		.capability = ARM64_WORKAROUND_REPEAT_TLBI,
-+		MIDR_RANGE(MIDR_QCOM_FALKOR_V1, 0x00, 0x00),
-+	},
-+#endif
- 	{
- 	}
- };
+-	asm volatile("tlbi vmalle1" : : );
+-	dsb(nsh);
++	__tlbi_dsb(vmalle1, nsh);
+ 	isb();
+ 
+ 	write_sysreg(0, vttbr_el2);
+@@ -82,7 +79,5 @@ void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
+ void __hyp_text __kvm_flush_vm_context(void)
+ {
+ 	dsb(ishst);
+-	asm volatile("tlbi alle1is	\n"
+-		     "ic ialluis	  ": : );
+-	dsb(ish);
++	__tlbi_asm_dsb("ic ialluis", alle1is, ish);
+ }
 -- 
 Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
 Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code Aurora
