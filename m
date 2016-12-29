@@ -1,29 +1,21 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH kvm-unit-tests v8 03/10] arm/arm64: add some
- delay routines
-Date: Tue, 27 Dec 2016 17:27:44 +0100
-Message-ID: <20161227162744.2ih6vmijri3slax5@kamzik.brq.redhat.com>
-References: <20161208175030.12269-1-drjones@redhat.com>
- <20161208175030.12269-4-drjones@redhat.com>
- <dfb48863-82a7-3bd2-d2dc-498570325970@arm.com>
- <20161209121541.i3advgnpbu5gvoft@hawk.localdomain>
- <cd3f8a17-f080-5ac8-9398-cddee4d23521@codeaurora.org>
+From: Christopher Covington <cov@codeaurora.org>
+Subject: [PATCH v2 1/5] arm64: Define Falkor v1 CPU
+Date: Thu, 29 Dec 2016 17:43:31 -0500
+Message-ID: <20161229224335.13531-1-cov@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D584340199
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Dec 2016 11:26:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1A90404CC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Dec 2016 17:42:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Hh-sRlOA9CeO for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Dec 2016 11:26:24 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6A0040194
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Dec 2016 11:26:24 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <cd3f8a17-f080-5ac8-9398-cddee4d23521@codeaurora.org>
+ with ESMTP id 0SVOIhKLZLiG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Dec 2016 17:42:16 -0500 (EST)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0AFDA40197
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Dec 2016 17:42:15 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,47 +25,47 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christopher Covington <cov@codeaurora.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, Andre Przywara <andre.przywara@arm.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, shankerd@codeaurora.org, timur@codeaurora.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Dec 27, 2016 at 10:27:25AM -0500, Christopher Covington wrote:
-> On 12/09/2016 07:15 AM, Andrew Jones wrote:
-> > On Fri, Dec 09, 2016 at 11:41:06AM +0000, Andre Przywara wrote:
-> >> Hi,
-> >>
-> >> On 08/12/16 17:50, Andrew Jones wrote:
-> >>> Allow a thread to wait some specified amount of time. Can
-> >>> specify in cycles, usecs, and msecs.
-> 
-> >>> +++ b/lib/arm/asm/delay.h
-> >>> @@ -0,0 +1,14 @@
-> >>> +#ifndef _ASMARM_DELAY_H_
-> >>> +#define _ASMARM_DELAY_H_
-> >>> +/*
-> >>> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-> >>> + *
-> >>> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> >>> + */
-> >>> +#include <libcflat.h>
-> >>> +
-> >>> +extern void delay(u64 cycles);
-> >>
-> >> Nit: Shouldn't this parameter be called "ticks"? Cycles might be a bit
-> >> misleading, especially since this prototype is the only documentation on
-> >> this. You might just want to fix this when applying the patches.
-> > 
-> > Right or wrong the kernel uses 'cycles' for this function, named
-> > __timer_delay for arm and __delay for arm64. I guess I prefer
-> > consistency here.
-> 
-> I too expect timers to tick and CPUs to cycle. The benefit of
-> parameter-name-precise consistency with the Linux source is not
-> obvious to me.
->
+From: Shanker Donthineni <shankerd@codeaurora.org>
 
-I just didn't have a strong enough opinion on it to change it. It appears
-I'm in a minority though. As this is in master already, patches welcome :)
+Define the MIDR implementer and part number field values for the Qualcomm
+Datacenter Technologies Falkor processor version 1 in the usual manner.
 
-Thanks,
-drew
+Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+Signed-off-by: Christopher Covington <cov@codeaurora.org>
+---
+ arch/arm64/include/asm/cputype.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index 26a68dd..ee60561 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -71,6 +71,7 @@
+ #define ARM_CPU_IMP_APM			0x50
+ #define ARM_CPU_IMP_CAVIUM		0x43
+ #define ARM_CPU_IMP_BRCM		0x42
++#define ARM_CPU_IMP_QCOM		0x51
+ 
+ #define ARM_CPU_PART_AEM_V8		0xD0F
+ #define ARM_CPU_PART_FOUNDATION		0xD00
+@@ -84,10 +85,13 @@
+ 
+ #define BRCM_CPU_PART_VULCAN		0x516
+ 
++#define QCOM_CPU_PART_FALKOR_V1		0x800
++
+ #define MIDR_CORTEX_A53 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A53)
+ #define MIDR_CORTEX_A57 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A57)
+ #define MIDR_THUNDERX	MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
+ #define MIDR_THUNDERX_81XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_81XX)
++#define MIDR_QCOM_FALKOR_V1 MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_FALKOR_V1)
+ 
+ #ifndef __ASSEMBLY__
+ 
+-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
+Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code Aurora
+Forum, a Linux Foundation Collaborative Project.
