@@ -1,56 +1,71 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2 4/5] arm64: Use __tlbi_dsb() macros in KVM code
-Date: Tue, 3 Jan 2017 15:57:56 +0000
-Message-ID: <20170103155756.GB14183@leverpostej>
-References: <20161229224335.13531-1-cov@codeaurora.org>
- <20161229224335.13531-4-cov@codeaurora.org>
+From: Brendan Gregg <brendan.d.gregg@gmail.com>
+Subject: Re: [PATCH 11/13] fs: fix unsigned enum warning with gcc-4.2
+Date: Tue, 3 Jan 2017 14:47:09 -0800
+Message-ID: <CAE40pdenVkk-JerdB905nyupoDDPiQk9qv4p1Jv62kcj3-dKhQ@mail.gmail.com>
+References: <20161216105634.235457-1-arnd@arndb.de> <20161216105634.235457-12-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 217CE40797
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2017 10:57:20 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NiTXVM+-69Mp for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Jan 2017 10:57:19 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10FE7406A0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2017 10:57:18 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20161229224335.13531-4-cov@codeaurora.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christopher Covington <cov@codeaurora.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, timur@codeaurora.org, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <20161216105634.235457-12-arnd@arndb.de>
+Sender: linux-arch-owner@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Dec 29, 2016 at 05:43:34PM -0500, Christopher Covington wrote:
-> Refactor the KVM code to use the newly introduced __tlbi_dsb macros, which
-> will allow an errata workaround that repeats tlbi dsb sequences to only
-> change one location. This is not intended to change the generated assembly
-> and comparing before and after vmlinux objdump shows no functional changes.
+On Fri, Dec 16, 2016 at 2:56 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> With arm-linux-gcc-4.2, almost every file we build in the kernel ends
+> up with this warning:
+>
+> include/linux/fs.h:2648: warning: comparison of unsigned expression < 0 is always false
+>
 
-> @@ -40,9 +41,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
->  	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
->  	 * the Stage-1 invalidation happened first.
->  	 */
-> -	dsb(ish);
+Thanks, I'd like to see this fixed as a similar warning gets printed
+whenever running many of the bcc/BPF tools, which gets annoying and is
+user-visible. eg:
 
-Looks like this got accidentally removed. AFAICT it is still necessary.
+# /usr/share/bcc/tools/xfsslower 1
+In file included from /virtual/main.c:3:
+/lib/modules/4.8.6-300.fc25.x86_64/build/include/linux/fs.h:2677:9:
+warning: comparison of unsigned enum expression < 0 is always false
+[-Wtautological-compare]
+        if (id < 0 || id >= READING_MAX_ID)
+            ~~ ^ ~
+1 warning generated.
+Tracing XFS operations slower than 1 ms
+TIME     COMM           PID    T BYTES   OFF_KB   LAT(ms) FILENAME
+14:44:27 cksum          4414   R 65536   0           1.02 chcon
+14:44:27 cksum          4414   R 65536   0           1.20 cpio
+14:44:27 cksum          4414   R 65536   0           1.01 diff
+14:44:27 cksum          4414   R 65536   0           1.15 dir
+[...]
 
-> -	asm volatile("tlbi vmalle1is" : : );
-> -	dsb(ish);
-> +	__tlbi_dsb(vmalle1is, ish);
->  	isb();
+This patch fixes the warning.
 
-Thanks,
-Mark.
+Brendan
+
+>
+> Later versions don't have this problem, but it's easy enough to
+> work around.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  include/linux/fs.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 398cf20a706d..782c2a292fd7 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -2645,7 +2645,7 @@ static const char * const kernel_read_file_str[] = {
+>
+>  static inline const char *kernel_read_file_id_str(enum kernel_read_file_id id)
+>  {
+> -       if (id < 0 || id >= READING_MAX_ID)
+> +       if ((unsigned)id >= READING_MAX_ID)
+>                 return kernel_read_file_str[READING_UNKNOWN];
+>
+>         return kernel_read_file_str[id];
+> --
+> 2.9.0
+>
