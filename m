@@ -1,25 +1,26 @@
 From: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Subject: Re: [PATCH V6 03/10] efi: parse ARM processor error
-Date: Thu, 5 Jan 2017 14:17:54 -0700
-Message-ID: <63d439c0-0e21-dcf5-72da-e84ae0cc2df8@codeaurora.org>
+Subject: Re: [PATCH V6 05/10] acpi: apei: handle SEA notification type for
+ ARMv8
+Date: Thu, 5 Jan 2017 15:31:06 -0700
+Message-ID: <8b7fa162-0d44-025f-758d-d61cfa75c787@codeaurora.org>
 References: <1481147303-7979-1-git-send-email-tbaicar@codeaurora.org>
- <1481147303-7979-4-git-send-email-tbaicar@codeaurora.org>
- <5852A3CA.807@arm.com>
+ <1481147303-7979-6-git-send-email-tbaicar@codeaurora.org>
+ <58594E62.3050003@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13EC7408AA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Jan 2017 16:16:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4933B4079A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Jan 2017 17:29:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4dhy197lUQTd for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Jan 2017 16:16:25 -0500 (EST)
+ with ESMTP id ueTjlZ2gTxA4 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Jan 2017 17:29:36 -0500 (EST)
 Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0D9F407EF
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Jan 2017 16:16:24 -0500 (EST)
-In-Reply-To: <5852A3CA.807@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4912C4069B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Jan 2017 17:29:35 -0500 (EST)
+In-Reply-To: <58594E62.3050003@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,187 +34,83 @@ To: James Morse <james.morse@arm.com>
 Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/15/2016 7:08 AM, James Morse wrote:
+On 12/20/2016 8:29 AM, James Morse wrote:
 > Hi Tyler,
 >
 > On 07/12/16 21:48, Tyler Baicar wrote:
->> Add support for ARM Common Platform Error Record (CPER).
->> UEFI 2.6 specification adds support for ARM specific
->> processor error information to be reported as part of the
->> CPER records. This provides more detail on for processor error logs.
-> Looks good to me, a few minor comments below.
->
-> Reviewed-by: James Morse <james.morse@arm.com>
-Thanks!
->> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
->> index 8fa4e23..1ac2572 100644
->> --- a/drivers/firmware/efi/cper.c
->> +++ b/drivers/firmware/efi/cper.c
->> @@ -184,6 +199,110 @@ static void cper_print_proc_generic(const char *pfx,
->>   		printk("%s""IP: 0x%016llx\n", pfx, proc->ip);
->>   }
+>> ARM APEI extension proposal added SEA (Synchrounous External
+>> Abort) notification type for ARMv8.
+>> Add a new GHES error source handling function for SEA. If an error
+>> source's notification type is SEA, then this function can be registered
+>> into the SEA exception handler. That way GHES will parse and report
+>> SEA exceptions when they occur.
+>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+>> index 2acbc60..66ab3fd 100644
+>> --- a/drivers/acpi/apei/ghes.c
+>> +++ b/drivers/acpi/apei/ghes.c
+>> @@ -767,6 +771,62 @@ static struct notifier_block ghes_notifier_sci = {
+>>   	.notifier_call = ghes_notify_sci,
+>>   };
 >>   
->> +static void cper_print_proc_arm(const char *pfx,
->> +				const struct cper_sec_proc_arm *proc)
+>> +#ifdef CONFIG_HAVE_ACPI_APEI_SEA
+>> +static LIST_HEAD(ghes_sea);
+>> +
+>> +static int ghes_notify_sea(struct notifier_block *this,
+>> +				  unsigned long event, void *data)
 >> +{
->> +	int i, len, max_ctx_type;
->> +	struct cper_arm_err_info *err_info;
->> +	struct cper_arm_ctx_info *ctx_info;
->> +	char newpfx[64];
+>> +	struct ghes *ghes;
+>> +	int ret = NOTIFY_DONE;
 >> +
->> +	printk("%ssection length: %d\n", pfx, proc->section_length);
-> Compared to the rest of the file, this:
->> 	printk("%s""section length: %d\n", pfx, proc->section_length);
-> would be more in keeping. I guess its done this way to avoid some spurious
-> warning about %ssection not being recognised by printk().
-Makes sense, I'll make this change next patchset.
->> +	printk("%sMIDR: 0x%016llx\n", pfx, proc->midr);
->> +
->> +	len = proc->section_length - (sizeof(*proc) +
->> +		proc->err_info_num * (sizeof(*err_info)));
->> +	if (len < 0) {
->> +		printk("%ssection length is too small\n", pfx);
-> This calculation is all based on values in the 'struct cper_sec_proc_arm', is it
-> worth making more noise about how the firmware-generated record is incorrectly
-> formatted? If we see this message its not the kernel's fault!
-I can make the print more clear saying that the firmware-generated 
-record is incorrect to make
-it clear it is not a kernel issue.
->> +		printk("%sERR_INFO_NUM is %d\n", pfx, proc->err_info_num);
->> +		return;
+>> +	rcu_read_lock();
+>> +	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
+>> +		if (!ghes_proc(ghes))
+>> +			ret = NOTIFY_OK;
 >> +	}
+>> +	rcu_read_unlock();
 >> +
->> +	if (proc->validation_bits & CPER_ARM_VALID_MPIDR)
->> +		printk("%sMPIDR: 0x%016llx\n", pfx, proc->mpidr);
->> +	if (proc->validation_bits & CPER_ARM_VALID_AFFINITY_LEVEL)
->> +		printk("%serror affinity level: %d\n", pfx,
->> +			proc->affinity_level);
->> +	if (proc->validation_bits & CPER_ARM_VALID_RUNNING_STATE) {
->> +		printk("%srunning state: %d\n", pfx, proc->running_state);
-> This field is described as a bit field in table 260, can we print it as 0x%lx in
-> case additional bits are set?
-Yes, will do.
->> +		printk("%sPSCI state: %d\n", pfx, proc->psci_state);
->> +	}
->> +
->> +	snprintf(newpfx, sizeof(newpfx), "%s%s", pfx, INDENT_SP);
->> +
->> +	err_info = (struct cper_arm_err_info *)(proc + 1);
->> +	for (i = 0; i < proc->err_info_num; i++) {
->> +		printk("%sError info structure %d:\n", pfx, i);
->> +		printk("%sversion:%d\n", newpfx, err_info->version);
->> +		printk("%slength:%d\n", newpfx, err_info->length);
->> +		if (err_info->validation_bits &
->> +		    CPER_ARM_INFO_VALID_MULTI_ERR) {
->> +			if (err_info->multiple_error == 0)
->> +				printk("%ssingle error\n", newpfx);
->> +			else if (err_info->multiple_error == 1)
->> +				printk("%smultiple errors\n", newpfx);
->> +			else
->> +				printk("%smultiple errors count:%d\n",
->> +				newpfx, err_info->multiple_error);
-> This is described as unsigned in table 261.
-Will change.
->> +		}
->> +		if (err_info->validation_bits & CPER_ARM_INFO_VALID_FLAGS) {
->> +			if (err_info->flags & CPER_ARM_INFO_FLAGS_FIRST)
->> +				printk("%sfirst error captured\n", newpfx);
->> +			if (err_info->flags & CPER_ARM_INFO_FLAGS_LAST)
->> +				printk("%slast error captured\n", newpfx);
->> +			if (err_info->flags & CPER_ARM_INFO_FLAGS_PROPAGATED)
->> +				printk("%spropagated error captured\n",
->> +				       newpfx);
-> Table 261 also has an 'overflow' bit in flags. It may be worth printing a
-> warning if this is set:
->> Note: Overflow bit indicates that firmware/hardware error
->> buffers had experience an overflow, and it is possible that
->> some error information has been lost.
-I will add that in.
->> +		}
->> +		printk("%serror_type: %d, %s\n", newpfx, err_info->type,
->> +			err_info->type < ARRAY_SIZE(proc_error_type_strs) ?
->> +			proc_error_type_strs[err_info->type] : "unknown");
->> +		if (err_info->validation_bits & CPER_ARM_INFO_VALID_ERR_INFO)
->> +			printk("%serror_info: 0x%016llx\n", newpfx,
->> +			       err_info->error_info);
->> +		if (err_info->validation_bits & CPER_ARM_INFO_VALID_VIRT_ADDR)
->> +			printk("%svirtual fault address: 0x%016llx\n",
->> +				newpfx, err_info->virt_fault_addr);
->> +		if (err_info->validation_bits &
->> +		    CPER_ARM_INFO_VALID_PHYSICAL_ADDR)
->> +			printk("%sphysical fault address: 0x%016llx\n",
->> +				newpfx, err_info->physical_fault_addr);
->> +		err_info += 1;
->> +	}
->> +	ctx_info = (struct cper_arm_ctx_info *)err_info;
->> +	max_ctx_type = (sizeof(arm_reg_ctx_strs) /
->> +			sizeof(arm_reg_ctx_strs[0]) - 1);
-> ARRAY_SIZE() - 1?
-I'll use ARRAY_SIZE in the next patchset.
->> +	for (i = 0; i < proc->context_info_num; i++) {
->> +		int size = sizeof(*ctx_info) + ctx_info->size;
->> +
->> +		printk("%sContext info structure %d:\n", pfx, i);
->> +		if (len < size) {
->> +			printk("%ssection length is too small\n", newpfx);
->> +			return;
->> +		}
->> +		if (ctx_info->type > max_ctx_type) {
->> +			printk("%sInvalid context type: %d\n",	newpfx,
->> +						ctx_info->type);
->> +			printk("%sMax context type: %d\n", newpfx,
->> +						max_ctx_type);
->> +			return;
->> +		}
->> +		printk("%sregister context type %d: %s\n", newpfx,
->> +			ctx_info->type, arm_reg_ctx_strs[ctx_info->type]);
->> +		print_hex_dump(newpfx, "", DUMP_PREFIX_OFFSET, 16, 4,
->> +				(ctx_info + 1), ctx_info->size, 0);
->> +		len -= size;
->> +		ctx_info = (struct cper_arm_ctx_info *)((long)ctx_info + size);
->> +	}
->> +
->> +	if (len > 0) {
->> +		printk("%sVendor specific error info has %d bytes:\n", pfx,
->> +		       len);
-> %u - just in case it is surprisingly large!
->
-Will do.
->> +		print_hex_dump(newpfx, "", DUMP_PREFIX_OFFSET, 16, 4, ctx_info,
->> +				len, 0);
->> +	}
+>> +	return ret;
 >> +}
->> +
->>   static const char * const mem_err_type_strs[] = {
->>   	"unknown",
->>   	"no error",
->> @@ -458,6 +577,15 @@ static void cper_estatus_print_section(
->>   			cper_print_pcie(newpfx, pcie, gdata);
->>   		else
->>   			goto err_section_too_small;
->> +	} else if (!uuid_le_cmp(*sec_type, CPER_SEC_PROC_ARM)) {
->> +		struct cper_sec_proc_arm *arm_err;
->> +
->> +		arm_err = acpi_hest_generic_data_payload(gdata);
->> +		printk("%ssection_type: ARM processor error\n", newpfx);
->> +		if (gdata->error_data_length >= sizeof(*arm_err))
->> +			cper_print_proc_arm(newpfx, arm_err);
->> +		else
->> +			goto err_section_too_small;
->>   	} else
->>   		printk("%s""section type: unknown, %pUl\n", newpfx, sec_type);
->>   
-> This is the only processor-specific entry in this function,
-> CPER_SEC_PROC_{IA,IPF} don't appear anywhere else in the tree.
+> What stops this from being re-entrant?
 >
-> Is it worth adding an (IS_ENABLED(CONFIG_ARM64) || IS_ENABLED(CONFIG_ARM)) in
-> the if()? This would let the compiler remove cper_print_proc_arm(() on x86/ia64
-> systems which won't ever see a record of this type.
-Yes, I can add that.
+> ghes_copy_tofrom_phs() takes the ghes_ioremap_lock_irq spinlock, but there is
+> nothing to stop a subsequent instruction fetch or memory access causing another
+> (maybe different) Synchronous External Abort which deadlocks trying to take the
+> same lock.
+>
+> ghes_notify_sea() looks to be based on ghes_notify_sci(), which (if I've found
+> the right part of the ACPI spec) is a level-low interrupt. spin_lock_irqsave()
+> would mask interrupts so there is no risk of a different notification firing on
+> the same CPU, (it looks like they are almost all ultimately an irq).
+>
+> NMI is the odd one out because its not maskable like this, but ghes_notify_nmi()
+> has:
+>> 	if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
+>> 		return ret;
+> To ensure there is only ever one thread poking around in this code.
+>
+> What happens if a system describes two GHES sources, one using an irq the other
+> SEA? The SEA error can interrupt the irq error while its holding the above lock.
+> I guess this is also why all the NMI code in that file is separate.
+>
+>
+> Thanks,
+>
+> James
+Hi James,
 
-Thank you for the feedback!
+Let me see if I'm following you right :)
+I should use spin_lock_irqsave() in ghes_notify_sea() to avoid 
+ghes_notify_sci() from
+interrupting this process and potentially causing the deadlock?
 
--Tyler
+This race condition does seem valid. We are using the same 
+acknowledgment for all our
+HEST table entries, so our firmware will not populate more than one 
+entry at a time. That
+gets us around this race condition.
+
+Thanks,
+Tyler
 
 -- 
 Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
