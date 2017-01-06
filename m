@@ -1,27 +1,31 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH V6 05/10] acpi: apei: handle SEA notification type for
- ARMv8
-Date: Fri, 06 Jan 2017 10:43:39 +0000
-Message-ID: <586F74DB.3020107@arm.com>
-References: <1481147303-7979-1-git-send-email-tbaicar@codeaurora.org>
- <1481147303-7979-6-git-send-email-tbaicar@codeaurora.org>
- <58594E62.3050003@arm.com>
- <8b7fa162-0d44-025f-758d-d61cfa75c787@codeaurora.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC PATCH 1/7] arm64: Use physical counter for in-kernel reads
+Date: Fri, 6 Jan 2017 11:53:01 +0100
+Message-ID: <20170106105301.GB27758@cbox>
+References: <20161210204712.21830-1-christoffer.dall@linaro.org>
+ <20161210204712.21830-2-christoffer.dall@linaro.org>
+ <5e820613-f9f3-0035-b145-0e22e9bcfeca@arm.com>
+ <20170106100049.GB21089@cbox>
+ <89b4c1c1-3c6a-b7a1-cbcb-93a64812ebff@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C677405DA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 05:43:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2CD7405DA
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 05:51:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 53CJFW+nwjNc for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Jan 2017 05:43:07 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 606DA405D5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 05:43:07 -0500 (EST)
-In-Reply-To: <8b7fa162-0d44-025f-758d-d61cfa75c787@codeaurora.org>
+ with ESMTP id zQnWWuhFSElM for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Jan 2017 05:51:27 -0500 (EST)
+Received: from mail-lf0-f45.google.com (mail-lf0-f45.google.com
+ [209.85.215.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66FAC405D5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 05:51:26 -0500 (EST)
+Received: by mail-lf0-f45.google.com with SMTP id x140so44312239lfa.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Jan 2017 02:53:03 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <89b4c1c1-3c6a-b7a1-cbcb-93a64812ebff@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,112 +35,87 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Tyler,
+On Fri, Jan 06, 2017 at 10:38:49AM +0000, Marc Zyngier wrote:
+> On 06/01/17 10:00, Christoffer Dall wrote:
+> > Hi Marc,
+> > 
+> > On Thu, Jan 05, 2017 at 06:11:14PM +0000, Marc Zyngier wrote:
+> >> [adding the arm64 maintainers, plus Mark as arch timer maintainer]
+> > 
+> > Right, sorry, I should have done that already.
+> > 
+> >>
+> >> On 10/12/16 20:47, Christoffer Dall wrote:
+> >>> Using the physical counter allows KVM to retain the offset between the
+> >>> virtual and physical counter as long as it is actively running a VCPU.
+> >>>
+> >>> As soon as a VCPU is released, another thread is scheduled or we start
+> >>> running userspace applications, we reset the offset to 0, so that VDSO
+> >>> operations can still read the virtual counter and get the same view of
+> >>> time as the kernel.
+> >>>
+> >>> This opens up potential improvements for KVM performance.
+> >>>
+> >>> VHE kernels or kernels using the virtual timer are unaffected by this.
+> >>>
+> >>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >>> ---
+> >>>  arch/arm64/include/asm/arch_timer.h  | 6 ++++--
+> >>>  drivers/clocksource/arm_arch_timer.c | 2 +-
+> >>>  2 files changed, 5 insertions(+), 3 deletions(-)
+> >>>
+> >>> diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
+> >>> index eaa5bbe..cec2549 100644
+> >>> --- a/arch/arm64/include/asm/arch_timer.h
+> >>> +++ b/arch/arm64/include/asm/arch_timer.h
+> >>> @@ -139,11 +139,13 @@ static inline void arch_timer_set_cntkctl(u32 cntkctl)
+> >>>  
+> >>>  static inline u64 arch_counter_get_cntpct(void)
+> >>>  {
+> >>> +	u64 cval;
+> >>>  	/*
+> >>>  	 * AArch64 kernel and user space mandate the use of CNTVCT.
+> >>>  	 */
+> >>> -	BUG();
+> >>> -	return 0;
+> >>> +	isb();
+> >>> +	asm volatile("mrs %0, cntpct_el0" : "=r" (cval));
+> >>> +	return cval;
+> >>>  }
+> >>>  
+> >>>  static inline u64 arch_counter_get_cntvct(void)
+> >>> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+> >>> index 73c487d..a5b0789 100644
+> >>> --- a/drivers/clocksource/arm_arch_timer.c
+> >>> +++ b/drivers/clocksource/arm_arch_timer.c
+> >>> @@ -597,7 +597,7 @@ static void __init arch_counter_register(unsigned type)
+> >>>  
+> >>>  	/* Register the CP15 based counter if we have one */
+> >>>  	if (type & ARCH_CP15_TIMER) {
+> >>> -		if (IS_ENABLED(CONFIG_ARM64) || arch_timer_uses_ppi == VIRT_PPI)
+> >>> +		if (arch_timer_uses_ppi == VIRT_PPI || is_kernel_in_hyp_mode())
+> >>
+> >> Why do we have this is_kernel_in_hyp_mode clause? I can't think of any
+> >> reason for a VHE kernel to use the virtual counter at all...
+> >>
+> > 
+> > Good question.  I think I just didn't want to change behavior from the
+> > existing functionality mre than necessary.
+> > 
+> > Note that on a VHE kernel this will be the EL2 virtual counter, not the
+> > EL1 virtual counter, due to the register redirection.  Are the virtual
+> > and physical EL2 counters always equivalent on a VHE system?
+> 
+> Yes, they are. CNTVOFF_EL2 is ignored in that case, and you get an extra
+> interrupt for the new EL2 virtual timer as well.
+> 
 
-On 05/01/17 22:31, Baicar, Tyler wrote:
-> On 12/20/2016 8:29 AM, James Morse wrote:
->> On 07/12/16 21:48, Tyler Baicar wrote:
->>> ARM APEI extension proposal added SEA (Synchrounous External
->>> Abort) notification type for ARMv8.
->>> Add a new GHES error source handling function for SEA. If an error
->>> source's notification type is SEA, then this function can be registered
->>> into the SEA exception handler. That way GHES will parse and report
->>> SEA exceptions when they occur.
->>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
->>> index 2acbc60..66ab3fd 100644
->>> --- a/drivers/acpi/apei/ghes.c
->>> +++ b/drivers/acpi/apei/ghes.c
->>> @@ -767,6 +771,62 @@ static struct notifier_block ghes_notifier_sci = {
->>>       .notifier_call = ghes_notify_sci,
->>>   };
->>>   +#ifdef CONFIG_HAVE_ACPI_APEI_SEA
->>> +static LIST_HEAD(ghes_sea);
->>> +
->>> +static int ghes_notify_sea(struct notifier_block *this,
->>> +                  unsigned long event, void *data)
->>> +{
->>> +    struct ghes *ghes;
->>> +    int ret = NOTIFY_DONE;
->>> +
->>> +    rcu_read_lock();
->>> +    list_for_each_entry_rcu(ghes, &ghes_sea, list) {
->>> +        if (!ghes_proc(ghes))
->>> +            ret = NOTIFY_OK;
->>> +    }
->>> +    rcu_read_unlock();
->>> +
->>> +    return ret;
->>> +}
-
->> What stops this from being re-entrant?
->>
->> ghes_copy_tofrom_phs() takes the ghes_ioremap_lock_irq spinlock, but there is
->> nothing to stop a subsequent instruction fetch or memory access causing another
->> (maybe different) Synchronous External Abort which deadlocks trying to take the
->> same lock.
->>
->> ghes_notify_sea() looks to be based on ghes_notify_sci(), which (if I've found
->> the right part of the ACPI spec) is a level-low interrupt. spin_lock_irqsave()
->> would mask interrupts so there is no risk of a different notification firing on
->> the same CPU, (it looks like they are almost all ultimately an irq).
->>
->> NMI is the odd one out because its not maskable like this, but ghes_notify_nmi()
->> has:
->>>     if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
->>>         return ret;
->> To ensure there is only ever one thread poking around in this code.
->>
->> What happens if a system describes two GHES sources, one using an irq the other
->> SEA? The SEA error can interrupt the irq error while its holding the above lock.
->> I guess this is also why all the NMI code in that file is separate.
-
-
-> Let me see if I'm following you right :)
-> I should use spin_lock_irqsave() in ghes_notify_sea() to avoid ghes_notify_sci()
-> from
-> interrupting this process and potentially causing the deadlock?
-
-This way round you are already safe: The CPU masks interrupts when it takes the
-exception, they should still be masked by the time we get in here...
-
-The other way round is a lot more fun!
-
-What happens if APEI is processing some error record that was notified via an
-interrupt, and then takes the Synchronous External Abort, and ends up back in
-this code? Masking interrupts doesn't stop the external-abort, and trying to
-take the ghes_ioremap_lock_irq will deadlock.
-
-What happens if we interrupt printk() holding all its locks is another thing I
-haven't worked out yet.
-
-
-> This race condition does seem valid. We are using the same acknowledgment for
-> all our
-> HEST table entries, so our firmware will not populate more than one entry at a
-> time. That
-> gets us around this race condition.
-
-Ah, so your firmware will wait for the interrupt-signalled error to be finished
-before it triggers the Synchronous External Abort. I think this would still be a
-linux bug if the firmware didn't do this.
-
-x86 could have done the same with NMI notifications, but we have all this 'if
-(in_nmi)' to allow interrupts-masked GHES handling to be interrupted.
-
-What do you think to re-using the 'if (in_nmi)' code for SEA? We can argue that
-SEA is NMI-like in that it can't be masked, and it interrupts code that had
-interrupts masked. It 'should' be as simple as putting 'HAVE_NMI' in arm64's
-Kconfig, and wrapping the atomic notifier call with nmi_enter()/nmi_exit() from
-linux/hardirq.h. (...famous last words...)
-
-This probably answers my printk() questions too, but I need to look into it some
-more.
-
+ok, in that case I suppose I can just check for arch_timer_uses_ppi ==
+VIRT_PPI and be done with it.
 
 Thanks,
-
-James
+-Christoffer
