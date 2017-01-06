@@ -1,26 +1,25 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH 4/7] KVM: arm/arm64: Check that system supports split
- eoi/deactivate
-Date: Fri, 6 Jan 2017 10:24:04 +0000
-Message-ID: <c3f788da-4cae-76ee-d186-ad44fcf3a318@arm.com>
+Subject: Re: [RFC PATCH 1/7] arm64: Use physical counter for in-kernel reads
+Date: Fri, 6 Jan 2017 10:38:49 +0000
+Message-ID: <89b4c1c1-3c6a-b7a1-cbcb-93a64812ebff@arm.com>
 References: <20161210204712.21830-1-christoffer.dall@linaro.org>
- <20161210204712.21830-5-christoffer.dall@linaro.org>
- <7e44980f-d4b9-a5d0-b0a9-5424548300d8@arm.com> <20170106100257.GD21089@cbox>
+ <20161210204712.21830-2-christoffer.dall@linaro.org>
+ <5e820613-f9f3-0035-b145-0e22e9bcfeca@arm.com> <20170106100049.GB21089@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29D9E4044B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 05:22:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0006A405D5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 05:37:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hRmuvL-VsN07 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Jan 2017 05:22:30 -0500 (EST)
+ with ESMTP id 5khRhv1cGbSf for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Jan 2017 05:37:15 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5D4140187
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 05:22:29 -0500 (EST)
-In-Reply-To: <20170106100257.GD21089@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA89B40190
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 05:37:14 -0500 (EST)
+In-Reply-To: <20170106100049.GB21089@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,71 +30,83 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/01/17 10:02, Christoffer Dall wrote:
-> On Thu, Jan 05, 2017 at 05:40:58PM +0000, Marc Zyngier wrote:
+On 06/01/17 10:00, Christoffer Dall wrote:
+> Hi Marc,
+> 
+> On Thu, Jan 05, 2017 at 06:11:14PM +0000, Marc Zyngier wrote:
+>> [adding the arm64 maintainers, plus Mark as arch timer maintainer]
+> 
+> Right, sorry, I should have done that already.
+> 
+>>
 >> On 10/12/16 20:47, Christoffer Dall wrote:
->>> Some systems without proper firmware and/or hardware description data
->>> don't support the split EOI and deactivate operation and therefore
->>> don't provide an irq_set_vcpu_affinity implementation.  On such
->>> systems, we cannot leave the physical interrupt active after the timer
->>> handler on the host has run, so we cannot support KVM with the timer
->>> changes we about to introduce.
+>>> Using the physical counter allows KVM to retain the offset between the
+>>> virtual and physical counter as long as it is actively running a VCPU.
+>>>
+>>> As soon as a VCPU is released, another thread is scheduled or we start
+>>> running userspace applications, we reset the offset to 0, so that VDSO
+>>> operations can still read the virtual counter and get the same view of
+>>> time as the kernel.
+>>>
+>>> This opens up potential improvements for KVM performance.
+>>>
+>>> VHE kernels or kernels using the virtual timer are unaffected by this.
 >>>
 >>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 >>> ---
->>>  virt/kvm/arm/arch_timer.c | 30 ++++++++++++++++++++++++++++++
->>>  1 file changed, 30 insertions(+)
+>>>  arch/arm64/include/asm/arch_timer.h  | 6 ++++--
+>>>  drivers/clocksource/arm_arch_timer.c | 2 +-
+>>>  2 files changed, 5 insertions(+), 3 deletions(-)
 >>>
->>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->>> index c7c3bfd..f27a086 100644
->>> --- a/virt/kvm/arm/arch_timer.c
->>> +++ b/virt/kvm/arm/arch_timer.c
->>> @@ -418,6 +418,31 @@ static int kvm_timer_dying_cpu(unsigned int cpu)
->>>  	return 0;
+>>> diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
+>>> index eaa5bbe..cec2549 100644
+>>> --- a/arch/arm64/include/asm/arch_timer.h
+>>> +++ b/arch/arm64/include/asm/arch_timer.h
+>>> @@ -139,11 +139,13 @@ static inline void arch_timer_set_cntkctl(u32 cntkctl)
+>>>  
+>>>  static inline u64 arch_counter_get_cntpct(void)
+>>>  {
+>>> +	u64 cval;
+>>>  	/*
+>>>  	 * AArch64 kernel and user space mandate the use of CNTVCT.
+>>>  	 */
+>>> -	BUG();
+>>> -	return 0;
+>>> +	isb();
+>>> +	asm volatile("mrs %0, cntpct_el0" : "=r" (cval));
+>>> +	return cval;
 >>>  }
 >>>  
->>> +static bool has_split_eoi_deactivate_support(void)
->>> +{
->>> +	struct irq_desc *desc;
->>> +	struct irq_data *data;
->>> +	struct irq_chip *chip;
->>> +
->>> +	/*
->>> +	 * Check if split EOI and deactivate is supported on this machine.
->>> +	 */
->>> +	desc = irq_to_desc(host_vtimer_irq);
->>> +	if (!desc) {
->>> +		kvm_err("kvm_arch_timer: no host_vtimer_irq descriptor\n");
->>> +		return false;
->>> +	}
->>> +
->>> +	data = irq_desc_get_irq_data(desc);
->>> +	chip = irq_data_get_irq_chip(data);
->>> +	if (!chip || !chip->irq_set_vcpu_affinity) {
->>> +		kvm_err("kvm_arch_timer: no split EOI/deactivate; abort\n");
->>> +		return false;
->>> +	}
->>> +
->>> +	return true;
->>> +}
+>>>  static inline u64 arch_counter_get_cntvct(void)
+>>> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+>>> index 73c487d..a5b0789 100644
+>>> --- a/drivers/clocksource/arm_arch_timer.c
+>>> +++ b/drivers/clocksource/arm_arch_timer.c
+>>> @@ -597,7 +597,7 @@ static void __init arch_counter_register(unsigned type)
+>>>  
+>>>  	/* Register the CP15 based counter if we have one */
+>>>  	if (type & ARCH_CP15_TIMER) {
+>>> -		if (IS_ENABLED(CONFIG_ARM64) || arch_timer_uses_ppi == VIRT_PPI)
+>>> +		if (arch_timer_uses_ppi == VIRT_PPI || is_kernel_in_hyp_mode())
 >>
->> That feels really involved. How about reporting that we don't have a
->> usable VGIC altogether from the GIC driver?
+>> Why do we have this is_kernel_in_hyp_mode clause? I can't think of any
+>> reason for a VHE kernel to use the virtual counter at all...
 >>
 > 
-> You mean not booting the kernel at all, or establish some communication
-> from the GIC driver to KVM, telling KVM if it's usable for
-> virtualization or not?
+> Good question.  I think I just didn't want to change behavior from the
+> existing functionality mre than necessary.
+> 
+> Note that on a VHE kernel this will be the EL2 virtual counter, not the
+> EL1 virtual counter, due to the register redirection.  Are the virtual
+> and physical EL2 counters always equivalent on a VHE system?
 
-We already query the vgic configuration by calling gic_get_kvm_info() at
-boot time. My suggestion is to make it return NULL if the GIC can't
-support split EOI/deactivate, and fallback to the "no-vgic" mode, if
-ever implemented.
+Yes, they are. CNTVOFF_EL2 is ignored in that case, and you get an extra
+interrupt for the new EL2 virtual timer as well.
 
-Thoughts?
+Thanks,
 
 	M.
 -- 
