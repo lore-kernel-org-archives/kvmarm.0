@@ -1,29 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 1/7] arm64: Use physical counter for in-kernel reads
-Date: Fri, 6 Jan 2017 11:00:49 +0100
-Message-ID: <20170106100049.GB21089@cbox>
+Subject: Re: [RFC PATCH 0/7] KVM: arm/arm64: Optimize arch timer register
+ handling
+Date: Fri, 6 Jan 2017 11:01:47 +0100
+Message-ID: <20170106100147.GC21089@cbox>
 References: <20161210204712.21830-1-christoffer.dall@linaro.org>
- <20161210204712.21830-2-christoffer.dall@linaro.org>
- <5e820613-f9f3-0035-b145-0e22e9bcfeca@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78687404E4
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 04:59:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27E6C404E4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 05:00:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s3WjtCJcAdol for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Jan 2017 04:59:14 -0500 (EST)
-Received: from mail-lf0-f41.google.com (mail-lf0-f41.google.com
- [209.85.215.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12B49405E9
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 04:59:13 -0500 (EST)
-Received: by mail-lf0-f41.google.com with SMTP id x140so43647683lfa.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Jan 2017 02:00:51 -0800 (PST)
+ with ESMTP id uXSCSkG8ne77 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Jan 2017 05:00:13 -0500 (EST)
+Received: from mail-lf0-f53.google.com (mail-lf0-f53.google.com
+ [209.85.215.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0FFA24048E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jan 2017 05:00:11 -0500 (EST)
+Received: by mail-lf0-f53.google.com with SMTP id d16so49474035lfb.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Jan 2017 02:01:49 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <5e820613-f9f3-0035-b145-0e22e9bcfeca@arm.com>
+In-Reply-To: <20161210204712.21830-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,85 +32,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On Thu, Jan 05, 2017 at 06:11:14PM +0000, Marc Zyngier wrote:
-> [adding the arm64 maintainers, plus Mark as arch timer maintainer]
-
-Right, sorry, I should have done that already.
-
+On Sat, Dec 10, 2016 at 09:47:05PM +0100, Christoffer Dall wrote:
+> We currently spend around ~400 cycles on each entry/exit to the guest
+> dealing with arch timer registers, even when the timer is not pending
+> and not doing anything.
 > 
-> On 10/12/16 20:47, Christoffer Dall wrote:
-> > Using the physical counter allows KVM to retain the offset between the
-> > virtual and physical counter as long as it is actively running a VCPU.
-> > 
-> > As soon as a VCPU is released, another thread is scheduled or we start
-> > running userspace applications, we reset the offset to 0, so that VDSO
-> > operations can still read the virtual counter and get the same view of
-> > time as the kernel.
-> > 
-> > This opens up potential improvements for KVM performance.
-> > 
-> > VHE kernels or kernels using the virtual timer are unaffected by this.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> >  arch/arm64/include/asm/arch_timer.h  | 6 ++++--
-> >  drivers/clocksource/arm_arch_timer.c | 2 +-
-> >  2 files changed, 5 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
-> > index eaa5bbe..cec2549 100644
-> > --- a/arch/arm64/include/asm/arch_timer.h
-> > +++ b/arch/arm64/include/asm/arch_timer.h
-> > @@ -139,11 +139,13 @@ static inline void arch_timer_set_cntkctl(u32 cntkctl)
-> >  
-> >  static inline u64 arch_counter_get_cntpct(void)
-> >  {
-> > +	u64 cval;
-> >  	/*
-> >  	 * AArch64 kernel and user space mandate the use of CNTVCT.
-> >  	 */
-> > -	BUG();
-> > -	return 0;
-> > +	isb();
-> > +	asm volatile("mrs %0, cntpct_el0" : "=r" (cval));
-> > +	return cval;
-> >  }
-> >  
-> >  static inline u64 arch_counter_get_cntvct(void)
-> > diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-> > index 73c487d..a5b0789 100644
-> > --- a/drivers/clocksource/arm_arch_timer.c
-> > +++ b/drivers/clocksource/arm_arch_timer.c
-> > @@ -597,7 +597,7 @@ static void __init arch_counter_register(unsigned type)
-> >  
-> >  	/* Register the CP15 based counter if we have one */
-> >  	if (type & ARCH_CP15_TIMER) {
-> > -		if (IS_ENABLED(CONFIG_ARM64) || arch_timer_uses_ppi == VIRT_PPI)
-> > +		if (arch_timer_uses_ppi == VIRT_PPI || is_kernel_in_hyp_mode())
+> We can do much better by moving the arch timer save/restore to the
+> vcpu_load and vcpu_put functions, but this means that if we don't read
+> back the timer state on every exit from the guest, then we have to be
+> able to start taking timer interrupts for the virtual timer in KVM and
+> handle that properly.
 > 
-> Why do we have this is_kernel_in_hyp_mode clause? I can't think of any
-> reason for a VHE kernel to use the virtual counter at all...
+> That has a number of funny consequences, such as having to make sure we
+> don't deadlock between any of the vgic code and interrupt injection
+> happening from an ISR.  On the plus side, being able to inject
+> virtual interrupts corresponding to a physical interrupt directly from
+> an ISR is probably a good system design change.
+> 
+> We also have to change the use of the physical vs. virtual counter in
+> the arm64 kernel to avoid having to save/restore the CNTVOFF_EL2
+> register on every return to the hypervisor.  The only reason I could
+> find for using the virtual counter for the kernel on systems with access
+> to the physical counter is to detect if firmware did not properly clear
+> CNTVOFF_EL2, and this change has to weighed against the existing check
+> (assuming I got this right).
+> 
+> On a non-VHE system (AMD Seattle) I have measured this to improve the
+> world-switch time by about ~100 cycles, but on an EL2 kernel (emulating
+> VHE behavior on the same hardware) this gives us around ~250 cycles
+> worth of improvement, because we can avoid the extra configuration of
+> trapping accesses to the physical timer from EL1 on every switch.
+> 
+> I'm not sure if the benefits outweigh the complexity of this patch set,
+> nor am I sure if I'm missing an overall better approach, hence the RFC
+> tag on the series.
+> 
+> I'm looking forward to overall comments on the approach.
 > 
 
-Good question.  I think I just didn't want to change behavior from the
-existing functionality mre than necessary.
-
-Note that on a VHE kernel this will be the EL2 virtual counter, not the
-EL1 virtual counter, due to the register redirection.  Are the virtual
-and physical EL2 counters always equivalent on a VHE system?
-
-
-> >  			arch_timer_read_counter = arch_counter_get_cntvct;
-> >  		else
-> >  			arch_timer_read_counter = arch_counter_get_cntpct;
-> > 
-> 
+FYI for anyone looking at these patches, I found some issues with the
+series and will respin shortly.  Patch 5 has also been split to
+hopefully simplify the review, as I realized it is horrible to look at
+in its current form.
 
 Thanks,
 -Christoffer
