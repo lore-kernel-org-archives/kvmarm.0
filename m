@@ -1,39 +1,40 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC 15/55] KVM: arm64: Trap EL1 VM register accesses in virtual EL2
-Date: Mon,  9 Jan 2017 01:24:11 -0500
-Message-ID: <1483943091-1364-16-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC 31/55] KVM: arm/arm64: Inject maintenance interrupts to the
+ guest hypervisor
+Date: Mon,  9 Jan 2017 01:24:27 -0500
+Message-ID: <1483943091-1364-32-git-send-email-jintack@cs.columbia.edu>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C98D44025C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6967D4075C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wpPa1O82Gjo4 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 01:24:12 -0500 (EST)
+ with ESMTP id aEi041k3QVI7 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 01:24:32 -0500 (EST)
 Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
  [128.59.72.39])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7123D407F4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2C7B9404CC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:32 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096P4ds017232
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:53 -0500
+ by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Q9dK018086
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:13 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 1186D83
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:53 -0500 (EST)
-Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
- [128.59.72.13]) by hazelnut (Postfix) with ESMTP id E26DF80
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:52 -0500 (EST)
+ by hazelnut (Postfix) with ESMTP id C1B1396
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:13 -0500 (EST)
+Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
+ [128.59.72.14]) by hazelnut (Postfix) with ESMTP id D239680
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:12 -0500 (EST)
 Received: from mail-qk0-f200.google.com (mail-qk0-f200.google.com
  [209.85.220.200])
- by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Pq4F040809
+ by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096QCir042537
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:52 -0500
-Received: by mail-qk0-f200.google.com with SMTP id 11so31129161qkl.4
- for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:25:52 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:12 -0500
+Received: by mail-qk0-f200.google.com with SMTP id a195so63263047qkg.3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:26:12 -0800 (PST)
 In-Reply-To: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -49,54 +50,74 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-When running in virtual EL2 mode, we actually run the hardware in EL1
-and therefore have to use the EL1 registers to ensure correct operation.
-
-By setting the HCR.TVM and HCR.TVRM we ensure that the virtual EL2 mode
-doesn't shoot itself in the foot when setting up what it believes to be
-a different mode's system register state (for example when preparing to
-switch to a VM).
-
-We can leverage the existing sysregs infrastructure to support trapped
-accesses to these registers.
+If we exit a nested VM with a pending maintenance interrupt from the
+GIC, then we need to forward this to the guest hypervisor so that it can
+re-sync the appropriate LRs and sample level triggered interrupts again.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- arch/arm64/kvm/hyp/switch.c | 2 ++
- arch/arm64/kvm/sys_regs.c   | 7 ++++++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/context.c           |  3 +++
+ include/kvm/arm_vgic.h             |  2 ++
+ virt/kvm/arm/vgic/vgic-v2-nested.c | 16 ++++++++++++++++
+ 3 files changed, 21 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 83037cd..c05c48f 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -82,6 +82,8 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 		write_sysreg(1 << 30, fpexc32_el2);
- 		isb();
- 	}
-+	if (vcpu_mode_el2(vcpu))
-+		val |= HCR_TVM | HCR_TRVM;
- 	write_sysreg(val, hcr_el2);
- 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
- 	write_sysreg(1 << 15, hstr_el2);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 202f64d..b8e993a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -101,7 +101,12 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
+index 7a94c9d..a93ffe4 100644
+--- a/arch/arm64/kvm/context.c
++++ b/arch/arm64/kvm/context.c
+@@ -140,6 +140,9 @@ static void sync_shadow_el1_state(struct kvm_vcpu *vcpu, bool setup)
+ void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
  {
- 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
- 
--	BUG_ON(!p->is_write);
-+	BUG_ON(!vcpu_mode_el2(vcpu) && !p->is_write);
+ 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
 +
-+	if (!p->is_write) {
-+		p->regval = vcpu_sys_reg(vcpu, r->reg);
-+		return true;
-+	}
++	vgic_handle_nested_maint_irq(vcpu);
++
+ 	if (unlikely(vcpu_mode_el2(vcpu))) {
+ 		ctxt->hw_pstate = *vcpu_cpsr(vcpu) & ~PSR_MODE_MASK;
  
- 	if (!p->is_aarch32) {
- 		vcpu_sys_reg(vcpu, r->reg) = p->regval;
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 484f6b1..fc882d6 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -315,9 +315,11 @@ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ #ifdef CONFIG_KVM_ARM_NESTED_HYP
+ void vgic_v2_setup_shadow_state(struct kvm_vcpu *vcpu);
+ void vgic_v2_restore_shadow_state(struct kvm_vcpu *vcpu);
++void vgic_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
+ #else
+ static inline void vgic_v2_setup_shadow_state(struct kvm_vcpu *vcpu) { }
+ static inline void vgic_v2_restore_shadow_state(struct kvm_vcpu *vcpu) { }
++static inline void vgic_handle_nested_maint_irq(struct kvm_vcpu *vcpu) { }
+ #endif
+ 
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+diff --git a/virt/kvm/arm/vgic/vgic-v2-nested.c b/virt/kvm/arm/vgic/vgic-v2-nested.c
+index a992da5..85f646b 100644
+--- a/virt/kvm/arm/vgic/vgic-v2-nested.c
++++ b/virt/kvm/arm/vgic/vgic-v2-nested.c
+@@ -300,6 +300,22 @@ void vgic_v2_restore_shadow_state(struct kvm_vcpu *vcpu)
+ 	vgic_cpu->nested_vgic_v2 = vgic_cpu->shadow_vgic_v2;
+ }
+ 
++void vgic_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
++{
++	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++
++	/*
++	 * If we exit a nested VM with a pending maintenance interrupt from the
++	 * GIC, then we need to forward this to the guest hypervisor so that it
++	 * can re-sync the appropriate LRs and sample level triggered interrupts
++	 * again.
++	 */
++	if (vcpu_el2_imo_is_set(vcpu) && !vcpu_mode_el2(vcpu) &&
++	    (cpu_if->vgic_hcr & GICH_HCR_EN) &&
++	    vgic_mmio_read_v2_misr(vcpu, 0, 0))
++		kvm_inject_nested_irq(vcpu);
++}
++
+ void vgic_init_nested(struct kvm_vcpu *vcpu)
+ {
+ 	vgic_v2_setup_shadow_state(vcpu);
 -- 
 1.9.1
