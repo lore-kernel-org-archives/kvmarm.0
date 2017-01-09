@@ -1,39 +1,40 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC 23/55] KVM: arm64: Forward WFX to the guest hypervisor
-Date: Mon,  9 Jan 2017 01:24:19 -0500
-Message-ID: <1483943091-1364-24-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC 21/55] KVM: arm64: Forward HVC instruction to the guest
+ hypervisor
+Date: Mon,  9 Jan 2017 01:24:17 -0500
+Message-ID: <1483943091-1364-22-git-send-email-jintack@cs.columbia.edu>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A499940194
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 47BF940539
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qrTvjMkUy5Na for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 01:24:24 -0500 (EST)
+ with ESMTP id 6mBsLitGK9-Q for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 01:24:19 -0500 (EST)
 Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
  [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 015A4403F8
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 581A04069A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:19 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096PWtv005289
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:04 -0500
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096PXnp005357
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:00 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 8DB0495
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:04 -0500 (EST)
-Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
- [128.59.72.14]) by hazelnut (Postfix) with ESMTP id AF4BF8F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:02 -0500 (EST)
-Received: from mail-qt0-f199.google.com (mail-qt0-f199.google.com
- [209.85.216.199])
- by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Q28M042256
+ by hazelnut (Postfix) with ESMTP id E486C6D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:00 -0500 (EST)
+Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
+ [128.59.72.16]) by hazelnut (Postfix) with ESMTP id CD31E7E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:00 -0500 (EST)
+Received: from mail-qk0-f200.google.com (mail-qk0-f200.google.com
+ [209.85.220.200])
+ by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Q0xg004964
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:02 -0500
-Received: by mail-qt0-f199.google.com with SMTP id l7so63076987qtd.2
- for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:26:02 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:00 -0500
+Received: by mail-qk0-f200.google.com with SMTP id a195so63260913qkg.3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:26:00 -0800 (PST)
 In-Reply-To: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -47,73 +48,100 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Forward exceptions due to WFI or WFE to the guest hypervisor if the
-guest hypervisor has set corresponding virtual HCR_EL2.TWX bits.
+Forward exceptions due to hvc instruction to the guest hypervisor.
 
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- arch/arm64/include/asm/kvm_nested.h |  1 +
- arch/arm64/kvm/handle_exit.c        | 11 ++++++++++-
- arch/arm64/kvm/handle_exit_nested.c | 18 ++++++++++++++++++
- 3 files changed, 29 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_nested.h |  5 +++++
+ arch/arm64/kvm/Makefile             |  1 +
+ arch/arm64/kvm/handle_exit.c        | 11 +++++++++++
+ arch/arm64/kvm/handle_exit_nested.c | 27 +++++++++++++++++++++++++++
+ 4 files changed, 44 insertions(+)
+ create mode 100644 arch/arm64/include/asm/kvm_nested.h
+ create mode 100644 arch/arm64/kvm/handle_exit_nested.c
 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 620b4d3..8d36935 100644
---- a/arch/arm64/include/asm/kvm_nested.h
+new file mode 100644
+index 0000000..620b4d3
+--- /dev/null
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -2,4 +2,5 @@
- #define __ARM64_KVM_NESTED_H__
+@@ -0,0 +1,5 @@
++#ifndef __ARM64_KVM_NESTED_H__
++#define __ARM64_KVM_NESTED_H__
++
++int handle_hvc_nested(struct kvm_vcpu *vcpu);
++#endif
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index b342bdd..9c35e9a 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -35,4 +35,5 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+ kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
  
- int handle_hvc_nested(struct kvm_vcpu *vcpu);
-+int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
- #endif
++kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += handle_exit_nested.o
+ kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += emulate-nested.o
 diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index ce6d2ef..046fdf8 100644
+index a891684..208be16 100644
 --- a/arch/arm64/kvm/handle_exit.c
 +++ b/arch/arm64/kvm/handle_exit.c
-@@ -101,7 +101,16 @@ static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
-  */
- static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
--	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
-+	bool is_wfe = !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE);
+@@ -29,6 +29,10 @@
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_psci.h>
+ 
 +#ifdef CONFIG_KVM_ARM_NESTED_HYP
-+	int ret = handle_wfx_nested(vcpu, is_wfe);
++#include <asm/kvm_nested.h>
++#endif
 +
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+ 
+@@ -42,6 +46,13 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			    kvm_vcpu_hvc_get_imm(vcpu));
+ 	vcpu->stat.hvc_exit_stat++;
+ 
++#ifdef CONFIG_KVM_ARM_NESTED_HYP
++	ret = handle_hvc_nested(vcpu);
 +	if (ret < 0 && ret != -EINVAL)
 +		return ret;
 +	else if (ret >= 0)
 +		return ret;
 +#endif
-+	if (is_wfe) {
- 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
- 		vcpu->stat.wfe_exit_stat++;
- 		kvm_vcpu_on_spin(vcpu);
+ 	ret = kvm_psci_call(vcpu);
+ 	if (ret < 0) {
+ 		kvm_inject_undefined(vcpu);
 diff --git a/arch/arm64/kvm/handle_exit_nested.c b/arch/arm64/kvm/handle_exit_nested.c
-index a6ce23b..871ecfc 100644
---- a/arch/arm64/kvm/handle_exit_nested.c
+new file mode 100644
+index 0000000..a6ce23b
+--- /dev/null
 +++ b/arch/arm64/kvm/handle_exit_nested.c
-@@ -25,3 +25,21 @@ int handle_hvc_nested(struct kvm_vcpu *vcpu)
- {
- 	return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
- }
-+
+@@ -0,0 +1,27 @@
 +/*
-+ * Inject wfx to the nested hypervisor if this is from the nested VM and
-+ * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
-+ * handle this.
++ * Copyright (C) 2016 - Columbia University
++ * Author: Jintack Lim <jintack@cs.columbia.edu>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
-+int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
++
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
++
++#include <asm/kvm_emulate.h>
++
++/* We forward all hvc instruction to the guest hypervisor. */
++int handle_hvc_nested(struct kvm_vcpu *vcpu)
 +{
-+	u64 hcr_el2 = vcpu_el2_reg(vcpu, HCR_EL2);
-+
-+	if (vcpu_mode_el2(vcpu))
-+		return -EINVAL;
-+
-+	if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
-+		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-+
-+	return -EINVAL;
++	return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
 +}
 -- 
 1.9.1
