@@ -1,33 +1,27 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
+From: Catalin Marinas <catalin.marinas@arm.com>
 Subject: Re: [PATCH 1/2] ARM: hyp-stub: improve ABI
-Date: Mon, 9 Jan 2017 14:10:59 +0000
-Message-ID: <20170109141059.GB14217@n2100.armlinux.org.uk>
-References: <72f93940-cf87-fd91-90f2-760b7ff050fb@arm.com>
- <20161215113539.GK14217@n2100.armlinux.org.uk>
- <06fca797-da5d-f7f2-eecb-9b1b33b7e83f@arm.com>
- <20161215151548.GL14217@n2100.armlinux.org.uk>
- <c21d6514-44a2-ba88-0fe5-d14d5897cc48@arm.com>
- <20161215185717.GM14217@n2100.armlinux.org.uk>
- <20170103095149.GA14242@cbox>
- <20170109122639.GX14217@n2100.armlinux.org.uk>
- <20170109132636.GH4348@cbox>
- <20170109140500.GA14217@n2100.armlinux.org.uk>
+Date: Mon, 9 Jan 2017 14:28:06 +0000
+Message-ID: <20170109142806.GB7593@e104818-lin.cambridge.arm.com>
+References: <20161213113044.GC19985@leverpostej>
+ <E1cH74w-0003ke-Qp@rmk-PC.armlinux.org.uk>
+ <72f93940-cf87-fd91-90f2-760b7ff050fb@arm.com>
+ <20170109125431.GY14217@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F0BB402AF
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 09:09:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2C2740421
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 09:26:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hKkRAtI6-tCR for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 09:09:29 -0500 (EST)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 068EA40284
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 09:09:28 -0500 (EST)
+ with ESMTP id C+c0r9rVqTe7 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 09:26:29 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 487F440419
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 09:26:28 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20170109140500.GA14217@n2100.armlinux.org.uk>
+In-Reply-To: <20170109125431.GY14217@n2100.armlinux.org.uk>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,72 +31,43 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, dave.martin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, dave.martin@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 09, 2017 at 02:05:00PM +0000, Russell King - ARM Linux wrote:
-> So, although Marc produced a patch which updates the KVM hypervisor for
-> the GET_VECTORS change, through reading the code today, it's become clear
-> that much more is needed, so I'm yet again banging on about documentation.
-> It's only become clear to me today that the KVM stub calling convention
-> for the host kernel is:
+On Mon, Jan 09, 2017 at 12:54:31PM +0000, Russell King - ARM Linux wrote:
+> So, we need KVM's stub to be (a) better documented so this stuff is
+> obvious, and (b) updated so that kdump stands a chance of working even
+> if the KVM stub is still in place at the point the host kernel panics.
 > 
-> entry:
-> 	r0 = function pointer
-> 	r1 = 32-bit function argument 0
-> 	r2 = 32-bit function argument 1
-> 	r3 = 32-bit function argument 2
-> 	no further arguments are supported
-> 	--- or ---
-> 	r0 = -1 (or 0 post Marc's patch) for get_vectors
-> exit:
-> 	r0 = vectors (if get_vectors call was made)
-> 	otherwise, who knows...
-> 
-> I specify "32-bit" there because they're shifted by one register, which,
-> if a 64-bit argument is passed with EABI, the arguments will no longer be
-> appropriately aligned... so it's an important detail to be aware of with
-> the current KVM hypervisor interface.
-> 
-> What I want to do here is to fix this kexec issue completely, not in a
-> piecemeal fashion - I'm not interested in fixing one small problem, then
-> coming back to it in a few months time to fix another problem.  That's a
-> waste of time (well, unless you're into job creation.)  I've always been
-> for "if you're going to do the job, damn well do the job properly".  So
-> I'm not going to accept anything short of fixing _both_ kexec and kdump
-> together.
-> 
-> So, given that the hyp-stub has this ABI after my patches:
-> 
-> entry:
-> 	r0 = argument (0 = get vectors, 1 = set vectors, 2 = call function)
-> 	r1 = vectors for r0 = 1
-> 	r3 = function pointer (with bit 0 already set for thumb functions)
-> 	     for r0 = 2
-> exit:
-> 	r0 = -1 for invalid calls
-> 	r0 = current vectors address (for r0 = 0 on entry)
-> 	is not expected to return for r0 = 2 on entry
-> 	otherwise registers preserved preserved
-> 
-> which is clearly incompatible with the current KVM stub, can we come up
-> with a common ABI that is satisfactory to both.
-> 
-> The above are probably the very first time anyone has written out the
-> ABI of these things, and as can be seen, it's still something of a mess.
+> Another reason why documentation is important here is that we need to
+> make it clear to alternative hypervisors that the host kernel may issue
+> a HVC call at any moment due to a crash with particular arguments, and
+> that the host kernel expects a certain behaviour in that case, and that
+> the hypervisor does not crash.
 
-For completeness, this is the existing hyp-stub ABI:
+The only hypervisor (apart from the hyp-stub) built and deployed
+together with the kernel is KVM. On ARM, to be able to enable KVM, the
+host kernel must be booted in Hyp mode and install the stub before
+dropping to SVC.
 
-entry:
-	r0 = -1 => get_vectors
-	r0 != -1 => set_vectors (to the value in r0)
-exit:
-	r0 = current vector address
+With Xen (or a different Type-1 hypervisor), the "host" kernel (dom0 for
+Xen, a.k.a. control domain) is booted in SVC mode directly, so hyp-stub
+is not installed and is_hyp_mode_available() returns false.
 
-And that's it.
+> For example, how will Xen behave - is introducing these changes going
+> to cause a regression with Xen?  Does anyone even know the answer to
+> that?  From what I can see, it seems we'll end up calling Xen's
+> hypervisor with a random r12 value (which it uses as a reason code)
+> but without the 0xea1 immediate constant in the HVC instruction.
+> Beyond that, I've no idea.
+
+Any HVC calls from the control domain kernel must comply with the ABI
+offered by the corresponding hypervisor and has nothing to do with the
+hyp-stub ABI. Routing hyp-stub ABI HVC calls to an unaware hypervisor
+like Xen as part of kdump/kexec is a kernel bug and would probably
+result in the kernel being killed. I haven't tried but kexec in a host
+kernel under Xen should work just like kexec in any other guest kernel.
 
 -- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+Catalin
