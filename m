@@ -1,23 +1,25 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC] arm64: KVM: Honor guest device memory type mappings
-Date: Mon, 9 Jan 2017 10:26:21 +0000
-Message-ID: <742b9e8f-168d-81bf-368c-0f094d6cc124@arm.com>
-References: <1481317164-2511-1-git-send-email-mike.caraman@nxp.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH v2] KVM: arm/arm64: Fix occasional warning from the timer work
+ function
+Date: Mon,  9 Jan 2017 12:18:56 +0100
+Message-ID: <20170109111856.8439-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88DC640354
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 05:24:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ECEEC406BB
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 06:17:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BbvmYOq3Nhad for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 05:24:43 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 45095400F9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 05:24:43 -0500 (EST)
-In-Reply-To: <1481317164-2511-1-git-send-email-mike.caraman@nxp.com>
+ with ESMTP id 00x+bRtJkbwr for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 06:17:21 -0500 (EST)
+Received: from mail-lf0-f51.google.com (mail-lf0-f51.google.com
+ [209.85.215.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE2864066D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 06:17:20 -0500 (EST)
+Received: by mail-lf0-f51.google.com with SMTP id o140so37387372lff.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 Jan 2017 03:19:02 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,72 +29,64 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Caraman Mihai Claudiu-B02008 <mike.caraman@nxp.com>, kvmarm@lists.cs.columbia.edu
-Cc: david.lapp@nxp.com, Catalin Marinas <catalin.marinas@arm.com>, roy.pledge@nxp.com, Will Deacon <will.deacon@arm.com>, stuart.yoder@nxp.com
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, mbrugger@suse.com, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[+ Christoffer, Will, Catalin - In the future, please Cc the relevant
-maintainers]
+When a VCPU blocks (WFI) and has programmed the vtimer, we program a
+soft timer to expire in the future to wake up the vcpu thread when
+appropriate.  Because such as wake up involves a vcpu kick, and the
+timer expire function can get called from interrupt context, and the
+kick may sleep, we have to schedule the kick in the work function.
 
-On 09/12/16 20:59, Caraman Mihai Claudiu-B02008 wrote:
-> From: Mihai Caraman <mike.caraman@nxp.com>
-> 
-> Stage 2 non-Gathering and non-Reordering memory attributes have precedence over stage 1
-> Gathering and Reordering attributes. Honor guest device memory type mappings using GRE
-> memory type at stage 2.
+The work function currently has a warning that gets raised if it turns
+out that the timer shouldn't fire when it's run, which was added because
+the idea was that in that case the work should never have been cancelled.
 
-This feels incredibly scary. One you start enabling gathering and
-reordering, there is nothing that prevents a write to a device from a
-given guest to be merged or reordered with a write from another guest to
-the same device (think of the GIC). This would only require one of the
-guests to use GRE attributes itself.
+However, it turns out that this whole thing is racy and we can get
+spurious warnings.  The problem is that we clear the armed flag in the
+work function, which may run in parallel with the
+kvm_timer_unschedule->timer_disarm() call.  This results in a possible
+situation where the timer_disarm() call does not call
+cancel_work_sync(), which effectively synchronizes the completion of the
+work function with running the VCPU.  As a result, the VCPU thread
+proceeds before the work function completees, causing changes to the
+timer state such that kvm_timer_should_fire(vcpu) returns false in the
+work function.
 
-So as it stands, my feeling is that it is a big NO.
+All we do in the work function is to kick the VCPU, and an occasional
+rare extra kick never harmed anyone.  Since the race above is extremely
+rare, we don't bother checking if the race happens but simply remove the
+check and the clearing of the armed flag from the work function.
 
-> This is a preamble for a bigger change that will honor guest normal memory mappings for
-> targets connected to HN-F interfaces.
+Reported-by: Matthias Brugger <mbrugger@suse.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+Changes since v1:
+ - Don't add a second call to cancel_work_sync, but avoid clearing
+   the armed flag to let the timer_disarm() function call
+   cancel_work_sync on every unschedule call.
+ - Note that I chose to remove the warning, despite it shouldn't really
+   happen anymore, because I don't see the value in the warning and
+   it does a bit of potentially unnecessary checking in a potentially
+   hot path.
 
-Normal memory mappings for devices? Unless you can prove that this is a
-valid architectural configuration, this is unlikely to happen. And I'm
-not keen on taking any such change before seeing the whole thing.
+ virt/kvm/arm/arch_timer.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-> 
-> Signed-off-by: Mihai Caraman <mike.caraman@nxp.com>
-> ---
->  arch/arm64/include/asm/memory.h       | 2 +-
->  arch/arm64/include/asm/pgtable-prot.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-> index b71086d..d4834ba 100644
-> --- a/arch/arm64/include/asm/memory.h
-> +++ b/arch/arm64/include/asm/memory.h
-> @@ -134,7 +134,7 @@
->   * Memory types for Stage-2 translation
->   */
->  #define MT_S2_NORMAL		0xf
-> -#define MT_S2_DEVICE_nGnRE	0x1
-> +#define MT_S2_DEVICE_GRE	0x3
->  
->  #ifdef CONFIG_ARM64_4K_PAGES
->  #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
-> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
-> index 2142c77..11b43f7 100644
-> --- a/arch/arm64/include/asm/pgtable-prot.h
-> +++ b/arch/arm64/include/asm/pgtable-prot.h
-> @@ -61,7 +61,7 @@
->  #define PAGE_HYP_DEVICE		__pgprot(PROT_DEVICE_nGnRE | PTE_HYP)
->  
->  #define PAGE_S2			__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_NORMAL) | PTE_S2_RDONLY)
-> -#define PAGE_S2_DEVICE		__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_UXN)
-> +#define PAGE_S2_DEVICE		__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_DEVICE_GRE) | PTE_S2_RDONLY | PTE_UXN)
->  
->  #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_PXN | PTE_UXN)
->  #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
-> 
-
-Thanks,
-
-	M.
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index a2dbbcc..a7fe606 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -89,9 +89,6 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+ 	struct kvm_vcpu *vcpu;
+ 
+ 	vcpu = container_of(work, struct kvm_vcpu, arch.timer_cpu.expired);
+-	vcpu->arch.timer_cpu.armed = false;
+-
+-	WARN_ON(!kvm_timer_should_fire(vcpu));
+ 
+ 	/*
+ 	 * If the vcpu is blocked we want to wake it up so that it will see
 -- 
-Jazz is not dead. It just smells funny...
+2.9.0
