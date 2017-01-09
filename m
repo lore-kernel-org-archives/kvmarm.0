@@ -1,40 +1,39 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC 31/55] KVM: arm/arm64: Inject maintenance interrupts to the
- guest hypervisor
-Date: Mon,  9 Jan 2017 01:24:27 -0500
-Message-ID: <1483943091-1364-32-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC 33/55] KVM: arm/arm64: Remove unused params in mmu functions
+Date: Mon,  9 Jan 2017 01:24:29 -0500
+Message-ID: <1483943091-1364-34-git-send-email-jintack@cs.columbia.edu>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6967D4075C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E2E174027C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aEi041k3QVI7 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 01:24:32 -0500 (EST)
-Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
- [128.59.72.39])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2C7B9404CC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:32 -0500 (EST)
+ with ESMTP id Bb8JUBkO3T4c for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 01:24:35 -0500 (EST)
+Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
+ [128.59.72.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF4D040194
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:33 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Q9dK018086
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:13 -0500
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Q9BH006310
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:15 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id C1B1396
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:13 -0500 (EST)
-Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
- [128.59.72.14]) by hazelnut (Postfix) with ESMTP id D239680
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:12 -0500 (EST)
-Received: from mail-qk0-f200.google.com (mail-qk0-f200.google.com
- [209.85.220.200])
- by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096QCir042537
+ by hazelnut (Postfix) with ESMTP id 5ECEA8A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:15 -0500 (EST)
+Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
+ [128.59.72.15]) by hazelnut (Postfix) with ESMTP id 26A0B8C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:15 -0500 (EST)
+Received: from mail-qt0-f197.google.com (mail-qt0-f197.google.com
+ [209.85.216.197])
+ by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096QEcb057425
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:12 -0500
-Received: by mail-qk0-f200.google.com with SMTP id a195so63263047qkg.3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:26:12 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:15 -0500
+Received: by mail-qt0-f197.google.com with SMTP id t56so77866636qte.3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:26:15 -0800 (PST)
 In-Reply-To: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -50,74 +49,70 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-If we exit a nested VM with a pending maintenance interrupt from the
-GIC, then we need to forward this to the guest hypervisor so that it can
-re-sync the appropriate LRs and sample level triggered interrupts again.
+stage2_flush_xxx functions take a pointer to the kvm struct as the first
+parameter but they are never used. Clean this up before modifying mmu
+code for nested virtualization support.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- arch/arm64/kvm/context.c           |  3 +++
- include/kvm/arm_vgic.h             |  2 ++
- virt/kvm/arm/vgic/vgic-v2-nested.c | 16 ++++++++++++++++
- 3 files changed, 21 insertions(+)
+ arch/arm/kvm/mmu.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
-index 7a94c9d..a93ffe4 100644
---- a/arch/arm64/kvm/context.c
-+++ b/arch/arm64/kvm/context.c
-@@ -140,6 +140,9 @@ static void sync_shadow_el1_state(struct kvm_vcpu *vcpu, bool setup)
- void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+
-+	vgic_handle_nested_maint_irq(vcpu);
-+
- 	if (unlikely(vcpu_mode_el2(vcpu))) {
- 		ctxt->hw_pstate = *vcpu_cpsr(vcpu) & ~PSR_MODE_MASK;
- 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 484f6b1..fc882d6 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -315,9 +315,11 @@ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- #ifdef CONFIG_KVM_ARM_NESTED_HYP
- void vgic_v2_setup_shadow_state(struct kvm_vcpu *vcpu);
- void vgic_v2_restore_shadow_state(struct kvm_vcpu *vcpu);
-+void vgic_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
- #else
- static inline void vgic_v2_setup_shadow_state(struct kvm_vcpu *vcpu) { }
- static inline void vgic_v2_restore_shadow_state(struct kvm_vcpu *vcpu) { }
-+static inline void vgic_handle_nested_maint_irq(struct kvm_vcpu *vcpu) { }
- #endif
- 
- #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
-diff --git a/virt/kvm/arm/vgic/vgic-v2-nested.c b/virt/kvm/arm/vgic/vgic-v2-nested.c
-index a992da5..85f646b 100644
---- a/virt/kvm/arm/vgic/vgic-v2-nested.c
-+++ b/virt/kvm/arm/vgic/vgic-v2-nested.c
-@@ -300,6 +300,22 @@ void vgic_v2_restore_shadow_state(struct kvm_vcpu *vcpu)
- 	vgic_cpu->nested_vgic_v2 = vgic_cpu->shadow_vgic_v2;
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index a5265ed..57cb671 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -300,7 +300,7 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
+ 	} while (pgd++, addr = next, addr != end);
  }
  
-+void vgic_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-+
-+	/*
-+	 * If we exit a nested VM with a pending maintenance interrupt from the
-+	 * GIC, then we need to forward this to the guest hypervisor so that it
-+	 * can re-sync the appropriate LRs and sample level triggered interrupts
-+	 * again.
-+	 */
-+	if (vcpu_el2_imo_is_set(vcpu) && !vcpu_mode_el2(vcpu) &&
-+	    (cpu_if->vgic_hcr & GICH_HCR_EN) &&
-+	    vgic_mmio_read_v2_misr(vcpu, 0, 0))
-+		kvm_inject_nested_irq(vcpu);
-+}
-+
- void vgic_init_nested(struct kvm_vcpu *vcpu)
+-static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
++static void stage2_flush_ptes(pmd_t *pmd,
+ 			      phys_addr_t addr, phys_addr_t end)
  {
- 	vgic_v2_setup_shadow_state(vcpu);
+ 	pte_t *pte;
+@@ -312,7 +312,7 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
+ 	} while (pte++, addr += PAGE_SIZE, addr != end);
+ }
+ 
+-static void stage2_flush_pmds(struct kvm *kvm, pud_t *pud,
++static void stage2_flush_pmds(pud_t *pud,
+ 			      phys_addr_t addr, phys_addr_t end)
+ {
+ 	pmd_t *pmd;
+@@ -325,12 +325,12 @@ static void stage2_flush_pmds(struct kvm *kvm, pud_t *pud,
+ 			if (pmd_thp_or_huge(*pmd))
+ 				kvm_flush_dcache_pmd(*pmd);
+ 			else
+-				stage2_flush_ptes(kvm, pmd, addr, next);
++				stage2_flush_ptes(pmd, addr, next);
+ 		}
+ 	} while (pmd++, addr = next, addr != end);
+ }
+ 
+-static void stage2_flush_puds(struct kvm *kvm, pgd_t *pgd,
++static void stage2_flush_puds(pgd_t *pgd,
+ 			      phys_addr_t addr, phys_addr_t end)
+ {
+ 	pud_t *pud;
+@@ -343,7 +343,7 @@ static void stage2_flush_puds(struct kvm *kvm, pgd_t *pgd,
+ 			if (stage2_pud_huge(*pud))
+ 				kvm_flush_dcache_pud(*pud);
+ 			else
+-				stage2_flush_pmds(kvm, pud, addr, next);
++				stage2_flush_pmds(pud, addr, next);
+ 		}
+ 	} while (pud++, addr = next, addr != end);
+ }
+@@ -359,7 +359,7 @@ static void stage2_flush_memslot(struct kvm *kvm,
+ 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+ 	do {
+ 		next = stage2_pgd_addr_end(addr, end);
+-		stage2_flush_puds(kvm, pgd, addr, next);
++		stage2_flush_puds(pgd, addr, next);
+ 	} while (pgd++, addr = next, addr != end);
+ }
+ 
 -- 
 1.9.1
