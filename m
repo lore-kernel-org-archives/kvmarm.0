@@ -1,39 +1,39 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC 33/55] KVM: arm/arm64: Remove unused params in mmu functions
-Date: Mon,  9 Jan 2017 01:24:29 -0500
-Message-ID: <1483943091-1364-34-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC 23/55] KVM: arm64: Forward WFX to the guest hypervisor
+Date: Mon,  9 Jan 2017 01:24:19 -0500
+Message-ID: <1483943091-1364-24-git-send-email-jintack@cs.columbia.edu>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E2E174027C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A499940194
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Bb8JUBkO3T4c for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 01:24:35 -0500 (EST)
+ with ESMTP id qrTvjMkUy5Na for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 01:24:24 -0500 (EST)
 Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
  [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF4D040194
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 015A4403F8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:23 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Q9BH006310
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:15 -0500
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096PWtv005289
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:04 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 5ECEA8A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:15 -0500 (EST)
-Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
- [128.59.72.15]) by hazelnut (Postfix) with ESMTP id 26A0B8C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:15 -0500 (EST)
-Received: from mail-qt0-f197.google.com (mail-qt0-f197.google.com
- [209.85.216.197])
- by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096QEcb057425
+ by hazelnut (Postfix) with ESMTP id 8DB0495
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:04 -0500 (EST)
+Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
+ [128.59.72.14]) by hazelnut (Postfix) with ESMTP id AF4BF8F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:02 -0500 (EST)
+Received: from mail-qt0-f199.google.com (mail-qt0-f199.google.com
+ [209.85.216.199])
+ by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Q28M042256
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:15 -0500
-Received: by mail-qt0-f197.google.com with SMTP id t56so77866636qte.3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:26:15 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:02 -0500
+Received: by mail-qt0-f199.google.com with SMTP id l7so63076987qtd.2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:26:02 -0800 (PST)
 In-Reply-To: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -47,72 +47,73 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+Forward exceptions due to WFI or WFE to the guest hypervisor if the
+guest hypervisor has set corresponding virtual HCR_EL2.TWX bits.
 
-stage2_flush_xxx functions take a pointer to the kvm struct as the first
-parameter but they are never used. Clean this up before modifying mmu
-code for nested virtualization support.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- arch/arm/kvm/mmu.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  1 +
+ arch/arm64/kvm/handle_exit.c        | 11 ++++++++++-
+ arch/arm64/kvm/handle_exit_nested.c | 18 ++++++++++++++++++
+ 3 files changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index a5265ed..57cb671 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -300,7 +300,7 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
- 	} while (pgd++, addr = next, addr != end);
- }
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 620b4d3..8d36935 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -2,4 +2,5 @@
+ #define __ARM64_KVM_NESTED_H__
  
--static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
-+static void stage2_flush_ptes(pmd_t *pmd,
- 			      phys_addr_t addr, phys_addr_t end)
+ int handle_hvc_nested(struct kvm_vcpu *vcpu);
++int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ #endif
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index ce6d2ef..046fdf8 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -101,7 +101,16 @@ static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+  */
+ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
  {
- 	pte_t *pte;
-@@ -312,7 +312,7 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
- 	} while (pte++, addr += PAGE_SIZE, addr != end);
- }
- 
--static void stage2_flush_pmds(struct kvm *kvm, pud_t *pud,
-+static void stage2_flush_pmds(pud_t *pud,
- 			      phys_addr_t addr, phys_addr_t end)
+-	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
++	bool is_wfe = !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE);
++#ifdef CONFIG_KVM_ARM_NESTED_HYP
++	int ret = handle_wfx_nested(vcpu, is_wfe);
++
++	if (ret < 0 && ret != -EINVAL)
++		return ret;
++	else if (ret >= 0)
++		return ret;
++#endif
++	if (is_wfe) {
+ 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
+ 		vcpu->stat.wfe_exit_stat++;
+ 		kvm_vcpu_on_spin(vcpu);
+diff --git a/arch/arm64/kvm/handle_exit_nested.c b/arch/arm64/kvm/handle_exit_nested.c
+index a6ce23b..871ecfc 100644
+--- a/arch/arm64/kvm/handle_exit_nested.c
++++ b/arch/arm64/kvm/handle_exit_nested.c
+@@ -25,3 +25,21 @@ int handle_hvc_nested(struct kvm_vcpu *vcpu)
  {
- 	pmd_t *pmd;
-@@ -325,12 +325,12 @@ static void stage2_flush_pmds(struct kvm *kvm, pud_t *pud,
- 			if (pmd_thp_or_huge(*pmd))
- 				kvm_flush_dcache_pmd(*pmd);
- 			else
--				stage2_flush_ptes(kvm, pmd, addr, next);
-+				stage2_flush_ptes(pmd, addr, next);
- 		}
- 	} while (pmd++, addr = next, addr != end);
+ 	return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
  }
- 
--static void stage2_flush_puds(struct kvm *kvm, pgd_t *pgd,
-+static void stage2_flush_puds(pgd_t *pgd,
- 			      phys_addr_t addr, phys_addr_t end)
- {
- 	pud_t *pud;
-@@ -343,7 +343,7 @@ static void stage2_flush_puds(struct kvm *kvm, pgd_t *pgd,
- 			if (stage2_pud_huge(*pud))
- 				kvm_flush_dcache_pud(*pud);
- 			else
--				stage2_flush_pmds(kvm, pud, addr, next);
-+				stage2_flush_pmds(pud, addr, next);
- 		}
- 	} while (pud++, addr = next, addr != end);
- }
-@@ -359,7 +359,7 @@ static void stage2_flush_memslot(struct kvm *kvm,
- 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	do {
- 		next = stage2_pgd_addr_end(addr, end);
--		stage2_flush_puds(kvm, pgd, addr, next);
-+		stage2_flush_puds(pgd, addr, next);
- 	} while (pgd++, addr = next, addr != end);
- }
- 
++
++/*
++ * Inject wfx to the nested hypervisor if this is from the nested VM and
++ * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
++ * handle this.
++ */
++int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
++{
++	u64 hcr_el2 = vcpu_el2_reg(vcpu, HCR_EL2);
++
++	if (vcpu_mode_el2(vcpu))
++		return -EINVAL;
++
++	if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
++
++	return -EINVAL;
++}
 -- 
 1.9.1
