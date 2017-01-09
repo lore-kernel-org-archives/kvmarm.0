@@ -1,39 +1,39 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC 13/55] KVM: arm64: Handle eret instruction traps
-Date: Mon,  9 Jan 2017 01:24:09 -0500
-Message-ID: <1483943091-1364-14-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC 12/55] KVM: arm64: Handle EL2 register access traps
+Date: Mon,  9 Jan 2017 01:24:08 -0500
+Message-ID: <1483943091-1364-13-git-send-email-jintack@cs.columbia.edu>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F169440698
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDF8D40190
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 91R-b5-WDmiJ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 01:24:09 -0500 (EST)
-Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
- [128.59.72.39])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C84EC406B8
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:08 -0500 (EST)
+ with ESMTP id Ieqgkthg3UyK for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 01:24:07 -0500 (EST)
+Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
+ [128.59.72.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F4B6406B8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:07 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096PXKZ017324
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:50 -0500
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096O7QT005079
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:49 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 5167E84
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:50 -0500 (EST)
-Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
- [128.59.72.13]) by hazelnut (Postfix) with ESMTP id 2A13C84
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:50 -0500 (EST)
-Received: from mail-qt0-f200.google.com (mail-qt0-f200.google.com
- [209.85.216.200])
- by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096PnEs040744
+ by hazelnut (Postfix) with ESMTP id 1B2AF81
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:49 -0500 (EST)
+Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
+ [128.59.72.15]) by hazelnut (Postfix) with ESMTP id 013DD81
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:49 -0500 (EST)
+Received: from mail-qk0-f198.google.com (mail-qk0-f198.google.com
+ [209.85.220.198])
+ by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096PmJH056739
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:50 -0500
-Received: by mail-qt0-f200.google.com with SMTP id x49so82674521qtc.7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:25:50 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:48 -0500
+Received: by mail-qk0-f198.google.com with SMTP id a16so37631370qkc.6
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:25:48 -0800 (PST)
 In-Reply-To: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -47,91 +47,188 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When HCR.NV bit is set, eret instruction execution in the guest
-hypervisor will trap with EC code 0x1A. Let ELR_EL2 and SPSR_EL2 state
-from the guest's perspective be restored to the hardware on the next
-guest entry.
+ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
+this bit is set, accessing EL2 registers in EL1 traps to EL2. In
+addition, executing following instructions in EL1 will trap to EL2 -
+tlbi and at instructions which are undefined when exectued in EL1, eret
+instruction, msr/mrs instructions to access SP_EL1.
+
+This patch handles traps due to accessing EL2 registers in EL1.  The
+host hypervisor keeps EL2 register values in memory, and will use them
+to emulate the behavior that the guest hypervisor expects from the
+hardware.
+
+Subsequent patches will handle other kinds of traps.
 
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- arch/arm64/include/asm/esr.h |  1 +
- arch/arm64/kvm/handle_exit.c | 12 ++++++++++++
- arch/arm64/kvm/trace.h       | 21 +++++++++++++++++++++
- 3 files changed, 34 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 119 ++++++++++++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.h |   7 +++
+ 2 files changed, 126 insertions(+)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index d14c478..f32e3a7 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -42,6 +42,7 @@
- #define ESR_ELx_EC_HVC64	(0x16)
- #define ESR_ELx_EC_SMC64	(0x17)
- #define ESR_ELx_EC_SYS64	(0x18)
-+#define ESR_ELx_EC_ERET		(0x1A)
- /* Unallocated EC: 0x19 - 0x1E */
- #define ESR_ELx_EC_IMP_DEF	(0x1f)
- #define ESR_ELx_EC_IABT_LOW	(0x20)
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index a204adf..4e4a915 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -125,6 +125,17 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	return ret;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 7cef94f..4158f2f 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -873,6 +873,18 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
-+static int kvm_handle_eret(struct kvm_vcpu *vcpu, struct kvm_run *run)
++static bool trap_el2_reg(struct kvm_vcpu *vcpu,
++			 struct sys_reg_params *p,
++			 const struct sys_reg_desc *r)
 +{
-+	trace_kvm_nested_eret(vcpu, vcpu_el2_reg(vcpu, ELR_EL2),
-+			      vcpu_el2_reg(vcpu, SPSR_EL2));
++	if (!p->is_write)
++		p->regval = vcpu_el2_reg(vcpu, r->reg);
++	else
++		vcpu_el2_reg(vcpu, r->reg) = p->regval;
 +
-+	*vcpu_pc(vcpu) = vcpu_el2_reg(vcpu, ELR_EL2);
-+	*vcpu_cpsr(vcpu) = vcpu_el2_reg(vcpu, SPSR_EL2);
-+
-+	return 1;
++	return true;
 +}
 +
- static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
- 	[ESR_ELx_EC_CP15_32]	= kvm_handle_cp15_32,
-@@ -137,6 +148,7 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	[ESR_ELx_EC_HVC64]	= handle_hvc,
- 	[ESR_ELx_EC_SMC64]	= handle_smc,
- 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
-+	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
- 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
-diff --git a/arch/arm64/kvm/trace.h b/arch/arm64/kvm/trace.h
-index 7c86cfb..5f40987 100644
---- a/arch/arm64/kvm/trace.h
-+++ b/arch/arm64/kvm/trace.h
-@@ -187,6 +187,27 @@
- 	TP_printk("vcpu: %p, inject exception to vEL2: ESR_EL2 0x%lx, vector: 0x%016lx",
- 		  __entry->vcpu, __entry->esr_el2, __entry->pc)
- );
-+
-+TRACE_EVENT(kvm_nested_eret,
-+	TP_PROTO(struct kvm_vcpu *vcpu, unsigned long elr_el2,
-+		 unsigned long spsr_el2),
-+	TP_ARGS(vcpu, elr_el2, spsr_el2),
-+
-+	TP_STRUCT__entry(
-+		__field(struct kvm_vcpu *,	vcpu)
-+		__field(unsigned long,		elr_el2)
-+		__field(unsigned long,		spsr_el2)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu = vcpu;
-+		__entry->elr_el2 = elr_el2;
-+		__entry->spsr_el2 = spsr_el2;
-+	),
-+
-+	TP_printk("vcpu: %p, eret to elr_el2: 0x%016lx, with spsr_el2: 0x%08lx",
-+		  __entry->vcpu, __entry->elr_el2, __entry->spsr_el2)
-+);
- #endif /* _TRACE_ARM64_KVM_H */
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -1163,15 +1175,122 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b1111), Op2(0b111),
+ 	  access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
  
- #undef TRACE_INCLUDE_PATH
++	/* VPIDR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0000), CRm(0b0000), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, VPIDR_EL2, 0 },
++	/* VMPIDR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0000), CRm(0b0000), Op2(0b101),
++	  trap_el2_reg, reset_el2_val, VMPIDR_EL2, 0 },
++
++	/* SCTLR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0000), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, SCTLR_EL2, 0 },
++	/* ACTLR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0000), Op2(0b001),
++	  trap_el2_reg, reset_el2_val, ACTLR_EL2, 0 },
++	/* HCR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0001), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, HCR_EL2, 0 },
++	/* MDCR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0001), Op2(0b001),
++	  trap_el2_reg, reset_el2_val, MDCR_EL2, 0 },
++	/* CPTR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0001), Op2(0b010),
++	  trap_el2_reg, reset_el2_val, CPTR_EL2, 0 },
++	/* HSTR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0001), Op2(0b011),
++	  trap_el2_reg, reset_el2_val, HSTR_EL2, 0 },
++	/* HACR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0001), Op2(0b111),
++	  trap_el2_reg, reset_el2_val, HACR_EL2, 0 },
++
++	/* TTBR0_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0000), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, TTBR0_EL2, 0 },
++	/* TCR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0000), Op2(0b010),
++	  trap_el2_reg, reset_el2_val, TCR_EL2, 0 },
++	/* VTTBR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0001), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, VTTBR_EL2, 0 },
++	/* VTCR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0001), Op2(0b010),
++	  trap_el2_reg, reset_el2_val, VTCR_EL2, 0 },
++
+ 	/* DACR32_EL2 */
+ 	{ Op0(0b11), Op1(0b100), CRn(0b0011), CRm(0b0000), Op2(0b000),
+ 	  NULL, reset_unknown, DACR32_EL2 },
++
++	/* SPSR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0100), CRm(0b0000), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, SPSR_EL2, 0 },
++	/* ELR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0100), CRm(0b0000), Op2(0b001),
++	  trap_el2_reg, reset_el2_val, ELR_EL2, 0 },
++	/* SP_EL1 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0100), CRm(0b0001), Op2(0b000),
++	  trap_el2_reg },
++
+ 	/* IFSR32_EL2 */
+ 	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0000), Op2(0b001),
+ 	  NULL, reset_unknown, IFSR32_EL2 },
++	/* AFSR0_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0001), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, AFSR0_EL2, 0 },
++	/* AFSR1_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0001), Op2(0b001),
++	  trap_el2_reg, reset_el2_val, AFSR1_EL2, 0 },
++	/* ESR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0010), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, ESR_EL2, 0 },
+ 	/* FPEXC32_EL2 */
+ 	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0011), Op2(0b000),
+ 	  NULL, reset_val, FPEXC32_EL2, 0x70 },
++
++	/* FAR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0110), CRm(0b0000), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, FAR_EL2, 0 },
++	/* HPFAR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b0110), CRm(0b0000), Op2(0b100),
++	  trap_el2_reg, reset_el2_val, HPFAR_EL2, 0 },
++
++	/* MAIR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1010), CRm(0b0010), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, MAIR_EL2, 0 },
++	/* AMAIR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1010), CRm(0b0011), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, AMAIR_EL2, 0 },
++
++	/* VBAR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1100), CRm(0b0000), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, VBAR_EL2, 0 },
++	/* RVBAR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1100), CRm(0b0000), Op2(0b001),
++	  trap_el2_reg, reset_el2_val, RVBAR_EL2, 0 },
++	/* RMR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1100), CRm(0b0000), Op2(0b010),
++	  trap_el2_reg, reset_el2_val, RMR_EL2, 0 },
++
++	/* TPIDR_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1101), CRm(0b0000), Op2(0b010),
++	  trap_el2_reg, reset_el2_val, TPIDR_EL2, 0 },
++
++	/* CNTVOFF_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1110), CRm(0b0000), Op2(0b011),
++	  trap_el2_reg, reset_el2_val, CNTVOFF_EL2, 0 },
++	/* CNTHCTL_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1110), CRm(0b0001), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, CNTHCTL_EL2, 0 },
++	/* CNTHP_TVAL_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1110), CRm(0b0010), Op2(0b000),
++	  trap_el2_reg, reset_el2_val, CNTHP_TVAL_EL2, 0 },
++	/* CNTHP_CTL_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1110), CRm(0b0010), Op2(0b001),
++	  trap_el2_reg, reset_el2_val, CNTHP_CTL_EL2, 0 },
++	/* CNTHP_CVAL_EL2 */
++	{ Op0(0b11), Op1(0b100), CRn(0b1110), CRm(0b0010), Op2(0b010),
++	  trap_el2_reg, reset_el2_val, CNTHP_CVAL_EL2, 0 },
++
+ };
+ 
+ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index dbbb01c..181290f 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -117,6 +117,13 @@ static inline void reset_val(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r
+ 	vcpu_sys_reg(vcpu, r->reg) = r->val;
+ }
+ 
++static inline void reset_el2_val(struct kvm_vcpu *vcpu,
++				 const struct sys_reg_desc *r)
++{
++	BUG_ON(r->reg >= NR_EL2_REGS);
++	vcpu_el2_reg(vcpu, r->reg) = r->val;
++}
++
+ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
+ 			      const struct sys_reg_desc *i2)
+ {
 -- 
 1.9.1
