@@ -1,39 +1,39 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC 22/55] KVM: arm64: Handle PSCI call from the guest
-Date: Mon,  9 Jan 2017 01:24:18 -0500
-Message-ID: <1483943091-1364-23-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC 15/55] KVM: arm64: Trap EL1 VM register accesses in virtual EL2
+Date: Mon,  9 Jan 2017 01:24:11 -0500
+Message-ID: <1483943091-1364-16-git-send-email-jintack@cs.columbia.edu>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CCA5C404E4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C98D44025C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TTWkE5gcJs6s for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 01:24:20 -0500 (EST)
+ with ESMTP id wpPa1O82Gjo4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 01:24:12 -0500 (EST)
 Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
  [128.59.72.39])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0141840696
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7123D407F4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:11 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096PXvI017320
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:01 -0500
+ by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096P4ds017232
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:53 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 973E86D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:01 -0500 (EST)
-Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
- [128.59.72.14]) by hazelnut (Postfix) with ESMTP id 711636D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:01 -0500 (EST)
-Received: from mail-qt0-f197.google.com (mail-qt0-f197.google.com
- [209.85.216.197])
- by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Q1DE042205
+ by hazelnut (Postfix) with ESMTP id 1186D83
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:53 -0500 (EST)
+Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
+ [128.59.72.13]) by hazelnut (Postfix) with ESMTP id E26DF80
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:52 -0500 (EST)
+Received: from mail-qk0-f200.google.com (mail-qk0-f200.google.com
+ [209.85.220.200])
+ by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Pq4F040809
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:01 -0500
-Received: by mail-qt0-f197.google.com with SMTP id f4so58596159qte.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:26:01 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:52 -0500
+Received: by mail-qk0-f200.google.com with SMTP id 11so31129161qkl.4
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:25:52 -0800 (PST)
 In-Reply-To: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -47,54 +47,56 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VMs used to execute hvc #0 for the psci call. However, when we come to
-provide virtual EL2 to the VM, the host OS inside the VM also calls
-kvm_call_hyp which is also hvc #0. So, it's hard to differentiate
-between them from the host hypervisor's point of view.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-So, let the VM execute smc for the psci call. On ARMv8.3, even if EL3 is
-not implemented, a smc instruction executed at non-secure EL1 is trapped
-to EL2 if HCR_EL2.TSC==1, rather than being treated as UNDEFINED. So,
-the host hypervisor can handle this psci call without any confusion.
+When running in virtual EL2 mode, we actually run the hardware in EL1
+and therefore have to use the EL1 registers to ensure correct operation.
 
+By setting the HCR.TVM and HCR.TVRM we ensure that the virtual EL2 mode
+doesn't shoot itself in the foot when setting up what it believes to be
+a different mode's system register state (for example when preparing to
+switch to a VM).
+
+We can leverage the existing sysregs infrastructure to support trapped
+accesses to these registers.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- arch/arm64/kvm/handle_exit.c | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/switch.c | 2 ++
+ arch/arm64/kvm/sys_regs.c   | 7 ++++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 208be16..ce6d2ef 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -64,8 +64,27 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 83037cd..c05c48f 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -82,6 +82,8 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 		write_sysreg(1 << 30, fpexc32_el2);
+ 		isb();
+ 	}
++	if (vcpu_mode_el2(vcpu))
++		val |= HCR_TVM | HCR_TRVM;
+ 	write_sysreg(val, hcr_el2);
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 202f64d..b8e993a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -101,7 +101,12 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
  {
--	kvm_inject_undefined(vcpu);
--	return 1;
-+	int ret;
-+
-+	/* If imm is non-zero, it's not defined */
-+	if (kvm_vcpu_hvc_get_imm(vcpu)) {
-+		kvm_inject_undefined(vcpu);
-+		return 1;
-+	}
-+
-+	/*
-+	 * If imm is zero, it's a psci call.
-+	 * Note that on ARMv8.3, even if EL3 is not implemented, SMC executed
-+	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
-+	 * being treated as UNDEFINED.
-+	 */
-+	ret = kvm_psci_call(vcpu);
-+	if (ret < 0) {
-+		kvm_inject_undefined(vcpu);
-+		return 1;
-+	}
-+
-+	return ret;
- }
+ 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
  
- /**
+-	BUG_ON(!p->is_write);
++	BUG_ON(!vcpu_mode_el2(vcpu) && !p->is_write);
++
++	if (!p->is_write) {
++		p->regval = vcpu_sys_reg(vcpu, r->reg);
++		return true;
++	}
+ 
+ 	if (!p->is_aarch32) {
+ 		vcpu_sys_reg(vcpu, r->reg) = p->regval;
 -- 
 1.9.1
