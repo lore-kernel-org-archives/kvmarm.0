@@ -1,39 +1,40 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC 03/55] KVM: arm64: Add KVM nesting feature
-Date: Mon,  9 Jan 2017 01:23:59 -0500
-Message-ID: <1483943091-1364-4-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC 09/55] KVM: arm64: Set shadow EL1 registers for virtual EL2
+ execution
+Date: Mon,  9 Jan 2017 01:24:05 -0500
+Message-ID: <1483943091-1364-10-git-send-email-jintack@cs.columbia.edu>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD8AC4025C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:23:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F0B74025C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dXqH8LfRG8hT for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 01:23:56 -0500 (EST)
-Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
- [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D14E94066C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:23:54 -0500 (EST)
+ with ESMTP id uH5yhswXEnuQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 01:24:01 -0500 (EST)
+Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
+ [128.59.72.39])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7833E407F4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:01 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Odwv005146
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:36 -0500
+ by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096P4dQ017232
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:43 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 7EAB26D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:36 -0500 (EST)
-Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
- [128.59.72.15]) by hazelnut (Postfix) with ESMTP id 5C67E7E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:36 -0500 (EST)
-Received: from mail-qt0-f197.google.com (mail-qt0-f197.google.com
- [209.85.216.197])
- by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Paqo056475
+ by hazelnut (Postfix) with ESMTP id 132C381
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:43 -0500 (EST)
+Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
+ [128.59.72.13]) by hazelnut (Postfix) with ESMTP id DFF4C85
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:25:42 -0500 (EST)
+Received: from mail-qk0-f197.google.com (mail-qk0-f197.google.com
+ [209.85.220.197])
+ by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Pgut040633
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:36 -0500
-Received: by mail-qt0-f197.google.com with SMTP id x49so82672827qtc.7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:25:36 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:25:42 -0500
+Received: by mail-qk0-f197.google.com with SMTP id c69so110039442qkg.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:25:42 -0800 (PST)
 In-Reply-To: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -49,67 +50,105 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Set the initial exception level of the guest to EL2 if nested
-virtualization feature is enabled.
+When entering virtual EL2, we need to reflect virtual EL2 register
+states to corresponding shadow EL1 registers. We can simply copy them if
+their formats are identical.  Otherwise, we need to convert EL2 register
+state to EL1 register state.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/include/uapi/asm/kvm.h | 1 +
- arch/arm64/kvm/reset.c            | 8 ++++++++
- 3 files changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/context.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e505038..c0c8b02 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -41,7 +41,7 @@
+diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
+index acb4b1e..2e9e386 100644
+--- a/arch/arm64/kvm/context.c
++++ b/arch/arm64/kvm/context.c
+@@ -17,6 +17,76 @@
  
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
--#define KVM_VCPU_MAX_FEATURES 4
-+#define KVM_VCPU_MAX_FEATURES 5
- 
- #define KVM_REQ_VCPU_EXIT	8
- 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 3051f86..78117bf 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -97,6 +97,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
- #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-+#define KVM_ARM_VCPU_NESTED_VIRT	4 /* Support nested virtual EL2 */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 74322c2..e6b0b20 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -41,6 +41,11 @@
- 			PSR_F_BIT | PSR_D_BIT),
- };
- 
-+static const struct kvm_regs default_regs_reset_el2 = {
-+	.regs.pstate = (PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT |
-+			PSR_F_BIT | PSR_D_BIT),
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_emulate.h>
++#include <asm/esr.h>
++
++struct el1_el2_map {
++	enum vcpu_sysreg	el1;
++	enum el2_regs		el2;
 +};
 +
- static const struct kvm_regs default_regs_reset32 = {
- 	.regs.pstate = (COMPAT_PSR_MODE_SVC | COMPAT_PSR_A_BIT |
- 			COMPAT_PSR_I_BIT | COMPAT_PSR_F_BIT),
-@@ -124,6 +129,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 			if (!cpu_has_32bit_el1())
- 				return -EINVAL;
- 			cpu_reset = &default_regs_reset32;
-+		} else if (test_bit(KVM_ARM_VCPU_NESTED_VIRT,
-+				    vcpu->arch.features)) {
-+			cpu_reset = &default_regs_reset_el2;
- 		} else {
- 			cpu_reset = &default_regs_reset;
- 		}
++/*
++ * List of EL2 registers which can be directly applied to EL1 registers to
++ * emulate running EL2 in EL1.  The EL1 registers here must either be trapped
++ * or paravirtualized in EL1.
++ */
++static const struct el1_el2_map el1_el2_map[] = {
++	{ AMAIR_EL1, AMAIR_EL2 },
++	{ MAIR_EL1, MAIR_EL2 },
++	{ TTBR0_EL1, TTBR0_EL2 },
++	{ ACTLR_EL1, ACTLR_EL2 },
++	{ AFSR0_EL1, AFSR0_EL2 },
++	{ AFSR1_EL1, AFSR1_EL2 },
++	{ SCTLR_EL1, SCTLR_EL2 },
++	{ VBAR_EL1, VBAR_EL2 },
++};
++
++static inline u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
++{
++	return ((tcr_el2 & TCR_EL2_PS_MASK) >> TCR_EL2_PS_SHIFT)
++		<< TCR_IPS_SHIFT;
++}
++
++static inline u64 cptr_el2_to_cpacr_el1(u64 cptr_el2)
++{
++	u64 cpacr_el1 = 0;
++
++	if (!(cptr_el2 & CPTR_EL2_TFP))
++		cpacr_el1 |= CPACR_EL1_FPEN;
++	if (cptr_el2 & CPTR_EL2_TTA)
++		cpacr_el1 |= CPACR_EL1_TTA;
++
++	return cpacr_el1;
++}
++
++static void create_shadow_el1_sysregs(struct kvm_vcpu *vcpu)
++{
++	u64 *s_sys_regs = vcpu->arch.ctxt.shadow_sys_regs;
++	u64 *el2_regs = vcpu->arch.ctxt.el2_regs;
++	u64 tcr_el2;
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(el1_el2_map); i++) {
++		const struct el1_el2_map *map = &el1_el2_map[i];
++
++		s_sys_regs[map->el1] = el2_regs[map->el2];
++	}
++
++	tcr_el2 = el2_regs[TCR_EL2];
++	s_sys_regs[TCR_EL1] =
++		TCR_EPD1 |	/* disable TTBR1_EL1 */
++		((tcr_el2 & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
++		tcr_el2_ips_to_tcr_el1_ps(tcr_el2) |
++		(tcr_el2 & TCR_EL2_TG0_MASK) |
++		(tcr_el2 & TCR_EL2_ORGN0_MASK) |
++		(tcr_el2 & TCR_EL2_IRGN0_MASK) |
++		(tcr_el2 & TCR_EL2_T0SZ_MASK);
++
++	/* Rely on separate VMID for VA context, always use ASID 0 */
++	s_sys_regs[TTBR0_EL1] &= ~GENMASK_ULL(63, 48);
++	s_sys_regs[TTBR1_EL1] = 0;
++
++	s_sys_regs[CPACR_EL1] = cptr_el2_to_cpacr_el1(el2_regs[CPTR_EL2]);
++}
+ 
+ /**
+  * kvm_arm_setup_shadow_state -- prepare shadow state based on emulated mode
+@@ -37,6 +107,7 @@ void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
+ 		else
+ 			ctxt->hw_pstate |= PSR_MODE_EL1t;
+ 
++		create_shadow_el1_sysregs(vcpu);
+ 		ctxt->hw_sys_regs = ctxt->shadow_sys_regs;
+ 		ctxt->hw_sp_el1 = ctxt->el2_regs[SP_EL2];
+ 	} else {
 -- 
 1.9.1
