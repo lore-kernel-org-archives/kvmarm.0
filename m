@@ -1,29 +1,32 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC 8/8] KVM: arm/arm64: Emulate the EL1 phys timer register
- access
-Date: Mon, 9 Jan 2017 13:16:12 +0100
-Message-ID: <20170109121612.GG4348@cbox>
-References: <1482772326-29110-1-git-send-email-jintack@cs.columbia.edu>
- <1482772326-29110-9-git-send-email-jintack@cs.columbia.edu>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH 1/2] ARM: hyp-stub: improve ABI
+Date: Mon, 9 Jan 2017 12:26:39 +0000
+Message-ID: <20170109122639.GX14217@n2100.armlinux.org.uk>
+References: <20161213113044.GC19985@leverpostej>
+ <E1cH74w-0003ke-Qp@rmk-PC.armlinux.org.uk>
+ <72f93940-cf87-fd91-90f2-760b7ff050fb@arm.com>
+ <20161215113539.GK14217@n2100.armlinux.org.uk>
+ <06fca797-da5d-f7f2-eecb-9b1b33b7e83f@arm.com>
+ <20161215151548.GL14217@n2100.armlinux.org.uk>
+ <c21d6514-44a2-ba88-0fe5-d14d5897cc48@arm.com>
+ <20161215185717.GM14217@n2100.armlinux.org.uk>
+ <20170103095149.GA14242@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83A39404E4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 07:14:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 35AB74019C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 07:25:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vNDH+9QRit+x for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 07:14:34 -0500 (EST)
-Received: from mail-lf0-f53.google.com (mail-lf0-f53.google.com
- [209.85.215.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BC4240423
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 07:14:33 -0500 (EST)
-Received: by mail-lf0-f53.google.com with SMTP id v186so38897998lfa.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 Jan 2017 04:16:15 -0800 (PST)
+ with ESMTP id UE3kF+BUBZDB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 07:25:06 -0500 (EST)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4AAB400F3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 07:25:06 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <1482772326-29110-9-git-send-email-jintack@cs.columbia.edu>
+In-Reply-To: <20170103095149.GA14242@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,130 +36,67 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, andre.przywara@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, dave.martin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 26, 2016 at 12:12:06PM -0500, Jintack Lim wrote:
-> Emulate read and write operations to CNTP_TVAL, CNTP_CVAL and CNTP_CTL.
-> Now the VM is able to use the EL1 physical timer.
+On Tue, Jan 03, 2017 at 10:51:49AM +0100, Christoffer Dall wrote:
+> Hi Russell,
 > 
-> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-> ---
->  arch/arm64/kvm/sys_regs.c    | 35 ++++++++++++++++++++++++++++++++---
->  include/kvm/arm_arch_timer.h |  3 +++
->  virt/kvm/arm/arch_timer.c    |  4 ++--
->  3 files changed, 37 insertions(+), 5 deletions(-)
+> On Thu, Dec 15, 2016 at 06:57:18PM +0000, Russell King - ARM Linux wrote:
+> > What's also coming clear is that there's very few people who understand
+> > all the interactions here, and the whole thing seems to be an undocumented
+> > mess.  
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index fd9e747..7cef94f 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -824,7 +824,15 @@ static bool access_cntp_tval(struct kvm_vcpu *vcpu,
->  		struct sys_reg_params *p,
->  		const struct sys_reg_desc *r)
->  {
-> -	kvm_inject_undefined(vcpu);
-> +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-> +	cycle_t now = kvm_phys_timer_read();
-> +
-> +	if (p->is_write) {
-> +		ptimer->cnt_cval = p->regval + now;
-> +		kvm_timer_emulate(vcpu, ptimer);
+> I think the hyp stub has just served a very limited purpose so far, and
+> therefore is a somewhat immature implementation.  Now we've discovered a
+> need to clean it up, and we're all for that.  Again, I don't think the
+> problem is any larger than that, we just need to fix it, and it seems to
+> me everyone is willing to work on that.
 
-Hmm, do we really need those calls here?
+What I want to see is some documentation of the hyp-stub, so that there
+can be some element of confidence that changes there are properly
+coordinated.  As I said in a follow up email:
 
-I guess I'm a little confused about exactly what the kvm_timer_emulate()
-function is supposed to do, and it feels to me like these handlers
-should just record what the guest is asking the kernel to do and the
-logic of handling the additional timer should be moved into the run path
-as much as possible.
+| Either we need more people to have an understanding (so if one of them
+| gets run over by a bus, we're not left floundering around) or we need
+| it to be documented - even if it's just a simple comment "the ABI in
+| this file is shared with XYZ, if you change the ABI here, also update
+| XYZ too."
 
-Thanks,
--Christoffer
+> Marc even offered to work on your suggestion to support the general
+> hyp ABI commands in KVM.
 
-> +	} else
-> +		p->regval = ptimer->cnt_cval - now;
-> +
->  	return true;
->  }
->  
-> @@ -832,7 +840,21 @@ static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
->  		struct sys_reg_params *p,
->  		const struct sys_reg_desc *r)
->  {
-> -	kvm_inject_undefined(vcpu);
-> +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-> +
-> +	if (p->is_write) {
-> +		/* ISTATUS bit is read-only */
-> +		ptimer->cnt_ctl = p->regval & ~ARCH_TIMER_CTRL_IT_STAT;
-> +		kvm_timer_emulate(vcpu, ptimer);
-> +	} else {
-> +		cycle_t now = kvm_phys_timer_read();
-> +
-> +		p->regval = ptimer->cnt_ctl;
-> +		/* Set ISTATUS bit if it's expired */
-> +		if (ptimer->cnt_cval <= now)
-> +			p->regval |= ARCH_TIMER_CTRL_IT_STAT;
-> +	}
-> +
->  	return true;
->  }
->  
-> @@ -840,7 +862,14 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
->  		struct sys_reg_params *p,
->  		const struct sys_reg_desc *r)
->  {
-> -	kvm_inject_undefined(vcpu);
-> +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-> +
-> +	if (p->is_write) {
-> +		ptimer->cnt_cval = p->regval;
-> +		kvm_timer_emulate(vcpu, ptimer);
-> +	} else
-> +		p->regval = ptimer->cnt_cval;
-> +
->  	return true;
->  }
->  
-> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> index 04ed9c1..776579b 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-> @@ -75,6 +75,9 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu,
->  			   struct arch_timer_context *timer_ctx);
->  void kvm_timer_schedule(struct kvm_vcpu *vcpu);
->  void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
-> +void kvm_timer_emulate(struct kvm_vcpu *vcpu, struct arch_timer_context *timer);
-> +
-> +cycle_t kvm_phys_timer_read(void);
->  
->  void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
->  
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index be8d953..7a161f8 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -39,7 +39,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->  	vcpu_vtimer(vcpu)->active_cleared_last = false;
->  }
->  
-> -static cycle_t kvm_phys_timer_read(void)
-> +cycle_t kvm_phys_timer_read(void)
->  {
->  	return timecounter->cc->read(timecounter->cc);
->  }
-> @@ -258,7 +258,7 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
->   * Schedule the background timer for the emulated timer. The background timer
->   * runs whenever vcpu is runnable and the timer is not expired.
->   */
-> -static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
-> +void kvm_timer_emulate(struct kvm_vcpu *vcpu,
->  		       struct arch_timer_context *timer_ctx)
->  {
->  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-> -- 
-> 1.9.1
-> 
-> 
+... which is pointless, because it's a duplication of the effort I've
+already put in.  My patches already do the:
+
+#define HVC_GET_VECTORS 0
+#define HVC_SET_VECTORS 1
+#define HVC_SOFT_RESTART 2
+
+thing which ARM64 does, passing the arguments in via the appropriate
+registers.  However, such a change is a major revision of hyp-stub's
+ABI, which completely changes the way it works.
+
+The issue here is that there seems to be only one person, Marc, who
+understands that the KVM hypervisor also needs to be updated - everyone
+else I've talked to was of the opinion that hyp-stub's ABI is limited
+to hyp-stub.S.  That's worse than "I don't know" because it leads to
+exactly the situation that my patches created: the two ABIs going out
+of step.
+
+What I'm asking for is a patch to add some sort of documentation ASAP
+which ensures that this important non-obvious information isn't limited
+to just one person.  As I mentioned in the quote above, it can be as
+simple as merely pointing each file at its counterparts which have to
+be updated at the same time.
+
+Longer term, I'd like to see the existing hypervisor documentation in
+Documentation/virtual/kvm/hypercalls.txt updated with the ARM details.
+According to that document, KVM effectively only exists on PPC and x86
+at the present time...
+
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
