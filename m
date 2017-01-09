@@ -1,39 +1,39 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC 24/55] KVM: arm64: Forward FP exceptions to the guest hypervisor
-Date: Mon,  9 Jan 2017 01:24:20 -0500
-Message-ID: <1483943091-1364-25-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC 27/55] KVM: arm/arm64: Emulate GICH interface on GICv2
+Date: Mon,  9 Jan 2017 01:24:23 -0500
+Message-ID: <1483943091-1364-28-git-send-email-jintack@cs.columbia.edu>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64A254044D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B506B4018B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2nQlbl6soOUv for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jan 2017 01:24:25 -0500 (EST)
+ with ESMTP id LRYtdo9cBL3e for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jan 2017 01:24:27 -0500 (EST)
 Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
  [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B4DA407D6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B52D9407F4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:24:27 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096PXCZ005328
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:05 -0500
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096PWu9005289
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:09 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id B55F1A3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:05 -0500 (EST)
-Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
- [128.59.72.15]) by hazelnut (Postfix) with ESMTP id B6788B1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:03 -0500 (EST)
-Received: from mail-qt0-f197.google.com (mail-qt0-f197.google.com
- [209.85.216.197])
- by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Q3Qk057119
+ by hazelnut (Postfix) with ESMTP id 273488E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:09 -0500 (EST)
+Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
+ [128.59.72.13]) by hazelnut (Postfix) with ESMTP id 640B08C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jan 2017 01:26:07 -0500 (EST)
+Received: from mail-qt0-f198.google.com (mail-qt0-f198.google.com
+ [209.85.216.198])
+ by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v096Q7vU041143
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:03 -0500
-Received: by mail-qt0-f197.google.com with SMTP id f4so58596555qte.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:26:03 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 9 Jan 2017 01:26:07 -0500
+Received: by mail-qt0-f198.google.com with SMTP id x49so82676920qtc.7
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 08 Jan 2017 22:26:07 -0800 (PST)
 In-Reply-To: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -47,106 +47,238 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Forward exceptions due to floating-point register accesses to the guest
-hypervisor if it has set CPTR_EL2.TFP bit.
+Emulate GICH interface accesses from the guest hypervisor.
 
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  1 +
- arch/arm64/kernel/asm-offsets.c     |  1 +
- arch/arm64/kvm/handle_exit.c        |  3 +++
- arch/arm64/kvm/handle_exit_nested.c |  6 ++++++
- arch/arm64/kvm/hyp/entry.S          | 14 ++++++++++++++
- arch/arm64/kvm/hyp/hyp-entry.S      |  2 +-
- 6 files changed, 26 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/Makefile            |   1 +
+ virt/kvm/arm/vgic/vgic-v2-nested.c | 207 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 208 insertions(+)
+ create mode 100644 virt/kvm/arm/vgic/vgic-v2-nested.c
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 8d36935..54c5ce5 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -3,4 +3,5 @@
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 9c35e9a..8573faf 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -37,3 +37,4 @@ kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
  
- int handle_hvc_nested(struct kvm_vcpu *vcpu);
- int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
-+int kvm_handle_fp_asimd(struct kvm_vcpu *vcpu, struct kvm_run *run);
- #endif
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index 4a2f0f0..b635f1a 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -131,6 +131,7 @@ int main(void)
-   DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
-   DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
-   DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
-+  DEFINE(VIRTUAL_CPTR_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.el2_regs[CPTR_EL2]));
- #endif
- #ifdef CONFIG_CPU_PM
-   DEFINE(CPU_SUSPEND_SZ,	sizeof(struct cpu_suspend_ctx));
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 046fdf8..308f5c5 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -195,6 +195,9 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	[ESR_ELx_EC_BREAKPT_LOW]= kvm_handle_guest_debug,
- 	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
- 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
-+#ifdef CONFIG_KVM_ARM_NESTED_HYP
-+	[ESR_ELx_EC_FP_ASIMD]	= kvm_handle_fp_asimd,
-+#endif
- };
- 
- static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/handle_exit_nested.c b/arch/arm64/kvm/handle_exit_nested.c
-index 871ecfc..7544c6d 100644
---- a/arch/arm64/kvm/handle_exit_nested.c
-+++ b/arch/arm64/kvm/handle_exit_nested.c
-@@ -43,3 +43,9 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
- 
- 	return -EINVAL;
- }
+ kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += handle_exit_nested.o
+ kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += emulate-nested.o
++kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += $(KVM)/arm/vgic/vgic-v2-nested.o
+diff --git a/virt/kvm/arm/vgic/vgic-v2-nested.c b/virt/kvm/arm/vgic/vgic-v2-nested.c
+new file mode 100644
+index 0000000..b13128e
+--- /dev/null
++++ b/virt/kvm/arm/vgic/vgic-v2-nested.c
+@@ -0,0 +1,207 @@
++#include <linux/cpu.h>
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
++#include <linux/interrupt.h>
++#include <linux/io.h>
++#include <linux/uaccess.h>
 +
-+/* This is only called when virtual CPTR_EL2.TFP bit is set. */
-+int kvm_handle_fp_asimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
++#include <linux/irqchip/arm-gic.h>
++
++#include <asm/kvm_emulate.h>
++#include <asm/kvm_arm.h>
++#include <asm/kvm_mmu.h>
++#include <kvm/arm_vgic.h>
++
++#include "vgic.h"
++#include "vgic-mmio.h"
++
++static inline struct vgic_v2_cpu_if *vcpu_nested_if(struct kvm_vcpu *vcpu)
 +{
-+	return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
++	return &vcpu->arch.vgic_cpu.nested_vgic_v2;
 +}
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 12ee62d..a76f102 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -158,6 +158,20 @@ abort_guest_exit_end:
- 1:	ret
- ENDPROC(__guest_exit)
- 
-+ENTRY(__fpsimd_guest_trap)
-+#ifdef CONFIG_KVM_ARM_NESTED_HYP
-+// If virtual CPTR_EL2.TFP is set, then foward it to the nested hyp.
-+	mrs	x1, tpidr_el2
-+	ldr	x0, [x1, #VIRTUAL_CPTR_EL2]
-+	and 	x0, x0, #CPTR_EL2_TFP
-+	cbnz	x0, 1f
-+#endif
-+	b	__fpsimd_guest_restore
-+1:
-+	mov	x0, #ARM_EXCEPTION_TRAP
-+	b	__guest_exit
-+ENDPROC(__fpsimd_guest_trap)
 +
- ENTRY(__fpsimd_guest_restore)
- 	stp	x2, x3, [sp, #-16]!
- 	stp	x4, lr, [sp, #-16]!
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 4e92399..d83494b 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -108,7 +108,7 @@ el1_trap:
- 
- 	/* Guest accessed VFP/SIMD registers, save host, restore Guest */
- 	cmp	x0, #ESR_ELx_EC_FP_ASIMD
--	b.eq	__fpsimd_guest_restore
-+	b.eq	__fpsimd_guest_trap
- 
- 	mrs	x1, tpidr_el2
- 	mov	x0, #ARM_EXCEPTION_TRAP
++static inline struct vgic_v2_cpu_if *vcpu_shadow_if(struct kvm_vcpu *vcpu)
++{
++	return &vcpu->arch.vgic_cpu.shadow_vgic_v2;
++}
++
++static unsigned long vgic_mmio_read_v2_vtr(struct kvm_vcpu *vcpu,
++					   gpa_t addr, unsigned int len)
++{
++	u32 reg;
++
++	reg = kvm_vgic_global_state.nr_lr - 1;
++	reg |= 0b100 << 26;
++	reg |= 0b100 << 29;
++
++	return reg;
++}
++
++static inline bool lr_triggers_eoi(u32 lr)
++{
++	return !(lr & (GICH_LR_STATE | GICH_LR_HW)) && (lr & GICH_LR_EOI);
++}
++
++static unsigned long get_eisr(struct kvm_vcpu *vcpu, bool upper_reg)
++{
++	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++	int max_lr = upper_reg ? 64 : 32;
++	int min_lr = upper_reg ? 32 : 0;
++	int nr_lr = min(kvm_vgic_global_state.nr_lr, max_lr);
++	int i;
++	u32 reg = 0;
++
++	for (i = min_lr; i < nr_lr; i++) {
++		if (lr_triggers_eoi(cpu_if->vgic_lr[i]))
++			reg |= BIT(i - min_lr);
++	}
++
++	return reg;
++}
++
++static unsigned long vgic_mmio_read_v2_eisr0(struct kvm_vcpu *vcpu,
++					     gpa_t addr, unsigned int len)
++{
++	return get_eisr(vcpu, false);
++}
++
++static unsigned long vgic_mmio_read_v2_eisr1(struct kvm_vcpu *vcpu,
++					     gpa_t addr, unsigned int len)
++{
++	return get_eisr(vcpu, true);
++}
++
++static u32 get_elrsr(struct kvm_vcpu *vcpu, bool upper_reg)
++{
++	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++	int max_lr = upper_reg ? 64 : 32;
++	int min_lr = upper_reg ? 32 : 0;
++	int nr_lr = min(kvm_vgic_global_state.nr_lr, max_lr);
++	u32 reg = 0;
++	int i;
++
++	for (i = min_lr; i < nr_lr; i++) {
++		if (!(cpu_if->vgic_lr[i] & GICH_LR_STATE))
++			reg |= BIT(i - min_lr);
++	}
++
++	return reg;
++}
++
++static unsigned long vgic_mmio_read_v2_elrsr0(struct kvm_vcpu *vcpu,
++					      gpa_t addr, unsigned int len)
++{
++	return get_elrsr(vcpu, false);
++}
++
++static unsigned long vgic_mmio_read_v2_elrsr1(struct kvm_vcpu *vcpu,
++					      gpa_t addr, unsigned int len)
++{
++	return get_elrsr(vcpu, true);
++}
++
++static unsigned long vgic_mmio_read_v2_misr(struct kvm_vcpu *vcpu,
++					    gpa_t addr, unsigned int len)
++{
++	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++	int nr_lr = kvm_vgic_global_state.nr_lr;
++	u32 reg = 0;
++
++	if (vgic_mmio_read_v2_eisr0(vcpu, addr, len) ||
++			vgic_mmio_read_v2_eisr1(vcpu, addr, len))
++		reg |= GICH_MISR_EOI;
++
++	if (cpu_if->vgic_hcr & GICH_HCR_UIE) {
++		u32 elrsr0 = vgic_mmio_read_v2_elrsr0(vcpu, addr, len);
++		u32 elrsr1 = vgic_mmio_read_v2_elrsr1(vcpu, addr, len);
++		int used_lrs;
++
++		used_lrs = nr_lr - (hweight32(elrsr0) + hweight32(elrsr1));
++		if (used_lrs <= 1)
++			reg |= GICH_MISR_U;
++	}
++
++	/* TODO: Support remaining bits in this register */
++	return reg;
++}
++
++static unsigned long vgic_mmio_read_v2_gich(struct kvm_vcpu *vcpu,
++					    gpa_t addr, unsigned int len)
++{
++	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++	u32 value;
++
++	switch (addr & 0xfff) {
++	case GICH_HCR:
++		value = cpu_if->vgic_hcr;
++		break;
++	case GICH_VMCR:
++		value = cpu_if->vgic_vmcr;
++		break;
++	case GICH_APR:
++		value = cpu_if->vgic_apr;
++		break;
++	case GICH_LR0 ... (GICH_LR0 + 4 * (VGIC_V2_MAX_LRS - 1)):
++		value = cpu_if->vgic_lr[(addr & 0xff) >> 2];
++		break;
++	default:
++		return 0;
++	}
++
++	return value;
++}
++
++static void vgic_mmio_write_v2_gich(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len,
++				    unsigned long val)
++{
++	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++
++	switch (addr & 0xfff) {
++	case GICH_HCR:
++		cpu_if->vgic_hcr = val;
++		break;
++	case GICH_VMCR:
++		cpu_if->vgic_vmcr = val;
++		break;
++	case GICH_APR:
++		cpu_if->vgic_apr = val;
++		break;
++	case GICH_LR0 ... (GICH_LR0 + 4 * (VGIC_V2_MAX_LRS - 1)):
++		cpu_if->vgic_lr[(addr & 0xff) >> 2] = val;
++		break;
++	}
++}
++
++static const struct vgic_register_region vgic_v2_gich_registers[] = {
++	REGISTER_DESC_WITH_LENGTH(GICH_HCR,
++		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich, 4,
++		VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICH_VTR,
++		vgic_mmio_read_v2_vtr, vgic_mmio_write_wi, 4,
++		VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICH_VMCR,
++		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich, 4,
++		VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICH_MISR,
++		vgic_mmio_read_v2_misr, vgic_mmio_write_wi, 4,
++		VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICH_EISR0,
++		vgic_mmio_read_v2_eisr0, vgic_mmio_write_wi, 4,
++		VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICH_EISR1,
++		vgic_mmio_read_v2_eisr1, vgic_mmio_write_wi, 4,
++		VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICH_ELRSR0,
++		vgic_mmio_read_v2_elrsr0, vgic_mmio_write_wi, 4,
++		VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICH_ELRSR1,
++		vgic_mmio_read_v2_elrsr1, vgic_mmio_write_wi, 4,
++		VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICH_APR,
++		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich, 4,
++		VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH(GICH_LR0,
++		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich,
++		4 * VGIC_V2_MAX_LRS, VGIC_ACCESS_32bit),
++};
 -- 
 1.9.1
