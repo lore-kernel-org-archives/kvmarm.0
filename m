@@ -1,130 +1,248 @@
-From: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Subject: Re: [PATCH V6 05/10] acpi: apei: handle SEA notification type for
- ARMv8
-Date: Tue, 10 Jan 2017 10:50:53 -0700
-Message-ID: <dfb77246-3c13-9e37-d3d5-0975fc7c6567@codeaurora.org>
-References: <1481147303-7979-1-git-send-email-tbaicar@codeaurora.org>
- <1481147303-7979-6-git-send-email-tbaicar@codeaurora.org>
- <58594E62.3050003@arm.com>
- <8b7fa162-0d44-025f-758d-d61cfa75c787@codeaurora.org>
- <586F74DB.3020107@arm.com>
+From: Jintack Lim <jintack@cs.columbia.edu>
+Subject: Re: [RFC 7/8] KVM: arm/arm64: Set up a background timer for the
+ physical timer emulation
+Date: Tue, 10 Jan 2017 13:47:49 -0500
+Message-ID: <CAHyh4xhvjR2k5H4kTM3t_rXyzih-h2aHQTN9VPqrzJbJ=Zuq0g@mail.gmail.com>
+References: <1482772326-29110-1-git-send-email-jintack@cs.columbia.edu>
+ <1482772326-29110-8-git-send-email-jintack@cs.columbia.edu>
+ <20170109121326.GE4348@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <586F74DB.3020107@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, devel@acpica.org, Suzuki.Po
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09C3D40421
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 13:46:11 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id LrgRt+M4kU7t for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Jan 2017 13:46:09 -0500 (EST)
+Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
+ [128.59.72.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CCB1840284
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 13:46:09 -0500 (EST)
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0AIi8n5004600
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 13:47:53 -0500
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+ by hazelnut (Postfix) with ESMTP id 16D7886
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 13:47:53 -0500 (EST)
+Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
+ [128.59.72.14]) by hazelnut (Postfix) with ESMTP id D57E26D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 13:47:52 -0500 (EST)
+Received: from mail-oi0-f71.google.com (mail-oi0-f71.google.com
+ [209.85.218.71])
+ by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0AIlqvW046768
+ (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 13:47:52 -0500
+Received: by mail-oi0-f71.google.com with SMTP id u143so284965292oif.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 10:47:52 -0800 (PST)
+Received: from mail-oi0-f54.google.com (mail-oi0-f54.google.com.
+ [209.85.218.54])
+ by smtp.gmail.com with ESMTPSA id f68sm1247731oih.20.2017.01.10.10.47.50
+ for <kvmarm@lists.cs.columbia.edu>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 10 Jan 2017 10:47:50 -0800 (PST)
+Received: by mail-oi0-f54.google.com with SMTP id u143so149341753oif.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 10:47:50 -0800 (PST)
+In-Reply-To: <20170109121326.GE4348@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: KVM General <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, andre.przywara@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hello James,
+Hi Christoffer,
 
+thanks for the review!
 
-On 1/6/2017 3:43 AM, James Morse wrote:
-> On 05/01/17 22:31, Baicar, Tyler wrote:
->> On 12/20/2016 8:29 AM, James Morse wrote:
->>> On 07/12/16 21:48, Tyler Baicar wrote:
->>>> ARM APEI extension proposal added SEA (Synchrounous External
->>>> Abort) notification type for ARMv8.
->>>> Add a new GHES error source handling function for SEA. If an error
->>>> source's notification type is SEA, then this function can be registered
->>>> into the SEA exception handler. That way GHES will parse and report
->>>> SEA exceptions when they occur.
->>>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
->>>> index 2acbc60..66ab3fd 100644
->>>> --- a/drivers/acpi/apei/ghes.c
->>>> +++ b/drivers/acpi/apei/ghes.c
->>>> @@ -767,6 +771,62 @@ static struct notifier_block ghes_notifier_sci = {
->>>>        .notifier_call = ghes_notify_sci,
->>>>    };
->>>>    +#ifdef CONFIG_HAVE_ACPI_APEI_SEA
->>>> +static LIST_HEAD(ghes_sea);
->>>> +
->>>> +static int ghes_notify_sea(struct notifier_block *this,
->>>> +                  unsigned long event, void *data)
->>>> +{
->>>> +    struct ghes *ghes;
->>>> +    int ret = NOTIFY_DONE;
->>>> +
->>>> +    rcu_read_lock();
->>>> +    list_for_each_entry_rcu(ghes, &ghes_sea, list) {
->>>> +        if (!ghes_proc(ghes))
->>>> +            ret = NOTIFY_OK;
->>>> +    }
->>>> +    rcu_read_unlock();
->>>> +
->>>> +    return ret;
->>>> +}
->>> What stops this from being re-entrant?
->>>
->>> ghes_copy_tofrom_phs() takes the ghes_ioremap_lock_irq spinlock, but there is
->>> nothing to stop a subsequent instruction fetch or memory access causing another
->>> (maybe different) Synchronous External Abort which deadlocks trying to take the
->>> same lock.
->>>
->>> ghes_notify_sea() looks to be based on ghes_notify_sci(), which (if I've found
->>> the right part of the ACPI spec) is a level-low interrupt. spin_lock_irqsave()
->>> would mask interrupts so there is no risk of a different notification firing on
->>> the same CPU, (it looks like they are almost all ultimately an irq).
->>>
->>> NMI is the odd one out because its not maskable like this, but ghes_notify_nmi()
->>> has:
->>>>      if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
->>>>          return ret;
->>> To ensure there is only ever one thread poking around in this code.
->>>
->>> What happens if a system describes two GHES sources, one using an irq the other
->>> SEA? The SEA error can interrupt the irq error while its holding the above lock.
->>> I guess this is also why all the NMI code in that file is separate.
+On Mon, Jan 9, 2017 at 7:13 AM, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Mon, Dec 26, 2016 at 12:12:05PM -0500, Jintack Lim wrote:
+>> Set a background timer for the EL1 physical timer emulation while VMs are
+>> running, so that VMs get interrupts for the physical timer in a timely
+>> manner.
+>>
+>> We still use just one background timer. When a VM is runnable, we use
+>> the background timer for the physical timer emulation.  When the VM is
+>> about to be blocked, we use the background timer to wake up the vcpu at
+>> the earliest timer expiration among timers the VM is using.
+>>
+>> As a result, the assumption that the background timer is not armed while
+>> VMs are running does not hold any more. So, remove BUG_ON()s and
+>> WARN_ON()s accordingly.
+>>
+>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+>> ---
+>>  virt/kvm/arm/arch_timer.c | 42 +++++++++++++++++++++++++++++++-----------
+>>  1 file changed, 31 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>> index aa7e243..be8d953 100644
+>> --- a/virt/kvm/arm/arch_timer.c
+>> +++ b/virt/kvm/arm/arch_timer.c
+>> @@ -91,9 +91,6 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+>>       vcpu = container_of(work, struct kvm_vcpu, arch.timer_cpu.expired);
+>>       vcpu->arch.timer_cpu.armed = false;
+>>
+>> -     WARN_ON(!kvm_timer_should_fire(vcpu, vcpu_vtimer(vcpu)) &&
+>> -             !kvm_timer_should_fire(vcpu, vcpu_ptimer(vcpu)));
+>> -
 >
->> Let me see if I'm following you right :)
->> I should use spin_lock_irqsave() in ghes_notify_sea() to avoid ghes_notify_sci()
->> from
->> interrupting this process and potentially causing the deadlock?
-> This way round you are already safe: The CPU masks interrupts when it takes the
-> exception, they should still be masked by the time we get in here...
+> This seems misplaced and has been addressed here:
+> https://lists.cs.columbia.edu/pipermail/kvmarm/2017-January/022933.html
 >
-> The other way round is a lot more fun!
->
-> What happens if APEI is processing some error record that was notified via an
-> interrupt, and then takes the Synchronous External Abort, and ends up back in
-> this code? Masking interrupts doesn't stop the external-abort, and trying to
-> take the ghes_ioremap_lock_irq will deadlock.
->
-> What happens if we interrupt printk() holding all its locks is another thing I
-> haven't worked out yet.
->
->
->> This race condition does seem valid. We are using the same acknowledgment for
->> all our
->> HEST table entries, so our firmware will not populate more than one entry at a
->> time. That
->> gets us around this race condition.
-> Ah, so your firmware will wait for the interrupt-signalled error to be finished
-> before it triggers the Synchronous External Abort. I think this would still be a
-> linux bug if the firmware didn't do this.
->
-> x86 could have done the same with NMI notifications, but we have all this 'if
-> (in_nmi)' to allow interrupts-masked GHES handling to be interrupted.
->
-> What do you think to re-using the 'if (in_nmi)' code for SEA? We can argue that
-> SEA is NMI-like in that it can't be masked, and it interrupts code that had
-> interrupts masked. It 'should' be as simple as putting 'HAVE_NMI' in arm64's
-> Kconfig, and wrapping the atomic notifier call with nmi_enter()/nmi_exit() from
-> linux/hardirq.h. (...famous last words...)
->
-> This probably answers my printk() questions too, but I need to look into it some
-> more.
+> When you respin you can benefit from basing on that (assuming it gets
+> acked and goes int).
 
-Thanks for the detailed description! I looked through this and it seems 
-like re-using the NMI code should work. I'll add the use of the in_nmi 
-code in the next patchset.
+Ok, I got it.
 
-Thanks,
-Tyler
+>
+>>       /*
+>>        * If the vcpu is blocked we want to wake it up so that it will see
+>>        * the timer has expired when entering the guest.
+>> @@ -139,7 +136,6 @@ static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx)
+>>
+>>  /*
+>>   * Returns minimal timer expiration time in ns among guest timers.
+>> - * Note that it will return inf time if none of timers can fire.
+>>   */
+>>  static u64 kvm_timer_min_block(struct kvm_vcpu *vcpu)
+>>  {
+>> @@ -153,7 +149,9 @@ static u64 kvm_timer_min_block(struct kvm_vcpu *vcpu)
+>>       if (kvm_timer_irq_can_fire(ptimer))
+>>               min_phys = kvm_timer_compute_delta(vcpu, ptimer);
+>>
+>> -     WARN_ON((min_virt == ULLONG_MAX) && (min_phys == ULLONG_MAX));
+>> +     /* If none of timers can fire, then return 0 */
+>> +     if ((min_virt == ULLONG_MAX) && (min_phys == ULLONG_MAX))
+>> +             return 0;
+>
+> Why didn't you have this semantics in the previous patch?
 
--- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+I should have put this in the previous patch, and I'll do that.
+
+Just let you know, WARN_ON() in the previous patch was there because I
+thought that the caller of this function is sure that one of the
+timers are able to fire. But I think that's beyond the scope of this
+function.
+
+>
+>>
+>>       return min(min_virt, min_phys);
+>>  }
+>> @@ -257,6 +255,26 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>>  }
+>>
+>>  /*
+>> + * Schedule the background timer for the emulated timer. The background timer
+>> + * runs whenever vcpu is runnable and the timer is not expired.
+>> + */
+>> +static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
+>> +                    struct arch_timer_context *timer_ctx)
+>> +{
+>> +     struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>> +
+>> +     if (kvm_timer_should_fire(vcpu, timer_ctx))
+>> +             return;
+>> +
+>> +     if (!kvm_timer_irq_can_fire(timer_ctx))
+>> +             return;
+>> +
+>> +     /*  The timer has not yet expired, schedule a background timer */
+>> +     timer_disarm(timer);
+>> +     timer_arm(timer, kvm_timer_compute_delta(vcpu, timer_ctx));
+>
+> I'm wondering what the effect of this thing really is.  Isn't the soft
+> timer programmed in timer_arm() based on Linux's own timekeeping
+> schedule, such that the physical timer will be programmed to the next
+> tick, regardless of what you program here, so all you have to do is
+> check if you need to inject the phys timer on entry to the VM?
+>
+> On the other hand, if this can cause Linux to program the phys timer to
+> expire sooner, then I guess it makes sense.  Thinking about it, would
+> that be the case on a tickless system?
+
+I don't have a good answer for this, so I'll get back to you!
+
+>
+>> +}
+>> +
+>> +/*
+>>   * Schedule the background timer before calling kvm_vcpu_block, so that this
+>>   * thread is removed from its waitqueue and made runnable when there's a timer
+>>   * interrupt to handle.
+>> @@ -267,8 +285,6 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>>       struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>>       struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>>
+>> -     BUG_ON(timer_is_armed(timer));
+>> -
+>>       /*
+>>        * No need to schedule a background timer if any guest timer has
+>>        * already expired, because kvm_vcpu_block will return before putting
+>> @@ -290,13 +306,21 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>>        * The guest timers have not yet expired, schedule a background timer.
+>>        * Pick smaller expiration time between phys and virt timer.
+>>        */
+>> +     timer_disarm(timer);
+>>       timer_arm(timer, kvm_timer_min_block(vcpu));
+>>  }
+>>
+>>  void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+>>  {
+>>       struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>> +
+>>       timer_disarm(timer);
+>> +
+>> +     /*
+>> +      * Now we return from the blocking. If we have any timer to emulate,
+>> +      * and it's not expired, set the background timer for it.
+>> +      */
+>> +     kvm_timer_emulate(vcpu, vcpu_ptimer(vcpu));
+>
+> hmm, this is only called when returning from the kvm_vcpu_block() path.
+> What about when you do vcpu_load/put, don't you need to schedule/cancel
+> it there too?
+
+We can do that, but I think that's not necessary. Firing the physical
+timer while a vcpu is unloaded doesn't affect the task scheduling. Or
+is it awkward to do so?
+
+>
+> Maybe it's simpler to just program the soft timer during flush_hwstate
+> and cancel the timer during sync_hwstate.  Does that work?
+
+As far as I remember, it worked. I agree that it's simpler.
+But as I mentioned in the patch [8/8] reply this *may* cause more overhead.
+
+>
+>>  }
+>>
+>>  /**
+>> @@ -375,10 +399,6 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+>>   */
+>>  void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+>>  {
+>> -     struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>> -
+>> -     BUG_ON(timer_is_armed(timer));
+>> -
+>>       /*
+>>        * The guest could have modified the timer registers or the timer
+>>        * could have expired, update the timer state.
+>> --
+>> 1.9.1
+>>
+>>
+>
+> Thanks,
+> -Christoffer
+>
