@@ -1,49 +1,51 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: Re: [RFC 00/55] Nested Virtualization on KVM/ARM
-Date: Tue, 10 Jan 2017 11:18:21 -0500
-Message-ID: <CAHyh4xg23zgqzJa9yUgXdjZN5v45fBLjDFJok_DPSWUo9UaewQ@mail.gmail.com>
-References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <7991b5fa-cbd3-a3b3-3f1c-8b8655ebdcfd@redhat.com>
+Subject: Re: [RFC 4/8] KVM: arm/arm64: Initialize the emulated EL1 physical
+ timer
+Date: Tue, 10 Jan 2017 12:03:00 -0500
+Message-ID: <CAHyh4xgq_me42Jv+=6P=NhcyxpjJ4R6zgWGY2HibEc6e09Af2g@mail.gmail.com>
+References: <1482772326-29110-1-git-send-email-jintack@cs.columbia.edu>
+ <1482772326-29110-5-git-send-email-jintack@cs.columbia.edu>
+ <20170109120235.GD4348@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 059EA4044B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 11:16:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2F8B405B9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 12:01:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k0-q5+4nNj7S for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Jan 2017 11:16:42 -0500 (EST)
-Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
- [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B9A74027C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 11:16:41 -0500 (EST)
+ with ESMTP id C6Z6jWQRHJB4 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Jan 2017 12:01:23 -0500 (EST)
+Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
+ [128.59.72.39])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 802D1404FF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 12:01:23 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0AGIP7X058981
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 11:18:25 -0500
+ by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0AH0Bsi009468
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 12:03:06 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 4999786
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 11:18:25 -0500 (EST)
-Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
- [128.59.72.14]) by hazelnut (Postfix) with ESMTP id 7E7A691
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 11:18:24 -0500 (EST)
-Received: from mail-oi0-f72.google.com (mail-oi0-f72.google.com
- [209.85.218.72])
- by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0AGIOoW024437
+ by hazelnut (Postfix) with ESMTP id C8E5B95
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 12:03:06 -0500 (EST)
+Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
+ [128.59.72.15]) by hazelnut (Postfix) with ESMTP id 4633898
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 12:03:04 -0500 (EST)
+Received: from mail-oi0-f71.google.com (mail-oi0-f71.google.com
+ [209.85.218.71])
+ by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0AH33uQ025666
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 11:18:24 -0500
-Received: by mail-oi0-f72.google.com with SMTP id u143so278043680oif.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 08:18:24 -0800 (PST)
-Received: from mail-oi0-f41.google.com (mail-oi0-f41.google.com.
- [209.85.218.41])
- by smtp.gmail.com with ESMTPSA id h74sm1062901oic.9.2017.01.10.08.18.22
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 12:03:04 -0500
+Received: by mail-oi0-f71.google.com with SMTP id y140so213376175oie.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 09:03:04 -0800 (PST)
+Received: from mail-oi0-f43.google.com (mail-oi0-f43.google.com.
+ [209.85.218.43])
+ by smtp.gmail.com with ESMTPSA id 99sm1066471otd.28.2017.01.10.09.03.01
  for <kvmarm@lists.cs.columbia.edu>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 10 Jan 2017 08:18:22 -0800 (PST)
-Received: by mail-oi0-f41.google.com with SMTP id b126so735737620oia.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 08:18:22 -0800 (PST)
-In-Reply-To: <7991b5fa-cbd3-a3b3-3f1c-8b8655ebdcfd@redhat.com>
+ Tue, 10 Jan 2017 09:03:02 -0800 (PST)
+Received: by mail-oi0-f43.google.com with SMTP id 3so553674996oih.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Jan 2017 09:03:01 -0800 (PST)
+In-Reply-To: <20170109120235.GD4348@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -53,28 +55,186 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: David Hildenbrand <david@redhat.com>
-Cc: KVM General <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, andre.przywara@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: KVM General <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, andre.przywara@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 9, 2017 at 10:05 AM, David Hildenbrand <david@redhat.com> wrote:
+On Mon, Jan 9, 2017 at 7:02 AM, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Mon, Dec 26, 2016 at 12:12:02PM -0500, Jintack Lim wrote:
+>> Initialize the emulated EL1 physical timer with the default irq number.
+>>
+>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+>> ---
+>>  arch/arm/kvm/reset.c         |  9 ++++++++-
+>>  arch/arm64/kvm/reset.c       |  9 ++++++++-
+>>  include/kvm/arm_arch_timer.h |  3 ++-
+>>  virt/kvm/arm/arch_timer.c    | 12 ++++++++++--
+>>  4 files changed, 28 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
+>> index 4b5e802..1da8b2d 100644
+>> --- a/arch/arm/kvm/reset.c
+>> +++ b/arch/arm/kvm/reset.c
+>> @@ -37,6 +37,11 @@
+>>       .usr_regs.ARM_cpsr = SVC_MODE | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT,
+>>  };
+>>
+>> +static const struct kvm_irq_level cortexa_ptimer_irq = {
+>> +     { .irq = 30 },
+>> +     .level = 1,
+>> +};
+>> +
+>>  static const struct kvm_irq_level cortexa_vtimer_irq = {
+>>       { .irq = 27 },
+>>       .level = 1,
+>> @@ -58,6 +63,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>>  {
+>>       struct kvm_regs *reset_regs;
+>>       const struct kvm_irq_level *cpu_vtimer_irq;
+>> +     const struct kvm_irq_level *cpu_ptimer_irq;
+>>
+>>       switch (vcpu->arch.target) {
+>>       case KVM_ARM_TARGET_CORTEX_A7:
+>> @@ -65,6 +71,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>>               reset_regs = &cortexa_regs_reset;
+>>               vcpu->arch.midr = read_cpuid_id();
+>>               cpu_vtimer_irq = &cortexa_vtimer_irq;
+>> +             cpu_ptimer_irq = &cortexa_ptimer_irq;
+>>               break;
+>>       default:
+>>               return -ENODEV;
+>> @@ -77,5 +84,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>>       kvm_reset_coprocs(vcpu);
+>>
+>>       /* Reset arch_timer context */
+>> -     return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+>> +     return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq, cpu_ptimer_irq);
+>>  }
+>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+>> index 5bc4608..74322c2 100644
+>> --- a/arch/arm64/kvm/reset.c
+>> +++ b/arch/arm64/kvm/reset.c
+>> @@ -46,6 +46,11 @@
+>>                       COMPAT_PSR_I_BIT | COMPAT_PSR_F_BIT),
+>>  };
+>>
+>> +static const struct kvm_irq_level default_ptimer_irq = {
+>> +     .irq    = 30,
+>> +     .level  = 1,
+>> +};
+>> +
+>>  static const struct kvm_irq_level default_vtimer_irq = {
+>>       .irq    = 27,
+>>       .level  = 1,
+>> @@ -110,6 +115,7 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>>  {
+>>       const struct kvm_irq_level *cpu_vtimer_irq;
+>> +     const struct kvm_irq_level *cpu_ptimer_irq;
+>>       const struct kvm_regs *cpu_reset;
+>>
+>>       switch (vcpu->arch.target) {
+>> @@ -123,6 +129,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>>               }
+>>
+>>               cpu_vtimer_irq = &default_vtimer_irq;
+>> +             cpu_ptimer_irq = &default_ptimer_irq;
+>>               break;
+>>       }
+>>
+>> @@ -136,5 +143,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>>       kvm_pmu_vcpu_reset(vcpu);
+>>
+>>       /* Reset timer */
+>> -     return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+>> +     return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq, cpu_ptimer_irq);
+>>  }
+>> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+>> index d21652a..04ed9c1 100644
+>> --- a/include/kvm/arm_arch_timer.h
+>> +++ b/include/kvm/arm_arch_timer.h
+>> @@ -61,7 +61,8 @@ struct arch_timer_cpu {
+>>  int kvm_timer_enable(struct kvm_vcpu *vcpu);
+>>  void kvm_timer_init(struct kvm *kvm);
+>>  int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>> -                      const struct kvm_irq_level *irq);
+>> +                      const struct kvm_irq_level *virt_irq,
+>> +                      const struct kvm_irq_level *phys_irq);
+>>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
+>>  void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
+>>  void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
+>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>> index 3bd6063..ed80864 100644
+>> --- a/virt/kvm/arm/arch_timer.c
+>> +++ b/virt/kvm/arm/arch_timer.c
+>> @@ -339,9 +339,11 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+>>  }
+>>
+>>  int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>> -                      const struct kvm_irq_level *irq)
+>> +                      const struct kvm_irq_level *virt_irq,
+>> +                      const struct kvm_irq_level *phys_irq)
+>>  {
+>>       struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>> +     struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>>
+>>       /*
+>>        * The vcpu timer irq number cannot be determined in
+>> @@ -349,7 +351,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>>        * kvm_vcpu_set_target(). To handle this, we determine
+>>        * vcpu timer irq number when the vcpu is reset.
+>>        */
+>> -     vtimer->irq.irq = irq->irq;
+>> +     vtimer->irq.irq = virt_irq->irq;
+>> +     ptimer->irq.irq = phys_irq->irq;
+>>
+>>       /*
+>>        * The bits in CNTV_CTL are architecturally reset to UNKNOWN for ARMv8
+>> @@ -358,6 +361,7 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>>        * the ARMv7 architecture.
+>>        */
+>>       vtimer->cnt_ctl = 0;
+>> +     ptimer->cnt_ctl = 0;
+>>       kvm_timer_update_state(vcpu);
+>>
+>>       return 0;
+>> @@ -477,11 +481,15 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+>>  int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>>  {
+>>       struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>> +     struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>>       struct irq_desc *desc;
+>>       struct irq_data *data;
+>>       int phys_irq;
+>>       int ret;
+>>
+>> +     /* Always enable emulated the EL1 physical timer */
 >
->> Even though this work is not complete (see limitations below), I'd
->> appreciate
->> early feedback on this RFC. Specifically, I'm interested in:
->> - Is it better to have a kernel config or to make it configurable at
->> runtime?
+> Dubious comment the way it stands.
 >
->
-> x86 and s390x have a kernel module parameter (nested) that can only be
-> changed when loading the module and should default to false. So the
-> admin explicitly has to enable it. Maybe going the same path makes
-> sense.
+> Does the rest of the code really support one timer being enabled while
+> another one not so?
 
-I think that makes sense. Thanks!
+No. The code never check if the physical timer is enabled. I think
+it's not necessary to set enable bit for this emulated physical timer.
+We, however, may need to set/check this enable bit later if we decide
+to give the EL1 physical timer to the guest instead of emulating it.
 
 >
-> --
+> In any case, the comment should explain the rationale as opposed to
+> reiterate what the following code line does, or just not be there.
 >
-> David
+>> +     ptimer->enabled = 1;
+>> +
+>>       if (vtimer->enabled)
+>>               return 0;
+>>
+>> --
+>> 1.9.1
+>>
+>>
+>
+> Thanks,
+> -Christoffer
 >
