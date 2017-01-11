@@ -1,63 +1,51 @@
 From: Christopher Covington <cov@codeaurora.org>
-Subject: Re: [PATCH v2 2/5] arm64: Work around Falkor erratum 1003
-Date: Wed, 11 Jan 2017 08:11:08 -0500
-Message-ID: <4bd902f7-4900-7ee6-6346-e3f4897afef2@codeaurora.org>
-References: <20161229224335.13531-1-cov@codeaurora.org>
- <20161229224335.13531-2-cov@codeaurora.org> <20170104103322.GA20461@cbox>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E90E640295
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Jan 2017 08:09:33 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vpbqyKewE3OW for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Jan 2017 08:09:28 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B522A4027C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Jan 2017 08:09:28 -0500 (EST)
-In-Reply-To: <20170104103322.GA20461@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-doc@vger.kernel.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH v3 1/5] arm64: Define Falkor v1 CPU
+Date: Wed, 11 Jan 2017 09:41:14 -0500
+Message-ID: <20170111144118.17062-1-cov@codeaurora.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, shankerd@codeaurora.org, timur@codeaurora.org
+Cc: Mark Langsdorf <mlangsdo@redhat.com>, Mark Salter <msalter@redhat.com>, Jon Masters <jcm@redhat.com>, Christopher Covington <cov@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+From: Shanker Donthineni <shankerd@codeaurora.org>
 
-On 01/04/2017 05:33 AM, Christoffer Dall wrote:
-> On Thu, Dec 29, 2016 at 05:43:32PM -0500, Christopher Covington wrote:
->> From: Shanker Donthineni <shankerd@codeaurora.org>
->>
->> On the Qualcomm Datacenter Technologies Falkor v1 CPU, memory accesses may
->> allocate TLB entries using an incorrect ASID when TTBRx_EL1 is being
->> updated. Changing the TTBRx_EL1[ASID] and TTBRx_EL1[BADDR] fields
->> separately using a reserved ASID will ensure that there are no TLB entries
->> with incorrect ASID after changing the the ASID.
-> 
-> When we restore guest state in KVM, we completely save and restore
-> TTBRx_EL1 from EL2. Would that be affected by this erratum?
+Define the MIDR implementer and part number field values for the Qualcomm
+Datacenter Technologies Falkor processor version 1 in the usual manner.
 
-Good question, but apparently not. I'll add the following explanation to the
-v3 commit message.
+Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+Signed-off-by: Christopher Covington <cov@codeaurora.org>
+---
+ arch/arm64/include/asm/cputype.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-"EL2 and EL3 code changing the EL1&0 ASID is not subject to this erratum
-because hardware is prohibited from performing translations from an
-out-of-context translation regime."
-
-Thanks,
-Cov
-
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index 26a68dd..ee60561 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -71,6 +71,7 @@
+ #define ARM_CPU_IMP_APM			0x50
+ #define ARM_CPU_IMP_CAVIUM		0x43
+ #define ARM_CPU_IMP_BRCM		0x42
++#define ARM_CPU_IMP_QCOM		0x51
+ 
+ #define ARM_CPU_PART_AEM_V8		0xD0F
+ #define ARM_CPU_PART_FOUNDATION		0xD00
+@@ -84,10 +85,13 @@
+ 
+ #define BRCM_CPU_PART_VULCAN		0x516
+ 
++#define QCOM_CPU_PART_FALKOR_V1		0x800
++
+ #define MIDR_CORTEX_A53 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A53)
+ #define MIDR_CORTEX_A57 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A57)
+ #define MIDR_THUNDERX	MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
+ #define MIDR_THUNDERX_81XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_81XX)
++#define MIDR_QCOM_FALKOR_V1 MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_FALKOR_V1)
+ 
+ #ifndef __ASSEMBLY__
+ 
 -- 
 Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
-Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code
-Aurora Forum, a Linux Foundation Collaborative Project.
+Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code Aurora
+Forum, a Linux Foundation Collaborative Project.
