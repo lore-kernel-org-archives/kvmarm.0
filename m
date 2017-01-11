@@ -1,65 +1,43 @@
 From: Mark Rutland <mark.rutland@arm.com>
 Subject: Re: [PATCH v3 2/5] arm64: Work around Falkor erratum 1003
-Date: Wed, 11 Jan 2017 18:40:52 +0000
-Message-ID: <20170111184052.GE29247@leverpostej>
+Date: Wed, 11 Jan 2017 18:45:55 +0000
+Message-ID: <20170111184555.GF29247@leverpostej>
 References: <20170111144118.17062-1-cov@codeaurora.org>
  <20170111144118.17062-2-cov@codeaurora.org>
  <20170111180627.GG20288@e104818-lin.cambridge.arm.com>
- <278a45c0-bd49-b8a2-63ae-80ad851bab9b@arm.com>
+ <20170111183339.GC29247@leverpostej>
+ <5da456f8-fcc5-b6e2-d58b-01a671da595b@codeaurora.org>
+ <20170111183738.GD29247@leverpostej>
+ <2069d58c-0b81-dad4-511f-05e7d002eb34@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-doc-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <278a45c0-bd49-b8a2-63ae-80ad851bab9b@arm.com>
-Sender: linux-doc-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Christopher Covington <cov@codeaurora.org>, Mark Langsdorf <mlangsdo@redhat.com>, linux-doc@vger.kernel.org, kvm@vger.kernel.org, Jon Masters <jcm@redhat.com>, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <2069d58c-0b81-dad4-511f-05e7d002eb34@codeaurora.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Timur Tabi <timur@codeaurora.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Christopher Covington <cov@codeaurora.org>, Mark Langsdorf <mlangsdo@redhat.com>, linux-doc@vger.kernel.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Jon Masters <jcm@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 11, 2017 at 06:22:08PM +0000, Marc Zyngier wrote:
-> On 11/01/17 18:06, Catalin Marinas wrote:
-> > On Wed, Jan 11, 2017 at 09:41:15AM -0500, Christopher Covington wrote:
-> >> diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-> >> index 32682be..9ee46df 100644
-> >> --- a/arch/arm64/mm/proc.S
-> >> +++ b/arch/arm64/mm/proc.S
-> >> @@ -23,6 +23,7 @@
-> >>  #include <asm/assembler.h>
-> >>  #include <asm/asm-offsets.h>
-> >>  #include <asm/hwcap.h>
-> >> +#include <asm/mmu_context.h>
-> >>  #include <asm/pgtable.h>
-> >>  #include <asm/pgtable-hwdef.h>
-> >>  #include <asm/cpufeature.h>
-> >> @@ -140,6 +141,18 @@ ENDPROC(cpu_do_resume)
-> >>  ENTRY(cpu_do_switch_mm)
-> >>  	mmid	x1, x1				// get mm->context.id
-> >>  	bfi	x0, x1, #48, #16		// set the ASID
-> >> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1003
-> >> +alternative_if ARM64_WORKAROUND_QCOM_FALKOR_E1003
-> >> +	mrs     x2, ttbr0_el1
-> >> +	mov     x3, #FALKOR_RESERVED_ASID
-> >> +	bfi     x2, x3, #48, #16                // reserved ASID + old BADDR
-> >> +	msr     ttbr0_el1, x2
-> >> +	isb
-> >> +	bfi     x2, x0, #0, #48                 // reserved ASID + new BADDR
-> >> +	msr     ttbr0_el1, x2
-> >> +	isb
-> >> +alternative_else_nop_endif
-> >> +#endif
-> >>  	msr	ttbr0_el1, x0			// set TTBR0
-> >>  	isb
-> >>  	post_ttbr0_update_workaround
-> > 
-> > Please move the above hunk to a pre_ttbr0_update_workaround macro for
-> > consistency with post_ttbr0_update_workaround.
+On Wed, Jan 11, 2017 at 12:40:42PM -0600, Timur Tabi wrote:
+> On 01/11/2017 12:37 PM, Mark Rutland wrote:
+> >The name, as it is, is perfectly descriptive.
+> >
+> >Let's not sacrifice legibility over a non-issue.
 > 
-> In which case (and also for consistency), should we add that pre_ttbr0
-> macro to entry.S, just before __uaccess_ttbr0_enable? It may not be
-> needed in the SW pan case, but it is probably worth entertaining the
-> idea that there may be something to do there...
+> I don't want to kick a dead horse or anything, but changing it to
+> QCOM_FLKR_ERRATUM_1003 would eliminate all the spacing problems
+> without sacrificing anything.
 
-Likewise, I beleive we may need to modify cpu_set_reserved_ttbr0().
+The CPU is called "Falkor", not "FLKR", and we're not coming up with an
+ACPI table name...
+
+The ARM Ltd. erratum numbers are global to all parts, so we don't
+include the part name. Is the 1003 erratum number specific to Falkor?
+
+If it's global, you could use QCOM_ERRATUM_1003 instead.
+
+Otherwise, QCOM_FALKOR_ERRATUM_1003 is preferable.
 
 Thanks,
 Mark.
