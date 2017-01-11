@@ -1,76 +1,137 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [kvm-unit-tests PATCH 1/6] libcflat: add PRI(dux)32 format types
-Date: Wed, 11 Jan 2017 16:28:36 +0000
-Message-ID: <20170111162841.15569-2-alex.bennee@linaro.org>
+Subject: [kvm-unit-tests PATCH 6/6] run_tests: allow passing of options to QEMU
+Date: Wed, 11 Jan 2017 16:28:41 +0000
+Message-ID: <20170111162841.15569-7-alex.bennee@linaro.org>
 References: <20170111162841.15569-1-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C0A240670
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Jan 2017 11:27:09 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p42feK3-brLU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Jan 2017 11:27:08 -0500 (EST)
-Received: from mail-wj0-f170.google.com (mail-wj0-f170.google.com
- [209.85.210.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EE14405A8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Jan 2017 11:27:07 -0500 (EST)
-Received: by mail-wj0-f170.google.com with SMTP id kq3so60636432wjc.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Jan 2017 08:28:51 -0800 (PST)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170111162841.15569-1-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: drjones@redhat.com, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-U28gd2UgY2FuIGhhdmUgcG9ydGFibGUgZm9ybWF0dGluZyBvZiB1aW50MzJfdCB0eXBlcy4gSG93
-ZXZlciB0aGVyZSBpcwphIGNhdGNoLiBEaWZmZXJlbnQgY29tcGlsZXJzIGNhbiB1c2UgbGVnYWxs
-eSBzdWJ0bHkgZGlmZmVyZW50IHR5cGVzCnRob3VnaCBzbyB3ZSBuZWVkIHRvIHByb2JlIHRoZSBj
-b21waWxlciBkZWZpbmVkIGludGRlZi5oIGZpcnN0LgoKU2lnbmVkLW9mZi1ieTogQWxleCBCZW5u
-w6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgotLS0KIE1ha2VmaWxlICAgICAgIHwgIDEgKwog
-Y29uZmlndXJlICAgICAgfCAxMyArKysrKysrKysrKysrCiBsaWIvbGliY2ZsYXQuaCB8ICA5ICsr
-KysrKysrKwogMyBmaWxlcyBjaGFuZ2VkLCAyMyBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEv
-TWFrZWZpbGUgYi9NYWtlZmlsZQppbmRleCBhMzIzMzNiLi45ODIyZDlhIDEwMDY0NAotLS0gYS9N
-YWtlZmlsZQorKysgYi9NYWtlZmlsZQpAQCAtNTUsNiArNTUsNyBAQCBDRkxBR1MgKz0gJChmb21p
-dF9mcmFtZV9wb2ludGVyKQogQ0ZMQUdTICs9ICQoZm5vX3N0YWNrX3Byb3RlY3RvcikKIENGTEFH
-UyArPSAkKGZub19zdGFja19wcm90ZWN0b3JfYWxsKQogQ0ZMQUdTICs9ICQod25vX2ZyYW1lX2Fk
-ZHJlc3MpCitDRkxBR1MgKz0gJChpZiAkKFUzMl9MT05HX0ZNVCksLURfX1UzMl9MT05HX0ZNVF9f
-LCkKIAogQ1hYRkxBR1MgKz0gJChDRkxBR1MpCiAKZGlmZiAtLWdpdCBhL2NvbmZpZ3VyZSBiL2Nv
-bmZpZ3VyZQppbmRleCA5OTVjOGZhLi4xMjc4NjhjIDEwMDc1NQotLS0gYS9jb25maWd1cmUKKysr
-IGIvY29uZmlndXJlCkBAIC0xMDksNiArMTA5LDE4IEBAIGlmIFsgLWYgJHRlc3RkaXIvcnVuIF07
-IHRoZW4KICAgICBsbiAtZnMgJHRlc3RkaXIvcnVuICR0ZXN0ZGlyLXJ1bgogZmkKIAorIyBjaGVj
-ayBpZiB1aW50MzJfdCBuZWVkcyBhIGxvbmcgZm9ybWF0IG1vZGlmaWVyCitjYXQgPDwgRU9GID4g
-bGliX3Rlc3QuYworI2luY2x1ZGUgPGludHR5cGVzLmg+CitFT0YKKworJGNyb3NzX3ByZWZpeCRj
-YyBsaWJfdGVzdC5jIC1FIHwgZ3JlcCAidHlwZWRlZiIgfCBncmVwICJsb25nIiB8IGdyZXAgInVp
-bnQzMl90IiAmPiAvZGV2L251bGwKK2V4aXQ9JD8KK2lmIFsgJGV4aXQgLWVxIDAgXTsgdGhlbgor
-ICAgIHUzMl9sb25nPXRydWUKK2ZpCitybSAtZiBsaWJfdGVzdC5jCisKICMgY2hlY2sgZm9yIGRl
-cGVuZGVudCAzMiBiaXQgbGlicmFyaWVzCiBpZiBbICIkYXJjaCIgIT0gImFybSIgXTsgdGhlbgog
-Y2F0IDw8IEVPRiA+IGxpYl90ZXN0LmMKQEAgLTE1NSw0ICsxNjcsNSBAQCBURVNUX0RJUj0kdGVz
-dGRpcgogRklSTVdBUkU9JGZpcm13YXJlCiBFTkRJQU49JGVuZGlhbgogUFJFVFRZX1BSSU5UX1NU
-QUNLUz0kcHJldHR5X3ByaW50X3N0YWNrcworVTMyX0xPTkdfRk1UPSR1MzJfbG9uZwogRU9GCmRp
-ZmYgLS1naXQgYS9saWIvbGliY2ZsYXQuaCBiL2xpYi9saWJjZmxhdC5oCmluZGV4IDM4MDM5NWYu
-LmU4MGZjNTAgMTAwNjQ0Ci0tLSBhL2xpYi9saWJjZmxhdC5oCisrKyBiL2xpYi9saWJjZmxhdC5o
-CkBAIC01OCwxMiArNTgsMjEgQEAgdHlwZWRlZiBfQm9vbAkJYm9vbDsKICNkZWZpbmUgdHJ1ZSAg
-MQogCiAjaWYgX19TSVpFT0ZfTE9OR19fID09IDgKKyMgIGRlZmluZSBfX1BSSTMyX1BSRUZJWAog
-IyAgZGVmaW5lIF9fUFJJNjRfUFJFRklYCSJsIgogIyAgZGVmaW5lIF9fUFJJUFRSX1BSRUZJWAki
-bCIKICNlbHNlCisjaWYgZGVmaW5lZChfX1UzMl9MT05HX0ZNVF9fKQorIyAgZGVmaW5lIF9fUFJJ
-MzJfUFJFRklYICAgICAgICAibCIKKyNlbHNlCisjICBkZWZpbmUgX19QUkkzMl9QUkVGSVgKKyNl
-bmRpZgogIyAgZGVmaW5lIF9fUFJJNjRfUFJFRklYCSJsbCIKICMgIGRlZmluZSBfX1BSSVBUUl9Q
-UkVGSVgKICNlbmRpZgorI2RlZmluZSBQUklkMzIgIF9fUFJJMzJfUFJFRklYCSJkIgorI2RlZmlu
-ZSBQUkl1MzIgIF9fUFJJMzJfUFJFRklYCSJ1IgorI2RlZmluZSBQUkl4MzIgIF9fUFJJMzJfUFJF
-RklYCSJ4IgogI2RlZmluZSBQUklkNjQgIF9fUFJJNjRfUFJFRklYCSJkIgogI2RlZmluZSBQUkl1
-NjQgIF9fUFJJNjRfUFJFRklYCSJ1IgogI2RlZmluZSBQUkl4NjQgIF9fUFJJNjRfUFJFRklYCSJ4
-IgotLSAKMi4xMS4wCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0
-cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+This allows additional options to be passed to QEMU. It follows the
+convention of passing parameters after a -- to the child process. In
+my case I'm using it to toggle MTTCG on an off:
+
+  ./run_tests.sh -- --accel tcg,thread=multi
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+---
+v1
+  - changes from -o to --
+  - fixed whitespace damage
+---
+ README.md              |  6 ++++++
+ run_tests.sh           | 13 +++++++++++--
+ scripts/functions.bash |  7 ++++---
+ 3 files changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/README.md b/README.md
+index fa3a445..1bd6dcb 100644
+--- a/README.md
++++ b/README.md
+@@ -55,6 +55,12 @@ To extend or disable the timeouts:
+ 
+     TIMEOUT=0 ./run_tests.sh
+ 
++Any arguments past the end-of-arguments marker (--) is passed on down
++to the QEMU invocation. This can of course be combined with the other
++modifiers:
++
++    ACCEL=tcg ./run_tests.sh -v -- --accel tcg,thread=multi
++
+ # Contributing
+ 
+ ## Directory structure
+diff --git a/run_tests.sh b/run_tests.sh
+index 254129d..3270fba 100755
+--- a/run_tests.sh
++++ b/run_tests.sh
+@@ -13,7 +13,7 @@ function usage()
+ {
+ cat <<EOF
+ 
+-Usage: $0 [-g group] [-h] [-v]
++Usage: $0 [-g group] [-h] [-v] [-- QEMU options]
+ 
+     -g: Only execute tests in the given group
+     -h: Output this help text
+@@ -22,6 +22,8 @@ Usage: $0 [-g group] [-h] [-v]
+ Set the environment variable QEMU=/path/to/qemu-system-ARCH to
+ specify the appropriate qemu binary for ARCH-run.
+ 
++All options specified after -- are passed on to QEMU.
++
+ EOF
+ }
+ 
+@@ -29,6 +31,7 @@ RUNTIME_arch_run="./$TEST_DIR/run"
+ source scripts/runtime.bash
+ 
+ while getopts "g:hv" opt; do
++
+     case $opt in
+         g)
+             only_group=$OPTARG
+@@ -46,6 +49,12 @@ while getopts "g:hv" opt; do
+     esac
+ done
+ 
++# Any options left for QEMU?
++shift $((OPTIND-1))
++if [ "$#" -gt  0 ]; then
++    extra_opts="$@"
++fi
++
+ RUNTIME_log_stderr () { cat >> test.log; }
+ RUNTIME_log_stdout () {
+     if [ "$PRETTY_PRINT_STACKS" = "yes" ]; then
+@@ -59,4 +68,4 @@ RUNTIME_log_stdout () {
+ config=$TEST_DIR/unittests.cfg
+ rm -f test.log
+ printf "BUILD_HEAD=$(cat build-head)\n\n" > test.log
+-for_each_unittest $config run
++for_each_unittest $config run "$extra_opts"
+diff --git a/scripts/functions.bash b/scripts/functions.bash
+index ee9143c..60fbc6a 100644
+--- a/scripts/functions.bash
++++ b/scripts/functions.bash
+@@ -3,10 +3,11 @@ function for_each_unittest()
+ {
+ 	local unittests="$1"
+ 	local cmd="$2"
++	local extra_opts=$3
+ 	local testname
+ 	local smp
+ 	local kernel
+-	local opts
++	local opts=$extra_opts
+ 	local groups
+ 	local arch
+ 	local check
+@@ -21,7 +22,7 @@ function for_each_unittest()
+ 			testname=${BASH_REMATCH[1]}
+ 			smp=1
+ 			kernel=""
+-			opts=""
++			opts=$extra_opts
+ 			groups=""
+ 			arch=""
+ 			check=""
+@@ -32,7 +33,7 @@ function for_each_unittest()
+ 		elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
+ 			smp=${BASH_REMATCH[1]}
+ 		elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
+-			opts=${BASH_REMATCH[1]}
++			opts="$opts ${BASH_REMATCH[1]}"
+ 		elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
+ 			groups=${BASH_REMATCH[1]}
+ 		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
+-- 
+2.11.0
+
