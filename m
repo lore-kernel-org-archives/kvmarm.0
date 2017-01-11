@@ -1,108 +1,123 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: [PATCH v3 5/5] arm64: Work around Falkor erratum 1009
-Date: Wed, 11 Jan 2017 09:41:18 -0500
-Message-ID: <20170111144118.17062-5-cov@codeaurora.org>
-References: <20170111144118.17062-1-cov@codeaurora.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170111144118.17062-1-cov@codeaurora.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, shankerd@codeaurora.org, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-Cc: Mark Langsdorf <mlangsdo@redhat.com>, Mark Salter <msalter@redhat.com>, Jon Masters <jcm@redhat.com>, Christopher Covington <cov@codeaurora.org>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [kvm-unit-tests PATCH 3/6] docs: move README to README.md and symlink
+Date: Wed, 11 Jan 2017 16:28:38 +0000
+Message-ID: <20170111162841.15569-4-alex.bennee@linaro.org>
+References: <20170111162841.15569-1-alex.bennee@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AE7E640665
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Jan 2017 11:27:09 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id TPNcKfZ-SxBC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Jan 2017 11:27:08 -0500 (EST)
+Received: from mail-wj0-f181.google.com (mail-wj0-f181.google.com
+ [209.85.210.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79B2C404F1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Jan 2017 11:27:08 -0500 (EST)
+Received: by mail-wj0-f181.google.com with SMTP id kq3so60636828wjc.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Jan 2017 08:28:53 -0800 (PST)
+In-Reply-To: <20170111162841.15569-1-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: drjones@redhat.com, pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-During a TLB invalidate sequence targeting the inner shareable
-domain, Falkor may prematurely complete the DSB before all loads
-and stores using the old translation are observed; instruction
-fetches are not subject to the conditions of this erratum.
-
-Signed-off-by: Christopher Covington <cov@codeaurora.org>
----
- Documentation/arm64/silicon-errata.txt |  1 +
- arch/arm64/Kconfig                     | 10 ++++++++++
- arch/arm64/include/asm/cpucaps.h       |  3 ++-
- arch/arm64/include/asm/tlbflush.h      |  5 ++++-
- arch/arm64/kernel/cpu_errata.c         |  7 +++++++
- 5 files changed, 24 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/arm64/silicon-errata.txt b/Documentation/arm64/silicon-errata.txt
-index 7151aed..98bef2a 100644
---- a/Documentation/arm64/silicon-errata.txt
-+++ b/Documentation/arm64/silicon-errata.txt
-@@ -64,3 +64,4 @@ stable kernels.
- |               |                 |                 |                          |
- | Freescale/NXP | LS2080A/LS1043A | A-008585        | FSL_ERRATUM_A008585      |
- | Qualcomm      | Falkor v1       | E1003           | QCOM_FALKOR_ERRATUM_1003 |
-+| Qualcomm      | Falkor v1       | E1009           | QCOM_FALKOR_ERRATUM_1009 |
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 2a80ac9..d13e903 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -490,6 +490,16 @@ config QCOM_FALKOR_ERRATUM_1003
- 
- 	  If unsure, say Y.
- 
-+config QCOM_FALKOR_ERRATUM_1009
-+	bool "Falkor E1009: Prematurely complete a DSB after a TLBI"
-+	default y
-+	help
-+	  Falkor CPU may prematurely complete a DSB following a TLBI xxIS
-+	  invalidate maintenance operations. Repeat the TLBI operation one
-+	  more time to fix the issue.
-+
-+	  If unsure, say Y.
-+
- endmenu
- 
- 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 5aaf7ee..55bcd02 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -36,7 +36,8 @@
- #define ARM64_MISMATCHED_CACHE_LINE_SIZE	15
- #define ARM64_HAS_NO_FPSIMD			16
- #define ARM64_WORKAROUND_QCOM_FALKOR_E1003	17
-+#define ARM64_WORKAROUND_REPEAT_TLBI		18
- 
--#define ARM64_NCAPS				18
-+#define ARM64_NCAPS				19
- 
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index f28813c..7313cd3 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -85,7 +85,10 @@
- 			asm (__TLBI_INSTR(op, ##__VA_ARGS__)		       \
- 			__TLBI_IO(op, ##__VA_ARGS__));			       \
- 		asm volatile (	     as			"\ndsb " #attr "\n"    \
--		: : : "memory"); } while (0)
-+			ALTERNATIVE("nop"		"\nnop"	       "\n",   \
-+			__TLBI_INSTR(op, ##__VA_ARGS__)	"\ndsb " #attr "\n",   \
-+			ARM64_WORKAROUND_REPEAT_TLBI)			       \
-+		__TLBI_IO(op, ##__VA_ARGS__) : "memory"); } while (0)
- 
- #define __tlbi_dsb(...)	__tlbi_asm_dsb("", ##__VA_ARGS__)
- 
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 787b542..e644364 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -137,6 +137,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		MIDR_RANGE(MIDR_QCOM_FALKOR_V1, 0x00, 0x00),
- 	},
- #endif
-+#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1009
-+	{
-+		.desc = "Qualcomm Falkor erratum 1009",
-+		.capability = ARM64_WORKAROUND_REPEAT_TLBI,
-+		MIDR_RANGE(MIDR_QCOM_FALKOR_V1, 0x00, 0x00),
-+	},
-+#endif
- 	{
- 	}
- };
--- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
-Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code Aurora
-Forum, a Linux Foundation Collaborative Project.
+VGhpcyBhbGxvd3MgYSBzbGlnaHRseSBuaWNlciBmb3JtYXR0aW5nIG9mIHRoZSB0ZXh0IHdoZW4g
+ZGlzcGxheWVkIG9uCnNvbWUgcmVwb3NpdG9yeSBob3N0cy4gV2Uga2VlcCBhIHN5bWxpbmsgZnJv
+bSBSRUFETUUgZm9yIHRoZQpvbGQtc2Nob29sIHB1cmlzdHMuCgpTaWduZWQtb2ZmLWJ5OiBBbGV4
+IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Ci0tLQogUkVBRE1FICAgIHwgNjkgKy0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KIFJFQURN
+RS5tZCB8IDgxICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKwogMiBmaWxlcyBjaGFuZ2VkLCA4MiBpbnNlcnRpb25zKCspLCA2OCBk
+ZWxldGlvbnMoLSkKIG1vZGUgY2hhbmdlIDEwMDY0NCA9PiAxMjAwMDAgUkVBRE1FCiBjcmVhdGUg
+bW9kZSAxMDA2NDQgUkVBRE1FLm1kCgpkaWZmIC0tZ2l0IGEvUkVBRE1FIGIvUkVBRE1FCmRlbGV0
+ZWQgZmlsZSBtb2RlIDEwMDY0NAppbmRleCBmOGYxOTZkLi4wMDAwMDAwCi0tLSBhL1JFQURNRQor
+KysgL2Rldi9udWxsCkBAIC0xLDY4ICswLDAgQEAKLVdlbGNvbWUgdG8ga3ZtLXVuaXQtdGVzdHMK
+LQotU2VlIGh0dHA6Ly93d3cubGludXgta3ZtLm9yZy9wYWdlL0tWTS11bml0LXRlc3RzIGZvciBh
+IGhpZ2gtbGV2ZWwKLWRlc2NyaXB0aW9uIG9mIHRoaXMgcHJvamVjdCwgYXMgd2VsbCBhcyBydW5u
+aW5nIHRlc3RzIGFuZCBhZGRpbmcKLXRlc3RzIEhPV1RPcy4KLQotVGhpcyBkaXJlY3RvcnkgY29u
+dGFpbnMgc291cmNlcyBmb3IgYSBrdm0gdGVzdCBzdWl0ZS4KLQotVG8gY3JlYXRlIHRoZSB0ZXN0
+IGltYWdlcyBkbwotICAuL2NvbmZpZ3VyZQotICBtYWtlCi1pbiB0aGlzIGRpcmVjdG9yeS4gVGVz
+dCBpbWFnZXMgYXJlIGNyZWF0ZWQgaW4gLi88QVJDSD4vKi5mbGF0Ci0KLVRoZW4gdXNlIHRoZSBy
+dW5uZXIgc2NyaXB0IHRvIGRldGVjdCB0aGUgY29ycmVjdCBpbnZvY2F0aW9uIGFuZAotaW52b2tl
+IHRoZSB0ZXN0LCBlLmcuCi0gIC4veDg2LXJ1biAuL3g4Ni9tc3IuZmxhdAotb3IKLSAgLi9ydW5f
+dGVzdHMuc2gKLXRvIHJ1biB0aGVtIGFsbC4KLQotVG8gc2VsZWN0IGEgc3BlY2lmaWMgcWVtdSBi
+aW5hcnksIHNwZWNpZnkgdGhlIFFFTVU9PHBhdGg+Ci1lbnZpcm9ubWVudCB2YXJpYWJsZSwgZS5n
+LgotICBRRU1VPS90bXAvcWVtdS94ODZfNjQtc29mdG1tdS9xZW11LXN5c3RlbS14ODZfNjQgLi94
+ODYtcnVuIC4veDg2L21zci5mbGF0Ci0KLVRvIGNyZWF0ZSBhbmQgdXNlIHN0YW5kYWxvbmUgdGVz
+dHMgZG8KLSAgLi9jb25maWd1cmUKLSAgbWFrZSBzdGFuZGFsb25lCi0gIChzZW5kIHRlc3RzL3Nv
+bWUtdGVzdCBzb21ld2hlcmUpCi0gIChnbyB0byBzb21ld2hlcmUpCi0gIC4vc29tZS10ZXN0Ci0K
+LSdtYWtlIGluc3RhbGwnIHdpbGwgaW5zdGFsbCBhbGwgdGVzdHMgaW4gUFJFRklYL3NoYXJlL2t2
+bS11bml0LXRlc3RzL3Rlc3RzLAotZWFjaCBhcyBhIHN0YW5kYWxvbmUgdGVzdC4KLQotRGlyZWN0
+b3J5IHN0cnVjdHVyZToKLS46CQljb25maWd1cmUgc2NyaXB0LCB0b3AtbGV2ZWwgTWFrZWZpbGUs
+IGFuZCBydW5fdGVzdHMuc2gKLS4vc2NyaXB0czoJaGVscGVyIHNjcmlwdHMgZm9yIGJ1aWxkaW5n
+IGFuZCBydW5uaW5nIHRlc3RzCi0uL2xpYjoJCWdlbmVyYWwgYXJjaGl0ZWN0dXJlIG5ldXRyYWwg
+c2VydmljZXMgZm9yIHRoZSB0ZXN0cwotLi9saWIvPEFSQ0g+OglhcmNoaXRlY3R1cmUgZGVwZW5k
+ZW50IHNlcnZpY2VzIGZvciB0aGUgdGVzdHMKLS4vPEFSQ0g+Ogl0aGUgc291cmNlcyBvZiB0aGUg
+dGVzdHMgYW5kIHRoZSBjcmVhdGVkIG9iamVjdHMvaW1hZ2VzCi0KLVNlZSA8QVJDSD4vUkVBRE1F
+IGZvciBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZG9jdW1lbnRhdGlvbi4KLQotQ09OVFJJQlVUSU5H
+OgotPT09PT09PT09PT09PQotCi1TdHlsZQotLS0tLS0KLQotQ3VycmVudGx5IHRoZXJlIGlzIGEg
+bWl4IG9mIGluZGVudGF0aW9uIHN0eWxlcyBzbyBhbnkgY2hhbmdlcyB0bwotZXhpc3RpbmcgZmls
+ZXMgc2hvdWxkIGJlIGNvbnNpc3RlbnQgd2l0aCB0aGUgZXhpc3Rpbmcgc3R5bGUuIEZvciBuZXcK
+LWZpbGVzOgotCi0gIC0gQzogcGxlYXNlIHVzZSBzdGFuZGFyZCBsaW51eC13aXRoLXRhYnMKLSAg
+LSBTaGVsbDogdXNlIFRBQnMgZm9yIGluZGVudGF0aW9uCi0KLVBhdGNoZXMKLS0tLS0tLS0KLQot
+UGF0Y2hlcyBhcmUgd2VsY29tZSBhdCB0aGUgS1ZNIG1haWxpbmcgbGlzdCA8a3ZtQHZnZXIua2Vy
+bmVsLm9yZz4uCi0KLVBsZWFzZSBwcmVmaXggbWVzc2FnZXMgd2l0aDogW2t2bS11bml0LXRlc3Rz
+IFBBVENIXQotCi1Zb3UgY2FuIGFkZCB0aGUgZm9sbG93aW5nIHRvIC5naXQvY29uZmlnIHRvIGRv
+IHRoaXMgYXV0b21hdGljYWxseSBmb3IgeW91OgotCi1bZm9ybWF0XQotCXN1YmplY3RwcmVmaXgg
+PSBrdm0tdW5pdC10ZXN0cyBQQVRDSAotCmRpZmYgLS1naXQgYS9SRUFETUUgYi9SRUFETUUKbmV3
+IGZpbGUgbW9kZSAxMjAwMDAKaW5kZXggMDAwMDAwMC4uNDIwNjFjMAotLS0gL2Rldi9udWxsCisr
+KyBiL1JFQURNRQpAQCAtMCwwICsxIEBACitSRUFETUUubWQKXCBObyBuZXdsaW5lIGF0IGVuZCBv
+ZiBmaWxlCmRpZmYgLS1naXQgYS9SRUFETUUubWQgYi9SRUFETUUubWQKbmV3IGZpbGUgbW9kZSAx
+MDA2NDQKaW5kZXggMDAwMDAwMC4uNTAyN2I2MgotLS0gL2Rldi9udWxsCisrKyBiL1JFQURNRS5t
+ZApAQCAtMCwwICsxLDgxIEBACisjIFdlbGNvbWUgdG8ga3ZtLXVuaXQtdGVzdHMKKworU2VlIGh0
+dHA6Ly93d3cubGludXgta3ZtLm9yZy9wYWdlL0tWTS11bml0LXRlc3RzIGZvciBhIGhpZ2gtbGV2
+ZWwKK2Rlc2NyaXB0aW9uIG9mIHRoaXMgcHJvamVjdCwgYXMgd2VsbCBhcyBydW5uaW5nIHRlc3Rz
+IGFuZCBhZGRpbmcKK3Rlc3RzIEhPV1RPcy4KKworIyBCdWlsZGluZyB0aGUgdGVzdHMKKworVGhp
+cyBkaXJlY3RvcnkgY29udGFpbnMgc291cmNlcyBmb3IgYSBrdm0gdGVzdCBzdWl0ZS4KKworVG8g
+Y3JlYXRlIHRoZSB0ZXN0IGltYWdlcyBkbzoKKworICAgIC4vY29uZmlndXJlCisgICAgbWFrZQor
+CitpbiB0aGlzIGRpcmVjdG9yeS4gVGVzdCBpbWFnZXMgYXJlIGNyZWF0ZWQgaW4gLi88QVJDSD4v
+Ki5mbGF0CisKKyMjIFN0YW5kYWxvbmUgdGVzdHMKKworVGhlIHRlc3RzIGNhbiBiZSBidWlsdCBh
+cyBzdGFuZGFsb25lCitUbyBjcmVhdGUgYW5kIHVzZSBzdGFuZGFsb25lIHRlc3RzIGRvOgorCisg
+ICAgLi9jb25maWd1cmUKKyAgICBtYWtlIHN0YW5kYWxvbmUKKyAgICAoc2VuZCB0ZXN0cy9zb21l
+LXRlc3Qgc29tZXdoZXJlKQorICAgIChnbyB0byBzb21ld2hlcmUpCisgICAgLi9zb21lLXRlc3QK
+KworJ21ha2UgaW5zdGFsbCcgd2lsbCBpbnN0YWxsIGFsbCB0ZXN0cyBpbiBQUkVGSVgvc2hhcmUv
+a3ZtLXVuaXQtdGVzdHMvdGVzdHMsCitlYWNoIGFzIGEgc3RhbmRhbG9uZSB0ZXN0LgorCisKKyMg
+UnVubmluZyB0aGUgdGVzdHMKKworVGhlbiB1c2UgdGhlIHJ1bm5lciBzY3JpcHQgdG8gZGV0ZWN0
+IHRoZSBjb3JyZWN0IGludm9jYXRpb24gYW5kCitpbnZva2UgdGhlIHRlc3Q6CisKKyAgICAuL3g4
+Ni1ydW4gLi94ODYvbXNyLmZsYXQKK29yOgorCisgICAgLi9ydW5fdGVzdHMuc2gKKwordG8gcnVu
+IHRoZW0gYWxsLgorCitUbyBzZWxlY3QgYSBzcGVjaWZpYyBxZW11IGJpbmFyeSwgc3BlY2lmeSB0
+aGUgUUVNVT08cGF0aD4KK2Vudmlyb25tZW50IHZhcmlhYmxlOgorCisgICAgUUVNVT0vdG1wL3Fl
+bXUveDg2XzY0LXNvZnRtbXUvcWVtdS1zeXN0ZW0teDg2XzY0IC4veDg2LXJ1biAuL3g4Ni9tc3Iu
+ZmxhdAorCisjIENvbnRyaWJ1dGluZworCisjIyBEaXJlY3Rvcnkgc3RydWN0dXJlCisKKyAgICAu
+OgkJCQljb25maWd1cmUgc2NyaXB0LCB0b3AtbGV2ZWwgTWFrZWZpbGUsIGFuZCBydW5fdGVzdHMu
+c2gKKyAgICAuL3NjcmlwdHM6CQloZWxwZXIgc2NyaXB0cyBmb3IgYnVpbGRpbmcgYW5kIHJ1bm5p
+bmcgdGVzdHMKKyAgICAuL2xpYjoJCQlnZW5lcmFsIGFyY2hpdGVjdHVyZSBuZXV0cmFsIHNlcnZp
+Y2VzIGZvciB0aGUgdGVzdHMKKyAgICAuL2xpYi88QVJDSD46CWFyY2hpdGVjdHVyZSBkZXBlbmRl
+bnQgc2VydmljZXMgZm9yIHRoZSB0ZXN0cworICAgIC4vPEFSQ0g+OgkJdGhlIHNvdXJjZXMgb2Yg
+dGhlIHRlc3RzIGFuZCB0aGUgY3JlYXRlZCBvYmplY3RzL2ltYWdlcworCitTZWUgPEFSQ0g+L1JF
+QURNRSBmb3IgYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRvY3VtZW50YXRpb24uCisKKyMjIFN0eWxl
+CisKK0N1cnJlbnRseSB0aGVyZSBpcyBhIG1peCBvZiBpbmRlbnRhdGlvbiBzdHlsZXMgc28gYW55
+IGNoYW5nZXMgdG8KK2V4aXN0aW5nIGZpbGVzIHNob3VsZCBiZSBjb25zaXN0ZW50IHdpdGggdGhl
+IGV4aXN0aW5nIHN0eWxlLiBGb3IgbmV3CitmaWxlczoKKworICAtIEM6IHBsZWFzZSB1c2Ugc3Rh
+bmRhcmQgbGludXgtd2l0aC10YWJzCisgIC0gU2hlbGw6IHVzZSBUQUJzIGZvciBpbmRlbnRhdGlv
+bgorCisjIyBQYXRjaGVzCisKK1BhdGNoZXMgYXJlIHdlbGNvbWUgYXQgdGhlIEtWTSBtYWlsaW5n
+IGxpc3QgPGt2bUB2Z2VyLmtlcm5lbC5vcmc+LgorCitQbGVhc2UgcHJlZml4IG1lc3NhZ2VzIHdp
+dGg6IFtrdm0tdW5pdC10ZXN0cyBQQVRDSF0KKworWW91IGNhbiBhZGQgdGhlIGZvbGxvd2luZyB0
+byAuZ2l0L2NvbmZpZyB0byBkbyB0aGlzIGF1dG9tYXRpY2FsbHkgZm9yIHlvdToKKworICAgIFtm
+b3JtYXRdCisgICAgICAgIHN1YmplY3RwcmVmaXggPSBrdm0tdW5pdC10ZXN0cyBQQVRDSAorCi0t
+IAoyLjExLjAKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+Cmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczov
+L2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
