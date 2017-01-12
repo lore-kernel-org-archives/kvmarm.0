@@ -1,227 +1,157 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 09/13] KVM: arm64: ITS: KVM_DEV_ARM_VGIC_GRP_ITS_TABLES group
-Date: Thu, 12 Jan 2017 16:56:49 +0100
-Message-ID: <1484236613-24633-10-git-send-email-eric.auger@redhat.com>
+Subject: [RFC 10/13] KVM: arm64: ITS: vgic_its_alloc_itte/device
+Date: Thu, 12 Jan 2017 16:56:50 +0100
+Message-ID: <1484236613-24633-11-git-send-email-eric.auger@redhat.com>
 References: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9BCA40419
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 10:55:52 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 9LJjzsULLqLJ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Jan 2017 10:55:51 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B214B40354
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 10:55:51 -0500 (EST)
 In-Reply-To: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: andre.przywara@arm.com, Prasun.Kapoor@cavium.com, pbonzini@redhat.com, dgilbert@redhat.com
+Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Introduce a new group aiming at saving/restoring the ITS
-tables to/from the guest memory.
-
-We hold the its lock during the save and restore to prevent
-any command from being executed. This also garantees the LPI
-list is not going to change and no MSI injection can happen
-during the operation.
-
-At this stage the functionality is not yet implemented. Only
-the skeleton is put in place.
+Add two new helpers to allocate an its itte and an its device.
+This will avoid duplication on restore path.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
+ virt/kvm/arm/vgic/vgic-its.c | 71 ++++++++++++++++++++++++++++++--------------
+ 1 file changed, 48 insertions(+), 23 deletions(-)
 
-At the end of the restore I trigger a map_resources. This aims
-at accomodating the virtio-net-pci guest use case. On restore I
-can see the virtio-net-pci device sends MSI before the first
-VCPU run. The fact we are not able to handle MSIs at that stage
-stalls the virtio-net-pci device. We may fix this issue at QEMU
-level instead.
----
- arch/arm/include/uapi/asm/kvm.h   |   1 +
- arch/arm64/include/uapi/asm/kvm.h |   1 +
- virt/kvm/arm/vgic/vgic-its.c      | 120 +++++++++++++++++++++++++++++++++++++-
- 3 files changed, 121 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index f6a167c..84fdfb0 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -193,6 +193,7 @@ struct kvm_arch_memory_slot {
- #define KVM_DEV_ARM_VGIC_CPU_SYSREGS    6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO 7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
-+#define KVM_DEV_ARM_VGIC_GRP_ITS_TABLES	9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 8850e9b..31e1137 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -213,6 +213,7 @@ struct kvm_arch_memory_slot {
- #define KVM_DEV_ARM_VGIC_CPU_SYSREGS    6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO 7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
-+#define KVM_DEV_ARM_VGIC_GRP_ITS_TABLES 9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 32429fd..aeb9d08 100644
+index aeb9d08..07bf180 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1548,6 +1548,117 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
- 	return 0;
+@@ -732,6 +732,26 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
+ 	kfree(collection);
  }
  
-+/**
-+ * vgic_its_flush_pending_tables - Flush the pending tables into guest RAM
-+ */
-+static int vgic_its_flush_pending_tables(struct kvm *kvm,
-+					 struct vgic_its *its)
++static int vgic_its_alloc_itte(struct its_device *device,
++			       struct its_itte **ittep,
++			       struct its_collection *collection,
++			       u32 lpi_id, u32 event_id)
 +{
-+	return -ENXIO;
++	struct its_itte *itte;
++
++	itte = kzalloc(sizeof(itte), GFP_KERNEL);
++	if (!itte)
++		return -ENOMEM;
++
++	itte->event_id	= event_id;
++	itte->collection = collection;
++	itte->lpi = lpi_id;
++
++	list_add_tail(&itte->itte_list, &device->itt_head);
++	*ittep = itte;
++	return 0;
 +}
 +
-+/**
-+ * vgic_its_restore_pending_tables - Restore the pending tables from guest
-+ * RAM to internal data structs
-+ */
-+static int vgic_its_restore_pending_tables(struct kvm *kvm,
-+					   struct vgic_its *its)
-+{
-+	return -ENXIO;
-+}
-+
-+/**
-+ * vgic_its_flush_device_tables - flush the device table and all ITT
-+ * into guest RAM
-+ */
-+static int vgic_its_flush_device_tables(struct kvm *kvm, struct vgic_its *its)
-+{
-+	return -ENXIO;
-+}
-+
-+/**
-+ * vgic_its_restore_device_tables - restore the device table and all ITT
-+ * from guest RAM to internal data structs
-+ */
-+static int vgic_its_restore_device_tables(struct kvm *kvm,
-+					  struct vgic_its *its)
-+{
-+	return -ENXIO;
-+}
-+
-+/**
-+ * vgic_its_flush_collection_table - flush the collection table into
-+ * guest RAM
-+ */
-+static int vgic_its_flush_collection_table(struct kvm *kvm,
-+					   struct vgic_its *its)
-+{
-+	return -ENXIO;
-+}
-+
-+/**
-+ * vgic_its_restore_collection_table - reads the collection table
-+ * in guest memory and restores the ITS internal state. Requires the
-+ * BASER registers to be restored before.
-+ */
-+static int vgic_its_restore_collection_table(struct kvm *kvm,
-+					     struct vgic_its *its)
-+{
-+	return -ENXIO;
-+}
-+
-+/**
-+ * vgic_its_table_flush - Flush all the tables into guest RAM
-+ */
-+static int vgic_its_table_flush(struct kvm *kvm,  struct vgic_its *its)
-+{
-+	int ret;
-+
-+	mutex_lock(&its->its_lock);
-+
-+	ret = vgic_its_flush_pending_tables(kvm, its);
-+	if (ret)
-+		goto out;
-+	ret = vgic_its_flush_device_tables(kvm, its);
-+	if (ret)
-+		goto out;
-+
-+	ret = vgic_its_flush_collection_table(kvm, its);
-+out:
-+	mutex_unlock(&its->its_lock);
-+	return ret;
-+}
-+
-+/**
-+ * vgic_its_table_restore - Restore all tables from guest RAM to internal
-+ * data structs
-+ */
-+static int vgic_its_table_restore(struct kvm *kvm,  struct vgic_its *its)
-+{
-+	int ret;
-+
-+	mutex_lock(&its->its_lock);
-+	ret = vgic_its_restore_collection_table(kvm, its);
-+	if (ret)
-+		goto out;
-+
-+	ret = vgic_its_restore_device_tables(kvm, its);
-+	if (ret)
-+		goto out;
-+
-+	ret = vgic_its_restore_pending_tables(kvm, its);
-+out:
-+	mutex_unlock(&its->its_lock);
-+
-+	/**
-+	 *  HACK: In real use case we observe MSI injection before
-+	 *  the first CPU run. This is likely to stall virtio-net-pci
-+	 *  This may need a fix at user-space level instead
-+	 */
-+	ret = kvm_vgic_map_resources(kvm);
-+	return ret;
-+}
-+
- static int vgic_its_has_attr(struct kvm_device *dev,
- 			     struct kvm_device_attr *attr)
- {
-@@ -1566,6 +1677,8 @@ static int vgic_its_has_attr(struct kvm_device *dev,
- 		break;
- 	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS:
- 		return vgic_its_has_attr_regs(dev, attr);
-+	case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
-+		return 0;
- 	}
- 	return -ENXIO;
- }
-@@ -1614,6 +1727,8 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+ /*
+  * The MAPTI and MAPI commands map LPIs to ITTEs.
+  * Must be called with its_lock mutex held.
+@@ -745,7 +765,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+ 	struct its_itte *itte;
+ 	struct its_device *device;
+ 	struct its_collection *collection, *new_coll = NULL;
+-	int lpi_nr;
++	int lpi_nr, ret;
+ 	struct vgic_irq *irq;
  
- 		return vgic_its_attr_regs_access(dev, attr, &reg, true);
+ 	device = find_its_device(its, device_id);
+@@ -772,19 +792,13 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+ 		new_coll = collection;
  	}
-+	case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
-+		return vgic_its_table_restore(dev->kvm, its);
+ 
+-	itte = kzalloc(sizeof(struct its_itte), GFP_KERNEL);
+-	if (!itte) {
++	ret = vgic_its_alloc_itte(device, &itte, collection, lpi_nr, event_id);
++	if (ret) {
+ 		if (new_coll)
+ 			vgic_its_free_collection(its, coll_id);
+-		return -ENOMEM;
++		return ret;
  	}
- 	return -ENXIO;
+ 
+-	itte->event_id	= event_id;
+-	list_add_tail(&itte->itte_list, &device->itt_head);
+-
+-	itte->collection = collection;
+-	itte->lpi = lpi_nr;
+-
+ 	irq = vgic_add_lpi(kvm, lpi_nr);
+ 	if (IS_ERR(irq)) {
+ 		if (new_coll)
+@@ -823,6 +837,29 @@ static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
+ 	kfree(device);
  }
-@@ -1621,9 +1736,10 @@ static int vgic_its_set_attr(struct kvm_device *dev,
- static int vgic_its_get_attr(struct kvm_device *dev,
- 			     struct kvm_device_attr *attr)
- {
-+	struct vgic_its *its = dev->private;
+ 
++static int vgic_its_alloc_device(struct vgic_its *its,
++				 struct its_device **devp,
++				 u32 device_id, gpa_t itt_addr_field,
++				 size_t size_field)
++{
++	struct its_device *device;
 +
- 	switch (attr->group) {
- 	case KVM_DEV_ARM_VGIC_GRP_ADDR: {
--		struct vgic_its *its = dev->private;
- 		u64 addr = its->vgic_its_base;
- 		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
- 		unsigned long type = (unsigned long)attr->attr;
-@@ -1644,6 +1760,8 @@ static int vgic_its_get_attr(struct kvm_device *dev,
- 		if (ret)
- 			return ret;
- 		return put_user(reg, uaddr);
-+	case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
-+		return vgic_its_table_flush(dev->kvm, its);
- 	}
- 	default:
- 		return -ENXIO;
++	device = kzalloc(sizeof(*device), GFP_KERNEL);
++	if (!device)
++		return -ENOMEM;
++
++	device->device_id = device_id;
++	device->itt_addr = itt_addr_field << 8;
++	device->nb_eventid_bits = size_field + 1;
++	device->itt_size = ((2 << (size_field + 1)) - 1) * 16;
++	INIT_LIST_HEAD(&device->itt_head);
++
++	list_add_tail(&device->dev_list, &its->device_list);
++	*devp = device;
++
++	return 0;
++}
++
+ /*
+  * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
+  * Must be called with the its_lock mutex held.
+@@ -856,19 +893,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	if (!valid)
+ 		return 0;
+ 
+-	device = kzalloc(sizeof(struct its_device), GFP_KERNEL);
+-	if (!device)
+-		return -ENOMEM;
+-
+-	device->device_id = device_id;
+-	device->itt_addr = itt_addr << 8;
+-	device->nb_eventid_bits = size + 1;
+-	device->itt_size = ((2 << (size + 1)) - 1) * 16;
+-	INIT_LIST_HEAD(&device->itt_head);
+-
+-	list_add_tail(&device->dev_list, &its->device_list);
+-
+-	return 0;
++	return vgic_its_alloc_device(its, &device, device_id, itt_addr, size);
+ }
+ 
+ /*
 -- 
 2.5.5
-
