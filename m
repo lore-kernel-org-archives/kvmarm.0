@@ -1,216 +1,181 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 12/13] KVM: arm64: ITS: Device and translation table flush
-Date: Thu, 12 Jan 2017 16:56:52 +0100
-Message-ID: <1484236613-24633-13-git-send-email-eric.auger@redhat.com>
+Subject: [RFC 13/13] KVM: arm64: ITS: Pending table save/restore
+Date: Thu, 12 Jan 2017 16:56:53 +0100
+Message-ID: <1484236613-24633-14-git-send-email-eric.auger@redhat.com>
 References: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FA2540670
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 10:56:03 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 7utz7YDAXVS7 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Jan 2017 10:56:02 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB22740354
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 10:56:02 -0500 (EST)
 In-Reply-To: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: andre.przywara@arm.com, Prasun.Kapoor@cavium.com, pbonzini@redhat.com, dgilbert@redhat.com
+Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch flushes the device table into guest RAM, at
-the address specified by the BASER register. The last
-written element is a dummy element with valid bit set to
-zero.
+Save and restore the pending tables.
 
-For each device listed in the device table, we also flush
-the translation table into the address specific in the
-corresponding device table entry.
+Pending table restore obviously requires the pendbaser to be
+already set.
 
-On restore, devices are re-allocated and their itte are
-re-built. LPI is re-created and its config gets updated.
+We also make sure the first kB of the pending table is zeroed.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
+
+Not sure what to do with this 1st kB. Should we really care?
+
+Maybe we should read it instead from guest RAM and return
+an error if it is non zero, as the spec says on init it should be
+zero. Then we do not touch it.
 ---
- virt/kvm/arm/vgic/vgic-its.c | 158 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 156 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 94 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 92 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index a1861b8..16a9aac 100644
+index 16a9aac..4a2b4de 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1592,13 +1592,129 @@ static int vgic_its_restore_pending_tables(struct kvm *kvm,
- 	return -ENXIO;
+@@ -316,6 +316,29 @@ static u32 max_lpis_propbaser(u64 propbaser)
+ 	return 1U << min(nr_idbits, INTERRUPT_ID_BITS_ITS);
  }
  
-+static int vgic_its_flush_itt(struct kvm *kvm, struct its_device *device)
++/**
++ * its_zero_pending_table_first1kB - Sets the first kB of the
++ * pending table to 0
++ * @vcpu: vcpu handle the pending table is attached to
++ *
++ * The content of the 1st kB is implementation defined. We force
++ * it to 0. Note the spec says it should already contain zeros on
++ * initial allocation and it must be visible to redist, else the
++ * behavior is unpredicatable
++ */
++static int its_zero_pending_table_first1kB(struct kvm_vcpu *vcpu)
 +{
-+	struct its_itte *itte;
-+	size_t max_size, filled = 0;
-+	u64 val, *ptr;
++	gpa_t pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
++	u8 *tmp;
 +	int ret;
 +
-+	ptr = (u64 *)device->itt_addr;
-+	max_size = device->itt_size;
++	tmp = kzalloc(1024, GFP_KERNEL);
++	ret = kvm_write_guest(vcpu->kvm, (gpa_t)pendbase, tmp, 1024);
++	kfree(tmp);
 +
-+	list_for_each_entry(itte, &device->itt_head, itte_list) {
-+		if (filled == max_size)
-+			return -ENOSPC;
-+		val = ((u64)device->device_id << 32) | (1ULL << 16) |
-+			itte->collection->collection_id;
-+		ret = kvm_write_guest(kvm, (gpa_t)ptr++, &val, 8);
-+		if (ret)
-+			return ret;
-+		val = (u64)itte->lpi << 32 | itte->event_id;
-+		ret = kvm_write_guest(kvm, (gpa_t)ptr++, &val, 8);
-+		if (ret)
-+			return ret;
-+		filled += ITTE_SIZE;
-+	}
-+	return 0;
++	return ret;
 +}
 +
-+static int vgic_its_restore_itt(struct kvm *kvm, struct vgic_its *its,
-+				struct its_device *dev)
-+{
-+	u64 val, *ptr = (u64 *)dev->itt_addr;
-+	size_t max_size, read = 0;
-+	bool valid;
+ /*
+  * Scan the whole LPI pending table and sync the pending bit in there
+  * with our own data structures. This relies on the LPI being
+@@ -1399,6 +1422,8 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+ {
+ 	if (!(vcpu->arch.vgic_cpu.pendbaser & GICR_PENDBASER_PTZ))
+ 		its_sync_lpi_pending_table(vcpu);
 +
-+	max_size = dev->itt_size;
-+
-+	while (read < max_size) {
-+		u32 coll_id, device_id, lpi_id, event_id;
-+		struct its_collection *collection;
-+		struct its_itte *itte;
-+		struct vgic_irq *irq;
-+		int ret;
-+
-+		ret = kvm_read_guest(kvm, (gpa_t)ptr++, &val, 8);
-+		if (ret)
-+			return ret;
-+		valid = val & 0x10000;
-+		if (!valid)
-+			break;
-+		coll_id = val & 0xFFFF;
-+		device_id = val >> 32;
-+		ret = kvm_read_guest(kvm, (gpa_t)ptr++, &val, 8);
-+		if (ret)
-+			return ret;
-+		lpi_id = val >> 32;
-+		event_id = val & 0xFFFFFFFFFFFFFFFF;
-+		collection = find_collection(its, coll_id);
-+		if (!collection)
-+			return -EINVAL;
-+		ret = vgic_its_alloc_itte(dev, &itte, collection,
-+					  lpi_id, event_id);
-+		if (ret)
-+			return ret;
-+
-+		irq = vgic_add_lpi(kvm, lpi_id);
-+		if (IS_ERR(irq))
-+			return PTR_ERR(irq);
-+		itte->irq = irq;
-+
-+		/* restores the configuration of the LPI */
-+		ret = update_lpi_config(kvm, irq, NULL);
-+		if (ret)
-+			return ret;
-+
-+		update_affinity_itte(kvm, itte);
-+		read += ITTE_SIZE;
-+	}
-+	return 0;
-+}
-+
- /**
-  * vgic_its_flush_device_tables - flush the device table and all ITT
-  * into guest RAM
-  */
- static int vgic_its_flush_device_tables(struct kvm *kvm, struct vgic_its *its)
++	its_zero_pending_table_first1kB(vcpu);
+ }
+ 
+ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
+@@ -1579,7 +1604,47 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+ static int vgic_its_flush_pending_tables(struct kvm *kvm,
+ 					 struct vgic_its *its)
  {
 -	return -ENXIO;
-+	struct its_device *dev;
-+	size_t max_size, filled = 0;
-+	u64 val, *ptr;
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct vgic_irq *irq;
 +	int ret;
-+
-+	ptr = (u64 *)(its->baser_device_table & 0x0000FFFFFFFFF000);
-+
-+	/* max size of the device table (64kB page size) */
-+	max_size = its->device_table_size;
-+
-+	list_for_each_entry(dev, &its->device_list, dev_list) {
-+		if (filled == max_size)
-+			return -ENOSPC;
-+		ret = vgic_its_flush_itt(kvm, dev);
-+		if (ret)
-+			return ret;
-+		val = ((u64)dev->device_id << 32) | (1 << 5) |
-+				(dev->nb_eventid_bits - 1);
-+		ret = kvm_write_guest(kvm, (gpa_t)ptr++, &val, 8);
-+		if (ret)
-+			return ret;
-+		val = dev->itt_addr >> 8;
-+		ret = kvm_write_guest(kvm, (gpa_t)ptr++, &val, 8);
-+		if (ret)
-+			return ret;
-+		filled += DEV_ENTRY_SIZE;
-+	}
-+	if (filled == max_size)
-+		return 0;
 +
 +	/**
-+	 * table is not fully filled, add a last dummy element
-+	 * element with valid but unset
++	 * we do not take the dist->lpi_list_lock this we have a garantee
++	 * the LPI list is not touched while the cmd and its lock are held
 +	 */
-+	val = 0;
-+	ret = kvm_write_guest(kvm, (gpa_t)ptr, &val, 8);
-+	return ret;
- }
- 
- /**
-@@ -1608,7 +1724,45 @@ static int vgic_its_flush_device_tables(struct kvm *kvm, struct vgic_its *its)
- static int vgic_its_restore_device_tables(struct kvm *kvm,
- 					  struct vgic_its *its)
- {
--	return -ENXIO;
-+	size_t max_size, read = 0;
-+	struct its_device *dev;
-+	u64 val, *ptr;
-+	bool valid;
-+	int ret;
++	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
++		struct kvm_vcpu *vcpu;
++		gpa_t pendbase, ptr;
++		bool stored;
++		u8 val;
 +
-+	ptr = (u64 *)(its->baser_device_table & 0x0000FFFFFFFFF000);
-+	if (!ptr)
-+		return 0;
++		vcpu = irq->target_vcpu;
++		if (!vcpu)
++			return -EINVAL;
 +
-+	max_size = its->device_table_size;
++		pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
 +
-+	while (read < max_size) {
-+		u32 device_id;
-+		gpa_t itt_addr;
-+		size_t size;
++		ptr = pendbase + (irq->intid / BITS_PER_BYTE);
 +
-+		ret = kvm_read_guest(kvm, (gpa_t)ptr++, &val, 8);
++		ret = kvm_read_guest(kvm, (gpa_t)ptr, &val, 1);
 +		if (ret)
 +			return ret;
-+		valid = val & 0x20;
-+		if (!valid)
-+			break;
-+		device_id =  val >> 32;
-+		size = val & 0x1F;
-+		ret = kvm_read_guest(kvm, (gpa_t)ptr++, &val, 8);
++
++		stored = val & (irq->intid % BITS_PER_BYTE);
++		if (stored == irq->pending)
++			continue;
++
++		if (irq->pending)
++			val |= 1 << (irq->intid % BITS_PER_BYTE);
++		else
++			val &= ~(1 << (irq->intid % BITS_PER_BYTE));
++
++		ret = kvm_write_guest(kvm, (gpa_t)ptr, &val, 1);
 +		if (ret)
 +			return ret;
-+		itt_addr = val & 0x000FFFFFFFFFFFFF;
-+		ret = vgic_its_alloc_device(its, &dev, device_id,
-+					    itt_addr, size);
-+		if (ret)
-+			return ret;
-+		ret = vgic_its_restore_itt(kvm, its, dev);
-+		if (ret)
-+			return ret;
-+		read += DEV_ENTRY_SIZE;
 +	}
++
 +	return 0;
  }
  
  /**
+@@ -1589,7 +1654,32 @@ static int vgic_its_flush_pending_tables(struct kvm *kvm,
+ static int vgic_its_restore_pending_tables(struct kvm *kvm,
+ 					   struct vgic_its *its)
+ {
+-	return -ENXIO;
++	struct vgic_irq *irq;
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	int ret;
++
++	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
++		struct kvm_vcpu *vcpu;
++		gpa_t pendbase, ptr;
++		u8 val;
++
++		vcpu = irq->target_vcpu;
++		if (!vcpu)
++			return -EINVAL;
++
++		if (!(vcpu->arch.vgic_cpu.pendbaser & GICR_PENDBASER_PTZ))
++			return 0;
++
++		pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
++
++		ptr = pendbase + (irq->intid / BITS_PER_BYTE);
++
++		ret = kvm_read_guest(kvm, (gpa_t)ptr, &val, 1);
++		if (ret)
++			return ret;
++		irq->pending = val & (1 << (irq->intid % BITS_PER_BYTE));
++	}
++	return 0;
+ }
+ 
+ static int vgic_its_flush_itt(struct kvm *kvm, struct its_device *device)
 -- 
 2.5.5
-
