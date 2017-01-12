@@ -1,70 +1,57 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: [RFC PATCH 13/13] arm64: kvm: Use common Set/Way sys definitions
-Date: Tue, 31 Jan 2017 18:05:51 +0000
-Message-ID: <1485885951-2747-14-git-send-email-mark.rutland@arm.com>
-References: <1485885951-2747-1-git-send-email-mark.rutland@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D8AE640A7B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 13:07:14 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MqnOp08e2GDF for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Jan 2017 13:07:10 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C193440A80
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 13:07:09 -0500 (EST)
-In-Reply-To: <1485885951-2747-1-git-send-email-mark.rutland@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [RFC 06/13] KVM: arm64: ITS: Expose ITT_Entry_Size in GITS_TYPER
+Date: Thu, 12 Jan 2017 16:56:46 +0100
+Message-ID: <1484236613-24633-7-git-send-email-eric.auger@redhat.com>
+References: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: andre.przywara@arm.com, Prasun.Kapoor@cavium.com, pbonzini@redhat.com, dgilbert@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we have common definitions for the encoding of Set/Way cache
-maintenance operations, make the KVM code use these, simplifying the
-sys_reg_descs table.
+An ITT_Entry_Size of 2x8Bytes is reported to the guest
+to provision for ITTE state storage.
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- arch/arm64/kvm/sys_regs.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ include/linux/irqchip/arm-gic-v3.h | 1 +
+ virt/kvm/arm/vgic/vgic-its.c       | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2b0b5fc..0d81bd4 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -824,15 +824,9 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-  * more demanding guest...
-  */
- static const struct sys_reg_desc sys_reg_descs[] = {
--	/* DC ISW */
--	{ Op0(0b01), Op1(0b000), CRn(0b0111), CRm(0b0110), Op2(0b010),
--	  access_dcsw },
--	/* DC CSW */
--	{ Op0(0b01), Op1(0b000), CRn(0b0111), CRm(0b1010), Op2(0b010),
--	  access_dcsw },
--	/* DC CISW */
--	{ Op0(0b01), Op1(0b000), CRn(0b0111), CRm(0b1110), Op2(0b010),
--	  access_dcsw },
-+	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
-+	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
-+	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 170e00a..8cfd81bc 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -233,6 +233,7 @@
+ #define GITS_CTLR_QUIESCENT		(1U << 31)
  
- 	DBG_BCR_BVR_WCR_WVR_EL1(0),
- 	DBG_BCR_BVR_WCR_WVR_EL1(1),
+ #define GITS_TYPER_PLPIS		(1UL << 0)
++#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
+ #define GITS_TYPER_IDBITS_SHIFT		8
+ #define GITS_TYPER_DEVBITS_SHIFT	13
+ #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index e174220..96378b8 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -33,6 +33,8 @@
+ #include "vgic.h"
+ #include "vgic-mmio.h"
+ 
++#define ITTE_SIZE 16
++
+ /*
+  * Creates a new (reference to a) struct vgic_irq for a given LPI.
+  * If this LPI is already mapped on another ITS, we increase its refcount
+@@ -399,6 +401,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+ 	 */
+ 	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
+ 	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
++	reg |= ITTE_SIZE << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
+ 
+ 	return extract_bytes(reg, addr & 7, len);
+ }
 -- 
-1.9.1
+2.5.5
+
