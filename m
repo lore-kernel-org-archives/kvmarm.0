@@ -1,56 +1,110 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v3 2/5] arm64: Work around Falkor erratum 1003
-Date: Thu, 12 Jan 2017 16:12:14 +0000
-Message-ID: <20170112161214.GB12583@leverpostej>
-References: <20170111144118.17062-1-cov@codeaurora.org>
- <20170111144118.17062-2-cov@codeaurora.org>
- <20170111180627.GG20288@e104818-lin.cambridge.arm.com>
- <278a45c0-bd49-b8a2-63ae-80ad851bab9b@arm.com>
- <20170111184052.GE29247@leverpostej>
- <20170112154548.twj2ktbfzbsarzbc@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3EC440284
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 11:11:29 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rQ4Bvo-GtrRo for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Jan 2017 11:11:28 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F6714025C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 11:11:28 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20170112154548.twj2ktbfzbsarzbc@localhost>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Mark Langsdorf <mlangsdo@redhat.com>, kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>, Jon Masters <jcm@redhat.com>, timur@codeaurora.org, linux-doc@vger.kernel.org, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH] KVM: arm/arm64: vgic: Fix deadlock on error handling
+Date: Thu, 12 Jan 2017 16:16:14 +0000
+Message-ID: <1484237774-19047-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: andre.przywara@arm.com, eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 12, 2017 at 03:45:48PM +0000, Catalin Marinas wrote:
-> On Wed, Jan 11, 2017 at 06:40:52PM +0000, Mark Rutland wrote:
+Dmitry Vyukov reported that the syzkaller fuzzer triggered a
+deadlock in the vgic setup code when an error was detected, as
+the cleanup code tries to take a lock that is already held by
+the setup code.
 
-> > Likewise, I beleive we may need to modify cpu_set_reserved_ttbr0().
-> 
-> This may be fine if my assumptions about this erratum are correct. In
-> the cpu_set_reserved_ttbr0() case we set TTBR0_EL1 to a table without
-> any entries, so no new entries could be tagged with the old ASID.
+The fix is to avoid retaking the lock when cleaning up, by
+telling the cleanup function that we already hold it.
 
-For some reason, I was under the impression that the issue was old table
-entries being allocated to the new ASID. Looking over the series again,
-it's not clear to me precisely which cases can occur.
+Cc: stable@vger.kernel.org
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-init.c | 18 +++++++++++++-----
+ virt/kvm/arm/vgic/vgic-v2.c   |  2 --
+ virt/kvm/arm/vgic/vgic-v3.c   |  2 --
+ 3 files changed, 13 insertions(+), 9 deletions(-)
 
-It would be good to see that clarified.
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 5114391..c737ea0 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -268,15 +268,11 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 
+-	mutex_lock(&kvm->lock);
+-
+ 	dist->ready = false;
+ 	dist->initialized = false;
+ 
+ 	kfree(dist->spis);
+ 	dist->nr_spis = 0;
+-
+-	mutex_unlock(&kvm->lock);
+ }
+ 
+ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -286,7 +282,8 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+ }
+ 
+-void kvm_vgic_destroy(struct kvm *kvm)
++/* To be called with kvm->lock held */
++static void __kvm_vgic_destroy(struct kvm *kvm)
+ {
+ 	struct kvm_vcpu *vcpu;
+ 	int i;
+@@ -297,6 +294,13 @@ void kvm_vgic_destroy(struct kvm *kvm)
+ 		kvm_vgic_vcpu_destroy(vcpu);
+ }
+ 
++void kvm_vgic_destroy(struct kvm *kvm)
++{
++	mutex_lock(&kvm->lock);
++	__kvm_vgic_destroy(kvm);
++	mutex_unlock(&kvm->lock);
++}
++
+ /**
+  * vgic_lazy_init: Lazy init is only allowed if the GIC exposed to the guest
+  * is a GICv2. A GICv3 must be explicitly initialized by the guest using the
+@@ -348,6 +352,10 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+ 		ret = vgic_v2_map_resources(kvm);
+ 	else
+ 		ret = vgic_v3_map_resources(kvm);
++
++	if (ret)
++		__kvm_vgic_destroy(kvm);
++
+ out:
+ 	mutex_unlock(&kvm->lock);
+ 	return ret;
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 9bab867..834137e 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -293,8 +293,6 @@ int vgic_v2_map_resources(struct kvm *kvm)
+ 	dist->ready = true;
+ 
+ out:
+-	if (ret)
+-		kvm_vgic_destroy(kvm);
+ 	return ret;
+ }
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 7df1b90..a4c7fff 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -308,8 +308,6 @@ int vgic_v3_map_resources(struct kvm *kvm)
+ 	dist->ready = true;
+ 
+ out:
+-	if (ret)
+-		kvm_vgic_destroy(kvm);
+ 	return ret;
+ }
+ 
+-- 
+2.1.4
 
-Thanks,
-Mark.
