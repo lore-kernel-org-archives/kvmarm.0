@@ -1,296 +1,103 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: kvm: deadlock in kvm_vgic_map_resources
-Date: Thu, 12 Jan 2017 10:50:04 +0000
-Message-ID: <a4acacfb-8178-b904-f27d-235fc4a58275@arm.com>
-References: <CACT4Y+YRg=H0F-_QTtPf0--o85sQCb__j=V25tPchx9ycYtyKg@mail.gmail.com>
- <70371c5c-d0c0-b59e-b12c-fd8359392763@arm.com>
- <286255e8-918e-66b5-012f-f347a2ae71cd@arm.com>
- <0994d5a9-d9f4-7b80-4b16-1797c093edb5@arm.com> <20170112104253.GB13547@cbox>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 1/6] libcflat: add PRI(dux)32 format types
+Date: Thu, 12 Jan 2017 13:29:24 +0100
+Message-ID: <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
+References: <20170111162841.15569-1-alex.bennee@linaro.org>
+ <20170111162841.15569-2-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 37EB140284
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 05:48:24 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B9ILbaUQAMyJ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Jan 2017 05:48:22 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 913ED404F1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 05:48:22 -0500 (EST)
-In-Reply-To: <20170112104253.GB13547@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: KVM list <kvm@vger.kernel.org>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, LKML <linux-kernel@vger.kernel.org>, syzkaller <syzkaller@googlegroups.com>, Dmitry Vyukov <dvyukov@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170111162841.15569-2-alex.bennee@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, drjones@redhat.com
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/01/17 10:42, Christoffer Dall wrote:
-> On Thu, Jan 12, 2017 at 10:30:39AM +0000, Marc Zyngier wrote:
->> On 12/01/17 09:55, Andre Przywara wrote:
->>> Hi,
->>>
->>> On 12/01/17 09:32, Marc Zyngier wrote:
->>>> Hi Dmitry,
->>>>
->>>> On 11/01/17 19:01, Dmitry Vyukov wrote:
->>>>> Hello,
->>>>>
->>>>> While running syzkaller fuzzer I've got the following deadlock.
->>>>> On commit 9c763584b7c8911106bb77af7e648bef09af9d80.
->>>>>
->>>>>
->>>>> =============================================
->>>>> [ INFO: possible recursive locking detected ]
->>>>> 4.9.0-rc6-xc2-00056-g08372dd4b91d-dirty #50 Not tainted
->>>>> ---------------------------------------------
->>>>> syz-executor/20805 is trying to acquire lock:
->>>>> (
->>>>> &kvm->lock
->>>>> ){+.+.+.}
->>>>> , at:
->>>>> [< inline >] kvm_vgic_dist_destroy
->>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-init.c:271
->>>>> [<ffff2000080ea4bc>] kvm_vgic_destroy+0x34/0x250
->>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-init.c:294
->>>>> but task is already holding lock:
->>>>> (&kvm->lock){+.+.+.}, at:
->>>>> [<ffff2000080ea7e4>] kvm_vgic_map_resources+0x2c/0x108
->>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-init.c:343
->>>>> other info that might help us debug this:
->>>>> Possible unsafe locking scenario:
->>>>> CPU0
->>>>> ----
->>>>> lock(&kvm->lock);
->>>>> lock(&kvm->lock);
->>>>> *** DEADLOCK ***
->>>>> May be due to missing lock nesting notation
->>>>> 2 locks held by syz-executor/20805:
->>>>> #0:(&vcpu->mutex){+.+.+.}, at:
->>>>> [<ffff2000080bcc30>] vcpu_load+0x28/0x1d0
->>>>> arch/arm64/kvm/../../../virt/kvm/kvm_main.c:143
->>>>> #1:(&kvm->lock){+.+.+.}, at:
->>>>> [<ffff2000080ea7e4>] kvm_vgic_map_resources+0x2c/0x108
->>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-init.c:343
->>>>> stack backtrace:
->>>>> CPU: 2 PID: 20805 Comm: syz-executor Not tainted
->>>>> 4.9.0-rc6-xc2-00056-g08372dd4b91d-dirty #50
->>>>> Hardware name: Hardkernel ODROID-C2 (DT)
->>>>> Call trace:
->>>>> [<ffff200008090560>] dump_backtrace+0x0/0x3c8 arch/arm64/kernel/traps.c:69
->>>>> [<ffff200008090948>] show_stack+0x20/0x30 arch/arm64/kernel/traps.c:219
->>>>> [< inline >] __dump_stack lib/dump_stack.c:15
->>>>> [<ffff200008895840>] dump_stack+0x100/0x150 lib/dump_stack.c:51
->>>>> [< inline >] print_deadlock_bug kernel/locking/lockdep.c:1728
->>>>> [< inline >] check_deadlock kernel/locking/lockdep.c:1772
->>>>> [< inline >] validate_chain kernel/locking/lockdep.c:2250
->>>>> [<ffff2000081c8718>] __lock_acquire+0x1938/0x3440 kernel/locking/lockdep.c:3335
->>>>> [<ffff2000081caa84>] lock_acquire+0xdc/0x1d8 kernel/locking/lockdep.c:3746
->>>>> [< inline >] __mutex_lock_common kernel/locking/mutex.c:521
->>>>> [<ffff200009700004>] mutex_lock_nested+0xdc/0x7b8 kernel/locking/mutex.c:621
->>>>> [< inline >] kvm_vgic_dist_destroy
->>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-init.c:271
->>>>> [<ffff2000080ea4bc>] kvm_vgic_destroy+0x34/0x250
->>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-init.c:294
->>>>> [<ffff2000080ec290>] vgic_v2_map_resources+0x218/0x430
->>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-v2.c:295
->>>>> [<ffff2000080ea884>] kvm_vgic_map_resources+0xcc/0x108
->>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-init.c:348
->>>>> [< inline >] kvm_vcpu_first_run_init
->>>>> arch/arm64/kvm/../../../arch/arm/kvm/arm.c:505
->>>>> [<ffff2000080d2768>] kvm_arch_vcpu_ioctl_run+0xab8/0xce0
->>>>> arch/arm64/kvm/../../../arch/arm/kvm/arm.c:591
->>>>> [<ffff2000080c1fec>] kvm_vcpu_ioctl+0x434/0xc08
->>>>> arch/arm64/kvm/../../../virt/kvm/kvm_main.c:2557
->>>>> [< inline >] vfs_ioctl fs/ioctl.c:43
->>>>> [<ffff200008450c38>] do_vfs_ioctl+0x128/0xfc0 fs/ioctl.c:679
->>>>> [< inline >] SYSC_ioctl fs/ioctl.c:694
->>>>> [<ffff200008451b78>] SyS_ioctl+0xa8/0xb8 fs/ioctl.c:685
->>>>> [<ffff200008083ef0>] el0_svc_naked+0x24/0x28 arch/arm64/kernel/entry.S:755
->>>>
->>>> Nice catch, and many thanks for reporting this.
->>>>
->>>> The bug is fairly obvious. Christoffer, what do you think? I don't think
->>>> we need to hold the kvm->lock all the way, but I'd like another pair of
->>>> eyes (the coffee machine is out of order again, and tea doesn't cut it).
->>>>
->>>> Thanks,
->>>>
->>>> 	M.
->>>>
->>>> From 93f80b20fb9351a49ee8b74eed3fc59c84651371 Mon Sep 17 00:00:00 2001
->>>> From: Marc Zyngier <marc.zyngier@arm.com>
->>>> Date: Thu, 12 Jan 2017 09:21:56 +0000
->>>> Subject: [PATCH] KVM: arm/arm64: vgic: Fix deadlock on error handling
->>>>
->>>> Dmitry Vyukov reported that the syzkaller fuzzer triggered a
->>>> deadlock in the vgic setup code when an error was detected, as
->>>> the cleanup code tries to take a lock that is already held by
->>>> the setup code.
->>>>
->>>> The fix is pretty obvious: move the cleaup call after having
->>>> dropped the lock, since not much can happen at that point.
->>>                           ^^^^^^^^
->>> Is that really true? If for instance the calls to
->>> vgic_register_dist_iodev() or kvm_phys_addr_ioremap() in
->>> vgic_v2_map_resources() fail, we leave the function with a half
->>> initialized VGIC (because vgic_init() succeeded). 
->>
->> But we only set dist->ready to true when everything went OK. How is 
->> that an issue?
->>
->>> Dropping the lock at
->>> this point without having the GIC cleaned up before sounds a bit
->>> suspicious (I may be wrong on this, though).
->>
->> Thinking of it, that may open a race with vgic init call, leading to 
->> leaking distributor memory.
->>
->>>
->>> Can't we just document that kvm_vgic_destroy() needs to be called with
->>> the kvm->lock held and take the lock around the only other caller
->>> (kvm_arch_destroy_vm() in arch/arm/kvm/arm.c)?
->>> We can then keep holding the lock in the map_resources calls.
->>> Though we might still move the calls to kvm_vgic_destroy() into the
->>> wrapper function as a cleanup (as shown below), just before dropping the
->>> lock.
->>
->> I'd rather keep the changes limited to the vgic code, and save myself 
->> having to document more locking (we already have our fair share here). 
->> How about this (untested):
->>
->> From 24dc3f5750da20d89e0ce9b7855d125d0100bee8 Mon Sep 17 00:00:00 2001
->> From: Marc Zyngier <marc.zyngier@arm.com>
->> Date: Thu, 12 Jan 2017 09:21:56 +0000
->> Subject: [PATCH] KVM: arm/arm64: vgic: Fix deadlock on error handling
->>
->> Dmitry Vyukov reported that the syzkaller fuzzer triggered a
->> deadlock in the vgic setup code when an error was detected, as
->> the cleanup code tries to take a lock that is already held by
->> the setup code.
->>
->> The fix is to avoid retaking the lock when cleaning up, by
->> telling the cleanup function that we already hold it.
->>
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-init.c | 21 ++++++++++++++++-----
->>  virt/kvm/arm/vgic/vgic-v2.c   |  2 --
->>  virt/kvm/arm/vgic/vgic-v3.c   |  2 --
->>  3 files changed, 16 insertions(+), 9 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
->> index 5114391..30d74e2 100644
->> --- a/virt/kvm/arm/vgic/vgic-init.c
->> +++ b/virt/kvm/arm/vgic/vgic-init.c
->> @@ -264,11 +264,12 @@ int vgic_init(struct kvm *kvm)
->>  	return ret;
->>  }
->>  
->> -static void kvm_vgic_dist_destroy(struct kvm *kvm)
->> +static void kvm_vgic_dist_destroy(struct kvm *kvm, bool locked)
->>  {
->>  	struct vgic_dist *dist = &kvm->arch.vgic;
->>  
->> -	mutex_lock(&kvm->lock);
->> +	if (!locked)
->> +		mutex_lock(&kvm->lock);
+
+
+On 11/01/2017 17:28, Alex Bennée wrote:
+> So we can have portable formatting of uint32_t types. However there is
+> a catch. Different compilers can use legally subtly different types
+> though so we need to probe the compiler defined intdef.h first.
+
+Interesting, what platform has long uint32_t?  I thought the issue was
+whether 64-bit is long or "long long".
+
+Paolo
+
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  Makefile       |  1 +
+>  configure      | 13 +++++++++++++
+>  lib/libcflat.h |  9 +++++++++
+>  3 files changed, 23 insertions(+)
 > 
-> Hmm, not a fan of passing this variable around.  How about this instead
-> then (untested):
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index 5114391..a25806b 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -264,19 +264,16 @@ int vgic_init(struct kvm *kvm)
->  	return ret;
->  }
+> diff --git a/Makefile b/Makefile
+> index a32333b..9822d9a 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -55,6 +55,7 @@ CFLAGS += $(fomit_frame_pointer)
+>  CFLAGS += $(fno_stack_protector)
+>  CFLAGS += $(fno_stack_protector_all)
+>  CFLAGS += $(wno_frame_address)
+> +CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
 >  
-> +/* Must be called with the kvm->lock held */
->  static void kvm_vgic_dist_destroy(struct kvm *kvm)
->  {
->  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  CXXFLAGS += $(CFLAGS)
 >  
-> -	mutex_lock(&kvm->lock);
-> -
->  	dist->ready = false;
->  	dist->initialized = false;
+> diff --git a/configure b/configure
+> index 995c8fa..127868c 100755
+> --- a/configure
+> +++ b/configure
+> @@ -109,6 +109,18 @@ if [ -f $testdir/run ]; then
+>      ln -fs $testdir/run $testdir-run
+>  fi
 >  
->  	kfree(dist->spis);
->  	dist->nr_spis = 0;
-> -
-> -	mutex_unlock(&kvm->lock);
->  }
->  
->  void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
-> @@ -286,7 +283,7 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
->  }
->  
-> -void kvm_vgic_destroy(struct kvm *kvm)
-> +void __kvm_vgic_destroy(struct kvm *kvm)
->  {
->  	struct kvm_vcpu *vcpu;
->  	int i;
-> @@ -297,6 +294,13 @@ void kvm_vgic_destroy(struct kvm *kvm)
->  		kvm_vgic_vcpu_destroy(vcpu);
->  }
->  
-> +void kvm_vgic_destroy(struct kvm *kvm)
-> +{
-> +	mutex_lock(&kvm->lock);
-> +	__kvm_vgic_destroy(kvm);
-> +	mutex_unlock(&kvm->lock);
-> +}
+> +# check if uint32_t needs a long format modifier
+> +cat << EOF > lib_test.c
+> +#include <inttypes.h>
+> +EOF
 > +
-
-I initially wrote that exactly, but ended up deciding against as it
-changes the locking more than strictly necessary. On the other hand, I
-think this looks better, so if everyone agrees I'll take that.
-
->  /**
->   * vgic_lazy_init: Lazy init is only allowed if the GIC exposed to the guest
->   * is a GICv2. A GICv3 must be explicitly initialized by the guest using the
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index 9bab867..c6f7ec7 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -294,7 +294,7 @@ int vgic_v2_map_resources(struct kvm *kvm)
+> +$cross_prefix$cc lib_test.c -E | grep "typedef" | grep "long" | grep "uint32_t" &> /dev/null
+> +exit=$?
+> +if [ $exit -eq 0 ]; then
+> +    u32_long=true
+> +fi
+> +rm -f lib_test.c
+> +
+>  # check for dependent 32 bit libraries
+>  if [ "$arch" != "arm" ]; then
+>  cat << EOF > lib_test.c
+> @@ -155,4 +167,5 @@ TEST_DIR=$testdir
+>  FIRMWARE=$firmware
+>  ENDIAN=$endian
+>  PRETTY_PRINT_STACKS=$pretty_print_stacks
+> +U32_LONG_FMT=$u32_long
+>  EOF
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index 380395f..e80fc50 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -58,12 +58,21 @@ typedef _Bool		bool;
+>  #define true  1
 >  
->  out:
->  	if (ret)
-> -		kvm_vgic_destroy(kvm);
-> +		__kvm_vgic_destroy(kvm);
->  	return ret;
->  }
->  
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 5c9f974..f1c7819 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -303,7 +303,7 @@ int vgic_v3_map_resources(struct kvm *kvm)
->  
->  out:
->  	if (ret)
-> -		kvm_vgic_destroy(kvm);
-> +		__kvm_vgic_destroy(kvm);
-
-I'm still keen on factoring the destroy calls in the calling function.
-Is there any reason why we wouldn't do it?
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+>  #if __SIZEOF_LONG__ == 8
+> +#  define __PRI32_PREFIX
+>  #  define __PRI64_PREFIX	"l"
+>  #  define __PRIPTR_PREFIX	"l"
+>  #else
+> +#if defined(__U32_LONG_FMT__)
+> +#  define __PRI32_PREFIX        "l"
+> +#else
+> +#  define __PRI32_PREFIX
+> +#endif
+>  #  define __PRI64_PREFIX	"ll"
+>  #  define __PRIPTR_PREFIX
+>  #endif
+> +#define PRId32  __PRI32_PREFIX	"d"
+> +#define PRIu32  __PRI32_PREFIX	"u"
+> +#define PRIx32  __PRI32_PREFIX	"x"
+>  #define PRId64  __PRI64_PREFIX	"d"
+>  #define PRIu64  __PRI64_PREFIX	"u"
+>  #define PRIx64  __PRI64_PREFIX	"x"
+> 
