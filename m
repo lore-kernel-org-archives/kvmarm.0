@@ -1,26 +1,28 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 5/6] docs: mention modifying env vars in
- README
-Date: Thu, 12 Jan 2017 18:14:29 +0100
-Message-ID: <20170112171429.ldiwl7eduxwstgkq@hawk.localdomain>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [kvm-unit-tests PATCH 1/6] libcflat: add PRI(dux)32 format types
+Date: Thu, 12 Jan 2017 17:18:25 +0000
+Message-ID: <87fuko2o4e.fsf@linaro.org>
 References: <20170111162841.15569-1-alex.bennee@linaro.org>
- <20170111162841.15569-6-alex.bennee@linaro.org>
+ <20170111162841.15569-2-alex.bennee@linaro.org>
+ <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
+ <20170112165629.nbczamlqlpsqaauh@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF1D84019A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 12:12:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C2DD4066D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 12:16:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id b9YwJNiyt910 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Jan 2017 12:12:50 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EAC7340194
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 12:12:49 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20170111162841.15569-6-alex.bennee@linaro.org>
+ with ESMTP id qu+kAdWmjdCU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Jan 2017 12:16:42 -0500 (EST)
+Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E8B240194
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 12:16:41 -0500 (EST)
+Received: by mail-wm0-f43.google.com with SMTP id r126so29137513wmr.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 09:18:27 -0800 (PST)
+In-reply-to: <20170112165629.nbczamlqlpsqaauh@hawk.localdomain>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,70 +32,78 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 11, 2017 at 04:28:40PM +0000, Alex Benn=E9e wrote:
-> I had started adding a series of flags to control the run-time
-> behaviour of the tests but it was pointed out env vars can already do
-> that. Mention them in the README so others can find out to.
-> =
-
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> ---
->  README.md | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> =
-
-> diff --git a/README.md b/README.md
-> index 9462824..fa3a445 100644
-> --- a/README.md
-> +++ b/README.md
-> @@ -47,6 +47,14 @@ environment variable:
->  =
-
->      QEMU=3D/tmp/qemu/x86_64-softmmu/qemu-system-x86_64 ./x86-run ./x86/m=
-sr.flat
->  =
-
-> +To force the acceleration mode:
-> +
-> +    ACCEL=3Dtcg ./run_tests.sh
-> +
-> +To extend or disable the timeouts:
-> +
-> +    TIMEOUT=3D0 ./run_tests.sh
-> +
-
-This is a nice addition to the README, but please add more detail.
-
-To force the use of TCG:
- ACCEL=3Dtcg ./run_tests.sh
-
-To force failure when KVM is not present:
- ACCEL=3Dkvm ./run_tests.sh
-
-To modify the timeout:
- TIMEOUT=3D$DURATION ./run_tests.sh # man timeout(1) for duration format
- TIMEOUT=3D0 ./run_tests.sh # disable the timeout
-
-or something like that...
-
-thanks,
-drew
-
-
->  # Contributing
->  =
-
->  ## Directory structure
-> -- =
-
-> 2.11.0
-> =
-
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IE9uIFRodSwgSmFu
+IDEyLCAyMDE3IGF0IDAxOjI5OjI0UE0gKzAxMDAsIFBhb2xvIEJvbnppbmkgd3JvdGU6Cj4+Cj4+
+Cj4+IE9uIDExLzAxLzIwMTcgMTc6MjgsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gPiBTbyB3ZSBj
+YW4gaGF2ZSBwb3J0YWJsZSBmb3JtYXR0aW5nIG9mIHVpbnQzMl90IHR5cGVzLiBIb3dldmVyIHRo
+ZXJlIGlzCj4+ID4gYSBjYXRjaC4gRGlmZmVyZW50IGNvbXBpbGVycyBjYW4gdXNlIGxlZ2FsbHkg
+c3VidGx5IGRpZmZlcmVudCB0eXBlcwo+PiA+IHRob3VnaCBzbyB3ZSBuZWVkIHRvIHByb2JlIHRo
+ZSBjb21waWxlciBkZWZpbmVkIGludGRlZi5oIGZpcnN0Lgo+Pgo+PiBJbnRlcmVzdGluZywgd2hh
+dCBwbGF0Zm9ybSBoYXMgbG9uZyB1aW50MzJfdD8gIEkgdGhvdWdodCB0aGUgaXNzdWUgd2FzCj4+
+IHdoZXRoZXIgNjQtYml0IGlzIGxvbmcgb3IgImxvbmcgbG9uZyIuCj4+Cj4+IFBhb2xvCj4+Cj4+
+ID4gU2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+
+PiA+IC0tLQo+PiA+ICBNYWtlZmlsZSAgICAgICB8ICAxICsKPj4gPiAgY29uZmlndXJlICAgICAg
+fCAxMyArKysrKysrKysrKysrCj4+ID4gIGxpYi9saWJjZmxhdC5oIHwgIDkgKysrKysrKysrCj4+
+ID4gIDMgZmlsZXMgY2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKQo+PiA+Cj4+ID4gZGlmZiAtLWdp
+dCBhL01ha2VmaWxlIGIvTWFrZWZpbGUKPj4gPiBpbmRleCBhMzIzMzNiLi45ODIyZDlhIDEwMDY0
+NAo+PiA+IC0tLSBhL01ha2VmaWxlCj4+ID4gKysrIGIvTWFrZWZpbGUKPj4gPiBAQCAtNTUsNiAr
+NTUsNyBAQCBDRkxBR1MgKz0gJChmb21pdF9mcmFtZV9wb2ludGVyKQo+PiA+ICBDRkxBR1MgKz0g
+JChmbm9fc3RhY2tfcHJvdGVjdG9yKQo+PiA+ICBDRkxBR1MgKz0gJChmbm9fc3RhY2tfcHJvdGVj
+dG9yX2FsbCkKPj4gPiAgQ0ZMQUdTICs9ICQod25vX2ZyYW1lX2FkZHJlc3MpCj4+ID4gK0NGTEFH
+UyArPSAkKGlmICQoVTMyX0xPTkdfRk1UKSwtRF9fVTMyX0xPTkdfRk1UX18sKQo+PiA+Cj4+ID4g
+IENYWEZMQUdTICs9ICQoQ0ZMQUdTKQo+PiA+Cj4+ID4gZGlmZiAtLWdpdCBhL2NvbmZpZ3VyZSBi
+L2NvbmZpZ3VyZQo+PiA+IGluZGV4IDk5NWM4ZmEuLjEyNzg2OGMgMTAwNzU1Cj4+ID4gLS0tIGEv
+Y29uZmlndXJlCj4+ID4gKysrIGIvY29uZmlndXJlCj4+ID4gQEAgLTEwOSw2ICsxMDksMTggQEAg
+aWYgWyAtZiAkdGVzdGRpci9ydW4gXTsgdGhlbgo+PiA+ICAgICAgbG4gLWZzICR0ZXN0ZGlyL3J1
+biAkdGVzdGRpci1ydW4KPj4gPiAgZmkKPj4gPgo+PiA+ICsjIGNoZWNrIGlmIHVpbnQzMl90IG5l
+ZWRzIGEgbG9uZyBmb3JtYXQgbW9kaWZpZXIKPj4gPiArY2F0IDw8IEVPRiA+IGxpYl90ZXN0LmMK
+Pj4gPiArI2luY2x1ZGUgPGludHR5cGVzLmg+Cj4+ID4gK0VPRgo+PiA+ICsKPj4gPiArJGNyb3Nz
+X3ByZWZpeCRjYyBsaWJfdGVzdC5jIC1FIHwgZ3JlcCAidHlwZWRlZiIgfCBncmVwICJsb25nIiB8
+IGdyZXAgInVpbnQzMl90IiAmPiAvZGV2L251bGwKPgo+IFRoaXMgd29uJ3Qgd29yayB3aXRoIGNy
+b3NzIGNvbXBpbGVycyB0aGF0IGRvbid0IGhhdmUgaW50dHlwZXMuaCBpbiB0aGVpcgo+IHBhdGgg
+KGxpa2UgbWluZSkuIEhvdyBhYm91dCBzb21ldGhpbmcgbGlrZQoKSG1tIGdvb2QgcG9pbnQsIGlu
+IG15IGNhc2UgaW50dHlwZXMuaCBjYW1lIGZyb20gdGhlIGxpYm5ld2xpYi1kZXYgcGFja2FnZS4K
+Cj4KPiAgY2F0IDw8IEVPRiA+IGxpYl90ZXN0LmMKPiAgX19VSU5UMzJfVFlQRV9fCj4gIEVPRgo+
+ICB1MzJfbG9uZz0iYGFhcmNoNjQtbGludXgtZ251LWdjYyBsaWJfdGVzdC5jIC1FIHwgYXdrICcv
+dW5zaWduZWQvICYmICQyID09ICJsb25nIidgIgoKSG1tIGl0IGlzIG5vdCBjbGVhciBmcm9tIHRo
+ZSBkb2NzIGlmIHRoaXMgaXMgYSBHQ0Npc20uIElmIGl0IGlzIGRvIHdlCmNhcmU/IEFsc28gdGhl
+IGRvY3MgZG8gc2F5OgoKIlNvbWUgb2YgdGhlc2UgbWFjcm9zIG1heSBub3QgYmUgZGVmaW5lZCBv
+biBwYXJ0aWN1bGFyIHN5c3RlbXMgaWYgR0NDIGRvZXMgbm90IHByb3ZpZGUgYSBzdGRpbnQuaCBo
+ZWFkZXIgb24gdGhvc2Ugc3lzdGVtcy4gIgoKPiBBbHRob3VnaCBJIGZlZWwgdGhlcmUgc2hvdWxk
+IGJlIGEgY29tcGlsZXIgbWFjcm8gd2F5IHRvIGRvIHRoaXMgd2l0aG91dAo+IGEgbmVlZCBmb3Ig
+Y29uZmlndXJlL21ha2VmaWxlIHRyaWNrZXJ5IGF0IGFsbC4uLgoKSSBkaWQgYXNrIG91ciB0b29s
+Y2hhaW4gYm9kcy4gVGhleSBzdGFydGVkIGdvaW5nIG9uIGFib3V0IHBvdGVudGlhbApzb2x1dGlv
+bnMgdXNpbmcgX0dlbmVyaWMgYnV0IEkgZmVhciB0aGF0IG1pZ2h0IGJlIHdvcnNlIGluIHRoaXMg
+Y2FzZSEKCj4KPiBUaGFua3MsCj4gZHJldwo+Cj4KPj4gPiArZXhpdD0kPwo+PiA+ICtpZiBbICRl
+eGl0IC1lcSAwIF07IHRoZW4KPj4gPiArICAgIHUzMl9sb25nPXRydWUKPj4gPiArZmkKPj4gPiAr
+cm0gLWYgbGliX3Rlc3QuYwo+PiA+ICsKPj4gPiAgIyBjaGVjayBmb3IgZGVwZW5kZW50IDMyIGJp
+dCBsaWJyYXJpZXMKPj4gPiAgaWYgWyAiJGFyY2giICE9ICJhcm0iIF07IHRoZW4KPj4gPiAgY2F0
+IDw8IEVPRiA+IGxpYl90ZXN0LmMKPj4gPiBAQCAtMTU1LDQgKzE2Nyw1IEBAIFRFU1RfRElSPSR0
+ZXN0ZGlyCj4+ID4gIEZJUk1XQVJFPSRmaXJtd2FyZQo+PiA+ICBFTkRJQU49JGVuZGlhbgo+PiA+
+ICBQUkVUVFlfUFJJTlRfU1RBQ0tTPSRwcmV0dHlfcHJpbnRfc3RhY2tzCj4+ID4gK1UzMl9MT05H
+X0ZNVD0kdTMyX2xvbmcKPj4gPiAgRU9GCj4+ID4gZGlmZiAtLWdpdCBhL2xpYi9saWJjZmxhdC5o
+IGIvbGliL2xpYmNmbGF0LmgKPj4gPiBpbmRleCAzODAzOTVmLi5lODBmYzUwIDEwMDY0NAo+PiA+
+IC0tLSBhL2xpYi9saWJjZmxhdC5oCj4+ID4gKysrIGIvbGliL2xpYmNmbGF0LmgKPj4gPiBAQCAt
+NTgsMTIgKzU4LDIxIEBAIHR5cGVkZWYgX0Jvb2wJCWJvb2w7Cj4+ID4gICNkZWZpbmUgdHJ1ZSAg
+MQo+PiA+Cj4+ID4gICNpZiBfX1NJWkVPRl9MT05HX18gPT0gOAo+PiA+ICsjICBkZWZpbmUgX19Q
+UkkzMl9QUkVGSVgKPj4gPiAgIyAgZGVmaW5lIF9fUFJJNjRfUFJFRklYCSJsIgo+PiA+ICAjICBk
+ZWZpbmUgX19QUklQVFJfUFJFRklYCSJsIgo+PiA+ICAjZWxzZQo+PiA+ICsjaWYgZGVmaW5lZChf
+X1UzMl9MT05HX0ZNVF9fKQo+PiA+ICsjICBkZWZpbmUgX19QUkkzMl9QUkVGSVggICAgICAgICJs
+Igo+PiA+ICsjZWxzZQo+PiA+ICsjICBkZWZpbmUgX19QUkkzMl9QUkVGSVgKPj4gPiArI2VuZGlm
+Cj4+ID4gICMgIGRlZmluZSBfX1BSSTY0X1BSRUZJWAkibGwiCj4+ID4gICMgIGRlZmluZSBfX1BS
+SVBUUl9QUkVGSVgKPj4gPiAgI2VuZGlmCj4+ID4gKyNkZWZpbmUgUFJJZDMyICBfX1BSSTMyX1BS
+RUZJWAkiZCIKPj4gPiArI2RlZmluZSBQUkl1MzIgIF9fUFJJMzJfUFJFRklYCSJ1Igo+PiA+ICsj
+ZGVmaW5lIFBSSXgzMiAgX19QUkkzMl9QUkVGSVgJIngiCj4+ID4gICNkZWZpbmUgUFJJZDY0ICBf
+X1BSSTY0X1BSRUZJWAkiZCIKPj4gPiAgI2RlZmluZSBQUkl1NjQgIF9fUFJJNjRfUFJFRklYCSJ1
+Igo+PiA+ICAjZGVmaW5lIFBSSXg2NCAgX19QUkk2NF9QUkVGSVgJIngiCj4+ID4KPj4gLS0KPj4g
+VG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJl
+IGt2bSIgaW4KPj4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5l
+bC5vcmcKPj4gTW9yZSBtYWpvcmRvbW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9t
+YWpvcmRvbW8taW5mby5odG1sCgoKLS0KQWxleCBCZW5uw6llCl9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
+c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
+L2xpc3RpbmZvL2t2bWFybQo=
