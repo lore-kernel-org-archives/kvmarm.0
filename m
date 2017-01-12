@@ -1,22 +1,38 @@
-From: Andre Przywara <andre.przywara@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: kvm: deadlock in kvm_vgic_map_resources
-Date: Thu, 12 Jan 2017 10:51:07 +0000
-Message-ID: <f9202750-c816-c47f-35e8-9c3dca96aa3c@arm.com>
+Date: Thu, 12 Jan 2017 10:50:04 +0000
+Message-ID: <a4acacfb-8178-b904-f27d-235fc4a58275@arm.com>
 References: <CACT4Y+YRg=H0F-_QTtPf0--o85sQCb__j=V25tPchx9ycYtyKg@mail.gmail.com>
  <70371c5c-d0c0-b59e-b12c-fd8359392763@arm.com>
  <286255e8-918e-66b5-012f-f347a2ae71cd@arm.com>
  <0994d5a9-d9f4-7b80-4b16-1797c093edb5@arm.com> <20170112104253.GB13547@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 37EB140284
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 05:48:24 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id B9ILbaUQAMyJ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Jan 2017 05:48:22 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 913ED404F1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 05:48:22 -0500 (EST)
 In-Reply-To: <20170112104253.GB13547@cbox>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: Dmitry Vyukov <dvyukov@google.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, KVM list <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, syzkaller <syzkaller@googlegroups.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: KVM list <kvm@vger.kernel.org>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, LKML <linux-kernel@vger.kernel.org>, syzkaller <syzkaller@googlegroups.com>, Dmitry Vyukov <dvyukov@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
-
-Hi,
 
 On 12/01/17 10:42, Christoffer Dall wrote:
 > On Thu, Jan 12, 2017 at 10:30:39AM +0000, Marc Zyngier wrote:
@@ -192,15 +208,7 @@ On 12/01/17 10:42, Christoffer Dall wrote:
 > 
 > Hmm, not a fan of passing this variable around.  How about this instead
 > then (untested):
-
-Yes, I like that version more.
-And if we now move the calls to __kvm_vgic_destroy() into vgic-init.c
-(as in Marc's first patch, but just before dropping the lock), we don't
-even need to export __kvm_vgic_destroy(), right?
-
-Cheers,
-Andre.
-
+> 
 > diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
 > index 5114391..a25806b 100644
 > --- a/virt/kvm/arm/vgic/vgic-init.c
@@ -246,6 +254,11 @@ Andre.
 > +	mutex_unlock(&kvm->lock);
 > +}
 > +
+
+I initially wrote that exactly, but ended up deciding against as it
+changes the locking more than strictly necessary. On the other hand, I
+think this looks better, so if everyone agrees I'll take that.
+
 >  /**
 >   * vgic_lazy_init: Lazy init is only allowed if the GIC exposed to the guest
 >   * is a GICv2. A GICv3 must be explicitly initialized by the guest using the
@@ -272,24 +285,12 @@ Andre.
 >  	if (ret)
 > -		kvm_vgic_destroy(kvm);
 > +		__kvm_vgic_destroy(kvm);
->  	return ret;
->  }
->  
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 859f65c..74a0bbb 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -37,6 +37,8 @@ struct vgic_vmcr {
->  	u32	pmr;
->  };
->  
-> +void __kvm_vgic_destroy(struct kvm *kvm);
-> +
->  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  			      u32 intid);
->  void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
-> 
-> 
-> Thanks,
-> -Christoffer
-> 
+
+I'm still keen on factoring the destroy calls in the calling function.
+Is there any reason why we wouldn't do it?
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
