@@ -1,77 +1,121 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 2/5] arm64: Work around Falkor erratum 1003
-Date: Thu, 12 Jan 2017 15:55:58 +0000
-Message-ID: <20170112155558.ud4ln3lk5lpwxrq3@localhost>
-References: <20170111144118.17062-1-cov@codeaurora.org>
- <20170111144118.17062-2-cov@codeaurora.org>
- <20170111180627.GG20288@e104818-lin.cambridge.arm.com>
- <278a45c0-bd49-b8a2-63ae-80ad851bab9b@arm.com>
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [RFC 01/13] KVM: arm/arm64: Add vITS save/restore API documentation
+Date: Thu, 12 Jan 2017 16:56:41 +0100
+Message-ID: <1484236613-24633-2-git-send-email-eric.auger@redhat.com>
+References: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <278a45c0-bd49-b8a2-63ae-80ad851bab9b@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christopher Covington <cov@codeaurora.org>, Mark Langsdorf <mlangsdo@redhat.com>, linux-doc@vger.kernel.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Jon Masters <jcm@redhat.com>, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, shankerd@codeaurora.org, Christoffer Dall <christoffer.dall@linaro.org>, Mark Salter <msalter@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22DF540430
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 10:55:21 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WAXZxe6mdiBw for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Jan 2017 10:55:19 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00C3B403FB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 10:55:19 -0500 (EST)
+In-Reply-To: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 11, 2017 at 06:22:08PM +0000, Marc Zyngier wrote:
-> On 11/01/17 18:06, Catalin Marinas wrote:
-> > On Wed, Jan 11, 2017 at 09:41:15AM -0500, Christopher Covington wrote:
-> >> diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-> >> index 32682be..9ee46df 100644
-> >> --- a/arch/arm64/mm/proc.S
-> >> +++ b/arch/arm64/mm/proc.S
-> >> @@ -23,6 +23,7 @@
-> >>  #include <asm/assembler.h>
-> >>  #include <asm/asm-offsets.h>
-> >>  #include <asm/hwcap.h>
-> >> +#include <asm/mmu_context.h>
-> >>  #include <asm/pgtable.h>
-> >>  #include <asm/pgtable-hwdef.h>
-> >>  #include <asm/cpufeature.h>
-> >> @@ -140,6 +141,18 @@ ENDPROC(cpu_do_resume)
-> >>  ENTRY(cpu_do_switch_mm)
-> >>  	mmid	x1, x1				// get mm->context.id
-> >>  	bfi	x0, x1, #48, #16		// set the ASID
-> >> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1003
-> >> +alternative_if ARM64_WORKAROUND_QCOM_FALKOR_E1003
-> >> +	mrs     x2, ttbr0_el1
-> >> +	mov     x3, #FALKOR_RESERVED_ASID
-> >> +	bfi     x2, x3, #48, #16                // reserved ASID + old BADDR
-> >> +	msr     ttbr0_el1, x2
-> >> +	isb
-> >> +	bfi     x2, x0, #0, #48                 // reserved ASID + new BADDR
-> >> +	msr     ttbr0_el1, x2
-> >> +	isb
-> >> +alternative_else_nop_endif
-> >> +#endif
-> >>  	msr	ttbr0_el1, x0			// set TTBR0
-> >>  	isb
-> >>  	post_ttbr0_update_workaround
-> > 
-> > Please move the above hunk to a pre_ttbr0_update_workaround macro for
-> > consistency with post_ttbr0_update_workaround.
-> 
-> In which case (and also for consistency), should we add that pre_ttbr0
-> macro to entry.S, just before __uaccess_ttbr0_enable? It may not be
-> needed in the SW pan case, but it is probably worth entertaining the
-> idea that there may be something to do there...
+Add description for how to access vITS registers and how to flush/restore
+vITS tables into/from memory
 
-It may actually be needed in entry.S as well. With SW PAN, we move the
-context switching from cpu_do_switch_mm to the kernel_exit macro when
-returning to user. In this case we are switching from the reserved ASID
-0 and reserved TTBR0_EL1 (pointing to a zeroed page) to the user's
-TTBR0_EL1 and ASID. If the ASID switch isn't taken into account, we may
-end up with new TLB entries being tagged with the reserved ASID. Apart
-from a potential loss of protection with TTBR0 PAN, is there anything
-else that could go wrong? Maybe a TLB conflict if we mix TLBs from
-multiple address spaces tagged with the same reserved ASID.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ Documentation/virtual/kvm/devices/arm-vgic-its.txt | 70 ++++++++++++++++++++++
+ 1 file changed, 70 insertions(+)
 
-If the above is an issue, we would need to patch
-__uaccess_ttbr0_enable() as well, though I'm more inclined to make this
-erratum not selectable when TTBR0 PAN is enabled.
-
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+index 6081a5b..bd74613 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+@@ -36,3 +36,73 @@ Groups:
+     -ENXIO:  ITS not properly configured as required prior to setting
+              this attribute
+     -ENOMEM: Memory shortage when allocating ITS internal data
++
++  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
++  Attributes:
++      The attr field of kvm_device_attr encodes the offset of the
++      ITS register, relative to the ITS control frame base address
++      (ITS_base).
++
++      kvm_device_attr.addr points to a __u64 value whatever the width
++      of the addressed register (32/64 bits).
++
++      Writes to read-only registers are ignored by the kernel except
++      for a single register, GITS_READR. Normally this register is RO
++      but it needs to be restored otherwise commands in the queue will
++      be re-executed after CWRITER setting.
++
++      For other registers, Getting or setting a register has the same
++      effect as reading/writing the register on real hardware.
++  Errors:
++    -ENXIO: Offset does not correspond to any supported register
++    -EFAULT: Invalid user pointer for attr->addr
++    -EINVAL: Offset is not 64-bit aligned
++
++  KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
++  Attributes
++       The attr field of kvm_device_attr is not used.
++
++       request the flush-save/restore of the ITS tables, namely
++       the device table, the collection table, all the ITT tables,
++       the LPI pending tables. On save, the tables are flushed
++       into guest memory at the location provisionned by the guest
++       in GITS_BASER (device and collection tables), on MAPD command
++       (ITT_addr), GICR_PENDBASERs (pending tables).
++
++       This means the GIC should be restored before the ITS and all
++       ITS registers but the GITS_CTRL must be restored before
++       restoring the ITS tables.
++
++       Note the LPI configuration table is read-only for the
++       in-kernel ITS and its save/restore goes through the standard
++       RAM save/restore.
++
++       The layout of the tables in guest memory defines an ABI.
++       The entries are laid out in memory as follows;
++
++    Device Table Entry (DTE) layout: entry size = 16 bytes
++
++    bits:     | 63   ...  32  | 31 ... 6 | 5 | 4   ...   0 |
++    values:   |   DeviceID    |   Resv   | V |    Size     |
++
++    bits:     | 63 ... 44 | 43  ...  0  |
++    values:   |    Resv   |  ITT_addr   |
++
++    Collection Table Entry (CTE) layout: entry size = 8 bytes
++
++    bits:     | 63| 62 ..  52  | 51 ... 16 | 15  ...   0 |
++    values:   | V |    RES0    |  RDBase   |    ICID     |
++
++    Interrupt Translation Table Entry (ITTE) layout: entry size = 16 bytes
++
++    bits:     | 63   ...  32  | 31 ... 17 | 16 | 15  ...  0 |
++    values:   |   DeviceID    |    RES0   | V  |    ICID    |
++
++    bits:     | 63 ...  32    | 31      ...        0 |
++    values:   |   pINTID      |        EventID       |
++
++    LPI Pending Table layout:
++
++    As specified in the ARM Generic Interrupt Controller Architecture
++    Specification GIC Architecture version 3.0 and version 4. The first
++    1kB contains only zeros.
 -- 
-Catalin
+2.5.5
