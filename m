@@ -1,155 +1,126 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC 01/13] KVM: arm/arm64: Add vITS save/restore API
- documentation
-Date: Thu, 12 Jan 2017 16:52:54 +0000
-Message-ID: <4fe81c1b-9956-d458-b0ef-b7219f1249fe@arm.com>
-References: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
- <1484236613-24633-2-git-send-email-eric.auger@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 1/6] libcflat: add PRI(dux)32 format types
+Date: Thu, 12 Jan 2017 17:56:29 +0100
+Message-ID: <20170112165629.nbczamlqlpsqaauh@hawk.localdomain>
+References: <20170111162841.15569-1-alex.bennee@linaro.org>
+ <20170111162841.15569-2-alex.bennee@linaro.org>
+ <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9633F4027C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 11:51:13 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QOZgrb1r75Zs for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Jan 2017 11:51:12 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 32E9F4025C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 11:51:12 -0500 (EST)
-In-Reply-To: <1484236613-24633-2-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, Prasun.Kapoor@cavium.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
-
-On 12/01/17 15:56, Eric Auger wrote:
-> Add description for how to access vITS registers and how to flush/restore
-> vITS tables into/from memory
+On Thu, Jan 12, 2017 at 01:29:24PM +0100, Paolo Bonzini wrote:
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 70 ++++++++++++++++++++++
->  1 file changed, 70 insertions(+)
 > 
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> index 6081a5b..bd74613 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> @@ -36,3 +36,73 @@ Groups:
->      -ENXIO:  ITS not properly configured as required prior to setting
->               this attribute
->      -ENOMEM: Memory shortage when allocating ITS internal data
-> +
-> +  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-> +  Attributes:
-> +      The attr field of kvm_device_attr encodes the offset of the
-> +      ITS register, relative to the ITS control frame base address
-> +      (ITS_base).
-> +
-> +      kvm_device_attr.addr points to a __u64 value whatever the width
-> +      of the addressed register (32/64 bits).
-> +
-> +      Writes to read-only registers are ignored by the kernel except
-> +      for a single register, GITS_READR. Normally this register is RO
-> +      but it needs to be restored otherwise commands in the queue will
-> +      be re-executed after CWRITER setting.
-> +
-> +      For other registers, Getting or setting a register has the same
-> +      effect as reading/writing the register on real hardware.
-> +  Errors:
-> +    -ENXIO: Offset does not correspond to any supported register
-> +    -EFAULT: Invalid user pointer for attr->addr
-> +    -EINVAL: Offset is not 64-bit aligned
-> +
-> +  KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
-> +  Attributes
-> +       The attr field of kvm_device_attr is not used.
-> +
-> +       request the flush-save/restore of the ITS tables, namely
-> +       the device table, the collection table, all the ITT tables,
-> +       the LPI pending tables. On save, the tables are flushed
-> +       into guest memory at the location provisionned by the guest
-
-					    provisioned
-
-> +       in GITS_BASER (device and collection tables), on MAPD command
-> +       (ITT_addr), GICR_PENDBASERs (pending tables).
-> +
-> +       This means the GIC should be restored before the ITS and all
-> +       ITS registers but the GITS_CTRL must be restored before
-> +       restoring the ITS tables.
-> +
-> +       Note the LPI configuration table is read-only for the
-> +       in-kernel ITS and its save/restore goes through the standard
-> +       RAM save/restore.
-> +
-> +       The layout of the tables in guest memory defines an ABI.
-> +       The entries are laid out in memory as follows;
-> +
-> +    Device Table Entry (DTE) layout: entry size = 16 bytes
-> +
-> +    bits:     | 63   ...  32  | 31 ... 6 | 5 | 4   ...   0 |
-> +    values:   |   DeviceID    |   Resv   | V |    Size     |
-> +
-> +    bits:     | 63 ... 44 | 43  ...  0  |
-> +    values:   |    Resv   |  ITT_addr   |
-
-While I appreciate this layout represents the absolute maximum an ITS
-could implement, I'm a bit concerned about the amount of memory we may
-end-up requiring here. All the ITSs implementations I know of seem to
-get away with 8 bytes per entry. Maybe I'm just too worried.
-
-Also, please mention that ITT_addr is actually ITT_addr[51:8], as we're
-guaranteed to have an ITT that is 256 byte aligned.
-
-> +
-> +    Collection Table Entry (CTE) layout: entry size = 8 bytes
-> +
-> +    bits:     | 63| 62 ..  52  | 51 ... 16 | 15  ...   0 |
-> +    values:   | V |    RES0    |  RDBase   |    ICID     |
-> +
-> +    Interrupt Translation Table Entry (ITTE) layout: entry size = 16 bytes
-
-The actual name is Interrupt Translation Entry (ITE). I have a patch
-renaming this all over the vgic-its.c file...
-
-> +
-> +    bits:     | 63   ...  32  | 31 ... 17 | 16 | 15  ...  0 |
-> +    values:   |   DeviceID    |    RES0   | V  |    ICID    |
-> +
-> +    bits:     | 63 ...  32    | 31      ...        0 |
-> +    values:   |   pINTID      |        EventID       |
-
-Same concern here. 32bit DevID, EventID and INTID seem a bit over the
-top. But maybe we shouldn't be concerned about memory... ;-)
-
-> +
-> +    LPI Pending Table layout:
-> +
-> +    As specified in the ARM Generic Interrupt Controller Architecture
-> +    Specification GIC Architecture version 3.0 and version 4. The first
-> +    1kB contains only zeros.
+> On 11/01/2017 17:28, Alex Bennée wrote:
+> > So we can have portable formatting of uint32_t types. However there is
+> > a catch. Different compilers can use legally subtly different types
+> > though so we need to probe the compiler defined intdef.h first.
 > 
+> Interesting, what platform has long uint32_t?  I thought the issue was
+> whether 64-bit is long or "long long".
+> 
+> Paolo
+> 
+> > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> > ---
+> >  Makefile       |  1 +
+> >  configure      | 13 +++++++++++++
+> >  lib/libcflat.h |  9 +++++++++
+> >  3 files changed, 23 insertions(+)
+> > 
+> > diff --git a/Makefile b/Makefile
+> > index a32333b..9822d9a 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -55,6 +55,7 @@ CFLAGS += $(fomit_frame_pointer)
+> >  CFLAGS += $(fno_stack_protector)
+> >  CFLAGS += $(fno_stack_protector_all)
+> >  CFLAGS += $(wno_frame_address)
+> > +CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
+> >  
+> >  CXXFLAGS += $(CFLAGS)
+> >  
+> > diff --git a/configure b/configure
+> > index 995c8fa..127868c 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -109,6 +109,18 @@ if [ -f $testdir/run ]; then
+> >      ln -fs $testdir/run $testdir-run
+> >  fi
+> >  
+> > +# check if uint32_t needs a long format modifier
+> > +cat << EOF > lib_test.c
+> > +#include <inttypes.h>
+> > +EOF
+> > +
+> > +$cross_prefix$cc lib_test.c -E | grep "typedef" | grep "long" | grep "uint32_t" &> /dev/null
 
-You definitely want to relax this. An ITS implementation is allowed (and
-actually encouraged) to maintain a coarse map in the first kB, and use
-this to quickly scan the table, which would be very useful on restore.
+This won't work with cross compilers that don't have inttypes.h in their
+path (like mine). How about something like
+
+ cat << EOF > lib_test.c
+ __UINT32_TYPE__
+ EOF
+ u32_long="`aarch64-linux-gnu-gcc lib_test.c -E | awk '/unsigned/ && $2 == "long"'`"
+
+Although I feel there should be a compiler macro way to do this without
+a need for configure/makefile trickery at all...
 
 Thanks,
+drew
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+
+> > +exit=$?
+> > +if [ $exit -eq 0 ]; then
+> > +    u32_long=true
+> > +fi
+> > +rm -f lib_test.c
+> > +
+> >  # check for dependent 32 bit libraries
+> >  if [ "$arch" != "arm" ]; then
+> >  cat << EOF > lib_test.c
+> > @@ -155,4 +167,5 @@ TEST_DIR=$testdir
+> >  FIRMWARE=$firmware
+> >  ENDIAN=$endian
+> >  PRETTY_PRINT_STACKS=$pretty_print_stacks
+> > +U32_LONG_FMT=$u32_long
+> >  EOF
+> > diff --git a/lib/libcflat.h b/lib/libcflat.h
+> > index 380395f..e80fc50 100644
+> > --- a/lib/libcflat.h
+> > +++ b/lib/libcflat.h
+> > @@ -58,12 +58,21 @@ typedef _Bool		bool;
+> >  #define true  1
+> >  
+> >  #if __SIZEOF_LONG__ == 8
+> > +#  define __PRI32_PREFIX
+> >  #  define __PRI64_PREFIX	"l"
+> >  #  define __PRIPTR_PREFIX	"l"
+> >  #else
+> > +#if defined(__U32_LONG_FMT__)
+> > +#  define __PRI32_PREFIX        "l"
+> > +#else
+> > +#  define __PRI32_PREFIX
+> > +#endif
+> >  #  define __PRI64_PREFIX	"ll"
+> >  #  define __PRIPTR_PREFIX
+> >  #endif
+> > +#define PRId32  __PRI32_PREFIX	"d"
+> > +#define PRIu32  __PRI32_PREFIX	"u"
+> > +#define PRIx32  __PRI32_PREFIX	"x"
+> >  #define PRId64  __PRI64_PREFIX	"d"
+> >  #define PRIu64  __PRI64_PREFIX	"u"
+> >  #define PRIx64  __PRI64_PREFIX	"x"
+> > 
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
