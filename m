@@ -1,14 +1,14 @@
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 1/6] libcflat: add PRI(dux)32 format types
-Date: Thu, 12 Jan 2017 13:29:24 +0100
-Message-ID: <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 4/6] docs: mention checkpatch in the README
+Date: Thu, 12 Jan 2017 13:29:52 +0100
+Message-ID: <322298cd-aefa-e945-d3f4-1237767a06ef@redhat.com>
 References: <20170111162841.15569-1-alex.bennee@linaro.org>
- <20170111162841.15569-2-alex.bennee@linaro.org>
+ <20170111162841.15569-5-alex.bennee@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170111162841.15569-2-alex.bennee@linaro.org>
+In-Reply-To: <20170111162841.15569-5-alex.bennee@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, drjones@redhat.com
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
@@ -17,87 +17,21 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 
 On 11/01/2017 17:28, Alex Bennée wrote:
-> So we can have portable formatting of uint32_t types. However there is
-> a catch. Different compilers can use legally subtly different types
-> though so we need to probe the compiler defined intdef.h first.
-
-Interesting, what platform has long uint32_t?  I thought the issue was
-whether 64-bit is long or "long long".
-
-Paolo
-
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  Makefile       |  1 +
->  configure      | 13 +++++++++++++
->  lib/libcflat.h |  9 +++++++++
->  3 files changed, 23 insertions(+)
+>  README.md | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/Makefile b/Makefile
-> index a32333b..9822d9a 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -55,6 +55,7 @@ CFLAGS += $(fomit_frame_pointer)
->  CFLAGS += $(fno_stack_protector)
->  CFLAGS += $(fno_stack_protector_all)
->  CFLAGS += $(wno_frame_address)
-> +CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
+> diff --git a/README.md b/README.md
+> index 5027b62..9462824 100644
+> --- a/README.md
+> +++ b/README.md
+> @@ -79,3 +79,4 @@ You can add the following to .git/config to do this automatically for you:
+>      [format]
+>          subjectprefix = kvm-unit-tests PATCH
 >  
->  CXXFLAGS += $(CFLAGS)
->  
-> diff --git a/configure b/configure
-> index 995c8fa..127868c 100755
-> --- a/configure
-> +++ b/configure
-> @@ -109,6 +109,18 @@ if [ -f $testdir/run ]; then
->      ln -fs $testdir/run $testdir-run
->  fi
->  
-> +# check if uint32_t needs a long format modifier
-> +cat << EOF > lib_test.c
-> +#include <inttypes.h>
-> +EOF
-> +
-> +$cross_prefix$cc lib_test.c -E | grep "typedef" | grep "long" | grep "uint32_t" &> /dev/null
-> +exit=$?
-> +if [ $exit -eq 0 ]; then
-> +    u32_long=true
-> +fi
-> +rm -f lib_test.c
-> +
->  # check for dependent 32 bit libraries
->  if [ "$arch" != "arm" ]; then
->  cat << EOF > lib_test.c
-> @@ -155,4 +167,5 @@ TEST_DIR=$testdir
->  FIRMWARE=$firmware
->  ENDIAN=$endian
->  PRETTY_PRINT_STACKS=$pretty_print_stacks
-> +U32_LONG_FMT=$u32_long
->  EOF
-> diff --git a/lib/libcflat.h b/lib/libcflat.h
-> index 380395f..e80fc50 100644
-> --- a/lib/libcflat.h
-> +++ b/lib/libcflat.h
-> @@ -58,12 +58,21 @@ typedef _Bool		bool;
->  #define true  1
->  
->  #if __SIZEOF_LONG__ == 8
-> +#  define __PRI32_PREFIX
->  #  define __PRI64_PREFIX	"l"
->  #  define __PRIPTR_PREFIX	"l"
->  #else
-> +#if defined(__U32_LONG_FMT__)
-> +#  define __PRI32_PREFIX        "l"
-> +#else
-> +#  define __PRI32_PREFIX
-> +#endif
->  #  define __PRI64_PREFIX	"ll"
->  #  define __PRIPTR_PREFIX
->  #endif
-> +#define PRId32  __PRI32_PREFIX	"d"
-> +#define PRIu32  __PRI32_PREFIX	"u"
-> +#define PRIx32  __PRI32_PREFIX	"x"
->  #define PRId64  __PRI64_PREFIX	"d"
->  #define PRIu64  __PRI64_PREFIX	"u"
->  #define PRIx64  __PRI64_PREFIX	"x"
-> 
+> +Please run the kernel's ./scripts/checkpatch.pl on new patches
+
+Does it really work well on kvm-unit-tests?
+
+Paolo
