@@ -1,64 +1,115 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 2/6] lib/pci: fix BAR format strings
-Date: Thu, 12 Jan 2017 13:35:58 +0100
-Message-ID: <faf255f3-2a97-4b94-9866-161060f646a1@redhat.com>
-References: <20170111162841.15569-1-alex.bennee@linaro.org>
- <20170111162841.15569-3-alex.bennee@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [kvm-unit-tests PATCH 1/6] libcflat: add PRI(dux)32 format types
+Date: Thu, 12 Jan 2017 12:39:50 +0000
+Message-ID: <87k2a0310p.fsf@linaro.org>
+References: <20170111162841.15569-1-alex.bennee@linaro.org> <20170111162841.15569-2-alex.bennee@linaro.org> <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 362DB403F8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 07:34:15 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PDQ2eJ0-AVnK for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Jan 2017 07:34:14 -0500 (EST)
-Received: from mail-wj0-f195.google.com (mail-wj0-f195.google.com
- [209.85.210.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B2154027C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 07:34:13 -0500 (EST)
-Received: by mail-wj0-f195.google.com with SMTP id ey1so1722840wjd.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 04:35:59 -0800 (PST)
-In-Reply-To: <20170111162841.15569-3-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, drjones@redhat.com
-Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: drjones@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CgpPbiAxMS8wMS8yMDE3IDE3OjI4LCBBbGV4IEJlbm7DqWUgd3JvdGU6Cj4gVXNpbmcgJXggYXMg
-YSBmb3JtYXQgc3RyaW5nIGlzIG5vdCBwb3J0YWJsZSBhY3Jvc3MgMzIvNjQgYml0IGJ1aWxkcy4K
-PiBVc2UgZXhwbGljaXQgUFJJeDMyIGZvcm1hdCBzdHJpbmdzIGxpa2UgdGhlIDY0IGJpdCB2ZXJz
-aW9uIGFib3ZlLgo+IAo+IFNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVA
-bGluYXJvLm9yZz4KPiAtLS0KPiAgbGliL3BjaS5jIHwgNCArKy0tCj4gIDEgZmlsZSBjaGFuZ2Vk
-LCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCj4gCj4gZGlmZiAtLWdpdCBhL2xpYi9w
-Y2kuYyBiL2xpYi9wY2kuYwo+IGluZGV4IDY0MTYxOTEuLjU5N2Q4ZjIgMTAwNjQ0Cj4gLS0tIGEv
-bGliL3BjaS5jCj4gKysrIGIvbGliL3BjaS5jCj4gQEAgLTY3LDcgKzY3LDcgQEAgYm9vbCBwY2lf
-c2V0dXBfbXNpKHN0cnVjdCBwY2lfZGV2ICpkZXYsIHVpbnQ2NF90IG1zaV9hZGRyLCB1aW50MzJf
-dCBtc2lfZGF0YSkKPiAgCQlwY2lfY29uZmlnX3dyaXRlbChhZGRyLCBvZmZzZXQgKyBQQ0lfTVNJ
-X0RBVEFfMzIsIG1zaV9kYXRhKTsKPiAgCQlwcmludGYoIk1TSTogZGV2IDB4JXggaW5pdCAzMmJp
-dCBhZGRyZXNzOiAiLCBhZGRyKTsKPiAgCX0KPiAtCXByaW50ZigiYWRkcj0weCVseCwgZGF0YT0w
-eCV4XG4iLCBtc2lfYWRkciwgbXNpX2RhdGEpOwo+ICsJcHJpbnRmKCJhZGRyPTB4JSIgUFJJeDY0
-ICIsIGRhdGE9MHglIiBQUkl4MzIgIlxuIiwgbXNpX2FkZHIsIG1zaV9kYXRhKTsKCkFwcGx5aW5n
-IG9ubHkgdGhlICVseCAtPiAlIlBSSXg2NCIgY2hhbmdlIGZvciBub3cgKHRob3VnaCBpdCdzIGFs
-c28gaW4KQW5kcmV3J3MgMzItYml0IGNvbXBpbGF0aW9uIGZpeGVzIHBhdGNoKS4KClBhb2xvCj4g
-IAo+ICAJbXNpX2NvbnRyb2wgfD0gUENJX01TSV9GTEFHU19FTkFCTEU7Cj4gIAlwY2lfY29uZmln
-X3dyaXRldyhhZGRyLCBvZmZzZXQgKyBQQ0lfTVNJX0ZMQUdTLCBtc2lfY29udHJvbCk7Cj4gQEAg
-LTIzNyw3ICsyMzcsNyBAQCB2b2lkIHBjaV9iYXJfcHJpbnQoc3RydWN0IHBjaV9kZXYgKmRldiwg
-aW50IGJhcl9udW0pCj4gIAkJcHJpbnRmKCJCQVIjJWQsJWQgWyUiIFBSSXg2NCAiLSUiIFBSSXg2
-NCAiICIsCj4gIAkJICAgICAgIGJhcl9udW0sIGJhcl9udW0gKyAxLCBzdGFydCwgZW5kKTsKPiAg
-CX0gZWxzZSB7Cj4gLQkJcHJpbnRmKCJCQVIjJWQgWyUwMngtJTAyeCAiLAo+ICsJCXByaW50Zigi
-QkFSIyVkIFslIiBQUkl4MzIgIi0lIiBQUkl4MzIgIiAiLAo+ICAJCSAgICAgICBiYXJfbnVtLCAo
-dWludDMyX3Qpc3RhcnQsICh1aW50MzJfdCllbmQpOwo+ICAJfQo+ICAKPiAKX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdApr
-dm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1
-L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 11/01/2017 17:28, Alex Bennée wrote:
+>> So we can have portable formatting of uint32_t types. However there is
+>> a catch. Different compilers can use legally subtly different types
+>> though so we need to probe the compiler defined intdef.h first.
+>
+> Interesting, what platform has long uint32_t?  I thought the issue was
+> whether 64-bit is long or "long long".
+
+I haven't run into that one. This came up with the arm-none-eabi-gcc on
+my overdrive01 box. According to the toolchain guys there is no particular
+reason a 32bit compiler can't use long for its natural word length.
+
+The native compiler on Debian armhf doesn't do this but the
+arm-none-eabi-gcc compilers on both 64bit and 32bit Debian need this.
+
+>
+> Paolo
+>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>  Makefile       |  1 +
+>>  configure      | 13 +++++++++++++
+>>  lib/libcflat.h |  9 +++++++++
+>>  3 files changed, 23 insertions(+)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index a32333b..9822d9a 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -55,6 +55,7 @@ CFLAGS += $(fomit_frame_pointer)
+>>  CFLAGS += $(fno_stack_protector)
+>>  CFLAGS += $(fno_stack_protector_all)
+>>  CFLAGS += $(wno_frame_address)
+>> +CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
+>>
+>>  CXXFLAGS += $(CFLAGS)
+>>
+>> diff --git a/configure b/configure
+>> index 995c8fa..127868c 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -109,6 +109,18 @@ if [ -f $testdir/run ]; then
+>>      ln -fs $testdir/run $testdir-run
+>>  fi
+>>
+>> +# check if uint32_t needs a long format modifier
+>> +cat << EOF > lib_test.c
+>> +#include <inttypes.h>
+>> +EOF
+>> +
+>> +$cross_prefix$cc lib_test.c -E | grep "typedef" | grep "long" | grep "uint32_t" &> /dev/null
+>> +exit=$?
+>> +if [ $exit -eq 0 ]; then
+>> +    u32_long=true
+>> +fi
+>> +rm -f lib_test.c
+>> +
+>>  # check for dependent 32 bit libraries
+>>  if [ "$arch" != "arm" ]; then
+>>  cat << EOF > lib_test.c
+>> @@ -155,4 +167,5 @@ TEST_DIR=$testdir
+>>  FIRMWARE=$firmware
+>>  ENDIAN=$endian
+>>  PRETTY_PRINT_STACKS=$pretty_print_stacks
+>> +U32_LONG_FMT=$u32_long
+>>  EOF
+>> diff --git a/lib/libcflat.h b/lib/libcflat.h
+>> index 380395f..e80fc50 100644
+>> --- a/lib/libcflat.h
+>> +++ b/lib/libcflat.h
+>> @@ -58,12 +58,21 @@ typedef _Bool		bool;
+>>  #define true  1
+>>
+>>  #if __SIZEOF_LONG__ == 8
+>> +#  define __PRI32_PREFIX
+>>  #  define __PRI64_PREFIX	"l"
+>>  #  define __PRIPTR_PREFIX	"l"
+>>  #else
+>> +#if defined(__U32_LONG_FMT__)
+>> +#  define __PRI32_PREFIX        "l"
+>> +#else
+>> +#  define __PRI32_PREFIX
+>> +#endif
+>>  #  define __PRI64_PREFIX	"ll"
+>>  #  define __PRIPTR_PREFIX
+>>  #endif
+>> +#define PRId32  __PRI32_PREFIX	"d"
+>> +#define PRIu32  __PRI32_PREFIX	"u"
+>> +#define PRIx32  __PRI32_PREFIX	"x"
+>>  #define PRId64  __PRI64_PREFIX	"d"
+>>  #define PRIu64  __PRI64_PREFIX	"u"
+>>  #define PRIx64  __PRI64_PREFIX	"x"
+>>
+
+
+--
+Alex Bennée
