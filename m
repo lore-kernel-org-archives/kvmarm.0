@@ -1,162 +1,52 @@
-From: Andrew Jones <drjones@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [kvm-unit-tests PATCH 1/6] libcflat: add PRI(dux)32 format types
-Date: Thu, 12 Jan 2017 18:43:03 +0100
-Message-ID: <20170112174303.7abj3gtcqawumkl7@hawk.localdomain>
+Date: Thu, 12 Jan 2017 18:44:27 +0100
+Message-ID: <144fdce4-ddd4-0c93-296b-44aeec57c664@redhat.com>
 References: <20170111162841.15569-1-alex.bennee@linaro.org>
  <20170111162841.15569-2-alex.bennee@linaro.org>
  <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
  <20170112165629.nbczamlqlpsqaauh@hawk.localdomain>
  <87fuko2o4e.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD2384019A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 12:42:43 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id XNW3J6hZJGEV for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Jan 2017 12:42:43 -0500 (EST)
+Received: from mail-lf0-f66.google.com (mail-lf0-f66.google.com
+ [209.85.215.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D633E40194
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 12:42:42 -0500 (EST)
+Received: by mail-lf0-f66.google.com with SMTP id v186so2899493lfa.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 09:44:28 -0800 (PST)
 In-Reply-To: <87fuko2o4e.fsf@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 12, 2017 at 05:18:25PM +0000, Alex Bennée wrote:
-> 
-> Andrew Jones <drjones@redhat.com> writes:
-> 
-> > On Thu, Jan 12, 2017 at 01:29:24PM +0100, Paolo Bonzini wrote:
-> >>
-> >>
-> >> On 11/01/2017 17:28, Alex Bennée wrote:
-> >> > So we can have portable formatting of uint32_t types. However there is
-> >> > a catch. Different compilers can use legally subtly different types
-> >> > though so we need to probe the compiler defined intdef.h first.
-> >>
-> >> Interesting, what platform has long uint32_t?  I thought the issue was
-> >> whether 64-bit is long or "long long".
-> >>
-> >> Paolo
-> >>
-> >> > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> >> > ---
-> >> >  Makefile       |  1 +
-> >> >  configure      | 13 +++++++++++++
-> >> >  lib/libcflat.h |  9 +++++++++
-> >> >  3 files changed, 23 insertions(+)
-> >> >
-> >> > diff --git a/Makefile b/Makefile
-> >> > index a32333b..9822d9a 100644
-> >> > --- a/Makefile
-> >> > +++ b/Makefile
-> >> > @@ -55,6 +55,7 @@ CFLAGS += $(fomit_frame_pointer)
-> >> >  CFLAGS += $(fno_stack_protector)
-> >> >  CFLAGS += $(fno_stack_protector_all)
-> >> >  CFLAGS += $(wno_frame_address)
-> >> > +CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
-> >> >
-> >> >  CXXFLAGS += $(CFLAGS)
-> >> >
-> >> > diff --git a/configure b/configure
-> >> > index 995c8fa..127868c 100755
-> >> > --- a/configure
-> >> > +++ b/configure
-> >> > @@ -109,6 +109,18 @@ if [ -f $testdir/run ]; then
-> >> >      ln -fs $testdir/run $testdir-run
-> >> >  fi
-> >> >
-> >> > +# check if uint32_t needs a long format modifier
-> >> > +cat << EOF > lib_test.c
-> >> > +#include <inttypes.h>
-> >> > +EOF
-> >> > +
-> >> > +$cross_prefix$cc lib_test.c -E | grep "typedef" | grep "long" | grep "uint32_t" &> /dev/null
-> >
-> > This won't work with cross compilers that don't have inttypes.h in their
-> > path (like mine). How about something like
-> 
-> Hmm good point, in my case inttypes.h came from the libnewlib-dev package.
-> 
-> >
-> >  cat << EOF > lib_test.c
-> >  __UINT32_TYPE__
-> >  EOF
-> >  u32_long="`aarch64-linux-gnu-gcc lib_test.c -E | awk '/unsigned/ && $2 == "long"'`"
-> 
-> Hmm it is not clear from the docs if this is a GCCism. If it is do we
-> care? Also the docs do say:
-
-I think we're pretty bound to gcc already. I guess until somebody picks
-up the effort to get clang, or whatever, compiling runnable
-kvm-unit-tests, and commits to maintaining it, then I wouldn't worry too
-much about it...
-
-> 
-> "Some of these macros may not be defined on particular systems if GCC does not provide a stdint.h header on those systems. "
-
-We already expect stdint.h, we include it from libcflat.h.
-
-> 
-> > Although I feel there should be a compiler macro way to do this without
-> > a need for configure/makefile trickery at all...
-> 
-> I did ask our toolchain bods. They started going on about potential
-> solutions using _Generic but I fear that might be worse in this case!
-
-Yikes :-)
-
-drew
-
-> 
-> >
-> > Thanks,
-> > drew
-> >
-> >
-> >> > +exit=$?
-> >> > +if [ $exit -eq 0 ]; then
-> >> > +    u32_long=true
-> >> > +fi
-> >> > +rm -f lib_test.c
-> >> > +
-> >> >  # check for dependent 32 bit libraries
-> >> >  if [ "$arch" != "arm" ]; then
-> >> >  cat << EOF > lib_test.c
-> >> > @@ -155,4 +167,5 @@ TEST_DIR=$testdir
-> >> >  FIRMWARE=$firmware
-> >> >  ENDIAN=$endian
-> >> >  PRETTY_PRINT_STACKS=$pretty_print_stacks
-> >> > +U32_LONG_FMT=$u32_long
-> >> >  EOF
-> >> > diff --git a/lib/libcflat.h b/lib/libcflat.h
-> >> > index 380395f..e80fc50 100644
-> >> > --- a/lib/libcflat.h
-> >> > +++ b/lib/libcflat.h
-> >> > @@ -58,12 +58,21 @@ typedef _Bool		bool;
-> >> >  #define true  1
-> >> >
-> >> >  #if __SIZEOF_LONG__ == 8
-> >> > +#  define __PRI32_PREFIX
-> >> >  #  define __PRI64_PREFIX	"l"
-> >> >  #  define __PRIPTR_PREFIX	"l"
-> >> >  #else
-> >> > +#if defined(__U32_LONG_FMT__)
-> >> > +#  define __PRI32_PREFIX        "l"
-> >> > +#else
-> >> > +#  define __PRI32_PREFIX
-> >> > +#endif
-> >> >  #  define __PRI64_PREFIX	"ll"
-> >> >  #  define __PRIPTR_PREFIX
-> >> >  #endif
-> >> > +#define PRId32  __PRI32_PREFIX	"d"
-> >> > +#define PRIu32  __PRI32_PREFIX	"u"
-> >> > +#define PRIx32  __PRI32_PREFIX	"x"
-> >> >  #define PRId64  __PRI64_PREFIX	"d"
-> >> >  #define PRIu64  __PRI64_PREFIX	"u"
-> >> >  #define PRIx64  __PRI64_PREFIX	"x"
-> >> >
-> >> --
-> >> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> >> the body of a message to majordomo@vger.kernel.org
-> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> --
-> Alex Bennée
+CgpPbiAxMi8wMS8yMDE3IDE4OjE4LCBBbGV4IEJlbm7DqWUgd3JvdGU6Cj4+IEFsdGhvdWdoIEkg
+ZmVlbCB0aGVyZSBzaG91bGQgYmUgYSBjb21waWxlciBtYWNybyB3YXkgdG8gZG8gdGhpcyB3aXRo
+b3V0Cj4+IGEgbmVlZCBmb3IgY29uZmlndXJlL21ha2VmaWxlIHRyaWNrZXJ5IGF0IGFsbC4uLgo+
+IAo+IEkgZGlkIGFzayBvdXIgdG9vbGNoYWluIGJvZHMuIFRoZXkgc3RhcnRlZCBnb2luZyBvbiBh
+Ym91dCBwb3RlbnRpYWwKPiBzb2x1dGlvbnMgdXNpbmcgX0dlbmVyaWMgYnV0IEkgZmVhciB0aGF0
+IG1pZ2h0IGJlIHdvcnNlIGluIHRoaXMgY2FzZSEKCkkgZG9uJ3QgdGhpbmsgX0dlbmVyaWMgY2Fu
+IGRvIHN0cmluZyBjb25jYXRlbmF0aW9uLCBjYW4gaXQ/CgppbnR0eXBlcy5oIGlzIG5vdCBwYXJ0
+IG9mIHRoZSBzZXQgb2YgZnJlZXN0YW5kaW5nIGhlYWRlcnMsIG9ubHkgc3RkaW50LmgKaXMuICBX
+aG8gaXMgcHJvdmlkaW5nIHN0ZGludC5oIGluIHlvdXIgY2FzZT8KClBhb2xvCl9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QK
+a3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVk
+dS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
