@@ -1,181 +1,162 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 6/6] run_tests: allow passing of options
- to QEMU
-Date: Thu, 12 Jan 2017 18:32:04 +0100
-Message-ID: <20170112173204.ufd2ggw7iz7xv772@hawk.localdomain>
+Subject: Re: [kvm-unit-tests PATCH 1/6] libcflat: add PRI(dux)32 format types
+Date: Thu, 12 Jan 2017 18:43:03 +0100
+Message-ID: <20170112174303.7abj3gtcqawumkl7@hawk.localdomain>
 References: <20170111162841.15569-1-alex.bennee@linaro.org>
- <20170111162841.15569-7-alex.bennee@linaro.org>
+ <20170111162841.15569-2-alex.bennee@linaro.org>
+ <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
+ <20170112165629.nbczamlqlpsqaauh@hawk.localdomain>
+ <87fuko2o4e.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170111162841.15569-7-alex.bennee@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <87fuko2o4e.fsf@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 11, 2017 at 04:28:41PM +0000, Alex Benn=E9e wrote:
-> This allows additional options to be passed to QEMU. It follows the
-> convention of passing parameters after a -- to the child process. In
-> my case I'm using it to toggle MTTCG on an off:
-> =
+On Thu, Jan 12, 2017 at 05:18:25PM +0000, Alex Bennée wrote:
+> 
+> Andrew Jones <drjones@redhat.com> writes:
+> 
+> > On Thu, Jan 12, 2017 at 01:29:24PM +0100, Paolo Bonzini wrote:
+> >>
+> >>
+> >> On 11/01/2017 17:28, Alex Bennée wrote:
+> >> > So we can have portable formatting of uint32_t types. However there is
+> >> > a catch. Different compilers can use legally subtly different types
+> >> > though so we need to probe the compiler defined intdef.h first.
+> >>
+> >> Interesting, what platform has long uint32_t?  I thought the issue was
+> >> whether 64-bit is long or "long long".
+> >>
+> >> Paolo
+> >>
+> >> > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> >> > ---
+> >> >  Makefile       |  1 +
+> >> >  configure      | 13 +++++++++++++
+> >> >  lib/libcflat.h |  9 +++++++++
+> >> >  3 files changed, 23 insertions(+)
+> >> >
+> >> > diff --git a/Makefile b/Makefile
+> >> > index a32333b..9822d9a 100644
+> >> > --- a/Makefile
+> >> > +++ b/Makefile
+> >> > @@ -55,6 +55,7 @@ CFLAGS += $(fomit_frame_pointer)
+> >> >  CFLAGS += $(fno_stack_protector)
+> >> >  CFLAGS += $(fno_stack_protector_all)
+> >> >  CFLAGS += $(wno_frame_address)
+> >> > +CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
+> >> >
+> >> >  CXXFLAGS += $(CFLAGS)
+> >> >
+> >> > diff --git a/configure b/configure
+> >> > index 995c8fa..127868c 100755
+> >> > --- a/configure
+> >> > +++ b/configure
+> >> > @@ -109,6 +109,18 @@ if [ -f $testdir/run ]; then
+> >> >      ln -fs $testdir/run $testdir-run
+> >> >  fi
+> >> >
+> >> > +# check if uint32_t needs a long format modifier
+> >> > +cat << EOF > lib_test.c
+> >> > +#include <inttypes.h>
+> >> > +EOF
+> >> > +
+> >> > +$cross_prefix$cc lib_test.c -E | grep "typedef" | grep "long" | grep "uint32_t" &> /dev/null
+> >
+> > This won't work with cross compilers that don't have inttypes.h in their
+> > path (like mine). How about something like
+> 
+> Hmm good point, in my case inttypes.h came from the libnewlib-dev package.
+> 
+> >
+> >  cat << EOF > lib_test.c
+> >  __UINT32_TYPE__
+> >  EOF
+> >  u32_long="`aarch64-linux-gnu-gcc lib_test.c -E | awk '/unsigned/ && $2 == "long"'`"
+> 
+> Hmm it is not clear from the docs if this is a GCCism. If it is do we
+> care? Also the docs do say:
 
->   ./run_tests.sh -- --accel tcg,thread=3Dmulti
-> =
+I think we're pretty bound to gcc already. I guess until somebody picks
+up the effort to get clang, or whatever, compiling runnable
+kvm-unit-tests, and commits to maintaining it, then I wouldn't worry too
+much about it...
 
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> =
+> 
+> "Some of these macros may not be defined on particular systems if GCC does not provide a stdint.h header on those systems. "
 
-> ---
-> v1
->   - changes from -o to --
->   - fixed whitespace damage
-> ---
->  README.md              |  6 ++++++
->  run_tests.sh           | 13 +++++++++++--
->  scripts/functions.bash |  7 ++++---
->  3 files changed, 21 insertions(+), 5 deletions(-)
-> =
+We already expect stdint.h, we include it from libcflat.h.
 
-> diff --git a/README.md b/README.md
-> index fa3a445..1bd6dcb 100644
-> --- a/README.md
-> +++ b/README.md
-> @@ -55,6 +55,12 @@ To extend or disable the timeouts:
->  =
+> 
+> > Although I feel there should be a compiler macro way to do this without
+> > a need for configure/makefile trickery at all...
+> 
+> I did ask our toolchain bods. They started going on about potential
+> solutions using _Generic but I fear that might be worse in this case!
 
->      TIMEOUT=3D0 ./run_tests.sh
->  =
-
-> +Any arguments past the end-of-arguments marker (--) is passed on down
-> +to the QEMU invocation. This can of course be combined with the other
-> +modifiers:
-> +
-> +    ACCEL=3Dtcg ./run_tests.sh -v -- --accel tcg,thread=3Dmulti
-> +
->  # Contributing
->  =
-
->  ## Directory structure
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 254129d..3270fba 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -13,7 +13,7 @@ function usage()
->  {
->  cat <<EOF
->  =
-
-> -Usage: $0 [-g group] [-h] [-v]
-> +Usage: $0 [-g group] [-h] [-v] [-- QEMU options]
->  =
-
->      -g: Only execute tests in the given group
->      -h: Output this help text
-> @@ -22,6 +22,8 @@ Usage: $0 [-g group] [-h] [-v]
->  Set the environment variable QEMU=3D/path/to/qemu-system-ARCH to
->  specify the appropriate qemu binary for ARCH-run.
->  =
-
-> +All options specified after -- are passed on to QEMU.
-> +
->  EOF
->  }
->  =
-
-> @@ -29,6 +31,7 @@ RUNTIME_arch_run=3D"./$TEST_DIR/run"
->  source scripts/runtime.bash
->  =
-
->  while getopts "g:hv" opt; do
-> +
-
-stray blank line added?
-
->      case $opt in
->          g)
->              only_group=3D$OPTARG
-> @@ -46,6 +49,12 @@ while getopts "g:hv" opt; do
->      esac
->  done
->  =
-
-> +# Any options left for QEMU?
-> +shift $((OPTIND-1))
-> +if [ "$#" -gt  0 ]; then
-> +    extra_opts=3D"$@"
-> +fi
-
-We can unconditionally do the extra_opts=3D"$@", extra_opts will just
-be null in the case there aren't more args, like it was before.
-
-> +
->  RUNTIME_log_stderr () { cat >> test.log; }
->  RUNTIME_log_stdout () {
->      if [ "$PRETTY_PRINT_STACKS" =3D "yes" ]; then
-> @@ -59,4 +68,4 @@ RUNTIME_log_stdout () {
->  config=3D$TEST_DIR/unittests.cfg
->  rm -f test.log
->  printf "BUILD_HEAD=3D$(cat build-head)\n\n" > test.log
-> -for_each_unittest $config run
-> +for_each_unittest $config run "$extra_opts"
-> diff --git a/scripts/functions.bash b/scripts/functions.bash
-> index ee9143c..60fbc6a 100644
-> --- a/scripts/functions.bash
-> +++ b/scripts/functions.bash
-> @@ -3,10 +3,11 @@ function for_each_unittest()
->  {
->  	local unittests=3D"$1"
->  	local cmd=3D"$2"
-> +	local extra_opts=3D$3
->  	local testname
->  	local smp
->  	local kernel
-> -	local opts
-> +	local opts=3D$extra_opts
->  	local groups
->  	local arch
->  	local check
-> @@ -21,7 +22,7 @@ function for_each_unittest()
->  			testname=3D${BASH_REMATCH[1]}
->  			smp=3D1
->  			kernel=3D""
-> -			opts=3D""
-> +			opts=3D$extra_opts
->  			groups=3D""
->  			arch=3D""
->  			check=3D""
-> @@ -32,7 +33,7 @@ function for_each_unittest()
->  		elif [[ $line =3D~ ^smp\ *=3D\ *(.*)$ ]]; then
->  			smp=3D${BASH_REMATCH[1]}
->  		elif [[ $line =3D~ ^extra_params\ *=3D\ *(.*)$ ]]; then
-> -			opts=3D${BASH_REMATCH[1]}
-> +			opts=3D"$opts ${BASH_REMATCH[1]}"
-
-How do QEMU opts work with respect to precedence? If the later
-opts override the earlier (I think they do), then we should put
-opts after rematch here, because the user explicitly added those
-options to the command line, and therefore probably prefers them.
-
->  		elif [[ $line =3D~ ^groups\ *=3D\ *(.*)$ ]]; then
->  			groups=3D${BASH_REMATCH[1]}
->  		elif [[ $line =3D~ ^arch\ *=3D\ *(.*)$ ]]; then
-> -- =
-
-> 2.11.0
->
-
-Thanks for this patch! I'm looking forward to making use of it for
-testing Peter's EL2 series with/without "-machine virtualization=3Don"
+Yikes :-)
 
 drew
+
+> 
+> >
+> > Thanks,
+> > drew
+> >
+> >
+> >> > +exit=$?
+> >> > +if [ $exit -eq 0 ]; then
+> >> > +    u32_long=true
+> >> > +fi
+> >> > +rm -f lib_test.c
+> >> > +
+> >> >  # check for dependent 32 bit libraries
+> >> >  if [ "$arch" != "arm" ]; then
+> >> >  cat << EOF > lib_test.c
+> >> > @@ -155,4 +167,5 @@ TEST_DIR=$testdir
+> >> >  FIRMWARE=$firmware
+> >> >  ENDIAN=$endian
+> >> >  PRETTY_PRINT_STACKS=$pretty_print_stacks
+> >> > +U32_LONG_FMT=$u32_long
+> >> >  EOF
+> >> > diff --git a/lib/libcflat.h b/lib/libcflat.h
+> >> > index 380395f..e80fc50 100644
+> >> > --- a/lib/libcflat.h
+> >> > +++ b/lib/libcflat.h
+> >> > @@ -58,12 +58,21 @@ typedef _Bool		bool;
+> >> >  #define true  1
+> >> >
+> >> >  #if __SIZEOF_LONG__ == 8
+> >> > +#  define __PRI32_PREFIX
+> >> >  #  define __PRI64_PREFIX	"l"
+> >> >  #  define __PRIPTR_PREFIX	"l"
+> >> >  #else
+> >> > +#if defined(__U32_LONG_FMT__)
+> >> > +#  define __PRI32_PREFIX        "l"
+> >> > +#else
+> >> > +#  define __PRI32_PREFIX
+> >> > +#endif
+> >> >  #  define __PRI64_PREFIX	"ll"
+> >> >  #  define __PRIPTR_PREFIX
+> >> >  #endif
+> >> > +#define PRId32  __PRI32_PREFIX	"d"
+> >> > +#define PRIu32  __PRI32_PREFIX	"u"
+> >> > +#define PRIx32  __PRI32_PREFIX	"x"
+> >> >  #define PRId64  __PRI64_PREFIX	"d"
+> >> >  #define PRIu64  __PRI64_PREFIX	"u"
+> >> >  #define PRIx64  __PRI64_PREFIX	"x"
+> >> >
+> >> --
+> >> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> >> the body of a message to majordomo@vger.kernel.org
+> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> --
+> Alex Bennée
