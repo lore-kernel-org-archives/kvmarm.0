@@ -1,109 +1,181 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [kvm-unit-tests PATCH 1/6] libcflat: add PRI(dux)32 format types
-Date: Thu, 12 Jan 2017 17:18:25 +0000
-Message-ID: <87fuko2o4e.fsf@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 6/6] run_tests: allow passing of options
+ to QEMU
+Date: Thu, 12 Jan 2017 18:32:04 +0100
+Message-ID: <20170112173204.ufd2ggw7iz7xv772@hawk.localdomain>
 References: <20170111162841.15569-1-alex.bennee@linaro.org>
- <20170111162841.15569-2-alex.bennee@linaro.org>
- <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
- <20170112165629.nbczamlqlpsqaauh@hawk.localdomain>
+ <20170111162841.15569-7-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C2DD4066D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 12:16:43 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qu+kAdWmjdCU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Jan 2017 12:16:42 -0500 (EST)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E8B240194
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 12:16:41 -0500 (EST)
-Received: by mail-wm0-f43.google.com with SMTP id r126so29137513wmr.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 09:18:27 -0800 (PST)
-In-reply-to: <20170112165629.nbczamlqlpsqaauh@hawk.localdomain>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20170111162841.15569-7-alex.bennee@linaro.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IE9uIFRodSwgSmFu
-IDEyLCAyMDE3IGF0IDAxOjI5OjI0UE0gKzAxMDAsIFBhb2xvIEJvbnppbmkgd3JvdGU6Cj4+Cj4+
-Cj4+IE9uIDExLzAxLzIwMTcgMTc6MjgsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gPiBTbyB3ZSBj
-YW4gaGF2ZSBwb3J0YWJsZSBmb3JtYXR0aW5nIG9mIHVpbnQzMl90IHR5cGVzLiBIb3dldmVyIHRo
-ZXJlIGlzCj4+ID4gYSBjYXRjaC4gRGlmZmVyZW50IGNvbXBpbGVycyBjYW4gdXNlIGxlZ2FsbHkg
-c3VidGx5IGRpZmZlcmVudCB0eXBlcwo+PiA+IHRob3VnaCBzbyB3ZSBuZWVkIHRvIHByb2JlIHRo
-ZSBjb21waWxlciBkZWZpbmVkIGludGRlZi5oIGZpcnN0Lgo+Pgo+PiBJbnRlcmVzdGluZywgd2hh
-dCBwbGF0Zm9ybSBoYXMgbG9uZyB1aW50MzJfdD8gIEkgdGhvdWdodCB0aGUgaXNzdWUgd2FzCj4+
-IHdoZXRoZXIgNjQtYml0IGlzIGxvbmcgb3IgImxvbmcgbG9uZyIuCj4+Cj4+IFBhb2xvCj4+Cj4+
-ID4gU2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+
-PiA+IC0tLQo+PiA+ICBNYWtlZmlsZSAgICAgICB8ICAxICsKPj4gPiAgY29uZmlndXJlICAgICAg
-fCAxMyArKysrKysrKysrKysrCj4+ID4gIGxpYi9saWJjZmxhdC5oIHwgIDkgKysrKysrKysrCj4+
-ID4gIDMgZmlsZXMgY2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKQo+PiA+Cj4+ID4gZGlmZiAtLWdp
-dCBhL01ha2VmaWxlIGIvTWFrZWZpbGUKPj4gPiBpbmRleCBhMzIzMzNiLi45ODIyZDlhIDEwMDY0
-NAo+PiA+IC0tLSBhL01ha2VmaWxlCj4+ID4gKysrIGIvTWFrZWZpbGUKPj4gPiBAQCAtNTUsNiAr
-NTUsNyBAQCBDRkxBR1MgKz0gJChmb21pdF9mcmFtZV9wb2ludGVyKQo+PiA+ICBDRkxBR1MgKz0g
-JChmbm9fc3RhY2tfcHJvdGVjdG9yKQo+PiA+ICBDRkxBR1MgKz0gJChmbm9fc3RhY2tfcHJvdGVj
-dG9yX2FsbCkKPj4gPiAgQ0ZMQUdTICs9ICQod25vX2ZyYW1lX2FkZHJlc3MpCj4+ID4gK0NGTEFH
-UyArPSAkKGlmICQoVTMyX0xPTkdfRk1UKSwtRF9fVTMyX0xPTkdfRk1UX18sKQo+PiA+Cj4+ID4g
-IENYWEZMQUdTICs9ICQoQ0ZMQUdTKQo+PiA+Cj4+ID4gZGlmZiAtLWdpdCBhL2NvbmZpZ3VyZSBi
-L2NvbmZpZ3VyZQo+PiA+IGluZGV4IDk5NWM4ZmEuLjEyNzg2OGMgMTAwNzU1Cj4+ID4gLS0tIGEv
-Y29uZmlndXJlCj4+ID4gKysrIGIvY29uZmlndXJlCj4+ID4gQEAgLTEwOSw2ICsxMDksMTggQEAg
-aWYgWyAtZiAkdGVzdGRpci9ydW4gXTsgdGhlbgo+PiA+ICAgICAgbG4gLWZzICR0ZXN0ZGlyL3J1
-biAkdGVzdGRpci1ydW4KPj4gPiAgZmkKPj4gPgo+PiA+ICsjIGNoZWNrIGlmIHVpbnQzMl90IG5l
-ZWRzIGEgbG9uZyBmb3JtYXQgbW9kaWZpZXIKPj4gPiArY2F0IDw8IEVPRiA+IGxpYl90ZXN0LmMK
-Pj4gPiArI2luY2x1ZGUgPGludHR5cGVzLmg+Cj4+ID4gK0VPRgo+PiA+ICsKPj4gPiArJGNyb3Nz
-X3ByZWZpeCRjYyBsaWJfdGVzdC5jIC1FIHwgZ3JlcCAidHlwZWRlZiIgfCBncmVwICJsb25nIiB8
-IGdyZXAgInVpbnQzMl90IiAmPiAvZGV2L251bGwKPgo+IFRoaXMgd29uJ3Qgd29yayB3aXRoIGNy
-b3NzIGNvbXBpbGVycyB0aGF0IGRvbid0IGhhdmUgaW50dHlwZXMuaCBpbiB0aGVpcgo+IHBhdGgg
-KGxpa2UgbWluZSkuIEhvdyBhYm91dCBzb21ldGhpbmcgbGlrZQoKSG1tIGdvb2QgcG9pbnQsIGlu
-IG15IGNhc2UgaW50dHlwZXMuaCBjYW1lIGZyb20gdGhlIGxpYm5ld2xpYi1kZXYgcGFja2FnZS4K
-Cj4KPiAgY2F0IDw8IEVPRiA+IGxpYl90ZXN0LmMKPiAgX19VSU5UMzJfVFlQRV9fCj4gIEVPRgo+
-ICB1MzJfbG9uZz0iYGFhcmNoNjQtbGludXgtZ251LWdjYyBsaWJfdGVzdC5jIC1FIHwgYXdrICcv
-dW5zaWduZWQvICYmICQyID09ICJsb25nIidgIgoKSG1tIGl0IGlzIG5vdCBjbGVhciBmcm9tIHRo
-ZSBkb2NzIGlmIHRoaXMgaXMgYSBHQ0Npc20uIElmIGl0IGlzIGRvIHdlCmNhcmU/IEFsc28gdGhl
-IGRvY3MgZG8gc2F5OgoKIlNvbWUgb2YgdGhlc2UgbWFjcm9zIG1heSBub3QgYmUgZGVmaW5lZCBv
-biBwYXJ0aWN1bGFyIHN5c3RlbXMgaWYgR0NDIGRvZXMgbm90IHByb3ZpZGUgYSBzdGRpbnQuaCBo
-ZWFkZXIgb24gdGhvc2Ugc3lzdGVtcy4gIgoKPiBBbHRob3VnaCBJIGZlZWwgdGhlcmUgc2hvdWxk
-IGJlIGEgY29tcGlsZXIgbWFjcm8gd2F5IHRvIGRvIHRoaXMgd2l0aG91dAo+IGEgbmVlZCBmb3Ig
-Y29uZmlndXJlL21ha2VmaWxlIHRyaWNrZXJ5IGF0IGFsbC4uLgoKSSBkaWQgYXNrIG91ciB0b29s
-Y2hhaW4gYm9kcy4gVGhleSBzdGFydGVkIGdvaW5nIG9uIGFib3V0IHBvdGVudGlhbApzb2x1dGlv
-bnMgdXNpbmcgX0dlbmVyaWMgYnV0IEkgZmVhciB0aGF0IG1pZ2h0IGJlIHdvcnNlIGluIHRoaXMg
-Y2FzZSEKCj4KPiBUaGFua3MsCj4gZHJldwo+Cj4KPj4gPiArZXhpdD0kPwo+PiA+ICtpZiBbICRl
-eGl0IC1lcSAwIF07IHRoZW4KPj4gPiArICAgIHUzMl9sb25nPXRydWUKPj4gPiArZmkKPj4gPiAr
-cm0gLWYgbGliX3Rlc3QuYwo+PiA+ICsKPj4gPiAgIyBjaGVjayBmb3IgZGVwZW5kZW50IDMyIGJp
-dCBsaWJyYXJpZXMKPj4gPiAgaWYgWyAiJGFyY2giICE9ICJhcm0iIF07IHRoZW4KPj4gPiAgY2F0
-IDw8IEVPRiA+IGxpYl90ZXN0LmMKPj4gPiBAQCAtMTU1LDQgKzE2Nyw1IEBAIFRFU1RfRElSPSR0
-ZXN0ZGlyCj4+ID4gIEZJUk1XQVJFPSRmaXJtd2FyZQo+PiA+ICBFTkRJQU49JGVuZGlhbgo+PiA+
-ICBQUkVUVFlfUFJJTlRfU1RBQ0tTPSRwcmV0dHlfcHJpbnRfc3RhY2tzCj4+ID4gK1UzMl9MT05H
-X0ZNVD0kdTMyX2xvbmcKPj4gPiAgRU9GCj4+ID4gZGlmZiAtLWdpdCBhL2xpYi9saWJjZmxhdC5o
-IGIvbGliL2xpYmNmbGF0LmgKPj4gPiBpbmRleCAzODAzOTVmLi5lODBmYzUwIDEwMDY0NAo+PiA+
-IC0tLSBhL2xpYi9saWJjZmxhdC5oCj4+ID4gKysrIGIvbGliL2xpYmNmbGF0LmgKPj4gPiBAQCAt
-NTgsMTIgKzU4LDIxIEBAIHR5cGVkZWYgX0Jvb2wJCWJvb2w7Cj4+ID4gICNkZWZpbmUgdHJ1ZSAg
-MQo+PiA+Cj4+ID4gICNpZiBfX1NJWkVPRl9MT05HX18gPT0gOAo+PiA+ICsjICBkZWZpbmUgX19Q
-UkkzMl9QUkVGSVgKPj4gPiAgIyAgZGVmaW5lIF9fUFJJNjRfUFJFRklYCSJsIgo+PiA+ICAjICBk
-ZWZpbmUgX19QUklQVFJfUFJFRklYCSJsIgo+PiA+ICAjZWxzZQo+PiA+ICsjaWYgZGVmaW5lZChf
-X1UzMl9MT05HX0ZNVF9fKQo+PiA+ICsjICBkZWZpbmUgX19QUkkzMl9QUkVGSVggICAgICAgICJs
-Igo+PiA+ICsjZWxzZQo+PiA+ICsjICBkZWZpbmUgX19QUkkzMl9QUkVGSVgKPj4gPiArI2VuZGlm
-Cj4+ID4gICMgIGRlZmluZSBfX1BSSTY0X1BSRUZJWAkibGwiCj4+ID4gICMgIGRlZmluZSBfX1BS
-SVBUUl9QUkVGSVgKPj4gPiAgI2VuZGlmCj4+ID4gKyNkZWZpbmUgUFJJZDMyICBfX1BSSTMyX1BS
-RUZJWAkiZCIKPj4gPiArI2RlZmluZSBQUkl1MzIgIF9fUFJJMzJfUFJFRklYCSJ1Igo+PiA+ICsj
-ZGVmaW5lIFBSSXgzMiAgX19QUkkzMl9QUkVGSVgJIngiCj4+ID4gICNkZWZpbmUgUFJJZDY0ICBf
-X1BSSTY0X1BSRUZJWAkiZCIKPj4gPiAgI2RlZmluZSBQUkl1NjQgIF9fUFJJNjRfUFJFRklYCSJ1
-Igo+PiA+ICAjZGVmaW5lIFBSSXg2NCAgX19QUkk2NF9QUkVGSVgJIngiCj4+ID4KPj4gLS0KPj4g
-VG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJl
-IGt2bSIgaW4KPj4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5l
-bC5vcmcKPj4gTW9yZSBtYWpvcmRvbW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9t
-YWpvcmRvbW8taW5mby5odG1sCgoKLS0KQWxleCBCZW5uw6llCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
-c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
-L2xpc3RpbmZvL2t2bWFybQo=
+On Wed, Jan 11, 2017 at 04:28:41PM +0000, Alex Benn=E9e wrote:
+> This allows additional options to be passed to QEMU. It follows the
+> convention of passing parameters after a -- to the child process. In
+> my case I'm using it to toggle MTTCG on an off:
+> =
+
+>   ./run_tests.sh -- --accel tcg,thread=3Dmulti
+> =
+
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> =
+
+> ---
+> v1
+>   - changes from -o to --
+>   - fixed whitespace damage
+> ---
+>  README.md              |  6 ++++++
+>  run_tests.sh           | 13 +++++++++++--
+>  scripts/functions.bash |  7 ++++---
+>  3 files changed, 21 insertions(+), 5 deletions(-)
+> =
+
+> diff --git a/README.md b/README.md
+> index fa3a445..1bd6dcb 100644
+> --- a/README.md
+> +++ b/README.md
+> @@ -55,6 +55,12 @@ To extend or disable the timeouts:
+>  =
+
+>      TIMEOUT=3D0 ./run_tests.sh
+>  =
+
+> +Any arguments past the end-of-arguments marker (--) is passed on down
+> +to the QEMU invocation. This can of course be combined with the other
+> +modifiers:
+> +
+> +    ACCEL=3Dtcg ./run_tests.sh -v -- --accel tcg,thread=3Dmulti
+> +
+>  # Contributing
+>  =
+
+>  ## Directory structure
+> diff --git a/run_tests.sh b/run_tests.sh
+> index 254129d..3270fba 100755
+> --- a/run_tests.sh
+> +++ b/run_tests.sh
+> @@ -13,7 +13,7 @@ function usage()
+>  {
+>  cat <<EOF
+>  =
+
+> -Usage: $0 [-g group] [-h] [-v]
+> +Usage: $0 [-g group] [-h] [-v] [-- QEMU options]
+>  =
+
+>      -g: Only execute tests in the given group
+>      -h: Output this help text
+> @@ -22,6 +22,8 @@ Usage: $0 [-g group] [-h] [-v]
+>  Set the environment variable QEMU=3D/path/to/qemu-system-ARCH to
+>  specify the appropriate qemu binary for ARCH-run.
+>  =
+
+> +All options specified after -- are passed on to QEMU.
+> +
+>  EOF
+>  }
+>  =
+
+> @@ -29,6 +31,7 @@ RUNTIME_arch_run=3D"./$TEST_DIR/run"
+>  source scripts/runtime.bash
+>  =
+
+>  while getopts "g:hv" opt; do
+> +
+
+stray blank line added?
+
+>      case $opt in
+>          g)
+>              only_group=3D$OPTARG
+> @@ -46,6 +49,12 @@ while getopts "g:hv" opt; do
+>      esac
+>  done
+>  =
+
+> +# Any options left for QEMU?
+> +shift $((OPTIND-1))
+> +if [ "$#" -gt  0 ]; then
+> +    extra_opts=3D"$@"
+> +fi
+
+We can unconditionally do the extra_opts=3D"$@", extra_opts will just
+be null in the case there aren't more args, like it was before.
+
+> +
+>  RUNTIME_log_stderr () { cat >> test.log; }
+>  RUNTIME_log_stdout () {
+>      if [ "$PRETTY_PRINT_STACKS" =3D "yes" ]; then
+> @@ -59,4 +68,4 @@ RUNTIME_log_stdout () {
+>  config=3D$TEST_DIR/unittests.cfg
+>  rm -f test.log
+>  printf "BUILD_HEAD=3D$(cat build-head)\n\n" > test.log
+> -for_each_unittest $config run
+> +for_each_unittest $config run "$extra_opts"
+> diff --git a/scripts/functions.bash b/scripts/functions.bash
+> index ee9143c..60fbc6a 100644
+> --- a/scripts/functions.bash
+> +++ b/scripts/functions.bash
+> @@ -3,10 +3,11 @@ function for_each_unittest()
+>  {
+>  	local unittests=3D"$1"
+>  	local cmd=3D"$2"
+> +	local extra_opts=3D$3
+>  	local testname
+>  	local smp
+>  	local kernel
+> -	local opts
+> +	local opts=3D$extra_opts
+>  	local groups
+>  	local arch
+>  	local check
+> @@ -21,7 +22,7 @@ function for_each_unittest()
+>  			testname=3D${BASH_REMATCH[1]}
+>  			smp=3D1
+>  			kernel=3D""
+> -			opts=3D""
+> +			opts=3D$extra_opts
+>  			groups=3D""
+>  			arch=3D""
+>  			check=3D""
+> @@ -32,7 +33,7 @@ function for_each_unittest()
+>  		elif [[ $line =3D~ ^smp\ *=3D\ *(.*)$ ]]; then
+>  			smp=3D${BASH_REMATCH[1]}
+>  		elif [[ $line =3D~ ^extra_params\ *=3D\ *(.*)$ ]]; then
+> -			opts=3D${BASH_REMATCH[1]}
+> +			opts=3D"$opts ${BASH_REMATCH[1]}"
+
+How do QEMU opts work with respect to precedence? If the later
+opts override the earlier (I think they do), then we should put
+opts after rematch here, because the user explicitly added those
+options to the command line, and therefore probably prefers them.
+
+>  		elif [[ $line =3D~ ^groups\ *=3D\ *(.*)$ ]]; then
+>  			groups=3D${BASH_REMATCH[1]}
+>  		elif [[ $line =3D~ ^arch\ *=3D\ *(.*)$ ]]; then
+> -- =
+
+> 2.11.0
+>
+
+Thanks for this patch! I'm looking forward to making use of it for
+testing Peter's EL2 series with/without "-machine virtualization=3Don"
+
+drew
