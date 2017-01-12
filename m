@@ -1,37 +1,101 @@
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 4/6] docs: mention checkpatch in the README
-Date: Thu, 12 Jan 2017 13:29:52 +0100
-Message-ID: <322298cd-aefa-e945-d3f4-1237767a06ef@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 6/6] run_tests: allow passing of options to
+ QEMU
+Date: Thu, 12 Jan 2017 13:30:39 +0100
+Message-ID: <bbb5de4d-da85-2cfa-71a5-a7468dd8466b@redhat.com>
 References: <20170111162841.15569-1-alex.bennee@linaro.org>
- <20170111162841.15569-5-alex.bennee@linaro.org>
+ <20170111162841.15569-7-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170111162841.15569-5-alex.bennee@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E08D1403F8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 07:28:57 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QqJer6ibow4P for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Jan 2017 07:28:56 -0500 (EST)
+Received: from mail-wj0-f195.google.com (mail-wj0-f195.google.com
+ [209.85.210.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 720D94027C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 07:28:56 -0500 (EST)
+Received: by mail-wj0-f195.google.com with SMTP id kp2so1721346wjc.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Jan 2017 04:30:42 -0800 (PST)
+In-Reply-To: <20170111162841.15569-7-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, drjones@redhat.com
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 11/01/2017 17:28, Alex Bennée wrote:
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  README.md | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/README.md b/README.md
-> index 5027b62..9462824 100644
-> --- a/README.md
-> +++ b/README.md
-> @@ -79,3 +79,4 @@ You can add the following to .git/config to do this automatically for you:
->      [format]
->          subjectprefix = kvm-unit-tests PATCH
->  
-> +Please run the kernel's ./scripts/checkpatch.pl on new patches
-
-Does it really work well on kvm-unit-tests?
-
-Paolo
+CgpPbiAxMS8wMS8yMDE3IDE3OjI4LCBBbGV4IEJlbm7DqWUgd3JvdGU6Cj4gVGhpcyBhbGxvd3Mg
+YWRkaXRpb25hbCBvcHRpb25zIHRvIGJlIHBhc3NlZCB0byBRRU1VLiBJdCBmb2xsb3dzIHRoZQo+
+IGNvbnZlbnRpb24gb2YgcGFzc2luZyBwYXJhbWV0ZXJzIGFmdGVyIGEgLS0gdG8gdGhlIGNoaWxk
+IHByb2Nlc3MuIEluCj4gbXkgY2FzZSBJJ20gdXNpbmcgaXQgdG8gdG9nZ2xlIE1UVENHIG9uIGFu
+IG9mZjoKPiAKPiAgIC4vcnVuX3Rlc3RzLnNoIC0tIC0tYWNjZWwgdGNnLHRocmVhZD1tdWx0aQo+
+IAo+IFNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4K
+PiAKPiAtLS0KPiB2MQo+ICAgLSBjaGFuZ2VzIGZyb20gLW8gdG8gLS0KPiAgIC0gZml4ZWQgd2hp
+dGVzcGFjZSBkYW1hZ2UKPiAtLS0KPiAgUkVBRE1FLm1kICAgICAgICAgICAgICB8ICA2ICsrKysr
+Kwo+ICBydW5fdGVzdHMuc2ggICAgICAgICAgIHwgMTMgKysrKysrKysrKystLQo+ICBzY3JpcHRz
+L2Z1bmN0aW9ucy5iYXNoIHwgIDcgKysrKy0tLQo+ICAzIGZpbGVzIGNoYW5nZWQsIDIxIGluc2Vy
+dGlvbnMoKyksIDUgZGVsZXRpb25zKC0pCj4gCj4gZGlmZiAtLWdpdCBhL1JFQURNRS5tZCBiL1JF
+QURNRS5tZAo+IGluZGV4IGZhM2E0NDUuLjFiZDZkY2IgMTAwNjQ0Cj4gLS0tIGEvUkVBRE1FLm1k
+Cj4gKysrIGIvUkVBRE1FLm1kCj4gQEAgLTU1LDYgKzU1LDEyIEBAIFRvIGV4dGVuZCBvciBkaXNh
+YmxlIHRoZSB0aW1lb3V0czoKPiAgCj4gICAgICBUSU1FT1VUPTAgLi9ydW5fdGVzdHMuc2gKPiAg
+Cj4gK0FueSBhcmd1bWVudHMgcGFzdCB0aGUgZW5kLW9mLWFyZ3VtZW50cyBtYXJrZXIgKC0tKSBp
+cyBwYXNzZWQgb24gZG93bgo+ICt0byB0aGUgUUVNVSBpbnZvY2F0aW9uLiBUaGlzIGNhbiBvZiBj
+b3Vyc2UgYmUgY29tYmluZWQgd2l0aCB0aGUgb3RoZXIKPiArbW9kaWZpZXJzOgo+ICsKPiArICAg
+IEFDQ0VMPXRjZyAuL3J1bl90ZXN0cy5zaCAtdiAtLSAtLWFjY2VsIHRjZyx0aHJlYWQ9bXVsdGkK
+PiArCj4gICMgQ29udHJpYnV0aW5nCj4gIAo+ICAjIyBEaXJlY3Rvcnkgc3RydWN0dXJlCj4gZGlm
+ZiAtLWdpdCBhL3J1bl90ZXN0cy5zaCBiL3J1bl90ZXN0cy5zaAo+IGluZGV4IDI1NDEyOWQuLjMy
+NzBmYmEgMTAwNzU1Cj4gLS0tIGEvcnVuX3Rlc3RzLnNoCj4gKysrIGIvcnVuX3Rlc3RzLnNoCj4g
+QEAgLTEzLDcgKzEzLDcgQEAgZnVuY3Rpb24gdXNhZ2UoKQo+ICB7Cj4gIGNhdCA8PEVPRgo+ICAK
+PiAtVXNhZ2U6ICQwIFstZyBncm91cF0gWy1oXSBbLXZdCj4gK1VzYWdlOiAkMCBbLWcgZ3JvdXBd
+IFstaF0gWy12XSBbLS0gUUVNVSBvcHRpb25zXQo+ICAKPiAgICAgIC1nOiBPbmx5IGV4ZWN1dGUg
+dGVzdHMgaW4gdGhlIGdpdmVuIGdyb3VwCj4gICAgICAtaDogT3V0cHV0IHRoaXMgaGVscCB0ZXh0
+Cj4gQEAgLTIyLDYgKzIyLDggQEAgVXNhZ2U6ICQwIFstZyBncm91cF0gWy1oXSBbLXZdCj4gIFNl
+dCB0aGUgZW52aXJvbm1lbnQgdmFyaWFibGUgUUVNVT0vcGF0aC90by9xZW11LXN5c3RlbS1BUkNI
+IHRvCj4gIHNwZWNpZnkgdGhlIGFwcHJvcHJpYXRlIHFlbXUgYmluYXJ5IGZvciBBUkNILXJ1bi4K
+PiAgCj4gK0FsbCBvcHRpb25zIHNwZWNpZmllZCBhZnRlciAtLSBhcmUgcGFzc2VkIG9uIHRvIFFF
+TVUuCj4gKwo+ICBFT0YKPiAgfQo+ICAKPiBAQCAtMjksNiArMzEsNyBAQCBSVU5USU1FX2FyY2hf
+cnVuPSIuLyRURVNUX0RJUi9ydW4iCj4gIHNvdXJjZSBzY3JpcHRzL3J1bnRpbWUuYmFzaAo+ICAK
+PiAgd2hpbGUgZ2V0b3B0cyAiZzpodiIgb3B0OyBkbwo+ICsKPiAgICAgIGNhc2UgJG9wdCBpbgo+
+ICAgICAgICAgIGcpCj4gICAgICAgICAgICAgIG9ubHlfZ3JvdXA9JE9QVEFSRwo+IEBAIC00Niw2
+ICs0OSwxMiBAQCB3aGlsZSBnZXRvcHRzICJnOmh2IiBvcHQ7IGRvCj4gICAgICBlc2FjCj4gIGRv
+bmUKPiAgCj4gKyMgQW55IG9wdGlvbnMgbGVmdCBmb3IgUUVNVT8KPiArc2hpZnQgJCgoT1BUSU5E
+LTEpKQo+ICtpZiBbICIkIyIgLWd0ICAwIF07IHRoZW4KPiArICAgIGV4dHJhX29wdHM9IiRAIgo+
+ICtmaQo+ICsKPiAgUlVOVElNRV9sb2dfc3RkZXJyICgpIHsgY2F0ID4+IHRlc3QubG9nOyB9Cj4g
+IFJVTlRJTUVfbG9nX3N0ZG91dCAoKSB7Cj4gICAgICBpZiBbICIkUFJFVFRZX1BSSU5UX1NUQUNL
+UyIgPSAieWVzIiBdOyB0aGVuCj4gQEAgLTU5LDQgKzY4LDQgQEAgUlVOVElNRV9sb2dfc3Rkb3V0
+ICgpIHsKPiAgY29uZmlnPSRURVNUX0RJUi91bml0dGVzdHMuY2ZnCj4gIHJtIC1mIHRlc3QubG9n
+Cj4gIHByaW50ZiAiQlVJTERfSEVBRD0kKGNhdCBidWlsZC1oZWFkKVxuXG4iID4gdGVzdC5sb2cK
+PiAtZm9yX2VhY2hfdW5pdHRlc3QgJGNvbmZpZyBydW4KPiArZm9yX2VhY2hfdW5pdHRlc3QgJGNv
+bmZpZyBydW4gIiRleHRyYV9vcHRzIgo+IGRpZmYgLS1naXQgYS9zY3JpcHRzL2Z1bmN0aW9ucy5i
+YXNoIGIvc2NyaXB0cy9mdW5jdGlvbnMuYmFzaAo+IGluZGV4IGVlOTE0M2MuLjYwZmJjNmEgMTAw
+NjQ0Cj4gLS0tIGEvc2NyaXB0cy9mdW5jdGlvbnMuYmFzaAo+ICsrKyBiL3NjcmlwdHMvZnVuY3Rp
+b25zLmJhc2gKPiBAQCAtMywxMCArMywxMSBAQCBmdW5jdGlvbiBmb3JfZWFjaF91bml0dGVzdCgp
+Cj4gIHsKPiAgCWxvY2FsIHVuaXR0ZXN0cz0iJDEiCj4gIAlsb2NhbCBjbWQ9IiQyIgo+ICsJbG9j
+YWwgZXh0cmFfb3B0cz0kMwo+ICAJbG9jYWwgdGVzdG5hbWUKPiAgCWxvY2FsIHNtcAo+ICAJbG9j
+YWwga2VybmVsCj4gLQlsb2NhbCBvcHRzCj4gKwlsb2NhbCBvcHRzPSRleHRyYV9vcHRzCj4gIAls
+b2NhbCBncm91cHMKPiAgCWxvY2FsIGFyY2gKPiAgCWxvY2FsIGNoZWNrCj4gQEAgLTIxLDcgKzIy
+LDcgQEAgZnVuY3Rpb24gZm9yX2VhY2hfdW5pdHRlc3QoKQo+ICAJCQl0ZXN0bmFtZT0ke0JBU0hf
+UkVNQVRDSFsxXX0KPiAgCQkJc21wPTEKPiAgCQkJa2VybmVsPSIiCj4gLQkJCW9wdHM9IiIKPiAr
+CQkJb3B0cz0kZXh0cmFfb3B0cwo+ICAJCQlncm91cHM9IiIKPiAgCQkJYXJjaD0iIgo+ICAJCQlj
+aGVjaz0iIgo+IEBAIC0zMiw3ICszMyw3IEBAIGZ1bmN0aW9uIGZvcl9lYWNoX3VuaXR0ZXN0KCkK
+PiAgCQllbGlmIFtbICRsaW5lID1+IF5zbXBcICo9XCAqKC4qKSQgXV07IHRoZW4KPiAgCQkJc21w
+PSR7QkFTSF9SRU1BVENIWzFdfQo+ICAJCWVsaWYgW1sgJGxpbmUgPX4gXmV4dHJhX3BhcmFtc1wg
+Kj1cICooLiopJCBdXTsgdGhlbgo+IC0JCQlvcHRzPSR7QkFTSF9SRU1BVENIWzFdfQo+ICsJCQlv
+cHRzPSIkb3B0cyAke0JBU0hfUkVNQVRDSFsxXX0iCj4gIAkJZWxpZiBbWyAkbGluZSA9fiBeZ3Jv
+dXBzXCAqPVwgKiguKikkIF1dOyB0aGVuCj4gIAkJCWdyb3Vwcz0ke0JBU0hfUkVNQVRDSFsxXX0K
+PiAgCQllbGlmIFtbICRsaW5lID1+IF5hcmNoXCAqPVwgKiguKikkIF1dOyB0aGVuCj4gCgpHcmVh
+dCBpZGVhIQoKUGFvbG8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0
+dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
