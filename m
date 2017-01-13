@@ -1,27 +1,25 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 1/6] libcflat: add PRI(dux)32 format types
-Date: Fri, 13 Jan 2017 19:03:41 +0100
-Message-ID: <20170113180341.3hvo4ixs74kjgcmo@kamzik.brq.redhat.com>
-References: <20170111162841.15569-1-alex.bennee@linaro.org>
- <20170111162841.15569-2-alex.bennee@linaro.org>
- <4286b719-ff75-d2cd-68b5-cb9d9bb89553@redhat.com>
- <20170112165629.nbczamlqlpsqaauh@hawk.localdomain>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Increase number of memslots to 512
+Date: Fri, 13 Jan 2017 18:16:42 +0000
+Message-ID: <6fc30f74-d1ab-028f-7e5f-a5d1fe69c17a@arm.com>
+References: <1484153537-20984-1-git-send-email-linucherian@gmail.com>
+ <61fa02f8-b244-6bae-eaa1-cb745ea543e1@arm.com>
+ <CAGOz-0aD-hV7sDAX70pSGdCj1J4s4xc4qQBwbaKzVZArfRK2AQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A674402EC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jan 2017 13:02:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BDE140430
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jan 2017 13:15:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KxFu+UjzZJQE for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Jan 2017 13:01:58 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C8C7B402AF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jan 2017 13:01:58 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20170112165629.nbczamlqlpsqaauh@hawk.localdomain>
+ with ESMTP id gzyhR-EBXs+A for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Jan 2017 13:14:59 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF576402EC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jan 2017 13:14:58 -0500 (EST)
+In-Reply-To: <CAGOz-0aD-hV7sDAX70pSGdCj1J4s4xc4qQBwbaKzVZArfRK2AQ@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,152 +29,86 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Linu Cherian <linucherian@gmail.com>
+Cc: sunil.goutham@cavium.com, Linu Cherian <linu.cherian@cavium.com>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 12, 2017 at 05:56:29PM +0100, Andrew Jones wrote:
-> On Thu, Jan 12, 2017 at 01:29:24PM +0100, Paolo Bonzini wrote:
-> > =
+On 13/01/17 17:25, Linu Cherian wrote:
+> On Fri, Jan 13, 2017 at 5:33 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>> Hi Linu,
+>>
+>> On 11/01/17 16:52, linucherian@gmail.com wrote:
+>>> From: Linu Cherian <linu.cherian@cavium.com>
+>>>
+>>> Having only 32 memslots is a real constraint for the maximum number of
+>>> PCI devices that can be assigned to a single guest. Assuming each PCI
+>>> device/virtual function having two memory BAR regions, we could assign
+>>> only 15 devices/virtual functions to a guest.
+>>>
+>>> So increase KVM_MEM_SLOTS_NUM to 512 as done in other archs like x86 and
+>>> powerpc. For this, KVM_USER_MEM_SLOTS has been changed to 508.
+>>>
+>>> Signed-off-by: Linu Cherian <linu.cherian@cavium.com>
+>>> ---
+>>>  arch/arm/kvm/arm.c                | 3 +++
+>>>  arch/arm64/include/asm/kvm_host.h | 2 +-
+>>>  2 files changed, 4 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>>> index 8f92efa..a19389b 100644
+>>> --- a/arch/arm/kvm/arm.c
+>>> +++ b/arch/arm/kvm/arm.c
+>>> @@ -221,6 +221,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>>       case KVM_CAP_MAX_VCPUS:
+>>>               r = KVM_MAX_VCPUS;
+>>>               break;
+>>> +     case KVM_CAP_NR_MEMSLOTS:
+>>> +             r = KVM_USER_MEM_SLOTS;
+>>> +             break;
+>>>       case KVM_CAP_MSI_DEVID:
+>>>               if (!kvm)
+>>>                       r = -EINVAL;
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index e505038..88f017d 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -30,7 +30,7 @@
+>>>
+>>>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>>>
+>>> -#define KVM_USER_MEM_SLOTS 32
+>>> +#define KVM_USER_MEM_SLOTS 508
+>>>  #define KVM_PRIVATE_MEM_SLOTS 4
+>>>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>>>  #define KVM_HALT_POLL_NS_DEFAULT 500000
+>>>
+>>
+>> I'm not opposed to that patch, but if I may ask: how has that been tested?
+>>
+> 
+> I have tested this on Cavium ARM64 SOC, by assigning multiple
+> VFs(virtual functions) of a SRIOV device to a single VM. Each VF has
+> two memory regions(two BARs) implemented.
+> 
+> Without, this change, when the number of virtual functions assigned to
+> the guest crosses 15, qemu aborts with
+> "kvm_alloc_slot: no free slot available", during guest kernel booting.
+> 
+> Now, with this change guest kernel boots fine with more than 15 VFs
+> assigned(tested upto 29) and also all the PCI VFs assigned to the guest
+> get listed under lspci with memory resources configured.
+> 
+> Please let me know if you are looking for more specifics like bootlogs etc.
 
-> > =
+Let me be more precise. At the moment, KVM on arm64 doesn't support the
+delivery of MSIs generated by physical devices into a guest (patches are
+in progress, but not merged yet). So unless you used devices that have
+no need for interrupts, I don't see how this works.
 
-> > On 11/01/2017 17:28, Alex Benn=E9e wrote:
-> > > So we can have portable formatting of uint32_t types. However there is
-> > > a catch. Different compilers can use legally subtly different types
-> > > though so we need to probe the compiler defined intdef.h first.
-> > =
-
-> > Interesting, what platform has long uint32_t?  I thought the issue was
-> > whether 64-bit is long or "long long".
-> > =
-
-> > Paolo
-> > =
-
-> > > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> > > ---
-> > >  Makefile       |  1 +
-> > >  configure      | 13 +++++++++++++
-> > >  lib/libcflat.h |  9 +++++++++
-> > >  3 files changed, 23 insertions(+)
-> > > =
-
-> > > diff --git a/Makefile b/Makefile
-> > > index a32333b..9822d9a 100644
-> > > --- a/Makefile
-> > > +++ b/Makefile
-> > > @@ -55,6 +55,7 @@ CFLAGS +=3D $(fomit_frame_pointer)
-> > >  CFLAGS +=3D $(fno_stack_protector)
-> > >  CFLAGS +=3D $(fno_stack_protector_all)
-> > >  CFLAGS +=3D $(wno_frame_address)
-> > > +CFLAGS +=3D $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
-> > >  =
-
-> > >  CXXFLAGS +=3D $(CFLAGS)
-> > >  =
-
-> > > diff --git a/configure b/configure
-> > > index 995c8fa..127868c 100755
-> > > --- a/configure
-> > > +++ b/configure
-> > > @@ -109,6 +109,18 @@ if [ -f $testdir/run ]; then
-> > >      ln -fs $testdir/run $testdir-run
-> > >  fi
-> > >  =
-
-> > > +# check if uint32_t needs a long format modifier
-> > > +cat << EOF > lib_test.c
-> > > +#include <inttypes.h>
-> > > +EOF
-> > > +
-> > > +$cross_prefix$cc lib_test.c -E | grep "typedef" | grep "long" | grep=
- "uint32_t" &> /dev/null
-> =
-
-> This won't work with cross compilers that don't have inttypes.h in their
-> path (like mine). How about something like
-
-Paolo,
-
-I see you merged the above. As I stated in this mail, that doesn't work
-for my environment, neither arm nor powerpc cross-compile for me now...
-
-Please replace with something like I proposed below. We can probably
-replace the awk with a grep though.
+Can you shed some light on your test process?
 
 Thanks,
-drew
 
-
-> =
-
->  cat << EOF > lib_test.c
->  __UINT32_TYPE__
->  EOF
->  u32_long=3D"`aarch64-linux-gnu-gcc lib_test.c -E | awk '/unsigned/ && $2=
- =3D=3D "long"'`"
-> =
-
-> Although I feel there should be a compiler macro way to do this without
-> a need for configure/makefile trickery at all...
-> =
-
-> Thanks,
-> drew
-> =
-
-> =
-
-> > > +exit=3D$?
-> > > +if [ $exit -eq 0 ]; then
-> > > +    u32_long=3Dtrue
-> > > +fi
-> > > +rm -f lib_test.c
-> > > +
-> > >  # check for dependent 32 bit libraries
-> > >  if [ "$arch" !=3D "arm" ]; then
-> > >  cat << EOF > lib_test.c
-> > > @@ -155,4 +167,5 @@ TEST_DIR=3D$testdir
-> > >  FIRMWARE=3D$firmware
-> > >  ENDIAN=3D$endian
-> > >  PRETTY_PRINT_STACKS=3D$pretty_print_stacks
-> > > +U32_LONG_FMT=3D$u32_long
-> > >  EOF
-> > > diff --git a/lib/libcflat.h b/lib/libcflat.h
-> > > index 380395f..e80fc50 100644
-> > > --- a/lib/libcflat.h
-> > > +++ b/lib/libcflat.h
-> > > @@ -58,12 +58,21 @@ typedef _Bool		bool;
-> > >  #define true  1
-> > >  =
-
-> > >  #if __SIZEOF_LONG__ =3D=3D 8
-> > > +#  define __PRI32_PREFIX
-> > >  #  define __PRI64_PREFIX	"l"
-> > >  #  define __PRIPTR_PREFIX	"l"
-> > >  #else
-> > > +#if defined(__U32_LONG_FMT__)
-> > > +#  define __PRI32_PREFIX        "l"
-> > > +#else
-> > > +#  define __PRI32_PREFIX
-> > > +#endif
-> > >  #  define __PRI64_PREFIX	"ll"
-> > >  #  define __PRIPTR_PREFIX
-> > >  #endif
-> > > +#define PRId32  __PRI32_PREFIX	"d"
-> > > +#define PRIu32  __PRI32_PREFIX	"u"
-> > > +#define PRIx32  __PRI32_PREFIX	"x"
-> > >  #define PRId64  __PRI64_PREFIX	"d"
-> > >  #define PRIu64  __PRI64_PREFIX	"u"
-> > >  #define PRIx64  __PRI64_PREFIX	"x"
-> > > =
-
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe kvm" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+	M.
+-- 
+Jazz is not dead. It just smells funny...
