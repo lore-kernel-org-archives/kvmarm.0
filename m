@@ -1,19 +1,21 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
 Subject: Re: [PATCH] KVM: arm/arm64: vgic: Fix deadlock on error handling
-Date: Thu, 12 Jan 2017 20:07:09 +0100
-Message-ID: <20170112190709.GA18045@cbox>
+Date: Fri, 13 Jan 2017 09:30:11 +0100
+Message-ID: <716c59b7-efe2-a218-136f-c0b8bc66bd92@redhat.com>
 References: <1484237774-19047-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
 In-Reply-To: <1484237774-19047-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: andre.przywara@arm.com, eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Dmitry Vyukov <dvyukov@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 12, 2017 at 04:16:14PM +0000, Marc Zyngier wrote:
+Hi Marc,
+
+On 12/01/2017 17:16, Marc Zyngier wrote:
 > Dmitry Vyukov reported that the syzkaller fuzzer triggered a
 > deadlock in the vgic setup code when an error was detected, as
 > the cleanup code tries to take a lock that is already held by
@@ -24,8 +26,11 @@ On Thu, Jan 12, 2017 at 04:16:14PM +0000, Marc Zyngier wrote:
 > 
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Thanks
+
+Eric
 
 > ---
 >  virt/kvm/arm/vgic/vgic-init.c | 18 +++++++++++++-----
@@ -114,6 +119,4 @@ Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 >  	return ret;
 >  }
 >  
-> -- 
-> 2.1.4
 > 
