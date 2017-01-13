@@ -1,191 +1,50 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC 01/13] KVM: arm/arm64: Add vITS save/restore API
- documentation
-Date: Fri, 13 Jan 2017 09:46:44 +0000
-Message-ID: <65287f0d-b01f-c63d-dc56-c7052cd9dd33@arm.com>
-References: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
- <1484236613-24633-2-git-send-email-eric.auger@redhat.com>
- <4fe81c1b-9956-d458-b0ef-b7219f1249fe@arm.com>
- <e58a566d-e100-d31a-fb26-a15a793d3623@redhat.com>
+Subject: Re: [PATCH v2] KVM: arm/arm64: Fix occasional warning from the timer
+ work function
+Date: Fri, 13 Jan 2017 11:12:16 +0000
+Message-ID: <daadc615-b9b8-7510-7978-b6854a5184b1@arm.com>
+References: <20170109111856.8439-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <e58a566d-e100-d31a-fb26-a15a793d3623@redhat.com>
+In-Reply-To: <20170109111856.8439-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: andre.przywara@arm.com, Prasun.Kapoor@cavium.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, mbrugger@suse.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/01/17 09:07, Auger Eric wrote:
-> Hi Marc,
+On 09/01/17 11:18, Christoffer Dall wrote:
+> When a VCPU blocks (WFI) and has programmed the vtimer, we program a
+> soft timer to expire in the future to wake up the vcpu thread when
+> appropriate.  Because such as wake up involves a vcpu kick, and the
+> timer expire function can get called from interrupt context, and the
+> kick may sleep, we have to schedule the kick in the work function.
 > 
-> On 12/01/2017 17:52, Marc Zyngier wrote:
->> Hi Eric,
->>
->> On 12/01/17 15:56, Eric Auger wrote:
->>> Add description for how to access vITS registers and how to flush/restore
->>> vITS tables into/from memory
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>> ---
->>>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 70 ++++++++++++++++++++++
->>>  1 file changed, 70 insertions(+)
->>>
->>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>> index 6081a5b..bd74613 100644
->>> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>> @@ -36,3 +36,73 @@ Groups:
->>>      -ENXIO:  ITS not properly configured as required prior to setting
->>>               this attribute
->>>      -ENOMEM: Memory shortage when allocating ITS internal data
->>> +
->>> +  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
->>> +  Attributes:
->>> +      The attr field of kvm_device_attr encodes the offset of the
->>> +      ITS register, relative to the ITS control frame base address
->>> +      (ITS_base).
->>> +
->>> +      kvm_device_attr.addr points to a __u64 value whatever the width
->>> +      of the addressed register (32/64 bits).
->>> +
->>> +      Writes to read-only registers are ignored by the kernel except
->>> +      for a single register, GITS_READR. Normally this register is RO
->>> +      but it needs to be restored otherwise commands in the queue will
->>> +      be re-executed after CWRITER setting.
->>> +
->>> +      For other registers, Getting or setting a register has the same
->>> +      effect as reading/writing the register on real hardware.
->>> +  Errors:
->>> +    -ENXIO: Offset does not correspond to any supported register
->>> +    -EFAULT: Invalid user pointer for attr->addr
->>> +    -EINVAL: Offset is not 64-bit aligned
->>> +
->>> +  KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
->>> +  Attributes
->>> +       The attr field of kvm_device_attr is not used.
->>> +
->>> +       request the flush-save/restore of the ITS tables, namely
->>> +       the device table, the collection table, all the ITT tables,
->>> +       the LPI pending tables. On save, the tables are flushed
->>> +       into guest memory at the location provisionned by the guest
->>
->> 					    provisioned
->>
->>> +       in GITS_BASER (device and collection tables), on MAPD command
->>> +       (ITT_addr), GICR_PENDBASERs (pending tables).
->>> +
->>> +       This means the GIC should be restored before the ITS and all
->>> +       ITS registers but the GITS_CTRL must be restored before
->>> +       restoring the ITS tables.
->>> +
->>> +       Note the LPI configuration table is read-only for the
->>> +       in-kernel ITS and its save/restore goes through the standard
->>> +       RAM save/restore.
->>> +
->>> +       The layout of the tables in guest memory defines an ABI.
->>> +       The entries are laid out in memory as follows;
->>> +
->>> +    Device Table Entry (DTE) layout: entry size = 16 bytes
->>> +
->>> +    bits:     | 63   ...  32  | 31 ... 6 | 5 | 4   ...   0 |
->>> +    values:   |   DeviceID    |   Resv   | V |    Size     |
->>> +
->>> +    bits:     | 63 ... 44 | 43  ...  0  |
->>> +    values:   |    Resv   |  ITT_addr   |
->>
->> While I appreciate this layout represents the absolute maximum an ITS
->> could implement, I'm a bit concerned about the amount of memory we may
->> end-up requiring here. All the ITSs implementations I know of seem to
->> get away with 8 bytes per entry. Maybe I'm just too worried.
+> The work function currently has a warning that gets raised if it turns
+> out that the timer shouldn't fire when it's run, which was added because
+> the idea was that in that case the work should never have been cancelled.
 > 
-> OK so I would propose a 16b DeviceId and 16b eventid
+> However, it turns out that this whole thing is racy and we can get
+> spurious warnings.  The problem is that we clear the armed flag in the
+> work function, which may run in parallel with the
+> kvm_timer_unschedule->timer_disarm() call.  This results in a possible
+> situation where the timer_disarm() call does not call
+> cancel_work_sync(), which effectively synchronizes the completion of the
+> work function with running the VCPU.  As a result, the VCPU thread
+> proceeds before the work function completees, causing changes to the
+> timer state such that kvm_timer_should_fire(vcpu) returns false in the
+> work function.
 > 
-> bits:     | 63   ...  48  | 47 ... 4 | 3   ...   0 |
-> values:   |   DeviceID    | ITT_addr |    Size     |
+> All we do in the work function is to kick the VCPU, and an occasional
+> rare extra kick never harmed anyone.  Since the race above is extremely
+> rare, we don't bother checking if the race happens but simply remove the
+> check and the clearing of the armed flag from the work function.
 > 
-> I can use the size field as a validity indicator
+> Reported-by: Matthias Brugger <mbrugger@suse.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-Note that you are allowed to use a 0 size field. It means 1 bit of
-EventID (2 possible interrupts). So maybe using a particular address as
-a valid flag?
-
-> 
->>
->> Also, please mention that ITT_addr is actually ITT_addr[51:8], as we're
->> guaranteed to have an ITT that is 256 byte aligned.
-> sure
->>
->>> +
->>> +    Collection Table Entry (CTE) layout: entry size = 8 bytes
->>> +
->>> +    bits:     | 63| 62 ..  52  | 51 ... 16 | 15  ...   0 |
->>> +    values:   | V |    RES0    |  RDBase   |    ICID     |
->>> +
->>> +    Interrupt Translation Table Entry (ITTE) layout: entry size = 16 bytes
->>
->> The actual name is Interrupt Translation Entry (ITE). I have a patch
->> renaming this all over the vgic-its.c file...
-> ok
->>
->>> +
->>> +    bits:     | 63   ...  32  | 31 ... 17 | 16 | 15  ...  0 |
->>> +    values:   |   DeviceID    |    RES0   | V  |    ICID    |
->>> +
->>> +    bits:     | 63 ...  32    | 31      ...        0 |
->>> +    values:   |   pINTID      |        EventID       |
->>
->> Same concern here. 32bit DevID, EventID and INTID seem a bit over the
->> top. But maybe we shouldn't be concerned about memory... ;-)
-> So I would suggest encoding
-> 16b DeviceId
-> 16b eventid
-> 16b collection ID
-> 16b pINTID
-> 
-> bits:     | 63   ...  48  | 47 ... 32 | 31 ... 15 | 15  ...  0 |
-> values:   |   DeviceID    |   pINTID  |  EventId  |   ICID     |
-> 
-> a null pINTID would meen the ITE is invalid.
-> 
-> Does that make sense or should I instead reduce the number of bits
-> allocated to collections and keep the pINTID bit number larger?
-
-16bit worth of collections is quite a lot (64k CPUs?). I'd be perfectly
-fine with a smaller number, but let's see what people think.
-
-> 
-> 
->>
->>> +
->>> +    LPI Pending Table layout:
->>> +
->>> +    As specified in the ARM Generic Interrupt Controller Architecture
->>> +    Specification GIC Architecture version 3.0 and version 4. The first
->>> +    1kB contains only zeros.
->>>
->>
->> You definitely want to relax this. An ITS implementation is allowed (and
->> actually encouraged) to maintain a coarse map in the first kB, and use
->> this to quickly scan the table, which would be very useful on restore.
-> Maybe I miss something here. Currently I restore the ITEs before the
-> pending tables. So considering all the ITEs I know which LPI are defined
-> and which pending bits need to be restored. Why would I need to use a
-> coarse map for?
-
-You could, instead of testing all the bits for which you can generate an
-LPI, look at the coarse map, which usually uses one bit to represent
-something like 64 bits of pending table, and find out what is currently
-pending. That's what HW does, but maybe there is no need to do this for
-the SW implementation, specially if we have very few LPIs.
-
-> I understand the CPU cannot write the pending tables in our back, spec
-> says behavior would be unpredictable, right?
-
-Absolutely. Only the ITS can touch that memory.
-
-Thanks,
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
 	M.
 -- 
