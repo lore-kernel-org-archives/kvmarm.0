@@ -1,115 +1,88 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 3/3] KVM: arm/arm64: vgic: Fix deadlock on error handling
-Date: Fri, 13 Jan 2017 11:31:33 +0000
-Message-ID: <1484307093-29153-4-git-send-email-marc.zyngier@arm.com>
-References: <1484307093-29153-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1484307093-29153-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+Subject: Re: [PATCH] KVM: arm64: Increase number of memslots to 512
+Date: Fri, 13 Jan 2017 12:03:38 +0000
+Message-ID: <61fa02f8-b244-6bae-eaa1-cb745ea543e1@arm.com>
+References: <1484153537-20984-1-git-send-email-linucherian@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 881BA40674
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jan 2017 07:01:56 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Yl-WB3aunFMt for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Jan 2017 07:01:55 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 66254402EF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jan 2017 07:01:54 -0500 (EST)
+In-Reply-To: <1484153537-20984-1-git-send-email-linucherian@gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linucherian@gmail.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, rkrcmar@redhat.com
+Cc: sunil.goutham@cavium.com, Linu Cherian <linu.cherian@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Dmitry Vyukov reported that the syzkaller fuzzer triggered a
-deadlock in the vgic setup code when an error was detected, as
-the cleanup code tries to take a lock that is already held by
-the setup code.
+Hi Linu,
 
-The fix is to avoid retaking the lock when cleaning up, by
-telling the cleanup function that we already hold it.
+On 11/01/17 16:52, linucherian@gmail.com wrote:
+> From: Linu Cherian <linu.cherian@cavium.com>
+> 
+> Having only 32 memslots is a real constraint for the maximum number of
+> PCI devices that can be assigned to a single guest. Assuming each PCI
+> device/virtual function having two memory BAR regions, we could assign
+> only 15 devices/virtual functions to a guest.
+> 
+> So increase KVM_MEM_SLOTS_NUM to 512 as done in other archs like x86 and
+> powerpc. For this, KVM_USER_MEM_SLOTS has been changed to 508.
+> 
+> Signed-off-by: Linu Cherian <linu.cherian@cavium.com>
+> ---
+>  arch/arm/kvm/arm.c                | 3 +++
+>  arch/arm64/include/asm/kvm_host.h | 2 +-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 8f92efa..a19389b 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -221,6 +221,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_MAX_VCPUS:
+>  		r = KVM_MAX_VCPUS;
+>  		break;
+> +	case KVM_CAP_NR_MEMSLOTS:
+> +		r = KVM_USER_MEM_SLOTS;
+> +		break;
+>  	case KVM_CAP_MSI_DEVID:
+>  		if (!kvm)
+>  			r = -EINVAL;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e505038..88f017d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -30,7 +30,7 @@
+>  
+>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>  
+> -#define KVM_USER_MEM_SLOTS 32
+> +#define KVM_USER_MEM_SLOTS 508
+>  #define KVM_PRIVATE_MEM_SLOTS 4
+>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>  #define KVM_HALT_POLL_NS_DEFAULT 500000
+> 
 
-Cc: stable@vger.kernel.org
-Reported-by: Dmitry Vyukov <dvyukov@google.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/vgic/vgic-init.c | 18 +++++++++++++-----
- virt/kvm/arm/vgic/vgic-v2.c   |  2 --
- virt/kvm/arm/vgic/vgic-v3.c   |  2 --
- 3 files changed, 13 insertions(+), 9 deletions(-)
+I'm not opposed to that patch, but if I may ask: how has that been tested?
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 5114391..c737ea0 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -268,15 +268,11 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 
--	mutex_lock(&kvm->lock);
--
- 	dist->ready = false;
- 	dist->initialized = false;
- 
- 	kfree(dist->spis);
- 	dist->nr_spis = 0;
--
--	mutex_unlock(&kvm->lock);
- }
- 
- void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
-@@ -286,7 +282,8 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
- }
- 
--void kvm_vgic_destroy(struct kvm *kvm)
-+/* To be called with kvm->lock held */
-+static void __kvm_vgic_destroy(struct kvm *kvm)
- {
- 	struct kvm_vcpu *vcpu;
- 	int i;
-@@ -297,6 +294,13 @@ void kvm_vgic_destroy(struct kvm *kvm)
- 		kvm_vgic_vcpu_destroy(vcpu);
- }
- 
-+void kvm_vgic_destroy(struct kvm *kvm)
-+{
-+	mutex_lock(&kvm->lock);
-+	__kvm_vgic_destroy(kvm);
-+	mutex_unlock(&kvm->lock);
-+}
-+
- /**
-  * vgic_lazy_init: Lazy init is only allowed if the GIC exposed to the guest
-  * is a GICv2. A GICv3 must be explicitly initialized by the guest using the
-@@ -348,6 +352,10 @@ int kvm_vgic_map_resources(struct kvm *kvm)
- 		ret = vgic_v2_map_resources(kvm);
- 	else
- 		ret = vgic_v3_map_resources(kvm);
-+
-+	if (ret)
-+		__kvm_vgic_destroy(kvm);
-+
- out:
- 	mutex_unlock(&kvm->lock);
- 	return ret;
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index 9bab867..834137e 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -293,8 +293,6 @@ int vgic_v2_map_resources(struct kvm *kvm)
- 	dist->ready = true;
- 
- out:
--	if (ret)
--		kvm_vgic_destroy(kvm);
- 	return ret;
- }
- 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 5c9f974..e6b03fd 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -302,8 +302,6 @@ int vgic_v3_map_resources(struct kvm *kvm)
- 	dist->ready = true;
- 
- out:
--	if (ret)
--		kvm_vgic_destroy(kvm);
- 	return ret;
- }
- 
+Thanks,
+
+	M.
 -- 
-2.1.4
-
+Jazz is not dead. It just smells funny...
