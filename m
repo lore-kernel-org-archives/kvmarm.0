@@ -1,22 +1,22 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH RFC 5/7] ARM64: KVM: Support cross type vCPU
-Date: Mon, 16 Jan 2017 17:33:32 +0800
-Message-ID: <1484559214-2248-6-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH RFC 3/7] ARM64: KVM: Reset ID registers when creating the VCPUs
+Date: Mon, 16 Jan 2017 17:33:30 +0800
+Message-ID: <1484559214-2248-4-git-send-email-zhaoshenglong@huawei.com>
 References: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13E44406BB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BBE240064
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:34:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TEUZwNP+Tu-5 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jan 2017 04:33:40 -0500 (EST)
+ with ESMTP id kaXgrXELCs7P for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Jan 2017 04:34:02 -0500 (EST)
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [119.145.14.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8736540019
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4243C4075C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:50 -0500 (EST)
 In-Reply-To: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,173 +33,185 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Add a capability to tell userspace that KVM supports cross type vCPU.
-Add a cpu feature for userspace to set when it doesn't use host type
-vCPU and kvm_vcpu_preferred_target return the host MIDR register value
-so that userspace can check whether its requested vCPU type macthes the
-one of physical CPU and if so, KVM will not trap ID registers even
-though userspace doesn't specify -cpu host.
-Guest accesses MIDR through VPIDR_EL2 so we save/restore it no matter
-it's a cross type vCPU.
+Reset ID registers when creating the VCPUs and store the values per
+VCPU. Also modify the get_invariant_sys_reg and set_invariant_sys_reg
+to get/set the ID register from vcpu context.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm/kvm/arm.c                   | 10 ++++++++--
- arch/arm64/include/asm/kvm_emulate.h |  3 +++
- arch/arm64/include/asm/kvm_host.h    |  3 ++-
- arch/arm64/include/uapi/asm/kvm.h    |  1 +
- arch/arm64/kvm/guest.c               | 17 ++++++++++++++++-
- arch/arm64/kvm/hyp/sysreg-sr.c       |  2 ++
- include/uapi/linux/kvm.h             |  1 +
- 7 files changed, 33 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_coproc.h |  1 +
+ arch/arm64/kvm/guest.c              |  1 +
+ arch/arm64/kvm/sys_regs.c           | 58 ++++++++++++++++++-------------------
+ 3 files changed, 31 insertions(+), 29 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 1167678..bdceb19 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -207,6 +207,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_PSCI_0_2:
- 	case KVM_CAP_READONLY_MEM:
- 	case KVM_CAP_MP_STATE:
-+	case KVM_CAP_ARM_CROSS_VCPU:
- 		r = 1;
- 		break;
- 	case KVM_CAP_COALESCED_MMIO:
-@@ -809,8 +810,9 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- {
- 	unsigned int i;
- 	int phys_target = kvm_target_cpu();
-+	bool cross_vcpu = kvm_vcpu_has_feature_cross_cpu(init);
+diff --git a/arch/arm64/include/asm/kvm_coproc.h b/arch/arm64/include/asm/kvm_coproc.h
+index 0b52377..0801b66 100644
+--- a/arch/arm64/include/asm/kvm_coproc.h
++++ b/arch/arm64/include/asm/kvm_coproc.h
+@@ -24,6 +24,7 @@
+ #include <linux/kvm_host.h>
  
--	if (init->target != phys_target)
-+	if (!cross_vcpu && init->target != phys_target)
- 		return -EINVAL;
+ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
++void kvm_reset_id_sys_regs(struct kvm_vcpu *vcpu);
  
- 	/*
-@@ -839,7 +841,11 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 			set_bit(i, vcpu->arch.features);
- 	}
- 
--	vcpu->arch.target = phys_target;
-+	if (!cross_vcpu)
-+		vcpu->arch.target = phys_target;
-+	else
-+		/* Use generic ARMv8 target for cross type vcpu. */
-+		vcpu->arch.target = KVM_ARM_TARGET_GENERIC_V8;
- 
- 	/* Now we know what it is, we can reset it. */
- 	return kvm_reset_vcpu(vcpu);
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index f5ea0ba..bca7d3a 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -49,6 +49,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hcr_el2 |= HCR_E2H;
- 	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
-+	if (test_bit(KVM_ARM_VCPU_CROSS, vcpu->arch.features))
-+		/* TODO: Set HCR_TID2 and trap cache registers */
-+		vcpu->arch.hcr_el2 |= HCR_TID3 | HCR_TID1 | HCR_TID0;
- }
- 
- static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6034f92..d0073d7 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -41,10 +41,11 @@
- 
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
--#define KVM_VCPU_MAX_FEATURES 4
-+#define KVM_VCPU_MAX_FEATURES 5
- 
- #define KVM_REQ_VCPU_EXIT	8
- 
-+bool kvm_vcpu_has_feature_cross_cpu(const struct kvm_vcpu_init *init);
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
- int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 3051f86..7ba7117 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -97,6 +97,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
- #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-+#define KVM_ARM_VCPU_CROSS		4 /* Support cross type vCPU */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
+ struct kvm_sys_reg_table {
+ 	const struct sys_reg_desc *table;
 diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 92abe2b..4a5ccab 100644
+index b37446a..92abe2b 100644
 --- a/arch/arm64/kvm/guest.c
 +++ b/arch/arm64/kvm/guest.c
-@@ -308,8 +308,15 @@ int __attribute_const__ kvm_target_cpu(void)
- 	return KVM_ARM_TARGET_GENERIC_V8;
- }
+@@ -48,6 +48,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
  
-+bool kvm_vcpu_has_feature_cross_cpu(const struct kvm_vcpu_init *init)
-+{
-+	return init->features[KVM_ARM_VCPU_CROSS / 32] &
-+	       (1 << (KVM_ARM_VCPU_CROSS % 32));
-+}
-+
- int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
+ int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
  {
-+	bool cross_vcpu = kvm_vcpu_has_feature_cross_cpu(init);
- 	int target = kvm_target_cpu();
- 
- 	if (target < 0)
-@@ -323,7 +330,15 @@ int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
- 	 * specific features available for the preferred
- 	 * target type.
- 	 */
--	init->target = (__u32)target;
-+	/* If userspace wants a cross type vcpu other that host, here we return
-+	 * the midr for userspace to check whether the midr value of requeseted
-+	 * vcpu matches the one of host. If they match, we will not trap CPU ID
-+	 * registers even though userspace doesn't specify -cpu host.
-+	 */
-+	if (cross_vcpu)
-+		init->target = read_cpuid_id();
-+	else
-+		init->target = (__u32)target;
- 
++	kvm_reset_id_sys_regs(vcpu);
  	return 0;
  }
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 9341376..9461829 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -45,6 +45,7 @@ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
  
- static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index bf71eb4..7c5fa03 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1440,11 +1440,11 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+  * the guest, or a future kvm may trap them.
+  */
+ 
+-#define FUNCTION_INVARIANT(reg)						\
+-	static void get_##reg(struct kvm_vcpu *v,			\
+-			      const struct sys_reg_desc *r)		\
++#define FUNCTION_INVARIANT(register)					\
++	static void get_##register(struct kvm_vcpu *v,			\
++				   const struct sys_reg_desc *r)	\
+ 	{								\
+-		((struct sys_reg_desc *)r)->val = read_sysreg(reg);	\
++		vcpu_id_sys_reg(v, r->reg) = read_sysreg(register);	\
+ 	}
+ 
+ FUNCTION_INVARIANT(midr_el1)
+@@ -1480,7 +1480,6 @@ FUNCTION_INVARIANT(id_aa64mmfr1_el1)
+ FUNCTION_INVARIANT(clidr_el1)
+ FUNCTION_INVARIANT(aidr_el1)
+ 
+-/* ->val is filled in by kvm_sys_reg_table_init() */
+ static struct sys_reg_desc invariant_sys_regs[] = {
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b000),
+ 	  NULL, get_midr_el1, MIDR_EL1 },
+@@ -1952,43 +1951,43 @@ static int reg_to_user(void __user *uaddr, const u64 *val, u64 id)
+ 	return 0;
+ }
+ 
+-static int get_invariant_sys_reg(u64 id, void __user *uaddr)
++static int get_invariant_sys_reg(struct kvm_vcpu *vcpu,
++				 const struct kvm_one_reg *reg)
  {
-+	ctxt->id_sys_regs[MIDR_EL1]     = read_sysreg(vpidr_el2);
- 	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
- 	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
- 	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
-@@ -98,6 +99,7 @@ static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctx
+ 	struct sys_reg_params params;
+ 	const struct sys_reg_desc *r;
++	void __user *uaddr = (void __user *)(unsigned long)reg->addr;
  
- static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+-	if (!index_to_params(id, &params))
++	if (!index_to_params(reg->id, &params))
+ 		return -ENOENT;
+ 
+ 	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
+ 	if (!r)
+ 		return -ENOENT;
+ 
+-	return reg_to_user(uaddr, &r->val, id);
++	if (r->get_user)
++		return (r->get_user)(vcpu, r, reg, uaddr);
++
++	return reg_to_user(uaddr, &vcpu_id_sys_reg(vcpu, r->reg), reg->id);
+ }
+ 
+-static int set_invariant_sys_reg(u64 id, void __user *uaddr)
++static int set_invariant_sys_reg(struct kvm_vcpu *vcpu,
++				 const struct kvm_one_reg *reg)
  {
-+	write_sysreg(ctxt->id_sys_regs[MIDR_EL1],       vpidr_el2);
- 	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
- 	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
- 	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	sctlr);
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index cac48ed..46115a2 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -871,6 +871,7 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_S390_USER_INSTR0 130
- #define KVM_CAP_MSI_DEVID 131
- #define KVM_CAP_PPC_HTM 132
-+#define KVM_CAP_ARM_CROSS_VCPU 133
+ 	struct sys_reg_params params;
+ 	const struct sys_reg_desc *r;
+-	int err;
+-	u64 val = 0; /* Make sure high bits are 0 for 32-bit regs */
++	void __user *uaddr = (void __user *)(unsigned long)reg->addr;
  
- #ifdef KVM_CAP_IRQ_ROUTING
+-	if (!index_to_params(id, &params))
++	if (!index_to_params(reg->id, &params))
+ 		return -ENOENT;
+ 	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
+ 	if (!r)
+ 		return -ENOENT;
  
+-	err = reg_from_user(&val, uaddr, id);
+-	if (err)
+-		return err;
+-
+-	/* This is what we mean by invariant: you can't change it. */
+-	if (r->val != val)
+-		return -EINVAL;
++	if (r->set_user)
++		return (r->set_user)(vcpu, r, reg, uaddr);
+ 
+-	return 0;
++	return reg_from_user(&vcpu_id_sys_reg(vcpu, r->reg), uaddr, reg->id);
+ }
+ 
+ static bool is_valid_cache(u32 val)
+@@ -2086,7 +2085,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+ 
+ 	r = index_to_sys_reg_desc(vcpu, reg->id);
+ 	if (!r)
+-		return get_invariant_sys_reg(reg->id, uaddr);
++		return get_invariant_sys_reg(vcpu, reg);
+ 
+ 	if (r->get_user)
+ 		return (r->get_user)(vcpu, r, reg, uaddr);
+@@ -2107,7 +2106,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+ 
+ 	r = index_to_sys_reg_desc(vcpu, reg->id);
+ 	if (!r)
+-		return set_invariant_sys_reg(reg->id, uaddr);
++		return set_invariant_sys_reg(vcpu, reg);
+ 
+ 	if (r->set_user)
+ 		return (r->set_user)(vcpu, r, reg, uaddr);
+@@ -2252,7 +2251,6 @@ static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n)
+ void kvm_sys_reg_table_init(void)
+ {
+ 	unsigned int i;
+-	struct sys_reg_desc clidr;
+ 
+ 	/* Make sure tables are unique and in order. */
+ 	BUG_ON(check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs)));
+@@ -2262,10 +2260,6 @@ void kvm_sys_reg_table_init(void)
+ 	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs)));
+ 	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs)));
+ 
+-	/* We abuse the reset function to overwrite the table itself. */
+-	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
+-		invariant_sys_regs[i].reset(NULL, &invariant_sys_regs[i]);
+-
+ 	/*
+ 	 * CLIDR format is awkward, so clean it up.  See ARM B4.1.20:
+ 	 *
+@@ -2276,8 +2270,7 @@ void kvm_sys_reg_table_init(void)
+ 	 *   value of 0b000, the values of Ctype4 to Ctype7 must be
+ 	 *   ignored.
+ 	 */
+-	get_clidr_el1(NULL, &clidr); /* Ugly... */
+-	cache_levels = clidr.val;
++	cache_levels = read_sysreg(clidr_el1);
+ 	for (i = 0; i < 7; i++)
+ 		if (((cache_levels >> (i*3)) & 7) == 0)
+ 			break;
+@@ -2310,3 +2303,10 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+ 		if (vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
+ 			panic("Didn't reset vcpu_sys_reg(%zi)", num);
+ }
++
++void kvm_reset_id_sys_regs(struct kvm_vcpu *vcpu)
++{
++	unsigned int i;
++	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
++		invariant_sys_regs[i].reset(vcpu, &invariant_sys_regs[i]);
++}
 -- 
 2.0.4
