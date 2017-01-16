@@ -1,139 +1,168 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH RFC 6/7] ARM64: KVM: Support heterogeneous system
-Date: Mon, 16 Jan 2017 17:33:33 +0800
-Message-ID: <1484559214-2248-7-git-send-email-zhaoshenglong@huawei.com>
-References: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
+From: no-reply@patchew.org
+Subject: Re: [PATCH RFC 0/6] target-arm: KVM64: Cross type vCPU
+ support
+Date: Mon, 16 Jan 2017 01:42:29 -0800 (PST)
+Message-ID: <148455974738.214.1147183737428542202@790289a7ca88>
+References: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
+Reply-To: qemu-devel@nongnu.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49C48401A1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:46 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nfm9OA4HP4Eu for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jan 2017 04:33:41 -0500 (EST)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [119.145.14.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C82344027C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:39 -0500 (EST)
-In-Reply-To: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, qemu-arm@nongnu.org, wu.wubin@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
+Resent-Message-Id: <E1cT3oL-0006ny-HG@eggs.gnu.org>
+In-Reply-To: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
+List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
+List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel/>
+List-Post: <mailto:qemu-devel@nongnu.org>
+List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
+List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+Sender: "Qemu-devel" <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
+Cc: wei@redhat.com, peter.maydell@linaro.org, drjones@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, christoffer.dall@linaro.org, zhaoshenglong@huawei.com, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shannon Zhao <shannon.zhao@linaro.org>
-
-When initializing KVM, check whether physical hardware is a
-heterogeneous system through the MIDR values. If so, force userspace to
-set the KVM_ARM_VCPU_CROSS feature bit. Otherwise, it should fail to
-initialize VCPUs.
-
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
----
- arch/arm/kvm/arm.c       | 26 ++++++++++++++++++++++++++
- include/uapi/linux/kvm.h |  1 +
- 2 files changed, 27 insertions(+)
-
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index bdceb19..21ec070 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -46,6 +46,7 @@
- #include <asm/kvm_coproc.h>
- #include <asm/kvm_psci.h>
- #include <asm/sections.h>
-+#include <asm/cputype.h>
- 
- #ifdef REQUIRES_VIRT
- __asm__(".arch_extension	virt");
-@@ -65,6 +66,7 @@ static unsigned int kvm_vmid_bits __read_mostly;
- static DEFINE_SPINLOCK(kvm_vmid_lock);
- 
- static bool vgic_present;
-+static bool heterogeneous_system;
- 
- static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
- 
-@@ -210,6 +212,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_CROSS_VCPU:
- 		r = 1;
- 		break;
-+	case KVM_CAP_ARM_HETEROGENEOUS:
-+		r = heterogeneous_system;
-+		break;
- 	case KVM_CAP_COALESCED_MMIO:
- 		r = KVM_COALESCED_MMIO_PAGE_OFFSET;
- 		break;
-@@ -812,6 +817,12 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 	int phys_target = kvm_target_cpu();
- 	bool cross_vcpu = kvm_vcpu_has_feature_cross_cpu(init);
- 
-+	if (heterogeneous_system && !cross_vcpu) {
-+		kvm_err("%s:Host is a heterogeneous system, set KVM_ARM_VCPU_CROSS bit\n",
-+			__func__);
-+		return -EINVAL;
-+	}
-+
- 	if (!cross_vcpu && init->target != phys_target)
- 		return -EINVAL;
- 
-@@ -1397,6 +1408,11 @@ static void check_kvm_target_cpu(void *ret)
- 	*(int *)ret = kvm_target_cpu();
- }
- 
-+static void get_physical_cpu_midr(void *midr)
-+{
-+	*(u32 *)midr = read_cpuid_id();
-+}
-+
- struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
- {
- 	struct kvm_vcpu *vcpu;
-@@ -1417,6 +1433,7 @@ int kvm_arch_init(void *opaque)
- {
- 	int err;
- 	int ret, cpu;
-+	u32 current_midr, midr;
- 
- 	if (!is_hyp_mode_available()) {
- 		kvm_err("HYP mode not available\n");
-@@ -1431,6 +1448,15 @@ int kvm_arch_init(void *opaque)
- 		}
- 	}
- 
-+	current_midr = read_cpuid_id();
-+	for_each_online_cpu(cpu) {
-+		smp_call_function_single(cpu, get_physical_cpu_midr, &midr, 1);
-+		if (current_midr != midr) {
-+			heterogeneous_system = true;
-+			break;
-+		}
-+	}
-+
- 	err = init_common_resources();
- 	if (err)
- 		return err;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 46115a2..cc2b63d 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -872,6 +872,7 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_MSI_DEVID 131
- #define KVM_CAP_PPC_HTM 132
- #define KVM_CAP_ARM_CROSS_VCPU 133
-+#define KVM_CAP_ARM_HETEROGENEOUS 134
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.0.4
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE0ODQ1NTg4MjEtMTU1MTItMS1naXQtc2VuZC1lbWFpbC16aGFvc2hlbmdsb25n
+QGh1YXdlaS5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBSRkMgMC82XSB0YXJnZXQt
+YXJtOiBLVk02NDogQ3Jvc3MgdHlwZSB2Q1BVIHN1cHBvcnQKCj09PSBURVNUIFNDUklQVCBCRUdJ
+TiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGlu
+ZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
+RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
+dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
+b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
+MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
+M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
+aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3
+LzE0ODQ1NTg4MjEtMTU1MTItMS1naXQtc2VuZC1lbWFpbC16aGFvc2hlbmdsb25nQGh1YXdlaS5j
+b20gLT4gcGF0Y2hldy8xNDg0NTU4ODIxLTE1NTEyLTEtZ2l0LXNlbmQtZW1haWwtemhhb3NoZW5n
+bG9uZ0BodWF3ZWkuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYWQ1ZTg3YiB0
+YXJnZXQtYXJtOiBjcHU2NDogQWRkIHN1cHBvcnQgZm9yIENvcnRleC1BNzIKZDRmNmM4NiBhcm06
+IHZpcnQ6IEVuYWJsZSBnZW5lcmljIHR5cGUgQ1BVIGluIHZpcnQgbWFjaGluZQpkYjI0MjZlIHRh
+cmdldDogYXJtOiBBZGQgYSBnZW5lcmljIHR5cGUgY3B1CjA0MmRmZjggYXJtOiBrdm02NDogQ2hl
+Y2sgaWYga3ZtIHN1cHBvcnRzIGNyb3NzIHR5cGUgdkNQVQpkOGI4ZGIxIHRhcmdldDogYXJtOiBB
+ZGQgdGhlIHFlbXUgdGFyZ2V0IGZvciBLVk1fQVJNX1RBUkdFVF9HRU5FUklDX1Y4CjcxZWIwN2Qg
+aGVhZGVyczogdXBkYXRlIGxpbnV4IGhlYWRlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
+aW5nIFBBVENIIDEvNjogaGVhZGVyczogdXBkYXRlIGxpbnV4IGhlYWRlcnMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMi82OiB0YXJnZXQ6IGFybTogQWRkIHRoZSBxZW11IHRhcmdldCBmb3IgS1ZNX0FSTV9U
+QVJHRVRfR0VORVJJQ19WOC4uLgpDaGVja2luZyBQQVRDSCAzLzY6IGFybToga3ZtNjQ6IENoZWNr
+IGlmIGt2bSBzdXBwb3J0cyBjcm9zcyB0eXBlIHZDUFUuLi4KRVJST1I6IE1hY3JvcyB3aXRoIGNv
+bXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMjE6IEZJTEU6
+IHRhcmdldC9hcm0va3ZtNjQuYzo0ODQ6CisjZGVmaW5lIEFSTV9DUFVfSURfTUlEUiAgICAgICAg
+MywgMCwgMCwgMCwgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBi
+ZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMjQ6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0
+ODc6CisjZGVmaW5lIEFSTV9DUFVfSURfUkVWSURSICAgICAgMywgMCwgMCwgMCwgNgoKRVJST1I6
+IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRo
+ZXNpcwojMjU6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0ODg6CisjZGVmaW5lIEFSTV9DUFVf
+SURfQUlEUiAgICAgICAgMywgMSwgMCwgMCwgNwoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXgg
+dmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMjg6IEZJTEU6IHRhcmdl
+dC9hcm0va3ZtNjQuYzo0OTE6CisjZGVmaW5lIEFSTV9DUFVfSURfQ0NTSURSICAgICAgMywgMSwg
+MCwgMCwgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNs
+b3NlZCBpbiBwYXJlbnRoZXNpcwojMjk6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0OTI6Cisj
+ZGVmaW5lIEFSTV9DUFVfSURfQ0xJRFIgICAgICAgMywgMSwgMCwgMCwgMQoKRVJST1I6IE1hY3Jv
+cyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwoj
+MzA6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0OTM6CisjZGVmaW5lIEFSTV9DUFVfSURfQ1NT
+RUxSICAgICAgMywgMiwgMCwgMCwgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVz
+IHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzE6IEZJTEU6IHRhcmdldC9hcm0v
+a3ZtNjQuYzo0OTQ6CisjZGVmaW5lIEFSTV9DUFVfSURfQ1RSICAgICAgICAgMywgMywgMCwgMCwg
+MQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBp
+biBwYXJlbnRoZXNpcwojMzQ6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0OTc6CisjZGVmaW5l
+IEFSTV9DUFVfSURfUEZSMCAgICAgICAgMywgMCwgMCwgMSwgMAoKRVJST1I6IE1hY3JvcyB3aXRo
+IGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzU6IEZJ
+TEU6IHRhcmdldC9hcm0va3ZtNjQuYzo0OTg6CisjZGVmaW5lIEFSTV9DUFVfSURfUEZSMSAgICAg
+ICAgMywgMCwgMCwgMSwgMQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3Vs
+ZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzY6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQu
+Yzo0OTk6CisjZGVmaW5lIEFSTV9DUFVfSURfREZSMCAgICAgICAgMywgMCwgMCwgMSwgMgoKRVJS
+T1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJl
+bnRoZXNpcwojMzc6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDA6CisjZGVmaW5lIEFSTV9D
+UFVfSURfQUZSMCAgICAgICAgMywgMCwgMCwgMSwgMwoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBs
+ZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzg6IEZJTEU6IHRh
+cmdldC9hcm0va3ZtNjQuYzo1MDE6CisjZGVmaW5lIEFSTV9DUFVfSURfTU1GUjAgICAgICAgMywg
+MCwgMCwgMSwgNAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBl
+bmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzk6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDI6
+CisjZGVmaW5lIEFSTV9DUFVfSURfTU1GUjEgICAgICAgMywgMCwgMCwgMSwgNQoKRVJST1I6IE1h
+Y3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNp
+cwojNDA6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDM6CisjZGVmaW5lIEFSTV9DUFVfSURf
+TU1GUjIgICAgICAgMywgMCwgMCwgMSwgNgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFs
+dWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDE6IEZJTEU6IHRhcmdldC9h
+cm0va3ZtNjQuYzo1MDQ6CisjZGVmaW5lIEFSTV9DUFVfSURfTU1GUjMgICAgICAgMywgMCwgMCwg
+MSwgNwoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3Nl
+ZCBpbiBwYXJlbnRoZXNpcwojNDI6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDU6CisjZGVm
+aW5lIEFSTV9DUFVfSURfSVNBUjAgICAgICAgMywgMCwgMCwgMiwgMAoKRVJST1I6IE1hY3JvcyB3
+aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDM6
+IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDY6CisjZGVmaW5lIEFSTV9DUFVfSURfSVNBUjEg
+ICAgICAgMywgMCwgMCwgMiwgMQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNo
+b3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDQ6IEZJTEU6IHRhcmdldC9hcm0va3Zt
+NjQuYzo1MDc6CisjZGVmaW5lIEFSTV9DUFVfSURfSVNBUjIgICAgICAgMywgMCwgMCwgMiwgMgoK
+RVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBw
+YXJlbnRoZXNpcwojNDU6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MDg6CisjZGVmaW5lIEFS
+TV9DUFVfSURfSVNBUjMgICAgICAgMywgMCwgMCwgMiwgMwoKRVJST1I6IE1hY3JvcyB3aXRoIGNv
+bXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDY6IEZJTEU6
+IHRhcmdldC9hcm0va3ZtNjQuYzo1MDk6CisjZGVmaW5lIEFSTV9DUFVfSURfSVNBUjQgICAgICAg
+MywgMCwgMCwgMiwgNAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBi
+ZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDc6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1
+MTA6CisjZGVmaW5lIEFSTV9DUFVfSURfSVNBUjUgICAgICAgMywgMCwgMCwgMiwgNQoKRVJST1I6
+IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRo
+ZXNpcwojNDg6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTE6CisjZGVmaW5lIEFSTV9DUFVf
+SURfTU1GUjQgICAgICAgMywgMCwgMCwgMiwgNgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXgg
+dmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDk6IEZJTEU6IHRhcmdl
+dC9hcm0va3ZtNjQuYzo1MTI6CisjZGVmaW5lIEFSTV9DUFVfSURfTVZGUjAgICAgICAgMywgMCwg
+MCwgMywgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNs
+b3NlZCBpbiBwYXJlbnRoZXNpcwojNTA6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTM6Cisj
+ZGVmaW5lIEFSTV9DUFVfSURfTVZGUjEgICAgICAgMywgMCwgMCwgMywgMQoKRVJST1I6IE1hY3Jv
+cyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwoj
+NTE6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTQ6CisjZGVmaW5lIEFSTV9DUFVfSURfTVZG
+UjIgICAgICAgMywgMCwgMCwgMywgMgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVz
+IHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTI6IEZJTEU6IHRhcmdldC9hcm0v
+a3ZtNjQuYzo1MTU6CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NFBGUjAgICAgMywgMCwgMCwgNCwg
+MAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBp
+biBwYXJlbnRoZXNpcwojNTM6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTY6CisjZGVmaW5l
+IEFSTV9DUFVfSURfQUE2NFBGUjEgICAgMywgMCwgMCwgNCwgMQoKRVJST1I6IE1hY3JvcyB3aXRo
+IGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTQ6IEZJ
+TEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTc6CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NERGUjAg
+ICAgMywgMCwgMCwgNSwgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3Vs
+ZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTU6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQu
+Yzo1MTg6CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NERGUjEgICAgMywgMCwgMCwgNSwgMQoKRVJS
+T1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJl
+bnRoZXNpcwojNTY6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MTk6CisjZGVmaW5lIEFSTV9D
+UFVfSURfQUE2NEFGUjAgICAgMywgMCwgMCwgNSwgNAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBs
+ZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTc6IEZJTEU6IHRh
+cmdldC9hcm0va3ZtNjQuYzo1MjA6CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NEFGUjEgICAgMywg
+MCwgMCwgNSwgNQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBl
+bmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTg6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MjE6
+CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NElTQVIwICAgMywgMCwgMCwgNiwgMAoKRVJST1I6IE1h
+Y3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNp
+cwojNTk6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MjI6CisjZGVmaW5lIEFSTV9DUFVfSURf
+QUE2NElTQVIxICAgMywgMCwgMCwgNiwgMQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFs
+dWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNjA6IEZJTEU6IHRhcmdldC9h
+cm0va3ZtNjQuYzo1MjM6CisjZGVmaW5lIEFSTV9DUFVfSURfQUE2NE1NRlIwICAgMywgMCwgMCwg
+NywgMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3Nl
+ZCBpbiBwYXJlbnRoZXNpcwojNjE6IEZJTEU6IHRhcmdldC9hcm0va3ZtNjQuYzo1MjQ6CisjZGVm
+aW5lIEFSTV9DUFVfSURfQUE2NE1NRlIxICAgMywgMCwgMCwgNywgMQoKRVJST1I6IHNwYWNlIHJl
+cXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzE1MDogRklMRTogdGFyZ2V0
+L2FybS9rdm02NC5jOjYxMzoKKyAgICAgICAgaWYoaWRfcmVnaXRzZXJzW2ldLmlkICE9IDApIHsK
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxOTQ6IEZJTEU6IHRhcmdldC9hcm0v
+a3ZtNjQuYzo2Nzk6CisgICAgICAgICAgICBmcHJpbnRmKHN0ZGVyciwgImhldGVyb2dlbmVvdXMg
+c3lzdGVtIGNhbid0IHN1cHBvcnQgaG9zdCBndWVzdCBDUFUgdHlwZVxuIik7Cgp0b3RhbDogMzYg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAyMDcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC82OiB0YXJnZXQ6IGFybTogQWRk
+IGEgZ2VuZXJpYyB0eXBlIGNwdS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+NjM6IEZJTEU6IHRhcmdldC9hcm0vY3B1NjQuYzoyNTA6CisgICAgY3B1LT5pZF9hYTY0bW1mcjAg
+PSAweDBmMDAxMTAxOyAvKiBvbmx5IHN1cHBvcnQgNGsgcGFnZSwgMzYgYml0IHBoeXNpY2FsIGFk
+ZHIgKi8KCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjYgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA1LzY6IGFy
+bTogdmlydDogRW5hYmxlIGdlbmVyaWMgdHlwZSBDUFUgaW4gdmlydCBtYWNoaW5lLi4uCkNoZWNr
+aW5nIFBBVENIIDYvNjogdGFyZ2V0LWFybTogY3B1NjQ6IEFkZCBzdXBwb3J0IGZvciBDb3J0ZXgt
+QTcyLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
+IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEBmcmVlbGlzdHMub3Jn
