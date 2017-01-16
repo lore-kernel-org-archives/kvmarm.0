@@ -1,23 +1,23 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH RFC 3/6] arm: kvm64: Check if kvm supports cross type vCPU
-Date: Mon, 16 Jan 2017 17:26:58 +0800
-Message-ID: <1484558821-15512-4-git-send-email-zhaoshenglong@huawei.com>
-References: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH RFC 4/7] ARM64: KVM: emulate accessing ID registers
+Date: Mon, 16 Jan 2017 17:33:31 +0800
+Message-ID: <1484559214-2248-5-git-send-email-zhaoshenglong@huawei.com>
+References: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 62977400E9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:27:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A138F405CC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yCQGEInm8JvI for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jan 2017 04:27:40 -0500 (EST)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E545840664
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:27:21 -0500 (EST)
-In-Reply-To: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
+ with ESMTP id wNHsjOxLJUG8 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Jan 2017 04:33:40 -0500 (EST)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [119.145.14.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FC50401A1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:37 -0500 (EST)
+In-Reply-To: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,234 +27,151 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, wu.wubin@huawei.com, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, qemu-arm@nongnu.org, wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-If user requests a specific type vCPU which is not same with the
-physical ones and if kvm supports cross type vCPU, we set the
-KVM_ARM_VCPU_CROSS bit and set the CPU ID registers.
-
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- target/arm/kvm64.c | 182 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 182 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 83 ++++++++++++++++++++++++++++-------------------
+ 1 file changed, 50 insertions(+), 33 deletions(-)
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 6111109..70442ea 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -481,7 +481,151 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUClass *ahcc)
-     return true;
- }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 7c5fa03..f613e29 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1480,71 +1480,84 @@ FUNCTION_INVARIANT(id_aa64mmfr1_el1)
+ FUNCTION_INVARIANT(clidr_el1)
+ FUNCTION_INVARIANT(aidr_el1)
  
-+#define ARM_CPU_ID_MIDR        3, 0, 0, 0, 0
- #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
-+/* ID group 1 registers */
-+#define ARM_CPU_ID_REVIDR      3, 0, 0, 0, 6
-+#define ARM_CPU_ID_AIDR        3, 1, 0, 0, 7
-+
-+/* ID group 2 registers */
-+#define ARM_CPU_ID_CCSIDR      3, 1, 0, 0, 0
-+#define ARM_CPU_ID_CLIDR       3, 1, 0, 0, 1
-+#define ARM_CPU_ID_CSSELR      3, 2, 0, 0, 0
-+#define ARM_CPU_ID_CTR         3, 3, 0, 0, 1
-+
-+/* ID group 3 registers */
-+#define ARM_CPU_ID_PFR0        3, 0, 0, 1, 0
-+#define ARM_CPU_ID_PFR1        3, 0, 0, 1, 1
-+#define ARM_CPU_ID_DFR0        3, 0, 0, 1, 2
-+#define ARM_CPU_ID_AFR0        3, 0, 0, 1, 3
-+#define ARM_CPU_ID_MMFR0       3, 0, 0, 1, 4
-+#define ARM_CPU_ID_MMFR1       3, 0, 0, 1, 5
-+#define ARM_CPU_ID_MMFR2       3, 0, 0, 1, 6
-+#define ARM_CPU_ID_MMFR3       3, 0, 0, 1, 7
-+#define ARM_CPU_ID_ISAR0       3, 0, 0, 2, 0
-+#define ARM_CPU_ID_ISAR1       3, 0, 0, 2, 1
-+#define ARM_CPU_ID_ISAR2       3, 0, 0, 2, 2
-+#define ARM_CPU_ID_ISAR3       3, 0, 0, 2, 3
-+#define ARM_CPU_ID_ISAR4       3, 0, 0, 2, 4
-+#define ARM_CPU_ID_ISAR5       3, 0, 0, 2, 5
-+#define ARM_CPU_ID_MMFR4       3, 0, 0, 2, 6
-+#define ARM_CPU_ID_MVFR0       3, 0, 0, 3, 0
-+#define ARM_CPU_ID_MVFR1       3, 0, 0, 3, 1
-+#define ARM_CPU_ID_MVFR2       3, 0, 0, 3, 2
-+#define ARM_CPU_ID_AA64PFR0    3, 0, 0, 4, 0
-+#define ARM_CPU_ID_AA64PFR1    3, 0, 0, 4, 1
-+#define ARM_CPU_ID_AA64DFR0    3, 0, 0, 5, 0
-+#define ARM_CPU_ID_AA64DFR1    3, 0, 0, 5, 1
-+#define ARM_CPU_ID_AA64AFR0    3, 0, 0, 5, 4
-+#define ARM_CPU_ID_AA64AFR1    3, 0, 0, 5, 5
-+#define ARM_CPU_ID_AA64ISAR0   3, 0, 0, 6, 0
-+#define ARM_CPU_ID_AA64ISAR1   3, 0, 0, 6, 1
-+#define ARM_CPU_ID_AA64MMFR0   3, 0, 0, 7, 0
-+#define ARM_CPU_ID_AA64MMFR1   3, 0, 0, 7, 1
-+#define ARM_CPU_ID_MAX         36
-+
-+static int kvm_arm_set_id_registers(CPUState *cs)
++static bool access_id_reg(struct kvm_vcpu *vcpu,
++			  struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
 +{
-+    int ret = 0;
-+    uint32_t i;
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    struct kvm_one_reg id_regitsers[ARM_CPU_ID_MAX];
++	if (p->is_write) {
++		vcpu_id_sys_reg(vcpu, r->reg) = p->regval;
++	} else {
++		p->regval = vcpu_id_sys_reg(vcpu, r->reg);
++	}
 +
-+    memset(id_regitsers, 0, ARM_CPU_ID_MAX * sizeof(struct kvm_one_reg));
-+
-+    id_regitsers[0].id = ARM64_SYS_REG(ARM_CPU_ID_MIDR);
-+    id_regitsers[0].addr = (uintptr_t)&cpu->midr;
-+
-+    id_regitsers[1].id = ARM64_SYS_REG(ARM_CPU_ID_REVIDR);
-+    id_regitsers[1].addr = (uintptr_t)&cpu->revidr;
-+
-+    id_regitsers[2].id = ARM64_SYS_REG(ARM_CPU_ID_MVFR0);
-+    id_regitsers[2].addr = (uintptr_t)&cpu->mvfr0;
-+
-+    id_regitsers[3].id = ARM64_SYS_REG(ARM_CPU_ID_MVFR1);
-+    id_regitsers[3].addr = (uintptr_t)&cpu->mvfr1;
-+
-+    id_regitsers[4].id = ARM64_SYS_REG(ARM_CPU_ID_MVFR2);
-+    id_regitsers[4].addr = (uintptr_t)&cpu->mvfr2;
-+
-+    id_regitsers[5].id = ARM64_SYS_REG(ARM_CPU_ID_PFR0);
-+    id_regitsers[5].addr = (uintptr_t)&cpu->id_pfr0;
-+
-+    id_regitsers[6].id = ARM64_SYS_REG(ARM_CPU_ID_PFR1);
-+    id_regitsers[6].addr = (uintptr_t)&cpu->id_pfr1;
-+
-+    id_regitsers[7].id = ARM64_SYS_REG(ARM_CPU_ID_DFR0);
-+    id_regitsers[7].addr = (uintptr_t)&cpu->id_dfr0;
-+
-+    id_regitsers[8].id = ARM64_SYS_REG(ARM_CPU_ID_AFR0);
-+    id_regitsers[8].addr = (uintptr_t)&cpu->id_afr0;
-+
-+    id_regitsers[9].id = ARM64_SYS_REG(ARM_CPU_ID_MMFR0);
-+    id_regitsers[9].addr = (uintptr_t)&cpu->id_mmfr0;
-+
-+    id_regitsers[10].id = ARM64_SYS_REG(ARM_CPU_ID_MMFR1);
-+    id_regitsers[10].addr = (uintptr_t)&cpu->id_mmfr1;
-+
-+    id_regitsers[11].id = ARM64_SYS_REG(ARM_CPU_ID_MMFR2);
-+    id_regitsers[11].addr = (uintptr_t)&cpu->id_mmfr2;
-+
-+    id_regitsers[12].id = ARM64_SYS_REG(ARM_CPU_ID_MMFR3);
-+    id_regitsers[12].addr = (uintptr_t)&cpu->id_mmfr3;
-+
-+    id_regitsers[13].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR0);
-+    id_regitsers[13].addr = (uintptr_t)&cpu->id_isar0;
-+
-+    id_regitsers[14].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR1);
-+    id_regitsers[14].addr = (uintptr_t)&cpu->id_isar1;
-+
-+    id_regitsers[15].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR2);
-+    id_regitsers[15].addr = (uintptr_t)&cpu->id_isar2;
-+
-+    id_regitsers[16].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR3);
-+    id_regitsers[16].addr = (uintptr_t)&cpu->id_isar3;
-+
-+    id_regitsers[17].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR4);
-+    id_regitsers[17].addr = (uintptr_t)&cpu->id_isar4;
-+
-+    id_regitsers[18].id = ARM64_SYS_REG(ARM_CPU_ID_ISAR5);
-+    id_regitsers[18].addr = (uintptr_t)&cpu->id_isar5;
-+
-+    id_regitsers[19].id = ARM64_SYS_REG(ARM_CPU_ID_AA64PFR0);
-+    id_regitsers[19].addr = (uintptr_t)&cpu->id_aa64pfr0;
-+
-+    id_regitsers[20].id = ARM64_SYS_REG(ARM_CPU_ID_AA64DFR0);
-+    id_regitsers[20].addr = (uintptr_t)&cpu->id_aa64dfr0;
-+
-+    id_regitsers[21].id = ARM64_SYS_REG(ARM_CPU_ID_AA64ISAR0);
-+    id_regitsers[21].addr = (uintptr_t)&cpu->id_aa64isar0;
-+
-+    id_regitsers[22].id = ARM64_SYS_REG(ARM_CPU_ID_AA64MMFR0);
-+    id_regitsers[22].addr = (uintptr_t)&cpu->id_aa64mmfr0;
-+
-+    id_regitsers[23].id = ARM64_SYS_REG(ARM_CPU_ID_CLIDR);
-+    id_regitsers[23].addr = (uintptr_t)&cpu->clidr;
-+
-+    id_regitsers[24].id = ARM64_SYS_REG(ARM_CPU_ID_CTR);
-+    id_regitsers[24].addr = (uintptr_t)&cpu->ctr;
-+
-+
-+    for (i = 0; i < ARM_CPU_ID_MAX; i++) {
-+        if(id_regitsers[i].id != 0) {
-+            ret = kvm_set_one_reg(cs, id_regitsers[i].id,
-+                                  (void *)id_regitsers[i].addr);
-+            if (ret) {
-+                fprintf(stderr, "set ID register 0x%llx failed\n",
-+                        id_regitsers[i].id);
-+                return ret;
-+            }
-+        } else {
-+            break;
-+        }
-+    }
-+
-+    /* TODO: Set CCSIDR */
-+    return ret;
++	return true;
 +}
- 
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-@@ -489,6 +633,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     uint64_t mpidr;
-     ARMCPU *cpu = ARM_CPU(cs);
-     CPUARMState *env = &cpu->env;
-+    bool heterogeneous = false, cross = false;
-+    struct kvm_vcpu_init init;
- 
-     if (cpu->kvm_target == QEMU_KVM_ARM_TARGET_NONE ||
-         !object_dynamic_cast(OBJECT(cpu), TYPE_AARCH64_CPU)) {
-@@ -518,12 +664,48 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         unset_feature(&env->features, ARM_FEATURE_PMU);
-     }
- 
-+    /*
-+     * Check if host is a heterogeneous system. It doesn't support -cpu host on
-+     * heterogeneous system. If user requests a specific type VCPU, it should
-+     * set the KVM_ARM_VCPU_CROSS bit to tell KVM that userspace want a specific
-+     * vCPU. If KVM supports cross type vCPU, then set the ID registers.
-+     */
-+    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_HETEROGENEOUS)) {
-+        heterogeneous = true;
-+    }
 +
-+    if (strcmp(object_get_typename(OBJECT(cpu)), TYPE_ARM_HOST_CPU) == 0) {
-+        if (heterogeneous) {
-+            fprintf(stderr, "heterogeneous system can't support host guest CPU type\n");
-+            return -EINVAL;
-+        }
-+    } else if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_CROSS_VCPU)) {
-+        init.features[0] = 1 << KVM_ARM_VCPU_CROSS;
-+        if (kvm_vm_ioctl(cs->kvm_state, KVM_ARM_PREFERRED_TARGET, &init) < 0) {
-+            return -EINVAL;
-+        }
-+
-+        if (init.target != (cpu->midr & 0xFF00FFF0) || heterogeneous) {
-+            cpu->kvm_target = QEMU_KVM_ARM_TARGET_GENERIC_V8;
-+            cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_CROSS;
-+            cross = true;
-+       }
-+    }
-+
-     /* Do KVM_ARM_VCPU_INIT ioctl */
-     ret = kvm_arm_vcpu_init(cs);
-     if (ret) {
-         return ret;
-     }
+ static struct sys_reg_desc invariant_sys_regs[] = {
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b000),
+-	  NULL, get_midr_el1, MIDR_EL1 },
++	  access_id_reg, get_midr_el1, MIDR_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b110),
+-	  NULL, get_revidr_el1, REVIDR_EL1 },
++	  access_id_reg, get_revidr_el1, REVIDR_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b000),
+-	  NULL, get_id_pfr0_el1, ID_PFR0_EL1 },
++	  access_id_reg, get_id_pfr0_el1, ID_PFR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b001),
+-	  NULL, get_id_pfr1_el1, ID_PFR1_EL1 },
++	  access_id_reg, get_id_pfr1_el1, ID_PFR1_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b010),
+-	  NULL, get_id_dfr0_el1, ID_DFR0_EL1 },
++	  access_id_reg, get_id_dfr0_el1, ID_DFR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b011),
+-	  NULL, get_id_afr0_el1, ID_AFR0_EL1 },
++	  access_id_reg, get_id_afr0_el1, ID_AFR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b100),
+-	  NULL, get_id_mmfr0_el1, ID_MMFR0_EL1 },
++	  access_id_reg, get_id_mmfr0_el1, ID_MMFR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b101),
+-	  NULL, get_id_mmfr1_el1, ID_MMFR1_EL1 },
++	  access_id_reg, get_id_mmfr1_el1, ID_MMFR1_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b110),
+-	  NULL, get_id_mmfr2_el1, ID_MMFR2_EL1 },
++	  access_id_reg, get_id_mmfr2_el1, ID_MMFR2_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b111),
+-	  NULL, get_id_mmfr3_el1, ID_MMFR3_EL1 },
++	  access_id_reg, get_id_mmfr3_el1, ID_MMFR3_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b000),
+-	  NULL, get_id_isar0_el1, ID_ISAR0_EL1 },
++	  access_id_reg, get_id_isar0_el1, ID_ISAR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b001),
+-	  NULL, get_id_isar1_el1, ID_ISAR1_EL1 },
++	  access_id_reg, get_id_isar1_el1, ID_ISAR1_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b010),
+-	  NULL, get_id_isar2_el1, ID_ISAR2_EL1 },
++	  access_id_reg, get_id_isar2_el1, ID_ISAR2_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b011),
+-	  NULL, get_id_isar3_el1, ID_ISAR3_EL1 },
++	  access_id_reg, get_id_isar3_el1, ID_ISAR3_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b100),
+-	  NULL, get_id_isar4_el1, ID_ISAR4_EL1 },
++	  access_id_reg, get_id_isar4_el1, ID_ISAR4_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b101),
+-	  NULL, get_id_isar5_el1, ID_ISAR5_EL1 },
++	  access_id_reg, get_id_isar5_el1, ID_ISAR5_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0011), Op2(0b000),
+-	  NULL, get_mvfr0_el1, MVFR0_EL1 },
++	  access_id_reg, get_mvfr0_el1, MVFR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0011), Op2(0b001),
+-	  NULL, get_mvfr1_el1, MVFR1_EL1 },
++	  access_id_reg, get_mvfr1_el1, MVFR1_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0011), Op2(0b010),
+-	  NULL, get_mvfr2_el1, MVFR2_EL1 },
++	  access_id_reg, get_mvfr2_el1, MVFR2_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0100), Op2(0b000),
+-	  NULL, get_id_aa64pfr0_el1, ID_AA64PFR0_EL1 },
++	  access_id_reg, get_id_aa64pfr0_el1, ID_AA64PFR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0100), Op2(0b001),
+-	  NULL, get_id_aa64pfr1_el1, ID_AA64PFR1_EL1 },
++	  access_id_reg, get_id_aa64pfr1_el1, ID_AA64PFR1_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0101), Op2(0b000),
+-	  NULL, get_id_aa64dfr0_el1, ID_AA64DFR0_EL1 },
++	  access_id_reg, get_id_aa64dfr0_el1, ID_AA64DFR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0101), Op2(0b001),
+-	  NULL, get_id_aa64dfr1_el1, ID_AA64DFR1_EL1 },
++	  access_id_reg, get_id_aa64dfr1_el1, ID_AA64DFR1_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0101), Op2(0b100),
+-	  NULL, get_id_aa64afr0_el1, ID_AA64AFR0_EL1 },
++	  access_id_reg, get_id_aa64afr0_el1, ID_AA64AFR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0101), Op2(0b101),
+-	  NULL, get_id_aa64afr1_el1, ID_AA64AFR1_EL1 },
++	  access_id_reg, get_id_aa64afr1_el1, ID_AA64AFR1_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0110), Op2(0b000),
+-	  NULL, get_id_aa64isar0_el1, ID_AA64ISAR0_EL1 },
++	  access_id_reg, get_id_aa64isar0_el1, ID_AA64ISAR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0110), Op2(0b001),
+-	  NULL, get_id_aa64isar1_el1, ID_AA64ISAR1_EL1 },
++	  access_id_reg, get_id_aa64isar1_el1, ID_AA64ISAR1_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0111), Op2(0b000),
+-	  NULL, get_id_aa64mmfr0_el1, ID_AA64MMFR0_EL1 },
++	  access_id_reg, get_id_aa64mmfr0_el1, ID_AA64MMFR0_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0111), Op2(0b001),
+-	  NULL, get_id_aa64mmfr1_el1, ID_AA64MMFR1_EL1 },
++	  access_id_reg, get_id_aa64mmfr1_el1, ID_AA64MMFR1_EL1 },
+ 	{ Op0(0b11), Op1(0b001), CRn(0b0000), CRm(0b0000), Op2(0b001),
+-	  NULL, get_clidr_el1, CLIDR_EL1 },
++	  access_id_reg, get_clidr_el1, CLIDR_EL1 },
+ 	{ Op0(0b11), Op1(0b001), CRn(0b0000), CRm(0b0000), Op2(0b111),
+-	  NULL, get_aidr_el1, AIDR_EL1 },
++	  access_id_reg, get_aidr_el1, AIDR_EL1 },
+ 	{ Op0(0b11), Op1(0b011), CRn(0b0000), CRm(0b0000), Op2(0b001),
+-	  NULL, get_ctr_el0, CTR_EL0 },
++	  access_id_reg, get_ctr_el0, CTR_EL0 },
+ };
  
-+    if (cross) {
-+        ret = kvm_arm_set_id_registers(cs);
-+        if (ret) {
-+            fprintf(stderr, "set vcpu ID registers failed\n");
-+            return ret;
-+        }
-+    }
-+
-     /*
-      * When KVM is in use, PSCI is emulated in-kernel and not by qemu.
-      * Currently KVM has its own idea about MPIDR assignment, so we
+ /* Target specific emulation tables */
+@@ -1809,8 +1822,12 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
+ 
+ 	/* Search target-specific then generic table. */
+ 	r = find_reg(params, table, num);
+-	if (!r)
++	if (!r) {
+ 		r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
++		if (!r)
++			r = find_reg(params, invariant_sys_regs,
++				     ARRAY_SIZE(invariant_sys_regs));
++	}
+ 
+ 	if (likely(r)) {
+ 		/*
 -- 
 2.0.4
