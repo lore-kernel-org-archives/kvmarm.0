@@ -1,22 +1,22 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH RFC 2/7] ARM64: KVM: Add reset handlers for all ID registers
-Date: Mon, 16 Jan 2017 17:33:29 +0800
-Message-ID: <1484559214-2248-3-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH RFC 7/7] ARM64: KVM: Add user set handler for id_aa64mmfr0_el1
+Date: Mon, 16 Jan 2017 17:33:34 +0800
+Message-ID: <1484559214-2248-8-git-send-email-zhaoshenglong@huawei.com>
 References: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB0BB401A1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 99837405B9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qKe-sccdhJfA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jan 2017 04:33:39 -0500 (EST)
+ with ESMTP id HO3bwvDuTFGg for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Jan 2017 04:33:38 -0500 (EST)
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [119.145.14.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4A21401F2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 137984019C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jan 2017 04:33:37 -0500 (EST)
 In-Reply-To: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,224 +33,62 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Move invariant_sys_regs before emulate_sys_reg so that it can be used
-later.
+Check if the configuration is fine.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 193 ++++++++++++++++++++++++++++------------------
- 1 file changed, 116 insertions(+), 77 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 87e7e66..bf71eb4 100644
+index f613e29..9763b79 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1432,6 +1432,122 @@ static const struct sys_reg_desc cp15_64_regs[] = {
- 	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, c2_TTBR1 },
- };
- 
-+/*
-+ * These are the invariant sys_reg registers: we let the guest see the
-+ * host versions of these, so they're part of the guest state.
-+ *
-+ * A future CPU may provide a mechanism to present different values to
-+ * the guest, or a future kvm may trap them.
-+ */
-+
-+#define FUNCTION_INVARIANT(reg)						\
-+	static void get_##reg(struct kvm_vcpu *v,			\
-+			      const struct sys_reg_desc *r)		\
-+	{								\
-+		((struct sys_reg_desc *)r)->val = read_sysreg(reg);	\
-+	}
-+
-+FUNCTION_INVARIANT(midr_el1)
-+FUNCTION_INVARIANT(ctr_el0)
-+FUNCTION_INVARIANT(revidr_el1)
-+FUNCTION_INVARIANT(id_pfr0_el1)
-+FUNCTION_INVARIANT(id_pfr1_el1)
-+FUNCTION_INVARIANT(id_dfr0_el1)
-+FUNCTION_INVARIANT(id_afr0_el1)
-+FUNCTION_INVARIANT(id_mmfr0_el1)
-+FUNCTION_INVARIANT(id_mmfr1_el1)
-+FUNCTION_INVARIANT(id_mmfr2_el1)
-+FUNCTION_INVARIANT(id_mmfr3_el1)
-+FUNCTION_INVARIANT(id_isar0_el1)
-+FUNCTION_INVARIANT(id_isar1_el1)
-+FUNCTION_INVARIANT(id_isar2_el1)
-+FUNCTION_INVARIANT(id_isar3_el1)
-+FUNCTION_INVARIANT(id_isar4_el1)
-+FUNCTION_INVARIANT(id_isar5_el1)
-+FUNCTION_INVARIANT(mvfr0_el1)
-+FUNCTION_INVARIANT(mvfr1_el1)
-+FUNCTION_INVARIANT(mvfr2_el1)
-+FUNCTION_INVARIANT(id_aa64pfr0_el1)
-+FUNCTION_INVARIANT(id_aa64pfr1_el1)
-+FUNCTION_INVARIANT(id_aa64dfr0_el1)
-+FUNCTION_INVARIANT(id_aa64dfr1_el1)
-+FUNCTION_INVARIANT(id_aa64afr0_el1)
-+FUNCTION_INVARIANT(id_aa64afr1_el1)
-+FUNCTION_INVARIANT(id_aa64isar0_el1)
-+FUNCTION_INVARIANT(id_aa64isar1_el1)
-+FUNCTION_INVARIANT(id_aa64mmfr0_el1)
-+FUNCTION_INVARIANT(id_aa64mmfr1_el1)
-+FUNCTION_INVARIANT(clidr_el1)
-+FUNCTION_INVARIANT(aidr_el1)
-+
-+/* ->val is filled in by kvm_sys_reg_table_init() */
-+static struct sys_reg_desc invariant_sys_regs[] = {
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b000),
-+	  NULL, get_midr_el1, MIDR_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b110),
-+	  NULL, get_revidr_el1, REVIDR_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b000),
-+	  NULL, get_id_pfr0_el1, ID_PFR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b001),
-+	  NULL, get_id_pfr1_el1, ID_PFR1_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b010),
-+	  NULL, get_id_dfr0_el1, ID_DFR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b011),
-+	  NULL, get_id_afr0_el1, ID_AFR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b100),
-+	  NULL, get_id_mmfr0_el1, ID_MMFR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b101),
-+	  NULL, get_id_mmfr1_el1, ID_MMFR1_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b110),
-+	  NULL, get_id_mmfr2_el1, ID_MMFR2_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b111),
-+	  NULL, get_id_mmfr3_el1, ID_MMFR3_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b000),
-+	  NULL, get_id_isar0_el1, ID_ISAR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b001),
-+	  NULL, get_id_isar1_el1, ID_ISAR1_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b010),
-+	  NULL, get_id_isar2_el1, ID_ISAR2_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b011),
-+	  NULL, get_id_isar3_el1, ID_ISAR3_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b100),
-+	  NULL, get_id_isar4_el1, ID_ISAR4_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b101),
-+	  NULL, get_id_isar5_el1, ID_ISAR5_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0011), Op2(0b000),
-+	  NULL, get_mvfr0_el1, MVFR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0011), Op2(0b001),
-+	  NULL, get_mvfr1_el1, MVFR1_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0011), Op2(0b010),
-+	  NULL, get_mvfr2_el1, MVFR2_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0100), Op2(0b000),
-+	  NULL, get_id_aa64pfr0_el1, ID_AA64PFR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0100), Op2(0b001),
-+	  NULL, get_id_aa64pfr1_el1, ID_AA64PFR1_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0101), Op2(0b000),
-+	  NULL, get_id_aa64dfr0_el1, ID_AA64DFR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0101), Op2(0b001),
-+	  NULL, get_id_aa64dfr1_el1, ID_AA64DFR1_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0101), Op2(0b100),
-+	  NULL, get_id_aa64afr0_el1, ID_AA64AFR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0101), Op2(0b101),
-+	  NULL, get_id_aa64afr1_el1, ID_AA64AFR1_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0110), Op2(0b000),
-+	  NULL, get_id_aa64isar0_el1, ID_AA64ISAR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0110), Op2(0b001),
-+	  NULL, get_id_aa64isar1_el1, ID_AA64ISAR1_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0111), Op2(0b000),
-+	  NULL, get_id_aa64mmfr0_el1, ID_AA64MMFR0_EL1 },
-+	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0111), Op2(0b001),
-+	  NULL, get_id_aa64mmfr1_el1, ID_AA64MMFR1_EL1 },
-+	{ Op0(0b11), Op1(0b001), CRn(0b0000), CRm(0b0000), Op2(0b001),
-+	  NULL, get_clidr_el1, CLIDR_EL1 },
-+	{ Op0(0b11), Op1(0b001), CRn(0b0000), CRm(0b0000), Op2(0b111),
-+	  NULL, get_aidr_el1, AIDR_EL1 },
-+	{ Op0(0b11), Op1(0b011), CRn(0b0000), CRm(0b0000), Op2(0b001),
-+	  NULL, get_ctr_el0, CTR_EL0 },
-+};
-+
- /* Target specific emulation tables */
- static struct kvm_sys_reg_target_table *target_tables[KVM_ARM_NUM_TARGETS];
- 
-@@ -1822,83 +1938,6 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
- 	return r;
+@@ -1493,6 +1493,35 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
--/*
-- * These are the invariant sys_reg registers: we let the guest see the
-- * host versions of these, so they're part of the guest state.
-- *
-- * A future CPU may provide a mechanism to present different values to
-- * the guest, or a future kvm may trap them.
-- */
--
--#define FUNCTION_INVARIANT(reg)						\
--	static void get_##reg(struct kvm_vcpu *v,			\
--			      const struct sys_reg_desc *r)		\
--	{								\
--		((struct sys_reg_desc *)r)->val = read_sysreg(reg);	\
--	}
--
--FUNCTION_INVARIANT(midr_el1)
--FUNCTION_INVARIANT(ctr_el0)
--FUNCTION_INVARIANT(revidr_el1)
--FUNCTION_INVARIANT(id_pfr0_el1)
--FUNCTION_INVARIANT(id_pfr1_el1)
--FUNCTION_INVARIANT(id_dfr0_el1)
--FUNCTION_INVARIANT(id_afr0_el1)
--FUNCTION_INVARIANT(id_mmfr0_el1)
--FUNCTION_INVARIANT(id_mmfr1_el1)
--FUNCTION_INVARIANT(id_mmfr2_el1)
--FUNCTION_INVARIANT(id_mmfr3_el1)
--FUNCTION_INVARIANT(id_isar0_el1)
--FUNCTION_INVARIANT(id_isar1_el1)
--FUNCTION_INVARIANT(id_isar2_el1)
--FUNCTION_INVARIANT(id_isar3_el1)
--FUNCTION_INVARIANT(id_isar4_el1)
--FUNCTION_INVARIANT(id_isar5_el1)
--FUNCTION_INVARIANT(clidr_el1)
--FUNCTION_INVARIANT(aidr_el1)
--
--/* ->val is filled in by kvm_sys_reg_table_init() */
--static struct sys_reg_desc invariant_sys_regs[] = {
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b000),
--	  NULL, get_midr_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b110),
--	  NULL, get_revidr_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b000),
--	  NULL, get_id_pfr0_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b001),
--	  NULL, get_id_pfr1_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b010),
--	  NULL, get_id_dfr0_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b011),
--	  NULL, get_id_afr0_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b100),
--	  NULL, get_id_mmfr0_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b101),
--	  NULL, get_id_mmfr1_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b110),
--	  NULL, get_id_mmfr2_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b111),
--	  NULL, get_id_mmfr3_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b000),
--	  NULL, get_id_isar0_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b001),
--	  NULL, get_id_isar1_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b010),
--	  NULL, get_id_isar2_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b011),
--	  NULL, get_id_isar3_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b100),
--	  NULL, get_id_isar4_el1 },
--	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b101),
--	  NULL, get_id_isar5_el1 },
--	{ Op0(0b11), Op1(0b001), CRn(0b0000), CRm(0b0000), Op2(0b001),
--	  NULL, get_clidr_el1 },
--	{ Op0(0b11), Op1(0b001), CRn(0b0000), CRm(0b0000), Op2(0b111),
--	  NULL, get_aidr_el1 },
--	{ Op0(0b11), Op1(0b011), CRn(0b0000), CRm(0b0000), Op2(0b001),
--	  NULL, get_ctr_el0 },
--};
--
- static int reg_from_user(u64 *val, const void __user *uaddr, u64 id)
- {
- 	if (copy_from_user(val, uaddr, KVM_REG_SIZE(id)) != 0)
++static int set_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
++				const struct sys_reg_desc *rd,
++				const struct kvm_one_reg *reg,
++				void __user *uaddr)
++{
++	u64 val, id_aa64mmfr0;
++
++	if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)) != 0)
++		return -EFAULT;
++
++	asm volatile("mrs %0, id_aa64mmfr0_el1\n" : "=r" (id_aa64mmfr0));
++
++	if ((val & GENMASK(3, 0)) > (id_aa64mmfr0 & GENMASK(3, 0)) ||
++	    (val & GENMASK(7, 4)) > (id_aa64mmfr0 & GENMASK(7, 4)) ||
++	    (val & GENMASK(11, 8)) > (id_aa64mmfr0 & GENMASK(11, 8)) ||
++	    (val & GENMASK(15, 12)) > (id_aa64mmfr0 & GENMASK(15, 12)) ||
++	    (val & GENMASK(19, 16)) > (id_aa64mmfr0 & GENMASK(19, 16)) ||
++	    (val & GENMASK(23, 20)) > (id_aa64mmfr0 & GENMASK(23, 20)) ||
++	    (val & GENMASK(27, 24)) < (id_aa64mmfr0 & GENMASK(27, 24)) ||
++	    (val & GENMASK(31, 28)) < (id_aa64mmfr0 & GENMASK(31, 28))) {
++		kvm_err("Wrong memory translation granule size/Physical Address range\n");
++		return -EINVAL;
++	}
++
++	vcpu_id_sys_reg(vcpu, rd->reg) = val & GENMASK(31, 0);
++
++	return 0;
++}
++
+ static struct sys_reg_desc invariant_sys_regs[] = {
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b000),
+ 	  access_id_reg, get_midr_el1, MIDR_EL1 },
+@@ -1549,7 +1578,8 @@ static struct sys_reg_desc invariant_sys_regs[] = {
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0110), Op2(0b001),
+ 	  access_id_reg, get_id_aa64isar1_el1, ID_AA64ISAR1_EL1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0111), Op2(0b000),
+-	  access_id_reg, get_id_aa64mmfr0_el1, ID_AA64MMFR0_EL1 },
++	  access_id_reg, get_id_aa64mmfr0_el1, ID_AA64MMFR0_EL1,
++	  0, NULL, set_id_aa64mmfr0_el1 },
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0111), Op2(0b001),
+ 	  access_id_reg, get_id_aa64mmfr1_el1, ID_AA64MMFR1_EL1 },
+ 	{ Op0(0b11), Op1(0b001), CRn(0b0000), CRm(0b0000), Op2(0b001),
 -- 
 2.0.4
