@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [RFC PATCH 15/33] irqchip/gic-v4: Add management structure definitions
-Date: Tue, 17 Jan 2017 10:20:36 +0000
-Message-ID: <1484648454-21216-16-git-send-email-marc.zyngier@arm.com>
+Subject: [RFC PATCH 28/33] irqchip/gic-v3-its: Support VPE doorbell
+ invalidation even when !DirectLPI
+Date: Tue, 17 Jan 2017 10:20:49 +0000
+Message-ID: <1484648454-21216-29-git-send-email-marc.zyngier@arm.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F3A44068E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE4C94069B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:20:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZAKgtublighe for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Jan 2017 05:19:46 -0500 (EST)
+ with ESMTP id WTBb+LHaa3zX for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Jan 2017 05:20:03 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 964294086A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A0FB34096F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:20:02 -0500 (EST)
 In-Reply-To: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,112 +32,105 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a bunch of GICv4-specific data structures that will get used in
-subsequent patches.
+When we don't have the DirectLPI feature, we must work around the
+architecture shortcomings to be able to perform the required
+invalidation.
+
+For this, we create a fake device whose sole purpose is to
+provide a way to issue a map/inv/unmap sequence (and the corresponding
+sync operations). That's 6 commands and a full serialization point
+to be able to do this.
+
+You just have hope the hypervisor won't do that too often...
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/linux/irqchip/arm-gic-v4.h | 92 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 92 insertions(+)
- create mode 100644 include/linux/irqchip/arm-gic-v4.h
+ drivers/irqchip/irq-gic-v3-its.c | 59 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 57 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-new file mode 100644
-index 0000000..6e9c2b3
---- /dev/null
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -0,0 +1,92 @@
-+/*
-+ * Copyright (C) 2016 ARM Limited, All Rights Reserved.
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 008fb71..3787579 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -133,6 +133,9 @@ struct its_device {
+ 	u32			device_id;
+ };
+ 
++static struct its_device *vpe_proxy_dev;
++static DEFINE_RAW_SPINLOCK(vpe_proxy_dev_lock);
 +
-+#ifndef __LINUX_IRQCHIP_ARM_GIC_V4_H
-+#define __LINUX_IRQCHIP_ARM_GIC_V4_H
+ static LIST_HEAD(its_nodes);
+ static DEFINE_SPINLOCK(its_lock);
+ static struct rdists *gic_rdists;
+@@ -993,8 +996,35 @@ static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
+ 		struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+ 		void __iomem *rdbase;
+ 
+-		rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
+-		writeq_relaxed(d->hwirq, rdbase + GICR_INVLPIR);
++		if (gic_rdists->has_direct_lpi) {
++			rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
++			writeq_relaxed(d->hwirq, rdbase + GICR_INVLPIR);
++		} else {
++			/*
++			 * This is insane.
++			 *
++			 * If a GICv4 doesn't implement Direct LPIs,
++			 * the only way to perform an invalidate is to
++			 * use a fake device to issue a MAP/INV/UNMAP
++			 * sequence. Since each of these commands has
++			 * a sync operation, this is really fast. Not.
++			 *
++			 * We always use event 0, and this serialize
++			 * all VPE invalidations in the system.
++			 *
++			 * Broken by design(tm).
++			 */
++			unsigned long flags;
 +
-+/* Embedded in kvm.arch */
-+struct its_vm {
-+	struct irq_domain	*domain;
-+	struct page		*vprop_page;
-+	irq_hw_number_t		db_lpi_base;
-+	unsigned long		*db_bitmap;
-+	int			nr_db_lpis;
-+};
++			raw_spin_lock_irqsave(&vpe_proxy_dev_lock, flags);
 +
-+/* Embedded in kvm_vcpu.arch */
-+struct its_vpe {
-+	struct page 		*vpt_page;
-+	struct its_vm		*its_vm;
-+	irq_hw_number_t		vpe_db_lpi;
-+	u16			col_idx;
-+	u16			vpe_id;
-+	bool			idai;
-+	bool			pending_last;
-+};
++			vpe_proxy_dev->event_map.col_map[0] = vpe->col_idx;
++			its_send_mapvi(vpe_proxy_dev, vpe->vpe_db_lpi, 0);
++			its_send_inv(vpe_proxy_dev, 0);
++			its_send_discard(vpe_proxy_dev, 0);
 +
-+/*
-+ * struct its_vlpi: structure describing a VLPI. Only to be
-+ * interpreted in the context of a physical interrupt it complements.
-+ *
-+ * @vintid:	Virtual LPI number
-+ * @db_enabled:	Is the VPE doorbell to be generated?
-+ * @vpe_idx:	Index (0-based) of the VPE in this VM. Not the vpe_id!
-+ */
-+struct its_vlpi {
-+	u32			vintid;
-+	bool			db_enabled;
-+	u16			vpe_idx;
-+};
++			raw_spin_unlock_irqrestore(&vpe_proxy_dev_lock, flags);
++		}
+ 	}
+ }
+ 
+@@ -2481,6 +2511,31 @@ static struct irq_domain *its_init_vpe_domain(void)
+ 	struct fwnode_handle *handle;
+ 	struct irq_domain *domain;
+ 
++	if (gic_rdists->has_direct_lpi) {
++		pr_info("ITS: Using DirectLPI for VPE invalidation\n");
++	} else {
++		struct its_node *its;
 +
-+/*
-+ * struct its_vlpi_map: structure describing the mappings of all vlpis
-+ * for a single device. To be used as the vcpu_info passed to
-+ * irq_set_vcpu_affinity().
-+ *
-+ * @vpes: Array of struct its_vpe, describing the GICv4 view of the
-+ * 	  vpus.
-+ * @vlpis: Array of struct vlpi, each one matching one the
-+ *	   corresponding LPI
-+ * @nr_vpes: Size of the @vpes array
-+ * @nr_vlpis: Size of the @vlpis array
-+ */
-+struct its_vlpi_map {
-+	/* nr_vpes  */
-+	struct its_vpe		**vpes;
-+	struct its_vlpi		*vlpis;
-+	int			nr_vpes;
-+	int			nr_vlpis;
-+};
++		list_for_each_entry(its, &its_nodes, entry) {
++			u32 devid;
 +
-+enum its_cmd_type {
-+	MAP_VLPI,
-+	UNMAP_VLPI,
-+	PROP_UPDATE_VLPI,
-+	SCHEDULE_VPE,
-+	DESCHEDULE_VPE,
-+	INVALL_VPE,
-+};
++			if (!its->is_v4)
++				continue;
 +
-+struct its_cmd_info {
-+	enum its_cmd_type		cmd_type;
-+	union {
-+		struct its_vlpi_map	*map;
-+		u8			config;
-+	};
-+};
++			/* Use the last possible DevID */
++			devid = GENMASK(its->device_ids - 1, 0);
++			vpe_proxy_dev = its_create_device(its, devid, 1);
++			if (!vpe_proxy_dev) {
++				pr_err("ITS: Can't allocate GICv4 proxy device\n");
++				return NULL;
++			}
 +
-+#endif
++			pr_info("ITS: Allocated DevID %x as GICv4 proxy device\n",
++				devid);
++			break;
++		}
++	}
++
+ 	handle = irq_domain_alloc_fwnode("VPE domain");
+ 	if (!handle)
+ 		return NULL;
 -- 
 2.1.4
