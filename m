@@ -1,78 +1,90 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [RFC PATCH 14/33] irqchip/gic-v3-its: Generalize LPI configuration
-Date: Tue, 17 Jan 2017 10:20:35 +0000
-Message-ID: <1484648454-21216-15-git-send-email-marc.zyngier@arm.com>
+Subject: [RFC PATCH 10/33] irqchip/gic-v4-its: Allow use of indirect VCPU
+ tables
+Date: Tue, 17 Jan 2017 10:20:31 +0000
+Message-ID: <1484648454-21216-11-git-send-email-marc.zyngier@arm.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86241405E9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:38 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id M5HGP5AyFQ1S for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Jan 2017 05:19:37 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ADF7040783
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:37 -0500 (EST)
 In-Reply-To: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We're are going to need to change a bit more than just the enable
-bit in the LPI property table in the future. So let's change the
-LPI configuration funtion to take a set of bits to be cleared,
-and a set of bits to be set.
-
-This way, we'll be able to use it when a guest updates an LPI
-property (priority, for example).
+The VCPU tables can be quite sparse as well, and it makes sense
+to use indirect tables as well if possible.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index dcd4771..0dbc8b0 100644
+index c92ff4d..14305db1 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -672,17 +672,18 @@ static inline u32 its_get_event_id(struct irq_data *d)
- 	return d->hwirq - its_dev->event_map.lpi_base;
+@@ -1060,10 +1060,13 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+ 	return 0;
  }
  
--static void lpi_set_config(struct irq_data *d, bool enable)
-+static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
+-static bool its_parse_baser_device(struct its_node *its, struct its_baser *baser,
+-				   u32 psz, u32 *order)
++static bool its_parse_indirect_baser(struct its_node *its,
++				     struct its_baser *baser,
++				     u32 psz, u32 *order)
  {
- 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
- 	irq_hw_number_t hwirq = d->hwirq;
--	u32 id = its_get_event_id(d);
--	u8 *cfg = page_address(gic_rdists->prop_page) + hwirq - 8192;
-+	struct page *prop_page;
-+	u8 *cfg;
+-	u64 esz = GITS_BASER_ENTRY_SIZE(its_read_baser(its, baser));
++	u64 tmp = its_read_baser(its, baser);
++	u64 type = GITS_BASER_TYPE(tmp);
++	u64 esz = GITS_BASER_ENTRY_SIZE(tmp);
+ 	u64 val = GITS_BASER_InnerShareable | GITS_BASER_WaWb;
+ 	u32 ids = its->device_ids;
+ 	u32 new_order = *order;
+@@ -1102,8 +1105,9 @@ static bool its_parse_baser_device(struct its_node *its, struct its_baser *baser
+ 	if (new_order >= MAX_ORDER) {
+ 		new_order = MAX_ORDER - 1;
+ 		ids = ilog2(PAGE_ORDER_TO_SIZE(new_order) / (int)esz);
+-		pr_warn("ITS@%pa: Device Table too large, reduce ids %u->%u\n",
+-			&its->phys_base, its->device_ids, ids);
++		pr_warn("ITS@%pa: %s Table too large, reduce ids %u->%u\n",
++			&its->phys_base, its_base_type_string[type],
++			its->device_ids, ids);
+ 	}
  
--	if (enable)
--		*cfg |= LPI_PROP_ENABLED;
--	else
--		*cfg &= ~LPI_PROP_ENABLED;
-+	prop_page = gic_rdists->prop_page;
-+
-+	cfg = page_address(prop_page) + hwirq - 8192;
-+	*cfg &= ~clr;
-+	*cfg |= set;
+ 	*order = new_order;
+@@ -1154,8 +1158,10 @@ static int its_alloc_tables(struct its_node *its)
+ 		if (type == GITS_BASER_TYPE_NONE)
+ 			continue;
  
- 	/*
- 	 * Make the above write visible to the redistributors.
-@@ -693,17 +694,17 @@ static void lpi_set_config(struct irq_data *d, bool enable)
- 		gic_flush_dcache_to_poc(cfg, sizeof(*cfg));
- 	else
- 		dsb(ishst);
--	its_send_inv(its_dev, id);
-+	its_send_inv(its_dev, its_get_event_id(d));
- }
+-		if (type == GITS_BASER_TYPE_DEVICE)
+-			indirect = its_parse_baser_device(its, baser, psz, &order);
++		if (type == GITS_BASER_TYPE_DEVICE ||
++		    type == GITS_BASER_TYPE_VCPU)
++			indirect = its_parse_indirect_baser(its, baser,
++							    psz, &order);
  
- static void its_mask_irq(struct irq_data *d)
- {
--	lpi_set_config(d, false);
-+	lpi_update_config(d, LPI_PROP_ENABLED, 0);
- }
- 
- static void its_unmask_irq(struct irq_data *d)
- {
--	lpi_set_config(d, true);
-+	lpi_update_config(d, 0, LPI_PROP_ENABLED);
- }
- 
- static int its_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
+ 		err = its_setup_baser(its, baser, cache, shr, psz, order, indirect);
+ 		if (err < 0) {
 -- 
 2.1.4
