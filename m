@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [RFC PATCH 24/33] irqchip/gic-v3-its: Add VPE scheduling
-Date: Tue, 17 Jan 2017 10:20:45 +0000
-Message-ID: <1484648454-21216-25-git-send-email-marc.zyngier@arm.com>
+Subject: [RFC PATCH 06/33] irqchip/gic-v3-its: Add probing for VLPI properties
+Date: Tue, 17 Jan 2017 10:20:27 +0000
+Message-ID: <1484648454-21216-7-git-send-email-marc.zyngier@arm.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A5DB407F4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 377F34019C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EcmmhcVMXy6j for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Jan 2017 05:19:57 -0500 (EST)
+ with ESMTP id 39MTbJiJMt6d for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Jan 2017 05:19:32 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 122C640963
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3028840692
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:32 -0500 (EST)
 In-Reply-To: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,170 +31,126 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When a VPE is scheduled to run, the corresponding redistributor must
-be told so, by setting VPROPBASER to the VM's property table, and
-VPENDBASER to the vcpu's pending table.
-
-When scheduled out, we preserve the IDAI and PendingLast bits. The
-latter is specially important, as it tells the hypervisor that
-there are pending interrupts for this vcpu.
+Add the probing code for the ITS VLPI support. This includes
+configuring the ITS number if not supporting the single VMOVP
+command feature.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c   | 57 ++++++++++++++++++++++++++++++++++
- include/linux/irqchip/arm-gic-v3.h | 63 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 120 insertions(+)
+ drivers/irqchip/irq-gic-v3-its.c   | 47 ++++++++++++++++++++++++++++++++++----
+ include/linux/irqchip/arm-gic-v3.h |  4 ++++
+ 2 files changed, 47 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 598e25b..f918d59 100644
+index 9304dd2..99f6130 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -143,6 +143,7 @@ static DEFINE_IDA(its_vpeid_ida);
+@@ -103,6 +103,7 @@ struct its_node {
+ 	u32			ite_size;
+ 	u32			device_ids;
+ 	int			numa_node;
++	bool			is_v4;
+ };
  
+ #define ITS_ITT_ALIGN		SZ_256
+@@ -135,6 +136,8 @@ static DEFINE_SPINLOCK(its_lock);
+ static struct rdists *gic_rdists;
+ static struct irq_domain *its_parent;
+ 
++static unsigned long its_list_map;
++
  #define gic_data_rdist()		(raw_cpu_ptr(gic_rdists->rdist))
  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
-+#define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
  
- static struct its_collection *dev_event_to_col(struct its_device *its_dev,
- 					       u32 event)
-@@ -2039,8 +2040,64 @@ static const struct irq_domain_ops its_domain_ops = {
- 	.deactivate		= its_irq_domain_deactivate,
- };
+@@ -1661,8 +1664,8 @@ static int __init its_probe_one(struct resource *res,
+ {
+ 	struct its_node *its;
+ 	void __iomem *its_base;
+-	u32 val;
+-	u64 baser, tmp;
++	u32 val, ctlr;
++	u64 baser, tmp, typer;
+ 	int err;
  
-+static int its_vpe_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
-+{
-+	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-+	struct its_cmd_info *info = vcpu_info;
-+	u64 val;
+ 	its_base = ioremap(res->start, resource_size(res));
+@@ -1695,9 +1698,44 @@ static int __init its_probe_one(struct resource *res,
+ 	raw_spin_lock_init(&its->lock);
+ 	INIT_LIST_HEAD(&its->entry);
+ 	INIT_LIST_HEAD(&its->its_device_list);
++	typer = gic_read_typer(its_base + GITS_TYPER);
+ 	its->base = its_base;
+ 	its->phys_base = res->start;
+-	its->ite_size = ((gic_read_typer(its_base + GITS_TYPER) >> 4) & 0xf) + 1;
++	its->ite_size = ((typer >> 4) & 0xf) + 1;
++	its->is_v4 = !!(typer & GITS_TYPER_VLPIS);
++	if (its->is_v4 && !(typer & GITS_TYPER_VMOVP)) {
++		int its_number;
 +
-+	switch (info->cmd_type) {
-+	case SCHEDULE_VPE:
-+	{
-+		void * __iomem vlpi_base = gic_data_rdist_vlpi_base();
-+
-+		/* Schedule the VPE */
-+		val  = virt_to_phys(page_address(vpe->its_vm->vprop_page)) &
-+			GENMASK_ULL(51, 12);
-+		val |= (LPI_NRBITS - 1) & GICR_VPROPBASER_IDBITS_MASK;
-+		val |= GICR_VPROPBASER_RaWb;
-+		val |= GICR_VPROPBASER_InnerShareable;
-+		gits_write_vpropbaser(val, vlpi_base + GICR_VPROPBASER);
-+
-+		val  = virt_to_phys(page_address(vpe->vpt_page)) & GENMASK(51, 16);
-+		val |= GICR_VPENDBASER_WaWb;
-+		val |= GICR_VPENDBASER_NonShareable;
-+		val |= GICR_PENDBASER_PendingLast;
-+		val |= vpe->idai ? GICR_PENDBASER_IDAI : 0;
-+		val |= GICR_PENDBASER_Valid;
-+		gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
-+
-+		return 0;
-+	}
-+
-+	case DESCHEDULE_VPE:
-+	{
-+		void * __iomem vlpi_base = gic_data_rdist_vlpi_base();
-+
-+		/* We're being scheduled out */
-+		val = gits_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
-+		val &= ~GICR_PENDBASER_Valid;
-+		gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
-+
-+		val = gits_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
-+		while (val & GICR_PENDBASER_Dirty) {
-+			cpu_relax();
-+			val = gits_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
++		its_number = find_first_zero_bit(&its_list_map, 16);
++		if (its_number >= 16) {
++			pr_err("ITS@%pa: No ITSList entry available!\n",
++			       &res->start);
++			err = -EINVAL;
++			goto out_free_its;
 +		}
 +
-+		vpe->idai = !!(val & GICR_PENDBASER_IDAI);
-+		vpe->pending_last = !!(val & GICR_PENDBASER_PendingLast);
-+		return 0;
++		ctlr = readl_relaxed(its_base + GITS_CTLR);
++		ctlr &= ~GITS_CTLR_ITS_NUMBER;
++		ctlr |= its_number << GITS_CTLR_ITS_NUMBER_SHIFT;
++		writel_relaxed(ctlr, its_base + GITS_CTLR);
++		ctlr = readl_relaxed(its_base + GITS_CTLR);
++		if ((ctlr & GITS_CTLR_ITS_NUMBER) != (its_number << GITS_CTLR_ITS_NUMBER_SHIFT)) {
++			its_number = ctlr & GITS_CTLR_ITS_NUMBER;
++			its_number >>= GITS_CTLR_ITS_NUMBER_SHIFT;
++		}
++
++		if (test_and_set_bit(its_number, &its_list_map)) {
++			pr_err("ITS@%pa: Duplicate ITSList entry %d\n",
++			       &res->start, its_number);
++			err = -EINVAL;
++			goto out_free_its;
++		}
++
++		pr_info("ITS@%pa: Using ITS number %d\n", &res->start, its_number);
++	} else {
++		pr_info("ITS@%pa: Single VMOVP capable\n", &res->start);
 +	}
 +
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
- static struct irq_chip its_vpe_irq_chip = {
- 	.name			= "GICv4-vpe",
-+	.irq_set_vcpu_affinity	= its_vpe_set_vcpu_affinity,
- };
+ 	its->numa_node = numa_node;
  
- static int its_vpe_id_alloc(void)
+ 	its->cmd_base = kzalloc(ITS_CMD_QUEUE_SZ, GFP_KERNEL);
+@@ -1743,7 +1781,8 @@ static int __init its_probe_one(struct resource *res,
+ 	}
+ 
+ 	gits_write_cwriter(0, its->base + GITS_CWRITER);
+-	writel_relaxed(GITS_CTLR_ENABLE, its->base + GITS_CTLR);
++	ctlr = readl_relaxed(its->base + GITS_CTLR);
++	writel_relaxed(ctlr | GITS_CTLR_ENABLE, its->base + GITS_CTLR);
+ 
+ 	err = its_init_domain(handle, its);
+ 	if (err)
 diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 1b3a070..2789c9a 100644
+index b162bfa..dc7dcc6 100644
 --- a/include/linux/irqchip/arm-gic-v3.h
 +++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -209,6 +209,69 @@
- #define LPI_PROP_ENABLED		(1 << 0)
+@@ -231,14 +231,18 @@
+ #define GITS_TRANSLATER			0x10040
  
- /*
-+ * Re-Distributor registers, offsets from VLPI_base
-+ */
-+#define GICR_VPROPBASER			0x0070
-+
-+#define GICR_VPROPBASER_IDBITS_MASK	0x1f
-+
-+#define GICR_VPROPBASER_SHAREABILITY_SHIFT		(10)
-+#define GICR_VPROPBASER_INNER_CACHEABILITY_SHIFT	(7)
-+#define GICR_VPROPBASER_OUTER_CACHEABILITY_SHIFT	(56)
-+
-+#define GICR_VPROPBASER_SHAREABILITY_MASK				\
-+	GIC_BASER_SHAREABILITY(GICR_VPROPBASER, SHAREABILITY_MASK)
-+#define GICR_VPROPBASER_INNER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, MASK)
-+#define GICR_VPROPBASER_OUTER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, OUTER, MASK)
-+#define GICR_VPROPBASER_CACHEABILITY_MASK				\
-+	GICR_VPROPBASER_INNER_CACHEABILITY_MASK
-+
-+#define GICR_VPROPBASER_InnerShareable					\
-+	GIC_BASER_SHAREABILITY(GICR_VPROPBASER, InnerShareable)
-+
-+#define GICR_VPROPBASER_nCnB	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, nCnB)
-+#define GICR_VPROPBASER_nC 	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, nC)
-+#define GICR_VPROPBASER_RaWt	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, RaWt)
-+#define GICR_VPROPBASER_RaWb	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, RaWt)
-+#define GICR_VPROPBASER_WaWt	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, WaWt)
-+#define GICR_VPROPBASER_WaWb	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, WaWb)
-+#define GICR_VPROPBASER_RaWaWt	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, RaWaWt)
-+#define GICR_VPROPBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, RaWaWb)
-+
-+#define GICR_VPENDBASER			0x0078
-+
-+#define GICR_VPENDBASER_SHAREABILITY_SHIFT		(10)
-+#define GICR_VPENDBASER_INNER_CACHEABILITY_SHIFT	(7)
-+#define GICR_VPENDBASER_OUTER_CACHEABILITY_SHIFT	(56)
-+#define GICR_VPENDBASER_SHAREABILITY_MASK				\
-+	GIC_BASER_SHAREABILITY(GICR_VPENDBASER, SHAREABILITY_MASK)
-+#define GICR_VPENDBASER_INNER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, MASK)
-+#define GICR_VPENDBASER_OUTER_CACHEABILITY_MASK				\
-+	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, OUTER, MASK)
-+#define GICR_VPENDBASER_CACHEABILITY_MASK				\
-+	GICR_VPENDBASER_INNER_CACHEABILITY_MASK
-+
-+#define GICR_VPENDBASER_NonShareable					\
-+	GIC_BASER_SHAREABILITY(GICR_VPENDBASER, NonShareable)
-+
-+#define GICR_VPENDBASER_nCnB	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, nCnB)
-+#define GICR_VPENDBASER_nC 	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, nC)
-+#define GICR_VPENDBASER_RaWt	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, RaWt)
-+#define GICR_VPENDBASER_RaWb	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, RaWt)
-+#define GICR_VPENDBASER_WaWt	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, WaWt)
-+#define GICR_VPENDBASER_WaWb	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, WaWb)
-+#define GICR_VPENDBASER_RaWaWt	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, RaWaWt)
-+#define GICR_VPENDBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, RaWaWb)
-+
-+#define GICR_PENDBASER_Dirty		(1ULL << 60)
-+#define GICR_PENDBASER_PendingLast	(1ULL << 61)
-+#define GICR_PENDBASER_IDAI		(1ULL << 62)
-+#define GICR_PENDBASER_Valid		(1ULL << 63)
-+
-+/*
-  * ITS registers, offsets from ITS_base
-  */
- #define GITS_CTLR			0x0000
+ #define GITS_CTLR_ENABLE		(1U << 0)
++#define	GITS_CTLR_ITS_NUMBER_SHIFT	4
++#define	GITS_CTLR_ITS_NUMBER		(0xFU << GITS_CTLR_ITS_NUMBER_SHIFT)
+ #define GITS_CTLR_QUIESCENT		(1U << 31)
+ 
+ #define GITS_TYPER_PLPIS		(1UL << 0)
++#define GITS_TYPER_VLPIS		(1UL << 1)
+ #define GITS_TYPER_IDBITS_SHIFT		8
+ #define GITS_TYPER_DEVBITS_SHIFT	13
+ #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
+ #define GITS_TYPER_PTA			(1UL << 19)
+ #define GITS_TYPER_HWCOLLCNT_SHIFT	24
++#define GITS_TYPER_VMOVP		(1ULL << 37)
+ 
+ #define GITS_CBASER_VALID			(1ULL << 63)
+ #define GITS_CBASER_SHAREABILITY_SHIFT		(10)
 -- 
 2.1.4
