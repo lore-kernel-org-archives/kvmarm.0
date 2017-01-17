@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [RFC PATCH 20/33] irqchip/gic-v3-its: Add VPE domain infrastructure
-Date: Tue, 17 Jan 2017 10:20:41 +0000
-Message-ID: <1484648454-21216-21-git-send-email-marc.zyngier@arm.com>
+Subject: [RFC PATCH 09/33] irqchip/gic-v3-its: Split out property table
+ allocation
+Date: Tue, 17 Jan 2017 10:20:30 +0000
+Message-ID: <1484648454-21216-10-git-send-email-marc.zyngier@arm.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFE844086D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57D0B4068E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a7j8++uRLUO1 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Jan 2017 05:19:51 -0500 (EST)
+ with ESMTP id KtGjJqQXNmNt for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Jan 2017 05:19:36 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85BAE408BA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A11C406CA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jan 2017 05:19:36 -0500 (EST)
 In-Reply-To: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,81 +32,67 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add the basic GICv4 VPE (vcpu in GICv4 parlance) infrastructure
-(irqchip, irq domain) that is going to be populated in the following
-patches.
+Move the LPI property table allocation into its own function, as
+this is going to be required for those associated with VMs in
+the future.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ drivers/irqchip/irq-gic-v3-its.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 6931018..ddd8096 100644
+index b28fb19..c92ff4d 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -1918,6 +1918,13 @@ static const struct irq_domain_ops its_domain_ops = {
- 	.deactivate		= its_irq_domain_deactivate,
- };
- 
-+static struct irq_chip its_vpe_irq_chip = {
-+	.name			= "GICv4-vpe",
-+};
-+
-+static const struct irq_domain_ops its_vpe_domain_ops = {
-+};
-+
- static int its_force_quiescent(void __iomem *base)
- {
- 	u32 count = 1000000;	/* 1s */
-@@ -2017,6 +2024,27 @@ static int its_init_domain(struct fwnode_handle *handle, struct its_node *its)
- 	return 0;
+@@ -889,15 +889,31 @@ static void its_lpi_free(struct event_lpi_map *map)
+ 	kfree(map->col_map);
  }
  
-+static struct irq_domain *its_init_vpe_domain(void)
++static struct page *its_allocate_prop_table(gfp_t gfp_flags)
 +{
-+	struct fwnode_handle *handle;
-+	struct irq_domain *domain;
++	struct page *prop_page;
 +
-+	handle = irq_domain_alloc_fwnode("VPE domain");
-+	if (!handle)
++	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
++	if (!prop_page)
 +		return NULL;
 +
-+	domain = irq_domain_create_tree(handle, &its_vpe_domain_ops, NULL);
-+	if (!domain) {
-+		kfree(handle);
-+		return NULL;
-+	}
++	/* Priority 0xa0, Group-1, disabled */
++	memset(page_address(prop_page),
++	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
++	       LPI_PROPBASE_SZ);
 +
-+	domain->parent = its_parent;
-+	domain->bus_token = DOMAIN_BUS_NEXUS;
-+
-+	return domain;
++	/* Make sure the GIC will observe the written configuration */
++	gic_flush_dcache_to_poc(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
+ 
++	return prop_page;
 +}
-+
- static int __init its_probe_one(struct resource *res,
- 				struct fwnode_handle *handle, int numa_node)
- {
-@@ -2266,6 +2294,8 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
- 		    struct irq_domain *parent_domain)
- {
- 	struct device_node *of_node;
-+	struct its_node *its;
-+	bool has_v4 = false;
  
- 	its_parent = parent_domain;
- 	of_node = to_of_node(handle);
-@@ -2283,5 +2313,11 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
- 	its_alloc_lpi_tables();
- 	its_lpi_init(rdists->id_bits);
  
-+	list_for_each_entry(its, &its_nodes, entry)
-+		has_v4 |= its->is_v4;
-+
-+	if (has_v4 & rdists->has_vlpis)
-+		its_init_vpe_domain();
-+
+ static int __init its_alloc_lpi_tables(void)
+ {
+ 	phys_addr_t paddr;
+ 
+-	gic_rdists->prop_page = alloc_pages(GFP_NOWAIT,
+-					   get_order(LPI_PROPBASE_SZ));
++	gic_rdists->prop_page = its_allocate_prop_table(GFP_NOWAIT);
+ 	if (!gic_rdists->prop_page) {
+ 		pr_err("Failed to allocate PROPBASE\n");
+ 		return -ENOMEM;
+@@ -906,14 +922,6 @@ static int __init its_alloc_lpi_tables(void)
+ 	paddr = page_to_phys(gic_rdists->prop_page);
+ 	pr_info("GIC: using LPI property table @%pa\n", &paddr);
+ 
+-	/* Priority 0xa0, Group-1, disabled */
+-	memset(page_address(gic_rdists->prop_page),
+-	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
+-	       LPI_PROPBASE_SZ);
+-
+-	/* Make sure the GIC will observe the written configuration */
+-	gic_flush_dcache_to_poc(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
+-
  	return 0;
  }
+ 
 -- 
 2.1.4
