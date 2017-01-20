@@ -1,76 +1,172 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v10 8/8] arm/arm64: Documentation: Update arm-vgic-v3.txt
-Date: Fri, 20 Jan 2017 20:57:22 +0100
-Message-ID: <20170120195722.GJ13531@cbox>
+Subject: Re: [PATCH v10 0/8] arm/arm64: vgic: Implement API for vGICv3 live
+ migration
+Date: Fri, 20 Jan 2017 20:59:15 +0100
+Message-ID: <20170120195915.GK13531@cbox>
 References: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
- <1480576187-5012-9-git-send-email-vijay.kilari@gmail.com>
- <7d82df18-debd-72e7-af6e-3816b8aaee85@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B7A14092C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Jan 2017 14:59:24 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kFD1PHCeEvyv for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Jan 2017 14:59:22 -0500 (EST)
+Received: from mail-lf0-f47.google.com (mail-lf0-f47.google.com
+ [209.85.215.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 574CA40783
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Jan 2017 14:59:21 -0500 (EST)
+Received: by mail-lf0-f47.google.com with SMTP id v186so64387062lfa.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Jan 2017 11:59:22 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <7d82df18-debd-72e7-af6e-3816b8aaee85@redhat.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Auger Eric <eric.auger@redhat.com>
-Cc: peter.maydell@linaro.org, vijay.kilari@gmail.com, marc.zyngier@arm.com, p.fedin@samsung.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: vijay.kilari@gmail.com
+Cc: marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 16, 2016 at 01:18:09PM +0100, Auger Eric wrote:
-> Hi Vijaya,
+Hi Vijaya,
+
+On Thu, Dec 01, 2016 at 12:39:39PM +0530, vijay.kilari@gmail.com wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 > 
-> On 01/12/2016 08:09, vijay.kilari@gmail.com wrote:
-> > From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> > 
-> > Update error code returned for Invalid CPU interface register
-> > value and access in AArch32 mode.
-> > 
-> > Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> > ---
-> >  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 9 ++++++++-
-> >  1 file changed, 8 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> > index 9348b3c..0f29850 100644
-> > --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> > +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> > @@ -142,10 +142,12 @@ Groups:
-> >      KVM_DEV_ARM_VGIC_CPU_SYSREGS accesses the CPU interface registers for the
-> >      CPU specified by the mpidr field.
-> >  
-> > +    CPU interface registers access is not implemented for AArch32 mode.
-> > +    Error -ENXIO is returned when accessed in AArch32 mode.
-> >    Errors:
-> >      -ENXIO: Getting or setting this register is not yet supported
-> >      -EBUSY: VCPU is running
-> > -    -EINVAL: Invalid mpidr supplied
-> > +    -EINVAL: Invalid mpidr or register value supplied
-> >  
-> >  
-> >    KVM_DEV_ARM_VGIC_GRP_NR_IRQS
-> > @@ -193,6 +195,11 @@ Groups:
-> >  
-> >  	Bit[n] indicates the status for interrupt vINTID + n.
-> >  
-> > +	Getting or setting the level info for an edge-triggered interrupt is
-> > +	not guaranteed to work.
-> I don't get this statement. is the API applicable to edge triggered IRQs?
+> This patchset adds API for saving and restoring
+> of VGICv3 registers to support live migration with new vgic feature.
+> This API definition is as per version of VGICv3 specification
+> Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> 
+> The patch 3 & 4 are picked from the Pavel's previous implementation.
+> http://www.spinics.net/lists/kvm/msg122040.html
+> 
+> NOTE: Only compilation tested for AArch32. No hardware to test.
 > 
 
-I guess this could be clarified to "is ignored", but with the earlier
-implementation you might be able to get away with doing
-"line_level=x; config=LEVEL;", but you could then at the same time break
-something with edge-triggered IRQs, so...
+I'm mostly happy with this series at this point, and everything beyond
+the ABI discussion can be fixed later if we should spot anything.
 
+Assuming we can agree on the API for the level_info shortly, can you
+address the other comments in the series and reabse on v4.10-rc4 (or rc5
+if that's out when you get there) and send out a new version that we can
+queue?
 
-Thanks for looking at this in detail.
-
+Thanks,
 -Christoffer
+
+
+> v9 => v10:
+>  - Dropped support for AArch32 mode.
+>  - Fixed line level update
+>  - Updated documentation
+>  - Moved vgic-sys-reg-v3.c to arch/arm64/kvm/ and
+>    added vgic-v3-coproc.c to arch/arm/kvm for AArch32
+>  - Fixed nits
+> 
+> v8 => v9:
+>  - Rebased to kvmarm/next branch
+>  - Introduce support for save and restore of CPU interface
+>    registers for AArch32 mode (9,10 and 11 patches).
+>    Only compilation tested.
+>  - Fixed vmcr.ctlr format
+>  - Updated error code for invalid CPU REG value in Documentation
+>  - Updated commit messages and added comments required
+>  - Queued IRQ when irq_line is set.
+>  - Compatibility check on ICC_CTLR_EL1.SEIS and A3V
+> 
+> v7 => v8:
+>  - Rebased to 4.9-rc3
+>  - Fixed wrong parameter to VGIC_TO_MPIDR
+> v6 => v7:
+>  - Rename all patches heading from vgic-new to vgic
+>  - Moved caching of priority and ID bits from vgic global struct
+>    to vgic_cpu struct.
+> 
+> v5 => v6:
+>  - Collated all register definitions to single patch (4)
+>  - Introduce macro to convert userspace MPIDR format to MPIDR reg format
+>  - Check on ICC_CTLR_EL1.CBPR value is made while accessing ICC_BPR1_EL1
+>  - Cached ich_vtr_el2 and guests priority and ID bits
+>  - Check on number of priority and ID bits when ICC_CTRL_EL1 write is made
+>  - Check is made on SRE bit for ICC_SRE_EL1 write
+> 
+> v4 => v5:
+>  - ICC_CTLR_EL1 access is updated to reflect HW values
+>  - Updated ICC reg access mask and shift macros
+>  - Introduced patch 4 for VMCR changes
+>  - Other minor fixes.
+> v3 => v4:
+>  - Rebased to latest code base
+>  - Moved vgic_uaccess() from vgic-mmio-v2.c to vgic-mmio.c
+>  - Dropped macro REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED_UACCESS
+>  - Dropped LE conversion for userspace access
+>  - Introduced vgic_uaccess_write_pending() for ISPENDR write
+>  - Change macro KVM_DEV_ARM_VGIC_V3_CPUID_MASK to KVM_DEV_ARM_VGIC_V3_MIDR_MASK
+>  - Refactored some code as common code.
+>  - Changed handing of ICC_* registers
+>  - Allowed ICC_SRE_EL1 read by userspace
+>  - Fixed KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_* macros
+> 
+> v2 => v3:
+>  - Implemented separate API for ISPENDR and ICPENDR to
+>    read soft_pending instead of pending for level triggerred interrupts
+>  - Implemented ioctl KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO to access line level
+>  - Rebased on top of Christoffer's patch set
+>    http://www.spinics.net/lists/kvm/msg136840.html
+> 
+>  NOTE: GICD_STATUSR and GICR_STATUSR are implemented as RAZ/WI.
+> 
+> v1 => v2:
+>  - The init sequence change patch is no more required.
+>    Fixed in patch 2 by using static vgic_io_dev regions structure instead
+>    of using dynamic allocation pointer.
+>  - Updated commit message of patch 4.
+>  - Dropped usage of union to manage 32-bit and 64-bit access in patch 1.
+>    Used local variable for 32-bit access.
+>  - Updated macro __ARM64_SYS_REG and ARM64_SYS_REG in
+>    arch/arm64/include/uapi/asm/kvm.h as per qemu requirements.
+> 
+> Vijaya Kumar K (8):
+>   arm/arm64: vgic: Implement support for userspace access
+>   arm/arm64: vgic: Add distributor and redistributor access
+>   arm/arm64: vgic: Introduce find_reg_by_id()
+>   irqchip/gic-v3: Add missing system register definitions
+>   arm/arm64: vgic: Introduce VENG0 and VENG1 fields to vmcr struct
+>   arm/arm64: vgic: Implement VGICv3 CPU interface access
+>   arm/arm64: vgic: Implement KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO ioctl
+>   arm/arm64: Documentation: Update arm-vgic-v3.txt
+> 
+>  Documentation/virtual/kvm/devices/arm-vgic-v3.txt |   9 +-
+>  arch/arm/include/uapi/asm/kvm.h                   |  13 +
+>  arch/arm/kvm/Makefile                             |   4 +-
+>  arch/arm/kvm/vgic-v3-coproc.c                     |  35 +++
+>  arch/arm64/include/uapi/asm/kvm.h                 |  13 +
+>  arch/arm64/kvm/Makefile                           |   3 +-
+>  arch/arm64/kvm/sys_regs.c                         |  22 +-
+>  arch/arm64/kvm/sys_regs.h                         |   4 +
+>  arch/arm64/kvm/vgic-sys-reg-v3.c                  | 338 ++++++++++++++++++++++
+>  include/kvm/arm_vgic.h                            |   9 +
+>  include/linux/irqchip/arm-gic-v3.h                |  45 ++-
+>  virt/kvm/arm/vgic/vgic-kvm-device.c               | 215 +++++++++++++-
+>  virt/kvm/arm/vgic/vgic-mmio-v2.c                  |  57 +---
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 204 +++++++++++--
+>  virt/kvm/arm/vgic/vgic-mmio.c                     | 162 ++++++++++-
+>  virt/kvm/arm/vgic/vgic-mmio.h                     |  28 ++
+>  virt/kvm/arm/vgic/vgic-v3.c                       |  28 +-
+>  virt/kvm/arm/vgic/vgic.h                          |  60 +++-
+>  18 files changed, 1144 insertions(+), 105 deletions(-)
+>  create mode 100644 arch/arm/kvm/vgic-v3-coproc.c
+>  create mode 100644 arch/arm64/kvm/vgic-sys-reg-v3.c
+> 
+> -- 
+> 1.9.1
+> 
