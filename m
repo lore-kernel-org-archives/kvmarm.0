@@ -1,13 +1,16 @@
-From: Sudeep Holla <sudeep.holla@arm.com>
-Subject: [PATCH 2/2] arm64: kvm: upgrade csselr and ccsidr to 64-bit values
-Date: Fri, 20 Jan 2017 10:50:10 +0000
-Message-ID: <1484909410-11673-2-git-send-email-sudeep.holla@arm.com>
-References: <1484909410-11673-1-git-send-email-sudeep.holla@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v10 0/8] arm/arm64: vgic: Implement API for vGICv3 live
+ migration
+Date: Fri, 20 Jan 2017 14:51:42 +0100
+Message-ID: <20170120135142.GA13531@cbox>
+References: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
+ <588020D2.4020108@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1484909410-11673-1-git-send-email-sudeep.holla@arm.com>
+Content-Disposition: inline
+In-Reply-To: <588020D2.4020108@huawei.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -17,80 +20,34 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Sudeep Holla <sudeep.holla@arm.com>
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: peter.maydell@linaro.org, vijay.kilari@gmail.com, marc.zyngier@arm.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-csselr and ccsidr are treated as 64-bit values already elsewhere in the
-kernel. It also aligns well with the architecture extensions that allow
-64-bit format for ccsidr.
+Hi Shannon,
 
-This patch upgrades the existing accesses to csselr and ccsidr from
-32-bit to 64-bit in preparation to add support to those extensions.
+On Thu, Jan 19, 2017 at 10:13:38AM +0800, Shannon Zhao wrote:
+> Hi Vijaya,
+> 
+> On 2016/12/1 15:09, vijay.kilari@gmail.com wrote:
+> > From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> > 
+> > This patchset adds API for saving and restoring
+> > of VGICv3 registers to support live migration with new vgic feature.
+> > This API definition is as per version of VGICv3 specification
+> > Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> > 
+> > The patch 3 & 4 are picked from the Pavel's previous implementation.
+> > http://www.spinics.net/lists/kvm/msg122040.html
+> > 
+> > NOTE: Only compilation tested for AArch32. No hardware to test.
+> > 
+> Where can I fetch the latest corresponding QEMU patches? I didn't find
+> them in qemu-devel/qemu-arm mail list.
+> 
 
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
----
- arch/arm64/kvm/sys_regs.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Vijaya must have gotten something wrong in sending to the lists, because
+I couldn't find them in the archive either, and Eric also couldn't find
+them.  But I was cc'ed, so I've bounced them your way.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 5dca1f10340f..a3559a8a2b0c 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -58,15 +58,15 @@
-  */
- 
- /* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
--static u32 cache_levels;
-+static u64 cache_levels;
- 
- /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
- #define CSSELR_MAX 	((MAX_CACHE_LEVEL - 1) >> 1)
- 
- /* Which cache CCSIDR represents depends on CSSELR value. */
--static u32 get_ccsidr(u32 csselr)
-+static u64 get_ccsidr(u64 csselr)
- {
--	u32 ccsidr;
-+	u64 ccsidr;
- 
- 	/* Make sure noone else changes CSSELR during this! */
- 	local_irq_disable();
-@@ -1952,9 +1952,9 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
- 	return 0;
- }
- 
--static bool is_valid_cache(u32 val)
-+static bool is_valid_cache(u64 val)
- {
--	u32 level, ctype;
-+	u64 level, ctype;
- 
- 	if (val >= CSSELR_MAX)
- 		return false;
-@@ -1979,8 +1979,8 @@ static bool is_valid_cache(u32 val)
- 
- static int demux_c15_get(u64 id, void __user *uaddr)
- {
--	u32 val;
--	u32 __user *uval = uaddr;
-+	u64 val;
-+	u64 __user *uval = uaddr;
- 
- 	/* Fail if we have unknown bits set. */
- 	if (id & ~(KVM_REG_ARCH_MASK|KVM_REG_SIZE_MASK|KVM_REG_ARM_COPROC_MASK
-@@ -2004,8 +2004,8 @@ static int demux_c15_get(u64 id, void __user *uaddr)
- 
- static int demux_c15_set(u64 id, void __user *uaddr)
- {
--	u32 val, newval;
--	u32 __user *uval = uaddr;
-+	u64 val, newval;
-+	u64 __user *uval = uaddr;
- 
- 	/* Fail if we have unknown bits set. */
- 	if (id & ~(KVM_REG_ARCH_MASK|KVM_REG_SIZE_MASK|KVM_REG_ARM_COPROC_MASK
--- 
-2.7.4
+-Christoffer
