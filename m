@@ -1,269 +1,146 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: vgic: Add debugfs vgic-state file
-Date: Fri, 20 Jan 2017 21:07:08 +0100
-Message-ID: <20170120200708.GM13531@cbox>
-References: <20170120103330.13858-1-christoffer.dall@linaro.org>
- <d63155bc-84f3-85cc-ec32-5a73e635b774@arm.com>
+From: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Subject: Re: [PATCH V7 04/10] arm64: exception: handle Synchronous External
+ Abort
+Date: Fri, 20 Jan 2017 13:35:11 -0700
+Message-ID: <a2b1bcad-8d07-4d9d-a9ff-8a56814a8285@codeaurora.org>
+References: <1484244924-24786-1-git-send-email-tbaicar@codeaurora.org>
+ <1484244924-24786-5-git-send-email-tbaicar@codeaurora.org>
+ <587DF279.1010402@arm.com>
+ <e8c0151e-2087-d49c-42fc-906755aca052@codeaurora.org>
+ <5880FD8A.2000405@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <d63155bc-84f3-85cc-ec32-5a73e635b774@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Alex Bennee <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 278974095B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Jan 2017 15:35:19 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id GaEstx-rfYs5 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Jan 2017 15:35:18 -0500 (EST)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CBA17408E9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Jan 2017 15:35:17 -0500 (EST)
+In-Reply-To: <5880FD8A.2000405@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+On 1/19/2017 10:55 AM, James Morse wrote:
+> Hi Tyler,
+>
+> On 18/01/17 23:26, Baicar, Tyler wrote:
+>> On 1/17/2017 3:31 AM, James Morse wrote:
+>>> On 12/01/17 18:15, Tyler Baicar wrote:
+>>>> SEA exceptions are often caused by an uncorrected hardware
+>>>> error, and are handled when data abort and instruction abort
+>>>> exception classes have specific values for their Fault Status
+>>>> Code.
+>>>> When SEA occurs, before killing the process, go through
+>>>> the handlers registered in the notification list.
+>>>> Update fault_info[] with specific SEA faults so that the
+>>>> new SEA handler is used.
+>>>> @@ -480,6 +496,28 @@ static int do_bad(unsigned long addr, unsigned int esr,
+>>>> struct pt_regs *regs)
+>>>>        return 1;
+>>>>    }
+>>>>    +/*
+>>>> + * This abort handler deals with Synchronous External Abort.
+>>>> + * It calls notifiers, and then returns "fault".
+>>>> + */
+>>>> +static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>>>> +{
+>>>> +    struct siginfo info;
+>>>> +
+>>>> +    atomic_notifier_call_chain(&sea_handler_chain, 0, NULL);
+>>>> +
+>>>> +    pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
+>>>> +         fault_name(esr), esr, addr);
+>>>> +
+>>>> +    info.si_signo = SIGBUS;
+>>>> +    info.si_errno = 0;
+>>>> +    info.si_code  = 0;
+>>> Half of the other do_*() functions in this file read the signo and code from the
+>>> fault_info table.
+>>>
+>>>
+>>>> +    info.si_addr  = (void __user *)addr;
+>>> addr here was read from FAR_EL1, but for some of the classes of exception you
+>>> have listed below this register isn't updated with the faulting address.
+>>>
+>>> The ARM-ARM version 'k' in D1.10.5 "Summary of registers on faults taken to an
+>>> Exception level that is using Aarch64" has:
+>>>> The architecture permits that the FAR_ELx is UNKNOWN for Synchronous External
+>>>> Aborts other than Synchronous External Aborts on Translation Table Walks. In
+>>>> this case, the ISS.FnV bit returned in ESR_ELx  indicates whether FAR_ELx is
+>>>> valid.
+>>> This is a problem if we get 'synchronous external abort' or 'synchronous parity
+>>> error' while a user space process was running.
+>> It looks like this would just cause an incorrect address to be printed in the
+>> above pr_err.
+>> Unless I'm missing something, I don't see arm64_notify_die or anything that gets
+>> called from
+>> there using the info.si_addr variable.
+> I may be misreading something here...
+>
+> This patch has:
+>> 	info.si_addr  = (void __user *)addr;
+>> 	arm64_notify_die("", regs, &info, esr);
+>  From arch/arm64/kernel/traps.c:arm64_notify_die():
+>> 	if (user_mode(regs)) {
+>> 		current->thread.fault_address = 0;
+>> 		current->thread.fault_code = err;
+>> 		force_sig_info(info->si_signo, info, current);
+>> 	}
+> So if the SEA interrupted userspace, we put maybe-unknown addr into
+> force_sig_info() to deliver a signal to user space. User-space then gets a copy
+> of the info struct containing the maybe-unknown addr.
+>
+> I think this is an existing bug, but if we are separating the synchronous
+> external aborts from the generic do_bad handler, we should probably check the
+> FnV bit. (I think we should still print it out)
+>
+>
+>> What do you suggest I do here? The firmware should be reporting the physical and
+>> virtual
+>> address information if it is available in the HEST entry that the kernel will
+>> parse.
+> Its not just firmware that may trigger this, other SoCs may use it for parity or
+> ECC errors, and they may not always have a valid address in FAR_EL1.
+>
+> I think we should check the FnV bit in the esr variable and set info.si_addr to
+> 0 if the addr we have isn't valid:
+> 'For some implementations, the value of si_addr may be inaccurate.' [0]
+>
+>
+> Thanks,
+>
+> James
+>
+>
+> [0] http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html
+Hello James,
 
-On Fri, Jan 20, 2017 at 06:07:26PM +0000, Andre Przywara wrote:
-> Hej Christoffer,
-> 
-> On 20/01/17 10:33, Christoffer Dall wrote:
-> > Add a file to debugfs to read the in-kernel state of the vgic.  We don't
-> > do any locking of the entire VGIC state while traversing all the IRQs,
-> > so if the VM is running the user/developer may not see a quiesced state,
-> > but should take care to pause the VM using facilities in user space for
-> > that purpose.
-> > 
-> > We also don't support LPIs yet, but they can be added easily if needed.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> >  arch/arm/kvm/Makefile          |   1 +
-> >  arch/arm64/kvm/Makefile        |   1 +
-> >  include/kvm/arm_vgic.h         |   5 +
-> >  virt/kvm/arm/vgic/vgic-debug.c | 278 +++++++++++++++++++++++++++++++++++++++++
-> >  virt/kvm/arm/vgic/vgic-init.c  |   4 +
-> >  virt/kvm/arm/vgic/vgic.h       |   3 +
-> >  6 files changed, 292 insertions(+)
-> >  create mode 100644 virt/kvm/arm/vgic/vgic-debug.c
-> > 
-> > diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-> > index d571243..12b6281 100644
-> > --- a/arch/arm/kvm/Makefile
-> > +++ b/arch/arm/kvm/Makefile
-> > @@ -33,5 +33,6 @@ obj-y += $(KVM)/arm/vgic/vgic-mmio-v2.o
-> >  obj-y += $(KVM)/arm/vgic/vgic-mmio-v3.o
-> >  obj-y += $(KVM)/arm/vgic/vgic-kvm-device.o
-> >  obj-y += $(KVM)/arm/vgic/vgic-its.o
-> > +obj-y += $(KVM)/arm/vgic/vgic-debug.o
-> >  obj-y += $(KVM)/irqchip.o
-> >  obj-y += $(KVM)/arm/arch_timer.o
-> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> > index d50a82a..e025bec 100644
-> > --- a/arch/arm64/kvm/Makefile
-> > +++ b/arch/arm64/kvm/Makefile
-> > @@ -31,6 +31,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v2.o
-> >  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v3.o
-> >  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-kvm-device.o
-> >  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-its.o
-> > +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-debug.o
-> >  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
-> >  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
-> >  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
-> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> > index 002f092..1087aee 100644
-> > --- a/include/kvm/arm_vgic.h
-> > +++ b/include/kvm/arm_vgic.h
-> > @@ -165,6 +165,8 @@ struct vgic_its {
-> >  	struct list_head	collection_list;
-> >  };
-> >  
-> > +struct vgic_state_iter;
-> > +
-> >  struct vgic_dist {
-> >  	bool			in_kernel;
-> >  	bool			ready;
-> > @@ -212,6 +214,9 @@ struct vgic_dist {
-> >  	spinlock_t		lpi_list_lock;
-> >  	struct list_head	lpi_list_head;
-> >  	int			lpi_list_count;
-> > +
-> > +	/* used by vgic-debug */
-> > +	struct vgic_state_iter *iter;
-> >  };
-> >  
-> >  struct vgic_v2_cpu_if {
-> > diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
-> > new file mode 100644
-> > index 0000000..76e8b11
-> > --- /dev/null
-> > +++ b/virt/kvm/arm/vgic/vgic-debug.c
-> > @@ -0,0 +1,278 @@
-> > +/*
-> > + * Copyright (C) 2016 Linaro
-> > + * Author: Christoffer Dall <christoffer.dall@linaro.org>
-> > + *
-> > + * This program is free software; you can redistribute it and/or modify
-> > + * it under the terms of the GNU General Public License version 2 as
-> > + * published by the Free Software Foundation.
-> > + *
-> > + * This program is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > + * GNU General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU General Public License
-> > + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> > + */
-> > +
-> > +#include <linux/cpu.h>
-> > +#include <linux/debugfs.h>
-> > +#include <linux/interrupt.h>
-> > +#include <linux/kvm_host.h>
-> > +#include <linux/seq_file.h>
-> > +#include <linux/uaccess.h>
-> > +#include <kvm/arm_vgic.h>
-> > +#include <asm/kvm_mmu.h>
-> > +#include "vgic.h"
-> > +
-> > +/*
-> > + * Structure to control looping through the entire vgic state.  We start at
-> > + * zero for each field and move upwards.  So, if dist_id is 0 we print the
-> > + * distributor info.  When dist_id is 1, we have already printed it and move
-> > + * on.
-> > + *
-> > + * When vcpu_id < nr_cpus we print the vcpu info until vcpu_id == nr_cpus and
-> > + * so on.
-> > + */
-> > +struct vgic_state_iter {
-> > +	int nr_cpus;
-> > +	int nr_spis;
-> > +	int dist_id;
-> > +	int vcpu_id;
-> > +	int intid;
-> > +};
-> > +
-> > +static void iter_next(struct vgic_state_iter *iter)
-> > +{
-> > +	if (iter->dist_id == 0) {
-> > +		iter->dist_id++;
-> > +		return;
-> > +	}
-> > +
-> > +	iter->intid++;
-> > +	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
-> > +	    ++iter->vcpu_id < iter->nr_cpus)
-> > +		iter->intid = 0;
-> > +}
-> > +
-> > +static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
-> > +		      loff_t pos)
-> > +{
-> > +	int nr_cpus = atomic_read(&kvm->online_vcpus);
-> > +
-> > +	memset(iter, 0, sizeof(*iter));
-> > +
-> > +	iter->nr_cpus = nr_cpus;
-> > +	iter->nr_spis = kvm->arch.vgic.nr_spis;
-> > +
-> > +	/* Fast forward to the right position if needed */
-> > +	while (pos--)
-> > +		iter_next(iter);
-> > +}
-> > +
-> > +static bool the_end(struct vgic_state_iter *iter)
-> 
-> "Of everything that stands, the end"? ;-)
-
-"It's the end of the world as we know it".  How appropriate on this day.
-
-
-> 
-> I wonder if we really need this. AFAICT the_end never returns true after
-> init has been called, so the only caller is after the iter_next(). So
-> can't we just close the Door(s) and fold the_end() into
-> iter_next()?
-> 
-
-see below.
-
-> > +{
-> > +	return iter->dist_id > 0 &&
-> > +		iter->vcpu_id == iter->nr_cpus &&
-> > +		(iter->intid - VGIC_NR_PRIVATE_IRQS) == iter->nr_spis;
-> > +}
-> > +
-> > +static void *debug_start(struct seq_file *s, loff_t *pos)
-> > +{
-> > +	struct kvm *kvm = (struct kvm *)s->private;
-> > +	struct vgic_state_iter *iter;
-> > +
-> > +	mutex_lock(&kvm->lock);
-> > +	iter = kvm->arch.vgic.iter;
-> > +	if (iter) {
-> > +		iter = ERR_PTR(-EBUSY);
-> > +		goto out;
-> > +	}
-> > +
-> > +	iter = kmalloc(sizeof(*iter), GFP_KERNEL);
-> > +	if (!iter) {
-> > +		iter = ERR_PTR(-ENOMEM);
-> > +		goto out;
-> > +	}
-> > +
-> > +	iter_init(kvm, iter, *pos);
-> > +	kvm->arch.vgic.iter = iter;
-> > +
-> > +	if (the_end(iter))
-> > +		iter = NULL;
-> 
-> I don't understand the need for that. If you have just initialized iter,
-> the_end() will never return true, as at least dist_id is always 0.
-> Or is there some magic (maybe future?) feature that I miss here?
-> 
-
-This has file position semantics, so it's possible to call debug_start
-with a non-zero offset, and in fact possible to jump all the way ahead
-past the end of the file.  In this case, this function must return NULL.
-
-I base this on a number of examples out there (there's a recent one on
-lwn.net) and on trying to understand the seq file logic.
-
-> > +out:
-> > +	mutex_unlock(&kvm->lock);
-> > +	return iter;
-> > +}
-> > +
-> > +static void *debug_next(struct seq_file *s, void *v, loff_t *pos)
-> > +{
-> > +	struct kvm *kvm = (struct kvm *)s->private;
-> > +	struct vgic_state_iter *iter = kvm->arch.vgic.iter;
-> > +
-> > +	++*pos;
-> > +	iter_next(iter);
-> > +	if (the_end(iter))
-> > +		iter = NULL;
-> > +	return iter;
-> > +}
-> > +
-> > +static void debug_stop(struct seq_file *s, void *v)
-> > +{
-> > +	struct kvm *kvm = (struct kvm *)s->private;
-> > +	struct vgic_state_iter *iter;
-> > +
-> > +	mutex_lock(&kvm->lock);
-> > +	iter = kvm->arch.vgic.iter;
-> > +	kfree(iter);
-> > +	kvm->arch.vgic.iter = NULL;
-> 
-> Would it be better to set the kvm->iter pointer to NULL before we free
-> it? Or doesn't this matter as we are under the lock and the only other
-> code who cares is debug_start()?
-
-Yeah, that would be the definition of a critical section wouldn't it?
-
-I don't mind moving it around though, if it makes some
-
-> 
-> So far, need to wrap my mind around this sequential file operations
-> scheme first ...
-> 
-
-Thanks for having a look.  I don't think we need to overdo this one,
-it's a debug feature, it seems pretty stable, and you need root access
-to look at it, but of course it shouldn't be entirely shitty either.
+Okay, that makes sense, we don't want userspace to be notified with an 
+incorrect address.
+I will add the check to verify it's valid. Which bit in the ESR is the 
+FnV bit? I'm not finding
+the bit breakdown of the ISS that shows it.
 
 Thanks,
--Christoffer
+Tyler
+
+-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
