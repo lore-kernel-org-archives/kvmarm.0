@@ -1,31 +1,34 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v10 8/8] arm/arm64: Documentation: Update arm-vgic-v3.txt
-Date: Mon, 23 Jan 2017 12:20:19 +0100
-Message-ID: <20170123112019.GC15850@cbox>
-References: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
- <1480576187-5012-9-git-send-email-vijay.kilari@gmail.com>
- <7d82df18-debd-72e7-af6e-3816b8aaee85@redhat.com>
- <20170120195722.GJ13531@cbox>
- <CALicx6twCMrK8gb=zR1wt1eH-eiPDyA3=BnLPFy=22O5wW52ew@mail.gmail.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [PATCH v3 6/9] kvm: arm/arm64: Add host pmu to support VM
+ introspection
+Date: Mon, 23 Jan 2017 11:21:36 +0000
+Message-ID: <87a8aikon3.fsf@e105922-lin.cambridge.arm.com>
+References: <20170110113856.7183-1-punit.agrawal@arm.com>
+ <20170110113856.7183-7-punit.agrawal@arm.com>
+ <1a6b8d71-58a5-b29b-3f01-e945deb2baf6@arm.com>
+ <20170118113523.GB3231@leverpostej>
+ <87o9z4msi3.fsf@e105922-lin.cambridge.arm.com>
+ <c2382140-b7ac-11d8-89f0-bf421e38f844@arm.com>
+ <87fukgmnf0.fsf@e105922-lin.cambridge.arm.com>
+ <20170118151729.GI3231@leverpostej>
+ <877f5smjg1.fsf@e105922-lin.cambridge.arm.com>
+ <20170118180546.GN3231@leverpostej> <20170119164231.GA5664@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8690640838
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 06:20:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AAB240838
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 06:21:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0MwQAT9O+IzE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Jan 2017 06:20:21 -0500 (EST)
-Received: from mail-lf0-f53.google.com (mail-lf0-f53.google.com
- [209.85.215.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E3D540190
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 06:20:20 -0500 (EST)
-Received: by mail-lf0-f53.google.com with SMTP id v186so91638873lfa.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 03:20:25 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <CALicx6twCMrK8gb=zR1wt1eH-eiPDyA3=BnLPFy=22O5wW52ew@mail.gmail.com>
+ with ESMTP id V3l4yuSEQc2q for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Jan 2017 06:21:33 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD01F40190
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 06:21:33 -0500 (EST)
+In-Reply-To: <20170119164231.GA5664@cbox> (Christoffer Dall's message of "Thu,
+ 19 Jan 2017 17:42:31 +0100")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,80 +38,89 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Peter Zijlstra <peterz@infradead.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 23, 2017 at 04:22:39PM +0530, Vijay Kilari wrote:
-> Hi Christoffer,
-> 
-> In the document,
-> 
->     The mpidr field is used to specify which
->     redistributor is accessed.  The mpidr is ignored for the distributor.
-> 
-> We still rely on MPIDR for KVM_DEV_ARM_VGIC_GRP_DIST_REGS to fetch
-> vcpu info. So don't we need to remove this restriction?.
-> Or force to use vcpu[0]?
+Hi Christoffer,
 
-Does the data we return ever change if you supply a diferent MPIDR and
-access a distributor register?  If not (and I don't think it should),
-then the API is properly defined but the internal implementation should
-not rely on the value provided by user space.
+Christoffer Dall <christoffer.dall@linaro.org> writes:
 
-Thanks,
--Christoffer
+> On Wed, Jan 18, 2017 at 06:05:46PM +0000, Mark Rutland wrote:
+>> On Wed, Jan 18, 2017 at 04:17:18PM +0000, Punit Agrawal wrote:
+>> > Mark Rutland <mark.rutland@arm.com> writes:
+>> > 
+>> > > On Wed, Jan 18, 2017 at 02:51:31PM +0000, Punit Agrawal wrote:
+>> > >> I should've clarified in my reply that I wasn't looking to support the
+>> > >> third instance from Mark's examples above - "monitor all vCPUs on a
+>> > >> pCPU". I think it'll be quite expensive to figure out which threads from
+>> > >> a given pool are vCPUs.
+>> > >
+>> > > I'm not sure I follow why you would need to do that?
+>> > >
+>> > > In that case, we'd open a CPU-bound perf event for the pCPU, which would
+>> > > get installed in the CPU context immediately. It would be present for
+>> > > all tasks.
+>> > >
+>> > > Given it's present for all tasks, we don't need to figure out which
+>> > > happen to have vCPUs. The !vCPU tasks simply shouldn't trigger events.
+>> > >
+>> > > Am I missing something?
+>> > 
+>> > When enabling a CPU-bound event for pCPU, we'd have to enable trapping
+>> > of TLB operations for the vCPUs running on pCPU. Have a look at Patch
+>> > 7/9.
+>> > 
+>> > Also, we'd have to enable/disable trapping when tasks are migrated
+>> > between pCPUs.
+>> 
+>> Ah, so we can't configure the trap and leave it active, since it'll
+>> affect the host.
+>> 
+>> We could have a per-cpu flag, and a hook into vcpu_run, but that's also
+>> gnarly.
+>> 
+>> I'll have a think.
+>> 
+>> > So far I've assumed that a VM pid is immutable. If that doesn't hold
+>> > then we need to think of another mechanism to refer to a VM from
+>> > userspace.
+>> 
+>> Even if we can't migrate the VM between processes (i.e. it's immutable),
+>> it's still not unique within a process, so I'm fairly sure we need
+>> another mechanism (even if we get away with the common case today).
+>> 
+> I don't understand what the requirements here are exactly but the KVM
+> API documentation says:
+>
+>   In general file descriptors can be migrated among processes by means
+>   of fork() and the SCM_RIGHTS facility of unix domain socket.  These
+>   kinds of tricks are explicitly not supported by kvm.  While they will
+>   not cause harm to the host, their actual behavior is not guaranteed by
+>   the API.  The only supported use is one virtual machine per process,
+>   and one vcpu per thread.
+>
+> So this code should maintain those semantics and it's fair to assume the
+> thread group leader of a given VM stays the same, but the code must not
+> rely on this fact for safe operations.
 
-> 
-> On Sat, Jan 21, 2017 at 1:27 AM, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
-> > On Fri, Dec 16, 2016 at 01:18:09PM +0100, Auger Eric wrote:
-> >> Hi Vijaya,
-> >>
-> >> On 01/12/2016 08:09, vijay.kilari@gmail.com wrote:
-> >> > From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> >> >
-> >> > Update error code returned for Invalid CPU interface register
-> >> > value and access in AArch32 mode.
-> >> >
-> >> > Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> >> > ---
-> >> >  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 9 ++++++++-
-> >> >  1 file changed, 8 insertions(+), 1 deletion(-)
-> >> >
-> >> > diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> >> > index 9348b3c..0f29850 100644
-> >> > --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> >> > +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> >> > @@ -142,10 +142,12 @@ Groups:
-> >> >      KVM_DEV_ARM_VGIC_CPU_SYSREGS accesses the CPU interface registers for the
-> >> >      CPU specified by the mpidr field.
-> >> >
-> >> > +    CPU interface registers access is not implemented for AArch32 mode.
-> >> > +    Error -ENXIO is returned when accessed in AArch32 mode.
-> >> >    Errors:
-> >> >      -ENXIO: Getting or setting this register is not yet supported
-> >> >      -EBUSY: VCPU is running
-> >> > -    -EINVAL: Invalid mpidr supplied
-> >> > +    -EINVAL: Invalid mpidr or register value supplied
-> >> >
-> >> >
-> >> >    KVM_DEV_ARM_VGIC_GRP_NR_IRQS
-> >> > @@ -193,6 +195,11 @@ Groups:
-> >> >
-> >> >     Bit[n] indicates the status for interrupt vINTID + n.
-> >> >
-> >> > +   Getting or setting the level info for an edge-triggered interrupt is
-> >> > +   not guaranteed to work.
-> >> I don't get this statement. is the API applicable to edge triggered IRQs?
-> >>
-> >
-> > I guess this could be clarified to "is ignored", but with the earlier
-> > implementation you might be able to get away with doing
-> > "line_level=x; config=LEVEL;", but you could then at the same time break
-> > something with edge-triggered IRQs, so...
-> >
-> >
-> > Thanks for looking at this in detail.
-> >
-> > -Christoffer
+Thanks for clarifying. The current version passes muster on these
+assumptions, but I'll have to take a closer look to convince myself of
+the safety.
+
+By moving to vCPU pids in the next version, things should further
+improve in this regard.
+
+>
+> I also don't see why a process couldn't open multiple VMs; however
+> messy that may be, it appears possible to me.
+
+I imagine there is an implicit reliance on the VMM to handle any
+resulting fallout if it chooses to do this.
+
+>
+> -Christoffer
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
