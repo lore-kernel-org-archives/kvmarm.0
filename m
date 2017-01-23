@@ -1,28 +1,29 @@
 From: Vijay Kilari <vijay.kilari@gmail.com>
-Subject: Re: [PATCH v10 0/8] arm/arm64: vgic: Implement API for vGICv3 live
- migration
-Date: Mon, 23 Jan 2017 15:54:51 +0530
-Message-ID: <CALicx6sCdPdS97Lcsfr0BGyW21FXBVfMyWPRDtNXAcFLXp29Yw@mail.gmail.com>
+Subject: Re: [PATCH v10 8/8] arm/arm64: Documentation: Update arm-vgic-v3.txt
+Date: Mon, 23 Jan 2017 16:22:39 +0530
+Message-ID: <CALicx6twCMrK8gb=zR1wt1eH-eiPDyA3=BnLPFy=22O5wW52ew@mail.gmail.com>
 References: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
- <20170120195915.GK13531@cbox>
+ <1480576187-5012-9-git-send-email-vijay.kilari@gmail.com>
+ <7d82df18-debd-72e7-af6e-3816b8aaee85@redhat.com>
+ <20170120195722.GJ13531@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF18140986
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 05:24:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AE3440838
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 05:52:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AovTn5jN3slf for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Jan 2017 05:24:47 -0500 (EST)
-Received: from mail-oi0-f41.google.com (mail-oi0-f41.google.com
- [209.85.218.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE06E40838
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 05:24:47 -0500 (EST)
-Received: by mail-oi0-f41.google.com with SMTP id j15so77396001oih.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 02:24:52 -0800 (PST)
-In-Reply-To: <20170120195915.GK13531@cbox>
+ with ESMTP id tEyHtEPZOtqZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Jan 2017 05:52:36 -0500 (EST)
+Received: from mail-ot0-f195.google.com (mail-ot0-f195.google.com
+ [74.125.82.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE7DE40190
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 05:52:35 -0500 (EST)
+Received: by mail-ot0-f195.google.com with SMTP id f9so14930263otd.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 02:52:40 -0800 (PST)
+In-Reply-To: <20170120195722.GJ13531@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,33 +37,69 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Jan 21, 2017 at 1:29 AM, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> Hi Vijaya,
->
-> On Thu, Dec 01, 2016 at 12:39:39PM +0530, vijay.kilari@gmail.com wrote:
->> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->>
->> This patchset adds API for saving and restoring
->> of VGICv3 registers to support live migration with new vgic feature.
->> This API definition is as per version of VGICv3 specification
->> Documentation/virtual/kvm/devices/arm-vgic-v3.txt
->>
->> The patch 3 & 4 are picked from the Pavel's previous implementation.
->> http://www.spinics.net/lists/kvm/msg122040.html
->>
->> NOTE: Only compilation tested for AArch32. No hardware to test.
->>
->
-> I'm mostly happy with this series at this point, and everything beyond
-> the ABI discussion can be fixed later if we should spot anything.
->
-> Assuming we can agree on the API for the level_info shortly, can you
-> address the other comments in the series and reabse on v4.10-rc4 (or rc5
-> if that's out when you get there) and send out a new version that we can
-> queue?
+Hi Christoffer,
 
-OK.
+In the document,
+
+    The mpidr field is used to specify which
+    redistributor is accessed.  The mpidr is ignored for the distributor.
+
+We still rely on MPIDR for KVM_DEV_ARM_VGIC_GRP_DIST_REGS to fetch
+vcpu info. So don't we need to remove this restriction?.
+Or force to use vcpu[0]?
 
 Regards
 Vijay
+
+On Sat, Jan 21, 2017 at 1:27 AM, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Fri, Dec 16, 2016 at 01:18:09PM +0100, Auger Eric wrote:
+>> Hi Vijaya,
+>>
+>> On 01/12/2016 08:09, vijay.kilari@gmail.com wrote:
+>> > From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>> >
+>> > Update error code returned for Invalid CPU interface register
+>> > value and access in AArch32 mode.
+>> >
+>> > Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>> > ---
+>> >  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 9 ++++++++-
+>> >  1 file changed, 8 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>> > index 9348b3c..0f29850 100644
+>> > --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>> > +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>> > @@ -142,10 +142,12 @@ Groups:
+>> >      KVM_DEV_ARM_VGIC_CPU_SYSREGS accesses the CPU interface registers for the
+>> >      CPU specified by the mpidr field.
+>> >
+>> > +    CPU interface registers access is not implemented for AArch32 mode.
+>> > +    Error -ENXIO is returned when accessed in AArch32 mode.
+>> >    Errors:
+>> >      -ENXIO: Getting or setting this register is not yet supported
+>> >      -EBUSY: VCPU is running
+>> > -    -EINVAL: Invalid mpidr supplied
+>> > +    -EINVAL: Invalid mpidr or register value supplied
+>> >
+>> >
+>> >    KVM_DEV_ARM_VGIC_GRP_NR_IRQS
+>> > @@ -193,6 +195,11 @@ Groups:
+>> >
+>> >     Bit[n] indicates the status for interrupt vINTID + n.
+>> >
+>> > +   Getting or setting the level info for an edge-triggered interrupt is
+>> > +   not guaranteed to work.
+>> I don't get this statement. is the API applicable to edge triggered IRQs?
+>>
+>
+> I guess this could be clarified to "is ignored", but with the earlier
+> implementation you might be able to get away with doing
+> "line_level=x; config=LEVEL;", but you could then at the same time break
+> something with edge-triggered IRQs, so...
+>
+>
+> Thanks for looking at this in detail.
+>
+> -Christoffer
