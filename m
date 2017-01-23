@@ -1,33 +1,23 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v10 7/8] arm/arm64: vgic: Implement
- KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO ioctl
-Date: Mon, 23 Jan 2017 14:42:05 +0100
-Message-ID: <20170123134205.GE15850@cbox>
-References: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
- <1480576187-5012-8-git-send-email-vijay.kilari@gmail.com>
- <20170120195338.GH13531@cbox>
- <CAFEAcA8bZUPC2YTBYTVY3oB4MJFJcKOgT77PN3vkp5gPjVRPgA@mail.gmail.com>
- <20170123110639.GA15850@cbox>
- <CAFEAcA9Odatt_JUshMXnBiq0DyO7LEN=yCWnjwHPyO8uj2tJNw@mail.gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Remove struct vgic_irq pending field
+Date: Mon, 23 Jan 2017 15:44:16 +0000
+Message-ID: <ef1d4338-8348-74a7-390d-dcc60fc47607@arm.com>
+References: <20170123133951.10329-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCF7840296
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 08:42:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B5037408EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 10:44:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xbtI-OyxpQmQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Jan 2017 08:42:06 -0500 (EST)
-Received: from mail-lf0-f50.google.com (mail-lf0-f50.google.com
- [209.85.215.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 783EF40194
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 08:42:06 -0500 (EST)
-Received: by mail-lf0-f50.google.com with SMTP id n124so93359275lfd.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 05:42:11 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9Odatt_JUshMXnBiq0DyO7LEN=yCWnjwHPyO8uj2tJNw@mail.gmail.com>
+ with ESMTP id 9knI7-jyXTsS for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Jan 2017 10:44:14 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF3EB40190
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 10:44:14 -0500 (EST)
+In-Reply-To: <20170123133951.10329-1-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,52 +27,43 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 23, 2017 at 11:41:41AM +0000, Peter Maydell wrote:
-> On 23 January 2017 at 11:06, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
-> > ok, I think you're right that it can be done this way, but it has the
-> > unfortunate consequence of having to change a lot of the implementation.
-> >
-> > The reason is that we store the latch state in two different variables,
-> > depening on whether it's an edge- or level-triggered interrupts.
-> >
-> > We use the irq->pending field for the computed result (using above
-> > calculaiton) for level interrupts based on irq->line_level and
-> > irq->soft_pending.  soft_pending is the latch state for level interrupts
-> > only.
-> >
-> > For edge triggered interrupts the computed result and the latch state
-> > are alway the same (right?) so we we only use the irq->pending field for
-> > that.
-> >
-> > But unless I didn't have enough coffee this morning, this only works if
-> > you have a-priori knowledge of which interrupts are level and which are
-> > edge.  When this is not the case, as in the case of order-free
-> > save/restore, then I think the only solution is to rework the logic so
-> > that the soft_pending field is used for the latch state for both edge
-> > and level interrupts, and the pending field is just the internal
-> > computed value.
+On 23/01/17 13:39, Christoffer Dall wrote:
+> One of the goals behind the VGIC redesign was to get rid of cached or
+> intermediate state in the data structures, but we decided to allow
+> ourselves to precompute the pending value of an IRQ based on the line
+> level and pending latch state.  However, this has now become difficult
+> to base proper GICv3 save/restore on, because there is a potential to
+> modify the pending state without knowing if an interrupt is edge or
+> level configured.
 > 
-> I *think* you could fudge it by saying "when the config changes
-> from edge to level, copy the current irq->pending into irq->soft_pending".
-> Then you can always read the latch state (it's soft_pending
-> if level, otherwise pending), and writing it is "set both if
-> level, just irq->pending if edge". That in turn gives you enough
-> information I think to cope with restores of all of (config,
-> level, pending-latch) in any order. It feels a bit fragile, though.
+> See the following post and related message for more background:
+> https://lists.cs.columbia.edu/pipermail/kvmarm/2017-January/023195.html
+> 
+> This commit gets rid of the precomputed pending field in favor of a
+> function that calculates the value when needed, irq_is_pending().
+> 
+> The soft_pending field is renamed to pending_latch to represent that
+> this latch is the equivalent hardware latch which gets manipulated by
+> the input signal for edge-triggered interrupts and when writing to the
+> SPENDR/CPENDR registers.
+> 
+> After this commit save/restore code should be able to simply restore the
+> pending_latch state, line_level state, and config state in any order and
+> get the desired result.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-Right, thanks for working this out.  I agree it's fragile and I cannot
-seem to easily convince myself it would be correct, so I sent out a
-patch to get rid of the pending cached state which should simplify the
-save/restore patches as well.
+I admit having lost a few brain cells looking at this patch, and I can't
+prove it wrong! ;-) I like the fact that it now provides a safe
+abstraction to the pending state, and that there is exactly *one* place
+where line_level is evaluated.
 
-Assuming the other VGIC suspects don't object to that, I suggest we base
-these patches on top of that one and see if we can convince ourselves
-that it's correct then.
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Thanks,
--Christoffer
+	M.
+-- 
+Jazz is not dead. It just smells funny...
