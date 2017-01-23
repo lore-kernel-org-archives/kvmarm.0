@@ -1,29 +1,29 @@
 From: Vijay Kilari <vijay.kilari@gmail.com>
-Subject: Re: [PATCH v10 8/8] arm/arm64: Documentation: Update arm-vgic-v3.txt
-Date: Mon, 23 Jan 2017 16:22:39 +0530
-Message-ID: <CALicx6twCMrK8gb=zR1wt1eH-eiPDyA3=BnLPFy=22O5wW52ew@mail.gmail.com>
-References: <1480576187-5012-1-git-send-email-vijay.kilari@gmail.com>
- <1480576187-5012-9-git-send-email-vijay.kilari@gmail.com>
- <7d82df18-debd-72e7-af6e-3816b8aaee85@redhat.com>
- <20170120195722.GJ13531@cbox>
+Subject: Re: [PATCH v9 04/11] irqchip/gic-v3: Add missing system register
+ definitions
+Date: Mon, 23 Jan 2017 16:25:27 +0530
+Message-ID: <CALicx6vb+9L4WBVWrbMysAa+sOKpsqGWLZtBrQNPURkZU=jiTw@mail.gmail.com>
+References: <1479906118-15832-1-git-send-email-vijay.kilari@gmail.com>
+ <1479906118-15832-5-git-send-email-vijay.kilari@gmail.com>
+ <09831c41-3421-0c35-9d62-0ad7c92916d0@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AE3440838
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 05:52:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7F1B40838
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 05:55:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tEyHtEPZOtqZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Jan 2017 05:52:36 -0500 (EST)
+ with ESMTP id ukmF+2Zl3mSi for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Jan 2017 05:55:23 -0500 (EST)
 Received: from mail-ot0-f195.google.com (mail-ot0-f195.google.com
  [74.125.82.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE7DE40190
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 05:52:35 -0500 (EST)
-Received: by mail-ot0-f195.google.com with SMTP id f9so14930263otd.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 02:52:40 -0800 (PST)
-In-Reply-To: <20170120195722.GJ13531@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3E2C40190
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 05:55:23 -0500 (EST)
+Received: by mail-ot0-f195.google.com with SMTP id 73so14918482otj.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 02:55:28 -0800 (PST)
+In-Reply-To: <09831c41-3421-0c35-9d62-0ad7c92916d0@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,73 +33,104 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+Hi Eric,
 
-In the document,
-
-    The mpidr field is used to specify which
-    redistributor is accessed.  The mpidr is ignored for the distributor.
-
-We still rely on MPIDR for KVM_DEV_ARM_VGIC_GRP_DIST_REGS to fetch
-vcpu info. So don't we need to remove this restriction?.
-Or force to use vcpu[0]?
-
-Regards
-Vijay
-
-On Sat, Jan 21, 2017 at 1:27 AM, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> On Fri, Dec 16, 2016 at 01:18:09PM +0100, Auger Eric wrote:
->> Hi Vijaya,
+On Tue, Dec 6, 2016 at 7:23 PM, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi,
+> On 23/11/2016 14:01, vijay.kilari@gmail.com wrote:
+>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 >>
->> On 01/12/2016 08:09, vijay.kilari@gmail.com wrote:
->> > From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->> >
->> > Update error code returned for Invalid CPU interface register
->> > value and access in AArch32 mode.
->> >
->> > Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->> > ---
->> >  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 9 ++++++++-
->> >  1 file changed, 8 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
->> > index 9348b3c..0f29850 100644
->> > --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
->> > +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
->> > @@ -142,10 +142,12 @@ Groups:
->> >      KVM_DEV_ARM_VGIC_CPU_SYSREGS accesses the CPU interface registers for the
->> >      CPU specified by the mpidr field.
->> >
->> > +    CPU interface registers access is not implemented for AArch32 mode.
->> > +    Error -ENXIO is returned when accessed in AArch32 mode.
->> >    Errors:
->> >      -ENXIO: Getting or setting this register is not yet supported
->> >      -EBUSY: VCPU is running
->> > -    -EINVAL: Invalid mpidr supplied
->> > +    -EINVAL: Invalid mpidr or register value supplied
->> >
->> >
->> >    KVM_DEV_ARM_VGIC_GRP_NR_IRQS
->> > @@ -193,6 +195,11 @@ Groups:
->> >
->> >     Bit[n] indicates the status for interrupt vINTID + n.
->> >
->> > +   Getting or setting the level info for an edge-triggered interrupt is
->> > +   not guaranteed to work.
->> I don't get this statement. is the API applicable to edge triggered IRQs?
+>> Define register definitions for ICH_VMCR_EL2, ICC_CTLR_EL1 and
+>> ICH_VTR_EL2, ICC_BPR0_EL1, ICC_BPR1_EL1 registers.
 >>
+>> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 >
-> I guess this could be clarified to "is ignored", but with the earlier
-> implementation you might be able to get away with doing
-> "line_level=x; config=LEVEL;", but you could then at the same time break
-> something with edge-triggered IRQs, so...
+>> ---
+>>  include/linux/irqchip/arm-gic-v3.h | 43 ++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 41 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+>> index 0deea34..b4f8287 100644
+>> --- a/include/linux/irqchip/arm-gic-v3.h
+>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>> @@ -352,8 +352,30 @@
+>>  /*
+>>   * CPU interface registers
+>>   */
+>> -#define ICC_CTLR_EL1_EOImode_drop_dir        (0U << 1)
+>> -#define ICC_CTLR_EL1_EOImode_drop    (1U << 1)
+>> +#define ICC_CTLR_EL1_EOImode_SHIFT   (1)
+>> +#define ICC_CTLR_EL1_EOImode_drop_dir        (0U << ICC_CTLR_EL1_EOImode_SHIFT)
+>> +#define ICC_CTLR_EL1_EOImode_drop    (1U << ICC_CTLR_EL1_EOImode_SHIFT)
+>> +#define ICC_CTLR_EL1_EOImode_MASK    (1 << ICC_CTLR_EL1_EOImode_SHIFT)
+>> +#define ICC_CTLR_EL1_CBPR_SHIFT              0
+>> +#define ICC_CTLR_EL1_CBPR_MASK               (1 << ICC_CTLR_EL1_CBPR_SHIFT)
+>> +#define ICC_CTLR_EL1_PRI_BITS_SHIFT  8
+>> +#define ICC_CTLR_EL1_PRI_BITS_MASK   (0x7 << ICC_CTLR_EL1_PRI_BITS_SHIFT)
+>> +#define ICC_CTLR_EL1_ID_BITS_SHIFT   11
+>> +#define ICC_CTLR_EL1_ID_BITS_MASK    (0x7 << ICC_CTLR_EL1_ID_BITS_SHIFT)
+>> +#define ICC_CTLR_EL1_SEIS_SHIFT              14
+>> +#define ICC_CTLR_EL1_SEIS_MASK               (0x1 << ICC_CTLR_EL1_SEIS_SHIFT)
+>> +#define ICC_CTLR_EL1_A3V_SHIFT               15
+>> +#define ICC_CTLR_EL1_A3V_MASK                (0x1 << ICC_CTLR_EL1_A3V_SHIFT)
+>> +#define ICC_PMR_EL1_SHIFT            0
+>> +#define ICC_PMR_EL1_MASK             (0xff << ICC_PMR_EL1_SHIFT)
+>> +#define ICC_BPR0_EL1_SHIFT           0
+>> +#define ICC_BPR0_EL1_MASK            (0x7 << ICC_BPR0_EL1_SHIFT)
+>> +#define ICC_BPR1_EL1_SHIFT           0
+>> +#define ICC_BPR1_EL1_MASK            (0x7 << ICC_BPR1_EL1_SHIFT)
+>> +#define ICC_IGRPEN0_EL1_SHIFT                0
+>> +#define ICC_IGRPEN0_EL1_MASK         (1 << ICC_IGRPEN0_EL1_SHIFT)
+>> +#define ICC_IGRPEN1_EL1_SHIFT                0
+>> +#define ICC_IGRPEN1_EL1_MASK         (1 << ICC_IGRPEN1_EL1_SHIFT)
+>>  #define ICC_SRE_EL1_SRE                      (1U << 0)
+>>
+>>  /*
+>> @@ -384,12 +406,29 @@
+>>
+>>  #define ICH_VMCR_CTLR_SHIFT          0
+>>  #define ICH_VMCR_CTLR_MASK           (0x21f << ICH_VMCR_CTLR_SHIFT)
+>> +#define ICH_VMCR_CBPR_SHIFT          4
+>> +#define ICH_VMCR_CBPR_MASK           (1 << ICH_VMCR_CBPR_SHIFT)
+>> +#define ICH_VMCR_EOIM_SHIFT          9
+>> +#define ICH_VMCR_EOIM_MASK           (1 << ICH_VMCR_EOIM_SHIFT)
+>>  #define ICH_VMCR_BPR1_SHIFT          18
+>>  #define ICH_VMCR_BPR1_MASK           (7 << ICH_VMCR_BPR1_SHIFT)
+>>  #define ICH_VMCR_BPR0_SHIFT          21
+>>  #define ICH_VMCR_BPR0_MASK           (7 << ICH_VMCR_BPR0_SHIFT)
+>>  #define ICH_VMCR_PMR_SHIFT           24
+>>  #define ICH_VMCR_PMR_MASK            (0xffUL << ICH_VMCR_PMR_SHIFT)
+>> +#define ICH_VMCR_ENG0_SHIFT          0
+>> +#define ICH_VMCR_ENG0_MASK           (1 << ICH_VMCR_ENG0_SHIFT)
+>> +#define ICH_VMCR_ENG1_SHIFT          1
+>> +#define ICH_VMCR_ENG1_MASK           (1 << ICH_VMCR_ENG1_SHIFT)
+> Besides the fact the V* was omitted (for instance VENG0) this looks good
+> to me.
+
+The previous definitions of has omitted V. If we have to prefix V then
+it needs to be changed for all other definitions of VMCR.
+I propose to ignore it for now and can clean up later as a separate patch.
+
+>> +
+>> +#define ICH_VTR_PRI_BITS_SHIFT               29
+>> +#define ICH_VTR_PRI_BITS_MASK                (7 << ICH_VTR_PRI_BITS_SHIFT)
+>> +#define ICH_VTR_ID_BITS_SHIFT                23
+>> +#define ICH_VTR_ID_BITS_MASK         (7 << ICH_VTR_ID_BITS_SHIFT)
+>> +#define ICH_VTR_SEIS_SHIFT           22
+>> +#define ICH_VTR_SEIS_MASK            (1 << ICH_VTR_SEIS_SHIFT)
+>> +#define ICH_VTR_A3V_SHIFT            21
+>> +#define ICH_VTR_A3V_MASK             (1 << ICH_VTR_A3V_SHIFT)
+> Some fields are omitted but I guess they are not used.
 >
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 >
-> Thanks for looking at this in detail.
+> Eric
 >
-> -Christoffer
+>>
+>>  #define ICC_IAR1_EL1_SPURIOUS                0x3ff
+>>
+>>
