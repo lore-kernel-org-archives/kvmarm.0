@@ -1,75 +1,54 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: Re: [PATCH v3 2/5] arm64: Work around Falkor erratum 1003
-Date: Tue, 24 Jan 2017 09:54:44 -0500
-Message-ID: <abe718b7-c832-7748-f043-f9a62d0dd1e4@codeaurora.org>
-References: <20170111144118.17062-1-cov@codeaurora.org>
- <20170111144118.17062-2-cov@codeaurora.org>
- <20170111180627.GG20288@e104818-lin.cambridge.arm.com>
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH V7 05/10] acpi: apei: handle SEA notification type for
+ ARMv8
+Date: Tue, 24 Jan 2017 17:55:32 +0000
+Message-ID: <58879514.1020501@arm.com>
+References: <1484244924-24786-1-git-send-email-tbaicar@codeaurora.org> <1484244924-24786-6-git-send-email-tbaicar@codeaurora.org> <587F80A7.10008@arm.com> <3de443d7-2c68-f179-daae-bc8f851470b7@codeaurora.org> <5880FDFC.7060304@arm.com> <8b9d254a-5450-d841-baf7-5819a88043e4@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <20170111180627.GG20288@e104818-lin.cambridge.arm.com>
-Sender: linux-doc-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, shankerd@codeaurora.org, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Jon Masters <jcm@redhat.com>, Mark Langsdorf <mlangsdo@redhat.com>, Mark Salter <msalter@redhat.com>
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <8b9d254a-5450-d841-baf7-5819a88043e4-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "Baicar, Tyler" <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Cc: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devel-E0kO6a4B6psdnm+yROfE0A@public.gmane.org, Suzuki.Po
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Catalin,
+Hi Tyler,
 
-On 01/11/2017 01:06 PM, Catalin Marinas wrote:
-> Some minor comments below, nothing fundamental (as long as you say the
-> new sequence doesn't have the speculative TLB load problem I mentioned
-> on a previous version).
+On 20/01/17 20:58, Baicar, Tyler wrote:
+> On 1/19/2017 10:57 AM, James Morse wrote:
+>> On 18/01/17 23:51, Baicar, Tyler wrote:
+>>> On 1/18/2017 7:50 AM, James Morse wrote:
+>>>> On 12/01/17 18:15, Tyler Baicar wrote:
+>>>>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
 
-This workaround is documented as providing functional correctness for
-both explicit and speculative memory accesses.
+>> There are two other things that need changing to make the in_nmi() code path
+>> work on arm64.
+>> Always reserve the virtual-address-space forcing GHES_IOREMAP_PAGES to be 2
+>> regardless of CONFIG_HAVE_ACPI_APEI_NMI. This is almost revert of
+>> 594c7255dce7a13cac50cf2470cc56e2c3b0494e (but that did a few other things too).
 
->> diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
->> index 32682be..9ee46df 100644
->> --- a/arch/arm64/mm/proc.S
->> +++ b/arch/arm64/mm/proc.S
->> @@ -23,6 +23,7 @@
->>  #include <asm/assembler.h>
->>  #include <asm/asm-offsets.h>
->>  #include <asm/hwcap.h>
->> +#include <asm/mmu_context.h>
->>  #include <asm/pgtable.h>
->>  #include <asm/pgtable-hwdef.h>
->>  #include <asm/cpufeature.h>
->> @@ -140,6 +141,18 @@ ENDPROC(cpu_do_resume)
->>  ENTRY(cpu_do_switch_mm)
->>  	mmid	x1, x1				// get mm->context.id
->>  	bfi	x0, x1, #48, #16		// set the ASID
->> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1003
->> +alternative_if ARM64_WORKAROUND_QCOM_FALKOR_E1003
->> +	mrs     x2, ttbr0_el1
->> +	mov     x3, #FALKOR_RESERVED_ASID
->> +	bfi     x2, x3, #48, #16                // reserved ASID + old BADDR
->> +	msr     ttbr0_el1, x2
->> +	isb
->> +	bfi     x2, x0, #0, #48                 // reserved ASID + new BADDR
->> +	msr     ttbr0_el1, x2
->> +	isb
->> +alternative_else_nop_endif
->> +#endif
->>  	msr	ttbr0_el1, x0			// set TTBR0
->>  	isb
->>  	post_ttbr0_update_workaround
+> Looks simple enough, should I force it to 2 in all cases, or add a check for
+> CONFIG_HAVE_ACPI_APEI_SEA
+> similar to the check for CONFIG_HAVE_ACPI_APEI_NMI?
+
+Its just address space not actual memory it is reserving right? I think just
+reserve two pages all the time to save eye-sore #ifdefs!
+
+
+>> We also need to fix ghes_ioremap_pfn_nmi() to use arch_apei_get_mem_attribute()
+>> and not assume PAGE_KERNEL.
+
+> So just change the call to ioremap_page_range to:
 > 
-> Please move the above hunk to a pre_ttbr0_update_workaround macro for
-> consistency with post_ttbr0_update_workaround.
+> ioremap_page_range(vaddr, vaddr + PAGE_SIZE, pfn << PAGE_SHIFT,
+> arch_apei_get_mem_attribute());
 
-How should I deal with inputs to the macro?
+(you need to give arch_apei_get_mem_attribute() the address...) copying whatever
+ghes_ioremap_pfn_irq() does a few lines down is probably best.
 
-A) Use no input parameters and hard code x0 usage
-B) Use a macro input parameter for the new TTBR value (x0)
-C) Something else
 
 Thanks,
-Cov
 
--- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
-Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code
-Aurora Forum, a Linux Foundation Collaborative Project.
+James
