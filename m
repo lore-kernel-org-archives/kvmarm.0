@@ -1,30 +1,24 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Increase number of memslots to 512
-Date: Tue, 24 Jan 2017 09:04:36 +0000
-Message-ID: <a1c19088-daca-bf28-13b1-f29f2ce1fe03@arm.com>
-References: <1484153537-20984-1-git-send-email-linucherian@gmail.com>
- <61fa02f8-b244-6bae-eaa1-cb745ea543e1@arm.com>
- <CAGOz-0aD-hV7sDAX70pSGdCj1J4s4xc4qQBwbaKzVZArfRK2AQ@mail.gmail.com>
- <6fc30f74-d1ab-028f-7e5f-a5d1fe69c17a@arm.com>
- <CAGOz-0bR-YnUiv5v_duJYOQE3jxCoGRO=f05==tD5kL489g2CQ@mail.gmail.com>
- <868tqdvrzu.fsf@arm.com>
- <CANHdaiZf9bHaaNVo1FyMokZ89gfbnMKuQP2KjW21nBqNzqWqYw@mail.gmail.com>
- <CAGOz-0bDP0vgsa2C5znbAukDPiui485Q9Ea-oEQzGjhCE_W3og@mail.gmail.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Remove struct vgic_irq pending field
+Date: Tue, 24 Jan 2017 10:01:07 +0000
+Message-ID: <1dc74e05-b72f-7b98-0d67-8cbde732e83b@arm.com>
+References: <20170123133951.10329-1-christoffer.dall@linaro.org>
+ <154ecb7e-457d-ea56-4ae2-c2b37c951a8a@arm.com> <20170123183447.GH15850@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B9D5D4097B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 04:04:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E9C8440985
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 04:59:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SSQWUTNJra7q for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Jan 2017 04:04:33 -0500 (EST)
+ with ESMTP id xDVD1wCW8UBE for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Jan 2017 04:59:42 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A20D4018B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 04:04:33 -0500 (EST)
-In-Reply-To: <CAGOz-0bDP0vgsa2C5znbAukDPiui485Q9Ea-oEQzGjhCE_W3og@mail.gmail.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCC504097B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 04:59:42 -0500 (EST)
+In-Reply-To: <20170123183447.GH15850@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,55 +28,91 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Linu Cherian <linucherian@gmail.com>, Geetha Akula <geethasowjanya.akula@gmail.com>
-Cc: sunil.goutham@cavium.com, linux-arm-kernel@lists.infradead.org, Linu Cherian <linu.cherian@cavium.com>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/01/17 05:06, Linu Cherian wrote:
-> On Sat, Jan 14, 2017 at 9:53 PM, Geetha Akula
-> <geethasowjanya.akula@gmail.com> wrote:
->> Hi Marc,
+Hi Christoffer,
+
+On 23/01/17 18:34, Christoffer Dall wrote:
+> On Mon, Jan 23, 2017 at 05:57:05PM +0000, Andre Przywara wrote:
+>> Hi Christoffer,
 >>
->> We have been testing vfio patches regularly. We are in contact with Eric
->> offline. In fact we are the first one to test V5 patches on Eric request as
->> he had some issue with his test setup.  After our feedback it was posted in
->> upstream.
->> We also reported issues found with vfio patches. We been contact with Eric
->> regularly.
+>> On 23/01/17 13:39, Christoffer Dall wrote:
+>>> One of the goals behind the VGIC redesign was to get rid of cached or
+>>> intermediate state in the data structures, but we decided to allow
+>>> ourselves to precompute the pending value of an IRQ based on the line
+>>> level and pending latch state.  However, this has now become difficult
+>>> to base proper GICv3 save/restore on, because there is a potential to
+>>> modify the pending state without knowing if an interrupt is edge or
+>>> level configured.
+>>>
+>>> See the following post and related message for more background:
+>>> https://lists.cs.columbia.edu/pipermail/kvmarm/2017-January/023195.html
+>>>
+>>> This commit gets rid of the precomputed pending field in favor of a
+>>> function that calculates the value when needed, irq_is_pending().
+>>>
+>>> The soft_pending field is renamed to pending_latch to represent that
+>>> this latch is the equivalent hardware latch which gets manipulated by
+>>> the input signal for edge-triggered interrupts and when writing to the
+>>> SPENDR/CPENDR registers.
+>>>
+>>> After this commit save/restore code should be able to simply restore the
+>>> pending_latch state, line_level state, and config state in any order and
+>>> get the desired result.
 >>
->> Thanks,
->> Geetha.
+>> In general I like this very much and am wondering why we didn't come up
+>> with this earlier. But I guess we were so subscribed to our "cached
+>> pending" bit.
 >>
->> On 14-Jan-2017 4:17 PM, "Marc Zyngier" <marc.zyngier@arm.com> wrote:
->>>
->>> On Sat, Jan 14 2017 at 09:53:52 AM, Linu Cherian <linucherian@gmail.com>
->>> wrote:
->>>>> Let me be more precise. At the moment, KVM on arm64 doesn't support the
->>>>> delivery of MSIs generated by physical devices into a guest (patches
->>>>> are
->>>>> in progress, but not merged yet). So unless you used devices that have
->>>>> no need for interrupts, I don't see how this works.
->>>>>
->>>>> Can you shed some light on your test process?
->>>>>
->>>>
->>>> We did the testing on top of latest VFIO msi support patches submitted
->>>> by Eric Auger.
->>>
->>> Did you? That's reassuring. It would have been good if any of the Cavium
->>> folks did chime in on the list and help reviewing though - so far, all
->>> I've heard is a deafening silence. I guess there was no hurry for Cavium
->>> to see these patches being merged.
->>>
+>> So I checked several cases, tested some logic equations and drew the
+>> state diagrams for the "before" and "after" case, but I couldn't find a
+>> reason why this wouldn't work.
+>>
+>> I also think you can get rid of the irq_set_pending_latch() wrapper and
+>> assign the value directly, as I don't see any reason to hide the fact
+>> that it's indeed a simple assignment and nothing magic behind this
+>> function. Also it would make the diff a bit easier to read.
 > 
-> May i know if this patch is queued for merge.
+> Agreed.  Once we have agreement about if we should cleanup clearing the
+> latch state, I'll respin with that and add you and Marc's RB tags with
+> the changed version.
+> 
+>>
+>> But apart from that:
+>>
+>> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+>>
+>>
+>> I also gave this a quick test on the Juno and the Midway with both
+>> kvmtool and QEMU and they survived some basic testing.
+>>
+>> I need to check a GICv3 machine tomorrow, but I don't expect any
+>> differences here.
+>>
+> 
+> Thanks.
+> 
+> I tested this, including GICv2 migration on Mustang, and was going to do
+> GICv3 testing and 32-bit testin tomorrow, but I'm quite happy to hear
+> you gave it a spin on a 32-bit platform already.
 
-Not at the moment, since none of the patches it implicitly depends on
-are merged yet either. Once Eric's patches are in (or at least in
--next), this can be queued - assuming it gets some reviewing too.
+OK, so a GICv3 machine survived over night testing, resulting in some 10
+millions of interrupts of every kind (LPIs, edge SPIs, some 100,000
+level SPIs (UART only), SGIs, PPIs).
+Same on a Juno, no LPIs there of course, but also millions of interrupts
+working fine over night.
 
-Thanks,
+So:
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Tested-by: Andre Przywara <andre.przywara@arm.com>
+
+So this was just Linux as a guest, which - at least last time I checked
+- doesn't use GIC_DIST_SET_PENDING or GIC_DIST_CLEAR_PENDING registers
+too much (if at all under normal load).
+I think we should add some tests to kvm-unit-tests to actually trigger
+this code explicitly.
+
+Cheers,
+Andre.
