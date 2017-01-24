@@ -1,30 +1,26 @@
-From: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Subject: Re: [PATCH V7 05/10] acpi: apei: handle SEA notification type for
- ARMv8
-Date: Tue, 24 Jan 2017 11:43:38 -0700
-Message-ID: <1a9c6783-4d9f-5b50-1d7e-b4d65742661b@codeaurora.org>
-References: <1484244924-24786-1-git-send-email-tbaicar@codeaurora.org>
- <1484244924-24786-6-git-send-email-tbaicar@codeaurora.org>
- <587F80A7.10008@arm.com>
- <3de443d7-2c68-f179-daae-bc8f851470b7@codeaurora.org>
- <5880FDFC.7060304@arm.com>
- <8b9d254a-5450-d841-baf7-5819a88043e4@codeaurora.org>
- <58879514.1020501@arm.com>
+From: Christopher Covington <cov@codeaurora.org>
+Subject: Re: [PATCH v3 3/5] arm64: Create and use __tlbi_dsb() macros
+Date: Tue, 24 Jan 2017 17:03:59 -0500
+Message-ID: <968e0d85-164d-36ff-8f00-bee6ff2e875e@codeaurora.org>
+References: <20170111144118.17062-1-cov@codeaurora.org>
+ <20170111144118.17062-3-cov@codeaurora.org> <20170112165852.GH13843@arm.com>
+ <8f8057f5-d33f-15b3-de9f-6e718c23e97d@codeaurora.org>
+ <20170113161209.GI3253@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA2D640960
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 13:43:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6EDE400E9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 17:03:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h8okVK3uxZKW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Jan 2017 13:43:37 -0500 (EST)
+ with ESMTP id VdICxXz0z4lH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Jan 2017 17:03:56 -0500 (EST)
 Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D21AC408EB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 13:43:36 -0500 (EST)
-In-Reply-To: <58879514.1020501@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 931E140064
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 17:03:56 -0500 (EST)
+In-Reply-To: <20170113161209.GI3253@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,45 +30,107 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+To: Will Deacon <will.deacon@arm.com>
+Cc: Mark Langsdorf <mlangsdo@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Jon Masters <jcm@redhat.com>, timur@codeaurora.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 1/24/2017 10:55 AM, James Morse wrote:
-> Hi Tyler,
->
-> On 20/01/17 20:58, Baicar, Tyler wrote:
->> On 1/19/2017 10:57 AM, James Morse wrote:
->>> On 18/01/17 23:51, Baicar, Tyler wrote:
->>>> On 1/18/2017 7:50 AM, James Morse wrote:
->>>>> On 12/01/17 18:15, Tyler Baicar wrote:
->>>>>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
->>> There are two other things that need changing to make the in_nmi() code path
->>> work on arm64.
->>> Always reserve the virtual-address-space forcing GHES_IOREMAP_PAGES to be 2
->>> regardless of CONFIG_HAVE_ACPI_APEI_NMI. This is almost revert of
->>> 594c7255dce7a13cac50cf2470cc56e2c3b0494e (but that did a few other things too).
->> Looks simple enough, should I force it to 2 in all cases, or add a check for
->> CONFIG_HAVE_ACPI_APEI_SEA
->> similar to the check for CONFIG_HAVE_ACPI_APEI_NMI?
-> Its just address space not actual memory it is reserving right? I think just
-> reserve two pages all the time to save eye-sore #ifdefs!
->
-Okay, will do!
->>> We also need to fix ghes_ioremap_pfn_nmi() to use arch_apei_get_mem_attribute()
->>> and not assume PAGE_KERNEL.
->> So just change the call to ioremap_page_range to:
+Hi Will,
+
+On 01/13/2017 11:12 AM, Will Deacon wrote:
+> On Fri, Jan 13, 2017 at 10:12:36AM -0500, Christopher Covington wrote:
+>> On 01/12/2017 11:58 AM, Will Deacon wrote:
+>>> On Wed, Jan 11, 2017 at 09:41:16AM -0500, Christopher Covington wrote:
+>>>> +#define __tlbi_asm_dsb(as, op, attr, ...) do {				       \
+>>>> +		__TLBI_FOR(op, ##__VA_ARGS__)				       \
+>>>> +			asm (__TLBI_INSTR(op, ##__VA_ARGS__)		       \
+>>>> +			__TLBI_IO(op, ##__VA_ARGS__));			       \
+>>>> +		asm volatile (	     as			"\ndsb " #attr "\n"    \
+>>>> +		: : : "memory"); } while (0)
+>>>> +
+>>>> +#define __tlbi_dsb(...)	__tlbi_asm_dsb("", ##__VA_ARGS__)
+>>>
+>>> I can't deny that this is cool, but ultimately it's completely unreadable.
+>>> What I was thinking you'd do would be make __tlbi expand to:
+>>>
+>>>   tlbi
+>>>   dsb
+>>>   tlbi
+>>>   dsb
+>>>
+>>> for Falkor, and:
+>>>
+>>>   tlbi
+>>>   nop
+>>>   nop
+>>>   nop
+>>>
+>>> for everybody else.
+
+I've implemented this (minus the last dsb / nop) in the next revision.
+
+>> Thanks for the suggestion. So would __tlbi take a dsb sharability argument in
+>> your proposal? Or would it be communicated in some other fashion, maybe inferred
+>> from the tlbi argument? Or would the workaround dsbs all be the worst/broadest
+>> case?
+> 
+> I think always using inner-shareable should be ok. If you wanted to optimise
+> this, you'd want to avoid the workaround altogether for non-shareable
+> invalidation, but that's fairly rare and I doubt you'd be able to measure
+> the impact.
+
+I did not originally notice that Shanker's original workaround implementation
+unnecessarily applies the workaround to non-shareable invalidations. They're
+not affected by the erratum. But as you say, it's simpler to modify __tlbi for
+all cases. I'm not currently worried about that performance impact.
+
+>>> Wouldn't that localise this change sufficiently that you wouldn't need
+>>> to change all the callers and encode the looping in your cpp macros?
+>>>
+>>> I realise you get an extra dsb in some places with that change, but I'd
+>>> like to see numbers for the impact of that on top of the workaround. If
+>>> it's an issue, then an alternative sequence would be:
+>>>
+>>>   tlbi
+>>>   dsb
+>>>   tlbi
+>>>
+>>> and you'd rely on the existing dsb to complete that.
+>>>
+>>> Having said that, I don't understand how your current loop code works
+>>> when the workaround is applied. AFAICT, you end up emitting something
+>>> like:
+>>>
+>>> dsb ishst
+>>> for i in 0 to n
+>>> 	tlbi va+i
+>>> dsb
+>>> tlbi va+n
+>>> dsb
+>>>
+>>> which looks wrong to me. Am I misreading something here?
 >>
->> ioremap_page_range(vaddr, vaddr + PAGE_SIZE, pfn << PAGE_SHIFT,
->> arch_apei_get_mem_attribute());
-> (you need to give arch_apei_get_mem_attribute() the address...) copying whatever
-> ghes_ioremap_pfn_irq() does a few lines down is probably best.
-Sounds good, I'll make the changes in my next patchset.
+>> You're right, I am off by 1 << (PAGE_SHIFT - 12) here. I would need to
+>> increment, compare, not take the loop branch (regular for loop stuff),
+>> then decrement (missing) and perform TLB invalidation again (present but
+>> using incorrect value).
+> 
+> It also strikes me as odd that you only need one extra TLBI after the loop
+> has finished, as opposed to a tlbi; dsb; tlbi loop body (which is what you'd
+> get if you modified __tlbi as I suggest).
+> 
+> Is it sufficient to have one extra TLBI after the loop and, if so, is the
+> performance impact of my suggestion therefore unacceptable?
+
+One is sufficient according to the errata documentation. I've described that
+aspect in the commit message of the next revision.
+
+I've suggested colleagues follow up regarding performance. But reliable
+functionality comes first.
 
 Thanks,
-Tyler
+Cov
 
 -- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
+Technologies, Inc. Qualcomm Technologies, Inc. is a member of the Code
+Aurora Forum, a Linux Foundation Collaborative Project.
