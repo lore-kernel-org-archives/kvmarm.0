@@ -1,47 +1,72 @@
 From: Christopher Covington <cov@codeaurora.org>
 Subject: Re: [PATCH v3 2/5] arm64: Work around Falkor erratum 1003
-Date: Tue, 24 Jan 2017 09:27:44 -0500
-Message-ID: <ab7d621e-0ba2-f113-22fc-2866f9cba5f5@codeaurora.org>
+Date: Tue, 24 Jan 2017 09:54:44 -0500
+Message-ID: <abe718b7-c832-7748-f043-f9a62d0dd1e4@codeaurora.org>
 References: <20170111144118.17062-1-cov@codeaurora.org>
  <20170111144118.17062-2-cov@codeaurora.org>
  <20170111180627.GG20288@e104818-lin.cambridge.arm.com>
- <278a45c0-bd49-b8a2-63ae-80ad851bab9b@arm.com>
- <20170111184052.GE29247@leverpostej>
- <20170112154548.twj2ktbfzbsarzbc@localhost>
- <20170112161214.GB12583@leverpostej>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170112161214.GB12583@leverpostej>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
-Cc: Mark Langsdorf <mlangsdo@redhat.com>, kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>, Jon Masters <jcm@redhat.com>, timur@codeaurora.org, linux-doc@vger.kernel.org, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <20170111180627.GG20288@e104818-lin.cambridge.arm.com>
+Sender: linux-doc-owner@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, shankerd@codeaurora.org, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Jon Masters <jcm@redhat.com>, Mark Langsdorf <mlangsdo@redhat.com>, Mark Salter <msalter@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/12/2017 11:12 AM, Mark Rutland wrote:
-> On Thu, Jan 12, 2017 at 03:45:48PM +0000, Catalin Marinas wrote:
->> On Wed, Jan 11, 2017 at 06:40:52PM +0000, Mark Rutland wrote:
-> 
->>> Likewise, I beleive we may need to modify cpu_set_reserved_ttbr0().
->>
->> This may be fine if my assumptions about this erratum are correct. In
->> the cpu_set_reserved_ttbr0() case we set TTBR0_EL1 to a table without
->> any entries, so no new entries could be tagged with the old ASID.
-> 
-> For some reason, I was under the impression that the issue was old table
-> entries being allocated to the new ASID. Looking over the series again,
-> it's not clear to me precisely which cases can occur.
-> 
-> It would be good to see that clarified.
+Hi Catalin,
 
-I'll add more general background the commit message in the next revision
-and I've also asked directly about this. The answer is that page table
-entries using the new translation table base address will be allocated
-into the TLB using the old ASID. If employing the workaround, it's
-possible for page table entries using the new translation table base
-to be allocated into the TLB using the reserved ASID.
+On 01/11/2017 01:06 PM, Catalin Marinas wrote:
+> Some minor comments below, nothing fundamental (as long as you say the
+> new sequence doesn't have the speculative TLB load problem I mentioned
+> on a previous version).
 
+This workaround is documented as providing functional correctness for
+both explicit and speculative memory accesses.
+
+>> diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+>> index 32682be..9ee46df 100644
+>> --- a/arch/arm64/mm/proc.S
+>> +++ b/arch/arm64/mm/proc.S
+>> @@ -23,6 +23,7 @@
+>>  #include <asm/assembler.h>
+>>  #include <asm/asm-offsets.h>
+>>  #include <asm/hwcap.h>
+>> +#include <asm/mmu_context.h>
+>>  #include <asm/pgtable.h>
+>>  #include <asm/pgtable-hwdef.h>
+>>  #include <asm/cpufeature.h>
+>> @@ -140,6 +141,18 @@ ENDPROC(cpu_do_resume)
+>>  ENTRY(cpu_do_switch_mm)
+>>  	mmid	x1, x1				// get mm->context.id
+>>  	bfi	x0, x1, #48, #16		// set the ASID
+>> +#ifdef CONFIG_QCOM_FALKOR_ERRATUM_1003
+>> +alternative_if ARM64_WORKAROUND_QCOM_FALKOR_E1003
+>> +	mrs     x2, ttbr0_el1
+>> +	mov     x3, #FALKOR_RESERVED_ASID
+>> +	bfi     x2, x3, #48, #16                // reserved ASID + old BADDR
+>> +	msr     ttbr0_el1, x2
+>> +	isb
+>> +	bfi     x2, x0, #0, #48                 // reserved ASID + new BADDR
+>> +	msr     ttbr0_el1, x2
+>> +	isb
+>> +alternative_else_nop_endif
+>> +#endif
+>>  	msr	ttbr0_el1, x0			// set TTBR0
+>>  	isb
+>>  	post_ttbr0_update_workaround
+> 
+> Please move the above hunk to a pre_ttbr0_update_workaround macro for
+> consistency with post_ttbr0_update_workaround.
+
+How should I deal with inputs to the macro?
+
+A) Use no input parameters and hard code x0 usage
+B) Use a macro input parameter for the new TTBR value (x0)
+C) Something else
+
+Thanks,
 Cov
 
 -- 
