@@ -1,28 +1,32 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 2/2] arm64: kvm: upgrade csselr and ccsidr to 64-bit values
-Date: Mon, 23 Jan 2017 22:08:59 +0100
-Message-ID: <20170123210859.GJ15850@cbox>
-References: <1484909410-11673-1-git-send-email-sudeep.holla@arm.com>
- <1484909410-11673-2-git-send-email-sudeep.holla@arm.com>
+From: Linu Cherian <linucherian@gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Increase number of memslots to 512
+Date: Tue, 24 Jan 2017 10:36:48 +0530
+Message-ID: <CAGOz-0bDP0vgsa2C5znbAukDPiui485Q9Ea-oEQzGjhCE_W3og@mail.gmail.com>
+References: <1484153537-20984-1-git-send-email-linucherian@gmail.com>
+ <61fa02f8-b244-6bae-eaa1-cb745ea543e1@arm.com>
+ <CAGOz-0aD-hV7sDAX70pSGdCj1J4s4xc4qQBwbaKzVZArfRK2AQ@mail.gmail.com>
+ <6fc30f74-d1ab-028f-7e5f-a5d1fe69c17a@arm.com>
+ <CAGOz-0bR-YnUiv5v_duJYOQE3jxCoGRO=f05==tD5kL489g2CQ@mail.gmail.com>
+ <868tqdvrzu.fsf@arm.com>
+ <CANHdaiZf9bHaaNVo1FyMokZ89gfbnMKuQP2KjW21nBqNzqWqYw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F04334097B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 16:09:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6908408EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 00:06:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HZ0nUtuklJHB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Jan 2017 16:08:59 -0500 (EST)
-Received: from mail-lf0-f46.google.com (mail-lf0-f46.google.com
- [209.85.215.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B3020408EB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 16:08:59 -0500 (EST)
-Received: by mail-lf0-f46.google.com with SMTP id x1so13760494lff.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 13:09:05 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <1484909410-11673-2-git-send-email-sudeep.holla@arm.com>
+ with ESMTP id XC5fV9KNy2oa for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Jan 2017 00:06:44 -0500 (EST)
+Received: from mail-yw0-f194.google.com (mail-yw0-f194.google.com
+ [209.85.161.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEE5C408E9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 00:06:43 -0500 (EST)
+Received: by mail-yw0-f194.google.com with SMTP id q71so14510224ywg.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Jan 2017 21:06:49 -0800 (PST)
+In-Reply-To: <CANHdaiZf9bHaaNVo1FyMokZ89gfbnMKuQP2KjW21nBqNzqWqYw@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,90 +36,46 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Sudeep Holla <sudeep.holla@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Geetha Akula <geethasowjanya.akula@gmail.com>
+Cc: sunil.goutham@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, Linu Cherian <linu.cherian@cavium.com>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 20, 2017 at 10:50:10AM +0000, Sudeep Holla wrote:
-> csselr and ccsidr are treated as 64-bit values already elsewhere in the
-> kernel. It also aligns well with the architecture extensions that allow
-> 64-bit format for ccsidr.
-> 
-> This patch upgrades the existing accesses to csselr and ccsidr from
-> 32-bit to 64-bit in preparation to add support to those extensions.
-> 
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 5dca1f10340f..a3559a8a2b0c 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -58,15 +58,15 @@
->   */
->  
->  /* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
-> -static u32 cache_levels;
-> +static u64 cache_levels;
->  
->  /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
->  #define CSSELR_MAX 	((MAX_CACHE_LEVEL - 1) >> 1)
->  
->  /* Which cache CCSIDR represents depends on CSSELR value. */
-> -static u32 get_ccsidr(u32 csselr)
-> +static u64 get_ccsidr(u64 csselr)
->  {
-> -	u32 ccsidr;
-> +	u64 ccsidr;
->  
->  	/* Make sure noone else changes CSSELR during this! */
->  	local_irq_disable();
-> @@ -1952,9 +1952,9 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
->  	return 0;
->  }
->  
-> -static bool is_valid_cache(u32 val)
-> +static bool is_valid_cache(u64 val)
->  {
-> -	u32 level, ctype;
-> +	u64 level, ctype;
->  
->  	if (val >= CSSELR_MAX)
->  		return false;
-> @@ -1979,8 +1979,8 @@ static bool is_valid_cache(u32 val)
->  
->  static int demux_c15_get(u64 id, void __user *uaddr)
->  {
-> -	u32 val;
-> -	u32 __user *uval = uaddr;
-> +	u64 val;
-> +	u64 __user *uval = uaddr;
->  
->  	/* Fail if we have unknown bits set. */
->  	if (id & ~(KVM_REG_ARCH_MASK|KVM_REG_SIZE_MASK|KVM_REG_ARM_COPROC_MASK
-> @@ -2004,8 +2004,8 @@ static int demux_c15_get(u64 id, void __user *uaddr)
->  
->  static int demux_c15_set(u64 id, void __user *uaddr)
->  {
-> -	u32 val, newval;
-> -	u32 __user *uval = uaddr;
-> +	u64 val, newval;
-> +	u64 __user *uval = uaddr;
+On Sat, Jan 14, 2017 at 9:53 PM, Geetha Akula
+<geethasowjanya.akula@gmail.com> wrote:
+> Hi Marc,
+>
+> We have been testing vfio patches regularly. We are in contact with Eric
+> offline. In fact we are the first one to test V5 patches on Eric request as
+> he had some issue with his test setup.  After our feedback it was posted in
+> upstream.
+> We also reported issues found with vfio patches. We been contact with Eric
+> regularly.
+>
+> Thanks,
+> Geetha.
+>
+> On 14-Jan-2017 4:17 PM, "Marc Zyngier" <marc.zyngier@arm.com> wrote:
+>>
+>> On Sat, Jan 14 2017 at 09:53:52 AM, Linu Cherian <linucherian@gmail.com>
+>> wrote:
+>> >> Let me be more precise. At the moment, KVM on arm64 doesn't support the
+>> >> delivery of MSIs generated by physical devices into a guest (patches
+>> >> are
+>> >> in progress, but not merged yet). So unless you used devices that have
+>> >> no need for interrupts, I don't see how this works.
+>> >>
+>> >> Can you shed some light on your test process?
+>> >>
+>> >
+>> > We did the testing on top of latest VFIO msi support patches submitted
+>> > by Eric Auger.
+>>
+>> Did you? That's reassuring. It would have been good if any of the Cavium
+>> folks did chime in on the list and help reviewing though - so far, all
+>> I've heard is a deafening silence. I guess there was no hurry for Cavium
+>> to see these patches being merged.
+>>
 
-Doesn't converting these uval pointers to u64 cause us to break the ABI
-as we'll now be reading/writing 64-bit values to userspace with the
-get_user and put_user following the declarations?
+May i know if this patch is queued for merge.
 
->  
->  	/* Fail if we have unknown bits set. */
->  	if (id & ~(KVM_REG_ARCH_MASK|KVM_REG_SIZE_MASK|KVM_REG_ARM_COPROC_MASK
-> -- 
-> 2.7.4
-> 
-
-Thanks,
--Christoffer
+Thanks.
