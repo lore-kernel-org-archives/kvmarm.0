@@ -1,162 +1,386 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: vgic: Add debugfs vgic-state file
-Date: Tue, 24 Jan 2017 11:58:33 +0100
-Message-ID: <20170124105833.GM15850@cbox>
-References: <20170120103330.13858-1-christoffer.dall@linaro.org>
- <524751ae-8e17-f9a0-88c6-95d4614478af@arm.com>
+Subject: [PATCH v2] KVM: arm/arm64: Remove struct vgic_irq pending field
+Date: Tue, 24 Jan 2017 12:01:17 +0100
+Message-ID: <20170124110117.13390-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <524751ae-8e17-f9a0-88c6-95d4614478af@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Alex Bennee <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A50B4019A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 06:01:49 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id lq9YeTe3v-fT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Jan 2017 06:01:46 -0500 (EST)
+Received: from mail-lf0-f47.google.com (mail-lf0-f47.google.com
+ [209.85.215.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1720640194
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 06:01:45 -0500 (EST)
+Received: by mail-lf0-f47.google.com with SMTP id v186so108731223lfa.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Jan 2017 03:01:52 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jan 24, 2017 at 10:23:57AM +0000, Andre Przywara wrote:
-> Hi,
-> 
-> so I gave this patch (adapted to live without the soft_pending state)
-> some testing on my machines (Midway, Juno, GICv3 ITS h/w) and it seemed
-> to work well - at least if one is nice and starts only one process
-> accessing vgic-state (see below). I caught some IRQs red-handed and the
-> output looked plausible.
-> The only comment I have is that "MPIDR" is a misleading header name for
-> that column. It's actually a union with the GICv2 targets field, which
-> is a bitmask of the targetting VCPUs. So the output looks more like a
-> bitmask and not an MPIDR on many machines. But that's just cosmetic.
-> 
-> Just discovered one thing: As soon as a second task is reading the file
-> (with "while [ 1 ]; do cat vgic-state > /dev/null; done &" in the
-> background, for instance), I get this splat on the host:
-> 
-> [60796.007461] Unable to handle kernel NULL pointer dereference at
-> virtual address 00000008
-> [60796.015538] pgd = ffff800974e30000
-> [60796.018952] [00000008] *pgd=00000009f4d0a003[60796.023067] Internal
-> error: Oops: 96000006 [#1] PREEMPT SMP
-> [60796.028588] Modules linked in:
-> [60796.031626] CPU: 3 PID: 5690 Comm: cat Tainted: G        W
-> 4.9.0-00026-ge24503e-dirty #444
-> [60796.040326] Hardware name: ARM Juno development board (r0) (DT)
-> [60796.046190] task: ffff80097231ab00 task.stack: ffff800973894000
-> [60796.052059] PC is at iter_next+0x18/0x80
-> [60796.055946] LR is at debug_next+0x38/0x90
-> [60796.059917] pc : [<ffff0000080c4b38>] lr : [<ffff0000080c4bd8>]
-> pstate: 20000145
-> [60796.067240] sp : ffff800973897cc0
-> [60796.070522] x29: ffff800973897cc0 x28: ffff800973897d60
-> [60796.075805] x27: 0000000033c61000 x26: ffff800974e4dd40
-> [60796.081086] x25: 0000000000010000 x24: ffff800974da6380
-> [60796.086360] x23: ffff800973897eb8 x22: 0000000000000000
-> [60796.091634] x21: 0000000000000459 x20: ffff800973897d68
-> [60796.096908] x19: 0000000000000000 x18: 0000000000000001
-> [60796.102181] x17: 000000000041a1c8 x16: ffff000008275258
-> [60796.107456] x15: ffff800975546457 x14: 0000ffffa3912a94
-> [60796.112730] x13: 0000000000000000 x12: 0000000005f5e0ff
-> [60796.118004] x11: 0000000000000000 x10: 000000000000000c
-> [60796.123282] x9 : 000000000000000f x8 : ffff800973897b08
-> [60796.128555] x7 : 0000000000000004 x6 : ffff800975546459
-> [60796.133829] x5 : 0000000000000001 x4 : 0000000000000001
-> [60796.139103] x3 : ffff0000080c4ba0 x2 : ffff800973897d68
-> [60796.144377] x1 : ffff800972074000 x0 : ffff0000080c4bd8
-> [60796.149650]
-> [60796.151128] Process cat (pid: 5690, stack limit = 0xffff800973894020)
-> [60796.157508] Stack: (0xffff800973897cc0 to 0xffff800973898000)
-> [60796.163203] 7cc0: ffff800973897ce0 ffff0000080c4bd8 0000000000000000
-> ffff800974fc9a00
-> [60796.170962] 7ce0: ffff800973897d00 ffff0000082a14d0 ffff800974e4dd00
-> ffff800974fc9a00
-> [60796.178721] 7d00: ffff800973897d70 ffff000008415410 0000000000000000
-> ffff800974da6380
-> [60796.186479] 7d20: 0000000033c61000 0000000000010000 ffff800973897eb8
-> ffff0000090bc1a8
-> [60796.194237] 7d40: 0000000000000123 000000000000003f ffff000008b12000
-> ffff800973894000
-> [60796.201995] 7d60: 000000000000000d 000000000000000e ffff800973897dc0
-> ffff000008272d88
-> [60796.209753] 7d80: ffff800974da6380 ffff800973897eb8 0000000000010000
-> 0000000033c61000
-> [60796.217514] 7da0: 0000000060000000 0000000000000015 0000000000000000
-> 0000000100000000
-> [60796.225277] 7dc0: ffff800973897e50 ffff000008273d00 0000000000010000
-> ffff800974da6380
-> [60796.233035] 7de0: 0000000033c61000 ffff800973897eb8 ffff800973897e20
-> ffff000008273be8
-> [60796.240794] 7e00: ffff800974da6380 0000000000010000 0000000000000000
-> ffff800973897eb8
-> [60796.248552] 7e20: ffff800973897e50 ffff000008273cdc 0000000000010000
-> ffff800974da6380
-> [60796.256310] 7e40: 0000000033c61000 ffff800973897eb8 ffff800973897e80
-> ffff0000082752ac
-> [60796.264069] 7e60: ffff800974da6380 ffff800974da6380 0000000033c61000
-> 0000000000010000
-> [60796.271830] 7e80: 0000000000000000 ffff0000080836f0 0000000000000000
-> 000000000041a310
-> [60796.279588] 7ea0: ffffffffffffffff 0000ffffa39cd45c 0000000000000123
-> 0000000000000000
-> [60796.287346] 7ec0: 0000000000000003 0000000033c61000 0000000000010000
-> 0000000000000000
-> [60796.295103] 7ee0: 0000000000011011 0000000000000001 0000000000000011
-> 0000000000000002
-> [60796.302861] 7f00: 000000000000003f 1f3c201f7372686b 00000000ffffffff
-> 0000000000000030
-> [60796.310618] 7f20: 0000000000000038 0000000000000000 0000ffffa3912a94
-> 0000ffffa3a47588
-> [60796.318376] 7f40: 0000000000000000 000000000041a1c8 0000ffffe30bd910
-> 0000000000010000
-> [60796.326133] 7f60: 000000000041a310 0000000033c61000 0000000000000003
-> 000000007fffe000
-> [60796.333891] 7f80: 00000000004088d0 0000000000000000 0000000000000000
-> 0000000000000000
-> [60796.341649] 7fa0: 0000000000010000 0000ffffe30bdbb0 0000000000404dcc
-> 0000ffffe30bdbb0
-> [60796.349407] 7fc0: 0000ffffa39cd45c 0000000060000000 0000000000000003
-> 000000000000003f
-> [60796.357164] 7fe0: 0000000000000000 0000000000000000 0000000000000000
-> 0000000000000000
-> [60796.364917] Call trace:
-> [60796.367342] Exception stack(0xffff800973897af0 to 0xffff800973897c20)
-> [60796.373729] 7ae0:                                   0000000000000000
-> 0001000000000000
-> [60796.381492] 7b00: ffff800973897cc0 ffff0000080c4b38 ffff800973897b20
-> ffff000008de460f
-> [60796.389251] 7b20: ffff800973897ba0 ffff0000082a1a38 ffff800974e4dd00
-> ffff800973897c10
-> [60796.397009] 7b40: ffff000008de45d0 ffff800972234dc0 ffff800973897eb8
-> ffff800974da6380
-> [60796.404767] 7b60: 0000000000010000 ffff800974e4dd40 0000000033c61000
-> ffff800973897d60
-> [60796.412529] 7b80: 0000000000000002 ffff000008b633c8 ffff0000080c4bd8
-> ffff800972074000
-> [60796.420287] 7ba0: ffff800973897d68 ffff0000080c4ba0 0000000000000001
-> 0000000000000001
-> [60796.428045] 7bc0: ffff800975546459 0000000000000004 ffff800973897b08
-> 000000000000000f
-> [60796.435802] 7be0: 000000000000000c 0000000000000000 0000000005f5e0ff
-> 0000000000000000
-> [60796.443560] 7c00: 0000ffffa3912a94 ffff800975546457 ffff000008275258
-> 000000000041a1c8
-> [60796.451320] [<ffff0000080c4b38>] iter_next+0x18/0x80
-> [60796.456239] [<ffff0000080c4bd8>] debug_next+0x38/0x90
-> [60796.461247] [<ffff0000082a14d0>] seq_read+0x310/0x420
-> [60796.466256] [<ffff000008415410>] full_proxy_read+0x60/0x88
-> [60796.471693] [<ffff000008272d88>] __vfs_read+0x48/0x130
-> [60796.476784] [<ffff000008273d00>] vfs_read+0x88/0x140
-> [60796.481703] [<ffff0000082752ac>] SyS_read+0x54/0xb0
-> [60796.486538] [<ffff0000080836f0>] el0_svc_naked+0x24/0x28
-> [60796.491804] Code: f9000bf3 aa0003f3 aa1e03e0 d503201f (b9400a60)
-> [60796.498076] ---[ end trace 31bfd09d844bbfc9 ]---
-> 
-> As I didn't understand the seq_* semantics in the first place, I didn't
-> have a look yet what could cause this.
+One of the goals behind the VGIC redesign was to get rid of cached or
+intermediate state in the data structures, but we decided to allow
+ourselves to precompute the pending value of an IRQ based on the line
+level and pending latch state.  However, this has now become difficult
+to base proper GICv3 save/restore on, because there is a potential to
+modify the pending state without knowing if an interrupt is edge or
+level configured.
 
-Nice catch, I'll have a look at this.
+See the following post and related message for more background:
+https://lists.cs.columbia.edu/pipermail/kvmarm/2017-January/023195.html
 
-Just so I'm sure, these are two processes reading the vgic-state file
-for the same single VM, right?
+This commit gets rid of the precomputed pending field in favor of a
+function that calculates the value when needed, irq_is_pending().
 
-Thanks for actually testing this!
+The soft_pending field is renamed to pending_latch to represent that
+this latch is the equivalent hardware latch which gets manipulated by
+the input signal for edge-triggered interrupts and when writing to the
+SPENDR/CPENDR registers.
 
--Christoffer
+After this commit save/restore code should be able to simply restore the
+pending_latch state, line_level state, and config state in any order and
+get the desired result.
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Tested-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+I kept the reviewed and tested by tags despite having modified this to no
+longer include the wrapper function, as I found the change trivial enough to
+trust it.  I also tested with UEFI, just to be on the safe side.
+
+ include/kvm/arm_vgic.h           |  5 +++--
+ virt/kvm/arm/vgic/vgic-its.c     |  6 +++---
+ virt/kvm/arm/vgic/vgic-mmio-v2.c |  6 +++---
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |  2 +-
+ virt/kvm/arm/vgic/vgic-mmio.c    | 19 +++++--------------
+ virt/kvm/arm/vgic/vgic-v2.c      | 12 +++++-------
+ virt/kvm/arm/vgic/vgic-v3.c      | 12 +++++-------
+ virt/kvm/arm/vgic/vgic.c         | 16 +++++++---------
+ virt/kvm/arm/vgic/vgic.h         |  8 ++++++++
+ 9 files changed, 40 insertions(+), 46 deletions(-)
+
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 002f092..da2ce08 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -101,9 +101,10 @@ struct vgic_irq {
+ 					 */
+ 
+ 	u32 intid;			/* Guest visible INTID */
+-	bool pending;
+ 	bool line_level;		/* Level only */
+-	bool soft_pending;		/* Level only */
++	bool pending_latch;		/* The pending latch state used to calculate
++					 * the pending state for both level
++					 * and edge triggered IRQs. */
+ 	bool active;			/* not used for LPIs */
+ 	bool enabled;
+ 	bool hw;			/* Tied to HW IRQ */
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 8c2b3cd..571b64a 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -350,7 +350,7 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+ 
+ 		irq = vgic_get_irq(vcpu->kvm, NULL, intids[i]);
+ 		spin_lock(&irq->irq_lock);
+-		irq->pending = pendmask & (1U << bit_nr);
++		irq->pending_latch = pendmask & (1U << bit_nr);
+ 		vgic_queue_irq_unlock(vcpu->kvm, irq);
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+@@ -465,7 +465,7 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+ 		return -EBUSY;
+ 
+ 	spin_lock(&itte->irq->irq_lock);
+-	itte->irq->pending = true;
++	itte->irq->pending_latch = true;
+ 	vgic_queue_irq_unlock(kvm, itte->irq);
+ 
+ 	return 0;
+@@ -913,7 +913,7 @@ static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
+ 	if (!itte)
+ 		return E_ITS_CLEAR_UNMAPPED_INTERRUPT;
+ 
+-	itte->irq->pending = false;
++	itte->irq->pending_latch = false;
+ 
+ 	return 0;
+ }
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index 78e34bc..07e67f1 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -98,7 +98,7 @@ static void vgic_mmio_write_sgir(struct kvm_vcpu *source_vcpu,
+ 		irq = vgic_get_irq(source_vcpu->kvm, vcpu, intid);
+ 
+ 		spin_lock(&irq->irq_lock);
+-		irq->pending = true;
++		irq->pending_latch = true;
+ 		irq->source |= 1U << source_vcpu->vcpu_id;
+ 
+ 		vgic_queue_irq_unlock(source_vcpu->kvm, irq);
+@@ -182,7 +182,7 @@ static void vgic_mmio_write_sgipendc(struct kvm_vcpu *vcpu,
+ 
+ 		irq->source &= ~((val >> (i * 8)) & 0xff);
+ 		if (!irq->source)
+-			irq->pending = false;
++			irq->pending_latch = false;
+ 
+ 		spin_unlock(&irq->irq_lock);
+ 		vgic_put_irq(vcpu->kvm, irq);
+@@ -204,7 +204,7 @@ static void vgic_mmio_write_sgipends(struct kvm_vcpu *vcpu,
+ 		irq->source |= (val >> (i * 8)) & 0xff;
+ 
+ 		if (irq->source) {
+-			irq->pending = true;
++			irq->pending_latch = true;
+ 			vgic_queue_irq_unlock(vcpu->kvm, irq);
+ 		} else {
+ 			spin_unlock(&irq->irq_lock);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 50f42f0..2aca52a 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -646,7 +646,7 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
+ 		irq = vgic_get_irq(vcpu->kvm, c_vcpu, sgi);
+ 
+ 		spin_lock(&irq->irq_lock);
+-		irq->pending = true;
++		irq->pending_latch = true;
+ 
+ 		vgic_queue_irq_unlock(vcpu->kvm, irq);
+ 		vgic_put_irq(vcpu->kvm, irq);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index ebe1b9f..2670d39 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -111,7 +111,7 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+ 	for (i = 0; i < len * 8; i++) {
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+ 
+-		if (irq->pending)
++		if (irq_is_pending(irq))
+ 			value |= (1U << i);
+ 
+ 		vgic_put_irq(vcpu->kvm, irq);
+@@ -131,9 +131,7 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+ 
+ 		spin_lock(&irq->irq_lock);
+-		irq->pending = true;
+-		if (irq->config == VGIC_CONFIG_LEVEL)
+-			irq->soft_pending = true;
++		irq->pending_latch = true;
+ 
+ 		vgic_queue_irq_unlock(vcpu->kvm, irq);
+ 		vgic_put_irq(vcpu->kvm, irq);
+@@ -152,12 +150,7 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
+ 
+ 		spin_lock(&irq->irq_lock);
+ 
+-		if (irq->config == VGIC_CONFIG_LEVEL) {
+-			irq->soft_pending = false;
+-			irq->pending = irq->line_level;
+-		} else {
+-			irq->pending = false;
+-		}
++		irq->pending_latch = false;
+ 
+ 		spin_unlock(&irq->irq_lock);
+ 		vgic_put_irq(vcpu->kvm, irq);
+@@ -359,12 +352,10 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
+ 		irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+ 		spin_lock(&irq->irq_lock);
+ 
+-		if (test_bit(i * 2 + 1, &val)) {
++		if (test_bit(i * 2 + 1, &val))
+ 			irq->config = VGIC_CONFIG_EDGE;
+-		} else {
++		else
+ 			irq->config = VGIC_CONFIG_LEVEL;
+-			irq->pending = irq->line_level | irq->soft_pending;
+-		}
+ 
+ 		spin_unlock(&irq->irq_lock);
+ 		vgic_put_irq(vcpu->kvm, irq);
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 834137e..b834ecd 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -104,7 +104,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		/* Edge is the only case where we preserve the pending bit */
+ 		if (irq->config == VGIC_CONFIG_EDGE &&
+ 		    (val & GICH_LR_PENDING_BIT)) {
+-			irq->pending = true;
++			irq->pending_latch = true;
+ 
+ 			if (vgic_irq_is_sgi(intid)) {
+ 				u32 cpuid = val & GICH_LR_PHYSID_CPUID;
+@@ -120,9 +120,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		 */
+ 		if (irq->config == VGIC_CONFIG_LEVEL) {
+ 			if (!(val & GICH_LR_PENDING_BIT))
+-				irq->soft_pending = false;
+-
+-			irq->pending = irq->line_level || irq->soft_pending;
++				irq->pending_latch = false;
+ 		}
+ 
+ 		spin_unlock(&irq->irq_lock);
+@@ -145,11 +143,11 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ {
+ 	u32 val = irq->intid;
+ 
+-	if (irq->pending) {
++	if (irq_is_pending(irq)) {
+ 		val |= GICH_LR_PENDING_BIT;
+ 
+ 		if (irq->config == VGIC_CONFIG_EDGE)
+-			irq->pending = false;
++			irq->pending_latch = false;
+ 
+ 		if (vgic_irq_is_sgi(irq->intid)) {
+ 			u32 src = ffs(irq->source);
+@@ -158,7 +156,7 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 			val |= (src - 1) << GICH_LR_PHYSID_CPUID_SHIFT;
+ 			irq->source &= ~(1 << (src - 1));
+ 			if (irq->source)
+-				irq->pending = true;
++				irq->pending_latch = true;
+ 		}
+ 	}
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index e6b03fd..679ba93 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -94,7 +94,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		/* Edge is the only case where we preserve the pending bit */
+ 		if (irq->config == VGIC_CONFIG_EDGE &&
+ 		    (val & ICH_LR_PENDING_BIT)) {
+-			irq->pending = true;
++			irq->pending_latch = true;
+ 
+ 			if (vgic_irq_is_sgi(intid) &&
+ 			    model == KVM_DEV_TYPE_ARM_VGIC_V2) {
+@@ -111,9 +111,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		 */
+ 		if (irq->config == VGIC_CONFIG_LEVEL) {
+ 			if (!(val & ICH_LR_PENDING_BIT))
+-				irq->soft_pending = false;
+-
+-			irq->pending = irq->line_level || irq->soft_pending;
++				irq->pending_latch = false;
+ 		}
+ 
+ 		spin_unlock(&irq->irq_lock);
+@@ -127,11 +125,11 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+ 	u64 val = irq->intid;
+ 
+-	if (irq->pending) {
++	if (irq_is_pending(irq)) {
+ 		val |= ICH_LR_PENDING_BIT;
+ 
+ 		if (irq->config == VGIC_CONFIG_EDGE)
+-			irq->pending = false;
++			irq->pending_latch = false;
+ 
+ 		if (vgic_irq_is_sgi(irq->intid) &&
+ 		    model == KVM_DEV_TYPE_ARM_VGIC_V2) {
+@@ -141,7 +139,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 			val |= (src - 1) << GICH_LR_PHYSID_CPUID_SHIFT;
+ 			irq->source &= ~(1 << (src - 1));
+ 			if (irq->source)
+-				irq->pending = true;
++				irq->pending_latch = true;
+ 		}
+ 	}
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 6440b56..dea12df 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -160,7 +160,7 @@ static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+ 	 * If the distributor is disabled, pending interrupts shouldn't be
+ 	 * forwarded.
+ 	 */
+-	if (irq->enabled && irq->pending) {
++	if (irq->enabled && irq_is_pending(irq)) {
+ 		if (unlikely(irq->target_vcpu &&
+ 			     !irq->target_vcpu->kvm->arch.vgic.enabled))
+ 			return NULL;
+@@ -204,8 +204,8 @@ static int vgic_irq_cmp(void *priv, struct list_head *a, struct list_head *b)
+ 		goto out;
+ 	}
+ 
+-	penda = irqa->enabled && irqa->pending;
+-	pendb = irqb->enabled && irqb->pending;
++	penda = irqa->enabled && irq_is_pending(irqa);
++	pendb = irqb->enabled && irq_is_pending(irqb);
+ 
+ 	if (!penda || !pendb) {
+ 		ret = (int)pendb - (int)penda;
+@@ -371,12 +371,10 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+ 		return 0;
+ 	}
+ 
+-	if (irq->config == VGIC_CONFIG_LEVEL) {
++	if (irq->config == VGIC_CONFIG_LEVEL)
+ 		irq->line_level = level;
+-		irq->pending = level || irq->soft_pending;
+-	} else {
+-		irq->pending = true;
+-	}
++	else
++		irq->pending_latch = true;
+ 
+ 	vgic_queue_irq_unlock(kvm, irq);
+ 	vgic_put_irq(kvm, irq);
+@@ -689,7 +687,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+ 
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		spin_lock(&irq->irq_lock);
+-		pending = irq->pending && irq->enabled;
++		pending = irq_is_pending(irq) && irq->enabled;
+ 		spin_unlock(&irq->irq_lock);
+ 
+ 		if (pending)
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 859f65c..b2cf34b 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -30,6 +30,14 @@
+ 
+ #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
+ 
++static inline bool irq_is_pending(struct vgic_irq *irq)
++{
++	if (irq->config == VGIC_CONFIG_EDGE)
++		return irq->pending_latch;
++	else
++		return irq->pending_latch || irq->line_level;
++}
++
+ struct vgic_vmcr {
+ 	u32	ctlr;
+ 	u32	abpr;
+-- 
+2.9.0
