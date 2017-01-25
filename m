@@ -1,21 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 0/3] Fix cache flushing when mapping at stage-2
-Date: Wed, 25 Jan 2017 15:36:28 +0000
-Message-ID: <1485358591-12278-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 3/3] arm/arm64: KVM: Get rid of KVM_MEMSLOT_INCOHERENT
+Date: Wed, 25 Jan 2017 15:36:31 +0000
+Message-ID: <1485358591-12278-4-git-send-email-marc.zyngier@arm.com>
+References: <1485358591-12278-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DB01405DA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jan 2017 10:36:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26D7F40905
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jan 2017 10:36:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h0jxA2T5LRhk for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Jan 2017 10:36:28 -0500 (EST)
+ with ESMTP id 3ZdMBgJEPQJF for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Jan 2017 10:36:30 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4498240064
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jan 2017 10:36:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C7AB4018B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jan 2017 10:36:30 -0500 (EST)
+In-Reply-To: <1485358591-12278-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,34 +30,46 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When we fault in a page, we flush it to the PoC (Point of Coherency)
-if the faulting vcpu has its own caches off, so that it can observe
-the page we just brought it.
-    
-But if the vcpu has its caches on, we skip that step. Bad things
-happen when *another* vcpu tries to access that page with its own
-caches disabled. At that point, there is no garantee that the data has
-made it to the PoC, and we access stale data.
-    
-The obvious fix is to always flush to PoC when a page is faulted in,
-no matter what the state of the vcpu is.
+KVM_MEMSLOT_INCOHERENT is not used anymore, as we've killed its
+only use in the arm/arm64 MMU code. Let's remove the last artifacts.
 
-This leads to additional cleanups, removing the code that was forcing
-read-only memslots to be flushed to PoC as well (since the flushing is
-now unconditional). Only the first patch is critical, and deserves a
-Cc to stable.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/kvm/mmu.c       | 9 ---------
+ include/linux/kvm_host.h | 1 -
+ 2 files changed, 10 deletions(-)
 
-Marc Zyngier (3):
-  arm/arm64: KVM: Enforce unconditional flush to PoC when mapping to
-    stage-2
-  arm/arm64: KVM: Stop propagating cacheability status of a faulted page
-  arm/arm64: KVM: Get rid of KVM_MEMSLOT_INCOHERENT
-
- arch/arm/include/asm/kvm_mmu.h   | 12 ++----------
- arch/arm/kvm/mmu.c               | 20 ++++----------------
- arch/arm64/include/asm/kvm_mmu.h |  6 ++----
- include/linux/kvm_host.h         |  1 -
- 4 files changed, 8 insertions(+), 31 deletions(-)
-
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 5cc35080..962616f 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -1876,15 +1876,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
+ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 			    unsigned long npages)
+ {
+-	/*
+-	 * Readonly memslots are not incoherent with the caches by definition,
+-	 * but in practice, they are used mostly to emulate ROMs or NOR flashes
+-	 * that the guest may consider devices and hence map as uncached.
+-	 * To prevent incoherency issues in these cases, tag all readonly
+-	 * regions as incoherent.
+-	 */
+-	if (slot->flags & KVM_MEM_READONLY)
+-		slot->flags |= KVM_MEMSLOT_INCOHERENT;
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 1c5190d..cda457b 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -45,7 +45,6 @@
+  * include/linux/kvm_h.
+  */
+ #define KVM_MEMSLOT_INVALID	(1UL << 16)
+-#define KVM_MEMSLOT_INCOHERENT	(1UL << 17)
+ 
+ /* Two fragments for cross MMIO pages. */
+ #define KVM_MAX_MMIO_FRAGMENTS	2
 -- 
 2.1.4
