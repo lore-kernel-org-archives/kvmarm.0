@@ -1,7 +1,7 @@
-From: Auger Eric <eric.auger@redhat.com>
+From: Andre Przywara <andre.przywara@arm.com>
 Subject: Re: [PATCH v2] KVM: arm/arm64: vgic: Add debugfs vgic-state file
-Date: Wed, 25 Jan 2017 10:07:15 +0100
-Message-ID: <bea5852f-25be-4b8e-b7d7-e60613826a04@redhat.com>
+Date: Wed, 25 Jan 2017 10:09:25 +0000
+Message-ID: <0ec06062-e6fd-eb38-5c26-76670bd96d0b@arm.com>
 References: <20170124132555.19094-1-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
@@ -10,12 +10,12 @@ Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170124132555.19094-1-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Alex Bennee <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Alex Bennee <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Christoffer,
 
-On 24/01/2017 14:25, Christoffer Dall wrote:
+On 24/01/17 13:25, Christoffer Dall wrote:
 > Add a file to debugfs to read the in-kernel state of the vgic.  We don't
 > do any locking of the entire VGIC state while traversing all the IRQs,
 > so if the VM is running the user/developer may not see a quiesced state,
@@ -25,6 +25,15 @@ On 24/01/2017 14:25, Christoffer Dall wrote:
 > We also don't support LPIs yet, but they can be added easily if needed.
 > 
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+Thanks for renaming the MPIDR header field! Also I can confirm that the
+multiple readers issue has been fixed.
+
+Tested-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
+Andre.
+
 > ---
 > Changes since v1:
 >  - Check error code in vgic_debug_stop so that users which did not
@@ -119,7 +128,6 @@ On 24/01/2017 14:25, Christoffer Dall wrote:
 > +#include <linux/kvm_host.h>
 > +#include <linux/seq_file.h>
 > +#include <linux/uaccess.h>
-not requested
 > +#include <kvm/arm_vgic.h>
 > +#include <asm/kvm_mmu.h>
 > +#include "vgic.h"
@@ -248,8 +256,6 @@ not requested
 > +
 > +	seq_printf(s, "P=pending, L=line_level, S=soft_pending, A=active\n");
 > +	seq_printf(s, "E=enabled, H=hw, L=config_level\n");
-s/Pending/Pending Latched
-s/S=soft_pending, //
 > +}
 > +
 > +static void print_header(struct seq_file *s, struct vgic_irq *irq,
@@ -300,12 +306,9 @@ s/S=soft_pending, //
 > +			irq->hw,
 > +			irq->config == VGIC_CONFIG_LEVEL,
 > +			irq->hwintid,
-nit: why not choosing a %4d format like intid?
 > +			irq->mpidr,
-is it set for GICv2?
 > +			irq->source,
 > +			irq->priority,
-nit: decimal format for prio?
 > +			(irq->vcpu) ? irq->vcpu->vcpu_id : -1);
 > +
 > +}
@@ -421,12 +424,3 @@ nit: decimal format for prio?
 > +
 >  #endif
 > 
-
-Besides
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
-
-Tested on Cavium ThunderX
-
-Eric
