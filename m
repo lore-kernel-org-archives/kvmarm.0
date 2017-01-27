@@ -1,36 +1,50 @@
-From: Prakash B <bjsprakash.linux@gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Increase number of memslots to 512
-Date: Fri, 27 Jan 2017 19:08:25 +0530
-Message-ID: <CACJhumeA5FBNQUph6shCPE65=UAxiwfo97LK=3tReKbdyniduw@mail.gmail.com>
-References: <1484153537-20984-1-git-send-email-linucherian@gmail.com>
- <61fa02f8-b244-6bae-eaa1-cb745ea543e1@arm.com>
- <CAGOz-0aD-hV7sDAX70pSGdCj1J4s4xc4qQBwbaKzVZArfRK2AQ@mail.gmail.com>
- <6fc30f74-d1ab-028f-7e5f-a5d1fe69c17a@arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v4 3/4] arm64: Use __tlbi() macros in KVM code
+Date: Fri, 27 Jan 2017 13:53:07 +0000
+Message-ID: <20170127135306.GK21144@arm.com>
+References: <20170125155232.10277-1-cov@codeaurora.org>
+ <20170125155232.10277-3-cov@codeaurora.org>
+ <20170125193943.GW15850@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <6fc30f74-d1ab-028f-7e5f-a5d1fe69c17a@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: sunil.goutham@cavium.com, rkrcmar@redhat.com, bprakash@caviumnetworks.com, Linu Cherian <linucherian@gmail.com>, linux-arm-kernel@lists.infradead.org, Linu Cherian <linu.cherian@cavium.com>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C32F740064
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Jan 2017 08:52:57 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id pWu4xOQYBXBc for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Jan 2017 08:52:54 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 48C8E40019
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Jan 2017 08:52:53 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20170125193943.GW15850@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Mark Langsdorf <mlangsdo@redhat.com>, Jon Masters <jcm@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, timur@codeaurora.org, linux-kernel@vger.kernel.org, Neil Leeder <nleeder@codeaurora.org>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-> Can you shed some light on your test process?
-Hi Linu / Marc Zyngier,
+On Wed, Jan 25, 2017 at 08:39:43PM +0100, Christoffer Dall wrote:
+> On Wed, Jan 25, 2017 at 10:52:31AM -0500, Christopher Covington wrote:
+> > Refactor the KVM code to use the __tlbi macros, which will allow an errata
+> > workaround that repeats tlbi dsb sequences to only change one location.
+> > This is not intended to change the generated assembly and comparing before
+> > and after vmlinux objdump shows no functional changes.
+> > 
+> > Signed-off-by: Christopher Covington <cov@codeaurora.org>
+> 
+> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-I tested this patch on top of latest VFIO MSI supported version 9
-patches on ThunderX with internal 10G VNIC and Intel IXGBE NIC.
-Please feel free to add my:
-Tested-by: Prakash, Brahmajyosyula <Brahmajyosyula.Prakash@cavium.com>
+Thanks, I'll queue this one via arm64.
 
-Thanks,
- prakash B
+Will
