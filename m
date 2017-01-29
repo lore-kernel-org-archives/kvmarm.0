@@ -1,24 +1,29 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC v2 00/10] Provide the EL1 physical timer to the VM
-Date: Sun, 29 Jan 2017 15:55:28 +0000
-Message-ID: <86h94h97yn.fsf@arm.com>
-References: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH RFC 3/6] arm: kvm64: Check if kvm supports
+ cross type vCPU
+Date: Sun, 29 Jan 2017 20:42:14 +0000
+Message-ID: <CAFEAcA-nB7uQAGcZWUYeiAis2tY33U6yeiig+kwd2-KRD=KSuw@mail.gmail.com>
+References: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
+ <1484558821-15512-4-git-send-email-zhaoshenglong@huawei.com>
+ <20170129115306.iuhvofl3y65x7sjw@hawk.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F40B74096F
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 10:55:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E33DC40625
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 15:42:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H8DAKxMFlGw0 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 29 Jan 2017 10:55:25 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0696640967
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 10:55:24 -0500 (EST)
-In-Reply-To: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
- (Jintack Lim's message of "Thu, 26 Jan 2017 20:04:50 -0500")
+ with ESMTP id QNPboLiuX1t5 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 29 Jan 2017 15:42:18 -0500 (EST)
+Received: from mail-vk0-f46.google.com (mail-vk0-f46.google.com
+ [209.85.213.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 902C140296
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 15:42:18 -0500 (EST)
+Received: by mail-vk0-f46.google.com with SMTP id r136so205358616vke.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 12:42:35 -0800 (PST)
+In-Reply-To: <20170129115306.iuhvofl3y65x7sjw@hawk.localdomain>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,60 +33,31 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jintack,
-
-On Fri, Jan 27 2017 at 01:04:50 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
-> The ARM architecture defines the EL1 physical timer and the virtual timer,
-> and it is reasonable for an OS to expect to be able to access both.
-> However, the current KVM implementation does not provide the EL1 physical
-> timer to VMs but terminates VMs on access to the timer.
+On 29 January 2017 at 11:53, Andrew Jones <drjones@redhat.com> wrote:
+> On Mon, Jan 16, 2017 at 05:26:58PM +0800, Shannon Zhao wrote:
+>> From: Shannon Zhao <shannon.zhao@linaro.org>
+>> +    memset(id_regitsers, 0, ARM_CPU_ID_MAX * sizeof(struct kvm_one_reg));
+>> +
+>> +    id_regitsers[0].id = ARM64_SYS_REG(ARM_CPU_ID_MIDR);
+>> +    id_regitsers[0].addr = (uintptr_t)&cpu->midr;
+>> +
+>> +    id_regitsers[1].id = ARM64_SYS_REG(ARM_CPU_ID_REVIDR);
+>> +    id_regitsers[1].addr = (uintptr_t)&cpu->revidr;
+>> +
 >
-> This patch series enables VMs to use the EL1 physical timer through
-> trap-and-emulate.  The KVM host emulates each EL1 physical timer register
-> access and sets up the background timer accordingly.  When the background
-> timer expires, the KVM host injects EL1 physical timer interrupts to the
-> VM.  Alternatively, it's also possible to allow VMs to access the EL1
-> physical timer without trapping.  However, this requires somehow using the
-> EL2 physical timer for the Linux host while running the VM instead of the
-> EL1 physical timer.  Right now I just implemented trap-and-emulate because
-> this was straightforward to do, and I leave it to future work to determine
-> if transferring the EL1 physical timer state to the EL2 timer provides any
-> performance benefit.
+> We can condense this nicely with list initialization
 >
-> This feature will be useful for any OS that wishes to access the EL1
-> physical timer. Nested virtualization is one of those use cases. A nested
-> hypervisor running inside a VM would think it has full access to the
-> hardware and naturally tries to use the EL1 physical timer as Linux would
-> do. Other nested hypervisors may try to use the EL2 physical timer as Xen
-> would do, but supporting the EL2 physical timer to the VM is out of scope
-> of this patch series. This patch series will make it easy to add the EL2
-> timer support in the future, though.
->
-> Note that Linux VMs booting in EL1 will be unaffected by this patch series
-> and will continue to use only the virtual timer and this patch series will
-> therefore not introduce any performance degredation as a result of
-> trap-and-emulate.
+>  struct kvm_one_reg id_regitsers[] = {
+>    { ARM64_SYS_REG(ARM_CPU_ID_MIDR), (uintptr_t)&cpu->midr },
+>    { ARM64_SYS_REG(ARM_CPU_ID_REVIDR), (uintptr_t)&cpu->revidr },
+>    ...
+>    { 0, 0 }
 
-Thanks for respining this series. Overall, this looks quite good, and
-the couple of comments I have should be easy to address.
+"registers", please :-)
 
-My main concern is that we do expose a timer that doesn't hide
-CNTVOFF. I appreciate that that was already the case, since CNTPCT was
-always available (and this avoided trapping the counter), but maybe we
-should have a way for userspace to ask for a mode where CNTPCT=CNTVCT,
-byt trapping the physical counter and taking CNTVOFF in all physical
-timer calculations.
-
-I'm pretty sure you've addressed this one way or another in your nested
-virt series, so maybe extracting the relevant patches and adding them on
-top of this series could be an option?
-
-Thanks,
-
-        M.
--- 
-Jazz is not dead. It just smells funny.
+thanks
+-- PMM
