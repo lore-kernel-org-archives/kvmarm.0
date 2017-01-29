@@ -1,25 +1,26 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 4/6] target: arm: Add a generic type cpu
-Date: Sun, 29 Jan 2017 12:59:55 +0100
-Message-ID: <20170129115955.kz2o3r6nuitg6o6i@hawk.localdomain>
-References: <1484558821-15512-1-git-send-email-zhaoshenglong@huawei.com>
- <1484558821-15512-5-git-send-email-zhaoshenglong@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC v2 03/10] KVM: arm/arm64: Decouple kvm timer functions from
+ virtual timer
+Date: Sun, 29 Jan 2017 12:01:21 +0000
+Message-ID: <8637g29isu.fsf@arm.com>
+References: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
+ <1485479100-4966-4-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DB31B405DA
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 06:59:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF1AA40284
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 07:01:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uZ4crFNqEakf for <kvmarm@lists.cs.columbia.edu>;
- Sun, 29 Jan 2017 06:59:44 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE96A40187
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 06:59:43 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <1484558821-15512-5-git-send-email-zhaoshenglong@huawei.com>
+ with ESMTP id wi4oIQVUE-lZ for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 29 Jan 2017 07:01:18 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B62240187
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 07:01:18 -0500 (EST)
+In-Reply-To: <1485479100-4966-4-git-send-email-jintack@cs.columbia.edu>
+ (Jintack Lim's message of "Thu, 26 Jan 2017 20:04:53 -0500")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,103 +30,187 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 16, 2017 at 05:26:59PM +0800, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
-> 
-> Add a generic type cpu, it's useful for migration when running on
-> different hardwares.
+On Fri, Jan 27 2017 at 01:04:53 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
+> Now that we have a separate structure for timer context, make functions
+> general so that they can work with any timer context, not just the
 
-How are the cpu parameters and features chosen for this generic
-version? Shouldn't some of them, like id_aa64mmfr0, be configurable?
-Or do we want to create multiple generic flavors?
+  generic?
 
-Thanks,
-drew
-
-> 
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> virtual timer context.  This does not change the virtual timer
+> functionality.
+>
+> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 > ---
->  target/arm/cpu64.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 54 insertions(+)
-> 
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 549cb1e..223f31e 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -204,6 +204,59 @@ static void aarch64_a53_initfn(Object *obj)
->      define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
+>  arch/arm/kvm/arm.c           |  2 +-
+>  include/kvm/arm_arch_timer.h |  3 ++-
+>  virt/kvm/arm/arch_timer.c    | 55 ++++++++++++++++++++++----------------------
+>  3 files changed, 30 insertions(+), 30 deletions(-)
+>
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 9d74464..9a34a3c 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -301,7 +301,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  
+>  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm_timer_should_fire(vcpu);
+> +	return kvm_timer_should_fire(vcpu, vcpu_vtimer(vcpu));
 >  }
 >  
-> +static void aarch64_generic_initfn(Object *obj)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +
-> +    cpu->dtb_compatible = "arm,armv8";
-> +    set_feature(&cpu->env, ARM_FEATURE_V8);
-> +    set_feature(&cpu->env, ARM_FEATURE_VFP4);
-> +    set_feature(&cpu->env, ARM_FEATURE_NEON);
-> +    set_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER);
-> +    set_feature(&cpu->env, ARM_FEATURE_AARCH64);
-> +    set_feature(&cpu->env, ARM_FEATURE_CBAR_RO);
-> +    set_feature(&cpu->env, ARM_FEATURE_V8_AES);
-> +    set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
-> +    set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-> +    set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-> +    set_feature(&cpu->env, ARM_FEATURE_CRC);
-> +    set_feature(&cpu->env, ARM_FEATURE_EL3);
-> +    cpu->kvm_target = QEMU_KVM_ARM_TARGET_GENERIC_V8;
-> +    cpu->midr = 0x410fd000; /* FIXME: this needs to adjust */
-> +    cpu->revidr = 0x00000000;
-> +    cpu->reset_fpsid = 0x41034070;
-> +    cpu->mvfr0 = 0x10110222;
-> +    cpu->mvfr1 = 0x12111111;
-> +    cpu->mvfr2 = 0x00000043;
-> +    cpu->ctr = 0x84448004; /* L1Ip = VIPT */
-> +    cpu->reset_sctlr = 0x00c50838;
-> +    cpu->id_pfr0 = 0x00000131;
-> +    cpu->id_pfr1 = 0x00011011;
-> +    cpu->id_dfr0 = 0x03010066;
-> +    cpu->id_afr0 = 0x00000000;
-> +    cpu->id_mmfr0 = 0x10101105;
-> +    cpu->id_mmfr1 = 0x40000000;
-> +    cpu->id_mmfr2 = 0x01260000;
-> +    cpu->id_mmfr3 = 0x02102211;
-> +    cpu->id_isar0 = 0x02101110;
-> +    cpu->id_isar1 = 0x13112111;
-> +    cpu->id_isar2 = 0x21232042;
-> +    cpu->id_isar3 = 0x01112131;
-> +    cpu->id_isar4 = 0x00011142;
-> +    cpu->id_isar5 = 0x00011121;
-> +    cpu->id_aa64pfr0 = 0x00002222;
-> +    cpu->id_aa64dfr0 = 0x10305106;
-> +    cpu->id_aa64isar0 = 0x00011120;
-> +    cpu->id_aa64mmfr0 = 0x0f001101; /* only support 4k page, 36 bit physical addr */
-> +    cpu->dbgdidr = 0x3516d000;
-> +    cpu->clidr = 0x0a200023;
-> +    cpu->ccsidr[0] = 0x7003e01a; /* 8KB L1 dcache */
-> +    cpu->ccsidr[1] = 0x2007e00a; /* 8KB L1 icache */
-> +    cpu->ccsidr[2] = 0x700fe07a; /* 128KB L2 cache */
-> +    cpu->dcz_blocksize = 4; /* 64 bytes */
-> +    define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
-> +}
-> +
->  #ifdef CONFIG_USER_ONLY
->  static void aarch64_any_initfn(Object *obj)
+>  void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index 1b9c988..d921d20 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -67,7 +67,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>  u64 kvm_arm_timer_get_reg(struct kvm_vcpu *, u64 regid);
+>  int kvm_arm_timer_set_reg(struct kvm_vcpu *, u64 regid, u64 value);
+>  
+> -bool kvm_timer_should_fire(struct kvm_vcpu *vcpu);
+> +bool kvm_timer_should_fire(struct kvm_vcpu *vcpu,
+> +			   struct arch_timer_context *timer_ctx);
+>  void kvm_timer_schedule(struct kvm_vcpu *vcpu);
+>  void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index fa4c042..f72005a 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -98,13 +98,13 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+>  	kvm_vcpu_kick(vcpu);
+>  }
+>  
+> -static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
+> +static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu,
+> +				   struct arch_timer_context *timer_ctx)
 >  {
-> @@ -232,6 +285,7 @@ typedef struct ARMCPUInfo {
->  static const ARMCPUInfo aarch64_cpus[] = {
->      { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
->      { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
-> +    { .name = "generic",            .initfn = aarch64_generic_initfn },
->  #ifdef CONFIG_USER_ONLY
->      { .name = "any",         .initfn = aarch64_any_initfn },
->  #endif
-> -- 
-> 2.0.4
-> 
-> 
-> 
+>  	u64 cval, now;
+> -	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  
+> -	cval = vtimer->cnt_cval;
+> -	now = kvm_phys_timer_read() - vtimer->cntvoff;
+> +	cval = timer_ctx->cnt_cval;
+> +	now = kvm_phys_timer_read() - timer_ctx->cntvoff;
+>  
+>  	if (now < cval) {
+>  		u64 ns;
+> @@ -133,7 +133,7 @@ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
+>  	 * PoV (NTP on the host may have forced it to expire
+>  	 * early). If we should have slept longer, restart it.
+>  	 */
+> -	ns = kvm_timer_compute_delta(vcpu);
+> +	ns = kvm_timer_compute_delta(vcpu, vcpu_vtimer(vcpu));
+>  	if (unlikely(ns)) {
+>  		hrtimer_forward_now(hrt, ns_to_ktime(ns));
+>  		return HRTIMER_RESTART;
+> @@ -143,42 +143,40 @@ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
+>  	return HRTIMER_NORESTART;
+>  }
+>  
+> -static bool kvm_timer_irq_can_fire(struct kvm_vcpu *vcpu)
+> +static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx)
+>  {
+> -	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+> -
+> -	return !(vtimer->cnt_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
+> -		(vtimer->cnt_ctl & ARCH_TIMER_CTRL_ENABLE);
+> +	return !(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
+> +		(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_ENABLE);
+>  }
+>  
+> -bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+> +bool kvm_timer_should_fire(struct kvm_vcpu *vcpu,
+> +			   struct arch_timer_context *timer_ctx)
+>  {
+> -	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	u64 cval, now;
+>  
+> -	if (!kvm_timer_irq_can_fire(vcpu))
+> +	if (!kvm_timer_irq_can_fire(timer_ctx))
+>  		return false;
+>  
+> -	cval = vtimer->cnt_cval;
+> -	now = kvm_phys_timer_read() - vtimer->cntvoff;
+> +	cval = timer_ctx->cnt_cval;
+> +	now = kvm_phys_timer_read() - timer_ctx->cntvoff;
+>  
+>  	return cval <= now;
+>  }
+>  
+> -static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
+> +static void kvm_timer_update_mapped_irq(struct kvm_vcpu *vcpu, bool new_level,
+> +					struct arch_timer_context *timer_ctx)
+>  {
+>  	int ret;
+> -	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  
+>  	BUG_ON(!vgic_initialized(vcpu->kvm));
+>  
+> -	vtimer->active_cleared_last = false;
+> -	vtimer->irq.level = new_level;
+> -	trace_kvm_timer_update_irq(vcpu->vcpu_id, vtimer->irq.irq,
+> -				   vtimer->irq.level);
+> +	timer_ctx->active_cleared_last = false;
+> +	timer_ctx->irq.level = new_level;
+> +	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+> +				   timer_ctx->irq.level);
+>  	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
+> -					 vtimer->irq.irq,
+> -					 vtimer->irq.level);
+> +					 timer_ctx->irq.irq,
+> +					 timer_ctx->irq.level);
+>  	WARN_ON(ret);
+>  }
+>  
+> @@ -200,8 +198,8 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>  	if (!vgic_initialized(vcpu->kvm) || !timer->enabled)
+>  		return -ENODEV;
+>  
+> -	if (kvm_timer_should_fire(vcpu) != vtimer->irq.level)
+> -		kvm_timer_update_irq(vcpu, !vtimer->irq.level);
+> +	if (kvm_timer_should_fire(vcpu, vtimer) != vtimer->irq.level)
+> +		kvm_timer_update_mapped_irq(vcpu, !vtimer->irq.level, vtimer);
+>  
+>  	return 0;
+>  }
+> @@ -214,6 +212,7 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>  void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  
+>  	BUG_ON(timer_is_armed(timer));
+>  
+> @@ -222,18 +221,18 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>  	 * already expired, because kvm_vcpu_block will return before putting
+>  	 * the thread to sleep.
+>  	 */
+> -	if (kvm_timer_should_fire(vcpu))
+> +	if (kvm_timer_should_fire(vcpu, vtimer))
+>  		return;
+>  
+>  	/*
+>  	 * If the timer is not capable of raising interrupts (disabled or
+>  	 * masked), then there's no more work for us to do.
+>  	 */
+> -	if (!kvm_timer_irq_can_fire(vcpu))
+> +	if (!kvm_timer_irq_can_fire(vtimer))
+>  		return;
+>  
+>  	/*  The timer has not yet expired, schedule a background timer */
+> -	timer_arm(timer, kvm_timer_compute_delta(vcpu));
+> +	timer_arm(timer, kvm_timer_compute_delta(vcpu, vtimer));
+>  }
+>  
+>  void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+
+          M.
+-- 
+Jazz is not dead. It just smells funny.
