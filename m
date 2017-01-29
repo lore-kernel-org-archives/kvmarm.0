@@ -1,26 +1,26 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC v2 06/10] KVM: arm/arm64: Update the physical timer
- interrupt level
-Date: Sun, 29 Jan 2017 15:21:06 +0000
-Message-ID: <86sho199jx.fsf@arm.com>
+Subject: Re: [RFC v2 10/10] KVM: arm/arm64: Emulate the EL1 phys timer
+ register access
+Date: Sun, 29 Jan 2017 15:44:35 +0000
+Message-ID: <86lgtt98gs.fsf@arm.com>
 References: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
- <1485479100-4966-7-git-send-email-jintack@cs.columbia.edu>
+ <1485479100-4966-11-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E70E540625
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 10:21:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 871D44093E
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 10:45:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cQ2B9VOGxkyj for <kvmarm@lists.cs.columbia.edu>;
- Sun, 29 Jan 2017 10:21:49 -0500 (EST)
+ with ESMTP id oD7zGoQYgwih for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 29 Jan 2017 10:45:55 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE56F40194
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 10:21:49 -0500 (EST)
-In-Reply-To: <1485479100-4966-7-git-send-email-jintack@cs.columbia.edu>
- (Jintack Lim's message of "Thu, 26 Jan 2017 20:04:56 -0500")
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6511840692
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Jan 2017 10:45:55 -0500 (EST)
+In-Reply-To: <1485479100-4966-11-git-send-email-jintack@cs.columbia.edu>
+ (Jintack Lim's message of "Thu, 26 Jan 2017 20:05:00 -0500")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,75 +34,108 @@ To: Jintack Lim <jintack@cs.columbia.edu>
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 27 2017 at 01:04:56 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
-> Now that we maintain the EL1 physical timer register states of VMs,
-> update the physical timer interrupt level along with the virtual one.
->
-> Note that the emulated EL1 physical timer is not mapped to any hardware
-> timer, so we call a proper vgic function.
+On Fri, Jan 27 2017 at 01:05:00 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
+> Emulate read and write operations to CNTP_TVAL, CNTP_CVAL and CNTP_CTL.
+> Now VMs are able to use the EL1 physical timer.
 >
 > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 > ---
->  virt/kvm/arm/arch_timer.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
+>  arch/arm64/kvm/sys_regs.c    | 32 +++++++++++++++++++++++++++++---
+>  include/kvm/arm_arch_timer.h |  2 ++
+>  virt/kvm/arm/arch_timer.c    |  2 +-
+>  3 files changed, 32 insertions(+), 4 deletions(-)
 >
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index fd9e747..adf009f 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -824,7 +824,14 @@ static bool access_cntp_tval(struct kvm_vcpu *vcpu,
+>  		struct sys_reg_params *p,
+>  		const struct sys_reg_desc *r)
+>  {
+> -	kvm_inject_undefined(vcpu);
+> +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+> +	u64 now = kvm_phys_timer_read();
+> +
+> +	if (p->is_write)
+> +		ptimer->cnt_cval = p->regval + now;
+> +	else
+> +		p->regval = ptimer->cnt_cval - now;
+> +
+>  	return true;
+>  }
+>  
+> @@ -832,7 +839,20 @@ static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
+>  		struct sys_reg_params *p,
+>  		const struct sys_reg_desc *r)
+>  {
+> -	kvm_inject_undefined(vcpu);
+> +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+> +
+> +	if (p->is_write) {
+> +		/* ISTATUS bit is read-only */
+> +		ptimer->cnt_ctl = p->regval & ~ARCH_TIMER_CTRL_IT_STAT;
+> +	} else {
+> +		u64 now = kvm_phys_timer_read();
+> +
+> +		p->regval = ptimer->cnt_ctl;
+> +		/* Set ISTATUS bit if it's expired */
+> +		if (ptimer->cnt_cval <= now)
+> +			p->regval |= ARCH_TIMER_CTRL_IT_STAT;
+> +	}
+
+Shouldn't we take the ENABLE bit into account? The ARMv8 ARM version I
+have at hand (version h) seems to indicate that we should, but we should
+check with the latest and greatest...
+
+> +
+>  	return true;
+>  }
+>  
+> @@ -840,7 +860,13 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+>  		struct sys_reg_params *p,
+>  		const struct sys_reg_desc *r)
+>  {
+> -	kvm_inject_undefined(vcpu);
+> +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+> +
+> +	if (p->is_write)
+> +		ptimer->cnt_cval = p->regval;
+> +	else
+> +		p->regval = ptimer->cnt_cval;
+> +
+>  	return true;
+>  }
+>  
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index a364593..fec99f2 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -74,6 +74,8 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu,
+>  void kvm_timer_schedule(struct kvm_vcpu *vcpu);
+>  void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
+>  
+> +u64 kvm_phys_timer_read(void);
+> +
+>  void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
+>  
+>  void kvm_timer_init_vhe(void);
 > diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index 0f6e935..3b6bd50 100644
+> index b366bb2..9eec063 100644
 > --- a/virt/kvm/arm/arch_timer.c
 > +++ b/virt/kvm/arm/arch_timer.c
-> @@ -180,6 +180,21 @@ static void kvm_timer_update_mapped_irq(struct kvm_vcpu *vcpu, bool new_level,
->  	WARN_ON(ret);
+> @@ -40,7 +40,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>  	vcpu_vtimer(vcpu)->active_cleared_last = false;
 >  }
 >  
-> +static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
-> +				 struct arch_timer_context *timer)
-> +{
-> +	int ret;
-> +
-> +	BUG_ON(!vgic_initialized(vcpu->kvm));
-
-Although I've added my fair share of BUG_ON() in the code base, I've
-since reconsidered my position. If we get in a situation where the vgic
-is not initialized, maybe it would be better to just WARN_ON and return
-early rather than killing the whole box. Thoughts?
-
-> +
-> +	timer->irq.level = new_level;
-> +	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->irq.irq,
-> +				   timer->irq.level);
-> +	ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, timer->irq.irq,
-> +				  timer->irq.level);
-> +	WARN_ON(ret);
-> +}
-> +
->  /*
->   * Check if there was a change in the timer state (should we raise or lower
->   * the line level to the GIC).
-> @@ -188,6 +203,7 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
+> -static u64 kvm_phys_timer_read(void)
+> +u64 kvm_phys_timer_read(void)
 >  {
->  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-> +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
->  
->  	/*
->  	 * If userspace modified the timer registers via SET_ONE_REG before
-> @@ -201,6 +217,10 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
->  	if (kvm_timer_should_fire(vcpu, vtimer) != vtimer->irq.level)
->  		kvm_timer_update_mapped_irq(vcpu, !vtimer->irq.level, vtimer);
->  
-> +	/* The emulated EL1 physical timer irq is not mapped to hardware */
-
-Maybe a slightly better comment would be saying that we're using a
-purely virtual interrupt, unrelated to the hardware interrupt.
-
-> +	if (kvm_timer_should_fire(vcpu, ptimer) != ptimer->irq.level)
-> +		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
-> +
->  	return 0;
+>  	return timecounter->cc->read(timecounter->cc);
 >  }
 
-Otherwise looks good.
+Thanks,
 
-          M.
+	M.
 -- 
 Jazz is not dead. It just smells funny.
