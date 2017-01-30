@@ -1,23 +1,22 @@
 From: Sudeep Holla <sudeep.holla@arm.com>
-Subject: [PATCH v2 2/3] arm64: kvm: reuse existing cache type/info related
- macros
-Date: Mon, 30 Jan 2017 16:25:26 +0000
-Message-ID: <1485793527-18028-2-git-send-email-sudeep.holla@arm.com>
+Subject: [PATCH v2 3/3] arm64: kvm: add support for the extended 64bit ccsidr
+Date: Mon, 30 Jan 2017 16:25:27 +0000
+Message-ID: <1485793527-18028-3-git-send-email-sudeep.holla@arm.com>
 References: <1485793527-18028-1-git-send-email-sudeep.holla@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B3E440284
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:25:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7AEE40625
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:25:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zFfj+YnHO5mD for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Jan 2017 11:25:20 -0500 (EST)
+ with ESMTP id jI2d73m2p10L for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Jan 2017 11:25:21 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 967A040625
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:25:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B21FD40284
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:25:21 -0500 (EST)
 In-Reply-To: <1485793527-18028-1-git-send-email-sudeep.holla@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,149 +28,225 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Sudeep Holla <sudeep.holla@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Sudeep Holla <sudeep.holla@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We already have various macros related to cache type and bitfields in
-CLIDR system register. We can replace some of the hardcoded values
-here using those existing macros.
+csselr and ccsidr are treated as 64-bit values already elsewhere in the
+kernel. It also aligns well with the architecture extensions that allow
+64-bit format for ccsidr.
 
-This patch reuses those existing cache type/info related macros and
-replaces the hardcorded values. It also removes some of the comments
-that become trivial with the macro names.
+This patch upgrades the existing accesses to csselr and ccsidr from
+32-bit to 64-bit in preparation to add support to those extensions.
+It also add dedicated KVM_REG_ARM_DEMUX_ID_EXT_CCSIDR demux register
+to handle 64-bit ccsidr in KVM.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
 ---
- arch/arm64/include/asm/cachetype.h |  7 +++++++
- arch/arm64/kernel/cacheinfo.c      |  7 -------
- arch/arm64/kvm/sys_regs.c          | 33 ++++++++++++++++-----------------
- 3 files changed, 23 insertions(+), 24 deletions(-)
+ arch/arm64/include/uapi/asm/kvm.h |   1 +
+ arch/arm64/kvm/sys_regs.c         | 104 ++++++++++++++++++++++++++++----------
+ 2 files changed, 77 insertions(+), 28 deletions(-)
 
 v1->v2:
-	- Fixed issue pointed by Christoffer(left shift operator)
-	- Replace couple of more hardcored values with macros
+	- Added dependency on cpu_supports_ccsidr_64b_format(PATCH 1/3)
+	- Added a new KVM_REG_ARM_DEMUX_ID_EXT_CCSIDR demux register id
+	  to support new 64bit CCSIDR
 
-diff --git a/arch/arm64/include/asm/cachetype.h b/arch/arm64/include/asm/cachetype.h
-index 180b3288aa3f..6cefbd39a40f 100644
---- a/arch/arm64/include/asm/cachetype.h
-+++ b/arch/arm64/include/asm/cachetype.h
-@@ -39,6 +39,13 @@
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 3051f86a9b5f..8aa18e65e6a5 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -161,6 +161,7 @@ struct kvm_arch_memory_slot {
+ #define KVM_REG_ARM_DEMUX_ID_MASK	0x000000000000FF00
+ #define KVM_REG_ARM_DEMUX_ID_SHIFT	8
+ #define KVM_REG_ARM_DEMUX_ID_CCSIDR	(0x00 << KVM_REG_ARM_DEMUX_ID_SHIFT)
++#define KVM_REG_ARM_DEMUX_ID_EXT_CCSIDR	(0x01 << KVM_REG_ARM_DEMUX_ID_SHIFT)
+ #define KVM_REG_ARM_DEMUX_VAL_MASK	0x00000000000000FF
+ #define KVM_REG_ARM_DEMUX_VAL_SHIFT	0
 
- extern unsigned long __icache_flags;
-
-+#define MAX_CACHE_LEVEL			7	/* Max 7 level supported */
-+/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
-+#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
-+#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
-+#define CLIDR_CTYPE(clidr, level)	\
-+	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
-+
- /*
-  * +---------------+---------+---------+------------------------------+
-  * | Property      |   v1    |    v2   | Calculation                  |
-diff --git a/arch/arm64/kernel/cacheinfo.c b/arch/arm64/kernel/cacheinfo.c
-index 888b38f1709f..fdb384f18906 100644
---- a/arch/arm64/kernel/cacheinfo.c
-+++ b/arch/arm64/kernel/cacheinfo.c
-@@ -26,13 +26,6 @@
- #include <asm/cachetype.h>
- #include <asm/processor.h>
-
--#define MAX_CACHE_LEVEL			7	/* Max 7 level supported */
--/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
--#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
--#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
--#define CLIDR_CTYPE(clidr, level)	\
--	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
--
- static inline enum cache_type get_cache_type(int level)
- {
- 	u64 clidr;
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 87e7e6608cd8..72656743b4cc 100644
+index 72656743b4cc..f9822ac6d9ab 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -21,11 +21,13 @@
+@@ -58,15 +58,15 @@
   */
 
- #include <linux/bsearch.h>
-+#include <linux/cacheinfo.h>
- #include <linux/kvm_host.h>
- #include <linux/mm.h>
- #include <linux/uaccess.h>
+ /* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
+-static u32 cache_levels;
++static u64 cache_levels;
 
- #include <asm/cacheflush.h>
-+#include <asm/cachetype.h>
- #include <asm/cputype.h>
- #include <asm/debug-monitors.h>
- #include <asm/esr.h>
-@@ -59,7 +61,7 @@
- static u32 cache_levels;
-
- /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
--#define CSSELR_MAX 12
-+#define CSSELR_MAX 	((MAX_CACHE_LEVEL - 1) << 1)
+-/* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
++/* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_{EXT_,}CCSIDR */
+ #define CSSELR_MAX 	((MAX_CACHE_LEVEL - 1) << 1)
 
  /* Which cache CCSIDR represents depends on CSSELR value. */
- static u32 get_ccsidr(u32 csselr)
-@@ -68,9 +70,7 @@ static u32 get_ccsidr(u32 csselr)
+-static u32 get_ccsidr(u32 csselr)
++static u64 get_ccsidr(u64 csselr)
+ {
+-	u32 ccsidr;
++	u64 ccsidr;
 
  	/* Make sure noone else changes CSSELR during this! */
  	local_irq_disable();
--	write_sysreg(csselr, csselr_el1);
--	isb();
--	ccsidr = read_sysreg(ccsidr_el1);
-+	ccsidr = cache_get_ccsidr(csselr);
- 	local_irq_enable();
-
- 	return ccsidr;
-@@ -1960,19 +1960,18 @@ static bool is_valid_cache(u32 val)
- 		return false;
-
- 	/* Bottom bit is Instruction or Data bit.  Next 3 bits are level. */
--	level = (val >> 1);
--	ctype = (cache_levels >> (level * 3)) & 7;
-+	level = (val >> 1) + 1;
-+	ctype = CLIDR_CTYPE(cache_levels, level);
-
- 	switch (ctype) {
--	case 0: /* No cache */
--		return false;
--	case 1: /* Instruction cache only */
--		return (val & 1);
--	case 2: /* Data cache only */
--	case 4: /* Unified cache */
--		return !(val & 1);
--	case 3: /* Separate instruction and data caches */
-+	case CACHE_TYPE_INST:
-+		return (val & CACHE_TYPE_INST);
-+	case CACHE_TYPE_DATA:
-+	case CACHE_TYPE_UNIFIED:
-+		return !(val & CACHE_TYPE_INST);
-+	case CACHE_TYPE_SEPARATE:
- 		return true;
-+	case CACHE_TYPE_NOCACHE:
- 	default: /* Reserved: we can't know instruction or data. */
- 		return false;
- 	}
-@@ -2239,11 +2238,11 @@ void kvm_sys_reg_table_init(void)
- 	 */
- 	get_clidr_el1(NULL, &clidr); /* Ugly... */
- 	cache_levels = clidr.val;
--	for (i = 0; i < 7; i++)
--		if (((cache_levels >> (i*3)) & 7) == 0)
-+	for (i = 1; i <= MAX_CACHE_LEVEL; i++)
-+		if (CLIDR_CTYPE(cache_levels, i) == CACHE_TYPE_NOCACHE)
- 			break;
- 	/* Clear all higher bits. */
--	cache_levels &= (1 << (i*3))-1;
-+	cache_levels &= (1 << CLIDR_CTYPE_SHIFT(i)) - 1;
+@@ -1952,9 +1952,9 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
+ 	return 0;
  }
 
- /**
+-static bool is_valid_cache(u32 val)
++static bool is_valid_cache(u64 val)
+ {
+-	u32 level, ctype;
++	u64 level, ctype;
+
+ 	if (val >= CSSELR_MAX)
+ 		return false;
+@@ -1977,10 +1977,28 @@ static bool is_valid_cache(u32 val)
+ 	}
+ }
+
++static int demux_ccsidr_validate_get(u64 id, int size, u64 *val)
++{
++	u64 cidx;
++
++	if (KVM_REG_SIZE(id) != size)
++		return -ENOENT;
++
++	cidx = (id & KVM_REG_ARM_DEMUX_VAL_MASK)
++			>> KVM_REG_ARM_DEMUX_VAL_SHIFT;
++	if (!is_valid_cache(cidx))
++		return -ENOENT;
++
++	*val = get_ccsidr(cidx);
++	return 0;
++}
++
+ static int demux_c15_get(u64 id, void __user *uaddr)
+ {
+-	u32 val;
+-	u32 __user *uval = uaddr;
++	int ret;
++	u64 val;
++	u32 __user *uval;
++	u64 __user *uval64;
+
+ 	/* Fail if we have unknown bits set. */
+ 	if (id & ~(KVM_REG_ARCH_MASK|KVM_REG_SIZE_MASK|KVM_REG_ARM_COPROC_MASK
+@@ -1989,14 +2007,17 @@ static int demux_c15_get(u64 id, void __user *uaddr)
+
+ 	switch (id & KVM_REG_ARM_DEMUX_ID_MASK) {
+ 	case KVM_REG_ARM_DEMUX_ID_CCSIDR:
+-		if (KVM_REG_SIZE(id) != 4)
+-			return -ENOENT;
+-		val = (id & KVM_REG_ARM_DEMUX_VAL_MASK)
+-			>> KVM_REG_ARM_DEMUX_VAL_SHIFT;
+-		if (!is_valid_cache(val))
+-			return -ENOENT;
+-
+-		return put_user(get_ccsidr(val), uval);
++		ret = demux_ccsidr_validate_get(id, sizeof(*uval), &val);
++		if (ret)
++			return ret;
++		uval = uaddr;
++		return put_user(val, uval);
++	case KVM_REG_ARM_DEMUX_ID_EXT_CCSIDR:
++		ret = demux_ccsidr_validate_get(id, sizeof(*uval64), &val);
++		if (ret)
++			return ret;
++		uval64 = uaddr;
++		return put_user(val, uval64);
+ 	default:
+ 		return -ENOENT;
+ 	}
+@@ -2004,8 +2025,10 @@ static int demux_c15_get(u64 id, void __user *uaddr)
+
+ static int demux_c15_set(u64 id, void __user *uaddr)
+ {
+-	u32 val, newval;
+-	u32 __user *uval = uaddr;
++	int ret;
++	u64 val, newval;
++	u32 __user *uval;
++	u64 __user *uval64;
+
+ 	/* Fail if we have unknown bits set. */
+ 	if (id & ~(KVM_REG_ARCH_MASK|KVM_REG_SIZE_MASK|KVM_REG_ARM_COPROC_MASK
+@@ -2014,18 +2037,29 @@ static int demux_c15_set(u64 id, void __user *uaddr)
+
+ 	switch (id & KVM_REG_ARM_DEMUX_ID_MASK) {
+ 	case KVM_REG_ARM_DEMUX_ID_CCSIDR:
+-		if (KVM_REG_SIZE(id) != 4)
+-			return -ENOENT;
+-		val = (id & KVM_REG_ARM_DEMUX_VAL_MASK)
+-			>> KVM_REG_ARM_DEMUX_VAL_SHIFT;
+-		if (!is_valid_cache(val))
+-			return -ENOENT;
++		ret = demux_ccsidr_validate_get(id, sizeof(*uval), &val);
++		if (ret)
++			return ret;
+
++		uval = uaddr;
+ 		if (get_user(newval, uval))
+ 			return -EFAULT;
+
+ 		/* This is also invariant: you can't change it. */
+-		if (newval != get_ccsidr(val))
++		if (newval != val)
++			return -EINVAL;
++		return 0;
++	case KVM_REG_ARM_DEMUX_ID_EXT_CCSIDR:
++		ret = demux_ccsidr_validate_get(id, sizeof(*uval), &val);
++		if (ret)
++			return ret;
++
++		uval64 = uaddr;
++		if (get_user(newval, uval64))
++			return -EFAULT;
++
++		/* This is also invariant: you can't change it. */
++		if (newval != val)
+ 			return -EINVAL;
+ 		return 0;
+ 	default:
+@@ -2086,12 +2120,10 @@ static unsigned int num_demux_regs(void)
+ 	return count;
+ }
+
+-static int write_demux_regids(u64 __user *uindices)
++static int write_demux_ccsidr(u64 val, u64 __user *uindices)
+ {
+-	u64 val = KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_DEMUX;
+ 	unsigned int i;
+
+-	val |= KVM_REG_ARM_DEMUX_ID_CCSIDR;
+ 	for (i = 0; i < CSSELR_MAX; i++) {
+ 		if (!is_valid_cache(i))
+ 			continue;
+@@ -2099,9 +2131,25 @@ static int write_demux_regids(u64 __user *uindices)
+ 			return -EFAULT;
+ 		uindices++;
+ 	}
++
+ 	return 0;
+ }
+
++static int write_demux_regids(u64 __user *uindices)
++{
++	int ret;
++	u64 val = KVM_REG_ARM64 | KVM_REG_ARM_DEMUX;
++
++	if (cpu_supports_ccsidr_64b_format())
++		/* 64 bit extended CCSIDR */
++		ret = write_demux_ccsidr(val | KVM_REG_ARM_DEMUX_ID_EXT_CCSIDR |
++					 KVM_REG_SIZE_U64, uindices);
++	else
++		ret = write_demux_ccsidr(val | KVM_REG_ARM_DEMUX_ID_CCSIDR |
++					 KVM_REG_SIZE_U32, uindices);
++	return ret;
++}
++
+ static u64 sys_reg_to_index(const struct sys_reg_desc *reg)
+ {
+ 	return (KVM_REG_ARM64 | KVM_REG_SIZE_U64 |
 --
 2.7.4
