@@ -1,27 +1,49 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC v2 06/10] KVM: arm/arm64: Update the physical timer
- interrupt level
-Date: Mon, 30 Jan 2017 18:48:02 +0000
-Message-ID: <13152c8e-2256-4224-e15c-73c8d6ce06e4@arm.com>
+From: Jintack Lim <jintack@cs.columbia.edu>
+Subject: Re: [RFC v2 00/10] Provide the EL1 physical timer to the VM
+Date: Mon, 30 Jan 2017 14:02:28 -0500
+Message-ID: <CAHyh4xiErc288_bj=YmtADcZj5rUG8ryMrW+dP428gxDuOJCUQ@mail.gmail.com>
 References: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
- <1485479100-4966-7-git-send-email-jintack@cs.columbia.edu>
- <86sho199jx.fsf@arm.com> <20170130150203.GD16459@cbox>
- <b3a4a3e4-65d4-1af3-2b77-14b7fffd9d06@arm.com> <20170130184131.GE16459@cbox>
+ <86h94h97yn.fsf@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61EA040905
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 13:47:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ADCDD40905
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5-EBl86UZgPO for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Jan 2017 13:47:48 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1311040783
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 13:47:47 -0500 (EST)
-In-Reply-To: <20170130184131.GE16459@cbox>
+ with ESMTP id r3IhDyxWfdEA for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Jan 2017 14:02:12 -0500 (EST)
+Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
+ [128.59.72.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6DFA40430
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:12 -0500 (EST)
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0UIw57E004818
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:30 -0500
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+ by hazelnut (Postfix) with ESMTP id B82058E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:30 -0500 (EST)
+Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
+ [128.59.72.13]) by hazelnut (Postfix) with ESMTP id 6008181
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:30 -0500 (EST)
+Received: from mail-ua0-f197.google.com (mail-ua0-f197.google.com
+ [209.85.217.197])
+ by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0UJ2UGt000980
+ (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:30 -0500
+Received: by mail-ua0-f197.google.com with SMTP id i68so205648014uad.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:02:30 -0800 (PST)
+Received: from mail-ua0-f169.google.com (mail-ua0-f169.google.com.
+ [209.85.217.169])
+ by smtp.gmail.com with ESMTPSA id s9sm5175395vke.11.2017.01.30.11.02.28
+ for <kvmarm@lists.cs.columbia.edu>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 30 Jan 2017 11:02:29 -0800 (PST)
+Received: by mail-ua0-f169.google.com with SMTP id 35so257007507uak.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:02:28 -0800 (PST)
+In-Reply-To: <86h94h97yn.fsf@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,81 +53,76 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: KVM General <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux@armlinux.org.uk, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Andre Przywara <andre.przywara@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 30/01/17 18:41, Christoffer Dall wrote:
-> On Mon, Jan 30, 2017 at 05:50:03PM +0000, Marc Zyngier wrote:
->> On 30/01/17 15:02, Christoffer Dall wrote:
->>> On Sun, Jan 29, 2017 at 03:21:06PM +0000, Marc Zyngier wrote:
->>>> On Fri, Jan 27 2017 at 01:04:56 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
->>>>> Now that we maintain the EL1 physical timer register states of VMs,
->>>>> update the physical timer interrupt level along with the virtual one.
->>>>>
->>>>> Note that the emulated EL1 physical timer is not mapped to any hardware
->>>>> timer, so we call a proper vgic function.
->>>>>
->>>>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
->>>>> ---
->>>>>  virt/kvm/arm/arch_timer.c | 20 ++++++++++++++++++++
->>>>>  1 file changed, 20 insertions(+)
->>>>>
->>>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->>>>> index 0f6e935..3b6bd50 100644
->>>>> --- a/virt/kvm/arm/arch_timer.c
->>>>> +++ b/virt/kvm/arm/arch_timer.c
->>>>> @@ -180,6 +180,21 @@ static void kvm_timer_update_mapped_irq(struct kvm_vcpu *vcpu, bool new_level,
->>>>>  	WARN_ON(ret);
->>>>>  }
->>>>>  
->>>>> +static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
->>>>> +				 struct arch_timer_context *timer)
->>>>> +{
->>>>> +	int ret;
->>>>> +
->>>>> +	BUG_ON(!vgic_initialized(vcpu->kvm));
->>>>
->>>> Although I've added my fair share of BUG_ON() in the code base, I've
->>>> since reconsidered my position. If we get in a situation where the vgic
->>>> is not initialized, maybe it would be better to just WARN_ON and return
->>>> early rather than killing the whole box. Thoughts?
->>>>
->>>
->>> The distinction to me is whether this will cause fatal crashes or
->>> exploits down the road if we're working on uninitialized data.  If all
->>> that can happen if the vgic is not initialized, is that the guest
->>> doesn't see interrupts, for example, then a WARN_ON is appropriate.
->>>
->>> Which is the case here?
->>>
->>> That being said, do we need this at all?  This is in the critial path
->>> and is actually measurable (I know this from my work on the other timer
->>> series), so it's better to get rid of it if we can.  Can we simply
->>> convince ourselves this will never happen, and is the code ever likely
->>> to change so that it gets called with the vgic disabled later?
+Hi Marc,
+
+On Sun, Jan 29, 2017 at 10:55 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> Hi Jintack,
+>
+> On Fri, Jan 27 2017 at 01:04:50 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
+>> The ARM architecture defines the EL1 physical timer and the virtual timer,
+>> and it is reasonable for an OS to expect to be able to access both.
+>> However, the current KVM implementation does not provide the EL1 physical
+>> timer to VMs but terminates VMs on access to the timer.
 >>
->> That'd be the best course of action. I remember us reworking some of
->> that in the now defunct vgic-less series. Maybe we could salvage that
->> code, if only for the time we spent on it...
+>> This patch series enables VMs to use the EL1 physical timer through
+>> trap-and-emulate.  The KVM host emulates each EL1 physical timer register
+>> access and sets up the background timer accordingly.  When the background
+>> timer expires, the KVM host injects EL1 physical timer interrupts to the
+>> VM.  Alternatively, it's also possible to allow VMs to access the EL1
+>> physical timer without trapping.  However, this requires somehow using the
+>> EL2 physical timer for the Linux host while running the VM instead of the
+>> EL1 physical timer.  Right now I just implemented trap-and-emulate because
+>> this was straightforward to do, and I leave it to future work to determine
+>> if transferring the EL1 physical timer state to the EL2 timer provides any
+>> performance benefit.
 >>
-> Ah, we never merged it?  Were we waiting on a userspace implementation
-> or agreement on the ABI?
+>> This feature will be useful for any OS that wishes to access the EL1
+>> physical timer. Nested virtualization is one of those use cases. A nested
+>> hypervisor running inside a VM would think it has full access to the
+>> hardware and naturally tries to use the EL1 physical timer as Linux would
+>> do. Other nested hypervisors may try to use the EL2 physical timer as Xen
+>> would do, but supporting the EL2 physical timer to the VM is out of scope
+>> of this patch series. This patch series will make it easy to add the EL2
+>> timer support in the future, though.
+>>
+>> Note that Linux VMs booting in EL1 will be unaffected by this patch series
+>> and will continue to use only the virtual timer and this patch series will
+>> therefore not introduce any performance degredation as a result of
+>> trap-and-emulate.
+>
+> Thanks for respining this series. Overall, this looks quite good, and
+> the couple of comments I have should be easy to address.
 
-We were waiting on the userspace side to be respun against the latest
-API, and there were some comments from Peter (IIRC) about supporting
-PPIs in general (the other timers and the PMU, for example).
+Thanks for the review!
 
-None of that happened, as the most vocal proponent of the series
-apparently lost interest.
+>
+> My main concern is that we do expose a timer that doesn't hide
+> CNTVOFF. I appreciate that that was already the case, since CNTPCT was
+> always available (and this avoided trapping the counter), but maybe we
+> should have a way for userspace to ask for a mode where CNTPCT=CNTVCT,
+> byt trapping the physical counter and taking CNTVOFF in all physical
+> timer calculations.
 
-> There was definitely a useful cleanup with the whole enabled flag thing
-> on the timer I remember.
-
-Indeed. We should at least try to resurrect that bit.
+As discussed in the other thread, I think we can expose CNTVOFF to the
+guest OS. I have a patch that lets the guest hypervisor observe CNTVCT
+= CNTPCT - offset (virtual CNTVOFF_EL2) and I will include it in the
+next nesting patch series.
 
 Thanks,
+Jintack
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+>
+> I'm pretty sure you've addressed this one way or another in your nested
+> virt series, so maybe extracting the relevant patches and adding them on
+> top of this series could be an option?
+>
+> Thanks,
+>
+>         M.
+> --
+> Jazz is not dead. It just smells funny.
+>
