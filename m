@@ -1,49 +1,31 @@
-From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: Re: [RFC v2 00/10] Provide the EL1 physical timer to the VM
-Date: Mon, 30 Jan 2017 14:02:28 -0500
-Message-ID: <CAHyh4xiErc288_bj=YmtADcZj5rUG8ryMrW+dP428gxDuOJCUQ@mail.gmail.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC v2 05/10] KVM: arm/arm64: Initialize the emulated EL1
+ physical timer
+Date: Mon, 30 Jan 2017 20:04:50 +0100
+Message-ID: <20170130190450.GF16459@cbox>
 References: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
- <86h94h97yn.fsf@arm.com>
+ <1485479100-4966-6-git-send-email-jintack@cs.columbia.edu>
+ <86wpde83xn.fsf@arm.com> <20170130145816.GC16459@cbox>
+ <57b57b31-b8ad-f5c8-a1fc-4cde9a564dd2@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ADCDD40905
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E21540905
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:04:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r3IhDyxWfdEA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Jan 2017 14:02:12 -0500 (EST)
-Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
- [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6DFA40430
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:12 -0500 (EST)
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0UIw57E004818
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:30 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id B82058E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:30 -0500 (EST)
-Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
- [128.59.72.13]) by hazelnut (Postfix) with ESMTP id 6008181
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:30 -0500 (EST)
-Received: from mail-ua0-f197.google.com (mail-ua0-f197.google.com
- [209.85.217.197])
- by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0UJ2UGt000980
- (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:02:30 -0500
-Received: by mail-ua0-f197.google.com with SMTP id i68so205648014uad.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:02:30 -0800 (PST)
-Received: from mail-ua0-f169.google.com (mail-ua0-f169.google.com.
- [209.85.217.169])
- by smtp.gmail.com with ESMTPSA id s9sm5175395vke.11.2017.01.30.11.02.28
- for <kvmarm@lists.cs.columbia.edu>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 30 Jan 2017 11:02:29 -0800 (PST)
-Received: by mail-ua0-f169.google.com with SMTP id 35so257007507uak.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:02:28 -0800 (PST)
-In-Reply-To: <86h94h97yn.fsf@arm.com>
+ with ESMTP id YQvJ-1IhA4cS for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Jan 2017 14:04:34 -0500 (EST)
+Received: from mail-lf0-f50.google.com (mail-lf0-f50.google.com
+ [209.85.215.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5110A40430
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 14:04:34 -0500 (EST)
+Received: by mail-lf0-f50.google.com with SMTP id x1so112898688lff.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:04:52 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <57b57b31-b8ad-f5c8-a1fc-4cde9a564dd2@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -54,75 +36,213 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: KVM General <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux@armlinux.org.uk, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Andre Przywara <andre.przywara@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On Mon, Jan 30, 2017 at 05:44:20PM +0000, Marc Zyngier wrote:
+> On 30/01/17 14:58, Christoffer Dall wrote:
+> > On Sun, Jan 29, 2017 at 12:07:48PM +0000, Marc Zyngier wrote:
+> >> On Fri, Jan 27 2017 at 01:04:55 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
+> >>> Initialize the emulated EL1 physical timer with the default irq number.
+> >>>
+> >>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+> >>> ---
+> >>>  arch/arm/kvm/reset.c         | 9 ++++++++-
+> >>>  arch/arm64/kvm/reset.c       | 9 ++++++++-
+> >>>  include/kvm/arm_arch_timer.h | 3 ++-
+> >>>  virt/kvm/arm/arch_timer.c    | 9 +++++++--
+> >>>  4 files changed, 25 insertions(+), 5 deletions(-)
+> >>>
+> >>> diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
+> >>> index 4b5e802..1da8b2d 100644
+> >>> --- a/arch/arm/kvm/reset.c
+> >>> +++ b/arch/arm/kvm/reset.c
+> >>> @@ -37,6 +37,11 @@
+> >>>  	.usr_regs.ARM_cpsr = SVC_MODE | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT,
+> >>>  };
+> >>>  
+> >>> +static const struct kvm_irq_level cortexa_ptimer_irq = {
+> >>> +	{ .irq = 30 },
+> >>> +	.level = 1,
+> >>> +};
+> >>
+> >> At some point, we'll have to make that discoverable/configurable. Maybe
+> >> the time for a discoverable arch timer has come (see below).
+> >>
+> >>> +
+> >>>  static const struct kvm_irq_level cortexa_vtimer_irq = {
+> >>>  	{ .irq = 27 },
+> >>>  	.level = 1,
+> >>> @@ -58,6 +63,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >>>  {
+> >>>  	struct kvm_regs *reset_regs;
+> >>>  	const struct kvm_irq_level *cpu_vtimer_irq;
+> >>> +	const struct kvm_irq_level *cpu_ptimer_irq;
+> >>>  
+> >>>  	switch (vcpu->arch.target) {
+> >>>  	case KVM_ARM_TARGET_CORTEX_A7:
+> >>> @@ -65,6 +71,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >>>  		reset_regs = &cortexa_regs_reset;
+> >>>  		vcpu->arch.midr = read_cpuid_id();
+> >>>  		cpu_vtimer_irq = &cortexa_vtimer_irq;
+> >>> +		cpu_ptimer_irq = &cortexa_ptimer_irq;
+> >>>  		break;
+> >>>  	default:
+> >>>  		return -ENODEV;
+> >>> @@ -77,5 +84,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >>>  	kvm_reset_coprocs(vcpu);
+> >>>  
+> >>>  	/* Reset arch_timer context */
+> >>> -	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+> >>> +	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq, cpu_ptimer_irq);
+> >>>  }
+> >>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> >>> index e95d4f6..d9e9697 100644
+> >>> --- a/arch/arm64/kvm/reset.c
+> >>> +++ b/arch/arm64/kvm/reset.c
+> >>> @@ -46,6 +46,11 @@
+> >>>  			COMPAT_PSR_I_BIT | COMPAT_PSR_F_BIT),
+> >>>  };
+> >>>  
+> >>> +static const struct kvm_irq_level default_ptimer_irq = {
+> >>> +	.irq	= 30,
+> >>> +	.level	= 1,
+> >>> +};
+> >>> +
+> >>>  static const struct kvm_irq_level default_vtimer_irq = {
+> >>>  	.irq	= 27,
+> >>>  	.level	= 1,
+> >>> @@ -104,6 +109,7 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+> >>>  int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >>>  {
+> >>>  	const struct kvm_irq_level *cpu_vtimer_irq;
+> >>> +	const struct kvm_irq_level *cpu_ptimer_irq;
+> >>>  	const struct kvm_regs *cpu_reset;
+> >>>  
+> >>>  	switch (vcpu->arch.target) {
+> >>> @@ -117,6 +123,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >>>  		}
+> >>>  
+> >>>  		cpu_vtimer_irq = &default_vtimer_irq;
+> >>> +		cpu_ptimer_irq = &default_ptimer_irq;
+> >>>  		break;
+> >>>  	}
+> >>>  
+> >>> @@ -130,5 +137,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >>>  	kvm_pmu_vcpu_reset(vcpu);
+> >>>  
+> >>>  	/* Reset timer */
+> >>> -	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+> >>> +	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq, cpu_ptimer_irq);
+> >>>  }
+> >>> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> >>> index 69f648b..a364593 100644
+> >>> --- a/include/kvm/arm_arch_timer.h
+> >>> +++ b/include/kvm/arm_arch_timer.h
+> >>> @@ -59,7 +59,8 @@ struct arch_timer_cpu {
+> >>>  int kvm_timer_enable(struct kvm_vcpu *vcpu);
+> >>>  void kvm_timer_init(struct kvm *kvm);
+> >>>  int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+> >>> -			 const struct kvm_irq_level *irq);
+> >>> +			 const struct kvm_irq_level *virt_irq,
+> >>> +			 const struct kvm_irq_level *phys_irq);
+> >>>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
+> >>>  void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
+> >>>  void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
+> >>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> >>> index f72005a..0f6e935 100644
+> >>> --- a/virt/kvm/arm/arch_timer.c
+> >>> +++ b/virt/kvm/arm/arch_timer.c
+> >>> @@ -329,9 +329,11 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+> >>>  }
+> >>>  
+> >>>  int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+> >>> -			 const struct kvm_irq_level *irq)
+> >>> +			 const struct kvm_irq_level *virt_irq,
+> >>> +			 const struct kvm_irq_level *phys_irq)
+> >>>  {
+> >>>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+> >>> +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+> >>>  
+> >>>  	/*
+> >>>  	 * The vcpu timer irq number cannot be determined in
+> >>> @@ -339,7 +341,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+> >>>  	 * kvm_vcpu_set_target(). To handle this, we determine
+> >>>  	 * vcpu timer irq number when the vcpu is reset.
+> >>>  	 */
+> >>> -	vtimer->irq.irq = irq->irq;
+> >>> +	vtimer->irq.irq = virt_irq->irq;
+> >>> +	ptimer->irq.irq = phys_irq->irq;
+> >>>  
+> >>>  	/*
+> >>>  	 * The bits in CNTV_CTL are architecturally reset to UNKNOWN for ARMv8
+> >>> @@ -348,6 +351,7 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+> >>>  	 * the ARMv7 architecture.
+> >>>  	 */
+> >>>  	vtimer->cnt_ctl = 0;
+> >>> +	ptimer->cnt_ctl = 0;
+> >>>  	kvm_timer_update_state(vcpu);
+> >>>  
+> >>>  	return 0;
+> >>> @@ -369,6 +373,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+> >>>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> >>>  
+> >>>  	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
+> >>> +	vcpu_ptimer(vcpu)->cntvoff = 0;
+> >>
+> >> This is quite contentious, IMHO. Do we really want to expose the delta
+> >> between the virtual and physical counters? That's a clear indication to
+> >> the guest that it is virtualized. I"m not sure it matters, but I think
+> >> we should at least make a conscious choice, and maybe give the
+> >> opportunity to userspace to select the desired behaviour.
+> >>
+> > 
+> > So my understanding of the architecture is that you should always have
+> > two timer/counter pairs available at EL1.  They may be synchronized, and
+> > they may not.  If you want an accurate reading of wall clock time, look
+> > at the physical counter, and that can generally be expected to be fast,
+> > precise, and syncrhonized (on working hardware, of course).
+> > 
+> > Now, there can be a constant or potentially monotonically increasing
+> > offset between the physial and virtual counters, which may mean you're
+> > running under a hypervisor or (in the first case) that firmware
+> > programmed or neglected to program cntvoff.  I don't think it's an
+> > inherent problem to expose that difference to a guest, and I think it's
+> > more important that reading the physical counter is fast and doesn't
+> > trap.
+> > 
+> > The question is which contract we can have with a guest OS, and which
+> > legacy we have to keep supporting (Linux, UEFI, ?).
+> > 
+> > Probably Linux should keep relying on the virtual counter/timer only,
+> > unless something is advertised in DT/ACPI, about it being able to use
+> > the physical timer/counter pair, even when booted at EL1.  We could
+> > explore the opportunities to build on that to let the guest figure
+> > out stolen time by reading the two counters and by programming the
+> > proper timer depending on the desired semantics (i.e. virtual or
+> > physical time).
+> > 
+> > In terms of this patch, I actually think it's fine, but we may need to
+> > build something more on top later.  It is possible, though, that I'm
+> > entirely missing the point about Linux timekeeping infrastructure and
+> > that my reading of the architecture is bogus.
+> > 
+> > What do you think?
+> 
+> I don't disagree with any of this (hopefully I was clearer in my reply
+> to the cover letter).
 
-On Sun, Jan 29, 2017 at 10:55 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> Hi Jintack,
->
-> On Fri, Jan 27 2017 at 01:04:50 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
->> The ARM architecture defines the EL1 physical timer and the virtual timer,
->> and it is reasonable for an OS to expect to be able to access both.
->> However, the current KVM implementation does not provide the EL1 physical
->> timer to VMs but terminates VMs on access to the timer.
->>
->> This patch series enables VMs to use the EL1 physical timer through
->> trap-and-emulate.  The KVM host emulates each EL1 physical timer register
->> access and sets up the background timer accordingly.  When the background
->> timer expires, the KVM host injects EL1 physical timer interrupts to the
->> VM.  Alternatively, it's also possible to allow VMs to access the EL1
->> physical timer without trapping.  However, this requires somehow using the
->> EL2 physical timer for the Linux host while running the VM instead of the
->> EL1 physical timer.  Right now I just implemented trap-and-emulate because
->> this was straightforward to do, and I leave it to future work to determine
->> if transferring the EL1 physical timer state to the EL2 timer provides any
->> performance benefit.
->>
->> This feature will be useful for any OS that wishes to access the EL1
->> physical timer. Nested virtualization is one of those use cases. A nested
->> hypervisor running inside a VM would think it has full access to the
->> hardware and naturally tries to use the EL1 physical timer as Linux would
->> do. Other nested hypervisors may try to use the EL2 physical timer as Xen
->> would do, but supporting the EL2 physical timer to the VM is out of scope
->> of this patch series. This patch series will make it easy to add the EL2
->> timer support in the future, though.
->>
->> Note that Linux VMs booting in EL1 will be unaffected by this patch series
->> and will continue to use only the virtual timer and this patch series will
->> therefore not introduce any performance degredation as a result of
->> trap-and-emulate.
->
-> Thanks for respining this series. Overall, this looks quite good, and
-> the couple of comments I have should be easy to address.
+Yeah, my long-winded reply was sort of to convince myself about my own
+understanding :)
 
-Thanks for the review!
 
->
-> My main concern is that we do expose a timer that doesn't hide
-> CNTVOFF. I appreciate that that was already the case, since CNTPCT was
-> always available (and this avoided trapping the counter), but maybe we
-> should have a way for userspace to ask for a mode where CNTPCT=CNTVCT,
-> byt trapping the physical counter and taking CNTVOFF in all physical
-> timer calculations.
-
-As discussed in the other thread, I think we can expose CNTVOFF to the
-guest OS. I have a patch that lets the guest hypervisor observe CNTVCT
-= CNTPCT - offset (virtual CNTVOFF_EL2) and I will include it in the
-next nesting patch series.
+> Wventually, we'll have to support an offset-able
+> physical counter to support nested virtualization, but this can come at
+> a later time.
+> 
+Why do we need the offset-able physical counter for nested
+virtualization?  I would think for nested virt we just need to support
+respecting how the guest hypervisor programs CNTVOFF?
 
 Thanks,
-Jintack
-
->
-> I'm pretty sure you've addressed this one way or another in your nested
-> virt series, so maybe extracting the relevant patches and adding them on
-> top of this series could be an option?
->
-> Thanks,
->
->         M.
-> --
-> Jazz is not dead. It just smells funny.
->
+-Christoffer
