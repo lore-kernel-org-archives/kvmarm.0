@@ -1,188 +1,111 @@
-From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: Re: [RFC v2 02/10] KVM: arm/arm64: Move cntvoff to each timer context
-Date: Mon, 30 Jan 2017 13:45:04 -0500
-Message-ID: <CAHyh4xjQ3XbY_o7urRKLwQ=0QoQmvbSfzsCfxOciV8HDMrNVtA@mail.gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC v2 06/10] KVM: arm/arm64: Update the physical timer
+ interrupt level
+Date: Mon, 30 Jan 2017 18:48:02 +0000
+Message-ID: <13152c8e-2256-4224-e15c-73c8d6ce06e4@arm.com>
 References: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
- <1485479100-4966-3-git-send-email-jintack@cs.columbia.edu>
- <867f5e9j4y.fsf@arm.com> <CAHyh4xiL18DPsR52FtLhafRWuycb5zA6MRL-SSSCRX96Ce-6ug@mail.gmail.com>
- <26af5458-ce45-447b-6ecf-d269e3cc631d@arm.com>
+ <1485479100-4966-7-git-send-email-jintack@cs.columbia.edu>
+ <86sho199jx.fsf@arm.com> <20170130150203.GD16459@cbox>
+ <b3a4a3e4-65d4-1af3-2b77-14b7fffd9d06@arm.com> <20170130184131.GE16459@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <26af5458-ce45-447b-6ecf-d269e3cc631d@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andre Przywara <andre.przywara@arm.com>, KVM General <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61EA040905
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 13:47:49 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5-EBl86UZgPO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Jan 2017 13:47:48 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1311040783
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 13:47:47 -0500 (EST)
+In-Reply-To: <20170130184131.GE16459@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 30, 2017 at 1:05 PM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On 30/01/17 17:58, Jintack Lim wrote:
->> On Sun, Jan 29, 2017 at 6:54 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
->>> On Fri, Jan 27 2017 at 01:04:52 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
->>>> Make cntvoff per each timer context. This is helpful to abstract kvm
->>>> timer functions to work with timer context without considering timer
->>>> types (e.g. physical timer or virtual timer).
+On 30/01/17 18:41, Christoffer Dall wrote:
+> On Mon, Jan 30, 2017 at 05:50:03PM +0000, Marc Zyngier wrote:
+>> On 30/01/17 15:02, Christoffer Dall wrote:
+>>> On Sun, Jan 29, 2017 at 03:21:06PM +0000, Marc Zyngier wrote:
+>>>> On Fri, Jan 27 2017 at 01:04:56 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
+>>>>> Now that we maintain the EL1 physical timer register states of VMs,
+>>>>> update the physical timer interrupt level along with the virtual one.
+>>>>>
+>>>>> Note that the emulated EL1 physical timer is not mapped to any hardware
+>>>>> timer, so we call a proper vgic function.
+>>>>>
+>>>>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+>>>>> ---
+>>>>>  virt/kvm/arm/arch_timer.c | 20 ++++++++++++++++++++
+>>>>>  1 file changed, 20 insertions(+)
+>>>>>
+>>>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>>>>> index 0f6e935..3b6bd50 100644
+>>>>> --- a/virt/kvm/arm/arch_timer.c
+>>>>> +++ b/virt/kvm/arm/arch_timer.c
+>>>>> @@ -180,6 +180,21 @@ static void kvm_timer_update_mapped_irq(struct kvm_vcpu *vcpu, bool new_level,
+>>>>>  	WARN_ON(ret);
+>>>>>  }
+>>>>>  
+>>>>> +static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+>>>>> +				 struct arch_timer_context *timer)
+>>>>> +{
+>>>>> +	int ret;
+>>>>> +
+>>>>> +	BUG_ON(!vgic_initialized(vcpu->kvm));
 >>>>
->>>> This also would pave the way for ever doing adjustments of the cntvoff
->>>> on a per-CPU basis if that should ever make sense.
+>>>> Although I've added my fair share of BUG_ON() in the code base, I've
+>>>> since reconsidered my position. If we get in a situation where the vgic
+>>>> is not initialized, maybe it would be better to just WARN_ON and return
+>>>> early rather than killing the whole box. Thoughts?
 >>>>
->>>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
->>>> ---
->>>>  arch/arm/include/asm/kvm_host.h   |  6 +++---
->>>>  arch/arm64/include/asm/kvm_host.h |  4 ++--
->>>>  include/kvm/arm_arch_timer.h      |  8 +++-----
->>>>  virt/kvm/arm/arch_timer.c         | 26 ++++++++++++++++++++------
->>>>  virt/kvm/arm/hyp/timer-sr.c       |  3 +--
->>>>  5 files changed, 29 insertions(+), 18 deletions(-)
->>>>
->>>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->>>> index d5423ab..f5456a9 100644
->>>> --- a/arch/arm/include/asm/kvm_host.h
->>>> +++ b/arch/arm/include/asm/kvm_host.h
->>>> @@ -60,9 +60,6 @@ struct kvm_arch {
->>>>       /* The last vcpu id that ran on each physical CPU */
->>>>       int __percpu *last_vcpu_ran;
->>>>
->>>> -     /* Timer */
->>>> -     struct arch_timer_kvm   timer;
->>>> -
->>>>       /*
->>>>        * Anything that is not used directly from assembly code goes
->>>>        * here.
->>>> @@ -75,6 +72,9 @@ struct kvm_arch {
->>>>       /* Stage-2 page table */
->>>>       pgd_t *pgd;
->>>>
->>>> +     /* A lock to synchronize cntvoff among all vtimer context of vcpus */
->>>> +     spinlock_t cntvoff_lock;
 >>>
->>> Is there any condition where we need this to be a spinlock? I would have
->>> thought that a mutex should have been enough, as this should only be
->>> updated on migration or initialization. Not that it matters much in this
->>> case, but I wondered if there is something I'm missing.
+>>> The distinction to me is whether this will cause fatal crashes or
+>>> exploits down the road if we're working on uninitialized data.  If all
+>>> that can happen if the vgic is not initialized, is that the guest
+>>> doesn't see interrupts, for example, then a WARN_ON is appropriate.
 >>>
->>>> +
->>>>       /* Interrupt controller */
->>>>       struct vgic_dist        vgic;
->>>>       int max_vcpus;
->>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>>> index e505038..23749a8 100644
->>>> --- a/arch/arm64/include/asm/kvm_host.h
->>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>> @@ -71,8 +71,8 @@ struct kvm_arch {
->>>>       /* Interrupt controller */
->>>>       struct vgic_dist        vgic;
->>>>
->>>> -     /* Timer */
->>>> -     struct arch_timer_kvm   timer;
->>>> +     /* A lock to synchronize cntvoff among all vtimer context of vcpus */
->>>> +     spinlock_t cntvoff_lock;
->>>>  };
->>>>
->>>>  #define KVM_NR_MEM_OBJS     40
->>>> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
->>>> index daad3c1..1b9c988 100644
->>>> --- a/include/kvm/arm_arch_timer.h
->>>> +++ b/include/kvm/arm_arch_timer.h
->>>> @@ -23,11 +23,6 @@
->>>>  #include <linux/hrtimer.h>
->>>>  #include <linux/workqueue.h>
->>>>
->>>> -struct arch_timer_kvm {
->>>> -     /* Virtual offset */
->>>> -     u64                     cntvoff;
->>>> -};
->>>> -
->>>>  struct arch_timer_context {
->>>>       /* Registers: control register, timer value */
->>>>       u32                             cnt_ctl;
->>>> @@ -38,6 +33,9 @@ struct arch_timer_context {
->>>>
->>>>       /* Active IRQ state caching */
->>>>       bool                            active_cleared_last;
->>>> +
->>>> +     /* Virtual offset */
->>>> +     u64                     cntvoff;
->>>>  };
->>>>
->>>>  struct arch_timer_cpu {
->>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->>>> index 6740efa..fa4c042 100644
->>>> --- a/virt/kvm/arm/arch_timer.c
->>>> +++ b/virt/kvm/arm/arch_timer.c
->>>> @@ -101,9 +101,10 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
->>>>  static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
->>>>  {
->>>>       u64 cval, now;
->>>> +     struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
->>>>
->>>> -     cval = vcpu_vtimer(vcpu)->cnt_cval;
->>>> -     now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
->>>> +     cval = vtimer->cnt_cval;
->>>> +     now = kvm_phys_timer_read() - vtimer->cntvoff;
->>>>
->>>>       if (now < cval) {
->>>>               u64 ns;
->>>> @@ -159,7 +160,7 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
->>>>               return false;
->>>>
->>>>       cval = vtimer->cnt_cval;
->>>> -     now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
->>>> +     now = kvm_phys_timer_read() - vtimer->cntvoff;
->>>>
->>>>       return cval <= now;
->>>>  }
->>>> @@ -353,10 +354,23 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
->>>>       return 0;
->>>>  }
->>>>
->>>> +/* Make the updates of cntvoff for all vtimer contexts atomic */
->>>> +static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
+>>> Which is the case here?
 >>>
->>> Arguably, this acts on the VM itself and not a single vcpu. maybe you
->>> should consider passing the struct kvm pointer to reflect this.
->>>
+>>> That being said, do we need this at all?  This is in the critial path
+>>> and is actually measurable (I know this from my work on the other timer
+>>> series), so it's better to get rid of it if we can.  Can we simply
+>>> convince ourselves this will never happen, and is the code ever likely
+>>> to change so that it gets called with the vgic disabled later?
 >>
->> Yes, that would be better.
+>> That'd be the best course of action. I remember us reworking some of
+>> that in the now defunct vgic-less series. Maybe we could salvage that
+>> code, if only for the time we spent on it...
 >>
->>>> +{
->>>> +     int i;
->>>> +
->>>> +     spin_lock(&vcpu->kvm->arch.cntvoff_lock);
->>>> +     kvm_for_each_vcpu(i, vcpu, vcpu->kvm)
->>>> +             vcpu_vtimer(vcpu)->cntvoff = cntvoff;
->>>> +     spin_unlock(&vcpu->kvm->arch.cntvoff_lock);
->>>> +}
->>>> +
->>>>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->>>>  {
->>>>       struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->>>>
->>>> +     update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
->>>
->>> Maybe a comment indicating that we recompute CNTVOFF for all vcpus would
->>> be welcome (this is not a change in semantics, but it was never obvious
->>> in the existing code).
->>
->> I'll add a comment. In fact, I was told to make cntvoff synchronized
->> across all the vcpus, but I'm afraid that I understand why. Could you
->> explain me where this constraint comes from?
->
-> The virtual counter is the only one a guest can rely on (as the physical
-> one is disabled). So we must present to the guest a view of time that is
-> uniform across CPUs. If we allow CNTVOFF to vary across CPUs, time
-> starts fluctuating when we migrate a process from a vcpu to another, and
-> Linux gets *really* unhappy.
+> Ah, we never merged it?  Were we waiting on a userspace implementation
+> or agreement on the ABI?
 
-Ah, that makes sense to me. Thanks a lot.
+We were waiting on the userspace side to be respun against the latest
+API, and there were some comments from Peter (IIRC) about supporting
+PPIs in general (the other timers and the PMU, for example).
 
->
-> An easy fix for this is to make CNTVOFF a VM-global value, ensuring that
-> all the CPUs see the same counter values at the same time.
->
-> Thanks,
->
->         M.
-> --
-> Jazz is not dead. It just smells funny...
->
+None of that happened, as the most vocal proponent of the series
+apparently lost interest.
+
+> There was definitely a useful cleanup with the whole enabled flag thing
+> on the timer I remember.
+
+Indeed. We should at least try to resurrect that bit.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
