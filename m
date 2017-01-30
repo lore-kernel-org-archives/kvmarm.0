@@ -1,25 +1,51 @@
-From: Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH v2 1/3] arm64: cacheinfo: add support for alternative
- format of CCSIDR_EL1
-Date: Mon, 30 Jan 2017 16:57:35 +0000
-Message-ID: <568a27c1-f910-46e8-7283-2040e28df380@arm.com>
-References: <1485793527-18028-1-git-send-email-sudeep.holla@arm.com>
- <ad552a58-4acd-f2ab-7d40-124b40c6c014@arm.com>
+From: Jintack Lim <jintack@cs.columbia.edu>
+Subject: Re: [RFC v2 10/10] KVM: arm/arm64: Emulate the EL1 phys timer
+ register access
+Date: Mon, 30 Jan 2017 12:08:06 -0500
+Message-ID: <CAHyh4xhgNYjpyaGz=UtFfC+smh6CVZgJ530WWmwwmpg=Bi799A@mail.gmail.com>
+References: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
+ <1485479100-4966-11-git-send-email-jintack@cs.columbia.edu>
+ <86lgtt98gs.fsf@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 51D0540194
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:57:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EA6340194
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:07:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AqP3Zjth8s7L for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Jan 2017 11:57:26 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5212240190
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:57:25 -0500 (EST)
-In-Reply-To: <ad552a58-4acd-f2ab-7d40-124b40c6c014@arm.com>
+ with ESMTP id ZsD54Ta4+dwR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Jan 2017 12:07:52 -0500 (EST)
+Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
+ [128.59.72.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C86A840190
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:07:52 -0500 (EST)
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0UH5j5A053834
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:08:10 -0500
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+ by hazelnut (Postfix) with ESMTP id B894285
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:08:10 -0500 (EST)
+Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
+ [128.59.72.13]) by hazelnut (Postfix) with ESMTP id E938A89
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:08:08 -0500 (EST)
+Received: from mail-ua0-f198.google.com (mail-ua0-f198.google.com
+ [209.85.217.198])
+ by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0UH88lv046526
+ (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:08:08 -0500
+Received: by mail-ua0-f198.google.com with SMTP id j94so204253528uad.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 09:08:08 -0800 (PST)
+Received: from mail-vk0-f41.google.com (mail-vk0-f41.google.com.
+ [209.85.213.41])
+ by smtp.gmail.com with ESMTPSA id 31sm5093092uat.27.2017.01.30.09.08.07
+ for <kvmarm@lists.cs.columbia.edu>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 30 Jan 2017 09:08:07 -0800 (PST)
+Received: by mail-vk0-f41.google.com with SMTP id x75so219767211vke.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 09:08:07 -0800 (PST)
+In-Reply-To: <86lgtt98gs.fsf@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,85 +55,126 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Sudeep Holla <sudeep.holla@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: KVM General <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Marc,
 
-
-On 30/01/17 16:47, Suzuki K Poulose wrote:
-> On 30/01/17 16:25, Sudeep Holla wrote:
->> The number of sets described for each cache level in the CCSIDR is
->> limited to 32K and the associativity is limited to 1024 ways.
+On Sun, Jan 29, 2017 at 10:44 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> On Fri, Jan 27 2017 at 01:05:00 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
+>> Emulate read and write operations to CNTP_TVAL, CNTP_CVAL and CNTP_CTL.
+>> Now VMs are able to use the EL1 physical timer.
 >>
->> As part of the ARM8.3 extensions, an alternative format for the
->> CCSIDR_EL1 is introduced for AArch64, and for AArch32, a new CCSIDR2
->> register is introduced to hold the upper 32 bits of this information,
->> and the CCSIDR register format is changed. An identification registers
->> are also added to identify the presence for this functionality.
+>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+>> ---
+>>  arch/arm64/kvm/sys_regs.c    | 32 +++++++++++++++++++++++++++++---
+>>  include/kvm/arm_arch_timer.h |  2 ++
+>>  virt/kvm/arm/arch_timer.c    |  2 +-
+>>  3 files changed, 32 insertions(+), 4 deletions(-)
 >>
->> This patch adds support for the alternative format of CCSIDR_EL1.
-
-[...]
-
->>  void __init setup_cpu_features(void);
->>
->>  void update_cpu_capabilities(const struct arm64_cpu_capabilities *caps,
->> @@ -224,6 +229,10 @@ static inline bool system_uses_ttbr0_pan(void)
->>          !cpus_have_cap(ARM64_HAS_PAN);
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index fd9e747..adf009f 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -824,7 +824,14 @@ static bool access_cntp_tval(struct kvm_vcpu *vcpu,
+>>               struct sys_reg_params *p,
+>>               const struct sys_reg_desc *r)
+>>  {
+>> -     kvm_inject_undefined(vcpu);
+>> +     struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>> +     u64 now = kvm_phys_timer_read();
+>> +
+>> +     if (p->is_write)
+>> +             ptimer->cnt_cval = p->regval + now;
+>> +     else
+>> +             p->regval = ptimer->cnt_cval - now;
+>> +
+>>       return true;
 >>  }
 >>
->> +static inline bool cpu_supports_ccsidr_64b_format(void)
->> +{
->> +    return
->> id_aa64mmfr2_ccsidr_64b_format(read_system_reg(SYS_ID_AA64MMFR2_EL1));
-> 
-> read_system_reg() gives you the system wide safe value for the register,
-> which could
-> be different from that of the current CPU. You have to use
-> read_sysreg_s(), to read
-> a register on the CPU (which aren't yet recognized by GAS).
-> 
-> Sorry, the names are a bit confusing, which can easily cause such
-> issues. May be we should rename some of them.
-> 
+>> @@ -832,7 +839,20 @@ static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
+>>               struct sys_reg_params *p,
+>>               const struct sys_reg_desc *r)
+>>  {
+>> -     kvm_inject_undefined(vcpu);
+>> +     struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>> +
+>> +     if (p->is_write) {
+>> +             /* ISTATUS bit is read-only */
+>> +             ptimer->cnt_ctl = p->regval & ~ARCH_TIMER_CTRL_IT_STAT;
+>> +     } else {
+>> +             u64 now = kvm_phys_timer_read();
+>> +
+>> +             p->regval = ptimer->cnt_ctl;
+>> +             /* Set ISTATUS bit if it's expired */
+>> +             if (ptimer->cnt_cval <= now)
+>> +                     p->regval |= ARCH_TIMER_CTRL_IT_STAT;
+>> +     }
+>
+> Shouldn't we take the ENABLE bit into account? The ARMv8 ARM version I
+> have at hand (version h) seems to indicate that we should, but we should
+> check with the latest and greatest...
 
-Thanks, fixed locally, will post as part of next version.
+Thanks! I was not clear about this. I have ARM ARM version k, and it
+says that 'When the value of the ENABLE bit is 0, the ISTATUS field is
+UNKNOWN.' So I thought the istatus value doesn't matter if ENABLE is
+0, and just set istatus bit regardless of ENABLE bit. If this is not
+what the manual meant, then I'm happy to fix this.
 
->> +}
->>  #endif /* __ASSEMBLY__ */
->>
->>  #endif
->> diff --git a/arch/arm64/include/asm/sysreg.h
->> b/arch/arm64/include/asm/sysreg.h
->> index 98ae03f8eedd..c72dfe8807ca 100644
->> --- a/arch/arm64/include/asm/sysreg.h
->> +++ b/arch/arm64/include/asm/sysreg.h
->> @@ -183,6 +183,7 @@
->>  #define ID_AA64MMFR1_VMIDBITS_16    2
->>
->>  /* id_aa64mmfr2 */
->> +#define ID_AA64MMFR2_CCIDX_SHIFT    20
->>  #define ID_AA64MMFR2_LVA_SHIFT        16
->>  #define ID_AA64MMFR2_IESB_SHIFT        12
->>  #define ID_AA64MMFR2_LSM_SHIFT        8
->> diff --git a/arch/arm64/kernel/cacheinfo.c
->> b/arch/arm64/kernel/cacheinfo.c
->> index 3f2250fc391b..888b38f1709f 100644
->> --- a/arch/arm64/kernel/cacheinfo.c
->> +++ b/arch/arm64/kernel/cacheinfo.c
->> @@ -43,6 +43,13 @@ static inline enum cache_type get_cache_type(int
->> level)
->>      return CLIDR_CTYPE(clidr, level);
+Thanks,
+Jintack
+
+>
+>> +
+>>       return true;
 >>  }
 >>
->> +int icache_get_numsets(void)
-> 
-> Could this be static ? I could not see it used anywhere else outside
-> this file.
-
-Used in arch/arm64/kernel/cpuinfo.c
-
--- 
-Regards,
-Sudeep
+>> @@ -840,7 +860,13 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+>>               struct sys_reg_params *p,
+>>               const struct sys_reg_desc *r)
+>>  {
+>> -     kvm_inject_undefined(vcpu);
+>> +     struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>> +
+>> +     if (p->is_write)
+>> +             ptimer->cnt_cval = p->regval;
+>> +     else
+>> +             p->regval = ptimer->cnt_cval;
+>> +
+>>       return true;
+>>  }
+>>
+>> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+>> index a364593..fec99f2 100644
+>> --- a/include/kvm/arm_arch_timer.h
+>> +++ b/include/kvm/arm_arch_timer.h
+>> @@ -74,6 +74,8 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu,
+>>  void kvm_timer_schedule(struct kvm_vcpu *vcpu);
+>>  void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
+>>
+>> +u64 kvm_phys_timer_read(void);
+>> +
+>>  void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
+>>
+>>  void kvm_timer_init_vhe(void);
+>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>> index b366bb2..9eec063 100644
+>> --- a/virt/kvm/arm/arch_timer.c
+>> +++ b/virt/kvm/arm/arch_timer.c
+>> @@ -40,7 +40,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>>       vcpu_vtimer(vcpu)->active_cleared_last = false;
+>>  }
+>>
+>> -static u64 kvm_phys_timer_read(void)
+>> +u64 kvm_phys_timer_read(void)
+>>  {
+>>       return timecounter->cc->read(timecounter->cc);
+>>  }
+>
+> Thanks,
+>
+>         M.
+> --
+> Jazz is not dead. It just smells funny.
+>
