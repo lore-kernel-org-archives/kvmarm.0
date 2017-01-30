@@ -1,28 +1,22 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC 01/13] KVM: arm/arm64: Add vITS save/restore API
- documentation
-Date: Mon, 30 Jan 2017 17:15:27 +0100
-Message-ID: <d55926b8-634b-e4da-b565-a9e179f5482b@redhat.com>
-References: <1484236613-24633-1-git-send-email-eric.auger@redhat.com>
- <1484236613-24633-2-git-send-email-eric.auger@redhat.com>
- <4fe81c1b-9956-d458-b0ef-b7219f1249fe@arm.com>
- <e58a566d-e100-d31a-fb26-a15a793d3623@redhat.com>
- <65287f0d-b01f-c63d-dc56-c7052cd9dd33@arm.com>
+From: Sudeep Holla <sudeep.holla@arm.com>
+Subject: [PATCH v2 1/3] arm64: cacheinfo: add support for alternative format
+ of CCSIDR_EL1
+Date: Mon, 30 Jan 2017 16:25:25 +0000
+Message-ID: <1485793527-18028-1-git-send-email-sudeep.holla@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 448A240783
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:15:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BD9740783
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:25:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VjOrx2pZsDdj for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Jan 2017 11:15:15 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF6AC40430
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:15:15 -0500 (EST)
-In-Reply-To: <65287f0d-b01f-c63d-dc56-c7052cd9dd33@arm.com>
+ with ESMTP id sztacRhleCWC for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Jan 2017 11:25:19 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C7E6D40284
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 11:25:19 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,209 +26,213 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, eric.auger.pro@gmail.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, Prasun.Kapoor@cavium.com
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Sudeep Holla <sudeep.holla@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+The number of sets described for each cache level in the CCSIDR is
+limited to 32K and the associativity is limited to 1024 ways.
 
-On 13/01/2017 10:46, Marc Zyngier wrote:
-> On 13/01/17 09:07, Auger Eric wrote:
->> Hi Marc,
->>
->> On 12/01/2017 17:52, Marc Zyngier wrote:
->>> Hi Eric,
->>>
->>> On 12/01/17 15:56, Eric Auger wrote:
->>>> Add description for how to access vITS registers and how to flush/restore
->>>> vITS tables into/from memory
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>> ---
->>>>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 70 ++++++++++++++++++++++
->>>>  1 file changed, 70 insertions(+)
->>>>
->>>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>>> index 6081a5b..bd74613 100644
->>>> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>>> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>>> @@ -36,3 +36,73 @@ Groups:
->>>>      -ENXIO:  ITS not properly configured as required prior to setting
->>>>               this attribute
->>>>      -ENOMEM: Memory shortage when allocating ITS internal data
->>>> +
->>>> +  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
->>>> +  Attributes:
->>>> +      The attr field of kvm_device_attr encodes the offset of the
->>>> +      ITS register, relative to the ITS control frame base address
->>>> +      (ITS_base).
->>>> +
->>>> +      kvm_device_attr.addr points to a __u64 value whatever the width
->>>> +      of the addressed register (32/64 bits).
->>>> +
->>>> +      Writes to read-only registers are ignored by the kernel except
->>>> +      for a single register, GITS_READR. Normally this register is RO
->>>> +      but it needs to be restored otherwise commands in the queue will
->>>> +      be re-executed after CWRITER setting.
->>>> +
->>>> +      For other registers, Getting or setting a register has the same
->>>> +      effect as reading/writing the register on real hardware.
->>>> +  Errors:
->>>> +    -ENXIO: Offset does not correspond to any supported register
->>>> +    -EFAULT: Invalid user pointer for attr->addr
->>>> +    -EINVAL: Offset is not 64-bit aligned
->>>> +
->>>> +  KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
->>>> +  Attributes
->>>> +       The attr field of kvm_device_attr is not used.
->>>> +
->>>> +       request the flush-save/restore of the ITS tables, namely
->>>> +       the device table, the collection table, all the ITT tables,
->>>> +       the LPI pending tables. On save, the tables are flushed
->>>> +       into guest memory at the location provisionned by the guest
->>>
->>> 					    provisioned
->>>
->>>> +       in GITS_BASER (device and collection tables), on MAPD command
->>>> +       (ITT_addr), GICR_PENDBASERs (pending tables).
->>>> +
->>>> +       This means the GIC should be restored before the ITS and all
->>>> +       ITS registers but the GITS_CTRL must be restored before
->>>> +       restoring the ITS tables.
->>>> +
->>>> +       Note the LPI configuration table is read-only for the
->>>> +       in-kernel ITS and its save/restore goes through the standard
->>>> +       RAM save/restore.
->>>> +
->>>> +       The layout of the tables in guest memory defines an ABI.
->>>> +       The entries are laid out in memory as follows;
->>>> +
->>>> +    Device Table Entry (DTE) layout: entry size = 16 bytes
->>>> +
->>>> +    bits:     | 63   ...  32  | 31 ... 6 | 5 | 4   ...   0 |
->>>> +    values:   |   DeviceID    |   Resv   | V |    Size     |
->>>> +
->>>> +    bits:     | 63 ... 44 | 43  ...  0  |
->>>> +    values:   |    Resv   |  ITT_addr   |
->>>
->>> While I appreciate this layout represents the absolute maximum an ITS
->>> could implement, I'm a bit concerned about the amount of memory we may
->>> end-up requiring here. All the ITSs implementations I know of seem to
->>> get away with 8 bytes per entry. Maybe I'm just too worried.
->>
->> OK so I would propose a 16b DeviceId and 16b eventid
->>
->> bits:     | 63   ...  48  | 47 ... 4 | 3   ...   0 |
->> values:   |   DeviceID    | ITT_addr |    Size     |
->>
->> I can use the size field as a validity indicator
-> 
-> Note that you are allowed to use a 0 size field. It means 1 bit of
-> EventID (2 possible interrupts). So maybe using a particular address as
-> a valid flag?
-Is it really acceptable to encode the deviceId and eventid on 16 bits
-instead of 32 bits max each?
+As part of the ARM8.3 extensions, an alternative format for the
+CCSIDR_EL1 is introduced for AArch64, and for AArch32, a new CCSIDR2
+register is introduced to hold the upper 32 bits of this information,
+and the CCSIDR register format is changed. An identification registers
+are also added to identify the presence for this functionality.
 
-Currently I do not use the deviceId indexing, ie. the device id is
-directly encoded in the entry. The spec rather suggests device id
-indexing in flat table and this is also stems from 2 stage table support.
+This patch adds support for the alternative format of CCSIDR_EL1.
 
-So I have 2 strategies:
-- ignore the device id indexing and store valid data at the beginning of
-available buffers (pros: no sparsity, cons: shrinks device and eventid
-to 16 bits). Natural in flat mode, less natural in 2 stage mode.
-- implement device id indexing (pros: keep the full range for deviceid
-and eventid, cons: sparsity). Then sparsity needs to be handled somehow.
-Now I better understand your remark on first kB of the pending table...
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+---
+ arch/arm64/include/asm/cachetype.h  | 58 +++++++++++++++++++++++--------------
+ arch/arm64/include/asm/cpufeature.h |  9 ++++++
+ arch/arm64/include/asm/sysreg.h     |  1 +
+ arch/arm64/kernel/cacheinfo.c       | 26 ++++++++++++-----
+ arch/arm64/kernel/cpufeature.c      |  1 +
+ 5 files changed, 67 insertions(+), 28 deletions(-)
 
+diff --git a/arch/arm64/include/asm/cachetype.h b/arch/arm64/include/asm/cachetype.h
+index f5588692f1d4..180b3288aa3f 100644
+--- a/arch/arm64/include/asm/cachetype.h
++++ b/arch/arm64/include/asm/cachetype.h
+@@ -40,9 +40,17 @@
+ extern unsigned long __icache_flags;
 
-> 
->>
->>>
->>> Also, please mention that ITT_addr is actually ITT_addr[51:8], as we're
->>> guaranteed to have an ITT that is 256 byte aligned.
->> sure
->>>
->>>> +
->>>> +    Collection Table Entry (CTE) layout: entry size = 8 bytes
->>>> +
->>>> +    bits:     | 63| 62 ..  52  | 51 ... 16 | 15  ...   0 |
->>>> +    values:   | V |    RES0    |  RDBase   |    ICID     |
->>>> +
->>>> +    Interrupt Translation Table Entry (ITTE) layout: entry size = 16 bytes
->>>
->>> The actual name is Interrupt Translation Entry (ITE). I have a patch
->>> renaming this all over the vgic-its.c file...
->> ok
->>>
->>>> +
->>>> +    bits:     | 63   ...  32  | 31 ... 17 | 16 | 15  ...  0 |
->>>> +    values:   |   DeviceID    |    RES0   | V  |    ICID    |
->>>> +
->>>> +    bits:     | 63 ...  32    | 31      ...        0 |
->>>> +    values:   |   pINTID      |        EventID       |
->>>
->>> Same concern here. 32bit DevID, EventID and INTID seem a bit over the
->>> top. But maybe we shouldn't be concerned about memory... ;-)
->> So I would suggest encoding
->> 16b DeviceId
->> 16b eventid
->> 16b collection ID
->> 16b pINTID
->>
->> bits:     | 63   ...  48  | 47 ... 32 | 31 ... 15 | 15  ...  0 |
->> values:   |   DeviceID    |   pINTID  |  EventId  |   ICID     |
->>
->> a null pINTID would meen the ITE is invalid.
->>
->> Does that make sense or should I instead reduce the number of bits
->> allocated to collections and keep the pINTID bit number larger?
-> 
-> 16bit worth of collections is quite a lot (64k CPUs?). I'd be perfectly
-> fine with a smaller number, but let's see what people think.
-This is useless to store the deviceId here since the deviceId is known
-from the upper level device table. I will fix that in v2. But anyway if
-I encode the ITE on 8 bytes I must shrink the pINTID/EventId compared to
-their max size (32b). If EventId is encoded on 16b then I guess the
-pINTID should be encoded on the same number of bits. ICID on 10 bits?
+ /*
+- * NumSets, bits[27:13] - (Number of sets in cache) - 1
+- * Associativity, bits[12:3] - (Associativity of cache) - 1
+- * LineSize, bits[2:0] - (Log2(Number of words in cache line)) - 2
++ * +---------------+---------+---------+------------------------------+
++ * | Property      |   v1    |    v2   | Calculation                  |
++ * +---------------+---------+---------+------------------------------+
++ * | Attributes    | [31:28] |    NA   |                              |
++ * +---------------+---------+---------+------------------------------+
++ * | NumSets       | [27:13] | [55:32] | Number of sets in cache - 1  |
++ * +---------------+---------+---------+------------------------------+
++ * | Associativity | [12: 3] | [23: 3] | Associativity of cache - 1   |
++ * +---------------+---------+---------+------------------------------+
++ * | LineSize      | [ 2: 0] | [ 2: 0] | Log2(Words in cache line) - 2|
++ * +---------------+---------+---------+------------------------------+
+  */
+ #define CCSIDR_EL1_WRITE_THROUGH	BIT(31)
+ #define CCSIDR_EL1_WRITE_BACK		BIT(30)
+@@ -50,19 +58,32 @@ extern unsigned long __icache_flags;
+ #define CCSIDR_EL1_WRITE_ALLOCATE	BIT(28)
+ #define CCSIDR_EL1_LINESIZE_MASK	0x7
+ #define CCSIDR_EL1_LINESIZE(x)		((x) & CCSIDR_EL1_LINESIZE_MASK)
+-#define CCSIDR_EL1_ASSOCIATIVITY_SHIFT	3
+-#define CCSIDR_EL1_ASSOCIATIVITY_MASK	0x3ff
+-#define CCSIDR_EL1_ASSOCIATIVITY(x)	\
+-	(((x) >> CCSIDR_EL1_ASSOCIATIVITY_SHIFT) & CCSIDR_EL1_ASSOCIATIVITY_MASK)
+-#define CCSIDR_EL1_NUMSETS_SHIFT	13
+-#define CCSIDR_EL1_NUMSETS_MASK		0x7fff
+-#define CCSIDR_EL1_NUMSETS(x) \
+-	(((x) >> CCSIDR_EL1_NUMSETS_SHIFT) & CCSIDR_EL1_NUMSETS_MASK)
+-
+-#define CACHE_LINESIZE(x)	(16 << CCSIDR_EL1_LINESIZE(x))
+-#define CACHE_NUMSETS(x)	(CCSIDR_EL1_NUMSETS(x) + 1)
+-#define CACHE_ASSOCIATIVITY(x)	(CCSIDR_EL1_ASSOCIATIVITY(x) + 1)
+-
++#define CCSIDR_EL1_V1_ASSOCIATIVITY_SHIFT	3
++#define CCSIDR_EL1_V1_ASSOCIATIVITY_MASK	0x3ff
++#define CCSIDR_EL1_V2_ASSOCIATIVITY_SHIFT	3
++#define CCSIDR_EL1_V2_ASSOCIATIVITY_MASK	0x1fffff
++#define CCSIDR_EL1_V1_NUMSETS_SHIFT		13
++#define CCSIDR_EL1_V1_NUMSETS_MASK		0x7fff
++#define CCSIDR_EL1_V2_NUMSETS_SHIFT		32
++#define CCSIDR_EL1_V2_NUMSETS_MASK		0xffffff
++
++#define CCSIDR_EL1_V1_ATTRIBUTE_MASK		0xf0000000
++#define CCSIDR_EL1_V2_ATTRIBUTE_MASK		0x0	/* Not supported */
++#define CCSIDR_EL1_ATTRIBUTES(v, x)	((x) & CCSIDR_EL1_V##v##_ATTRIBUTE_MASK)
++#define CCSIDR_EL1_ASSOCIATIVITY(v, x) \
++	(((x) >> CCSIDR_EL1_V##v##_ASSOCIATIVITY_SHIFT) & CCSIDR_EL1_V##v##_ASSOCIATIVITY_MASK)
++#define CCSIDR_EL1_NUMSETS(v, x) \
++	(((x) >> CCSIDR_EL1_V##v##_NUMSETS_SHIFT) & CCSIDR_EL1_V##v##_NUMSETS_MASK)
++
++#define CACHE_LINESIZE(x)		(16 << CCSIDR_EL1_LINESIZE(x))
++#define CACHE_NUMSETS_V1(x)		(CCSIDR_EL1_NUMSETS(1, x) + 1)
++#define CACHE_ASSOCIATIVITY_V1(x)	(CCSIDR_EL1_ASSOCIATIVITY(1, x) + 1)
++#define CACHE_ATTRIBUTES_V1(x)		(CCSIDR_EL1_ATTRIBUTES(1, x))
++#define CACHE_NUMSETS_V2(x)		(CCSIDR_EL1_NUMSETS(2, x) + 1)
++#define CACHE_ASSOCIATIVITY_V2(x)	(CCSIDR_EL1_ASSOCIATIVITY(2, x) + 1)
++#define CACHE_ATTRIBUTES_V2(x)		(CCSIDR_EL1_ATTRIBUTES(2, x))
++
++extern int icache_get_numsets(void);
+ extern u64 __attribute_const__ cache_get_ccsidr(u64 csselr);
 
-Thoughts?
+ /* Helpers for Level 1 Instruction cache csselr = 1L */
+@@ -71,11 +92,6 @@ static inline int icache_get_linesize(void)
+ 	return CACHE_LINESIZE(cache_get_ccsidr(1L));
+ }
 
-Thanks
+-static inline int icache_get_numsets(void)
+-{
+-	return CACHE_NUMSETS(cache_get_ccsidr(1L));
+-}
+-
+ /*
+  * Whilst the D-side always behaves as PIPT on AArch64, aliasing is
+  * permitted in the I-cache.
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index b4989df48670..076a22ade503 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -185,6 +185,11 @@ static inline bool id_aa64pfr0_32bit_el0(u64 pfr0)
+ 	return val == ID_AA64PFR0_EL0_32BIT_64BIT;
+ }
 
-Eric
-> 
->>
->>
->>>
->>>> +
->>>> +    LPI Pending Table layout:
->>>> +
->>>> +    As specified in the ARM Generic Interrupt Controller Architecture
->>>> +    Specification GIC Architecture version 3.0 and version 4. The first
->>>> +    1kB contains only zeros.
->>>>
->>>
->>> You definitely want to relax this. An ITS implementation is allowed (and
->>> actually encouraged) to maintain a coarse map in the first kB, and use
->>> this to quickly scan the table, which would be very useful on restore.
->> Maybe I miss something here. Currently I restore the ITEs before the
->> pending tables. So considering all the ITEs I know which LPI are defined
->> and which pending bits need to be restored. Why would I need to use a
->> coarse map for?
-> 
-> You could, instead of testing all the bits for which you can generate an
-> LPI, look at the coarse map, which usually uses one bit to represent
-> something like 64 bits of pending table, and find out what is currently
-> pending. That's what HW does, but maybe there is no need to do this for
-> the SW implementation, specially if we have very few LPIs.
-> 
->> I understand the CPU cannot write the pending tables in our back, spec
->> says behavior would be unpredictable, right?
-> 
-> Absolutely. Only the ITS can touch that memory.
-> 
-> Thanks,
-> 
-> 	M.
-> 
++static inline bool id_aa64mmfr2_ccsidr_64b_format(u64 mmfr2)
++{
++	return cpuid_feature_extract_unsigned_field(mmfr2, ID_AA64MMFR2_CCIDX_SHIFT) == 0x1;
++}
++
+ void __init setup_cpu_features(void);
+
+ void update_cpu_capabilities(const struct arm64_cpu_capabilities *caps,
+@@ -224,6 +229,10 @@ static inline bool system_uses_ttbr0_pan(void)
+ 		!cpus_have_cap(ARM64_HAS_PAN);
+ }
+
++static inline bool cpu_supports_ccsidr_64b_format(void)
++{
++	return id_aa64mmfr2_ccsidr_64b_format(read_system_reg(SYS_ID_AA64MMFR2_EL1));
++}
+ #endif /* __ASSEMBLY__ */
+
+ #endif
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 98ae03f8eedd..c72dfe8807ca 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -183,6 +183,7 @@
+ #define ID_AA64MMFR1_VMIDBITS_16	2
+
+ /* id_aa64mmfr2 */
++#define ID_AA64MMFR2_CCIDX_SHIFT	20
+ #define ID_AA64MMFR2_LVA_SHIFT		16
+ #define ID_AA64MMFR2_IESB_SHIFT		12
+ #define ID_AA64MMFR2_LSM_SHIFT		8
+diff --git a/arch/arm64/kernel/cacheinfo.c b/arch/arm64/kernel/cacheinfo.c
+index 3f2250fc391b..888b38f1709f 100644
+--- a/arch/arm64/kernel/cacheinfo.c
++++ b/arch/arm64/kernel/cacheinfo.c
+@@ -43,6 +43,13 @@ static inline enum cache_type get_cache_type(int level)
+ 	return CLIDR_CTYPE(clidr, level);
+ }
+
++int icache_get_numsets(void)
++{
++	if (cpu_supports_ccsidr_64b_format())
++		return CACHE_NUMSETS_V2(cache_get_ccsidr(1L));
++	return CACHE_NUMSETS_V1(cache_get_ccsidr(1L));
++}
++
+ /*
+  * Cache Size Selection Register(CSSELR) selects which Cache Size ID
+  * Register(CCSIDR) is accessible by specifying the required cache
+@@ -71,15 +78,20 @@ static void ci_leaf_init(struct cacheinfo *this_leaf,
+ 	this_leaf->level = level;
+ 	this_leaf->type = type;
+ 	this_leaf->coherency_line_size = CACHE_LINESIZE(tmp);
+-	this_leaf->number_of_sets = CACHE_NUMSETS(tmp);
+-	this_leaf->ways_of_associativity = CACHE_ASSOCIATIVITY(tmp);
++	if (cpu_supports_ccsidr_64b_format()) {
++		this_leaf->number_of_sets = CACHE_NUMSETS_V2(tmp);
++		this_leaf->ways_of_associativity = CACHE_ASSOCIATIVITY_V2(tmp);
++	} else {
++		this_leaf->number_of_sets = CACHE_NUMSETS_V1(tmp);
++		this_leaf->ways_of_associativity = CACHE_ASSOCIATIVITY_V1(tmp);
++		this_leaf->attributes =
++		 ((tmp & CCSIDR_EL1_WRITE_THROUGH) ? CACHE_WRITE_THROUGH : 0) |
++		 ((tmp & CCSIDR_EL1_WRITE_BACK) ? CACHE_WRITE_BACK : 0) |
++		 ((tmp & CCSIDR_EL1_READ_ALLOCATE) ? CACHE_READ_ALLOCATE : 0) |
++		 ((tmp & CCSIDR_EL1_WRITE_ALLOCATE) ? CACHE_WRITE_ALLOCATE : 0);
++	}
+ 	this_leaf->size = this_leaf->number_of_sets *
+ 	    this_leaf->coherency_line_size * this_leaf->ways_of_associativity;
+-	this_leaf->attributes =
+-		((tmp & CCSIDR_EL1_WRITE_THROUGH) ? CACHE_WRITE_THROUGH : 0) |
+-		((tmp & CCSIDR_EL1_WRITE_BACK) ? CACHE_WRITE_BACK : 0) |
+-		((tmp & CCSIDR_EL1_READ_ALLOCATE) ? CACHE_READ_ALLOCATE : 0) |
+-		((tmp & CCSIDR_EL1_WRITE_ALLOCATE) ? CACHE_WRITE_ALLOCATE : 0);
+ }
+
+ static int __init_cache_level(unsigned int cpu)
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index fdf8f045929f..1a942950d611 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -137,6 +137,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr1[] = {
+ };
+
+ static const struct arm64_ftr_bits ftr_id_aa64mmfr2[] = {
++	ARM64_FTR_BITS(FTR_STRICT, FTR_EXACT, ID_AA64MMFR2_CCIDX_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_STRICT, FTR_EXACT, ID_AA64MMFR2_LVA_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_STRICT, FTR_EXACT, ID_AA64MMFR2_IESB_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_STRICT, FTR_EXACT, ID_AA64MMFR2_LSM_SHIFT, 4, 0),
+--
+2.7.4
