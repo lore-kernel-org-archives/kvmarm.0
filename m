@@ -1,29 +1,71 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
 Subject: Re: [RFC v2 03/10] KVM: arm/arm64: Decouple kvm timer functions from
  virtual timer
-Date: Mon, 30 Jan 2017 12:17:53 -0500
-Message-ID: <CAHyh4xhiQueAffsaXOZO8Q83W9_TD3s3+9jyiK=nUW_AhAqh7g@mail.gmail.com>
+Date: Mon, 30 Jan 2017 12:18:50 -0500
+Message-ID: <CAHyh4xgNusa9hFo4OMDaJPqT4t_U1=mRow=g8zuL3iT337odcw@mail.gmail.com>
 References: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
- <1485479100-4966-4-git-send-email-jintack@cs.columbia.edu> <8637g29isu.fsf@arm.com>
+ <1485479100-4966-4-git-send-email-jintack@cs.columbia.edu>
+ <20170130144904.GB16459@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <8637g29isu.fsf@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, andre.przywara@arm.com, KVM General <kvm@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C09940296
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:18:36 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id v6wH8sSh5FA1 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Jan 2017 12:18:35 -0500 (EST)
+Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
+ [128.59.72.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C2B140190
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:18:34 -0500 (EST)
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0UHH8lq063863
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:18:52 -0500
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+ by hazelnut (Postfix) with ESMTP id C589184
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:18:52 -0500 (EST)
+Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
+ [128.59.72.13]) by hazelnut (Postfix) with ESMTP id AEABE83
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:18:52 -0500 (EST)
+Received: from mail-vk0-f69.google.com (mail-vk0-f69.google.com
+ [209.85.213.69])
+ by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v0UHIqj3054793
+ (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 12:18:52 -0500
+Received: by mail-vk0-f69.google.com with SMTP id x75so192551137vke.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 09:18:52 -0800 (PST)
+Received: from mail-ua0-f181.google.com (mail-ua0-f181.google.com.
+ [209.85.217.181])
+ by smtp.gmail.com with ESMTPSA id u2sm5169096vkb.19.2017.01.30.09.18.51
+ for <kvmarm@lists.cs.columbia.edu>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 30 Jan 2017 09:18:51 -0800 (PST)
+Received: by mail-ua0-f181.google.com with SMTP id y9so256203068uae.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Jan 2017 09:18:51 -0800 (PST)
+In-Reply-To: <20170130144904.GB16459@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: KVM General <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, andre.przywara@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Jan 29, 2017 at 7:01 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On Fri, Jan 27 2017 at 01:04:53 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
+Hi Christoffer,
+
+On Mon, Jan 30, 2017 at 9:49 AM, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Thu, Jan 26, 2017 at 08:04:53PM -0500, Jintack Lim wrote:
 >> Now that we have a separate structure for timer context, make functions
 >> general so that they can work with any timer context, not just the
->
->   generic?
-
-yes, thanks!
-
->
 >> virtual timer context.  This does not change the virtual timer
 >> functionality.
 >>
@@ -72,6 +114,12 @@ yes, thanks!
 >> -static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
 >> +static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu,
 >> +                                struct arch_timer_context *timer_ctx)
+>
+> do you need the vcpu parameter here?
+
+No, I'll remove it.
+
+>
 >>  {
 >>       u64 cval, now;
 >> -     struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
@@ -110,6 +158,15 @@ yes, thanks!
 >> -bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
 >> +bool kvm_timer_should_fire(struct kvm_vcpu *vcpu,
 >> +                        struct arch_timer_context *timer_ctx)
+>
+> do you need the vcpu parameter here?
+
+No, I'll remove it.
+
+Thanks,
+Jintack
+
+>
 >>  {
 >> -     struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
 >>       u64 cval, now;
@@ -192,10 +249,8 @@ yes, thanks!
 >>  }
 >>
 >>  void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
->
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
->
->           M.
-> --
-> Jazz is not dead. It just smells funny.
+>> --
+>> 1.9.1
+>>
+>>
 >
