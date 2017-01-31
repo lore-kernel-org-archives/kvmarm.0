@@ -1,26 +1,21 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 2/4] arm64: Work around Falkor erratum 1003
-Date: Tue, 31 Jan 2017 17:56:57 +0000
-Message-ID: <3cab36fb-984a-beae-64db-6ce830ba94f6@arm.com>
-References: <20170125155232.10277-1-cov@codeaurora.org>
- <20170125155232.10277-2-cov@codeaurora.org>
- <20170131123735.GD11191@leverpostej>
- <36478002-4cd8-7f1c-1a25-8bfe35022a47@codeaurora.org>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: [RFC PATCH 00/13] arm64/kvm: use common sysreg definitions
+Date: Tue, 31 Jan 2017 18:05:38 +0000
+Message-ID: <1485885951-2747-1-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E2EEE40665
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 12:56:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 306D5405DA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 13:06:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xTsvKhxGQ0z7 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Jan 2017 12:56:43 -0500 (EST)
+ with ESMTP id AHiY-OJl89ta for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Jan 2017 13:06:42 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D4C6B40194
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 12:56:42 -0500 (EST)
-In-Reply-To: <36478002-4cd8-7f1c-1a25-8bfe35022a47@codeaurora.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C3E0940194
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 13:06:42 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,80 +25,68 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christopher Covington <cov@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>
-Cc: Mark Langsdorf <mlangsdo@redhat.com>, linux-doc@vger.kernel.org, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Neil Leeder <nleeder@codeaurora.org>, Jon Masters <jcm@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 31/01/17 17:48, Christopher Covington wrote:
-> On 01/31/2017 07:37 AM, Mark Rutland wrote:
->> On Wed, Jan 25, 2017 at 10:52:30AM -0500, Christopher Covington wrote:
->>> The Qualcomm Datacenter Technologies Falkor v1 CPU may allocate TLB entries
->>> using an incorrect ASID when TTBRx_EL1 is being updated. When the erratum
->>> is triggered, page table entries using the new translation table base
->>> address (BADDR) will be allocated into the TLB using the old ASID. All
->>> circumstances leading to the incorrect ASID being cached in the TLB arise
->>> when software writes TTBRx_EL1[ASID] and TTBRx_EL1[BADDR], a memory
->>> operation is in the process of performing a translation using the specific
->>> TTBRx_EL1 being written, and the memory operation uses a translation table
->>> descriptor designated as non-global. EL2 and EL3 code changing the EL1&0
->>> ASID is not subject to this erratum because hardware is prohibited from
->>> performing translations from an out-of-context translation regime.
->>>
->>> Consider the following pseudo code.
->>>
->>>   write new BADDR and ASID values to TTBRx_EL1
->>>
->>> Replacing the above sequence with the one below will ensure that no TLB
->>> entries with an incorrect ASID are used by software.
->>>
->>>   write reserved value to TTBRx_EL1[ASID]
->>>   ISB
->>>   write new value to TTBRx_EL1[BADDR]
->>>   ISB
->>>   write new value to TTBRx_EL1[ASID]
->>>   ISB
->>>
->>> When the above sequence is used, page table entries using the new BADDR
->>> value may still be incorrectly allocated into the TLB using the reserved
->>> ASID. Yet this will not reduce functionality, since TLB entries incorrectly
->>> tagged with the reserved ASID will never be hit by a later instruction.
->>
->> Based on my understanding that entries allocated to the reserved ASID
->> will not be used for subsequent page table walks (and so we don't have
->> asynchronous behaviour to contend with), this sounds fine to me.
->>
->> Thanks for taking the time to clarify the details on that.
->>
->>> Based on work by Shanker Donthineni <shankerd@codeaurora.org>
->>>
->>> Signed-off-by: Christopher Covington <cov@codeaurora.org>
->>> ---
->>>  Documentation/arm64/silicon-errata.txt |  1 +
->>>  arch/arm64/Kconfig                     | 11 +++++++++++
->>>  arch/arm64/include/asm/assembler.h     | 23 +++++++++++++++++++++++
->>>  arch/arm64/include/asm/cpucaps.h       |  3 ++-
->>>  arch/arm64/include/asm/mmu_context.h   |  8 +++++++-
->>>  arch/arm64/kernel/cpu_errata.c         |  7 +++++++
->>>  arch/arm64/mm/context.c                | 11 +++++++++++
->>>  arch/arm64/mm/proc.S                   |  1 +
->>>  8 files changed, 63 insertions(+), 2 deletions(-)
->>
->> Don't we need to use pre_ttbr0_update_workaround in <asm/asm-uaccess.h>
->> for CONFIG_ARM64_SW_TTBR0_PAN? We implicitly switch to the reserved ASID
->> for the empty table in __uaccess_ttbr0_disable.
->>
->> That also means we have to invalidate the reserved ASID so as to not
->> accidentally hit while uaccess is disabled.
-> 
-> The CPU in question (Falkor v1) has hardware PAN support. Do we need
-> to worry about including the workaround in the SW PAN code in that case?
+Whenever we add new functionality involving new system registers, we need to
+add sys_reg() definitions so that we can access the registers regardless of
+whether the toolchain can assemble them. At the same time, we have to add
+duplicate definitions of the register encodings to KVM's sysreg tables, so that
+we can handle any configurable traps. This redundancy is unfortunate, and
+defining the encodings directly in the sysreg tables can make those tables
+difficult to read.
 
-Given that all ARMv8 CPUs can support SW_PAN, it is more likely to be
-enabled than the ARMv8.1 PAN. I'd vote for supporting the workaround in
-that case too, and hope that people do enable the HW version.
+This series attempts to address both of these issues by allowing us to use
+common sys_reg() mnemonics in <asm/sysreg.h> to initialise KVM's sysreg tables.
+To that end, this series tries to make <asm/sysreg.h> the canonical location
+for common sysreg encodings.
+
+Largely, I've only attacked the AArch64-native SYS encodings required by KVM
+today, though for the debug and perfmon groups it was easier to take the whole
+group from the ARM ARM than to filter them to only what KVM needed. I've
+ignored CP{15,14} registers for now, but these could be encoded similarly.
+
+To verify that I haven't accidentally broken KVM, I've diffed sys_regs.o and
+sys_regs_generic_v8.o on a section-by-section basis before and after the series
+is applied. The .text, .data, and .rodata sections (and most others) are
+identical. The __bug_table section, and some .debug* sections differ, and this
+appears to be due to line numbers changing due to removed lines.
+
+One thing I wasn't sure how to address was banks of registers such as
+PMEVCNTR<n>_EL0. We currently enumerate all cases for our GICv3 definitions,
+but it seemed painful to expand ~30 cases for PMEVCNTR<n>_EL0 and friends, and
+for these I've made the macros take an 'n' parameter.
+
+The series is based on the arm64/for-next/core branch, since it relies on
+commit c9ee0f98662a6e35 ("arm64: cpufeature: Define helpers for sys_reg id")
+for the definition of SYS_DESC().
 
 Thanks,
+Mark.
 
-	M.
+Mark Rutland (13):
+  arm64: sysreg: sort by encoding
+  arm64: sysreg: add debug system registers
+  arm64: sysreg: add performance monitor registers
+  arm64: sysreg: subsume GICv3 sysreg definitions
+  arm64: sysreg: add register encodings used by KVM
+  arm64: sysreg: add Set/Way sys encodings
+  arm64: kvm: add SYS_DESC()
+  arm64: kvm: Use common debug sysreg definitions
+  arm64: kvm: Use common performance monitor sysreg definitions
+  arm64: kvm: Use common GICv3 sysreg definitions
+  arm64: kvm: use common invariant sysreg definitions
+  arm64: kvm: Use common sysreg definitions
+  arm64: kvm: Use common Set/Way sys definitions
+
+ arch/arm64/include/asm/arch_gicv3.h  |  81 ++-------
+ arch/arm64/include/asm/sysreg.h      | 158 +++++++++++++++-
+ arch/arm64/kernel/head.S             |   8 +-
+ arch/arm64/kvm/sys_regs.c            | 344 +++++++++++------------------------
+ arch/arm64/kvm/sys_regs.h            |   5 +
+ arch/arm64/kvm/sys_regs_generic_v8.c |   4 +-
+ 6 files changed, 276 insertions(+), 324 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+1.9.1
