@@ -1,25 +1,28 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v4 2/4] arm64: Work around Falkor erratum 1003
-Date: Tue, 31 Jan 2017 12:37:36 +0000
-Message-ID: <20170131123735.GD11191@leverpostej>
-References: <20170125155232.10277-1-cov@codeaurora.org>
- <20170125155232.10277-2-cov@codeaurora.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC v2 06/10] KVM: arm/arm64: Update the physical timer
+ interrupt level
+Date: Tue, 31 Jan 2017 17:00:03 +0000
+Message-ID: <772a1d9b-4410-7bf5-d36b-19d49d261506@arm.com>
+References: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
+ <1485479100-4966-7-git-send-email-jintack@cs.columbia.edu>
+ <86sho199jx.fsf@arm.com> <20170130150203.GD16459@cbox>
+ <b3a4a3e4-65d4-1af3-2b77-14b7fffd9d06@arm.com> <20170130184131.GE16459@cbox>
+ <13152c8e-2256-4224-e15c-73c8d6ce06e4@arm.com> <20170130190654.GG16459@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C742401A1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 07:38:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBFB940A21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 11:59:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A9HU4-J8qWFD for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Jan 2017 07:38:24 -0500 (EST)
+ with ESMTP id kqffMg1PhY1N for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Jan 2017 11:59:48 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E0EA440194
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 07:38:23 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20170125155232.10277-2-cov@codeaurora.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BECE40A1D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 11:59:48 -0500 (EST)
+In-Reply-To: <20170130190654.GG16459@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,68 +32,94 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christopher Covington <cov@codeaurora.org>
-Cc: Mark Langsdorf <mlangsdo@redhat.com>, linux-doc@vger.kernel.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Neil Leeder <nleeder@codeaurora.org>, Jon Masters <jcm@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 25, 2017 at 10:52:30AM -0500, Christopher Covington wrote:
-> The Qualcomm Datacenter Technologies Falkor v1 CPU may allocate TLB entries
-> using an incorrect ASID when TTBRx_EL1 is being updated. When the erratum
-> is triggered, page table entries using the new translation table base
-> address (BADDR) will be allocated into the TLB using the old ASID. All
-> circumstances leading to the incorrect ASID being cached in the TLB arise
-> when software writes TTBRx_EL1[ASID] and TTBRx_EL1[BADDR], a memory
-> operation is in the process of performing a translation using the specific
-> TTBRx_EL1 being written, and the memory operation uses a translation table
-> descriptor designated as non-global. EL2 and EL3 code changing the EL1&0
-> ASID is not subject to this erratum because hardware is prohibited from
-> performing translations from an out-of-context translation regime.
+On 30/01/17 19:06, Christoffer Dall wrote:
+> On Mon, Jan 30, 2017 at 06:48:02PM +0000, Marc Zyngier wrote:
+>> On 30/01/17 18:41, Christoffer Dall wrote:
+>>> On Mon, Jan 30, 2017 at 05:50:03PM +0000, Marc Zyngier wrote:
+>>>> On 30/01/17 15:02, Christoffer Dall wrote:
+>>>>> On Sun, Jan 29, 2017 at 03:21:06PM +0000, Marc Zyngier wrote:
+>>>>>> On Fri, Jan 27 2017 at 01:04:56 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
+>>>>>>> Now that we maintain the EL1 physical timer register states of VMs,
+>>>>>>> update the physical timer interrupt level along with the virtual one.
+>>>>>>>
+>>>>>>> Note that the emulated EL1 physical timer is not mapped to any hardware
+>>>>>>> timer, so we call a proper vgic function.
+>>>>>>>
+>>>>>>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+>>>>>>> ---
+>>>>>>>  virt/kvm/arm/arch_timer.c | 20 ++++++++++++++++++++
+>>>>>>>  1 file changed, 20 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>>>>>>> index 0f6e935..3b6bd50 100644
+>>>>>>> --- a/virt/kvm/arm/arch_timer.c
+>>>>>>> +++ b/virt/kvm/arm/arch_timer.c
+>>>>>>> @@ -180,6 +180,21 @@ static void kvm_timer_update_mapped_irq(struct kvm_vcpu *vcpu, bool new_level,
+>>>>>>>  	WARN_ON(ret);
+>>>>>>>  }
+>>>>>>>  
+>>>>>>> +static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+>>>>>>> +				 struct arch_timer_context *timer)
+>>>>>>> +{
+>>>>>>> +	int ret;
+>>>>>>> +
+>>>>>>> +	BUG_ON(!vgic_initialized(vcpu->kvm));
+>>>>>>
+>>>>>> Although I've added my fair share of BUG_ON() in the code base, I've
+>>>>>> since reconsidered my position. If we get in a situation where the vgic
+>>>>>> is not initialized, maybe it would be better to just WARN_ON and return
+>>>>>> early rather than killing the whole box. Thoughts?
+>>>>>>
+>>>>>
+>>>>> The distinction to me is whether this will cause fatal crashes or
+>>>>> exploits down the road if we're working on uninitialized data.  If all
+>>>>> that can happen if the vgic is not initialized, is that the guest
+>>>>> doesn't see interrupts, for example, then a WARN_ON is appropriate.
+>>>>>
+>>>>> Which is the case here?
+>>>>>
+>>>>> That being said, do we need this at all?  This is in the critial path
+>>>>> and is actually measurable (I know this from my work on the other timer
+>>>>> series), so it's better to get rid of it if we can.  Can we simply
+>>>>> convince ourselves this will never happen, and is the code ever likely
+>>>>> to change so that it gets called with the vgic disabled later?
+>>>>
+>>>> That'd be the best course of action. I remember us reworking some of
+>>>> that in the now defunct vgic-less series. Maybe we could salvage that
+>>>> code, if only for the time we spent on it...
+>>>>
+>>> Ah, we never merged it?  Were we waiting on a userspace implementation
+>>> or agreement on the ABI?
+>>
+>> We were waiting on the userspace side to be respun against the latest
+>> API, and there were some comments from Peter (IIRC) about supporting
+>> PPIs in general (the other timers and the PMU, for example).
+>>
+>> None of that happened, as the most vocal proponent of the series
+>> apparently lost interest.
+>>
+>>> There was definitely a useful cleanup with the whole enabled flag thing
+>>> on the timer I remember.
+>>
+>> Indeed. We should at least try to resurrect that bit.
+>>
 > 
-> Consider the following pseudo code.
-> 
->   write new BADDR and ASID values to TTBRx_EL1
-> 
-> Replacing the above sequence with the one below will ensure that no TLB
-> entries with an incorrect ASID are used by software.
-> 
->   write reserved value to TTBRx_EL1[ASID]
->   ISB
->   write new value to TTBRx_EL1[BADDR]
->   ISB
->   write new value to TTBRx_EL1[ASID]
->   ISB
-> 
-> When the above sequence is used, page table entries using the new BADDR
-> value may still be incorrectly allocated into the TLB using the reserved
-> ASID. Yet this will not reduce functionality, since TLB entries incorrectly
-> tagged with the reserved ASID will never be hit by a later instruction.
+> It's probably worth it trying to resurrect the whole thing I think,
+> especially since I think the implementation ended up looking quite nice.
 
-Based on my understanding that entries allocated to the reserved ASID
-will not be used for subsequent page table walks (and so we don't have
-asynchronous behaviour to contend with), this sounds fine to me.
+Indeed. My only concern is about the userspace counterpart, which hasn't
+materialized when expected. Hopefully it will this time around!
 
-Thanks for taking the time to clarify the details on that.
+> I can add a rebase of that to my list of never-ending timer rework.
 
-> Based on work by Shanker Donthineni <shankerd@codeaurora.org>
-> 
-> Signed-off-by: Christopher Covington <cov@codeaurora.org>
-> ---
->  Documentation/arm64/silicon-errata.txt |  1 +
->  arch/arm64/Kconfig                     | 11 +++++++++++
->  arch/arm64/include/asm/assembler.h     | 23 +++++++++++++++++++++++
->  arch/arm64/include/asm/cpucaps.h       |  3 ++-
->  arch/arm64/include/asm/mmu_context.h   |  8 +++++++-
->  arch/arm64/kernel/cpu_errata.c         |  7 +++++++
->  arch/arm64/mm/context.c                | 11 +++++++++++
->  arch/arm64/mm/proc.S                   |  1 +
->  8 files changed, 63 insertions(+), 2 deletions(-)
-
-Don't we need to use pre_ttbr0_update_workaround in <asm/asm-uaccess.h>
-for CONFIG_ARM64_SW_TTBR0_PAN? We implicitly switch to the reserved ASID
-for the empty table in __uaccess_ttbr0_disable.
-
-That also means we have to invalidate the reserved ASID so as to not
-accidentally hit while uaccess is disabled.
+We all know that you can do that while sleeping! ;-)
 
 Thanks,
-Mark.
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
