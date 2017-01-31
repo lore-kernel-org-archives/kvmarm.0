@@ -1,22 +1,22 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [PATCH v4 1/9] arm64/kvm: hyp: tlb: use __tlbi() helper
-Date: Tue, 31 Jan 2017 17:16:22 +0000
-Message-ID: <20170131171630.26898-2-punit.agrawal@arm.com>
+Subject: [PATCH v4 2/9] KVM: Add event to trace tlb invalidations
+Date: Tue, 31 Jan 2017 17:16:23 +0000
+Message-ID: <20170131171630.26898-3-punit.agrawal@arm.com>
 References: <20170131171630.26898-1-punit.agrawal@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B5FA4096F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 12:16:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C45194095B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 12:16:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pUTwxhVAHrhB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Jan 2017 12:16:46 -0500 (EST)
+ with ESMTP id mO7cFoiQEkfE for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Jan 2017 12:16:56 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA2214096E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 12:16:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A99ED408EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jan 2017 12:16:56 -0500 (EST)
 In-Reply-To: <20170131171630.26898-1-punit.agrawal@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,73 +28,47 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Mark Rutland <mark.rutland@arm.com>
+As TLB operations can have an impact on system performance, add a trace
+event to enable monitoring of guest TLB maintenance operations.
 
-Now that we have a __tlbi() helper, make use of this in the arm64 KVM hyp
-code to get rid of asm() boilerplate. At the same time, we simplify
-__tlb_flush_vm_context by using __flush_icache_all(), as this has the
-appropriate instruction cache maintenance and barrier.
-
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-[ rename tlbi -> __tlbi, convert additional sites, update commit log ]
 Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/arm64/kvm/hyp/tlb.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ include/trace/events/kvm.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 88e2f2b938f0..b2cfbedea582 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -16,6 +16,7 @@
-  */
+diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
+index 8ade3eb6c640..fbe33089264c 100644
+--- a/include/trace/events/kvm.h
++++ b/include/trace/events/kvm.h
+@@ -393,6 +393,24 @@ TRACE_EVENT(kvm_halt_poll_ns,
+ #define trace_kvm_halt_poll_ns_shrink(vcpu_id, new, old) \
+ 	trace_kvm_halt_poll_ns(false, vcpu_id, new, old)
  
- #include <asm/kvm_hyp.h>
-+#include <asm/tlbflush.h>
++TRACE_EVENT(kvm_tlb_invalidate,
++	TP_PROTO(unsigned long vcpu_pc, u32 opcode),
++	TP_ARGS(vcpu_pc, opcode),
++
++	TP_STRUCT__entry(
++		__field(unsigned long, vcpu_pc)
++		__field(u32, opcode)
++	),
++
++	TP_fast_assign(
++		__entry->vcpu_pc = vcpu_pc;
++		__entry->opcode = opcode;
++	),
++
++	TP_printk("vcpu_pc=0x%16lx opcode=%08x", __entry->vcpu_pc,
++		  __entry->opcode)
++);
++
+ #endif /* _TRACE_KVM_MAIN_H */
  
- void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
-@@ -32,7 +33,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	 * whole of Stage-1. Weep...
- 	 */
- 	ipa >>= 12;
--	asm volatile("tlbi ipas2e1is, %0" : : "r" (ipa));
-+	__tlbi(ipas2e1is, ipa);
- 
- 	/*
- 	 * We have to ensure completion of the invalidation at Stage-2,
-@@ -41,7 +42,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	 * the Stage-1 invalidation happened first.
- 	 */
- 	dsb(ish);
--	asm volatile("tlbi vmalle1is" : : );
-+	__tlbi(vmalle1is);
- 	dsb(ish);
- 	isb();
- 
-@@ -57,7 +58,7 @@ void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
- 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
- 	isb();
- 
--	asm volatile("tlbi vmalls12e1is" : : );
-+	__tlbi(vmalls12e1is);
- 	dsb(ish);
- 	isb();
- 
-@@ -82,7 +83,6 @@ void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
- void __hyp_text __kvm_flush_vm_context(void)
- {
- 	dsb(ishst);
--	asm volatile("tlbi alle1is	\n"
--		     "ic ialluis	  ": : );
--	dsb(ish);
-+	__tlbi(alle1is);
-+	__flush_icache_all(); /* contains a dsb(ish) */
- }
+ /* This part must be outside protection */
 -- 
 2.11.0
