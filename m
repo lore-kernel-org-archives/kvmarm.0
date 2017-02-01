@@ -1,31 +1,38 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v4 2/4] arm64: Work around Falkor erratum 1003
-Date: Wed, 1 Feb 2017 17:41:05 +0000
-Message-ID: <20170201174105.GK8177@arm.com>
-References: <20170125155232.10277-1-cov@codeaurora.org>
- <20170125155232.10277-2-cov@codeaurora.org>
- <20170131123735.GD11191@leverpostej>
- <36478002-4cd8-7f1c-1a25-8bfe35022a47@codeaurora.org>
- <3cab36fb-984a-beae-64db-6ce830ba94f6@arm.com>
- <b4cf83d2-ae05-3362-bc23-2341d00516dc@codeaurora.org>
- <20170201163358.GG8177@arm.com>
- <20170201173609.GE26507@e104818-lin.cambridge.arm.com>
+From: Jintack Lim <jintack@cs.columbia.edu>
+Subject: [RFC v3 00/10] Provide the EL1 physical timer to the VM
+Date: Wed,  1 Feb 2017 12:43:00 -0500
+Message-ID: <1485970990-13775-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F49D40A80
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:40:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BC4E40A80
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:42:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sLOFlaJoxMHO for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Feb 2017 12:40:45 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E53F40A7C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:40:45 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20170201173609.GE26507@e104818-lin.cambridge.arm.com>
+ with ESMTP id EKVokmT3qMGH for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Feb 2017 12:42:53 -0500 (EST)
+Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
+ [128.59.72.39])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 462CC40A7C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:42:52 -0500 (EST)
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+ by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v11He8iA030672
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 1 Feb 2017 12:43:14 -0500
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+ by hazelnut (Postfix) with ESMTP id 60B0988
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:14 -0500 (EST)
+Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
+ [128.59.72.16]) by hazelnut (Postfix) with ESMTP id 036B390
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:14 -0500 (EST)
+Received: from mail-qt0-f197.google.com (mail-qt0-f197.google.com
+ [209.85.216.197])
+ by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v11HhDdv018269
+ (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 1 Feb 2017 12:43:13 -0500
+Received: by mail-qt0-f197.google.com with SMTP id c25so153955431qtg.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Feb 2017 09:43:13 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,45 +42,77 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Mark Langsdorf <mlangsdo@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Jon Masters <jcm@redhat.com>, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, Neil Leeder <nleeder@codeaurora.org>, linux-arm-kernel@lists.infradead.org
+To: pbonzini@redhat.com, rkrcmar@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, andre.przywara@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 01, 2017 at 05:36:09PM +0000, Catalin Marinas wrote:
-> On Wed, Feb 01, 2017 at 04:33:58PM +0000, Will Deacon wrote:
-> > On Wed, Feb 01, 2017 at 11:29:22AM -0500, Christopher Covington wrote:
-> > > On 01/31/2017 12:56 PM, Marc Zyngier wrote:
-> > > > Given that all ARMv8 CPUs can support SW_PAN, it is more likely to be
-> > > > enabled than the ARMv8.1 PAN. I'd vote for supporting the workaround in
-> > > > that case too, and hope that people do enable the HW version.
-> > > 
-> > > Okay, I'll do my best to add support for the SW PAN case. I rebased and
-> > > submitted v6 of the E1009 patch [1] so that it no longer depends on this
-> > > patch landing first, if you all are inclined to pick it up while work on
-> > > this E1003 patch continues.
-> > 
-> > The alternative is not enabling SW_PAN (at runtime) if this errata is
-> > present, along with a warning stating that hardware-PAN should be
-> > enabled in kconfig instead. Not sure what distributions will make of that
-> > though.
-> 
-> The problem with this patch is that when ARM64_SW_TTBR0_PAN is enabled
-> and in the absence of hardware PAN (or ARM64_PAN disabled),
-> cpu_do_switch_mm is no longer called for user process switching, so the
-> workaround is pretty much useless.
+The ARM architecture defines the EL1 physical timer and the virtual timer,
+and it is reasonable for an OS to expect to be able to access both.
+However, the current KVM implementation does not provide the EL1 physical
+timer to VMs but terminates VMs on access to the timer.
 
-Oh, I see what you mean now.
+This patch series enables VMs to use the EL1 physical timer through
+trap-and-emulate.  The KVM host emulates each EL1 physical timer register
+access and sets up the background timer accordingly.  When the background
+timer expires, the KVM host injects EL1 physical timer interrupts to the
+VM.  Alternatively, it's also possible to allow VMs to access the EL1
+physical timer without trapping.  However, this requires somehow using the
+EL2 physical timer for the Linux host while running the VM instead of the
+EL1 physical timer.  Right now I just implemented trap-and-emulate because
+this was straightforward to do, and I leave it to future work to determine
+if transferring the EL1 physical timer state to the EL2 timer provides any
+performance benefit.
 
-> I'm ok with adding the Kconfig dependency below to
-> QCOM_FALKOR_ERRATUM_1003:
-> 
-> 	depends on !ARM64_SW_TTBR0_PAN || ARM64_PAN
-> 
-> together with a run-time warning if ARM64_SW_TTBR0_PAN is being used.
+This feature will be useful for any OS that wishes to access the EL1
+physical timer. Nested virtualization is one of those use cases. A nested
+hypervisor running inside a VM would think it has full access to the
+hardware and naturally tries to use the EL1 physical timer as Linux would
+do. Other nested hypervisors may try to use the EL2 physical timer as Xen
+would do, but supporting the EL2 physical timer to the VM is out of scope
+of this patch series. This patch series will make it easy to add the EL2
+timer support in the future, though.
 
-That makes it look like hardware-PAN is the cause of the erratum. Maybe
-just select ARM64_PAN if the erratum workaround is selected, then
-runtime warning if we find that the h/w doesn't have PAN but does have
-the erratum (which should never fire)?
+Note that Linux VMs booting in EL1 will be unaffected by this patch series
+and will continue to use only the virtual timer and this patch series will
+therefore not introduce any performance degredation as a result of
+trap-and-emulate.
 
-Will
+v2 => v3:
+ - Rebase on kvmarm/queue
+ - Take kvm->lock to synchronize cntvoff across all vtimers
+ - Remove unnecessary function parameters
+ - Add comments
+
+v1 => v2:
+ - Rebase on kvm-arm-for-4.10-rc4
+ - To make it simple, schedule the background timer for the EL1 physical timer
+   emulation on every entry to the VM and cancel it on exit.
+ - Change timer_context structure to have cntvoff and restore enable field back
+   to arch_timer_cpu structure
+
+Jintack Lim (10):
+  KVM: arm/arm64: Abstract virtual timer context into separate structure
+  KVM: arm/arm64: Move cntvoff to each timer context
+  KVM: arm/arm64: Decouple kvm timer functions from virtual timer
+  KVM: arm/arm64: Add the EL1 physical timer context
+  KVM: arm/arm64: Initialize the emulated EL1 physical timer
+  KVM: arm/arm64: Update the physical timer interrupt level
+  KVM: arm/arm64: Set a background timer to the earliest timer
+    expiration
+  KVM: arm/arm64: Set up a background timer for the physical timer
+    emulation
+  KVM: arm64: Add the EL1 physical timer access handler
+  KVM: arm/arm64: Emulate the EL1 phys timer registers
+
+ arch/arm/include/asm/kvm_host.h   |   3 -
+ arch/arm/kvm/arm.c                |   4 +-
+ arch/arm/kvm/reset.c              |   9 +-
+ arch/arm64/include/asm/kvm_host.h |   3 -
+ arch/arm64/kvm/reset.c            |   9 +-
+ arch/arm64/kvm/sys_regs.c         |  65 +++++++++++++
+ include/kvm/arm_arch_timer.h      |  39 ++++----
+ virt/kvm/arm/arch_timer.c         | 193 ++++++++++++++++++++++++++------------
+ virt/kvm/arm/hyp/timer-sr.c       |  13 +--
+ 9 files changed, 242 insertions(+), 96 deletions(-)
+
+-- 
+1.9.1
