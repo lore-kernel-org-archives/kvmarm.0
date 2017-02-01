@@ -1,25 +1,35 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH RFC 1/7] ARM64: KVM: Add the definition of ID registers
-Date: Sat, 28 Jan 2017 13:07:15 +0100
-Message-ID: <20170128120715.nq4bla5aumxxrkeo@hawk.localdomain>
-References: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
- <1484559214-2248-2-git-send-email-zhaoshenglong@huawei.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC v2 06/10] KVM: arm/arm64: Update the physical timer
+ interrupt level
+Date: Wed, 1 Feb 2017 09:02:35 +0100
+Message-ID: <20170201080235.GA6226@cbox>
+References: <1485479100-4966-1-git-send-email-jintack@cs.columbia.edu>
+ <1485479100-4966-7-git-send-email-jintack@cs.columbia.edu>
+ <86sho199jx.fsf@arm.com> <20170130150203.GD16459@cbox>
+ <b3a4a3e4-65d4-1af3-2b77-14b7fffd9d06@arm.com>
+ <20170130184131.GE16459@cbox>
+ <13152c8e-2256-4224-e15c-73c8d6ce06e4@arm.com>
+ <20170130190654.GG16459@cbox>
+ <772a1d9b-4410-7bf5-d36b-19d49d261506@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AC5940838
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Jan 2017 07:07:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6C4F40692
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 03:02:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ryMWiKITd7y1 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 28 Jan 2017 07:07:06 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 88F4540187
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Jan 2017 07:07:06 -0500 (EST)
+ with ESMTP id FIqBcdlJwjTf for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Feb 2017 03:02:19 -0500 (EST)
+Received: from mail-lf0-f48.google.com (mail-lf0-f48.google.com
+ [209.85.215.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65ED9405DA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 03:02:19 -0500 (EST)
+Received: by mail-lf0-f48.google.com with SMTP id z134so224226199lff.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Feb 2017 00:02:40 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1484559214-2248-2-git-send-email-zhaoshenglong@huawei.com>
+In-Reply-To: <772a1d9b-4410-7bf5-d36b-19d49d261506@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,101 +39,94 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: marc.zyngier@arm.com, qemu-arm@nongnu.org, wu.wubin@huawei.com, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 16, 2017 at 05:33:28PM +0800, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
+On Tue, Jan 31, 2017 at 05:00:03PM +0000, Marc Zyngier wrote:
+> On 30/01/17 19:06, Christoffer Dall wrote:
+> > On Mon, Jan 30, 2017 at 06:48:02PM +0000, Marc Zyngier wrote:
+> >> On 30/01/17 18:41, Christoffer Dall wrote:
+> >>> On Mon, Jan 30, 2017 at 05:50:03PM +0000, Marc Zyngier wrote:
+> >>>> On 30/01/17 15:02, Christoffer Dall wrote:
+> >>>>> On Sun, Jan 29, 2017 at 03:21:06PM +0000, Marc Zyngier wrote:
+> >>>>>> On Fri, Jan 27 2017 at 01:04:56 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
+> >>>>>>> Now that we maintain the EL1 physical timer register states of VMs,
+> >>>>>>> update the physical timer interrupt level along with the virtual one.
+> >>>>>>>
+> >>>>>>> Note that the emulated EL1 physical timer is not mapped to any hardware
+> >>>>>>> timer, so we call a proper vgic function.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+> >>>>>>> ---
+> >>>>>>>  virt/kvm/arm/arch_timer.c | 20 ++++++++++++++++++++
+> >>>>>>>  1 file changed, 20 insertions(+)
+> >>>>>>>
+> >>>>>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> >>>>>>> index 0f6e935..3b6bd50 100644
+> >>>>>>> --- a/virt/kvm/arm/arch_timer.c
+> >>>>>>> +++ b/virt/kvm/arm/arch_timer.c
+> >>>>>>> @@ -180,6 +180,21 @@ static void kvm_timer_update_mapped_irq(struct kvm_vcpu *vcpu, bool new_level,
+> >>>>>>>  	WARN_ON(ret);
+> >>>>>>>  }
+> >>>>>>>  
+> >>>>>>> +static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+> >>>>>>> +				 struct arch_timer_context *timer)
+> >>>>>>> +{
+> >>>>>>> +	int ret;
+> >>>>>>> +
+> >>>>>>> +	BUG_ON(!vgic_initialized(vcpu->kvm));
+> >>>>>>
+> >>>>>> Although I've added my fair share of BUG_ON() in the code base, I've
+> >>>>>> since reconsidered my position. If we get in a situation where the vgic
+> >>>>>> is not initialized, maybe it would be better to just WARN_ON and return
+> >>>>>> early rather than killing the whole box. Thoughts?
+> >>>>>>
+> >>>>>
+> >>>>> The distinction to me is whether this will cause fatal crashes or
+> >>>>> exploits down the road if we're working on uninitialized data.  If all
+> >>>>> that can happen if the vgic is not initialized, is that the guest
+> >>>>> doesn't see interrupts, for example, then a WARN_ON is appropriate.
+> >>>>>
+> >>>>> Which is the case here?
+> >>>>>
+> >>>>> That being said, do we need this at all?  This is in the critial path
+> >>>>> and is actually measurable (I know this from my work on the other timer
+> >>>>> series), so it's better to get rid of it if we can.  Can we simply
+> >>>>> convince ourselves this will never happen, and is the code ever likely
+> >>>>> to change so that it gets called with the vgic disabled later?
+> >>>>
+> >>>> That'd be the best course of action. I remember us reworking some of
+> >>>> that in the now defunct vgic-less series. Maybe we could salvage that
+> >>>> code, if only for the time we spent on it...
+> >>>>
+> >>> Ah, we never merged it?  Were we waiting on a userspace implementation
+> >>> or agreement on the ABI?
+> >>
+> >> We were waiting on the userspace side to be respun against the latest
+> >> API, and there were some comments from Peter (IIRC) about supporting
+> >> PPIs in general (the other timers and the PMU, for example).
+> >>
+> >> None of that happened, as the most vocal proponent of the series
+> >> apparently lost interest.
+> >>
+> >>> There was definitely a useful cleanup with the whole enabled flag thing
+> >>> on the timer I remember.
+> >>
+> >> Indeed. We should at least try to resurrect that bit.
+> >>
+> > 
+> > It's probably worth it trying to resurrect the whole thing I think,
+> > especially since I think the implementation ended up looking quite nice.
 > 
-> Add a new memeber in kvm_cpu_context to save the ID registers value.
+> Indeed. My only concern is about the userspace counterpart, which hasn't
+> materialized when expected. Hopefully it will this time around!
+> 
+> > I can add a rebase of that to my list of never-ending timer rework.
+> 
+> We all know that you can do that while sleeping! ;-)
+> 
 
-Currently all the sysregs that need to be save/restored are in a single
-array, sys_regs. This commit message needs to provide the rationale for
-introducing the id_sys_regs array. If there is no good reason, then the
-ID registers should be integrated with the rest. Also, what about the
-ARMv7/AArch32 equivalent registers?
+Haha, maybe that will finally make the code right.
 
-Thanks,
-drew
-
-> 
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 46 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e505038..6034f92 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -187,12 +187,57 @@ enum vcpu_sysreg {
->  
->  #define NR_COPRO_REGS	(NR_SYS_REGS * 2)
->  
-> +enum id_vcpu_sysreg {
-> +	MIDR_EL1,
-> +	/* ID group 1 registers */
-> +	REVIDR_EL1,
-> +	AIDR_EL1,
-> +
-> +	/* ID group 2 registers */
-> +	CTR_EL0,
-> +	CCSIDR_EL1,
-> +	CLIDR_EL1,
-> +
-> +	/* ID group 3 registers */
-> +	ID_PFR0_EL1,
-> +	ID_PFR1_EL1,
-> +	ID_DFR0_EL1,
-> +	ID_AFR0_EL1,
-> +	ID_MMFR0_EL1,
-> +	ID_MMFR1_EL1,
-> +	ID_MMFR2_EL1,
-> +	ID_MMFR3_EL1,
-> +	ID_ISAR0_EL1,
-> +	ID_ISAR1_EL1,
-> +	ID_ISAR2_EL1,
-> +	ID_ISAR3_EL1,
-> +	ID_ISAR4_EL1,
-> +	ID_ISAR5_EL1,
-> +	MVFR0_EL1,
-> +	MVFR1_EL1,
-> +	MVFR2_EL1,
-> +	ID_AA64PFR0_EL1,
-> +	ID_AA64PFR1_EL1,
-> +	ID_AA64DFR0_EL1,
-> +	ID_AA64DFR1_EL1,
-> +	ID_AA64ISAR0_EL1,
-> +	ID_AA64ISAR1_EL1,
-> +	ID_AA64MMFR0_EL1,
-> +	ID_AA64MMFR1_EL1,
-> +	ID_AA64AFR0_EL1,
-> +	ID_AA64AFR1_EL1,
-> +	ID_MMFR4_EL1,
-> +
-> +	NR_ID_SYS_REGS
-> +};
-> +
->  struct kvm_cpu_context {
->  	struct kvm_regs	gp_regs;
->  	union {
->  		u64 sys_regs[NR_SYS_REGS];
->  		u32 copro[NR_COPRO_REGS];
->  	};
-> +	u64 id_sys_regs[NR_ID_SYS_REGS];
->  };
->  
->  typedef struct kvm_cpu_context kvm_cpu_context_t;
-> @@ -277,6 +322,7 @@ struct kvm_vcpu_arch {
->  
->  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
->  #define vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
-> +#define vcpu_id_sys_reg(v,r)	((v)->arch.ctxt.id_sys_regs[(r)])
->  /*
->   * CP14 and CP15 live in the same array, as they are backed by the
->   * same system registers.
-> -- 
-> 2.0.4
-> 
-> 
+-Christoffer
