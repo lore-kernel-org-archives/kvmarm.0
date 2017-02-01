@@ -1,7 +1,7 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
+From: Will Deacon <will.deacon@arm.com>
 Subject: Re: [PATCH v4 2/4] arm64: Work around Falkor erratum 1003
-Date: Wed, 1 Feb 2017 17:36:09 +0000
-Message-ID: <20170201173609.GE26507@e104818-lin.cambridge.arm.com>
+Date: Wed, 1 Feb 2017 17:41:05 +0000
+Message-ID: <20170201174105.GK8177@arm.com>
 References: <20170125155232.10277-1-cov@codeaurora.org>
  <20170125155232.10277-2-cov@codeaurora.org>
  <20170131123735.GD11191@leverpostej>
@@ -9,49 +9,71 @@ References: <20170125155232.10277-1-cov@codeaurora.org>
  <3cab36fb-984a-beae-64db-6ce830ba94f6@arm.com>
  <b4cf83d2-ae05-3362-bc23-2341d00516dc@codeaurora.org>
  <20170201163358.GG8177@arm.com>
+ <20170201173609.GE26507@e104818-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-doc-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F49D40A80
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:40:46 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id sLOFlaJoxMHO for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Feb 2017 12:40:45 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E53F40A7C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:40:45 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20170201163358.GG8177@arm.com>
-Sender: linux-doc-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: Christopher Covington <cov@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, Mark Langsdorf <mlangsdo@redhat.com>, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, shankerd@codeaurora.org, linux-arm-kernel@lists.infradead.org, Neil Leeder <nleeder@codeaurora.org>, Jon Masters <jcm@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
+In-Reply-To: <20170201173609.GE26507@e104818-lin.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Mark Langsdorf <mlangsdo@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Jon Masters <jcm@redhat.com>, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, Neil Leeder <nleeder@codeaurora.org>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 01, 2017 at 04:33:58PM +0000, Will Deacon wrote:
-> On Wed, Feb 01, 2017 at 11:29:22AM -0500, Christopher Covington wrote:
-> > On 01/31/2017 12:56 PM, Marc Zyngier wrote:
-> > > Given that all ARMv8 CPUs can support SW_PAN, it is more likely to be
-> > > enabled than the ARMv8.1 PAN. I'd vote for supporting the workaround in
-> > > that case too, and hope that people do enable the HW version.
+On Wed, Feb 01, 2017 at 05:36:09PM +0000, Catalin Marinas wrote:
+> On Wed, Feb 01, 2017 at 04:33:58PM +0000, Will Deacon wrote:
+> > On Wed, Feb 01, 2017 at 11:29:22AM -0500, Christopher Covington wrote:
+> > > On 01/31/2017 12:56 PM, Marc Zyngier wrote:
+> > > > Given that all ARMv8 CPUs can support SW_PAN, it is more likely to be
+> > > > enabled than the ARMv8.1 PAN. I'd vote for supporting the workaround in
+> > > > that case too, and hope that people do enable the HW version.
+> > > 
+> > > Okay, I'll do my best to add support for the SW PAN case. I rebased and
+> > > submitted v6 of the E1009 patch [1] so that it no longer depends on this
+> > > patch landing first, if you all are inclined to pick it up while work on
+> > > this E1003 patch continues.
 > > 
-> > Okay, I'll do my best to add support for the SW PAN case. I rebased and
-> > submitted v6 of the E1009 patch [1] so that it no longer depends on this
-> > patch landing first, if you all are inclined to pick it up while work on
-> > this E1003 patch continues.
+> > The alternative is not enabling SW_PAN (at runtime) if this errata is
+> > present, along with a warning stating that hardware-PAN should be
+> > enabled in kconfig instead. Not sure what distributions will make of that
+> > though.
 > 
-> The alternative is not enabling SW_PAN (at runtime) if this errata is
-> present, along with a warning stating that hardware-PAN should be
-> enabled in kconfig instead. Not sure what distributions will make of that
-> though.
+> The problem with this patch is that when ARM64_SW_TTBR0_PAN is enabled
+> and in the absence of hardware PAN (or ARM64_PAN disabled),
+> cpu_do_switch_mm is no longer called for user process switching, so the
+> workaround is pretty much useless.
 
-The problem with this patch is that when ARM64_SW_TTBR0_PAN is enabled
-and in the absence of hardware PAN (or ARM64_PAN disabled),
-cpu_do_switch_mm is no longer called for user process switching, so the
-workaround is pretty much useless.
+Oh, I see what you mean now.
 
-I'm ok with adding the Kconfig dependency below to
-QCOM_FALKOR_ERRATUM_1003:
+> I'm ok with adding the Kconfig dependency below to
+> QCOM_FALKOR_ERRATUM_1003:
+> 
+> 	depends on !ARM64_SW_TTBR0_PAN || ARM64_PAN
+> 
+> together with a run-time warning if ARM64_SW_TTBR0_PAN is being used.
 
-	depends on !ARM64_SW_TTBR0_PAN || ARM64_PAN
+That makes it look like hardware-PAN is the cause of the erratum. Maybe
+just select ARM64_PAN if the erratum workaround is selected, then
+runtime warning if we find that the h/w doesn't have PAN but does have
+the erratum (which should never fire)?
 
-together with a run-time warning if ARM64_SW_TTBR0_PAN is being used.
-
-I'm not keen on adding the workaround to the uaccess macros. They are
-complex enough already and people who do want SW PAN (and single Image)
-would end up with 6-8 extra unnecessary nops on each side of a uaccess
-(and nops are not entirely free).
-
--- 
-Catalin
+Will
