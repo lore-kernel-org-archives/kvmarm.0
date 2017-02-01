@@ -1,40 +1,39 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC v3 06/10] KVM: arm/arm64: Update the physical timer interrupt
- level
-Date: Wed,  1 Feb 2017 12:43:06 -0500
-Message-ID: <1485970990-13775-7-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC v3 04/10] KVM: arm/arm64: Add the EL1 physical timer context
+Date: Wed,  1 Feb 2017 12:43:04 -0500
+Message-ID: <1485970990-13775-5-git-send-email-jintack@cs.columbia.edu>
 References: <1485970990-13775-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A64A40C17
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F60240BD7
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:42:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gEIelq7js-x7 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Feb 2017 12:43:01 -0500 (EST)
-Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
- [128.59.72.39])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C36740BD7
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:00 -0500 (EST)
+ with ESMTP id xPAlOl8X6nwC for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Feb 2017 12:42:57 -0500 (EST)
+Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
+ [128.59.72.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0419440C17
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:42:57 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v11He8iQ030672
- for <kvmarm@lists.cs.columbia.edu>; Wed, 1 Feb 2017 12:43:21 -0500
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v11He8YM001130
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 1 Feb 2017 12:43:18 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 9450881
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:21 -0500 (EST)
-Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
- [128.59.72.15]) by hazelnut (Postfix) with ESMTP id 7CD6086
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:21 -0500 (EST)
-Received: from mail-qt0-f199.google.com (mail-qt0-f199.google.com
- [209.85.216.199])
- by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v11HhL5X044953
+ by hazelnut (Postfix) with ESMTP id 8568A81
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:18 -0500 (EST)
+Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
+ [128.59.72.14]) by hazelnut (Postfix) with ESMTP id 6E9E581
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:18 -0500 (EST)
+Received: from mail-qt0-f197.google.com (mail-qt0-f197.google.com
+ [209.85.216.197])
+ by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v11HhITE019896
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Wed, 1 Feb 2017 12:43:21 -0500
-Received: by mail-qt0-f199.google.com with SMTP id c25so153960184qtg.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Feb 2017 09:43:21 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 1 Feb 2017 12:43:18 -0500
+Received: by mail-qt0-f197.google.com with SMTP id k15so400567726qtg.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Feb 2017 09:43:18 -0800 (PST)
 In-Reply-To: <1485970990-13775-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -48,35 +47,30 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: pbonzini@redhat.com, rkrcmar@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, andre.przywara@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we maintain the EL1 physical timer register states of VMs,
-update the physical timer interrupt level along with the virtual one.
+Add the EL1 physical timer context.
 
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- virt/kvm/arm/arch_timer.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/kvm/arm_arch_timer.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index ae38703..1b086fd6 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -186,6 +186,7 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index f46fa3b..6445a3d 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -40,6 +40,7 @@ struct arch_timer_context {
  
- 	/*
- 	 * If userspace modified the timer registers via SET_ONE_REG before
-@@ -199,6 +200,9 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	if (kvm_timer_should_fire(vtimer) != vtimer->irq.level)
- 		kvm_timer_update_irq(vcpu, !vtimer->irq.level, vtimer);
+ struct arch_timer_cpu {
+ 	struct arch_timer_context	vtimer;
++	struct arch_timer_context	ptimer;
  
-+	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
-+		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
-+
- 	return 0;
- }
+ 	/* Background timer used when the guest is not running */
+ 	struct hrtimer			timer;
+@@ -75,4 +76,5 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+ void kvm_timer_init_vhe(void);
  
+ #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
++#define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.ptimer)
+ #endif
 -- 
 1.9.1
