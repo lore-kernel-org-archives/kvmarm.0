@@ -1,28 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v8 01/16] FDT: introduce global phandle allocation
-Date: Wed, 01 Feb 2017 17:13:32 +0000
-Message-ID: <878tppkf5v.fsf@on-the-bus.cambridge.arm.com>
-References: <20161104173203.21168-1-andre.przywara@arm.com>
- <20161104173203.21168-2-andre.przywara@arm.com>
- <d1dc4e68-66e1-85d1-f5d1-5743e5172409@arm.com>
- <4c43b500-c0c8-cb25-27f4-f6d24233c088@arm.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [PATCH v4 3/4] arm64: Use __tlbi() macros in KVM code
+Date: Wed, 01 Feb 2017 17:14:34 +0000
+Message-ID: <87h94drfyd.fsf@e105922-lin.cambridge.arm.com>
+References: <20170125155232.10277-1-cov@codeaurora.org>
+ <20170125155232.10277-3-cov@codeaurora.org>
+ <20170125193943.GW15850@cbox> <20170127135306.GK21144@arm.com>
+ <87lgtprgi4.fsf@e105922-lin.cambridge.arm.com>
+ <20170201170852.GI8177@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 020044092C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:13:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8F3540967
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:14:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T0r01it9lIZK for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Feb 2017 12:13:15 -0500 (EST)
+ with ESMTP id yKIhwuu-eBOV for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Feb 2017 12:14:14 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D967C40783
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:13:14 -0500 (EST)
-In-Reply-To: <4c43b500-c0c8-cb25-27f4-f6d24233c088@arm.com> (=?utf-8?Q?=22?=
- =?utf-8?Q?Andr=C3=A9?=
- Przywara"'s message of "Wed, 1 Feb 2017 16:44:19 +0000")
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC4A84092C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:14:14 -0500 (EST)
+In-Reply-To: <20170201170852.GI8177@arm.com> (Will Deacon's message of "Wed, 1
+ Feb 2017 17:08:52 +0000")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,86 +32,48 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?utf-8?Q?Andr=C3=A9?= Przywara <andre.przywara@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Mark Langsdorf <mlangsdo@redhat.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Jon Masters <jcm@redhat.com>, timur@codeaurora.org, linux-kernel@vger.kernel.org, Neil Leeder <nleeder@codeaurora.org>, Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gV2VkLCBGZWIgMDEgMjAxNyBhdCAgNDo0NDoxOSBwbSBHTVQsIEFuZHLDqSBQcnp5d2FyYSA8
-YW5kcmUucHJ6eXdhcmFAYXJtLmNvbT4gd3JvdGU6CgpIaSBBbmRyZSwKCj4gSGkgTWFyYywgV2ls
-bCwKPgo+IE9uIDA5LzEyLzE2IDEyOjAzLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+IE9uIDA0LzEx
-LzE2IDE3OjMxLCBBbmRyZSBQcnp5d2FyYSB3cm90ZToKPj4+IEFsbG9jYXRpbmcgYW4gRkRUIHBo
-YW5kbGUgKGEgdW5pcXVlIGlkZW50aWZpZXIpIHVzaW5nIGEgc3RhdGljCj4+PiB2YXJpYWJsZSBp
-biBhIHN0YXRpYyBpbmxpbmUgZnVuY3Rpb24gZGVmaW5lZCBpbiBhIGhlYWRlciBmaWxlIHdvcmtz
-Cj4+PiBvbmx5IGlmIGFsbCB1c2VycyBhcmUgaW4gdGhlIHNhbWUgc291cmNlIGZpbGUuIFNvIHRy
-eWluZyB0byBhbGxvY2F0ZQo+Pj4gYSBoYW5kbGUgZnJvbSB0d28gZGlmZmVyZW50IGNvbXBpbGF0
-aW9uIHVuaXRzIGZhaWxzLgo+Pj4gSW50cm9kdWNlIGdsb2JhbCBwaGFuZGxlIGFsbG9jYXRpb24g
-YW5kIHJlZmVyZW5jZSBjb2RlIHRvIHByb3Blcmx5Cj4+PiBhbGxvY2F0ZSB1bmlxdWUgcGhhbmRs
-ZXMuCj4+Pgo+Pj4gU2lnbmVkLW9mZi1ieTogQW5kcmUgUHJ6eXdhcmEgPGFuZHJlLnByenl3YXJh
-QGFybS5jb20+Cj4+PiAtLS0KPj4+ICBNYWtlZmlsZSAgICAgICAgICB8ICAxICsKPj4+ICBhcm0v
-ZmR0LmMgICAgICAgICB8ICAyICstCj4+PiAgYXJtL2dpYy5jICAgICAgICAgfCAgMiArLQo+Pj4g
-IGluY2x1ZGUva3ZtL2ZkdC5oIHwgMTAgKysrKystLS0tLQo+Pj4gIGt2bS1mZHQuYyAgICAgICAg
-IHwgMjYgKysrKysrKysrKysrKysrKysrKysrKysrKysKPj4+ICA1IGZpbGVzIGNoYW5nZWQsIDM0
-IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pCj4+PiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGt2
-bS1mZHQuYwo+Pj4KPj4+IGRpZmYgLS1naXQgYS9NYWtlZmlsZSBiL01ha2VmaWxlCj4+PiBpbmRl
-eCAxZjAxOTZmLi5lNGE0MDAyIDEwMDY0NAo+Pj4gLS0tIGEvTWFrZWZpbGUKPj4+ICsrKyBiL01h
-a2VmaWxlCj4+PiBAQCAtOTgsNiArOTgsNyBAQCBPQkpTCSs9IGt2bS1pcGMubwo+Pj4gIE9CSlMJ
-Kz0gYnVpbHRpbi1zYW5kYm94Lm8KPj4+ICBPQkpTCSs9IHZpcnRpby9tbWlvLm8KPj4+ICBPQkpT
-CSs9IGh3L2k4MDQyLm8KPj4+ICtPQkpTCSs9IGt2bS1mZHQubwo+Pj4gIAo+Pj4gICMgVHJhbnNs
-YXRlIHVuYW1lIC1tIGludG8gQVJDSCBzdHJpbmcKPj4+ICBBUkNIID89ICQoc2hlbGwgdW5hbWUg
-LW0gfCBzZWQgLWUgcy9pLjg2L2kzODYvIC1lIHMvcHBjLiovcG93ZXJwYy8gXAo+Pj4gZGlmZiAt
-LWdpdCBhL2FybS9mZHQuYyBiL2FybS9mZHQuYwo+Pj4gaW5kZXggMzgxZDQ4Zi4uOGJjZmZmYiAx
-MDA2NDQKPj4+IC0tLSBhL2FybS9mZHQuYwo+Pj4gKysrIGIvYXJtL2ZkdC5jCj4+PiBAQCAtMTE0
-LDcgKzExNCw3IEBAIHN0YXRpYyBpbnQgc2V0dXBfZmR0KHN0cnVjdCBrdm0gKmt2bSkKPj4+ICB7
-Cj4+PiAgCXN0cnVjdCBkZXZpY2VfaGVhZGVyICpkZXZfaGRyOwo+Pj4gIAl1OCBzdGFnaW5nX2Zk
-dFtGRFRfTUFYX1NJWkVdOwo+Pj4gLQl1MzIgZ2ljX3BoYW5kbGUJCT0gZmR0X19hbGxvY19waGFu
-ZGxlKCk7Cj4+PiArCXUzMiBnaWNfcGhhbmRsZQkJPSBmZHRfX2dldF9waGFuZGxlKFBIQU5ETEVf
-R0lDKTsKPj4+ICAJdTY0IG1lbV9yZWdfcHJvcFtdCT0gewo+Pj4gIAkJY3B1X3RvX2ZkdDY0KGt2
-bS0+YXJjaC5tZW1vcnlfZ3Vlc3Rfc3RhcnQpLAo+Pj4gIAkJY3B1X3RvX2ZkdDY0KGt2bS0+cmFt
-X3NpemUpLAo+Pj4gZGlmZiAtLWdpdCBhL2FybS9naWMuYyBiL2FybS9naWMuYwo+Pj4gaW5kZXgg
-ZDZkNmRkMC4uYjYwNDM3ZSAxMDA2NDQKPj4+IC0tLSBhL2FybS9naWMuYwo+Pj4gKysrIGIvYXJt
-L2dpYy5jCj4+PiBAQCAtMjIyLDcgKzIyMiw3IEBAIHZvaWQgZ2ljX19nZW5lcmF0ZV9mZHRfbm9k
-ZXModm9pZCAqZmR0LCB1MzIgcGhhbmRsZSwgZW51bSBpcnFjaGlwX3R5cGUgdHlwZSkKPj4+ICAJ
-X0ZEVChmZHRfcHJvcGVydHlfY2VsbChmZHQsICIjaW50ZXJydXB0LWNlbGxzIiwgR0lDX0ZEVF9J
-UlFfTlVNX0NFTExTKSk7Cj4+PiAgCV9GRFQoZmR0X3Byb3BlcnR5KGZkdCwgImludGVycnVwdC1j
-b250cm9sbGVyIiwgTlVMTCwgMCkpOwo+Pj4gIAlfRkRUKGZkdF9wcm9wZXJ0eShmZHQsICJyZWci
-LCByZWdfcHJvcCwgc2l6ZW9mKHJlZ19wcm9wKSkpOwo+Pj4gLQlfRkRUKGZkdF9wcm9wZXJ0eV9j
-ZWxsKGZkdCwgInBoYW5kbGUiLCBwaGFuZGxlKSk7Cj4+PiArCV9GRFQoZmR0X3Byb3BlcnR5X2Nl
-bGwoZmR0LCAicGhhbmRsZSIsIGZkdF9fZ2V0X3BoYW5kbGUoUEhBTkRMRV9HSUMpKSk7Cj4+PiAg
-CV9GRFQoZmR0X2VuZF9ub2RlKGZkdCkpOwo+Pj4gIH0KPj4+ICAKPj4+IGRpZmYgLS1naXQgYS9p
-bmNsdWRlL2t2bS9mZHQuaCBiL2luY2x1ZGUva3ZtL2ZkdC5oCj4+PiBpbmRleCA1M2Q4NWE0Li5j
-ZDJiYjcyIDEwMDY0NAo+Pj4gLS0tIGEvaW5jbHVkZS9rdm0vZmR0LmgKPj4+ICsrKyBiL2luY2x1
-ZGUva3ZtL2ZkdC5oCj4+PiBAQCAtOCw2ICs4LDEwIEBACj4+PiAgI2luY2x1ZGUgPGxpbnV4L3R5
-cGVzLmg+Cj4+PiAgCj4+PiAgI2RlZmluZSBGRFRfTUFYX1NJWkUJMHgxMDAwMAo+Pj4gKyNkZWZp
-bmUgRkRUX0lOVkFMSURfUEhBTkRMRSAwCj4+PiArI2RlZmluZSBGRFRfSVNfVkFMSURfUEhBTkRM
-RShwaGFuZGxlKSAoKHBoYW5kbGUpICE9IEZEVF9JTlZBTElEX1BIQU5ETEUpCj4+PiArCj4+PiAr
-ZW51bSBwaGFuZGxlcyB7UEhBTkRMRV9HSUMsIFBIQU5ETEVTX01BWH07Cj4+IAo+PiBBbm90aGVy
-IG5pdCBoZXJlOiBQSEFORExFX0dJQyBpcyBwcmV0dHkgbXVjaCBBUk0tc3BlY2lmaWMsIHdoaWxl
-IEZEVCBpcwo+PiBzdXBwb3NlZCB0byBiZSBnZW5lcmljLiBDYW4ndCB3ZSBtb3ZlIHRoZSBlbnVt
-IHRvIGJlIGFyY2hpdGVjdHVyZQo+PiBzcGVjaWZpYyBhbmQgbm90IHB1dCB0aGlzIGluIGFuIGFy
-Y2hpdGVjdHVyZSBhZ25vc3RpYyBvbmU/Cj4KPiBTbyB3aGlsZSB0cnlpbmcgdG8gZmluZCB0aGUg
-YmVzdCBwb3NzaWJsZSBzb2x1dGlvbiBmb3IgdGhpcyBzZWVtaW5nbHkKPiBzaW1wbGUgcHJvYmxl
-bSwgSSB3YXMgd29uZGVyaW5nIHdoeSB3ZSBoYWQgdGhpcyBhbGxvY2F0aW9uIGZ1bmN0aW9uIGlu
-Cj4gdGhlIGZpcnN0IHBsYWNlPwo+IEl0IHNlZW1zIGEgYml0IG92ZXJraWxsIHRvIGFsbG9jYXRl
-IGEgaGFuZGxlIGlmIHdlIGNvdWxkIGp1c3QgZ28gd2l0aAo+IHN0YXRpYyB2YWx1ZXMuCj4gSSBj
-aGFuZ2VkIHRoZSBmaXJzdCB0d28gcGF0Y2hlcyBub3cgdG8gaGF2ZSBhbiBlbnVtIHBlciBhcmNo
-aXRlY3R1cmUgdG8KPiBsaXN0IGFsbCBwb3NzaWJsZSBoYW5kbGVzIGFuZCB0aGVuIGp1c3QgdXNp
-bmcgdGhvc2UgdmFsdWVzIGRpcmVjdGx5Cj4gaW5zdGVhZCBvZiBnb2luZyB0aHJvdWdoIGFub3Ro
-ZXIgbGF5ZXIgb2YgaW5kaXJlY3Rpb24uCgpZZXMsIHRoYXQgcHJvYmFibHkgbWFrZSBzZW5zZSwg
-YXQgbGVhc3QgZm9yIHRoZSB0aW1lIGJlaW5nLgoKPiBTbyBpcyB0aGVyZSBhbnl0aGluZyB0aGF0
-IHdpbGwgcmVxdWlyZSBkeW5hbWljIHBoYW5kbGVzIGluIHRoZSBmdXR1cmU/Cj4gVGhpcyB2ZXJz
-aW9uIHByb3Bvc2VkIGhlcmUgY2FuJ3QgcmVhbGx5IGNvcGUgd2l0aCB0aGVtIGFueXdheSBhbmQg
-aW4gdGhlCj4gbW9tZW50IGl0J3MganVzdCBhYm91dCBfb25lXyBHSUMgcGhhbmRsZSBhbmQgX29u
-ZV8gSVRTIHBoYW5kbGUsIHNvIGEKPiBzdGF0aWMgYXNzaWdubWVudCBpcyBtdWNoIHNpbXBsZXIu
-Cj4KPiBXaWxsIHdlIG5lZWQgbXVsdGlwbGUgSVRTZXMgZm9yIGRldmljZSBwYXNzdGhyb3VnaD8g
-T3Igd291bGQgaXQganVzdCBiZQo+IG9uZSBJVFMgZm9yIGFsbCBoYXJkd2FyZSBkZXZpY2VzIGFu
-ZCBvbmUgZm9yIGVtdWxhdGVkIHZpcnRpbz8KCkhhdmluZyBtdWx0aXBsZSBJVFNlcyBpcyBkZWZp
-bml0ZWx5IG9uIHRoZSBjYXJkcyAocGFzcy10aHJvdWdoIGFuZAplbXVsYXRlZCBkZXZpY2VzIGFy
-ZSBvbmUgY2FzZSwgd2hlcmUgb25jZSBvZiB0aGVtIHdvdWxkIGJlIGRyaXZlbiB1c2luZwpHSUN2
-NCBhbmQgdGhlIG90aGVyIGJlIHB1cmVseSB2aXJ0dWFsKS4gVGhpcyBwcm9iYWJseSB3b3VsZCB0
-cmFuc2xhdGUKaW50byBoYXZpbmcgbXVsdGlwbGUgUENJZSBob3N0IGNvbnRyb2xsZXJzLgoKU28g
-bWF5YmUgd2UgZG9uJ3QgbmVlZCB0aGUgZnVsbCBicmVhdGggb2YgYW4gYWxsb2NhdG9yIHlldCwg
-YnV0IEkgcmVja29uCnRoYXQgd2Ugc2hvdWxkbid0IHByZXRlbmQgdGhhdCB0aGVyZSBpcyBubyB1
-c2UgZm9yIGl0LCBmb3JldmVyLgoKVGhhbmtzLAoKCU0uCi0tIApKYXp6IGlzIG5vdCBkZWFkLCBp
-dCBqdXN0IHNtZWxsIGZ1bm55LgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5l
-ZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Will Deacon <will.deacon@arm.com> writes:
+
+> On Wed, Feb 01, 2017 at 05:02:43PM +0000, Punit Agrawal wrote:
+>> Will Deacon <will.deacon@arm.com> writes:
+>> 
+>> > On Wed, Jan 25, 2017 at 08:39:43PM +0100, Christoffer Dall wrote:
+>> >> On Wed, Jan 25, 2017 at 10:52:31AM -0500, Christopher Covington wrote:
+>> >> > Refactor the KVM code to use the __tlbi macros, which will allow an errata
+>> >> > workaround that repeats tlbi dsb sequences to only change one location.
+>> >> > This is not intended to change the generated assembly and comparing before
+>> >> > and after vmlinux objdump shows no functional changes.
+>> >> > 
+>> >> > Signed-off-by: Christopher Covington <cov@codeaurora.org>
+>> >> 
+>> >> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+>> >
+>> > Thanks, I'll queue this one via arm64.
+>> 
+>> I just noticed this patch but there's been a similar patch from Mark
+>> that I've been carrying as part of the KVM TLB monitoring series[0].
+>> 
+>> [0] http://www.mail-archive.com/kvmarm@lists.cs.columbia.edu/msg09359.html
+>
+> Well I've already queued the one from Christopher. It's weird that Mark's
+> version appears to miss the local VMID case (but it does have the
+> flush_icache_all I wanted :).
+>
+> Anyway, I'm not reverting anything, so you'll need to rebase when this
+> lot lands in mainline.
+
+Sure. I'll drop the patch the next time around.
+
+The patch is unrelated to that series and should've gone in when
+we introduced the __tlbi() macro but got left out somehow.
+
+>
+> Will
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
