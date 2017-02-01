@@ -1,40 +1,39 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC v3 08/10] KVM: arm/arm64: Set up a background timer for the
- physical timer emulation
-Date: Wed,  1 Feb 2017 12:43:08 -0500
-Message-ID: <1485970990-13775-9-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC v3 09/10] KVM: arm64: Add the EL1 physical timer access handler
+Date: Wed,  1 Feb 2017 12:43:09 -0500
+Message-ID: <1485970990-13775-10-git-send-email-jintack@cs.columbia.edu>
 References: <1485970990-13775-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6397A40A80
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 43AE440C75
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OSGqTzljRSah for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Feb 2017 12:43:01 -0500 (EST)
-Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
- [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BEA7A40C17
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:01 -0500 (EST)
+ with ESMTP id 4BW3uBhUbqgT for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Feb 2017 12:43:03 -0500 (EST)
+Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
+ [128.59.72.39])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 18BC240AF9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:03 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v11He8D1001118
- for <kvmarm@lists.cs.columbia.edu>; Wed, 1 Feb 2017 12:43:23 -0500
+ by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v11He8qR030678
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 1 Feb 2017 12:43:24 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id 4DCDC82
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:23 -0500 (EST)
-Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
- [128.59.72.15]) by hazelnut (Postfix) with ESMTP id 2BB2882
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:23 -0500 (EST)
+ by hazelnut (Postfix) with ESMTP id 9DD7A80
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:24 -0500 (EST)
+Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
+ [128.59.72.16]) by hazelnut (Postfix) with ESMTP id 7CE5280
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 12:43:24 -0500 (EST)
 Received: from mail-qt0-f199.google.com (mail-qt0-f199.google.com
  [209.85.216.199])
- by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v11HhNw7045001
+ by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v11HhODh018486
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Wed, 1 Feb 2017 12:43:23 -0500
-Received: by mail-qt0-f199.google.com with SMTP id c25so153961079qtg.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Feb 2017 09:43:23 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 1 Feb 2017 12:43:24 -0500
+Received: by mail-qt0-f199.google.com with SMTP id x49so398065319qtc.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Feb 2017 09:43:24 -0800 (PST)
 In-Reply-To: <1485970990-13775-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -48,69 +47,67 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: pbonzini@redhat.com, rkrcmar@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, andre.przywara@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Set a background timer for the EL1 physical timer emulation while VMs
-are running, so that VMs get the physical timer interrupts in a timely
-manner.
-
-Schedule the background timer on entry to the VM and cancel it on exit.
-This would not have any performance impact to the guest OSes that
-currently use the virtual timer since the physical timer is always not
-enabled.
+KVM traps on the EL1 phys timer accesses from VMs, but it doesn't handle
+those traps. This results in terminating VMs. Instead, set a handler for
+the EL1 phys timer access, and inject an undefined exception as an
+intermediate step.
 
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- virt/kvm/arm/arch_timer.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 89bdb79..1806e5e 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -229,6 +229,22 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	return 0;
- }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index caa47ce..1cd3464 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -820,6 +820,30 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
+ 	  access_pmu_evtyper, reset_unknown, (PMEVTYPER0_EL0 + n), }
  
-+/* Schedule the background timer for the emulated timer. */
-+static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
-+			      struct arch_timer_context *timer_ctx)
++static bool access_cntp_tval(struct kvm_vcpu *vcpu,
++		struct sys_reg_params *p,
++		const struct sys_reg_desc *r)
 +{
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++	kvm_inject_undefined(vcpu);
++	return true;
++}
 +
-+	if (kvm_timer_should_fire(timer_ctx))
-+		return;
++static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
++		struct sys_reg_params *p,
++		const struct sys_reg_desc *r)
++{
++	kvm_inject_undefined(vcpu);
++	return true;
++}
 +
-+	if (!kvm_timer_irq_can_fire(timer_ctx))
-+		return;
-+
-+	/*  The timer has not yet expired, schedule a background timer */
-+	timer_arm(timer, kvm_timer_compute_delta(timer_ctx));
++static bool access_cntp_cval(struct kvm_vcpu *vcpu,
++		struct sys_reg_params *p,
++		const struct sys_reg_desc *r)
++{
++	kvm_inject_undefined(vcpu);
++	return true;
 +}
 +
  /*
-  * Schedule the background timer before calling kvm_vcpu_block, so that this
-  * thread is removed from its waitqueue and made runnable when there's a timer
-@@ -286,6 +302,9 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	if (kvm_timer_update_state(vcpu))
- 		return;
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -1029,6 +1053,16 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b011),
+ 	  NULL, reset_unknown, TPIDRRO_EL0 },
  
-+	/* Set the background timer for the physical timer emulation. */
-+	kvm_timer_emulate(vcpu, vcpu_ptimer(vcpu));
++	/* CNTP_TVAL_EL0 */
++	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b000),
++	  access_cntp_tval },
++	/* CNTP_CTL_EL0 */
++	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b001),
++	  access_cntp_ctl },
++	/* CNTP_CVAL_EL0 */
++	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b010),
++	  access_cntp_cval },
 +
- 	/*
- 	* If we enter the guest with the virtual input level to the VGIC
- 	* asserted, then we have already told the VGIC what we need to, and
-@@ -348,7 +367,11 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 
--	BUG_ON(timer_is_armed(timer));
-+	/*
-+	 * This is to cancel the background timer for the physical timer
-+	 * emulation if it is set.
-+	 */
-+	timer_disarm(timer);
- 
- 	/*
- 	 * The guest could have modified the timer registers or the timer
+ 	/* PMEVCNTRn_EL0 */
+ 	PMU_PMEVCNTR_EL0(0),
+ 	PMU_PMEVCNTR_EL0(1),
 -- 
 1.9.1
