@@ -1,7 +1,7 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
+From: Will Deacon <will.deacon@arm.com>
 Subject: Re: [PATCH v4 2/4] arm64: Work around Falkor erratum 1003
-Date: Wed, 1 Feb 2017 17:51:41 +0000
-Message-ID: <20170201175140.GG26507@e104818-lin.cambridge.arm.com>
+Date: Wed, 1 Feb 2017 17:59:48 +0000
+Message-ID: <20170201175947.GL8177@arm.com>
 References: <20170125155232.10277-1-cov@codeaurora.org>
  <20170125155232.10277-2-cov@codeaurora.org>
  <20170131123735.GD11191@leverpostej>
@@ -18,8 +18,8 @@ Return-path: <linux-doc-owner@vger.kernel.org>
 Content-Disposition: inline
 In-Reply-To: <20170201174934.GF26507@e104818-lin.cambridge.arm.com>
 Sender: linux-doc-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Mark Langsdorf <mlangsdo@redhat.com>, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Jon Masters <jcm@redhat.com>, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, shankerd@codeaurora.org, Christopher Covington <cov@codeaurora.org>, Neil Leeder <nleeder@codeaurora.org>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Mark Langsdorf <mlangsdo@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Jon Masters <jcm@redhat.com>, timur@codeaurora.org, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Christopher Covington <cov@codeaurora.org>, Paolo Bonzini <pbonzini@redhat.com>, Neil Leeder <nleeder@codeaurora.org>, shankerd@codeaurora.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Wed, Feb 01, 2017 at 05:49:34PM +0000, Catalin Marinas wrote:
@@ -59,7 +59,12 @@ On Wed, Feb 01, 2017 at 05:49:34PM +0000, Catalin Marinas wrote:
 > > That makes it look like hardware-PAN is the cause of the erratum.
 > 
 > With the right Kconfig comment we could make this clearer.
-> 
+
+It's not just a comment though, the kconfig option for the workaround
+will disappear from menuconfig as long as the dependencies aren't met.
+The dependency is really that SW_PAN depends on !ERRATUM_1003, but that
+doesn't work for the distributions.
+
 > > Maybe
 > > just select ARM64_PAN if the erratum workaround is selected, then
 > > runtime warning if we find that the h/w doesn't have PAN but does have
@@ -70,12 +75,15 @@ On Wed, Feb 01, 2017 at 05:49:34PM +0000, Catalin Marinas wrote:
 > a dependency. It's more like if you do need a PAN, make sure you only
 > use the hw one.
 
-Alternatively, your select idea could be refined to:
+True, in the case that all PAN options are disabled we still want this
+to work. How about:
 
-	select ARM64_PAN if ARM64_SW_TTBR0_PAN
+  select ARM64_PAN if ARM64_SW_TTBR0_PAN
 
-but we still need a proper comment as people would wonder what this is
-for.
+?
 
--- 
-Catalin
+In fact, what's the reason for supporting SW_PAN and ARM64_PAN as a
+config combination? Why not just have "PAN" that enables them both and
+uses the hardware feature if it's there?
+
+Will
