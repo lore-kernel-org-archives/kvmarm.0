@@ -1,29 +1,29 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC v3 07/10] KVM: arm/arm64: Set a background timer to the
- earliest timer expiration
-Date: Thu, 2 Feb 2017 11:30:53 +0100
-Message-ID: <20170202103053.GF27852@cbox>
+Subject: Re: [RFC v3 09/10] KVM: arm64: Add the EL1 physical timer access
+ handler
+Date: Thu, 2 Feb 2017 11:31:03 +0100
+Message-ID: <20170202103103.GH27852@cbox>
 References: <1485970990-13775-1-git-send-email-jintack@cs.columbia.edu>
- <1485970990-13775-8-git-send-email-jintack@cs.columbia.edu>
+ <1485970990-13775-10-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C510240284
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 05:30:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D3EC40A66
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 05:30:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fv11pXqWGA7o for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Feb 2017 05:30:35 -0500 (EST)
-Received: from mail-lf0-f44.google.com (mail-lf0-f44.google.com
- [209.85.215.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5EB72401A1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 05:30:35 -0500 (EST)
-Received: by mail-lf0-f44.google.com with SMTP id x1so6111840lff.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Feb 2017 02:30:57 -0800 (PST)
+ with ESMTP id VSBKwOWXYTNt for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Feb 2017 05:30:45 -0500 (EST)
+Received: from mail-lf0-f41.google.com (mail-lf0-f41.google.com
+ [209.85.215.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B9F840296
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 05:30:45 -0500 (EST)
+Received: by mail-lf0-f41.google.com with SMTP id z134so6065777lff.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Feb 2017 02:31:07 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1485970990-13775-8-git-send-email-jintack@cs.columbia.edu>
+In-Reply-To: <1485970990-13775-10-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,9 +37,11 @@ To: Jintack Lim <jintack@cs.columbia.edu>
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 01, 2017 at 12:43:07PM -0500, Jintack Lim wrote:
-> When scheduling a background timer, consider both of the virtual and
-> physical timer and pick the earliest expiration time.
+On Wed, Feb 01, 2017 at 12:43:09PM -0500, Jintack Lim wrote:
+> KVM traps on the EL1 phys timer accesses from VMs, but it doesn't handle
+> those traps. This results in terminating VMs. Instead, set a handler for
+> the EL1 phys timer access, and inject an undefined exception as an
+> intermediate step.
 > 
 > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 
