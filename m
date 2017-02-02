@@ -1,7 +1,7 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvmtool PATCH v9 09/15] arm: allow creation of an MSI register frame region
-Date: Thu,  2 Feb 2017 16:32:17 +0000
-Message-ID: <20170202163223.15372-10-andre.przywara@arm.com>
+Subject: [kvmtool PATCH v9 02/15] arm: use static DT phandle for the GIC
+Date: Thu,  2 Feb 2017 16:32:10 +0000
+Message-ID: <20170202163223.15372-3-andre.przywara@arm.com>
 References: <20170202163223.15372-1-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170202163223.15372-1-andre.przywara@arm.com>
@@ -10,143 +10,171 @@ To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
 Cc: Vladimir Murzin <vladimir.murzin@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICv3 ITS expects a separate 64K page to hold ITS registers.
-Add a function to reserve such a page in the guest's I/O memory and
-use that for the ITS vGIC type.
+As KVM supports only onc (v)GIC per guest and it's hard to imagine that
+we will ever need more than that, lets simplify the FDT generation by
+not passing that single, constant phandle around.
+Let's just reference that one global symbol from enum phandles instead.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/gic.c                    | 63 ++++++++++++++++++++++++++++++++++++++++++++
- arm/include/arm-common/gic.h |  1 +
- 2 files changed, 64 insertions(+)
+ arm/aarch32/arm-cpu.c                 | 4 ++--
+ arm/aarch64/arm-cpu.c                 | 5 +++--
+ arm/fdt.c                             | 6 +++---
+ arm/gic.c                             | 4 ++--
+ arm/include/arm-common/gic.h          | 2 +-
+ arm/include/arm-common/kvm-cpu-arch.h | 3 +--
+ arm/include/arm-common/pci.h          | 2 +-
+ arm/pci.c                             | 4 ++--
+ 8 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 8479b89..78fd583 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -8,10 +8,13 @@
+diff --git a/arm/aarch32/arm-cpu.c b/arm/aarch32/arm-cpu.c
+index d8d6293..27a8e17 100644
+--- a/arm/aarch32/arm-cpu.c
++++ b/arm/aarch32/arm-cpu.c
+@@ -8,11 +8,11 @@
  #include <linux/byteorder.h>
- #include <linux/kernel.h>
- #include <linux/kvm.h>
-+#include <linux/sizes.h>
+ #include <linux/types.h>
  
- static int gic_fd = -1;
- static u64 gic_redists_base;
- static u64 gic_redists_size;
-+static u64 gic_msi_base;
-+static u64 gic_msi_size = 0;
- 
- int irqchip_parser(const struct option *opt, const char *arg, int unset)
+-static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
++static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
  {
-@@ -29,6 +32,56 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
- 	return 0;
+ 	int timer_interrupts[4] = {13, 14, 11, 10};
+ 
+-	gic__generate_fdt_nodes(fdt, gic_phandle, IRQCHIP_GICV2);
++	gic__generate_fdt_nodes(fdt, IRQCHIP_GICV2);
+ 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
  }
  
-+static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr)
-+{
-+	struct kvm_create_device its_device = {
-+		.type = KVM_DEV_TYPE_ARM_VGIC_ITS,
-+		.flags	= 0,
-+	};
-+	struct kvm_device_attr its_attr = {
-+		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
-+		.attr	= KVM_VGIC_ITS_ADDR_TYPE,
-+		.addr	= (u64)(unsigned long)&its_frame_addr,
-+	};
-+	struct kvm_device_attr its_init_attr = {
-+		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
-+		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
-+	};
-+	int err;
-+
-+	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &its_device);
-+	if (err) {
-+		fprintf(stderr,
-+			"GICv3 ITS requested, but kernel does not support it.\n");
-+		fprintf(stderr, "Try --irqchip=gicv3 instead\n");
-+		return err;
-+	}
-+
-+	err = ioctl(its_device.fd, KVM_HAS_DEVICE_ATTR, &its_attr);
-+	if (err) {
-+		close(its_device.fd);
-+		its_device.fd = -1;
-+		return err;
-+	}
-+
-+	err = ioctl(its_device.fd, KVM_SET_DEVICE_ATTR, &its_attr);
-+	if (err)
-+		return err;
-+
-+	return ioctl(its_device.fd, KVM_SET_DEVICE_ATTR, &its_init_attr);
-+}
-+
-+static int gic__create_msi_frame(struct kvm *kvm, enum irqchip_type type,
-+				 u64 msi_frame_addr)
-+{
-+	switch (type) {
-+	case IRQCHIP_GICV3_ITS:
-+		return gic__create_its_frame(kvm, msi_frame_addr);
-+	default:	/* No MSI frame needed */
-+		return 0;
-+	}
-+}
-+
- static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+index c21c0bb..d7572b7 100644
+--- a/arm/aarch64/arm-cpu.c
++++ b/arm/aarch64/arm-cpu.c
+@@ -10,10 +10,11 @@
+ #include <linux/byteorder.h>
+ #include <linux/types.h>
+ 
+-static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
++static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
  {
- 	int err;
-@@ -58,6 +111,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- 		dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
- 		break;
- 	case IRQCHIP_GICV3:
-+	case IRQCHIP_GICV3_ITS:
- 		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
- 		dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
- 		break;
-@@ -73,6 +127,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- 	case IRQCHIP_GICV2:
- 		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
- 		break;
-+	case IRQCHIP_GICV3_ITS:
- 	case IRQCHIP_GICV3:
- 		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
- 		break;
-@@ -84,6 +139,10 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- 	if (err)
- 		goto out_err;
- 
-+	err = gic__create_msi_frame(kvm, type, gic_msi_base);
-+	if (err)
-+		goto out_err;
+ 	int timer_interrupts[4] = {13, 14, 11, 10};
+-	gic__generate_fdt_nodes(fdt, gic_phandle, kvm->cfg.arch.irqchip);
 +
- 	return 0;
++	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
+ 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
+ 	pmu__generate_fdt_nodes(fdt, kvm);
+ }
+diff --git a/arm/fdt.c b/arm/fdt.c
+index bcd0c3a..f90207a 100644
+--- a/arm/fdt.c
++++ b/arm/fdt.c
+@@ -124,7 +124,7 @@ static int setup_fdt(struct kvm *kvm)
+ 						     kvm->arch.dtb_guest_start);
+ 	void (*generate_mmio_fdt_nodes)(void *, struct device_header *,
+ 					void (*)(void *, u8, enum irq_type));
+-	void (*generate_cpu_peripheral_fdt_nodes)(void *, struct kvm *, u32)
++	void (*generate_cpu_peripheral_fdt_nodes)(void *, struct kvm *)
+ 					= kvm->cpus[0]->generate_fdt_nodes;
  
- out_err:
-@@ -127,9 +186,13 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
- 	switch (type) {
- 	case IRQCHIP_GICV2:
- 		break;
-+	case IRQCHIP_GICV3_ITS:
-+		gic_msi_size = KVM_VGIC_V3_ITS_SIZE;
-+		/* fall through */
- 	case IRQCHIP_GICV3:
- 		gic_redists_size = kvm->cfg.nrcpus * ARM_GIC_REDIST_SIZE;
- 		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
-+		gic_msi_base = gic_redists_base - gic_msi_size;
- 		break;
- 	default:
- 		return -ENODEV;
+ 	/* Create new tree without a reserve map */
+@@ -165,7 +165,7 @@ static int setup_fdt(struct kvm *kvm)
+ 	/* CPU and peripherals (interrupt controller, timers, etc) */
+ 	generate_cpu_nodes(fdt, kvm);
+ 	if (generate_cpu_peripheral_fdt_nodes)
+-		generate_cpu_peripheral_fdt_nodes(fdt, kvm, PHANDLE_GIC);
++		generate_cpu_peripheral_fdt_nodes(fdt, kvm);
+ 
+ 	/* Virtio MMIO devices */
+ 	dev_hdr = device__first_dev(DEVICE_BUS_MMIO);
+@@ -184,7 +184,7 @@ static int setup_fdt(struct kvm *kvm)
+ 	}
+ 
+ 	/* PCI host controller */
+-	pci__generate_fdt_nodes(fdt, PHANDLE_GIC);
++	pci__generate_fdt_nodes(fdt);
+ 
+ 	/* PSCI firmware */
+ 	_FDT(fdt_begin_node(fdt, "psci"));
+diff --git a/arm/gic.c b/arm/gic.c
+index d6d6dd0..ff032d2 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -194,7 +194,7 @@ static int gic__init_gic(struct kvm *kvm)
+ }
+ late_init(gic__init_gic)
+ 
+-void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
++void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
+ {
+ 	const char *compatible;
+ 	u64 reg_prop[] = {
+@@ -222,7 +222,7 @@ void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
+ 	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
+ 	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
+ 	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
+-	_FDT(fdt_property_cell(fdt, "phandle", phandle));
++	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_GIC));
+ 	_FDT(fdt_end_node(fdt));
+ }
+ 
 diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
-index b43a180..433dd23 100644
+index 4fde5ac..b43a180 100644
 --- a/arm/include/arm-common/gic.h
 +++ b/arm/include/arm-common/gic.h
-@@ -24,6 +24,7 @@
- enum irqchip_type {
- 	IRQCHIP_GICV2,
- 	IRQCHIP_GICV3,
-+	IRQCHIP_GICV3_ITS,
+@@ -30,6 +30,6 @@ struct kvm;
+ 
+ int gic__alloc_irqnum(void);
+ int gic__create(struct kvm *kvm, enum irqchip_type type);
+-void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type);
++void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type);
+ 
+ #endif /* ARM_COMMON__GIC_H */
+diff --git a/arm/include/arm-common/kvm-cpu-arch.h b/arm/include/arm-common/kvm-cpu-arch.h
+index 8a6a6e7..923d2c4 100644
+--- a/arm/include/arm-common/kvm-cpu-arch.h
++++ b/arm/include/arm-common/kvm-cpu-arch.h
+@@ -25,8 +25,7 @@ struct kvm_cpu {
+ 
+ 	struct kvm_coalesced_mmio_ring	*ring;
+ 
+-	void		(*generate_fdt_nodes)(void *fdt, struct kvm* kvm,
+-					      u32 gic_phandle);
++	void		(*generate_fdt_nodes)(void *fdt, struct kvm* kvm);
  };
  
- struct kvm;
+ struct kvm_arm_target {
+diff --git a/arm/include/arm-common/pci.h b/arm/include/arm-common/pci.h
+index ee87725..9008a0e 100644
+--- a/arm/include/arm-common/pci.h
++++ b/arm/include/arm-common/pci.h
+@@ -1,6 +1,6 @@
+ #ifndef ARM_COMMON__PCI_H
+ #define ARM_COMMON__PCI_H
+ 
+-void pci__generate_fdt_nodes(void *fdt, u32 gic_phandle);
++void pci__generate_fdt_nodes(void *fdt);
+ 
+ #endif /* ARM_COMMON__PCI_H */
+diff --git a/arm/pci.c b/arm/pci.c
+index 99a8130..2bc718e 100644
+--- a/arm/pci.c
++++ b/arm/pci.c
+@@ -21,7 +21,7 @@ struct of_interrupt_map_entry {
+ 	struct of_gic_irq		gic_irq;
+ } __attribute__((packed));
+ 
+-void pci__generate_fdt_nodes(void *fdt, u32 gic_phandle)
++void pci__generate_fdt_nodes(void *fdt)
+ {
+ 	struct device_header *dev_hdr;
+ 	struct of_interrupt_map_entry irq_map[OF_PCI_IRQ_MAP_MAX];
+@@ -83,7 +83,7 @@ void pci__generate_fdt_nodes(void *fdt, u32 gic_phandle)
+ 				},
+ 				.pci_pin	= cpu_to_fdt32(pin),
+ 			},
+-			.gic_phandle	= cpu_to_fdt32(gic_phandle),
++			.gic_phandle	= cpu_to_fdt32(PHANDLE_GIC),
+ 			.gic_irq = {
+ 				.type	= cpu_to_fdt32(GIC_FDT_IRQ_TYPE_SPI),
+ 				.num	= cpu_to_fdt32(irq - GIC_SPI_IRQ_BASE),
 -- 
 2.9.0
