@@ -1,145 +1,27 @@
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH V8 09/10] trace, ras: add ARM processor error trace event
-Date: Wed, 1 Feb 2017 22:15:44 -0500
-Message-ID: <20170201221544.3d8651e5@grimm.local.home>
-References: <1485969413-23577-1-git-send-email-tbaicar@codeaurora.org>
- <1485969413-23577-10-git-send-email-tbaicar@codeaurora.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [RFC v3 02/10] KVM: arm/arm64: Move cntvoff to each timer context
+Date: Thu, 2 Feb 2017 11:03:39 +0100
+Message-ID: <20170202100339.GA27852@cbox>
+References: <1485970990-13775-1-git-send-email-jintack@cs.columbia.edu>
+ <1485970990-13775-3-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8723C40BD8
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 22:15:31 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YpfvSewZimQY for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Feb 2017 22:15:30 -0500 (EST)
-Received: from smtprelay.hostedemail.com (smtprelay0049.hostedemail.com
- [216.40.44.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D21740B40
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Feb 2017 22:15:30 -0500 (EST)
-In-Reply-To: <1485969413-23577-10-git-send-email-tbaicar@codeaurora.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1485970990-13775-3-git-send-email-jintack@cs.columbia.edu>
+Sender: kvm-owner@vger.kernel.org
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: pbonzini@redhat.com, rkrcmar@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, andre.przywara@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed,  1 Feb 2017 10:16:52 -0700
-Tyler Baicar <tbaicar@codeaurora.org> wrote:
-
-> Currently there are trace events for the various RAS
-> errors with the exception of ARM processor type errors.
-> Add a new trace event for such errors so that the user
-> will know when they occur. These trace events are
-> consistent with the ARM processor error section type
-> defined in UEFI 2.6 spec section N.2.4.4.
+On Wed, Feb 01, 2017 at 12:43:02PM -0500, Jintack Lim wrote:
+> Make cntvoff per each timer context. This is helpful to abstract kvm
+> timer functions to work with timer context without considering timer
+> types (e.g. physical timer or virtual timer).
 > 
-> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
-> Acked-by: Steven Rostedt <rostedt@goodmis.org>
-> ---
->  drivers/acpi/apei/ghes.c    |  7 ++++++-
->  drivers/firmware/efi/cper.c |  1 +
->  drivers/ras/ras.c           |  1 +
->  include/ras/ras_event.h     | 34 ++++++++++++++++++++++++++++++++++
->  4 files changed, 42 insertions(+), 1 deletion(-)
+> This also would pave the way for ever doing adjustments of the cntvoff
+> on a per-CPU basis if that should ever make sense.
 > 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index a989345..013faf0 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -512,7 +512,12 @@ static void ghes_do_proc(struct ghes *ghes,
->  
->  		}
->  #endif
-> -		else {
-> +		else if (!uuid_le_cmp(sec_type, CPER_SEC_PROC_ARM)) {
-> +			struct cper_sec_proc_arm *arm_err;
-> +
-> +			arm_err = acpi_hest_generic_data_payload(gdata);
-> +			trace_arm_event(arm_err);
+> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 
-According to the kbuild failure, I'm guessing this file requires a:
-
- #include <ras/ras_event.h>
-
--- Steve
-
-> +		} else {
->  			void *unknown_err = acpi_hest_generic_data_payload(gdata);
->  			trace_unknown_sec_event(&sec_type,
->  					fru_id, fru_text, sec_sev,
-> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
-> index 48cb8ee..0ec678e 100644
-> --- a/drivers/firmware/efi/cper.c
-> +++ b/drivers/firmware/efi/cper.c
-> @@ -35,6 +35,7 @@
->  #include <linux/printk.h>
->  #include <linux/bcd.h>
->  #include <acpi/ghes.h>
-> +#include <ras/ras_event.h>
->  
->  #define INDENT_SP	" "
->  
-> diff --git a/drivers/ras/ras.c b/drivers/ras/ras.c
-> index fb2500b..8ba5a94 100644
-> --- a/drivers/ras/ras.c
-> +++ b/drivers/ras/ras.c
-> @@ -28,3 +28,4 @@ static int __init ras_init(void)
->  #endif
->  EXPORT_TRACEPOINT_SYMBOL_GPL(mc_event);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(unknown_sec_event);
-> +EXPORT_TRACEPOINT_SYMBOL_GPL(arm_event);
-> diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
-> index 5861b6f..b36db48 100644
-> --- a/include/ras/ras_event.h
-> +++ b/include/ras/ras_event.h
-> @@ -162,6 +162,40 @@
->  );
->  
->  /*
-> + * ARM Processor Events Report
-> + *
-> + * This event is generated when hardware detects an ARM processor error
-> + * has occurred. UEFI 2.6 spec section N.2.4.4.
-> + */
-> +TRACE_EVENT(arm_event,
-> +
-> +	TP_PROTO(const struct cper_sec_proc_arm *proc),
-> +
-> +	TP_ARGS(proc),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(u64, mpidr)
-> +		__field(u64, midr)
-> +		__field(u32, running_state)
-> +		__field(u32, psci_state)
-> +		__field(u8, affinity)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->affinity = proc->affinity_level;
-> +		__entry->mpidr = proc->mpidr;
-> +		__entry->midr = proc->midr;
-> +		__entry->running_state = proc->running_state;
-> +		__entry->psci_state = proc->psci_state;
-> +	),
-> +
-> +	TP_printk("affinity level: %d; MPIDR: %016llx; MIDR: %016llx; "
-> +		  "running state: %d; PSCI state: %d",
-> +		  __entry->affinity, __entry->mpidr, __entry->midr,
-> +		  __entry->running_state, __entry->psci_state)
-> +);
-> +
-> +/*
->   * Unknown Section Report
->   *
->   * This event is generated when hardware detected a hardware
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
