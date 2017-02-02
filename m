@@ -1,106 +1,144 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC v3 00/10] Provide the EL1 physical timer to the VM
-Date: Thu, 2 Feb 2017 16:08:44 +0100
-Message-ID: <CAMJs5B89qBe9NRULeFeVxH6f=BQ-NdEE+1i2DhYJwEmJtZe9mQ@mail.gmail.com>
-References: <1485970990-13775-1-git-send-email-jintack@cs.columbia.edu>
- <20170202123104.GJ27852@cbox>
- <CAHyh4xhsqS6CijRysFvg+NqGo0rBQU45OhAaZUuHDm4M0JufTg@mail.gmail.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v8 01/16] FDT: introduce global phandle allocation
+Date: Thu, 2 Feb 2017 16:31:26 +0000
+Message-ID: <a139b765-90eb-ce19-dc54-213c777e4a3e@arm.com>
+References: <20161104173203.21168-1-andre.przywara@arm.com>
+ <20161104173203.21168-2-andre.przywara@arm.com>
+ <d1dc4e68-66e1-85d1-f5d1-5743e5172409@arm.com>
+ <4c43b500-c0c8-cb25-27f4-f6d24233c088@arm.com>
+ <878tppkf5v.fsf@on-the-bus.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FFF0401A1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 10:08:24 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vl+5V2iOED1B for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Feb 2017 10:08:23 -0500 (EST)
-Received: from mail-yw0-f170.google.com (mail-yw0-f170.google.com
- [209.85.161.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0AC2F40194
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 10:08:22 -0500 (EST)
-Received: by mail-yw0-f170.google.com with SMTP id l19so12900635ywc.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Feb 2017 07:08:45 -0800 (PST)
-In-Reply-To: <CAHyh4xhsqS6CijRysFvg+NqGo0rBQU45OhAaZUuHDm4M0JufTg@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: KVM General <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Andre Przywara <andre.przywara@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <878tppkf5v.fsf@on-the-bus.cambridge.arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Vladimir Murzin <vladimir.murzin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 2, 2017 at 3:51 PM, Jintack Lim <jintack@cs.columbia.edu> wrote:
-> On Thu, Feb 2, 2017 at 7:31 AM, Christoffer Dall <cdall@linaro.org> wrote:
->> Hi Jintack,
+Hi Marc,
+
+On 01/02/17 17:13, Marc Zyngier wrote:
+> On Wed, Feb 01 2017 at  4:44:19 pm GMT, André Przywara <andre.przywara@arm.com> wrote:
+> 
+> Hi Andre,
+> 
+>> Hi Marc, Will,
 >>
->> On Wed, Feb 01, 2017 at 12:43:00PM -0500, Jintack Lim wrote:
->>> The ARM architecture defines the EL1 physical timer and the virtual timer,
->>> and it is reasonable for an OS to expect to be able to access both.
->>> However, the current KVM implementation does not provide the EL1 physical
->>> timer to VMs but terminates VMs on access to the timer.
+>> On 09/12/16 12:03, Marc Zyngier wrote:
+>>> On 04/11/16 17:31, Andre Przywara wrote:
+>>>> Allocating an FDT phandle (a unique identifier) using a static
+>>>> variable in a static inline function defined in a header file works
+>>>> only if all users are in the same source file. So trying to allocate
+>>>> a handle from two different compilation units fails.
+>>>> Introduce global phandle allocation and reference code to properly
+>>>> allocate unique phandles.
+>>>>
+>>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>>>> ---
+>>>>  Makefile          |  1 +
+>>>>  arm/fdt.c         |  2 +-
+>>>>  arm/gic.c         |  2 +-
+>>>>  include/kvm/fdt.h | 10 +++++-----
+>>>>  kvm-fdt.c         | 26 ++++++++++++++++++++++++++
+>>>>  5 files changed, 34 insertions(+), 7 deletions(-)
+>>>>  create mode 100644 kvm-fdt.c
+>>>>
+>>>> diff --git a/Makefile b/Makefile
+>>>> index 1f0196f..e4a4002 100644
+>>>> --- a/Makefile
+>>>> +++ b/Makefile
+>>>> @@ -98,6 +98,7 @@ OBJS	+= kvm-ipc.o
+>>>>  OBJS	+= builtin-sandbox.o
+>>>>  OBJS	+= virtio/mmio.o
+>>>>  OBJS	+= hw/i8042.o
+>>>> +OBJS	+= kvm-fdt.o
+>>>>  
+>>>>  # Translate uname -m into ARCH string
+>>>>  ARCH ?= $(shell uname -m | sed -e s/i.86/i386/ -e s/ppc.*/powerpc/ \
+>>>> diff --git a/arm/fdt.c b/arm/fdt.c
+>>>> index 381d48f..8bcfffb 100644
+>>>> --- a/arm/fdt.c
+>>>> +++ b/arm/fdt.c
+>>>> @@ -114,7 +114,7 @@ static int setup_fdt(struct kvm *kvm)
+>>>>  {
+>>>>  	struct device_header *dev_hdr;
+>>>>  	u8 staging_fdt[FDT_MAX_SIZE];
+>>>> -	u32 gic_phandle		= fdt__alloc_phandle();
+>>>> +	u32 gic_phandle		= fdt__get_phandle(PHANDLE_GIC);
+>>>>  	u64 mem_reg_prop[]	= {
+>>>>  		cpu_to_fdt64(kvm->arch.memory_guest_start),
+>>>>  		cpu_to_fdt64(kvm->ram_size),
+>>>> diff --git a/arm/gic.c b/arm/gic.c
+>>>> index d6d6dd0..b60437e 100644
+>>>> --- a/arm/gic.c
+>>>> +++ b/arm/gic.c
+>>>> @@ -222,7 +222,7 @@ void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
+>>>>  	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
+>>>>  	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
+>>>>  	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
+>>>> -	_FDT(fdt_property_cell(fdt, "phandle", phandle));
+>>>> +	_FDT(fdt_property_cell(fdt, "phandle", fdt__get_phandle(PHANDLE_GIC)));
+>>>>  	_FDT(fdt_end_node(fdt));
+>>>>  }
+>>>>  
+>>>> diff --git a/include/kvm/fdt.h b/include/kvm/fdt.h
+>>>> index 53d85a4..cd2bb72 100644
+>>>> --- a/include/kvm/fdt.h
+>>>> +++ b/include/kvm/fdt.h
+>>>> @@ -8,6 +8,10 @@
+>>>>  #include <linux/types.h>
+>>>>  
+>>>>  #define FDT_MAX_SIZE	0x10000
+>>>> +#define FDT_INVALID_PHANDLE 0
+>>>> +#define FDT_IS_VALID_PHANDLE(phandle) ((phandle) != FDT_INVALID_PHANDLE)
+>>>> +
+>>>> +enum phandles {PHANDLE_GIC, PHANDLES_MAX};
 >>>
->>> This patch series enables VMs to use the EL1 physical timer through
->>> trap-and-emulate.  The KVM host emulates each EL1 physical timer register
->>> access and sets up the background timer accordingly.  When the background
->>> timer expires, the KVM host injects EL1 physical timer interrupts to the
->>> VM.  Alternatively, it's also possible to allow VMs to access the EL1
->>> physical timer without trapping.  However, this requires somehow using the
->>> EL2 physical timer for the Linux host while running the VM instead of the
->>> EL1 physical timer.  Right now I just implemented trap-and-emulate because
->>> this was straightforward to do, and I leave it to future work to determine
->>> if transferring the EL1 physical timer state to the EL2 timer provides any
->>> performance benefit.
->>>
->>> This feature will be useful for any OS that wishes to access the EL1
->>> physical timer. Nested virtualization is one of those use cases. A nested
->>> hypervisor running inside a VM would think it has full access to the
->>> hardware and naturally tries to use the EL1 physical timer as Linux would
->>> do. Other nested hypervisors may try to use the EL2 physical timer as Xen
->>> would do, but supporting the EL2 physical timer to the VM is out of scope
->>> of this patch series. This patch series will make it easy to add the EL2
->>> timer support in the future, though.
->>>
->>> Note that Linux VMs booting in EL1 will be unaffected by this patch series
->>> and will continue to use only the virtual timer and this patch series will
->>> therefore not introduce any performance degredation as a result of
->>> trap-and-emulate.
->>>
->>> v2 => v3:
->>>  - Rebase on kvmarm/queue
->>>  - Take kvm->lock to synchronize cntvoff across all vtimers
->>>  - Remove unnecessary function parameters
->>>  - Add comments
+>>> Another nit here: PHANDLE_GIC is pretty much ARM-specific, while FDT is
+>>> supposed to be generic. Can't we move the enum to be architecture
+>>> specific and not put this in an architecture agnostic one?
 >>
->> I just gave v3 a test run on my TC2 (32-bit platform) and my guest
->> quickly locks up trying to run cyclictest or when booting the machine it
->> stalls with RCU timeouts.
->
-> Ok. It's my fault not to specify that the emulated physical timer is
-> supported/tested on arm64.
-> On 32-bit platform, it is supposed to show the same behavior as
-> before, but I haven't tested.
-> Were you using the physical timer or the virtual timer for the guest?
->
-
-I used the same guest and QEMU that I always test with so I expect it
-to only use the virtual timer.
-
-I wonder if we can somehow manage to not reset the timer properly on
-the 32-bit side and end up in a form of endless interrupt loop?
-
+>> So while trying to find the best possible solution for this seemingly
+>> simple problem, I was wondering why we had this allocation function in
+>> the first place?
+>> It seems a bit overkill to allocate a handle if we could just go with
+>> static values.
+>> I changed the first two patches now to have an enum per architecture to
+>> list all possible handles and then just using those values directly
+>> instead of going through another layer of indirection.
+> 
+> Yes, that probably make sense, at least for the time being.
+> 
+>> So is there anything that will require dynamic phandles in the future?
+>> This version proposed here can't really cope with them anyway and in the
+>> moment it's just about _one_ GIC phandle and _one_ ITS phandle, so a
+>> static assignment is much simpler.
 >>
->> Could you have a look?
->
-> Sure, I'll have a look. I don't have access to my Cubietruck today,
-> but I can work on that tomorrow.
->
-ok, thanks.
+>> Will we need multiple ITSes for device passthrough? Or would it just be
+>> one ITS for all hardware devices and one for emulated virtio?
+> 
+> Having multiple ITSes is definitely on the cards (pass-through and
+> emulated devices are one case, where once of them would be driven using
+> GICv4 and the other be purely virtual). This probably would translate
+> into having multiple PCIe host controllers.
 
--Christoffer
+OK, I see. At the moment the kvmtool code seems to rely on having only a
+single PCI controller using a static setup. As changing this would
+require some rework (for instance to allow dynamic MMIO allocation), I
+would like to refrain from adding multiple ITS support prematurely now.
+We should do this later in conjunction with multiple PCI controller
+support, I believe.
+
+> So maybe we don't need the full breath of an allocator yet, but I reckon
+> that we shouldn't pretend that there is no use for it, forever.
+
+OK, got it.
+
+I will post my version with the static phandle setup, feel free to shoot
+it down if this is too much of a simplification or if you have the
+feeling that removing the allocation will bite us later.
+
+Cheers,
+Andre.
