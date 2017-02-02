@@ -1,23 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvmtool PATCH v9 04/15] MSI-X: update GSI routing after changed
- MSI-X configuration
-Date: Thu,  2 Feb 2017 16:32:12 +0000
-Message-ID: <20170202163223.15372-5-andre.przywara@arm.com>
+Subject: [kvmtool PATCH v9 12/15] PCI: inject PCI device ID on MSI injection
+Date: Thu,  2 Feb 2017 16:32:20 +0000
+Message-ID: <20170202163223.15372-13-andre.przywara@arm.com>
 References: <20170202163223.15372-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EF6940194
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 11:30:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0217740A63
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 11:31:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O8dUVIC9AOsL for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Feb 2017 11:30:57 -0500 (EST)
+ with ESMTP id aR9+18zGD56Z for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Feb 2017 11:31:06 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D2A4E40B40
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 11:30:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BFEF240A95
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 11:31:05 -0500 (EST)
 In-Reply-To: <20170202163223.15372-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,157 +31,51 @@ To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When we set up GSI routing to map MSIs to KVM's GSI numbers, we
-write the current device's MSI setup into the kernel routing table.
-However the device driver in the guest can use PCI configuration space
-accesses to change the MSI configuration (address and/or payload data).
-Whenever this happens after we have setup the routing table already,
-we must amend the previously sent data.
-So when MSI-X PCI config space accesses write address or payload,
-find the associated GSI number and the matching routing table entry
-and update the kernel routing table (only if the data has changed).
-
-This fixes vhost-net, where the queue's IRQFD was setup before the
-MSI vectors.
+The ITS emulation requires a unique device ID to be passed along the
+MSI payload when kvmtool wants to trigger an MSI in the guest.
+According to the proposed changes to the interface add the PCI
+bus/device/function triple to the structure passed with the ioctl.
+Check the respective capability before actually adding the device ID
+to the kvm_msi struct.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- include/kvm/irq.h |  1 +
- irq.c             | 34 ++++++++++++++++++++++++++++++++++
- virtio/pci.c      | 53 +++++++++++++++++++++++++++++++++++++++++++----------
- 3 files changed, 78 insertions(+), 10 deletions(-)
+ virtio/pci.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/include/kvm/irq.h b/include/kvm/irq.h
-index bb71521..f35eb7e 100644
---- a/include/kvm/irq.h
-+++ b/include/kvm/irq.h
-@@ -21,5 +21,6 @@ int irq__exit(struct kvm *kvm);
- 
- int irq__allocate_routing_entry(void);
- int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
-+void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
- 
- #endif
-diff --git a/irq.c b/irq.c
-index a742aa2..6ec71c3 100644
---- a/irq.c
-+++ b/irq.c
-@@ -93,6 +93,40 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
- 	return next_gsi++;
- }
- 
-+static bool update_data(u32 *ptr, u32 newdata)
-+{
-+	if (*ptr == newdata)
-+		return false;
-+
-+	*ptr = newdata;
-+	return true;
-+}
-+
-+void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg)
-+{
-+	struct kvm_irq_routing_msi *entry;
-+	unsigned int i;
-+	bool changed;
-+
-+	for (i = 0; i < irq_routing->nr; i++)
-+		if (gsi == irq_routing->entries[i].gsi)
-+			break;
-+	if (i == irq_routing->nr)
-+		return;
-+
-+	entry = &irq_routing->entries[i].u.msi;
-+
-+	changed  = update_data(&entry->address_hi, msg->address_hi);
-+	changed |= update_data(&entry->address_lo, msg->address_lo);
-+	changed |= update_data(&entry->data, msg->data);
-+
-+	if (!changed)
-+		return;
-+
-+	if (ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing) == -1)
-+		die_perror("KVM_SET_GSI_ROUTING");
-+}
-+
- int __attribute__((weak)) irq__exit(struct kvm *kvm)
- {
- 	free(irq_routing);
 diff --git a/virtio/pci.c b/virtio/pci.c
-index 072e5b7..7cc0ba4 100644
+index 98bf6b7..cecfe8a 100644
 --- a/virtio/pci.c
 +++ b/virtio/pci.c
-@@ -152,6 +152,30 @@ static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 p
- 	return ret;
+@@ -321,14 +321,28 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
+ 		update_msix_map(vpci, table, vecnum);
  }
  
-+static void update_msix_map(struct virtio_pci *vpci,
-+			    struct msix_table *msix_entry, u32 vecnum)
-+{
-+	u32 gsi, i;
-+
-+	/* Find the GSI number used for that vector */
-+	if (vecnum == vpci->config_vector) {
-+		gsi = vpci->config_gsi;
-+	} else {
-+		for (i = 0; i < VIRTIO_PCI_MAX_VQ; i++)
-+			if (vpci->vq_vector[i] == vecnum)
-+				break;
-+		if (i == VIRTIO_PCI_MAX_VQ)
-+			return;
-+		gsi = vpci->gsis[i];
+-static void virtio_pci__signal_msi(struct kvm *kvm, struct virtio_pci *vpci, int vec)
++static void virtio_pci__signal_msi(struct kvm *kvm, struct virtio_pci *vpci,
++				   int vec)
+ {
++	static int needs_devid = 0;
+ 	struct kvm_msi msi = {
+ 		.address_lo = vpci->msix_table[vec].msg.address_lo,
+ 		.address_hi = vpci->msix_table[vec].msg.address_hi,
+ 		.data = vpci->msix_table[vec].msg.data,
+ 	};
+ 
++	if (needs_devid == 0) {
++		if (kvm__supports_vm_extension(kvm, KVM_CAP_MSI_DEVID))
++			needs_devid = 1;
++		else
++			needs_devid = -1;
 +	}
 +
-+	if (gsi == 0)
-+		return;
-+
-+	msix_entry = &msix_entry[vecnum];
-+	irq__update_msix_route(vpci->kvm, gsi, &msix_entry->msg);
-+}
-+
- static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *vdev, u16 port,
- 					void *data, int size, int offset)
- {
-@@ -259,21 +283,30 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
- 					   u8 is_write, void *ptr)
- {
- 	struct virtio_pci *vpci = ptr;
--	void *table;
--	u32 offset;
-+	struct msix_table *table;
-+	int vecnum;
-+	size_t offset;
- 
- 	if (addr > vpci->msix_io_block + PCI_IO_SIZE) {
--		table	= &vpci->msix_pba;
--		offset	= vpci->msix_io_block + PCI_IO_SIZE;
-+		table  = (struct msix_table *)&vpci->msix_pba;
-+		offset = addr - (vpci->msix_io_block + PCI_IO_SIZE);
- 	} else {
--		table	= &vpci->msix_table;
--		offset	= vpci->msix_io_block;
-+		table  = vpci->msix_table;
-+		offset = addr - vpci->msix_io_block;
- 	}
-+	vecnum = offset / sizeof(struct msix_table);
-+	offset = offset % sizeof(struct msix_table);
-+
-+	if (!is_write) {
-+		memcpy(data, (void *)&table[vecnum] + offset, len);
-+		return;
++	if (needs_devid > 0) {
++		msi.flags = KVM_MSI_VALID_DEVID;
++		msi.devid = vpci->dev_hdr.dev_num << 3;
 +	}
 +
-+	memcpy((void *)&table[vecnum] + offset, data, len);
- 
--	if (is_write)
--		memcpy(table + addr - offset, data, len);
--	else
--		memcpy(data, table + addr - offset, len);
-+	/* Did we just update the address or payload? */
-+	if (offset < offsetof(struct msix_table, ctrl))
-+		update_msix_map(vpci, table, vecnum);
+ 	ioctl(kvm->vm_fd, KVM_SIGNAL_MSI, &msi);
  }
  
- static void virtio_pci__signal_msi(struct kvm *kvm, struct virtio_pci *vpci, int vec)
 -- 
 2.9.0
