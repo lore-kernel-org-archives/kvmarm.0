@@ -1,116 +1,188 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvmtool PATCH v9 10/15] arm: FDT: create MSI controller DT node
-Date: Thu,  2 Feb 2017 16:32:18 +0000
-Message-ID: <20170202163223.15372-11-andre.przywara@arm.com>
+Subject: [kvmtool PATCH v9 04/15] MSI-X: update GSI routing after changed
+ MSI-X configuration
+Date: Thu,  2 Feb 2017 16:32:12 +0000
+Message-ID: <20170202163223.15372-5-andre.przywara@arm.com>
 References: <20170202163223.15372-1-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EF6940194
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 11:30:58 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id O8dUVIC9AOsL for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Feb 2017 11:30:57 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D2A4E40B40
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 11:30:55 -0500 (EST)
 In-Reply-To: <20170202163223.15372-1-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: Vladimir Murzin <vladimir.murzin@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARM GICv3 ITS requires a separate device tree node to describe
-the ITS. Add this as a child to the GIC interrupt controller node
-to let a guest discover and use the ITS if the user requests it.
-Since we now need to specify #address-cells for the GIC node, we
-have to add two zeroes to the interrupt map to match that.
+When we set up GSI routing to map MSIs to KVM's GSI numbers, we
+write the current device's MSI setup into the kernel routing table.
+However the device driver in the guest can use PCI configuration space
+accesses to change the MSI configuration (address and/or payload data).
+Whenever this happens after we have setup the routing table already,
+we must amend the previously sent data.
+So when MSI-X PCI config space accesses write address or payload,
+find the associated GSI number and the matching routing table entry
+and update the kernel routing table (only if the data has changed).
+
+This fixes vhost-net, where the queue's IRQFD was setup before the
+MSI vectors.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/gic.c                         | 22 +++++++++++++++++++++-
- arm/include/arm-common/fdt-arch.h |  2 +-
- arm/pci.c                         |  5 +++++
- 3 files changed, 27 insertions(+), 2 deletions(-)
+ include/kvm/irq.h |  1 +
+ irq.c             | 34 ++++++++++++++++++++++++++++++++++
+ virtio/pci.c      | 53 +++++++++++++++++++++++++++++++++++++++++++----------
+ 3 files changed, 78 insertions(+), 10 deletions(-)
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 78fd583..c8478a3 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -250,7 +250,8 @@ late_init(gic__init_gic)
+diff --git a/include/kvm/irq.h b/include/kvm/irq.h
+index bb71521..f35eb7e 100644
+--- a/include/kvm/irq.h
++++ b/include/kvm/irq.h
+@@ -21,5 +21,6 @@ int irq__exit(struct kvm *kvm);
  
- void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
- {
--	const char *compatible;
-+	const char *compatible, *msi_compatible = NULL;
-+	u64 msi_prop[2];
- 	u64 reg_prop[] = {
- 		cpu_to_fdt64(ARM_GIC_DIST_BASE), cpu_to_fdt64(ARM_GIC_DIST_SIZE),
- 		0, 0,				/* to be filled */
-@@ -262,6 +263,9 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
- 		reg_prop[2] = cpu_to_fdt64(ARM_GIC_CPUI_BASE);
- 		reg_prop[3] = cpu_to_fdt64(ARM_GIC_CPUI_SIZE);
- 		break;
-+	case IRQCHIP_GICV3_ITS:
-+		msi_compatible = "arm,gic-v3-its";
-+		/* fall-through */
- 	case IRQCHIP_GICV3:
- 		compatible = "arm,gic-v3";
- 		reg_prop[2] = cpu_to_fdt64(gic_redists_base);
-@@ -277,6 +281,22 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
- 	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
- 	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
- 	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_GIC));
-+	_FDT(fdt_property_cell(fdt, "#address-cells", 2));
-+	_FDT(fdt_property_cell(fdt, "#size-cells", 2));
-+
-+	if (msi_compatible) {
-+		_FDT(fdt_property(fdt, "ranges", NULL, 0));
-+
-+		_FDT(fdt_begin_node(fdt, "msic"));
-+		_FDT(fdt_property_string(fdt, "compatible", msi_compatible));
-+		_FDT(fdt_property(fdt, "msi-controller", NULL, 0));
-+		_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_MSI));
-+		msi_prop[0] = cpu_to_fdt64(gic_msi_base);
-+		msi_prop[1] = cpu_to_fdt64(gic_msi_size);
-+		_FDT(fdt_property(fdt, "reg", msi_prop, sizeof(msi_prop)));
-+		_FDT(fdt_end_node(fdt));
-+	}
-+
- 	_FDT(fdt_end_node(fdt));
+ int irq__allocate_routing_entry(void);
+ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
++void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
+ 
+ #endif
+diff --git a/irq.c b/irq.c
+index a742aa2..6ec71c3 100644
+--- a/irq.c
++++ b/irq.c
+@@ -93,6 +93,40 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
+ 	return next_gsi++;
  }
  
-diff --git a/arm/include/arm-common/fdt-arch.h b/arm/include/arm-common/fdt-arch.h
-index 53ba633..60c2d40 100644
---- a/arm/include/arm-common/fdt-arch.h
-+++ b/arm/include/arm-common/fdt-arch.h
-@@ -1,6 +1,6 @@
- #ifndef ARM__FDT_H
- #define ARM__FDT_H
++static bool update_data(u32 *ptr, u32 newdata)
++{
++	if (*ptr == newdata)
++		return false;
++
++	*ptr = newdata;
++	return true;
++}
++
++void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg)
++{
++	struct kvm_irq_routing_msi *entry;
++	unsigned int i;
++	bool changed;
++
++	for (i = 0; i < irq_routing->nr; i++)
++		if (gsi == irq_routing->entries[i].gsi)
++			break;
++	if (i == irq_routing->nr)
++		return;
++
++	entry = &irq_routing->entries[i].u.msi;
++
++	changed  = update_data(&entry->address_hi, msg->address_hi);
++	changed |= update_data(&entry->address_lo, msg->address_lo);
++	changed |= update_data(&entry->data, msg->data);
++
++	if (!changed)
++		return;
++
++	if (ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing) == -1)
++		die_perror("KVM_SET_GSI_ROUTING");
++}
++
+ int __attribute__((weak)) irq__exit(struct kvm *kvm)
+ {
+ 	free(irq_routing);
+diff --git a/virtio/pci.c b/virtio/pci.c
+index 072e5b7..7cc0ba4 100644
+--- a/virtio/pci.c
++++ b/virtio/pci.c
+@@ -152,6 +152,30 @@ static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 p
+ 	return ret;
+ }
  
--enum phandles {PHANDLE_RESERVED = 0, PHANDLE_GIC, PHANDLES_MAX};
-+enum phandles {PHANDLE_RESERVED = 0, PHANDLE_GIC, PHANDLE_MSI, PHANDLES_MAX};
++static void update_msix_map(struct virtio_pci *vpci,
++			    struct msix_table *msix_entry, u32 vecnum)
++{
++	u32 gsi, i;
++
++	/* Find the GSI number used for that vector */
++	if (vecnum == vpci->config_vector) {
++		gsi = vpci->config_gsi;
++	} else {
++		for (i = 0; i < VIRTIO_PCI_MAX_VQ; i++)
++			if (vpci->vq_vector[i] == vecnum)
++				break;
++		if (i == VIRTIO_PCI_MAX_VQ)
++			return;
++		gsi = vpci->gsis[i];
++	}
++
++	if (gsi == 0)
++		return;
++
++	msix_entry = &msix_entry[vecnum];
++	irq__update_msix_route(vpci->kvm, gsi, &msix_entry->msg);
++}
++
+ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *vdev, u16 port,
+ 					void *data, int size, int offset)
+ {
+@@ -259,21 +283,30 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
+ 					   u8 is_write, void *ptr)
+ {
+ 	struct virtio_pci *vpci = ptr;
+-	void *table;
+-	u32 offset;
++	struct msix_table *table;
++	int vecnum;
++	size_t offset;
  
- #endif /* ARM__FDT_H */
-diff --git a/arm/pci.c b/arm/pci.c
-index 2bc718e..37145cc 100644
---- a/arm/pci.c
-+++ b/arm/pci.c
-@@ -18,6 +18,8 @@ struct of_gic_irq {
- struct of_interrupt_map_entry {
- 	struct of_pci_irq_mask		pci_irq_mask;
- 	u32				gic_phandle;
-+	u32				gic_addr_hi;
-+	u32				gic_addr_lo;
- 	struct of_gic_irq		gic_irq;
- } __attribute__((packed));
+ 	if (addr > vpci->msix_io_block + PCI_IO_SIZE) {
+-		table	= &vpci->msix_pba;
+-		offset	= vpci->msix_io_block + PCI_IO_SIZE;
++		table  = (struct msix_table *)&vpci->msix_pba;
++		offset = addr - (vpci->msix_io_block + PCI_IO_SIZE);
+ 	} else {
+-		table	= &vpci->msix_table;
+-		offset	= vpci->msix_io_block;
++		table  = vpci->msix_table;
++		offset = addr - vpci->msix_io_block;
+ 	}
++	vecnum = offset / sizeof(struct msix_table);
++	offset = offset % sizeof(struct msix_table);
++
++	if (!is_write) {
++		memcpy(data, (void *)&table[vecnum] + offset, len);
++		return;
++	}
++
++	memcpy((void *)&table[vecnum] + offset, data, len);
  
-@@ -64,6 +66,7 @@ void pci__generate_fdt_nodes(void *fdt)
- 	_FDT(fdt_property(fdt, "bus-range", bus_range, sizeof(bus_range)));
- 	_FDT(fdt_property(fdt, "reg", &cfg_reg_prop, sizeof(cfg_reg_prop)));
- 	_FDT(fdt_property(fdt, "ranges", ranges, sizeof(ranges)));
-+	_FDT(fdt_property_cell(fdt, "msi-parent", PHANDLE_MSI));
+-	if (is_write)
+-		memcpy(table + addr - offset, data, len);
+-	else
+-		memcpy(data, table + addr - offset, len);
++	/* Did we just update the address or payload? */
++	if (offset < offsetof(struct msix_table, ctrl))
++		update_msix_map(vpci, table, vecnum);
+ }
  
- 	/* Generate the interrupt map ... */
- 	dev_hdr = device__first_dev(DEVICE_BUS_PCI);
-@@ -84,6 +87,8 @@ void pci__generate_fdt_nodes(void *fdt)
- 				.pci_pin	= cpu_to_fdt32(pin),
- 			},
- 			.gic_phandle	= cpu_to_fdt32(PHANDLE_GIC),
-+			.gic_addr_hi	= 0,
-+			.gic_addr_lo	= 0,
- 			.gic_irq = {
- 				.type	= cpu_to_fdt32(GIC_FDT_IRQ_TYPE_SPI),
- 				.num	= cpu_to_fdt32(irq - GIC_SPI_IRQ_BASE),
+ static void virtio_pci__signal_msi(struct kvm *kvm, struct virtio_pci *vpci, int vec)
 -- 
 2.9.0
