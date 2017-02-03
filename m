@@ -1,40 +1,40 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC v4 01/10] KVM: arm/arm64: Abstract virtual timer context into
- separate structure
-Date: Fri,  3 Feb 2017 10:19:59 -0500
-Message-ID: <1486135208-13415-2-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC v4 03/10] KVM: arm/arm64: Decouple kvm timer functions from
+ virtual timer
+Date: Fri,  3 Feb 2017 10:20:01 -0500
+Message-ID: <1486135208-13415-4-git-send-email-jintack@cs.columbia.edu>
 References: <1486135208-13415-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B26E40284
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:19:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CA3140A1D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:19:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Lx1WhMR8Ug0V for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Feb 2017 10:19:48 -0500 (EST)
-Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
- [128.59.72.39])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1223F40838
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:19:47 -0500 (EST)
+ with ESMTP id Z9m3D5ezNJCJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Feb 2017 10:19:49 -0500 (EST)
+Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
+ [128.59.72.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D22240625
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:19:49 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v13FFLTc048313
- for <kvmarm@lists.cs.columbia.edu>; Fri, 3 Feb 2017 10:20:12 -0500
+ by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v13FI7AP025831
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 3 Feb 2017 10:20:14 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id C9A306D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:20:12 -0500 (EST)
-Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
- [128.59.72.14]) by hazelnut (Postfix) with ESMTP id 37C318E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:20:12 -0500 (EST)
-Received: from mail-qt0-f199.google.com (mail-qt0-f199.google.com
- [209.85.216.199])
- by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v13FKBZA003018
+ by hazelnut (Postfix) with ESMTP id 43E7E7E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:20:14 -0500 (EST)
+Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
+ [128.59.72.16]) by hazelnut (Postfix) with ESMTP id 2CB2C7E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:20:14 -0500 (EST)
+Received: from mail-qt0-f197.google.com (mail-qt0-f197.google.com
+ [209.85.216.197])
+ by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v13FKE9p018908
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Fri, 3 Feb 2017 10:20:12 -0500
-Received: by mail-qt0-f199.google.com with SMTP id w20so30631345qtb.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Feb 2017 07:20:12 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 3 Feb 2017 10:20:14 -0500
+Received: by mail-qt0-f197.google.com with SMTP id k15so30771977qtg.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Feb 2017 07:20:14 -0800 (PST)
 In-Reply-To: <1486135208-13415-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -48,340 +48,175 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: pbonzini@redhat.com, rkrcmar@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, andre.przywara@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Abstract virtual timer context into a separate structure and change all
-callers referring to timer registers, irq state and so on. No change in
+Now that we have a separate structure for timer context, make functions
+generic so that they can work with any timer context, not just the
+virtual timer context.  This does not change the virtual timer
 functionality.
 
-This is about to become very handy when adding the EL1 physical timer.
-
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/arm_arch_timer.h | 27 ++++++++---------
- virt/kvm/arm/arch_timer.c    | 69 +++++++++++++++++++++++---------------------
- virt/kvm/arm/hyp/timer-sr.c  | 10 ++++---
- 3 files changed, 56 insertions(+), 50 deletions(-)
+ arch/arm/kvm/arm.c           |  2 +-
+ include/kvm/arm_arch_timer.h |  2 +-
+ virt/kvm/arm/arch_timer.c    | 54 ++++++++++++++++++++------------------------
+ 3 files changed, 27 insertions(+), 31 deletions(-)
 
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index f93f2171..0ecd6cf 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -300,7 +300,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 
+ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ {
+-	return kvm_timer_should_fire(vcpu);
++	return kvm_timer_should_fire(vcpu_vtimer(vcpu));
+ }
+ 
+ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
 diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 5c970ce..daad3c1 100644
+index 2c8560b..f46fa3b 100644
 --- a/include/kvm/arm_arch_timer.h
 +++ b/include/kvm/arm_arch_timer.h
-@@ -28,15 +28,20 @@ struct arch_timer_kvm {
- 	u64			cntvoff;
- };
+@@ -66,7 +66,7 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *, u64 regid);
+ int kvm_arm_timer_set_reg(struct kvm_vcpu *, u64 regid, u64 value);
  
--struct arch_timer_cpu {
-+struct arch_timer_context {
- 	/* Registers: control register, timer value */
--	u32				cntv_ctl;	/* Saved/restored */
--	u64				cntv_cval;	/* Saved/restored */
-+	u32				cnt_ctl;
-+	u64				cnt_cval;
-+
-+	/* Timer IRQ */
-+	struct kvm_irq_level		irq;
-+
-+	/* Active IRQ state caching */
-+	bool				active_cleared_last;
-+};
+-bool kvm_timer_should_fire(struct kvm_vcpu *vcpu);
++bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
+ void kvm_timer_schedule(struct kvm_vcpu *vcpu);
+ void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
  
--	/*
--	 * Anything that is not used directly from assembly code goes
--	 * here.
--	 */
-+struct arch_timer_cpu {
-+	struct arch_timer_context	vtimer;
- 
- 	/* Background timer used when the guest is not running */
- 	struct hrtimer			timer;
-@@ -47,12 +52,6 @@ struct arch_timer_cpu {
- 	/* Background timer active */
- 	bool				armed;
- 
--	/* Timer IRQ */
--	struct kvm_irq_level		irq;
--
--	/* Active IRQ state caching */
--	bool				active_cleared_last;
--
- 	/* Is the timer enabled */
- 	bool			enabled;
- };
-@@ -77,4 +76,6 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
- 
- void kvm_timer_init_vhe(void);
-+
-+#define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
- #endif
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 91ecf48..d3556b3 100644
+index 5004a67..5261f98 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -37,7 +37,7 @@
- 
- void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.timer_cpu.active_cleared_last = false;
-+	vcpu_vtimer(vcpu)->active_cleared_last = false;
+@@ -98,13 +98,12 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+ 	kvm_vcpu_kick(vcpu);
  }
  
- static u64 kvm_phys_timer_read(void)
-@@ -102,7 +102,7 @@ static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
+-static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
++static u64 kvm_timer_compute_delta(struct arch_timer_context *timer_ctx)
  {
  	u64 cval, now;
+-	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
  
--	cval = vcpu->arch.timer_cpu.cntv_cval;
-+	cval = vcpu_vtimer(vcpu)->cnt_cval;
- 	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+-	cval = vtimer->cnt_cval;
+-	now = kvm_phys_timer_read() - vtimer->cntvoff;
++	cval = timer_ctx->cnt_cval;
++	now = kvm_phys_timer_read() - timer_ctx->cntvoff;
  
  	if (now < cval) {
-@@ -144,21 +144,21 @@ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
- 
- static bool kvm_timer_irq_can_fire(struct kvm_vcpu *vcpu)
- {
--	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
--	return !(timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
--		(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE);
-+	return !(vtimer->cnt_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
-+		(vtimer->cnt_ctl & ARCH_TIMER_CTRL_ENABLE);
+ 		u64 ns;
+@@ -133,7 +132,7 @@ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
+ 	 * PoV (NTP on the host may have forced it to expire
+ 	 * early). If we should have slept longer, restart it.
+ 	 */
+-	ns = kvm_timer_compute_delta(vcpu);
++	ns = kvm_timer_compute_delta(vcpu_vtimer(vcpu));
+ 	if (unlikely(ns)) {
+ 		hrtimer_forward_now(hrt, ns_to_ktime(ns));
+ 		return HRTIMER_RESTART;
+@@ -143,43 +142,39 @@ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
+ 	return HRTIMER_NORESTART;
  }
  
- bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+-static bool kvm_timer_irq_can_fire(struct kvm_vcpu *vcpu)
++static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx)
  {
--	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+-	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+-
+-	return !(vtimer->cnt_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
+-		(vtimer->cnt_ctl & ARCH_TIMER_CTRL_ENABLE);
++	return !(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
++		(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_ENABLE);
+ }
+ 
+-bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
++bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+ {
+-	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
  	u64 cval, now;
  
- 	if (!kvm_timer_irq_can_fire(vcpu))
+-	if (!kvm_timer_irq_can_fire(vcpu))
++	if (!kvm_timer_irq_can_fire(timer_ctx))
  		return false;
  
--	cval = timer->cntv_cval;
-+	cval = vtimer->cnt_cval;
- 	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+-	cval = vtimer->cnt_cval;
+-	now = kvm_phys_timer_read() - vtimer->cntvoff;
++	cval = timer_ctx->cnt_cval;
++	now = kvm_phys_timer_read() - timer_ctx->cntvoff;
  
  	return cval <= now;
-@@ -167,18 +167,18 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
- static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
+ }
+ 
+-static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
++static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
++				 struct arch_timer_context *timer_ctx)
  {
  	int ret;
--	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+-	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
  
  	BUG_ON(!vgic_initialized(vcpu->kvm));
  
--	timer->active_cleared_last = false;
--	timer->irq.level = new_level;
--	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->irq.irq,
--				   timer->irq.level);
-+	vtimer->active_cleared_last = false;
-+	vtimer->irq.level = new_level;
-+	trace_kvm_timer_update_irq(vcpu->vcpu_id, vtimer->irq.irq,
-+				   vtimer->irq.level);
+-	vtimer->active_cleared_last = false;
+-	vtimer->irq.level = new_level;
+-	trace_kvm_timer_update_irq(vcpu->vcpu_id, vtimer->irq.irq,
+-				   vtimer->irq.level);
++	timer_ctx->active_cleared_last = false;
++	timer_ctx->irq.level = new_level;
++	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
++				   timer_ctx->irq.level);
  
- 	ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
--					 timer->irq.irq,
--					 timer->irq.level);
-+					 vtimer->irq.irq,
-+					 vtimer->irq.level);
+-	ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+-					 vtimer->irq.irq,
+-					 vtimer->irq.level);
++	ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, timer_ctx->irq.irq,
++				  timer_ctx->irq.level);
  	WARN_ON(ret);
  }
  
-@@ -189,18 +189,19 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
- static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
- 	/*
- 	 * If userspace modified the timer registers via SET_ONE_REG before
--	 * the vgic was initialized, we mustn't set the timer->irq.level value
-+	 * the vgic was initialized, we mustn't set the vtimer->irq.level value
- 	 * because the guest would never see the interrupt.  Instead wait
- 	 * until we call this function from kvm_timer_flush_hwstate.
- 	 */
+@@ -201,8 +196,8 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
  	if (!vgic_initialized(vcpu->kvm) || !timer->enabled)
  		return -ENODEV;
  
--	if (kvm_timer_should_fire(vcpu) != timer->irq.level)
--		kvm_timer_update_irq(vcpu, !timer->irq.level);
-+	if (kvm_timer_should_fire(vcpu) != vtimer->irq.level)
-+		kvm_timer_update_irq(vcpu, !vtimer->irq.level);
+-	if (kvm_timer_should_fire(vcpu) != vtimer->irq.level)
+-		kvm_timer_update_irq(vcpu, !vtimer->irq.level);
++	if (kvm_timer_should_fire(vtimer) != vtimer->irq.level)
++		kvm_timer_update_irq(vcpu, !vtimer->irq.level, vtimer);
  
  	return 0;
  }
-@@ -250,7 +251,7 @@ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
-  */
- void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+@@ -215,6 +210,7 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
  {
--	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
 +	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	bool phys_active;
- 	int ret;
  
-@@ -274,8 +275,8 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	* to ensure that hardware interrupts from the timer triggers a guest
- 	* exit.
- 	*/
--	phys_active = timer->irq.level ||
--			kvm_vgic_map_is_active(vcpu, timer->irq.irq);
-+	phys_active = vtimer->irq.level ||
-+			kvm_vgic_map_is_active(vcpu, vtimer->irq.irq);
+ 	BUG_ON(timer_is_armed(timer));
  
- 	/*
- 	 * We want to avoid hitting the (re)distributor as much as
-@@ -297,7 +298,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	 * - cached value is "active clear"
- 	 * - value to be programmed is "active clear"
+@@ -223,18 +219,18 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+ 	 * already expired, because kvm_vcpu_block will return before putting
+ 	 * the thread to sleep.
  	 */
--	if (timer->active_cleared_last && !phys_active)
-+	if (vtimer->active_cleared_last && !phys_active)
+-	if (kvm_timer_should_fire(vcpu))
++	if (kvm_timer_should_fire(vtimer))
  		return;
  
- 	ret = irq_set_irqchip_state(host_vtimer_irq,
-@@ -305,7 +306,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 				    phys_active);
- 	WARN_ON(ret);
- 
--	timer->active_cleared_last = !phys_active;
-+	vtimer->active_cleared_last = !phys_active;
- }
- 
- /**
-@@ -331,7 +332,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 			 const struct kvm_irq_level *irq)
- {
--	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
  	/*
- 	 * The vcpu timer irq number cannot be determined in
-@@ -339,7 +340,7 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 	 * kvm_vcpu_set_target(). To handle this, we determine
- 	 * vcpu timer irq number when the vcpu is reset.
+ 	 * If the timer is not capable of raising interrupts (disabled or
+ 	 * masked), then there's no more work for us to do.
  	 */
--	timer->irq.irq = irq->irq;
-+	vtimer->irq.irq = irq->irq;
+-	if (!kvm_timer_irq_can_fire(vcpu))
++	if (!kvm_timer_irq_can_fire(vtimer))
+ 		return;
  
- 	/*
- 	 * The bits in CNTV_CTL are architecturally reset to UNKNOWN for ARMv8
-@@ -347,7 +348,7 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 	 * resets the timer to be disabled and unmasked and is compliant with
- 	 * the ARMv7 architecture.
- 	 */
--	timer->cntv_ctl = 0;
-+	vtimer->cnt_ctl = 0;
- 	kvm_timer_update_state(vcpu);
- 
- 	return 0;
-@@ -369,17 +370,17 @@ static void kvm_timer_init_interrupt(void *info)
- 
- int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
- {
--	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
- 	switch (regid) {
- 	case KVM_REG_ARM_TIMER_CTL:
--		timer->cntv_ctl = value;
-+		vtimer->cnt_ctl = value;
- 		break;
- 	case KVM_REG_ARM_TIMER_CNT:
- 		vcpu->kvm->arch.timer.cntvoff = kvm_phys_timer_read() - value;
- 		break;
- 	case KVM_REG_ARM_TIMER_CVAL:
--		timer->cntv_cval = value;
-+		vtimer->cnt_cval = value;
- 		break;
- 	default:
- 		return -1;
-@@ -391,15 +392,15 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
- 
- u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
- {
--	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
- 	switch (regid) {
- 	case KVM_REG_ARM_TIMER_CTL:
--		return timer->cntv_ctl;
-+		return vtimer->cnt_ctl;
- 	case KVM_REG_ARM_TIMER_CNT:
- 		return kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
- 	case KVM_REG_ARM_TIMER_CVAL:
--		return timer->cntv_cval;
-+		return vtimer->cnt_cval;
- 	}
- 	return (u64)-1;
- }
-@@ -463,14 +464,16 @@ int kvm_timer_hyp_init(void)
- void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
- 	timer_disarm(timer);
--	kvm_vgic_unmap_phys_irq(vcpu, timer->irq.irq);
-+	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
+ 	/*  The timer has not yet expired, schedule a background timer */
+-	timer_arm(timer, kvm_timer_compute_delta(vcpu));
++	timer_arm(timer, kvm_timer_compute_delta(vtimer));
  }
  
- int kvm_timer_enable(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	struct irq_desc *desc;
- 	struct irq_data *data;
- 	int phys_irq;
-@@ -498,7 +501,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 	 * Tell the VGIC that the virtual interrupt is tied to a
- 	 * physical interrupt. We do that once per VCPU.
- 	 */
--	ret = kvm_vgic_map_phys_irq(vcpu, timer->irq.irq, phys_irq);
-+	ret = kvm_vgic_map_phys_irq(vcpu, vtimer->irq.irq, phys_irq);
- 	if (ret)
- 		return ret;
- 
-diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
-index 63e28dd..0cf0895 100644
---- a/virt/kvm/arm/hyp/timer-sr.c
-+++ b/virt/kvm/arm/hyp/timer-sr.c
-@@ -25,11 +25,12 @@
- void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	u64 val;
- 
- 	if (timer->enabled) {
--		timer->cntv_ctl = read_sysreg_el0(cntv_ctl);
--		timer->cntv_cval = read_sysreg_el0(cntv_cval);
-+		vtimer->cnt_ctl = read_sysreg_el0(cntv_ctl);
-+		vtimer->cnt_cval = read_sysreg_el0(cntv_cval);
- 	}
- 
- 	/* Disable the virtual timer */
-@@ -54,6 +55,7 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	u64 val;
- 
- 	/* Those bits are already configured at boot on VHE-system */
-@@ -70,8 +72,8 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
- 
- 	if (timer->enabled) {
- 		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
--		write_sysreg_el0(timer->cntv_cval, cntv_cval);
-+		write_sysreg_el0(vtimer->cnt_cval, cntv_cval);
- 		isb();
--		write_sysreg_el0(timer->cntv_ctl, cntv_ctl);
-+		write_sysreg_el0(vtimer->cnt_ctl, cntv_ctl);
- 	}
- }
+ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
 -- 
 1.9.1
