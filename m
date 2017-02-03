@@ -1,38 +1,40 @@
 From: Jintack Lim <jintack@cs.columbia.edu>
-Subject: [RFC v4 00/10] Provide the EL1 physical timer to the VM
-Date: Fri,  3 Feb 2017 10:19:58 -0500
-Message-ID: <1486135208-13415-1-git-send-email-jintack@cs.columbia.edu>
+Subject: [RFC v4 02/10] KVM: arm/arm64: Move cntvoff to each timer context
+Date: Fri,  3 Feb 2017 10:20:00 -0500
+Message-ID: <1486135208-13415-3-git-send-email-jintack@cs.columbia.edu>
+References: <1486135208-13415-1-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E48E14096E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:19:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D1F140960
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:19:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NEqIFWxpMn3z for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id SzIUdMDOe2Ok for <kvmarm@lists.cs.columbia.edu>;
  Fri,  3 Feb 2017 10:19:48 -0500 (EST)
-Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
- [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0708C40284
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:19:47 -0500 (EST)
+Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
+ [128.59.72.39])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2BF284095B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:19:48 -0500 (EST)
 Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v13FI7BM025845
- for <kvmarm@lists.cs.columbia.edu>; Fri, 3 Feb 2017 10:20:12 -0500
+ by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v13FHkKn050777
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 3 Feb 2017 10:20:13 -0500
 Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id B65A981
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:20:12 -0500 (EST)
-Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
- [128.59.72.15]) by hazelnut (Postfix) with ESMTP id 21D8A82
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:20:11 -0500 (EST)
-Received: from mail-qk0-f198.google.com (mail-qk0-f198.google.com
- [209.85.220.198])
- by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v13FKALY046585
+ by hazelnut (Postfix) with ESMTP id 251C482
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:20:13 -0500 (EST)
+Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
+ [128.59.72.14]) by hazelnut (Postfix) with ESMTP id 09EB784
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 10:20:13 -0500 (EST)
+Received: from mail-qk0-f200.google.com (mail-qk0-f200.google.com
+ [209.85.220.200])
+ by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v13FKCrm003034
  (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Fri, 3 Feb 2017 10:20:11 -0500
-Received: by mail-qk0-f198.google.com with SMTP id d201so637926qkg.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Feb 2017 07:20:11 -0800 (PST)
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 3 Feb 2017 10:20:12 -0500
+Received: by mail-qk0-f200.google.com with SMTP id s186so635620qkb.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Feb 2017 07:20:12 -0800 (PST)
+In-Reply-To: <1486135208-13415-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -45,78 +47,207 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: pbonzini@redhat.com, rkrcmar@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, andre.przywara@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARM architecture defines the EL1 physical timer and the virtual timer,
-and it is reasonable for an OS to expect to be able to access both.
-However, the current KVM implementation does not provide the EL1 physical
-timer to VMs but terminates VMs on access to the timer.
+Make cntvoff per each timer context. This is helpful to abstract kvm
+timer functions to work with timer context without considering timer
+types (e.g. physical timer or virtual timer).
 
-This patch series enables VMs to use the EL1 physical timer through
-trap-and-emulate only on arm64. The KVM host emulates each EL1 physical
-timer register access and sets up the background timer accordingly.  When
-the background timer expires, the KVM host injects EL1 physical timer
-interrupts to the VM.  Alternatively, it's also possible to allow VMs to
-access the EL1 physical timer without trapping.  However, this requires
-somehow using the EL2 physical timer for the Linux host while running the
-VM instead of the EL1 physical timer.  Right now I just implemented
-trap-and-emulate because this was straightforward to do, and I leave it to
-future work to determine if transferring the EL1 physical timer state to
-the EL2 timer provides any performance benefit.
+This also would pave the way for ever doing adjustments of the cntvoff
+on a per-CPU basis if that should ever make sense.
 
-This feature will be useful for any OS that wishes to access the EL1
-physical timer. Nested virtualization is one of those use cases. A nested
-hypervisor running inside a VM would think it has full access to the
-hardware and naturally tries to use the EL1 physical timer as Linux would
-do. Other nested hypervisors may try to use the EL2 physical timer as Xen
-would do, but supporting the EL2 physical timer to the VM is out of scope
-of this patch series. This patch series will make it easy to add the EL2
-timer support in the future, though.
+Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm/include/asm/kvm_host.h   |  3 ---
+ arch/arm/kvm/arm.c                |  1 -
+ arch/arm64/include/asm/kvm_host.h |  3 ---
+ include/kvm/arm_arch_timer.h      |  9 +++------
+ virt/kvm/arm/arch_timer.c         | 38 ++++++++++++++++++++++++++++----------
+ virt/kvm/arm/hyp/timer-sr.c       |  3 +--
+ 6 files changed, 32 insertions(+), 25 deletions(-)
 
-Note that Linux VMs booting in EL1 will be unaffected by this patch series
-and will continue to use only the virtual timer and this patch series will
-therefore not introduce any performance degredation as a result of
-trap-and-emulate.
-
-v3 => v4:
- - Fix a bug that prevents a VM from booting on 32-bit architecture
- - Clarify that the emulated physical timer is only supported on arm64
-   in the cover letter
-
-v2 => v3:
- - Rebase on kvmarm/queue
- - Take kvm->lock to synchronize cntvoff across all vtimers
- - Remove unnecessary function parameters
- - Add comments
-
-v1 => v2:
- - Rebase on kvm-arm-for-4.10-rc4
- - To make it simple, schedule the background timer for the EL1 physical timer
-   emulation on every entry to the VM and cancel it on exit.
- - Change timer_context structure to have cntvoff and restore enable field back
-   to arch_timer_cpu structure
-Jintack Lim (10):
-  KVM: arm/arm64: Abstract virtual timer context into separate structure
-  KVM: arm/arm64: Move cntvoff to each timer context
-  KVM: arm/arm64: Decouple kvm timer functions from virtual timer
-  KVM: arm/arm64: Add the EL1 physical timer context
-  KVM: arm/arm64: Initialize the emulated EL1 physical timer
-  KVM: arm/arm64: Update the physical timer interrupt level
-  KVM: arm/arm64: Set a background timer to the earliest timer
-    expiration
-  KVM: arm/arm64: Set up a background timer for the physical timer
-    emulation
-  KVM: arm64: Add the EL1 physical timer access handler
-  KVM: arm/arm64: Emulate the EL1 phys timer registers
-
- arch/arm/include/asm/kvm_host.h   |   3 -
- arch/arm/kvm/arm.c                |   4 +-
- arch/arm/kvm/reset.c              |   9 +-
- arch/arm64/include/asm/kvm_host.h |   3 -
- arch/arm64/kvm/reset.c            |   9 +-
- arch/arm64/kvm/sys_regs.c         |  65 +++++++++++++
- include/kvm/arm_arch_timer.h      |  39 ++++----
- virt/kvm/arm/arch_timer.c         | 200 ++++++++++++++++++++++++++------------
- virt/kvm/arm/hyp/timer-sr.c       |  13 +--
- 9 files changed, 249 insertions(+), 96 deletions(-)
-
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index d5423ab..cc495d79 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -60,9 +60,6 @@ struct kvm_arch {
+ 	/* The last vcpu id that ran on each physical CPU */
+ 	int __percpu *last_vcpu_ran;
+ 
+-	/* Timer */
+-	struct arch_timer_kvm	timer;
+-
+ 	/*
+ 	 * Anything that is not used directly from assembly code goes
+ 	 * here.
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 9d74464..f93f2171 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -135,7 +135,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 		goto out_free_stage2_pgd;
+ 
+ 	kvm_vgic_early_init(kvm);
+-	kvm_timer_init(kvm);
+ 
+ 	/* Mark the initial VMID generation invalid */
+ 	kvm->arch.vmid_gen = 0;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e505038..4a758cb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -70,9 +70,6 @@ struct kvm_arch {
+ 
+ 	/* Interrupt controller */
+ 	struct vgic_dist	vgic;
+-
+-	/* Timer */
+-	struct arch_timer_kvm	timer;
+ };
+ 
+ #define KVM_NR_MEM_OBJS     40
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index daad3c1..2c8560b 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -23,11 +23,6 @@
+ #include <linux/hrtimer.h>
+ #include <linux/workqueue.h>
+ 
+-struct arch_timer_kvm {
+-	/* Virtual offset */
+-	u64			cntvoff;
+-};
+-
+ struct arch_timer_context {
+ 	/* Registers: control register, timer value */
+ 	u32				cnt_ctl;
+@@ -38,6 +33,9 @@ struct arch_timer_context {
+ 
+ 	/* Active IRQ state caching */
+ 	bool				active_cleared_last;
++
++	/* Virtual offset */
++	u64			cntvoff;
+ };
+ 
+ struct arch_timer_cpu {
+@@ -58,7 +56,6 @@ struct arch_timer_cpu {
+ 
+ int kvm_timer_hyp_init(void);
+ int kvm_timer_enable(struct kvm_vcpu *vcpu);
+-void kvm_timer_init(struct kvm *kvm);
+ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+ 			 const struct kvm_irq_level *irq);
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index d3556b3..5004a67 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -101,9 +101,10 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+ static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
+ {
+ 	u64 cval, now;
++	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 
+-	cval = vcpu_vtimer(vcpu)->cnt_cval;
+-	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
++	cval = vtimer->cnt_cval;
++	now = kvm_phys_timer_read() - vtimer->cntvoff;
+ 
+ 	if (now < cval) {
+ 		u64 ns;
+@@ -159,7 +160,7 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+ 		return false;
+ 
+ 	cval = vtimer->cnt_cval;
+-	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
++	now = kvm_phys_timer_read() - vtimer->cntvoff;
+ 
+ 	return cval <= now;
+ }
+@@ -354,10 +355,32 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
++/* Make the updates of cntvoff for all vtimer contexts atomic */
++static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
++{
++	int i;
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm_vcpu *tmp;
++
++	mutex_lock(&kvm->lock);
++	kvm_for_each_vcpu(i, tmp, kvm)
++		vcpu_vtimer(tmp)->cntvoff = cntvoff;
++
++	/*
++	 * When called from the vcpu create path, the CPU being created is not
++	 * included in the loop above, so we just set it here as well.
++	 */
++	vcpu_vtimer(vcpu)->cntvoff = cntvoff;
++	mutex_unlock(&kvm->lock);
++}
++
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 
++	/* Synchronize cntvoff across all vtimers of a VM. */
++	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
++
+ 	INIT_WORK(&timer->expired, kvm_timer_inject_irq_work);
+ 	hrtimer_init(&timer->timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+ 	timer->timer.function = kvm_timer_expire;
+@@ -377,7 +400,7 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+ 		vtimer->cnt_ctl = value;
+ 		break;
+ 	case KVM_REG_ARM_TIMER_CNT:
+-		vcpu->kvm->arch.timer.cntvoff = kvm_phys_timer_read() - value;
++		update_vtimer_cntvoff(vcpu, kvm_phys_timer_read() - value);
+ 		break;
+ 	case KVM_REG_ARM_TIMER_CVAL:
+ 		vtimer->cnt_cval = value;
+@@ -398,7 +421,7 @@ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
+ 	case KVM_REG_ARM_TIMER_CTL:
+ 		return vtimer->cnt_ctl;
+ 	case KVM_REG_ARM_TIMER_CNT:
+-		return kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
++		return kvm_phys_timer_read() - vtimer->cntvoff;
+ 	case KVM_REG_ARM_TIMER_CVAL:
+ 		return vtimer->cnt_cval;
+ 	}
+@@ -510,11 +533,6 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
+-void kvm_timer_init(struct kvm *kvm)
+-{
+-	kvm->arch.timer.cntvoff = kvm_phys_timer_read();
+-}
+-
+ /*
+  * On VHE system, we only need to configure trap on physical timer and counter
+  * accesses in EL0 and EL1 once, not for every world switch.
+diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
+index 0cf0895..4734915 100644
+--- a/virt/kvm/arm/hyp/timer-sr.c
++++ b/virt/kvm/arm/hyp/timer-sr.c
+@@ -53,7 +53,6 @@ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
+ 
+ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	u64 val;
+@@ -71,7 +70,7 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	if (timer->enabled) {
+-		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
++		write_sysreg(vtimer->cntvoff, cntvoff_el2);
+ 		write_sysreg_el0(vtimer->cnt_cval, cntv_cval);
+ 		isb();
+ 		write_sysreg_el0(vtimer->cnt_ctl, cntv_ctl);
 -- 
 1.9.1
