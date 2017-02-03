@@ -1,23 +1,26 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvmtool PATCH v9 15/15] arm64: enable GICv3-ITS emulation
-Date: Thu,  2 Feb 2017 16:32:23 +0000
-Message-ID: <20170202163223.15372-16-andre.przywara@arm.com>
-References: <20170202163223.15372-1-andre.przywara@arm.com>
+From: Sudeep Holla <sudeep.holla@arm.com>
+Subject: Re: [PATCH v2 3/3] arm64: kvm: add support for the extended 64bit
+ ccsidr
+Date: Fri, 3 Feb 2017 10:44:38 +0000
+Message-ID: <d9b2a308-c207-5f92-d855-33339bd28990@arm.com>
+References: <1485793527-18028-1-git-send-email-sudeep.holla@arm.com>
+ <1485793527-18028-3-git-send-email-sudeep.holla@arm.com>
+ <85bd7758-e0a3-f274-ba7a-db080e66d97c@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0289040A7C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 11:31:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C87B40969
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 05:44:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zmYvbLQIwC2E for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Feb 2017 11:31:12 -0500 (EST)
+ with ESMTP id 7H7c95V-+y14 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Feb 2017 05:44:18 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F20340BCC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Feb 2017 11:31:09 -0500 (EST)
-In-Reply-To: <20170202163223.15372-1-andre.przywara@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E39E64092C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 05:44:17 -0500 (EST)
+In-Reply-To: <85bd7758-e0a3-f274-ba7a-db080e66d97c@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,47 +30,36 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Sudeep Holla <sudeep.holla@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With everything in place for the ITS emulation add a new option to the
---irqchip parameter to allow the user to specify --irqchip=gicv3-its
-to enable the ITS emulation.
-This will trigger creating the FDT node and an ITS register frame to
-tell the kernel we want ITS emulation in the guest.
+Hi Marc,
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/gic.c                                | 2 ++
- arm/include/arm-common/kvm-config-arch.h | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+On 01/02/17 16:02, Marc Zyngier wrote:
+[...]
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 5e5a227..54fd8fc 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -26,6 +26,8 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
- 		*type = IRQCHIP_GICV2;
- 	} else if (!strcmp(arg, "gicv3")) {
- 		*type = IRQCHIP_GICV3;
-+	} else if (!strcmp(arg, "gicv3-its")) {
-+		*type = IRQCHIP_GICV3_ITS;
- 	} else {
- 		pr_err("irqchip: unknown type \"%s\"\n", arg);
- 		return -1;
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index ed626b5..b48e720 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -27,7 +27,7 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset);
- 		    "Force virtio devices to use PCI as their default "		\
- 		    "transport"),						\
-         OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
--		     "[gicv2|gicv3]",					\
-+		     "[gicv2|gicv3|gicv3-its]",					\
- 		     "Type of interrupt controller to emulate in the guest",	\
- 		     irqchip_parser, NULL),
- 
+> 
+> I'm a bit worried about this patch. If we snapshot a VM on a 32bit
+> CCSIDR system, and restore it on a 64bit CSSIDR system (or the reverse),
+> what happens? My hunch is that we cannot restore the VM properly.
+>
+
+I agree. I had a look at QEMU as you suggested offline. Looks like QEMU
+emulate these registers with predefined values for each core type. Also
+it looks like it's not using the existing DEMUX_ID_CCSIDR
+
+> Now, I'm questioning the need for having those altogether, as we do a
+> lot of work to prevent the guest from actually using that geometry (and
+> on a big-little system, this hardly works).
+> 
+
+If we can conclude there are no users for DEMUX_ID_CCSIDR, we can remove
+it all together instead of introducing new one for 64bit.
+
+Are there any other users of these interface provided by KVM after from
+kvmtool and qemu ?
+
 -- 
-2.9.0
+Regards,
+Sudeep
