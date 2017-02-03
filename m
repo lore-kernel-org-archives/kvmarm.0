@@ -1,75 +1,51 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: vgic: Stop injecting the MSI occurrence
- twice
-Date: Fri, 3 Feb 2017 14:53:25 +0100
-Message-ID: <20170203135325.GL27852@cbox>
-References: <1486089003-413-1-git-send-email-shankerd@codeaurora.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC 01/13] KVM: arm/arm64: Add vITS save/restore API documentation
+Date: Fri, 3 Feb 2017 14:00:13 +0000
+Message-ID: <CAFEAcA98mFM=iNs2n=F9d4suV7+mjPJRjZfiYagX5y7HiPgMnw@mail.gmail.com>
+References: <1484236613-24633-1-git-send-email-eric.auger@redhat.com> <1484236613-24633-2-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F013140838
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 08:53:04 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 46n53-qT9QSb for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Feb 2017 08:53:03 -0500 (EST)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D692740284
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Feb 2017 08:53:03 -0500 (EST)
-Received: by mail-wm0-f47.google.com with SMTP id c85so30020244wmi.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Feb 2017 05:53:28 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <1486089003-413-1-git-send-email-shankerd@codeaurora.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shanker Donthineni <shankerd@codeaurora.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1484236613-24633-2-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Vijaya Kumar K <vijayak@caviumnetworks.com>, "Kumar, Vijaya" <Vijaya.Kumar@cavium.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Andrew Jones <drjones@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, Andre Przywara <andre.przywara@arm.com>, "prasun.kapoor" <Prasun.Kapoor@cavium.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Shanker,
-
-[please cc the kvmarm list for kvm/arm patches, thanks]
-
-On Thu, Feb 02, 2017 at 08:30:03PM -0600, Shanker Donthineni wrote:
-> The IRQFD framework calls the architecture dependent function
-> twice if the corresponding GSI type is edge triggered. For ARM,
-> the function kvm_set_msi() is getting called twice whenever the
-> IRQFD receives the event signal. The rest of the code path is
-> trying to inject the MSI without any validation checks. No need
-> to call the function vgic_its_inject_msi() second time to avoid
-> an unnecessary overhead in IRQ queue logic. It also avoids the
-> possibility of VM seeing the MSI twice.
-> 
-> Simple fix, return -1 if the argument 'level' value is zero.
-> 
-> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+On 12 January 2017 at 15:56, Eric Auger <eric.auger@redhat.com> wrote:
+> Add description for how to access vITS registers and how to flush/restore
+> vITS tables into/from memory
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > ---
->  virt/kvm/arm/vgic/vgic-irqfd.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
-> index d918dcf..f138ed2 100644
-> --- a/virt/kvm/arm/vgic/vgic-irqfd.c
-> +++ b/virt/kvm/arm/vgic/vgic-irqfd.c
-> @@ -99,6 +99,9 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->  	if (!vgic_has_its(kvm))
->  		return -ENODEV;
->  
-> +	if (!level)
-> +		return -1;
+>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 70 ++++++++++++++++++++++
+>  1 file changed, 70 insertions(+)
+>
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> index 6081a5b..bd74613 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> @@ -36,3 +36,73 @@ Groups:
+>      -ENXIO:  ITS not properly configured as required prior to setting
+>               this attribute
+>      -ENOMEM: Memory shortage when allocating ITS internal data
 > +
->  	return vgic_its_inject_msi(kvm, &msi);
->  }
->  
-> -- 
+> +  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+> +  Attributes:
+> +      The attr field of kvm_device_attr encodes the offset of the
+> +      ITS register, relative to the ITS control frame base address
+> +      (ITS_base).
+> +
+> +      kvm_device_attr.addr points to a __u64 value whatever the width
+> +      of the addressed register (32/64 bits).
+> +
+> +      Writes to read-only registers are ignored by the kernel except
+> +      for a single register, GITS_READR. Normally this register is RO
+> +      but it needs to be restored otherwise commands in the queue will
+> +      be re-executed after CWRITER setting.
 
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Dumb question -- is it possible/sensible to process the command
+queue rather than migrating a list of outstanding commands?
+
+thanks
+-- PMM
