@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v2 17/19] KVM: arm64: ITS: ITT flush and restore
-Date: Wed,  8 Feb 2017 12:43:30 +0100
-Message-ID: <1486554212-2774-18-git-send-email-eric.auger@redhat.com>
+Subject: [RFC v2 18/19] KVM: arm64: ITS: Device table save/restore
+Date: Wed,  8 Feb 2017 12:43:31 +0100
+Message-ID: <1486554212-2774-19-git-send-email-eric.auger@redhat.com>
 References: <1486554212-2774-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBAA040A14
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Feb 2017 06:44:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C9A74408E9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Feb 2017 06:44:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xPUpvYJvFYNi for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Feb 2017 06:44:16 -0500 (EST)
+ with ESMTP id YWfdKynDkl3k for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Feb 2017 06:44:20 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D48340A63
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Feb 2017 06:44:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DCC9940962
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Feb 2017 06:44:19 -0500 (EST)
 In-Reply-To: <1486554212-2774-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,130 +31,205 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Introduce routines to flush and restore device ITT and their
-interrupt table entries (ITE).
+This patch flushes the device table entries into guest RAM.
+Both flat table and 2 stage tables are supported.  DeviceId
+indexing is used.
 
-The routines will be called on device table flush and
-restore.
+For each device listed in the device table, we also flush
+the translation table using the vgic_its_flush/restore_itt
+routines.
+
+On restore, devices are re-allocated and their itte are
+re-built.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
-v2: creation
+v1 -> v2:
+- use 8 byte format for DTE and ITE
+- support 2 stage format
+- remove kvm parameter
+- ITT flush/restore moved in a separate patch
+- use deviceid indexing
 ---
- virt/kvm/arm/vgic/vgic-its.c | 99 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 99 insertions(+)
+ virt/kvm/arm/vgic/vgic-its.c | 145 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 143 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 1060125..be9e8ed 100644
+index be9e8ed..c1ae85b 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1748,6 +1748,105 @@ static int vgic_its_restore_pending_tables(struct vgic_its *its)
- 	return -ENXIO;
+@@ -1814,6 +1814,7 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+ 		return ret;
+ 
+ 	update_affinity_ite(kvm, ite);
++	return 0;
  }
  
-+static int vgic_its_flush_ite(struct vgic_its *its, struct its_device *dev,
-+			      struct its_ite *ite, gpa_t gpa)
+ static int vgic_its_flush_itt(struct vgic_its *its, struct its_device *device)
+@@ -1848,12 +1849,137 @@ static int vgic_its_restore_itt(struct vgic_its *its,
+ }
+ 
+ /**
++ * vgic_its_flush_dte - Flush a device table entry at a given GPA
++ *
++ * @its: ITS handle
++ * @dev: ITS device
++ * @ptr: GPA
++ */
++static int vgic_its_flush_dte(struct vgic_its *its,
++			      struct its_device *dev, gpa_t ptr)
 +{
 +	struct kvm *kvm = its->dev->kvm;
++	u64 val, itt_addr_field;
++	int ret;
 +	u32 next_offset;
-+	u64 val;
 +
-+	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
-+	val = ((u64)next_offset << 48) | ((u64)ite->lpi << 16) |
-+		ite->collection->collection_id;
++	itt_addr_field = dev->itt_addr >> 8;
++	next_offset = compute_next_devid_offset(&its->device_list, dev);
++	val = (((u64)next_offset << 45) | (itt_addr_field << 5) |
++		(dev->nb_eventid_bits - 1));
 +	val = cpu_to_le64(val);
-+	return kvm_write_guest(kvm, gpa, &val, VITS_ESZ);
++	ret = kvm_write_guest(kvm, ptr, &val, 8);
++	return ret;
 +}
 +
 +/**
-+ * vgic_its_restore_ite - restore an interrupt translation entry
-+ * @event_id: id used for indexing
-+ * @ptr: kernel VA where the 8 byte ITE is located
-+ * @opaque: pointer to the its_device
-+ * @next: id offset to the next entry
++ * vgic_its_restore_dte - restore a device table entry
++ *
++ * @its: its handle
++ * @id: device id the DTE corresponds to
++ * @ptr: kernel VA where the 8 byte DTE is located
++ * @opaque: unused
++ * @next: offset to the next valid device id
++ *
++ * Return: < 0 on error, 0 otherwise
 + */
-+static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
++static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
 +				void *ptr, void *opaque, u32 *next)
 +{
-+	struct its_device *dev = (struct its_device *)opaque;
-+	struct its_collection *collection;
-+	struct kvm *kvm = its->dev->kvm;
++	struct its_device *dev;
++	gpa_t itt_addr;
++	size_t size;
 +	u64 val, *p = (u64 *)ptr;
-+	struct vgic_irq *irq;
-+	u32 coll_id, lpi_id;
-+	struct its_ite *ite;
 +	int ret;
 +
 +	val = *p;
-+	*next = 1;
-+
 +	val = le64_to_cpu(val);
 +
-+	coll_id = val & GENMASK_ULL(15, 0);
-+	lpi_id = (val & GENMASK_ULL(47, 16)) >> 16;
++	size = val & GENMASK_ULL(4, 0);
++	itt_addr = (val & GENMASK_ULL(48, 5)) >> 5;
++	*next = 1;
 +
-+	if (!lpi_id)
++	if (!itt_addr)
 +		return 0;
 +
-+	*next = (val & GENMASK_ULL(63, 48)) >> 48;
++	/* dte entry is valid */
++	*next = (val & GENMASK_ULL(63, 45)) >> 45;
 +
-+	collection = find_collection(its, coll_id);
-+	if (!collection)
-+		return -EINVAL;
-+
-+	ret = vgic_its_alloc_ite(dev, &ite, collection,
-+				  lpi_id, event_id);
++	ret = vgic_its_alloc_device(its, &dev, id,
++				    itt_addr, size);
 +	if (ret)
 +		return ret;
++	ret = vgic_its_restore_itt(its, dev);
 +
-+	irq = vgic_add_lpi(kvm, lpi_id);
-+	if (IS_ERR(irq))
-+		return PTR_ERR(irq);
-+	ite->irq = irq;
-+
-+	/* restore the configuration of the LPI */
-+	ret = update_lpi_config(kvm, irq, NULL);
-+	if (ret)
-+		return ret;
-+
-+	update_affinity_ite(kvm, ite);
++	return ret;
 +}
 +
-+static int vgic_its_flush_itt(struct vgic_its *its, struct its_device *device)
-+{
-+	gpa_t base = device->itt_addr;
-+	struct its_ite *ite;
-+	int ret;
-+
-+	list_for_each_entry(ite, &device->itt_head, ite_list) {
-+		gpa_t gpa = base + ite->event_id * VITS_ESZ;
-+
-+		ret = vgic_its_flush_ite(its, device, ite, gpa);
-+		if (ret)
-+			return ret;
-+	}
-+	return 0;
-+}
-+
-+static int vgic_its_restore_itt(struct vgic_its *its,
-+				struct its_device *dev)
-+{
-+	size_t max_size = (2 << dev->nb_eventid_bits) * VITS_ESZ;
-+	gpa_t base = dev->itt_addr;
-+	int ret;
-+
-+	ret =  lookup_table(its, base, max_size, VITS_ESZ, 0,
-+			    vgic_its_restore_ite, dev);
-+
-+	if (ret < 0)
-+		return ret;
-+	return 0;
-+}
-+
- /**
++/**
   * vgic_its_flush_device_tables - flush the device table and all ITT
   * into guest RAM
+  */
+ static int vgic_its_flush_device_tables(struct vgic_its *its)
+ {
+-	return -ENXIO;
++	struct its_device *dev;
++	u64 baser;
++
++	baser = its->baser_device_table;
++
++	list_for_each_entry(dev, &its->device_list, dev_list) {
++		int ret;
++		gpa_t eaddr;
++
++		if (!vgic_its_check_id(its, baser,
++				       dev->device_id, &eaddr))
++			return -EINVAL;
++
++		ret = vgic_its_flush_itt(its, dev);
++		if (ret)
++			return ret;
++
++		ret = vgic_its_flush_dte(its, dev, eaddr);
++		if (ret)
++			return ret;
++		}
++	return 0;
++}
++
++/**
++ * handle_l1_entry - callback used for L1 entries (2 stage case)
++ *
++ * @its: its handle
++ * @id: id
++ * @addr: kernel VA
++ * @opaque: unused
++ * @next_offset: offset to the next L1 entry: 0 if the last element
++ * was found, 1 otherwise
++ */
++static int handle_l1_entry(struct vgic_its *its, u32 id, void *addr,
++			   void *opaque, u32 *next_offset)
++{
++	u64 *pe = addr;
++	gpa_t gpa;
++	int l2_start_id = id * (SZ_64K / 8);
++	int ret;
++
++	*pe = le64_to_cpu(*pe);
++	*next_offset = 1;
++
++	if (!(*pe & BIT_ULL(63)))
++		return 0;
++
++	gpa = *pe & GENMASK_ULL(51, 16);
++
++	ret = lookup_table(its, gpa, SZ_64K, 8,
++			    l2_start_id, vgic_its_restore_dte, NULL);
++
++	if (ret == 1) {
++		/* last entry was found in this L2 table */
++		*next_offset = 0;
++		ret = 0;
++	}
++
++	return ret;
+ }
+ 
+ /**
+@@ -1862,7 +1988,22 @@ static int vgic_its_flush_device_tables(struct vgic_its *its)
+  */
+ static int vgic_its_restore_device_tables(struct vgic_its *its)
+ {
+-	return -ENXIO;
++	u64 baser = its->baser_device_table;
++	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
++	int l1_esz = GITS_BASER_ENTRY_SIZE(baser);
++	gpa_t l1_gpa;
++
++	l1_gpa = BASER_ADDRESS(baser);
++	if (!l1_gpa)
++		return 0;
++
++	if (!(baser & GITS_BASER_INDIRECT))
++		return lookup_table(its, l1_gpa, l1_tbl_size, l1_esz,
++				    0, vgic_its_restore_dte, NULL);
++
++	/* two stage table */
++	return lookup_table(its, l1_gpa, l1_tbl_size, 8, 0,
++			    handle_l1_entry, NULL);
+ }
+ 
+ static int vgic_its_flush_cte(struct vgic_its *its,
 -- 
 2.5.5
