@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v2 12/19] KVM: arm64: ITS: vgic_its_alloc_ite/device
-Date: Wed,  8 Feb 2017 12:43:25 +0100
-Message-ID: <1486554212-2774-13-git-send-email-eric.auger@redhat.com>
+Subject: [RFC v2 13/19] KVM: arm64: ITS: Sort the device and ITE lists
+Date: Wed,  8 Feb 2017 12:43:26 +0100
+Message-ID: <1486554212-2774-14-git-send-email-eric.auger@redhat.com>
 References: <1486554212-2774-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F091D40A7C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Feb 2017 06:43:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CDBF140992
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Feb 2017 06:44:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AlaJ10wbkJ-Z for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Feb 2017 06:43:56 -0500 (EST)
+ with ESMTP id 8eq9GPd-XUv6 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Feb 2017 06:44:00 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 24E8D40992
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Feb 2017 06:43:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1B94408E9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Feb 2017 06:43:59 -0500 (EST)
 In-Reply-To: <1486554212-2774-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,132 +31,83 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add two new helpers to allocate an its ite and an its device.
-This will avoid duplication on restore path.
+Natively sort the device and ITE lists in ascending
+deviceId/eventid order. This paves the way to optimized
+DTE and ITE scan in guest RAM table where entries are chained
+together using a next ID offset.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
-
-v1 -> v2:
-- report itt_size fix and remove ITE_SIZE
-- s/itte/ite/g
----
- virt/kvm/arm/vgic/vgic-its.c | 70 +++++++++++++++++++++++++++++---------------
- 1 file changed, 47 insertions(+), 23 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 36 ++++++++++++++++++++++++++++++++++--
+ 1 file changed, 34 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index dd7545a..9792110 100644
+index 9792110..1cd6ae6 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -734,6 +734,26 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
+@@ -734,6 +734,21 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
  	kfree(collection);
  }
  
-+static int vgic_its_alloc_ite(struct its_device *device,
-+			       struct its_ite **itep,
-+			       struct its_collection *collection,
-+			       u32 lpi_id, u32 event_id)
++static void ite_list_insert_sorted(struct list_head *h, struct its_ite *ite)
 +{
-+	struct its_ite *ite;
++	struct list_head *pos = h->next;
++	u32 id = ite->event_id;
 +
-+	ite = kzalloc(sizeof(ite), GFP_KERNEL);
-+	if (!ite)
-+		return -ENOMEM;
-+
-+	ite->event_id	= event_id;
-+	ite->collection = collection;
-+	ite->lpi = lpi_id;
-+
-+	list_add_tail(&ite->ite_list, &device->itt_head);
-+	*itep = ite;
-+	return 0;
++	while (pos != h) {
++		struct its_ite *iter =
++			list_entry(pos, struct its_ite, ite_list);
++		if (id < iter->event_id)
++			break;
++		pos = pos->next;
++	}
++	list_add_tail(&ite->ite_list, pos);
 +}
 +
- /*
-  * The MAPTI and MAPI commands map LPIs to ITTEs.
-  * Must be called with its_lock mutex held.
-@@ -747,7 +767,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	struct its_ite *ite;
- 	struct its_device *device;
- 	struct its_collection *collection, *new_coll = NULL;
--	int lpi_nr;
-+	int lpi_nr, ret;
- 	struct vgic_irq *irq;
+ static int vgic_its_alloc_ite(struct its_device *device,
+ 			       struct its_ite **itep,
+ 			       struct its_collection *collection,
+@@ -749,7 +764,7 @@ static int vgic_its_alloc_ite(struct its_device *device,
+ 	ite->collection = collection;
+ 	ite->lpi = lpi_id;
  
- 	device = find_its_device(its, device_id);
-@@ -777,19 +797,13 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 		new_coll = collection;
- 	}
- 
--	ite = kzalloc(sizeof(struct its_ite), GFP_KERNEL);
--	if (!ite) {
-+	ret = vgic_its_alloc_ite(device, &ite, collection, lpi_nr, event_id);
-+	if (ret) {
- 		if (new_coll)
- 			vgic_its_free_collection(its, coll_id);
--		return -ENOMEM;
-+		return ret;
- 	}
- 
--	ite->event_id	= event_id;
 -	list_add_tail(&ite->ite_list, &device->itt_head);
--
--	ite->collection = collection;
--	ite->lpi = lpi_nr;
--
- 	irq = vgic_add_lpi(kvm, lpi_nr);
- 	if (IS_ERR(irq)) {
- 		if (new_coll)
-@@ -828,6 +842,28 @@ static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
++	ite_list_insert_sorted(&device->itt_head, ite);
+ 	*itep = ite;
+ 	return 0;
+ }
+@@ -842,6 +857,22 @@ static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
  	kfree(device);
  }
  
-+static int vgic_its_alloc_device(struct vgic_its *its,
-+				 struct its_device **devp,
-+				 u32 device_id, gpa_t itt_addr_field,
-+				 size_t size_field)
++static void device_list_insert_sorted(struct list_head *h,
++				      struct its_device *dev)
 +{
-+	struct its_device *device;
++	struct list_head *pos = h->next;
++	u32 id = dev->device_id;
 +
-+	device = kzalloc(sizeof(*device), GFP_KERNEL);
-+	if (!device)
-+		return -ENOMEM;
-+
-+	device->device_id = device_id;
-+	device->itt_addr = itt_addr_field << 8;
-+	device->nb_eventid_bits = size_field + 1;
-+	INIT_LIST_HEAD(&device->itt_head);
-+
-+	list_add_tail(&device->dev_list, &its->device_list);
-+	*devp = device;
-+
-+	return 0;
++	while (pos != h) {
++		struct its_device *iter =
++			list_entry(pos, struct its_device, dev_list);
++		if (id < iter->device_id)
++			break;
++		pos = pos->next;
++	}
++	list_add_tail(&dev->dev_list, pos);
 +}
 +
- /*
-  * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
-  * Must be called with the its_lock mutex held.
-@@ -864,19 +900,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	if (!valid)
- 		return 0;
+ static int vgic_its_alloc_device(struct vgic_its *its,
+ 				 struct its_device **devp,
+ 				 u32 device_id, gpa_t itt_addr_field,
+@@ -858,7 +889,8 @@ static int vgic_its_alloc_device(struct vgic_its *its,
+ 	device->nb_eventid_bits = size_field + 1;
+ 	INIT_LIST_HEAD(&device->itt_head);
  
--	device = kzalloc(sizeof(struct its_device), GFP_KERNEL);
--	if (!device)
--		return -ENOMEM;
--
--	device->device_id = device_id;
--	device->itt_addr = itt_addr << 8;
--	device->nb_eventid_bits = size + 1;
--
--	INIT_LIST_HEAD(&device->itt_head);
--
 -	list_add_tail(&device->dev_list, &its->device_list);
--
--	return 0;
-+	return vgic_its_alloc_device(its, &device, device_id, itt_addr, size);
- }
++	device_list_insert_sorted(&its->device_list, device);
++
+ 	*devp = device;
  
- /*
+ 	return 0;
 -- 
 2.5.5
