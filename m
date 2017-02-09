@@ -1,86 +1,105 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 10/25] KVM: arm/arm64: Documentation: Update arm-vgic-v3.txt
-Date: Thu,  9 Feb 2017 14:59:08 +0000
-Message-ID: <1486652363-7696-11-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 12/25] arm/arm64: KVM: Stop propagating cacheability status of a faulted page
+Date: Thu,  9 Feb 2017 14:59:10 +0000
+Message-ID: <1486652363-7696-13-git-send-email-marc.zyngier@arm.com>
 References: <1486652363-7696-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F41B40BDA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:24 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gFA6w-EUj6NJ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Feb 2017 09:59:23 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A4A0040B5B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:20 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1486652363-7696-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, Pavel Fedin <p.fedin@samsung.com>, Shanker Donthineni <shankerd@codeaurora.org>, Jintack Lim <jintack@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Now that we unconditionally flush newly mapped pages to the PoC,
+there is no need to care about the "uncached" status of individual
+pages - they must all be visible all the way down.
 
-Update error code returned for Invalid CPU interface register
-value and access in AArch32 mode.
-
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   |  3 +--
+ arch/arm/kvm/mmu.c               | 11 ++++-------
+ arch/arm64/include/asm/kvm_mmu.h |  3 +--
+ 3 files changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-index 9348b3c..c1a2461 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-@@ -118,7 +118,7 @@ Groups:
-     -EBUSY: One or more VCPUs are running
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index a58bbaa..95f38dc 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -129,8 +129,7 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
  
+ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
+ 					       kvm_pfn_t pfn,
+-					       unsigned long size,
+-					       bool ipa_uncached)
++					       unsigned long size)
+ {
+ 	/*
+ 	 * If we are going to insert an instruction page and the icache is
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index a5265ed..5cc35080 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -1232,9 +1232,9 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ }
  
--  KVM_DEV_ARM_VGIC_CPU_SYSREGS
-+  KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
-   Attributes:
-     The attr field of kvm_device_attr encodes two values:
-     bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
-@@ -139,13 +139,15 @@ Groups:
-     All system regs accessed through this API are (rw, 64-bit) and
-     kvm_device_attr.addr points to a __u64 value.
+ static void coherent_cache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
+-				      unsigned long size, bool uncached)
++				      unsigned long size)
+ {
+-	__coherent_cache_guest_page(vcpu, pfn, size, uncached);
++	__coherent_cache_guest_page(vcpu, pfn, size);
+ }
  
--    KVM_DEV_ARM_VGIC_CPU_SYSREGS accesses the CPU interface registers for the
-+    KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS accesses the CPU interface registers for the
-     CPU specified by the mpidr field.
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+@@ -1250,7 +1250,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	struct vm_area_struct *vma;
+ 	kvm_pfn_t pfn;
+ 	pgprot_t mem_type = PAGE_S2;
+-	bool fault_ipa_uncached;
+ 	bool logging_active = memslot_is_logging(memslot);
+ 	unsigned long flags = 0;
  
-+    CPU interface registers access is not implemented for AArch32 mode.
-+    Error -ENXIO is returned when accessed in AArch32 mode.
-   Errors:
-     -ENXIO: Getting or setting this register is not yet supported
-     -EBUSY: VCPU is running
--    -EINVAL: Invalid mpidr supplied
-+    -EINVAL: Invalid mpidr or register value supplied
+@@ -1337,8 +1336,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (!hugetlb && !force_pte)
+ 		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
  
+-	fault_ipa_uncached = memslot->flags & KVM_MEMSLOT_INCOHERENT;
+-
+ 	if (hugetlb) {
+ 		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
+ 		new_pmd = pmd_mkhuge(new_pmd);
+@@ -1346,7 +1343,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+ 			kvm_set_pfn_dirty(pfn);
+ 		}
+-		coherent_cache_guest_page(vcpu, pfn, PMD_SIZE, fault_ipa_uncached);
++		coherent_cache_guest_page(vcpu, pfn, PMD_SIZE);
+ 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
+ 	} else {
+ 		pte_t new_pte = pfn_pte(pfn, mem_type);
+@@ -1356,7 +1353,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			kvm_set_pfn_dirty(pfn);
+ 			mark_page_dirty(kvm, gfn);
+ 		}
+-		coherent_cache_guest_page(vcpu, pfn, PAGE_SIZE, fault_ipa_uncached);
++		coherent_cache_guest_page(vcpu, pfn, PAGE_SIZE);
+ 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
+ 	}
  
-   KVM_DEV_ARM_VGIC_GRP_NR_IRQS
-@@ -204,3 +206,6 @@ Groups:
-     architecture defined MPIDR, and the field is encoded as follows:
-       | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
-+  Errors:
-+    -EINVAL: vINTID is not multiple of 32 or
-+     info field is not VGIC_LEVEL_INFO_LINE_LEVEL
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 6d22017..aa1e6db 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -236,8 +236,7 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+ 
+ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
+ 					       kvm_pfn_t pfn,
+-					       unsigned long size,
+-					       bool ipa_uncached)
++					       unsigned long size)
+ {
+ 	void *va = page_address(pfn_to_page(pfn));
+ 
 -- 
 2.1.4
