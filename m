@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 22/25] KVM: arm/arm64: Set a background timer to the earliest
- timer expiration
-Date: Thu,  9 Feb 2017 14:59:20 +0000
-Message-ID: <1486652363-7696-23-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 24/25] KVM: arm64: Add the EL1 physical timer access handler
+Date: Thu,  9 Feb 2017 14:59:22 +0000
+Message-ID: <1486652363-7696-25-git-send-email-marc.zyngier@arm.com>
 References: <1486652363-7696-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A5AB40C22
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 122A440BD2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6N6wrxAffEeL for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Feb 2017 09:59:46 -0500 (EST)
+ with ESMTP id Y2gie+LneJaR for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Feb 2017 09:59:50 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E0AE140C9D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BD9A40C28
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:50 -0500 (EST)
 In-Reply-To: <1486652363-7696-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,129 +33,69 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Jintack Lim <jintack@cs.columbia.edu>
 
-When scheduling a background timer, consider both of the virtual and
-physical timer and pick the earliest expiration time.
+KVM traps on the EL1 phys timer accesses from VMs, but it doesn't handle
+those traps. This results in terminating VMs. Instead, set a handler for
+the EL1 phys timer access, and inject an undefined exception as an
+intermediate step.
 
 Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/arm.c        |  3 ++-
- virt/kvm/arm/arch_timer.c | 53 +++++++++++++++++++++++++++++++++++------------
- 2 files changed, 42 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 0ecd6cf..21c493a 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -300,7 +300,8 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index caa47ce..1cd3464 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -820,6 +820,30 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
+ 	  access_pmu_evtyper, reset_unknown, (PMEVTYPER0_EL0 + n), }
  
- int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
- {
--	return kvm_timer_should_fire(vcpu_vtimer(vcpu));
-+	return kvm_timer_should_fire(vcpu_vtimer(vcpu)) ||
-+	       kvm_timer_should_fire(vcpu_ptimer(vcpu));
- }
- 
- void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 7f9a664..0ea7452 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -118,6 +118,35 @@ static u64 kvm_timer_compute_delta(struct arch_timer_context *timer_ctx)
- 	return 0;
- }
- 
-+static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx)
++static bool access_cntp_tval(struct kvm_vcpu *vcpu,
++		struct sys_reg_params *p,
++		const struct sys_reg_desc *r)
 +{
-+	return !(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
-+		(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_ENABLE);
++	kvm_inject_undefined(vcpu);
++	return true;
 +}
 +
-+/*
-+ * Returns the earliest expiration time in ns among guest timers.
-+ * Note that it will return 0 if none of timers can fire.
-+ */
-+static u64 kvm_timer_earliest_exp(struct kvm_vcpu *vcpu)
++static bool access_cntp_ctl(struct kvm_vcpu *vcpu,
++		struct sys_reg_params *p,
++		const struct sys_reg_desc *r)
 +{
-+	u64 min_virt = ULLONG_MAX, min_phys = ULLONG_MAX;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-+
-+	if (kvm_timer_irq_can_fire(vtimer))
-+		min_virt = kvm_timer_compute_delta(vtimer);
-+
-+	if (kvm_timer_irq_can_fire(ptimer))
-+		min_phys = kvm_timer_compute_delta(ptimer);
-+
-+	/* If none of timers can fire, then return 0 */
-+	if ((min_virt == ULLONG_MAX) && (min_phys == ULLONG_MAX))
-+		return 0;
-+
-+	return min(min_virt, min_phys);
++	kvm_inject_undefined(vcpu);
++	return true;
 +}
 +
- static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
- {
- 	struct arch_timer_cpu *timer;
-@@ -132,7 +161,7 @@ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
- 	 * PoV (NTP on the host may have forced it to expire
- 	 * early). If we should have slept longer, restart it.
- 	 */
--	ns = kvm_timer_compute_delta(vcpu_vtimer(vcpu));
-+	ns = kvm_timer_earliest_exp(vcpu);
- 	if (unlikely(ns)) {
- 		hrtimer_forward_now(hrt, ns_to_ktime(ns));
- 		return HRTIMER_RESTART;
-@@ -142,12 +171,6 @@ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
- 	return HRTIMER_NORESTART;
- }
++static bool access_cntp_cval(struct kvm_vcpu *vcpu,
++		struct sys_reg_params *p,
++		const struct sys_reg_desc *r)
++{
++	kvm_inject_undefined(vcpu);
++	return true;
++}
++
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -1029,6 +1053,16 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b011),
+ 	  NULL, reset_unknown, TPIDRRO_EL0 },
  
--static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx)
--{
--	return !(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
--		(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_ENABLE);
--}
--
- bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
- {
- 	u64 cval, now;
-@@ -215,26 +238,30 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
- 	BUG_ON(timer_is_armed(timer));
- 
- 	/*
--	 * No need to schedule a background timer if the guest timer has
-+	 * No need to schedule a background timer if any guest timer has
- 	 * already expired, because kvm_vcpu_block will return before putting
- 	 * the thread to sleep.
- 	 */
--	if (kvm_timer_should_fire(vtimer))
-+	if (kvm_timer_should_fire(vtimer) || kvm_timer_should_fire(ptimer))
- 		return;
- 
- 	/*
--	 * If the timer is not capable of raising interrupts (disabled or
-+	 * If both timers are not capable of raising interrupts (disabled or
- 	 * masked), then there's no more work for us to do.
- 	 */
--	if (!kvm_timer_irq_can_fire(vtimer))
-+	if (!kvm_timer_irq_can_fire(vtimer) && !kvm_timer_irq_can_fire(ptimer))
- 		return;
- 
--	/*  The timer has not yet expired, schedule a background timer */
--	timer_arm(timer, kvm_timer_compute_delta(vtimer));
-+	/*
-+	 * The guest timers have not yet expired, schedule a background timer.
-+	 * Set the earliest expiration time among the guest timers.
-+	 */
-+	timer_arm(timer, kvm_timer_earliest_exp(vcpu));
- }
- 
- void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
++	/* CNTP_TVAL_EL0 */
++	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b000),
++	  access_cntp_tval },
++	/* CNTP_CTL_EL0 */
++	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b001),
++	  access_cntp_ctl },
++	/* CNTP_CVAL_EL0 */
++	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b010),
++	  access_cntp_cval },
++
+ 	/* PMEVCNTRn_EL0 */
+ 	PMU_PMEVCNTR_EL0(0),
+ 	PMU_PMEVCNTR_EL0(1),
 -- 
 2.1.4
