@@ -1,122 +1,77 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 14/25] KVM: arm/arm64: Remove kvm_vgic_inject_mapped_irq
-Date: Thu,  9 Feb 2017 14:59:12 +0000
-Message-ID: <1486652363-7696-15-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 13/25] arm/arm64: KVM: Get rid of KVM_MEMSLOT_INCOHERENT
+Date: Thu,  9 Feb 2017 14:59:11 +0000
+Message-ID: <1486652363-7696-14-git-send-email-marc.zyngier@arm.com>
 References: <1486652363-7696-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C48F740C17
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:36 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id SNLKvz3OEa2J for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Feb 2017 09:59:31 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E959540C49
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:26 -0500 (EST)
 In-Reply-To: <1486652363-7696-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, Pavel Fedin <p.fedin@samsung.com>, Shanker Donthineni <shankerd@codeaurora.org>, Jintack Lim <jintack@cs.columbia.edu>
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+KVM_MEMSLOT_INCOHERENT is not used anymore, as we've killed its
+only use in the arm/arm64 MMU code. Let's remove the last artifacts.
 
-The only benefit of having kvm_vgic_inject_mapped_irq separate from
-kvm_vgic_inject_irq is that we pass a boolean that we use for error
-checking on the injection path.
-
-While this could potentially help in some aspect of robustness, it's
-also a little bit of a defensive move, and arguably callers into the
-vgic should have make sure they have marked their virtual IRQs as mapped
-if required.
-
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/arch_timer.c |  3 ++-
- virt/kvm/arm/vgic/vgic.c  | 50 +++++++++++++++--------------------------------
- 2 files changed, 18 insertions(+), 35 deletions(-)
+ arch/arm/kvm/mmu.c       | 9 ---------
+ include/linux/kvm_host.h | 1 -
+ 2 files changed, 10 deletions(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 6a084cd..91ecf48 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -175,7 +175,8 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
- 	timer->irq.level = new_level;
- 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->irq.irq,
- 				   timer->irq.level);
--	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
-+
-+	ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
- 					 timer->irq.irq,
- 					 timer->irq.level);
- 	WARN_ON(ret);
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index dea12df..654dfd4 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -335,9 +335,22 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
- 	return true;
- }
- 
--static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
--				   unsigned int intid, bool level,
--				   bool mapped_irq)
-+/**
-+ * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
-+ * @kvm:     The VM structure pointer
-+ * @cpuid:   The CPU for PPIs
-+ * @intid:   The INTID to inject a new state to.
-+ * @level:   Edge-triggered:  true:  to trigger the interrupt
-+ *			      false: to ignore the call
-+ *	     Level-sensitive  true:  raise the input signal
-+ *			      false: lower the input signal
-+ *
-+ * The VGIC is not concerned with devices being active-LOW or active-HIGH for
-+ * level-sensitive interrupts.  You can think of the level parameter as 1
-+ * being HIGH and 0 being LOW and all devices being active-HIGH.
-+ */
-+int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
-+			bool level)
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 5cc35080..962616f 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -1876,15 +1876,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
+ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 			    unsigned long npages)
  {
- 	struct kvm_vcpu *vcpu;
- 	struct vgic_irq *irq;
-@@ -357,11 +370,6 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
- 	if (!irq)
- 		return -EINVAL;
- 
--	if (irq->hw != mapped_irq) {
--		vgic_put_irq(kvm, irq);
--		return -EINVAL;
--	}
--
- 	spin_lock(&irq->irq_lock);
- 
- 	if (!vgic_validate_injection(irq, level)) {
-@@ -382,32 +390,6 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+-	/*
+-	 * Readonly memslots are not incoherent with the caches by definition,
+-	 * but in practice, they are used mostly to emulate ROMs or NOR flashes
+-	 * that the guest may consider devices and hence map as uncached.
+-	 * To prevent incoherency issues in these cases, tag all readonly
+-	 * regions as incoherent.
+-	 */
+-	if (slot->flags & KVM_MEM_READONLY)
+-		slot->flags |= KVM_MEMSLOT_INCOHERENT;
  	return 0;
  }
  
--/**
-- * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
-- * @kvm:     The VM structure pointer
-- * @cpuid:   The CPU for PPIs
-- * @intid:   The INTID to inject a new state to.
-- * @level:   Edge-triggered:  true:  to trigger the interrupt
-- *			      false: to ignore the call
-- *	     Level-sensitive  true:  raise the input signal
-- *			      false: lower the input signal
-- *
-- * The VGIC is not concerned with devices being active-LOW or active-HIGH for
-- * level-sensitive interrupts.  You can think of the level parameter as 1
-- * being HIGH and 0 being LOW and all devices being active-HIGH.
-- */
--int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
--			bool level)
--{
--	return vgic_update_irq_pending(kvm, cpuid, intid, level, false);
--}
--
--int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
--			       bool level)
--{
--	return vgic_update_irq_pending(kvm, cpuid, intid, level, true);
--}
--
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq)
- {
- 	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 1c5190d..cda457b 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -45,7 +45,6 @@
+  * include/linux/kvm_h.
+  */
+ #define KVM_MEMSLOT_INVALID	(1UL << 16)
+-#define KVM_MEMSLOT_INCOHERENT	(1UL << 17)
+ 
+ /* Two fragments for cross MMIO pages. */
+ #define KVM_MAX_MMIO_FRAGMENTS	2
 -- 
 2.1.4
