@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 11/25] arm/arm64: KVM: Enforce unconditional flush to PoC when
- mapping to stage-2
-Date: Thu,  9 Feb 2017 14:59:09 +0000
-Message-ID: <1486652363-7696-12-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 17/25] KVM: arm/arm64: Move cntvoff to each timer context
+Date: Thu,  9 Feb 2017 14:59:15 +0000
+Message-ID: <1486652363-7696-18-git-send-email-marc.zyngier@arm.com>
 References: <1486652363-7696-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EC0340B5B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A25B440C30
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8ZcQTfpOdWhq for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Feb 2017 09:59:23 -0500 (EST)
+ with ESMTP id V+y06XGMGs7P for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Feb 2017 09:59:35 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE06B40C4B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ABAE40C57
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 09:59:35 -0500 (EST)
 In-Reply-To: <1486652363-7696-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,72 +31,210 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When we fault in a page, we flush it to the PoC (Point of Coherency)
-if the faulting vcpu has its own caches off, so that it can observe
-the page we just brought it.
+From: Jintack Lim <jintack@cs.columbia.edu>
 
-But if the vcpu has its caches on, we skip that step. Bad things
-happen when *another* vcpu tries to access that page with its own
-caches disabled. At that point, there is no garantee that the
-data has made it to the PoC, and we access stale data.
+Make cntvoff per each timer context. This is helpful to abstract kvm
+timer functions to work with timer context without considering timer
+types (e.g. physical timer or virtual timer).
 
-The obvious fix is to always flush to PoC when a page is faulted
-in, no matter what the state of the vcpu is.
+This also would pave the way for ever doing adjustments of the cntvoff
+on a per-CPU basis if that should ever make sense.
 
-Cc: stable@vger.kernel.org
-Fixes: 2d58b733c876 ("arm64: KVM: force cache clean on page fault when caches are off")
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h   | 9 +--------
- arch/arm64/include/asm/kvm_mmu.h | 3 +--
- 2 files changed, 2 insertions(+), 10 deletions(-)
+ arch/arm/include/asm/kvm_host.h   |  3 ---
+ arch/arm/kvm/arm.c                |  1 -
+ arch/arm64/include/asm/kvm_host.h |  3 ---
+ include/kvm/arm_arch_timer.h      |  9 +++------
+ virt/kvm/arm/arch_timer.c         | 38 ++++++++++++++++++++++++++++----------
+ virt/kvm/arm/hyp/timer-sr.c       |  3 +--
+ 6 files changed, 32 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 74a44727..a58bbaa 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -150,18 +150,12 @@ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
- 	 * and iterate over the range.
- 	 */
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index d5423ab..cc495d79 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -60,9 +60,6 @@ struct kvm_arch {
+ 	/* The last vcpu id that ran on each physical CPU */
+ 	int __percpu *last_vcpu_ran;
  
--	bool need_flush = !vcpu_has_cache_enabled(vcpu) || ipa_uncached;
+-	/* Timer */
+-	struct arch_timer_kvm	timer;
 -
- 	VM_BUG_ON(size & ~PAGE_MASK);
+ 	/*
+ 	 * Anything that is not used directly from assembly code goes
+ 	 * here.
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 9d74464..f93f2171 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -135,7 +135,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 		goto out_free_stage2_pgd;
  
--	if (!need_flush && !icache_is_pipt())
--		goto vipt_cache;
+ 	kvm_vgic_early_init(kvm);
+-	kvm_timer_init(kvm);
+ 
+ 	/* Mark the initial VMID generation invalid */
+ 	kvm->arch.vmid_gen = 0;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e505038..4a758cb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -70,9 +70,6 @@ struct kvm_arch {
+ 
+ 	/* Interrupt controller */
+ 	struct vgic_dist	vgic;
 -
- 	while (size) {
- 		void *va = kmap_atomic_pfn(pfn);
+-	/* Timer */
+-	struct arch_timer_kvm	timer;
+ };
  
--		if (need_flush)
--			kvm_flush_dcache_to_poc(va, PAGE_SIZE);
-+		kvm_flush_dcache_to_poc(va, PAGE_SIZE);
+ #define KVM_NR_MEM_OBJS     40
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index daad3c1..2c8560b 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -23,11 +23,6 @@
+ #include <linux/hrtimer.h>
+ #include <linux/workqueue.h>
  
- 		if (icache_is_pipt())
- 			__cpuc_coherent_user_range((unsigned long)va,
-@@ -173,7 +167,6 @@ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
- 		kunmap_atomic(va);
+-struct arch_timer_kvm {
+-	/* Virtual offset */
+-	u64			cntvoff;
+-};
+-
+ struct arch_timer_context {
+ 	/* Registers: control register, timer value */
+ 	u32				cnt_ctl;
+@@ -38,6 +33,9 @@ struct arch_timer_context {
+ 
+ 	/* Active IRQ state caching */
+ 	bool				active_cleared_last;
++
++	/* Virtual offset */
++	u64			cntvoff;
+ };
+ 
+ struct arch_timer_cpu {
+@@ -58,7 +56,6 @@ struct arch_timer_cpu {
+ 
+ int kvm_timer_hyp_init(void);
+ int kvm_timer_enable(struct kvm_vcpu *vcpu);
+-void kvm_timer_init(struct kvm *kvm);
+ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+ 			 const struct kvm_irq_level *irq);
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index d3556b3..5004a67 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -101,9 +101,10 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+ static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
+ {
+ 	u64 cval, now;
++	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 
+-	cval = vcpu_vtimer(vcpu)->cnt_cval;
+-	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
++	cval = vtimer->cnt_cval;
++	now = kvm_phys_timer_read() - vtimer->cntvoff;
+ 
+ 	if (now < cval) {
+ 		u64 ns;
+@@ -159,7 +160,7 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+ 		return false;
+ 
+ 	cval = vtimer->cnt_cval;
+-	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
++	now = kvm_phys_timer_read() - vtimer->cntvoff;
+ 
+ 	return cval <= now;
+ }
+@@ -354,10 +355,32 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
++/* Make the updates of cntvoff for all vtimer contexts atomic */
++static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
++{
++	int i;
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm_vcpu *tmp;
++
++	mutex_lock(&kvm->lock);
++	kvm_for_each_vcpu(i, tmp, kvm)
++		vcpu_vtimer(tmp)->cntvoff = cntvoff;
++
++	/*
++	 * When called from the vcpu create path, the CPU being created is not
++	 * included in the loop above, so we just set it here as well.
++	 */
++	vcpu_vtimer(vcpu)->cntvoff = cntvoff;
++	mutex_unlock(&kvm->lock);
++}
++
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 
++	/* Synchronize cntvoff across all vtimers of a VM. */
++	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
++
+ 	INIT_WORK(&timer->expired, kvm_timer_inject_irq_work);
+ 	hrtimer_init(&timer->timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+ 	timer->timer.function = kvm_timer_expire;
+@@ -377,7 +400,7 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+ 		vtimer->cnt_ctl = value;
+ 		break;
+ 	case KVM_REG_ARM_TIMER_CNT:
+-		vcpu->kvm->arch.timer.cntvoff = kvm_phys_timer_read() - value;
++		update_vtimer_cntvoff(vcpu, kvm_phys_timer_read() - value);
+ 		break;
+ 	case KVM_REG_ARM_TIMER_CVAL:
+ 		vtimer->cnt_cval = value;
+@@ -398,7 +421,7 @@ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
+ 	case KVM_REG_ARM_TIMER_CTL:
+ 		return vtimer->cnt_ctl;
+ 	case KVM_REG_ARM_TIMER_CNT:
+-		return kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
++		return kvm_phys_timer_read() - vtimer->cntvoff;
+ 	case KVM_REG_ARM_TIMER_CVAL:
+ 		return vtimer->cnt_cval;
+ 	}
+@@ -510,11 +533,6 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
+-void kvm_timer_init(struct kvm *kvm)
+-{
+-	kvm->arch.timer.cntvoff = kvm_phys_timer_read();
+-}
+-
+ /*
+  * On VHE system, we only need to configure trap on physical timer and counter
+  * accesses in EL0 and EL1 once, not for every world switch.
+diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
+index 0cf0895..4734915 100644
+--- a/virt/kvm/arm/hyp/timer-sr.c
++++ b/virt/kvm/arm/hyp/timer-sr.c
+@@ -53,7 +53,6 @@ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
+ 
+ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	u64 val;
+@@ -71,7 +70,7 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
  	}
  
--vipt_cache:
- 	if (!icache_is_pipt() && !icache_is_vivt_asid_tagged()) {
- 		/* any kind of VIPT cache */
- 		__flush_icache_all();
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 6f72fe8..6d22017 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -241,8 +241,7 @@ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
- {
- 	void *va = page_address(pfn_to_page(pfn));
- 
--	if (!vcpu_has_cache_enabled(vcpu) || ipa_uncached)
--		kvm_flush_dcache_to_poc(va, size);
-+	kvm_flush_dcache_to_poc(va, size);
- 
- 	if (!icache_is_aliasing()) {		/* PIPT */
- 		flush_icache_range((unsigned long)va,
+ 	if (timer->enabled) {
+-		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
++		write_sysreg(vtimer->cntvoff, cntvoff_el2);
+ 		write_sysreg_el0(vtimer->cnt_cval, cntv_cval);
+ 		isb();
+ 		write_sysreg_el0(vtimer->cnt_ctl, cntv_ctl);
 -- 
 2.1.4
