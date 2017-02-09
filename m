@@ -1,23 +1,25 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v2 19/19] KVM: arm64: ITS: Pending table save/restore
-Date: Wed,  8 Feb 2017 12:43:32 +0100
-Message-ID: <1486554212-2774-20-git-send-email-eric.auger@redhat.com>
-References: <1486554212-2774-1-git-send-email-eric.auger@redhat.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH V8 06/10] acpi: apei: panic OS with fatal error status
+ block
+Date: Thu, 09 Feb 2017 10:48:42 +0000
+Message-ID: <589C490A.9080109@arm.com>
+References: <1485969413-23577-1-git-send-email-tbaicar@codeaurora.org>
+ <1485969413-23577-7-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B6A7040948
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Feb 2017 06:44:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5220440A6A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 05:49:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ar8dlo9oTDmD for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Feb 2017 06:44:24 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECF6D408EB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Feb 2017 06:44:23 -0500 (EST)
-In-Reply-To: <1486554212-2774-1-git-send-email-eric.auger@redhat.com>
+ with ESMTP id AC4UcglS98HF for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Feb 2017 05:49:29 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD8774092C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Feb 2017 05:49:27 -0500 (EST)
+In-Reply-To: <1485969413-23577-7-git-send-email-tbaicar@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,114 +29,79 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Prasun.Kapoor@cavium.com
+To: Tyler Baicar <tbaicar@codeaurora.org>, zjzhang@codeaurora.org
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Save and restore the pending tables.
+Hi Jonathan, Tyler,
 
-Pending table restore obviously requires the pendbaser to be
-already set.
+On 01/02/17 17:16, Tyler Baicar wrote:
+> From: "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>
+> 
+> Even if an error status block's severity is fatal, the kernel does not
+> honor the severity level and panic.
+> 
+> With the firmware first model, the platform could inform the OS about a
+> fatal hardware error through the non-NMI GHES notification type. The OS
+> should panic when a hardware error record is received with this
+> severity.
+> 
+> Call panic() after CPER data in error status block is printed if
+> severity is fatal, before each error section is handled.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 8756172..86c1f15 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -687,6 +689,13 @@ static int ghes_ack_error(struct acpi_hest_generic_v2 *generic_v2)
+>  	return rc;
+>  }
+>  
+> +static void __ghes_call_panic(void)
+> +{
+> +	if (panic_timeout == 0)
+> +		panic_timeout = ghes_panic_timeout;
+> +	panic("Fatal hardware error!");
+> +}
+> +
 
----
+__ghes_panic() also has:
+>	__ghes_print_estatus(KERN_EMERG, ghes->generic, ghes->estatus);
 
-v1 -> v2:
-- do not care about the 1st KB which should be zeroed according to
-  the spec.
----
- virt/kvm/arm/vgic/vgic-its.c | 71 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 69 insertions(+), 2 deletions(-)
+Which prints this estatus regardless of rate limiting and cache-ing.
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index c1ae85b..67db680 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1736,7 +1736,48 @@ static int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
-  */
- static int vgic_its_flush_pending_tables(struct vgic_its *its)
- {
--	return -ENXIO;
-+	struct kvm *kvm = its->dev->kvm;
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	struct vgic_irq *irq;
-+	int ret;
-+
-+	/**
-+	 * we do not take the dist->lpi_list_lock since we have a garantee
-+	 * the LPI list is not touched while the its lock is held
-+	 */
-+	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-+		struct kvm_vcpu *vcpu;
-+		gpa_t pendbase, ptr;
-+		bool stored;
-+		u8 val;
-+
-+		vcpu = irq->target_vcpu;
-+		if (!vcpu)
-+			return -EINVAL;
-+
-+		pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+
-+		ptr = pendbase + (irq->intid / BITS_PER_BYTE);
-+
-+		ret = kvm_read_guest(kvm, (gpa_t)ptr, &val, 1);
-+		if (ret)
-+			return ret;
-+
-+		stored = val & (irq->intid % BITS_PER_BYTE);
-+		if (stored == irq->pending_latch)
-+			continue;
-+
-+		if (irq->pending_latch)
-+			val |= 1 << (irq->intid % BITS_PER_BYTE);
-+		else
-+			val &= ~(1 << (irq->intid % BITS_PER_BYTE));
-+
-+		ret = kvm_write_guest(kvm, (gpa_t)ptr, &val, 1);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
- }
- 
- /**
-@@ -1745,7 +1786,33 @@ static int vgic_its_flush_pending_tables(struct vgic_its *its)
-  */
- static int vgic_its_restore_pending_tables(struct vgic_its *its)
- {
--	return -ENXIO;
-+	struct vgic_irq *irq;
-+	struct kvm *kvm = its->dev->kvm;
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	int ret;
-+
-+	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-+		struct kvm_vcpu *vcpu;
-+		gpa_t pendbase, ptr;
-+		u8 val;
-+
-+		vcpu = irq->target_vcpu;
-+		if (!vcpu)
-+			return -EINVAL;
-+
-+		if (!(vcpu->arch.vgic_cpu.pendbaser & GICR_PENDBASER_PTZ))
-+			return 0;
-+
-+		pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+
-+		ptr = pendbase + (irq->intid / BITS_PER_BYTE);
-+
-+		ret = kvm_read_guest(kvm, (gpa_t)ptr, &val, 1);
-+		if (ret)
-+			return ret;
-+		irq->pending_latch = val & (1 << (irq->intid % BITS_PER_BYTE));
-+	}
-+	return 0;
- }
- 
- static int vgic_its_flush_ite(struct vgic_its *its, struct its_device *dev,
--- 
-2.5.5
+[ ... ]
+
+> @@ -698,6 +707,10 @@ static int ghes_proc(struct ghes *ghes)
+>  		if (ghes_print_estatus(NULL, ghes->generic, ghes->estatus))
+
+ghes_print_estatus() uses some custom rate limiting '2 messages every 5
+seconds', GHES_SEV_PANIC shares the same limit as GHES_SEV_RECOVERABLE.
+
+I think its possible to get 2 recoverable messages, then a panic in a 5 second
+window. The rate limit will kick in to stop the panic estatus block being
+printed, but we still go on to call panic() without the real reason being printed...
+
+(the caching thing only seems to consider identical messages, given we would
+never see two panic messages, I don't think that will cause any problems.)
+
+>  			ghes_estatus_cache_add(ghes->generic, ghes->estatus);
+>  	}
+> +	if (ghes_severity(ghes->estatus->error_severity) >= GHES_SEV_PANIC) {
+> +		__ghes_call_panic();
+> +	}
+> +
+
+I think this ghes_severity() then panic() should go above the:
+>	if (!ghes_estatus_cached(ghes->estatus)) {
+and we should call __ghes_print_estatus() here too, to make sure the message
+definitely got out!
+
+
+With that,
+Reviewed-by: James Morse <james.morse@arm.com>
+
+
+Thanks,
+
+James
