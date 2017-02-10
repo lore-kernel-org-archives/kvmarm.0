@@ -1,26 +1,25 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 2/4] arm64: alternatives: apply boot time fixups via the
- linear mapping
-Date: Fri, 10 Feb 2017 17:16:43 +0000
-Message-ID: <1486747005-15973-3-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH 1/4] arm: kvm: move kvm_vgic_global_state out of .text section
+Date: Fri, 10 Feb 2017 17:16:42 +0000
+Message-ID: <1486747005-15973-2-git-send-email-ard.biesheuvel@linaro.org>
 References: <1486747005-15973-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C28340C2C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Feb 2017 12:16:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 21B8D40C1C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Feb 2017 12:16:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TVigWNdeeb1F for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Feb 2017 12:16:20 -0500 (EST)
-Received: from mail-wr0-f172.google.com (mail-wr0-f172.google.com
- [209.85.128.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2717440C3F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Feb 2017 12:16:19 -0500 (EST)
-Received: by mail-wr0-f172.google.com with SMTP id 89so112820553wrr.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Feb 2017 09:16:57 -0800 (PST)
+ with ESMTP id zOEO1G57quID for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Feb 2017 12:16:17 -0500 (EST)
+Received: from mail-wr0-f176.google.com (mail-wr0-f176.google.com
+ [209.85.128.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3804C40C17
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Feb 2017 12:16:17 -0500 (EST)
+Received: by mail-wr0-f176.google.com with SMTP id k90so112512501wrc.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Feb 2017 09:16:54 -0800 (PST)
 In-Reply-To: <1486747005-15973-1-git-send-email-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,113 +34,31 @@ To: linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, will.deacon@arm.
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, marc.zyngier@arm.com, andre.przywara@arm.com, kernel-hardening@lists.openwall.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-One important rule of thumb when designing a secure software system is
-that memory should never be writable and executable at the same time.
-We mostly adhere to this rule in the kernel, except at boot time, when
-regions may be mapped RWX until after we are done applying alternatives
-or making other one-off changes.
-
-For the alternative patching, we can improve the situation by applying
-the fixups via the linear mapping, which is never mapped with executable
-permissions. So map the linear alias of .text with RW- permissions
-initially, and remove the write permissions as soon as alternative
-patching has completed.
+The kvm_vgic_global_state struct contains a static key which is
+written to by jump_label_init() at boot time. So in preparation of
+making .text regions truly (well, almost truly) read-only, mark
+kvm_vgic_global_state __ro_after_init so it moves to the .rodata
+section instead.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/include/asm/mmu.h    |  1 +
- arch/arm64/kernel/alternative.c |  6 ++---
- arch/arm64/kernel/smp.c         |  1 +
- arch/arm64/mm/mmu.c             | 25 ++++++++++++++++----
- 4 files changed, 25 insertions(+), 8 deletions(-)
+ virt/kvm/arm/vgic/vgic.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
-index 47619411f0ff..5468c834b072 100644
---- a/arch/arm64/include/asm/mmu.h
-+++ b/arch/arm64/include/asm/mmu.h
-@@ -37,5 +37,6 @@ extern void create_pgd_mapping(struct mm_struct *mm, phys_addr_t phys,
- 			       unsigned long virt, phys_addr_t size,
- 			       pgprot_t prot, bool page_mappings_only);
- extern void *fixmap_remap_fdt(phys_addr_t dt_phys);
-+extern void mark_linear_text_alias_ro(void);
- 
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 6440b56ec90e..2f373455ed4e 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -29,7 +29,9 @@
+ #define DEBUG_SPINLOCK_BUG_ON(p)
  #endif
-diff --git a/arch/arm64/kernel/alternative.c b/arch/arm64/kernel/alternative.c
-index 06d650f61da7..eacdbcc45630 100644
---- a/arch/arm64/kernel/alternative.c
-+++ b/arch/arm64/kernel/alternative.c
-@@ -122,7 +122,7 @@ static void __apply_alternatives(void *alt_region)
  
- 		pr_info_once("patching kernel code\n");
+-struct vgic_global __section(.hyp.text) kvm_vgic_global_state = {.gicv3_cpuif = STATIC_KEY_FALSE_INIT,};
++struct vgic_global kvm_vgic_global_state __ro_after_init = {
++	.gicv3_cpuif = STATIC_KEY_FALSE_INIT,
++};
  
--		origptr = ALT_ORIG_PTR(alt);
-+		origptr = lm_alias(ALT_ORIG_PTR(alt));
- 		replptr = ALT_REPL_PTR(alt);
- 		nr_inst = alt->alt_len / sizeof(insn);
- 
-@@ -131,8 +131,8 @@ static void __apply_alternatives(void *alt_region)
- 			*(origptr + i) = cpu_to_le32(insn);
- 		}
- 
--		flush_icache_range((uintptr_t)origptr,
--				   (uintptr_t)(origptr + nr_inst));
-+		flush_icache_range((uintptr_t)ALT_ORIG_PTR(alt),
-+				   (uintptr_t)(ALT_ORIG_PTR(alt) + nr_inst));
- 	}
- }
- 
-diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-index a8ec5da530af..d6307e311a10 100644
---- a/arch/arm64/kernel/smp.c
-+++ b/arch/arm64/kernel/smp.c
-@@ -432,6 +432,7 @@ void __init smp_cpus_done(unsigned int max_cpus)
- 	setup_cpu_features();
- 	hyp_mode_check();
- 	apply_alternatives_all();
-+	mark_linear_text_alias_ro();
- }
- 
- void __init smp_prepare_boot_cpu(void)
-diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index 2131521ddc24..f4b045d1cc53 100644
---- a/arch/arm64/mm/mmu.c
-+++ b/arch/arm64/mm/mmu.c
-@@ -395,16 +395,31 @@ static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end
- 				     debug_pagealloc_enabled());
- 
- 	/*
--	 * Map the linear alias of the [_text, __init_begin) interval as
--	 * read-only/non-executable. This makes the contents of the
--	 * region accessible to subsystems such as hibernate, but
--	 * protects it from inadvertent modification or execution.
-+	 * Map the linear alias of the [_text, __init_begin) interval
-+	 * as non-executable now, and remove the write permission in
-+	 * mark_linear_text_alias_ro() below (which will be called after
-+	 * alternative patching has completed). This makes the contents
-+	 * of the region accessible to subsystems such as hibernate,
-+	 * but protects it from inadvertent modification or execution.
- 	 */
- 	__create_pgd_mapping(pgd, kernel_start, __phys_to_virt(kernel_start),
--			     kernel_end - kernel_start, PAGE_KERNEL_RO,
-+			     kernel_end - kernel_start, PAGE_KERNEL,
- 			     early_pgtable_alloc, debug_pagealloc_enabled());
- }
- 
-+void mark_linear_text_alias_ro(void)
-+{
-+	/*
-+	 * Remove the write permissions from the linear alias of .text/.rodata
-+	 */
-+	create_mapping_late(__pa_symbol(_text), (unsigned long)lm_alias(_text),
-+			    (unsigned long)__init_begin - (unsigned long)_text,
-+			    PAGE_KERNEL_RO);
-+
-+	/* flush the TLBs after updating live kernel mappings */
-+	flush_tlb_all();
-+}
-+
- static void __init map_mem(pgd_t *pgd)
- {
- 	struct memblock_region *reg;
+ /*
+  * Locking order is always:
 -- 
 2.7.4
