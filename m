@@ -1,72 +1,36 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/4] arm: kvm: move kvm_vgic_global_state out of .text
- section
-Date: Fri, 10 Feb 2017 17:26:52 +0000
-Message-ID: <d578fb88-0af1-9161-fb6c-cc524a3ec7ea@arm.com>
-References: <1486747005-15973-1-git-send-email-ard.biesheuvel@linaro.org>
- <1486747005-15973-2-git-send-email-ard.biesheuvel@linaro.org>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH 3/4] arm64: mmu: map .text as read-only from the outset
+Date: Fri, 10 Feb 2017 10:41:58 -0800
+Message-ID: <CAGXu5jKQjtwZ-JFPBQ8epjuXYbQ4d4s404-=hJm_y=CpsHQFAA@mail.gmail.com>
+References: <1486747005-15973-1-git-send-email-ard.biesheuvel@linaro.org> <1486747005-15973-4-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBBE240A14
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Feb 2017 12:26:18 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q3sBDdDgnViL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Feb 2017 12:26:18 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DBF440992
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Feb 2017 12:26:18 -0500 (EST)
-In-Reply-To: <1486747005-15973-2-git-send-email-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, keescook@chromium.org, labbott@fedoraproject.org, james.morse@arm.com
-Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kernel-hardening@lists.openwall.com
+Content-Type: text/plain; charset=UTF-8
+Return-path: <kernel-hardening-return-6482-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Sender: keescook@google.com
+In-Reply-To: <1486747005-15973-4-git-send-email-ard.biesheuvel@linaro.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Mark Rutland <mark.rutland@arm.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Laura Abbott <labbott@fedoraproject.org>, James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, andre.przywara@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/02/17 17:16, Ard Biesheuvel wrote:
-> The kvm_vgic_global_state struct contains a static key which is
-> written to by jump_label_init() at boot time. So in preparation of
-> making .text regions truly (well, almost truly) read-only, mark
-> kvm_vgic_global_state __ro_after_init so it moves to the .rodata
-> section instead.
-> 
+On Fri, Feb 10, 2017 at 9:16 AM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> Now that alternatives patching code no longer relies on the primary
+> mapping of .text being writable, we can remove the code that removes
+> the writable permissions post-init time, and map it read-only from
+> the outset.
+>
 > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  virt/kvm/arm/vgic/vgic.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index 6440b56ec90e..2f373455ed4e 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -29,7 +29,9 @@
->  #define DEBUG_SPINLOCK_BUG_ON(p)
->  #endif
->  
-> -struct vgic_global __section(.hyp.text) kvm_vgic_global_state = {.gicv3_cpuif = STATIC_KEY_FALSE_INIT,};
-> +struct vgic_global kvm_vgic_global_state __ro_after_init = {
-> +	.gicv3_cpuif = STATIC_KEY_FALSE_INIT,
-> +};
->  
->  /*
->   * Locking order is always:
-> 
 
-I guess that's a nice way to find out if someone is playing with this
-structure (which indeed shouldn't change once KVM has initialized).
+Awesome!
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-	M.
+-Kees
+
 -- 
-Jazz is not dead. It just smells funny...
+Kees Cook
+Pixel Security
