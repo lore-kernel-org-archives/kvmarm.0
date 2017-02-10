@@ -1,43 +1,72 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 0/4] arm64: mmu: avoid writeable-executable mappings
-Date: Fri, 10 Feb 2017 17:16:41 +0000
-Message-ID: <1486747005-15973-1-git-send-email-ard.biesheuvel@linaro.org>
-Return-path: <kernel-hardening-return-6475-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-To: linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, keescook@chromium.org, labbott@fedoraproject.org, james.morse@arm.com
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, kernel-hardening@lists.openwall.com, andre.przywara@arm.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/4] arm: kvm: move kvm_vgic_global_state out of .text
+ section
+Date: Fri, 10 Feb 2017 17:26:52 +0000
+Message-ID: <d578fb88-0af1-9161-fb6c-cc524a3ec7ea@arm.com>
+References: <1486747005-15973-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1486747005-15973-2-git-send-email-ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBBE240A14
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Feb 2017 12:26:18 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id q3sBDdDgnViL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Feb 2017 12:26:18 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DBF440992
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Feb 2017 12:26:18 -0500 (EST)
+In-Reply-To: <1486747005-15973-2-git-send-email-ard.biesheuvel@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, keescook@chromium.org, labbott@fedoraproject.org, james.morse@arm.com
+Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kernel-hardening@lists.openwall.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Having memory that is writable and executable at the same time is a
-security hazard, and so we tend to avoid those when we can. However,
-at boot time, we keep .text mapped writable during the entire init
-phase, and the init region itself is mapped rwx as well.
+On 10/02/17 17:16, Ard Biesheuvel wrote:
+> The kvm_vgic_global_state struct contains a static key which is
+> written to by jump_label_init() at boot time. So in preparation of
+> making .text regions truly (well, almost truly) read-only, mark
+> kvm_vgic_global_state __ro_after_init so it moves to the .rodata
+> section instead.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  virt/kvm/arm/vgic/vgic.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index 6440b56ec90e..2f373455ed4e 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -29,7 +29,9 @@
+>  #define DEBUG_SPINLOCK_BUG_ON(p)
+>  #endif
+>  
+> -struct vgic_global __section(.hyp.text) kvm_vgic_global_state = {.gicv3_cpuif = STATIC_KEY_FALSE_INIT,};
+> +struct vgic_global kvm_vgic_global_state __ro_after_init = {
+> +	.gicv3_cpuif = STATIC_KEY_FALSE_INIT,
+> +};
+>  
+>  /*
+>   * Locking order is always:
+> 
 
-Let's improve the situation by:
-- making the alternatives patching use the linear mapping
-- splitting the init region into separate text and data regions
+I guess that's a nice way to find out if someone is playing with this
+structure (which indeed shouldn't change once KVM has initialized).
 
-This removes all RWX mappings except the really early one created
-in head.S (which we could perhaps fix in the future as well)
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Ard Biesheuvel (4):
-  arm: kvm: move kvm_vgic_global_state out of .text section
-  arm64: alternatives: apply boot time fixups via the linear mapping
-  arm64: mmu: map .text as read-only from the outset
-  arm64: mmu: apply strict permissions to .init.text and .init.data
-
- arch/arm64/include/asm/mmu.h      |  1 +
- arch/arm64/include/asm/sections.h |  3 +-
- arch/arm64/kernel/alternative.c   |  6 +--
- arch/arm64/kernel/smp.c           |  1 +
- arch/arm64/kernel/vmlinux.lds.S   | 32 ++++++++++-----
- arch/arm64/mm/init.c              |  3 +-
- arch/arm64/mm/mmu.c               | 42 ++++++++++++++------
- virt/kvm/arm/vgic/vgic.c          |  4 +-
- 8 files changed, 64 insertions(+), 28 deletions(-)
-
+	M.
 -- 
-2.7.4
+Jazz is not dead. It just smells funny...
