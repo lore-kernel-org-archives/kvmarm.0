@@ -1,22 +1,46 @@
 From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC PATCH 33/33] irqchip/gic-v4: Enable low-level GICv4
- operations
-Date: Mon, 13 Feb 2017 12:17:58 +0100 (CET)
-Message-ID: <alpine.DEB.2.20.1702131217480.3619@nanos>
-References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com> <1484648454-21216-34-git-send-email-marc.zyngier@arm.com>
+Subject: Re: [RFC PATCH 00/33] irqchip: Core support for GICv4
+Date: Mon, 13 Feb 2017 12:19:55 +0100 (CET)
+Message-ID: <alpine.DEB.2.20.1702131218160.3619@nanos>
+References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1484648454-21216-34-git-send-email-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0773440C26
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 06:19:18 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id B1rV5N6NBeT1 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Feb 2017 06:19:17 -0500 (EST)
+Received: from Galois.linutronix.de (Galois.linutronix.de [146.0.238.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58A9A40BC4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 06:19:17 -0500 (EST)
+In-Reply-To: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>
+Cc: Jason Cooper <jason@lakedaemon.net>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
+
+Marc,
 
 On Tue, 17 Jan 2017, Marc Zyngier wrote:
 
-> Get the show on the road...
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> This series implements the core support for GICv4. And despite its
+> size, it does exactly *nothing*. What it adds is an infrastructure
+> that a hypervisor (KVM) can use to route VLPIs to a guest.
 
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+That's a very well done patch set and it was a pleasure to review!
+
+Thanks,
+
+	tglx
