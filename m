@@ -1,46 +1,60 @@
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC PATCH 00/33] irqchip: Core support for GICv4
-Date: Mon, 13 Feb 2017 12:19:55 +0100 (CET)
-Message-ID: <alpine.DEB.2.20.1702131218160.3619@nanos>
-References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2 1/5] arm: kvm: move kvm_vgic_global_state out of .text
+ section
+Date: Mon, 13 Feb 2017 17:58:15 +0000
+Message-ID: <20170213175815.GB16636@leverpostej>
+References: <1486844586-26135-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1486844586-26135-2-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0773440C26
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 06:19:18 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B1rV5N6NBeT1 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Feb 2017 06:19:17 -0500 (EST)
-Received: from Galois.linutronix.de (Galois.linutronix.de [146.0.238.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58A9A40BC4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 06:19:17 -0500 (EST)
-In-Reply-To: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Jason Cooper <jason@lakedaemon.net>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kernel-hardening-return-6592-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Content-Disposition: inline
+In-Reply-To: <1486844586-26135-2-git-send-email-ard.biesheuvel@linaro.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will.deacon@arm.com, labbott@fedoraproject.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, andre.przywara@arm.com, Suzuki.Poulose@arm.com, james.morse@arm.com, keescook@chromium.org, kernel-hardening@lists.openwall.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Marc,
+On Sat, Feb 11, 2017 at 08:23:02PM +0000, Ard Biesheuvel wrote:
+> The kvm_vgic_global_state struct contains a static key which is
+> written to by jump_label_init() at boot time. So in preparation of
+> making .text regions truly (well, almost truly) read-only, mark
+> kvm_vgic_global_state __ro_after_init so it moves to the .rodata
+> section instead.
+> 
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Reviewed-by: Laura Abbott <labbott@redhat.com>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On Tue, 17 Jan 2017, Marc Zyngier wrote:
+With this applied I can boot Juno happily and launch working VMs.
 
-> This series implements the core support for GICv4. And despite its
-> size, it does exactly *nothing*. What it adds is an infrastructure
-> that a hypervisor (KVM) can use to route VLPIs to a guest.
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+Tested-by: Mark Rutland <mark.rutland@arm.com>
 
-That's a very well done patch set and it was a pleasure to review!
+Mark.
 
-Thanks,
-
-	tglx
+> ---
+>  virt/kvm/arm/vgic/vgic.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index 6440b56ec90e..2f373455ed4e 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -29,7 +29,9 @@
+>  #define DEBUG_SPINLOCK_BUG_ON(p)
+>  #endif
+>  
+> -struct vgic_global __section(.hyp.text) kvm_vgic_global_state = {.gicv3_cpuif = STATIC_KEY_FALSE_INIT,};
+> +struct vgic_global kvm_vgic_global_state __ro_after_init = {
+> +	.gicv3_cpuif = STATIC_KEY_FALSE_INIT,
+> +};
+>  
+>  /*
+>   * Locking order is always:
+> -- 
+> 2.7.4
+> 
