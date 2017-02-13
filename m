@@ -1,25 +1,24 @@
 From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC PATCH 11/33] irqchip/gic-v3-its: Split out pending table
- allocation
-Date: Mon, 13 Feb 2017 11:29:10 +0100 (CET)
-Message-ID: <alpine.DEB.2.20.1702131128590.3619@nanos>
+Subject: Re: [RFC PATCH 12/33] irqchip/gic-v3-its: Rework LPI freeing
+Date: Mon, 13 Feb 2017 11:30:49 +0100 (CET)
+Message-ID: <alpine.DEB.2.20.1702131129200.3619@nanos>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-12-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-13-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B57CF40A95
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 05:28:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5580F40B8C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 05:30:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k4Mo7ezcuGfB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Feb 2017 05:28:31 -0500 (EST)
+ with ESMTP id goWNWRQTbz6M for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Feb 2017 05:30:10 -0500 (EST)
 Received: from Galois.linutronix.de (Galois.linutronix.de [146.0.238.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1202840A14
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 05:28:31 -0500 (EST)
-In-Reply-To: <1484648454-21216-12-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A7CE440A95
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 05:30:10 -0500 (EST)
+In-Reply-To: <1484648454-21216-13-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,8 +34,8 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 On Tue, 17 Jan 2017, Marc Zyngier wrote:
 
-> Just as for the property table, let's move the pending table
-> allocation to a separate function.
+> Rework LPI deallocation so that it can be reused by the v4 support
+> code.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
