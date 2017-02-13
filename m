@@ -1,24 +1,25 @@
 From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC PATCH 05/33] irqchip/gic-v3-its: Zero command on allocation
-Date: Mon, 13 Feb 2017 10:55:50 +0100 (CET)
-Message-ID: <alpine.DEB.2.20.1702131055200.3619@nanos>
+Subject: Re: [RFC PATCH 06/33] irqchip/gic-v3-its: Add probing for VLPI
+ properties
+Date: Mon, 13 Feb 2017 11:00:38 +0100 (CET)
+Message-ID: <alpine.DEB.2.20.1702131057290.3619@nanos>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-6-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-7-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F6F540C25
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 04:55:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB72340C25
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 05:00:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dP+ewN3W4ieX for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Feb 2017 04:55:12 -0500 (EST)
+ with ESMTP id Q5smE8aJtuv6 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Feb 2017 05:00:00 -0500 (EST)
 Received: from Galois.linutronix.de (Galois.linutronix.de [146.0.238.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00E2740BE9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 04:55:12 -0500 (EST)
-In-Reply-To: <1484648454-21216-6-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A99640BE9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 04:59:59 -0500 (EST)
+In-Reply-To: <1484648454-21216-7-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,31 +34,40 @@ Cc: Jason Cooper <jason@lakedaemon.net>, linux-kernel@vger.kernel.org, linux-arm
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Tue, 17 Jan 2017, Marc Zyngier wrote:
+> +	typer = gic_read_typer(its_base + GITS_TYPER);
+>  	its->base = its_base;
+>  	its->phys_base = res->start;
+> -	its->ite_size = ((gic_read_typer(its_base + GITS_TYPER) >> 4) & 0xf) + 1;
+> +	its->ite_size = ((typer >> 4) & 0xf) + 1;
+> +	its->is_v4 = !!(typer & GITS_TYPER_VLPIS);
+> +	if (its->is_v4 && !(typer & GITS_TYPER_VMOVP)) {
+> +		int its_number;
+> +
+> +		its_number = find_first_zero_bit(&its_list_map, 16);
 
-> When reusing commands from the ring buffer, it would be better
-> to zero them out, even if the ITS should ignore the unused
-> fields.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 2ca27f6..9304dd2 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -426,6 +426,12 @@ static struct its_cmd_block *its_allocate_entry(struct its_node *its)
->  	if (its->cmd_write == (its->cmd_base + ITS_CMD_QUEUE_NR_ENTRIES))
->  		its->cmd_write = its->cmd_base;
->  
-> +	/* Clear command  */
-> +	cmd->raw_cmd[0] = 0;
-> +	cmd->raw_cmd[1] = 0;
-> +	cmd->raw_cmd[2] = 0;
-> +	cmd->raw_cmd[3] = 0;
+s/16/ITS_MAX_ENTITIES or whatever.
 
-  memset ?
+> +		if (its_number >= 16) {
+> +			pr_err("ITS@%pa: No ITSList entry available!\n",
+> +			       &res->start);
+> +			err = -EINVAL;
+> +			goto out_free_its;
+> +		}
+> +
+> +		ctlr = readl_relaxed(its_base + GITS_CTLR);
+> +		ctlr &= ~GITS_CTLR_ITS_NUMBER;
+> +		ctlr |= its_number << GITS_CTLR_ITS_NUMBER_SHIFT;
+> +		writel_relaxed(ctlr, its_base + GITS_CTLR);
+> +		ctlr = readl_relaxed(its_base + GITS_CTLR);
+> +		if ((ctlr & GITS_CTLR_ITS_NUMBER) != (its_number << GITS_CTLR_ITS_NUMBER_SHIFT)) {
+> +			its_number = ctlr & GITS_CTLR_ITS_NUMBER;
+> +			its_number >>= GITS_CTLR_ITS_NUMBER_SHIFT;
+> +		}
+> +
+> +		if (test_and_set_bit(its_number, &its_list_map)) {
+
+You just established above that the bit is not set. I assume that this is
+code which has no concurrency concerns....
 
 Thanks,
 
