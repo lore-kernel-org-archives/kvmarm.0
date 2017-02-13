@@ -1,45 +1,25 @@
 From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC PATCH 25/33] irqchip/gic-v3-its: Add VPE invalidation
- hook
-Date: Mon, 13 Feb 2017 11:48:33 +0100 (CET)
-Message-ID: <alpine.DEB.2.20.1702131148240.3619@nanos>
-References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-26-git-send-email-marc.zyngier@arm.com>
+Subject: Re: [RFC PATCH 26/33] irqchip/gic-v3-its: Add VPE affinity changes
+Date: Mon, 13 Feb 2017 11:56:42 +0100 (CET)
+Message-ID: <alpine.DEB.2.20.1702131156260.3619@nanos>
+References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com> <1484648454-21216-27-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B4A440C27
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 05:47:54 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dc41rUa8T3zt for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Feb 2017 05:47:53 -0500 (EST)
-Received: from Galois.linutronix.de (Galois.linutronix.de [146.0.238.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC20E40C26
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 05:47:53 -0500 (EST)
-In-Reply-To: <1484648454-21216-26-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=US-ASCII
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1484648454-21216-27-git-send-email-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Jason Cooper <jason@lakedaemon.net>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, Jason Cooper <jason@lakedaemon.net>, Eric Auger <eric.auger@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Tue, 17 Jan 2017, Marc Zyngier wrote:
 
-> When a guest issues a INVALL command targetting a collection, it must
-> be translated into a VINVALL for the VPE that has this collection.
+> When we're about to run a vcpu, it is crucial that the redistributor
+> associated with the physical CPU is being told about the new residency.
 > 
-> This patch implements a hook that offers this functionallity to the
-> hypervisor.
+> This is abstracted by hijacking the irq_set_affinity method for the
+> doorbell interrupt associated with the VPE. It is expected that the
+> hypervisor will call this method before scheduling the VPE.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
