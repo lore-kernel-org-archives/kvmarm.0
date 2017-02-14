@@ -1,23 +1,27 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 0/5] arm64: mmu: avoid writeable-executable mappings
-Date: Tue, 14 Feb 2017 20:52:33 +0000
-Message-ID: <1487105558-21897-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 3/5] arm64: alternatives: apply boot time fixups via the
+ linear mapping
+Date: Tue, 14 Feb 2017 20:52:36 +0000
+Message-ID: <1487105558-21897-4-git-send-email-ard.biesheuvel@linaro.org>
+References: <1487105558-21897-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ECAF440992
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 15:54:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 443CF40BDD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 15:54:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bEXOSf8MDvmh for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Feb 2017 15:54:02 -0500 (EST)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77F9C40296
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 15:54:01 -0500 (EST)
-Received: by mail-wm0-f50.google.com with SMTP id v77so26689416wmv.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 12:54:46 -0800 (PST)
+ with ESMTP id XZ07tc5DPxda for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Feb 2017 15:54:10 -0500 (EST)
+Received: from mail-wr0-f177.google.com (mail-wr0-f177.google.com
+ [209.85.128.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2846D40C17
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 15:54:10 -0500 (EST)
+Received: by mail-wr0-f177.google.com with SMTP id k90so178025010wrc.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 12:54:55 -0800 (PST)
+In-Reply-To: <1487105558-21897-1-git-send-email-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,51 +35,102 @@ To: linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, catalin.marinas@
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, keescook@chromium.org, marc.zyngier@arm.com, andre.przywara@arm.com, kernel-hardening@lists.openwall.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Having memory that is writable and executable at the same time is a
-security hazard, and so we tend to avoid those when we can. However,
-at boot time, we keep .text mapped writable during the entire init
-phase, and the init region itself is mapped rwx as well.
+One important rule of thumb when desiging a secure software system is
+that memory should never be writable and executable at the same time.
+We mostly adhere to this rule in the kernel, except at boot time, when
+regions may be mapped RWX until after we are done applying alternatives
+or making other one-off changes.
 
-Let's improve the situation by:
-- making the alternatives patching use the linear mapping
-- splitting the init region into separate text and data regions
+For the alternative patching, we can improve the situation by applying
+the fixups via the linear mapping, which is never mapped with executable
+permissions. So map the linear alias of .text with RW- permissions
+initially, and remove the write permissions as soon as alternative
+patching has completed.
 
-This removes all RWX mappings except the really early one created
-in head.S (which we could perhaps fix in the future as well)
+Reviewed-by: Laura Abbott <labbott@redhat.com>
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+Tested-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm64/include/asm/mmu.h    |  1 +
+ arch/arm64/kernel/alternative.c |  2 +-
+ arch/arm64/kernel/smp.c         |  1 +
+ arch/arm64/mm/mmu.c             | 22 +++++++++++++++-----
+ 4 files changed, 20 insertions(+), 6 deletions(-)
 
-Changes since v2:
-  - ensure that text mappings remain writable under rodata=off
-  - rename create_mapping_late() to update_mapping_prot()
-  - clarify commit log of #2
-  - add acks
-
-Changes since v1:
-- add patch to move TLB maintenance into create_mapping_late() and remove it
-  from its callers (#2)
-- use the true address not the linear alias when patching branch instructions,
-  spotted by Suzuki (#3)
-- mark mark_linear_text_alias_ro() __init (#3)
-- move the .rela section back into __initdata: as it turns out, leaving a hole
-  between the segments results in a peculiar situation where other unrelated
-  allocations end up right in the middle of the kernel Image, which is
-  probably a bad idea (#5). See below for an example.
-- add acks
-
-Ard Biesheuvel (5):
-  arm: kvm: move kvm_vgic_global_state out of .text section
-  arm64: mmu: move TLB maintenance from callers to create_mapping_late()
-  arm64: alternatives: apply boot time fixups via the linear mapping
-  arm64: mmu: map .text as read-only from the outset
-  arm64: mmu: apply strict permissions to .init.text and .init.data
-
- arch/arm64/include/asm/mmu.h      |  1 +
- arch/arm64/include/asm/sections.h |  3 +-
- arch/arm64/kernel/alternative.c   |  2 +-
- arch/arm64/kernel/smp.c           |  1 +
- arch/arm64/kernel/vmlinux.lds.S   | 25 +++++---
- arch/arm64/mm/mmu.c               | 61 +++++++++++++-------
- virt/kvm/arm/vgic/vgic.c          |  4 +-
- 7 files changed, 65 insertions(+), 32 deletions(-)
-
+diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
+index 47619411f0ff..5468c834b072 100644
+--- a/arch/arm64/include/asm/mmu.h
++++ b/arch/arm64/include/asm/mmu.h
+@@ -37,5 +37,6 @@ extern void create_pgd_mapping(struct mm_struct *mm, phys_addr_t phys,
+ 			       unsigned long virt, phys_addr_t size,
+ 			       pgprot_t prot, bool page_mappings_only);
+ extern void *fixmap_remap_fdt(phys_addr_t dt_phys);
++extern void mark_linear_text_alias_ro(void);
+ 
+ #endif
+diff --git a/arch/arm64/kernel/alternative.c b/arch/arm64/kernel/alternative.c
+index 06d650f61da7..8cee29d9bc07 100644
+--- a/arch/arm64/kernel/alternative.c
++++ b/arch/arm64/kernel/alternative.c
+@@ -128,7 +128,7 @@ static void __apply_alternatives(void *alt_region)
+ 
+ 		for (i = 0; i < nr_inst; i++) {
+ 			insn = get_alt_insn(alt, origptr + i, replptr + i);
+-			*(origptr + i) = cpu_to_le32(insn);
++			((u32 *)lm_alias(origptr))[i] = cpu_to_le32(insn);
+ 		}
+ 
+ 		flush_icache_range((uintptr_t)origptr,
+diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
+index a8ec5da530af..d6307e311a10 100644
+--- a/arch/arm64/kernel/smp.c
++++ b/arch/arm64/kernel/smp.c
+@@ -432,6 +432,7 @@ void __init smp_cpus_done(unsigned int max_cpus)
+ 	setup_cpu_features();
+ 	hyp_mode_check();
+ 	apply_alternatives_all();
++	mark_linear_text_alias_ro();
+ }
+ 
+ void __init smp_prepare_boot_cpu(void)
+diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+index a98419b72a09..b7ce0b9ad096 100644
+--- a/arch/arm64/mm/mmu.c
++++ b/arch/arm64/mm/mmu.c
+@@ -398,16 +398,28 @@ static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end
+ 				     debug_pagealloc_enabled());
+ 
+ 	/*
+-	 * Map the linear alias of the [_text, __init_begin) interval as
+-	 * read-only/non-executable. This makes the contents of the
+-	 * region accessible to subsystems such as hibernate, but
+-	 * protects it from inadvertent modification or execution.
++	 * Map the linear alias of the [_text, __init_begin) interval
++	 * as non-executable now, and remove the write permission in
++	 * mark_linear_text_alias_ro() below (which will be called after
++	 * alternative patching has completed). This makes the contents
++	 * of the region accessible to subsystems such as hibernate,
++	 * but protects it from inadvertent modification or execution.
+ 	 */
+ 	__create_pgd_mapping(pgd, kernel_start, __phys_to_virt(kernel_start),
+-			     kernel_end - kernel_start, PAGE_KERNEL_RO,
++			     kernel_end - kernel_start, PAGE_KERNEL,
+ 			     early_pgtable_alloc, debug_pagealloc_enabled());
+ }
+ 
++void __init mark_linear_text_alias_ro(void)
++{
++	/*
++	 * Remove the write permissions from the linear alias of .text/.rodata
++	 */
++	update_mapping_prot(__pa_symbol(_text), (unsigned long)lm_alias(_text),
++			    (unsigned long)__init_begin - (unsigned long)_text,
++			    PAGE_KERNEL_RO);
++}
++
+ static void __init map_mem(pgd_t *pgd)
+ {
+ 	struct memblock_region *reg;
 -- 
 2.7.4
