@@ -1,27 +1,26 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 5/5] arm64: mmu: apply strict permissions to .init.text and
- .init.data
-Date: Tue, 14 Feb 2017 20:52:38 +0000
-Message-ID: <1487105558-21897-6-git-send-email-ard.biesheuvel@linaro.org>
-References: <1487105558-21897-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Raz <raziebe@gmail.com>
+Subject: Re: Booting a kernel to EL1 in Armv8.1
+Date: Tue, 14 Feb 2017 22:08:19 +0000
+Message-ID: <CAPB=Z-oKHfTn5h2nuctRAkJLCx3+vsNzM_0DzWiJLhdGy78bMg@mail.gmail.com>
+References: <CAPB=Z-pGjZ398fZuUeR2EsOnVf-0Qp3m4ckdeCBniKZmjs25Nw@mail.gmail.com>
+ <20170125082252.GS15850@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============7363071559285539907=="
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3057140296
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 15:54:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 95FCE408EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 17:07:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jfKnPCG5PsgB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Feb 2017 15:54:17 -0500 (EST)
-Received: from mail-wr0-f182.google.com (mail-wr0-f182.google.com
- [209.85.128.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C76240BBB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 15:54:17 -0500 (EST)
-Received: by mail-wr0-f182.google.com with SMTP id i10so178612679wrb.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 12:55:02 -0800 (PST)
-In-Reply-To: <1487105558-21897-1-git-send-email-ard.biesheuvel@linaro.org>
+ with ESMTP id CrNZtt0d+8NF for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Feb 2017 17:07:58 -0500 (EST)
+Received: from mail-lf0-f53.google.com (mail-lf0-f53.google.com
+ [209.85.215.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D76DC40625
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 17:07:57 -0500 (EST)
+Received: by mail-lf0-f53.google.com with SMTP id n124so72851355lfd.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 14:08:42 -0800 (PST)
+In-Reply-To: <20170125082252.GS15850@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,125 +30,169 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, labbott@fedoraproject.org
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, keescook@chromium.org, marc.zyngier@arm.com, andre.przywara@arm.com, kernel-hardening@lists.openwall.com, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To avoid having mappings that are writable and executable at the same
-time, split the init region into a .init.text region that is mapped
-read-only, and a .init.data region that is mapped non-executable.
+--===============7363071559285539907==
+Content-Type: multipart/alternative; boundary=001a114002f87a397d054884ce6f
 
-This is possible now that the alternative patching occurs via the linear
-mapping, and the linear alias of the init region is always mapped writable
-(but never executable).
+--001a114002f87a397d054884ce6f
+Content-Type: text/plain; charset=UTF-8
 
-Since the alternatives descriptions themselves are read-only data, move
-those into the .init.text region.
+On Wed, Jan 25, 2017 at 8:22 AM, Christoffer Dall <
+christoffer.dall@linaro.org> wrote:
 
-Reviewed-by: Laura Abbott <labbott@redhat.com>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm64/include/asm/sections.h |  3 ++-
- arch/arm64/kernel/vmlinux.lds.S   | 25 +++++++++++++-------
- arch/arm64/mm/mmu.c               | 12 ++++++----
- 3 files changed, 26 insertions(+), 14 deletions(-)
+> On Tue, Jan 24, 2017 at 09:50:04PM +0000, Raz wrote:
+> > Hello
+> >
+> > I am trying to boot EL1 kernel in a platform based on Armv8.1.
+> > I am using fvp as a hardware.
+> > What I am trying to achieve is to execute some kernel code in
+> > EL2 exception level..
+>
+> When you boot a reasonably recent kernel on VHE, it will execute in EL2,
+> so all the code you're executing will be at EL2, so I think you've
+> already achieved what you're trying to do.
+>
+> >
+> > The current VHE patch is booting the kernel into EL2. So I took an older
+> > kernel
+> > and I tried to set  TTBR1_EL2 to access kernel memory as if it is
+> TTBR1_EL1
+> > .
+>
+> That won't work unless you set the E2H bit, see the ARMv8.1
+> documentation.
+>
+> If you boot a kernel that doesn't have the necessary bits to enable VHE,
+> then you'll just run as on a non-VHE system with the main kernel running
+> at EL1 and a stub installed at EL2 which eventually gets replaced by the
+> KVM hyp lowvisor code in EL2.
+>
+> >
+> > It is theoretically possible ?
+>
+> I'm not sure what you're asking?
+>
+> > Setting TTBR1_EL2 to TTBR1_EL1
+> > and enabling mmu  thtough sctlr_el2 does not work.
+> >
+>
+> Again, not sure what you're trying to do.  If you're running in EL1
+> (because you're old kernel drops you to EL1) then trying to access EL2
+> registers obviously won't work.
+>
+> I created my own vector instead of kvm's . I am doing that because I want
+to create a sort of secured execution context by using a hypervisor. It is
+an academic work.
 
-diff --git a/arch/arm64/include/asm/sections.h b/arch/arm64/include/asm/sections.h
-index 4e7e7067afdb..22582819b2e5 100644
---- a/arch/arm64/include/asm/sections.h
-+++ b/arch/arm64/include/asm/sections.h
-@@ -24,7 +24,8 @@ extern char __hibernate_exit_text_start[], __hibernate_exit_text_end[];
- extern char __hyp_idmap_text_start[], __hyp_idmap_text_end[];
- extern char __hyp_text_start[], __hyp_text_end[];
- extern char __idmap_text_start[], __idmap_text_end[];
-+extern char __initdata_begin[], __initdata_end[];
-+extern char __inittext_begin[], __inittext_end[];
- extern char __irqentry_text_start[], __irqentry_text_end[];
- extern char __mmuoff_data_start[], __mmuoff_data_end[];
--
- #endif /* __ASM_SECTIONS_H */
-diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-index b8deffa9e1bf..2c93d259046c 100644
---- a/arch/arm64/kernel/vmlinux.lds.S
-+++ b/arch/arm64/kernel/vmlinux.lds.S
-@@ -143,12 +143,27 @@ SECTIONS
- 
- 	. = ALIGN(SEGMENT_ALIGN);
- 	__init_begin = .;
-+	__inittext_begin = .;
- 
- 	INIT_TEXT_SECTION(8)
- 	.exit.text : {
- 		ARM_EXIT_KEEP(EXIT_TEXT)
- 	}
- 
-+	. = ALIGN(4);
-+	.altinstructions : {
-+		__alt_instructions = .;
-+		*(.altinstructions)
-+		__alt_instructions_end = .;
-+	}
-+	.altinstr_replacement : {
-+		*(.altinstr_replacement)
-+	}
-+
-+	. = ALIGN(PAGE_SIZE);
-+	__inittext_end = .;
-+	__initdata_begin = .;
-+
- 	.init.data : {
- 		INIT_DATA
- 		INIT_SETUP(16)
-@@ -164,15 +179,6 @@ SECTIONS
- 
- 	PERCPU_SECTION(L1_CACHE_BYTES)
- 
--	. = ALIGN(4);
--	.altinstructions : {
--		__alt_instructions = .;
--		*(.altinstructions)
--		__alt_instructions_end = .;
--	}
--	.altinstr_replacement : {
--		*(.altinstr_replacement)
--	}
- 	.rela : ALIGN(8) {
- 		*(.rela .rela*)
- 	}
-@@ -181,6 +187,7 @@ SECTIONS
- 	__rela_size	= SIZEOF(.rela);
- 
- 	. = ALIGN(SEGMENT_ALIGN);
-+	__initdata_end = .;
- 	__init_end = .;
- 
- 	_data = .;
-diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index 70a492b36fe7..cb9f2716c4b6 100644
---- a/arch/arm64/mm/mmu.c
-+++ b/arch/arm64/mm/mmu.c
-@@ -485,14 +485,18 @@ early_param("rodata", parse_rodata);
-  */
- static void __init map_kernel(pgd_t *pgd)
- {
--	static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_init, vmlinux_data;
-+	static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_inittext,
-+				vmlinux_initdata, vmlinux_data;
- 
- 	pgprot_t text_prot = rodata_enabled ? PAGE_KERNEL_ROX : PAGE_KERNEL_EXEC;
- 
- 	map_kernel_segment(pgd, _text, _etext, text_prot, &vmlinux_text);
--	map_kernel_segment(pgd, __start_rodata, __init_begin, PAGE_KERNEL, &vmlinux_rodata);
--	map_kernel_segment(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC,
--			   &vmlinux_init);
-+	map_kernel_segment(pgd, __start_rodata, __inittext_begin, PAGE_KERNEL,
-+			   &vmlinux_rodata);
-+	map_kernel_segment(pgd, __inittext_begin, __inittext_end, text_prot,
-+			   &vmlinux_inittext);
-+	map_kernel_segment(pgd, __initdata_begin, __initdata_end, PAGE_KERNEL,
-+			   &vmlinux_initdata);
- 	map_kernel_segment(pgd, _data, _end, PAGE_KERNEL, &vmlinux_data);
- 
- 	if (!pgd_val(*pgd_offset_raw(pgd, FIXADDR_START))) {
+I managed to do that by the way. I am calling regular kernel code in EL2.
+so thank you.
+
+
+If you run a VHE kernel, it will have already set the _EL2 registers to
+> the values you want (but it will use _EL1 register access intructions to
+> do so, and they are transparently rewritten by hardware to program the
+> corresponding _EL2 registers).
+>
+> Hope this helps,
+> -Christoffer
+>
+
+
+
 -- 
-2.7.4
+https://sites.google.com/site/ironspeedlinux/
+
+--001a114002f87a397d054884ce6f
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><div class=3D"gmail_extra"><br><div class=3D"gmail_quo=
+te">On Wed, Jan 25, 2017 at 8:22 AM, Christoffer Dall <span dir=3D"ltr">&lt=
+;<a href=3D"mailto:christoffer.dall@linaro.org" target=3D"_blank">christoff=
+er.dall@linaro.org</a>&gt;</span> wrote:<br><blockquote class=3D"gmail_quot=
+e" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">=
+<span>On Tue, Jan 24, 2017 at 09:50:04PM +0000, Raz wrote:<br>
+&gt; Hello<br>
+&gt;<br>
+&gt; I am trying to boot EL1 kernel in a platform based on Armv8.1.<br>
+&gt; I am using fvp as a hardware.<br>
+&gt; What I am trying to achieve is to execute some kernel code in<br>
+&gt; EL2 exception level..<br>
+<br>
+</span>When you boot a reasonably recent kernel on VHE, it will execute in =
+EL2,<br>
+so all the code you&#39;re executing will be at EL2, so I think you&#39;ve<=
+br>
+already achieved what you&#39;re trying to do.<br>
+<span><br>
+&gt;<br>
+&gt; The current VHE patch is booting the kernel into EL2. So I took an old=
+er<br>
+&gt; kernel<br>
+&gt; and I tried to set=C2=A0 TTBR1_EL2 to access kernel memory as if it is=
+ TTBR1_EL1<br>
+&gt; .<br>
+<br>
+</span>That won&#39;t work unless you set the E2H bit, see the ARMv8.1<br>
+documentation.<br>
+<br>
+If you boot a kernel that doesn&#39;t have the necessary bits to enable VHE=
+,<br>
+then you&#39;ll just run as on a non-VHE system with the main kernel runnin=
+g<br>
+at EL1 and a stub installed at EL2 which eventually gets replaced by the<br=
+>
+KVM hyp lowvisor code in EL2.<br>
+<span><br>
+&gt;<br>
+&gt; It is theoretically possible ?<br>
+<br>
+</span>I&#39;m not sure what you&#39;re asking?<br>
+<span><br>
+&gt; Setting TTBR1_EL2 to TTBR1_EL1<br>
+&gt; and enabling mmu=C2=A0 thtough sctlr_el2 does not work.<br>
+&gt;<br>
+<br>
+</span>Again, not sure what you&#39;re trying to do.=C2=A0 If you&#39;re ru=
+nning in EL1<br>
+(because you&#39;re old kernel drops you to EL1) then trying to access EL2<=
+br>
+registers obviously won&#39;t work.<br>
+<br></blockquote><div>I created my own vector instead of kvm&#39;s . I am d=
+oing that because I want to create a sort of secured execution context by u=
+sing a hypervisor. It is an academic work. <br><br></div><div>I managed to =
+do that by the way. I am calling regular kernel code in EL2. so thank you. =
+<br></div><div><br><br></div><blockquote class=3D"gmail_quote" style=3D"mar=
+gin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+If you run a VHE kernel, it will have already set the _EL2 registers to<br>
+the values you want (but it will use _EL1 register access intructions to<br=
+>
+do so, and they are transparently rewritten by hardware to program the<br>
+corresponding _EL2 registers).<br>
+<br>
+Hope this helps,<br>
+-Christoffer<br>
+</blockquote></div><br><br clear=3D"all"><br>-- <br><div class=3D"m_-884120=
+7887007875843gmail_signature" data-smartmail=3D"gmail_signature"><div dir=
+=3D"ltr"><div><a href=3D"https://sites.google.com/site/ironspeedlinux/" tar=
+get=3D"_blank">https://sites.google.com/site/<wbr>ironspeedlinux/</a></div>=
+</div></div>
+</div></div>
+
+--001a114002f87a397d054884ce6f--
+
+--===============7363071559285539907==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============7363071559285539907==--
