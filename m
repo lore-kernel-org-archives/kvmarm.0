@@ -1,25 +1,27 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: Re: [RFC PATCH 24/33] irqchip/gic-v3-its: Add VPE scheduling
-Date: Mon, 13 Feb 2017 19:24:49 -0600
-Message-ID: <e3701dcd-410e-6957-d1f6-57c28f649c79@codeaurora.org>
-References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-25-git-send-email-marc.zyngier@arm.com>
-Reply-To: shankerd@codeaurora.org
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2 2/5] arm64: mmu: move TLB maintenance from callers to
+ create_mapping_late()
+Date: Tue, 14 Feb 2017 15:54:36 +0000
+Message-ID: <20170214155436.GC23718@leverpostej>
+References: <1486844586-26135-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1486844586-26135-3-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41268405DA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 20:24:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30C7A40992
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 10:54:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5iWmGjmlvB3e for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Feb 2017 20:24:10 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 130BB400E9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Feb 2017 20:24:09 -0500 (EST)
-In-Reply-To: <1484648454-21216-25-git-send-email-marc.zyngier@arm.com>
+ with ESMTP id UfgWakgdXiYq for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Feb 2017 10:53:59 -0500 (EST)
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com
+ (mail-he1eur01on0072.outbound.protection.outlook.com [104.47.0.72])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A98440064
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 10:53:59 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1486844586-26135-3-git-send-email-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,218 +31,67 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: keescook@chromium.org, marc.zyngier@arm.com, catalin.marinas@arm.com, kernel-hardening@lists.openwall.com, will.deacon@arm.com, andre.przywara@arm.com, nd@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, labbott@fedoraproject.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On Sat, Feb 11, 2017 at 08:23:03PM +0000, Ard Biesheuvel wrote:
+> In preparation of changing the way we invoke create_mapping_late() (which
+> is currently invoked twice from the same function), move the TLB flushing
+> it performs from the caller into create_mapping_late() itself, and change
+> it to a TLB maintenance by VA rather than a full flush, which is more
+> appropriate here.
 
-On 01/17/2017 04:20 AM, Marc Zyngier wrote:
-> When a VPE is scheduled to run, the corresponding redistributor must
-> be told so, by setting VPROPBASER to the VM's property table, and
-> VPENDBASER to the vcpu's pending table.
->
-> When scheduled out, we preserve the IDAI and PendingLast bits. The
-> latter is specially important, as it tells the hypervisor that
-> there are pending interrupts for this vcpu.
->
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+It's not immediately clear what's meant by "changing the way we invoke
+create_mapping_late()" here.
+
+It's probably worth explicitly mentioning that we need to add another
+caller of create_mapping_late(), and this saves us adding (overly
+strong) TLB maintenance to all callers.
+
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 > ---
->   drivers/irqchip/irq-gic-v3-its.c   | 57
-> ++++++++++++++++++++++++++++++++++
->   include/linux/irqchip/arm-gic-v3.h | 63
-> ++++++++++++++++++++++++++++++++++++++
->   2 files changed, 120 insertions(+)
->
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c
-> b/drivers/irqchip/irq-gic-v3-its.c
-> index 598e25b..f918d59 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -143,6 +143,7 @@ static DEFINE_IDA(its_vpeid_ida);
->   
->   #define gic_data_rdist()		(raw_cpu_ptr(gic_rdists->rdist))
->   #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
-> +#define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() +
-> SZ_128K)
->   
->   static struct its_collection *dev_event_to_col(struct its_device
-> *its_dev,
->   					       u32 event)
-> @@ -2039,8 +2040,64 @@ static const struct irq_domain_ops its_domain_ops =
-> {
->   	.deactivate		= its_irq_domain_deactivate,
->   };
->   
-> +static int its_vpe_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
-> +{
-> +	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-> +	struct its_cmd_info *info = vcpu_info;
-> +	u64 val;
+>  arch/arm64/mm/mmu.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+> index 2131521ddc24..9e0ec1a8cd3b 100644
+> --- a/arch/arm64/mm/mmu.c
+> +++ b/arch/arm64/mm/mmu.c
+> @@ -356,6 +356,9 @@ static void create_mapping_late(phys_addr_t phys, unsigned long virt,
+>  
+>  	__create_pgd_mapping(init_mm.pgd, phys, virt, size, prot,
+>  			     NULL, debug_pagealloc_enabled());
 > +
-> +	switch (info->cmd_type) {
-> +	case SCHEDULE_VPE:
-> +	{
-> +		void * __iomem vlpi_base = gic_data_rdist_vlpi_base();
-> +
-> +		/* Schedule the VPE */
-> +		val  = virt_to_phys(page_address(vpe->its_vm->vprop_page))
-> &
-> +			GENMASK_ULL(51, 12);
-> +		val |= (LPI_NRBITS - 1) & GICR_VPROPBASER_IDBITS_MASK;
-> +		val |= GICR_VPROPBASER_RaWb;
-I know Write-allocation hints are not that important for PROP table, but 
-like to know any reason why Wa hints are not enabled? Enable Ra if there 
-is no strong reason behind it.
-> +		val |= GICR_VPROPBASER_InnerShareable;
-> +		gits_write_vpropbaser(val, vlpi_base + GICR_VPROPBASER);
-> +
-> +		val  = virt_to_phys(page_address(vpe->vpt_page)) &
-> GENMASK(51, 16);
-> +		val |= GICR_VPENDBASER_WaWb;
-it's very important to enable read allocation hints for performance 
-point of view. I think both Ra and Wa can be enabled without loosing any 
-functionality.
+> +	/* flush the TLBs after updating live kernel mappings */
+> +	flush_tlb_kernel_range(virt, virt + size);
+>  }
 
+It feels  a little odd to have the maintenance here given we still call
+this *create*_mapping_late.
 
-> +		val |= GICR_VPENDBASER_NonShareable;
-> +		val |= GICR_PENDBASER_PendingLast;
-> +		val |= vpe->idai ? GICR_PENDBASER_IDAI : 0;
-> +		val |= GICR_PENDBASER_Valid;
-> +		gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
-> +
-> +		return 0;
-> +	}
-> +
-> +	case DESCHEDULE_VPE:
-> +	{
-> +		void * __iomem vlpi_base = gic_data_rdist_vlpi_base();
-> +
-> +		/* We're being scheduled out */
-> +		val = gits_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
-> +		val &= ~GICR_PENDBASER_Valid;
-> +		gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
-> +
-> +		val = gits_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
-> +		while (val & GICR_PENDBASER_Dirty) {
-> +			cpu_relax();
-> +			val = gits_read_vpendbaser(vlpi_base +
-> GICR_VPENDBASER);
-> +		}
-> +
-> +		vpe->idai = !!(val & GICR_PENDBASER_IDAI);
-> +		vpe->pending_last = !!(val & GICR_PENDBASER_PendingLast);
-> +		return 0;
-> +	}
-> +
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +}
-> +
->   static struct irq_chip its_vpe_irq_chip = {
->   	.name			= "GICv4-vpe",
-> +	.irq_set_vcpu_affinity	= its_vpe_set_vcpu_affinity,
->   };
->   
->   static int its_vpe_id_alloc(void)
-> diff --git a/include/linux/irqchip/arm-gic-v3.h
-> b/include/linux/irqchip/arm-gic-v3.h
-> index 1b3a070..2789c9a 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -209,6 +209,69 @@
->   #define LPI_PROP_ENABLED		(1 << 0)
->   
->   /*
-> + * Re-Distributor registers, offsets from VLPI_base
-> + */
-> +#define GICR_VPROPBASER			0x0070
-> +
-> +#define GICR_VPROPBASER_IDBITS_MASK	0x1f
-> +
-> +#define GICR_VPROPBASER_SHAREABILITY_SHIFT		(10)
-> +#define GICR_VPROPBASER_INNER_CACHEABILITY_SHIFT	(7)
-> +#define GICR_VPROPBASER_OUTER_CACHEABILITY_SHIFT	(56)
-> +
-> +#define GICR_VPROPBASER_SHAREABILITY_MASK				\
-> +	GIC_BASER_SHAREABILITY(GICR_VPROPBASER, SHAREABILITY_MASK)
-> +#define GICR_VPROPBASER_INNER_CACHEABILITY_MASK
-> \
-> +	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, INNER, MASK)
-> +#define GICR_VPROPBASER_OUTER_CACHEABILITY_MASK
-> \
-> +	GIC_BASER_CACHEABILITY(GICR_VPROPBASER, OUTER, MASK)
-> +#define GICR_VPROPBASER_CACHEABILITY_MASK				\
-> +	GICR_VPROPBASER_INNER_CACHEABILITY_MASK
-> +
-> +#define GICR_VPROPBASER_InnerShareable					\
-> +	GIC_BASER_SHAREABILITY(GICR_VPROPBASER, InnerShareable)
-> +
-> +#define GICR_VPROPBASER_nCnB	GIC_BASER_CACHEABILITY(GICR_VPROPBASER,
-> INNER, nCnB)
-> +#define GICR_VPROPBASER_nC 	GIC_BASER_CACHEABILITY(GICR_VPROPBASER,
-> INNER, nC)
-> +#define GICR_VPROPBASER_RaWt	GIC_BASER_CACHEABILITY(GICR_VPROPBASER,
-> INNER, RaWt)
-> +#define GICR_VPROPBASER_RaWb	GIC_BASER_CACHEABILITY(GICR_VPROPBASER,
-> INNER, RaWt)
-> +#define GICR_VPROPBASER_WaWt	GIC_BASER_CACHEABILITY(GICR_VPROPBASER,
-> INNER, WaWt)
-> +#define GICR_VPROPBASER_WaWb	GIC_BASER_CACHEABILITY(GICR_VPROPBASER,
-> INNER, WaWb)
-> +#define GICR_VPROPBASER_RaWaWt	GIC_BASER_CACHEABILITY(GICR_VPROPBASER,
-> INNER, RaWaWt)
-> +#define GICR_VPROPBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_VPROPBASER,
-> INNER, RaWaWb)
-> +
-> +#define GICR_VPENDBASER			0x0078
-> +
-> +#define GICR_VPENDBASER_SHAREABILITY_SHIFT		(10)
-> +#define GICR_VPENDBASER_INNER_CACHEABILITY_SHIFT	(7)
-> +#define GICR_VPENDBASER_OUTER_CACHEABILITY_SHIFT	(56)
-> +#define GICR_VPENDBASER_SHAREABILITY_MASK				\
-> +	GIC_BASER_SHAREABILITY(GICR_VPENDBASER, SHAREABILITY_MASK)
-> +#define GICR_VPENDBASER_INNER_CACHEABILITY_MASK
-> \
-> +	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, INNER, MASK)
-> +#define GICR_VPENDBASER_OUTER_CACHEABILITY_MASK
-> \
-> +	GIC_BASER_CACHEABILITY(GICR_VPENDBASER, OUTER, MASK)
-> +#define GICR_VPENDBASER_CACHEABILITY_MASK				\
-> +	GICR_VPENDBASER_INNER_CACHEABILITY_MASK
-> +
-> +#define GICR_VPENDBASER_NonShareable					\
-> +	GIC_BASER_SHAREABILITY(GICR_VPENDBASER, NonShareable)
-> +
-> +#define GICR_VPENDBASER_nCnB	GIC_BASER_CACHEABILITY(GICR_VPENDBASER,
-> INNER, nCnB)
-> +#define GICR_VPENDBASER_nC 	GIC_BASER_CACHEABILITY(GICR_VPENDBASER,
-> INNER, nC)
-> +#define GICR_VPENDBASER_RaWt	GIC_BASER_CACHEABILITY(GICR_VPENDBASER,
-> INNER, RaWt)
-> +#define GICR_VPENDBASER_RaWb	GIC_BASER_CACHEABILITY(GICR_VPENDBASER,
-> INNER, RaWt)
-> +#define GICR_VPENDBASER_WaWt	GIC_BASER_CACHEABILITY(GICR_VPENDBASER,
-> INNER, WaWt)
-> +#define GICR_VPENDBASER_WaWb	GIC_BASER_CACHEABILITY(GICR_VPENDBASER,
-> INNER, WaWb)
-> +#define GICR_VPENDBASER_RaWaWt	GIC_BASER_CACHEABILITY(GICR_VPENDBASER,
-> INNER, RaWaWt)
-> +#define GICR_VPENDBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_VPENDBASER,
-> INNER, RaWaWb)
-> +
-> +#define GICR_PENDBASER_Dirty		(1ULL << 60)
-> +#define GICR_PENDBASER_PendingLast	(1ULL << 61)
-> +#define GICR_PENDBASER_IDAI		(1ULL << 62)
-> +#define GICR_PENDBASER_Valid		(1ULL << 63)
-> +
-> +/*
->    * ITS registers, offsets from ITS_base
->    */
->   #define GITS_CTLR			0x0000
+Given the only users of this are changing permissions, perhaps we should
+rename this to change_mapping_prot(), or something like that?
 
--- 
-Shanker Donthineni
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+Otherwise, this looks fine to me, and boots fine. Either way:
+
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+Tested-by: Mark Rutland <mark.rutland@arm.com>
+
+Thanks,
+Mark.
+
+>  static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end)
+> @@ -438,9 +441,6 @@ void mark_rodata_ro(void)
+>  	create_mapping_late(__pa_symbol(__start_rodata), (unsigned long)__start_rodata,
+>  			    section_size, PAGE_KERNEL_RO);
+>  
+> -	/* flush the TLBs after updating live kernel mappings */
+> -	flush_tlb_all();
+> -
+>  	debug_checkwx();
+>  }
+>  
+> -- 
+> 2.7.4
+> 
