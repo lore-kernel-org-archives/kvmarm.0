@@ -1,27 +1,28 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2 5/5] arm64: mmu: apply strict permissions to
- .init.text and .init.data
-Date: Tue, 14 Feb 2017 15:57:27 +0000
-Message-ID: <20170214155727.GF23718@leverpostej>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2 4/5] arm64: mmu: map .text as read-only from the outset
+Date: Tue, 14 Feb 2017 16:15:11 +0000
+Message-ID: <651D9CBB-3E64-41CE-BF85-D2FF0CB927B7@linaro.org>
 References: <1486844586-26135-1-git-send-email-ard.biesheuvel@linaro.org>
- <1486844586-26135-6-git-send-email-ard.biesheuvel@linaro.org>
-Mime-Version: 1.0
+ <1486844586-26135-5-git-send-email-ard.biesheuvel@linaro.org>
+ <20170214155704.GE23718@leverpostej>
+Mime-Version: 1.0 (1.0)
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 42E7140A7B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 10:56:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D1B2E405DA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 11:14:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2fl6iyIxZLbb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Feb 2017 10:56:52 -0500 (EST)
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com
- (mail-ve1eur01on0045.outbound.protection.outlook.com [104.47.1.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B6A3400E9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 10:56:51 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <1486844586-26135-6-git-send-email-ard.biesheuvel@linaro.org>
+ with ESMTP id Lp86vAZp2b5o for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Feb 2017 11:14:30 -0500 (EST)
+Received: from mail-wr0-f175.google.com (mail-wr0-f175.google.com
+ [209.85.128.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 032BF40187
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 11:14:29 -0500 (EST)
+Received: by mail-wr0-f175.google.com with SMTP id c4so15567442wrd.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 08:15:14 -0800 (PST)
+In-Reply-To: <20170214155704.GE23718@leverpostej>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,58 +32,70 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Mark Rutland <mark.rutland@arm.com>
 Cc: keescook@chromium.org, marc.zyngier@arm.com, catalin.marinas@arm.com, kernel-hardening@lists.openwall.com, will.deacon@arm.com, andre.przywara@arm.com, nd@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, labbott@fedoraproject.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Feb 11, 2017 at 08:23:06PM +0000, Ard Biesheuvel wrote:
-> To avoid having mappings that are writable and executable at the same
-> time, split the init region into a .init.text region that is mapped
-> read-only, and a .init.data region that is mapped non-executable.
-> 
-> This is possible now that the alternative patching occurs via the linear
-> mapping, and the linear alias of the init region is always mapped writable
-> (but never executable).
-> 
-> Since the alternatives descriptions themselves are read-only data, move
-> those into the .init.text region.
-> 
-> Reviewed-by: Laura Abbott <labbott@redhat.com>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-This generally looks good.
-
-As with my comment on patch 4, we might want to allow .init.text to be
-mapped writeable for the sake of external debuggers.
-
-Thanks,
-Mark.
-
-> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-> index e97f1ce967ec..c53c43b4ed3f 100644
-> --- a/arch/arm64/mm/mmu.c
-> +++ b/arch/arm64/mm/mmu.c
-> @@ -479,12 +479,16 @@ static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
->   */
->  static void __init map_kernel(pgd_t *pgd)
->  {
-> -	static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_init, vmlinux_data;
-> +	static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_inittext,
-> +				vmlinux_initdata, vmlinux_data;
->  
->  	map_kernel_segment(pgd, _text, _etext, PAGE_KERNEL_ROX, &vmlinux_text);
-> -	map_kernel_segment(pgd, __start_rodata, __init_begin, PAGE_KERNEL, &vmlinux_rodata);
-> -	map_kernel_segment(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC,
-> -			   &vmlinux_init);
-> +	map_kernel_segment(pgd, __start_rodata, __inittext_begin, PAGE_KERNEL,
-> +			   &vmlinux_rodata);
-> +	map_kernel_segment(pgd, __inittext_begin, __inittext_end, PAGE_KERNEL_ROX,
-> +			   &vmlinux_inittext);
-> +	map_kernel_segment(pgd, __initdata_begin, __initdata_end, PAGE_KERNEL,
-> +			   &vmlinux_initdata);
->  	map_kernel_segment(pgd, _data, _end, PAGE_KERNEL, &vmlinux_data);
->  
->  	if (!pgd_val(*pgd_offset_raw(pgd, FIXADDR_START))) {
-> -- 
-> 2.7.4
+> On 14 Feb 2017, at 15:57, Mark Rutland <mark.rutland@arm.com> wrote:
 > 
+>> On Sat, Feb 11, 2017 at 08:23:05PM +0000, Ard Biesheuvel wrote:
+>> Now that alternatives patching code no longer relies on the primary
+>> mapping of .text being writable, we can remove the code that removes
+>> the writable permissions post-init time, and map it read-only from
+>> the outset.
+>> 
+>> Reviewed-by: Laura Abbott <labbott@redhat.com>
+>> Reviewed-by: Kees Cook <keescook@chromium.org>
+>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> 
+> This generally looks good.
+> 
+> One effect of this is that even with rodata=off, external debuggers
+> can't install SW breakpoints via the executable mapping.
+> 
+
+Interesting. For the sake of my education, could you elaborate on how that works under the hood?
+
+> We might want to allow that to be overridden. e.g. make rodata= an
+> early param, and switch the permissions based on that in map_kernel(),
+> e.g. have:
+> 
+>    pgprot_t text_prot = rodata_enabled ? PAGE_KERNEL_ROX
+>                        : PAGE_KERNEL_EXEC);
+> 
+> ... and use that for .text and .init.text by default.
+> 
+> 
+
+Is there any way we could restrict this privilege to external debuggers? Having trivial 'off' switches for security features makes me feel uneasy (although this is orthogonal to this patch)
+>> ---
+>> arch/arm64/mm/mmu.c | 5 +----
+>> 1 file changed, 1 insertion(+), 4 deletions(-)
+>> 
+>> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+>> index 7ed981c7f4c0..e97f1ce967ec 100644
+>> --- a/arch/arm64/mm/mmu.c
+>> +++ b/arch/arm64/mm/mmu.c
+>> @@ -442,9 +442,6 @@ void mark_rodata_ro(void)
+>> {
+>>    unsigned long section_size;
+>> 
+>> -    section_size = (unsigned long)_etext - (unsigned long)_text;
+>> -    create_mapping_late(__pa_symbol(_text), (unsigned long)_text,
+>> -                section_size, PAGE_KERNEL_ROX);
+>>    /*
+>>     * mark .rodata as read only. Use __init_begin rather than __end_rodata
+>>     * to cover NOTES and EXCEPTION_TABLE.
+>> @@ -484,7 +481,7 @@ static void __init map_kernel(pgd_t *pgd)
+>> {
+>>    static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_init, vmlinux_data;
+>> 
+>> -    map_kernel_segment(pgd, _text, _etext, PAGE_KERNEL_EXEC, &vmlinux_text);
+>> +    map_kernel_segment(pgd, _text, _etext, PAGE_KERNEL_ROX, &vmlinux_text);
+>>    map_kernel_segment(pgd, __start_rodata, __init_begin, PAGE_KERNEL, &vmlinux_rodata);
+>>    map_kernel_segment(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC,
+>>               &vmlinux_init);
+>> -- 
+>> 2.7.4
+>> 
