@@ -1,198 +1,268 @@
-From: Raz <raziebe@gmail.com>
-Subject: Re: Booting a kernel to EL1 in Armv8.1
-Date: Tue, 14 Feb 2017 22:08:19 +0000
-Message-ID: <CAPB=Z-oKHfTn5h2nuctRAkJLCx3+vsNzM_0DzWiJLhdGy78bMg@mail.gmail.com>
-References: <CAPB=Z-pGjZ398fZuUeR2EsOnVf-0Qp3m4ckdeCBniKZmjs25Nw@mail.gmail.com>
- <20170125082252.GS15850@cbox>
+From: Zhengqiang <zhengqiang10@huawei.com>
+Subject: Re: [PATCH V8 05/10] acpi: apei: handle SEA notification type for
+ ARMv8
+Date: Wed, 15 Feb 2017 14:24:49 +0800
+Message-ID: <58A3F431.9040808@huawei.com>
+References: <1485969413-23577-1-git-send-email-tbaicar@codeaurora.org>
+ <1485969413-23577-6-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============7363071559285539907=="
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 95FCE408EB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 17:07:59 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CrNZtt0d+8NF for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Feb 2017 17:07:58 -0500 (EST)
-Received: from mail-lf0-f53.google.com (mail-lf0-f53.google.com
- [209.85.215.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D76DC40625
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 17:07:57 -0500 (EST)
-Received: by mail-lf0-f53.google.com with SMTP id n124so72851355lfd.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Feb 2017 14:08:42 -0800 (PST)
-In-Reply-To: <20170125082252.GS15850@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <1485969413-23577-6-git-send-email-tbaicar@codeaurora.org>
+Sender: linux-acpi-owner@vger.kernel.org
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kern
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============7363071559285539907==
-Content-Type: multipart/alternative; boundary=001a114002f87a397d054884ce6f
+Hi Tyler:
 
---001a114002f87a397d054884ce6f
-Content-Type: text/plain; charset=UTF-8
+On 2017/2/2 1:16, Tyler Baicar wrote:
+> ARM APEI extension proposal added SEA (Synchronous External Abort)
+> notification type for ARMv8.
+> Add a new GHES error source handling function for SEA. If an error
+> source's notification type is SEA, then this function can be registered
+> into the SEA exception handler. That way GHES will parse and report
+> SEA exceptions when they occur.
+> 
+> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+> Signed-off-by: Naveen Kaje <nkaje@codeaurora.org>
+> ---
+>  arch/arm64/Kconfig        |  2 ++
+>  arch/arm64/mm/fault.c     | 11 +++++++
+>  drivers/acpi/apei/Kconfig | 14 +++++++++
+>  drivers/acpi/apei/ghes.c  | 78 ++++++++++++++++++++++++++++++++++++++++++-----
+>  include/acpi/ghes.h       |  2 ++
+>  5 files changed, 100 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 1117421..f92778d 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -53,6 +53,8 @@ config ARM64
+>  	select HANDLE_DOMAIN_IRQ
+>  	select HARDIRQS_SW_RESEND
+>  	select HAVE_ACPI_APEI if (ACPI && EFI)
+> +	select HAVE_ACPI_APEI_SEA if (ACPI && EFI)
+> +	select HAVE_NMI if HAVE_ACPI_APEI_SEA
+>  	select HAVE_ALIGNED_STRUCT_PAGE if SLUB
+>  	select HAVE_ARCH_AUDITSYSCALL
+>  	select HAVE_ARCH_BITREVERSE
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index 9ae7e65..5a5a096 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/highmem.h>
+>  #include <linux/perf_event.h>
+>  #include <linux/preempt.h>
+> +#include <linux/hardirq.h>
+>  
+>  #include <asm/bug.h>
+>  #include <asm/cpufeature.h>
+> @@ -41,6 +42,8 @@
+>  #include <asm/pgtable.h>
+>  #include <asm/tlbflush.h>
+>  
+> +#include <acpi/ghes.h>
+> +
+>  static const char *fault_name(unsigned int esr);
+>  
+>  #ifdef CONFIG_KPROBES
+> @@ -500,6 +503,14 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>  	pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
+>  		 fault_name(esr), esr, addr);
+>  
+> +	/*
+> +	 * synchronize_rcu() will wait for nmi_exit(), so no need to
+> +	 * rcu_read_lock().
+> +	 */
+> +	nmi_enter();
+> +	ghes_notify_sea();
+> +	nmi_exit();
+> +
 
-On Wed, Jan 25, 2017 at 8:22 AM, Christoffer Dall <
-christoffer.dall@linaro.org> wrote:
+For fatal error:
+ghes_notify_sea() -> ghes_proc() -> __ghes_call_panic(),cause panic;
+do_sea() function also call arm64_notify_die(), will cause panic too;
+Does it can happen, panic will be called twice ?
 
-> On Tue, Jan 24, 2017 at 09:50:04PM +0000, Raz wrote:
-> > Hello
-> >
-> > I am trying to boot EL1 kernel in a platform based on Armv8.1.
-> > I am using fvp as a hardware.
-> > What I am trying to achieve is to execute some kernel code in
-> > EL2 exception level..
->
-> When you boot a reasonably recent kernel on VHE, it will execute in EL2,
-> so all the code you're executing will be at EL2, so I think you've
-> already achieved what you're trying to do.
->
-> >
-> > The current VHE patch is booting the kernel into EL2. So I took an older
-> > kernel
-> > and I tried to set  TTBR1_EL2 to access kernel memory as if it is
-> TTBR1_EL1
-> > .
->
-> That won't work unless you set the E2H bit, see the ARMv8.1
-> documentation.
->
-> If you boot a kernel that doesn't have the necessary bits to enable VHE,
-> then you'll just run as on a non-VHE system with the main kernel running
-> at EL1 and a stub installed at EL2 which eventually gets replaced by the
-> KVM hyp lowvisor code in EL2.
->
-> >
-> > It is theoretically possible ?
->
-> I'm not sure what you're asking?
->
-> > Setting TTBR1_EL2 to TTBR1_EL1
-> > and enabling mmu  thtough sctlr_el2 does not work.
-> >
->
-> Again, not sure what you're trying to do.  If you're running in EL1
-> (because you're old kernel drops you to EL1) then trying to access EL2
-> registers obviously won't work.
->
-> I created my own vector instead of kvm's . I am doing that because I want
-to create a sort of secured execution context by using a hypervisor. It is
-an academic work.
+>  	info.si_signo = SIGBUS;
+>  	info.si_errno = 0;
+>  	info.si_code  = 0;
+> diff --git a/drivers/acpi/apei/Kconfig b/drivers/acpi/apei/Kconfig
+> index b0140c8..3786ff1 100644
+> --- a/drivers/acpi/apei/Kconfig
+> +++ b/drivers/acpi/apei/Kconfig
+> @@ -4,6 +4,20 @@ config HAVE_ACPI_APEI
+>  config HAVE_ACPI_APEI_NMI
+>  	bool
+>  
+> +config HAVE_ACPI_APEI_SEA
+> +	bool "APEI Synchronous External Abort logging/recovering support"
+> +	depends on ARM64
+> +	help
+> +	  This option should be enabled if the system supports
+> +	  firmware first handling of SEA (Synchronous External Abort).
+> +	  SEA happens with certain faults of data abort or instruction
+> +	  abort synchronous exceptions on ARMv8 systems. If a system
+> +	  supports firmware first handling of SEA, the platform analyzes
+> +	  and handles hardware error notifications with SEA, and it may then
+> +	  form a HW error record for the OS to parse and handle. This
+> +	  option allows the OS to look for such HW error record, and
+> +	  take appropriate action.
+> +
+>  config ACPI_APEI
+>  	bool "ACPI Platform Error Interface (APEI)"
+>  	select MISC_FILESYSTEMS
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index b25e7cf..8756172 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -114,11 +114,7 @@
+>   * Two virtual pages are used, one for IRQ/PROCESS context, the other for
+>   * NMI context (optionally).
+>   */
+> -#ifdef CONFIG_HAVE_ACPI_APEI_NMI
+>  #define GHES_IOREMAP_PAGES           2
+> -#else
+> -#define GHES_IOREMAP_PAGES           1
+> -#endif
+>  #define GHES_IOREMAP_IRQ_PAGE(base)	(base)
+>  #define GHES_IOREMAP_NMI_PAGE(base)	((base) + PAGE_SIZE)
+>  
+> @@ -156,11 +152,14 @@ static void ghes_ioremap_exit(void)
+>  
+>  static void __iomem *ghes_ioremap_pfn_nmi(u64 pfn)
+>  {
+> -	unsigned long vaddr;
+> +	unsigned long vaddr, paddr;
+> +	pgprot_t prot;
+>  
+>  	vaddr = (unsigned long)GHES_IOREMAP_NMI_PAGE(ghes_ioremap_area->addr);
+> -	ioremap_page_range(vaddr, vaddr + PAGE_SIZE,
+> -			   pfn << PAGE_SHIFT, PAGE_KERNEL);
+> +
+> +	paddr = pfn << PAGE_SHIFT;
+> +	prot = arch_apei_get_mem_attribute(paddr);
+> +	ioremap_page_range(vaddr, vaddr + PAGE_SIZE, paddr, prot);
+>  
+>  	return (void __iomem *)vaddr;
+>  }
+> @@ -767,6 +766,48 @@ static int ghes_notify_sci(struct notifier_block *this,
+>  	.notifier_call = ghes_notify_sci,
+>  };
+>  
+> +#ifdef CONFIG_HAVE_ACPI_APEI_SEA
+> +static LIST_HEAD(ghes_sea);
+> +
+> +void ghes_notify_sea(void)
+> +{
+> +	struct ghes *ghes;
+> +
+> +	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
+> +		ghes_proc(ghes);
+> +	}
+> +}
+> +
+> +static int ghes_sea_add(struct ghes *ghes)
+> +{
+> +	mutex_lock(&ghes_list_mutex);
+> +	list_add_rcu(&ghes->list, &ghes_sea);
+> +	mutex_unlock(&ghes_list_mutex);
+> +	return 0;
+> +}
+> +
+> +static void ghes_sea_remove(struct ghes *ghes)
+> +{
+> +	mutex_lock(&ghes_list_mutex);
+> +	list_del_rcu(&ghes->list);
+> +	mutex_unlock(&ghes_list_mutex);
+> +	synchronize_rcu();
+> +}
+> +#else /* CONFIG_HAVE_ACPI_APEI_SEA */
+> +static inline int ghes_sea_add(struct ghes *ghes)
+> +{
+> +	pr_err(GHES_PFX "ID: %d, trying to add SEA notification which is not supported\n",
+> +	       ghes->generic->header.source_id);
+> +	return -ENOTSUPP;
+> +}
+> +
+> +static inline void ghes_sea_remove(struct ghes *ghes)
+> +{
+> +	pr_err(GHES_PFX "ID: %d, trying to remove SEA notification which is not supported\n",
+> +	       ghes->generic->header.source_id);
+> +}
+> +#endif /* CONFIG_HAVE_ACPI_APEI_SEA */
+> +
+>  #ifdef CONFIG_HAVE_ACPI_APEI_NMI
+>  /*
+>   * printk is not safe in NMI context.  So in NMI handler, we allocate
+> @@ -1012,6 +1053,14 @@ static int ghes_probe(struct platform_device *ghes_dev)
+>  	case ACPI_HEST_NOTIFY_EXTERNAL:
+>  	case ACPI_HEST_NOTIFY_SCI:
+>  		break;
+> +	case ACPI_HEST_NOTIFY_SEA:
+> +		if (!IS_ENABLED(CONFIG_HAVE_ACPI_APEI_SEA)) {
+> +			pr_warn(GHES_PFX "Generic hardware error source: %d notified via SEA is not supported\n",
+> +				generic->header.source_id);
+> +			rc = -ENOTSUPP;
+> +			goto err;
+> +		}
+> +		break;
+>  	case ACPI_HEST_NOTIFY_NMI:
+>  		if (!IS_ENABLED(CONFIG_HAVE_ACPI_APEI_NMI)) {
+>  			pr_warn(GHES_PFX "Generic hardware error source: %d notified via NMI interrupt is not supported!\n",
+> @@ -1023,6 +1072,13 @@ static int ghes_probe(struct platform_device *ghes_dev)
+>  		pr_warning(GHES_PFX "Generic hardware error source: %d notified via local interrupt is not supported!\n",
+>  			   generic->header.source_id);
+>  		goto err;
+> +	case ACPI_HEST_NOTIFY_GPIO:
+> +	case ACPI_HEST_NOTIFY_SEI:
+> +	case ACPI_HEST_NOTIFY_GSIV:
+> +		pr_warn(GHES_PFX "Generic hardware error source: %d notified via notification type %u is not supported\n",
+> +			generic->header.source_id, generic->header.source_id);
+> +		rc = -ENOTSUPP;
+> +		goto err;
+>  	default:
+>  		pr_warning(FW_WARN GHES_PFX "Unknown notification type: %u for generic hardware error source: %d\n",
+>  			   generic->notify.type, generic->header.source_id);
+> @@ -1077,6 +1133,11 @@ static int ghes_probe(struct platform_device *ghes_dev)
+>  		list_add_rcu(&ghes->list, &ghes_sci);
+>  		mutex_unlock(&ghes_list_mutex);
+>  		break;
+> +	case ACPI_HEST_NOTIFY_SEA:
+> +		rc = ghes_sea_add(ghes);
+> +		if (rc)
+> +			goto err_edac_unreg;
+> +		break;
+>  	case ACPI_HEST_NOTIFY_NMI:
+>  		ghes_nmi_add(ghes);
+>  		break;
+> @@ -1119,6 +1180,9 @@ static int ghes_remove(struct platform_device *ghes_dev)
+>  			unregister_acpi_hed_notifier(&ghes_notifier_sci);
+>  		mutex_unlock(&ghes_list_mutex);
+>  		break;
+> +	case ACPI_HEST_NOTIFY_SEA:
+> +		ghes_sea_remove(ghes);
+> +		break;
+>  	case ACPI_HEST_NOTIFY_NMI:
+>  		ghes_nmi_remove(ghes);
+>  		break;
+> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+> index 6ae318b..adf5455 100644
+> --- a/include/acpi/ghes.h
+> +++ b/include/acpi/ghes.h
+> @@ -95,3 +95,5 @@ static inline void *acpi_hest_generic_data_payload(struct acpi_hest_generic_data
+>  		(void *)(((struct acpi_hest_generic_data_v300 *)(gdata)) + 1) :
+>  		gdata + 1;
+>  }
+> +
+> +void ghes_notify_sea(void);
+> 
 
-I managed to do that by the way. I am calling regular kernel code in EL2.
-so thank you.
+Thanks,
 
+Zhengqiang
 
-If you run a VHE kernel, it will have already set the _EL2 registers to
-> the values you want (but it will use _EL1 register access intructions to
-> do so, and they are transparently rewritten by hardware to program the
-> corresponding _EL2 registers).
->
-> Hope this helps,
-> -Christoffer
->
-
-
-
--- 
-https://sites.google.com/site/ironspeedlinux/
-
---001a114002f87a397d054884ce6f
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><div class=3D"gmail_extra"><br><div class=3D"gmail_quo=
-te">On Wed, Jan 25, 2017 at 8:22 AM, Christoffer Dall <span dir=3D"ltr">&lt=
-;<a href=3D"mailto:christoffer.dall@linaro.org" target=3D"_blank">christoff=
-er.dall@linaro.org</a>&gt;</span> wrote:<br><blockquote class=3D"gmail_quot=
-e" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">=
-<span>On Tue, Jan 24, 2017 at 09:50:04PM +0000, Raz wrote:<br>
-&gt; Hello<br>
-&gt;<br>
-&gt; I am trying to boot EL1 kernel in a platform based on Armv8.1.<br>
-&gt; I am using fvp as a hardware.<br>
-&gt; What I am trying to achieve is to execute some kernel code in<br>
-&gt; EL2 exception level..<br>
-<br>
-</span>When you boot a reasonably recent kernel on VHE, it will execute in =
-EL2,<br>
-so all the code you&#39;re executing will be at EL2, so I think you&#39;ve<=
-br>
-already achieved what you&#39;re trying to do.<br>
-<span><br>
-&gt;<br>
-&gt; The current VHE patch is booting the kernel into EL2. So I took an old=
-er<br>
-&gt; kernel<br>
-&gt; and I tried to set=C2=A0 TTBR1_EL2 to access kernel memory as if it is=
- TTBR1_EL1<br>
-&gt; .<br>
-<br>
-</span>That won&#39;t work unless you set the E2H bit, see the ARMv8.1<br>
-documentation.<br>
-<br>
-If you boot a kernel that doesn&#39;t have the necessary bits to enable VHE=
-,<br>
-then you&#39;ll just run as on a non-VHE system with the main kernel runnin=
-g<br>
-at EL1 and a stub installed at EL2 which eventually gets replaced by the<br=
->
-KVM hyp lowvisor code in EL2.<br>
-<span><br>
-&gt;<br>
-&gt; It is theoretically possible ?<br>
-<br>
-</span>I&#39;m not sure what you&#39;re asking?<br>
-<span><br>
-&gt; Setting TTBR1_EL2 to TTBR1_EL1<br>
-&gt; and enabling mmu=C2=A0 thtough sctlr_el2 does not work.<br>
-&gt;<br>
-<br>
-</span>Again, not sure what you&#39;re trying to do.=C2=A0 If you&#39;re ru=
-nning in EL1<br>
-(because you&#39;re old kernel drops you to EL1) then trying to access EL2<=
-br>
-registers obviously won&#39;t work.<br>
-<br></blockquote><div>I created my own vector instead of kvm&#39;s . I am d=
-oing that because I want to create a sort of secured execution context by u=
-sing a hypervisor. It is an academic work. <br><br></div><div>I managed to =
-do that by the way. I am calling regular kernel code in EL2. so thank you. =
-<br></div><div><br><br></div><blockquote class=3D"gmail_quote" style=3D"mar=
-gin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-If you run a VHE kernel, it will have already set the _EL2 registers to<br>
-the values you want (but it will use _EL1 register access intructions to<br=
->
-do so, and they are transparently rewritten by hardware to program the<br>
-corresponding _EL2 registers).<br>
-<br>
-Hope this helps,<br>
--Christoffer<br>
-</blockquote></div><br><br clear=3D"all"><br>-- <br><div class=3D"m_-884120=
-7887007875843gmail_signature" data-smartmail=3D"gmail_signature"><div dir=
-=3D"ltr"><div><a href=3D"https://sites.google.com/site/ironspeedlinux/" tar=
-get=3D"_blank">https://sites.google.com/site/<wbr>ironspeedlinux/</a></div>=
-</div></div>
-</div></div>
-
---001a114002f87a397d054884ce6f--
-
---===============7363071559285539907==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============7363071559285539907==--
