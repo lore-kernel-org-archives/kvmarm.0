@@ -1,26 +1,26 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: race-free exit from KVM_RUN without POSIX signals
-Date: Wed, 15 Feb 2017 16:56:42 +0100
-Message-ID: <1359d10f-1bee-e295-912d-8cdc5bf7a98c@redhat.com>
-References: <1487169821-14806-1-git-send-email-pbonzini@redhat.com>
- <2f9cd5cd-1bb5-0d9e-cb84-26615b211523@de.ibm.com>
+From: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Subject: Re: [PATCH V8 08/10] ras: acpi / apei: generate trace event for
+ unrecognized CPER section
+Date: Wed, 15 Feb 2017 09:54:09 -0700
+Message-ID: <e50b7673-a441-3a6b-cf75-c267881c1a92@codeaurora.org>
+References: <1485969413-23577-1-git-send-email-tbaicar@codeaurora.org>
+ <1485969413-23577-9-git-send-email-tbaicar@codeaurora.org>
+ <20170215105234.4921db1f@gandalf.local.home>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D50F40B5B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 10:55:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73A7A40C58
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 11:53:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VCVi+Ct2Oo3V for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Feb 2017 10:55:55 -0500 (EST)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DF65405DA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 10:55:54 -0500 (EST)
-Received: by mail-wm0-f66.google.com with SMTP id c85so8901483wmi.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 07:56:41 -0800 (PST)
-In-Reply-To: <2f9cd5cd-1bb5-0d9e-cb84-26615b211523@de.ibm.com>
+ with ESMTP id 2h4C4BnSMwP9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Feb 2017 11:53:30 -0500 (EST)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 92E0340C33
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 11:53:30 -0500 (EST)
+In-Reply-To: <20170215105234.4921db1f@gandalf.local.home>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,51 +30,86 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christian Borntraeger <borntraeger@de.ibm.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: james.hogan@imgtec.com, marc.zyngier@arm.com, kvm-ppc@vger.kernel.org, paulus@samba.org, cornelia.huck@de.ibm.com, kvmarm@lists.cs.columbia.edu
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 2/15/2017 8:52 AM, Steven Rostedt wrote:
+> On Wed,  1 Feb 2017 10:16:51 -0700
+> Tyler Baicar <tbaicar@codeaurora.org> wrote:
+>
+>> @@ -452,11 +454,21 @@ static void ghes_do_proc(struct ghes *ghes,
+>>   {
+>>   	int sev, sec_sev;
+>>   	struct acpi_hest_generic_data *gdata;
+>> +	uuid_le sec_type;
+>> +	uuid_le *fru_id = &NULL_UUID_LE;
+>> +	char *fru_text = "";
+>>   
+>>   	sev = ghes_severity(estatus->error_severity);
+>>   	apei_estatus_for_each_section(estatus, gdata) {
+>>   		sec_sev = ghes_severity(gdata->error_severity);
+>> -		if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
+>> +		sec_type = *(uuid_le *)gdata->section_type;
+>> +
+>> +		if (gdata->validation_bits & CPER_SEC_VALID_FRU_ID)
+>> +			fru_id = (uuid_le *)gdata->fru_id;
+>> +		if (gdata->validation_bits & CPER_SEC_VALID_FRU_TEXT)
+>> +			fru_text = gdata->fru_text;
+>> +
+>> +		if (!uuid_le_cmp(sec_type,
+>>   				 CPER_SEC_PLATFORM_MEM)) {
+>>   			struct cper_sec_mem_err *mem_err;
+>>   
+>> @@ -467,7 +479,7 @@ static void ghes_do_proc(struct ghes *ghes,
+>>   			ghes_handle_memory_failure(gdata, sev);
+>>   		}
+>>   #ifdef CONFIG_ACPI_APEI_PCIEAER
+>> -		else if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
+>> +		else if (!uuid_le_cmp(sec_type,
+>>   				      CPER_SEC_PCIE)) {
+>>   			struct cper_sec_pcie *pcie_err;
+>>   
+>> @@ -500,6 +512,12 @@ static void ghes_do_proc(struct ghes *ghes,
+>>   
+>>   		}
+>>   #endif
+>> +		else {
+> As an optimization, you can add:
+>
+> 		else if (trace_unknown_sec_event_enabled()) {
+>
+> instead, as then this wont be called unless the tracepoint is
+> activated. Will keep the logic from doing anything with
+> acpi_hest_generic_data_payload().
+>
+> Note, that trace_*_enabled() is activated via a jump_label, thus
+> there's no branches involved.
+>
+> -- Steve
+Hello Steve,
 
+In v9 I currently have this and the ARM trace event from this series 
+both wrapped in an
+ifdef verifying that CONFIG_RAS is enabled. This resolves the kbuild 
+failures and
+will have this code compiled out when that config isn't enabled. Do you 
+think I
+should use the ifdef or use these *_enabled() functions?
 
-On 15/02/2017 16:24, Christian Borntraeger wrote:
-> On 02/15/2017 03:43 PM, Paolo Bonzini wrote:
->> The purpose of the KVM_SET_SIGNAL_MASK API is to let userspace "kick"
->> a VCPU out of KVM_RUN through a POSIX signal.  A signal is attached
->> to a dummy signal handler; by blocking the signal outside KVM_RUN and
->> unblocking it inside, this possible race is closed:
+Thanks,
+Tyler
+>> +			void *unknown_err = acpi_hest_generic_data_payload(gdata);
+>> +			trace_unknown_sec_event(&sec_type,
+>> +					fru_id, fru_text, sec_sev,
+>> +					unknown_err, gdata->error_data_length);
+>> +		}
+>>   	}
+>>   }
+>>   
 >>
->>           VCPU thread                     service thread
->>    --------------------------------------------------------------
->>         check flag
->>                                           set flag
->>                                           raise signal
->>         (signal handler does nothing)
->>         KVM_RUN
->>
->> However, one issue with KVM_SET_SIGNAL_MASK is that it has to take
->> tsk->sighand->siglock on every KVM_RUN.  This lock is often on a
->> remote NUMA node, because it is on the node of a thread's creator.
->> Taking this lock can be very expensive if there are many userspace
->> exits (as is the case for SMP Windows VMs without Hyper-V reference
->> time counter).
->>
->> As an alternative, we can put the flag directly in kvm_run so that
->> KVM can see it:
->>
->>           VCPU thread                     service thread
->>    --------------------------------------------------------------
->>                                           raise signal
->>         signal handler
->>           set run->immediate_exit
->>         KVM_RUN
->>           check run->immediate_exit
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> 
-> Generic parts, the concept and the s390 parts looks good. (not tested yet, though)
 
-Note that this series doesn't work (due to David's suggestion) with the
-patches I posted last week.
-
-Paolo
+-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
