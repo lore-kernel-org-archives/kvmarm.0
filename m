@@ -1,89 +1,259 @@
-From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH V8 06/10] acpi: apei: panic OS with fatal error status
- block
-Date: Wed, 15 Feb 2017 12:13:09 +0000
-Message-ID: <58A445D5.7030501@arm.com>
-References: <1485969413-23577-1-git-send-email-tbaicar@codeaurora.org> <1485969413-23577-7-git-send-email-tbaicar@codeaurora.org> <589C490A.9080109@arm.com> <5b06372d-e389-5157-ccb4-a7b023990d4d@codeaurora.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] KVM: race-free exit from KVM_RUN without POSIX signals
+Date: Wed, 15 Feb 2017 15:43:41 +0100
+Message-ID: <1487169821-14806-1-git-send-email-pbonzini@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <5b06372d-e389-5157-ccb4-a7b023990d4d-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "Baicar, Tyler" <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
-Cc: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devel-E0kO6a4B6psdnm+yROfE0A@public.gmane.org, Suzuki.Poulose-5wv7dgnIgG8@public.gmane.org, punit.agr
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD7AB40A63
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 09:43:01 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2W4WxgVcpvrb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Feb 2017 09:43:00 -0500 (EST)
+Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D10240A3D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 09:43:00 -0500 (EST)
+Received: by mail-wm0-f68.google.com with SMTP id u63so8542180wmu.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 06:43:46 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: james.hogan@imgtec.com, marc.zyngier@arm.com, kvm-ppc@vger.kernel.org, borntraeger@de.ibm.com, paulus@samba.org, cornelia.huck@de.ibm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Tyler,
+The purpose of the KVM_SET_SIGNAL_MASK API is to let userspace "kick"
+a VCPU out of KVM_RUN through a POSIX signal.  A signal is attached
+to a dummy signal handler; by blocking the signal outside KVM_RUN and
+unblocking it inside, this possible race is closed:
 
-On 13/02/17 22:45, Baicar, Tyler wrote:
-> On 2/9/2017 3:48 AM, James Morse wrote:
->> On 01/02/17 17:16, Tyler Baicar wrote:
->>> From: "Jonathan (Zhixiong) Zhang" <zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
->>>
->>> Even if an error status block's severity is fatal, the kernel does not
->>> honor the severity level and panic.
->>>
->>> With the firmware first model, the platform could inform the OS about a
->>> fatal hardware error through the non-NMI GHES notification type. The OS
->>> should panic when a hardware error record is received with this
->>> severity.
->>>
->>> Call panic() after CPER data in error status block is printed if
->>> severity is fatal, before each error section is handled.
+          VCPU thread                     service thread
+   --------------------------------------------------------------
+        check flag
+                                          set flag
+                                          raise signal
+        (signal handler does nothing)
+        KVM_RUN
 
->>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
->>> index 8756172..86c1f15 100644
->>> --- a/drivers/acpi/apei/ghes.c
->>> +++ b/drivers/acpi/apei/ghes.c
->>> @@ -687,6 +689,13 @@ static int ghes_ack_error(struct acpi_hest_generic_v2
->>> *generic_v2)
->>>       return rc;
->>>   }
->>>   +static void __ghes_call_panic(void)
->>> +{
->>> +    if (panic_timeout == 0)
->>> +        panic_timeout = ghes_panic_timeout;
->>> +    panic("Fatal hardware error!");
->>> +}
->>> +
+However, one issue with KVM_SET_SIGNAL_MASK is that it has to take
+tsk->sighand->siglock on every KVM_RUN.  This lock is often on a
+remote NUMA node, because it is on the node of a thread's creator.
+Taking this lock can be very expensive if there are many userspace
+exits (as is the case for SMP Windows VMs without Hyper-V reference
+time counter).
 
->> __ghes_panic() also has:
->>>     __ghes_print_estatus(KERN_EMERG, ghes->generic, ghes->estatus);
->> Which prints this estatus regardless of rate limiting and cache-ing.
+As an alternative, we can put the flag directly in kvm_run so that
+KVM can see it:
 
-[...]
+          VCPU thread                     service thread
+   --------------------------------------------------------------
+                                          raise signal
+        signal handler
+          set run->immediate_exit
+        KVM_RUN
+          check run->immediate_exit
 
->>>               ghes_estatus_cache_add(ghes->generic, ghes->estatus);
->>>       }
->>> +    if (ghes_severity(ghes->estatus->error_severity) >= GHES_SEV_PANIC) {
->>> +        __ghes_call_panic();
->>> +    }
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+	change from RFC:
+	- implement in each architecture to ensure MMIO is completed
+	  [Radim]
+	- do not clear the flag [David Hildenbrand, offlist]
 
->> I think this ghes_severity() then panic() should go above the:
->>>     if (!ghes_estatus_cached(ghes->estatus)) {
->> and we should call __ghes_print_estatus() here too, to make sure the message
->> definitely got out!
+ Documentation/virtual/kvm/api.txt | 13 ++++++++++++-
+ arch/arm/kvm/arm.c                |  4 ++++
+ arch/mips/kvm/mips.c              |  7 ++++++-
+ arch/powerpc/kvm/powerpc.c        |  6 +++++-
+ arch/s390/kvm/kvm-s390.c          |  4 ++++
+ arch/x86/kvm/x86.c                |  6 +++++-
+ include/uapi/linux/kvm.h          |  4 +++-
+ 7 files changed, 39 insertions(+), 5 deletions(-)
 
-
-> Okay, that makes sense. If we move this up, is there a problem with calling
-> __ghes_panic() instead of making the __ghes_print_estatus() and
-> __ghes_call_panic() calls here? It looks like that will just add a call to
-> oops_begin() and ghes_print_queued_estatus() as well, but this is what
-> ghes_notify_nmi() does if the severity is panic.
-
-
-I don't think the queued stuff is relevant, isn't that just for x86-NMI messages
-that it doesn't print out directly?
-
-A quick grep shows arm64 doesn't have oops_begin(), you may have to add some
-equivalent mechanism. Lets try and avoid that rabbit hole!
-
-Given __ghes_panic() calls __ghes_print_estatus() too, you could try moving that
-into your new __ghes_call_panic().... or whatever results in the least lines
-changed!
-
-
-Thanks,
-
-James
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index e4f2cdcf78eb..925b1b6be073 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -3389,7 +3389,18 @@ struct kvm_run {
+ Request that KVM_RUN return when it becomes possible to inject external
+ interrupts into the guest.  Useful in conjunction with KVM_INTERRUPT.
+ 
+-	__u8 padding1[7];
++	__u8 immediate_exit;
++
++This field is polled once when KVM_RUN starts; if non-zero, KVM_RUN
++exits immediately, returning -EINTR.  In the common scenario where a
++signal is used to "kick" a VCPU out of KVM_RUN, this field can be used
++to avoid usage of KVM_SET_SIGNAL_MASK, which has worse scalability.
++Rather than blocking the signal outside KVM_RUN, userspace can set up
++a signal handler that sets run->immediate_exit to a non-zero value.
++
++This field is ignored if KVM_CAP_IMMEDIATE_EXIT is not available.
++
++	__u8 padding1[6];
+ 
+ 	/* out */
+ 	__u32 exit_reason;
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 21c493a9e5c9..c9a2103faeb9 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -206,6 +206,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_PSCI_0_2:
+ 	case KVM_CAP_READONLY_MEM:
+ 	case KVM_CAP_MP_STATE:
++	case KVM_CAP_IMMEDIATE_EXIT:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_COALESCED_MMIO:
+@@ -604,6 +605,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			return ret;
+ 	}
+ 
++	if (run->immediate_exit)
++		return -EINTR;
++
+ 	if (vcpu->sigset_active)
+ 		sigprocmask(SIG_SETMASK, &vcpu->sigset, &sigsaved);
+ 
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 31ee5ee0010b..ed81e5ac1426 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -397,7 +397,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 
+ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+-	int r = 0;
++	int r = -EINTR;
+ 	sigset_t sigsaved;
+ 
+ 	if (vcpu->sigset_active)
+@@ -409,6 +409,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		vcpu->mmio_needed = 0;
+ 	}
+ 
++	if (run->immediate_exit)
++		goto out;
++
+ 	lose_fpu(1);
+ 
+ 	local_irq_disable();
+@@ -429,6 +432,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	guest_exit_irqoff();
+ 	local_irq_enable();
+ 
++out:
+ 	if (vcpu->sigset_active)
+ 		sigprocmask(SIG_SETMASK, &sigsaved, NULL);
+ 
+@@ -1021,6 +1025,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ENABLE_CAP:
+ 	case KVM_CAP_READONLY_MEM:
+ 	case KVM_CAP_SYNC_MMU:
++	case KVM_CAP_IMMEDIATE_EXIT:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_COALESCED_MMIO:
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 2b3e4e620078..1fe1391ba2c2 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -511,6 +511,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ONE_REG:
+ 	case KVM_CAP_IOEVENTFD:
+ 	case KVM_CAP_DEVICE_CTRL:
++	case KVM_CAP_IMMEDIATE_EXIT:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_PPC_PAIRED_SINGLES:
+@@ -1117,7 +1118,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ #endif
+ 	}
+ 
+-	r = kvmppc_vcpu_run(run, vcpu);
++	if (run->immediate_exit)
++		r = -EINTR;
++	else
++		r = kvmppc_vcpu_run(run, vcpu);
+ 
+ 	if (vcpu->sigset_active)
+ 		sigprocmask(SIG_SETMASK, &sigsaved, NULL);
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 502de74ea984..99e35fe0dea8 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -370,6 +370,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_S390_IRQCHIP:
+ 	case KVM_CAP_VM_ATTRIBUTES:
+ 	case KVM_CAP_MP_STATE:
++	case KVM_CAP_IMMEDIATE_EXIT:
+ 	case KVM_CAP_S390_INJECT_IRQ:
+ 	case KVM_CAP_S390_USER_SIGP:
+ 	case KVM_CAP_S390_USER_STSI:
+@@ -2798,6 +2799,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+ 	int rc;
+ 	sigset_t sigsaved;
+ 
++	if (kvm_run->immediate_exit)
++		return -EINTR;
++
+ 	if (guestdbg_exit_pending(vcpu)) {
+ 		kvm_s390_prepare_debug_exit(vcpu);
+ 		return 0;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 63a89a51dcc9..2a0974383ffe 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2672,6 +2672,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_DISABLE_QUIRKS:
+ 	case KVM_CAP_SET_BOOT_CPU_ID:
+  	case KVM_CAP_SPLIT_IRQCHIP:
++	case KVM_CAP_IMMEDIATE_EXIT:
+ #ifdef CONFIG_KVM_DEVICE_ASSIGNMENT
+ 	case KVM_CAP_ASSIGN_DEV_IRQ:
+ 	case KVM_CAP_PCI_2_3:
+@@ -7202,7 +7203,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+ 	} else
+ 		WARN_ON(vcpu->arch.pio.count || vcpu->mmio_needed);
+ 
+-	r = vcpu_run(vcpu);
++	if (kvm_run->immediate_exit)
++		r = -EINTR;
++	else
++		r = vcpu_run(vcpu);
+ 
+ out:
+ 	post_kvm_run_save(vcpu);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 7964b970b9ad..f51d5082a377 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -218,7 +218,8 @@ struct kvm_hyperv_exit {
+ struct kvm_run {
+ 	/* in */
+ 	__u8 request_interrupt_window;
+-	__u8 padding1[7];
++	__u8 immediate_exit;
++	__u8 padding1[6];
+ 
+ 	/* out */
+ 	__u32 exit_reason;
+@@ -881,6 +882,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_SPAPR_RESIZE_HPT 133
+ #define KVM_CAP_PPC_MMU_RADIX 134
+ #define KVM_CAP_PPC_MMU_HASH_V3 135
++#define KVM_CAP_IMMEDIATE_EXIT 136
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+1.8.3.1
