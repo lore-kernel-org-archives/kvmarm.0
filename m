@@ -1,259 +1,285 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] KVM: race-free exit from KVM_RUN without POSIX signals
-Date: Wed, 15 Feb 2017 15:43:41 +0100
-Message-ID: <1487169821-14806-1-git-send-email-pbonzini@redhat.com>
+From: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Subject: Re: [PATCH V8 05/10] acpi: apei: handle SEA notification type for
+ ARMv8
+Date: Wed, 15 Feb 2017 07:58:57 -0700
+Message-ID: <f53fd8a5-cee1-c1e0-28f5-0e85ed6b5368@codeaurora.org>
+References: <1485969413-23577-1-git-send-email-tbaicar@codeaurora.org>
+ <1485969413-23577-6-git-send-email-tbaicar@codeaurora.org>
+ <58A3F431.9040808@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD7AB40A63
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 09:43:01 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2W4WxgVcpvrb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Feb 2017 09:43:00 -0500 (EST)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D10240A3D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 09:43:00 -0500 (EST)
-Received: by mail-wm0-f68.google.com with SMTP id u63so8542180wmu.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Feb 2017 06:43:46 -0800 (PST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: james.hogan@imgtec.com, marc.zyngier@arm.com, kvm-ppc@vger.kernel.org, borntraeger@de.ibm.com, paulus@samba.org, cornelia.huck@de.ibm.com, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <58A3F431.9040808@huawei.com>
+Sender: linux-acpi-owner@vger.kernel.org
+To: Zhengqiang <zhengqiang10@huawei.com>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The purpose of the KVM_SET_SIGNAL_MASK API is to let userspace "kick"
-a VCPU out of KVM_RUN through a POSIX signal.  A signal is attached
-to a dummy signal handler; by blocking the signal outside KVM_RUN and
-unblocking it inside, this possible race is closed:
+Hello Zhengqiang,
 
-          VCPU thread                     service thread
-   --------------------------------------------------------------
-        check flag
-                                          set flag
-                                          raise signal
-        (signal handler does nothing)
-        KVM_RUN
 
-However, one issue with KVM_SET_SIGNAL_MASK is that it has to take
-tsk->sighand->siglock on every KVM_RUN.  This lock is often on a
-remote NUMA node, because it is on the node of a thread's creator.
-Taking this lock can be very expensive if there are many userspace
-exits (as is the case for SMP Windows VMs without Hyper-V reference
-time counter).
+On 2/14/2017 11:24 PM, Zhengqiang wrote:
+> Hi Tyler:
+>
+> On 2017/2/2 1:16, Tyler Baicar wrote:
+>> ARM APEI extension proposal added SEA (Synchronous External Abort)
+>> notification type for ARMv8.
+>> Add a new GHES error source handling function for SEA. If an error
+>> source's notification type is SEA, then this function can be registered
+>> into the SEA exception handler. That way GHES will parse and report
+>> SEA exceptions when they occur.
+>>
+>> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+>> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+>> Signed-off-by: Naveen Kaje <nkaje@codeaurora.org>
+>> ---
+>>   arch/arm64/Kconfig        |  2 ++
+>>   arch/arm64/mm/fault.c     | 11 +++++++
+>>   drivers/acpi/apei/Kconfig | 14 +++++++++
+>>   drivers/acpi/apei/ghes.c  | 78 ++++++++++++++++++++++++++++++++++++++++++-----
+>>   include/acpi/ghes.h       |  2 ++
+>>   5 files changed, 100 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+>> index 1117421..f92778d 100644
+>> --- a/arch/arm64/Kconfig
+>> +++ b/arch/arm64/Kconfig
+>> @@ -53,6 +53,8 @@ config ARM64
+>>   	select HANDLE_DOMAIN_IRQ
+>>   	select HARDIRQS_SW_RESEND
+>>   	select HAVE_ACPI_APEI if (ACPI && EFI)
+>> +	select HAVE_ACPI_APEI_SEA if (ACPI && EFI)
+>> +	select HAVE_NMI if HAVE_ACPI_APEI_SEA
+>>   	select HAVE_ALIGNED_STRUCT_PAGE if SLUB
+>>   	select HAVE_ARCH_AUDITSYSCALL
+>>   	select HAVE_ARCH_BITREVERSE
+>> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+>> index 9ae7e65..5a5a096 100644
+>> --- a/arch/arm64/mm/fault.c
+>> +++ b/arch/arm64/mm/fault.c
+>> @@ -30,6 +30,7 @@
+>>   #include <linux/highmem.h>
+>>   #include <linux/perf_event.h>
+>>   #include <linux/preempt.h>
+>> +#include <linux/hardirq.h>
+>>   
+>>   #include <asm/bug.h>
+>>   #include <asm/cpufeature.h>
+>> @@ -41,6 +42,8 @@
+>>   #include <asm/pgtable.h>
+>>   #include <asm/tlbflush.h>
+>>   
+>> +#include <acpi/ghes.h>
+>> +
+>>   static const char *fault_name(unsigned int esr);
+>>   
+>>   #ifdef CONFIG_KPROBES
+>> @@ -500,6 +503,14 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>>   	pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
+>>   		 fault_name(esr), esr, addr);
+>>   
+>> +	/*
+>> +	 * synchronize_rcu() will wait for nmi_exit(), so no need to
+>> +	 * rcu_read_lock().
+>> +	 */
+>> +	nmi_enter();
+>> +	ghes_notify_sea();
+>> +	nmi_exit();
+>> +
+> For fatal error:
+> ghes_notify_sea() -> ghes_proc() -> __ghes_call_panic(),cause panic;
+> do_sea() function also call arm64_notify_die(), will cause panic too;
+> Does it can happen, panic will be called twice ?
+Since the panic function never returns, it isn't possible to call it 
+twice. ghes_proc will only
+cause a panic if the severity of the error is GHES_SEV_PANIC, so it's 
+possible that we call
+panic from either the GHES code or from arm64_notify_die() depending on 
+the error.
 
-As an alternative, we can put the flag directly in kvm_run so that
-KVM can see it:
+Thanks,
+Tyler
+>>   	info.si_signo = SIGBUS;
+>>   	info.si_errno = 0;
+>>   	info.si_code  = 0;
+>> diff --git a/drivers/acpi/apei/Kconfig b/drivers/acpi/apei/Kconfig
+>> index b0140c8..3786ff1 100644
+>> --- a/drivers/acpi/apei/Kconfig
+>> +++ b/drivers/acpi/apei/Kconfig
+>> @@ -4,6 +4,20 @@ config HAVE_ACPI_APEI
+>>   config HAVE_ACPI_APEI_NMI
+>>   	bool
+>>   
+>> +config HAVE_ACPI_APEI_SEA
+>> +	bool "APEI Synchronous External Abort logging/recovering support"
+>> +	depends on ARM64
+>> +	help
+>> +	  This option should be enabled if the system supports
+>> +	  firmware first handling of SEA (Synchronous External Abort).
+>> +	  SEA happens with certain faults of data abort or instruction
+>> +	  abort synchronous exceptions on ARMv8 systems. If a system
+>> +	  supports firmware first handling of SEA, the platform analyzes
+>> +	  and handles hardware error notifications with SEA, and it may then
+>> +	  form a HW error record for the OS to parse and handle. This
+>> +	  option allows the OS to look for such HW error record, and
+>> +	  take appropriate action.
+>> +
+>>   config ACPI_APEI
+>>   	bool "ACPI Platform Error Interface (APEI)"
+>>   	select MISC_FILESYSTEMS
+>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+>> index b25e7cf..8756172 100644
+>> --- a/drivers/acpi/apei/ghes.c
+>> +++ b/drivers/acpi/apei/ghes.c
+>> @@ -114,11 +114,7 @@
+>>    * Two virtual pages are used, one for IRQ/PROCESS context, the other for
+>>    * NMI context (optionally).
+>>    */
+>> -#ifdef CONFIG_HAVE_ACPI_APEI_NMI
+>>   #define GHES_IOREMAP_PAGES           2
+>> -#else
+>> -#define GHES_IOREMAP_PAGES           1
+>> -#endif
+>>   #define GHES_IOREMAP_IRQ_PAGE(base)	(base)
+>>   #define GHES_IOREMAP_NMI_PAGE(base)	((base) + PAGE_SIZE)
+>>   
+>> @@ -156,11 +152,14 @@ static void ghes_ioremap_exit(void)
+>>   
+>>   static void __iomem *ghes_ioremap_pfn_nmi(u64 pfn)
+>>   {
+>> -	unsigned long vaddr;
+>> +	unsigned long vaddr, paddr;
+>> +	pgprot_t prot;
+>>   
+>>   	vaddr = (unsigned long)GHES_IOREMAP_NMI_PAGE(ghes_ioremap_area->addr);
+>> -	ioremap_page_range(vaddr, vaddr + PAGE_SIZE,
+>> -			   pfn << PAGE_SHIFT, PAGE_KERNEL);
+>> +
+>> +	paddr = pfn << PAGE_SHIFT;
+>> +	prot = arch_apei_get_mem_attribute(paddr);
+>> +	ioremap_page_range(vaddr, vaddr + PAGE_SIZE, paddr, prot);
+>>   
+>>   	return (void __iomem *)vaddr;
+>>   }
+>> @@ -767,6 +766,48 @@ static int ghes_notify_sci(struct notifier_block *this,
+>>   	.notifier_call = ghes_notify_sci,
+>>   };
+>>   
+>> +#ifdef CONFIG_HAVE_ACPI_APEI_SEA
+>> +static LIST_HEAD(ghes_sea);
+>> +
+>> +void ghes_notify_sea(void)
+>> +{
+>> +	struct ghes *ghes;
+>> +
+>> +	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
+>> +		ghes_proc(ghes);
+>> +	}
+>> +}
+>> +
+>> +static int ghes_sea_add(struct ghes *ghes)
+>> +{
+>> +	mutex_lock(&ghes_list_mutex);
+>> +	list_add_rcu(&ghes->list, &ghes_sea);
+>> +	mutex_unlock(&ghes_list_mutex);
+>> +	return 0;
+>> +}
+>> +
+>> +static void ghes_sea_remove(struct ghes *ghes)
+>> +{
+>> +	mutex_lock(&ghes_list_mutex);
+>> +	list_del_rcu(&ghes->list);
+>> +	mutex_unlock(&ghes_list_mutex);
+>> +	synchronize_rcu();
+>> +}
+>> +#else /* CONFIG_HAVE_ACPI_APEI_SEA */
+>> +static inline int ghes_sea_add(struct ghes *ghes)
+>> +{
+>> +	pr_err(GHES_PFX "ID: %d, trying to add SEA notification which is not supported\n",
+>> +	       ghes->generic->header.source_id);
+>> +	return -ENOTSUPP;
+>> +}
+>> +
+>> +static inline void ghes_sea_remove(struct ghes *ghes)
+>> +{
+>> +	pr_err(GHES_PFX "ID: %d, trying to remove SEA notification which is not supported\n",
+>> +	       ghes->generic->header.source_id);
+>> +}
+>> +#endif /* CONFIG_HAVE_ACPI_APEI_SEA */
+>> +
+>>   #ifdef CONFIG_HAVE_ACPI_APEI_NMI
+>>   /*
+>>    * printk is not safe in NMI context.  So in NMI handler, we allocate
+>> @@ -1012,6 +1053,14 @@ static int ghes_probe(struct platform_device *ghes_dev)
+>>   	case ACPI_HEST_NOTIFY_EXTERNAL:
+>>   	case ACPI_HEST_NOTIFY_SCI:
+>>   		break;
+>> +	case ACPI_HEST_NOTIFY_SEA:
+>> +		if (!IS_ENABLED(CONFIG_HAVE_ACPI_APEI_SEA)) {
+>> +			pr_warn(GHES_PFX "Generic hardware error source: %d notified via SEA is not supported\n",
+>> +				generic->header.source_id);
+>> +			rc = -ENOTSUPP;
+>> +			goto err;
+>> +		}
+>> +		break;
+>>   	case ACPI_HEST_NOTIFY_NMI:
+>>   		if (!IS_ENABLED(CONFIG_HAVE_ACPI_APEI_NMI)) {
+>>   			pr_warn(GHES_PFX "Generic hardware error source: %d notified via NMI interrupt is not supported!\n",
+>> @@ -1023,6 +1072,13 @@ static int ghes_probe(struct platform_device *ghes_dev)
+>>   		pr_warning(GHES_PFX "Generic hardware error source: %d notified via local interrupt is not supported!\n",
+>>   			   generic->header.source_id);
+>>   		goto err;
+>> +	case ACPI_HEST_NOTIFY_GPIO:
+>> +	case ACPI_HEST_NOTIFY_SEI:
+>> +	case ACPI_HEST_NOTIFY_GSIV:
+>> +		pr_warn(GHES_PFX "Generic hardware error source: %d notified via notification type %u is not supported\n",
+>> +			generic->header.source_id, generic->header.source_id);
+>> +		rc = -ENOTSUPP;
+>> +		goto err;
+>>   	default:
+>>   		pr_warning(FW_WARN GHES_PFX "Unknown notification type: %u for generic hardware error source: %d\n",
+>>   			   generic->notify.type, generic->header.source_id);
+>> @@ -1077,6 +1133,11 @@ static int ghes_probe(struct platform_device *ghes_dev)
+>>   		list_add_rcu(&ghes->list, &ghes_sci);
+>>   		mutex_unlock(&ghes_list_mutex);
+>>   		break;
+>> +	case ACPI_HEST_NOTIFY_SEA:
+>> +		rc = ghes_sea_add(ghes);
+>> +		if (rc)
+>> +			goto err_edac_unreg;
+>> +		break;
+>>   	case ACPI_HEST_NOTIFY_NMI:
+>>   		ghes_nmi_add(ghes);
+>>   		break;
+>> @@ -1119,6 +1180,9 @@ static int ghes_remove(struct platform_device *ghes_dev)
+>>   			unregister_acpi_hed_notifier(&ghes_notifier_sci);
+>>   		mutex_unlock(&ghes_list_mutex);
+>>   		break;
+>> +	case ACPI_HEST_NOTIFY_SEA:
+>> +		ghes_sea_remove(ghes);
+>> +		break;
+>>   	case ACPI_HEST_NOTIFY_NMI:
+>>   		ghes_nmi_remove(ghes);
+>>   		break;
+>> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+>> index 6ae318b..adf5455 100644
+>> --- a/include/acpi/ghes.h
+>> +++ b/include/acpi/ghes.h
+>> @@ -95,3 +95,5 @@ static inline void *acpi_hest_generic_data_payload(struct acpi_hest_generic_data
+>>   		(void *)(((struct acpi_hest_generic_data_v300 *)(gdata)) + 1) :
+>>   		gdata + 1;
+>>   }
+>> +
+>> +void ghes_notify_sea(void);
+>>
+> Thanks,
+>
+> Zhengqiang
+>
 
-          VCPU thread                     service thread
-   --------------------------------------------------------------
-                                          raise signal
-        signal handler
-          set run->immediate_exit
-        KVM_RUN
-          check run->immediate_exit
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
-	change from RFC:
-	- implement in each architecture to ensure MMIO is completed
-	  [Radim]
-	- do not clear the flag [David Hildenbrand, offlist]
-
- Documentation/virtual/kvm/api.txt | 13 ++++++++++++-
- arch/arm/kvm/arm.c                |  4 ++++
- arch/mips/kvm/mips.c              |  7 ++++++-
- arch/powerpc/kvm/powerpc.c        |  6 +++++-
- arch/s390/kvm/kvm-s390.c          |  4 ++++
- arch/x86/kvm/x86.c                |  6 +++++-
- include/uapi/linux/kvm.h          |  4 +++-
- 7 files changed, 39 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index e4f2cdcf78eb..925b1b6be073 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -3389,7 +3389,18 @@ struct kvm_run {
- Request that KVM_RUN return when it becomes possible to inject external
- interrupts into the guest.  Useful in conjunction with KVM_INTERRUPT.
- 
--	__u8 padding1[7];
-+	__u8 immediate_exit;
-+
-+This field is polled once when KVM_RUN starts; if non-zero, KVM_RUN
-+exits immediately, returning -EINTR.  In the common scenario where a
-+signal is used to "kick" a VCPU out of KVM_RUN, this field can be used
-+to avoid usage of KVM_SET_SIGNAL_MASK, which has worse scalability.
-+Rather than blocking the signal outside KVM_RUN, userspace can set up
-+a signal handler that sets run->immediate_exit to a non-zero value.
-+
-+This field is ignored if KVM_CAP_IMMEDIATE_EXIT is not available.
-+
-+	__u8 padding1[6];
- 
- 	/* out */
- 	__u32 exit_reason;
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 21c493a9e5c9..c9a2103faeb9 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -206,6 +206,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_PSCI_0_2:
- 	case KVM_CAP_READONLY_MEM:
- 	case KVM_CAP_MP_STATE:
-+	case KVM_CAP_IMMEDIATE_EXIT:
- 		r = 1;
- 		break;
- 	case KVM_CAP_COALESCED_MMIO:
-@@ -604,6 +605,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 			return ret;
- 	}
- 
-+	if (run->immediate_exit)
-+		return -EINTR;
-+
- 	if (vcpu->sigset_active)
- 		sigprocmask(SIG_SETMASK, &vcpu->sigset, &sigsaved);
- 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 31ee5ee0010b..ed81e5ac1426 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -397,7 +397,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
- 
- int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
--	int r = 0;
-+	int r = -EINTR;
- 	sigset_t sigsaved;
- 
- 	if (vcpu->sigset_active)
-@@ -409,6 +409,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		vcpu->mmio_needed = 0;
- 	}
- 
-+	if (run->immediate_exit)
-+		goto out;
-+
- 	lose_fpu(1);
- 
- 	local_irq_disable();
-@@ -429,6 +432,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	guest_exit_irqoff();
- 	local_irq_enable();
- 
-+out:
- 	if (vcpu->sigset_active)
- 		sigprocmask(SIG_SETMASK, &sigsaved, NULL);
- 
-@@ -1021,6 +1025,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_READONLY_MEM:
- 	case KVM_CAP_SYNC_MMU:
-+	case KVM_CAP_IMMEDIATE_EXIT:
- 		r = 1;
- 		break;
- 	case KVM_CAP_COALESCED_MMIO:
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 2b3e4e620078..1fe1391ba2c2 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -511,6 +511,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ONE_REG:
- 	case KVM_CAP_IOEVENTFD:
- 	case KVM_CAP_DEVICE_CTRL:
-+	case KVM_CAP_IMMEDIATE_EXIT:
- 		r = 1;
- 		break;
- 	case KVM_CAP_PPC_PAIRED_SINGLES:
-@@ -1117,7 +1118,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- #endif
- 	}
- 
--	r = kvmppc_vcpu_run(run, vcpu);
-+	if (run->immediate_exit)
-+		r = -EINTR;
-+	else
-+		r = kvmppc_vcpu_run(run, vcpu);
- 
- 	if (vcpu->sigset_active)
- 		sigprocmask(SIG_SETMASK, &sigsaved, NULL);
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 502de74ea984..99e35fe0dea8 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -370,6 +370,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_S390_IRQCHIP:
- 	case KVM_CAP_VM_ATTRIBUTES:
- 	case KVM_CAP_MP_STATE:
-+	case KVM_CAP_IMMEDIATE_EXIT:
- 	case KVM_CAP_S390_INJECT_IRQ:
- 	case KVM_CAP_S390_USER_SIGP:
- 	case KVM_CAP_S390_USER_STSI:
-@@ -2798,6 +2799,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
- 	int rc;
- 	sigset_t sigsaved;
- 
-+	if (kvm_run->immediate_exit)
-+		return -EINTR;
-+
- 	if (guestdbg_exit_pending(vcpu)) {
- 		kvm_s390_prepare_debug_exit(vcpu);
- 		return 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 63a89a51dcc9..2a0974383ffe 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2672,6 +2672,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_DISABLE_QUIRKS:
- 	case KVM_CAP_SET_BOOT_CPU_ID:
-  	case KVM_CAP_SPLIT_IRQCHIP:
-+	case KVM_CAP_IMMEDIATE_EXIT:
- #ifdef CONFIG_KVM_DEVICE_ASSIGNMENT
- 	case KVM_CAP_ASSIGN_DEV_IRQ:
- 	case KVM_CAP_PCI_2_3:
-@@ -7202,7 +7203,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
- 	} else
- 		WARN_ON(vcpu->arch.pio.count || vcpu->mmio_needed);
- 
--	r = vcpu_run(vcpu);
-+	if (kvm_run->immediate_exit)
-+		r = -EINTR;
-+	else
-+		r = vcpu_run(vcpu);
- 
- out:
- 	post_kvm_run_save(vcpu);
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 7964b970b9ad..f51d5082a377 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -218,7 +218,8 @@ struct kvm_hyperv_exit {
- struct kvm_run {
- 	/* in */
- 	__u8 request_interrupt_window;
--	__u8 padding1[7];
-+	__u8 immediate_exit;
-+	__u8 padding1[6];
- 
- 	/* out */
- 	__u32 exit_reason;
-@@ -881,6 +882,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_SPAPR_RESIZE_HPT 133
- #define KVM_CAP_PPC_MMU_RADIX 134
- #define KVM_CAP_PPC_MMU_HASH_V3 135
-+#define KVM_CAP_IMMEDIATE_EXIT 136
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
 -- 
-1.8.3.1
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
+
