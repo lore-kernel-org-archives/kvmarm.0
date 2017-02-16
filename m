@@ -1,250 +1,269 @@
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH] KVM: race-free exit from KVM_RUN without POSIX signals
-Date: Thu, 16 Feb 2017 17:19:53 +0100
-Message-ID: <20170216161952.GB8156@potion>
-References: <1487169821-14806-1-git-send-email-pbonzini@redhat.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH V10 02/10] ras: acpi/apei: cper: generic error data entry
+ v3 per ACPI 6.1
+Date: Thu, 16 Feb 2017 18:25:28 +0000
+Message-ID: <CAKv+Gu8d-ObM4bGTmWUhZTmFMfKomBEpyj6OckXjOyhqYhF0KA@mail.gmail.com>
+References: <1487188282-2568-1-git-send-email-tbaicar@codeaurora.org>
+ <1487188282-2568-3-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1487169821-14806-1-git-send-email-pbonzini@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, james.hogan@imgtec.com, paulus@samba.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C58640CA7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 13:24:46 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id x8OtBBXTRa+6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Feb 2017 13:24:44 -0500 (EST)
+Received: from mail-it0-f52.google.com (mail-it0-f52.google.com
+ [209.85.214.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3002840C42
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 13:24:44 -0500 (EST)
+Received: by mail-it0-f52.google.com with SMTP id h10so183911ith.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 10:25:32 -0800 (PST)
+In-Reply-To: <1487188282-2568-3-git-send-email-tbaicar@codeaurora.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, KVM devel mailing list <kvm@vger.kernel.org>, Matt Fleming <matt@codeblueprint.co.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Robert Moore <robert.moore@intel.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Lv Zheng <lv.zheng@intel.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Fu Wei <fu.wei@linaro.org>, "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>, Russell King <linux@armlinux.org.uk>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, eun.taik.lee@samsung.com, shijie.huang@arm.com, Laura Abbott <labbott@redhat.com>, Len Brown <lenb@kernel.org>, harba@codeaurora.org, john.garry@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Steven Rostedt <rostedt@goodmis.org>, nkaje@codeaurora.org, sand
 List-Id: kvmarm@lists.cs.columbia.edu
 
-2017-02-15 15:43+0100, Paolo Bonzini:
-> The purpose of the KVM_SET_SIGNAL_MASK API is to let userspace "kick"
-> a VCPU out of KVM_RUN through a POSIX signal.  A signal is attached
-> to a dummy signal handler; by blocking the signal outside KVM_RUN and
-> unblocking it inside, this possible race is closed:
-> 
->           VCPU thread                     service thread
->    --------------------------------------------------------------
->         check flag
->                                           set flag
->                                           raise signal
->         (signal handler does nothing)
->         KVM_RUN
-> 
-> However, one issue with KVM_SET_SIGNAL_MASK is that it has to take
-> tsk->sighand->siglock on every KVM_RUN.  This lock is often on a
-> remote NUMA node, because it is on the node of a thread's creator.
-> Taking this lock can be very expensive if there are many userspace
-> exits (as is the case for SMP Windows VMs without Hyper-V reference
-> time counter).
-> 
-> As an alternative, we can put the flag directly in kvm_run so that
-> KVM can see it:
-> 
->           VCPU thread                     service thread
->    --------------------------------------------------------------
->                                           raise signal
->         signal handler
->           set run->immediate_exit
->         KVM_RUN
->           check run->immediate_exit
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 15 February 2017 at 19:51, Tyler Baicar <tbaicar@codeaurora.org> wrote:
+> Currently when a RAS error is reported it is not timestamped.
+> The ACPI 6.1 spec adds the timestamp field to the generic error
+> data entry v3 structure. The timestamp of when the firmware
+> generated the error is now being reported.
+>
+> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+> Signed-off-by: Richard Ruigrok <rruigrok@codeaurora.org>
+> Signed-off-by: Naveen Kaje <nkaje@codeaurora.org>
+> Reviewed-by: James Morse <james.morse@arm.com>
+
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+
 > ---
-
-The old immediate exit with signal did more work, but none of it should
-affect user-space, so it looks like another minor optimization,
-
-Reviewed-by: Radim Krčmář <rkrcmar@redhat.com>
-
-> 	change from RFC:
-> 	- implement in each architecture to ensure MMIO is completed
-> 	  [Radim]
-> 	- do not clear the flag [David Hildenbrand, offlist]
-> 
->  Documentation/virtual/kvm/api.txt | 13 ++++++++++++-
->  arch/arm/kvm/arm.c                |  4 ++++
->  arch/mips/kvm/mips.c              |  7 ++++++-
->  arch/powerpc/kvm/powerpc.c        |  6 +++++-
->  arch/s390/kvm/kvm-s390.c          |  4 ++++
->  arch/x86/kvm/x86.c                |  6 +++++-
->  include/uapi/linux/kvm.h          |  4 +++-
->  7 files changed, 39 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index e4f2cdcf78eb..925b1b6be073 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -3389,7 +3389,18 @@ struct kvm_run {
->  Request that KVM_RUN return when it becomes possible to inject external
->  interrupts into the guest.  Useful in conjunction with KVM_INTERRUPT.
->  
-> -	__u8 padding1[7];
-> +	__u8 immediate_exit;
+>  drivers/acpi/apei/ghes.c    |  9 ++++---
+>  drivers/firmware/efi/cper.c | 63 +++++++++++++++++++++++++++++++++++----------
+>  include/acpi/ghes.h         | 22 ++++++++++++++++
+>  3 files changed, 77 insertions(+), 17 deletions(-)
+>
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 5e1ec41..b25e7cf 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -420,7 +420,8 @@ static void ghes_handle_memory_failure(struct acpi_hest_generic_data *gdata, int
+>         int flags = -1;
+>         int sec_sev = ghes_severity(gdata->error_severity);
+>         struct cper_sec_mem_err *mem_err;
+> -       mem_err = (struct cper_sec_mem_err *)(gdata + 1);
 > +
-> +This field is polled once when KVM_RUN starts; if non-zero, KVM_RUN
-> +exits immediately, returning -EINTR.  In the common scenario where a
-> +signal is used to "kick" a VCPU out of KVM_RUN, this field can be used
-> +to avoid usage of KVM_SET_SIGNAL_MASK, which has worse scalability.
-> +Rather than blocking the signal outside KVM_RUN, userspace can set up
-> +a signal handler that sets run->immediate_exit to a non-zero value.
+> +       mem_err = acpi_hest_generic_data_payload(gdata);
+>
+>         if (!(mem_err->validation_bits & CPER_MEM_VALID_PA))
+>                 return;
+> @@ -457,7 +458,8 @@ static void ghes_do_proc(struct ghes *ghes,
+>                 if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
+>                                  CPER_SEC_PLATFORM_MEM)) {
+>                         struct cper_sec_mem_err *mem_err;
+> -                       mem_err = (struct cper_sec_mem_err *)(gdata+1);
 > +
-> +This field is ignored if KVM_CAP_IMMEDIATE_EXIT is not available.
+> +                       mem_err = acpi_hest_generic_data_payload(gdata);
+>                         ghes_edac_report_mem_error(ghes, sev, mem_err);
+>
+>                         arch_apei_report_mem_error(sev, mem_err);
+> @@ -467,7 +469,8 @@ static void ghes_do_proc(struct ghes *ghes,
+>                 else if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
+>                                       CPER_SEC_PCIE)) {
+>                         struct cper_sec_pcie *pcie_err;
+> -                       pcie_err = (struct cper_sec_pcie *)(gdata+1);
 > +
-> +	__u8 padding1[6];
->  
->  	/* out */
->  	__u32 exit_reason;
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 21c493a9e5c9..c9a2103faeb9 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -206,6 +206,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_ARM_PSCI_0_2:
->  	case KVM_CAP_READONLY_MEM:
->  	case KVM_CAP_MP_STATE:
-> +	case KVM_CAP_IMMEDIATE_EXIT:
->  		r = 1;
->  		break;
->  	case KVM_CAP_COALESCED_MMIO:
-> @@ -604,6 +605,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  			return ret;
->  	}
->  
-> +	if (run->immediate_exit)
-> +		return -EINTR;
+> +                       pcie_err = acpi_hest_generic_data_payload(gdata);
+>                         if (sev == GHES_SEV_RECOVERABLE &&
+>                             sec_sev == GHES_SEV_RECOVERABLE &&
+>                             pcie_err->validation_bits & CPER_PCIE_VALID_DEVICE_ID &&
+> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
+> index d425374..8fa4e23 100644
+> --- a/drivers/firmware/efi/cper.c
+> +++ b/drivers/firmware/efi/cper.c
+> @@ -32,6 +32,9 @@
+>  #include <linux/acpi.h>
+>  #include <linux/pci.h>
+>  #include <linux/aer.h>
+> +#include <linux/printk.h>
+> +#include <linux/bcd.h>
+> +#include <acpi/ghes.h>
+>
+>  #define INDENT_SP      " "
+>
+> @@ -386,13 +389,37 @@ static void cper_print_pcie(const char *pfx, const struct cper_sec_pcie *pcie,
+>         pfx, pcie->bridge.secondary_status, pcie->bridge.control);
+>  }
+>
+> +static void cper_estatus_print_section_v300(const char *pfx,
+> +       const struct acpi_hest_generic_data_v300 *gdata)
+> +{
+> +       __u8 hour, min, sec, day, mon, year, century, *timestamp;
 > +
->  	if (vcpu->sigset_active)
->  		sigprocmask(SIG_SETMASK, &vcpu->sigset, &sigsaved);
->  
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index 31ee5ee0010b..ed81e5ac1426 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -397,7 +397,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
->  
->  int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +       if (gdata->validation_bits & ACPI_HEST_GEN_VALID_TIMESTAMP) {
+> +               timestamp = (__u8 *)&(gdata->time_stamp);
+> +               sec = bcd2bin(timestamp[0]);
+> +               min = bcd2bin(timestamp[1]);
+> +               hour = bcd2bin(timestamp[2]);
+> +               day = bcd2bin(timestamp[4]);
+> +               mon = bcd2bin(timestamp[5]);
+> +               year = bcd2bin(timestamp[6]);
+> +               century = bcd2bin(timestamp[7]);
+> +               printk("%stime: %7s %02d%02d-%02d-%02d %02d:%02d:%02d\n", pfx,
+> +                       0x01 & *(timestamp + 3) ? "precise" : "", century,
+> +                       year, mon, day, hour, min, sec);
+> +       }
+> +}
+> +
+>  static void cper_estatus_print_section(
+> -       const char *pfx, const struct acpi_hest_generic_data *gdata, int sec_no)
+> +       const char *pfx, struct acpi_hest_generic_data *gdata, int sec_no)
 >  {
-> -	int r = 0;
-> +	int r = -EINTR;
->  	sigset_t sigsaved;
->  
->  	if (vcpu->sigset_active)
-> @@ -409,6 +409,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		vcpu->mmio_needed = 0;
->  	}
->  
-> +	if (run->immediate_exit)
-> +		goto out;
+>         uuid_le *sec_type = (uuid_le *)gdata->section_type;
+>         __u16 severity;
+>         char newpfx[64];
+>
+> +       if (acpi_hest_generic_data_version(gdata) >= 3)
+> +               cper_estatus_print_section_v300(pfx,
+> +                       (const struct acpi_hest_generic_data_v300 *)gdata);
 > +
->  	lose_fpu(1);
->  
->  	local_irq_disable();
-> @@ -429,6 +432,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	guest_exit_irqoff();
->  	local_irq_enable();
->  
-> +out:
->  	if (vcpu->sigset_active)
->  		sigprocmask(SIG_SETMASK, &sigsaved, NULL);
->  
-> @@ -1021,6 +1025,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_ENABLE_CAP:
->  	case KVM_CAP_READONLY_MEM:
->  	case KVM_CAP_SYNC_MMU:
-> +	case KVM_CAP_IMMEDIATE_EXIT:
->  		r = 1;
->  		break;
->  	case KVM_CAP_COALESCED_MMIO:
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 2b3e4e620078..1fe1391ba2c2 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -511,6 +511,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_ONE_REG:
->  	case KVM_CAP_IOEVENTFD:
->  	case KVM_CAP_DEVICE_CTRL:
-> +	case KVM_CAP_IMMEDIATE_EXIT:
->  		r = 1;
->  		break;
->  	case KVM_CAP_PPC_PAIRED_SINGLES:
-> @@ -1117,7 +1118,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>         severity = gdata->error_severity;
+>         printk("%s""Error %d, type: %s\n", pfx, sec_no,
+>                cper_severity_str(severity));
+> @@ -403,14 +430,18 @@ static void cper_estatus_print_section(
+>
+>         snprintf(newpfx, sizeof(newpfx), "%s%s", pfx, INDENT_SP);
+>         if (!uuid_le_cmp(*sec_type, CPER_SEC_PROC_GENERIC)) {
+> -               struct cper_sec_proc_generic *proc_err = (void *)(gdata + 1);
+> +               struct cper_sec_proc_generic *proc_err;
+> +
+> +               proc_err = acpi_hest_generic_data_payload(gdata);
+>                 printk("%s""section_type: general processor error\n", newpfx);
+>                 if (gdata->error_data_length >= sizeof(*proc_err))
+>                         cper_print_proc_generic(newpfx, proc_err);
+>                 else
+>                         goto err_section_too_small;
+>         } else if (!uuid_le_cmp(*sec_type, CPER_SEC_PLATFORM_MEM)) {
+> -               struct cper_sec_mem_err *mem_err = (void *)(gdata + 1);
+> +               struct cper_sec_mem_err *mem_err;
+> +
+> +               mem_err = acpi_hest_generic_data_payload(gdata);
+>                 printk("%s""section_type: memory error\n", newpfx);
+>                 if (gdata->error_data_length >=
+>                     sizeof(struct cper_sec_mem_err_old))
+> @@ -419,7 +450,9 @@ static void cper_estatus_print_section(
+>                 else
+>                         goto err_section_too_small;
+>         } else if (!uuid_le_cmp(*sec_type, CPER_SEC_PCIE)) {
+> -               struct cper_sec_pcie *pcie = (void *)(gdata + 1);
+> +               struct cper_sec_pcie *pcie;
+> +
+> +               pcie = acpi_hest_generic_data_payload(gdata);
+>                 printk("%s""section_type: PCIe error\n", newpfx);
+>                 if (gdata->error_data_length >= sizeof(*pcie))
+>                         cper_print_pcie(newpfx, pcie, gdata);
+> @@ -438,7 +471,7 @@ void cper_estatus_print(const char *pfx,
+>                         const struct acpi_hest_generic_status *estatus)
+>  {
+>         struct acpi_hest_generic_data *gdata;
+> -       unsigned int data_len, gedata_len;
+> +       unsigned int data_len;
+>         int sec_no = 0;
+>         char newpfx[64];
+>         __u16 severity;
+> @@ -451,12 +484,13 @@ void cper_estatus_print(const char *pfx,
+>         printk("%s""event severity: %s\n", pfx, cper_severity_str(severity));
+>         data_len = estatus->data_length;
+>         gdata = (struct acpi_hest_generic_data *)(estatus + 1);
+> +
+>         snprintf(newpfx, sizeof(newpfx), "%s%s", pfx, INDENT_SP);
+> -       while (data_len >= sizeof(*gdata)) {
+> -               gedata_len = gdata->error_data_length;
+> +
+> +       while (data_len >= acpi_hest_generic_data_size(gdata)) {
+>                 cper_estatus_print_section(newpfx, gdata, sec_no);
+> -               data_len -= gedata_len + sizeof(*gdata);
+> -               gdata = (void *)(gdata + 1) + gedata_len;
+> +               data_len -= acpi_hest_generic_data_record_size(gdata);
+> +               gdata = acpi_hest_generic_data_next(gdata);
+>                 sec_no++;
+>         }
+>  }
+> @@ -486,12 +520,13 @@ int cper_estatus_check(const struct acpi_hest_generic_status *estatus)
+>                 return rc;
+>         data_len = estatus->data_length;
+>         gdata = (struct acpi_hest_generic_data *)(estatus + 1);
+> -       while (data_len >= sizeof(*gdata)) {
+> -               gedata_len = gdata->error_data_length;
+> -               if (gedata_len > data_len - sizeof(*gdata))
+> +
+> +       while (data_len >= acpi_hest_generic_data_size(gdata)) {
+> +               gedata_len = acpi_hest_generic_data_error_length(gdata);
+> +               if (gedata_len > data_len - acpi_hest_generic_data_size(gdata))
+>                         return -EINVAL;
+> -               data_len -= gedata_len + sizeof(*gdata);
+> -               gdata = (void *)(gdata + 1) + gedata_len;
+> +               data_len -= gedata_len + acpi_hest_generic_data_size(gdata);
+> +               gdata = acpi_hest_generic_data_next(gdata);
+>         }
+>         if (data_len)
+>                 return -EINVAL;
+> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+> index 68f088a..6ae318b 100644
+> --- a/include/acpi/ghes.h
+> +++ b/include/acpi/ghes.h
+> @@ -12,6 +12,18 @@
+>  #define GHES_TO_CLEAR          0x0001
+>  #define GHES_EXITING           0x0002
+>
+> +#define acpi_hest_generic_data_error_length(gdata)     \
+> +       (((struct acpi_hest_generic_data *)(gdata))->error_data_length)
+> +#define acpi_hest_generic_data_size(gdata)             \
+> +       ((acpi_hest_generic_data_version(gdata) >= 3) ? \
+> +       sizeof(struct acpi_hest_generic_data_v300) :    \
+> +       sizeof(struct acpi_hest_generic_data))
+> +#define acpi_hest_generic_data_record_size(gdata)      \
+> +       (acpi_hest_generic_data_size(gdata) +           \
+> +       acpi_hest_generic_data_error_length(gdata))
+> +#define acpi_hest_generic_data_next(gdata)             \
+> +       ((void *)(gdata) + acpi_hest_generic_data_record_size(gdata))
+> +
+>  struct ghes {
+>         union {
+>                 struct acpi_hest_generic *generic;
+> @@ -73,3 +85,13 @@ static inline void ghes_edac_unregister(struct ghes *ghes)
+>  {
+>  }
 >  #endif
->  	}
->  
-> -	r = kvmppc_vcpu_run(run, vcpu);
-> +	if (run->immediate_exit)
-> +		r = -EINTR;
-> +	else
-> +		r = kvmppc_vcpu_run(run, vcpu);
->  
->  	if (vcpu->sigset_active)
->  		sigprocmask(SIG_SETMASK, &sigsaved, NULL);
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 502de74ea984..99e35fe0dea8 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -370,6 +370,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_S390_IRQCHIP:
->  	case KVM_CAP_VM_ATTRIBUTES:
->  	case KVM_CAP_MP_STATE:
-> +	case KVM_CAP_IMMEDIATE_EXIT:
->  	case KVM_CAP_S390_INJECT_IRQ:
->  	case KVM_CAP_S390_USER_SIGP:
->  	case KVM_CAP_S390_USER_STSI:
-> @@ -2798,6 +2799,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->  	int rc;
->  	sigset_t sigsaved;
->  
-> +	if (kvm_run->immediate_exit)
-> +		return -EINTR;
 > +
->  	if (guestdbg_exit_pending(vcpu)) {
->  		kvm_s390_prepare_debug_exit(vcpu);
->  		return 0;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 63a89a51dcc9..2a0974383ffe 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2672,6 +2672,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_DISABLE_QUIRKS:
->  	case KVM_CAP_SET_BOOT_CPU_ID:
->   	case KVM_CAP_SPLIT_IRQCHIP:
-> +	case KVM_CAP_IMMEDIATE_EXIT:
->  #ifdef CONFIG_KVM_DEVICE_ASSIGNMENT
->  	case KVM_CAP_ASSIGN_DEV_IRQ:
->  	case KVM_CAP_PCI_2_3:
-> @@ -7202,7 +7203,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->  	} else
->  		WARN_ON(vcpu->arch.pio.count || vcpu->mmio_needed);
->  
-> -	r = vcpu_run(vcpu);
-> +	if (kvm_run->immediate_exit)
-> +		r = -EINTR;
-> +	else
-> +		r = vcpu_run(vcpu);
->  
->  out:
->  	post_kvm_run_save(vcpu);
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 7964b970b9ad..f51d5082a377 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -218,7 +218,8 @@ struct kvm_hyperv_exit {
->  struct kvm_run {
->  	/* in */
->  	__u8 request_interrupt_window;
-> -	__u8 padding1[7];
-> +	__u8 immediate_exit;
-> +	__u8 padding1[6];
->  
->  	/* out */
->  	__u32 exit_reason;
-> @@ -881,6 +882,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_SPAPR_RESIZE_HPT 133
->  #define KVM_CAP_PPC_MMU_RADIX 134
->  #define KVM_CAP_PPC_MMU_HASH_V3 135
-> +#define KVM_CAP_IMMEDIATE_EXIT 136
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> -- 
-> 1.8.3.1
-> 
+> +#define acpi_hest_generic_data_version(gdata)                  \
+> +       (gdata->revision >> 8)
+> +
+> +static inline void *acpi_hest_generic_data_payload(struct acpi_hest_generic_data *gdata)
+> +{
+> +       return acpi_hest_generic_data_version(gdata) >= 3 ?
+> +               (void *)(((struct acpi_hest_generic_data_v300 *)(gdata)) + 1) :
+> +               gdata + 1;
+> +}
+> --
+> Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+> Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+> a Linux Foundation Collaborative Project.
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-efi" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
