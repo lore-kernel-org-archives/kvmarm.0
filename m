@@ -1,26 +1,25 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 06/33] irqchip/gic-v3-its: Add probing for VLPI
- properties
-Date: Thu, 16 Feb 2017 14:46:03 +0100
-Message-ID: <d04c4e22-49cd-13f8-f461-9ccf8057cb96@redhat.com>
+Subject: Re: [RFC PATCH 08/33] irqchip/gic-v3-its: Implement
+ irq_set_irqchip_state for pending state
+Date: Thu, 16 Feb 2017 15:59:24 +0100
+Message-ID: <c6d7e882-851c-d900-3870-4495f4b3be87@redhat.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-7-git-send-email-marc.zyngier@arm.com>
- <alpine.DEB.2.20.1702131057290.3619@nanos>
+ <1484648454-21216-9-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8FDA40C7D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 08:45:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F4CE40C49
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 09:58:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id S3VjGPVpsN5V for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Feb 2017 08:45:21 -0500 (EST)
+ with ESMTP id 5Aiey3x5Qige for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Feb 2017 09:58:41 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1AA940C72
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 08:45:21 -0500 (EST)
-In-Reply-To: <alpine.DEB.2.20.1702131057290.3619@nanos>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E654940C51
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 09:58:40 -0500 (EST)
+In-Reply-To: <1484648454-21216-9-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,69 +29,140 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Thomas Gleixner <tglx@linutronix.de>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, Jason Cooper <jason@lakedaemon.net>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Marc,
 
-On 13/02/2017 11:00, Thomas Gleixner wrote:
-> On Tue, 17 Jan 2017, Marc Zyngier wrote:
->> +	typer = gic_read_typer(its_base + GITS_TYPER);
->>  	its->base = its_base;
->>  	its->phys_base = res->start;
->> -	its->ite_size = ((gic_read_typer(its_base + GITS_TYPER) >> 4) & 0xf) + 1;
->> +	its->ite_size = ((typer >> 4) & 0xf) + 1;
->> +	its->is_v4 = !!(typer & GITS_TYPER_VLPIS);
->> +	if (its->is_v4 && !(typer & GITS_TYPER_VMOVP)) {
->> +		int its_number;
->> +
->> +		its_number = find_first_zero_bit(&its_list_map, 16);
+On 17/01/2017 11:20, Marc Zyngier wrote:
+> Allow the pending state of an LPI to be set or cleared via
+> irq_set_irqchip_state.
 > 
-> s/16/ITS_MAX_ENTITIES or whatever.
-> 
->> +		if (its_number >= 16) {
->> +			pr_err("ITS@%pa: No ITSList entry available!\n",
->> +			       &res->start);
->> +			err = -EINVAL;
->> +			goto out_free_its;
->> +		}
->> +
->> +		ctlr = readl_relaxed(its_base + GITS_CTLR);
->> +		ctlr &= ~GITS_CTLR_ITS_NUMBER;
->> +		ctlr |= its_number << GITS_CTLR_ITS_NUMBER_SHIFT;
->> +		writel_relaxed(ctlr, its_base + GITS_CTLR);
->> +		ctlr = readl_relaxed(its_base + GITS_CTLR);
->> +		if ((ctlr & GITS_CTLR_ITS_NUMBER) != (its_number << GITS_CTLR_ITS_NUMBER_SHIFT)) {
->> +			its_number = ctlr & GITS_CTLR_ITS_NUMBER;
->> +			its_number >>= GITS_CTLR_ITS_NUMBER_SHIFT;
->> +		}
->> +
->> +		if (test_and_set_bit(its_number, &its_list_map)) {
-> 
-> You just established above that the bit is not set. I assume that this is
-> code which has no concurrency concerns....
-
-I understand this covers the case where the ITS_number field is RO. In
-such a case the its_number has changed just above compared to the first
-find_first_zero_bit?
-
-Besides
-
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
 
 Eric
 
-
+> ---
+>  drivers/irqchip/irq-gic-v3-its.c | 78 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 78 insertions(+)
 > 
-> Thanks,
-> 
-> 	tglx
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index 520b764..b28fb19 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -163,6 +163,11 @@ struct its_cmd_desc {
+>  		struct {
+>  			struct its_device *dev;
+>  			u32 event_id;
+> +		} its_clear_cmd;
+> +
+> +		struct {
+> +			struct its_device *dev;
+> +			u32 event_id;
+>  		} its_int_cmd;
+>  
+>  		struct {
+> @@ -376,6 +381,40 @@ static struct its_collection *its_build_inv_cmd(struct its_cmd_block *cmd,
+>  	return col;
+>  }
+>  
+> +static struct its_collection *its_build_int_cmd(struct its_cmd_block *cmd,
+> +						struct its_cmd_desc *desc)
+> +{
+> +	struct its_collection *col;
+> +
+> +	col = dev_event_to_col(desc->its_int_cmd.dev,
+> +			       desc->its_int_cmd.event_id);
+> +
+> +	its_encode_cmd(cmd, GITS_CMD_INT);
+> +	its_encode_devid(cmd, desc->its_int_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_int_cmd.event_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +
+> +	return col;
+> +}
+> +
+> +static struct its_collection *its_build_clear_cmd(struct its_cmd_block *cmd,
+> +						  struct its_cmd_desc *desc)
+> +{
+> +	struct its_collection *col;
+> +
+> +	col = dev_event_to_col(desc->its_clear_cmd.dev,
+> +			       desc->its_clear_cmd.event_id);
+> +
+> +	its_encode_cmd(cmd, GITS_CMD_CLEAR);
+> +	its_encode_devid(cmd, desc->its_clear_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_clear_cmd.event_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +
+> +	return col;
+> +}
+> +
+>  static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
+>  						   struct its_cmd_desc *desc)
+>  {
+> @@ -530,6 +569,26 @@ static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
+>  static __its_send_single_cmd(its_send_single_command, its_cmd_builder_t,
+>  			     struct its_collection, its_build_sync_cmd)
+>  
+> +static void its_send_int(struct its_device *dev, u32 event_id)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_int_cmd.dev = dev;
+> +	desc.its_int_cmd.event_id = event_id;
+> +
+> +	its_send_single_command(dev->its, its_build_int_cmd, &desc);
+> +}
+> +
+> +static void its_send_clear(struct its_device *dev, u32 event_id)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_clear_cmd.dev = dev;
+> +	desc.its_clear_cmd.event_id = event_id;
+> +
+> +	its_send_single_command(dev->its, its_build_clear_cmd, &desc);
+> +}
+> +
+>  static void its_send_inv(struct its_device *dev, u32 event_id)
+>  {
+>  	struct its_cmd_desc desc;
+> @@ -693,6 +752,24 @@ static void its_irq_compose_msi_msg(struct irq_data *d, struct msi_msg *msg)
+>  	iommu_dma_map_msi_msg(d->irq, msg);
+>  }
+>  
+> +static int its_irq_set_irqchip_state(struct irq_data *d,
+> +				     enum irqchip_irq_state which,
+> +				     bool state)
+> +{
+> +	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+> +	u32 event = its_get_event_id(d);
+> +
+> +	if (which != IRQCHIP_STATE_PENDING)
+> +		return -EINVAL;
+> +
+> +	if (state)
+> +		its_send_int(its_dev, event);
+> +	else
+> +		its_send_clear(its_dev, event);
+> +
+> +	return 0;
+> +}
+> +
+>  static struct irq_chip its_irq_chip = {
+>  	.name			= "ITS",
+>  	.irq_mask		= its_mask_irq,
+> @@ -700,6 +777,7 @@ static struct irq_chip its_irq_chip = {
+>  	.irq_eoi		= irq_chip_eoi_parent,
+>  	.irq_set_affinity	= its_set_affinity,
+>  	.irq_compose_msi_msg	= its_irq_compose_msi_msg,
+> +	.irq_set_irqchip_state	= its_irq_set_irqchip_state,
+>  };
+>  
+>  /*
 > 
