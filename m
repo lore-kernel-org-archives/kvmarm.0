@@ -1,24 +1,24 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 02/33] irqchip/gic-v3: Add VLPI/DirectLPI discovery
-Date: Thu, 16 Feb 2017 14:19:29 +0100
-Message-ID: <fafa6600-c7f4-1915-baaa-2fd3759c1332@redhat.com>
+Subject: Re: [RFC PATCH 04/33] irqchip/gic-v3-its: Move LPI definitions around
+Date: Thu, 16 Feb 2017 14:22:43 +0100
+Message-ID: <d35f9268-e840-67d6-6b5a-646fbeb5e531@redhat.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-3-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-5-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 578D040C92
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 08:18:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F0BF40C4C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 08:22:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6A0aCQW5Wo9V for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Feb 2017 08:18:45 -0500 (EST)
+ with ESMTP id 6Gsl+WdtwB2z for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Feb 2017 08:22:00 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C85840C4C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 08:18:45 -0500 (EST)
-In-Reply-To: <1484648454-21216-3-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96C2840C47
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 08:22:00 -0500 (EST)
+In-Reply-To: <1484648454-21216-5-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,90 +32,66 @@ To: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm
 Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Marc,
 
 On 17/01/2017 11:20, Marc Zyngier wrote:
-> Add helper functions that probe for VLPI and DirectLPI properties.
+> The various LPI definitions are in the middle of the code, and
+> would be better placed at the beginning, given that we're going
+> to use some of them much earlier.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Besides the returned value previous questions,
-
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
-
-
 > ---
->  drivers/irqchip/irq-gic-v3.c       | 22 ++++++++++++++++++++++
->  include/linux/irqchip/arm-gic-v3.h |  3 +++
->  2 files changed, 25 insertions(+)
+>  drivers/irqchip/irq-gic-v3-its.c | 27 +++++++++++++++------------
+>  1 file changed, 15 insertions(+), 12 deletions(-)
 > 
-> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index 5cadec0..8a6de91 100644
-> --- a/drivers/irqchip/irq-gic-v3.c
-> +++ b/drivers/irqchip/irq-gic-v3.c
-> @@ -514,6 +514,24 @@ static int gic_populate_rdist(void)
->  	return -ENODEV;
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index 49b681e..2ca27f6 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -49,6 +49,21 @@
+>  #define RDIST_FLAGS_PROPBASE_NEEDS_FLUSHING	(1 << 0)
+>  
+>  /*
+> + * We allocate 64kB for PROPBASE. That gives us at most 64K LPIs to
+> + * deal with (one configuration byte per interrupt). PENDBASE has to
+> + * be 64kB aligned (one bit per LPI, plus 8192 bits for SPI/PPI/SGI).
+> + */
+> +#define LPI_PROPBASE_SZ		SZ_64K
+> +#define LPI_PENDBASE_SZ		(LPI_PROPBASE_SZ / 8 + SZ_1K)
+> +
+> +/*
+> + * This is how many bits of ID we need, including the useless ones.
+> + */
+> +#define LPI_NRBITS		ilog2(LPI_PROPBASE_SZ + SZ_8K)
+> +
+> +#define LPI_PROP_DEFAULT_PRIO	0xa0
+> +
+> +/*
+>   * Collection structure - just an ID, and a redistributor address to
+>   * ping. We use one per CPU as a bag of interrupts assigned to this
+>   * CPU.
+> @@ -779,20 +794,8 @@ static void its_lpi_free(struct event_lpi_map *map)
+>  	kfree(map->col_map);
 >  }
 >  
-> +static int __gic_update_vlpi_properties(struct redist_region *region,
-> +					void __iomem *ptr)
-> +{
-> +	u64 typer = gic_read_typer(ptr + GICR_TYPER);
-> +	gic_data.rdists.has_vlpis &= !!(typer & GICR_TYPER_VLPIS);
-> +	gic_data.rdists.has_direct_lpi &= !!(typer & GICR_TYPER_DirectLPIS);
-> +
-> +	return 1;
-> +}
-> +
-> +static void gic_update_vlpi_properties(void)
-> +{
-> +	gic_scan_rdist_properties(__gic_update_vlpi_properties);
-> +	pr_info("%sVLPI support, %sdirect LPI support\n",
-> +		!gic_data.rdists.has_vlpis ? "no " : "",
-> +		!gic_data.rdists.has_direct_lpi ? "no " : "");
-> +}
-> +
->  static void gic_cpu_sys_reg_init(void)
+> -/*
+> - * We allocate 64kB for PROPBASE. That gives us at most 64K LPIs to
+> - * deal with (one configuration byte per interrupt). PENDBASE has to
+> - * be 64kB aligned (one bit per LPI, plus 8192 bits for SPI/PPI/SGI).
+> - */
+> -#define LPI_PROPBASE_SZ		SZ_64K
+> -#define LPI_PENDBASE_SZ		(LPI_PROPBASE_SZ / 8 + SZ_1K)
+>  
+> -/*
+> - * This is how many bits of ID we need, including the useless ones.
+> - */
+> -#define LPI_NRBITS		ilog2(LPI_PROPBASE_SZ + SZ_8K)
+>  
+> -#define LPI_PROP_DEFAULT_PRIO	0xa0
+>  
+>  static int __init its_alloc_lpi_tables(void)
 >  {
->  	/*
-> @@ -975,6 +993,8 @@ static int __init gic_init_bases(void __iomem *dist_base,
->  	gic_data.domain = irq_domain_create_tree(handle, &gic_irq_domain_ops,
->  						 &gic_data);
->  	gic_data.rdists.rdist = alloc_percpu(typeof(*gic_data.rdists.rdist));
-> +	gic_data.rdists.has_vlpis = true;
-> +	gic_data.rdists.has_direct_lpi = true;
->  
->  	if (WARN_ON(!gic_data.domain) || WARN_ON(!gic_data.rdists.rdist)) {
->  		err = -ENOMEM;
-> @@ -983,6 +1003,8 @@ static int __init gic_init_bases(void __iomem *dist_base,
->  
->  	set_handle_irq(gic_handle_irq);
->  
-> +	gic_update_vlpi_properties();
-> +
->  	if (IS_ENABLED(CONFIG_ARM_GIC_V3_ITS) && gic_dist_supports_lpis())
->  		its_init(handle, &gic_data.rdists, gic_data.domain);
->  
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index e808f8a..b162bfa 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -200,6 +200,7 @@
->  
->  #define GICR_TYPER_PLPIS		(1U << 0)
->  #define GICR_TYPER_VLPIS		(1U << 1)
-> +#define GICR_TYPER_DirectLPIS		(1U << 3)
->  #define GICR_TYPER_LAST			(1U << 4)
->  
->  #define GIC_V3_REDIST_SIZE		0x20000
-> @@ -427,6 +428,8 @@ struct rdists {
->  	struct page		*prop_page;
->  	int			id_bits;
->  	u64			flags;
-> +	bool			has_vlpis;
-> +	bool			has_direct_lpi;
->  };
->  
->  struct irq_domain;
 > 
