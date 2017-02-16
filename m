@@ -1,188 +1,170 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: VGIC: fix command handling while ITS being
- disabled
-Date: Thu, 16 Feb 2017 13:22:02 +0100
-Message-ID: <fd34e7f8-fe6f-354f-b49e-f898586d5c4d@redhat.com>
-References: <20170216104120.31952-1-andre.przywara@arm.com>
+Subject: Re: [RFC PATCH 01/33] irqchip/gic-v3: Add redistributor iterator
+Date: Thu, 16 Feb 2017 13:47:44 +0100
+Message-ID: <22a9cb20-f5f0-20e7-e34c-f14847a35e5e@redhat.com>
+References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-2-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170216104120.31952-1-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A473540C4B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 07:47:02 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id rTWB2Njmz3Nc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Feb 2017 07:47:01 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C4B140C38
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 07:47:01 -0500 (EST)
+In-Reply-To: <1484648454-21216-2-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+Hi Marc,
 
-On 16/02/2017 11:41, Andre Przywara wrote:
-> The ITS spec says that ITS commands are only processed when the ITS
-> is enabled (section 8.19.4, Enabled, bit[0]). Our emulation was not taking
-> this into account.
-> Fix this by checking the enabled state before handling CWRITER writes.
-nit: you actually check the ITS state before executing commands.
+On 17/01/2017 11:20, Marc Zyngier wrote:
+> In order to discover the VLPI properties, we need to iterate over
+> the redistributor regions. As we already have code that does this,
+> let's factor it out and make it slightly more generic.
 > 
-> On the other hand that means that CWRITER could advance while the ITS
-> is disabled, and enabling it would need those commands to be processed.
-> Fix this case as well by refactoring actual command processing and
-> calling this from both the GITS_CWRITER and GITS_CTLR handlers.
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  drivers/irqchip/irq-gic-v3.c | 77 ++++++++++++++++++++++++++++++++------------
+>  1 file changed, 56 insertions(+), 21 deletions(-)
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index c132f29..5cadec0 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -421,24 +421,15 @@ static void __init gic_dist_init(void)
+>  		gic_write_irouter(affinity, base + GICD_IROUTER + i * 8);
+>  }
+>  
+> -static int gic_populate_rdist(void)
+> +static int gic_scan_rdist_properties(int (*fn)(struct redist_region *,
+> +					       void __iomem *))
+>  {
+> -	unsigned long mpidr = cpu_logical_map(smp_processor_id());
+> -	u64 typer;
+> -	u32 aff;
+> +	int ret = 0;
+in case
+if (reg != GIC_PIDR2_ARCH_GICv3 &&
+		    reg != GIC_PIDR2_ARCH_GICv4) is true you now return 0. Don' you
+want to return -ENODEV as before?
+
+
+>  	int i;
+>  
+> -	/*
+> -	 * Convert affinity to a 32bit value that can be matched to
+> -	 * GICR_TYPER bits [63:32].
+> -	 */
+> -	aff = (MPIDR_AFFINITY_LEVEL(mpidr, 3) << 24 |
+> -	       MPIDR_AFFINITY_LEVEL(mpidr, 2) << 16 |
+> -	       MPIDR_AFFINITY_LEVEL(mpidr, 1) << 8 |
+> -	       MPIDR_AFFINITY_LEVEL(mpidr, 0));
+> -
+>  	for (i = 0; i < gic_data.nr_redist_regions; i++) {
+>  		void __iomem *ptr = gic_data.redist_regions[i].redist_base;
+> +		u64 typer;
+>  		u32 reg;
+>  
+>  		reg = readl_relaxed(ptr + GICR_PIDR2) & GIC_PIDR2_ARCH_MASK;
+> @@ -450,14 +441,14 @@ static int gic_populate_rdist(void)
+>  
+>  		do {
+>  			typer = gic_read_typer(ptr + GICR_TYPER);
+> -			if ((typer >> 32) == aff) {
+> -				u64 offset = ptr - gic_data.redist_regions[i].redist_base;
+> -				gic_data_rdist_rd_base() = ptr;
+> -				gic_data_rdist()->phys_base = gic_data.redist_regions[i].phys_base + offset;
+> -				pr_info("CPU%d: found redistributor %lx region %d:%pa\n",
+> -					smp_processor_id(), mpidr, i,
+> -					&gic_data_rdist()->phys_base);
+> +			ret = fn(gic_data.redist_regions + i, ptr);
+> +			switch (ret) {
+> +			case 0:
+>  				return 0;
+> +			case -1:
+> +				break;
+> +			default:
+> +				ret = 0;
+>  			}
+>  
+>  			if (gic_data.redist_regions[i].single_redist)
+> @@ -473,9 +464,53 @@ static int gic_populate_rdist(void)
+>  		} while (!(typer & GICR_TYPER_LAST));
+>  	}
+Assuming you don't find the TYPER that matches the cpu (I don't know if
+it is possible), last fn() call will return 1 and the function will
+return 0. Before it returned -ENODEV I think.
 
 Thanks
 
 Eric
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 109 ++++++++++++++++++++++++++-----------------
->  1 file changed, 65 insertions(+), 44 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 8c2b3cd..ff86106 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -360,29 +360,6 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
->  	return ret;
->  }
 >  
-> -static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
-> -					     struct vgic_its *its,
-> -					     gpa_t addr, unsigned int len)
-> -{
-> -	u32 reg = 0;
-> -
-> -	mutex_lock(&its->cmd_lock);
-> -	if (its->creadr == its->cwriter)
-> -		reg |= GITS_CTLR_QUIESCENT;
-> -	if (its->enabled)
-> -		reg |= GITS_CTLR_ENABLE;
-> -	mutex_unlock(&its->cmd_lock);
-> -
-> -	return reg;
-> -}
-> -
-> -static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
-> -				     gpa_t addr, unsigned int len,
-> -				     unsigned long val)
-> -{
-> -	its->enabled = !!(val & GITS_CTLR_ENABLE);
-> -}
-> -
->  static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
->  					      struct vgic_its *its,
->  					      gpa_t addr, unsigned int len)
-> @@ -1161,33 +1138,16 @@ static void vgic_mmio_write_its_cbaser(struct kvm *kvm, struct vgic_its *its,
->  #define ITS_CMD_SIZE			32
->  #define ITS_CMD_OFFSET(reg)		((reg) & GENMASK(19, 5))
->  
-> -/*
-> - * By writing to CWRITER the guest announces new commands to be processed.
-> - * To avoid any races in the first place, we take the its_cmd lock, which
-> - * protects our ring buffer variables, so that there is only one user
-> - * per ITS handling commands at a given time.
-> - */
-> -static void vgic_mmio_write_its_cwriter(struct kvm *kvm, struct vgic_its *its,
-> -					gpa_t addr, unsigned int len,
-> -					unsigned long val)
-> +/* Must be called with the cmd_lock held. */
-> +static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
->  {
->  	gpa_t cbaser;
->  	u64 cmd_buf[4];
-> -	u32 reg;
->  
-> -	if (!its)
-> -		return;
-> -
-> -	mutex_lock(&its->cmd_lock);
-> -
-> -	reg = update_64bit_reg(its->cwriter, addr & 7, len, val);
-> -	reg = ITS_CMD_OFFSET(reg);
-> -	if (reg >= ITS_CMD_BUFFER_SIZE(its->cbaser)) {
-> -		mutex_unlock(&its->cmd_lock);
-> +	/* Commands are only processed when the ITS is enabled. */
-> +	if (!its->enabled)
->  		return;
-> -	}
->  
-> -	its->cwriter = reg;
->  	cbaser = CBASER_ADDRESS(its->cbaser);
->  
->  	while (its->cwriter != its->creadr) {
-> @@ -1207,6 +1167,34 @@ static void vgic_mmio_write_its_cwriter(struct kvm *kvm, struct vgic_its *its,
->  		if (its->creadr == ITS_CMD_BUFFER_SIZE(its->cbaser))
->  			its->creadr = 0;
->  	}
+> +	if (ret == -1)
+> +		ret = -ENODEV;
+> +
+> +	return 0;
 > +}
 > +
-> +/*
-> + * By writing to CWRITER the guest announces new commands to be processed.
-> + * To avoid any races in the first place, we take the its_cmd lock, which
-> + * protects our ring buffer variables, so that there is only one user
-> + * per ITS handling commands at a given time.
-> + */
-> +static void vgic_mmio_write_its_cwriter(struct kvm *kvm, struct vgic_its *its,
-> +					gpa_t addr, unsigned int len,
-> +					unsigned long val)
+> +static int __gic_populate_rdist(struct redist_region *region, void __iomem *ptr)
 > +{
-> +	u64 reg;
-> +
-> +	if (!its)
-> +		return;
-> +
-> +	mutex_lock(&its->cmd_lock);
-> +
-> +	reg = update_64bit_reg(its->cwriter, addr & 7, len, val);
-> +	reg = ITS_CMD_OFFSET(reg);
-> +	if (reg >= ITS_CMD_BUFFER_SIZE(its->cbaser)) {
-> +		mutex_unlock(&its->cmd_lock);
-> +		return;
-> +	}
-> +	its->cwriter = reg;
-> +
-> +	vgic_its_process_commands(kvm, its);
->  
->  	mutex_unlock(&its->cmd_lock);
->  }
-> @@ -1287,6 +1275,39 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
->  	*regptr = reg;
->  }
->  
-> +static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
-> +					     struct vgic_its *its,
-> +					     gpa_t addr, unsigned int len)
-> +{
-> +	u32 reg = 0;
-> +
-> +	mutex_lock(&its->cmd_lock);
-> +	if (its->creadr == its->cwriter)
-> +		reg |= GITS_CTLR_QUIESCENT;
-> +	if (its->enabled)
-> +		reg |= GITS_CTLR_ENABLE;
-> +	mutex_unlock(&its->cmd_lock);
-> +
-> +	return reg;
-> +}
-> +
-> +static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
-> +				     gpa_t addr, unsigned int len,
-> +				     unsigned long val)
-> +{
-> +	mutex_lock(&its->cmd_lock);
-> +
-> +	its->enabled = !!(val & GITS_CTLR_ENABLE);
+> +	unsigned long mpidr = cpu_logical_map(smp_processor_id());
+> +	u64 typer;
+> +	u32 aff;
 > +
 > +	/*
-> +	 * Try to process any pending commands. This function bails out early
-> +	 * if the ITS is disabled or no commands have been queued.
+> +	 * Convert affinity to a 32bit value that can be matched to
+> +	 * GICR_TYPER bits [63:32].
 > +	 */
-> +	vgic_its_process_commands(kvm, its);
+> +	aff = (MPIDR_AFFINITY_LEVEL(mpidr, 3) << 24 |
+> +	       MPIDR_AFFINITY_LEVEL(mpidr, 2) << 16 |
+> +	       MPIDR_AFFINITY_LEVEL(mpidr, 1) << 8 |
+> +	       MPIDR_AFFINITY_LEVEL(mpidr, 0));
 > +
-> +	mutex_unlock(&its->cmd_lock);
+> +	typer = gic_read_typer(ptr + GICR_TYPER);
+> +	if ((typer >> 32) == aff) {
+> +		u64 offset = ptr - region->redist_base;
+> +		gic_data_rdist_rd_base() = ptr;
+> +		gic_data_rdist()->phys_base = region->phys_base + offset;
+> +
+> +		pr_info("CPU%d: found redistributor %lx region %d:%pa\n",
+> +			smp_processor_id(), mpidr,
+> +			(int)(region - gic_data.redist_regions),
+> +			&gic_data_rdist()->phys_base);
+> +		return 0;
+> +	}
+> +
+> +	/* Try next one */
+> +	return 1;
 > +}
 > +
->  #define REGISTER_ITS_DESC(off, rd, wr, length, acc)		\
->  {								\
->  	.reg_offset = off,					\
+> +static int gic_populate_rdist(void)
+> +{
+> +	if (gic_scan_rdist_properties(__gic_populate_rdist) == 0)
+> +		return 0;
+> +
+>  	/* We couldn't even deal with ourselves... */
+>  	WARN(true, "CPU%d: mpidr %lx has no re-distributor!\n",
+> -	     smp_processor_id(), mpidr);
+> +	     smp_processor_id(),
+> +	     (unsigned long)cpu_logical_map(smp_processor_id()));
+>  	return -ENODEV;
+>  }
+>  
 > 
