@@ -1,24 +1,24 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 03/33] irqchip/gic-v3-its: Refactor command encoding
-Date: Thu, 16 Feb 2017 14:19:08 +0100
-Message-ID: <abcff5be-28fe-6bf5-76c1-2a65f86d05ee@redhat.com>
+Subject: Re: [RFC PATCH 02/33] irqchip/gic-v3: Add VLPI/DirectLPI discovery
+Date: Thu, 16 Feb 2017 14:19:29 +0100
+Message-ID: <fafa6600-c7f4-1915-baaa-2fd3759c1332@redhat.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-4-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-3-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0061240C4F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 08:18:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 578D040C92
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 08:18:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3ac-UipBq392 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Feb 2017 08:18:25 -0500 (EST)
+ with ESMTP id 6A0aCQW5Wo9V for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Feb 2017 08:18:45 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 28E7A40C4C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 08:18:25 -0500 (EST)
-In-Reply-To: <1484648454-21216-4-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C85840C4C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 08:18:45 -0500 (EST)
+In-Reply-To: <1484648454-21216-3-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,106 +32,90 @@ To: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm
 Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
+Hi,
 
 On 17/01/2017 11:20, Marc Zyngier wrote:
-> The way we encode the various ITS command fields is both tedious
-> and error prone. Let's introduce a helper function that performs
-> the encoding, and convert the existing encoders to use that
-> helper.
+> Add helper functions that probe for VLPI and DirectLPI properties.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 34 ++++++++++++++++------------------
->  1 file changed, 16 insertions(+), 18 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 69b040f..49b681e 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -193,58 +193,56 @@ struct its_cmd_block {
->  typedef struct its_collection *(*its_cmd_builder_t)(struct its_cmd_block *,
->  						    struct its_cmd_desc *);
->  
-> +static void its_mask_encode(u64 *raw_cmd, u64 val, int h, int l)
-> +{
-> +	u64 mask = GENMASK_ULL(h, l);
-> +	*raw_cmd &= ~mask;
-> +	*raw_cmd |= (val << l) & mask;
-> +}
-> +
->  static void its_encode_cmd(struct its_cmd_block *cmd, u8 cmd_nr)
->  {
-> -	cmd->raw_cmd[0] &= ~0xffULL;
-> -	cmd->raw_cmd[0] |= cmd_nr;
-> +	its_mask_encode(&cmd->raw_cmd[0], cmd_nr, 7, 0);
->  }
->  
->  static void its_encode_devid(struct its_cmd_block *cmd, u32 devid)
->  {
-> -	cmd->raw_cmd[0] &= BIT_ULL(32) - 1;
-> -	cmd->raw_cmd[0] |= ((u64)devid) << 32;
-> +	its_mask_encode(&cmd->raw_cmd[0], devid, 63, 32);
->  }
->  
->  static void its_encode_event_id(struct its_cmd_block *cmd, u32 id)
->  {
-> -	cmd->raw_cmd[1] &= ~0xffffffffULL;
-> -	cmd->raw_cmd[1] |= id;
-> +	its_mask_encode(&cmd->raw_cmd[1], id, 31, 0);
->  }
->  
->  static void its_encode_phys_id(struct its_cmd_block *cmd, u32 phys_id)
->  {
-> -	cmd->raw_cmd[1] &= 0xffffffffULL;
-> -	cmd->raw_cmd[1] |= ((u64)phys_id) << 32;
-> +	its_mask_encode(&cmd->raw_cmd[1], phys_id, 63, 32);
->  }
->  
->  static void its_encode_size(struct its_cmd_block *cmd, u8 size)
->  {
-> -	cmd->raw_cmd[1] &= ~0x1fULL;
-> -	cmd->raw_cmd[1] |= size & 0x1f;
-> +	its_mask_encode(&cmd->raw_cmd[1], size, 4, 0);
->  }
->  
->  static void its_encode_itt(struct its_cmd_block *cmd, u64 itt_addr)
->  {
-> -	cmd->raw_cmd[2] &= ~0xffffffffffffULL;
-> -	cmd->raw_cmd[2] |= itt_addr & 0xffffffffff00ULL;
-> +	its_mask_encode(&cmd->raw_cmd[2], itt_addr >> 8, 50, 8);
->  }
->  
->  static void its_encode_valid(struct its_cmd_block *cmd, int valid)
->  {
-> -	cmd->raw_cmd[2] &= ~(1ULL << 63);
-> -	cmd->raw_cmd[2] |= ((u64)!!valid) << 63;
-> +	its_mask_encode(&cmd->raw_cmd[2], !!valid, 63, 63);
->  }
->  
->  static void its_encode_target(struct its_cmd_block *cmd, u64 target_addr)
->  {
-> -	cmd->raw_cmd[2] &= ~(0xffffffffULL << 16);
-> -	cmd->raw_cmd[2] |= (target_addr & (0xffffffffULL << 16));
-> +	its_mask_encode(&cmd->raw_cmd[2], target_addr >> 16, 50, 16);
-Theoretically isn't it 16:51? In the previous code this was encoded as
-16-47 I think.
+Besides the returned value previous questions,
 
-Besides
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-
-Thanks
-
 Eric
+
+
+> ---
+>  drivers/irqchip/irq-gic-v3.c       | 22 ++++++++++++++++++++++
+>  include/linux/irqchip/arm-gic-v3.h |  3 +++
+>  2 files changed, 25 insertions(+)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index 5cadec0..8a6de91 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -514,6 +514,24 @@ static int gic_populate_rdist(void)
+>  	return -ENODEV;
 >  }
 >  
->  static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
+> +static int __gic_update_vlpi_properties(struct redist_region *region,
+> +					void __iomem *ptr)
+> +{
+> +	u64 typer = gic_read_typer(ptr + GICR_TYPER);
+> +	gic_data.rdists.has_vlpis &= !!(typer & GICR_TYPER_VLPIS);
+> +	gic_data.rdists.has_direct_lpi &= !!(typer & GICR_TYPER_DirectLPIS);
+> +
+> +	return 1;
+> +}
+> +
+> +static void gic_update_vlpi_properties(void)
+> +{
+> +	gic_scan_rdist_properties(__gic_update_vlpi_properties);
+> +	pr_info("%sVLPI support, %sdirect LPI support\n",
+> +		!gic_data.rdists.has_vlpis ? "no " : "",
+> +		!gic_data.rdists.has_direct_lpi ? "no " : "");
+> +}
+> +
+>  static void gic_cpu_sys_reg_init(void)
 >  {
-> -	cmd->raw_cmd[2] &= ~0xffffULL;
-> -	cmd->raw_cmd[2] |= col;
-> +	its_mask_encode(&cmd->raw_cmd[2], col, 15, 0);
->  }
+>  	/*
+> @@ -975,6 +993,8 @@ static int __init gic_init_bases(void __iomem *dist_base,
+>  	gic_data.domain = irq_domain_create_tree(handle, &gic_irq_domain_ops,
+>  						 &gic_data);
+>  	gic_data.rdists.rdist = alloc_percpu(typeof(*gic_data.rdists.rdist));
+> +	gic_data.rdists.has_vlpis = true;
+> +	gic_data.rdists.has_direct_lpi = true;
 >  
->  static inline void its_fixup_cmd(struct its_cmd_block *cmd)
+>  	if (WARN_ON(!gic_data.domain) || WARN_ON(!gic_data.rdists.rdist)) {
+>  		err = -ENOMEM;
+> @@ -983,6 +1003,8 @@ static int __init gic_init_bases(void __iomem *dist_base,
+>  
+>  	set_handle_irq(gic_handle_irq);
+>  
+> +	gic_update_vlpi_properties();
+> +
+>  	if (IS_ENABLED(CONFIG_ARM_GIC_V3_ITS) && gic_dist_supports_lpis())
+>  		its_init(handle, &gic_data.rdists, gic_data.domain);
+>  
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index e808f8a..b162bfa 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -200,6 +200,7 @@
+>  
+>  #define GICR_TYPER_PLPIS		(1U << 0)
+>  #define GICR_TYPER_VLPIS		(1U << 1)
+> +#define GICR_TYPER_DirectLPIS		(1U << 3)
+>  #define GICR_TYPER_LAST			(1U << 4)
+>  
+>  #define GIC_V3_REDIST_SIZE		0x20000
+> @@ -427,6 +428,8 @@ struct rdists {
+>  	struct page		*prop_page;
+>  	int			id_bits;
+>  	u64			flags;
+> +	bool			has_vlpis;
+> +	bool			has_direct_lpi;
+>  };
+>  
+>  struct irq_domain;
 > 
