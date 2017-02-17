@@ -1,96 +1,66 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 15/20] ARM: KVM: Allow the main HYP code to use the init hyp
- stub implementation
-Date: Fri, 17 Feb 2017 15:44:24 +0000
-Message-ID: <20170217154429.5000-16-marc.zyngier@arm.com>
+Subject: [PATCH 18/20] arm/arm64: KVM: Simplify __cpu_reset_hyp_mode
+Date: Fri, 17 Feb 2017 15:44:27 +0000
+Message-ID: <20170217154429.5000-19-marc.zyngier@arm.com>
 References: <20170217154429.5000-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 68B6B40DF7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 10:44:47 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rGwxAVI0mwqB for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Feb 2017 10:44:46 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 346E140CA1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 10:44:44 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170217154429.5000-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Russell King <linux@arm.linux.org.uk>
+Cc: Russell King <linux@arm.linux.org.uk>, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We now have a full hyp-stub implementation in the KVM init code,
-but the main KVM code only supports HVC_GET_VECTORS, which is not
-enough.
-
-Instead of reinventing the wheel, let's reuse the init implementation
-by branching to the idmap page when called with a hyp-stub hypercall.
+__cpu_reset_hyp_mode doesn't need to be passed any argument now,
+as the hyp-stub implementations are self-contained.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/hyp/hyp-entry.S | 29 ++++++++++++++++++++++++-----
- 1 file changed, 24 insertions(+), 5 deletions(-)
+ arch/arm/include/asm/kvm_host.h   | 3 +--
+ arch/arm/kvm/arm.c                | 3 +--
+ arch/arm64/include/asm/kvm_host.h | 3 +--
+ 3 files changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index 1f8db7d21fc5..a35baa81fd23 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -126,11 +126,30 @@ hyp_hvc:
- 	 */
- 	pop	{r0, r1, r2}
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 1962c5086897..370d7c6d6e7a 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -274,8 +274,7 @@ static inline void __cpu_init_stage2(void)
+ 	kvm_call_hyp(__init_stage2_translation);
+ }
  
--	/* Check for __hyp_get_vectors */
--	cmp	r0, #HVC_GET_VECTORS
--	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
--	beq	1f
-+	/*
-+	 * Check if we have a kernel function, which is guaranteed to be
-+	 * bigger than the maximum hyp stub hypercall
-+	 */
-+	cmp	r0, #HVC_STUB_HCALL_NR
-+	bhs	1f
+-static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+-					phys_addr_t phys_idmap_start)
++static inline void __cpu_reset_hyp_mode(void)
+ {
+ 	extern void __hyp_reset_vectors(void);
+ 	__hyp_reset_vectors();
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 9d7446456e0c..00b5205e8955 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1122,8 +1122,7 @@ static void cpu_hyp_reinit(void)
+ static void cpu_hyp_reset(void)
+ {
+ 	if (!is_kernel_in_hyp_mode())
+-		__cpu_reset_hyp_mode(hyp_default_vectors,
+-				     kvm_get_idmap_start());
++		__cpu_reset_hyp_mode();
+ }
  
-+	/*
-+	 * Not a kernel function, treat it as a stub hypercall.
-+	 * Compute the physical address for __kvm_handle_stub_hvc
-+	 * (as the code lives in the idmaped page) and branch there.
-+	 * We hijack ip (r12) as a tmp register.
-+	 */
-+	push	{r1}
-+	ldr	r1, =kimage_voffset
-+	ldr	r1, [r1]
-+	ldr	ip, =__kvm_handle_stub_hvc
-+	sub	ip, ip, r1
-+THUMB(	add	ip, ip, #1)
-+	pop	{r1}
-+
-+	bx	ip
-+
-+1:
- 	push	{lr}
+ static void _kvm_arch_hardware_enable(void *discard)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 2e493e9a671e..8c8aae7cfe19 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -361,8 +361,7 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+ 	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr);
+ }
  
- 	mov	lr, r0
-@@ -142,7 +161,7 @@ THUMB(	orr	lr, #1)
- 	blx	lr			@ Call the HYP function
- 
- 	pop	{lr}
--1:	eret
-+	eret
- 
- guest_trap:
- 	load_vcpu r0			@ Load VCPU pointer to r0
+-static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+-					phys_addr_t phys_idmap_start)
++static inline void __cpu_reset_hyp_mode(void)
+ {
+ 	extern void __hyp_reset_vectors(void);
+ 	__hyp_reset_vectors();
 -- 
 2.11.0
