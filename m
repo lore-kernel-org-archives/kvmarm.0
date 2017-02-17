@@ -1,25 +1,25 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 10/33] irqchip/gic-v4-its: Allow use of indirect VCPU
- tables
-Date: Fri, 17 Feb 2017 07:15:22 +0100
-Message-ID: <7d2009d9-ec84-f80a-443e-188a9933a256@redhat.com>
+Subject: Re: [RFC PATCH 09/33] irqchip/gic-v3-its: Split out property table
+ allocation
+Date: Fri, 17 Feb 2017 07:15:34 +0100
+Message-ID: <c98bf0f6-884a-3851-aefc-571b0cbce703@redhat.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-11-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-10-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA35240CE9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 01:14:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8A4440D16
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 01:14:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NM+oMRiWwI6w for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Feb 2017 01:14:38 -0500 (EST)
+ with ESMTP id TsgXc4LbU1YJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Feb 2017 01:14:48 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9236F40CDD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 01:14:38 -0500 (EST)
-In-Reply-To: <1484648454-21216-11-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E1CAB40CE9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 01:14:48 -0500 (EST)
+In-Reply-To: <1484648454-21216-10-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,69 +34,76 @@ Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Marc,
-
 On 17/01/2017 11:20, Marc Zyngier wrote:
-> The VCPU tables can be quite sparse as well, and it makes sense
-> to use indirect tables as well if possible.
+> Move the LPI property table allocation into its own function, as
+> this is going to be required for those associated with VMs in
+> the future.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  drivers/irqchip/irq-gic-v3-its.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
+>  drivers/irqchip/irq-gic-v3-its.c | 28 ++++++++++++++++++----------
+>  1 file changed, 18 insertions(+), 10 deletions(-)
 > 
 > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index c92ff4d..14305db1 100644
+> index b28fb19..c92ff4d 100644
 > --- a/drivers/irqchip/irq-gic-v3-its.c
 > +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -1060,10 +1060,13 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
->  	return 0;
+> @@ -889,15 +889,31 @@ static void its_lpi_free(struct event_lpi_map *map)
+>  	kfree(map->col_map);
 >  }
 >  
-> -static bool its_parse_baser_device(struct its_node *its, struct its_baser *baser,
-> -				   u32 psz, u32 *order)
-> +static bool its_parse_indirect_baser(struct its_node *its,
-> +				     struct its_baser *baser,
-> +				     u32 psz, u32 *order)
-nit: Personally I would keep the previous name since when I read the new
-one I have the impression indirect is always turned on.
+> +static struct page *its_allocate_prop_table(gfp_t gfp_flags)
+> +{
+> +	struct page *prop_page;
+> +
+> +	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
+> +	if (!prop_page)
+> +		return NULL;
+> +
+> +	/* Priority 0xa0, Group-1, disabled */
+> +	memset(page_address(prop_page),
+> +	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
+> +	       LPI_PROPBASE_SZ);
+> +
+> +	/* Make sure the GIC will observe the written configuration */
+> +	gic_flush_dcache_to_poc(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
+s/gic_rdists->prop_page/prop_page.
 
-Besides
+With that fix,
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
 
+
+>  
+> +	return prop_page;
+> +}
+>  
+>  
+>  static int __init its_alloc_lpi_tables(void)
 >  {
-> -	u64 esz = GITS_BASER_ENTRY_SIZE(its_read_baser(its, baser));
-> +	u64 tmp = its_read_baser(its, baser);
-> +	u64 type = GITS_BASER_TYPE(tmp);
-> +	u64 esz = GITS_BASER_ENTRY_SIZE(tmp);
->  	u64 val = GITS_BASER_InnerShareable | GITS_BASER_WaWb;
->  	u32 ids = its->device_ids;
->  	u32 new_order = *order;
-> @@ -1102,8 +1105,9 @@ static bool its_parse_baser_device(struct its_node *its, struct its_baser *baser
->  	if (new_order >= MAX_ORDER) {
->  		new_order = MAX_ORDER - 1;
->  		ids = ilog2(PAGE_ORDER_TO_SIZE(new_order) / (int)esz);
-> -		pr_warn("ITS@%pa: Device Table too large, reduce ids %u->%u\n",
-> -			&its->phys_base, its->device_ids, ids);
-> +		pr_warn("ITS@%pa: %s Table too large, reduce ids %u->%u\n",
-> +			&its->phys_base, its_base_type_string[type],
-> +			its->device_ids, ids);
->  	}
+>  	phys_addr_t paddr;
 >  
->  	*order = new_order;
-> @@ -1154,8 +1158,10 @@ static int its_alloc_tables(struct its_node *its)
->  		if (type == GITS_BASER_TYPE_NONE)
->  			continue;
+> -	gic_rdists->prop_page = alloc_pages(GFP_NOWAIT,
+> -					   get_order(LPI_PROPBASE_SZ));
+> +	gic_rdists->prop_page = its_allocate_prop_table(GFP_NOWAIT);
+>  	if (!gic_rdists->prop_page) {
+>  		pr_err("Failed to allocate PROPBASE\n");
+>  		return -ENOMEM;
+> @@ -906,14 +922,6 @@ static int __init its_alloc_lpi_tables(void)
+>  	paddr = page_to_phys(gic_rdists->prop_page);
+>  	pr_info("GIC: using LPI property table @%pa\n", &paddr);
 >  
-> -		if (type == GITS_BASER_TYPE_DEVICE)
-> -			indirect = its_parse_baser_device(its, baser, psz, &order);
-> +		if (type == GITS_BASER_TYPE_DEVICE ||
-> +		    type == GITS_BASER_TYPE_VCPU)
-> +			indirect = its_parse_indirect_baser(its, baser,
-> +							    psz, &order);
+> -	/* Priority 0xa0, Group-1, disabled */
+> -	memset(page_address(gic_rdists->prop_page),
+> -	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
+> -	       LPI_PROPBASE_SZ);
+> -
+> -	/* Make sure the GIC will observe the written configuration */
+> -	gic_flush_dcache_to_poc(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
+> -
+>  	return 0;
+>  }
 >  
->  		err = its_setup_baser(its, baser, cache, shr, psz, order, indirect);
->  		if (err < 0) {
 > 
