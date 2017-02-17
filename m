@@ -1,25 +1,25 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 09/33] irqchip/gic-v3-its: Split out property table
- allocation
-Date: Fri, 17 Feb 2017 07:15:34 +0100
-Message-ID: <c98bf0f6-884a-3851-aefc-571b0cbce703@redhat.com>
+Subject: Re: [RFC PATCH 08/33] irqchip/gic-v3-its: Implement
+ irq_set_irqchip_state for pending state
+Date: Fri, 17 Feb 2017 07:15:41 +0100
+Message-ID: <eeba615e-8e09-9f61-59db-905a6c2c8dbc@redhat.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-10-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-9-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8A4440D16
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 01:14:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 125C540D16
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 01:14:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TsgXc4LbU1YJ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Feb 2017 01:14:48 -0500 (EST)
+ with ESMTP id l0cB-Xm2zNmq for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Feb 2017 01:14:56 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E1CAB40CE9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 01:14:48 -0500 (EST)
-In-Reply-To: <1484648454-21216-10-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 26F5B40D25
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 01:14:56 -0500 (EST)
+In-Reply-To: <1484648454-21216-9-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,77 +33,137 @@ To: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm
 Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+
+
 On 17/01/2017 11:20, Marc Zyngier wrote:
-> Move the LPI property table allocation into its own function, as
-> this is going to be required for those associated with VMs in
-> the future.
+> Allow the pending state of an LPI to be set or cleared via
+> irq_set_irqchip_state.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 28 ++++++++++++++++++----------
->  1 file changed, 18 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index b28fb19..c92ff4d 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -889,15 +889,31 @@ static void its_lpi_free(struct event_lpi_map *map)
->  	kfree(map->col_map);
->  }
->  
-> +static struct page *its_allocate_prop_table(gfp_t gfp_flags)
-> +{
-> +	struct page *prop_page;
-> +
-> +	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
-> +	if (!prop_page)
-> +		return NULL;
-> +
-> +	/* Priority 0xa0, Group-1, disabled */
-> +	memset(page_address(prop_page),
-> +	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
-> +	       LPI_PROPBASE_SZ);
-> +
-> +	/* Make sure the GIC will observe the written configuration */
-> +	gic_flush_dcache_to_poc(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
-s/gic_rdists->prop_page/prop_page.
-
-With that fix,
-
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
 
 Eric
 
-
+> ---
+>  drivers/irqchip/irq-gic-v3-its.c | 78 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 78 insertions(+)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index 520b764..b28fb19 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -163,6 +163,11 @@ struct its_cmd_desc {
+>  		struct {
+>  			struct its_device *dev;
+>  			u32 event_id;
+> +		} its_clear_cmd;
+> +
+> +		struct {
+> +			struct its_device *dev;
+> +			u32 event_id;
+>  		} its_int_cmd;
 >  
-> +	return prop_page;
-> +}
->  
->  
->  static int __init its_alloc_lpi_tables(void)
->  {
->  	phys_addr_t paddr;
->  
-> -	gic_rdists->prop_page = alloc_pages(GFP_NOWAIT,
-> -					   get_order(LPI_PROPBASE_SZ));
-> +	gic_rdists->prop_page = its_allocate_prop_table(GFP_NOWAIT);
->  	if (!gic_rdists->prop_page) {
->  		pr_err("Failed to allocate PROPBASE\n");
->  		return -ENOMEM;
-> @@ -906,14 +922,6 @@ static int __init its_alloc_lpi_tables(void)
->  	paddr = page_to_phys(gic_rdists->prop_page);
->  	pr_info("GIC: using LPI property table @%pa\n", &paddr);
->  
-> -	/* Priority 0xa0, Group-1, disabled */
-> -	memset(page_address(gic_rdists->prop_page),
-> -	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
-> -	       LPI_PROPBASE_SZ);
-> -
-> -	/* Make sure the GIC will observe the written configuration */
-> -	gic_flush_dcache_to_poc(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
-> -
->  	return 0;
+>  		struct {
+> @@ -376,6 +381,40 @@ static struct its_collection *its_build_inv_cmd(struct its_cmd_block *cmd,
+>  	return col;
 >  }
 >  
+> +static struct its_collection *its_build_int_cmd(struct its_cmd_block *cmd,
+> +						struct its_cmd_desc *desc)
+> +{
+> +	struct its_collection *col;
+> +
+> +	col = dev_event_to_col(desc->its_int_cmd.dev,
+> +			       desc->its_int_cmd.event_id);
+> +
+> +	its_encode_cmd(cmd, GITS_CMD_INT);
+> +	its_encode_devid(cmd, desc->its_int_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_int_cmd.event_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +
+> +	return col;
+> +}
+> +
+> +static struct its_collection *its_build_clear_cmd(struct its_cmd_block *cmd,
+> +						  struct its_cmd_desc *desc)
+> +{
+> +	struct its_collection *col;
+> +
+> +	col = dev_event_to_col(desc->its_clear_cmd.dev,
+> +			       desc->its_clear_cmd.event_id);
+> +
+> +	its_encode_cmd(cmd, GITS_CMD_CLEAR);
+> +	its_encode_devid(cmd, desc->its_clear_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_clear_cmd.event_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +
+> +	return col;
+> +}
+> +
+>  static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
+>  						   struct its_cmd_desc *desc)
+>  {
+> @@ -530,6 +569,26 @@ static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
+>  static __its_send_single_cmd(its_send_single_command, its_cmd_builder_t,
+>  			     struct its_collection, its_build_sync_cmd)
+>  
+> +static void its_send_int(struct its_device *dev, u32 event_id)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_int_cmd.dev = dev;
+> +	desc.its_int_cmd.event_id = event_id;
+> +
+> +	its_send_single_command(dev->its, its_build_int_cmd, &desc);
+> +}
+> +
+> +static void its_send_clear(struct its_device *dev, u32 event_id)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_clear_cmd.dev = dev;
+> +	desc.its_clear_cmd.event_id = event_id;
+> +
+> +	its_send_single_command(dev->its, its_build_clear_cmd, &desc);
+> +}
+> +
+>  static void its_send_inv(struct its_device *dev, u32 event_id)
+>  {
+>  	struct its_cmd_desc desc;
+> @@ -693,6 +752,24 @@ static void its_irq_compose_msi_msg(struct irq_data *d, struct msi_msg *msg)
+>  	iommu_dma_map_msi_msg(d->irq, msg);
+>  }
+>  
+> +static int its_irq_set_irqchip_state(struct irq_data *d,
+> +				     enum irqchip_irq_state which,
+> +				     bool state)
+> +{
+> +	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+> +	u32 event = its_get_event_id(d);
+> +
+> +	if (which != IRQCHIP_STATE_PENDING)
+> +		return -EINVAL;
+> +
+> +	if (state)
+> +		its_send_int(its_dev, event);
+> +	else
+> +		its_send_clear(its_dev, event);
+> +
+> +	return 0;
+> +}
+> +
+>  static struct irq_chip its_irq_chip = {
+>  	.name			= "ITS",
+>  	.irq_mask		= its_mask_irq,
+> @@ -700,6 +777,7 @@ static struct irq_chip its_irq_chip = {
+>  	.irq_eoi		= irq_chip_eoi_parent,
+>  	.irq_set_affinity	= its_set_affinity,
+>  	.irq_compose_msi_msg	= its_irq_compose_msi_msg,
+> +	.irq_set_irqchip_state	= its_irq_set_irqchip_state,
+>  };
+>  
+>  /*
 > 
