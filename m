@@ -1,66 +1,85 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 18/20] arm/arm64: KVM: Simplify __cpu_reset_hyp_mode
-Date: Fri, 17 Feb 2017 15:44:27 +0000
-Message-ID: <20170217154429.5000-19-marc.zyngier@arm.com>
+Subject: [PATCH 19/20] arm/arm64: KVM: Remove kvm_get_idmap_start
+Date: Fri, 17 Feb 2017 15:44:28 +0000
+Message-ID: <20170217154429.5000-20-marc.zyngier@arm.com>
 References: <20170217154429.5000-1-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 88C3640FAE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 10:44:52 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Eq72jeTOJD2y for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Feb 2017 10:44:51 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DBBC40FAF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 10:44:50 -0500 (EST)
 In-Reply-To: <20170217154429.5000-1-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Russell King <linux@arm.linux.org.uk>, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Russell King <linux@arm.linux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-__cpu_reset_hyp_mode doesn't need to be passed any argument now,
-as the hyp-stub implementations are self-contained.
+With __cpu_reset_hyp_mode having become fairly dumb, there is no
+need for kvm_get_idmap_start anymore.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 3 +--
- arch/arm/kvm/arm.c                | 3 +--
- arch/arm64/include/asm/kvm_host.h | 3 +--
- 3 files changed, 3 insertions(+), 6 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   | 1 -
+ arch/arm/kvm/mmu.c               | 5 -----
+ arch/arm64/include/asm/kvm_mmu.h | 1 -
+ 3 files changed, 7 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 1962c5086897..370d7c6d6e7a 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -274,8 +274,7 @@ static inline void __cpu_init_stage2(void)
- 	kvm_call_hyp(__init_stage2_translation);
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 74a44727f8e1..646a4d4236ba 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -56,7 +56,6 @@ void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
+ 
+ phys_addr_t kvm_mmu_get_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+-phys_addr_t kvm_get_idmap_start(void);
+ int kvm_mmu_init(void);
+ void kvm_clear_hyp_idmap(void);
+ 
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index a5265edbeeab..12ab3372f240 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -1677,11 +1677,6 @@ phys_addr_t kvm_get_idmap_vector(void)
+ 	return hyp_idmap_vector;
  }
  
--static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
--					phys_addr_t phys_idmap_start)
-+static inline void __cpu_reset_hyp_mode(void)
+-phys_addr_t kvm_get_idmap_start(void)
+-{
+-	return hyp_idmap_start;
+-}
+-
+ static int kvm_map_idmap_text(pgd_t *pgd)
  {
- 	extern void __hyp_reset_vectors(void);
- 	__hyp_reset_vectors();
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 9d7446456e0c..00b5205e8955 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -1122,8 +1122,7 @@ static void cpu_hyp_reinit(void)
- static void cpu_hyp_reset(void)
- {
- 	if (!is_kernel_in_hyp_mode())
--		__cpu_reset_hyp_mode(hyp_default_vectors,
--				     kvm_get_idmap_start());
-+		__cpu_reset_hyp_mode();
- }
+ 	int err;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 6f72fe8b0e3e..ff1282344ece 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -155,7 +155,6 @@ void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
  
- static void _kvm_arch_hardware_enable(void *discard)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 2e493e9a671e..8c8aae7cfe19 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -361,8 +361,7 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
- 	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr);
- }
+ phys_addr_t kvm_mmu_get_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+-phys_addr_t kvm_get_idmap_start(void);
+ int kvm_mmu_init(void);
+ void kvm_clear_hyp_idmap(void);
  
--static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
--					phys_addr_t phys_idmap_start)
-+static inline void __cpu_reset_hyp_mode(void)
- {
- 	extern void __hyp_reset_vectors(void);
- 	__hyp_reset_vectors();
 -- 
 2.11.0
