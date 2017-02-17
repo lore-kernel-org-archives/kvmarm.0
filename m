@@ -1,21 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 00/20] arm/arm64: KVM: Rework the hyp-stub API
-Date: Fri, 17 Feb 2017 15:44:09 +0000
-Message-ID: <20170217154429.5000-1-marc.zyngier@arm.com>
+Subject: [PATCH 05/20] arm64: KVM: Convert __cpu_reset_hyp_mode to using
+ __hyp_reset_vectors
+Date: Fri, 17 Feb 2017 15:44:14 +0000
+Message-ID: <20170217154429.5000-6-marc.zyngier@arm.com>
+References: <20170217154429.5000-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EF6D40D8E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 10:44:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 882F840DA6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 10:44:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 58wHzQjxox-L for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Feb 2017 10:44:21 -0500 (EST)
+ with ESMTP id Y1JcoHCs9rOS for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Feb 2017 10:44:28 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A82DF40C66
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 10:44:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9664B40DC1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 10:44:28 -0500 (EST)
+In-Reply-To: <20170217154429.5000-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,75 +32,92 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Russell King <linux@arm.linux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As noticed by RMK in this thread[1], the hyp-stub API on 32bit ARM
-could do with some TLC (it cannot perform a soft-restart at HYP, and
-has holes in the hyp-stub support in a number of places).
+We are now able to use the hyp stub to reset HYP mode. Time to
+kiss __kvm_hyp_reset goodbye, and use __hyp_reset_vectors.
 
-This series implements the following:
-- Add HVC_[GS]ET_VECTORS and HVC_SOFT_RESTART to the 32bit code
-- Add HVC_RESET_VECTORS to both arm and arm64, removing the need for
-  __hyp_reset_vectors
-- Implement add the stub entry points in the KVM init code, which
-  didn't implement any so far
-- Convert the HYP code to use the init code stubs directly
-- Add some API documentation that covers the above
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/include/asm/kvm_asm.h  |  1 -
+ arch/arm64/include/asm/kvm_host.h |  4 ++--
+ arch/arm64/kvm/hyp-init.S         |  2 --
+ arch/arm64/kvm/hyp/hyp-entry.S    | 15 ---------------
+ 4 files changed, 2 insertions(+), 20 deletions(-)
 
-Patches 9 and 10 would be better squashed into 7 and 8, but I've kept
-separate so that I can take the blame for everything I've broken.
-
-This has been tested on arm and arm64, both as host and guest.
-
-[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2016-December/473472.html
-
-Marc Zyngier (18):
-  arm64: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
-  arm64: KVM: Implement HVC_RESET_VECTORS stub hypercall
-  arm64: KVM: Implement HVC_GET_VECTORS in the init code
-  arm64: KVM: Allow the main HYP code to use the init hyp stub
-    implementation
-  arm64: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
-  arm64: KVM: Implement HVC_SOFT_RESTART in the init code
-  ARM: KVM: Convert KVM to use HVC_GET_VECTORS
-  ARM: hyp-stub: Use r1 for the soft-restart address
-  ARM: Expose the VA/IDMAP offset
-  ARM: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
-  ARM: KVM: Implement HVC_RESET_VECTORS stub hypercall
-  ARM: KVM: Implement HVC_GET_VECTORS in the init code
-  ARM: KVM: Allow the main HYP code to use the init hyp stub
-    implementation
-  ARM: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
-  ARM: KVM: Implement HVC_SOFT_RESTART in the init code
-  arm/arm64: KVM: Simplify __cpu_reset_hyp_mode
-  arm/arm64: KVM: Remove kvm_get_idmap_start
-  arm/arm64: Add hyp-stub API documentation
-
-Russell King (2):
-  ARM: hyp-stub: improve ABI
-  ARM: soft-reboot into same mode that we entered the kernel
-
- Documentation/virtual/kvm/arm/hyp-abi.txt | 48 +++++++++++++++++++++++++
- arch/arm/include/asm/kvm_asm.h            |  2 --
- arch/arm/include/asm/kvm_host.h           |  6 ++--
- arch/arm/include/asm/kvm_mmu.h            |  1 -
- arch/arm/include/asm/proc-fns.h           |  4 +--
- arch/arm/include/asm/virt.h               | 11 ++++++
- arch/arm/kernel/hyp-stub.S                | 44 ++++++++++++++++++++---
- arch/arm/kernel/reboot.c                  |  7 ++--
- arch/arm/kvm/arm.c                        |  3 +-
- arch/arm/kvm/hyp/hyp-entry.S              | 29 +++++++++++++---
- arch/arm/kvm/init.S                       | 58 ++++++++++++++++++++++++++-----
- arch/arm/kvm/mmu.c                        |  5 ---
- arch/arm/mm/mmu.c                         |  5 +++
- arch/arm/mm/proc-v7.S                     | 12 ++++---
- arch/arm64/include/asm/kvm_asm.h          |  1 -
- arch/arm64/include/asm/kvm_host.h         |  7 ++--
- arch/arm64/include/asm/kvm_mmu.h          |  1 -
- arch/arm64/include/asm/virt.h             |  8 +++++
- arch/arm64/kernel/hyp-stub.S              | 13 ++++++-
- arch/arm64/kvm/hyp-init.S                 | 50 ++++++++++++++++++++------
- arch/arm64/kvm/hyp/hyp-entry.S            | 39 ++++++++++-----------
- 21 files changed, 278 insertions(+), 76 deletions(-)
- create mode 100644 Documentation/virtual/kvm/arm/hyp-abi.txt
-
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index ec3553eb9349..3e242f6613b3 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -47,7 +47,6 @@ struct kvm_vcpu;
+ 
+ extern char __kvm_hyp_init[];
+ extern char __kvm_hyp_init_end[];
+-extern char __kvm_hyp_reset[];
+ 
+ extern char __kvm_hyp_vector[];
+ 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e5050388e062..2e493e9a671e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -361,11 +361,11 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+ 	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr);
+ }
+ 
+-void __kvm_hyp_teardown(void);
+ static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+ 					phys_addr_t phys_idmap_start)
+ {
+-	kvm_call_hyp(__kvm_hyp_teardown, phys_idmap_start);
++	extern void __hyp_reset_vectors(void);
++	__hyp_reset_vectors();
+ }
+ 
+ static inline void kvm_arch_hardware_unsetup(void) {}
+diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
+index 2c7b86bb5483..d12a232abd81 100644
+--- a/arch/arm64/kvm/hyp-init.S
++++ b/arch/arm64/kvm/hyp-init.S
+@@ -134,7 +134,6 @@ ENTRY(__kvm_handle_stub_hvc)
+ 	/*
+ 	 * Reset kvm back to the hyp stub.
+ 	 */
+-ENTRY(__kvm_hyp_reset)
+ 	/* We're now in idmap, disable MMU */
+ 	mrs	x0, sctlr_el2
+ 	ldr	x1, =SCTLR_ELx_FLAGS
+@@ -151,7 +150,6 @@ ENTRY(__kvm_hyp_reset)
+ 
+ exit:
+ 	eret
+-ENDPROC(__kvm_hyp_reset)
+ ENDPROC(__kvm_handle_stub_hvc)
+ 
+ 	.ltorg
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 21eeb2552f33..1277f81b63b7 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -53,21 +53,6 @@ ENTRY(__vhe_hyp_call)
+ 	ret
+ ENDPROC(__vhe_hyp_call)
+ 
+-/*
+- * Compute the idmap address of __kvm_hyp_reset based on the idmap
+- * start passed as a parameter, and jump there.
+- *
+- * x0: HYP phys_idmap_start
+- */
+-ENTRY(__kvm_hyp_teardown)
+-	mov	x4, x0
+-	adr_l	x3, __kvm_hyp_reset
+-
+-	/* insert __kvm_hyp_reset()s offset into phys_idmap_start */
+-	bfi	x4, x3, #0, #PAGE_SHIFT
+-	br	x4
+-ENDPROC(__kvm_hyp_teardown)
+-	
+ el1_sync:				// Guest trapped into EL2
+ 	stp	x0, x1, [sp, #-16]!
+ 
 -- 
 2.11.0
