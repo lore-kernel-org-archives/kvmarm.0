@@ -1,23 +1,25 @@
-From: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH] KVM: race-free exit from KVM_RUN without POSIX signals
-Date: Thu, 16 Feb 2017 20:26:38 +0100
-Message-ID: <8a0f0818-07eb-c33e-9488-5a69c6bb67b1@redhat.com>
-References: <1487169821-14806-1-git-send-email-pbonzini@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC PATCH 10/33] irqchip/gic-v4-its: Allow use of indirect VCPU
+ tables
+Date: Fri, 17 Feb 2017 07:15:22 +0100
+Message-ID: <7d2009d9-ec84-f80a-443e-188a9933a256@redhat.com>
+References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-11-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33ADE40C8E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 14:25:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA35240CE9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 01:14:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Frct0czgFmmA for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Feb 2017 14:25:55 -0500 (EST)
+ with ESMTP id NM+oMRiWwI6w for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Feb 2017 01:14:38 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E29E40C21
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Feb 2017 14:25:55 -0500 (EST)
-In-Reply-To: <1487169821-14806-1-git-send-email-pbonzini@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9236F40CDD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Feb 2017 01:14:38 -0500 (EST)
+In-Reply-To: <1484648454-21216-11-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,30 +29,74 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: james.hogan@imgtec.com, marc.zyngier@arm.com, kvm-ppc@vger.kernel.org, borntraeger@de.ibm.com, paulus@samba.org, cornelia.huck@de.ibm.com, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
->  	post_kvm_run_save(vcpu);
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 7964b970b9ad..f51d5082a377 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -218,7 +218,8 @@ struct kvm_hyperv_exit {
->  struct kvm_run {
->  	/* in */
->  	__u8 request_interrupt_window;
-> -	__u8 padding1[7];
-> +	__u8 immediate_exit;
+Hi Marc,
 
-As mentioned already on IRC, maybe something like "block_vcpu_run" would
-fit better now.
+On 17/01/2017 11:20, Marc Zyngier wrote:
+> The VCPU tables can be quite sparse as well, and it makes sense
+> to use indirect tables as well if possible.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  drivers/irqchip/irq-gic-v3-its.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index c92ff4d..14305db1 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -1060,10 +1060,13 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+>  	return 0;
+>  }
+>  
+> -static bool its_parse_baser_device(struct its_node *its, struct its_baser *baser,
+> -				   u32 psz, u32 *order)
+> +static bool its_parse_indirect_baser(struct its_node *its,
+> +				     struct its_baser *baser,
+> +				     u32 psz, u32 *order)
+nit: Personally I would keep the previous name since when I read the new
+one I have the impression indirect is always turned on.
 
-But this is also ok and looks good to me.
+Besides
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
--- 
-Thanks,
+Eric
 
-David
+>  {
+> -	u64 esz = GITS_BASER_ENTRY_SIZE(its_read_baser(its, baser));
+> +	u64 tmp = its_read_baser(its, baser);
+> +	u64 type = GITS_BASER_TYPE(tmp);
+> +	u64 esz = GITS_BASER_ENTRY_SIZE(tmp);
+>  	u64 val = GITS_BASER_InnerShareable | GITS_BASER_WaWb;
+>  	u32 ids = its->device_ids;
+>  	u32 new_order = *order;
+> @@ -1102,8 +1105,9 @@ static bool its_parse_baser_device(struct its_node *its, struct its_baser *baser
+>  	if (new_order >= MAX_ORDER) {
+>  		new_order = MAX_ORDER - 1;
+>  		ids = ilog2(PAGE_ORDER_TO_SIZE(new_order) / (int)esz);
+> -		pr_warn("ITS@%pa: Device Table too large, reduce ids %u->%u\n",
+> -			&its->phys_base, its->device_ids, ids);
+> +		pr_warn("ITS@%pa: %s Table too large, reduce ids %u->%u\n",
+> +			&its->phys_base, its_base_type_string[type],
+> +			its->device_ids, ids);
+>  	}
+>  
+>  	*order = new_order;
+> @@ -1154,8 +1158,10 @@ static int its_alloc_tables(struct its_node *its)
+>  		if (type == GITS_BASER_TYPE_NONE)
+>  			continue;
+>  
+> -		if (type == GITS_BASER_TYPE_DEVICE)
+> -			indirect = its_parse_baser_device(its, baser, psz, &order);
+> +		if (type == GITS_BASER_TYPE_DEVICE ||
+> +		    type == GITS_BASER_TYPE_VCPU)
+> +			indirect = its_parse_indirect_baser(its, baser,
+> +							    psz, &order);
+>  
+>  		err = its_setup_baser(its, baser, cache, shr, psz, order, indirect);
+>  		if (err < 0) {
+> 
