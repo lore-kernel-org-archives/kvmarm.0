@@ -1,27 +1,23 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 13/20] ARM: KVM: Implement HVC_RESET_VECTORS stub hypercall
-Date: Sun, 19 Feb 2017 11:42:02 +0000
-Message-ID: <CAKv+Gu96uNzqvV0KabJWmnr-9NBcifeh+-9mCEFga7BY+gyQ8g@mail.gmail.com>
-References: <20170217154429.5000-1-marc.zyngier@arm.com>
- <20170217154429.5000-14-marc.zyngier@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH 2/2] arm64/kvm: survive unknown traps from guests
+Date: Mon, 20 Feb 2017 12:30:12 +0000
+Message-ID: <1487593812-9174-3-git-send-email-mark.rutland@arm.com>
+References: <1487593812-9174-1-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87C9940F8A
- for <kvmarm@lists.cs.columbia.edu>; Sun, 19 Feb 2017 06:41:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8EDA40C5D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Feb 2017 07:29:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eQg0RaFw0O3X for <kvmarm@lists.cs.columbia.edu>;
- Sun, 19 Feb 2017 06:41:10 -0500 (EST)
-Received: from mail-it0-f43.google.com (mail-it0-f43.google.com
- [209.85.214.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D89A140F89
- for <kvmarm@lists.cs.columbia.edu>; Sun, 19 Feb 2017 06:41:10 -0500 (EST)
-Received: by mail-it0-f43.google.com with SMTP id 203so1257243ith.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 19 Feb 2017 03:42:03 -0800 (PST)
-In-Reply-To: <20170217154429.5000-14-marc.zyngier@arm.com>
+ with ESMTP id bBsmviDFSCOI for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Feb 2017 07:29:29 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 356DA40B3E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Feb 2017 07:29:29 -0500 (EST)
+In-Reply-To: <1487593812-9174-1-git-send-email-mark.rutland@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,127 +27,73 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Russell King <linux@arm.linux.org.uk>, KVM devel mailing list <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, dave.martin@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17 February 2017 at 15:44, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> In order to restore HYP mode to its original condition, KVM currently
-> implements __kvm_hyp_reset(). As we're moving towards a hyp-stub
-> defined API, it becomes necessary to implement HVC_RESET_VECTORS.
->
-> This patch adds the HVC_RESET_VECTORS hypercall to the KVM init
-> code, which so far lacked any form of hypercall support.
->
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm/kernel/hyp-stub.S |  1 +
->  arch/arm/kvm/init.S        | 37 +++++++++++++++++++++++++++++++------
->  2 files changed, 32 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
-> index cf6d801f89e8..171a09cdf6b3 100644
-> --- a/arch/arm/kernel/hyp-stub.S
-> +++ b/arch/arm/kernel/hyp-stub.S
-> @@ -280,6 +280,7 @@ ENDPROC(__hyp_reset_vectors)
->
->  .align 5
->  __hyp_stub_vectors:
-> +.global __hyp_stub_vectors
+Currently we BUG() if we see an ESR_EL2.EC value we don't recognise. As
+configurable disables/enables are added to the architecture (controlled
+by RES1/RES0 bits respectively), with associated synchronous exceptions,
+it may be possible for a guest to trigger exceptions with classes that
+we don't recognise.
 
-Oh, and (nit:) perhaps use
+While we can't service these exceptions in a manner useful to the guest,
+we can avoid bringing down the host. Per ARM DDI 0487A.k_iss10775, page
+D7-1937, EC values within the range 0x00 - 0x2c are reserved for future
+use with synchronous exceptions, and EC values within the range 0x2d -
+0x3f may be used for either synchronous or asynchronous exceptions.
 
-ENTRY(__hyp_stub_vectors)
+The patch makes KVM handle any unknown EC by injecting an UNDEFINED
+exception into the guest, with a corresponding (ratelimited) warning in
+the host dmesg. We could later improve on this with with a new (opt-in)
+exit to the host userspace.
 
-here?
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Dave Martin <dave.martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ arch/arm64/kvm/handle_exit.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
->  __hyp_stub_reset:      W(b)    .
->  __hyp_stub_und:                W(b)    .
->  __hyp_stub_svc:                W(b)    .
-> diff --git a/arch/arm/kvm/init.S b/arch/arm/kvm/init.S
-> index bf89c919efc1..b0138118fac4 100644
-> --- a/arch/arm/kvm/init.S
-> +++ b/arch/arm/kvm/init.S
-> @@ -23,6 +23,7 @@
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/virt.h>
->
->  /********************************************************************
->   * Hypervisor initialization
-> @@ -39,6 +40,10 @@
->   * - Setup the page tables
->   * - Enable the MMU
->   * - Profit! (or eret, if you only care about the code).
-> + *
-> + * Another possibility is to get a HYP stub hypercall.
-> + * We discriminate between the two by checking if r0 contains a value
-> + * that is less than HVC_STUB_HCALL_NR.
->   */
->
->         .text
-> @@ -58,6 +63,10 @@ __kvm_hyp_init:
->         W(b)    .
->
->  __do_hyp_init:
-> +       @ Check for a stub hypercall
-> +       cmp     r0, #HVC_STUB_HCALL_NR
-> +       blo     __kvm_handle_stub_hvc
-> +
->         @ Set stack pointer
->         mov     sp, r0
->
-> @@ -112,22 +121,38 @@ __do_hyp_init:
->
->         eret
->
-> -       @ r0 : stub vectors address
-> +ENTRY(__kvm_handle_stub_hvc)
-> +       cmp     r0, #HVC_RESET_VECTORS
-> +       bne     1f
->  ENTRY(__kvm_hyp_reset)
->         /* We're now in idmap, disable MMU */
->         mrc     p15, 4, r1, c1, c0, 0   @ HSCTLR
-> -       ldr     r2, =(HSCTLR_M | HSCTLR_A | HSCTLR_C | HSCTLR_I)
-> -       bic     r1, r1, r2
-> +       ldr     r0, =(HSCTLR_M | HSCTLR_A | HSCTLR_C | HSCTLR_I)
-> +       bic     r1, r1, r0
->         mcr     p15, 4, r1, c1, c0, 0   @ HSCTLR
->
-> -       /* Install stub vectors */
-> -       mcr     p15, 4, r0, c12, c0, 0  @ HVBAR
-> -       isb
-> +       /*
-> +        * Install stub vectors. We cannot use 'adr' to get to the
-> +        * stub vectors, hence having to play the VA->PA game.
-> +        */
-> +       adr     r0, .L__va2pa   @ PA
-> +       ldr     r1, [r0]        @ VA
-> +       sub     r0, r0, r1      @ PA - VA
-> +       ldr     r1, =__hyp_stub_vectors
-> +       add     r1, r1, r0
-> +       mcr     p15, 4, r1, c12, c0, 0  @ HVBAR
-> +       b       exit
-> +
-> +1:     mov     r0, #-1
->
-> +exit:
->         eret
-> +ENDPROC(__kvm_handle_stub_hvc)
->  ENDPROC(__kvm_hyp_reset)
->
->         .ltorg
-> +.L__va2pa:
-> +       .word   .
->
->         .globl __kvm_hyp_init_end
->  __kvm_hyp_init_end:
-> --
-> 2.11.0
->
->
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 1bfe30d..fa1b18e 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -135,7 +135,19 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	return ret;
+ }
+ 
++static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	u32 hsr = kvm_vcpu_get_hsr(vcpu);
++
++	kvm_pr_unimpl("Unknown exception class: hsr: %#08x -- %s\n",
++		      hsr, esr_get_class_string(hsr));
++
++	kvm_inject_undefined(vcpu);
++	return 1;
++}
++
+ static exit_handle_fn arm_exit_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+ 	[ESR_ELx_EC_CP15_32]	= kvm_handle_cp15_32,
+ 	[ESR_ELx_EC_CP15_64]	= kvm_handle_cp15_64,
+@@ -162,13 +174,6 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+ 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
+ 	u8 hsr_ec = ESR_ELx_EC(hsr);
+ 
+-	if (hsr_ec >= ARRAY_SIZE(arm_exit_handlers) ||
+-	    !arm_exit_handlers[hsr_ec]) {
+-		kvm_err("Unknown exception class: hsr: %#08x -- %s\n",
+-			hsr, esr_get_class_string(hsr));
+-		BUG();
+-	}
+-
+ 	return arm_exit_handlers[hsr_ec];
+ }
+ 
+-- 
+1.9.1
