@@ -1,95 +1,110 @@
-From: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Subject: Re: [PATCH V10 05/10] acpi: apei: handle SEA notification type for
- ARMv8
-Date: Tue, 21 Feb 2017 09:52:54 -0700
-Message-ID: <8c6130c4-7ccd-1f8a-7c7b-7d097f9b298a@codeaurora.org>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH V10 07/10] efi: print unrecognized CPER section
+Date: Tue, 21 Feb 2017 19:10:11 +0000
+Message-ID: <58AC9093.5020303@arm.com>
 References: <1487188282-2568-1-git-send-email-tbaicar@codeaurora.org>
- <1487188282-2568-6-git-send-email-tbaicar@codeaurora.org>
- <CAKv+Gu_+w4UW4ds-2hLe+c36Ch+H4Zx-pMzrkTkqDYbzTHrxnA@mail.gmail.com>
+ <1487188282-2568-8-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu_+w4UW4ds-2hLe+c36Ch+H4Zx-pMzrkTkqDYbzTHrxnA@mail.gmail.com>
-Sender: linux-acpi-owner@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Len Brown <lenb@kernel.org>, Matt Fleming <matt@codeblueprint.co.uk>, Robert Moore <robert.moore@intel.com>, Lv Zheng <lv.zheng@intel.com>, nkaje@codeaurora.org, "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Andrew Morton <akpm@linux-foundation.org>, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, Laura Abbott <labbott@redhat.com>, shijie.huang@arm.comRichard Ruigrok <r>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6393440BBB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Feb 2017 14:09:27 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2RDsmMNg1PDI for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Feb 2017 14:09:26 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 156EC40625
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Feb 2017 14:09:25 -0500 (EST)
+In-Reply-To: <1487188282-2568-8-git-send-email-tbaicar@codeaurora.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hello Ard,
+Hi Tyler,
+
+On 15/02/17 19:51, Tyler Baicar wrote:
+> UEFI spec allows for non-standard section in Common Platform Error
+> Record. This is defined in section N.2.3 of UEFI version 2.5.
+> 
+> Currently if the CPER section's type (UUID) does not match with
+> one of the section types that the kernel knows how to parse, the
+> section is skipped. Therefore, user is not able to see
+> such CPER data, for instance, error record of non-standard section.
+> 
+> For above mentioned case, this change prints out the raw data in
+> hex in dmesg buffer. Data length is taken from Error Data length
+> field of Generic Error Data Entry.
+> 
+> Following is a sample output from dmesg:
+> [  115.771702] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 2
+> [  115.779042] {1}[Hardware Error]: It has been corrected by h/w and requires no further action
+> [  115.787456] {1}[Hardware Error]: event severity: corrected
+> [  115.792927] {1}[Hardware Error]:  Error 0, type: corrected
+> [  115.798415] {1}[Hardware Error]:  fru_id: 00000000-0000-0000-0000-000000000000
+> [  115.805596] {1}[Hardware Error]:  fru_text:
+> [  115.816105] {1}[Hardware Error]:  section type: d2e2621c-f936-468d-0d84-15a4ed015c8b
+> [  115.823880] {1}[Hardware Error]:  section length: 88
+> [  115.828779] {1}[Hardware Error]:   00000000: 01000001 00000002 5f434345 525f4543
+> [  115.836153] {1}[Hardware Error]:   00000010: 0000574d 00000000 00000000 00000000
+> [  115.843531] {1}[Hardware Error]:   00000020: 00000000 00000000 00000000 00000000
+> [  115.850908] {1}[Hardware Error]:   00000030: 00000000 00000000 00000000 00000000
+> [  115.858288] {1}[Hardware Error]:   00000040: fe800000 00000000 00000004 5f434345
+> [  115.865665] {1}[Hardware Error]:   00000050: 525f4543 0000574d
+
+The use-case for this is to capture the data and decode it with a vendor tool?
+(if so, please mention that in the commit message!)
 
 
-On 2/16/2017 11:32 AM, Ard Biesheuvel wrote:
-> On 15 February 2017 at 19:51, Tyler Baicar <tbaicar@codeaurora.org> wrote:
->> ARM APEI extension proposal added SEA (Synchronous External Abort)
->> notification type for ARMv8.
->> Add a new GHES error source handling function for SEA. If an error
->> source's notification type is SEA, then this function can be registered
->> into the SEA exception handler. That way GHES will parse and report
->> SEA exceptions when they occur.
->> An SEA can interrupt code that had interrupts masked and is treated as
->> an NMI. To aid this the page of address space for mapping APEI buffers
->> while in_nmi() is always reserved, and ghes_ioremap_pfn_nmi() is
->> changed to use the helper methods to find the prot_t to map with in
->> the same way as ghes_ioremap_pfn_irq().
->>
->> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
->> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
->> Signed-off-by: Naveen Kaje <nkaje@codeaurora.org>
->> ---
->>   arch/arm64/Kconfig        |  2 ++
->>   arch/arm64/mm/fault.c     | 13 ++++++++
->>   drivers/acpi/apei/Kconfig | 14 +++++++++
->>   drivers/acpi/apei/ghes.c  | 77 +++++++++++++++++++++++++++++++++++++++++++----
->>   include/acpi/ghes.h       |  7 +++++
->>   5 files changed, 107 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
->> index 1117421..8557556 100644
->> --- a/arch/arm64/Kconfig
->> +++ b/arch/arm64/Kconfig
->>
->> @@ -498,6 +500,17 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
->>          pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
->>                   fault_name(esr), esr, addr);
->>
->> +       /*
->> +        * Synchronous aborts may interrupt code which had interrupts masked.
->> +        * Before calling out into the wider kernel tell the interested
->> +        * subsystems.
->> +        */
->> +       if(IS_ENABLED(HAVE_ACPI_APEI_SEA)) {
-> Missing space after 'if'
-I'll add that in.
->> +               nmi_enter();
->> +               ghes_notify_sea();
->> +               nmi_exit();
->> +       }
->> +
->>          info.si_signo = SIGBUS;
->>          info.si_errno = 0;
->>          info.si_code  = 0;
->> diff --git a/drivers/acpi/apei/Kconfig b/drivers/acpi/apei/Kconfig
->> index b0140c8..ef7f7bd 100644
->> --- a/drivers/acpi/apei/Kconfig
->> +++ b/drivers/acpi/apei/Kconfig
->> @@ -4,6 +4,20 @@ config HAVE_ACPI_APEI
->>   config HAVE_ACPI_APEI_NMI
->>          bool
->>
->> +config HAVE_ACPI_APEI_SEA
-> HAVE_xxx Kconfig options are typically non user selectable, so I
-> suggest to drop the HAVE_ prefix here. Also, you should probably make
-> it 'default y' rather than select it elsewhere; this will still honour
-> the dependency on ARM64 && ACPI_APEI_GHES
->
-Okay, I will drop the HAVE_ and add in the default y
+> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
+> index c2b0a12..48cb8ee 100644
+> --- a/drivers/firmware/efi/cper.c
+> +++ b/drivers/firmware/efi/cper.c
+> @@ -591,8 +591,16 @@ static void cper_estatus_print_section(
+>  			cper_print_proc_arm(newpfx, arm_err);
+>  		else
+>  			goto err_section_too_small;
+> -	} else
+> -		printk("%s""section type: unknown, %pUl\n", newpfx, sec_type);
+
+Nit: Its odd that you remove the 'unknown' from this, but we don't get told what
+it is, so surely its still unknown.
+
+
+> +	} else {
+> +		const void *unknown_err;
+> +
+> +		unknown_err = acpi_hest_generic_data_payload(gdata);
+> +		printk("%ssection type: %pUl\n", newpfx, sec_type);
+> +		printk("%ssection length: %d\n", newpfx,
+
+Nit: please use the "%s""section... that this file consistently uses. This means
+this code will still work as expected when someone adds '%ss' support to printk!
+
+
+> +		       gdata->error_data_length);
+> +		print_hex_dump(newpfx, "", DUMP_PREFIX_OFFSET, 16, 4,
+> +			       unknown_err, gdata->error_data_length, 0);
+> +	}
+>  
+>  	return;
+
+
+FWIW:
+Reviewed-by: James Morse <james.morse@arm.com>
+
 
 Thanks,
-Tyler
 
--- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
-
+James
