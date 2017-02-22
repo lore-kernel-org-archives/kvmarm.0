@@ -1,28 +1,27 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC 40/55] KVM: arm/arm64: Handle vttbr_el2 write operation
- from the guest hypervisor
-Date: Wed, 22 Feb 2017 18:59:46 +0100
-Message-ID: <20170222175946.GV26976@cbox>
+Subject: Re: [RFC 41/55] KVM: arm/arm64: Unmap/flush shadow stage 2 page tables
+Date: Wed, 22 Feb 2017 19:09:02 +0100
+Message-ID: <20170222180902.GW26976@cbox>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <1483943091-1364-41-git-send-email-jintack@cs.columbia.edu>
+ <1483943091-1364-42-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B860040C72
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 12:59:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9798C40C8E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 13:08:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Uc96RqV8ks6o for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Feb 2017 12:59:01 -0500 (EST)
-Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA97A40C58
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 12:59:01 -0500 (EST)
-Received: by mail-wm0-f52.google.com with SMTP id v77so5718558wmv.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 10:00:00 -0800 (PST)
+ with ESMTP id qujMbTQRdpCV for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Feb 2017 13:08:18 -0500 (EST)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D099040C74
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 13:08:17 -0500 (EST)
+Received: by mail-wm0-f51.google.com with SMTP id v186so148161191wmd.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 10:09:16 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1483943091-1364-41-git-send-email-jintack@cs.columbia.edu>
+In-Reply-To: <1483943091-1364-42-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,145 +35,261 @@ To: Jintack Lim <jintack@cs.columbia.edu>
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, andre.przywara@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 09, 2017 at 01:24:36AM -0500, Jintack Lim wrote:
-> Each nested VM is supposed to have a mmu (i.e. shadow stage-2 page
+On Mon, Jan 09, 2017 at 01:24:37AM -0500, Jintack Lim wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> Unmap/flush shadow stage 2 page tables for the nested VMs as well as the
+> stage 2 page table for the guest hypervisor.
+> 
+> Note: A bunch of the code in mmu.c relating to MMU notifiers is
+> currently dealt with in an extremely abrupt way, for example by clearing
+> out an entire shadow stage-2 table.  Probably we can do smarter with
+> some sort of rmap structure.
 
-to have a 'struct kvm_mmu' ?
-
-> table), and we create it when the guest hypervisor writes to vttbr_el2
-> with a new vmid.
-
-I think the commit message should also mention that you maintain a list
-of seen nested stage 2 translation contexts and associated shadow page
-tables.
+I think we need to do better than this patch for merging something
+upstream.  At least the current approach will not perform well if we run
+more than one guest hypervisor on the system.
 
 > 
-> In case the guest hypervisor writes to vttbr_el2 with existing vmid, we
-> check if the base address is changed. If so, then what we have in the
-> shadow page table is not valid any more. So ummap it.
-
-unmap?  We clear the entire shadow stage 2 page table, right?
-
-> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 > ---
->  arch/arm/include/asm/kvm_host.h   |  1 +
->  arch/arm/kvm/arm.c                |  1 +
->  arch/arm64/include/asm/kvm_host.h |  1 +
->  arch/arm64/include/asm/kvm_mmu.h  |  6 ++++
->  arch/arm64/kvm/mmu-nested.c       | 71 +++++++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c         | 15 ++++++++-
->  6 files changed, 94 insertions(+), 1 deletion(-)
+>  arch/arm/include/asm/kvm_mmu.h   |  7 ++++
+>  arch/arm/kvm/arm.c               |  6 ++-
+>  arch/arm/kvm/mmu.c               | 11 +++++
+>  arch/arm64/include/asm/kvm_mmu.h | 13 ++++++
+>  arch/arm64/kvm/mmu-nested.c      | 90 ++++++++++++++++++++++++++++++++++++----
+>  5 files changed, 117 insertions(+), 10 deletions(-)
 > 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index fbde48d..ebf2810 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -84,6 +84,7 @@ struct kvm_arch {
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index 1b3309c..ae3aa39 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -230,6 +230,13 @@ static inline unsigned int kvm_get_vmid_bits(void)
+>  	return 8;
+>  }
 >  
->  	/* Never used on arm but added to be compatible with arm64 */
->  	struct list_head nested_mmu_list;
-> +	spinlock_t mmu_list_lock;
->  
->  	/* Interrupt controller */
->  	struct vgic_dist	vgic;
+> +static inline void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu) { }
+> +static inline int kvm_nested_s2_init(struct kvm_vcpu *vcpu) { return 0; }
+> +static inline void kvm_nested_s2_teardown(struct kvm_vcpu *vcpu) { }
+> +static inline void kvm_nested_s2_all_vcpus_wp(struct kvm *kvm) { }
+> +static inline void kvm_nested_s2_all_vcpus_unmap(struct kvm *kvm) { }
+> +static inline void kvm_nested_s2_all_vcpus_flush(struct kvm *kvm) { }
+> +
+>  static inline u64 kvm_get_vttbr(struct kvm_s2_vmid *vmid,
+>  				struct kvm_s2_mmu *mmu)
+>  {
 > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 147df97..6fa5754 100644
+> index 6fa5754..dc2795f 100644
 > --- a/arch/arm/kvm/arm.c
 > +++ b/arch/arm/kvm/arm.c
-> @@ -147,6 +147,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	kvm->arch.mmu.vmid.vmid_gen = 0;
->  	kvm->arch.mmu.el2_vmid.vmid_gen = 0;
->  	INIT_LIST_HEAD(&kvm->arch.nested_mmu_list);
-> +	spin_lock_init(&kvm->arch.mmu_list_lock);
+> @@ -191,6 +191,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
 >  
->  	/* The maximum number of VCPUs is limited by the host's GIC model */
->  	kvm->arch.max_vcpus = vgic_present ?
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 23e2267..52eea76 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -99,6 +99,7 @@ struct kvm_arch {
+>  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+>  		if (kvm->vcpus[i]) {
+> +			kvm_nested_s2_teardown(kvm->vcpus[i]);
+>  			kvm_arch_vcpu_free(kvm->vcpus[i]);
+>  			kvm->vcpus[i] = NULL;
+>  		}
+> @@ -333,6 +334,7 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
 >  
->  	/* Stage 2 shadow paging contexts for nested L2 VM */
->  	struct list_head nested_mmu_list;
-> +	spinlock_t mmu_list_lock;
+>  	vcpu->arch.hw_mmu = mmu;
+>  	vcpu->arch.hw_vttbr = kvm_get_vttbr(&mmu->vmid, mmu);
+> +	kvm_nested_s2_init(vcpu);
+>  
+>  	return 0;
+>  }
+> @@ -871,8 +873,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
+>  	 * guest MMU is turned off and flush the caches as needed.
+>  	 */
+> -	if (vcpu->arch.has_run_once)
+> +	if (vcpu->arch.has_run_once) {
+>  		stage2_unmap_vm(vcpu->kvm);
+> +		kvm_nested_s2_unmap(vcpu);
+> +	}
+>  
+>  	vcpu_reset_hcr(vcpu);
+>  
+> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> index 98b42e8..1677a87 100644
+> --- a/arch/arm/kvm/mmu.c
+> +++ b/arch/arm/kvm/mmu.c
+> @@ -416,6 +416,8 @@ static void stage2_flush_vm(struct kvm *kvm)
+>  	kvm_for_each_memslot(memslot, slots)
+>  		stage2_flush_memslot(&kvm->arch.mmu, memslot);
+>  
+> +	kvm_nested_s2_all_vcpus_flush(kvm);
+> +
+>  	spin_unlock(&kvm->mmu_lock);
+>  	srcu_read_unlock(&kvm->srcu, idx);
+>  }
+> @@ -1240,6 +1242,7 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
+>  
+>  	spin_lock(&kvm->mmu_lock);
+>  	kvm_stage2_wp_range(kvm, &kvm->arch.mmu, start, end);
+> +	kvm_nested_s2_all_vcpus_wp(kvm);
+>  	spin_unlock(&kvm->mmu_lock);
+>  	kvm_flush_remote_tlbs(kvm);
+>  }
+> @@ -1278,6 +1281,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>  		gfn_t gfn_offset, unsigned long mask)
+>  {
+>  	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
+> +	kvm_nested_s2_all_vcpus_wp(kvm);
+>  }
+>  
+>  static void coherent_cache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
+> @@ -1604,6 +1608,7 @@ static int handle_hva_to_gpa(struct kvm *kvm,
+>  static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
+>  {
+>  	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, PAGE_SIZE);
+> +	kvm_nested_s2_all_vcpus_unmap(kvm);
+>  	return 0;
+>  }
+>  
+> @@ -1642,6 +1647,7 @@ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
+>  	 * through this calling path.
+>  	 */
+>  	stage2_set_pte(&kvm->arch.mmu, NULL, gpa, pte, 0);
+> +	kvm_nested_s2_all_vcpus_unmap(kvm);
+>  	return 0;
+>  }
+>  
+> @@ -1675,6 +1681,8 @@ static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
+>  	if (pte_none(*pte))
+>  		return 0;
+>  
+> +	/* TODO: Handle nested_mmu structures here as well */
+> +
+>  	return stage2_ptep_test_and_clear_young(pte);
+>  }
+>  
+> @@ -1694,6 +1702,8 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
+>  	if (!pte_none(*pte))		/* Just a page... */
+>  		return pte_young(*pte);
+>  
+> +	/* TODO: Handle nested_mmu structures here as well */
 
-I'm wondering if we really need the separate spin lock or if we could
-just grab the KVM mutex?
+These TODO's should be addresses somehow as well.
 
->  };
+> +
+>  	return 0;
+>  }
 >  
->  #define KVM_NR_MEM_OBJS     40
+> @@ -1959,6 +1969,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+>  
+>  	spin_lock(&kvm->mmu_lock);
+>  	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
+> +	kvm_nested_s2_all_vcpus_unmap(kvm);
+>  	spin_unlock(&kvm->mmu_lock);
+>  }
+>  
 > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index d1ef650..fdc9327 100644
+> index fdc9327..e4d5d54 100644
 > --- a/arch/arm64/include/asm/kvm_mmu.h
 > +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -327,6 +327,7 @@ static inline unsigned int kvm_get_vmid_bits(void)
->  #ifdef CONFIG_KVM_ARM_NESTED_HYP
+> @@ -328,6 +328,12 @@ static inline unsigned int kvm_get_vmid_bits(void)
 >  struct kvm_nested_s2_mmu *get_nested_mmu(struct kvm_vcpu *vcpu, u64 vttbr);
 >  struct kvm_s2_mmu *vcpu_get_active_s2_mmu(struct kvm_vcpu *vcpu);
-> +bool handle_vttbr_update(struct kvm_vcpu *vcpu, u64 vttbr);
+>  bool handle_vttbr_update(struct kvm_vcpu *vcpu, u64 vttbr);
+> +void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu);
+> +int kvm_nested_s2_init(struct kvm_vcpu *vcpu);
+> +void kvm_nested_s2_teardown(struct kvm_vcpu *vcpu);
+> +void kvm_nested_s2_all_vcpus_wp(struct kvm *kvm);
+> +void kvm_nested_s2_all_vcpus_unmap(struct kvm *kvm);
+> +void kvm_nested_s2_all_vcpus_flush(struct kvm *kvm);
 >  #else
 >  static inline struct kvm_nested_s2_mmu *get_nested_mmu(struct kvm_vcpu *vcpu,
 >  						       u64 vttbr)
-> @@ -337,6 +338,11 @@ static inline struct kvm_s2_mmu *vcpu_get_active_s2_mmu(struct kvm_vcpu *vcpu)
+> @@ -343,6 +349,13 @@ static inline bool handle_vttbr_update(struct kvm_vcpu *vcpu, u64 vttbr)
 >  {
->  	return &vcpu->kvm->arch.mmu;
+>  	return false;
 >  }
 > +
-> +static inline bool handle_vttbr_update(struct kvm_vcpu *vcpu, u64 vttbr)
-> +{
-> +	return false;
-> +}
+> +static inline void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu) { }
+> +static inline int kvm_nested_s2_init(struct kvm_vcpu *vcpu) { return 0; }
+> +static inline void kvm_nested_s2_teardown(struct kvm_vcpu *vcpu) { }
+> +static inline void kvm_nested_s2_all_vcpus_wp(struct kvm *kvm) { }
+> +static inline void kvm_nested_s2_all_vcpus_unmap(struct kvm *kvm) { }
+> +static inline void kvm_nested_s2_all_vcpus_flush(struct kvm *kvm) { }
 >  #endif
 >  
 >  static inline u64 kvm_get_vttbr(struct kvm_s2_vmid *vmid,
 > diff --git a/arch/arm64/kvm/mmu-nested.c b/arch/arm64/kvm/mmu-nested.c
-> index d52078f..0811d94 100644
+> index 0811d94..b22b78c 100644
 > --- a/arch/arm64/kvm/mmu-nested.c
 > +++ b/arch/arm64/kvm/mmu-nested.c
-> @@ -53,3 +53,74 @@ struct kvm_s2_mmu *vcpu_get_active_s2_mmu(struct kvm_vcpu *vcpu)
+> @@ -1,6 +1,7 @@
+>  /*
+>   * Copyright (C) 2016 - Columbia University
+>   * Author: Jintack Lim <jintack@cs.columbia.edu>
+> + * Author: Christoffer Dall <cdall@cs.columbia.edu>
+>   *
+>   * This program is free software; you can redistribute it and/or modify
+>   * it under the terms of the GNU General Public License version 2 as
+> @@ -22,6 +23,86 @@
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/kvm_nested.h>
 >  
->  	return &nested_mmu->mmu;
->  }
 > +
-> +static struct kvm_nested_s2_mmu *create_nested_mmu(struct kvm_vcpu *vcpu,
-> +						   u64 vttbr)
+> +/* expects kvm->mmu_lock to be held */
+> +void kvm_nested_s2_all_vcpus_wp(struct kvm *kvm)
 > +{
-> +	struct kvm_nested_s2_mmu *nested_mmu, *tmp_mmu;
-> +	struct list_head *nested_mmu_list = &vcpu->kvm->arch.nested_mmu_list;
-> +	bool need_free = false;
-> +	int ret;
+> +	int i;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_nested_s2_mmu *nested_mmu;
+> +	struct list_head *nested_mmu_list;
 > +
-> +	nested_mmu = kzalloc(sizeof(struct kvm_nested_s2_mmu), GFP_KERNEL);
-> +	if (!nested_mmu)
-> +		return NULL;
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (need_resched() || spin_needbreak(&kvm->mmu_lock))
+> +			cond_resched_lock(&kvm->mmu_lock);
 > +
-> +	ret = __kvm_alloc_stage2_pgd(&nested_mmu->mmu);
-> +	if (ret) {
-> +		kfree(nested_mmu);
-> +		return NULL;
+> +		nested_mmu_list = &vcpu->kvm->arch.nested_mmu_list;
+> +		list_for_each_entry_rcu(nested_mmu, nested_mmu_list, list)
+> +			kvm_stage2_wp_range(kvm, &nested_mmu->mmu,
+> +				    0, KVM_PHYS_SIZE);
 > +	}
-> +
-> +	spin_lock(&vcpu->kvm->arch.mmu_list_lock);
-> +	tmp_mmu = get_nested_mmu(vcpu, vttbr);
-> +	if (!tmp_mmu)
-> +		list_add_rcu(&nested_mmu->list, nested_mmu_list);
-> +	else /* Somebody already created and put a new nested_mmu to the list */
-> +		need_free = true;
-> +	spin_unlock(&vcpu->kvm->arch.mmu_list_lock);
-> +
-> +	if (need_free) {
-> +		__kvm_free_stage2_pgd(&nested_mmu->mmu);
-> +		kfree(nested_mmu);
-> +		nested_mmu = tmp_mmu;
-> +	}
-> +
-> +	return nested_mmu;
 > +}
 > +
-> +static void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu)
+> +/* expects kvm->mmu_lock to be held */
+> +void kvm_nested_s2_all_vcpus_unmap(struct kvm *kvm)
+> +{
+> +	int i;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_nested_s2_mmu *nested_mmu;
+> +	struct list_head *nested_mmu_list;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (need_resched() || spin_needbreak(&kvm->mmu_lock))
+> +			cond_resched_lock(&kvm->mmu_lock);
+> +
+> +		nested_mmu_list = &vcpu->kvm->arch.nested_mmu_list;
+> +		list_for_each_entry_rcu(nested_mmu, nested_mmu_list, list)
+> +			kvm_unmap_stage2_range(&nested_mmu->mmu,
+> +				       0, KVM_PHYS_SIZE);
+> +	}
+> +}
+> +
+> +void kvm_nested_s2_all_vcpus_flush(struct kvm *kvm)
+> +{
+> +	int i;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_nested_s2_mmu *nested_mmu;
+> +	struct list_head *nested_mmu_list;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (need_resched() || spin_needbreak(&kvm->mmu_lock))
+> +			cond_resched_lock(&kvm->mmu_lock);
+> +
+> +		nested_mmu_list = &vcpu->kvm->arch.nested_mmu_list;
+> +		list_for_each_entry_rcu(nested_mmu, nested_mmu_list, list)
+> +			kvm_stage2_flush_range(&nested_mmu->mmu,
+> +				       0, KVM_PHYS_SIZE);
+> +	}
+> +}
+> +
+> +void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu)
 > +{
 > +	struct kvm_nested_s2_mmu *nested_mmu;
 > +	struct list_head *nested_mmu_list = &vcpu->kvm->arch.nested_mmu_list;
@@ -182,94 +297,49 @@ just grab the KVM mutex?
 > +	list_for_each_entry_rcu(nested_mmu, nested_mmu_list, list)
 > +		kvm_unmap_stage2_range(&nested_mmu->mmu, 0, KVM_PHYS_SIZE);
 > +}
+
+Did we change the functionality of this function in this patch as well
+or are we just moving it around?  I can't really tell.
+
+
+Thanks,
+-Christoffer
+
 > +
-> +bool handle_vttbr_update(struct kvm_vcpu *vcpu, u64 vttbr)
+> +int kvm_nested_s2_init(struct kvm_vcpu *vcpu)
+> +{
+> +	return 0;
+> +}
+> +
+> +void kvm_nested_s2_teardown(struct kvm_vcpu *vcpu)
 > +{
 > +	struct kvm_nested_s2_mmu *nested_mmu;
+> +	struct list_head *nested_mmu_list = &vcpu->kvm->arch.nested_mmu_list;
 > +
-> +	/* See if we can relax this */
-
-huh?
-
-> +	if (!vttbr)
-
-why is this a special case?
-
-Theoretically an IPA of zero and VMID zero could be a valid page table
-base pointer, right?
-
-I'm gussing because the guest hypervisor occasionally writes zero into
-VTTBR_EL2, for example when not using stage 2 translation, so perhaps
-what you need to do is to defer creating a new nested mmu structure
-until you actually enter the VM with stage 2 paging enabled?
-
-> +		return true;
-> +
-> +	nested_mmu = (struct kvm_nested_s2_mmu *)get_nested_mmu(vcpu, vttbr);
-> +	if (!nested_mmu) {
-> +		nested_mmu = create_nested_mmu(vcpu, vttbr);
-> +		if (!nested_mmu)
-> +			return false;
-
-I'm wondering if this can be simplified by having get_nested_mmu lookup
-and allocate the struct and renaming the get_nested_mmu funtion to
-lookup_nested_mmu?  This caller looks racy, even though it isn't, which
-would be improved by my suggestion as well.
-
-> +	} else {
-> +		/*
-> +		 * unmap the shadow page table if vttbr_el2 is
-
-While the function is called unmap, what we really do is
-clearing/flushing the shadow stage 2 page table.
-
-> +		 * changed to different value
-> +		 */
-> +		if (vttbr != nested_mmu->virtual_vttbr)
-> +			kvm_nested_s2_unmap(vcpu);
-> +	}
-> +
-> +	nested_mmu->virtual_vttbr = vttbr;
-> +
-> +	return true;
+> +	list_for_each_entry_rcu(nested_mmu, nested_mmu_list, list)
+> +		__kvm_free_stage2_pgd(&nested_mmu->mmu);
 > +}
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index e66f40d..ddb641c 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -960,6 +960,19 @@ static bool access_cpacr(struct kvm_vcpu *vcpu,
->  	return true;
+> +
+>  struct kvm_nested_s2_mmu *get_nested_mmu(struct kvm_vcpu *vcpu, u64 vttbr)
+>  {
+>  	struct kvm_nested_s2_mmu *mmu;
+> @@ -89,15 +170,6 @@ static struct kvm_nested_s2_mmu *create_nested_mmu(struct kvm_vcpu *vcpu,
+>  	return nested_mmu;
 >  }
 >  
-> +static bool access_vttbr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			 const struct sys_reg_desc *r)
-> +{
-> +	u64 vttbr = p->regval;
-> +
-> +	if (!p->is_write) {
-> +		p->regval = vcpu_el2_reg(vcpu, r->reg);
-> +		return true;
-> +	}
-> +
-> +	return handle_vttbr_update(vcpu, vttbr);
-> +}
-> +
->  static bool trap_el2_reg(struct kvm_vcpu *vcpu,
->  			 struct sys_reg_params *p,
->  			 const struct sys_reg_desc *r)
-> @@ -1306,7 +1319,7 @@ static bool trap_el2_reg(struct kvm_vcpu *vcpu,
->  	  trap_el2_reg, reset_el2_val, TCR_EL2, 0 },
->  	/* VTTBR_EL2 */
->  	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0001), Op2(0b000),
-> -	  trap_el2_reg, reset_el2_val, VTTBR_EL2, 0 },
-> +	  access_vttbr, reset_el2_val, VTTBR_EL2, 0 },
->  	/* VTCR_EL2 */
->  	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0001), Op2(0b010),
->  	  trap_el2_reg, reset_el2_val, VTCR_EL2, 0 },
+> -static void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu)
+> -{
+> -	struct kvm_nested_s2_mmu *nested_mmu;
+> -	struct list_head *nested_mmu_list = &vcpu->kvm->arch.nested_mmu_list;
+> -
+> -	list_for_each_entry_rcu(nested_mmu, nested_mmu_list, list)
+> -		kvm_unmap_stage2_range(&nested_mmu->mmu, 0, KVM_PHYS_SIZE);
+> -}
+> -
+>  bool handle_vttbr_update(struct kvm_vcpu *vcpu, u64 vttbr)
+>  {
+>  	struct kvm_nested_s2_mmu *nested_mmu;
 > -- 
 > 1.9.1
 > 
 > 
-
-Thanks,
--Christoffer
