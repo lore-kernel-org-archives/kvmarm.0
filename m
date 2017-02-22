@@ -1,84 +1,53 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 8/8] arm64: KVM: Do not corrupt registers on failed 64bit CP
- read
-Date: Wed, 22 Feb 2017 11:47:28 +0000
-Message-ID: <20170222114728.2472-9-marc.zyngier@arm.com>
+Subject: [PATCH 5/8] arm64: KVM: PMU: Inject UNDEF on non-privileged accesses
+Date: Wed, 22 Feb 2017 11:47:25 +0000
+Message-ID: <20170222114728.2472-6-marc.zyngier@arm.com>
 References: <20170222114728.2472-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A3C9D40C9F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 06:46:48 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id S760hwbB6m3K for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Feb 2017 06:46:48 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF7EE40CE6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 06:46:45 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170222114728.2472-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Shannon Zhao <shannon.zhao@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Shannon Zhao <shannon.zhao@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If we fail to emulate a mrrc instruction, we:
-1) deliver an exception,
-2) spit a nastygram on the console,
-3) write back some garbage to Rt/Rt2
-
-While 1) and 2) are perfectly acceptable, 3) is out of the scope of
-the architecture... Let's mimick the code in kvm_handle_cp_32 and
-be more cautious.
+access_pminten() and access_pmuserenr() can only be accessed when
+the CPU is in a priviledged mode. If it is not, let's inject an
+UNDEF exception.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 20 +++++++++-----------
- 1 file changed, 9 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 44b7a7325229..abda10476a04 100644
+index eec543906e21..cbe966658d5e 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1687,20 +1687,18 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
- 		params.regval |= vcpu_get_reg(vcpu, Rt2) << 32;
- 	}
+@@ -715,8 +715,10 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	if (!kvm_arm_pmu_v3_ready(vcpu))
+ 		return trap_raz_wi(vcpu, p, r);
  
--	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
--		goto out;
--	if (!emulate_cp(vcpu, &params, global, nr_global))
--		goto out;
--
--	unhandled_cp_access(vcpu, &params);
-+	if (!emulate_cp(vcpu, &params, target_specific, nr_specific) ||
-+	    !emulate_cp(vcpu, &params, global, nr_global)) {
-+		/* Split up the value between registers for the read side */
-+		if (!params.is_write) {
-+			vcpu_set_reg(vcpu, Rt, lower_32_bits(params.regval));
-+			vcpu_set_reg(vcpu, Rt2, upper_32_bits(params.regval));
+-	if (!vcpu_mode_priv(vcpu))
+-		return false;
++	if (!vcpu_mode_priv(vcpu)) {
++		pend_undef(vcpu);
++		return true;
++	}
+ 
+ 	if (p->is_write) {
+ 		u64 val = p->regval & mask;
+@@ -786,8 +788,10 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 		return trap_raz_wi(vcpu, p, r);
+ 
+ 	if (p->is_write) {
+-		if (!vcpu_mode_priv(vcpu))
+-			return false;
++		if (!vcpu_mode_priv(vcpu)) {
++			pend_undef(vcpu);
++			return true;
 +		}
  
--out:
--	/* Split up the value between registers for the read side */
--	if (!params.is_write) {
--		vcpu_set_reg(vcpu, Rt, lower_32_bits(params.regval));
--		vcpu_set_reg(vcpu, Rt2, upper_32_bits(params.regval));
-+		return 1;
- 	}
- 
-+	unhandled_cp_access(vcpu, &params);
- 	return 1;
- }
- 
+ 		vcpu_sys_reg(vcpu, PMUSERENR_EL0) = p->regval
+ 						    & ARMV8_PMU_USERENR_MASK;
 -- 
 2.11.0
