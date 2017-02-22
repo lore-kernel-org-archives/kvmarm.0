@@ -1,29 +1,27 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC 47/55] KVM: arm/arm64: Forward the guest hypervisor's stage
- 2 permission faults
-Date: Wed, 22 Feb 2017 19:15:46 +0100
-Message-ID: <20170222181546.GX26976@cbox>
+Subject: Re: [RFC 00/55] Nested Virtualization on KVM/ARM
+Date: Wed, 22 Feb 2017 19:23:31 +0100
+Message-ID: <20170222182331.GA27653@cbox>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <1483943091-1364-48-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1670F40C8E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 13:15:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AEC6D40CD5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 13:22:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GTn6upa4T4DP for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Feb 2017 13:15:01 -0500 (EST)
-Received: from mail-wr0-f181.google.com (mail-wr0-f181.google.com
- [209.85.128.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7486240C74
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 13:15:01 -0500 (EST)
-Received: by mail-wr0-f181.google.com with SMTP id s27so7828113wrb.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 10:16:00 -0800 (PST)
+ with ESMTP id R+Wy8Xgu6jLR for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Feb 2017 13:22:46 -0500 (EST)
+Received: from mail-wr0-f180.google.com (mail-wr0-f180.google.com
+ [209.85.128.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 94BE840C38
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 13:22:45 -0500 (EST)
+Received: by mail-wr0-f180.google.com with SMTP id 89so7914085wrr.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 10:23:44 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1483943091-1364-48-git-send-email-jintack@cs.columbia.edu>
+In-Reply-To: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,155 +35,121 @@ To: Jintack Lim <jintack@cs.columbia.edu>
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, andre.przywara@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 09, 2017 at 01:24:43AM -0500, Jintack Lim wrote:
-> From: Christoffer Dall <christoffer.dall@linaro.org>
-> 
-> When faulting on a shadow stage 2 page table we have to check if the
-> fault was a permission fault and if so, if that fault needs to be
-> handled by the guest hypervisor before us, in case the guest hypervisor
-> has created a less permissive S2 entry than the operation required.
-
-So I was a bit brief here.
-
-We can have discrepancies between the nested stage 2 page table and the
-shadow one in a couple of cases.  For example, the guest hypervisor can
-mark a page writable but the host hypervisor maps the page read-only in
-the shadow page table, if using something like KSM on the host level.
-In this case, a write fault is handled directly by the host hypervisor.
-But we could also simply have a read-only page mapped read-only in both
-tables, in which case the host hypervisor cannot do anything else than
-telling the guest hypervisor about the fault.
-
-Can you incorporate that into the commit message?
-
-Thanks,
--Christoffer
-
-> 
-> Check if this is the case, and inject a fault if it is.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-> ---
->  arch/arm/include/asm/kvm_mmu.h   |  7 +++++++
->  arch/arm/kvm/mmu.c               |  5 +++++
->  arch/arm64/include/asm/kvm_mmu.h |  9 +++++++++
->  arch/arm64/kvm/mmu-nested.c      | 33 +++++++++++++++++++++++++++++++++
->  4 files changed, 54 insertions(+)
-> 
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index ab41a10..0d106ae 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -241,6 +241,13 @@ static inline int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
->  	return 0;
->  }
->  
-> +static inline int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
-> +					   phys_addr_t fault_ipa,
-> +					   struct kvm_s2_trans *trans)
-> +{
-> +	return 0;
-> +}
-> +
->  static inline void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu) { }
->  static inline int kvm_nested_s2_init(struct kvm_vcpu *vcpu) { return 0; }
->  static inline void kvm_nested_s2_teardown(struct kvm_vcpu *vcpu) { }
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index abdf345..68fc8e8 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -1542,6 +1542,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		ret = kvm_walk_nested_s2(vcpu, fault_ipa, &nested_trans);
->  		if (ret)
->  			goto out_unlock;
-> +
-> +		ret = kvm_s2_handle_perm_fault(vcpu, fault_ipa, &nested_trans);
-> +		if (ret)
-> +			goto out_unlock;
-> +
->  		ipa = nested_trans.output;
->  	}
->  
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 2ac603d..2086296 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -338,6 +338,8 @@ struct kvm_s2_trans {
->  bool handle_vttbr_update(struct kvm_vcpu *vcpu, u64 vttbr);
->  int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
->  		       struct kvm_s2_trans *result);
-> +int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> +			     struct kvm_s2_trans *trans);
->  void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu);
->  int kvm_nested_s2_init(struct kvm_vcpu *vcpu);
->  void kvm_nested_s2_teardown(struct kvm_vcpu *vcpu);
-> @@ -366,6 +368,13 @@ static inline int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
->  	return 0;
->  }
->  
-> +static inline int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
-> +					   phys_addr_t fault_ipa,
-> +					   struct kvm_s2_trans *trans)
-> +{
-> +	return 0;
-> +}
-> +
->  static inline void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu) { }
->  static inline int kvm_nested_s2_init(struct kvm_vcpu *vcpu) { return 0; }
->  static inline void kvm_nested_s2_teardown(struct kvm_vcpu *vcpu) { }
-> diff --git a/arch/arm64/kvm/mmu-nested.c b/arch/arm64/kvm/mmu-nested.c
-> index b579d23..65ad0da 100644
-> --- a/arch/arm64/kvm/mmu-nested.c
-> +++ b/arch/arm64/kvm/mmu-nested.c
-> @@ -52,6 +52,19 @@ static unsigned int pa_max(void)
->  	return ps_to_output_size(parange);
->  }
->  
-> +static int vcpu_inject_s2_perm_fault(struct kvm_vcpu *vcpu, gpa_t ipa,
-> +				     int level)
-> +{
-> +	u32 esr;
-> +
-> +	vcpu->arch.ctxt.el2_regs[FAR_EL2] = vcpu->arch.fault.far_el2;
-> +	vcpu->arch.ctxt.el2_regs[HPFAR_EL2] = vcpu->arch.fault.hpfar_el2;
-> +	esr = kvm_vcpu_get_hsr(vcpu) & ~ESR_ELx_FSC;
-> +	esr |= ESR_ELx_FSC_PERM;
-> +	esr |= level & 0x3;
-> +	return kvm_inject_nested_sync(vcpu, esr);
-> +}
-> +
->  static int vcpu_inject_s2_trans_fault(struct kvm_vcpu *vcpu, gpa_t ipa,
->  				      int level)
->  {
-> @@ -268,6 +281,26 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
->  	return walk_nested_s2_pgd(vcpu, gipa, &wi, result);
->  }
->  
-> +/*
-> + * Returns non-zero if permission fault is handled by injecting it to the next
-> + * level hypervisor.
-> + */
-> +int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> +			     struct kvm_s2_trans *trans)
-> +{
-> +	unsigned long fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
-> +	bool write_fault = kvm_is_write_fault(vcpu);
-> +
-> +	if (fault_status != FSC_PERM)
-> +		return 0;
-> +
-> +	if ((write_fault && !trans->writable) ||
-> +	    (!write_fault && !trans->readable))
-> +		return vcpu_inject_s2_perm_fault(vcpu, fault_ipa, trans->level);
-> +
-> +	return 0;
-> +}
-> +
->  /* expects kvm->mmu_lock to be held */
->  void kvm_nested_s2_all_vcpus_wp(struct kvm *kvm)
->  {
-> -- 
-> 1.9.1
-> 
-> 
+SGkgSmludGFjaywKCgpPbiBNb24sIEphbiAwOSwgMjAxNyBhdCAwMToyMzo1NkFNIC0wNTAwLCBK
+aW50YWNrIExpbSB3cm90ZToKPiBOZXN0ZWQgdmlydHVhbGl6YXRpb24gaXMgdGhlIGFiaWxpdHkg
+dG8gcnVuIGEgdmlydHVhbCBtYWNoaW5lIGluc2lkZSBhbm90aGVyCj4gdmlydHVhbCBtYWNoaW5l
+LiBJbiBvdGhlciB3b3JkcywgaXTigJlzIGFib3V0IHJ1bm5pbmcgYSBoeXBlcnZpc29yICh0aGUg
+Z3Vlc3QKPiBoeXBlcnZpc29yKSBvbiB0b3Agb2YgYW5vdGhlciBoeXBlcnZpc29yICh0aGUgaG9z
+dCBoeXBlcnZpc29yKS4KPiAKPiBUaGlzIHNlcmllcyBzdXBwb3J0cyBuZXN0ZWQgdmlydHVhbGl6
+YXRpb24gb24gYXJtNjQuIEFSTSByZWNlbnRseSBhbm5vdW5jZWQgYW4KPiBleHRlbnNpb24gKEFS
+TXY4LjMpIHdoaWNoIGhhcyBzdXBwb3J0IGZvciBuZXN0ZWQgdmlydHVhbGl6YXRpb25bMV0uIFRo
+aXMgc2VyaWVzCj4gaXMgYmFzZWQgb24gdGhlIEFSTXY4LjMgc3BlY2lmaWNhdGlvbi4KPiAKPiBT
+dXBwb3J0aW5nIG5lc3RlZCB2aXJ0dWFsaXphdGlvbiBtZWFucyB0aGF0IHRoZSBoeXBlcnZpc29y
+IHByb3ZpZGVzIG5vdCBvbmx5Cj4gRUwwL0VMMSBleGVjdXRpb24gZW52aXJvbm1lbnQgd2l0aCBW
+TXMgYXMgaXQgdXN1YWxseSBkb2VzLCBidXQgYWxzbyB0aGUKPiB2aXJ0dWFsaXphdGlvbiBleHRl
+bnNpb25zIGluY2x1ZGluZyBFTDIgZXhlY3V0aW9uIGVudmlyb25tZW50IHdpdGggdGhlIFZNcy4K
+PiBPbmNlIHRoZSBob3N0IGh5cGVydmlzb3IgcHJvdmlkZXMgdGhvc2UgZXhlY3V0aW9uIGVudmly
+b25tZW50IHdpdGggdGhlIFZNcywKPiB0aGVuIHRoZSBndWVzdCBoeXBlcnZpc29yIGNhbiBydW4g
+aXRzIG93biBWTXMgKG5lc3RlZCBWTXMpIG5hdHVyYWxseS4KPiAKPiBUbyBzdXBwb3J0IG5lc3Rl
+ZCB2aXJ0dWFsaXphdGlvbiBvbiBBUk0gdGhlIGh5cGVydmlzb3IgbXVzdCBlbXVsYXRlIGEgdmly
+dHVhbAo+IGV4ZWN1dGlvbiBlbnZpcm9ubWVudCBjb25zaXN0aW5nIG9mIEVMMiwgRUwxLCBhbmQg
+RUwwLCBhcyB0aGUgZ3Vlc3QgaHlwZXJ2aXNvcgo+IHdpbGwgcnVuIGluIGEgdmlydHVhbCBFTDIg
+bW9kZS4gIE5vcm1hbGx5IEtWTS9BUk0gb25seSBlbXVsYXRlZCBhIFZNIHN1cHBvcnRpbmcKPiBF
+TDEvMCBydW5uaW5nIGluIHRoZWlyIHJlc3BlY3RpdmUgbmF0aXZlIENQVSBtb2RlcywgYnV0IHdp
+dGggbmVzdGVkCj4gdmlydHVhbGl6YXRpb24gd2UgZGVwcml2aWxlZ2UgdGhlIGd1ZXN0IGh5cGVy
+dmlzb3IgYW5kIGVtdWxhdGUgYSB2aXJ0dWFsIEVMMgo+IGV4ZWN1dGlvbiBtb2RlIGluIEVMMSB1
+c2luZyB0aGUgaGFyZHdhcmUgZmVhdHVyZXMgcHJvdmlkZWQgYnkgQVJNdjguMyB0byB0cmFwCj4g
+RUwyIG9wZXJhdGlvbnMgdG8gRUwxLiBUbyBkbyB0aGF0IHRoZSBob3N0IGh5cGVydmlzb3IgbmVl
+ZHMgdG8gbWFuYWdlIEVMMgo+IHJlZ2lzdGVyIHN0YXRlIGZvciB0aGUgZ3Vlc3QgaHlwZXJ2aXNv
+ciwgYW5kIHNoYWRvdyBFTDEgcmVnaXN0ZXIgc3RhdGUgdGhhdAo+IHJlZmxlY3RzIHRoZSBFTDIg
+cmVnaXN0ZXIgc3RhdGUgdG8gcnVuIHRoZSBndWVzdCBoeXBlcnZpc29yIGluIEVMMS4gU2VlIHBh
+dGNoIDYKPiB0aHJvdWdoIDEwIGZvciB0aGlzLgo+IAo+IEZvciBtZW1vcnkgdmlydHVhbGl6YXRp
+b24sIHRoZSBiaWdnZXN0IGlzc3VlIGlzIHRoYXQgd2Ugbm93IGhhdmUgbW9yZSB0aGFuIHR3bwo+
+IHN0YWdlcyBvZiB0cmFuc2xhdGlvbiB3aGVuIHJ1bm5pbmcgbmVzdGVkIFZNcy4gV2UgY2hvb3Nl
+IHRvIG1lcmdlIHR3byBzdGFnZS0yCj4gcGFnZSB0YWJsZXMgKG9uZSBmcm9tIHRoZSBndWVzdCBo
+eXBlcnZpc29yIGFuZCB0aGUgb3RoZXIgZnJvbSB0aGUgaG9zdAo+IGh5cGVydmlzb3IpIGFuZCBj
+cmVhdGUgc2hhZG93IHN0YWdlLTIgcGFnZSB0YWJsZXMsIHdoaWNoIGhhdmUgbWFwcGluZ3MgZnJv
+bSB0aGUKPiBuZXN0ZWQgVk3igJlzIHBoeXNpY2FsIGFkZHJlc3NlcyB0byB0aGUgbWFjaGluZSBw
+aHlzaWNhbCBhZGRyZXNzZXMuIFN0YWdlLTEKPiB0cmFuc2xhdGlvbiBpcyBkb25lIGJ5IHRoZSBo
+YXJkd2FyZSBhcyBpcyBkb25lIGZvciB0aGUgbm9ybWFsIFZNcy4KPiAKPiBUbyBwcm92aWRlIFZH
+SUMgc3VwcG9ydCB0byB0aGUgZ3Vlc3QgaHlwZXJ2aXNvciwgd2UgZW11bGF0ZSB0aGUgR0lDCj4g
+dmlydHVhbGl6YXRpb24gZXh0ZW5zaW9ucyB1c2luZyB0cmFwLWFuZC1lbXVsYXRlIHRvIGEgdmly
+dHVhbCBHSUMgSHlwZXJ2aXNvcgo+IENvbnRyb2wgSW50ZXJmYWNlLiAgRnVydGhlcm1vcmUsIHdl
+IGNhbiBzdGlsbCB1c2UgdGhlIEdJQyBWRSBoYXJkd2FyZSBmZWF0dXJlcwo+IHRvIGRlbGl2ZXIg
+dmlydHVhbCBpbnRlcnJ1cHRzIHRvIHRoZSBuZXN0ZWQgVk0sIGJ5IGRpcmVjdGx5IG1hcHBpbmcg
+dGhlIEdJQwo+IFZDUFUgaW50ZXJmYWNlIHRvIHRoZSBuZXN0ZWQgVk0gYW5kIHN3aXRjaGluZyB0
+aGUgY29udGVudCBvZiB0aGUgR0lDIEh5cGVydmlzb3IKPiBDb250cm9sIGludGVyZmFjZSB3aGVu
+IGFsdGVybmF0aW5nIGJldHdlZW4gYSBuZXN0ZWQgVk0gYW5kIGEgbm9ybWFsIFZNLiAgU2VlCj4g
+cGF0Y2hlcyAyNSB0aHJvdWdoIDMyLCBhbmQgNTAgdGhyb3VnaCA1MiBmb3IgbW9yZSBpbmZvcm1h
+dGlvbi4KPiAKPiBGb3IgdGltZXIgdmlydHVhbGl6YXRpb24sIHRoZSBndWVzdCBoeXBlcnZpc29y
+IGV4cGVjdHMgdG8gaGF2ZSBhY2Nlc3MgdG8gdGhlCj4gRUwyIHBoeXNpY2FsIHRpbWVyLCB0aGUg
+RUwxIHBoeXNpY2FsIHRpbWVyIGFuZCB0aGUgdmlydHVhbCB0aW1lci4gU28sIHRoZSBob3N0Cj4g
+aHlwZXJ2aXNvciBuZWVkcyB0byBwcm92aWRlIGFsbCBvZiB0aGVtLiBUaGUgdmlydHVhbCB0aW1l
+ciBpcyBhbHdheXMgYXZhaWxhYmxlCj4gdG8gVk1zLiBUaGUgcGh5c2ljYWwgdGltZXIgaXMgYXZh
+aWxhYmxlIHRvIFZNcyB2aWEgbXkgcHJldmlvdXMgcGF0Y2ggc2VyaWVzWzNdLgo+IFRoZSBFTDIg
+cGh5c2ljYWwgdGltZXIgaXMgbm90IHN1cHBvcnRlZCB5ZXQgaW4gdGhpcyBSRkMuIFdlIHBsYW4g
+dG8gc3VwcG9ydAo+IHRoaXMgYXMgaXQgaXMgcmVxdWlyZWQgdG8gcnVuIG90aGVyIGd1ZXN0IGh5
+cGVydmlzb3JzIHN1Y2ggYXMgWGVuLgo+IAo+IEV2ZW4gdGhvdWdoIHRoaXMgd29yayBpcyBub3Qg
+Y29tcGxldGUgKHNlZSBsaW1pdGF0aW9ucyBiZWxvdyksIEknZCBhcHByZWNpYXRlCj4gZWFybHkg
+ZmVlZGJhY2sgb24gdGhpcyBSRkMuIFNwZWNpZmljYWxseSwgSSdtIGludGVyZXN0ZWQgaW46Cj4g
+LSBJcyBpdCBiZXR0ZXIgdG8gaGF2ZSBhIGtlcm5lbCBjb25maWcgb3IgdG8gbWFrZSBpdCBjb25m
+aWd1cmFibGUgYXQgcnVudGltZT8KPiAtIEkgd29uZGVyIGlmIHRoZSBkYXRhIHN0cnVjdHVyZSBm
+b3IgbWVtb3J5IG1hbmFnZW1lbnQgbWFrZXMgc2Vuc2UuCj4gLSBXaGF0IGFyY2hpdGVjdHVyZSB2
+ZXJzaW9uIGRvIHdlIHN1cHBvcnQgZm9yIHRoZSBndWVzdCBoeXBlcnZpc29yLCBhbmQgaG93Pwo+
+ICAgRm9yIGV4YW1wbGUsIGRvIHdlIGFsd2F5cyBzdXBwb3J0IGFsbCBhcmNoaXRlY3R1cmUgdmVy
+c2lvbnMgb3IgdGhlIHNhbWUKPiAgIGFyY2hpdGVjdHVyZSBhcyB0aGUgdW5kZXJseWluZyBoYXJk
+d2FyZSBwbGF0Zm9ybT8gT3IgaXMgaXQgYmV0dGVyCj4gICB0byBtYWtlIGl0IGNvbmZpZ3VyYWJs
+ZSBmcm9tIHRoZSB1c2Vyc3BhY2U/Cj4gLSBJbml0aWFsIGNvbW1lbnRzIG9uIHRoZSBvdmVyYWxs
+IGRlc2lnbj8KPiAKPiBUaGlzIHBhdGNoIHNlcmllcyBpcyBiYXNlZCBvbiBrdm0tYXJtLWZvci00
+LjktcmM3IHdpdGggdGhlIHBhdGNoIHNlcmllcyB0byBwcm92aWRlCj4gVk1zIHdpdGggdGhlIEVM
+MSBwaHlzaWNhbCB0aW1lclsyXS4KPiAKPiBHaXQ6IGh0dHBzOi8vZ2l0aHViLmNvbS9jb2x1bWJp
+YS9uZXN0aW5nLXB1Yi90cmVlL3JmYy12MQo+IAo+IFRlc3Rpbmc6Cj4gV2UgaGF2ZSB0ZXN0ZWQg
+dGhpcyBvbiBBUk12OC4wIChBcHBsaWVkIE1pY3JvIFgtR2VuZSlbM10gc2luY2UgQVJNdjguMyBo
+YXJkd2FyZQo+IGlzIG5vdCBhdmFpbGFibGUgeWV0LiBXZSBoYXZlIHBhcmF2aXJ0dWFsaXplZCB0
+aGUgZ3Vlc3QgaHlwZXJ2aXNvciB0byB0cmFwIHRvCj4gRUwyIGFzIHNwZWNpZmllZCBpbiBBUk12
+OC4zIHNwZWNpZmljYXRpb24gdXNpbmcgaHZjIGluc3RydWN0aW9uLiBXZSBwbGFuIHRvCj4gdGVz
+dCB0aGlzIG9uIEFSTXY4LjMgbW9kZWwsIGFuZCB3aWxsIHBvc3QgdGhlIHJlc3VsdCBhbmQgdjIg
+aWYgbmVjZXNzYXJ5Lgo+IAo+IExpbWl0YXRpb25zOgo+IC0gVGhpcyBwYXRjaCBzZXJpZXMgb25s
+eSBzdXBwb3J0cyBhcm02NCwgbm90IGFybS4gQWxsIHRoZSBwYXRjaGVzIGNvbXBpbGUgb24KPiAg
+IGFybSwgYnV0IEkgaGF2ZW4ndCB0cnkgdG8gYm9vdCBub3JtYWwgVk1zIG9uIGl0Lgo+IC0gVGhl
+IGd1ZXN0IGh5cGVydmlzb3Igd2l0aCBWSEUgKEFSTXY4LjEpIGlzIG5vdCBzdXBwb3J0ZWQgaW4g
+dGhpcyBSRkMuIEkgaGF2ZQo+ICAgcGF0Y2hlcyBmb3IgdGhhdCwgYnV0IHRoZXkgbmVlZCB0byBi
+ZSBjbGVhbmVkIHVwLgo+IC0gUmVjdXJzaXZlIG5lc3RpbmcgKGkuZS4gZW11bGF0aW5nIEFSTXY4
+LjMgaW4gdGhlIFZNKSBpcyBub3QgdGVzdGVkIHlldC4KPiAtIE90aGVyIGh5cGVydmlzb3JzIChz
+dWNoIGFzIFhlbikgb24gS1ZNIGFyZSBub3QgdGVzdGVkLgo+IAo+IFRPRE86Cj4gLSBUZXN0IHRv
+IGJvb3Qgbm9ybWFsIFZNcyBvbiBhcm0gYXJjaGl0ZWN0dXJlCj4gLSBUZXN0IHRoaXMgb24gQVJN
+djguMyBtb2RlbAo+IC0gU3VwcG9ydCB0aGUgZ3Vlc3QgaHlwZXJ2aXNvciB3aXRoIFZIRQo+IC0g
+UHJvdmlkZSB0aGUgZ3Vlc3QgaHlwZXJ2aXNvciB3aXRoIHRoZSBFTDIgcGh5c2ljYWwgdGltZXIK
+PiAtIFJ1biBvdGhlciBoeXBlcnZpc29ycyBzdWNoIGFzIFhlbiBvbiBLVk0KPiAKCkkgaGF2ZSBh
+IGNvdXBsZSBvZiBvdmVyYWxsIHF1ZXN0aW9ucyBhbmQgY29tbWVudHMgb24gdGhpcyBzZXJpZXM6
+CgpGaXJzdCwgSSB0aGluayB3ZSBzaG91bGQgbWFrZSBzdXJlIHRoYXQgdGhlIHNlcmllcyBhY3R1
+YWxseSB3b3JrcyB3aXRoCnY4LjMgb24gdGhlIG1vZGVsIHVzaW5nIGJvdGggVkhFIGFuZCBub24t
+VkhFIGZvciB0aGUgaG9zdCBoeXBlcnZpc29yLgoKU2Vjb25kLCB0aGlzIHBhdGNoIHNldCBpcyBw
+cmV0dHkgbGFyZ2Ugb3ZlcmFsbCBhbmQgaXQgd291bGQgYmUgZ3JlYXQgaWYKd2UgY291bGQgc3Bs
+aXQgaXQgdXAgaW50byBzb21lIHNsaWdodGx5IG1vcmUgbWFuYWdlYWJsZSBiaXRzLiAgSSdtIG5v
+dApleGFjdGx5IGhvdyB0byBkbyB0aGF0LCBidXQgcGVyaGFwcyB3ZSBjYW4gcmV3b3JrIGl0IHNv
+IHRoYXQgd2UgYWRkIGJpdHMKb2YgZnJhbWV3b3JrIChDUFUsIG1lbW9yeSwgaW50ZXJydXB0LCB0
+aW1lcnMpIGFzIGluZGl2aWR1YWwgc2VyaWVzLCBhbmQKZmluYWxseSB3ZSBwbHVnIGFsbCB0aGUg
+bG9naWMgdG9nZXRoZXIgd2l0aCB0aGUgY3VycmVudCBmbG93LiAgV2hhdCBkbwp5b3UgdGhpbms/
+CgpUaGlyZCwgd2Ugc2hvdWxkIGZvbGxvdyB0aGUgZmVlZGJhY2sgZnJvbSBEYXZpZCBhYm91dCBu
+b3QgdXNpbmcgYSBrZXJuZWwKY29uZmlnIG9wdGlvbi4gIEknbSBhZnJhaWQgdGhhdCBzb21lIGNv
+ZGUgd2lsbCBiaXRyb3QgdG9vIGZhc3QgaWYgZ3VpZGVkCmJ5IGEga2VybmVsIGNvbmZpZyBvcHRp
+b24sIHNvIGEgcnVudGltZSBwYXJhbWV0ZXIgYW5kIHVzaW5nIHN0YXRpYyBrZXlzCndoZXJlIHJl
+bGV2YW50IHNlZW1zIGxpa2UgYSBiZXR0ZXIgYXBwcm9hY2ggdG8gbWUuICBCdXQgc2luY2UgS1ZN
+L0FSTSBpcwpub3QgbG9hZGVkIGFzIGEgbW9kdWxlLCB0aGlzIHdvdWxkIGhhdmUgdG8gYmUgYSBr
+ZXJuZWwgY21kbGluZQpwYXJhbWV0ZXIuICBXaGF0IGRvIHBlb3BsZSB0aGluaz8KCkZvdXJ0aCwg
+dGhlcmUgYXJlIHNvbWUgcGxhY2VzIHdoZXJlIHdlIGhhdmUgaGFyZC1jb2RlZCBpbmZvcm1hdGlv
+biAobGlrZQp0aGUgbG9jYXRpb24gb2YgdGhlIEdJQ0gvR0lDViBpbnRlcmZhY2VzKSB3aGljaCBo
+YXZlIHRvIGJlIGZpeGVkIGJ5CmFkZGluZyB0aGUgcmVxdWlyZWQgdXNlcnNwYWNlIGludGVyZmFj
+ZXMuCgpGaWZ0aCwgdGhlIG9yZGVyaW5nIG9mIHRoZSBwYXRjaGVzIG5lZWRzIGEgYml0IG9mIGxv
+dmUuIEkgdGhpbmsgaXQncwppbXBvcnRhbnQgdGhhdCB3ZSBidWlsZCB0aGUgd2hvbGUgaW5mcmFz
+dHJ1Y3R1cmUgZmlyc3QsIGJ1dCBsZWF2ZSBpdApjb21wbGV0ZWx5IGRpc2FibGVkIHVudGlsIHRo
+ZSBlbmQsIGFuZCB0aGVuIHdlIHBsdWcgaW4gYWxsIHRoZQpjYXBhYmlsaXRpZXMgb2YgdXNlcnNw
+YWNlIHRvIGNyZWF0ZSBhIG5lc3RlZCBWTSBpbiB0aGUgZW5kLiAgU28gZm9yCmV4YW1wbGUsIEkg
+d291bGQgZXhwZWN0IHRoYXQgcGF0Y2ggMDMgd291bGQgYmUgdGhlIGxhc3QgcGF0Y2ggaW4gdGhl
+CnNlcmllcy4KCk92ZXJhbGwgdGhvdWdoLCB0aGlzIGlzIGEgbWFzc2l2ZSBhbW91bnQgb2Ygd29y
+aywgYW5kIGl0J3MgYXdlc29tZSB0aGF0CnlvdSB3ZXJlIGFibGUgdG8gcHVsbCBpdCB0b2dldGhl
+ciB0byBhIHByZXR0eSBuaWNlIGluaXRpYWwgUkZDIQoKVGhhbmtzIQotQ2hyaXN0b2ZmZXIKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
+bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
+dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
