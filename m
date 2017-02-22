@@ -1,59 +1,62 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH] KVM: arm/arm64: vgic-v3: Don't pretend to support IRQ/FIQ bypass
-Date: Wed, 22 Feb 2017 12:13:48 +0000
-Message-ID: <20170222121348.3138-1-marc.zyngier@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [RFC 25/55] KVM: arm/arm64: Let vcpu thread modify its own
+ active state
+Date: Wed, 22 Feb 2017 13:27:14 +0100
+Message-ID: <20170222122714.GN26976@cbox>
+References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
+ <1483943091-1364-26-git-send-email-jintack@cs.columbia.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1483943091-1364-26-git-send-email-jintack@cs.columbia.edu>
 Sender: kvm-owner@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Vijay Kilari <vijay.kilari@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Our GICv3 emulation always presents ICC_SRE_EL1 with DIB/DFB set to
-zero, which implies that there is a way to bypass the GIC and
-inject raw IRQ/FIQ by driving the CPU pins.
+On Mon, Jan 09, 2017 at 01:24:21AM -0500, Jintack Lim wrote:
+> Currently, if a vcpu thread tries to change its own active state when
+> the irq is already in AP list, it'll loop forever. Since the VCPU thread
+> has already synced back LR state to the struct vgic_irq, let it modify
+> its own state safely.
+> 
+> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+> ---
+>  virt/kvm/arm/vgic/vgic-mmio.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index ebe1b9f..049c570 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -192,9 +192,9 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>  	 * If this virtual IRQ was written into a list register, we
+>  	 * have to make sure the CPU that runs the VCPU thread has
+>  	 * synced back LR state to the struct vgic_irq.  We can only
+> -	 * know this for sure, when either this irq is not assigned to
+> +	 * know this for sure, when this irq is not assigned to
+>  	 * anyone's AP list anymore, or the VCPU thread is not
+> -	 * running on any CPUs.
+> +	 * running on any CPUs, or current thread is the VCPU thread.
+>  	 *
+>  	 * In the opposite case, we know the VCPU thread may be on its
+>  	 * way back from the guest and still has to sync back this
+> @@ -202,6 +202,7 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>  	 * other thread sync back the IRQ.
+>  	 */
+>  	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
+> +	       irq->vcpu != vcpu && /* Current thread is not the VCPU thread */
+>  	       irq->vcpu->cpu != -1) /* VCPU thread is running */
+>  		cond_resched_lock(&irq->irq_lock);
+>  
+> -- 
+> 1.9.1
+> 
+> 
 
-Of course, we don't allow that when the GIC is configured, but
-we fail to indicate that to the guest. The obvious fix is to
-set these bits (and never let them being changed again).
+This seems to be an independent fix, so please send it outside of this
+series as an individual patch.
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- include/linux/irqchip/arm-gic-v3.h | 2 ++
- virt/kvm/arm/vgic/vgic-v3.c        | 5 ++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index e808f8ae6f14..0a8bad331341 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -354,6 +354,8 @@
-  */
- #define ICC_CTLR_EL1_EOImode_drop_dir	(0U << 1)
- #define ICC_CTLR_EL1_EOImode_drop	(1U << 1)
-+#define ICC_SRE_EL1_DIB			(1U << 2)
-+#define ICC_SRE_EL1_DFB			(1U << 1)
- #define ICC_SRE_EL1_SRE			(1U << 0)
- 
- /*
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index e6b03fd8c374..d062256131fc 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -215,10 +215,13 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
- 	/*
- 	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
- 	 * way, so we force SRE to 1 to demonstrate this to the guest.
-+	 * Also, we don't support any form of IRQ/FIQ bypass.
- 	 * This goes with the spec allowing the value to be RAO/WI.
- 	 */
- 	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
--		vgic_v3->vgic_sre = ICC_SRE_EL1_SRE;
-+		vgic_v3->vgic_sre = (ICC_SRE_EL1_DIB |
-+				     ICC_SRE_EL1_DFB |
-+				     ICC_SRE_EL1_SRE);
- 		vcpu->arch.vgic_cpu.pendbaser = INITIAL_PENDBASER_VALUE;
- 	} else {
- 		vgic_v3->vgic_sre = 0;
--- 
-2.11.0
+Thanks,
+-Christoffer
