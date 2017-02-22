@@ -1,44 +1,55 @@
 From: Christoffer Dall <cdall@linaro.org>
 Subject: Re: [RFC 12/55] KVM: arm64: Handle EL2 register access traps
-Date: Wed, 22 Feb 2017 12:30:22 +0100
-Message-ID: <20170222113022.GG26976@cbox>
+Date: Wed, 22 Feb 2017 12:31:50 +0100
+Message-ID: <20170222113150.GH26976@cbox>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
  <1483943091-1364-13-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72B2F40C49
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 06:31:07 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id wH5SmrdjPVNp for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Feb 2017 06:31:05 -0500 (EST)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC55440C32
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 06:31:05 -0500 (EST)
+Received: by mail-wm0-f51.google.com with SMTP id v186so137658084wmd.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 03:32:04 -0800 (PST)
 Content-Disposition: inline
 In-Reply-To: <1483943091-1364-13-git-send-email-jintack@cs.columbia.edu>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, andre.przywara@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Mon, Jan 09, 2017 at 01:24:08AM -0500, Jintack Lim wrote:
 > ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
 > this bit is set, accessing EL2 registers in EL1 traps to EL2. In
 > addition, executing following instructions in EL1 will trap to EL2 -
-
-the following:
-
-So these instructions trap:
- - tlbi
- - at
- - eret
- - mrs/msr accessgin sp_el1
-
-And they would previously undef at EL1, but now trap to EL2?
-
 > tlbi and at instructions which are undefined when exectued in EL1, eret
 > instruction, msr/mrs instructions to access SP_EL1.
-
-this is a bit confusing to read.
-
 > 
 > This patch handles traps due to accessing EL2 registers in EL1.  The
 > host hypervisor keeps EL2 register values in memory, and will use them
 > to emulate the behavior that the guest hypervisor expects from the
 > hardware.
+
+This patch just sets up the handlers but doesn't actually enable the NV
+feature, right?
+
 > 
 > Subsequent patches will handle other kinds of traps.
 > 
