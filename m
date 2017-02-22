@@ -1,228 +1,167 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC 12/55] KVM: arm64: Handle EL2 register access traps
-Date: Wed, 22 Feb 2017 12:31:50 +0100
-Message-ID: <20170222113150.GH26976@cbox>
+Subject: Re: [RFC 14/55] KVM: arm64: Take account of system instruction traps
+Date: Wed, 22 Feb 2017 12:34:04 +0100
+Message-ID: <20170222113404.GI26976@cbox>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <1483943091-1364-13-git-send-email-jintack@cs.columbia.edu>
+ <1483943091-1364-15-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72B2F40C49
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 06:31:07 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wH5SmrdjPVNp for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Feb 2017 06:31:05 -0500 (EST)
-Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC55440C32
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 06:31:05 -0500 (EST)
-Received: by mail-wm0-f51.google.com with SMTP id v186so137658084wmd.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 03:32:04 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1483943091-1364-13-git-send-email-jintack@cs.columbia.edu>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <1483943091-1364-15-git-send-email-jintack@cs.columbia.edu>
+Sender: kvm-owner@vger.kernel.org
 To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, andre.przywara@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 09, 2017 at 01:24:08AM -0500, Jintack Lim wrote:
-> ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
-> this bit is set, accessing EL2 registers in EL1 traps to EL2. In
-> addition, executing following instructions in EL1 will trap to EL2 -
-> tlbi and at instructions which are undefined when exectued in EL1, eret
-> instruction, msr/mrs instructions to access SP_EL1.
+On Mon, Jan 09, 2017 at 01:24:10AM -0500, Jintack Lim wrote:
+> When HCR.NV bit is set, execution of the EL2 translation regime Address
+> Translation instructions and TLB maintenance instructions are trapped to
+> EL2. In addition, execution of the EL1 translation regime Address
+> Translation instructions and TLB maintenance instructions that are only
+> accessible from EL2 and above are trapped to EL2. In these cases,
+> ESR_EL2.EC will be set to 0x18.
 > 
-> This patch handles traps due to accessing EL2 registers in EL1.  The
-> host hypervisor keeps EL2 register values in memory, and will use them
-> to emulate the behavior that the guest hypervisor expects from the
-> hardware.
-
-This patch just sets up the handlers but doesn't actually enable the NV
-feature, right?
-
+> Take account of this and handle system instructions as well as MRS/MSR
+> instructions in the handler. Change the handler name to reflect this.
 > 
-> Subsequent patches will handle other kinds of traps.
+> Emulation of those system instructions is to be done.
+
+Is it goint to be done in later patches in this series or left as an
+excercise for the reader?
+
 > 
 > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 > ---
->  arch/arm64/kvm/sys_regs.c | 119 ++++++++++++++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.h |   7 +++
->  2 files changed, 126 insertions(+)
+>  arch/arm64/include/asm/kvm_coproc.h |  2 +-
+>  arch/arm64/kvm/handle_exit.c        |  2 +-
+>  arch/arm64/kvm/sys_regs.c           | 49 ++++++++++++++++++++++++++++++++-----
+>  arch/arm64/kvm/trace.h              |  2 +-
+>  4 files changed, 46 insertions(+), 9 deletions(-)
 > 
+> diff --git a/arch/arm64/include/asm/kvm_coproc.h b/arch/arm64/include/asm/kvm_coproc.h
+> index 0b52377..1b3d21b 100644
+> --- a/arch/arm64/include/asm/kvm_coproc.h
+> +++ b/arch/arm64/include/asm/kvm_coproc.h
+> @@ -43,7 +43,7 @@ void kvm_register_target_sys_reg_table(unsigned int target,
+>  int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>  int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>  int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
+> -int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run);
+> +int kvm_handle_sys(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>  
+>  #define kvm_coproc_table_init kvm_sys_reg_table_init
+>  void kvm_sys_reg_table_init(void);
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 4e4a915..a891684 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -147,7 +147,7 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	[ESR_ELx_EC_SMC32]	= handle_smc,
+>  	[ESR_ELx_EC_HVC64]	= handle_hvc,
+>  	[ESR_ELx_EC_SMC64]	= handle_smc,
+> -	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
+> +	[ESR_ELx_EC_SYS64]	= kvm_handle_sys,
+>  	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
+>  	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
+>  	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 7cef94f..4158f2f 100644
+> index 4158f2f..202f64d 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -873,6 +873,18 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
->  	return true;
+> @@ -1903,6 +1903,36 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
+>  	return 1;
 >  }
 >  
-> +static bool trap_el2_reg(struct kvm_vcpu *vcpu,
-> +			 struct sys_reg_params *p,
-> +			 const struct sys_reg_desc *r)
+> +static int emulate_tlbi(struct kvm_vcpu *vcpu,
+> +			     struct sys_reg_params *params)
 > +{
-> +	if (!p->is_write)
-> +		p->regval = vcpu_el2_reg(vcpu, r->reg);
-> +	else
-> +		vcpu_el2_reg(vcpu, r->reg) = p->regval;
-> +
-> +	return true;
+> +	/* TODO: support tlbi instruction emulation*/
+> +	kvm_inject_undefined(vcpu);
+> +	return 1;
 > +}
 > +
->  /*
->   * Architected system registers.
->   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> @@ -1163,15 +1175,122 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
->  	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b1111), Op2(0b111),
->  	  access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
->  
-> +	/* VPIDR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0000), CRm(0b0000), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, VPIDR_EL2, 0 },
-> +	/* VMPIDR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0000), CRm(0b0000), Op2(0b101),
-> +	  trap_el2_reg, reset_el2_val, VMPIDR_EL2, 0 },
-> +
-> +	/* SCTLR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0000), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, SCTLR_EL2, 0 },
-> +	/* ACTLR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0000), Op2(0b001),
-> +	  trap_el2_reg, reset_el2_val, ACTLR_EL2, 0 },
-> +	/* HCR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0001), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, HCR_EL2, 0 },
-> +	/* MDCR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0001), Op2(0b001),
-> +	  trap_el2_reg, reset_el2_val, MDCR_EL2, 0 },
-> +	/* CPTR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0001), Op2(0b010),
-> +	  trap_el2_reg, reset_el2_val, CPTR_EL2, 0 },
-> +	/* HSTR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0001), Op2(0b011),
-> +	  trap_el2_reg, reset_el2_val, HSTR_EL2, 0 },
-> +	/* HACR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0001), CRm(0b0001), Op2(0b111),
-> +	  trap_el2_reg, reset_el2_val, HACR_EL2, 0 },
-> +
-> +	/* TTBR0_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0000), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, TTBR0_EL2, 0 },
-> +	/* TCR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0000), Op2(0b010),
-> +	  trap_el2_reg, reset_el2_val, TCR_EL2, 0 },
-> +	/* VTTBR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0001), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, VTTBR_EL2, 0 },
-> +	/* VTCR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0001), Op2(0b010),
-> +	  trap_el2_reg, reset_el2_val, VTCR_EL2, 0 },
-> +
->  	/* DACR32_EL2 */
->  	{ Op0(0b11), Op1(0b100), CRn(0b0011), CRm(0b0000), Op2(0b000),
->  	  NULL, reset_unknown, DACR32_EL2 },
-> +
-> +	/* SPSR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0100), CRm(0b0000), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, SPSR_EL2, 0 },
-> +	/* ELR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0100), CRm(0b0000), Op2(0b001),
-> +	  trap_el2_reg, reset_el2_val, ELR_EL2, 0 },
-> +	/* SP_EL1 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0100), CRm(0b0001), Op2(0b000),
-> +	  trap_el2_reg },
-> +
->  	/* IFSR32_EL2 */
->  	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0000), Op2(0b001),
->  	  NULL, reset_unknown, IFSR32_EL2 },
-> +	/* AFSR0_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0001), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, AFSR0_EL2, 0 },
-> +	/* AFSR1_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0001), Op2(0b001),
-> +	  trap_el2_reg, reset_el2_val, AFSR1_EL2, 0 },
-> +	/* ESR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0010), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, ESR_EL2, 0 },
->  	/* FPEXC32_EL2 */
->  	{ Op0(0b11), Op1(0b100), CRn(0b0101), CRm(0b0011), Op2(0b000),
->  	  NULL, reset_val, FPEXC32_EL2, 0x70 },
-> +
-> +	/* FAR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0110), CRm(0b0000), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, FAR_EL2, 0 },
-> +	/* HPFAR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b0110), CRm(0b0000), Op2(0b100),
-> +	  trap_el2_reg, reset_el2_val, HPFAR_EL2, 0 },
-> +
-> +	/* MAIR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1010), CRm(0b0010), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, MAIR_EL2, 0 },
-> +	/* AMAIR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1010), CRm(0b0011), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, AMAIR_EL2, 0 },
-> +
-> +	/* VBAR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1100), CRm(0b0000), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, VBAR_EL2, 0 },
-> +	/* RVBAR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1100), CRm(0b0000), Op2(0b001),
-> +	  trap_el2_reg, reset_el2_val, RVBAR_EL2, 0 },
-> +	/* RMR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1100), CRm(0b0000), Op2(0b010),
-> +	  trap_el2_reg, reset_el2_val, RMR_EL2, 0 },
-> +
-> +	/* TPIDR_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1101), CRm(0b0000), Op2(0b010),
-> +	  trap_el2_reg, reset_el2_val, TPIDR_EL2, 0 },
-> +
-> +	/* CNTVOFF_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1110), CRm(0b0000), Op2(0b011),
-> +	  trap_el2_reg, reset_el2_val, CNTVOFF_EL2, 0 },
-> +	/* CNTHCTL_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1110), CRm(0b0001), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, CNTHCTL_EL2, 0 },
-> +	/* CNTHP_TVAL_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1110), CRm(0b0010), Op2(0b000),
-> +	  trap_el2_reg, reset_el2_val, CNTHP_TVAL_EL2, 0 },
-> +	/* CNTHP_CTL_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1110), CRm(0b0010), Op2(0b001),
-> +	  trap_el2_reg, reset_el2_val, CNTHP_CTL_EL2, 0 },
-> +	/* CNTHP_CVAL_EL2 */
-> +	{ Op0(0b11), Op1(0b100), CRn(0b1110), CRm(0b0010), Op2(0b010),
-> +	  trap_el2_reg, reset_el2_val, CNTHP_CVAL_EL2, 0 },
-> +
->  };
->  
->  static bool trap_dbgidr(struct kvm_vcpu *vcpu,
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index dbbb01c..181290f 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -117,6 +117,13 @@ static inline void reset_val(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r
->  	vcpu_sys_reg(vcpu, r->reg) = r->val;
->  }
->  
-> +static inline void reset_el2_val(struct kvm_vcpu *vcpu,
-> +				 const struct sys_reg_desc *r)
+> +static int emulate_at(struct kvm_vcpu *vcpu,
+> +			     struct sys_reg_params *params)
 > +{
-> +	BUG_ON(r->reg >= NR_EL2_REGS);
-> +	vcpu_el2_reg(vcpu, r->reg) = r->val;
+> +	/* TODO: support address translation instruction emulation */
+> +	kvm_inject_undefined(vcpu);
+> +	return 1;
 > +}
 > +
->  static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
->  			      const struct sys_reg_desc *i2)
+> +static int emulate_sys_instr(struct kvm_vcpu *vcpu,
+> +			     struct sys_reg_params *params)
+> +{
+> +	int ret;
+> +
+> +	/* TLB maintenance instructions*/
+> +	if (params->CRn == 0b1000)
+> +		ret = emulate_tlbi(vcpu, params);
+> +	/* Address Translation instructions */
+> +	else if (params->CRn == 0b0111 && params->CRm == 0b1000)
+> +		ret = emulate_at(vcpu, params);
+> +	return ret;
+> +}
+> +
+>  static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
+>  			      const struct sys_reg_desc *table, size_t num)
 >  {
+> @@ -1914,18 +1944,19 @@ static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
+>  }
+>  
+>  /**
+> - * kvm_handle_sys_reg -- handles a mrs/msr trap on a guest sys_reg access
+> + * kvm_handle_sys-- handles a system instruction or mrs/msr instruction trap
+> +		    on a guest execution
+>   * @vcpu: The VCPU pointer
+>   * @run:  The kvm_run struct
+>   */
+> -int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +int kvm_handle_sys(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  {
+>  	struct sys_reg_params params;
+>  	unsigned long esr = kvm_vcpu_get_hsr(vcpu);
+>  	int Rt = (esr >> 5) & 0x1f;
+>  	int ret;
+>  
+> -	trace_kvm_handle_sys_reg(esr);
+> +	trace_kvm_handle_sys(esr);
+>  
+>  	params.is_aarch32 = false;
+>  	params.is_32bit = false;
+> @@ -1937,10 +1968,16 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	params.regval = vcpu_get_reg(vcpu, Rt);
+>  	params.is_write = !(esr & 1);
+>  
+> -	ret = emulate_sys_reg(vcpu, &params);
+> +	if (params.Op0 == 1) {
+> +		/* System instructions */
+> +		ret = emulate_sys_instr(vcpu, &params);
+> +	} else {
+> +		/* MRS/MSR instructions */
+> +		ret = emulate_sys_reg(vcpu, &params);
+> +		if (!params.is_write)
+> +			vcpu_set_reg(vcpu, Rt, params.regval);
+> +	}
+>  
+> -	if (!params.is_write)
+> -		vcpu_set_reg(vcpu, Rt, params.regval);
+>  	return ret;
+>  }
+>  
+> diff --git a/arch/arm64/kvm/trace.h b/arch/arm64/kvm/trace.h
+> index 5f40987..192708e 100644
+> --- a/arch/arm64/kvm/trace.h
+> +++ b/arch/arm64/kvm/trace.h
+> @@ -134,7 +134,7 @@
+>  	TP_printk("%s %s reg %d (0x%08llx)", __entry->fn,  __entry->is_write?"write to":"read from", __entry->reg, __entry->write_value)
+>  );
+>  
+> -TRACE_EVENT(kvm_handle_sys_reg,
+> +TRACE_EVENT(kvm_handle_sys,
+>  	TP_PROTO(unsigned long hsr),
+>  	TP_ARGS(hsr),
+>  
 > -- 
 > 1.9.1
 > 
