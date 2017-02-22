@@ -1,24 +1,28 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH] KVM: arm/arm64: vgic-v3: Don't pretend to support IRQ/FIQ
- bypass
-Date: Wed, 22 Feb 2017 17:52:03 +0100
-Message-ID: <0aaafedb-2f0c-c99c-3c7d-8c6e540df93d@redhat.com>
-References: <20170222121348.3138-1-marc.zyngier@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [RFC 40/55] KVM: arm/arm64: Handle vttbr_el2 write operation
+ from the guest hypervisor
+Date: Wed, 22 Feb 2017 18:59:46 +0100
+Message-ID: <20170222175946.GV26976@cbox>
+References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
+ <1483943091-1364-41-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7113840C2F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 11:51:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B860040C72
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 12:59:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qpWvAAOjjaoK for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Feb 2017 11:51:10 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6517540C2E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 11:51:09 -0500 (EST)
-In-Reply-To: <20170222121348.3138-1-marc.zyngier@arm.com>
+ with ESMTP id Uc96RqV8ks6o for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Feb 2017 12:59:01 -0500 (EST)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA97A40C58
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 12:59:01 -0500 (EST)
+Received: by mail-wm0-f52.google.com with SMTP id v77so5718558wmv.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 10:00:00 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1483943091-1364-41-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,62 +32,244 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, andre.przywara@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On Mon, Jan 09, 2017 at 01:24:36AM -0500, Jintack Lim wrote:
+> Each nested VM is supposed to have a mmu (i.e. shadow stage-2 page
 
-On 22/02/2017 13:13, Marc Zyngier wrote:
-> Our GICv3 emulation always presents ICC_SRE_EL1 with DIB/DFB set to
-> zero, which implies that there is a way to bypass the GIC and
-> inject raw IRQ/FIQ by driving the CPU pins.
+to have a 'struct kvm_mmu' ?
+
+> table), and we create it when the guest hypervisor writes to vttbr_el2
+> with a new vmid.
+
+I think the commit message should also mention that you maintain a list
+of seen nested stage 2 translation contexts and associated shadow page
+tables.
+
 > 
-> Of course, we don't allow that when the GIC is configured, but
-> we fail to indicate that to the guest. The obvious fix is to
-> set these bits (and never let them being changed again).
+> In case the guest hypervisor writes to vttbr_el2 with existing vmid, we
+> check if the base address is changed. If so, then what we have in the
+> shadow page table is not valid any more. So ummap it.
+
+unmap?  We clear the entire shadow stage 2 page table, right?
+
 > 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-
+> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 > ---
->  include/linux/irqchip/arm-gic-v3.h | 2 ++
->  virt/kvm/arm/vgic/vgic-v3.c        | 5 ++++-
->  2 files changed, 6 insertions(+), 1 deletion(-)
+>  arch/arm/include/asm/kvm_host.h   |  1 +
+>  arch/arm/kvm/arm.c                |  1 +
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/include/asm/kvm_mmu.h  |  6 ++++
+>  arch/arm64/kvm/mmu-nested.c       | 71 +++++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c         | 15 ++++++++-
+>  6 files changed, 94 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index e808f8ae6f14..0a8bad331341 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -354,6 +354,8 @@
->   */
->  #define ICC_CTLR_EL1_EOImode_drop_dir	(0U << 1)
->  #define ICC_CTLR_EL1_EOImode_drop	(1U << 1)
-> +#define ICC_SRE_EL1_DIB			(1U << 2)
-> +#define ICC_SRE_EL1_DFB			(1U << 1)
->  #define ICC_SRE_EL1_SRE			(1U << 0)
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index fbde48d..ebf2810 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -84,6 +84,7 @@ struct kvm_arch {
 >  
->  /*
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index e6b03fd8c374..d062256131fc 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -215,10 +215,13 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
->  	/*
->  	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
->  	 * way, so we force SRE to 1 to demonstrate this to the guest.
-> +	 * Also, we don't support any form of IRQ/FIQ bypass.
->  	 * This goes with the spec allowing the value to be RAO/WI.
->  	 */
->  	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-> -		vgic_v3->vgic_sre = ICC_SRE_EL1_SRE;
-> +		vgic_v3->vgic_sre = (ICC_SRE_EL1_DIB |
-> +				     ICC_SRE_EL1_DFB |
-> +				     ICC_SRE_EL1_SRE);
->  		vcpu->arch.vgic_cpu.pendbaser = INITIAL_PENDBASER_VALUE;
->  	} else {
->  		vgic_v3->vgic_sre = 0;
+>  	/* Never used on arm but added to be compatible with arm64 */
+>  	struct list_head nested_mmu_list;
+> +	spinlock_t mmu_list_lock;
+>  
+>  	/* Interrupt controller */
+>  	struct vgic_dist	vgic;
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 147df97..6fa5754 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -147,6 +147,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	kvm->arch.mmu.vmid.vmid_gen = 0;
+>  	kvm->arch.mmu.el2_vmid.vmid_gen = 0;
+>  	INIT_LIST_HEAD(&kvm->arch.nested_mmu_list);
+> +	spin_lock_init(&kvm->arch.mmu_list_lock);
+>  
+>  	/* The maximum number of VCPUs is limited by the host's GIC model */
+>  	kvm->arch.max_vcpus = vgic_present ?
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 23e2267..52eea76 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -99,6 +99,7 @@ struct kvm_arch {
+>  
+>  	/* Stage 2 shadow paging contexts for nested L2 VM */
+>  	struct list_head nested_mmu_list;
+> +	spinlock_t mmu_list_lock;
+
+I'm wondering if we really need the separate spin lock or if we could
+just grab the KVM mutex?
+
+>  };
+>  
+>  #define KVM_NR_MEM_OBJS     40
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index d1ef650..fdc9327 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -327,6 +327,7 @@ static inline unsigned int kvm_get_vmid_bits(void)
+>  #ifdef CONFIG_KVM_ARM_NESTED_HYP
+>  struct kvm_nested_s2_mmu *get_nested_mmu(struct kvm_vcpu *vcpu, u64 vttbr);
+>  struct kvm_s2_mmu *vcpu_get_active_s2_mmu(struct kvm_vcpu *vcpu);
+> +bool handle_vttbr_update(struct kvm_vcpu *vcpu, u64 vttbr);
+>  #else
+>  static inline struct kvm_nested_s2_mmu *get_nested_mmu(struct kvm_vcpu *vcpu,
+>  						       u64 vttbr)
+> @@ -337,6 +338,11 @@ static inline struct kvm_s2_mmu *vcpu_get_active_s2_mmu(struct kvm_vcpu *vcpu)
+>  {
+>  	return &vcpu->kvm->arch.mmu;
+>  }
+> +
+> +static inline bool handle_vttbr_update(struct kvm_vcpu *vcpu, u64 vttbr)
+> +{
+> +	return false;
+> +}
+>  #endif
+>  
+>  static inline u64 kvm_get_vttbr(struct kvm_s2_vmid *vmid,
+> diff --git a/arch/arm64/kvm/mmu-nested.c b/arch/arm64/kvm/mmu-nested.c
+> index d52078f..0811d94 100644
+> --- a/arch/arm64/kvm/mmu-nested.c
+> +++ b/arch/arm64/kvm/mmu-nested.c
+> @@ -53,3 +53,74 @@ struct kvm_s2_mmu *vcpu_get_active_s2_mmu(struct kvm_vcpu *vcpu)
+>  
+>  	return &nested_mmu->mmu;
+>  }
+> +
+> +static struct kvm_nested_s2_mmu *create_nested_mmu(struct kvm_vcpu *vcpu,
+> +						   u64 vttbr)
+> +{
+> +	struct kvm_nested_s2_mmu *nested_mmu, *tmp_mmu;
+> +	struct list_head *nested_mmu_list = &vcpu->kvm->arch.nested_mmu_list;
+> +	bool need_free = false;
+> +	int ret;
+> +
+> +	nested_mmu = kzalloc(sizeof(struct kvm_nested_s2_mmu), GFP_KERNEL);
+> +	if (!nested_mmu)
+> +		return NULL;
+> +
+> +	ret = __kvm_alloc_stage2_pgd(&nested_mmu->mmu);
+> +	if (ret) {
+> +		kfree(nested_mmu);
+> +		return NULL;
+> +	}
+> +
+> +	spin_lock(&vcpu->kvm->arch.mmu_list_lock);
+> +	tmp_mmu = get_nested_mmu(vcpu, vttbr);
+> +	if (!tmp_mmu)
+> +		list_add_rcu(&nested_mmu->list, nested_mmu_list);
+> +	else /* Somebody already created and put a new nested_mmu to the list */
+> +		need_free = true;
+> +	spin_unlock(&vcpu->kvm->arch.mmu_list_lock);
+> +
+> +	if (need_free) {
+> +		__kvm_free_stage2_pgd(&nested_mmu->mmu);
+> +		kfree(nested_mmu);
+> +		nested_mmu = tmp_mmu;
+> +	}
+> +
+> +	return nested_mmu;
+> +}
+> +
+> +static void kvm_nested_s2_unmap(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_nested_s2_mmu *nested_mmu;
+> +	struct list_head *nested_mmu_list = &vcpu->kvm->arch.nested_mmu_list;
+> +
+> +	list_for_each_entry_rcu(nested_mmu, nested_mmu_list, list)
+> +		kvm_unmap_stage2_range(&nested_mmu->mmu, 0, KVM_PHYS_SIZE);
+> +}
+> +
+> +bool handle_vttbr_update(struct kvm_vcpu *vcpu, u64 vttbr)
+> +{
+> +	struct kvm_nested_s2_mmu *nested_mmu;
+> +
+> +	/* See if we can relax this */
+
+huh?
+
+> +	if (!vttbr)
+
+why is this a special case?
+
+Theoretically an IPA of zero and VMID zero could be a valid page table
+base pointer, right?
+
+I'm gussing because the guest hypervisor occasionally writes zero into
+VTTBR_EL2, for example when not using stage 2 translation, so perhaps
+what you need to do is to defer creating a new nested mmu structure
+until you actually enter the VM with stage 2 paging enabled?
+
+> +		return true;
+> +
+> +	nested_mmu = (struct kvm_nested_s2_mmu *)get_nested_mmu(vcpu, vttbr);
+> +	if (!nested_mmu) {
+> +		nested_mmu = create_nested_mmu(vcpu, vttbr);
+> +		if (!nested_mmu)
+> +			return false;
+
+I'm wondering if this can be simplified by having get_nested_mmu lookup
+and allocate the struct and renaming the get_nested_mmu funtion to
+lookup_nested_mmu?  This caller looks racy, even though it isn't, which
+would be improved by my suggestion as well.
+
+> +	} else {
+> +		/*
+> +		 * unmap the shadow page table if vttbr_el2 is
+
+While the function is called unmap, what we really do is
+clearing/flushing the shadow stage 2 page table.
+
+> +		 * changed to different value
+> +		 */
+> +		if (vttbr != nested_mmu->virtual_vttbr)
+> +			kvm_nested_s2_unmap(vcpu);
+> +	}
+> +
+> +	nested_mmu->virtual_vttbr = vttbr;
+> +
+> +	return true;
+> +}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e66f40d..ddb641c 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -960,6 +960,19 @@ static bool access_cpacr(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static bool access_vttbr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +			 const struct sys_reg_desc *r)
+> +{
+> +	u64 vttbr = p->regval;
+> +
+> +	if (!p->is_write) {
+> +		p->regval = vcpu_el2_reg(vcpu, r->reg);
+> +		return true;
+> +	}
+> +
+> +	return handle_vttbr_update(vcpu, vttbr);
+> +}
+> +
+>  static bool trap_el2_reg(struct kvm_vcpu *vcpu,
+>  			 struct sys_reg_params *p,
+>  			 const struct sys_reg_desc *r)
+> @@ -1306,7 +1319,7 @@ static bool trap_el2_reg(struct kvm_vcpu *vcpu,
+>  	  trap_el2_reg, reset_el2_val, TCR_EL2, 0 },
+>  	/* VTTBR_EL2 */
+>  	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0001), Op2(0b000),
+> -	  trap_el2_reg, reset_el2_val, VTTBR_EL2, 0 },
+> +	  access_vttbr, reset_el2_val, VTTBR_EL2, 0 },
+>  	/* VTCR_EL2 */
+>  	{ Op0(0b11), Op1(0b100), CRn(0b0010), CRm(0b0001), Op2(0b010),
+>  	  trap_el2_reg, reset_el2_val, VTCR_EL2, 0 },
+> -- 
+> 1.9.1
 > 
+> 
+
+Thanks,
+-Christoffer
