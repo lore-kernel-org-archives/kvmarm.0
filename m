@@ -1,28 +1,27 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC 32/55] KVM: arm/arm64: register GICH iodev for the guest
- hypervisor
-Date: Wed, 22 Feb 2017 14:21:27 +0100
-Message-ID: <20170222132127.GS26976@cbox>
+Subject: Re: [RFC 39/55] KVM: arm/arm64: Add mmu context for the nesting
+Date: Wed, 22 Feb 2017 14:34:41 +0100
+Message-ID: <20170222133441.GT26976@cbox>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <1483943091-1364-33-git-send-email-jintack@cs.columbia.edu>
+ <1483943091-1364-40-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EB3D40D23
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 08:20:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E967740D31
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 08:33:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CeeBqLNQZOBv for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Feb 2017 08:20:42 -0500 (EST)
-Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD44F40C3E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 08:20:42 -0500 (EST)
-Received: by mail-wm0-f53.google.com with SMTP id 196so35206705wmm.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 05:21:41 -0800 (PST)
+ with ESMTP id 1Ei6fxC1pCkl for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Feb 2017 08:33:57 -0500 (EST)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A2D2040D23
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 08:33:56 -0500 (EST)
+Received: by mail-wm0-f42.google.com with SMTP id r141so2070949wmg.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 05:34:55 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1483943091-1364-33-git-send-email-jintack@cs.columbia.edu>
+In-Reply-To: <1483943091-1364-40-git-send-email-jintack@cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,170 +35,286 @@ To: Jintack Lim <jintack@cs.columbia.edu>
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, andre.przywara@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 09, 2017 at 01:24:28AM -0500, Jintack Lim wrote:
-> Register a device for the virtual interface control block(GICH) access
-> from the guest hypervisor.
+On Mon, Jan 09, 2017 at 01:24:35AM -0500, Jintack Lim wrote:
+> Add the shadow stage-2 MMU context to be used for the nesting, but don't
+> do anything with it yet.
 > 
-> TODO: Get GICH address from DT, which is hardcoded now.
+> The host hypervisor maintains mmu structures for each nested VM. When
+> entering a nested VM, the host hypervisor searches for the nested VM's
+> mmu using vmid as a key. Note that this vmid is from the guest
+> hypervisor's point of view.
+
+I feel like I'm missing some overall design description or rationale of
+why this is needed.  Can you expand on this commit message a bit?
+
 > 
-
-It's not so much about the DT as it is adding an API for userspace to
-tell KVM where to place it, and userspace can add the same required info
-into the DT/ACPI as needed.
-
-This is obviously something we have to address sooner as opposed to
-later.
-
-Thanks,
--Christoffer
-
 > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 > ---
->  arch/arm64/include/uapi/asm/kvm.h  |  6 ++++++
->  include/kvm/arm_vgic.h             |  5 ++++-
->  virt/kvm/arm/vgic/vgic-mmio.c      |  6 ++++++
->  virt/kvm/arm/vgic/vgic-v2-nested.c | 24 ++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic-v2.c        |  7 +++++++
->  virt/kvm/arm/vgic/vgic.h           |  6 ++++++
->  6 files changed, 53 insertions(+), 1 deletion(-)
+>  arch/arm/include/asm/kvm_host.h      |  3 ++
+>  arch/arm/kvm/arm.c                   |  1 +
+>  arch/arm64/include/asm/kvm_emulate.h | 13 ++++-----
+>  arch/arm64/include/asm/kvm_host.h    | 19 +++++++++++++
+>  arch/arm64/include/asm/kvm_mmu.h     | 31 ++++++++++++++++++++
+>  arch/arm64/kvm/Makefile              |  1 +
+>  arch/arm64/kvm/context.c             |  2 +-
+>  arch/arm64/kvm/mmu-nested.c          | 55 ++++++++++++++++++++++++++++++++++++
+>  8 files changed, 116 insertions(+), 9 deletions(-)
+>  create mode 100644 arch/arm64/kvm/mmu-nested.c
 > 
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 78117bf..3995d3d 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -99,6 +99,12 @@ struct kvm_regs {
->  #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
->  #define KVM_ARM_VCPU_NESTED_VIRT	4 /* Support nested virtual EL2 */
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index da45394..fbde48d 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -82,6 +82,9 @@ struct kvm_arch {
+>  	 * here.
+>  	 */
 >  
-> +/* FIXME: This should come from DT */
+> +	/* Never used on arm but added to be compatible with arm64 */
+> +	struct list_head nested_mmu_list;
+> +
+>  	/* Interrupt controller */
+>  	struct vgic_dist	vgic;
+>  	int max_vcpus;
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 371b38e7..147df97 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -146,6 +146,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	/* Mark the initial VMID generation invalid */
+>  	kvm->arch.mmu.vmid.vmid_gen = 0;
+>  	kvm->arch.mmu.el2_vmid.vmid_gen = 0;
+> +	INIT_LIST_HEAD(&kvm->arch.nested_mmu_list);
+>  
+>  	/* The maximum number of VCPUs is limited by the host's GIC model */
+>  	kvm->arch.max_vcpus = vgic_present ?
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 94068e7..abad676 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -183,6 +183,11 @@ static inline bool vcpu_el2_imo_is_set(const struct kvm_vcpu *vcpu)
+>  	return (vcpu_el2_reg(vcpu, HCR_EL2) & HCR_IMO);
+>  }
+>  
+> +static inline bool vcpu_nested_stage2_enabled(const struct kvm_vcpu *vcpu)
+> +{
+> +	return (vcpu_el2_reg(vcpu, HCR_EL2) & HCR_VM);
+> +}
+> +
+>  static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+>  {
+>  	return vcpu->arch.fault.esr_el2;
+> @@ -363,12 +368,4 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+>  	return data;		/* Leave LE untouched */
+>  }
+>  
+> -static inline struct kvm_s2_vmid *vcpu_get_active_vmid(struct kvm_vcpu *vcpu)
+> -{
+> -	if (unlikely(vcpu_mode_el2(vcpu)))
+> -		return &vcpu->kvm->arch.mmu.el2_vmid;
+> -
+> -	return &vcpu->kvm->arch.mmu.vmid;
+> -}
+> -
+>  #endif /* __ARM64_KVM_EMULATE_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index b33d35d..23e2267 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -65,6 +65,22 @@ struct kvm_s2_mmu {
+>  	pgd_t *pgd;
+>  };
+>  
+> +/* Per nested VM mmu structure */
+> +struct kvm_nested_s2_mmu {
+> +	struct kvm_s2_mmu mmu;
+> +
+> +	/*
+> +	 * The vttbr value set by the guest hypervisor for this nested VM.
+> +	 * vmid field is used as a key to search for this mmu structure among
+> +	 * all nested VM mmu structures by the host hypervisor.
+> +	 * baddr field is used to determine if we need to unmap stage 2
+> +	 * shadow page tables.
+> +	 */
+
+I don't really understand this comment in isolation - especially not the
+baddr part.
+
+> +	u64 virtual_vttbr;
+> +
+> +	struct list_head list;
+> +};
+> +
+>  struct kvm_arch {
+>  	/* Stage 2 paging state for the VM */
+>  	struct kvm_s2_mmu mmu;
+> @@ -80,6 +96,9 @@ struct kvm_arch {
+>  
+>  	/* Timer */
+>  	struct arch_timer_kvm	timer;
+> +
+> +	/* Stage 2 shadow paging contexts for nested L2 VM */
+> +	struct list_head nested_mmu_list;
+>  };
+>  
+>  #define KVM_NR_MEM_OBJS     40
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index a504162..d1ef650 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -112,6 +112,7 @@
+>  #include <asm/cacheflush.h>
+>  #include <asm/mmu_context.h>
+>  #include <asm/pgtable.h>
+> +#include <asm/kvm_emulate.h>
+>  
+>  static inline unsigned long __kern_hyp_va(unsigned long v)
+>  {
+> @@ -323,6 +324,21 @@ static inline unsigned int kvm_get_vmid_bits(void)
+>  	return (cpuid_feature_extract_unsigned_field(reg, ID_AA64MMFR1_VMIDBITS_SHIFT) == 2) ? 16 : 8;
+>  }
+>  
 > +#ifdef CONFIG_KVM_ARM_NESTED_HYP
-> +#define KVM_VGIC_V2_GICH_BASE          0x08030000
-> +#define KVM_VGIC_V2_GICH_SIZE          0x2000
+> +struct kvm_nested_s2_mmu *get_nested_mmu(struct kvm_vcpu *vcpu, u64 vttbr);
+> +struct kvm_s2_mmu *vcpu_get_active_s2_mmu(struct kvm_vcpu *vcpu);
+> +#else
+> +static inline struct kvm_nested_s2_mmu *get_nested_mmu(struct kvm_vcpu *vcpu,
+> +						       u64 vttbr)
+> +{
+> +	return NULL;
+> +}
+> +static inline struct kvm_s2_mmu *vcpu_get_active_s2_mmu(struct kvm_vcpu *vcpu)
+> +{
+> +	return &vcpu->kvm->arch.mmu;
+> +}
 > +#endif
 > +
->  struct kvm_vcpu_init {
->  	__u32 target;
->  	__u32 features[7];
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index fc882d6..5bda20c 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -125,7 +125,8 @@ enum iodev_type {
->  	IODEV_CPUIF,
->  	IODEV_DIST,
->  	IODEV_REDIST,
-> -	IODEV_ITS
-> +	IODEV_ITS,
-> +	IODEV_GICH,
->  };
->  
->  struct vgic_io_device {
-> @@ -198,6 +199,8 @@ struct vgic_dist {
->  
->  	struct vgic_io_device	dist_iodev;
->  
-> +	struct vgic_io_device	hyp_iodev;
-> +
->  	bool			has_its;
->  
->  	/*
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index 049c570..2e4097d 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -512,6 +512,9 @@ static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
->  	case IODEV_ITS:
->  		data = region->its_read(vcpu->kvm, iodev->its, addr, len);
->  		break;
-> +	case IODEV_GICH:
-> +		data = region->read(vcpu, addr, len);
-> +		break;
->  	}
->  
->  	vgic_data_host_to_mmio_bus(val, len, data);
-> @@ -543,6 +546,9 @@ static int dispatch_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
->  	case IODEV_ITS:
->  		region->its_write(vcpu->kvm, iodev->its, addr, len, data);
->  		break;
-> +	case IODEV_GICH:
-> +		region->write(vcpu, addr, len, data);
-> +		break;
->  	}
->  
->  	return 0;
-> diff --git a/virt/kvm/arm/vgic/vgic-v2-nested.c b/virt/kvm/arm/vgic/vgic-v2-nested.c
-> index 85f646b..cb55324 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2-nested.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2-nested.c
-> @@ -206,6 +206,30 @@ static void vgic_mmio_write_v2_gich(struct kvm_vcpu *vcpu,
->  		4 * VGIC_V2_MAX_LRS, VGIC_ACCESS_32bit),
->  };
->  
-> +int vgic_register_gich_iodev(struct kvm *kvm, struct vgic_dist *dist)
-> +{
-> +	struct vgic_io_device *io_device = &kvm->arch.vgic.hyp_iodev;
-> +	int ret = 0;
-> +	unsigned int len;
-> +
-> +	len = KVM_VGIC_V2_GICH_SIZE;
-> +
-> +	io_device->regions = vgic_v2_gich_registers;
-> +	io_device->nr_regions = ARRAY_SIZE(vgic_v2_gich_registers);
-> +	kvm_iodevice_init(&io_device->dev, &kvm_io_gic_ops);
-> +
-> +	io_device->base_addr = KVM_VGIC_V2_GICH_BASE;
-> +	io_device->iodev_type = IODEV_GICH;
-> +	io_device->redist_vcpu = NULL;
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, KVM_VGIC_V2_GICH_BASE,
-> +			len, &io_device->dev);
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	return ret;
-> +}
-> +
->  /*
->   * For LRs which have HW bit set such as timer interrupts, we modify them to
->   * have the host hardware interrupt number instead of the virtual one programmed
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index 9bab867..b8b73fd 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -280,6 +280,13 @@ int vgic_v2_map_resources(struct kvm *kvm)
->  		goto out;
->  	}
->  
-> +	/* Register virtual GICH interface to kvm io bus */
-> +	ret = vgic_register_gich_iodev(kvm, dist);
-> +	if (ret) {
-> +		kvm_err("Unable to register VGIC GICH regions\n");
-> +		goto out;
-> +	}
-> +
->  	if (!static_branch_unlikely(&vgic_v2_cpuif_trap)) {
->  		ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
->  					    kvm_vgic_global_state.vcpu_base,
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 2aef680..11d61a7 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -121,8 +121,14 @@ static inline int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
->  int vgic_init(struct kvm *kvm);
->  
->  #ifdef CONFIG_KVM_ARM_NESTED_HYP
-> +int vgic_register_gich_iodev(struct kvm *kvm, struct vgic_dist *dist);
->  void vgic_init_nested(struct kvm_vcpu *vcpu);
->  #else
-> +static inline int vgic_register_gich_iodev(struct kvm *kvm,
-> +		struct vgic_dist *dist)
-> +{
-> +	return 0;
-> +}
->  static inline void vgic_init_nested(struct kvm_vcpu *vcpu)
+>  static inline u64 kvm_get_vttbr(struct kvm_s2_vmid *vmid,
+>  				struct kvm_s2_mmu *mmu)
 >  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> @@ -334,5 +350,20 @@ static inline u64 kvm_get_vttbr(struct kvm_s2_vmid *vmid,
+>  	return baddr | vmid_field;
+>  }
+>  
+> +static inline u64 get_vmid(u64 vttbr)
+> +{
+> +	return (vttbr & VTTBR_VMID_MASK(get_kvm_vmid_bits()))>>VTTBR_VMID_SHIFT;
+
+whitespacealertbetweentheshiftmarker.
+
+> +}
+> +
+> +static inline struct kvm_s2_vmid *vcpu_get_active_vmid(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_s2_mmu *mmu = vcpu_get_active_s2_mmu(vcpu);
+> +
+> +	if (unlikely(vcpu_mode_el2(vcpu)))
+> +		return &mmu->el2_vmid;
+> +	else
+> +		return &mmu->vmid;
+> +}
+> +
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* __ARM64_KVM_MMU_H__ */
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 8573faf..b0b1074 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -36,5 +36,6 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+>  
+>  kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += handle_exit_nested.o
+> +kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += mmu-nested.o
+>  kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += emulate-nested.o
+>  kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += $(KVM)/arm/vgic/vgic-v2-nested.o
+> diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
+> index b2c0220..9ebc38f 100644
+> --- a/arch/arm64/kvm/context.c
+> +++ b/arch/arm64/kvm/context.c
+> @@ -91,7 +91,7 @@ static void create_shadow_el1_sysregs(struct kvm_vcpu *vcpu)
+>  
+>  static void setup_s2_mmu(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_s2_mmu *mmu = &vcpu->kvm->arch.mmu;
+> +	struct kvm_s2_mmu *mmu = vcpu_get_active_s2_mmu(vcpu);
+>  	struct kvm_s2_vmid *vmid = vcpu_get_active_vmid(vcpu);
+>  
+>  	vcpu->arch.hw_vttbr = kvm_get_vttbr(vmid, mmu);
+> diff --git a/arch/arm64/kvm/mmu-nested.c b/arch/arm64/kvm/mmu-nested.c
+> new file mode 100644
+> index 0000000..d52078f
+> --- /dev/null
+> +++ b/arch/arm64/kvm/mmu-nested.c
+> @@ -0,0 +1,55 @@
+> +/*
+> + * Copyright (C) 2016 - Columbia University
+> + * Author: Jintack Lim <jintack@cs.columbia.edu>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/kvm_arm.h>
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_mmu.h>
+> +#include <asm/kvm_nested.h>
+> +
+> +struct kvm_nested_s2_mmu *get_nested_mmu(struct kvm_vcpu *vcpu, u64 vttbr)
+> +{
+> +	struct kvm_nested_s2_mmu *mmu;
+> +	u64 target_vmid = get_vmid(vttbr);
+> +	struct list_head *nested_mmu_list = &vcpu->kvm->arch.nested_mmu_list;
+> +
+> +	list_for_each_entry_rcu(mmu, nested_mmu_list, list) {
+> +		u64 vmid = get_vmid(mmu->virtual_vttbr);
+> +
+> +		if (target_vmid == vmid)
+
+why is it sufficient to just look at the VMID and not having to consider
+the baddr?
+
+> +			return mmu;
+> +	}
+> +	return NULL;
+> +}
+> +
+> +struct kvm_s2_mmu *vcpu_get_active_s2_mmu(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_nested_s2_mmu *nested_mmu;
+> +
+> +	/* If we are NOT entering the nested VM, return mmu in kvm_arch */
+
+this comment doesn't add any info not clear in the code
+
+> +	if (vcpu_mode_el2(vcpu) || !vcpu_nested_stage2_enabled(vcpu))
+> +		return &vcpu->kvm->arch.mmu;
+> +
+> +	/* Otherwise, search for nested_mmu in the list */
+> +	nested_mmu = get_nested_mmu(vcpu, vcpu_el2_reg(vcpu, VTTBR_EL2));
+> +
+> +	/* When this function is called, nested_mmu should be in the list */
+> +	BUG_ON(!nested_mmu);
+
+can you provide a slightly stronger rationale behind why this BUG_ON
+should never fire - I don't feel convinced right now.
+
+> +
+> +	return &nested_mmu->mmu;
+> +}
 > -- 
 > 1.9.1
 > 
 > 
+
+Thanks,
+-Christoffer
