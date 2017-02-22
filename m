@@ -1,271 +1,284 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC 27/55] KVM: arm/arm64: Emulate GICH interface on GICv2
-Date: Wed, 22 Feb 2017 14:06:16 +0100
-Message-ID: <20170222130616.GO26976@cbox>
+Subject: Re: [RFC 28/55] KVM: arm/arm64: Prepare vgic state for the nested VM
+Date: Wed, 22 Feb 2017 14:12:46 +0100
+Message-ID: <20170222131246.GP26976@cbox>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <1483943091-1364-28-git-send-email-jintack@cs.columbia.edu>
+ <1483943091-1364-29-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B71240CED
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 08:12:04 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CNLwSLercQkR for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Feb 2017 08:12:03 -0500 (EST)
+Received: from mail-wr0-f175.google.com (mail-wr0-f175.google.com
+ [209.85.128.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E135C40C74
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 08:12:02 -0500 (EST)
+Received: by mail-wr0-f175.google.com with SMTP id 89so1571537wrr.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Feb 2017 05:13:00 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1483943091-1364-28-git-send-email-jintack@cs.columbia.edu>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <1483943091-1364-29-git-send-email-jintack@cs.columbia.edu>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, andre.przywara@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 09, 2017 at 01:24:23AM -0500, Jintack Lim wrote:
-> Emulate GICH interface accesses from the guest hypervisor.
+On Mon, Jan 09, 2017 at 01:24:24AM -0500, Jintack Lim wrote:
+> When entering a nested VM, we set up the hypervisor control interface
+> based on what the guest hypervisor has set. Especially, we investigate
+> each list register written by the guest hypervisor whether HW bit is
+> set.  If so, we translate hw irq number from the guest's point of view
+> to the real hardware irq number if there is a mapping.
+
+Does that really always work?
+
+Are there not some assumptions about the virtual device that the guest
+hypervisor is mapping the virtual IRQ to also exists as an equivalent
+device with some connected state on the host?
+
+Thanks,
+-Christoffer
+
 > 
-> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-> Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 > ---
->  arch/arm64/kvm/Makefile            |   1 +
->  virt/kvm/arm/vgic/vgic-v2-nested.c | 207 +++++++++++++++++++++++++++++++++++++
->  2 files changed, 208 insertions(+)
->  create mode 100644 virt/kvm/arm/vgic/vgic-v2-nested.c
+>  arch/arm/include/asm/kvm_emulate.h   |  5 ++
+>  arch/arm64/include/asm/kvm_emulate.h |  5 ++
+>  arch/arm64/kvm/context.c             |  4 ++
+>  include/kvm/arm_vgic.h               |  8 +++
+>  virt/kvm/arm/vgic/vgic-init.c        |  3 ++
+>  virt/kvm/arm/vgic/vgic-v2-nested.c   | 99 ++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h             | 11 ++++
+>  7 files changed, 135 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 9c35e9a..8573faf 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -37,3 +37,4 @@ kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+> index 0fa2f5a..05d5906 100644
+> --- a/arch/arm/include/asm/kvm_emulate.h
+> +++ b/arch/arm/include/asm/kvm_emulate.h
+> @@ -101,6 +101,11 @@ static inline bool vcpu_mode_el2(const struct kvm_vcpu *vcpu)
+>  	return false;
+>  }
 >  
->  kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += handle_exit_nested.o
->  kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += emulate-nested.o
-> +kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += $(KVM)/arm/vgic/vgic-v2-nested.o
+> +static inline bool vcpu_el2_imo_is_set(const struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+>  static inline unsigned long *vcpu_pc(struct kvm_vcpu *vcpu)
+>  {
+>  	return &vcpu->arch.ctxt.gp_regs.usr_regs.ARM_pc;
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 0987ee4..a9c993f 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -178,6 +178,11 @@ static inline bool vcpu_mode_el2(const struct kvm_vcpu *vcpu)
+>  	return mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t;
+>  }
+>  
+> +static inline bool vcpu_el2_imo_is_set(const struct kvm_vcpu *vcpu)
+> +{
+> +	return (vcpu_el2_reg(vcpu, HCR_EL2) & HCR_IMO);
+> +}
+> +
+>  static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+>  {
+>  	return vcpu->arch.fault.esr_el2;
+> diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
+> index 0025dd9..7a94c9d 100644
+> --- a/arch/arm64/kvm/context.c
+> +++ b/arch/arm64/kvm/context.c
+> @@ -161,6 +161,8 @@ void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
+>  		ctxt->hw_sys_regs = ctxt->sys_regs;
+>  		ctxt->hw_sp_el1 = ctxt->gp_regs.sp_el1;
+>  	}
+> +
+> +	vgic_v2_setup_shadow_state(vcpu);
+>  }
+>  
+>  /**
+> @@ -179,6 +181,8 @@ void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu)
+>  		*vcpu_cpsr(vcpu) = ctxt->hw_pstate;
+>  		ctxt->gp_regs.sp_el1 = ctxt->hw_sp_el1;
+>  	}
+> +
+> +	vgic_v2_restore_shadow_state(vcpu);
+>  }
+>  
+>  void kvm_arm_init_cpu_context(kvm_cpu_context_t *cpu_ctxt)
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 9a9cb27..484f6b1 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -312,6 +312,14 @@ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+>  
+>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+>  
+> +#ifdef CONFIG_KVM_ARM_NESTED_HYP
+> +void vgic_v2_setup_shadow_state(struct kvm_vcpu *vcpu);
+> +void vgic_v2_restore_shadow_state(struct kvm_vcpu *vcpu);
+> +#else
+> +static inline void vgic_v2_setup_shadow_state(struct kvm_vcpu *vcpu) { }
+> +static inline void vgic_v2_restore_shadow_state(struct kvm_vcpu *vcpu) { }
+> +#endif
+> +
+>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+>  #define vgic_initialized(k)	((k)->arch.vgic.initialized)
+>  #define vgic_ready(k)		((k)->arch.vgic.ready)
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index 8cebfbc..06ab8a5 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -216,6 +216,9 @@ static void kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+>  			irq->config = VGIC_CONFIG_LEVEL;
+>  		}
+>  	}
+> +
+> +	vgic_init_nested(vcpu);
+> +
+>  	if (kvm_vgic_global_state.type == VGIC_V2)
+>  		vgic_v2_enable(vcpu);
+>  	else
 > diff --git a/virt/kvm/arm/vgic/vgic-v2-nested.c b/virt/kvm/arm/vgic/vgic-v2-nested.c
-> new file mode 100644
-> index 0000000..b13128e
-> --- /dev/null
+> index b13128e..a992da5 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2-nested.c
 > +++ b/virt/kvm/arm/vgic/vgic-v2-nested.c
-> @@ -0,0 +1,207 @@
-> +#include <linux/cpu.h>
-> +#include <linux/kvm.h>
-> +#include <linux/kvm_host.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/io.h>
-> +#include <linux/uaccess.h>
+> @@ -205,3 +205,102 @@ static void vgic_mmio_write_v2_gich(struct kvm_vcpu *vcpu,
+>  		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich,
+>  		4 * VGIC_V2_MAX_LRS, VGIC_ACCESS_32bit),
+>  };
 > +
-> +#include <linux/irqchip/arm-gic.h>
-> +
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_arm.h>
-> +#include <asm/kvm_mmu.h>
-> +#include <kvm/arm_vgic.h>
-> +
-> +#include "vgic.h"
-> +#include "vgic-mmio.h"
-> +
-> +static inline struct vgic_v2_cpu_if *vcpu_nested_if(struct kvm_vcpu *vcpu)
+> +/*
+> + * For LRs which have HW bit set such as timer interrupts, we modify them to
+> + * have the host hardware interrupt number instead of the virtual one programmed
+> + * by the guest hypervisor.
+> + */
+> +static void vgic_v2_create_shadow_lr(struct kvm_vcpu *vcpu)
 > +{
-> +	return &vcpu->arch.vgic_cpu.nested_vgic_v2;
-> +}
-> +
-> +static inline struct vgic_v2_cpu_if *vcpu_shadow_if(struct kvm_vcpu *vcpu)
-> +{
-> +	return &vcpu->arch.vgic_cpu.shadow_vgic_v2;
-> +}
-> +
-> +static unsigned long vgic_mmio_read_v2_vtr(struct kvm_vcpu *vcpu,
-> +					   gpa_t addr, unsigned int len)
-> +{
-> +	u32 reg;
-> +
-> +	reg = kvm_vgic_global_state.nr_lr - 1;
-> +	reg |= 0b100 << 26;
-> +	reg |= 0b100 << 29;
-
-Pure magic?  Can we have some defines?  Have you checked the existing
-header file if we have some defines for this?
-
-> +
-> +	return reg;
-> +}
-> +
-> +static inline bool lr_triggers_eoi(u32 lr)
-> +{
-> +	return !(lr & (GICH_LR_STATE | GICH_LR_HW)) && (lr & GICH_LR_EOI);
-> +}
-> +
-> +static unsigned long get_eisr(struct kvm_vcpu *vcpu, bool upper_reg)
-> +{
-> +	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-> +	int max_lr = upper_reg ? 64 : 32;
-> +	int min_lr = upper_reg ? 32 : 0;
-> +	int nr_lr = min(kvm_vgic_global_state.nr_lr, max_lr);
 > +	int i;
-> +	u32 reg = 0;
-
-So the assumption here is that we can only emualte a virtual GICH
-interface with the same number of LRs that the hardware has, yes ?  Can
-you document this assumption in the commit message and explain how we
-deal with nr_lr for all this logic based on that.
-
-Seems like this could go in the commit message.
-
-> +
-> +	for (i = min_lr; i < nr_lr; i++) {
-> +		if (lr_triggers_eoi(cpu_if->vgic_lr[i]))
-> +			reg |= BIT(i - min_lr);
-> +	}
-> +
-> +	return reg;
-> +}
-> +
-> +static unsigned long vgic_mmio_read_v2_eisr0(struct kvm_vcpu *vcpu,
-> +					     gpa_t addr, unsigned int len)
-> +{
-> +	return get_eisr(vcpu, false);
-> +}
-> +
-> +static unsigned long vgic_mmio_read_v2_eisr1(struct kvm_vcpu *vcpu,
-> +					     gpa_t addr, unsigned int len)
-> +{
-> +	return get_eisr(vcpu, true);
-> +}
-> +
-> +static u32 get_elrsr(struct kvm_vcpu *vcpu, bool upper_reg)
-> +{
 > +	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-> +	int max_lr = upper_reg ? 64 : 32;
-> +	int min_lr = upper_reg ? 32 : 0;
-> +	int nr_lr = min(kvm_vgic_global_state.nr_lr, max_lr);
-> +	u32 reg = 0;
-> +	int i;
+> +	struct vgic_v2_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
+> +	struct vgic_irq *irq;
 > +
-> +	for (i = min_lr; i < nr_lr; i++) {
-> +		if (!(cpu_if->vgic_lr[i] & GICH_LR_STATE))
-> +			reg |= BIT(i - min_lr);
-> +	}
-> +
-> +	return reg;
-> +}
-> +
-> +static unsigned long vgic_mmio_read_v2_elrsr0(struct kvm_vcpu *vcpu,
-> +					      gpa_t addr, unsigned int len)
-> +{
-> +	return get_elrsr(vcpu, false);
-> +}
-> +
-> +static unsigned long vgic_mmio_read_v2_elrsr1(struct kvm_vcpu *vcpu,
-> +					      gpa_t addr, unsigned int len)
-> +{
-> +	return get_elrsr(vcpu, true);
-> +}
-> +
-> +static unsigned long vgic_mmio_read_v2_misr(struct kvm_vcpu *vcpu,
-> +					    gpa_t addr, unsigned int len)
-> +{
-> +	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
 > +	int nr_lr = kvm_vgic_global_state.nr_lr;
-> +	u32 reg = 0;
 > +
-> +	if (vgic_mmio_read_v2_eisr0(vcpu, addr, len) ||
-> +			vgic_mmio_read_v2_eisr1(vcpu, addr, len))
-> +		reg |= GICH_MISR_EOI;
+> +	for (i = 0; i < nr_lr; i++) {
+> +		u32 lr = cpu_if->vgic_lr[i];
+> +		int l1_irq;
 > +
-> +	if (cpu_if->vgic_hcr & GICH_HCR_UIE) {
-> +		u32 elrsr0 = vgic_mmio_read_v2_elrsr0(vcpu, addr, len);
-> +		u32 elrsr1 = vgic_mmio_read_v2_elrsr1(vcpu, addr, len);
-> +		int used_lrs;
+> +		if (!(lr & GICH_LR_HW))
+> +			goto next;
 > +
-> +		used_lrs = nr_lr - (hweight32(elrsr0) + hweight32(elrsr1));
-> +		if (used_lrs <= 1)
-> +			reg |= GICH_MISR_U;
+> +		/* We have the HW bit set */
+> +		l1_irq = (lr & GICH_LR_PHYSID_CPUID) >>
+> +			GICH_LR_PHYSID_CPUID_SHIFT;
+> +		irq = vgic_get_irq(vcpu->kvm, vcpu, l1_irq);
+> +
+> +		if (!irq->hw) {
+> +			/* There was no real mapping, so nuke the HW bit */
+> +			lr &= ~GICH_LR_HW;
+> +			vgic_put_irq(vcpu->kvm, irq);
+> +			goto next;
+> +		}
+> +
+> +		/* Translate the virtual mapping to the real one */
+> +		lr &= ~GICH_LR_EOI;
+> +		lr &= ~GICH_LR_PHYSID_CPUID;
+> +		lr |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
+> +		vgic_put_irq(vcpu->kvm, irq);
+> +
+> +next:
+> +		s_cpu_if->vgic_lr[i] = lr;
 > +	}
-> +
-> +	/* TODO: Support remaining bits in this register */
-
-Is this going to happen in this series?  Why don't we just do it here?
-
-> +	return reg;
 > +}
 > +
-> +static unsigned long vgic_mmio_read_v2_gich(struct kvm_vcpu *vcpu,
-> +					    gpa_t addr, unsigned int len)
+> +/*
+> + * Change the shadow HWIRQ field back to the virtual value before copying over
+> + * the entire shadow struct to the nested state.
+> + */
+> +static void vgic_v2_restore_shadow_lr(struct kvm_vcpu *vcpu)
 > +{
 > +	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-> +	u32 value;
+> +	struct vgic_v2_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
+> +	int nr_lr = kvm_vgic_global_state.nr_lr;
+> +	int lr;
 > +
-> +	switch (addr & 0xfff) {
-> +	case GICH_HCR:
-> +		value = cpu_if->vgic_hcr;
-> +		break;
-> +	case GICH_VMCR:
-> +		value = cpu_if->vgic_vmcr;
-> +		break;
-> +	case GICH_APR:
-> +		value = cpu_if->vgic_apr;
-> +		break;
-> +	case GICH_LR0 ... (GICH_LR0 + 4 * (VGIC_V2_MAX_LRS - 1)):
-> +		value = cpu_if->vgic_lr[(addr & 0xff) >> 2];
-> +		break;
-> +	default:
-> +		return 0;
+> +	for (lr = 0; lr < nr_lr; lr++) {
+> +		s_cpu_if->vgic_lr[lr] &= ~GICH_LR_PHYSID_CPUID;
+> +		s_cpu_if->vgic_lr[lr] |= cpu_if->vgic_lr[lr] &
+> +			GICH_LR_PHYSID_CPUID;
 > +	}
-> +
-> +	return value;
 > +}
 > +
-> +static void vgic_mmio_write_v2_gich(struct kvm_vcpu *vcpu,
-> +				    gpa_t addr, unsigned int len,
-> +				    unsigned long val)
+> +void vgic_v2_setup_shadow_state(struct kvm_vcpu *vcpu)
 > +{
-> +	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
+> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +	struct vgic_v2_cpu_if *cpu_if;
 > +
-> +	switch (addr & 0xfff) {
-> +	case GICH_HCR:
-> +		cpu_if->vgic_hcr = val;
-> +		break;
-> +	case GICH_VMCR:
-> +		cpu_if->vgic_vmcr = val;
-> +		break;
-> +	case GICH_APR:
-> +		cpu_if->vgic_apr = val;
-> +		break;
-> +	case GICH_LR0 ... (GICH_LR0 + 4 * (VGIC_V2_MAX_LRS - 1)):
-> +		cpu_if->vgic_lr[(addr & 0xff) >> 2] = val;
-
-Don't you need to check if we actually support this particular LR ?
-
-> +		break;
+> +	if (vcpu_el2_imo_is_set(vcpu) && !vcpu_mode_el2(vcpu)) {
+> +		vgic_cpu->shadow_vgic_v2 = vgic_cpu->nested_vgic_v2;
+> +		vgic_v2_create_shadow_lr(vcpu);
+> +		cpu_if = vcpu_shadow_if(vcpu);
+> +	} else {
+> +		cpu_if = &vgic_cpu->vgic_v2;
 > +	}
+> +
+> +	vgic_cpu->hw_v2_cpu_if = cpu_if;
 > +}
 > +
-> +static const struct vgic_register_region vgic_v2_gich_registers[] = {
-> +	REGISTER_DESC_WITH_LENGTH(GICH_HCR,
-> +		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich, 4,
-> +		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH(GICH_VTR,
-> +		vgic_mmio_read_v2_vtr, vgic_mmio_write_wi, 4,
-> +		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH(GICH_VMCR,
-> +		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich, 4,
-> +		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH(GICH_MISR,
-> +		vgic_mmio_read_v2_misr, vgic_mmio_write_wi, 4,
-> +		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH(GICH_EISR0,
-> +		vgic_mmio_read_v2_eisr0, vgic_mmio_write_wi, 4,
-> +		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH(GICH_EISR1,
-> +		vgic_mmio_read_v2_eisr1, vgic_mmio_write_wi, 4,
-> +		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH(GICH_ELRSR0,
-> +		vgic_mmio_read_v2_elrsr0, vgic_mmio_write_wi, 4,
-> +		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH(GICH_ELRSR1,
-> +		vgic_mmio_read_v2_elrsr1, vgic_mmio_write_wi, 4,
-> +		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH(GICH_APR,
-> +		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich, 4,
-> +		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH(GICH_LR0,
-> +		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich,
-> +		4 * VGIC_V2_MAX_LRS, VGIC_ACCESS_32bit),
-> +};
+> +void vgic_v2_restore_shadow_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +
+> +	/* Not using shadow state: Nothing to do... */
+> +	if (vgic_cpu->hw_v2_cpu_if == &vgic_cpu->vgic_v2)
+> +		return;
+> +
+> +	/*
+> +	 * Translate the shadow state HW fields back to the virtual ones
+> +	 * before copying the shadow struct back to the nested one.
+> +	 */
+> +	vgic_v2_restore_shadow_lr(vcpu);
+> +	vgic_cpu->nested_vgic_v2 = vgic_cpu->shadow_vgic_v2;
+> +}
+> +
+> +void vgic_init_nested(struct kvm_vcpu *vcpu)
+> +{
+> +	vgic_v2_setup_shadow_state(vcpu);
+> +}
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 9d9e014..2aef680 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -120,4 +120,15 @@ static inline int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+>  int vgic_lazy_init(struct kvm *kvm);
+>  int vgic_init(struct kvm *kvm);
+>  
+> +#ifdef CONFIG_KVM_ARM_NESTED_HYP
+> +void vgic_init_nested(struct kvm_vcpu *vcpu);
+> +#else
+> +static inline void vgic_init_nested(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +
+> +	vgic_cpu->hw_v2_cpu_if = &vgic_cpu->vgic_v2;
+> +}
+> +#endif
+> +
+>  #endif
 > -- 
 > 1.9.1
 > 
