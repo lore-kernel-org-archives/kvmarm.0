@@ -1,62 +1,272 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [RFC 25/55] KVM: arm/arm64: Let vcpu thread modify its own
- active state
-Date: Wed, 22 Feb 2017 13:27:14 +0100
-Message-ID: <20170222122714.GN26976@cbox>
+Subject: Re: [RFC 27/55] KVM: arm/arm64: Emulate GICH interface on GICv2
+Date: Wed, 22 Feb 2017 14:06:16 +0100
+Message-ID: <20170222130616.GO26976@cbox>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <1483943091-1364-26-git-send-email-jintack@cs.columbia.edu>
+ <1483943091-1364-28-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1483943091-1364-26-git-send-email-jintack@cs.columbia.edu>
+In-Reply-To: <1483943091-1364-28-git-send-email-jintack@cs.columbia.edu>
 Sender: kvm-owner@vger.kernel.org
 To: Jintack Lim <jintack@cs.columbia.edu>
 Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 09, 2017 at 01:24:21AM -0500, Jintack Lim wrote:
-> Currently, if a vcpu thread tries to change its own active state when
-> the irq is already in AP list, it'll loop forever. Since the VCPU thread
-> has already synced back LR state to the struct vgic_irq, let it modify
-> its own state safely.
+On Mon, Jan 09, 2017 at 01:24:23AM -0500, Jintack Lim wrote:
+> Emulate GICH interface accesses from the guest hypervisor.
 > 
 > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+> Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  virt/kvm/arm/vgic/vgic-mmio.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/Makefile            |   1 +
+>  virt/kvm/arm/vgic/vgic-v2-nested.c | 207 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 208 insertions(+)
+>  create mode 100644 virt/kvm/arm/vgic/vgic-v2-nested.c
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index ebe1b9f..049c570 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -192,9 +192,9 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->  	 * If this virtual IRQ was written into a list register, we
->  	 * have to make sure the CPU that runs the VCPU thread has
->  	 * synced back LR state to the struct vgic_irq.  We can only
-> -	 * know this for sure, when either this irq is not assigned to
-> +	 * know this for sure, when this irq is not assigned to
->  	 * anyone's AP list anymore, or the VCPU thread is not
-> -	 * running on any CPUs.
-> +	 * running on any CPUs, or current thread is the VCPU thread.
->  	 *
->  	 * In the opposite case, we know the VCPU thread may be on its
->  	 * way back from the guest and still has to sync back this
-> @@ -202,6 +202,7 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->  	 * other thread sync back the IRQ.
->  	 */
->  	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
-> +	       irq->vcpu != vcpu && /* Current thread is not the VCPU thread */
->  	       irq->vcpu->cpu != -1) /* VCPU thread is running */
->  		cond_resched_lock(&irq->irq_lock);
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 9c35e9a..8573faf 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -37,3 +37,4 @@ kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
 >  
+>  kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += handle_exit_nested.o
+>  kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += emulate-nested.o
+> +kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += $(KVM)/arm/vgic/vgic-v2-nested.o
+> diff --git a/virt/kvm/arm/vgic/vgic-v2-nested.c b/virt/kvm/arm/vgic/vgic-v2-nested.c
+> new file mode 100644
+> index 0000000..b13128e
+> --- /dev/null
+> +++ b/virt/kvm/arm/vgic/vgic-v2-nested.c
+> @@ -0,0 +1,207 @@
+> +#include <linux/cpu.h>
+> +#include <linux/kvm.h>
+> +#include <linux/kvm_host.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/io.h>
+> +#include <linux/uaccess.h>
+> +
+> +#include <linux/irqchip/arm-gic.h>
+> +
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_arm.h>
+> +#include <asm/kvm_mmu.h>
+> +#include <kvm/arm_vgic.h>
+> +
+> +#include "vgic.h"
+> +#include "vgic-mmio.h"
+> +
+> +static inline struct vgic_v2_cpu_if *vcpu_nested_if(struct kvm_vcpu *vcpu)
+> +{
+> +	return &vcpu->arch.vgic_cpu.nested_vgic_v2;
+> +}
+> +
+> +static inline struct vgic_v2_cpu_if *vcpu_shadow_if(struct kvm_vcpu *vcpu)
+> +{
+> +	return &vcpu->arch.vgic_cpu.shadow_vgic_v2;
+> +}
+> +
+> +static unsigned long vgic_mmio_read_v2_vtr(struct kvm_vcpu *vcpu,
+> +					   gpa_t addr, unsigned int len)
+> +{
+> +	u32 reg;
+> +
+> +	reg = kvm_vgic_global_state.nr_lr - 1;
+> +	reg |= 0b100 << 26;
+> +	reg |= 0b100 << 29;
+
+Pure magic?  Can we have some defines?  Have you checked the existing
+header file if we have some defines for this?
+
+> +
+> +	return reg;
+> +}
+> +
+> +static inline bool lr_triggers_eoi(u32 lr)
+> +{
+> +	return !(lr & (GICH_LR_STATE | GICH_LR_HW)) && (lr & GICH_LR_EOI);
+> +}
+> +
+> +static unsigned long get_eisr(struct kvm_vcpu *vcpu, bool upper_reg)
+> +{
+> +	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
+> +	int max_lr = upper_reg ? 64 : 32;
+> +	int min_lr = upper_reg ? 32 : 0;
+> +	int nr_lr = min(kvm_vgic_global_state.nr_lr, max_lr);
+> +	int i;
+> +	u32 reg = 0;
+
+So the assumption here is that we can only emualte a virtual GICH
+interface with the same number of LRs that the hardware has, yes ?  Can
+you document this assumption in the commit message and explain how we
+deal with nr_lr for all this logic based on that.
+
+Seems like this could go in the commit message.
+
+> +
+> +	for (i = min_lr; i < nr_lr; i++) {
+> +		if (lr_triggers_eoi(cpu_if->vgic_lr[i]))
+> +			reg |= BIT(i - min_lr);
+> +	}
+> +
+> +	return reg;
+> +}
+> +
+> +static unsigned long vgic_mmio_read_v2_eisr0(struct kvm_vcpu *vcpu,
+> +					     gpa_t addr, unsigned int len)
+> +{
+> +	return get_eisr(vcpu, false);
+> +}
+> +
+> +static unsigned long vgic_mmio_read_v2_eisr1(struct kvm_vcpu *vcpu,
+> +					     gpa_t addr, unsigned int len)
+> +{
+> +	return get_eisr(vcpu, true);
+> +}
+> +
+> +static u32 get_elrsr(struct kvm_vcpu *vcpu, bool upper_reg)
+> +{
+> +	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
+> +	int max_lr = upper_reg ? 64 : 32;
+> +	int min_lr = upper_reg ? 32 : 0;
+> +	int nr_lr = min(kvm_vgic_global_state.nr_lr, max_lr);
+> +	u32 reg = 0;
+> +	int i;
+> +
+> +	for (i = min_lr; i < nr_lr; i++) {
+> +		if (!(cpu_if->vgic_lr[i] & GICH_LR_STATE))
+> +			reg |= BIT(i - min_lr);
+> +	}
+> +
+> +	return reg;
+> +}
+> +
+> +static unsigned long vgic_mmio_read_v2_elrsr0(struct kvm_vcpu *vcpu,
+> +					      gpa_t addr, unsigned int len)
+> +{
+> +	return get_elrsr(vcpu, false);
+> +}
+> +
+> +static unsigned long vgic_mmio_read_v2_elrsr1(struct kvm_vcpu *vcpu,
+> +					      gpa_t addr, unsigned int len)
+> +{
+> +	return get_elrsr(vcpu, true);
+> +}
+> +
+> +static unsigned long vgic_mmio_read_v2_misr(struct kvm_vcpu *vcpu,
+> +					    gpa_t addr, unsigned int len)
+> +{
+> +	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
+> +	int nr_lr = kvm_vgic_global_state.nr_lr;
+> +	u32 reg = 0;
+> +
+> +	if (vgic_mmio_read_v2_eisr0(vcpu, addr, len) ||
+> +			vgic_mmio_read_v2_eisr1(vcpu, addr, len))
+> +		reg |= GICH_MISR_EOI;
+> +
+> +	if (cpu_if->vgic_hcr & GICH_HCR_UIE) {
+> +		u32 elrsr0 = vgic_mmio_read_v2_elrsr0(vcpu, addr, len);
+> +		u32 elrsr1 = vgic_mmio_read_v2_elrsr1(vcpu, addr, len);
+> +		int used_lrs;
+> +
+> +		used_lrs = nr_lr - (hweight32(elrsr0) + hweight32(elrsr1));
+> +		if (used_lrs <= 1)
+> +			reg |= GICH_MISR_U;
+> +	}
+> +
+> +	/* TODO: Support remaining bits in this register */
+
+Is this going to happen in this series?  Why don't we just do it here?
+
+> +	return reg;
+> +}
+> +
+> +static unsigned long vgic_mmio_read_v2_gich(struct kvm_vcpu *vcpu,
+> +					    gpa_t addr, unsigned int len)
+> +{
+> +	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
+> +	u32 value;
+> +
+> +	switch (addr & 0xfff) {
+> +	case GICH_HCR:
+> +		value = cpu_if->vgic_hcr;
+> +		break;
+> +	case GICH_VMCR:
+> +		value = cpu_if->vgic_vmcr;
+> +		break;
+> +	case GICH_APR:
+> +		value = cpu_if->vgic_apr;
+> +		break;
+> +	case GICH_LR0 ... (GICH_LR0 + 4 * (VGIC_V2_MAX_LRS - 1)):
+> +		value = cpu_if->vgic_lr[(addr & 0xff) >> 2];
+> +		break;
+> +	default:
+> +		return 0;
+> +	}
+> +
+> +	return value;
+> +}
+> +
+> +static void vgic_mmio_write_v2_gich(struct kvm_vcpu *vcpu,
+> +				    gpa_t addr, unsigned int len,
+> +				    unsigned long val)
+> +{
+> +	struct vgic_v2_cpu_if *cpu_if = vcpu_nested_if(vcpu);
+> +
+> +	switch (addr & 0xfff) {
+> +	case GICH_HCR:
+> +		cpu_if->vgic_hcr = val;
+> +		break;
+> +	case GICH_VMCR:
+> +		cpu_if->vgic_vmcr = val;
+> +		break;
+> +	case GICH_APR:
+> +		cpu_if->vgic_apr = val;
+> +		break;
+> +	case GICH_LR0 ... (GICH_LR0 + 4 * (VGIC_V2_MAX_LRS - 1)):
+> +		cpu_if->vgic_lr[(addr & 0xff) >> 2] = val;
+
+Don't you need to check if we actually support this particular LR ?
+
+> +		break;
+> +	}
+> +}
+> +
+> +static const struct vgic_register_region vgic_v2_gich_registers[] = {
+> +	REGISTER_DESC_WITH_LENGTH(GICH_HCR,
+> +		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich, 4,
+> +		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH(GICH_VTR,
+> +		vgic_mmio_read_v2_vtr, vgic_mmio_write_wi, 4,
+> +		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH(GICH_VMCR,
+> +		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich, 4,
+> +		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH(GICH_MISR,
+> +		vgic_mmio_read_v2_misr, vgic_mmio_write_wi, 4,
+> +		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH(GICH_EISR0,
+> +		vgic_mmio_read_v2_eisr0, vgic_mmio_write_wi, 4,
+> +		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH(GICH_EISR1,
+> +		vgic_mmio_read_v2_eisr1, vgic_mmio_write_wi, 4,
+> +		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH(GICH_ELRSR0,
+> +		vgic_mmio_read_v2_elrsr0, vgic_mmio_write_wi, 4,
+> +		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH(GICH_ELRSR1,
+> +		vgic_mmio_read_v2_elrsr1, vgic_mmio_write_wi, 4,
+> +		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH(GICH_APR,
+> +		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich, 4,
+> +		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH(GICH_LR0,
+> +		vgic_mmio_read_v2_gich, vgic_mmio_write_v2_gich,
+> +		4 * VGIC_V2_MAX_LRS, VGIC_ACCESS_32bit),
+> +};
 > -- 
 > 1.9.1
 > 
 > 
-
-This seems to be an independent fix, so please send it outside of this
-series as an individual patch.
-
-Thanks,
--Christoffer
