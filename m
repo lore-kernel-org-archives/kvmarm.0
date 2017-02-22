@@ -1,74 +1,61 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
+From: James Morse <james.morse@arm.com>
 Subject: Re: [PATCH V10 07/10] efi: print unrecognized CPER section
-Date: Wed, 22 Feb 2017 01:12:42 +0000
-Message-ID: <20170222011241.GX21222@n2100.armlinux.org.uk>
-References: <1487188282-2568-1-git-send-email-tbaicar@codeaurora.org>
- <1487188282-2568-8-git-send-email-tbaicar@codeaurora.org>
- <58AC9093.5020303@arm.com>
+Date: Wed, 22 Feb 2017 10:13:28 +0000
+Message-ID: <58AD6448.1070301@arm.com>
+References: <1487188282-2568-1-git-send-email-tbaicar@codeaurora.org> <1487188282-2568-8-git-send-email-tbaicar@codeaurora.org> <58AC9093.5020303@arm.com> <20170222011241.GX21222@n2100.armlinux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41AFE40C44
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Feb 2017 20:12:36 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eDjHhwcZxiNO for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Feb 2017 20:12:35 -0500 (EST)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D627840C3F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Feb 2017 20:12:34 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <58AC9093.5020303@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, Tyler Baicar <tbaicar@codeaurora.org>, will.deacon@arm.com, linux-kernel@vger.kernel.org, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, robert.moore@intel.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, astone@redhat.com, hanjun.guo@linaro.org, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <20170222011241.GX21222@n2100.armlinux.org.uk>
+Sender: linux-acpi-owner@vger.kernel.org
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Tyler Baicar <tbaicar@codeaurora.org>, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, devel@acpic
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Feb 21, 2017 at 07:10:11PM +0000, James Morse wrote:
-> Hi Tyler,
+On 22/02/17 01:12, Russell King - ARM Linux wrote:
+> On Tue, Feb 21, 2017 at 07:10:11PM +0000, James Morse wrote:
+>> Hi Tyler,
+>>
+>> On 15/02/17 19:51, Tyler Baicar wrote:
+>>> +	} else {
+>>> +		const void *unknown_err;
+>>> +
+>>> +		unknown_err = acpi_hest_generic_data_payload(gdata);
+>>> +		printk("%ssection type: %pUl\n", newpfx, sec_type);
+>>> +		printk("%ssection length: %d\n", newpfx,
+>>
+>> Nit: please use the "%s""section... that this file consistently uses. This means
+>> this code will still work as expected when someone adds '%ss' support to printk!
 > 
-> On 15/02/17 19:51, Tyler Baicar wrote:
-> > +	} else {
-> > +		const void *unknown_err;
-> > +
-> > +		unknown_err = acpi_hest_generic_data_payload(gdata);
-> > +		printk("%ssection type: %pUl\n", newpfx, sec_type);
-> > +		printk("%ssection length: %d\n", newpfx,
+> No.  That is wrong:
 > 
-> Nit: please use the "%s""section... that this file consistently uses. This means
-> this code will still work as expected when someone adds '%ss' support to printk!
+> "%s""section" is stored in memory as bytes containing:
+> 
+> '%' 's' 's' 'e' 'c' 't' 'i' 'o' 'n'
+> 
+> whereas "%ssection" is stored in memory as bytes containing:
+> 
+> '%' 's' 's' 'e' 'c' 't' 'i' 'o' 'n'
+> 
+> They're exactly the same, so when printk() comes to parse the string, it
+> sees exactly the same byte sequence.  So, the only thing that's happening
+> is code obfuscation for no good reason what so ever.
+> 
+> If you don't believe me, run some build tests and look at the resulting
+> strings... also look at the C standard.  "Adjacent string literal tokens
+> are concatenated."
+> 
+> Please get rid of this obfuscation.
 
-No.  That is wrong:
+Sure, I was always told not do this, clearly I didn't think about it for very long!
 
-"%s""section" is stored in memory as bytes containing:
+This file otherwise consistently uses the now-weird "%s""otherstring" pattern.
 
-'%' 's' 's' 'e' 'c' 't' 'i' 'o' 'n'
 
-whereas "%ssection" is stored in memory as bytes containing:
 
-'%' 's' 's' 'e' 'c' 't' 'i' 'o' 'n'
+Thanks,
 
-They're exactly the same, so when printk() comes to parse the string, it
-sees exactly the same byte sequence.  So, the only thing that's happening
-is code obfuscation for no good reason what so ever.
+James
 
-If you don't believe me, run some build tests and look at the resulting
-strings... also look at the C standard.  "Adjacent string literal tokens
-are concatenated."
 
-Please get rid of this obfuscation.
-
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
