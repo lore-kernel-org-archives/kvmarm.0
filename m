@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 21/22] arm/arm64: KVM: Use HVC_RESET_VECTORS to reinit HYP
- mode
-Date: Thu, 23 Feb 2017 10:26:56 +0000
-Message-ID: <20170223102657.23100-22-marc.zyngier@arm.com>
+Subject: [PATCH v2 22/22] arm/arm64: Add hyp-stub API documentation
+Date: Thu, 23 Feb 2017 10:26:57 +0000
+Message-ID: <20170223102657.23100-23-marc.zyngier@arm.com>
 References: <20170223102657.23100-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7D674100D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 05:27:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDEBB412ED
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 05:27:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id o4LkZS8gOosm for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Feb 2017 05:27:04 -0500 (EST)
+ with ESMTP id S3gu6Ehc1MZw for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Feb 2017 05:27:06 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C21E0412DD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 05:27:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77BBC40CDD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 05:27:06 -0500 (EST)
 In-Reply-To: <20170223102657.23100-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,76 +31,73 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Instead of trying to compare the value given by __hyp_get_vectors(),
-which doesn't offer any real guarantee to be the stub's address, use
-HVC_RESET_VECTORS to make sure we're in a sane state to reinstall
-KVM across PM events.
+In order to help people understanding the hyp-stub API that exists
+between the host kernel and the hypervisor mode (whether a hypervisor
+has been installed or not), let's document said API.
+
+As as with any form of documentation, I expect it to become obsolete
+and completely misleading within 20 minutes after having being merged.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/arm.c | 24 +++++++++---------------
- 1 file changed, 9 insertions(+), 15 deletions(-)
+ Documentation/virtual/kvm/arm/hyp-abi.txt | 49 +++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+ create mode 100644 Documentation/virtual/kvm/arm/hyp-abi.txt
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 7c3abeb49554..c4be9e0400f2 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -53,7 +53,6 @@ __asm__(".arch_extension	virt");
- 
- static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
- static kvm_cpu_context_t __percpu *kvm_host_cpu_state;
--static unsigned long hyp_default_vectors;
- 
- /* Per-CPU variable containing the currently running vcpu. */
- static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_arm_running_vcpu);
-@@ -1105,8 +1104,16 @@ static void cpu_init_hyp_mode(void *dummy)
- 	kvm_arm_init_debug();
- }
- 
-+static void cpu_hyp_reset(void)
-+{
-+	if (!is_kernel_in_hyp_mode())
-+		__hyp_reset_vectors();
-+}
+diff --git a/Documentation/virtual/kvm/arm/hyp-abi.txt b/Documentation/virtual/kvm/arm/hyp-abi.txt
+new file mode 100644
+index 000000000000..af6463f4de39
+--- /dev/null
++++ b/Documentation/virtual/kvm/arm/hyp-abi.txt
+@@ -0,0 +1,49 @@
++* Internal ABI between the kernel and HYP
 +
- static void cpu_hyp_reinit(void)
- {
-+	cpu_hyp_reset();
++This file documents the interaction between the Linux kernel and the
++hypervisor layer when running Linux as a hypervisor (for example
++KVM). It doesn't cover the interaction of the kernel with the
++hypervisor when running as a guest (under Xen, KVM or any other
++hypervisor), or any hypervisor-specific interaction when the kernel is
++used as a host.
 +
- 	if (is_kernel_in_hyp_mode()) {
- 		/*
- 		 * __cpu_init_stage2() is safe to call even if the PM
-@@ -1114,17 +1121,10 @@ static void cpu_hyp_reinit(void)
- 		 */
- 		__cpu_init_stage2();
- 	} else {
--		if (__hyp_get_vectors() == hyp_default_vectors)
--			cpu_init_hyp_mode(NULL);
-+		cpu_init_hyp_mode(NULL);
- 	}
- }
- 
--static void cpu_hyp_reset(void)
--{
--	if (!is_kernel_in_hyp_mode())
--		__hyp_reset_vectors();
--}
--
- static void _kvm_arch_hardware_enable(void *discard)
- {
- 	if (!__this_cpu_read(kvm_arm_hardware_enabled)) {
-@@ -1308,12 +1308,6 @@ static int init_hyp_mode(void)
- 		goto out_err;
- 
- 	/*
--	 * It is probably enough to obtain the default on one
--	 * CPU. It's unlikely to be different on the others.
--	 */
--	hyp_default_vectors = __hyp_get_vectors();
--
--	/*
- 	 * Allocate stack pages for Hypervisor-mode
- 	 */
- 	for_each_possible_cpu(cpu) {
++On arm and arm64 (without VHE), the kernel doesn't run in hypervisor
++mode, but still needs to interact with it, allowing a built-in
++hypervisor to be either installed or torn down.
++
++In order to achieve this, the kernel must be booted at HYP (arm) or
++EL2 (arm64), allowing it to install a set of stubs before dropping to
++SVC/EL1. These stubs are accessible by using a 'hvc #0' instruction,
++and only act on individual CPUs.
++
++Unless specified otherwise, any built-in hypervisor must implement
++these functions (see arch/arm{,64}/include/asm/virt.h):
++
++* r0/x0 = HVC_GET_VECTORS
++
++  Return the current value of HVBAR/VBAR_EL2 in r0/x0.
++
++* r0/x0 = HVC_SET_VECTORS
++  r1/x1 = vectors
++
++  Set HVBAR/VBAR_EL2 to 'vectors' to enable a hypervisor. 'vectors'
++  must be a physical address, and respect the alignment requirements
++  of the architecture. Only implemented by the initial stubs.
++
++* r0/x0 = HVC_RESET_VECTORS
++
++  Turn HYP/EL2 MMU off, and reset HVBAR/VBAR_EL2 to the default
++  value. This effectively disables an existing hypervisor.
++
++* r0/x0 = HVC_SOFT_RESTART
++  r1/x1 = restart address
++  x2 = x0's value when entering the next payload (arm64)
++  x3 = x1's value when entering the next payload (arm64)
++  x4 = x2's value when entering the next payload (arm64)
++
++  Mask all exceptions, disable the MMU, move the arguments into place
++  (arm64 only), and jump to the restart address while at HYP/EL2. This
++  hypercall is not expected to return to its caller.
++
++Any other value of r0/x0 triggers a hypervisor-specific handling,
++which is not documented here.
 -- 
 2.11.0
