@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 08/22] ARM: soft-reboot into same mode that we entered the
- kernel
-Date: Thu, 23 Feb 2017 10:26:43 +0000
-Message-ID: <20170223102657.23100-9-marc.zyngier@arm.com>
+Subject: [PATCH v2 16/22] ARM: KVM: Allow the main HYP code to use the init
+ hyp stub implementation
+Date: Thu, 23 Feb 2017 10:26:51 +0000
+Message-ID: <20170223102657.23100-17-marc.zyngier@arm.com>
 References: <20170223102657.23100-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CD74412A2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 05:26:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3738340FA5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 05:26:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EVGuvrVVhW9y for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Feb 2017 05:26:45 -0500 (EST)
+ with ESMTP id hB60zEEG3hR8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Feb 2017 05:26:57 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE2F340C92
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 05:26:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 52879412DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 05:26:56 -0500 (EST)
 In-Reply-To: <20170223102657.23100-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,146 +29,68 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Russell King <rmk+kernel@armlinux.org.uk>
+We now have a full hyp-stub implementation in the KVM init code,
+but the main KVM code only supports HVC_GET_VECTORS, which is not
+enough.
 
-When we soft-reboot (eg, kexec) from one kernel into the next, we need
-to ensure that we enter the new kernel in the same processor mode as
-when we were entered, so that (eg) the new kernel can install its own
-hypervisor - the old kernel's hypervisor will have been overwritten.
+Instead of reinventing the wheel, let's reuse the init implementation
+by branching to the idmap page when called with a hyp-stub hypercall.
 
-In order to do this, we need to pass a flag to cpu_reset() so it knows
-what to do, and we need to modify the kernel's own hypervisor stub to
-allow it to handle a soft-reboot.
-
-As we are always guaranteed to install our own hypervisor if we're
-entered in HYP32 mode, and KVM will have moved itself out of the way
-on kexec/normal reboot, we can assume that our hypervisor is in place
-when we want to kexec, so changing our hypervisor API should not be a
-problem.
-
-Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/proc-fns.h |  4 ++--
- arch/arm/kernel/hyp-stub.S      | 13 +++++++++++++
- arch/arm/kernel/reboot.c        |  7 +++++--
- arch/arm/mm/proc-v7.S           | 12 ++++++++----
- 4 files changed, 28 insertions(+), 8 deletions(-)
+ arch/arm/kvm/hyp/hyp-entry.S | 29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm/include/asm/proc-fns.h b/arch/arm/include/asm/proc-fns.h
-index 8877ad5ffe10..f2e1af45bd6f 100644
---- a/arch/arm/include/asm/proc-fns.h
-+++ b/arch/arm/include/asm/proc-fns.h
-@@ -43,7 +43,7 @@ extern struct processor {
- 	/*
- 	 * Special stuff for a reset
+diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
+index 1f8db7d21fc5..a35baa81fd23 100644
+--- a/arch/arm/kvm/hyp/hyp-entry.S
++++ b/arch/arm/kvm/hyp/hyp-entry.S
+@@ -126,11 +126,30 @@ hyp_hvc:
  	 */
--	void (*reset)(unsigned long addr) __attribute__((noreturn));
-+	void (*reset)(unsigned long addr, bool hvc) __attribute__((noreturn));
- 	/*
- 	 * Idle the processor
- 	 */
-@@ -88,7 +88,7 @@ extern void cpu_set_pte_ext(pte_t *ptep, pte_t pte);
- #else
- extern void cpu_set_pte_ext(pte_t *ptep, pte_t pte, unsigned int ext);
- #endif
--extern void cpu_reset(unsigned long addr) __attribute__((noreturn));
-+extern void cpu_reset(unsigned long addr, bool hvc) __attribute__((noreturn));
+ 	pop	{r0, r1, r2}
  
- /* These three are private to arch/arm/kernel/suspend.c */
- extern void cpu_do_suspend(void *);
-diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
-index f3e9ba5fb642..82915231c6f8 100644
---- a/arch/arm/kernel/hyp-stub.S
-+++ b/arch/arm/kernel/hyp-stub.S
-@@ -24,6 +24,7 @@
+-	/* Check for __hyp_get_vectors */
+-	cmp	r0, #HVC_GET_VECTORS
+-	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
+-	beq	1f
++	/*
++	 * Check if we have a kernel function, which is guaranteed to be
++	 * bigger than the maximum hyp stub hypercall
++	 */
++	cmp	r0, #HVC_STUB_HCALL_NR
++	bhs	1f
  
- #define HVC_GET_VECTORS 0
- #define HVC_SET_VECTORS 1
-+#define HVC_SOFT_RESTART 2
- 
- #ifndef ZIMAGE
- /*
-@@ -215,6 +216,10 @@ __hyp_stub_do_trap:
- 	mcr	p15, 4, r1, c12, c0, 0	@ set HVBAR
- 	b	__hyp_stub_exit
- 
-+1:	teq	r0, #HVC_SOFT_RESTART
-+	bne	1f
-+	bx	r3
++	/*
++	 * Not a kernel function, treat it as a stub hypercall.
++	 * Compute the physical address for __kvm_handle_stub_hvc
++	 * (as the code lives in the idmaped page) and branch there.
++	 * We hijack ip (r12) as a tmp register.
++	 */
++	push	{r1}
++	ldr	r1, =kimage_voffset
++	ldr	r1, [r1]
++	ldr	ip, =__kvm_handle_stub_hvc
++	sub	ip, ip, r1
++THUMB(	add	ip, ip, #1)
++	pop	{r1}
 +
- 1:	mov	r0, #-1
- 
- __hyp_stub_exit:
-@@ -256,6 +261,14 @@ ENTRY(__hyp_set_vectors)
- 	ret	lr
- ENDPROC(__hyp_set_vectors)
- 
-+ENTRY(__hyp_soft_restart)
-+	mov	r3, r0
-+	mov	r0, #HVC_SOFT_RESTART
-+	__HVC(0)
-+	mov	r0, r3
-+	ret	lr
-+ENDPROC(__hyp_soft_restart)
++	bx	ip
 +
- #ifndef ZIMAGE
- .align 2
- .L__boot_cpu_mode_offset:
-diff --git a/arch/arm/kernel/reboot.c b/arch/arm/kernel/reboot.c
-index 3fa867a2aae6..3b2aa9a9fe26 100644
---- a/arch/arm/kernel/reboot.c
-+++ b/arch/arm/kernel/reboot.c
-@@ -12,10 +12,11 @@
++1:
+ 	push	{lr}
  
- #include <asm/cacheflush.h>
- #include <asm/idmap.h>
-+#include <asm/virt.h>
+ 	mov	lr, r0
+@@ -142,7 +161,7 @@ THUMB(	orr	lr, #1)
+ 	blx	lr			@ Call the HYP function
  
- #include "reboot.h"
+ 	pop	{lr}
+-1:	eret
++	eret
  
--typedef void (*phys_reset_t)(unsigned long);
-+typedef void (*phys_reset_t)(unsigned long, bool);
- 
- /*
-  * Function pointers to optional machine specific functions
-@@ -51,7 +52,9 @@ static void __soft_restart(void *addr)
- 
- 	/* Switch to the identity mapping. */
- 	phys_reset = (phys_reset_t)virt_to_idmap(cpu_reset);
--	phys_reset((unsigned long)addr);
-+
-+	/* original stub should be restored by kvm */
-+	phys_reset((unsigned long)addr, is_hyp_mode_available());
- 
- 	/* Should never get here. */
- 	BUG();
-diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
-index d00d52c9de3e..1846ca4255d0 100644
---- a/arch/arm/mm/proc-v7.S
-+++ b/arch/arm/mm/proc-v7.S
-@@ -53,11 +53,15 @@ ENDPROC(cpu_v7_proc_fin)
- 	.align	5
- 	.pushsection	.idmap.text, "ax"
- ENTRY(cpu_v7_reset)
--	mrc	p15, 0, r1, c1, c0, 0		@ ctrl register
--	bic	r1, r1, #0x1			@ ...............m
-- THUMB(	bic	r1, r1, #1 << 30 )		@ SCTLR.TE (Thumb exceptions)
--	mcr	p15, 0, r1, c1, c0, 0		@ disable MMU
-+	mrc	p15, 0, r2, c1, c0, 0		@ ctrl register
-+	bic	r2, r2, #0x1			@ ...............m
-+ THUMB(	bic	r2, r2, #1 << 30 )		@ SCTLR.TE (Thumb exceptions)
-+	mcr	p15, 0, r2, c1, c0, 0		@ disable MMU
- 	isb
-+#ifdef CONFIG_ARM_VIRT_EXT
-+	teq	r1, #0
-+	bne	__hyp_soft_restart
-+#endif
- 	bx	r0
- ENDPROC(cpu_v7_reset)
- 	.popsection
+ guest_trap:
+ 	load_vcpu r0			@ Load VCPU pointer to r0
 -- 
 2.11.0
