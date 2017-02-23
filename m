@@ -1,81 +1,96 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH V2 2/2] KVM: arm64: Increase number of user memslots to 508
-Date: Thu, 23 Feb 2017 11:14:07 +0100
-Message-ID: <20170223101407.GB1409@cbox>
-References: <1486538141-30627-1-git-send-email-linucherian@gmail.com>
- <1486538141-30627-3-git-send-email-linucherian@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F423840D56
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 05:13:22 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T6-4XFPjr-O0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Feb 2017 05:13:21 -0500 (EST)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BDD2340C56
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 05:13:21 -0500 (EST)
-Received: by mail-wm0-f43.google.com with SMTP id r141so7053789wmg.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 02:14:21 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <1486538141-30627-3-git-send-email-linucherian@gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linucherian@gmail.com
-Cc: sunil.goutham@cavium.com, marc.zyngier@arm.com, linu.cherian@cavium.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v2 00/22] arm/arm64: KVM: Rework the hyp-stub API
+Date: Thu, 23 Feb 2017 10:26:35 +0000
+Message-ID: <20170223102657.23100-1-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Russell King <linux@arm.linux.org.uk>, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 08, 2017 at 12:45:41PM +0530, linucherian@gmail.com wrote:
-> From: Linu Cherian <linu.cherian@cavium.com>
-> 
-> Having only 32 memslots is a real constraint for the maximum
-> number of PCI devices that can be assigned to a single guest.
-> Assuming each PCI device/virtual function having two memory BAR
-> regions, we could assign only 15 devices/virtual functions to a
-> guest.
-> 
-> Hence increase KVM_USER_MEM_SLOTS to 508, so that KVM_MEM_SLOTS_NUM is
-> 512 as done in other archs like x86 and powerpc.
+As noticed by RMK in this thread[1], the hyp-stub API on 32bit ARM
+could do with some TLC (it cannot perform a soft-restart at HYP, and
+has holes in the hyp-stub support in a number of places). In general,
+it would be desirable for the 32bit behaviour to align on 64bit, if
+only to ease maintenance.
 
-Actually on powerpc they just define KVM_USER_MEM_SLOTS as 512 directly.
+This series implements the following:
+- Add HVC_[GS]ET_VECTORS and HVC_SOFT_RESTART to the 32bit code
+- Add HVC_RESET_VECTORS to both arm and arm64, removing the need for
+  __hyp_reset_vectors
+- Implement add the stub entry points in the KVM init code, which
+  didn't implement any so far
+- Convert the HYP code to use the init code stubs directly
+- Add some API documentation that covers the above
+- Some general cleanup as a result of these changes.
 
-On x86 they define them as 509 and have 3 private mem slots.
+Patches 9 to 11 would be better squashed into 7 and 8, but I've kept
+separate so that I can take the blame for everything I've broken.
 
-I don't understand the difference and as far as I can tell we don't have
-any private memslots on arm/arm64, so this is just weird to me.
+This has been tested on arm (Cubietruck, Jetson TK1) and arm64
+(Seattle), both as host and guest.
 
-Thanks,
--Christoffer
+[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2016-December/473472.html
 
-> 
-> Signed-off-by: Linu Cherian <linu.cherian@cavium.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e505038..88f017d 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -30,7 +30,7 @@
->  
->  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
->  
-> -#define KVM_USER_MEM_SLOTS 32
-> +#define KVM_USER_MEM_SLOTS 508
->  #define KVM_PRIVATE_MEM_SLOTS 4
->  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
->  #define KVM_HALT_POLL_NS_DEFAULT 500000
-> -- 
-> 1.9.1
-> 
+* From v1:
+  - Fixed some glaring bugs (reported by Ard and James)
+  - Tidy up stub vector export on 32bit (Ard)
+  - Nicer VA/PA conversion on 32bit (Ard)
+  - Updated cpu_v7_reset documentation
+  - Cleaned up HYP reset on PM events
+  - Minor stub documentation update
+
+Marc Zyngier (20):
+  arm64: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
+  arm64: KVM: Implement HVC_RESET_VECTORS stub hypercall
+  arm64: KVM: Implement HVC_GET_VECTORS in the init code
+  arm64: KVM: Allow the main HYP code to use the init hyp stub
+    implementation
+  arm64: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
+  arm64: KVM: Implement HVC_SOFT_RESTART in the init code
+  ARM: KVM: Convert KVM to use HVC_GET_VECTORS
+  ARM: Update cpu_v7_reset documentation
+  ARM: hyp-stub: Use r1 for the soft-restart address
+  ARM: Expose the VA/IDMAP offset
+  ARM: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
+  ARM: KVM: Implement HVC_RESET_VECTORS stub hypercall
+  ARM: KVM: Implement HVC_GET_VECTORS in the init code
+  ARM: KVM: Allow the main HYP code to use the init hyp stub
+    implementation
+  ARM: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
+  ARM: KVM: Implement HVC_SOFT_RESTART in the init code
+  arm/arm64: KVM: Use __hyp_reset_vectors() directly
+  arm/arm64: KVM: Remove kvm_get_idmap_start
+  arm/arm64: KVM: Use HVC_RESET_VECTORS to reinit HYP mode
+  arm/arm64: Add hyp-stub API documentation
+
+Russell King (2):
+  ARM: hyp-stub: improve ABI
+  ARM: soft-reboot into same mode that we entered the kernel
+
+ Documentation/virtual/kvm/arm/hyp-abi.txt | 49 ++++++++++++++++++++++++++++
+ arch/arm/include/asm/kvm_asm.h            |  2 --
+ arch/arm/include/asm/kvm_host.h           |  6 ----
+ arch/arm/include/asm/kvm_mmu.h            |  1 -
+ arch/arm/include/asm/proc-fns.h           |  4 +--
+ arch/arm/include/asm/virt.h               | 12 +++++++
+ arch/arm/kernel/hyp-stub.S                | 46 ++++++++++++++++++++++----
+ arch/arm/kernel/reboot.c                  |  7 ++--
+ arch/arm/kvm/arm.c                        | 25 ++++++--------
+ arch/arm/kvm/hyp/hyp-entry.S              | 29 ++++++++++++++---
+ arch/arm/kvm/init.S                       | 54 ++++++++++++++++++++++++++-----
+ arch/arm/kvm/mmu.c                        |  5 ---
+ arch/arm/mm/mmu.c                         |  5 +++
+ arch/arm/mm/proc-v7.S                     | 15 ++++++---
+ arch/arm64/include/asm/kvm_asm.h          |  1 -
+ arch/arm64/include/asm/kvm_host.h         |  7 ----
+ arch/arm64/include/asm/kvm_mmu.h          |  1 -
+ arch/arm64/include/asm/virt.h             |  9 ++++++
+ arch/arm64/kernel/hyp-stub.S              | 13 +++++++-
+ arch/arm64/kvm/hyp-init.S                 | 50 ++++++++++++++++++++++------
+ arch/arm64/kvm/hyp/hyp-entry.S            | 39 +++++++++++-----------
+ 21 files changed, 282 insertions(+), 98 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/arm/hyp-abi.txt
+
+-- 
+2.11.0
