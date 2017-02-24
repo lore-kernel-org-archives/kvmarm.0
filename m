@@ -1,28 +1,23 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 2/3] arm64: kvm: reuse existing cache type/info
- related macros
-Date: Thu, 23 Feb 2017 16:57:07 +0100
-Message-ID: <20170223155707.GD1409@cbox>
-References: <1485793527-18028-1-git-send-email-sudeep.holla@arm.com>
- <1485793527-18028-2-git-send-email-sudeep.holla@arm.com>
+From: Raz <raziebe@gmail.com>
+Subject: A question about TTBRs
+Date: Fri, 24 Feb 2017 09:55:09 +0000
+Message-ID: <CAPB=Z-omrvPjkjmQWfLNWtA86XJzEM1wCB1Rbc-2dnd0iUtaDA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============8793467008463196927=="
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B1C9540C27
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 10:56:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C881F40C3E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Feb 2017 04:54:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id POAt-hJV0c8P for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Feb 2017 10:56:21 -0500 (EST)
-Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 41C1040C1D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 10:56:20 -0500 (EST)
-Received: by mail-wm0-f51.google.com with SMTP id 196so3974836wmm.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Feb 2017 07:57:21 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <1485793527-18028-2-git-send-email-sudeep.holla@arm.com>
+ with ESMTP id zeGzPDmvDauN for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Feb 2017 04:54:31 -0500 (EST)
+Received: from mail-lf0-f51.google.com (mail-lf0-f51.google.com
+ [209.85.215.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC29440B5E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Feb 2017 04:54:30 -0500 (EST)
+Received: by mail-lf0-f51.google.com with SMTP id b80so6768242lfe.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Feb 2017 01:55:32 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,23 +27,58 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Sudeep Holla <sudeep.holla@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 30, 2017 at 04:25:26PM +0000, Sudeep Holla wrote:
-> We already have various macros related to cache type and bitfields in
-> CLIDR system register. We can replace some of the hardcoded values
-> here using those existing macros.
-> 
-> This patch reuses those existing cache type/info related macros and
-> replaces the hardcorded values. It also removes some of the comments
-> that become trivial with the macro names.
-> 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+--===============8793467008463196927==
+Content-Type: multipart/alternative; boundary=001a1140805edd6e32054943ba6c
 
-Acked-by: Christoffer Dall <cdall@linaro.org>
+--001a1140805edd6e32054943ba6c
+Content-Type: text/plain; charset=UTF-8
+
+Hello
+I am reading the arm8a book. According to the documentation the output
+address of each level 3 entry in TTBRx_EL1points to an address in the
+physical memory.
+By looking in the mmu tab in the DS5 studio I can see the TTBRs tables.
+
+What I do not understand is why while I have 2GB of RAM in the FVP (
+/proc/meminfo ) some page entries ( level 3 ) of the ttbr points to memory
+above 4GB; for instance:
+
+Output address NP:0xF794D000
+
+Doesn't the physical memory starts at address zero ? if not, where its
+starting point is configured?
+
+Thank you
+Raz
+
+--001a1140805edd6e32054943ba6c
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div><div><div><div>Hello<br>I am reading the arm8a book. =
+According to the documentation the output address of each level 3 entry in =
+TTBRx_EL1points to an address in the physical memory.<br></div>By looking i=
+n the mmu tab in the DS5 studio I can see the TTBRs tables. <br><br>What I =
+do not understand is why while I have 2GB of RAM in the FVP ( /proc/meminfo=
+ ) some page entries ( level 3 ) of the ttbr points to memory above 4GB; fo=
+r instance:<br><br>Output address NP:0xF794D000<br><br> </div>Doesn&#39;t t=
+he physical memory starts at address zero ? if not, where its starting poin=
+t is configured? <br><br></div>Thank you<br></div>Raz<br></div>
+
+--001a1140805edd6e32054943ba6c--
+
+--===============8793467008463196927==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============8793467008463196927==--
