@@ -1,70 +1,158 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: vgic-v3: Don't pretend to support
- IRQ/FIQ bypass
-Date: Fri, 24 Feb 2017 15:12:19 +0100
-Message-ID: <20170224141219.GI1409@cbox>
-References: <20170222121348.3138-1-marc.zyngier@arm.com>
+From: Xiongfeng Wang <wangxiongfeng2-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH V11 10/10] arm/arm64: KVM: add guest SEA support
+Date: Sat, 25 Feb 2017 15:15:47 +0800
+Message-ID: <df6ba5dc-d93f-925a-46bf-1e1e209d17f3@huawei.com>
+References: <1487712121-16688-1-git-send-email-tbaicar@codeaurora.org>
+ <1487712121-16688-11-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170222121348.3138-1-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Vijay Kilari <vijay.kilari@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1487712121-16688-11-git-send-email-tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, james.morse-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm@vg
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 22, 2017 at 12:13:48PM +0000, Marc Zyngier wrote:
-> Our GICv3 emulation always presents ICC_SRE_EL1 with DIB/DFB set to
-> zero, which implies that there is a way to bypass the GIC and
-> inject raw IRQ/FIQ by driving the CPU pins.
-> 
-> Of course, we don't allow that when the GIC is configured, but
-> we fail to indicate that to the guest. The obvious fix is to
-> set these bits (and never let them being changed again).
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Hi Tyler,
 
-Acked-by: Christoffer Dall <cdall@linaro.org>
 
+On 2017/2/22 5:22, Tyler Baicar wrote:
+> Currently external aborts are unsupported by the guest abort
+> handling. Add handling for SEAs so that the host kernel reports
+> SEAs which occur in the guest kernel.
+> 
+> Signed-off-by: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
 > ---
->  include/linux/irqchip/arm-gic-v3.h | 2 ++
->  virt/kvm/arm/vgic/vgic-v3.c        | 5 ++++-
->  2 files changed, 6 insertions(+), 1 deletion(-)
+>  arch/arm/include/asm/kvm_arm.h       |  1 +
+>  arch/arm/include/asm/system_misc.h   |  5 +++++
+>  arch/arm/kvm/mmu.c                   | 18 ++++++++++++++++--
+>  arch/arm64/include/asm/kvm_arm.h     |  1 +
+>  arch/arm64/include/asm/system_misc.h |  2 ++
+>  arch/arm64/mm/fault.c                | 18 ++++++++++++++++++
+>  6 files changed, 43 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index e808f8ae6f14..0a8bad331341 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -354,6 +354,8 @@
->   */
->  #define ICC_CTLR_EL1_EOImode_drop_dir	(0U << 1)
->  #define ICC_CTLR_EL1_EOImode_drop	(1U << 1)
-> +#define ICC_SRE_EL1_DIB			(1U << 2)
-> +#define ICC_SRE_EL1_DFB			(1U << 1)
->  #define ICC_SRE_EL1_SRE			(1U << 0)
+> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+> index e22089f..33a77509 100644
+> --- a/arch/arm/include/asm/kvm_arm.h
+> +++ b/arch/arm/include/asm/kvm_arm.h
+> @@ -187,6 +187,7 @@
+>  #define FSC_FAULT	(0x04)
+>  #define FSC_ACCESS	(0x08)
+>  #define FSC_PERM	(0x0c)
+> +#define FSC_EXTABT	(0x10)
+>  
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~0xf)
+> diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
+> index a3d61ad..ea45d94 100644
+> --- a/arch/arm/include/asm/system_misc.h
+> +++ b/arch/arm/include/asm/system_misc.h
+> @@ -24,4 +24,9 @@
+>  
+>  #endif /* !__ASSEMBLY__ */
+>  
+> +static inline int handle_guest_sea(unsigned long addr, unsigned int esr)
+> +{
+> +	return -1;
+> +}
+> +
+>  #endif /* __ASM_ARM_SYSTEM_MISC_H */
+> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> index a5265ed..04f1dd50 100644
+> --- a/arch/arm/kvm/mmu.c
+> +++ b/arch/arm/kvm/mmu.c
+> @@ -29,6 +29,7 @@
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/virt.h>
+> +#include <asm/system_misc.h>
+>  
+>  #include "trace.h"
+>  
+> @@ -1444,8 +1445,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  
+>  	/* Check the stage-2 fault is trans. fault or write fault */
+>  	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+> -	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+> -	    fault_status != FSC_ACCESS) {
+> +
+> +	/* The host kernel will handle the synchronous external abort. There
+> +	 * is no need to pass the error into the guest.
+> +	 */
+
+Can we inject an sea into the guest, so that the guest can kill the
+application which causes the error if the guest won't be terminated
+later. I'm not sure whether ghes_handle_memory_failure() called in
+ghes_do_proc() will kill the qemu process. I think it only kill user
+processes marked with PF_MCE_PROCESS & PF_MCE_EARLY.
+
+> +	if (fault_status == FSC_EXTABT) {
+> +		if(handle_guest_sea((unsigned long)fault_ipa,
+> +				    kvm_vcpu_get_hsr(vcpu))) {
+> +			kvm_err("Failed to handle guest SEA, FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+> +				kvm_vcpu_trap_get_class(vcpu),
+> +				(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
+> +				(unsigned long)kvm_vcpu_get_hsr(vcpu));
+> +			return -EFAULT;
+> +		}
+> +	} else if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+> +		   fault_status != FSC_ACCESS) {
+>  		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+>  			kvm_vcpu_trap_get_class(vcpu),
+>  			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 2a2752b..2b11d59 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -201,6 +201,7 @@
+>  #define FSC_FAULT	ESR_ELx_FSC_FAULT
+>  #define FSC_ACCESS	ESR_ELx_FSC_ACCESS
+>  #define FSC_PERM	ESR_ELx_FSC_PERM
+> +#define FSC_EXTABT	ESR_ELx_FSC_EXTABT
+>  
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~UL(0xf))
+> diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
+> index bc81243..5b2cecd1 100644
+> --- a/arch/arm64/include/asm/system_misc.h
+> +++ b/arch/arm64/include/asm/system_misc.h
+> @@ -58,4 +58,6 @@ void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned int,
+>  
+>  #endif	/* __ASSEMBLY__ */
+>  
+> +int handle_guest_sea(unsigned long addr, unsigned int esr);
+> +
+>  #endif	/* __ASM_SYSTEM_MISC_H */
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index b2d57fc..403277b 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -602,6 +602,24 @@ static const char *fault_name(unsigned int esr)
+>  }
 >  
 >  /*
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index e6b03fd8c374..d062256131fc 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -215,10 +215,13 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
->  	/*
->  	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
->  	 * way, so we force SRE to 1 to demonstrate this to the guest.
-> +	 * Also, we don't support any form of IRQ/FIQ bypass.
->  	 * This goes with the spec allowing the value to be RAO/WI.
->  	 */
->  	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-> -		vgic_v3->vgic_sre = ICC_SRE_EL1_SRE;
-> +		vgic_v3->vgic_sre = (ICC_SRE_EL1_DIB |
-> +				     ICC_SRE_EL1_DFB |
-> +				     ICC_SRE_EL1_SRE);
->  		vcpu->arch.vgic_cpu.pendbaser = INITIAL_PENDBASER_VALUE;
->  	} else {
->  		vgic_v3->vgic_sre = 0;
-> -- 
-> 2.11.0
+> + * Handle Synchronous External Aborts that occur in a guest kernel.
+> + */
+> +int handle_guest_sea(unsigned long addr, unsigned int esr)
+> +{
+> +	/*
+> +	 * synchronize_rcu() will wait for nmi_exit(), so no need to
+> +	 * rcu_read_lock().
+> +	 */
+> +	if(IS_ENABLED(HAVE_ACPI_APEI_SEA)) {
+> +		nmi_enter();
+> +		ghes_notify_sea();
+> +		nmi_exit();
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+>   * Dispatch a data abort to the relevant handler.
+>   */
+>  asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
 > 
+
+Thanks,
+Wang Xiongfeng
