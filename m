@@ -1,28 +1,30 @@
-From: Linu Cherian <linucherian@gmail.com>
-Subject: Re: [PATCH V2 2/2] KVM: arm64: Increase number of user memslots to 508
-Date: Sun, 26 Feb 2017 12:36:58 +0530
-Message-ID: <CAGOz-0bKYbVB_Zu1J+fCnQ=icK9yNHjXjh_hBxj4AjATw7cEXg@mail.gmail.com>
-References: <1486538141-30627-1-git-send-email-linucherian@gmail.com>
- <1486538141-30627-3-git-send-email-linucherian@gmail.com>
- <20170223101407.GB1409@cbox>
+From: Roman Livshits <romanliv@gmail.com>
+Subject: Android on virt device
+Date: Sun, 26 Feb 2017 12:12:35 +0200
+Message-ID: <6e04464a-9570-7d62-4bf4-9bbc1fb46e6b@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EB6440DB7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Feb 2017 02:05:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2C6D40DA4
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Feb 2017 05:11:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nplm819X+FAa for <kvmarm@lists.cs.columbia.edu>;
- Sun, 26 Feb 2017 02:05:54 -0500 (EST)
-Received: from mail-yb0-f193.google.com (mail-yb0-f193.google.com
- [209.85.213.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F1EC40DAF
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Feb 2017 02:05:54 -0500 (EST)
-Received: by mail-yb0-f193.google.com with SMTP id d88so2118809ybi.2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Feb 2017 23:06:59 -0800 (PST)
-In-Reply-To: <20170223101407.GB1409@cbox>
+ with ESMTP id io3sylF3sKOx for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 26 Feb 2017 05:11:35 -0500 (EST)
+Received: from mail-lf0-f49.google.com (mail-lf0-f49.google.com
+ [209.85.215.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7BBE640D55
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Feb 2017 05:11:34 -0500 (EST)
+Received: by mail-lf0-f49.google.com with SMTP id z127so23134179lfa.2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Feb 2017 02:12:39 -0800 (PST)
+Received: from [192.168.100.12] (85-76-144-124-nat.elisa-mobile.fi.
+ [85.76.144.124])
+ by smtp.gmail.com with ESMTPSA id t2sm3160262lfe.9.2017.02.26.02.12.36
+ for <kvmarm@lists.cs.columbia.edu>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 26 Feb 2017 02:12:37 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,30 +34,19 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: sunil.goutham@cavium.com, Marc Zyngier <marc.zyngier@arm.com>, Linu Cherian <linu.cherian@cavium.com>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 23, 2017 at 3:44 PM, Christoffer Dall <cdall@linaro.org> wrote:
-> On Wed, Feb 08, 2017 at 12:45:41PM +0530, linucherian@gmail.com wrote:
->> From: Linu Cherian <linu.cherian@cavium.com>
->>
->> Having only 32 memslots is a real constraint for the maximum
->> number of PCI devices that can be assigned to a single guest.
->> Assuming each PCI device/virtual function having two memory BAR
->> regions, we could assign only 15 devices/virtual functions to a
->> guest.
->>
->> Hence increase KVM_USER_MEM_SLOTS to 508, so that KVM_MEM_SLOTS_NUM is
->> 512 as done in other archs like x86 and powerpc.
->
-> Actually on powerpc they just define KVM_USER_MEM_SLOTS as 512 directly.
->
-> On x86 they define them as 509 and have 3 private mem slots.
->
-> I don't understand the difference and as far as I can tell we don't have
-> any private memslots on arm/arm64, so this is just weird to me.
->
+Hi
 
-Since the KVM_PRIVATE_MEM_SLOTS was already defined as 4, just kept
-it untouched. Should we remove this and keep KVM_USER_MEM_SLOTS as 512 ?
+I am trying to run Android on qemu virt machine.
+I want to use virt as this was used by the op-tee for implementing TEE 
+for ARM TrustZone, see https://github.com/OP-TEE/build#op-tee-buildgit, 
+so hope that running Android on virt would be easier comparing to 
+putting op-tee to ranchu, used by Android emulator 
+(http://www.linaro.org/blog/core-dump/running-64bit-android-l-qemu/).
+
+Is there any advice how to do this?
+
+Regards,
+Roman
