@@ -1,21 +1,23 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH] arm64: KVM: VHE: Clear HCR_TGE when invalidating guest TLBs
-Date: Mon, 27 Feb 2017 15:24:37 +0000
-Message-ID: <20170227152437.26261-1-marc.zyngier@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: [PATCH kvm-unit-tests 1/2] arm/arm64: Add PSCI tests
+Date: Mon, 27 Feb 2017 18:32:07 +0100
+Message-ID: <20170227173208.14854-2-drjones@redhat.com>
+References: <20170227173208.14854-1-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5021B4092C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Feb 2017 10:23:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27E1140C38
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Feb 2017 12:31:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gbiuJ2apt-cs for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Feb 2017 10:23:47 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D908C40017
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Feb 2017 10:23:46 -0500 (EST)
+ with ESMTP id JvHH0UV3CkVy for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Feb 2017 12:31:05 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F25D640C33
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Feb 2017 12:31:04 -0500 (EST)
+In-Reply-To: <20170227173208.14854-1-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,137 +27,168 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Tomasz Nowicki <tnowicki@caviumnetworks.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Levente Kurusa <lkurusa@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When invalidating guest TLBs, special care must be taken to
-actually shoot the guest TLBs and not the host ones if we're
-running on a VHE system.  This is controlled by the HCR_EL2.TGE
-bit, which we forget to clear before invalidating TLBs.
+From: Levente Kurusa <lkurusa@redhat.com>
 
-Address the issue by introducing two wrappers (__tlb_switch_to_guest
-and __tlb_switch_to_host) that take care of both the VTTBR_EL2
-and HCR_EL2.TGE switching.
+The cpu_on test exposed two races in KVM's PSCI emulation.
 
-Reported-by: Tomasz Nowicki <tnowicki@caviumnetworks.com>
-Tested-by: Tomasz Nowicki <tnowicki@caviumnetworks.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Levente Kurusa <lkurusa@redhat.com>
+[Rewrote the cpu_on test to improve the chance of hitting the race.
+ Also added affinity-info tests and made some minor cleanups. -drew]
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm64/kvm/hyp/tlb.c | 64 +++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 55 insertions(+), 9 deletions(-)
+ arm/Makefile.common |   1 +
+ arm/psci.c          | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg   |   6 +++
+ 3 files changed, 119 insertions(+)
+ create mode 100644 arm/psci.c
 
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 88e2f2b938f0..55889d057757 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -17,14 +17,62 @@
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index f7193c3e6d64..74c7394eb7c1 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -14,6 +14,7 @@ tests-common += $(TEST_DIR)/spinlock-test.flat
+ tests-common += $(TEST_DIR)/pci-test.flat
+ tests-common += $(TEST_DIR)/pmu.flat
+ tests-common += $(TEST_DIR)/gic.flat
++tests-common += $(TEST_DIR)/psci.flat
  
- #include <asm/kvm_hyp.h>
- 
-+static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
-+{
-+	u64 val;
+ tests-all = $(tests-common) $(tests)
+ all: $(tests-all)
+diff --git a/arm/psci.c b/arm/psci.c
+new file mode 100644
+index 000000000000..e571afb92c7e
+--- /dev/null
++++ b/arm/psci.c
+@@ -0,0 +1,112 @@
++/*
++ * PSCI tests
++ *
++ * Copyright (C) 2017, Red Hat, Inc.
++ * Author: Levente Kurusa <lkurusa@redhat.com>
++ * Author: Andrew Jones <drjones@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.
++ */
++#include <libcflat.h>
++#include <asm/smp.h>
++#include <asm/psci.h>
 +
-+	/*
-+	 * With VHE enabled, we have HCR_EL2.{E2H,TGE} = {1,1}, and
-+	 * most TLB operations target EL2/EL0. In order to affect the
-+	 * guest TLBs (EL1/EL0), we need to change one of these two
-+	 * bits. Changing E2H is impossible (goodbye TTBR1_EL2), so
-+	 * let's flip TGE before executing the TLB operation.
-+	 */
-+	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-+	val = read_sysreg(hcr_el2);
-+	val &= ~HCR_TGE;
-+	write_sysreg(val, hcr_el2);
-+	isb();
++static bool psci_invalid_function(void)
++{
++	return psci_invoke(1337, 0, 0, 0) == PSCI_RET_NOT_SUPPORTED;
 +}
 +
-+static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm)
++static int psci_affinity_info(unsigned long target_affinity, uint32_t lowest_affinity_level)
 +{
-+	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-+	isb();
++#ifdef __arm__
++	return psci_invoke(PSCI_0_2_FN_AFFINITY_INFO, target_affinity, lowest_affinity_level, 0);
++#else
++	return psci_invoke(PSCI_0_2_FN64_AFFINITY_INFO, target_affinity, lowest_affinity_level, 0);
++#endif
 +}
 +
-+static hyp_alternate_select(__tlb_switch_to_guest,
-+			    __tlb_switch_to_guest_nvhe,
-+			    __tlb_switch_to_guest_vhe,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
-+
-+static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm)
++static bool psci_affinity_info_on(void)
 +{
-+	/*
-+	 * We're done with the TLB operation, let's restore the host's
-+	 * view of HCR_EL2.
-+	 */
-+	write_sysreg(0, vttbr_el2);
-+	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
++	return psci_affinity_info(cpus[0], 0) == PSCI_0_2_AFFINITY_LEVEL_ON;
 +}
 +
-+static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm)
++static bool psci_affinity_info_off(void)
 +{
-+	write_sysreg(0, vttbr_el2);
++	return psci_affinity_info(cpus[1], 0) == PSCI_0_2_AFFINITY_LEVEL_OFF;
 +}
 +
-+static hyp_alternate_select(__tlb_switch_to_host,
-+			    __tlb_switch_to_host_nvhe,
-+			    __tlb_switch_to_host_vhe,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
++static int cpu_on_ret[NR_CPUS];
++static cpumask_t cpu_on_ready, cpu_on_done;
++static volatile int cpu_on_start;
 +
- void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
- 	dsb(ishst);
- 
- 	/* Switch to requested VMID */
- 	kvm = kern_hyp_va(kvm);
--	write_sysreg(kvm->arch.vttbr, vttbr_el2);
--	isb();
-+	__tlb_switch_to_guest()(kvm);
- 
- 	/*
- 	 * We could do so much better if we had the VA as well.
-@@ -45,7 +93,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	dsb(ish);
- 	isb();
- 
--	write_sysreg(0, vttbr_el2);
-+	__tlb_switch_to_host()(kvm);
- }
- 
- void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
-@@ -54,14 +102,13 @@ void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
- 
- 	/* Switch to requested VMID */
- 	kvm = kern_hyp_va(kvm);
--	write_sysreg(kvm->arch.vttbr, vttbr_el2);
--	isb();
-+	__tlb_switch_to_guest()(kvm);
- 
- 	asm volatile("tlbi vmalls12e1is" : : );
- 	dsb(ish);
- 	isb();
- 
--	write_sysreg(0, vttbr_el2);
-+	__tlb_switch_to_host()(kvm);
- }
- 
- void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
-@@ -69,14 +116,13 @@ void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
- 	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
- 
- 	/* Switch to requested VMID */
--	write_sysreg(kvm->arch.vttbr, vttbr_el2);
--	isb();
-+	__tlb_switch_to_guest()(kvm);
- 
- 	asm volatile("tlbi vmalle1" : : );
- 	dsb(nsh);
- 	isb();
- 
--	write_sysreg(0, vttbr_el2);
-+	__tlb_switch_to_host()(kvm);
- }
- 
- void __hyp_text __kvm_flush_vm_context(void)
++static void cpu_on_secondary_entry(void)
++{
++	int cpu = smp_processor_id();
++
++	cpumask_set_cpu(cpu, &cpu_on_ready);
++	while (!cpu_on_start)
++		cpu_relax();
++	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(halt));
++	cpumask_set_cpu(cpu, &cpu_on_done);
++	halt();
++}
++
++static bool psci_cpu_on_test(void)
++{
++	bool failed = false;
++	int cpu;
++
++	cpumask_set_cpu(1, &cpu_on_ready);
++	cpumask_set_cpu(1, &cpu_on_done);
++
++	for_each_present_cpu(cpu) {
++		if (cpu < 2)
++			continue;
++		smp_boot_secondary(cpu, cpu_on_secondary_entry);
++	}
++
++	cpumask_set_cpu(0, &cpu_on_ready);
++	while (!cpumask_full(&cpu_on_ready))
++		cpu_relax();
++
++	cpu_on_start = 1;
++	smp_mb();
++
++	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(halt));
++	cpumask_set_cpu(0, &cpu_on_done);
++
++	while (!cpumask_full(&cpu_on_done))
++		cpu_relax();
++
++	for_each_present_cpu(cpu) {
++		if (cpu == 1)
++			continue;
++		if (cpu_on_ret[cpu] != PSCI_RET_SUCCESS && cpu_on_ret[cpu] != PSCI_RET_ALREADY_ON) {
++			report_info("unexpected cpu_on return value: caller=CPU%d, ret=%d", cpu, cpu_on_ret[cpu]);
++			failed = true;
++		}
++	}
++
++	return !failed;
++}
++
++int main(void)
++{
++	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
++
++	report_info("PSCI version %d.%d", PSCI_VERSION_MAJOR(ver),
++					  PSCI_VERSION_MINOR(ver));
++	report("invalid-function", psci_invalid_function());
++	report("affinity-info-on", psci_affinity_info_on());
++	report("affinity-info-off", psci_affinity_info_off());
++	report("cpu-on", psci_cpu_on_test());
++
++#if 0
++	report_summary();
++	psci_invoke(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
++	report("system-off", false);
++	return 1; /* only reaches here if system-off fails */
++#else
++	return report_summary();
++#endif
++}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 8cf94729d86e..c98658f7488b 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -91,3 +91,9 @@ file = gic.flat
+ smp = $MAX_SMP
+ extra_params = -machine gic-version=3 -append 'ipi'
+ groups = gic
++
++# Test PSCI emulation
++[psci]
++file = psci.flat
++smp = $MAX_SMP
++groups = nodefault,psci
 -- 
-2.11.0
+2.9.3
