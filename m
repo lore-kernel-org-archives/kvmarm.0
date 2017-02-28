@@ -1,144 +1,51 @@
-From: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Subject: Re: [PATCH V11 10/10] arm/arm64: KVM: add guest SEA support
-Date: Tue, 28 Feb 2017 12:43:08 -0700
-Message-ID: <ff3aa805-0e03-9854-e294-ff6934c57f3f@codeaurora.org>
-References: <1487712121-16688-1-git-send-email-tbaicar@codeaurora.org>
- <1487712121-16688-11-git-send-email-tbaicar@codeaurora.org>
- <58B00E12.5020602@arm.com>
+From: Brendan Gregg <brendan.d.gregg@gmail.com>
+Subject: Re: [PATCH 11/13] fs: fix unsigned enum warning with gcc-4.2
+Date: Tue, 28 Feb 2017 13:53:10 -0800
+Message-ID: <CAE40pde6EcxiJtD627FVxRzjPADWXv2L7v8K2uUPvzmhC4JPYg@mail.gmail.com>
+References: <20161216105634.235457-1-arnd@arndb.de> <20161216105634.235457-12-arnd@arndb.de>
+ <CAE40pdenVkk-JerdB905nyupoDDPiQk9qv4p1Jv62kcj3-dKhQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D13840948
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Feb 2017 14:42:06 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5qzwTSd6QAVh for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Feb 2017 14:42:05 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 346DD40905
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Feb 2017 14:42:04 -0500 (EST)
-In-Reply-To: <58B00E12.5020602@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+Content-Type: text/plain; charset=UTF-8
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <CAE40pdenVkk-JerdB905nyupoDDPiQk9qv4p1Jv62kcj3-dKhQ@mail.gmail.com>
+Sender: linux-arch-owner@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hello James,
+On Tue, Jan 3, 2017 at 2:47 PM, Brendan Gregg <brendan.d.gregg@gmail.com> wrote:
+>
+> On Fri, Dec 16, 2016 at 2:56 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> >
+> > With arm-linux-gcc-4.2, almost every file we build in the kernel ends
+> > up with this warning:
+> >
+> > include/linux/fs.h:2648: warning: comparison of unsigned expression < 0 is always false
+> >
+>
+> Thanks, I'd like to see this fixed as a similar warning gets printed
+> whenever running many of the bcc/BPF tools, which gets annoying and is
+> user-visible. eg:
+>
+> # /usr/share/bcc/tools/xfsslower 1
+> In file included from /virtual/main.c:3:
+> /lib/modules/4.8.6-300.fc25.x86_64/build/include/linux/fs.h:2677:9:
+> warning: comparison of unsigned enum expression < 0 is always false
+> [-Wtautological-compare]
+>         if (id < 0 || id >= READING_MAX_ID)
+>             ~~ ^ ~
+> 1 warning generated.
+> Tracing XFS operations slower than 1 ms
+> TIME     COMM           PID    T BYTES   OFF_KB   LAT(ms) FILENAME
+> 14:44:27 cksum          4414   R 65536   0           1.02 chcon
+> 14:44:27 cksum          4414   R 65536   0           1.20 cpio
+> 14:44:27 cksum          4414   R 65536   0           1.01 diff
+> 14:44:27 cksum          4414   R 65536   0           1.15 dir
+> [...]
+>
+> This patch fixes the warning.
+>
 
+What's the status of this patch? I still get these warnings on latest. Thanks,
 
-On 2/24/2017 3:42 AM, James Morse wrote:
-> On 21/02/17 21:22, Tyler Baicar wrote:
->> Currently external aborts are unsupported by the guest abort
->> handling. Add handling for SEAs so that the host kernel reports
->> SEAs which occur in the guest kernel.
->> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
->> index e22089f..33a77509 100644
->> --- a/arch/arm/include/asm/kvm_arm.h
->> +++ b/arch/arm/include/asm/kvm_arm.h
->> @@ -187,6 +187,7 @@
->>   #define FSC_FAULT	(0x04)
->>   #define FSC_ACCESS	(0x08)
->>   #define FSC_PERM	(0x0c)
->> +#define FSC_EXTABT	(0x10)
-> arm64 has ESR_ELx_FSC_EXTABT which is used in inject_abt64(), but for matching
-> an external abort coming from hardware the range is wider.
->
-> Looking at the ARM-ARMs 'ISS encoding for an exception from an Instruction
-> Abort' in 'D7.2.27 ESR_ELx, Exception Syndrome Register (ELx)' (page D7-1954 of
-> version 'k'...iss10775), the ten flavours of you Synchronous abort you hooked
-> with do_sea() in patch 4 occupy 0x10 to 0x1f...
->
->
->> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
->> index a5265ed..04f1dd50 100644
->> --- a/arch/arm/kvm/mmu.c
->> +++ b/arch/arm/kvm/mmu.c
->> @@ -29,6 +29,7 @@
->>   #include <asm/kvm_asm.h>
->>   #include <asm/kvm_emulate.h>
->>   #include <asm/virt.h>
->> +#include <asm/system_misc.h>
->>   
->>   #include "trace.h"
->>   
->> @@ -1444,8 +1445,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>   
->>   	/* Check the stage-2 fault is trans. fault or write fault */
->>   	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
-> ... kvm_vcpu_trap_get_fault_type() on both arm and arm64 masks the HSR/ESR_EL2
-> with 0x3c ...
->
->
->> -	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
->> -	    fault_status != FSC_ACCESS) {
->> +
->> +	/* The host kernel will handle the synchronous external abort. There
->> +	 * is no need to pass the error into the guest.
->> +	 */
->> +	if (fault_status == FSC_EXTABT) {
-> ... but here we only check for 'Synchronous external abort, not on a translation
-> table walk'. Are the other types relevant?
-I believe the others should be relevant here as well. I haven't been 
-able to test the other types within a guest though.
-> If so we need some helper as this range is sparse and 'all other values are
-> reserved'. The aarch32 HSR format is slightly different. (G6-4411 ISS encoding
-> from an exception from a Data Abort).
-I can add a helper so that this if statement matches any of the 10 FSC 
-values which are mapped to the do_sea in the host code.
-> If not, can we change patch 4 to check this type too so we don't call out to
-> APEI for a fault type we know isn't relevant.
->
->
->> +		if(handle_guest_sea((unsigned long)fault_ipa,
->> +				    kvm_vcpu_get_hsr(vcpu))) {
->> +			kvm_err("Failed to handle guest SEA, FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
->> +				kvm_vcpu_trap_get_class(vcpu),
->> +				(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
->> +				(unsigned long)kvm_vcpu_get_hsr(vcpu));
->> +			return -EFAULT;
->> +		}
->> +	} else if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
->> +		   fault_status != FSC_ACCESS) {
->>   		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
->>   			kvm_vcpu_trap_get_class(vcpu),
->>   			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
->> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
->> index b2d57fc..403277b 100644
->> --- a/arch/arm64/mm/fault.c
->> +++ b/arch/arm64/mm/fault.c
->> @@ -602,6 +602,24 @@ static const char *fault_name(unsigned int esr)
->>   }
->>
->>   /*
->> + * Handle Synchronous External Aborts that occur in a guest kernel.
->> + */
->> +int handle_guest_sea(unsigned long addr, unsigned int esr)
->> +{
->> +	if(IS_ENABLED(HAVE_ACPI_APEI_SEA)) {
->> +		nmi_enter();
->> +		ghes_notify_sea();
->> +		nmi_exit();
-> This nmi stuff was needed for synchronous aborts that may have interrupted
-> APEI's interrupts-masked code. We want to avoid trying to take the same set of
-> locks, hence taking the in_nmi() path through APEI. Here we know we interrupted
-> a guest, so there is no risk that we have interrupted APEI on the host.
-> ghes_notify_sea() can safely take the normal path.
-Makes sense, I can remove the nmi_* calls here.
-
-Thanks,
-Tyler
-
--- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+Brendan
