@@ -1,28 +1,25 @@
-From: Hanjun Guo <hanjun.guo@linaro.org>
+From: James Morse <james.morse@arm.com>
 Subject: Re: [RFC PATCH V1 v4.10-rc3 1/1] acpi: apei: handle GSIV notification
  type
-Date: Wed, 1 Mar 2017 16:27:25 +0800
-Message-ID: <43507f99-d80b-6409-d249-b9b18425a1da@linaro.org>
+Date: Wed, 01 Mar 2017 17:04:09 +0000
+Message-ID: <58B6FF09.6030306@arm.com>
 References: <86258A5CC0A3704780874CF6004BA8A62DCAB57E@lhreml502-mbs>
- <58B579A1.90109@arm.com>
+ <58B579A1.90109@arm.com> <43507f99-d80b-6409-d249-b9b18425a1da@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6106240B8B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Mar 2017 03:26:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26D8240A42
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Mar 2017 12:03:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ysfpb57aNFXs for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Mar 2017 03:26:27 -0500 (EST)
-Received: from mail-pf0-f181.google.com (mail-pf0-f181.google.com
- [209.85.192.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0D8140625
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Mar 2017 03:26:27 -0500 (EST)
-Received: by mail-pf0-f181.google.com with SMTP id j5so9028615pfb.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Mar 2017 00:27:37 -0800 (PST)
-In-Reply-To: <58B579A1.90109@arm.com>
+ with ESMTP id AU9kzGMApPJi for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Mar 2017 12:03:13 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C511A4095A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Mar 2017 12:03:13 -0500 (EST)
+In-Reply-To: <43507f99-d80b-6409-d249-b9b18425a1da@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,66 +29,84 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, Shiju Jose <shiju.jose@huawei.com>
+To: Hanjun Guo <hanjun.guo@linaro.org>, Shiju Jose <shiju.jose@huawei.com>
 Cc: "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "matt@codeblueprint.co.uk" <matt@codeblueprint.co.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, "will.deacon@arm.com" <will.deacon@arm.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "paul.gortmaker@windriver.com" <paul.gortmaker@windriver.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "Guohanjun (Hanjun Guo)" <guohanjun@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "fu.wei@linaro.org" <fu.wei@linaro.org>, Gabriele Paoloni <gabriele.paoloni@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "wangxiongfeng (C)" <wangxiongfeng2@huawei.com>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, eun.taik.lee@s
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
+Hi Hanjun,
 
-On 2017/2/28 21:22, James Morse wrote:
-> Hi Shiju,
->
-> On 27/02/17 18:19, Shiju Jose wrote:
->> Add a new GHES error source handling function for
->> GSIV(Global System Interrupt Vector).
->> If an error source's notification type is GSIV,
->> then this handling function can be registered
->> into the GSIV handler and it can parse
->> and report error information when they occur.
->
-> I'm missing some of the story here, but how is GSIV different from 'External
-> Interrupt'? I'm guessing something other than the CPU takes this 'interrupt'...
+On 01/03/17 08:27, Hanjun Guo wrote:
+> On 2017/2/28 21:22, James Morse wrote:
+>> On 27/02/17 18:19, Shiju Jose wrote:
+>>> Add a new GHES error source handling function for
+>>> GSIV(Global System Interrupt Vector).
+>>> If an error source's notification type is GSIV,
+>>> then this handling function can be registered
+>>> into the GSIV handler and it can parse
+>>> and report error information when they occur.
+>>
+>> I'm missing some of the story here, but how is GSIV different from 'External
+>> Interrupt'? I'm guessing something other than the CPU takes this 'interrupt'...
+> 
+> Yes, it's the same from CPU side (they are interrupts!), but there
+> is history behind them and the usage is different.
+> 
+> I think External Interrupt was introduced before ACPI is available on
+> ARM (hardware reduced platforms), so I guess it was used for errors
+> reported to OS which were not using SCI mechanism, for example, some
+> IO error reporting.
+> 
+> For External Interrupt, we don't use the ACPI event system, so for
+> the firmware, it just report the errors associate with the interrupt
+> number, the kernel map the interrupt number and install the
+> irq handler for it.
+> 
+> For GSIV based event, it was introduced for hardware reduced platform
+> in recent ACPI revision, and ARM64 is one of its consumers. When
+> errors are reported via GSIV, ACPI event notification needs to be
+> implemented and requires the platform to define a hardware error device
+> (PNP0C33) in ACPI namespace, and also a generic event device ACPI0013.
 
-Yes, it's the same from CPU side (they are interrupts!), but there
-is history behind them and the usage is different.
+Okay, so for APEI this really means PNP0C33 was Notify()d. 'SCI' means the same
+but the route they take to get into APEI is different.
 
-I think External Interrupt was introduced before ACPI is available on
-ARM (hardware reduced platforms), so I guess it was used for errors
-reported to OS which were not using SCI mechanism, for example, some
-IO error reporting.
 
-For External Interrupt, we don't use the ACPI event system, so for
-the firmware, it just report the errors associate with the interrupt
-number, the kernel map the interrupt number and install the
-irq handler for it.
+> For example, if we are using SPI (ARM GIC) 100 to report errors, there
+> is a ACPI0013 driver in drivers/acpi/evged.c to register the irq, when
 
-For GSIV based event, it was introduced for hardware reduced platform
-in recent ACPI revision, and ARM64 is one of its consumers. When
-errors are reported via GSIV, ACPI event notification needs to be
-implemented and requires the platform to define a hardware error device
-(PNP0C33) in ACPI namespace, and also a generic event device ACPI0013.
+Aha, this is where the interrupt-magic happens.
 
-For example, if we are using SPI (ARM GIC) 100 to report errors, there
-is a ACPI0013 driver in drivers/acpi/evged.c to register the irq, when
-error happened and trigger the interrupt, ACPI0013 driver will
-notify the error device (PNP0C33), then error device driver
-(drivers/acpi/hed.c) will process the error data form APEI table...
 
-So GSIV is quite different from 'External interrupt' in the way of
-working from both firmware and kernel side.
+> error happened and trigger the interrupt, ACPI0013 driver will
+> notify the error device (PNP0C33), then error device driver
+> (drivers/acpi/hed.c) will process the error data form APEI table...
 
->
->
-> The GHES GSIV code below is identical to the behaviour of the SCI Notification
-> type... are these two names for the same thing? (I'm confused!)
 
-SCI is also an 'interrupt' but it's a special irq number for ACPI
-event, and it has GPE (general purpose event) registers behind it,
-which is used only on Intel platforms. SCI based event use
-Method(\_GPE._L0x) to notify the error device (PNP0C33), but GSIV
-is used for HW-reduced platform which has no GPEs.
+>> The GHES GSIV code below is identical to the behaviour of the SCI Notification
+>> type... are these two names for the same thing? (I'm confused!)
+> 
+> SCI is also an 'interrupt' but it's a special irq number for ACPI
+> event, and it has GPE (general purpose event) registers behind it,
+> which is used only on Intel platforms. SCI based event use
+> Method(\_GPE._L0x) to notify the error device (PNP0C33), but GSIV
+> is used for HW-reduced platform which has no GPEs.
 
-Hope it can clarify something :)
+> Hope it can clarify something :)
 
-Thanks
-Hanjun
+Yes thanks! (the mist is slowly clearing...)
+
+If ACPI_HEST_NOTIFY_SCI and ACPI_HEST_NOTIFY_GSIV both mean 'receive
+notification from PNP0C33', is there any point having separate lists and
+add/remove functions for them?
+
+Instead, could we rename Linux's ghes_notifier_sci() and ghes_sci list to
+describe 'hed' instead, then group the two case statements together? There would
+be no need to add a selectable CONFIG_ACPI_APEI_GSIV, as SCI is already built-in
+and this way the code added is tiny. The only thing we would lose is the name
+'GSIV' in the not-supported error message which we don't need if its always
+supported.
+
+
+Thanks,
+
+James
