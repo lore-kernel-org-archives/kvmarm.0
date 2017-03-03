@@ -1,37 +1,29 @@
-From: Yasutaka Tanaka <yt2558@columbia.edu>
-Subject: KVM on ARM Cortex A53 in 32-bit Mode
-Date: Thu, 2 Mar 2017 09:57:50 -0500
-Message-ID: <CAPn9co60wgUms-V_6PBB4CDKeWV_mJzHqg-5wjTchKFi4G9xkg@mail.gmail.com>
+From: Hanjun Guo <hanjun.guo@linaro.org>
+Subject: Re: [RFC PATCH V1 v4.10-rc3 1/1] acpi: apei: handle GSIV notification
+ type
+Date: Fri, 3 Mar 2017 12:20:15 +0800
+Message-ID: <43301c6b-558c-990a-5736-7725063b0c23@linaro.org>
+References: <86258A5CC0A3704780874CF6004BA8A62DCAB57E@lhreml502-mbs>
+ <58B579A1.90109@arm.com> <43507f99-d80b-6409-d249-b9b18425a1da@linaro.org>
+ <58B6FF09.6030306@arm.com>
+ <86258A5CC0A3704780874CF6004BA8A62DCAC378@lhreml502-mbs>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============4598941946209126767=="
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE03740992
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Mar 2017 09:56:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C04B40AF5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Mar 2017 23:21:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WNZauUnv1WeF for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Mar 2017 09:56:39 -0500 (EST)
-Received: from outprodmail02.cc.columbia.edu (outprodmail02.cc.columbia.edu
- [128.59.72.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1007740430
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Mar 2017 09:56:38 -0500 (EST)
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
- by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v22Eu9HO023279
- for <kvmarm@lists.cs.columbia.edu>; Thu, 2 Mar 2017 09:57:51 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
- by hazelnut (Postfix) with ESMTP id C15826D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Mar 2017 09:57:51 -0500 (EST)
-Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
- [128.59.72.16]) by hazelnut (Postfix) with ESMTP id AC68F7E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Mar 2017 09:57:51 -0500 (EST)
-Received: from mail-qk0-f198.google.com (mail-qk0-f198.google.com
- [209.85.220.198])
- by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id v22EvpMC011393
- (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Thu, 2 Mar 2017 09:57:51 -0500
-Received: by mail-qk0-f198.google.com with SMTP id n127so102682908qkf.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Mar 2017 06:57:51 -0800 (PST)
+ with ESMTP id DgJH8VM8eHKd for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Mar 2017 23:21:00 -0500 (EST)
+Received: from mail-pg0-f49.google.com (mail-pg0-f49.google.com [74.125.83.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51E4B40A86
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Mar 2017 23:21:00 -0500 (EST)
+Received: by mail-pg0-f49.google.com with SMTP id b129so39498587pgc.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Mar 2017 20:22:14 -0800 (PST)
+In-Reply-To: <86258A5CC0A3704780874CF6004BA8A62DCAC378@lhreml502-mbs>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -41,122 +33,103 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+To: Shiju Jose <shiju.jose@huawei.com>, James Morse <james.morse@arm.com>
+Cc: "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "matt@codeblueprint.co.uk" <matt@codeblueprint.co.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, "will.deacon@arm.com" <will.deacon@arm.com>, "robert.moore@intel.com" <robert.moore@intel.com>, "paul.gortmaker@windriver.com" <paul.gortmaker@windriver.com>, "lv.zheng@intel.com" <lv.zheng@intel.com>, "Guohanjun (Hanjun Guo)" <guohanjun@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "fu.wei@linaro.org" <fu.wei@linaro.org>, Gabriele Paoloni <gabriele.paoloni@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "wangxiongfeng (C)" <wangxiongfeng2@huawei.com>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, eun.taik.lee@s
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============4598941946209126767==
-Content-Type: multipart/alternative; boundary=94eb2c12543a2ab1720549c0a7ac
+On 2017/3/2 21:45, Shiju Jose wrote:
+> Hi James,
+>
+>>
+>> Hi Hanjun,
+>>
+>> On 01/03/17 08:27, Hanjun Guo wrote:
+>>> On 2017/2/28 21:22, James Morse wrote:
+>>>> On 27/02/17 18:19, Shiju Jose wrote:
+>>>>> Add a new GHES error source handling function for GSIV(Global
+>> System
+>>>>> Interrupt Vector).
+>>>>> If an error source's notification type is GSIV, then this handling
+>>>>> function can be registered into the GSIV handler and it can parse
+>>>>> and report error information when they occur.
+>>>>
+>>>> I'm missing some of the story here, but how is GSIV different from
+>>>> 'External Interrupt'? I'm guessing something other than the CPU
+>> takes this 'interrupt'...
+>>>
+>>> Yes, it's the same from CPU side (they are interrupts!), but there is
+>>> history behind them and the usage is different.
+>>>
+>>> I think External Interrupt was introduced before ACPI is available on
+>>> ARM (hardware reduced platforms), so I guess it was used for errors
+>>> reported to OS which were not using SCI mechanism, for example, some
+>>> IO error reporting.
+>>>
+>>> For External Interrupt, we don't use the ACPI event system, so for
+>> the
+>>> firmware, it just report the errors associate with the interrupt
+>>> number, the kernel map the interrupt number and install the irq
+>>> handler for it.
+>>>
+>>> For GSIV based event, it was introduced for hardware reduced platform
+>>> in recent ACPI revision, and ARM64 is one of its consumers. When
+>>> errors are reported via GSIV, ACPI event notification needs to be
+>>> implemented and requires the platform to define a hardware error
+>>> device
+>>> (PNP0C33) in ACPI namespace, and also a generic event device ACPI0013.
+>>
+>> Okay, so for APEI this really means PNP0C33 was Notify()d. 'SCI' means
+>> the same but the route they take to get into APEI is different.
+>>
+>>
+>>> For example, if we are using SPI (ARM GIC) 100 to report errors,
+>> there
+>>> is a ACPI0013 driver in drivers/acpi/evged.c to register the irq,
+>> when
+>>
+>> Aha, this is where the interrupt-magic happens.
+>>
+>>
+>>> error happened and trigger the interrupt, ACPI0013 driver will notify
+>>> the error device (PNP0C33), then error device driver
+>>> (drivers/acpi/hed.c) will process the error data form APEI table...
+>>
+>>
+>>>> The GHES GSIV code below is identical to the behaviour of the SCI
+>>>> Notification type... are these two names for the same thing? (I'm
+>>>> confused!)
+>>>
+>>> SCI is also an 'interrupt' but it's a special irq number for ACPI
+>>> event, and it has GPE (general purpose event) registers behind it,
+>>> which is used only on Intel platforms. SCI based event use
+>>> Method(\_GPE._L0x) to notify the error device (PNP0C33), but GSIV is
+>>> used for HW-reduced platform which has no GPEs.
+>>
+>>> Hope it can clarify something :)
+>>
+>> Yes thanks! (the mist is slowly clearing...)
+>>
+>> If ACPI_HEST_NOTIFY_SCI and ACPI_HEST_NOTIFY_GSIV both mean 'receive
+>> notification from PNP0C33', is there any point having separate lists
+>> and add/remove functions for them?
+>>
+>> Instead, could we rename Linux's ghes_notifier_sci() and ghes_sci list
+>> to describe 'hed' instead, then group the two case statements together?
+>> There would be no need to add a selectable CONFIG_ACPI_APEI_GSIV, as
+>> SCI is already built-in and this way the code added is tiny. The only
+>> thing we would lose is the name 'GSIV' in the not-supported error
+>> message which we don't need if its always supported.
+>
+> This method was tested ok. However we were not sure about reusing/changing the
+> existing ghes_notifier_sci() for gsiv will be accepted.
 
---94eb2c12543a2ab1720549c0a7ac
-Content-Type: text/plain; charset=UTF-8
+For now a notify (SCI/GSIV/GPIO) will trigger the process of all the
+ghes data even they are on different list, so add them on a single
+list and process them will have the same effect.
 
-Hello KVM/ARM community,
+> Thus added a separate handling function ghes_notifier_gsiv() for gsiv.
 
-I am now trying to execute KVM on Raspberry Pi 3 Model B (RPI3).
-Does anyone know whether KVM/ARM can run with 32-bit mode on ARM Cortex A53?
+I think we can prepare the patch and send out for review.
 
-The CPU of RPI3 is ARM Cortex A53 which can be executed in both 32-bit and
-64-bit mode. I've managed to display /dev/kvm on 64-bit mode execution
-(i.e. with a 64-bit linux kernel) on RPI3, but I failed to do so in 32-bit
-mode.
-
-In 32-bit mode, an KVM error messages says CPU not supported. I guess the
-reason for the error message is KVM_ARM_TARGET_CORTEX_A53 is only returned
-in /arch/arm64/kvm/guest.c not under/arch/arm/kvm/guest.c.
-
-So I'm wondering whether it's possible or not. What I'd like to do is to
-compare the execution speed of KVM between 32-bit and 64-bit mode. The
-second plan is to compare between KVMs of 32-bit RPI2 and 64-bit RPI3 (I
-have both), but since RPI2 spec is a little low and I'm worried that some
-numeric comparisons become unfair.
-
-(I was also notified by an KVM/ARM expert that since RPI doesn't have a GIC
-and I need to apply some patches)
-
-The 64-bit kernel I used is the official RPI3 one here:
-https://github.com/raspberrypi/linux
-I compiled after make bcmrpi3_defconfig config:
-https://github.com/raspberrypi/linux/blob/rpi-4.9.y/arch/arm64/configs/bcmrpi3_defconfig
-
-Best regards,
-Yasutaka Tanaka
-
---94eb2c12543a2ab1720549c0a7ac
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div><span style=3D"color:rgb(51,51,51);font-family:ubuntu=
-,tahoma,&quot;helvetica neue&quot;,helvetica,arial,sans-serif;font-size:14p=
-x">Hello KVM/ARM community,</span><br></div><div><span style=3D"color:rgb(5=
-1,51,51);font-family:ubuntu,tahoma,&quot;helvetica neue&quot;,helvetica,ari=
-al,sans-serif;font-size:14px"><br></span></div><div><span style=3D"color:rg=
-b(51,51,51);font-family:ubuntu,tahoma,&quot;helvetica neue&quot;,helvetica,=
-arial,sans-serif;font-size:14px">I am now trying to execute KVM on Raspberr=
-y Pi 3 Model B (RPI3).</span></div><div><font color=3D"#333333" face=3D"ubu=
-ntu, tahoma, helvetica neue, helvetica, arial, sans-serif"><span style=3D"f=
-ont-size:14px">Does anyone know whether KVM/ARM can run with 32-bit mode on=
- ARM Cortex A53?</span></font></div><div><span style=3D"color:rgb(51,51,51)=
-;font-family:ubuntu,tahoma,&quot;helvetica neue&quot;,helvetica,arial,sans-=
-serif;font-size:14px"><br></span></div><div><span style=3D"color:rgb(51,51,=
-51);font-family:ubuntu,tahoma,&quot;helvetica neue&quot;,helvetica,arial,sa=
-ns-serif;font-size:14px">The CPU of RPI3 is ARM Cortex A53 which can be exe=
-cuted in both 32-bit and 64-bit mode.=C2=A0</span><span style=3D"color:rgb(=
-51,51,51);font-family:ubuntu,tahoma,&quot;helvetica neue&quot;,helvetica,ar=
-ial,sans-serif;font-size:14px">I&#39;ve managed to display /dev/kvm on 64-b=
-it mode execution (i.e. with a 64-bit linux kernel) on RPI3, but I failed t=
-o do so in 32-bit mode.=C2=A0</span></div><div><span style=3D"color:rgb(51,=
-51,51);font-family:ubuntu,tahoma,&quot;helvetica neue&quot;,helvetica,arial=
-,sans-serif;font-size:14px"><br></span></div><div><span style=3D"color:rgb(=
-51,51,51);font-family:ubuntu,tahoma,&quot;helvetica neue&quot;,helvetica,ar=
-ial,sans-serif;font-size:14px">In 32-bit mode, an KVM error messages says C=
-PU not supported. I guess the reason for the error message is=C2=A0</span><=
-font color=3D"#333333" face=3D"ubuntu, tahoma, helvetica neue, helvetica, a=
-rial, sans-serif"><span style=3D"font-size:14px">KVM_ARM_TARGET_CORTEX_A53 =
-is only returned in /arch/arm64/kvm/guest.c not under/arch/arm/kvm/guest.c.=
-</span></font></div><div><span style=3D"color:rgb(51,51,51);font-family:ubu=
-ntu,tahoma,&quot;helvetica neue&quot;,helvetica,arial,sans-serif;font-size:=
-14px"><br></span></div><div><span style=3D"color:rgb(51,51,51);font-family:=
-ubuntu,tahoma,&quot;helvetica neue&quot;,helvetica,arial,sans-serif;font-si=
-ze:14px">So I&#39;m wondering whether it&#39;s possible or not. What I&#39;=
-d like to do is to compare the execution speed of KVM between 32-bit and 64=
--bit mode. The second plan is to compare between KVMs of 32-bit RPI2 and 64=
--bit RPI3 (I have both), but since RPI2 spec is a little low and I&#39;m wo=
-rried that some numeric comparisons become unfair.</span></div><div><span s=
-tyle=3D"color:rgb(51,51,51);font-family:ubuntu,tahoma,&quot;helvetica neue&=
-quot;,helvetica,arial,sans-serif;font-size:14px"><br></span></div><div><spa=
-n style=3D"color:rgb(51,51,51);font-family:ubuntu,tahoma,&quot;helvetica ne=
-ue&quot;,helvetica,arial,sans-serif;font-size:14px">(I was also notified by=
- an KVM/ARM expert that since RPI doesn&#39;t have a GIC and I need to appl=
-y some patches)</span></div><div><span style=3D"color:rgb(51,51,51);font-fa=
-mily:ubuntu,tahoma,&quot;helvetica neue&quot;,helvetica,arial,sans-serif;fo=
-nt-size:14px"><br></span></div><div><span style=3D"color:rgb(51,51,51);font=
--family:ubuntu,tahoma,&quot;helvetica neue&quot;,helvetica,arial,sans-serif=
-;font-size:14px">The 64-bit kernel I used is the official RPI3 one here:=C2=
-=A0</span><font color=3D"#333333" face=3D"ubuntu, tahoma, helvetica neue, h=
-elvetica, arial, sans-serif"><span style=3D"font-size:14px"><a href=3D"http=
-s://github.com/raspberrypi/linux">https://github.com/raspberrypi/linux</a><=
-/span></font></div><div><font color=3D"#333333" face=3D"ubuntu, tahoma, hel=
-vetica neue, helvetica, arial, sans-serif"><span style=3D"font-size:14px">I=
- compiled after make bcmrpi3_defconfig config:=C2=A0<a href=3D"https://gith=
-ub.com/raspberrypi/linux/blob/rpi-4.9.y/arch/arm64/configs/bcmrpi3_defconfi=
-g">https://github.com/raspberrypi/linux/blob/rpi-4.9.y/arch/arm64/configs/b=
-cmrpi3_defconfig</a></span></font></div><div><br></div><div>Best regards,</=
-div><div><span style=3D"color:rgb(51,51,51);font-family:ubuntu,tahoma,&quot=
-;helvetica neue&quot;,helvetica,arial,sans-serif;font-size:14px">Yasutaka T=
-anaka</span></div></div>
-
---94eb2c12543a2ab1720549c0a7ac--
-
-
---===============4598941946209126767==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============4598941946209126767==--
+Thanks
+Hanjun
