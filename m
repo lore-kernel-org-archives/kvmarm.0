@@ -1,7 +1,7 @@
 From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: [PATCH] arm64: kvm: Use has_vhe() instead of hyp_alternate_select()
-Date: Sun,  5 Mar 2017 20:28:43 -0600
-Message-ID: <1488767323-1958-1-git-send-email-shankerd@codeaurora.org>
+Subject: [PATCH v2] arm64: kvm: Use has_vhe() instead of hyp_alternate_select()
+Date: Sun,  5 Mar 2017 20:33:18 -0600
+Message-ID: <1488767598-2055-1-git-send-email-shankerd@codeaurora.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
@@ -14,9 +14,10 @@ code. We can achieve the same functionality by using has_vhe(). It
 improves the code readability, uses the jump label instructions, and
 also compiler generates the better code with a fewer instructions.
 
-Change-Id: Ia8084189833f2081ff13c392deb5070c46a64038
 Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
 ---
+v2: removed 'Change-Id: Ia8084189833f2081ff13c392deb5070c46a64038' from commit
+
  arch/arm64/kvm/hyp/debug-sr.c  | 12 ++++++----
  arch/arm64/kvm/hyp/switch.c    | 50 +++++++++++++++++++-----------------------
  arch/arm64/kvm/hyp/sysreg-sr.c | 23 +++++++++----------
