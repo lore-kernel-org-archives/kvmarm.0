@@ -1,23 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 03/19] arm/arm64: vgic: turn vgic_find_mmio_region into
- public
-Date: Mon,  6 Mar 2017 12:34:18 +0100
-Message-ID: <1488800074-21991-4-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v3 06/19] KVM: arm64: ITS: Implement
+ vgic_mmio_uaccess_write_its_creadr
+Date: Mon,  6 Mar 2017 12:34:21 +0100
+Message-ID: <1488800074-21991-7-git-send-email-eric.auger@redhat.com>
 References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9F9040C44
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:33:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 87E4040A7F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:33:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UheWO-JtYpRu for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 06:33:33 -0500 (EST)
+ with ESMTP id OLppCxNk7Gye for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 06:33:46 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB90C40C4E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:33:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C234440B5B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:33:46 -0500 (EST)
 In-Reply-To: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,42 +32,55 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We plan to use vgic_find_mmio_region in vgic-its.c so let's
-turn it into a public function.
+GITS_CREADR needs to be restored so let's implement the associated
+uaccess_write_its callback.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- virt/kvm/arm/vgic/vgic-mmio.c | 3 +--
- virt/kvm/arm/vgic/vgic-mmio.h | 5 +++++
- 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 3654b4c..0427ddb 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -430,8 +430,7 @@ static int match_region(const void *key, const void *elt)
- 	return 0;
+---
+---
+ virt/kvm/arm/vgic/vgic-its.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index e9c8f9f..6120c6e 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1225,6 +1225,25 @@ static unsigned long vgic_mmio_read_its_creadr(struct kvm *kvm,
+ 	return extract_bytes(its->creadr, addr & 0x7, len);
  }
  
--/* Find the proper register handler entry given a certain address offset. */
--static const struct vgic_register_region *
-+const struct vgic_register_region *
- vgic_find_mmio_region(const struct vgic_register_region *region, int nr_regions,
- 		      unsigned int offset)
- {
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index 98bb566..055ad42 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -192,4 +192,9 @@ u64 vgic_sanitise_shareability(u64 reg);
- u64 vgic_sanitise_field(u64 reg, u64 field_mask, int field_shift,
- 			u64 (*sanitise_fn)(u64));
- 
-+/* Find the proper register handler entry given a certain address offset */
-+const struct vgic_register_region *
-+vgic_find_mmio_region(const struct vgic_register_region *region,
-+		      int nr_regions, unsigned int offset);
++static void vgic_mmio_uaccess_write_its_creadr(struct kvm *kvm,
++					       struct vgic_its *its,
++					       gpa_t addr, unsigned int len,
++					       unsigned long val)
++{
++	u32 reg;
 +
- #endif
++	mutex_lock(&its->cmd_lock);
++	reg = update_64bit_reg(its->creadr, addr & 7, len, val);
++	reg = ITS_CMD_OFFSET(reg);
++	if (reg >= ITS_CMD_BUFFER_SIZE(its->cbaser)) {
++		mutex_unlock(&its->cmd_lock);
++		return;
++	}
++
++	its->creadr = reg;
++	mutex_unlock(&its->cmd_lock);
++}
++
+ #define BASER_INDEX(addr) (((addr) / sizeof(u64)) & 0x7)
+ static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm,
+ 					      struct vgic_its *its,
+@@ -1320,7 +1339,8 @@ static struct vgic_register_region its_registers[] = {
+ 		vgic_mmio_read_its_cwriter, vgic_mmio_write_its_cwriter, NULL,
+ 		8, VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+ 	REGISTER_ITS_DESC(GITS_CREADR,
+-		vgic_mmio_read_its_creadr, its_mmio_write_wi, NULL, 8,
++		vgic_mmio_read_its_creadr, its_mmio_write_wi,
++		vgic_mmio_uaccess_write_its_creadr, 8,
+ 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+ 	REGISTER_ITS_DESC(GITS_BASER,
+ 		vgic_mmio_read_its_baser, vgic_mmio_write_its_baser, NULL, 0x40,
 -- 
 2.5.5
