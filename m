@@ -1,236 +1,84 @@
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: [PATCH v2] arm64: kvm: Use has_vhe() instead of hyp_alternate_select()
-Date: Sun,  5 Mar 2017 20:33:18 -0600
-Message-ID: <1488767598-2055-1-git-send-email-shankerd@codeaurora.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, kvm <kvm@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Vikram Sethi <vikrams@codeaurora.org>, Shanker Donthineni <shankerd@codeaurora.org>
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+Subject: Re: [PATCH V11 10/10] arm/arm64: KVM: add guest SEA support
+Date: Mon, 6 Mar 2017 11:38:46 +0800
+Message-ID: <8d020d81-d697-f05e-dbce-3a5a02c7c7db@huawei.com>
+References: <1487712121-16688-1-git-send-email-tbaicar@codeaurora.org>
+ <1487712121-16688-11-git-send-email-tbaicar@codeaurora.org>
+ <df6ba5dc-d93f-925a-46bf-1e1e209d17f3@huawei.com> <58B43092.6040401@arm.com>
+ <3df82a7b-1a32-e2d7-ae78-7132a4eab1a0@huawei.com> <58B57941.3000703@arm.com>
+ <4ff98823-d6f0-eb2e-4b98-f6d5e255f6c3@huawei.com>
+ <6d0fa5a5-bcbf-38b8-45ac-d645220ee9e2@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A55E40A7F
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Mar 2017 22:38:40 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id NjoUyjy3xfln for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  5 Mar 2017 22:38:39 -0500 (EST)
+Received: from dggrg03-dlp.huawei.com (unknown [45.249.212.189])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A79D040A69
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Mar 2017 22:38:38 -0500 (EST)
+In-Reply-To: <6d0fa5a5-bcbf-38b8-45ac-d645220ee9e2@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, Tyler Baicar <tbaicar@codeaurora.org>, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, punit.agrawal@arm.com, john.garry@huawei.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now all the cpu_hwcaps features have their own static keys. We don't
-need a separate function hyp_alternate_select() to patch the vhe/nvhe
-code. We can achieve the same functionality by using has_vhe(). It
-improves the code readability, uses the jump label instructions, and
-also compiler generates the better code with a fewer instructions.
+Hi Marc,
 
-Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
----
-v2: removed 'Change-Id: Ia8084189833f2081ff13c392deb5070c46a64038' from commit
+On 2017/3/2 17:39, Marc Zyngier wrote:
+> On 01/03/17 02:31, Xiongfeng Wang wrote:
+> 
+> [lot of things]
+> 
+>> If an SEA is injected into guest OS, the guest OS will jump to the SEA
+>> exception entry when the context switched to guest OS. And the CPSR and
+>> FAR_EL1 are recovered according to the content of vcpu. Then the guest
+>> OS can signal a process or panic. If another guest process read the
+>> error data, another SEA will be generated and it will be single too.
+>>
+>> Without QEMU involved, the drawback is that no APEI table can be mocked
+>> up in guest OS, and no memory_failure() will be called. So the memory of
+>> error data will be released into buddy system and assigned to another
+>> process. If the error was caused by instantaneous radiation or
+>> electromagnetic, the memory is usable again if it is written with a
+>> correct data. If the memory has wore out and a correct data is written,
+>> the ECC error may occurs again with high possibility. Before a 2-bit ECC
+>> error is reported, much more 1-bit errors will be reported. This is
+>> report to host os, the host os can determine the memory node has worn
+>> out and hot-plug out the memory node, and guest os may be terminated if
+>> its memory data can't be migrated.
+>>
+>> Of course, it is better to get QEMU involved, so the memory_failure can
+>> be executed in guest OS. But before that implemented, can we add SEA
+>> injection in kvm_handle_guest_abort()?
+> 
+> No. I will strongly object to that. This is a platform decision to
+> forward SEAs, not an architectural one. The core KVM code is only
+> concerned about implementing the ARM architecture, and not something
+> that is firmware dependent.
+> 
+Thanks for the reply!
+I'm not sure if there exists some misunderstanding here. I was saying
+that APEI stuff is not included in the core KVM code, but SEA injection
+can be included, just like the SEI injection in the core KVM code. Yes,
+APEI is firmware dependent, but I think SEA is not. And the processing
+for SEA doesn't depend on whether APEI is implemented.
 
- arch/arm64/kvm/hyp/debug-sr.c  | 12 ++++++----
- arch/arm64/kvm/hyp/switch.c    | 50 +++++++++++++++++++-----------------------
- arch/arm64/kvm/hyp/sysreg-sr.c | 23 +++++++++----------
- 3 files changed, 43 insertions(+), 42 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index f5154ed..e5642c2 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -109,9 +109,13 @@ static void __hyp_text __debug_save_spe_nvhe(u64 *pmscr_el1)
- 	dsb(nsh);
- }
- 
--static hyp_alternate_select(__debug_save_spe,
--			    __debug_save_spe_nvhe, __debug_save_spe_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
-+static void __hyp_text __debug_save_spe(u64 *pmscr_el1)
-+{
-+	if (has_vhe())
-+		__debug_save_spe_vhe(pmscr_el1);
-+	else
-+		__debug_save_spe_nvhe(pmscr_el1);
-+}
- 
- static void __hyp_text __debug_restore_spe(u64 pmscr_el1)
- {
-@@ -180,7 +184,7 @@ void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
- 
- 	__debug_save_state(vcpu, &vcpu->arch.host_debug_state.regs,
- 			   kern_hyp_va(vcpu->arch.host_cpu_context));
--	__debug_save_spe()(&vcpu->arch.host_debug_state.pmscr_el1);
-+	__debug_save_spe(&vcpu->arch.host_debug_state.pmscr_el1);
- }
- 
- void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index aede165..c5c77b8 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -33,13 +33,9 @@ static bool __hyp_text __fpsimd_enabled_vhe(void)
- 	return !!(read_sysreg(cpacr_el1) & CPACR_EL1_FPEN);
- }
- 
--static hyp_alternate_select(__fpsimd_is_enabled,
--			    __fpsimd_enabled_nvhe, __fpsimd_enabled_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
--
- bool __hyp_text __fpsimd_enabled(void)
- {
--	return __fpsimd_is_enabled()();
-+	return has_vhe() ? __fpsimd_enabled_vhe() : __fpsimd_enabled_nvhe();
- }
- 
- static void __hyp_text __activate_traps_vhe(void)
-@@ -63,9 +59,10 @@ static void __hyp_text __activate_traps_nvhe(void)
- 	write_sysreg(val, cptr_el2);
- }
- 
--static hyp_alternate_select(__activate_traps_arch,
--			    __activate_traps_nvhe, __activate_traps_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
-+static void __hyp_text __activate_traps_arch(void)
-+{
-+	has_vhe() ? __activate_traps_vhe() : __activate_traps_nvhe();
-+}
- 
- static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- {
-@@ -97,7 +94,7 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 	write_sysreg(0, pmselr_el0);
- 	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
--	__activate_traps_arch()();
-+	__activate_traps_arch();
- }
- 
- static void __hyp_text __deactivate_traps_vhe(void)
-@@ -127,9 +124,10 @@ static void __hyp_text __deactivate_traps_nvhe(void)
- 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
- }
- 
--static hyp_alternate_select(__deactivate_traps_arch,
--			    __deactivate_traps_nvhe, __deactivate_traps_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
-+static void __hyp_text __deactivate_traps_arch(void)
-+{
-+	has_vhe() ? __deactivate_traps_vhe() : __deactivate_traps_nvhe();
-+}
- 
- static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- {
-@@ -142,7 +140,7 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.hcr_el2 & HCR_VSE)
- 		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
- 
--	__deactivate_traps_arch()();
-+	__deactivate_traps_arch();
- 	write_sysreg(0, hstr_el2);
- 	write_sysreg(0, pmuserenr_el0);
- }
-@@ -183,20 +181,14 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
- 		__vgic_v2_restore_state(vcpu);
- }
- 
--static bool __hyp_text __true_value(void)
-+static bool __check_arm_834220(void)
- {
--	return true;
--}
-+	if (cpus_have_const_cap(ARM64_WORKAROUND_834220))
-+		return true;
- 
--static bool __hyp_text __false_value(void)
--{
- 	return false;
- }
- 
--static hyp_alternate_select(__check_arm_834220,
--			    __false_value, __true_value,
--			    ARM64_WORKAROUND_834220);
--
- static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
- {
- 	u64 par, tmp;
-@@ -251,7 +243,7 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
- 	 * resolve the IPA using the AT instruction.
- 	 */
- 	if (!(esr & ESR_ELx_S1PTW) &&
--	    (__check_arm_834220()() || (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
-+	    (__check_arm_834220() || (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
- 		if (!__translate_far_to_hpfar(far, &hpfar))
- 			return false;
- 	} else {
-@@ -406,9 +398,13 @@ static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par)
- 	      (void *)read_sysreg(tpidr_el2));
- }
- 
--static hyp_alternate_select(__hyp_call_panic,
--			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
--			    ARM64_HAS_VIRT_HOST_EXTN);
-+static void __hyp_text __hyp_call_panic(u64 spsr, u64 elr, u64 par)
-+{
-+	if (has_vhe())
-+		__hyp_call_panic_vhe(spsr, elr, par);
-+	else
-+		__hyp_call_panic_nvhe(spsr, elr, par);
-+}
- 
- void __hyp_text __noreturn __hyp_panic(void)
- {
-@@ -428,7 +424,7 @@ void __hyp_text __noreturn __hyp_panic(void)
- 	}
- 
- 	/* Call panic for real */
--	__hyp_call_panic()(spsr, elr, par);
-+	__hyp_call_panic(spsr, elr, par);
- 
- 	unreachable();
- }
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 9341376..2a6cb27 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -21,9 +21,6 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_hyp.h>
- 
--/* Yes, this does nothing, on purpose */
--static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
--
- /*
-  * Non-VHE: Both host and guest must save everything.
-  *
-@@ -68,13 +65,15 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
- 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
- }
- 
--static hyp_alternate_select(__sysreg_call_save_host_state,
--			    __sysreg_save_state, __sysreg_do_nothing,
--			    ARM64_HAS_VIRT_HOST_EXTN);
-+static void __hyp_text __sysreg_call_save_host_state(struct kvm_cpu_context *ctxt)
-+{
-+	if (!has_vhe())
-+		__sysreg_save_state(ctxt);
-+}
- 
- void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_call_save_host_state()(ctxt);
-+	__sysreg_call_save_host_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
- }
- 
-@@ -121,13 +120,15 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
- }
- 
--static hyp_alternate_select(__sysreg_call_restore_host_state,
--			    __sysreg_restore_state, __sysreg_do_nothing,
--			    ARM64_HAS_VIRT_HOST_EXTN);
-+static void __hyp_text __sysreg_call_restore_host_state(struct kvm_cpu_context *ctxt)
-+{
-+	if (!has_vhe())
-+		__sysreg_restore_state(ctxt);
-+}
- 
- void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_call_restore_host_state()(ctxt);
-+	__sysreg_call_restore_host_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
- }
- 
--- 
-Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+Thanks,
+
+Wang Xiongfeng
+.
