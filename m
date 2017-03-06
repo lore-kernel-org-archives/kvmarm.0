@@ -1,28 +1,25 @@
-From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-Subject: Re: [PATCH V11 10/10] arm/arm64: KVM: add guest SEA support
-Date: Mon, 6 Mar 2017 11:38:46 +0800
-Message-ID: <8d020d81-d697-f05e-dbce-3a5a02c7c7db@huawei.com>
-References: <1487712121-16688-1-git-send-email-tbaicar@codeaurora.org>
- <1487712121-16688-11-git-send-email-tbaicar@codeaurora.org>
- <df6ba5dc-d93f-925a-46bf-1e1e209d17f3@huawei.com> <58B43092.6040401@arm.com>
- <3df82a7b-1a32-e2d7-ae78-7132a4eab1a0@huawei.com> <58B57941.3000703@arm.com>
- <4ff98823-d6f0-eb2e-4b98-f6d5e255f6c3@huawei.com>
- <6d0fa5a5-bcbf-38b8-45ac-d645220ee9e2@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2] arm64: kvm: Use has_vhe() instead of
+ hyp_alternate_select()
+Date: Mon, 06 Mar 2017 08:34:00 +0000
+Message-ID: <87bmte3itj.fsf@on-the-bus.cambridge.arm.com>
+References: <1488767598-2055-1-git-send-email-shankerd@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A55E40A7F
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Mar 2017 22:38:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55A5C40B5E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 03:32:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NjoUyjy3xfln for <kvmarm@lists.cs.columbia.edu>;
- Sun,  5 Mar 2017 22:38:39 -0500 (EST)
-Received: from dggrg03-dlp.huawei.com (unknown [45.249.212.189])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A79D040A69
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Mar 2017 22:38:38 -0500 (EST)
-In-Reply-To: <6d0fa5a5-bcbf-38b8-45ac-d645220ee9e2@arm.com>
+ with ESMTP id K8P37u2ISZpd for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 03:32:48 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A1E640A6A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 03:32:48 -0500 (EST)
+In-Reply-To: <1488767598-2055-1-git-send-email-shankerd@codeaurora.org>
+ (Shanker Donthineni's message of "Sun, 5 Mar 2017 20:33:18 -0600")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,53 +29,60 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, Tyler Baicar <tbaicar@codeaurora.org>, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, punit.agrawal@arm.com, john.garry@huawei.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+To: Shanker Donthineni <shankerd@codeaurora.org>
+Cc: kvm <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Shanker,
 
-On 2017/3/2 17:39, Marc Zyngier wrote:
-> On 01/03/17 02:31, Xiongfeng Wang wrote:
-> 
-> [lot of things]
-> 
->> If an SEA is injected into guest OS, the guest OS will jump to the SEA
->> exception entry when the context switched to guest OS. And the CPSR and
->> FAR_EL1 are recovered according to the content of vcpu. Then the guest
->> OS can signal a process or panic. If another guest process read the
->> error data, another SEA will be generated and it will be single too.
->>
->> Without QEMU involved, the drawback is that no APEI table can be mocked
->> up in guest OS, and no memory_failure() will be called. So the memory of
->> error data will be released into buddy system and assigned to another
->> process. If the error was caused by instantaneous radiation or
->> electromagnetic, the memory is usable again if it is written with a
->> correct data. If the memory has wore out and a correct data is written,
->> the ECC error may occurs again with high possibility. Before a 2-bit ECC
->> error is reported, much more 1-bit errors will be reported. This is
->> report to host os, the host os can determine the memory node has worn
->> out and hot-plug out the memory node, and guest os may be terminated if
->> its memory data can't be migrated.
->>
->> Of course, it is better to get QEMU involved, so the memory_failure can
->> be executed in guest OS. But before that implemented, can we add SEA
->> injection in kvm_handle_guest_abort()?
-> 
-> No. I will strongly object to that. This is a platform decision to
-> forward SEAs, not an architectural one. The core KVM code is only
-> concerned about implementing the ARM architecture, and not something
-> that is firmware dependent.
-> 
-Thanks for the reply!
-I'm not sure if there exists some misunderstanding here. I was saying
-that APEI stuff is not included in the core KVM code, but SEA injection
-can be included, just like the SEI injection in the core KVM code. Yes,
-APEI is firmware dependent, but I think SEA is not. And the processing
-for SEA doesn't depend on whether APEI is implemented.
+On Mon, Mar 06 2017 at  2:33:18 am GMT, Shanker Donthineni <shankerd@codeaurora.org> wrote:
+> Now all the cpu_hwcaps features have their own static keys. We don't
+> need a separate function hyp_alternate_select() to patch the vhe/nvhe
+> code. We can achieve the same functionality by using has_vhe(). It
+> improves the code readability, uses the jump label instructions, and
+> also compiler generates the better code with a fewer instructions.
 
+How do you define "better"? Which compiler? Do you have any benchmarking data?
+
+>
+> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+> ---
+> v2: removed 'Change-Id: Ia8084189833f2081ff13c392deb5070c46a64038' from commit
+>
+>  arch/arm64/kvm/hyp/debug-sr.c  | 12 ++++++----
+>  arch/arm64/kvm/hyp/switch.c    | 50 +++++++++++++++++++-----------------------
+>  arch/arm64/kvm/hyp/sysreg-sr.c | 23 +++++++++----------
+>  3 files changed, 43 insertions(+), 42 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> index f5154ed..e5642c2 100644
+> --- a/arch/arm64/kvm/hyp/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> @@ -109,9 +109,13 @@ static void __hyp_text __debug_save_spe_nvhe(u64 *pmscr_el1)
+>  	dsb(nsh);
+>  }
+>  
+> -static hyp_alternate_select(__debug_save_spe,
+> -			    __debug_save_spe_nvhe, __debug_save_spe_vhe,
+> -			    ARM64_HAS_VIRT_HOST_EXTN);
+> +static void __hyp_text __debug_save_spe(u64 *pmscr_el1)
+> +{
+> +	if (has_vhe())
+> +		__debug_save_spe_vhe(pmscr_el1);
+> +	else
+> +		__debug_save_spe_nvhe(pmscr_el1);
+> +}
+
+I have two worries about this kind of thing:
+- Not all compilers do support jump labels, leading to a memory access
+on each static key (GCC 4.8, for example). This would immediately
+introduce a pretty big regression
+- The hyp_alternate_select() method doesn't introduce a fast/slow path
+duality. Each path has the exact same cost. I'm not keen on choosing
+what is supposed to be the fast path, really.
 
 Thanks,
 
-Wang Xiongfeng
-.
+	M.
+-- 
+Jazz is not dead, it just smell funny.
