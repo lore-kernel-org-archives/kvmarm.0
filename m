@@ -1,22 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 09/19] KVM: arm64: ITS: Interpret MAPD ITT_addr field
-Date: Mon,  6 Mar 2017 12:34:24 +0100
-Message-ID: <1488800074-21991-10-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v3 10/19] KVM: arm64: ITS: Check the device id matches TYPER
+ DEVBITS range
+Date: Mon,  6 Mar 2017 12:34:25 +0100
+Message-ID: <1488800074-21991-11-git-send-email-eric.auger@redhat.com>
 References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E4AB40BC5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31A4640C44
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wzewft4h-Rfb for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 06:34:00 -0500 (EST)
+ with ESMTP id DdS44+AvwLKm for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 06:34:04 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A5ED940BC4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63BC440A6A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:04 -0500 (EST)
 In-Reply-To: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,49 +32,54 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Up to now the MAPD ITT_addr had been ignored. We will need it
-for save/restore. Let's record it in the its_device struct.
+On MAPD we currently check the device id can be stored in the device table.
+Let's first check it can be encoded within the range defined by TYPER
+DEVBITS.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ virt/kvm/arm/vgic/vgic-its.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 56bcd92..694023f 100644
+index 694023f..322e370 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -99,6 +99,7 @@ struct its_device {
+@@ -180,6 +180,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
  
- 	/* the head for the list of ITTEs */
- 	struct list_head itt_head;
-+	gpa_t itt_addr;
- 	u32 nb_eventid_bits;
- 	u32 device_id;
- };
-@@ -562,6 +563,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
- #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
- #define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
- #define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
-+#define its_cmd_get_ittaddr(cmd)	its_cmd_mask_field(cmd, 2, 8,  44)
- #define its_cmd_get_size(cmd)		its_cmd_mask_field(cmd, 1, 0,  5)
+ #define VITS_ESZ 8
+ #define VITS_TYPER_IDBITS 0xF
++#define VITS_TYPER_DEVBITS 0xF
  
  /*
-@@ -832,6 +834,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	u32 device_id = its_cmd_get_deviceid(its_cmd);
- 	bool valid = its_cmd_get_validbit(its_cmd);
- 	size_t size = its_cmd_get_size(its_cmd);
-+	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
- 	struct its_device *device;
+  * Finds and returns a collection in the ITS collection table.
+@@ -402,7 +403,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+ 	 * To avoid memory waste in the guest, we keep the number of IDBits and
+ 	 * DevBits low - as least for the time being.
+ 	 */
+-	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
++	reg |= VITS_TYPER_DEVBITS << GITS_TYPER_DEVBITS_SHIFT;
+ 	reg |= VITS_TYPER_IDBITS << GITS_TYPER_IDBITS_SHIFT;
+ 	reg |= (VITS_ESZ - 1) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
  
- 	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
-@@ -862,6 +865,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 		return -ENOMEM;
+@@ -631,7 +632,7 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+  * Check whether an ID can be stored into the corresponding guest table.
+  * For a direct table this is pretty easy, but gets a bit nasty for
+  * indirect tables. We check whether the resulting guest physical address
+- * is actually valid (covered by a memslot and guest accessbible).
++ * is actually valid (covered by a memslot and guest accessible).
+  * For this we have to read the respective first level entry.
+  */
+ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
+@@ -642,6 +643,9 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
+ 	gfn_t gfn;
+ 	int esz = GITS_BASER_ENTRY_SIZE(baser);
  
- 	device->device_id = device_id;
-+	device->itt_addr = itt_addr << 8;
- 	device->nb_eventid_bits = size + 1;
++	if (id >= (2 << (VITS_TYPER_DEVBITS + 1)))
++		return false;
++
+ 	if (!(baser & GITS_BASER_INDIRECT)) {
+ 		phys_addr_t addr;
  
- 	INIT_LIST_HEAD(&device->itt_head);
 -- 
 2.5.5
