@@ -1,26 +1,21 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH V11 10/10] arm/arm64: KVM: add guest SEA support
-Date: Mon, 06 Mar 2017 10:28:04 +0000
-Message-ID: <58BD39B4.9050809@arm.com>
-References: <1487712121-16688-1-git-send-email-tbaicar@codeaurora.org>
- <1487712121-16688-11-git-send-email-tbaicar@codeaurora.org>
- <58B00E12.5020602@arm.com>
- <ff3aa805-0e03-9854-e294-ff6934c57f3f@codeaurora.org>
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v3 00/19] vITS save/restore
+Date: Mon,  6 Mar 2017 12:34:15 +0100
+Message-ID: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AEE5840C25
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 05:27:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D5B840C44
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:33:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mOzb9Q231l7E for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 05:27:01 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F3D40A74
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 05:27:01 -0500 (EST)
-In-Reply-To: <ff3aa805-0e03-9854-e294-ff6934c57f3f@codeaurora.org>
+ with ESMTP id 3WCshAXl+k8y for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 06:33:22 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CB86340C2A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:33:22 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,48 +25,106 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Tyler,
+This series specifies and implements an API aimed at saving and restoring
+the state of the in-kernel emulated ITS device.
 
-On 28/02/17 19:43, Baicar, Tyler wrote:
-> On 2/24/2017 3:42 AM, James Morse wrote:
->> On 21/02/17 21:22, Tyler Baicar wrote:
->>> Currently external aborts are unsupported by the guest abort
->>> handling. Add handling for SEAs so that the host kernel reports
->>> SEAs which occur in the guest kernel.
+The ITS is programmed through registers and tables. Those latter
+are allocated by the guest. Their base address is programmed in
+registers or table entries before the ITS is enabled.
 
->>> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
->>> index b2d57fc..403277b 100644
->>> --- a/arch/arm64/mm/fault.c
->>> +++ b/arch/arm64/mm/fault.c
->>> @@ -602,6 +602,24 @@ static const char *fault_name(unsigned int esr)
->>>   }
->>>
->>>   /*
->>> + * Handle Synchronous External Aborts that occur in a guest kernel.
->>> + */
->>> +int handle_guest_sea(unsigned long addr, unsigned int esr)
->>> +{
->>> +    if(IS_ENABLED(HAVE_ACPI_APEI_SEA)) {
->>> +        nmi_enter();
->>> +        ghes_notify_sea();
->>> +        nmi_exit();
+The ITS is free to use some of them to flush its internal caches. This
+is likely to be used when entering low power state.
 
->> This nmi stuff was needed for synchronous aborts that may have interrupted
->> APEI's interrupts-masked code. We want to avoid trying to take the same set of
->> locks, hence taking the in_nmi() path through APEI. Here we know we interrupted
->> a guest, so there is no risk that we have interrupted APEI on the host.
->> ghes_notify_sea() can safely take the normal path.
+Therefore, for save/restore use case, it looks natural to use this
+guest RAM allocated space to save the table related data. However,
+currently, The ITS in-kernel emulated device does not use all of those
+tables and for those it uses, it does not always sync them with its
+cached data. Additional sync must happen for:
+- the collection table
+- the device table
+- the per-device translation tables
+- the LPI pending tables.
 
-> Makes sense, I can remove the nmi_* calls here.
+The LPI configation table and the command queues do not need extra
+syncs.
 
-Just occurs to me: if we do this we need to add the rcu_read_lock() in
-ghes_notify_sea() as its not protected by the rcu/nmi weirdness.
+An alternative to flushing the tables into guest RAM could have been
+to flush them into a separate user-space buffer. However the drawback
+of this alternative is that the virtualizer would allocate dedicated
+buffers to store the data that should normally be laid out in guest
+RAM. It would also be obliged to re-compute their size from
+register/table content.
+
+So saving the tables in guest RAM better fit the ITS programming
+model and optimizes the memory usage. The drawback of this solution
+is it brings additional challenges at user-space level to make sure
+the guest RAM is frozen after table sync.
+
+Best Regards
+
+Eric
+
+Git: complete series available at
+https://github.com/eauger/linux/tree/v4.11-rc1-its-mig-v3
+
+* Testing:
+- on Cavium ThunderX using a virtio-net-pci guest,
+  virsh save/restore commands and virt-manager live migration.
+  Tested with 1 and 2 stage device table.
+
+History:
+
+v2 -> v3:
+- fix restore ITS ITT_addr bit masking
+
+v1 -> v2:
+- rebased on Vijaya's v11
+- all entries now are 8 byte large
+- devid/eventid indexing for device table and ITT
+- support 2 stage device table
+- common infra to read indexed tables
+- add cpu <-> le64 conversions
+- itte renamed into ite
+- do not care anymore about pending table 1st KB
+  (not needed at the moment for coarse mapping)
+
+RFC v1
+- creation
 
 
-Thanks,
+Eric Auger (19):
+  KVM: arm/arm64: Add vITS save/restore API documentation
+  KVM: arm/arm64: rename itte into ite
+  arm/arm64: vgic: turn vgic_find_mmio_region into public
+  KVM: arm64: ITS: KVM_DEV_ARM_VGIC_GRP_ITS_REGS group
+  KVM: arm64: ITS: Implement vgic_its_has_attr_regs and attr_regs_access
+  KVM: arm64: ITS: Implement vgic_mmio_uaccess_write_its_creadr
+  KVM: arm64: ITS: Report the ITE size in GITS_TYPER
+  KVM: arm64: ITS: Interpret MAPD Size field and check related errors
+  KVM: arm64: ITS: Interpret MAPD ITT_addr field
+  KVM: arm64: ITS: Check the device id matches TYPER DEVBITS range
+  KVM: arm64: ITS: KVM_DEV_ARM_VGIC_GRP_ITS_TABLES group
+  KVM: arm64: ITS: vgic_its_alloc_ite/device
+  KVM: arm64: ITS: Sort the device and ITE lists
+  KVM: arm64: ITS: Add infrastructure for table lookup
+  KVM: arm64: ITS: Collection table save/restore
+  KVM: arm64: ITS: vgic_its_check_id returns the entry's GPA
+  KVM: arm64: ITS: ITT flush and restore
+  KVM: arm64: ITS: Device table save/restore
+  KVM: arm64: ITS: Pending table save/restore
 
-James
+ Documentation/virtual/kvm/devices/arm-vgic-its.txt |   78 ++
+ arch/arm/include/uapi/asm/kvm.h                    |    2 +
+ arch/arm64/include/uapi/asm/kvm.h                  |    2 +
+ include/linux/irqchip/arm-gic-v3.h                 |    3 +
+ virt/kvm/arm/vgic/vgic-its.c                       | 1031 ++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-mmio.c                      |    3 +-
+ virt/kvm/arm/vgic/vgic-mmio.h                      |   14 +-
+ 7 files changed, 1022 insertions(+), 111 deletions(-)
+
+-- 
+2.5.5
