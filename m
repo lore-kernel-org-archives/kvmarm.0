@@ -1,27 +1,28 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 0/8] arm64: KVM: Fix PMU exception generation
-Date: Sun, 5 Mar 2017 07:01:09 -0800
-Message-ID: <20170305150109.GA1502@lvm>
-References: <20170222114728.2472-1-marc.zyngier@arm.com>
+From: gengdongjiu <gengdj.1984@gmail.com>
+Subject: Re: [PATCH V11 10/10] arm/arm64: KVM: add guest SEA support
+Date: Mon, 6 Mar 2017 09:28:50 +0800
+Message-ID: <CAMj-D2CepweZ4y38-U=XX3V8xsKs2vnxGz6RyRTtjA0CcitFAg@mail.gmail.com>
+References: <1487712121-16688-1-git-send-email-tbaicar@codeaurora.org>
+ <1487712121-16688-11-git-send-email-tbaicar@codeaurora.org>
+ <df6ba5dc-d93f-925a-46bf-1e1e209d17f3@huawei.com> <58B43092.6040401@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72916405DA
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Mar 2017 09:59:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 69CD540A7B
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Mar 2017 20:27:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LM4IVNmq+mLv for <kvmarm@lists.cs.columbia.edu>;
- Sun,  5 Mar 2017 09:59:54 -0500 (EST)
-Received: from mail-wr0-f178.google.com (mail-wr0-f178.google.com
- [209.85.128.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C4BFC40430
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Mar 2017 09:59:54 -0500 (EST)
-Received: by mail-wr0-f178.google.com with SMTP id u48so101101778wrc.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 05 Mar 2017 07:01:12 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <20170222114728.2472-1-marc.zyngier@arm.com>
+ with ESMTP id rts6Apy8K7rE for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  5 Mar 2017 20:27:32 -0500 (EST)
+Received: from mail-yw0-f196.google.com (mail-yw0-f196.google.com
+ [209.85.161.196])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65E0840A6A
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Mar 2017 20:27:32 -0500 (EST)
+Received: by mail-yw0-f196.google.com with SMTP id o4so140937ywd.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 05 Mar 2017 17:28:51 -0800 (PST)
+In-Reply-To: <58B43092.6040401@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,66 +32,83 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Shannon Zhao <shannon.zhao@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, Tyler Baicar <tbaicar@codeaurora.org>, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, Xiongfeng Wang <wangxiongfeng2@huawei.com>, Fu Wei <fu.wei@linaro.org>, zjzhang@codeaurora.org, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, Len Brown <lenb@kernel.org>, harba@codeaurora.org, john.garry@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, rostedt@goodmis.org, nkaje@codeaurora.org, Sandeepa Prabhu <sandeepa.s.prabhu@gmail.com>, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, Hanjun Guo <hanj>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+Hi James,
 
-On Wed, Feb 22, 2017 at 11:47:20AM +0000, Marc Zyngier wrote:
-> Running the following code:
-> 
-> root@zomby-woof:~# cat test-pmu.c
-> int main(int argc, char *argv[])
-> {
-> 	unsigned int val;
-> 	asm ("mrc p15, 0, %0, c9, c13, 0\n" : "=r" (val));
-> 	return val;
-> }
-> 
-> in a 32bit guest (or a 64bit guest with a 32bit userspace) results in
-> this surprising result:
-> 
-> [  120.347497] kvm [1150]: Unsupported guest CP15 access at: ab0945ae
-> [  120.353689] kvm [1142]:  { Op0( 0), Op1( 0), CRn( 9), CRm(13), Op2( 0), func_read },
-> 
-> which is weird, because the guest behaves correctly:
-> root@zomby-woof:~# ./test-pmu 
-> [   16.184422] test-pmu[740]: undefined instruction: pc=00000000ab0945ae
-> [   16.186043] Code: 00340001 b4800000 af00b085 60396078 (3f1dee19) 
-> Illegal instruction
-> 
-> It gets the expected UNDEF, and all is fine. So what?
-> 
-> It turns out that the PMU emulation code is a bit lazy, and tells the
-> rest of KVM that the emulation has failed, so that an exception gets
-> delivered. Subtle differences in the 32bit vs 64bit handling make it
-> spit an "Unsupported..." error.
-> 
-> This series tries to set things straight:
-> - Allow an exception to be injected from an emulation handler
-> - Make all PMU illegal accesses inject an UNDEF
-> - Make these illegal accesses a successful emulation w.r.t the rest of KVM.
-> 
-> In the process, we also squash an interesting bug in the 64bit CP
-> access. Similar treatment could be applied to the 32bit kernel, except
-> that we don't ever inject an exception there (no PMU support yet).
 
-I'm a bit confused about this series and not too thrilled of the
-approach where we add a side-channel of the sys_reg param in the vcpu
-structure, which may or may not contain valid data at any given point.
+> Hi Wang Xiongfeng,
+>
+> On 25/02/17 07:15, Xiongfeng Wang wrote:
+>> On 2017/2/22 5:22, Tyler Baicar wrote:
+>>> Currently external aborts are unsupported by the guest abort
+>>> handling. Add handling for SEAs so that the host kernel reports
+>>> SEAs which occur in the guest kernel.
+>
+>>> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+>>> index a5265ed..04f1dd50 100644
+>>> --- a/arch/arm/kvm/mmu.c
+>>> +++ b/arch/arm/kvm/mmu.c
+>>> @@ -1444,8 +1445,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>>>
+>>>      /* Check the stage-2 fault is trans. fault or write fault */
+>>>      fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+>>> -    if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+>>> -        fault_status != FSC_ACCESS) {
+>>> +
+>>> +    /* The host kernel will handle the synchronous external abort. There
+>>> +     * is no need to pass the error into the guest.
+>>> +     */
+>
+>> Can we inject an sea into the guest, so that the guest can kill the
+>> application which causes the error if the guest won't be terminated
+>> later. I'm not sure whether ghes_handle_memory_failure() called in
+>> ghes_do_proc() will kill the qemu process. I think it only kill user
+>> processes marked with PF_MCE_PROCESS & PF_MCE_EARLY.
+>
+> My understanding is the pages will get unmapped and recovered where possible
+> (e.g. re-read from disk), the user space process will get SIGBUS/SIGSEV when it
+> next tries to access that page, which could be some time later.
+> These flags in find_early_kill_thread() are a way to make the memory-failure
+> code signal the process early, before it does any recovery. The 'MCE' makes me
+> think its x86 specific.
+> (early and late are described more in [0])
+>
+>
+> Guests are a special case as QEMU may never access the faulty memory itself, so
+> it won't receive the 'late' signal. It looks like ARM/arm64 KVM lacks support
+> for KVM_PFN_ERR_HWPOISON which sends SIGBUS from KVM's fault-handling code. I
+> have patches to add support for this which I intend to send at rc1.
 
-Couldn't we use a slightly bigger hammer (with cleaner semantics) and
-let all system register handling (cp on 32-bit and 64-bit sys regs
-alike) simply return true if they were emulated, in which case the
-caller should advance the PC, or false ifsomething else happened, and
-leave it up to the emulation of the individual registers to decide if
-any exceptions should be injected.
+could you push this patch to opensource?
 
-I don't think we have that many places where we want to inject an
-undefined exception in our handlers, and doing it explicitly might
-actually be a good idea to make it more clear that we're emulating the
-architecture properly.  What do you think?
 
-Thanks,
--Christoffer
+>
+> [0] suggests 'KVM qemu' sets these MCE flags to take the 'early' path, but given
+> x86s KVM_PFN_ERR_HWPOISON, this may be out of date.
+>
+>
+> Either way, once QEMU gets a signal indicating the virtual address, it can
+> generate its own APEI CPER records and use the KVM APIs to mock up an
+> Synchronous External Abort, (or inject an IRQ or run the vcpu waiting for the
+> guest's polling thread to come round, whichever was described to the guest via
+> the HEST/GHES tables).
+>
+> We can't hand the APEI CPER records we have in the kernel to the guest, as they
+> hold a host physical address, and maybe a host virtual address. We don't know
+> where in guest memory we could write new APEI CPER records as these locations
+> have to be reserved in the guests-UEFI memory map, and only QEMU knows where
+> they are.
+>
+> To deliver RAS events to a guest we have to get QEMU involved.
+>
+>
+> Thanks,
+>
+> James
+>
+>
+> [0] https://www.kernel.org/doc/Documentation/vm/hwpoison.txt
+>
