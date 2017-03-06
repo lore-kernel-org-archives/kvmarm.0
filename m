@@ -1,24 +1,26 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH] KVM: arm/arm64: Let vcpu thread modify its own active state
-Date: Mon,  6 Mar 2017 01:56:39 -0800
-Message-ID: <1488794199-22397-1-git-send-email-christoffer.dall@linaro.org>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH V11 10/10] arm/arm64: KVM: add guest SEA support
+Date: Mon, 06 Mar 2017 10:28:04 +0000
+Message-ID: <58BD39B4.9050809@arm.com>
+References: <1487712121-16688-1-git-send-email-tbaicar@codeaurora.org>
+ <1487712121-16688-11-git-send-email-tbaicar@codeaurora.org>
+ <58B00E12.5020602@arm.com>
+ <ff3aa805-0e03-9854-e294-ff6934c57f3f@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2188140A74
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 04:55:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AEE5840C25
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 05:27:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3dGo+B9PqgRw for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 04:55:23 -0500 (EST)
-Received: from mail-wr0-f177.google.com (mail-wr0-f177.google.com
- [209.85.128.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AF4FD400E9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 04:55:23 -0500 (EST)
-Received: by mail-wr0-f177.google.com with SMTP id u108so112379280wrb.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Mar 2017 01:56:43 -0800 (PST)
+ with ESMTP id mOzb9Q231l7E for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 05:27:01 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F3D40A74
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 05:27:01 -0500 (EST)
+In-Reply-To: <ff3aa805-0e03-9854-e294-ff6934c57f3f@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,45 +30,48 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org, Eric Auger <eric.auger@linaro.org>
+To: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jintack Lim <jintack@cs.columbia.edu>
+Hi Tyler,
 
-Currently, if a vcpu thread tries to change its own active state when
-the irq is already in AP list, it'll loop forever. Since the VCPU thread
-has already synced back LR state to the struct vgic_irq, let it modify
-its own state safely.
+On 28/02/17 19:43, Baicar, Tyler wrote:
+> On 2/24/2017 3:42 AM, James Morse wrote:
+>> On 21/02/17 21:22, Tyler Baicar wrote:
+>>> Currently external aborts are unsupported by the guest abort
+>>> handling. Add handling for SEAs so that the host kernel reports
+>>> SEAs which occur in the guest kernel.
 
-Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
----
- virt/kvm/arm/vgic/vgic-mmio.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+>>> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+>>> index b2d57fc..403277b 100644
+>>> --- a/arch/arm64/mm/fault.c
+>>> +++ b/arch/arm64/mm/fault.c
+>>> @@ -602,6 +602,24 @@ static const char *fault_name(unsigned int esr)
+>>>   }
+>>>
+>>>   /*
+>>> + * Handle Synchronous External Aborts that occur in a guest kernel.
+>>> + */
+>>> +int handle_guest_sea(unsigned long addr, unsigned int esr)
+>>> +{
+>>> +    if(IS_ENABLED(HAVE_ACPI_APEI_SEA)) {
+>>> +        nmi_enter();
+>>> +        ghes_notify_sea();
+>>> +        nmi_exit();
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 3654b4c..29101ab 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -185,9 +185,9 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 	 * If this virtual IRQ was written into a list register, we
- 	 * have to make sure the CPU that runs the VCPU thread has
- 	 * synced back LR state to the struct vgic_irq.  We can only
--	 * know this for sure, when either this irq is not assigned to
-+	 * know this for sure, when this irq is not assigned to
- 	 * anyone's AP list anymore, or the VCPU thread is not
--	 * running on any CPUs.
-+	 * running on any CPUs, or current thread is the VCPU thread.
- 	 *
- 	 * In the opposite case, we know the VCPU thread may be on its
- 	 * way back from the guest and still has to sync back this
-@@ -195,6 +195,7 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 	 * other thread sync back the IRQ.
- 	 */
- 	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
-+	       irq->vcpu != vcpu && /* Current thread is not the VCPU thread */
- 	       irq->vcpu->cpu != -1) /* VCPU thread is running */
- 		cond_resched_lock(&irq->irq_lock);
- 
--- 
-2.5.0
+>> This nmi stuff was needed for synchronous aborts that may have interrupted
+>> APEI's interrupts-masked code. We want to avoid trying to take the same set of
+>> locks, hence taking the in_nmi() path through APEI. Here we know we interrupted
+>> a guest, so there is no risk that we have interrupted APEI on the host.
+>> ghes_notify_sea() can safely take the normal path.
+
+> Makes sense, I can remove the nmi_* calls here.
+
+Just occurs to me: if we do this we need to add the rcu_read_lock() in
+ghes_notify_sea() as its not protected by the rcu/nmi weirdness.
+
+
+Thanks,
+
+James
