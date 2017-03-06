@@ -1,21 +1,24 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 00/19] vITS save/restore
-Date: Mon,  6 Mar 2017 12:34:15 +0100
-Message-ID: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v3 01/19] KVM: arm/arm64: Add vITS save/restore API
+ documentation
+Date: Mon,  6 Mar 2017 12:34:16 +0100
+Message-ID: <1488800074-21991-2-git-send-email-eric.auger@redhat.com>
+References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D5B840C44
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:33:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FE4E40A42
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:33:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3WCshAXl+k8y for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 06:33:22 -0500 (EST)
+ with ESMTP id 72rafCNxlPxY for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 06:33:27 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CB86340C2A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:33:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39FE740C51
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:33:27 -0500 (EST)
+In-Reply-To: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,102 +32,108 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series specifies and implements an API aimed at saving and restoring
-the state of the in-kernel emulated ITS device.
+Add description for how to access vITS registers and how to flush/restore
+vITS tables into/from memory
 
-The ITS is programmed through registers and tables. Those latter
-are allocated by the guest. Their base address is programmed in
-registers or table entries before the ITS is enabled.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-The ITS is free to use some of them to flush its internal caches. This
-is likely to be used when entering low power state.
-
-Therefore, for save/restore use case, it looks natural to use this
-guest RAM allocated space to save the table related data. However,
-currently, The ITS in-kernel emulated device does not use all of those
-tables and for those it uses, it does not always sync them with its
-cached data. Additional sync must happen for:
-- the collection table
-- the device table
-- the per-device translation tables
-- the LPI pending tables.
-
-The LPI configation table and the command queues do not need extra
-syncs.
-
-An alternative to flushing the tables into guest RAM could have been
-to flush them into a separate user-space buffer. However the drawback
-of this alternative is that the virtualizer would allocate dedicated
-buffers to store the data that should normally be laid out in guest
-RAM. It would also be obliged to re-compute their size from
-register/table content.
-
-So saving the tables in guest RAM better fit the ITS programming
-model and optimizes the memory usage. The drawback of this solution
-is it brings additional challenges at user-space level to make sure
-the guest RAM is frozen after table sync.
-
-Best Regards
-
-Eric
-
-Git: complete series available at
-https://github.com/eauger/linux/tree/v4.11-rc1-its-mig-v3
-
-* Testing:
-- on Cavium ThunderX using a virtio-net-pci guest,
-  virsh save/restore commands and virt-manager live migration.
-  Tested with 1 and 2 stage device table.
-
-History:
-
-v2 -> v3:
-- fix restore ITS ITT_addr bit masking
+---
 
 v1 -> v2:
-- rebased on Vijaya's v11
-- all entries now are 8 byte large
-- devid/eventid indexing for device table and ITT
-- support 2 stage device table
-- common infra to read indexed tables
-- add cpu <-> le64 conversions
-- itte renamed into ite
-- do not care anymore about pending table 1st KB
-  (not needed at the moment for coarse mapping)
+- DTE and ITE now are 8 bytes
+- DTE and ITE now indexed by deviceid/eventid
+- use ITE name instead of ITTE
+- mentions ITT_addr matches bits [51:8] of the actual address
+- mentions LE layout
+---
+ Documentation/virtual/kvm/devices/arm-vgic-its.txt | 78 ++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
-RFC v1
-- creation
-
-
-Eric Auger (19):
-  KVM: arm/arm64: Add vITS save/restore API documentation
-  KVM: arm/arm64: rename itte into ite
-  arm/arm64: vgic: turn vgic_find_mmio_region into public
-  KVM: arm64: ITS: KVM_DEV_ARM_VGIC_GRP_ITS_REGS group
-  KVM: arm64: ITS: Implement vgic_its_has_attr_regs and attr_regs_access
-  KVM: arm64: ITS: Implement vgic_mmio_uaccess_write_its_creadr
-  KVM: arm64: ITS: Report the ITE size in GITS_TYPER
-  KVM: arm64: ITS: Interpret MAPD Size field and check related errors
-  KVM: arm64: ITS: Interpret MAPD ITT_addr field
-  KVM: arm64: ITS: Check the device id matches TYPER DEVBITS range
-  KVM: arm64: ITS: KVM_DEV_ARM_VGIC_GRP_ITS_TABLES group
-  KVM: arm64: ITS: vgic_its_alloc_ite/device
-  KVM: arm64: ITS: Sort the device and ITE lists
-  KVM: arm64: ITS: Add infrastructure for table lookup
-  KVM: arm64: ITS: Collection table save/restore
-  KVM: arm64: ITS: vgic_its_check_id returns the entry's GPA
-  KVM: arm64: ITS: ITT flush and restore
-  KVM: arm64: ITS: Device table save/restore
-  KVM: arm64: ITS: Pending table save/restore
-
- Documentation/virtual/kvm/devices/arm-vgic-its.txt |   78 ++
- arch/arm/include/uapi/asm/kvm.h                    |    2 +
- arch/arm64/include/uapi/asm/kvm.h                  |    2 +
- include/linux/irqchip/arm-gic-v3.h                 |    3 +
- virt/kvm/arm/vgic/vgic-its.c                       | 1031 ++++++++++++++++++--
- virt/kvm/arm/vgic/vgic-mmio.c                      |    3 +-
- virt/kvm/arm/vgic/vgic-mmio.h                      |   14 +-
- 7 files changed, 1022 insertions(+), 111 deletions(-)
-
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+index 6081a5b..49ade0c 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+@@ -36,3 +36,81 @@ Groups:
+     -ENXIO:  ITS not properly configured as required prior to setting
+              this attribute
+     -ENOMEM: Memory shortage when allocating ITS internal data
++
++  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
++  Attributes:
++      The attr field of kvm_device_attr encodes the offset of the
++      ITS register, relative to the ITS control frame base address
++      (ITS_base).
++
++      kvm_device_attr.addr points to a __u64 value whatever the width
++      of the addressed register (32/64 bits).
++
++      Writes to read-only registers are ignored by the kernel except
++      for a single register, GITS_READR. Normally this register is RO
++      but it needs to be restored otherwise commands in the queue will
++      be re-executed after CWRITER setting.
++
++      For other registers, Getting or setting a register has the same
++      effect as reading/writing the register on real hardware.
++  Errors:
++    -ENXIO: Offset does not correspond to any supported register
++    -EFAULT: Invalid user pointer for attr->addr
++    -EINVAL: Offset is not 64-bit aligned
++
++  KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
++  Attributes
++       The attr field of kvm_device_attr is not used.
++
++       request the flush-save/restore of the ITS tables, namely
++       the device table, the collection table, all the ITT tables,
++       the LPI pending tables. On save, the tables are flushed
++       into guest memory at the location provisioned by the guest
++       in GITS_BASER (device and collection tables), on MAPD command
++       (ITT_addr), GICR_PENDBASERs (pending tables).
++
++       This means the GIC should be restored before the ITS and all
++       ITS registers but the GITS_CTRL must be restored before
++       restoring the ITS tables.
++
++       Note the LPI configuration table is read-only for the
++       in-kernel ITS and its save/restore goes through the standard
++       RAM save/restore.
++
++       The layout of the tables in guest memory defines an ABI.
++       The entries are laid in little endian format as follows;
++
++    The device table and ITE are respectively indexed by device id and
++    eventid. The collection table however is not indexed by collection id:
++    CTE are written at the beginning of the buffer.
++
++    Device Table Entry (DTE) layout: entry size = 8 bytes
++
++    bits:     | 63 ... 45 | 44 ... 5 | 4 ... 0 |
++    values:   |   next    | ITT_addr |  Size   |
++
++    where
++    - ITT_addr matches bits [48:8] of the ITT address (256B aligned).
++    - next field is meaningful only if the entry is valid (ITT_addr != NULL).
++    It equals to 0 if this entry is the last one; otherwise it corresponds
++    to the minimum between the offset to the next device id and 2^19 -1.
++
++    Collection Table Entry (CTE) layout: entry size = 8 bytes
++
++    bits:     | 63| 62 ..  52  | 51 ... 16 | 15  ...   0 |
++    values:   | V |    RES0    |  RDBase   |    ICID     |
++
++    Interrupt Translation Entry (ITE) layout: entry size = 8 bytes
++
++    bits:     | 63 ... 48 | 47 ... 16 | 15 ... 0 |
++    values:   |    next   |   pINTID  |  ICID    |
++
++    - next field is meaningful only if the entry is valid (pINTID != NULL).
++    It equals to 0 if this entry is the last one; otherwise it corresponds
++    to the minimum between the eventid offset to the next ITE and 2^16 -1.
++
++    LPI Pending Table layout:
++
++    As specified in the ARM Generic Interrupt Controller Architecture
++    Specification GIC Architecture version 3.0 and version 4. The first
++    1kB is not modified and therefore should contain zeroes.
 -- 
 2.5.5
