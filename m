@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 06/25] arm64: KVM: Implement HVC_SOFT_RESTART in the init
- code
-Date: Mon,  6 Mar 2017 14:24:39 +0000
-Message-ID: <20170306142458.8875-7-marc.zyngier@arm.com>
+Subject: [PATCH v3 07/25] ARM: hyp-stub: improve ABI
+Date: Mon,  6 Mar 2017 14:24:40 +0000
+Message-ID: <20170306142458.8875-8-marc.zyngier@arm.com>
 References: <20170306142458.8875-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6541B40C51
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:24:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B51A040BDE
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:24:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AloizzA6bTKd for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 09:24:55 -0500 (EST)
+ with ESMTP id ge33MsYRbo+H for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 09:24:57 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED25540C27
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:24:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B65140C54
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:24:57 -0500 (EST)
 In-Reply-To: <20170306142458.8875-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,66 +28,74 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, cdall@linaro.org, james.morse@arm.com
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Russell King <rmk+kernel@armlinux.org.uk>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Another missing stub hypercall is HVC_SOFT_RESTART. It turns out
-that it is pretty easy to implement in terms of HVC_RESET_VECTORS
-(since it needs to turn the MMU off).
+From: Russell King <rmk+kernel@armlinux.org.uk>
 
+Improve the hyp-stub ABI to allow it to do more than just get/set the
+vectors.  We follow the example in ARM64, where r0 is used as an opcode
+with the other registers as an argument.
+
+Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp-init.S | 31 +++++++++++++++++++++++--------
- 1 file changed, 23 insertions(+), 8 deletions(-)
+ arch/arm/kernel/hyp-stub.S | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index b53e95efc1c5..128d6e9732b9 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -129,21 +129,36 @@ ENTRY(__kvm_handle_stub_hvc)
- 	mrs	x0, vbar_el2
- 	b	exit
+diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
+index 15d073ae5da2..f3e9ba5fb642 100644
+--- a/arch/arm/kernel/hyp-stub.S
++++ b/arch/arm/kernel/hyp-stub.S
+@@ -22,6 +22,9 @@
+ #include <asm/assembler.h>
+ #include <asm/virt.h>
  
-+1:	cmp	x0, #HVC_SOFT_RESTART
-+	b.ne	1f
++#define HVC_GET_VECTORS 0
++#define HVC_SET_VECTORS 1
 +
-+	/* This is where we're about to jump, staying at EL2 */
-+	msr	elr_el2, x1
-+	mov	x0, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT | PSR_MODE_EL2h)
-+	msr	spsr_el2, x0
-+
-+	/* Shuffle the arguments, and don't come back */
-+	mov	x0, x2
-+	mov	x1, x3
-+	mov	x2, x4
-+	b	reset
-+
- 1:	cmp	x0, #HVC_RESET_VECTORS
- 	b.ne	1f
-+reset:
- 	/*
--	 * Reset kvm back to the hyp stub.
-+	 * Reset kvm back to the hyp stub. Do not clobber x0-x4 in
-+	 * case we coming via HVC_SOFT_RESTART.
- 	 */
--	/* We're now in idmap, disable MMU */
--	mrs	x0, sctlr_el2
--	ldr	x1, =SCTLR_ELx_FLAGS
--	bic	x0, x0, x1		// Clear SCTL_M and etc
--	msr	sctlr_el2, x0
-+	mrs	x5, sctlr_el2
-+	ldr	x6, =SCTLR_ELx_FLAGS
-+	bic	x5, x5, x6		// Clear SCTL_M and etc
-+	msr	sctlr_el2, x5
- 	isb
+ #ifndef ZIMAGE
+ /*
+  * For the kernel proper, we need to find out the CPU boot mode long after
+@@ -202,9 +205,19 @@ ARM_BE8(orr	r7, r7, #(1 << 25))     @ HSCTLR.EE
+ ENDPROC(__hyp_stub_install_secondary)
  
- 	/* Install stub vectors */
--	adr_l	x0, __hyp_stub_vectors
--	msr	vbar_el2, x0
-+	adr_l	x5, __hyp_stub_vectors
-+	msr	vbar_el2, x5
- 	b	exit
+ __hyp_stub_do_trap:
+-	cmp	r0, #-1
+-	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
+-	mcrne	p15, 4, r0, c12, c0, 0	@ set HVBAR
++	teq	r0, #HVC_GET_VECTORS
++	bne	1f
++	mrc	p15, 4, r0, c12, c0, 0	@ get HVBAR
++	b	__hyp_stub_exit
++
++1:	teq	r0, #HVC_SET_VECTORS
++	bne	1f
++	mcr	p15, 4, r1, c12, c0, 0	@ set HVBAR
++	b	__hyp_stub_exit
++
++1:	mov	r0, #-1
++
++__hyp_stub_exit:
+ 	__ERET
+ ENDPROC(__hyp_stub_do_trap)
  
- 1:	mov	x0, #-1
+@@ -231,10 +244,14 @@ ENDPROC(__hyp_stub_do_trap)
+  * initialisation entry point.
+  */
+ ENTRY(__hyp_get_vectors)
+-	mov	r0, #-1
++	mov	r0, #HVC_GET_VECTORS
++	__HVC(0)
++	ret	lr
+ ENDPROC(__hyp_get_vectors)
+-	@ fall through
++
+ ENTRY(__hyp_set_vectors)
++	mov	r1, r0
++	mov	r0, #HVC_SET_VECTORS
+ 	__HVC(0)
+ 	ret	lr
+ ENDPROC(__hyp_set_vectors)
 -- 
 2.11.0
