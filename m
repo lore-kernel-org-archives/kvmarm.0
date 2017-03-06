@@ -1,27 +1,25 @@
-From: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Subject: Re: [PATCH V11 10/10] arm/arm64: KVM: add guest SEA support
-Date: Mon, 6 Mar 2017 07:00:30 -0700
-Message-ID: <4b4bea7c-7591-8051-7be0-528581f29d10@codeaurora.org>
-References: <1487712121-16688-1-git-send-email-tbaicar@codeaurora.org>
- <1487712121-16688-11-git-send-email-tbaicar@codeaurora.org>
- <58B00E12.5020602@arm.com>
- <ff3aa805-0e03-9854-e294-ff6934c57f3f@codeaurora.org>
- <58BD39B4.9050809@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [kvmtool PATCH] arm/arm64: gic: Test changing active state of
+ interrupts
+Date: Mon,  6 Mar 2017 06:06:08 -0800
+Message-ID: <1488809168-86634-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EAE840A7F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 08:59:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D2A6400E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:05:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lKYWypr8p8KV for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 08:59:22 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2CB8840A7B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 08:59:21 -0500 (EST)
-In-Reply-To: <58BD39B4.9050809@arm.com>
+ with ESMTP id PpO2P3mfusqZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 09:04:56 -0500 (EST)
+Received: from mail-wr0-f178.google.com (mail-wr0-f178.google.com
+ [209.85.128.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D4B3140A74
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:04:55 -0500 (EST)
+Received: by mail-wr0-f178.google.com with SMTP id g10so117254876wrg.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Mar 2017 06:06:15 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,53 +29,130 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+To: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hello James,
+From: Christoffer Dall <cdall@linaro.org>
 
+We found a deadlock when changing the active state of an interrupt while
+the interrupt is queued on the LR of the running VCPU.
 
-On 3/6/2017 3:28 AM, James Morse wrote:
-> On 28/02/17 19:43, Baicar, Tyler wrote:
->> On 2/24/2017 3:42 AM, James Morse wrote:
->>> On 21/02/17 21:22, Tyler Baicar wrote:
->>>> Currently external aborts are unsupported by the guest abort
->>>> handling. Add handling for SEAs so that the host kernel reports
->>>> SEAs which occur in the guest kernel.
->>>> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
->>>> index b2d57fc..403277b 100644
->>>> --- a/arch/arm64/mm/fault.c
->>>> +++ b/arch/arm64/mm/fault.c
->>>> @@ -602,6 +602,24 @@ static const char *fault_name(unsigned int esr)
->>>>    }
->>>>
->>>>    /*
->>>> + * Handle Synchronous External Aborts that occur in a guest kernel.
->>>> + */
->>>> +int handle_guest_sea(unsigned long addr, unsigned int esr)
->>>> +{
->>>> +    if(IS_ENABLED(HAVE_ACPI_APEI_SEA)) {
->>>> +        nmi_enter();
->>>> +        ghes_notify_sea();
->>>> +        nmi_exit();
->>> This nmi stuff was needed for synchronous aborts that may have interrupted
->>> APEI's interrupts-masked code. We want to avoid trying to take the same set of
->>> locks, hence taking the in_nmi() path through APEI. Here we know we interrupted
->>> a guest, so there is no risk that we have interrupted APEI on the host.
->>> ghes_notify_sea() can safely take the normal path.
->> Makes sense, I can remove the nmi_* calls here.
-> Just occurs to me: if we do this we need to add the rcu_read_lock() in
-> ghes_notify_sea() as its not protected by the rcu/nmi weirdness.
->
-True, would you suggest leaving these nmi_* calls or adding the rcu_* 
-calls? And since that's only needed for this KVM case, shouldn't the 
-rcu_* calls just replace the nmi_* calls here (outside of ghes_notify_sea)?
+Defend KVM against this bug in the future now when we've introduced a
+fix.
 
-Thanks,
-Tyler
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ arm/gic.c         | 43 +++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg | 14 +++++++++++++-
+ lib/arm/asm/gic.h |  2 ++
+ 3 files changed, 58 insertions(+), 1 deletion(-)
 
+diff --git a/arm/gic.c b/arm/gic.c
+index 3054d45..82f6632 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -254,6 +254,47 @@ static struct gic gicv3 = {
+ 	},
+ };
+ 
++static void ipi_clear_active_handler(struct pt_regs *regs __unused)
++{
++	u32 irqstat = gic_read_iar();
++	u32 irqnr = gic_iar_irqnr(irqstat);
++
++	if (irqnr != GICC_INT_SPURIOUS) {
++		void *base;
++		u32 val = 1 << IPI_IRQ;
++
++		if (gic_version() == 2)
++			base = gicv2_dist_base();
++		else
++			base = gicv3_redist_base();
++
++		writel(val, base + GICD_ICACTIVER);
++
++		smp_rmb(); /* pairs with wmb in stats_reset */
++		++acked[smp_processor_id()];
++		check_irqnr(irqnr);
++		smp_wmb(); /* pairs with rmb in check_acked */
++	} else {
++		++spurious[smp_processor_id()];
++		smp_wmb();
++	}
++}
++
++static void run_active_clear_test(void)
++{
++	report_prefix_push("active");
++	gic_enable_defaults();
++#ifdef __arm__
++	install_exception_handler(EXCPTN_IRQ, ipi_clear_active_handler);
++#else
++	install_irq_handler(EL1H_IRQ, ipi_clear_active_handler);
++#endif
++	local_irq_enable();
++
++	ipi_test_self();
++	report_prefix_pop();
++}
++
+ int main(int argc, char **argv)
+ {
+ 	char pfx[8];
+@@ -290,6 +331,8 @@ int main(int argc, char **argv)
+ 				cpu == IPI_SENDER ? ipi_send : ipi_recv);
+ 		}
+ 		ipi_recv();
++	} else if (strcmp(argv[1], "active") == 0) {
++		run_active_clear_test();
+ 	} else {
+ 		report_abort("Unknown subtest '%s'", argv[1]);
+ 	}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index c98658f..32d9858 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -26,7 +26,7 @@
+ ##############################################################################
+ 
+ #
+-# Test that the configured number of processors (smp = <num>), and
++/# Test that the configured number of processors (smp = <num>), and
+ # that the configured amount of memory (-m <MB>) are correctly setup
+ # by the framework.
+ #
+@@ -92,6 +92,18 @@ smp = $MAX_SMP
+ extra_params = -machine gic-version=3 -append 'ipi'
+ groups = gic
+ 
++[gicv2-active]
++file = gic.flat
++smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
++extra_params = -machine gic-version=2 -append 'active'
++groups = gic
++
++[gicv3-active]
++file = gic.flat
++smp = $MAX_SMP
++extra_params = -machine gic-version=3 -append 'active'
++groups = gic
++
+ # Test PSCI emulation
+ [psci]
+ file = psci.flat
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index c8186f2..c688ccc 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -12,6 +12,8 @@
+ #define GICD_TYPER			0x0004
+ #define GICD_IGROUPR			0x0080
+ #define GICD_ISENABLER			0x0100
++#define GICD_ISACTIVER			0x0300
++#define GICD_ICACTIVER			0x0380
+ #define GICD_IPRIORITYR			0x0400
+ #define GICD_SGIR			0x0f00
+ 
 -- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+2.5.0
