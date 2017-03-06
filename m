@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 09/25] ARM: KVM: Convert KVM to use HVC_GET_VECTORS
-Date: Mon,  6 Mar 2017 14:24:42 +0000
-Message-ID: <20170306142458.8875-10-marc.zyngier@arm.com>
+Subject: [PATCH v3 19/25] arm/arm64: KVM: Use __hyp_reset_vectors() directly
+Date: Mon,  6 Mar 2017 14:24:52 +0000
+Message-ID: <20170306142458.8875-20-marc.zyngier@arm.com>
 References: <20170306142458.8875-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87E6940C9D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4216D40C5D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x-iy2+iaYdVN for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 09:25:02 -0500 (EST)
+ with ESMTP id OLELBqUrYniB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 09:25:26 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73DD040C8E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 04F2540CDD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:26 -0500 (EST)
 In-Reply-To: <20170306142458.8875-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,64 +31,65 @@ To: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The conversion of the HYP stub ABI to something similar to arm64
-left the KVM code broken, as it doesn't know about the new
-stub numbering. Let's move the various #defines to virt.h, and
-let KVM use HVC_GET_VECTORS.
+__cpu_reset_hyp_mode doesn't need to be passed any argument now,
+as the hyp-stub implementations are self-contained, and is now
+reduced to just calling __hyp_reset_vectors(). Let's drop the
+wrapper and use the stub hypercall directly.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/virt.h  | 8 ++++++++
- arch/arm/kernel/hyp-stub.S   | 4 ----
- arch/arm/kvm/hyp/hyp-entry.S | 2 +-
- 3 files changed, 9 insertions(+), 5 deletions(-)
+ arch/arm/include/asm/kvm_host.h   | 6 ------
+ arch/arm/kvm/arm.c                | 3 +--
+ arch/arm64/include/asm/kvm_host.h | 6 ------
+ 3 files changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
-index 6dae1956c74d..4ea16fcaf2ed 100644
---- a/arch/arm/include/asm/virt.h
-+++ b/arch/arm/include/asm/virt.h
-@@ -94,6 +94,14 @@ extern char __hyp_text_start[];
- extern char __hyp_text_end[];
- #endif
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index d75638beca4e..1590cd6849b0 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -271,12 +271,6 @@ static inline void __cpu_init_stage2(void)
+ 	kvm_call_hyp(__init_stage2_translation);
+ }
  
-+#else
-+
-+/* Only assembly code should need those */
-+
-+#define HVC_GET_VECTORS 0
-+#define HVC_SET_VECTORS 1
-+#define HVC_SOFT_RESTART 2
-+
- #endif /* __ASSEMBLY__ */
- 
- #endif /* ! VIRT_H */
-diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
-index 82915231c6f8..8301db963d83 100644
---- a/arch/arm/kernel/hyp-stub.S
-+++ b/arch/arm/kernel/hyp-stub.S
-@@ -22,10 +22,6 @@
- #include <asm/assembler.h>
- #include <asm/virt.h>
- 
--#define HVC_GET_VECTORS 0
--#define HVC_SET_VECTORS 1
--#define HVC_SOFT_RESTART 2
+-static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+-					phys_addr_t phys_idmap_start)
+-{
+-	__hyp_reset_vectors();
+-}
 -
- #ifndef ZIMAGE
- /*
-  * For the kernel proper, we need to find out the CPU boot mode long after
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index 96beb53934c9..1f8db7d21fc5 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -127,7 +127,7 @@ hyp_hvc:
- 	pop	{r0, r1, r2}
+ static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+ 	return 0;
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index c9a2103faeb9..c07284044b1e 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1126,8 +1126,7 @@ static void cpu_hyp_reinit(void)
+ static void cpu_hyp_reset(void)
+ {
+ 	if (!is_kernel_in_hyp_mode())
+-		__cpu_reset_hyp_mode(hyp_default_vectors,
+-				     kvm_get_idmap_start());
++		__hyp_reset_vectors();
+ }
  
- 	/* Check for __hyp_get_vectors */
--	cmp	r0, #-1
-+	cmp	r0, #HVC_GET_VECTORS
- 	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
- 	beq	1f
+ static void _kvm_arch_hardware_enable(void *discard)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index b8b6665dabbd..9a3d7b93944d 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -363,12 +363,6 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+ 	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr);
+ }
  
+-static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+-					phys_addr_t phys_idmap_start)
+-{
+-	__hyp_reset_vectors();
+-}
+-
+ static inline void kvm_arch_hardware_unsetup(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
 -- 
 2.11.0
