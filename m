@@ -1,23 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 10/19] KVM: arm64: ITS: Check the device id matches TYPER
- DEVBITS range
-Date: Mon,  6 Mar 2017 12:34:25 +0100
-Message-ID: <1488800074-21991-11-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v3 11/19] KVM: arm64: ITS: KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
+ group
+Date: Mon,  6 Mar 2017 12:34:26 +0100
+Message-ID: <1488800074-21991-12-git-send-email-eric.auger@redhat.com>
 References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31A4640C44
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE0CC40A6A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DdS44+AvwLKm for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 06:34:04 -0500 (EST)
+ with ESMTP id XjJQCyA-HTKP for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 06:34:08 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63BC440A6A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CBC3940BC4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:08 -0500 (EST)
 In-Reply-To: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,54 +32,215 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On MAPD we currently check the device id can be stored in the device table.
-Let's first check it can be encoded within the range defined by TYPER
-DEVBITS.
+Introduce a new group aiming at saving/restoring the ITS
+tables to/from the guest memory.
+
+We hold the its lock during the save and restore to prevent
+any command from being executed. This also garantees the LPI
+list is not going to change and no MSI injection can happen
+during the operation.
+
+At this stage the functionality is not yet implemented. Only
+the skeleton is put in place.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- virt/kvm/arm/vgic/vgic-its.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
 
+---
+
+v1 -> v2:
+- remove useless kvm parameter
+
+At the end of the restore I trigger a map_resources. This aims
+at accomodating the virtio-net-pci guest use case. On restore I
+can see the virtio-net-pci device sends MSI before the first
+VCPU run. The fact we are not able to handle MSIs at that stage
+stalls the virtio-net-pci device. We may fix this issue at QEMU
+level instead.
+---
+ arch/arm/include/uapi/asm/kvm.h   |   1 +
+ arch/arm64/include/uapi/asm/kvm.h |   1 +
+ virt/kvm/arm/vgic/vgic-its.c      | 115 +++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 116 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 4beb83b..7b165e9 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -193,6 +193,7 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+ #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
++#define KVM_DEV_ARM_VGIC_GRP_ITS_TABLES	9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 7e8dd69..166df68 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -213,6 +213,7 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+ #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
++#define KVM_DEV_ARM_VGIC_GRP_ITS_TABLES 9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 694023f..322e370 100644
+index 322e370..dd7545a 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -180,6 +180,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+@@ -1551,6 +1551,112 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+ 	return 0;
+ }
  
- #define VITS_ESZ 8
- #define VITS_TYPER_IDBITS 0xF
-+#define VITS_TYPER_DEVBITS 0xF
- 
- /*
-  * Finds and returns a collection in the ITS collection table.
-@@ -402,7 +403,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
- 	 * To avoid memory waste in the guest, we keep the number of IDBits and
- 	 * DevBits low - as least for the time being.
- 	 */
--	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
-+	reg |= VITS_TYPER_DEVBITS << GITS_TYPER_DEVBITS_SHIFT;
- 	reg |= VITS_TYPER_IDBITS << GITS_TYPER_IDBITS_SHIFT;
- 	reg |= (VITS_ESZ - 1) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
- 
-@@ -631,7 +632,7 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
-  * Check whether an ID can be stored into the corresponding guest table.
-  * For a direct table this is pretty easy, but gets a bit nasty for
-  * indirect tables. We check whether the resulting guest physical address
-- * is actually valid (covered by a memslot and guest accessbible).
-+ * is actually valid (covered by a memslot and guest accessible).
-  * For this we have to read the respective first level entry.
-  */
- static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
-@@ -642,6 +643,9 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
- 	gfn_t gfn;
- 	int esz = GITS_BASER_ENTRY_SIZE(baser);
- 
-+	if (id >= (2 << (VITS_TYPER_DEVBITS + 1)))
-+		return false;
++/**
++ * vgic_its_flush_pending_tables - Flush the pending tables into guest RAM
++ */
++static int vgic_its_flush_pending_tables(struct vgic_its *its)
++{
++	return -ENXIO;
++}
 +
- 	if (!(baser & GITS_BASER_INDIRECT)) {
- 		phys_addr_t addr;
++/**
++ * vgic_its_restore_pending_tables - Restore the pending tables from guest
++ * RAM to internal data structs
++ */
++static int vgic_its_restore_pending_tables(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_flush_device_tables - flush the device table and all ITT
++ * into guest RAM
++ */
++static int vgic_its_flush_device_tables(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_restore_device_tables - restore the device table and all ITT
++ * from guest RAM to internal data structs
++ */
++static int vgic_its_restore_device_tables(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_flush_collection_table - flush the collection table into
++ * guest RAM
++ */
++static int vgic_its_flush_collection_table(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_restore_collection_table - reads the collection table
++ * in guest memory and restores the ITS internal state. Requires the
++ * BASER registers to be restored before.
++ */
++static int vgic_its_restore_collection_table(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_table_flush - Flush all the tables into guest RAM
++ */
++static int vgic_its_table_flush(struct vgic_its *its)
++{
++	int ret;
++
++	mutex_lock(&its->its_lock);
++
++	ret = vgic_its_flush_pending_tables(its);
++	if (ret)
++		goto out;
++	ret = vgic_its_flush_device_tables(its);
++	if (ret)
++		goto out;
++
++	ret = vgic_its_flush_collection_table(its);
++out:
++	mutex_unlock(&its->its_lock);
++	return ret;
++}
++
++/**
++ * vgic_its_table_restore - Restore all tables from guest RAM to internal
++ * data structs
++ */
++static int vgic_its_table_restore(struct vgic_its *its)
++{
++	int ret;
++
++	mutex_lock(&its->its_lock);
++	ret = vgic_its_restore_collection_table(its);
++	if (ret)
++		goto out;
++
++	ret = vgic_its_restore_device_tables(its);
++	if (ret)
++		goto out;
++
++	ret = vgic_its_restore_pending_tables(its);
++out:
++	mutex_unlock(&its->its_lock);
++
++	/**
++	 *  In real use case we observe MSI injection before
++	 *  the first CPU run. This is likely to stall virtio-net-pci
++	 *  for instance
++	 */
++	ret = kvm_vgic_map_resources(its->dev->kvm);
++	return ret;
++}
++
+ static int vgic_its_has_attr(struct kvm_device *dev,
+ 			     struct kvm_device_attr *attr)
+ {
+@@ -1569,6 +1675,8 @@ static int vgic_its_has_attr(struct kvm_device *dev,
+ 		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS:
+ 		return vgic_its_has_attr_regs(dev, attr);
++	case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
++		return 0;
+ 	}
+ 	return -ENXIO;
+ }
+@@ -1617,6 +1725,8 @@ static int vgic_its_set_attr(struct kvm_device *dev,
  
+ 		return vgic_its_attr_regs_access(dev, attr, &reg, true);
+ 	}
++	case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
++		return vgic_its_table_restore(its);
+ 	}
+ 	return -ENXIO;
+ }
+@@ -1624,9 +1734,10 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+ static int vgic_its_get_attr(struct kvm_device *dev,
+ 			     struct kvm_device_attr *attr)
+ {
++	struct vgic_its *its = dev->private;
++
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_ADDR: {
+-		struct vgic_its *its = dev->private;
+ 		u64 addr = its->vgic_its_base;
+ 		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+ 		unsigned long type = (unsigned long)attr->attr;
+@@ -1647,6 +1758,8 @@ static int vgic_its_get_attr(struct kvm_device *dev,
+ 		if (ret)
+ 			return ret;
+ 		return put_user(reg, uaddr);
++	case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
++		return vgic_its_table_flush(its);
+ 	}
+ 	default:
+ 		return -ENXIO;
 -- 
 2.5.5
