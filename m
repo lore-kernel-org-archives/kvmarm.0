@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 14/19] KVM: arm64: ITS: Add infrastructure for table lookup
-Date: Mon,  6 Mar 2017 12:34:29 +0100
-Message-ID: <1488800074-21991-15-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v3 15/19] KVM: arm64: ITS: Collection table save/restore
+Date: Mon,  6 Mar 2017 12:34:30 +0100
+Message-ID: <1488800074-21991-16-git-send-email-eric.auger@redhat.com>
 References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B1AE40BE9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F076840C46
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M6x80qj9V1NR for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 06:34:19 -0500 (EST)
+ with ESMTP id sbjpYB+cs8i2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 06:34:23 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5B0E140C8E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1500540BE9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 06:34:23 -0500 (EST)
 In-Reply-To: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,156 +31,147 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: andre.przywara@arm.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Prasun.Kapoor@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a generic lookup_table() helper whose role consists in
-scanning a contiguous table located in guest RAM and applying
-a callback on each entry. Entries can be handled as linked lists
-since the callback may return an offset to the next entry and
-also tell that an entry is the last one.
+The flush path copies the collection entries into guest RAM
+at the GPA specified in the BASER register. This obviously
+requires the BASER to be set. The last written element
+is a dummy collection table entry.
 
-Helper functions also are added to compute the device/event ID
-offset to the next DTE/ITE.
+We do not index by collection ID as the collection entry
+can fit into 8 bytes while containing the collection ID.
+
+On restore path we re-allocate the collection objects.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
 ---
- virt/kvm/arm/vgic/vgic-its.c | 119 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
+
+v1 -> v2:
+- reword commit message and directly use 8 as entry size
+- no kvm parameter anymore
+- add helper for flush/restore cte
+- table size computed here
+- add le64/cpu conversions
+---
+ virt/kvm/arm/vgic/vgic-its.c | 94 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 92 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 1cd6ae6..cf04776 100644
+index cf04776..ad67759 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -181,6 +181,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
- #define VITS_ESZ 8
- #define VITS_TYPER_IDBITS 0xF
- #define VITS_TYPER_DEVBITS 0xF
-+#define VITS_DTE_MAX_DEVID_OFFSET GENMASK(19, 0)
-+#define VITS_ITE_MAX_EVENTID_OFFSET GENMASK(16, 0)
- 
- /*
-  * Finds and returns a collection in the ITS collection table.
-@@ -1607,6 +1609,123 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
- 	return 0;
+@@ -1761,13 +1761,84 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+ 	return -ENXIO;
  }
  
-+static u32 compute_next_devid_offset(struct list_head *h,
-+				     struct its_device *dev)
++static int vgic_its_flush_cte(struct vgic_its *its,
++			      struct its_collection *collection, u64 *ptr)
 +{
-+	struct list_head *e = &dev->dev_list;
-+	struct its_device *next;
-+	u32 next_offset;
++	u64 val;
++	int ret;
 +
-+	if (e->next == h)
++	val = ((u64)1 << 63 | ((u64)collection->target_addr << 16) |
++	       collection->collection_id);
++	val = cpu_to_le64(val);
++	ret = kvm_write_guest(its->dev->kvm, (gpa_t)ptr, &val, 8);
++	return ret;
++}
++
++static int vgic_its_restore_cte(struct vgic_its *its, u64 *ptr, bool *valid)
++{
++	struct its_collection *collection;
++	u32 target_addr;
++	u32 coll_id;
++	u64 val;
++	int ret;
++
++	*valid = false;
++
++	ret = kvm_read_guest(its->dev->kvm, (gpa_t)ptr, &val, 8);
++	if (ret)
++		return ret;
++	val = le64_to_cpu(val);
++	*valid = val & BIT_ULL(63);
++
++	if (!*valid)
 +		return 0;
-+	next = list_entry(e->next, struct its_device, dev_list);
-+	next_offset = next->device_id - dev->device_id;
 +
-+	return next_offset < VITS_DTE_MAX_DEVID_OFFSET ?
-+			next_offset : VITS_DTE_MAX_DEVID_OFFSET;
-+}
-+
-+static u32 compute_next_eventid_offset(struct list_head *h,
-+				       struct its_ite *ite)
-+{
-+	struct list_head *e = &ite->ite_list;
-+	struct its_ite *next;
-+	u32 next_offset;
-+
-+	if (e->next == h)
-+		return 0;
-+	next = list_entry(e->next, struct its_ite, ite_list);
-+	next_offset = next->event_id - ite->event_id;
-+
-+	return next_offset < VITS_ITE_MAX_EVENTID_OFFSET ?
-+			next_offset : VITS_ITE_MAX_EVENTID_OFFSET;
-+}
-+
-+static int next_segment(unsigned long len, int offset)
-+{
-+	if (len > PAGE_SIZE - offset)
-+		return PAGE_SIZE - offset;
-+	else
-+		return len;
-+}
-+
-+/**
-+ * entry_fn_t - Callback called on a table entry restore path
-+ * @its: its handle
-+ * @id: id of the entry
-+ * @addr: kernel VA of the entry
-+ * @opaque: pointer to an opaque data
-+ * @next_offset: minimal ID offset to the next entry. 0 if this
-+ * entry is the last one, 1 if the entry is invalid, >= 1 if an
-+ * entry's next_offset field was truly decoded
-+ *
-+ * Return: < 0 on error, 0 otherwise
-+ */
-+typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *addr,
-+			  void *opaque, u32 *next_offset);
-+
-+/**
-+ * lookup_table - scans a contiguous table in guest RAM and applies a function
-+ * to each entry
-+ *
-+ * @its: its handle
-+ * @base: base gpa of the table
-+ * @size: size of the table in bytes
-+ * @esz: entry size in bytes
-+ * @start_id: first entry's ID
-+ * @fn: function to apply on each entry
-+ *
-+ * Return: < 0 on error, 1 if last element identified, 0 otherwise
-+ */
-+static int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
-+			int start_id, entry_fn_t fn, void *opaque)
-+{
-+	gpa_t gpa = base, top = base + size - 1;
-+	unsigned long len = top - gpa;
-+	int ret, seg, offset = offset_in_page(gpa);
-+	gfn_t gfn = gpa >> PAGE_SHIFT;
-+	u32 id = start_id + (gpa - base)/esz;
-+	struct kvm *kvm = its->dev->kvm;
-+	kvm_pfn_t pfn;
-+
-+	while ((seg = next_segment(len, offset)) != 0) {
-+		u32 next_offset;
-+		bool writeable;
-+		void *addr;
-+
-+		pfn = gfn_to_pfn_prot(kvm, gfn, true, &writeable);
-+		if (is_error_noslot_pfn(pfn))
-+			return -EINVAL;
-+		addr = phys_to_virt((u64)pfn << PAGE_SHIFT);
-+		addr += offset;
-+
-+		while (seg > 0) {
-+			size_t byte_offset;
-+
-+			ret = fn(its, id, addr, opaque, &next_offset);
-+			if (ret < 0 || (!ret && !next_offset))
-+				goto out;
-+
-+			byte_offset = next_offset * esz;
-+
-+			id += next_offset;
-+			gpa += byte_offset;
-+			addr += byte_offset;
-+			seg -= byte_offset;
-+		}
-+		kvm_release_pfn_clean(pfn);
-+
-+		len = top - gpa;
-+		offset = offset_in_page(gpa);
-+		gfn = gpa >> PAGE_SHIFT;
-+		id = start_id + (gpa - base)/esz;
-+	}
++	target_addr = (u32)(val >> 16);
++	coll_id = val & 0xFFFF;
++	ret = vgic_its_alloc_collection(its, &collection, coll_id);
++	if (ret)
++		return ret;
++	collection->target_addr = target_addr;
 +	return 0;
-+out:
-+	kvm_release_pfn_clean(pfn);
-+	return (ret < 0 ? ret : 1);
 +}
 +
  /**
-  * vgic_its_flush_pending_tables - Flush the pending tables into guest RAM
+  * vgic_its_flush_collection_table - flush the collection table into
+  * guest RAM
   */
+ static int vgic_its_flush_collection_table(struct vgic_its *its)
+ {
+-	return -ENXIO;
++	struct its_collection *collection;
++	u64 val, *ptr;
++	size_t max_size, filled = 0;
++	int ret;
++
++	ptr = (u64 *)(BASER_ADDRESS(its->baser_coll_table));
++	if (!ptr)
++		return 0;
++
++	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
++
++	list_for_each_entry(collection, &its->collection_list, coll_list) {
++		if (filled == max_size)
++			return -ENOSPC;
++		ret = vgic_its_flush_cte(its, collection, ptr);
++		if (ret)
++			return ret;
++		ptr++;
++		filled += 8;
++	}
++
++	if (filled == max_size)
++		return 0;
++
++	/*
++	 * table is not fully filled, add a last dummy element
++	 * with valid bit unset
++	 */
++	val = 0;
++	ret = kvm_write_guest(its->dev->kvm, (gpa_t)ptr, &val, 8);
++	return ret;
+ }
+ 
+ /**
+@@ -1777,7 +1848,26 @@ static int vgic_its_flush_collection_table(struct vgic_its *its)
+  */
+ static int vgic_its_restore_collection_table(struct vgic_its *its)
+ {
+-	return -ENXIO;
++	size_t max_size, read = 0;
++	u64 *ptr;
++	int ret;
++
++	ptr = (u64 *)(BASER_ADDRESS(its->baser_coll_table));
++	if (!ptr)
++		return 0;
++
++	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
++
++	while (read < max_size) {
++		bool valid;
++
++		ret = vgic_its_restore_cte(its, ptr, &valid);
++		if (!valid || ret)
++			break;
++		ptr++;
++		read += 8;
++	}
++	return ret;
+ }
+ 
+ /**
 -- 
 2.5.5
