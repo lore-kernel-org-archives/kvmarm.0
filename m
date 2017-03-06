@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 16/25] ARM: KVM: Allow the main HYP code to use the init
- hyp stub implementation
-Date: Mon,  6 Mar 2017 14:24:49 +0000
-Message-ID: <20170306142458.8875-17-marc.zyngier@arm.com>
+Subject: [PATCH v3 21/25] arm/arm64: KVM: Use HVC_RESET_VECTORS to reinit HYP
+ mode
+Date: Mon,  6 Mar 2017 14:24:54 +0000
+Message-ID: <20170306142458.8875-22-marc.zyngier@arm.com>
 References: <20170306142458.8875-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 127D340C9F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 584C940C4E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0CgTUIxxHVUE for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 09:25:19 -0500 (EST)
+ with ESMTP id 6HxDjF23UsL3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 09:25:30 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E871840AE8
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B49C640C4B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:30 -0500 (EST)
 In-Reply-To: <20170306142458.8875-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,65 +32,76 @@ To: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We now have a full hyp-stub implementation in the KVM init code,
-but the main KVM code only supports HVC_GET_VECTORS, which is not
-enough.
-
-Instead of reinventing the wheel, let's reuse the init implementation
-by branching to the idmap page when called with a hyp-stub hypercall.
+Instead of trying to compare the value given by __hyp_get_vectors(),
+which doesn't offer any real guarantee to be the stub's address, use
+HVC_RESET_VECTORS to make sure we're in a sane state to reinstall
+KVM across PM events.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/hyp/hyp-entry.S | 29 ++++++++++++++++++++++++-----
- 1 file changed, 24 insertions(+), 5 deletions(-)
+ arch/arm/kvm/arm.c | 24 +++++++++---------------
+ 1 file changed, 9 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index 1f8db7d21fc5..a35baa81fd23 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -126,11 +126,30 @@ hyp_hvc:
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index c07284044b1e..2c192634a27d 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -53,7 +53,6 @@ __asm__(".arch_extension	virt");
+ 
+ static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+ static kvm_cpu_context_t __percpu *kvm_host_cpu_state;
+-static unsigned long hyp_default_vectors;
+ 
+ /* Per-CPU variable containing the currently running vcpu. */
+ static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_arm_running_vcpu);
+@@ -1109,8 +1108,16 @@ static void cpu_init_hyp_mode(void *dummy)
+ 	kvm_arm_init_debug();
+ }
+ 
++static void cpu_hyp_reset(void)
++{
++	if (!is_kernel_in_hyp_mode())
++		__hyp_reset_vectors();
++}
++
+ static void cpu_hyp_reinit(void)
+ {
++	cpu_hyp_reset();
++
+ 	if (is_kernel_in_hyp_mode()) {
+ 		/*
+ 		 * __cpu_init_stage2() is safe to call even if the PM
+@@ -1118,17 +1125,10 @@ static void cpu_hyp_reinit(void)
+ 		 */
+ 		__cpu_init_stage2();
+ 	} else {
+-		if (__hyp_get_vectors() == hyp_default_vectors)
+-			cpu_init_hyp_mode(NULL);
++		cpu_init_hyp_mode(NULL);
+ 	}
+ }
+ 
+-static void cpu_hyp_reset(void)
+-{
+-	if (!is_kernel_in_hyp_mode())
+-		__hyp_reset_vectors();
+-}
+-
+ static void _kvm_arch_hardware_enable(void *discard)
+ {
+ 	if (!__this_cpu_read(kvm_arm_hardware_enabled)) {
+@@ -1312,12 +1312,6 @@ static int init_hyp_mode(void)
+ 		goto out_err;
+ 
+ 	/*
+-	 * It is probably enough to obtain the default on one
+-	 * CPU. It's unlikely to be different on the others.
+-	 */
+-	hyp_default_vectors = __hyp_get_vectors();
+-
+-	/*
+ 	 * Allocate stack pages for Hypervisor-mode
  	 */
- 	pop	{r0, r1, r2}
- 
--	/* Check for __hyp_get_vectors */
--	cmp	r0, #HVC_GET_VECTORS
--	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
--	beq	1f
-+	/*
-+	 * Check if we have a kernel function, which is guaranteed to be
-+	 * bigger than the maximum hyp stub hypercall
-+	 */
-+	cmp	r0, #HVC_STUB_HCALL_NR
-+	bhs	1f
- 
-+	/*
-+	 * Not a kernel function, treat it as a stub hypercall.
-+	 * Compute the physical address for __kvm_handle_stub_hvc
-+	 * (as the code lives in the idmaped page) and branch there.
-+	 * We hijack ip (r12) as a tmp register.
-+	 */
-+	push	{r1}
-+	ldr	r1, =kimage_voffset
-+	ldr	r1, [r1]
-+	ldr	ip, =__kvm_handle_stub_hvc
-+	sub	ip, ip, r1
-+THUMB(	add	ip, ip, #1)
-+	pop	{r1}
-+
-+	bx	ip
-+
-+1:
- 	push	{lr}
- 
- 	mov	lr, r0
-@@ -142,7 +161,7 @@ THUMB(	orr	lr, #1)
- 	blx	lr			@ Call the HYP function
- 
- 	pop	{lr}
--1:	eret
-+	eret
- 
- guest_trap:
- 	load_vcpu r0			@ Load VCPU pointer to r0
+ 	for_each_possible_cpu(cpu) {
 -- 
 2.11.0
