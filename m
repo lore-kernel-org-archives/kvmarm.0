@@ -1,27 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 1/2] arm/kvm: survive unknown traps from guests
-Date: Mon, 6 Mar 2017 07:08:03 -0800
-Message-ID: <20170306150803.GB1502@lvm>
+Subject: Re: [PATCH 2/2] arm64/kvm: survive unknown traps from guests
+Date: Mon, 6 Mar 2017 07:08:08 -0800
+Message-ID: <20170306150808.GC1502@lvm>
 References: <1487593812-9174-1-git-send-email-mark.rutland@arm.com>
- <1487593812-9174-2-git-send-email-mark.rutland@arm.com>
+ <1487593812-9174-3-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87A0640AF5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 10:06:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DA1440AF5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 10:06:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ErgReV6f0nN7 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 10:06:46 -0500 (EST)
-Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDBA540AE8
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 10:06:45 -0500 (EST)
-Received: by mail-wm0-f48.google.com with SMTP id n11so67028827wma.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Mar 2017 07:08:05 -0800 (PST)
+ with ESMTP id Pn6ncj+RkmJq for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 10:06:51 -0500 (EST)
+Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1780740B58
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 10:06:50 -0500 (EST)
+Received: by mail-wm0-f46.google.com with SMTP id n11so67031228wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Mar 2017 07:08:10 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1487593812-9174-2-git-send-email-mark.rutland@arm.com>
+In-Reply-To: <1487593812-9174-3-git-send-email-mark.rutland@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,20 +35,18 @@ To: Mark Rutland <mark.rutland@arm.com>
 Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, dave.martin@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Feb 20, 2017 at 12:30:11PM +0000, Mark Rutland wrote:
-> Currently we BUG() if we see a HSR.EC value we don't recognise. As
+On Mon, Feb 20, 2017 at 12:30:12PM +0000, Mark Rutland wrote:
+> Currently we BUG() if we see an ESR_EL2.EC value we don't recognise. As
 > configurable disables/enables are added to the architecture (controlled
 > by RES1/RES0 bits respectively), with associated synchronous exceptions,
 > it may be possible for a guest to trigger exceptions with classes that
 > we don't recognise.
 > 
 > While we can't service these exceptions in a manner useful to the guest,
-> we can avoid bringing down the host. Per ARM DDI 0406C.c, all currently
-> unallocated HSR EC encodings are reserved, and per ARM DDI
-> 0487A.k_iss10775, page G6-4395, EC values within the range 0x00 - 0x2c
-> are reserved for future use with synchronous exceptions, and EC values
-> within the range 0x2d - 0x3f may be used for either synchronous or
-> asynchronous exceptions.
+> we can avoid bringing down the host. Per ARM DDI 0487A.k_iss10775, page
+> D7-1937, EC values within the range 0x00 - 0x2c are reserved for future
+> use with synchronous exceptions, and EC values within the range 0x2d -
+> 0x3f may be used for either synchronous or asynchronous exceptions.
 > 
 > The patch makes KVM handle any unknown EC by injecting an UNDEFINED
 > exception into the guest, with a corresponding (ratelimited) warning in
@@ -61,57 +59,41 @@ On Mon, Feb 20, 2017 at 12:30:11PM +0000, Mark Rutland wrote:
 > Cc: Marc Zyngier <marc.zyngier@arm.com>
 > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
->  arch/arm/include/asm/kvm_arm.h |  1 +
->  arch/arm/kvm/handle_exit.c     | 19 ++++++++++++-------
->  2 files changed, 13 insertions(+), 7 deletions(-)
+>  arch/arm64/kvm/handle_exit.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-> index e22089f..a3f0b3d 100644
-> --- a/arch/arm/include/asm/kvm_arm.h
-> +++ b/arch/arm/include/asm/kvm_arm.h
-> @@ -209,6 +209,7 @@
->  #define HSR_EC_IABT_HYP	(0x21)
->  #define HSR_EC_DABT	(0x24)
->  #define HSR_EC_DABT_HYP	(0x25)
-> +#define HSR_EC_MAX	(0x3f)
->  
->  #define HSR_WFI_IS_WFE		(_AC(1, UL) << 0)
->  
-> diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
-> index 4e40d19..96af65a 100644
-> --- a/arch/arm/kvm/handle_exit.c
-> +++ b/arch/arm/kvm/handle_exit.c
-> @@ -79,7 +79,19 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	return 1;
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 1bfe30d..fa1b18e 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -135,7 +135,19 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	return ret;
 >  }
 >  
 > +static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
 > +{
 > +	u32 hsr = kvm_vcpu_get_hsr(vcpu);
 > +
-> +	kvm_pr_unimpl("Unknown exception class: hsr: %#08x\n",
-> +		      hsr);
+> +	kvm_pr_unimpl("Unknown exception class: hsr: %#08x -- %s\n",
+> +		      hsr, esr_get_class_string(hsr));
 > +
 > +	kvm_inject_undefined(vcpu);
 > +	return 1;
 > +}
 > +
 >  static exit_handle_fn arm_exit_handlers[] = {
-> +	[0 ... HSR_EC_MAX]	= kvm_handle_unknown_ec,
-
-Cool stuff, didn't know you could do this in C.
-
->  	[HSR_EC_WFI]		= kvm_handle_wfx,
->  	[HSR_EC_CP15_32]	= kvm_handle_cp15_32,
->  	[HSR_EC_CP15_64]	= kvm_handle_cp15_64,
-> @@ -98,13 +110,6 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
->  {
->  	u8 hsr_ec = kvm_vcpu_trap_get_class(vcpu);
+> +	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+>  	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+>  	[ESR_ELx_EC_CP15_32]	= kvm_handle_cp15_32,
+>  	[ESR_ELx_EC_CP15_64]	= kvm_handle_cp15_64,
+> @@ -162,13 +174,6 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+>  	u32 hsr = kvm_vcpu_get_hsr(vcpu);
+>  	u8 hsr_ec = ESR_ELx_EC(hsr);
 >  
 > -	if (hsr_ec >= ARRAY_SIZE(arm_exit_handlers) ||
 > -	    !arm_exit_handlers[hsr_ec]) {
-> -		kvm_err("Unknown exception class: hsr: %#08x\n",
-> -			(unsigned int)kvm_vcpu_get_hsr(vcpu));
+> -		kvm_err("Unknown exception class: hsr: %#08x -- %s\n",
+> -			hsr, esr_get_class_string(hsr));
 > -		BUG();
 > -	}
 > -
@@ -119,7 +101,5 @@ Cool stuff, didn't know you could do this in C.
 >  }
 >  
 > -- 
-> 1.9.1
-> 
 
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
