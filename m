@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 12/25] ARM: Expose the VA/IDMAP offset
-Date: Mon,  6 Mar 2017 14:24:45 +0000
-Message-ID: <20170306142458.8875-13-marc.zyngier@arm.com>
+Subject: [PATCH v3 13/25] ARM: hyp-stub: Implement HVC_RESET_VECTORS stub
+ hypercall
+Date: Mon,  6 Mar 2017 14:24:46 +0000
+Message-ID: <20170306142458.8875-14-marc.zyngier@arm.com>
 References: <20170306142458.8875-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7800740CA1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D807440C90
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JZotSqjBfPLo for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 09:25:09 -0500 (EST)
+ with ESMTP id a0WYxADNWnYE for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Mar 2017 09:25:11 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8115840C8A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8C4240C8E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 09:25:11 -0500 (EST)
 In-Reply-To: <20170306142458.8875-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,42 +32,60 @@ To: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The KVM code needs to be able to compute the address of
-symbols in its idmap page (the equivalent of a virt_to_idmap()
-call). Unfortunately, virt_to_idmap is slightly complicated,
-depending on the use of arch_phys_to_idmap_offset or not, and
-none of that is readily available at HYP.
+Let's define a new stub hypercall that resets the HYP configuration
+to its default: hyp-stub vectors, and MMU disabled.
 
-Instead, expose a single kimage_voffset variable which contains the
-offset between a kernel VA and its idmap address, enabling the
-VA->IDMAP conversion. This allows the KVM code to behave similarily
-to its arm64 counterpart.
+Of course, for the hyp-stub itself, this is a trivial no-op.
+Hypervisors will have a bit more work to do.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/mm/mmu.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm/include/asm/virt.h |  3 +++
+ arch/arm/kernel/hyp-stub.S  | 11 ++++++++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/mm/mmu.c b/arch/arm/mm/mmu.c
-index 4e016d7f37b3..e98a2b5c4e85 100644
---- a/arch/arm/mm/mmu.c
-+++ b/arch/arm/mm/mmu.c
-@@ -87,6 +87,8 @@ struct cachepolicy {
- #define s2_policy(policy)	0
- #endif
- 
-+unsigned long kimage_voffset __ro_after_init;
+diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
+index 4ea16fcaf2ed..5186718aab68 100644
+--- a/arch/arm/include/asm/virt.h
++++ b/arch/arm/include/asm/virt.h
+@@ -101,6 +101,9 @@ extern char __hyp_text_end[];
+ #define HVC_GET_VECTORS 0
+ #define HVC_SET_VECTORS 1
+ #define HVC_SOFT_RESTART 2
++#define HVC_RESET_VECTORS 3
 +
- static struct cachepolicy cache_policies[] __initdata = {
- 	{
- 		.policy		= "uncached",
-@@ -1635,4 +1637,7 @@ void __init paging_init(const struct machine_desc *mdesc)
++#define HVC_STUB_HCALL_NR 4
  
- 	empty_zero_page = virt_to_page(zero_page);
- 	__flush_dcache_page(NULL, empty_zero_page);
+ #endif /* __ASSEMBLY__ */
+ 
+diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
+index 15eaa14322a7..21794d4a8f36 100644
+--- a/arch/arm/kernel/hyp-stub.S
++++ b/arch/arm/kernel/hyp-stub.S
+@@ -216,7 +216,10 @@ __hyp_stub_do_trap:
+ 	bne	1f
+ 	bx	r1
+ 
+-1:	mov	r0, #-1
++1:	teq	r0, #HVC_RESET_VECTORS
++	beq	__hyp_stub_exit
 +
-+	/* Compute the virt/idmap offset, mostly for the sake of KVM */
-+	kimage_voffset = (unsigned long)&kimage_voffset - virt_to_idmap(&kimage_voffset);
- }
++	mov	r0, #-1
+ 
+ __hyp_stub_exit:
+ 	__ERET
+@@ -264,6 +267,12 @@ ENTRY(__hyp_soft_restart)
+ 	ret	lr
+ ENDPROC(__hyp_soft_restart)
+ 
++ENTRY(__hyp_reset_vectors)
++	mov	r0, #HVC_RESET_VECTORS
++	__HVC(0)
++	ret	lr
++ENDPROC(__hyp_reset_vectors)
++
+ #ifndef ZIMAGE
+ .align 2
+ .L__boot_cpu_mode_offset:
 -- 
 2.11.0
