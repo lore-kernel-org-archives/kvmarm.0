@@ -1,26 +1,28 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v4 5/6] arm64: mmu: apply strict permissions to
- .init.text and .init.data
-Date: Tue, 7 Mar 2017 14:21:40 +0000
-Message-ID: <20170307142140.GB3514@leverpostej>
-References: <1488637848-13588-1-git-send-email-ard.biesheuvel@linaro.org>
- <1488637848-13588-6-git-send-email-ard.biesheuvel@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] KVM: arm64: VGIC: fix command handling while ITS being
+ disabled
+Date: Tue, 7 Mar 2017 06:49:01 -0800
+Message-ID: <20170307144901.GD101711@lvm>
+References: <20170216104120.31952-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A792A40A63
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 09:20:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DF0240A74
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 09:47:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gi9Wsl7Gb7Y5 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Mar 2017 09:20:31 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D38C40A54
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 09:20:31 -0500 (EST)
+ with ESMTP id dtY3CrQ+YhrW for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Mar 2017 09:47:43 -0500 (EST)
+Received: from mail-wr0-f179.google.com (mail-wr0-f179.google.com
+ [209.85.128.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B671F40905
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 09:47:43 -0500 (EST)
+Received: by mail-wr0-f179.google.com with SMTP id u48so3034274wrc.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Mar 2017 06:49:05 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1488637848-13588-6-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <20170216104120.31952-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,100 +32,175 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: keescook@chromium.org, kernel-hardening@lists.openwall.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, labbott@fedoraproject.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Mar 04, 2017 at 02:30:47PM +0000, Ard Biesheuvel wrote:
-> diff --git a/arch/arm64/include/asm/sections.h b/arch/arm64/include/asm/sections.h
-> index 4e7e7067afdb..22582819b2e5 100644
-> --- a/arch/arm64/include/asm/sections.h
-> +++ b/arch/arm64/include/asm/sections.h
-> @@ -24,7 +24,8 @@ extern char __hibernate_exit_text_start[], __hibernate_exit_text_end[];
->  extern char __hyp_idmap_text_start[], __hyp_idmap_text_end[];
->  extern char __hyp_text_start[], __hyp_text_end[];
->  extern char __idmap_text_start[], __idmap_text_end[];
-> +extern char __initdata_begin[], __initdata_end[];
-> +extern char __inittext_begin[], __inittext_end[];
->  extern char __irqentry_text_start[], __irqentry_text_end[];
->  extern char __mmuoff_data_start[], __mmuoff_data_end[];
+On Thu, Feb 16, 2017 at 10:41:20AM +0000, Andre Przywara wrote:
+> The ITS spec says that ITS commands are only processed when the ITS
+> is enabled (section 8.19.4, Enabled, bit[0]). Our emulation was not taking
+> this into account.
+> Fix this by checking the enabled state before handling CWRITER writes.
+> 
+> On the other hand that means that CWRITER could advance while the ITS
+> is disabled, and enabling it would need those commands to be processed.
+> Fix this case as well by refactoring actual command processing and
+> calling this from both the GITS_CWRITER and GITS_CTLR handlers.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 109 ++++++++++++++++++++++++++-----------------
+>  1 file changed, 65 insertions(+), 44 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 8c2b3cd..ff86106 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -360,29 +360,6 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+>  	return ret;
+>  }
+>  
+> -static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
+> -					     struct vgic_its *its,
+> -					     gpa_t addr, unsigned int len)
+> -{
+> -	u32 reg = 0;
 > -
->  #endif /* __ASM_SECTIONS_H */
-
-Unintended whitespace change?
-
-Please restore the line above the endif. 
-
-> diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-> index b8deffa9e1bf..2c93d259046c 100644
-> --- a/arch/arm64/kernel/vmlinux.lds.S
-> +++ b/arch/arm64/kernel/vmlinux.lds.S
-> @@ -143,12 +143,27 @@ SECTIONS
+> -	mutex_lock(&its->cmd_lock);
+> -	if (its->creadr == its->cwriter)
+> -		reg |= GITS_CTLR_QUIESCENT;
+> -	if (its->enabled)
+> -		reg |= GITS_CTLR_ENABLE;
+> -	mutex_unlock(&its->cmd_lock);
+> -
+> -	return reg;
+> -}
+> -
+> -static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+> -				     gpa_t addr, unsigned int len,
+> -				     unsigned long val)
+> -{
+> -	its->enabled = !!(val & GITS_CTLR_ENABLE);
+> -}
+> -
+>  static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+>  					      struct vgic_its *its,
+>  					      gpa_t addr, unsigned int len)
+> @@ -1161,33 +1138,16 @@ static void vgic_mmio_write_its_cbaser(struct kvm *kvm, struct vgic_its *its,
+>  #define ITS_CMD_SIZE			32
+>  #define ITS_CMD_OFFSET(reg)		((reg) & GENMASK(19, 5))
 >  
->  	. = ALIGN(SEGMENT_ALIGN);
->  	__init_begin = .;
-> +	__inittext_begin = .;
->  
->  	INIT_TEXT_SECTION(8)
->  	.exit.text : {
->  		ARM_EXIT_KEEP(EXIT_TEXT)
->  	}
->  
-> +	. = ALIGN(4);
-> +	.altinstructions : {
-> +		__alt_instructions = .;
-> +		*(.altinstructions)
-> +		__alt_instructions_end = .;
-> +	}
-> +	.altinstr_replacement : {
-> +		*(.altinstr_replacement)
-> +	}
-> +
-> +	. = ALIGN(PAGE_SIZE);
-
-Arguably this should be SEGMENT_ALIGN for consitency, but given this is
-just .init* this should be fine.
-
-> +	__inittext_end = .;
-> +	__initdata_begin = .;
-> +
->  	.init.data : {
->  		INIT_DATA
->  		INIT_SETUP(16)
-
-[...]
-
-> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-> index edd982f88714..0612573ef869 100644
-> --- a/arch/arm64/mm/mmu.c
-> +++ b/arch/arm64/mm/mmu.c
-> @@ -459,14 +459,18 @@ early_param("rodata", parse_rodata);
->   */
->  static void __init map_kernel(pgd_t *pgd)
+> -/*
+> - * By writing to CWRITER the guest announces new commands to be processed.
+> - * To avoid any races in the first place, we take the its_cmd lock, which
+> - * protects our ring buffer variables, so that there is only one user
+> - * per ITS handling commands at a given time.
+> - */
+> -static void vgic_mmio_write_its_cwriter(struct kvm *kvm, struct vgic_its *its,
+> -					gpa_t addr, unsigned int len,
+> -					unsigned long val)
+> +/* Must be called with the cmd_lock held. */
+> +static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
 >  {
-> -	static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_init, vmlinux_data;
-> +	static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_inittext,
-> +				vmlinux_initdata, vmlinux_data;
+>  	gpa_t cbaser;
+>  	u64 cmd_buf[4];
+> -	u32 reg;
 >  
->  	pgprot_t text_prot = rodata_enabled ? PAGE_KERNEL_ROX : PAGE_KERNEL_EXEC;
+> -	if (!its)
+> -		return;
+> -
+> -	mutex_lock(&its->cmd_lock);
+> -
+> -	reg = update_64bit_reg(its->cwriter, addr & 7, len, val);
+> -	reg = ITS_CMD_OFFSET(reg);
+> -	if (reg >= ITS_CMD_BUFFER_SIZE(its->cbaser)) {
+> -		mutex_unlock(&its->cmd_lock);
+> +	/* Commands are only processed when the ITS is enabled. */
+> +	if (!its->enabled)
+>  		return;
+> -	}
 >  
->  	map_kernel_segment(pgd, _text, _etext, text_prot, &vmlinux_text);
-> -	map_kernel_segment(pgd, __start_rodata, __init_begin, PAGE_KERNEL, &vmlinux_rodata);
-> -	map_kernel_segment(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC,
-> -			   &vmlinux_init);
-> +	map_kernel_segment(pgd, __start_rodata, __inittext_begin, PAGE_KERNEL,
-> +			   &vmlinux_rodata);
-> +	map_kernel_segment(pgd, __inittext_begin, __inittext_end, text_prot,
-> +			   &vmlinux_inittext);
-> +	map_kernel_segment(pgd, __initdata_begin, __initdata_end, PAGE_KERNEL,
-> +			   &vmlinux_initdata);
->  	map_kernel_segment(pgd, _data, _end, PAGE_KERNEL, &vmlinux_data);
+> -	its->cwriter = reg;
+>  	cbaser = CBASER_ADDRESS(its->cbaser);
+>  
+>  	while (its->cwriter != its->creadr) {
+> @@ -1207,6 +1167,34 @@ static void vgic_mmio_write_its_cwriter(struct kvm *kvm, struct vgic_its *its,
+>  		if (its->creadr == ITS_CMD_BUFFER_SIZE(its->cbaser))
+>  			its->creadr = 0;
+>  	}
+> +}
+> +
+> +/*
+> + * By writing to CWRITER the guest announces new commands to be processed.
+> + * To avoid any races in the first place, we take the its_cmd lock, which
+> + * protects our ring buffer variables, so that there is only one user
+> + * per ITS handling commands at a given time.
+> + */
+> +static void vgic_mmio_write_its_cwriter(struct kvm *kvm, struct vgic_its *its,
+> +					gpa_t addr, unsigned int len,
+> +					unsigned long val)
+> +{
+> +	u64 reg;
+> +
+> +	if (!its)
+> +		return;
+> +
+> +	mutex_lock(&its->cmd_lock);
+> +
+> +	reg = update_64bit_reg(its->cwriter, addr & 7, len, val);
+> +	reg = ITS_CMD_OFFSET(reg);
+> +	if (reg >= ITS_CMD_BUFFER_SIZE(its->cbaser)) {
+> +		mutex_unlock(&its->cmd_lock);
+> +		return;
+> +	}
+> +	its->cwriter = reg;
+> +
+> +	vgic_its_process_commands(kvm, its);
+>  
+>  	mutex_unlock(&its->cmd_lock);
+>  }
+> @@ -1287,6 +1275,39 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+>  	*regptr = reg;
+>  }
+>  
+> +static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
+> +					     struct vgic_its *its,
+> +					     gpa_t addr, unsigned int len)
+> +{
+> +	u32 reg = 0;
+> +
+> +	mutex_lock(&its->cmd_lock);
+> +	if (its->creadr == its->cwriter)
+> +		reg |= GITS_CTLR_QUIESCENT;
+> +	if (its->enabled)
+> +		reg |= GITS_CTLR_ENABLE;
+> +	mutex_unlock(&its->cmd_lock);
+> +
+> +	return reg;
+> +}
+> +
+> +static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+> +				     gpa_t addr, unsigned int len,
+> +				     unsigned long val)
+> +{
+> +	mutex_lock(&its->cmd_lock);
+> +
+> +	its->enabled = !!(val & GITS_CTLR_ENABLE);
+> +
+> +	/*
+> +	 * Try to process any pending commands. This function bails out early
+> +	 * if the ITS is disabled or no commands have been queued.
+> +	 */
+> +	vgic_its_process_commands(kvm, its);
+> +
+> +	mutex_unlock(&its->cmd_lock);
+> +}
+> +
+>  #define REGISTER_ITS_DESC(off, rd, wr, length, acc)		\
+>  {								\
+>  	.reg_offset = off,					\
+> -- 
+> 2.9.0
+> 
 
-
-This all look fine, given text_prot is used for the init text.
-
-With the whitespace restored:
-
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-
-Mark.
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
