@@ -1,26 +1,26 @@
-From: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Subject: Re: [PATCH V12 05/10] acpi: apei: handle SEA notification type for
- ARMv8
-Date: Tue, 7 Mar 2017 09:40:34 -0700
-Message-ID: <be39bb5b-4f00-21fd-49d1-b79431313c7b@codeaurora.org>
-References: <1488833103-21082-1-git-send-email-tbaicar@codeaurora.org>
- <1488833103-21082-6-git-send-email-tbaicar@codeaurora.org>
- <58BE9B7E.4070904@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v4 6/6] arm64: mm: set the contiguous bit for kernel
+ mappings where appropriate
+Date: Tue, 7 Mar 2017 16:46:48 +0000
+Message-ID: <20170307164648.GC3514@leverpostej>
+References: <1488637848-13588-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1488637848-13588-7-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E8A1240BBC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 11:39:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D35540BBC
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 11:45:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Pd0kTI+LeMFw for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Mar 2017 11:39:25 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7F5140A7B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 11:39:24 -0500 (EST)
-In-Reply-To: <58BE9B7E.4070904@arm.com>
+ with ESMTP id 3QIuJSI0Kpmh for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Mar 2017 11:45:39 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C1C540A7B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 11:45:39 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1488637848-13588-7-git-send-email-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,98 +30,229 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: keescook@chromium.org, kernel-hardening@lists.openwall.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, labbott@fedoraproject.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hello James,
+Hi,
 
+On Sat, Mar 04, 2017 at 02:30:48PM +0000, Ard Biesheuvel wrote:
+> This is the third attempt at enabling the use of contiguous hints for
+> kernel mappings. The most recent attempt 0bfc445dec9d was reverted after
+> it turned out that updating permission attributes on live contiguous ranges
+> may result in TLB conflicts. So this time, the contiguous hint is not set
+> for .rodata or for the linear alias of .text/.rodata, both of which are
+> mapped read-write initially, and remapped read-only at a later stage.
+> (Note that the latter region could also be unmapped and remapped again
+> with updated permission attributes, given that the region, while live, is
+> only mapped for the convenience of the hibernation code, but that also
+> means the TLB footprint is negligible anyway, so why bother)
+> 
+> This enables the following contiguous range sizes for the virtual mapping
+> of the kernel image, and for the linear mapping:
+> 
+>           granule size |  cont PTE  |  cont PMD  |
+>           -------------+------------+------------+
+>                4 KB    |    64 KB   |   32 MB    |
+>               16 KB    |     2 MB   |    1 GB*   |
+>               64 KB    |     2 MB   |   16 GB*   |
+> 
+> * Only when built for 3 or more levels of translation. This is due to the
+>   fact that a 2 level configuration only consists of PGDs and PTEs, and the
+>   added complexity of dealing with folded PMDs is not justified considering
+>   that 16 GB contiguous ranges are likely to be ignored by the hardware (and
+>   16k/2 levels is a niche configuration)
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/arm64/mm/mmu.c | 86 ++++++++++++++------
+>  1 file changed, 63 insertions(+), 23 deletions(-)
+> 
+> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+> index 0612573ef869..d0ae2f1f44fc 100644
+> --- a/arch/arm64/mm/mmu.c
+> +++ b/arch/arm64/mm/mmu.c
+> @@ -109,8 +109,10 @@ static bool pgattr_change_is_safe(u64 old, u64 new)
+>  static void alloc_init_pte(pmd_t *pmd, unsigned long addr,
+>  				  unsigned long end, unsigned long pfn,
+>  				  pgprot_t prot,
+> -				  phys_addr_t (*pgtable_alloc)(void))
+> +				  phys_addr_t (*pgtable_alloc)(void),
+> +				  bool may_use_cont)
 
-On 3/7/2017 4:37 AM, James Morse wrote:
-> On 06/03/17 20:44, Tyler Baicar wrote:
->> ARM APEI extension proposal added SEA (Synchronous External Abort)
->> notification type for ARMv8.
->> Add a new GHES error source handling function for SEA. If an error
->> source's notification type is SEA, then this function can be registered
->> into the SEA exception handler. That way GHES will parse and report
->> SEA exceptions when they occur.
->> An SEA can interrupt code that had interrupts masked and is treated as
->> an NMI. To aid this the page of address space for mapping APEI buffers
->> while in_nmi() is always reserved, and ghes_ioremap_pfn_nmi() is
->> changed to use the helper methods to find the prot_t to map with in
->> the same way as ghes_ioremap_pfn_irq().
->> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
->> index d178dc0..b2d57fc 100644
->> --- a/arch/arm64/mm/fault.c
->> +++ b/arch/arm64/mm/fault.c
->> @@ -41,6 +41,8 @@
->>   #include <asm/pgtable.h>
->>   #include <asm/tlbflush.h>
->>   
->> +#include <acpi/ghes.h>
->> +
->>   static const char *fault_name(unsigned int esr);
->>   
->>   #ifdef CONFIG_KPROBES
->> @@ -498,6 +500,17 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
->>   	pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
->>   		 fault_name(esr), esr, addr);
->>   
->> +	/*
->> +	 * Synchronous aborts may interrupt code which had interrupts masked.
->> +	 * Before calling out into the wider kernel tell the interested
->> +	 * subsystems.
->> +	 */
->> +	if (IS_ENABLED(ACPI_APEI_SEA)) {
-> IS_ENABLED() needs the CONFIG_ version of the symbols, otherwise this doesn't
-> get built.
->
-> (I guess the testing from the previous always-enabled version is still valid)
-Okay, I will use CONFIG_ACPI_APEI_SEA in the next patch set.
->
->> +		nmi_enter();
->> +		ghes_notify_sea();
->> +		nmi_exit();
->> +	}
->> +
->>   	info.si_signo = SIGBUS;
->>   	info.si_errno = 0;
->>   	info.si_code  = 0;
->> diff --git a/drivers/acpi/apei/Kconfig b/drivers/acpi/apei/Kconfig
->> index b0140c8..c545dd1 100644
->> --- a/drivers/acpi/apei/Kconfig
->> +++ b/drivers/acpi/apei/Kconfig
->> @@ -39,6 +39,21 @@ config ACPI_APEI_PCIEAER
->>   	  PCIe AER errors may be reported via APEI firmware first mode.
->>   	  Turn on this option to enable the corresponding support.
->>   
->> +config ACPI_APEI_SEA
->> +	bool "APEI Synchronous External Abort logging/recovering support"
->> +	depends on ARM64 && ACPI_APEI && ACPI_APEI_GHES
-> Nit: ACPI_APEI_GHES already depends on ACPI_APEI
-I can remove ACPI_APEI here then.
->> +	default y
->> +	help
->> +	  This option should be enabled if the system supports
->> +	  firmware first handling of SEA (Synchronous External Abort).
->> +	  SEA happens with certain faults of data abort or instruction
->> +	  abort synchronous exceptions on ARMv8 systems. If a system
->> +	  supports firmware first handling of SEA, the platform analyzes
->> +	  and handles hardware error notifications from SEA, and it may then
->> +	  form a HW error record for the OS to parse and handle. This
->> +	  option allows the OS to look for such hardware error record, and
->> +	  take appropriate action.
->> +
->>   config ACPI_APEI_MEMORY_FAILURE
->>   	bool "APEI memory error recovering support"
->>   	depends on ACPI_APEI && MEMORY_FAILURE
->
-> Reviewed-by: James Morse <james.morse@arm.com>
->
-Thanks!
-Tyler
+Maybe we should invert this as single_pages_only, to keep the same
+polarity as page_mappings_only?
 
--- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+That might make the calls to __create_pgd_mapping() in __map_memblock()
+look a little nicer, for instance.
+
+>  {
+> +	pgprot_t __prot = prot;
+>  	pte_t *pte;
+>  
+>  	BUG_ON(pmd_sect(*pmd));
+> @@ -128,7 +130,19 @@ static void alloc_init_pte(pmd_t *pmd, unsigned long addr,
+>  	do {
+>  		pte_t old_pte = *pte;
+>  
+> -		set_pte(pte, pfn_pte(pfn, prot));
+> +		/*
+> +		 * Set the contiguous bit for the subsequent group of PTEs if
+> +		 * its size and alignment are appropriate.
+> +		 */
+> +		if (may_use_cont &&
+> +		    ((addr | PFN_PHYS(pfn)) & ~CONT_PTE_MASK) == 0) {
+> +			if (end - addr >= CONT_PTE_SIZE)
+> +				__prot = __pgprot(pgprot_val(prot) | PTE_CONT);
+> +			else
+> +				__prot = prot;
+> +		}
+> +
+> +		set_pte(pte, pfn_pte(pfn, __prot));
+>  		pfn++;
+>  
+>  		/*
+
+While it would require more code, I think it would be better to add a
+function between alloc_init_pte() and alloc_init_pmd(), handling this in
+the usual fashion. e.g.
+
+---->8----
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index 0eef606..2c90925 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -74,6 +74,11 @@
+ #define pte_user_exec(pte)     (!(pte_val(pte) & PTE_UXN))
+ #define pte_cont(pte)          (!!(pte_val(pte) & PTE_CONT))
+ 
++#define pte_cont_addr_end(addr, end)                                           \
++({     unsigned long __boundary = ((addr) + CONT_PTE_SIZE) & CONT_PTE_MASK;    \
++       (__boundary - 1 < (end) - 1)? __boundary: (end);                        \
++})
++
+ #ifdef CONFIG_ARM64_HW_AFDBM
+ #define pte_hw_dirty(pte)      (pte_write(pte) && !(pte_val(pte) & PTE_RDONLY))
+ #else
+diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+index 2aec93ab..3cee826 100644
+--- a/arch/arm64/mm/mmu.c
++++ b/arch/arm64/mm/mmu.c
+@@ -142,6 +142,32 @@ static void alloc_init_pte(pmd_t *pmd, unsigned long addr,
+        pte_clear_fixmap();
+ }
+ 
++static void alloc_init_cont_pte(pmd_t *pmd, unsigned long addr,
++                                 unsigned long end, phys_addr_t phys,
++                                 pgprot_t prot,
++                                 phys_addr_t (*pgtable_alloc)(void),
++                                 bool may_use_cont)
++{
++       const pgprot_t cont_prot = __pgprot(pgprot_val(prot) | PTE_CONT);
++       unsigned long next;
++
++       do {
++               next = pte_cont_addr_end(addr, end);
++
++               /* try a contiguous mapping first */
++               if ((((addr | next | phys) & ~CONT_PTE_MASK) == 0) &&
++                   may_use_cont) {
++                       alloc_init_pte(pmd, addr, next, phys, cont_prot,
++                                      pgtable_alloc);
++               } else {
++                       alloc_init_pte(pmd, addr, next, phys, prot,
++                                      pgtable_alloc);
++               }
++
++               phys += next - addr;
++       } while (addr = next, addr != end);
++}
++
+ static void alloc_init_pmd(pud_t *pud, unsigned long addr, unsigned long end,
+                                  phys_addr_t phys, pgprot_t prot,
+                                  phys_addr_t (*pgtable_alloc)(void),
+---->8----
+
+It's more code, but it follows the existing pattern, and I personally
+find it easier to follow than changing prot within the loop.
+
+Note that I've cheated and made alloc_init_pte() take a phys_addr_t
+rather than a pfn, which I think we should do anyhow for consistency. I
+have a patch for that, if you agree.
+
+Another think we *might* want to do here is pass a flags parameter that
+than separate page_mappings_only and mask_use_cont. That might also make
+things less painful in future if there are other things we need to pass
+down.
+
+That might also end up complicating matters, given the way we currently
+use debug_pagealloc_enabled() in __create_pgd_mapping() callers, so I'm
+also happy to leave that.
+
+[...]
+
+> @@ -173,7 +189,19 @@ static void alloc_init_pmd(pud_t *pud, unsigned long addr, unsigned long end,
+>  		/* try section mapping first */
+>  		if (((addr | next | phys) & ~SECTION_MASK) == 0 &&
+>  		      !page_mappings_only) {
+> -			pmd_set_huge(pmd, phys, prot);
+> +			/*
+> +			 * Set the contiguous bit for the subsequent group of
+> +			 * PMDs if its size and alignment are appropriate.
+> +			 */
+> +			if (may_use_cont &&
+> +			    ((addr | phys) & ~CONT_PMD_MASK) == 0) {
+> +				if (end - addr >= CONT_PMD_SIZE)
+> +					__prot = __pgprot(pgprot_val(prot) |
+> +							  PTE_CONT);
+> +				else
+> +					__prot = prot;
+> +			}
+> +			pmd_set_huge(pmd, phys, __prot);
+
+As above, I think it would be better to have a alloc_init_cont_pmd()
+wrapper that iterated in CONT_PMD_SIZE chunks, so as to keep the usual
+pattern.
+
+> @@ -381,7 +418,8 @@ static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end
+>  	 */
+>  	__create_pgd_mapping(pgd, kernel_start, __phys_to_virt(kernel_start),
+>  			     kernel_end - kernel_start, PAGE_KERNEL,
+> -			     early_pgtable_alloc, debug_pagealloc_enabled());
+> +			     early_pgtable_alloc, debug_pagealloc_enabled(),
+> +			     false);
+>  }
+
+> @@ -437,7 +476,8 @@ static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
+>  	BUG_ON(!PAGE_ALIGNED(size));
+>  
+>  	__create_pgd_mapping(pgd, pa_start, (unsigned long)va_start, size, prot,
+> -			     early_pgtable_alloc, debug_pagealloc_enabled());
+> +			     early_pgtable_alloc, debug_pagealloc_enabled(),
+> +			     !debug_pagealloc_enabled() && may_use_cont);
+>  
+>  	vma->addr	= va_start;
+>  	vma->phys_addr	= pa_start;
+> @@ -464,14 +504,14 @@ static void __init map_kernel(pgd_t *pgd)
+>  
+>  	pgprot_t text_prot = rodata_enabled ? PAGE_KERNEL_ROX : PAGE_KERNEL_EXEC;
+>  
+> -	map_kernel_segment(pgd, _text, _etext, text_prot, &vmlinux_text);
+> +	map_kernel_segment(pgd, _text, _etext, text_prot, &vmlinux_text, true);
+>  	map_kernel_segment(pgd, __start_rodata, __inittext_begin, PAGE_KERNEL,
+> -			   &vmlinux_rodata);
+> +			   &vmlinux_rodata, false);
+>  	map_kernel_segment(pgd, __inittext_begin, __inittext_end, text_prot,
+> -			   &vmlinux_inittext);
+> +			   &vmlinux_inittext, true);
+>  	map_kernel_segment(pgd, __initdata_begin, __initdata_end, PAGE_KERNEL,
+> -			   &vmlinux_initdata);
+> -	map_kernel_segment(pgd, _data, _end, PAGE_KERNEL, &vmlinux_data);
+> +			   &vmlinux_initdata, true);
+> +	map_kernel_segment(pgd, _data, _end, PAGE_KERNEL, &vmlinux_data, true);
+
+It might be worth a comment somewhere as to why we have to special case
+text, rodata, and the linear alias, but otherwise this looks fine.
+
+Thanks,
+Mark.
