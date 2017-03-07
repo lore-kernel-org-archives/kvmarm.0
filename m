@@ -1,26 +1,25 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/2] arm/kvm: survive unknown traps from guests
-Date: Tue, 07 Mar 2017 07:54:44 +0000
-Message-ID: <87d1dt1pyz.fsf@on-the-bus.cambridge.arm.com>
-References: <1487593812-9174-1-git-send-email-mark.rutland@arm.com>
- <1487593812-9174-2-git-send-email-mark.rutland@arm.com>
- <20170306150803.GB1502@lvm> <20170306173330.GH18519@leverpostej>
+Subject: Re: [PATCH 0/8] arm64: KVM: Fix PMU exception generation
+Date: Tue, 07 Mar 2017 09:33:37 +0000
+Message-ID: <874lz51le6.fsf@on-the-bus.cambridge.arm.com>
+References: <20170222114728.2472-1-marc.zyngier@arm.com>
+ <20170305150109.GA1502@lvm>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8148540BBC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 02:53:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E69740AF5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 04:32:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZaGm77qFpzh5 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Mar 2017 02:53:28 -0500 (EST)
+ with ESMTP id PQQT5DwFLTab for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Mar 2017 04:32:21 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4207040A7B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 02:53:28 -0500 (EST)
-In-Reply-To: <20170306173330.GH18519@leverpostej> (Mark Rutland's message of
- "Mon, 6 Mar 2017 17:33:30 +0000")
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ADA1A40A80
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 04:32:20 -0500 (EST)
+In-Reply-To: <20170305150109.GA1502@lvm> (Christoffer Dall's message of "Sun,
+ 5 Mar 2017 07:01:09 -0800")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,33 +29,74 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, dave.martin@arm.com
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Shannon Zhao <shannon.zhao@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 06 2017 at  5:33:30 pm GMT, Mark Rutland <mark.rutland@arm.com> wrote:
-> On Mon, Mar 06, 2017 at 07:08:03AM -0800, Christoffer Dall wrote:
->> On Mon, Feb 20, 2017 at 12:30:11PM +0000, Mark Rutland wrote:
->> >  static exit_handle_fn arm_exit_handlers[] = {
->> > +	[0 ... HSR_EC_MAX]	= kvm_handle_unknown_ec,
+On Sun, Mar 05 2017 at  3:01:09 pm GMT, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+> Hi Marc,
+>
+> On Wed, Feb 22, 2017 at 11:47:20AM +0000, Marc Zyngier wrote:
+>> Running the following code:
 >> 
->> Cool stuff, didn't know you could do this in C.
+>> root@zomby-woof:~# cat test-pmu.c
+>> int main(int argc, char *argv[])
+>> {
+>> 	unsigned int val;
+>> 	asm ("mrc p15, 0, %0, c9, c13, 0\n" : "=r" (val));
+>> 	return val;
+>> }
+>> 
+>> in a 32bit guest (or a 64bit guest with a 32bit userspace) results in
+>> this surprising result:
+>> 
+>> [  120.347497] kvm [1150]: Unsupported guest CP15 access at: ab0945ae
+>> [  120.353689] kvm [1142]:  { Op0( 0), Op1( 0), CRn( 9), CRm(13), Op2( 0), func_read },
+>> 
+>> which is weird, because the guest behaves correctly:
+>> root@zomby-woof:~# ./test-pmu 
+>> [   16.184422] test-pmu[740]: undefined instruction: pc=00000000ab0945ae
+>> [   16.186043] Code: 00340001 b4800000 af00b085 60396078 (3f1dee19) 
+>> Illegal instruction
+>> 
+>> It gets the expected UNDEF, and all is fine. So what?
+>> 
+>> It turns out that the PMU emulation code is a bit lazy, and tells the
+>> rest of KVM that the emulation has failed, so that an exception gets
+>> delivered. Subtle differences in the 32bit vs 64bit handling make it
+>> spit an "Unsupported..." error.
+>> 
+>> This series tries to set things straight:
+>> - Allow an exception to be injected from an emulation handler
+>> - Make all PMU illegal accesses inject an UNDEF
+>> - Make these illegal accesses a successful emulation w.r.t the rest of KVM.
+>> 
+>> In the process, we also squash an interesting bug in the 64bit CP
+>> access. Similar treatment could be applied to the 32bit kernel, except
+>> that we don't ever inject an exception there (no PMU support yet).
 >
-> Strictly speaking, it's a GCC-ism, though we use it all over the place:
+> I'm a bit confused about this series and not too thrilled of the
+> approach where we add a side-channel of the sys_reg param in the vcpu
+> structure, which may or may not contain valid data at any given point.
 >
-> [mark@leverpostej:~/src/linux]% git grep '\[.*\.\.\..*\]\s=' | wc -l
-> 394
->
-> It may also make checkpatch a bit grumpy, though I think that's being
-> worked on.
->
->> Reviewed-by: Christoffer Dall <cdall@linaro.org>
->
-> Cheers!
->
-> I assume you or Marc will pick this up?
+> Couldn't we use a slightly bigger hammer (with cleaner semantics) and
+> let all system register handling (cp on 32-bit and 64-bit sys regs
+> alike) simply return true if they were emulated, in which case the
+> caller should advance the PC, or false ifsomething else happened, and
+> leave it up to the emulation of the individual registers to decide if
+> any exceptions should be injected.
 
-Yes, I'll queue that.
+So that was my other option - changing the semantics of the return
+value, and considering that an emulation never fails. At that stage, we
+can repurpose the return value form the accessor to simply indicate
+whether or not we should skip the current instruction.
+
+> I don't think we have that many places where we want to inject an
+> undefined exception in our handlers, and doing it explicitly might
+> actually be a good idea to make it more clear that we're emulating the
+> architecture properly.  What do you think?
+
+I think that'd work nicely. I'll rework the series along these lines.
 
 Thanks,
 
