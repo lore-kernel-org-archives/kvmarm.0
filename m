@@ -1,26 +1,29 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: KVM on ARM Cortex A53 in 32-bit Mode
-Date: Tue, 7 Mar 2017 01:55:59 -0800
-Message-ID: <20170307095559.GB101711@lvm>
-References: <CAPn9co60wgUms-V_6PBB4CDKeWV_mJzHqg-5wjTchKFi4G9xkg@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: arm/arm64: Let vcpu thread modify its own active
+ state
+Date: Tue, 7 Mar 2017 01:57:10 -0800
+Message-ID: <20170307095710.GC101711@lvm>
+References: <1488807757-86131-1-git-send-email-christoffer.dall@linaro.org>
+ <CAHyh4xgQDy9t8YD2P_q8MSQfv_1wa9JicZkQKV2OQNG3w48+9A@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7035340A80
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 04:54:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 89BFA40A80
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 04:55:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id erWvp25+bp+i for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Mar 2017 04:54:40 -0500 (EST)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49CFB40A54
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 04:54:40 -0500 (EST)
-Received: by mail-wm0-f44.google.com with SMTP id v203so9114074wmg.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Mar 2017 01:56:01 -0800 (PST)
+ with ESMTP id ogrFgRgW6AmT for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Mar 2017 04:55:51 -0500 (EST)
+Received: from mail-wr0-f180.google.com (mail-wr0-f180.google.com
+ [209.85.128.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7838D40A54
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 04:55:51 -0500 (EST)
+Received: by mail-wr0-f180.google.com with SMTP id g10so134997671wrg.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Mar 2017 01:57:12 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <CAPn9co60wgUms-V_6PBB4CDKeWV_mJzHqg-5wjTchKFi4G9xkg@mail.gmail.com>
+In-Reply-To: <CAHyh4xgQDy9t8YD2P_q8MSQfv_1wa9JicZkQKV2OQNG3w48+9A@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,55 +33,98 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Yasutaka Tanaka <yt2558@columbia.edu>
-Cc: kvmarm@lists.cs.columbia.edu
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: KVM General <kvm@vger.kernel.org>, Eric Auger <eric.auger@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Yasutaka,
-
-On Thu, Mar 02, 2017 at 09:57:50AM -0500, Yasutaka Tanaka wrote:
-> Hello KVM/ARM community,
+On Mon, Mar 06, 2017 at 02:20:44PM -0500, Jintack Lim wrote:
+> Hi Christoffer,
 > 
-> I am now trying to execute KVM on Raspberry Pi 3 Model B (RPI3).
-> Does anyone know whether KVM/ARM can run with 32-bit mode on ARM Cortex A53?
-
-Theoretically, it should.
-
+> thanks for submitting this patch.
 > 
-> The CPU of RPI3 is ARM Cortex A53 which can be executed in both 32-bit and
-> 64-bit mode. I've managed to display /dev/kvm on 64-bit mode execution
-> (i.e. with a 64-bit linux kernel) on RPI3, but I failed to do so in 32-bit
-> mode.
+> On Mon, Mar 6, 2017 at 8:42 AM, Christoffer Dall
+> <christoffer.dall@linaro.org> wrote:
+> > From: Jintack Lim <jintack@cs.columbia.edu>
+> >
+> > Currently, if a vcpu thread tries to change the active state of an
+> > interrupt which is already on the same vcpu's AP list,
 > 
-> In 32-bit mode, an KVM error messages says CPU not supported. I guess the
-> reason for the error message is KVM_ARM_TARGET_CORTEX_A53 is only returned
-> in /arch/arm64/kvm/guest.c not under/arch/arm/kvm/guest.c.
-> 
-> So I'm wondering whether it's possible or not. 
+> "it'll loop forever" is remove accidentally in the commit message in v2?
 
-It should be.  You may just have to add the minimal missing definitions
-for a 32-bit A53 CPU support.
-
-> What I'd like to do is to
-> compare the execution speed of KVM between 32-bit and 64-bit mode. The
-> second plan is to compare between KVMs of 32-bit RPI2 and 64-bit RPI3 (I
-> have both), but since RPI2 spec is a little low and I'm worried that some
-> numeric comparisons become unfair.
-
-I would be careful here, since the RPI3 doesn't have the GIC and you'll
-end up going to user space a lot for interrupt handling.  Especially
-look out for SMP workloads in the VM which may generate a lot of IPIs
-which are really going to suffer from having to go to userspace on the
-host.
+yes, we can fix this up when applying the patch.  Thanks.
 
 > 
-> (I was also notified by an KVM/ARM expert that since RPI doesn't have a GIC
-> and I need to apply some patches)
-
-Yes, you need the "Support userspace irqchip with arch timers" series
-and corresponding QEMU patches:
-
-http://www.spinics.net/lists/kvm/msg144685.html
-
-Good luck.
--Christoffer
+> > Since the VGIC
+> > mmio handler is called after a vcpu has already synced back the LR state
+> > to the struct vgic_irq, we can just let it proceed safely.
+> >
+> > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+> > ---
+> > Changes since v1:
+> >  - Reworked comment
+> >  - Consider userspace accesses
+> >  - Get the right requester VCPU for GICv3 private IRQ accesses
+> >  - Tested using kvm-unit-tests and verified that it deadlocked without
+> >    this patch and passed the test with this patch :)
+> 
+> nice!
+> 
+> >
+> >  virt/kvm/arm/vgic/vgic-mmio.c | 32 ++++++++++++++++++++++++--------
+> >  1 file changed, 24 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> > index 3654b4c..2a5db13 100644
+> > --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> > +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> > @@ -180,21 +180,37 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
+> >  static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+> >                                     bool new_active_state)
+> >  {
+> > +       struct kvm_vcpu *requester_vcpu;
+> >         spin_lock(&irq->irq_lock);
+> > +
+> > +       /*
+> > +        * The vcpu parameter here can mean multiple things depending on how
+> > +        * this function is called; when handling a trap from the kernel it
+> > +        * depends on the GIC version, and these functions are also called as
+> > +        * part of save/restore from userspace.
+> > +        *
+> > +        * Therefore, we have to figure out the requester in a reliable way.
+> > +        *
+> > +        * When accessing VGIC state from user space, the requester_vcpu is
+> > +        * NULL, which is fine, because we guarantee that no VCPUs are running
+> > +        * when accessing VGIC state from user space so irq->vcpu->cpu is
+> > +        * always -1.
+> > +        */
+> > +       requester_vcpu = kvm_arm_get_running_vcpu();
+> > +
+> >         /*
+> >          * If this virtual IRQ was written into a list register, we
+> >          * have to make sure the CPU that runs the VCPU thread has
+> > -        * synced back LR state to the struct vgic_irq.  We can only
+> > -        * know this for sure, when either this irq is not assigned to
+> > -        * anyone's AP list anymore, or the VCPU thread is not
+> > -        * running on any CPUs.
+> > +        * synced back the LR state to the struct vgic_irq.
+> >          *
+> > -        * In the opposite case, we know the VCPU thread may be on its
+> > -        * way back from the guest and still has to sync back this
+> > -        * IRQ, so we release and re-acquire the spin_lock to let the
+> > -        * other thread sync back the IRQ.
+> > +        * As long as the conditions below are true, we know the VCPU thread
+> > +        * may be on its way back from the guest (we kicked the VCPU thread in
+> > +        * vgic_change_active_prepare)  and still has to sync back this IRQ,
+> > +        * so we release and re-acquire the spin_lock to let the other thread
+> > +        * sync back the IRQ.
+> >          */
+> >         while (irq->vcpu && /* IRQ may have state in an LR somewhere */
+> > +              irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
+> >                irq->vcpu->cpu != -1) /* VCPU thread is running */
+> >                 cond_resched_lock(&irq->irq_lock);
+> >
+> > --
+> > 2.5.0
+> >
+> >
+> 
