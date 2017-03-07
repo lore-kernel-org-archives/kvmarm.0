@@ -1,24 +1,25 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH V12 10/10] arm/arm64: KVM: add guest SEA support
-Date: Tue, 07 Mar 2017 11:48:36 +0000
-Message-ID: <58BE9E14.6040208@arm.com>
-References: <1488833103-21082-1-git-send-email-tbaicar@codeaurora.org>
- <1488833103-21082-11-git-send-email-tbaicar@codeaurora.org>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v4 4/6] arm64: mmu: map .text as read-only from the outset
+Date: Tue, 7 Mar 2017 14:10:14 +0000
+Message-ID: <20170307141014.GA3514@leverpostej>
+References: <1488637848-13588-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1488637848-13588-5-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD70A40BAC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 06:47:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A866D40A74
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 09:09:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bFzGq-liTcUJ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Mar 2017 06:47:33 -0500 (EST)
+ with ESMTP id YRzNp4YX6bpu for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Mar 2017 09:09:09 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A86E40AE8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 06:47:33 -0500 (EST)
-In-Reply-To: <1488833103-21082-11-git-send-email-tbaicar@codeaurora.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39CC040A6A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 09:09:08 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1488637848-13588-5-git-send-email-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,141 +29,82 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: keescook@chromium.org, kernel-hardening@lists.openwall.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, labbott@fedoraproject.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Tyler,
-
-On 06/03/17 20:45, Tyler Baicar wrote:
-> Currently external aborts are unsupported by the guest abort
-> handling. Add handling for SEAs so that the host kernel reports
-> SEAs which occur in the guest kernel.
-
-> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-> index e22089f..a1a3dff 100644
-> --- a/arch/arm/include/asm/kvm_arm.h
-> +++ b/arch/arm/include/asm/kvm_arm.h
-> @@ -187,6 +187,16 @@
->  #define FSC_FAULT	(0x04)
->  #define FSC_ACCESS	(0x08)
->  #define FSC_PERM	(0x0c)
-> +#define FSC_SEA		(0x10)
-> +#define FSC_SEA_TTW0	(0x14)
-> +#define FSC_SEA_TTW1	(0x15)
-> +#define FSC_SEA_TTW2	(0x16)
-> +#define FSC_SEA_TTW3	(0x17)
-> +#define FSC_SECC	(0x18)
-> +#define FSC_SECC_TTW0	(0x1c)
-
-aarch32 doesn't have either of these 'TW0' values, it's an unused encoding.
-(However ...)
-
-> +#define FSC_SECC_TTW1	(0x1d)
-> +#define FSC_SECC_TTW2	(0x1e)
-> +#define FSC_SECC_TTW3	(0x1f)
+On Sat, Mar 04, 2017 at 02:30:46PM +0000, Ard Biesheuvel wrote:
+> Now that alternatives patching code no longer relies on the primary
+> mapping of .text being writable, we can remove the code that removes
+> the writable permissions post-init time, and map it read-only from
+> the outset.
+> 
+> To preserve the existing behavior under rodata=off, which is relied
+> upon by external debuggers to manage software breakpoints (as pointed
+> out by Mark), add an early_param() check for rodata=, and use RWX
+> permissions if it set to 'off'.
+> 
+> Reviewed-by: Laura Abbott <labbott@redhat.com>
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/arm64/mm/mmu.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+> index df377fbe464e..edd982f88714 100644
+> --- a/arch/arm64/mm/mmu.c
+> +++ b/arch/arm64/mm/mmu.c
+> @@ -416,9 +416,6 @@ void mark_rodata_ro(void)
+>  {
+>  	unsigned long section_size;
 >  
->  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
->  #define HPFAR_MASK	(~0xf)
-
->  #endif /* __ASM_ARM_SYSTEM_MISC_H */
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index a5265ed..f3608c9 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -1444,8 +1463,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  
->  	/* Check the stage-2 fault is trans. fault or write fault */
->  	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
-> -	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
-> -	    fault_status != FSC_ACCESS) {
-> +
-> +	/* The host kernel will handle the synchronous external abort. There
-> +	 * is no need to pass the error into the guest.
-> +	 */
-> +	if (is_abort_synchronous(fault_status)) {
-> +		if(handle_guest_sea((unsigned long)fault_ipa,
-> +				    kvm_vcpu_get_hsr(vcpu))) {
-
-
-... Looking further up in this function:
->	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
->	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu))) {
->		kvm_inject_vabt(vcpu);
->		return 1;
->	}
-
-... so external data aborts will have already been 'claimed' by kvm and dealt
-with, and we already have a helper for spotting external aborts. (sorry I didn't
-spot it earlier).
-
-We need to do the handle_guest_sea() before this code.
-
-kvm_inject_vabt() makes an SError interrupt pending for the guest. This makes a
-synchronous error asynchronous as the guest may have SError interrupts masked.
-
-I guess this was the best that could be done at the time of (4055710baca8
-"arm/arm64: KVM: Inject virtual abort when guest exits on external abort"), but
-in the light of this firmware-first handling, I'm not sure its the right thing
-to do.
-
-Is it possible for handle_guest_sea() to return whether it actually found any
-work to do? If there was none I think we should keep this kvm_inject_vabt() as
-it is the existing behaviour.
-
-
-> +			kvm_err("Failed to handle guest SEA, FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
-> +				kvm_vcpu_trap_get_class(vcpu),
-> +				(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
-> +				(unsigned long)kvm_vcpu_get_hsr(vcpu));
-> +			return -EFAULT;
-> +		}
-> +	} else if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
-> +		   fault_status != FSC_ACCESS) {
->  		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
->  			kvm_vcpu_trap_get_class(vcpu),
->  			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
-
-
-> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> index b2d57fc..31c5171 100644
-> --- a/arch/arm64/mm/fault.c
-> +++ b/arch/arm64/mm/fault.c
-> @@ -602,6 +602,24 @@ static const char *fault_name(unsigned int esr)
+> -	section_size = (unsigned long)_etext - (unsigned long)_text;
+> -	update_mapping_prot(__pa_symbol(_text), (unsigned long)_text,
+> -			    section_size, PAGE_KERNEL_ROX);
+>  	/*
+>  	 * mark .rodata as read only. Use __init_begin rather than __end_rodata
+>  	 * to cover NOTES and EXCEPTION_TABLE.
+> @@ -451,6 +448,12 @@ static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
+>  	vm_area_add_early(vma);
 >  }
 >  
->  /*
-> + * Handle Synchronous External Aborts that occur in a guest kernel.
-> + */
-> +int handle_guest_sea(unsigned long addr, unsigned int esr)
+> +static int __init parse_rodata(char *arg)
 > +{
-> +	/*
-> +	 * synchronize_rcu() will wait for nmi_exit(), so no need to
-> +	 * rcu_read_lock().
-> +	 */
-
-This comment has a life of its own! Given we don't always call ghes_notify_sea()
-when we interrupted un-interruptable code its not always true. I think the
-rcu_read_{,un}lock() should go against the list walk (so it looks like the
-examples), and ditch the comment!
-
-
-> +	if(IS_ENABLED(ACPI_APEI_SEA)) {
-> +		rcu_read_lock();
-> +		ghes_notify_sea();
-> +		rcu_read_unlock();
-> +	}
-> +
-> +	return 0;
+> +	return strtobool(arg, &rodata_enabled);
 > +}
+> +early_param("rodata", parse_rodata);
 > +
-> +/*
->   * Dispatch a data abort to the relevant handler.
+>  /*
+>   * Create fine-grained mappings for the kernel.
 >   */
->  asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
-> 
+> @@ -458,7 +461,9 @@ static void __init map_kernel(pgd_t *pgd)
+>  {
+>  	static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_init, vmlinux_data;
+>  
+> -	map_kernel_segment(pgd, _text, _etext, PAGE_KERNEL_EXEC, &vmlinux_text);
+> +	pgprot_t text_prot = rodata_enabled ? PAGE_KERNEL_ROX : PAGE_KERNEL_EXEC;
+> +
 
+It might be worth having a comment as to why, e.g.
+
+	/*
+	 * External debuggers may need to write directly to the text
+	 * mapping to install SW breakpoints. Allow this (only) when
+	 * explicitly requested with rodata=off.
+	 */
+
+... otherwise this looks fine. FWIW, either way:
+
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
 
 Thanks,
+Mark.
 
-James
+> +	map_kernel_segment(pgd, _text, _etext, text_prot, &vmlinux_text);
+>  	map_kernel_segment(pgd, __start_rodata, __init_begin, PAGE_KERNEL, &vmlinux_rodata);
+>  	map_kernel_segment(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC,
+>  			   &vmlinux_init);
+> -- 
+> 2.7.4
+> 
