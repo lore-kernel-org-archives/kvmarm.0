@@ -1,29 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 0/8] arm64: KVM: Fix PMU exception generation
-Date: Tue, 7 Mar 2017 01:52:08 -0800
-Message-ID: <20170307095208.GA101711@lvm>
-References: <20170222114728.2472-1-marc.zyngier@arm.com>
- <20170305150109.GA1502@lvm>
- <874lz51le6.fsf@on-the-bus.cambridge.arm.com>
+Subject: Re: KVM on ARM Cortex A53 in 32-bit Mode
+Date: Tue, 7 Mar 2017 01:55:59 -0800
+Message-ID: <20170307095559.GB101711@lvm>
+References: <CAPn9co60wgUms-V_6PBB4CDKeWV_mJzHqg-5wjTchKFi4G9xkg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 051F940C46
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 04:50:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7035340A80
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 04:54:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yJMaDKppGcPq for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Mar 2017 04:50:50 -0500 (EST)
-Received: from mail-wr0-f179.google.com (mail-wr0-f179.google.com
- [209.85.128.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 872A340A80
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 04:50:50 -0500 (EST)
-Received: by mail-wr0-f179.google.com with SMTP id g10so134904353wrg.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Mar 2017 01:52:11 -0800 (PST)
+ with ESMTP id erWvp25+bp+i for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Mar 2017 04:54:40 -0500 (EST)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49CFB40A54
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 04:54:40 -0500 (EST)
+Received: by mail-wm0-f44.google.com with SMTP id v203so9114074wmg.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Mar 2017 01:56:01 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <874lz51le6.fsf@on-the-bus.cambridge.arm.com>
+In-Reply-To: <CAPn9co60wgUms-V_6PBB4CDKeWV_mJzHqg-5wjTchKFi4G9xkg@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,75 +30,55 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Shannon Zhao <shannon.zhao@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Yasutaka Tanaka <yt2558@columbia.edu>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 07, 2017 at 09:33:37AM +0000, Marc Zyngier wrote:
-> On Sun, Mar 05 2017 at  3:01:09 pm GMT, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> > Hi Marc,
-> >
-> > On Wed, Feb 22, 2017 at 11:47:20AM +0000, Marc Zyngier wrote:
-> >> Running the following code:
-> >> 
-> >> root@zomby-woof:~# cat test-pmu.c
-> >> int main(int argc, char *argv[])
-> >> {
-> >> 	unsigned int val;
-> >> 	asm ("mrc p15, 0, %0, c9, c13, 0\n" : "=r" (val));
-> >> 	return val;
-> >> }
-> >> 
-> >> in a 32bit guest (or a 64bit guest with a 32bit userspace) results in
-> >> this surprising result:
-> >> 
-> >> [  120.347497] kvm [1150]: Unsupported guest CP15 access at: ab0945ae
-> >> [  120.353689] kvm [1142]:  { Op0( 0), Op1( 0), CRn( 9), CRm(13), Op2( 0), func_read },
-> >> 
-> >> which is weird, because the guest behaves correctly:
-> >> root@zomby-woof:~# ./test-pmu 
-> >> [   16.184422] test-pmu[740]: undefined instruction: pc=00000000ab0945ae
-> >> [   16.186043] Code: 00340001 b4800000 af00b085 60396078 (3f1dee19) 
-> >> Illegal instruction
-> >> 
-> >> It gets the expected UNDEF, and all is fine. So what?
-> >> 
-> >> It turns out that the PMU emulation code is a bit lazy, and tells the
-> >> rest of KVM that the emulation has failed, so that an exception gets
-> >> delivered. Subtle differences in the 32bit vs 64bit handling make it
-> >> spit an "Unsupported..." error.
-> >> 
-> >> This series tries to set things straight:
-> >> - Allow an exception to be injected from an emulation handler
-> >> - Make all PMU illegal accesses inject an UNDEF
-> >> - Make these illegal accesses a successful emulation w.r.t the rest of KVM.
-> >> 
-> >> In the process, we also squash an interesting bug in the 64bit CP
-> >> access. Similar treatment could be applied to the 32bit kernel, except
-> >> that we don't ever inject an exception there (no PMU support yet).
-> >
-> > I'm a bit confused about this series and not too thrilled of the
-> > approach where we add a side-channel of the sys_reg param in the vcpu
-> > structure, which may or may not contain valid data at any given point.
-> >
-> > Couldn't we use a slightly bigger hammer (with cleaner semantics) and
-> > let all system register handling (cp on 32-bit and 64-bit sys regs
-> > alike) simply return true if they were emulated, in which case the
-> > caller should advance the PC, or false ifsomething else happened, and
-> > leave it up to the emulation of the individual registers to decide if
-> > any exceptions should be injected.
+Hi Yasutaka,
+
+On Thu, Mar 02, 2017 at 09:57:50AM -0500, Yasutaka Tanaka wrote:
+> Hello KVM/ARM community,
 > 
-> So that was my other option - changing the semantics of the return
-> value, and considering that an emulation never fails. At that stage, we
-> can repurpose the return value form the accessor to simply indicate
-> whether or not we should skip the current instruction.
+> I am now trying to execute KVM on Raspberry Pi 3 Model B (RPI3).
+> Does anyone know whether KVM/ARM can run with 32-bit mode on ARM Cortex A53?
+
+Theoretically, it should.
+
 > 
-> > I don't think we have that many places where we want to inject an
-> > undefined exception in our handlers, and doing it explicitly might
-> > actually be a good idea to make it more clear that we're emulating the
-> > architecture properly.  What do you think?
+> The CPU of RPI3 is ARM Cortex A53 which can be executed in both 32-bit and
+> 64-bit mode. I've managed to display /dev/kvm on 64-bit mode execution
+> (i.e. with a 64-bit linux kernel) on RPI3, but I failed to do so in 32-bit
+> mode.
 > 
-> I think that'd work nicely. I'll rework the series along these lines.
+> In 32-bit mode, an KVM error messages says CPU not supported. I guess the
+> reason for the error message is KVM_ARM_TARGET_CORTEX_A53 is only returned
+> in /arch/arm64/kvm/guest.c not under/arch/arm/kvm/guest.c.
 > 
-Awesome, thanks.
+> So I'm wondering whether it's possible or not. 
+
+It should be.  You may just have to add the minimal missing definitions
+for a 32-bit A53 CPU support.
+
+> What I'd like to do is to
+> compare the execution speed of KVM between 32-bit and 64-bit mode. The
+> second plan is to compare between KVMs of 32-bit RPI2 and 64-bit RPI3 (I
+> have both), but since RPI2 spec is a little low and I'm worried that some
+> numeric comparisons become unfair.
+
+I would be careful here, since the RPI3 doesn't have the GIC and you'll
+end up going to user space a lot for interrupt handling.  Especially
+look out for SMP workloads in the VM which may generate a lot of IPIs
+which are really going to suffer from having to go to userspace on the
+host.
+
+> 
+> (I was also notified by an KVM/ARM expert that since RPI doesn't have a GIC
+> and I need to apply some patches)
+
+Yes, you need the "Support userspace irqchip with arch timers" series
+and corresponding QEMU patches:
+
+http://www.spinics.net/lists/kvm/msg144685.html
+
+Good luck.
 -Christoffer
