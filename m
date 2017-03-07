@@ -1,26 +1,25 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v4 6/6] arm64: mm: set the contiguous bit for kernel
- mappings where appropriate
-Date: Tue, 7 Mar 2017 16:46:48 +0000
-Message-ID: <20170307164648.GC3514@leverpostej>
-References: <1488637848-13588-1-git-send-email-ard.biesheuvel@linaro.org>
- <1488637848-13588-7-git-send-email-ard.biesheuvel@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] arm/arm64: gic: Test changing active
+ state of interrupts
+Date: Tue, 7 Mar 2017 17:58:11 +0100
+Message-ID: <20170307165811.a3c6tar7qlen4n2i@hawk.localdomain>
+References: <1488813369-87368-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D35540BBC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 11:45:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ABB540BBC
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 11:56:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3QIuJSI0Kpmh for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Mar 2017 11:45:39 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C1C540A7B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 11:45:39 -0500 (EST)
+ with ESMTP id x8si8jvbTDc6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Mar 2017 11:56:54 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 676EA40A7B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 11:56:54 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <1488637848-13588-7-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <1488813369-87368-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,229 +29,161 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: keescook@chromium.org, kernel-hardening@lists.openwall.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, labbott@fedoraproject.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On Sat, Mar 04, 2017 at 02:30:48PM +0000, Ard Biesheuvel wrote:
-> This is the third attempt at enabling the use of contiguous hints for
-> kernel mappings. The most recent attempt 0bfc445dec9d was reverted after
-> it turned out that updating permission attributes on live contiguous ranges
-> may result in TLB conflicts. So this time, the contiguous hint is not set
-> for .rodata or for the linear alias of .text/.rodata, both of which are
-> mapped read-write initially, and remapped read-only at a later stage.
-> (Note that the latter region could also be unmapped and remapped again
-> with updated permission attributes, given that the region, while live, is
-> only mapped for the convenience of the hibernation code, but that also
-> means the TLB footprint is negligible anyway, so why bother)
+On Mon, Mar 06, 2017 at 07:16:09AM -0800, Christoffer Dall wrote:
+> From: Christoffer Dall <cdall@linaro.org>
 > 
-> This enables the following contiguous range sizes for the virtual mapping
-> of the kernel image, and for the linear mapping:
+> We found a deadlock when changing the active state of an interrupt while
+> the interrupt is queued on the LR of the running VCPU.
 > 
->           granule size |  cont PTE  |  cont PMD  |
->           -------------+------------+------------+
->                4 KB    |    64 KB   |   32 MB    |
->               16 KB    |     2 MB   |    1 GB*   |
->               64 KB    |     2 MB   |   16 GB*   |
+> Defend KVM against this bug in the future now when we've introduced a
+> fix.
 > 
-> * Only when built for 3 or more levels of translation. This is due to the
->   fact that a 2 level configuration only consists of PGDs and PTEs, and the
->   added complexity of dealing with folded PMDs is not justified considering
->   that 16 GB contiguous ranges are likely to be ignored by the hardware (and
->   16k/2 levels is a niche configuration)
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
 > ---
->  arch/arm64/mm/mmu.c | 86 ++++++++++++++------
->  1 file changed, 63 insertions(+), 23 deletions(-)
+> Sending with the right subject prefix this time.
 > 
-> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-> index 0612573ef869..d0ae2f1f44fc 100644
-> --- a/arch/arm64/mm/mmu.c
-> +++ b/arch/arm64/mm/mmu.c
-> @@ -109,8 +109,10 @@ static bool pgattr_change_is_safe(u64 old, u64 new)
->  static void alloc_init_pte(pmd_t *pmd, unsigned long addr,
->  				  unsigned long end, unsigned long pfn,
->  				  pgprot_t prot,
-> -				  phys_addr_t (*pgtable_alloc)(void))
-> +				  phys_addr_t (*pgtable_alloc)(void),
-> +				  bool may_use_cont)
-
-Maybe we should invert this as single_pages_only, to keep the same
-polarity as page_mappings_only?
-
-That might make the calls to __create_pgd_mapping() in __map_memblock()
-look a little nicer, for instance.
-
->  {
-> +	pgprot_t __prot = prot;
->  	pte_t *pte;
+>  arm/gic.c         | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg | 14 +++++++++++++-
+>  lib/arm/asm/gic.h |  2 ++
+>  3 files changed, 58 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arm/gic.c b/arm/gic.c
+> index 3054d45..82f6632 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -254,6 +254,47 @@ static struct gic gicv3 = {
+>  	},
+>  };
 >  
->  	BUG_ON(pmd_sect(*pmd));
-> @@ -128,7 +130,19 @@ static void alloc_init_pte(pmd_t *pmd, unsigned long addr,
->  	do {
->  		pte_t old_pte = *pte;
->  
-> -		set_pte(pte, pfn_pte(pfn, prot));
-> +		/*
-> +		 * Set the contiguous bit for the subsequent group of PTEs if
-> +		 * its size and alignment are appropriate.
-> +		 */
-> +		if (may_use_cont &&
-> +		    ((addr | PFN_PHYS(pfn)) & ~CONT_PTE_MASK) == 0) {
-> +			if (end - addr >= CONT_PTE_SIZE)
-> +				__prot = __pgprot(pgprot_val(prot) | PTE_CONT);
-> +			else
-> +				__prot = prot;
-> +		}
+> +static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+> +{
+> +	u32 irqstat = gic_read_iar();
+> +	u32 irqnr = gic_iar_irqnr(irqstat);
 > +
-> +		set_pte(pte, pfn_pte(pfn, __prot));
->  		pfn++;
+> +	if (irqnr != GICC_INT_SPURIOUS) {
+> +		void *base;
+> +		u32 val = 1 << IPI_IRQ;
+> +
+> +		if (gic_version() == 2)
+> +			base = gicv2_dist_base();
+> +		else
+> +			base = gicv3_redist_base();
+
+Using the redistributor interface is correct with the current
+gic_enable_defaults(), because it enables affinity routing. I
+wonder if we shouldn't confirm it's enabled first though.
+
+> +
+> +		writel(val, base + GICD_ICACTIVER);
+
+For gicv3, with affinity routing enabled, the offset is
+technically named GICR_ICACTIVER0, but that's also 0x380, so
+it doesn't matter.
+
+Not sure we need the 'val' variable.
+
+> +
+> +		smp_rmb(); /* pairs with wmb in stats_reset */
+> +		++acked[smp_processor_id()];
+> +		check_irqnr(irqnr);
+> +		smp_wmb(); /* pairs with rmb in check_acked */
+> +	} else {
+> +		++spurious[smp_processor_id()];
+> +		smp_wmb();
+> +	}
+> +}
+> +
+> +static void run_active_clear_test(void)
+> +{
+> +	report_prefix_push("active");
+> +	gic_enable_defaults();
+> +#ifdef __arm__
+> +	install_exception_handler(EXCPTN_IRQ, ipi_clear_active_handler);
+> +#else
+> +	install_irq_handler(EL1H_IRQ, ipi_clear_active_handler);
+> +#endif
+> +	local_irq_enable();
+> +
+> +	ipi_test_self();
+> +	report_prefix_pop();
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>  	char pfx[8];
+> @@ -290,6 +331,8 @@ int main(int argc, char **argv)
+>  				cpu == IPI_SENDER ? ipi_send : ipi_recv);
+>  		}
+>  		ipi_recv();
+> +	} else if (strcmp(argv[1], "active") == 0) {
+> +		run_active_clear_test();
+
+test_active_clear() ?
+
+>  	} else {
+>  		report_abort("Unknown subtest '%s'", argv[1]);
+>  	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index c98658f..32d9858 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -26,7 +26,7 @@
+>  ##############################################################################
 >  
->  		/*
+>  #
+> -# Test that the configured number of processors (smp = <num>), and
+> +/# Test that the configured number of processors (smp = <num>), and
 
-While it would require more code, I think it would be better to add a
-function between alloc_init_pte() and alloc_init_pmd(), handling this in
-the usual fashion. e.g.
+stray character here
 
----->8----
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index 0eef606..2c90925 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -74,6 +74,11 @@
- #define pte_user_exec(pte)     (!(pte_val(pte) & PTE_UXN))
- #define pte_cont(pte)          (!!(pte_val(pte) & PTE_CONT))
- 
-+#define pte_cont_addr_end(addr, end)                                           \
-+({     unsigned long __boundary = ((addr) + CONT_PTE_SIZE) & CONT_PTE_MASK;    \
-+       (__boundary - 1 < (end) - 1)? __boundary: (end);                        \
-+})
-+
- #ifdef CONFIG_ARM64_HW_AFDBM
- #define pte_hw_dirty(pte)      (pte_write(pte) && !(pte_val(pte) & PTE_RDONLY))
- #else
-diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index 2aec93ab..3cee826 100644
---- a/arch/arm64/mm/mmu.c
-+++ b/arch/arm64/mm/mmu.c
-@@ -142,6 +142,32 @@ static void alloc_init_pte(pmd_t *pmd, unsigned long addr,
-        pte_clear_fixmap();
- }
- 
-+static void alloc_init_cont_pte(pmd_t *pmd, unsigned long addr,
-+                                 unsigned long end, phys_addr_t phys,
-+                                 pgprot_t prot,
-+                                 phys_addr_t (*pgtable_alloc)(void),
-+                                 bool may_use_cont)
-+{
-+       const pgprot_t cont_prot = __pgprot(pgprot_val(prot) | PTE_CONT);
-+       unsigned long next;
-+
-+       do {
-+               next = pte_cont_addr_end(addr, end);
-+
-+               /* try a contiguous mapping first */
-+               if ((((addr | next | phys) & ~CONT_PTE_MASK) == 0) &&
-+                   may_use_cont) {
-+                       alloc_init_pte(pmd, addr, next, phys, cont_prot,
-+                                      pgtable_alloc);
-+               } else {
-+                       alloc_init_pte(pmd, addr, next, phys, prot,
-+                                      pgtable_alloc);
-+               }
-+
-+               phys += next - addr;
-+       } while (addr = next, addr != end);
-+}
-+
- static void alloc_init_pmd(pud_t *pud, unsigned long addr, unsigned long end,
-                                  phys_addr_t phys, pgprot_t prot,
-                                  phys_addr_t (*pgtable_alloc)(void),
----->8----
-
-It's more code, but it follows the existing pattern, and I personally
-find it easier to follow than changing prot within the loop.
-
-Note that I've cheated and made alloc_init_pte() take a phys_addr_t
-rather than a pfn, which I think we should do anyhow for consistency. I
-have a patch for that, if you agree.
-
-Another think we *might* want to do here is pass a flags parameter that
-than separate page_mappings_only and mask_use_cont. That might also make
-things less painful in future if there are other things we need to pass
-down.
-
-That might also end up complicating matters, given the way we currently
-use debug_pagealloc_enabled() in __create_pgd_mapping() callers, so I'm
-also happy to leave that.
-
-[...]
-
-> @@ -173,7 +189,19 @@ static void alloc_init_pmd(pud_t *pud, unsigned long addr, unsigned long end,
->  		/* try section mapping first */
->  		if (((addr | next | phys) & ~SECTION_MASK) == 0 &&
->  		      !page_mappings_only) {
-> -			pmd_set_huge(pmd, phys, prot);
-> +			/*
-> +			 * Set the contiguous bit for the subsequent group of
-> +			 * PMDs if its size and alignment are appropriate.
-> +			 */
-> +			if (may_use_cont &&
-> +			    ((addr | phys) & ~CONT_PMD_MASK) == 0) {
-> +				if (end - addr >= CONT_PMD_SIZE)
-> +					__prot = __pgprot(pgprot_val(prot) |
-> +							  PTE_CONT);
-> +				else
-> +					__prot = prot;
-> +			}
-> +			pmd_set_huge(pmd, phys, __prot);
-
-As above, I think it would be better to have a alloc_init_cont_pmd()
-wrapper that iterated in CONT_PMD_SIZE chunks, so as to keep the usual
-pattern.
-
-> @@ -381,7 +418,8 @@ static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end
->  	 */
->  	__create_pgd_mapping(pgd, kernel_start, __phys_to_virt(kernel_start),
->  			     kernel_end - kernel_start, PAGE_KERNEL,
-> -			     early_pgtable_alloc, debug_pagealloc_enabled());
-> +			     early_pgtable_alloc, debug_pagealloc_enabled(),
-> +			     false);
->  }
-
-> @@ -437,7 +476,8 @@ static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
->  	BUG_ON(!PAGE_ALIGNED(size));
+>  # that the configured amount of memory (-m <MB>) are correctly setup
+>  # by the framework.
+>  #
+> @@ -92,6 +92,18 @@ smp = $MAX_SMP
+>  extra_params = -machine gic-version=3 -append 'ipi'
+>  groups = gic
 >  
->  	__create_pgd_mapping(pgd, pa_start, (unsigned long)va_start, size, prot,
-> -			     early_pgtable_alloc, debug_pagealloc_enabled());
-> +			     early_pgtable_alloc, debug_pagealloc_enabled(),
-> +			     !debug_pagealloc_enabled() && may_use_cont);
+> +[gicv2-active]
+> +file = gic.flat
+> +smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+> +extra_params = -machine gic-version=2 -append 'active'
+> +groups = gic
+> +
+> +[gicv3-active]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +extra_params = -machine gic-version=3 -append 'active'
+> +groups = gic
+> +
+>  # Test PSCI emulation
+>  [psci]
+>  file = psci.flat
+> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> index c8186f2..c688ccc 100644
+> --- a/lib/arm/asm/gic.h
+> +++ b/lib/arm/asm/gic.h
+> @@ -12,6 +12,8 @@
+>  #define GICD_TYPER			0x0004
+>  #define GICD_IGROUPR			0x0080
+>  #define GICD_ISENABLER			0x0100
+> +#define GICD_ISACTIVER			0x0300
+> +#define GICD_ICACTIVER			0x0380
+>  #define GICD_IPRIORITYR			0x0400
+>  #define GICD_SGIR			0x0f00
 >  
->  	vma->addr	= va_start;
->  	vma->phys_addr	= pa_start;
-> @@ -464,14 +504,14 @@ static void __init map_kernel(pgd_t *pgd)
->  
->  	pgprot_t text_prot = rodata_enabled ? PAGE_KERNEL_ROX : PAGE_KERNEL_EXEC;
->  
-> -	map_kernel_segment(pgd, _text, _etext, text_prot, &vmlinux_text);
-> +	map_kernel_segment(pgd, _text, _etext, text_prot, &vmlinux_text, true);
->  	map_kernel_segment(pgd, __start_rodata, __inittext_begin, PAGE_KERNEL,
-> -			   &vmlinux_rodata);
-> +			   &vmlinux_rodata, false);
->  	map_kernel_segment(pgd, __inittext_begin, __inittext_end, text_prot,
-> -			   &vmlinux_inittext);
-> +			   &vmlinux_inittext, true);
->  	map_kernel_segment(pgd, __initdata_begin, __initdata_end, PAGE_KERNEL,
-> -			   &vmlinux_initdata);
-> -	map_kernel_segment(pgd, _data, _end, PAGE_KERNEL, &vmlinux_data);
-> +			   &vmlinux_initdata, true);
-> +	map_kernel_segment(pgd, _data, _end, PAGE_KERNEL, &vmlinux_data, true);
+> -- 
+> 2.5.0
+> 
 
-It might be worth a comment somewhere as to why we have to special case
-text, rodata, and the linear alias, but otherwise this looks fine.
+Everything besides the stray character in unittests.cfg is on
+nit level, and the stray character can probably be cleaned up
+on commit, so
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 Thanks,
-Mark.
+drew
