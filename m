@@ -1,25 +1,24 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH V12 07/10] efi: print unrecognized CPER section
-Date: Mon, 06 Mar 2017 13:05:00 -0800
-Message-ID: <1488834300.2210.19.camel@perches.com>
-References: <1488833103-21082-1-git-send-email-tbaicar@codeaurora.org>
- <1488833103-21082-8-git-send-email-tbaicar@codeaurora.org>
+From: linucherian@gmail.com
+Subject: [PATCH V3 0/4] KVM: arm64: Increase number of user memslots
+Date: Tue,  7 Mar 2017 11:22:40 +0530
+Message-ID: <1488865964-17346-1-git-send-email-linucherian@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2CD8405DA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 16:03:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7731A40A86
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 00:51:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MOol1SAw9lQ4 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Mar 2017 16:03:48 -0500 (EST)
-Received: from smtprelay.hostedemail.com (smtprelay0239.hostedemail.com
- [216.40.44.239])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0048E40284
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Mar 2017 16:03:47 -0500 (EST)
-In-Reply-To: <1488833103-21082-8-git-send-email-tbaicar@codeaurora.org>
+ with ESMTP id 4jY1Qk7hTi1n for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Mar 2017 00:51:58 -0500 (EST)
+Received: from mail-pf0-f195.google.com (mail-pf0-f195.google.com
+ [209.85.192.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D42D40A7F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Mar 2017 00:51:58 -0500 (EST)
+Received: by mail-pf0-f195.google.com with SMTP id v190so9050270pfb.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Mar 2017 21:53:19 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,73 +28,36 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, devel@acpica.org, Suzuki.Poulose@arm.com, puni
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, rkrcmar@redhat.com
+Cc: Linu Cherian <linu.cherian@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, 2017-03-06 at 13:45 -0700, Tyler Baicar wrote:
-> UEFI spec allows for non-standard section in Common Platform Error
-> Record. This is defined in section N.2.3 of UEFI version 2.5.
-> 
-> Currently if the CPER section's type (UUID) does not match with
-> one of the section types that the kernel knows how to parse, the
-> section is skipped. Therefore, user is not able to see
-> such CPER data, for instance, error record of non-standard section.
-> 
-> For above mentioned case, this change prints out the raw data in
-> hex in dmesg buffer. Data length is taken from Error Data length
-> field of Generic Error Data Entry.
+From: Linu Cherian <linu.cherian@cavium.com>
 
-Hi Tyler.
 
-Trivia: (probably not worth resubmitting for this)
+v2 -> v3:
+- Added documentation for KVM_CAP_NR_MEMSLOTS
+- Removed KVM_PRIVATE_MEM_SLOTS which is unused
+- KVM_USER_MEM_SLOTS changed to 512 from 508
+ 
+v1 -> v2:
+- Enabling KVM_CAP_NR_MEMSLOTS for arm/arm64 moved to separate patch.
+- Updated commit message so that what is reported to userspace is explicit.
 
-There's a slight mismatch between logging output and commit
-message.  Now there's an ASCII block after the output.
 
-Another suggestion below.
 
-> Following is a sample output from dmesg:
-> [  115.771702] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 2
-> [  115.779042] {1}[Hardware Error]: It has been corrected by h/w and requires no further action
-> [  115.787456] {1}[Hardware Error]: event severity: corrected
-> [  115.792927] {1}[Hardware Error]:  Error 0, type: corrected
-> [  115.798415] {1}[Hardware Error]:  fru_id: 00000000-0000-0000-0000-000000000000
-> [  115.805596] {1}[Hardware Error]:  fru_text:
-> [  115.816105] {1}[Hardware Error]:  section type: d2e2621c-f936-468d-0d84-15a4ed015c8b
-> [  115.823880] {1}[Hardware Error]:  section length: 88
-> [  115.828779] {1}[Hardware Error]:   00000000: 01000001 00000002 5f434345 525f4543
-> [  115.836153] {1}[Hardware Error]:   00000010: 0000574d 00000000 00000000 00000000
-> [  115.843531] {1}[Hardware Error]:   00000020: 00000000 00000000 00000000 00000000
-> [  115.850908] {1}[Hardware Error]:   00000030: 00000000 00000000 00000000 00000000
-> [  115.858288] {1}[Hardware Error]:   00000040: fe800000 00000000 00000004 5f434345
-> [  115.865665] {1}[Hardware Error]:   00000050: 525f4543 0000574d
-[]
-> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
-[]
-> @@ -591,8 +591,16 @@ static void cper_estatus_print_section(
->  			cper_print_proc_arm(newpfx, arm_err);
->  		else
->  			goto err_section_too_small;
-> -	} else
-> -		printk("%s""section type: unknown, %pUl\n", newpfx, sec_type);
-> +	} else {
-> +		const void *unknown_err;
-> +
-> +		unknown_err = acpi_hest_generic_data_payload(gdata);
-> +		printk("%ssection type: unknown, %pUl\n", newpfx, sec_type);
-> +		printk("%ssection length: %d\n", newpfx,
-> +		       gdata->error_data_length);
+Linu Cherian (4):
+  KVM: Add documentation for KVM_CAP_NR_MEMSLOTS
+  KVM: arm/arm64: Enable KVM_CAP_NR_MEMSLOTS on arm/arm64
+  KVM: arm/arm64: Remove KVM_PRIVATE_MEM_SLOTS definition that are
+    unused
+  KVM: arm64: Increase number of user memslots to 512
 
-It might be nice to output this as
+ Documentation/virtual/kvm/api.txt | 4 ++++
+ arch/arm/include/asm/kvm_host.h   | 1 -
+ arch/arm/kvm/arm.c                | 3 +++
+ arch/arm64/include/asm/kvm_host.h | 3 +--
+ 4 files changed, 8 insertions(+), 3 deletions(-)
 
-		printk("%ssection length: %d (%#x)\n",
-		       newpfx, gdata->error_data_length, gdata->error_data_length);
-
-so it's easy to know the appropriate hex buffer length too.
-
-> +		print_hex_dump(newpfx, "", DUMP_PREFIX_OFFSET, 16, 4,
-> +			       unknown_err, gdata->error_data_length, true);
-> +	}
->  
->  	return;
->  
+-- 
+1.9.1
