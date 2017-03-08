@@ -1,24 +1,27 @@
 From: linucherian@gmail.com
-Subject: [PATCH v4 0/4] KVM: arm64: Increase number of user memslots
-Date: Wed,  8 Mar 2017 11:38:31 +0530
-Message-ID: <1488953315-22375-1-git-send-email-linucherian@gmail.com>
+Subject: [PATCH v4 3/4] KVM: arm/arm64: Remove KVM_PRIVATE_MEM_SLOTS
+ definition that are unused
+Date: Wed,  8 Mar 2017 11:38:34 +0530
+Message-ID: <1488953315-22375-4-git-send-email-linucherian@gmail.com>
+References: <1488953315-22375-1-git-send-email-linucherian@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2210F40C58
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 01:07:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B4D7B40C66
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 01:07:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RetEsFUhwyc9 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Mar 2017 01:07:42 -0500 (EST)
-Received: from mail-pf0-f193.google.com (mail-pf0-f193.google.com
- [209.85.192.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C81640C51
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 01:07:41 -0500 (EST)
-Received: by mail-pf0-f193.google.com with SMTP id o126so2624049pfb.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Mar 2017 22:09:04 -0800 (PST)
+ with ESMTP id oB4RPaX-TVDI for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Mar 2017 01:07:51 -0500 (EST)
+Received: from mail-pf0-f195.google.com (mail-pf0-f195.google.com
+ [209.85.192.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D64A40C51
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 01:07:50 -0500 (EST)
+Received: by mail-pf0-f195.google.com with SMTP id j5so2613898pfb.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Mar 2017 22:09:13 -0800 (PST)
+In-Reply-To: <1488953315-22375-1-git-send-email-linucherian@gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,31 +37,38 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Linu Cherian <linu.cherian@cavium.com>
 
-v3 -> v4:
-- Add missing commit messages in patches 1 and 3
+arm/arm64 architecture doesnt use private memslots, hence removing
+KVM_PRIVATE_MEM_SLOTS macro definition.
 
-v2 -> v3:
-- Added documentation for KVM_CAP_NR_MEMSLOTS
-- Removed KVM_PRIVATE_MEM_SLOTS which is unused
-- KVM_USER_MEM_SLOTS changed to 512 from 508
- 
-v1 -> v2:
-- Enabling KVM_CAP_NR_MEMSLOTS for arm/arm64 moved to separate patch.
-- Updated commit message so that what is reported to userspace is explicit.
-
-
-Linu Cherian (4):
-  KVM: Add documentation for KVM_CAP_NR_MEMSLOTS
-  KVM: arm/arm64: Enable KVM_CAP_NR_MEMSLOTS on arm/arm64
-  KVM: arm/arm64: Remove KVM_PRIVATE_MEM_SLOTS definition that are
-    unused
-  KVM: arm64: Increase number of user memslots to 512
-
- Documentation/virtual/kvm/api.txt | 4 ++++
+Signed-off-by: Linu Cherian <linu.cherian@cavium.com>
+---
  arch/arm/include/asm/kvm_host.h   | 1 -
- arch/arm/kvm/arm.c                | 3 +++
- arch/arm64/include/asm/kvm_host.h | 3 +--
- 4 files changed, 8 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 1 -
+ 2 files changed, 2 deletions(-)
 
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index d5423ab..b9b39f0 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -30,7 +30,6 @@
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+ 
+ #define KVM_USER_MEM_SLOTS 32
+-#define KVM_PRIVATE_MEM_SLOTS 4
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+ #define KVM_HAVE_ONE_REG
+ #define KVM_HALT_POLL_NS_DEFAULT 500000
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e505038..a0409b0 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -31,7 +31,6 @@
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+ 
+ #define KVM_USER_MEM_SLOTS 32
+-#define KVM_PRIVATE_MEM_SLOTS 4
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+ #define KVM_HALT_POLL_NS_DEFAULT 500000
+ 
 -- 
 1.9.1
