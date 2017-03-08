@@ -1,30 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [kvm-unit-tests PATCH] arm/arm64: gic: Test changing active
- state of interrupts
-Date: Wed, 8 Mar 2017 03:45:55 -0800
-Message-ID: <20170308114555.GB109453@lvm>
-References: <1488813369-87368-1-git-send-email-christoffer.dall@linaro.org>
- <20170307165811.a3c6tar7qlen4n2i@hawk.localdomain>
- <20170307193432.GC18298@potion>
+Subject: Re: [PATCH 5/5] KVM: arm/arm64: allow userspace to set MPIDR
+Date: Wed, 8 Mar 2017 05:19:07 -0800
+Message-ID: <20170308131907.GA109908@lvm>
+References: <20170227175504.15751-1-drjones@redhat.com>
+ <20170227175504.15751-6-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC5C940C55
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 06:44:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B922440064
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 08:17:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nkrHgY9-6eTa for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Mar 2017 06:44:36 -0500 (EST)
-Received: from mail-wr0-f176.google.com (mail-wr0-f176.google.com
- [209.85.128.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F33E40B5B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 06:44:35 -0500 (EST)
-Received: by mail-wr0-f176.google.com with SMTP id u48so21486529wrc.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Mar 2017 03:45:58 -0800 (PST)
+ with ESMTP id rhTRX2gF7Cv9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Mar 2017 08:17:47 -0500 (EST)
+Received: from mail-wr0-f180.google.com (mail-wr0-f180.google.com
+ [209.85.128.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 60E4540019
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 08:17:47 -0500 (EST)
+Received: by mail-wr0-f180.google.com with SMTP id g10so23122187wrg.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Mar 2017 05:19:10 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <20170307193432.GC18298@potion>
+In-Reply-To: <20170227175504.15751-6-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,106 +32,329 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, ashoks@broadcom.com, imammedo@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gVHVlLCBNYXIgMDcsIDIwMTcgYXQgMDg6MzQ6MzNQTSArMDEwMCwgUmFkaW0gS3LEjW3DocWZ
-IHdyb3RlOgo+IDIwMTctMDMtMDcgMTc6NTgrMDEwMCwgQW5kcmV3IEpvbmVzOgo+ID4gT24gTW9u
-LCBNYXIgMDYsIDIwMTcgYXQgMDc6MTY6MDlBTSAtMDgwMCwgQ2hyaXN0b2ZmZXIgRGFsbCB3cm90
-ZToKPiA+ID4gRnJvbTogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2RhbGxAbGluYXJvLm9yZz4KPiA+ID4g
-Cj4gPiA+IFdlIGZvdW5kIGEgZGVhZGxvY2sgd2hlbiBjaGFuZ2luZyB0aGUgYWN0aXZlIHN0YXRl
-IG9mIGFuIGludGVycnVwdCB3aGlsZQo+ID4gPiB0aGUgaW50ZXJydXB0IGlzIHF1ZXVlZCBvbiB0
-aGUgTFIgb2YgdGhlIHJ1bm5pbmcgVkNQVS4KPiA+ID4gCj4gPiA+IERlZmVuZCBLVk0gYWdhaW5z
-dCB0aGlzIGJ1ZyBpbiB0aGUgZnV0dXJlIG5vdyB3aGVuIHdlJ3ZlIGludHJvZHVjZWQgYQo+ID4g
-PiBmaXguCj4gPiA+IAo+ID4gPiBTaWduZWQtb2ZmLWJ5OiBDaHJpc3RvZmZlciBEYWxsIDxjZGFs
-bEBsaW5hcm8ub3JnPgo+ID4gPiAtLS0KPiA+ID4gU2VuZGluZyB3aXRoIHRoZSByaWdodCBzdWJq
-ZWN0IHByZWZpeCB0aGlzIHRpbWUuCj4gPiA+IAo+ID4gPiAgYXJtL2dpYy5jICAgICAgICAgfCA0
-MyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCj4gPiA+ICBhcm0v
-dW5pdHRlc3RzLmNmZyB8IDE0ICsrKysrKysrKysrKystCj4gPiA+ICBsaWIvYXJtL2FzbS9naWMu
-aCB8ICAyICsrCj4gPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDU4IGluc2VydGlvbnMoKyksIDEgZGVs
-ZXRpb24oLSkKPiA+ID4gCj4gPiA+IGRpZmYgLS1naXQgYS9hcm0vZ2ljLmMgYi9hcm0vZ2ljLmMK
-PiA+ID4gaW5kZXggMzA1NGQ0NS4uODJmNjYzMiAxMDA2NDQKPiA+ID4gLS0tIGEvYXJtL2dpYy5j
-Cj4gPiA+ICsrKyBiL2FybS9naWMuYwo+ID4gPiBAQCAtMjU0LDYgKzI1NCw0NyBAQCBzdGF0aWMg
-c3RydWN0IGdpYyBnaWN2MyA9IHsKPiA+ID4gIAl9LAo+ID4gPiAgfTsKPiA+ID4gIAo+ID4gPiAr
-c3RhdGljIHZvaWQgaXBpX2NsZWFyX2FjdGl2ZV9oYW5kbGVyKHN0cnVjdCBwdF9yZWdzICpyZWdz
-IF9fdW51c2VkKQo+ID4gPiArewo+ID4gPiArCXUzMiBpcnFzdGF0ID0gZ2ljX3JlYWRfaWFyKCk7
-Cj4gPiA+ICsJdTMyIGlycW5yID0gZ2ljX2lhcl9pcnFucihpcnFzdGF0KTsKPiA+ID4gKwo+ID4g
-PiArCWlmIChpcnFuciAhPSBHSUNDX0lOVF9TUFVSSU9VUykgewo+ID4gPiArCQl2b2lkICpiYXNl
-Owo+ID4gPiArCQl1MzIgdmFsID0gMSA8PCBJUElfSVJROwo+ID4gPiArCj4gPiA+ICsJCWlmIChn
-aWNfdmVyc2lvbigpID09IDIpCj4gPiA+ICsJCQliYXNlID0gZ2ljdjJfZGlzdF9iYXNlKCk7Cj4g
-PiA+ICsJCWVsc2UKPiA+ID4gKwkJCWJhc2UgPSBnaWN2M19yZWRpc3RfYmFzZSgpOwo+ID4gCj4g
-PiBVc2luZyB0aGUgcmVkaXN0cmlidXRvciBpbnRlcmZhY2UgaXMgY29ycmVjdCB3aXRoIHRoZSBj
-dXJyZW50Cj4gPiBnaWNfZW5hYmxlX2RlZmF1bHRzKCksIGJlY2F1c2UgaXQgZW5hYmxlcyBhZmZp
-bml0eSByb3V0aW5nLiBJCj4gPiB3b25kZXIgaWYgd2Ugc2hvdWxkbid0IGNvbmZpcm0gaXQncyBl
-bmFibGVkIGZpcnN0IHRob3VnaC4KPiA+IAo+ID4gPiArCj4gPiA+ICsJCXdyaXRlbCh2YWwsIGJh
-c2UgKyBHSUNEX0lDQUNUSVZFUik7Cj4gPiAKPiA+IEZvciBnaWN2Mywgd2l0aCBhZmZpbml0eSBy
-b3V0aW5nIGVuYWJsZWQsIHRoZSBvZmZzZXQgaXMKPiA+IHRlY2huaWNhbGx5IG5hbWVkIEdJQ1Jf
-SUNBQ1RJVkVSMCwgYnV0IHRoYXQncyBhbHNvIDB4MzgwLCBzbwo+ID4gaXQgZG9lc24ndCBtYXR0
-ZXIuCj4gPiAKPiA+IE5vdCBzdXJlIHdlIG5lZWQgdGhlICd2YWwnIHZhcmlhYmxlLgo+ID4gCj4g
-PiA+ICsKPiA+ID4gKwkJc21wX3JtYigpOyAvKiBwYWlycyB3aXRoIHdtYiBpbiBzdGF0c19yZXNl
-dCAqLwo+ID4gPiArCQkrK2Fja2VkW3NtcF9wcm9jZXNzb3JfaWQoKV07Cj4gPiA+ICsJCWNoZWNr
-X2lycW5yKGlycW5yKTsKPiA+ID4gKwkJc21wX3dtYigpOyAvKiBwYWlycyB3aXRoIHJtYiBpbiBj
-aGVja19hY2tlZCAqLwo+ID4gPiArCX0gZWxzZSB7Cj4gPiA+ICsJCSsrc3B1cmlvdXNbc21wX3By
-b2Nlc3Nvcl9pZCgpXTsKPiA+ID4gKwkJc21wX3dtYigpOwo+ID4gPiArCX0KPiA+ID4gK30KPiA+
-ID4gKwo+ID4gPiArc3RhdGljIHZvaWQgcnVuX2FjdGl2ZV9jbGVhcl90ZXN0KHZvaWQpCj4gPiA+
-ICt7Cj4gPiA+ICsJcmVwb3J0X3ByZWZpeF9wdXNoKCJhY3RpdmUiKTsKPiA+ID4gKwlnaWNfZW5h
-YmxlX2RlZmF1bHRzKCk7Cj4gPiA+ICsjaWZkZWYgX19hcm1fXwo+ID4gPiArCWluc3RhbGxfZXhj
-ZXB0aW9uX2hhbmRsZXIoRVhDUFROX0lSUSwgaXBpX2NsZWFyX2FjdGl2ZV9oYW5kbGVyKTsKPiA+
-ID4gKyNlbHNlCj4gPiA+ICsJaW5zdGFsbF9pcnFfaGFuZGxlcihFTDFIX0lSUSwgaXBpX2NsZWFy
-X2FjdGl2ZV9oYW5kbGVyKTsKPiA+ID4gKyNlbmRpZgo+ID4gPiArCWxvY2FsX2lycV9lbmFibGUo
-KTsKPiA+ID4gKwo+ID4gPiArCWlwaV90ZXN0X3NlbGYoKTsKPiA+ID4gKwlyZXBvcnRfcHJlZml4
-X3BvcCgpOwo+ID4gPiArfQo+ID4gPiArCj4gPiA+ICBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
-KmFyZ3YpCj4gPiA+ICB7Cj4gPiA+ICAJY2hhciBwZnhbOF07Cj4gPiA+IEBAIC0yOTAsNiArMzMx
-LDggQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQo+ID4gPiAgCQkJCWNwdSA9PSBJ
-UElfU0VOREVSID8gaXBpX3NlbmQgOiBpcGlfcmVjdik7Cj4gPiA+ICAJCX0KPiA+ID4gIAkJaXBp
-X3JlY3YoKTsKPiA+ID4gKwl9IGVsc2UgaWYgKHN0cmNtcChhcmd2WzFdLCAiYWN0aXZlIikgPT0g
-MCkgewo+ID4gPiArCQlydW5fYWN0aXZlX2NsZWFyX3Rlc3QoKTsKPiA+IAo+ID4gdGVzdF9hY3Rp
-dmVfY2xlYXIoKSA/Cj4gPiAKPiA+ID4gIAl9IGVsc2Ugewo+ID4gPiAgCQlyZXBvcnRfYWJvcnQo
-IlVua25vd24gc3VidGVzdCAnJXMnIiwgYXJndlsxXSk7Cj4gPiA+ICAJfQo+ID4gPiBkaWZmIC0t
-Z2l0IGEvYXJtL3VuaXR0ZXN0cy5jZmcgYi9hcm0vdW5pdHRlc3RzLmNmZwo+ID4gPiBpbmRleCBj
-OTg2NThmLi4zMmQ5ODU4IDEwMDY0NAo+ID4gPiAtLS0gYS9hcm0vdW5pdHRlc3RzLmNmZwo+ID4g
-PiArKysgYi9hcm0vdW5pdHRlc3RzLmNmZwo+ID4gPiBAQCAtMjYsNyArMjYsNyBAQAo+ID4gPiAg
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjCj4gPiA+ICAKPiA+ID4gICMKPiA+ID4gLSMgVGVzdCB0aGF0
-IHRoZSBjb25maWd1cmVkIG51bWJlciBvZiBwcm9jZXNzb3JzIChzbXAgPSA8bnVtPiksIGFuZAo+
-ID4gPiArLyMgVGVzdCB0aGF0IHRoZSBjb25maWd1cmVkIG51bWJlciBvZiBwcm9jZXNzb3JzIChz
-bXAgPSA8bnVtPiksIGFuZAo+ID4gCj4gPiBzdHJheSBjaGFyYWN0ZXIgaGVyZQo+ID4gCj4gPiA+
-ICAjIHRoYXQgdGhlIGNvbmZpZ3VyZWQgYW1vdW50IG9mIG1lbW9yeSAoLW0gPE1CPikgYXJlIGNv
-cnJlY3RseSBzZXR1cAo+ID4gPiAgIyBieSB0aGUgZnJhbWV3b3JrLgo+ID4gPiAgIwo+ID4gPiBA
-QCAtOTIsNiArOTIsMTggQEAgc21wID0gJE1BWF9TTVAKPiA+ID4gIGV4dHJhX3BhcmFtcyA9IC1t
-YWNoaW5lIGdpYy12ZXJzaW9uPTMgLWFwcGVuZCAnaXBpJwo+ID4gPiAgZ3JvdXBzID0gZ2ljCj4g
-PiA+ICAKPiA+ID4gK1tnaWN2Mi1hY3RpdmVdCj4gPiA+ICtmaWxlID0gZ2ljLmZsYXQKPiA+ID4g
-K3NtcCA9ICQoKCgkTUFYX1NNUCA8IDgpPyRNQVhfU01QOjgpKQo+ID4gPiArZXh0cmFfcGFyYW1z
-ID0gLW1hY2hpbmUgZ2ljLXZlcnNpb249MiAtYXBwZW5kICdhY3RpdmUnCj4gPiA+ICtncm91cHMg
-PSBnaWMKPiA+ID4gKwo+ID4gPiArW2dpY3YzLWFjdGl2ZV0KPiA+ID4gK2ZpbGUgPSBnaWMuZmxh
-dAo+ID4gPiArc21wID0gJE1BWF9TTVAKPiA+ID4gK2V4dHJhX3BhcmFtcyA9IC1tYWNoaW5lIGdp
-Yy12ZXJzaW9uPTMgLWFwcGVuZCAnYWN0aXZlJwo+ID4gPiArZ3JvdXBzID0gZ2ljCj4gPiA+ICsK
-PiA+ID4gICMgVGVzdCBQU0NJIGVtdWxhdGlvbgo+ID4gPiAgW3BzY2ldCj4gPiA+ICBmaWxlID0g
-cHNjaS5mbGF0Cj4gPiA+IGRpZmYgLS1naXQgYS9saWIvYXJtL2FzbS9naWMuaCBiL2xpYi9hcm0v
-YXNtL2dpYy5oCj4gPiA+IGluZGV4IGM4MTg2ZjIuLmM2ODhjY2MgMTAwNjQ0Cj4gPiA+IC0tLSBh
-L2xpYi9hcm0vYXNtL2dpYy5oCj4gPiA+ICsrKyBiL2xpYi9hcm0vYXNtL2dpYy5oCj4gPiA+IEBA
-IC0xMiw2ICsxMiw4IEBACj4gPiA+ICAjZGVmaW5lIEdJQ0RfVFlQRVIJCQkweDAwMDQKPiA+ID4g
-ICNkZWZpbmUgR0lDRF9JR1JPVVBSCQkJMHgwMDgwCj4gPiA+ICAjZGVmaW5lIEdJQ0RfSVNFTkFC
-TEVSCQkJMHgwMTAwCj4gPiA+ICsjZGVmaW5lIEdJQ0RfSVNBQ1RJVkVSCQkJMHgwMzAwCj4gPiA+
-ICsjZGVmaW5lIEdJQ0RfSUNBQ1RJVkVSCQkJMHgwMzgwCj4gPiA+ICAjZGVmaW5lIEdJQ0RfSVBS
-SU9SSVRZUgkJCTB4MDQwMAo+ID4gPiAgI2RlZmluZSBHSUNEX1NHSVIJCQkweDBmMDAKPiA+ID4g
-IAo+ID4gPiAtLSAKPiA+ID4gMi41LjAKPiA+ID4gCj4gPiAKPiA+IEV2ZXJ5dGhpbmcgYmVzaWRl
-cyB0aGUgc3RyYXkgY2hhcmFjdGVyIGluIHVuaXR0ZXN0cy5jZmcgaXMgb24KPiA+IG5pdCBsZXZl
-bCwgYW5kIHRoZSBzdHJheSBjaGFyYWN0ZXIgY2FuIHByb2JhYmx5IGJlIGNsZWFuZWQgdXAKPiA+
-IG9uIGNvbW1pdCwgc28KPiA+IAo+ID4gUmV2aWV3ZWQtYnk6IEFuZHJldyBKb25lcyA8ZHJqb25l
-c0ByZWRoYXQuY29tPgo+IAo+IENocmlzdG9mZmVyLCBJIGhhdmUgZml4ZWQgdGhlIHNsYXNoIGlu
-IGEgbG9jYWwgcmVwbywgcmVhZHkgdG8gcHVzaCBpZgo+IHlvdSBkbyBub3Qgd2FudCBhbnkgb3Ro
-ZXIgY2hhbmdlcy4KPiAKPiBCdHcuIGNhbiB0aGUgaG9zdCBiZSByZWJvb3RlZCB3aXRob3V0IG1h
-Z2ljLVN5c1JxIGFmdGVyIGhpdHRpbmcgdGhlIGJ1Zz8KPiAoSSB3YXMgd29uZGVyaW5nIGlmIHRo
-ZSBidWcgd2FzIGJhZCBlbm91Z2ggZm9yIHRoZSBub2RlZmF1bHQgZ3JvdXAsIGJ1dAo+ICBEcmV3
-IGRpZG4ndCBwb2ludCBpdCBvdXQgYW5kIHRoZSBob3N0IHNob3VsZCBzdGlsbCBiZSB1c2VhYmxl
-Cj4gIGFmdGVyd2FyZHMgLi4uKQo+IAoKR29vZCBxdWVzdGlvbi4gIEkganVzdCB0ZXN0ZWQgdGhp
-cyB3aXRoIHRoZSBicm9rZW4ga2VybmVsLCBhbmQgd2hpbGUgeW91CmRvIGhhdmUgYSB0aHJlYWQg
-dGhhdCBkb2Vzbid0IGV4aXQgYW5kIHNwaW5zIGEgYml0LCB0aGVuIHlvdXIgaG9zdCBpcwpjb21w
-bGV0ZWx5IHVzYWJsZSBhbmQgY2FuIGJlIG5vcm1hbGx5IHJlYm9vdGVkLCBzbyBJIHRoaW5rIHRo
-aXMgaXMKYWN0dWFsbHkgb2sgdG8gbGVhdmUgYXMgYSBkZWZhdWx0LCBidXQgaXQncyB1cCB0byB5
-b3UuCgpUaGFua3MsCi1DaHJpc3RvZmZlcgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
-bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
-dm1hcm0K
+On Mon, Feb 27, 2017 at 06:55:04PM +0100, Andrew Jones wrote:
+> QEMU would already prefer having control over the vcpu MPIDRs
+> in order to correctly map vcpus to virtual numa nodes without
+> having to first instantiate the vcpus. Also, when virtual cpu
+> topologies are eventually describable, QEMU may need to adjust
+> the MPIDR to reflect that topology. Finally, we need to cache
+> the MPIDR in the vcpu structure to fix potential races that can
+> arise between vcpu reset and the extraction of the MPIDR from
+> the sys-reg array. So, while we're tinkering with MPIDR to
+> provide it a cache, then we might as well extend its capabilities
+> to allowing user setting too.
+> 
+> Cc: Ashok Kumar <ashoks@broadcom.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arch/arm/include/asm/kvm_emulate.h   |  2 +-
+>  arch/arm/include/asm/kvm_host.h      |  3 ++
+>  arch/arm/kvm/arm.c                   |  1 +
+>  arch/arm/kvm/coproc.c                | 61 +++++++++++++++++++++++++++++-----
+>  arch/arm/kvm/coproc.h                |  6 ++++
+>  arch/arm64/include/asm/kvm_emulate.h |  2 +-
+>  arch/arm64/include/asm/kvm_host.h    |  3 ++
+>  arch/arm64/kvm/sys_regs.c            | 64 ++++++++++++++++++++++++++++--------
+>  include/uapi/linux/kvm.h             |  1 +
+>  9 files changed, 119 insertions(+), 24 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+> index 9a8a45aaf19a..1b922de46785 100644
+> --- a/arch/arm/include/asm/kvm_emulate.h
+> +++ b/arch/arm/include/asm/kvm_emulate.h
+> @@ -213,7 +213,7 @@ static inline u32 kvm_vcpu_hvc_get_imm(struct kvm_vcpu *vcpu)
+>  
+>  static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+>  {
+> -	return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK;
+> +	return vcpu->arch.vmpidr & MPIDR_HWID_BITMASK;
+>  }
+>  
+>  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 73f61773e9c2..6427cac77204 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -151,6 +151,9 @@ struct kvm_vcpu_arch {
+>  	/* The CPU type we expose to the VM */
+>  	u32 midr;
+>  
+> +	/* vcpu MPIDR */
+> +	u32 vmpidr;
+> +
+>  	/* HYP trapping configuration */
+>  	u32 hcr;
+>  
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index aa68354a0bf8..899528b884d9 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -207,6 +207,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_READONLY_MEM:
+>  	case KVM_CAP_MP_STATE:
+>  	case KVM_CAP_IMMEDIATE_EXIT:
+> +	case KVM_CAP_ARM_USER_MPIDR:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_COALESCED_MMIO:
+> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+> index 3e5e4194ef86..30d35dd407a6 100644
+> --- a/arch/arm/kvm/coproc.c
+> +++ b/arch/arm/kvm/coproc.c
+> @@ -99,16 +99,55 @@ int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	return 1;
+>  }
+>  
+> -static void reset_mpidr(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
+> +static int set_mpidr(struct kvm_vcpu *vcpu, const struct coproc_reg *rd,
+> +		     const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> +	struct kvm_vcpu *v;
+> +	__u32 mpidr;
+> +	int i;
+> +
+> +	if (copy_from_user(&mpidr, uaddr, KVM_REG_SIZE(reg->id)))
+> +		return -EFAULT;
+> +
+>  	/*
+> -	 * Compute guest MPIDR. We build a virtual cluster out of the
+> -	 * vcpu_id, but we read the 'U' bit from the underlying
+> -	 * hardware directly.
+> +	 * All ARMv7 processors that support KVM include the
+> +	 * Multiprocessing Extensions. Furthermore, without at
+> +	 * least one bit set in the MPIDR we won't be able to
+> +	 * distinguish a user set MPIDR from an unset MPIDR in
+> +	 * reset_mpidr. Thus we force bit 31 on.
+>  	 */
+> -	vcpu_cp15(vcpu, c0_MPIDR) = ((read_cpuid_mpidr() & MPIDR_SMP_BITMASK) |
+> -				     ((vcpu->vcpu_id >> 2) << MPIDR_LEVEL_BITS) |
+> -				     (vcpu->vcpu_id & 3));
+> +	mpidr |= (1UL << 31);
+> +
+> +	/* Ensure flag consistency and ID uniqueness */
+> +	kvm_for_each_vcpu(i, v, vcpu->kvm) {
+> +		if (v == vcpu)
+> +			continue;
+> +		if (((v->arch.vmpidr | mpidr) & MPIDR_SMP_BITMASK) != MPIDR_SMP_VALUE
+> +		    || ((mpidr & MPIDR_MT_BITMASK) && !(v->arch.vmpidr & MPIDR_MT_BITMASK))
+> +		    || v->arch.vmpidr == mpidr)
+> +			return -EINVAL;
+> +	}
+> +
+> +	vcpu->arch.vmpidr = mpidr;
+> +	vcpu_cp15(vcpu, c0_MPIDR) = mpidr;
+
+Isn't this all super racy?  What prevents two VCPUs from getting the
+same MPIDR at the same time?
+
+How do you support initializing the MPIDRs with a default value
+(existing ABI that we must maintain), but then making vcpu 1 have the
+mpidr of vcpu 0 and vice versa?
+
+I think you also need to make sure that you can only modify the MPIDR
+before actually running the VCPU.
+
+You can take a look at kvm_vgic_create at how we check has_run_once for
+inspiration.
+
+Thanks,
+-Christoffer
+
+> +
+> +	return 0;
+> +}
+> +
+> +static void reset_mpidr(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
+> +{
+> +	if (!vcpu->arch.vmpidr) {
+> +		/*
+> +		 * Compute guest MPIDR. We build a virtual cluster out of the
+> +		 * vcpu_id, but we read the 'U' bit from the underlying
+> +		 * hardware directly.
+> +		 */
+> +		u32 mpidr = ((read_cpuid_mpidr() & MPIDR_SMP_BITMASK) |
+> +			     ((vcpu->vcpu_id >> 2) << MPIDR_LEVEL_BITS) |
+> +			     (vcpu->vcpu_id & 3));
+> +		vcpu->arch.vmpidr = mpidr;
+> +	}
+> +	vcpu_cp15(vcpu, c0_MPIDR) = vcpu->arch.vmpidr;
+>  }
+>  
+>  /* TRM entries A7:4.3.31 A15:4.3.28 - RO WI */
+> @@ -300,7 +339,7 @@ static bool pm_fake(struct kvm_vcpu *vcpu,
+>  static const struct coproc_reg cp15_regs[] = {
+>  	/* MPIDR: we use VMPIDR for guest access. */
+>  	{ CRn( 0), CRm( 0), Op1( 0), Op2( 5), is32,
+> -			NULL, reset_mpidr, c0_MPIDR },
+> +			NULL, reset_mpidr, c0_MPIDR, 0, NULL, set_mpidr },
+>  
+>  	/* CSSELR: swapped by interrupt.S. */
+>  	{ CRn( 0), CRm( 0), Op1( 2), Op2( 0), is32,
+> @@ -1072,6 +1111,9 @@ int kvm_arm_coproc_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	if (!r)
+>  		return get_invariant_cp15(reg->id, uaddr);
+>  
+> +	if (r->get_user)
+> +		return (r->get_user)(vcpu, r, reg, uaddr);
+> +
+>  	ret = -ENOENT;
+>  	if (KVM_REG_SIZE(reg->id) == 8) {
+>  		u64 val;
+> @@ -1101,6 +1143,9 @@ int kvm_arm_coproc_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	if (!r)
+>  		return set_invariant_cp15(reg->id, uaddr);
+>  
+> +	if (r->set_user)
+> +		return (r->set_user)(vcpu, r, reg, uaddr);
+> +
+>  	ret = -ENOENT;
+>  	if (KVM_REG_SIZE(reg->id) == 8) {
+>  		u64 val;
+> diff --git a/arch/arm/kvm/coproc.h b/arch/arm/kvm/coproc.h
+> index eef1759c2b65..7107f19cac5e 100644
+> --- a/arch/arm/kvm/coproc.h
+> +++ b/arch/arm/kvm/coproc.h
+> @@ -52,6 +52,12 @@ struct coproc_reg {
+>  
+>  	/* Value (usually reset value) */
+>  	u64 val;
+> +
+> +	/* Custom get/set_user functions, fallback to generic if NULL */
+> +	int (*get_user)(struct kvm_vcpu *vcpu, const struct coproc_reg *rd,
+> +			const struct kvm_one_reg *reg, void __user *uaddr);
+> +	int (*set_user)(struct kvm_vcpu *vcpu, const struct coproc_reg *rd,
+> +			const struct kvm_one_reg *reg, void __user *uaddr);
+>  };
+>  
+>  static inline void print_cp_instr(const struct coproc_params *p)
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index f5ea0ba70f07..c138bb15b507 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -242,7 +242,7 @@ static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
+>  
+>  static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+>  {
+> -	return vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+> +	return vcpu->arch.vmpidr_el2 & MPIDR_HWID_BITMASK;
+>  }
+>  
+>  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index d1e4b5d962eb..31aed40a3724 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -198,6 +198,9 @@ typedef struct kvm_cpu_context kvm_cpu_context_t;
+>  struct kvm_vcpu_arch {
+>  	struct kvm_cpu_context ctxt;
+>  
+> +	/* vcpu MPIDR */
+> +	u64 vmpidr_el2;
+> +
+>  	/* HYP configuration */
+>  	u64 hcr_el2;
+>  	u32 mdcr_el2;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 0e26f8c2b56f..2b558ac034ce 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -429,21 +429,57 @@ static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  	vcpu_sys_reg(vcpu, AMAIR_EL1) = read_sysreg(amair_el1);
+>  }
+>  
+> -static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +static int set_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> +		     const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	u64 mpidr;
+> +	struct kvm_vcpu *v;
+> +	__u64 mpidr;
+> +	int i;
+>  
+> -	/*
+> -	 * Map the vcpu_id into the first three affinity level fields of
+> -	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
+> -	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
+> -	 * of the GICv3 to be able to address each CPU directly when
+> -	 * sending IPIs.
+> -	 */
+> -	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
+> -	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
+> -	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
+> -	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
+> +	if (copy_from_user(&mpidr, uaddr, KVM_REG_SIZE(reg->id)))
+> +		return -EFAULT;
+> +
+> +	/* Ensure RES1 bits are set */
+> +	mpidr |= (1ULL << 31);
+> +
+> +	/* Ensure no RES0 bits are set */
+> +	if ((mpidr & (GENMASK_ULL(63, 40) | GENMASK(29, 25))) ||
+> +	    (vcpu_mode_is_32bit(vcpu) && (mpidr & GENMASK_ULL(39, 32))))
+> +		return -EINVAL;
+> +
+> +	/* Ensure flag consistency and ID uniqueness */
+> +	kvm_for_each_vcpu(i, v, vcpu->kvm) {
+> +		if (v == vcpu)
+> +			continue;
+> +		if (((v->arch.vmpidr_el2 | mpidr) & MPIDR_UP_BITMASK)
+> +		    || ((mpidr & MPIDR_MT_BITMASK) && !(v->arch.vmpidr_el2 & MPIDR_MT_BITMASK))
+> +		    || v->arch.vmpidr_el2 == mpidr)
+> +			return -EINVAL;
+> +	}
+> +
+> +	vcpu->arch.vmpidr_el2 = mpidr;
+> +	vcpu_sys_reg(vcpu, MPIDR_EL1) = mpidr;
+> +
+> +	return 0;
+> +}
+> +
+> +static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	if (!vcpu->arch.vmpidr_el2) {
+> +		/*
+> +		 * Userspace didn't provide us an MPIDR, so we construct one
+> +		 * from the vcpu_id by mapping it into the first three affinity
+> +		 * levels. We limit the number of VCPUs in level 0 due to a
+> +		 * limitation of 16 CPUs in that level in the ICC_SGIxR
+> +		 * registers of the GICv3, which are used to address each CPU
+> +		 * directly when sending IPIs.
+> +		 */
+> +		u64 mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
+> +		mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
+> +		mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
+> +		vcpu->arch.vmpidr_el2 = (1ULL << 31) | mpidr;
+> +	}
+> +	vcpu_sys_reg(vcpu, MPIDR_EL1) = vcpu->arch.vmpidr_el2;
+>  }
+>  
+>  static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> @@ -961,7 +997,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	/* MPIDR_EL1 */
+>  	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b101),
+> -	  NULL, reset_mpidr, MPIDR_EL1 },
+> +	  NULL, reset_mpidr, MPIDR_EL1, 0, NULL, set_mpidr },
+>  	/* SCTLR_EL1 */
+>  	{ Op0(0b11), Op1(0b000), CRn(0b0001), CRm(0b0000), Op2(0b000),
+>  	  access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index f51d5082a377..c20b58fe84cd 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -883,6 +883,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_PPC_MMU_RADIX 134
+>  #define KVM_CAP_PPC_MMU_HASH_V3 135
+>  #define KVM_CAP_IMMEDIATE_EXIT 136
+> +#define KVM_CAP_ARM_USER_MPIDR 137
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> -- 
+> 2.9.3
+> 
