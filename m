@@ -1,27 +1,26 @@
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] arm/arm64: gic: Test changing active
- state of interrupts
-Date: Wed, 8 Mar 2017 16:40:21 +0100
-Message-ID: <20170308154020.GD18298@potion>
-References: <1488813369-87368-1-git-send-email-christoffer.dall@linaro.org>
- <20170307165811.a3c6tar7qlen4n2i@hawk.localdomain>
- <20170307193432.GC18298@potion> <20170308114555.GB109453@lvm>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH V12 10/10] arm/arm64: KVM: add guest SEA support
+Date: Wed, 08 Mar 2017 16:09:06 +0000
+Message-ID: <58C02CA2.4030601@arm.com>
+References: <1488833103-21082-1-git-send-email-tbaicar@codeaurora.org>
+ <1488833103-21082-11-git-send-email-tbaicar@codeaurora.org>
+ <58BE9E14.6040208@arm.com>
+ <783e18ac-9495-aaf6-8fbd-5a48c0b68f5b@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22E7D4095A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 10:39:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7620940A80
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 11:08:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BIkjFhQm1jEA for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Mar 2017 10:39:02 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F302140905
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 10:39:01 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20170308114555.GB109453@lvm>
+ with ESMTP id 12miVA4cNO6K for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Mar 2017 11:08:04 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E060140187
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 11:08:03 -0500 (EST)
+In-Reply-To: <783e18ac-9495-aaf6-8fbd-5a48c0b68f5b@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,113 +30,108 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+To: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-MjAxNy0wMy0wOCAwMzo0NS0wODAwLCBDaHJpc3RvZmZlciBEYWxsOgo+IE9uIFR1ZSwgTWFyIDA3
-LCAyMDE3IGF0IDA4OjM0OjMzUE0gKzAxMDAsIFJhZGltIEtyxI1tw6HFmSB3cm90ZToKPiA+IDIw
-MTctMDMtMDcgMTc6NTgrMDEwMCwgQW5kcmV3IEpvbmVzOgo+ID4gPiBPbiBNb24sIE1hciAwNiwg
-MjAxNyBhdCAwNzoxNjowOUFNIC0wODAwLCBDaHJpc3RvZmZlciBEYWxsIHdyb3RlOgo+ID4gPiA+
-IEZyb206IENocmlzdG9mZmVyIERhbGwgPGNkYWxsQGxpbmFyby5vcmc+Cj4gPiA+ID4gCj4gPiA+
-ID4gV2UgZm91bmQgYSBkZWFkbG9jayB3aGVuIGNoYW5naW5nIHRoZSBhY3RpdmUgc3RhdGUgb2Yg
-YW4gaW50ZXJydXB0IHdoaWxlCj4gPiA+ID4gdGhlIGludGVycnVwdCBpcyBxdWV1ZWQgb24gdGhl
-IExSIG9mIHRoZSBydW5uaW5nIFZDUFUuCj4gPiA+ID4gCj4gPiA+ID4gRGVmZW5kIEtWTSBhZ2Fp
-bnN0IHRoaXMgYnVnIGluIHRoZSBmdXR1cmUgbm93IHdoZW4gd2UndmUgaW50cm9kdWNlZCBhCj4g
-PiA+ID4gZml4Lgo+ID4gPiA+IAo+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IENocmlzdG9mZmVyIERh
-bGwgPGNkYWxsQGxpbmFyby5vcmc+Cj4gPiA+ID4gLS0tCj4gPiA+ID4gU2VuZGluZyB3aXRoIHRo
-ZSByaWdodCBzdWJqZWN0IHByZWZpeCB0aGlzIHRpbWUuCj4gPiA+ID4gCj4gPiA+ID4gIGFybS9n
-aWMuYyAgICAgICAgIHwgNDMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKwo+ID4gPiA+ICBhcm0vdW5pdHRlc3RzLmNmZyB8IDE0ICsrKysrKysrKysrKystCj4gPiA+
-ID4gIGxpYi9hcm0vYXNtL2dpYy5oIHwgIDIgKysKPiA+ID4gPiAgMyBmaWxlcyBjaGFuZ2VkLCA1
-OCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4gPiA+ID4gCj4gPiA+ID4gZGlmZiAtLWdp
-dCBhL2FybS9naWMuYyBiL2FybS9naWMuYwo+ID4gPiA+IGluZGV4IDMwNTRkNDUuLjgyZjY2MzIg
-MTAwNjQ0Cj4gPiA+ID4gLS0tIGEvYXJtL2dpYy5jCj4gPiA+ID4gKysrIGIvYXJtL2dpYy5jCj4g
-PiA+ID4gQEAgLTI1NCw2ICsyNTQsNDcgQEAgc3RhdGljIHN0cnVjdCBnaWMgZ2ljdjMgPSB7Cj4g
-PiA+ID4gIAl9LAo+ID4gPiA+ICB9Owo+ID4gPiA+ICAKPiA+ID4gPiArc3RhdGljIHZvaWQgaXBp
-X2NsZWFyX2FjdGl2ZV9oYW5kbGVyKHN0cnVjdCBwdF9yZWdzICpyZWdzIF9fdW51c2VkKQo+ID4g
-PiA+ICt7Cj4gPiA+ID4gKwl1MzIgaXJxc3RhdCA9IGdpY19yZWFkX2lhcigpOwo+ID4gPiA+ICsJ
-dTMyIGlycW5yID0gZ2ljX2lhcl9pcnFucihpcnFzdGF0KTsKPiA+ID4gPiArCj4gPiA+ID4gKwlp
-ZiAoaXJxbnIgIT0gR0lDQ19JTlRfU1BVUklPVVMpIHsKPiA+ID4gPiArCQl2b2lkICpiYXNlOwo+
-ID4gPiA+ICsJCXUzMiB2YWwgPSAxIDw8IElQSV9JUlE7Cj4gPiA+ID4gKwo+ID4gPiA+ICsJCWlm
-IChnaWNfdmVyc2lvbigpID09IDIpCj4gPiA+ID4gKwkJCWJhc2UgPSBnaWN2Ml9kaXN0X2Jhc2Uo
-KTsKPiA+ID4gPiArCQllbHNlCj4gPiA+ID4gKwkJCWJhc2UgPSBnaWN2M19yZWRpc3RfYmFzZSgp
-Owo+ID4gPiAKPiA+ID4gVXNpbmcgdGhlIHJlZGlzdHJpYnV0b3IgaW50ZXJmYWNlIGlzIGNvcnJl
-Y3Qgd2l0aCB0aGUgY3VycmVudAo+ID4gPiBnaWNfZW5hYmxlX2RlZmF1bHRzKCksIGJlY2F1c2Ug
-aXQgZW5hYmxlcyBhZmZpbml0eSByb3V0aW5nLiBJCj4gPiA+IHdvbmRlciBpZiB3ZSBzaG91bGRu
-J3QgY29uZmlybSBpdCdzIGVuYWJsZWQgZmlyc3QgdGhvdWdoLgo+ID4gPiAKPiA+ID4gPiArCj4g
-PiA+ID4gKwkJd3JpdGVsKHZhbCwgYmFzZSArIEdJQ0RfSUNBQ1RJVkVSKTsKPiA+ID4gCj4gPiA+
-IEZvciBnaWN2Mywgd2l0aCBhZmZpbml0eSByb3V0aW5nIGVuYWJsZWQsIHRoZSBvZmZzZXQgaXMK
-PiA+ID4gdGVjaG5pY2FsbHkgbmFtZWQgR0lDUl9JQ0FDVElWRVIwLCBidXQgdGhhdCdzIGFsc28g
-MHgzODAsIHNvCj4gPiA+IGl0IGRvZXNuJ3QgbWF0dGVyLgo+ID4gPiAKPiA+ID4gTm90IHN1cmUg
-d2UgbmVlZCB0aGUgJ3ZhbCcgdmFyaWFibGUuCj4gPiA+IAo+ID4gPiA+ICsKPiA+ID4gPiArCQlz
-bXBfcm1iKCk7IC8qIHBhaXJzIHdpdGggd21iIGluIHN0YXRzX3Jlc2V0ICovCj4gPiA+ID4gKwkJ
-KythY2tlZFtzbXBfcHJvY2Vzc29yX2lkKCldOwo+ID4gPiA+ICsJCWNoZWNrX2lycW5yKGlycW5y
-KTsKPiA+ID4gPiArCQlzbXBfd21iKCk7IC8qIHBhaXJzIHdpdGggcm1iIGluIGNoZWNrX2Fja2Vk
-ICovCj4gPiA+ID4gKwl9IGVsc2Ugewo+ID4gPiA+ICsJCSsrc3B1cmlvdXNbc21wX3Byb2Nlc3Nv
-cl9pZCgpXTsKPiA+ID4gPiArCQlzbXBfd21iKCk7Cj4gPiA+ID4gKwl9Cj4gPiA+ID4gK30KPiA+
-ID4gPiArCj4gPiA+ID4gK3N0YXRpYyB2b2lkIHJ1bl9hY3RpdmVfY2xlYXJfdGVzdCh2b2lkKQo+
-ID4gPiA+ICt7Cj4gPiA+ID4gKwlyZXBvcnRfcHJlZml4X3B1c2goImFjdGl2ZSIpOwo+ID4gPiA+
-ICsJZ2ljX2VuYWJsZV9kZWZhdWx0cygpOwo+ID4gPiA+ICsjaWZkZWYgX19hcm1fXwo+ID4gPiA+
-ICsJaW5zdGFsbF9leGNlcHRpb25faGFuZGxlcihFWENQVE5fSVJRLCBpcGlfY2xlYXJfYWN0aXZl
-X2hhbmRsZXIpOwo+ID4gPiA+ICsjZWxzZQo+ID4gPiA+ICsJaW5zdGFsbF9pcnFfaGFuZGxlcihF
-TDFIX0lSUSwgaXBpX2NsZWFyX2FjdGl2ZV9oYW5kbGVyKTsKPiA+ID4gPiArI2VuZGlmCj4gPiA+
-ID4gKwlsb2NhbF9pcnFfZW5hYmxlKCk7Cj4gPiA+ID4gKwo+ID4gPiA+ICsJaXBpX3Rlc3Rfc2Vs
-ZigpOwo+ID4gPiA+ICsJcmVwb3J0X3ByZWZpeF9wb3AoKTsKPiA+ID4gPiArfQo+ID4gPiA+ICsK
-PiA+ID4gPiAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQo+ID4gPiA+ICB7Cj4gPiA+
-ID4gIAljaGFyIHBmeFs4XTsKPiA+ID4gPiBAQCAtMjkwLDYgKzMzMSw4IEBAIGludCBtYWluKGlu
-dCBhcmdjLCBjaGFyICoqYXJndikKPiA+ID4gPiAgCQkJCWNwdSA9PSBJUElfU0VOREVSID8gaXBp
-X3NlbmQgOiBpcGlfcmVjdik7Cj4gPiA+ID4gIAkJfQo+ID4gPiA+ICAJCWlwaV9yZWN2KCk7Cj4g
-PiA+ID4gKwl9IGVsc2UgaWYgKHN0cmNtcChhcmd2WzFdLCAiYWN0aXZlIikgPT0gMCkgewo+ID4g
-PiA+ICsJCXJ1bl9hY3RpdmVfY2xlYXJfdGVzdCgpOwo+ID4gPiAKPiA+ID4gdGVzdF9hY3RpdmVf
-Y2xlYXIoKSA/Cj4gPiA+IAo+ID4gPiA+ICAJfSBlbHNlIHsKPiA+ID4gPiAgCQlyZXBvcnRfYWJv
-cnQoIlVua25vd24gc3VidGVzdCAnJXMnIiwgYXJndlsxXSk7Cj4gPiA+ID4gIAl9Cj4gPiA+ID4g
-ZGlmZiAtLWdpdCBhL2FybS91bml0dGVzdHMuY2ZnIGIvYXJtL3VuaXR0ZXN0cy5jZmcKPiA+ID4g
-PiBpbmRleCBjOTg2NThmLi4zMmQ5ODU4IDEwMDY0NAo+ID4gPiA+IC0tLSBhL2FybS91bml0dGVz
-dHMuY2ZnCj4gPiA+ID4gKysrIGIvYXJtL3VuaXR0ZXN0cy5jZmcKPiA+ID4gPiBAQCAtMjYsNyAr
-MjYsNyBAQAo+ID4gPiA+ICAjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKPiA+ID4gPiAgCj4gPiA+ID4g
-ICMKPiA+ID4gPiAtIyBUZXN0IHRoYXQgdGhlIGNvbmZpZ3VyZWQgbnVtYmVyIG9mIHByb2Nlc3Nv
-cnMgKHNtcCA9IDxudW0+KSwgYW5kCj4gPiA+ID4gKy8jIFRlc3QgdGhhdCB0aGUgY29uZmlndXJl
-ZCBudW1iZXIgb2YgcHJvY2Vzc29ycyAoc21wID0gPG51bT4pLCBhbmQKPiA+ID4gCj4gPiA+IHN0
-cmF5IGNoYXJhY3RlciBoZXJlCj4gPiA+IAo+ID4gPiA+ICAjIHRoYXQgdGhlIGNvbmZpZ3VyZWQg
-YW1vdW50IG9mIG1lbW9yeSAoLW0gPE1CPikgYXJlIGNvcnJlY3RseSBzZXR1cAo+ID4gPiA+ICAj
-IGJ5IHRoZSBmcmFtZXdvcmsuCj4gPiA+ID4gICMKPiA+ID4gPiBAQCAtOTIsNiArOTIsMTggQEAg
-c21wID0gJE1BWF9TTVAKPiA+ID4gPiAgZXh0cmFfcGFyYW1zID0gLW1hY2hpbmUgZ2ljLXZlcnNp
-b249MyAtYXBwZW5kICdpcGknCj4gPiA+ID4gIGdyb3VwcyA9IGdpYwo+ID4gPiA+ICAKPiA+ID4g
-PiArW2dpY3YyLWFjdGl2ZV0KPiA+ID4gPiArZmlsZSA9IGdpYy5mbGF0Cj4gPiA+ID4gK3NtcCA9
-ICQoKCgkTUFYX1NNUCA8IDgpPyRNQVhfU01QOjgpKQo+ID4gPiA+ICtleHRyYV9wYXJhbXMgPSAt
-bWFjaGluZSBnaWMtdmVyc2lvbj0yIC1hcHBlbmQgJ2FjdGl2ZScKPiA+ID4gPiArZ3JvdXBzID0g
-Z2ljCj4gPiA+ID4gKwo+ID4gPiA+ICtbZ2ljdjMtYWN0aXZlXQo+ID4gPiA+ICtmaWxlID0gZ2lj
-LmZsYXQKPiA+ID4gPiArc21wID0gJE1BWF9TTVAKPiA+ID4gPiArZXh0cmFfcGFyYW1zID0gLW1h
-Y2hpbmUgZ2ljLXZlcnNpb249MyAtYXBwZW5kICdhY3RpdmUnCj4gPiA+ID4gK2dyb3VwcyA9IGdp
-Ywo+ID4gPiA+ICsKPiA+ID4gPiAgIyBUZXN0IFBTQ0kgZW11bGF0aW9uCj4gPiA+ID4gIFtwc2Np
-XQo+ID4gPiA+ICBmaWxlID0gcHNjaS5mbGF0Cj4gPiA+ID4gZGlmZiAtLWdpdCBhL2xpYi9hcm0v
-YXNtL2dpYy5oIGIvbGliL2FybS9hc20vZ2ljLmgKPiA+ID4gPiBpbmRleCBjODE4NmYyLi5jNjg4
-Y2NjIDEwMDY0NAo+ID4gPiA+IC0tLSBhL2xpYi9hcm0vYXNtL2dpYy5oCj4gPiA+ID4gKysrIGIv
-bGliL2FybS9hc20vZ2ljLmgKPiA+ID4gPiBAQCAtMTIsNiArMTIsOCBAQAo+ID4gPiA+ICAjZGVm
-aW5lIEdJQ0RfVFlQRVIJCQkweDAwMDQKPiA+ID4gPiAgI2RlZmluZSBHSUNEX0lHUk9VUFIJCQkw
-eDAwODAKPiA+ID4gPiAgI2RlZmluZSBHSUNEX0lTRU5BQkxFUgkJCTB4MDEwMAo+ID4gPiA+ICsj
-ZGVmaW5lIEdJQ0RfSVNBQ1RJVkVSCQkJMHgwMzAwCj4gPiA+ID4gKyNkZWZpbmUgR0lDRF9JQ0FD
-VElWRVIJCQkweDAzODAKPiA+ID4gPiAgI2RlZmluZSBHSUNEX0lQUklPUklUWVIJCQkweDA0MDAK
-PiA+ID4gPiAgI2RlZmluZSBHSUNEX1NHSVIJCQkweDBmMDAKPiA+ID4gPiAgCj4gPiA+ID4gLS0g
-Cj4gPiA+ID4gMi41LjAKPiA+ID4gPiAKPiA+ID4gCj4gPiA+IEV2ZXJ5dGhpbmcgYmVzaWRlcyB0
-aGUgc3RyYXkgY2hhcmFjdGVyIGluIHVuaXR0ZXN0cy5jZmcgaXMgb24KPiA+ID4gbml0IGxldmVs
-LCBhbmQgdGhlIHN0cmF5IGNoYXJhY3RlciBjYW4gcHJvYmFibHkgYmUgY2xlYW5lZCB1cAo+ID4g
-PiBvbiBjb21taXQsIHNvCj4gPiA+IAo+ID4gPiBSZXZpZXdlZC1ieTogQW5kcmV3IEpvbmVzIDxk
-cmpvbmVzQHJlZGhhdC5jb20+Cj4gPiAKPiA+IENocmlzdG9mZmVyLCBJIGhhdmUgZml4ZWQgdGhl
-IHNsYXNoIGluIGEgbG9jYWwgcmVwbywgcmVhZHkgdG8gcHVzaCBpZgo+ID4geW91IGRvIG5vdCB3
-YW50IGFueSBvdGhlciBjaGFuZ2VzLgo+ID4gCj4gPiBCdHcuIGNhbiB0aGUgaG9zdCBiZSByZWJv
-b3RlZCB3aXRob3V0IG1hZ2ljLVN5c1JxIGFmdGVyIGhpdHRpbmcgdGhlIGJ1Zz8KPiA+IChJIHdh
-cyB3b25kZXJpbmcgaWYgdGhlIGJ1ZyB3YXMgYmFkIGVub3VnaCBmb3IgdGhlIG5vZGVmYXVsdCBn
-cm91cCwgYnV0Cj4gPiAgRHJldyBkaWRuJ3QgcG9pbnQgaXQgb3V0IGFuZCB0aGUgaG9zdCBzaG91
-bGQgc3RpbGwgYmUgdXNlYWJsZQo+ID4gIGFmdGVyd2FyZHMgLi4uKQo+ID4gCj4gCj4gR29vZCBx
-dWVzdGlvbi4gIEkganVzdCB0ZXN0ZWQgdGhpcyB3aXRoIHRoZSBicm9rZW4ga2VybmVsLCBhbmQg
-d2hpbGUgeW91Cj4gZG8gaGF2ZSBhIHRocmVhZCB0aGF0IGRvZXNuJ3QgZXhpdCBhbmQgc3BpbnMg
-YSBiaXQsIHRoZW4geW91ciBob3N0IGlzCj4gY29tcGxldGVseSB1c2FibGUgYW5kIGNhbiBiZSBu
-b3JtYWxseSByZWJvb3RlZCwgc28gSSB0aGluayB0aGlzIGlzCj4gYWN0dWFsbHkgb2sgdG8gbGVh
-dmUgYXMgYSBkZWZhdWx0LCBidXQgaXQncyB1cCB0byB5b3UuCgpJIGFncmVlLCBub2RlZmF1bHQg
-aXMgZm9yIHdvcnNlIGJ1Z3MuCgpQdXNoZWQsIHRoYW5rcy4KX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
-dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
-bGlzdGluZm8va3ZtYXJtCg==
+On 07/03/17 17:58, Baicar, Tyler wrote:
+> On 3/7/2017 4:48 AM, James Morse wrote:
+>> On 06/03/17 20:45, Tyler Baicar wrote:
+>>> Currently external aborts are unsupported by the guest abort
+>>> handling. Add handling for SEAs so that the host kernel reports
+>>> SEAs which occur in the guest kernel.
+
+>>> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+>>> index a5265ed..f3608c9 100644
+>>> --- a/arch/arm/kvm/mmu.c
+>>> +++ b/arch/arm/kvm/mmu.c
+>>> @@ -1444,8 +1463,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu,
+>>> struct kvm_run *run)
+>>>         /* Check the stage-2 fault is trans. fault or write fault */
+>>>       fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+>>> -    if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+>>> -        fault_status != FSC_ACCESS) {
+>>> +
+>>> +    /* The host kernel will handle the synchronous external abort. There
+>>> +     * is no need to pass the error into the guest.
+>>> +     */
+>>> +    if (is_abort_synchronous(fault_status)) {
+>>> +        if(handle_guest_sea((unsigned long)fault_ipa,
+>>> +                    kvm_vcpu_get_hsr(vcpu))) {
+>>
+>> ... Looking further up in this function:
+>>>     is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+>>>     if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu))) {
+>>>         kvm_inject_vabt(vcpu);
+>>>         return 1;
+>>>     }
+>> ... so external data aborts will have already been 'claimed' by kvm and dealt
+>> with, and we already have a helper for spotting external aborts. (sorry I didn't
+>> spot it earlier).
+>>
+>> We need to do the handle_guest_sea() before this code.
+>>
+>> kvm_inject_vabt() makes an SError interrupt pending for the guest. This makes a
+>> synchronous error asynchronous as the guest may have SError interrupts masked.
+>>
+>> I guess this was the best that could be done at the time of (4055710baca8
+>> "arm/arm64: KVM: Inject virtual abort when guest exits on external abort"), but
+>> in the light of this firmware-first handling, I'm not sure its the right thing
+>> to do.
+>>
+>> Is it possible for handle_guest_sea() to return whether it actually found any
+>> work to do? If there was none I think we should keep this kvm_inject_vabt() as
+>> it is the existing behaviour.
+
+> Yes, I'll move the handle_guest_sea() call above this. My testing didn't call
+> into that if statement for some reason...it made it to the handle_guest_sea()
+> call successfully.
+
+I guess you're not using data aborts for testing then.
+
+
+> If there is no work for the GHES code to do it will return and could still make
+> the kvm_inject_vabt() call. It will also return and do that same thing if the
+> error was not fatal in GHES...would that be an issue?
+
+We might inject a superfluous SError Interrupt in that case.
+
+For memory errors we may do the whole unmapping and signalling thing to handle
+the fault. For recoverable faults, QEMU can generate its own CPER records for
+the guest and do the work to notify the guest. Everything looks fine until the
+guest gets the extra SError interrupt.
+
+If there is firmware-first RAS data, we should skip the injected SError
+Interrupt as the host's RAS code should choose what to do. If this Synchronous
+External Abort was nothing to do with RAS, we should inject the SError interrupt
+as it's the existing behaviour, and not all platforms will have this Synchronous
+External Abort mechanism.
+
+x86's APEI NMI needs to know if the NMI was due to RAS, so we can probably
+borrow the same trick. ghes_notify_nmi() calls ghes_read_estatus() for each
+struct ghes. If they all return an error, there was no work to do.
+
+
+(I assume firmware will only generate one of these at a time, so there is no
+risk of one list-walker processing two entries, then the second finding nothing
+to do?)
+
+
+Thanks,
+
+James
+
+
+>>> +            kvm_err("Failed to handle guest SEA, FSC: EC=%#x xFSC=%#lx
+>>> ESR_EL2=%#lx\n",
+>>> +                kvm_vcpu_trap_get_class(vcpu),
+>>> +                (unsigned long)kvm_vcpu_trap_get_fault(vcpu),
+>>> +                (unsigned long)kvm_vcpu_get_hsr(vcpu));
+>>> +            return -EFAULT;
+>>> +        }
+>>> +    } else if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+>>> +           fault_status != FSC_ACCESS) {
+>>>           kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+>>>               kvm_vcpu_trap_get_class(vcpu),
+>>>               (unsigned long)kvm_vcpu_trap_get_fault(vcpu),
+>>
