@@ -1,29 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 5/5] KVM: arm/arm64: allow userspace to set MPIDR
-Date: Wed, 8 Mar 2017 09:21:59 -0800
-Message-ID: <20170308172159.GD109908@lvm>
+Subject: Re: [PATCH 0/5] KVM: arm/arm64: fix some races and allow userspace
+ to set MPIDR
+Date: Wed, 8 Mar 2017 09:27:12 -0800
+Message-ID: <20170308172712.GE109908@lvm>
 References: <20170227175504.15751-1-drjones@redhat.com>
- <20170227175504.15751-6-drjones@redhat.com>
- <20170308131907.GA109908@lvm>
- <CAFEAcA_2BtKUnFFciN1v2F3etkDVNvd4+wNOk-DX=hcWDwsCiA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 668EF408EB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 12:20:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 94838408EB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 12:25:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pI2JW1Yw3w0U for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Mar 2017 12:20:40 -0500 (EST)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E7A2405DA
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 12:20:39 -0500 (EST)
-Received: by mail-wm0-f41.google.com with SMTP id t189so36567735wmt.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Mar 2017 09:22:03 -0800 (PST)
+ with ESMTP id njdh2UZ+qiSk for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Mar 2017 12:25:52 -0500 (EST)
+Received: from mail-wr0-f181.google.com (mail-wr0-f181.google.com
+ [209.85.128.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CBDC5405DA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 12:25:51 -0500 (EST)
+Received: by mail-wr0-f181.google.com with SMTP id u108so28220340wrb.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Mar 2017 09:27:15 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_2BtKUnFFciN1v2F3etkDVNvd4+wNOk-DX=hcWDwsCiA@mail.gmail.com>
+In-Reply-To: <20170227175504.15751-1-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,28 +32,39 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Ashok Kumar <ashoks@broadcom.com>, Igor Mammedov <imammedo@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, ashoks@broadcom.com, imammedo@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 08, 2017 at 03:27:28PM +0100, Peter Maydell wrote:
-> On 8 March 2017 at 14:19, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> > Isn't this all super racy?  What prevents two VCPUs from getting the
-> > same MPIDR at the same time?
-> 
-> From a userspace API point of view, I was expecting this to be
-> "just don't do that then" territory, ie it's userspace's job
-> to set the MPIDRs to something that makes sense. Does KVM
-> actually care internally what the MPIDR presented to the guest is?
-> (In theory I don't see why you shouldn't be able to present
-> the guest with a bit of bogus hardware that claims the same
-> MPIDR for all cores.)
-> 
+Hi Drew,
 
-I think it's important that we maintain a strict mapping between an
-MPIDR and a VCPU at any given time, because otherwise, we'll have
-problems knowing which redestributor belongs to which VCPU and making
-other qualified decisions in the KVM/ARM implementation.
+On Mon, Feb 27, 2017 at 06:54:59PM +0100, Andrew Jones wrote:
+> This series fixes four races. Two are easy to produce with a
+> kvm-unit-test test[1], but the other two would be quite hard. I
+> didn't even try to produce those. The two hard to produce races are
+> addressed by changing vcpu->arch.pause and vcpu->arch.power_off to
+> vcpu requests. The two easy to produce races are addressed in two
+> different ways: the first takes advantage of power_off having been
+> changed to a vcpu request, the second caches vcpu MPIDRs in order
+> to avoid extracting them from sys_regs. When introducing the MPIDR
+> cache we also introduce a new feature (userspace settable MPIDRs).
+> 
+> Support for userspace settable MPIDRs was already posted once[2],
+> but rejected due to not having a use case. We have one now, which
+> is to satisfy QEMU's need for the MPDIR information very early,
+> before vcpu-init has even run. While the original posting author
+> wasn't me, I've taken authorship now, as I've changed the patch
+> substantially. If anybody disagrees with that, then feel free to
+> suggest alternatives. The QEMU counterpart has been posted[3].
+> 
+> This series is based on Radim's recent posting[4] that improves
+> the vcpu-request framework. I've tested the series on a couple
+> AArch64 platforms and compile-tested the arm bits.
 
-Thanks,
+So as we discussed during lunch today, it would be awesome if you could
+split this up into a series that fixes the identified races and a
+separate series for the introduction of supporting setting the MPIDR
+from user space.
+
+Thanks a lot!
 -Christoffer
