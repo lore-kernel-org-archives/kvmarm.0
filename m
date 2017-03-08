@@ -1,27 +1,27 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 2/5] KVM: arm/arm64: replace vcpu->arch.pause with a
- vcpu-request
-Date: Wed, 8 Mar 2017 15:44:11 +0100
-Message-ID: <20170308144411.tobywqs7qh4g4n2y@hawk.localdomain>
-References: <20170227175504.15751-1-drjones@redhat.com>
- <20170227175504.15751-3-drjones@redhat.com>
- <20170308143312.GC109908@lvm>
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] arm/arm64: gic: Test changing active
+ state of interrupts
+Date: Wed, 8 Mar 2017 16:40:21 +0100
+Message-ID: <20170308154020.GD18298@potion>
+References: <1488813369-87368-1-git-send-email-christoffer.dall@linaro.org>
+ <20170307165811.a3c6tar7qlen4n2i@hawk.localdomain>
+ <20170307193432.GC18298@potion> <20170308114555.GB109453@lvm>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 472E740A54
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 09:42:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22E7D4095A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 10:39:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aktKXmERyNyB for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Mar 2017 09:42:53 -0500 (EST)
+ with ESMTP id BIkjFhQm1jEA for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Mar 2017 10:39:02 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3CA2240296
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 09:42:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F302140905
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Mar 2017 10:39:01 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20170308143312.GC109908@lvm>
+In-Reply-To: <20170308114555.GB109453@lvm>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,44 +32,112 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: marc.zyngier@arm.com, ashoks@broadcom.com, imammedo@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 08, 2017 at 06:33:12AM -0800, Christoffer Dall wrote:
-> >  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
-> > @@ -621,7 +617,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >  
-> >  		update_vttbr(vcpu->kvm);
-> >  
-> > -		if (vcpu->arch.power_off || vcpu->arch.pause)
-> > +		if (vcpu->arch.power_off || __kvm_request_test(KVM_REQ_VCPU_PAUSE, vcpu))
-> >  			vcpu_sleep(vcpu);
-> >  
-> >  		/*
-> > @@ -644,8 +640,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >  			run->exit_reason = KVM_EXIT_INTR;
-> >  		}
-> >  
-> > +		vcpu->mode = IN_GUEST_MODE;
-> > +		smp_mb(); /* ensure vcpu->mode is visible to kvm_vcpu_kick */
-> 
-> I think this comment is misleading, because this smp_mb() is really
-> about ensuring that with respect to other CPUs, the write to vcpu->mode
-> is observable before the read of kvm_request_pending below, and the
-> corresponding other barrier is the barrier implied in cmpxchg used by
-> kvm_vcpu_exiting_guest_mode, which gets called by kvm_vcpu_kick(), which
-> is called after __kvm_set_request.
-
-Agreed
-
-> 
-> So this also means that our direct use of kvm_vcpu_kick() without making
-> a request is currently racy, so we should address that where appropriate
-> as well.
-> 
-> Do you feel brave enough to take a look at that?
-
-Yup, mission accepted.
-
-Thanks,
-drew
+MjAxNy0wMy0wOCAwMzo0NS0wODAwLCBDaHJpc3RvZmZlciBEYWxsOgo+IE9uIFR1ZSwgTWFyIDA3
+LCAyMDE3IGF0IDA4OjM0OjMzUE0gKzAxMDAsIFJhZGltIEtyxI1tw6HFmSB3cm90ZToKPiA+IDIw
+MTctMDMtMDcgMTc6NTgrMDEwMCwgQW5kcmV3IEpvbmVzOgo+ID4gPiBPbiBNb24sIE1hciAwNiwg
+MjAxNyBhdCAwNzoxNjowOUFNIC0wODAwLCBDaHJpc3RvZmZlciBEYWxsIHdyb3RlOgo+ID4gPiA+
+IEZyb206IENocmlzdG9mZmVyIERhbGwgPGNkYWxsQGxpbmFyby5vcmc+Cj4gPiA+ID4gCj4gPiA+
+ID4gV2UgZm91bmQgYSBkZWFkbG9jayB3aGVuIGNoYW5naW5nIHRoZSBhY3RpdmUgc3RhdGUgb2Yg
+YW4gaW50ZXJydXB0IHdoaWxlCj4gPiA+ID4gdGhlIGludGVycnVwdCBpcyBxdWV1ZWQgb24gdGhl
+IExSIG9mIHRoZSBydW5uaW5nIFZDUFUuCj4gPiA+ID4gCj4gPiA+ID4gRGVmZW5kIEtWTSBhZ2Fp
+bnN0IHRoaXMgYnVnIGluIHRoZSBmdXR1cmUgbm93IHdoZW4gd2UndmUgaW50cm9kdWNlZCBhCj4g
+PiA+ID4gZml4Lgo+ID4gPiA+IAo+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IENocmlzdG9mZmVyIERh
+bGwgPGNkYWxsQGxpbmFyby5vcmc+Cj4gPiA+ID4gLS0tCj4gPiA+ID4gU2VuZGluZyB3aXRoIHRo
+ZSByaWdodCBzdWJqZWN0IHByZWZpeCB0aGlzIHRpbWUuCj4gPiA+ID4gCj4gPiA+ID4gIGFybS9n
+aWMuYyAgICAgICAgIHwgNDMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKwo+ID4gPiA+ICBhcm0vdW5pdHRlc3RzLmNmZyB8IDE0ICsrKysrKysrKysrKystCj4gPiA+
+ID4gIGxpYi9hcm0vYXNtL2dpYy5oIHwgIDIgKysKPiA+ID4gPiAgMyBmaWxlcyBjaGFuZ2VkLCA1
+OCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4gPiA+ID4gCj4gPiA+ID4gZGlmZiAtLWdp
+dCBhL2FybS9naWMuYyBiL2FybS9naWMuYwo+ID4gPiA+IGluZGV4IDMwNTRkNDUuLjgyZjY2MzIg
+MTAwNjQ0Cj4gPiA+ID4gLS0tIGEvYXJtL2dpYy5jCj4gPiA+ID4gKysrIGIvYXJtL2dpYy5jCj4g
+PiA+ID4gQEAgLTI1NCw2ICsyNTQsNDcgQEAgc3RhdGljIHN0cnVjdCBnaWMgZ2ljdjMgPSB7Cj4g
+PiA+ID4gIAl9LAo+ID4gPiA+ICB9Owo+ID4gPiA+ICAKPiA+ID4gPiArc3RhdGljIHZvaWQgaXBp
+X2NsZWFyX2FjdGl2ZV9oYW5kbGVyKHN0cnVjdCBwdF9yZWdzICpyZWdzIF9fdW51c2VkKQo+ID4g
+PiA+ICt7Cj4gPiA+ID4gKwl1MzIgaXJxc3RhdCA9IGdpY19yZWFkX2lhcigpOwo+ID4gPiA+ICsJ
+dTMyIGlycW5yID0gZ2ljX2lhcl9pcnFucihpcnFzdGF0KTsKPiA+ID4gPiArCj4gPiA+ID4gKwlp
+ZiAoaXJxbnIgIT0gR0lDQ19JTlRfU1BVUklPVVMpIHsKPiA+ID4gPiArCQl2b2lkICpiYXNlOwo+
+ID4gPiA+ICsJCXUzMiB2YWwgPSAxIDw8IElQSV9JUlE7Cj4gPiA+ID4gKwo+ID4gPiA+ICsJCWlm
+IChnaWNfdmVyc2lvbigpID09IDIpCj4gPiA+ID4gKwkJCWJhc2UgPSBnaWN2Ml9kaXN0X2Jhc2Uo
+KTsKPiA+ID4gPiArCQllbHNlCj4gPiA+ID4gKwkJCWJhc2UgPSBnaWN2M19yZWRpc3RfYmFzZSgp
+Owo+ID4gPiAKPiA+ID4gVXNpbmcgdGhlIHJlZGlzdHJpYnV0b3IgaW50ZXJmYWNlIGlzIGNvcnJl
+Y3Qgd2l0aCB0aGUgY3VycmVudAo+ID4gPiBnaWNfZW5hYmxlX2RlZmF1bHRzKCksIGJlY2F1c2Ug
+aXQgZW5hYmxlcyBhZmZpbml0eSByb3V0aW5nLiBJCj4gPiA+IHdvbmRlciBpZiB3ZSBzaG91bGRu
+J3QgY29uZmlybSBpdCdzIGVuYWJsZWQgZmlyc3QgdGhvdWdoLgo+ID4gPiAKPiA+ID4gPiArCj4g
+PiA+ID4gKwkJd3JpdGVsKHZhbCwgYmFzZSArIEdJQ0RfSUNBQ1RJVkVSKTsKPiA+ID4gCj4gPiA+
+IEZvciBnaWN2Mywgd2l0aCBhZmZpbml0eSByb3V0aW5nIGVuYWJsZWQsIHRoZSBvZmZzZXQgaXMK
+PiA+ID4gdGVjaG5pY2FsbHkgbmFtZWQgR0lDUl9JQ0FDVElWRVIwLCBidXQgdGhhdCdzIGFsc28g
+MHgzODAsIHNvCj4gPiA+IGl0IGRvZXNuJ3QgbWF0dGVyLgo+ID4gPiAKPiA+ID4gTm90IHN1cmUg
+d2UgbmVlZCB0aGUgJ3ZhbCcgdmFyaWFibGUuCj4gPiA+IAo+ID4gPiA+ICsKPiA+ID4gPiArCQlz
+bXBfcm1iKCk7IC8qIHBhaXJzIHdpdGggd21iIGluIHN0YXRzX3Jlc2V0ICovCj4gPiA+ID4gKwkJ
+KythY2tlZFtzbXBfcHJvY2Vzc29yX2lkKCldOwo+ID4gPiA+ICsJCWNoZWNrX2lycW5yKGlycW5y
+KTsKPiA+ID4gPiArCQlzbXBfd21iKCk7IC8qIHBhaXJzIHdpdGggcm1iIGluIGNoZWNrX2Fja2Vk
+ICovCj4gPiA+ID4gKwl9IGVsc2Ugewo+ID4gPiA+ICsJCSsrc3B1cmlvdXNbc21wX3Byb2Nlc3Nv
+cl9pZCgpXTsKPiA+ID4gPiArCQlzbXBfd21iKCk7Cj4gPiA+ID4gKwl9Cj4gPiA+ID4gK30KPiA+
+ID4gPiArCj4gPiA+ID4gK3N0YXRpYyB2b2lkIHJ1bl9hY3RpdmVfY2xlYXJfdGVzdCh2b2lkKQo+
+ID4gPiA+ICt7Cj4gPiA+ID4gKwlyZXBvcnRfcHJlZml4X3B1c2goImFjdGl2ZSIpOwo+ID4gPiA+
+ICsJZ2ljX2VuYWJsZV9kZWZhdWx0cygpOwo+ID4gPiA+ICsjaWZkZWYgX19hcm1fXwo+ID4gPiA+
+ICsJaW5zdGFsbF9leGNlcHRpb25faGFuZGxlcihFWENQVE5fSVJRLCBpcGlfY2xlYXJfYWN0aXZl
+X2hhbmRsZXIpOwo+ID4gPiA+ICsjZWxzZQo+ID4gPiA+ICsJaW5zdGFsbF9pcnFfaGFuZGxlcihF
+TDFIX0lSUSwgaXBpX2NsZWFyX2FjdGl2ZV9oYW5kbGVyKTsKPiA+ID4gPiArI2VuZGlmCj4gPiA+
+ID4gKwlsb2NhbF9pcnFfZW5hYmxlKCk7Cj4gPiA+ID4gKwo+ID4gPiA+ICsJaXBpX3Rlc3Rfc2Vs
+ZigpOwo+ID4gPiA+ICsJcmVwb3J0X3ByZWZpeF9wb3AoKTsKPiA+ID4gPiArfQo+ID4gPiA+ICsK
+PiA+ID4gPiAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQo+ID4gPiA+ICB7Cj4gPiA+
+ID4gIAljaGFyIHBmeFs4XTsKPiA+ID4gPiBAQCAtMjkwLDYgKzMzMSw4IEBAIGludCBtYWluKGlu
+dCBhcmdjLCBjaGFyICoqYXJndikKPiA+ID4gPiAgCQkJCWNwdSA9PSBJUElfU0VOREVSID8gaXBp
+X3NlbmQgOiBpcGlfcmVjdik7Cj4gPiA+ID4gIAkJfQo+ID4gPiA+ICAJCWlwaV9yZWN2KCk7Cj4g
+PiA+ID4gKwl9IGVsc2UgaWYgKHN0cmNtcChhcmd2WzFdLCAiYWN0aXZlIikgPT0gMCkgewo+ID4g
+PiA+ICsJCXJ1bl9hY3RpdmVfY2xlYXJfdGVzdCgpOwo+ID4gPiAKPiA+ID4gdGVzdF9hY3RpdmVf
+Y2xlYXIoKSA/Cj4gPiA+IAo+ID4gPiA+ICAJfSBlbHNlIHsKPiA+ID4gPiAgCQlyZXBvcnRfYWJv
+cnQoIlVua25vd24gc3VidGVzdCAnJXMnIiwgYXJndlsxXSk7Cj4gPiA+ID4gIAl9Cj4gPiA+ID4g
+ZGlmZiAtLWdpdCBhL2FybS91bml0dGVzdHMuY2ZnIGIvYXJtL3VuaXR0ZXN0cy5jZmcKPiA+ID4g
+PiBpbmRleCBjOTg2NThmLi4zMmQ5ODU4IDEwMDY0NAo+ID4gPiA+IC0tLSBhL2FybS91bml0dGVz
+dHMuY2ZnCj4gPiA+ID4gKysrIGIvYXJtL3VuaXR0ZXN0cy5jZmcKPiA+ID4gPiBAQCAtMjYsNyAr
+MjYsNyBAQAo+ID4gPiA+ICAjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKPiA+ID4gPiAgCj4gPiA+ID4g
+ICMKPiA+ID4gPiAtIyBUZXN0IHRoYXQgdGhlIGNvbmZpZ3VyZWQgbnVtYmVyIG9mIHByb2Nlc3Nv
+cnMgKHNtcCA9IDxudW0+KSwgYW5kCj4gPiA+ID4gKy8jIFRlc3QgdGhhdCB0aGUgY29uZmlndXJl
+ZCBudW1iZXIgb2YgcHJvY2Vzc29ycyAoc21wID0gPG51bT4pLCBhbmQKPiA+ID4gCj4gPiA+IHN0
+cmF5IGNoYXJhY3RlciBoZXJlCj4gPiA+IAo+ID4gPiA+ICAjIHRoYXQgdGhlIGNvbmZpZ3VyZWQg
+YW1vdW50IG9mIG1lbW9yeSAoLW0gPE1CPikgYXJlIGNvcnJlY3RseSBzZXR1cAo+ID4gPiA+ICAj
+IGJ5IHRoZSBmcmFtZXdvcmsuCj4gPiA+ID4gICMKPiA+ID4gPiBAQCAtOTIsNiArOTIsMTggQEAg
+c21wID0gJE1BWF9TTVAKPiA+ID4gPiAgZXh0cmFfcGFyYW1zID0gLW1hY2hpbmUgZ2ljLXZlcnNp
+b249MyAtYXBwZW5kICdpcGknCj4gPiA+ID4gIGdyb3VwcyA9IGdpYwo+ID4gPiA+ICAKPiA+ID4g
+PiArW2dpY3YyLWFjdGl2ZV0KPiA+ID4gPiArZmlsZSA9IGdpYy5mbGF0Cj4gPiA+ID4gK3NtcCA9
+ICQoKCgkTUFYX1NNUCA8IDgpPyRNQVhfU01QOjgpKQo+ID4gPiA+ICtleHRyYV9wYXJhbXMgPSAt
+bWFjaGluZSBnaWMtdmVyc2lvbj0yIC1hcHBlbmQgJ2FjdGl2ZScKPiA+ID4gPiArZ3JvdXBzID0g
+Z2ljCj4gPiA+ID4gKwo+ID4gPiA+ICtbZ2ljdjMtYWN0aXZlXQo+ID4gPiA+ICtmaWxlID0gZ2lj
+LmZsYXQKPiA+ID4gPiArc21wID0gJE1BWF9TTVAKPiA+ID4gPiArZXh0cmFfcGFyYW1zID0gLW1h
+Y2hpbmUgZ2ljLXZlcnNpb249MyAtYXBwZW5kICdhY3RpdmUnCj4gPiA+ID4gK2dyb3VwcyA9IGdp
+Ywo+ID4gPiA+ICsKPiA+ID4gPiAgIyBUZXN0IFBTQ0kgZW11bGF0aW9uCj4gPiA+ID4gIFtwc2Np
+XQo+ID4gPiA+ICBmaWxlID0gcHNjaS5mbGF0Cj4gPiA+ID4gZGlmZiAtLWdpdCBhL2xpYi9hcm0v
+YXNtL2dpYy5oIGIvbGliL2FybS9hc20vZ2ljLmgKPiA+ID4gPiBpbmRleCBjODE4NmYyLi5jNjg4
+Y2NjIDEwMDY0NAo+ID4gPiA+IC0tLSBhL2xpYi9hcm0vYXNtL2dpYy5oCj4gPiA+ID4gKysrIGIv
+bGliL2FybS9hc20vZ2ljLmgKPiA+ID4gPiBAQCAtMTIsNiArMTIsOCBAQAo+ID4gPiA+ICAjZGVm
+aW5lIEdJQ0RfVFlQRVIJCQkweDAwMDQKPiA+ID4gPiAgI2RlZmluZSBHSUNEX0lHUk9VUFIJCQkw
+eDAwODAKPiA+ID4gPiAgI2RlZmluZSBHSUNEX0lTRU5BQkxFUgkJCTB4MDEwMAo+ID4gPiA+ICsj
+ZGVmaW5lIEdJQ0RfSVNBQ1RJVkVSCQkJMHgwMzAwCj4gPiA+ID4gKyNkZWZpbmUgR0lDRF9JQ0FD
+VElWRVIJCQkweDAzODAKPiA+ID4gPiAgI2RlZmluZSBHSUNEX0lQUklPUklUWVIJCQkweDA0MDAK
+PiA+ID4gPiAgI2RlZmluZSBHSUNEX1NHSVIJCQkweDBmMDAKPiA+ID4gPiAgCj4gPiA+ID4gLS0g
+Cj4gPiA+ID4gMi41LjAKPiA+ID4gPiAKPiA+ID4gCj4gPiA+IEV2ZXJ5dGhpbmcgYmVzaWRlcyB0
+aGUgc3RyYXkgY2hhcmFjdGVyIGluIHVuaXR0ZXN0cy5jZmcgaXMgb24KPiA+ID4gbml0IGxldmVs
+LCBhbmQgdGhlIHN0cmF5IGNoYXJhY3RlciBjYW4gcHJvYmFibHkgYmUgY2xlYW5lZCB1cAo+ID4g
+PiBvbiBjb21taXQsIHNvCj4gPiA+IAo+ID4gPiBSZXZpZXdlZC1ieTogQW5kcmV3IEpvbmVzIDxk
+cmpvbmVzQHJlZGhhdC5jb20+Cj4gPiAKPiA+IENocmlzdG9mZmVyLCBJIGhhdmUgZml4ZWQgdGhl
+IHNsYXNoIGluIGEgbG9jYWwgcmVwbywgcmVhZHkgdG8gcHVzaCBpZgo+ID4geW91IGRvIG5vdCB3
+YW50IGFueSBvdGhlciBjaGFuZ2VzLgo+ID4gCj4gPiBCdHcuIGNhbiB0aGUgaG9zdCBiZSByZWJv
+b3RlZCB3aXRob3V0IG1hZ2ljLVN5c1JxIGFmdGVyIGhpdHRpbmcgdGhlIGJ1Zz8KPiA+IChJIHdh
+cyB3b25kZXJpbmcgaWYgdGhlIGJ1ZyB3YXMgYmFkIGVub3VnaCBmb3IgdGhlIG5vZGVmYXVsdCBn
+cm91cCwgYnV0Cj4gPiAgRHJldyBkaWRuJ3QgcG9pbnQgaXQgb3V0IGFuZCB0aGUgaG9zdCBzaG91
+bGQgc3RpbGwgYmUgdXNlYWJsZQo+ID4gIGFmdGVyd2FyZHMgLi4uKQo+ID4gCj4gCj4gR29vZCBx
+dWVzdGlvbi4gIEkganVzdCB0ZXN0ZWQgdGhpcyB3aXRoIHRoZSBicm9rZW4ga2VybmVsLCBhbmQg
+d2hpbGUgeW91Cj4gZG8gaGF2ZSBhIHRocmVhZCB0aGF0IGRvZXNuJ3QgZXhpdCBhbmQgc3BpbnMg
+YSBiaXQsIHRoZW4geW91ciBob3N0IGlzCj4gY29tcGxldGVseSB1c2FibGUgYW5kIGNhbiBiZSBu
+b3JtYWxseSByZWJvb3RlZCwgc28gSSB0aGluayB0aGlzIGlzCj4gYWN0dWFsbHkgb2sgdG8gbGVh
+dmUgYXMgYSBkZWZhdWx0LCBidXQgaXQncyB1cCB0byB5b3UuCgpJIGFncmVlLCBub2RlZmF1bHQg
+aXMgZm9yIHdvcnNlIGJ1Z3MuCgpQdXNoZWQsIHRoYW5rcy4KX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
+dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
+bGlzdGluZm8va3ZtYXJtCg==
