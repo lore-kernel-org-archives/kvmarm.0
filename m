@@ -1,24 +1,24 @@
-From: Xie XiuQi <xiexiuqi@huawei.com>
-Subject: Re: [PATCH V12 09/10] trace, ras: add ARM processor error trace event
-Date: Thu, 9 Mar 2017 17:41:22 +0800
-Message-ID: <58C12342.2090701@huawei.com>
-References: <1488833103-21082-1-git-send-email-tbaicar@codeaurora.org>
- <1488833103-21082-10-git-send-email-tbaicar@codeaurora.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 01/10] arm64: KVM: VHE: Clear HCR_TGE when invalidating guest
+ TLBs
+Date: Thu,  9 Mar 2017 09:55:30 +0000
+Message-ID: <20170309095539.14512-2-marc.zyngier@arm.com>
+References: <20170309095539.14512-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 19279408EB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:48:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1029140BC4
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:54:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OXGpcgO7l1L4 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 04:48:38 -0500 (EST)
-Received: from dggrg02-dlp.huawei.com (unknown [45.249.212.188])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C0CF40625
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:48:36 -0500 (EST)
-In-Reply-To: <1488833103-21082-10-git-send-email-tbaicar@codeaurora.org>
+ with ESMTP id uaJRrfTRBmxO for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Mar 2017 04:54:42 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0893740BAC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:54:42 -0500 (EST)
+In-Reply-To: <20170309095539.14512-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,120 +28,139 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kern
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Linu Cherian <linu.cherian@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Tyler Baicar,
+When invalidating guest TLBs, special care must be taken to
+actually shoot the guest TLBs and not the host ones if we're
+running on a VHE system.  This is controlled by the HCR_EL2.TGE
+bit, which we forget to clear before invalidating TLBs.
 
-On 2017/3/7 4:45, Tyler Baicar wrote:
-> Currently there are trace events for the various RAS
-> errors with the exception of ARM processor type errors.
-> Add a new trace event for such errors so that the user
-> will know when they occur. These trace events are
-> consistent with the ARM processor error section type
-> defined in UEFI 2.6 spec section N.2.4.4.
-> 
-> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
-> Acked-by: Steven Rostedt <rostedt@goodmis.org>
-> ---
->  drivers/acpi/apei/ghes.c    |  8 +++++++-
->  drivers/firmware/efi/cper.c |  1 +
->  drivers/ras/ras.c           |  1 +
->  include/ras/ras_event.h     | 34 ++++++++++++++++++++++++++++++++++
->  4 files changed, 43 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index 842c0cc..81d7b79 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -514,7 +514,13 @@ static void ghes_do_proc(struct ghes *ghes,
->  		}
->  #endif
->  #ifdef CONFIG_RAS
-> -		else if (trace_unknown_sec_event_enabled()) {
-> +		else if (!uuid_le_cmp(sec_type, CPER_SEC_PROC_ARM) &&
-> +			 trace_arm_event_enabled()) {
-> +			struct cper_sec_proc_arm *arm_err;
-> +
-> +			arm_err = acpi_hest_generic_data_payload(gdata);
-> +			trace_arm_event(arm_err);
-> +		} else if (trace_unknown_sec_event_enabled()) {
->  			void *unknown_err = acpi_hest_generic_data_payload(gdata);
->  			trace_unknown_sec_event(&sec_type,
->  					fru_id, fru_text, sec_sev,
-> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
-> index 545a6c2..e9fb56a 100644
-> --- a/drivers/firmware/efi/cper.c
-> +++ b/drivers/firmware/efi/cper.c
-> @@ -35,6 +35,7 @@
->  #include <linux/printk.h>
->  #include <linux/bcd.h>
->  #include <acpi/ghes.h>
-> +#include <ras/ras_event.h>
->  
->  #define INDENT_SP	" "
->  
-> diff --git a/drivers/ras/ras.c b/drivers/ras/ras.c
-> index fb2500b..8ba5a94 100644
-> --- a/drivers/ras/ras.c
-> +++ b/drivers/ras/ras.c
-> @@ -28,3 +28,4 @@ static int __init ras_init(void)
->  #endif
->  EXPORT_TRACEPOINT_SYMBOL_GPL(mc_event);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(unknown_sec_event);
-> +EXPORT_TRACEPOINT_SYMBOL_GPL(arm_event);
-> diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
-> index 5861b6f..b36db48 100644
-> --- a/include/ras/ras_event.h
-> +++ b/include/ras/ras_event.h
-> @@ -162,6 +162,40 @@
->  );
->  
->  /*
-> + * ARM Processor Events Report
-> + *
-> + * This event is generated when hardware detects an ARM processor error
-> + * has occurred. UEFI 2.6 spec section N.2.4.4.
-> + */
-> +TRACE_EVENT(arm_event,
-> +
-> +	TP_PROTO(const struct cper_sec_proc_arm *proc),
-> +
-> +	TP_ARGS(proc),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(u64, mpidr)
-> +		__field(u64, midr)
-> +		__field(u32, running_state)
-> +		__field(u32, psci_state)
-> +		__field(u8, affinity)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->affinity = proc->affinity_level;
-> +		__entry->mpidr = proc->mpidr;
-> +		__entry->midr = proc->midr;
-> +		__entry->running_state = proc->running_state;
-> +		__entry->psci_state = proc->psci_state;
-> +	),
-> +
-> +	TP_printk("affinity level: %d; MPIDR: %016llx; MIDR: %016llx; "
-> +		  "running state: %d; PSCI state: %d",
-> +		  __entry->affinity, __entry->mpidr, __entry->midr,
-> +		  __entry->running_state, __entry->psci_state)
-> +);
-> +
+Address the issue by introducing two wrappers (__tlb_switch_to_guest
+and __tlb_switch_to_host) that take care of both the VTTBR_EL2
+and HCR_EL2.TGE switching.
 
-I think these fields are not enough, we need also export arm processor error
-information (UEFI 2.6 spec section N.2.4.4.1), or at least the error type,
-address, etc. So that the userspace (such as rasdaemon tool) could know what
-error occurred.
+Reported-by: Tomasz Nowicki <tnowicki@caviumnetworks.com>
+Tested-by: Tomasz Nowicki <tnowicki@caviumnetworks.com>
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Cc: stable@vger.kernel.org
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/hyp/tlb.c | 64 +++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 55 insertions(+), 9 deletions(-)
 
-Thanks,
-Xie XiuQi
-
-> +/*
->   * Unknown Section Report
->   *
->   * This event is generated when hardware detected a hardware
-> 
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index e8e7ba2bc11f..9e1d2b75eecd 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -18,14 +18,62 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/tlbflush.h>
+ 
++static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
++{
++	u64 val;
++
++	/*
++	 * With VHE enabled, we have HCR_EL2.{E2H,TGE} = {1,1}, and
++	 * most TLB operations target EL2/EL0. In order to affect the
++	 * guest TLBs (EL1/EL0), we need to change one of these two
++	 * bits. Changing E2H is impossible (goodbye TTBR1_EL2), so
++	 * let's flip TGE before executing the TLB operation.
++	 */
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	val = read_sysreg(hcr_el2);
++	val &= ~HCR_TGE;
++	write_sysreg(val, hcr_el2);
++	isb();
++}
++
++static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm)
++{
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	isb();
++}
++
++static hyp_alternate_select(__tlb_switch_to_guest,
++			    __tlb_switch_to_guest_nvhe,
++			    __tlb_switch_to_guest_vhe,
++			    ARM64_HAS_VIRT_HOST_EXTN);
++
++static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm)
++{
++	/*
++	 * We're done with the TLB operation, let's restore the host's
++	 * view of HCR_EL2.
++	 */
++	write_sysreg(0, vttbr_el2);
++	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
++}
++
++static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm)
++{
++	write_sysreg(0, vttbr_el2);
++}
++
++static hyp_alternate_select(__tlb_switch_to_host,
++			    __tlb_switch_to_host_nvhe,
++			    __tlb_switch_to_host_vhe,
++			    ARM64_HAS_VIRT_HOST_EXTN);
++
+ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ {
+ 	dsb(ishst);
+ 
+ 	/* Switch to requested VMID */
+ 	kvm = kern_hyp_va(kvm);
+-	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+-	isb();
++	__tlb_switch_to_guest()(kvm);
+ 
+ 	/*
+ 	 * We could do so much better if we had the VA as well.
+@@ -46,7 +94,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ 	dsb(ish);
+ 	isb();
+ 
+-	write_sysreg(0, vttbr_el2);
++	__tlb_switch_to_host()(kvm);
+ }
+ 
+ void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
+@@ -55,14 +103,13 @@ void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
+ 
+ 	/* Switch to requested VMID */
+ 	kvm = kern_hyp_va(kvm);
+-	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+-	isb();
++	__tlb_switch_to_guest()(kvm);
+ 
+ 	__tlbi(vmalls12e1is);
+ 	dsb(ish);
+ 	isb();
+ 
+-	write_sysreg(0, vttbr_el2);
++	__tlb_switch_to_host()(kvm);
+ }
+ 
+ void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
+@@ -70,14 +117,13 @@ void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
+ 	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
+ 
+ 	/* Switch to requested VMID */
+-	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+-	isb();
++	__tlb_switch_to_guest()(kvm);
+ 
+ 	__tlbi(vmalle1);
+ 	dsb(nsh);
+ 	isb();
+ 
+-	write_sysreg(0, vttbr_el2);
++	__tlb_switch_to_host()(kvm);
+ }
+ 
+ void __hyp_text __kvm_flush_vm_context(void)
+-- 
+2.11.0
