@@ -1,25 +1,25 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 04/10] arm64: mmu: map .text as read-only from the outset
-Date: Thu,  9 Mar 2017 09:25:06 +0100
-Message-ID: <1489047912-642-5-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v5 07/10] arm64/mmu: ignore debug_pagealloc for kernel segments
+Date: Thu,  9 Mar 2017 09:25:09 +0100
+Message-ID: <1489047912-642-8-git-send-email-ard.biesheuvel@linaro.org>
 References: <1489047912-642-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A36EF40C4A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 03:24:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAD3140C47
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 03:24:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qQVyxsbaCAJe for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 03:24:04 -0500 (EST)
-Received: from mail-wr0-f176.google.com (mail-wr0-f176.google.com
- [209.85.128.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7A4AC40C27
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 03:24:04 -0500 (EST)
-Received: by mail-wr0-f176.google.com with SMTP id u48so39712278wrc.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Mar 2017 00:25:29 -0800 (PST)
+ with ESMTP id zJfl2NSfTWJl for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Mar 2017 03:24:10 -0500 (EST)
+Received: from mail-wr0-f175.google.com (mail-wr0-f175.google.com
+ [209.85.128.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 46EF440C2F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 03:24:08 -0500 (EST)
+Received: by mail-wr0-f175.google.com with SMTP id u48so39713618wrc.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Mar 2017 00:25:33 -0800 (PST)
 In-Reply-To: <1489047912-642-1-git-send-email-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,66 +34,52 @@ To: linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, keescook@chromiu
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, marc.zyngier@arm.com, catalin.marinas@arm.com, kernel-hardening@lists.openwall.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that alternatives patching code no longer relies on the primary
-mapping of .text being writable, we can remove the code that removes
-the writable permissions post-init time, and map it read-only from
-the outset.
+The debug_pagealloc facility manipulates kernel mappings in the linear
+region at page granularity to detect out of bounds or use-after-free
+accesses. Since the kernel segments are not allocated dynamically,
+there is no point in taking the debug_pagealloc_enabled flag into
+account for them, and we can use block mappings unconditionally.
 
-To preserve the existing behavior under rodata=off, which is relied
-upon by external debuggers to manage software breakpoints (as pointed
-out by Mark), add an early_param() check for rodata=, and use RWX
-permissions if it set to 'off'.
+Note that this applies equally to the linear alias of text/rodata:
+we will never have dynamic allocations there given that the same
+memory is statically in use by the kernel image.
 
-Reviewed-by: Laura Abbott <labbott@redhat.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/mm/mmu.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ arch/arm64/mm/mmu.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index df377fbe464e..300e98e8cd63 100644
+index c3963c592ec3..d3fecd20a136 100644
 --- a/arch/arm64/mm/mmu.c
 +++ b/arch/arm64/mm/mmu.c
-@@ -416,9 +416,6 @@ void mark_rodata_ro(void)
- {
- 	unsigned long section_size;
+@@ -328,8 +328,7 @@ static void update_mapping_prot(phys_addr_t phys, unsigned long virt,
+ 		return;
+ 	}
  
--	section_size = (unsigned long)_etext - (unsigned long)_text;
--	update_mapping_prot(__pa_symbol(_text), (unsigned long)_text,
--			    section_size, PAGE_KERNEL_ROX);
- 	/*
- 	 * mark .rodata as read only. Use __init_begin rather than __end_rodata
- 	 * to cover NOTES and EXCEPTION_TABLE.
-@@ -451,6 +448,12 @@ static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
- 	vm_area_add_early(vma);
+-	__create_pgd_mapping(init_mm.pgd, phys, virt, size, prot,
+-			     NULL, debug_pagealloc_enabled());
++	__create_pgd_mapping(init_mm.pgd, phys, virt, size, prot, NULL, false);
+ 
+ 	/* flush the TLBs after updating live kernel mappings */
+ 	flush_tlb_kernel_range(virt, virt + size);
+@@ -381,7 +380,7 @@ static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end
+ 	 */
+ 	__create_pgd_mapping(pgd, kernel_start, __phys_to_virt(kernel_start),
+ 			     kernel_end - kernel_start, PAGE_KERNEL,
+-			     early_pgtable_alloc, debug_pagealloc_enabled());
++			     early_pgtable_alloc, false);
  }
  
-+static int __init parse_rodata(char *arg)
-+{
-+	return strtobool(arg, &rodata_enabled);
-+}
-+early_param("rodata", parse_rodata);
-+
- /*
-  * Create fine-grained mappings for the kernel.
-  */
-@@ -458,7 +461,14 @@ static void __init map_kernel(pgd_t *pgd)
- {
- 	static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_init, vmlinux_data;
+ void __init mark_linear_text_alias_ro(void)
+@@ -437,7 +436,7 @@ static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
+ 	BUG_ON(!PAGE_ALIGNED(size));
  
--	map_kernel_segment(pgd, _text, _etext, PAGE_KERNEL_EXEC, &vmlinux_text);
-+	/*
-+	 * External debuggers may need to write directly to the text
-+	 * mapping to install SW breakpoints. Allow this (only) when
-+	 * explicitly requested with rodata=off.
-+	 */
-+	pgprot_t text_prot = rodata_enabled ? PAGE_KERNEL_ROX : PAGE_KERNEL_EXEC;
-+
-+	map_kernel_segment(pgd, _text, _etext, text_prot, &vmlinux_text);
- 	map_kernel_segment(pgd, __start_rodata, __init_begin, PAGE_KERNEL, &vmlinux_rodata);
- 	map_kernel_segment(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC,
- 			   &vmlinux_init);
+ 	__create_pgd_mapping(pgd, pa_start, (unsigned long)va_start, size, prot,
+-			     early_pgtable_alloc, debug_pagealloc_enabled());
++			     early_pgtable_alloc, false);
+ 
+ 	vma->addr	= va_start;
+ 	vma->phys_addr	= pa_start;
 -- 
 2.7.4
