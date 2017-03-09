@@ -1,28 +1,29 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH RFC 5/7] ARM64: KVM: Support cross type vCPU
-Date: Thu, 9 Mar 2017 02:56:52 -0800
-Message-ID: <20170309105652.GC114809@lvm>
+Subject: Re: [PATCH RFC 7/7] ARM64: KVM: Add user set handler for
+ id_aa64mmfr0_el1
+Date: Thu, 9 Mar 2017 04:52:18 -0800
+Message-ID: <20170309125218.GD114809@lvm>
 References: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
- <1484559214-2248-6-git-send-email-zhaoshenglong@huawei.com>
- <20170128144754.cl7pikdwxbw7ovwz@hawk.localdomain>
+ <1484559214-2248-8-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA62140A14
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 06:02:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3495A40AE8
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 07:50:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jeYrMo3UhGov for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 06:02:56 -0500 (EST)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D24740625
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 06:02:55 -0500 (EST)
-Received: by mail-wm0-f41.google.com with SMTP id n11so53078307wma.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Mar 2017 03:04:21 -0800 (PST)
+ with ESMTP id o2hD2tg4b-l2 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Mar 2017 07:50:56 -0500 (EST)
+Received: from mail-wr0-f175.google.com (mail-wr0-f175.google.com
+ [209.85.128.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D6E340A66
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 07:50:56 -0500 (EST)
+Received: by mail-wr0-f175.google.com with SMTP id g10so44365964wrg.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Mar 2017 04:52:21 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <20170128144754.cl7pikdwxbw7ovwz@hawk.localdomain>
+In-Reply-To: <1484559214-2248-8-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,65 +33,85 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
+To: Shannon Zhao <zhaoshenglong@huawei.com>
 Cc: marc.zyngier@arm.com, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Jan 28, 2017 at 03:47:54PM +0100, Andrew Jones wrote:
-> On Mon, Jan 16, 2017 at 05:33:32PM +0800, Shannon Zhao wrote:
-> > From: Shannon Zhao <shannon.zhao@linaro.org>
-> > 
-> > Add a capability to tell userspace that KVM supports cross type vCPU.
-> > Add a cpu feature for userspace to set when it doesn't use host type
-> > vCPU and kvm_vcpu_preferred_target return the host MIDR register value
-> > so that userspace can check whether its requested vCPU type macthes the
-> > one of physical CPU and if so, KVM will not trap ID registers even
-> > though userspace doesn't specify -cpu host.
-> > Guest accesses MIDR through VPIDR_EL2 so we save/restore it no matter
-> > it's a cross type vCPU.
-> > 
-> > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> > ---
-> >  arch/arm/kvm/arm.c                   | 10 ++++++++--
-> >  arch/arm64/include/asm/kvm_emulate.h |  3 +++
-> >  arch/arm64/include/asm/kvm_host.h    |  3 ++-
-> >  arch/arm64/include/uapi/asm/kvm.h    |  1 +
-> >  arch/arm64/kvm/guest.c               | 17 ++++++++++++++++-
-> >  arch/arm64/kvm/hyp/sysreg-sr.c       |  2 ++
-> >  include/uapi/linux/kvm.h             |  1 +
-> >  7 files changed, 33 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> > index 1167678..bdceb19 100644
-> > --- a/arch/arm/kvm/arm.c
-> > +++ b/arch/arm/kvm/arm.c
-> > @@ -207,6 +207,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >  	case KVM_CAP_ARM_PSCI_0_2:
-> >  	case KVM_CAP_READONLY_MEM:
-> >  	case KVM_CAP_MP_STATE:
-> > +	case KVM_CAP_ARM_CROSS_VCPU:
-> >  		r = 1;
-> >  		break;
-> >  	case KVM_CAP_COALESCED_MMIO:
-> > @@ -809,8 +810,9 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-> >  {
-> >  	unsigned int i;
-> >  	int phys_target = kvm_target_cpu();
-> > +	bool cross_vcpu = kvm_vcpu_has_feature_cross_cpu(init);
-> >  
-> > -	if (init->target != phys_target)
-> > +	if (!cross_vcpu && init->target != phys_target)
-> >  		return -EINVAL;
+On Mon, Jan 16, 2017 at 05:33:34PM +0800, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> I'm not sure we need the vcpu feature bit. I think qemu should be
-> allowed to try any target (if using -cpu host it will try the
-> kvm preferred target). kvm should check that the input target is
-> a known target and that it is compatible with the phys_target,
-> otherwise -EINVAL.
-> 
+> Check if the configuration is fine.
 
-I agree. I think we just need to advertise the capability to user space
-instead.
+This commit message really needs some love and attention.
+
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 32 +++++++++++++++++++++++++++++++-
+>  1 file changed, 31 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f613e29..9763b79 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1493,6 +1493,35 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static int set_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
+> +				const struct sys_reg_desc *rd,
+> +				const struct kvm_one_reg *reg,
+> +				void __user *uaddr)
+> +{
+> +	u64 val, id_aa64mmfr0;
+> +
+> +	if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+> +		return -EFAULT;
+> +
+> +	asm volatile("mrs %0, id_aa64mmfr0_el1\n" : "=r" (id_aa64mmfr0));
+
+Doesn't the kernel have an abstraction for this already or a cached
+value?
+
+> +
+> +	if ((val & GENMASK(3, 0)) > (id_aa64mmfr0 & GENMASK(3, 0)) ||
+> +	    (val & GENMASK(7, 4)) > (id_aa64mmfr0 & GENMASK(7, 4)) ||
+> +	    (val & GENMASK(11, 8)) > (id_aa64mmfr0 & GENMASK(11, 8)) ||
+> +	    (val & GENMASK(15, 12)) > (id_aa64mmfr0 & GENMASK(15, 12)) ||
+> +	    (val & GENMASK(19, 16)) > (id_aa64mmfr0 & GENMASK(19, 16)) ||
+> +	    (val & GENMASK(23, 20)) > (id_aa64mmfr0 & GENMASK(23, 20)) ||
+> +	    (val & GENMASK(27, 24)) < (id_aa64mmfr0 & GENMASK(27, 24)) ||
+> +	    (val & GENMASK(31, 28)) < (id_aa64mmfr0 & GENMASK(31, 28))) {
+> +		kvm_err("Wrong memory translation granule size/Physical Address range\n");
+> +		return -EINVAL;
+> +	}
+
+This really needs some explanation as to what it's checking and what the
+logic is.
+
+> +
+> +	vcpu_id_sys_reg(vcpu, rd->reg) = val & GENMASK(31, 0);
+> +
+> +	return 0;
+> +}
+> +
+>  static struct sys_reg_desc invariant_sys_regs[] = {
+>  	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b000),
+>  	  access_id_reg, get_midr_el1, MIDR_EL1 },
+> @@ -1549,7 +1578,8 @@ static struct sys_reg_desc invariant_sys_regs[] = {
+>  	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0110), Op2(0b001),
+>  	  access_id_reg, get_id_aa64isar1_el1, ID_AA64ISAR1_EL1 },
+>  	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0111), Op2(0b000),
+> -	  access_id_reg, get_id_aa64mmfr0_el1, ID_AA64MMFR0_EL1 },
+> +	  access_id_reg, get_id_aa64mmfr0_el1, ID_AA64MMFR0_EL1,
+> +	  0, NULL, set_id_aa64mmfr0_el1 },
+>  	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0111), Op2(0b001),
+>  	  access_id_reg, get_id_aa64mmfr1_el1, ID_AA64MMFR1_EL1 },
+>  	{ Op0(0b11), Op1(0b001), CRn(0b0000), CRm(0b0000), Op2(0b001),
+> -- 
+> 2.0.4
+> 
+> 
 
 Thanks,
 -Christoffer
