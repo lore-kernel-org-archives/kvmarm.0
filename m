@@ -1,146 +1,47 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH RFC 6/7] ARM64: KVM: Support heterogeneous system
-Date: Thu, 9 Mar 2017 15:21:44 +0000
-Message-ID: <ee72bba1-65a6-d0c4-7f71-79d707a62ed2@arm.com>
-References: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
- <1484559214-2248-7-git-send-email-zhaoshenglong@huawei.com>
- <20170128145551.sknp447ieue56xgo@hawk.localdomain>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 00/10] KVM/ARM fixes for 4.11-rc2
+Date: Thu, 09 Mar 2017 15:52:23 +0000
+Message-ID: <87a88uwiq0.fsf@on-the-bus.cambridge.arm.com>
+References: <20170309095539.14512-1-marc.zyngier@arm.com>
+        <20170309151652.GA3210@potion>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B57C40AF9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 10:20:26 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id plKLfi+m5rtn for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 10:20:22 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B804C40AE8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 10:20:22 -0500 (EST)
-In-Reply-To: <20170128145551.sknp447ieue56xgo@hawk.localdomain>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: marc.zyngier@arm.com, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170309151652.GA3210@potion> ("Radim \=\?utf-8\?B\?S3LEjW3DocWZ\?\=
+ \=\?utf-8\?B\?Iidz\?\= message of "Thu,
+        9 Mar 2017 16:16:52 +0100")
+Sender: kvm-owner@vger.kernel.org
+To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <cdall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Linu Cherian <linu.cherian@cavium.com>, Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28/01/17 14:55, Andrew Jones wrote:
-> On Mon, Jan 16, 2017 at 05:33:33PM +0800, Shannon Zhao wrote:
->> From: Shannon Zhao <shannon.zhao@linaro.org>
->>
->> When initializing KVM, check whether physical hardware is a
->> heterogeneous system through the MIDR values. If so, force userspace to
->> set the KVM_ARM_VCPU_CROSS feature bit. Otherwise, it should fail to
->> initialize VCPUs.
->>
->> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->> ---
->>  arch/arm/kvm/arm.c       | 26 ++++++++++++++++++++++++++
->>  include/uapi/linux/kvm.h |  1 +
->>  2 files changed, 27 insertions(+)
->>
->> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
->> index bdceb19..21ec070 100644
->> --- a/arch/arm/kvm/arm.c
->> +++ b/arch/arm/kvm/arm.c
->> @@ -46,6 +46,7 @@
->>  #include <asm/kvm_coproc.h>
->>  #include <asm/kvm_psci.h>
->>  #include <asm/sections.h>
->> +#include <asm/cputype.h>
->>
->>  #ifdef REQUIRES_VIRT
->>  __asm__(".arch_extension	virt");
->> @@ -65,6 +66,7 @@ static unsigned int kvm_vmid_bits __read_mostly;
->>  static DEFINE_SPINLOCK(kvm_vmid_lock);
->>
->>  static bool vgic_present;
->> +static bool heterogeneous_system;
->>
->>  static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
->>
->> @@ -210,6 +212,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>  	case KVM_CAP_ARM_CROSS_VCPU:
->>  		r = 1;
->>  		break;
->> +	case KVM_CAP_ARM_HETEROGENEOUS:
->> +		r = heterogeneous_system;
->> +		break;
+On Thu, Mar 09 2017 at  3:16:52 pm GMT, Radim Krčmář <rkrcmar@redhat.com> wrote:
+> 2017-03-09 09:55+0000, Marc Zyngier:
+>> Paolo, Radim,
+>> 
+>> Here's the KVM/ARM updates for 4.11-rc2. The usual bag of vgic
+>> updates, making the memslot array large enough to handle guests with
+>> tons of devices assigned to them, a tidying up of exception handling,
+>> and a rather annoying TLB handling issue on VHE systems.
 >
-> What's this for? When/why would usespace check it?
+> Pulled, but what made you change the GPG key into a revoked one?
 >
->>  	case KVM_CAP_COALESCED_MMIO:
->>  		r = KVM_COALESCED_MMIO_PAGE_OFFSET;
->>  		break;
->> @@ -812,6 +817,12 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->>  	int phys_target = kvm_target_cpu();
->>  	bool cross_vcpu = kvm_vcpu_has_feature_cross_cpu(init);
->>
->> +	if (heterogeneous_system && !cross_vcpu) {
->> +		kvm_err("%s:Host is a heterogeneous system, set KVM_ARM_VCPU_CROSS bit\n",
->> +			__func__);
->> +		return -EINVAL;
->> +	}
->
-> Instead of forcing userspace to set a bit, why not just confirm the
-> target selected will work? E.g. if only generic works on a heterogeneous
-> system then just
->
->  if (heterogeneous_system && init->target != GENERIC)
->     return -EINVAL
->
-> should work
->
->> +
->>  	if (!cross_vcpu && init->target != phys_target)
->>  		return -EINVAL;
->>
->> @@ -1397,6 +1408,11 @@ static void check_kvm_target_cpu(void *ret)
->>  	*(int *)ret = kvm_target_cpu();
->>  }
->>
->> +static void get_physical_cpu_midr(void *midr)
->> +{
->> +	*(u32 *)midr = read_cpuid_id();
->> +}
->> +
->>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
->>  {
->>  	struct kvm_vcpu *vcpu;
->> @@ -1417,6 +1433,7 @@ int kvm_arch_init(void *opaque)
->>  {
->>  	int err;
->>  	int ret, cpu;
->> +	u32 current_midr, midr;
->>
->>  	if (!is_hyp_mode_available()) {
->>  		kvm_err("HYP mode not available\n");
->> @@ -1431,6 +1448,15 @@ int kvm_arch_init(void *opaque)
->>  		}
->>  	}
->>
->> +	current_midr = read_cpuid_id();
->> +	for_each_online_cpu(cpu) {
->> +		smp_call_function_single(cpu, get_physical_cpu_midr, &midr, 1);
->> +		if (current_midr != midr) {
->> +			heterogeneous_system = true;
->> +			break;
->> +		}
->> +	}
->
-> Is there no core kernel API that provides this?
+>   # gpg: Signature made Thu 09 Mar 2017 10:36:07 AM CET
+>   # gpg:                using RSA key AB309C74B93B1EA1
+>   # gpg: Good signature from "Marc Zyngier <marc.zyngier@arm.com>"
+>   # gpg: WARNING: This key has been revoked by its owner!
+>   # gpg:          This could mean that the signature is forged.
+>   # gpg: reason for revocation: Key has been compromised
+>   # gpg: revocation comment: Revoked after kernel.org hacking
+>   # Primary key fingerprint: 6958 C9F2 233C 5E9D 6CCA  818A AB30 9C74 B93B 1EA1
 
-On arm64, there is a per-cpu cpuinfo structure kept for each online CPU, which keeps
-cached values of the ID registers. May be we could use that here.
-See arch/arm64/kernel/cpuinfo.c::__cpuinfo_store_cpu()
+Gahhh... New laptop, keyring restored from a backup containing the
+revoked key, gpg-agent picking the revoked key as a default, idiot
+sitting behind the keyboard not paying attention :-(. Now fixed.
 
-Suzuki
+Sorry about that.
+
+	M.
+-- 
+Jazz is not dead, it just smell funny.
