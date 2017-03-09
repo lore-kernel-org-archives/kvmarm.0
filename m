@@ -1,23 +1,26 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH 11/15] KVM: arm64: Use common GICv3 sysreg definitions
-Date: Thu,  9 Mar 2017 17:07:23 +0000
-Message-ID: <1489079247-31092-12-git-send-email-mark.rutland@arm.com>
-References: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
+Subject: Re: [PATCH v5 07/10] arm64/mmu: ignore debug_pagealloc for kernel
+ segments
+Date: Thu, 9 Mar 2017 17:51:17 +0000
+Message-ID: <20170309175116.GD11966@leverpostej>
+References: <1489047912-642-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1489047912-642-8-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAEDC40962
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:07:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 84A54408EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:50:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uIG3s7gBL4lf for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 12:07:19 -0500 (EST)
+ with ESMTP id fIV-aIasRTlQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Mar 2017 12:50:04 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 284BE40C2D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:07:19 -0500 (EST)
-In-Reply-To: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BB8B40625
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:50:04 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1489047912-642-8-git-send-email-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,39 +30,71 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: keescook@chromium.org, kernel-hardening@lists.openwall.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, labbott@fedoraproject.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we have common definitions for the GICv3 register encodings,
-make the KVM code use these, simplifying the sys_reg_descs table.
+On Thu, Mar 09, 2017 at 09:25:09AM +0100, Ard Biesheuvel wrote:
+> The debug_pagealloc facility manipulates kernel mappings in the linear
+> region at page granularity to detect out of bounds or use-after-free
+> accesses. Since the kernel segments are not allocated dynamically,
+> there is no point in taking the debug_pagealloc_enabled flag into
+> account for them, and we can use block mappings unconditionally.
+> 
+> Note that this applies equally to the linear alias of text/rodata:
+> we will never have dynamic allocations there given that the same
+> memory is statically in use by the kernel image.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
----
- arch/arm64/kvm/sys_regs.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+This makes sense to me, and I haven't found anything this breaks.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 63b0785..1f3062b 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -973,12 +973,8 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
- 	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b0000), Op2(0b000),
- 	  NULL, reset_val, VBAR_EL1, 0 },
- 
--	/* ICC_SGI1R_EL1 */
--	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1011), Op2(0b101),
--	  access_gic_sgi },
--	/* ICC_SRE_EL1 */
--	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1100), Op2(0b101),
--	  access_gic_sre },
-+	{ SYS_DESC(SYS_ICC_SGI1R_EL1), access_gic_sgi },
-+	{ SYS_DESC(SYS_ICC_SRE_EL1), access_gic_sre },
- 
- 	/* CONTEXTIDR_EL1 */
- 	{ Op0(0b11), Op1(0b000), CRn(0b1101), CRm(0b0000), Op2(0b001),
--- 
-1.9.1
+It may be worth noting that a similar reasoning already applies the the
+FDT mapping, where we use create_mapping_noalloc(), and never mandate
+page mappings.
+
+Regardless:
+
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+
+Mark.
+
+> ---
+>  arch/arm64/mm/mmu.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+> index c3963c592ec3..d3fecd20a136 100644
+> --- a/arch/arm64/mm/mmu.c
+> +++ b/arch/arm64/mm/mmu.c
+> @@ -328,8 +328,7 @@ static void update_mapping_prot(phys_addr_t phys, unsigned long virt,
+>  		return;
+>  	}
+>  
+> -	__create_pgd_mapping(init_mm.pgd, phys, virt, size, prot,
+> -			     NULL, debug_pagealloc_enabled());
+> +	__create_pgd_mapping(init_mm.pgd, phys, virt, size, prot, NULL, false);
+>  
+>  	/* flush the TLBs after updating live kernel mappings */
+>  	flush_tlb_kernel_range(virt, virt + size);
+> @@ -381,7 +380,7 @@ static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end
+>  	 */
+>  	__create_pgd_mapping(pgd, kernel_start, __phys_to_virt(kernel_start),
+>  			     kernel_end - kernel_start, PAGE_KERNEL,
+> -			     early_pgtable_alloc, debug_pagealloc_enabled());
+> +			     early_pgtable_alloc, false);
+>  }
+>  
+>  void __init mark_linear_text_alias_ro(void)
+> @@ -437,7 +436,7 @@ static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
+>  	BUG_ON(!PAGE_ALIGNED(size));
+>  
+>  	__create_pgd_mapping(pgd, pa_start, (unsigned long)va_start, size, prot,
+> -			     early_pgtable_alloc, debug_pagealloc_enabled());
+> +			     early_pgtable_alloc, false);
+>  
+>  	vma->addr	= va_start;
+>  	vma->phys_addr	= pa_start;
+> -- 
+> 2.7.4
+> 
