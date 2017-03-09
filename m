@@ -1,22 +1,22 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH 07/15] arm64: sysreg: add Set/Way sys encodings
-Date: Thu,  9 Mar 2017 17:07:19 +0000
-Message-ID: <1489079247-31092-8-git-send-email-mark.rutland@arm.com>
+Subject: [PATCH 09/15] KVM: arm64: Use common debug sysreg definitions
+Date: Thu,  9 Mar 2017 17:07:21 +0000
+Message-ID: <1489079247-31092-10-git-send-email-mark.rutland@arm.com>
 References: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5BA540C25
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:07:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0645E40A42
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:07:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Snk3sE28U6et for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 12:07:11 -0500 (EST)
+ with ESMTP id NiOW-WMa3raF for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Mar 2017 12:07:15 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 163F440C43
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:07:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EC2340C58
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:07:15 -0500 (EST)
 In-Reply-To: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,49 +31,121 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Cache maintenance ops fall in the SYS instruction class, and KVM needs
-to handle them. So as to keep all SYS encodings in one place, this
-patch adds them to sysreg.h.
+Now that we have common definitions for the debug register encodings,
+make the KVM code use these, simplifying the sys_reg_descs table.
 
-The encodings were taken from ARM DDI 0487A.k_iss10775, Table C5-2.
-
-To make it clear that these are instructions rather than registers, and
-to allow us to change the way these are handled in future, a new
-sys_insn() alias for sys_reg() is added and used for these new
-definitions.
+The table previously erroneously referred to MDCCSR_EL0 as MDCCSR_EL1.
+This is corrected (as is necessary in order to use the common sysreg
+definition).
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
 ---
- arch/arm64/include/asm/sysreg.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 73 ++++++++++++++---------------------------------
+ 1 file changed, 21 insertions(+), 52 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index f623320..128eae8 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -48,6 +48,8 @@
- 	 ((crn) << CRn_shift) | ((crm) << CRm_shift) | \
- 	 ((op2) << Op2_shift))
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 0e26f8c..5fa23fd 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -793,17 +793,13 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
  
-+#define sys_insn	sys_reg
-+
- #define sys_reg_Op0(id)	(((id) >> Op0_shift) & Op0_mask)
- #define sys_reg_Op1(id)	(((id) >> Op1_shift) & Op1_mask)
- #define sys_reg_CRn(id)	(((id) >> CRn_shift) & CRn_mask)
-@@ -89,6 +91,10 @@
- #define SET_PSTATE_UAO(x) __emit_inst(0xd5000000 | REG_PSTATE_UAO_IMM |	\
- 				      (!!x)<<8 | 0x1f)
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+-	/* DBGBVRn_EL1 */						\
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b100),	\
++	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+ 	  trap_bvr, reset_bvr, n, 0, get_bvr, set_bvr },		\
+-	/* DBGBCRn_EL1 */						\
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b101),	\
++	{ SYS_DESC(SYS_DBGBCRn_EL1(n)),					\
+ 	  trap_bcr, reset_bcr, n, 0, get_bcr, set_bcr },		\
+-	/* DBGWVRn_EL1 */						\
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b110),	\
++	{ SYS_DESC(SYS_DBGWVRn_EL1(n)),					\
+ 	  trap_wvr, reset_wvr, n, 0,  get_wvr, set_wvr },		\
+-	/* DBGWCRn_EL1 */						\
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b111),	\
++	{ SYS_DESC(SYS_DBGWCRn_EL1(n)),					\
+ 	  trap_wcr, reset_wcr, n, 0,  get_wcr, set_wcr }
  
-+#define SYS_DC_ISW			sys_insn(1, 0, 7, 6, 2)
-+#define SYS_DC_CSW			sys_insn(1, 0, 7, 10, 2)
-+#define SYS_DC_CISW			sys_insn(1, 0, 7, 14, 2)
+ /* Macro to expand the PMEVCNTRn_EL0 register */
+@@ -899,12 +895,8 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+ 
+ 	DBG_BCR_BVR_WCR_WVR_EL1(0),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(1),
+-	/* MDCCINT_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b000),
+-	  trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
+-	/* MDSCR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b010),
+-	  trap_debug_regs, reset_val, MDSCR_EL1, 0 },
++	{ SYS_DESC(SYS_MDCCINT_EL1), trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
++	{ SYS_DESC(SYS_MDSCR_EL1), trap_debug_regs, reset_val, MDSCR_EL1, 0 },
+ 	DBG_BCR_BVR_WCR_WVR_EL1(2),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(3),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(4),
+@@ -920,44 +912,21 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+ 	DBG_BCR_BVR_WCR_WVR_EL1(14),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(15),
+ 
+-	/* MDRAR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0001), CRm(0b0000), Op2(0b000),
+-	  trap_raz_wi },
+-	/* OSLAR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0001), CRm(0b0000), Op2(0b100),
+-	  trap_raz_wi },
+-	/* OSLSR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0001), CRm(0b0001), Op2(0b100),
+-	  trap_oslsr_el1 },
+-	/* OSDLR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0001), CRm(0b0011), Op2(0b100),
+-	  trap_raz_wi },
+-	/* DBGPRCR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0001), CRm(0b0100), Op2(0b100),
+-	  trap_raz_wi },
+-	/* DBGCLAIMSET_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0111), CRm(0b1000), Op2(0b110),
+-	  trap_raz_wi },
+-	/* DBGCLAIMCLR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0111), CRm(0b1001), Op2(0b110),
+-	  trap_raz_wi },
+-	/* DBGAUTHSTATUS_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0111), CRm(0b1110), Op2(0b110),
+-	  trap_dbgauthstatus_el1 },
+-
+-	/* MDCCSR_EL1 */
+-	{ Op0(0b10), Op1(0b011), CRn(0b0000), CRm(0b0001), Op2(0b000),
+-	  trap_raz_wi },
+-	/* DBGDTR_EL0 */
+-	{ Op0(0b10), Op1(0b011), CRn(0b0000), CRm(0b0100), Op2(0b000),
+-	  trap_raz_wi },
+-	/* DBGDTR[TR]X_EL0 */
+-	{ Op0(0b10), Op1(0b011), CRn(0b0000), CRm(0b0101), Op2(0b000),
+-	  trap_raz_wi },
+-
+-	/* DBGVCR32_EL2 */
+-	{ Op0(0b10), Op1(0b100), CRn(0b0000), CRm(0b0111), Op2(0b000),
+-	  NULL, reset_val, DBGVCR32_EL2, 0 },
++	{ SYS_DESC(SYS_MDRAR_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_OSLAR_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1 },
++	{ SYS_DESC(SYS_OSDLR_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_DBGPRCR_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_DBGCLAIMSET_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
 +
- #define SYS_OSDTRRX_EL1			sys_reg(2, 0, 0, 0, 2)
- #define SYS_MDCCINT_EL1			sys_reg(2, 0, 0, 2, 0)
- #define SYS_MDSCR_EL1			sys_reg(2, 0, 0, 2, 2)
++	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
++	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
++	// DBGDTR[TR]X_EL0 share the same encoding
++	{ SYS_DESC(SYS_DBGDTRTX_EL0), trap_raz_wi },
++
++	{ SYS_DESC(SYS_DBGVCR32_EL2), NULL, reset_val, DBGVCR32_EL2, 0 },
+ 
+ 	/* MPIDR_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b101),
 -- 
 1.9.1
