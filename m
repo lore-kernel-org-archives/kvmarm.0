@@ -1,98 +1,105 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH RFC 7/7] ARM64: KVM: Add user set handler for
- id_aa64mmfr0_el1
-Date: Thu, 9 Mar 2017 15:03:32 +0000
-Message-ID: <20170309150331.GA10724@leverpostej>
-References: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
- <1484559214-2248-8-git-send-email-zhaoshenglong@huawei.com>
- <20170309125218.GD114809@lvm>
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH 00/10] KVM/ARM fixes for 4.11-rc2
+Date: Thu, 9 Mar 2017 16:16:52 +0100
+Message-ID: <20170309151652.GA3210@potion>
+References: <20170309095539.14512-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC64F40AE8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 10:02:25 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YcYzg9RFRoEm for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 10:02:24 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A0884095A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 10:02:23 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170309125218.GD114809@lvm>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: marc.zyngier@arm.com, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+In-Reply-To: <20170309095539.14512-1-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <cdall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Linu Cherian <linu.cherian@cavium.com>, Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Mar 09, 2017 at 04:52:18AM -0800, Christoffer Dall wrote:
-> On Mon, Jan 16, 2017 at 05:33:34PM +0800, Shannon Zhao wrote:
-> > From: Shannon Zhao <shannon.zhao@linaro.org>
-> > 
-> > Check if the configuration is fine.
+2017-03-09 09:55+0000, Marc Zyngier:
+> Paolo, Radim,
 > 
-> This commit message really needs some love and attention.
+> Here's the KVM/ARM updates for 4.11-rc2. The usual bag of vgic
+> updates, making the memslot array large enough to handle guests with
+> tons of devices assigned to them, a tidying up of exception handling,
+> and a rather annoying TLB handling issue on VHE systems.
+
+Pulled, but what made you change the GPG key into a revoked one?
+
+  # gpg: Signature made Thu 09 Mar 2017 10:36:07 AM CET
+  # gpg:                using RSA key AB309C74B93B1EA1
+  # gpg: Good signature from "Marc Zyngier <marc.zyngier@arm.com>"
+  # gpg: WARNING: This key has been revoked by its owner!
+  # gpg:          This could mean that the signature is forged.
+  # gpg: reason for revocation: Key has been compromised
+  # gpg: revocation comment: Revoked after kernel.org hacking
+  # Primary key fingerprint: 6958 C9F2 233C 5E9D 6CCA  818A AB30 9C74 B93B 1EA1
+
+Thanks.
+
+> Please pull,
 > 
-> > 
-> > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 32 +++++++++++++++++++++++++++++++-
-> >  1 file changed, 31 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index f613e29..9763b79 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1493,6 +1493,35 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
-> >  	return true;
-> >  }
-> >  
-> > +static int set_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
-> > +				const struct sys_reg_desc *rd,
-> > +				const struct kvm_one_reg *reg,
-> > +				void __user *uaddr)
-> > +{
-> > +	u64 val, id_aa64mmfr0;
-> > +
-> > +	if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)) != 0)
-> > +		return -EFAULT;
-> > +
-> > +	asm volatile("mrs %0, id_aa64mmfr0_el1\n" : "=r" (id_aa64mmfr0));
+> Thanks,
 > 
-> Doesn't the kernel have an abstraction for this already or a cached
-> value?
-
-Certainly we shouldn't be using a raw mrs instruction. We have
-read_sysreg() or read_cpuid() for that.
-
-The cpufeature code has a cached, system-wide safe value cached for each
-system register. The cpuid_feature_extract_field() helper uses that.
-
-> > +	if ((val & GENMASK(3, 0)) > (id_aa64mmfr0 & GENMASK(3, 0)) ||
-> > +	    (val & GENMASK(7, 4)) > (id_aa64mmfr0 & GENMASK(7, 4)) ||
-> > +	    (val & GENMASK(11, 8)) > (id_aa64mmfr0 & GENMASK(11, 8)) ||
-> > +	    (val & GENMASK(15, 12)) > (id_aa64mmfr0 & GENMASK(15, 12)) ||
-> > +	    (val & GENMASK(19, 16)) > (id_aa64mmfr0 & GENMASK(19, 16)) ||
-> > +	    (val & GENMASK(23, 20)) > (id_aa64mmfr0 & GENMASK(23, 20)) ||
-> > +	    (val & GENMASK(27, 24)) < (id_aa64mmfr0 & GENMASK(27, 24)) ||
-> > +	    (val & GENMASK(31, 28)) < (id_aa64mmfr0 & GENMASK(31, 28))) {
-
-Please use mnemonics. For example, we have ID_AA64MMFR0_TGRAN*_SHIFT
-defined in <asm/sysreg.h>.
-
-We also have extraction helpers, see
-cpuid_feature_extract_unsigned_field(), as used in
-id_aa64mmfr0_mixed_endian_el0().
-
-Thanks,
-Mark.
+> 	M.
+> 
+> The following changes since commit c1ae3cfa0e89fa1a7ecc4c99031f5e9ae99d9201:
+> 
+>   Linux 4.11-rc1 (2017-03-05 12:59:56 -0800)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.11-rc2
+> 
+> for you to fetch changes up to 955a3fc6d2a1c11d6d00bce4f3816100ce0530cf:
+> 
+>   KVM: arm64: Increase number of user memslots to 512 (2017-03-09 09:13:50 +0000)
+> 
+> ----------------------------------------------------------------
+> KVM/ARM updates for v4.11-rc2
+> 
+> vgic updates:
+> - Honour disabling the ITS
+> - Don't deadlock when deactivating own interrupts via MMIO
+> - Correctly expose the lact of IRQ/FIQ bypass on GICv3
+> 
+> I/O virtualization:
+> - Make KVM_CAP_NR_MEMSLOTS big enough for large guests with
+>   many PCIe devices
+> 
+> General bug fixes:
+> - Gracefully handle exception generated with syndroms that
+>   the host doesn't understand
+> - Properly invalidate TLBs on VHE systems
+> 
+> ----------------------------------------------------------------
+> Andre Przywara (1):
+>       KVM: arm/arm64: VGIC: Fix command handling while ITS being disabled
+> 
+> Jintack Lim (1):
+>       KVM: arm/arm64: Let vcpu thread modify its own active state
+> 
+> Linu Cherian (4):
+>       KVM: Add documentation for KVM_CAP_NR_MEMSLOTS
+>       KVM: arm/arm64: Enable KVM_CAP_NR_MEMSLOTS on arm/arm64
+>       KVM: arm/arm64: Remove KVM_PRIVATE_MEM_SLOTS definition that are unused
+>       KVM: arm64: Increase number of user memslots to 512
+> 
+> Marc Zyngier (2):
+>       arm64: KVM: VHE: Clear HCR_TGE when invalidating guest TLBs
+>       KVM: arm/arm64: vgic-v3: Don't pretend to support IRQ/FIQ bypass
+> 
+> Mark Rutland (2):
+>       arm: KVM: Survive unknown traps from guests
+>       arm64: KVM: Survive unknown traps from guests
+> 
+>  Documentation/virtual/kvm/api.txt  |   4 ++
+>  arch/arm/include/asm/kvm_arm.h     |   1 +
+>  arch/arm/include/asm/kvm_host.h    |   1 -
+>  arch/arm/kvm/arm.c                 |   3 +
+>  arch/arm/kvm/handle_exit.c         |  19 ++++---
+>  arch/arm64/include/asm/kvm_host.h  |   3 +-
+>  arch/arm64/kvm/handle_exit.c       |  19 ++++---
+>  arch/arm64/kvm/hyp/tlb.c           |  64 +++++++++++++++++++---
+>  include/linux/irqchip/arm-gic-v3.h |   2 +
+>  virt/kvm/arm/vgic/vgic-its.c       | 109 ++++++++++++++++++++++---------------
+>  virt/kvm/arm/vgic/vgic-mmio.c      |  32 ++++++++---
+>  virt/kvm/arm/vgic/vgic-v3.c        |   5 +-
+>  12 files changed, 183 insertions(+), 79 deletions(-)
