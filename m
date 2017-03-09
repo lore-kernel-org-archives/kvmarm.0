@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 03/10] KVM: arm/arm64: Let vcpu thread modify its own active
- state
-Date: Thu,  9 Mar 2017 09:55:32 +0000
-Message-ID: <20170309095539.14512-4-marc.zyngier@arm.com>
+Subject: [PATCH 04/10] arm: KVM: Survive unknown traps from guests
+Date: Thu,  9 Mar 2017 09:55:33 +0000
+Message-ID: <20170309095539.14512-5-marc.zyngier@arm.com>
 References: <20170309095539.14512-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B06240BC4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:54:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CB9A40A7B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:54:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TUGM61SxgW02 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 04:54:51 -0500 (EST)
+ with ESMTP id Ze7J2+mumbi2 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Mar 2017 04:54:56 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 636D140625
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:54:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67D8940625
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:54:56 -0500 (EST)
 In-Reply-To: <20170309095539.14512-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,72 +31,86 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Linu Cherian <linu.cherian@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jintack Lim <jintack@cs.columbia.edu>
+From: Mark Rutland <mark.rutland@arm.com>
 
-Currently, if a vcpu thread tries to change the active state of an
-interrupt which is already on the same vcpu's AP list, it will loop
-forever. Since the VGIC mmio handler is called after a vcpu has
-already synced back the LR state to the struct vgic_irq, we can just
-let it proceed safely.
+Currently we BUG() if we see a HSR.EC value we don't recognise. As
+configurable disables/enables are added to the architecture (controlled
+by RES1/RES0 bits respectively), with associated synchronous exceptions,
+it may be possible for a guest to trigger exceptions with classes that
+we don't recognise.
 
-Cc: stable@vger.kernel.org
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
+While we can't service these exceptions in a manner useful to the guest,
+we can avoid bringing down the host. Per ARM DDI 0406C.c, all currently
+unallocated HSR EC encodings are reserved, and per ARM DDI
+0487A.k_iss10775, page G6-4395, EC values within the range 0x00 - 0x2c
+are reserved for future use with synchronous exceptions, and EC values
+within the range 0x2d - 0x3f may be used for either synchronous or
+asynchronous exceptions.
+
+The patch makes KVM handle any unknown EC by injecting an UNDEFINED
+exception into the guest, with a corresponding (ratelimited) warning in
+the host dmesg. We could later improve on this with with a new (opt-in)
+exit to the host userspace.
+
+Cc: Dave Martin <dave.martin@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio.c | 32 ++++++++++++++++++++++++--------
- 1 file changed, 24 insertions(+), 8 deletions(-)
+ arch/arm/include/asm/kvm_arm.h |  1 +
+ arch/arm/kvm/handle_exit.c     | 19 ++++++++++++-------
+ 2 files changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 3654b4c835ef..2a5db1352722 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -180,21 +180,37 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
- static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 				    bool new_active_state)
+diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+index e22089fb44dc..a3f0b3d50089 100644
+--- a/arch/arm/include/asm/kvm_arm.h
++++ b/arch/arm/include/asm/kvm_arm.h
+@@ -209,6 +209,7 @@
+ #define HSR_EC_IABT_HYP	(0x21)
+ #define HSR_EC_DABT	(0x24)
+ #define HSR_EC_DABT_HYP	(0x25)
++#define HSR_EC_MAX	(0x3f)
+ 
+ #define HSR_WFI_IS_WFE		(_AC(1, UL) << 0)
+ 
+diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
+index 4e40d1955e35..96af65a30d78 100644
+--- a/arch/arm/kvm/handle_exit.c
++++ b/arch/arm/kvm/handle_exit.c
+@@ -79,7 +79,19 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	return 1;
+ }
+ 
++static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	u32 hsr = kvm_vcpu_get_hsr(vcpu);
++
++	kvm_pr_unimpl("Unknown exception class: hsr: %#08x\n",
++		      hsr);
++
++	kvm_inject_undefined(vcpu);
++	return 1;
++}
++
+ static exit_handle_fn arm_exit_handlers[] = {
++	[0 ... HSR_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[HSR_EC_WFI]		= kvm_handle_wfx,
+ 	[HSR_EC_CP15_32]	= kvm_handle_cp15_32,
+ 	[HSR_EC_CP15_64]	= kvm_handle_cp15_64,
+@@ -98,13 +110,6 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
  {
-+	struct kvm_vcpu *requester_vcpu;
- 	spin_lock(&irq->irq_lock);
-+
-+	/*
-+	 * The vcpu parameter here can mean multiple things depending on how
-+	 * this function is called; when handling a trap from the kernel it
-+	 * depends on the GIC version, and these functions are also called as
-+	 * part of save/restore from userspace.
-+	 *
-+	 * Therefore, we have to figure out the requester in a reliable way.
-+	 *
-+	 * When accessing VGIC state from user space, the requester_vcpu is
-+	 * NULL, which is fine, because we guarantee that no VCPUs are running
-+	 * when accessing VGIC state from user space so irq->vcpu->cpu is
-+	 * always -1.
-+	 */
-+	requester_vcpu = kvm_arm_get_running_vcpu();
-+
- 	/*
- 	 * If this virtual IRQ was written into a list register, we
- 	 * have to make sure the CPU that runs the VCPU thread has
--	 * synced back LR state to the struct vgic_irq.  We can only
--	 * know this for sure, when either this irq is not assigned to
--	 * anyone's AP list anymore, or the VCPU thread is not
--	 * running on any CPUs.
-+	 * synced back the LR state to the struct vgic_irq.
- 	 *
--	 * In the opposite case, we know the VCPU thread may be on its
--	 * way back from the guest and still has to sync back this
--	 * IRQ, so we release and re-acquire the spin_lock to let the
--	 * other thread sync back the IRQ.
-+	 * As long as the conditions below are true, we know the VCPU thread
-+	 * may be on its way back from the guest (we kicked the VCPU thread in
-+	 * vgic_change_active_prepare)  and still has to sync back this IRQ,
-+	 * so we release and re-acquire the spin_lock to let the other thread
-+	 * sync back the IRQ.
- 	 */
- 	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
-+	       irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
- 	       irq->vcpu->cpu != -1) /* VCPU thread is running */
- 		cond_resched_lock(&irq->irq_lock);
+ 	u8 hsr_ec = kvm_vcpu_trap_get_class(vcpu);
+ 
+-	if (hsr_ec >= ARRAY_SIZE(arm_exit_handlers) ||
+-	    !arm_exit_handlers[hsr_ec]) {
+-		kvm_err("Unknown exception class: hsr: %#08x\n",
+-			(unsigned int)kvm_vcpu_get_hsr(vcpu));
+-		BUG();
+-	}
+-
+ 	return arm_exit_handlers[hsr_ec];
+ }
  
 -- 
 2.11.0
