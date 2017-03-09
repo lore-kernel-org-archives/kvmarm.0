@@ -1,25 +1,25 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 06/10] arm64/mmu: align alloc_init_pte prototype with
- pmd/pud versions
-Date: Thu,  9 Mar 2017 09:25:08 +0100
-Message-ID: <1489047912-642-7-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v5 04/10] arm64: mmu: map .text as read-only from the outset
+Date: Thu,  9 Mar 2017 09:25:06 +0100
+Message-ID: <1489047912-642-5-git-send-email-ard.biesheuvel@linaro.org>
 References: <1489047912-642-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B826140C4E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 03:24:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A36EF40C4A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 03:24:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5xjziNeB-zA8 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 03:24:08 -0500 (EST)
-Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB2E840C35
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 03:24:07 -0500 (EST)
-Received: by mail-wm0-f48.google.com with SMTP id v186so133214737wmd.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Mar 2017 00:25:32 -0800 (PST)
+ with ESMTP id qQVyxsbaCAJe for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Mar 2017 03:24:04 -0500 (EST)
+Received: from mail-wr0-f176.google.com (mail-wr0-f176.google.com
+ [209.85.128.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7A4AC40C27
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 03:24:04 -0500 (EST)
+Received: by mail-wr0-f176.google.com with SMTP id u48so39712278wrc.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Mar 2017 00:25:29 -0800 (PST)
 In-Reply-To: <1489047912-642-1-git-send-email-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,47 +34,66 @@ To: linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, keescook@chromiu
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, marc.zyngier@arm.com, catalin.marinas@arm.com, kernel-hardening@lists.openwall.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Align the function prototype of alloc_init_pte() with its pmd and pud
-counterparts by replacing the pfn parameter with the equivalent physical
-address.
+Now that alternatives patching code no longer relies on the primary
+mapping of .text being writable, we can remove the code that removes
+the writable permissions post-init time, and map it read-only from
+the outset.
 
+To preserve the existing behavior under rodata=off, which is relied
+upon by external debuggers to manage software breakpoints (as pointed
+out by Mark), add an early_param() check for rodata=, and use RWX
+permissions if it set to 'off'.
+
+Reviewed-by: Laura Abbott <labbott@redhat.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/mm/mmu.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/mm/mmu.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index 75e21c33caff..c3963c592ec3 100644
+index df377fbe464e..300e98e8cd63 100644
 --- a/arch/arm64/mm/mmu.c
 +++ b/arch/arm64/mm/mmu.c
-@@ -107,7 +107,7 @@ static bool pgattr_change_is_safe(u64 old, u64 new)
+@@ -416,9 +416,6 @@ void mark_rodata_ro(void)
+ {
+ 	unsigned long section_size;
+ 
+-	section_size = (unsigned long)_etext - (unsigned long)_text;
+-	update_mapping_prot(__pa_symbol(_text), (unsigned long)_text,
+-			    section_size, PAGE_KERNEL_ROX);
+ 	/*
+ 	 * mark .rodata as read only. Use __init_begin rather than __end_rodata
+ 	 * to cover NOTES and EXCEPTION_TABLE.
+@@ -451,6 +448,12 @@ static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
+ 	vm_area_add_early(vma);
  }
  
- static void alloc_init_pte(pmd_t *pmd, unsigned long addr,
--				  unsigned long end, unsigned long pfn,
-+				  unsigned long end, phys_addr_t phys,
- 				  pgprot_t prot,
- 				  phys_addr_t (*pgtable_alloc)(void))
++static int __init parse_rodata(char *arg)
++{
++	return strtobool(arg, &rodata_enabled);
++}
++early_param("rodata", parse_rodata);
++
+ /*
+  * Create fine-grained mappings for the kernel.
+  */
+@@ -458,7 +461,14 @@ static void __init map_kernel(pgd_t *pgd)
  {
-@@ -128,8 +128,8 @@ static void alloc_init_pte(pmd_t *pmd, unsigned long addr,
- 	do {
- 		pte_t old_pte = *pte;
+ 	static struct vm_struct vmlinux_text, vmlinux_rodata, vmlinux_init, vmlinux_data;
  
--		set_pte(pte, pfn_pte(pfn, prot));
--		pfn++;
-+		set_pte(pte, pfn_pte(__phys_to_pfn(phys), prot));
-+		phys += PAGE_SIZE;
- 
- 		/*
- 		 * After the PTE entry has been populated once, we
-@@ -182,7 +182,7 @@ static void alloc_init_pmd(pud_t *pud, unsigned long addr, unsigned long end,
- 			BUG_ON(!pgattr_change_is_safe(pmd_val(old_pmd),
- 						      pmd_val(*pmd)));
- 		} else {
--			alloc_init_pte(pmd, addr, next, __phys_to_pfn(phys),
-+			alloc_init_pte(pmd, addr, next, phys,
- 				       prot, pgtable_alloc);
- 
- 			BUG_ON(pmd_val(old_pmd) != 0 &&
+-	map_kernel_segment(pgd, _text, _etext, PAGE_KERNEL_EXEC, &vmlinux_text);
++	/*
++	 * External debuggers may need to write directly to the text
++	 * mapping to install SW breakpoints. Allow this (only) when
++	 * explicitly requested with rodata=off.
++	 */
++	pgprot_t text_prot = rodata_enabled ? PAGE_KERNEL_ROX : PAGE_KERNEL_EXEC;
++
++	map_kernel_segment(pgd, _text, _etext, text_prot, &vmlinux_text);
+ 	map_kernel_segment(pgd, __start_rodata, __init_begin, PAGE_KERNEL, &vmlinux_rodata);
+ 	map_kernel_segment(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC,
+ 			   &vmlinux_init);
 -- 
 2.7.4
