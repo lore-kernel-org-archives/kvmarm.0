@@ -1,21 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 00/10] KVM/ARM fixes for 4.11-rc2
-Date: Thu,  9 Mar 2017 09:55:29 +0000
-Message-ID: <20170309095539.14512-1-marc.zyngier@arm.com>
+Subject: [PATCH 02/10] KVM: arm/arm64: vgic-v3: Don't pretend to support
+ IRQ/FIQ bypass
+Date: Thu,  9 Mar 2017 09:55:31 +0000
+Message-ID: <20170309095539.14512-3-marc.zyngier@arm.com>
+References: <20170309095539.14512-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F15C408EB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:54:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EC2F40625
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:54:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wvtYqDfQALrs for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 04:54:38 -0500 (EST)
+ with ESMTP id c1+IL+mbtokY for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Mar 2017 04:54:46 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30BA440625
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:54:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 798C140BE3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 04:54:46 -0500 (EST)
+In-Reply-To: <20170309095539.14512-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,79 +32,54 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Linu Cherian <linu.cherian@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Paolo, Radim,
+Our GICv3 emulation always presents ICC_SRE_EL1 with DIB/DFB set to
+zero, which implies that there is a way to bypass the GIC and
+inject raw IRQ/FIQ by driving the CPU pins.
 
-Here's the KVM/ARM updates for 4.11-rc2. The usual bag of vgic
-updates, making the memslot array large enough to handle guests with
-tons of devices assigned to them, a tidying up of exception handling,
-and a rather annoying TLB handling issue on VHE systems.
+Of course, we don't allow that when the GIC is configured, but
+we fail to indicate that to the guest. The obvious fix is to
+set these bits (and never let them being changed again).
 
-Please pull,
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Acked-by: Christoffer Dall <cdall@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ include/linux/irqchip/arm-gic-v3.h | 2 ++
+ virt/kvm/arm/vgic/vgic-v3.c        | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-Thanks,
-
-	M.
-
-The following changes since commit c1ae3cfa0e89fa1a7ecc4c99031f5e9ae99d9201:
-
-  Linux 4.11-rc1 (2017-03-05 12:59:56 -0800)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.11-rc2
-
-for you to fetch changes up to 955a3fc6d2a1c11d6d00bce4f3816100ce0530cf:
-
-  KVM: arm64: Increase number of user memslots to 512 (2017-03-09 09:13:50 +0000)
-
-----------------------------------------------------------------
-KVM/ARM updates for v4.11-rc2
-
-vgic updates:
-- Honour disabling the ITS
-- Don't deadlock when deactivating own interrupts via MMIO
-- Correctly expose the lact of IRQ/FIQ bypass on GICv3
-
-I/O virtualization:
-- Make KVM_CAP_NR_MEMSLOTS big enough for large guests with
-  many PCIe devices
-
-General bug fixes:
-- Gracefully handle exception generated with syndroms that
-  the host doesn't understand
-- Properly invalidate TLBs on VHE systems
-
-----------------------------------------------------------------
-Andre Przywara (1):
-      KVM: arm/arm64: VGIC: Fix command handling while ITS being disabled
-
-Jintack Lim (1):
-      KVM: arm/arm64: Let vcpu thread modify its own active state
-
-Linu Cherian (4):
-      KVM: Add documentation for KVM_CAP_NR_MEMSLOTS
-      KVM: arm/arm64: Enable KVM_CAP_NR_MEMSLOTS on arm/arm64
-      KVM: arm/arm64: Remove KVM_PRIVATE_MEM_SLOTS definition that are unused
-      KVM: arm64: Increase number of user memslots to 512
-
-Marc Zyngier (2):
-      arm64: KVM: VHE: Clear HCR_TGE when invalidating guest TLBs
-      KVM: arm/arm64: vgic-v3: Don't pretend to support IRQ/FIQ bypass
-
-Mark Rutland (2):
-      arm: KVM: Survive unknown traps from guests
-      arm64: KVM: Survive unknown traps from guests
-
- Documentation/virtual/kvm/api.txt  |   4 ++
- arch/arm/include/asm/kvm_arm.h     |   1 +
- arch/arm/include/asm/kvm_host.h    |   1 -
- arch/arm/kvm/arm.c                 |   3 +
- arch/arm/kvm/handle_exit.c         |  19 ++++---
- arch/arm64/include/asm/kvm_host.h  |   3 +-
- arch/arm64/kvm/handle_exit.c       |  19 ++++---
- arch/arm64/kvm/hyp/tlb.c           |  64 +++++++++++++++++++---
- include/linux/irqchip/arm-gic-v3.h |   2 +
- virt/kvm/arm/vgic/vgic-its.c       | 109 ++++++++++++++++++++++---------------
- virt/kvm/arm/vgic/vgic-mmio.c      |  32 ++++++++---
- virt/kvm/arm/vgic/vgic-v3.c        |   5 +-
- 12 files changed, 183 insertions(+), 79 deletions(-)
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 672cfef72fc8..97cbca19430d 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -373,6 +373,8 @@
+ #define ICC_IGRPEN0_EL1_MASK		(1 << ICC_IGRPEN0_EL1_SHIFT)
+ #define ICC_IGRPEN1_EL1_SHIFT		0
+ #define ICC_IGRPEN1_EL1_MASK		(1 << ICC_IGRPEN1_EL1_SHIFT)
++#define ICC_SRE_EL1_DIB			(1U << 2)
++#define ICC_SRE_EL1_DFB			(1U << 1)
+ #define ICC_SRE_EL1_SRE			(1U << 0)
+ 
+ /*
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index edc6ee2dc852..be0f4c3e0142 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -229,10 +229,13 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+ 	/*
+ 	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
+ 	 * way, so we force SRE to 1 to demonstrate this to the guest.
++	 * Also, we don't support any form of IRQ/FIQ bypass.
+ 	 * This goes with the spec allowing the value to be RAO/WI.
+ 	 */
+ 	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+-		vgic_v3->vgic_sre = ICC_SRE_EL1_SRE;
++		vgic_v3->vgic_sre = (ICC_SRE_EL1_DIB |
++				     ICC_SRE_EL1_DFB |
++				     ICC_SRE_EL1_SRE);
+ 		vcpu->arch.vgic_cpu.pendbaser = INITIAL_PENDBASER_VALUE;
+ 	} else {
+ 		vgic_v3->vgic_sre = 0;
+-- 
+2.11.0
