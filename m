@@ -1,22 +1,22 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH 15/15] KVM: arm64: Use common Set/Way sys definitions
-Date: Thu,  9 Mar 2017 17:07:27 +0000
-Message-ID: <1489079247-31092-16-git-send-email-mark.rutland@arm.com>
+Subject: [PATCH 13/15] KVM: arm64: use common invariant sysreg definitions
+Date: Thu,  9 Mar 2017 17:07:25 +0000
+Message-ID: <1489079247-31092-14-git-send-email-mark.rutland@arm.com>
 References: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5599840AF9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:07:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82A4840BBB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:07:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YrlNWRzU1-Up for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 12:07:27 -0500 (EST)
+ with ESMTP id 49ZXLGcXv7oK for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Mar 2017 12:07:26 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90E7F40B3E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:07:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41FA240B3E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 12:07:23 -0500 (EST)
 In-Reply-To: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,40 +31,86 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we have common definitions for the encoding of Set/Way cache
-maintenance operations, make the KVM code use these, simplifying the
-sys_reg_descs table.
+Now that we have common definitions for the register encodings used by
+KVM, make the KVM code uses thse for invariant sysreg definitions. This
+makes said definitions a reasonable amount shorter, especially as many
+comments are rendered redundant and can be removed.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu
 ---
- arch/arm64/kvm/sys_regs.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 57 ++++++++++++++++-------------------------------
+ 1 file changed, 19 insertions(+), 38 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index effa5ce..0e6c477 100644
+index 860707f..e637e1d 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -879,15 +879,9 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
-  * more demanding guest...
-  */
- static const struct sys_reg_desc sys_reg_descs[] = {
--	/* DC ISW */
--	{ Op0(0b01), Op1(0b000), CRn(0b0111), CRm(0b0110), Op2(0b010),
--	  access_dcsw },
--	/* DC CSW */
--	{ Op0(0b01), Op1(0b000), CRn(0b0111), CRm(0b1010), Op2(0b010),
--	  access_dcsw },
--	/* DC CISW */
--	{ Op0(0b01), Op1(0b000), CRn(0b0111), CRm(0b1110), Op2(0b010),
--	  access_dcsw },
-+	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
-+	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
-+	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+@@ -1857,44 +1857,25 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
  
- 	DBG_BCR_BVR_WCR_WVR_EL1(0),
- 	DBG_BCR_BVR_WCR_WVR_EL1(1),
+ /* ->val is filled in by kvm_sys_reg_table_init() */
+ static struct sys_reg_desc invariant_sys_regs[] = {
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b000),
+-	  NULL, get_midr_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b110),
+-	  NULL, get_revidr_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b000),
+-	  NULL, get_id_pfr0_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b001),
+-	  NULL, get_id_pfr1_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b010),
+-	  NULL, get_id_dfr0_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b011),
+-	  NULL, get_id_afr0_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b100),
+-	  NULL, get_id_mmfr0_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b101),
+-	  NULL, get_id_mmfr1_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b110),
+-	  NULL, get_id_mmfr2_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0001), Op2(0b111),
+-	  NULL, get_id_mmfr3_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b000),
+-	  NULL, get_id_isar0_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b001),
+-	  NULL, get_id_isar1_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b010),
+-	  NULL, get_id_isar2_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b011),
+-	  NULL, get_id_isar3_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b100),
+-	  NULL, get_id_isar4_el1 },
+-	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b101),
+-	  NULL, get_id_isar5_el1 },
+-	{ Op0(0b11), Op1(0b001), CRn(0b0000), CRm(0b0000), Op2(0b001),
+-	  NULL, get_clidr_el1 },
+-	{ Op0(0b11), Op1(0b001), CRn(0b0000), CRm(0b0000), Op2(0b111),
+-	  NULL, get_aidr_el1 },
+-	{ Op0(0b11), Op1(0b011), CRn(0b0000), CRm(0b0000), Op2(0b001),
+-	  NULL, get_ctr_el0 },
++	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
++	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
++	{ SYS_DESC(SYS_ID_PFR0_EL1), NULL, get_id_pfr0_el1 },
++	{ SYS_DESC(SYS_ID_PFR1_EL1), NULL, get_id_pfr1_el1 },
++	{ SYS_DESC(SYS_ID_DFR0_EL1), NULL, get_id_dfr0_el1 },
++	{ SYS_DESC(SYS_ID_AFR0_EL1), NULL, get_id_afr0_el1 },
++	{ SYS_DESC(SYS_ID_MMFR0_EL1), NULL, get_id_mmfr0_el1 },
++	{ SYS_DESC(SYS_ID_MMFR1_EL1), NULL, get_id_mmfr1_el1 },
++	{ SYS_DESC(SYS_ID_MMFR2_EL1), NULL, get_id_mmfr2_el1 },
++	{ SYS_DESC(SYS_ID_MMFR3_EL1), NULL, get_id_mmfr3_el1 },
++	{ SYS_DESC(SYS_ID_ISAR0_EL1), NULL, get_id_isar0_el1 },
++	{ SYS_DESC(SYS_ID_ISAR1_EL1), NULL, get_id_isar1_el1 },
++	{ SYS_DESC(SYS_ID_ISAR2_EL1), NULL, get_id_isar2_el1 },
++	{ SYS_DESC(SYS_ID_ISAR3_EL1), NULL, get_id_isar3_el1 },
++	{ SYS_DESC(SYS_ID_ISAR4_EL1), NULL, get_id_isar4_el1 },
++	{ SYS_DESC(SYS_ID_ISAR5_EL1), NULL, get_id_isar5_el1 },
++	{ SYS_DESC(SYS_CLIDR_EL1), NULL, get_clidr_el1 },
++	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
++	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
+ };
+ 
+ static int reg_from_user(u64 *val, const void __user *uaddr, u64 id)
 -- 
 1.9.1
