@@ -1,105 +1,146 @@
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH 00/10] KVM/ARM fixes for 4.11-rc2
-Date: Thu, 9 Mar 2017 16:16:52 +0100
-Message-ID: <20170309151652.GA3210@potion>
-References: <20170309095539.14512-1-marc.zyngier@arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH RFC 6/7] ARM64: KVM: Support heterogeneous system
+Date: Thu, 9 Mar 2017 15:21:44 +0000
+Message-ID: <ee72bba1-65a6-d0c4-7f71-79d707a62ed2@arm.com>
+References: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
+ <1484559214-2248-7-git-send-email-zhaoshenglong@huawei.com>
+ <20170128145551.sknp447ieue56xgo@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170309095539.14512-1-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <cdall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Linu Cherian <linu.cherian@cavium.com>, Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B57C40AF9
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 10:20:26 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id plKLfi+m5rtn for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Mar 2017 10:20:22 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B804C40AE8
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 10:20:22 -0500 (EST)
+In-Reply-To: <20170128145551.sknp447ieue56xgo@hawk.localdomain>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: marc.zyngier@arm.com, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-2017-03-09 09:55+0000, Marc Zyngier:
-> Paolo, Radim,
-> 
-> Here's the KVM/ARM updates for 4.11-rc2. The usual bag of vgic
-> updates, making the memslot array large enough to handle guests with
-> tons of devices assigned to them, a tidying up of exception handling,
-> and a rather annoying TLB handling issue on VHE systems.
+On 28/01/17 14:55, Andrew Jones wrote:
+> On Mon, Jan 16, 2017 at 05:33:33PM +0800, Shannon Zhao wrote:
+>> From: Shannon Zhao <shannon.zhao@linaro.org>
+>>
+>> When initializing KVM, check whether physical hardware is a
+>> heterogeneous system through the MIDR values. If so, force userspace to
+>> set the KVM_ARM_VCPU_CROSS feature bit. Otherwise, it should fail to
+>> initialize VCPUs.
+>>
+>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+>> ---
+>>  arch/arm/kvm/arm.c       | 26 ++++++++++++++++++++++++++
+>>  include/uapi/linux/kvm.h |  1 +
+>>  2 files changed, 27 insertions(+)
+>>
+>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>> index bdceb19..21ec070 100644
+>> --- a/arch/arm/kvm/arm.c
+>> +++ b/arch/arm/kvm/arm.c
+>> @@ -46,6 +46,7 @@
+>>  #include <asm/kvm_coproc.h>
+>>  #include <asm/kvm_psci.h>
+>>  #include <asm/sections.h>
+>> +#include <asm/cputype.h>
+>>
+>>  #ifdef REQUIRES_VIRT
+>>  __asm__(".arch_extension	virt");
+>> @@ -65,6 +66,7 @@ static unsigned int kvm_vmid_bits __read_mostly;
+>>  static DEFINE_SPINLOCK(kvm_vmid_lock);
+>>
+>>  static bool vgic_present;
+>> +static bool heterogeneous_system;
+>>
+>>  static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
+>>
+>> @@ -210,6 +212,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_ARM_CROSS_VCPU:
+>>  		r = 1;
+>>  		break;
+>> +	case KVM_CAP_ARM_HETEROGENEOUS:
+>> +		r = heterogeneous_system;
+>> +		break;
+>
+> What's this for? When/why would usespace check it?
+>
+>>  	case KVM_CAP_COALESCED_MMIO:
+>>  		r = KVM_COALESCED_MMIO_PAGE_OFFSET;
+>>  		break;
+>> @@ -812,6 +817,12 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+>>  	int phys_target = kvm_target_cpu();
+>>  	bool cross_vcpu = kvm_vcpu_has_feature_cross_cpu(init);
+>>
+>> +	if (heterogeneous_system && !cross_vcpu) {
+>> +		kvm_err("%s:Host is a heterogeneous system, set KVM_ARM_VCPU_CROSS bit\n",
+>> +			__func__);
+>> +		return -EINVAL;
+>> +	}
+>
+> Instead of forcing userspace to set a bit, why not just confirm the
+> target selected will work? E.g. if only generic works on a heterogeneous
+> system then just
+>
+>  if (heterogeneous_system && init->target != GENERIC)
+>     return -EINVAL
+>
+> should work
+>
+>> +
+>>  	if (!cross_vcpu && init->target != phys_target)
+>>  		return -EINVAL;
+>>
+>> @@ -1397,6 +1408,11 @@ static void check_kvm_target_cpu(void *ret)
+>>  	*(int *)ret = kvm_target_cpu();
+>>  }
+>>
+>> +static void get_physical_cpu_midr(void *midr)
+>> +{
+>> +	*(u32 *)midr = read_cpuid_id();
+>> +}
+>> +
+>>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
+>>  {
+>>  	struct kvm_vcpu *vcpu;
+>> @@ -1417,6 +1433,7 @@ int kvm_arch_init(void *opaque)
+>>  {
+>>  	int err;
+>>  	int ret, cpu;
+>> +	u32 current_midr, midr;
+>>
+>>  	if (!is_hyp_mode_available()) {
+>>  		kvm_err("HYP mode not available\n");
+>> @@ -1431,6 +1448,15 @@ int kvm_arch_init(void *opaque)
+>>  		}
+>>  	}
+>>
+>> +	current_midr = read_cpuid_id();
+>> +	for_each_online_cpu(cpu) {
+>> +		smp_call_function_single(cpu, get_physical_cpu_midr, &midr, 1);
+>> +		if (current_midr != midr) {
+>> +			heterogeneous_system = true;
+>> +			break;
+>> +		}
+>> +	}
+>
+> Is there no core kernel API that provides this?
 
-Pulled, but what made you change the GPG key into a revoked one?
+On arm64, there is a per-cpu cpuinfo structure kept for each online CPU, which keeps
+cached values of the ID registers. May be we could use that here.
+See arch/arm64/kernel/cpuinfo.c::__cpuinfo_store_cpu()
 
-  # gpg: Signature made Thu 09 Mar 2017 10:36:07 AM CET
-  # gpg:                using RSA key AB309C74B93B1EA1
-  # gpg: Good signature from "Marc Zyngier <marc.zyngier@arm.com>"
-  # gpg: WARNING: This key has been revoked by its owner!
-  # gpg:          This could mean that the signature is forged.
-  # gpg: reason for revocation: Key has been compromised
-  # gpg: revocation comment: Revoked after kernel.org hacking
-  # Primary key fingerprint: 6958 C9F2 233C 5E9D 6CCA  818A AB30 9C74 B93B 1EA1
-
-Thanks.
-
-> Please pull,
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> The following changes since commit c1ae3cfa0e89fa1a7ecc4c99031f5e9ae99d9201:
-> 
->   Linux 4.11-rc1 (2017-03-05 12:59:56 -0800)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.11-rc2
-> 
-> for you to fetch changes up to 955a3fc6d2a1c11d6d00bce4f3816100ce0530cf:
-> 
->   KVM: arm64: Increase number of user memslots to 512 (2017-03-09 09:13:50 +0000)
-> 
-> ----------------------------------------------------------------
-> KVM/ARM updates for v4.11-rc2
-> 
-> vgic updates:
-> - Honour disabling the ITS
-> - Don't deadlock when deactivating own interrupts via MMIO
-> - Correctly expose the lact of IRQ/FIQ bypass on GICv3
-> 
-> I/O virtualization:
-> - Make KVM_CAP_NR_MEMSLOTS big enough for large guests with
->   many PCIe devices
-> 
-> General bug fixes:
-> - Gracefully handle exception generated with syndroms that
->   the host doesn't understand
-> - Properly invalidate TLBs on VHE systems
-> 
-> ----------------------------------------------------------------
-> Andre Przywara (1):
->       KVM: arm/arm64: VGIC: Fix command handling while ITS being disabled
-> 
-> Jintack Lim (1):
->       KVM: arm/arm64: Let vcpu thread modify its own active state
-> 
-> Linu Cherian (4):
->       KVM: Add documentation for KVM_CAP_NR_MEMSLOTS
->       KVM: arm/arm64: Enable KVM_CAP_NR_MEMSLOTS on arm/arm64
->       KVM: arm/arm64: Remove KVM_PRIVATE_MEM_SLOTS definition that are unused
->       KVM: arm64: Increase number of user memslots to 512
-> 
-> Marc Zyngier (2):
->       arm64: KVM: VHE: Clear HCR_TGE when invalidating guest TLBs
->       KVM: arm/arm64: vgic-v3: Don't pretend to support IRQ/FIQ bypass
-> 
-> Mark Rutland (2):
->       arm: KVM: Survive unknown traps from guests
->       arm64: KVM: Survive unknown traps from guests
-> 
->  Documentation/virtual/kvm/api.txt  |   4 ++
->  arch/arm/include/asm/kvm_arm.h     |   1 +
->  arch/arm/include/asm/kvm_host.h    |   1 -
->  arch/arm/kvm/arm.c                 |   3 +
->  arch/arm/kvm/handle_exit.c         |  19 ++++---
->  arch/arm64/include/asm/kvm_host.h  |   3 +-
->  arch/arm64/kvm/handle_exit.c       |  19 ++++---
->  arch/arm64/kvm/hyp/tlb.c           |  64 +++++++++++++++++++---
->  include/linux/irqchip/arm-gic-v3.h |   2 +
->  virt/kvm/arm/vgic/vgic-its.c       | 109 ++++++++++++++++++++++---------------
->  virt/kvm/arm/vgic/vgic-mmio.c      |  32 ++++++++---
->  virt/kvm/arm/vgic/vgic-v3.c        |   5 +-
->  12 files changed, 183 insertions(+), 79 deletions(-)
+Suzuki
