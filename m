@@ -1,29 +1,24 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH v5 10/10] arm64: mm: set the contiguous bit for kernel
- mappings where appropriate
-Date: Thu, 9 Mar 2017 20:40:55 +0100
-Message-ID: <CAKv+Gu8DJvs7=hR_bnJct3=P_1utZ31rxuVKUrjVnD1MWveHHw@mail.gmail.com>
-References: <1489047912-642-1-git-send-email-ard.biesheuvel@linaro.org>
- <1489047912-642-11-git-send-email-ard.biesheuvel@linaro.org>
- <20170309193343.GG11966@leverpostej>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 00/15] arm64/kvm: use common sysreg definitions
+Date: Fri, 10 Mar 2017 08:17:22 +0000
+Message-ID: <87a88tv94d.fsf@on-the-bus.cambridge.arm.com>
+References: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F5540A14
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 14:39:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A620540948
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Mar 2017 03:16:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mHnNCJZpM+ud for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Mar 2017 14:39:31 -0500 (EST)
-Received: from mail-io0-f181.google.com (mail-io0-f181.google.com
- [209.85.223.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 60FA640625
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Mar 2017 14:39:31 -0500 (EST)
-Received: by mail-io0-f181.google.com with SMTP id f84so34092438ioj.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Mar 2017 11:40:56 -0800 (PST)
-In-Reply-To: <20170309193343.GG11966@leverpostej>
+ with ESMTP id PVCqAiHfUbTm for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Mar 2017 03:16:01 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D25340905
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Mar 2017 03:16:01 -0500 (EST)
+In-Reply-To: <1489079247-31092-1-git-send-email-mark.rutland@arm.com> (Mark
+ Rutland's message of "Thu, 9 Mar 2017 17:07:12 +0000")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,171 +29,54 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Mark Rutland <mark.rutland@arm.com>
-Cc: Kees Cook <keescook@chromium.org>, kernel-hardening@lists.openwall.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Laura Abbott <labbott@fedoraproject.org>
+Cc: catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 9 March 2017 at 20:33, Mark Rutland <mark.rutland@arm.com> wrote:
-> On Thu, Mar 09, 2017 at 09:25:12AM +0100, Ard Biesheuvel wrote:
->> +static inline u64 pte_cont_addr_end(u64 addr, u64 end)
->> +{
->> +     return min((addr + CONT_PTE_SIZE) & CONT_PTE_MASK, end);
->> +}
->> +
->> +static inline u64 pmd_cont_addr_end(u64 addr, u64 end)
->> +{
->> +     return min((addr + CONT_PMD_SIZE) & CONT_PMD_MASK, end);
->> +}
+On Thu, Mar 09 2017 at  5:07:12 pm GMT, Mark Rutland <mark.rutland@arm.com> wrote:
+> Currently we duplicate effort in maintaining system register encodings across
+> arm64's <asm/sysreg.h>, KVM's sysreg tables, and other places. This redundancy
+> is unfortunate, and as encodings are encoded in-place without any mnemonic,
+> this ends up more painful to read than necessary.
 >
-> These differ structurally from the usual p??_addr_end() macros defined
-> in include/asm-generic/pgtable.h. I agree the asm-generic macros aren't
-> pretty, but it would be nice to be consistent.
+> This series ameliorates this by making <asm/sysreg.h> the canonical location
+> for (architected) system register encodings, with other users building atop of
+> this, e.g. with KVM deriving its sysreg table values from the common mnemonics.
 >
-> I don't think the above handle a partial contiguous span at the end of
-> the address space (e.g. where end is initial PAGE_SIZE away from 2^64),
-> whereas the asm-generic form does, AFAICT.
+> I've only attacked AArch64-native SYS encodings, and ignored CP{15,14}
+> registers for now, but these could be handled similarly. Largely, I've stuck to
+> only what KVM needs, though for the debug and perfmon groups it was easier to
+> take the whole group from the ARM ARM than to filter them to only what KVM
+> needed today.
 >
-> Can we please use:
+> To verify that I haven't accidentally broken KVM, I've diffed sys_regs.o and
+> sys_regs_generic_v8.o on a section-by-section basis before and after the series
+> is applied. The .text, .data, and .rodata sections (and most others) are
+> identical. The __bug_table section, and some .debug* sections differ, and this
+> appears to be due to line numbers changing due to removed lines.
 >
-> #define pte_cont_addr_end(addr, end)                                            \
-> ({      unsigned long __boundary = ((addr) + CONT_PTE_SIZE) & CONT_PTE_MASK;    \
->         (__boundary - 1 < (end) - 1)? __boundary: (end);                        \
-> })
+> One thing I wasn't sure how to address was banks of registers such as
+> PMEVCNTR<n>_EL0. We currently enumerate all cases for our GICv3 definitions,
+> but it seemed painful to expand ~30 cases for PMEVCNTR<n>_EL0 and friends, and
+> for these I've made the macros take an 'n' parameter. It would be nice to be
+> consistent either way, and I'm happy to expand those cases.
 >
-> #define pmd_cont_addr_end(addr, end)                                            \
-> ({      unsigned long __boundary = ((addr) + CONT_PMD_SIZE) & CONT_PMD_MASK;    \
->         (__boundary - 1 < (end) - 1)? __boundary: (end);                        \
-> })
->
-> ... instead?
->
+> I've pushed thes series out to a branch [1] based on v4.11-rc1. It looks like
+> git rebase is also happy to apply the patches atop of the kvm-arm-for-4.11-rc2
+> tag.
 
-OK, so that's what the -1 is for. Either version is fine by me.
+I had a quick glance at this series, and this looks like a very good
+piece of work - thanks for doing this.
 
-> [...]
->
->> +static void init_pte(pte_t *pte, unsigned long addr, unsigned long end,
->> +                  phys_addr_t phys, pgprot_t prot)
->>  {
->> +     do {
->> +             pte_t old_pte = *pte;
->> +
->> +             set_pte(pte, pfn_pte(__phys_to_pfn(phys), prot));
->> +
->> +             /*
->> +              * After the PTE entry has been populated once, we
->> +              * only allow updates to the permission attributes.
->> +              */
->> +             BUG_ON(!pgattr_change_is_safe(pte_val(old_pte), pte_val(*pte)));
->> +
->> +     } while (pte++, addr += PAGE_SIZE, phys += PAGE_SIZE, addr != end);
->> +}
->> +
->> +static void alloc_init_cont_pte(pmd_t *pmd, unsigned long addr,
->> +                             unsigned long end, phys_addr_t phys,
->> +                             pgprot_t prot,
->> +                             phys_addr_t (*pgtable_alloc)(void),
->> +                             int flags)
->> +{
->> +     unsigned long next;
->>       pte_t *pte;
->>
->>       BUG_ON(pmd_sect(*pmd));
->> @@ -136,45 +156,30 @@ static void alloc_init_pte(pmd_t *pmd, unsigned long addr,
->>
->>       pte = pte_set_fixmap_offset(pmd, addr);
->>       do {
->> -             pte_t old_pte = *pte;
->> +             pgprot_t __prot = prot;
->>
->> -             set_pte(pte, pfn_pte(__phys_to_pfn(phys), prot));
->> -             phys += PAGE_SIZE;
->> +             next = pte_cont_addr_end(addr, end);
->>
->> -             /*
->> -              * After the PTE entry has been populated once, we
->> -              * only allow updates to the permission attributes.
->> -              */
->> -             BUG_ON(!pgattr_change_is_safe(pte_val(old_pte), pte_val(*pte)));
->> +             /* use a contiguous mapping if the range is suitably aligned */
->> +             if ((((addr | next | phys) & ~CONT_PTE_MASK) == 0) &&
->> +                 (flags & NO_CONT_MAPPINGS) == 0)
->> +                     __prot = __pgprot(pgprot_val(prot) | PTE_CONT);
->>
->> -     } while (pte++, addr += PAGE_SIZE, addr != end);
->> +             init_pte(pte, addr, next, phys, __prot);
->> +
->> +             phys += next - addr;
->> +             pte += (next - addr) / PAGE_SIZE;
->> +     } while (addr = next, addr != end);
->>
->>       pte_clear_fixmap();
->>  }
->
-> I think it would be preferable to pass the pmd down into
-> alloc_init_pte(), so that we don't have to mess with the pte in both
-> alloc_init_cont_pte() and alloc_init_pte().
->
-> Likewise for alloc_init_cont_pmd() and alloc_init_pmd(), regarding the
-> pmd.
->
-> I realise we'll redundantly map/unmap the PTE for each contiguous span,
-> but I doubt there's a case it has a noticeable impact.
->
+The next question is how do we merge this. Obviously, we can't split it
+between trees, and this is very likely to clash with anything that we
+will merge on the KVM side (the sysreg table is a popular place).
 
-OK
+Will, Catalin: Would it make sense to create a stable branch with these
+patches, and merge it into both the arm64 and KVM trees? That'd make
+things easier...
 
-> With lots of memory we'll use blocks at a higher level, and for
-> debug_pagealloc we'll pass the whole pte down to init_pte() as we
-> currently do.
->
-> [...]
->
->> +     if (pud_none(*pud)) {
->> +             phys_addr_t pmd_phys;
->> +             BUG_ON(!pgtable_alloc);
->> +             pmd_phys = pgtable_alloc();
->> +             pmd = pmd_set_fixmap(pmd_phys);
->> +             __pud_populate(pud, pmd_phys, PUD_TYPE_TABLE);
->> +             pmd_clear_fixmap();
->> +     }
->
-> It looks like when the splitting logic was removed, we forgot to remove
-> the fixmapping here (and for the pmd_none() case). The __p?d_populate
-> functions don't touch the next level table, so there's no reason to
-> fixmap it.
->
-> Would you mind spinning a patch to rip those out?
->
+Thanks,
 
-Ah right, pmd is not even referenced in the __pud_populate invocation.
-Yes, I will add a patch before this one to remove that.
-
-> [...]
->
->>  void __init create_pgd_mapping(struct mm_struct *mm, phys_addr_t phys,
->>                              unsigned long virt, phys_addr_t size,
->>                              pgprot_t prot, bool page_mappings_only)
->>  {
->> -     int flags;
->> +     int flags = NO_CONT_MAPPINGS;
->>
->>       BUG_ON(mm == &init_mm);
->>
->>       if (page_mappings_only)
->> -             flags = NO_BLOCK_MAPPINGS;
->> +             flags |= NO_BLOCK_MAPPINGS;
->
-> Why is it never safe to use cont mappings here?
->
-> EFI's the only caller of this, and the only case I can see that we need
-> to avoid contiguous entries for are the runtime services data/code, due
-> to efi_set_mapping_permissions(). We map those with page_mappings_only
-> set.
->
-> I couldn't spot why we'd need to avoid cont entries otherwise.
->
-> What am I missing?
->
-
-Nothing. It is erring on the side of caution, really, since there is
-no performance concern here.
+	M.
+-- 
+Jazz is not dead, it just smell funny.
