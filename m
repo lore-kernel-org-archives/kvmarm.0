@@ -1,82 +1,94 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 00/15] arm64/kvm: use common sysreg definitions
-Date: Fri, 10 Mar 2017 08:17:22 +0000
-Message-ID: <87a88tv94d.fsf@on-the-bus.cambridge.arm.com>
-References: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
+From: Andrey Konovalov <andreyknvl@google.com>
+Subject: kvm/arm64: use-after-free in kvm_unmap_hva_handler/unmap_stage2_pmds
+Date: Fri, 10 Mar 2017 14:34:25 +0100
+Message-ID: <CAAeHK+yjKm3mO2h9M30t-V_PnMhXEM887_zESCSg6gkbzivPsQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A620540948
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Mar 2017 03:16:02 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PVCqAiHfUbTm for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Mar 2017 03:16:01 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D25340905
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Mar 2017 03:16:01 -0500 (EST)
-In-Reply-To: <1489079247-31092-1-git-send-email-mark.rutland@arm.com> (Mark
- Rutland's message of "Thu, 9 Mar 2017 17:07:12 +0000")
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, "commit_signer:26/27=96%)"@google.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>
+Cc: Dmitry Vyukov <dvyukov@google.com>, Kostya Serebryany <kcc@google.com>, syzkaller <syzkaller@googlegroups.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Mar 09 2017 at  5:07:12 pm GMT, Mark Rutland <mark.rutland@arm.com> wrote:
-> Currently we duplicate effort in maintaining system register encodings across
-> arm64's <asm/sysreg.h>, KVM's sysreg tables, and other places. This redundancy
-> is unfortunate, and as encodings are encoded in-place without any mnemonic,
-> this ends up more painful to read than necessary.
->
-> This series ameliorates this by making <asm/sysreg.h> the canonical location
-> for (architected) system register encodings, with other users building atop of
-> this, e.g. with KVM deriving its sysreg table values from the common mnemonics.
->
-> I've only attacked AArch64-native SYS encodings, and ignored CP{15,14}
-> registers for now, but these could be handled similarly. Largely, I've stuck to
-> only what KVM needs, though for the debug and perfmon groups it was easier to
-> take the whole group from the ARM ARM than to filter them to only what KVM
-> needed today.
->
-> To verify that I haven't accidentally broken KVM, I've diffed sys_regs.o and
-> sys_regs_generic_v8.o on a section-by-section basis before and after the series
-> is applied. The .text, .data, and .rodata sections (and most others) are
-> identical. The __bug_table section, and some .debug* sections differ, and this
-> appears to be due to line numbers changing due to removed lines.
->
-> One thing I wasn't sure how to address was banks of registers such as
-> PMEVCNTR<n>_EL0. We currently enumerate all cases for our GICv3 definitions,
-> but it seemed painful to expand ~30 cases for PMEVCNTR<n>_EL0 and friends, and
-> for these I've made the macros take an 'n' parameter. It would be nice to be
-> consistent either way, and I'm happy to expand those cases.
->
-> I've pushed thes series out to a branch [1] based on v4.11-rc1. It looks like
-> git rebase is also happy to apply the patches atop of the kvm-arm-for-4.11-rc2
-> tag.
+Hi,
 
-I had a quick glance at this series, and this looks like a very good
-piece of work - thanks for doing this.
+I've got the following error report while fuzzing the kernel with syzkaller.
 
-The next question is how do we merge this. Obviously, we can't split it
-between trees, and this is very likely to clash with anything that we
-will merge on the KVM side (the sysreg table is a popular place).
+On linux-next commit 56b8bad5e066c23e8fa273ef5fba50bd3da2ace8 (Mar 8).
 
-Will, Catalin: Would it make sense to create a stable branch with these
-patches, and merge it into both the arm64 and KVM trees? That'd make
-things easier...
+Unfortunately I can't reproduce it.
 
-Thanks,
+==================================================================
+BUG: KASAN: use-after-free in put_page include/linux/compiler.h:243 [inline]
+BUG: KASAN: use-after-free in unmap_stage2_pmds
+arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:240 [inline]
+BUG: KASAN: use-after-free in unmap_stage2_puds
+arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:269 [inline]
+BUG: KASAN: use-after-free in unmap_stage2_range+0x884/0x938
+arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:299
+Read of size 8 at addr ffff80004585c000 by task syz-executor/5176
 
-	M.
--- 
-Jazz is not dead, it just smell funny.
+CPU: 1 PID: 5176 Comm: syz-executor Not tainted
+4.11.0-rc1-next-20170308-xc2-dirty #3
+Hardware name: Hardkernel ODROID-C2 (DT)
+Call trace:
+[<ffff20000808fbb0>] dump_backtrace+0x0/0x440 arch/arm64/kernel/traps.c:69
+[<ffff200008090010>] show_stack+0x20/0x30 arch/arm64/kernel/traps.c:219
+[<ffff2000088e9578>] __write_once_size include/linux/compiler.h:271 [inline]
+[<ffff2000088e9578>] dump_stack+0x110/0x168 lib/dump_stack.c:54
+[<ffff200008414018>] print_address_description+0x60/0x248
+[<ffff2000084142e8>] print_error_description mm/kasan/report.c:98 [inline]
+[<ffff2000084142e8>] kasan_report_error+0xe8/0x250 mm/kasan/report.c:287
+[<ffff200008414564>] kasan_report mm/kasan/report.c:308 [inline]
+[<ffff200008414564>] __asan_report_load8_noabort+0x3c/0x48 mm/kasan/report.c:329
+[<ffff2000080d9664>] put_page include/linux/compiler.h:243 [inline]
+[<ffff2000080d9664>] unmap_stage2_pmds
+arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:240 [inline]
+[<ffff2000080d9664>] unmap_stage2_puds
+arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:269 [inline]
+[<ffff2000080d9664>] unmap_stage2_range+0x884/0x938
+arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:299
+[<ffff2000080d9740>] kvm_unmap_hva_handler+0x28/0x38
+arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:1556
+[<ffff2000080d7578>] handle_hva_to_gpa+0x140/0x250
+arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:1547
+[<ffff2000080db858>] kvm_unmap_hva_range+0x60/0x80
+arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:1579
+[<ffff2000080c12dc>]
+kvm_mmu_notifier_invalidate_range_start+0x194/0x278
+arch/arm64/kvm/../../../virt/kvm/kvm_main.c:357
+[<ffff2000083fea58>] __mmu_notifier_invalidate_range_start+0x1d0/0x2a0
+mm/mmu_notifier.c:199
+[<ffff200008395f44>] mmu_notifier_invalidate_range_start
+include/linux/mmu_notifier.h:282 [inline]
+[<ffff200008395f44>] unmap_vmas+0x12c/0x198 mm/memory.c:1372
+[<ffff2000083a8e00>] unmap_region+0x128/0x230 mm/mmap.c:2460
+[<ffff2000083ae6e0>] update_hiwater_vm include/linux/mm.h:1483 [inline]
+[<ffff2000083ae6e0>] remove_vma_list mm/mmap.c:2432 [inline]
+[<ffff2000083ae6e0>] do_munmap+0x598/0x9b0 mm/mmap.c:2662
+[<ffff2000083b14a0>] find_vma_links mm/mmap.c:495 [inline]
+[<ffff2000083b14a0>] mmap_region+0x138/0xc78 mm/mmap.c:1610
+[<ffff2000083b23ac>] is_file_hugepages include/linux/hugetlb.h:269 [inline]
+[<ffff2000083b23ac>] do_mmap+0x3cc/0x848 mm/mmap.c:1446
+[<ffff200008369b0c>] do_mmap_pgoff include/linux/mm.h:2039 [inline]
+[<ffff200008369b0c>] vm_mmap_pgoff+0xec/0x120 mm/util.c:305
+[<ffff2000083ac558>] SYSC_mmap_pgoff mm/mmap.c:1475 [inline]
+[<ffff2000083ac558>] SyS_mmap_pgoff+0x220/0x420 mm/mmap.c:1458
+[<ffff20000808ecf0>] sys_mmap+0x58/0x80 arch/arm64/kernel/sys.c:37
+[<ffff200008083f70>] el0_svc_naked+0x24/0x28
+
+The buggy address belongs to the page:
+page:ffff7e0001161700 count:0 mapcount:0 mapping:          (null) index:0x0
+flags: 0xfffc00000000000()
+raw: 0fffc00000000000 0000000000000000 0000000000000000 00000000ffffffff
+raw: ffff7e00018c9120 ffff7e0000ea8b60 0000000000000000 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff80004585bf00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff80004585bf80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+>ffff80004585c000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                   ^
+ ffff80004585c080: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff80004585c100: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+==================================================================
