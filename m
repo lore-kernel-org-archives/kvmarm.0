@@ -1,38 +1,94 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 02/25] arm64: KVM: Implement HVC_RESET_VECTORS stub hypercall
-Date: Mon, 13 Mar 2017 18:03:00 +0000
-Message-ID: <87a88pt5pn.fsf@on-the-bus.cambridge.arm.com>
-References: <20170306142458.8875-1-marc.zyngier@arm.com>
-        <20170306142458.8875-3-marc.zyngier@arm.com>
-        <58C6DCB7.1010705@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH 2/5] KVM: arm/arm64: replace vcpu->arch.pause with a
+ vcpu-request
+Date: Mon, 13 Mar 2017 19:22:23 +0100
+Message-ID: <20170313182223.GB1277@cbox>
+References: <20170227175504.15751-1-drjones@redhat.com>
+ <20170227175504.15751-3-drjones@redhat.com>
+ <20170308143312.GC109908@lvm>
+ <20170308144411.tobywqs7qh4g4n2y@hawk.localdomain>
+ <20170313103005.GA1277@cbox>
+ <20170313172642.hsrtpcxo4cd6p74s@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <58C6DCB7.1010705@arm.com> (James Morse's message of "Mon, 13 Mar
-        2017 17:53:59 +0000")
-Sender: kvm-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, cdall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 18E9640A54
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Mar 2017 14:21:04 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id w3Be6DBBQa2s for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Mar 2017 14:21:02 -0400 (EDT)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B35B40430
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Mar 2017 14:21:02 -0400 (EDT)
+Received: by mail-wm0-f52.google.com with SMTP id t189so46860964wmt.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Mar 2017 11:22:35 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170313172642.hsrtpcxo4cd6p74s@kamzik.brq.redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, imammedo@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 13 2017 at  5:53:59 pm GMT, James Morse <james.morse@arm.com> wrote:
-> On 06/03/17 14:24, Marc Zyngier wrote:
->> In order to restore HYP mode to its original condition, KVM currently
->> implements __kvm_hyp_reset(). As we're moving towards a hyp-stub
->> defined API, it becomes necessary to implement HVC_RESET_VECTORS.
->> 
->> This patch adds the HVC_RESET_VECTORS hypercall to the KVM init
->> code, which so far lacked any form of hypercall support.
->
-> (Nit: other patches to the init code in this series have 'init' in the subject,
-> this one doesn't.)
+On Mon, Mar 13, 2017 at 06:27:55PM +0100, Andrew Jones wrote:
+> On Mon, Mar 13, 2017 at 11:30:05AM +0100, Christoffer Dall wrote:
+> > On Wed, Mar 08, 2017 at 03:44:11PM +0100, Andrew Jones wrote:
+> > > On Wed, Mar 08, 2017 at 06:33:12AM -0800, Christoffer Dall wrote:
+> > > > >  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+> > > > > @@ -621,7 +617,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> > > > >  
+> > > > >  		update_vttbr(vcpu->kvm);
+> > > > >  
+> > > > > -		if (vcpu->arch.power_off || vcpu->arch.pause)
+> > > > > +		if (vcpu->arch.power_off || __kvm_request_test(KVM_REQ_VCPU_PAUSE, vcpu))
+> > > > >  			vcpu_sleep(vcpu);
+> > > > >  
+> > > > >  		/*
+> > > > > @@ -644,8 +640,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> > > > >  			run->exit_reason = KVM_EXIT_INTR;
+> > > > >  		}
+> > > > >  
+> > > > > +		vcpu->mode = IN_GUEST_MODE;
+> > > > > +		smp_mb(); /* ensure vcpu->mode is visible to kvm_vcpu_kick */
+> > > > 
+> > > > I think this comment is misleading, because this smp_mb() is really
+> > > > about ensuring that with respect to other CPUs, the write to vcpu->mode
+> > > > is observable before the read of kvm_request_pending below, and the
+> > > > corresponding other barrier is the barrier implied in cmpxchg used by
+> > > > kvm_vcpu_exiting_guest_mode, which gets called by kvm_vcpu_kick(), which
+> > > > is called after __kvm_set_request.
+> > > 
+> > > Agreed
+> > > 
+> > 
+> > Just an adjustment to our conclusion from last week:
+> > 
+> > Will Deacon clarified that the cmpxchg doesn't have barrier semantics if
+> > the cmpxchg operation fails.  My brain hurts trying to work out if we're
+> > still safe in that case.  Thoughts?
+> >
+> 
+> OK, I just ran my brain through a blender, and then I grabbed Radim to
+> bounce my thoughts off him first. I think he and I are in agreement that
+> kvm_arch_vcpu_should_kick() should get a read barrier before the cmpxchg.
+> That smp_rmb() would pair with the general barrier that I have poorly
+> commented in the code above.
+> 
+> I'll refresh this series in the next couple days, adding that barrier,
+> and some better comments.
+> 
 
-Good point, I'll update the series locally to reflect this.
+Comments and an explicit barrier sounds like a welcome change.
 
-> Reviewed-by: James Morse <james.morse@arm.com>
-
-Thanks!
-
-	M.
--- 
-Jazz is not dead, it just smell funny.
+Thanks,
+-Christoffer
