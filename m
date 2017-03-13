@@ -1,29 +1,29 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 2/5] KVM: arm/arm64: replace vcpu->arch.pause with a
- vcpu-request
-Date: Mon, 13 Mar 2017 18:27:55 +0100
-Message-ID: <20170313172642.hsrtpcxo4cd6p74s@kamzik.brq.redhat.com>
-References: <20170227175504.15751-1-drjones@redhat.com>
- <20170227175504.15751-3-drjones@redhat.com>
- <20170308143312.GC109908@lvm>
- <20170308144411.tobywqs7qh4g4n2y@hawk.localdomain>
- <20170313103005.GA1277@cbox>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 01/19] KVM: arm/arm64: Add vITS save/restore API
+ documentation
+Date: Mon, 13 Mar 2017 18:38:32 +0100
+Message-ID: <CAFEAcA_VqJQ-BFQPpdnK07x6B=cN-HcPY7pBr7=J5UGXm4iSnQ@mail.gmail.com>
+References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
+ <1488800074-21991-2-git-send-email-eric.auger@redhat.com>
+ <CAFEAcA_hobSQZvOQHGgdoJYw9q099GNrY=5ffjYO5YeePtKdNA@mail.gmail.com>
+ <6f86ec3f-6b9e-34ba-628a-c2ef7b8c3529@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A7F5240AF9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Mar 2017 13:26:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B9B840AF9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Mar 2017 13:37:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VJIUHqKA1m7o for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Mar 2017 13:26:27 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 71BEB40430
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Mar 2017 13:26:27 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20170313103005.GA1277@cbox>
+ with ESMTP id EM87uPPGo1Em for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Mar 2017 13:37:21 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 80AE840430
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Mar 2017 13:37:21 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id t189so45930108wmt.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Mar 2017 10:38:54 -0700 (PDT)
+In-Reply-To: <6f86ec3f-6b9e-34ba-628a-c2ef7b8c3529@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,55 +33,50 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: marc.zyngier@arm.com, imammedo@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Auger Eric <eric.auger@redhat.com>
+Cc: "prasun.kapoor" <Prasun.Kapoor@cavium.com>, kvm-devel <kvm@vger.kernel.org>, Juan Quintela <quintela@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Kumar,
+ Vijaya" <Vijaya.Kumar@cavium.com>, Vijaya Kumar K <vijayak@caviumnetworks.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 13, 2017 at 11:30:05AM +0100, Christoffer Dall wrote:
-> On Wed, Mar 08, 2017 at 03:44:11PM +0100, Andrew Jones wrote:
-> > On Wed, Mar 08, 2017 at 06:33:12AM -0800, Christoffer Dall wrote:
-> > > >  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
-> > > > @@ -621,7 +617,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> > > >  
-> > > >  		update_vttbr(vcpu->kvm);
-> > > >  
-> > > > -		if (vcpu->arch.power_off || vcpu->arch.pause)
-> > > > +		if (vcpu->arch.power_off || __kvm_request_test(KVM_REQ_VCPU_PAUSE, vcpu))
-> > > >  			vcpu_sleep(vcpu);
-> > > >  
-> > > >  		/*
-> > > > @@ -644,8 +640,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> > > >  			run->exit_reason = KVM_EXIT_INTR;
-> > > >  		}
-> > > >  
-> > > > +		vcpu->mode = IN_GUEST_MODE;
-> > > > +		smp_mb(); /* ensure vcpu->mode is visible to kvm_vcpu_kick */
-> > > 
-> > > I think this comment is misleading, because this smp_mb() is really
-> > > about ensuring that with respect to other CPUs, the write to vcpu->mode
-> > > is observable before the read of kvm_request_pending below, and the
-> > > corresponding other barrier is the barrier implied in cmpxchg used by
-> > > kvm_vcpu_exiting_guest_mode, which gets called by kvm_vcpu_kick(), which
-> > > is called after __kvm_set_request.
-> > 
-> > Agreed
-> > 
-> 
-> Just an adjustment to our conclusion from last week:
-> 
-> Will Deacon clarified that the cmpxchg doesn't have barrier semantics if
-> the cmpxchg operation fails.  My brain hurts trying to work out if we're
-> still safe in that case.  Thoughts?
+On 13 March 2017 at 15:42, Auger Eric <eric.auger@redhat.com> wrote:
+> On 13/03/2017 14:08, Peter Maydell wrote:
+>> These CTE/ITE/DTE formats don't seem to have any kind of
+>> "escape hatch" for allowing backwards compatible extensions
+>> to the format. Do we need one? (I think that's particularly
+>> likely to be useful where there's an ITS feature we don't
+>> currently implement but might perhaps want to in future,
+>> like GICv4 virtual interrupt injection.)
 >
+> Maybe we could rely on the ITS registers (that must be restored before
+> the tables) to get any info about the format used to encode the table
+> entries. We have GITS_CTLR[1] that can help discriminate between GICv3/
+> GICv4. GITS_BASER.Entry_size can be 8B for current implementation and
+> 16B for an enhanced implementation. CTE[52:62] can be used to encode a
+> format version.
 
-OK, I just ran my brain through a blender, and then I grabbed Radim to
-bounce my thoughts off him first. I think he and I are in agreement that
-kvm_arch_vcpu_should_kick() should get a read barrier before the cmpxchg.
-That smp_rmb() would pair with the general barrier that I have poorly
-commented in the code above.
+Using the registers seems like a good idea, though I
+don't know about the specific fields. The most obvious
+place to keep something like this would be GITS_IIDR.Revision
+I suppose. Using the "size of the table entry" fields would
+work too.
 
-I'll refresh this series in the next couple days, adding that barrier,
-and some better comments.
+If we have to make all these tables double the size if
+we move to 16b/entry in future, is that a significant
+increase in memory used, or a don't-really-care increase?
 
-Thanks,
-drew
+I guess what we should do is:
+ * identify obviously imminently upcoming features (like
+   GICv4 support, wider physaddrs) and make sure the format
+   supports them
+   [let's say, anything we think we're definitely likely
+   to be adding in the next 12 months]
+ * decide on our 'escape hatch' plan for anything
+   more vague
+ * test that we do correctly fail migration for an
+   incoming ITS state that asks for an unsupported Revision
+ * document how the 'escape hatch' is intended to work
+   so we don't then invent a different approach in the
+   future :-)
+
+thanks
+-- PMM
