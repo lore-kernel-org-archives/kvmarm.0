@@ -1,22 +1,23 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 1/3] kvm: arm/arm64: Take mmap_sem in stage2_unmap_vm
-Date: Tue, 14 Mar 2017 14:52:32 +0000
-Message-ID: <1489503154-20705-2-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 2/3] kvm: arm/arm64: Take mmap_sem in
+ kvm_arch_prepare_memory_region
+Date: Tue, 14 Mar 2017 14:52:33 +0000
+Message-ID: <1489503154-20705-3-git-send-email-suzuki.poulose@arm.com>
 References: <1489503154-20705-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 546E840BDE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Mar 2017 10:51:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 264CD40430
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Mar 2017 10:52:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SAEILp8kKFnc for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Mar 2017 10:51:57 -0400 (EDT)
+ with ESMTP id kiOSLS0RNu9u for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Mar 2017 10:52:01 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8284D40296
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Mar 2017 10:51:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 13B8B40BE3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Mar 2017 10:52:01 -0400 (EDT)
 In-Reply-To: <1489503154-20705-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,37 +34,62 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-We don't hold the mmap_sem while searching for the VMAs when
-we try to unmap each memslot for a VM. Fix this properly to
-avoid unexpected results.
+We don't hold the mmap_sem while searching for VMAs (via find_vma), in
+kvm_arch_prepare_memory_region, which can end up in expected failures.
 
-Fixes: commit 957db105c997 ("arm/arm64: KVM: Introduce stage2_unmap_vm")
-Cc: stable@vger.kernel.org # v3.19+
+Fixes: commit 8eef91239e57 ("arm/arm64: KVM: map MMIO regions at creation time")
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Eric Auger <eric.auger@rehat.com>
+Cc: stable@vger.kernel.org # v3.18+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+[ Handle dirty page logging failure case ]
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/kvm/mmu.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm/kvm/mmu.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 962616f..f2e2e0c 100644
+index f2e2e0c..13b9c1f 100644
 --- a/arch/arm/kvm/mmu.c
 +++ b/arch/arm/kvm/mmu.c
-@@ -803,6 +803,7 @@ void stage2_unmap_vm(struct kvm *kvm)
- 	int idx;
+@@ -1803,6 +1803,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	    (KVM_PHYS_SIZE >> PAGE_SHIFT))
+ 		return -EFAULT;
  
- 	idx = srcu_read_lock(&kvm->srcu);
 +	down_read(&current->mm->mmap_sem);
+ 	/*
+ 	 * A memory region could potentially cover multiple VMAs, and any holes
+ 	 * between them, so iterate over all of them to find out if we can map
+@@ -1846,8 +1847,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 			pa += vm_start - vma->vm_start;
+ 
+ 			/* IO region dirty page logging not allowed */
+-			if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES)
+-				return -EINVAL;
++			if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES) {
++				ret = -EINVAL;
++				goto out;
++			}
+ 
+ 			ret = kvm_phys_addr_ioremap(kvm, gpa, pa,
+ 						    vm_end - vm_start,
+@@ -1859,7 +1862,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	} while (hva < reg_end);
+ 
+ 	if (change == KVM_MR_FLAGS_ONLY)
+-		return ret;
++		goto out;
+ 
  	spin_lock(&kvm->mmu_lock);
- 
- 	slots = kvm_memslots(kvm);
-@@ -810,6 +811,7 @@ void stage2_unmap_vm(struct kvm *kvm)
- 		stage2_unmap_memslot(kvm, memslot);
- 
+ 	if (ret)
+@@ -1867,6 +1870,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	else
+ 		stage2_flush_memslot(kvm, memslot);
  	spin_unlock(&kvm->mmu_lock);
++out:
 +	up_read(&current->mm->mmap_sem);
- 	srcu_read_unlock(&kvm->srcu, idx);
+ 	return ret;
  }
  
 -- 
