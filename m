@@ -1,23 +1,24 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 3/3] kvm: arm/arm64: Fix locking for kvm_free_stage2_pgd
-Date: Tue, 14 Mar 2017 14:52:34 +0000
-Message-ID: <1489503154-20705-4-git-send-email-suzuki.poulose@arm.com>
-References: <1489503154-20705-1-git-send-email-suzuki.poulose@arm.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH v3 00/25] arm/arm64: KVM: Rework the hyp-stub API
+Date: Tue, 14 Mar 2017 16:05:46 +0000
+Message-ID: <20170314160545.GP21222@n2100.armlinux.org.uk>
+References: <20170306142458.8875-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC69940A63
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Mar 2017 10:52:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9869F40A63
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Mar 2017 12:04:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hMpRRm4cb+YD for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Mar 2017 10:52:05 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C24940BC5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Mar 2017 10:52:05 -0400 (EDT)
-In-Reply-To: <1489503154-20705-1-git-send-email-suzuki.poulose@arm.com>
+ with ESMTP id a7aQuBxPvcnk for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Mar 2017 12:04:26 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E83540430
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Mar 2017 12:04:25 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20170306142458.8875-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,38 +28,20 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, andreyknvl@google.com
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, ard.biesheuvel@linaro.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org, kcc@google.com, syzkaller@googlegroups.com, dvyukov@google.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: cdall@linaro.org, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In kvm_free_stage2_pgd() we don't hold the kvm->mmu_lock while calling
-unmap_stage2_range() on the entire memory range for the guest. This could
-cause problems with other callers (e.g, munmap on a memslot) trying to
-unmap a range.
+On Mon, Mar 06, 2017 at 02:24:33PM +0000, Marc Zyngier wrote:
+> As noticed by RMK in this thread[1], the hyp-stub API on 32bit ARM
+> could do with some TLC (it cannot perform a soft-restart at HYP, and
+> has holes in the hyp-stub support in a number of places). In general,
+> it would be desirable for the 32bit behaviour to align on 64bit, if
+> only to ease maintenance.
 
-Fixes: commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
-Cc: stable@vger.kernel.org # v3.10+
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm/kvm/mmu.c | 3 +++
- 1 file changed, 3 insertions(+)
+What's the merge plan for this?
 
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 13b9c1f..b361f71 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -831,7 +831,10 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
- 	if (kvm->arch.pgd == NULL)
- 		return;
- 
-+	spin_lock(&kvm->mmu_lock);
- 	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
-+	spin_unlock(&kvm->mmu_lock);
-+
- 	/* Free the HW pgd, one page at a time */
- 	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
- 	kvm->arch.pgd = NULL;
 -- 
-2.7.4
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
