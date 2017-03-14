@@ -1,142 +1,113 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: kvm/arm64: use-after-free in
- kvm_unmap_hva_handler/unmap_stage2_pmds
-Date: Tue, 14 Mar 2017 17:57:26 +0100
-Message-ID: <9f473bb9-d0eb-6803-1263-75ffef0301fe@redhat.com>
-References: <CAAeHK+yjKm3mO2h9M30t-V_PnMhXEM887_zESCSg6gkbzivPsQ@mail.gmail.com>
- <20f6c994-d83e-7a6f-9f13-f10287211a6c@arm.com>
+From: "Baicar, Tyler" <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Subject: Re: [PATCH V12 09/10] trace, ras: add ARM processor error trace event
+Date: Tue, 14 Mar 2017 13:29:08 -0600
+Message-ID: <1aceb614-a1ad-8e7c-e488-0437c4bc1502@codeaurora.org>
+References: <1488833103-21082-1-git-send-email-tbaicar@codeaurora.org>
+ <1488833103-21082-10-git-send-email-tbaicar@codeaurora.org>
+ <58C12342.2090701@huawei.com>
+ <14545228-7ff1-b31c-1fa5-daacf89a44b9@codeaurora.org>
+ <58C60485.2070509@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20f6c994-d83e-7a6f-9f13-f10287211a6c@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>, Andrey Konovalov <andreyknvl@google.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, "commit_signer:26/27=96%)"@google.com, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>
-Cc: Dmitry Vyukov <dvyukov@google.com>, Kostya Serebryany <kcc@google.com>, syzkaller <syzkaller@googlegroups.com>
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <58C60485.2070509-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Xie XiuQi <xiexiuqi-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, james.morse-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29Tb/PtFMR13I2A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hello Xie XiUQi,
 
 
-On 14/03/2017 12:07, Suzuki K Poulose wrote:
-> On 10/03/17 13:34, Andrey Konovalov wrote:
->> Hi,
+On 3/12/2017 8:31 PM, Xie XiuQi wrote:
+> Hi Baicar Tyler,
+>
+> On 2017/3/11 2:23, Baicar, Tyler wrote:
+>> Hello Xie XiuQi,
 >>
->> I've got the following error report while fuzzing the kernel with
->> syzkaller.
 >>
->> On linux-next commit 56b8bad5e066c23e8fa273ef5fba50bd3da2ace8 (Mar 8).
->>
->> Unfortunately I can't reproduce it.
->>
->> ==================================================================
->> BUG: KASAN: use-after-free in put_page include/linux/compiler.h:243
->> [inline]
->> BUG: KASAN: use-after-free in unmap_stage2_pmds
->> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:240 [inline]
->> BUG: KASAN: use-after-free in unmap_stage2_puds
->> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:269 [inline]
->> BUG: KASAN: use-after-free in unmap_stage2_range+0x884/0x938
->> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:299
->> Read of size 8 at addr ffff80004585c000 by task syz-executor/5176
-> 
-> 
->> [<ffff2000080d9664>] put_page include/linux/compiler.h:243 [inline]
->> [<ffff2000080d9664>] unmap_stage2_pmds
->> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:240 [inline]
->> [<ffff2000080d9664>] unmap_stage2_puds
->> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:269 [inline]
->> [<ffff2000080d9664>] unmap_stage2_range+0x884/0x938
->> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:299
->> [<ffff2000080d9740>] kvm_unmap_hva_handler+0x28/0x38
->> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:1556
->> [<ffff2000080d7578>] handle_hva_to_gpa+0x140/0x250
->> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:1547
->> [<ffff2000080db858>] kvm_unmap_hva_range+0x60/0x80
->> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:1579
->> [<ffff2000080c12dc>]
->> kvm_mmu_notifier_invalidate_range_start+0x194/0x278
->> arch/arm64/kvm/../../../virt/kvm/kvm_main.c:357
->> [<ffff2000083fea58>] __mmu_notifier_invalidate_range_start+0x1d0/0x2a0
->> mm/mmu_notifier.c:199
->> [<ffff200008395f44>] mmu_notifier_invalidate_range_start
->> include/linux/mmu_notifier.h:282 [inline]
->> [<ffff200008395f44>] unmap_vmas+0x12c/0x198 mm/memory.c:1372
->> [<ffff2000083a8e00>] unmap_region+0x128/0x230 mm/mmap.c:2460
->> [<ffff2000083ae6e0>] update_hiwater_vm include/linux/mm.h:1483 [inline]
->> [<ffff2000083ae6e0>] remove_vma_list mm/mmap.c:2432 [inline]
->> [<ffff2000083ae6e0>] do_munmap+0x598/0x9b0 mm/mmap.c:2662
->> [<ffff2000083b14a0>] find_vma_links mm/mmap.c:495 [inline]
->> [<ffff2000083b14a0>] mmap_region+0x138/0xc78 mm/mmap.c:1610
->> [<ffff2000083b23ac>] is_file_hugepages include/linux/hugetlb.h:269
->> [inline]
->> [<ffff2000083b23ac>] do_mmap+0x3cc/0x848 mm/mmap.c:1446
->> [<ffff200008369b0c>] do_mmap_pgoff include/linux/mm.h:2039 [inline]
->> [<ffff200008369b0c>] vm_mmap_pgoff+0xec/0x120 mm/util.c:305
->> [<ffff2000083ac558>] SYSC_mmap_pgoff mm/mmap.c:1475 [inline]
->> [<ffff2000083ac558>] SyS_mmap_pgoff+0x220/0x420 mm/mmap.c:1458
->> [<ffff20000808ecf0>] sys_mmap+0x58/0x80 arch/arm64/kernel/sys.c:37
->> [<ffff200008083f70>] el0_svc_naked+0x24/0x28
->>
-> 
-> We hold kvm->mmu_lock, while manipulating the stage2 ranges. However, I
-> find that
-> we don't take the lock, when we do it f rom kvm_free_stage2_pgd(), which
-> could
-> potentially have caused a problem with an munmap of a memslot ?
-> 
-> Lightly tested...
-> 
-> 
-> commit fa75684dbf0fe845cf8403517d6e0c2c3344a544
-> Author: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Date:   Tue Mar 14 10:26:54 2017 +0000
-> 
->     kvm: arm: Fix locking for kvm_free_stage2_pgd
->         In kvm_free_stage2_pgd() we don't hold the kvm->mmu_lock while
-> calling
->     unmap_stage2_range() on the entire memory range for the guest. This
-> could
->     cause problems with other callers (e.g, munmap on a memslot) trying to
->     unmap a range.
->         Cc: Marc Zyngier <marc.zyngier@arm.com>
->     Cc: Christoffer Dall <christoffer.dall@linaro.org>
->     Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index a07ce3e..7f97063 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -831,7 +831,10 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
->         if (kvm->arch.pgd == NULL)
->                 return;
->  
-> +       spin_lock(&kvm->mmu_lock);
->         unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
-> +       spin_unlock(&kvm->mmu_lock);
-> +
->         /* Free the HW pgd, one page at a time */
->         free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
->         kvm->arch.pgd = NULL;
+>> On 3/9/2017 2:41 AM, Xie XiuQi wrote:
+>>> On 2017/3/7 4:45, Tyler Baicar wrote:
+>>>> Currently there are trace events for the various RAS
+>>>> errors with the exception of ARM processor type errors.
+>>>> Add a new trace event for such errors so that the user
+>>>> will know when they occur. These trace events are
+>>>> consistent with the ARM processor error section type
+>>>> defined in UEFI 2.6 spec section N.2.4.4.
+>>>>
+>>>> Signed-off-by: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+>>>> Acked-by: Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org>
+>>>> ---
+>>>>    drivers/acpi/apei/ghes.c    |  8 +++++++-
+>>>>    drivers/firmware/efi/cper.c |  1 +
+>>>>    drivers/ras/ras.c           |  1 +
+>>>>    include/ras/ras_event.h     | 34 ++++++++++++++++++++++++++++++++++
+>>>>    4 files changed, 43 insertions(+), 1 deletion(-)
+>>>> diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
+>>>> index 5861b6f..b36db48 100644
+>>>> --- a/include/ras/ras_event.h
+>>>> +++ b/include/ras/ras_event.h
+>>>> @@ -162,6 +162,40 @@
+>>>>    );
+>>>>      /*
+>>>> + * ARM Processor Events Report
+>>>> + *
+>>>> + * This event is generated when hardware detects an ARM processor error
+>>>> + * has occurred. UEFI 2.6 spec section N.2.4.4.
+>>>> + */
+>>>> +TRACE_EVENT(arm_event,
+>>>> +
+>>>> +    TP_PROTO(const struct cper_sec_proc_arm *proc),
+>>>> +
+>>>> +    TP_ARGS(proc),
+>>>> +
+>>>> +    TP_STRUCT__entry(
+>>>> +        __field(u64, mpidr)
+>>>> +        __field(u64, midr)
+>>>> +        __field(u32, running_state)
+>>>> +        __field(u32, psci_state)
+>>>> +        __field(u8, affinity)
+>>>> +    ),
+>>>> +
+>>>> +    TP_fast_assign(
+>>>> +        __entry->affinity = proc->affinity_level;
+>>>> +        __entry->mpidr = proc->mpidr;
+>>>> +        __entry->midr = proc->midr;
+>>>> +        __entry->running_state = proc->running_state;
+>>>> +        __entry->psci_state = proc->psci_state;
+>>>> +    ),
+>>>> +
+>>>> +    TP_printk("affinity level: %d; MPIDR: %016llx; MIDR: %016llx; "
+>>>> +          "running state: %d; PSCI state: %d",
+>>>> +          __entry->affinity, __entry->mpidr, __entry->midr,
+>>>> +          __entry->running_state, __entry->psci_state)
+>>>> +);
+>>>> +
+>>> I think these fields are not enough, we need also export arm processor error
+>>> information (UEFI 2.6 spec section N.2.4.4.1), or at least the error type,
+>>> address, etc. So that the userspace (such as rasdaemon tool) could know what
+>>> error occurred.
+>> This is something I am planning on adding in later. It is not clear to me how to
+>> actually do this at this point. If you look at the spec, there is not a single
+>> error information structure. There is at least one, but possibly a lot. There is
+>> also an unknown amount of context information structures. In "Table 260. ARM Processor
+>> Error Section" there are ERR_INFO_NUM and CONTEXT_INFO_NUM which give the number of these
+>> structures. I think there will need to be separate trace events added in for each of
+>> these structures because I don't think there is a way to have variable amounts of
+>> structures inside of a trace event.
+> Yes, I agree.
+>
+> Additional, cper_sec_proc_arm has validation bit, which indicates whether or not each of
+> the fields is valid in this section. How could we show it in this trace event? If the filed
+> is invalid, we would get a wrong value here.
+>
+I will add in checks for whether the fields are valid similar to what 
+you did for the error info patch.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> 
-> 
->> The buggy address belongs to the page:
->> page:ffff7e0001161700 count:0 mapcount:0 mapping:          (null)
->> index:0x0
->> flags: 0xfffc00000000000()
->> raw: 0fffc00000000000 0000000000000000 0000000000000000 00000000ffffffff
->> raw: ffff7e00018c9120 ffff7e0000ea8b60 0000000000000000 0000000000000000
->> page dumped because: kasan: bad access detected
->>
->> Memory state around the buggy address:
->>  ffff80004585bf00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->>  ffff80004585bf80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->>> ffff80004585c000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->>                    ^
->>  ffff80004585c080: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->>  ffff80004585c100: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->> ==================================================================
->>
-> 
+Thanks,
+Tyler
+
+-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
