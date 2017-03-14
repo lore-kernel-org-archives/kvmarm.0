@@ -1,217 +1,130 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: kvm/arm64: use-after-free in kvm_vm_ioctl/vmacache_update
-Date: Tue, 14 Mar 2017 12:26:18 +0000
-Message-ID: <7f9de429-d9e5-eb89-c72e-e002a65e8e0f@arm.com>
-References: <CAAeHK+wha3wr=HraKtGMqeEnZUU6-jboowG5PWRMHtqwTQC7FQ@mail.gmail.com>
- <CAAeHK+wLjS5ZGdNb4W3UkWO8HsFB=s1+a-1boN_F0boM1-bxUg@mail.gmail.com>
- <3a57c408-8aa5-d339-4176-add4924e817d@arm.com>
- <0fc0380f-f108-7d20-ee8a-1b044fa1f115@arm.com>
- <2200dd06-2374-b95d-131b-5a2437d14007@arm.com>
+From: Keerthy <j-keerthy@ti.com>
+Subject: Re: [PATCH v3 00/25] arm/arm64: KVM: Rework the hyp-stub API
+Date: Tue, 14 Mar 2017 19:08:03 +0530
+Message-ID: <8493dac7-c9be-fd3b-c5c0-83fbbfa4af10@ti.com>
+References: <20170306142458.8875-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E4C640A54
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Mar 2017 08:24:52 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PJX6jEuJEbeZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Mar 2017 08:24:50 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B217440190
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Mar 2017 08:24:50 -0400 (EDT)
-In-Reply-To: <2200dd06-2374-b95d-131b-5a2437d14007@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>, Andrey Konovalov <andreyknvl@google.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ingo Molnar <mingo@kernel.org>, Michal Hocko <mhocko@suse.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Markus Elfring <elfring@users.sourceforge.net>, Lorenzo Stoakes <lstoakes@gmail.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>
-Cc: Kostya Serebryany <kcc@google.com>, syzkaller <syzkaller@googlegroups.com>, Dmitry Vyukov <dvyukov@google.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20170306142458.8875-1-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, cdall@linaro.org, james.morse@arm.com
+Cc: "J, KEERTHY" <j-keerthy@ti.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14/03/17 11:03, Suzuki K Poulose wrote:
-> On 13/03/17 09:58, Marc Zyngier wrote:
->> On 10/03/17 18:37, Suzuki K Poulose wrote:
->>> On 10/03/17 15:50, Andrey Konovalov wrote:
->>>> On Fri, Mar 10, 2017 at 2:38 PM, Andrey Konovalov <andreyknvl@google.com> wrote:
->>>>> Hi,
->>>>>
->>>>> I've got the following error report while fuzzing the kernel with syzkaller.
->>>>>
->>>>> On linux-next commit 56b8bad5e066c23e8fa273ef5fba50bd3da2ace8 (Mar 8).
->>>>>
->>>>> Unfortunately I can't reproduce it.
->>>>>
->>>>> ==================================================================
->>>>> BUG: KASAN: use-after-free in vmacache_update+0x114/0x118 mm/vmacache.c:63
->>>>> Read of size 8 at addr ffff80003b9a2040 by task syz-executor/26615
->>>>>
->>>>> CPU: 1 PID: 26615 Comm: syz-executor Not tainted
->>>>> 4.11.0-rc1-next-20170308-xc2-dirty #3
->>>>> Hardware name: Hardkernel ODROID-C2 (DT)
->>>>> Call trace:
->>>>> [<ffff20000808fbb0>] dump_backtrace+0x0/0x440 arch/arm64/kernel/traps.c:505
->>>>> [<ffff200008090010>] show_stack+0x20/0x30 arch/arm64/kernel/traps.c:228
->>>>> [<ffff2000088e9578>] __dump_stack lib/dump_stack.c:16 [inline]
->>>>> [<ffff2000088e9578>] dump_stack+0x110/0x168 lib/dump_stack.c:52
->>>>> [<ffff200008414018>] print_address_description+0x60/0x248 mm/kasan/report.c:250
->>>>> [<ffff2000084142e8>] kasan_report_error+0xe8/0x250 mm/kasan/report.c:349
->>>>> [<ffff200008414564>] kasan_report mm/kasan/report.c:372 [inline]
->>>>> [<ffff200008414564>] __asan_report_load8_noabort+0x3c/0x48 mm/kasan/report.c:393
->>>>> [<ffff200008383f64>] vmacache_update+0x114/0x118 mm/vmacache.c:63
->>>>> [<ffff2000083a9000>] find_vma+0xf8/0x150 mm/mmap.c:2124
->>>>> [<ffff2000080dc19c>] kvm_arch_prepare_memory_region+0x2ac/0x488
->>>>> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:1817
->>>>> [<ffff2000080c2920>] __kvm_set_memory_region+0x3d8/0x12b8
->>>>> arch/arm64/kvm/../../../virt/kvm/kvm_main.c:1026
->>>>> [<ffff2000080c3838>] kvm_set_memory_region+0x38/0x58
->>>>> arch/arm64/kvm/../../../virt/kvm/kvm_main.c:1075
->>>>> [<ffff2000080c747c>] kvm_vm_ioctl_set_memory_region
->>>>> arch/arm64/kvm/../../../virt/kvm/kvm_main.c:1087 [inline]
->>>>> [<ffff2000080c747c>] kvm_vm_ioctl+0xb94/0x1308
->>>>> arch/arm64/kvm/../../../virt/kvm/kvm_main.c:2960
->>>>> [<ffff20000848f928>] vfs_ioctl fs/ioctl.c:45 [inline]
->>>>> [<ffff20000848f928>] do_vfs_ioctl+0x128/0xfc0 fs/ioctl.c:685
->>>>> [<ffff200008490868>] SYSC_ioctl fs/ioctl.c:700 [inline]
->>>>> [<ffff200008490868>] SyS_ioctl+0xa8/0xb8 fs/ioctl.c:691
->>>>> [<ffff200008083f70>] el0_svc_naked+0x24/0x28
->>>>>
->>>>> Allocated by task 26657:
->>>>>  save_stack_trace_tsk+0x0/0x330 arch/arm64/kernel/stacktrace.c:133
->>>>>  save_stack_trace+0x20/0x30 arch/arm64/kernel/stacktrace.c:216
->>>>>  save_stack mm/kasan/kasan.c:515 [inline]
->>>>>  set_track mm/kasan/kasan.c:527 [inline]
->>>>>  kasan_kmalloc+0xd4/0x180 mm/kasan/kasan.c:619
->>>>>  kasan_slab_alloc+0x14/0x20 mm/kasan/kasan.c:557
->>>>>  slab_post_alloc_hook mm/slab.h:456 [inline]
->>>>>  slab_alloc_node mm/slub.c:2718 [inline]
->>>>>  slab_alloc mm/slub.c:2726 [inline]
->>>>>  kmem_cache_alloc+0x144/0x230 mm/slub.c:2731
->>>>>  __split_vma+0x118/0x608 mm/mmap.c:2515
->>>>>  do_munmap+0x194/0x9b0 mm/mmap.c:2636
->>>>> Freed by task 26657:
->>>>>  save_stack_trace_tsk+0x0/0x330 arch/arm64/kernel/stacktrace.c:133
->>>>>  save_stack_trace+0x20/0x30 arch/arm64/kernel/stacktrace.c:216
->>>>>  save_stack mm/kasan/kasan.c:515 [inline]
->>>>>  set_track mm/kasan/kasan.c:527 [inline]
->>>>>  kasan_slab_free+0x84/0x198 mm/kasan/kasan.c:592
->>>>>  slab_free_hook mm/slub.c:1357 [inline]
->>>>>  slab_free_freelist_hook mm/slub.c:1379 [inline]
->>>>>  slab_free mm/slub.c:2961 [inline]
->>>>>  kmem_cache_free+0x80/0x258 mm/slub.c:2983
->>>>>  __vma_adjust+0x6b0/0xf mm/mmap.c:890]  el0_svc_naked+0x24/0x28
->>>>>
->>>>> The buggy address belongs to the object at ffff80003b9a2000
->>>>>  which belongs to the cache vm_area_struct(647:session-6.scope) of size 184
->>>>> The buggy address is located 64 bytes inside of
->>>>>  184-byte region [ffff80003b9a2000, ffff80003b9a20b8)
->>>>> The buggy address belongs to the page:
->>>>> page:ffff7e0000ee6880 count:1 mapcount:0 mapping:          (null) index:0x0
->>>>> flags: 0xfffc00000000100(slab)
->>>>> raw: 0fffc00000000100 0000000000000000 0000000000000000 0000000180100010
->>>>> raw: 0000000000000000 0000000c00000001 ffff80005a5cc600 ffff80005ac99980
->>>>> page dumped because: kasan: bad access detected
->>>>> page->mem_cgroup:ffff80005ac99980
->>>>>
->>>>> Memory state around the buggy address:
->>>>>  ffff80003b9a1f00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->>>>>  ffff80003b9a1f80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->>>>>> ffff80003b9a2000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>>>>                                            ^
->>>>>  ffff80003b9a2080: fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc fb
->>>>>  ffff80003b9a2100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>>>> ==================================================================
->>>>
->>>> Another one that looks related and doesn't have parts of stack traces missing:
->>>>
->>>> ==================================================================
->>>> BUG: KASAN: use-after-free in find_vma+0x140/0x150 mm/mmap.c:2114
->>>> Read of size 8 at addr ffff800031a03e90 by task syz-executor/4360
->>>>
->>>> CPU: 2 PID: 4360 Comm: syz-executor Not tainted
->>>> 4.11.0-rc1-next-20170308-xc2-dirty #3
->>>> Hardware name: Hardkernel ODROID-C2 (DT)
->>>> Call trace:
->>>> [<ffff20000808fbb0>] dump_backtrace+0x0/0x440 arch/arm64/kernel/traps.c:505
->>>> [<ffff200008090010>] show_stack+0x20/0x30 arch/arm64/kernel/traps.c:228
->>>> [<ffff2000088e9578>] __dump_stack lib/dump_stack.c:16 [inline]
->>>> [<ffff2000088e9578>] dump_stack+0x110/0x168 lib/dump_stack.c:52
->>>> [<ffff200008414018>] print_address_description+0x60/0x248 mm/kasan/report.c:250
->>>> [<ffff2000084142e8>] kasan_report_error+0xe8/0x250 mm/kasan/report.c:349
->>>> [<ffff200008414564>] kasan_report mm/kasan/report.c:372 [inline]
->>>> [<ffff200008414564>] __asan_report_load8_noabort+0x3c/0x48 mm/kasan/report.c:393
->>>> [<ffff2000083a9048>] find_vma+0x140/0x150 mm/mmap.c:2114
->>>> [<ffff2000080dc19c>] kvm_arch_prepare_memory_region+0x2ac/0x488
->>>> arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:1817
->>>
->>> It looks like we don't take the mmap_sem before calling find_vma() in
->>> stage2_unmap_memslot() and in kvm_arch_prepare_memory_region(), which is causing
->>> the race, with probably the test trying to unmap ranges in between.
->>
->> That indeed seems like a possible failure mode. The annoying thing is
->> that we're not exactly in a position to take mmap_sem in
->> stage2_unmap_memslot, since we hold the kvm->mmu_lock spinlock. We may
->> have to hold mmap_sem while iterating over all the memslots.
->>
->> How about the following (very lightly tested):
->>
->> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
->> index 962616fd4ddd..2006a79d5912 100644
->> --- a/arch/arm/kvm/mmu.c
->> +++ b/arch/arm/kvm/mmu.c
->> @@ -803,6 +803,7 @@ void stage2_unmap_vm(struct kvm *kvm)
->>  	int idx;
->>
->>  	idx = srcu_read_lock(&kvm->srcu);
->> +	down_read(&current->mm->mmap_sem);
->>  	spin_lock(&kvm->mmu_lock);
->>
->>  	slots = kvm_memslots(kvm);
->> @@ -810,6 +811,7 @@ void stage2_unmap_vm(struct kvm *kvm)
->>  		stage2_unmap_memslot(kvm, memslot);
->>
->>  	spin_unlock(&kvm->mmu_lock);
->> +	up_read(&current->mm->mmap_sem);
->>  	srcu_read_unlock(&kvm->srcu, idx);
->>  }
->>
->> @@ -1813,6 +1815,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->>  	 *     |               memory region                |
->>  	 *     +--------------------------------------------+
->>  	 */
->> +	down_read(&current->mm->mmap_sem);
->>  	do {
->>  		struct vm_area_struct *vma = find_vma(current->mm, hva);
->>  		hva_t vm_start, vm_end;
-> 
-> I have added the following hunk :
-> 
-> @@ -1844,8 +1847,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->                          pa += vm_start - vma->vm_start;
->   
->                          /* IO region dirty page logging not allowed */
-> -                       if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES)
-> -                               return -EINVAL;
-> +                       if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-> +                               ret = -EINVAL;
-> +                               goto out;
-> +                       }
->   
->                          ret = kvm_phys_addr_ioremap(kvm, gpa, pa,
->                                                      vm_end - vm_start,
-> 
 
-Ah, of course... Thanks for pointing that out, I'll fix it as I post a
-proper patch.
 
-Thanks,
+On Monday 06 March 2017 07:54 PM, Marc Zyngier wrote:
+> As noticed by RMK in this thread[1], the hyp-stub API on 32bit ARM
+> could do with some TLC (it cannot perform a soft-restart at HYP, and
+> has holes in the hyp-stub support in a number of places). In general,
+> it would be desirable for the 32bit behaviour to align on 64bit, if
+> only to ease maintenance.
+> 
+> This series implements the following:
+> - Add HVC_[GS]ET_VECTORS and HVC_SOFT_RESTART to the 32bit code
+> - Add HVC_RESET_VECTORS to both arm and arm64, removing the need for
+>   __hyp_reset_vectors
+> - Implement add the stub entry points in the KVM init code, which
+>   didn't implement any so far
+> - Convert the HYP code to use the init code stubs directly
+> - Some general cleanup as a result of these changes (which includes
+>   killing HVC_GET_VECTORS)
+> - Add some API documentation that covers the above
+> 
+> Patches 9 to 11 would be better squashed into 7 and 8, but I've kept
+> separate so that I can take the blame for everything I've broken.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Tested for kexec booting with the patch series applied on linux-next.
+
+kexec is working nicely with HYP and SVC modes. Tested for both modes by
+using different u-boot for booting in HYP and SVC modes. Kexec works well.
+
+Tested on DRA7-EVM, AM57XX-EVM and KEYSTONE-K2E-EVM.
+
+Tested-by: Keerthy <j-keerthy@ti.com>
+
+> 
+> This has been tested on arm (Cubietruck, Jetson TK1) and arm64
+> (Seattle), both as host and guest.
+> 
+> [1] http://lists.infradead.org/pipermail/linux-arm-kernel/2016-December/473472.html
+> 
+> * From v2:
+>   - Kill HVC_GET_VECTORS and the corresponding __hyp_get_vectors
+> 
+> * From v1:
+>   - Fixed some glaring bugs (reported by Ard and James)
+>   - Tidy up stub vector export on 32bit (Ard)
+>   - Nicer VA/PA conversion on 32bit (Ard)
+>   - Updated cpu_v7_reset documentation
+>   - Cleaned up HYP reset on PM events
+>   - Minor stub documentation update
+> 
+> Marc Zyngier (23):
+>   arm64: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
+>   arm64: KVM: Implement HVC_RESET_VECTORS stub hypercall
+>   arm64: KVM: Implement HVC_GET_VECTORS in the init code
+>   arm64: KVM: Allow the main HYP code to use the init hyp stub
+>     implementation
+>   arm64: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
+>   arm64: KVM: Implement HVC_SOFT_RESTART in the init code
+>   ARM: KVM: Convert KVM to use HVC_GET_VECTORS
+>   ARM: Update cpu_v7_reset documentation
+>   ARM: hyp-stub: Use r1 for the soft-restart address
+>   ARM: Expose the VA/IDMAP offset
+>   ARM: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
+>   ARM: KVM: Implement HVC_RESET_VECTORS stub hypercall
+>   ARM: KVM: Implement HVC_GET_VECTORS in the init code
+>   ARM: KVM: Allow the main HYP code to use the init hyp stub
+>     implementation
+>   ARM: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
+>   ARM: KVM: Implement HVC_SOFT_RESTART in the init code
+>   arm/arm64: KVM: Use __hyp_reset_vectors() directly
+>   arm/arm64: KVM: Remove kvm_get_idmap_start
+>   arm/arm64: KVM: Use HVC_RESET_VECTORS to reinit HYP mode
+>   ARM: decompressor: Remove __hyp_get_vectors usage
+>   ARM: hyp-stub/KVM: Kill __hyp_get_vectors
+>   arm64: hyp-stub/KVM: Kill __hyp_get_vectors
+>   arm/arm64: Add hyp-stub API documentation
+> 
+> Russell King (2):
+>   ARM: hyp-stub: improve ABI
+>   ARM: soft-reboot into same mode that we entered the kernel
+> 
+>  Documentation/virtual/kvm/arm/hyp-abi.txt | 45 ++++++++++++++++++++++++++++
+>  arch/arm/boot/compressed/head.S           |  5 +++-
+>  arch/arm/include/asm/kvm_asm.h            |  2 --
+>  arch/arm/include/asm/kvm_host.h           |  6 ----
+>  arch/arm/include/asm/kvm_mmu.h            |  1 -
+>  arch/arm/include/asm/proc-fns.h           |  4 +--
+>  arch/arm/include/asm/virt.h               | 12 +++++++-
+>  arch/arm/kernel/hyp-stub.S                | 39 +++++++++++++++++++-----
+>  arch/arm/kernel/reboot.c                  |  7 +++--
+>  arch/arm/kvm/arm.c                        | 25 ++++++----------
+>  arch/arm/kvm/hyp/hyp-entry.S              | 29 ++++++++++++++----
+>  arch/arm/kvm/init.S                       | 49 ++++++++++++++++++++++++++-----
+>  arch/arm/kvm/interrupts.S                 |  4 ---
+>  arch/arm/kvm/mmu.c                        |  5 ----
+>  arch/arm/mm/mmu.c                         |  5 ++++
+>  arch/arm/mm/proc-v7.S                     | 15 ++++++----
+>  arch/arm64/include/asm/kvm_asm.h          |  1 -
+>  arch/arm64/include/asm/kvm_host.h         |  7 -----
+>  arch/arm64/include/asm/kvm_mmu.h          |  1 -
+>  arch/arm64/include/asm/virt.h             | 17 +++++++----
+>  arch/arm64/kernel/hyp-stub.S              | 26 ++++++++--------
+>  arch/arm64/kvm/hyp-init.S                 | 45 +++++++++++++++++++++-------
+>  arch/arm64/kvm/hyp.S                      |  2 +-
+>  arch/arm64/kvm/hyp/hyp-entry.S            | 39 ++++++++++++------------
+>  24 files changed, 265 insertions(+), 126 deletions(-)
+>  create mode 100644 Documentation/virtual/kvm/arm/hyp-abi.txt
+> 
