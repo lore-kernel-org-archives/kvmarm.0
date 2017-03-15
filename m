@@ -1,29 +1,28 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 2/3] kvm: arm/arm64: Take mmap_sem in
- kvm_arch_prepare_memory_region
-Date: Wed, 15 Mar 2017 12:05:26 +0100
-Message-ID: <20170315110526.GC31974@cbox>
-References: <1489503154-20705-1-git-send-email-suzuki.poulose@arm.com>
- <1489503154-20705-3-git-send-email-suzuki.poulose@arm.com>
+Subject: Re: [PATCH RFC 6/7] ARM64: KVM: Support heterogeneous system
+Date: Wed, 15 Mar 2017 12:50:44 +0100
+Message-ID: <20170315115044.GO1277@cbox>
+References: <1484559214-2248-1-git-send-email-zhaoshenglong@huawei.com>
+ <1484559214-2248-7-git-send-email-zhaoshenglong@huawei.com>
+ <20170128145551.sknp447ieue56xgo@hawk.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BE7140A86
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Mar 2017 07:04:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 236EC40B58
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Mar 2017 07:49:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id C8-K9vlLeH-B for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Mar 2017 07:04:03 -0400 (EDT)
-Received: from mail-wr0-f179.google.com (mail-wr0-f179.google.com
- [209.85.128.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A4DF40A7F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Mar 2017 07:04:03 -0400 (EDT)
-Received: by mail-wr0-f179.google.com with SMTP id u48so8477967wrc.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Mar 2017 04:05:39 -0700 (PDT)
+ with ESMTP id 1Dgc1SlyIrkS for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Mar 2017 07:49:22 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 064CE405DA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Mar 2017 07:49:21 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id n11so20851518wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Mar 2017 04:50:57 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1489503154-20705-3-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <20170128145551.sknp447ieue56xgo@hawk.localdomain>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,74 +32,95 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, andreyknvl@google.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org, kcc@google.com, syzkaller@googlegroups.com, dvyukov@google.com, catalin.marinas@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, qemu-arm@nongnu.org, wu.wubin@huawei.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 14, 2017 at 02:52:33PM +0000, Suzuki K Poulose wrote:
-> From: Marc Zyngier <marc.zyngier@arm.com>
-> 
-> We don't hold the mmap_sem while searching for VMAs (via find_vma), in
-> kvm_arch_prepare_memory_region, which can end up in expected failures.
-> 
-> Fixes: commit 8eef91239e57 ("arm/arm64: KVM: map MMIO regions at creation time")
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Eric Auger <eric.auger@rehat.com>
-> Cc: stable@vger.kernel.org # v3.18+
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> [ Handle dirty page logging failure case ]
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Hi Drew,
 
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
+[Replying here to try to capture the discussion about this patch we had
+at connect].
 
-> ---
->  arch/arm/kvm/mmu.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+On Sat, Jan 28, 2017 at 03:55:51PM +0100, Andrew Jones wrote:
+> On Mon, Jan 16, 2017 at 05:33:33PM +0800, Shannon Zhao wrote:
+> > From: Shannon Zhao <shannon.zhao@linaro.org>
+> > 
+> > When initializing KVM, check whether physical hardware is a
+> > heterogeneous system through the MIDR values. If so, force userspace to
+> > set the KVM_ARM_VCPU_CROSS feature bit. Otherwise, it should fail to
+> > initialize VCPUs.
+> > 
+> > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> > ---
+> >  arch/arm/kvm/arm.c       | 26 ++++++++++++++++++++++++++
+> >  include/uapi/linux/kvm.h |  1 +
+> >  2 files changed, 27 insertions(+)
+> > 
+> > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> > index bdceb19..21ec070 100644
+> > --- a/arch/arm/kvm/arm.c
+> > +++ b/arch/arm/kvm/arm.c
+> > @@ -46,6 +46,7 @@
+> >  #include <asm/kvm_coproc.h>
+> >  #include <asm/kvm_psci.h>
+> >  #include <asm/sections.h>
+> > +#include <asm/cputype.h>
+> >  
+> >  #ifdef REQUIRES_VIRT
+> >  __asm__(".arch_extension	virt");
+> > @@ -65,6 +66,7 @@ static unsigned int kvm_vmid_bits __read_mostly;
+> >  static DEFINE_SPINLOCK(kvm_vmid_lock);
+> >  
+> >  static bool vgic_present;
+> > +static bool heterogeneous_system;
+> >  
+> >  static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
+> >  
+> > @@ -210,6 +212,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> >  	case KVM_CAP_ARM_CROSS_VCPU:
+> >  		r = 1;
+> >  		break;
+> > +	case KVM_CAP_ARM_HETEROGENEOUS:
+> > +		r = heterogeneous_system;
+> > +		break;
 > 
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index f2e2e0c..13b9c1f 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -1803,6 +1803,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  	    (KVM_PHYS_SIZE >> PAGE_SHIFT))
->  		return -EFAULT;
->  
-> +	down_read(&current->mm->mmap_sem);
->  	/*
->  	 * A memory region could potentially cover multiple VMAs, and any holes
->  	 * between them, so iterate over all of them to find out if we can map
-> @@ -1846,8 +1847,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  			pa += vm_start - vma->vm_start;
->  
->  			/* IO region dirty page logging not allowed */
-> -			if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES)
-> -				return -EINVAL;
-> +			if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-> +				ret = -EINVAL;
-> +				goto out;
-> +			}
->  
->  			ret = kvm_phys_addr_ioremap(kvm, gpa, pa,
->  						    vm_end - vm_start,
-> @@ -1859,7 +1862,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  	} while (hva < reg_end);
->  
->  	if (change == KVM_MR_FLAGS_ONLY)
-> -		return ret;
-> +		goto out;
->  
->  	spin_lock(&kvm->mmu_lock);
->  	if (ret)
-> @@ -1867,6 +1870,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  	else
->  		stage2_flush_memslot(kvm, memslot);
->  	spin_unlock(&kvm->mmu_lock);
-> +out:
-> +	up_read(&current->mm->mmap_sem);
->  	return ret;
->  }
->  
-> -- 
-> 2.7.4
+> What's this for? When/why would usespace check it?
 > 
+
+Without a capability, how can userspace tell the difference between "I
+got -EINVAL because I'm on an old kernel" or "I asked for something that
+any kernel cannot emulate"?
+
+Do we need to distinguish between these cases?
+
+> >  	case KVM_CAP_COALESCED_MMIO:
+> >  		r = KVM_COALESCED_MMIO_PAGE_OFFSET;
+> >  		break;
+> > @@ -812,6 +817,12 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+> >  	int phys_target = kvm_target_cpu();
+> >  	bool cross_vcpu = kvm_vcpu_has_feature_cross_cpu(init);
+> >  
+> > +	if (heterogeneous_system && !cross_vcpu) {
+> > +		kvm_err("%s:Host is a heterogeneous system, set KVM_ARM_VCPU_CROSS bit\n",
+> > +			__func__);
+> > +		return -EINVAL;
+> > +	}
+> 
+> Instead of forcing userspace to set a bit, why not just confirm the
+> target selected will work? E.g. if only generic works on a heterogeneous
+> system then just 
+> 
+>  if (heterogeneous_system && init->target != GENERIC)
+>     return -EINVAL
+> 
+> should work
+> 
+
+Yes, I think we concluded that if we advertise if we can do the
+cross type emulation or not, then if we can do the emulation we should
+just do it when possible, for maximum user experience.
+
+I'm sure I missed some aspect of this discussion though.
+
+Thanks,
+-Christoffer
