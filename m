@@ -1,31 +1,96 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 0/3] kvm: arm/arm64: Fixes for use after free problems
-Date: Thu, 16 Mar 2017 18:20:48 +0000
-Message-ID: <1489688451-17520-1-git-send-email-suzuki.poulose@arm.com>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
+Subject: [PATCH v2 2/3] kvm: arm/arm64: Take mmap_sem in
+ kvm_arch_prepare_memory_region
+Date: Thu, 16 Mar 2017 18:20:50 +0000
+Message-ID: <1489688451-17520-3-git-send-email-suzuki.poulose@arm.com>
+References: <1489688451-17520-1-git-send-email-suzuki.poulose@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3069F40C28
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 14:19:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 4oH3+7bhjMPk for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Mar 2017 14:19:28 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A325040017
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 14:19:27 -0400 (EDT)
+In-Reply-To: <1489688451-17520-1-git-send-email-suzuki.poulose@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, andreyknvl@google.com
-Cc: dvyukov@google.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kcc@google.com, syzkaller@googlegroups.com, will.deacon@arm.com, catalin.marinas@arm.com, pbonzini@redhat.com, mark.rutland@arm.com, suzuki.poulose@arm.com, ard.biesheuvel@linaro.org, stable@vger.kernel.org
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, ard.biesheuvel@linaro.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org, kcc@google.com, syzkaller@googlegroups.com, dvyukov@google.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series contains potential fixes for problems reported by [0] & [1].
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-[0] http://lists.infradead.org/pipermail/linux-arm-kernel/2017-March/492944.html
-[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2017-March/492943.html
+We don't hold the mmap_sem while searching for VMAs (via find_vma), in
+kvm_arch_prepare_memory_region, which can end up in expected failures.
 
-Changes since V1:
- - Yield the kvm->mmu_lock if necessary in unmap_stage2_range to prevent
-   vCPU starvation and lockup detector warnings.
+Fixes: commit 8eef91239e57 ("arm/arm64: KVM: map MMIO regions at creation time")
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Eric Auger <eric.auger@rehat.com>
+Cc: stable@vger.kernel.org # v3.18+
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+[ Handle dirty page logging failure case ]
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ arch/arm/kvm/mmu.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-Marc Zyngier (2):
-  kvm: arm/arm64: Take mmap_sem in stage2_unmap_vm
-  kvm: arm/arm64: Take mmap_sem in kvm_arch_prepare_memory_region
-
-Suzuki K Poulose (1):
-  kvm: arm/arm64: Fix locking for kvm_free_stage2_pgd
-
- arch/arm/kvm/mmu.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
-
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index f2e2e0c..13b9c1f 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -1803,6 +1803,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	    (KVM_PHYS_SIZE >> PAGE_SHIFT))
+ 		return -EFAULT;
+ 
++	down_read(&current->mm->mmap_sem);
+ 	/*
+ 	 * A memory region could potentially cover multiple VMAs, and any holes
+ 	 * between them, so iterate over all of them to find out if we can map
+@@ -1846,8 +1847,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 			pa += vm_start - vma->vm_start;
+ 
+ 			/* IO region dirty page logging not allowed */
+-			if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES)
+-				return -EINVAL;
++			if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES) {
++				ret = -EINVAL;
++				goto out;
++			}
+ 
+ 			ret = kvm_phys_addr_ioremap(kvm, gpa, pa,
+ 						    vm_end - vm_start,
+@@ -1859,7 +1862,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	} while (hva < reg_end);
+ 
+ 	if (change == KVM_MR_FLAGS_ONLY)
+-		return ret;
++		goto out;
+ 
+ 	spin_lock(&kvm->mmu_lock);
+ 	if (ret)
+@@ -1867,6 +1870,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	else
+ 		stage2_flush_memslot(kvm, memslot);
+ 	spin_unlock(&kvm->mmu_lock);
++out:
++	up_read(&current->mm->mmap_sem);
+ 	return ret;
+ }
+ 
 -- 
 2.7.4
