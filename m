@@ -1,25 +1,24 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 23/33] irqchip/gic-v3-its: Add VPENDBASER/VPROPBASER
- accessors
-Date: Thu, 16 Mar 2017 22:03:56 +0100
-Message-ID: <155b4430-60ba-66bd-3843-469bb2509ad5@redhat.com>
+Subject: Re: [RFC PATCH 31/33] irqchip/gic-v4: Add VLPI configuration interface
+Date: Thu, 16 Mar 2017 22:08:06 +0100
+Message-ID: <6300fefc-9dc5-88f0-2de1-0d5ba7fac20e@redhat.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-24-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-32-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AED9540B5E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 17:02:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 599A040BC5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 17:06:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HzBtMGDv7MmJ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Mar 2017 17:02:23 -0400 (EDT)
+ with ESMTP id X+M2Wt46C9UH for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Mar 2017 17:06:33 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D591E40019
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 17:02:22 -0400 (EDT)
-In-Reply-To: <1484648454-21216-24-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BA5840BC4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 17:06:32 -0400 (EDT)
+In-Reply-To: <1484648454-21216-32-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,70 +35,66 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi,
 
 On 17/01/2017 11:20, Marc Zyngier wrote:
-> V{PEND,PROP}BASER being 64bit registers, they need some ad-hoc
-> accessors on 32bit, specially given that VPENDBASER contains
-> a Valid bit, making the access a bit convoluted.
+> Add the required interfaces to map, unmap and update a VLPI.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
+
 > ---
->  arch/arm/include/asm/arch_gicv3.h   | 28 ++++++++++++++++++++++++++++
->  arch/arm64/include/asm/arch_gicv3.h |  5 +++++
->  2 files changed, 33 insertions(+)
+>  drivers/irqchip/irq-gic-v4.c       | 29 +++++++++++++++++++++++++++++
+>  include/linux/irqchip/arm-gic-v4.h |  3 +++
+>  2 files changed, 32 insertions(+)
 > 
-> diff --git a/arch/arm/include/asm/arch_gicv3.h b/arch/arm/include/asm/arch_gicv3.h
-> index 2747590..3f18832 100644
-> --- a/arch/arm/include/asm/arch_gicv3.h
-> +++ b/arch/arm/include/asm/arch_gicv3.h
-> @@ -291,5 +291,33 @@ static inline u64 __gic_readq_nonatomic(const volatile void __iomem *addr)
->   */
->  #define gits_write_cwriter(v, c)	__gic_writeq_nonatomic(v, c)
+> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+> index 7d74089..36ccaac 100644
+> --- a/drivers/irqchip/irq-gic-v4.c
+> +++ b/drivers/irqchip/irq-gic-v4.c
+> @@ -140,3 +140,32 @@ int its_invall_vpe(struct its_vpe *vpe)
 >  
-> +/*
-> + * GITS_VPROPBASER - hi and lo bits may be accessed independently.
-> + */
-> +#define gits_write_vpropbaser(v, c)	__gic_writeq_nonatomic(v, c)
+>  	return its_send_vpe_cmd(vpe, &info);
+>  }
 > +
-> +/*
-> + * GITS_VPENDBASER - the Valid bit must be cleared before changing
-> + * anything else.
-> + */
-> +static inline void gits_write_vpendbaser(u64 val, void * __iomem addr)
+> +int its_map_vlpi(int irq, struct its_vlpi_map *map)
 > +{
-> +	u32 tmp;
+> +	struct its_cmd_info info = {
+> +		.cmd_type = MAP_VLPI,
+> +		.map      = map,
+> +	};
 > +
-> +	tmp = readl_relaxed(addr + 4);
-> +	if (tmp & GICR_PENDBASER_Valid) {
-> +		tmp &= ~GICR_PENDBASER_Valid;
-> +		writel_relaxed(tmp, addr + 4);
-> +	}
-> +
-> +	/*
-> +	 * Use the fact that __gic_writeq_nonatomic writes the second
-> +	 * half of the 64bit quantity after the first.
-> +	 */
-> +	__gic_writeq_nonatomic(val, addr);
+> +	return irq_set_vcpu_affinity(irq, &info);
 > +}
 > +
-> +#define gits_read_vpendbaser(c)		__gic_readq_nonatomic(c)
+> +int its_unmap_vlpi(int irq)
+> +{
+> +	struct its_cmd_info info = {
+> +		.cmd_type = UNMAP_VLPI,
+> +	};
 > +
->  #endif /* !__ASSEMBLY__ */
->  #endif /* !__ASM_ARCH_GICV3_H */
-> diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
-> index f37e3a2..9420b7a 100644
-> --- a/arch/arm64/include/asm/arch_gicv3.h
-> +++ b/arch/arm64/include/asm/arch_gicv3.h
-> @@ -188,5 +188,10 @@ static inline void gic_write_bpr1(u32 val)
->  #define gicr_write_pendbaser(v, c)	writeq_relaxed(v, c)
->  #define gicr_read_pendbaser(c)		readq_relaxed(c)
+> +	return irq_set_vcpu_affinity(irq, &info);
+> +}
+> +
+> +int its_prop_update_vlpi(int irq, u8 config)
+> +{
+> +	struct its_cmd_info info = {
+> +		.cmd_type = PROP_UPDATE_VLPI,
+> +		.config   = config,
+> +	};
+> +
+> +	return irq_set_vcpu_affinity(irq, &info);
+> +}
+> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+> index 1c58add..f85a929 100644
+> --- a/include/linux/irqchip/arm-gic-v4.h
+> +++ b/include/linux/irqchip/arm-gic-v4.h
+> @@ -93,5 +93,8 @@ int its_alloc_vcpu_irqs(struct its_vm *vm, struct its_vpe **vpes, int nr_vpes);
+>  void its_free_vcpu_irqs(struct its_vm *vm, int nr_vpes);
+>  int its_schedule_vpe(struct its_vpe *vpe, bool on);
+>  int its_invall_vpe(struct its_vpe *vpe);
+> +int its_map_vlpi(int irq, struct its_vlpi_map *map);
+> +int its_unmap_vlpi(int irq);
+> +int its_prop_update_vlpi(int irq, u8 config);
 >  
-> +#define gits_write_vpropbaser(v, c)	writeq_relaxed(v, c)
-> +
-> +#define gits_write_vpendbaser(v, c)	writeq_relaxed(v, c)
-> +#define gits_read_vpendbaser(c)		readq_relaxed(c)
-> +
->  #endif /* __ASSEMBLY__ */
->  #endif /* __ASM_ARCH_GICV3_H */
+>  #endif
 > 
