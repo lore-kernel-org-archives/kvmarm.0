@@ -1,25 +1,28 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 21/33] irqchip/gic-v3-its: Add VPE irq domain
- allocation/teardown
-Date: Thu, 16 Mar 2017 10:27:03 +0100
-Message-ID: <4fda8fbe-2c65-196e-81ea-fff513a17f11@redhat.com>
-References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-22-git-send-email-marc.zyngier@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: KVM on ARM Cortex A53 in 32-bit Mode
+Date: Thu, 16 Mar 2017 10:38:49 +0100
+Message-ID: <20170316093849.GT1277@cbox>
+References: <CAPn9co60wgUms-V_6PBB4CDKeWV_mJzHqg-5wjTchKFi4G9xkg@mail.gmail.com>
+ <20170307095559.GB101711@lvm>
+ <CAO=Ss3XeBW17XfXroKsS-KbHcJV1E7c8gDBP+CnhyNYDMpeXsg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AEB240A63
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 05:25:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EC8340BAC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 05:37:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J8a2GH1lP9AZ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Mar 2017 05:25:30 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4591A40A14
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 05:25:30 -0400 (EDT)
-In-Reply-To: <1484648454-21216-22-git-send-email-marc.zyngier@arm.com>
+ with ESMTP id vD3XwHB9e3Dn for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Mar 2017 05:37:26 -0400 (EDT)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD83B40B3E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 05:37:25 -0400 (EDT)
+Received: by mail-wm0-f48.google.com with SMTP id n11so42623823wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 02:39:03 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CAO=Ss3XeBW17XfXroKsS-KbHcJV1E7c8gDBP+CnhyNYDMpeXsg@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,251 +32,67 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+To: "Yasutaka, T" <skyfly0008@gmail.com>
+Cc: Yasutaka Tanaka <yt2558@columbia.edu>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Wed, Mar 15, 2017 at 07:50:36PM -0400, Yasutaka, T wrote:
+> Hi Christopher and other KVM/ARM community members,
+> 
+> I tried the following QEMU and Kernel combinations on Raspberry Pi 3
+> (AArch64 mode) but failed:
+> 
+> Latest commit of Alexander Graf's no-kvm-irqchip QEMU branch:
+> https://github.com/agraf/qemu/tree/no-kvm-irqchip
+> 
+> raspberrypi/linux's rpi-4.10.y branch (forked from Linux 4.10-rc8?) latest
+> commit bb0ff9d059c67e1611c7422f7982a6a4876efe67
+> patched by $(git diff (linux 4.10-rc5 commit
+> 7a308bb3016f57e5be11a677d15b821536419d36) (Christpher's irqs-to-user-v2
+> latest commit d0a7cc725535df1b9cc64b442d246c20a9edb904) )
+> 
+> and got the following error:
+> 
+> pi@raspberrypi:~/os/graf/no-kvm-irqchip/aarch64-softmmu $
+> qemu-system-aarch64 --enable-kvm -M virt
+> "kvm" accelerator not found.
+> No accelerator found!
 
-On 17/01/2017 11:20, Marc Zyngier wrote:
-> When creating a VM, the low level GICv4 code is responsible for:
-> - allocating each VPE a unique VPEID
-> - allocating a doorbell interrupt for each VPE
-> - allocating the pending tables for each VPE
-> - allocating the property table for the VM
-> 
-> This of course has to be reversed when the VM is brought down.
-> 
-> All of this is wired into the irq domain alloc/free methods.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 174 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 174 insertions(+)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index ddd8096..54d0075 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -139,6 +139,7 @@ static struct rdists *gic_rdists;
->  static struct irq_domain *its_parent;
->  
->  static unsigned long its_list_map;
-> +static DEFINE_IDA(its_vpeid_ida);
->  
->  #define gic_data_rdist()		(raw_cpu_ptr(gic_rdists->rdist))
->  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
-> @@ -1146,6 +1147,11 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
->  	return prop_page;
->  }
->  
-> +static void its_free_prop_table(struct page *prop_page)
-> +{
-> +	free_pages((unsigned long)page_address(prop_page),
-> +		   get_order(LPI_PROPBASE_SZ));
-> +}
->  
->  static int __init its_alloc_lpi_tables(void)
->  {
-> @@ -1444,6 +1450,12 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
->  	return pend_page;
->  }
->  
-> +static void its_free_pending_table(struct page *pt)
-> +{
-> +	free_pages((unsigned long)page_address(pt),
-> +		   get_order(max(LPI_PENDBASE_SZ, SZ_64K)));
-> +}
-> +
->  static void its_cpu_init_lpis(void)
->  {
->  	void __iomem *rbase = gic_data_rdist_rd_base();
-> @@ -1666,6 +1678,34 @@ static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
->  	return its_alloc_table_entry(baser, dev_id);
->  }
->  
-> +static bool its_alloc_vpe_table(u32 vpe_id)
-> +{
-> +	struct its_node *its;
-> +
-> +	/*
-> +	 * Make sure the L2 tables are allocated on *all* v4 ITSs. We
-> +	 * could try and only do it on ITSs corresponding to devices
-> +	 * that have interrupts targeted at this VPE, but the
-> +	 * complexity becomes crazy (and you have tons of memory
-> +	 * anyway, right?).
-> +	 */
-> +	list_for_each_entry(its, &its_nodes, entry) {
-> +		struct its_baser *baser;
-> +
-> +		if (!its->is_v4)
-> +			continue;
-> +
-> +		baser = its_get_baser(its, GITS_BASER_TYPE_VCPU);
-> +		if (!baser)
-> +			return false;
+You'd need "-machine virt,kernel_irqchip=off" to use the userspace GIC
+emulation.  Perhaps QEMU's error message for trying to initialize the
+in-kernel GIC is just weird.
 
-don't you need to check the vpe_id doesn't overshoot the BASER caps?
-> +
-> +		if (!its_alloc_table_entry(baser, vpe_id))
-> +			return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
->  					    int nvecs)
->  {
-> @@ -1922,7 +1962,141 @@ static struct irq_chip its_vpe_irq_chip = {
->  	.name			= "GICv4-vpe",
->  };
->  
-> +static int its_vpe_id_alloc(void)
-> +{
-> +	return ida_simple_get(&its_vpeid_ida, 0, 1 << 16, GFP_KERNEL);
-> +}
-> +
-> +static void its_vpe_id_free(u16 id)
-> +{
-> +	ida_simple_remove(&its_vpeid_ida, id);
-> +}
-> +
-> +static int its_vpe_init(struct its_vpe *vpe)
-> +{
-> +	struct page *vpt_page;
-> +	int vpe_id;
-> +
-> +	/* Allocate vpe_id */
-> +	vpe_id = its_vpe_id_alloc();
-> +	if (vpe_id < 0)
-> +		return vpe_id;
-> +
-> +	/* Allocate VPT */
-> +	vpt_page = its_allocate_pending_table(GFP_KERNEL);
-> +	if (vpt_page) {
-isn't it !vpt_page?
-> +		its_vpe_id_free(vpe_id);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	if (!its_alloc_vpe_table(vpe_id)) {
-> +		its_vpe_id_free(vpe_id);
-> +		its_free_pending_table(vpe->vpt_page);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	vpe->vpe_id = vpe_id;
-> +	vpe->vpt_page = vpt_page;
-> +
-> +	return 0;
-> +}
-> +
-> +static void its_vpe_teardown(struct its_vpe *vpe)
-> +{
-> +	its_vpe_id_free(vpe->vpe_id);
-> +	its_free_pending_table(vpe->vpt_page);
-don't you need to remove the VPE entry as well?
-> +}
-> +
-> +static int its_vpe_irq_domain_alloc(struct irq_domain *domain, unsigned int virq,
-> +				    unsigned int nr_irqs, void *args)
-> +{
-> +	msi_alloc_info_t *info = args;
-> +	struct its_vpe **vpes = info->scratchpad[0].ptr;
-> +	struct its_vm *vm = vpes[0]->its_vm;
-> +	unsigned long *bitmap;
-> +	struct page *vprop_page;
-> +	int base, nr_ids, i, err = 0;
-> +
-> +	bitmap = its_lpi_alloc_chunks(nr_irqs, &base, &nr_ids);
-> +	if (!bitmap)
-> +		return -ENOMEM;
-> +
-> +	if (nr_ids < nr_irqs) {
-> +		its_lpi_free_chunks(bitmap, base, nr_ids);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	vprop_page = its_allocate_prop_table(GFP_KERNEL);
-> +	if (!vprop_page) {
-> +		its_lpi_free_chunks(bitmap, base, nr_ids);
-> +		return ENOMEM;
--ENOMEM
-> +	}
-> +
-> +	for (i = 0; i < nr_irqs; i++) {
-> +		vpes[i]->vpe_db_lpi = base + i;
-> +		err = its_vpe_init(vpes[i]);
-> +		if (err)
-> +			break;
-> +		irq_domain_set_hwirq_and_chip(domain,
-> +					      virq + i, vpes[i]->vpe_db_lpi,
-> +					      &its_vpe_irq_chip, vpes[i]);
-> +		set_bit(i, bitmap);
-> +	}
-> +
-> +	if (err) {
-> +		while (--i >= 0) {
-> +			its_vpe_teardown(vpes[i]);
-> +			clear_bit(i, bitmap);
-> +		}
-> +
-> +		its_lpi_free_chunks(bitmap, base, nr_ids);
-> +		its_free_prop_table(vprop_page);
-> +
-> +		return err;
-> +	}
-> +
-> +	vm->db_bitmap = bitmap;
-> +	vm->db_lpi_base = base;
-> +	vm->nr_db_lpis = nr_ids;
-> +	vm->vprop_page = vprop_page;
-> +
-> +	return 0;
-> +}
-> +
-> +static void its_vpe_irq_domain_free(struct irq_domain *domain,
-> +				    unsigned int virq,
-> +				    unsigned int nr_irqs)
-> +{
-> +	struct its_vm *vm = NULL;
-> +	int i;
-> +
-> +	for (i = 0; i < nr_irqs; i++) {
-> +		struct irq_data *data = irq_domain_get_irq_data(domain, virq);
-> +		struct its_vpe *vpe = irq_data_get_irq_chip_data(data);
-> +
-> +		BUG_ON(vm && vm != vpe->its_vm);
-> +		if (!vm)
-> +			vm = vpe->its_vm;
-I don't get the above. actually I missed who does set its_vm field on
-the vpe.
-
-Thanks
-
-Eric
-> +
-> +		clear_bit(vpe->vpe_db_lpi - vm->db_lpi_base, vm->db_bitmap);
-> +		its_vpe_teardown(vpe);
-> +		irq_domain_reset_irq_data(data);
-> +	}
-> +
-> +	if (!vm)
-> +		return;
-> +
-> +	if (bitmap_empty(vm->db_bitmap, vm->nr_db_lpis)) {
-> +		its_lpi_free_chunks(vm->db_bitmap, vm->db_lpi_base, vm->nr_db_lpis);
-> +		its_free_prop_table(vm->vprop_page);
-> +	}
-> +
-> +	irq_domain_free_irqs_parent(domain, virq, nr_irqs);
-> +}
-> +
->  static const struct irq_domain_ops its_vpe_domain_ops = {
-> +	.alloc			= its_vpe_irq_domain_alloc,
-> +	.free			= its_vpe_irq_domain_free,
->  };
->  
->  static int its_force_quiescent(void __iomem *base)
 > 
+> pi@raspberrypi:~/os/graf/no-kvm-irqchip/aarch64-softmmu $ lkvm run test
+>   # lkvm run -k test -m 448 -c 4 --name guest-1605
+>   Error: Unsupported KVM extension detected: KVM_CAP_IRQCHIP
+>   Fatal: Failed to create virtual GIC
+
+I don't think kvmtool supports running on a system that doesn't have
+in-kernel GIC support.
+
+> 
+> 
+> which seems strange for me because dmesg shows kernel is 4.10.2-v8+ and
+> Boot CPU is AArach64, all CPUs are initialized in HYP mode and /dev/kvm
+> exists. So I thought GIC emulation is also enabled, or should I need to
+> enable other config flags or do settings?
+
+The RPI3 doesn't have a GIC, so you'll never get KVM emulation of the
+GIC with that board.  Ever.  That's why you want the irqchip in
+userspace patches.
+
+> Or, is this way of applying patch
+> wrong? Current config.gz is:
+> https://gist.github.com/caprice-j/d6e144cb8727df813a4fbe716beac3cb
+> 
+> My other concerns are no kvm-ok command is available and /proc/cpuinfo does
+> not show flags for virtualization support (I believe RPI3's cortex A53
+> (ARMv8) has builtin virt support and does not show the support flag
+> explicitly in /proc/cpuinfo ... but I'm unsure that is true)
+
+If you have /dev/kvm then KVM as such is running on your system, no need
+to worry further, just fix your setup to emulate the GIC in userspace.
+
+Thanks,
+-Christoffer
