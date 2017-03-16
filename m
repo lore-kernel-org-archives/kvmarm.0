@@ -1,23 +1,21 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 1/3] kvm: arm/arm64: Take mmap_sem in stage2_unmap_vm
-Date: Thu, 16 Mar 2017 18:20:49 +0000
-Message-ID: <1489688451-17520-2-git-send-email-suzuki.poulose@arm.com>
-References: <1489688451-17520-1-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH] kvm: arm/arm64: Simplify lock relaxation in stage2_wp_range
+Date: Thu, 16 Mar 2017 18:24:34 +0000
+Message-ID: <1489688674-17692-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D008408EB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 14:19:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DECF40187
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 14:25:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RxMd1jLbRSEk for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Mar 2017 14:19:24 -0400 (EDT)
+ with ESMTP id Mgs3Zop-vJye for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Mar 2017 14:25:27 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC13740284
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 14:19:24 -0400 (EDT)
-In-Reply-To: <1489688451-17520-1-git-send-email-suzuki.poulose@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 671D940017
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 14:25:27 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,44 +25,44 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, andreyknvl@google.com
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, ard.biesheuvel@linaro.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org, kcc@google.com, syzkaller@googlegroups.com, dvyukov@google.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-We don't hold the mmap_sem while searching for the VMAs when
-we try to unmap each memslot for a VM. Fix this properly to
-avoid unexpected results.
+Add checks to make sure that kvm->mmu_lock is held while calling
+stage2_wp_range. Also avoid explicit checks already done by cond_resched_lock().
 
-Fixes: commit 957db105c997 ("arm/arm64: KVM: Introduce stage2_unmap_vm")
-Cc: stable@vger.kernel.org # v3.19+
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+[ Added assert_spin_locked check ]
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/kvm/mmu.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm/kvm/mmu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 962616f..f2e2e0c 100644
+index 7628ef1..37e67f5 100644
 --- a/arch/arm/kvm/mmu.c
 +++ b/arch/arm/kvm/mmu.c
-@@ -803,6 +803,7 @@ void stage2_unmap_vm(struct kvm *kvm)
- 	int idx;
+@@ -1162,6 +1162,8 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+ 	pgd_t *pgd;
+ 	phys_addr_t next;
  
- 	idx = srcu_read_lock(&kvm->srcu);
-+	down_read(&current->mm->mmap_sem);
- 	spin_lock(&kvm->mmu_lock);
++	assert_spin_locked(&kvm->mmu_lock);
++
+ 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+ 	do {
+ 		/*
+@@ -1171,8 +1173,7 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+ 		 * CONFIG_LOCKDEP. Additionally, holding the lock too long
+ 		 * will also starve other vCPUs.
+ 		 */
+-		if (need_resched() || spin_needbreak(&kvm->mmu_lock))
+-			cond_resched_lock(&kvm->mmu_lock);
++		cond_resched_lock(&kvm->mmu_lock);
  
- 	slots = kvm_memslots(kvm);
-@@ -810,6 +811,7 @@ void stage2_unmap_vm(struct kvm *kvm)
- 		stage2_unmap_memslot(kvm, memslot);
- 
- 	spin_unlock(&kvm->mmu_lock);
-+	up_read(&current->mm->mmap_sem);
- 	srcu_read_unlock(&kvm->srcu, idx);
- }
- 
+ 		next = stage2_pgd_addr_end(addr, end);
+ 		if (stage2_pgd_present(*pgd))
 -- 
 2.7.4
