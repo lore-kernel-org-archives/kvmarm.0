@@ -1,25 +1,25 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 20/33] irqchip/gic-v3-its: Add VPE domain
- infrastructure
-Date: Thu, 16 Mar 2017 10:18:38 +0100
-Message-ID: <ce962630-8c60-abd8-dfc8-6ad4186523ab@redhat.com>
+Subject: Re: [RFC PATCH 21/33] irqchip/gic-v3-its: Add VPE irq domain
+ allocation/teardown
+Date: Thu, 16 Mar 2017 10:27:03 +0100
+Message-ID: <4fda8fbe-2c65-196e-81ea-fff513a17f11@redhat.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-21-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-22-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D81540A80
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 05:17:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AEB240A63
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 05:25:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UhURlOJP4Rd0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Mar 2017 05:17:08 -0400 (EDT)
+ with ESMTP id J8a2GH1lP9AZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Mar 2017 05:25:30 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 547EC40A7B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 05:17:08 -0400 (EDT)
-In-Reply-To: <1484648454-21216-21-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4591A40A14
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 05:25:30 -0400 (EDT)
+In-Reply-To: <1484648454-21216-22-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,84 +36,244 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi,
 
 On 17/01/2017 11:20, Marc Zyngier wrote:
-> Add the basic GICv4 VPE (vcpu in GICv4 parlance) infrastructure
-> (irqchip, irq domain) that is going to be populated in the following
-> patches.
+> When creating a VM, the low level GICv4 code is responsible for:
+> - allocating each VPE a unique VPEID
+> - allocating a doorbell interrupt for each VPE
+> - allocating the pending tables for each VPE
+> - allocating the property table for the VM
+> 
+> This of course has to be reversed when the VM is brought down.
+> 
+> All of this is wired into the irq domain alloc/free methods.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-
 > ---
->  drivers/irqchip/irq-gic-v3-its.c | 36 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
+>  drivers/irqchip/irq-gic-v3-its.c | 174 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 174 insertions(+)
 > 
 > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 6931018..ddd8096 100644
+> index ddd8096..54d0075 100644
 > --- a/drivers/irqchip/irq-gic-v3-its.c
 > +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -1918,6 +1918,13 @@ static const struct irq_domain_ops its_domain_ops = {
->  	.deactivate		= its_irq_domain_deactivate,
->  };
+> @@ -139,6 +139,7 @@ static struct rdists *gic_rdists;
+>  static struct irq_domain *its_parent;
 >  
-> +static struct irq_chip its_vpe_irq_chip = {
-> +	.name			= "GICv4-vpe",
-> +};
-> +
-> +static const struct irq_domain_ops its_vpe_domain_ops = {
-> +};
-> +
->  static int its_force_quiescent(void __iomem *base)
->  {
->  	u32 count = 1000000;	/* 1s */
-> @@ -2017,6 +2024,27 @@ static int its_init_domain(struct fwnode_handle *handle, struct its_node *its)
->  	return 0;
+>  static unsigned long its_list_map;
+> +static DEFINE_IDA(its_vpeid_ida);
+>  
+>  #define gic_data_rdist()		(raw_cpu_ptr(gic_rdists->rdist))
+>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+> @@ -1146,6 +1147,11 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
+>  	return prop_page;
 >  }
 >  
-> +static struct irq_domain *its_init_vpe_domain(void)
+> +static void its_free_prop_table(struct page *prop_page)
 > +{
-> +	struct fwnode_handle *handle;
-> +	struct irq_domain *domain;
-> +
-> +	handle = irq_domain_alloc_fwnode("VPE domain");
-> +	if (!handle)
-> +		return NULL;
-> +
-> +	domain = irq_domain_create_tree(handle, &its_vpe_domain_ops, NULL);
-> +	if (!domain) {
-> +		kfree(handle);
-> +		return NULL;
-> +	}
-> +
-> +	domain->parent = its_parent;
-> +	domain->bus_token = DOMAIN_BUS_NEXUS;
-> +
-> +	return domain;
+> +	free_pages((unsigned long)page_address(prop_page),
+> +		   get_order(LPI_PROPBASE_SZ));
+> +}
+>  
+>  static int __init its_alloc_lpi_tables(void)
+>  {
+> @@ -1444,6 +1450,12 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
+>  	return pend_page;
+>  }
+>  
+> +static void its_free_pending_table(struct page *pt)
+> +{
+> +	free_pages((unsigned long)page_address(pt),
+> +		   get_order(max(LPI_PENDBASE_SZ, SZ_64K)));
 > +}
 > +
->  static int __init its_probe_one(struct resource *res,
->  				struct fwnode_handle *handle, int numa_node)
+>  static void its_cpu_init_lpis(void)
 >  {
-> @@ -2266,6 +2294,8 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
->  		    struct irq_domain *parent_domain)
->  {
->  	struct device_node *of_node;
-> +	struct its_node *its;
-> +	bool has_v4 = false;
->  
->  	its_parent = parent_domain;
->  	of_node = to_of_node(handle);
-> @@ -2283,5 +2313,11 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
->  	its_alloc_lpi_tables();
->  	its_lpi_init(rdists->id_bits);
->  
-> +	list_for_each_entry(its, &its_nodes, entry)
-> +		has_v4 |= its->is_v4;
-> +
-> +	if (has_v4 & rdists->has_vlpis)
-> +		its_init_vpe_domain();
-> +
->  	return 0;
+>  	void __iomem *rbase = gic_data_rdist_rd_base();
+> @@ -1666,6 +1678,34 @@ static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
+>  	return its_alloc_table_entry(baser, dev_id);
 >  }
+>  
+> +static bool its_alloc_vpe_table(u32 vpe_id)
+> +{
+> +	struct its_node *its;
+> +
+> +	/*
+> +	 * Make sure the L2 tables are allocated on *all* v4 ITSs. We
+> +	 * could try and only do it on ITSs corresponding to devices
+> +	 * that have interrupts targeted at this VPE, but the
+> +	 * complexity becomes crazy (and you have tons of memory
+> +	 * anyway, right?).
+> +	 */
+> +	list_for_each_entry(its, &its_nodes, entry) {
+> +		struct its_baser *baser;
+> +
+> +		if (!its->is_v4)
+> +			continue;
+> +
+> +		baser = its_get_baser(its, GITS_BASER_TYPE_VCPU);
+> +		if (!baser)
+> +			return false;
+
+don't you need to check the vpe_id doesn't overshoot the BASER caps?
+> +
+> +		if (!its_alloc_table_entry(baser, vpe_id))
+> +			return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>  					    int nvecs)
+>  {
+> @@ -1922,7 +1962,141 @@ static struct irq_chip its_vpe_irq_chip = {
+>  	.name			= "GICv4-vpe",
+>  };
+>  
+> +static int its_vpe_id_alloc(void)
+> +{
+> +	return ida_simple_get(&its_vpeid_ida, 0, 1 << 16, GFP_KERNEL);
+> +}
+> +
+> +static void its_vpe_id_free(u16 id)
+> +{
+> +	ida_simple_remove(&its_vpeid_ida, id);
+> +}
+> +
+> +static int its_vpe_init(struct its_vpe *vpe)
+> +{
+> +	struct page *vpt_page;
+> +	int vpe_id;
+> +
+> +	/* Allocate vpe_id */
+> +	vpe_id = its_vpe_id_alloc();
+> +	if (vpe_id < 0)
+> +		return vpe_id;
+> +
+> +	/* Allocate VPT */
+> +	vpt_page = its_allocate_pending_table(GFP_KERNEL);
+> +	if (vpt_page) {
+isn't it !vpt_page?
+> +		its_vpe_id_free(vpe_id);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	if (!its_alloc_vpe_table(vpe_id)) {
+> +		its_vpe_id_free(vpe_id);
+> +		its_free_pending_table(vpe->vpt_page);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	vpe->vpe_id = vpe_id;
+> +	vpe->vpt_page = vpt_page;
+> +
+> +	return 0;
+> +}
+> +
+> +static void its_vpe_teardown(struct its_vpe *vpe)
+> +{
+> +	its_vpe_id_free(vpe->vpe_id);
+> +	its_free_pending_table(vpe->vpt_page);
+don't you need to remove the VPE entry as well?
+> +}
+> +
+> +static int its_vpe_irq_domain_alloc(struct irq_domain *domain, unsigned int virq,
+> +				    unsigned int nr_irqs, void *args)
+> +{
+> +	msi_alloc_info_t *info = args;
+> +	struct its_vpe **vpes = info->scratchpad[0].ptr;
+> +	struct its_vm *vm = vpes[0]->its_vm;
+> +	unsigned long *bitmap;
+> +	struct page *vprop_page;
+> +	int base, nr_ids, i, err = 0;
+> +
+> +	bitmap = its_lpi_alloc_chunks(nr_irqs, &base, &nr_ids);
+> +	if (!bitmap)
+> +		return -ENOMEM;
+> +
+> +	if (nr_ids < nr_irqs) {
+> +		its_lpi_free_chunks(bitmap, base, nr_ids);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	vprop_page = its_allocate_prop_table(GFP_KERNEL);
+> +	if (!vprop_page) {
+> +		its_lpi_free_chunks(bitmap, base, nr_ids);
+> +		return ENOMEM;
+-ENOMEM
+> +	}
+> +
+> +	for (i = 0; i < nr_irqs; i++) {
+> +		vpes[i]->vpe_db_lpi = base + i;
+> +		err = its_vpe_init(vpes[i]);
+> +		if (err)
+> +			break;
+> +		irq_domain_set_hwirq_and_chip(domain,
+> +					      virq + i, vpes[i]->vpe_db_lpi,
+> +					      &its_vpe_irq_chip, vpes[i]);
+> +		set_bit(i, bitmap);
+> +	}
+> +
+> +	if (err) {
+> +		while (--i >= 0) {
+> +			its_vpe_teardown(vpes[i]);
+> +			clear_bit(i, bitmap);
+> +		}
+> +
+> +		its_lpi_free_chunks(bitmap, base, nr_ids);
+> +		its_free_prop_table(vprop_page);
+> +
+> +		return err;
+> +	}
+> +
+> +	vm->db_bitmap = bitmap;
+> +	vm->db_lpi_base = base;
+> +	vm->nr_db_lpis = nr_ids;
+> +	vm->vprop_page = vprop_page;
+> +
+> +	return 0;
+> +}
+> +
+> +static void its_vpe_irq_domain_free(struct irq_domain *domain,
+> +				    unsigned int virq,
+> +				    unsigned int nr_irqs)
+> +{
+> +	struct its_vm *vm = NULL;
+> +	int i;
+> +
+> +	for (i = 0; i < nr_irqs; i++) {
+> +		struct irq_data *data = irq_domain_get_irq_data(domain, virq);
+> +		struct its_vpe *vpe = irq_data_get_irq_chip_data(data);
+> +
+> +		BUG_ON(vm && vm != vpe->its_vm);
+> +		if (!vm)
+> +			vm = vpe->its_vm;
+I don't get the above. actually I missed who does set its_vm field on
+the vpe.
+
+Thanks
+
+Eric
+> +
+> +		clear_bit(vpe->vpe_db_lpi - vm->db_lpi_base, vm->db_bitmap);
+> +		its_vpe_teardown(vpe);
+> +		irq_domain_reset_irq_data(data);
+> +	}
+> +
+> +	if (!vm)
+> +		return;
+> +
+> +	if (bitmap_empty(vm->db_bitmap, vm->nr_db_lpis)) {
+> +		its_lpi_free_chunks(vm->db_bitmap, vm->db_lpi_base, vm->nr_db_lpis);
+> +		its_free_prop_table(vm->vprop_page);
+> +	}
+> +
+> +	irq_domain_free_irqs_parent(domain, virq, nr_irqs);
+> +}
+> +
+>  static const struct irq_domain_ops its_vpe_domain_ops = {
+> +	.alloc			= its_vpe_irq_domain_alloc,
+> +	.free			= its_vpe_irq_domain_free,
+>  };
+>  
+>  static int its_force_quiescent(void __iomem *base)
 > 
