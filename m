@@ -1,25 +1,25 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH 19/33] irqchip/gic-v3-its: Add VLPI configuration
- handling
-Date: Thu, 16 Mar 2017 09:59:33 +0100
-Message-ID: <b459a98c-e2bc-d338-82c0-08bd06060e92@redhat.com>
+Subject: Re: [RFC PATCH 20/33] irqchip/gic-v3-its: Add VPE domain
+ infrastructure
+Date: Thu, 16 Mar 2017 10:18:38 +0100
+Message-ID: <ce962630-8c60-abd8-dfc8-6ad4186523ab@redhat.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-20-git-send-email-marc.zyngier@arm.com>
+ <1484648454-21216-21-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C58B408EB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 04:58:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D81540A80
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 05:17:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3vviu3mL4S2d for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Mar 2017 04:57:59 -0400 (EDT)
+ with ESMTP id UhURlOJP4Rd0 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Mar 2017 05:17:08 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B037B40905
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 04:57:59 -0400 (EDT)
-In-Reply-To: <1484648454-21216-20-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 547EC40A7B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Mar 2017 05:17:08 -0400 (EDT)
+In-Reply-To: <1484648454-21216-21-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,97 +36,84 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi,
 
 On 17/01/2017 11:20, Marc Zyngier wrote:
-> When a VLPI is reconfigured (enabled, disabled, change in priority),
-> the full configuration byte must be written, and the caches invalidated.
-> 
-> Also, when using the irq_mask/irq_unmask methods, it is necessary
-> to disable the doorbell for that particular interrupt (by mapping it
-> to 1023) on top of clearing the Enable bit.
+> Add the basic GICv4 VPE (vcpu in GICv4 parlance) infrastructure
+> (irqchip, irq domain) that is going to be populated in the following
+> patches.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
+Eric
+
 > ---
->  drivers/irqchip/irq-gic-v3-its.c | 37 +++++++++++++++++++++++++++++++++++--
->  1 file changed, 35 insertions(+), 2 deletions(-)
+>  drivers/irqchip/irq-gic-v3-its.c | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
 > 
 > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index d50a019..6931018 100644
+> index 6931018..ddd8096 100644
 > --- a/drivers/irqchip/irq-gic-v3-its.c
 > +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -796,11 +796,18 @@ static inline u32 its_get_event_id(struct irq_data *d)
->  static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
+> @@ -1918,6 +1918,13 @@ static const struct irq_domain_ops its_domain_ops = {
+>  	.deactivate		= its_irq_domain_deactivate,
+>  };
+>  
+> +static struct irq_chip its_vpe_irq_chip = {
+> +	.name			= "GICv4-vpe",
+> +};
+> +
+> +static const struct irq_domain_ops its_vpe_domain_ops = {
+> +};
+> +
+>  static int its_force_quiescent(void __iomem *base)
 >  {
->  	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-> -	irq_hw_number_t hwirq = d->hwirq;
-> +	irq_hw_number_t hwirq;
->  	struct page *prop_page;
->  	u8 *cfg;
->  
-> -	prop_page = gic_rdists->prop_page;
-> +	if (irqd_is_forwarded_to_vcpu(d)) {
-> +		u32 event = its_get_event_id(d);
-> +		prop_page = its_dev->event_map.vlpi_map->vpes[0]->its_vm->vprop_page;
-> +		hwirq = its_dev->event_map.vlpi_map->vlpis[event].vintid;
-> +	} else {
-> +		prop_page = gic_rdists->prop_page;
-> +		hwirq = d->hwirq;
-> +	}
->  
->  	cfg = page_address(prop_page) + hwirq - 8192;
->  	*cfg &= ~clr;
-> @@ -818,13 +825,28 @@ static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
->  	its_send_inv(its_dev, its_get_event_id(d));
+>  	u32 count = 1000000;	/* 1s */
+> @@ -2017,6 +2024,27 @@ static int its_init_domain(struct fwnode_handle *handle, struct its_node *its)
+>  	return 0;
 >  }
 >  
-> +static void its_vlpi_set_doorbell(struct irq_data *d, bool enable)
+> +static struct irq_domain *its_init_vpe_domain(void)
 > +{
-> +	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-> +	u32 event = its_get_event_id(d);
+> +	struct fwnode_handle *handle;
+> +	struct irq_domain *domain;
 > +
-> +	its_dev->event_map.vlpi_map->vlpis[event].db_enabled = enable;
-> +	its_send_vmapti(its_dev, event);
+> +	handle = irq_domain_alloc_fwnode("VPE domain");
+> +	if (!handle)
+> +		return NULL;
+> +
+> +	domain = irq_domain_create_tree(handle, &its_vpe_domain_ops, NULL);
+> +	if (!domain) {
+> +		kfree(handle);
+> +		return NULL;
+> +	}
+> +
+> +	domain->parent = its_parent;
+> +	domain->bus_token = DOMAIN_BUS_NEXUS;
+> +
+> +	return domain;
 > +}
 > +
->  static void its_mask_irq(struct irq_data *d)
+>  static int __init its_probe_one(struct resource *res,
+>  				struct fwnode_handle *handle, int numa_node)
 >  {
-> +	if (irqd_is_forwarded_to_vcpu(d))
-> +		its_vlpi_set_doorbell(d, false);
-> +
->  	lpi_update_config(d, LPI_PROP_ENABLED, 0);
->  }
->  
->  static void its_unmask_irq(struct irq_data *d)
+> @@ -2266,6 +2294,8 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
+>  		    struct irq_domain *parent_domain)
 >  {
-> +	if (irqd_is_forwarded_to_vcpu(d))
-> +		its_vlpi_set_doorbell(d, true);
+>  	struct device_node *of_node;
+> +	struct its_node *its;
+> +	bool has_v4 = false;
+>  
+>  	its_parent = parent_domain;
+>  	of_node = to_of_node(handle);
+> @@ -2283,5 +2313,11 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
+>  	its_alloc_lpi_tables();
+>  	its_lpi_init(rdists->id_bits);
+>  
+> +	list_for_each_entry(its, &its_nodes, entry)
+> +		has_v4 |= its->is_v4;
 > +
->  	lpi_update_config(d, 0, LPI_PROP_ENABLED);
+> +	if (has_v4 & rdists->has_vlpis)
+> +		its_init_vpe_domain();
+> +
+>  	return 0;
 >  }
->  
-> @@ -837,6 +859,10 @@ static int its_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
->  	struct its_collection *target_col;
->  	u32 id = its_get_event_id(d);
->  
-> +	/* A forwarded interrupt should use irq_set_vcpu_affinity */
-> +	if (irqd_is_forwarded_to_vcpu(d))
-> +		return -EINVAL;
-> +
->         /* lpi cannot be routed to a redistributor that is on a foreign node */
->  	if (its_dev->its->flags & ITS_FLAGS_WORKAROUND_CAVIUM_23144) {
->  		if (its_dev->its->numa_node >= 0) {
-> @@ -969,6 +995,13 @@ static int its_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
->  
->  	case PROP_UPDATE_VLPI:
->  	{
-> +		if (!its_dev->event_map.vlpi_map ||
-> +		    !irqd_is_forwarded_to_vcpu(d))
-> +			return -EINVAL;
-> +
-> +		lpi_update_config(d, 0xff, info->config);
-> +		its_vlpi_set_doorbell(d, !!(info->config & LPI_PROP_ENABLED));
-> +
->  		return 0;
->  	}
->  
 > 
