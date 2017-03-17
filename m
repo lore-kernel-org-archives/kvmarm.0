@@ -1,26 +1,25 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH v3 00/25] arm/arm64: KVM: Rework the hyp-stub API
-Date: Fri, 17 Mar 2017 11:43:14 +0000
-Message-ID: <20170317114314.GA21222@n2100.armlinux.org.uk>
-References: <20170306142458.8875-1-marc.zyngier@arm.com>
- <20170314160545.GP21222@n2100.armlinux.org.uk>
- <4bf5788f-7ed8-198e-8089-1c7a8385f96b@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v3 03/19] arm/arm64: vgic: turn vgic_find_mmio_region into
+ public
+Date: Fri, 17 Mar 2017 14:38:56 +0000
+Message-ID: <7b4aa19d-d413-7714-a317-b9e59a2fbf88@arm.com>
+References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
+ <1488800074-21991-4-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DFB440A66
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Mar 2017 07:41:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 128E440A63
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Mar 2017 10:35:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xSHDBKNHtLp7 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Mar 2017 07:41:53 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D22C40948
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Mar 2017 07:41:52 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <4bf5788f-7ed8-198e-8089-1c7a8385f96b@arm.com>
+ with ESMTP id UYxckC6ms7dL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Mar 2017 10:35:26 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC68F40966
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Mar 2017 10:35:26 -0400 (EDT)
+In-Reply-To: <1488800074-21991-4-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,29 +29,61 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: cdall@linaro.org, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 14, 2017 at 04:09:44PM +0000, Marc Zyngier wrote:
-> On 14/03/17 16:05, Russell King - ARM Linux wrote:
-> > On Mon, Mar 06, 2017 at 02:24:33PM +0000, Marc Zyngier wrote:
-> >> As noticed by RMK in this thread[1], the hyp-stub API on 32bit ARM
-> >> could do with some TLC (it cannot perform a soft-restart at HYP, and
-> >> has holes in the hyp-stub support in a number of places). In general,
-> >> it would be desirable for the 32bit behaviour to align on 64bit, if
-> >> only to ease maintenance.
-> > 
-> > What's the merge plan for this?
+Hi Eric,
+
+On 06/03/17 11:34, Eric Auger wrote:
+> We plan to use vgic_find_mmio_region in vgic-its.c so let's
+> turn it into a public function.
+
+Just a nit below, but for the patch:
+
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+> ---
+>  virt/kvm/arm/vgic/vgic-mmio.c | 3 +--
+>  virt/kvm/arm/vgic/vgic-mmio.h | 5 +++++
+>  2 files changed, 6 insertions(+), 2 deletions(-)
 > 
-> If you're happy with it (together with Christoffer, Will and Catalin), I
-> plat to take it through the kvmarm tree.
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index 3654b4c..0427ddb 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -430,8 +430,7 @@ static int match_region(const void *key, const void *elt)
+>  	return 0;
+>  }
+>  
+> -/* Find the proper register handler entry given a certain address offset. */
+> -static const struct vgic_register_region *
+> +const struct vgic_register_region *
+>  vgic_find_mmio_region(const struct vgic_register_region *region, int nr_regions,
+>  		      unsigned int offset)
+>  {
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+> index 98bb566..055ad42 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.h
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
+> @@ -192,4 +192,9 @@ u64 vgic_sanitise_shareability(u64 reg);
+>  u64 vgic_sanitise_field(u64 reg, u64 field_mask, int field_shift,
+>  			u64 (*sanitise_fn)(u64));
+>  
+> +/* Find the proper register handler entry given a certain address offset */
+> +const struct vgic_register_region *
+> +vgic_find_mmio_region(const struct vgic_register_region *region,
 
-Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
+I wonder if we should use the opportunity to use the plural in the
+variable name here ("regions") to make it clear that this is an array
+(just needed some time myself here to remember what it does).
 
-Thanks.
+Cheers,
+Andre.
 
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+> +		      int nr_regions, unsigned int offset);
+> +
+>  #endif
+> 
