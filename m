@@ -1,25 +1,25 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v3 10/19] KVM: arm64: ITS: Check the device id matches
- TYPER DEVBITS range
-Date: Fri, 17 Mar 2017 15:41:49 +0000
-Message-ID: <1ce84330-42bb-4e8d-5446-d481ac4419f2@arm.com>
-References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
- <1488800074-21991-11-git-send-email-eric.auger@redhat.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Signal SIGBUS when stage2 discovers
+ hwpoison memory
+Date: Fri, 17 Mar 2017 15:48:46 +0000
+Message-ID: <58CC055E.50800@arm.com>
+References: <20170315160727.16465-1-james.morse@arm.com>
+ <87wpbohrj3.fsf@e105922-lin.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D4E2E40A69
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Mar 2017 11:38:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C909740B3E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Mar 2017 11:47:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q0KXvgaMQyWk for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Mar 2017 11:38:19 -0400 (EDT)
+ with ESMTP id o8pb-6jeN6xT for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Mar 2017 11:47:22 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AA1C40A63
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Mar 2017 11:38:19 -0400 (EDT)
-In-Reply-To: <1488800074-21991-11-git-send-email-eric.auger@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D97AE40966
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Mar 2017 11:47:22 -0400 (EDT)
+In-Reply-To: <87wpbohrj3.fsf@e105922-lin.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,78 +29,71 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
+To: Punit Agrawal <punit.agrawal@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, gengdongjiu <gengdj.1984@gmail.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Punit,
 
-On 06/03/17 11:34, Eric Auger wrote:
-> On MAPD we currently check the device id can be stored in the device table.
-> Let's first check it can be encoded within the range defined by TYPER
-> DEVBITS.
+On 17/03/17 15:06, Punit Agrawal wrote:
+> James Morse <james.morse@arm.com> writes:
+>> Once we enable ARCH_SUPPORTS_MEMORY_FAILURE on arm64[0], notifications for
+>> broken memory can call memory_failure() in mm/memory-failure.c to deliver
+>> SIGBUS to any user space process using the page, and notify all the
+>> in-kernel users.
+>>
+>> If the page corresponded with guest memory, KVM will unmap this page
+>> from its stage2 page tables. The user space process that allocated
+>> this memory may have never touched this page in which case it may not
+>> be mapped meaning SIGBUS won't be delivered.
+>>
+>> When this happens KVM discovers pfn == KVM_PFN_ERR_HWPOISON when it
+>> comes to process the stage2 fault.
+>>
+>> Do as x86 does, and deliver the SIGBUS when we discover
+>> KVM_PFN_ERR_HWPOISON. Use the stage2 mapping size as the si_addr_lsb
+>> as this matches the user space mapping size.
+
+>> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+>> index 962616fd4ddd..9d1aa294e88f 100644
+>> --- a/arch/arm/kvm/mmu.c
+>> +++ b/arch/arm/kvm/mmu.c
+>> @@ -1237,6 +1239,23 @@ static void coherent_cache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
+>>  	__coherent_cache_guest_page(vcpu, pfn, size);
+>>  }
+>>  
+>> +static void kvm_send_hwpoison_signal(unsigned long address, bool hugetlb)
+>> +{
+>> +	siginfo_t info;
+>> +
+>> +	info.si_signo   = SIGBUS;
+>> +	info.si_errno   = 0;
+>> +	info.si_code    = BUS_MCEERR_AR;
+>> +	info.si_addr    = (void __user *)address;
+>> +
+>> +	if (hugetlb)
+>> +		info.si_addr_lsb = PMD_SHIFT;
+>> +	else
+>> +		info.si_addr_lsb = PAGE_SHIFT;
+>> +
+>> +	send_sig_info(SIGBUS, &info, current);
+>> +}
+
+> The changes look good to me. Though in essence as mentioned in the
+> commit log we are not doing anything different to x86 here. Worth moving
+> kvm_send_hwpoison_signal to an architecture agostic location and using
+> it from there?
+
+I had an earlier version that did exactly that, but the x86 version always
+reports PAGE_SHIFT as the si_addr_lsb value. I don't know enough about their
+version of stage2 to know if that's a bug or an implementation detail, so I
+chose not to copy it.
+
+
+> In any case, FWIW,
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 694023f..322e370 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -180,6 +180,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
->  
->  #define VITS_ESZ 8
->  #define VITS_TYPER_IDBITS 0xF
-> +#define VITS_TYPER_DEVBITS 0xF
+> Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
 
-Same comment as for the other, please use 16 here.
+Thanks!
 
->  /*
->   * Finds and returns a collection in the ITS collection table.
-> @@ -402,7 +403,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
->  	 * To avoid memory waste in the guest, we keep the number of IDBits and
->  	 * DevBits low - as least for the time being.
->  	 */
-> -	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
-> +	reg |= VITS_TYPER_DEVBITS << GITS_TYPER_DEVBITS_SHIFT;
->  	reg |= VITS_TYPER_IDBITS << GITS_TYPER_IDBITS_SHIFT;
->  	reg |= (VITS_ESZ - 1) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
->  
-> @@ -631,7 +632,7 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
->   * Check whether an ID can be stored into the corresponding guest table.
->   * For a direct table this is pretty easy, but gets a bit nasty for
->   * indirect tables. We check whether the resulting guest physical address
-> - * is actually valid (covered by a memslot and guest accessbible).
-> + * is actually valid (covered by a memslot and guest accessible).
-
-Good lord, nice catch ;-)
-
->   * For this we have to read the respective first level entry.
->   */
->  static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
-
-Just seeing that "int" might not be sufficient here, since a device ID
-can go up to (2^32 - 1). I wonder if you can fix it on the way.
-
-> @@ -642,6 +643,9 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
->  	gfn_t gfn;
->  	int esz = GITS_BASER_ENTRY_SIZE(baser);
->  
-> +	if (id >= (2 << (VITS_TYPER_DEVBITS + 1)))
-
-But shouldn't this be "1 << " if you add one already?
-So if you use 16 as mentioned above, wouldn't BIT(VITS_TYPER_DEVBITS) be
-more readable? Or even better use BIT_ULL to cover the worst case of 32
-bits of device ID here as well.
-
-Cheers,
-Andre.
-
-> +		return false;
-> +
->  	if (!(baser & GITS_BASER_INDIRECT)) {
->  		phys_addr_t addr;
->  
-> 
+James
