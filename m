@@ -1,24 +1,23 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v3 12/19] KVM: arm64: ITS: vgic_its_alloc_ite/device
-Date: Fri, 17 Mar 2017 17:01:03 +0000
-Message-ID: <f913a9be-d994-9c18-3a30-e60e1778480a@arm.com>
-References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
- <1488800074-21991-13-git-send-email-eric.auger@redhat.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: [PATCH] KVM: arm64: Ensure LRs are clear when they should be
+Date: Sat, 18 Mar 2017 13:56:56 +0100
+Message-ID: <20170318125656.16523-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2073B40A74
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Mar 2017 12:57:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A925140C43
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Mar 2017 08:55:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g0eD7SxFlnA3 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Mar 2017 12:57:34 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D6CCA40064
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Mar 2017 12:57:33 -0400 (EDT)
-In-Reply-To: <1488800074-21991-13-git-send-email-eric.auger@redhat.com>
+ with ESMTP id KGIGMw2LxfuZ for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 18 Mar 2017 08:55:32 -0400 (EDT)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2662940C42
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Mar 2017 08:55:31 -0400 (EDT)
+Received: by mail-wm0-f42.google.com with SMTP id n11so33986240wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Mar 2017 05:57:13 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,154 +27,136 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-On 06/03/17 11:34, Eric Auger wrote:
-> Add two new helpers to allocate an its ite and an its device.
-> This will avoid duplication on restore path.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v1 -> v2:
-> - report itt_size fix and remove ITE_SIZE
-> - s/itte/ite/g
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 70 +++++++++++++++++++++++++++++---------------
->  1 file changed, 47 insertions(+), 23 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index dd7545a..9792110 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -734,6 +734,26 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
->  	kfree(collection);
->  }
->  
+We currently have some code to clear the list registers on GICv3, but we
+never call this code, because the caller got nuked when removing the old
+vgic.  We also used to have a similar GICv2 part, but that got lost in
+the process too.
 
-Can you please propagate the:
-"Must be called with its_lock mutex held." comment here?
+Let's reintroduce the logic for GICv2 and call the logic when we
+initialize the use of hypervisors on the CPU, for example when first
+loading KVM or when exiting a low power state.
 
-> +static int vgic_its_alloc_ite(struct its_device *device,
-> +			       struct its_ite **itep,
-> +			       struct its_collection *collection,
-> +			       u32 lpi_id, u32 event_id)
-> +{
-> +	struct its_ite *ite;
-> +
-> +	ite = kzalloc(sizeof(ite), GFP_KERNEL);
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+Marc, Eric, Andre,
 
-That should be sizeof(*ite) or sizeof(struct its_ite).
+I'm unable to convince myself that the LRs should already be clear via
+the reset of the hardware, and for any power management scenario I
+suppose it's possible for secure-side firmware to have messed with the
+LRs behind our backs; plus we used to have this functionality and it got
+dropped for the new vgic.  Am I forgetting some discussion where we
+decided it wasn't needed anymore?
 
-> +	if (!ite)
-> +		return -ENOMEM;
-> +
-> +	ite->event_id	= event_id;
-> +	ite->collection = collection;
-> +	ite->lpi = lpi_id;
-> +
-> +	list_add_tail(&ite->ite_list, &device->itt_head);
-> +	*itep = ite;
-> +	return 0;
-> +}
-> +
->  /*
->   * The MAPTI and MAPI commands map LPIs to ITTEs.
->   * Must be called with its_lock mutex held.
-> @@ -747,7 +767,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
->  	struct its_ite *ite;
->  	struct its_device *device;
->  	struct its_collection *collection, *new_coll = NULL;
-> -	int lpi_nr;
-> +	int lpi_nr, ret;
->  	struct vgic_irq *irq;
->  
->  	device = find_its_device(its, device_id);
-> @@ -777,19 +797,13 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
->  		new_coll = collection;
->  	}
->  
-> -	ite = kzalloc(sizeof(struct its_ite), GFP_KERNEL);
-> -	if (!ite) {
-> +	ret = vgic_its_alloc_ite(device, &ite, collection, lpi_nr, event_id);
-> +	if (ret) {
->  		if (new_coll)
->  			vgic_its_free_collection(its, coll_id);
-> -		return -ENOMEM;
-> +		return ret;
->  	}
->  
-> -	ite->event_id	= event_id;
-> -	list_add_tail(&ite->ite_list, &device->itt_head);
-> -
-> -	ite->collection = collection;
-> -	ite->lpi = lpi_nr;
-> -
->  	irq = vgic_add_lpi(kvm, lpi_nr);
->  	if (IS_ERR(irq)) {
->  		if (new_coll)
-> @@ -828,6 +842,28 @@ static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
->  	kfree(device);
->  }
->  
-> +static int vgic_its_alloc_device(struct vgic_its *its,
-> +				 struct its_device **devp,
-> +				 u32 device_id, gpa_t itt_addr_field,
-> +				 size_t size_field)
-> +{
-> +	struct its_device *device;
-> +
-> +	device = kzalloc(sizeof(*device), GFP_KERNEL);
-> +	if (!device)
-> +		return -ENOMEM;
-> +
-> +	device->device_id = device_id;
-> +	device->itt_addr = itt_addr_field << 8;
-> +	device->nb_eventid_bits = size_field + 1;
+Thanks,
+-Christoffer
 
-I'd rather see these command buffer entry decodings done at the source,
-not here (though this isn't in this patch).
+ arch/arm/kvm/arm.c            |  3 +++
+ include/kvm/arm_vgic.h        |  1 +
+ virt/kvm/arm/vgic/vgic-init.c | 19 +++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v2.c   | 15 +++++++++++++++
+ virt/kvm/arm/vgic/vgic.h      |  2 ++
+ 5 files changed, 40 insertions(+)
 
-The rest looks fine.
-
-Cheers,
-Andre
-
-> +	INIT_LIST_HEAD(&device->itt_head);
-> +
-> +	list_add_tail(&device->dev_list, &its->device_list);
-> +	*devp = device;
-> +
-> +	return 0;
-> +}
-> +
->  /*
->   * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
->   * Must be called with the its_lock mutex held.
-> @@ -864,19 +900,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->  	if (!valid)
->  		return 0;
->  
-> -	device = kzalloc(sizeof(struct its_device), GFP_KERNEL);
-> -	if (!device)
-> -		return -ENOMEM;
-> -
-> -	device->device_id = device_id;
-> -	device->itt_addr = itt_addr << 8;
-> -	device->nb_eventid_bits = size + 1;
-> -
-> -	INIT_LIST_HEAD(&device->itt_head);
-> -
-> -	list_add_tail(&device->dev_list, &its->device_list);
-> -
-> -	return 0;
-> +	return vgic_its_alloc_device(its, &device, device_id, itt_addr, size);
->  }
->  
->  /*
-> 
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index c9a2103..d775aac 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1121,6 +1121,9 @@ static void cpu_hyp_reinit(void)
+ 		if (__hyp_get_vectors() == hyp_default_vectors)
+ 			cpu_init_hyp_mode(NULL);
+ 	}
++
++	if (vgic_present)
++		kvm_vgic_init_cpu_hardware();
+ }
+ 
+ static void cpu_hyp_reset(void)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index b72dd2a..c0b3d99 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -295,6 +295,7 @@ void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu);
+ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu);
+ int kvm_vgic_map_resources(struct kvm *kvm);
+ int kvm_vgic_hyp_init(void);
++void kvm_vgic_init_cpu_hardware(void);
+ 
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level);
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 276139a..702f810 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -392,6 +392,25 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+ }
+ 
+ /**
++ * kvm_vgic_init_cpu_hardware - initialize the GIC VE hardware
++ *
++ * For a specific CPU, initialize the GIC VE hardware.
++ */
++void kvm_vgic_init_cpu_hardware(void)
++{
++	BUG_ON(preemptible());
++
++	/*
++	 * We want to make sure the list registers start out clear so that we
++	 * only have the program the used registers.
++	 */
++	if (kvm_vgic_global_state.type == VGIC_V2)
++		vgic_v2_init_lrs();
++	else
++		kvm_call_hyp(__vgic_v3_init_lrs);
++}
++
++/**
+  * kvm_vgic_hyp_init: populates the kvm_vgic_global_state variable
+  * according to the host GIC model. Accordingly calls either
+  * vgic_v2/v3_probe which registers the KVM_DEVICE that can be
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index b834ecd..94cf4b9 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -36,6 +36,21 @@ static unsigned long *u64_to_bitmask(u64 *val)
+ 	return (unsigned long *)val;
+ }
+ 
++static inline void vgic_v2_write_lr(int lr, u32 val)
++{
++	void __iomem *base = kvm_vgic_global_state.vctrl_base;
++
++	writel_relaxed(val, base + GICH_LR0 + (lr * 4));
++}
++
++void vgic_v2_init_lrs(void)
++{
++	int i;
++
++	for (i = 0; i < kvm_vgic_global_state.nr_lr; i++)
++		vgic_v2_write_lr(i, 0);
++}
++
+ void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index db28f7c..91566f5 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -130,6 +130,8 @@ int vgic_v2_map_resources(struct kvm *kvm);
+ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
+ 			     enum vgic_type);
+ 
++void vgic_v2_init_lrs(void);
++
+ static inline void vgic_get_irq_kref(struct vgic_irq *irq)
+ {
+ 	if (irq->intid < VGIC_MIN_LPI)
+-- 
+2.9.0
