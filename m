@@ -1,201 +1,156 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
 Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
-Date: Mon, 20 Mar 2017 11:24:05 +0000
-Message-ID: <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
+Date: Mon, 20 Mar 2017 20:28:10 +0800
+Message-ID: <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
 References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
+ <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 688C940BD2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 07:22:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IQchuqsoCKWR for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Mar 2017 07:22:28 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 37D2A40A14
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 07:22:27 -0400 (EDT)
-In-Reply-To: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dongjiu Geng <gengdongjiu@huawei.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: wuquanming@huawei.com, wangxiongfeng2@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: wuquanming@huawei.com, James Morse <James.Morse@arm.com>, wangxiongfeng2@huawei.com, xiexiuqi@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Please include James Morse on anything RAS related, as he's already
-looking at related patches.
-
-On 20/03/17 07:55, Dongjiu Geng wrote:
-> In the RAS implementation, hardware pass the virtual SEI
-> syndrome information through the VSESR_EL2, so set the virtual
-> SEI syndrome using physical SEI syndrome el2_elr to pass to
-> the guest OS
-> 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Quanming wu <wuquanming@huawei.com>
-> ---
->  arch/arm64/Kconfig                   |  8 ++++++++
->  arch/arm64/include/asm/esr.h         |  1 +
->  arch/arm64/include/asm/kvm_emulate.h | 12 ++++++++++++
->  arch/arm64/include/asm/kvm_host.h    |  4 ++++
->  arch/arm64/kvm/hyp/switch.c          | 15 ++++++++++++++-
->  arch/arm64/kvm/inject_fault.c        | 10 ++++++++++
->  6 files changed, 49 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 8c7c244247b6..ea62170a3b75 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -908,6 +908,14 @@ endmenu
->  
->  menu "ARMv8.2 architectural features"
->  
-> +config HAS_RAS_EXTENSION
-> +	bool "Support arm64 RAS extension"
-> +	default n
-> +	help
-> +	  Reliability, Availability, Serviceability(RAS; part of the ARMv8.2 Extensions).
-> +
-> +	  Selecting this option OS will try to recover the error that RAS hardware node detected.
-> +
-
-As this is an architectural extension, this should be controlled by the
-CPU feature mechanism, and not be chosen at compile time. What you have
-here will break horribly when booted on a CPU that doesn't implement RAS.
-
->  config ARM64_UAO
->  	bool "Enable support for User Access Override (UAO)"
->  	default y
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index d14c478976d0..e38d32b2bdad 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -111,6 +111,7 @@
->  #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
->  #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
->  #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
-> +#define VSESR_ELx_IDS_ISS_MASK    ((1UL << 25) - 1)
->  
->  /* ESR value templates for specific events */
->  
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index f5ea0ba70f07..20d4da7f5dce 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -148,6 +148,18 @@ static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
->  	return vcpu->arch.fault.esr_el2;
->  }
->  
-> +#ifdef CONFIG_HAS_RAS_EXTENSION
-> +static inline u32 kvm_vcpu_get_vsesr(const struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu->arch.fault.vsesr_el2;
-> +}
-> +
-> +static inline void kvm_vcpu_set_vsesr(struct kvm_vcpu *vcpu, unsigned long val)
-> +{
-> +	vcpu->arch.fault.vsesr_el2 = val;
-> +}
-> +#endif
-> +
->  static inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
->  {
->  	u32 esr = kvm_vcpu_get_hsr(vcpu);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e7705e7bb07b..f9e3bb57c461 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -83,6 +83,10 @@ struct kvm_mmu_memory_cache {
->  };
->  
->  struct kvm_vcpu_fault_info {
-> +#ifdef CONFIG_HAS_RAS_EXTENSION
-> +	/* Virtual SError Exception Syndrome Register */
-> +	u32 vsesr_el2;
-> +#endif
->  	u32 esr_el2;		/* Hyp Syndrom Register */
->  	u64 far_el2;		/* Hyp Fault Address Register */
->  	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index aede1658aeda..770a153fb6ba 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -86,6 +86,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
->  		isb();
->  	}
->  	write_sysreg(val, hcr_el2);
-> +#ifdef CONFIG_HAS_RAS_EXTENSION
-> +	/* If virtual System Error or Asynchronous Abort is pending. set
-> +	 * the virtual exception syndrome information
-> +	 */
-> +	if (vcpu->arch.hcr_el2 & HCR_VSE)
-> +		write_sysreg(vcpu->arch.fault.vsesr_el2, vsesr_el2);
-> +#endif
->  	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
->  	write_sysreg(1 << 15, hstr_el2);
->  	/*
-> @@ -139,8 +146,14 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
->  	 * the crucial bit is "On taking a vSError interrupt,
->  	 * HCR_EL2.VSE is cleared to 0."
->  	 */
-> -	if (vcpu->arch.hcr_el2 & HCR_VSE)
-> +	if (vcpu->arch.hcr_el2 & HCR_VSE) {
->  		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
-> +#ifdef CONFIG_HAS_RAS_EXTENSION
-> +		/* set vsesr_el2[24:0] with esr_el2[24:0] */
-> +		kvm_vcpu_set_vsesr(vcpu, read_sysreg_el2(esr)
-> +					& VSESR_ELx_IDS_ISS_MASK);
-
-What guarantees that ESR_EL2 still contains the latest exception? What
-does it mean to store something that is the current EL2 exception
-syndrome together with an SError that has already been injected?
-
-Also, is it correct to directly copy the ESR_EL2 bits into VSESR_EL2? My
-own reading of the specification seem to imply that there is at least
-differences when the guest is AArch32. Surely there would be some
-processing here.
-
-> +#endif
-> +	}
->  
->  	__deactivate_traps_arch()();
->  	write_sysreg(0, hstr_el2);
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index da6a8cfa54a0..08a13dfe28a8 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -242,4 +242,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
->  void kvm_inject_vabt(struct kvm_vcpu *vcpu)
->  {
->  	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
-> +#ifdef CONFIG_HAS_RAS_EXTENSION
-> +	/* If virtual System Error or Asynchronous Abort is set. set
-> +	 * the virtual exception syndrome information
-> +	 */
-> +	kvm_vcpu_set_vsesr(vcpu, ((kvm_vcpu_get_vsesr(vcpu)
-> +				& (~VSESR_ELx_IDS_ISS_MASK))
-> +				| (kvm_vcpu_get_hsr(vcpu)
-> +				& VSESR_ELx_IDS_ISS_MASK)));
-
-What is the rational for setting VSESR_EL2 with the EL1 syndrome
-information? That doesn't make any sense to me.
-
-Overall, this patch is completely inconsistent and unclear in what it
-tries to achieve. Also, as I already tated before, I'd like to see the
-"firmware first" mode of operation be enforced here, going back to
-userspace and let the VMM decide what to do.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+CgpPbiAyMDE3LzMvMjAgMTk6MjQsIE1hcmMgWnluZ2llciB3cm90ZToKPiBQbGVhc2UgaW5jbHVk
+ZSBKYW1lcyBNb3JzZSBvbiBhbnl0aGluZyBSQVMgcmVsYXRlZCwgYXMgaGUncyBhbHJlYWR5Cj4g
+bG9va2luZyBhdCByZWxhdGVkIHBhdGNoZXMuCj4gCj4gT24gMjAvMDMvMTcgMDc6NTUsIERvbmdq
+aXUgR2VuZyB3cm90ZToKPj4gSW4gdGhlIFJBUyBpbXBsZW1lbnRhdGlvbiwgaGFyZHdhcmUgcGFz
+cyB0aGUgdmlydHVhbCBTRUkKPj4gc3luZHJvbWUgaW5mb3JtYXRpb24gdGhyb3VnaCB0aGUgVlNF
+U1JfRUwyLCBzbyBzZXQgdGhlIHZpcnR1YWwKPj4gU0VJIHN5bmRyb21lIHVzaW5nIHBoeXNpY2Fs
+IFNFSSBzeW5kcm9tZSBlbDJfZWxyIHRvIHBhc3MgdG8KPj4gdGhlIGd1ZXN0IE9TCj4+Cj4+IFNp
+Z25lZC1vZmYtYnk6IERvbmdqaXUgR2VuZyA8Z2VuZ2RvbmdqaXVAaHVhd2VpLmNvbT4KPj4gU2ln
+bmVkLW9mZi1ieTogUXVhbm1pbmcgd3UgPHd1cXVhbm1pbmdAaHVhd2VpLmNvbT4KPj4gLS0tCj4+
+ICBhcmNoL2FybTY0L0tjb25maWcgICAgICAgICAgICAgICAgICAgfCAgOCArKysrKysrKwo+PiAg
+YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9lc3IuaCAgICAgICAgIHwgIDEgKwo+PiAgYXJjaC9hcm02
+NC9pbmNsdWRlL2FzbS9rdm1fZW11bGF0ZS5oIHwgMTIgKysrKysrKysrKysrCj4+ICBhcmNoL2Fy
+bTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICAgfCAgNCArKysrCj4+ICBhcmNoL2FybTY0L2t2
+bS9oeXAvc3dpdGNoLmMgICAgICAgICAgfCAxNSArKysrKysrKysrKysrKy0KPj4gIGFyY2gvYXJt
+NjQva3ZtL2luamVjdF9mYXVsdC5jICAgICAgICB8IDEwICsrKysrKysrKysKPj4gIDYgZmlsZXMg
+Y2hhbmdlZCwgNDkgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+Pgo+PiBkaWZmIC0tZ2l0
+IGEvYXJjaC9hcm02NC9LY29uZmlnIGIvYXJjaC9hcm02NC9LY29uZmlnCj4+IGluZGV4IDhjN2My
+NDQyNDdiNi4uZWE2MjE3MGEzYjc1IDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L0tjb25maWcK
+Pj4gKysrIGIvYXJjaC9hcm02NC9LY29uZmlnCj4+IEBAIC05MDgsNiArOTA4LDE0IEBAIGVuZG1l
+bnUKPj4gIAo+PiAgbWVudSAiQVJNdjguMiBhcmNoaXRlY3R1cmFsIGZlYXR1cmVzIgo+PiAgCj4+
+ICtjb25maWcgSEFTX1JBU19FWFRFTlNJT04KPj4gKwlib29sICJTdXBwb3J0IGFybTY0IFJBUyBl
+eHRlbnNpb24iCj4+ICsJZGVmYXVsdCBuCj4+ICsJaGVscAo+PiArCSAgUmVsaWFiaWxpdHksIEF2
+YWlsYWJpbGl0eSwgU2VydmljZWFiaWxpdHkoUkFTOyBwYXJ0IG9mIHRoZSBBUk12OC4yIEV4dGVu
+c2lvbnMpLgo+PiArCj4+ICsJICBTZWxlY3RpbmcgdGhpcyBvcHRpb24gT1Mgd2lsbCB0cnkgdG8g
+cmVjb3ZlciB0aGUgZXJyb3IgdGhhdCBSQVMgaGFyZHdhcmUgbm9kZSBkZXRlY3RlZC4KPj4gKwo+
+IAo+IEFzIHRoaXMgaXMgYW4gYXJjaGl0ZWN0dXJhbCBleHRlbnNpb24sIHRoaXMgc2hvdWxkIGJl
+IGNvbnRyb2xsZWQgYnkgdGhlCj4gQ1BVIGZlYXR1cmUgbWVjaGFuaXNtLCBhbmQgbm90IGJlIGNo
+b3NlbiBhdCBjb21waWxlIHRpbWUuIFdoYXQgeW91IGhhdmUKPiBoZXJlIHdpbGwgYnJlYWsgaG9y
+cmlibHkgd2hlbiBib290ZWQgb24gYSBDUFUgdGhhdCBkb2Vzbid0IGltcGxlbWVudCBSQVMuCgp0
+aGFua3MgdmVyeSBtdWNoIGZvciB5b3VyIHJldmlldywgeWVzLCBpdCBpcywgeW91IGFyZSByaWdo
+dC4KCj4gCj4+ICBjb25maWcgQVJNNjRfVUFPCj4+ICAJYm9vbCAiRW5hYmxlIHN1cHBvcnQgZm9y
+IFVzZXIgQWNjZXNzIE92ZXJyaWRlIChVQU8pIgo+PiAgCWRlZmF1bHQgeQo+PiBkaWZmIC0tZ2l0
+IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9lc3IuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20v
+ZXNyLmgKPj4gaW5kZXggZDE0YzQ3ODk3NmQwLi5lMzhkMzJiMmJkYWQgMTAwNjQ0Cj4+IC0tLSBh
+L2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vZXNyLmgKPj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRl
+L2FzbS9lc3IuaAo+PiBAQCAtMTExLDYgKzExMSw3IEBACj4+ICAjZGVmaW5lIEVTUl9FTHhfQ09O
+RF9NQVNLCShVTCgweEYpIDw8IEVTUl9FTHhfQ09ORF9TSElGVCkKPj4gICNkZWZpbmUgRVNSX0VM
+eF9XRnhfSVNTX1dGRQkoVUwoMSkgPDwgMCkKPj4gICNkZWZpbmUgRVNSX0VMeF94VkNfSU1NX01B
+U0sJKCgxVUwgPDwgMTYpIC0gMSkKPj4gKyNkZWZpbmUgVlNFU1JfRUx4X0lEU19JU1NfTUFTSyAg
+ICAoKDFVTCA8PCAyNSkgLSAxKQo+PiAgCj4+ICAvKiBFU1IgdmFsdWUgdGVtcGxhdGVzIGZvciBz
+cGVjaWZpYyBldmVudHMgKi8KPj4gIAo+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRl
+L2FzbS9rdm1fZW11bGF0ZS5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fZW11bGF0ZS5o
+Cj4+IGluZGV4IGY1ZWEwYmE3MGYwNy4uMjBkNGRhN2Y1ZGNlIDEwMDY0NAo+PiAtLS0gYS9hcmNo
+L2FybTY0L2luY2x1ZGUvYXNtL2t2bV9lbXVsYXRlLmgKPj4gKysrIGIvYXJjaC9hcm02NC9pbmNs
+dWRlL2FzbS9rdm1fZW11bGF0ZS5oCj4+IEBAIC0xNDgsNiArMTQ4LDE4IEBAIHN0YXRpYyBpbmxp
+bmUgdTMyIGt2bV92Y3B1X2dldF9oc3IoY29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+PiAg
+CXJldHVybiB2Y3B1LT5hcmNoLmZhdWx0LmVzcl9lbDI7Cj4+ICB9Cj4+ICAKPj4gKyNpZmRlZiBD
+T05GSUdfSEFTX1JBU19FWFRFTlNJT04KPj4gK3N0YXRpYyBpbmxpbmUgdTMyIGt2bV92Y3B1X2dl
+dF92c2Vzcihjb25zdCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+ICt7Cj4+ICsJcmV0dXJuIHZj
+cHUtPmFyY2guZmF1bHQudnNlc3JfZWwyOwo+PiArfQo+PiArCj4+ICtzdGF0aWMgaW5saW5lIHZv
+aWQga3ZtX3ZjcHVfc2V0X3ZzZXNyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdW5zaWduZWQgbG9u
+ZyB2YWwpCj4+ICt7Cj4+ICsJdmNwdS0+YXJjaC5mYXVsdC52c2Vzcl9lbDIgPSB2YWw7Cj4+ICt9
+Cj4+ICsjZW5kaWYKPj4gKwo+PiAgc3RhdGljIGlubGluZSBpbnQga3ZtX3ZjcHVfZ2V0X2NvbmRp
+dGlvbihjb25zdCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+ICB7Cj4+ICAJdTMyIGVzciA9IGt2
+bV92Y3B1X2dldF9oc3IodmNwdSk7Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUv
+YXNtL2t2bV9ob3N0LmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4gaW5k
+ZXggZTc3MDVlN2JiMDdiLi5mOWUzYmI1N2M0NjEgMTAwNjQ0Cj4+IC0tLSBhL2FyY2gvYXJtNjQv
+aW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+PiArKysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2
+bV9ob3N0LmgKPj4gQEAgLTgzLDYgKzgzLDEwIEBAIHN0cnVjdCBrdm1fbW11X21lbW9yeV9jYWNo
+ZSB7Cj4+ICB9Owo+PiAgCj4+ICBzdHJ1Y3Qga3ZtX3ZjcHVfZmF1bHRfaW5mbyB7Cj4+ICsjaWZk
+ZWYgQ09ORklHX0hBU19SQVNfRVhURU5TSU9OCj4+ICsJLyogVmlydHVhbCBTRXJyb3IgRXhjZXB0
+aW9uIFN5bmRyb21lIFJlZ2lzdGVyICovCj4+ICsJdTMyIHZzZXNyX2VsMjsKPj4gKyNlbmRpZgo+
+PiAgCXUzMiBlc3JfZWwyOwkJLyogSHlwIFN5bmRyb20gUmVnaXN0ZXIgKi8KPj4gIAl1NjQgZmFy
+X2VsMjsJCS8qIEh5cCBGYXVsdCBBZGRyZXNzIFJlZ2lzdGVyICovCj4+ICAJdTY0IGhwZmFyX2Vs
+MjsJCS8qIEh5cCBJUEEgRmF1bHQgQWRkcmVzcyBSZWdpc3RlciAqLwo+PiBkaWZmIC0tZ2l0IGEv
+YXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jIGIvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5j
+Cj4+IGluZGV4IGFlZGUxNjU4YWVkYS4uNzcwYTE1M2ZiNmJhIDEwMDY0NAo+PiAtLS0gYS9hcmNo
+L2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKPj4gKysrIGIvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRj
+aC5jCj4+IEBAIC04Niw2ICs4NiwxMyBAQCBzdGF0aWMgdm9pZCBfX2h5cF90ZXh0IF9fYWN0aXZh
+dGVfdHJhcHMoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+PiAgCQlpc2IoKTsKPj4gIAl9Cj4+ICAJ
+d3JpdGVfc3lzcmVnKHZhbCwgaGNyX2VsMik7Cj4+ICsjaWZkZWYgQ09ORklHX0hBU19SQVNfRVhU
+RU5TSU9OCj4+ICsJLyogSWYgdmlydHVhbCBTeXN0ZW0gRXJyb3Igb3IgQXN5bmNocm9ub3VzIEFi
+b3J0IGlzIHBlbmRpbmcuIHNldAo+PiArCSAqIHRoZSB2aXJ0dWFsIGV4Y2VwdGlvbiBzeW5kcm9t
+ZSBpbmZvcm1hdGlvbgo+PiArCSAqLwo+PiArCWlmICh2Y3B1LT5hcmNoLmhjcl9lbDIgJiBIQ1Jf
+VlNFKQo+PiArCQl3cml0ZV9zeXNyZWcodmNwdS0+YXJjaC5mYXVsdC52c2Vzcl9lbDIsIHZzZXNy
+X2VsMik7Cj4+ICsjZW5kaWYKPj4gIAkvKiBUcmFwIG9uIEFBcmNoMzIgY3AxNSBjMTUgYWNjZXNz
+ZXMgKEVMMSBvciBFTDApICovCj4+ICAJd3JpdGVfc3lzcmVnKDEgPDwgMTUsIGhzdHJfZWwyKTsK
+Pj4gIAkvKgo+PiBAQCAtMTM5LDggKzE0NiwxNCBAQCBzdGF0aWMgdm9pZCBfX2h5cF90ZXh0IF9f
+ZGVhY3RpdmF0ZV90cmFwcyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+ICAJICogdGhlIGNydWNp
+YWwgYml0IGlzICJPbiB0YWtpbmcgYSB2U0Vycm9yIGludGVycnVwdCwKPj4gIAkgKiBIQ1JfRUwy
+LlZTRSBpcyBjbGVhcmVkIHRvIDAuIgo+PiAgCSAqLwo+PiAtCWlmICh2Y3B1LT5hcmNoLmhjcl9l
+bDIgJiBIQ1JfVlNFKQo+PiArCWlmICh2Y3B1LT5hcmNoLmhjcl9lbDIgJiBIQ1JfVlNFKSB7Cj4+
+ICAJCXZjcHUtPmFyY2guaGNyX2VsMiA9IHJlYWRfc3lzcmVnKGhjcl9lbDIpOwo+PiArI2lmZGVm
+IENPTkZJR19IQVNfUkFTX0VYVEVOU0lPTgo+PiArCQkvKiBzZXQgdnNlc3JfZWwyWzI0OjBdIHdp
+dGggZXNyX2VsMlsyNDowXSAqLwo+PiArCQlrdm1fdmNwdV9zZXRfdnNlc3IodmNwdSwgcmVhZF9z
+eXNyZWdfZWwyKGVzcikKPj4gKwkJCQkJJiBWU0VTUl9FTHhfSURTX0lTU19NQVNLKTsKPiAKPiBX
+aGF0IGd1YXJhbnRlZXMgdGhhdCBFU1JfRUwyIHN0aWxsIGNvbnRhaW5zIHRoZSBsYXRlc3QgZXhj
+ZXB0aW9uPyBXaGF0Cj4gZG9lcyBpdCBtZWFuIHRvIHN0b3JlIHNvbWV0aGluZyB0aGF0IGlzIHRo
+ZSBjdXJyZW50IEVMMiBleGNlcHRpb24KPiBzeW5kcm9tZSB0b2dldGhlciB3aXRoIGFuIFNFcnJv
+ciB0aGF0IGhhcyBhbHJlYWR5IGJlZW4gaW5qZWN0ZWQ/Cgp5ZXMsIHRoYW5rcyBmb3IgdGhlIHJl
+dmlldywgSSB3aWxsIGFkZCBhIGp1ZGdlbWVudCBjb25kaXRpb24gZm9yIHRoZSAiZXhpdF9jb2Rl
+IgppZiB0aGUgImV4aXRfY29kZSA9PSBBUk1fRVhDRVBUSU9OX0VMMV9TRVJST1IiIHRoZW4gc2V0
+IHRoZSB2c2Vzcl9lbDIuCgpmb3IgdGhlIGFhcmNoMzIsIGl0IG9ubHkgbmVlZCBzZXQgdGhlICJF
+eFQsIGJpdCBbMTJdIiBhbmQgQUVULCAiYml0cyBbMTU6MTRdIiwgb3RoZXIgYml0IGlzIFJFUzAK
+Cj4gCj4gQWxzbywgaXMgaXQgY29ycmVjdCB0byBkaXJlY3RseSBjb3B5IHRoZSBFU1JfRUwyIGJp
+dHMgaW50byBWU0VTUl9FTDI/IE15CnBsZWFzZSBzZWUgYmVsb3cgc3BlYyBkZXNjcmlwdGlvbiwg
+aXQgdmlydHVhbCBTRVJST1Igc3luZHJvbWUgZnJvbSBWU0VTUl9FTDIuCi0tLS0tCu+CtyBDb250
+cm9sIHJldHVybnMgdG8gdGhlIE9TLCBhbmQgdGhlIEVTQiBpbnN0cnVjdGlvbiBpcyByZS1leGVj
+dXRlZC4K4oCUIFRoZSBwaHlzaWNhbCBhc3luY2hyb25vdXMgU0Vycm9yIGludGVycnVwdCBoYXMg
+YmVlbiBjbGVhcmVkLCBzbyBpdCBpcyBub3QgdGFrZW4gYWdhaW4uCuKAlCBUaGUgUEUgc2V0cyBW
+RElTUl9FTDIuQSB0byAxIGFuZCByZWNvcmRzIHRoZSBzeW5kcm9tZSBmcm9tIFZTRVNSX0VMMiBp
+biBWRElTUl9FTDIuCi0tLS0tCgo+IG93biByZWFkaW5nIG9mIHRoZSBzcGVjaWZpY2F0aW9uIHNl
+ZW0gdG8gaW1wbHkgdGhhdCB0aGVyZSBpcyBhdCBsZWFzdAo+IGRpZmZlcmVuY2VzIHdoZW4gdGhl
+IGd1ZXN0IGlzIEFBcmNoMzIuIFN1cmVseSB0aGVyZSB3b3VsZCBiZSBzb21lCj4gcHJvY2Vzc2lu
+ZyBoZXJlLgoKCgo+IAo+PiArI2VuZGlmCj4+ICsJfQo+PiAgCj4+ICAJX19kZWFjdGl2YXRlX3Ry
+YXBzX2FyY2goKSgpOwo+PiAgCXdyaXRlX3N5c3JlZygwLCBoc3RyX2VsMik7Cj4+IGRpZmYgLS1n
+aXQgYS9hcmNoL2FybTY0L2t2bS9pbmplY3RfZmF1bHQuYyBiL2FyY2gvYXJtNjQva3ZtL2luamVj
+dF9mYXVsdC5jCj4+IGluZGV4IGRhNmE4Y2ZhNTRhMC4uMDhhMTNkZmUyOGE4IDEwMDY0NAo+PiAt
+LS0gYS9hcmNoL2FybTY0L2t2bS9pbmplY3RfZmF1bHQuYwo+PiArKysgYi9hcmNoL2FybTY0L2t2
+bS9pbmplY3RfZmF1bHQuYwo+PiBAQCAtMjQyLDQgKzI0MiwxNCBAQCB2b2lkIGt2bV9pbmplY3Rf
+dW5kZWZpbmVkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4gIHZvaWQga3ZtX2luamVjdF92YWJ0
+KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4gIHsKPj4gIAl2Y3B1X3NldF9oY3IodmNwdSwgdmNw
+dV9nZXRfaGNyKHZjcHUpIHwgSENSX1ZTRSk7Cj4+ICsjaWZkZWYgQ09ORklHX0hBU19SQVNfRVhU
+RU5TSU9OCj4+ICsJLyogSWYgdmlydHVhbCBTeXN0ZW0gRXJyb3Igb3IgQXN5bmNocm9ub3VzIEFi
+b3J0IGlzIHNldC4gc2V0Cj4+ICsJICogdGhlIHZpcnR1YWwgZXhjZXB0aW9uIHN5bmRyb21lIGlu
+Zm9ybWF0aW9uCj4+ICsJICovCj4+ICsJa3ZtX3ZjcHVfc2V0X3ZzZXNyKHZjcHUsICgoa3ZtX3Zj
+cHVfZ2V0X3ZzZXNyKHZjcHUpCj4+ICsJCQkJJiAoflZTRVNSX0VMeF9JRFNfSVNTX01BU0spKQo+
+PiArCQkJCXwgKGt2bV92Y3B1X2dldF9oc3IodmNwdSkKPj4gKwkJCQkmIFZTRVNSX0VMeF9JRFNf
+SVNTX01BU0spKSk7Cj4gCj4gV2hhdCBpcyB0aGUgcmF0aW9uYWwgZm9yIHNldHRpbmcgVlNFU1Jf
+RUwyIHdpdGggdGhlIEVMMSBzeW5kcm9tZQo+IGluZm9ybWF0aW9uPyBUaGF0IGRvZXNuJ3QgbWFr
+ZSBhbnkgc2Vuc2UgdG8gbWUuCnRoYW5rcywgSSBzZXQgdGhlIFZTRVNSX0VMMiB1c2luZyB0aGUg
+IEVMMiBzeW5kcm9tZSBpbmZvcm1hdGlvbiwgImt2bV92Y3B1X2dldF9oc3IiCnJldHVybiB0aGUg
+dmFsdWUgb2YgZXNyX2VsMiwgbm90IEVMMSBzeW5kcm9tZSBpbmZvcm1hdGlvbgoKPiAKPiBPdmVy
+YWxsLCB0aGlzIHBhdGNoIGlzIGNvbXBsZXRlbHkgaW5jb25zaXN0ZW50IGFuZCB1bmNsZWFyIGlu
+IHdoYXQgaXQKPiB0cmllcyB0byBhY2hpZXZlLiBBbHNvLCBhcyBJIGFscmVhZHkgdGF0ZWQgYmVm
+b3JlLCBJJ2QgbGlrZSB0byBzZWUgdGhlCj4gImZpcm13YXJlIGZpcnN0IiBtb2RlIG9mIG9wZXJh
+dGlvbiBiZSBlbmZvcmNlZCBoZXJlLCBnb2luZyBiYWNrIHRvCj4gdXNlcnNwYWNlIGFuZCBsZXQg
+dGhlIFZNTSBkZWNpZGUgd2hhdCB0byBkby4KPiAKPiBUaGFua3MsCj4gCj4gCU0uCj4gCgoKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KbGludXgtYXJtLWtl
+cm5lbCBtYWlsaW5nIGxpc3QKbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnCmh0
+dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtYXJtLWtlcm5l
+bAo=
