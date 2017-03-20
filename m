@@ -1,26 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH 2/9] KVM: arm/arm64: vgic: Avoid flushing vgic state when
- there's no pending IRQ
-Date: Mon, 20 Mar 2017 11:58:11 +0100
-Message-ID: <20170320105818.20481-3-cdall@linaro.org>
+Subject: [PATCH 5/9] KVM: arm/arm64: vgic: Get rid of unnecessary
+ save_maint_int_state
+Date: Mon, 20 Mar 2017 11:58:14 +0100
+Message-ID: <20170320105818.20481-6-cdall@linaro.org>
 References: <20170320105818.20481-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D05440C90
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 06:56:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B44640AF9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 06:56:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OvYVU-3Cv4mc for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Mar 2017 06:56:42 -0400 (EDT)
-Received: from mail-wr0-f170.google.com (mail-wr0-f170.google.com
- [209.85.128.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C799E40A80
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 06:56:42 -0400 (EDT)
-Received: by mail-wr0-f170.google.com with SMTP id u108so89458608wrb.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 03:58:27 -0700 (PDT)
+ with ESMTP id u8PiUmaDqpg5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Mar 2017 06:56:46 -0400 (EDT)
+Received: from mail-wr0-f181.google.com (mail-wr0-f181.google.com
+ [209.85.128.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6242E40CD2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 06:56:46 -0400 (EDT)
+Received: by mail-wr0-f181.google.com with SMTP id u108so89459739wrb.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 03:58:31 -0700 (PDT)
 In-Reply-To: <20170320105818.20481-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,53 +32,124 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shih-Wei Li <shihwei@cs.columbia.edu>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-We do not need to flush vgic states in each world switch unless
-there is pending IRQ queued to the vgic's ap list. We can thus reduce
-the overhead by not grabbing the spinlock and not making the extra
-function call to vgic_flush_lr_state.
+Now when we don't look at the MISR and EISR values anymore, we can get
+rid of the logic to save them in the GIC save/restore code.
 
-Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ virt/kvm/arm/hyp/vgic-v2-sr.c | 40 ----------------------------------------
+ virt/kvm/arm/hyp/vgic-v3-sr.c | 29 -----------------------------
+ 2 files changed, 69 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 2ac0def..1436c2e 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -637,12 +637,17 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
- /* Sync back the hardware VGIC state into our emulation after a guest's run. */
- void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+
- 	if (unlikely(!vgic_initialized(vcpu->kvm)))
- 		return;
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index 34b37ce..a4c3bb0 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -22,45 +22,6 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
  
- 	vgic_process_maintenance_interrupt(vcpu);
- 	vgic_fold_lr_state(vcpu);
- 	vgic_prune_ap_list(vcpu);
-+
-+	/* Make sure we can fast-path in flush_hwstate */
-+	vgic_cpu->used_lrs = 0;
+-static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu,
+-					    void __iomem *base)
+-{
+-	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+-	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+-	u32 eisr0, eisr1;
+-	int i;
+-	bool expect_mi;
+-
+-	expect_mi = !!(cpu_if->vgic_hcr & GICH_HCR_UIE);
+-
+-	for (i = 0; i < used_lrs && !expect_mi; i++)
+-		expect_mi |= (!(cpu_if->vgic_lr[i] & GICH_LR_HW) &&
+-			      (cpu_if->vgic_lr[i] & GICH_LR_EOI));
+-
+-	if (expect_mi) {
+-		cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
+-
+-		if (cpu_if->vgic_misr & GICH_MISR_EOI) {
+-			eisr0  = readl_relaxed(base + GICH_EISR0);
+-			if (unlikely(used_lrs > 32))
+-				eisr1  = readl_relaxed(base + GICH_EISR1);
+-			else
+-				eisr1 = 0;
+-		} else {
+-			eisr0 = eisr1 = 0;
+-		}
+-	} else {
+-		cpu_if->vgic_misr = 0;
+-		eisr0 = eisr1 = 0;
+-	}
+-
+-#ifdef CONFIG_CPU_BIG_ENDIAN
+-	cpu_if->vgic_eisr = ((u64)eisr0 << 32) | eisr1;
+-#else
+-	cpu_if->vgic_eisr = ((u64)eisr1 << 32) | eisr0;
+-#endif
+-}
+-
+ static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
+ {
+ 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+@@ -111,7 +72,6 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+ 	if (used_lrs) {
+ 		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
+ 
+-		save_maint_int_state(vcpu, base);
+ 		save_elrsr(vcpu, base);
+ 		save_lrs(vcpu, base);
+ 
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index b3c36b6..41bbbb0 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -118,33 +118,6 @@ static void __hyp_text __gic_v3_set_lr(u64 val, int lr)
+ 	}
  }
  
- /* Flush our emulation state into the GIC hardware before entering the guest. */
-@@ -651,6 +656,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 	if (unlikely(!vgic_initialized(vcpu->kvm)))
- 		return;
+-static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu)
+-{
+-	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+-	int i;
+-	bool expect_mi;
+-	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+-
+-	expect_mi = !!(cpu_if->vgic_hcr & ICH_HCR_UIE);
+-
+-	for (i = 0; i < used_lrs; i++) {
+-		expect_mi |= (!(cpu_if->vgic_lr[i] & ICH_LR_HW) &&
+-			      (cpu_if->vgic_lr[i] & ICH_LR_EOI));
+-	}
+-
+-	if (expect_mi) {
+-		cpu_if->vgic_misr  = read_gicreg(ICH_MISR_EL2);
+-
+-		if (cpu_if->vgic_misr & ICH_MISR_EOI)
+-			cpu_if->vgic_eisr = read_gicreg(ICH_EISR_EL2);
+-		else
+-			cpu_if->vgic_eisr = 0;
+-	} else {
+-		cpu_if->vgic_misr = 0;
+-		cpu_if->vgic_eisr = 0;
+-	}
+-}
+-
+ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+@@ -168,8 +141,6 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 		val = read_gicreg(ICH_VTR_EL2);
+ 		nr_pri_bits = vtr_to_nr_pri_bits(val);
  
-+	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
-+		return;
-+
- 	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
- 	vgic_flush_lr_state(vcpu);
- 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+-		save_maint_int_state(vcpu);
+-
+ 		for (i = 0; i <= used_lrs; i++) {
+ 			if (cpu_if->vgic_elrsr & (1 << i))
+ 				cpu_if->vgic_lr[i] &= ~ICH_LR_STATE;
 -- 
 2.9.0
