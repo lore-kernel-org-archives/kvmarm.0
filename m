@@ -1,202 +1,161 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: Ensure LRs are clear when they should be
-Date: Sun, 19 Mar 2017 20:25:04 +0100
-Message-ID: <20170319192504.GY1277@cbox>
-References: <20170318125656.16523-1-cdall@linaro.org>
- <874lyqsmoc.fsf@on-the-bus.cambridge.arm.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
+Date: Mon, 20 Mar 2017 15:55:34 +0800
+Message-ID: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C2F240C33
- for <kvmarm@lists.cs.columbia.edu>; Sun, 19 Mar 2017 15:23:36 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9lHD0s4R+8tM for <kvmarm@lists.cs.columbia.edu>;
- Sun, 19 Mar 2017 15:23:34 -0400 (EDT)
-Received: from mail-wr0-f182.google.com (mail-wr0-f182.google.com
- [209.85.128.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 76B1E40C07
- for <kvmarm@lists.cs.columbia.edu>; Sun, 19 Mar 2017 15:23:34 -0400 (EDT)
-Received: by mail-wr0-f182.google.com with SMTP id g10so80219933wrg.2
- for <kvmarm@lists.cs.columbia.edu>; Sun, 19 Mar 2017 12:25:17 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <874lyqsmoc.fsf@on-the-bus.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: catalin.marinas@arm.com, will.deacon@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: wuquanming@huawei.com, wangxiongfeng2@huawei.com, xiexiuqi@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Mar 18, 2017 at 02:07:47PM +0000, Marc Zyngier wrote:
-> On Sat, Mar 18 2017 at 12:56:56 pm GMT, Christoffer Dall <cdall@linaro.org> wrote:
-> 
-> Hi Christoffer,
-> 
-> > From: Christoffer Dall <christoffer.dall@linaro.org>
-> >
-> > We currently have some code to clear the list registers on GICv3, but we
-> > never call this code, because the caller got nuked when removing the old
-> > vgic.  We also used to have a similar GICv2 part, but that got lost in
-> > the process too.
-> >
-> > Let's reintroduce the logic for GICv2 and call the logic when we
-> > initialize the use of hypervisors on the CPU, for example when first
-> > loading KVM or when exiting a low power state.
-> >
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> > Marc, Eric, Andre,
-> >
-> > I'm unable to convince myself that the LRs should already be clear via
-> > the reset of the hardware, and for any power management scenario I
-> > suppose it's possible for secure-side firmware to have messed with the
-> > LRs behind our backs; plus we used to have this functionality and it got
-> > dropped for the new vgic.  Am I forgetting some discussion where we
-> > decided it wasn't needed anymore?
-> 
-> No, that's definitely something we overlooked while transitioning from
-> one implementation to another. Thanks for noticing it!
-> 
-> >
-> > Thanks,
-> > -Christoffer
-> >
-> >  arch/arm/kvm/arm.c            |  3 +++
-> >  include/kvm/arm_vgic.h        |  1 +
-> >  virt/kvm/arm/vgic/vgic-init.c | 19 +++++++++++++++++++
-> >  virt/kvm/arm/vgic/vgic-v2.c   | 15 +++++++++++++++
-> >  virt/kvm/arm/vgic/vgic.h      |  2 ++
-> >  5 files changed, 40 insertions(+)
-> >
-> > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> > index c9a2103..d775aac 100644
-> > --- a/arch/arm/kvm/arm.c
-> > +++ b/arch/arm/kvm/arm.c
-> > @@ -1121,6 +1121,9 @@ static void cpu_hyp_reinit(void)
-> >  		if (__hyp_get_vectors() == hyp_default_vectors)
-> >  			cpu_init_hyp_mode(NULL);
-> >  	}
-> > +
-> > +	if (vgic_present)
-> > +		kvm_vgic_init_cpu_hardware();
-> 
-> We didn't have this before, but that's certainly an improvement. It is
-> not so much that secure could have messed with the LRs themselves, but
-> that the LRs reset value is UNDEF out of reset.
-> 
+In the RAS implementation, hardware pass the virtual SEI
+syndrome information through the VSESR_EL2, so set the virtual
+SEI syndrome using physical SEI syndrome el2_elr to pass to
+the guest OS
 
-ok, is the other scenario with secure side messing with the LRs not
-still potentially possible though?  (someone impementing a misguided
-power management solution for example)
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Quanming wu <wuquanming@huawei.com>
+---
+ arch/arm64/Kconfig                   |  8 ++++++++
+ arch/arm64/include/asm/esr.h         |  1 +
+ arch/arm64/include/asm/kvm_emulate.h | 12 ++++++++++++
+ arch/arm64/include/asm/kvm_host.h    |  4 ++++
+ arch/arm64/kvm/hyp/switch.c          | 15 ++++++++++++++-
+ arch/arm64/kvm/inject_fault.c        | 10 ++++++++++
+ 6 files changed, 49 insertions(+), 1 deletion(-)
 
-> >  }
-> >  
-> >  static void cpu_hyp_reset(void)
-> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> > index b72dd2a..c0b3d99 100644
-> > --- a/include/kvm/arm_vgic.h
-> > +++ b/include/kvm/arm_vgic.h
-> > @@ -295,6 +295,7 @@ void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu);
-> >  void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu);
-> >  int kvm_vgic_map_resources(struct kvm *kvm);
-> >  int kvm_vgic_hyp_init(void);
-> > +void kvm_vgic_init_cpu_hardware(void);
-> >  
-> >  int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
-> >  			bool level);
-> > diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> > index 276139a..702f810 100644
-> > --- a/virt/kvm/arm/vgic/vgic-init.c
-> > +++ b/virt/kvm/arm/vgic/vgic-init.c
-> > @@ -392,6 +392,25 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
-> >  }
-> >  
-> >  /**
-> > + * kvm_vgic_init_cpu_hardware - initialize the GIC VE hardware
-> > + *
-> > + * For a specific CPU, initialize the GIC VE hardware.
-> > + */
-> > +void kvm_vgic_init_cpu_hardware(void)
-> > +{
-> > +	BUG_ON(preemptible());
-> > +
-> > +	/*
-> > +	 * We want to make sure the list registers start out clear so that we
-> > +	 * only have the program the used registers.
-> > +	 */
-> > +	if (kvm_vgic_global_state.type == VGIC_V2)
-> > +		vgic_v2_init_lrs();
-> > +	else
-> > +		kvm_call_hyp(__vgic_v3_init_lrs);
-> > +}
-> > +
-> > +/**
-> >   * kvm_vgic_hyp_init: populates the kvm_vgic_global_state variable
-> >   * according to the host GIC model. Accordingly calls either
-> >   * vgic_v2/v3_probe which registers the KVM_DEVICE that can be
-> > diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> > index b834ecd..94cf4b9 100644
-> > --- a/virt/kvm/arm/vgic/vgic-v2.c
-> > +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> > @@ -36,6 +36,21 @@ static unsigned long *u64_to_bitmask(u64 *val)
-> >  	return (unsigned long *)val;
-> >  }
-> >  
-> > +static inline void vgic_v2_write_lr(int lr, u32 val)
-> > +{
-> > +	void __iomem *base = kvm_vgic_global_state.vctrl_base;
-> > +
-> > +	writel_relaxed(val, base + GICH_LR0 + (lr * 4));
-> > +}
-> > +
-> > +void vgic_v2_init_lrs(void)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i = 0; i < kvm_vgic_global_state.nr_lr; i++)
-> > +		vgic_v2_write_lr(i, 0);
-> > +}
-> 
-> Nit: do you need to have two functions here? Or is that something that
-> you're going to reuse in the near future?
-> 
-
-I have some optimization patches to GICv2 lying around that will
-eventually use vgic_v2_write_lr directly, but I don't mind combining it
-now and splitting it later when introducting those patches if you
-prefer?
-
-> > +
-> >  void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
-> > diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> > index db28f7c..91566f5 100644
-> > --- a/virt/kvm/arm/vgic/vgic.h
-> > +++ b/virt/kvm/arm/vgic/vgic.h
-> > @@ -130,6 +130,8 @@ int vgic_v2_map_resources(struct kvm *kvm);
-> >  int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
-> >  			     enum vgic_type);
-> >  
-> > +void vgic_v2_init_lrs(void);
-> > +
-> >  static inline void vgic_get_irq_kref(struct vgic_irq *irq)
-> >  {
-> >  	if (irq->intid < VGIC_MIN_LPI)
-> 
-> Looks good to me!
-> 
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> 
-
-Thanks,
--Christoffer
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 8c7c244247b6..ea62170a3b75 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -908,6 +908,14 @@ endmenu
+ 
+ menu "ARMv8.2 architectural features"
+ 
++config HAS_RAS_EXTENSION
++	bool "Support arm64 RAS extension"
++	default n
++	help
++	  Reliability, Availability, Serviceability(RAS; part of the ARMv8.2 Extensions).
++
++	  Selecting this option OS will try to recover the error that RAS hardware node detected.
++
+ config ARM64_UAO
+ 	bool "Enable support for User Access Override (UAO)"
+ 	default y
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index d14c478976d0..e38d32b2bdad 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -111,6 +111,7 @@
+ #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
+ #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+ #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
++#define VSESR_ELx_IDS_ISS_MASK    ((1UL << 25) - 1)
+ 
+ /* ESR value templates for specific events */
+ 
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index f5ea0ba70f07..20d4da7f5dce 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -148,6 +148,18 @@ static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.fault.esr_el2;
+ }
+ 
++#ifdef CONFIG_HAS_RAS_EXTENSION
++static inline u32 kvm_vcpu_get_vsesr(const struct kvm_vcpu *vcpu)
++{
++	return vcpu->arch.fault.vsesr_el2;
++}
++
++static inline void kvm_vcpu_set_vsesr(struct kvm_vcpu *vcpu, unsigned long val)
++{
++	vcpu->arch.fault.vsesr_el2 = val;
++}
++#endif
++
+ static inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+ {
+ 	u32 esr = kvm_vcpu_get_hsr(vcpu);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e7705e7bb07b..f9e3bb57c461 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -83,6 +83,10 @@ struct kvm_mmu_memory_cache {
+ };
+ 
+ struct kvm_vcpu_fault_info {
++#ifdef CONFIG_HAS_RAS_EXTENSION
++	/* Virtual SError Exception Syndrome Register */
++	u32 vsesr_el2;
++#endif
+ 	u32 esr_el2;		/* Hyp Syndrom Register */
+ 	u64 far_el2;		/* Hyp Fault Address Register */
+ 	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index aede1658aeda..770a153fb6ba 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -86,6 +86,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 		isb();
+ 	}
+ 	write_sysreg(val, hcr_el2);
++#ifdef CONFIG_HAS_RAS_EXTENSION
++	/* If virtual System Error or Asynchronous Abort is pending. set
++	 * the virtual exception syndrome information
++	 */
++	if (vcpu->arch.hcr_el2 & HCR_VSE)
++		write_sysreg(vcpu->arch.fault.vsesr_el2, vsesr_el2);
++#endif
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+ 	/*
+@@ -139,8 +146,14 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	 * the crucial bit is "On taking a vSError interrupt,
+ 	 * HCR_EL2.VSE is cleared to 0."
+ 	 */
+-	if (vcpu->arch.hcr_el2 & HCR_VSE)
++	if (vcpu->arch.hcr_el2 & HCR_VSE) {
+ 		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
++#ifdef CONFIG_HAS_RAS_EXTENSION
++		/* set vsesr_el2[24:0] with esr_el2[24:0] */
++		kvm_vcpu_set_vsesr(vcpu, read_sysreg_el2(esr)
++					& VSESR_ELx_IDS_ISS_MASK);
++#endif
++	}
+ 
+ 	__deactivate_traps_arch()();
+ 	write_sysreg(0, hstr_el2);
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index da6a8cfa54a0..08a13dfe28a8 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -242,4 +242,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
++#ifdef CONFIG_HAS_RAS_EXTENSION
++	/* If virtual System Error or Asynchronous Abort is set. set
++	 * the virtual exception syndrome information
++	 */
++	kvm_vcpu_set_vsesr(vcpu, ((kvm_vcpu_get_vsesr(vcpu)
++				& (~VSESR_ELx_IDS_ISS_MASK))
++				| (kvm_vcpu_get_hsr(vcpu)
++				& VSESR_ELx_IDS_ISS_MASK)));
++#endif
++
+ }
+-- 
+2.11.0
