@@ -1,24 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH 3/9] KVM: arm/arm64: vgic: Get rid of live_lrs
-Date: Mon, 20 Mar 2017 11:58:12 +0100
-Message-ID: <20170320105818.20481-4-cdall@linaro.org>
+Subject: [PATCH 4/9] KVM: arm/arm64: vgic: Get rid of unnecessary
+ process_maintenance operation
+Date: Mon, 20 Mar 2017 11:58:13 +0100
+Message-ID: <20170320105818.20481-5-cdall@linaro.org>
 References: <20170320105818.20481-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FB6340CA7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 06:56:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EB4E40BBC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 06:56:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QG3goXc4URks for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Mar 2017 06:56:44 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3344640C41
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 06:56:43 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id u132so60111311wmg.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 03:58:28 -0700 (PDT)
+ with ESMTP id PxIaTwGtb1bn for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Mar 2017 06:56:45 -0400 (EDT)
+Received: from mail-wr0-f182.google.com (mail-wr0-f182.google.com
+ [209.85.128.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 37E1440C8E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 06:56:45 -0400 (EDT)
+Received: by mail-wr0-f182.google.com with SMTP id g10so89497800wrg.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 03:58:30 -0700 (PDT)
 In-Reply-To: <20170320105818.20481-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,260 +37,234 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-There is no need to calculate and maintain live_lrs when we always
-populate the lowest numbered LRs first on every entry and clear all LRs
-on every exit.
+Since we always read back the LRs that we wrote to the guest and the
+MISR and EISR registers simply provide a summary of the configuration of
+the bits in the LRs, there is really no need to read back those status
+registers and process them.  We can might as well just signal the
+notifyfd when folding the LR state and save some cycles in the process.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/arm_vgic.h        |  2 --
- virt/kvm/arm/hyp/vgic-v2-sr.c | 39 ++++++++++-----------------------------
- virt/kvm/arm/hyp/vgic-v3-sr.c | 42 ++++++++++++------------------------------
- 3 files changed, 22 insertions(+), 61 deletions(-)
+ virt/kvm/arm/vgic/vgic-v2.c | 55 ++++++++++-----------------------------------
+ virt/kvm/arm/vgic/vgic-v3.c | 47 +++++++++++---------------------------
+ virt/kvm/arm/vgic/vgic.c    |  8 +++----
+ virt/kvm/arm/vgic/vgic.h    |  4 ++--
+ 4 files changed, 31 insertions(+), 83 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 8d7c3a7..fa12d99 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -264,8 +264,6 @@ struct vgic_cpu {
- 	 */
- 	struct list_head ap_list_head;
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index dfe6e5e..0172754 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -22,20 +22,6 @@
  
--	u64 live_lrs;
+ #include "vgic.h"
+ 
+-/*
+- * Call this function to convert a u64 value to an unsigned long * bitmask
+- * in a way that works on both 32-bit and 64-bit LE and BE platforms.
+- *
+- * Warning: Calling this function may modify *val.
+- */
+-static unsigned long *u64_to_bitmask(u64 *val)
+-{
+-#if defined(CONFIG_CPU_BIG_ENDIAN) && BITS_PER_LONG == 32
+-	*val = (*val >> 32) | (*val << 32);
+-#endif
+-	return (unsigned long *)val;
+-}
 -
- 	/*
- 	 * Members below are used with GICv3 emulation only and represent
- 	 * parts of the redistributor.
-diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
-index d3d3b9b..34b37ce 100644
---- a/virt/kvm/arm/hyp/vgic-v2-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
-@@ -26,27 +26,23 @@ static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu,
- 					    void __iomem *base)
+ static inline void vgic_v2_write_lr(int lr, u32 val)
  {
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
--	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
-+	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
- 	u32 eisr0, eisr1;
- 	int i;
- 	bool expect_mi;
- 
- 	expect_mi = !!(cpu_if->vgic_hcr & GICH_HCR_UIE);
- 
--	for (i = 0; i < nr_lr; i++) {
--		if (!(vcpu->arch.vgic_cpu.live_lrs & (1UL << i)))
--				continue;
--
-+	for (i = 0; i < used_lrs && !expect_mi; i++)
- 		expect_mi |= (!(cpu_if->vgic_lr[i] & GICH_LR_HW) &&
- 			      (cpu_if->vgic_lr[i] & GICH_LR_EOI));
--	}
- 
- 	if (expect_mi) {
- 		cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
- 
- 		if (cpu_if->vgic_misr & GICH_MISR_EOI) {
- 			eisr0  = readl_relaxed(base + GICH_EISR0);
--			if (unlikely(nr_lr > 32))
-+			if (unlikely(used_lrs > 32))
- 				eisr1  = readl_relaxed(base + GICH_EISR1);
- 			else
- 				eisr1 = 0;
-@@ -87,13 +83,10 @@ static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
- static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
- {
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
--	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
- 	int i;
-+	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
- 
--	for (i = 0; i < nr_lr; i++) {
--		if (!(vcpu->arch.vgic_cpu.live_lrs & (1UL << i)))
--			continue;
--
-+	for (i = 0; i < used_lrs; i++) {
- 		if (cpu_if->vgic_elrsr & (1UL << i))
- 			cpu_if->vgic_lr[i] &= ~GICH_LR_STATE;
- 		else
-@@ -110,11 +103,12 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
- 	struct vgic_dist *vgic = &kvm->arch.vgic;
- 	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-+	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
- 
- 	if (!base)
- 		return;
- 
--	if (vcpu->arch.vgic_cpu.live_lrs) {
-+	if (used_lrs) {
- 		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
- 
- 		save_maint_int_state(vcpu, base);
-@@ -122,8 +116,6 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
- 		save_lrs(vcpu, base);
- 
- 		writel_relaxed(0, base + GICH_HCR);
--
--		vcpu->arch.vgic_cpu.live_lrs = 0;
- 	} else {
- 		cpu_if->vgic_eisr = 0;
- 		cpu_if->vgic_elrsr = ~0UL;
-@@ -139,31 +131,20 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
- 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
- 	struct vgic_dist *vgic = &kvm->arch.vgic;
- 	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
--	int nr_lr = (kern_hyp_va(&kvm_vgic_global_state))->nr_lr;
- 	int i;
--	u64 live_lrs = 0;
-+	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
- 
- 	if (!base)
- 		return;
- 
--
--	for (i = 0; i < nr_lr; i++)
--		if (cpu_if->vgic_lr[i] & GICH_LR_STATE)
--			live_lrs |= 1UL << i;
--
--	if (live_lrs) {
-+	if (used_lrs) {
- 		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
- 		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
--		for (i = 0; i < nr_lr; i++) {
--			if (!(live_lrs & (1UL << i)))
--				continue;
--
-+		for (i = 0; i < used_lrs; i++) {
- 			writel_relaxed(cpu_if->vgic_lr[i],
- 				       base + GICH_LR0 + (i * 4));
- 		}
- 	}
--
--	vcpu->arch.vgic_cpu.live_lrs = live_lrs;
+ 	void __iomem *base = kvm_vgic_global_state.vctrl_base;
+@@ -51,38 +37,10 @@ void vgic_v2_init_lrs(void)
+ 		vgic_v2_write_lr(i, 0);
  }
  
- #ifdef CONFIG_ARM64
-diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index e51ee7e..b3c36b6 100644
---- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -118,18 +118,16 @@ static void __hyp_text __gic_v3_set_lr(u64 val, int lr)
- 	}
- }
- 
--static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu, int nr_lr)
-+static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu)
+-void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu)
++void vgic_v2_clear_uie(struct kvm_vcpu *vcpu)
  {
- 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
- 	int i;
- 	bool expect_mi;
-+	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
- 
- 	expect_mi = !!(cpu_if->vgic_hcr & ICH_HCR_UIE);
- 
--	for (i = 0; i < nr_lr; i++) {
--		if (!(vcpu->arch.vgic_cpu.live_lrs & (1UL << i)))
--				continue;
+ 	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
 -
-+	for (i = 0; i < used_lrs; i++) {
- 		expect_mi |= (!(cpu_if->vgic_lr[i] & ICH_LR_HW) &&
- 			      (cpu_if->vgic_lr[i] & ICH_LR_EOI));
- 	}
-@@ -150,6 +148,7 @@ static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu, int nr_lr)
- void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-+	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
- 	u64 val;
- 
- 	/*
-@@ -159,23 +158,19 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 	if (!cpu_if->vgic_sre)
- 		dsb(st);
- 
--	if (vcpu->arch.vgic_cpu.live_lrs) {
-+	if (used_lrs) {
- 		int i;
--		u32 max_lr_idx, nr_pri_bits;
-+		u32 nr_pri_bits;
- 
- 		cpu_if->vgic_elrsr = read_gicreg(ICH_ELSR_EL2);
- 
- 		write_gicreg(0, ICH_HCR_EL2);
- 		val = read_gicreg(ICH_VTR_EL2);
--		max_lr_idx = vtr_to_max_lr_idx(val);
- 		nr_pri_bits = vtr_to_nr_pri_bits(val);
- 
--		save_maint_int_state(vcpu, max_lr_idx + 1);
+-	if (cpuif->vgic_misr & GICH_MISR_EOI) {
+-		u64 eisr = cpuif->vgic_eisr;
+-		unsigned long *eisr_bmap = u64_to_bitmask(&eisr);
+-		int lr;
 -
--		for (i = 0; i <= max_lr_idx; i++) {
--			if (!(vcpu->arch.vgic_cpu.live_lrs & (1UL << i)))
--				continue;
-+		save_maint_int_state(vcpu);
- 
-+		for (i = 0; i <= used_lrs; i++) {
- 			if (cpu_if->vgic_elrsr & (1 << i))
- 				cpu_if->vgic_lr[i] &= ~ICH_LR_STATE;
- 			else
-@@ -203,8 +198,6 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 		default:
- 			cpu_if->vgic_ap1r[0] = read_gicreg(ICH_AP1R0_EL2);
- 		}
+-		for_each_set_bit(lr, eisr_bmap, kvm_vgic_global_state.nr_lr) {
+-			u32 intid = cpuif->vgic_lr[lr] & GICH_LR_VIRTUALID;
 -
--		vcpu->arch.vgic_cpu.live_lrs = 0;
- 	} else {
- 		cpu_if->vgic_misr  = 0;
- 		cpu_if->vgic_eisr  = 0;
-@@ -232,9 +225,9 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-+	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
- 	u64 val;
--	u32 max_lr_idx, nr_pri_bits;
--	u16 live_lrs = 0;
-+	u32 nr_pri_bits;
- 	int i;
- 
- 	/*
-@@ -251,15 +244,9 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- 	}
- 
- 	val = read_gicreg(ICH_VTR_EL2);
--	max_lr_idx = vtr_to_max_lr_idx(val);
- 	nr_pri_bits = vtr_to_nr_pri_bits(val);
- 
--	for (i = 0; i <= max_lr_idx; i++) {
--		if (cpu_if->vgic_lr[i] & ICH_LR_STATE)
--			live_lrs |= (1 << i);
--	}
+-			WARN_ON(cpuif->vgic_lr[lr] & GICH_LR_STATE);
 -
--	if (live_lrs) {
-+	if (used_lrs) {
- 		write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
- 
- 		switch (nr_pri_bits) {
-@@ -282,12 +269,8 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- 			write_gicreg(cpu_if->vgic_ap1r[0], ICH_AP1R0_EL2);
- 		}
- 
--		for (i = 0; i <= max_lr_idx; i++) {
--			if (!(live_lrs & (1 << i)))
--				continue;
--
-+		for (i = 0; i < used_lrs; i++)
- 			__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
+-			/* Only SPIs require notification */
+-			if (vgic_valid_spi(vcpu->kvm, intid))
+-				kvm_notify_acked_irq(vcpu->kvm, 0,
+-						     intid - VGIC_NR_PRIVATE_IRQS);
 -		}
- 	}
+-	}
+-
+-	/* check and disable underflow maintenance IRQ */
+ 	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
+-
+-	/*
+-	 * In the next iterations of the vcpu loop, if we sync the
+-	 * vgic state after flushing it, but before entering the guest
+-	 * (this happens for pending signals and vmid rollovers), then
+-	 * make sure we don't pick up any old maintenance interrupts
+-	 * here.
+-	 */
+-	cpuif->vgic_eisr = 0;
+ }
  
- 	/*
-@@ -299,7 +282,6 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- 		isb();
- 		dsb(sy);
- 	}
--	vcpu->arch.vgic_cpu.live_lrs = live_lrs;
+ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+@@ -92,6 +50,12 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+ 	cpuif->vgic_hcr |= GICH_HCR_UIE;
+ }
  
- 	/*
- 	 * Prevent the guest from touching the GIC system registers if
++static bool lr_signals_eoi_mi(u32 lr_val)
++{
++	return !(lr_val & GICH_LR_STATE) && (lr_val & GICH_LR_EOI) &&
++	       !(lr_val & GICH_LR_HW);
++}
++
+ /*
+  * transfer the content of the LRs back into the corresponding ap_list:
+  * - active bit is transferred as is
+@@ -109,6 +73,11 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		u32 intid = val & GICH_LR_VIRTUALID;
+ 		struct vgic_irq *irq;
+ 
++		/* Notify fds when the guest EOI'ed a level-triggered SPI */
++		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
++			kvm_notify_acked_irq(vcpu->kvm, 0,
++					     intid - VGIC_NR_PRIVATE_IRQS);
++
+ 		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+ 
+ 		spin_lock(&irq->irq_lock);
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 3d7796c..7880c5c 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -21,42 +21,9 @@
+ 
+ #include "vgic.h"
+ 
+-void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
++void vgic_v3_clear_uie(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+-	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+-
+-	if (cpuif->vgic_misr & ICH_MISR_EOI) {
+-		unsigned long eisr_bmap = cpuif->vgic_eisr;
+-		int lr;
+-
+-		for_each_set_bit(lr, &eisr_bmap, kvm_vgic_global_state.nr_lr) {
+-			u32 intid;
+-			u64 val = cpuif->vgic_lr[lr];
+-
+-			if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
+-				intid = val & ICH_LR_VIRTUAL_ID_MASK;
+-			else
+-				intid = val & GICH_LR_VIRTUALID;
+-
+-			WARN_ON(cpuif->vgic_lr[lr] & ICH_LR_STATE);
+-
+-			/* Only SPIs require notification */
+-			if (vgic_valid_spi(vcpu->kvm, intid))
+-				kvm_notify_acked_irq(vcpu->kvm, 0,
+-						     intid - VGIC_NR_PRIVATE_IRQS);
+-		}
+-
+-		/*
+-		 * In the next iterations of the vcpu loop, if we sync
+-		 * the vgic state after flushing it, but before
+-		 * entering the guest (this happens for pending
+-		 * signals and vmid rollovers), then make sure we
+-		 * don't pick up any old maintenance interrupts here.
+-		 */
+-		cpuif->vgic_eisr = 0;
+-	}
+-
+ 	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
+ }
+ 
+@@ -67,6 +34,12 @@ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+ 	cpuif->vgic_hcr |= ICH_HCR_UIE;
+ }
+ 
++static bool lr_signals_eoi_mi(u64 lr_val)
++{
++	return !(lr_val & ICH_LR_STATE) && (lr_val & ICH_LR_EOI) &&
++	       !(lr_val & ICH_LR_HW);
++}
++
+ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+@@ -82,6 +55,12 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 			intid = val & ICH_LR_VIRTUAL_ID_MASK;
+ 		else
+ 			intid = val & GICH_LR_VIRTUALID;
++
++		/* Notify fds when the guest EOI'ed a level-triggered IRQ */
++		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
++			kvm_notify_acked_irq(vcpu->kvm, 0,
++					     intid - VGIC_NR_PRIVATE_IRQS);
++
+ 		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+ 		if (!irq)	/* An LPI could have been unmapped. */
+ 			continue;
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 1436c2e..f5b3c25 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -527,12 +527,12 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 	spin_unlock(&vgic_cpu->ap_list_lock);
+ }
+ 
+-static inline void vgic_process_maintenance_interrupt(struct kvm_vcpu *vcpu)
++static inline void vgic_clear_uie(struct kvm_vcpu *vcpu)
+ {
+ 	if (kvm_vgic_global_state.type == VGIC_V2)
+-		vgic_v2_process_maintenance(vcpu);
++		vgic_v2_clear_uie(vcpu);
+ 	else
+-		vgic_v3_process_maintenance(vcpu);
++		vgic_v3_clear_uie(vcpu);
+ }
+ 
+ static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
+@@ -642,7 +642,7 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	if (unlikely(!vgic_initialized(vcpu->kvm)))
+ 		return;
+ 
+-	vgic_process_maintenance_interrupt(vcpu);
++	vgic_clear_uie(vcpu);
+ 	vgic_fold_lr_state(vcpu);
+ 	vgic_prune_ap_list(vcpu);
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 3f64220..72ba9ee 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -112,7 +112,7 @@ void vgic_kick_vcpus(struct kvm *kvm);
+ int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+ 		      phys_addr_t addr, phys_addr_t alignment);
+ 
+-void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu);
++void vgic_v2_clear_uie(struct kvm_vcpu *vcpu);
+ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
+@@ -143,7 +143,7 @@ static inline void vgic_get_irq_kref(struct vgic_irq *irq)
+ 	kref_get(&irq->refcount);
+ }
+ 
+-void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu);
++void vgic_v3_clear_uie(struct kvm_vcpu *vcpu);
+ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
 -- 
 2.9.0
