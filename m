@@ -1,26 +1,25 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
-Date: Mon, 20 Mar 2017 15:08:08 +0000
-Message-ID: <58CFF058.8020205@arm.com>
-References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
- <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
- <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
- <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic-v2: Expose the correct GICC_PMR
+ values to userspace
+Date: Mon, 20 Mar 2017 15:12:05 +0000
+Message-ID: <3fb0ff07-7191-b814-b7d6-5165de97a805@arm.com>
+References: <20170316114535.25233-1-marc.zyngier@arm.com>
+ <20170316114535.25233-2-marc.zyngier@arm.com> <20170320142425.GB20711@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D459140A14
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 11:06:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1019F40962
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 11:10:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wXTz8PyBaHpf for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Mar 2017 11:06:44 -0400 (EDT)
+ with ESMTP id mGSj73XP74kz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Mar 2017 11:10:24 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76FB640187
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 11:06:43 -0400 (EDT)
-In-Reply-To: <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B802D40187
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 11:10:24 -0400 (EDT)
+In-Reply-To: <20170320142425.GB20711@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,100 +29,141 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>, xiexiuqi@huawei.com
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dongjiu Geng,
-
-On 20/03/17 13:58, Marc Zyngier wrote:
-> On 20/03/17 12:28, gengdongjiu wrote:
->> On 2017/3/20 19:24, Marc Zyngier wrote:
->>> Please include James Morse on anything RAS related, as he's already
->>> looking at related patches.
-
-(Thanks Marc,)
-
->>> On 20/03/17 07:55, Dongjiu Geng wrote:
->>>> In the RAS implementation, hardware pass the virtual SEI
->>>> syndrome information through the VSESR_EL2, so set the virtual
->>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
->>>> the guest OS
-
-How does this work with firmware first?
-If we took a Physical SError Interrupt the CPER records are in the hosts memory.
-To deliver a RAS event to the guest something needs to generate CPER records and
-put them in the guest memory. Only Qemu knows where these memory regions are.
-
-Put another way, what is the guest expected to do with this SError interrupt?
-The only choice is panic(). We should send this via Qemu so that we can add
-proper guest RAS support later. Once Qemu has written the CPER records into
-guest memory, it can notify the guest.
-
-Is anyone from Huawei looking at adding RAS support for Qemu?
-
-
-It looks like we should save/restore VSESR_EL2 as part of the guest CPU state,
-but this needs doing with the cpufeature framework so that the single-image
-kernel works on platforms with and without these features.
-
-Xie XiuQi's series for SEI also touches the cpufeature framework.
-
-
->>>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->>>> index aede1658aeda..770a153fb6ba 100644
->>>> --- a/arch/arm64/kvm/hyp/switch.c
->>>> +++ b/arch/arm64/kvm/hyp/switch.c
->>>> @@ -86,6 +86,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
->>>>  		isb();
->>>>  	}
->>>>  	write_sysreg(val, hcr_el2);
->>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
->>>> +	/* If virtual System Error or Asynchronous Abort is pending. set
->>>> +	 * the virtual exception syndrome information
->>>> +	 */
->>>> +	if (vcpu->arch.hcr_el2 & HCR_VSE)
-
->>>> +		write_sysreg(vcpu->arch.fault.vsesr_el2, vsesr_el2);
-
-This won't build with versions of binutils that don't recognise vsesr_el2.
-Is there another patch out there that adds a sysreg definition for vsesr_el2?
-
-
->>>> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
->>>> index da6a8cfa54a0..08a13dfe28a8 100644
->>>> --- a/arch/arm64/kvm/inject_fault.c
->>>> +++ b/arch/arm64/kvm/inject_fault.c
->>>> @@ -242,4 +242,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
->>>>  void kvm_inject_vabt(struct kvm_vcpu *vcpu)
->>>>  {
->>>>  	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
->>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
->>>> +	/* If virtual System Error or Asynchronous Abort is set. set
->>>> +	 * the virtual exception syndrome information
->>>> +	 */
->>>> +	kvm_vcpu_set_vsesr(vcpu, ((kvm_vcpu_get_vsesr(vcpu)
->>>> +				& (~VSESR_ELx_IDS_ISS_MASK))
->>>> +				| (kvm_vcpu_get_hsr(vcpu)
->>>> +				& VSESR_ELx_IDS_ISS_MASK)));
->>>
->>> What is the rational for setting VSESR_EL2 with the EL1 syndrome
->>> information? That doesn't make any sense to me.
->> thanks, I set the VSESR_EL2 using the  EL2 syndrome information, "kvm_vcpu_get_hsr"
->> return the value of esr_el2, not EL1 syndrome information
+On 20/03/17 14:24, Christoffer Dall wrote:
+> On Thu, Mar 16, 2017 at 11:45:34AM +0000, Marc Zyngier wrote:
+>> We allow userspace to save/restore the GICC_PMR values in order
+>> to allow migration. This value is extracted from GICH_PMCR, where
+>> it occupies a 5 bit field. But the canonical PMR is an 8 bit
+>> value and we fail to shift the virtual priority, resulting in
+>> a non-sensical value being reported to userspace.
+>>
+>> Fixing it once and for all would be ideal, but that would break
+>> migration of guest from old to new kernels. We thus introduce
+>> a new GICv2 attribute (KVM_DEV_ARM_VGIC_CTRL_CANONICAL_PMR)
+>> that allows userspace to register its interest for the one true
+>> representation of PMR.
 > 
-> Ah, good point. But that doesn't make it more valid. I still don't see
-> anything in the spec that supports this behaviour, and I still propose
-> that when RAS is enabled, the VSError injection is mediated by userspace.
+> Thinking about this some more, I think we should just leave the ABI as
+> is without introducing the flag, because we do not loose any information
+> by doing so, and we can completely leave it up to userspace to work
+> around our funny ABI.
 
-I agree, we should be handling RAS errors as firmware-first, and Qemu plays the
-part of firmware for a guest. We will probably need to have a KVM API for Qemu
-to pend an SError with a specific ESR value.
+Right. That's the other option. Do we have any use case where we'd like
+to expose the real thing to userspace? This would impact migration from
+KVM to "something else", but I'm not sure we ever want to consider this
+seriously.
 
-If this isn't a firmware-first RAS error the existing code will pend an SError
-for the guest.
+> In the end, considering my comments on the next patch, the result would
+> be amusing, and look something like this patch instead:
+> 
+> 
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> index 76e61c8..b2f60ca 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> @@ -83,6 +83,12 @@ Groups:
+>  
+>      Bits for undefined preemption levels are RAZ/WI.
+>  
+> +    For historical reasons and to provide ABI compatibility with userspace we
+> +    export the GICC_PMR register in the format of the GICH_VMCR.VMPriMask
+> +    field in the lower 5 bits of a word, meaning that userspace must always
+> +    use the lower 5 bits to communicate with the KVM device and must shift the
+> +    value left by 3 places to obtain the actual priority mask level.
+> +
+>    Limitations:
+>      - Priorities are not implemented, and registers are RAZ/WI
+>      - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> index a3ad7ff..7b7ecac 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> @@ -229,7 +229,14 @@ static unsigned long vgic_mmio_read_vcpuif(struct kvm_vcpu *vcpu,
+>  		val = vmcr.ctlr;
+>  		break;
+>  	case GIC_CPU_PRIMASK:
+> -		val = vmcr.pmr;
+> +		/*
+> +		 * Our KVM_DEV_TYPE_ARM_VGIC_V2 device ABI exports the
+> +		 * the PMR field as GICH_VMCR.VMPriMask rather than
+> +		 * GICC_PMR.Priority, so we expose the upper five bits of
+> +		 * priority mask to userspace using the lower bits in the
+> +		 * unsigned long.
+> +		 */
+> +		val = vmcr.pmr >> 3;
+>  		break;
+>  	case GIC_CPU_BINPOINT:
+>  		val = vmcr.bpr;
+> @@ -262,7 +269,14 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
+>  		vmcr.ctlr = val;
+>  		break;
+>  	case GIC_CPU_PRIMASK:
+> -		vmcr.pmr = val;
+> +		/*
+> +		 * Our KVM_DEV_TYPE_ARM_VGIC_V2 device ABI exports the
+> +		 * the PMR field as GICH_VMCR.VMPriMask rather than
+> +		 * GICC_PMR.Priority, so we expose the upper five bits of
+> +		 * priority mask to userspace using the lower bits in the
+> +		 * unsigned long.
+> +		 */
+> +		vmcr.pmr = val << 3;
 
+By just looking at the code, I understand that you have struct vmcr
+carrying PMR using its architectural representation? That's cunning indeed.
+
+>  		break;
+>  	case GIC_CPU_BINPOINT:
+>  		vmcr.bpr = val;
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index b834ecd..95739cc 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -191,7 +191,7 @@ void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  		GICH_VMCR_ALIAS_BINPOINT_MASK;
+>  	vmcr |= (vmcrp->bpr << GICH_VMCR_BINPOINT_SHIFT) &
+>  		GICH_VMCR_BINPOINT_MASK;
+> -	vmcr |= (vmcrp->pmr << GICH_VMCR_PRIMASK_SHIFT) &
+> +	vmcr |= ((vmcrp->pmr >> 3) << GICH_VMCR_PRIMASK_SHIFT) &
+>  		GICH_VMCR_PRIMASK_MASK;
+>  
+>  	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = vmcr;
+> @@ -207,8 +207,8 @@ void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  			GICH_VMCR_ALIAS_BINPOINT_SHIFT;
+>  	vmcrp->bpr  = (vmcr & GICH_VMCR_BINPOINT_MASK) >>
+>  			GICH_VMCR_BINPOINT_SHIFT;
+> -	vmcrp->pmr  = (vmcr & GICH_VMCR_PRIMASK_MASK) >>
+> -			GICH_VMCR_PRIMASK_SHIFT;
+> +	vmcrp->pmr  = ((vmcr & GICH_VMCR_PRIMASK_MASK) >>
+> +			GICH_VMCR_PRIMASK_SHIFT) << 3;
+>  }
+>  
+>  void vgic_v2_enable(struct kvm_vcpu *vcpu)
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index db28f7c..64b70b4 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -85,7 +85,8 @@ struct vgic_vmcr {
+>  	u32	ctlr;
+>  	u32	abpr;
+>  	u32	bpr;
+> -	u32	pmr;
+> +	u32	pmr;  /* Priority mask field in the GICC_PMR and
+> +		       * ICC_PMR_EL1 priority field format */
+>  	/* Below member variable are valid only for GICv3 */
+>  	u32	grpen0;
+>  	u32	grpen1;
+> 
+> 
+> Let me know what you think.
+
+If everybody is happy with it, then so am I.
 
 Thanks,
 
-James
+	M.
+-- 
+Jazz is not dead. It just smells funny...
