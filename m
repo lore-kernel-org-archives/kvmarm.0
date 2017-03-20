@@ -1,25 +1,29 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
-Date: Mon, 20 Mar 2017 13:58:32 +0000
-Message-ID: <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
-References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
- <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
- <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic-v2: Expose the correct GICC_PMR
+ values to userspace
+Date: Mon, 20 Mar 2017 15:24:25 +0100
+Message-ID: <20170320142425.GB20711@cbox>
+References: <20170316114535.25233-1-marc.zyngier@arm.com>
+ <20170316114535.25233-2-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B4DE40A80
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 09:56:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D1EFD40C26
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 10:22:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KDOr9ucDE79H for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Mar 2017 09:56:52 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C814340948
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 09:56:52 -0400 (EDT)
-In-Reply-To: <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
+ with ESMTP id TepyDZ3iX9UX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Mar 2017 10:22:43 -0400 (EDT)
+Received: from mail-wr0-f179.google.com (mail-wr0-f179.google.com
+ [209.85.128.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1FDB840BE9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 10:22:42 -0400 (EDT)
+Received: by mail-wr0-f179.google.com with SMTP id u108so93520252wrb.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 07:24:28 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170316114535.25233-2-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,147 +33,126 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: wuquanming@huawei.com, wangxiongfeng2@huawei.com
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMjAvMDMvMTcgMTI6MjgsIGdlbmdkb25naml1IHdyb3RlOgo+IAo+IAo+IE9uIDIwMTcvMy8y
-MCAxOToyNCwgTWFyYyBaeW5naWVyIHdyb3RlOgo+PiBQbGVhc2UgaW5jbHVkZSBKYW1lcyBNb3Jz
-ZSBvbiBhbnl0aGluZyBSQVMgcmVsYXRlZCwgYXMgaGUncyBhbHJlYWR5Cj4+IGxvb2tpbmcgYXQg
-cmVsYXRlZCBwYXRjaGVzLgo+Pgo+PiBPbiAyMC8wMy8xNyAwNzo1NSwgRG9uZ2ppdSBHZW5nIHdy
-b3RlOgo+Pj4gSW4gdGhlIFJBUyBpbXBsZW1lbnRhdGlvbiwgaGFyZHdhcmUgcGFzcyB0aGUgdmly
-dHVhbCBTRUkKPj4+IHN5bmRyb21lIGluZm9ybWF0aW9uIHRocm91Z2ggdGhlIFZTRVNSX0VMMiwg
-c28gc2V0IHRoZSB2aXJ0dWFsCj4+PiBTRUkgc3luZHJvbWUgdXNpbmcgcGh5c2ljYWwgU0VJIHN5
-bmRyb21lIGVsMl9lbHIgdG8gcGFzcyB0bwo+Pj4gdGhlIGd1ZXN0IE9TCj4+Pgo+Pj4gU2lnbmVk
-LW9mZi1ieTogRG9uZ2ppdSBHZW5nIDxnZW5nZG9uZ2ppdUBodWF3ZWkuY29tPgo+Pj4gU2lnbmVk
-LW9mZi1ieTogUXVhbm1pbmcgd3UgPHd1cXVhbm1pbmdAaHVhd2VpLmNvbT4KPj4+IC0tLQo+Pj4g
-IGFyY2gvYXJtNjQvS2NvbmZpZyAgICAgICAgICAgICAgICAgICB8ICA4ICsrKysrKysrCj4+PiAg
-YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9lc3IuaCAgICAgICAgIHwgIDEgKwo+Pj4gIGFyY2gvYXJt
-NjQvaW5jbHVkZS9hc20va3ZtX2VtdWxhdGUuaCB8IDEyICsrKysrKysrKysrKwo+Pj4gIGFyY2gv
-YXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgICB8ICA0ICsrKysKPj4+ICBhcmNoL2FybTY0
-L2t2bS9oeXAvc3dpdGNoLmMgICAgICAgICAgfCAxNSArKysrKysrKysrKysrKy0KPj4+ICBhcmNo
-L2FybTY0L2t2bS9pbmplY3RfZmF1bHQuYyAgICAgICAgfCAxMCArKysrKysrKysrCj4+PiAgNiBm
-aWxlcyBjaGFuZ2VkLCA0OSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4+Pgo+Pj4gZGlm
-ZiAtLWdpdCBhL2FyY2gvYXJtNjQvS2NvbmZpZyBiL2FyY2gvYXJtNjQvS2NvbmZpZwo+Pj4gaW5k
-ZXggOGM3YzI0NDI0N2I2Li5lYTYyMTcwYTNiNzUgMTAwNjQ0Cj4+PiAtLS0gYS9hcmNoL2FybTY0
-L0tjb25maWcKPj4+ICsrKyBiL2FyY2gvYXJtNjQvS2NvbmZpZwo+Pj4gQEAgLTkwOCw2ICs5MDgs
-MTQgQEAgZW5kbWVudQo+Pj4gIAo+Pj4gIG1lbnUgIkFSTXY4LjIgYXJjaGl0ZWN0dXJhbCBmZWF0
-dXJlcyIKPj4+ICAKPj4+ICtjb25maWcgSEFTX1JBU19FWFRFTlNJT04KPj4+ICsJYm9vbCAiU3Vw
-cG9ydCBhcm02NCBSQVMgZXh0ZW5zaW9uIgo+Pj4gKwlkZWZhdWx0IG4KPj4+ICsJaGVscAo+Pj4g
-KwkgIFJlbGlhYmlsaXR5LCBBdmFpbGFiaWxpdHksIFNlcnZpY2VhYmlsaXR5KFJBUzsgcGFydCBv
-ZiB0aGUgQVJNdjguMiBFeHRlbnNpb25zKS4KPj4+ICsKPj4+ICsJICBTZWxlY3RpbmcgdGhpcyBv
-cHRpb24gT1Mgd2lsbCB0cnkgdG8gcmVjb3ZlciB0aGUgZXJyb3IgdGhhdCBSQVMgaGFyZHdhcmUg
-bm9kZSBkZXRlY3RlZC4KPj4+ICsKPj4KPj4gQXMgdGhpcyBpcyBhbiBhcmNoaXRlY3R1cmFsIGV4
-dGVuc2lvbiwgdGhpcyBzaG91bGQgYmUgY29udHJvbGxlZCBieSB0aGUKPj4gQ1BVIGZlYXR1cmUg
-bWVjaGFuaXNtLCBhbmQgbm90IGJlIGNob3NlbiBhdCBjb21waWxlIHRpbWUuIFdoYXQgeW91IGhh
-dmUKPj4gaGVyZSB3aWxsIGJyZWFrIGhvcnJpYmx5IHdoZW4gYm9vdGVkIG9uIGEgQ1BVIHRoYXQg
-ZG9lc24ndCBpbXBsZW1lbnQgUkFTLgo+IAo+IHRoYW5rcyB2ZXJ5IG11Y2ggZm9yIHlvdXIgcmV2
-aWV3LCB5ZXMsIGl0IGlzLCB5b3UgYXJlIHJpZ2h0Lgo+IAo+Pgo+Pj4gIGNvbmZpZyBBUk02NF9V
-QU8KPj4+ICAJYm9vbCAiRW5hYmxlIHN1cHBvcnQgZm9yIFVzZXIgQWNjZXNzIE92ZXJyaWRlIChV
-QU8pIgo+Pj4gIAlkZWZhdWx0IHkKPj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUv
-YXNtL2Vzci5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9lc3IuaAo+Pj4gaW5kZXggZDE0YzQ3
-ODk3NmQwLi5lMzhkMzJiMmJkYWQgMTAwNjQ0Cj4+PiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUv
-YXNtL2Vzci5oCj4+PiArKysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Vzci5oCj4+PiBAQCAt
-MTExLDYgKzExMSw3IEBACj4+PiAgI2RlZmluZSBFU1JfRUx4X0NPTkRfTUFTSwkoVUwoMHhGKSA8
-PCBFU1JfRUx4X0NPTkRfU0hJRlQpCj4+PiAgI2RlZmluZSBFU1JfRUx4X1dGeF9JU1NfV0ZFCShV
-TCgxKSA8PCAwKQo+Pj4gICNkZWZpbmUgRVNSX0VMeF94VkNfSU1NX01BU0sJKCgxVUwgPDwgMTYp
-IC0gMSkKPj4+ICsjZGVmaW5lIFZTRVNSX0VMeF9JRFNfSVNTX01BU0sgICAgKCgxVUwgPDwgMjUp
-IC0gMSkKPj4+ICAKPj4+ICAvKiBFU1IgdmFsdWUgdGVtcGxhdGVzIGZvciBzcGVjaWZpYyBldmVu
-dHMgKi8KPj4+ICAKPj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9l
-bXVsYXRlLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9lbXVsYXRlLmgKPj4+IGluZGV4
-IGY1ZWEwYmE3MGYwNy4uMjBkNGRhN2Y1ZGNlIDEwMDY0NAo+Pj4gLS0tIGEvYXJjaC9hcm02NC9p
-bmNsdWRlL2FzbS9rdm1fZW11bGF0ZS5oCj4+PiArKysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNt
-L2t2bV9lbXVsYXRlLmgKPj4+IEBAIC0xNDgsNiArMTQ4LDE4IEBAIHN0YXRpYyBpbmxpbmUgdTMy
-IGt2bV92Y3B1X2dldF9oc3IoY29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+Pj4gIAlyZXR1
-cm4gdmNwdS0+YXJjaC5mYXVsdC5lc3JfZWwyOwo+Pj4gIH0KPj4+ICAKPj4+ICsjaWZkZWYgQ09O
-RklHX0hBU19SQVNfRVhURU5TSU9OCj4+PiArc3RhdGljIGlubGluZSB1MzIga3ZtX3ZjcHVfZ2V0
-X3ZzZXNyKGNvbnN0IHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4+ICt7Cj4+PiArCXJldHVybiB2
-Y3B1LT5hcmNoLmZhdWx0LnZzZXNyX2VsMjsKPj4+ICt9Cj4+PiArCj4+PiArc3RhdGljIGlubGlu
-ZSB2b2lkIGt2bV92Y3B1X3NldF92c2VzcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHVuc2lnbmVk
-IGxvbmcgdmFsKQo+Pj4gK3sKPj4+ICsJdmNwdS0+YXJjaC5mYXVsdC52c2Vzcl9lbDIgPSB2YWw7
-Cj4+PiArfQo+Pj4gKyNlbmRpZgo+Pj4gKwo+Pj4gIHN0YXRpYyBpbmxpbmUgaW50IGt2bV92Y3B1
-X2dldF9jb25kaXRpb24oY29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+Pj4gIHsKPj4+ICAJ
-dTMyIGVzciA9IGt2bV92Y3B1X2dldF9oc3IodmNwdSk7Cj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC9h
-cm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1f
-aG9zdC5oCj4+PiBpbmRleCBlNzcwNWU3YmIwN2IuLmY5ZTNiYjU3YzQ2MSAxMDA2NDQKPj4+IC0t
-LSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4gKysrIGIvYXJjaC9hcm02
-NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+PiBAQCAtODMsNiArODMsMTAgQEAgc3RydWN0IGt2
-bV9tbXVfbWVtb3J5X2NhY2hlIHsKPj4+ICB9Owo+Pj4gIAo+Pj4gIHN0cnVjdCBrdm1fdmNwdV9m
-YXVsdF9pbmZvIHsKPj4+ICsjaWZkZWYgQ09ORklHX0hBU19SQVNfRVhURU5TSU9OCj4+PiArCS8q
-IFZpcnR1YWwgU0Vycm9yIEV4Y2VwdGlvbiBTeW5kcm9tZSBSZWdpc3RlciAqLwo+Pj4gKwl1MzIg
-dnNlc3JfZWwyOwo+Pj4gKyNlbmRpZgo+Pj4gIAl1MzIgZXNyX2VsMjsJCS8qIEh5cCBTeW5kcm9t
-IFJlZ2lzdGVyICovCj4+PiAgCXU2NCBmYXJfZWwyOwkJLyogSHlwIEZhdWx0IEFkZHJlc3MgUmVn
-aXN0ZXIgKi8KPj4+ICAJdTY0IGhwZmFyX2VsMjsJCS8qIEh5cCBJUEEgRmF1bHQgQWRkcmVzcyBS
-ZWdpc3RlciAqLwo+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2guYyBi
-L2FyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2guYwo+Pj4gaW5kZXggYWVkZTE2NThhZWRhLi43NzBh
-MTUzZmI2YmEgMTAwNjQ0Cj4+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKPj4+
-ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2guYwo+Pj4gQEAgLTg2LDYgKzg2LDEzIEBA
-IHN0YXRpYyB2b2lkIF9faHlwX3RleHQgX19hY3RpdmF0ZV90cmFwcyhzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUpCj4+PiAgCQlpc2IoKTsKPj4+ICAJfQo+Pj4gIAl3cml0ZV9zeXNyZWcodmFsLCBoY3Jf
-ZWwyKTsKPj4+ICsjaWZkZWYgQ09ORklHX0hBU19SQVNfRVhURU5TSU9OCj4+PiArCS8qIElmIHZp
-cnR1YWwgU3lzdGVtIEVycm9yIG9yIEFzeW5jaHJvbm91cyBBYm9ydCBpcyBwZW5kaW5nLiBzZXQK
-Pj4+ICsJICogdGhlIHZpcnR1YWwgZXhjZXB0aW9uIHN5bmRyb21lIGluZm9ybWF0aW9uCj4+PiAr
-CSAqLwo+Pj4gKwlpZiAodmNwdS0+YXJjaC5oY3JfZWwyICYgSENSX1ZTRSkKPj4+ICsJCXdyaXRl
-X3N5c3JlZyh2Y3B1LT5hcmNoLmZhdWx0LnZzZXNyX2VsMiwgdnNlc3JfZWwyKTsKPj4+ICsjZW5k
-aWYKPj4+ICAJLyogVHJhcCBvbiBBQXJjaDMyIGNwMTUgYzE1IGFjY2Vzc2VzIChFTDEgb3IgRUww
-KSAqLwo+Pj4gIAl3cml0ZV9zeXNyZWcoMSA8PCAxNSwgaHN0cl9lbDIpOwo+Pj4gIAkvKgo+Pj4g
-QEAgLTEzOSw4ICsxNDYsMTQgQEAgc3RhdGljIHZvaWQgX19oeXBfdGV4dCBfX2RlYWN0aXZhdGVf
-dHJhcHMoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+Pj4gIAkgKiB0aGUgY3J1Y2lhbCBiaXQgaXMg
-Ik9uIHRha2luZyBhIHZTRXJyb3IgaW50ZXJydXB0LAo+Pj4gIAkgKiBIQ1JfRUwyLlZTRSBpcyBj
-bGVhcmVkIHRvIDAuIgo+Pj4gIAkgKi8KPj4+IC0JaWYgKHZjcHUtPmFyY2guaGNyX2VsMiAmIEhD
-Ul9WU0UpCj4+PiArCWlmICh2Y3B1LT5hcmNoLmhjcl9lbDIgJiBIQ1JfVlNFKSB7Cj4+PiAgCQl2
-Y3B1LT5hcmNoLmhjcl9lbDIgPSByZWFkX3N5c3JlZyhoY3JfZWwyKTsKPj4+ICsjaWZkZWYgQ09O
-RklHX0hBU19SQVNfRVhURU5TSU9OCj4+PiArCQkvKiBzZXQgdnNlc3JfZWwyWzI0OjBdIHdpdGgg
-ZXNyX2VsMlsyNDowXSAqLwo+Pj4gKwkJa3ZtX3ZjcHVfc2V0X3ZzZXNyKHZjcHUsIHJlYWRfc3lz
-cmVnX2VsMihlc3IpCj4+PiArCQkJCQkmIFZTRVNSX0VMeF9JRFNfSVNTX01BU0spOwo+Pgo+PiBX
-aGF0IGd1YXJhbnRlZXMgdGhhdCBFU1JfRUwyIHN0aWxsIGNvbnRhaW5zIHRoZSBsYXRlc3QgZXhj
-ZXB0aW9uPyBXaGF0Cj4+IGRvZXMgaXQgbWVhbiB0byBzdG9yZSBzb21ldGhpbmcgdGhhdCBpcyB0
-aGUgY3VycmVudCBFTDIgZXhjZXB0aW9uCj4+IHN5bmRyb21lIHRvZ2V0aGVyIHdpdGggYW4gU0Vy
-cm9yIHRoYXQgaGFzIGFscmVhZHkgYmVlbiBpbmplY3RlZD8KPiAKPiB5ZXMsIHRoYW5rcyBmb3Ig
-dGhlIHJldmlldywgSSB3aWxsIGFkZCBhIGp1ZGdlbWVudCBjb25kaXRpb24gZm9yIHRoZSAiZXhp
-dF9jb2RlIgo+IGlmIHRoZSAiZXhpdF9jb2RlID09IEFSTV9FWENFUFRJT05fRUwxX1NFUlJPUiIg
-dGhlbiBzZXQgdGhlIHZzZXNyX2VsMi4KPiAKPiBmb3IgdGhlIGFhcmNoMzIsIGl0IG9ubHkgbmVl
-ZCBzZXQgdGhlICJFeFQsIGJpdCBbMTJdIiBhbmQgQUVULCAiYml0cyBbMTU6MTRdIiwgb3RoZXIg
-Yml0IGlzIFJFUzAKPiAKPj4KPj4gQWxzbywgaXMgaXQgY29ycmVjdCB0byBkaXJlY3RseSBjb3B5
-IHRoZSBFU1JfRUwyIGJpdHMgaW50byBWU0VTUl9FTDI/IE15Cj4gcGxlYXNlIHNlZSBiZWxvdyBz
-cGVjIGRlc2NyaXB0aW9uLCBpdCB2aXJ0dWFsIFNFUlJPUiBzeW5kcm9tZSBmcm9tIFZTRVNSX0VM
-Mi4KPiAtLS0tLQo+IO+CtyBDb250cm9sIHJldHVybnMgdG8gdGhlIE9TLCBhbmQgdGhlIEVTQiBp
-bnN0cnVjdGlvbiBpcyByZS1leGVjdXRlZC4KPiDigJQgVGhlIHBoeXNpY2FsIGFzeW5jaHJvbm91
-cyBTRXJyb3IgaW50ZXJydXB0IGhhcyBiZWVuIGNsZWFyZWQsIHNvIGl0IGlzIG5vdCB0YWtlbiBh
-Z2Fpbi4KPiDigJQgVGhlIFBFIHNldHMgVkRJU1JfRUwyLkEgdG8gMSBhbmQgcmVjb3JkcyB0aGUg
-c3luZHJvbWUgZnJvbSBWU0VTUl9FTDIgaW4gVkRJU1JfRUwyLgo+IC0tLS0tCgpXaGljaCBkb2Vz
-bid0IHNheSBhbnl0aGluZyBhYm91dCBkaXJlY3RseSB1c2luZyBFU1JfRUwyIGFuZCBwcm9wYWdh
-dGluZwppdCBkaXJlY3RseSB0byB0aGUgZ3Vlc3QsIHNwZWNpYWxseSB3aGVuIHRoZXJlIGlzICph
-bHJlYWR5KiBhbiBTRXJyb3IKcGVuZGluZyAoanVzdCBpbiBjYXNlIHlvdSBoYXZlbid0IG5vdGlj
-ZWQsIHRoaXMgaXMgdGhlICpleGl0KiBwYXRoLCBhbmQKSSBjYW4ndCBzZWUgd2h5IHlvdSB3b3Vs
-ZCBvdmVybG9hZCBWU0VTUl9FTDIgYXQgYXQgcG9pbnQpLgoKPiAKPj4gb3duIHJlYWRpbmcgb2Yg
-dGhlIHNwZWNpZmljYXRpb24gc2VlbSB0byBpbXBseSB0aGF0IHRoZXJlIGlzIGF0IGxlYXN0Cj4+
-IGRpZmZlcmVuY2VzIHdoZW4gdGhlIGd1ZXN0IGlzIEFBcmNoMzIuIFN1cmVseSB0aGVyZSB3b3Vs
-ZCBiZSBzb21lCj4+IHByb2Nlc3NpbmcgaGVyZS4KPiAKPiAKPiAKPj4KPj4+ICsjZW5kaWYKPj4+
-ICsJfQo+Pj4gIAo+Pj4gIAlfX2RlYWN0aXZhdGVfdHJhcHNfYXJjaCgpKCk7Cj4+PiAgCXdyaXRl
-X3N5c3JlZygwLCBoc3RyX2VsMik7Cj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaW5q
-ZWN0X2ZhdWx0LmMgYi9hcmNoL2FybTY0L2t2bS9pbmplY3RfZmF1bHQuYwo+Pj4gaW5kZXggZGE2
-YThjZmE1NGEwLi4wOGExM2RmZTI4YTggMTAwNjQ0Cj4+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9p
-bmplY3RfZmF1bHQuYwo+Pj4gKysrIGIvYXJjaC9hcm02NC9rdm0vaW5qZWN0X2ZhdWx0LmMKPj4+
-IEBAIC0yNDIsNCArMjQyLDE0IEBAIHZvaWQga3ZtX2luamVjdF91bmRlZmluZWQoc3RydWN0IGt2
-bV92Y3B1ICp2Y3B1KQo+Pj4gIHZvaWQga3ZtX2luamVjdF92YWJ0KHN0cnVjdCBrdm1fdmNwdSAq
-dmNwdSkKPj4+ICB7Cj4+PiAgCXZjcHVfc2V0X2hjcih2Y3B1LCB2Y3B1X2dldF9oY3IodmNwdSkg
-fCBIQ1JfVlNFKTsKPj4+ICsjaWZkZWYgQ09ORklHX0hBU19SQVNfRVhURU5TSU9OCj4+PiArCS8q
-IElmIHZpcnR1YWwgU3lzdGVtIEVycm9yIG9yIEFzeW5jaHJvbm91cyBBYm9ydCBpcyBzZXQuIHNl
-dAo+Pj4gKwkgKiB0aGUgdmlydHVhbCBleGNlcHRpb24gc3luZHJvbWUgaW5mb3JtYXRpb24KPj4+
-ICsJICovCj4+PiArCWt2bV92Y3B1X3NldF92c2Vzcih2Y3B1LCAoKGt2bV92Y3B1X2dldF92c2Vz
-cih2Y3B1KQo+Pj4gKwkJCQkmICh+VlNFU1JfRUx4X0lEU19JU1NfTUFTSykpCj4+PiArCQkJCXwg
-KGt2bV92Y3B1X2dldF9oc3IodmNwdSkKPj4+ICsJCQkJJiBWU0VTUl9FTHhfSURTX0lTU19NQVNL
-KSkpOwo+Pgo+PiBXaGF0IGlzIHRoZSByYXRpb25hbCBmb3Igc2V0dGluZyBWU0VTUl9FTDIgd2l0
-aCB0aGUgRUwxIHN5bmRyb21lCj4+IGluZm9ybWF0aW9uPyBUaGF0IGRvZXNuJ3QgbWFrZSBhbnkg
-c2Vuc2UgdG8gbWUuCj4gdGhhbmtzLCBJIHNldCB0aGUgVlNFU1JfRUwyIHVzaW5nIHRoZSAgRUwy
-IHN5bmRyb21lIGluZm9ybWF0aW9uLCAia3ZtX3ZjcHVfZ2V0X2hzciIKPiByZXR1cm4gdGhlIHZh
-bHVlIG9mIGVzcl9lbDIsIG5vdCBFTDEgc3luZHJvbWUgaW5mb3JtYXRpb24KCkFoLCBnb29kIHBv
-aW50LiBCdXQgdGhhdCBkb2Vzbid0IG1ha2UgaXQgbW9yZSB2YWxpZC4gSSBzdGlsbCBkb24ndCBz
-ZWUKYW55dGhpbmcgaW4gdGhlIHNwZWMgdGhhdCBzdXBwb3J0cyB0aGlzIGJlaGF2aW91ciwgYW5k
-IEkgc3RpbGwgcHJvcG9zZQp0aGF0IHdoZW4gUkFTIGlzIGVuYWJsZWQsIHRoZSBWU0Vycm9yIGlu
-amVjdGlvbiBpcyBtZWRpYXRlZCBieSB1c2Vyc3BhY2UuCgpUaGFua3MsCgoJTS4KLS0gCkphenog
-aXMgbm90IGRlYWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
-c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
-L2xpc3RpbmZvL2t2bWFybQo=
+On Thu, Mar 16, 2017 at 11:45:34AM +0000, Marc Zyngier wrote:
+> We allow userspace to save/restore the GICC_PMR values in order
+> to allow migration. This value is extracted from GICH_PMCR, where
+> it occupies a 5 bit field. But the canonical PMR is an 8 bit
+> value and we fail to shift the virtual priority, resulting in
+> a non-sensical value being reported to userspace.
+> 
+> Fixing it once and for all would be ideal, but that would break
+> migration of guest from old to new kernels. We thus introduce
+> a new GICv2 attribute (KVM_DEV_ARM_VGIC_CTRL_CANONICAL_PMR)
+> that allows userspace to register its interest for the one true
+> representation of PMR.
+
+Thinking about this some more, I think we should just leave the ABI as
+is without introducing the flag, because we do not loose any information
+by doing so, and we can completely leave it up to userspace to work
+around our funny ABI.
+
+In the end, considering my comments on the next patch, the result would
+be amusing, and look something like this patch instead:
+
+
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+index 76e61c8..b2f60ca 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+@@ -83,6 +83,12 @@ Groups:
+ 
+     Bits for undefined preemption levels are RAZ/WI.
+ 
++    For historical reasons and to provide ABI compatibility with userspace we
++    export the GICC_PMR register in the format of the GICH_VMCR.VMPriMask
++    field in the lower 5 bits of a word, meaning that userspace must always
++    use the lower 5 bits to communicate with the KVM device and must shift the
++    value left by 3 places to obtain the actual priority mask level.
++
+   Limitations:
+     - Priorities are not implemented, and registers are RAZ/WI
+     - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index a3ad7ff..7b7ecac 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -229,7 +229,14 @@ static unsigned long vgic_mmio_read_vcpuif(struct kvm_vcpu *vcpu,
+ 		val = vmcr.ctlr;
+ 		break;
+ 	case GIC_CPU_PRIMASK:
+-		val = vmcr.pmr;
++		/*
++		 * Our KVM_DEV_TYPE_ARM_VGIC_V2 device ABI exports the
++		 * the PMR field as GICH_VMCR.VMPriMask rather than
++		 * GICC_PMR.Priority, so we expose the upper five bits of
++		 * priority mask to userspace using the lower bits in the
++		 * unsigned long.
++		 */
++		val = vmcr.pmr >> 3;
+ 		break;
+ 	case GIC_CPU_BINPOINT:
+ 		val = vmcr.bpr;
+@@ -262,7 +269,14 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
+ 		vmcr.ctlr = val;
+ 		break;
+ 	case GIC_CPU_PRIMASK:
+-		vmcr.pmr = val;
++		/*
++		 * Our KVM_DEV_TYPE_ARM_VGIC_V2 device ABI exports the
++		 * the PMR field as GICH_VMCR.VMPriMask rather than
++		 * GICC_PMR.Priority, so we expose the upper five bits of
++		 * priority mask to userspace using the lower bits in the
++		 * unsigned long.
++		 */
++		vmcr.pmr = val << 3;
+ 		break;
+ 	case GIC_CPU_BINPOINT:
+ 		vmcr.bpr = val;
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index b834ecd..95739cc 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -191,7 +191,7 @@ void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ 		GICH_VMCR_ALIAS_BINPOINT_MASK;
+ 	vmcr |= (vmcrp->bpr << GICH_VMCR_BINPOINT_SHIFT) &
+ 		GICH_VMCR_BINPOINT_MASK;
+-	vmcr |= (vmcrp->pmr << GICH_VMCR_PRIMASK_SHIFT) &
++	vmcr |= ((vmcrp->pmr >> 3) << GICH_VMCR_PRIMASK_SHIFT) &
+ 		GICH_VMCR_PRIMASK_MASK;
+ 
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = vmcr;
+@@ -207,8 +207,8 @@ void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ 			GICH_VMCR_ALIAS_BINPOINT_SHIFT;
+ 	vmcrp->bpr  = (vmcr & GICH_VMCR_BINPOINT_MASK) >>
+ 			GICH_VMCR_BINPOINT_SHIFT;
+-	vmcrp->pmr  = (vmcr & GICH_VMCR_PRIMASK_MASK) >>
+-			GICH_VMCR_PRIMASK_SHIFT;
++	vmcrp->pmr  = ((vmcr & GICH_VMCR_PRIMASK_MASK) >>
++			GICH_VMCR_PRIMASK_SHIFT) << 3;
+ }
+ 
+ void vgic_v2_enable(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index db28f7c..64b70b4 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -85,7 +85,8 @@ struct vgic_vmcr {
+ 	u32	ctlr;
+ 	u32	abpr;
+ 	u32	bpr;
+-	u32	pmr;
++	u32	pmr;  /* Priority mask field in the GICC_PMR and
++		       * ICC_PMR_EL1 priority field format */
+ 	/* Below member variable are valid only for GICv3 */
+ 	u32	grpen0;
+ 	u32	grpen1;
+
+
+Let me know what you think.
+
+Thanks,
+-Christoffer
