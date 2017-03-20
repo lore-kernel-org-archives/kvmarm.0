@@ -1,28 +1,26 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 2/2] KVM: arm/arm64: vgic-v3: Format PMR to mimic the
- GICv2 behaviour
-Date: Mon, 20 Mar 2017 15:24:35 +0100
-Message-ID: <20170320142435.GC20711@cbox>
-References: <20170316114535.25233-1-marc.zyngier@arm.com>
- <20170316114535.25233-3-marc.zyngier@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
+Date: Mon, 20 Mar 2017 15:08:08 +0000
+Message-ID: <58CFF058.8020205@arm.com>
+References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
+ <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
+ <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
+ <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4239740C58
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 10:22:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D459140A14
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 11:06:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1jWPN4CYeLCY for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Mar 2017 10:22:53 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB1AA40C4C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 10:22:52 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id u132so64951780wmg.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 07:24:37 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170316114535.25233-3-marc.zyngier@arm.com>
+ with ESMTP id wXTz8PyBaHpf for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Mar 2017 11:06:44 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76FB640187
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 11:06:43 -0400 (EDT)
+In-Reply-To: <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,82 +30,100 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: gengdongjiu <gengdongjiu@huawei.com>, xiexiuqi@huawei.com
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Mar 16, 2017 at 11:45:35AM +0000, Marc Zyngier wrote:
-> Similarily to the GICv2 case, we need to expose a PMR value that
-> is either the 8bit value (KVM_DEV_ARM_VGIC_CTRL_CANONICAL_PMR
-> being set) or the 5bit, truncated value otherwise.
+Hi Dongjiu Geng,
 
-I'm a bit puzzled by this patch as well.  The struct vmcr is an internal
-representation of the VMCR register fields without well-defined
-semantics of how the fields should be laid out.
+On 20/03/17 13:58, Marc Zyngier wrote:
+> On 20/03/17 12:28, gengdongjiu wrote:
+>> On 2017/3/20 19:24, Marc Zyngier wrote:
+>>> Please include James Morse on anything RAS related, as he's already
+>>> looking at related patches.
 
-I think I would prefer it if we document on the vmcr struct which format
-the pmr field is in, and choose the actual ICC_PMR_EL1 or GICC_PMR
-format for this field, and then we leave the get/set_vmcr functions
-untouched.
+(Thanks Marc,)
 
+>>> On 20/03/17 07:55, Dongjiu Geng wrote:
+>>>> In the RAS implementation, hardware pass the virtual SEI
+>>>> syndrome information through the VSESR_EL2, so set the virtual
+>>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
+>>>> the guest OS
+
+How does this work with firmware first?
+If we took a Physical SError Interrupt the CPER records are in the hosts memory.
+To deliver a RAS event to the guest something needs to generate CPER records and
+put them in the guest memory. Only Qemu knows where these memory regions are.
+
+Put another way, what is the guest expected to do with this SError interrupt?
+The only choice is panic(). We should send this via Qemu so that we can add
+proper guest RAS support later. Once Qemu has written the CPER records into
+guest memory, it can notify the guest.
+
+Is anyone from Huawei looking at adding RAS support for Qemu?
+
+
+It looks like we should save/restore VSESR_EL2 as part of the guest CPU state,
+but this needs doing with the cpufeature framework so that the single-image
+kernel works on platforms with and without these features.
+
+Xie XiuQi's series for SEI also touches the cpufeature framework.
+
+
+>>>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+>>>> index aede1658aeda..770a153fb6ba 100644
+>>>> --- a/arch/arm64/kvm/hyp/switch.c
+>>>> +++ b/arch/arm64/kvm/hyp/switch.c
+>>>> @@ -86,6 +86,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+>>>>  		isb();
+>>>>  	}
+>>>>  	write_sysreg(val, hcr_el2);
+>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
+>>>> +	/* If virtual System Error or Asynchronous Abort is pending. set
+>>>> +	 * the virtual exception syndrome information
+>>>> +	 */
+>>>> +	if (vcpu->arch.hcr_el2 & HCR_VSE)
+
+>>>> +		write_sysreg(vcpu->arch.fault.vsesr_el2, vsesr_el2);
+
+This won't build with versions of binutils that don't recognise vsesr_el2.
+Is there another patch out there that adds a sysreg definition for vsesr_el2?
+
+
+>>>> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+>>>> index da6a8cfa54a0..08a13dfe28a8 100644
+>>>> --- a/arch/arm64/kvm/inject_fault.c
+>>>> +++ b/arch/arm64/kvm/inject_fault.c
+>>>> @@ -242,4 +242,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+>>>>  void kvm_inject_vabt(struct kvm_vcpu *vcpu)
+>>>>  {
+>>>>  	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
+>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
+>>>> +	/* If virtual System Error or Asynchronous Abort is set. set
+>>>> +	 * the virtual exception syndrome information
+>>>> +	 */
+>>>> +	kvm_vcpu_set_vsesr(vcpu, ((kvm_vcpu_get_vsesr(vcpu)
+>>>> +				& (~VSESR_ELx_IDS_ISS_MASK))
+>>>> +				| (kvm_vcpu_get_hsr(vcpu)
+>>>> +				& VSESR_ELx_IDS_ISS_MASK)));
+>>>
+>>> What is the rational for setting VSESR_EL2 with the EL1 syndrome
+>>> information? That doesn't make any sense to me.
+>> thanks, I set the VSESR_EL2 using the  EL2 syndrome information, "kvm_vcpu_get_hsr"
+>> return the value of esr_el2, not EL1 syndrome information
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic-v3.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index be0f4c3e0142..d260214a5bdb 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -184,6 +184,17 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  	vmcr |= (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
->  	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
->  	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
-> +
-> +	/*
-> +	 * If we're emulating GICv2 and that userspace can't deal with
+> Ah, good point. But that doesn't make it more valid. I still don't see
+> anything in the spec that supports this behaviour, and I still propose
+> that when RAS is enabled, the VSError injection is mediated by userspace.
 
-My comments above notwithstanding:
+I agree, we should be handling RAS errors as firmware-first, and Qemu plays the
+part of firmware for a guest. We will probably need to have a KVM API for Qemu
+to pend an SError with a specific ESR value.
 
-s/that//
+If this isn't a firmware-first RAS error the existing code will pend an SError
+for the guest.
 
-> +	 * the normal PMR range (8 bits), we need to make it GICv3
-> +	 * compatible by shifting the value by 3 bits in order to deal
-> +	 * with the full 8bit range.
-> +	 */
-> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
-> +	    !test_bit(VGIC_QUIRK_CANONICAL_PMR, &vcpu->kvm->arch.vgic.quirks))
-> +		vmcrp->pmr <<= 3;
-> +
->  	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
->  	vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
->  	vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
-> @@ -205,6 +216,16 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
->  	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
->  	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
-> +
-> +	/*
-> +	 * If we're emulating GICv2 and that userspace DOES NOT deal
-
-s/that//
-
-nit: why do we write DOES NOT here i upper case (feels a bit aggressive)?
-
-> +	 * with the normal PMR range (8 bits), we need to reduce it to
-> +	 * the GICv2 range (5 bits).
-> +	 */
-> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
-> +	    !test_bit(VGIC_QUIRK_CANONICAL_PMR, &vcpu->kvm->arch.vgic.quirks))
-> +		vmcrp->pmr >>= 3;
-> +
->  	vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
->  	vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
->  }
-> -- 
-> 2.11.0
-> 
 
 Thanks,
--Christoffer
+
+James
