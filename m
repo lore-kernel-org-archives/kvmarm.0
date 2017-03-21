@@ -1,26 +1,32 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v2 08/10] KVM: arm/arm64: vgic: Implement early VGIC init
- functionality
-Date: Tue, 21 Mar 2017 22:10:57 +0100
-Message-ID: <20170321211059.8719-9-cdall@linaro.org>
-References: <20170321211059.8719-1-cdall@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
+Date: Tue, 21 Mar 2017 22:10:41 +0000
+Message-ID: <CAFEAcA_NBvRQpuXJ2iZs_8n3b6920Z6E5ueuiAeF-4JCcqPRxQ@mail.gmail.com>
+References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
+ <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
+ <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
+ <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com> <58CFF058.8020205@arm.com>
+ <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
+ <20170321113428.GC15920@cbox>
+ <58D17AF0.2010802@arm.com> <20170321193933.GB31111@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AA1840C43
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 17:09:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8484F40190
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 18:09:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E-Y4YGmwRRZ2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 17:09:24 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53CBA40C4C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 17:09:22 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id n11so21250357wma.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 14:11:09 -0700 (PDT)
-In-Reply-To: <20170321211059.8719-1-cdall@linaro.org>
+ with ESMTP id ClnbQ4X6ZJ3A for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 18:09:16 -0400 (EDT)
+Received: from mail-wr0-f170.google.com (mail-wr0-f170.google.com
+ [209.85.128.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23509400E9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 18:09:15 -0400 (EDT)
+Received: by mail-wr0-f170.google.com with SMTP id g10so120274814wrg.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:11:02 -0700 (PDT)
+In-Reply-To: <20170321193933.GB31111@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,166 +36,18 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, wuquanming@huawei.com, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, gengdongjiu <gengdongjiu@huawei.com>, Andre Przywara <andre.przywara@arm.com>, huangshaoyu@huawei.com, wangxiongfeng2@huawei.com, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement early initialization for both the distributor and the CPU
-interfaces.  The basic idea is that even though the VGIC is not
-functional or not requested from user space, the critical path of the
-run loop can still call VGIC functions that just won't do anything,
-without them having to check additional initialization flags to ensure
-they don't look at uninitialized data structures.
+On 21 March 2017 at 19:39, Christoffer Dall <cdall@linaro.org> wrote:
+> My confusion here comes from not thinking about QEMU or KVM as firmware,
+> but as the machine, so it would be sort of like the functionality is
+> baked into hardware rather than firmware.
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
----
- virt/kvm/arm/vgic/vgic-init.c | 96 +++++++++++++++++++++++++------------------
- 1 file changed, 56 insertions(+), 40 deletions(-)
+There is precedent for that kind of thing -- we implement PSCI
+in KVM/QEMU for the guest, though in real hardware it would be
+provided by firmware at EL3.
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 3762fd1..25fd1b9 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -24,7 +24,12 @@
- 
- /*
-  * Initialization rules: there are multiple stages to the vgic
-- * initialization, both for the distributor and the CPU interfaces.
-+ * initialization, both for the distributor and the CPU interfaces.  The basic
-+ * idea is that even though the VGIC is not functional or not requested from
-+ * user space, the critical path of the run loop can still call VGIC functions
-+ * that just won't do anything, without them having to check additional
-+ * initialization flags to ensure they don't look at uninitialized data
-+ * structures.
-  *
-  * Distributor:
-  *
-@@ -39,23 +44,67 @@
-  *
-  * CPU Interface:
-  *
-- * - kvm_vgic_cpu_early_init(): initialization of static data that
-+ * - kvm_vgic_vcpu_early_init(): initialization of static data that
-  *   doesn't depend on any sizing information or emulation type. No
-  *   allocation is allowed there.
-  */
- 
- /* EARLY INIT */
- 
--/*
-- * Those 2 functions should not be needed anymore but they
-- * still are called from arm.c
-+/**
-+ * kvm_vgic_early_init() - Initialize static VGIC VCPU data structures
-+ * @kvm: The VM whose VGIC districutor should be initialized
-+ *
-+ * Only do initialization of static structures that don't require any
-+ * allocation or sizing information from userspace.  vgic_init() called
-+ * kvm_vgic_dist_init() which takes care of the rest.
-  */
- void kvm_vgic_early_init(struct kvm *kvm)
- {
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+
-+	INIT_LIST_HEAD(&dist->lpi_list_head);
-+	spin_lock_init(&dist->lpi_list_lock);
- }
- 
-+/**
-+ * kvm_vgic_vcpu_early_init() - Initialize static VGIC VCPU data structures
-+ * @vcpu: The VCPU whose VGIC data structures whould be initialized
-+ *
-+ * Only do initialization, but do not actually enable the VGIC CPU interface
-+ * yet.
-+ */
- void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu)
- {
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	int i;
-+
-+	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
-+	spin_lock_init(&vgic_cpu->ap_list_lock);
-+
-+	/*
-+	 * Enable and configure all SGIs to be edge-triggered and
-+	 * configure all PPIs as level-triggered.
-+	 */
-+	for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
-+		struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
-+
-+		INIT_LIST_HEAD(&irq->ap_list);
-+		spin_lock_init(&irq->irq_lock);
-+		irq->intid = i;
-+		irq->vcpu = NULL;
-+		irq->target_vcpu = vcpu;
-+		irq->targets = 1U << vcpu->vcpu_id;
-+		kref_init(&irq->refcount);
-+		if (vgic_irq_is_sgi(i)) {
-+			/* SGIs */
-+			irq->enabled = 1;
-+			irq->config = VGIC_CONFIG_EDGE;
-+		} else {
-+			/* PPIs */
-+			irq->config = VGIC_CONFIG_LEVEL;
-+		}
-+	}
- }
- 
- /* CREATION */
-@@ -148,9 +197,6 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
- 	struct kvm_vcpu *vcpu0 = kvm_get_vcpu(kvm, 0);
- 	int i;
- 
--	INIT_LIST_HEAD(&dist->lpi_list_head);
--	spin_lock_init(&dist->lpi_list_lock);
--
- 	dist->spis = kcalloc(nr_spis, sizeof(struct vgic_irq), GFP_KERNEL);
- 	if (!dist->spis)
- 		return  -ENOMEM;
-@@ -181,41 +227,11 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
- }
- 
- /**
-- * kvm_vgic_vcpu_init: initialize the vcpu data structures and
-- * enable the VCPU interface
-- * @vcpu: the VCPU which's VGIC should be initialized
-+ * kvm_vgic_vcpu_init() - Enable the VCPU interface
-+ * @vcpu: the VCPU which's VGIC should be enabled
-  */
- static void kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- {
--	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
--	int i;
--
--	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
--	spin_lock_init(&vgic_cpu->ap_list_lock);
--
--	/*
--	 * Enable and configure all SGIs to be edge-triggered and
--	 * configure all PPIs as level-triggered.
--	 */
--	for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
--		struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
--
--		INIT_LIST_HEAD(&irq->ap_list);
--		spin_lock_init(&irq->irq_lock);
--		irq->intid = i;
--		irq->vcpu = NULL;
--		irq->target_vcpu = vcpu;
--		irq->targets = 1U << vcpu->vcpu_id;
--		kref_init(&irq->refcount);
--		if (vgic_irq_is_sgi(i)) {
--			/* SGIs */
--			irq->enabled = 1;
--			irq->config = VGIC_CONFIG_EDGE;
--		} else {
--			/* PPIs */
--			irq->config = VGIC_CONFIG_LEVEL;
--		}
--	}
- 	if (kvm_vgic_global_state.type == VGIC_V2)
- 		vgic_v2_enable(vcpu);
- 	else
--- 
-2.9.0
+thanks
+-- PMM
