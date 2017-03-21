@@ -1,25 +1,27 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 12/19] KVM: arm64: ITS: vgic_its_alloc_ite/device
-Date: Tue, 21 Mar 2017 18:42:43 +0100
-Message-ID: <4b9ac0cb-2950-7515-e603-f70483edc0ee@redhat.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v3 08/19] KVM: arm64: ITS: Interpret MAPD Size field and
+ check related errors
+Date: Tue, 21 Mar 2017 17:57:14 +0000
+Message-ID: <3d1ad0a8-ef14-0cf0-80c3-5c9f94606651@arm.com>
 References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
- <1488800074-21991-13-git-send-email-eric.auger@redhat.com>
- <f913a9be-d994-9c18-3a30-e60e1778480a@arm.com>
+ <1488800074-21991-9-git-send-email-eric.auger@redhat.com>
+ <7daaac71-1dbf-94c9-2b6b-fadf94a5b776@arm.com>
+ <22002901-88f6-119f-8465-3557fa4bd8e6@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00B6540AE8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:41:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6972040C28
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:53:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Y7JKwAHkyT9O for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 13:41:04 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 08FC840A14
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:41:04 -0400 (EDT)
-In-Reply-To: <f913a9be-d994-9c18-3a30-e60e1778480a@arm.com>
+ with ESMTP id MslwbLFEV-X1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 13:53:34 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FAA940A14
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:53:34 -0400 (EDT)
+In-Reply-To: <22002901-88f6-119f-8465-3557fa4bd8e6@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,164 +31,166 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi
+Hi Eric,
 
-On 17/03/2017 18:01, Andre Przywara wrote:
-> Hi,
+On 21/03/17 17:40, Auger Eric wrote:
+> Hi Andre,
 > 
-> On 06/03/17 11:34, Eric Auger wrote:
->> Add two new helpers to allocate an its ite and an its device.
->> This will avoid duplication on restore path.
+> On 17/03/2017 16:03, Andre Przywara wrote:
+>> Hi,
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> On 06/03/17 11:34, Eric Auger wrote:
+>>> Up to now the MAPD's ITT size field has been ignored. It encodes
+>>> the number of eventid bit minus 1. It should be used to check
+>>> the eventid when a MAPTI command is issued on a device. Let's
+>>> store the nb_eventid_bits in the its_device and do the check
+>>> on MAPTI. Also make sure the ITT size field does not exceed the
+>>> GITS_TYPER IDBITS field.
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>
+>>> ---
+>>> ---
+>>>  include/linux/irqchip/arm-gic-v3.h |  2 ++
+>>>  virt/kvm/arm/vgic/vgic-its.c       | 14 +++++++++++++-
+>>>  2 files changed, 15 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+>>> index d81f10f..a7a5548 100644
+>>> --- a/include/linux/irqchip/arm-gic-v3.h
+>>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>>> @@ -338,9 +338,11 @@
+>>>  #define E_ITS_INT_UNMAPPED_INTERRUPT		0x010307
+>>>  #define E_ITS_CLEAR_UNMAPPED_INTERRUPT		0x010507
+>>>  #define E_ITS_MAPD_DEVICE_OOR			0x010801
+>>> +#define E_ITS_MAPD_ITTSIZE_OOR			0x010802
+>>>  #define E_ITS_MAPC_PROCNUM_OOR			0x010902
+>>>  #define E_ITS_MAPC_COLLECTION_OOR		0x010903
+>>>  #define E_ITS_MAPTI_UNMAPPED_DEVICE		0x010a04
+>>> +#define E_ITS_MAPTI_ID_OOR			0x010a05
+>>>  #define E_ITS_MAPTI_PHYSICALID_OOR		0x010a06
+>>>  #define E_ITS_INV_UNMAPPED_INTERRUPT		0x010c07
+>>>  #define E_ITS_INVALL_UNMAPPED_COLLECTION	0x010d09
+>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>>> index 6d84508..56bcd92 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>>> @@ -99,6 +99,7 @@ struct its_device {
+>>>  
+>>>  	/* the head for the list of ITTEs */
+>>>  	struct list_head itt_head;
+>>> +	u32 nb_eventid_bits;
+>>>  	u32 device_id;
+>>>  };
+>>>  
+>>> @@ -177,6 +178,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+>>>  #define GIC_LPI_OFFSET 8192
+>>>  
+>>>  #define VITS_ESZ 8
+>>> +#define VITS_TYPER_IDBITS 0xF
 >>
->> ---
+>> Alone for consistency reasons I'd use "16" here and subtract one upon
+>> encoding this into the TYPER register.
+> OK done
 >>
->> v1 -> v2:
->> - report itt_size fix and remove ITE_SIZE
->> - s/itte/ite/g
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 70 +++++++++++++++++++++++++++++---------------
->>  1 file changed, 47 insertions(+), 23 deletions(-)
+>>>  
+>>>  /*
+>>>   * Finds and returns a collection in the ITS collection table.
+>>> @@ -400,7 +402,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+>>>  	 * DevBits low - as least for the time being.
+>>>  	 */
+>>>  	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
+>>> -	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
+>>> +	reg |= VITS_TYPER_IDBITS << GITS_TYPER_IDBITS_SHIFT;
+>>>  	reg |= (VITS_ESZ - 1) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
+>>>  
+>>>  	return extract_bytes(reg, addr & 7, len);
+>>> @@ -560,6 +562,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
+>>>  #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
+>>>  #define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
+>>>  #define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
+>>> +#define its_cmd_get_size(cmd)		its_cmd_mask_field(cmd, 1, 0,  5)
 >>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index dd7545a..9792110 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -734,6 +734,26 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
->>  	kfree(collection);
->>  }
->>  
+>> Can you please move this up to be in order with the other fields?
+> done
+>>
+>>>  /*
+>>>   * The DISCARD command frees an Interrupt Translation Table Entry (ITTE).
+>>> @@ -745,6 +748,9 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>>>  	if (!device)
+>>>  		return E_ITS_MAPTI_UNMAPPED_DEVICE;
+>>>  
+>>> +	if (event_id >= (2 << device->nb_eventid_bits))
+>>
+>> And I'd find it less confusing to hold the actual bit size in
+>> nb_eventid_bits (and abstract from the particular encoding in TYPER).
+>> That would avoid this slightly odd (2 << ...) here, for instance.
+> OK I replaced nb_eventid_bits by nb_eventids which corresponds to the
+> the max number of eventids for this device
 > 
-> Can you please propagate the:
-> "Must be called with its_lock mutex held." comment here?
-sure
+> More than odd, the shift is completely wrong. Now I use BIT_ULL() as you
+> mentioned later on.
 > 
->> +static int vgic_its_alloc_ite(struct its_device *device,
->> +			       struct its_ite **itep,
->> +			       struct its_collection *collection,
->> +			       u32 lpi_id, u32 event_id)
->> +{
->> +	struct its_ite *ite;
->> +
->> +	ite = kzalloc(sizeof(ite), GFP_KERNEL);
-> 
-> That should be sizeof(*ite) or sizeof(struct its_ite).
-definitively! thanks. I don't get how this didn't crash.
-> 
->> +	if (!ite)
->> +		return -ENOMEM;
->> +
->> +	ite->event_id	= event_id;
->> +	ite->collection = collection;
->> +	ite->lpi = lpi_id;
->> +
->> +	list_add_tail(&ite->ite_list, &device->itt_head);
->> +	*itep = ite;
->> +	return 0;
->> +}
->> +
->>  /*
->>   * The MAPTI and MAPI commands map LPIs to ITTEs.
->>   * Must be called with its_lock mutex held.
->> @@ -747,7 +767,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
->>  	struct its_ite *ite;
->>  	struct its_device *device;
->>  	struct its_collection *collection, *new_coll = NULL;
->> -	int lpi_nr;
->> +	int lpi_nr, ret;
->>  	struct vgic_irq *irq;
->>  
->>  	device = find_its_device(its, device_id);
->> @@ -777,19 +797,13 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
->>  		new_coll = collection;
->>  	}
->>  
->> -	ite = kzalloc(sizeof(struct its_ite), GFP_KERNEL);
->> -	if (!ite) {
->> +	ret = vgic_its_alloc_ite(device, &ite, collection, lpi_nr, event_id);
->> +	if (ret) {
->>  		if (new_coll)
->>  			vgic_its_free_collection(its, coll_id);
->> -		return -ENOMEM;
->> +		return ret;
->>  	}
->>  
->> -	ite->event_id	= event_id;
->> -	list_add_tail(&ite->ite_list, &device->itt_head);
->> -
->> -	ite->collection = collection;
->> -	ite->lpi = lpi_nr;
->> -
->>  	irq = vgic_add_lpi(kvm, lpi_nr);
->>  	if (IS_ERR(irq)) {
->>  		if (new_coll)
->> @@ -828,6 +842,28 @@ static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
->>  	kfree(device);
->>  }
->>  
->> +static int vgic_its_alloc_device(struct vgic_its *its,
->> +				 struct its_device **devp,
->> +				 u32 device_id, gpa_t itt_addr_field,
->> +				 size_t size_field)
->> +{
->> +	struct its_device *device;
->> +
->> +	device = kzalloc(sizeof(*device), GFP_KERNEL);
->> +	if (!device)
->> +		return -ENOMEM;
->> +
->> +	device->device_id = device_id;
->> +	device->itt_addr = itt_addr_field << 8;
->> +	device->nb_eventid_bits = size_field + 1;
-> 
-> I'd rather see these command buffer entry decodings done at the source,
-> not here (though this isn't in this patch).
-yes that's corrected now
+> The only drawback is that when flushing the DTE I need to use ilog2 to
+> encode the size field again.
 
-Thanks
+Oh sorry, I am fine (and actually prefer) to encode the number of bits,
+but the *actual* number of bits, not something like -1. This seems to be
+a bit inconsistent throughout the series, I was suspecting that those "2
+<< x" expressions were to take care of the -1/+1 encoding.
+The problem with using the actual number (apart from the ilog2 issue) is
+that you can't really cover exactly 32 bits worth of devices.
 
-Eric
-> 
-> The rest looks fine.
-> 
-> Cheers,
-> Andre
-> 
->> +	INIT_LIST_HEAD(&device->itt_head);
->> +
->> +	list_add_tail(&device->dev_list, &its->device_list);
->> +	*devp = device;
->> +
->> +	return 0;
->> +}
->> +
->>  /*
->>   * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
->>   * Must be called with the its_lock mutex held.
->> @@ -864,19 +900,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->>  	if (!valid)
->>  		return 0;
->>  
->> -	device = kzalloc(sizeof(struct its_device), GFP_KERNEL);
->> -	if (!device)
->> -		return -ENOMEM;
->> -
->> -	device->device_id = device_id;
->> -	device->itt_addr = itt_addr << 8;
->> -	device->nb_eventid_bits = size + 1;
->> -
->> -	INIT_LIST_HEAD(&device->itt_head);
->> -
->> -	list_add_tail(&device->dev_list, &its->device_list);
->> -
->> -	return 0;
->> +	return vgic_its_alloc_device(its, &device, device_id, itt_addr, size);
->>  }
->>  
->>  /*
+So sorry for the confusion, and hope you can easily revert your change ;-)
+
+Cheers,
+Andre.
+
 >>
+>>> +		return E_ITS_MAPTI_ID_OOR;
+>>> +
+>>>  	if (its_cmd_get_command(its_cmd) == GITS_CMD_MAPTI)
+>>>  		lpi_nr = its_cmd_get_physical_id(its_cmd);
+>>>  	else
+>>> @@ -825,11 +831,15 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>>>  {
+>>>  	u32 device_id = its_cmd_get_deviceid(its_cmd);
+>>>  	bool valid = its_cmd_get_validbit(its_cmd);
+>>> +	size_t size = its_cmd_get_size(its_cmd);
+>>
+>> If you add 1 here, you'd make clear that this is an encoding property.
+> done
+> 
+> Thanks
+> 
+> Eric
+> 
+>>
+>> Cheers,
+>> Andre.
+>>
+>>>  	struct its_device *device;
+>>>  
+>>>  	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
+>>>  		return E_ITS_MAPD_DEVICE_OOR;
+>>>  
+>>> +	if (valid && size > VITS_TYPER_IDBITS)
+>>> +		return E_ITS_MAPD_ITTSIZE_OOR;
+>>> +
+>>>  	device = find_its_device(its, device_id);
+>>>  
+>>>  	/*
+>>> @@ -852,6 +862,8 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>>>  		return -ENOMEM;
+>>>  
+>>>  	device->device_id = device_id;
+>>> +	device->nb_eventid_bits = size + 1;
+>>> +
+>>>  	INIT_LIST_HEAD(&device->itt_head);
+>>>  
+>>>  	list_add_tail(&device->dev_list, &its->device_list);
+>>>
