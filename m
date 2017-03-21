@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 04/28] arm64: hyp-stub: Implement HVC_RESET_VECTORS stub
- hypercall
-Date: Tue, 21 Mar 2017 19:20:34 +0000
-Message-ID: <20170321192058.9300-5-marc.zyngier@arm.com>
+Subject: [PATCH v4 01/28] arm64: hyp-stub: Stop pointlessly clobbering lr
+Date: Tue, 21 Mar 2017 19:20:31 +0000
+Message-ID: <20170321192058.9300-2-marc.zyngier@arm.com>
 References: <20170321192058.9300-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67C3B40C98
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55FA340AE8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IuO-IdfuLxDW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 15:20:07 -0400 (EDT)
+ with ESMTP id 11wL2PRDubmG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 15:20:02 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0FBE40C72
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A19540C2A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:02 -0400 (EDT)
 In-Reply-To: <20170321192058.9300-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,72 +31,37 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Let's define a new stub hypercall that resets the HYP configuration
-to its default: hyp-stub vectors, and MMU disabled.
+When entering the kernel hyp stub, we check whether or not we've
+made it here through an HVC instruction, clobbering lr (aka x30)
+in the process.
 
-Of course, for the hyp-stub itself, this is a trivial no-op.
-Hypervisors will have a bit more work to do.
+This is completely pointless, as HVC is the only way to get here
+(all traps to EL2 are disabled, no interrupt override is applied).
 
-Reviewed-by: James Morse <james.morse@arm.com>
+So let's remove this bit of code whose only point is to corrupt
+a valuable register.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/virt.h |  9 +++++++++
- arch/arm64/kernel/hyp-stub.S  | 11 ++++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ arch/arm64/kernel/hyp-stub.S | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index 439f6b5d31f6..f24f1eb72dc0 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -39,6 +39,14 @@
-  */
- #define HVC_SOFT_RESTART 2
- 
-+/*
-+ * HVC_RESET_VECTORS - Restore the vectors to the original HYP stubs
-+ */
-+#define HVC_RESET_VECTORS 3
-+
-+/* Max number of HYP stub hypercalls */
-+#define HVC_STUB_HCALL_NR 4
-+
- #define BOOT_CPU_MODE_EL1	(0xe11)
- #define BOOT_CPU_MODE_EL2	(0xe12)
- 
-@@ -62,6 +70,7 @@ extern u32 __boot_cpu_mode[2];
- 
- void __hyp_set_vectors(phys_addr_t phys_vector_base);
- phys_addr_t __hyp_get_vectors(void);
-+void __hyp_reset_vectors(void);
- 
- /* Reports the availability of HYP mode */
- static inline bool is_hyp_mode_available(void)
 diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index 193dfb25ce2f..dd0a7522fbe1 100644
+index d3b5f75e652e..e4215ad06930 100644
 --- a/arch/arm64/kernel/hyp-stub.S
 +++ b/arch/arm64/kernel/hyp-stub.S
-@@ -73,8 +73,11 @@ el1_sync:
- 	mov	x1, x3
- 	br	x4				// no return
+@@ -55,12 +55,6 @@ ENDPROC(__hyp_stub_vectors)
+ 	.align 11
  
-+3:	cmp	x0, #HVC_RESET_VECTORS
-+	beq	9f				// Nothing to reset!
-+
- 	/* Someone called kvm_call_hyp() against the hyp-stub... */
--3:	mov	x0, #ARM_EXCEPTION_HYP_GONE
-+	mov	x0, #ARM_EXCEPTION_HYP_GONE
- 
- 9:	eret
- ENDPROC(el1_sync)
-@@ -127,3 +130,9 @@ ENTRY(__hyp_set_vectors)
- 	hvc	#0
- 	ret
- ENDPROC(__hyp_set_vectors)
-+
-+ENTRY(__hyp_reset_vectors)
-+	mov	x0, #HVC_RESET_VECTORS
-+	hvc	#0
-+	ret
-+ENDPROC(__hyp_reset_vectors)
+ el1_sync:
+-	mrs	x30, esr_el2
+-	lsr	x30, x30, #ESR_ELx_EC_SHIFT
+-
+-	cmp	x30, #ESR_ELx_EC_HVC64
+-	b.ne	9f				// Not an HVC trap
+-
+ 	cmp	x0, #HVC_GET_VECTORS
+ 	b.ne	1f
+ 	mrs	x0, vbar_el2
 -- 
 2.11.0
