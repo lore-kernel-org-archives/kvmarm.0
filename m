@@ -1,26 +1,25 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
-Date: Tue, 21 Mar 2017 14:32:29 +0800
-Message-ID: <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
-References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
- <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
- <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
- <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com> <58CFF058.8020205@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/9] KVM: arm/arm64: vgic: Defer touching GICH_VMCR to
+ vcpu_load/put
+Date: Tue, 21 Mar 2017 10:29:08 +0000
+Message-ID: <a4683f7c-498d-85f3-8987-f6e002f1ebb3@arm.com>
+References: <20170320105818.20481-1-cdall@linaro.org>
+ <20170320105818.20481-2-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C14B840C2F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 02:32:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D4F240BE9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 06:27:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ys4fzJcICp-n for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 02:32:55 -0400 (EDT)
-Received: from dggrg03-dlp.huawei.com (unknown [45.249.212.189])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96C7D40BD2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 02:32:54 -0400 (EDT)
-In-Reply-To: <58CFF058.8020205@arm.com>
+ with ESMTP id wmVAumbO1HsJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 06:27:25 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8A0540BDA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 06:27:25 -0400 (EDT)
+In-Reply-To: <20170320105818.20481-2-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,136 +29,269 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, xiexiuqi@huawei.com
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <cdall@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 20/03/17 10:58, Christoffer Dall wrote:
+> From: Christoffer Dall <cdall@cs.columbia.edu>
+> 
+> We don't have to save/restore the VMCR on every entry to/from the guest,
+> since on GICv2 we can access the control interface from EL1 and on VHE
+> systems with GICv3 we can access the control interface from KVM running
+> in EL2.
+> 
+> GICv3 systems without VHE becomes the rare case, which has to
+> save/restore the register on each round trip.
+> 
+> For in-context accesses to the VMCR, meaning emulation code needs access
+> to the value of the VCPU that is currently running within vcpu_load
+> and vcpu_put will detect that the it should load the VMCR from the
+> physical GIC instead of using the cached memory value.  While this extra
+> checking adds some code complexity we end up moving code out of the
+> critical path.
+> 
+> Note that userspace accesses may see out-of-date values if the VCPU is
+> running while accessing the VGIC state via the KVM device API, but this
+> is already the case.
+> 
+> Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> ---
+>  arch/arm/include/asm/kvm_asm.h   |  3 +++
+>  arch/arm/kvm/arm.c               | 11 +++++-----
+>  arch/arm64/include/asm/kvm_asm.h |  2 ++
+>  include/kvm/arm_vgic.h           |  3 +++
+>  virt/kvm/arm/hyp/vgic-v2-sr.c    |  3 ---
+>  virt/kvm/arm/hyp/vgic-v3-sr.c    | 14 ++++++++----
+>  virt/kvm/arm/vgic/vgic-init.c    | 12 +++++++++++
+>  virt/kvm/arm/vgic/vgic-v2.c      | 46 ++++++++++++++++++++++++++++++++++++++--
+>  virt/kvm/arm/vgic/vgic-v3.c      | 42 ++++++++++++++++++++++++++++++++++--
+>  virt/kvm/arm/vgic/vgic.c         | 22 +++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h         |  6 ++++++
+>  11 files changed, 148 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+> index 8ef0538..dd16044 100644
+> --- a/arch/arm/include/asm/kvm_asm.h
+> +++ b/arch/arm/include/asm/kvm_asm.h
+> @@ -75,7 +75,10 @@ extern void __init_stage2_translation(void);
+>  extern void __kvm_hyp_reset(unsigned long);
+>  
+>  extern u64 __vgic_v3_get_ich_vtr_el2(void);
+> +extern u64 __vgic_v3_read_vmcr(void);
+> +extern void __vgic_v3_write_vmcr(u32 vmcr);
+>  extern void __vgic_v3_init_lrs(void);
+> +
+>  #endif
+>  
+>  #endif /* __ARM_KVM_ASM_H__ */
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index d775aac..cfdf2f5 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -348,15 +348,14 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	vcpu->arch.host_cpu_context = this_cpu_ptr(kvm_host_cpu_state);
+>  
+>  	kvm_arm_set_running_vcpu(vcpu);
+> +
+> +	kvm_vgic_load(vcpu);
+>  }
+>  
+>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  {
+> -	/*
+> -	 * The arch-generic KVM code expects the cpu field of a vcpu to be -1
+> -	 * if the vcpu is no longer assigned to a cpu.  This is used for the
+> -	 * optimized make_all_cpus_request path.
+> -	 */
+> +	kvm_vgic_put(vcpu);
+> +
+>  	vcpu->cpu = -1;
+>  
+>  	kvm_arm_set_running_vcpu(NULL);
+> @@ -630,7 +629,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		 * non-preemptible context.
+>  		 */
+>  		preempt_disable();
+> +
+>  		kvm_pmu_flush_hwstate(vcpu);
+> +
+>  		kvm_timer_flush_hwstate(vcpu);
+>  		kvm_vgic_flush_hwstate(vcpu);
+>  
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index ec3553eb..49f99cd 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -59,6 +59,8 @@ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
+>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
+>  extern u64 __vgic_v3_get_ich_vtr_el2(void);
+> +extern u64 __vgic_v3_read_vmcr(void);
+> +extern void __vgic_v3_write_vmcr(u32 vmcr);
+>  extern void __vgic_v3_init_lrs(void);
+>  
+>  extern u32 __kvm_get_mdcr_el2(void);
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index c0b3d99..8d7c3a7 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -307,6 +307,9 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+>  
+>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+>  
+> +void kvm_vgic_load(struct kvm_vcpu *vcpu);
+> +void kvm_vgic_put(struct kvm_vcpu *vcpu);
+> +
+>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+>  #define vgic_initialized(k)	((k)->arch.vgic.initialized)
+>  #define vgic_ready(k)		((k)->arch.vgic.ready)
+> diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+> index c8aeb7b..d3d3b9b 100644
+> --- a/virt/kvm/arm/hyp/vgic-v2-sr.c
+> +++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+> @@ -114,8 +114,6 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+>  	if (!base)
+>  		return;
+>  
+> -	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
+> -
+>  	if (vcpu->arch.vgic_cpu.live_lrs) {
+>  		cpu_if->vgic_apr = readl_relaxed(base + GICH_APR);
+>  
+> @@ -165,7 +163,6 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  
+> -	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
+>  	vcpu->arch.vgic_cpu.live_lrs = live_lrs;
+>  }
+>  
+> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+> index 3947095..e51ee7e 100644
+> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
+> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+> @@ -159,8 +159,6 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+>  	if (!cpu_if->vgic_sre)
+>  		dsb(st);
+>  
+> -	cpu_if->vgic_vmcr  = read_gicreg(ICH_VMCR_EL2);
+> -
+>  	if (vcpu->arch.vgic_cpu.live_lrs) {
+>  		int i;
+>  		u32 max_lr_idx, nr_pri_bits;
+> @@ -261,8 +259,6 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+>  			live_lrs |= (1 << i);
+>  	}
+>  
+> -	write_gicreg(cpu_if->vgic_vmcr, ICH_VMCR_EL2);
+> -
+>  	if (live_lrs) {
+>  		write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
+>  
+> @@ -326,3 +322,13 @@ u64 __hyp_text __vgic_v3_get_ich_vtr_el2(void)
+>  {
+>  	return read_gicreg(ICH_VTR_EL2);
+>  }
+> +
+> +u64 __hyp_text __vgic_v3_read_vmcr(void)
+> +{
+> +	return read_gicreg(ICH_VMCR_EL2);
+> +}
+> +
+> +void __hyp_text __vgic_v3_write_vmcr(u32 vmcr)
+> +{
+> +	write_gicreg(vmcr, ICH_VMCR_EL2);
+> +}
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index 702f810..3762fd1 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -262,6 +262,18 @@ int vgic_init(struct kvm *kvm)
+>  	vgic_debug_init(kvm);
+>  
+>  	dist->initialized = true;
+> +
+> +	/*
+> +	 * If we're initializing GICv2 on-demand when first running the VCPU
+> +	 * then we need to load the VGIC state onto the CPU.  We can detect
+> +	 * this easily by checking if we are in between vcpu_load and vcpu_put
+> +	 * when we just initialized the VGIC.
+> +	 */
+> +	preempt_disable();
+> +	vcpu = kvm_arm_get_running_vcpu();
+> +	if (vcpu)
+> +		kvm_vgic_load(vcpu);
+> +	preempt_enable();
+>  out:
+>  	return ret;
+>  }
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index 94cf4b9..dfe6e5e 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -199,6 +199,9 @@ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr)
+>  
+>  void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  {
+> +	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	int cpu;
+>  	u32 vmcr;
+>  
+>  	vmcr  = (vmcrp->ctlr << GICH_VMCR_CTRL_SHIFT) & GICH_VMCR_CTRL_MASK;
+> @@ -209,12 +212,35 @@ void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  	vmcr |= (vmcrp->pmr << GICH_VMCR_PRIMASK_SHIFT) &
+>  		GICH_VMCR_PRIMASK_MASK;
+>  
+> -	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = vmcr;
+> +	cpu_if->vgic_vmcr = vmcr;
+> +
+> +	cpu = get_cpu();
+> +	if (vcpu->cpu == cpu)
+> +		/*
+> +		 * We have run vcpu_load and we're on VHE which means the VMCR
+> +		 * has already been flushed to the CPU; flush it again.
+> +		 */
 
+I don't understand this comment. What has VHE to do with this?
 
-On 2017/3/20 23:08, James Morse wrote:
-> Hi Dongjiu Geng,
-> 
-> On 20/03/17 13:58, Marc Zyngier wrote:
->> On 20/03/17 12:28, gengdongjiu wrote:
->>> On 2017/3/20 19:24, Marc Zyngier wrote:
->>>> Please include James Morse on anything RAS related, as he's already
->>>> looking at related patches.
-> 
-> (Thanks Marc,)
-> 
->>>> On 20/03/17 07:55, Dongjiu Geng wrote:
->>>>> In the RAS implementation, hardware pass the virtual SEI
->>>>> syndrome information through the VSESR_EL2, so set the virtual
->>>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
->>>>> the guest OS
-> 
-> How does this work with firmware first?
+> +		writel_relaxed(vmcr, vgic->vctrl_base + GICH_VMCR);
+> +	put_cpu();
 
-I explained it in previous mail about the work flow.
+There is one thing I don't quite get: I thought we could only get there
+with a userspace access. I understand that we've run vcpu_load()
+already, and that we end-up with a stale configuration in the HW. But
+why do we need to immediately propagate it? Surely we can rely on the
+vcpu thread doing a vcpu_load itself to load the new value, right? I
+must be missing something...
 
-when the Guest OS triggers an SEI, it will firstly trap to EL3 firmware, El3 firmware records the error
-info to the APEI table, then copy the ESR_EL3 ELR_EL3 to ESR_EL2 ELR_EL2 and transfers control to the
-hypervisor, hypervisor delegates the error exception to EL1 guest OS by setting HCR_EL2.VSE to 1 and pass the
-virtual SEI syndrome through vsesr_el2. The EL1 guest OS check the DISR_EL1 syndrome information to decide to
-terminate the application, or do some other recovery action. because the HCR_EL2.AMO is set, so in fact, read
-DISR_EL1, it returns the VDISR_EL2. and VDISR_EL2 is loaded from VSESR_EL2, so here I pass the virtual SEI
-syndrome vsesr_el2.
+>  }
+>  
+>  void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  {
+> -	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr;
+> +	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	int cpu;
+> +	u32 vmcr;
+> +
+> +	cpu = get_cpu();
+> +	if (vcpu->cpu == cpu)
+> +		/*
+> +		 * We have run vcpu_load and which means the VMCR
+> +		 * has already been flushed to the CPU; sync it back.
+> +		 */
+> +		cpu_if->vgic_vmcr = readl_relaxed(vgic->vctrl_base + GICH_VMCR);
+> +	put_cpu();
+> +
+> +	vmcr = cpu_if->vgic_vmcr;
 
-> If we took a Physical SError Interrupt the CPER records are in the hosts memory.
-> To deliver a RAS event to the guest something needs to generate CPER records and
-> put them in the guest memory. Only Qemu knows where these memory regions are.
-> 
-> Put another way, what is the guest expected to do with this SError interrupt?
-No, we do not only panic,if it is EL0 application SEI. the OS error recovery
-agent will terminate the EL0 application to isolate the error; If it is EL1 guest
-OS SError, guest OS can see whether it can recover. if the error was in a read-only file cache buffer, guest OS
-can invalidate the page and reload the data from disk.
+Same comment as above.
 
-if all of the above are failed, OS will panic.
+Thanks,
 
-
-> The only choice is panic(). We should send this via Qemu so that we can add
-> proper guest RAS support later. Once Qemu has written the CPER records into
-> guest memory, it can notify the guest.
-> 
-> Is anyone from Huawei looking at adding RAS support for Qemu?
- yes, I am looking at Qemu and want to add RAS support.
- do you mean let Qemu inject both the SEA and SEI?
-
-> 
-> 
-> It looks like we should save/restore VSESR_EL2 as part of the guest CPU state,
-> but this needs doing with the cpufeature framework so that the single-image
-> kernel works on platforms with and without these features.
- yes, you are right, we will follow cpufeature framework.
-
-
-> 
-> Xie XiuQi's series for SEI also touches the cpufeature framework.
-> 
-> 
->>>>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->>>>> index aede1658aeda..770a153fb6ba 100644
->>>>> --- a/arch/arm64/kvm/hyp/switch.c
->>>>> +++ b/arch/arm64/kvm/hyp/switch.c
->>>>> @@ -86,6 +86,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
->>>>>  		isb();
->>>>>  	}
->>>>>  	write_sysreg(val, hcr_el2);
->>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
->>>>> +	/* If virtual System Error or Asynchronous Abort is pending. set
->>>>> +	 * the virtual exception syndrome information
->>>>> +	 */
->>>>> +	if (vcpu->arch.hcr_el2 & HCR_VSE)
-> 
->>>>> +		write_sysreg(vcpu->arch.fault.vsesr_el2, vsesr_el2);
-> 
-> This won't build with versions of binutils that don't recognise vsesr_el2.
-> Is there another patch out there that adds a sysreg definition for vsesr_el2?
-> 
-> 
->>>>> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
->>>>> index da6a8cfa54a0..08a13dfe28a8 100644
->>>>> --- a/arch/arm64/kvm/inject_fault.c
->>>>> +++ b/arch/arm64/kvm/inject_fault.c
->>>>> @@ -242,4 +242,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
->>>>>  void kvm_inject_vabt(struct kvm_vcpu *vcpu)
->>>>>  {
->>>>>  	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
->>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
->>>>> +	/* If virtual System Error or Asynchronous Abort is set. set
->>>>> +	 * the virtual exception syndrome information
->>>>> +	 */
->>>>> +	kvm_vcpu_set_vsesr(vcpu, ((kvm_vcpu_get_vsesr(vcpu)
->>>>> +				& (~VSESR_ELx_IDS_ISS_MASK))
->>>>> +				| (kvm_vcpu_get_hsr(vcpu)
->>>>> +				& VSESR_ELx_IDS_ISS_MASK)));
->>>>
->>>> What is the rational for setting VSESR_EL2 with the EL1 syndrome
->>>> information? That doesn't make any sense to me.
->>> thanks, I set the VSESR_EL2 using the  EL2 syndrome information, "kvm_vcpu_get_hsr"
->>> return the value of esr_el2, not EL1 syndrome information
->>
->> Ah, good point. But that doesn't make it more valid. I still don't see
->> anything in the spec that supports this behaviour, and I still propose
->> that when RAS is enabled, the VSError injection is mediated by userspace.
-> 
-> I agree, we should be handling RAS errors as firmware-first, and Qemu plays the
-> part of firmware for a guest. We will probably need to have a KVM API for Qemu
-> to pend an SError with a specific ESR value.
-> 
-> If this isn't a firmware-first RAS error the existing code will pend an SError
-> for the guest.
-> 
-so for both SEA and SEI, do you prefer to below steps?
-EL0/EL1 SEI/SEA ---> EL3 firmware first handle ------> EL2 hypervisor notify the Qemu to inject SEI/SEA------>Qemu call KVM API to inject SEA/SEI---->KVM inject SEA/SEI to guest OS
-
-
-> 
-> Thanks,
-> 
-> James
-> 
-> 
-> .
-> 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
