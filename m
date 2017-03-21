@@ -1,8 +1,8 @@
-From: James Morse <james.morse@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH v3 01/25] arm64: hyp-stub: Implement HVC_RESET_VECTORS
  stub hypercall
-Date: Tue, 21 Mar 2017 17:25:34 +0000
-Message-ID: <58D1620E.30001@arm.com>
+Date: Tue, 21 Mar 2017 17:26:06 +0000
+Message-ID: <11a10d32-700f-d969-556a-4d1748c2e92f@arm.com>
 References: <20170306142458.8875-1-marc.zyngier@arm.com>
  <20170306142458.8875-2-marc.zyngier@arm.com>
  <20170321170407.GD21829@e104818-lin.cambridge.arm.com>
@@ -11,15 +11,15 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F1E4A40A54
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:24:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AD2A40B5E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:24:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oU9zh0O07w-T for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 13:24:07 -0400 (EDT)
+ with ESMTP id zxfYFkMTgYpx for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 13:24:22 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B3EC40A14
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:24:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F55040A54
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:24:22 -0400 (EDT)
 In-Reply-To: <20170321170407.GD21829@e104818-lin.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,10 +31,8 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: cdall@linaro.org, Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: cdall@linaro.org, Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
-
-Hi Catalin,
 
 On 21/03/17 17:04, Catalin Marinas wrote:
 > On Mon, Mar 06, 2017 at 02:24:34PM +0000, Marc Zyngier wrote:
@@ -62,11 +60,14 @@ On 21/03/17 17:04, Catalin Marinas wrote:
 > corrupted by the EL2 code (if yes, are other caller-saved registers that
 > need preserving)? I don't see something similar in the arch/arm code.
 
-Kexec on arm64 needed a register to clobber in the hyp-stub's el1_sync code. We
-wanted to preserve all the registers so soft_restart() could look more like a
-function call.
+Yeah, that's another oddity. The KVM code uses it as a temp register,
+but that feels quite wrong, now that you mention it. If should be saved
+there, and definitely not in the stubs.
 
+Let me grab a hammer, and I'll set that one straight.
 
 Thanks,
 
-James
+	M.
+-- 
+Jazz is not dead. It just smells funny...
