@@ -1,153 +1,290 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
-Date: Tue, 21 Mar 2017 13:10:22 +0000
-Message-ID: <58D1263E.90800@arm.com>
-References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
- <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
- <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
- <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com> <58CFF058.8020205@arm.com>
- <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 4/9] KVM: arm/arm64: vgic: Get rid of unnecessary
+ process_maintenance operationjjjj
+Date: Tue, 21 Mar 2017 13:26:52 +0000
+Message-ID: <3c813d9d-001d-03d9-3c4f-31ae8f25a45e@arm.com>
+References: <20170320105818.20481-1-cdall@linaro.org>
+ <20170320105818.20481-5-cdall@linaro.org>
+ <0da4b9c8-8631-e0f0-0ead-e9f65746b529@arm.com> <20170321122644.GD15920@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CC9240C44
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 09:08:57 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Hqdw8NPx80nl for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 09:08:56 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BD7540960
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 09:08:55 -0400 (EDT)
-In-Reply-To: <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>, xiexiuqi@huawei.com
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170321122644.GD15920@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 21/03/17 06:32, gengdongjiu wrote:
-> On 2017/3/20 23:08, James Morse wrote:
->> On 20/03/17 13:58, Marc Zyngier wrote:
->>> On 20/03/17 12:28, gengdongjiu wrote:
->>>> On 2017/3/20 19:24, Marc Zyngier wrote:
->>>>> On 20/03/17 07:55, Dongjiu Geng wrote:
->>>>>> In the RAS implementation, hardware pass the virtual SEI
->>>>>> syndrome information through the VSESR_EL2, so set the virtual
->>>>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
->>>>>> the guest OS
-
-(I've juggled the order of your replies:)
-
-> so for both SEA and SEI, do you prefer to below steps?
-> EL0/EL1 SEI/SEA ---> EL3 firmware first handle ------> EL2 hypervisor notify >
-the Qemu to inject SEI/SEA------>Qemu call KVM API to inject SEA/SEI---->KVM >
-inject SEA/SEI to guest OS
-
-Yes, to expand your EL2 hypervisor notify Qemu step:
-1 The host should call its APEI code to parse the CPER records.
-2 User space processes are then notified via SIGBUS (or for rasdaemon, trace
-  points).
-3 Qemu can take the address delivered via SIGBUS and generate CPER records for
-  the guest. It knows how to convert host addresses to guest IPAs, and it knows
-  where in guest memory to write the CPER records.
-4 Qemu can then notify the guest via whatever mechanism it advertised via the
-  HEST/GHES table. It might not be the same mechanism that the host received
-  the notification through.
-
-Steps 1 and 2 are the same even if no guest is running, so we don't have to add
-any special case for KVM. This is existing code that x86 uses.
-We can test the Qemu parts without any firmware support and the APEI path in the
-host and guest is the same.
-
-
->> Is anyone from Huawei looking at adding RAS support for Qemu?
->  yes, I am looking at Qemu and want to add RAS support.
-
-Great, support in Qemu is one of the missing pieces. On x86 it looks like it
-emulates machine-check-exceptions, which is how x86 did this before
-firmware-first and APEI became the standard.
-
-
->  do you mean let Qemu inject both the SEA and SEI?
-
-To do the notification, yes. It needs to happen after the CPER records have been
-written, and the mechanism and CPER memory location need to match what the guest
-was told via the HEST/GHES table.
-
-If Qemu didn't tell the guest about firmware-first, it can still deliver the
-guest an SError Interrupt.
-
-
-SEA should be possible to do with the KVM_SET_REG API, GPIO/GSIV and the other
-kind of interrupts can use irqfd. For SEI we may need to add an API call to KVM
-to let it pend SError with a specific ESR.
-
-
-
->> How does this work with firmware first?
-
-> when the Guest OS triggers an SEI, it will firstly trap to EL3 firmware, El3 firmware records the error
-> info to the APEI table, 
-
-These are CPER records in a memory area pointed to by one of HEST's GHES entries?
-
-
-> then copy the ESR_EL3 ELR_EL3 to ESR_EL2 ELR_EL2 and transfers control to the
-> hypervisor, hypervisor delegates the error exception to EL1 guest
-
-This is a problem, just because the error occurred while the guest was running
-doesn't mean we should deliver it directly to the guest. Some of these errors
-will be fatal for the CPU and the host should try and power it off to contain
-the fault. For example: CPER's 'micro-architectural error', should the guest
-power-off the vCPU? All that really does is return to the hypervisor, the error
-hasn't been contained.
-
-Firmware should handle the error first, then the host, finally the guest via Qemu.
-
-
-> OS by setting HCR_EL2.VSE to 1 and pass the virtual SEI syndrome through vsesr_el2. 
-> The EL1 guest OS check the DISR_EL1 syndrome information to decide to
-> terminate the application, or do some other recovery action. because the HCR_EL2.AMO is set, so in fact, read
-> DISR_EL1, it returns the VDISR_EL2. and VDISR_EL2 is loaded from VSESR_EL2, so here I pass the virtual SEI
-> syndrome vsesr_el2.
-
-So this is how an SError Interrupt's ESR gets into a guest. How does it get hold
-of the CPER records?
-
-
->> If we took a Physical SError Interrupt the CPER records are in the hosts memory.
->> To deliver a RAS event to the guest something needs to generate CPER records and
->> put them in the guest memory. Only Qemu knows where these memory regions are.
+On 21/03/17 12:26, Christoffer Dall wrote:
+> On Tue, Mar 21, 2017 at 11:36:19AM +0000, Marc Zyngier wrote:
+>> On 20/03/17 10:58, Christoffer Dall wrote:
+>>> From: Christoffer Dall <christoffer.dall@linaro.org>
+>>>
+>>> Since we always read back the LRs that we wrote to the guest and the
+>>> MISR and EISR registers simply provide a summary of the configuration of
+>>> the bits in the LRs, there is really no need to read back those status
+>>> registers and process them.  We can might as well just signal the
+>>> notifyfd when folding the LR state and save some cycles in the process.
+>>>
+>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>>> ---
+>>>  virt/kvm/arm/vgic/vgic-v2.c | 55 ++++++++++-----------------------------------
+>>>  virt/kvm/arm/vgic/vgic-v3.c | 47 +++++++++++---------------------------
+>>>  virt/kvm/arm/vgic/vgic.c    |  8 +++----
+>>>  virt/kvm/arm/vgic/vgic.h    |  4 ++--
+>>>  4 files changed, 31 insertions(+), 83 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+>>> index dfe6e5e..0172754 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-v2.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+>>> @@ -22,20 +22,6 @@
+>>>  
+>>>  #include "vgic.h"
+>>>  
+>>> -/*
+>>> - * Call this function to convert a u64 value to an unsigned long * bitmask
+>>> - * in a way that works on both 32-bit and 64-bit LE and BE platforms.
+>>> - *
+>>> - * Warning: Calling this function may modify *val.
+>>> - */
+>>> -static unsigned long *u64_to_bitmask(u64 *val)
+>>> -{
+>>> -#if defined(CONFIG_CPU_BIG_ENDIAN) && BITS_PER_LONG == 32
+>>> -	*val = (*val >> 32) | (*val << 32);
+>>> -#endif
+>>> -	return (unsigned long *)val;
+>>> -}
+>>> -
 >>
->> Put another way, what is the guest expected to do with this SError interrupt?
->
-> No, we do not only panic,if it is EL0 application SEI. the OS error recovery
-> agent will terminate the EL0 application to isolate the error; If it is EL1 guest
-> OS SError, guest OS can see whether it can recover. if the error was in a read-only file cache buffer, guest OS
-> can invalidate the page and reload the data from disk.
+>> Getting rid of u64_to_bitmask makes me feel slightly better...
+>>
+>>>  static inline void vgic_v2_write_lr(int lr, u32 val)
+>>>  {
+>>>  	void __iomem *base = kvm_vgic_global_state.vctrl_base;
+>>> @@ -51,38 +37,10 @@ void vgic_v2_init_lrs(void)
+>>>  		vgic_v2_write_lr(i, 0);
+>>>  }
+>>>  
+>>> -void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu)
+>>> +void vgic_v2_clear_uie(struct kvm_vcpu *vcpu)
+>>>  {
+>>>  	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+>>> -
+>>> -	if (cpuif->vgic_misr & GICH_MISR_EOI) {
+>>> -		u64 eisr = cpuif->vgic_eisr;
+>>> -		unsigned long *eisr_bmap = u64_to_bitmask(&eisr);
+>>> -		int lr;
+>>> -
+>>> -		for_each_set_bit(lr, eisr_bmap, kvm_vgic_global_state.nr_lr) {
+>>> -			u32 intid = cpuif->vgic_lr[lr] & GICH_LR_VIRTUALID;
+>>> -
+>>> -			WARN_ON(cpuif->vgic_lr[lr] & GICH_LR_STATE);
+>>> -
+>>> -			/* Only SPIs require notification */
+>>> -			if (vgic_valid_spi(vcpu->kvm, intid))
+>>> -				kvm_notify_acked_irq(vcpu->kvm, 0,
+>>> -						     intid - VGIC_NR_PRIVATE_IRQS);
+>>> -		}
+>>> -	}
+>>> -
+>>> -	/* check and disable underflow maintenance IRQ */
+>>>  	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
+>>> -
+>>> -	/*
+>>> -	 * In the next iterations of the vcpu loop, if we sync the
+>>> -	 * vgic state after flushing it, but before entering the guest
+>>> -	 * (this happens for pending signals and vmid rollovers), then
+>>> -	 * make sure we don't pick up any old maintenance interrupts
+>>> -	 * here.
+>>> -	 */
+>>> -	cpuif->vgic_eisr = 0;
+>>>  }
+>>>  
+>>>  void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+>>> @@ -92,6 +50,12 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+>>>  	cpuif->vgic_hcr |= GICH_HCR_UIE;
+>>>  }
+>>>  
+>>> +static bool lr_signals_eoi_mi(u32 lr_val)
+>>> +{
+>>> +	return !(lr_val & GICH_LR_STATE) && (lr_val & GICH_LR_EOI) &&
+>>> +	       !(lr_val & GICH_LR_HW);
+>>> +}
+>>> +
+>>>  /*
+>>>   * transfer the content of the LRs back into the corresponding ap_list:
+>>>   * - active bit is transferred as is
+>>> @@ -109,6 +73,11 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>>>  		u32 intid = val & GICH_LR_VIRTUALID;
+>>>  		struct vgic_irq *irq;
+>>>  
+>>> +		/* Notify fds when the guest EOI'ed a level-triggered SPI */
+>>> +		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+>>> +			kvm_notify_acked_irq(vcpu->kvm, 0,
+>>> +					     intid - VGIC_NR_PRIVATE_IRQS);
+>>> +
+>>>  		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+>>>  
+>>>  		spin_lock(&irq->irq_lock);
+>>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+>>> index 3d7796c..7880c5c 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-v3.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+>>> @@ -21,42 +21,9 @@
+>>>  
+>>>  #include "vgic.h"
+>>>  
+>>> -void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+>>> +void vgic_v3_clear_uie(struct kvm_vcpu *vcpu)
+>>>  {
+>>>  	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+>>> -	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+>>> -
+>>> -	if (cpuif->vgic_misr & ICH_MISR_EOI) {
+>>> -		unsigned long eisr_bmap = cpuif->vgic_eisr;
+>>> -		int lr;
+>>> -
+>>> -		for_each_set_bit(lr, &eisr_bmap, kvm_vgic_global_state.nr_lr) {
+>>> -			u32 intid;
+>>> -			u64 val = cpuif->vgic_lr[lr];
+>>> -
+>>> -			if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
+>>> -				intid = val & ICH_LR_VIRTUAL_ID_MASK;
+>>> -			else
+>>> -				intid = val & GICH_LR_VIRTUALID;
+>>> -
+>>> -			WARN_ON(cpuif->vgic_lr[lr] & ICH_LR_STATE);
+>>> -
+>>> -			/* Only SPIs require notification */
+>>> -			if (vgic_valid_spi(vcpu->kvm, intid))
+>>> -				kvm_notify_acked_irq(vcpu->kvm, 0,
+>>> -						     intid - VGIC_NR_PRIVATE_IRQS);
+>>> -		}
+>>> -
+>>> -		/*
+>>> -		 * In the next iterations of the vcpu loop, if we sync
+>>> -		 * the vgic state after flushing it, but before
+>>> -		 * entering the guest (this happens for pending
+>>> -		 * signals and vmid rollovers), then make sure we
+>>> -		 * don't pick up any old maintenance interrupts here.
+>>> -		 */
+>>> -		cpuif->vgic_eisr = 0;
+>>> -	}
+>>> -
+>>>  	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
+>>>  }
+>>>  
+>>> @@ -67,6 +34,12 @@ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+>>>  	cpuif->vgic_hcr |= ICH_HCR_UIE;
+>>>  }
+>>>  
+>>> +static bool lr_signals_eoi_mi(u64 lr_val)
+>>> +{
+>>> +	return !(lr_val & ICH_LR_STATE) && (lr_val & ICH_LR_EOI) &&
+>>> +	       !(lr_val & ICH_LR_HW);
+>>> +}
+>>> +
+>>>  void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>>>  {
+>>>  	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+>>> @@ -82,6 +55,12 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>>>  			intid = val & ICH_LR_VIRTUAL_ID_MASK;
+>>>  		else
+>>>  			intid = val & GICH_LR_VIRTUALID;
+>>> +
+>>> +		/* Notify fds when the guest EOI'ed a level-triggered IRQ */
+>>> +		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+>>> +			kvm_notify_acked_irq(vcpu->kvm, 0,
+>>> +					     intid - VGIC_NR_PRIVATE_IRQS);
+>>> +
+>>>  		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+>>>  		if (!irq)	/* An LPI could have been unmapped. */
+>>>  			continue;
+>>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+>>> index 1436c2e..f5b3c25 100644
+>>> --- a/virt/kvm/arm/vgic/vgic.c
+>>> +++ b/virt/kvm/arm/vgic/vgic.c
+>>> @@ -527,12 +527,12 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+>>>  	spin_unlock(&vgic_cpu->ap_list_lock);
+>>>  }
+>>>  
+>>> -static inline void vgic_process_maintenance_interrupt(struct kvm_vcpu *vcpu)
+>>> +static inline void vgic_clear_uie(struct kvm_vcpu *vcpu)
+>>>  {
+>>>  	if (kvm_vgic_global_state.type == VGIC_V2)
+>>> -		vgic_v2_process_maintenance(vcpu);
+>>> +		vgic_v2_clear_uie(vcpu);
+>>>  	else
+>>> -		vgic_v3_process_maintenance(vcpu);
+>>> +		vgic_v3_clear_uie(vcpu);
+>>>  }
+>>>  
+>>>  static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
+>>> @@ -642,7 +642,7 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>>>  	if (unlikely(!vgic_initialized(vcpu->kvm)))
+>>>  		return;
+>>>  
+>>> -	vgic_process_maintenance_interrupt(vcpu);
+>>> +	vgic_clear_uie(vcpu);
+>>>  	vgic_fold_lr_state(vcpu);
+>>
+>> nit: If you moved vgic_*_clear_uie() into vgic_*_fold_lr_state, you
+>> could get rid of this call, extra prototypes, and save yourself the
+>> extra check. Not a big deal though.
+>>
+> 
+> I thought about this, but the problem is that strictly speaking, you
+> don't need to consume any LRs to set the underflow, you just need enough
+> in the AP list, and it's theoretically possible that you have nr_lrs+1
+> interrupts in the AP list which have all been migrated away.
 
-How do we get an address for memory failure? SError is asynchronous, I don't
-think it sets the FAR. (SEA is synchronous and its not guaranteed to set the
-FAR..). As far as I understand this information is in the CPER records in host
-memory.
+But isn't that a problem we already have, independently of reworking the
+above?
 
-If we did have an address it would be a host address, how is it converted to a
-guest IPA? I think Qemu should do this as part of its CPER record generation,
-once the host has decided the error wasn't catastrophic.
+> So, it would require something like this including a rework in
+> flush_lr_state to work with the following patch which only calls
+> vgic_fold_lr_state when there are in fact anything live in LRs:
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index e5cf930..4b1feef 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -601,10 +601,8 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>  
+>  	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
+>  
+> -	if (compute_ap_list_depth(vcpu) > kvm_vgic_global_state.nr_lr) {
+> -		vgic_set_underflow(vcpu);
+> +	if (compute_ap_list_depth(vcpu) > kvm_vgic_global_state.nr_lr)
+>  		vgic_sort_ap_list(vcpu);
+> -	}
+>  
+>  	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+>  		spin_lock(&irq->irq_lock);
+> @@ -623,8 +621,12 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>  next:
+>  		spin_unlock(&irq->irq_lock);
+>  
+> -		if (count == kvm_vgic_global_state.nr_lr)
+> +		if (count == kvm_vgic_global_state.nr_lr) {
+> +			if (!list_is_last(&irq->ap_list,
+> +					  &vgic_cpu->ap_list_head))
+> +				vgic_set_underflow(vcpu);
+>  			break;
+> +		}
+>  	}
+>  
+>  	vcpu->arch.vgic_cpu.used_lrs = count;
+> 
+> What do you think?
 
+I think this deserves a patch of its own. Also, how about renaming
+clear_uie to clear_underflow?
 
 Thanks,
 
-James
+	M.
+-- 
+Jazz is not dead. It just smells funny...
