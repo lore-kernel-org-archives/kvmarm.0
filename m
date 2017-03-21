@@ -1,211 +1,289 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic-v2: Expose the correct GICC_PMR
- values to userspace
-Date: Mon, 20 Mar 2017 19:03:58 +0000
-Message-ID: <af6bc764-0180-d1fc-5060-8ccddddb316c@arm.com>
-References: <20170316114535.25233-1-marc.zyngier@arm.com>
- <20170316114535.25233-2-marc.zyngier@arm.com> <20170320142425.GB20711@cbox>
- <3fb0ff07-7191-b814-b7d6-5165de97a805@arm.com> <20170320183129.GA32242@cbox>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
+Date: Tue, 21 Mar 2017 14:07:40 +0800
+Message-ID: <693256ed-c5e6-f62e-5475-4cab5514159e@huawei.com>
+References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
+ <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
+ <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
+ <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 446C140A7F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 15:02:18 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Bse1y+tLk+iR for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Mar 2017 15:02:16 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09F7340BE9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Mar 2017 15:02:15 -0400 (EDT)
-In-Reply-To: <20170320183129.GA32242@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, wuquanming@huawei.com, James.Morse@arm.com, huangshaoyu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 20/03/17 18:31, Christoffer Dall wrote:
-> On Mon, Mar 20, 2017 at 03:12:05PM +0000, Marc Zyngier wrote:
->> On 20/03/17 14:24, Christoffer Dall wrote:
->>> On Thu, Mar 16, 2017 at 11:45:34AM +0000, Marc Zyngier wrote:
->>>> We allow userspace to save/restore the GICC_PMR values in order
->>>> to allow migration. This value is extracted from GICH_PMCR, where
->>>> it occupies a 5 bit field. But the canonical PMR is an 8 bit
->>>> value and we fail to shift the virtual priority, resulting in
->>>> a non-sensical value being reported to userspace.
+Hi Marc,
+  Thank you very much for your review.
+
+
+On 2017/3/20 21:58, Marc Zyngier wrote:
+> On 20/03/17 12:28, gengdongjiu wrote:
+>>
+>>
+>> On 2017/3/20 19:24, Marc Zyngier wrote:
+>>> Please include James Morse on anything RAS related, as he's already
+>>> looking at related patches.
+>>>
+>>> On 20/03/17 07:55, Dongjiu Geng wrote:
+>>>> In the RAS implementation, hardware pass the virtual SEI
+>>>> syndrome information through the VSESR_EL2, so set the virtual
+>>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
+>>>> the guest OS
 >>>>
->>>> Fixing it once and for all would be ideal, but that would break
->>>> migration of guest from old to new kernels. We thus introduce
->>>> a new GICv2 attribute (KVM_DEV_ARM_VGIC_CTRL_CANONICAL_PMR)
->>>> that allows userspace to register its interest for the one true
->>>> representation of PMR.
+>>>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>>>> Signed-off-by: Quanming wu <wuquanming@huawei.com>
+>>>> ---
+>>>>  arch/arm64/Kconfig                   |  8 ++++++++
+>>>>  arch/arm64/include/asm/esr.h         |  1 +
+>>>>  arch/arm64/include/asm/kvm_emulate.h | 12 ++++++++++++
+>>>>  arch/arm64/include/asm/kvm_host.h    |  4 ++++
+>>>>  arch/arm64/kvm/hyp/switch.c          | 15 ++++++++++++++-
+>>>>  arch/arm64/kvm/inject_fault.c        | 10 ++++++++++
+>>>>  6 files changed, 49 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+>>>> index 8c7c244247b6..ea62170a3b75 100644
+>>>> --- a/arch/arm64/Kconfig
+>>>> +++ b/arch/arm64/Kconfig
+>>>> @@ -908,6 +908,14 @@ endmenu
+>>>>  
+>>>>  menu "ARMv8.2 architectural features"
+>>>>  
+>>>> +config HAS_RAS_EXTENSION
+>>>> +	bool "Support arm64 RAS extension"
+>>>> +	default n
+>>>> +	help
+>>>> +	  Reliability, Availability, Serviceability(RAS; part of the ARMv8.2 Extensions).
+>>>> +
+>>>> +	  Selecting this option OS will try to recover the error that RAS hardware node detected.
+>>>> +
 >>>
->>> Thinking about this some more, I think we should just leave the ABI as
->>> is without introducing the flag, because we do not loose any information
->>> by doing so, and we can completely leave it up to userspace to work
->>> around our funny ABI.
+>>> As this is an architectural extension, this should be controlled by the
+>>> CPU feature mechanism, and not be chosen at compile time. What you have
+>>> here will break horribly when booted on a CPU that doesn't implement RAS.
 >>
->> Right. That's the other option. Do we have any use case where we'd like
->> to expose the real thing to userspace? 
-> 
-> My stand here is that we *are* exposing the real thing - we just decided
-> to use a funny format.  If anything relied on the format being exported
-> as reading the GICC_PMR directly, then their code would be already
-> broken, and I don't think we care about supporting an already-broken
-> non-functional userspace.  The ABI is already what it is - not
-> beautiful - but functionally just fine.
-> 
-> 
->> This would impact migration from
->> KVM to "something else", but I'm not sure we ever want to consider this
->> seriously.
+>> thanks very much for your review, yes, it is, you are right.
 >>
-> 
-> I don't think it really impacts anything.  For example, KVM to TCG will
-> still work, it just requires userspace to do the wrangling of shifting
-> the PMR 3 bits left and right, but it knows all about the versions it's
-> dealing with etc. so that can be solved in userspace as well.
-> 
-> And also, you're right, nobody is doing anything like this in userspace
-> in the moment, so let's just clarify our bad ABI and declare success ;)
-> 
-> 
-> 
->>> In the end, considering my comments on the next patch, the result would
->>> be amusing, and look something like this patch instead:
 >>>
+>>>>  config ARM64_UAO
+>>>>  	bool "Enable support for User Access Override (UAO)"
+>>>>  	default y
+>>>> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+>>>> index d14c478976d0..e38d32b2bdad 100644
+>>>> --- a/arch/arm64/include/asm/esr.h
+>>>> +++ b/arch/arm64/include/asm/esr.h
+>>>> @@ -111,6 +111,7 @@
+>>>>  #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
+>>>>  #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+>>>>  #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
+>>>> +#define VSESR_ELx_IDS_ISS_MASK    ((1UL << 25) - 1)
+>>>>  
+>>>>  /* ESR value templates for specific events */
+>>>>  
+>>>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>>>> index f5ea0ba70f07..20d4da7f5dce 100644
+>>>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>>>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>>>> @@ -148,6 +148,18 @@ static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+>>>>  	return vcpu->arch.fault.esr_el2;
+>>>>  }
+>>>>  
+>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
+>>>> +static inline u32 kvm_vcpu_get_vsesr(const struct kvm_vcpu *vcpu)
+>>>> +{
+>>>> +	return vcpu->arch.fault.vsesr_el2;
+>>>> +}
+>>>> +
+>>>> +static inline void kvm_vcpu_set_vsesr(struct kvm_vcpu *vcpu, unsigned long val)
+>>>> +{
+>>>> +	vcpu->arch.fault.vsesr_el2 = val;
+>>>> +}
+>>>> +#endif
+>>>> +
+>>>>  static inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+>>>>  {
+>>>>  	u32 esr = kvm_vcpu_get_hsr(vcpu);
+>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>>> index e7705e7bb07b..f9e3bb57c461 100644
+>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>> @@ -83,6 +83,10 @@ struct kvm_mmu_memory_cache {
+>>>>  };
+>>>>  
+>>>>  struct kvm_vcpu_fault_info {
+>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
+>>>> +	/* Virtual SError Exception Syndrome Register */
+>>>> +	u32 vsesr_el2;
+>>>> +#endif
+>>>>  	u32 esr_el2;		/* Hyp Syndrom Register */
+>>>>  	u64 far_el2;		/* Hyp Fault Address Register */
+>>>>  	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
+>>>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+>>>> index aede1658aeda..770a153fb6ba 100644
+>>>> --- a/arch/arm64/kvm/hyp/switch.c
+>>>> +++ b/arch/arm64/kvm/hyp/switch.c
+>>>> @@ -86,6 +86,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+>>>>  		isb();
+>>>>  	}
+>>>>  	write_sysreg(val, hcr_el2);
+>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
+>>>> +	/* If virtual System Error or Asynchronous Abort is pending. set
+>>>> +	 * the virtual exception syndrome information
+>>>> +	 */
+>>>> +	if (vcpu->arch.hcr_el2 & HCR_VSE)
+>>>> +		write_sysreg(vcpu->arch.fault.vsesr_el2, vsesr_el2);
+>>>> +#endif
+>>>>  	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+>>>>  	write_sysreg(1 << 15, hstr_el2);
+>>>>  	/*
+>>>> @@ -139,8 +146,14 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+>>>>  	 * the crucial bit is "On taking a vSError interrupt,
+>>>>  	 * HCR_EL2.VSE is cleared to 0."
+>>>>  	 */
+>>>> -	if (vcpu->arch.hcr_el2 & HCR_VSE)
+>>>> +	if (vcpu->arch.hcr_el2 & HCR_VSE) {
+>>>>  		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
+>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
+>>>> +		/* set vsesr_el2[24:0] with esr_el2[24:0] */
+>>>> +		kvm_vcpu_set_vsesr(vcpu, read_sysreg_el2(esr)
+>>>> +					& VSESR_ELx_IDS_ISS_MASK);
 >>>
->>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
->>> index 76e61c8..b2f60ca 100644
->>> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
->>> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
->>> @@ -83,6 +83,12 @@ Groups:
->>>  
->>>      Bits for undefined preemption levels are RAZ/WI.
->>>  
->>> +    For historical reasons and to provide ABI compatibility with userspace we
->>> +    export the GICC_PMR register in the format of the GICH_VMCR.VMPriMask
->>> +    field in the lower 5 bits of a word, meaning that userspace must always
->>> +    use the lower 5 bits to communicate with the KVM device and must shift the
->>> +    value left by 3 places to obtain the actual priority mask level.
->>> +
->>>    Limitations:
->>>      - Priorities are not implemented, and registers are RAZ/WI
->>>      - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>> index a3ad7ff..7b7ecac 100644
->>> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>> @@ -229,7 +229,14 @@ static unsigned long vgic_mmio_read_vcpuif(struct kvm_vcpu *vcpu,
->>>  		val = vmcr.ctlr;
->>>  		break;
->>>  	case GIC_CPU_PRIMASK:
->>> -		val = vmcr.pmr;
->>> +		/*
->>> +		 * Our KVM_DEV_TYPE_ARM_VGIC_V2 device ABI exports the
->>> +		 * the PMR field as GICH_VMCR.VMPriMask rather than
->>> +		 * GICC_PMR.Priority, so we expose the upper five bits of
->>> +		 * priority mask to userspace using the lower bits in the
->>> +		 * unsigned long.
->>> +		 */
->>> +		val = vmcr.pmr >> 3;
->>>  		break;
->>>  	case GIC_CPU_BINPOINT:
->>>  		val = vmcr.bpr;
->>> @@ -262,7 +269,14 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
->>>  		vmcr.ctlr = val;
->>>  		break;
->>>  	case GIC_CPU_PRIMASK:
->>> -		vmcr.pmr = val;
->>> +		/*
->>> +		 * Our KVM_DEV_TYPE_ARM_VGIC_V2 device ABI exports the
->>> +		 * the PMR field as GICH_VMCR.VMPriMask rather than
->>> +		 * GICC_PMR.Priority, so we expose the upper five bits of
->>> +		 * priority mask to userspace using the lower bits in the
->>> +		 * unsigned long.
->>> +		 */
->>> +		vmcr.pmr = val << 3;
+>>> What guarantees that ESR_EL2 still contains the latest exception? What
+>>> does it mean to store something that is the current EL2 exception
+>>> syndrome together with an SError that has already been injected?
 >>
->> By just looking at the code, I understand that you have struct vmcr
->> carrying PMR using its architectural representation? That's cunning indeed.
+>> yes, thanks for the review, I will add a judgement condition for the "exit_code"
+>> if the "exit_code == ARM_EXCEPTION_EL1_SERROR" then set the vsesr_el2.
 >>
-> 
-> Yeah, so that's the idea.  My thought is that we either (a) don't use
-> the intermediate struct vmcr representation for PMR at all, or (b)
-> clearly define why we need to intermediate data structure and which
-> format it should be in (the architectural one).
-> 
-> If there's a better case for (a), we can do that too, but I found this
-> one easily explainable with the comments I suggested.
-> 
->>>  		break;
->>>  	case GIC_CPU_BINPOINT:
->>>  		vmcr.bpr = val;
->>> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
->>> index b834ecd..95739cc 100644
->>> --- a/virt/kvm/arm/vgic/vgic-v2.c
->>> +++ b/virt/kvm/arm/vgic/vgic-v2.c
->>> @@ -191,7 +191,7 @@ void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->>>  		GICH_VMCR_ALIAS_BINPOINT_MASK;
->>>  	vmcr |= (vmcrp->bpr << GICH_VMCR_BINPOINT_SHIFT) &
->>>  		GICH_VMCR_BINPOINT_MASK;
->>> -	vmcr |= (vmcrp->pmr << GICH_VMCR_PRIMASK_SHIFT) &
->>> +	vmcr |= ((vmcrp->pmr >> 3) << GICH_VMCR_PRIMASK_SHIFT) &
->>>  		GICH_VMCR_PRIMASK_MASK;
->>>  
->>>  	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = vmcr;
->>> @@ -207,8 +207,8 @@ void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->>>  			GICH_VMCR_ALIAS_BINPOINT_SHIFT;
->>>  	vmcrp->bpr  = (vmcr & GICH_VMCR_BINPOINT_MASK) >>
->>>  			GICH_VMCR_BINPOINT_SHIFT;
->>> -	vmcrp->pmr  = (vmcr & GICH_VMCR_PRIMASK_MASK) >>
->>> -			GICH_VMCR_PRIMASK_SHIFT;
->>> +	vmcrp->pmr  = ((vmcr & GICH_VMCR_PRIMASK_MASK) >>
->>> +			GICH_VMCR_PRIMASK_SHIFT) << 3;
->>>  }
->>>  
->>>  void vgic_v2_enable(struct kvm_vcpu *vcpu)
->>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->>> index db28f7c..64b70b4 100644
->>> --- a/virt/kvm/arm/vgic/vgic.h
->>> +++ b/virt/kvm/arm/vgic/vgic.h
->>> @@ -85,7 +85,8 @@ struct vgic_vmcr {
->>>  	u32	ctlr;
->>>  	u32	abpr;
->>>  	u32	bpr;
->>> -	u32	pmr;
->>> +	u32	pmr;  /* Priority mask field in the GICC_PMR and
->>> +		       * ICC_PMR_EL1 priority field format */
->>>  	/* Below member variable are valid only for GICv3 */
->>>  	u32	grpen0;
->>>  	u32	grpen1;
+>> for the aarch32, it only need set the "ExT, bit [12]" and AET, "bits [15:14]", other bit is RES0
+>>
 >>>
->>>
->>> Let me know what you think.
->>
->> If everybody is happy with it, then so am I.
->>
+>>> Also, is it correct to directly copy the ESR_EL2 bits into VSESR_EL2? My
+>> please see below spec description, it virtual SERROR syndrome from VSESR_EL2.
+>> -----
+>>  Control returns to the OS, and the ESB instruction is re-executed.
+>> — The physical asynchronous SError interrupt has been cleared, so it is not taken again.
+>> — The PE sets VDISR_EL2.A to 1 and records the syndrome from VSESR_EL2 in VDISR_EL2.
+>> -----
 > 
-> 
-> Cool.  Would you like me to send a proper patch, or do you prefer to
-> take care of this one on your end?
+> Which doesn't say anything about directly using ESR_EL2 and propagating
+> it directly to the guest, specially when there is *already* an SError
 
-Please do send a proper patch (rather this one than your second version,
-which I found rather hard to read), and I'll apply it on top of the
-current set of fixes.
+thank you for the comments.
+In my current solution which I refer to ARM RAS spec(RAS_Extension_PRD03-PRDC-010953-32-0.pdf).
+when the Guest OS triggers an SEI, it will firstly trap to EL3 firmware, El3 firmware records the error
+info to the APEI table, then copy the ESR_EL3 ELR_EL3 to ESR_EL2 ELR_EL2 and transfers control to the
+hypervisor, hypervisor delegates the error exception to EL1 guest OS by setting HCR_EL2.VSE to 1 and pass the
+virtual SEI syndrome through vsesr_el2. The EL1 guest OS check the DISR_EL1 syndrome information to decide to
+terminate the application, or do some other recovery action. because the HCR_EL2.AMO is set, so in fact, read
+DISR_EL1, it returns the VDISR_EL2. and VDISR_EL2 is loaded from VSESR_EL2, so here I pass the virtual SEI
+syndrome vsesr_el2.
 
-Thanks,
+please see the ARM spec example about SEI with ESB
+----------------------------------------------------------------------------------------------------
+ The firmware logs, triages, and delegates the error exception to the hypervisor. As the error came
+from EL1, it does by faking an SError interrupt exception entry to EL2.
+ Control transfers to the hypervisor’s delegated error recovery agent. It repeats the process of triaging
+the error.
+ The hypervisor delegates the error exception to EL1 by setting HCR_EL2.VSE to 1, and returns
+control to the OS using ERET.
+ Control returns to the OS, and the ESB instruction is re-executed.
+— The physical asynchronous SError interrupt has been cleared, so it is not taken again.
+— The PE sets VDISR_EL2.A to 1 and records the syndrome from VSESR_EL2 in VDISR_EL2.
+ The SVC exception entry code completes, and then the OS checks DISR_EL1 for a deferred SError
+interrupt.
+— See the example code sequence in Error Synchronization Barrier.
+— This in fact returns VDISR_EL2 because the HCR_EL2.AMO bit is set.
+ Because this returns DISR_EL1.A set, the OS instead processes the error.
+— Although the error exception was taken from EL1, the OS error recovery agent can use the
+information that it was taken from the ESB instruction at the exception entry point to isolate
+the error to the EL0 application and not affect the OS.
+ The error has been logged, triaged, and contained to the EL0 application.
+-------------------------------------------------------------------------------------------------------------
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+
+> pending (just in case you haven't noticed, this is the *exit* path, and
+> I can't see why you would overload VSESR_EL2 at at point).
+>
+thanks for the question.
+This is exit path, for the case that already an SError is pending.it should be overload VSESR_EL2 using
+the esr_el2 in below situation, right?
+
+int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+                       int exception_index)
+{
+        exit_handle_fn exit_handler;
+
+        if (ARM_SERROR_PENDING(exception_index)) {
+                u8 hsr_ec = ESR_ELx_EC(kvm_vcpu_get_hsr(vcpu));
+
+                /*
+                 * HVC/SMC already have an adjusted PC, which we need
+                 * to correct in order to return to after having
+                 * injected the SError.
+                 */
+                if (hsr_ec == ESR_ELx_EC_HVC32 || hsr_ec == ESR_ELx_EC_HVC64 ||
+                    hsr_ec == ESR_ELx_EC_SMC32 || hsr_ec == ESR_ELx_EC_SMC64) {
+                        u32 adj =  kvm_vcpu_trap_il_is32bit(vcpu) ? 4 : 2;
+                        *vcpu_pc(vcpu) -= adj;
+                }
+
+                kvm_inject_vabt(vcpu);
+                return 1;
+        }
+
+
+>>
+>>> own reading of the specification seem to imply that there is at least
+>>> differences when the guest is AArch32. Surely there would be some
+>>> processing here.
+>>
+>>
+>>
+>>>
+>>>> +#endif
+>>>> +	}
+>>>>  
+>>>>  	__deactivate_traps_arch()();
+>>>>  	write_sysreg(0, hstr_el2);
+>>>> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+>>>> index da6a8cfa54a0..08a13dfe28a8 100644
+>>>> --- a/arch/arm64/kvm/inject_fault.c
+>>>> +++ b/arch/arm64/kvm/inject_fault.c
+>>>> @@ -242,4 +242,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+>>>>  void kvm_inject_vabt(struct kvm_vcpu *vcpu)
+>>>>  {
+>>>>  	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
+>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
+>>>> +	/* If virtual System Error or Asynchronous Abort is set. set
+>>>> +	 * the virtual exception syndrome information
+>>>> +	 */
+>>>> +	kvm_vcpu_set_vsesr(vcpu, ((kvm_vcpu_get_vsesr(vcpu)
+>>>> +				& (~VSESR_ELx_IDS_ISS_MASK))
+>>>> +				| (kvm_vcpu_get_hsr(vcpu)
+>>>> +				& VSESR_ELx_IDS_ISS_MASK)));
+>>>
+>>> What is the rational for setting VSESR_EL2 with the EL1 syndrome
+>>> information? That doesn't make any sense to me.
+>> thanks, I set the VSESR_EL2 using the  EL2 syndrome information, "kvm_vcpu_get_hsr"
+>> return the value of esr_el2, not EL1 syndrome information
+> 
+> Ah, good point. But that doesn't make it more valid. I still don't see
+> anything in the spec that supports this behaviour, and I still propose
+> that when RAS is enabled, the VSError injection is mediated by userspace.
+> 
+For the reason that set vsesr_el2 using esr_el2, I have explained it in above.
+do you mean below steps?
+
+EL0/EL1 SEI ---> EL3 firmware ------> EL2 hypervisor notify the Qemu to inject VSError ------>Qemu call KVM API to inject VSError ---->KVM
+
+
+
+> Thanks,
+> 
+> 	M.
+> 
