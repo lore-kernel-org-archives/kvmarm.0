@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 25/28] ARM: decompressor: Remove __hyp_get_vectors usage
-Date: Tue, 21 Mar 2017 19:20:55 +0000
-Message-ID: <20170321192058.9300-26-marc.zyngier@arm.com>
+Subject: [PATCH v4 22/28] arm/arm64: KVM: Use __hyp_reset_vectors() directly
+Date: Tue, 21 Mar 2017 19:20:52 +0000
+Message-ID: <20170321192058.9300-23-marc.zyngier@arm.com>
 References: <20170321192058.9300-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1E4240C45
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 52DF340C28
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zThn7SY6q-w0 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 15:20:49 -0400 (EDT)
+ with ESMTP id u4SOOGkq39BM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 15:20:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C47F40CA1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4438340CC6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:43 -0400 (EDT)
 In-Reply-To: <20170321192058.9300-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,44 +31,65 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When the compressed image needs to be relocated to avoid being
-overwritten by the decompression process, we need to relocate
-the hyp vectors as well so that we can find them once the
-decompression has taken effect.
+__cpu_reset_hyp_mode doesn't need to be passed any argument now,
+as the hyp-stub implementations are self-contained, and is now
+reduced to just calling __hyp_reset_vectors(). Let's drop the
+wrapper and use the stub hypercall directly.
 
-For that, we perform the following calculation:
-	u32 v = __hyp_get_vectors();
-	v += offset;
-	__hyp_set_vectors(v);
-
-But we're guaranteed that the initial value of v as returned by
-__hyp_get_vectors is always __hyp_stub_vectors, because we have
-just set it by calling __hyp_stub_install.
-
-So let's remove the use of __hyp_get_vectors, and directly use
-__hyp_stub_vectors instead.
-
-Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/boot/compressed/head.S | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_host.h   | 6 ------
+ arch/arm/kvm/arm.c                | 3 +--
+ arch/arm64/include/asm/kvm_host.h | 6 ------
+ 3 files changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/arch/arm/boot/compressed/head.S b/arch/arm/boot/compressed/head.S
-index 9150f9732785..d58bb104c6e8 100644
---- a/arch/arm/boot/compressed/head.S
-+++ b/arch/arm/boot/compressed/head.S
-@@ -422,7 +422,10 @@ dtb_check_done:
- 		cmp	r0, #HYP_MODE
- 		bne	1f
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index adea30753185..d488b8866bc9 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -270,12 +270,6 @@ static inline void __cpu_init_stage2(void)
+ 	kvm_call_hyp(__init_stage2_translation);
+ }
  
--		bl	__hyp_get_vectors
-+0:		adr	r0, 0b
-+		movw	r1, #:lower16:__hyp_stub_vectors - 0b
-+		movt	r1, #:upper16:__hyp_stub_vectors - 0b
-+		add	r0, r0, r1
- 		sub	r0, r0, r5
- 		add	r0, r0, r10
- 		bl	__hyp_set_vectors
+-static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+-					phys_addr_t phys_idmap_start)
+-{
+-	__hyp_reset_vectors();
+-}
+-
+ static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+ 	return 0;
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 96dba7cd8be7..57dd48d61796 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1129,8 +1129,7 @@ static void cpu_hyp_reinit(void)
+ static void cpu_hyp_reset(void)
+ {
+ 	if (!is_kernel_in_hyp_mode())
+-		__cpu_reset_hyp_mode(hyp_default_vectors,
+-				     kvm_get_idmap_start());
++		__hyp_reset_vectors();
+ }
+ 
+ static void _kvm_arch_hardware_enable(void *discard)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 0355dd109956..578df18f66b7 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -362,12 +362,6 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+ 	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr);
+ }
+ 
+-static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+-					phys_addr_t phys_idmap_start)
+-{
+-	__hyp_reset_vectors();
+-}
+-
+ static inline void kvm_arch_hardware_unsetup(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
 -- 
 2.11.0
