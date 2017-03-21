@@ -1,27 +1,25 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v3 01/25] arm64: hyp-stub: Implement HVC_RESET_VECTORS
- stub hypercall
-Date: Tue, 21 Mar 2017 17:41:54 +0000
-Message-ID: <58D165E2.7050501@arm.com>
-References: <20170306142458.8875-1-marc.zyngier@arm.com>
- <20170306142458.8875-2-marc.zyngier@arm.com>
- <20170321170407.GD21829@e104818-lin.cambridge.arm.com>
- <58D1620E.30001@arm.com> <0cce34c1-cb6f-0ba3-ac98-c0a0e986dc86@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v3 12/19] KVM: arm64: ITS: vgic_its_alloc_ite/device
+Date: Tue, 21 Mar 2017 18:42:43 +0100
+Message-ID: <4b9ac0cb-2950-7515-e603-f70483edc0ee@redhat.com>
+References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
+ <1488800074-21991-13-git-send-email-eric.auger@redhat.com>
+ <f913a9be-d994-9c18-3a30-e60e1778480a@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79DE240A14
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:40:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00B6540AE8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:41:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LJD-2WAHPi5J for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 13:40:25 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8169040C07
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:40:25 -0400 (EDT)
-In-Reply-To: <0cce34c1-cb6f-0ba3-ac98-c0a0e986dc86@arm.com>
+ with ESMTP id Y7JKwAHkyT9O for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 13:41:04 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 08FC840A14
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:41:04 -0400 (EDT)
+In-Reply-To: <f913a9be-d994-9c18-3a30-e60e1778480a@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,48 +29,164 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: cdall@linaro.org, Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Andre Przywara <andre.przywara@arm.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 21/03/17 17:37, Marc Zyngier wrote:
-> On 21/03/17 17:25, James Morse wrote:
->> On 21/03/17 17:04, Catalin Marinas wrote:
->>> On Mon, Mar 06, 2017 at 02:24:34PM +0000, Marc Zyngier wrote:
->>>> Let's define a new stub hypercall that resets the HYP configuration
->>>> to its default: hyp-stub vectors, and MMU disabled.
->>>>
->>>> Of course, for the hyp-stub itself, this is a trivial no-op.
->>>> Hypervisors will have a bit more work to do.
->>>>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>  arch/arm64/include/asm/virt.h |  9 +++++++++
->>>>  arch/arm64/kernel/hyp-stub.S  | 13 ++++++++++++-
->>>>  2 files changed, 21 insertions(+), 1 deletion(-)
->>> [...]
->>>> +ENTRY(__hyp_reset_vectors)
->>>> +	str	lr, [sp, #-16]!
->>>> +	mov	x0, #HVC_RESET_VECTORS
->>>> +	hvc	#0
->>>> +	ldr	lr, [sp], #16
->>>> +	ret
->>>> +ENDPROC(__hyp_reset_vectors)
->>>
->>> Why do we need to specifically preserve lr across the hvc call? Is it
->>> corrupted by the EL2 code (if yes, are other caller-saved registers that
->>> need preserving)? I don't see something similar in the arch/arm code.
->>
->> Kexec on arm64 needed a register to clobber in the hyp-stub's el1_sync code. We
->> wanted to preserve all the registers so soft_restart() could look more like a
->> function call.
+Hi
+
+On 17/03/2017 18:01, Andre Przywara wrote:
+> Hi,
 > 
-> I don't think we need this anymore. Once we enter __cpu_soft_restart(),
-> there is no turning back. Or am I missing something else?
+> On 06/03/17 11:34, Eric Auger wrote:
+>> Add two new helpers to allocate an its ite and an its device.
+>> This will avoid duplication on restore path.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v1 -> v2:
+>> - report itt_size fix and remove ITE_SIZE
+>> - s/itte/ite/g
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 70 +++++++++++++++++++++++++++++---------------
+>>  1 file changed, 47 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index dd7545a..9792110 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -734,6 +734,26 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
+>>  	kfree(collection);
+>>  }
+>>  
+> 
+> Can you please propagate the:
+> "Must be called with its_lock mutex held." comment here?
+sure
+> 
+>> +static int vgic_its_alloc_ite(struct its_device *device,
+>> +			       struct its_ite **itep,
+>> +			       struct its_collection *collection,
+>> +			       u32 lpi_id, u32 event_id)
+>> +{
+>> +	struct its_ite *ite;
+>> +
+>> +	ite = kzalloc(sizeof(ite), GFP_KERNEL);
+> 
+> That should be sizeof(*ite) or sizeof(struct its_ite).
+definitively! thanks. I don't get how this didn't crash.
+> 
+>> +	if (!ite)
+>> +		return -ENOMEM;
+>> +
+>> +	ite->event_id	= event_id;
+>> +	ite->collection = collection;
+>> +	ite->lpi = lpi_id;
+>> +
+>> +	list_add_tail(&ite->ite_list, &device->itt_head);
+>> +	*itep = ite;
+>> +	return 0;
+>> +}
+>> +
+>>  /*
+>>   * The MAPTI and MAPI commands map LPIs to ITTEs.
+>>   * Must be called with its_lock mutex held.
+>> @@ -747,7 +767,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>>  	struct its_ite *ite;
+>>  	struct its_device *device;
+>>  	struct its_collection *collection, *new_coll = NULL;
+>> -	int lpi_nr;
+>> +	int lpi_nr, ret;
+>>  	struct vgic_irq *irq;
+>>  
+>>  	device = find_its_device(its, device_id);
+>> @@ -777,19 +797,13 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>>  		new_coll = collection;
+>>  	}
+>>  
+>> -	ite = kzalloc(sizeof(struct its_ite), GFP_KERNEL);
+>> -	if (!ite) {
+>> +	ret = vgic_its_alloc_ite(device, &ite, collection, lpi_nr, event_id);
+>> +	if (ret) {
+>>  		if (new_coll)
+>>  			vgic_its_free_collection(its, coll_id);
+>> -		return -ENOMEM;
+>> +		return ret;
+>>  	}
+>>  
+>> -	ite->event_id	= event_id;
+>> -	list_add_tail(&ite->ite_list, &device->itt_head);
+>> -
+>> -	ite->collection = collection;
+>> -	ite->lpi = lpi_nr;
+>> -
+>>  	irq = vgic_add_lpi(kvm, lpi_nr);
+>>  	if (IS_ERR(irq)) {
+>>  		if (new_coll)
+>> @@ -828,6 +842,28 @@ static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
+>>  	kfree(device);
+>>  }
+>>  
+>> +static int vgic_its_alloc_device(struct vgic_its *its,
+>> +				 struct its_device **devp,
+>> +				 u32 device_id, gpa_t itt_addr_field,
+>> +				 size_t size_field)
+>> +{
+>> +	struct its_device *device;
+>> +
+>> +	device = kzalloc(sizeof(*device), GFP_KERNEL);
+>> +	if (!device)
+>> +		return -ENOMEM;
+>> +
+>> +	device->device_id = device_id;
+>> +	device->itt_addr = itt_addr_field << 8;
+>> +	device->nb_eventid_bits = size_field + 1;
+> 
+> I'd rather see these command buffer entry decodings done at the source,
+> not here (though this isn't in this patch).
+yes that's corrected now
 
-My recollection of the history may be wrong: but we needed to mess with esr_el2
-before we know its a soft_restart() call, at which point we didn't want to
-clobber the registers. This was the strange use of x18 in kexec.
+Thanks
 
-
-James
+Eric
+> 
+> The rest looks fine.
+> 
+> Cheers,
+> Andre
+> 
+>> +	INIT_LIST_HEAD(&device->itt_head);
+>> +
+>> +	list_add_tail(&device->dev_list, &its->device_list);
+>> +	*devp = device;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  /*
+>>   * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
+>>   * Must be called with the its_lock mutex held.
+>> @@ -864,19 +900,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>>  	if (!valid)
+>>  		return 0;
+>>  
+>> -	device = kzalloc(sizeof(struct its_device), GFP_KERNEL);
+>> -	if (!device)
+>> -		return -ENOMEM;
+>> -
+>> -	device->device_id = device_id;
+>> -	device->itt_addr = itt_addr << 8;
+>> -	device->nb_eventid_bits = size + 1;
+>> -
+>> -	INIT_LIST_HEAD(&device->itt_head);
+>> -
+>> -	list_add_tail(&device->dev_list, &its->device_list);
+>> -
+>> -	return 0;
+>> +	return vgic_its_alloc_device(its, &device, device_id, itt_addr, size);
+>>  }
+>>  
+>>  /*
+>>
