@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 06/28] arm64: KVM: Implement HVC_GET_VECTORS in the init
- code
-Date: Tue, 21 Mar 2017 19:20:36 +0000
-Message-ID: <20170321192058.9300-7-marc.zyngier@arm.com>
+Subject: [PATCH v4 10/28] ARM: hyp-stub: improve ABI
+Date: Tue, 21 Mar 2017 19:20:40 +0000
+Message-ID: <20170321192058.9300-11-marc.zyngier@arm.com>
 References: <20170321192058.9300-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E479340C49
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED89040C9F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FLBUvKD3VMxF for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 15:20:12 -0400 (EDT)
+ with ESMTP id 8C2Y4fp1TumE for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 15:20:19 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47D8740CB9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E581540D44
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:18 -0400 (EDT)
 In-Reply-To: <20170321192058.9300-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,35 +28,75 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Keerthy <j-keerthy@ti.com>
+Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Russell King <rmk+kernel@armlinux.org.uk>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we have an infrastructure to handle hypercalls in the KVM
-init code, let's implement HVC_GET_VECTORS there.
+From: Russell King <rmk+kernel@armlinux.org.uk>
 
-Reviewed-by: James Morse <james.morse@arm.com>
+Improve the hyp-stub ABI to allow it to do more than just get/set the
+vectors.  We follow the example in ARM64, where r0 is used as an opcode
+with the other registers as an argument.
+
+Tested-by: Keerthy <j-keerthy@ti.com>
+Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp-init.S | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/arm/kernel/hyp-stub.S | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 6cf98ccd10f2..1d89995378e9 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -124,7 +124,12 @@ __do_hyp_init:
- ENDPROC(__kvm_hyp_init)
+diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
+index 15d073ae5da2..f3e9ba5fb642 100644
+--- a/arch/arm/kernel/hyp-stub.S
++++ b/arch/arm/kernel/hyp-stub.S
+@@ -22,6 +22,9 @@
+ #include <asm/assembler.h>
+ #include <asm/virt.h>
  
- ENTRY(__kvm_handle_stub_hvc)
--	cmp	x0, #HVC_RESET_VECTORS
-+	cmp	x0, #HVC_GET_VECTORS
-+	b.ne	1f
-+	mrs	x0, vbar_el2
-+	b	exit
++#define HVC_GET_VECTORS 0
++#define HVC_SET_VECTORS 1
 +
-+1:	cmp	x0, #HVC_RESET_VECTORS
- 	b.ne	1f
- 	/*
- 	 * Reset kvm back to the hyp stub.
+ #ifndef ZIMAGE
+ /*
+  * For the kernel proper, we need to find out the CPU boot mode long after
+@@ -202,9 +205,19 @@ ARM_BE8(orr	r7, r7, #(1 << 25))     @ HSCTLR.EE
+ ENDPROC(__hyp_stub_install_secondary)
+ 
+ __hyp_stub_do_trap:
+-	cmp	r0, #-1
+-	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
+-	mcrne	p15, 4, r0, c12, c0, 0	@ set HVBAR
++	teq	r0, #HVC_GET_VECTORS
++	bne	1f
++	mrc	p15, 4, r0, c12, c0, 0	@ get HVBAR
++	b	__hyp_stub_exit
++
++1:	teq	r0, #HVC_SET_VECTORS
++	bne	1f
++	mcr	p15, 4, r1, c12, c0, 0	@ set HVBAR
++	b	__hyp_stub_exit
++
++1:	mov	r0, #-1
++
++__hyp_stub_exit:
+ 	__ERET
+ ENDPROC(__hyp_stub_do_trap)
+ 
+@@ -231,10 +244,14 @@ ENDPROC(__hyp_stub_do_trap)
+  * initialisation entry point.
+  */
+ ENTRY(__hyp_get_vectors)
+-	mov	r0, #-1
++	mov	r0, #HVC_GET_VECTORS
++	__HVC(0)
++	ret	lr
+ ENDPROC(__hyp_get_vectors)
+-	@ fall through
++
+ ENTRY(__hyp_set_vectors)
++	mov	r1, r0
++	mov	r0, #HVC_SET_VECTORS
+ 	__HVC(0)
+ 	ret	lr
+ ENDPROC(__hyp_set_vectors)
 -- 
 2.11.0
