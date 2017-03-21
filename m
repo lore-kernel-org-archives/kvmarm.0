@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 03/28] arm64: hyp-stub: Don't save lr in the EL1 code
-Date: Tue, 21 Mar 2017 19:20:33 +0000
-Message-ID: <20170321192058.9300-4-marc.zyngier@arm.com>
+Subject: [PATCH v4 05/28] arm64: KVM: Implement HVC_RESET_VECTORS stub
+ hypercall in the init code
+Date: Tue, 21 Mar 2017 19:20:35 +0000
+Message-ID: <20170321192058.9300-6-marc.zyngier@arm.com>
 References: <20170321192058.9300-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F95540C90
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 376DC40C26
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yKd-jq3hwlPM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 15:20:05 -0400 (EDT)
+ with ESMTP id 4XYIRrBFq+Ly for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 15:20:09 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF1F340C2A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7218340C72
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 15:20:09 -0400 (EDT)
 In-Reply-To: <20170321192058.9300-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,36 +32,65 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The EL2 code is not corrupting lr anymore, so don't bother preserving
-it in the EL1 trampoline code.
+In order to restore HYP mode to its original condition, KVM currently
+implements __kvm_hyp_reset(). As we're moving towards a hyp-stub
+defined API, it becomes necessary to implement HVC_RESET_VECTORS.
 
+This patch adds the HVC_RESET_VECTORS hypercall to the KVM init
+code, which so far lacked any form of hypercall support.
+
+Reviewed-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kernel/hyp-stub.S | 4 ----
- 1 file changed, 4 deletions(-)
+ arch/arm64/kvm/hyp-init.S | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index e4215ad06930..193dfb25ce2f 100644
---- a/arch/arm64/kernel/hyp-stub.S
-+++ b/arch/arm64/kernel/hyp-stub.S
-@@ -116,18 +116,14 @@ ENDPROC(\label)
-  */
+diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
+index 6b29d3d9e1f2..6cf98ccd10f2 100644
+--- a/arch/arm64/kvm/hyp-init.S
++++ b/arch/arm64/kvm/hyp-init.S
+@@ -22,6 +22,7 @@
+ #include <asm/kvm_mmu.h>
+ #include <asm/pgtable-hwdef.h>
+ #include <asm/sysreg.h>
++#include <asm/virt.h>
  
- ENTRY(__hyp_get_vectors)
--	str	lr, [sp, #-16]!
- 	mov	x0, #HVC_GET_VECTORS
- 	hvc	#0
--	ldr	lr, [sp], #16
- 	ret
- ENDPROC(__hyp_get_vectors)
+ 	.text
+ 	.pushsection	.hyp.idmap.text, "ax"
+@@ -58,6 +59,9 @@ __invalid:
+ 	 * x2: HYP vectors
+ 	 */
+ __do_hyp_init:
++	/* Check for a stub HVC call */
++	cmp	x0, #HVC_STUB_HCALL_NR
++	b.lo	__kvm_handle_stub_hvc
  
- ENTRY(__hyp_set_vectors)
--	str	lr, [sp, #-16]!
- 	mov	x1, x0
- 	mov	x0, #HVC_SET_VECTORS
- 	hvc	#0
--	ldr	lr, [sp], #16
- 	ret
- ENDPROC(__hyp_set_vectors)
+ 	msr	ttbr0_el2, x0
+ 
+@@ -119,6 +123,9 @@ __do_hyp_init:
+ 	eret
+ ENDPROC(__kvm_hyp_init)
+ 
++ENTRY(__kvm_handle_stub_hvc)
++	cmp	x0, #HVC_RESET_VECTORS
++	b.ne	1f
+ 	/*
+ 	 * Reset kvm back to the hyp stub.
+ 	 */
+@@ -133,9 +140,14 @@ ENTRY(__kvm_hyp_reset)
+ 	/* Install stub vectors */
+ 	adr_l	x0, __hyp_stub_vectors
+ 	msr	vbar_el2, x0
++	b	exit
+ 
++1:	mov	x0, #-1
++
++exit:
+ 	eret
+ ENDPROC(__kvm_hyp_reset)
++ENDPROC(__kvm_handle_stub_hvc)
+ 
+ 	.ltorg
+ 
 -- 
 2.11.0
