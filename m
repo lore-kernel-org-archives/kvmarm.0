@@ -1,25 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 5/9] KVM: arm/arm64: vgic: Get rid of unnecessary
- save_maint_int_state
-Date: Tue, 21 Mar 2017 11:44:37 +0000
-Message-ID: <99019ceb-d811-dad1-c46e-77a9d2d05664@arm.com>
+Subject: Re: [PATCH 6/9] KVM: arm/arm64: vgic: Get rid of MISR and EISR fields
+Date: Tue, 21 Mar 2017 11:45:26 +0000
+Message-ID: <17272a3a-0408-77ee-8f46-58eb5d7db029@arm.com>
 References: <20170320105818.20481-1-cdall@linaro.org>
- <20170320105818.20481-6-cdall@linaro.org>
+ <20170320105818.20481-7-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF39540BDA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 07:42:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE75440BDA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 07:43:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xlG5pbByLmQ8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 07:42:53 -0400 (EDT)
+ with ESMTP id CpAW9L+JxtOu for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 07:43:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A038940BD2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 07:42:53 -0400 (EDT)
-In-Reply-To: <20170320105818.20481-6-cdall@linaro.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BEA940BD2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 07:43:43 -0400 (EDT)
+In-Reply-To: <20170320105818.20481-7-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,8 +35,7 @@ List-Id: kvmarm@lists.cs.columbia.edu
 On 20/03/17 10:58, Christoffer Dall wrote:
 > From: Christoffer Dall <christoffer.dall@linaro.org>
 > 
-> Now when we don't look at the MISR and EISR values anymore, we can get
-> rid of the logic to save them in the GIC save/restore code.
+> We don't use these fields anymore so let's nuke them completely.
 > 
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 
