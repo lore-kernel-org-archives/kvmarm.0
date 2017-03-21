@@ -1,25 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v2 04/10] KVM: arm/arm64: vgic: Only set underflow when
- actually out of LRs
-Date: Tue, 21 Mar 2017 22:10:53 +0100
-Message-ID: <20170321211059.8719-5-cdall@linaro.org>
+Subject: [PATCH v2 02/10] KVM: arm/arm64: vgic: Avoid flushing vgic state when
+ there's no pending IRQ
+Date: Tue, 21 Mar 2017 22:10:51 +0100
+Message-ID: <20170321211059.8719-3-cdall@linaro.org>
 References: <20170321211059.8719-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82AEA40C7D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 17:09:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0224C40C41
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 17:09:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e0ruu6V10ZPL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 17:09:18 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 138C940C4E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 17:09:18 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id n11so21249237wma.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 14:11:05 -0700 (PDT)
+ with ESMTP id fJYTpdeRKYsp for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 17:09:16 -0400 (EDT)
+Received: from mail-wr0-f172.google.com (mail-wr0-f172.google.com
+ [209.85.128.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 198C940C54
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 17:09:15 -0400 (EDT)
+Received: by mail-wr0-f172.google.com with SMTP id u108so119562237wrb.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 14:11:03 -0700 (PDT)
 In-Reply-To: <20170321211059.8719-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,57 +32,69 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Shih-Wei Li <shihwei@cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently assume that all the interrupts in our AP list will be
-queued to LRs, but that's not necessarily the case, because some of them
-could have been migrated away to different VCPUs and only the VCPU
-thread itself can remove interrupts from its AP list.
+From: Shih-Wei Li <shihwei@cs.columbia.edu>
 
-Therefore, slightly change the logic to only setting the underflow
-interrupt when we actually run out of LRs.
+We do not need to flush vgic states in each world switch unless
+there is pending IRQ queued to the vgic's ap list. We can thus reduce
+the overhead by not grabbing the spinlock and not making the extra
+function call to vgic_flush_lr_state.
 
-As it turns out, this allows us to further simplify the handling in
-vgic_sync_hwstate in later patches.
+Note: list_empty is a single atomic read (uses READ_ONCE) and can
+therefore check if a list is empty or not without the need to take the
+spinlock protecting the list.
 
+Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
 Changes since v1:
- - New patch
+ - Added comment in kvm_vgic_flush_hwstate
 
- virt/kvm/arm/vgic/vgic.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ virt/kvm/arm/vgic/vgic.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 1043291..442f7df 100644
+index 2ac0def..1043291 100644
 --- a/virt/kvm/arm/vgic/vgic.c
 +++ b/virt/kvm/arm/vgic/vgic.c
-@@ -601,10 +601,8 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+@@ -637,12 +637,17 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ /* Sync back the hardware VGIC state into our emulation after a guest's run. */
+ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++
+ 	if (unlikely(!vgic_initialized(vcpu->kvm)))
+ 		return;
  
- 	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
+ 	vgic_process_maintenance_interrupt(vcpu);
+ 	vgic_fold_lr_state(vcpu);
+ 	vgic_prune_ap_list(vcpu);
++
++	/* Make sure we can fast-path in flush_hwstate */
++	vgic_cpu->used_lrs = 0;
+ }
  
--	if (compute_ap_list_depth(vcpu) > kvm_vgic_global_state.nr_lr) {
--		vgic_set_underflow(vcpu);
-+	if (compute_ap_list_depth(vcpu) > kvm_vgic_global_state.nr_lr)
- 		vgic_sort_ap_list(vcpu);
--	}
+ /* Flush our emulation state into the GIC hardware before entering the guest. */
+@@ -651,6 +656,18 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	if (unlikely(!vgic_initialized(vcpu->kvm)))
+ 		return;
  
- 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
- 		spin_lock(&irq->irq_lock);
-@@ -623,8 +621,12 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
- next:
- 		spin_unlock(&irq->irq_lock);
- 
--		if (count == kvm_vgic_global_state.nr_lr)
-+		if (count == kvm_vgic_global_state.nr_lr) {
-+			if (!list_is_last(&irq->ap_list,
-+					  &vgic_cpu->ap_list_head))
-+				vgic_set_underflow(vcpu);
- 			break;
-+		}
- 	}
- 
- 	vcpu->arch.vgic_cpu.used_lrs = count;
++	/*
++	 * If there are no virtual interrupts active or pending for this
++	 * VCPU, then there is no work to do and we can bail out without
++	 * taking any lock.  There is a potential race with someone injecting
++	 * interrupts to the VCPU, but it is a benign race as the VCPU will
++	 * either observe the new interrupt before or after doing this check,
++	 * and introducing additional synchronization mechanism doesn't change
++	 * this.
++	 */
++	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
++		return;
++
+ 	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
+ 	vgic_flush_lr_state(vcpu);
+ 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
 -- 
 2.9.0
