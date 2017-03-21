@@ -1,196 +1,199 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v3 08/19] KVM: arm64: ITS: Interpret MAPD Size field and
- check related errors
-Date: Tue, 21 Mar 2017 17:57:14 +0000
-Message-ID: <3d1ad0a8-ef14-0cf0-80c3-5c9f94606651@arm.com>
+Subject: Re: [PATCH v3 14/19] KVM: arm64: ITS: Add infrastructure for table
+ lookup
+Date: Tue, 21 Mar 2017 18:12:40 +0000
+Message-ID: <841f3278-b101-b920-c4a9-0d97b34c9a8a@arm.com>
 References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
- <1488800074-21991-9-git-send-email-eric.auger@redhat.com>
- <7daaac71-1dbf-94c9-2b6b-fadf94a5b776@arm.com>
- <22002901-88f6-119f-8465-3557fa4bd8e6@redhat.com>
+ <1488800074-21991-15-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6972040C28
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:53:35 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MslwbLFEV-X1 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 13:53:34 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FAA940A14
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 13:53:34 -0400 (EDT)
-In-Reply-To: <22002901-88f6-119f-8465-3557fa4bd8e6@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1488800074-21991-15-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Prasun.Kapoor@cavium.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+Hi,
 
-On 21/03/17 17:40, Auger Eric wrote:
-> Hi Andre,
+On 06/03/17 11:34, Eric Auger wrote:
+> Add a generic lookup_table() helper whose role consists in
+> scanning a contiguous table located in guest RAM and applying
+> a callback on each entry. Entries can be handled as linked lists
+> since the callback may return an offset to the next entry and
+> also tell that an entry is the last one.
 > 
-> On 17/03/2017 16:03, Andre Przywara wrote:
->> Hi,
->>
->> On 06/03/17 11:34, Eric Auger wrote:
->>> Up to now the MAPD's ITT size field has been ignored. It encodes
->>> the number of eventid bit minus 1. It should be used to check
->>> the eventid when a MAPTI command is issued on a device. Let's
->>> store the nb_eventid_bits in the its_device and do the check
->>> on MAPTI. Also make sure the ITT size field does not exceed the
->>> GITS_TYPER IDBITS field.
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>
->>> ---
->>> ---
->>>  include/linux/irqchip/arm-gic-v3.h |  2 ++
->>>  virt/kvm/arm/vgic/vgic-its.c       | 14 +++++++++++++-
->>>  2 files changed, 15 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
->>> index d81f10f..a7a5548 100644
->>> --- a/include/linux/irqchip/arm-gic-v3.h
->>> +++ b/include/linux/irqchip/arm-gic-v3.h
->>> @@ -338,9 +338,11 @@
->>>  #define E_ITS_INT_UNMAPPED_INTERRUPT		0x010307
->>>  #define E_ITS_CLEAR_UNMAPPED_INTERRUPT		0x010507
->>>  #define E_ITS_MAPD_DEVICE_OOR			0x010801
->>> +#define E_ITS_MAPD_ITTSIZE_OOR			0x010802
->>>  #define E_ITS_MAPC_PROCNUM_OOR			0x010902
->>>  #define E_ITS_MAPC_COLLECTION_OOR		0x010903
->>>  #define E_ITS_MAPTI_UNMAPPED_DEVICE		0x010a04
->>> +#define E_ITS_MAPTI_ID_OOR			0x010a05
->>>  #define E_ITS_MAPTI_PHYSICALID_OOR		0x010a06
->>>  #define E_ITS_INV_UNMAPPED_INTERRUPT		0x010c07
->>>  #define E_ITS_INVALL_UNMAPPED_COLLECTION	0x010d09
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index 6d84508..56bcd92 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -99,6 +99,7 @@ struct its_device {
->>>  
->>>  	/* the head for the list of ITTEs */
->>>  	struct list_head itt_head;
->>> +	u32 nb_eventid_bits;
->>>  	u32 device_id;
->>>  };
->>>  
->>> @@ -177,6 +178,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
->>>  #define GIC_LPI_OFFSET 8192
->>>  
->>>  #define VITS_ESZ 8
->>> +#define VITS_TYPER_IDBITS 0xF
->>
->> Alone for consistency reasons I'd use "16" here and subtract one upon
->> encoding this into the TYPER register.
-> OK done
->>
->>>  
->>>  /*
->>>   * Finds and returns a collection in the ITS collection table.
->>> @@ -400,7 +402,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
->>>  	 * DevBits low - as least for the time being.
->>>  	 */
->>>  	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
->>> -	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
->>> +	reg |= VITS_TYPER_IDBITS << GITS_TYPER_IDBITS_SHIFT;
->>>  	reg |= (VITS_ESZ - 1) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
->>>  
->>>  	return extract_bytes(reg, addr & 7, len);
->>> @@ -560,6 +562,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
->>>  #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
->>>  #define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
->>>  #define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
->>> +#define its_cmd_get_size(cmd)		its_cmd_mask_field(cmd, 1, 0,  5)
->>
->> Can you please move this up to be in order with the other fields?
-> done
->>
->>>  /*
->>>   * The DISCARD command frees an Interrupt Translation Table Entry (ITTE).
->>> @@ -745,6 +748,9 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
->>>  	if (!device)
->>>  		return E_ITS_MAPTI_UNMAPPED_DEVICE;
->>>  
->>> +	if (event_id >= (2 << device->nb_eventid_bits))
->>
->> And I'd find it less confusing to hold the actual bit size in
->> nb_eventid_bits (and abstract from the particular encoding in TYPER).
->> That would avoid this slightly odd (2 << ...) here, for instance.
-> OK I replaced nb_eventid_bits by nb_eventids which corresponds to the
-> the max number of eventids for this device
+> Helper functions also are added to compute the device/event ID
+> offset to the next DTE/ITE.
 > 
-> More than odd, the shift is completely wrong. Now I use BIT_ULL() as you
-> mentioned later on.
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 119 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 119 insertions(+)
 > 
-> The only drawback is that when flushing the DTE I need to use ilog2 to
-> encode the size field again.
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 1cd6ae6..cf04776 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -181,6 +181,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+>  #define VITS_ESZ 8
+>  #define VITS_TYPER_IDBITS 0xF
+>  #define VITS_TYPER_DEVBITS 0xF
+> +#define VITS_DTE_MAX_DEVID_OFFSET GENMASK(19, 0)
+> +#define VITS_ITE_MAX_EVENTID_OFFSET GENMASK(16, 0)
 
-Oh sorry, I am fine (and actually prefer) to encode the number of bits,
-but the *actual* number of bits, not something like -1. This seems to be
-a bit inconsistent throughout the series, I was suspecting that those "2
-<< x" expressions were to take care of the -1/+1 encoding.
-The problem with using the actual number (apart from the ilog2 issue) is
-that you can't really cover exactly 32 bits worth of devices.
+GENMASK here is a bit misleading, I think (BIT(20) - 1) would be
+clearer, wouldn't it?
 
-So sorry for the confusion, and hope you can easily revert your change ;-)
+>  
+>  /*
+>   * Finds and returns a collection in the ITS collection table.
+> @@ -1607,6 +1609,123 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+>  	return 0;
+>  }
+>  
+> +static u32 compute_next_devid_offset(struct list_head *h,
+> +				     struct its_device *dev)
+> +{
+> +	struct list_head *e = &dev->dev_list;
+> +	struct its_device *next;
+> +	u32 next_offset;
+> +
+> +	if (e->next == h)
+> +		return 0;
+> +	next = list_entry(e->next, struct its_device, dev_list);
+> +	next_offset = next->device_id - dev->device_id;
+> +
+> +	return next_offset < VITS_DTE_MAX_DEVID_OFFSET ?
+> +			next_offset : VITS_DTE_MAX_DEVID_OFFSET;
+
+	return min(next_offset, VITS_DTE_MAX_DEVID_OFFSET);
+
+> +}
+> +
+> +static u32 compute_next_eventid_offset(struct list_head *h,
+> +				       struct its_ite *ite)
+> +{
+> +	struct list_head *e = &ite->ite_list;
+> +	struct its_ite *next;
+> +	u32 next_offset;
+> +
+> +	if (e->next == h)
+> +		return 0;
+> +	next = list_entry(e->next, struct its_ite, ite_list);
+> +	next_offset = next->event_id - ite->event_id;
+> +
+> +	return next_offset < VITS_ITE_MAX_EVENTID_OFFSET ?
+> +			next_offset : VITS_ITE_MAX_EVENTID_OFFSET;
+
+	return min(next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
+
+> +}
+> +
+> +static int next_segment(unsigned long len, int offset)
+
+Isn't "segment" a page, really? And thus should be named like this?
+
+> +{
+> +	if (len > PAGE_SIZE - offset)
+> +		return PAGE_SIZE - offset;
+> +	else
+> +		return len;
+> +}
+
+Can be: return min(len, PAGE_SIZE - offset); which means it could be a
+macro even.
+
+> +
+> +/**
+> + * entry_fn_t - Callback called on a table entry restore path
+> + * @its: its handle
+> + * @id: id of the entry
+> + * @addr: kernel VA of the entry
+> + * @opaque: pointer to an opaque data
+> + * @next_offset: minimal ID offset to the next entry. 0 if this
+> + * entry is the last one, 1 if the entry is invalid, >= 1 if an
+> + * entry's next_offset field was truly decoded
+> + *
+> + * Return: < 0 on error, 0 otherwise
+> + */
+> +typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *addr,
+> +			  void *opaque, u32 *next_offset);
+> +
+> +/**
+> + * lookup_table - scans a contiguous table in guest RAM and applies a function
+> + * to each entry
+> + *
+> + * @its: its handle
+> + * @base: base gpa of the table
+> + * @size: size of the table in bytes
+> + * @esz: entry size in bytes
+> + * @start_id: first entry's ID
+> + * @fn: function to apply on each entry
+> + *
+> + * Return: < 0 on error, 1 if last element identified, 0 otherwise
+> + */
+> +static int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
+
+   ^^^^^^
+Won't this trigger a build warning when building at this patch only?
+
+The rest looks fine.
 
 Cheers,
-Andre.
+Andre
 
->>
->>> +		return E_ITS_MAPTI_ID_OOR;
->>> +
->>>  	if (its_cmd_get_command(its_cmd) == GITS_CMD_MAPTI)
->>>  		lpi_nr = its_cmd_get_physical_id(its_cmd);
->>>  	else
->>> @@ -825,11 +831,15 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->>>  {
->>>  	u32 device_id = its_cmd_get_deviceid(its_cmd);
->>>  	bool valid = its_cmd_get_validbit(its_cmd);
->>> +	size_t size = its_cmd_get_size(its_cmd);
->>
->> If you add 1 here, you'd make clear that this is an encoding property.
-> done
+
+> +			int start_id, entry_fn_t fn, void *opaque)
+> +{
+> +	gpa_t gpa = base, top = base + size - 1;
+> +	unsigned long len = top - gpa;
+> +	int ret, seg, offset = offset_in_page(gpa);
+> +	gfn_t gfn = gpa >> PAGE_SHIFT;
+> +	u32 id = start_id + (gpa - base)/esz;
+> +	struct kvm *kvm = its->dev->kvm;
+> +	kvm_pfn_t pfn;
+> +
+> +	while ((seg = next_segment(len, offset)) != 0) {
+> +		u32 next_offset;
+> +		bool writeable;
+> +		void *addr;
+> +
+> +		pfn = gfn_to_pfn_prot(kvm, gfn, true, &writeable);
+> +		if (is_error_noslot_pfn(pfn))
+> +			return -EINVAL;
+> +		addr = phys_to_virt((u64)pfn << PAGE_SHIFT);
+> +		addr += offset;
+> +
+> +		while (seg > 0) {
+> +			size_t byte_offset;
+> +
+> +			ret = fn(its, id, addr, opaque, &next_offset);
+> +			if (ret < 0 || (!ret && !next_offset))
+> +				goto out;
+> +
+> +			byte_offset = next_offset * esz;
+> +
+> +			id += next_offset;
+> +			gpa += byte_offset;
+> +			addr += byte_offset;
+> +			seg -= byte_offset;
+> +		}
+> +		kvm_release_pfn_clean(pfn);
+> +
+> +		len = top - gpa;
+> +		offset = offset_in_page(gpa);
+> +		gfn = gpa >> PAGE_SHIFT;
+> +		id = start_id + (gpa - base)/esz;
+> +	}
+> +	return 0;
+> +out:
+> +	kvm_release_pfn_clean(pfn);
+> +	return (ret < 0 ? ret : 1);
+> +}
+> +
+>  /**
+>   * vgic_its_flush_pending_tables - Flush the pending tables into guest RAM
+>   */
 > 
-> Thanks
-> 
-> Eric
-> 
->>
->> Cheers,
->> Andre.
->>
->>>  	struct its_device *device;
->>>  
->>>  	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
->>>  		return E_ITS_MAPD_DEVICE_OOR;
->>>  
->>> +	if (valid && size > VITS_TYPER_IDBITS)
->>> +		return E_ITS_MAPD_ITTSIZE_OOR;
->>> +
->>>  	device = find_its_device(its, device_id);
->>>  
->>>  	/*
->>> @@ -852,6 +862,8 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->>>  		return -ENOMEM;
->>>  
->>>  	device->device_id = device_id;
->>> +	device->nb_eventid_bits = size + 1;
->>> +
->>>  	INIT_LIST_HEAD(&device->itt_head);
->>>  
->>>  	list_add_tail(&device->dev_list, &its->device_list);
->>>
