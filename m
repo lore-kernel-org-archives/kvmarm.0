@@ -1,24 +1,28 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v3 17/19] KVM: arm64: ITS: ITT flush and restore
-Date: Tue, 21 Mar 2017 18:13:43 +0000
-Message-ID: <41f6b5b7-275e-8752-cdd7-96bb1e53ab04@arm.com>
-References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
- <1488800074-21991-18-git-send-email-eric.auger@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 01/25] arm64: hyp-stub: Implement HVC_RESET_VECTORS
+ stub hypercall
+Date: Tue, 21 Mar 2017 18:36:51 +0000
+Message-ID: <8b0b5948-368f-530c-cd64-7b97dbe2312a@arm.com>
+References: <20170306142458.8875-1-marc.zyngier@arm.com>
+ <20170306142458.8875-2-marc.zyngier@arm.com>
+ <20170321170407.GD21829@e104818-lin.cambridge.arm.com>
+ <58D1620E.30001@arm.com> <0cce34c1-cb6f-0ba3-ac98-c0a0e986dc86@arm.com>
+ <58D165E2.7050501@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DE5140BC4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 14:10:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5DE240C2E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 14:35:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3mJf17n7+R-U for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 14:10:02 -0400 (EDT)
+ with ESMTP id ZOmLHSKwa3YB for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 14:35:07 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EDCD40A54
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 14:10:01 -0400 (EDT)
-In-Reply-To: <1488800074-21991-18-git-send-email-eric.auger@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4E1140C22
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 14:35:07 -0400 (EDT)
+In-Reply-To: <58D165E2.7050501@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,153 +32,123 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
+To: James Morse <james.morse@arm.com>
+Cc: cdall@linaro.org, Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 06/03/17 11:34, Eric Auger wrote:
-> Introduce routines to flush and restore device ITT and their
-> interrupt table entries (ITE).
+On 21/03/17 17:41, James Morse wrote:
+> On 21/03/17 17:37, Marc Zyngier wrote:
+>> On 21/03/17 17:25, James Morse wrote:
+>>> On 21/03/17 17:04, Catalin Marinas wrote:
+>>>> On Mon, Mar 06, 2017 at 02:24:34PM +0000, Marc Zyngier wrote:
+>>>>> Let's define a new stub hypercall that resets the HYP configuration
+>>>>> to its default: hyp-stub vectors, and MMU disabled.
+>>>>>
+>>>>> Of course, for the hyp-stub itself, this is a trivial no-op.
+>>>>> Hypervisors will have a bit more work to do.
+>>>>>
+>>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>>>> ---
+>>>>>  arch/arm64/include/asm/virt.h |  9 +++++++++
+>>>>>  arch/arm64/kernel/hyp-stub.S  | 13 ++++++++++++-
+>>>>>  2 files changed, 21 insertions(+), 1 deletion(-)
+>>>> [...]
+>>>>> +ENTRY(__hyp_reset_vectors)
+>>>>> +	str	lr, [sp, #-16]!
+>>>>> +	mov	x0, #HVC_RESET_VECTORS
+>>>>> +	hvc	#0
+>>>>> +	ldr	lr, [sp], #16
+>>>>> +	ret
+>>>>> +ENDPROC(__hyp_reset_vectors)
+>>>>
+>>>> Why do we need to specifically preserve lr across the hvc call? Is it
+>>>> corrupted by the EL2 code (if yes, are other caller-saved registers that
+>>>> need preserving)? I don't see something similar in the arch/arm code.
+>>>
+>>> Kexec on arm64 needed a register to clobber in the hyp-stub's el1_sync code. We
+>>> wanted to preserve all the registers so soft_restart() could look more like a
+>>> function call.
+>>
+>> I don't think we need this anymore. Once we enter __cpu_soft_restart(),
+>> there is no turning back. Or am I missing something else?
 > 
-> The routines will be called on device table flush and
-> restore.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> v2 -> v3:
-> - add return 0 in vgic_its_restore_ite (was in subsequent patch)
-> 
-> v2: creation
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 100 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 100 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 1060125..a216849 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1748,6 +1748,106 @@ static int vgic_its_restore_pending_tables(struct vgic_its *its)
->  	return -ENXIO;
->  }
->  
-> +static int vgic_its_flush_ite(struct vgic_its *its, struct its_device *dev,
-> +			      struct its_ite *ite, gpa_t gpa)
-> +{
-> +	struct kvm *kvm = its->dev->kvm;
-> +	u32 next_offset;
-> +	u64 val;
-> +
-> +	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
-> +	val = ((u64)next_offset << 48) | ((u64)ite->lpi << 16) |
-> +		ite->collection->collection_id;
-> +	val = cpu_to_le64(val);
-> +	return kvm_write_guest(kvm, gpa, &val, VITS_ESZ);
-> +}
-> +
-> +/**
-> + * vgic_its_restore_ite - restore an interrupt translation entry
-> + * @event_id: id used for indexing
-> + * @ptr: kernel VA where the 8 byte ITE is located
-> + * @opaque: pointer to the its_device
-> + * @next: id offset to the next entry
-> + */
-> +static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
-> +				void *ptr, void *opaque, u32 *next)
-> +{
-> +	struct its_device *dev = (struct its_device *)opaque;
-> +	struct its_collection *collection;
-> +	struct kvm *kvm = its->dev->kvm;
-> +	u64 val, *p = (u64 *)ptr;
-> +	struct vgic_irq *irq;
-> +	u32 coll_id, lpi_id;
-> +	struct its_ite *ite;
-> +	int ret;
-> +
-> +	val = *p;
-> +	*next = 1;
-> +
-> +	val = le64_to_cpu(val);
-> +
-> +	coll_id = val & GENMASK_ULL(15, 0);
-> +	lpi_id = (val & GENMASK_ULL(47, 16)) >> 16;
-> +
-> +	if (!lpi_id)
-> +		return 0;
-> +
-> +	*next = (val & GENMASK_ULL(63, 48)) >> 48;
+> My recollection of the history may be wrong: but we needed to mess with esr_el2
+> before we know its a soft_restart() call, at which point we didn't want to
+> clobber the registers. This was the strange use of x18 in kexec.
 
-No need for the mask here, just ">> 48" would be enough.
+After a bit of digging together with James, we found the guilty one.
+The hyp-stub entry code uses lr (aka x30) as a scratch register to 
+find out if we've made it here via a HVC instruction. This is an 
+absolutely pointless test, because by definition HVC is the only way to 
+get there.
 
-> +
-> +	collection = find_collection(its, coll_id);
-> +	if (!collection)
-> +		return -EINVAL;
-> +
-> +	ret = vgic_its_alloc_ite(dev, &ite, collection,
-> +				  lpi_id, event_id);
-> +	if (ret)
-> +		return ret;
-> +
-> +	irq = vgic_add_lpi(kvm, lpi_id);
-> +	if (IS_ERR(irq))
-> +		return PTR_ERR(irq);
-> +	ite->irq = irq;
-> +
-> +	/* restore the configuration of the LPI */
-> +	ret = update_lpi_config(kvm, irq, NULL);
-> +	if (ret)
-> +		return ret;
-> +
-> +	update_affinity_ite(kvm, ite);
-> +	return 0;
-> +}
-> +
-> +static int vgic_its_flush_itt(struct vgic_its *its, struct its_device *device)
-> +{
-> +	gpa_t base = device->itt_addr;
-> +	struct its_ite *ite;
-> +	int ret;
-> +
-> +	list_for_each_entry(ite, &device->itt_head, ite_list) {
-> +		gpa_t gpa = base + ite->event_id * VITS_ESZ;
-> +
-> +		ret = vgic_its_flush_ite(its, device, ite, gpa);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +	return 0;
-> +}
-> +
-> +static int vgic_its_restore_itt(struct vgic_its *its,
-> +				struct its_device *dev)
-> +{
-> +	size_t max_size = (2 << dev->nb_eventid_bits) * VITS_ESZ;
+I've ended up with the following patch:
 
-I think that depends on your usage of nb_eventid_bits, but this "2 <<"
-is really confusing here. So I really think you should just hold the
-actual number of bits in this variable and handle the +/- 1 encoding
-just once when sourcing the information.
+diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+index 8ccdd549f7c7..210bd6b3849d 100644
+--- a/arch/arm64/kernel/hyp-stub.S
++++ b/arch/arm64/kernel/hyp-stub.S
+@@ -55,12 +55,6 @@ ENDPROC(__hyp_stub_vectors)
+ 	.align 11
+ 
+ el1_sync:
+-	mrs	x30, esr_el2
+-	lsr	x30, x30, #ESR_ELx_EC_SHIFT
+-
+-	cmp	x30, #ESR_ELx_EC_HVC64
+-	b.ne	9f				// Not an HVC trap
+-
+ 	cmp	x0, #HVC_SET_VECTORS
+ 	b.ne	2f
+ 	msr	vbar_el2, x1
+@@ -120,18 +114,14 @@ ENDPROC(\label)
+  */
+ 
+ ENTRY(__hyp_set_vectors)
+-	str	lr, [sp, #-16]!
+ 	mov	x1, x0
+ 	mov	x0, #HVC_SET_VECTORS
+ 	hvc	#0
+-	ldr	lr, [sp], #16
+ 	ret
+ ENDPROC(__hyp_set_vectors)
+ 
+ ENTRY(__hyp_reset_vectors)
+-	str	lr, [sp, #-16]!
+ 	mov	x0, #HVC_RESET_VECTORS
+ 	hvc	#0
+-	ldr	lr, [sp], #16
+ 	ret
+ ENDPROC(__hyp_reset_vectors)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 1277f81b63b7..5170ce1021da 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -32,17 +32,17 @@
+ 	 * Shuffle the parameters before calling the function
+ 	 * pointed to in x0. Assumes parameters in x[1,2,3].
+ 	 */
++	str	lr, [sp, #-16]!
+ 	mov	lr, x0
+ 	mov	x0, x1
+ 	mov	x1, x2
+ 	mov	x2, x3
+ 	blr	lr
++	ldr	lr, [sp], #16
+ .endm
+ 
+ ENTRY(__vhe_hyp_call)
+-	str	lr, [sp, #-16]!
+ 	do_el2_call
+-	ldr	lr, [sp], #16
+ 	/*
+ 	 * We used to rely on having an exception return to get
+ 	 * an implicit isb. In the E2H case, we don't have it anymore.
 
-The rest looks fine.
+I'll split that in convenient patches and repost the series.
 
-Cheers,
-Andre.
+Thanks,
 
-> +	gpa_t base = dev->itt_addr;
-> +	int ret;
-> +
-> +	ret =  lookup_table(its, base, max_size, VITS_ESZ, 0,
-> +			    vgic_its_restore_ite, dev);
-> +
-> +	if (ret < 0)
-> +		return ret;
-> +	return 0;
-> +}
-> +
->  /**
->   * vgic_its_flush_device_tables - flush the device table and all ITT
->   * into guest RAM
-> 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
