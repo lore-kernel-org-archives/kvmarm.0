@@ -1,31 +1,25 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
-Date: Tue, 21 Mar 2017 12:34:28 +0100
-Message-ID: <20170321113428.GC15920@cbox>
-References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
- <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
- <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
- <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
- <58CFF058.8020205@arm.com>
- <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 4/9] KVM: arm/arm64: vgic: Get rid of unnecessary
+ process_maintenance operation
+Date: Tue, 21 Mar 2017 11:36:19 +0000
+Message-ID: <0da4b9c8-8631-e0f0-0ead-e9f65746b529@arm.com>
+References: <20170320105818.20481-1-cdall@linaro.org>
+ <20170320105818.20481-5-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F40C940C2A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 07:32:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39B9540C2A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 07:34:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1tI39JH0eOBh for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 07:32:44 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7590640C26
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 07:32:44 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id n11so9850381wma.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 04:34:30 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
+ with ESMTP id trrG+cEthynN for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Mar 2017 07:34:36 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 91A5740C26
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 07:34:36 -0400 (EDT)
+In-Reply-To: <20170320105818.20481-5-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,146 +29,256 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, huangshaoyu@huawei.com, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 21, 2017 at 02:32:29PM +0800, gengdongjiu wrote:
+On 20/03/17 10:58, Christoffer Dall wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
 > 
+> Since we always read back the LRs that we wrote to the guest and the
+> MISR and EISR registers simply provide a summary of the configuration of
+> the bits in the LRs, there is really no need to read back those status
+> registers and process them.  We can might as well just signal the
+> notifyfd when folding the LR state and save some cycles in the process.
 > 
-> On 2017/3/20 23:08, James Morse wrote:
-> > Hi Dongjiu Geng,
-> > 
-> > On 20/03/17 13:58, Marc Zyngier wrote:
-> >> On 20/03/17 12:28, gengdongjiu wrote:
-> >>> On 2017/3/20 19:24, Marc Zyngier wrote:
-> >>>> Please include James Morse on anything RAS related, as he's already
-> >>>> looking at related patches.
-> > 
-> > (Thanks Marc,)
-> > 
-> >>>> On 20/03/17 07:55, Dongjiu Geng wrote:
-> >>>>> In the RAS implementation, hardware pass the virtual SEI
-> >>>>> syndrome information through the VSESR_EL2, so set the virtual
-> >>>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
-> >>>>> the guest OS
-> > 
-> > How does this work with firmware first?
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  virt/kvm/arm/vgic/vgic-v2.c | 55 ++++++++++-----------------------------------
+>  virt/kvm/arm/vgic/vgic-v3.c | 47 +++++++++++---------------------------
+>  virt/kvm/arm/vgic/vgic.c    |  8 +++----
+>  virt/kvm/arm/vgic/vgic.h    |  4 ++--
+>  4 files changed, 31 insertions(+), 83 deletions(-)
 > 
-> I explained it in previous mail about the work flow.
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index dfe6e5e..0172754 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -22,20 +22,6 @@
+>  
+>  #include "vgic.h"
+>  
+> -/*
+> - * Call this function to convert a u64 value to an unsigned long * bitmask
+> - * in a way that works on both 32-bit and 64-bit LE and BE platforms.
+> - *
+> - * Warning: Calling this function may modify *val.
+> - */
+> -static unsigned long *u64_to_bitmask(u64 *val)
+> -{
+> -#if defined(CONFIG_CPU_BIG_ENDIAN) && BITS_PER_LONG == 32
+> -	*val = (*val >> 32) | (*val << 32);
+> -#endif
+> -	return (unsigned long *)val;
+> -}
+> -
 
-When delivering and reporting SEIs to the VM, should this happen
-directly to the OS running in the VM, or to the guest firmware (e.g.
-UEFI) running in the VM as well?
+Getting rid of u64_to_bitmask makes me feel slightly better...
+
+>  static inline void vgic_v2_write_lr(int lr, u32 val)
+>  {
+>  	void __iomem *base = kvm_vgic_global_state.vctrl_base;
+> @@ -51,38 +37,10 @@ void vgic_v2_init_lrs(void)
+>  		vgic_v2_write_lr(i, 0);
+>  }
+>  
+> -void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu)
+> +void vgic_v2_clear_uie(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+> -
+> -	if (cpuif->vgic_misr & GICH_MISR_EOI) {
+> -		u64 eisr = cpuif->vgic_eisr;
+> -		unsigned long *eisr_bmap = u64_to_bitmask(&eisr);
+> -		int lr;
+> -
+> -		for_each_set_bit(lr, eisr_bmap, kvm_vgic_global_state.nr_lr) {
+> -			u32 intid = cpuif->vgic_lr[lr] & GICH_LR_VIRTUALID;
+> -
+> -			WARN_ON(cpuif->vgic_lr[lr] & GICH_LR_STATE);
+> -
+> -			/* Only SPIs require notification */
+> -			if (vgic_valid_spi(vcpu->kvm, intid))
+> -				kvm_notify_acked_irq(vcpu->kvm, 0,
+> -						     intid - VGIC_NR_PRIVATE_IRQS);
+> -		}
+> -	}
+> -
+> -	/* check and disable underflow maintenance IRQ */
+>  	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
+> -
+> -	/*
+> -	 * In the next iterations of the vcpu loop, if we sync the
+> -	 * vgic state after flushing it, but before entering the guest
+> -	 * (this happens for pending signals and vmid rollovers), then
+> -	 * make sure we don't pick up any old maintenance interrupts
+> -	 * here.
+> -	 */
+> -	cpuif->vgic_eisr = 0;
+>  }
+>  
+>  void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+> @@ -92,6 +50,12 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+>  	cpuif->vgic_hcr |= GICH_HCR_UIE;
+>  }
+>  
+> +static bool lr_signals_eoi_mi(u32 lr_val)
+> +{
+> +	return !(lr_val & GICH_LR_STATE) && (lr_val & GICH_LR_EOI) &&
+> +	       !(lr_val & GICH_LR_HW);
+> +}
+> +
+>  /*
+>   * transfer the content of the LRs back into the corresponding ap_list:
+>   * - active bit is transferred as is
+> @@ -109,6 +73,11 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>  		u32 intid = val & GICH_LR_VIRTUALID;
+>  		struct vgic_irq *irq;
+>  
+> +		/* Notify fds when the guest EOI'ed a level-triggered SPI */
+> +		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+> +			kvm_notify_acked_irq(vcpu->kvm, 0,
+> +					     intid - VGIC_NR_PRIVATE_IRQS);
+> +
+>  		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+>  
+>  		spin_lock(&irq->irq_lock);
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 3d7796c..7880c5c 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -21,42 +21,9 @@
+>  
+>  #include "vgic.h"
+>  
+> -void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+> +void vgic_v3_clear_uie(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+> -	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+> -
+> -	if (cpuif->vgic_misr & ICH_MISR_EOI) {
+> -		unsigned long eisr_bmap = cpuif->vgic_eisr;
+> -		int lr;
+> -
+> -		for_each_set_bit(lr, &eisr_bmap, kvm_vgic_global_state.nr_lr) {
+> -			u32 intid;
+> -			u64 val = cpuif->vgic_lr[lr];
+> -
+> -			if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> -				intid = val & ICH_LR_VIRTUAL_ID_MASK;
+> -			else
+> -				intid = val & GICH_LR_VIRTUALID;
+> -
+> -			WARN_ON(cpuif->vgic_lr[lr] & ICH_LR_STATE);
+> -
+> -			/* Only SPIs require notification */
+> -			if (vgic_valid_spi(vcpu->kvm, intid))
+> -				kvm_notify_acked_irq(vcpu->kvm, 0,
+> -						     intid - VGIC_NR_PRIVATE_IRQS);
+> -		}
+> -
+> -		/*
+> -		 * In the next iterations of the vcpu loop, if we sync
+> -		 * the vgic state after flushing it, but before
+> -		 * entering the guest (this happens for pending
+> -		 * signals and vmid rollovers), then make sure we
+> -		 * don't pick up any old maintenance interrupts here.
+> -		 */
+> -		cpuif->vgic_eisr = 0;
+> -	}
+> -
+>  	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
+>  }
+>  
+> @@ -67,6 +34,12 @@ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+>  	cpuif->vgic_hcr |= ICH_HCR_UIE;
+>  }
+>  
+> +static bool lr_signals_eoi_mi(u64 lr_val)
+> +{
+> +	return !(lr_val & ICH_LR_STATE) && (lr_val & ICH_LR_EOI) &&
+> +	       !(lr_val & ICH_LR_HW);
+> +}
+> +
+>  void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+> @@ -82,6 +55,12 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>  			intid = val & ICH_LR_VIRTUAL_ID_MASK;
+>  		else
+>  			intid = val & GICH_LR_VIRTUALID;
+> +
+> +		/* Notify fds when the guest EOI'ed a level-triggered IRQ */
+> +		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+> +			kvm_notify_acked_irq(vcpu->kvm, 0,
+> +					     intid - VGIC_NR_PRIVATE_IRQS);
+> +
+>  		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+>  		if (!irq)	/* An LPI could have been unmapped. */
+>  			continue;
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index 1436c2e..f5b3c25 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -527,12 +527,12 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+>  	spin_unlock(&vgic_cpu->ap_list_lock);
+>  }
+>  
+> -static inline void vgic_process_maintenance_interrupt(struct kvm_vcpu *vcpu)
+> +static inline void vgic_clear_uie(struct kvm_vcpu *vcpu)
+>  {
+>  	if (kvm_vgic_global_state.type == VGIC_V2)
+> -		vgic_v2_process_maintenance(vcpu);
+> +		vgic_v2_clear_uie(vcpu);
+>  	else
+> -		vgic_v3_process_maintenance(vcpu);
+> +		vgic_v3_clear_uie(vcpu);
+>  }
+>  
+>  static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
+> @@ -642,7 +642,7 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>  	if (unlikely(!vgic_initialized(vcpu->kvm)))
+>  		return;
+>  
+> -	vgic_process_maintenance_interrupt(vcpu);
+> +	vgic_clear_uie(vcpu);
+>  	vgic_fold_lr_state(vcpu);
+
+nit: If you moved vgic_*_clear_uie() into vgic_*_fold_lr_state, you
+could get rid of this call, extra prototypes, and save yourself the
+extra check. Not a big deal though.
+
+>  	vgic_prune_ap_list(vcpu);
+>  
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 3f64220..72ba9ee 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -112,7 +112,7 @@ void vgic_kick_vcpus(struct kvm *kvm);
+>  int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+>  		      phys_addr_t addr, phys_addr_t alignment);
+>  
+> -void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu);
+> +void vgic_v2_clear_uie(struct kvm_vcpu *vcpu);
+>  void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
+>  void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+>  void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
+> @@ -143,7 +143,7 @@ static inline void vgic_get_irq_kref(struct vgic_irq *irq)
+>  	kref_get(&irq->refcount);
+>  }
+>  
+> -void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu);
+> +void vgic_v3_clear_uie(struct kvm_vcpu *vcpu);
+>  void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
+>  void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+>  void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
+> 
+
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
 Thanks,
--Christoffer
 
-> 
-> when the Guest OS triggers an SEI, it will firstly trap to EL3 firmware, El3 firmware records the error
-> info to the APEI table, then copy the ESR_EL3 ELR_EL3 to ESR_EL2 ELR_EL2 and transfers control to the
-> hypervisor, hypervisor delegates the error exception to EL1 guest OS by setting HCR_EL2.VSE to 1 and pass the
-> virtual SEI syndrome through vsesr_el2. The EL1 guest OS check the DISR_EL1 syndrome information to decide to
-> terminate the application, or do some other recovery action. because the HCR_EL2.AMO is set, so in fact, read
-> DISR_EL1, it returns the VDISR_EL2. and VDISR_EL2 is loaded from VSESR_EL2, so here I pass the virtual SEI
-> syndrome vsesr_el2.
-> 
-> > If we took a Physical SError Interrupt the CPER records are in the hosts memory.
-> > To deliver a RAS event to the guest something needs to generate CPER records and
-> > put them in the guest memory. Only Qemu knows where these memory regions are.
-> > 
-> > Put another way, what is the guest expected to do with this SError interrupt?
-> No, we do not only panic,if it is EL0 application SEI. the OS error recovery
-> agent will terminate the EL0 application to isolate the error; If it is EL1 guest
-> OS SError, guest OS can see whether it can recover. if the error was in a read-only file cache buffer, guest OS
-> can invalidate the page and reload the data from disk.
-> 
-> if all of the above are failed, OS will panic.
-> 
-> 
-> > The only choice is panic(). We should send this via Qemu so that we can add
-> > proper guest RAS support later. Once Qemu has written the CPER records into
-> > guest memory, it can notify the guest.
-> > 
-> > Is anyone from Huawei looking at adding RAS support for Qemu?
->  yes, I am looking at Qemu and want to add RAS support.
->  do you mean let Qemu inject both the SEA and SEI?
-> 
-> > 
-> > 
-> > It looks like we should save/restore VSESR_EL2 as part of the guest CPU state,
-> > but this needs doing with the cpufeature framework so that the single-image
-> > kernel works on platforms with and without these features.
->  yes, you are right, we will follow cpufeature framework.
-> 
-> 
-> > 
-> > Xie XiuQi's series for SEI also touches the cpufeature framework.
-> > 
-> > 
-> >>>>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> >>>>> index aede1658aeda..770a153fb6ba 100644
-> >>>>> --- a/arch/arm64/kvm/hyp/switch.c
-> >>>>> +++ b/arch/arm64/kvm/hyp/switch.c
-> >>>>> @@ -86,6 +86,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
-> >>>>>  		isb();
-> >>>>>  	}
-> >>>>>  	write_sysreg(val, hcr_el2);
-> >>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
-> >>>>> +	/* If virtual System Error or Asynchronous Abort is pending. set
-> >>>>> +	 * the virtual exception syndrome information
-> >>>>> +	 */
-> >>>>> +	if (vcpu->arch.hcr_el2 & HCR_VSE)
-> > 
-> >>>>> +		write_sysreg(vcpu->arch.fault.vsesr_el2, vsesr_el2);
-> > 
-> > This won't build with versions of binutils that don't recognise vsesr_el2.
-> > Is there another patch out there that adds a sysreg definition for vsesr_el2?
-> > 
-> > 
-> >>>>> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> >>>>> index da6a8cfa54a0..08a13dfe28a8 100644
-> >>>>> --- a/arch/arm64/kvm/inject_fault.c
-> >>>>> +++ b/arch/arm64/kvm/inject_fault.c
-> >>>>> @@ -242,4 +242,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
-> >>>>>  void kvm_inject_vabt(struct kvm_vcpu *vcpu)
-> >>>>>  {
-> >>>>>  	vcpu_set_hcr(vcpu, vcpu_get_hcr(vcpu) | HCR_VSE);
-> >>>>> +#ifdef CONFIG_HAS_RAS_EXTENSION
-> >>>>> +	/* If virtual System Error or Asynchronous Abort is set. set
-> >>>>> +	 * the virtual exception syndrome information
-> >>>>> +	 */
-> >>>>> +	kvm_vcpu_set_vsesr(vcpu, ((kvm_vcpu_get_vsesr(vcpu)
-> >>>>> +				& (~VSESR_ELx_IDS_ISS_MASK))
-> >>>>> +				| (kvm_vcpu_get_hsr(vcpu)
-> >>>>> +				& VSESR_ELx_IDS_ISS_MASK)));
-> >>>>
-> >>>> What is the rational for setting VSESR_EL2 with the EL1 syndrome
-> >>>> information? That doesn't make any sense to me.
-> >>> thanks, I set the VSESR_EL2 using the  EL2 syndrome information, "kvm_vcpu_get_hsr"
-> >>> return the value of esr_el2, not EL1 syndrome information
-> >>
-> >> Ah, good point. But that doesn't make it more valid. I still don't see
-> >> anything in the spec that supports this behaviour, and I still propose
-> >> that when RAS is enabled, the VSError injection is mediated by userspace.
-> > 
-> > I agree, we should be handling RAS errors as firmware-first, and Qemu plays the
-> > part of firmware for a guest. We will probably need to have a KVM API for Qemu
-> > to pend an SError with a specific ESR value.
-> > 
-> > If this isn't a firmware-first RAS error the existing code will pend an SError
-> > for the guest.
-> > 
-> so for both SEA and SEI, do you prefer to below steps?
-> EL0/EL1 SEI/SEA ---> EL3 firmware first handle ------> EL2 hypervisor notify the Qemu to inject SEI/SEA------>Qemu call KVM API to inject SEA/SEI---->KVM inject SEA/SEI to guest OS
-> 
-> 
-> > 
-> > Thanks,
-> > 
-> > James
-> > 
-> > 
-> > .
-> > 
-> 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
