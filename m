@@ -1,180 +1,71 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 19/19] KVM: arm64: ITS: Pending table save/restore
-Date: Wed, 22 Mar 2017 16:12:52 +0100
-Message-ID: <52a9896e-f8ec-05aa-7b0e-e7b9aa97df15@redhat.com>
-References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
- <1488800074-21991-20-git-send-email-eric.auger@redhat.com>
- <6e2f94c2-8afe-9b5f-d097-a43e168b95df@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 00/28] arm/arm64: KVM: Rework the hyp-stub API
+Date: Wed, 22 Mar 2017 16:14:44 +0000
+Message-ID: <3dab2f39-88c2-e10b-942c-58a1d8053b71@arm.com>
+References: <20170321192058.9300-1-marc.zyngier@arm.com>
+ <20170322133724.GA10969@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A105840187
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 11:11:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XQ-WorquNRGu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Mar 2017 11:11:09 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9AF5F400E9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 11:11:09 -0400 (EDT)
-In-Reply-To: <6e2f94c2-8afe-9b5f-d097-a43e168b95df@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170322133724.GA10969@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Russell King <linux@arm.linux.org.uk>, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+Hi Christoffer,
 
-On 20/03/2017 19:21, Andre Przywara wrote:
-> Hi Eric,
-> 
-> just fast-forwarded to the end and noticed this one:
+On 22/03/17 13:37, Christoffer Dall wrote:
+> Hi Marc,
 > 
 > 
-> On 06/03/17 11:34, Eric Auger wrote:
->> Save and restore the pending tables.
+> On Tue, Mar 21, 2017 at 07:20:30PM +0000, Marc Zyngier wrote:
+>> As noticed by RMK in this thread[1], the hyp-stub API on 32bit ARM
+>> could do with some TLC (it cannot perform a soft-restart at HYP, and
+>> has holes in the hyp-stub support in a number of places). In general,
+>> it would be desirable for the 32bit behaviour to align on 64bit, if
+>> only to ease maintenance.
 >>
->> Pending table restore obviously requires the pendbaser to be
->> already set.
+>> This series implements the following:
+>> - Add HVC_[GS]ET_VECTORS and HVC_SOFT_RESTART to the 32bit code
+>> - Add HVC_RESET_VECTORS to both arm and arm64, removing the need for
+>>   __hyp_reset_vectors
+>> - Implement add the stub entry points in the KVM init code, which
+>>   didn't implement any so far
+>> - Convert the HYP code to use the init code stubs directly
+>> - Some general cleanup as a result of these changes (which includes
+>>   killing HVC_GET_VECTORS)
+>> - Add some API documentation that covers the above
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v1 -> v2:
->> - do not care about the 1st KB which should be zeroed according to
->>   the spec.
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 71 ++++++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 69 insertions(+), 2 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 27ebabd..24824be 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -1736,7 +1736,48 @@ static int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
->>   */
->>  static int vgic_its_flush_pending_tables(struct vgic_its *its)
->>  {
->> -	return -ENXIO;
->> +	struct kvm *kvm = its->dev->kvm;
->> +	struct vgic_dist *dist = &kvm->arch.vgic;
->> +	struct vgic_irq *irq;
->> +	int ret;
->> +
->> +	/**
->> +	 * we do not take the dist->lpi_list_lock since we have a garantee
->> +	 * the LPI list is not touched while the its lock is held
+>> Patches 12 to 14 would be better squashed into 10 and 11, but I've
+>> kept them separate so that I can take the blame for everything I've
+>> broken.
 > 
-> Can you elaborate on what gives us this guarantee? I see that we have a
-> locking *order*, but that doesn't mean we can avoid taking the lock. So
-> to me it looks like we need to take the lpi_list_lock spinlock here,
-> which unfortunately breaks the kvm_read_guest() calls below.
+> This series looks great overall.  I'm still going through the details of
+> the patches, but one high level questions:
 > 
-> If you agree on this, you can take a look at the INVALL implementation,
-> where I faced the same issue. The solution we came up with is
-> vgic_copy_lpi_list(), which you can call under the lock to create a
-> (private) copy of the LPI list, which you can later iterate without
-> holding the lock - and thus are free to call sleeping functions.
+> What if we formalized the way to call a function in Hyp mode, whatever
+> its current configuration may be, via a specific HVC number.  That would
+> mean that the documentation say nothing of a hypervisor specific
+> implementaiton.
 
-Yes the comment is wrong and at least I need to fix it. The its_lock
-prevents new commands to be absorbed but does not protect from a change
-of the pending status which is our interest here.
+Do you mean an actual function call indirected via an HVC? Similar to
+what we already do today for KVM when we want to call HYP functions?
 
-On the other hand, can't we simply consider the flush (and restore)
-cannot happen if the VM is in running state. In the current QEMU
-integration we wait for the VM to be paused before flushing the tables
-in guest RAM. Otherwise you will get some stall data anyway. So can't we
-simply document this requirement. I think the requirement is different
-from the INVALL's one. Does it make sense?
+> Could we then use that to initialize hyp mode for a hypervisor, i.e.
+> KVM, without having to actually change the vectors?  Couldn't we simply
+> use the the hvc stub to call a function in the physical address space,
+> and be rid of the concept of hyp-init alltogether?
 
-Thanks
+My problem here is when you say "in the physical space". Do you want to
+be able to call such a function from any context? That's certainly
+doable now, but I'm not completely sure of what we get.
 
-Eric
-> 
-> Cheers,
-> Andre.
-> 
->> +	 */
->> +	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
->> +		struct kvm_vcpu *vcpu;
->> +		gpa_t pendbase, ptr;
->> +		bool stored;
->> +		u8 val;
->> +
->> +		vcpu = irq->target_vcpu;
->> +		if (!vcpu)
->> +			return -EINVAL;
->> +
->> +		pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
->> +
->> +		ptr = pendbase + (irq->intid / BITS_PER_BYTE);
->> +
->> +		ret = kvm_read_guest(kvm, (gpa_t)ptr, &val, 1);
->> +		if (ret)
->> +			return ret;
->> +
->> +		stored = val & (irq->intid % BITS_PER_BYTE);
->> +		if (stored == irq->pending_latch)
->> +			continue;
->> +
->> +		if (irq->pending_latch)
->> +			val |= 1 << (irq->intid % BITS_PER_BYTE);
->> +		else
->> +			val &= ~(1 << (irq->intid % BITS_PER_BYTE));
->> +
->> +		ret = kvm_write_guest(kvm, (gpa_t)ptr, &val, 1);
->> +		if (ret)
->> +			return ret;
->> +	}
->> +
->> +	return 0;
->>  }
->>  
->>  /**
->> @@ -1745,7 +1786,33 @@ static int vgic_its_flush_pending_tables(struct vgic_its *its)
->>   */
->>  static int vgic_its_restore_pending_tables(struct vgic_its *its)
->>  {
->> -	return -ENXIO;
->> +	struct vgic_irq *irq;
->> +	struct kvm *kvm = its->dev->kvm;
->> +	struct vgic_dist *dist = &kvm->arch.vgic;
->> +	int ret;
->> +
->> +	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
->> +		struct kvm_vcpu *vcpu;
->> +		gpa_t pendbase, ptr;
->> +		u8 val;
->> +
->> +		vcpu = irq->target_vcpu;
->> +		if (!vcpu)
->> +			return -EINVAL;
->> +
->> +		if (!(vcpu->arch.vgic_cpu.pendbaser & GICR_PENDBASER_PTZ))
->> +			return 0;
->> +
->> +		pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
->> +
->> +		ptr = pendbase + (irq->intid / BITS_PER_BYTE);
->> +
->> +		ret = kvm_read_guest(kvm, (gpa_t)ptr, &val, 1);
->> +		if (ret)
->> +			return ret;
->> +		irq->pending_latch = val & (1 << (irq->intid % BITS_PER_BYTE));
->> +	}
->> +	return 0;
->>  }
->>  
->>  static int vgic_its_flush_ite(struct vgic_its *its, struct its_device *dev,
->>
+Maybe I just don't see the use case - can you enlighten me?
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
