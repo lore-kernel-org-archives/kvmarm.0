@@ -1,70 +1,136 @@
-From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-Subject: Re: [PATCH V11 10/10] arm/arm64: KVM: add guest SEA support
-Date: Wed, 22 Mar 2017 10:46:59 +0800
-Message-ID: <6eee7a67-808e-8712-2ec2-593eac52d921@huawei.com>
-References: <1487712121-16688-1-git-send-email-tbaicar@codeaurora.org>
- <1487712121-16688-11-git-send-email-tbaicar@codeaurora.org>
- <df6ba5dc-d93f-925a-46bf-1e1e209d17f3@huawei.com> <58B43092.6040401@arm.com>
+From: Xie XiuQi <xiexiuqi@huawei.com>
+Subject: Re: [PATCH V13 09/10] trace, ras: add ARM processor error trace event
+Date: Wed, 22 Mar 2017 10:48:58 +0800
+Message-ID: <e1e63cbb-a75e-af11-4fa0-446b40999ee8@huawei.com>
+References: <1490136425-4324-1-git-send-email-tbaicar@codeaurora.org>
+ <1490136425-4324-10-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F60E40C44
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 22:46:02 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A3iO+ttW36Cw for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Mar 2017 22:46:01 -0400 (EDT)
-Received: from dggrg01-dlp.huawei.com (unknown [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 203F340BDE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Mar 2017 22:45:58 -0400 (EDT)
-In-Reply-To: <58B43092.6040401@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, xiexiuqi@huawei.com, gengdongjiu@huawei.com, punit.agrawal@arm.com
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, Tyler Baicar <tbaicar@codeaurora.org>, will.deacon@arm.com, linux@armlinux.org.uk, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, robert.moore@intel.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, marc.zyngier@arm.com, john.garry@huawei.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <1490136425-4324-10-git-send-email-tbaicar@codeaurora.org>
+Sender: linux-acpi-owner@vger.kernel.org
+To: Tyler Baicar <tbaicar@codeaurora.org>, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vg
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
+Reviewed-by: Xie XiuQi <xiexiuqi@huawei.com>
 
+On 2017/3/22 6:47, Tyler Baicar wrote:
+> Currently there are trace events for the various RAS
+> errors with the exception of ARM processor type errors.
+> Add a new trace event for such errors so that the user
+> will know when they occur. These trace events are
+> consistent with the ARM processor error section type
+> defined in UEFI 2.6 spec section N.2.4.4.
+> 
+> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+> Acked-by: Steven Rostedt <rostedt@goodmis.org>
+> ---
+>  drivers/acpi/apei/ghes.c    |  8 +++++++-
+>  drivers/firmware/efi/cper.c |  1 +
+>  drivers/ras/ras.c           |  1 +
+>  include/ras/ras_event.h     | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 54 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 3ecbacc..230b095 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -515,7 +515,13 @@ static void ghes_do_proc(struct ghes *ghes,
+>  		}
+>  #endif
+>  #ifdef CONFIG_RAS
+> -		else if (trace_unknown_sec_event_enabled()) {
+> +		else if (!uuid_le_cmp(sec_type, CPER_SEC_PROC_ARM) &&
+> +			 trace_arm_event_enabled()) {
+> +			struct cper_sec_proc_arm *arm_err;
+> +
+> +			arm_err = acpi_hest_generic_data_payload(gdata);
+> +			trace_arm_event(arm_err);
+> +		} else if (trace_unknown_sec_event_enabled()) {
+>  			void *unknown_err = acpi_hest_generic_data_payload(gdata);
+>  			trace_unknown_sec_event(&sec_type,
+>  					fru_id, fru_text, sec_sev,
+> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
+> index d263bc8..37a39af 100644
+> --- a/drivers/firmware/efi/cper.c
+> +++ b/drivers/firmware/efi/cper.c
+> @@ -35,6 +35,7 @@
+>  #include <linux/printk.h>
+>  #include <linux/bcd.h>
+>  #include <acpi/ghes.h>
+> +#include <ras/ras_event.h>
+>  
+>  #define INDENT_SP	" "
+>  
+> diff --git a/drivers/ras/ras.c b/drivers/ras/ras.c
+> index fb2500b..8ba5a94 100644
+> --- a/drivers/ras/ras.c
+> +++ b/drivers/ras/ras.c
+> @@ -28,3 +28,4 @@ static int __init ras_init(void)
+>  #endif
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(mc_event);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(unknown_sec_event);
+> +EXPORT_TRACEPOINT_SYMBOL_GPL(arm_event);
+> diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
+> index 5861b6f..13befad 100644
+> --- a/include/ras/ras_event.h
+> +++ b/include/ras/ras_event.h
+> @@ -162,6 +162,51 @@
+>  );
+>  
+>  /*
+> + * ARM Processor Events Report
+> + *
+> + * This event is generated when hardware detects an ARM processor error
+> + * has occurred. UEFI 2.6 spec section N.2.4.4.
+> + */
+> +TRACE_EVENT(arm_event,
+> +
+> +	TP_PROTO(const struct cper_sec_proc_arm *proc),
+> +
+> +	TP_ARGS(proc),
+> +
+> +	TP_STRUCT__entry(
+> +		__field(u64, mpidr)
+> +		__field(u64, midr)
+> +		__field(u32, running_state)
+> +		__field(u32, psci_state)
+> +		__field(u8, affinity)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		if (proc->validation_bits & CPER_ARM_VALID_AFFINITY_LEVEL)
+> +			__entry->affinity = proc->affinity_level;
+> +		else
+> +			__entry->affinity = ~0;
+> +		if (proc->validation_bits & CPER_ARM_VALID_MPIDR)
+> +			__entry->mpidr = proc->mpidr;
+> +		else
+> +			__entry->mpidr = 0ULL;
+> +		__entry->midr = proc->midr;
+> +		if (proc->validation_bits & CPER_ARM_VALID_RUNNING_STATE) {
+> +			__entry->running_state = proc->running_state;
+> +			__entry->psci_state = proc->psci_state;
+> +		} else {
+> +			__entry->running_state = ~0;
+> +			__entry->psci_state = ~0;
+> +		}
+> +	),
+> +
+> +	TP_printk("affinity level: %d; MPIDR: %016llx; MIDR: %016llx; "
+> +		  "running state: %d; PSCI state: %d",
+> +		  __entry->affinity, __entry->mpidr, __entry->midr,
+> +		  __entry->running_state, __entry->psci_state)
+> +);
+> +
+> +/*
+>   * Unknown Section Report
+>   *
+>   * This event is generated when hardware detected a hardware
+> 
 
-> Guests are a special case as QEMU may never access the faulty memory itself, so
-> it won't receive the 'late' signal. It looks like ARM/arm64 KVM lacks support
-> for KVM_PFN_ERR_HWPOISON which sends SIGBUS from KVM's fault-handling code. I
-> have patches to add support for this which I intend to send at rc1.
-> 
-> [0] suggests 'KVM qemu' sets these MCE flags to take the 'early' path, but given
-> x86s KVM_PFN_ERR_HWPOISON, this may be out of date.
-> 
-> 
-> Either way, once QEMU gets a signal indicating the virtual address, it can
-> generate its own APEI CPER records and use the KVM APIs to mock up an
-> Synchronous External Abort, (or inject an IRQ or run the vcpu waiting for the
-> guest's polling thread to come round, whichever was described to the guest via
-> the HEST/GHES tables).
-> 
-
-I have another confusion about the SIGBUS signal. Can QEMU always get a SIGBUS when needed.
-I know one circumstance which will send SIGBUS. The ghes_handle_memory_failure() in
-ghes_do_proc() will send SIGBUS to QEMU, but this only happens when there exists memory section
-in ghes, that is the section type is CPER_SEC_PLATFORM_MEM.
-Suppose this case, an load  error in guest application causes an SEA, and the firmware take it.
-The firmware begin to scan the error record and fill the ghes. But the error record in memory node
-has been read by other handler. The firmware won't add memory section in ghes, so
-ghes_handle_memory_failure() won't be called.
-I mean that we may not rely on ghes_handle_memory_failure() to send SIGBUS to QEMU. Whether we should
-add some other code to send SIGBUS in handle_guest_abort(). I don't know whether the ARM/arm64
- KVM_PFN_ERR_HWPOISON you mentioned above will cover all the cases.
-
+-- 
 Thanks,
+Xie XiuQi
 
-Wang Xiongfeng
-.
