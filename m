@@ -1,25 +1,26 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 15/19] KVM: arm64: ITS: Collection table save/restore
-Date: Wed, 22 Mar 2017 15:12:54 +0100
-Message-ID: <5b5e819e-a462-0737-643b-b6aaac7fe921@redhat.com>
+Subject: Re: [PATCH v3 05/19] KVM: arm64: ITS: Implement
+ vgic_its_has_attr_regs and attr_regs_access
+Date: Wed, 22 Mar 2017 15:15:05 +0100
+Message-ID: <c539367c-8b20-12d7-ff59-a3450556c16c@redhat.com>
 References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
- <1488800074-21991-16-git-send-email-eric.auger@redhat.com>
- <12e8bb9b-75cb-998b-fb7c-c5f96adafd59@arm.com>
+ <1488800074-21991-6-git-send-email-eric.auger@redhat.com>
+ <3002064c-edd7-93a4-afdd-52ccb95f854e@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F06840A66
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 10:11:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2FF540A66
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 10:13:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EgzIqx8RpLqG for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Mar 2017 10:11:12 -0400 (EDT)
+ with ESMTP id F7qOeXD6KfhP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Mar 2017 10:13:24 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6732D40A63
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 10:11:11 -0400 (EDT)
-In-Reply-To: <12e8bb9b-75cb-998b-fb7c-c5f96adafd59@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 94FEF40A63
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 10:13:24 -0400 (EDT)
+In-Reply-To: <3002064c-edd7-93a4-afdd-52ccb95f854e@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,181 +31,224 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Andre Przywara <andre.przywara@arm.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
+Cc: Prasun.Kapoor@cavium.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
-
-On 21/03/2017 19:13, Andre Przywara wrote:
-> Hi,
+Andre,
+On 20/03/2017 19:13, Andre Przywara wrote:
+> Hi Eric,
 > 
 > On 06/03/17 11:34, Eric Auger wrote:
->> The flush path copies the collection entries into guest RAM
->> at the GPA specified in the BASER register. This obviously
->> requires the BASER to be set. The last written element
->> is a dummy collection table entry.
+>> This patch implements vgic_its_has_attr_regs and vgic_its_attr_regs_access
+>> upon the MMIO framework. VGIC ITS KVM device KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+>> group becomes functional.
 >>
->> We do not index by collection ID as the collection entry
->> can fit into 8 bytes while containing the collection ID.
->>
->> On restore path we re-allocate the collection objects.
+>> At least GITS_CREADR requires to differentiate a guest write action from a
+>> user access. As such let's introduce a new uaccess_its_write
+>> vgic_register_region callback.
 >>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
 >> ---
->>
->> v1 -> v2:
->> - reword commit message and directly use 8 as entry size
->> - no kvm parameter anymore
->> - add helper for flush/restore cte
->> - table size computed here
->> - add le64/cpu conversions
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 94 +++++++++++++++++++++++++++++++++++++++++++-
->>  1 file changed, 92 insertions(+), 2 deletions(-)
+>>  virt/kvm/arm/vgic/vgic-its.c  | 74 ++++++++++++++++++++++++++++++++++++-------
+>>  virt/kvm/arm/vgic/vgic-mmio.h |  9 ++++--
+>>  2 files changed, 69 insertions(+), 14 deletions(-)
 >>
 >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index cf04776..ad67759 100644
+>> index 43bb17e..e9c8f9f 100644
 >> --- a/virt/kvm/arm/vgic/vgic-its.c
 >> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -1761,13 +1761,84 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
->>  	return -ENXIO;
+>> @@ -1287,13 +1287,14 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+>>  	*regptr = reg;
 >>  }
 >>  
->> +static int vgic_its_flush_cte(struct vgic_its *its,
->> +			      struct its_collection *collection, u64 *ptr)
+>> -#define REGISTER_ITS_DESC(off, rd, wr, length, acc)		\
+>> +#define REGISTER_ITS_DESC(off, rd, wr, uwr, length, acc)		\
+>>  {								\
+>>  	.reg_offset = off,					\
+>>  	.len = length,						\
+>>  	.access_flags = acc,					\
+>>  	.its_read = rd,						\
+>>  	.its_write = wr,					\
+>> +	.uaccess_its_write = uwr,					\
 > 
-> I don't think "u64 *ptr" is right here, why not use "gpa_t gpa" and save
-> the cast below?
-Agreed. changed.
+> I was wondering if it would create less churn to keep this definition
+> here (with .uaccess_its_write automatically becoming NULL), and then
+> either open-code the one special case below or provide a second wrapper
+> macro. But I guess either way is not really nice, so we could go with
+> this approach here as well.
+
+Agreed. I plan to introduce REGISTER_ITS_DESC_UACCESS in next patch instead.
+
 > 
->> +{
->> +	u64 val;
->> +	int ret;
+>>  }
+>>  
+>>  static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
+>> @@ -1304,28 +1305,28 @@ static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
+>>  
+>>  static struct vgic_register_region its_registers[] = {
+>>  	REGISTER_ITS_DESC(GITS_CTLR,
+>> -		vgic_mmio_read_its_ctlr, vgic_mmio_write_its_ctlr, 4,
+>> +		vgic_mmio_read_its_ctlr, vgic_mmio_write_its_ctlr, NULL, 4,
+>>  		VGIC_ACCESS_32bit),
+>>  	REGISTER_ITS_DESC(GITS_IIDR,
+>> -		vgic_mmio_read_its_iidr, its_mmio_write_wi, 4,
+>> +		vgic_mmio_read_its_iidr, its_mmio_write_wi, NULL, 4,
+>>  		VGIC_ACCESS_32bit),
+>>  	REGISTER_ITS_DESC(GITS_TYPER,
+>> -		vgic_mmio_read_its_typer, its_mmio_write_wi, 8,
+>> +		vgic_mmio_read_its_typer, its_mmio_write_wi, NULL, 8,
+>>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>>  	REGISTER_ITS_DESC(GITS_CBASER,
+>> -		vgic_mmio_read_its_cbaser, vgic_mmio_write_its_cbaser, 8,
+>> +		vgic_mmio_read_its_cbaser, vgic_mmio_write_its_cbaser, NULL, 8,
+>>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>>  	REGISTER_ITS_DESC(GITS_CWRITER,
+>> -		vgic_mmio_read_its_cwriter, vgic_mmio_write_its_cwriter, 8,
+>> -		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>> +		vgic_mmio_read_its_cwriter, vgic_mmio_write_its_cwriter, NULL,
+>> +		8, VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>>  	REGISTER_ITS_DESC(GITS_CREADR,
+>> -		vgic_mmio_read_its_creadr, its_mmio_write_wi, 8,
+>> +		vgic_mmio_read_its_creadr, its_mmio_write_wi, NULL, 8,
+>>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>>  	REGISTER_ITS_DESC(GITS_BASER,
+>> -		vgic_mmio_read_its_baser, vgic_mmio_write_its_baser, 0x40,
+>> +		vgic_mmio_read_its_baser, vgic_mmio_write_its_baser, NULL, 0x40,
+>>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>>  	REGISTER_ITS_DESC(GITS_IDREGS_BASE,
+>> -		vgic_mmio_read_its_idregs, its_mmio_write_wi, 0x30,
+>> +		vgic_mmio_read_its_idregs, its_mmio_write_wi, NULL, 0x30,
+>>  		VGIC_ACCESS_32bit),
+>>  };
+>>  
+>> @@ -1448,14 +1449,63 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+>>  int vgic_its_has_attr_regs(struct kvm_device *dev,
+>>  			   struct kvm_device_attr *attr)
+>>  {
+>> -	return -ENXIO;
+>> +	const struct vgic_register_region *region;
+>> +	struct vgic_io_device iodev = {
+>> +		.regions = its_registers,
+>> +		.nr_regions = ARRAY_SIZE(its_registers),
+>> +	};
+>> +	gpa_t offset;
 >> +
->> +	val = ((u64)1 << 63 | ((u64)collection->target_addr << 16) |
->> +	       collection->collection_id);
->> +	val = cpu_to_le64(val);
->> +	ret = kvm_write_guest(its->dev->kvm, (gpa_t)ptr, &val, 8);
->> +	return ret;
->> +}
->> +
->> +static int vgic_its_restore_cte(struct vgic_its *its, u64 *ptr, bool *valid)
->> +{
->> +	struct its_collection *collection;
->> +	u32 target_addr;
->> +	u32 coll_id;
->> +	u64 val;
->> +	int ret;
->> +
->> +	*valid = false;
->> +
->> +	ret = kvm_read_guest(its->dev->kvm, (gpa_t)ptr, &val, 8);
->> +	if (ret)
->> +		return ret;
->> +	val = le64_to_cpu(val);
->> +	*valid = val & BIT_ULL(63);
->> +
->> +	if (!*valid)
->> +		return 0;
->> +
->> +	target_addr = (u32)(val >> 16);
->> +	coll_id = val & 0xFFFF;
->> +	ret = vgic_its_alloc_collection(its, &collection, coll_id);
+>> +	offset = attr->attr;
 > 
-> I think you should do as the other users do and check if there is a
-> collection with that ID already. Or refactor vgic_its_alloc_collection()
-> to do that for you: allocate or use an existing one.
-added a check in this function.
+> Those two can be on one line.
+> But actually why not just put attr->attr below and save that variable at
+> all?
+done
 > 
->> +	if (ret)
->> +		return ret;
->> +	collection->target_addr = target_addr;
+>> +
+>> +	region = vgic_find_mmio_region(iodev.regions,
+>> +				       iodev.nr_regions,
+>> +				       offset);
+>> +	if (!region)
+>> +		return -ENXIO;
+> 
+> Nit: empty line here?
+done
+> 
 >> +	return 0;
->> +}
->> +
->>  /**
->>   * vgic_its_flush_collection_table - flush the collection table into
->>   * guest RAM
->>   */
->>  static int vgic_its_flush_collection_table(struct vgic_its *its)
->>  {
->> -	return -ENXIO;
->> +	struct its_collection *collection;
->> +	u64 val, *ptr;
-> 
-> Please don't use a pointer for that guest address, use gpa_t instead.
-done
-> 
->> +	size_t max_size, filled = 0;
->> +	int ret;
->> +
->> +	ptr = (u64 *)(BASER_ADDRESS(its->baser_coll_table));
->> +	if (!ptr)
->> +		return 0;
->> +
->> +	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
->> +
->> +	list_for_each_entry(collection, &its->collection_list, coll_list) {
->> +		if (filled == max_size)
->> +			return -ENOSPC;
->> +		ret = vgic_its_flush_cte(its, collection, ptr);
->> +		if (ret)
->> +			return ret;
->> +		ptr++;
->> +		filled += 8;
->> +	}
->> +
->> +	if (filled == max_size)
->> +		return 0;
->> +
->> +	/*
->> +	 * table is not fully filled, add a last dummy element
->> +	 * with valid bit unset
->> +	 */
->> +	val = 0;
->> +	ret = kvm_write_guest(its->dev->kvm, (gpa_t)ptr, &val, 8);
->> +	return ret;
 >>  }
 >>  
->>  /**
->> @@ -1777,7 +1848,26 @@ static int vgic_its_flush_collection_table(struct vgic_its *its)
->>   */
->>  static int vgic_its_restore_collection_table(struct vgic_its *its)
+>>  int vgic_its_attr_regs_access(struct kvm_device *dev,
+>>  			      struct kvm_device_attr *attr,
+>>  			      u64 *reg, bool is_write)
 >>  {
 >> -	return -ENXIO;
->> +	size_t max_size, read = 0;
->> +	u64 *ptr;
+>> +	const struct vgic_register_region *region;
+>> +	struct vgic_io_device iodev = {
+>> +		.regions = its_registers,
+>> +		.nr_regions = ARRAY_SIZE(its_registers),
+>> +	};
+>> +	struct vgic_its *its = dev->private;
+>> +	gpa_t addr, offset;
+>> +	unsigned int len;
+>> +
+>> +	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base))
+>> +		return -ENXIO;
+>> +
+>> +	offset = attr->attr;
+>> +	if (offset & 0x7)
+>> +		return -EINVAL;
 > 
-> Same comment as above, please use gpa_t.
-done
+> Isn't this still breaking IIDR reads (a 32-bit register at offset 0x4)?
+Hum yes it does. I will fix & test that. At the moment I was not
+saving/restoring the IIDR but this is the plan now. Thanks for spotting
+this.
+> 
+>> +
+>> +	addr = its->vgic_its_base + offset;
+>> +
+>> +	region = vgic_find_mmio_region(iodev.regions,
+>> +				       iodev.nr_regions,
+>> +				       offset);
+>> +	if (!region)
+>> +		return -ENXIO;
+>> +
+>> +	len = region->access_flags & VGIC_ACCESS_64bit ? 8 : 4;
+> 
+> Can you add a comment that states that we only support full register
+> accesses via this interface (deviating from the spec which allows split
+> accesses to 64-bit registers)? I think that's mentioned somewhere else
+> (Documentation/...), but it avoids confusion for the casual reader here.
+Added that comment.
+> 
+> Also I am wondering if that way of using the pointer here for both 32-
+> and 64-bit registers breaks on big endian? Or is it specified somewhere
+> that this interface uses LE only?
+
+Agreed, I used add vgic_data_mmio_bus_to_host and
+vgic_data_host_to_mmio_bus handling.
 
 Thanks
 
 Eric
 > 
+> The rest looks fine, thanks!
+> 
 > Cheers,
 > Andre.
 > 
->> +	int ret;
->> +
->> +	ptr = (u64 *)(BASER_ADDRESS(its->baser_coll_table));
->> +	if (!ptr)
->> +		return 0;
->> +
->> +	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
->> +
->> +	while (read < max_size) {
->> +		bool valid;
->> +
->> +		ret = vgic_its_restore_cte(its, ptr, &valid);
->> +		if (!valid || ret)
->> +			break;
->> +		ptr++;
->> +		read += 8;
+>> +	if (is_write) {
+>> +		if (region->uaccess_its_write)
+>> +			region->uaccess_its_write(dev->kvm, its, addr,
+>> +						  len, *reg);
+>> +		else
+>> +			region->its_write(dev->kvm, its, addr, len, *reg);
+>> +	} else {
+>> +		*reg = region->its_read(dev->kvm, its, addr, len);
 >> +	}
->> +	return ret;
+>> +	return 0;
 >>  }
 >>  
->>  /**
+>>  static int vgic_its_has_attr(struct kvm_device *dev,
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+>> index 055ad42..ad8a585 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio.h
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
+>> @@ -36,8 +36,13 @@ struct vgic_register_region {
+>>  	};
+>>  	unsigned long (*uaccess_read)(struct kvm_vcpu *vcpu, gpa_t addr,
+>>  				      unsigned int len);
+>> -	void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
+>> -			      unsigned int len, unsigned long val);
+>> +	union {
+>> +		void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
+>> +				      unsigned int len, unsigned long val);
+>> +		void (*uaccess_its_write)(struct kvm *kvm, struct vgic_its *its,
+>> +					  gpa_t addr, unsigned int len,
+>> +					  unsigned long val);
+>> +	};
+>>  };
+>>  
+>>  extern struct kvm_io_device_ops kvm_io_gic_ops;
 >>
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
