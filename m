@@ -1,165 +1,120 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
-Date: Wed, 22 Mar 2017 21:37:23 +0800
-Message-ID: <39832689-89a6-49a3-be59-b4a1203c2486@huawei.com>
-References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
- <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
- <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
- <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com> <58CFF058.8020205@arm.com>
- <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com> <58D1263E.90800@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v3 16/19] KVM: arm64: ITS: vgic_its_check_id returns the
+ entry's GPA
+Date: Wed, 22 Mar 2017 15:11:05 +0100
+Message-ID: <5e14fa1c-2eb6-6746-968b-4ecc18dd7cdd@redhat.com>
+References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
+ <1488800074-21991-17-git-send-email-eric.auger@redhat.com>
+ <be79d92f-2522-a754-f006-66901d26e94c@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <58D1263E.90800@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>, xiexiuqi@huawei.com
-Cc: Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B572340A66
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 10:09:25 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id rsY4ZdCfvMay for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Mar 2017 10:09:24 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8809540A63
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 10:09:24 -0400 (EDT)
+In-Reply-To: <be79d92f-2522-a754-f006-66901d26e94c@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
-  Thank you very much for your detailed comment and answer.
+Hi,
 
-On 2017/3/21 21:10, James Morse wrote:
+On 21/03/2017 19:12, Andre Przywara wrote:
 > Hi,
 > 
-> On 21/03/17 06:32, gengdongjiu wrote:
->> On 2017/3/20 23:08, James Morse wrote:
->>> On 20/03/17 13:58, Marc Zyngier wrote:
->>>> On 20/03/17 12:28, gengdongjiu wrote:
->>>>> On 2017/3/20 19:24, Marc Zyngier wrote:
->>>>>> On 20/03/17 07:55, Dongjiu Geng wrote:
->>>>>>> In the RAS implementation, hardware pass the virtual SEI
->>>>>>> syndrome information through the VSESR_EL2, so set the virtual
->>>>>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
->>>>>>> the guest OS
-> 
-> (I've juggled the order of your replies:)
-> 
->> so for both SEA and SEI, do you prefer to below steps?
->> EL0/EL1 SEI/SEA ---> EL3 firmware first handle ------> EL2 hypervisor notify >
-> the Qemu to inject SEI/SEA------>Qemu call KVM API to inject SEA/SEI---->KVM >
-> inject SEA/SEI to guest OS
-> 
-> Yes, to expand your EL2 hypervisor notify Qemu step:
-> 1 The host should call its APEI code to parse the CPER records.
-> 2 User space processes are then notified via SIGBUS (or for rasdaemon, trace
->   points).
-> 3 Qemu can take the address delivered via SIGBUS and generate CPER records for
->   the guest. It knows how to convert host addresses to guest IPAs, and it knows
->   where in guest memory to write the CPER records.
-> 4 Qemu can then notify the guest via whatever mechanism it advertised via the
->   HEST/GHES table. It might not be the same mechanism that the host received
->   the notification through.
-> 
-> Steps 1 and 2 are the same even if no guest is running, so we don't have to add
-> any special case for KVM. This is existing code that x86 uses.
-> We can test the Qemu parts without any firmware support and the APEI path in the
-> host and guest is the same.
-   here do you mean map host APEI table to guest for steps 1 and 2 test? so that the APEI path in the
-  host and guest is the same.
-
-> 
-> 
->>> Is anyone from Huawei looking at adding RAS support for Qemu?
->>  yes, I am looking at Qemu and want to add RAS support.
-> 
-> Great, support in Qemu is one of the missing pieces. On x86 it looks like it
-> emulates machine-check-exceptions, which is how x86 did this before
-> firmware-first and APEI became the standard.
-> 
-> 
->>  do you mean let Qemu inject both the SEA and SEI?
-> 
-> To do the notification, yes. It needs to happen after the CPER records have been
-> written, and the mechanism and CPER memory location need to match what the guest
-> was told via the HEST/GHES table.
-> 
-> If Qemu didn't tell the guest about firmware-first, it can still deliver the
-> guest an SError Interrupt.
-> 
-> 
-> SEA should be possible to do with the KVM_SET_REG API, GPIO/GSIV and the other
-> kind of interrupts can use irqfd. For SEI we may need to add an API call to KVM
-> to let it pend SError with a specific ESR.
-> 
-> 
-> 
->>> How does this work with firmware first?
-> 
->> when the Guest OS triggers an SEI, it will firstly trap to EL3 firmware, El3 firmware records the error
->> info to the APEI table, 
-> 
-> These are CPER records in a memory area pointed to by one of HEST's GHES entries?
-> 
-> 
->> then copy the ESR_EL3 ELR_EL3 to ESR_EL2 ELR_EL2 and transfers control to the
->> hypervisor, hypervisor delegates the error exception to EL1 guest
-> 
-> This is a problem, just because the error occurred while the guest was running
-> doesn't mean we should deliver it directly to the guest. Some of these errors
-> will be fatal for the CPU and the host should try and power it off to contain
-yes, some of error does not need to deliver to guest OS directly. for example if the error is guest kernel fault error,
-hypervisor can directly power off the whole guest OS
-
-> the fault. For example: CPER's 'micro-architectural error', should the guest
-> power-off the vCPU? All that really does is return to the hypervisor, the error
-for this example, I think it is better hypervisor directly close the whole guest OS, instead of
-guest power-off the vCPU.
-
-> hasn't been contained.
-
-
-> 
-> Firmware should handle the error first, then the host, finally the guest via Qemu.
-> 
-> 
->> OS by setting HCR_EL2.VSE to 1 and pass the virtual SEI syndrome through vsesr_el2. 
->> The EL1 guest OS check the DISR_EL1 syndrome information to decide to
->> terminate the application, or do some other recovery action. because the HCR_EL2.AMO is set, so in fact, read
->> DISR_EL1, it returns the VDISR_EL2. and VDISR_EL2 is loaded from VSESR_EL2, so here I pass the virtual SEI
->> syndrome vsesr_el2.
-> 
-> So this is how an SError Interrupt's ESR gets into a guest. How does it get hold
-> of the CPER records?
-> 
-> 
->>> If we took a Physical SError Interrupt the CPER records are in the hosts memory.
->>> To deliver a RAS event to the guest something needs to generate CPER records and
->>> put them in the guest memory. Only Qemu knows where these memory regions are.
->>>
->>> Put another way, what is the guest expected to do with this SError interrupt?
+> On 06/03/17 11:34, Eric Auger wrote:
+>> As vgic_its_check_id() computes the device/collection entry's
+>> GPA, let's return it so that new callers can retrieve it easily.
 >>
->> No, we do not only panic,if it is EL0 application SEI. the OS error recovery
->> agent will terminate the EL0 application to isolate the error; If it is EL1 guest
->> OS SError, guest OS can see whether it can recover. if the error was in a read-only file cache buffer, guest OS
->> can invalidate the page and reload the data from disk.
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v2: new
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 11 ++++++++---
+>>  1 file changed, 8 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index ad67759..1060125 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -637,7 +637,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+>>   * is actually valid (covered by a memslot and guest accessible).
+>>   * For this we have to read the respective first level entry.
+>>   */
+>> -static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
+>> +static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id,
+>> +			      gpa_t *eaddr)
+>>  {
+>>  	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
+>>  	int index;
+>> @@ -657,6 +658,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
+>>  		addr = BASER_ADDRESS(baser) + id * esz;
+>>  		gfn = addr >> PAGE_SHIFT;
+>>  
+>> +		*eaddr = addr;
 > 
-> How do we get an address for memory failure? SError is asynchronous, I don't
-> think it sets the FAR. (SEA is synchronous and its not guaranteed to set the
-Thank you to point that. sorry, my answer is not right. in fact, I think the FAR and
-CPER are both not accurate for the  asynchronous SError. so guest OS can not try to recover.
-but it can still know which application create this SError which is deferred by ESB, then guest OS close the APP.
-by the way, for the synchronous SEA, do you think which address should be used? FAR or CPER that record come from ERR<n>ADDR?
-I see Qualcomm series patches mainly use FAR not CPER record that come from ERR<n>ADDR for SEA.
-so for the SEA case, I do not know which address is more accurate for FAR and CPER record
+> If you check that eaddr is not NULL before writing to it, you can save
+> the dummy variable in the two callers below (which doesn't hurt, but
+> does not help readability either).
+done
 
-> FAR..). As far as I understand this information is in the CPER records in host
-> memory.
+Thanks
 
-
+Eric
 > 
-> If we did have an address it would be a host address, how is it converted to a
-> guest IPA? I think Qemu should do this as part of its CPER record generation,
-> once the host has decided the error wasn't catastrophic.
- thanks for your suggestion.
-
+> Cheers,
+> Andre.
 > 
-> 
-> Thanks,
-> 
-> James
-> 
-> 
-> .
-> 
+>>  		return kvm_is_visible_gfn(its->dev->kvm, gfn);
+>>  	}
+>>  
+>> @@ -689,6 +691,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
+>>  	indirect_ptr += index * esz;
+>>  	gfn = indirect_ptr >> PAGE_SHIFT;
+>>  
+>> +	*eaddr = indirect_ptr;
+>>  	return kvm_is_visible_gfn(its->dev->kvm, gfn);
+>>  }
+>>  
+>> @@ -697,8 +700,9 @@ static int vgic_its_alloc_collection(struct vgic_its *its,
+>>  				     u32 coll_id)
+>>  {
+>>  	struct its_collection *collection;
+>> +	gpa_t eaddr;
+>>  
+>> -	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id))
+>> +	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, &eaddr))
+>>  		return E_ITS_MAPC_COLLECTION_OOR;
+>>  
+>>  	collection = kzalloc(sizeof(*collection), GFP_KERNEL);
+>> @@ -910,8 +914,9 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>>  	size_t size = its_cmd_get_size(its_cmd);
+>>  	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
+>>  	struct its_device *device;
+>> +	gpa_t eaddr;
+>>  
+>> -	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
+>> +	if (!vgic_its_check_id(its, its->baser_device_table, device_id, &eaddr))
+>>  		return E_ITS_MAPD_DEVICE_OOR;
+>>  
+>>  	if (valid && size > VITS_TYPER_IDBITS)
+>>
