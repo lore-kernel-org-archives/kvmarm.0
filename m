@@ -1,26 +1,27 @@
-From: Xie XiuQi <xiexiuqi@huawei.com>
-Subject: Re: [PATCH V11 10/10] arm/arm64: KVM: add guest SEA support
-Date: Wed, 22 Mar 2017 20:08:48 +0800
-Message-ID: <b57e2cb1-129b-7369-96e0-33e5c87dbb74@huawei.com>
-References: <1487712121-16688-1-git-send-email-tbaicar@codeaurora.org>
- <1487712121-16688-11-git-send-email-tbaicar@codeaurora.org>
- <df6ba5dc-d93f-925a-46bf-1e1e209d17f3@huawei.com> <58B43092.6040401@arm.com>
- <6eee7a67-808e-8712-2ec2-593eac52d921@huawei.com> <58D25C8D.3070507@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v4 00/28] arm/arm64: KVM: Rework the hyp-stub API
+Date: Wed, 22 Mar 2017 14:37:24 +0100
+Message-ID: <20170322133724.GA10969@cbox>
+References: <20170321192058.9300-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 395C540BBB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 08:07:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D82340C33
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 09:35:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VEXdLisbGVrD for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Mar 2017 08:07:31 -0400 (EDT)
-Received: from dggrg03-dlp.huawei.com (unknown [45.249.212.189])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 042EC40A63
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 08:07:29 -0400 (EDT)
-In-Reply-To: <58D25C8D.3070507@arm.com>
+ with ESMTP id u0886MCpBDxK for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Mar 2017 09:35:36 -0400 (EDT)
+Received: from mail-wr0-f182.google.com (mail-wr0-f182.google.com
+ [209.85.128.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0CC640BD2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 09:35:36 -0400 (EDT)
+Received: by mail-wr0-f182.google.com with SMTP id g10so129841212wrg.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 06:37:24 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170321192058.9300-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,105 +31,139 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, Xiongfeng Wang <wangxiongfeng2@huawei.com>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, Tyler Baicar <tbaicar@codeaurora.org>, will.deacon@arm.com, linux@armlinux.org.uk, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, robert.moore@intel.com, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, Keerthy <j-keerthy@ti.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
+Hi Marc,
 
-On 2017/3/22 19:14, James Morse wrote:
-> Hi Wang Xiongfeng,
-> 
-> On 22/03/17 02:46, Xiongfeng Wang wrote:
->>> Guests are a special case as QEMU may never access the faulty memory itself, so
->>> it won't receive the 'late' signal. It looks like ARM/arm64 KVM lacks support
->>> for KVM_PFN_ERR_HWPOISON which sends SIGBUS from KVM's fault-handling code. I
->>> have patches to add support for this which I intend to send at rc1.
->>>
->>> [0] suggests 'KVM qemu' sets these MCE flags to take the 'early' path, but given
->>> x86s KVM_PFN_ERR_HWPOISON, this may be out of date.
->>>
->>>
->>> Either way, once QEMU gets a signal indicating the virtual address, it can
->>> generate its own APEI CPER records and use the KVM APIs to mock up an
->>> Synchronous External Abort, (or inject an IRQ or run the vcpu waiting for the
->>> guest's polling thread to come round, whichever was described to the guest via
->>> the HEST/GHES tables).
->>>
->>
->> I have another confusion about the SIGBUS signal. Can QEMU always get a SIGBUS when needed.
->> I know one circumstance which will send SIGBUS. The ghes_handle_memory_failure() in
->> ghes_do_proc() will send SIGBUS to QEMU, but this only happens when there exists memory section
->> in ghes, that is the section type is CPER_SEC_PLATFORM_MEM.
->> Suppose this case, an load  error in guest application causes an SEA, and the firmware take it.
->> The firmware begin to scan the error record and fill the ghes. But the error record in memory node
->> has been read by other handler.
-> 
-> (this looks like a race)
-> 
->> The firmware won't add memory section in ghes, so ghes_handle_memory_failure() won't be called.
-> 
-> I think this would be a firmware bug. Firmware can reserve as much memory as it
-> needs for writing CPER records, there should not be a case where 'the memory' is
-> currently being processed by another handler.
 
-I have a question here:
-Consider this case, the memory controller first detected a memory error,
-but it has not been consumed. So it will not generate the SEA. Memory error
-may be reported to the OS by IRQ with MEM section in CPER record; and
-after for a while, the error data was loaded into the cache and consumed,
-when the SEA is generated. Is it possible only processor section, and no
-MEM section in CPER record?
-
-Obviously there are two different GHES above, one for SEA and another for IRQ/GSIV.
-Could we assume that there is mem section in the SEA ghes table?
-
+On Tue, Mar 21, 2017 at 07:20:30PM +0000, Marc Zyngier wrote:
+> As noticed by RMK in this thread[1], the hyp-stub API on 32bit ARM
+> could do with some TLC (it cannot perform a soft-restart at HYP, and
+> has holes in the hyp-stub support in a number of places). In general,
+> it would be desirable for the 32bit behaviour to align on 64bit, if
+> only to ease maintenance.
 > 
-> The memory firmware uses to write CPER records too shouldn't be published to the
-> OS until it has finished. Once firmware has finished writing the CPER records it
-> can update the memory pointed to by GHES->ErrorStatusAddress with the location
-> of the CPER records and invoke the Notification method for this GHES. (SEI, SEA,
-> IRQ etc). We should always get a complete set of CPER records to describe the error.
+> This series implements the following:
+> - Add HVC_[GS]ET_VECTORS and HVC_SOFT_RESTART to the 32bit code
+> - Add HVC_RESET_VECTORS to both arm and arm64, removing the need for
+>   __hyp_reset_vectors
+> - Implement add the stub entry points in the KVM init code, which
+>   didn't implement any so far
+> - Convert the HYP code to use the init code stubs directly
+> - Some general cleanup as a result of these changes (which includes
+>   killing HVC_GET_VECTORS)
+> - Add some API documentation that covers the above
 > 
+> Patches 12 to 14 would be better squashed into 10 and 11, but I've
+> kept them separate so that I can take the blame for everything I've
+> broken.
 
-Does it mean that the BIOS has the responsibility to ensure that the GHES table has a
-complete error info, including memory, bus, tlb, cache and other related error info?
+This series looks great overall.  I'm still going through the details of
+the patches, but one high level questions:
 
--- 
+What if we formalized the way to call a function in Hyp mode, whatever
+its current configuration may be, via a specific HVC number.  That would
+mean that the documentation say nothing of a hypervisor specific
+implementaiton.
+
+Could we then use that to initialize hyp mode for a hypervisor, i.e.
+KVM, without having to actually change the vectors?  Couldn't we simply
+use the the hvc stub to call a function in the physical address space,
+and be rid of the concept of hyp-init alltogether?
+
+I'm probably missing something, but let me know your thoughts.
+
 Thanks,
-Xie XiuQi
+-Christoffer
 
-> It firmware uses GHESv2 it can get an 'ack' write from APEI once it has finished
-> processing the records. Once it gets this firmware knows it can re-use the memory.
 > 
-> (Obviously each GHES entry can only process one error at a time. Firmware should
-> either handle this, or have one entry for each Error Source that can happen
-> independently)
+> I've tested this on arm (Cubietruck, Jetson TK1) and arm64 (Seattle),
+> both as host and guest. Keerthy has been kind enough to test the 32bit
+> code on DRA7-EVM, AM57XX-EVM and KEYSTONE-K2E-EVM.
 > 
+> [1] http://lists.infradead.org/pipermail/linux-arm-kernel/2016-December/473472.html
 > 
->> I mean that we may not rely on ghes_handle_memory_failure() to send SIGBUS to QEMU. Whether we should
->> add some other code to send SIGBUS in handle_guest_abort(). I don't know whether the ARM/arm64
->>  KVM_PFN_ERR_HWPOISON you mentioned above will cover all the cases.
+> * From v3:
+>   - Reworked the way we save/restore lr on arm64, making it EL2's job
+>   in a consistent way (these are the three initial patches)
+>   - Collected RBs, TBs and Acks from James, Keerthy and Russell
+>   - Rebased on 4.11-rc3
 > 
-> The SIGBUS routine is part of the kernel's recovery method for memory errors. It
-> should cover all the errors reported with this CPER_SEC_PLATFORM_MEM.
+> * From v2:
+>   - Kill HVC_GET_VECTORS and the corresponding __hyp_get_vectors
 > 
-> Back to the race you describe. It shouldn't matter if one CPU processes an error
-> for guest memory while a vcpu is running on another. This may happen if the
-> error was detected by DRAM's background scrub.
-> If we don't treat KVM/Qemu as anything special the memory_failure()->SIGBUS path
-> will happen regardless of whether the fault interrupted the guest or not.
+> * From v1:
+>   - Fixed some glaring bugs (reported by Ard and James)
+>   - Tidy up stub vector export on 32bit (Ard)
+>   - Nicer VA/PA conversion on 32bit (Ard)
+>   - Updated cpu_v7_reset documentation
+>   - Cleaned up HYP reset on PM events
+>   - Minor stub documentation update
 > 
+> Marc Zyngier (26):
+>   arm64: hyp-stub: Stop pointlessly clobbering lr
+>   arm64: KVM: Move lr save/restore to do_el2_call
+>   arm64: hyp-stub: Don't save lr in the EL1 code
+>   arm64: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
+>   arm64: KVM: Implement HVC_RESET_VECTORS stub hypercall in the init
+>     code
+>   arm64: KVM: Implement HVC_GET_VECTORS in the init code
+>   arm64: KVM: Allow the main HYP code to use the init hyp stub
+>     implementation
+>   arm64: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
+>   arm64: KVM: Implement HVC_SOFT_RESTART in the init code
+>   ARM: KVM: Convert KVM to use HVC_GET_VECTORS
+>   ARM: Update cpu_v7_reset documentation
+>   ARM: hyp-stub: Use r1 for the soft-restart address
+>   ARM: Expose the VA/IDMAP offset
+>   ARM: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
+>   ARM: KVM: Implement HVC_RESET_VECTORS stub hypercall in the init code
+>   ARM: KVM: Implement HVC_GET_VECTORS in the init code
+>   ARM: KVM: Allow the main HYP code to use the init hyp stub
+>     implementation
+>   ARM: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
+>   ARM: KVM: Implement HVC_SOFT_RESTART in the init code
+>   arm/arm64: KVM: Use __hyp_reset_vectors() directly
+>   arm/arm64: KVM: Remove kvm_get_idmap_start
+>   arm/arm64: KVM: Use HVC_RESET_VECTORS to reinit HYP mode
+>   ARM: decompressor: Remove __hyp_get_vectors usage
+>   ARM: hyp-stub/KVM: Kill __hyp_get_vectors
+>   arm64: hyp-stub/KVM: Kill __hyp_get_vectors
+>   arm/arm64: Add hyp-stub API documentation
 > 
-> There are other types of error such as PCIe, CPU, BUS error etc. If it's
-> possible to recover from these we may need additional code in the kernel. This
-> shouldn't necessarily treat KVM as a special case.
+> Russell King (2):
+>   ARM: hyp-stub: improve ABI
+>   ARM: soft-reboot into same mode that we entered the kernel
 > 
+>  Documentation/virtual/kvm/arm/hyp-abi.txt | 45 ++++++++++++++++++++++++++++
+>  arch/arm/boot/compressed/head.S           |  5 +++-
+>  arch/arm/include/asm/kvm_asm.h            |  2 --
+>  arch/arm/include/asm/kvm_host.h           |  6 ----
+>  arch/arm/include/asm/kvm_mmu.h            |  1 -
+>  arch/arm/include/asm/proc-fns.h           |  4 +--
+>  arch/arm/include/asm/virt.h               | 12 +++++++-
+>  arch/arm/kernel/hyp-stub.S                | 39 +++++++++++++++++++-----
+>  arch/arm/kernel/reboot.c                  |  7 +++--
+>  arch/arm/kvm/arm.c                        | 25 ++++++----------
+>  arch/arm/kvm/hyp/hyp-entry.S              | 29 ++++++++++++++----
+>  arch/arm/kvm/init.S                       | 49 ++++++++++++++++++++++++++-----
+>  arch/arm/kvm/interrupts.S                 |  4 ---
+>  arch/arm/kvm/mmu.c                        |  5 ----
+>  arch/arm/mm/mmu.c                         |  5 ++++
+>  arch/arm/mm/proc-v7.S                     | 15 ++++++----
+>  arch/arm64/include/asm/kvm_asm.h          |  1 -
+>  arch/arm64/include/asm/kvm_host.h         |  7 -----
+>  arch/arm64/include/asm/kvm_mmu.h          |  1 -
+>  arch/arm64/include/asm/virt.h             | 17 +++++++----
+>  arch/arm64/kernel/hyp-stub.S              | 34 +++++++--------------
+>  arch/arm64/kvm/hyp-init.S                 | 45 +++++++++++++++++++++-------
+>  arch/arm64/kvm/hyp.S                      |  2 +-
+>  arch/arm64/kvm/hyp/hyp-entry.S            | 43 +++++++++++++--------------
+>  24 files changed, 266 insertions(+), 137 deletions(-)
+>  create mode 100644 Documentation/virtual/kvm/arm/hyp-abi.txt
 > 
-> Thanks,
-> 
-> James
-> 
-> 
-> .
+> -- 
+> 2.11.0
 > 
