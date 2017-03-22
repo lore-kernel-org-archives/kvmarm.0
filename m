@@ -1,169 +1,165 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 00/28] arm/arm64: KVM: Rework the hyp-stub API
-Date: Wed, 22 Mar 2017 14:37:24 +0100
-Message-ID: <20170322133724.GA10969@cbox>
-References: <20170321192058.9300-1-marc.zyngier@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
+Date: Wed, 22 Mar 2017 21:37:23 +0800
+Message-ID: <39832689-89a6-49a3-be59-b4a1203c2486@huawei.com>
+References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
+ <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
+ <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
+ <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com> <58CFF058.8020205@arm.com>
+ <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com> <58D1263E.90800@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D82340C33
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 09:35:38 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u0886MCpBDxK for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Mar 2017 09:35:36 -0400 (EDT)
-Received: from mail-wr0-f182.google.com (mail-wr0-f182.google.com
- [209.85.128.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0CC640BD2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 09:35:36 -0400 (EDT)
-Received: by mail-wr0-f182.google.com with SMTP id g10so129841212wrg.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Mar 2017 06:37:24 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170321192058.9300-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, Keerthy <j-keerthy@ti.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <58D1263E.90800@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>, xiexiuqi@huawei.com
+Cc: Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+Hi James,
+  Thank you very much for your detailed comment and answer.
+
+On 2017/3/21 21:10, James Morse wrote:
+> Hi,
+> 
+> On 21/03/17 06:32, gengdongjiu wrote:
+>> On 2017/3/20 23:08, James Morse wrote:
+>>> On 20/03/17 13:58, Marc Zyngier wrote:
+>>>> On 20/03/17 12:28, gengdongjiu wrote:
+>>>>> On 2017/3/20 19:24, Marc Zyngier wrote:
+>>>>>> On 20/03/17 07:55, Dongjiu Geng wrote:
+>>>>>>> In the RAS implementation, hardware pass the virtual SEI
+>>>>>>> syndrome information through the VSESR_EL2, so set the virtual
+>>>>>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
+>>>>>>> the guest OS
+> 
+> (I've juggled the order of your replies:)
+> 
+>> so for both SEA and SEI, do you prefer to below steps?
+>> EL0/EL1 SEI/SEA ---> EL3 firmware first handle ------> EL2 hypervisor notify >
+> the Qemu to inject SEI/SEA------>Qemu call KVM API to inject SEA/SEI---->KVM >
+> inject SEA/SEI to guest OS
+> 
+> Yes, to expand your EL2 hypervisor notify Qemu step:
+> 1 The host should call its APEI code to parse the CPER records.
+> 2 User space processes are then notified via SIGBUS (or for rasdaemon, trace
+>   points).
+> 3 Qemu can take the address delivered via SIGBUS and generate CPER records for
+>   the guest. It knows how to convert host addresses to guest IPAs, and it knows
+>   where in guest memory to write the CPER records.
+> 4 Qemu can then notify the guest via whatever mechanism it advertised via the
+>   HEST/GHES table. It might not be the same mechanism that the host received
+>   the notification through.
+> 
+> Steps 1 and 2 are the same even if no guest is running, so we don't have to add
+> any special case for KVM. This is existing code that x86 uses.
+> We can test the Qemu parts without any firmware support and the APEI path in the
+> host and guest is the same.
+   here do you mean map host APEI table to guest for steps 1 and 2 test? so that the APEI path in the
+  host and guest is the same.
+
+> 
+> 
+>>> Is anyone from Huawei looking at adding RAS support for Qemu?
+>>  yes, I am looking at Qemu and want to add RAS support.
+> 
+> Great, support in Qemu is one of the missing pieces. On x86 it looks like it
+> emulates machine-check-exceptions, which is how x86 did this before
+> firmware-first and APEI became the standard.
+> 
+> 
+>>  do you mean let Qemu inject both the SEA and SEI?
+> 
+> To do the notification, yes. It needs to happen after the CPER records have been
+> written, and the mechanism and CPER memory location need to match what the guest
+> was told via the HEST/GHES table.
+> 
+> If Qemu didn't tell the guest about firmware-first, it can still deliver the
+> guest an SError Interrupt.
+> 
+> 
+> SEA should be possible to do with the KVM_SET_REG API, GPIO/GSIV and the other
+> kind of interrupts can use irqfd. For SEI we may need to add an API call to KVM
+> to let it pend SError with a specific ESR.
+> 
+> 
+> 
+>>> How does this work with firmware first?
+> 
+>> when the Guest OS triggers an SEI, it will firstly trap to EL3 firmware, El3 firmware records the error
+>> info to the APEI table, 
+> 
+> These are CPER records in a memory area pointed to by one of HEST's GHES entries?
+> 
+> 
+>> then copy the ESR_EL3 ELR_EL3 to ESR_EL2 ELR_EL2 and transfers control to the
+>> hypervisor, hypervisor delegates the error exception to EL1 guest
+> 
+> This is a problem, just because the error occurred while the guest was running
+> doesn't mean we should deliver it directly to the guest. Some of these errors
+> will be fatal for the CPU and the host should try and power it off to contain
+yes, some of error does not need to deliver to guest OS directly. for example if the error is guest kernel fault error,
+hypervisor can directly power off the whole guest OS
+
+> the fault. For example: CPER's 'micro-architectural error', should the guest
+> power-off the vCPU? All that really does is return to the hypervisor, the error
+for this example, I think it is better hypervisor directly close the whole guest OS, instead of
+guest power-off the vCPU.
+
+> hasn't been contained.
 
 
-On Tue, Mar 21, 2017 at 07:20:30PM +0000, Marc Zyngier wrote:
-> As noticed by RMK in this thread[1], the hyp-stub API on 32bit ARM
-> could do with some TLC (it cannot perform a soft-restart at HYP, and
-> has holes in the hyp-stub support in a number of places). In general,
-> it would be desirable for the 32bit behaviour to align on 64bit, if
-> only to ease maintenance.
 > 
-> This series implements the following:
-> - Add HVC_[GS]ET_VECTORS and HVC_SOFT_RESTART to the 32bit code
-> - Add HVC_RESET_VECTORS to both arm and arm64, removing the need for
->   __hyp_reset_vectors
-> - Implement add the stub entry points in the KVM init code, which
->   didn't implement any so far
-> - Convert the HYP code to use the init code stubs directly
-> - Some general cleanup as a result of these changes (which includes
->   killing HVC_GET_VECTORS)
-> - Add some API documentation that covers the above
+> Firmware should handle the error first, then the host, finally the guest via Qemu.
 > 
-> Patches 12 to 14 would be better squashed into 10 and 11, but I've
-> kept them separate so that I can take the blame for everything I've
-> broken.
+> 
+>> OS by setting HCR_EL2.VSE to 1 and pass the virtual SEI syndrome through vsesr_el2. 
+>> The EL1 guest OS check the DISR_EL1 syndrome information to decide to
+>> terminate the application, or do some other recovery action. because the HCR_EL2.AMO is set, so in fact, read
+>> DISR_EL1, it returns the VDISR_EL2. and VDISR_EL2 is loaded from VSESR_EL2, so here I pass the virtual SEI
+>> syndrome vsesr_el2.
+> 
+> So this is how an SError Interrupt's ESR gets into a guest. How does it get hold
+> of the CPER records?
+> 
+> 
+>>> If we took a Physical SError Interrupt the CPER records are in the hosts memory.
+>>> To deliver a RAS event to the guest something needs to generate CPER records and
+>>> put them in the guest memory. Only Qemu knows where these memory regions are.
+>>>
+>>> Put another way, what is the guest expected to do with this SError interrupt?
+>>
+>> No, we do not only panic,if it is EL0 application SEI. the OS error recovery
+>> agent will terminate the EL0 application to isolate the error; If it is EL1 guest
+>> OS SError, guest OS can see whether it can recover. if the error was in a read-only file cache buffer, guest OS
+>> can invalidate the page and reload the data from disk.
+> 
+> How do we get an address for memory failure? SError is asynchronous, I don't
+> think it sets the FAR. (SEA is synchronous and its not guaranteed to set the
+Thank you to point that. sorry, my answer is not right. in fact, I think the FAR and
+CPER are both not accurate for the  asynchronous SError. so guest OS can not try to recover.
+but it can still know which application create this SError which is deferred by ESB, then guest OS close the APP.
+by the way, for the synchronous SEA, do you think which address should be used? FAR or CPER that record come from ERR<n>ADDR?
+I see Qualcomm series patches mainly use FAR not CPER record that come from ERR<n>ADDR for SEA.
+so for the SEA case, I do not know which address is more accurate for FAR and CPER record
 
-This series looks great overall.  I'm still going through the details of
-the patches, but one high level questions:
+> FAR..). As far as I understand this information is in the CPER records in host
+> memory.
 
-What if we formalized the way to call a function in Hyp mode, whatever
-its current configuration may be, via a specific HVC number.  That would
-mean that the documentation say nothing of a hypervisor specific
-implementaiton.
-
-Could we then use that to initialize hyp mode for a hypervisor, i.e.
-KVM, without having to actually change the vectors?  Couldn't we simply
-use the the hvc stub to call a function in the physical address space,
-and be rid of the concept of hyp-init alltogether?
-
-I'm probably missing something, but let me know your thoughts.
-
-Thanks,
--Christoffer
 
 > 
-> I've tested this on arm (Cubietruck, Jetson TK1) and arm64 (Seattle),
-> both as host and guest. Keerthy has been kind enough to test the 32bit
-> code on DRA7-EVM, AM57XX-EVM and KEYSTONE-K2E-EVM.
+> If we did have an address it would be a host address, how is it converted to a
+> guest IPA? I think Qemu should do this as part of its CPER record generation,
+> once the host has decided the error wasn't catastrophic.
+ thanks for your suggestion.
+
 > 
-> [1] http://lists.infradead.org/pipermail/linux-arm-kernel/2016-December/473472.html
 > 
-> * From v3:
->   - Reworked the way we save/restore lr on arm64, making it EL2's job
->   in a consistent way (these are the three initial patches)
->   - Collected RBs, TBs and Acks from James, Keerthy and Russell
->   - Rebased on 4.11-rc3
+> Thanks,
 > 
-> * From v2:
->   - Kill HVC_GET_VECTORS and the corresponding __hyp_get_vectors
+> James
 > 
-> * From v1:
->   - Fixed some glaring bugs (reported by Ard and James)
->   - Tidy up stub vector export on 32bit (Ard)
->   - Nicer VA/PA conversion on 32bit (Ard)
->   - Updated cpu_v7_reset documentation
->   - Cleaned up HYP reset on PM events
->   - Minor stub documentation update
 > 
-> Marc Zyngier (26):
->   arm64: hyp-stub: Stop pointlessly clobbering lr
->   arm64: KVM: Move lr save/restore to do_el2_call
->   arm64: hyp-stub: Don't save lr in the EL1 code
->   arm64: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
->   arm64: KVM: Implement HVC_RESET_VECTORS stub hypercall in the init
->     code
->   arm64: KVM: Implement HVC_GET_VECTORS in the init code
->   arm64: KVM: Allow the main HYP code to use the init hyp stub
->     implementation
->   arm64: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
->   arm64: KVM: Implement HVC_SOFT_RESTART in the init code
->   ARM: KVM: Convert KVM to use HVC_GET_VECTORS
->   ARM: Update cpu_v7_reset documentation
->   ARM: hyp-stub: Use r1 for the soft-restart address
->   ARM: Expose the VA/IDMAP offset
->   ARM: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
->   ARM: KVM: Implement HVC_RESET_VECTORS stub hypercall in the init code
->   ARM: KVM: Implement HVC_GET_VECTORS in the init code
->   ARM: KVM: Allow the main HYP code to use the init hyp stub
->     implementation
->   ARM: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
->   ARM: KVM: Implement HVC_SOFT_RESTART in the init code
->   arm/arm64: KVM: Use __hyp_reset_vectors() directly
->   arm/arm64: KVM: Remove kvm_get_idmap_start
->   arm/arm64: KVM: Use HVC_RESET_VECTORS to reinit HYP mode
->   ARM: decompressor: Remove __hyp_get_vectors usage
->   ARM: hyp-stub/KVM: Kill __hyp_get_vectors
->   arm64: hyp-stub/KVM: Kill __hyp_get_vectors
->   arm/arm64: Add hyp-stub API documentation
-> 
-> Russell King (2):
->   ARM: hyp-stub: improve ABI
->   ARM: soft-reboot into same mode that we entered the kernel
-> 
->  Documentation/virtual/kvm/arm/hyp-abi.txt | 45 ++++++++++++++++++++++++++++
->  arch/arm/boot/compressed/head.S           |  5 +++-
->  arch/arm/include/asm/kvm_asm.h            |  2 --
->  arch/arm/include/asm/kvm_host.h           |  6 ----
->  arch/arm/include/asm/kvm_mmu.h            |  1 -
->  arch/arm/include/asm/proc-fns.h           |  4 +--
->  arch/arm/include/asm/virt.h               | 12 +++++++-
->  arch/arm/kernel/hyp-stub.S                | 39 +++++++++++++++++++-----
->  arch/arm/kernel/reboot.c                  |  7 +++--
->  arch/arm/kvm/arm.c                        | 25 ++++++----------
->  arch/arm/kvm/hyp/hyp-entry.S              | 29 ++++++++++++++----
->  arch/arm/kvm/init.S                       | 49 ++++++++++++++++++++++++++-----
->  arch/arm/kvm/interrupts.S                 |  4 ---
->  arch/arm/kvm/mmu.c                        |  5 ----
->  arch/arm/mm/mmu.c                         |  5 ++++
->  arch/arm/mm/proc-v7.S                     | 15 ++++++----
->  arch/arm64/include/asm/kvm_asm.h          |  1 -
->  arch/arm64/include/asm/kvm_host.h         |  7 -----
->  arch/arm64/include/asm/kvm_mmu.h          |  1 -
->  arch/arm64/include/asm/virt.h             | 17 +++++++----
->  arch/arm64/kernel/hyp-stub.S              | 34 +++++++--------------
->  arch/arm64/kvm/hyp-init.S                 | 45 +++++++++++++++++++++-------
->  arch/arm64/kvm/hyp.S                      |  2 +-
->  arch/arm64/kvm/hyp/hyp-entry.S            | 43 +++++++++++++--------------
->  24 files changed, 266 insertions(+), 137 deletions(-)
->  create mode 100644 Documentation/virtual/kvm/arm/hyp-abi.txt
-> 
-> -- 
-> 2.11.0
+> .
 > 
