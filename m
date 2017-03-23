@@ -1,86 +1,97 @@
-From: Mark Rutland <mark.rutland@arm.com>
+From: Daniel Lezcano <daniel.lezcano@linaro.org>
 Subject: Re: [PATCH V8 1/3] irq: Add flags to request_percpu_irq function
-Date: Thu, 23 Mar 2017 18:54:52 +0000
-Message-ID: <20170323185449.GA21359@leverpostej>
+Date: Thu, 23 Mar 2017 20:19:53 +0100
+Message-ID: <20170323191953.GC24630@mai>
 References: <1490290924-12958-1-git-send-email-daniel.lezcano@linaro.org>
+ <20170323185449.GA21359@leverpostej>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5574440962
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Mar 2017 15:18:08 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id VMzS1yCOw0mA for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Mar 2017 15:18:07 -0400 (EDT)
+Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DBF54408EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Mar 2017 15:18:06 -0400 (EDT)
+Received: by mail-wm0-f47.google.com with SMTP id u132so69850992wmg.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Mar 2017 12:19:57 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1490290924-12958-1-git-send-email-daniel.lezcano@linaro.org>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-To: Daniel Lezcano <daniel.lezcano@linaro.org>
-Cc: tglx@linutronix.de, nicolas.pitre@linaro.org, linux-samsung-soc@vger.kernel.org, vincent.guittot@linaro.org, kernel@stlinux.com, kvm@vger.kernel.org, rafael@kernel.org, peterz@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org, linux-snps-arc@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, will.deacon@arm.com, marc.zyngier@arm.com
+In-Reply-To: <20170323185449.GA21359@leverpostej>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: nicolas.pitre@linaro.org, linux-samsung-soc@vger.kernel.org, vincent.guittot@linaro.org, kernel@stlinux.com, kvm@vger.kernel.org, rafael@kernel.org, peterz@infradead.org, netdev@vger.kernel.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, marc.zyngier@arm.com, xen-devel@lists.xenproject.org, tglx@linutronix.de, linux-snps-arc@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Daniel,
-
-On Thu, Mar 23, 2017 at 06:42:01PM +0100, Daniel Lezcano wrote:
-> In the next changes, we track the interrupts but we discard the timers as
-> that does not make sense. The next interrupt on a timer is predictable.
-
-Sorry, but I could not parse this. 
-
-[...]
-
-> diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
-> index 9612b84..0f5ab4a 100644
-> --- a/drivers/perf/arm_pmu.c
-> +++ b/drivers/perf/arm_pmu.c
-> @@ -661,7 +661,7 @@ static int cpu_pmu_request_irq(struct arm_pmu *cpu_pmu, irq_handler_t handler)
->  
->  	irq = platform_get_irq(pmu_device, 0);
->  	if (irq > 0 && irq_is_percpu(irq)) {
-> -		err = request_percpu_irq(irq, handler, "arm-pmu",
-> +		err = request_percpu_irq(irq, 0, handler, "arm-pmu",
->  					 &hw_events->percpu_pmu);
->  		if (err) {
->  			pr_err("unable to request IRQ%d for ARM PMU counters\n",
-
-Please Cc myself and Will Deacon when modifying the arm_pmu driver, as
-per MAINTAINERS. I only spotted this patch by chance.
-
-This conflicts with arm_pmu changes I have queued for v4.12 [1].
-
-So, can we leave the prototype of request_percpu_irq() as-is?
-
-Why not add a new request_percpu_irq_flags() function, and leave
-request_percpu_irq() as a wrapper for that? e.g.
-
-static inline int
-request_percpu_irq(unsigned int irq, irq_handler_t handler,
-		   const char *devname, void __percpu *percpu_dev_id)
-{
-	return request_percpu_irq_flags(irq, handler, devname,
-					percpu_dev_id, 0);
-}
-
-... that would avoid having to touch any non-timer driver for now.
-
-[...]
-
-> -request_percpu_irq(unsigned int irq, irq_handler_t handler,
-> -		   const char *devname, void __percpu *percpu_dev_id);
-> +request_percpu_irq(unsigned int irq, unsigned long flags,
-> +		   irq_handler_t handler,  const char *devname,
-> +		   void __percpu *percpu_dev_id);
->  
-
-Looking at request_irq, the prototype is:
-
-int __must_check
-request_irq(unsigned int irq, irq_handler_t handler,
-	    unsigned long flags, const char *name,
-	    void *dev);
-
-... surely it would be better to share the same argument order? i.e.
-
-int __must_check
-request_percpu_irq(unsigned int irq, irq_handler_t handler,
-		   unsigned long flags, const char *devname,
-		   void __percpu *percpu_dev_id);
-
-Thanks,
-Mark.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git/log/?h=arm/perf/refactoring
+SGkgTWFyaywKCk9uIFRodSwgTWFyIDIzLCAyMDE3IGF0IDA2OjU0OjUyUE0gKzAwMDAsIE1hcmsg
+UnV0bGFuZCB3cm90ZToKPiBIaSBEYW5pZWwsCj4gCj4gT24gVGh1LCBNYXIgMjMsIDIwMTcgYXQg
+MDY6NDI6MDFQTSArMDEwMCwgRGFuaWVsIExlemNhbm8gd3JvdGU6Cj4gPiBJbiB0aGUgbmV4dCBj
+aGFuZ2VzLCB3ZSB0cmFjayB0aGUgaW50ZXJydXB0cyBidXQgd2UgZGlzY2FyZCB0aGUgdGltZXJz
+IGFzCj4gPiB0aGF0IGRvZXMgbm90IG1ha2Ugc2Vuc2UuIFRoZSBuZXh0IGludGVycnVwdCBvbiBh
+IHRpbWVyIGlzIHByZWRpY3RhYmxlLgo+IAo+IFNvcnJ5LCBidXQgSSBjb3VsZCBub3QgcGFyc2Ug
+dGhpcy4gCgpJIG1lYW50IHdlIGFyZSBtZWFzdXJpbmcgd2hlbiBhcmUgaGFwcGVuaW5nIHRoZSBp
+bnRlcnJ1cHRzIGJ5IGdldHRpbmcgdGhlIGxvY2FsCmNsb2NrIGluIHRoZSBpbnRlcnJ1cHQgaGFu
+ZGxlci4gQnV0IGlmIHRoZSBpbnRlcnJ1cHRzIGFyZSBjb21pbmcgZnJvbSBhIHRpbWVyLCBpdApp
+cyBub3QgbmVjZXNzYXJ5IHRvIGRvIHRoYXQgYmVjYXVzZSB3ZSBhbHJlYWR5IGtub3cgd2hlbiB0
+aGV5IHdpbGwgb2NjdXIuCgpTbywgaW4gb3JkZXIgdG8gc29ydCBvdXQgd2hpY2ggaW50ZXJydXB0
+IHdlIG1lYXN1cmUsIHdlIHVzZSB0aGUgSVJRRl9USU1FUiBmbGFnLgoKVW5mb3J0dW5hdGVseSwg
+dGhpcyBmbGFnIGlzIG1pc3Npbmcgd2hlbiB3ZSBkbyBhIHJlcXVlc3RfcGVyY3B1X2lycS4gVGhl
+CnB1cnBvc2Ugb2YgdGhpcyBwYXRjaCBpcyB0byBmaXggdGhhdC4KCj4gPiBkaWZmIC0tZ2l0IGEv
+ZHJpdmVycy9wZXJmL2FybV9wbXUuYyBiL2RyaXZlcnMvcGVyZi9hcm1fcG11LmMKPiA+IGluZGV4
+IDk2MTJiODQuLjBmNWFiNGEgMTAwNjQ0Cj4gPiAtLS0gYS9kcml2ZXJzL3BlcmYvYXJtX3BtdS5j
+Cj4gPiArKysgYi9kcml2ZXJzL3BlcmYvYXJtX3BtdS5jCj4gPiBAQCAtNjYxLDcgKzY2MSw3IEBA
+IHN0YXRpYyBpbnQgY3B1X3BtdV9yZXF1ZXN0X2lycShzdHJ1Y3QgYXJtX3BtdSAqY3B1X3BtdSwg
+aXJxX2hhbmRsZXJfdCBoYW5kbGVyKQo+ID4gIAo+ID4gIAlpcnEgPSBwbGF0Zm9ybV9nZXRfaXJx
+KHBtdV9kZXZpY2UsIDApOwo+ID4gIAlpZiAoaXJxID4gMCAmJiBpcnFfaXNfcGVyY3B1KGlycSkp
+IHsKPiA+IC0JCWVyciA9IHJlcXVlc3RfcGVyY3B1X2lycShpcnEsIGhhbmRsZXIsICJhcm0tcG11
+IiwKPiA+ICsJCWVyciA9IHJlcXVlc3RfcGVyY3B1X2lycShpcnEsIDAsIGhhbmRsZXIsICJhcm0t
+cG11IiwKPiA+ICAJCQkJCSAmaHdfZXZlbnRzLT5wZXJjcHVfcG11KTsKPiA+ICAJCWlmIChlcnIp
+IHsKPiA+ICAJCQlwcl9lcnIoInVuYWJsZSB0byByZXF1ZXN0IElSUSVkIGZvciBBUk0gUE1VIGNv
+dW50ZXJzXG4iLAo+IAo+IFBsZWFzZSBDYyBteXNlbGYgYW5kIFdpbGwgRGVhY29uIHdoZW4gbW9k
+aWZ5aW5nIHRoZSBhcm1fcG11IGRyaXZlciwgYXMKPiBwZXIgTUFJTlRBSU5FUlMuIEkgb25seSBz
+cG90dGVkIHRoaXMgcGF0Y2ggYnkgY2hhbmNlLgoKQWgsIG9rLCBzb3JyeSBmb3IgdGhhdC4gVGhh
+bmtzIGZvciBzcG90dGluZyB0aGlzLCB5b3Ugc2hvdWxkIGhhdmUgYmVlbiBDYydlZCBieQpteSBj
+Y2NtZCBzY3JpcHQuIEkgd2lsbCBjaGVjayB0aGF0LgoKPiBUaGlzIGNvbmZsaWN0cyB3aXRoIGFy
+bV9wbXUgY2hhbmdlcyBJIGhhdmUgcXVldWVkIGZvciB2NC4xMiBbMV0uCj4gCj4gU28sIGNhbiB3
+ZSBsZWF2ZSB0aGUgcHJvdG90eXBlIG9mIHJlcXVlc3RfcGVyY3B1X2lycSgpIGFzLWlzPwo+IAo+
+IFdoeSBub3QgYWRkIGEgbmV3IHJlcXVlc3RfcGVyY3B1X2lycV9mbGFncygpIGZ1bmN0aW9uLCBh
+bmQgbGVhdmUKPiByZXF1ZXN0X3BlcmNwdV9pcnEoKSBhcyBhIHdyYXBwZXIgZm9yIHRoYXQ/IGUu
+Zy4KClsgLi4uIF0KCj4gc3RhdGljIGlubGluZSBpbnQKPiByZXF1ZXN0X3BlcmNwdV9pcnEodW5z
+aWduZWQgaW50IGlycSwgaXJxX2hhbmRsZXJfdCBoYW5kbGVyLAo+IAkJICAgY29uc3QgY2hhciAq
+ZGV2bmFtZSwgdm9pZCBfX3BlcmNwdSAqcGVyY3B1X2Rldl9pZCkKPiB7Cj4gCXJldHVybiByZXF1
+ZXN0X3BlcmNwdV9pcnFfZmxhZ3MoaXJxLCBoYW5kbGVyLCBkZXZuYW1lLAo+IAkJCQkJcGVyY3B1
+X2Rldl9pZCwgMCk7Cj4gfQo+IAo+IC4uLiB0aGF0IHdvdWxkIGF2b2lkIGhhdmluZyB0byB0b3Vj
+aCBhbnkgbm9uLXRpbWVyIGRyaXZlciBmb3Igbm93LgoKTW1oLCB5ZXMuIFRoYXQncyBhIGdvb2Qg
+c3VnZ2VzdGlvbi4KCj4gWy4uLl0KPiAKPiA+IC1yZXF1ZXN0X3BlcmNwdV9pcnEodW5zaWduZWQg
+aW50IGlycSwgaXJxX2hhbmRsZXJfdCBoYW5kbGVyLAo+ID4gLQkJICAgY29uc3QgY2hhciAqZGV2
+bmFtZSwgdm9pZCBfX3BlcmNwdSAqcGVyY3B1X2Rldl9pZCk7Cj4gPiArcmVxdWVzdF9wZXJjcHVf
+aXJxKHVuc2lnbmVkIGludCBpcnEsIHVuc2lnbmVkIGxvbmcgZmxhZ3MsCj4gPiArCQkgICBpcnFf
+aGFuZGxlcl90IGhhbmRsZXIsICBjb25zdCBjaGFyICpkZXZuYW1lLAo+ID4gKwkJICAgdm9pZCBf
+X3BlcmNwdSAqcGVyY3B1X2Rldl9pZCk7Cj4gPiAgCj4gCj4gTG9va2luZyBhdCByZXF1ZXN0X2ly
+cSwgdGhlIHByb3RvdHlwZSBpczoKPiAKPiBpbnQgX19tdXN0X2NoZWNrCj4gcmVxdWVzdF9pcnEo
+dW5zaWduZWQgaW50IGlycSwgaXJxX2hhbmRsZXJfdCBoYW5kbGVyLAo+IAkgICAgdW5zaWduZWQg
+bG9uZyBmbGFncywgY29uc3QgY2hhciAqbmFtZSwKPiAJICAgIHZvaWQgKmRldik7Cj4gCj4gLi4u
+IHN1cmVseSBpdCB3b3VsZCBiZSBiZXR0ZXIgdG8gc2hhcmUgdGhlIHNhbWUgYXJndW1lbnQgb3Jk
+ZXI/IGkuZS4KPiAKPiBpbnQgX19tdXN0X2NoZWNrCj4gcmVxdWVzdF9wZXJjcHVfaXJxKHVuc2ln
+bmVkIGludCBpcnEsIGlycV9oYW5kbGVyX3QgaGFuZGxlciwKPiAJCSAgIHVuc2lnbmVkIGxvbmcg
+ZmxhZ3MsIGNvbnN0IGNoYXIgKmRldm5hbWUsCj4gCQkgICB2b2lkIF9fcGVyY3B1ICpwZXJjcHVf
+ZGV2X2lkKTsKPiAKCkFncmVlLgoKVGhhbmtzIGZvciB0aGUgcmV2aWV3LgoKICAtLSBEYW5pZWwK
+CgotLSAKCiA8aHR0cDovL3d3dy5saW5hcm8ub3JnLz4gTGluYXJvLm9yZyDilIIgT3BlbiBzb3Vy
+Y2Ugc29mdHdhcmUgZm9yIEFSTSBTb0NzCgpGb2xsb3cgTGluYXJvOiAgPGh0dHA6Ly93d3cuZmFj
+ZWJvb2suY29tL3BhZ2VzL0xpbmFybz4gRmFjZWJvb2sgfAo8aHR0cDovL3R3aXR0ZXIuY29tLyMh
+L2xpbmFyb29yZz4gVHdpdHRlciB8CjxodHRwOi8vd3d3LmxpbmFyby5vcmcvbGluYXJvLWJsb2cv
+PiBCbG9nCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
+bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
+c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
