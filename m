@@ -1,23 +1,26 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH] arm/arm64: KVM: send SIGBUS error to qemu
-Date: Thu, 23 Mar 2017 15:06:17 +0000
-Message-ID: <58D3E469.8090408@arm.com>
-References: <1490274061-487-1-git-send-email-gengdongjiu@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 00/28] arm/arm64: KVM: Rework the hyp-stub API
+Date: Thu, 23 Mar 2017 15:16:49 +0000
+Message-ID: <e424e00c-e649-8e6a-7f73-ffbd37046779@arm.com>
+References: <20170321192058.9300-1-marc.zyngier@arm.com>
+ <20170322133724.GA10969@cbox> <3dab2f39-88c2-e10b-942c-58a1d8053b71@arm.com>
+ <20170322172708.GA17329@cbox> <10524c84-1e1e-05f8-97b9-436c8649ffa8@arm.com>
+ <20170323143916.GA27715@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 863CE40A54
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Mar 2017 11:04:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5145B40A66
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Mar 2017 11:15:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XmOIz1Yreavq for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Mar 2017 11:04:48 -0400 (EDT)
+ with ESMTP id Hnh226AZvxA1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Mar 2017 11:15:02 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 384CC40190
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Mar 2017 11:04:47 -0400 (EDT)
-In-Reply-To: <1490274061-487-1-git-send-email-gengdongjiu@huawei.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3361340962
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Mar 2017 11:15:01 -0400 (EDT)
+In-Reply-To: <20170323143916.GA27715@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,89 +30,94 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: wuquanming@huawei.com, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, linux@armlinux.org.uk, wangxiongfeng2@huawei.com, huangshaoyu@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, Keerthy <j-keerthy@ti.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dongjiu Geng,
+On 23/03/17 14:39, Christoffer Dall wrote:
+> On Thu, Mar 23, 2017 at 10:53:04AM +0000, Marc Zyngier wrote:
+>> On 22/03/17 17:27, Christoffer Dall wrote:
+>>>
+>>> I don't think there is a great use case beyond what we already do, it
+>>> would just be to have one set of hyp vectors fewer, so that either the
+>>> hyp stub is in place, or a hypervisor is in place, not kvm-init vectors.
+>>>
+>>> So instead of doing:
+>>>   __hyp_set_vectors(kvm_get_idmap_vector());
+>>>   hvc(); /* via the misused kvm_call_hyp thing */
+>>>
+>>> you would do:
+>>>
+>>>   __hyp_call_function(__kvm_hyp_init, arg1, arg2);
+>>>
+>>> which would change the vector and initialize anything.
+>>>
+>>> Not sure if that can work though, or if there are any downsides that I
+>>> haven't thought about?
+>>
+>> I've given it a go, and that seems to work, at least on arm64. We may 
+>> have to set the vectors in a slightly different way on 32bit because 
+>> we're going to run out of registers (we only have two left once we 
+>> reach the function being called).
+> 
+> Right, that's a challenge I clearly didn't foresee.
+> 
+>>
+>> Another thing is that the function called is not really a function. It 
+>> is an exception handler, as it has to end with an eret (or we may need 
+>> to save LR in funky ways).
+> 
+> Shouldn't it have the same semantics as the KVM calling function thing
+> where it pushes the LR on the stack?  But of course, that requires
+> having a stack for each runtime that owns hyp mode at any given time.
+> Potentially not great.
 
-On 23/03/17 13:01, Dongjiu Geng wrote:
-> when the pfn is KVM_PFN_ERR_HWPOISON, it indicates to send
-> SIGBUS signal from KVM's fault-handling code to qemu, qemu
-> can handle this signal according to the fault address.
+Indeed, and that's the point where I'm starting to think that we may be
+trying to beautify something that may not be worth it.
 
-I'm afraid I beat you to it on this one:
-https://www.spinics.net/lists/arm-kernel/msg568919.html
+> If possible, the idea would be that you'd call functions, just like you
+> normally do, but the functions you call can choose to never return -
+> again just like a C function can do if it messes with your machine
+> configuration.
+> 
+> But maybe the idea is fundamentally flawed, if the only function
+> you'd ever call from the hyp stub is one that takes over the hyp world,
+> and then the original design was just based on using set_vectors.  Hmmm.
 
-(Are you the same gengdj who ask me to post that patch?:
- https://lkml.org/lkml/2017/3/5/187 )
+That's my point above. The only use case we have so far for this method
+is to take over EL2. On the other have, I've noticed that the more I
+rework this area, the more old stuff surfaces, ready to be nuked. Maybe
+I should keep digging.
 
-We don't need upstream KVM to do this until either arm or arm64 has
-ARCH_SUPPORTS_MEMORY_FAILURE. Punit and Tyler have discovered problems with the
-way arm64's hugepage and hwpoison interact:
-https://www.spinics.net/lists/arm-kernel/msg568995.html
+> 
+>>  The potential blocker for this is that the
+>> 32bit decompressor does use set_vectors in funky ways to deal with
+>> relocation. If we get rid of set_vectors like I just did on 64bit,
+>> we'll need to mess with that as well.
+> 
+> Interesting.  I didn't think that we'd necessarily get rid of
+> set_vectors, but I agree with you that if we wanted to do this, it
+> should probably go.
+> 
+>>
+>> Anyway, here's the hack, 64bit only, quickly tested on Mustang. I'm not
+>> completely sure this is any prettier, but it is certainly manageable.
+> 
+> There are two things I like about it.  First, it gets rid of the
+> 'additional runtime' in hyp and second the changes to
+> cpu_init_hyp_mode() are quite nice, imho.
+> 
+> Thanks being said, this series is pretty nice as it is, so I don't want
+> to impose more work on you at the moment, so maybe we save your patch
+> snipped below for later if we want to consider looking at it some other
+> time?
 
-
-Some comments on the differences:
-
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index 962616fd4ddd..1307ec400de3 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -1237,6 +1237,20 @@ static void coherent_cache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
->  	__coherent_cache_guest_page(vcpu, pfn, size);
->  }
->  
-> +static void kvm_send_hwpoison_signal(unsigned long address,
-> +					struct task_struct *tsk)
-> +{
-> +	siginfo_t info;
-> +
-> +	info.si_signo	= SIGBUS;
-> +	info.si_errno	= 0;
-> +	info.si_code	= BUS_MCEERR_AR;
-> +	info.si_addr	= (void __user *)address;
-> +	info.si_addr_lsb = PAGE_SHIFT;
-
-Any version of this patch should handle hugepage for the sizes KVM uses in its
-stage2 mappings. By just passing PAGE_SHIFT you let the guest fault for each
-page that makes up the hugepage.
-
-
-> +
-> +	send_sig_info(SIGBUS, &info, tsk);
-> +}
-> +
->  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			  struct kvm_memory_slot *memslot, unsigned long hva,
->  			  unsigned long fault_status)
-> @@ -1309,6 +1323,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (is_error_noslot_pfn(pfn))
->  		return -EFAULT;
->  
-> +	if (is_error_hwpoison_pfn(pfn)) {
-> +		kvm_send_hwpoison_signal(kvm_vcpu_gfn_to_hva(vcpu, gfn),
-> +								current);
-> +		return -EFAULT;
-
-This will return -EFAULT from the KVM_RUN ioctl(). Is Qemu expected to know it
-should try again? This is indistinguishable from the is_error_noslot_pfn() error
-above.
-
-x86 returns 0 from this path, kvm_handle_bad_page() in arch/x86/kvm/mmu.c as the
-SIGBUS should arrive first. If the SIGBUS is handled the error has been resolved
-and Qemu can call KVM_RUN again. Returning an error and sending SIGBUS suggests
-there are two problems.
-
-
-> +	}
-> +
->  	if (kvm_is_device_pfn(pfn)) {
->  		mem_type = PAGE_S2_DEVICE;
->  		flags |= KVM_S2PTE_FLAG_IS_IOMAP;
-
-
+What I can do is prepare an extra series that would include the
+corresponding 32bit changes, and we then evaluate that separately. I
+don't mind spending a bit of time on it.
 
 Thanks,
 
-James
+	M.
+-- 
+Jazz is not dead. It just smells funny...
