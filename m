@@ -1,89 +1,90 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 19/28] ARM: KVM: Allow the main HYP code to use the
- init hyp stub implementation
-Date: Fri, 24 Mar 2017 15:34:32 +0100
-Message-ID: <20170324143432.GD25903@cbox>
+Subject: Re: [PATCH v4 25/28] ARM: decompressor: Remove __hyp_get_vectors usage
+Date: Fri, 24 Mar 2017 15:34:40 +0100
+Message-ID: <20170324143440.GE25903@cbox>
 References: <20170321192058.9300-1-marc.zyngier@arm.com>
- <20170321192058.9300-20-marc.zyngier@arm.com>
+ <20170321192058.9300-26-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6284040AF9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 10:32:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id jpmjLnCjUuTQ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Mar 2017 10:32:50 -0400 (EDT)
+Received: from mail-wr0-f171.google.com (mail-wr0-f171.google.com
+ [209.85.128.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 44E3A40A7F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 10:32:50 -0400 (EDT)
+Received: by mail-wr0-f171.google.com with SMTP id y90so3023530wrb.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 07:34:42 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20170321192058.9300-20-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <20170321192058.9300-26-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Russell King <linux@arm.linux.org.uk>, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Keerthy <j-keerthy@ti.com>
+Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, Keerthy <j-keerthy@ti.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 21, 2017 at 07:20:49PM +0000, Marc Zyngier wrote:
-> We now have a full hyp-stub implementation in the KVM init code,
-> but the main KVM code only supports HVC_GET_VECTORS, which is not
-> enough.
+On Tue, Mar 21, 2017 at 07:20:55PM +0000, Marc Zyngier wrote:
+> When the compressed image needs to be relocated to avoid being
+> overwritten by the decompression process, we need to relocate
+> the hyp vectors as well so that we can find them once the
+> decompression has taken effect.
 > 
-> Instead of reinventing the wheel, let's reuse the init implementation
-> by branching to the idmap page when called with a hyp-stub hypercall.
+> For that, we perform the following calculation:
+> 	u32 v = __hyp_get_vectors();
+> 	v += offset;
+> 	__hyp_set_vectors(v);
 > 
-> Tested-by: Keerthy <j-keerthy@ti.com>
+> But we're guaranteed that the initial value of v as returned by
+> __hyp_get_vectors is always __hyp_stub_vectors, because we have
+> just set it by calling __hyp_stub_install.
+> 
+> So let's remove the use of __hyp_get_vectors, and directly use
+> __hyp_stub_vectors instead.
+> 
 > Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm/kvm/hyp/hyp-entry.S | 29 ++++++++++++++++++++++++-----
->  1 file changed, 24 insertions(+), 5 deletions(-)
+>  arch/arm/boot/compressed/head.S | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-> index 1f8db7d21fc5..a35baa81fd23 100644
-> --- a/arch/arm/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm/kvm/hyp/hyp-entry.S
-> @@ -126,11 +126,30 @@ hyp_hvc:
->  	 */
->  	pop	{r0, r1, r2}
+> diff --git a/arch/arm/boot/compressed/head.S b/arch/arm/boot/compressed/head.S
+> index 9150f9732785..d58bb104c6e8 100644
+> --- a/arch/arm/boot/compressed/head.S
+> +++ b/arch/arm/boot/compressed/head.S
+> @@ -422,7 +422,10 @@ dtb_check_done:
+>  		cmp	r0, #HYP_MODE
+>  		bne	1f
 >  
-> -	/* Check for __hyp_get_vectors */
-> -	cmp	r0, #HVC_GET_VECTORS
-> -	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
-> -	beq	1f
-> +	/*
-> +	 * Check if we have a kernel function, which is guaranteed to be
-> +	 * bigger than the maximum hyp stub hypercall
-> +	 */
-> +	cmp	r0, #HVC_STUB_HCALL_NR
-> +	bhs	1f
->  
-> +	/*
-> +	 * Not a kernel function, treat it as a stub hypercall.
-> +	 * Compute the physical address for __kvm_handle_stub_hvc
-> +	 * (as the code lives in the idmaped page) and branch there.
-> +	 * We hijack ip (r12) as a tmp register.
-> +	 */
+> -		bl	__hyp_get_vectors
+> +0:		adr	r0, 0b
+> +		movw	r1, #:lower16:__hyp_stub_vectors - 0b
+> +		movt	r1, #:upper16:__hyp_stub_vectors - 0b
+> +		add	r0, r0, r1
 
-How can we just clobber r12 and be sure we don't corrupt the caller?
+nit: you could add a comment explaining what r0 ends up containing,
+because I'm pretty sure this will feel obscure when not read in the
+context of this series with your commit message above.
 
-> +	push	{r1}
-> +	ldr	r1, =kimage_voffset
-> +	ldr	r1, [r1]
-> +	ldr	ip, =__kvm_handle_stub_hvc
-> +	sub	ip, ip, r1
-> +THUMB(	add	ip, ip, #1)
-> +	pop	{r1}
-> +
-> +	bx	ip
-> +
-> +1:
->  	push	{lr}
->  
->  	mov	lr, r0
-> @@ -142,7 +161,7 @@ THUMB(	orr	lr, #1)
->  	blx	lr			@ Call the HYP function
->  
->  	pop	{lr}
-> -1:	eret
-> +	eret
->  
->  guest_trap:
->  	load_vcpu r0			@ Load VCPU pointer to r0
+>  		sub	r0, r0, r5
+>  		add	r0, r0, r10
+>  		bl	__hyp_set_vectors
 > -- 
 > 2.11.0
 > 
 
-Thanks,
--Christoffer
+Nevertheless:
+
+Acked-by: Christoffer Dall <cdall@linaro.org>
