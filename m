@@ -1,25 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 28/28] arm/arm64: Add hyp-stub API documentation
-Date: Fri, 24 Mar 2017 15:57:41 +0000
-Message-ID: <ea653ce3-e85a-a42a-9b4f-a5d1daabf871@arm.com>
-References: <20170321192058.9300-1-marc.zyngier@arm.com>
- <20170321192058.9300-29-marc.zyngier@arm.com> <20170324143316.GA25903@cbox>
- <ff4fe929-98f0-de0e-2f1a-d06c7969d5e0@arm.com> <20170324152340.GG25903@cbox>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH V13 10/10] arm/arm64: KVM: add guest SEA support
+Date: Fri, 24 Mar 2017 17:01:58 +0100
+Message-ID: <20170324160158.GH25903@cbox>
+References: <1490136425-4324-1-git-send-email-tbaicar@codeaurora.org>
+ <1490136425-4324-11-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B733040960
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 11:55:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 19F2E40A54
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 12:00:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Jz6PE+KHFjAA for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Mar 2017 11:55:53 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 27BC340905
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 11:55:52 -0400 (EDT)
-In-Reply-To: <20170324152340.GG25903@cbox>
+ with ESMTP id 1o+FlM69SWku for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Mar 2017 12:00:09 -0400 (EDT)
+Received: from mail-wr0-f173.google.com (mail-wr0-f173.google.com
+ [209.85.128.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB78F40969
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 12:00:08 -0400 (EDT)
+Received: by mail-wr0-f173.google.com with SMTP id y90so4694227wrb.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 09:02:01 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1490136425-4324-11-git-send-email-tbaicar@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,118 +32,315 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, Keerthy <j-keerthy@ti.com>, kvmarm@lists.cs.columbia.edu
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/03/17 15:23, Christoffer Dall wrote:
-> On Fri, Mar 24, 2017 at 02:42:13PM +0000, Marc Zyngier wrote:
->> On 24/03/17 14:33, Christoffer Dall wrote:
->>> On Tue, Mar 21, 2017 at 07:20:58PM +0000, Marc Zyngier wrote:
->>>> In order to help people understanding the hyp-stub API that exists
->>>> between the host kernel and the hypervisor mode (whether a hypervisor
->>>> has been installed or not), let's document said API.
->>>>
->>>> As with any form of documentation, I expect it to become obsolete
->>>> and completely misleading within 20 minutes after having being merged.
->>>
->>> I don't think this last sentence belongs in the commit message.
->>>
->>>>
->>>> Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>  Documentation/virtual/kvm/arm/hyp-abi.txt | 45 +++++++++++++++++++++++++++++++
->>>>  1 file changed, 45 insertions(+)
->>>>  create mode 100644 Documentation/virtual/kvm/arm/hyp-abi.txt
->>>>
->>>> diff --git a/Documentation/virtual/kvm/arm/hyp-abi.txt b/Documentation/virtual/kvm/arm/hyp-abi.txt
->>>> new file mode 100644
->>>> index 000000000000..a1e0314d2249
->>>> --- /dev/null
->>>> +++ b/Documentation/virtual/kvm/arm/hyp-abi.txt
->>>> @@ -0,0 +1,45 @@
->>>> +* Internal ABI between the kernel and HYP
->>>> +
->>>> +This file documents the interaction between the Linux kernel and the
->>>> +hypervisor layer when running Linux as a hypervisor (for example
->>>> +KVM). It doesn't cover the interaction of the kernel with the
->>>> +hypervisor when running as a guest (under Xen, KVM or any other
->>>> +hypervisor), or any hypervisor-specific interaction when the kernel is
->>>> +used as a host.
->>>> +
->>>> +On arm and arm64 (without VHE), the kernel doesn't run in hypervisor
->>>> +mode, but still needs to interact with it, allowing a built-in
->>>> +hypervisor to be either installed or torn down.
->>>> +
->>>> +In order to achieve this, the kernel must be booted at HYP (arm) or
->>>> +EL2 (arm64), allowing it to install a set of stubs before dropping to
->>>> +SVC/EL1. These stubs are accessible by using a 'hvc #0' instruction,
->>>> +and only act on individual CPUs.
->>>> +
->>>> +Unless specified otherwise, any built-in hypervisor must implement
->>>> +these functions (see arch/arm{,64}/include/asm/virt.h):
->>>> +
->>>> +* r0/x0 = HVC_SET_VECTORS
->>>> +  r1/x1 = vectors
->>>> +
->>>> +  Set HVBAR/VBAR_EL2 to 'vectors' to enable a hypervisor. 'vectors'
->>>> +  must be a physical address, and respect the alignment requirements
->>>> +  of the architecture. Only implemented by the initial stubs.
->>>
->>> Does this last sentence mean that KVM doesn't implement this function?
->>
->> Indeed. 
+On Tue, Mar 21, 2017 at 04:47:05PM -0600, Tyler Baicar wrote:
+> Currently external aborts are unsupported by the guest abort
+> handling. Add handling for SEAs so that the host kernel reports
+> SEAs which occur in the guest kernel.
+
+The logic in kvm_handle_guest_abort could deserve an explanation here.
+
+Surely the whole logic of how KVM fits into the picture here and how
+we're dealing with synchronous errors could be explained here, based on
+the long conversations between you and James on many prior iterations on
+this patch.
+
 > 
-> I think the wording could be improved to "Only implemented by the
-> initial stubs, not by Linux hypervisors."
-
-Looks good to me, I'll use that.
-
->> Directly setting the vectors is inherently unsafe (MMU could
->> still be ON, for example), hence the HVC_SET_VECTORS operation that
->> allow this to be done safely (RESET followed by SET).
->>
+> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+> ---
+>  arch/arm/include/asm/kvm_arm.h       | 10 +++++++++
+>  arch/arm/include/asm/system_misc.h   |  5 +++++
+>  arch/arm/kvm/mmu.c                   | 41 ++++++++++++++++++++++++++++++------
+>  arch/arm64/include/asm/kvm_arm.h     | 10 +++++++++
+>  arch/arm64/include/asm/system_misc.h |  2 ++
+>  arch/arm64/mm/fault.c                | 19 +++++++++++++++--
+>  drivers/acpi/apei/ghes.c             | 13 ++++++------
+>  include/acpi/ghes.h                  |  2 +-
+>  8 files changed, 86 insertions(+), 16 deletions(-)
 > 
-> Hmm, is it any less safe than setting the vectors using the hyp stubs?
-> In the initial case, we're relying on the caller knowing that the MMU is
-> off, and that the stubs are in place, otherwise it doesn't make sense.
+> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+> index a3f0b3d..ebf020b 100644
+> --- a/arch/arm/include/asm/kvm_arm.h
+> +++ b/arch/arm/include/asm/kvm_arm.h
+> @@ -187,6 +187,16 @@
+>  #define FSC_FAULT	(0x04)
+>  #define FSC_ACCESS	(0x08)
+>  #define FSC_PERM	(0x0c)
+> +#define FSC_SEA		(0x10)
+> +#define FSC_SEA_TTW0	(0x14)
+> +#define FSC_SEA_TTW1	(0x15)
+> +#define FSC_SEA_TTW2	(0x16)
+> +#define FSC_SEA_TTW3	(0x17)
+> +#define FSC_SECC	(0x18)
+> +#define FSC_SECC_TTW0	(0x1c)
+> +#define FSC_SECC_TTW1	(0x1d)
+> +#define FSC_SECC_TTW2	(0x1e)
+> +#define FSC_SECC_TTW3	(0x1f)
+>  
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~0xf)
+> diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
+> index a3d61ad..ea45d94 100644
+> --- a/arch/arm/include/asm/system_misc.h
+> +++ b/arch/arm/include/asm/system_misc.h
+> @@ -24,4 +24,9 @@
+>  
+>  #endif /* !__ASSEMBLY__ */
+>  
+> +static inline int handle_guest_sea(unsigned long addr, unsigned int esr)
+> +{
+> +	return -1;
+> +}
+> +
+>  #endif /* __ASM_ARM_SYSTEM_MISC_H */
+> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> index 962616f..105b6ab 100644
+> --- a/arch/arm/kvm/mmu.c
+> +++ b/arch/arm/kvm/mmu.c
+> @@ -29,6 +29,7 @@
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/virt.h>
+> +#include <asm/system_misc.h>
+>  
+>  #include "trace.h"
+>  
+> @@ -1406,6 +1407,24 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>  		kvm_set_pfn_accessed(pfn);
+>  }
+>  
+> +static bool is_abort_synchronous(unsigned long fault_status) {
 
-That's why I was implying here that RESET+SET is the safe way of doing
-it. Another solution may be to make SET imply RESET, and keep it
-implemented always?
+this naming feels a bit weird to me.  For example, this will return
+false for a normal translation fault, which is indeed synchronous.
 
-> But I think the point is just that we don't have a need to change the
-> vector from within KVM; we only have a need to set the vector when going
-> from stub->kvm, and we have a need to reset the whole thing (including
-> turning off the MMU) when going from kvm->stub.
+Below you cann handle_guest_sea conditionally based on the result of
+this function, so could it be called is_abort_sea ?
 
-Exactly. The current API doesn't try to cater for all possible cases. It
-just make sure that KVM can be installed and torn down safely.
+> +	switch (fault_status) {
+> +	case FSC_SEA:
+> +	case FSC_SEA_TTW0:
+> +	case FSC_SEA_TTW1:
+> +	case FSC_SEA_TTW2:
+> +	case FSC_SEA_TTW3:
+> +	case FSC_SECC:
+> +	case FSC_SECC_TTW0:
+> +	case FSC_SECC_TTW1:
+> +	case FSC_SECC_TTW2:
+> +	case FSC_SECC_TTW3:
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+>  /**
+>   * kvm_handle_guest_abort - handles all 2nd stage aborts
+>   * @vcpu:	the VCPU pointer
+> @@ -1426,23 +1445,31 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	unsigned long hva;
+>  	bool is_iabt, write_fault, writable;
+>  	gfn_t gfn;
+> -	int ret, idx;
+> +	int ret, idx, sea_status = 1;
+> +
+> +	/* Check the stage-2 fault is trans. fault or write fault */
 
-> Anyhow, my comment was just about the wording, as I had some nagging
-> doubt when I read the patch.
+I think this comment was supposed to belong with the check for the three
+types below, not for calling kvm_vcpu_trap_get_fault_type, and I also
+think the comment is outdated, because it doesn't mention the access
+flag.
+
+I suggest either removing the comment, or keep it where it was and
+change to say "trans. fault, write fault, acces flag fault, or
+sea_status", with some insight into what sea_status means here.
+
+> +	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+> +
+> +	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+> +
+> +	/* The host kernel will handle the synchronous external abort. There
+> +	 * is no need to pass the error into the guest.
+> +	 */
+
+nit: commenting style.
+
+> +	if (is_abort_synchronous(fault_status))
+> +		sea_status = handle_guest_sea((unsigned long)fault_ipa,
+
+will this ever be used on AArch32 in the future?
+
+If so, casting a phys_addr_t for an IPA to an unsigned long is an
+incredibly bad idea.  Why not just use phys_addr_t for handle_guest_sea?
+
+> +				    kvm_vcpu_get_hsr(vcpu));
+>  
+>  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+> -	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu))) {
+> +	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu)) && sea_status) {
+>  		kvm_inject_vabt(vcpu);
+>  		return 1;
+>  	}
+>  
+> -	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+> -
+>  	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_hsr(vcpu),
+>  			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
+>  
+> -	/* Check the stage-2 fault is trans. fault or write fault */
+> -	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+>  	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+> -	    fault_status != FSC_ACCESS) {
+> +	    fault_status != FSC_ACCESS && sea_status) {
+
+I don't understand the maning of sea_status here.  If sea_status is
+non-zero then the fault_status matters, but if sea_status is zero, then
+we just continue by handling this as an MMIO abort or a user fault?
+
+What am I missing here?
+
+
+
+>  		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+>  			kvm_vcpu_trap_get_class(vcpu),
+>  			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 6e99978..61d694c 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -204,6 +204,16 @@
+>  #define FSC_FAULT	ESR_ELx_FSC_FAULT
+>  #define FSC_ACCESS	ESR_ELx_FSC_ACCESS
+>  #define FSC_PERM	ESR_ELx_FSC_PERM
+> +#define FSC_SEA		ESR_ELx_FSC_EXTABT
+> +#define FSC_SEA_TTW0	(0x14)
+> +#define FSC_SEA_TTW1	(0x15)
+> +#define FSC_SEA_TTW2	(0x16)
+> +#define FSC_SEA_TTW3	(0x17)
+> +#define FSC_SECC	(0x18)
+> +#define FSC_SECC_TTW0	(0x1c)
+> +#define FSC_SECC_TTW1	(0x1d)
+> +#define FSC_SECC_TTW2	(0x1e)
+> +#define FSC_SECC_TTW3	(0x1f)
+>  
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~UL(0xf))
+> diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
+> index bc81243..5b2cecd 100644
+> --- a/arch/arm64/include/asm/system_misc.h
+> +++ b/arch/arm64/include/asm/system_misc.h
+> @@ -58,4 +58,6 @@ void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned int,
+>  
+>  #endif	/* __ASSEMBLY__ */
+>  
+> +int handle_guest_sea(unsigned long addr, unsigned int esr);
+> +
+>  #endif	/* __ASM_SYSTEM_MISC_H */
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index f7372ce..ee96307 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -497,6 +497,7 @@ static int do_bad(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>  static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>  {
+>  	struct siginfo info;
+> +	int ret = 0;
+>  
+>  	pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
+>  		 fault_name(esr), esr, addr);
+> @@ -508,7 +509,7 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>  	 */
+>  	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA)) {
+>  		nmi_enter();
+> -		ghes_notify_sea();
+> +		ret = ghes_notify_sea();
+>  		nmi_exit();
+>  	}
+>  
+> @@ -521,7 +522,7 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>  		info.si_addr  = (void __user *)addr;
+>  	arm64_notify_die("", regs, &info, esr);
+>  
+> -	return 0;
+> +	return ret;
+>  }
+>  
+>  static const struct fault_info {
+> @@ -603,6 +604,20 @@ static const char *fault_name(unsigned int esr)
+>  }
+>  
+>  /*
+> + * Handle Synchronous External Aborts that occur in a guest kernel.
+> + */
+
+Can you document what the return value here means?
+
+I have no idea what the semantics of ghes_notify_sea() are.
+
+> +int handle_guest_sea(unsigned long addr, unsigned int esr)
+> +{
+> +	int ret = -ENOENT;
+> +
+> +	if(IS_ENABLED(CONFIG_ACPI_APEI_SEA)) {
+> +		ret = ghes_notify_sea();
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +/*
+>   * Dispatch a data abort to the relevant handler.
+>   */
+>  asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 230b095..81eabc6 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -810,17 +810,18 @@ static int ghes_notify_sci(struct notifier_block *this,
+>  #ifdef CONFIG_ACPI_APEI_SEA
+>  static LIST_HEAD(ghes_sea);
+>  
+> -void ghes_notify_sea(void)
+> +int ghes_notify_sea(void)
+>  {
+>  	struct ghes *ghes;
+> +	int ret = -ENOENT;
+>  
+> -	/*
+> -	 * synchronize_rcu() will wait for nmi_exit(), so no need to
+> -	 * rcu_read_lock().
+> -	 */
+> +	rcu_read_lock();
+>  	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
+> -		ghes_proc(ghes);
+> +		if(!ghes_proc(ghes))
+> +			ret = 0;
+>  	}
+> +	rcu_read_unlock();
+> +	return ret;
+>  }
+>  
+>  static void ghes_sea_add(struct ghes *ghes)
+> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+> index 18bc935..2a727dc 100644
+> --- a/include/acpi/ghes.h
+> +++ b/include/acpi/ghes.h
+> @@ -99,6 +99,6 @@ static inline void *acpi_hest_generic_data_payload(struct acpi_hest_generic_data
+>  		gdata + 1;
+>  }
+>  
+> -void ghes_notify_sea(void);
+> +int ghes_notify_sea(void);
+>  
+>  #endif /* GHES_H */
+> -- 
+> Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+> Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+> a Linux Foundation Collaborative Project.
 > 
->>>
->>>> +
->>>> +* r0/x0 = HVC_RESET_VECTORS
->>>> +
->>>> +  Turn HYP/EL2 MMU off, and reset HVBAR/VBAR_EL2 to the default
->>>> +  value. This effectively disables an existing hypervisor.
->>>
->>> What's the 'default value' ?  Could we say to the physical address of
->>> the hypervisor stub's exception vector?
->>
->> Shouldn't that be the kernel stub's exception vector?
->>
-> 
-> Yeah, the "initials stubs' exception vector" is probably the most
-> coherent thing we can use here.
-
-I'll use that when respinning it.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-Christoffer
