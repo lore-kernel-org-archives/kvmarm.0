@@ -1,77 +1,136 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 19/28] ARM: KVM: Allow the main HYP code to use the
- init hyp stub implementation
-Date: Fri, 24 Mar 2017 15:01:23 +0000
-Message-ID: <00380529-bee2-ba10-548d-319bc4fa5c1b@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v4 28/28] arm/arm64: Add hyp-stub API documentation
+Date: Fri, 24 Mar 2017 16:23:40 +0100
+Message-ID: <20170324152340.GG25903@cbox>
 References: <20170321192058.9300-1-marc.zyngier@arm.com>
- <20170321192058.9300-20-marc.zyngier@arm.com> <20170324143432.GD25903@cbox>
+ <20170321192058.9300-29-marc.zyngier@arm.com>
+ <20170324143316.GA25903@cbox>
+ <ff4fe929-98f0-de0e-2f1a-d06c7969d5e0@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170324143432.GD25903@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Russell King <linux@arm.linux.org.uk>, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Keerthy <j-keerthy@ti.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 216B540905
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 11:21:53 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id irIY9rvcy8GL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Mar 2017 11:21:51 -0400 (EDT)
+Received: from mail-wr0-f175.google.com (mail-wr0-f175.google.com
+ [209.85.128.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 82AC1405DA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 11:21:50 -0400 (EDT)
+Received: by mail-wr0-f175.google.com with SMTP id u1so3939338wra.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 08:23:42 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <ff4fe929-98f0-de0e-2f1a-d06c7969d5e0@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, Keerthy <j-keerthy@ti.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/03/17 14:34, Christoffer Dall wrote:
-> On Tue, Mar 21, 2017 at 07:20:49PM +0000, Marc Zyngier wrote:
->> We now have a full hyp-stub implementation in the KVM init code,
->> but the main KVM code only supports HVC_GET_VECTORS, which is not
->> enough.
->>
->> Instead of reinventing the wheel, let's reuse the init implementation
->> by branching to the idmap page when called with a hyp-stub hypercall.
->>
->> Tested-by: Keerthy <j-keerthy@ti.com>
->> Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm/kvm/hyp/hyp-entry.S | 29 ++++++++++++++++++++++++-----
->>  1 file changed, 24 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
->> index 1f8db7d21fc5..a35baa81fd23 100644
->> --- a/arch/arm/kvm/hyp/hyp-entry.S
->> +++ b/arch/arm/kvm/hyp/hyp-entry.S
->> @@ -126,11 +126,30 @@ hyp_hvc:
->>  	 */
->>  	pop	{r0, r1, r2}
->>  
->> -	/* Check for __hyp_get_vectors */
->> -	cmp	r0, #HVC_GET_VECTORS
->> -	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
->> -	beq	1f
->> +	/*
->> +	 * Check if we have a kernel function, which is guaranteed to be
->> +	 * bigger than the maximum hyp stub hypercall
->> +	 */
->> +	cmp	r0, #HVC_STUB_HCALL_NR
->> +	bhs	1f
->>  
->> +	/*
->> +	 * Not a kernel function, treat it as a stub hypercall.
->> +	 * Compute the physical address for __kvm_handle_stub_hvc
->> +	 * (as the code lives in the idmaped page) and branch there.
->> +	 * We hijack ip (r12) as a tmp register.
->> +	 */
+On Fri, Mar 24, 2017 at 02:42:13PM +0000, Marc Zyngier wrote:
+> On 24/03/17 14:33, Christoffer Dall wrote:
+> > On Tue, Mar 21, 2017 at 07:20:58PM +0000, Marc Zyngier wrote:
+> >> In order to help people understanding the hyp-stub API that exists
+> >> between the host kernel and the hypervisor mode (whether a hypervisor
+> >> has been installed or not), let's document said API.
+> >>
+> >> As with any form of documentation, I expect it to become obsolete
+> >> and completely misleading within 20 minutes after having being merged.
+> > 
+> > I don't think this last sentence belongs in the commit message.
+> > 
+> >>
+> >> Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
+> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> >> ---
+> >>  Documentation/virtual/kvm/arm/hyp-abi.txt | 45 +++++++++++++++++++++++++++++++
+> >>  1 file changed, 45 insertions(+)
+> >>  create mode 100644 Documentation/virtual/kvm/arm/hyp-abi.txt
+> >>
+> >> diff --git a/Documentation/virtual/kvm/arm/hyp-abi.txt b/Documentation/virtual/kvm/arm/hyp-abi.txt
+> >> new file mode 100644
+> >> index 000000000000..a1e0314d2249
+> >> --- /dev/null
+> >> +++ b/Documentation/virtual/kvm/arm/hyp-abi.txt
+> >> @@ -0,0 +1,45 @@
+> >> +* Internal ABI between the kernel and HYP
+> >> +
+> >> +This file documents the interaction between the Linux kernel and the
+> >> +hypervisor layer when running Linux as a hypervisor (for example
+> >> +KVM). It doesn't cover the interaction of the kernel with the
+> >> +hypervisor when running as a guest (under Xen, KVM or any other
+> >> +hypervisor), or any hypervisor-specific interaction when the kernel is
+> >> +used as a host.
+> >> +
+> >> +On arm and arm64 (without VHE), the kernel doesn't run in hypervisor
+> >> +mode, but still needs to interact with it, allowing a built-in
+> >> +hypervisor to be either installed or torn down.
+> >> +
+> >> +In order to achieve this, the kernel must be booted at HYP (arm) or
+> >> +EL2 (arm64), allowing it to install a set of stubs before dropping to
+> >> +SVC/EL1. These stubs are accessible by using a 'hvc #0' instruction,
+> >> +and only act on individual CPUs.
+> >> +
+> >> +Unless specified otherwise, any built-in hypervisor must implement
+> >> +these functions (see arch/arm{,64}/include/asm/virt.h):
+> >> +
+> >> +* r0/x0 = HVC_SET_VECTORS
+> >> +  r1/x1 = vectors
+> >> +
+> >> +  Set HVBAR/VBAR_EL2 to 'vectors' to enable a hypervisor. 'vectors'
+> >> +  must be a physical address, and respect the alignment requirements
+> >> +  of the architecture. Only implemented by the initial stubs.
+> > 
+> > Does this last sentence mean that KVM doesn't implement this function?
 > 
-> How can we just clobber r12 and be sure we don't corrupt the caller?
+> Indeed. 
 
-r12 (aka ip) is allowed to be clobbered by the linker (used by inserted
-code veneers, for example). Given that this is a standalone object, we
-can safely assume that r12 has been saved if it was used by the caller.
+I think the wording could be improved to "Only implemented by the
+initial stubs, not by Linux hypervisors."
 
-Here is what the PCS says:
+> Directly setting the vectors is inherently unsafe (MMU could
+> still be ON, for example), hence the HVC_SET_VECTORS operation that
+> allow this to be done safely (RESET followed by SET).
+> 
 
-"Register r12 (IP) may be used by a linker as a scratch register between
-a routine and any subroutine it calls (for details, see
-§5.3.1.1, Use of IP by the linker). It can also be used within a routine
-to hold intermediate values between subroutine calls."
+Hmm, is it any less safe than setting the vectors using the hyp stubs?
+In the initial case, we're relying on the caller knowing that the MMU is
+off, and that the stubs are in place, otherwise it doesn't make sense.
+
+But I think the point is just that we don't have a need to change the
+vector from within KVM; we only have a need to set the vector when going
+from stub->kvm, and we have a need to reset the whole thing (including
+turning off the MMU) when going from kvm->stub.
+
+Anyhow, my comment was just about the wording, as I had some nagging
+doubt when I read the patch.
+
+> > 
+> >> +
+> >> +* r0/x0 = HVC_RESET_VECTORS
+> >> +
+> >> +  Turn HYP/EL2 MMU off, and reset HVBAR/VBAR_EL2 to the default
+> >> +  value. This effectively disables an existing hypervisor.
+> > 
+> > What's the 'default value' ?  Could we say to the physical address of
+> > the hypervisor stub's exception vector?
+> 
+> Shouldn't that be the kernel stub's exception vector?
+> 
+
+Yeah, the "initials stubs' exception vector" is probably the most
+coherent thing we can use here.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-Christoffer
