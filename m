@@ -1,25 +1,28 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 19/19] KVM: arm64: ITS: Pending table save/restore
-Date: Fri, 24 Mar 2017 12:20:50 +0100
-Message-ID: <bb875857-b484-3701-fc79-9b1ad3a5bafd@redhat.com>
+Subject: Re: [PATCH v3 18/19] KVM: arm64: ITS: Device table save/restore
+Date: Fri, 24 Mar 2017 12:27:31 +0100
+Message-ID: <dacdb2d2-c868-5edb-ce63-715fb218b092@redhat.com>
 References: <1488800074-21991-1-git-send-email-eric.auger@redhat.com>
- <1488800074-21991-20-git-send-email-eric.auger@redhat.com>
- <19960cae-8dbd-6244-a2d6-96a8cea46d80@arm.com>
+ <1488800074-21991-19-git-send-email-eric.auger@redhat.com>
+ <2c4841df-f7b3-ee03-16d3-7e32c9cbd936@arm.com>
+ <728905ad-61a2-f510-b04f-5af178dfaade@redhat.com>
+ <27cb5ad5-d43e-44f8-7311-c4d10de4e0ad@redhat.com>
+ <83e91a43-237f-2bce-574c-6a97ee66e8d2@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD29140A66
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 07:19:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6067440A66
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 07:25:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uI522FQfp1RB for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Mar 2017 07:19:05 -0400 (EDT)
+ with ESMTP id 1sjjSlUfXEPe for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Mar 2017 07:25:46 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 69683405DA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 07:19:04 -0400 (EDT)
-In-Reply-To: <19960cae-8dbd-6244-a2d6-96a8cea46d80@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FBAF405DA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Mar 2017 07:25:45 -0400 (EDT)
+In-Reply-To: <83e91a43-237f-2bce-574c-6a97ee66e8d2@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,172 +36,131 @@ To: Andre Przywara <andre.przywara@arm.com>, eric.auger.pro@gmail.com, marc.zyng
 Cc: Prasun.Kapoor@cavium.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+Hi,
 
-On 22/03/2017 15:39, Andre Przywara wrote:
-> Hi Eric,
+On 24/03/2017 12:12, Andre Przywara wrote:
+> Hi,
 > 
-> On 06/03/17 11:34, Eric Auger wrote:
->> Save and restore the pending tables.
+> On 24/03/17 10:45, Auger Eric wrote:
+>> Hi Andre,
 >>
->> Pending table restore obviously requires the pendbaser to be
->> already set.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v1 -> v2:
->> - do not care about the 1st KB which should be zeroed according to
->>   the spec.
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 71 ++++++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 69 insertions(+), 2 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 27ebabd..24824be 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -1736,7 +1736,48 @@ static int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
->>   */
->>  static int vgic_its_flush_pending_tables(struct vgic_its *its)
+>> On 24/03/2017 11:38, Auger Eric wrote:
+>>> Hi Andre,
+>>>
+>>> On 22/03/2017 15:39, Andre Przywara wrote:
+>>>> Hi,
+>>>>
+>>>> On 06/03/17 11:34, Eric Auger wrote:
+>>>>> This patch flushes the device table entries into guest RAM.
+>>>>> Both flat table and 2 stage tables are supported.  DeviceId
+>>>>> indexing is used.
+>>>>>
+>>>>> For each device listed in the device table, we also flush
+>>>>> the translation table using the vgic_its_flush/restore_itt
+>>>>> routines.
+>>>>>
+>>>>> On restore, devices are re-allocated and their itte are
+>>>>> re-built.
+>>>>
+>>>> Some minor things below.
+>>>> In general I had quite some trouble to understand what's going on here,
+>>>> though I convinced myself that this is correct. So could you add a bit
+>>>> more comments here? For instance to explain that we have to explicitly
+>>>> handle the L1 table on restore, but not on flush.
+>>>
+>>> On flush vgic_its_check_id does the 2 stage handling and computes the
+>>> entry address from the devid:
+>>>
+>>> 		if (!vgic_its_check_id(its, baser,
+>>> 				       dev->device_id, &eaddr))
+>>>
+>>> Then you simply flush the entry at that address
+>>>
+>>> On restore, you need to scan the level1 and level2 tables for valid entries.
+>>>>
+>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>>
+>>>>> ---
+>>>>> v2 -> v3:
+>>>>> - fix itt_addr bitmask in vgic_its_restore_dte
+>>>>> - addition of return 0 in vgic_its_restore_ite moved to
+>>>>>   the ITE related patch
+>>>>>
+>>>>> v1 -> v2:
+>>>>> - use 8 byte format for DTE and ITE
+>>>>> - support 2 stage format
+>>>>> - remove kvm parameter
+>>>>> - ITT flush/restore moved in a separate patch
+>>>>> - use deviceid indexing
+>>>>> ---
+>>>>>  virt/kvm/arm/vgic/vgic-its.c | 144 ++++++++++++++++++++++++++++++++++++++++++-
+>>>>>  1 file changed, 142 insertions(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>>>>> index a216849..27ebabd 100644
+>>>>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>>>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>>>>> @@ -1849,12 +1849,137 @@ static int vgic_its_restore_itt(struct vgic_its *its,
+>>>>>  }
+>>>>>  
+>>>>>  /**
+>>>>> + * vgic_its_flush_dte - Flush a device table entry at a given GPA
+>>>>> + *
+>>>>> + * @its: ITS handle
+>>>>> + * @dev: ITS device
+>>>>> + * @ptr: GPA
+>>>>> + */
+>>>>> +static int vgic_its_flush_dte(struct vgic_its *its,
+>>>>> +			      struct its_device *dev, gpa_t ptr)
+>>>>> +{
+>>>>> +	struct kvm *kvm = its->dev->kvm;
+>>>>> +	u64 val, itt_addr_field;
+>>>>> +	int ret;
+>>>>> +	u32 next_offset;
+>>>>> +
+>>>>> +	itt_addr_field = dev->itt_addr >> 8;
+>>>>> +	next_offset = compute_next_devid_offset(&its->device_list, dev);
+>>>>> +	val = (((u64)next_offset << 45) | (itt_addr_field << 5) |
+>>>>
+>>>> So this gives you 19 bits for next_offset, but the value of
+>>>> VITS_DTE_MAX_DEVID_OFFSET suggests 20 bits. It should become more
+>>>> obvious what's happening here if use "BITS(x) - 1" at the definition as
+>>>> suggested before.
+>>> Yes this should be 19 bits
+>>>>
+>>>> Also you limit itt_addr here to 40 bits, where the actual limit seems to
+>>>> be 44 bits (52 - 8). Is that limited by KVM somewhere else?
+>>>
+>>> Those 40 bits match [47:8] of the itt_addr. I limited to 48 since I
+>>> found a comment saying
+>>> /*
+>>>  * We only implement 48 bits of PA at the moment, although the ITS
+>>>  * supports more. Let's be restrictive here.
+>>>  */
+>>>
+>>>
+>>> On the other hand there is
+>>> #define its_cmd_get_ittaddr(cmd) its_cmd_mask_field(cmd, 2,  8, 44)
+>>> To me this is wrong. I would have expected its_cmd_mask_field(cmd, 2,
+>>> 8, 47) instead as the other *_ADDRESS()
+>> Forget that. That's my own code which is wrong!
 > 
-> So as suspected before, I think passing the "its" pointer here is wrong.
-> In fact you don't use that ITS except for getting the kvm pointer.
-> Architecturally the pending tables are per redistributor, so you should
-> pass a struct vcpu pointer.
-> So the cleanest way would be to have a FLUSH/RESTORE_PENDING_TABLE ioctl
-> on the *redistributor* kvm_device, which iterates through the list here
-> and just dumps the pending bits for LPIs targeting that VCPU (skipping
-> over others).
-> Alternatively it would be enough to pass just a struct kvm pointer here
-> and keep dumping all LPIs, but call this function only once per VM (not
-> for each ITS). That sounds a bit dodgy from the architectural point of
-> view, though.
-> 
->>  {
->> -	return -ENXIO;
->> +	struct kvm *kvm = its->dev->kvm;
->> +	struct vgic_dist *dist = &kvm->arch.vgic;
->> +	struct vgic_irq *irq;
->> +	int ret;
->> +
->> +	/**
->> +	 * we do not take the dist->lpi_list_lock since we have a garantee
->> +	 * the LPI list is not touched while the its lock is held
->> +	 */
-> 
-> As mentioned before I think this has to be reworked to take the lock,
-> copy the table, drop the lock again and then iterate over the (private)
-> copy to handle each LPI.
-> Or something completely different.
-> But IIRC the lpi_list_lock is taken completely independent of any ITS
-> emulation code in vgic.c.
+> Ah, that would explain why I was just struggling to find it ;-)
+> Please note that the last parameters is a "size", which really means
+> "number of bits". That's different from GENMASK, which takes the last
+> valid bit.
+Oh so my code was correct eventually and covered the whole range offered
+by the HW (52 bits). After working with GENMASK() I mixed up and did not
+understand my own code anymore.
+> Also there is "slight glitch" in the spec here:
+> The bit *diagram* for MAPD puts the last valid ITT address bit at 50,
+> but the text clearly speaks or [51:8], which also makes more sense.
+Yes I noticed that and reported it to Marc too.
 
-I aligned the code with other user access:
-take the kvm lock and take all vcpu locks to make sure the vcpu are not
-running
-> 
->> +	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
->> +		struct kvm_vcpu *vcpu;
->> +		gpa_t pendbase, ptr;
->> +		bool stored;
->> +		u8 val;
->> +
->> +		vcpu = irq->target_vcpu;
->> +		if (!vcpu)
->> +			return -EINVAL;
-> 
-> Isn't target_vcpu == NULL a valid use case? So continue; instead of return?
-yes correct.
-> 
->> +
->> +		pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
->> +
->> +		ptr = pendbase + (irq->intid / BITS_PER_BYTE);
->> +
->> +		ret = kvm_read_guest(kvm, (gpa_t)ptr, &val, 1);
->> +		if (ret)
->> +			return ret;
->> +
->> +		stored = val & (irq->intid % BITS_PER_BYTE);
->> +		if (stored == irq->pending_latch)
->> +			continue;
->> +
->> +		if (irq->pending_latch)
->> +			val |= 1 << (irq->intid % BITS_PER_BYTE);
->> +		else
->> +			val &= ~(1 << (irq->intid % BITS_PER_BYTE));
->> +
->> +		ret = kvm_write_guest(kvm, (gpa_t)ptr, &val, 1);
->> +		if (ret)
->> +			return ret;
->> +	}
->> +
->> +	return 0;
->>  }
->>  
->>  /**
->> @@ -1745,7 +1786,33 @@ static int vgic_its_flush_pending_tables(struct vgic_its *its)
->>   */
->>  static int vgic_its_restore_pending_tables(struct vgic_its *its)
-> 
-> Could deserve the comment that it doesn't actually scan the table for
-> set bits, but only checks the mapped LPIs (and thus should come last in
-> the restore process).
-> Also the same comment as above about using the "its" pointer applies here.
-done
-> 
->>  {
->> -	return -ENXIO;
->> +	struct vgic_irq *irq;
->> +	struct kvm *kvm = its->dev->kvm;
->> +	struct vgic_dist *dist = &kvm->arch.vgic;
->> +	int ret;
->> +
->> +	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
->> +		struct kvm_vcpu *vcpu;
->> +		gpa_t pendbase, ptr;
->> +		u8 val;
->> +
->> +		vcpu = irq->target_vcpu;
->> +		if (!vcpu)
->> +			return -EINVAL;
->> +
->> +		if (!(vcpu->arch.vgic_cpu.pendbaser & GICR_PENDBASER_PTZ))
->> +			return 0;
-> 
-> I believe this bit is only set once by software to communicate that
-> *initially* (upon enabling LPIs in the redistributor) the pending table
-> is clear. It is never cleared by the redistributor, so you can't rely on
-> it here.
-you're right
-
-thanks
+Thanks!
 
 Eric
 > 
 > Cheers,
 > Andre.
-> 
->> +
->> +		pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
->> +
->> +		ptr = pendbase + (irq->intid / BITS_PER_BYTE);
->> +
->> +		ret = kvm_read_guest(kvm, (gpa_t)ptr, &val, 1);
->> +		if (ret)
->> +			return ret;
->> +		irq->pending_latch = val & (1 << (irq->intid % BITS_PER_BYTE));
->> +	}
->> +	return 0;
->>  }
->>  
->>  static int vgic_its_flush_ite(struct vgic_its *its, struct its_device *dev,
->>
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 > 
