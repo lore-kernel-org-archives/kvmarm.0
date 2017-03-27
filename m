@@ -1,23 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 12/22] KVM: arm64: ITS: Check the device id matches TYPER
- DEVBITS range
-Date: Mon, 27 Mar 2017 11:31:02 +0200
-Message-ID: <1490607072-21610-13-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v4 13/22] KVM: arm64: ITS: KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
+ group
+Date: Mon, 27 Mar 2017 11:31:03 +0200
+Message-ID: <1490607072-21610-14-git-send-email-eric.auger@redhat.com>
 References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D709A40A80
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A5D8A40BD2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ps+tM12b62ox for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Mar 2017 05:30:21 -0400 (EDT)
+ with ESMTP id GnkVcveYSh2e for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Mar 2017 05:30:27 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D5BE840C8A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E55940A80
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:27 -0400 (EDT)
 In-Reply-To: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,65 +32,243 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On MAPD we currently check the device id can be stored in the device table.
-Let's first check it can be encoded within the range defined by TYPER
-DEVBITS.
+Introduce a new group aiming at saving/restoring the ITS
+tables to/from the guest memory.
+
+We hold the vcpus lock during the save and restore to make
+sure no vcpu is running.
+
+At this stage the functionality is not yet implemented. Only
+the skeleton is put in place.
+
+The ABI revision supposed to have been set through IIDR user
+write is checked before the table restoration. This guarantees
+this vITS knows how to restore the saved tables.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
 v3 -> v4:
-- VITS_TYPER_DEVBITS set to 16 for homogeneity
-- use BIT_ULL
----
- virt/kvm/arm/vgic/vgic-its.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+- pass kvm struct handle to vgic_its_flush/restore_pending_tables
+- take the kvm lock and vcpu locks
+- ABI revision check
+- check attr->attr is null
 
+v1 -> v2:
+- remove useless kvm parameter
+---
+ arch/arm/include/uapi/asm/kvm.h   |   1 +
+ arch/arm64/include/uapi/asm/kvm.h |   1 +
+ virt/kvm/arm/vgic/vgic-its.c      | 142 +++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 143 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 4beb83b..7b165e9 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -193,6 +193,7 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+ #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
++#define KVM_DEV_ARM_VGIC_GRP_ITS_TABLES	9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 7e8dd69..166df68 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -213,6 +213,7 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+ #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
++#define KVM_DEV_ARM_VGIC_GRP_ITS_TABLES 9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 89a0db7..b275aea 100644
+index b275aea..76dd562 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -183,6 +183,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+@@ -1627,6 +1627,135 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+ 	return ret;
+ }
  
- #define VITS_ESZ 8
- #define VITS_TYPER_IDBITS 16
-+#define VITS_TYPER_DEVBITS 16
- 
- /*
-  * Finds and returns a collection in the ITS collection table.
-@@ -382,8 +383,8 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
- 	 * To avoid memory waste in the guest, we keep the number of IDBits and
- 	 * DevBits low - as least for the time being.
- 	 */
--	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
- 	reg |= (VITS_TYPER_IDBITS - 1) << GITS_TYPER_IDBITS_SHIFT;
-+	reg |= (VITS_TYPER_DEVBITS - 1) << GITS_TYPER_DEVBITS_SHIFT;
- 	reg |= (VITS_ESZ - 1) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
- 
- 	return extract_bytes(reg, addr & 7, len);
-@@ -623,10 +624,10 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
-  * Check whether an ID can be stored into the corresponding guest table.
-  * For a direct table this is pretty easy, but gets a bit nasty for
-  * indirect tables. We check whether the resulting guest physical address
-- * is actually valid (covered by a memslot and guest accessbible).
-+ * is actually valid (covered by a memslot and guest accessible).
-  * For this we have to read the respective first level entry.
-  */
--static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
-+static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
- {
- 	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 	int index;
-@@ -634,6 +635,9 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
- 	gfn_t gfn;
- 	int esz = GITS_BASER_ENTRY_SIZE(baser);
- 
-+	if (id >= BIT_ULL(VITS_TYPER_DEVBITS))
-+		return false;
++/**
++ * vgic_its_flush_pending_tables - Flush the pending tables into guest RAM
++ */
++static int vgic_its_flush_pending_tables(struct kvm *kvm)
++{
++	return -ENXIO;
++}
 +
- 	if (!(baser & GITS_BASER_INDIRECT)) {
- 		phys_addr_t addr;
++/**
++ * vgic_its_restore_pending_tables - Restore the pending tables from guest
++ * RAM to internal data structs
++ */
++static int vgic_its_restore_pending_tables(struct kvm *kvm)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_flush_device_tables - flush the device table and all ITT
++ * into guest RAM
++ */
++static int vgic_its_flush_device_tables(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_restore_device_tables - restore the device table and all ITT
++ * from guest RAM to internal data structs
++ */
++static int vgic_its_restore_device_tables(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_flush_collection_table - flush the collection table into
++ * guest RAM
++ */
++static int vgic_its_flush_collection_table(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_restore_collection_table - reads the collection table
++ * in guest memory and restores the ITS internal state. Requires the
++ * BASER registers to be restored before.
++ */
++static int vgic_its_restore_collection_table(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_table_flush - Flush all the tables into guest RAM
++ */
++static int vgic_its_table_flush(struct vgic_its *its)
++{
++	struct kvm *kvm = its->dev->kvm;
++	int ret;
++
++	mutex_lock(&kvm->lock);
++
++	if (!lock_all_vcpus(kvm)) {
++		mutex_unlock(&kvm->lock);
++		return -EBUSY;
++	}
++
++	ret = vgic_its_flush_pending_tables(kvm);
++	if (ret)
++		goto out;
++	ret = vgic_its_flush_device_tables(its);
++	if (ret)
++		goto out;
++
++	ret = vgic_its_flush_collection_table(its);
++
++out:
++	unlock_all_vcpus(kvm);
++	mutex_unlock(&kvm->lock);
++	return ret;
++}
++
++/**
++ * vgic_its_table_restore - Restore all tables from guest RAM to internal
++ * data structs
++ */
++static int vgic_its_table_restore(struct vgic_its *its)
++{
++	struct kvm *kvm = its->dev->kvm;
++	int ret;
++
++	mutex_lock(&kvm->lock);
++
++	if (its->user_revision < REV) {
++		mutex_unlock(&kvm->lock);
++		return -EINVAL;
++	}
++
++	if (!lock_all_vcpus(kvm)) {
++		mutex_unlock(&kvm->lock);
++		return -EBUSY;
++	}
++
++	ret = vgic_its_restore_collection_table(its);
++	if (ret)
++		goto out;
++
++	ret = vgic_its_restore_device_tables(its);
++	if (ret)
++		goto out;
++
++	ret = vgic_its_restore_pending_tables(kvm);
++
++out:
++	unlock_all_vcpus(kvm);
++	mutex_unlock(&kvm->lock);
++
++	if (ret)
++		return ret;
++
++	/*
++	 * On restore path, MSI injections can happen before the
++	 * first VCPU run so let's complete the GIC init here.
++	 */
++	return kvm_vgic_map_resources(its->dev->kvm);
++}
++
+ static int vgic_its_has_attr(struct kvm_device *dev,
+ 			     struct kvm_device_attr *attr)
+ {
+@@ -1645,6 +1774,8 @@ static int vgic_its_has_attr(struct kvm_device *dev,
+ 		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS:
+ 		return vgic_its_has_attr_regs(dev, attr);
++	case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
++		return 0;
+ 	}
+ 	return -ENXIO;
+ }
+@@ -1693,6 +1824,10 @@ static int vgic_its_set_attr(struct kvm_device *dev,
  
+ 		return vgic_its_attr_regs_access(dev, attr, &reg, true);
+ 	}
++	case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
++		if (attr->attr)
++			return -EINVAL;
++		return vgic_its_table_restore(its);
+ 	}
+ 	return -ENXIO;
+ }
+@@ -1700,9 +1835,10 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+ static int vgic_its_get_attr(struct kvm_device *dev,
+ 			     struct kvm_device_attr *attr)
+ {
++	struct vgic_its *its = dev->private;
++
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_ADDR: {
+-		struct vgic_its *its = dev->private;
+ 		u64 addr = its->vgic_its_base;
+ 		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+ 		unsigned long type = (unsigned long)attr->attr;
+@@ -1723,6 +1859,10 @@ static int vgic_its_get_attr(struct kvm_device *dev,
+ 		if (ret)
+ 			return ret;
+ 		return put_user(reg, uaddr);
++	case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
++		if (attr->attr)
++			return -EINVAL;
++		return vgic_its_table_flush(its);
+ 	}
+ 	default:
+ 		return -ENXIO;
 -- 
 2.5.5
