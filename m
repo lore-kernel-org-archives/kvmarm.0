@@ -1,22 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 11/22] KVM: arm64: ITS: Interpret MAPD ITT_addr field
-Date: Mon, 27 Mar 2017 11:31:01 +0200
-Message-ID: <1490607072-21610-12-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v4 12/22] KVM: arm64: ITS: Check the device id matches TYPER
+ DEVBITS range
+Date: Mon, 27 Mar 2017 11:31:02 +0200
+Message-ID: <1490607072-21610-13-git-send-email-eric.auger@redhat.com>
 References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DF0E40A14
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D709A40A80
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5jJJ8L7s0u3c for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Mar 2017 05:30:17 -0400 (EDT)
+ with ESMTP id Ps+tM12b62ox for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Mar 2017 05:30:21 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E7CA40C43
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D5BE840C8A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:21 -0400 (EDT)
 In-Reply-To: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,55 +32,65 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Up to now the MAPD ITT_addr had been ignored. We will need it
-for save/restore. Let's record it in the its_device struct.
+On MAPD we currently check the device id can be stored in the device table.
+Let's first check it can be encoded within the range defined by TYPER
+DEVBITS.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
 v3 -> v4:
-- in vgic_its_cmd_handle_mapd, itt_addr directly is shifted
-- correct ittaddr bitmask to support 48bit GPA
+- VITS_TYPER_DEVBITS set to 16 for homogeneity
+- use BIT_ULL
 ---
- virt/kvm/arm/vgic/vgic-its.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ virt/kvm/arm/vgic/vgic-its.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index ddd2780..89a0db7 100644
+index 89a0db7..b275aea 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -103,6 +103,7 @@ struct its_device {
- 	/* the head for the list of ITTEs */
- 	struct list_head itt_head;
- 	u32 nb_eventid_bits;
-+	gpa_t itt_addr;
- 	u32 device_id;
- };
+@@ -183,6 +183,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
  
-@@ -553,6 +554,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
- #define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
- #define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
- #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
-+#define its_cmd_get_ittaddr(cmd)	its_cmd_mask_field(cmd, 2,  8, 47)
- #define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
- #define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
+ #define VITS_ESZ 8
+ #define VITS_TYPER_IDBITS 16
++#define VITS_TYPER_DEVBITS 16
  
-@@ -824,6 +826,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	u32 device_id = its_cmd_get_deviceid(its_cmd);
- 	bool valid = its_cmd_get_validbit(its_cmd);
- 	u8 nb_eventid_bits = its_cmd_get_size(its_cmd) + 1;
-+	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd) << 8;
- 	struct its_device *device;
+ /*
+  * Finds and returns a collection in the ITS collection table.
+@@ -382,8 +383,8 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+ 	 * To avoid memory waste in the guest, we keep the number of IDBits and
+ 	 * DevBits low - as least for the time being.
+ 	 */
+-	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
+ 	reg |= (VITS_TYPER_IDBITS - 1) << GITS_TYPER_IDBITS_SHIFT;
++	reg |= (VITS_TYPER_DEVBITS - 1) << GITS_TYPER_DEVBITS_SHIFT;
+ 	reg |= (VITS_ESZ - 1) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
  
- 	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
-@@ -855,6 +858,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	return extract_bytes(reg, addr & 7, len);
+@@ -623,10 +624,10 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+  * Check whether an ID can be stored into the corresponding guest table.
+  * For a direct table this is pretty easy, but gets a bit nasty for
+  * indirect tables. We check whether the resulting guest physical address
+- * is actually valid (covered by a memslot and guest accessbible).
++ * is actually valid (covered by a memslot and guest accessible).
+  * For this we have to read the respective first level entry.
+  */
+-static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
++static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
+ {
+ 	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
+ 	int index;
+@@ -634,6 +635,9 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
+ 	gfn_t gfn;
+ 	int esz = GITS_BASER_ENTRY_SIZE(baser);
  
- 	device->device_id = device_id;
- 	device->nb_eventid_bits = nb_eventid_bits;
-+	device->itt_addr = itt_addr;
- 
- 	INIT_LIST_HEAD(&device->itt_head);
++	if (id >= BIT_ULL(VITS_TYPER_DEVBITS))
++		return false;
++
+ 	if (!(baser & GITS_BASER_INDIRECT)) {
+ 		phys_addr_t addr;
  
 -- 
 2.5.5
