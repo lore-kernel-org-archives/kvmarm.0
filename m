@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 15/22] KVM: arm64: ITS: Sort the device and ITE lists
-Date: Mon, 27 Mar 2017 11:31:05 +0200
-Message-ID: <1490607072-21610-16-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v4 16/22] KVM: expose next_segment()
+Date: Mon, 27 Mar 2017 11:31:06 +0200
+Message-ID: <1490607072-21610-17-git-send-email-eric.auger@redhat.com>
 References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5924440A86
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AF35940A86
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z3Y+U6jqnoeU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Mar 2017 05:30:39 -0400 (EDT)
+ with ESMTP id KbIN8tMyYogu for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Mar 2017 05:30:45 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7678840A14
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2A1740A6A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:45 -0400 (EDT)
 In-Reply-To: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,89 +31,52 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Natively sort the device and ITE lists in ascending
-deviceId/eventid order. This paves the way to optimized
-DTE and ITE scan in guest RAM table where entries are chained
-together using a next ID offset.
+Expose next_segment() as we would like to reuse this routine in
+ARM vgic-its code.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
 ---
+ include/linux/kvm_host.h | 8 ++++++++
+ virt/kvm/kvm_main.c      | 8 --------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-v3 -> v4:
-- added Andre's R-b
----
- virt/kvm/arm/vgic/vgic-its.c | 36 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 34 insertions(+), 2 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 2a1ccbf..7364b7d 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -726,6 +726,21 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
- 	kfree(collection);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 2c14ad9..b4b5d82 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -92,6 +92,14 @@ static inline bool is_noslot_pfn(kvm_pfn_t pfn)
+ 	return pfn == KVM_PFN_NOSLOT;
  }
  
-+static void ite_list_insert_sorted(struct list_head *h, struct its_ite *ite)
++static inline int next_segment(unsigned long len, int offset)
 +{
-+	struct list_head *pos = h->next;
-+	u32 id = ite->event_id;
-+
-+	while (pos != h) {
-+		struct its_ite *iter =
-+			list_entry(pos, struct its_ite, ite_list);
-+		if (id < iter->event_id)
-+			break;
-+		pos = pos->next;
-+	}
-+	list_add_tail(&ite->ite_list, pos);
++	if (len > PAGE_SIZE - offset)
++		return PAGE_SIZE - offset;
++	else
++		return len;
 +}
 +
- /* Must be called with its_lock mutex held */
- static int vgic_its_alloc_ite(struct its_device *device,
- 			       struct its_ite **itep,
-@@ -742,7 +757,7 @@ static int vgic_its_alloc_ite(struct its_device *device,
- 	ite->collection = collection;
- 	ite->lpi = lpi_id;
- 
--	list_add_tail(&ite->ite_list, &device->itt_head);
-+	ite_list_insert_sorted(&device->itt_head, ite);
- 	*itep = ite;
- 	return 0;
+ /*
+  * architectures with KVM_HVA_ERR_BAD other than PAGE_OFFSET (e.g. s390)
+  * provide own defines and kvm_is_error_hva
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index a17d787..b825e86 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1738,14 +1738,6 @@ void kvm_get_pfn(kvm_pfn_t pfn)
  }
-@@ -835,6 +850,22 @@ static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
- 	kfree(device);
- }
+ EXPORT_SYMBOL_GPL(kvm_get_pfn);
  
-+static void device_list_insert_sorted(struct list_head *h,
-+				      struct its_device *dev)
-+{
-+	struct list_head *pos = h->next;
-+	u32 id = dev->device_id;
-+
-+	while (pos != h) {
-+		struct its_device *iter =
-+			list_entry(pos, struct its_device, dev_list);
-+		if (id < iter->device_id)
-+			break;
-+		pos = pos->next;
-+	}
-+	list_add_tail(&dev->dev_list, pos);
-+}
-+
- /* Must be called with its_lock mutex held */
- static int vgic_its_alloc_device(struct vgic_its *its,
- 				 struct its_device **devp,
-@@ -852,7 +883,8 @@ static int vgic_its_alloc_device(struct vgic_its *its,
- 	device->nb_eventid_bits = nb_eventid_bits;
- 	INIT_LIST_HEAD(&device->itt_head);
- 
--	list_add_tail(&device->dev_list, &its->device_list);
-+	device_list_insert_sorted(&its->device_list, device);
-+
- 	*devp = device;
- 
- 	return 0;
+-static int next_segment(unsigned long len, int offset)
+-{
+-	if (len > PAGE_SIZE - offset)
+-		return PAGE_SIZE - offset;
+-	else
+-		return len;
+-}
+-
+ static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
+ 				 void *data, int offset, int len)
+ {
 -- 
 2.5.5
