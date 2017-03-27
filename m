@@ -1,23 +1,25 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 22/22] KVM: arm64: ITS: Pending table save/restore
-Date: Mon, 27 Mar 2017 11:31:12 +0200
-Message-ID: <1490607072-21610-23-git-send-email-eric.auger@redhat.com>
-References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 01/10] KVM: arm/arm64: vgic: Defer touching GICH_VMCR
+ to vcpu_load/put
+Date: Mon, 27 Mar 2017 11:49:39 +0100
+Message-ID: <5cdcadc0-c6c4-bb11-5a70-83f3a00a6532@arm.com>
+References: <20170321211059.8719-1-cdall@linaro.org>
+ <20170321211059.8719-2-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6245C40A6A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:31:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9363140AF5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 06:47:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R84lL016t9tF for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Mar 2017 05:31:13 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 793FF40A80
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:31:13 -0400 (EDT)
-In-Reply-To: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
+ with ESMTP id N+evBnwoQ0fk for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Mar 2017 06:47:45 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EB7640A66
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 06:47:45 -0400 (EDT)
+In-Reply-To: <20170321211059.8719-2-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,118 +29,32 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <cdall@cs.columbia.edu>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Save and restore the pending tables.
+On 21/03/17 21:10, Christoffer Dall wrote:
+> From: Christoffer Dall <cdall@cs.columbia.edu>
+> 
+> We don't have to save/restore the VMCR on every entry to/from the guest,
+> since on GICv2 we can access the control interface from EL1 and on VHE
+> systems with GICv3 we can access the control interface from KVM running
+> in EL2.
+> 
+> GICv3 systems without VHE become the rare case, which have to
+> save/restore the register in the put/load functions by doing an extra
+> jump to EL2 to access the EL2-only register state.
+> 
+> Note that userspace accesses may see out-of-date values if the VCPU is
+> running while accessing the VGIC state via the KVM device API, but this
+> is already the case and it is up to userspace to quiesce the CPUs before
+> reading the CPU registers from the GIC for an up-to-date view.
+> 
+> Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
 
-Pending table restore obviously requires the pendbaser to be
-already set.
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
----
-
-v3 -> v4:
-- remove the wrong comment about locking
-- pass kvm struct instead of its handle
-- add comment about restore method
-- remove GITR_PENDABASER.PTZ check
-- continue if target_vcpu == NULL
-- new locking strategy
-
-v1 -> v2:
-- do not care about the 1st KB which should be zeroed according to
-  the spec.
----
- virt/kvm/arm/vgic/vgic-its.c | 66 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 64 insertions(+), 2 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index a516bbb..e10aa81 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1804,16 +1804,78 @@ static int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
-  */
- static int vgic_its_flush_pending_tables(struct kvm *kvm)
- {
--	return -ENXIO;
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	struct vgic_irq *irq;
-+	int ret;
-+
-+	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-+		struct kvm_vcpu *vcpu;
-+		gpa_t pendbase, ptr;
-+		bool stored;
-+		u8 val;
-+
-+		vcpu = irq->target_vcpu;
-+		if (!vcpu)
-+			continue;
-+
-+		pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+
-+		ptr = pendbase + (irq->intid / BITS_PER_BYTE);
-+
-+		ret = kvm_read_guest(kvm, (gpa_t)ptr, &val, 1);
-+		if (ret)
-+			return ret;
-+
-+		stored = val & (irq->intid % BITS_PER_BYTE);
-+		if (stored == irq->pending_latch)
-+			continue;
-+
-+		if (irq->pending_latch)
-+			val |= 1 << (irq->intid % BITS_PER_BYTE);
-+		else
-+			val &= ~(1 << (irq->intid % BITS_PER_BYTE));
-+
-+		ret = kvm_write_guest(kvm, (gpa_t)ptr, &val, 1);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
- }
- 
- /**
-  * vgic_its_restore_pending_tables - Restore the pending tables from guest
-  * RAM to internal data structs
-+ *
-+ * Does not scan the whole pending tables but just loop on all registered
-+ * LPIS and scan their associated pending bit. This obviously requires
-+ * the ITEs to be restored before.
-  */
- static int vgic_its_restore_pending_tables(struct kvm *kvm)
- {
--	return -ENXIO;
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	struct vgic_irq *irq;
-+	int ret;
-+
-+	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-+		struct kvm_vcpu *vcpu;
-+		gpa_t pendbase, ptr;
-+		u8 val;
-+
-+		vcpu = irq->target_vcpu;
-+		if (!vcpu)
-+			continue;
-+
-+		pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+
-+		ptr = pendbase + (irq->intid / BITS_PER_BYTE);
-+
-+		ret = kvm_read_guest(kvm, (gpa_t)ptr, &val, 1);
-+		if (ret)
-+			return ret;
-+		irq->pending_latch = val & (1 << (irq->intid % BITS_PER_BYTE));
-+	}
-+	return 0;
- }
- 
- static int vgic_its_flush_ite(struct vgic_its *its, struct its_device *dev,
+	M.
 -- 
-2.5.5
+Jazz is not dead. It just smells funny...
