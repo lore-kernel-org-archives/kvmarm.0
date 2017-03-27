@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 9/9] arm: KVM: Treat CP15 accessors returning false as
- successful
-Date: Mon, 27 Mar 2017 17:03:45 +0100
-Message-ID: <20170327160345.12402-10-marc.zyngier@arm.com>
+Subject: [PATCH v2 7/9] arm64: KVM: Do not corrupt registers on failed 64bit
+ CP read
+Date: Mon, 27 Mar 2017 17:03:43 +0100
+Message-ID: <20170327160345.12402-8-marc.zyngier@arm.com>
 References: <20170327160345.12402-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38ACE40C4A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 12:02:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 46BDA40C4E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 12:02:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0w-OhRXllswm for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Mar 2017 12:02:16 -0400 (EDT)
+ with ESMTP id yJOneMeVCCcO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Mar 2017 12:02:10 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFAB740C50
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 12:02:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8462840C74
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 12:02:10 -0400 (EDT)
 In-Reply-To: <20170327160345.12402-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,40 +32,51 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Shannon Zhao <shannon.zhao@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Instead of considering that a CP15 accessor has failed when
-returning false, let's consider that it is *always* successful
-(after all, we won't stand for an incomplete emulation).
+If we fail to emulate a mrrc instruction, we:
+1) deliver an exception,
+2) spit a nastygram on the console,
+3) write back some garbage to Rt/Rt2
 
-The return value now simply indicates whether we should skip
-the instruction (because it has now been emulated), or if we
-should leave the PC alone if the emulation has injected an
-exception.
+While 1) and 2) are perfectly acceptable, 3) is out of the scope of
+the architecture... Let's mimick the code in kvm_handle_cp_32 and
+be more cautious.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/coproc.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index 519aac12b365..2c14b69511e9 100644
---- a/arch/arm/kvm/coproc.c
-+++ b/arch/arm/kvm/coproc.c
-@@ -520,15 +520,15 @@ static int emulate_cp15(struct kvm_vcpu *vcpu,
- 		if (likely(r->access(vcpu, params, r))) {
- 			/* Skip instruction, since it was emulated */
- 			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
--			return 1;
- 		}
--		/* If access function fails, it should complain. */
- 	} else {
-+		/* If access function fails, it should complain. */
- 		kvm_err("Unsupported guest CP15 access at: %08lx\n",
- 			*vcpu_pc(vcpu));
- 		print_cp_instr(params);
-+		kvm_inject_undefined(vcpu);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4e5d4eee8cec..1080a76e960f 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1678,20 +1678,18 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+ 		params.regval |= vcpu_get_reg(vcpu, Rt2) << 32;
  	}
--	kvm_inject_undefined(vcpu);
-+
+ 
+-	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
+-		goto out;
+-	if (!emulate_cp(vcpu, &params, global, nr_global))
+-		goto out;
+-
+-	unhandled_cp_access(vcpu, &params);
++	if (!emulate_cp(vcpu, &params, target_specific, nr_specific) ||
++	    !emulate_cp(vcpu, &params, global, nr_global)) {
++		/* Split up the value between registers for the read side */
++		if (!params.is_write) {
++			vcpu_set_reg(vcpu, Rt, lower_32_bits(params.regval));
++			vcpu_set_reg(vcpu, Rt2, upper_32_bits(params.regval));
++		}
+ 
+-out:
+-	/* Split up the value between registers for the read side */
+-	if (!params.is_write) {
+-		vcpu_set_reg(vcpu, Rt, lower_32_bits(params.regval));
+-		vcpu_set_reg(vcpu, Rt2, upper_32_bits(params.regval));
++		return 1;
+ 	}
+ 
++	unhandled_cp_access(vcpu, &params);
  	return 1;
  }
  
