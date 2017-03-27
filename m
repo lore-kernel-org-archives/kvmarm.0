@@ -1,23 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 06/22] KVM: arm64: ITS: Implement vgic_its_has_attr_regs
- and attr_regs_access
-Date: Mon, 27 Mar 2017 11:30:56 +0200
-Message-ID: <1490607072-21610-7-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v4 08/22] KVM: arm64: ITS: Implement
+ vgic_mmio_uaccess_write_its_iidr
+Date: Mon, 27 Mar 2017 11:30:58 +0200
+Message-ID: <1490607072-21610-9-git-send-email-eric.auger@redhat.com>
 References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56A9540AE8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:29:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AC1B40AE8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LNwaU7Kb853A for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Mar 2017 05:29:55 -0400 (EDT)
+ with ESMTP id kSQhm0ccPRpB for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Mar 2017 05:30:04 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7403740A95
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:29:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4D5A40A14
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:04 -0400 (EDT)
 In-Reply-To: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,144 +32,91 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch implements vgic_its_has_attr_regs and vgic_its_attr_regs_access
-upon the MMIO framework. VGIC ITS KVM device KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-group becomes functional.
+The GITS_IIDR revision field is used to encode the version of the
+table layout (ABI). So we need to restore it to check the table
+layout to be restored is compatible with the destination vITS.
 
-At least GITS_CREADR requires to differentiate a guest write action from a
-user access. As such let's introduce a new uaccess_its_write
-vgic_register_region callback.
+The user selected revision is stored in the user_revision field.
+It will be compared against the REV num at table restoration time.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
-v3 -> v4:
-- remove changes to the REGISTER_ITS_DESC macro. This will be handled in
-  subsequent patch with the introduction of a new REGISTER_ITS_DESC_UACCESS
-  macro
-- fix IIDR access and add a comment wrt full length access
-- handle endianness
-- add kvm lock and vcpus lock
+v4: creation
 ---
- virt/kvm/arm/vgic/vgic-its.c  | 78 +++++++++++++++++++++++++++++++++++++++++--
- virt/kvm/arm/vgic/vgic-mmio.h |  9 +++--
- 2 files changed, 83 insertions(+), 4 deletions(-)
+ include/kvm/arm_vgic.h       |  2 ++
+ virt/kvm/arm/vgic/vgic-its.c | 24 +++++++++++++++++++++---
+ 2 files changed, 23 insertions(+), 3 deletions(-)
 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index b72dd2a..41b71ca 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -162,6 +162,8 @@ struct vgic_its {
+ 	u32			creadr;
+ 	u32			cwriter;
+ 
++	u32			user_revision;
++
+ 	/* Protects the device and collection lists */
+ 	struct mutex		its_lock;
+ 	struct list_head	device_list;
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index f687e91..9b9ea86 100644
+index a5f3abe..169b486 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1469,14 +1469,88 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
- int vgic_its_has_attr_regs(struct kvm_device *dev,
- 			   struct kvm_device_attr *attr)
+@@ -33,6 +33,9 @@
+ #include "vgic.h"
+ #include "vgic-mmio.h"
+ 
++/* ITS Table Layout ABI Revision */
++#define REV 0x1
++
+ /*
+  * Creates a new (reference to a) struct vgic_irq for a given LPI.
+  * If this LPI is already mapped on another ITS, we increase its refcount
+@@ -384,7 +387,19 @@ static unsigned long vgic_mmio_read_its_iidr(struct kvm *kvm,
+ 					     struct vgic_its *its,
+ 					     gpa_t addr, unsigned int len)
  {
--	return -ENXIO;
-+	const struct vgic_register_region *region;
-+	struct vgic_io_device iodev = {
-+		.regions = its_registers,
-+		.nr_regions = ARRAY_SIZE(its_registers),
-+	};
-+	gpa_t offset = attr->attr;
+-	return (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
++	return (PRODUCT_ID_KVM << 24) | (REV << 12) | IMPLEMENTER_ARM;
++}
 +
-+	region = vgic_find_mmio_region(iodev.regions,
-+				       iodev.nr_regions,
-+				       offset);
-+	if (!region)
-+		return -ENXIO;
++static void vgic_mmio_uaccess_write_its_iidr(struct kvm *kvm,
++					     struct vgic_its *its,
++					     gpa_t addr, unsigned int len,
++					     unsigned long val)
++{
++	u64 tmp = 0;
 +
-+	return 0;
++	tmp = update_64bit_reg(tmp, addr & 3, len, val);
++	tmp = (tmp & GENMASK(15, 12)) >> 12;
++	its->user_revision = tmp;
  }
  
- int vgic_its_attr_regs_access(struct kvm_device *dev,
- 			      struct kvm_device_attr *attr,
- 			      u64 *reg, bool is_write)
- {
--	return -ENXIO;
-+	const struct vgic_register_region *region;
-+	struct vgic_io_device iodev = {
-+		.regions = its_registers,
-+		.nr_regions = ARRAY_SIZE(its_registers),
-+	};
-+	struct vgic_its *its = dev->private;
-+	gpa_t addr, offset = attr->attr;
-+	unsigned int len;
-+	unsigned long data = 0;
-+	int ret = 0;
-+
-+	/*
-+	 * Among supported registers, only GITS_CTLR (0x0) and GITS_IIDR (0x4)
-+	 * are 32 bits. Others are 64 bits.
-+	 */
-+	if ((offset < 0x8 && offset & 0x3) || (offset >= 0x8 && offset & 0x7))
-+		return -EINVAL;
-+
-+	mutex_lock(&dev->kvm->lock);
-+
-+	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base)) {
-+		ret = -ENXIO;
-+		goto out;
-+	}
-+
-+	region = vgic_find_mmio_region(iodev.regions,
-+				       iodev.nr_regions,
-+				       offset);
-+	if (!region) {
-+		ret = -ENXIO;
-+		goto out;
-+	}
-+
-+	if (!lock_all_vcpus(dev->kvm)) {
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
-+	addr = its->vgic_its_base + offset;
-+
-+	/*
-+	 * Only full length register accesses are supported although
-+	 * the architecture spec theoretically allows upper/lower 32
-+	 * bits to be accessed independently
-+	 */
-+	len = region->access_flags & VGIC_ACCESS_64bit ? 8 : 4;
-+
-+	if (is_write) {
-+		data = vgic_data_mmio_bus_to_host(reg, len);
-+		if (region->uaccess_its_write)
-+			region->uaccess_its_write(dev->kvm, its, addr,
-+						  len, data);
-+		else
-+			region->its_write(dev->kvm, its, addr, len, data);
-+	} else {
-+		data = region->its_read(dev->kvm, its, addr, len);
-+		vgic_data_host_to_mmio_bus(reg, len, data);
-+	}
-+	unlock_all_vcpus(dev->kvm);
-+out:
-+	mutex_unlock(&dev->kvm->lock);
-+	return ret;
- }
+ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+@@ -1359,8 +1374,9 @@ static struct vgic_register_region its_registers[] = {
+ 	REGISTER_ITS_DESC(GITS_CTLR,
+ 		vgic_mmio_read_its_ctlr, vgic_mmio_write_its_ctlr, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_ITS_DESC(GITS_IIDR,
+-		vgic_mmio_read_its_iidr, its_mmio_write_wi, 4,
++	REGISTER_ITS_DESC_UACCESS(GITS_IIDR,
++		vgic_mmio_read_its_iidr, its_mmio_write_wi,
++		vgic_mmio_uaccess_write_its_iidr, 4,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_ITS_DESC(GITS_TYPER,
+ 		vgic_mmio_read_its_typer, its_mmio_write_wi, 8,
+@@ -1458,6 +1474,8 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 		((u64)GITS_BASER_TYPE_COLLECTION << GITS_BASER_TYPE_SHIFT);
+ 	dev->kvm->arch.vgic.propbaser = INITIAL_PROPBASER_VALUE;
  
- static int vgic_its_has_attr(struct kvm_device *dev,
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index 6eec91b..becc473 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -36,8 +36,13 @@ struct vgic_register_region {
- 	};
- 	unsigned long (*uaccess_read)(struct kvm_vcpu *vcpu, gpa_t addr,
- 				      unsigned int len);
--	void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
--			      unsigned int len, unsigned long val);
-+	union {
-+		void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
-+				      unsigned int len, unsigned long val);
-+		void (*uaccess_its_write)(struct kvm *kvm, struct vgic_its *its,
-+					  gpa_t addr, unsigned int len,
-+					  unsigned long val);
-+	};
- };
++	its->user_revision = 0;
++
+ 	dev->private = its;
  
- extern struct kvm_io_device_ops kvm_io_gic_ops;
+ 	return 0;
 -- 
 2.5.5
