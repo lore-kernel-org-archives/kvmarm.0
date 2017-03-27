@@ -1,23 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 08/22] KVM: arm64: ITS: Implement
- vgic_mmio_uaccess_write_its_iidr
-Date: Mon, 27 Mar 2017 11:30:58 +0200
-Message-ID: <1490607072-21610-9-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v4 09/22] KVM: arm64: ITS: Report the ITE size in GITS_TYPER
+Date: Mon, 27 Mar 2017 11:30:59 +0200
+Message-ID: <1490607072-21610-10-git-send-email-eric.auger@redhat.com>
 References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AC1B40AE8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F5AC40A63
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kSQhm0ccPRpB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Mar 2017 05:30:04 -0400 (EDT)
+ with ESMTP id POdsyQqYgL2D for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Mar 2017 05:30:09 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4D5A40A14
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF4FB40BE4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Mar 2017 05:30:09 -0400 (EDT)
 In-Reply-To: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,91 +31,70 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GITS_IIDR revision field is used to encode the version of the
-table layout (ABI). So we need to restore it to check the table
-layout to be restored is compatible with the destination vITS.
-
-The user selected revision is stored in the user_revision field.
-It will be compared against the REV num at table restoration time.
+An ITE size of 8 Bytes is reported to the guest. Combining this
+information with the number of event IDs the guest wants to support,
+this latter will be able to allocate each device's ITT with the
+right size.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
 ---
 
-v4: creation
----
- include/kvm/arm_vgic.h       |  2 ++
- virt/kvm/arm/vgic/vgic-its.c | 24 +++++++++++++++++++++---
- 2 files changed, 23 insertions(+), 3 deletions(-)
+v2 -> v3:
+- changed (u64)(VITS_ESZ - 1) to (VITS_ESZ - 1ULL) in
+  vgic_register_its_iodev
+- added Andre's R-b
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index b72dd2a..41b71ca 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -162,6 +162,8 @@ struct vgic_its {
- 	u32			creadr;
- 	u32			cwriter;
+v1 -> v2:
+- correct ITT_ENTRY_SIZE field
+- remove ITE_SIZE since all entries become 8 bytes
+---
+ include/linux/irqchip/arm-gic-v3.h | 1 +
+ virt/kvm/arm/vgic/vgic-its.c       | 5 ++++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 97cbca1..d86f963 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -232,6 +232,7 @@
+ #define GITS_CTLR_QUIESCENT		(1U << 31)
  
-+	u32			user_revision;
-+
- 	/* Protects the device and collection lists */
- 	struct mutex		its_lock;
- 	struct list_head	device_list;
+ #define GITS_TYPER_PLPIS		(1UL << 0)
++#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
+ #define GITS_TYPER_IDBITS_SHIFT		8
+ #define GITS_TYPER_DEVBITS_SHIFT	13
+ #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index a5f3abe..169b486 100644
+index 169b486..fabcac1 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -33,6 +33,9 @@
- #include "vgic.h"
- #include "vgic-mmio.h"
+@@ -179,6 +179,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
  
-+/* ITS Table Layout ABI Revision */
-+#define REV 0x1
+ #define GIC_LPI_OFFSET 8192
+ 
++#define VITS_ESZ 8
 +
  /*
-  * Creates a new (reference to a) struct vgic_irq for a given LPI.
-  * If this LPI is already mapped on another ITS, we increase its refcount
-@@ -384,7 +387,19 @@ static unsigned long vgic_mmio_read_its_iidr(struct kvm *kvm,
- 					     struct vgic_its *its,
- 					     gpa_t addr, unsigned int len)
- {
--	return (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-+	return (PRODUCT_ID_KVM << 24) | (REV << 12) | IMPLEMENTER_ARM;
-+}
-+
-+static void vgic_mmio_uaccess_write_its_iidr(struct kvm *kvm,
-+					     struct vgic_its *its,
-+					     gpa_t addr, unsigned int len,
-+					     unsigned long val)
-+{
-+	u64 tmp = 0;
-+
-+	tmp = update_64bit_reg(tmp, addr & 3, len, val);
-+	tmp = (tmp & GENMASK(15, 12)) >> 12;
-+	its->user_revision = tmp;
+  * Finds and returns a collection in the ITS collection table.
+  * Must be called with the its_lock mutex held.
+@@ -379,6 +381,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+ 	 */
+ 	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
+ 	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
++	reg |= (VITS_ESZ - 1) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
+ 
+ 	return extract_bytes(reg, addr & 7, len);
  }
+@@ -1436,7 +1439,7 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
+ 	(GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWb)		| \
+ 	 GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, SameAsInner)		| \
+ 	 GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)		| \
+-	 ((8ULL - 1) << GITS_BASER_ENTRY_SIZE_SHIFT)			| \
++	 ((VITS_ESZ - 1ULL) << GITS_BASER_ENTRY_SIZE_SHIFT)		| \
+ 	 GITS_BASER_PAGE_SIZE_64K)
  
- static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
-@@ -1359,8 +1374,9 @@ static struct vgic_register_region its_registers[] = {
- 	REGISTER_ITS_DESC(GITS_CTLR,
- 		vgic_mmio_read_its_ctlr, vgic_mmio_write_its_ctlr, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_ITS_DESC(GITS_IIDR,
--		vgic_mmio_read_its_iidr, its_mmio_write_wi, 4,
-+	REGISTER_ITS_DESC_UACCESS(GITS_IIDR,
-+		vgic_mmio_read_its_iidr, its_mmio_write_wi,
-+		vgic_mmio_uaccess_write_its_iidr, 4,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_ITS_DESC(GITS_TYPER,
- 		vgic_mmio_read_its_typer, its_mmio_write_wi, 8,
-@@ -1458,6 +1474,8 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
- 		((u64)GITS_BASER_TYPE_COLLECTION << GITS_BASER_TYPE_SHIFT);
- 	dev->kvm->arch.vgic.propbaser = INITIAL_PROPBASER_VALUE;
- 
-+	its->user_revision = 0;
-+
- 	dev->private = its;
- 
- 	return 0;
+ #define INITIAL_PROPBASER_VALUE						  \
 -- 
 2.5.5
