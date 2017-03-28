@@ -1,33 +1,29 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
-Date: Tue, 28 Mar 2017 14:22:29 +0200
-Message-ID: <20170328122229.GA31789@cbox>
-References: <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
- <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
- <58CFF058.8020205@arm.com>
- <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
- <20170321113428.GC15920@cbox> <58D17AF0.2010802@arm.com>
- <20170321193933.GB31111@cbox> <58DA3F68.6090901@arm.com>
- <20170328112328.GA31156@cbox> <20170328115413.GJ23682@e104320-lin>
+Subject: Re: [PATCH v2 2/9] arm64: KVM: PMU: Inject UNDEF exception on
+ illegal register access
+Date: Tue, 28 Mar 2017 14:44:55 +0200
+Message-ID: <20170328124455.GB31156@cbox>
+References: <20170327160345.12402-1-marc.zyngier@arm.com>
+ <20170327160345.12402-3-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7556E40BE4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 08:20:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC6B440BE4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 08:43:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id C4FLDH-E4TRr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Mar 2017 08:20:33 -0400 (EDT)
+ with ESMTP id Fbr2KqMJWsOT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Mar 2017 08:42:59 -0400 (EDT)
 Received: from mail-wr0-f177.google.com (mail-wr0-f177.google.com
  [209.85.128.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E1C2F40A80
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 08:20:32 -0400 (EDT)
-Received: by mail-wr0-f177.google.com with SMTP id l43so102116984wre.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 05:22:32 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 387A740A80
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 08:42:58 -0400 (EDT)
+Received: by mail-wr0-f177.google.com with SMTP id l43so103100814wre.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 05:44:58 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20170328115413.GJ23682@e104320-lin>
+In-Reply-To: <20170327160345.12402-3-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,86 +33,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Achin Gupta <achin.gupta@arm.com>
-Cc: Leif.Lindholm@linaro.com, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, gengdongjiu <gengdongjiu@huawei.com>, wangxiongfeng2@huawei.com, wuquanming@huawei.com, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, huangshaoyu@huawei.com, nd@arm.com, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Shannon Zhao <shannon.zhao@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 28, 2017 at 12:54:13PM +0100, Achin Gupta wrote:
-> On Tue, Mar 28, 2017 at 01:23:28PM +0200, Christoffer Dall wrote:
-> > On Tue, Mar 28, 2017 at 11:48:08AM +0100, James Morse wrote:
-> > > Hi Christoffer,
-> > >
-> > > (CC: Leif and Achin who know more about how UEFI fits into this picture)
-> > >
-> > > On 21/03/17 19:39, Christoffer Dall wrote:
-> > > > On Tue, Mar 21, 2017 at 07:11:44PM +0000, James Morse wrote:
-> > > >> On 21/03/17 11:34, Christoffer Dall wrote:
-> > > >>> On Tue, Mar 21, 2017 at 02:32:29PM +0800, gengdongjiu wrote:
-> > > >>>> On 2017/3/20 23:08, James Morse wrote:
-> > > >>>>>>>> On 20/03/17 07:55, Dongjiu Geng wrote:
-> > > >>>>>>>>> In the RAS implementation, hardware pass the virtual SEI
-> > > >>>>>>>>> syndrome information through the VSESR_EL2, so set the virtual
-> > > >>>>>>>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
-> > > >>>>>>>>> the guest OS
-> > > >>>>>
-> > > >>>>> How does this work with firmware first?
-> > > >>>>
-> > > >>>> I explained it in previous mail about the work flow.
-> > > >>>
-> > > >>> When delivering and reporting SEIs to the VM, should this happen
-> > > >>> directly to the OS running in the VM, or to the guest firmware (e.g.
-> > > >>> UEFI) running in the VM as well?
-> > > >>
-> > > >> 'firmware first' is the ACPI specs name for x86's BIOS or management-mode
-> > > >> handling the error. On arm64 we have multiple things called firmware, so the
-> > > >> name might be more confusing than helpful.
-> > > >>
-> > > >> As far as I understand it, firmware here refers to the secure-world and EL3.
-> > > >> Something like ATF can use SCR_EL3.EA to claim SErrors and external aborts,
-> > > >> routing them to EL3 where secure platform specific firmware generates CPER records.
-> > > >> For a guest, Qemu takes the role of this EL3-firmware.
+On Mon, Mar 27, 2017 at 05:03:38PM +0100, Marc Zyngier wrote:
+> Both pmu_*_el0_disabled() and pmu_counter_idx_valid() perform checks
+> on the validity of an access, but only return a boolean indicating
+> if the access is valid or not.
 > 
-> +1
+> Let's allow these functions to also inject an UNDEF exception if
+> the access was illegal.
 > 
-> > > >>
-> > > > Thanks for the clarification.  So UEFI in the VM would not be involved
-> > > > in this at all?
-> > >
-> > > On the host, part of UEFI is involved to generate the CPER records.
-> > > In a guest?, I don't know.
-> > > Qemu could generate the records, or drive some other component to do it.
-> >
-> > I think I am beginning to understand this a bit.  Since the guet UEFI
-> > instance is specifically built for the machine it runs on, QEMU's virt
-> > machine in this case, they could simply agree (by some contract) to
-> > place the records at some specific location in memory, and if the guest
-> > kernel asks its guest UEFI for that location, things should just work by
-> > having logic in QEMU to process error reports and populate guest memory.
-> >
-> > Is this how others see the world too?
-> 
-> I think so!
-> 
-> AFAIU, the memory where CPERs will reside should be specified in a GHES entry in
-> the HEST. Is this not the case with a guest kernel i.e. the guest UEFI creates a
-> HEST for the guest Kernel?
-> 
-> If so, then the question is how the guest UEFI finds out where QEMU (acting as
-> EL3 firmware) will populate the CPERs. This could either be a contract between
-> the two or a guest DXE driver uses the MM_COMMUNICATE call (see [1]) to ask QEMU
-> where the memory is.
-> 
-> This is the way I expect it to work at the EL3/EL2 boundary. So I am
-> extrapolating it to the guest/hypervisor boundary. Do shout if I am missing
-> anything.
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-No that sounds like a resonable comparison.
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
 
-I'm not entirely sure what a HEST or GHES is, but I think the only place
-where I'm still not clear is if when the guest kernel is notified of
-errors does it (a) just traverse memory by following some pointers
-(which it may have pre-loaded at boot from UEFI), or (b) run UEFI code
-which can call into QEMU and generate error records on demand?
-
-Thanks,
--Christoffer
+> ---
+>  arch/arm64/kvm/sys_regs.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 7e1d673304d5..d98ce9a52291 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -465,6 +465,9 @@ static bool check_disabled(struct kvm_vcpu *vcpu, u64 flags)
+>  	u64 reg = vcpu_sys_reg(vcpu, PMUSERENR_EL0);
+>  	bool cond = (reg & flags) || vcpu_mode_priv(vcpu);
+>  
+> +	if (!cond)
+> +		kvm_inject_undefined(vcpu);
+> +
+>  	return !cond;
+>  }
+>  
+> @@ -564,8 +567,10 @@ static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
+>  
+>  	pmcr = vcpu_sys_reg(vcpu, PMCR_EL0);
+>  	val = (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
+> -	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX)
+> +	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
+> +		kvm_inject_undefined(vcpu);
+>  		return false;
+> +	}
+>  
+>  	return true;
+>  }
+> -- 
+> 2.11.0
+> 
