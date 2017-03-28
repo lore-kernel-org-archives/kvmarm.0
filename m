@@ -1,33 +1,25 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: Signal SIGBUS when stage2 discovers
- hwpoison memory
-Date: Tue, 28 Mar 2017 17:12:23 +0200
-Message-ID: <20170328151223.GC20211@cbox>
-References: <20170315160727.16465-1-james.morse@arm.com>
- <20170324183044.GK25903@cbox>
- <87y3vrezjb.fsf@e105922-lin.cambridge.arm.com>
- <58D8FEF8.9000205@arm.com> <20170327124459.GA21871@cbox>
- <87mvc6g81r.fsf@e105922-lin.cambridge.arm.com>
- <20170327144711.GB21871@cbox>
- <871sthfoac.fsf@e105922-lin.cambridge.arm.com>
+From: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Subject: Re: [PATCH V13 10/10] arm/arm64: KVM: add guest SEA support
+Date: Tue, 28 Mar 2017 10:35:22 -0600
+Message-ID: <ba39628f-f389-afe2-ea45-4b1e2de5c2e9@codeaurora.org>
+References: <1490136425-4324-1-git-send-email-tbaicar@codeaurora.org>
+ <1490136425-4324-11-git-send-email-tbaicar@codeaurora.org>
+ <bb4b4608-85ba-fd20-53b1-c19d99019de1@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 537B940BC4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 11:10:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77C9440A69
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 12:33:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c+K6hXTH8jbo for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Mar 2017 11:10:27 -0400 (EDT)
-Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1AF8B40A66
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 11:10:26 -0400 (EDT)
-Received: by mail-wm0-f53.google.com with SMTP id o81so1204326wmb.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 08:12:26 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <871sthfoac.fsf@e105922-lin.cambridge.arm.com>
+ with ESMTP id x9aemXzdMdGm for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Mar 2017 12:33:30 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 44A1A40969
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 12:33:29 -0400 (EDT)
+In-Reply-To: <bb4b4608-85ba-fd20-53b1-c19d99019de1@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,245 +29,280 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Punit Agrawal <punit.agrawal@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, gengdongjiu <gengdj.1984@gmail.com>
+To: Marc Zyngier <marc.zyngier@arm.com>, christoffer.dall@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, devel@acpica.org, Suzuki.Poulose@arm.com, punit.agrawal@arm.com, astone@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 28, 2017 at 03:50:51PM +0100, Punit Agrawal wrote:
-> Christoffer Dall <cdall@linaro.org> writes:
-> 
-> > On Mon, Mar 27, 2017 at 02:31:44PM +0100, Punit Agrawal wrote:
-> >> Christoffer Dall <cdall@linaro.org> writes:
-> >> 
-> >> > On Mon, Mar 27, 2017 at 01:00:56PM +0100, James Morse wrote:
-> >> >> Hi guys,
-> >> >> 
-> >> >> On 27/03/17 12:20, Punit Agrawal wrote:
-> >> >> > Christoffer Dall <cdall@linaro.org> writes:
-> >> >> >> On Wed, Mar 15, 2017 at 04:07:27PM +0000, James Morse wrote:
-> >> >> >>> Once we enable ARCH_SUPPORTS_MEMORY_FAILURE on arm64[0], notifications for
-> >> >> >>> broken memory can call memory_failure() in mm/memory-failure.c to deliver
-> >> >> >>> SIGBUS to any user space process using the page, and notify all the
-> >> >> >>> in-kernel users.
-> >> >> >>>
-> >> >> >>> If the page corresponded with guest memory, KVM will unmap this page
-> >> >> >>> from its stage2 page tables. The user space process that allocated
-> >> >> >>> this memory may have never touched this page in which case it may not
-> >> >> >>> be mapped meaning SIGBUS won't be delivered.
-> >> >> >>>
-> >> >> >>> When this happens KVM discovers pfn == KVM_PFN_ERR_HWPOISON when it
-> >> >> >>> comes to process the stage2 fault.
-> >> >> >>>
-> >> >> >>> Do as x86 does, and deliver the SIGBUS when we discover
-> >> >> >>> KVM_PFN_ERR_HWPOISON. Use the stage2 mapping size as the si_addr_lsb
-> >> >> >>> as this matches the user space mapping size.
-> >> >> 
-> >> >> >>> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> >> >> >>> index 962616fd4ddd..9d1aa294e88f 100644
-> >> >> >>> --- a/arch/arm/kvm/mmu.c
-> >> >> >>> +++ b/arch/arm/kvm/mmu.c
-> >> >> >>> @@ -20,8 +20,10 @@
-> >> >> >>>  #include <linux/kvm_host.h>
-> >> >> >>>  #include <linux/io.h>
-> >> >> >>>  #include <linux/hugetlb.h>
-> >> >> >>> +#include <linux/sched/signal.h>
-> >> >> >>>  #include <trace/events/kvm.h>
-> >> >> >>>  #include <asm/pgalloc.h>
-> >> >> >>> +#include <asm/siginfo.h>
-> >> >> >>>  #include <asm/cacheflush.h>
-> >> >> >>>  #include <asm/kvm_arm.h>
-> >> >> >>>  #include <asm/kvm_mmu.h>
-> >> >> >>> @@ -1237,6 +1239,23 @@ static void coherent_cache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
-> >> >> >>>  	__coherent_cache_guest_page(vcpu, pfn, size);
-> >> >> >>>  }
-> >> >> >>>  
-> >> >> >>> +static void kvm_send_hwpoison_signal(unsigned long address, bool hugetlb)
-> >> >> >>> +{
-> >> >> >>> +	siginfo_t info;
-> >> >> >>> +
-> >> >> >>> +	info.si_signo   = SIGBUS;
-> >> >> >>> +	info.si_errno   = 0;
-> >> >> >>> +	info.si_code    = BUS_MCEERR_AR;
-> >> >> >>> +	info.si_addr    = (void __user *)address;
-> >> >> >>> +
-> >> >> >>> +	if (hugetlb)
-> >> >> >>> +		info.si_addr_lsb = PMD_SHIFT;
-> >> >> >>> +	else
-> >> >> >>> +		info.si_addr_lsb = PAGE_SHIFT;
-> >> >> >>> +
-> >> >> >>> +	send_sig_info(SIGBUS, &info, current);
-> >> >> >>> +}
-> >> >> >>> +
-> >> >> >>>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >> >> >>>  			  struct kvm_memory_slot *memslot, unsigned long hva,
-> >> >> >>>  			  unsigned long fault_status)
-> >> >> >>> @@ -1306,6 +1325,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >> >> >>>  	smp_rmb();
-> >> >> >>>  
-> >> >> >>>  	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
-> >> >> >>> +	if (pfn == KVM_PFN_ERR_HWPOISON) {
-> >> >> >>> +		kvm_send_hwpoison_signal(hva, hugetlb);
-> >> >> >>
-> >> >> >> The way this is called means that we'll only notify userspace of a huge
-> >> >> >> mapping if userspace is mapping hugetlbfs, and not because the stage2
-> >> >> >> mapping may or may not have used transparent huge pages when the error
-> >> >> >> was discovered.  Is this the desired semantics?
-> >> >> 
-> >> >> No,
-> >> >> 
-> >> >> 
-> >> >> > I think so.
-> >> >> >
-> >> >> > AFAIUI, transparent hugepages are split before being poisoned while all
-> >> >> > the underlying pages of a hugepage are poisoned together, i.e., no
-> >> >> > splitting.
-> >> >> 
-> >> >> In which case I need to look into this some more!
-> >> >> 
-> >> >> My thinking was we should report the size that was knocked out of the stage2 to
-> >> >> avoid the guest repeatedly faulting until it has touched every guest-page-size
-> >> >> in the stage2 hole.
-> >> >
-> >> > By signaling something at the fault path, I think it's going to be very
-> >> > hard to backtrack how the stage 2 page tables looked like when faults
-> >> > started happening, because I think these are completely decoupled events
-> >> > (the mmu notifier and the later fault).
-> >> >
-> >> >> 
-> >> >> Reading the code in that kvm/mmu.c it looked like the mapping sizes would always
-> >> >> be the same as those used by userspace.
-> >> >
-> >> > I think the mapping sizes should be the same between userspace and KVM,
-> >> > but the mapping size of a particular page (and associated pages) may
-> >> > vary over time.
-> >> 
-> >> Stage 1 and Stage 2 support different hugepage sizes. A larger size
-> >> stage 1 page maps to multiple stage 2 page table entries. For stage 1,
-> >> we support PUD_SIZE, CONT_PMD_SIZE, PMD_SIZE and CONT_PTE_SIZE while
-> >> only PMD_SIZE is supported for Stage 2.
-> >> 
-> >> >
-> >> >> 
-> >> >> If the page was split before KVM could have taken this fault I assumed it would
-> >> >> fault on the page-size mapping and hugetlb would be false.
-> >> >
-> >> > I think you could have a huge page, which gets unmapped as a result on
-> >> > it getting split (perhaps because there was a failure on one page) and
-> >> > later as you fault, you can discover a range which can be a hugetlbfs or
-> >> > transparent huge pages.
-> >> >
-> >> > The question that I don't know is how Linux behaves if a page is marked
-> >> > with hwpoison, in that case, if Linux never supports THP and always
-> >> > marks an entire huge page in a hugetlbfs with the poison, then I think
-> >> > we're mostly good here.  If not, we should make sure we align with
-> >> > whatever the rest of the kernel does.
-> >> 
-> >> AFAICT, a hugetlbfs page is poisoned as a whole while thp is split
-> >> before poisoning. Quoting comment near the top of memory_failure() in
-> >> mm/memory_failure.c.
-> >> 
-> >>     /*
-> >>      * Currently errors on hugetlbfs pages are measured in hugepage units,
-> >>      * so nr_pages should be 1 << compound_order.  OTOH when errors are on
-> >>      * transparent hugepages, they are supposed to be split and error
-> >>      * measurement is done in normal page units.  So nr_pages should be one
-> >>      * in this case.
-> >>      */
-> >> 
-> >> >
-> >> >> (which is already
-> >> >> wrong for another reason, looks like I grabbed the variable before
-> >> >> transparent_hugepage_adjust() has had a go a it.).
-> >> >> 
-> >> >
-> >> > yes, which is why I asked if you only care about hugetlbfs.
-> >> >
-> >> 
-> >> Based on the comment above, we should never get a poisoned page that is
-> >> part of a transparent hugepage.
-> >> 
-> >> >> 
-> >> >> >> Also notice that the hva is not necessarily aligned to the beginning of
-> >> >> >> the huge page, so can we be giving userspace wrong information by
-> >> >> >> pointing in the middle of a huge page and telling it there was an
-> >> >> >> address error in the size of the PMD ?
-> >> >> >>
-> >> >> > 
-> >> >> > I could be reading it wrong but I think we are fine here - the address
-> >> >> > (hva) is the location that faulted. And the lsb indicates the least
-> >> >> > significant bit of the faulting address (See man sigaction(2)). The
-> >> >> > receiver of the signal is expected to use the address and lsb to workout
-> >> >> > the extent of corruption.
-> >> >> 
-> >> >> kill_proc() in mm/memory-failure.c does this too, but the address is set by
-> >> >> page_address_in_vma() in add_to_kill() of the same file. (I'll chat with Punit
-> >> >> off list.)
-> >> >> 
-> >> >> 
-> >> >> > Though I missed a subtlety while reviewing the patch before. The
-> >> >> > reported lsb should be for the userspace hugepage mapping (i.e., hva)
-> >> >> > and not for the stage 2.
-> >> >> 
-> >> >> I thought these were always supposed to be the same, and using hugetlb was a bug
-> >> >> because I didn't look closely enough at what is_vm_hugetlb_page() does.
-> >> 
-> >> See above.
-> >> 
-> >> >> 
-> >> >> 
-> >> >> > In light of this, I'd like to retract my Reviewed-by tag for this
-> >> >> > version of the patch as I believe we'll need to change the lsb
-> >> >> > reporting.
-> >> >> 
-> >> >> Sure, lets work out what this should be doing. I'm beginning to suspect x86's
-> >> >> 'always page size' was correct to begin with!
-> >> >> 
-> >> >
-> >> > I had a sense of that too, but it would be good to understand how you
-> >> > mark and individual page within a hugetlbfs huge page with hwpoison...
-> >> 
-> >> I don't think it is possible to mark an individual page in a hugetlbfs
-> >> page - it's all or nothing.
-> >> 
-> >> AFAICT, the SIGBUS report is for user mappings and doesn't have to care
-> >> whether it's Stage 2 hugetlb page or thp. And the lsb determination should
-> >> take the Stage 1 hugepage size into account - something along the lines
-> >> of the snippet from previous email.
-> >> 
-> >
-> > I think the lsb should indicate the size of the memory region known to
-> > be broken by the kernel - however that whole mechanism works.
-> 
-> Agreed.
-> 
-> To re-iterate and confirm that we are on the same page 
+Hello Marc,
 
-Haha, good one.
 
-> (this time using
-> correct terminology) -
-> 
-> * the kernel poisons pages in PAGE_SIZEed or hugepage sized units
->   depending on where the poisoned address maps to. If the affected
->   location maps to a transparent hugepage, the thp is split and the
->   PAGE_SIZed unit corresponding to the location is poisoned.
-> 
-> * When sending a SIGBUS on encountering a poisoned pfn, the lsb should
->   be -
->   
->   - PAGE_SHIFT, if the hva does not map to a hugepage
->   - huge_page_shift(hstate_vma(vma)), if the hva belongs to a hugepage
-> 
-> Hopefully that makes sense.
-> 
+On 3/24/2017 8:03 AM, Marc Zyngier wrote:
+> On 21/03/17 22:47, Tyler Baicar wrote:
+>> Currently external aborts are unsupported by the guest abort
+>> handling. Add handling for SEAs so that the host kernel reports
+>> SEAs which occur in the guest kernel.
+>>
+>> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+>> ---
+>>   arch/arm/include/asm/kvm_arm.h       | 10 +++++++++
+>>   arch/arm/include/asm/system_misc.h   |  5 +++++
+>>   arch/arm/kvm/mmu.c                   | 41 ++++++++++++++++++++++++++++++------
+>>   arch/arm64/include/asm/kvm_arm.h     | 10 +++++++++
+>>   arch/arm64/include/asm/system_misc.h |  2 ++
+>>   arch/arm64/mm/fault.c                | 19 +++++++++++++++--
+>>   drivers/acpi/apei/ghes.c             | 13 ++++++------
+>>   include/acpi/ghes.h                  |  2 +-
+>>   8 files changed, 86 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+>> index a3f0b3d..ebf020b 100644
+>> --- a/arch/arm/include/asm/kvm_arm.h
+>> +++ b/arch/arm/include/asm/kvm_arm.h
+>> @@ -187,6 +187,16 @@
+>>   #define FSC_FAULT	(0x04)
+>>   #define FSC_ACCESS	(0x08)
+>>   #define FSC_PERM	(0x0c)
+>> +#define FSC_SEA		(0x10)
+>> +#define FSC_SEA_TTW0	(0x14)
+>> +#define FSC_SEA_TTW1	(0x15)
+>> +#define FSC_SEA_TTW2	(0x16)
+>> +#define FSC_SEA_TTW3	(0x17)
+>> +#define FSC_SECC	(0x18)
+>> +#define FSC_SECC_TTW0	(0x1c)
+>> +#define FSC_SECC_TTW1	(0x1d)
+>> +#define FSC_SECC_TTW2	(0x1e)
+>> +#define FSC_SECC_TTW3	(0x1f)
+>>   
+>>   /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>>   #define HPFAR_MASK	(~0xf)
+>> diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
+>> index a3d61ad..ea45d94 100644
+>> --- a/arch/arm/include/asm/system_misc.h
+>> +++ b/arch/arm/include/asm/system_misc.h
+>> @@ -24,4 +24,9 @@
+>>   
+>>   #endif /* !__ASSEMBLY__ */
+>>   
+>> +static inline int handle_guest_sea(unsigned long addr, unsigned int esr)
+>> +{
+>> +	return -1;
+>> +}
+>> +
+> Shouldn't this be in the #ifndef __ASSEMBLY__ block? The assembler is
+> definitely going to barf on that...
+I will move this in the next patch set.
+>>   #endif /* __ASM_ARM_SYSTEM_MISC_H */
+>> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+>> index 962616f..105b6ab 100644
+>> --- a/arch/arm/kvm/mmu.c
+>> +++ b/arch/arm/kvm/mmu.c
+>> @@ -29,6 +29,7 @@
+>>   #include <asm/kvm_asm.h>
+>>   #include <asm/kvm_emulate.h>
+>>   #include <asm/virt.h>
+>> +#include <asm/system_misc.h>
+>>   
+>>   #include "trace.h"
+>>   
+>> @@ -1406,6 +1407,24 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>>   		kvm_set_pfn_accessed(pfn);
+>>   }
+>>   
+>> +static bool is_abort_synchronous(unsigned long fault_status) {
+>> +	switch (fault_status) {
+>> +	case FSC_SEA:
+>> +	case FSC_SEA_TTW0:
+>> +	case FSC_SEA_TTW1:
+>> +	case FSC_SEA_TTW2:
+>> +	case FSC_SEA_TTW3:
+>> +	case FSC_SECC:
+>> +	case FSC_SECC_TTW0:
+>> +	case FSC_SECC_TTW1:
+>> +	case FSC_SECC_TTW2:
+>> +	case FSC_SECC_TTW3:
+>> +		return true;
+>> +	default:
+>> +		return false;
+>> +	}
+>> +}
+>> +
+>>   /**
+>>    * kvm_handle_guest_abort - handles all 2nd stage aborts
+>>    * @vcpu:	the VCPU pointer
+>> @@ -1426,23 +1445,31 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>>   	unsigned long hva;
+>>   	bool is_iabt, write_fault, writable;
+>>   	gfn_t gfn;
+>> -	int ret, idx;
+>> +	int ret, idx, sea_status = 1;
+>> +
+>> +	/* Check the stage-2 fault is trans. fault or write fault */
+>> +	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+>> +
+>> +	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+>> +
+>> +	/* The host kernel will handle the synchronous external abort. There
+>> +	 * is no need to pass the error into the guest.
+>> +	 */
+>> +	if (is_abort_synchronous(fault_status))
+>> +		sea_status = handle_guest_sea((unsigned long)fault_ipa,
+>> +				    kvm_vcpu_get_hsr(vcpu));
+>>   
+>>   	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+>> -	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu))) {
+>> +	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu)) && sea_status) {
+>>   		kvm_inject_vabt(vcpu);
+>>   		return 1;
+>>   	}
+>>   
+>> -	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+>> -
+>>   	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_hsr(vcpu),
+>>   			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
+>>   
+>> -	/* Check the stage-2 fault is trans. fault or write fault */
+>> -	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+>>   	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+>> -	    fault_status != FSC_ACCESS) {
+>> +	    fault_status != FSC_ACCESS && sea_status) {
+>>   		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+>>   			kvm_vcpu_trap_get_class(vcpu),
+>>   			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
+>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+>> index 6e99978..61d694c 100644
+>> --- a/arch/arm64/include/asm/kvm_arm.h
+>> +++ b/arch/arm64/include/asm/kvm_arm.h
+>> @@ -204,6 +204,16 @@
+>>   #define FSC_FAULT	ESR_ELx_FSC_FAULT
+>>   #define FSC_ACCESS	ESR_ELx_FSC_ACCESS
+>>   #define FSC_PERM	ESR_ELx_FSC_PERM
+>> +#define FSC_SEA		ESR_ELx_FSC_EXTABT
+>> +#define FSC_SEA_TTW0	(0x14)
+>> +#define FSC_SEA_TTW1	(0x15)
+>> +#define FSC_SEA_TTW2	(0x16)
+>> +#define FSC_SEA_TTW3	(0x17)
+>> +#define FSC_SECC	(0x18)
+>> +#define FSC_SECC_TTW0	(0x1c)
+>> +#define FSC_SECC_TTW1	(0x1d)
+>> +#define FSC_SECC_TTW2	(0x1e)
+>> +#define FSC_SECC_TTW3	(0x1f)
+>>   
+>>   /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>>   #define HPFAR_MASK	(~UL(0xf))
+>> diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
+>> index bc81243..5b2cecd 100644
+>> --- a/arch/arm64/include/asm/system_misc.h
+>> +++ b/arch/arm64/include/asm/system_misc.h
+>> @@ -58,4 +58,6 @@ void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned int,
+>>   
+>>   #endif	/* __ASSEMBLY__ */
+>>   
+>> +int handle_guest_sea(unsigned long addr, unsigned int esr);
+> Same remark here.
+Same here.
+>
+>> +
+>>   #endif	/* __ASM_SYSTEM_MISC_H */
+>> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+>> index f7372ce..ee96307 100644
+>> --- a/arch/arm64/mm/fault.c
+>> +++ b/arch/arm64/mm/fault.c
+>> @@ -497,6 +497,7 @@ static int do_bad(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>>   static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>>   {
+>>   	struct siginfo info;
+>> +	int ret = 0;
+>>   
+>>   	pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
+>>   		 fault_name(esr), esr, addr);
+>> @@ -508,7 +509,7 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>>   	 */
+>>   	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA)) {
+>>   		nmi_enter();
+>> -		ghes_notify_sea();
+>> +		ret = ghes_notify_sea();
+>>   		nmi_exit();
+>>   	}
+>>   
+>> @@ -521,7 +522,7 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>>   		info.si_addr  = (void __user *)addr;
+>>   	arm64_notify_die("", regs, &info, esr);
+>>   
+>> -	return 0;
+>> +	return ret;
+>>   }
+>>   
+>>   static const struct fault_info {
+>> @@ -603,6 +604,20 @@ static const char *fault_name(unsigned int esr)
+>>   }
+>>   
+>>   /*
+>> + * Handle Synchronous External Aborts that occur in a guest kernel.
+>> + */
+>> +int handle_guest_sea(unsigned long addr, unsigned int esr)
+>> +{
+>> +	int ret = -ENOENT;
+>> +
+>> +	if(IS_ENABLED(CONFIG_ACPI_APEI_SEA)) {
+>> +		ret = ghes_notify_sea();
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +/*
+>>    * Dispatch a data abort to the relevant handler.
+>>    */
+>>   asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
+>> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+>> index 230b095..81eabc6 100644
+>> --- a/drivers/acpi/apei/ghes.c
+>> +++ b/drivers/acpi/apei/ghes.c
+>> @@ -810,17 +810,18 @@ static int ghes_notify_sci(struct notifier_block *this,
+>>   #ifdef CONFIG_ACPI_APEI_SEA
+>>   static LIST_HEAD(ghes_sea);
+>>   
+>> -void ghes_notify_sea(void)
+>> +int ghes_notify_sea(void)
+>>   {
+>>   	struct ghes *ghes;
+>> +	int ret = -ENOENT;
+>>   
+>> -	/*
+>> -	 * synchronize_rcu() will wait for nmi_exit(), so no need to
+>> -	 * rcu_read_lock().
+>> -	 */
+>> +	rcu_read_lock();
+>>   	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
+>> -		ghes_proc(ghes);
+>> +		if(!ghes_proc(ghes))
+>> +			ret = 0;
+>>   	}
+>> +	rcu_read_unlock();
+>> +	return ret;
+>>   }
+>>   
+>>   static void ghes_sea_add(struct ghes *ghes)
+>> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+>> index 18bc935..2a727dc 100644
+>> --- a/include/acpi/ghes.h
+>> +++ b/include/acpi/ghes.h
+>> @@ -99,6 +99,6 @@ static inline void *acpi_hest_generic_data_payload(struct acpi_hest_generic_data
+>>   		gdata + 1;
+>>   }
+>>   
+>> -void ghes_notify_sea(void);
+>> +int ghes_notify_sea(void);
+>>   
+>>   #endif /* GHES_H */
+>>
+> Otherwise, the KVM changes look good to me. Assuming you fix the two
+> nits above:
+>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Thanks!
+Tyler
 
-Yes, sounds reasonable to me.  Only thing we could argue, is that if
-userspace knows it's dealing with hugetlbfs, it should know the minimal
-granularity of the memory it can deal with, so maybe that's why x86
-doesn't bother and always just uses PAGE_SHIFT.
-
-In both cases though, the patch was mostly fine, and probably gets the
-job done regardless of which lsb is reported.
-
-Thanks,
--Christoffer
+-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
