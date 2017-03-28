@@ -1,24 +1,31 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 1/9] arm64: KVM: PMU: Refactor pmu_*_el0_disabled
-Date: Tue, 28 Mar 2017 14:21:15 +0100
-Message-ID: <0505d0e7-bfb6-903a-5c24-53b375e58332@arm.com>
-References: <20170327160345.12402-1-marc.zyngier@arm.com>
- <20170327160345.12402-2-marc.zyngier@arm.com> <20170328124623.GJ31156@cbox>
+From: Achin Gupta <achin.gupta@arm.com>
+Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
+Date: Tue, 28 Mar 2017 14:24:55 +0100
+Message-ID: <20170328132455.GK23682@e104320-lin>
+References: <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
+ <58CFF058.8020205@arm.com>
+ <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
+ <20170321113428.GC15920@cbox> <58D17AF0.2010802@arm.com>
+ <20170321193933.GB31111@cbox> <58DA3F68.6090901@arm.com>
+ <20170328112328.GA31156@cbox> <20170328115413.GJ23682@e104320-lin>
+ <20170328122229.GA31789@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CEBB940C17
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 09:19:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7257240BE4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 09:22:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qslOgddCJ5bu for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Mar 2017 09:19:19 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AE6B40960
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 09:19:19 -0400 (EDT)
-In-Reply-To: <20170328124623.GJ31156@cbox>
+ with ESMTP id Nwj32UvaoHB9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Mar 2017 09:22:31 -0400 (EDT)
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com
+ (mail-ve1eur01on0086.outbound.protection.outlook.com [104.47.1.86])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B972340966
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 09:22:30 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20170328122229.GA31789@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,46 +36,98 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <cdall@linaro.org>
-Cc: Shannon Zhao <shannon.zhao@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Leif.Lindholm@linaro.com, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, gengdongjiu <gengdongjiu@huawei.com>, wangxiongfeng2@huawei.com, wuquanming@huawei.com, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, huangshaoyu@huawei.com, nd@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28/03/17 13:46, Christoffer Dall wrote:
-> On Mon, Mar 27, 2017 at 05:03:37PM +0100, Marc Zyngier wrote:
->> There is a lot of duplication in the pmu_*_el0_disabled helpers,
->> and as we're going to modify them shortly, let's move all the
->> common stuff in a single function.
->>
->> No functionnal change.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/kvm/sys_regs.c | 25 +++++++++++--------------
->>  1 file changed, 11 insertions(+), 14 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 0e26f8c2b56f..7e1d673304d5 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -460,35 +460,32 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->>  	vcpu_sys_reg(vcpu, PMCR_EL0) = val;
->>  }
->>  
->> -static bool pmu_access_el0_disabled(struct kvm_vcpu *vcpu)
->> +static bool check_disabled(struct kvm_vcpu *vcpu, u64 flags)
->>  {
->>  	u64 reg = vcpu_sys_reg(vcpu, PMUSERENR_EL0);
->> +	bool cond = (reg & flags) || vcpu_mode_priv(vcpu);
-> 
-> nit: I would call this variable 'enabled' and then return !enabled to
-> make it clear what's going on.
-> 
-> (If you agree, I can fix this up when applying along with the typo and
-> rename pointed out by Suzuki).
+On Tue, Mar 28, 2017 at 02:22:29PM +0200, Christoffer Dall wrote:
+> On Tue, Mar 28, 2017 at 12:54:13PM +0100, Achin Gupta wrote:
+> > On Tue, Mar 28, 2017 at 01:23:28PM +0200, Christoffer Dall wrote:
+> > > On Tue, Mar 28, 2017 at 11:48:08AM +0100, James Morse wrote:
+> > > > Hi Christoffer,
+> > > >
+> > > > (CC: Leif and Achin who know more about how UEFI fits into this picture)
+> > > >
+> > > > On 21/03/17 19:39, Christoffer Dall wrote:
+> > > > > On Tue, Mar 21, 2017 at 07:11:44PM +0000, James Morse wrote:
+> > > > >> On 21/03/17 11:34, Christoffer Dall wrote:
+> > > > >>> On Tue, Mar 21, 2017 at 02:32:29PM +0800, gengdongjiu wrote:
+> > > > >>>> On 2017/3/20 23:08, James Morse wrote:
+> > > > >>>>>>>> On 20/03/17 07:55, Dongjiu Geng wrote:
+> > > > >>>>>>>>> In the RAS implementation, hardware pass the virtual SEI
+> > > > >>>>>>>>> syndrome information through the VSESR_EL2, so set the virtual
+> > > > >>>>>>>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
+> > > > >>>>>>>>> the guest OS
+> > > > >>>>>
+> > > > >>>>> How does this work with firmware first?
+> > > > >>>>
+> > > > >>>> I explained it in previous mail about the work flow.
+> > > > >>>
+> > > > >>> When delivering and reporting SEIs to the VM, should this happen
+> > > > >>> directly to the OS running in the VM, or to the guest firmware (e.g.
+> > > > >>> UEFI) running in the VM as well?
+> > > > >>
+> > > > >> 'firmware first' is the ACPI specs name for x86's BIOS or management-mode
+> > > > >> handling the error. On arm64 we have multiple things called firmware, so the
+> > > > >> name might be more confusing than helpful.
+> > > > >>
+> > > > >> As far as I understand it, firmware here refers to the secure-world and EL3.
+> > > > >> Something like ATF can use SCR_EL3.EA to claim SErrors and external aborts,
+> > > > >> routing them to EL3 where secure platform specific firmware generates CPER records.
+> > > > >> For a guest, Qemu takes the role of this EL3-firmware.
+> >
+> > +1
+> >
+> > > > >>
+> > > > > Thanks for the clarification.  So UEFI in the VM would not be involved
+> > > > > in this at all?
+> > > >
+> > > > On the host, part of UEFI is involved to generate the CPER records.
+> > > > In a guest?, I don't know.
+> > > > Qemu could generate the records, or drive some other component to do it.
+> > >
+> > > I think I am beginning to understand this a bit.  Since the guet UEFI
+> > > instance is specifically built for the machine it runs on, QEMU's virt
+> > > machine in this case, they could simply agree (by some contract) to
+> > > place the records at some specific location in memory, and if the guest
+> > > kernel asks its guest UEFI for that location, things should just work by
+> > > having logic in QEMU to process error reports and populate guest memory.
+> > >
+> > > Is this how others see the world too?
+> >
+> > I think so!
+> >
+> > AFAIU, the memory where CPERs will reside should be specified in a GHES entry in
+> > the HEST. Is this not the case with a guest kernel i.e. the guest UEFI creates a
+> > HEST for the guest Kernel?
+> >
+> > If so, then the question is how the guest UEFI finds out where QEMU (acting as
+> > EL3 firmware) will populate the CPERs. This could either be a contract between
+> > the two or a guest DXE driver uses the MM_COMMUNICATE call (see [1]) to ask QEMU
+> > where the memory is.
+> >
+> > This is the way I expect it to work at the EL3/EL2 boundary. So I am
+> > extrapolating it to the guest/hypervisor boundary. Do shout if I am missing
+> > anything.
+>
+> No that sounds like a resonable comparison.
+>
+> I'm not entirely sure what a HEST or GHES is, but I think the only place
+> where I'm still not clear is if when the guest kernel is notified of
+> errors does it (a) just traverse memory by following some pointers
+> (which it may have pre-loaded at boot from UEFI), or (b) run UEFI code
+> which can call into QEMU and generate error records on demand?
 
-Yup, that'd be absolutely fine.
+So HEST is the ACPI Harware Error Source Table. It has entries in it for Generic
+HW Error Sources (GHES) amongst other types of error sources (x86 MCE etc). Each
+Error source specifies an address where the address of the CPER created by
+firmware will be populated. OS upon receipt of an error reads the CPERs to find
+the error source. It uses the addresses specified in the GHES entries of the
+HEST. This is closer to (a) above. HEST has the pointers preloaded at boot by
+UEFI.
 
-Thanks,
+hth,
+Achin
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+>
+> Thanks,
+> -Christoffer
