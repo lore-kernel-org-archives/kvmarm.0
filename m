@@ -1,26 +1,27 @@
-From: Radha Mohan <mohun106@gmail.com>
-Subject: Re: host stalls when qemu-system-aarch64 with kvm and pflash
-Date: Tue, 28 Mar 2017 13:24:15 -0700
-Message-ID: <CAC8NTUVPoH=ZiJ51EoOLPKhsyGKo5iszkhHzb5K8Heax3n2KuA@mail.gmail.com>
-References: <CAC8NTUUWuH4k7SZSus_hz6a6V+OLGYUFcSOUwVbji2YDAZbVdQ@mail.gmail.com>
- <20170328201623.GD20211@cbox>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH V14 10/10] arm/arm64: KVM: add guest SEA support
+Date: Tue, 28 Mar 2017 22:26:39 +0200
+Message-ID: <20170328202639.GE20211@cbox>
+References: <1490729440-32591-1-git-send-email-tbaicar@codeaurora.org>
+ <1490729440-32591-11-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5920A40992
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 16:22:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C3EE840992
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 16:24:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id S5t6c+SqCzB5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Mar 2017 16:22:17 -0400 (EDT)
-Received: from mail-pg0-f49.google.com (mail-pg0-f49.google.com [74.125.83.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 918DC40969
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 16:22:17 -0400 (EDT)
-Received: by mail-pg0-f49.google.com with SMTP id g2so82264038pge.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 13:24:17 -0700 (PDT)
-In-Reply-To: <20170328201623.GD20211@cbox>
+ with ESMTP id cle7D6abQOEu for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Mar 2017 16:24:42 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0EDDA40969
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 16:24:41 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id u132so48874002wmg.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 13:26:41 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1490729440-32591-11-git-send-email-tbaicar@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,174 +31,286 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: qemu-devel@nongnu.org, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 28, 2017 at 1:16 PM, Christoffer Dall <cdall@linaro.org> wrote:
-> Hi Radha,
->
-> On Tue, Mar 28, 2017 at 12:58:24PM -0700, Radha Mohan wrote:
->> Hi,
->> I am seeing an issue with qemu-system-aarch64 when using pflash
->> (booting kernel via UEFI bios).
->>
->> Host kernel: 4.11.0-rc3-next-20170323
->> Qemu version: v2.9.0-rc1
->>
->> Command used:
->> ./aarch64-softmmu/qemu-system-aarch64 -cpu host -enable-kvm -M
->> virt,gic_version=3 -nographic -smp 1 -m 2048 -drive
->> if=none,id=hd0,file=/root/zesty-server-cloudimg-arm64.img,id=0 -device
->> virtio-blk-device,drive=hd0 -pflash /root/flash0.img -pflash
->> /root/flash1.img
->>
->>
->> As soon as the guest kernel boots the host starts to stall and prints
->> the below messages. And the system never recovers. I can neither
->> poweroff the guest nor the host. So I have resort to external power
->> reset of the host.
->>
->> ==================
->> [  116.199077] NMI watchdog: BUG: soft lockup - CPU#25 stuck for 23s!
->> [kworker/25:1:454]
->> [  116.206901] Modules linked in: binfmt_misc nls_iso8859_1 aes_ce_blk
->> shpchp crypto_simd gpio_keys cryptd aes_ce_cipher ghash_ce sha2_ce
->> sha1_ce uio_pdrv_genirq uio autofs4 btrfs raid10 rai
->> d456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor
->> raid6_pq libcrc32c raid1 raid0 multipath linear ast i2c_algo_bit ttm
->> drm_kms_helper syscopyarea sysfillrect sysimgblt fb_s
->> ys_fops drm nicvf ahci nicpf libahci thunder_bgx thunder_xcv
->> mdio_thunder mdio_cavium
->>
->> [  116.206995] CPU: 25 PID: 454 Comm: kworker/25:1 Not tainted
->> 4.11.0-rc3-next-20170323 #1
->> [  116.206997] Hardware name: www.cavium.com crb-1s/crb-1s, BIOS 0.3 Feb 23 2017
->> [  116.207010] Workqueue: events netstamp_clear
->> [  116.207015] task: ffff801f906b5400 task.stack: ffff801f901a4000
->> [  116.207020] PC is at smp_call_function_many+0x284/0x2e8
->> [  116.207023] LR is at smp_call_function_many+0x244/0x2e8
->> [  116.207026] pc : [<ffff000008156ecc>] lr : [<ffff000008156e8c>]
->> pstate: 80000145
->> [  116.207028] sp : ffff801f901a7be0
->> [  116.207030] x29: ffff801f901a7be0 x28: ffff000009139000
->> [  116.207036] x27: ffff000009139434 x26: 0000000000000080
->> [  116.207041] x25: 0000000000000000 x24: ffff0000081565d0
->> [  116.207047] x23: 0000000000000001 x22: ffff000008e11e00
->> [  116.207052] x21: ffff801f6d5cff00 x20: ffff801f6d5cff08
->> [  116.207057] x19: ffff000009138e38 x18: 0000000000000a03
->> [  116.207063] x17: 0000ffffb77c9028 x16: ffff0000082e81d8
->> [  116.207068] x15: 00003d0d6dd44d08 x14: 0036312196549b4a
->> [  116.207073] x13: 0000000058dabe4c x12: 0000000000000018
->> [  116.207079] x11: 00000000366e2f04 x10: 00000000000009f0
->> [  116.207084] x9 : ffff801f901a7d30 x8 : 0000000000000002
->> [  116.207089] x7 : 0000000000000000 x6 : 0000000000000000
->> [  116.207095] x5 : ffffffff00000000 x4 : 0000000000000020
->> [  116.207100] x3 : 0000000000000020 x2 : 0000000000000000
->> [  116.207105] x1 : ffff801f6d682578 x0 : 0000000000000003
->>
->> [  150.443116] INFO: rcu_sched self-detected stall on CPU
->> [  150.448261]  25-...: (14997 ticks this GP)
->> idle=47a/140000000000001/0 softirq=349/349 fqs=7495
->> [  150.451115] INFO: rcu_sched detected stalls on CPUs/tasks:
->> [  150.451123]  25-...: (14997 ticks this GP)
->> idle=47a/140000000000001/0 softirq=349/349 fqs=7495
->> [  150.451124]  (detected by 13, t=15002 jiffies, g=805, c=804, q=8384)
->> [  150.451136] Task dump for CPU 25:
->> [  150.451138] kworker/25:1    R  running task        0   454      2 0x00000002
->> [  150.451155] Workqueue: events netstamp_clear
->> [  150.451158] Call trace:
->> [  150.451164] [<ffff000008086188>] __switch_to+0x90/0xa8
->> [  150.451172] [<ffff0000081f6240>] static_key_slow_inc+0x128/0x138
->> [  150.451175] [<ffff0000081f6284>] static_key_enable+0x34/0x60
->> [  150.451178] [<ffff000008843268>] netstamp_clear+0x68/0x80
->> [  150.451181] [<ffff0000080e49a0>] process_one_work+0x158/0x478
->> [  150.451183] [<ffff0000080e4d10>] worker_thread+0x50/0x4a8
->> [  150.451187] [<ffff0000080ebd78>] kthread+0x108/0x138
->> [  150.451190] [<ffff0000080836c0>] ret_from_fork+0x10/0x50
->> [  150.477451]   (t=15008 jiffies g=805 c=804 q=8384)
->> [  150.482242] Task dump for CPU 25:
->> [  150.482245] kworker/25:1    R  running task        0   454      2 0x00000002
->> [  150.482259] Workqueue: events netstamp_clear
->> [  150.482264] Call trace:
->> [  150.482271] [<ffff00000808a530>] dump_backtrace+0x0/0x2b0
->> [  150.482277] [<ffff00000808a804>] show_stack+0x24/0x30
->> [  150.482281] [<ffff0000080fb750>] sched_show_task+0x128/0x178
->> [  150.482285] [<ffff0000080fd298>] dump_cpu_task+0x48/0x58
->> [  150.482288] [<ffff0000081f81e4>] rcu_dump_cpu_stacks+0xa0/0xe8
->> [  150.482297] [<ffff00000813983c>] rcu_check_callbacks+0x774/0x938
->> [  150.482305] [<ffff00000813fcb4>] update_process_times+0x34/0x60
->> [  150.482314] [<ffff000008151b80>] tick_sched_handle.isra.7+0x38/0x70
->> [  150.482319] [<ffff000008151c04>] tick_sched_timer+0x4c/0x98
->> [  150.482324] [<ffff000008140510>] __hrtimer_run_queues+0xd8/0x2b8
->> [  150.482328] [<ffff000008141180>] hrtimer_interrupt+0xa8/0x228
->> [  150.482334] [<ffff0000087f2a2c>] arch_timer_handler_phys+0x3c/0x50
->> [  150.482341] [<ffff00000812c194>] handle_percpu_devid_irq+0x8c/0x230
->> [  150.482344] [<ffff000008126174>] generic_handle_irq+0x34/0x50
->> [  150.482347] [<ffff000008126898>] __handle_domain_irq+0x68/0xc0
->> [  150.482351] [<ffff0000080817e4>] gic_handle_irq+0xc4/0x170
->> [  150.482356] Exception stack(0xffff801f901a7ab0 to 0xffff801f901a7be0)
->> [  150.482360] 7aa0:
->> 0000000000000003 ffff801f6d682578
->> [  150.482364] 7ac0: 0000000000000000 0000000000000020
->> 0000000000000020 ffffffff00000000
->> [  150.482367] 7ae0: 0000000000000000 0000000000000000
->> 0000000000000002 ffff801f901a7d30
->> [  150.482371] 7b00: 00000000000009f0 00000000366e2f04
->> 0000000000000018 0000000058dabe4c
->> [  150.482375] 7b20: 0036312196549b4a 00003d0d6dd44d08
->> ffff0000082e81d8 0000ffffb77c9028
->> [  150.482378] 7b40: 0000000000000a03 ffff000009138e38
->> ffff801f6d5cff08 ffff801f6d5cff00
->> [  150.482382] 7b60: ffff000008e11e00 0000000000000001
->> ffff0000081565d0 0000000000000000
->> [  150.482386] 7b80: 0000000000000080 ffff000009139434
->> ffff000009139000 ffff801f901a7be0
->> [  150.482390] 7ba0: ffff000008156e8c ffff801f901a7be0
->> ffff000008156ecc 0000000080000145
->> [  150.482394] 7bc0: ffff801f901a7be0 ffff000008156e68
->> ffffffffffffffff ffff000008156e8c
->> [  150.482397] [<ffff000008082ff4>] el1_irq+0xb4/0x140
->> [  150.482401] [<ffff000008156ecc>] smp_call_function_many+0x284/0x2e8
->> [  150.482405] [<ffff000008157020>] kick_all_cpus_sync+0x30/0x38
->> [  150.482409] [<ffff00000897c6cc>] aarch64_insn_patch_text+0xec/0xf8
->> [  150.482415] [<ffff000008095978>] arch_jump_label_transform+0x60/0x98
->> [  150.482420] [<ffff0000081f593c>] __jump_label_update+0x8c/0xa8
->> [  150.482423] [<ffff0000081f6088>] jump_label_update+0x58/0xe8
->> [  150.482429] [<ffff0000081f6240>] static_key_slow_inc+0x128/0x138
->> [  150.482434] [<ffff0000081f6284>] static_key_enable+0x34/0x60
->> [  150.482438] [<ffff000008843268>] netstamp_clear+0x68/0x80
->> [  150.482441] [<ffff0000080e49a0>] process_one_work+0x158/0x478
->> [  150.482444] [<ffff0000080e4d10>] worker_thread+0x50/0x4a8
->> [  150.482448] [<ffff0000080ebd78>] kthread+0x108/0x138
->> [  150.482451] [<ffff0000080836c0>] ret_from_fork+0x10/0x50
->>
->> ====================================
->>
->> I am observing that this usually happens when the guest tries to
->> bringup or use the default virtio-net interface.
->> And I am unable to reproduce this when directly booting the guest
->> kernel without UEFI BIOS.
->> So anyone observed similar issue ?
->>
->
-> I haven't seen this myself.
->
-> Have you tried with other versions of QEMU and the host kernel by any
-> chance using the same setup?
+On Tue, Mar 28, 2017 at 01:30:40PM -0600, Tyler Baicar wrote:
+> Currently external aborts are unsupported by the guest abort
+> handling. Add handling for SEAs so that the host kernel reports
+> SEAs which occur in the guest kernel.
+> 
+> When an SEA occurs in the guest kernel, the guest exits and is
+> routed to kvm_handle_guest_abort(). Prior to this patch, a print
+> message of an unsupported FSC would be printed and nothing else
+> would happen. With this patch, the code gets routed to the APEI
+> handling of SEAs in the host kernel to report the SEA information.
+> 
+> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_arm.h       | 10 ++++++++++
+>  arch/arm/include/asm/system_misc.h   |  5 +++++
+>  arch/arm/kvm/mmu.c                   | 34 +++++++++++++++++++++++++++++++---
+>  arch/arm64/include/asm/kvm_arm.h     | 10 ++++++++++
+>  arch/arm64/include/asm/system_misc.h |  2 ++
+>  arch/arm64/mm/fault.c                | 23 +++++++++++++++++++++--
+>  drivers/acpi/apei/ghes.c             | 13 +++++++------
+>  include/acpi/ghes.h                  |  2 +-
+>  8 files changed, 87 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+> index a3f0b3d..ebf020b 100644
+> --- a/arch/arm/include/asm/kvm_arm.h
+> +++ b/arch/arm/include/asm/kvm_arm.h
+> @@ -187,6 +187,16 @@
+>  #define FSC_FAULT	(0x04)
+>  #define FSC_ACCESS	(0x08)
+>  #define FSC_PERM	(0x0c)
+> +#define FSC_SEA		(0x10)
+> +#define FSC_SEA_TTW0	(0x14)
+> +#define FSC_SEA_TTW1	(0x15)
+> +#define FSC_SEA_TTW2	(0x16)
+> +#define FSC_SEA_TTW3	(0x17)
+> +#define FSC_SECC	(0x18)
+> +#define FSC_SECC_TTW0	(0x1c)
+> +#define FSC_SECC_TTW1	(0x1d)
+> +#define FSC_SECC_TTW2	(0x1e)
+> +#define FSC_SECC_TTW3	(0x1f)
+>  
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~0xf)
+> diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
+> index a3d61ad..8c4a89f 100644
+> --- a/arch/arm/include/asm/system_misc.h
+> +++ b/arch/arm/include/asm/system_misc.h
+> @@ -22,6 +22,11 @@
+>  
+>  extern unsigned int user_debug;
+>  
+> +static inline int handle_guest_sea(phys_addr_t addr, unsigned int esr)
+> +{
+> +	return -1;
+> +}
+> +
+>  #endif /* !__ASSEMBLY__ */
+>  
+>  #endif /* __ASM_ARM_SYSTEM_MISC_H */
+> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> index 962616f..9a977c8 100644
+> --- a/arch/arm/kvm/mmu.c
+> +++ b/arch/arm/kvm/mmu.c
+> @@ -29,6 +29,7 @@
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/virt.h>
+> +#include <asm/system_misc.h>
+>  
+>  #include "trace.h"
+>  
+> @@ -1406,6 +1407,24 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>  		kvm_set_pfn_accessed(pfn);
+>  }
+>  
+> +static bool is_abort_sea(unsigned long fault_status) {
+> +	switch (fault_status) {
+> +	case FSC_SEA:
+> +	case FSC_SEA_TTW0:
+> +	case FSC_SEA_TTW1:
+> +	case FSC_SEA_TTW2:
+> +	case FSC_SEA_TTW3:
+> +	case FSC_SECC:
+> +	case FSC_SECC_TTW0:
+> +	case FSC_SECC_TTW1:
+> +	case FSC_SECC_TTW2:
+> +	case FSC_SECC_TTW3:
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+>  /**
+>   * kvm_handle_guest_abort - handles all 2nd stage aborts
+>   * @vcpu:	the VCPU pointer
+> @@ -1428,19 +1447,28 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	gfn_t gfn;
+>  	int ret, idx;
+>  
+> +	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+> +
+> +	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+> +
+> +	/*
+> +	 * The host kernel will handle the synchronous external abort. There
+> +	 * is no need to pass the error into the guest.
+> +	 */
+> +	if (is_abort_sea(fault_status))
+> +		if (!handle_guest_sea(fault_ipa, kvm_vcpu_get_hsr(vcpu)))
+> +			return 1;
+> +
 
-The earlier qemu version (atleast 2.5 which is default on ubuntu
-16.04) have different issue. The same thing happens when I use
-vhost=on but without vhost and with virtio-net didn't see the issue.
-The Armband folks have also reported the vhost issue here
-https://bugs.launchpad.net/ubuntu/+source/edk2/+bug/1673564
+So what's the logic in presenting this as a vabt to the guest when the
+host couldn't handle it?  What do you do in other parts of the kernel if
+you see an abort that the host cannot handle?
 
-So I am beginning to think the issue could be related to the flash
-emulation but wanted to check on ml if anyone else is seeing it. But
-if it is flash emulation how can it hose the host like this ?
+nit: I'd prefer to see braces around the the multi-line block above.
 
-I will also try with qemu 2.8 and see.
 
->
-> Thanks for reporting this,
-> -Christoffer
+>  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+>  	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu))) {
+>  		kvm_inject_vabt(vcpu);
+>  		return 1;
+>  	}
+>  
+> -	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+> -
+>  	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_hsr(vcpu),
+>  			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
+>  
+>  	/* Check the stage-2 fault is trans. fault or write fault */
+> -	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+>  	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+>  	    fault_status != FSC_ACCESS) {
+>  		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 6e99978..61d694c 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -204,6 +204,16 @@
+>  #define FSC_FAULT	ESR_ELx_FSC_FAULT
+>  #define FSC_ACCESS	ESR_ELx_FSC_ACCESS
+>  #define FSC_PERM	ESR_ELx_FSC_PERM
+> +#define FSC_SEA		ESR_ELx_FSC_EXTABT
+> +#define FSC_SEA_TTW0	(0x14)
+> +#define FSC_SEA_TTW1	(0x15)
+> +#define FSC_SEA_TTW2	(0x16)
+> +#define FSC_SEA_TTW3	(0x17)
+> +#define FSC_SECC	(0x18)
+> +#define FSC_SECC_TTW0	(0x1c)
+> +#define FSC_SECC_TTW1	(0x1d)
+> +#define FSC_SECC_TTW2	(0x1e)
+> +#define FSC_SECC_TTW3	(0x1f)
+>  
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~UL(0xf))
+> diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
+> index bc81243..95aa442 100644
+> --- a/arch/arm64/include/asm/system_misc.h
+> +++ b/arch/arm64/include/asm/system_misc.h
+> @@ -56,6 +56,8 @@ void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned int,
+>  	__show_ratelimited;						\
+>  })
+>  
+> +int handle_guest_sea(phys_addr_t addr, unsigned int esr);
+> +
+>  #endif	/* __ASSEMBLY__ */
+>  
+>  #endif	/* __ASM_SYSTEM_MISC_H */
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index f7372ce..3abb367 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -497,6 +497,7 @@ static int do_bad(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>  static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>  {
+>  	struct siginfo info;
+> +	int ret = 0;
+>  
+>  	pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
+>  		 fault_name(esr), esr, addr);
+> @@ -508,7 +509,7 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>  	 */
+>  	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA)) {
+>  		nmi_enter();
+> -		ghes_notify_sea();
+> +		ret = ghes_notify_sea();
+>  		nmi_exit();
+>  	}
+>  
+> @@ -521,7 +522,7 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>  		info.si_addr  = (void __user *)addr;
+>  	arm64_notify_die("", regs, &info, esr);
+>  
+> -	return 0;
+> +	return ret;
+>  }
+>  
+>  static const struct fault_info {
+> @@ -603,6 +604,24 @@ static const char *fault_name(unsigned int esr)
+>  }
+>  
+>  /*
+> + * Handle Synchronous External Aborts that occur in a guest kernel.
+> + *
+> + * The return value will be zero if the SEA was successfully handled
+> + * and non-zero if there was an error processing the error or there was
+> + * no error to process.
+> + */
+> +int handle_guest_sea(phys_addr_t addr, unsigned int esr)
+> +{
+> +	int ret = -ENOENT;
+> +
+> +	if(IS_ENABLED(CONFIG_ACPI_APEI_SEA)) {
+
+nit: missing white space
+
+> +		ret = ghes_notify_sea();
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +/*
+>   * Dispatch a data abort to the relevant handler.
+>   */
+>  asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 230b095..81eabc6 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -810,17 +810,18 @@ static int ghes_notify_sci(struct notifier_block *this,
+>  #ifdef CONFIG_ACPI_APEI_SEA
+>  static LIST_HEAD(ghes_sea);
+>  
+> -void ghes_notify_sea(void)
+> +int ghes_notify_sea(void)
+>  {
+>  	struct ghes *ghes;
+> +	int ret = -ENOENT;
+>  
+> -	/*
+> -	 * synchronize_rcu() will wait for nmi_exit(), so no need to
+> -	 * rcu_read_lock().
+> -	 */
+> +	rcu_read_lock();
+>  	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
+> -		ghes_proc(ghes);
+> +		if(!ghes_proc(ghes))
+> +			ret = 0;
+>  	}
+> +	rcu_read_unlock();
+> +	return ret;
+>  }
+>  
+>  static void ghes_sea_add(struct ghes *ghes)
+> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+> index 18bc935..2a727dc 100644
+> --- a/include/acpi/ghes.h
+> +++ b/include/acpi/ghes.h
+> @@ -99,6 +99,6 @@ static inline void *acpi_hest_generic_data_payload(struct acpi_hest_generic_data
+>  		gdata + 1;
+>  }
+>  
+> -void ghes_notify_sea(void);
+> +int ghes_notify_sea(void);
+>  
+>  #endif /* GHES_H */
+> -- 
+
+I feel like the changes to acpi/arm64 in this patch could have been a
+separate patch or folded into previous patches, but for the KVM part of
+this patch:
+
+Acked-by: Christoffer Dall <cdall@linaro.org>
