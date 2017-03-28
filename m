@@ -1,24 +1,25 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH V13 10/10] arm/arm64: KVM: add guest SEA support
-Date: Tue, 28 Mar 2017 11:57:52 +0100
-Message-ID: <58DA41B0.8080203@arm.com>
-References: <1490136425-4324-1-git-send-email-tbaicar@codeaurora.org>
- <1490136425-4324-11-git-send-email-tbaicar@codeaurora.org>
+From: Prakash B <bjsprakash.linux@gmail.com>
+Subject: Aarch64: Qemu master or 2.9.0-rc1 breaks compatibility with 4.10
+ kernel.
+Date: Tue, 28 Mar 2017 16:52:51 +0530
+Message-ID: <CACJhumejPG6s_dewyHH=e5=QLcOUCzvzhakA7oSqm2Ms5cQvRA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E539040BC4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 06:56:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 51FBF40B3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 07:20:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rmqwF03rWxLY for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Mar 2017 06:56:22 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C056540625
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 06:56:22 -0400 (EDT)
-In-Reply-To: <1490136425-4324-11-git-send-email-tbaicar@codeaurora.org>
+ with ESMTP id jjxdLBVHazOJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Mar 2017 07:20:53 -0400 (EDT)
+Received: from mail-qt0-f195.google.com (mail-qt0-f195.google.com
+ [209.85.216.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 612F640AE8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 07:20:53 -0400 (EDT)
+Received: by mail-qt0-f195.google.com with SMTP id n37so11557211qtb.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 04:22:52 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,90 +29,50 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawei.com
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, Eric Auger <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, Vijaya.Kumar@cavium.com
+Cc: bprakash@caviumnetworks.com, sgoutham@cavium.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Tyler,
+Hi ,
 
-On 21/03/17 22:47, Tyler Baicar wrote:
-> Currently external aborts are unsupported by the guest abort
-> handling. Add handling for SEAs so that the host kernel reports
-> SEAs which occur in the guest kernel.
+Qemu master or v2.9.0-rc1 doesn't launch guest  when host kernel
+version 4.10 or  lower on Aarch64 (cavium ThunderX), its failing with
+abort  "qemu-system-aarch64: KVM_GET_DEVICE_ATTR failed: No such
+device or address"
 
-Looks good,
+"GICv3 live migration support"  patch breaks the  compatibility b/w
+kernel and qemu.
 
-Can we squash the APEI changes into the patch that added them? This would be one
-fewer patches that then need the ACPI maintainer to review.
+Is this expected behaviour,  can we provide a fix without  breaking
+compatibility b/w kernel and qemu .
 
+For  more information  below is gdb back trace .
+-------------------------------------------------------------------
 
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index 962616f..105b6ab 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -1406,6 +1407,24 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  		kvm_set_pfn_accessed(pfn);
->  }
->  
-> +static bool is_abort_synchronous(unsigned long fault_status) {
-
-I missed kvm_vcpu_dabt_isextabt() when I suggested we would need a helper (my
-fault). Can we use that instead?
-
-(my argument that the unused encodings are reserved doesn't hold if KVM is
-already doing this... )
-
-
-> @@ -1426,23 +1445,31 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	unsigned long hva;
->  	bool is_iabt, write_fault, writable;
->  	gfn_t gfn;
-> -	int ret, idx;
-> +	int ret, idx, sea_status = 1;
-> +
-> +	/* Check the stage-2 fault is trans. fault or write fault */
-> +	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
-> +
-> +	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-> +
-> +	/* The host kernel will handle the synchronous external abort. There
-> +	 * is no need to pass the error into the guest.
-> +	 */
-> +	if (is_abort_synchronous(fault_status))
-> +		sea_status = handle_guest_sea((unsigned long)fault_ipa,
-> +				    kvm_vcpu_get_hsr(vcpu));
+Thread 1 "qemu-system-aar" received signal SIGABRT, Aborted.
+0x0000ffffa4bd7528 in __GI_raise (sig=sig@entry=6) at
+../sysdeps/unix/sysv/linux/raise.c:54
+54    ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+(gdb) bt
+#0  0x0000ffffa4bd7528 in __GI_raise (sig=sig@entry=6) at
+../sysdeps/unix/sysv/linux/raise.c:54
+#1  0x0000ffffa4bd89e0 in __GI_abort () at abort.c:89
+#2  0x0000000000479d3c in kvm_device_access (fd=23, group=6, attr=50788,
+val=0x15c80d8, write=false)
+    at /home/ubuntu/workarea/sources/qemu-stable/qemu-2.9/kvm-all.c:2225
+#3  0x00000000004ed948 in arm_gicv3_icc_reset (env=0x13a8ff8, ri=0x1629ed0) at
+/home/ubuntu/workarea/sources/qemu-stable/qemu-2.9/hw/intc/arm_gicv3_kvm.c:618
+#4  0x0000000000610414 in cp_reg_reset (key=0x1629cf0, value=0x1629ed0,
+opaque=0x13a0cf0) at
+/home/ubuntu/workarea/sources/qemu-stable/qemu-2.9/target/arm/cpu.c:75
+#5  0x0000ffffa4fb0878 in g_hash_table_foreach () from
+/lib/aarch64-linux-gnu/libglib-2.0.so.0
+Backtrace stopped: previous frame identical to this frame (corrupt stack?)
 
 
-Why not return from here if the error has been handled?
 
-You use sea_status to skip the next two things that KVM might do, but it goes on
-to try and process this, possibly calling user_mem_abort(), surely all this is
-unnecessary?
+Verified guest  booting on host 4.10 kernel by reverting "GICv3:
+support state save/restore" patches  and  guest booted without issues.
 
-
->  
->  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
-> -	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu))) {
-> +	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu)) && sea_status) {
->  		kvm_inject_vabt(vcpu);
->  		return 1;
->  	}
->  
-> -	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-> -
->  	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_hsr(vcpu),
->  			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
->  
-> -	/* Check the stage-2 fault is trans. fault or write fault */
-> -	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
->  	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
-> -	    fault_status != FSC_ACCESS) {
-> +	    fault_status != FSC_ACCESS && sea_status) {
->  		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
->  			kvm_vcpu_trap_get_class(vcpu),
->  			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
-
-
-Thanks,
-
-James
+Regards,
+Prakash B
