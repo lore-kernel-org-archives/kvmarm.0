@@ -1,27 +1,23 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 00/15] arm64/kvm: use common sysreg definitions
-Date: Tue, 28 Mar 2017 19:48:28 +0100
-Message-ID: <20170328184828.GF8643@leverpostej>
-References: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
- <87a88tv94d.fsf@on-the-bus.cambridge.arm.com>
- <20170310183555.GB6271@arm.com>
- <20170322183512.GB27921@leverpostej>
+From: Tyler Baicar <tbaicar@codeaurora.org>
+Subject: [PATCH V14 01/10] acpi: apei: read ack upon ghes record consumption
+Date: Tue, 28 Mar 2017 13:30:31 -0600
+Message-ID: <1490729440-32591-2-git-send-email-tbaicar@codeaurora.org>
+References: <1490729440-32591-1-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE44340A86
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 14:46:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E95A740BDA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 15:29:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4oLNhK6Se+wB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Mar 2017 14:46:47 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C1AA340A7B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 14:46:47 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20170322183512.GB27921@leverpostej>
+ with ESMTP id Hf9AMiKUOd4C for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Mar 2017 15:29:16 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC95B40B8C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 15:29:15 -0400 (EDT)
+In-Reply-To: <1490729440-32591-1-git-send-email-tbaicar@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,45 +27,193 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>, catalin.marinas@arm.com, Christoffer Dall <cdall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, devel@acpica.org, Suzuki.Poulose@arm.com, punit.agrawal@arm.com, astone@redhat.com, harba@codeaur
+Cc: Tyler Baicar <tbaicar@codeaurora.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 22, 2017 at 06:35:13PM +0000, Mark Rutland wrote:
-> On Fri, Mar 10, 2017 at 06:35:55PM +0000, Will Deacon wrote:
-> > On Fri, Mar 10, 2017 at 08:17:22AM +0000, Marc Zyngier wrote:
-> 
-> > > The next question is how do we merge this. Obviously, we can't split it
-> > > between trees, and this is very likely to clash with anything that we
-> > > will merge on the KVM side (the sysreg table is a popular place).
-> > > 
-> > > Will, Catalin: Would it make sense to create a stable branch with these
-> > > patches, and merge it into both the arm64 and KVM trees? That'd make
-> > > things easier...
-> > 
-> > I think the scope for conflict on our side is pretty high too, so a shared
-> > branch might be the best way to go. I don't want to branch just yet though,
-> > so I'll probably wait a week or so before setting something in stone.
-> 
-> Any further thoughts on this?
-> 
-> Christoffer has Acked the KVM bits, so if you're happy to do so for the
-> arm64 bits I can make a stable branch.
+A RAS (Reliability, Availability, Serviceability) controller
+may be a separate processor running in parallel with OS
+execution, and may generate error records for consumption by
+the OS. If the RAS controller produces multiple error records,
+then they may be overwritten before the OS has consumed them.
 
-Looking around, it doesn't look like there's anything outside of arm64
-that'll conflict on the <asm/sysreg.h> changes, and git's happy to merge
-my changes with Suzuki's changes currently queued in arm64's
-for-next/core branch.
+The Generic Hardware Error Source (GHES) v2 structure
+introduces the capability for the OS to acknowledge the
+consumption of the error record generated by the RAS
+controller. A RAS controller supporting GHESv2 shall wait for
+the acknowledgment before writing a new error record, thus
+eliminating the race condition.
 
-I think it would make sense for those to be in a common branch taken by
-both the arm64 and KVM trees, with the KVM-specific parts being taken by
-KVM alone atop of that.
+Add support for parsing of GHESv2 sub-tables as well.
 
-Would everyone be happy with that?
+Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+CC: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+Reviewed-by: James Morse <james.morse@arm.com>
+---
+ drivers/acpi/apei/ghes.c | 49 +++++++++++++++++++++++++++++++++++++++++++++---
+ drivers/acpi/apei/hest.c |  7 +++++--
+ include/acpi/ghes.h      |  5 ++++-
+ 3 files changed, 55 insertions(+), 6 deletions(-)
 
-For reference, I've updated my branches so that arm64/common-sysreg only
-contains the common parts, with the KVM parts atop of that in
-kvm/common-sysreg.
-
-Thanks,
-Mark.
+diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+index b192b42..0241e36 100644
+--- a/drivers/acpi/apei/ghes.c
++++ b/drivers/acpi/apei/ghes.c
+@@ -46,6 +46,7 @@
+ #include <linux/nmi.h>
+ #include <linux/sched/clock.h>
+ 
++#include <acpi/actbl1.h>
+ #include <acpi/ghes.h>
+ #include <acpi/apei.h>
+ #include <asm/tlbflush.h>
+@@ -80,6 +81,10 @@
+ 	((struct acpi_hest_generic_status *)				\
+ 	 ((struct ghes_estatus_node *)(estatus_node) + 1))
+ 
++#define IS_HEST_TYPE_GENERIC_V2(ghes)				\
++	((struct acpi_hest_header *)ghes->generic)->type ==	\
++	 ACPI_HEST_TYPE_GENERIC_ERROR_V2
++
+ /*
+  * This driver isn't really modular, however for the time being,
+  * continuing to use module_param is the easiest way to remain
+@@ -249,10 +254,18 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+ 	ghes = kzalloc(sizeof(*ghes), GFP_KERNEL);
+ 	if (!ghes)
+ 		return ERR_PTR(-ENOMEM);
++
+ 	ghes->generic = generic;
++	if (IS_HEST_TYPE_GENERIC_V2(ghes)) {
++		rc = apei_map_generic_address(
++			&ghes->generic_v2->read_ack_register);
++		if (rc)
++			goto err_free;
++	}
++
+ 	rc = apei_map_generic_address(&generic->error_status_address);
+ 	if (rc)
+-		goto err_free;
++		goto err_unmap_read_ack_addr;
+ 	error_block_length = generic->error_block_length;
+ 	if (error_block_length > GHES_ESTATUS_MAX_SIZE) {
+ 		pr_warning(FW_WARN GHES_PFX
+@@ -264,13 +277,17 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+ 	ghes->estatus = kmalloc(error_block_length, GFP_KERNEL);
+ 	if (!ghes->estatus) {
+ 		rc = -ENOMEM;
+-		goto err_unmap;
++		goto err_unmap_status_addr;
+ 	}
+ 
+ 	return ghes;
+ 
+-err_unmap:
++err_unmap_status_addr:
+ 	apei_unmap_generic_address(&generic->error_status_address);
++err_unmap_read_ack_addr:
++	if (IS_HEST_TYPE_GENERIC_V2(ghes))
++		apei_unmap_generic_address(
++			&ghes->generic_v2->read_ack_register);
+ err_free:
+ 	kfree(ghes);
+ 	return ERR_PTR(rc);
+@@ -280,6 +297,9 @@ static void ghes_fini(struct ghes *ghes)
+ {
+ 	kfree(ghes->estatus);
+ 	apei_unmap_generic_address(&ghes->generic->error_status_address);
++	if (IS_HEST_TYPE_GENERIC_V2(ghes))
++		apei_unmap_generic_address(
++			&ghes->generic_v2->read_ack_register);
+ }
+ 
+ static inline int ghes_severity(int severity)
+@@ -649,6 +669,23 @@ static void ghes_estatus_cache_add(
+ 	rcu_read_unlock();
+ }
+ 
++static int ghes_ack_error(struct acpi_hest_generic_v2 *generic_v2)
++{
++	int rc;
++	u64 val = 0;
++
++	rc = apei_read(&val, &generic_v2->read_ack_register);
++	if (rc)
++		return rc;
++	val &= generic_v2->read_ack_preserve <<
++		generic_v2->read_ack_register.bit_offset;
++	val |= generic_v2->read_ack_write <<
++		generic_v2->read_ack_register.bit_offset;
++	rc = apei_write(val, &generic_v2->read_ack_register);
++
++	return rc;
++}
++
+ static int ghes_proc(struct ghes *ghes)
+ {
+ 	int rc;
+@@ -661,6 +698,12 @@ static int ghes_proc(struct ghes *ghes)
+ 			ghes_estatus_cache_add(ghes->generic, ghes->estatus);
+ 	}
+ 	ghes_do_proc(ghes, ghes->estatus);
++
++	if (IS_HEST_TYPE_GENERIC_V2(ghes)) {
++		rc = ghes_ack_error(ghes->generic_v2);
++		if (rc)
++			return rc;
++	}
+ out:
+ 	ghes_clear_estatus(ghes);
+ 	return rc;
+diff --git a/drivers/acpi/apei/hest.c b/drivers/acpi/apei/hest.c
+index 8f2a98e..456b488 100644
+--- a/drivers/acpi/apei/hest.c
++++ b/drivers/acpi/apei/hest.c
+@@ -52,6 +52,7 @@
+ 	[ACPI_HEST_TYPE_AER_ENDPOINT] = sizeof(struct acpi_hest_aer),
+ 	[ACPI_HEST_TYPE_AER_BRIDGE] = sizeof(struct acpi_hest_aer_bridge),
+ 	[ACPI_HEST_TYPE_GENERIC_ERROR] = sizeof(struct acpi_hest_generic),
++	[ACPI_HEST_TYPE_GENERIC_ERROR_V2] = sizeof(struct acpi_hest_generic_v2),
+ };
+ 
+ static int hest_esrc_len(struct acpi_hest_header *hest_hdr)
+@@ -141,7 +142,8 @@ static int __init hest_parse_ghes_count(struct acpi_hest_header *hest_hdr, void
+ {
+ 	int *count = data;
+ 
+-	if (hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR)
++	if (hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR ||
++	    hest_hdr->type == ACPI_HEST_TYPE_GENERIC_ERROR_V2)
+ 		(*count)++;
+ 	return 0;
+ }
+@@ -152,7 +154,8 @@ static int __init hest_parse_ghes(struct acpi_hest_header *hest_hdr, void *data)
+ 	struct ghes_arr *ghes_arr = data;
+ 	int rc, i;
+ 
+-	if (hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR)
++	if (hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR &&
++	    hest_hdr->type != ACPI_HEST_TYPE_GENERIC_ERROR_V2)
+ 		return 0;
+ 
+ 	if (!((struct acpi_hest_generic *)hest_hdr)->enabled)
+diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
+index 720446c..68f088a 100644
+--- a/include/acpi/ghes.h
++++ b/include/acpi/ghes.h
+@@ -13,7 +13,10 @@
+ #define GHES_EXITING		0x0002
+ 
+ struct ghes {
+-	struct acpi_hest_generic *generic;
++	union {
++		struct acpi_hest_generic *generic;
++		struct acpi_hest_generic_v2 *generic_v2;
++	};
+ 	struct acpi_hest_generic_status *estatus;
+ 	u64 buffer_paddr;
+ 	unsigned long flags;
+-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
