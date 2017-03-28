@@ -1,25 +1,34 @@
-From: Prakash B <bjsprakash.linux@gmail.com>
-Subject: Aarch64: Qemu master or 2.9.0-rc1 breaks compatibility with 4.10
- kernel.
-Date: Tue, 28 Mar 2017 16:52:51 +0530
-Message-ID: <CACJhumejPG6s_dewyHH=e5=QLcOUCzvzhakA7oSqm2Ms5cQvRA@mail.gmail.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
+Date: Tue, 28 Mar 2017 13:23:28 +0200
+Message-ID: <20170328112328.GA31156@cbox>
+References: <1489996534-8270-1-git-send-email-gengdongjiu@huawei.com>
+ <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
+ <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
+ <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com>
+ <58CFF058.8020205@arm.com>
+ <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
+ <20170321113428.GC15920@cbox> <58D17AF0.2010802@arm.com>
+ <20170321193933.GB31111@cbox> <58DA3F68.6090901@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 51FBF40B3E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 07:20:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B96D240B3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 07:21:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jjxdLBVHazOJ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Mar 2017 07:20:53 -0400 (EDT)
-Received: from mail-qt0-f195.google.com (mail-qt0-f195.google.com
- [209.85.216.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 612F640AE8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 07:20:53 -0400 (EDT)
-Received: by mail-qt0-f195.google.com with SMTP id n37so11557211qtb.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 04:22:52 -0700 (PDT)
+ with ESMTP id wbDAx+ri0o6r for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Mar 2017 07:21:33 -0400 (EDT)
+Received: from mail-wr0-f177.google.com (mail-wr0-f177.google.com
+ [209.85.128.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3530E40AE8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 07:21:32 -0400 (EDT)
+Received: by mail-wr0-f177.google.com with SMTP id w43so85888260wrb.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 04:23:32 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <58DA3F68.6090901@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,50 +38,63 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, Eric Auger <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, Vijaya.Kumar@cavium.com
-Cc: bprakash@caviumnetworks.com, sgoutham@cavium.com
+To: James Morse <james.morse@arm.com>
+Cc: Leif.Lindholm@linaro.com, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, Achin Gupta <Achin.Gupta@arm.com>, will.deacon@arm.com, linux-kernel@vger.kernel.org, gengdongjiu <gengdongjiu@huawei.com>, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi ,
+On Tue, Mar 28, 2017 at 11:48:08AM +0100, James Morse wrote:
+> Hi Christoffer,
+> 
+> (CC: Leif and Achin who know more about how UEFI fits into this picture)
+> 
+> On 21/03/17 19:39, Christoffer Dall wrote:
+> > On Tue, Mar 21, 2017 at 07:11:44PM +0000, James Morse wrote:
+> >> On 21/03/17 11:34, Christoffer Dall wrote:
+> >>> On Tue, Mar 21, 2017 at 02:32:29PM +0800, gengdongjiu wrote:
+> >>>> On 2017/3/20 23:08, James Morse wrote:
+> >>>>>>>> On 20/03/17 07:55, Dongjiu Geng wrote:
+> >>>>>>>>> In the RAS implementation, hardware pass the virtual SEI
+> >>>>>>>>> syndrome information through the VSESR_EL2, so set the virtual
+> >>>>>>>>> SEI syndrome using physical SEI syndrome el2_elr to pass to
+> >>>>>>>>> the guest OS
+> >>>>>
+> >>>>> How does this work with firmware first?
+> >>>>
+> >>>> I explained it in previous mail about the work flow.
+> >>>
+> >>> When delivering and reporting SEIs to the VM, should this happen
+> >>> directly to the OS running in the VM, or to the guest firmware (e.g.
+> >>> UEFI) running in the VM as well?
+> >>
+> >> 'firmware first' is the ACPI specs name for x86's BIOS or management-mode
+> >> handling the error. On arm64 we have multiple things called firmware, so the
+> >> name might be more confusing than helpful.
+> >>
+> >> As far as I understand it, firmware here refers to the secure-world and EL3.
+> >> Something like ATF can use SCR_EL3.EA to claim SErrors and external aborts,
+> >> routing them to EL3 where secure platform specific firmware generates CPER records.
+> >> For a guest, Qemu takes the role of this EL3-firmware.
+> >>
+> > Thanks for the clarification.  So UEFI in the VM would not be involved
+> > in this at all?
+> 
+> On the host, part of UEFI is involved to generate the CPER records.
+> In a guest?, I don't know.
+> Qemu could generate the records, or drive some other component to do it.
 
-Qemu master or v2.9.0-rc1 doesn't launch guest  when host kernel
-version 4.10 or  lower on Aarch64 (cavium ThunderX), its failing with
-abort  "qemu-system-aarch64: KVM_GET_DEVICE_ATTR failed: No such
-device or address"
+I think I am beginning to understand this a bit.  Since the guet UEFI
+instance is specifically built for the machine it runs on, QEMU's virt
+machine in this case, they could simply agree (by some contract) to
+place the records at some specific location in memory, and if the guest
+kernel asks its guest UEFI for that location, things should just work by
+having logic in QEMU to process error reports and populate guest memory.
 
-"GICv3 live migration support"  patch breaks the  compatibility b/w
-kernel and qemu.
+Is this how others see the world too?
 
-Is this expected behaviour,  can we provide a fix without  breaking
-compatibility b/w kernel and qemu .
+> 
+> Leif and Achin are the people with the UEFI/bigger picture.
+> 
+> 
 
-For  more information  below is gdb back trace .
--------------------------------------------------------------------
-
-Thread 1 "qemu-system-aar" received signal SIGABRT, Aborted.
-0x0000ffffa4bd7528 in __GI_raise (sig=sig@entry=6) at
-../sysdeps/unix/sysv/linux/raise.c:54
-54    ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
-(gdb) bt
-#0  0x0000ffffa4bd7528 in __GI_raise (sig=sig@entry=6) at
-../sysdeps/unix/sysv/linux/raise.c:54
-#1  0x0000ffffa4bd89e0 in __GI_abort () at abort.c:89
-#2  0x0000000000479d3c in kvm_device_access (fd=23, group=6, attr=50788,
-val=0x15c80d8, write=false)
-    at /home/ubuntu/workarea/sources/qemu-stable/qemu-2.9/kvm-all.c:2225
-#3  0x00000000004ed948 in arm_gicv3_icc_reset (env=0x13a8ff8, ri=0x1629ed0) at
-/home/ubuntu/workarea/sources/qemu-stable/qemu-2.9/hw/intc/arm_gicv3_kvm.c:618
-#4  0x0000000000610414 in cp_reg_reset (key=0x1629cf0, value=0x1629ed0,
-opaque=0x13a0cf0) at
-/home/ubuntu/workarea/sources/qemu-stable/qemu-2.9/target/arm/cpu.c:75
-#5  0x0000ffffa4fb0878 in g_hash_table_foreach () from
-/lib/aarch64-linux-gnu/libglib-2.0.so.0
-Backtrace stopped: previous frame identical to this frame (corrupt stack?)
-
-
-
-Verified guest  booting on host 4.10 kernel by reverting "GICv3:
-support state save/restore" patches  and  guest booted without issues.
-
-Regards,
-Prakash B
+Thanks!
+-Christoffer
