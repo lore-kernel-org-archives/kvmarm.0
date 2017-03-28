@@ -1,29 +1,29 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 4/9] arm64: KVM: Make unexpected reads from WO
- registers inject an undef
-Date: Tue, 28 Mar 2017 14:45:13 +0200
-Message-ID: <20170328124513.GD31156@cbox>
+Subject: Re: [PATCH v2 5/9] arm64: KVM: PMU: Inject UNDEF on read access to
+ PMSWINC_EL0
+Date: Tue, 28 Mar 2017 14:45:20 +0200
+Message-ID: <20170328124520.GE31156@cbox>
 References: <20170327160345.12402-1-marc.zyngier@arm.com>
- <20170327160345.12402-5-marc.zyngier@arm.com>
+ <20170327160345.12402-6-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DE0E40C30
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 08:43:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55A4140C33
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 08:43:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8+U55hwKARgA for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Mar 2017 08:43:17 -0400 (EDT)
-Received: from mail-wr0-f172.google.com (mail-wr0-f172.google.com
- [209.85.128.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 591E340C33
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 08:43:17 -0400 (EDT)
-Received: by mail-wr0-f172.google.com with SMTP id u1so103528616wra.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 05:45:16 -0700 (PDT)
+ with ESMTP id cYoYOgAvn9QB for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Mar 2017 08:43:23 -0400 (EDT)
+Received: from mail-wr0-f182.google.com (mail-wr0-f182.google.com
+ [209.85.128.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E8CE40C47
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 08:43:23 -0400 (EDT)
+Received: by mail-wr0-f182.google.com with SMTP id l43so103118553wre.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Mar 2017 05:45:22 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20170327160345.12402-5-marc.zyngier@arm.com>
+In-Reply-To: <20170327160345.12402-6-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,75 +37,45 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Shannon Zhao <shannon.zhao@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 27, 2017 at 05:03:40PM +0100, Marc Zyngier wrote:
-> Reads from write-only system registers are generally confined to
-> EL1 and not propagated to EL2 (that's what the architecture
-> mantates). In order to be sure that we have a sane behaviour
-> even in the unlikely event that we have a broken system, we still
-> handle it in KVM.
+On Mon, Mar 27, 2017 at 05:03:41PM +0100, Marc Zyngier wrote:
+> PMSWINC_EL0 is a WO register, so let's UNDEF when reading from it
+> (in the highly hypothetical case where this doesn't UNDEF at EL1).
 > 
-> In that case, let's inject an undef into the guest.
-> 
-> Let's also remove write_to_read_only which isn't used anywhere.
-> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm64/kvm/sys_regs.c |  9 +++++++++
->  arch/arm64/kvm/sys_regs.h | 18 ------------------
->  2 files changed, 9 insertions(+), 18 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 5e3ce7890b35..19a036b4f6ac 100644
+> index 19a036b4f6ac..f80a61af5e88 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -55,6 +55,15 @@
->   * 64bit interface.
->   */
+> @@ -772,16 +772,15 @@ static bool access_pmswinc(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	if (!kvm_arm_pmu_v3_ready(vcpu))
+>  		return trap_raz_wi(vcpu, p, r);
 >  
-> +static bool read_from_write_only(struct kvm_vcpu *vcpu,
-> +				 const struct sys_reg_params *params)
-> +{
-> +	WARN_ONCE(1, "Unexpected sys_reg read to write-only register\n");
-> +	print_sys_reg_instr(params);
-> +	kvm_inject_undefined(vcpu);
-> +	return false;
-> +}
+> +	if (!p->is_write)
+> +		return read_from_write_only(vcpu, p);
 > +
->  /* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
->  static u32 cache_levels;
+>  	if (pmu_write_swinc_el0_disabled(vcpu))
+>  		return false;
 >  
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index 9c6ffd0f0196..638f724e45af 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -83,24 +83,6 @@ static inline bool read_zero(struct kvm_vcpu *vcpu,
->  	return true;
+> -	if (p->is_write) {
+> -		mask = kvm_pmu_valid_counter_mask(vcpu);
+> -		kvm_pmu_software_increment(vcpu, p->regval & mask);
+> -		return true;
+> -	}
+> -
+> -	return false;
+> +	mask = kvm_pmu_valid_counter_mask(vcpu);
+> +	kvm_pmu_software_increment(vcpu, p->regval & mask);
+> +	return true;
 >  }
 >  
-> -static inline bool write_to_read_only(struct kvm_vcpu *vcpu,
-> -				      const struct sys_reg_params *params)
-> -{
-> -	kvm_debug("sys_reg write to read-only register at: %lx\n",
-> -		  *vcpu_pc(vcpu));
-> -	print_sys_reg_instr(params);
-> -	return false;
-> -}
-> -
-> -static inline bool read_from_write_only(struct kvm_vcpu *vcpu,
-> -					const struct sys_reg_params *params)
-> -{
-> -	kvm_debug("sys_reg read to write-only register at: %lx\n",
-> -		  *vcpu_pc(vcpu));
-> -	print_sys_reg_instr(params);
-> -	return false;
-> -}
-> -
->  /* Reset functions */
->  static inline void reset_unknown(struct kvm_vcpu *vcpu,
->  				 const struct sys_reg_desc *r)
+>  static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
 > -- 
 > 2.11.0
 > 
