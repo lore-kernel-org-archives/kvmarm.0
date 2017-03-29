@@ -1,30 +1,29 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
-Date: Wed, 29 Mar 2017 17:36:37 +0800
-Message-ID: <5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
-References: <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
- <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
- <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com> <58CFF058.8020205@arm.com>
- <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
- <20170321113428.GC15920@cbox> <58D17AF0.2010802@arm.com>
- <20170321193933.GB31111@cbox> <58DA3F68.6090901@arm.com>
- <20170328112328.GA31156@cbox> <20170328115413.GJ23682@e104320-lin>
- <b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com> <58DA67BA.8070404@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 00/15] arm64/kvm: use common sysreg definitions
+Date: Wed, 29 Mar 2017 10:55:32 +0100
+Message-ID: <20170329095532.GA23442@leverpostej>
+References: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
+ <87a88tv94d.fsf@on-the-bus.cambridge.arm.com>
+ <20170310183555.GB6271@arm.com>
+ <20170322183512.GB27921@leverpostej>
+ <20170328184828.GF8643@leverpostej> <20170328202931.GF20211@cbox>
+ <20170329084146.GA15778@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5405240A63
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 05:35:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AA3D40A69
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 05:53:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bhxQ7ndwek98 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Mar 2017 05:35:47 -0400 (EDT)
-Received: from dggrg03-dlp.huawei.com (unknown [45.249.212.189])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72CC9408EB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 05:35:45 -0400 (EDT)
-In-Reply-To: <58DA67BA.8070404@arm.com>
+ with ESMTP id pQNWNlVJzgb5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Mar 2017 05:53:55 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB4E440966
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 05:53:55 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20170329084146.GA15778@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,64 +33,37 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: lersek@redhat.com, ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, Achin Gupta <achin.gupta@arm.com>, will.deacon@arm.com, wuquanming@huawei.com, wangxiongfeng2@huawei.com, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, Leif.Lindholm@linaro.com, huangshaoyu@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, andre.przywara@arm.com, nd@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkhpIExhc3psby9CaWVzaGV1dmVsL1FlbXUgZGV2ZWxvcGVyLAoKICAgTm93IEkgZW5jb3VudGVy
-IGEgaXNzdWUgYW5kIHdhbnQgdG8gY29uc3VsdCB3aXRoIHlvdSBpbiBBUk02NCBwbGF0Zm9ybe+8
-jCBhcyBkZXNjcmliZWQgYmVsb3c6CgogICB3aGVuIGd1ZXN0IE9TIGhhcHBlbiBzeW5jaHJvbm91
-cyBvciBhc3luY2hyb25vdXMgYWJvcnQsIGt2bSBuZWVkcyB0byBzZW5kIHRoZSBlcnJvciBhZGRy
-ZXNzIHRvIFFlbXUgb3IgVUVGSSB0aHJvdWdoIHNpZ2J1cyB0byBkeW5hbWljYWxseSBnZW5lcmF0
-ZSBBUEVJIHRhYmxlLiBmcm9tIG15IGludmVzdGlnYXRpb24sIHRoZXJlIGFyZSB0d28gd2F5czoK
-CiAgICgxKSBRZW11IGdldCB0aGUgZXJyb3IgYWRkcmVzcywgYW5kIGdlbmVyYXRlIHRoZSBBUEVJ
-IHRhYmxlLCB0aGVuIG5vdGlmeSBVRUZJIHRvIGtub3cgdGhpcyBnZW5lcmF0aW9uLCB0aGVuIGlu
-amVjdCBhYm9ydCBlcnJvciB0byBndWVzdCBPUywgZ3Vlc3QgT1MgcmVhZCB0aGUgQVBFSSB0YWJs
-ZS4KICAgKDIpIFFlbXUgZ2V0IHRoZSBlcnJvciBhZGRyZXNzLCBhbmQgbGV0IFVFRkkgdG8gZ2Vu
-ZXJhdGUgdGhlIEFQRUkgdGFibGUsIHRoZW4gaW5qZWN0IGFib3J0IGVycm9yIHRvIGd1ZXN0IE9T
-LCBndWVzdCBPUyByZWFkIHRoZSBBUEVJIHRhYmxlLgoKCiAgIERvIHlvdSB0aGluayB3aGljaCBt
-b2R1bGVzIGdlbmVyYXRlcyB0aGUgQVBFSSB0YWJsZSBpcyBiZXR0ZXI/IFVFRkkgb3IgUWVtdT8K
-CgoKCk9uIDIwMTcvMy8yOCAyMTo0MCwgSmFtZXMgTW9yc2Ugd3JvdGU6Cj4gSGkgZ2VuZ2Rvbmdq
-aXUsCj4gCj4gT24gMjgvMDMvMTcgMTM6MTYsIGdlbmdkb25naml1IHdyb3RlOgo+PiBPbiAyMDE3
-LzMvMjggMTk6NTQsIEFjaGluIEd1cHRhIHdyb3RlOgo+Pj4gT24gVHVlLCBNYXIgMjgsIDIwMTcg
-YXQgMDE6MjM6MjhQTSArMDIwMCwgQ2hyaXN0b2ZmZXIgRGFsbCB3cm90ZToKPj4+PiBPbiBUdWUs
-IE1hciAyOCwgMjAxNyBhdCAxMTo0ODowOEFNICswMTAwLCBKYW1lcyBNb3JzZSB3cm90ZToKPj4+
-Pj4gT24gdGhlIGhvc3QsIHBhcnQgb2YgVUVGSSBpcyBpbnZvbHZlZCB0byBnZW5lcmF0ZSB0aGUg
-Q1BFUiByZWNvcmRzLgo+Pj4+PiBJbiBhIGd1ZXN0PywgSSBkb24ndCBrbm93Lgo+Pj4+PiBRZW11
-IGNvdWxkIGdlbmVyYXRlIHRoZSByZWNvcmRzLCBvciBkcml2ZSBzb21lIG90aGVyIGNvbXBvbmVu
-dCB0byBkbyBpdC4KPj4+Pgo+Pj4+IEkgdGhpbmsgSSBhbSBiZWdpbm5pbmcgdG8gdW5kZXJzdGFu
-ZCB0aGlzIGEgYml0LiAgU2luY2UgdGhlIGd1ZXQgVUVGSQo+Pj4+IGluc3RhbmNlIGlzIHNwZWNp
-ZmljYWxseSBidWlsdCBmb3IgdGhlIG1hY2hpbmUgaXQgcnVucyBvbiwgUUVNVSdzIHZpcnQKPj4+
-PiBtYWNoaW5lIGluIHRoaXMgY2FzZSwgdGhleSBjb3VsZCBzaW1wbHkgYWdyZWUgKGJ5IHNvbWUg
-Y29udHJhY3QpIHRvCj4+Pj4gcGxhY2UgdGhlIHJlY29yZHMgYXQgc29tZSBzcGVjaWZpYyBsb2Nh
-dGlvbiBpbiBtZW1vcnksIGFuZCBpZiB0aGUgZ3Vlc3QKPj4+PiBrZXJuZWwgYXNrcyBpdHMgZ3Vl
-c3QgVUVGSSBmb3IgdGhhdCBsb2NhdGlvbiwgdGhpbmdzIHNob3VsZCBqdXN0IHdvcmsgYnkKPj4+
-PiBoYXZpbmcgbG9naWMgaW4gUUVNVSB0byBwcm9jZXNzIGVycm9yIHJlcG9ydHMgYW5kIHBvcHVs
-YXRlIGd1ZXN0IG1lbW9yeS4KPj4+Pgo+Pj4+IElzIHRoaXMgaG93IG90aGVycyBzZWUgdGhlIHdv
-cmxkIHRvbz8KPj4+Cj4+PiBJIHRoaW5rIHNvIQo+Pj4KPj4+IEFGQUlVLCB0aGUgbWVtb3J5IHdo
-ZXJlIENQRVJzIHdpbGwgcmVzaWRlIHNob3VsZCBiZSBzcGVjaWZpZWQgaW4gYSBHSEVTIGVudHJ5
-IGluCj4+PiB0aGUgSEVTVC4gSXMgdGhpcyBub3QgdGhlIGNhc2Ugd2l0aCBhIGd1ZXN0IGtlcm5l
-bCBpLmUuIHRoZSBndWVzdCBVRUZJIGNyZWF0ZXMgYQo+Pj4gSEVTVCBmb3IgdGhlIGd1ZXN0IEtl
-cm5lbD8KPj4+Cj4+PiBJZiBzbywgdGhlbiB0aGUgcXVlc3Rpb24gaXMgaG93IHRoZSBndWVzdCBV
-RUZJIGZpbmRzIG91dCB3aGVyZSBRRU1VIChhY3RpbmcgYXMKPj4+IEVMMyBmaXJtd2FyZSkgd2ls
-bCBwb3B1bGF0ZSB0aGUgQ1BFUnMuIFRoaXMgY291bGQgZWl0aGVyIGJlIGEgY29udHJhY3QgYmV0
-d2Vlbgo+Pj4gdGhlIHR3byBvciBhIGd1ZXN0IERYRSBkcml2ZXIgdXNlcyB0aGUgTU1fQ09NTVVO
-SUNBVEUgY2FsbCAoc2VlIFsxXSkgdG8gYXNrIFFFTVUKPj4+IHdoZXJlIHRoZSBtZW1vcnkgaXMu
-Cj4+Cj4+IHdoZXRoZXIgaW52b2tlIHRoZSBndWVzdCBVRUZJIHdpbGwgYmUgY29tcGxleD8gbm90
-IHNlZSB0aGUgYWR2YW50YWdlLiBpdCBzZWVtcyB4ODYgUWVtdQo+PiBkaXJlY3RseSBnZW5lcmF0
-ZSB0aGUgQUNQSSB0YWJsZSwgYnV0IEkgYW0gbm90IHN1cmUsIHdlIGFyZSBjaGVja2luZyB0aGUg
-cWVtdQo+IGxvZ2ljYWwuCj4+IGxldCBRZW11IGdlbmVyYXRlIENQRVIgcmVjb3JkIG1heSBiZSBj
-bGVhci4KPiAKPiBBdCBib290IFVFRkkgaW4gdGhlIGd1ZXN0IHdpbGwgbmVlZCB0byBtYWtlIHN1
-cmUgdGhlIGFyZWFzIG9mIG1lbW9yeSB0aGF0IG1heSBiZQo+IHVzZWQgZm9yIENQRVIgcmVjb3Jk
-cyBhcmUgcmVzZXJ2ZWQuIFdoZXRoZXIgVUVGSSBvciBRZW11IGRlY2lkZXMgd2hlcmUgdGhlc2Ug
-YXJlCj4gbmVlZHMgZGVjaWRpbmcsIChidXQgcHJvYmFibHkgbm90IGhlcmUpLi4uCj4gCj4gQXQg
-cnVudGltZSwgd2hlbiBhbiBlcnJvciBoYXMgb2NjdXJyZWQsIEkgYWdyZWUgaXQgd291bGQgYmUg
-c2ltcGxlciAoZmV3ZXIKPiBjb21wb25lbnRzIGludm9sdmVkKSBpZiBRZW11IGdlbmVyYXRlcyB0
-aGUgQ1BFUiByZWNvcmRzLiBCdXQgaWYgVUVGSSBtYWRlIHRoZQo+IG1lbW9yeSBjaG9pY2UgYWJv
-dmUgdGhleSBuZWVkIHRvIGludGVyYWN0IGFuZCBpdCBnZXRzIGNvbXBsaWNhdGVkIGFnYWluLiBU
-aGUKPiBDUEVSIHJlY29yZHMgYXJlIGRlZmluZWQgaW4gdGhlIFVFRkkgc3BlYywgc28gSSB3b3Vs
-ZCBleHBlY3QgVUVGSSB0byBjb250YWluCj4gY29kZSB0byBnZW5lcmF0ZS9wYXJzZSB0aGVtLgo+
-IAo+IAo+IFRoYW5rcywKPiAKPiBKYW1lcwo+IAo+IAo+IC4KPiAKCl9fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
-QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
-bWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Wed, Mar 29, 2017 at 09:41:47AM +0100, Will Deacon wrote:
+> On Tue, Mar 28, 2017 at 10:29:31PM +0200, Christoffer Dall wrote:
+> > On Tue, Mar 28, 2017 at 07:48:28PM +0100, Mark Rutland wrote:
+> > > On Wed, Mar 22, 2017 at 06:35:13PM +0000, Mark Rutland wrote:
+
+> > > I think it would make sense for those to be in a common branch taken by
+> > > both the arm64 and KVM trees, with the KVM-specific parts being taken by
+> > > KVM alone atop of that.
+> > > 
+> > > Would everyone be happy with that?
+> > 
+> > I'm happy with that.
+> > 
+> > > For reference, I've updated my branches so that arm64/common-sysreg only
+> > > contains the common parts, with the KVM parts atop of that in
+> > > kvm/common-sysreg.
+> > 
+> > Will, Catalin:  Let me know if you're going to pull from common-sysreg
+> > and I'll do the same and add the kvm patches above.
+> 
+> I think that's what we'll do, but Catalin's out this week (we're taking it
+> in turns to go to work). I'd say go ahead and pull it into kvm if there
+> aren't any conflicts. No need to wait for us.
+> 
+> Mark -- those branches are stable, right?
+
+They are now. I will not touch either branch.
+
+Thanks,
+Mark.
