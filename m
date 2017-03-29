@@ -1,28 +1,25 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH 00/15] arm64/kvm: use common sysreg definitions
-Date: Wed, 29 Mar 2017 09:41:47 +0100
-Message-ID: <20170329084146.GA15778@arm.com>
-References: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
- <87a88tv94d.fsf@on-the-bus.cambridge.arm.com>
- <20170310183555.GB6271@arm.com>
- <20170322183512.GB27921@leverpostej>
- <20170328184828.GF8643@leverpostej> <20170328202931.GF20211@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [kvmtool PATCH v9 12/15] PCI: inject PCI device ID on MSI
+ injection
+Date: Wed, 29 Mar 2017 09:50:03 +0100
+Message-ID: <1655aef3-44f2-d07c-08ee-9d211b108628@arm.com>
+References: <20170202163223.15372-1-andre.przywara@arm.com>
+ <20170202163223.15372-13-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B70840A7B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 04:39:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4514B40A7B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 04:48:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jsxkCFcF19y3 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Mar 2017 04:39:31 -0400 (EDT)
+ with ESMTP id HXeIDgXTok9z for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Mar 2017 04:48:06 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AC7540969
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 04:39:31 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20170328202931.GF20211@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E8AE40969
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 04:48:05 -0400 (EDT)
+In-Reply-To: <20170202163223.15372-13-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,59 +29,66 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>
+To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 28, 2017 at 10:29:31PM +0200, Christoffer Dall wrote:
-> On Tue, Mar 28, 2017 at 07:48:28PM +0100, Mark Rutland wrote:
-> > On Wed, Mar 22, 2017 at 06:35:13PM +0000, Mark Rutland wrote:
-> > > On Fri, Mar 10, 2017 at 06:35:55PM +0000, Will Deacon wrote:
-> > > > On Fri, Mar 10, 2017 at 08:17:22AM +0000, Marc Zyngier wrote:
-> > > 
-> > > > > The next question is how do we merge this. Obviously, we can't split it
-> > > > > between trees, and this is very likely to clash with anything that we
-> > > > > will merge on the KVM side (the sysreg table is a popular place).
-> > > > > 
-> > > > > Will, Catalin: Would it make sense to create a stable branch with these
-> > > > > patches, and merge it into both the arm64 and KVM trees? That'd make
-> > > > > things easier...
-> > > > 
-> > > > I think the scope for conflict on our side is pretty high too, so a shared
-> > > > branch might be the best way to go. I don't want to branch just yet though,
-> > > > so I'll probably wait a week or so before setting something in stone.
-> > > 
-> > > Any further thoughts on this?
-> > > 
-> > > Christoffer has Acked the KVM bits, so if you're happy to do so for the
-> > > arm64 bits I can make a stable branch.
-> > 
-> > Looking around, it doesn't look like there's anything outside of arm64
-> > that'll conflict on the <asm/sysreg.h> changes, and git's happy to merge
-> > my changes with Suzuki's changes currently queued in arm64's
-> > for-next/core branch.
-> > 
-> > I think it would make sense for those to be in a common branch taken by
-> > both the arm64 and KVM trees, with the KVM-specific parts being taken by
-> > KVM alone atop of that.
-> > 
-> > Would everyone be happy with that?
+On 02/02/17 16:32, Andre Przywara wrote:
+> The ITS emulation requires a unique device ID to be passed along the
+> MSI payload when kvmtool wants to trigger an MSI in the guest.
+> According to the proposed changes to the interface add the PCI
+> bus/device/function triple to the structure passed with the ioctl.
+> Check the respective capability before actually adding the device ID
+> to the kvm_msi struct.
 > 
-> I'm happy with that.
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  virtio/pci.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
 > 
-> > 
-> > For reference, I've updated my branches so that arm64/common-sysreg only
-> > contains the common parts, with the KVM parts atop of that in
-> > kvm/common-sysreg.
-> > 
+> diff --git a/virtio/pci.c b/virtio/pci.c
+> index 98bf6b7..cecfe8a 100644
+> --- a/virtio/pci.c
+> +++ b/virtio/pci.c
+> @@ -321,14 +321,28 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
+>  		update_msix_map(vpci, table, vecnum);
+>  }
+>  
+> -static void virtio_pci__signal_msi(struct kvm *kvm, struct virtio_pci *vpci, int vec)
+> +static void virtio_pci__signal_msi(struct kvm *kvm, struct virtio_pci *vpci,
+> +				   int vec)
+>  {
+> +	static int needs_devid = 0;
+>  	struct kvm_msi msi = {
+>  		.address_lo = vpci->msix_table[vec].msg.address_lo,
+>  		.address_hi = vpci->msix_table[vec].msg.address_hi,
+>  		.data = vpci->msix_table[vec].msg.data,
+>  	};
+>  
+> +	if (needs_devid == 0) {
+> +		if (kvm__supports_vm_extension(kvm, KVM_CAP_MSI_DEVID))
+
+Grump... Pretty horrible, even if it works. Even if we will never end-up
+in a situation where we can mix ITS and non-ITS MSIs, could we instead
+store this as a flag in the virtio_pci device?
+
+> +			needs_devid = 1;
+> +		else
+> +			needs_devid = -1;
+> +	}
+> +
+> +	if (needs_devid > 0) {
+> +		msi.flags = KVM_MSI_VALID_DEVID;
+> +		msi.devid = vpci->dev_hdr.dev_num << 3;
+> +	}
+> +
+>  	ioctl(kvm->vm_fd, KVM_SIGNAL_MSI, &msi);
+>  }
+>  
 > 
-> Will, Catalin:  Let me know if you're going to pull from common-sysreg
-> and I'll do the same and add the kvm patches above.
 
-I think that's what we'll do, but Catalin's out this week (we're taking it
-in turns to go to work). I'd say go ahead and pull it into kvm if there
-aren't any conflicts. No need to wait for us.
+Thanks,
 
-Mark -- those branches are stable, right?
-
-Will
+	M.
+-- 
+Jazz is not dead. It just smells funny...
