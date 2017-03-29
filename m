@@ -1,45 +1,97 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [kvmtool PATCH v9 00/15] kvmtool: arm: ITS emulation and GSI
- routing support
-Date: Wed, 29 Mar 2017 09:58:41 +0100
-Message-ID: <997ccfcb-b569-cf99-aa72-36450f62c807@arm.com>
-References: <20170202163223.15372-1-andre.przywara@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
+Date: Wed, 29 Mar 2017 17:36:37 +0800
+Message-ID: <5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
+References: <7055772d-2a20-6e0c-2bf8-204bc9ef52a5@arm.com>
+ <b912c293-4314-7c90-30a4-2f986feb1670@huawei.com>
+ <22fb583f-a33e-15f8-a059-fb112b27dd4f@arm.com> <58CFF058.8020205@arm.com>
+ <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
+ <20170321113428.GC15920@cbox> <58D17AF0.2010802@arm.com>
+ <20170321193933.GB31111@cbox> <58DA3F68.6090901@arm.com>
+ <20170328112328.GA31156@cbox> <20170328115413.GJ23682@e104320-lin>
+ <b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com> <58DA67BA.8070404@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170202163223.15372-1-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: Vladimir Murzin <vladimir.murzin@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5405240A63
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 05:35:48 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bhxQ7ndwek98 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Mar 2017 05:35:47 -0400 (EDT)
+Received: from dggrg03-dlp.huawei.com (unknown [45.249.212.189])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72CC9408EB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 05:35:45 -0400 (EDT)
+In-Reply-To: <58DA67BA.8070404@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: lersek@redhat.com, ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, Achin Gupta <achin.gupta@arm.com>, will.deacon@arm.com, wuquanming@huawei.com, wangxiongfeng2@huawei.com, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, Leif.Lindholm@linaro.com, huangshaoyu@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, andre.przywara@arm.com, nd@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 02/02/17 16:32, Andre Przywara wrote:
-> Hi,
-> 
-> an update to the ITS emulation series for kvmtool.
-> I reworked the phandle allocation by actually removing and replacing it
-> with some simple, static assignments. That definitely fits kvmtool's
-> needs today, where the GIC and the PCI controller are statically
-> assigned anyway. If that is too much of a simplification, let me know.
-> Also I fixed the error return in case some GSI routing setup fails.
-> On that way I use the opportunity to merge in 32-bit ARM support for the
-> ITS and the VGICv3, as the kernel learned about it recently as well.
-> The rest is effectively unchanged apart from some rebasing and
-> adjustments due to the mentioned changes.
-
-Hi Andre,
-
-Sorry for the time it took me to get to this series. Overall, this is
-looking good. There is a number of nits I'd like you to address (the
-DEVID detection is pretty nasty), and I suspect a weird corner case when
-irq__add_msix_route() fails in patch 6.
-
-If you can respin it quickly, I promise to get back to it quickly, and
-we can (finally) merge it!
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+CkhpIExhc3psby9CaWVzaGV1dmVsL1FlbXUgZGV2ZWxvcGVyLAoKICAgTm93IEkgZW5jb3VudGVy
+IGEgaXNzdWUgYW5kIHdhbnQgdG8gY29uc3VsdCB3aXRoIHlvdSBpbiBBUk02NCBwbGF0Zm9ybe+8
+jCBhcyBkZXNjcmliZWQgYmVsb3c6CgogICB3aGVuIGd1ZXN0IE9TIGhhcHBlbiBzeW5jaHJvbm91
+cyBvciBhc3luY2hyb25vdXMgYWJvcnQsIGt2bSBuZWVkcyB0byBzZW5kIHRoZSBlcnJvciBhZGRy
+ZXNzIHRvIFFlbXUgb3IgVUVGSSB0aHJvdWdoIHNpZ2J1cyB0byBkeW5hbWljYWxseSBnZW5lcmF0
+ZSBBUEVJIHRhYmxlLiBmcm9tIG15IGludmVzdGlnYXRpb24sIHRoZXJlIGFyZSB0d28gd2F5czoK
+CiAgICgxKSBRZW11IGdldCB0aGUgZXJyb3IgYWRkcmVzcywgYW5kIGdlbmVyYXRlIHRoZSBBUEVJ
+IHRhYmxlLCB0aGVuIG5vdGlmeSBVRUZJIHRvIGtub3cgdGhpcyBnZW5lcmF0aW9uLCB0aGVuIGlu
+amVjdCBhYm9ydCBlcnJvciB0byBndWVzdCBPUywgZ3Vlc3QgT1MgcmVhZCB0aGUgQVBFSSB0YWJs
+ZS4KICAgKDIpIFFlbXUgZ2V0IHRoZSBlcnJvciBhZGRyZXNzLCBhbmQgbGV0IFVFRkkgdG8gZ2Vu
+ZXJhdGUgdGhlIEFQRUkgdGFibGUsIHRoZW4gaW5qZWN0IGFib3J0IGVycm9yIHRvIGd1ZXN0IE9T
+LCBndWVzdCBPUyByZWFkIHRoZSBBUEVJIHRhYmxlLgoKCiAgIERvIHlvdSB0aGluayB3aGljaCBt
+b2R1bGVzIGdlbmVyYXRlcyB0aGUgQVBFSSB0YWJsZSBpcyBiZXR0ZXI/IFVFRkkgb3IgUWVtdT8K
+CgoKCk9uIDIwMTcvMy8yOCAyMTo0MCwgSmFtZXMgTW9yc2Ugd3JvdGU6Cj4gSGkgZ2VuZ2Rvbmdq
+aXUsCj4gCj4gT24gMjgvMDMvMTcgMTM6MTYsIGdlbmdkb25naml1IHdyb3RlOgo+PiBPbiAyMDE3
+LzMvMjggMTk6NTQsIEFjaGluIEd1cHRhIHdyb3RlOgo+Pj4gT24gVHVlLCBNYXIgMjgsIDIwMTcg
+YXQgMDE6MjM6MjhQTSArMDIwMCwgQ2hyaXN0b2ZmZXIgRGFsbCB3cm90ZToKPj4+PiBPbiBUdWUs
+IE1hciAyOCwgMjAxNyBhdCAxMTo0ODowOEFNICswMTAwLCBKYW1lcyBNb3JzZSB3cm90ZToKPj4+
+Pj4gT24gdGhlIGhvc3QsIHBhcnQgb2YgVUVGSSBpcyBpbnZvbHZlZCB0byBnZW5lcmF0ZSB0aGUg
+Q1BFUiByZWNvcmRzLgo+Pj4+PiBJbiBhIGd1ZXN0PywgSSBkb24ndCBrbm93Lgo+Pj4+PiBRZW11
+IGNvdWxkIGdlbmVyYXRlIHRoZSByZWNvcmRzLCBvciBkcml2ZSBzb21lIG90aGVyIGNvbXBvbmVu
+dCB0byBkbyBpdC4KPj4+Pgo+Pj4+IEkgdGhpbmsgSSBhbSBiZWdpbm5pbmcgdG8gdW5kZXJzdGFu
+ZCB0aGlzIGEgYml0LiAgU2luY2UgdGhlIGd1ZXQgVUVGSQo+Pj4+IGluc3RhbmNlIGlzIHNwZWNp
+ZmljYWxseSBidWlsdCBmb3IgdGhlIG1hY2hpbmUgaXQgcnVucyBvbiwgUUVNVSdzIHZpcnQKPj4+
+PiBtYWNoaW5lIGluIHRoaXMgY2FzZSwgdGhleSBjb3VsZCBzaW1wbHkgYWdyZWUgKGJ5IHNvbWUg
+Y29udHJhY3QpIHRvCj4+Pj4gcGxhY2UgdGhlIHJlY29yZHMgYXQgc29tZSBzcGVjaWZpYyBsb2Nh
+dGlvbiBpbiBtZW1vcnksIGFuZCBpZiB0aGUgZ3Vlc3QKPj4+PiBrZXJuZWwgYXNrcyBpdHMgZ3Vl
+c3QgVUVGSSBmb3IgdGhhdCBsb2NhdGlvbiwgdGhpbmdzIHNob3VsZCBqdXN0IHdvcmsgYnkKPj4+
+PiBoYXZpbmcgbG9naWMgaW4gUUVNVSB0byBwcm9jZXNzIGVycm9yIHJlcG9ydHMgYW5kIHBvcHVs
+YXRlIGd1ZXN0IG1lbW9yeS4KPj4+Pgo+Pj4+IElzIHRoaXMgaG93IG90aGVycyBzZWUgdGhlIHdv
+cmxkIHRvbz8KPj4+Cj4+PiBJIHRoaW5rIHNvIQo+Pj4KPj4+IEFGQUlVLCB0aGUgbWVtb3J5IHdo
+ZXJlIENQRVJzIHdpbGwgcmVzaWRlIHNob3VsZCBiZSBzcGVjaWZpZWQgaW4gYSBHSEVTIGVudHJ5
+IGluCj4+PiB0aGUgSEVTVC4gSXMgdGhpcyBub3QgdGhlIGNhc2Ugd2l0aCBhIGd1ZXN0IGtlcm5l
+bCBpLmUuIHRoZSBndWVzdCBVRUZJIGNyZWF0ZXMgYQo+Pj4gSEVTVCBmb3IgdGhlIGd1ZXN0IEtl
+cm5lbD8KPj4+Cj4+PiBJZiBzbywgdGhlbiB0aGUgcXVlc3Rpb24gaXMgaG93IHRoZSBndWVzdCBV
+RUZJIGZpbmRzIG91dCB3aGVyZSBRRU1VIChhY3RpbmcgYXMKPj4+IEVMMyBmaXJtd2FyZSkgd2ls
+bCBwb3B1bGF0ZSB0aGUgQ1BFUnMuIFRoaXMgY291bGQgZWl0aGVyIGJlIGEgY29udHJhY3QgYmV0
+d2Vlbgo+Pj4gdGhlIHR3byBvciBhIGd1ZXN0IERYRSBkcml2ZXIgdXNlcyB0aGUgTU1fQ09NTVVO
+SUNBVEUgY2FsbCAoc2VlIFsxXSkgdG8gYXNrIFFFTVUKPj4+IHdoZXJlIHRoZSBtZW1vcnkgaXMu
+Cj4+Cj4+IHdoZXRoZXIgaW52b2tlIHRoZSBndWVzdCBVRUZJIHdpbGwgYmUgY29tcGxleD8gbm90
+IHNlZSB0aGUgYWR2YW50YWdlLiBpdCBzZWVtcyB4ODYgUWVtdQo+PiBkaXJlY3RseSBnZW5lcmF0
+ZSB0aGUgQUNQSSB0YWJsZSwgYnV0IEkgYW0gbm90IHN1cmUsIHdlIGFyZSBjaGVja2luZyB0aGUg
+cWVtdQo+IGxvZ2ljYWwuCj4+IGxldCBRZW11IGdlbmVyYXRlIENQRVIgcmVjb3JkIG1heSBiZSBj
+bGVhci4KPiAKPiBBdCBib290IFVFRkkgaW4gdGhlIGd1ZXN0IHdpbGwgbmVlZCB0byBtYWtlIHN1
+cmUgdGhlIGFyZWFzIG9mIG1lbW9yeSB0aGF0IG1heSBiZQo+IHVzZWQgZm9yIENQRVIgcmVjb3Jk
+cyBhcmUgcmVzZXJ2ZWQuIFdoZXRoZXIgVUVGSSBvciBRZW11IGRlY2lkZXMgd2hlcmUgdGhlc2Ug
+YXJlCj4gbmVlZHMgZGVjaWRpbmcsIChidXQgcHJvYmFibHkgbm90IGhlcmUpLi4uCj4gCj4gQXQg
+cnVudGltZSwgd2hlbiBhbiBlcnJvciBoYXMgb2NjdXJyZWQsIEkgYWdyZWUgaXQgd291bGQgYmUg
+c2ltcGxlciAoZmV3ZXIKPiBjb21wb25lbnRzIGludm9sdmVkKSBpZiBRZW11IGdlbmVyYXRlcyB0
+aGUgQ1BFUiByZWNvcmRzLiBCdXQgaWYgVUVGSSBtYWRlIHRoZQo+IG1lbW9yeSBjaG9pY2UgYWJv
+dmUgdGhleSBuZWVkIHRvIGludGVyYWN0IGFuZCBpdCBnZXRzIGNvbXBsaWNhdGVkIGFnYWluLiBU
+aGUKPiBDUEVSIHJlY29yZHMgYXJlIGRlZmluZWQgaW4gdGhlIFVFRkkgc3BlYywgc28gSSB3b3Vs
+ZCBleHBlY3QgVUVGSSB0byBjb250YWluCj4gY29kZSB0byBnZW5lcmF0ZS9wYXJzZSB0aGVtLgo+
+IAo+IAo+IFRoYW5rcywKPiAKPiBKYW1lcwo+IAo+IAo+IC4KPiAKCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
+QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
+bWFuL2xpc3RpbmZvL2t2bWFybQo=
