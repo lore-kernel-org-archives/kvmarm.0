@@ -1,25 +1,31 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [kvmtool PATCH v9 04/15] MSI-X: update GSI routing after changed
- MSI-X configuration
-Date: Wed, 29 Mar 2017 10:57:33 +0100
-Message-ID: <d4659488-b341-b1e8-2587-687e45a169b7@arm.com>
-References: <20170202163223.15372-1-andre.przywara@arm.com>
- <20170202163223.15372-5-andre.przywara@arm.com>
+From: Achin Gupta <achin.gupta@arm.com>
+Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
+Date: Wed, 29 Mar 2017 11:36:59 +0100
+Message-ID: <20170329103658.GQ23682@e104320-lin>
+References: <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
+ <20170321113428.GC15920@cbox> <58D17AF0.2010802@arm.com>
+ <20170321193933.GB31111@cbox> <58DA3F68.6090901@arm.com>
+ <20170328112328.GA31156@cbox> <20170328115413.GJ23682@e104320-lin>
+ <b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com>
+ <58DA67BA.8070404@arm.com>
+ <5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CE7240A69
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 05:54:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2814640BDA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 06:34:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zJr8ZNEzB2Yd for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Mar 2017 05:54:19 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 069C440966
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 05:54:19 -0400 (EDT)
-In-Reply-To: <20170202163223.15372-5-andre.przywara@arm.com>
+ with ESMTP id WMH-NO4IYm7g for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Mar 2017 06:34:34 -0400 (EDT)
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com
+ (mail-ve1eur01on0046.outbound.protection.outlook.com [104.47.1.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CCCD840A69
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Mar 2017 06:34:33 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,172 +35,98 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, qemu-devel@nongnu.org, wuquanming@huawei.com, wangxiongfeng2@huawei.com, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, Leif.Lindholm@linaro.com, huangshaoyu@huawei.com, lersek@redhat.com, Marc Zyngier <marc.zyngier@arm.com>, andre.przywara@arm.com, edk2-devel@lists.01.org, nd@arm.com, linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 02/02/17 16:32, Andre Przywara wrote:
-> When we set up GSI routing to map MSIs to KVM's GSI numbers, we
-> write the current device's MSI setup into the kernel routing table.
-> However the device driver in the guest can use PCI configuration space
-> accesses to change the MSI configuration (address and/or payload data).
-> Whenever this happens after we have setup the routing table already,
-> we must amend the previously sent data.
-> So when MSI-X PCI config space accesses write address or payload,
-> find the associated GSI number and the matching routing table entry
-> and update the kernel routing table (only if the data has changed).
-> 
-> This fixes vhost-net, where the queue's IRQFD was setup before the
-> MSI vectors.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/irq.h |  1 +
->  irq.c             | 34 ++++++++++++++++++++++++++++++++++
->  virtio/pci.c      | 53 +++++++++++++++++++++++++++++++++++++++++++----------
->  3 files changed, 78 insertions(+), 10 deletions(-)
-> 
-> diff --git a/include/kvm/irq.h b/include/kvm/irq.h
-> index bb71521..f35eb7e 100644
-> --- a/include/kvm/irq.h
-> +++ b/include/kvm/irq.h
-> @@ -21,5 +21,6 @@ int irq__exit(struct kvm *kvm);
->  
->  int irq__allocate_routing_entry(void);
->  int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
-> +void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
->  
->  #endif
-> diff --git a/irq.c b/irq.c
-> index a742aa2..6ec71c3 100644
-> --- a/irq.c
-> +++ b/irq.c
-> @@ -93,6 +93,40 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
->  	return next_gsi++;
->  }
->  
-> +static bool update_data(u32 *ptr, u32 newdata)
-> +{
-> +	if (*ptr == newdata)
-> +		return false;
-> +
-> +	*ptr = newdata;
-> +	return true;
-> +}
-> +
-> +void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg)
-> +{
-> +	struct kvm_irq_routing_msi *entry;
-> +	unsigned int i;
-> +	bool changed;
-> +
-> +	for (i = 0; i < irq_routing->nr; i++)
-> +		if (gsi == irq_routing->entries[i].gsi)
-> +			break;
-> +	if (i == irq_routing->nr)
-> +		return;
-> +
-> +	entry = &irq_routing->entries[i].u.msi;
-> +
-> +	changed  = update_data(&entry->address_hi, msg->address_hi);
-> +	changed |= update_data(&entry->address_lo, msg->address_lo);
-> +	changed |= update_data(&entry->data, msg->data);
-> +
-> +	if (!changed)
-> +		return;
-> +
-> +	if (ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing) == -1)
-> +		die_perror("KVM_SET_GSI_ROUTING");
-> +}
-> +
->  int __attribute__((weak)) irq__exit(struct kvm *kvm)
->  {
->  	free(irq_routing);
-> diff --git a/virtio/pci.c b/virtio/pci.c
-> index 072e5b7..7cc0ba4 100644
-> --- a/virtio/pci.c
-> +++ b/virtio/pci.c
-> @@ -152,6 +152,30 @@ static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 p
->  	return ret;
->  }
->  
-> +static void update_msix_map(struct virtio_pci *vpci,
-> +			    struct msix_table *msix_entry, u32 vecnum)
-> +{
-> +	u32 gsi, i;
-> +
-> +	/* Find the GSI number used for that vector */
-> +	if (vecnum == vpci->config_vector) {
-> +		gsi = vpci->config_gsi;
-> +	} else {
-> +		for (i = 0; i < VIRTIO_PCI_MAX_VQ; i++)
-> +			if (vpci->vq_vector[i] == vecnum)
-> +				break;
-> +		if (i == VIRTIO_PCI_MAX_VQ)
-> +			return;
-> +		gsi = vpci->gsis[i];
-> +	}
-> +
-> +	if (gsi == 0)
-> +		return;
-> +
-> +	msix_entry = &msix_entry[vecnum];
-> +	irq__update_msix_route(vpci->kvm, gsi, &msix_entry->msg);
-> +}
-> +
->  static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *vdev, u16 port,
->  					void *data, int size, int offset)
->  {
-> @@ -259,21 +283,30 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
->  					   u8 is_write, void *ptr)
->  {
->  	struct virtio_pci *vpci = ptr;
-> -	void *table;
-> -	u32 offset;
-> +	struct msix_table *table;
-> +	int vecnum;
-> +	size_t offset;
->  
->  	if (addr > vpci->msix_io_block + PCI_IO_SIZE) {
-> -		table	= &vpci->msix_pba;
-> -		offset	= vpci->msix_io_block + PCI_IO_SIZE;
-> +		table  = (struct msix_table *)&vpci->msix_pba;
-> +		offset = addr - (vpci->msix_io_block + PCI_IO_SIZE);
-
-Hi,
-
-For pba we might want to return here if the access is write. Granted Linux
-doesn't care about pba at the moment, so we'll never end up here. But for
-another kind of guest, entering update_msix_map with the pba as argument
-won't end well.
-
-Thanks,
-Jean-Philippe
-
->  	} else {
-> -		table	= &vpci->msix_table;
-> -		offset	= vpci->msix_io_block;
-> +		table  = vpci->msix_table;
-> +		offset = addr - vpci->msix_io_block;
->  	}
-> +	vecnum = offset / sizeof(struct msix_table);
-> +	offset = offset % sizeof(struct msix_table);
-> +
-> +	if (!is_write) {
-> +		memcpy(data, (void *)&table[vecnum] + offset, len);
-> +		return;
-> +	}
-> +
-> +	memcpy((void *)&table[vecnum] + offset, data, len);
->  
-> -	if (is_write)
-> -		memcpy(table + addr - offset, data, len);
-> -	else
-> -		memcpy(data, table + addr - offset, len);
-> +	/* Did we just update the address or payload? */
-> +	if (offset < offsetof(struct msix_table, ctrl))
-> +		update_msix_map(vpci, table, vecnum);
->  }
->  
->  static void virtio_pci__signal_msi(struct kvm *kvm, struct virtio_pci *vpci, int vec)
-> 
+SGkgZ2VuZ2RvbmdqaXUsCgpPbiBXZWQsIE1hciAyOSwgMjAxNyBhdCAwNTozNjozN1BNICswODAw
+LCBnZW5nZG9uZ2ppdSB3cm90ZToKPgo+IEhpIExhc3psby9CaWVzaGV1dmVsL1FlbXUgZGV2ZWxv
+cGVyLAo+Cj4gICAgTm93IEkgZW5jb3VudGVyIGEgaXNzdWUgYW5kIHdhbnQgdG8gY29uc3VsdCB3
+aXRoIHlvdSBpbiBBUk02NCBwbGF0Zm9ybe+8jCBhcyBkZXNjcmliZWQgYmVsb3c6Cj4KPiAgICB3
+aGVuIGd1ZXN0IE9TIGhhcHBlbiBzeW5jaHJvbm91cyBvciBhc3luY2hyb25vdXMgYWJvcnQsIGt2
+bSBuZWVkcyB0byBzZW5kIHRoZSBlcnJvciBhZGRyZXNzIHRvIFFlbXUgb3IgVUVGSSB0aHJvdWdo
+IHNpZ2J1cyB0byBkeW5hbWljYWxseSBnZW5lcmF0ZSBBUEVJIHRhYmxlLiBmcm9tIG15IGludmVz
+dGlnYXRpb24sIHRoZXJlIGFyZSB0d28gd2F5czoKPgo+ICAgICgxKSBRZW11IGdldCB0aGUgZXJy
+b3IgYWRkcmVzcywgYW5kIGdlbmVyYXRlIHRoZSBBUEVJIHRhYmxlLCB0aGVuIG5vdGlmeSBVRUZJ
+IHRvIGtub3cgdGhpcyBnZW5lcmF0aW9uLCB0aGVuIGluamVjdCBhYm9ydCBlcnJvciB0byBndWVz
+dCBPUywgZ3Vlc3QgT1MgcmVhZCB0aGUgQVBFSSB0YWJsZS4KPiAgICAoMikgUWVtdSBnZXQgdGhl
+IGVycm9yIGFkZHJlc3MsIGFuZCBsZXQgVUVGSSB0byBnZW5lcmF0ZSB0aGUgQVBFSSB0YWJsZSwg
+dGhlbiBpbmplY3QgYWJvcnQgZXJyb3IgdG8gZ3Vlc3QgT1MsIGd1ZXN0IE9TIHJlYWQgdGhlIEFQ
+RUkgdGFibGUuCgpKdXN0IGJlaW5nIHBlZGFudGljISBJIGRvbid0IHRoaW5rIHdlIGFyZSB0YWxr
+aW5nIGFib3V0IGNyZWF0aW5nIHRoZSBBUEVJIHRhYmxlCmR5bmFtaWNhbGx5IGhlcmUuIFRoZSBp
+c3N1ZSBpczogT25jZSBLVk0gaGFzIHJlY2VpdmVkIGFuIGVycm9yIHRoYXQgaXMgZGVzdGluZWQK
+Zm9yIGEgZ3Vlc3QgaXQgd2lsbCByYWlzZSBhIFNJR0JVUyB0byBRZW11LiBOb3cgYmVmb3JlIFFl
+bXUgY2FuIGluamVjdCB0aGUgZXJyb3IKaW50byB0aGUgZ3Vlc3QgT1MsIGEgQ1BFUiAoQ29tbW9u
+IFBsYXRmb3JtIEVycm9yIFJlY29yZCkgaGFzIHRvIGJlIGdlbmVyYXRlZApjb3JyZXNwb25kaW5n
+IHRvIHRoZSBlcnJvciBzb3VyY2UgKEdIRVMgY29ycmVzcG9uZGluZyB0byBtZW1vcnkgc3Vic3lz
+dGVtLApwcm9jZXNzb3IgZXRjKSB0byBhbGxvdyB0aGUgZ3Vlc3QgT1MgdG8gZG8gYW55dGhpbmcg
+bWVhbmluZ2Z1bCB3aXRoIHRoZQplcnJvci4gU28gd2hvIHNob3VsZCBjcmVhdGUgdGhlIENQRVIg
+aXMgdGhlIHF1ZXN0aW9uLgoKQXQgdGhlIEVMMy9FTDIgaW50ZXJmYWNlIChTZWN1cmUgRmlybXdh
+cmUgYW5kIE9TL0h5cGVydmlzb3IpLCBhbiBlcnJvciBhcnJpdmVzCmF0IEVMMyBhbmQgc2VjdXJl
+IGZpcm13YXJlIChhdCBFTDMgb3IgYSBsb3dlciBzZWN1cmUgZXhjZXB0aW9uIGxldmVsKSBpcwpy
+ZXNwb25zaWJsZSBmb3IgY3JlYXRpbmcgdGhlIENQRVIuIEFSTSBpcyBleHBlcmltZW50aW5nIHdp
+dGggdXNpbmcgYSBTdGFuZGFsb25lCk1NIEVESzIgaW1hZ2UgaW4gdGhlIHNlY3VyZSB3b3JsZCB0
+byBkbyB0aGUgQ1BFUiBjcmVhdGlvbi4gVGhpcyB3aWxsIGF2b2lkCmFkZGluZyB0aGUgc2FtZSBj
+b2RlIGluIEFSTSBURiBpbiBFTDMgKGJldHRlciBmb3Igc2VjdXJpdHkpLiBUaGUgZXJyb3Igd2ls
+bCB0aGVuCmJlIGluamVjdGVkIGludG8gdGhlIE9TL0h5cGVydmlzb3IgKHRocm91Z2ggU0VBL1NF
+SS9TREVJKSB0aHJvdWdoIEFSTSBUcnVzdGVkCkZpcm13YXJlLgoKUWVtdSBpcyBlc3NlbnRpYWxs
+eSBmdWxmaWxsaW5nIHRoZSByb2xlIG9mIHNlY3VyZSBmaXJtd2FyZSBhdCB0aGUgRUwyL0VMMQpp
+bnRlcmZhY2UgKGFzIGRpc2N1c3NlZCB3aXRoIENocmlzdG9mZmVyIGJlbG93KS4gU28gaXQgc2hv
+dWxkIGdlbmVyYXRlIHRoZSBDUEVSCmJlZm9yZSBpbmplY3RpbmcgdGhlIGVycm9yLgoKVGhpcyBp
+cyBjb3JyZXNwb25kcyB0byAoMSkgYWJvdmUgYXBhcnQgZnJvbSBub3RpZnlpbmcgVUVGSSAoSSBh
+bSBhc3N1bWluZyB5b3UKbWVhbiBndWVzdCBVRUZJKS4gQXQgdGhpcyB0aW1lLCB0aGUgZ3Vlc3Qg
+T1MgYWxyZWFkeSBrbm93cyB3aGVyZSB0byBwaWNrIHVwIHRoZQpDUEVSIGZyb20gdGhyb3VnaCB0
+aGUgSEVTVC4gUWVtdSBoYXMgdG8gY3JlYXRlIHRoZSBDUEVSIGFuZCBwb3B1bGF0ZSBpdHMgYWRk
+cmVzcwphdCB0aGUgYWRkcmVzcyBleHBvcnRlZCBpbiB0aGUgSEVTVC4gR3Vlc3QgVUVGSSBzaG91
+bGQgbm90IGJlIGludm9sdmVkIGluIHRoaXMKZmxvdy4gSXRzIGpvYiB3YXMgdG8gY3JlYXRlIHRo
+ZSBIRVNUIGF0IGJvb3QgYW5kIHRoYXQgaGFzIGJlZW4gZG9uZSBieSB0aGlzCnN0YWdlLgoKUWVt
+dSBmb2xrIHdpbGwgYmUgYWJsZSB0byBhZGQgYnV0IGl0IGxvb2tzIGxpa2Ugc3VwcG9ydCBmb3Ig
+Q1BFUiBnZW5lcmF0aW9uIHdpbGwKbmVlZCB0byBiZSBhZGRlZCB0byBRZW11LiBXZSBuZWVkIHRv
+IHJlc29sdmUgdGhpcy4KCkRvIHNob3V0IGlmIEkgYW0gbWlzc2luZyBhbnl0aGluZyBhYm92ZS4K
+CmNoZWVycywKQWNoaW4KCgo+Cj4KPiAgICBEbyB5b3UgdGhpbmsgd2hpY2ggbW9kdWxlcyBnZW5l
+cmF0ZXMgdGhlIEFQRUkgdGFibGUgaXMgYmV0dGVyPyBVRUZJIG9yIFFlbXU/Cj4KPgo+Cj4KPiBP
+biAyMDE3LzMvMjggMjE6NDAsIEphbWVzIE1vcnNlIHdyb3RlOgo+ID4gSGkgZ2VuZ2RvbmdqaXUs
+Cj4gPgo+ID4gT24gMjgvMDMvMTcgMTM6MTYsIGdlbmdkb25naml1IHdyb3RlOgo+ID4+IE9uIDIw
+MTcvMy8yOCAxOTo1NCwgQWNoaW4gR3VwdGEgd3JvdGU6Cj4gPj4+IE9uIFR1ZSwgTWFyIDI4LCAy
+MDE3IGF0IDAxOjIzOjI4UE0gKzAyMDAsIENocmlzdG9mZmVyIERhbGwgd3JvdGU6Cj4gPj4+PiBP
+biBUdWUsIE1hciAyOCwgMjAxNyBhdCAxMTo0ODowOEFNICswMTAwLCBKYW1lcyBNb3JzZSB3cm90
+ZToKPiA+Pj4+PiBPbiB0aGUgaG9zdCwgcGFydCBvZiBVRUZJIGlzIGludm9sdmVkIHRvIGdlbmVy
+YXRlIHRoZSBDUEVSIHJlY29yZHMuCj4gPj4+Pj4gSW4gYSBndWVzdD8sIEkgZG9uJ3Qga25vdy4K
+PiA+Pj4+PiBRZW11IGNvdWxkIGdlbmVyYXRlIHRoZSByZWNvcmRzLCBvciBkcml2ZSBzb21lIG90
+aGVyIGNvbXBvbmVudCB0byBkbyBpdC4KPiA+Pj4+Cj4gPj4+PiBJIHRoaW5rIEkgYW0gYmVnaW5u
+aW5nIHRvIHVuZGVyc3RhbmQgdGhpcyBhIGJpdC4gIFNpbmNlIHRoZSBndWV0IFVFRkkKPiA+Pj4+
+IGluc3RhbmNlIGlzIHNwZWNpZmljYWxseSBidWlsdCBmb3IgdGhlIG1hY2hpbmUgaXQgcnVucyBv
+biwgUUVNVSdzIHZpcnQKPiA+Pj4+IG1hY2hpbmUgaW4gdGhpcyBjYXNlLCB0aGV5IGNvdWxkIHNp
+bXBseSBhZ3JlZSAoYnkgc29tZSBjb250cmFjdCkgdG8KPiA+Pj4+IHBsYWNlIHRoZSByZWNvcmRz
+IGF0IHNvbWUgc3BlY2lmaWMgbG9jYXRpb24gaW4gbWVtb3J5LCBhbmQgaWYgdGhlIGd1ZXN0Cj4g
+Pj4+PiBrZXJuZWwgYXNrcyBpdHMgZ3Vlc3QgVUVGSSBmb3IgdGhhdCBsb2NhdGlvbiwgdGhpbmdz
+IHNob3VsZCBqdXN0IHdvcmsgYnkKPiA+Pj4+IGhhdmluZyBsb2dpYyBpbiBRRU1VIHRvIHByb2Nl
+c3MgZXJyb3IgcmVwb3J0cyBhbmQgcG9wdWxhdGUgZ3Vlc3QgbWVtb3J5Lgo+ID4+Pj4KPiA+Pj4+
+IElzIHRoaXMgaG93IG90aGVycyBzZWUgdGhlIHdvcmxkIHRvbz8KPiA+Pj4KPiA+Pj4gSSB0aGlu
+ayBzbyEKPiA+Pj4KPiA+Pj4gQUZBSVUsIHRoZSBtZW1vcnkgd2hlcmUgQ1BFUnMgd2lsbCByZXNp
+ZGUgc2hvdWxkIGJlIHNwZWNpZmllZCBpbiBhIEdIRVMgZW50cnkgaW4KPiA+Pj4gdGhlIEhFU1Qu
+IElzIHRoaXMgbm90IHRoZSBjYXNlIHdpdGggYSBndWVzdCBrZXJuZWwgaS5lLiB0aGUgZ3Vlc3Qg
+VUVGSSBjcmVhdGVzIGEKPiA+Pj4gSEVTVCBmb3IgdGhlIGd1ZXN0IEtlcm5lbD8KPiA+Pj4KPiA+
+Pj4gSWYgc28sIHRoZW4gdGhlIHF1ZXN0aW9uIGlzIGhvdyB0aGUgZ3Vlc3QgVUVGSSBmaW5kcyBv
+dXQgd2hlcmUgUUVNVSAoYWN0aW5nIGFzCj4gPj4+IEVMMyBmaXJtd2FyZSkgd2lsbCBwb3B1bGF0
+ZSB0aGUgQ1BFUnMuIFRoaXMgY291bGQgZWl0aGVyIGJlIGEgY29udHJhY3QgYmV0d2Vlbgo+ID4+
+PiB0aGUgdHdvIG9yIGEgZ3Vlc3QgRFhFIGRyaXZlciB1c2VzIHRoZSBNTV9DT01NVU5JQ0FURSBj
+YWxsIChzZWUgWzFdKSB0byBhc2sgUUVNVQo+ID4+PiB3aGVyZSB0aGUgbWVtb3J5IGlzLgo+ID4+
+Cj4gPj4gd2hldGhlciBpbnZva2UgdGhlIGd1ZXN0IFVFRkkgd2lsbCBiZSBjb21wbGV4PyBub3Qg
+c2VlIHRoZSBhZHZhbnRhZ2UuIGl0IHNlZW1zIHg4NiBRZW11Cj4gPj4gZGlyZWN0bHkgZ2VuZXJh
+dGUgdGhlIEFDUEkgdGFibGUsIGJ1dCBJIGFtIG5vdCBzdXJlLCB3ZSBhcmUgY2hlY2tpbmcgdGhl
+IHFlbXUKPiA+IGxvZ2ljYWwuCj4gPj4gbGV0IFFlbXUgZ2VuZXJhdGUgQ1BFUiByZWNvcmQgbWF5
+IGJlIGNsZWFyLgo+ID4KPiA+IEF0IGJvb3QgVUVGSSBpbiB0aGUgZ3Vlc3Qgd2lsbCBuZWVkIHRv
+IG1ha2Ugc3VyZSB0aGUgYXJlYXMgb2YgbWVtb3J5IHRoYXQgbWF5IGJlCj4gPiB1c2VkIGZvciBD
+UEVSIHJlY29yZHMgYXJlIHJlc2VydmVkLiBXaGV0aGVyIFVFRkkgb3IgUWVtdSBkZWNpZGVzIHdo
+ZXJlIHRoZXNlIGFyZQo+ID4gbmVlZHMgZGVjaWRpbmcsIChidXQgcHJvYmFibHkgbm90IGhlcmUp
+Li4uCj4gPgo+ID4gQXQgcnVudGltZSwgd2hlbiBhbiBlcnJvciBoYXMgb2NjdXJyZWQsIEkgYWdy
+ZWUgaXQgd291bGQgYmUgc2ltcGxlciAoZmV3ZXIKPiA+IGNvbXBvbmVudHMgaW52b2x2ZWQpIGlm
+IFFlbXUgZ2VuZXJhdGVzIHRoZSBDUEVSIHJlY29yZHMuIEJ1dCBpZiBVRUZJIG1hZGUgdGhlCj4g
+PiBtZW1vcnkgY2hvaWNlIGFib3ZlIHRoZXkgbmVlZCB0byBpbnRlcmFjdCBhbmQgaXQgZ2V0cyBj
+b21wbGljYXRlZCBhZ2Fpbi4gVGhlCj4gPiBDUEVSIHJlY29yZHMgYXJlIGRlZmluZWQgaW4gdGhl
+IFVFRkkgc3BlYywgc28gSSB3b3VsZCBleHBlY3QgVUVGSSB0byBjb250YWluCj4gPiBjb2RlIHRv
+IGdlbmVyYXRlL3BhcnNlIHRoZW0uCj4gPgo+ID4KPiA+IFRoYW5rcywKPiA+Cj4gPiBKYW1lcwo+
+ID4KPiA+Cj4gPiAuCj4gPgo+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVk
+dQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
