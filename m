@@ -1,91 +1,218 @@
 From: Xie XiuQi <xiexiuqi@huawei.com>
-Subject: [PATCH v3 6/8] arm64: RAS: add ras extension runtime detection
-Date: Thu, 30 Mar 2017 18:31:15 +0800
-Message-ID: <1490869877-118713-16-git-send-email-xiexiuqi@huawei.com>
+Subject: [PATCH v3 4/8] APEI: GHES: reserve a virtual page for SEI context
+Date: Thu, 30 Mar 2017 18:31:13 +0800
+Message-ID: <1490869877-118713-14-git-send-email-xiexiuqi@huawei.com>
 References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 520D940C51
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 06:32:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id cxxG5TFAIpKA for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Mar 2017 06:32:51 -0400 (EDT)
+Received: from dggrg03-dlp.huawei.com (unknown [45.249.212.189])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4389C40C4A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 06:32:49 -0400 (EDT)
 In-Reply-To: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, fu.wei@linaro.org, rostedt@goodmis.org, hanjun.guo@linaro.org, shiju.jose@huawei.com
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, gengdongjiu@huawei.com, zhengqiang10@huawei.com, wuquanming@huawei.com, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com
+Cc: wuquanming@huawei.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com, wangxiongfeng2@huawei.com, linux-acpi@vger.kernel.org, zhengqiang10@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-According to <<RAS Extension PRD03>> document, we add RAS extension
-feature runtime detection, which would be used for error recovery
-in the future.
+On arm64 platform, SEI may interrupt code which had interrupts masked.
+But SEI could be masked, so it's not treated as NMI, however SEA is
+treated as NMI.
+
+So, the  memory area used to transfer hardware error information from
+BIOS to Linux can be determined only in NMI, SEI(arm64), IRQ or timer
+handler.
+
+In this patch, we add a virtual page for SEI context.
 
 Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
-Reviewed-by: Kefeng Wang <wangkefeng.wang@huawei.com>
 ---
- arch/arm64/include/asm/cpucaps.h |  3 ++-
- arch/arm64/include/asm/sysreg.h  |  2 ++
- arch/arm64/kernel/cpufeature.c   | 11 +++++++++++
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ drivers/acpi/apei/ghes.c | 98 +++++++++++++++++++++++-------------------------
+ 1 file changed, 47 insertions(+), 51 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index fb78a5d..3847cf8 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -37,7 +37,8 @@
- #define ARM64_HAS_NO_FPSIMD			16
- #define ARM64_WORKAROUND_REPEAT_TLBI		17
- #define ARM64_WORKAROUND_QCOM_FALKOR_E1003	18
-+#define ARM64_HAS_RAS_EXTN			19
+diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+index 045d101..b1f9b1f 100644
+--- a/drivers/acpi/apei/ghes.c
++++ b/drivers/acpi/apei/ghes.c
+@@ -108,26 +108,33 @@
  
--#define ARM64_NCAPS				19
-+#define ARM64_NCAPS				20
+ /*
+  * Because the memory area used to transfer hardware error information
+- * from BIOS to Linux can be determined only in NMI, IRQ or timer
+- * handler, but general ioremap can not be used in atomic context, so
+- * a special version of atomic ioremap is implemented for that.
++ * from BIOS to Linux can be determined only in NMI, SEI (ARM64), IRQ or
++ * timer handler, but general ioremap can not be used in atomic context,
++ * so a special version of atomic ioremap is implemented for that.
+  */
  
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index ac24b6e..32964c7 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -157,6 +157,7 @@
- #define ID_AA64ISAR0_AES_SHIFT		4
+ /*
+- * Two virtual pages are used, one for IRQ/PROCESS context, the other for
+- * NMI context (optionally).
++ * 3 virtual pages are used, one for IRQ/PROCESS context, one for SEI
++ * (on ARM64 platform), and the other for NMI context (optionally).
+  */
++#ifdef CONFIG_ACPI_APEI_SEI
++#define GHES_IOREMAP_PAGES           3
++#define GHES_IOREMAP_SEI_PAGE(base)	((base) + PAGE_SIZE*2)
++#else
+ #define GHES_IOREMAP_PAGES           2
++#endif
++
+ #define GHES_IOREMAP_IRQ_PAGE(base)	(base)
+ #define GHES_IOREMAP_NMI_PAGE(base)	((base) + PAGE_SIZE)
  
- /* id_aa64pfr0 */
-+#define ID_AA64PFR0_RAS_SHIFT		28
- #define ID_AA64PFR0_GIC_SHIFT		24
- #define ID_AA64PFR0_ASIMD_SHIFT		20
- #define ID_AA64PFR0_FP_SHIFT		16
-@@ -165,6 +166,7 @@
- #define ID_AA64PFR0_EL1_SHIFT		4
- #define ID_AA64PFR0_EL0_SHIFT		0
+ /* virtual memory area for atomic ioremap */
+ static struct vm_struct *ghes_ioremap_area;
+ /*
+- * These 2 spinlock is used to prevent atomic ioremap virtual memory
++ * These 3 spinlock is used to prevent atomic ioremap virtual memory
+  * area from being mapped simultaneously.
+  */
+ static DEFINE_RAW_SPINLOCK(ghes_ioremap_lock_nmi);
++static DEFINE_SPINLOCK(ghes_ioremap_lock_sei);
+ static DEFINE_SPINLOCK(ghes_ioremap_lock_irq);
  
-+#define ID_AA64PFR0_RAS_V1		0x1
- #define ID_AA64PFR0_FP_NI		0xf
- #define ID_AA64PFR0_FP_SUPPORTED	0x0
- #define ID_AA64PFR0_ASIMD_NI		0xf
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index abda8e8..b0fb81e 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -98,6 +98,7 @@
- };
+ static struct gen_pool *ghes_estatus_pool;
+@@ -155,54 +162,55 @@ static void ghes_ioremap_exit(void)
+ 	free_vm_area(ghes_ioremap_area);
+ }
  
- static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_RAS_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_GIC_SHIFT, 4, 0),
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
-@@ -860,6 +861,16 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
- 		.min_field_value = 0,
- 		.matches = has_no_fpsimd,
- 	},
-+	{
-+		.desc = "ARM64 RAS Extension Support",
-+		.capability = ARM64_HAS_RAS_EXTN,
-+		.def_scope = SCOPE_SYSTEM,
-+		.matches = has_cpuid_feature,
-+		.sys_reg = SYS_ID_AA64PFR0_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64PFR0_RAS_SHIFT,
-+		.min_field_value = ID_AA64PFR0_RAS_V1,
-+	},
- 	{},
- };
+-static void __iomem *ghes_ioremap_pfn_nmi(u64 pfn)
++static void __iomem *ghes_ioremap_pfn(u64 pfn)
+ {
+-	unsigned long vaddr;
++	unsigned long vaddr, flags = 0;
+ 	phys_addr_t paddr;
+ 	pgprot_t prot;
+ 
+-	vaddr = (unsigned long)GHES_IOREMAP_NMI_PAGE(ghes_ioremap_area->addr);
+-
+-	paddr = pfn << PAGE_SHIFT;
+-	prot = arch_apei_get_mem_attribute(paddr);
+-	ioremap_page_range(vaddr, vaddr + PAGE_SIZE, paddr, prot);
+-
+-	return (void __iomem *)vaddr;
+-}
+-
+-static void __iomem *ghes_ioremap_pfn_irq(u64 pfn)
+-{
+-	unsigned long vaddr, paddr;
+-	pgprot_t prot;
+-
+-	vaddr = (unsigned long)GHES_IOREMAP_IRQ_PAGE(ghes_ioremap_area->addr);
++	if (in_nmi()) {
++		raw_spin_lock(&ghes_ioremap_lock_nmi);
++		vaddr = (unsigned long)GHES_IOREMAP_NMI_PAGE(ghes_ioremap_area->addr);
++	} else if (this_cpu_read(sei_in_process)) {
++		spin_lock_irqsave(&ghes_ioremap_lock_sei, flags);
++		vaddr = (unsigned long)GHES_IOREMAP_SEI_PAGE(ghes_ioremap_area->addr);
++	} else {
++		spin_lock_irqsave(&ghes_ioremap_lock_irq, flags);
++		vaddr = (unsigned long)GHES_IOREMAP_IRQ_PAGE(ghes_ioremap_area->addr);
++	}
+ 
+ 	paddr = pfn << PAGE_SHIFT;
+ 	prot = arch_apei_get_mem_attribute(paddr);
+-
+ 	ioremap_page_range(vaddr, vaddr + PAGE_SIZE, paddr, prot);
+ 
+ 	return (void __iomem *)vaddr;
+ }
+ 
+-static void ghes_iounmap_nmi(void __iomem *vaddr_ptr)
++static void ghes_iounmap(void __iomem *vaddr_ptr)
+ {
+ 	unsigned long vaddr = (unsigned long __force)vaddr_ptr;
+ 	void *base = ghes_ioremap_area->addr;
++	unsigned long page, flags = 0;
++
++	if (in_nmi()) {
++		page = (unsigned long)GHES_IOREMAP_NMI_PAGE(base);
++	} else if (this_cpu_read(sei_in_process)) {
++		page = (unsigned long)GHES_IOREMAP_SEI_PAGE(base);
++	} else {
++		page = (unsigned long)GHES_IOREMAP_IRQ_PAGE(base);
++	}
+ 
+-	BUG_ON(vaddr != (unsigned long)GHES_IOREMAP_NMI_PAGE(base));
++	BUG_ON(vaddr != page);
+ 	unmap_kernel_range_noflush(vaddr, PAGE_SIZE);
+ 	arch_apei_flush_tlb_one(vaddr);
+-}
+-
+-static void ghes_iounmap_irq(void __iomem *vaddr_ptr)
+-{
+-	unsigned long vaddr = (unsigned long __force)vaddr_ptr;
+-	void *base = ghes_ioremap_area->addr;
+ 
+-	BUG_ON(vaddr != (unsigned long)GHES_IOREMAP_IRQ_PAGE(base));
+-	unmap_kernel_range_noflush(vaddr, PAGE_SIZE);
+-	arch_apei_flush_tlb_one(vaddr);
++	if (in_nmi()) {
++		raw_spin_unlock(&ghes_ioremap_lock_nmi);
++	} else if (this_cpu_read(sei_in_process)) {
++		spin_unlock_irqrestore(&ghes_ioremap_lock_sei, flags);
++	} else {
++		spin_unlock_irqrestore(&ghes_ioremap_lock_irq, flags);
++	}
+ }
+ 
+ static int ghes_estatus_pool_init(void)
+@@ -327,20 +335,13 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
+ 				  int from_phys)
+ {
+ 	void __iomem *vaddr;
+-	unsigned long flags = 0;
+-	int in_nmi = in_nmi();
+ 	u64 offset;
+ 	u32 trunk;
+ 
+ 	while (len > 0) {
+ 		offset = paddr - (paddr & PAGE_MASK);
+-		if (in_nmi) {
+-			raw_spin_lock(&ghes_ioremap_lock_nmi);
+-			vaddr = ghes_ioremap_pfn_nmi(paddr >> PAGE_SHIFT);
+-		} else {
+-			spin_lock_irqsave(&ghes_ioremap_lock_irq, flags);
+-			vaddr = ghes_ioremap_pfn_irq(paddr >> PAGE_SHIFT);
+-		}
++		vaddr = ghes_ioremap_pfn(paddr >> PAGE_SHIFT);
++
+ 		trunk = PAGE_SIZE - offset;
+ 		trunk = min(trunk, len);
+ 		if (from_phys)
+@@ -350,13 +351,8 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
+ 		len -= trunk;
+ 		paddr += trunk;
+ 		buffer += trunk;
+-		if (in_nmi) {
+-			ghes_iounmap_nmi(vaddr);
+-			raw_spin_unlock(&ghes_ioremap_lock_nmi);
+-		} else {
+-			ghes_iounmap_irq(vaddr);
+-			spin_unlock_irqrestore(&ghes_ioremap_lock_irq, flags);
+-		}
++
++		ghes_iounmap(vaddr);
+ 	}
+ }
  
 -- 
 1.8.3.1
