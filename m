@@ -1,185 +1,232 @@
 From: Xie XiuQi <xiexiuqi@huawei.com>
-Subject: [PATCH v3 1/8] trace: ras: add ARM processor error information trace
- event
-Date: Thu, 30 Mar 2017 18:31:10 +0800
-Message-ID: <1490869877-118713-11-git-send-email-xiexiuqi@huawei.com>
+Subject: [PATCH v3 8/8] arm64: exception: check shared writable page in SEI
+ handler
+Date: Thu, 30 Mar 2017 18:31:17 +0800
+Message-ID: <1490869877-118713-18-git-send-email-xiexiuqi@huawei.com>
 References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DCA740A7F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 06:33:38 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id TBqJnOB6vlEG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Mar 2017 06:33:37 -0400 (EDT)
+Received: from dggrg01-dlp.huawei.com (unknown [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 261A940190
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 06:33:35 -0400 (EDT)
 In-Reply-To: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, fu.wei@linaro.org, rostedt@goodmis.org, hanjun.guo@linaro.org, shiju.jose@huawei.com
-Cc: wuquanming@huawei.com, kvm@vger.kernel.org, xiexiuqi@huawei.com, Tyler Baicar <tbaicar@codeaurora.org>, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com, wangxiongfeng2@huawei.com, linux-acpi@vger.kernel.org, zhengqiang10@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: wuquanming@huawei.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com, wangxiongfeng2@huawei.com, linux-acpi@vger.kernel.org, Wang Xiongfeng <wangxiongfengi2@huawei.com>, zhengqiang10@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a new trace event for ARM processor error information, so that
-the user will know what error occurred. With this information the
-user may take appropriate action.
+From: Wang Xiongfeng <wangxiongfeng2@huawei.com>
 
-These trace events are consistent with the ARM processor error
-information table which defined in UEFI 2.6 spec section N.2.4.4.1.
+Since SEI is asynchronous, the error data has been consumed. So we must
+suppose that all the memory data current process can write are
+contaminated. If the process doesn't have shared writable pages, the
+process will be killed, and the system will continue running normally.
+Otherwise, the system must be terminated, because the error has been
+propagated to other processes running on other cores, and recursively
+the error may be propagated to several another processes.
 
----
-v2: add trace enabled condition as Steven's suggestion.
-    fix a typo.
----
-
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Tyler Baicar <tbaicar@codeaurora.org>
+Signed-off-by: Wang Xiongfeng <wangxiongfengi2@huawei.com>
 Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
 ---
- drivers/acpi/apei/ghes.c | 10 ++++++
- include/linux/cper.h     |  5 +++
- include/ras/ras_event.h  | 87 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 102 insertions(+)
+ arch/arm64/kernel/traps.c | 149 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 144 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 81eabc6..6be0333 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -518,9 +518,19 @@ static void ghes_do_proc(struct ghes *ghes,
- 		else if (!uuid_le_cmp(sec_type, CPER_SEC_PROC_ARM) &&
- 			 trace_arm_event_enabled()) {
- 			struct cper_sec_proc_arm *arm_err;
-+			struct cper_arm_err_info *err_info;
-+			int i;
+diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+index 99be6d8..b222589 100644
+--- a/arch/arm64/kernel/traps.c
++++ b/arch/arm64/kernel/traps.c
+@@ -34,6 +34,8 @@
+ #include <linux/sched/task_stack.h>
+ #include <linux/syscalls.h>
+ #include <linux/mm_types.h>
++#include <linux/swap.h>
++#include <linux/swapops.h>
  
- 			arm_err = acpi_hest_generic_data_payload(gdata);
- 			trace_arm_event(arm_err);
-+
-+			if (trace_arm_proc_err_enabled()) {
-+				err_info = (struct cper_arm_err_info *)(arm_err + 1);
-+				for (i = 0; i < arm_err->err_info_num; i++) {
-+					trace_arm_proc_err(err_info);
-+					err_info += 1;
-+				}
-+			}
- 		} else if (trace_unknown_sec_event_enabled()) {
- 			void *unknown_err = acpi_hest_generic_data_payload(gdata);
- 			trace_unknown_sec_event(&sec_type,
-diff --git a/include/linux/cper.h b/include/linux/cper.h
-index 85450f3..0cae900 100644
---- a/include/linux/cper.h
-+++ b/include/linux/cper.h
-@@ -270,6 +270,11 @@ enum {
- #define CPER_ARM_INFO_VALID_VIRT_ADDR		0x0008
- #define CPER_ARM_INFO_VALID_PHYSICAL_ADDR	0x0010
+ #include <asm/atomic.h>
+ #include <asm/bug.h>
+@@ -662,7 +664,144 @@ asmlinkage void bad_mode(struct pt_regs *regs, int reason, unsigned int esr)
+ 	[ESR_ELx_AET_CE]	=	"Corrected",
+ };
  
-+#define CPER_ARM_INFO_TYPE_CACHE		0
-+#define CPER_ARM_INFO_TYPE_TLB			1
-+#define CPER_ARM_INFO_TYPE_BUS			2
-+#define CPER_ARM_INFO_TYPE_UARCH		3
++static void shared_writable_pte_entry(pte_t *pte, unsigned long addr,
++				struct mm_walk *walk)
++{
++	int *is_shared_writable = walk->private;
++	struct vm_area_struct *vma = walk->vma;
++	struct page *page = NULL;
++	int mapcount = -1;
 +
- #define CPER_ARM_INFO_FLAGS_FIRST		0x0001
- #define CPER_ARM_INFO_FLAGS_LAST		0x0002
- #define CPER_ARM_INFO_FLAGS_PROPAGATED		0x0004
-diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
-index 13befad..026b094 100644
---- a/include/ras/ras_event.h
-+++ b/include/ras/ras_event.h
-@@ -206,6 +206,93 @@
- 		  __entry->running_state, __entry->psci_state)
- );
- 
-+#define ARM_PROC_ERR_TYPE	\
-+	EM ( CPER_ARM_INFO_TYPE_CACHE, "cache error" )	\
-+	EM ( CPER_ARM_INFO_TYPE_TLB,  "TLB error" )	\
-+	EM ( CPER_ARM_INFO_TYPE_BUS, "bus error" )	\
-+	EMe ( CPER_ARM_INFO_TYPE_UARCH, "micro-architectural error" )
++	if (!pte_write(__pte(pgprot_val(vma->vm_page_prot))))
++		return;
 +
-+#define ARM_PROC_ERR_FLAGS	\
-+	EM ( CPER_ARM_INFO_FLAGS_FIRST, "First error captured" )	\
-+	EM ( CPER_ARM_INFO_FLAGS_LAST,  "Last error captured" )	\
-+	EM ( CPER_ARM_INFO_FLAGS_PROPAGATED, "Propagated" )	\
-+	EMe ( CPER_ARM_INFO_FLAGS_OVERFLOW, "Overflow" )
++	if (pte_present(*pte)) {
++		page = vm_normal_page(vma, addr, *pte);
++	} else if (is_swap_pte(*pte)) {
++		swp_entry_t swpent = pte_to_swp_entry(*pte);
++
++		if (!non_swap_entry(swpent))
++			mapcount = swp_swapcount(swpent);
++		else if (is_migration_entry(swpent))
++			page = migration_entry_to_page(swpent);
++	}
++
++	if (mapcount == -1 && page)
++		mapcount = page_mapcount(page);
++	if (mapcount >= 2)
++		*is_shared_writable = 1;
++}
++
++static void shared_writable_pmd_entry(pmd_t *pmd, unsigned long addr,
++				struct mm_walk *walk)
++{
++	struct page *page;
++	int mapcount;
++	int *is_shared_writable = walk->private;
++
++	if (!pmd_write(*pmd))
++		return;
++
++	page = pmd_page(*pmd);
++	if (page) {
++		mapcount = page_mapcount(page);
++		if (mapcount >= 2)
++			*is_shared_writable = 1;
++	}
++}
++
++static int shared_writable_pte_range(pmd_t *pmd, unsigned long addr,
++				unsigned long end, struct mm_walk *walk)
++{
++	pte_t *pte;
++
++	if (pmd_trans_huge(*pmd)) {
++		shared_writable_pmd_entry(pmd, addr, walk);
++		return 0;
++	}
++
++	if (pmd_trans_unstable(pmd))
++		return 0;
++
++	pte = pte_offset_map(pmd, addr);
++	for (; addr != end; pte++, addr += PAGE_SIZE)
++	shared_writable_pte_entry(pte, addr, walk);
++	return 0;
++}
++
++#ifdef CONFIG_HUGETLB_PAGE
++static int shared_writable_hugetlb_range(pte_t *pte, unsigned long hmask,
++					unsigned long addr, unsigned long end,
++					struct mm_walk *walk)
++{
++	struct vm_area_struct *vma = walk->vma;
++	int *is_shared_writable = walk->private;
++	struct page *page = NULL;
++	int mapcount;
++
++	if (!pte_write(*pte))
++		return 0;
++
++	if (pte_present(*pte)) {
++		page = vm_normal_page(vma, addr, *pte);
++	} else if (is_swap_pte(*pte)) {
++		swp_entry_t swpent = pte_to_swp_entry(*pte);
++
++		if (is_migration_entry(swpent))
++			page = migration_entry_to_page(swpent);
++	}
++
++	if (page) {
++		mapcount = page_mapcount(page);
++
++		if (mapcount >= 2)
++			*is_shared_writable = 1;
++	}
++	return 0;
++}
++#endif
 +
 +/*
-+ * First define the enums in MM_ACTION_RESULT to be exported to userspace
-+ * via TRACE_DEFINE_ENUM().
++ *Check whether there exists a page in mm_struct which is shared with other
++ process and writable (not COW) at the same time. 0 means existing such a page.
 + */
-+#undef EM
-+#undef EMe
-+#define EM(a, b) TRACE_DEFINE_ENUM(a);
-+#define EMe(a, b)	TRACE_DEFINE_ENUM(a);
++int mm_shared_writable(struct mm_struct *mm)
++{
++	struct vm_area_struct *vma;
++	int is_shared_writable = 0;
++	struct mm_walk shared_writable_walk = {
++		.pmd_entry = shared_writable_pte_range,
++#ifdef CONFIG_HUGETLB_PAGE
++		.hugetlb_entry = shared_writable_hugetlb_range,
++#endif
++		.mm = mm,
++		.private = &is_shared_writable,
++	};
 +
-+ARM_PROC_ERR_TYPE
-+ARM_PROC_ERR_FLAGS
++	if (!mm)
++		return -EPERM;
++
++	vma = mm->mmap;
++	while (vma) {
++		walk_page_vma(vma, &shared_writable_walk);
++		if (is_shared_writable)
++			return 1;
++		vma = vma->vm_next;
++	}
++	return 0;
++}
++
+ DEFINE_PER_CPU(int, sei_in_process);
 +
 +/*
-+ * Now redefine the EM() and EMe() macros to map the enums to the strings
-+ * that will be printed in the output.
++ * Since SEI is asynchronous, the error data has been consumed. So we must
++ * suppose that all the memory data current process can write are
++ * contaminated. If the process doesn't have shared writable pages, the
++ * process will be killed, and the system will continue running normally.
++ * Otherwise, the system must be terminated, because the error has been
++ * propagated to other processes running on other cores, and recursively
++ * the error may be propagated to several another processes.
 + */
-+#undef EM
-+#undef EMe
-+#define EM(a, b)		{ a, b },
-+#define EMe(a, b)	{ a, b }
-+
-+TRACE_EVENT(arm_proc_err,
-+
-+	TP_PROTO(const struct cper_arm_err_info *err),
-+
-+	TP_ARGS(err),
-+
-+	TP_STRUCT__entry(
-+		__field(u8, type)
-+		__field(u16, multiple_error)
-+		__field(u8, flags)
-+		__field(u64, error_info)
-+		__field(u64, virt_fault_addr)
-+		__field(u64, physical_fault_addr)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->type = err->type;
-+
-+		if (err->validation_bits & CPER_ARM_INFO_VALID_MULTI_ERR)
-+			__entry->multiple_error = err->multiple_error;
-+		else
-+			__entry->multiple_error = ~0;
-+
-+		if (err->validation_bits & CPER_ARM_INFO_VALID_FLAGS)
-+			__entry->flags = err->flags;
-+		else
-+			__entry->flags = ~0;
-+
-+		if (err->validation_bits & CPER_ARM_INFO_VALID_ERR_INFO)
-+			__entry->error_info = err->error_info;
-+		else
-+			__entry->error_info = 0ULL;
-+
-+		if (err->validation_bits & CPER_ARM_INFO_VALID_VIRT_ADDR)
-+			__entry->virt_fault_addr = err->virt_fault_addr;
-+		else
-+			__entry->virt_fault_addr = 0ULL;
-+
-+		if (err->validation_bits & CPER_ARM_INFO_VALID_PHYSICAL_ADDR)
-+			__entry->physical_fault_addr = err->physical_fault_addr;
-+		else
-+			__entry->physical_fault_addr = 0ULL;
-+	),
-+
-+	TP_printk("ARM Processor Error: type %s; count: %u; flags: %s;"
-+		  " error info: %016llx; virtual address: %016llx;"
-+		  " physical address: %016llx",
-+		  __print_symbolic(__entry->type, ARCH_PROC_ERR_TYPE),
-+		  __entry->multiple_error,
-+		  __print_symbolic(__entry->flags, ARCH_PROC_ERR_FLAGS),
-+		  __entry->error_info, __entry->virt_fault_addr,
-+		  __entry->physical_fault_addr)
-+);
-+
- /*
-  * Unknown Section Report
-  *
+ asmlinkage void do_sei(struct pt_regs *regs, unsigned int esr, int el)
+ {
+ 	int aet = ESR_ELx_AET(esr);
+@@ -684,16 +823,16 @@ asmlinkage void do_sei(struct pt_regs *regs, unsigned int esr, int el)
+ 	if (el == 0 && IS_ENABLED(CONFIG_ARM64_ESB) &&
+ 	    cpus_have_cap(ARM64_HAS_RAS_EXTN)) {
+ 		siginfo_t info;
+-		void __user *pc = (void __user *)instruction_pointer(regs);
+ 
+ 		if (aet >= ESR_ELx_AET_UEO)
+ 			return;
+ 
+-		if (aet == ESR_ELx_AET_UEU) {
+-			info.si_signo = SIGILL;
++		if (aet == ESR_ELx_AET_UEU &&
++		    !mm_shared_writable(current->mm)) {
++			info.si_signo = SIGKILL;
+ 			info.si_errno = 0;
+-			info.si_code  = ILL_ILLOPC;
+-			info.si_addr  = pc;
++			info.si_code = 0;
++			info.si_addr = 0;
+ 
+ 			current->thread.fault_address = 0;
+ 			current->thread.fault_code = 0;
 -- 
 1.8.3.1
