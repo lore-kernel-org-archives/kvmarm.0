@@ -1,256 +1,96 @@
-From: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: host stalls when qemu-system-aarch64 with kvm and pflash
-Date: Thu, 30 Mar 2017 18:47:26 +0200
-Message-ID: <62b3784e-4c10-cf42-f2d2-285d314b23cd@redhat.com>
-References: <CAC8NTUUWuH4k7SZSus_hz6a6V+OLGYUFcSOUwVbji2YDAZbVdQ@mail.gmail.com>
- <20170328201623.GD20211@cbox>
- <CAC8NTUVPoH=ZiJ51EoOLPKhsyGKo5iszkhHzb5K8Heax3n2KuA@mail.gmail.com>
- <20170329185630.GA4908@cbox>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC9A640966
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 12:45:33 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0K7qcOLNowBN for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Mar 2017 12:45:32 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06EA440190
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 12:45:30 -0400 (EDT)
-In-Reply-To: <20170329185630.GA4908@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>, Radha Mohan <mohun106@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: KVM/ARM: sleeping function called from invalid context
+Date: Thu, 30 Mar 2017 18:36:07 +0100
+Message-ID: <1490895367-10547-1-git-send-email-suzuki.poulose@arm.com>
+References: <7047d954-5c43-600a-3511-4c7dbd60c175@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <7047d954-5c43-600a-3511-4c7dbd60c175@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: marc.zyngier@arm.com, mark.rutland@arm.com, peterz@infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Arnd Bergmann <arnd@arndb.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/29/17 20:56, Christoffer Dall wrote:
-> On Tue, Mar 28, 2017 at 01:24:15PM -0700, Radha Mohan wrote:
->> On Tue, Mar 28, 2017 at 1:16 PM, Christoffer Dall <cdall@linaro.org> wrote:
->>> Hi Radha,
->>>
->>> On Tue, Mar 28, 2017 at 12:58:24PM -0700, Radha Mohan wrote:
->>>> Hi,
->>>> I am seeing an issue with qemu-system-aarch64 when using pflash
->>>> (booting kernel via UEFI bios).
->>>>
->>>> Host kernel: 4.11.0-rc3-next-20170323
->>>> Qemu version: v2.9.0-rc1
->>>>
->>>> Command used:
->>>> ./aarch64-softmmu/qemu-system-aarch64 -cpu host -enable-kvm -M
->>>> virt,gic_version=3 -nographic -smp 1 -m 2048 -drive
->>>> if=none,id=hd0,file=/root/zesty-server-cloudimg-arm64.img,id=0 -device
->>>> virtio-blk-device,drive=hd0 -pflash /root/flash0.img -pflash
->>>> /root/flash1.img
->>>>
->>>>
->>>> As soon as the guest kernel boots the host starts to stall and prints
->>>> the below messages. And the system never recovers. I can neither
->>>> poweroff the guest nor the host. So I have resort to external power
->>>> reset of the host.
->>>>
->>>> ==================
->>>> [  116.199077] NMI watchdog: BUG: soft lockup - CPU#25 stuck for 23s!
->>>> [kworker/25:1:454]
->>>> [  116.206901] Modules linked in: binfmt_misc nls_iso8859_1 aes_ce_blk
->>>> shpchp crypto_simd gpio_keys cryptd aes_ce_cipher ghash_ce sha2_ce
->>>> sha1_ce uio_pdrv_genirq uio autofs4 btrfs raid10 rai
->>>> d456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor
->>>> raid6_pq libcrc32c raid1 raid0 multipath linear ast i2c_algo_bit ttm
->>>> drm_kms_helper syscopyarea sysfillrect sysimgblt fb_s
->>>> ys_fops drm nicvf ahci nicpf libahci thunder_bgx thunder_xcv
->>>> mdio_thunder mdio_cavium
->>>>
->>>> [  116.206995] CPU: 25 PID: 454 Comm: kworker/25:1 Not tainted
->>>> 4.11.0-rc3-next-20170323 #1
->>>> [  116.206997] Hardware name: www.cavium.com crb-1s/crb-1s, BIOS 0.3 Feb 23 2017
->>>> [  116.207010] Workqueue: events netstamp_clear
->>>> [  116.207015] task: ffff801f906b5400 task.stack: ffff801f901a4000
->>>> [  116.207020] PC is at smp_call_function_many+0x284/0x2e8
->>>> [  116.207023] LR is at smp_call_function_many+0x244/0x2e8
->>>> [  116.207026] pc : [<ffff000008156ecc>] lr : [<ffff000008156e8c>]
->>>> pstate: 80000145
->>>> [  116.207028] sp : ffff801f901a7be0
->>>> [  116.207030] x29: ffff801f901a7be0 x28: ffff000009139000
->>>> [  116.207036] x27: ffff000009139434 x26: 0000000000000080
->>>> [  116.207041] x25: 0000000000000000 x24: ffff0000081565d0
->>>> [  116.207047] x23: 0000000000000001 x22: ffff000008e11e00
->>>> [  116.207052] x21: ffff801f6d5cff00 x20: ffff801f6d5cff08
->>>> [  116.207057] x19: ffff000009138e38 x18: 0000000000000a03
->>>> [  116.207063] x17: 0000ffffb77c9028 x16: ffff0000082e81d8
->>>> [  116.207068] x15: 00003d0d6dd44d08 x14: 0036312196549b4a
->>>> [  116.207073] x13: 0000000058dabe4c x12: 0000000000000018
->>>> [  116.207079] x11: 00000000366e2f04 x10: 00000000000009f0
->>>> [  116.207084] x9 : ffff801f901a7d30 x8 : 0000000000000002
->>>> [  116.207089] x7 : 0000000000000000 x6 : 0000000000000000
->>>> [  116.207095] x5 : ffffffff00000000 x4 : 0000000000000020
->>>> [  116.207100] x3 : 0000000000000020 x2 : 0000000000000000
->>>> [  116.207105] x1 : ffff801f6d682578 x0 : 0000000000000003
->>>>
->>>> [  150.443116] INFO: rcu_sched self-detected stall on CPU
->>>> [  150.448261]  25-...: (14997 ticks this GP)
->>>> idle=47a/140000000000001/0 softirq=349/349 fqs=7495
->>>> [  150.451115] INFO: rcu_sched detected stalls on CPUs/tasks:
->>>> [  150.451123]  25-...: (14997 ticks this GP)
->>>> idle=47a/140000000000001/0 softirq=349/349 fqs=7495
->>>> [  150.451124]  (detected by 13, t=15002 jiffies, g=805, c=804, q=8384)
->>>> [  150.451136] Task dump for CPU 25:
->>>> [  150.451138] kworker/25:1    R  running task        0   454      2 0x00000002
->>>> [  150.451155] Workqueue: events netstamp_clear
->>>> [  150.451158] Call trace:
->>>> [  150.451164] [<ffff000008086188>] __switch_to+0x90/0xa8
->>>> [  150.451172] [<ffff0000081f6240>] static_key_slow_inc+0x128/0x138
->>>> [  150.451175] [<ffff0000081f6284>] static_key_enable+0x34/0x60
->>>> [  150.451178] [<ffff000008843268>] netstamp_clear+0x68/0x80
->>>> [  150.451181] [<ffff0000080e49a0>] process_one_work+0x158/0x478
->>>> [  150.451183] [<ffff0000080e4d10>] worker_thread+0x50/0x4a8
->>>> [  150.451187] [<ffff0000080ebd78>] kthread+0x108/0x138
->>>> [  150.451190] [<ffff0000080836c0>] ret_from_fork+0x10/0x50
->>>> [  150.477451]   (t=15008 jiffies g=805 c=804 q=8384)
->>>> [  150.482242] Task dump for CPU 25:
->>>> [  150.482245] kworker/25:1    R  running task        0   454      2 0x00000002
->>>> [  150.482259] Workqueue: events netstamp_clear
->>>> [  150.482264] Call trace:
->>>> [  150.482271] [<ffff00000808a530>] dump_backtrace+0x0/0x2b0
->>>> [  150.482277] [<ffff00000808a804>] show_stack+0x24/0x30
->>>> [  150.482281] [<ffff0000080fb750>] sched_show_task+0x128/0x178
->>>> [  150.482285] [<ffff0000080fd298>] dump_cpu_task+0x48/0x58
->>>> [  150.482288] [<ffff0000081f81e4>] rcu_dump_cpu_stacks+0xa0/0xe8
->>>> [  150.482297] [<ffff00000813983c>] rcu_check_callbacks+0x774/0x938
->>>> [  150.482305] [<ffff00000813fcb4>] update_process_times+0x34/0x60
->>>> [  150.482314] [<ffff000008151b80>] tick_sched_handle.isra.7+0x38/0x70
->>>> [  150.482319] [<ffff000008151c04>] tick_sched_timer+0x4c/0x98
->>>> [  150.482324] [<ffff000008140510>] __hrtimer_run_queues+0xd8/0x2b8
->>>> [  150.482328] [<ffff000008141180>] hrtimer_interrupt+0xa8/0x228
->>>> [  150.482334] [<ffff0000087f2a2c>] arch_timer_handler_phys+0x3c/0x50
->>>> [  150.482341] [<ffff00000812c194>] handle_percpu_devid_irq+0x8c/0x230
->>>> [  150.482344] [<ffff000008126174>] generic_handle_irq+0x34/0x50
->>>> [  150.482347] [<ffff000008126898>] __handle_domain_irq+0x68/0xc0
->>>> [  150.482351] [<ffff0000080817e4>] gic_handle_irq+0xc4/0x170
->>>> [  150.482356] Exception stack(0xffff801f901a7ab0 to 0xffff801f901a7be0)
->>>> [  150.482360] 7aa0:
->>>> 0000000000000003 ffff801f6d682578
->>>> [  150.482364] 7ac0: 0000000000000000 0000000000000020
->>>> 0000000000000020 ffffffff00000000
->>>> [  150.482367] 7ae0: 0000000000000000 0000000000000000
->>>> 0000000000000002 ffff801f901a7d30
->>>> [  150.482371] 7b00: 00000000000009f0 00000000366e2f04
->>>> 0000000000000018 0000000058dabe4c
->>>> [  150.482375] 7b20: 0036312196549b4a 00003d0d6dd44d08
->>>> ffff0000082e81d8 0000ffffb77c9028
->>>> [  150.482378] 7b40: 0000000000000a03 ffff000009138e38
->>>> ffff801f6d5cff08 ffff801f6d5cff00
->>>> [  150.482382] 7b60: ffff000008e11e00 0000000000000001
->>>> ffff0000081565d0 0000000000000000
->>>> [  150.482386] 7b80: 0000000000000080 ffff000009139434
->>>> ffff000009139000 ffff801f901a7be0
->>>> [  150.482390] 7ba0: ffff000008156e8c ffff801f901a7be0
->>>> ffff000008156ecc 0000000080000145
->>>> [  150.482394] 7bc0: ffff801f901a7be0 ffff000008156e68
->>>> ffffffffffffffff ffff000008156e8c
->>>> [  150.482397] [<ffff000008082ff4>] el1_irq+0xb4/0x140
->>>> [  150.482401] [<ffff000008156ecc>] smp_call_function_many+0x284/0x2e8
->>>> [  150.482405] [<ffff000008157020>] kick_all_cpus_sync+0x30/0x38
->>>> [  150.482409] [<ffff00000897c6cc>] aarch64_insn_patch_text+0xec/0xf8
->>>> [  150.482415] [<ffff000008095978>] arch_jump_label_transform+0x60/0x98
->>>> [  150.482420] [<ffff0000081f593c>] __jump_label_update+0x8c/0xa8
->>>> [  150.482423] [<ffff0000081f6088>] jump_label_update+0x58/0xe8
->>>> [  150.482429] [<ffff0000081f6240>] static_key_slow_inc+0x128/0x138
->>>> [  150.482434] [<ffff0000081f6284>] static_key_enable+0x34/0x60
->>>> [  150.482438] [<ffff000008843268>] netstamp_clear+0x68/0x80
->>>> [  150.482441] [<ffff0000080e49a0>] process_one_work+0x158/0x478
->>>> [  150.482444] [<ffff0000080e4d10>] worker_thread+0x50/0x4a8
->>>> [  150.482448] [<ffff0000080ebd78>] kthread+0x108/0x138
->>>> [  150.482451] [<ffff0000080836c0>] ret_from_fork+0x10/0x50
->>>>
->>>> ====================================
->>>>
->>>> I am observing that this usually happens when the guest tries to
->>>> bringup or use the default virtio-net interface.
->>>> And I am unable to reproduce this when directly booting the guest
->>>> kernel without UEFI BIOS.
->>>> So anyone observed similar issue ?
->>>>
->>>
->>> I haven't seen this myself.
->>>
->>> Have you tried with other versions of QEMU and the host kernel by any
->>> chance using the same setup?
->>
->> The earlier qemu version (atleast 2.5 which is default on ubuntu
->> 16.04) have different issue. The same thing happens when I use
->> vhost=on but without vhost and with virtio-net didn't see the issue.
->> The Armband folks have also reported the vhost issue here
->> https://bugs.launchpad.net/ubuntu/+source/edk2/+bug/1673564
-> 
-> So I just ran your setup using the flash emulation on the ThunderX in
-> packet.net and my host is happily continuing to run hackbench.
-> 
->>
->> So I am beginning to think the issue could be related to the flash
->> emulation but wanted to check on ml if anyone else is seeing it. But
->> if it is flash emulation how can it hose the host like this ?
-> 
-> Why do you think it's related to the flash emulation?
-> 
-> From what you're telling me it sounds much more like a vhost regression.
-> 
-> Can you try with v4.10 of the kernel with vhost=on ?
+I have confirmed the theory using a sample code like :
 
-Does this QEMU pull req help by any chance?
+	spin_lock(&a);
+	spin_lock(&b);
+	cond_resched_lock(&b);
+	spin_unlock(&b);
+	spin_unlock(&a);
 
-  [Qemu-devel] [PULL 0/2] vhost, pc: fixes
-  http://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg06103.html
+Also, the following patch solves the problem for me.
 
-It says "Region caching is still causing issues around reset". (Region
-caching was a recent, very intrusive, virtio change in QEMU that sort of
-blew up everything and developers have been dealing with the fallout
-ever since. <-- my personal account anyway)
 
-In another (separate, downstream) discussion, I explained that the
-VirtioNetDxe driver in OVMF and ArmVirtQemu does a virtio reset on the
-virtio network device in an ExitBootServices() callback; that is, when
-the kernel's UEFI stub takes control of the system. Resetting the virtio
-device is supposed to cause the host to de-configure the device and to
-forget all about it. If that doesn't occur correctly, the guest kernel
-can definitely end up in a crappy state (the host might still consider
-memory areas belong to the virtio device that were originally allocated
-by the firmware, but are now overwritten by the guest kernel).
+ ----8>-----
 
-In addition, I found some relevant-looking, recent vhost commits in the
-kernel:
+sched: Fix ___might_sleep preempt count checks
 
-275bf960ac69 vhost: better detection of available buffers
-0ed005ce02fa vhost_net: tx batching
-635b8c8ecdd2 tap: Renaming tap related APIs, data structures, macros
-9a393b5d5988 tap: tap as an independent module
-e3b56cdd4351 vhost: try avoiding avail index access when getting
-             descriptor
-f88949138058 vhost: introduce O(1) vq metadata cache
+___might_sleep checks if the preempt_count equals the passed in
+preempt_offset to issue a warning. This could cause false warnings,
+when preempt_count is greater than the requested offset. Fix the
+check to make sure we handle this case.
 
-I think the symptoms could be a strange interplay between recent QEMU
-and kernel changes that are tickled by the firmware's virtio-net driver
-the wrong way.
+e.g, following code sequence could cause false warning:
 
-Thanks
-Laszlo
+foo:
+	spin_lock(&a);
+	...
+	bar() --------->     bar:
+				spin_lock(&b);
+				cond_resched_lock(&b);
+				do_something();
+				spin_unlock(&b);
+		<-----------
+	...
+	spin_unlock(&a)
 
-> 
-> Thanks,
-> -Christoffer
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+where locks a and b need not necessarily be related.
+
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Frederic Weisbecker <fweisbec@gmail.com>
+Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Reported-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ kernel/sched/core.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 3b31fc0..28842dc 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -6144,11 +6144,11 @@ void __init sched_init(void)
+ }
+ 
+ #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
+-static inline int preempt_count_equals(int preempt_offset)
++static inline int preempt_count_safe(int preempt_offset)
+ {
+ 	int nested = preempt_count() + rcu_preempt_depth();
+ 
+-	return (nested == preempt_offset);
++	return (nested >= preempt_offset);
+ }
+ 
+ void __might_sleep(const char *file, int line, int preempt_offset)
+@@ -6179,7 +6179,7 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
+ 	/* WARN_ON_ONCE() by default, no rate limit required: */
+ 	rcu_sleep_check();
+ 
+-	if ((preempt_count_equals(preempt_offset) && !irqs_disabled() &&
++	if ((preempt_count_safe(preempt_offset) && !irqs_disabled() &&
+ 	     !is_idle_task(current)) ||
+ 	    system_state != SYSTEM_RUNNING || oops_in_progress)
+ 		return;
+@@ -6205,7 +6205,7 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
+ 	if (irqs_disabled())
+ 		print_irqtrace_events(current);
+ 	if (IS_ENABLED(CONFIG_DEBUG_PREEMPT)
+-	    && !preempt_count_equals(preempt_offset)) {
++	    && !preempt_count_safe(preempt_offset)) {
+ 		pr_err("Preemption disabled at:");
+ 		print_ip_sym(preempt_disable_ip);
+ 		pr_cont("\n");
+-- 
+2.7.4
