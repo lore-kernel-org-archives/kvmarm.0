@@ -1,207 +1,200 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [kbuild-all] [PATCH v4 13/22] KVM: arm64: ITS:
- KVM_DEV_ARM_VGIC_GRP_ITS_TABLES group
-Date: Thu, 30 Mar 2017 10:29:45 +0200
-Message-ID: <33373e19-66c2-e396-cc44-aadade85a372@redhat.com>
-References: <201703272354.OaYhCMvV%fengguang.wu@intel.com>
- <0d43e874-c443-7d55-b741-ce27bd103cb5@redhat.com>
- <20170330022159.GB15042@yexl-desktop>
- <202d880c-148f-acd3-08d3-867175cbe425@redhat.com>
- <20170330072908.GA21772@yexl-desktop>
+From: Xie XiuQi <xiexiuqi@huawei.com>
+Subject: [PATCH v3 4/8] APEI: GHES: reserve a virtual page for SEI context
+Date: Thu, 30 Mar 2017 18:31:04 +0800
+Message-ID: <1490869877-118713-5-git-send-email-xiexiuqi@huawei.com>
+References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E08140962
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 04:27:52 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iAZLMvkvSYu9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Mar 2017 04:27:51 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6ABB40190
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 04:27:50 -0400 (EDT)
-In-Reply-To: <20170330072908.GA21772@yexl-desktop>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ye Xiaolong <xiaolong.ye@intel.com>
-Cc: kbuild test robot <lkp@intel.com>, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, kbuild-all@01.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+Content-Type: text/plain
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
+Sender: linux-acpi-owner@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, fu.wei@linaro.org, rostedt@goodmis.org, hanjun.guo@linaro.org, shiju.jose@huawei.com
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, gengdongjiu@huawei.com, zhengqiang10@huawei.com, wuquanming@huawei.com, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Xiaolong,
+On arm64 platform, SEI may interrupt code which had interrupts masked.
+But SEI could be masked, so it's not treated as NMI, however SEA is
+treated as NMI.
 
-On 30/03/2017 09:29, Ye Xiaolong wrote:
-> On 03/30, Auger Eric wrote:
->> Hi Xiaolong
->>
->> On 30/03/2017 04:21, Ye Xiaolong wrote:
->>> Hi, Eric
->>>
->>> On 03/27, Auger Eric wrote:
->>>> Hi,
->>>>
->>>> On 27/03/2017 17:04, kbuild test robot wrote:
->>>>> Hi Eric,
->>>>>
->>>>> [auto build test ERROR on kvmarm/next]
->>>>> [also build test ERROR on v4.11-rc4 next-20170327]
->>>>> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
->>>>>
->>>>> url:    https://github.com/0day-ci/linux/commits/Eric-Auger/vITS-save-restore/20170327-195443
->>>>> base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
->>>>> config: arm64-defconfig (attached as .config)
->>>>> compiler: aarch64-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
->>>>> reproduce:
->>>>>         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->>>>>         chmod +x ~/bin/make.cross
->>>>>         # save the attached .config to linux build tree
->>>>>         make.cross ARCH=arm64 
->>>>>
->>>>> All errors (new ones prefixed by >>):
->>>>>
->>>>>    arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c: In function 'vgic_its_has_attr':
->>>>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1766:33: error: 'its' undeclared (first use in this function)
->>>>>       return vgic_its_table_restore(its);
->>>>
->>>> I think this is due to the fact the series is applied on KVM: arm/arm64:
->>>> Emulate the EL1 phys timer registers (kvmarm-for-4.11).
->>>>
->>>> Please apply it to (kvmarm/queue, kvmarm/next, kvm_next) KVM: arm/arm64:
->>>> vgic: Improve sync_hwstate performance  (255905e)
->>>> I also checked it compiles on 4.11-rc4.
->>>
->>> Hmm, we did apply your series on top of kvarm/next, judging from the function
->>> code below, I can't see the 'its' declaration. 
->>>
->>> static int vgic_its_has_attr(struct kvm_device *dev,
->>>                              struct kvm_device_attr *attr)
->>> {
->>>         switch (attr->group) {
->>>         case KVM_DEV_ARM_VGIC_GRP_ADDR:
->>>                 switch (attr->attr) {
->>>                 case KVM_VGIC_ITS_ADDR_TYPE:
->>>                         return 0;
->>>                 }
->>>                 break;
->>>         case KVM_DEV_ARM_VGIC_GRP_CTRL:
->>>                 switch (attr->attr) {
->>>                 case KVM_DEV_ARM_VGIC_CTRL_INIT:
->>>                         return 0;
->>>                 }
->>>                 break;
->>>         case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
->>>                 u64 __user *uaddr = (u64 __user *)(long)attr->addr;
->>>                 u64 reg;
->>>
->>>                 if (get_user(reg, uaddr))
->>>                         return -EFAULT;
->>>
->>>                 return vgic_its_attr_regs_access(dev, attr, &reg, true);
->>>         }
->>>         case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
->>>                 if (attr->attr)
->>>                         return -EINVAL;
->>>                 return vgic_its_table_restore(its);
->> The above code shows that my series is not correctly applied since that
->> call to vgic_its_table_restore() should normally be in
->> vgic_its_set_attr() and not in vgic_its_has_attr() function
->> (virt/kvm/arm/vgic-its.c).
->>
-> 
-> Er, you are right, the real problem here seems we had a rather old kvmarm/next mirror
-> at the time 0day applied your series.
-> 
-> Thanks for the clarification and sorry for the noise.
+So, the  memory area used to transfer hardware error information from
+BIOS to Linux can be determined only in NMI, SEI(arm64), IRQ or timer
+handler.
 
-no worries
+In this patch, we add a virtual page for SEI context.
 
-Thanks
+Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
+---
+ drivers/acpi/apei/ghes.c | 98 +++++++++++++++++++++++-------------------------
+ 1 file changed, 47 insertions(+), 51 deletions(-)
 
-Eric
-> 
-> Thanks,
-> Xiaolong
->> I pushed this series applied on top of up to date kvmarm/next at
->> https://github.com/eauger/linux/tree/v4.11-rc3-its-mig-v4.
->>
->> As noticed earlier, the series is applied on top of 255905e (KVM:
->> arm/arm64: vgic: Improve sync_hwstate performance)
->>
->> Thanks
->>
->> Eric
->>
->>
->>>         }
->>>         return -ENXIO;
->>> }
->>>
->>> Thanks,
->>> Xiaolong
->>>
->>>>
->>>> Please let me know if I got something wrong.
->>>>
->>>> Thanks
->>>>
->>>> Eric
->>>>>                                     ^~~
->>>>>    arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1766:33: note: each undeclared identifier is reported only once for each function it appears in
->>>>>
->>>>> vim +/its +1766 arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c
->>>>>
->>>>>   1750			case KVM_DEV_ARM_VGIC_CTRL_INIT:
->>>>>   1751				return 0;
->>>>>   1752			}
->>>>>   1753			break;
->>>>>   1754		case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
->>>>>   1755			u64 __user *uaddr = (u64 __user *)(long)attr->addr;
->>>>>   1756			u64 reg;
->>>>>   1757	
->>>>>   1758			if (get_user(reg, uaddr))
->>>>>   1759				return -EFAULT;
->>>>>   1760	
->>>>>   1761			return vgic_its_attr_regs_access(dev, attr, &reg, true);
->>>>>   1762		}
->>>>>   1763		case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
->>>>>   1764			if (attr->attr)
->>>>>   1765				return -EINVAL;
->>>>>> 1766			return vgic_its_table_restore(its);
->>>>>   1767		}
->>>>>   1768		return -ENXIO;
->>>>>   1769	}
->>>>>   1770	
->>>>>   1771	static int vgic_its_set_attr(struct kvm_device *dev,
->>>>>   1772				     struct kvm_device_attr *attr)
->>>>>   1773	{
->>>>>   1774		struct vgic_its *its = dev->private;
->>>>>
->>>>> ---
->>>>> 0-DAY kernel test infrastructure                Open Source Technology Center
->>>>> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
->>>>>
->>>>>
->>>>>
->>>>> _______________________________________________
->>>>> linux-arm-kernel mailing list
->>>>> linux-arm-kernel@lists.infradead.org
->>>>> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
->>>>>
->>>> _______________________________________________
->>>> kbuild-all mailing list
->>>> kbuild-all@lists.01.org
->>>> https://lists.01.org/mailman/listinfo/kbuild-all
->>>
->>> _______________________________________________
->>> linux-arm-kernel mailing list
->>> linux-arm-kernel@lists.infradead.org
->>> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
->>>
+diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+index 045d101..b1f9b1f 100644
+--- a/drivers/acpi/apei/ghes.c
++++ b/drivers/acpi/apei/ghes.c
+@@ -108,26 +108,33 @@
+ 
+ /*
+  * Because the memory area used to transfer hardware error information
+- * from BIOS to Linux can be determined only in NMI, IRQ or timer
+- * handler, but general ioremap can not be used in atomic context, so
+- * a special version of atomic ioremap is implemented for that.
++ * from BIOS to Linux can be determined only in NMI, SEI (ARM64), IRQ or
++ * timer handler, but general ioremap can not be used in atomic context,
++ * so a special version of atomic ioremap is implemented for that.
+  */
+ 
+ /*
+- * Two virtual pages are used, one for IRQ/PROCESS context, the other for
+- * NMI context (optionally).
++ * 3 virtual pages are used, one for IRQ/PROCESS context, one for SEI
++ * (on ARM64 platform), and the other for NMI context (optionally).
+  */
++#ifdef CONFIG_ACPI_APEI_SEI
++#define GHES_IOREMAP_PAGES           3
++#define GHES_IOREMAP_SEI_PAGE(base)	((base) + PAGE_SIZE*2)
++#else
+ #define GHES_IOREMAP_PAGES           2
++#endif
++
+ #define GHES_IOREMAP_IRQ_PAGE(base)	(base)
+ #define GHES_IOREMAP_NMI_PAGE(base)	((base) + PAGE_SIZE)
+ 
+ /* virtual memory area for atomic ioremap */
+ static struct vm_struct *ghes_ioremap_area;
+ /*
+- * These 2 spinlock is used to prevent atomic ioremap virtual memory
++ * These 3 spinlock is used to prevent atomic ioremap virtual memory
+  * area from being mapped simultaneously.
+  */
+ static DEFINE_RAW_SPINLOCK(ghes_ioremap_lock_nmi);
++static DEFINE_SPINLOCK(ghes_ioremap_lock_sei);
+ static DEFINE_SPINLOCK(ghes_ioremap_lock_irq);
+ 
+ static struct gen_pool *ghes_estatus_pool;
+@@ -155,54 +162,55 @@ static void ghes_ioremap_exit(void)
+ 	free_vm_area(ghes_ioremap_area);
+ }
+ 
+-static void __iomem *ghes_ioremap_pfn_nmi(u64 pfn)
++static void __iomem *ghes_ioremap_pfn(u64 pfn)
+ {
+-	unsigned long vaddr;
++	unsigned long vaddr, flags = 0;
+ 	phys_addr_t paddr;
+ 	pgprot_t prot;
+ 
+-	vaddr = (unsigned long)GHES_IOREMAP_NMI_PAGE(ghes_ioremap_area->addr);
+-
+-	paddr = pfn << PAGE_SHIFT;
+-	prot = arch_apei_get_mem_attribute(paddr);
+-	ioremap_page_range(vaddr, vaddr + PAGE_SIZE, paddr, prot);
+-
+-	return (void __iomem *)vaddr;
+-}
+-
+-static void __iomem *ghes_ioremap_pfn_irq(u64 pfn)
+-{
+-	unsigned long vaddr, paddr;
+-	pgprot_t prot;
+-
+-	vaddr = (unsigned long)GHES_IOREMAP_IRQ_PAGE(ghes_ioremap_area->addr);
++	if (in_nmi()) {
++		raw_spin_lock(&ghes_ioremap_lock_nmi);
++		vaddr = (unsigned long)GHES_IOREMAP_NMI_PAGE(ghes_ioremap_area->addr);
++	} else if (this_cpu_read(sei_in_process)) {
++		spin_lock_irqsave(&ghes_ioremap_lock_sei, flags);
++		vaddr = (unsigned long)GHES_IOREMAP_SEI_PAGE(ghes_ioremap_area->addr);
++	} else {
++		spin_lock_irqsave(&ghes_ioremap_lock_irq, flags);
++		vaddr = (unsigned long)GHES_IOREMAP_IRQ_PAGE(ghes_ioremap_area->addr);
++	}
+ 
+ 	paddr = pfn << PAGE_SHIFT;
+ 	prot = arch_apei_get_mem_attribute(paddr);
+-
+ 	ioremap_page_range(vaddr, vaddr + PAGE_SIZE, paddr, prot);
+ 
+ 	return (void __iomem *)vaddr;
+ }
+ 
+-static void ghes_iounmap_nmi(void __iomem *vaddr_ptr)
++static void ghes_iounmap(void __iomem *vaddr_ptr)
+ {
+ 	unsigned long vaddr = (unsigned long __force)vaddr_ptr;
+ 	void *base = ghes_ioremap_area->addr;
++	unsigned long page, flags = 0;
++
++	if (in_nmi()) {
++		page = (unsigned long)GHES_IOREMAP_NMI_PAGE(base);
++	} else if (this_cpu_read(sei_in_process)) {
++		page = (unsigned long)GHES_IOREMAP_SEI_PAGE(base);
++	} else {
++		page = (unsigned long)GHES_IOREMAP_IRQ_PAGE(base);
++	}
+ 
+-	BUG_ON(vaddr != (unsigned long)GHES_IOREMAP_NMI_PAGE(base));
++	BUG_ON(vaddr != page);
+ 	unmap_kernel_range_noflush(vaddr, PAGE_SIZE);
+ 	arch_apei_flush_tlb_one(vaddr);
+-}
+-
+-static void ghes_iounmap_irq(void __iomem *vaddr_ptr)
+-{
+-	unsigned long vaddr = (unsigned long __force)vaddr_ptr;
+-	void *base = ghes_ioremap_area->addr;
+ 
+-	BUG_ON(vaddr != (unsigned long)GHES_IOREMAP_IRQ_PAGE(base));
+-	unmap_kernel_range_noflush(vaddr, PAGE_SIZE);
+-	arch_apei_flush_tlb_one(vaddr);
++	if (in_nmi()) {
++		raw_spin_unlock(&ghes_ioremap_lock_nmi);
++	} else if (this_cpu_read(sei_in_process)) {
++		spin_unlock_irqrestore(&ghes_ioremap_lock_sei, flags);
++	} else {
++		spin_unlock_irqrestore(&ghes_ioremap_lock_irq, flags);
++	}
+ }
+ 
+ static int ghes_estatus_pool_init(void)
+@@ -327,20 +335,13 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
+ 				  int from_phys)
+ {
+ 	void __iomem *vaddr;
+-	unsigned long flags = 0;
+-	int in_nmi = in_nmi();
+ 	u64 offset;
+ 	u32 trunk;
+ 
+ 	while (len > 0) {
+ 		offset = paddr - (paddr & PAGE_MASK);
+-		if (in_nmi) {
+-			raw_spin_lock(&ghes_ioremap_lock_nmi);
+-			vaddr = ghes_ioremap_pfn_nmi(paddr >> PAGE_SHIFT);
+-		} else {
+-			spin_lock_irqsave(&ghes_ioremap_lock_irq, flags);
+-			vaddr = ghes_ioremap_pfn_irq(paddr >> PAGE_SHIFT);
+-		}
++		vaddr = ghes_ioremap_pfn(paddr >> PAGE_SHIFT);
++
+ 		trunk = PAGE_SIZE - offset;
+ 		trunk = min(trunk, len);
+ 		if (from_phys)
+@@ -350,13 +351,8 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
+ 		len -= trunk;
+ 		paddr += trunk;
+ 		buffer += trunk;
+-		if (in_nmi) {
+-			ghes_iounmap_nmi(vaddr);
+-			raw_spin_unlock(&ghes_ioremap_lock_nmi);
+-		} else {
+-			ghes_iounmap_irq(vaddr);
+-			spin_unlock_irqrestore(&ghes_ioremap_lock_irq, flags);
+-		}
++
++		ghes_iounmap(vaddr);
+ 	}
+ }
+ 
+-- 
+1.8.3.1
+
