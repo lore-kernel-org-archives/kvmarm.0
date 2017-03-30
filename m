@@ -1,200 +1,89 @@
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH v3 1/8] trace: ras: add ARM processor error information
- trace event
-Date: Thu, 30 Mar 2017 12:02:20 -0400
-Message-ID: <20170330120220.56e624d9@gandalf.local.home>
-References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
-        <1490869877-118713-2-git-send-email-xiexiuqi@huawei.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: KVM/ARM: sleeping function called from invalid context
+Date: Thu, 30 Mar 2017 17:40:34 +0100
+Message-ID: <7047d954-5c43-600a-3511-4c7dbd60c175@arm.com>
+References: <20170330143112.GI16211@leverpostej>
+ <20170330152955.GJ16211@leverpostej>
+ <e25e57ee-5ba5-4343-ed4e-aad6f4e665b4@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1490869877-118713-2-git-send-email-xiexiuqi@huawei.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Xie XiuQi <xiexiuqi@huawei.com>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, fu.wei@linaro.org, hanjun.guo@linaro.org, shiju.jose@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, gengdongjiu@huawei.com, zhengqiang10@huawei.com, wuquanming@huawei.com, wangxiongfeng2@huawei.com, Tyler Baicar <tbaicar@codeaurora.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <e25e57ee-5ba5-4343-ed4e-aad6f4e665b4@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: tglx@linutronix.de, peterz@infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 30 Mar 2017 18:31:01 +0800
-Xie XiuQi <xiexiuqi@huawei.com> wrote:
+On 30/03/17 16:41, Marc Zyngier wrote:
+> On 30/03/17 16:29, Mark Rutland wrote:
+>> On Thu, Mar 30, 2017 at 03:31:12PM +0100, Mark Rutland wrote:
+>>> Hi,
+>>>
+>>> I'm seeing the splat below when running KVM on an arm64 host with
+>>> CONFIG_DEBUG_ATOMIC_SLEEP and CONFIG_LOCKDEP enabled.
+>>>
+>>> I saw this on v4.11-rc1, and I can reproduce the problem on the current
+>>> kvmarm master branch (563e2f5daa66fbc1).
+>>>
+>>> I've hacked noinlines into arch/arm/kvm/mmu.c in an attempt to get a
+>>> better backtrace; without this, the report says the call is at
+>>> arch/arm/kvm/mmu.c:299, which is somewhat confusing.
+>>
+>> Looking again, that initial kernel was not a vanilla v4.11-rc1, and I am
+>> *not* able to reproduce this issue with a vanilla v4.11-rc1.
+>>
+>> I believe I had applied an earlier fix for the locking issue Suzuki
+>> recently addressed, which was why my line numbers were off.
+>>
+>> I *can* trigger this issue with the current kvmarm master, and the log I
+>> posted is valid.
+>>
+>> Sorry for the bogus info; I will be more careful next time.
+>
+> No worries, thanks Mark.
+>
+> So here's my (very) superficial analysis of the issue:
+> - Memory pressure, we try to swap out something
+> - try_to_unmap_one takes a spinlock (via page_vma_mapped_walk)
+> - MMU notifier kick in with the spinlock held
+> - we take kvm->mmu_lock
+> - in unmap_stage2_range, we do a cond_resched_lock(kvm->mmu_lock)
+> - we still hold the page_vma_mapped_walk spinlock, might_sleep screams
 
-> Add a new trace event for ARM processor error information, so that
-> the user will know what error occurred. With this information the
-> user may take appropriate action.
-> 
-> These trace events are consistent with the ARM processor error
-> information table which defined in UEFI 2.6 spec section N.2.4.4.1.
-> 
-> ---
-> v2: add trace enabled condition as Steven's suggestion.
->     fix a typo.
-> ---
-> 
-> Cc: Steven Rostedt <rostedt@goodmis.org>
-> Cc: Tyler Baicar <tbaicar@codeaurora.org>
-> Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
-> ---
->  drivers/acpi/apei/ghes.c | 10 ++++++
->  include/linux/cper.h     |  5 +++
->  include/ras/ras_event.h  | 87 ++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 102 insertions(+)
-> 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index 81eabc6..6be0333 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -518,9 +518,19 @@ static void ghes_do_proc(struct ghes *ghes,
->  		else if (!uuid_le_cmp(sec_type, CPER_SEC_PROC_ARM) &&
->  			 trace_arm_event_enabled()) {
->  			struct cper_sec_proc_arm *arm_err;
-> +			struct cper_arm_err_info *err_info;
-> +			int i;
->  
->  			arm_err = acpi_hest_generic_data_payload(gdata);
->  			trace_arm_event(arm_err);
-> +
-> +			if (trace_arm_proc_err_enabled()) {
-> +				err_info = (struct cper_arm_err_info *)(arm_err + 1);
-> +				for (i = 0; i < arm_err->err_info_num; i++) {
-> +					trace_arm_proc_err(err_info);
-> +					err_info += 1;
-> +				}
-> +			}
->  		} else if (trace_unknown_sec_event_enabled()) {
->  			void *unknown_err = acpi_hest_generic_data_payload(gdata);
->  			trace_unknown_sec_event(&sec_type,
-> diff --git a/include/linux/cper.h b/include/linux/cper.h
-> index 85450f3..0cae900 100644
-> --- a/include/linux/cper.h
-> +++ b/include/linux/cper.h
-> @@ -270,6 +270,11 @@ enum {
->  #define CPER_ARM_INFO_VALID_VIRT_ADDR		0x0008
->  #define CPER_ARM_INFO_VALID_PHYSICAL_ADDR	0x0010
->  
-> +#define CPER_ARM_INFO_TYPE_CACHE		0
-> +#define CPER_ARM_INFO_TYPE_TLB			1
-> +#define CPER_ARM_INFO_TYPE_BUS			2
-> +#define CPER_ARM_INFO_TYPE_UARCH		3
-> +
->  #define CPER_ARM_INFO_FLAGS_FIRST		0x0001
->  #define CPER_ARM_INFO_FLAGS_LAST		0x0002
->  #define CPER_ARM_INFO_FLAGS_PROPAGATED		0x0004
-> diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
-> index 13befad..026b094 100644
-> --- a/include/ras/ras_event.h
-> +++ b/include/ras/ras_event.h
-> @@ -206,6 +206,93 @@
->  		  __entry->running_state, __entry->psci_state)
->  );
->  
-> +#define ARM_PROC_ERR_TYPE	\
-> +	EM ( CPER_ARM_INFO_TYPE_CACHE, "cache error" )	\
-> +	EM ( CPER_ARM_INFO_TYPE_TLB,  "TLB error" )	\
-> +	EM ( CPER_ARM_INFO_TYPE_BUS, "bus error" )	\
-> +	EMe ( CPER_ARM_INFO_TYPE_UARCH, "micro-architectural error" )
-> +
-> +#define ARM_PROC_ERR_FLAGS	\
-> +	EM ( CPER_ARM_INFO_FLAGS_FIRST, "First error captured" )	\
-> +	EM ( CPER_ARM_INFO_FLAGS_LAST,  "Last error captured" )	\
-> +	EM ( CPER_ARM_INFO_FLAGS_PROPAGATED, "Propagated" )	\
-> +	EMe ( CPER_ARM_INFO_FLAGS_OVERFLOW, "Overflow" )
-> +
+Correct.
 
-Can flags have more than one bit set?
+>
+> I can see multiple ways of doing this:
+> 1) We track that we're coming via an MMU notifier, and don't call
+> cond_resched_lock() in that case
+> 2) We get rid of cond_resched_lock()
+> 3) we have a different code path for the MMU notifier that doesn't
+> involve cond_resched_lock().
+>
+> Only (1) vaguely appeals to me, and I positively hate (3). We could
+> revert to (2), but it is likely to be helpful when tearing down large
+> ranges.
+>
+> Another possibility is that the might_sleep() warning is just spurious,
+> and I think that Suzuki has a theory...
 
-> +/*
-> + * First define the enums in MM_ACTION_RESULT to be exported to userspace
-> + * via TRACE_DEFINE_ENUM().
-> + */
-> +#undef EM
-> +#undef EMe
-> +#define EM(a, b) TRACE_DEFINE_ENUM(a);
-> +#define EMe(a, b)	TRACE_DEFINE_ENUM(a);
-> +
-> +ARM_PROC_ERR_TYPE
-> +ARM_PROC_ERR_FLAGS
-> +
-> +/*
-> + * Now redefine the EM() and EMe() macros to map the enums to the strings
-> + * that will be printed in the output.
-> + */
-> +#undef EM
-> +#undef EMe
-> +#define EM(a, b)		{ a, b },
-> +#define EMe(a, b)	{ a, b }
-> +
-> +TRACE_EVENT(arm_proc_err,
-> +
-> +	TP_PROTO(const struct cper_arm_err_info *err),
-> +
-> +	TP_ARGS(err),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(u8, type)
-> +		__field(u16, multiple_error)
-> +		__field(u8, flags)
-> +		__field(u64, error_info)
-> +		__field(u64, virt_fault_addr)
-> +		__field(u64, physical_fault_addr)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->type = err->type;
-> +
-> +		if (err->validation_bits & CPER_ARM_INFO_VALID_MULTI_ERR)
-> +			__entry->multiple_error = err->multiple_error;
-> +		else
-> +			__entry->multiple_error = ~0;
-> +
-> +		if (err->validation_bits & CPER_ARM_INFO_VALID_FLAGS)
-> +			__entry->flags = err->flags;
-> +		else
-> +			__entry->flags = ~0;
-> +
-> +		if (err->validation_bits & CPER_ARM_INFO_VALID_ERR_INFO)
-> +			__entry->error_info = err->error_info;
-> +		else
-> +			__entry->error_info = 0ULL;
-> +
-> +		if (err->validation_bits & CPER_ARM_INFO_VALID_VIRT_ADDR)
-> +			__entry->virt_fault_addr = err->virt_fault_addr;
-> +		else
-> +			__entry->virt_fault_addr = 0ULL;
-> +
-> +		if (err->validation_bits & CPER_ARM_INFO_VALID_PHYSICAL_ADDR)
-> +			__entry->physical_fault_addr = err->physical_fault_addr;
-> +		else
-> +			__entry->physical_fault_addr = 0ULL;
+So the cond_resched_lock() thinks that it could drop the lock and do a sched.
+So it issues __might_sleep(PREEMPT_LOCK_OFFSET) to make sure the preempt_count
+is as if there is only one {i.e, this} spin_lock preventing the preemption, and
+it could drop the lock after verifying should_resched(PREEMPT_LOCK_OFFSET) (and bit more
+other checks) turns true. But since we are holding two spin_locks in this rare path,
+the preempt_offset is PREEMPT_LOCK_OFFSET + 1 (as we do preempt_count_inc for each
+lock).
 
-else statements add a lot of branch conditions, and kills the branch
-prediction. What about setting up default values, and then setting only
-if the if statement is true.
+Now, ___might_sleep() checks if the preempt_count exactly matches the passed count, using
+preempt_count_equals(), and goes ahead to complain if it doesn't, even if the preempt_count
+is greater than the passed count, in which case the should_resched() should deny the schedule
+operation and we skip it. So, I think, ___might_sleep should really check
+if (preempt_count >= preempt_offset) to scream about it, of course making sure that the callers
+honoring the same case.
 
+To summarise, since we do have two locks held, we won't be able to reschedule in this case
+but the might_sleep screams even if we are safe.
 
-	memset(&__entry->error_info, 0,
-	       sizeof(__entry) - offsetof(typeof(__entry), error_info)));
-	__entry->multiple_error = ~0;
-	__entry->flags = ~0;
-
-	if (...)
-
-> +	),
-> +
-> +	TP_printk("ARM Processor Error: type %s; count: %u; flags: %s;"
-> +		  " error info: %016llx; virtual address: %016llx;"
-> +		  " physical address: %016llx",
-> +		  __print_symbolic(__entry->type, ARCH_PROC_ERR_TYPE),
-> +		  __entry->multiple_error,
-> +		  __print_symbolic(__entry->flags, ARCH_PROC_ERR_FLAGS),
-
-Again, can flags have more than one bit set? If so, then this wont work.
-
--- Steve
-
-> +		  __entry->error_info, __entry->virt_fault_addr,
-> +		  __entry->physical_fault_addr)
-> +);
-> +
->  /*
->   * Unknown Section Report
->   *
+Suzuki
