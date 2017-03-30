@@ -1,127 +1,143 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] kvm: pass the virtual SEI syndrome to guest OS
-Date: Thu, 30 Mar 2017 09:22:47 +0800
-Message-ID: <59037bde-e950-570b-4571-376589379308@huawei.com>
-References: <58DA3F68.6090901@arm.com> <20170328112328.GA31156@cbox>
- <20170328115413.GJ23682@e104320-lin>
- <b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com> <58DA67BA.8070404@arm.com>
- <5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
- <20170329103658.GQ23682@e104320-lin>
- <CAMj-D2BT3ByY-iFrRVVK7y=G7zhRBtM031VgLn6JzwUE-WCdWQ@mail.gmail.com>
- <20170329144822.GA1020@cbox>
- <fa712d47-4f77-7710-c4f7-cd7eab9fed9e@redhat.com>
- <20170329174412.GA4472@cbox>
+From: Ye Xiaolong <xiaolong.ye@intel.com>
+Subject: Re: [kbuild-all] [PATCH v4 13/22] KVM: arm64: ITS:
+ KVM_DEV_ARM_VGIC_GRP_ITS_TABLES group
+Date: Thu, 30 Mar 2017 10:21:59 +0800
+Message-ID: <20170330022159.GB15042@yexl-desktop>
+References: <201703272354.OaYhCMvV%fengguang.wu@intel.com>
+ <0d43e874-c443-7d55-b741-ce27bd103cb5@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170329174412.GA4472@cbox>
+Content-Disposition: inline
+In-Reply-To: <0d43e874-c443-7d55-b741-ce27bd103cb5@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>, Laszlo Ersek <lersek@redhat.com>
-Cc: gengdongjiu <gengdj.1984@gmail.com>, Achin Gupta <achin.gupta@arm.com>, ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, James Morse <james.morse@arm.com>, xiexiuqi@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, Leif.Lindholm@linaro.comnd@arm.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: kbuild test robot <lkp@intel.com>, peter.maydell@linaro.org, drjones@redhat.com, christoffer.dall@linaro.org, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, kbuild-all@01.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer/Laszlo,
+Hi, Eric
 
-On 2017/3/30 1:44, Christoffer Dall wrote:
-> On Wed, Mar 29, 2017 at 05:37:49PM +0200, Laszlo Ersek wrote:
->> On 03/29/17 16:48, Christoffer Dall wrote:
->>> On Wed, Mar 29, 2017 at 10:36:51PM +0800, gengdongjiu wrote:
->>>> 2017-03-29 18:36 GMT+08:00, Achin Gupta <achin.gupta@arm.com>:
->>
->>>>> Qemu is essentially fulfilling the role of secure firmware at the
->>>>> EL2/EL1 interface (as discussed with Christoffer below). So it
->>>>> should generate the CPER before injecting the error.
->>>>>
->>>>> This is corresponds to (1) above apart from notifying UEFI (I am
->>>>> assuming you mean guest UEFI). At this time, the guest OS already
->>>>> knows where to pick up the CPER from through the HEST. Qemu has
->>>>> to create the CPER and populate its address at the address
->>>>> exported in the HEST. Guest UEFI should not be involved in this 
->>>>> flow. Its job was to create the HEST at boot and that has been
->>>>> done by this stage.
->>>>
->>>> Sorry,  As I understand it, after Qemu generate the CPER table, it
->>>> should pass the CPER table to the guest UEFI, then Guest UEFI  place
->>>> this CPER table to the guest OS memory. In this flow, the Guest UEFI
->>>> should be involved, else the Guest OS can not see the CPER table.
->>>>
->>>
->>> I think you need to explain the "pass the CPER table to the guest UEFI"
->>> concept in terms of what really happens, step by step, and when you say
->>> "then Guest UEFI place the CPER table to the guest OS memory", I'm
->>> curious who is running what code on the hardware when doing that.
->>
->> I strongly suggest to keep the guest firmware's runtime involvement to
->> zero. Two reasons:
->>
->> (1) As you explained above (... which I conveniently snipped), when you
->> inject an interrupt to the guest, the handler registered for that
->> interrupt will come from the guest kernel.
->>
->> The only exception to this is when the platform provides a type of
->> interrupt whose handler can be registered and then locked down by the
->> firmware. On x86, this is the SMI.
->>
->> In practice though,
->> - in OVMF (x86), we only do synchronous (software-initiated) SMIs (for
->> privileged UEFI varstore access),
->> - and in ArmVirtQemu (ARM / aarch64), none of the management mode stuff
->> exists at all.
->>
->> I understand that the Platform Init 1.5 (or 1.6?) spec abstracted away
->> the MM (management mode) protocols from Intel SMM, but at this point
->> there is zero code in ArmVirtQemu for that. (And I'm unsure how much of
->> any eligible underlying hw emulation exists in QEMU.)
->>
->> So you can't get the guest firmware to react to the injected interrupt
->> without the guest OS coming between first.
->>
->> (2) Achin's description matches really-really closely what is possible,
->> and what should be done with QEMU, ArmVirtQemu, and the guest kernel.
->>
->> In any solution for this feature, the firmware has to reserve some
->> memory from the OS at boot. The current facilities we have enable this.
->> As I described previously, the ACPI linker/loader actions can be mapped
->> more or less 1:1 to Achin's design. From a practical perspective, you
->> really want to keep the guest firmware as dumb as possible (meaning: as
->> generic as possible), and keep the ACPI specifics to the QEMU and the
->> guest kernel sides.
->>
->> The error serialization actions -- the co-operation between guest kernel
->> and QEMU on the special memory areas -- that were mentioned earlier by
->> Michael and Punit look like a complication. But, IMO, they don't differ
->> from any other device emulation -- DMA actions in particular -- that
->> QEMU already does. Device models are what QEMU *does*. Read the command
->> block that the guest driver placed in guest memory, parse it, sanity
->> check it, verify it, execute it, write back the status code, inject an
->> interrupt (and/or let any polling guest driver notice it "soon after" --
->> use barriers as necessary).
->>
->> Thus, I suggest to rely on the generic ACPI linker/loader interface
->> (between QEMU and guest firmware) *only* to make the firmware lay out
->> stuff (= reserve buffers, set up pointers, install QEMU's ACPI tables)
->> *at boot*. Then, at runtime, let the guest kernel and QEMU (the "device
->> model") talk to each other directly. Keep runtime firmware involvement
->> to zero.
->>
->> You *really* don't want to debug three components at runtime, when you
->> can solve the thing with two. (Two components whose build systems won't
->> drive you mad, I should add.)
->>
->> IMO, Achin's design nailed it. We can do that.
->>
-> I completely agree.
-> 
-> My questions were intended for gengdongjiu to clarify his/her 
-> and clear up any misunderstandings between what Achin suggested and what
-> he/she wrote.
+On 03/27, Auger Eric wrote:
+>Hi,
+>
+>On 27/03/2017 17:04, kbuild test robot wrote:
+>> Hi Eric,
+>> 
+>> [auto build test ERROR on kvmarm/next]
+>> [also build test ERROR on v4.11-rc4 next-20170327]
+>> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+>> 
+>> url:    https://github.com/0day-ci/linux/commits/Eric-Auger/vITS-save-restore/20170327-195443
+>> base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+>> config: arm64-defconfig (attached as .config)
+>> compiler: aarch64-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
+>> reproduce:
+>>         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>>         chmod +x ~/bin/make.cross
+>>         # save the attached .config to linux build tree
+>>         make.cross ARCH=arm64 
+>> 
+>> All errors (new ones prefixed by >>):
+>> 
+>>    arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c: In function 'vgic_its_has_attr':
+>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1766:33: error: 'its' undeclared (first use in this function)
+>>       return vgic_its_table_restore(its);
+>
+>I think this is due to the fact the series is applied on KVM: arm/arm64:
+>Emulate the EL1 phys timer registers (kvmarm-for-4.11).
+>
+>Please apply it to (kvmarm/queue, kvmarm/next, kvm_next) KVM: arm/arm64:
+>vgic: Improve sync_hwstate performance  (255905e)
+>I also checked it compiles on 4.11-rc4.
 
-  Achin and Laszlo's understanding are right. thanks for your suggestion.
+Hmm, we did apply your series on top of kvarm/next, judging from the function
+code below, I can't see the 'its' declaration. 
 
-> 
-> Thanks,
-> -Christoffer
-> 
-> .
-> 
+static int vgic_its_has_attr(struct kvm_device *dev,
+                             struct kvm_device_attr *attr)
+{
+        switch (attr->group) {
+        case KVM_DEV_ARM_VGIC_GRP_ADDR:
+                switch (attr->attr) {
+                case KVM_VGIC_ITS_ADDR_TYPE:
+                        return 0;
+                }
+                break;
+        case KVM_DEV_ARM_VGIC_GRP_CTRL:
+                switch (attr->attr) {
+                case KVM_DEV_ARM_VGIC_CTRL_INIT:
+                        return 0;
+                }
+                break;
+        case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
+                u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+                u64 reg;
+
+                if (get_user(reg, uaddr))
+                        return -EFAULT;
+
+                return vgic_its_attr_regs_access(dev, attr, &reg, true);
+        }
+        case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
+                if (attr->attr)
+                        return -EINVAL;
+                return vgic_its_table_restore(its);
+        }
+        return -ENXIO;
+}
+
+Thanks,
+Xiaolong
+
+>
+>Please let me know if I got something wrong.
+>
+>Thanks
+>
+>Eric
+>>                                     ^~~
+>>    arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1766:33: note: each undeclared identifier is reported only once for each function it appears in
+>> 
+>> vim +/its +1766 arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c
+>> 
+>>   1750			case KVM_DEV_ARM_VGIC_CTRL_INIT:
+>>   1751				return 0;
+>>   1752			}
+>>   1753			break;
+>>   1754		case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
+>>   1755			u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+>>   1756			u64 reg;
+>>   1757	
+>>   1758			if (get_user(reg, uaddr))
+>>   1759				return -EFAULT;
+>>   1760	
+>>   1761			return vgic_its_attr_regs_access(dev, attr, &reg, true);
+>>   1762		}
+>>   1763		case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
+>>   1764			if (attr->attr)
+>>   1765				return -EINVAL;
+>>> 1766			return vgic_its_table_restore(its);
+>>   1767		}
+>>   1768		return -ENXIO;
+>>   1769	}
+>>   1770	
+>>   1771	static int vgic_its_set_attr(struct kvm_device *dev,
+>>   1772				     struct kvm_device_attr *attr)
+>>   1773	{
+>>   1774		struct vgic_its *its = dev->private;
+>> 
+>> ---
+>> 0-DAY kernel test infrastructure                Open Source Technology Center
+>> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+>> 
+>> 
+>> 
+>> _______________________________________________
+>> linux-arm-kernel mailing list
+>> linux-arm-kernel@lists.infradead.org
+>> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+>> 
+>_______________________________________________
+>kbuild-all mailing list
+>kbuild-all@lists.01.org
+>https://lists.01.org/mailman/listinfo/kbuild-all
