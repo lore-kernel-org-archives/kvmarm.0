@@ -1,22 +1,23 @@
 From: Xie XiuQi <xiexiuqi@huawei.com>
-Subject: [PATCH v3 0/8] arm64: acpi: apei: handle SEI notification type for
- ARMv8
-Date: Thu, 30 Mar 2017 18:31:00 +0800
-Message-ID: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
+Subject: [PATCH v3 6/8] arm64: RAS: add ras extension runtime detection
+Date: Thu, 30 Mar 2017 18:31:06 +0800
+Message-ID: <1490869877-118713-7-git-send-email-xiexiuqi@huawei.com>
+References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 20E5440A6A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 06:32:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DAA540C1D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 06:32:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ArToyyqyYwgH for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Mar 2017 06:32:43 -0400 (EDT)
-Received: from dggrg02-dlp.huawei.com (unknown [45.249.212.188])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E9B540A86
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 06:32:42 -0400 (EDT)
+ with ESMTP id w5HIW9cxpbuL for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Mar 2017 06:32:46 -0400 (EDT)
+Received: from dggrg01-dlp.huawei.com (unknown [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5113040AE8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 06:32:44 -0400 (EDT)
+In-Reply-To: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,83 +31,80 @@ To: christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, 
 Cc: wuquanming@huawei.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com, wangxiongfeng2@huawei.com, linux-acpi@vger.kernel.org, zhengqiang10@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-ARM APEI extension proposal added SEI (asynchronous SError interrupt)
-notification type for ARMv8.
+According to <<RAS Extension PRD03>> document, we add RAS extension
+feature runtime detection, which would be used for error recovery
+in the future.
 
-Add a new GHES error source handling function for SEI. In firmware
-first mode, if an error source's notification type is SEI. Then GHES
-could parse and report the detail error information.
+Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
+Reviewed-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+---
+ arch/arm64/include/asm/cpucaps.h |  3 ++-
+ arch/arm64/include/asm/sysreg.h  |  2 ++
+ arch/arm64/kernel/cpufeature.c   | 11 +++++++++++
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
-In firmware first mode, we could assume:
-1) The ghes for sei is a global table, firmware should report one sei at a time.
-2) SEI is masked while exception is processing
-3) SEI may interrupt while irq handler is running 
-4) SEA may interrupt while SEI handler is running
-
-So, the memory area used to transfer hardware error information from
-BIOS to Linux can be determined only in NMI, SEI(arm64), IRQ or timer
-handler. We add a virtual page for SEI context.
-
-Error Synchronization Barrier (ESB; part of the ARMv8.2 Extensions)
-is used to synchronize Unrecoverable errors. That is, containable errors
-architecturally consumed by the PE and not silently propagated.
-
-With ESB it is generally possible to isolate an unrecoverable error
-between two ESB instructions. So, it's possible to recovery from
-unrecoverable errors reported by asynchronous SError interrupt.
-
-Since SEI is asynchronous, a SEI generated on user process may propagate
-to another user process via shared memory, which may cause unrecoverable.
-We have a idea which only recover sei from user process which has no
-writable shared memory.
-
-The idea is still in the discussion, any comments is welcome.
-
-This series is based on Tyler's series "[PATCH V13 00/10] Add UEFI 2.6 and ACPI 6.1 updates
-for RAS on ARM64" and the latest mainline.
-
-v3: add ARM processor error information trace event
-    add a per-cpu variable to indecate sei is processing
-    remove nmi_{enter/exit} protection for ghes_notify_sei()
-    reserve a virtual page for processing ghes table in SEI context
-    don't always inject vabt for sei
-    serprate do_sei from bad_mode
-    add esb which make recovery from sei possible
-    add an idea to recovery from sei for shared memory process
-
-v2: add kvm guest SEI notification support
-    add nmi_{entry, exit} to protect ghes_notify_sei
-
-https://lkml.org/lkml/2017/3/7/962
-https://lkml.org/lkml/2017/3/3/189
-
-Wang Xiongfeng (1):
-  arm64: exception: check shared writable page in SEI handler
-
-Xie XiuQi (7):
-  trace: ras: add ARM processor error information trace event
-  acpi: apei: handle SEI notification type for ARMv8
-  arm64: apei: add a per-cpu variable to indecate sei is processing
-  APEI: GHES: reserve a virtual page for SEI context
-  arm64: KVM: add guest SEI support
-  arm64: RAS: add ras extension runtime detection
-  arm64: exception: handle asynchronous SError interrupt
-
- arch/arm64/Kconfig                   |  16 +++
- arch/arm64/include/asm/cpucaps.h     |   3 +-
- arch/arm64/include/asm/esr.h         |  14 +++
- arch/arm64/include/asm/sysreg.h      |   2 +
- arch/arm64/include/asm/system_misc.h |   1 +
- arch/arm64/kernel/cpufeature.c       |  11 ++
- arch/arm64/kernel/entry.S            |  70 ++++++++++-
- arch/arm64/kernel/traps.c            | 217 +++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c         |  22 +++-
- drivers/acpi/apei/Kconfig            |  14 +++
- drivers/acpi/apei/ghes.c             | 166 +++++++++++++++++++--------
- include/acpi/ghes.h                  |   3 +
- include/linux/cper.h                 |   5 +
- include/ras/ras_event.h              |  87 ++++++++++++++
- 14 files changed, 575 insertions(+), 56 deletions(-)
-
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index fb78a5d..3847cf8 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -37,7 +37,8 @@
+ #define ARM64_HAS_NO_FPSIMD			16
+ #define ARM64_WORKAROUND_REPEAT_TLBI		17
+ #define ARM64_WORKAROUND_QCOM_FALKOR_E1003	18
++#define ARM64_HAS_RAS_EXTN			19
+ 
+-#define ARM64_NCAPS				19
++#define ARM64_NCAPS				20
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index ac24b6e..32964c7 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -157,6 +157,7 @@
+ #define ID_AA64ISAR0_AES_SHIFT		4
+ 
+ /* id_aa64pfr0 */
++#define ID_AA64PFR0_RAS_SHIFT		28
+ #define ID_AA64PFR0_GIC_SHIFT		24
+ #define ID_AA64PFR0_ASIMD_SHIFT		20
+ #define ID_AA64PFR0_FP_SHIFT		16
+@@ -165,6 +166,7 @@
+ #define ID_AA64PFR0_EL1_SHIFT		4
+ #define ID_AA64PFR0_EL0_SHIFT		0
+ 
++#define ID_AA64PFR0_RAS_V1		0x1
+ #define ID_AA64PFR0_FP_NI		0xf
+ #define ID_AA64PFR0_FP_SUPPORTED	0x0
+ #define ID_AA64PFR0_ASIMD_NI		0xf
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index abda8e8..b0fb81e 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -98,6 +98,7 @@
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_RAS_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_GIC_SHIFT, 4, 0),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
+@@ -860,6 +861,16 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
+ 		.min_field_value = 0,
+ 		.matches = has_no_fpsimd,
+ 	},
++	{
++		.desc = "ARM64 RAS Extension Support",
++		.capability = ARM64_HAS_RAS_EXTN,
++		.def_scope = SCOPE_SYSTEM,
++		.matches = has_cpuid_feature,
++		.sys_reg = SYS_ID_AA64PFR0_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64PFR0_RAS_SHIFT,
++		.min_field_value = ID_AA64PFR0_RAS_V1,
++	},
+ 	{},
+ };
+ 
 -- 
 1.8.3.1
