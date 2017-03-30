@@ -1,26 +1,29 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [kbuild-all] [PATCH v4 13/22] KVM: arm64: ITS:
- KVM_DEV_ARM_VGIC_GRP_ITS_TABLES group
-Date: Thu, 30 Mar 2017 08:46:43 +0200
-Message-ID: <202d880c-148f-acd3-08d3-867175cbe425@redhat.com>
-References: <201703272354.OaYhCMvV%fengguang.wu@intel.com>
- <0d43e874-c443-7d55-b741-ce27bd103cb5@redhat.com>
- <20170330022159.GB15042@yexl-desktop>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [kvmtool PATCH v9 06/15] PCI: Only allocate IRQ routing entry
+ when available
+Date: Thu, 30 Mar 2017 08:29:34 +0100
+Message-ID: <87k277ql29.fsf@on-the-bus.cambridge.arm.com>
+References: <20170202163223.15372-1-andre.przywara@arm.com>
+ <20170202163223.15372-7-andre.przywara@arm.com>
+ <d26dea9f-386b-316c-a2b3-d42ea1883997@arm.com>
+ <6371fdda-bdd5-2aa0-de8c-4f97953ee326@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F63940A86
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 02:44:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA3F940190
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 03:27:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xXFUy+BU6pvm for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Mar 2017 02:44:49 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 17F29400E9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 02:44:48 -0400 (EDT)
-In-Reply-To: <20170330022159.GB15042@yexl-desktop>
+ with ESMTP id uWyvGygAqIX5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Mar 2017 03:27:39 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CE79400E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Mar 2017 03:27:39 -0400 (EDT)
+In-Reply-To: <6371fdda-bdd5-2aa0-de8c-4f97953ee326@arm.com> (=?utf-8?Q?=22?=
+ =?utf-8?Q?Andr=C3=A9?=
+ Przywara"'s message of "Wed, 29 Mar 2017 21:44:47 +0100")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,158 +33,57 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ye Xiaolong <xiaolong.ye@intel.com>
-Cc: kbuild test robot <lkp@intel.com>, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, kbuild-all@01.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+To: =?utf-8?Q?Andr=C3=A9?= Przywara <andre.przywara@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Xiaolong
-
-On 30/03/2017 04:21, Ye Xiaolong wrote:
-> Hi, Eric
-> 
-> On 03/27, Auger Eric wrote:
->> Hi,
->>
->> On 27/03/2017 17:04, kbuild test robot wrote:
->>> Hi Eric,
->>>
->>> [auto build test ERROR on kvmarm/next]
->>> [also build test ERROR on v4.11-rc4 next-20170327]
->>> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
->>>
->>> url:    https://github.com/0day-ci/linux/commits/Eric-Auger/vITS-save-restore/20170327-195443
->>> base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
->>> config: arm64-defconfig (attached as .config)
->>> compiler: aarch64-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
->>> reproduce:
->>>         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->>>         chmod +x ~/bin/make.cross
->>>         # save the attached .config to linux build tree
->>>         make.cross ARCH=arm64 
->>>
->>> All errors (new ones prefixed by >>):
->>>
->>>    arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c: In function 'vgic_its_has_attr':
->>>>> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1766:33: error: 'its' undeclared (first use in this function)
->>>       return vgic_its_table_restore(its);
->>
->> I think this is due to the fact the series is applied on KVM: arm/arm64:
->> Emulate the EL1 phys timer registers (kvmarm-for-4.11).
->>
->> Please apply it to (kvmarm/queue, kvmarm/next, kvm_next) KVM: arm/arm64:
->> vgic: Improve sync_hwstate performance  (255905e)
->> I also checked it compiles on 4.11-rc4.
-> 
-> Hmm, we did apply your series on top of kvarm/next, judging from the function
-> code below, I can't see the 'its' declaration. 
-> 
-> static int vgic_its_has_attr(struct kvm_device *dev,
->                              struct kvm_device_attr *attr)
-> {
->         switch (attr->group) {
->         case KVM_DEV_ARM_VGIC_GRP_ADDR:
->                 switch (attr->attr) {
->                 case KVM_VGIC_ITS_ADDR_TYPE:
->                         return 0;
->                 }
->                 break;
->         case KVM_DEV_ARM_VGIC_GRP_CTRL:
->                 switch (attr->attr) {
->                 case KVM_DEV_ARM_VGIC_CTRL_INIT:
->                         return 0;
->                 }
->                 break;
->         case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
->                 u64 __user *uaddr = (u64 __user *)(long)attr->addr;
->                 u64 reg;
-> 
->                 if (get_user(reg, uaddr))
->                         return -EFAULT;
-> 
->                 return vgic_its_attr_regs_access(dev, attr, &reg, true);
->         }
->         case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
->                 if (attr->attr)
->                         return -EINVAL;
->                 return vgic_its_table_restore(its);
-The above code shows that my series is not correctly applied since that
-call to vgic_its_table_restore() should normally be in
-vgic_its_set_attr() and not in vgic_its_has_attr() function
-(virt/kvm/arm/vgic-its.c).
-
-I pushed this series applied on top of up to date kvmarm/next at
-https://github.com/eauger/linux/tree/v4.11-rc3-its-mig-v4.
-
-As noticed earlier, the series is applied on top of 255905e (KVM:
-arm/arm64: vgic: Improve sync_hwstate performance)
-
-Thanks
-
-Eric
-
-
->         }
->         return -ENXIO;
-> }
-> 
-> Thanks,
-> Xiaolong
-> 
->>
->> Please let me know if I got something wrong.
->>
->> Thanks
->>
->> Eric
->>>                                     ^~~
->>>    arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1766:33: note: each undeclared identifier is reported only once for each function it appears in
->>>
->>> vim +/its +1766 arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c
->>>
->>>   1750			case KVM_DEV_ARM_VGIC_CTRL_INIT:
->>>   1751				return 0;
->>>   1752			}
->>>   1753			break;
->>>   1754		case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
->>>   1755			u64 __user *uaddr = (u64 __user *)(long)attr->addr;
->>>   1756			u64 reg;
->>>   1757	
->>>   1758			if (get_user(reg, uaddr))
->>>   1759				return -EFAULT;
->>>   1760	
->>>   1761			return vgic_its_attr_regs_access(dev, attr, &reg, true);
->>>   1762		}
->>>   1763		case KVM_DEV_ARM_VGIC_GRP_ITS_TABLES:
->>>   1764			if (attr->attr)
->>>   1765				return -EINVAL;
->>>> 1766			return vgic_its_table_restore(its);
->>>   1767		}
->>>   1768		return -ENXIO;
->>>   1769	}
->>>   1770	
->>>   1771	static int vgic_its_set_attr(struct kvm_device *dev,
->>>   1772				     struct kvm_device_attr *attr)
->>>   1773	{
->>>   1774		struct vgic_its *its = dev->private;
->>>
->>> ---
->>> 0-DAY kernel test infrastructure                Open Source Technology Center
->>> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
->>>
->>>
->>>
->>> _______________________________________________
->>> linux-arm-kernel mailing list
->>> linux-arm-kernel@lists.infradead.org
->>> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
->>>
->> _______________________________________________
->> kbuild-all mailing list
->> kbuild-all@lists.01.org
->> https://lists.01.org/mailman/listinfo/kbuild-all
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+T24gV2VkLCBNYXIgMjkgMjAxNyBhdCAgOTo0NDo0NyBwbSBCU1QsIEFuZHLDqSBQcnp5d2FyYSA8
+YW5kcmUucHJ6eXdhcmFAYXJtLmNvbT4gd3JvdGU6Cj4gSGkgTWFyYywKPgo+IHRoYW5rcyBmb3Ig
+aGF2aW5nIGEgbG9vayEKPgo+IE9uIDI5LzAzLzE3IDA5OjMwLCBNYXJjIFp5bmdpZXIgd3JvdGU6
+Cj4+IE9uIDAyLzAyLzE3IDE2OjMyLCBBbmRyZSBQcnp5d2FyYSB3cm90ZToKPj4+IElmIHdlIG5l
+ZWQgdG8gaW5qZWN0IGFuIE1TSSBpbnRvIHRoZSBndWVzdCwgd2UgcmVseSBhdCB0aGUgbW9tZW50
+IG9uIGEKPj4+IHdvcmtpbmcgR1NJIE1TSSByb3V0aW5nIGZ1bmN0aW9uYWxpdHkuIEhvd2V2ZXIg
+d2UgY2FuIGdldCBhd2F5IHdpdGhvdXQKPj4+IElSUSByb3V0aW5nLCBpZiB0aGUgaG9zdCBzdXBw
+b3J0cyBNU0kgaW5qZWN0aW9uIHZpYSB0aGUgS1ZNX1NJR05BTF9NU0kKPj4+IGlvY3RsLgo+Pj4g
+U28gd2UgdHJ5IHRoZSBHU0kgcm91dGluZyBmaXJzdCwgYnV0IGlmIHRoYXQgZmFpbHMgZHVlIHRv
+IGEgbWlzc2luZwo+Pj4gSVJRIHJvdXRpbmcgZnVuY3Rpb25hbGl0eSwgd2UgZmFsbCBiYWNrIHRv
+IEtWTV9TSUdOQUxfTVNJIChpZiB0aGF0IGlzCj4+PiBzdXBwb3J0ZWQpLgo+Pj4KPj4+IFNpZ25l
+ZC1vZmYtYnk6IEFuZHJlIFByenl3YXJhIDxhbmRyZS5wcnp5d2FyYUBhcm0uY29tPgo+Pj4gLS0t
+Cj4+PiAgdmlydGlvL3BjaS5jIHwgMTYgKysrKysrKysrKysrKystLQo+Pj4gIDEgZmlsZSBjaGFu
+Z2VkLCAxNCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQo+Pj4KPj4+IGRpZmYgLS1naXQg
+YS92aXJ0aW8vcGNpLmMgYi92aXJ0aW8vcGNpLmMKPj4+IGluZGV4IDdjYzBiYTQuLjk4YmY2Yjcg
+MTAwNjQ0Cj4+PiAtLS0gYS92aXJ0aW8vcGNpLmMKPj4+ICsrKyBiL3ZpcnRpby9wY2kuYwo+Pj4g
+QEAgLTE5Myw4ICsxOTMsMTQgQEAgc3RhdGljIGJvb2wgdmlydGlvX3BjaV9fc3BlY2lmaWNfaW9f
+b3V0KHN0cnVjdCBrdm0gKmt2bSwgc3RydWN0IHZpcnRpb19kZXZpY2UgKnYKPj4+ICAKPj4+ICAJ
+CQlnc2kgPSBpcnFfX2FkZF9tc2l4X3JvdXRlKGt2bSwKPj4+ICAJCQkJCQkgICZ2cGNpLT5tc2l4
+X3RhYmxlW3ZlY10ubXNnKTsKPj4+IC0JCQlpZiAoZ3NpID49IDApCj4+PiArCQkJaWYgKGdzaSA+
+PSAwKSB7Cj4+PiAgCQkJCXZwY2ktPmNvbmZpZ19nc2kgPSBnc2k7Cj4+PiArCQkJCWJyZWFrOwo+
+Pj4gKwkJCX0KPj4+ICsJCQlpZiAoZ3NpID09IC1FTlhJTyAmJgo+Pj4gKwkJCSAgICB2cGNpLT5m
+ZWF0dXJlcyAmIFZJUlRJT19QQ0lfRl9TSUdOQUxfTVNJKQo+Pj4gKwkJCQkJYnJlYWs7Cj4+PiAr
+CQkJZGllKCJmYWlsZWQgdG8gY29uZmlndXJlIE1TSXMiKTsKPj4+ICAJCQlicmVhazsKPj4+ICAJ
+CWNhc2UgVklSVElPX01TSV9RVUVVRV9WRUNUT1I6Cj4+PiAgCQkJdmVjID0gaW9wb3J0X19yZWFk
+MTYoZGF0YSk7Cj4+PiBAQCAtMjA1LDggKzIxMSwxNCBAQCBzdGF0aWMgYm9vbCB2aXJ0aW9fcGNp
+X19zcGVjaWZpY19pb19vdXQoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3QgdmlydGlvX2RldmljZSAq
+dgo+Pj4gIAo+Pj4gIAkJCWdzaSA9IGlycV9fYWRkX21zaXhfcm91dGUoa3ZtLAo+Pj4gIAkJCQkJ
+CSAgJnZwY2ktPm1zaXhfdGFibGVbdmVjXS5tc2cpOwo+Pj4gLQkJCWlmIChnc2kgPCAwKQo+Pj4g
+KwkJCWlmIChnc2kgPCAwKSB7Cj4+PiArCQkJCWlmIChnc2kgPT0gLUVOWElPICYmCj4+PiArCQkJ
+CSAgICB2cGNpLT5mZWF0dXJlcyAmIFZJUlRJT19QQ0lfRl9TSUdOQUxfTVNJKQo+Pj4gKwkJCQkJ
+YnJlYWs7Cj4+PiArCj4+PiArCQkJCWRpZSgiZmFpbGVkIHRvIGNvbmZpZ3VyZSBNU0lzIik7Cj4+
+PiAgCQkJCWJyZWFrOwo+Pj4gKwkJCX0KPj4+ICAJCQl2cGNpLT5nc2lzW3ZwY2ktPnF1ZXVlX3Nl
+bGVjdG9yXSA9IGdzaTsKPj4gCj4+IElzIGl0IHJlYWxseSBleHBlY3RlZCB0byBmaW5kIC1FTlhJ
+TyBpbiB0aGlzIGFycmF5IGluc3RlYWQgb2YgYSBHU0k/Cj4KPiBOb3Qgc3VyZSBJIGdldCB0aGlz
+ICJpbiB0aGlzIGFycmF5IiBjb21tZW50IGhlcmUuIEFueSBuZWdhdGl2ZSByZXR1cm4KPiB2YWx1
+ZSBlbmRzIHVwIGluIGEgYnJlYWssIHdpdGhvdXQgd3JpdGluZyBpdCBhbnl3aGVyZS4KPiBMYXRl
+ciBvbiB3ZSBjaGVjayBmb3IgVklSVElPX1BDSV9GX1NJR05BTF9NU0kgZmlyc3QgYmVmb3JlIHJl
+ZmVyZW5jaW5nCj4gdGhlIGFycmF5LiBUaGlzIGlzIGFkbWl0dGVkbHkgYSBiaXQgY29udm9sdXRl
+ZC4KPiBTbyBzaGFsbCBJIGFkZCBjb21tZW50cyBoZXJlPyBPciByZXdyaXRlIHRoZSBpZiBzdGF0
+ZW1lbnQgdG8gbWFrZSB0aGlzCj4gbW9yZSBvYnZpb3VzPwoKQWghIE9mIGNvdXJzZSB5b3UncmUg
+cmlnaHQsIEkgY29tcGxldGVseSBtaXNyZWFkIHRoZSBjb2RlLiBNYXliZSBpbmRlZWQKcmV3cml0
+aW5nIGEgYml0IHRvIG1ha2UgaXQgbW9yZSBvYnZpb3VzOgoKCWlmIChnc2kgPT0gLUVOWElPICYm
+IHZwY2ktPmZlYXR1cmVzICYgVklSVElPX1BDSV9GX1NJR05BTF9NU0kpCgkJYnJlYWs7CiAgICAg
+ICAgaWYgKGdzaSA8IDApIHsKICAgICAgICAJZGllKCJmYWlsZWQgdG8gY29uZmlndXJlIE1TSXMi
+KTsKICAgICAgICAgICAgICAgIGJyZWFrCiAgICAgICAgfQoKd2hpY2ggaXMgY2xvc2VyIHRvIHRo
+ZSBmaXJzdC4KClRoYW5rcywKCglNLgotLSAKSmF6eiBpcyBub3QgZGVhZCwgaXQganVzdCBzbWVs
+bCBmdW5ueS4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
+a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
+bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
