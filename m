@@ -1,121 +1,91 @@
 From: Xie XiuQi <xiexiuqi@huawei.com>
-Subject: [PATCH v3 5/8] arm64: KVM: add guest SEI support
-Date: Thu, 30 Mar 2017 18:31:14 +0800
-Message-ID: <1490869877-118713-15-git-send-email-xiexiuqi@huawei.com>
+Subject: [PATCH v3 6/8] arm64: RAS: add ras extension runtime detection
+Date: Thu, 30 Mar 2017 18:31:15 +0800
+Message-ID: <1490869877-118713-16-git-send-email-xiexiuqi@huawei.com>
 References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Return-path: <linux-acpi-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
-Sender: linux-acpi-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 To: christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, fu.wei@linaro.org, rostedt@goodmis.org, hanjun.guo@linaro.org, shiju.jose@huawei.com
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, gengdongjiu@huawei.com, zhengqiang10@huawei.com, wuquanming@huawei.com, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add ghes handling for SEI so that the host kernel could parse and
-report detailed error information for SEI which occur in the guest
-kernel.
-
-If there were no CPER records, (or the system doesn't support SEI as a GHES
-notification mechanism), then yes we should still call kvm_inject_vabt().
+According to <<RAS Extension PRD03>> document, we add RAS extension
+feature runtime detection, which would be used for error recovery
+in the future.
 
 Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
+Reviewed-by: Kefeng Wang <wangkefeng.wang@huawei.com>
 ---
- arch/arm64/include/asm/system_misc.h |  1 +
- arch/arm64/kernel/traps.c            | 14 ++++++++++++++
- arch/arm64/kvm/handle_exit.c         | 22 ++++++++++++++++++++--
- 3 files changed, 35 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/cpucaps.h |  3 ++-
+ arch/arm64/include/asm/sysreg.h  |  2 ++
+ arch/arm64/kernel/cpufeature.c   | 11 +++++++++++
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
-index 5b2cecd..d68d61f 100644
---- a/arch/arm64/include/asm/system_misc.h
-+++ b/arch/arm64/include/asm/system_misc.h
-@@ -59,5 +59,6 @@ void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned int,
- #endif	/* __ASSEMBLY__ */
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index fb78a5d..3847cf8 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -37,7 +37,8 @@
+ #define ARM64_HAS_NO_FPSIMD			16
+ #define ARM64_WORKAROUND_REPEAT_TLBI		17
+ #define ARM64_WORKAROUND_QCOM_FALKOR_E1003	18
++#define ARM64_HAS_RAS_EXTN			19
  
- int handle_guest_sea(unsigned long addr, unsigned int esr);
-+int handle_guest_sei(unsigned long addr, unsigned int esr);
+-#define ARM64_NCAPS				19
++#define ARM64_NCAPS				20
  
- #endif	/* __ASM_SYSTEM_MISC_H */
-diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-index 955dc8c..b6d6727 100644
---- a/arch/arm64/kernel/traps.c
-+++ b/arch/arm64/kernel/traps.c
-@@ -618,6 +618,20 @@ const char *esr_get_class_string(u32 esr)
- DEFINE_PER_CPU(int, sei_in_process);
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index ac24b6e..32964c7 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -157,6 +157,7 @@
+ #define ID_AA64ISAR0_AES_SHIFT		4
  
- /*
-+ * Handle asynchronous SError interrupt that occur in a guest kernel.
-+ */
-+int handle_guest_sei(unsigned long addr, unsigned int esr)
-+{
-+        int ret = -ENOENT;
-+
-+        if(IS_ENABLED(CONFIG_ACPI_APEI_SEI)) {
-+                ret = ghes_notify_sei();
-+        }
-+
-+        return ret;
-+}
-+
-+/*
-  * bad_mode handles the impossible case in the exception vector. This is always
-  * fatal.
-  */
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index fa1b18e..c89d83a 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -28,6 +28,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_psci.h>
-+#include <asm/system_misc.h>
+ /* id_aa64pfr0 */
++#define ID_AA64PFR0_RAS_SHIFT		28
+ #define ID_AA64PFR0_GIC_SHIFT		24
+ #define ID_AA64PFR0_ASIMD_SHIFT		20
+ #define ID_AA64PFR0_FP_SHIFT		16
+@@ -165,6 +166,7 @@
+ #define ID_AA64PFR0_EL1_SHIFT		4
+ #define ID_AA64PFR0_EL0_SHIFT		0
  
- #define CREATE_TRACE_POINTS
- #include "trace.h"
-@@ -177,6 +178,23 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
- 	return arm_exit_handlers[hsr_ec];
- }
++#define ID_AA64PFR0_RAS_V1		0x1
+ #define ID_AA64PFR0_FP_NI		0xf
+ #define ID_AA64PFR0_FP_SUPPORTED	0x0
+ #define ID_AA64PFR0_ASIMD_NI		0xf
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index abda8e8..b0fb81e 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -98,6 +98,7 @@
+ };
  
-+static int kvm_handle_guest_sei(struct kvm_vcpu *vcpu, struct kvm_run *run)
-+{
-+	unsigned long fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-+
-+	if (handle_guest_sei((unsigned long)fault_ipa,
-+				kvm_vcpu_get_hsr(vcpu))) {
-+		kvm_err("Failed to handle guest SEI, FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
-+				kvm_vcpu_trap_get_class(vcpu),
-+				(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
-+				(unsigned long)kvm_vcpu_get_hsr(vcpu));
-+
-+		kvm_inject_vabt(vcpu);
-+	}
-+
-+	return 0;
-+}
-+
- /*
-  * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
-  * proper exit to userspace.
-@@ -200,7 +218,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 			*vcpu_pc(vcpu) -= adj;
- 		}
+ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_RAS_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64PFR0_GIC_SHIFT, 4, 0),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
+@@ -860,6 +861,16 @@ static bool has_no_fpsimd(const struct arm64_cpu_capabilities *entry, int __unus
+ 		.min_field_value = 0,
+ 		.matches = has_no_fpsimd,
+ 	},
++	{
++		.desc = "ARM64 RAS Extension Support",
++		.capability = ARM64_HAS_RAS_EXTN,
++		.def_scope = SCOPE_SYSTEM,
++		.matches = has_cpuid_feature,
++		.sys_reg = SYS_ID_AA64PFR0_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64PFR0_RAS_SHIFT,
++		.min_field_value = ID_AA64PFR0_RAS_V1,
++	},
+ 	{},
+ };
  
--		kvm_inject_vabt(vcpu);
-+		kvm_handle_guest_sei(vcpu, run);
- 		return 1;
- 	}
- 
-@@ -210,7 +228,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	case ARM_EXCEPTION_IRQ:
- 		return 1;
- 	case ARM_EXCEPTION_EL1_SERROR:
--		kvm_inject_vabt(vcpu);
-+		kvm_handle_guest_sei(vcpu, run);
- 		return 1;
- 	case ARM_EXCEPTION_TRAP:
- 		/*
 -- 
 1.8.3.1
-
