@@ -1,105 +1,151 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v2 7/9] KVM: arm/arm64: PMU: remove request-less vcpu kick
-Date: Fri, 31 Mar 2017 18:06:56 +0200
-Message-ID: <20170331160658.4331-8-drjones@redhat.com>
+Subject: [PATCH v2 9/9] KVM: arm/arm64: avoid race by caching MPIDR
+Date: Fri, 31 Mar 2017 18:06:58 +0200
+Message-ID: <20170331160658.4331-10-drjones@redhat.com>
 References: <20170331160658.4331-1-drjones@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE28E40B5B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Mar 2017 12:05:19 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z4WTguZDCCna for <kvmarm@lists.cs.columbia.edu>;
- Fri, 31 Mar 2017 12:05:19 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 262D740C2A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Mar 2017 12:05:19 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170331160658.4331-1-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: marc.zyngier@arm.com, cdall@linaro.org, pbonzini@redhat.com
+Cc: cdall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Refactor PMU overflow handling in order to remove the request-less
-vcpu kick.  Now, since kvm_vgic_inject_irq() uses vcpu requests,
-there should be no chance that a kick sent at just the wrong time
-(between the VCPU's call to kvm_pmu_flush_hwstate() and before it
-enters guest mode) results in a failure for the guest to see updated
-GIC state until its next exit some time later for some other reason.
+Cache the MPIDR in the vcpu structure to fix potential races that
+can arise between vcpu reset and the extraction of the MPIDR from
+the sys-reg array.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- virt/kvm/arm/pmu.c | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+ arch/arm/include/asm/kvm_emulate.h   |  2 +-
+ arch/arm/include/asm/kvm_host.h      |  3 +++
+ arch/arm/kvm/coproc.c                | 20 ++++++++++++--------
+ arch/arm64/include/asm/kvm_emulate.h |  2 +-
+ arch/arm64/include/asm/kvm_host.h    |  3 +++
+ arch/arm64/kvm/sys_regs.c            | 27 ++++++++++++++-------------
+ 6 files changed, 34 insertions(+), 23 deletions(-)
 
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 69ccce308458..9d725f3afb11 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -203,6 +203,19 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
- 	return reg;
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 9a8a45aaf19a..1b922de46785 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -213,7 +213,7 @@ static inline u32 kvm_vcpu_hvc_get_imm(struct kvm_vcpu *vcpu)
+ 
+ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+ {
+-	return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK;
++	return vcpu->arch.vmpidr & MPIDR_HWID_BITMASK;
  }
  
-+static void kvm_pmu_check_overflow(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	bool overflow;
+ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 0b8a6d6b3cb3..e0f461f0af67 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -151,6 +151,9 @@ struct kvm_vcpu_arch {
+ 	/* The CPU type we expose to the VM */
+ 	u32 midr;
+ 
++	/* vcpu MPIDR */
++	u32 vmpidr;
 +
-+	overflow = !!kvm_pmu_overflow_status(vcpu);
-+	if (pmu->irq_level != overflow) {
-+		pmu->irq_level = overflow;
-+		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-+				    pmu->irq_num, overflow);
+ 	/* HYP trapping configuration */
+ 	u32 hcr;
+ 
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index 3e5e4194ef86..c4df7c9c8ddb 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -101,14 +101,18 @@ int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
+ {
+-	/*
+-	 * Compute guest MPIDR. We build a virtual cluster out of the
+-	 * vcpu_id, but we read the 'U' bit from the underlying
+-	 * hardware directly.
+-	 */
+-	vcpu_cp15(vcpu, c0_MPIDR) = ((read_cpuid_mpidr() & MPIDR_SMP_BITMASK) |
+-				     ((vcpu->vcpu_id >> 2) << MPIDR_LEVEL_BITS) |
+-				     (vcpu->vcpu_id & 3));
++	if (!vcpu->arch.vmpidr) {
++		/*
++		 * Compute guest MPIDR. We build a virtual cluster out of the
++		 * vcpu_id, but we read the 'U' bit from the underlying
++		 * hardware directly.
++		 */
++		u32 mpidr = ((read_cpuid_mpidr() & MPIDR_SMP_BITMASK) |
++			     ((vcpu->vcpu_id >> 2) << MPIDR_LEVEL_BITS) |
++			     (vcpu->vcpu_id & 3));
++		vcpu->arch.vmpidr = mpidr;
 +	}
-+}
++	vcpu_cp15(vcpu, c0_MPIDR) = vcpu->arch.vmpidr;
+ }
+ 
+ /* TRM entries A7:4.3.31 A15:4.3.28 - RO WI */
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index f5ea0ba70f07..c138bb15b507 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -242,7 +242,7 @@ static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
+ 
+ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+ {
+-	return vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
++	return vcpu->arch.vmpidr_el2 & MPIDR_HWID_BITMASK;
+ }
+ 
+ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7057512b3474..268c10d95a79 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -198,6 +198,9 @@ typedef struct kvm_cpu_context kvm_cpu_context_t;
+ struct kvm_vcpu_arch {
+ 	struct kvm_cpu_context ctxt;
+ 
++	/* vcpu MPIDR */
++	u64 vmpidr_el2;
 +
- /**
-  * kvm_pmu_overflow_set - set PMU overflow interrupt
-  * @vcpu: The vcpu pointer
-@@ -210,31 +223,19 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
-  */
- void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
- {
--	u64 reg;
--
- 	if (val == 0)
- 		return;
+ 	/* HYP configuration */
+ 	u64 hcr_el2;
+ 	u32 mdcr_el2;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 0e26f8c2b56f..517aed6d8016 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -431,19 +431,20 @@ static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
  
- 	vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= val;
--	reg = kvm_pmu_overflow_status(vcpu);
--	if (reg != 0)
--		kvm_vcpu_kick(vcpu);
-+	kvm_pmu_check_overflow(vcpu);
+ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ {
+-	u64 mpidr;
+-
+-	/*
+-	 * Map the vcpu_id into the first three affinity level fields of
+-	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
+-	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
+-	 * of the GICv3 to be able to address each CPU directly when
+-	 * sending IPIs.
+-	 */
+-	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
+-	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
+-	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
+-	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
++	if (!vcpu->arch.vmpidr_el2) {
++		/*
++		 * Map the vcpu_id into the first three affinity level fields
++		 * of the MPIDR. We limit the number of VCPUs in level 0 due to
++		 * a limitation of 16 CPUs in that level in the ICC_SGIxR
++		 * registers of the GICv3, which are used to address each CPU
++		 * directly when sending IPIs.
++		 */
++		u64 mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
++		mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
++		mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
++		vcpu->arch.vmpidr_el2 = (1ULL << 31) | mpidr;
++	}
++	vcpu_sys_reg(vcpu, MPIDR_EL1) = vcpu->arch.vmpidr_el2;
  }
  
- static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
- {
--	struct kvm_pmu *pmu = &vcpu->arch.pmu;
--	bool overflow;
--
- 	if (!kvm_arm_pmu_v3_ready(vcpu))
- 		return;
- 
--	overflow = !!kvm_pmu_overflow_status(vcpu);
--	if (pmu->irq_level != overflow) {
--		pmu->irq_level = overflow;
--		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
--				    pmu->irq_num, overflow);
--	}
-+	kvm_pmu_check_overflow(vcpu);
- }
- 
- /**
+ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
 -- 
 2.9.3
