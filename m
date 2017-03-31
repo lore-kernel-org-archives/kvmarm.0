@@ -1,13 +1,13 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v3 2/8] acpi: apei: handle SEI notification type for ARMv8
-Date: Fri, 31 Mar 2017 17:20:26 +0100
-Message-ID: <58DE81CA.3020803@arm.com>
-References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com> <1490869877-118713-3-git-send-email-xiexiuqi@huawei.com>
+Subject: Re: [PATCH v3 4/8] APEI: GHES: reserve a virtual page for SEI context
+Date: Fri, 31 Mar 2017 17:22:42 +0100
+Message-ID: <58DE8252.7070709@arm.com>
+References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com> <1490869877-118713-5-git-send-email-xiexiuqi@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <1490869877-118713-3-git-send-email-xiexiuqi@huawei.com>
+In-Reply-To: <1490869877-118713-5-git-send-email-xiexiuqi@huawei.com>
 Sender: linux-acpi-owner@vger.kernel.org
 To: Xie XiuQi <xiexiuqi@huawei.com>
 Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, fu.wei@linaro.org, rostedt@goodmis.org, hanjun.guo@linaro.org, shiju.jose@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, gengdongjiu@huawei.com, zhengqiang10@huawei.com, wuquanming@huawei.com, wangxiongfeng2@huawei.com
@@ -16,62 +16,70 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi Xie XiuQi,
 
 On 30/03/17 11:31, Xie XiuQi wrote:
-> ARM APEI extension proposal added SEI (asynchronous SError interrupt)
-> notification type for ARMv8.
+> On arm64 platform, SEI may interrupt code which had interrupts masked.
+> But SEI could be masked, so it's not treated as NMI, however SEA is
+> treated as NMI.
 > 
-> Add a new GHES error source handling function for SEI. In firmware
-> first mode, if an error source's notification type is SEI. Then GHES
-> could parse and report the detail error information.
+> So, the  memory area used to transfer hardware error information from
+> BIOS to Linux can be determined only in NMI, SEI(arm64), IRQ or timer
+> handler.
+> 
+> In this patch, we add a virtual page for SEI context.
 
-The APEI additions are unsafe until patch 4 as SEA can interrupt SEI and
-deadlock while trying to take the same set of locks. This patch needs to be
-after that interaction is fixed/prevented, or we should prevent it by adding a
-depends-on-not to the Kconfig to prevent SEI and SEA being registered at the
-same time. (as a short term fix).
-
-(more comments on this on that later patch)
+I don't think this is the best way of solving the interaction problem. If we
+ever need to add another notification method this gets even more complicated,
+and the ioremap code has to know how these methods can interact.
 
 
-> diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-> index e52be6a..53710a2 100644
-> --- a/arch/arm64/kernel/traps.c
-> +++ b/arch/arm64/kernel/traps.c
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 045d101..b1f9b1f 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -155,54 +162,55 @@ static void ghes_ioremap_exit(void)
 
-> @@ -625,6 +627,14 @@ asmlinkage void bad_mode(struct pt_regs *regs, int reason, unsigned int esr)
+> -static void __iomem *ghes_ioremap_pfn_irq(u64 pfn)
+> -{
+> -	unsigned long vaddr, paddr;
+> -	pgprot_t prot;
+> -
+> -	vaddr = (unsigned long)GHES_IOREMAP_IRQ_PAGE(ghes_ioremap_area->addr);
+> +	if (in_nmi()) {
+> +		raw_spin_lock(&ghes_ioremap_lock_nmi);
+> +		vaddr = (unsigned long)GHES_IOREMAP_NMI_PAGE(ghes_ioremap_area->addr);
+> +	} else if (this_cpu_read(sei_in_process)) {
 
-bad_mode() is called in other scenarios too, for example executing an undefined
-instruction at EL1. You split the SError path out of the vectors in patch 7, I
-think we should do that here.
+> +		spin_lock_irqsave(&ghes_ioremap_lock_sei, flags);
 
-
->  		handler[reason], smp_processor_id(), esr,
->  		esr_get_class_string(esr));
->  
-> +	/*
-> +	 * In firmware first mode, we could assume firmware will only generate one
-> +	 * of cper records at a time. There is no risk for one cpu to parse ghes table.
-> +	 */
-
-I don't follow this comment, is this saying SError can't interrupt SError? We
-already get this guarantee as the CPU masks SError when it takes an exception.
-
-Firmware can generate multiple CPER records for a single 'event'. The CPER
-records are the 'Data' in ACPI:Table 18-343 Generic Error Data Entry, and there
-are 'zero or more' of these with a 'Generic Error Status Block' header that
-describes the overall event. (Table 18-342).
-
-I don't think we need this comment.
+I think this one should be a raw_spin_lock. I'm pretty sure this is for RT-linux
+where spin_lock() on a contented lock will call schedule() in the same way
+mutex_lock() does. If interrupts were masked by arch code then you need to use
+raw_spin_lock.
+So now we need to know how we got in here, we interrupted the SError handler so
+this should only be Synchronous External Abort. Having to know how we got here
+is another problem with this approach.
 
 
-> +	if (IS_ENABLED(CONFIG_ACPI_APEI_SEI) && ESR_ELx_EC(esr) == ESR_ELx_EC_SERROR) {
-> +		ghes_notify_sei();
-> +	}
+As suggested earlier[0], I think the best way is to allocate one page of virtual
+address space per struct ghes, and move the locks out to the notify calls, which
+can know how they are called.
 
->  	die("Oops - bad mode", regs, 0);
->  	local_irq_disable();
->  	panic("bad mode");
+I've pushed a branch to:
+http://www.linux-arm.org/git?p=linux-jm.git;a=commit;h=refs/heads/apei_ioremap_rework/v1
+
+I intend to post those patches as an RFC series later in the cycle, I've only
+build tested it so far.
+
 
 Thanks,
 
 James
+
+> +		vaddr = (unsigned long)GHES_IOREMAP_SEI_PAGE(ghes_ioremap_area->addr);
+> +	} else {
+> +		spin_lock_irqsave(&ghes_ioremap_lock_irq, flags);
+> +		vaddr = (unsigned long)GHES_IOREMAP_IRQ_PAGE(ghes_ioremap_area->addr);
+> +	}
+
+
+[0] https://lkml.org/lkml/2017/3/20/434
 
