@@ -1,96 +1,76 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: KVM/ARM: sleeping function called from invalid context
-Date: Thu, 30 Mar 2017 18:36:07 +0100
-Message-ID: <1490895367-10547-1-git-send-email-suzuki.poulose@arm.com>
-References: <7047d954-5c43-600a-3511-4c7dbd60c175@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <7047d954-5c43-600a-3511-4c7dbd60c175@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org
-Cc: marc.zyngier@arm.com, mark.rutland@arm.com, peterz@infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Arnd Bergmann <arnd@arndb.de>
+From: Andrew Jones <drjones@redhat.com>
+Subject: [PATCH v2 0/9] KVM: arm/arm64: race fixes and vcpu requests
+Date: Fri, 31 Mar 2017 18:06:49 +0200
+Message-ID: <20170331160658.4331-1-drjones@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: cdall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-I have confirmed the theory using a sample code like :
+This series fixes some hard to produce races by introducing the use of
+vcpu requests.  It also fixes a couple easier to produce races, ones
+that have been produced with the PSCI kvm-unit-test test.  The easy two
+are addressed in two different ways: the first takes advantage of
+power_off having been changed to a vcpu request, the second caches vcpu
+MPIDRs in order to avoid extracting them from sys_regs.  I've tested the
+series on a Mustang and a ThunderX and compile-tested the ARM bits.
 
-	spin_lock(&a);
-	spin_lock(&b);
-	cond_resched_lock(&b);
-	spin_unlock(&b);
-	spin_unlock(&a);
+Patch 2/9 adds documentation, as, at least for me, understanding vcpu
+request interplay with vcpu kicks and vcpu mode and the memory barriers
+that interplay implies, is exhausting.  Hopefully the document is useful
+to others.  I'm not married to it though, so it can be deferred/dropped
+as people like...
 
-Also, the following patch solves the problem for me.
+v2:
+  - No longer based on Radim's vcpu request API rework[1], except for
+    including "add kvm_request_pending" as patch 1/9 [drew]
+  - Added vcpu request documentation [drew]
+  - Dropped the introduction of user settable MPIDRs [Christoffer]
+  - Added vcpu requests to all request-less vcpu kicks [Christoffer]
 
+[1] https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1340496.html
 
- ----8>-----
+Andrew Jones (7):
+  KVM: Add documentation for VCPU requests
+  KVM: arm/arm64: prepare to use vcpu requests
+  KVM: arm/arm64: replace vcpu->arch.pause with a vcpu request
+  KVM: arm/arm64: replace vcpu->arch.power_off with a vcpu request
+  KVM: arm/arm64: use a vcpu request on irq injection
+  KVM: arm/arm64: PMU: remove request-less vcpu kick
+  KVM: arm/arm64: avoid race by caching MPIDR
 
-sched: Fix ___might_sleep preempt count checks
+Levente Kurusa (1):
+  KVM: arm/arm64: fix race in kvm_psci_vcpu_on
 
-___might_sleep checks if the preempt_count equals the passed in
-preempt_offset to issue a warning. This could cause false warnings,
-when preempt_count is greater than the requested offset. Fix the
-check to make sure we handle this case.
+Radim Krčmář (1):
+  KVM: add kvm_request_pending
 
-e.g, following code sequence could cause false warning:
+ Documentation/virtual/kvm/vcpu-requests.rst | 114 ++++++++++++++++++++++++++++
+ arch/arm/include/asm/kvm_emulate.h          |   2 +-
+ arch/arm/include/asm/kvm_host.h             |  13 ++--
+ arch/arm/kvm/arm.c                          |  68 +++++++++++------
+ arch/arm/kvm/coproc.c                       |  20 +++--
+ arch/arm/kvm/handle_exit.c                  |   1 +
+ arch/arm/kvm/psci.c                         |  18 ++---
+ arch/arm64/include/asm/kvm_emulate.h        |   2 +-
+ arch/arm64/include/asm/kvm_host.h           |  13 ++--
+ arch/arm64/kvm/handle_exit.c                |   1 +
+ arch/arm64/kvm/sys_regs.c                   |  27 +++----
+ arch/mips/kvm/trap_emul.c                   |   2 +-
+ arch/powerpc/kvm/booke.c                    |   2 +-
+ arch/powerpc/kvm/powerpc.c                  |   5 +-
+ arch/s390/kvm/kvm-s390.c                    |   2 +-
+ arch/x86/kvm/x86.c                          |   4 +-
+ include/linux/kvm_host.h                    |   5 ++
+ virt/kvm/arm/arch_timer.c                   |   1 +
+ virt/kvm/arm/pmu.c                          |  29 +++----
+ virt/kvm/arm/vgic/vgic.c                    |  12 ++-
+ 20 files changed, 245 insertions(+), 96 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/vcpu-requests.rst
 
-foo:
-	spin_lock(&a);
-	...
-	bar() --------->     bar:
-				spin_lock(&b);
-				cond_resched_lock(&b);
-				do_something();
-				spin_unlock(&b);
-		<-----------
-	...
-	spin_unlock(&a)
-
-where locks a and b need not necessarily be related.
-
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Frederic Weisbecker <fweisbec@gmail.com>
-Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Reported-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- kernel/sched/core.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 3b31fc0..28842dc 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -6144,11 +6144,11 @@ void __init sched_init(void)
- }
- 
- #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
--static inline int preempt_count_equals(int preempt_offset)
-+static inline int preempt_count_safe(int preempt_offset)
- {
- 	int nested = preempt_count() + rcu_preempt_depth();
- 
--	return (nested == preempt_offset);
-+	return (nested >= preempt_offset);
- }
- 
- void __might_sleep(const char *file, int line, int preempt_offset)
-@@ -6179,7 +6179,7 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
- 	/* WARN_ON_ONCE() by default, no rate limit required: */
- 	rcu_sleep_check();
- 
--	if ((preempt_count_equals(preempt_offset) && !irqs_disabled() &&
-+	if ((preempt_count_safe(preempt_offset) && !irqs_disabled() &&
- 	     !is_idle_task(current)) ||
- 	    system_state != SYSTEM_RUNNING || oops_in_progress)
- 		return;
-@@ -6205,7 +6205,7 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
- 	if (irqs_disabled())
- 		print_irqtrace_events(current);
- 	if (IS_ENABLED(CONFIG_DEBUG_PREEMPT)
--	    && !preempt_count_equals(preempt_offset)) {
-+	    && !preempt_count_safe(preempt_offset)) {
- 		pr_err("Preemption disabled at:");
- 		print_ip_sym(preempt_disable_ip);
- 		pr_cont("\n");
 -- 
-2.7.4
+2.9.3
