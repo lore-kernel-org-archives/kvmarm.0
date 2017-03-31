@@ -1,221 +1,145 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v2 5/9] KVM: arm/arm64: replace vcpu->arch.power_off with a vcpu request
-Date: Fri, 31 Mar 2017 18:06:54 +0200
-Message-ID: <20170331160658.4331-6-drjones@redhat.com>
+Subject: [PATCH v2 6/9] KVM: arm/arm64: use a vcpu request on irq injection
+Date: Fri, 31 Mar 2017 18:06:55 +0200
+Message-ID: <20170331160658.4331-7-drjones@redhat.com>
 References: <20170331160658.4331-1-drjones@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E136F40C1D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Mar 2017 12:05:17 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8cpNbxCxVsrZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 31 Mar 2017 12:05:17 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0928A40A66
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Mar 2017 12:05:17 -0400 (EDT)
 In-Reply-To: <20170331160658.4331-1-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: cdall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
+Cc: marc.zyngier@arm.com, cdall@linaro.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Like pause, replacing power_off with a vcpu request ensures
-visibility of changes and avoids the final race before entering
-the guest.
+Don't use request-less VCPU kicks when injecting IRQs, as a VCPU
+kick meant to trigger the interrupt injection could be sent while
+the VCPU is outside guest mode, which means no IPI is sent, and
+after it has called kvm_vgic_flush_hwstate(), meaning it won't see
+the updated GIC state until its next exit some time later for some
+other reason.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm/include/asm/kvm_host.h   |  4 +---
- arch/arm/kvm/arm.c                | 32 ++++++++++++++++++--------------
- arch/arm/kvm/psci.c               | 17 +++++------------
- arch/arm64/include/asm/kvm_host.h |  4 +---
- 4 files changed, 25 insertions(+), 32 deletions(-)
+ arch/arm/include/asm/kvm_host.h   |  1 +
+ arch/arm/kvm/arm.c                |  1 +
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ virt/kvm/arm/arch_timer.c         |  1 +
+ virt/kvm/arm/vgic/vgic.c          | 12 ++++++++++--
+ 5 files changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 52c25536d254..afed5d44634d 100644
+index afed5d44634d..0b8a6d6b3cb3 100644
 --- a/arch/arm/include/asm/kvm_host.h
 +++ b/arch/arm/include/asm/kvm_host.h
-@@ -46,6 +46,7 @@
- #endif
+@@ -47,6 +47,7 @@
  
  #define KVM_REQ_PAUSE		8
-+#define KVM_REQ_POWER_OFF	9
+ #define KVM_REQ_POWER_OFF	9
++#define KVM_REQ_IRQ_PENDING	10
  
  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
  int __attribute_const__ kvm_target_cpu(void);
-@@ -170,9 +171,6 @@ struct kvm_vcpu_arch {
- 	 * here.
- 	 */
- 
--	/* vcpu power-off state */
--	bool power_off;
--
- 	/* IO related fields */
- 	struct kvm_decode mmio_decode;
- 
 diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index f3bfbb5f3d96..7ed39060b1cf 100644
+index 7ed39060b1cf..a106feccf314 100644
 --- a/arch/arm/kvm/arm.c
 +++ b/arch/arm/kvm/arm.c
-@@ -381,7 +381,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
- 				    struct kvm_mp_state *mp_state)
- {
--	if (vcpu->arch.power_off)
-+	if (test_bit(KVM_REQ_POWER_OFF, &vcpu->requests))
- 		mp_state->mp_state = KVM_MP_STATE_STOPPED;
- 	else
- 		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
-@@ -394,10 +394,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- {
- 	switch (mp_state->mp_state) {
- 	case KVM_MP_STATE_RUNNABLE:
--		vcpu->arch.power_off = false;
-+		clear_bit(KVM_REQ_POWER_OFF, &vcpu->requests);
- 		break;
- 	case KVM_MP_STATE_STOPPED:
--		vcpu->arch.power_off = true;
-+		set_bit(KVM_REQ_POWER_OFF, &vcpu->requests);
- 		break;
- 	default:
- 		return -EINVAL;
-@@ -415,9 +415,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
-  */
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
- {
--	return ((!!v->arch.irq_lines || kvm_vgic_vcpu_pending_irq(v))
--		&& !v->arch.power_off
--		&& !test_bit(KVM_REQ_PAUSE, &v->requests));
-+	return (!!v->arch.irq_lines || kvm_vgic_vcpu_pending_irq(v)) &&
-+		!test_bit(KVM_REQ_POWER_OFF, &v->requests) &&
-+		!test_bit(KVM_REQ_PAUSE, &v->requests);
- }
- 
- /* Just ensure a guest exit from a particular CPU */
-@@ -578,8 +578,9 @@ static void vcpu_sleep(struct kvm_vcpu *vcpu)
- {
- 	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
- 
--	swait_event_interruptible(*wq, ((!vcpu->arch.power_off) &&
--		(!test_bit(KVM_REQ_PAUSE, &vcpu->requests))));
-+	swait_event_interruptible(*wq,
-+		!test_bit(KVM_REQ_POWER_OFF, &vcpu->requests) &&
-+		!test_bit(KVM_REQ_PAUSE, &vcpu->requests));
- }
- 
- static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
-@@ -632,8 +633,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- 		update_vttbr(vcpu->kvm);
- 
--		if (vcpu->arch.power_off || test_bit(KVM_REQ_PAUSE, &vcpu->requests))
--			vcpu_sleep(vcpu);
-+		if (kvm_request_pending(vcpu)) {
-+			if (test_bit(KVM_REQ_POWER_OFF, &vcpu->requests) ||
-+			    test_bit(KVM_REQ_PAUSE, &vcpu->requests))
-+				vcpu_sleep(vcpu);
-+		}
- 
- 		/*
- 		 * Preparing the interrupts to be injected also
-@@ -664,8 +668,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		WRITE_ONCE(vcpu->mode, IN_GUEST_MODE);
- 		smp_mb();
- 
--		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
--			vcpu->arch.power_off || kvm_request_pending(vcpu)) {
-+		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)
-+		    || kvm_request_pending(vcpu)) {
- 			WRITE_ONCE(vcpu->mode, OUTSIDE_GUEST_MODE);
- 			local_irq_enable();
- 			kvm_pmu_sync_hwstate(vcpu);
-@@ -892,9 +896,9 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 	 * Handle the "start in power-off" case.
+@@ -768,6 +768,7 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
+ 	 * trigger a world-switch round on the running physical CPU to set the
+ 	 * virtual IRQ/FIQ fields in the HCR appropriately.
  	 */
- 	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
--		vcpu->arch.power_off = true;
-+		set_bit(KVM_REQ_POWER_OFF, &vcpu->requests);
- 	else
--		vcpu->arch.power_off = false;
-+		clear_bit(KVM_REQ_POWER_OFF, &vcpu->requests);
++	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+ 	kvm_vcpu_kick(vcpu);
  
  	return 0;
- }
-diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
-index 82fe7eb5b6a7..f732484abc7a 100644
---- a/arch/arm/kvm/psci.c
-+++ b/arch/arm/kvm/psci.c
-@@ -64,7 +64,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
- 
- static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.power_off = true;
-+	set_bit(KVM_REQ_POWER_OFF, &vcpu->requests);
- }
- 
- static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-@@ -88,7 +88,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	 */
- 	if (!vcpu)
- 		return PSCI_RET_INVALID_PARAMS;
--	if (!vcpu->arch.power_off) {
-+	if (!test_bit(KVM_REQ_POWER_OFF, &vcpu->requests)) {
- 		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
- 			return PSCI_RET_ALREADY_ON;
- 		else
-@@ -116,8 +116,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	 * the general puspose registers are undefined upon CPU_ON.
- 	 */
- 	vcpu_set_reg(vcpu, 0, context_id);
--	vcpu->arch.power_off = false;
--	smp_mb();		/* Make sure the above is visible */
-+	clear_bit(KVM_REQ_POWER_OFF, &vcpu->requests);
- 
- 	wq = kvm_arch_vcpu_wq(vcpu);
- 	swake_up(wq);
-@@ -154,7 +153,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
- 		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
- 		if ((mpidr & target_affinity_mask) == target_affinity) {
- 			matching_cpus++;
--			if (!tmp->arch.power_off)
-+			if (!test_bit(KVM_REQ_POWER_OFF, &tmp->requests))
- 				return PSCI_0_2_AFFINITY_LEVEL_ON;
- 		}
- 	}
-@@ -167,9 +166,6 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
- 
- static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
- {
--	int i;
--	struct kvm_vcpu *tmp;
--
- 	/*
- 	 * The KVM ABI specifies that a system event exit may call KVM_RUN
- 	 * again and may perform shutdown/reboot at a later time that when the
-@@ -179,10 +175,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
- 	 * after this call is handled and before the VCPUs have been
- 	 * re-initialized.
- 	 */
--	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
--		tmp->arch.power_off = true;
--		kvm_vcpu_kick(tmp);
--	}
-+	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_POWER_OFF);
- 
- 	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
- 	vcpu->run->system_event.type = type;
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6e1271a77e92..e78895f675d0 100644
+index e78895f675d0..7057512b3474 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -43,6 +43,7 @@
- #define KVM_VCPU_MAX_FEATURES 4
+@@ -44,6 +44,7 @@
  
  #define KVM_REQ_PAUSE		8
-+#define KVM_REQ_POWER_OFF	9
+ #define KVM_REQ_POWER_OFF	9
++#define KVM_REQ_IRQ_PENDING	10
  
  int __attribute_const__ kvm_target_cpu(void);
  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-@@ -253,9 +254,6 @@ struct kvm_vcpu_arch {
- 		u32	mdscr_el1;
- 	} guest_debug_preserved;
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 35d7100e0815..3c48abbf951b 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -95,6 +95,7 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+ 	 * If the vcpu is blocked we want to wake it up so that it will see
+ 	 * the timer has expired when entering the guest.
+ 	 */
++	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+ 	kvm_vcpu_kick(vcpu);
+ }
  
--	/* vcpu power-off state */
--	bool power_off;
--
- 	/* IO related fields */
- 	struct kvm_decode mmio_decode;
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 654dfd40e449..31fb89057f0c 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -283,8 +283,10 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
+ 		 * won't see this one until it exits for some other
+ 		 * reason.
+ 		 */
+-		if (vcpu)
++		if (vcpu) {
++			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+ 			kvm_vcpu_kick(vcpu);
++		}
+ 		return false;
+ 	}
+ 
+@@ -330,6 +332,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
+ 	spin_unlock(&irq->irq_lock);
+ 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+ 
++	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+ 	kvm_vcpu_kick(vcpu);
+ 
+ 	return true;
+@@ -654,6 +657,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
+ 	vgic_flush_lr_state(vcpu);
+ 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
++
++	/* The GIC is now ready to deliver the IRQ. */
++	clear_bit(KVM_REQ_IRQ_PENDING, &vcpu->requests);
+ }
+ 
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+@@ -691,8 +697,10 @@ void vgic_kick_vcpus(struct kvm *kvm)
+ 	 * a good kick...
+ 	 */
+ 	kvm_for_each_vcpu(c, vcpu, kvm) {
+-		if (kvm_vgic_vcpu_pending_irq(vcpu))
++		if (kvm_vgic_vcpu_pending_irq(vcpu)) {
++			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+ 			kvm_vcpu_kick(vcpu);
++		}
+ 	}
+ }
  
 -- 
 2.9.3
