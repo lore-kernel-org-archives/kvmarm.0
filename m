@@ -1,7 +1,7 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v2 2/9] KVM: Add documentation for VCPU requests
-Date: Fri, 31 Mar 2017 18:06:51 +0200
-Message-ID: <20170331160658.4331-3-drjones@redhat.com>
+Subject: [PATCH v2 3/9] KVM: arm/arm64: prepare to use vcpu requests
+Date: Fri, 31 Mar 2017 18:06:52 +0200
+Message-ID: <20170331160658.4331-4-drjones@redhat.com>
 References: <20170331160658.4331-1-drjones@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170331160658.4331-1-drjones@redhat.com>
@@ -10,131 +10,54 @@ To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: cdall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- Documentation/virtual/kvm/vcpu-requests.rst | 114 ++++++++++++++++++++++++++++
- 1 file changed, 114 insertions(+)
- create mode 100644 Documentation/virtual/kvm/vcpu-requests.rst
+Make sure we don't leave vcpu requests we don't intend to
+handle later set in the request bitmap. If we don't clear
+them, then kvm_request_pending() may return true when we
+don't want it to.
 
-diff --git a/Documentation/virtual/kvm/vcpu-requests.rst b/Documentation/virtual/kvm/vcpu-requests.rst
-new file mode 100644
-index 000000000000..ea4a966d5c8a
---- /dev/null
-+++ b/Documentation/virtual/kvm/vcpu-requests.rst
-@@ -0,0 +1,114 @@
-+=================
-+KVM VCPU Requests
-+=================
-+
-+Overview
-+========
-+
-+KVM supports an internal API enabling threads to request a VCPU thread to
-+perform some activity.  For example, a thread may request a VCPU to flush
-+its TLB with a VCPU request.  The API consists of only four calls::
-+
-+  /* Check if VCPU @vcpu has request @req pending. Clears the request. */
-+  bool kvm_check_request(int req, struct kvm_vcpu *vcpu);
-+
-+  /* Check if any requests are pending for VCPU @vcpu. */
-+  bool kvm_request_pending(struct kvm_vcpu *vcpu);
-+
-+  /* Make request @req of VCPU @vcpu. */
-+  void kvm_make_request(int req, struct kvm_vcpu *vcpu);
-+
-+  /* Make request @req of all VCPUs of the VM with struct kvm @kvm. */
-+  bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
-+
-+Typically a requester wants the VCPU to perform the activity as soon
-+as possible after making the request.  This means most requests,
-+kvm_make_request() calls, are followed by a call to kvm_vcpu_kick(),
-+and kvm_make_all_cpus_request() has the kicking of all VCPUs built
-+into it.
-+
-+VCPU Kicks
-+----------
-+
-+A VCPU kick does one of three things:
-+
-+ 1) wakes a sleeping VCPU (which sleeps outside guest mode).
-+ 2) sends an IPI to a VCPU currently in guest mode, in order to bring it
-+    out.
-+ 3) nothing, when the VCPU is already outside guest mode and not sleeping.
-+
-+VCPU Request Internals
-+======================
-+
-+VCPU requests are simply bit indices of the vcpu->requests bitmap.  This
-+means general bitops[1], e.g. clear_bit(KVM_REQ_UNHALT, &vcpu->requests),
-+may also be used.  The first 8 bits are reserved for architecture
-+independent requests, all additional bits are available for architecture
-+dependent requests.
-+
-+VCPU Requests with Associated State
-+===================================
-+
-+Requesters that want the requested VCPU to handle new state need to ensure
-+the state is observable to the requested VCPU thread's CPU at the time the
-+CPU observes the request.  This means a write memory barrier should be
-+insert between the preparation of the state and the write of the VCPU
-+request bitmap.  Additionally, on the requested VCPU thread's side, a
-+corresponding read barrier should be issued after reading the request bit
-+and before proceeding to use the state associated with it.  See the kernel
-+memory barrier documentation [2].
-+
-+VCPU Requests and Guest Mode
-+============================
-+
-+As long as the guest is either in guest mode, in which case it gets an IPI
-+and will definitely see the request, or is outside guest mode, but has yet
-+to do its final request check, and therefore when it does, it will see the
-+request, then things will work.  However, the transition from outside to
-+inside guest mode, after the last request check has been made, opens a
-+window where a request could be made, but the VCPU would not see until it
-+exits guest mode some time later.  See the table below.
-+
-++------------------+-----------------+----------------+--------------+
-+| vcpu->mode       | done last check | kick sends IPI | request seen |
-++==================+=================+================+==============+
-+| IN_GUEST_MODE    |      N/A        |      YES       |     YES      |
-++------------------+-----------------+----------------+--------------+
-+| !IN_GUEST_MODE   |      NO         |      NO        |     YES      |
-++------------------+-----------------+----------------+--------------+
-+| !IN_GUEST_MODE   |      YES        |      NO        |     NO       |
-++------------------+-----------------+----------------+--------------+
-+
-+To ensure the third scenario shown in the table above cannot happen, we
-+need to ensure the VCPU's mode change is observable by all CPUs prior to
-+its final request check and that a requester's request is observable by
-+the requested VCPU prior to the kick.  To do that we need general memory
-+barriers between each pair of operations involving mode and requests, i.e.
-+
-+  CPU_i                                  CPU_j
-+-------------------------------------------------------------------------
-+  vcpu->mode = IN_GUEST_MODE;            kvm_make_request(REQ, vcpu);
-+  smp_mb();                              smp_mb();
-+  if (kvm_request_pending(vcpu))         if (vcpu->mode == IN_GUEST_MODE)
-+      handle_requests();                     send_IPI(vcpu->cpu);
-+
-+Whether explicit barriers are needed, or reliance on implicit barriers is
-+sufficient, is architecture dependent.  Alternatively, an architecture may
-+choose to just always send the IPI, as not sending it, when it's not
-+necessary, is just an optimization.
-+
-+Additionally, the error prone third scenario described above also exhibits
-+why a request-less VCPU kick is almost never correct.  Without the
-+assurance that a non-IPI generating kick will still result in an action by
-+the requested VCPU, as the final kvm_request_pending() check does, then
-+the kick may not initiate anything useful at all.  If, for instance, a
-+request-less kick was made to a VCPU that was just about to set its mode
-+to IN_GUEST_MODE, meaning no IPI is sent, then the VCPU may continue its
-+entry without actually having done whatever it was the kick was meant to
-+initiate.
-+
-+References
-+==========
-+
-+[1] Documentation/core-api/atomic_ops.rst
-+[2] Documentation/memory-barriers.txt
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Acked-by: Christoffer Dall <cdall@linaro.org>
+---
+ arch/arm/kvm/handle_exit.c   | 1 +
+ arch/arm/kvm/psci.c          | 1 +
+ arch/arm64/kvm/handle_exit.c | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
+index 96af65a30d78..ffb2406e5905 100644
+--- a/arch/arm/kvm/handle_exit.c
++++ b/arch/arm/kvm/handle_exit.c
+@@ -72,6 +72,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		trace_kvm_wfx(*vcpu_pc(vcpu), false);
+ 		vcpu->stat.wfi_exit_stat++;
+ 		kvm_vcpu_block(vcpu);
++		clear_bit(KVM_REQ_UNHALT, &vcpu->requests);
+ 	}
+ 
+ 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
+index c2b131527a64..82fe7eb5b6a7 100644
+--- a/arch/arm/kvm/psci.c
++++ b/arch/arm/kvm/psci.c
+@@ -57,6 +57,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+ 	 * for KVM will preserve the register state.
+ 	 */
+ 	kvm_vcpu_block(vcpu);
++	clear_bit(KVM_REQ_UNHALT, &vcpu->requests);
+ 
+ 	return PSCI_RET_SUCCESS;
+ }
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index fa1b18e364fc..e4937fb2fb89 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -89,6 +89,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
+ 		vcpu->stat.wfi_exit_stat++;
+ 		kvm_vcpu_block(vcpu);
++		clear_bit(KVM_REQ_UNHALT, &vcpu->requests);
+ 	}
+ 
+ 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
 -- 
 2.9.3
