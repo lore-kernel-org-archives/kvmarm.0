@@ -1,53 +1,82 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 24/34] ARM: KVM: Implement HVC_SOFT_RESTART in the init code
-Date: Mon,  3 Apr 2017 19:37:57 +0100
-Message-ID: <20170403183807.1620-25-marc.zyngier@arm.com>
+Subject: [PATCH v5 25/34] ARM: KVM: Gracefully handle hyp-stubs being restored
+ from under our feet
+Date: Mon,  3 Apr 2017 19:37:58 +0100
+Message-ID: <20170403183807.1620-26-marc.zyngier@arm.com>
 References: <20170403183807.1620-1-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00F6D40CA1
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:37:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id B2gpvuOwHCnC for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Apr 2017 14:37:07 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE05640017
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:37:07 -0400 (EDT)
 In-Reply-To: <20170403183807.1620-1-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Russell King <linux@arm.linux.org.uk>, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Keerthy <j-keerthy@ti.com>
+Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Another missing stub hypercall is HVC_SOFT_RESTART. It turns out
-that it is pretty easy to implement in terms of HVC_RESET_VECTORS
-(since it needs to turn the MMU off).
+Should kvm_reboot() be invoked while guest is running, an IPI
+wil be issued, forcing the guest to exit and HYP being reset to
+the stubs. We will then try to reenter the guest, only to get
+an error (HVC_STUB_ERR).
 
-Tested-by: Keerthy <j-keerthy@ti.com>
-Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+This patch allows this case to be gracefully handled by exiting
+the run loop.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/init.S | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/arm/include/asm/kvm_asm.h | 2 +-
+ arch/arm/kvm/handle_exit.c     | 8 ++++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/kvm/init.S b/arch/arm/kvm/init.S
-index fb336090ee9c..e53360dceb19 100644
---- a/arch/arm/kvm/init.S
-+++ b/arch/arm/kvm/init.S
-@@ -127,8 +127,22 @@ ENTRY(__kvm_handle_stub_hvc)
- 	mrc	p15, 4, r0, c12, c0, 0	@ get HVBAR
- 	b	exit
- 
-+1:	cmp	r0, #HVC_SOFT_RESTART
-+	bne	1f
-+
-+	/* The target is expected in r1 */
-+	msr	ELR_hyp, r1
-+	mrs	r0, cpsr
-+	bic	r0, r0, #MODE_MASK
-+	orr	r0, r0, #HYP_MODE
-+THUMB(	orr	r0, r0, #PSR_T_BIT	)
-+	msr	spsr_cxsf, r0
-+	b	reset
-+
- 1:	cmp	r0, #HVC_RESET_VECTORS
- 	bne	1f
-+
-+reset:
- 	/* We're now in idmap, disable MMU */
- 	mrc	p15, 4, r1, c1, c0, 0	@ HSCTLR
- 	ldr	r0, =(HSCTLR_M | HSCTLR_A | HSCTLR_C | HSCTLR_I)
+diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+index 7ccb6f1aac5b..df113302e637 100644
+--- a/arch/arm/include/asm/kvm_asm.h
++++ b/arch/arm/include/asm/kvm_asm.h
+@@ -33,7 +33,7 @@
+ #define ARM_EXCEPTION_IRQ	  5
+ #define ARM_EXCEPTION_FIQ	  6
+ #define ARM_EXCEPTION_HVC	  7
+-
++#define ARM_EXCEPTION_HYP_GONE	  HVC_STUB_ERR
+ /*
+  * The rr_lo_hi macro swaps a pair of registers depending on
+  * current endianness. It is used in conjunction with ldrd and strd
+diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
+index 96af65a30d78..5fd7968cdae9 100644
+--- a/arch/arm/kvm/handle_exit.c
++++ b/arch/arm/kvm/handle_exit.c
+@@ -160,6 +160,14 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 	case ARM_EXCEPTION_DATA_ABORT:
+ 		kvm_inject_vabt(vcpu);
+ 		return 1;
++	case ARM_EXCEPTION_HYP_GONE:
++		/*
++		 * HYP has been reset to the hyp-stub. This happens
++		 * when a guest is pre-empted by kvm_reboot()'s
++		 * shutdown call.
++		 */
++		run->exit_reason = KVM_EXIT_FAIL_ENTRY;
++		return 0;
+ 	default:
+ 		kvm_pr_unimpl("Unsupported exception type: %d",
+ 			      exception_index);
 -- 
 2.11.0
