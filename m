@@ -1,64 +1,65 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 08/34] arm64: KVM: Implement HVC_GET_VECTORS in the init
- code
-Date: Mon,  3 Apr 2017 19:37:41 +0100
-Message-ID: <20170403183807.1620-9-marc.zyngier@arm.com>
+Subject: [PATCH v5 04/34] arm64: hyp-stub: Define a return value for failed stub calls
+Date: Mon,  3 Apr 2017 19:37:37 +0100
+Message-ID: <20170403183807.1620-5-marc.zyngier@arm.com>
 References: <20170403183807.1620-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE34740C21
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:36 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YJo90GcYuYGZ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Apr 2017 14:36:35 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FCCC40C41
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:35 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170403183807.1620-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Keerthy <j-keerthy@ti.com>
+Cc: Russell King <linux@arm.linux.org.uk>, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we have an infrastructure to handle hypercalls in the KVM
-init code, let's implement HVC_GET_VECTORS there.
+Define a standard return value to be returned when a hyp stub
+call fails, and make KVM use it for ARM_EXCEPTION_HYP_GONE
+(instead of using a KVM-specific value).
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Reviewed-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp-init.S | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_asm.h | 2 +-
+ arch/arm64/include/asm/virt.h    | 3 +++
+ arch/arm64/kernel/hyp-stub.S     | 2 +-
+ 3 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 5e39ad53bcae..fded932ede1b 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -124,7 +124,12 @@ __do_hyp_init:
- ENDPROC(__kvm_hyp_init)
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index ec3553eb9349..1769380a8fc0 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -28,7 +28,7 @@
+ #define ARM_EXCEPTION_EL1_SERROR  1
+ #define ARM_EXCEPTION_TRAP	  2
+ /* The hyp-stub will return this for any kvm_call_hyp() call */
+-#define ARM_EXCEPTION_HYP_GONE	  3
++#define ARM_EXCEPTION_HYP_GONE	  HVC_STUB_ERR
  
- ENTRY(__kvm_handle_stub_hvc)
--	cmp	x0, #HVC_RESET_VECTORS
-+	cmp	x0, #HVC_GET_VECTORS
-+	b.ne	1f
-+	mrs	x0, vbar_el2
-+	b	exit
+ #define KVM_ARM64_DEBUG_DIRTY_SHIFT	0
+ #define KVM_ARM64_DEBUG_DIRTY		(1 << KVM_ARM64_DEBUG_DIRTY_SHIFT)
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 439f6b5d31f6..1466d14c664d 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -39,6 +39,9 @@
+  */
+ #define HVC_SOFT_RESTART 2
+ 
++/* Error returned when an invalid stub number is passed into x0 */
++#define HVC_STUB_ERR	0xbadca11
 +
-+1:	cmp	x0, #HVC_RESET_VECTORS
- 	b.ne	1f
- 	/*
- 	 * Reset kvm back to the hyp stub.
+ #define BOOT_CPU_MODE_EL1	(0xe11)
+ #define BOOT_CPU_MODE_EL2	(0xe12)
+ 
+diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+index 193dfb25ce2f..f53e8b84cd3a 100644
+--- a/arch/arm64/kernel/hyp-stub.S
++++ b/arch/arm64/kernel/hyp-stub.S
+@@ -74,7 +74,7 @@ el1_sync:
+ 	br	x4				// no return
+ 
+ 	/* Someone called kvm_call_hyp() against the hyp-stub... */
+-3:	mov	x0, #ARM_EXCEPTION_HYP_GONE
++3:	ldr	x0, =HVC_STUB_ERR
+ 
+ 9:	eret
+ ENDPROC(el1_sync)
 -- 
 2.11.0
