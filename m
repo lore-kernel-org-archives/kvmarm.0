@@ -1,21 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 00/34] arm/arm64: KVM: Rework the hyp-stub API
-Date: Mon,  3 Apr 2017 19:37:33 +0100
-Message-ID: <20170403183807.1620-1-marc.zyngier@arm.com>
+Subject: [PATCH v5 02/34] arm64: KVM: Move lr save/restore to do_el2_call
+Date: Mon,  3 Apr 2017 19:37:35 +0100
+Message-ID: <20170403183807.1620-3-marc.zyngier@arm.com>
+References: <20170403183807.1620-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDB3540190
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CF4640A66
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8vEqWgvifoN3 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Apr 2017 14:36:21 -0400 (EDT)
+ with ESMTP id EfJ3dP4vfNxC for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Apr 2017 14:36:24 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09BC440017
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6154B40190
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:24 -0400 (EDT)
+In-Reply-To: <20170403183807.1620-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,127 +31,60 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As noticed by RMK in this thread[1], the hyp-stub API on 32bit ARM
-could do with some TLC (it cannot perform a soft-restart at HYP, and
-has holes in the hyp-stub support in a number of places). In general,
-it would be desirable for the 32bit behaviour to align on 64bit, if
-only to ease maintenance.
+At the moment, we only save/restore lr if on VHE, as we rely only
+the EL1 code to have preserved it in the non-VHE case.
 
-This series implements the following:
-- Add HVC_[GS]ET_VECTORS and HVC_SOFT_RESTART to the 32bit code
-- Add HVC_RESET_VECTORS to both arm and arm64, removing the need for
-  __hyp_reset_vectors
-- Implement add the stub entry points in the KVM init code, which
-  didn't implement any so far
-- Convert the HYP code to use the init code stubs directly
-- Some general cleanup as a result of these changes (which includes
-  killing HVC_GET_VECTORS)
-- Add some API documentation that covers the above
+As we're about to get rid of the latter, let's move the save/restore
+code to the do_el2_call macro, unifying both code paths.
 
-Patches 14 to 16 would be better squashed into 12 and 13, but I've
-kept them separate so that I can take the blame for everything I've
-broken.
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/hyp.S           | 3 ---
+ arch/arm64/kvm/hyp/hyp-entry.S | 4 ++--
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-I've tested this on arm (Cubietruck, Jetson TK1) and arm64 (Seattle),
-both as host and guest. Keerthy has been kind enough to test the 32bit
-code on DRA7-EVM, AM57XX-EVM and KEYSTONE-K2E-EVM.
-
-[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2016-December/473472.html
-
-* From v4:
-  - Added a standard return value on stub hypercall failure
-  - Zero r0/x0 on successful hypercall
-  - Make 32bit ARM resistant to kvm_reboot while executing a guest
-  - Update documentation to reflect the calling convention expectations
-  - Added Acks from Catalin
-  - Rebased on 4.11-rc5
-
-* From v3:
-  - Reworked the way we save/restore lr on arm64, making it EL2's job
-  in a consistent way (these are the three initial patches)
-  - Collected RBs, TBs and Acks from James, Keerthy and Russell
-  - Rebased on 4.11-rc3
-
-* From v2:
-  - Kill HVC_GET_VECTORS and the corresponding __hyp_get_vectors
-
-* From v1:
-  - Fixed some glaring bugs (reported by Ard and James)
-  - Tidy up stub vector export on 32bit (Ard)
-  - Nicer VA/PA conversion on 32bit (Ard)
-  - Updated cpu_v7_reset documentation
-  - Cleaned up HYP reset on PM events
-  - Minor stub documentation update
-
-Marc Zyngier (32):
-  arm64: hyp-stub: Stop pointlessly clobbering lr
-  arm64: KVM: Move lr save/restore to do_el2_call
-  arm64: hyp-stub: Don't save lr in the EL1 code
-  arm64: hyp-stub: Define a return value for failed stub calls
-  arm64: hyp-stub: Update documentation in asm/virt.h
-  arm64: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
-  arm64: KVM: Implement HVC_RESET_VECTORS stub hypercall in the init
-    code
-  arm64: KVM: Implement HVC_GET_VECTORS in the init code
-  arm64: KVM: Allow the main HYP code to use the init hyp stub
-    implementation
-  arm64: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
-  arm64: KVM: Implement HVC_SOFT_RESTART in the init code
-  ARM: KVM: Convert KVM to use HVC_GET_VECTORS
-  ARM: Update cpu_v7_reset documentation
-  ARM: hyp-stub: Use r1 for the soft-restart address
-  ARM: Expose the VA/IDMAP offset
-  ARM: hyp-stub: Define a return value for failed stub calls
-  ARM: hyp-stub: Implement HVC_RESET_VECTORS stub hypercall
-  ARM: KVM: Implement HVC_RESET_VECTORS stub hypercall in the init code
-  ARM: KVM: Implement HVC_GET_VECTORS in the init code
-  ARM: KVM: Allow the main HYP code to use the init hyp stub
-    implementation
-  ARM: KVM: Convert __cpu_reset_hyp_mode to using __hyp_reset_vectors
-  ARM: KVM: Implement HVC_SOFT_RESTART in the init code
-  ARM: KVM: Gracefully handle hyp-stubs being restored from under our
-    feet
-  arm/arm64: KVM: Use __hyp_reset_vectors() directly
-  arm/arm64: KVM: Remove kvm_get_idmap_start
-  arm/arm64: KVM: Use HVC_RESET_VECTORS to reinit HYP mode
-  ARM: decompressor: Remove __hyp_get_vectors usage
-  ARM: hyp-stub/KVM: Kill __hyp_get_vectors
-  arm64: hyp-stub/KVM: Kill __hyp_get_vectors
-  arm64: hyp-stub: Zero x0 on successful stub handling
-  ARM: hyp-stub: Zero r0 on successful stub handling
-  arm/arm64: Add hyp-stub API documentation
-
-Russell King (2):
-  ARM: hyp-stub: improve ABI
-  ARM: soft-reboot into same mode that we entered the kernel
-
- Documentation/virtual/kvm/arm/hyp-abi.txt | 53 +++++++++++++++++++++++++++++++
- arch/arm/boot/compressed/head.S           | 12 ++++++-
- arch/arm/include/asm/kvm_asm.h            |  4 +--
- arch/arm/include/asm/kvm_host.h           |  6 ----
- arch/arm/include/asm/kvm_mmu.h            |  1 -
- arch/arm/include/asm/proc-fns.h           |  4 +--
- arch/arm/include/asm/virt.h               | 14 +++++++-
- arch/arm/kernel/hyp-stub.S                | 41 +++++++++++++++++++-----
- arch/arm/kernel/reboot.c                  |  7 ++--
- arch/arm/kvm/arm.c                        | 25 ++++++---------
- arch/arm/kvm/handle_exit.c                |  8 +++++
- arch/arm/kvm/hyp/hyp-entry.S              | 29 ++++++++++++++---
- arch/arm/kvm/init.S                       | 51 ++++++++++++++++++++++++-----
- arch/arm/kvm/interrupts.S                 |  4 ---
- arch/arm/kvm/mmu.c                        |  5 ---
- arch/arm/mm/mmu.c                         |  5 +++
- arch/arm/mm/proc-v7.S                     | 15 ++++++---
- arch/arm64/include/asm/kvm_asm.h          |  3 +-
- arch/arm64/include/asm/kvm_host.h         |  7 ----
- arch/arm64/include/asm/kvm_mmu.h          |  1 -
- arch/arm64/include/asm/virt.h             | 31 ++++++++++++------
- arch/arm64/kernel/hyp-stub.S              | 38 ++++++++--------------
- arch/arm64/kvm/hyp-init.S                 | 46 +++++++++++++++++++++------
- arch/arm64/kvm/hyp.S                      |  5 +--
- arch/arm64/kvm/hyp/hyp-entry.S            | 43 ++++++++++++-------------
- 25 files changed, 312 insertions(+), 146 deletions(-)
- create mode 100644 Documentation/virtual/kvm/arm/hyp-abi.txt
-
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 2726635dceba..f6f20b58d65a 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -38,13 +38,10 @@
+  * A function pointer with a value less than 0xfff has a special meaning,
+  * and is used to implement __hyp_get_vectors in the same way as in
+  * arch/arm64/kernel/hyp_stub.S.
+- * HVC behaves as a 'bl' call and will clobber lr.
+  */
+ ENTRY(__kvm_call_hyp)
+ alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+-	str     lr, [sp, #-16]!
+ 	hvc	#0
+-	ldr     lr, [sp], #16
+ 	ret
+ alternative_else_nop_endif
+ 	b	__vhe_hyp_call
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 5e9052f087f2..d8ef788646c6 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -32,17 +32,17 @@
+ 	 * Shuffle the parameters before calling the function
+ 	 * pointed to in x0. Assumes parameters in x[1,2,3].
+ 	 */
++	str	lr, [sp, #-16]!
+ 	mov	lr, x0
+ 	mov	x0, x1
+ 	mov	x1, x2
+ 	mov	x2, x3
+ 	blr	lr
++	ldr	lr, [sp], #16
+ .endm
+ 
+ ENTRY(__vhe_hyp_call)
+-	str	lr, [sp, #-16]!
+ 	do_el2_call
+-	ldr	lr, [sp], #16
+ 	/*
+ 	 * We used to rely on having an exception return to get
+ 	 * an implicit isb. In the E2H case, we don't have it anymore.
 -- 
 2.11.0
