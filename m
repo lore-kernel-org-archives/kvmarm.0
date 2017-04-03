@@ -1,104 +1,130 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3] kvm: arm/arm64: Fix locking for kvm_free_stage2_pgd
-Date: Mon, 3 Apr 2017 16:31:27 +0200
-Message-ID: <20170403143127.GA11752@cbox>
-References: <1491228763-23450-1-git-send-email-suzuki.poulose@arm.com>
- <20170403142211.GE18905@leverpostej>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170403142211.GE18905@leverpostej>
-Sender: stable-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, andreyknvl@google.com, dvyukov@google.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kcc@google.com, syzkaller@googlegroups.com, will.deacon@arm.com, catalin.marinas@arm.com, pbonzini@redhat.com, ard.biesheuvel@linaro.org, stable@vger.kernel.org
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: [RFC 0/9] ARMv8.3 pointer authentication userspace support
+Date: Mon,  3 Apr 2017 16:19:16 +0100
+Message-ID: <1491232765-32501-1-git-send-email-mark.rutland@arm.com>
+Return-path: <linux-arch-owner@vger.kernel.org>
+Sender: linux-arch-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, arnd@arndb.de, catalin.marinas@arm.com, christoffer.dall@linaro.org, jiong.wang@arm.com, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, marc.zyngier@arm.com, mark.rutland@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 03, 2017 at 03:22:11PM +0100, Mark Rutland wrote:
-> Hi,
-> 
-> On Mon, Apr 03, 2017 at 03:12:43PM +0100, Suzuki K Poulose wrote:
-> > In kvm_free_stage2_pgd() we don't hold the kvm->mmu_lock while calling
-> > unmap_stage2_range() on the entire memory range for the guest. This could
-> > cause problems with other callers (e.g, munmap on a memslot) trying to
-> > unmap a range. And since we have to unmap the entire Guest memory range
-> > holding a spinlock, make sure we yield the lock if necessary, after we
-> > unmap each PUD range.
-> > 
-> > Fixes: commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
-> > Cc: stable@vger.kernel.org # v3.10+
-> > Cc: Paolo Bonzini <pbonzin@redhat.com>
-> > Cc: Marc Zyngier <marc.zyngier@arm.com>
-> > Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> > Cc: Mark Rutland <mark.rutland@arm.com>
-> > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > [ Avoid vCPU starvation and lockup detector warnings ]
-> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > 
-> > ---
-> > Changes since V2:
-> >  - Restrict kvm->mmu_lock relaxation to bigger ranges in unmap_stage2_range(),
-> >    to avoid possible issues like [0]
-> > 
-> >  [0] http://lists.infradead.org/pipermail/linux-arm-kernel/2017-March/498210.html
-> 
-> Sorry if I'm being thick, but how does restricting this to a larger
-> range help with the "sleeping function called from invalid context"
-> issue?
-> 
-> Surely that just makes it rarer?
+This series adds support for the ARMv8.3 pointer authentication extension.
 
-As far as I can tell, the unmap_stage2_range() function is only called
-in the problematic path which has the extra lock taken rom
-try_to_unmap_one() via the kvm_unmap_hva() function, which always
-passes PAGE_SIZE as the argument, which is always smaller than
-S2_PUD_SIZE.
+I've included a quick intro to the extension below, with the usual series
+description below that. The final patch of the series adds additional
+documentation regarding the extension.
 
-Did I miss something?
+I've based the series on the arm64 for-next/core branch [1]. I'm aware that
+this series may conflict with other patches currently in flight (e.g.
+allocation of ELF notes), and I intend to rebase this series as things settle.
+
+I've pushed the series to the arm64/pointer-auth branch [2] of my linux tree.
+I've also pushed out a necessary bootwrapper patch to the pointer-auth branch
+[3] of my bootwrapper repo.
+
+
+Extension Overview 
+==================
+
+The ARMv8.3 pointer authentication extension adds functionality to detect
+modification of pointer values, mitigating certain classes of attack such as
+stack smashing, and making return oriented programming attacks harder
+
+The extension introduces the concept of a pointer authentication code (PAC),
+which is stored in some upper bits of pointers. Each PAC is derived from the
+original pointer, another 64-bit value (e.g. the stack pointer), and a secret
+128-bit key.
+
+New instructions are added which can be used to:
+
+* Insert a PAC into a pointer
+* Strip a PAC from a pointer
+* Authenticate strip a PAC from a pointer
+
+If authentication succeeds, the code is removed, yielding the original pointer.
+If authentication fails, bits are set in the pointer such that it is guaranteed
+to cause a fault if used.
+
+These instructions can make use of four keys:
+
+* APIAKey (A.K.A. Instruction A key)
+* APIBKey (A.K.A. Instruction B key)
+* APDAKey (A.K.A. Data A key)
+* APDBKey (A.K.A. Data B Key)
+
+A subset of these instruction encodings have been allocated from the HINT
+space, and will operate as NOPs on any ARMv8 parts which do not feature the
+extension (or if purposefully disabled by the kernel). Software using only this
+subset of the instructions should function correctly on all ARMv8-A parts.
+
+Additionally, instructions are added to authenticate small blocks of memory in
+similar fashion, using APGAKey (A.K.A. Generic key).
+
+
+This Series
+===========
+
+This series enables the use of instructions using APIAKey, which is initialised
+and maintained per-process (shared by all threads). This series does not add
+support for APIBKey, APDAKey, APDBKey, nor APGAKey. The series only supports
+the use of an architected algorithm.
+
+I've given this some basic testing with a homebrew test suite. More ideally,
+we'd add some tests to the kernel source tree.
+
+I've added some basic KVM support, but this doesn't cater for systems with
+mismatched support. Looking forward, we'll need ID register emulation in KVM so
+that we can hide features from guests to cater for cases like this.
+
+There are also a few questions to consider, e.g:
+
+* Should we expose a per-process data key now, to go with the insn key?
+* Should keys be per-thread rather than per-process?
+* Should we expose generic authentication (i.e. APGAKey)?
+* Should the kernel remove PACs when unwinding user stacks?
 
 Thanks,
--Christoffer
-> 
-> > 
-> > Changes since V1:
-> >  - Yield the kvm->mmu_lock if necessary in unmap_stage2_range to prevent
-> >    vCPU starvation and lockup detector warnings.
-> > ---
-> >  arch/arm/kvm/mmu.c | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> > 
-> > diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> > index 13b9c1f..db94f3a 100644
-> > --- a/arch/arm/kvm/mmu.c
-> > +++ b/arch/arm/kvm/mmu.c
-> > @@ -292,8 +292,15 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
-> >  	phys_addr_t addr = start, end = start + size;
-> >  	phys_addr_t next;
-> >  
-> > +	assert_spin_locked(&kvm->mmu_lock);
-> >  	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
-> >  	do {
-> > +		/*
-> > +		 * If the range is too large, release the kvm->mmu_lock
-> > +		 * to prevent starvation and lockup detector warnings.
-> > +		 */
-> > +		if (size > S2_PUD_SIZE)
-> > +			cond_resched_lock(&kvm->mmu_lock);
-> >  		next = stage2_pgd_addr_end(addr, end);
-> >  		if (!stage2_pgd_none(*pgd))
-> >  			unmap_stage2_puds(kvm, pgd, addr, next);
-> > @@ -831,7 +838,10 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
-> >  	if (kvm->arch.pgd == NULL)
-> >  		return;
-> >  
-> > +	spin_lock(&kvm->mmu_lock);
-> >  	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
-> > +	spin_unlock(&kvm->mmu_lock);
-> > +
-> >  	/* Free the HW pgd, one page at a time */
-> >  	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
-> >  	kvm->arch.pgd = NULL;
-> > -- 
-> > 2.7.4
-> > 
+Mark.
+
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
+[2] git://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git arm64/pointer-auth
+[3] git://git.kernel.org/pub/scm/linux/kernel/git/mark/boot-wrapper-aarch64.git pointer-auth
+
+Mark Rutland (9):
+  asm-generic: mm_hooks: allow hooks to be overridden individually
+  arm64: add pointer authentication register bits
+  arm64/cpufeature: add ARMv8.3 id_aa64isar1 bits
+  arm64/cpufeature: detect pointer authentication
+  arm64: Don't trap host pointer auth use to EL2
+  arm64: add basic pointer authentication support
+  arm64: expose PAC bit positions via ptrace
+  arm64/kvm: context-switch PAC registers
+  arm64: docs: document pointer authentication
+
+ Documentation/arm64/booting.txt                |  8 +++
+ Documentation/arm64/pointer-authentication.txt | 78 +++++++++++++++++++++
+ arch/arm64/Kconfig                             | 23 ++++++
+ arch/arm64/include/asm/cpucaps.h               |  4 +-
+ arch/arm64/include/asm/esr.h                   |  3 +-
+ arch/arm64/include/asm/kvm_arm.h               |  2 +
+ arch/arm64/include/asm/kvm_emulate.h           | 15 ++++
+ arch/arm64/include/asm/kvm_host.h              | 12 ++++
+ arch/arm64/include/asm/mmu.h                   |  5 ++
+ arch/arm64/include/asm/mmu_context.h           | 25 ++++++-
+ arch/arm64/include/asm/pointer_auth.h          | 96 ++++++++++++++++++++++++++
+ arch/arm64/include/asm/sysreg.h                | 30 ++++++++
+ arch/arm64/include/uapi/asm/hwcap.h            |  1 +
+ arch/arm64/include/uapi/asm/ptrace.h           |  5 ++
+ arch/arm64/kernel/cpufeature.c                 | 39 ++++++++++-
+ arch/arm64/kernel/cpuinfo.c                    |  1 +
+ arch/arm64/kernel/head.S                       | 19 ++++-
+ arch/arm64/kernel/ptrace.c                     | 39 +++++++++++
+ arch/arm64/kvm/hyp/sysreg-sr.c                 | 43 ++++++++++++
+ include/asm-generic/mm_hooks.h                 | 12 ++++
+ include/uapi/linux/elf.h                       |  1 +
+ 21 files changed, 454 insertions(+), 7 deletions(-)
+ create mode 100644 Documentation/arm64/pointer-authentication.txt
+ create mode 100644 arch/arm64/include/asm/pointer_auth.h
+
+-- 
+1.9.1
