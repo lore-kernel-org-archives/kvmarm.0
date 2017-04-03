@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 15/34] ARM: Update cpu_v7_reset documentation
-Date: Mon,  3 Apr 2017 19:37:48 +0100
-Message-ID: <20170403183807.1620-16-marc.zyngier@arm.com>
+Subject: [PATCH v5 23/34] ARM: KVM: Convert __cpu_reset_hyp_mode to using
+ __hyp_reset_vectors
+Date: Mon,  3 Apr 2017 19:37:56 +0100
+Message-ID: <20170403183807.1620-24-marc.zyngier@arm.com>
 References: <20170403183807.1620-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3C0A40A7F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E34240C43
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:37:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 58D9wGx4zIaU for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Apr 2017 14:36:48 -0400 (EDT)
+ with ESMTP id UykOrBuPu1M2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Apr 2017 14:37:04 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D6E6940C56
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 48B5E40C4C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:37:04 -0400 (EDT)
 In-Reply-To: <20170403183807.1620-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,37 +32,64 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-cpu_v7_reset() now takes a second parameter indicating whether
-we should reboot in HYP or not. Update the documentation to
-reflect this.
+We are now able to use the hyp stub to reset HYP mode. Time to
+kiss __kvm_hyp_reset goodbye, and use __hyp_reset_vectors.
 
 Tested-by: Keerthy <j-keerthy@ti.com>
 Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/mm/proc-v7.S | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_asm.h  | 2 --
+ arch/arm/include/asm/kvm_host.h | 2 +-
+ arch/arm/kvm/init.S             | 2 --
+ 3 files changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
-index 1846ca4255d0..01d64c0b2563 100644
---- a/arch/arm/mm/proc-v7.S
-+++ b/arch/arm/mm/proc-v7.S
-@@ -39,13 +39,14 @@ ENTRY(cpu_v7_proc_fin)
- ENDPROC(cpu_v7_proc_fin)
+diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+index 8ef05381984b..7ccb6f1aac5b 100644
+--- a/arch/arm/include/asm/kvm_asm.h
++++ b/arch/arm/include/asm/kvm_asm.h
+@@ -72,8 +72,6 @@ extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
  
- /*
-- *	cpu_v7_reset(loc)
-+ *	cpu_v7_reset(loc, hyp)
-  *
-  *	Perform a soft reset of the system.  Put the CPU into the
-  *	same state as it would be if it had been reset, and branch
-  *	to what would be the reset vector.
-  *
-  *	- loc   - location to jump to for soft reset
-+ *	- hyp   - indicate if restart occurs in HYP mode
-  *
-  *	This code must be executed using a flat identity mapping with
-  *      caches disabled.
+ extern void __init_stage2_translation(void);
+ 
+-extern void __kvm_hyp_reset(unsigned long);
+-
+ extern u64 __vgic_v3_get_ich_vtr_el2(void);
+ extern void __vgic_v3_init_lrs(void);
+ #endif
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 31ee468ce667..adea30753185 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -273,7 +273,7 @@ static inline void __cpu_init_stage2(void)
+ static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+ 					phys_addr_t phys_idmap_start)
+ {
+-	kvm_call_hyp((void *)virt_to_idmap(__kvm_hyp_reset), vector_ptr);
++	__hyp_reset_vectors();
+ }
+ 
+ static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+diff --git a/arch/arm/kvm/init.S b/arch/arm/kvm/init.S
+index d6b2f496fa13..fb336090ee9c 100644
+--- a/arch/arm/kvm/init.S
++++ b/arch/arm/kvm/init.S
+@@ -129,7 +129,6 @@ ENTRY(__kvm_handle_stub_hvc)
+ 
+ 1:	cmp	r0, #HVC_RESET_VECTORS
+ 	bne	1f
+-ENTRY(__kvm_hyp_reset)
+ 	/* We're now in idmap, disable MMU */
+ 	mrc	p15, 4, r1, c1, c0, 0	@ HSCTLR
+ 	ldr	r0, =(HSCTLR_M | HSCTLR_A | HSCTLR_C | HSCTLR_I)
+@@ -151,7 +150,6 @@ ENTRY(__kvm_hyp_reset)
+ exit:
+ 	eret
+ ENDPROC(__kvm_handle_stub_hvc)
+-ENDPROC(__kvm_hyp_reset)
+ 
+ 	.ltorg
+ 
 -- 
 2.11.0
