@@ -1,23 +1,22 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: [RFC 1/9] asm-generic: mm_hooks: allow hooks to be overridden
- individually
-Date: Mon,  3 Apr 2017 16:19:17 +0100
-Message-ID: <1491232765-32501-2-git-send-email-mark.rutland@arm.com>
+Subject: [RFC 2/9] arm64: add pointer authentication register bits
+Date: Mon,  3 Apr 2017 16:19:18 +0100
+Message-ID: <1491232765-32501-3-git-send-email-mark.rutland@arm.com>
 References: <1491232765-32501-1-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E7CAF40A66
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 11:17:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A754240C17
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 11:17:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6uKB8ZQLMVPc for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Apr 2017 11:17:47 -0400 (EDT)
+ with ESMTP id LffV8epOk4kn for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Apr 2017 11:17:58 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E96B540B58
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 11:17:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FA1F40A7F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 11:17:58 -0400 (EDT)
 In-Reply-To: <1491232765-32501-1-git-send-email-mark.rutland@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,75 +31,103 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently, an architecture must either implement all of the mm hooks
-itself, or use all of those provided by the asm-generic implementation.
-When an architecture only needs to override a single hook, it must copy
-the stub implementations from the asm-generic version.
+The ARMv8.3 pointer authentication extension adds:
 
-To avoid this repetition, allow each hook to be overridden indiviually,
-by placing each under an #ifndef block. As architectures providing their
-own hooks can't include this file today, this shouldn't adversely affect
-any existing hooks.
+* New fields in ID_AA64ISAR1 to report the presence of pointer
+  authentication functionality.
+
+* New control bits in SCTLR_ELx to enable this functionality.
+
+* New system registers to hold the keys necessary for this
+  functionality.
+
+* A new ESR_ELx.EC code used when the new instructions are affected by
+  configurable traps
+
+This patch adds the relevant definitions to <asm/sysreg.h> and
+<asm/esr.h> for these, to be used by subsequent patches.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Arnd Bergmann <arnd@arndb.de> 
-Cc: linux-arch@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
 ---
- include/asm-generic/mm_hooks.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ arch/arm64/include/asm/esr.h    |  3 ++-
+ arch/arm64/include/asm/sysreg.h | 30 ++++++++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/include/asm-generic/mm_hooks.h b/include/asm-generic/mm_hooks.h
-index cc5d9a1..c5a4328 100644
---- a/include/asm-generic/mm_hooks.h
-+++ b/include/asm-generic/mm_hooks.h
-@@ -6,36 +6,48 @@
- #ifndef _ASM_GENERIC_MM_HOOKS_H
- #define _ASM_GENERIC_MM_HOOKS_H
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index d14c478..dd61adc 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -29,7 +29,8 @@
+ #define ESR_ELx_EC_CP14_LS	(0x06)
+ #define ESR_ELx_EC_FP_ASIMD	(0x07)
+ #define ESR_ELx_EC_CP10_ID	(0x08)
+-/* Unallocated EC: 0x09 - 0x0B */
++#define ESR_ELx_EC_PAC		(0x09)
++/* Unallocated EC: 0x0A - 0x0B */
+ #define ESR_ELx_EC_CP14_64	(0x0C)
+ /* Unallocated EC: 0x0d */
+ #define ESR_ELx_EC_ILL		(0x0E)
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index c776bde..2ed69aa 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -122,6 +122,19 @@
+ #define SYS_CTR_EL0			sys_reg(3, 3, 0, 0, 1)
+ #define SYS_DCZID_EL0			sys_reg(3, 3, 0, 0, 7)
  
-+#ifndef arch_dup_mmap
- static inline void arch_dup_mmap(struct mm_struct *oldmm,
- 				 struct mm_struct *mm)
- {
- }
-+#endif
++#define SYS_APIAKEYLO_EL1		sys_reg(3, 0, 2, 1, 0)
++#define SYS_APIAKEYHI_EL1		sys_reg(3, 0, 2, 1, 1)
++#define SYS_APIBKEYLO_EL1		sys_reg(3, 0, 2, 1, 2)
++#define SYS_APIBKEYHI_EL1		sys_reg(3, 0, 2, 1, 3)
++
++#define SYS_APDAKEYLO_EL1		sys_reg(3, 0, 2, 2, 0)
++#define SYS_APDAKEYHI_EL1		sys_reg(3, 0, 2, 2, 1)
++#define SYS_APDBKEYLO_EL1		sys_reg(3, 0, 2, 2, 2)
++#define SYS_APDBKEYHI_EL1		sys_reg(3, 0, 2, 2, 3)
++
++#define SYS_APGAKEYLO_EL1		sys_reg(3, 0, 2, 3, 0)
++#define SYS_APGAKEYHI_EL1		sys_reg(3, 0, 2, 3, 1)
++
+ #define REG_PSTATE_PAN_IMM		sys_reg(0, 0, 4, 0, 4)
+ #define REG_PSTATE_UAO_IMM		sys_reg(0, 0, 4, 0, 3)
  
-+#ifndef arch_exit_mmap
- static inline void arch_exit_mmap(struct mm_struct *mm)
- {
- }
-+#endif
+@@ -131,7 +144,11 @@
+ 				      (!!x)<<8 | 0x1f)
  
-+#ifndef arch_unmap
- static inline void arch_unmap(struct mm_struct *mm,
- 			struct vm_area_struct *vma,
- 			unsigned long start, unsigned long end)
- {
- }
-+#endif
+ /* Common SCTLR_ELx flags. */
++#define SCTLR_ELx_ENIA	(1 << 31)
++#define SCTLR_ELx_ENIB	(1 << 30)
++#define SCTLR_ELx_ENDA	(1 << 27)
+ #define SCTLR_ELx_EE    (1 << 25)
++#define SCTLR_ELx_ENDB	(1 << 13)
+ #define SCTLR_ELx_I	(1 << 12)
+ #define SCTLR_ELx_SA	(1 << 3)
+ #define SCTLR_ELx_C	(1 << 2)
+@@ -157,9 +174,22 @@
+ #define ID_AA64ISAR0_AES_SHIFT		4
  
-+#ifndef arch_bprm_mm_init
- static inline void arch_bprm_mm_init(struct mm_struct *mm,
- 				     struct vm_area_struct *vma)
- {
- }
-+#endif
+ /* id_aa64isar1 */
++#define ID_AA64ISAR1_GPI_SHIFT		28
++#define ID_AA64ISAR1_GPA_SHIFT		24
+ #define ID_AA64ISAR1_LRCPC_SHIFT	20
+ #define ID_AA64ISAR1_FCMA_SHIFT		16
+ #define ID_AA64ISAR1_JSCVT_SHIFT	12
++#define ID_AA64ISAR1_APA_SHIFT		4
++#define ID_AA64ISAR1_API_SHIFT		8
++
++#define ID_AA64ISAR1_APA_NI		0x0
++#define ID_AA64ISAR1_APA_ARCHITECTED	0x1
++#define ID_AA64ISAR1_API_NI		0x0
++#define ID_AA64ISAR1_API_IMP_DEF	0x1
++#define ID_AA64ISAR1_GPA_NI		0x0
++#define ID_AA64ISAR1_GPA_ARCHITECTED	0x1
++#define ID_AA64ISAR1_GPI_NI		0x0
++#define ID_AA64ISAR1_GPI_IMP_DEF	0x1
  
-+#ifndef arch_vma_access_permitted
- static inline bool arch_vma_access_permitted(struct vm_area_struct *vma,
- 		bool write, bool execute, bool foreign)
- {
- 	/* by default, allow everything */
- 	return true;
- }
-+#endif
- 
-+#ifndef arch_pte_access_permitted
- static inline bool arch_pte_access_permitted(pte_t pte, bool write)
- {
- 	/* by default, allow everything */
- 	return true;
- }
-+#endif
- #endif	/* _ASM_GENERIC_MM_HOOKS_H */
+ /* id_aa64pfr0 */
+ #define ID_AA64PFR0_GIC_SHIFT		24
 -- 
 1.9.1
