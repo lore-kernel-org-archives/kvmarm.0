@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v5 05/34] arm64: hyp-stub: Update documentation in asm/virt.h
-Date: Mon,  3 Apr 2017 19:37:38 +0100
-Message-ID: <20170403183807.1620-6-marc.zyngier@arm.com>
+Subject: [PATCH v5 09/34] arm64: KVM: Allow the main HYP code to use the init
+ hyp stub implementation
+Date: Mon,  3 Apr 2017 19:37:42 +0100
+Message-ID: <20170403183807.1620-10-marc.zyngier@arm.com>
 References: <20170403183807.1620-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE05240A86
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C346440948
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OJkAV2FkSpar for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Apr 2017 14:36:31 -0400 (EDT)
+ with ESMTP id 0y8v6RqH2z21 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Apr 2017 14:36:37 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24B2C40BC4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8E7940C4A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Apr 2017 14:36:37 -0400 (EDT)
 In-Reply-To: <20170403183807.1620-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,35 +32,61 @@ To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.c
 Cc: Russell King <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Comments in asm/virt.h are slightly out of date, so let's align
-them with the new behaviour of the code.
+We now have a full hyp-stub implementation in the KVM init code,
+but the main KVM code only supports HVC_GET_VECTORS, which is not
+enough.
 
+Instead of reinventing the wheel, let's reuse the init implementation
+by branching to the idmap page when called with a hyp-stub hypercall.
+
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/virt.h | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/hyp-entry.S | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index 1466d14c664d..1569c3a0d794 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -19,9 +19,14 @@
- #define __ASM__VIRT_H
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index d8ef788646c6..4f34c5996f86 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -87,10 +87,24 @@ alternative_endif
+ 	/* Here, we're pretty sure the host called HVC. */
+ 	ldp	x0, x1, [sp], #16
  
- /*
-- * The arm64 hcall implementation uses x0 to specify the hcall type. A value
-- * less than 0xfff indicates a special hcall, such as get/set vector.
-- * Any other value is used as a pointer to the function to call.
-+ * The arm64 hcall implementation uses x0 to specify the hcall
-+ * number. A value less than HVC_STUB_HCALL_NR indicates a special
-+ * hcall, such as set vector. Any other value is handled in a
-+ * hypervisor specific way.
-+ *
-+ * The hypercall is allowed to clobber any of the caller-saved
-+ * registers (x0-x18), so it is advisable to use it through the
-+ * indirection of a function call (as implemented in hyp-stub.S).
-  */
+-	cmp	x0, #HVC_GET_VECTORS
+-	b.ne	1f
+-	mrs	x0, vbar_el2
+-	b	2f
++	/* Check for a stub HVC call */
++	cmp	x0, #HVC_STUB_HCALL_NR
++	b.hs	1f
++
++	/*
++	 * Compute the idmap address of __kvm_handle_stub_hvc and
++	 * jump there. Since we use kimage_voffset, do not use the
++	 * HYP VA for __kvm_handle_stub_hvc, but the kernel VA instead
++	 * (by loading it from the constant pool).
++	 *
++	 * Preserve x0-x4, which may contain stub parameters.
++	 */
++	ldr	x5, =__kvm_handle_stub_hvc
++	ldr_l	x6, kimage_voffset
++
++	/* x5 = __pa(x5) */
++	sub	x5, x5, x6
++	br	x5
  
- /* HVC_GET_VECTORS - Return the value of the vbar_el2 register. */
+ 1:
+ 	/*
+@@ -99,7 +113,7 @@ alternative_endif
+ 	kern_hyp_va	x0
+ 	do_el2_call
+ 
+-2:	eret
++	eret
+ 
+ el1_trap:
+ 	/*
 -- 
 2.11.0
