@@ -1,166 +1,80 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 9/9] KVM: arm/arm64: avoid race by caching MPIDR
-Date: Tue, 4 Apr 2017 21:44:39 +0200
-Message-ID: <20170404194439.GI31208@cbox>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: replace vcpu->arch.pause with a
+ vcpu request
+Date: Tue, 4 Apr 2017 22:10:15 +0200
+Message-ID: <63209d09-0c45-0bb2-322b-e422f1360df7@redhat.com>
 References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-10-drjones@redhat.com>
+ <20170331160658.4331-5-drjones@redhat.com> <20170404160417.GN11752@cbox>
+ <20170404175718.su4tjx3psyez3qee@kamzik.brq.redhat.com>
+ <20170404190438.GF31208@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170331160658.4331-10-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDC9940A86
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 16:08:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5h7MuNXO8kwD for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Apr 2017 16:08:09 -0400 (EDT)
+Received: from mail-wr0-f193.google.com (mail-wr0-f193.google.com
+ [209.85.128.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA81040A63
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 16:08:08 -0400 (EDT)
+Received: by mail-wr0-f193.google.com with SMTP id w43so43600445wrb.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Apr 2017 13:10:21 -0700 (PDT)
+In-Reply-To: <20170404190438.GF31208@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>, Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Mar 31, 2017 at 06:06:58PM +0200, Andrew Jones wrote:
-> Cache the MPIDR in the vcpu structure to fix potential races that
-> can arise between vcpu reset and the extraction of the MPIDR from
-> the sys-reg array.
 
-I don't understand the race, sorry.
 
-Can you be more specific in where this goes wrong and exactly what this
-fixes?
+On 04/04/2017 21:04, Christoffer Dall wrote:
+>  - (On a related work, I suddenly felt it weird that
+>    kvm_make_all_cpus_request() doesn't wake up sleeping VCPUs, but only
+>    sends an IPI; does this mean that calling this function should be
+>    followed by a kick() for each VCPU?  Maybe Radim was looking at this
+>    in his series already.)
 
-Thanks,
--Christoffer
+Yes, kvm_make_all_cpus_request in x86 is only used for "non urgent"
+requests, i.e. things to do before the next guest entry.
 
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  arch/arm/include/asm/kvm_emulate.h   |  2 +-
->  arch/arm/include/asm/kvm_host.h      |  3 +++
->  arch/arm/kvm/coproc.c                | 20 ++++++++++++--------
->  arch/arm64/include/asm/kvm_emulate.h |  2 +-
->  arch/arm64/include/asm/kvm_host.h    |  3 +++
->  arch/arm64/kvm/sys_regs.c            | 27 ++++++++++++++-------------
->  6 files changed, 34 insertions(+), 23 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-> index 9a8a45aaf19a..1b922de46785 100644
-> --- a/arch/arm/include/asm/kvm_emulate.h
-> +++ b/arch/arm/include/asm/kvm_emulate.h
-> @@ -213,7 +213,7 @@ static inline u32 kvm_vcpu_hvc_get_imm(struct kvm_vcpu *vcpu)
->  
->  static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
->  {
-> -	return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK;
-> +	return vcpu->arch.vmpidr & MPIDR_HWID_BITMASK;
->  }
->  
->  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 0b8a6d6b3cb3..e0f461f0af67 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -151,6 +151,9 @@ struct kvm_vcpu_arch {
->  	/* The CPU type we expose to the VM */
->  	u32 midr;
->  
-> +	/* vcpu MPIDR */
-> +	u32 vmpidr;
-> +
->  	/* HYP trapping configuration */
->  	u32 hcr;
->  
-> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-> index 3e5e4194ef86..c4df7c9c8ddb 100644
-> --- a/arch/arm/kvm/coproc.c
-> +++ b/arch/arm/kvm/coproc.c
-> @@ -101,14 +101,18 @@ int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  
->  static void reset_mpidr(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
->  {
-> -	/*
-> -	 * Compute guest MPIDR. We build a virtual cluster out of the
-> -	 * vcpu_id, but we read the 'U' bit from the underlying
-> -	 * hardware directly.
-> -	 */
-> -	vcpu_cp15(vcpu, c0_MPIDR) = ((read_cpuid_mpidr() & MPIDR_SMP_BITMASK) |
-> -				     ((vcpu->vcpu_id >> 2) << MPIDR_LEVEL_BITS) |
-> -				     (vcpu->vcpu_id & 3));
-> +	if (!vcpu->arch.vmpidr) {
-> +		/*
-> +		 * Compute guest MPIDR. We build a virtual cluster out of the
-> +		 * vcpu_id, but we read the 'U' bit from the underlying
-> +		 * hardware directly.
-> +		 */
-> +		u32 mpidr = ((read_cpuid_mpidr() & MPIDR_SMP_BITMASK) |
-> +			     ((vcpu->vcpu_id >> 2) << MPIDR_LEVEL_BITS) |
-> +			     (vcpu->vcpu_id & 3));
-> +		vcpu->arch.vmpidr = mpidr;
-> +	}
-> +	vcpu_cp15(vcpu, c0_MPIDR) = vcpu->arch.vmpidr;
->  }
->  
->  /* TRM entries A7:4.3.31 A15:4.3.28 - RO WI */
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index f5ea0ba70f07..c138bb15b507 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -242,7 +242,7 @@ static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
->  
->  static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
->  {
-> -	return vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
-> +	return vcpu->arch.vmpidr_el2 & MPIDR_HWID_BITMASK;
->  }
->  
->  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7057512b3474..268c10d95a79 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -198,6 +198,9 @@ typedef struct kvm_cpu_context kvm_cpu_context_t;
->  struct kvm_vcpu_arch {
->  	struct kvm_cpu_context ctxt;
->  
-> +	/* vcpu MPIDR */
-> +	u64 vmpidr_el2;
-> +
->  	/* HYP configuration */
->  	u64 hcr_el2;
->  	u32 mdcr_el2;
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 0e26f8c2b56f..517aed6d8016 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -431,19 +431,20 @@ static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  
->  static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  {
-> -	u64 mpidr;
-> -
-> -	/*
-> -	 * Map the vcpu_id into the first three affinity level fields of
-> -	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
-> -	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
-> -	 * of the GICv3 to be able to address each CPU directly when
-> -	 * sending IPIs.
-> -	 */
-> -	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
-> -	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
-> -	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
-> -	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
-> +	if (!vcpu->arch.vmpidr_el2) {
-> +		/*
-> +		 * Map the vcpu_id into the first three affinity level fields
-> +		 * of the MPIDR. We limit the number of VCPUs in level 0 due to
-> +		 * a limitation of 16 CPUs in that level in the ICC_SGIxR
-> +		 * registers of the GICv3, which are used to address each CPU
-> +		 * directly when sending IPIs.
-> +		 */
-> +		u64 mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
-> +		mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
-> +		mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
-> +		vcpu->arch.vmpidr_el2 = (1ULL << 31) | mpidr;
-> +	}
-> +	vcpu_sys_reg(vcpu, MPIDR_EL1) = vcpu->arch.vmpidr_el2;
->  }
->  
->  static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> -- 
-> 2.9.3
-> 
+>  - In the explanation you wrote, you use the term 'we' a lot, but when
+>    talking about SMP barriers, I think it only makes sense to talk about
+>    actions and observations between multiple CPUs and we have to be
+>    specific about which CPU observes or does what with respect to the
+>    other.  Maybe I'm being a stickler here, but there something here
+>    which is making me uneasy.
+
+The write1-mb-if(read2) / write2-mb-if(read1) pattern is pretty common,
+so I think it is justified to cut the ordering on the reasoning and just
+focus on what the two memory locations and conditions mean.  But I'd
+wait for v3, since I'm sure that Drew also understands the
+synchronization better.
+
+>  - Finally, it feels very hard to prove the correctness of this, and
+>    equally hard to test it (given how long we've been running with
+>    apparently racy code).  I would hope that we could abstract some of
+>    this into architecture generic things, that someone who eat memory
+>    barriers for breakfast could help us verify, but again, maybe this is
+>    Radim's series I'm asking for here.
+
+What I can do here is to suggest copying the paradigms from x86, which
+is quite battle tested (Windows hammers it really hard).
+
+For QEMU I did use model checking in the past for some similarly hairy
+synchronization code, but that is really just "executable documentation"
+because the model is not written in C.
+
+Paolo
