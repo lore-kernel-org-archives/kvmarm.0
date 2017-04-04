@@ -1,108 +1,94 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 7/9] KVM: arm/arm64: PMU: remove request-less vcpu kick
-Date: Tue, 4 Apr 2017 20:29:18 +0200
-Message-ID: <20170404182918.buuvpsvh3cjo6wdn@kamzik.brq.redhat.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: replace vcpu->arch.pause with a
+ vcpu request
+Date: Tue, 4 Apr 2017 20:38:34 +0200
+Message-ID: <20170404183834.GE31208@cbox>
 References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-8-drjones@redhat.com>
- <20170404174612.GC31208@cbox>
+ <20170331160658.4331-5-drjones@redhat.com>
+ <20170404160417.GN11752@cbox>
+ <06b2a225-192c-9c96-c092-6e0575dd9410@redhat.com>
+ <20170404171953.GP11752@cbox>
+ <e3977a97-a240-58a6-288d-09f3c12de56c@redhat.com>
+ <20170404175750.GD31208@cbox>
+ <b49156ee-ca97-5d43-15a6-ed6ec8116535@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A19840948
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 14:36:21 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id becrqlwhQ6vh for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Apr 2017 14:36:20 -0400 (EDT)
+Received: from mail-wr0-f182.google.com (mail-wr0-f182.google.com
+ [209.85.128.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 17E4640296
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 14:36:19 -0400 (EDT)
+Received: by mail-wr0-f182.google.com with SMTP id w11so219555631wrc.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Apr 2017 11:38:32 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20170404174612.GC31208@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
+In-Reply-To: <b49156ee-ca97-5d43-15a6-ed6ec8116535@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 04, 2017 at 07:46:12PM +0200, Christoffer Dall wrote:
-> On Fri, Mar 31, 2017 at 06:06:56PM +0200, Andrew Jones wrote:
-> > Refactor PMU overflow handling in order to remove the request-less
-> > vcpu kick.  Now, since kvm_vgic_inject_irq() uses vcpu requests,
-> > there should be no chance that a kick sent at just the wrong time
-> > (between the VCPU's call to kvm_pmu_flush_hwstate() and before it
-> > enters guest mode) results in a failure for the guest to see updated
-> > GIC state until its next exit some time later for some other reason.
-> > 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  virt/kvm/arm/pmu.c | 29 +++++++++++++++--------------
-> >  1 file changed, 15 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> > index 69ccce308458..9d725f3afb11 100644
-> > --- a/virt/kvm/arm/pmu.c
-> > +++ b/virt/kvm/arm/pmu.c
-> > @@ -203,6 +203,19 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
-> >  	return reg;
-> >  }
-> >  
-> > +static void kvm_pmu_check_overflow(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> > +	bool overflow;
-> > +
-> > +	overflow = !!kvm_pmu_overflow_status(vcpu);
-> > +	if (pmu->irq_level != overflow) {
-> > +		pmu->irq_level = overflow;
-> > +		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-> > +				    pmu->irq_num, overflow);
-> > +	}
-> > +}
-> > +
+On Tue, Apr 04, 2017 at 08:15:09PM +0200, Paolo Bonzini wrote:
 > 
-> If we are changing the way the PMU works to adjust the interrupt
-> signaling whenever the PMU changes its internal state, do we still ahv
-> to call kvm_pmu_update_state() from each flush/sync path now?
+> 
+> On 04/04/2017 19:57, Christoffer Dall wrote:
+> >> Right.  That code does
+> >>
+> >>                 tmp->arch.power_off = true;
+> >>                 kvm_vcpu_kick(tmp);
+> >>
+> >> and I think what's really missing in arm.c is the "if (vcpu->mode ==
+> >> EXITING_GUEST_MODE)" check that is found in x86.c.  Then pausing can
+> >> also simply use kvm_vcpu_kick.
+> > I see, that's why the cmpxchg() works the way it does.  We just still
+> > need to move the vcpu->mode = IN_GUEST_MODE before our
+> > with-interrupts-disabled check.
+> > 
+> > What I'm not sure is why you can get away without using a memory barrier
+> > or WRITE_ONCE on x86, but is this simply because x86 is a strongly
+> > ordered architecture?
+> 
+> x86 does have a memory barrier:
+> 
+>         vcpu->mode = IN_GUEST_MODE;
+> 
+>         srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+>         smp_mb__after_srcu_read_unlock();
 
-The thought crossed my mind to rework that completely, in order to remove
-that flush/sync, but then went for the smaller patch for this series.  I
-can take a look at it though.
-
-Thanks,
-drew
+duh, the long complicated barrier version made me totally miss it.
+Sorry.
 
 > 
-> >  /**
-> >   * kvm_pmu_overflow_set - set PMU overflow interrupt
-> >   * @vcpu: The vcpu pointer
-> > @@ -210,31 +223,19 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
-> >   */
-> >  void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
-> >  {
-> > -	u64 reg;
-> > -
-> >  	if (val == 0)
-> >  		return;
-> >  
-> >  	vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= val;
-> > -	reg = kvm_pmu_overflow_status(vcpu);
-> > -	if (reg != 0)
-> > -		kvm_vcpu_kick(vcpu);
-> > +	kvm_pmu_check_overflow(vcpu);
-> >  }
-> >  
-> >  static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
-> >  {
-> > -	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> > -	bool overflow;
-> > -
-> >  	if (!kvm_arm_pmu_v3_ready(vcpu))
-> >  		return;
-> >  
-> > -	overflow = !!kvm_pmu_overflow_status(vcpu);
-> > -	if (pmu->irq_level != overflow) {
-> > -		pmu->irq_level = overflow;
-> > -		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-> > -				    pmu->irq_num, overflow);
-> > -	}
-> > +	kvm_pmu_check_overflow(vcpu);
-> >  }
-> >  
-> >  /**
-> > -- 
-> > 2.9.3
-> > 
+>         /*
+>          * This handles the case where a posted interrupt was
+>          * notified with kvm_vcpu_kick.
+>          */
+>         if (kvm_lapic_enabled(vcpu)) {
+>                 if (kvm_x86_ops->sync_pir_to_irr && vcpu->arch.apicv_active)
+>                         kvm_x86_ops->sync_pir_to_irr(vcpu);
+>         }
 > 
-> Thanks,
-> -Christoffer
+>         if (vcpu->mode == EXITING_GUEST_MODE || vcpu->requests
+> 
+> and WRITE_ONCE is not needed if you have a memory barrier (though I find it
+> more self-documenting to use it anyway).
+> 
+
+ok, thanks.
+
+-Christoffer
