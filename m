@@ -1,90 +1,101 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 0/9] KVM: arm/arm64: race fixes and vcpu requests
-Date: Tue, 4 Apr 2017 09:27:46 +0200
-Message-ID: <20170404072746.psxsrjstgv6qwyvp@kamzik.brq.redhat.com>
-References: <20170331160658.4331-1-drjones@redhat.com>
- <20170403152845.GB11752@cbox>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v4 19/28] ARM: KVM: Allow the main HYP code to use the
+ init hyp stub implementation
+Date: Tue, 4 Apr 2017 09:36:54 +0200
+Message-ID: <20170404073654.GE11752@cbox>
+References: <20170321192058.9300-1-marc.zyngier@arm.com>
+ <20170321192058.9300-20-marc.zyngier@arm.com>
+ <20170324143432.GD25903@cbox>
+ <00380529-bee2-ba10-548d-319bc4fa5c1b@arm.com>
+ <20170403173225.GD11752@cbox>
+ <77ad21b3-ede6-28a2-aebd-73364f546617@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB31040064
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 03:25:41 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w47ObS1X8O28 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Apr 2017 03:25:40 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5259E40A86
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 03:25:40 -0400 (EDT)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170403152845.GB11752@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <77ad21b3-ede6-28a2-aebd-73364f546617@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Russell King <linux@arm.linux.org.uk>, Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Keerthy <j-keerthy@ti.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 03, 2017 at 05:28:45PM +0200, Christoffer Dall wrote:
-> Hi Drew,
-> 
-> On Fri, Mar 31, 2017 at 06:06:49PM +0200, Andrew Jones wrote:
-> > This series fixes some hard to produce races by introducing the use of
-> > vcpu requests.  It also fixes a couple easier to produce races, ones
-> > that have been produced with the PSCI kvm-unit-test test.  The easy two
-> > are addressed in two different ways: the first takes advantage of
-> > power_off having been changed to a vcpu request, the second caches vcpu
-> > MPIDRs in order to avoid extracting them from sys_regs.  I've tested the
-> > series on a Mustang and a ThunderX and compile-tested the ARM bits.
+On Mon, Apr 03, 2017 at 06:51:02PM +0100, Marc Zyngier wrote:
+> On 03/04/17 18:32, Christoffer Dall wrote:
+> > On Fri, Mar 24, 2017 at 03:01:23PM +0000, Marc Zyngier wrote:
+> >> On 24/03/17 14:34, Christoffer Dall wrote:
+> >>> On Tue, Mar 21, 2017 at 07:20:49PM +0000, Marc Zyngier wrote:
+> >>>> We now have a full hyp-stub implementation in the KVM init code,
+> >>>> but the main KVM code only supports HVC_GET_VECTORS, which is not
+> >>>> enough.
+> >>>>
+> >>>> Instead of reinventing the wheel, let's reuse the init implementation
+> >>>> by branching to the idmap page when called with a hyp-stub hypercall.
+> >>>>
+> >>>> Tested-by: Keerthy <j-keerthy@ti.com>
+> >>>> Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
+> >>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> >>>> ---
+> >>>>  arch/arm/kvm/hyp/hyp-entry.S | 29 ++++++++++++++++++++++++-----
+> >>>>  1 file changed, 24 insertions(+), 5 deletions(-)
+> >>>>
+> >>>> diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
+> >>>> index 1f8db7d21fc5..a35baa81fd23 100644
+> >>>> --- a/arch/arm/kvm/hyp/hyp-entry.S
+> >>>> +++ b/arch/arm/kvm/hyp/hyp-entry.S
+> >>>> @@ -126,11 +126,30 @@ hyp_hvc:
+> >>>>  	 */
+> >>>>  	pop	{r0, r1, r2}
+> >>>>  
+> >>>> -	/* Check for __hyp_get_vectors */
+> >>>> -	cmp	r0, #HVC_GET_VECTORS
+> >>>> -	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
+> >>>> -	beq	1f
+> >>>> +	/*
+> >>>> +	 * Check if we have a kernel function, which is guaranteed to be
+> >>>> +	 * bigger than the maximum hyp stub hypercall
+> >>>> +	 */
+> >>>> +	cmp	r0, #HVC_STUB_HCALL_NR
+> >>>> +	bhs	1f
+> >>>>  
+> >>>> +	/*
+> >>>> +	 * Not a kernel function, treat it as a stub hypercall.
+> >>>> +	 * Compute the physical address for __kvm_handle_stub_hvc
+> >>>> +	 * (as the code lives in the idmaped page) and branch there.
+> >>>> +	 * We hijack ip (r12) as a tmp register.
+> >>>> +	 */
+> >>>
+> >>> How can we just clobber r12 and be sure we don't corrupt the caller?
+> >>
+> >> r12 (aka ip) is allowed to be clobbered by the linker (used by inserted
+> >> code veneers, for example). Given that this is a standalone object, we
+> >> can safely assume that r12 has been saved if it was used by the caller.
+> >>
+> >> Here is what the PCS says:
+> >>
+> >> "Register r12 (IP) may be used by a linker as a scratch register between
+> >> a routine and any subroutine it calls (for details, see
+> >> §5.3.1.1, Use of IP by the linker). It can also be used within a routine
+> >> to hold intermediate values between subroutine calls."
+> >>
 > > 
-> > Patch 2/9 adds documentation, as, at least for me, understanding vcpu
-> > request interplay with vcpu kicks and vcpu mode and the memory barriers
-> > that interplay implies, is exhausting.  Hopefully the document is useful
-> > to others.  I'm not married to it though, so it can be deferred/dropped
-> > as people like...
+> > So isn't this similar to my comment on the arm64 code, which relies on
+> > this being called via a function call, as opposed to directly issuring
+> > an HVC via inline assembly?
 > 
-> Sounds helpful, I'll have a look.
+> Indeed, this is the exact same thing.
 > 
-> > 
-> > v2:
-> >   - No longer based on Radim's vcpu request API rework[1], except for
-> >     including "add kvm_request_pending" as patch 1/9 [drew]
+> > If so, documenting this limitation/restriction/feature would be nice.
 > 
-> I lost track here; did those patches get merged or dropped and why are
-> we not basing this work on them anymore, and should patch 1/9 be applied
-> here or is it expected to land in the KVM tree via some other path?
-
-I think Radim still wants to rework the API, but, as his work doesn't
-provide fixes or functional changes, his timeline may not be the same
-as for this series.  He also wants to expand his rework to add API
-that includes kicking with requesting.  I'm not sure how all that will
-look yet, so, in the end, I decided I might as well just use the current
-API for now.  kvm_request_pending() was too nice an addition to drop
-though.
-
+> I've added the following to the documentation:
 > 
-> >   - Added vcpu request documentation [drew]
-> >   - Dropped the introduction of user settable MPIDRs [Christoffer]
-> >   - Added vcpu requests to all request-less vcpu kicks [Christoffer]
-> > 
+> "A stub hypercall is allowed to clobber any of the caller-saved
+> registers (x0-x18 on arm64, r0-r3 and ip on arm). It is thus recommended
+> to use a function call to perform the hypercall."
 > 
-> Didn't we also have an issue with a missing barrier if the cmpxchg
-> operation doesn't succeed?  Did that fall though the cracks or is it
-> just missing in the changelog?
-
-Just missing from the changelog. Sorry about that.
-
-  - Ensure we have a read barrier (or equivalent) prior to issuing the
-    cmpxchg in kvm_vcpu_exiting_guest_mode(), as a failed cmpxchg does
-    not guarantee any barrier [Christoffer]
+> Does this work for you?
+> 
+It very much does.
 
 Thanks,
-drew
+-Christoffer
