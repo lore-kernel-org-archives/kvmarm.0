@@ -1,176 +1,59 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3] kvm: arm/arm64: Fix locking for kvm_free_stage2_pgd
-Date: Tue, 4 Apr 2017 14:29:00 +0200
-Message-ID: <20170404122900.GJ11752@cbox>
-References: <1491228763-23450-1-git-send-email-suzuki.poulose@arm.com>
- <20170404101316.GF11752@cbox>
- <28bece63-9917-5f00-ccdf-fe663def500f@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: replace vcpu->arch.pause with a
+ vcpu request
+Date: Tue, 4 Apr 2017 14:39:19 +0100
+Message-ID: <44739aad-ba52-4f02-8d3d-643365b7f8a7@arm.com>
+References: <20170331160658.4331-1-drjones@redhat.com>
+ <20170331160658.4331-5-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 65920400E9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 08:26:49 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MxZZEpw7z8ZN for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Apr 2017 08:26:47 -0400 (EDT)
-Received: from mail-wr0-f175.google.com (mail-wr0-f175.google.com
- [209.85.128.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7471840064
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 08:26:47 -0400 (EDT)
-Received: by mail-wr0-f175.google.com with SMTP id w11so211007218wrc.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Apr 2017 05:28:59 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <28bece63-9917-5f00-ccdf-fe663def500f@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, andreyknvl@google.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org, kcc@google.com, syzkaller@googlegroups.com, dvyukov@google.com, catalin.marinas@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170331160658.4331-5-drjones@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: cdall@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 04, 2017 at 11:35:35AM +0100, Suzuki K Poulose wrote:
-> Hi Christoffer,
+On 31/03/17 17:06, Andrew Jones wrote:
+> This not only ensures visibility of changes to pause by using
+> atomic ops, but also plugs a small race where a vcpu could get its
+> pause state enabled just after its last check before entering the
+> guest. With this patch, while the vcpu will still initially enter
+> the guest, it will exit immediately due to the IPI sent by the vcpu
+> kick issued after making the vcpu request.
 > 
-> On 04/04/17 11:13, Christoffer Dall wrote:
-> >Hi Suzuki,
-> >
-> >On Mon, Apr 03, 2017 at 03:12:43PM +0100, Suzuki K Poulose wrote:
-> >>In kvm_free_stage2_pgd() we don't hold the kvm->mmu_lock while calling
-> >>unmap_stage2_range() on the entire memory range for the guest. This could
-> >>cause problems with other callers (e.g, munmap on a memslot) trying to
-> >>unmap a range. And since we have to unmap the entire Guest memory range
-> >>holding a spinlock, make sure we yield the lock if necessary, after we
-> >>unmap each PUD range.
-> >>
-> >>Fixes: commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
-> >>Cc: stable@vger.kernel.org # v3.10+
-> >>Cc: Paolo Bonzini <pbonzin@redhat.com>
-> >>Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >>Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> >>Cc: Mark Rutland <mark.rutland@arm.com>
-> >>Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> >>[ Avoid vCPU starvation and lockup detector warnings ]
-> >>Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> >>Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> >>
-> >
-> >This unfortunately fails to build on 32-bit ARM, and I also think we
-> >intended to check against S2_PGDIR_SIZE, not S2_PUD_SIZE.
+> We use bitops, rather than kvm_make/check_request(), because we
+> don't need the barriers they provide, nor do we want the side-effect
+> of kvm_check_request() clearing the request. For pause, only the
+> requester should do the clearing.
 > 
-> Sorry about that, I didn't test the patch with arm32. I am fine the
-> patch below. And I agree that the name change does make things more
-> readable. See below for a hunk that I posted to the kbuild report.
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h   |  5 +----
+>  arch/arm/kvm/arm.c                | 45 +++++++++++++++++++++++++++------------
+>  arch/arm64/include/asm/kvm_host.h |  5 +----
+>  3 files changed, 33 insertions(+), 22 deletions(-)
 > 
-> >
-> >How about adding this to your patch (which includes a rename of
-> >S2_PGD_SIZE which is horribly confusing as it indicates the size of the
-> >first level stage-2 table itself, where S2_PGDIR_SIZE indicates the size
-> >of address space mapped by a single entry in the same table):
-> >
-> >diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
-> >index 460d616..c997f2d 100644
-> >--- a/arch/arm/include/asm/stage2_pgtable.h
-> >+++ b/arch/arm/include/asm/stage2_pgtable.h
-> >@@ -35,10 +35,13 @@
-> >
-> > #define stage2_pud_huge(pud)			pud_huge(pud)
-> >
-> >+#define S2_PGDIR_SIZE				PGDIR_SIZE
-> >+#define S2_PGDIR_MASK				PGDIR_MASK
-> >+
-> > /* Open coded p*d_addr_end that can deal with 64bit addresses */
-> > static inline phys_addr_t stage2_pgd_addr_end(phys_addr_t addr, phys_addr_t end)
-> > {
-> >-	phys_addr_t boundary = (addr + PGDIR_SIZE) & PGDIR_MASK;
-> >+	phys_addr_t boundary = (addr + S2_PGDIR_SIZE) & S2_PGDIR_MASK;
-> >
-> > 	return (boundary - 1 < end - 1) ? boundary : end;
-> > }
-> >diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> >index db94f3a..6e79a4c 100644
-> >--- a/arch/arm/kvm/mmu.c
-> >+++ b/arch/arm/kvm/mmu.c
-> >@@ -41,7 +41,7 @@ static unsigned long hyp_idmap_start;
-> > static unsigned long hyp_idmap_end;
-> > static phys_addr_t hyp_idmap_vector;
-> >
-> >-#define S2_PGD_SIZE	(PTRS_PER_S2_PGD * sizeof(pgd_t))
-> >+#define S2_PGD_TABLE_SIZE	(PTRS_PER_S2_PGD * sizeof(pgd_t))
-> > #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
-> >
-> > #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
-> >@@ -299,7 +299,7 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
-> > 		 * If the range is too large, release the kvm->mmu_lock
-> > 		 * to prevent starvation and lockup detector warnings.
-> > 		 */
-> >-		if (size > S2_PUD_SIZE)
-> >+		if (size > S2_PGDIR_SIZE)
-> > 			cond_resched_lock(&kvm->mmu_lock);
-> > 		next = stage2_pgd_addr_end(addr, end);
-> > 		if (!stage2_pgd_none(*pgd))
-> >@@ -747,7 +747,7 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
-> > 	}
-> >
-> > 	/* Allocate the HW PGD, making sure that each page gets its own refcount */
-> >-	pgd = alloc_pages_exact(S2_PGD_SIZE, GFP_KERNEL | __GFP_ZERO);
-> >+	pgd = alloc_pages_exact(S2_PGD_TABLE_SIZE, GFP_KERNEL | __GFP_ZERO);
-> > 	if (!pgd)
-> > 		return -ENOMEM;
-> >
-> >@@ -843,7 +843,7 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
-> > 	spin_unlock(&kvm->mmu_lock);
-> >
-> > 	/* Free the HW pgd, one page at a time */
-> >-	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
-> >+	free_pages_exact(kvm->arch.pgd, S2_PGD_TABLE_SIZE);
-> > 	kvm->arch.pgd = NULL;
-> > }
-> >
-> 
-> Btw, I have a different hunk to solve the problem, posted to the kbuild
-> report. I will post it here for the sake of capturing the discussion in
-> one place. The following hunk on top of the patch, changes the lock
-> release after we process one PGDIR entry. As for the first time
-> we enter the loop we haven't done much with the lock held, hence it may make
-> sense to do it after the first round and we have more work to do.
-> 
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index db94f3a..582a972 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -295,15 +295,15 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
->         assert_spin_locked(&kvm->mmu_lock);
->         pgd = kvm->arch.pgd + stage2_pgd_index(addr);
->         do {
-> +               next = stage2_pgd_addr_end(addr, end);
-> +               if (!stage2_pgd_none(*pgd))
-> +                       unmap_stage2_puds(kvm, pgd, addr, next);
->                 /*
->                  * If the range is too large, release the kvm->mmu_lock
->                  * to prevent starvation and lockup detector warnings.
->                  */
-> -               if (size > S2_PUD_SIZE)
-> +               if (next != end)
->                         cond_resched_lock(&kvm->mmu_lock);
-> -               next = stage2_pgd_addr_end(addr, end);
-> -               if (!stage2_pgd_none(*pgd))
-> -                       unmap_stage2_puds(kvm, pgd, addr, next);
->         } while (pgd++, addr = next, addr != end);
->  }
-> 
-> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 31ee468ce667..52c25536d254 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -45,7 +45,7 @@
+>  #define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
+>  #endif
+>  
+> -#define KVM_REQ_VCPU_EXIT	8
+> +#define KVM_REQ_PAUSE		8
 
-I like your change, let me fix that up, and we can always do the rename
-trick later.
+Small nit: can we have a #define for this 8? KVM_REQ_ARCH_BASE, or
+something along those lines?
+
+I've otherwise started hammering this series over a number of systems,
+looking good so far.
 
 Thanks,
--Christoffer
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
