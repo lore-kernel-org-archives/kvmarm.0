@@ -1,105 +1,68 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 0/9] KVM: arm/arm64: race fixes and vcpu requests
-Date: Tue, 4 Apr 2017 18:05:25 +0200
-Message-ID: <20170404160525.GO11752@cbox>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: replace vcpu->arch.pause with a
+ vcpu request
+Date: Tue, 4 Apr 2017 18:24:36 +0200
+Message-ID: <06b2a225-192c-9c96-c092-6e0575dd9410@redhat.com>
 References: <20170331160658.4331-1-drjones@redhat.com>
- <20170403152845.GB11752@cbox>
- <20170404072746.psxsrjstgv6qwyvp@kamzik.brq.redhat.com>
+ <20170331160658.4331-5-drjones@redhat.com> <20170404160417.GN11752@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D4BA40A14
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 12:03:14 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W+Uimy2EKoJJ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Apr 2017 12:03:13 -0400 (EDT)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7A99B40017
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 12:03:11 -0400 (EDT)
-Received: by mail-wm0-f43.google.com with SMTP id y22so29576626wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Apr 2017 09:05:23 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170404072746.psxsrjstgv6qwyvp@kamzik.brq.redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170404160417.GN11752@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>, Andrew Jones <drjones@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 04, 2017 at 09:27:46AM +0200, Andrew Jones wrote:
-> On Mon, Apr 03, 2017 at 05:28:45PM +0200, Christoffer Dall wrote:
-> > Hi Drew,
-> > 
-> > On Fri, Mar 31, 2017 at 06:06:49PM +0200, Andrew Jones wrote:
-> > > This series fixes some hard to produce races by introducing the use of
-> > > vcpu requests.  It also fixes a couple easier to produce races, ones
-> > > that have been produced with the PSCI kvm-unit-test test.  The easy two
-> > > are addressed in two different ways: the first takes advantage of
-> > > power_off having been changed to a vcpu request, the second caches vcpu
-> > > MPIDRs in order to avoid extracting them from sys_regs.  I've tested the
-> > > series on a Mustang and a ThunderX and compile-tested the ARM bits.
-> > > 
-> > > Patch 2/9 adds documentation, as, at least for me, understanding vcpu
-> > > request interplay with vcpu kicks and vcpu mode and the memory barriers
-> > > that interplay implies, is exhausting.  Hopefully the document is useful
-> > > to others.  I'm not married to it though, so it can be deferred/dropped
-> > > as people like...
-> > 
-> > Sounds helpful, I'll have a look.
-> > 
-> > > 
-> > > v2:
-> > >   - No longer based on Radim's vcpu request API rework[1], except for
-> > >     including "add kvm_request_pending" as patch 1/9 [drew]
-> > 
-> > I lost track here; did those patches get merged or dropped and why are
-> > we not basing this work on them anymore, and should patch 1/9 be applied
-> > here or is it expected to land in the KVM tree via some other path?
+
+
+On 04/04/2017 18:04, Christoffer Dall wrote:
+>> For pause, only the requester should do the clearing.
+
+This suggests that maybe this should not be a request.  The request
+would be just the need to act on a GIC command, exactly as before this patch.
+
+What I don't understand is:
+
+>> With this patch, while the vcpu will still initially enter
+>> the guest, it will exit immediately due to the IPI sent by the vcpu
+>> kick issued after making the vcpu request.
+
+Isn't this also true of KVM_REQ_VCPU_EXIT that was used before?
+
+So this:
+
++			vcpu->arch.power_off || kvm_request_pending(vcpu)) {
++			WRITE_ONCE(vcpu->mode, OUTSIDE_GUEST_MODE);
+
+is the crux of the fix, you can keep using vcpu->arch.pause.
+
+By the way, vcpu->arch.power_off can go away from this "if" too because
+KVM_RUN and KVM_SET_MP_STATE are mutually exclusive through the vcpu mutex.
+The earlier check is enough:
+
+                 if (vcpu->arch.power_off || vcpu->arch.pause)
+                         vcpu_sleep(vcpu);
+
+
+>> +		/*
+>> +		 * Indicate we're in guest mode now, before doing a final
+>> +		 * check for pending vcpu requests. The general barrier
+>> +		 * pairs with the one in kvm_arch_vcpu_should_kick().
+>> +		 * Please see the comment there for more details.
+>> +		 */
+>> +		WRITE_ONCE(vcpu->mode, IN_GUEST_MODE);
+>> +		smp_mb();
 > 
-> I think Radim still wants to rework the API, but, as his work doesn't
-> provide fixes or functional changes, his timeline may not be the same
-> as for this series.  He also wants to expand his rework to add API
-> that includes kicking with requesting.  I'm not sure how all that will
-> look yet, so, in the end, I decided I might as well just use the current
-> API for now.  kvm_request_pending() was too nice an addition to drop
-> though.
-
-Makes sense, thanks for the explanation.
-
+> There are two changes here:
 > 
-> > 
-> > >   - Added vcpu request documentation [drew]
-> > >   - Dropped the introduction of user settable MPIDRs [Christoffer]
-> > >   - Added vcpu requests to all request-less vcpu kicks [Christoffer]
-> > > 
-> > 
-> > Didn't we also have an issue with a missing barrier if the cmpxchg
-> > operation doesn't succeed?  Did that fall though the cracks or is it
-> > just missing in the changelog?
-> 
-> Just missing from the changelog. Sorry about that.
+> there's a change from a normal write to a WRITE_ONCE and there's also a
+> change to that adds a memory barrier.  I feel like I'd like to know if
+> these are tied together or two separate cleanups.  I also wonder if we
+> could split out more general changes from the pause thing to have a
+> better log of why we changed the run loop?
 
-No worries.
+You probably should just use smp_store_mb here.
 
-> 
->   - Ensure we have a read barrier (or equivalent) prior to issuing the
->     cmpxchg in kvm_vcpu_exiting_guest_mode(), as a failed cmpxchg does
->     not guarantee any barrier [Christoffer]
-
-Thanks for adding this, although I'm not able to convince myself that we
-got all the detailed aspects of this correct, just yet, but hopefully
-some of the questions I've asked on the individual patches can improve
-this.
-
-Thanks,
--Christoffer
+Paolo
