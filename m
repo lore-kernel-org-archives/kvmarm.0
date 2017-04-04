@@ -1,29 +1,30 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 00/15] arm64/kvm: use common sysreg definitions
-Date: Tue, 4 Apr 2017 18:11:33 +0100
-Message-ID: <20170404171133.GG19969@e104818-lin.cambridge.arm.com>
-References: <1489079247-31092-1-git-send-email-mark.rutland@arm.com>
- <87a88tv94d.fsf@on-the-bus.cambridge.arm.com>
- <20170310183555.GB6271@arm.com>
- <20170322183512.GB27921@leverpostej>
- <20170328184828.GF8643@leverpostej> <20170328202931.GF20211@cbox>
- <20170329084146.GA15778@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: replace vcpu->arch.pause with a
+ vcpu request
+Date: Tue, 4 Apr 2017 19:19:53 +0200
+Message-ID: <20170404171953.GP11752@cbox>
+References: <20170331160658.4331-1-drjones@redhat.com>
+ <20170331160658.4331-5-drjones@redhat.com>
+ <20170404160417.GN11752@cbox>
+ <06b2a225-192c-9c96-c092-6e0575dd9410@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A10B40296
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 13:09:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BEC0F40A63
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 13:17:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id COa70NrFqSV8 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Apr 2017 13:09:26 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0D4940187
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 13:09:25 -0400 (EDT)
+ with ESMTP id kSTKp2yUS5C2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Apr 2017 13:17:39 -0400 (EDT)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 815A540948
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 13:17:39 -0400 (EDT)
+Received: by mail-wm0-f51.google.com with SMTP id o81so31184458wmb.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Apr 2017 10:19:51 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20170329084146.GA15778@arm.com>
+In-Reply-To: <06b2a225-192c-9c96-c092-6e0575dd9410@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,62 +34,91 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 29, 2017 at 09:41:47AM +0100, Will Deacon wrote:
-> On Tue, Mar 28, 2017 at 10:29:31PM +0200, Christoffer Dall wrote:
-> > On Tue, Mar 28, 2017 at 07:48:28PM +0100, Mark Rutland wrote:
-> > > On Wed, Mar 22, 2017 at 06:35:13PM +0000, Mark Rutland wrote:
-> > > > On Fri, Mar 10, 2017 at 06:35:55PM +0000, Will Deacon wrote:
-> > > > > On Fri, Mar 10, 2017 at 08:17:22AM +0000, Marc Zyngier wrote:
-> > > > 
-> > > > > > The next question is how do we merge this. Obviously, we can't split it
-> > > > > > between trees, and this is very likely to clash with anything that we
-> > > > > > will merge on the KVM side (the sysreg table is a popular place).
-> > > > > > 
-> > > > > > Will, Catalin: Would it make sense to create a stable branch with these
-> > > > > > patches, and merge it into both the arm64 and KVM trees? That'd make
-> > > > > > things easier...
-> > > > > 
-> > > > > I think the scope for conflict on our side is pretty high too, so a shared
-> > > > > branch might be the best way to go. I don't want to branch just yet though,
-> > > > > so I'll probably wait a week or so before setting something in stone.
-> > > > 
-> > > > Any further thoughts on this?
-> > > > 
-> > > > Christoffer has Acked the KVM bits, so if you're happy to do so for the
-> > > > arm64 bits I can make a stable branch.
-> > > 
-> > > Looking around, it doesn't look like there's anything outside of arm64
-> > > that'll conflict on the <asm/sysreg.h> changes, and git's happy to merge
-> > > my changes with Suzuki's changes currently queued in arm64's
-> > > for-next/core branch.
-> > > 
-> > > I think it would make sense for those to be in a common branch taken by
-> > > both the arm64 and KVM trees, with the KVM-specific parts being taken by
-> > > KVM alone atop of that.
-> > > 
-> > > Would everyone be happy with that?
-> > 
-> > I'm happy with that.
-> > 
-> > > 
-> > > For reference, I've updated my branches so that arm64/common-sysreg only
-> > > contains the common parts, with the KVM parts atop of that in
-> > > kvm/common-sysreg.
-> > > 
-> > 
-> > Will, Catalin:  Let me know if you're going to pull from common-sysreg
-> > and I'll do the same and add the kvm patches above.
+On Tue, Apr 04, 2017 at 06:24:36PM +0200, Paolo Bonzini wrote:
 > 
-> I think that's what we'll do, but Catalin's out this week (we're taking it
-> in turns to go to work). I'd say go ahead and pull it into kvm if there
-> aren't any conflicts. No need to wait for us.
+> 
+> On 04/04/2017 18:04, Christoffer Dall wrote:
+> >> For pause, only the requester should do the clearing.
+> 
+> This suggests that maybe this should not be a request.  The request
+> would be just the need to act on a GIC command, exactly as before this patch.
 
-I pulled it into the arm64 for-next/core as well (to be pushed out later
-today).
+Maybe the semantics should be:
 
--- 
-Catalin
+requester:                                vcpu:
+----------                                -----
+make_requet(vcpu, KVM_REQ_PAUSE);
+                                          handles the request by
+					  clearing it and setting
+					  vcpu->pause = true;
+wait until vcpu->pause == true
+make_request(vcpu, KVM_REQ_UNPAUSE);
+                                          vcpus 'wake up' clear the
+					  UNPAUSE request and set
+					  vcpu->pause = false;
+
+The benefit would be that we get to re-use the complicated "figure out
+the VCPU mode and whether or not we should send an IPI and get the
+barriers right" stuff.
+
+> 
+> What I don't understand is:
+> 
+> >> With this patch, while the vcpu will still initially enter
+> >> the guest, it will exit immediately due to the IPI sent by the vcpu
+> >> kick issued after making the vcpu request.
+> 
+> Isn't this also true of KVM_REQ_VCPU_EXIT that was used before?
+> 
+> So this:
+> 
+> +			vcpu->arch.power_off || kvm_request_pending(vcpu)) {
+> +			WRITE_ONCE(vcpu->mode, OUTSIDE_GUEST_MODE);
+> 
+> is the crux of the fix, you can keep using vcpu->arch.pause.
+
+Probably; I feel like there's a fix here which should be a separate
+patch from using a different requests instead of the KVM_REQ_VCPU_EXIT +
+the pause flag.
+
+> 
+> By the way, vcpu->arch.power_off can go away from this "if" too because
+> KVM_RUN and KVM_SET_MP_STATE are mutually exclusive through the vcpu mutex.
+
+But we also allow setting the power_off flag from the in-kernel PSCI
+emulation in the context of another VCPU thread.
+
+> The earlier check is enough:
+> 
+>                  if (vcpu->arch.power_off || vcpu->arch.pause)
+>                          vcpu_sleep(vcpu);
+> 
+> 
+> >> +		/*
+> >> +		 * Indicate we're in guest mode now, before doing a final
+> >> +		 * check for pending vcpu requests. The general barrier
+> >> +		 * pairs with the one in kvm_arch_vcpu_should_kick().
+> >> +		 * Please see the comment there for more details.
+> >> +		 */
+> >> +		WRITE_ONCE(vcpu->mode, IN_GUEST_MODE);
+> >> +		smp_mb();
+> > 
+> > There are two changes here:
+> > 
+> > there's a change from a normal write to a WRITE_ONCE and there's also a
+> > change to that adds a memory barrier.  I feel like I'd like to know if
+> > these are tied together or two separate cleanups.  I also wonder if we
+> > could split out more general changes from the pause thing to have a
+> > better log of why we changed the run loop?
+> 
+> You probably should just use smp_store_mb here.
+> 
+
+That looks cleaner at least.
+
+Thanks,
+-Christoffer
