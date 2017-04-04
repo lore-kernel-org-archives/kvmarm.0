@@ -1,148 +1,105 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 6/9] KVM: arm/arm64: use a vcpu request on irq
- injection
-Date: Tue, 4 Apr 2017 20:27:01 +0200
-Message-ID: <20170404182701.pzen66bxzf6md4qo@kamzik.brq.redhat.com>
+Subject: Re: [PATCH v2 7/9] KVM: arm/arm64: PMU: remove request-less vcpu kick
+Date: Tue, 4 Apr 2017 20:29:18 +0200
+Message-ID: <20170404182918.buuvpsvh3cjo6wdn@kamzik.brq.redhat.com>
 References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-7-drjones@redhat.com>
- <20170404174208.GB31208@cbox>
+ <20170331160658.4331-8-drjones@redhat.com>
+ <20170404174612.GC31208@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170404174208.GB31208@cbox>
+In-Reply-To: <20170404174612.GC31208@cbox>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <cdall@linaro.org>
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 04, 2017 at 07:42:08PM +0200, Christoffer Dall wrote:
-> On Fri, Mar 31, 2017 at 06:06:55PM +0200, Andrew Jones wrote:
-> > Don't use request-less VCPU kicks when injecting IRQs, as a VCPU
-> > kick meant to trigger the interrupt injection could be sent while
-> > the VCPU is outside guest mode, which means no IPI is sent, and
-> > after it has called kvm_vgic_flush_hwstate(), meaning it won't see
-> > the updated GIC state until its next exit some time later for some
-> > other reason.
+On Tue, Apr 04, 2017 at 07:46:12PM +0200, Christoffer Dall wrote:
+> On Fri, Mar 31, 2017 at 06:06:56PM +0200, Andrew Jones wrote:
+> > Refactor PMU overflow handling in order to remove the request-less
+> > vcpu kick.  Now, since kvm_vgic_inject_irq() uses vcpu requests,
+> > there should be no chance that a kick sent at just the wrong time
+> > (between the VCPU's call to kvm_pmu_flush_hwstate() and before it
+> > enters guest mode) results in a failure for the guest to see updated
+> > GIC state until its next exit some time later for some other reason.
 > > 
 > > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > > ---
-> >  arch/arm/include/asm/kvm_host.h   |  1 +
-> >  arch/arm/kvm/arm.c                |  1 +
-> >  arch/arm64/include/asm/kvm_host.h |  1 +
-> >  virt/kvm/arm/arch_timer.c         |  1 +
-> >  virt/kvm/arm/vgic/vgic.c          | 12 ++++++++++--
-> >  5 files changed, 14 insertions(+), 2 deletions(-)
+> >  virt/kvm/arm/pmu.c | 29 +++++++++++++++--------------
+> >  1 file changed, 15 insertions(+), 14 deletions(-)
 > > 
-> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> > index afed5d44634d..0b8a6d6b3cb3 100644
-> > --- a/arch/arm/include/asm/kvm_host.h
-> > +++ b/arch/arm/include/asm/kvm_host.h
-> > @@ -47,6 +47,7 @@
-> >  
-> >  #define KVM_REQ_PAUSE		8
-> >  #define KVM_REQ_POWER_OFF	9
-> > +#define KVM_REQ_IRQ_PENDING	10
-> >  
-> >  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
-> >  int __attribute_const__ kvm_target_cpu(void);
-> > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> > index 7ed39060b1cf..a106feccf314 100644
-> > --- a/arch/arm/kvm/arm.c
-> > +++ b/arch/arm/kvm/arm.c
-> > @@ -768,6 +768,7 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
-> >  	 * trigger a world-switch round on the running physical CPU to set the
-> >  	 * virtual IRQ/FIQ fields in the HCR appropriately.
-> >  	 */
-> > +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-> >  	kvm_vcpu_kick(vcpu);
-> >  
-> >  	return 0;
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index e78895f675d0..7057512b3474 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -44,6 +44,7 @@
-> >  
-> >  #define KVM_REQ_PAUSE		8
-> >  #define KVM_REQ_POWER_OFF	9
-> > +#define KVM_REQ_IRQ_PENDING	10
-> >  
-> >  int __attribute_const__ kvm_target_cpu(void);
-> >  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-> > diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> > index 35d7100e0815..3c48abbf951b 100644
-> > --- a/virt/kvm/arm/arch_timer.c
-> > +++ b/virt/kvm/arm/arch_timer.c
-> > @@ -95,6 +95,7 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
-> >  	 * If the vcpu is blocked we want to wake it up so that it will see
-> >  	 * the timer has expired when entering the guest.
-> >  	 */
-> > +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-> >  	kvm_vcpu_kick(vcpu);
+> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> > index 69ccce308458..9d725f3afb11 100644
+> > --- a/virt/kvm/arm/pmu.c
+> > +++ b/virt/kvm/arm/pmu.c
+> > @@ -203,6 +203,19 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
+> >  	return reg;
 > >  }
 > >  
-> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> > index 654dfd40e449..31fb89057f0c 100644
-> > --- a/virt/kvm/arm/vgic/vgic.c
-> > +++ b/virt/kvm/arm/vgic/vgic.c
-> > @@ -283,8 +283,10 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
-> >  		 * won't see this one until it exits for some other
-> >  		 * reason.
-> >  		 */
-> > -		if (vcpu)
-> > +		if (vcpu) {
-> > +			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-> >  			kvm_vcpu_kick(vcpu);
-> > +		}
-> >  		return false;
-> >  	}
-> >  
-> > @@ -330,6 +332,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
-> >  	spin_unlock(&irq->irq_lock);
-> >  	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> >  
-> > +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-> >  	kvm_vcpu_kick(vcpu);
-> >  
-> >  	return true;
-> > @@ -654,6 +657,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
-> >  	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> >  	vgic_flush_lr_state(vcpu);
-> >  	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+> > +static void kvm_pmu_check_overflow(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > +	bool overflow;
 > > +
-> > +	/* The GIC is now ready to deliver the IRQ. */
-> > +	clear_bit(KVM_REQ_IRQ_PENDING, &vcpu->requests);
+> > +	overflow = !!kvm_pmu_overflow_status(vcpu);
+> > +	if (pmu->irq_level != overflow) {
+> > +		pmu->irq_level = overflow;
+> > +		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+> > +				    pmu->irq_num, overflow);
+> > +	}
+> > +}
+> > +
 > 
-> this is not going to be called when we don't have the vgic, which means
-> that if vcpu_interrupt_line() is used as you modify it above, the
-> request will never get cleared.
+> If we are changing the way the PMU works to adjust the interrupt
+> signaling whenever the PMU changes its internal state, do we still ahv
+> to call kvm_pmu_update_state() from each flush/sync path now?
 
-Ah, thanks. I'll try to sort that out a better way.  Of course with
-Paolo's comments about request-less kicks working due to the mode
-change in kvm_vcpu_kick() (when an additional condition is added
-before the vcpu enters guest mode), then maybe we don't need this, or
-the next patch, at all.
+The thought crossed my mind to rework that completely, in order to remove
+that flush/sync, but then went for the smaller patch for this series.  I
+can take a look at it though.
 
 Thanks,
 drew
 
 > 
+> >  /**
+> >   * kvm_pmu_overflow_set - set PMU overflow interrupt
+> >   * @vcpu: The vcpu pointer
+> > @@ -210,31 +223,19 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
+> >   */
+> >  void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
+> >  {
+> > -	u64 reg;
+> > -
+> >  	if (val == 0)
+> >  		return;
+> >  
+> >  	vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= val;
+> > -	reg = kvm_pmu_overflow_status(vcpu);
+> > -	if (reg != 0)
+> > -		kvm_vcpu_kick(vcpu);
+> > +	kvm_pmu_check_overflow(vcpu);
 > >  }
 > >  
-> >  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
-> > @@ -691,8 +697,10 @@ void vgic_kick_vcpus(struct kvm *kvm)
-> >  	 * a good kick...
-> >  	 */
-> >  	kvm_for_each_vcpu(c, vcpu, kvm) {
-> > -		if (kvm_vgic_vcpu_pending_irq(vcpu))
-> > +		if (kvm_vgic_vcpu_pending_irq(vcpu)) {
-> > +			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-> >  			kvm_vcpu_kick(vcpu);
-> > +		}
-> >  	}
+> >  static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
+> >  {
+> > -	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > -	bool overflow;
+> > -
+> >  	if (!kvm_arm_pmu_v3_ready(vcpu))
+> >  		return;
+> >  
+> > -	overflow = !!kvm_pmu_overflow_status(vcpu);
+> > -	if (pmu->irq_level != overflow) {
+> > -		pmu->irq_level = overflow;
+> > -		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+> > -				    pmu->irq_num, overflow);
+> > -	}
+> > +	kvm_pmu_check_overflow(vcpu);
 > >  }
 > >  
+> >  /**
 > > -- 
 > > 2.9.3
 > > 
