@@ -1,27 +1,24 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3] kvm: arm/arm64: Fix locking for kvm_free_stage2_pgd
-Date: Tue, 4 Apr 2017 12:13:16 +0200
-Message-ID: <20170404101316.GF11752@cbox>
-References: <1491228763-23450-1-git-send-email-suzuki.poulose@arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [kvmarm:master 1/3] arch/arm/kvm/mmu.c:302:14: error:
+ 'S2_PUD_SIZE' undeclared
+Date: Tue, 4 Apr 2017 11:14:01 +0100
+Message-ID: <cf4974ea-6cfd-331c-6a77-cf4c9f07812b@arm.com>
+References: <201704040547.iQuSbIzK%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D9DF40B58
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 06:11:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B694640017
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 06:11:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tJQPS9gQsJIs for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Apr 2017 06:11:04 -0400 (EDT)
-Received: from mail-wr0-f172.google.com (mail-wr0-f172.google.com
- [209.85.128.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E79FC40A86
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 06:11:03 -0400 (EDT)
-Received: by mail-wr0-f172.google.com with SMTP id w11so206007077wrc.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Apr 2017 03:13:15 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1491228763-23450-1-git-send-email-suzuki.poulose@arm.com>
+ with ESMTP id EkP451GU2xfR for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Apr 2017 06:11:53 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6710740A86
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Apr 2017 06:11:53 -0400 (EDT)
+In-Reply-To: <201704040547.iQuSbIzK%fengguang.wu@intel.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,148 +28,93 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, andreyknvl@google.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org, kcc@google.com, syzkaller@googlegroups.com, dvyukov@google.com, catalin.marinas@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: kbuild test robot <fengguang.wu@intel.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kbuild-all@01.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+On 03/04/17 22:15, kbuild test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git master
+> head:   1f1c45c6f66a586ca420ca02cbd93a35690394f9
+> commit: f9d9eb7f7a2c7e388861fe1cdb253f63e63555fe [1/3] kvm: arm/arm64: Fix locking for kvm_free_stage2_pgd
+> config: arm-axm55xx_defconfig (attached as .config)
+> compiler: arm-linux-gnueabi-gcc (Debian 6.1.1-9) 6.1.1 20160705
+> reproduce:
+>         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         git checkout f9d9eb7f7a2c7e388861fe1cdb253f63e63555fe
+>         # save the attached .config to linux build tree
+>         make.cross ARCH=arm
+>
+> All errors (new ones prefixed by >>):
+>
+>    arch/arm/kvm/mmu.c: In function 'unmap_stage2_range':
+>>> arch/arm/kvm/mmu.c:302:14: error: 'S2_PUD_SIZE' undeclared (first use in this function)
+>       if (size > S2_PUD_SIZE)
+>                  ^~~~~~~~~~~
 
-On Mon, Apr 03, 2017 at 03:12:43PM +0100, Suzuki K Poulose wrote:
-> In kvm_free_stage2_pgd() we don't hold the kvm->mmu_lock while calling
-> unmap_stage2_range() on the entire memory range for the guest. This could
-> cause problems with other callers (e.g, munmap on a memslot) trying to
-> unmap a range. And since we have to unmap the entire Guest memory range
-> holding a spinlock, make sure we yield the lock if necessary, after we
-> unmap each PUD range.
-> 
-> Fixes: commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
-> Cc: stable@vger.kernel.org # v3.10+
-> Cc: Paolo Bonzini <pbonzin@redhat.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> [ Avoid vCPU starvation and lockup detector warnings ]
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
+Thanks kbuild for catching this one !
 
-This unfortunately fails to build on 32-bit ARM, and I also think we
-intended to check against S2_PGDIR_SIZE, not S2_PUD_SIZE.
+>    arch/arm/kvm/mmu.c:302:14: note: each undeclared identifier is reported only once for each function it appears in
+>
+> vim +/S2_PUD_SIZE +302 arch/arm/kvm/mmu.c
+>
+>    296		pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+>    297		do {
+>    298			/*
+>    299			 * If the range is too large, release the kvm->mmu_lock
+>    300			 * to prevent starvation and lockup detector warnings.
+>    301			 */
+>  > 302			if (size > S2_PUD_SIZE)
+>    303				cond_resched_lock(&kvm->mmu_lock);
+>    304			next = stage2_pgd_addr_end(addr, end);
+>    305			if (!stage2_pgd_none(*pgd))
+>
 
-How about adding this to your patch (which includes a rename of
-S2_PGD_SIZE which is horribly confusing as it indicates the size of the
-first level stage-2 table itself, where S2_PGDIR_SIZE indicates the size
-of address space mapped by a single entry in the same table):
 
-diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
-index 460d616..c997f2d 100644
---- a/arch/arm/include/asm/stage2_pgtable.h
-+++ b/arch/arm/include/asm/stage2_pgtable.h
-@@ -35,10 +35,13 @@
- 
- #define stage2_pud_huge(pud)			pud_huge(pud)
- 
-+#define S2_PGDIR_SIZE				PGDIR_SIZE
-+#define S2_PGDIR_MASK				PGDIR_MASK
-+
- /* Open coded p*d_addr_end that can deal with 64bit addresses */
- static inline phys_addr_t stage2_pgd_addr_end(phys_addr_t addr, phys_addr_t end)
- {
--	phys_addr_t boundary = (addr + PGDIR_SIZE) & PGDIR_MASK;
-+	phys_addr_t boundary = (addr + S2_PGDIR_SIZE) & S2_PGDIR_MASK;
- 
- 	return (boundary - 1 < end - 1) ? boundary : end;
- }
+Marc, Christoffer,
+
+Ah! I didn't test this on arm32. We have two options :
+
+1) Define S2_P{U,M}_SIZE for arm32 in asm/stage2_pgtable.h
+
+or,
+
+2)  use the following hunk on top of the patch, which changes the lock
+release after we process one PGDIR entry. As for the first time we enter
+the loop we haven't done much with the lock held, hence it may make
+sense to do it after the first round and we have more work to do.
+
+Let me know what you think
+
+
 diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index db94f3a..6e79a4c 100644
+index db94f3a..582a972 100644
 --- a/arch/arm/kvm/mmu.c
 +++ b/arch/arm/kvm/mmu.c
-@@ -41,7 +41,7 @@ static unsigned long hyp_idmap_start;
- static unsigned long hyp_idmap_end;
- static phys_addr_t hyp_idmap_vector;
- 
--#define S2_PGD_SIZE	(PTRS_PER_S2_PGD * sizeof(pgd_t))
-+#define S2_PGD_TABLE_SIZE	(PTRS_PER_S2_PGD * sizeof(pgd_t))
- #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
- 
- #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
-@@ -299,7 +299,7 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
- 		 * If the range is too large, release the kvm->mmu_lock
- 		 * to prevent starvation and lockup detector warnings.
- 		 */
--		if (size > S2_PUD_SIZE)
-+		if (size > S2_PGDIR_SIZE)
- 			cond_resched_lock(&kvm->mmu_lock);
- 		next = stage2_pgd_addr_end(addr, end);
- 		if (!stage2_pgd_none(*pgd))
-@@ -747,7 +747,7 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
- 	}
- 
- 	/* Allocate the HW PGD, making sure that each page gets its own refcount */
--	pgd = alloc_pages_exact(S2_PGD_SIZE, GFP_KERNEL | __GFP_ZERO);
-+	pgd = alloc_pages_exact(S2_PGD_TABLE_SIZE, GFP_KERNEL | __GFP_ZERO);
- 	if (!pgd)
- 		return -ENOMEM;
- 
-@@ -843,7 +843,7 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
- 	spin_unlock(&kvm->mmu_lock);
- 
- 	/* Free the HW pgd, one page at a time */
--	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
-+	free_pages_exact(kvm->arch.pgd, S2_PGD_TABLE_SIZE);
- 	kvm->arch.pgd = NULL;
- }
- 
+@@ -295,15 +295,15 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
+         assert_spin_locked(&kvm->mmu_lock);
+         pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+         do {
++               next = stage2_pgd_addr_end(addr, end);
++               if (!stage2_pgd_none(*pgd))
++                       unmap_stage2_puds(kvm, pgd, addr, next);
+                 /*
+                  * If the range is too large, release the kvm->mmu_lock
+                  * to prevent starvation and lockup detector warnings.
+                  */
+-               if (size > S2_PUD_SIZE)
++               if (next != end)
+                         cond_resched_lock(&kvm->mmu_lock);
+-               next = stage2_pgd_addr_end(addr, end);
+-               if (!stage2_pgd_none(*pgd))
+-                       unmap_stage2_puds(kvm, pgd, addr, next);
+         } while (pgd++, addr = next, addr != end);
+  }
+  
 
-Thanks,
--Christoffer
+Suzuki
 
 > ---
-> Changes since V2:
->  - Restrict kvm->mmu_lock relaxation to bigger ranges in unmap_stage2_range(),
->    to avoid possible issues like [0]
-> 
->  [0] http://lists.infradead.org/pipermail/linux-arm-kernel/2017-March/498210.html
-> 
-> Changes since V1:
->  - Yield the kvm->mmu_lock if necessary in unmap_stage2_range to prevent
->    vCPU starvation and lockup detector warnings.
-> ---
->  arch/arm/kvm/mmu.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index 13b9c1f..db94f3a 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -292,8 +292,15 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
->  	phys_addr_t addr = start, end = start + size;
->  	phys_addr_t next;
->  
-> +	assert_spin_locked(&kvm->mmu_lock);
->  	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
->  	do {
-> +		/*
-> +		 * If the range is too large, release the kvm->mmu_lock
-> +		 * to prevent starvation and lockup detector warnings.
-> +		 */
-> +		if (size > S2_PUD_SIZE)
-> +			cond_resched_lock(&kvm->mmu_lock);
->  		next = stage2_pgd_addr_end(addr, end);
->  		if (!stage2_pgd_none(*pgd))
->  			unmap_stage2_puds(kvm, pgd, addr, next);
-> @@ -831,7 +838,10 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
->  	if (kvm->arch.pgd == NULL)
->  		return;
->  
-> +	spin_lock(&kvm->mmu_lock);
->  	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
-> +	spin_unlock(&kvm->mmu_lock);
-> +
->  	/* Free the HW pgd, one page at a time */
->  	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
->  	kvm->arch.pgd = NULL;
-> -- 
-> 2.7.4
-> 
+> 0-DAY kernel test infrastructure                Open Source Technology Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+>
