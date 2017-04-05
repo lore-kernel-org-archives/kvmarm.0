@@ -1,91 +1,146 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: replace vcpu->arch.pause with a
- vcpu request
-Date: Wed, 5 Apr 2017 09:09:59 +0200
-Message-ID: <20170405070959.GA1526@cbox>
-References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-5-drjones@redhat.com>
- <20170404160417.GN11752@cbox>
- <20170404175718.su4tjx3psyez3qee@kamzik.brq.redhat.com>
- <20170404190438.GF31208@cbox>
- <63209d09-0c45-0bb2-322b-e422f1360df7@redhat.com>
+Subject: Re: [PATCH v2 2/5] KVM: arm/arm64: Add ARM user space interrupt
+ signaling ABI
+Date: Wed, 5 Apr 2017 10:12:37 +0200
+Message-ID: <20170405081237.GB1526@cbox>
+References: <20170203145655.15007-1-cdall@linaro.org>
+ <20170203145655.15007-3-cdall@linaro.org>
+ <CAFEAcA-HMZnjbnhDC-13rWuQP-X2pk-W-6DvSR8n9_f-e4R=cA@mail.gmail.com>
+ <20170221114153.GA26976@cbox>
+ <5fe89e77-4fcc-f2e5-a796-a1e1f38eef9f@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC60140A14
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Apr 2017 04:10:25 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id N2gX0zviBu7N for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Apr 2017 04:10:24 -0400 (EDT)
+Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD81640190
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Apr 2017 04:10:23 -0400 (EDT)
+Received: by mail-wm0-f46.google.com with SMTP id y22so43496375wmh.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Apr 2017 01:12:37 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <63209d09-0c45-0bb2-322b-e422f1360df7@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, rkrcmar@redhat.com
+In-Reply-To: <5fe89e77-4fcc-f2e5-a796-a1e1f38eef9f@suse.de>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Alexander Graf <agraf@suse.de>
+Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Pekka Enberg <penberg@iki.fi>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 04, 2017 at 10:10:15PM +0200, Paolo Bonzini wrote:
+On Wed, Apr 05, 2017 at 02:14:11AM +0200, Alexander Graf wrote:
 > 
 > 
-> On 04/04/2017 21:04, Christoffer Dall wrote:
-> >  - (On a related work, I suddenly felt it weird that
-> >    kvm_make_all_cpus_request() doesn't wake up sleeping VCPUs, but only
-> >    sends an IPI; does this mean that calling this function should be
-> >    followed by a kick() for each VCPU?  Maybe Radim was looking at this
-> >    in his series already.)
+> On 21.02.17 12:41, Christoffer Dall wrote:
+> >Hi Alex,
+> >
+> >On Fri, Feb 03, 2017 at 05:51:18PM +0000, Peter Maydell wrote:
+> >>On 3 February 2017 at 14:56, Christoffer Dall <cdall@linaro.org> wrote:
+> >>>From: Christoffer Dall <christoffer.dall@linaro.org>
+> >>>
+> >>>We have 2 modes for dealing with interrupts in the ARM world. We can
+> >>>either handle them all using hardware acceleration through the vgic or
+> >>>we can emulate a gic in user space and only drive CPU IRQ pins from
+> >>>there.
+> >>>
+> >>>Unfortunately, when driving IRQs from user space, we never tell user
+> >>>space about events from devices emulated inside the kernel, which may
+> >>>result in interrupt line state changes, so we lose out on for example
+> >>>timer and PMU events if we run with user space gic emulation.
+> >>>
+> >>>Define an ABI to publish such device output levels to userspace.
+> >>>
+> >>>Signed-off-by: Alexander Graf <agraf@suse.de>
+> >>>Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >>
+> >>
+> >>Acked-by: Peter Maydell <peter.maydell@linaro.org>
+> >>
+> >>for the userspace ABI/docs part.
+> >>
+> >
+> >Given Peter's ack on this ABI, any chance you could take a look at
+> >fixing the userspace SMP issue and respinning the userspace patches for
+> >this series?
 > 
-> Yes, kvm_make_all_cpus_request in x86 is only used for "non urgent"
-> requests, i.e. things to do before the next guest entry.
+> The problem with user space SMP was simply a missing lock:
+> 
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index a66845f..1b33895 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -548,10 +548,14 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs,
+> struct kvm_run *run)
+> 
+>      /* Synchronize our internal vtimer irq line with the kvm one */
+>      if (run->s.regs.device_irq_level != cpu->device_irq_level) {
+> -        qemu_set_irq(ARM_CPU(cs)->gt_timer_outputs[GTIMER_VIRT],
+> +        qemu_mutex_lock_iothread();
+> +        qemu_set_irq(cpu->gt_timer_outputs[GTIMER_VIRT],
+>                       run->s.regs.device_irq_level &
+> KVM_ARM_DEV_EL1_VTIMER);
+> +        qemu_set_irq(cpu->gt_timer_outputs[GTIMER_PHYS],
+> +                     run->s.regs.device_irq_level &
+> KVM_ARM_DEV_EL1_PTIMER);
+>          /* TODO: Handle changes in PTIMER and PMU as well */
+>          cpu->device_irq_level = run->s.regs.device_irq_level;
+> +        qemu_mutex_unlock_iothread();
+>      }
+> 
+>      return MEMTXATTRS_UNSPECIFIED;
+> 
+> ----
+> 
+> 
+> I also wasn't able to use your series out of the box. There are
+> several places in the code that check whether a timer is enabled
+> (for register save/restore for example) and without vgic we never
+> ended up setting that to true.
+> 
+> I don't know how safe it is to set it to true regardless. It feels
+> to me like someone has to put more thought into how to switch from
+> an initialized user space timer state to a vgic one. For reference,
+> my test patch is below:
+> 
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 891a725..56a5d51 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -629,8 +629,11 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  		return 0;
+> 
+>  	/* Without a VGIC we do not map virtual IRQs to physical IRQs */
+> -	if (!irqchip_in_kernel(vcpu->kvm))
+> +	if (!irqchip_in_kernel(vcpu->kvm)) {
+> +		/* Enable timer for now, may be racy? */
+> +		timer->enabled = 1;
+>  		return 0;
+> +	}
+> 
+>  	if (!vgic_initialized(vcpu->kvm))
+>  		return -ENODEV;
 > 
 
-Ah, another good thing to document somewhere.
+Heh, sorry about this, I accidentally pushed the wrong content to my git
+repo, so I'm guessing you pulled from there instead of applying these
+patches directly.  If you want a branch with these patches as intended,
+try this:
 
-> >  - In the explanation you wrote, you use the term 'we' a lot, but when
-> >    talking about SMP barriers, I think it only makes sense to talk about
-> >    actions and observations between multiple CPUs and we have to be
-> >    specific about which CPU observes or does what with respect to the
-> >    other.  Maybe I'm being a stickler here, but there something here
-> >    which is making me uneasy.
-> 
-> The write1-mb-if(read2) / write2-mb-if(read1) pattern is pretty common,
-> so I think it is justified to cut the ordering on the reasoning and just
-> focus on what the two memory locations and conditions mean.
+git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git irqs-to-user-v2-for-real
 
-ok, but the pattern above was not common to me (and I'm pretty sure I'm
-not the only fool in the bunch here), so if we can reference something
-that explains that this is a known pattern which has been tried and
-proven, that would be even better.
-
-> But I'd
-> wait for v3, since I'm sure that Drew also understands the
-> synchronization better.
-> 
-
-Yes, I'm confident that v3 will be great ;)
-
-> >  - Finally, it feels very hard to prove the correctness of this, and
-> >    equally hard to test it (given how long we've been running with
-> >    apparently racy code).  I would hope that we could abstract some of
-> >    this into architecture generic things, that someone who eat memory
-> >    barriers for breakfast could help us verify, but again, maybe this is
-> >    Radim's series I'm asking for here.
-> 
-> What I can do here is to suggest copying the paradigms from x86, which
-> is quite battle tested (Windows hammers it really hard).
-
-That sounds reasonable, but I think part of the problem was that we
-simply didn't understand what the paradigms were (see the
-kvm_make_all_cpus_request above as an example), so Drew's action about
-documenting what this all is and the constraints of using it is really
-important for me to do that.
-
-> 
-> For QEMU I did use model checking in the past for some similarly hairy
-> synchronization code, but that is really just "executable documentation"
-> because the model is not written in C.
-> 
-
-I played with using blast on some of the KVM/ARM code a long time ago,
-and while I was able to find a bug with it, it was sort of an obvious
-bug, and the things I was able to do with it was pretty limited to the
-problems I could imagine myself anyhow.  Perhaps this is what you mean
-with executable documentation.  In any case, I feel it starts with
-documentation.
+I have a v3 ready based on v4.11-rc1 plus other KVM fixes and I'll send
+that out later today once I've tested with your qemu fix above.
 
 Thanks,
 -Christoffer
