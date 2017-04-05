@@ -1,105 +1,64 @@
-From: Christoffer Dall <cdall@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [PATCH v2 2/9] KVM: Add documentation for VCPU requests
-Date: Wed, 5 Apr 2017 19:45:38 +0200
-Message-ID: <20170405174538.GB27123@cbox>
+Date: Wed, 5 Apr 2017 20:29:12 +0200
+Message-ID: <45234347-1773-3359-81e3-e1ffe2ae560b@redhat.com>
 References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-3-drjones@redhat.com>
- <20170404152403.GK11752@cbox>
+ <20170331160658.4331-3-drjones@redhat.com> <20170404152403.GK11752@cbox>
  <20170404170600.w6snnecqoi4aqv4d@kamzik.brq.redhat.com>
  <20170404172340.GQ11752@cbox> <20170405141139.GA13944@potion>
+ <20170405174538.GB27123@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EE2C40B40
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Apr 2017 13:43:24 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id npqG3JbqSmqq for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Apr 2017 13:43:23 -0400 (EDT)
-Received: from mail-wr0-f175.google.com (mail-wr0-f175.google.com
- [209.85.128.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4362940AF9
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Apr 2017 13:43:23 -0400 (EDT)
-Received: by mail-wr0-f175.google.com with SMTP id w43so24276195wrb.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Apr 2017 10:45:37 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170405141139.GA13944@potion>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170405174538.GB27123@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gV2VkLCBBcHIgMDUsIDIwMTcgYXQgMDQ6MTE6NDBQTSArMDIwMCwgUmFkaW0gS3LEjW3DocWZ
-IHdyb3RlOgo+IDIwMTctMDQtMDQgMTk6MjMrMDIwMCwgQ2hyaXN0b2ZmZXIgRGFsbDoKPiA+IE9u
-IFR1ZSwgQXByIDA0LCAyMDE3IGF0IDA3OjA2OjAwUE0gKzAyMDAsIEFuZHJldyBKb25lcyB3cm90
-ZToKPiA+PiBPbiBUdWUsIEFwciAwNCwgMjAxNyBhdCAwNToyNDowM1BNICswMjAwLCBDaHJpc3Rv
-ZmZlciBEYWxsIHdyb3RlOgo+ID4+ID4gT24gRnJpLCBNYXIgMzEsIDIwMTcgYXQgMDY6MDY6NTFQ
-TSArMDIwMCwgQW5kcmV3IEpvbmVzIHdyb3RlOgo+ID4+ID4gPiArYW5kIHdpbGwgZGVmaW5pdGVs
-eSBzZWUgdGhlIHJlcXVlc3QsIG9yIGlzIG91dHNpZGUgZ3Vlc3QgbW9kZSwgYnV0IGhhcyB5ZXQK
-PiA+PiA+ID4gK3RvIGRvIGl0cyBmaW5hbCByZXF1ZXN0IGNoZWNrLCBhbmQgdGhlcmVmb3JlIHdo
-ZW4gaXQgZG9lcywgaXQgd2lsbCBzZWUgdGhlCj4gPj4gPiA+ICtyZXF1ZXN0LCB0aGVuIHRoaW5n
-cyB3aWxsIHdvcmsuICBIb3dldmVyLCB0aGUgdHJhbnNpdGlvbiBmcm9tIG91dHNpZGUgdG8KPiA+
-PiA+ID4gK2luc2lkZSBndWVzdCBtb2RlLCBhZnRlciB0aGUgbGFzdCByZXF1ZXN0IGNoZWNrIGhh
-cyBiZWVuIG1hZGUsIG9wZW5zIGEKPiA+PiA+ID4gK3dpbmRvdyB3aGVyZSBhIHJlcXVlc3QgY291
-bGQgYmUgbWFkZSwgYnV0IHRoZSBWQ1BVIHdvdWxkIG5vdCBzZWUgdW50aWwgaXQKPiA+PiA+ID4g
-K2V4aXRzIGd1ZXN0IG1vZGUgc29tZSB0aW1lIGxhdGVyLiAgU2VlIHRoZSB0YWJsZSBiZWxvdy4K
-PiA+PiA+IAo+ID4+ID4gVGhpcyB0ZXh0LCBhbmQgdGhlIHRhYmxlIGJlbG93LCBvbmx5IGRlYWxz
-IHdpdGggdGhlIGRldGFpbHMgb2YgZW50ZXJpbmcKPiA+PiA+IHRoZSBndWVzdC4gIFNob3VsZCB3
-ZSB0YWxrIGFib3V0IGt2bV92Y3B1X2V4aXRpbmdfZ3Vlc3RfbW9kZSgpIGFuZAo+ID4+ID4gYW55
-dGhpbmcgcmVsYXRlZCB0byBleGl0aW5nIHRoZSBndWVzdD8KPiA+PiAKPiA+PiBJIHRoaW5rIGFs
-bCAhSU5fR1VFU1RfTU9ERSBzaG91bGQgYmVoYXZlIHRoZSBzYW1lLCBzbyBJIHdhcyBhdm9pZGlu
-Zwo+ID4+IHRoZSB1c2Ugb2YgRVhJVElOR19HVUVTVF9NT0RFIGFuZCBPVVRTSURFX0dVRVNUX01P
-REUsIHdoaWNoIHdvdWxkbid0IGJlCj4gPj4gaGFyZCB0byBhZGRyZXNzLCBidXQgdGhlbiBJJ2Qg
-YWxzbyBoYXZlIHRvIGFkZHJlc3MKPiA+PiBSRUFESU5HX1NIQURPV19QQUdFX1RBQkxFUywgd2hp
-Y2ggbWF5IGNvbXBsaWNhdGUgdGhlIGRvY3VtZW50IG1vcmUgdGhhbgo+ID4+IG5lY2Vzc2FyeS4g
-IEknbSBub3Qgc3VyZSB3ZSBuZWVkIHRvIGFkZHJlc3MgYSBWQ1BVIGV4aXRpbmcgZ3Vlc3QgbW9k
-ZSwKPiA+PiBvdGhlciB0aGFuIG1ha2luZyBzdXJlIGl0J3MgY2xlYXIgdGhhdCBhIFZDUFUgdGhh
-dCBleGl0cyBtdXN0IGNoZWNrCj4gPj4gcmVxdWVzdHMgYmVmb3JlIGl0IGVudGVycyBhZ2Fpbi4K
-PiA+IAo+ID4gQnV0IHRoZSBwcm9ibGVtIGlzIHRoYXQga3ZtX21ha2VfYWxsX2NwdXNfcmVxdWVz
-dCgpIG9ubHkgc2VuZHMgSVBJcyB0bwo+ID4gQ1BVcyB3aGVyZSB0aGUgbW9kZSB3YXMgZGlmZmVy
-ZW50IGZyb20gT1VUU0lERV9HVUVTVF9NT0RFLCBzbyB0aGVyZSBpdCdzCj4gPiBhYm91dCAhT1VU
-U0lERV9HVUVTVF9NT0RFIHJhdGhlciB0aGFuICFJTl9HVUVTVF9NT0RFLCBzbyB0aGVyZSdzIHNv
-bWUKPiA+IHN1YnRsZXR5IGhlcmUgd2hpY2ggSSBmZWVsIGxpa2UgaXQncyBkYW5nZXJvdXMgdG8g
-cGFwZXIgb3Zlci4KPiAKPiBSaWdodCwgdGhhdCBuZWVkcyBmaXhpbmcgaW4gdGhlIGNvZGUuCgpS
-ZWFsbHk/ICBJIHRob3VnaHQgUGFvbG8gc2FpZCB0aGF0IHRoaXMgaXMgdGhlIGludGVuZGVkIGJl
-aGF2aW9yIGFuZApzZW1hbnRpY3M7IG5vbi11cmdlbnQgcmVxdWVzdHMgdGhhdCBzaG91bGQganVz
-dCBiZSBzZXJ2aWNlZCBiZWZvcmUgdGhlCm5leHQgZ3Vlc3QgZW50cnkuCgpOb3cgSSdtIGNvbmZ1
-c2VkIGFnYWluLiAgV2hhdCBkaWQgSSBtaXNzPwoKPiAKPiBndWVzdF9tb2RlIGlzIGp1c3QgYW4g
-b3B0aW1pemF0aW9uIHRoYXQgYWxsb3dzIHVzIHRvIHNraXAgc2VuZGluZyB0aGUKPiBJUEkgd2hl
-biB0aGUgVkNQVSBpcyBrbm93biB0byBoYW5kbGUgdGhlIHJlcXVlc3QgYXMgc29vbiBhcyBwb3Nz
-aWJsZS4KPiAKPiAgIElOX0dVRVNUX01PREU6IHdlIG11c3QgZm9yY2UgVk0gZXhpdCBvciB0aGUg
-cmVxdWVzdCBjb3VsZCBuZXZlciBiZQo+ICAgICBoYW5kbGVkCj4gICBFWElUSU5HX0dVRVNUX01P
-REU6IGFub3RoZXIgcmVxdWVzdCBhbHJlYWR5IGZvcmNlcyB0aGUgVk0gZXhpdCBhbmQKPiAgICAg
-d2UncmUganVzdCB3YWl0aW5nIGZvciB0aGUgVkNQVSB0byBub3RpY2Ugb3VyIHJlcXVlc3QKPiAg
-IE9VVFNJREVfR1VFU1RfTU9ERTogS1ZNIGlzIGdvaW5nIHRvIG5vdGljZSBvdXIgcmVxdWVzdCB3
-aXRob3V0IGFueQo+ICAgICBpbnRlcnZlbnRpb24KPiAgIFJFQURJTkdfU0hBRE9XX1BBR0VfVEFC
-TEVTOiBzYW1lIGFzIE9VVFNJREVfR1VFU1RfTU9ERSAtLSByZW5hbWUgdG8KPiAgICAgdW53aWVs
-ZGx5IE9VVFNJREVfR1VFU1RfTU9ERV9SRUFESU5HX1NIQURPV19QQUdFX1RBQkxFUz8KCkFnYWlu
-LCBJIHRob3VnaHQgUGFvbG8gd2FzIGFyZ3VpbmcgdGhhdCBFWElUSU5HX0dVRVNUX01PREUgbWFr
-ZXMgdGhlCndob2xlIHRoaW5nIHdvcmsgYmVjYXVzZSB5b3UgY2hlY2sgdGhhdCBhZnRlciBjaGVj
-a2luZyByZXF1ZXN0cz8KCj4gCj4gVGhlIGtpY2sgaXMgbmVlZGVkIG9ubHkgaW4gSU5fR1VFU1Rf
-TU9ERSBhbmQgYSB3YWtlIHVwIGlzIG5lZWRlZCBpbiBjYXNlCj4gd2hlcmUgdGhlIGd1ZXN0IGlz
-IGhhbHRlZCBPVVRTSURFX0dVRVNUX01PREUgLi4uCgo+IEhtLCBtYXliZSB3ZSBzaG91bGQgYWRk
-IGEgaGFsdCBzdGF0ZSB0b28/CgpXb3VsZG4ndCB0aGF0IGJlIHN3YWl0X2FjdGl2ZSgmdmNwdS0+
-d3EpID8gICBZb3UgY291bGQgYWRkIGEgd3JhcHBlcgp0aG91Z2guCgpXaGF0IEkgdGhpbmsgeW91
-IG5lZWQgaXMgYSB3YXkgdG8gZGlzdGluZ3Vpc2ggdGhlIHNlbWFudGljcyBvZiBjYWxsaW5nCmt2
-bV9tYWtlX2FsbF9jcHVzX3JlcXVlc3QoKSwgcGVyaGFwcyBieSBhZGRpbmcgYSAnYm9vbCB3YWtl
-X3VwJwpwYXJhbWV0ZXIuCgpJIGFsc28gZmVlbCBsaWtlIGl0IHdvdWxkIGJlIG1vcmUgcmVsaWFi
-bGUgb3IgZWFzaWVyIHRvIHVuZGVyc3RhbmQgaWYKa3ZtX21ha2VfYWxsX2NwdXNfcmVxdWVzdCgp
-IGNhbGxlZCBrdm1fdmNwdV9raWNrKCkgc29tZWhvdywgYnV0IHRoZXJlCm1heSBiZSBzdWNoIGFu
-IGVzdGFibGlzaGVkIGFuZCB1bmRlcnN0b29kIHVzZSBvZiB0aGUgZGlmZmVyZW5jZXMgYmV0d2Vl
-bgp0aGUgdHdvIGJ5IG90aGVyIGFyY2hpdGVjdHVyZXMgdGhhdCBpdCdzIHdvcnNlIHRvIGludHJv
-ZHVjZSB0aGUgY2h1cm4gb2YKY2hhbmdpbmcgaXQuICBJIGRvbid0IGtub3cuCgpUaGFua3MsCi1D
-aHJpc3RvZmZlcgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Xwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6
-Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+
+
+On 05/04/2017 19:45, Christoffer Dall wrote:
+>>> But the problem is that kvm_make_all_cpus_request() only sends IPIs to
+>>> CPUs where the mode was different from OUTSIDE_GUEST_MODE, so there it's
+>>> about !OUTSIDE_GUEST_MODE rather than !IN_GUEST_MODE, so there's some
+>>> subtlety here which I feel like it's dangerous to paper over.
+>> Right, that needs fixing in the code.
+> Really?  I thought Paolo said that this is the intended behavior and
+> semantics; non-urgent requests that should just be serviced before the
+> next guest entry.
+
+Indeed, that's right...
+
+>> guest_mode is just an optimization that allows us to skip sending the
+>> IPI when the VCPU is known to handle the request as soon as possible.
+>>
+>>   IN_GUEST_MODE: we must force VM exit or the request could never be
+>>     handled
+>>   EXITING_GUEST_MODE: another request already forces the VM exit and
+>>     we're just waiting for the VCPU to notice our request
+>>   OUTSIDE_GUEST_MODE: KVM is going to notice our request without any
+>>     intervention
+>>   READING_SHADOW_PAGE_TABLES: same as OUTSIDE_GUEST_MODE -- rename to
+>>     unwieldly OUTSIDE_GUEST_MODE_READING_SHADOW_PAGE_TABLES?
+> Again, I thought Paolo was arguing that EXITING_GUEST_MODE makes the
+> whole thing work because you check that after checking requests?
+
+... but apparently I was wrong here, see my email from this morning.
+
+>> The kick is needed only in IN_GUEST_MODE and a wake up is needed in case
+>> where the guest is halted OUTSIDE_GUEST_MODE ...
+>> Hm, maybe we should add a halt state too?
+> Wouldn't that be swait_active(&vcpu->wq) ?   You could add a wrapper
+> though.
+
+Yes.  I think the wrapper is probably unnecessary.
+
+> What I think you need is a way to distinguish the semantics of calling
+> kvm_make_all_cpus_request(), perhaps by adding a 'bool wake_up'
+> parameter.
+
+That would be fine.
+
+Paolo
