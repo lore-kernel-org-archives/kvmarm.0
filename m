@@ -1,130 +1,56 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 8/9] KVM: arm/arm64: fix race in kvm_psci_vcpu_on
-Date: Wed, 5 Apr 2017 11:30:27 +0200
-Message-ID: <20170405093027.GD1526@cbox>
-References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-9-drjones@redhat.com>
- <20170404194208.GH31208@cbox>
- <20170405083559.k3ivjzgevcksjoaq@kamzik.brq.redhat.com>
- <20170405085005.GC1526@cbox>
- <20170405091212.kblfdghzj4e4zooc@kamzik.brq.redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D2AC40430
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Apr 2017 05:28:14 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 00I1sjo1Bk2X for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Apr 2017 05:28:13 -0400 (EDT)
-Received: from mail-wr0-f171.google.com (mail-wr0-f171.google.com
- [209.85.128.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 077C640296
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Apr 2017 05:28:12 -0400 (EDT)
-Received: by mail-wr0-f171.google.com with SMTP id t20so5350507wra.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Apr 2017 02:30:26 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170405091212.kblfdghzj4e4zooc@kamzik.brq.redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Levente Kurusa <lkurusa@redhat.com>, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Subject: [PULL 0/5] KVM/ARM Fixes for v4.11-rc6
+Date: Wed,  5 Apr 2017 12:13:26 +0200
+Message-ID: <20170405101331.23812-1-cdall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 05, 2017 at 11:12:12AM +0200, Andrew Jones wrote:
-> On Wed, Apr 05, 2017 at 10:50:05AM +0200, Christoffer Dall wrote:
-> > On Wed, Apr 05, 2017 at 10:35:59AM +0200, Andrew Jones wrote:
-> > > On Tue, Apr 04, 2017 at 09:42:08PM +0200, Christoffer Dall wrote:
-> > > > On Fri, Mar 31, 2017 at 06:06:57PM +0200, Andrew Jones wrote:
-> > > > > From: Levente Kurusa <lkurusa@redhat.com>
-> > > > > 
-> > > > > When two vcpus issue PSCI_CPU_ON on the same core at the same time,
-> > > > > then it's possible for them to both enter the target vcpu's setup
-> > > > > at the same time. This results in unexpected behaviors at best,
-> > > > > and the potential for some nasty bugs at worst.
-> > > > > 
-> > > > > Signed-off-by: Levente Kurusa <lkurusa@redhat.com>
-> > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > > ---
-> > > > >  arch/arm/kvm/psci.c | 4 ++--
-> > > > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > > > 
-> > > > > diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
-> > > > > index f732484abc7a..0204daa899b1 100644
-> > > > > --- a/arch/arm/kvm/psci.c
-> > > > > +++ b/arch/arm/kvm/psci.c
-> > > > > @@ -88,7 +88,8 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > > > >  	 */
-> > > > >  	if (!vcpu)
-> > > > >  		return PSCI_RET_INVALID_PARAMS;
-> > > > > -	if (!test_bit(KVM_REQ_POWER_OFF, &vcpu->requests)) {
-> > > > > +
-> > > > > +	if (!test_and_clear_bit(KVM_REQ_POWER_OFF, &vcpu->requests)) {
-> > > > >  		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
-> > > > >  			return PSCI_RET_ALREADY_ON;
-> > > > >  		else
-> > > > > @@ -116,7 +117,6 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > > > >  	 * the general puspose registers are undefined upon CPU_ON.
-> > > > >  	 */
-> > > > >  	vcpu_set_reg(vcpu, 0, context_id);
-> > > > > -	clear_bit(KVM_REQ_POWER_OFF, &vcpu->requests);
-> > > > >  
-> > > > >  	wq = kvm_arch_vcpu_wq(vcpu);
-> > > > >  	swake_up(wq);
-> > > > > -- 
-> > > > > 2.9.3
-> > > > > 
-> > > > 
-> > > > Depending on what you end up doing with the requests, if you keep the
-> > > > bool flag you could just use the kvm->lock mutex instead.
-> > > > 
-> > > > Have you considered if there are any potential races between
-> > > > kvm_psci_system_off() being called on one VCPU while two other VPCUs are
-> > > > turning on the same CPU that is being turend off as part of system-wide
-> > > > power down as well?
-> > > 
-> > > Sounds like a nice unit test.  I haven't considered it, but I guess
-> > > the kvm_psci_system_off/reset calling VCPU will ultimately "win", as
-> > > it'll cause an exit to userspace that initiates a shutdown/reset.
-> > > When the VCPUs are restarted then vcpu init should reset the power_off
-> > > state correctly.  As long as the race this patch addresses is fixed, then
-> > > I'm not sure there should be any risk with the actual system_off/reset
-> > > being delayed wrt a vcpu being "on'ed" again, nor with there being more
-> > > than one VCPU trying to "on" it at the same time.
-> > > 
-> > > > 
-> > > > I'm wondering if this means we should take the kvm->lock at a higher
-> > > > level when handling PSCI events...
-> > > 
-> > > That would simplify our analysis of the PSCI emulation, but I'm not
-> > > sure we want to give a guest the power to constantly acquire that
-> > > mutex with a barrage of PSCI calls.  Maybe we should create a PSCI
-> > > mutex?  In order to avoid holding it too long we may want power_off to
-> > > be more than a boolean though, i.e. the PENDING state might also be
-> > > a good idea to represent.
-> > > 
-> > 
-> > Hmm, the kvm->lock mutex is per-VM, so if a VM wants to use its CPU
-> > resources by taking its own mutex, I don't really see the problem.
-> 
-> I was worried about management paths that lead to a need for that
-> lock. For example, I see x86's kvm_free_vcpus(), called from
-> kvm_arch_destroy_vm(), acquires it. A quick grep of ARM code doesn't
-> reveal anything though.
-> 
-Even in that case, PSCI is guaranteed to make progress, right?  So I
-still don't understand the challenge.
+Hi Paolo and Radim,
 
-In any case, I'll have a look over this patch again when you respin.
+Please pull a handfull of fixes for the next -rc release of v4.11.
+
+They include:
+ - Addressing a problem with GICv3 userspace save/restore
+ - Clarify GICv2 userspace save/restore ABI
+ - Be more careful in clearing GIC LRs
+ - Add missing synchronization primitive to our MMU handling code
+
+The following changes since commit 955a3fc6d2a1c11d6d00bce4f3816100ce0530cf:
+
+  KVM: arm64: Increase number of user memslots to 512 (2017-03-09 09:13:50 +0000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm-for-v4.11-rc6
+
+for you to fetch changes up to 6d56111c92d247bb64301029fe88365aa4caf16e:
+
+  KVM: arm/arm64: vgic: Fix GICC_PMR uaccess on GICv3 and clarify ABI (2017-04-04 14:33:59 +0200)
 
 Thanks,
 -Christoffer
+
+Christoffer Dall (2):
+      KVM: arm64: Ensure LRs are clear when they should be
+      KVM: arm/arm64: vgic: Fix GICC_PMR uaccess on GICv3 and clarify ABI
+
+Marc Zyngier (2):
+      arm/arm64: KVM: Take mmap_sem in stage2_unmap_vm
+      arm/arm64: KVM: Take mmap_sem in kvm_arch_prepare_memory_region
+
+Suzuki K Poulose (1):
+      kvm: arm/arm64: Fix locking for kvm_free_stage2_pgd
+
+ Documentation/virtual/kvm/devices/arm-vgic.txt |  6 ++++++
+ arch/arm/kvm/arm.c                             |  3 +++
+ arch/arm/kvm/mmu.c                             | 23 ++++++++++++++++++++---
+ include/kvm/arm_vgic.h                         |  1 +
+ include/linux/irqchip/arm-gic.h                |  3 +++
+ virt/kvm/arm/vgic/vgic-init.c                  | 19 +++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio-v2.c               | 20 ++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-v2.c                    | 23 +++++++++++++++++++----
+ virt/kvm/arm/vgic/vgic.h                       | 11 ++++++++++-
+ 9 files changed, 99 insertions(+), 10 deletions(-)
