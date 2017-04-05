@@ -1,28 +1,26 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 8/9] KVM: arm/arm64: fix race in kvm_psci_vcpu_on
-Date: Wed, 5 Apr 2017 11:12:12 +0200
-Message-ID: <20170405091212.kblfdghzj4e4zooc@kamzik.brq.redhat.com>
-References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-9-drjones@redhat.com>
- <20170404194208.GH31208@cbox>
- <20170405083559.k3ivjzgevcksjoaq@kamzik.brq.redhat.com>
- <20170405085005.GC1526@cbox>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: [PATCH v3 1/5] KVM: arm/arm64: Cleanup the arch timer code's irqchip
+ checking
+Date: Wed,  5 Apr 2017 11:28:11 +0200
+Message-ID: <20170405092815.22503-2-cdall@linaro.org>
+References: <20170405092815.22503-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23F1A40430
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Apr 2017 05:10:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 019CF40190
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Apr 2017 05:26:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gUdObOvCrfiK for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Apr 2017 05:10:06 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 27B1E40190
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Apr 2017 05:10:05 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20170405085005.GC1526@cbox>
+ with ESMTP id 0BoKOGjaeo5o for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Apr 2017 05:26:04 -0400 (EDT)
+Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CAF5640430
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Apr 2017 05:26:03 -0400 (EDT)
+Received: by mail-wm0-f46.google.com with SMTP id t189so8439026wmt.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Apr 2017 02:28:17 -0700 (PDT)
+In-Reply-To: <20170405092815.22503-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,89 +30,84 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: Levente Kurusa <lkurusa@redhat.com>, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Pekka Enberg <penberg@iki.fi>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 05, 2017 at 10:50:05AM +0200, Christoffer Dall wrote:
-> On Wed, Apr 05, 2017 at 10:35:59AM +0200, Andrew Jones wrote:
-> > On Tue, Apr 04, 2017 at 09:42:08PM +0200, Christoffer Dall wrote:
-> > > On Fri, Mar 31, 2017 at 06:06:57PM +0200, Andrew Jones wrote:
-> > > > From: Levente Kurusa <lkurusa@redhat.com>
-> > > > 
-> > > > When two vcpus issue PSCI_CPU_ON on the same core at the same time,
-> > > > then it's possible for them to both enter the target vcpu's setup
-> > > > at the same time. This results in unexpected behaviors at best,
-> > > > and the potential for some nasty bugs at worst.
-> > > > 
-> > > > Signed-off-by: Levente Kurusa <lkurusa@redhat.com>
-> > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > ---
-> > > >  arch/arm/kvm/psci.c | 4 ++--
-> > > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
-> > > > index f732484abc7a..0204daa899b1 100644
-> > > > --- a/arch/arm/kvm/psci.c
-> > > > +++ b/arch/arm/kvm/psci.c
-> > > > @@ -88,7 +88,8 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > > >  	 */
-> > > >  	if (!vcpu)
-> > > >  		return PSCI_RET_INVALID_PARAMS;
-> > > > -	if (!test_bit(KVM_REQ_POWER_OFF, &vcpu->requests)) {
-> > > > +
-> > > > +	if (!test_and_clear_bit(KVM_REQ_POWER_OFF, &vcpu->requests)) {
-> > > >  		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
-> > > >  			return PSCI_RET_ALREADY_ON;
-> > > >  		else
-> > > > @@ -116,7 +117,6 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > > >  	 * the general puspose registers are undefined upon CPU_ON.
-> > > >  	 */
-> > > >  	vcpu_set_reg(vcpu, 0, context_id);
-> > > > -	clear_bit(KVM_REQ_POWER_OFF, &vcpu->requests);
-> > > >  
-> > > >  	wq = kvm_arch_vcpu_wq(vcpu);
-> > > >  	swake_up(wq);
-> > > > -- 
-> > > > 2.9.3
-> > > > 
-> > > 
-> > > Depending on what you end up doing with the requests, if you keep the
-> > > bool flag you could just use the kvm->lock mutex instead.
-> > > 
-> > > Have you considered if there are any potential races between
-> > > kvm_psci_system_off() being called on one VCPU while two other VPCUs are
-> > > turning on the same CPU that is being turend off as part of system-wide
-> > > power down as well?
-> > 
-> > Sounds like a nice unit test.  I haven't considered it, but I guess
-> > the kvm_psci_system_off/reset calling VCPU will ultimately "win", as
-> > it'll cause an exit to userspace that initiates a shutdown/reset.
-> > When the VCPUs are restarted then vcpu init should reset the power_off
-> > state correctly.  As long as the race this patch addresses is fixed, then
-> > I'm not sure there should be any risk with the actual system_off/reset
-> > being delayed wrt a vcpu being "on'ed" again, nor with there being more
-> > than one VCPU trying to "on" it at the same time.
-> > 
-> > > 
-> > > I'm wondering if this means we should take the kvm->lock at a higher
-> > > level when handling PSCI events...
-> > 
-> > That would simplify our analysis of the PSCI emulation, but I'm not
-> > sure we want to give a guest the power to constantly acquire that
-> > mutex with a barrage of PSCI calls.  Maybe we should create a PSCI
-> > mutex?  In order to avoid holding it too long we may want power_off to
-> > be more than a boolean though, i.e. the PENDING state might also be
-> > a good idea to represent.
-> > 
-> 
-> Hmm, the kvm->lock mutex is per-VM, so if a VM wants to use its CPU
-> resources by taking its own mutex, I don't really see the problem.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-I was worried about management paths that lead to a need for that
-lock. For example, I see x86's kvm_free_vcpus(), called from
-kvm_arch_destroy_vm(), acquires it. A quick grep of ARM code doesn't
-reveal anything though.
+Currently we check if we have an in-kernel irqchip and if the vgic was
+properly implemented several places in the arch timer code.  But, we
+already predicate our enablement of the arm timers on having a valid
+and initialized gic, so we can simply check if the timers are enabled or
+not.
 
-Thanks,
-drew
+This also gets rid of the ugly "error that's not an error but used to
+signal that the timer shouldn't poke the gic" construct we have.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/arch_timer.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 35d7100..363f0d2 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -189,8 +189,6 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ {
+ 	int ret;
+ 
+-	BUG_ON(!vgic_initialized(vcpu->kvm));
+-
+ 	timer_ctx->active_cleared_last = false;
+ 	timer_ctx->irq.level = new_level;
+ 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+@@ -205,7 +203,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+  * Check if there was a change in the timer state (should we raise or lower
+  * the line level to the GIC).
+  */
+-static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
++static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+@@ -217,16 +215,14 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 	 * because the guest would never see the interrupt.  Instead wait
+ 	 * until we call this function from kvm_timer_flush_hwstate.
+ 	 */
+-	if (!vgic_initialized(vcpu->kvm) || !timer->enabled)
+-		return -ENODEV;
++	if (!timer->enabled)
++		return;
+ 
+ 	if (kvm_timer_should_fire(vtimer) != vtimer->irq.level)
+ 		kvm_timer_update_irq(vcpu, !vtimer->irq.level, vtimer);
+ 
+ 	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
+ 		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+-
+-	return 0;
+ }
+ 
+ /* Schedule the background timer for the emulated timer. */
+@@ -295,13 +291,16 @@ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+  */
+ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+ {
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	bool phys_active;
+ 	int ret;
+ 
+-	if (kvm_timer_update_state(vcpu))
++	if (unlikely(!timer->enabled))
+ 		return;
+ 
++	kvm_timer_update_state(vcpu);
++
+ 	/* Set the background timer for the physical timer emulation. */
+ 	kvm_timer_emulate(vcpu, vcpu_ptimer(vcpu));
+ 
+-- 
+2.9.0
