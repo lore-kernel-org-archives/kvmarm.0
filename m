@@ -1,58 +1,101 @@
 From: Christoffer Dall <cdall@linaro.org>
 Subject: Re: [PATCH v2 2/9] KVM: Add documentation for VCPU requests
-Date: Thu, 6 Apr 2017 16:27:14 +0200
-Message-ID: <20170406142714.GE27123@cbox>
+Date: Thu, 6 Apr 2017 16:29:46 +0200
+Message-ID: <20170406142946.GF27123@cbox>
 References: <20170331160658.4331-1-drjones@redhat.com>
  <20170331160658.4331-3-drjones@redhat.com>
  <20170404152403.GK11752@cbox>
  <20170404170600.w6snnecqoi4aqv4d@kamzik.brq.redhat.com>
- <20170404172340.GQ11752@cbox>
- <20170405141139.GA13944@potion>
+ <20170404172340.GQ11752@cbox> <20170405141139.GA13944@potion>
  <20170405174538.GB27123@cbox>
  <45234347-1773-3359-81e3-e1ffe2ae560b@redhat.com>
+ <20170405204606.GH6369@potion>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D2CB40B3E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 10:27:32 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 12cvphPW9ldB for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Apr 2017 10:27:31 -0400 (EDT)
+Received: from mail-lf0-f49.google.com (mail-lf0-f49.google.com
+ [209.85.215.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A0DE40A7B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 10:27:31 -0400 (EDT)
+Received: by mail-lf0-f49.google.com with SMTP id j90so27365245lfk.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Apr 2017 07:29:46 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <45234347-1773-3359-81e3-e1ffe2ae560b@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com
+In-Reply-To: <20170405204606.GH6369@potion>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: marc.zyngier@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 05, 2017 at 08:29:12PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 05/04/2017 19:45, Christoffer Dall wrote:
-> >>> But the problem is that kvm_make_all_cpus_request() only sends IPIs to
-> >>> CPUs where the mode was different from OUTSIDE_GUEST_MODE, so there it's
-> >>> about !OUTSIDE_GUEST_MODE rather than !IN_GUEST_MODE, so there's some
-> >>> subtlety here which I feel like it's dangerous to paper over.
-> >> Right, that needs fixing in the code.
-> > Really?  I thought Paolo said that this is the intended behavior and
-> > semantics; non-urgent requests that should just be serviced before the
-> > next guest entry.
-> 
-> Indeed, that's right...
-> 
-> >> guest_mode is just an optimization that allows us to skip sending the
-> >> IPI when the VCPU is known to handle the request as soon as possible.
-> >>
-> >>   IN_GUEST_MODE: we must force VM exit or the request could never be
-> >>     handled
-> >>   EXITING_GUEST_MODE: another request already forces the VM exit and
-> >>     we're just waiting for the VCPU to notice our request
-> >>   OUTSIDE_GUEST_MODE: KVM is going to notice our request without any
-> >>     intervention
-> >>   READING_SHADOW_PAGE_TABLES: same as OUTSIDE_GUEST_MODE -- rename to
-> >>     unwieldly OUTSIDE_GUEST_MODE_READING_SHADOW_PAGE_TABLES?
-> > Again, I thought Paolo was arguing that EXITING_GUEST_MODE makes the
-> > whole thing work because you check that after checking requests?
-> 
-> ... but apparently I was wrong here, see my email from this morning.
-> 
-I now managed to understand that e-mail, so it feels like we're
-converging in our understanding, which I hope is a good thing - meaning
-that we're converging to a correct understanding :)
-
--Christoffer
+T24gV2VkLCBBcHIgMDUsIDIwMTcgYXQgMTA6NDY6MDdQTSArMDIwMCwgUmFkaW0gS3LEjW3DocWZ
+IHdyb3RlOgo+IDIwMTctMDQtMDUgMjA6MjkrMDIwMCwgUGFvbG8gQm9uemluaToKPiA+IE9uIDA1
+LzA0LzIwMTcgMTk6NDUsIENocmlzdG9mZmVyIERhbGwgd3JvdGU6Cj4gPj4+PiBCdXQgdGhlIHBy
+b2JsZW0gaXMgdGhhdCBrdm1fbWFrZV9hbGxfY3B1c19yZXF1ZXN0KCkgb25seSBzZW5kcyBJUElz
+IHRvCj4gPj4+PiBDUFVzIHdoZXJlIHRoZSBtb2RlIHdhcyBkaWZmZXJlbnQgZnJvbSBPVVRTSURF
+X0dVRVNUX01PREUsIHNvIHRoZXJlIGl0J3MKPiA+Pj4+IGFib3V0ICFPVVRTSURFX0dVRVNUX01P
+REUgcmF0aGVyIHRoYW4gIUlOX0dVRVNUX01PREUsIHNvIHRoZXJlJ3Mgc29tZQo+ID4+Pj4gc3Vi
+dGxldHkgaGVyZSB3aGljaCBJIGZlZWwgbGlrZSBpdCdzIGRhbmdlcm91cyB0byBwYXBlciBvdmVy
+Lgo+ID4+PiBSaWdodCwgdGhhdCBuZWVkcyBmaXhpbmcgaW4gdGhlIGNvZGUuCj4gPj4gUmVhbGx5
+PyAgSSB0aG91Z2h0IFBhb2xvIHNhaWQgdGhhdCB0aGlzIGlzIHRoZSBpbnRlbmRlZCBiZWhhdmlv
+ciBhbmQKPiA+PiBzZW1hbnRpY3M7IG5vbi11cmdlbnQgcmVxdWVzdHMgdGhhdCBzaG91bGQganVz
+dCBiZSBzZXJ2aWNlZCBiZWZvcmUgdGhlCj4gPj4gbmV4dCBndWVzdCBlbnRyeS4KPiA+IAo+ID4g
+SW5kZWVkLCB0aGF0J3MgcmlnaHQuLi4KPiA+IAo+ID4+PiBndWVzdF9tb2RlIGlzIGp1c3QgYW4g
+b3B0aW1pemF0aW9uIHRoYXQgYWxsb3dzIHVzIHRvIHNraXAgc2VuZGluZyB0aGUKPiA+Pj4gSVBJ
+IHdoZW4gdGhlIFZDUFUgaXMga25vd24gdG8gaGFuZGxlIHRoZSByZXF1ZXN0IGFzIHNvb24gYXMg
+cG9zc2libGUuCj4gPj4+Cj4gPj4+ICAgSU5fR1VFU1RfTU9ERTogd2UgbXVzdCBmb3JjZSBWTSBl
+eGl0IG9yIHRoZSByZXF1ZXN0IGNvdWxkIG5ldmVyIGJlCj4gPj4+ICAgICBoYW5kbGVkCj4gPj4+
+ICAgRVhJVElOR19HVUVTVF9NT0RFOiBhbm90aGVyIHJlcXVlc3QgYWxyZWFkeSBmb3JjZXMgdGhl
+IFZNIGV4aXQgYW5kCj4gPj4+ICAgICB3ZSdyZSBqdXN0IHdhaXRpbmcgZm9yIHRoZSBWQ1BVIHRv
+IG5vdGljZSBvdXIgcmVxdWVzdAo+ID4+PiAgIE9VVFNJREVfR1VFU1RfTU9ERTogS1ZNIGlzIGdv
+aW5nIHRvIG5vdGljZSBvdXIgcmVxdWVzdCB3aXRob3V0IGFueQo+ID4+PiAgICAgaW50ZXJ2ZW50
+aW9uCj4gPj4+ICAgUkVBRElOR19TSEFET1dfUEFHRV9UQUJMRVM6IHNhbWUgYXMgT1VUU0lERV9H
+VUVTVF9NT0RFIC0tIHJlbmFtZSB0bwo+ID4+PiAgICAgdW53aWVsZGx5IE9VVFNJREVfR1VFU1Rf
+TU9ERV9SRUFESU5HX1NIQURPV19QQUdFX1RBQkxFUz8KPiA+PiBBZ2FpbiwgSSB0aG91Z2h0IFBh
+b2xvIHdhcyBhcmd1aW5nIHRoYXQgRVhJVElOR19HVUVTVF9NT0RFIG1ha2VzIHRoZQo+ID4+IHdo
+b2xlIHRoaW5nIHdvcmsgYmVjYXVzZSB5b3UgY2hlY2sgdGhhdCBhZnRlciBjaGVja2luZyByZXF1
+ZXN0cz8KPiA+IAo+ID4gLi4uIGJ1dCBhcHBhcmVudGx5IEkgd2FzIHdyb25nIGhlcmUsIHNlZSBt
+eSBlbWFpbCBmcm9tIHRoaXMgbW9ybmluZy4KPiAKPiBPaywgSSdsbCBwcmVwYXJlIGEgcGF0Y2gg
+dGhhdCB1c2VzIGt2bV9hcmNoX3ZjcHVfc2hvdWxkX2tpY2soKSBpbgo+IGt2bV9tYWtlX2FsbF9j
+cHVzX3JlcXVlc3QoKS4KPiAKPiA+Pj4gVGhlIGtpY2sgaXMgbmVlZGVkIG9ubHkgaW4gSU5fR1VF
+U1RfTU9ERSBhbmQgYSB3YWtlIHVwIGlzIG5lZWRlZCBpbiBjYXNlCj4gPj4+IHdoZXJlIHRoZSBn
+dWVzdCBpcyBoYWx0ZWQgT1VUU0lERV9HVUVTVF9NT0RFIC4uLgo+ID4+PiBIbSwgbWF5YmUgd2Ug
+c2hvdWxkIGFkZCBhIGhhbHQgc3RhdGUgdG9vPwo+ID4+IFdvdWxkbid0IHRoYXQgYmUgc3dhaXRf
+YWN0aXZlKCZ2Y3B1LT53cSkgPyAgIFlvdSBjb3VsZCBhZGQgYSB3cmFwcGVyCj4gPj4gdGhvdWdo
+Lgo+ID4gCj4gPiBZZXMuICBJIHRoaW5rIHRoZSB3cmFwcGVyIGlzIHByb2JhYmx5IHVubmVjZXNz
+YXJ5Lgo+IAo+IFRoZSBzdGF0ZSB3b3VsZCBvbmx5IG1ha2Ugc2Vuc2UgaWYgaXQgd2VyZSBkaWZm
+ZXJlbnQgLS0gdGhlcmUgaXMgYSB0aW1lCj4gd2hlbiB0aGUgVkNQVSBpcyBoYWx0ZWQsIGJ1dCBz
+d2FpdF9hY3RpdmUoJnZjcHUtPndxKSByZXR1cm5zIGZhbHNlLgo+IFByb2JhYmx5IGRvZXNuJ3Qg
+aGF2ZSBhbnkgZ29vZCB1c2Ugbm93LCB0aG91Z2guCj4gCj4gPj4gV2hhdCBJIHRoaW5rIHlvdSBu
+ZWVkIGlzIGEgd2F5IHRvIGRpc3Rpbmd1aXNoIHRoZSBzZW1hbnRpY3Mgb2YgY2FsbGluZwo+ID4+
+IGt2bV9tYWtlX2FsbF9jcHVzX3JlcXVlc3QoKSwgcGVyaGFwcyBieSBhZGRpbmcgYSAnYm9vbCB3
+YWtlX3VwJwo+ID4+IHBhcmFtZXRlci4KPiA+IAo+ID4gVGhhdCB3b3VsZCBiZSBmaW5lLgo+IAo+
+IEkgdGhpbmsgdGhlIHdha2V1cCBpcyBtb3JlIHRpZWQgdG8gdGhlIHJlcXVlc3QgdHlwZSB0aGFu
+IHRvIHRoZSBwbGFjZQo+IGNhbGxpbmcgaXQsIAoKYWdyZWVkCgo+IHNvIHdlIGNvdWxkIHNheSB3
+aGljaCByZXF1ZXN0cyBhcmUgImxhenkiIGFuZCBkb24ndCBkbwo+IHdha2V1cCBhbmQgaGF2ZSBr
+dm1fbWFrZV9hbGxfY3B1c19yZXF1ZXN0KCkgd2l0aG91dCBhbiBleHRyYSBhcmd1bWVudC4KClNv
+dW5kcyBnb29kIHRvIG1lLgoKV2UgY291bGQgZW5jb2RlIHRoZSBsYXp5L25vbi1sYXp5IHRoaW5n
+IGluIGEgYml0IGluIHRoZSByZXF1ZXN0IG51bWJlcgp0aGF0IGdldHMgbWFza2VkIG9mZiBiZWZv
+cmUgY2xlYXJpbmcvY2hlY2tpbmcgdGhlIHJlcXVlc3QgYml0LCBidXQKcGVyaGFwcyB0aGVyZSBh
+cmUgbmljZXIgc29sdXRpb25zLgoKPiAKPiBJbiB0aGUgZW5kLCBJIHdvdWxkIGxpa2UgaWYga3Zt
+X21ha2VfYWxsX2NwdXNfcmVxdWVzdCgpIHdhcyBhbiBvcHRpbWl6ZWQKPiB2YXJpYW50IG9mCj4g
+Cj4gICBrdm1fZm9yX2VhY2hfdmNwdShpLCB2Y3B1LCBrdm0pIHsKPiAgICAga3ZtX21ha2VfcmVx
+dWVzdCh2Y3B1LCByZXF1ZXN0KTsKPiAgICAga3ZtX3ZjcHVfa2ljayh2Y3B1KTsKPiAgIH0KClll
+cywgSSB3b3VsZCBsaWtlIHRoaXMgdG9vLgoKLUNocmlzdG9mZmVyCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
+QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
+bWFuL2xpc3RpbmZvL2t2bWFybQo=
