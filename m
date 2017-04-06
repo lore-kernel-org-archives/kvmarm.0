@@ -1,80 +1,38 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 3/5] KVM: arm/arm64: Support arch timers with a
- userspace gic
-Date: Thu, 6 Apr 2017 17:49:05 +0100
-Message-ID: <baaf0d40-222b-633e-77b6-75fc61f3e0ed@arm.com>
-References: <20170405092815.22503-1-cdall@linaro.org>
- <20170405092815.22503-4-cdall@linaro.org>
+From: Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH V14 00/10] Add UEFI 2.6 and ACPI 6.1 updates for RAS on
+ ARM64
+Date: Thu, 6 Apr 2017 18:12:00 +0100
+Message-ID: <20170406171200.GE7705@e104818-lin.cambridge.arm.com>
+References: <1490729440-32591-1-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ECDA40B40
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 12:46:56 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xR+ouUT3VApr for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Apr 2017 12:46:54 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6705E40A86
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 12:46:54 -0400 (EDT)
-In-Reply-To: <20170405092815.22503-4-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Pekka Enberg <penberg@iki.fi>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1490729440-32591-1-git-send-email-tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org
+Cc: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, james.morse-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dev
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/04/17 10:28, Christoffer Dall wrote:
-> From: Alexander Graf <agraf@suse.de>
-> 
-> If you're running with a userspace gic or other interrupt constroller
+Hi Rafael,
 
-controller
+On Tue, Mar 28, 2017 at 01:30:30PM -0600, Tyler Baicar wrote:
+> Tyler Baicar (9):
+>   acpi: apei: read ack upon ghes record consumption
+>   ras: acpi/apei: cper: generic error data entry v3 per ACPI 6.1
+>   efi: parse ARM processor error
+>   arm64: exception: handle Synchronous External Abort
+>   acpi: apei: handle SEA notification type for ARMv8
+>   efi: print unrecognized CPER section
+>   ras: acpi / apei: generate trace event for unrecognized CPER section
+>   trace, ras: add ARM processor error trace event
+>   arm/arm64: KVM: add guest SEA support
 
-> (that is no vgic in the kernel), then you have so far not been able to
-> use the architected timers, because the output of the architected
-> timers, which are driven inside the kernel, was a kernel-only construct
-> between the arch timer code and the vgic.
-> 
-> This patch implements the new KVM_CAP_ARM_USER_IRQ feature, where we use a
-> side channel on the kvm_run structure, run->s.regs.device_irq_level, to
-> always notify userspace of the timer output levels when using a userspace
-> irqchip.
-> 
-> This works by ensureing that before we enter the guest, if the timer
+It looks like the KVM parts are getting acked and the arm64 and efi bits
+have been acked as well. Are you ok to take this series through the ACPI
+tree?
 
-ensuring
+Thanks.
 
-> output level has changed compared to what we last told userspace, we
-> don't enter the guest, but instead return to userspace to notify it of
-> the new level.  If we are exiting, because of an MMIO for example, and
-> the level changed at the same time, the value is also updated and
-> userspace can sample the line as it needs.  This is nicely achieved
-> simply always updating the timer_irq_level field after the main run
-> loop.
-> 
-> Note that the kvm_timer_update_irq trace event is changed to show the
-> host IRQ number for the timer instead of the guest IRQ number, because
-> the kernel no longer know which IRQ userspace wires up the timer signal
-> to.
-> 
-> Also note that this patch implements all required functionality but does
-> not yet advertise the capability.
-> 
-> Signed-off-by: Alexander Graf <agraf@suse.de>
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-
-Otherwise looks good.
-
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+Catalin
