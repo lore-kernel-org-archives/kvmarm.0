@@ -1,104 +1,92 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [RFC kvm-unit-tests PATCH 4/8] Makefiles: use explicit path for
- including sub-Makefiles
-Date: Thu,  6 Apr 2017 20:07:23 +0100
-Message-ID: <20170406190727.5624-5-alex.bennee@linaro.org>
+Subject: [RFC kvm-unit-tests PATCH 1/8] configure: make it run-able from outside source tree
+Date: Thu,  6 Apr 2017 20:07:20 +0100
+Message-ID: <20170406190727.5624-2-alex.bennee@linaro.org>
 References: <20170406190727.5624-1-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2586C40BBC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 15:05:24 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id elEPmrQlEslX for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Apr 2017 15:05:23 -0400 (EDT)
-Received: from mail-wr0-f176.google.com (mail-wr0-f176.google.com
- [209.85.128.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF7F640C8C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 15:05:22 -0400 (EDT)
-Received: by mail-wr0-f176.google.com with SMTP id c55so3242747wrc.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Apr 2017 12:07:38 -0700 (PDT)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170406190727.5624-1-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: drjones@redhat.com, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SSB3b3VsZCBvZiB0aG91Z2h0IFZQQVRIIHRvb2sgY2FyZSBvZiB0aGlzIGJ1dCBhcHBhcmVudGx5
-IG5vdC4KClNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9y
-Zz4KLS0tCiBNYWtlZmlsZSAgICAgICAgICAgICAgIHwgOCArKysrLS0tLQogYXJtL01ha2VmaWxl
-ICAgICAgICAgICB8IDIgKy0KIGFybS9NYWtlZmlsZS5hcm0gICAgICAgfCAyICstCiBhcm0vTWFr
-ZWZpbGUuYXJtNjQgICAgIHwgMiArLQogcG93ZXJwYy9NYWtlZmlsZSAgICAgICB8IDIgKy0KIHBv
-d2VycGMvTWFrZWZpbGUucHBjNjQgfCAyICstCiB4ODYvTWFrZWZpbGUgICAgICAgICAgIHwgMiAr
-LQogeDg2L01ha2VmaWxlLmkzODYgICAgICB8IDIgKy0KIHg4Ni9NYWtlZmlsZS54ODZfNjQgICAg
-fCAyICstCiA5IGZpbGVzIGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKyksIDEyIGRlbGV0aW9ucygt
-KQoKZGlmZiAtLWdpdCBhL01ha2VmaWxlIGIvTWFrZWZpbGUKaW5kZXggODBiYzU3ZS4uNzgxMTg2
-ZSAxMDA2NDQKLS0tIGEvTWFrZWZpbGUKKysrIGIvTWFrZWZpbGUKQEAgLTMyLDE0ICszMiwxNCBA
-QCBjZmxhdG9ianMgOj0gXAogCWxpYi9zdGFjay5vCiAKICMgbGliZmR0IHBhdGhzCi1MSUJGRFRf
-b2JqZGlyID0gbGliL2xpYmZkdAotTElCRkRUX3NyY2RpciA9IGxpYi9saWJmZHQKK0xJQkZEVF9v
-YmpkaXIgPSAkKFNSQ0RJUikvbGliL2xpYmZkdAorTElCRkRUX3NyY2RpciA9ICQoU1JDRElSKS9s
-aWIvbGliZmR0CiBMSUJGRFRfYXJjaGl2ZSA9ICQoTElCRkRUX29iamRpcikvbGliZmR0LmEKIExJ
-QkZEVF9pbmNsdWRlID0gJChhZGRwcmVmaXggJChMSUJGRFRfc3JjZGlyKS8sJChMSUJGRFRfSU5D
-TFVERVMpKQogTElCRkRUX3ZlcnNpb24gPSAkKGFkZHByZWZpeCAkKExJQkZEVF9zcmNkaXIpLywk
-KExJQkZEVF9WRVJTSU9OKSkKIAotI2luY2x1ZGUgYXJjaGl0ZWN1cmUgc3BlY2lmaWMgbWFrZSBy
-dWxlcwotaW5jbHVkZSAkKFRFU1RfRElSKS9NYWtlZmlsZQorI2luY2x1ZGUgYXJjaGl0ZWN0dXJl
-IHNwZWNpZmljIG1ha2UgcnVsZXMKK2luY2x1ZGUgJChTUkNESVIpLyQoVEVTVF9ESVIpL01ha2Vm
-aWxlCiAKICMgY2Mtb3B0aW9uCiAjIFVzYWdlOiBPUF9DRkxBR1MrPSQoY2FsbCBjYy1vcHRpb24s
-IC1mYWxpZ24tZnVuY3Rpb25zPTAsIC1tYWxpZ24tZnVuY3Rpb25zPTApCmRpZmYgLS1naXQgYS9h
-cm0vTWFrZWZpbGUgYi9hcm0vTWFrZWZpbGUKaW5kZXggMzY5YTM4Yi4uOGEwMDdhYiAxMDA2NDQK
-LS0tIGEvYXJtL01ha2VmaWxlCisrKyBiL2FybS9NYWtlZmlsZQpAQCAtMSArMSBAQAotaW5jbHVk
-ZSAkKFRFU1RfRElSKS9NYWtlZmlsZS4kKEFSQ0gpCitpbmNsdWRlICQoU1JDRElSKS8kKFRFU1Rf
-RElSKS9NYWtlZmlsZS4kKEFSQ0gpCmRpZmYgLS1naXQgYS9hcm0vTWFrZWZpbGUuYXJtIGIvYXJt
-L01ha2VmaWxlLmFybQppbmRleCA5MmYzNzU3Li42YjU3Mjg0IDEwMDY0NAotLS0gYS9hcm0vTWFr
-ZWZpbGUuYXJtCisrKyBiL2FybS9NYWtlZmlsZS5hcm0KQEAgLTIyLDYgKzIyLDYgQEAgY2ZsYXRv
-YmpzICs9IGxpYi9hcm0vc3RhY2subwogIyBhcm0gc3BlY2lmaWMgdGVzdHMKIHRlc3RzID0KIAot
-aW5jbHVkZSAkKFRFU1RfRElSKS9NYWtlZmlsZS5jb21tb24KK2luY2x1ZGUgJChTUkNESVIpLyQo
-VEVTVF9ESVIpL01ha2VmaWxlLmNvbW1vbgogCiBhcmNoX2NsZWFuOiBhcm1fY2xlYW4KZGlmZiAt
-LWdpdCBhL2FybS9NYWtlZmlsZS5hcm02NCBiL2FybS9NYWtlZmlsZS5hcm02NAppbmRleCAwYjA3
-NjFjLi5iNWZjMWVjIDEwMDY0NAotLS0gYS9hcm0vTWFrZWZpbGUuYXJtNjQKKysrIGIvYXJtL01h
-a2VmaWxlLmFybTY0CkBAIC0xNCw3ICsxNCw3IEBAIGNmbGF0b2JqcyArPSBsaWIvYXJtNjQvc3Bp
-bmxvY2subwogIyBhcm02NCBzcGVjaWZpYyB0ZXN0cwogdGVzdHMgPQogCi1pbmNsdWRlICQoVEVT
-VF9ESVIpL01ha2VmaWxlLmNvbW1vbgoraW5jbHVkZSAkKFNSQ0RJUikvJChURVNUX0RJUikvTWFr
-ZWZpbGUuY29tbW9uCiAKIGFyY2hfY2xlYW46IGFybV9jbGVhbgogCSQoUk0pIGxpYi9hcm02NC8u
-Ki5kCmRpZmYgLS1naXQgYS9wb3dlcnBjL01ha2VmaWxlIGIvcG93ZXJwYy9NYWtlZmlsZQppbmRl
-eCAzNjlhMzhiLi44YTAwN2FiIDEwMDY0NAotLS0gYS9wb3dlcnBjL01ha2VmaWxlCisrKyBiL3Bv
-d2VycGMvTWFrZWZpbGUKQEAgLTEgKzEgQEAKLWluY2x1ZGUgJChURVNUX0RJUikvTWFrZWZpbGUu
-JChBUkNIKQoraW5jbHVkZSAkKFNSQ0RJUikvJChURVNUX0RJUikvTWFrZWZpbGUuJChBUkNIKQpk
-aWZmIC0tZ2l0IGEvcG93ZXJwYy9NYWtlZmlsZS5wcGM2NCBiL3Bvd2VycGMvTWFrZWZpbGUucHBj
-NjQKaW5kZXggM2RhM2E4My4uM2MwMjk0YSAxMDA2NDQKLS0tIGEvcG93ZXJwYy9NYWtlZmlsZS5w
-cGM2NAorKysgYi9wb3dlcnBjL01ha2VmaWxlLnBwYzY0CkBAIC0yMCw3ICsyMCw3IEBAIGNmbGF0
-b2JqcyArPSBsaWIvcHBjNjQvc3BpbmxvY2subwogIyBwcGM2NCBzcGVjaWZpYyB0ZXN0cwogdGVz
-dHMgPQogCi1pbmNsdWRlICQoVEVTVF9ESVIpL01ha2VmaWxlLmNvbW1vbgoraW5jbHVkZSAkKFNS
-Q0RJUikvJChURVNUX0RJUikvTWFrZWZpbGUuY29tbW9uCiAKIGFyY2hfY2xlYW46IHBvd2VycGNf
-Y2xlYW4KIAkkKFJNKSBsaWIvcHBjNjQvLiouZApkaWZmIC0tZ2l0IGEveDg2L01ha2VmaWxlIGIv
-eDg2L01ha2VmaWxlCmluZGV4IDM2OWEzOGIuLjhhMDA3YWIgMTAwNjQ0Ci0tLSBhL3g4Ni9NYWtl
-ZmlsZQorKysgYi94ODYvTWFrZWZpbGUKQEAgLTEgKzEgQEAKLWluY2x1ZGUgJChURVNUX0RJUikv
-TWFrZWZpbGUuJChBUkNIKQoraW5jbHVkZSAkKFNSQ0RJUikvJChURVNUX0RJUikvTWFrZWZpbGUu
-JChBUkNIKQpkaWZmIC0tZ2l0IGEveDg2L01ha2VmaWxlLmkzODYgYi94ODYvTWFrZWZpbGUuaTM4
-NgppbmRleCAyODRiOWU1Li5kODAxYjgwIDEwMDY0NAotLS0gYS94ODYvTWFrZWZpbGUuaTM4Ngor
-KysgYi94ODYvTWFrZWZpbGUuaTM4NgpAQCAtNyw0ICs3LDQgQEAgY2ZsYXRvYmpzICs9IGxpYi94
-ODYvc2V0am1wMzIubwogdGVzdHMgPSAkKFRFU1RfRElSKS90YXNrc3dpdGNoLmZsYXQgJChURVNU
-X0RJUikvdGFza3N3aXRjaDIuZmxhdCBcCiAJJChURVNUX0RJUikvY21weGNoZzhiLmZsYXQKIAot
-aW5jbHVkZSAkKFRFU1RfRElSKS9NYWtlZmlsZS5jb21tb24KK2luY2x1ZGUgJChTUkNESVIpLyQo
-VEVTVF9ESVIpL01ha2VmaWxlLmNvbW1vbgpkaWZmIC0tZ2l0IGEveDg2L01ha2VmaWxlLng4Nl82
-NCBiL3g4Ni9NYWtlZmlsZS54ODZfNjQKaW5kZXggM2UyODIxZS4uMzBmODJhNiAxMDA2NDQKLS0t
-IGEveDg2L01ha2VmaWxlLng4Nl82NAorKysgYi94ODYvTWFrZWZpbGUueDg2XzY0CkBAIC0xNyw3
-ICsxNyw3IEBAIHRlc3RzICs9ICQoVEVTVF9ESVIpL3ZteC5mbGF0CiB0ZXN0cyArPSAkKFRFU1Rf
-RElSKS90c2NkZWFkbGluZV9sYXRlbmN5LmZsYXQKIHRlc3RzICs9ICQoVEVTVF9ESVIpL2ludGVs
-LWlvbW11LmZsYXQKIAotaW5jbHVkZSAkKFRFU1RfRElSKS9NYWtlZmlsZS5jb21tb24KK2luY2x1
-ZGUgJChTUkNESVIpLyQoVEVTVF9ESVIpL01ha2VmaWxlLmNvbW1vbgogCiAkKFRFU1RfRElSKS9o
-eXBlcnZfY2xvY2suZWxmOiAkKFRFU1RfRElSKS9oeXBlcnZfY2xvY2subwogCi0tIAoyLjExLjAK
-Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
-YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
-LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+This is a first step to enabling out-of-tree builds for
+kvm-unit-tests. When you invoke configure like this:
+
+  ../tree.git/configure [args]
+
+It will detect we the case and:
+
+  - link ../tree.git/Makefile to the build-dir
+  - ensure lib is created with a correct lib/asm
+  - set SRCDIR in the config.mk
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ configure | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/configure b/configure
+index 8821f37..223809c 100755
+--- a/configure
++++ b/configure
+@@ -1,5 +1,6 @@
+ #!/bin/bash
+ 
++srcdir=$(cd "$(dirname "$0")"; pwd)
+ prefix=/usr/local
+ cc=gcc
+ ld=ld
+@@ -102,12 +103,12 @@ elif [ "$arch" = "ppc64" ]; then
+ else
+     testdir=$arch
+ fi
+-if [ ! -d $testdir ]; then
++if [ ! -d $srcdir/$testdir ]; then
+     echo "$testdir does not exist!"
+     exit 1
+ fi
+-if [ -f $testdir/run ]; then
+-    ln -fs $testdir/run $testdir-run
++if [ -f $srcdir/$testdir/run ]; then
++    ln -fs $srcdir/$testdir/run $testdir-run
+ fi
+ 
+ # check if uint32_t needs a long format modifier
+@@ -135,18 +136,27 @@ fi
+ rm -f lib_test.c
+ fi
+ 
++# Are we in a separate build tree? If so, link the Makefile
++# so that 'make' works.
++if test ! -e Makefile; then
++    echo "linking Makefile..."
++    ln -s "${srcdir}/Makefile" .
++fi
++
+ # link lib/asm for the architecture
+ rm -f lib/asm
+ asm=asm-generic
+-if [ -d lib/$arch/asm ]; then
+-	asm=$arch/asm
+-elif [ -d lib/$testdir/asm ]; then
+-	asm=$testdir/asm
++if [ -d $srcdir/lib/$arch/asm ]; then
++	asm=$srcdir/lib/$arch/asm
++elif [ -d $srcdir/lib/$testdir/asm ]; then
++	asm=$srcdir/lib/$testdir/asm
+ fi
++mkdir -p lib
+ ln -s $asm lib/asm
+ 
+ # create the config
+ cat <<EOF > config.mak
++SRCDIR=$srcdir
+ PREFIX=$prefix
+ HOST=$host
+ ARCH=$arch
+-- 
+2.11.0
