@@ -1,51 +1,74 @@
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [RFC kvm-unit-tests PATCH 2/8] Makefile: ensure build-head works
- out-of-src-tree
-Date: Thu,  6 Apr 2017 20:07:21 +0100
-Message-ID: <20170406190727.5624-3-alex.bennee@linaro.org>
-References: <20170406190727.5624-1-alex.bennee@linaro.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v3 0/5] Support userspace irqchip with arch timers
+Date: Thu, 6 Apr 2017 21:13:20 +0200
+Message-ID: <20170406191320.GI27123@cbox>
+References: <20170405092815.22503-1-cdall@linaro.org>
+ <a41d1e18-dea7-5cfa-5783-09f02d9ce194@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52D8B40A80
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 15:05:22 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 36CZiAm5EeqS for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Apr 2017 15:05:21 -0400 (EDT)
-Received: from mail-wr0-f176.google.com (mail-wr0-f176.google.com
- [209.85.128.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8432340AF9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 15:05:21 -0400 (EDT)
-Received: by mail-wr0-f176.google.com with SMTP id t20so76935557wra.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Apr 2017 12:07:37 -0700 (PDT)
-In-Reply-To: <20170406190727.5624-1-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: drjones@redhat.com, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <a41d1e18-dea7-5cfa-5783-09f02d9ce194@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, Pekka Enberg <penberg@iki.fi>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-UGFzcyAtQyAkKFNSQ0RJUikgdG8gdGhlIGdpdCBjb21tYW5kIHRoYXQgZ2VuZXJhdGVzIHRoZSBi
-dWlsZC1oZWFkCnN0YW1wLgoKU2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5l
-ZUBsaW5hcm8ub3JnPgotLS0KIE1ha2VmaWxlIHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5z
-ZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvTWFrZWZpbGUgYi9NYWtlZmls
-ZQppbmRleCAxNmNlMjk3Li5lYmE3YjI4IDEwMDY0NAotLS0gYS9NYWtlZmlsZQorKysgYi9NYWtl
-ZmlsZQpAQCAtODAsNyArODAsNyBAQCAkKExJQkZEVF9hcmNoaXZlKTogJChhZGRwcmVmaXggJChM
-SUJGRFRfb2JqZGlyKS8sJChMSUJGRFRfT0JKUykpCiAKIC1pbmNsdWRlICovLiouZCAqLyovLiou
-ZAogCi1hbGw6ICQoc2hlbGwgZ2l0IHJldi1wYXJzZSAtLXZlcmlmeSAtLXNob3J0PTggSEVBRCA+
-YnVpbGQtaGVhZCAyPi9kZXYvbnVsbCkKK2FsbDogJChzaGVsbCBnaXQgLUMgJChTUkNESVIpIHJl
-di1wYXJzZSAtLXZlcmlmeSAtLXNob3J0PTggSEVBRCA+YnVpbGQtaGVhZCAyPi9kZXYvbnVsbCkK
-IAogc3RhbmRhbG9uZTogYWxsCiAJQHNjcmlwdHMvbWtzdGFuZGFsb25lLnNoCi0tIAoyLjExLjAK
-Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
-YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
-LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Thu, Apr 06, 2017 at 06:31:59PM +0100, Marc Zyngier wrote:
+> On 05/04/17 10:28, Christoffer Dall wrote:
+> > This series is the second version of the rework of the patches to support
+> > architected timers with a userspace irqchip sent by Alexander Graf [1].
+> > 
+> > We first cleanup some of the timer code to make it easier to understand
+> > what is being done in the later patches, and then define the ABI,
+> > implement timers support, implement PMU support, and finally advertise
+> > the features.
+> > 
+> > These patches are based on the recent work from Jintack to support the
+> > physical timer in addition to the virtual timer.  This series including
+> > its dependencies can be found here:
+> > 
+> > git://git.kernel.org/pub/scm/linux/kernel/git/cdall/linux.git irqs-to-user-v3
+> > 
+> > I tested this using Alex's QEMU patch with his fixes for SMP applied.  This
+> > seems to be rock-solid.  The temporary-not-for-upstream-but-for-testing patch
+> > can be found here (force-pushed and rebased since v2):
+> > 
+> > https://git.linaro.org/people/christoffer.dall/qemu-arm.git no-kvm-irqchip
+> > 
+> > I also tested it on 32-bit and it looks good there as well.
+> > 
+> > Changes since v2:
+> >  - Actually push the right content to the kernel branch, sorry.
+> >  - Rebased on kvmarm/queue as of this morning (v4.11-rc1+ stuff)
+> >  - Changed IOCTL numbers as needed
+> > 
+> > Changes since v1:
+> >  - Rework the ABI to support devices in general as opposed to just
+> >    timers
+> >  - Support the PMU in addition to timers
+> >  - Also support the physical timer (rebased on Jintack's work)
+> >  - Updated some comments where I noticed things were out of date.
+> > 
+> > Several changes have been made compared to v7 of the original single
+> > patch, including:
+> >  - Rewording ABI documentation to be more in line with the ARM
+> >    architecture
+> >  - Add an explicit check for needing to notify userspace of a level
+> >    change instead of propagating the value
+> >  - Changes to commenting throughout to more accurately describe the
+> >    architecture concepts we try to maintain
+> >  - Reword of functions, for example from sync to update when the date
+> >    only flows one direction
+> > 
+> > [1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2016-September/021867.html
+> > [2]: git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+> 
+> The couple of nits I mentioned notwithstanding, for the whole series:
+> 
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> 
+
+Thanks.   I have applied this to kvmarm/queue.
+
+-Christoffer
