@@ -1,227 +1,101 @@
 From: Xie XiuQi <xiexiuqi@huawei.com>
-Subject: Re: [PATCH v3 1/8] trace: ras: add ARM processor error information
- trace event
-Date: Thu, 6 Apr 2017 17:03:21 +0800
-Message-ID: <fb989f4e-acf2-67ce-824b-e11726096225@huawei.com>
+Subject: Re: [PATCH v3 2/8] acpi: apei: handle SEI notification type for ARMv8
+Date: Thu, 6 Apr 2017 17:11:06 +0800
+Message-ID: <e2214c34-9c29-1ef8-5de7-11e2836f5c4f@huawei.com>
 References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
- <1490869877-118713-2-git-send-email-xiexiuqi@huawei.com>
- <20170330120220.56e624d9@gandalf.local.home>
+ <1490869877-118713-3-git-send-email-xiexiuqi@huawei.com>
+ <58DE81CA.3020803@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <20170330120220.56e624d9@gandalf.local.home>
-Sender: linux-acpi-owner@vger.kernel.org
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, fu.wei@linaro.org, hanjun.guo@linaro.org, shiju.jose@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, gengdongjiu@huawei.com, zhengqiang10@huawei.com, wuquanming@huawei.com, wangxiongfeng2@huawei.com, Tyler Baicar <tbaicar@codeaurora.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <58DE81CA.3020803@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, wuquanming@huawei.com, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, rostedt@goodmis.org, gengdongjiu@huawei.com, wangxiongfeng2@huawei.com, linux-acpi@vger.kernel.org, christoffer.dall@linaro.org, shiju.jose@huawei.com, zhengqiang10@huawei.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, hanjun.guo@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Steve,
+Hi James,
 
-Sorry for reply late.
+Sorry for reply late, and thanks for your comments.
 
-On 2017/3/31 0:02, Steven Rostedt wrote:
-> On Thu, 30 Mar 2017 18:31:01 +0800
-> Xie XiuQi <xiexiuqi@huawei.com> wrote:
+On 2017/4/1 0:20, James Morse wrote:
+> Hi Xie XiuQi,
 > 
->> Add a new trace event for ARM processor error information, so that
->> the user will know what error occurred. With this information the
->> user may take appropriate action.
+> On 30/03/17 11:31, Xie XiuQi wrote:
+>> ARM APEI extension proposal added SEI (asynchronous SError interrupt)
+>> notification type for ARMv8.
 >>
->> These trace events are consistent with the ARM processor error
->> information table which defined in UEFI 2.6 spec section N.2.4.4.1.
->>
->> ---
->> v2: add trace enabled condition as Steven's suggestion.
->>     fix a typo.
->> ---
->>
->> Cc: Steven Rostedt <rostedt@goodmis.org>
->> Cc: Tyler Baicar <tbaicar@codeaurora.org>
->> Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
->> ---
->>  drivers/acpi/apei/ghes.c | 10 ++++++
->>  include/linux/cper.h     |  5 +++
->>  include/ras/ras_event.h  | 87 ++++++++++++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 102 insertions(+)
->>
->> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
->> index 81eabc6..6be0333 100644
->> --- a/drivers/acpi/apei/ghes.c
->> +++ b/drivers/acpi/apei/ghes.c
->> @@ -518,9 +518,19 @@ static void ghes_do_proc(struct ghes *ghes,
->>  		else if (!uuid_le_cmp(sec_type, CPER_SEC_PROC_ARM) &&
->>  			 trace_arm_event_enabled()) {
->>  			struct cper_sec_proc_arm *arm_err;
->> +			struct cper_arm_err_info *err_info;
->> +			int i;
+>> Add a new GHES error source handling function for SEI. In firmware
+>> first mode, if an error source's notification type is SEI. Then GHES
+>> could parse and report the detail error information.
+> 
+> The APEI additions are unsafe until patch 4 as SEA can interrupt SEI and
+> deadlock while trying to take the same set of locks. This patch needs to be
+> after that interaction is fixed/prevented, or we should prevent it by adding a
+> depends-on-not to the Kconfig to prevent SEI and SEA being registered at the
+> same time. (as a short term fix).
+
+Will fix later.
+
+> 
+> (more comments on this on that later patch)
+> 
+> 
+>> diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+>> index e52be6a..53710a2 100644
+>> --- a/arch/arm64/kernel/traps.c
+>> +++ b/arch/arm64/kernel/traps.c
+> 
+>> @@ -625,6 +627,14 @@ asmlinkage void bad_mode(struct pt_regs *regs, int reason, unsigned int esr)
+> 
+> bad_mode() is called in other scenarios too, for example executing an undefined
+> instruction at EL1. You split the SError path out of the vectors in patch 7, I
+> think we should do that here.
+> 
+> 
+>>  		handler[reason], smp_processor_id(), esr,
+>>  		esr_get_class_string(esr));
 >>  
->>  			arm_err = acpi_hest_generic_data_payload(gdata);
->>  			trace_arm_event(arm_err);
->> +
->> +			if (trace_arm_proc_err_enabled()) {
->> +				err_info = (struct cper_arm_err_info *)(arm_err + 1);
->> +				for (i = 0; i < arm_err->err_info_num; i++) {
->> +					trace_arm_proc_err(err_info);
->> +					err_info += 1;
->> +				}
->> +			}
->>  		} else if (trace_unknown_sec_event_enabled()) {
->>  			void *unknown_err = acpi_hest_generic_data_payload(gdata);
->>  			trace_unknown_sec_event(&sec_type,
->> diff --git a/include/linux/cper.h b/include/linux/cper.h
->> index 85450f3..0cae900 100644
->> --- a/include/linux/cper.h
->> +++ b/include/linux/cper.h
->> @@ -270,6 +270,11 @@ enum {
->>  #define CPER_ARM_INFO_VALID_VIRT_ADDR		0x0008
->>  #define CPER_ARM_INFO_VALID_PHYSICAL_ADDR	0x0010
->>  
->> +#define CPER_ARM_INFO_TYPE_CACHE		0
->> +#define CPER_ARM_INFO_TYPE_TLB			1
->> +#define CPER_ARM_INFO_TYPE_BUS			2
->> +#define CPER_ARM_INFO_TYPE_UARCH		3
->> +
->>  #define CPER_ARM_INFO_FLAGS_FIRST		0x0001
->>  #define CPER_ARM_INFO_FLAGS_LAST		0x0002
->>  #define CPER_ARM_INFO_FLAGS_PROPAGATED		0x0004
->> diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
->> index 13befad..026b094 100644
->> --- a/include/ras/ras_event.h
->> +++ b/include/ras/ras_event.h
->> @@ -206,6 +206,93 @@
->>  		  __entry->running_state, __entry->psci_state)
->>  );
->>  
->> +#define ARM_PROC_ERR_TYPE	\
->> +	EM ( CPER_ARM_INFO_TYPE_CACHE, "cache error" )	\
->> +	EM ( CPER_ARM_INFO_TYPE_TLB,  "TLB error" )	\
->> +	EM ( CPER_ARM_INFO_TYPE_BUS, "bus error" )	\
->> +	EMe ( CPER_ARM_INFO_TYPE_UARCH, "micro-architectural error" )
->> +
->> +#define ARM_PROC_ERR_FLAGS	\
->> +	EM ( CPER_ARM_INFO_FLAGS_FIRST, "First error captured" )	\
->> +	EM ( CPER_ARM_INFO_FLAGS_LAST,  "Last error captured" )	\
->> +	EM ( CPER_ARM_INFO_FLAGS_PROPAGATED, "Propagated" )	\
->> +	EMe ( CPER_ARM_INFO_FLAGS_OVERFLOW, "Overflow" )
->> +
+>> +	/*
+>> +	 * In firmware first mode, we could assume firmware will only generate one
+>> +	 * of cper records at a time. There is no risk for one cpu to parse ghes table.
+>> +	 */
 > 
-> Can flags have more than one bit set?
+> I don't follow this comment, is this saying SError can't interrupt SError? We
+> already get this guarantee as the CPU masks SError when it takes an exception.
+> 
+> Firmware can generate multiple CPER records for a single 'event'. The CPER
+> records are the 'Data' in ACPI:Table 18-343 Generic Error Data Entry, and there
+> are 'zero or more' of these with a 'Generic Error Status Block' header that
+> describes the overall event. (Table 18-342).
+> 
+> I don't think we need this comment.
 
-Yes, indeed. ARM_PROC_ERR_FLAGS might have more than on bit set.
-Could we use __print_flags instead? like:
-
-#define show_proc_err_flags(flags) __print_flags(flags, "|",			\
-	{ CPER_ARM_INFO_FLAGS_FIRST,		"First error captured" },	\
-	{ CPER_ARM_INFO_FLAGS_LAST,		"Last error captured" },	\
-	{ CPER_ARM_INFO_FLAGS_PROPAGATED,	"Propagated" },			\
-	{ CPER_ARM_INFO_FLAGS_OVERFLOW,		"Overflow" }}
+Thanks for your explanation, OK, I'll remove this comment.
 
 > 
->> +/*
->> + * First define the enums in MM_ACTION_RESULT to be exported to userspace
->> + * via TRACE_DEFINE_ENUM().
->> + */
->> +#undef EM
->> +#undef EMe
->> +#define EM(a, b) TRACE_DEFINE_ENUM(a);
->> +#define EMe(a, b)	TRACE_DEFINE_ENUM(a);
->> +
->> +ARM_PROC_ERR_TYPE
->> +ARM_PROC_ERR_FLAGS
->> +
->> +/*
->> + * Now redefine the EM() and EMe() macros to map the enums to the strings
->> + * that will be printed in the output.
->> + */
->> +#undef EM
->> +#undef EMe
->> +#define EM(a, b)		{ a, b },
->> +#define EMe(a, b)	{ a, b }
->> +
->> +TRACE_EVENT(arm_proc_err,
->> +
->> +	TP_PROTO(const struct cper_arm_err_info *err),
->> +
->> +	TP_ARGS(err),
->> +
->> +	TP_STRUCT__entry(
->> +		__field(u8, type)
->> +		__field(u16, multiple_error)
->> +		__field(u8, flags)
->> +		__field(u64, error_info)
->> +		__field(u64, virt_fault_addr)
->> +		__field(u64, physical_fault_addr)
->> +	),
->> +
->> +	TP_fast_assign(
->> +		__entry->type = err->type;
->> +
->> +		if (err->validation_bits & CPER_ARM_INFO_VALID_MULTI_ERR)
->> +			__entry->multiple_error = err->multiple_error;
->> +		else
->> +			__entry->multiple_error = ~0;
->> +
->> +		if (err->validation_bits & CPER_ARM_INFO_VALID_FLAGS)
->> +			__entry->flags = err->flags;
->> +		else
->> +			__entry->flags = ~0;
->> +
->> +		if (err->validation_bits & CPER_ARM_INFO_VALID_ERR_INFO)
->> +			__entry->error_info = err->error_info;
->> +		else
->> +			__entry->error_info = 0ULL;
->> +
->> +		if (err->validation_bits & CPER_ARM_INFO_VALID_VIRT_ADDR)
->> +			__entry->virt_fault_addr = err->virt_fault_addr;
->> +		else
->> +			__entry->virt_fault_addr = 0ULL;
->> +
->> +		if (err->validation_bits & CPER_ARM_INFO_VALID_PHYSICAL_ADDR)
->> +			__entry->physical_fault_addr = err->physical_fault_addr;
->> +		else
->> +			__entry->physical_fault_addr = 0ULL;
 > 
-> else statements add a lot of branch conditions, and kills the branch
-> prediction. What about setting up default values, and then setting only
-> if the if statement is true.
+>> +	if (IS_ENABLED(CONFIG_ACPI_APEI_SEI) && ESR_ELx_EC(esr) == ESR_ELx_EC_SERROR) {
+>> +		ghes_notify_sei();
+>> +	}
 > 
+>>  	die("Oops - bad mode", regs, 0);
+>>  	local_irq_disable();
+>>  	panic("bad mode");
 > 
-> 	memset(&__entry->error_info, 0,
-> 	       sizeof(__entry) - offsetof(typeof(__entry), error_info)));
-> 	__entry->multiple_error = ~0;
-> 	__entry->flags = ~0;
+> Thanks,
 > 
-> 	if (...)
-
-I'll use this style next version, thanks.
-
+> James
 > 
->> +	),
->> +
->> +	TP_printk("ARM Processor Error: type %s; count: %u; flags: %s;"
->> +		  " error info: %016llx; virtual address: %016llx;"
->> +		  " physical address: %016llx",
->> +		  __print_symbolic(__entry->type, ARCH_PROC_ERR_TYPE),
->> +		  __entry->multiple_error,
->> +		  __print_symbolic(__entry->flags, ARCH_PROC_ERR_FLAGS),
-> 
-> Again, can flags have more than one bit set? If so, then this wont work.
-> 
-> -- Steve
-> 
->> +		  __entry->error_info, __entry->virt_fault_addr,
->> +		  __entry->physical_fault_addr)
->> +);
->> +
->>  /*
->>   * Unknown Section Report
->>   *
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-acpi" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
 > .
 > 
@@ -229,4 +103,3 @@ I'll use this style next version, thanks.
 -- 
 Thanks,
 Xie XiuQi
-
