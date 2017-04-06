@@ -1,110 +1,126 @@
-From: Xie XiuQi <xiexiuqi@huawei.com>
-Subject: Re: [PATCH v3 4/8] APEI: GHES: reserve a virtual page for SEI context
-Date: Thu, 6 Apr 2017 17:25:32 +0800
-Message-ID: <9feb4506-5038-ce43-f0e5-0c5c279abc41@huawei.com>
-References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
- <1490869877-118713-5-git-send-email-xiexiuqi@huawei.com>
- <58DE8252.7070709@arm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: Re: [PATCH v2 2/9] KVM: Add documentation for VCPU requests
+Date: Thu, 6 Apr 2017 12:18:02 +0200
+Message-ID: <985f69f3-3a4b-3742-731e-aac3a26b1777@de.ibm.com>
+References: <20170331160658.4331-1-drjones@redhat.com>
+ <20170331160658.4331-3-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <58DE8252.7070709@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, wuquanming@huawei.com, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, rostedt@goodmis.org, gengdongjiu@huawei.com, wangxiongfeng2@huawei.com, linux-acpi@vger.kernel.org, christoffer.dall@linaro.org, shiju.jose@huawei.com, zhengqiang10@huawei.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, hanjun.guo@linaro.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 439C040AF9
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 06:15:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ynlhyReKPG3k for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Apr 2017 06:15:53 -0400 (EDT)
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
+ [148.163.158.5])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2560240A7F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 06:15:52 -0400 (EDT)
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+ v369wrSn071110
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 6 Apr 2017 06:18:07 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 29ndvra2ug-1
+ (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Apr 2017 06:18:07 -0400
+Received: from localhost
+ by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <kvmarm@lists.cs.columbia.edu> from <borntraeger@de.ibm.com>;
+ Thu, 6 Apr 2017 06:18:07 -0400
+In-Reply-To: <20170331160658.4331-3-drjones@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: marc.zyngier@arm.com, cdall@linaro.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
+On 03/31/2017 06:06 PM, Andrew Jones wrote:
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  Documentation/virtual/kvm/vcpu-requests.rst | 114 ++++++++++++++++++++++++++++
+>  1 file changed, 114 insertions(+)
+>  create mode 100644 Documentation/virtual/kvm/vcpu-requests.rst
+> 
+> diff --git a/Documentation/virtual/kvm/vcpu-requests.rst b/Documentation/virtual/kvm/vcpu-requests.rst
+> new file mode 100644
+> index 000000000000..ea4a966d5c8a
+> --- /dev/null
+> +++ b/Documentation/virtual/kvm/vcpu-requests.rst
+> @@ -0,0 +1,114 @@
+> +=================
+> +KVM VCPU Requests
+> +=================
+> +
+> +Overview
+> +========
+> +
+> +KVM supports an internal API enabling threads to request a VCPU thread to
+> +perform some activity.  For example, a thread may request a VCPU to flush
+> +its TLB with a VCPU request.  The API consists of only four calls::
+> +
+> +  /* Check if VCPU @vcpu has request @req pending. Clears the request. */
+> +  bool kvm_check_request(int req, struct kvm_vcpu *vcpu);
+> +
+> +  /* Check if any requests are pending for VCPU @vcpu. */
+> +  bool kvm_request_pending(struct kvm_vcpu *vcpu);
+> +
+> +  /* Make request @req of VCPU @vcpu. */
+> +  void kvm_make_request(int req, struct kvm_vcpu *vcpu);
+> +
+> +  /* Make request @req of all VCPUs of the VM with struct kvm @kvm. */
+> +  bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
+> +
+> +Typically a requester wants the VCPU to perform the activity as soon
+> +as possible after making the request.  This means most requests,
+> +kvm_make_request() calls, are followed by a call to kvm_vcpu_kick(),
+> +and kvm_make_all_cpus_request() has the kicking of all VCPUs built
+> +into it.
+> +
+> +VCPU Kicks
+> +----------
+> +
+> +A VCPU kick does one of three things:
+> +
+> + 1) wakes a sleeping VCPU (which sleeps outside guest mode).
+> + 2) sends an IPI to a VCPU currently in guest mode, in order to bring it
+> +    out.
+> + 3) nothing, when the VCPU is already outside guest mode and not sleeping.
+> +
+> +VCPU Request Internals
+> +======================
+> +
+> +VCPU requests are simply bit indices of the vcpu->requests bitmap.  This
+> +means general bitops[1], e.g. clear_bit(KVM_REQ_UNHALT, &vcpu->requests),
+> +may also be used.  The first 8 bits are reserved for architecture
+> +independent requests, all additional bits are available for architecture
+> +dependent requests.
+> +
+> +VCPU Requests with Associated State
+> +===================================
+> +
+> +Requesters that want the requested VCPU to handle new state need to ensure
+> +the state is observable to the requested VCPU thread's CPU at the time the
+> +CPU observes the request.  This means a write memory barrier should be
+> +insert between the preparation of the state and the write of the VCPU
+> +request bitmap.  Additionally, on the requested VCPU thread's side, a
+> +corresponding read barrier should be issued after reading the request bit
+> +and before proceeding to use the state associated with it.  See the kernel
+> +memory barrier documentation [2].
+> +
+> +VCPU Requests and Guest Mode
+> +============================
 
-Thanks for your comments.
-
-On 2017/4/1 0:22, James Morse wrote:
-> Hi Xie XiuQi,
-> 
-> On 30/03/17 11:31, Xie XiuQi wrote:
->> On arm64 platform, SEI may interrupt code which had interrupts masked.
->> But SEI could be masked, so it's not treated as NMI, however SEA is
->> treated as NMI.
->>
->> So, the  memory area used to transfer hardware error information from
->> BIOS to Linux can be determined only in NMI, SEI(arm64), IRQ or timer
->> handler.
->>
->> In this patch, we add a virtual page for SEI context.
-> 
-> I don't think this is the best way of solving the interaction problem. If we
-> ever need to add another notification method this gets even more complicated,
-> and the ioremap code has to know how these methods can interact.
-> 
-> 
->> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
->> index 045d101..b1f9b1f 100644
->> --- a/drivers/acpi/apei/ghes.c
->> +++ b/drivers/acpi/apei/ghes.c
->> @@ -155,54 +162,55 @@ static void ghes_ioremap_exit(void)
-> 
->> -static void __iomem *ghes_ioremap_pfn_irq(u64 pfn)
->> -{
->> -	unsigned long vaddr, paddr;
->> -	pgprot_t prot;
->> -
->> -	vaddr = (unsigned long)GHES_IOREMAP_IRQ_PAGE(ghes_ioremap_area->addr);
->> +	if (in_nmi()) {
->> +		raw_spin_lock(&ghes_ioremap_lock_nmi);
->> +		vaddr = (unsigned long)GHES_IOREMAP_NMI_PAGE(ghes_ioremap_area->addr);
->> +	} else if (this_cpu_read(sei_in_process)) {
-> 
->> +		spin_lock_irqsave(&ghes_ioremap_lock_sei, flags);
-> 
-> I think this one should be a raw_spin_lock. I'm pretty sure this is for RT-linux
-> where spin_lock() on a contented lock will call schedule() in the same way
-> mutex_lock() does. If interrupts were masked by arch code then you need to use
-> raw_spin_lock.
-> So now we need to know how we got in here, we interrupted the SError handler so
-> this should only be Synchronous External Abort. Having to know how we got here
-> is another problem with this approach.
-> 
-> 
-> As suggested earlier[0], I think the best way is to allocate one page of virtual
-> address space per struct ghes, and move the locks out to the notify calls, which
-> can know how they are called.
-> 
-> I've pushed a branch to:
-> http://www.linux-arm.org/git?p=linux-jm.git;a=commit;h=refs/heads/apei_ioremap_rework/v1
-> 
-
-Good! I could rebase on your patch next time.
-
-> I intend to post those patches as an RFC series later in the cycle, I've only
-> build tested it so far.
-> 
-> 
-> Thanks,
-> 
-> James
-> 
->> +		vaddr = (unsigned long)GHES_IOREMAP_SEI_PAGE(ghes_ioremap_area->addr);
->> +	} else {
->> +		spin_lock_irqsave(&ghes_ioremap_lock_irq, flags);
->> +		vaddr = (unsigned long)GHES_IOREMAP_IRQ_PAGE(ghes_ioremap_area->addr);
->> +	}
-> 
-> 
-> [0] https://lkml.org/lkml/2017/3/20/434
-> 
-> 
-> .
-> 
-
--- 
-Thanks,
-Xie XiuQi
+FWIW, s390 does not implement the guest mode. Maybe add some words that not
+all architectures implement that? Or do we expect Radims rework soon?
