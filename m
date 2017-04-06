@@ -1,39 +1,80 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 1/9] KVM: add kvm_request_pending
-Date: Thu, 6 Apr 2017 17:08:53 +0200
-Message-ID: <20170406150853.l3emn2iq7nhbi5gq@kamzik.brq.redhat.com>
-References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-2-drjones@redhat.com>
- <20170404153014.GL11752@cbox>
- <20170404164120.xvlvyebvcqoci5cu@kamzik.brq.redhat.com>
- <20170405131049.GD6369@potion>
- <20170405173918.GA27123@cbox>
- <20170405202016.GG6369@potion>
- <20170406120211.lcd4ygkms7zk3hkw@kamzik.brq.redhat.com>
- <20170406143751.GG27123@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 3/5] KVM: arm/arm64: Support arch timers with a
+ userspace gic
+Date: Thu, 6 Apr 2017 17:49:05 +0100
+Message-ID: <baaf0d40-222b-633e-77b6-75fc61f3e0ed@arm.com>
+References: <20170405092815.22503-1-cdall@linaro.org>
+ <20170405092815.22503-4-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170406143751.GG27123@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ECDA40B40
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 12:46:56 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id xR+ouUT3VApr for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Apr 2017 12:46:54 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6705E40A86
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 12:46:54 -0400 (EDT)
+In-Reply-To: <20170405092815.22503-4-cdall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Pekka Enberg <penberg@iki.fi>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 06, 2017 at 04:37:51PM +0200, Christoffer Dall wrote:
-> > FWIW, I first suggested using READ_ONCE() for the freshness argument,
+On 05/04/17 10:28, Christoffer Dall wrote:
+> From: Alexander Graf <agraf@suse.de>
 > 
-> What is the 'freshness argument' ?
+> If you're running with a userspace gic or other interrupt constroller
 
-My own made-up lingo to state that each time the variable is accessed it
-must be loaded anew, taken care of by the volatile use in READ_ONCE.  As
-vcpu->requests can be written by other threads, then I prefer READ_ONCE
-being used to read it, as it allows me to avoid spending energy convincing
-myself that the compiler would have emitted a load at that point anyway.
+controller
 
-The writes to vcpu->requests always go through bitops, so they're already
-also emitting fresh loads before doing their stores.
+> (that is no vgic in the kernel), then you have so far not been able to
+> use the architected timers, because the output of the architected
+> timers, which are driven inside the kernel, was a kernel-only construct
+> between the arch timer code and the vgic.
+> 
+> This patch implements the new KVM_CAP_ARM_USER_IRQ feature, where we use a
+> side channel on the kvm_run structure, run->s.regs.device_irq_level, to
+> always notify userspace of the timer output levels when using a userspace
+> irqchip.
+> 
+> This works by ensureing that before we enter the guest, if the timer
 
-Thanks,
-drew
+ensuring
+
+> output level has changed compared to what we last told userspace, we
+> don't enter the guest, but instead return to userspace to notify it of
+> the new level.  If we are exiting, because of an MMIO for example, and
+> the level changed at the same time, the value is also updated and
+> userspace can sample the line as it needs.  This is nicely achieved
+> simply always updating the timer_irq_level field after the main run
+> loop.
+> 
+> Note that the kvm_timer_update_irq trace event is changed to show the
+> host IRQ number for the timer instead of the guest IRQ number, because
+> the kernel no longer know which IRQ userspace wires up the timer signal
+> to.
+> 
+> Also note that this patch implements all required functionality but does
+> not yet advertise the capability.
+> 
+> Signed-off-by: Alexander Graf <agraf@suse.de>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+Otherwise looks good.
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
