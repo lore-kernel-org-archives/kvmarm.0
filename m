@@ -1,126 +1,153 @@
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH v2 2/9] KVM: Add documentation for VCPU requests
-Date: Thu, 6 Apr 2017 12:18:02 +0200
-Message-ID: <985f69f3-3a4b-3742-731e-aac3a26b1777@de.ibm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v2 1/9] KVM: add kvm_request_pending
+Date: Thu, 6 Apr 2017 14:02:12 +0200
+Message-ID: <20170406120211.lcd4ygkms7zk3hkw@kamzik.brq.redhat.com>
 References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-3-drjones@redhat.com>
+ <20170331160658.4331-2-drjones@redhat.com>
+ <20170404153014.GL11752@cbox>
+ <20170404164120.xvlvyebvcqoci5cu@kamzik.brq.redhat.com>
+ <20170405131049.GD6369@potion>
+ <20170405173918.GA27123@cbox>
+ <20170405202016.GG6369@potion>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 439C040AF9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 06:15:54 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ynlhyReKPG3k for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Apr 2017 06:15:53 -0400 (EDT)
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
- [148.163.158.5])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2560240A7F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Apr 2017 06:15:52 -0400 (EDT)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
- v369wrSn071110
- for <kvmarm@lists.cs.columbia.edu>; Thu, 6 Apr 2017 06:18:07 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
- by mx0b-001b2d01.pphosted.com with ESMTP id 29ndvra2ug-1
- (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Apr 2017 06:18:07 -0400
-Received: from localhost
- by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <kvmarm@lists.cs.columbia.edu> from <borntraeger@de.ibm.com>;
- Thu, 6 Apr 2017 06:18:07 -0400
-In-Reply-To: <20170331160658.4331-3-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: marc.zyngier@arm.com, cdall@linaro.org, pbonzini@redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170405202016.GG6369@potion>
+Sender: kvm-owner@vger.kernel.org
+To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/31/2017 06:06 PM, Andrew Jones wrote:
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  Documentation/virtual/kvm/vcpu-requests.rst | 114 ++++++++++++++++++++++++++++
->  1 file changed, 114 insertions(+)
->  create mode 100644 Documentation/virtual/kvm/vcpu-requests.rst
+On Wed, Apr 05, 2017 at 10:20:17PM +0200, Radim Krčmář wrote:
+> 2017-04-05 19:39+0200, Christoffer Dall:
+> > On Wed, Apr 05, 2017 at 03:10:50PM +0200, Radim Krčmář wrote:
+> >> 2017-04-04 18:41+0200, Andrew Jones:
+> >> > On Tue, Apr 04, 2017 at 05:30:14PM +0200, Christoffer Dall wrote:
+> >> >> On Fri, Mar 31, 2017 at 06:06:50PM +0200, Andrew Jones wrote:
+> >> >> > From: Radim Krčmář <rkrcmar@redhat.com>
+> >> >> > 
+> >> >> > A first step in vcpu->requests encapsulation.
+> >> >> 
+> >> >> Could we have a note here on why we need to access vcpu->requests using
+> >> >> READ_ONCE now?
+> >> > 
+> >> > Sure, maybe we should put the note as a comment above the read in
+> >> > kvm_request_pending().  Something like
+> >> > 
+> >> >  /*
+> >> >   * vcpu->requests reads may appear in sequences that have strict
+> >> >   * data or control dependencies.  Use READ_ONCE() to ensure the
+> >> >   * compiler does not do anything that breaks the required ordering.
+> >> >   */
+> >> > 
+> >> > Radim?
+> >> 
+> >> Uses of vcpu->requests should already have barriers that take care of
+> >> the ordering.  I think the main reason for READ_ONCE() is to tell
+> >> programmers that requests are special, but predictable.
+> > 
+> > I don't know what to do with "special, but predictable", unfortunately.
+> > In fact, I don't even think I know what you mean.
 > 
-> diff --git a/Documentation/virtual/kvm/vcpu-requests.rst b/Documentation/virtual/kvm/vcpu-requests.rst
-> new file mode 100644
-> index 000000000000..ea4a966d5c8a
-> --- /dev/null
-> +++ b/Documentation/virtual/kvm/vcpu-requests.rst
-> @@ -0,0 +1,114 @@
-> +=================
-> +KVM VCPU Requests
-> +=================
-> +
-> +Overview
-> +========
-> +
-> +KVM supports an internal API enabling threads to request a VCPU thread to
-> +perform some activity.  For example, a thread may request a VCPU to flush
-> +its TLB with a VCPU request.  The API consists of only four calls::
-> +
-> +  /* Check if VCPU @vcpu has request @req pending. Clears the request. */
-> +  bool kvm_check_request(int req, struct kvm_vcpu *vcpu);
-> +
-> +  /* Check if any requests are pending for VCPU @vcpu. */
-> +  bool kvm_request_pending(struct kvm_vcpu *vcpu);
-> +
-> +  /* Make request @req of VCPU @vcpu. */
-> +  void kvm_make_request(int req, struct kvm_vcpu *vcpu);
-> +
-> +  /* Make request @req of all VCPUs of the VM with struct kvm @kvm. */
-> +  bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
-> +
-> +Typically a requester wants the VCPU to perform the activity as soon
-> +as possible after making the request.  This means most requests,
-> +kvm_make_request() calls, are followed by a call to kvm_vcpu_kick(),
-> +and kvm_make_all_cpus_request() has the kicking of all VCPUs built
-> +into it.
-> +
-> +VCPU Kicks
-> +----------
-> +
-> +A VCPU kick does one of three things:
-> +
-> + 1) wakes a sleeping VCPU (which sleeps outside guest mode).
-> + 2) sends an IPI to a VCPU currently in guest mode, in order to bring it
-> +    out.
-> + 3) nothing, when the VCPU is already outside guest mode and not sleeping.
-> +
-> +VCPU Request Internals
-> +======================
-> +
-> +VCPU requests are simply bit indices of the vcpu->requests bitmap.  This
-> +means general bitops[1], e.g. clear_bit(KVM_REQ_UNHALT, &vcpu->requests),
-> +may also be used.  The first 8 bits are reserved for architecture
-> +independent requests, all additional bits are available for architecture
-> +dependent requests.
-> +
-> +VCPU Requests with Associated State
-> +===================================
-> +
-> +Requesters that want the requested VCPU to handle new state need to ensure
-> +the state is observable to the requested VCPU thread's CPU at the time the
-> +CPU observes the request.  This means a write memory barrier should be
-> +insert between the preparation of the state and the write of the VCPU
-> +request bitmap.  Additionally, on the requested VCPU thread's side, a
-> +corresponding read barrier should be issued after reading the request bit
-> +and before proceeding to use the state associated with it.  See the kernel
-> +memory barrier documentation [2].
-> +
-> +VCPU Requests and Guest Mode
-> +============================
+> With "special" to stand for the idea that vcpu->requests can change
+> outside of the current execution thread.  Letting the programmer assume
+> additional guarantees makes the generated code and resulting behavior
+> more predictable.
+> 
+> >> READ_ONCE() is not necessary in any use I'm aware of, but there is no
+> >> harm in telling the compiler that vcpu->requests are what we think they
+> >> are ...
+> > 
+> > Hmmm, I'm equally lost.
+> 
+> vcpu->requests are volatile, so we need to assume that they can change
+> at any moment when using them.
+> 
+> I would prefer if vcpu->requests were of an atomic type and READ_ONCE()
+> is about as close we can get without a major overhaul.
+> 
+> >> 
+> >>  /*
+> >>   * vcpu->requests are a lockless synchronization mechanism, where
+> > 
+> > is the requests a synchronization mechanism?  I think of it more as a
+> > cross-thread communication protocol.
+> 
+> Partly, synchronization is too restrictive and communication seems too
+> generic, but probably still better.  No idea how to shortly describe the
+> part of vcpu->requests that prevents VM entry and that setting a request
+> kicks VM out of guest mode.
+> 
+> x86 uses KVM_REQ_MCLOCK_INPROGRESS for synchronization between cores and
+> the use in this series looked very similar.
+> 
+> >>   * memory barriers are necessary for correct behavior, see
+> >>   * Documentation/virtual/kvm/vcpu-requests.rst.
+> >>   *
+> >>   * READ_ONCE() is not necessary for correctness, but simplifies
+> >>   * reasoning by constricting the generated code.
+> >>   */
+> >> 
+> >> I considered READ_ONCE() to be self-documenting. :)
+> > 
+> > I realize that I'm probably unusually slow in this whole area, but using
+> > READ_ONCE() where unnecessary doesn't help my reasoning, but makes me
+> > wonder which part of this I didn't understand, so I don't seem to agree
+> > with the statement that it simplifies reasoning.
+> 
+> No, I think it is a matter of approach.  When I see a READ_ONCE()
+> without a comment, I think that the programmer was aware that this
+> memory can change at any time and was defensive about it.
+> 
+> I consider this use to simplify future development:
+> We think now that READ_ONCE() is not needed, but vcpu->requests is still
+> volatile and future changes in code might make READ_ONCE() necessary.
+> Preemptively putting READ_ONCE() there saves us thinking or hard-to-find
+> bugs.
+> 
+> > Really, if there is no reason to use it, I don't think we should use it.
+> 
+> I am leaning towards READ_ONCE() as the default for implicitly volatile
+> memory, but commenting why we didn't have to use READ_ONCE() sounds good
+> too.
+> 
+> > To me, READ_ONCE() indicates that there's some flow in the code where
+> > it's essential that the compiler doesn't generate multiple loads, but
+> > that we only see a momentary single-read snapshot of the value, and this
+> > doesn't seem to be the case.
+> 
+> The compiler can also squash multiple reads together, which is more
+> dangerous in this case as we would not notice a new requests.  Avoiding
+> READ_ONCE() requires a better knowledge of the compiler algorithms that
+> prove which variable can be optimized.
+> 
+> The difference is really minor and I agree that the comment is bad.
+> The only comment I'm happy with is nothing, though ... even "READ_ONCE()
+> is not necessary" is wrong as that might change without us noticing.
 
-FWIW, s390 does not implement the guest mode. Maybe add some words that not
-all architectures implement that? Or do we expect Radims rework soon?
+FWIW, I first suggested using READ_ONCE() for the freshness argument,
+but then started to believe there were even more reasons after reading
+the comment above it in include/linux/compiler.h.  The last paragraph
+of that comment says there are two major use cases for it.  I think the
+first one maps to the freshness argument.  The second one is
+
+ (2) Ensuring that the compiler does not  fold, spindle, or otherwise
+     mutilate accesses that either do not require ordering or that
+     interact with an explicit memory barrier or atomic instruction that
+     provides the required ordering.
+
+Documentation/memory-barriers.txt seemed to agree with that, as it's
+full of READ/WRITE_ONCE's, and statements saying they are not optional.
+However, reading it closer (how many times have I tried to read it
+closer?), I can't see any pattern where they're required that we need
+to be concerned about.  I think the future-proofing / freshness argument
+still stands though, and I also like that it flags the variable as
+"special".
+
+I think I actually prefer no comment now too, but the commit message
+should get a sentence or two explaining why it got thrown in.
+
+Thanks,
+drew
