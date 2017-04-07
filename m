@@ -1,45 +1,33 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [RFC kvm-unit-tests PATCH 2/8] Makefile: ensure build-head works
- out-of-src-tree
-Date: Fri, 7 Apr 2017 13:44:08 +0200
-Message-ID: <20170407114408.j7j5m36doxhny7fy@kamzik.brq.redhat.com>
-References: <20170406190727.5624-1-alex.bennee@linaro.org>
- <20170406190727.5624-3-alex.bennee@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 2/9] KVM: Add documentation for VCPU requests
+Date: Fri, 7 Apr 2017 19:44:36 +0800
+Message-ID: <20616e52-f6e2-fdf0-7e1b-e1e83d724abc@redhat.com>
+References: <20170331160658.4331-1-drjones@redhat.com>
+ <20170331160658.4331-3-drjones@redhat.com> <20170404152403.GK11752@cbox>
+ <20170404170600.w6snnecqoi4aqv4d@kamzik.brq.redhat.com>
+ <20170404172340.GQ11752@cbox> <20170405141139.GA13944@potion>
+ <20170405174538.GB27123@cbox>
+ <45234347-1773-3359-81e3-e1ffe2ae560b@redhat.com>
+ <20170405204606.GH6369@potion> <20170406142946.GF27123@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170406190727.5624-3-alex.bennee@linaro.org>
+In-Reply-To: <20170406142946.GF27123@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+To: Christoffer Dall <cdall@linaro.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 06, 2017 at 08:07:21PM +0100, Alex Bennée wrote:
-> Pass -C $(SRCDIR) to the git command that generates the build-head
-> stamp.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 16ce297..eba7b28 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -80,7 +80,7 @@ $(LIBFDT_archive): $(addprefix $(LIBFDT_objdir)/,$(LIBFDT_OBJS))
->  
->  -include */.*.d */*/.*.d
->  
-> -all: $(shell git rev-parse --verify --short=8 HEAD >build-head 2>/dev/null)
-> +all: $(shell git -C $(SRCDIR) rev-parse --verify --short=8 HEAD >build-head 2>/dev/null)
->  
->  standalone: all
->  	@scripts/mkstandalone.sh
-> -- 
-> 2.11.0
->
 
-Reviewed-by: Andrew Jones <drjones@redhat.com> 
+
+On 06/04/2017 22:29, Christoffer Dall wrote:
+> We could encode the lazy/non-lazy thing in a bit in the request number
+> that gets masked off before clearing/checking the request bit, but
+> perhaps there are nicer solutions.
+
+Actually this is the first "nice" solution that it's been proposed.
+
+Thanks,
+
+Paolo
