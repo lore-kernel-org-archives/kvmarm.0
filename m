@@ -1,114 +1,145 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [RFC kvm-unit-tests PATCH 6/8] Makefiles: handle linking of scripts into build-tree
-Date: Fri, 07 Apr 2017 11:38:07 +0100
-Message-ID: <87lgrca4fk.fsf@linaro.org>
-References: <20170406190727.5624-1-alex.bennee@linaro.org> <20170406190727.5624-7-alex.bennee@linaro.org> <a81e981b-1c6e-c8ac-82a6-ced80c045461@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [RFC kvm-unit-tests PATCH 1/8] configure: make it run-able from
+ outside source tree
+Date: Fri, 7 Apr 2017 13:40:53 +0200
+Message-ID: <20170407114053.powj76325kjseqek@kamzik.brq.redhat.com>
+References: <20170406190727.5624-1-alex.bennee@linaro.org>
+ <20170406190727.5624-2-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <a81e981b-1c6e-c8ac-82a6-ced80c045461@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Thomas Huth <thuth@redhat.com>
-Cc: drjones@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 69A2540C41
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 07:38:43 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id NZz4tjJJOBSx for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Apr 2017 07:38:42 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 371E240BAC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 07:38:41 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20170406190727.5624-2-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Thu, Apr 06, 2017 at 08:07:20PM +0100, Alex Benn=E9e wrote:
+> This is a first step to enabling out-of-tree builds for
+> kvm-unit-tests. When you invoke configure like this:
+> =
 
-Thomas Huth <thuth@redhat.com> writes:
+>   ../tree.git/configure [args]
+> =
 
-> On 06.04.2017 21:07, Alex Bennée wrote:
->> When doing an out-of-src-tree build we still want access to the
->> various bits of common script machinery to run. This is handled by the
->> scripts-common list which sub-builds can add explicit extra stuff to.
->>
->> The final rule is conditional so we don't attempt to link files when
->> we are doing an in-src-tree build.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  Makefile            | 13 +++++++++++++
->>  x86/Makefile.common |  4 ++++
->>  2 files changed, 17 insertions(+)
->>
->> diff --git a/Makefile b/Makefile
->> index 56598df..c9fea88 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -31,6 +31,10 @@ cflatobjs := \
->>  	lib/report.o \
->>  	lib/stack.o
->>
->> +# These are scripts we want linked from the source tree
->> +scripts-common := run_tests.sh \
->> +	scripts
->> +
->>  # libfdt paths
->>  LIBFDT_objdir = $(SRCDIR)/lib/libfdt
->>  LIBFDT_srcdir = $(SRCDIR)/lib/libfdt
->> @@ -86,8 +90,17 @@ $(LIBFDT_archive): $(addprefix $(LIBFDT_objdir)/,$(LIBFDT_OBJS))
->>  	mkdir -p $(dir $@)
->>  	$(CC) $(CFLAGS) -c -o $@ $<
->>
->> +$(scripts-common): $(SRCDIR)/$@
->> +	ln -sf $<$@ $@
->
-> The prerequisite does not seem to work correctly here. I can see that
-> the symlinks are regenerated each time I run make. Even worse, during
-> the second run, there is a
->
-> ln -sf /home/thuth/devel/kvm-unit-tests/scripts scripts
->
-> which generates a symlink in the source directory, since the "scripts"
-> symlink already exists!
->
-> I think you can not use automatic variables like $@ in the prerequisite
-> list, can you?
->
-> Maybe it would be better to create these symlinks in the configure
-> script already?
+> It will detect we the case and:
+> =
 
-Hmm maybe. The trouble is catching them all. That's why I wanted to have
-something like scripts-common that sub Makefiles could add to.
+>   - link ../tree.git/Makefile to the build-dir
+>   - ensure lib is created with a correct lib/asm
+>   - set SRCDIR in the config.mk
+> =
 
-We could certainly make the rule a bit more robust against re-linking
-though.
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> ---
+>  configure | 24 +++++++++++++++++-------
+>  1 file changed, 17 insertions(+), 7 deletions(-)
+> =
 
->
->>  -include */.*.d */*/.*.d
->>
->> +
->> +# We only need to link common scripts for out-of-src-tree builds
->> +ifneq ($(CURDIR), $(SRCDIR))
->> +all: $(scripts-common)
->> +endif
->> +
->>  all: $(shell git -C $(SRCDIR) rev-parse --verify --short=8 HEAD >build-head 2>/dev/null)
->>
->>  standalone: all
->> diff --git a/x86/Makefile.common b/x86/Makefile.common
->> index fbab82c..ef6e543 100644
->> --- a/x86/Makefile.common
->> +++ b/x86/Makefile.common
->> @@ -54,8 +54,12 @@ tests-common += api/dirty-log
->>  tests-common += api/dirty-log-perf
->>  endif
->>
->> +scripts-common += $(TEST_DIR)/run
->> +scripts-common += $(TEST_DIR)/unittests.cfg
->> +
->>  test_cases: $(tests-common) $(tests)
->>
->> +
->
-> Cosmetic nit: Superfluous white space change.
->
->>  $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I lib -I lib/x86
->>
->>  $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
->>
->
->  Thomas
+> diff --git a/configure b/configure
+> index 8821f37..223809c 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1,5 +1,6 @@
+>  #!/bin/bash
+>  =
 
+> +srcdir=3D$(cd "$(dirname "$0")"; pwd)
 
---
-Alex Bennée
+Why not just $(dirname "$0")? Any reason the path can't
+be relative?  Also, could use realpath vs. the cd/pwd.
+
+>  prefix=3D/usr/local
+>  cc=3Dgcc
+>  ld=3Dld
+> @@ -102,12 +103,12 @@ elif [ "$arch" =3D "ppc64" ]; then
+>  else
+>      testdir=3D$arch
+>  fi
+> -if [ ! -d $testdir ]; then
+> +if [ ! -d $srcdir/$testdir ]; then
+>      echo "$testdir does not exist!"
+>      exit 1
+>  fi
+> -if [ -f $testdir/run ]; then
+> -    ln -fs $testdir/run $testdir-run
+> +if [ -f $srcdir/$testdir/run ]; then
+> +    ln -fs $srcdir/$testdir/run $testdir-run
+>  fi
+
+$srcdir could have spaces in it, so now we need "" on all these
+references, e.g. [ -f "$srcdir/$testdir/run" ]
+
+>  =
+
+>  # check if uint32_t needs a long format modifier
+> @@ -135,18 +136,27 @@ fi
+>  rm -f lib_test.c
+>  fi
+>  =
+
+> +# Are we in a separate build tree? If so, link the Makefile
+> +# so that 'make' works.
+> +if test ! -e Makefile; then
+
+[ ! -e Makefile ]
+
+> +    echo "linking Makefile..."
+> +    ln -s "${srcdir}/Makefile" .
+
+No need for the {}
+
+> +fi
+> +
+>  # link lib/asm for the architecture
+>  rm -f lib/asm
+>  asm=3Dasm-generic
+> -if [ -d lib/$arch/asm ]; then
+> -	asm=3D$arch/asm
+> -elif [ -d lib/$testdir/asm ]; then
+> -	asm=3D$testdir/asm
+> +if [ -d $srcdir/lib/$arch/asm ]; then
+> +	asm=3D$srcdir/lib/$arch/asm
+> +elif [ -d $srcdir/lib/$testdir/asm ]; then
+> +	asm=3D$srcdir/lib/$testdir/asm
+
+""'s
+
+>  fi
+> +mkdir -p lib
+>  ln -s $asm lib/asm
+>  =
+
+>  # create the config
+>  cat <<EOF > config.mak
+> +SRCDIR=3D$srcdir
+>  PREFIX=3D$prefix
+>  HOST=3D$host
+>  ARCH=3D$arch
+> -- =
+
+> 2.11.0
+>
+
+Thanks,
+drew
