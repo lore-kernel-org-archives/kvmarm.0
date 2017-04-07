@@ -1,65 +1,50 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: replace vcpu->arch.pause with a
- vcpu request
-Date: Fri, 7 Apr 2017 19:47:29 +0800
-Message-ID: <b435db93-9d46-52d6-7aa7-458dbbc2b7ef@redhat.com>
-References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-5-drjones@redhat.com> <20170404160417.GN11752@cbox>
- <20170404175718.su4tjx3psyez3qee@kamzik.brq.redhat.com>
- <20170404190438.GF31208@cbox>
- <63209d09-0c45-0bb2-322b-e422f1360df7@redhat.com>
- <20170405070959.GA1526@cbox>
- <91ab3b0b-c30e-7a19-f60f-882d26388ef5@redhat.com>
- <20170406141443.GC27123@cbox>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [RFC kvm-unit-tests PATCH 3/8] Makefile: set VPATH based on
+ SRCDIR
+Date: Fri, 7 Apr 2017 13:56:38 +0200
+Message-ID: <20170407115638.yh4yri35jvxpsljz@kamzik.brq.redhat.com>
+References: <20170406190727.5624-1-alex.bennee@linaro.org>
+ <20170406190727.5624-4-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170406141443.GC27123@cbox>
+Content-Disposition: inline
+In-Reply-To: <20170406190727.5624-4-alex.bennee@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 06/04/2017 22:14, Christoffer Dall wrote:
->> So it seems like there are no races after all in KVM/ARM code
->
-> No races after Drew's fix has been applied to set vcpu->mode =
-> IN_GUEST_MODE, before checking the pause flag, correct?  (I think that's
-> what the spin model below is modeling).
-
-Yes.  All of them include the vcpu->mode = IN_GUEST_MODE assignment and
-(implicitly because spin is sequentially consistent) the memory barrier.
-
->> After this experiment, I think I like Drew's KVM_REQ_PAUSE more than I did
->> yesterday.  However, yet another alternative is to leave pause/power_off as
->> they are, while taking some inspiration from his patch to do some cleanups:
->>
->> 1) change the "if"
->>
->>                 if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
->>                         vcpu->arch.power_off || vcpu->arch.pause) {
->>
->> to test kvm_requests_pending instead of pause/power_off
->>
->> 2) clear KVM_REQ_VCPU_EXIT before the other "if":
->>
->>                 if (vcpu->arch.power_off || vcpu->arch.pause)
->>                         vcpu_sleep(vcpu);
->
-> I like using requests as only requests from one thread to the VCPU
-> thread, and not to maintain specific state about a VCPU.
+On Thu, Apr 06, 2017 at 08:07:22PM +0100, Alex Bennée wrote:
+> Setting the VPATH prompts make to search VPATH for source files. There
+> are still some fix-ups needed for linking and including other Makefile
+> fragments for each architecture.
 > 
-> The benefit of Drew's approach is that since these pieces of state are
-> boolean, you can have just a single check in the critical path in the
-> run loop instead of having to access multiple fields.
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  Makefile | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index eba7b28..80bc57e 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -7,6 +7,9 @@ endif
+>  
+>  include config.mak
+>  
+> +# Set search path for all sources
+> +VPATH=$(SRCDIR)
 
-I think you'd still need two checks for KVM_REQ_PAUSE/KVM_REQ_POWEROFF:
-one to check whether to sleep, and one to check whether to abort the
-vmentry.
+nit: prefer spaces around the =
 
-Pause and power_off could be merged into a single bitmask if necessary, too.
+> +
+>  libdirs-get = $(shell [ -d "lib/$(1)" ] && echo "lib/$(1) lib/$(1)/asm")
+>  ARCH_LIBDIRS := $(call libdirs-get,$(ARCH)) $(call libdirs-get,$(TEST_DIR))
+>  
+> -- 
+> 2.11.0
+> 
 
-Paolo
+Reviewed-by: Andrew Jones <drjones@redhat.com>
