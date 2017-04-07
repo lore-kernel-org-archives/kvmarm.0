@@ -1,93 +1,113 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [RFC kvm-unit-tests PATCH 6/8] Makefiles: handle linking of
- scripts into build-tree
-Date: Fri, 7 Apr 2017 15:37:25 +0200
-Message-ID: <20170407133725.voe3eykrlqvp7wt3@kamzik.brq.redhat.com>
+Subject: Re: [RFC kvm-unit-tests PATCH 8/8] Makefiles: fix up the arm build
+ include and link paths
+Date: Fri, 7 Apr 2017 15:56:58 +0200
+Message-ID: <20170407135658.nayjvdgm4jgtbqqo@kamzik.brq.redhat.com>
 References: <20170406190727.5624-1-alex.bennee@linaro.org>
- <20170406190727.5624-7-alex.bennee@linaro.org>
- <a81e981b-1c6e-c8ac-82a6-ced80c045461@redhat.com>
- <87lgrca4fk.fsf@linaro.org>
+ <20170406190727.5624-9-alex.bennee@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <87lgrca4fk.fsf@linaro.org>
+In-Reply-To: <20170406190727.5624-9-alex.bennee@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, pbonzini@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 07, 2017 at 11:38:07AM +0100, Alex Bennée wrote:
+On Thu, Apr 06, 2017 at 08:07:27PM +0100, Alex Bennée wrote:
+> We still need to tell the compiler the correct search path for finding
+> headers and the like. This is slightly complicated by the "dynamic"
+> asm search path which is in our build tree but (may be) symlinked to
+> the right architectures headers.
 > 
-> Thomas Huth <thuth@redhat.com> writes:
+> Also we explicitly include SRCDIR for the linking scripts as VPATH
+> doesn't seem to find them well enough.
 > 
-> > On 06.04.2017 21:07, Alex Bennée wrote:
-> >> When doing an out-of-src-tree build we still want access to the
-> >> various bits of common script machinery to run. This is handled by the
-> >> scripts-common list which sub-builds can add explicit extra stuff to.
-> >>
-> >> The final rule is conditional so we don't attempt to link files when
-> >> we are doing an in-src-tree build.
-> >>
-> >> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> >> ---
-> >>  Makefile            | 13 +++++++++++++
-> >>  x86/Makefile.common |  4 ++++
-> >>  2 files changed, 17 insertions(+)
-> >>
-> >> diff --git a/Makefile b/Makefile
-> >> index 56598df..c9fea88 100644
-> >> --- a/Makefile
-> >> +++ b/Makefile
-> >> @@ -31,6 +31,10 @@ cflatobjs := \
-> >>  	lib/report.o \
-> >>  	lib/stack.o
-> >>
-> >> +# These are scripts we want linked from the source tree
-> >> +scripts-common := run_tests.sh \
-> >> +	scripts
-> >> +
-> >>  # libfdt paths
-> >>  LIBFDT_objdir = $(SRCDIR)/lib/libfdt
-> >>  LIBFDT_srcdir = $(SRCDIR)/lib/libfdt
-> >> @@ -86,8 +90,17 @@ $(LIBFDT_archive): $(addprefix $(LIBFDT_objdir)/,$(LIBFDT_OBJS))
-> >>  	mkdir -p $(dir $@)
-> >>  	$(CC) $(CFLAGS) -c -o $@ $<
-> >>
-> >> +$(scripts-common): $(SRCDIR)/$@
-> >> +	ln -sf $<$@ $@
-> >
-> > The prerequisite does not seem to work correctly here. I can see that
-> > the symlinks are regenerated each time I run make. Even worse, during
-> > the second run, there is a
-> >
-> > ln -sf /home/thuth/devel/kvm-unit-tests/scripts scripts
-> >
-> > which generates a symlink in the source directory, since the "scripts"
-> > symlink already exists!
-> >
-> > I think you can not use automatic variables like $@ in the prerequisite
-> > list, can you?
-> >
-> > Maybe it would be better to create these symlinks in the configure
-> > script already?
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  arm/Makefile.common     | 15 +++++++++------
+>  scripts/asm-offsets.mak |  4 +++-
+>  2 files changed, 12 insertions(+), 7 deletions(-)
 > 
-> Hmm maybe. The trouble is catching them all. That's why I wanted to have
-> something like scripts-common that sub Makefiles could add to.
-> 
-> We could certainly make the rule a bit more robust against re-linking
-> though.
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index 74c7394..b1fead1 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -16,7 +16,10 @@ tests-common += $(TEST_DIR)/pmu.flat
+>  tests-common += $(TEST_DIR)/gic.flat
+>  tests-common += $(TEST_DIR)/psci.flat
+>  
+> -tests-all = $(tests-common) $(tests)
+> +scripts-common += $(TEST_DIR)/run
+> +scripts-common += $(TEST_DIR)/unittests.cfg
+> +
+> +tests-all = $(tests-common) $(tests) $(scripts_common)
+>  all: $(tests-all)
+>  
+>  ##################################################################
+> @@ -26,13 +29,13 @@ CFLAGS += -std=gnu99
+>  CFLAGS += -ffreestanding
+>  CFLAGS += -Wextra
+>  CFLAGS += -O2
+> -CFLAGS += -I lib -I lib/libfdt
+> +CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib
+>  
+>  # We want to keep intermediate files
+>  .PRECIOUS: %.elf %.o
+>  
+>  asm-offsets = lib/$(ARCH)/asm-offsets.h
+> -include scripts/asm-offsets.mak
+> +include $(SRCDIR)/scripts/asm-offsets.mak
+>  
+>  cflatobjs += lib/util.o
+>  cflatobjs += lib/alloc.o
+> @@ -60,11 +63,11 @@ start_addr := $(shell printf "%x\n" $$(( $(phys_base) + $(kernel_offset) )))
+>  
+>  FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libgcc) $(libeabi)
+>  %.elf: LDFLAGS = $(CFLAGS) -nostdlib
+> -%.elf: %.o $(FLATLIBS) arm/flat.lds $(cstart.o)
+> +%.elf: %.o $(FLATLIBS) $(SRCDIR)/arm/flat.lds $(cstart.o)
+>  	$(CC) $(LDFLAGS) -o $@ \
+> -		-Wl,-T,arm/flat.lds,--build-id=none,-Ttext=$(start_addr) \
+> +		-Wl,-T,$(SRCDIR)/arm/flat.lds,--build-id=none,-Ttext=$(start_addr) \
+>  		$(filter %.o, $^) $(FLATLIBS) \
+> -		lib/auxinfo.c -DPROGNAME=\"$(@:.elf=.flat)\"
+> +		$(SRCDIR)/lib/auxinfo.c -DPROGNAME=\"$(@:.elf=.flat)\"
+>  
+>  %.flat: %.elf
+>  	$(OBJCOPY) -O binary $^ $@
+> diff --git a/scripts/asm-offsets.mak b/scripts/asm-offsets.mak
+> index b2578a6..ecf583f 100644
+> --- a/scripts/asm-offsets.mak
+> +++ b/scripts/asm-offsets.mak
+> @@ -29,11 +29,13 @@ define make_asm_offsets
+>  endef
+>  
+>  $(asm-offsets:.h=.s): $(asm-offsets:.h=.c)
+> +	mkdir -p $(dir $@)
+>  	$(CC) $(CFLAGS) -fverbose-asm -S -o $@ $<
 
-I think I'd prefer configure doing this linking. I don't think we'll
-ever have more than
+For some reason I'm not a big fan of all these mkdirs getting sprinkled
+around.  Maybe we can just have the arch makefiles be sure to create
+lib/$(ARCH) first?
 
- ln -sf "$srcdir/$testdir/run" $testdir/
- ln -sf "$srcdir/$testdir/unittests.cfg" $testdir/
- ln -sf "$srcdir/run_tests.sh"
- ln -sf "$srcdir/scripts"
+>  
+>  $(asm-offsets): $(asm-offsets:.h=.s)
+>  	$(call make_asm_offsets)
+> -	cp -f $(asm-offsets) lib/generated
+> +	mkdir -p lib/generated
 
-(And now I see what we want an absolute path for $srcdir.)
+Could make this directory from configure
+
+> +	cp -f $(asm-offsets) lib/generated/
+>  
+>  asm_offsets_clean:
+>  	$(RM) $(asm-offsets) $(asm-offsets:.h=.s) \
+> -- 
+> 2.11.0
+>
 
 Thanks,
-drew
+drew 
