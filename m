@@ -1,92 +1,149 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [RFC kvm-unit-tests PATCH 5/8] Makefile: add explicit mkdir for
- .o targets
-Date: Fri, 7 Apr 2017 16:42:34 +0200
-Message-ID: <20170407144234.kmq2ofvh5e6vyssq@kamzik.brq.redhat.com>
-References: <20170406190727.5624-1-alex.bennee@linaro.org>
- <20170406190727.5624-6-alex.bennee@linaro.org>
+From: Adam Wallis <awallis@codeaurora.org>
+Subject: Re: [RFC 0/9] ARMv8.3 pointer authentication userspace support
+Date: Fri, 7 Apr 2017 11:09:30 -0400
+Message-ID: <68cdfcee-33aa-8511-2fff-4b2308e80b7a@codeaurora.org>
+References: <1491232765-32501-1-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 045B240BE3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 10:40:25 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GNabDrTdbyd0 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Apr 2017 10:40:23 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06A6D40B5B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 10:40:22 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20170406190727.5624-6-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <1491232765-32501-1-git-send-email-mark.rutland@arm.com>
+Content-Language: en-US
+Sender: linux-arch-owner@vger.kernel.org
+To: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: linux-arch@vger.kernel.org, arnd@arndb.de, jiong.wang@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 06, 2017 at 08:07:24PM +0100, Alex Benn=E9e wrote:
-> This is fairly direct way of ensuring the target build directories are
-> created before we build a binary blob. mkdir -p fails gracefully if
-> the directory is already there.
-> =
+On 4/3/2017 11:19 AM, Mark Rutland wrote:
+> This series adds support for the ARMv8.3 pointer authentication extension.
+> 
+> I've included a quick intro to the extension below, with the usual series
+> description below that. The final patch of the series adds additional
+> documentation regarding the extension.
+> 
+> I've based the series on the arm64 for-next/core branch [1]. I'm aware that
+> this series may conflict with other patches currently in flight (e.g.
+> allocation of ELF notes), and I intend to rebase this series as things settle.
+> 
+> I've pushed the series to the arm64/pointer-auth branch [2] of my linux tree.
+> I've also pushed out a necessary bootwrapper patch to the pointer-auth branch
+> [3] of my bootwrapper repo.
+> 
+> 
+> Extension Overview 
+> ==================
+> 
+> The ARMv8.3 pointer authentication extension adds functionality to detect
+> modification of pointer values, mitigating certain classes of attack such as
+> stack smashing, and making return oriented programming attacks harder
+> 
+> The extension introduces the concept of a pointer authentication code (PAC),
+> which is stored in some upper bits of pointers. Each PAC is derived from the
+> original pointer, another 64-bit value (e.g. the stack pointer), and a secret
+> 128-bit key.
+> 
+> New instructions are added which can be used to:
+> 
+> * Insert a PAC into a pointer
+> * Strip a PAC from a pointer
+> * Authenticate strip a PAC from a pointer
+> 
+> If authentication succeeds, the code is removed, yielding the original pointer.
+> If authentication fails, bits are set in the pointer such that it is guaranteed
+> to cause a fault if used.
+> 
+> These instructions can make use of four keys:
+> 
+> * APIAKey (A.K.A. Instruction A key)
+> * APIBKey (A.K.A. Instruction B key)
+> * APDAKey (A.K.A. Data A key)
+> * APDBKey (A.K.A. Data B Key)
+> 
+> A subset of these instruction encodings have been allocated from the HINT
+> space, and will operate as NOPs on any ARMv8 parts which do not feature the
+> extension (or if purposefully disabled by the kernel). Software using only this
+> subset of the instructions should function correctly on all ARMv8-A parts.
+> 
+> Additionally, instructions are added to authenticate small blocks of memory in
+> similar fashion, using APGAKey (A.K.A. Generic key).
+> 
+> 
+> This Series
+> ===========
+> 
+> This series enables the use of instructions using APIAKey, which is initialised
+> and maintained per-process (shared by all threads). This series does not add
+> support for APIBKey, APDAKey, APDBKey, nor APGAKey. The series only supports
+> the use of an architected algorithm.
+> 
+> I've given this some basic testing with a homebrew test suite. More ideally,
+> we'd add some tests to the kernel source tree.
+> 
+> I've added some basic KVM support, but this doesn't cater for systems with
+> mismatched support. Looking forward, we'll need ID register emulation in KVM so
+> that we can hide features from guests to cater for cases like this.
+> 
+> There are also a few questions to consider, e.g:
+> 
+> * Should we expose a per-process data key now, to go with the insn key?
+> * Should keys be per-thread rather than per-process?
+> * Should we expose generic authentication (i.e. APGAKey)?
+> * Should the kernel remove PACs when unwinding user stacks?
+> 
+> Thanks,
+> Mark.
+> 
+> [1] git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
+> [2] git://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git arm64/pointer-auth
+> [3] git://git.kernel.org/pub/scm/linux/kernel/git/mark/boot-wrapper-aarch64.git pointer-auth
+> 
+> Mark Rutland (9):
+>   asm-generic: mm_hooks: allow hooks to be overridden individually
+>   arm64: add pointer authentication register bits
+>   arm64/cpufeature: add ARMv8.3 id_aa64isar1 bits
+>   arm64/cpufeature: detect pointer authentication
+>   arm64: Don't trap host pointer auth use to EL2
+>   arm64: add basic pointer authentication support
+>   arm64: expose PAC bit positions via ptrace
+>   arm64/kvm: context-switch PAC registers
+>   arm64: docs: document pointer authentication
+> 
+>  Documentation/arm64/booting.txt                |  8 +++
+>  Documentation/arm64/pointer-authentication.txt | 78 +++++++++++++++++++++
+>  arch/arm64/Kconfig                             | 23 ++++++
+>  arch/arm64/include/asm/cpucaps.h               |  4 +-
+>  arch/arm64/include/asm/esr.h                   |  3 +-
+>  arch/arm64/include/asm/kvm_arm.h               |  2 +
+>  arch/arm64/include/asm/kvm_emulate.h           | 15 ++++
+>  arch/arm64/include/asm/kvm_host.h              | 12 ++++
+>  arch/arm64/include/asm/mmu.h                   |  5 ++
+>  arch/arm64/include/asm/mmu_context.h           | 25 ++++++-
+>  arch/arm64/include/asm/pointer_auth.h          | 96 ++++++++++++++++++++++++++
+>  arch/arm64/include/asm/sysreg.h                | 30 ++++++++
+>  arch/arm64/include/uapi/asm/hwcap.h            |  1 +
+>  arch/arm64/include/uapi/asm/ptrace.h           |  5 ++
+>  arch/arm64/kernel/cpufeature.c                 | 39 ++++++++++-
+>  arch/arm64/kernel/cpuinfo.c                    |  1 +
+>  arch/arm64/kernel/head.S                       | 19 ++++-
+>  arch/arm64/kernel/ptrace.c                     | 39 +++++++++++
+>  arch/arm64/kvm/hyp/sysreg-sr.c                 | 43 ++++++++++++
+>  include/asm-generic/mm_hooks.h                 | 12 ++++
+>  include/uapi/linux/elf.h                       |  1 +
+>  21 files changed, 454 insertions(+), 7 deletions(-)
+>  create mode 100644 Documentation/arm64/pointer-authentication.txt
+>  create mode 100644 arch/arm64/include/asm/pointer_auth.h
+> 
 
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> ---
->  Makefile | 5 +++++
->  1 file changed, 5 insertions(+)
-> =
+Tested on Qualcomm platform with ARMV8 architecture (without 8.3 extensions) for
+backwards compatibility (meaning I did not pass -march=armv8.3-a to GCC; only
+-msign-return-address=all). The HINT PACIASP/AUTIASP caused no issues and no
+other issues were encountered. Will test again once a platform is available with
+8.3-a extensions.
 
-> diff --git a/Makefile b/Makefile
-> index 781186e..56598df 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -79,8 +79,13 @@ $(LIBFDT_archive): $(addprefix $(LIBFDT_objdir)/,$(LIB=
-FDT_OBJS))
->  	$(AR) rcs $@ $^
->  =
+Thanks
 
->  %.o: %.S
-> +	mkdir -p $(dir $@)
->  	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
->  =
-
-> +%.o: %.c
-> +	mkdir -p $(dir $@)
-> +	$(CC) $(CFLAGS) -c -o $@ $<
-
-This rule will override any arch makefile %.o rule.  I don't think we want
-to do that.  And I guess that means we should move the '%.o: %.S' rule up
-above the include $(TEST_DIR)/Makefile so we don't override those either.
-
-> +
->  -include */.*.d */*/.*.d
->  =
-
->  all: $(shell git -C $(SRCDIR) rev-parse --verify --short=3D8 HEAD >build=
--head 2>/dev/null)
-> -- =
-
-> 2.11.0
->
-
-I'd prefer we just have a couple places where we do mkdir:  one in the
-common Makefile for common dirs (BUILD_DIRS) and one in the arch makefile
-for arch dirs (ARCH_BUILD_DIRS).
-
-The example linked below looks like something we might be able to apply.
-
-https://www.gnu.org/software/make/manual/html_node/Prerequisite-Types.html#=
-Prerequisite-Types
-
-Thanks,
-drew
+-- 
+Adam Wallis
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
