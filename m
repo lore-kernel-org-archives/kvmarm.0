@@ -1,26 +1,29 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [RFC kvm-unit-tests PATCH 4/8] Makefiles: use explicit path for
- including sub-Makefiles
-Date: Fri, 7 Apr 2017 14:20:10 +0200
-Message-ID: <20170407122010.umftrqr2qqd6g3q4@kamzik.brq.redhat.com>
-References: <20170406190727.5624-1-alex.bennee@linaro.org>
- <20170406190727.5624-5-alex.bennee@linaro.org>
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH v2 1/9] KVM: add kvm_request_pending
+Date: Fri, 7 Apr 2017 15:15:37 +0200
+Message-ID: <20170407131537.GE23559@potion>
+References: <20170331160658.4331-1-drjones@redhat.com>
+ <20170331160658.4331-2-drjones@redhat.com>
+ <20170404153014.GL11752@cbox>
+ <20170404164120.xvlvyebvcqoci5cu@kamzik.brq.redhat.com>
+ <20170405131049.GD6369@potion> <20170405173918.GA27123@cbox>
+ <20170405202016.GG6369@potion> <20170406142535.GD27123@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B246740A86
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 08:17:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C78F40BC5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 09:13:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iQh9iZx1Ibwl for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Apr 2017 08:17:58 -0400 (EDT)
+ with ESMTP id UHEthOhcMgJX for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Apr 2017 09:13:25 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD5B140A80
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 08:17:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E0D4B40BAC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 09:13:24 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20170406190727.5624-5-alex.bennee@linaro.org>
+In-Reply-To: <20170406142535.GD27123@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,161 +33,83 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 06, 2017 at 08:07:23PM +0100, Alex Benn=E9e wrote:
-> I would of thought VPATH took care of this but apparently not.
-> =
-
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> ---
->  Makefile               | 8 ++++----
->  arm/Makefile           | 2 +-
->  arm/Makefile.arm       | 2 +-
->  arm/Makefile.arm64     | 2 +-
->  powerpc/Makefile       | 2 +-
->  powerpc/Makefile.ppc64 | 2 +-
->  x86/Makefile           | 2 +-
->  x86/Makefile.i386      | 2 +-
->  x86/Makefile.x86_64    | 2 +-
->  9 files changed, 12 insertions(+), 12 deletions(-)
-> =
-
-> diff --git a/Makefile b/Makefile
-> index 80bc57e..781186e 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -32,14 +32,14 @@ cflatobjs :=3D \
->  	lib/stack.o
->  =
-
->  # libfdt paths
-> -LIBFDT_objdir =3D lib/libfdt
-> -LIBFDT_srcdir =3D lib/libfdt
-> +LIBFDT_objdir =3D $(SRCDIR)/lib/libfdt
-> +LIBFDT_srcdir =3D $(SRCDIR)/lib/libfdt
->  LIBFDT_archive =3D $(LIBFDT_objdir)/libfdt.a
->  LIBFDT_include =3D $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_INCLUDES))
->  LIBFDT_version =3D $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_VERSION))
-
-Can't we just do VPATH +=3D $LIBFDT_srcdir instead?
-
->  =
-
-> -#include architecure specific make rules
-> -include $(TEST_DIR)/Makefile
-> +#include architecture specific make rules
-> +include $(SRCDIR)/$(TEST_DIR)/Makefile
-
-Yeah, it appears VPATH doesn't apply to 'include', and I don't see any
-variable that does...  The only way to get make to look elsewhere is
-by adding '-I dir' to the make invocation, which we don't want to require.
-I guess adding SRCDIR to all include lines, like this patch does, is the
-only way to go.
-
->  =
-
->  # cc-option
->  # Usage: OP_CFLAGS+=3D$(call cc-option, -falign-functions=3D0, -malign-f=
-unctions=3D0)
-> diff --git a/arm/Makefile b/arm/Makefile
-> index 369a38b..8a007ab 100644
-> --- a/arm/Makefile
-> +++ b/arm/Makefile
-> @@ -1 +1 @@
-> -include $(TEST_DIR)/Makefile.$(ARCH)
-> +include $(SRCDIR)/$(TEST_DIR)/Makefile.$(ARCH)
-> diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-> index 92f3757..6b57284 100644
-> --- a/arm/Makefile.arm
-> +++ b/arm/Makefile.arm
-> @@ -22,6 +22,6 @@ cflatobjs +=3D lib/arm/stack.o
->  # arm specific tests
->  tests =3D
->  =
-
-> -include $(TEST_DIR)/Makefile.common
-> +include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->  =
-
->  arch_clean: arm_clean
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 0b0761c..b5fc1ec 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -14,7 +14,7 @@ cflatobjs +=3D lib/arm64/spinlock.o
->  # arm64 specific tests
->  tests =3D
->  =
-
-> -include $(TEST_DIR)/Makefile.common
-> +include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->  =
-
->  arch_clean: arm_clean
->  	$(RM) lib/arm64/.*.d
-> diff --git a/powerpc/Makefile b/powerpc/Makefile
-> index 369a38b..8a007ab 100644
-> --- a/powerpc/Makefile
-> +++ b/powerpc/Makefile
-> @@ -1 +1 @@
-> -include $(TEST_DIR)/Makefile.$(ARCH)
-> +include $(SRCDIR)/$(TEST_DIR)/Makefile.$(ARCH)
-> diff --git a/powerpc/Makefile.ppc64 b/powerpc/Makefile.ppc64
-> index 3da3a83..3c0294a 100644
-> --- a/powerpc/Makefile.ppc64
-> +++ b/powerpc/Makefile.ppc64
-> @@ -20,7 +20,7 @@ cflatobjs +=3D lib/ppc64/spinlock.o
->  # ppc64 specific tests
->  tests =3D
->  =
-
-> -include $(TEST_DIR)/Makefile.common
-> +include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->  =
-
->  arch_clean: powerpc_clean
->  	$(RM) lib/ppc64/.*.d
-> diff --git a/x86/Makefile b/x86/Makefile
-> index 369a38b..8a007ab 100644
-> --- a/x86/Makefile
-> +++ b/x86/Makefile
-> @@ -1 +1 @@
-> -include $(TEST_DIR)/Makefile.$(ARCH)
-> +include $(SRCDIR)/$(TEST_DIR)/Makefile.$(ARCH)
-> diff --git a/x86/Makefile.i386 b/x86/Makefile.i386
-> index 284b9e5..d801b80 100644
-> --- a/x86/Makefile.i386
-> +++ b/x86/Makefile.i386
-> @@ -7,4 +7,4 @@ cflatobjs +=3D lib/x86/setjmp32.o
->  tests =3D $(TEST_DIR)/taskswitch.flat $(TEST_DIR)/taskswitch2.flat \
->  	$(TEST_DIR)/cmpxchg8b.flat
->  =
-
-> -include $(TEST_DIR)/Makefile.common
-> +include $(SRCDIR)/$(TEST_DIR)/Makefile.common
-> diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-> index 3e2821e..30f82a6 100644
-> --- a/x86/Makefile.x86_64
-> +++ b/x86/Makefile.x86_64
-> @@ -17,7 +17,7 @@ tests +=3D $(TEST_DIR)/vmx.flat
->  tests +=3D $(TEST_DIR)/tscdeadline_latency.flat
->  tests +=3D $(TEST_DIR)/intel-iommu.flat
->  =
-
-> -include $(TEST_DIR)/Makefile.common
-> +include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->  =
-
->  $(TEST_DIR)/hyperv_clock.elf: $(TEST_DIR)/hyperv_clock.o
->  =
-
-> -- =
-
-> 2.11.0
->
-
-Thanks,
-drew
+MjAxNy0wNC0wNiAxNjoyNSswMjAwLCBDaHJpc3RvZmZlciBEYWxsOgo+IE9uIFdlZCwgQXByIDA1
+LCAyMDE3IGF0IDEwOjIwOjE3UE0gKzAyMDAsIFJhZGltIEtyxI1tw6HFmSB3cm90ZToKPj4gMjAx
+Ny0wNC0wNSAxOTozOSswMjAwLCBDaHJpc3RvZmZlciBEYWxsOgo+PiA+IE9uIFdlZCwgQXByIDA1
+LCAyMDE3IGF0IDAzOjEwOjUwUE0gKzAyMDAsIFJhZGltIEtyxI1tw6HFmSB3cm90ZToKPj4geDg2
+IHVzZXMgS1ZNX1JFUV9NQ0xPQ0tfSU5QUk9HUkVTUyBmb3Igc3luY2hyb25pemF0aW9uIGJldHdl
+ZW4gY29yZXMgYW5kCj4+IHRoZSB1c2UgaW4gdGhpcyBzZXJpZXMgbG9va2VkIHZlcnkgc2ltaWxh
+ci4KPj4gCj4+ID4+ICAgKiBtZW1vcnkgYmFycmllcnMgYXJlIG5lY2Vzc2FyeSBmb3IgY29ycmVj
+dCBiZWhhdmlvciwgc2VlCj4+ID4+ICAgKiBEb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL3ZjcHUt
+cmVxdWVzdHMucnN0Lgo+PiA+PiAgICoKPj4gPj4gICAqIFJFQURfT05DRSgpIGlzIG5vdCBuZWNl
+c3NhcnkgZm9yIGNvcnJlY3RuZXNzLCBidXQgc2ltcGxpZmllcwo+PiA+PiAgICogcmVhc29uaW5n
+IGJ5IGNvbnN0cmljdGluZyB0aGUgZ2VuZXJhdGVkIGNvZGUuCj4+ID4+ICAgKi8KPj4gPj4gCj4+
+ID4+IEkgY29uc2lkZXJlZCBSRUFEX09OQ0UoKSB0byBiZSBzZWxmLWRvY3VtZW50aW5nLiA6KQo+
+PiA+IAo+PiA+IEkgcmVhbGl6ZSB0aGF0IEknbSBwcm9iYWJseSB1bnVzdWFsbHkgc2xvdyBpbiB0
+aGlzIHdob2xlIGFyZWEsIGJ1dCB1c2luZwo+PiA+IFJFQURfT05DRSgpIHdoZXJlIHVubmVjZXNz
+YXJ5IGRvZXNuJ3QgaGVscCBteSByZWFzb25pbmcsIGJ1dCBtYWtlcyBtZQo+PiA+IHdvbmRlciB3
+aGljaCBwYXJ0IG9mIHRoaXMgSSBkaWRuJ3QgdW5kZXJzdGFuZCwgc28gSSBkb24ndCBzZWVtIHRv
+IGFncmVlCj4+ID4gd2l0aCB0aGUgc3RhdGVtZW50IHRoYXQgaXQgc2ltcGxpZmllcyByZWFzb25p
+bmcuCj4+IAo+PiBObywgSSB0aGluayBpdCBpcyBhIG1hdHRlciBvZiBhcHByb2FjaC4gIFdoZW4g
+SSBzZWUgYSBSRUFEX09OQ0UoKQo+PiB3aXRob3V0IGEgY29tbWVudCwgSSB0aGluayB0aGF0IHRo
+ZSBwcm9ncmFtbWVyIHdhcyBhd2FyZSB0aGF0IHRoaXMKPj4gbWVtb3J5IGNhbiBjaGFuZ2UgYXQg
+YW55IHRpbWUgYW5kIHdhcyBkZWZlbnNpdmUgYWJvdXQgaXQuCj4gCj4gSSB0aGluayBpdCBtZWFu
+cyB0aGF0IHlvdSBoYXZlIHRvIHJlYWQgaXQgZXhhY3RseSBvbmNlIGF0IHRoZSBleGFjdCBmbG93
+Cj4gaW4gdGhlIGNvZGUgd2hlcmUgaXQncyBwbGFjZWQuCgpUaGUgY29tcGlsZXIgY2FuIHN0aWxs
+IHJlb3JkZXIgc3Vycm91bmRpbmcgbm9uLXZvbGF0aWxlIGNvZGUsIGJ1dApyZWFkaW5nIGV4YWN0
+bHkgb25jZSBpcyB0aGUgc3Vic2V0IG9mIG1lYW5pbmcgdGhhdCBSRUFEX09OQ0UoKSBzaG91bGQK
+aGF2ZS4gIE5vdCBhc3NpZ25pbmcgaXQgYW55IG1vcmUgbWVhbmluZyBzb3VuZHMgZ29vZC4KCj4+
+IEkgY29uc2lkZXIgdGhpcyB1c2UgdG8gc2ltcGxpZnkgZnV0dXJlIGRldmVsb3BtZW50Ogo+PiBX
+ZSB0aGluayBub3cgdGhhdCBSRUFEX09OQ0UoKSBpcyBub3QgbmVlZGVkLCBidXQgdmNwdS0+cmVx
+dWVzdHMgaXMgc3RpbGwKPj4gdm9sYXRpbGUgYW5kIGZ1dHVyZSBjaGFuZ2VzIGluIGNvZGUgbWln
+aHQgbWFrZSBSRUFEX09OQ0UoKSBuZWNlc3NhcnkuCj4+IFByZWVtcHRpdmVseSBwdXR0aW5nIFJF
+QURfT05DRSgpIHRoZXJlIHNhdmVzIHVzIHRoaW5raW5nIG9yIGhhcmQtdG8tZmluZAo+PiBidWdz
+Lgo+PiAKPiAKPiBJJ20gYWx3YXlzIGEgYml0IHNjZXB0aWNhbCBhYm91dCBzdWNoIHJlYXNvbmlu
+ZyBhcyBJIHRoaW5rIHdpdGhvdXQgYQo+IGNvbXBsZXRlIHVuZGVyc3RhbmRpbmcgb2Ygd2hhdCBu
+ZWVkcyB0byBjaGFuZ2Ugd2hlbiBkb2luZyBjaGFuZ2VzLCB3ZSdyZQo+IGxpa2VseSB0byBnZXQg
+aXQgd3JvbmcgYW55d2F5LgoKSSB0aGluayB3ZSBjYW5ub3QgYWNoaWV2ZSBhbmQgbWFpbnRhaW4g
+YSBjb21wbGV0ZSB1bmRlcnN0YW5kaW5nLCBzbwpnZXR0aW5nIHRoaW5ncyB3cm9uZyBpcyBqdXN0
+IGEgbWF0dGVyIG9mIHRpbWUuCgpJdCBpcyBhbG1vc3QgaW1wb3NzaWJsZSB0byBicmVhayBvcmRl
+cmluZyBvZiB2Y3B1LT5yZXF1ZXN0cywgdGhvdWdoLgoKPj4gPiBUbyBtZSwgUkVBRF9PTkNFKCkg
+aW5kaWNhdGVzIHRoYXQgdGhlcmUncyBzb21lIGZsb3cgaW4gdGhlIGNvZGUgd2hlcmUKPj4gPiBp
+dCdzIGVzc2VudGlhbCB0aGF0IHRoZSBjb21waWxlciBkb2Vzbid0IGdlbmVyYXRlIG11bHRpcGxl
+IGxvYWRzLCBidXQKPj4gPiB0aGF0IHdlIG9ubHkgc2VlIGEgbW9tZW50YXJ5IHNpbmdsZS1yZWFk
+IHNuYXBzaG90IG9mIHRoZSB2YWx1ZSwgYW5kIHRoaXMKPj4gPiBkb2Vzbid0IHNlZW0gdG8gYmUg
+dGhlIGNhc2UuCj4+IAo+PiBUaGUgY29tcGlsZXIgY2FuIGFsc28gc3F1YXNoIG11bHRpcGxlIHJl
+YWRzIHRvZ2V0aGVyLCB3aGljaCBpcyBtb3JlCj4+IGRhbmdlcm91cyBpbiB0aGlzIGNhc2UgYXMg
+d2Ugd291bGQgbm90IG5vdGljZSBhIG5ldyByZXF1ZXN0cy4gIEF2b2lkaW5nCj4+IFJFQURfT05D
+RSgpIHJlcXVpcmVzIGEgYmV0dGVyIGtub3dsZWRnZSBvZiB0aGUgY29tcGlsZXIgYWxnb3JpdGht
+cyB0aGF0Cj4+IHByb3ZlIHdoaWNoIHZhcmlhYmxlIGNhbiBiZSBvcHRpbWl6ZWQuCj4gCj4gSXNu
+J3QgdGhhdCBjb3ZlcmVkIGJ5IHRoZSBtZW1vcnkgYmFycmllcnMgdGhhdCBpbXBseSBjb21waWxl
+ciBiYXJyaWVycwo+IHRoYXQgd2UgKHdpbGwpIGhhdmUgYmV0d2VlbiBjaGVja2luZyB0aGUgbW9k
+ZSBhbmQgdGhlIHJlcXVlc3RzIHZhcmlhYmxlPwoKSXQgaXMsIGFzbSB2b2xhdGlsZSAoIiIgOjo6
+ICJtZW1vcnkiKSBpcyBlbm91Z2guCgpUaGUgbWluaW1hbCBjb25kaXRpb25zIHRoYXQgd291bGQg
+cmVxdWlyZSBleHBsaWNpdCBiYXJyaWVyOgogMSkgbm90IGhhdmluZyB2Y3B1LT5tb2RlKCksIGJl
+Y2F1c2UgaXQgY2Fubm90IHdvcmsgd2l0aG91dCBtZW1vcnkKICAgIGJhcnJpZXJzCiAyKSB0aGUg
+aW5zdHJ1Y3Rpb24gdGhhdCBkaXNhYmxlcyBpbnRlcnJ1cHRzIGRvZXNuJ3QgaGF2ZSAibWVtb3J5
+IgogICAgY29uc3RyYWludCAgKHRoZSBzbXBfcm1iIGluIGJldHdlZW4gaXMgbm90IG5lY2Vzc2Fy
+eSBoZXJlKQoKQW5kIG9mIGNvdXJzZSwgdGhlcmUgd291bGQgaGF2ZSB0byBiZSBubyBmdW5jdGlv
+bnMgdGhhdCB3b3VsZCBjb250YWluIGEKY29tcGlsZXIgYmFycmllciBvciB0aGVpciBib2RpZXMg
+cmVtYWluZWQgdW5rbm93biBpbiBiZXR3ZWVuIGRpc2FibGluZwppbnRlcnJ1cHRzIGFuZCBjaGVj
+a2luZyByZXF1ZXN0cyAuLi4KCj4+IFRoZSBkaWZmZXJlbmNlIGlzIHJlYWxseSBtaW5vciBhbmQg
+SSBhZ3JlZSB0aGF0IHRoZSBjb21tZW50IGlzIGJhZC4KPj4gVGhlIG9ubHkgY29tbWVudCBJJ20g
+aGFwcHkgd2l0aCBpcyBub3RoaW5nLCB0aG91Z2ggLi4uIGV2ZW4gIlJFQURfT05DRSgpCj4+IGlz
+IG5vdCBuZWNlc3NhcnkiIGlzIHdyb25nIGFzIHRoYXQgbWlnaHQgY2hhbmdlIHdpdGhvdXQgdXMg
+bm90aWNpbmcuCj4gCj4gIlJFQURfT05DRSgpIGlzIG5vdCBuZWNlc3NhcnkiIHdoaWxlIGFjdHVh
+bGx5IHVzaW5nIFJFQURfT05DRSgpIGlzIGEKPiB0ZXJyaWJsZSBjb21tZW50IGJlY2F1c2UgaXQg
+bWFrZXMgcmVhZGVycyBqdXN0IGRvdWJ0IHRoZSBjb3JyZWN0bmVzcyBvZgo+IHRoZSBjb2RlLgo+
+IAo+IFJlZ2FyZGxlc3Mgb2Ygd2hldGhlciBvciBub3Qgd2UgZW5kIHVwIHVzaW5nIFJFQURfT05D
+RSgpLCBJIHRoaW5rIHdlCj4gc2hvdWxkIGRvY3VtZW50IGV4YWN0bHkgd2hhdCB0aGUgcmVxdWly
+ZW1lbnRzIGFyZSBmb3IgYWNjZXNzaW5nIHRoaXMKPiB2YXJpYWJsZSBhdCB0aGlzIHRpbWUsIGku
+ZS4gYW55IGFzc3VtcHRpb24gYWJvdXQgcHJlY2VkaW5nIGJhcnJpZXJzIG9yCj4gb3RoZXIgZmxv
+d3Mgb2YgZXZlbnRzIHRoYXQgd2UgcmVseSBvbi4KCk1ha2VzIHNlbnNlLiAgTXkgcGl0Y2ggYXQg
+dGhlIGRvY3VtZW50YXRpb24gYWZ0ZXIgZHJvcHBpbmcgUkVBRF9PTkNFKCk6CgogIC8qCiAgICog
+IFRoZSByZXR1cm4gdmFsdWUgb2Yga3ZtX3JlcXVlc3RfcGVuZGluZygpIGlzIGltcGxpY2l0bHkg
+dm9sYXRpbGUKICAgKiAgYW5kIG11c3QgYmUgcHJvdGVjdGVkIGZyb20gcmVvcmRlcmluZyBieSB0
+aGUgY2FsbGVyLgogICAqLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
