@@ -1,115 +1,96 @@
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH v2 1/9] KVM: add kvm_request_pending
-Date: Fri, 7 Apr 2017 15:15:37 +0200
-Message-ID: <20170407131537.GE23559@potion>
-References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-2-drjones@redhat.com>
- <20170404153014.GL11752@cbox>
- <20170404164120.xvlvyebvcqoci5cu@kamzik.brq.redhat.com>
- <20170405131049.GD6369@potion> <20170405173918.GA27123@cbox>
- <20170405202016.GG6369@potion> <20170406142535.GD27123@cbox>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [RFC kvm-unit-tests PATCH 7/8] Makefiles: fix up the x86 build
+ include and link paths
+Date: Fri, 7 Apr 2017 15:31:52 +0200
+Message-ID: <20170407133152.j4lrz43cj4vkl7ox@kamzik.brq.redhat.com>
+References: <20170406190727.5624-1-alex.bennee@linaro.org>
+ <20170406190727.5624-8-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C78F40BC5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 09:13:26 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UHEthOhcMgJX for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Apr 2017 09:13:25 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E0D4B40BAC
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 09:13:24 -0400 (EDT)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170406142535.GD27123@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <20170406190727.5624-8-alex.bennee@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-MjAxNy0wNC0wNiAxNjoyNSswMjAwLCBDaHJpc3RvZmZlciBEYWxsOgo+IE9uIFdlZCwgQXByIDA1
-LCAyMDE3IGF0IDEwOjIwOjE3UE0gKzAyMDAsIFJhZGltIEtyxI1tw6HFmSB3cm90ZToKPj4gMjAx
-Ny0wNC0wNSAxOTozOSswMjAwLCBDaHJpc3RvZmZlciBEYWxsOgo+PiA+IE9uIFdlZCwgQXByIDA1
-LCAyMDE3IGF0IDAzOjEwOjUwUE0gKzAyMDAsIFJhZGltIEtyxI1tw6HFmSB3cm90ZToKPj4geDg2
-IHVzZXMgS1ZNX1JFUV9NQ0xPQ0tfSU5QUk9HUkVTUyBmb3Igc3luY2hyb25pemF0aW9uIGJldHdl
-ZW4gY29yZXMgYW5kCj4+IHRoZSB1c2UgaW4gdGhpcyBzZXJpZXMgbG9va2VkIHZlcnkgc2ltaWxh
-ci4KPj4gCj4+ID4+ICAgKiBtZW1vcnkgYmFycmllcnMgYXJlIG5lY2Vzc2FyeSBmb3IgY29ycmVj
-dCBiZWhhdmlvciwgc2VlCj4+ID4+ICAgKiBEb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL3ZjcHUt
-cmVxdWVzdHMucnN0Lgo+PiA+PiAgICoKPj4gPj4gICAqIFJFQURfT05DRSgpIGlzIG5vdCBuZWNl
-c3NhcnkgZm9yIGNvcnJlY3RuZXNzLCBidXQgc2ltcGxpZmllcwo+PiA+PiAgICogcmVhc29uaW5n
-IGJ5IGNvbnN0cmljdGluZyB0aGUgZ2VuZXJhdGVkIGNvZGUuCj4+ID4+ICAgKi8KPj4gPj4gCj4+
-ID4+IEkgY29uc2lkZXJlZCBSRUFEX09OQ0UoKSB0byBiZSBzZWxmLWRvY3VtZW50aW5nLiA6KQo+
-PiA+IAo+PiA+IEkgcmVhbGl6ZSB0aGF0IEknbSBwcm9iYWJseSB1bnVzdWFsbHkgc2xvdyBpbiB0
-aGlzIHdob2xlIGFyZWEsIGJ1dCB1c2luZwo+PiA+IFJFQURfT05DRSgpIHdoZXJlIHVubmVjZXNz
-YXJ5IGRvZXNuJ3QgaGVscCBteSByZWFzb25pbmcsIGJ1dCBtYWtlcyBtZQo+PiA+IHdvbmRlciB3
-aGljaCBwYXJ0IG9mIHRoaXMgSSBkaWRuJ3QgdW5kZXJzdGFuZCwgc28gSSBkb24ndCBzZWVtIHRv
-IGFncmVlCj4+ID4gd2l0aCB0aGUgc3RhdGVtZW50IHRoYXQgaXQgc2ltcGxpZmllcyByZWFzb25p
-bmcuCj4+IAo+PiBObywgSSB0aGluayBpdCBpcyBhIG1hdHRlciBvZiBhcHByb2FjaC4gIFdoZW4g
-SSBzZWUgYSBSRUFEX09OQ0UoKQo+PiB3aXRob3V0IGEgY29tbWVudCwgSSB0aGluayB0aGF0IHRo
-ZSBwcm9ncmFtbWVyIHdhcyBhd2FyZSB0aGF0IHRoaXMKPj4gbWVtb3J5IGNhbiBjaGFuZ2UgYXQg
-YW55IHRpbWUgYW5kIHdhcyBkZWZlbnNpdmUgYWJvdXQgaXQuCj4gCj4gSSB0aGluayBpdCBtZWFu
-cyB0aGF0IHlvdSBoYXZlIHRvIHJlYWQgaXQgZXhhY3RseSBvbmNlIGF0IHRoZSBleGFjdCBmbG93
-Cj4gaW4gdGhlIGNvZGUgd2hlcmUgaXQncyBwbGFjZWQuCgpUaGUgY29tcGlsZXIgY2FuIHN0aWxs
-IHJlb3JkZXIgc3Vycm91bmRpbmcgbm9uLXZvbGF0aWxlIGNvZGUsIGJ1dApyZWFkaW5nIGV4YWN0
-bHkgb25jZSBpcyB0aGUgc3Vic2V0IG9mIG1lYW5pbmcgdGhhdCBSRUFEX09OQ0UoKSBzaG91bGQK
-aGF2ZS4gIE5vdCBhc3NpZ25pbmcgaXQgYW55IG1vcmUgbWVhbmluZyBzb3VuZHMgZ29vZC4KCj4+
-IEkgY29uc2lkZXIgdGhpcyB1c2UgdG8gc2ltcGxpZnkgZnV0dXJlIGRldmVsb3BtZW50Ogo+PiBX
-ZSB0aGluayBub3cgdGhhdCBSRUFEX09OQ0UoKSBpcyBub3QgbmVlZGVkLCBidXQgdmNwdS0+cmVx
-dWVzdHMgaXMgc3RpbGwKPj4gdm9sYXRpbGUgYW5kIGZ1dHVyZSBjaGFuZ2VzIGluIGNvZGUgbWln
-aHQgbWFrZSBSRUFEX09OQ0UoKSBuZWNlc3NhcnkuCj4+IFByZWVtcHRpdmVseSBwdXR0aW5nIFJF
-QURfT05DRSgpIHRoZXJlIHNhdmVzIHVzIHRoaW5raW5nIG9yIGhhcmQtdG8tZmluZAo+PiBidWdz
-Lgo+PiAKPiAKPiBJJ20gYWx3YXlzIGEgYml0IHNjZXB0aWNhbCBhYm91dCBzdWNoIHJlYXNvbmlu
-ZyBhcyBJIHRoaW5rIHdpdGhvdXQgYQo+IGNvbXBsZXRlIHVuZGVyc3RhbmRpbmcgb2Ygd2hhdCBu
-ZWVkcyB0byBjaGFuZ2Ugd2hlbiBkb2luZyBjaGFuZ2VzLCB3ZSdyZQo+IGxpa2VseSB0byBnZXQg
-aXQgd3JvbmcgYW55d2F5LgoKSSB0aGluayB3ZSBjYW5ub3QgYWNoaWV2ZSBhbmQgbWFpbnRhaW4g
-YSBjb21wbGV0ZSB1bmRlcnN0YW5kaW5nLCBzbwpnZXR0aW5nIHRoaW5ncyB3cm9uZyBpcyBqdXN0
-IGEgbWF0dGVyIG9mIHRpbWUuCgpJdCBpcyBhbG1vc3QgaW1wb3NzaWJsZSB0byBicmVhayBvcmRl
-cmluZyBvZiB2Y3B1LT5yZXF1ZXN0cywgdGhvdWdoLgoKPj4gPiBUbyBtZSwgUkVBRF9PTkNFKCkg
-aW5kaWNhdGVzIHRoYXQgdGhlcmUncyBzb21lIGZsb3cgaW4gdGhlIGNvZGUgd2hlcmUKPj4gPiBp
-dCdzIGVzc2VudGlhbCB0aGF0IHRoZSBjb21waWxlciBkb2Vzbid0IGdlbmVyYXRlIG11bHRpcGxl
-IGxvYWRzLCBidXQKPj4gPiB0aGF0IHdlIG9ubHkgc2VlIGEgbW9tZW50YXJ5IHNpbmdsZS1yZWFk
-IHNuYXBzaG90IG9mIHRoZSB2YWx1ZSwgYW5kIHRoaXMKPj4gPiBkb2Vzbid0IHNlZW0gdG8gYmUg
-dGhlIGNhc2UuCj4+IAo+PiBUaGUgY29tcGlsZXIgY2FuIGFsc28gc3F1YXNoIG11bHRpcGxlIHJl
-YWRzIHRvZ2V0aGVyLCB3aGljaCBpcyBtb3JlCj4+IGRhbmdlcm91cyBpbiB0aGlzIGNhc2UgYXMg
-d2Ugd291bGQgbm90IG5vdGljZSBhIG5ldyByZXF1ZXN0cy4gIEF2b2lkaW5nCj4+IFJFQURfT05D
-RSgpIHJlcXVpcmVzIGEgYmV0dGVyIGtub3dsZWRnZSBvZiB0aGUgY29tcGlsZXIgYWxnb3JpdGht
-cyB0aGF0Cj4+IHByb3ZlIHdoaWNoIHZhcmlhYmxlIGNhbiBiZSBvcHRpbWl6ZWQuCj4gCj4gSXNu
-J3QgdGhhdCBjb3ZlcmVkIGJ5IHRoZSBtZW1vcnkgYmFycmllcnMgdGhhdCBpbXBseSBjb21waWxl
-ciBiYXJyaWVycwo+IHRoYXQgd2UgKHdpbGwpIGhhdmUgYmV0d2VlbiBjaGVja2luZyB0aGUgbW9k
-ZSBhbmQgdGhlIHJlcXVlc3RzIHZhcmlhYmxlPwoKSXQgaXMsIGFzbSB2b2xhdGlsZSAoIiIgOjo6
-ICJtZW1vcnkiKSBpcyBlbm91Z2guCgpUaGUgbWluaW1hbCBjb25kaXRpb25zIHRoYXQgd291bGQg
-cmVxdWlyZSBleHBsaWNpdCBiYXJyaWVyOgogMSkgbm90IGhhdmluZyB2Y3B1LT5tb2RlKCksIGJl
-Y2F1c2UgaXQgY2Fubm90IHdvcmsgd2l0aG91dCBtZW1vcnkKICAgIGJhcnJpZXJzCiAyKSB0aGUg
-aW5zdHJ1Y3Rpb24gdGhhdCBkaXNhYmxlcyBpbnRlcnJ1cHRzIGRvZXNuJ3QgaGF2ZSAibWVtb3J5
-IgogICAgY29uc3RyYWludCAgKHRoZSBzbXBfcm1iIGluIGJldHdlZW4gaXMgbm90IG5lY2Vzc2Fy
-eSBoZXJlKQoKQW5kIG9mIGNvdXJzZSwgdGhlcmUgd291bGQgaGF2ZSB0byBiZSBubyBmdW5jdGlv
-bnMgdGhhdCB3b3VsZCBjb250YWluIGEKY29tcGlsZXIgYmFycmllciBvciB0aGVpciBib2RpZXMg
-cmVtYWluZWQgdW5rbm93biBpbiBiZXR3ZWVuIGRpc2FibGluZwppbnRlcnJ1cHRzIGFuZCBjaGVj
-a2luZyByZXF1ZXN0cyAuLi4KCj4+IFRoZSBkaWZmZXJlbmNlIGlzIHJlYWxseSBtaW5vciBhbmQg
-SSBhZ3JlZSB0aGF0IHRoZSBjb21tZW50IGlzIGJhZC4KPj4gVGhlIG9ubHkgY29tbWVudCBJJ20g
-aGFwcHkgd2l0aCBpcyBub3RoaW5nLCB0aG91Z2ggLi4uIGV2ZW4gIlJFQURfT05DRSgpCj4+IGlz
-IG5vdCBuZWNlc3NhcnkiIGlzIHdyb25nIGFzIHRoYXQgbWlnaHQgY2hhbmdlIHdpdGhvdXQgdXMg
-bm90aWNpbmcuCj4gCj4gIlJFQURfT05DRSgpIGlzIG5vdCBuZWNlc3NhcnkiIHdoaWxlIGFjdHVh
-bGx5IHVzaW5nIFJFQURfT05DRSgpIGlzIGEKPiB0ZXJyaWJsZSBjb21tZW50IGJlY2F1c2UgaXQg
-bWFrZXMgcmVhZGVycyBqdXN0IGRvdWJ0IHRoZSBjb3JyZWN0bmVzcyBvZgo+IHRoZSBjb2RlLgo+
-IAo+IFJlZ2FyZGxlc3Mgb2Ygd2hldGhlciBvciBub3Qgd2UgZW5kIHVwIHVzaW5nIFJFQURfT05D
-RSgpLCBJIHRoaW5rIHdlCj4gc2hvdWxkIGRvY3VtZW50IGV4YWN0bHkgd2hhdCB0aGUgcmVxdWly
-ZW1lbnRzIGFyZSBmb3IgYWNjZXNzaW5nIHRoaXMKPiB2YXJpYWJsZSBhdCB0aGlzIHRpbWUsIGku
-ZS4gYW55IGFzc3VtcHRpb24gYWJvdXQgcHJlY2VkaW5nIGJhcnJpZXJzIG9yCj4gb3RoZXIgZmxv
-d3Mgb2YgZXZlbnRzIHRoYXQgd2UgcmVseSBvbi4KCk1ha2VzIHNlbnNlLiAgTXkgcGl0Y2ggYXQg
-dGhlIGRvY3VtZW50YXRpb24gYWZ0ZXIgZHJvcHBpbmcgUkVBRF9PTkNFKCk6CgogIC8qCiAgICog
-IFRoZSByZXR1cm4gdmFsdWUgb2Yga3ZtX3JlcXVlc3RfcGVuZGluZygpIGlzIGltcGxpY2l0bHkg
-dm9sYXRpbGUKICAgKiAgYW5kIG11c3QgYmUgcHJvdGVjdGVkIGZyb20gcmVvcmRlcmluZyBieSB0
-aGUgY2FsbGVyLgogICAqLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
-aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On Thu, Apr 06, 2017 at 08:07:26PM +0100, Alex Bennée wrote:
+> We still need to tell the compiler the correct search path for finding
+> headers and the like. This is slightly complicated by the "dynamic"
+> asm search path which is in our build tree but (may be) symlinked to
+> the right architectures headers.
+> 
+> Also we explicitly include SRCDIR for the linking scripts as VPATH
+> doesn't seem to find them well enough.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  Makefile            |  2 +-
+>  x86/Makefile.common | 10 +++++-----
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index c9fea88..22da887 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -78,7 +78,7 @@ $(libcflat): $(cflatobjs)
+>  	$(AR) rcs $@ $^
+>  
+>  include $(LIBFDT_srcdir)/Makefile.libfdt
+> -$(LIBFDT_archive): CFLAGS += -ffreestanding -I lib -I lib/libfdt -Wno-sign-compare
+> +$(LIBFDT_archive): CFLAGS += -ffreestanding -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -Wno-sign-compare
+>  $(LIBFDT_archive): $(addprefix $(LIBFDT_objdir)/,$(LIBFDT_OBJS))
+>  	$(AR) rcs $@ $^
+>  
+> diff --git a/x86/Makefile.common b/x86/Makefile.common
+> index ef6e543..032ed19 100644
+> --- a/x86/Makefile.common
+> +++ b/x86/Makefile.common
+> @@ -17,7 +17,7 @@ cflatobjs += lib/x86/acpi.o
+>  cflatobjs += lib/x86/stack.o
+>  
+>  $(libcflat): LDFLAGS += -nostdlib
+> -$(libcflat): CFLAGS += -ffreestanding -I lib
+> +$(libcflat): CFLAGS += -ffreestanding -I $(SRCDIR)/lib -I lib
+>  
+>  CFLAGS += -m$(bits)
+>  CFLAGS += -O1
+> @@ -31,8 +31,8 @@ libgcc := $(shell $(CC) -m$(bits) --print-libgcc-file-name)
+>  .PRECIOUS: %.elf %.o
+>  
+>  FLATLIBS = lib/libcflat.a $(libgcc)
+> -%.elf: %.o $(FLATLIBS) x86/flat.lds $(cstart.o)
+> -	$(CC) $(CFLAGS) -nostdlib -o $@ -Wl,-T,x86/flat.lds \
+> +%.elf: %.o $(FLATLIBS) $(SRCDIR)/x86/flat.lds $(cstart.o)
+> +	$(CC) $(CFLAGS) -nostdlib -o $@ -Wl,-T,$(SRCDIR)/x86/flat.lds \
+>  		$(filter %.o, $^) $(FLATLIBS)
+>  
+>  %.flat: %.elf
+> @@ -60,10 +60,10 @@ scripts-common += $(TEST_DIR)/unittests.cfg
+>  test_cases: $(tests-common) $(tests)
+>  
+>  
+> -$(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I lib -I lib/x86
+> +$(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I $(SRCDIR)/lib -I $(SRCDIR)/lib/x86 -I lib
+>  
+>  $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
+> -	$(CC) -m32 -nostdlib -o $@ -Wl,-T,$(TEST_DIR)/realmode.lds $^
+> +	$(CC) -m32 -nostdlib -o $@ -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
+>  
+>  $(TEST_DIR)/realmode.o: bits = 32
+>  
+> -- 
+> 2.11.0
+>
+
+I'm curious if we can drop this patch by telling VPATH about all the
+directories: VPATH += $(SRCDIR)/$(TEST_DIR) $(SRCDIR)/lib ...
+
+If so, then I think the earlier patch that sets VPATH to SRCDIR should
+set it to the list of all common dirs, and the arch makefiles will += in
+whatever else they need.
+
+Thanks,
+drew
