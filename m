@@ -1,144 +1,76 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC 8/9] arm64/kvm: context-switch PAC registers
-Date: Fri, 7 Apr 2017 16:41:29 +0100
-Message-ID: <973af0d9-f7bc-24ee-567d-23e0e487b970@arm.com>
-References: <1491232765-32501-1-git-send-email-mark.rutland@arm.com>
- <1491232765-32501-9-git-send-email-mark.rutland@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v3 8/8] arm64: exception: check shared writable page in
+ SEI handler
+Date: Fri, 07 Apr 2017 16:56:45 +0100
+Message-ID: <58E7B6BD.3000401@arm.com>
+References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
+ <1490869877-118713-9-git-send-email-xiexiuqi@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <1491232765-32501-9-git-send-email-mark.rutland@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, arnd@arndb.de, catalin.marinas@arm.com, christoffer.dall@linaro.org, jiong.wang@arm.com, kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org, suzuki.poulose@arm.com, will.deacon@arm.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE77C40C54
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 11:54:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id K5leUeBcyDr3 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Apr 2017 11:54:53 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9952F40C2F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Apr 2017 11:54:53 -0400 (EDT)
+In-Reply-To: <1490869877-118713-9-git-send-email-xiexiuqi@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Xie XiuQi <xiexiuqi@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org, wuquanming@huawei.com, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, rostedt@goodmis.org, gengdongjiu@huawei.com, wangxiongfeng2@huawei.com, linux-acpi@vger.kernel.org, Wang Xiongfeng <wangxiongfengi2@huawei.com>, shiju.jose@huawei.com, zhengqiang10@huawei.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, hanjun.guo@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Mark,
+Hi Xie XiuQi,
 
-On 03/04/17 16:19, Mark Rutland wrote:
-> If we have pointer authentication support, a guest may wish to use it.
-> This patch adds the infrastructure to allow it to do so.
+On 30/03/17 11:31, Xie XiuQi wrote:
+> From: Wang Xiongfeng <wangxiongfeng2@huawei.com>
 > 
-> This is sufficient for basic testing, but not for real-world usage. A
-> guest will still see pointer authentication support advertised in the ID
-> registers, and we will need to trap accesses to these to provide
-> santized values.
-> 
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org> 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: kvmarm@lists.cs.columbia.edu
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 15 +++++++++++++
->  arch/arm64/include/asm/kvm_host.h    | 12 ++++++++++
->  arch/arm64/kvm/hyp/sysreg-sr.c       | 43 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 70 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index f5ea0ba..0c3cb43 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -28,6 +28,8 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_mmio.h>
->  #include <asm/ptrace.h>
-> +#include <asm/cpucaps.h>
-> +#include <asm/cpufeature.h>
->  #include <asm/cputype.h>
->  #include <asm/virt.h>
->  
-> @@ -49,6 +51,19 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
->  		vcpu->arch.hcr_el2 |= HCR_E2H;
->  	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
->  		vcpu->arch.hcr_el2 &= ~HCR_RW;
-> +
-> +	/*
-> +	 * Address auth and generic auth share the same enable bits, so we have
-> +	 * to ensure both are uniform before we can enable support in a guest.
-> +	 * Until we have the infrastructure to detect uniform absence of a
-> +	 * feature, only permit the case when both are supported.
-> +	 *
-> +	 * Note that a guest will still see the feature in ID_AA64_ISAR1 until
-> +	 * we introduce code to emulate the ID registers.
-> +	 */
-> +	if (cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH) &&
-> +	    cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH))
-> +		vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
+> Since SEI is asynchronous, the error data has been consumed. So we must
+> suppose that all the memory data current process can write are
+> contaminated. If the process doesn't have shared writable pages, the
+> process will be killed, and the system will continue running normally.
+> Otherwise, the system must be terminated, because the error has been
+> propagated to other processes running on other cores, and recursively
+> the error may be propagated to several another processes.
 
-Instead of unconditionally allowing the guest to access this feature...
+This is pretty complicated. We can't guarantee that another CPU hasn't modified
+the page tables while we do this, (so its racy). We can't guarantee that the
+corrupt data hasn't been sent over the network or written to disk in the mean
+time (so its not enough).
 
->  }
->  
->  static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e7705e7..b25f710 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -133,6 +133,18 @@ enum vcpu_sysreg {
->  	PMSWINC_EL0,	/* Software Increment Register */
->  	PMUSERENR_EL0,	/* User Enable Register */
->  
-> +	/* Pointer Authentication Registers */
-> +	APIAKEYLO_EL1,
-> +	APIAKEYHI_EL1,
-> +	APIBKEYLO_EL1,
-> +	APIBKEYHI_EL1,
-> +	APDAKEYLO_EL1,
-> +	APDAKEYHI_EL1,
-> +	APDBKEYLO_EL1,
-> +	APDBKEYHI_EL1,
-> +	APGAKEYLO_EL1,
-> +	APGAKEYHI_EL1,
-> +
->  	/* 32bit specific registers. Keep them at the end of the range */
->  	DACR32_EL2,	/* Domain Access Control Register */
->  	IFSR32_EL2,	/* Instruction Fault Status Register */
-> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> index 9341376..3440b42 100644
-> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> @@ -18,6 +18,8 @@
->  #include <linux/compiler.h>
->  #include <linux/kvm_host.h>
->  
-> +#include <asm/cpucaps.h>
-> +#include <asm/cpufeature.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_hyp.h>
->  
-> @@ -31,6 +33,24 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
->   * pstate, and guest must save everything.
->   */
->  
-> +#define __save_ap_key(regs, key) \
-> +	regs[key ## KEYLO_EL1] = read_sysreg_s(SYS_ ## key ## KEYLO_EL1); \
-> +	regs[key ## KEYHI_EL1] = read_sysreg_s(SYS_ ## key ## KEYHI_EL1)
-> +
-> +static void __hyp_text __sysreg_save_ap_keys(struct kvm_cpu_context *ctxt)
-> +{
-> +	if (cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH)) {
-> +		__save_ap_key(ctxt->sys_regs, APIA);
-> +		__save_ap_key(ctxt->sys_regs, APIB);
-> +		__save_ap_key(ctxt->sys_regs, APDA);
-> +		__save_ap_key(ctxt->sys_regs, APDB);
-> +	}
-> +
-> +	if (cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH)) {
-> +		__save_ap_key(ctxt->sys_regs, APGA);
-> +	}
-> +}
-> +
+The scenario you have is a write of corrupt data to memory where another CPU
+reading it doesn't know the value is corrupt.
 
-...which immediately translates in quite a bit of sysreg churn on both
-host and guest (specially given that these are not banked by exception
-level), could we make it a bit more lazy instead?
+The hardware gives us quite a lot of help containing errors. The RAS
+specification (DDI 0587A) describes your scenario as error propagation in '2.1.2
+Architectural error propagation', and then classifies it in '2.1.3
+Architecturally infected, containable and uncontainable' as uncontained because
+the value is no longer in the general-purpose registers. For uncontained errors
+we should panic().
 
-Even an "enable on first use" would be good, given that it is likely
-that we'll have non PAC-enabled VMs for quite a while.
+We shouldn't need to try to track errors after we get a notification as the
+hardware has done this for us.
 
-Thoughts?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Firmware-first does complicate this if events like this are not delivered using
+a synchronous external abort, as Linux may have PSTATE.A masked preventing
+SError Interrupts from being taken. It looks like PSTATE.A is masked much more
+often than is necessary. I will look into cleaning this up.
+
+
+Thanks,
+
+James
