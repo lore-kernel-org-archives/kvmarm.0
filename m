@@ -1,132 +1,76 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 1/9] KVM: add kvm_request_pending
-Date: Sat, 8 Apr 2017 11:23:14 -0700
-Message-ID: <20170408182314.GD29201@lvm>
-References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-2-drjones@redhat.com>
- <20170404153014.GL11752@cbox>
- <20170404164120.xvlvyebvcqoci5cu@kamzik.brq.redhat.com>
- <20170405131049.GD6369@potion>
- <20170405173918.GA27123@cbox>
- <20170405202016.GG6369@potion>
- <20170406142535.GD27123@cbox>
- <20170407131537.GE23559@potion>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 11/22] KVM: arm64: ITS: Interpret MAPD ITT_addr field
+Date: Sat, 08 Apr 2017 19:58:54 +0100
+Message-ID: <86lgrabua9.fsf@arm.com>
+References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
+        <1490607072-21610-12-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170407131537.GE23559@potion>
+In-Reply-To: <1490607072-21610-12-git-send-email-eric.auger@redhat.com> (Eric
+        Auger's message of "Mon, 27 Mar 2017 11:31:01 +0200")
 Sender: kvm-owner@vger.kernel.org
-To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: Christoffer Dall <cdall@linaro.org>, Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 07, 2017 at 03:15:37PM +0200, Radim Krčmář wrote:
-> 2017-04-06 16:25+0200, Christoffer Dall:
-> > On Wed, Apr 05, 2017 at 10:20:17PM +0200, Radim Krčmář wrote:
-> >> 2017-04-05 19:39+0200, Christoffer Dall:
-> >> > On Wed, Apr 05, 2017 at 03:10:50PM +0200, Radim Krčmář wrote:
-> >> x86 uses KVM_REQ_MCLOCK_INPROGRESS for synchronization between cores and
-> >> the use in this series looked very similar.
-> >> 
-> >> >>   * memory barriers are necessary for correct behavior, see
-> >> >>   * Documentation/virtual/kvm/vcpu-requests.rst.
-> >> >>   *
-> >> >>   * READ_ONCE() is not necessary for correctness, but simplifies
-> >> >>   * reasoning by constricting the generated code.
-> >> >>   */
-> >> >> 
-> >> >> I considered READ_ONCE() to be self-documenting. :)
-> >> > 
-> >> > I realize that I'm probably unusually slow in this whole area, but using
-> >> > READ_ONCE() where unnecessary doesn't help my reasoning, but makes me
-> >> > wonder which part of this I didn't understand, so I don't seem to agree
-> >> > with the statement that it simplifies reasoning.
-> >> 
-> >> No, I think it is a matter of approach.  When I see a READ_ONCE()
-> >> without a comment, I think that the programmer was aware that this
-> >> memory can change at any time and was defensive about it.
-> > 
-> > I think it means that you have to read it exactly once at the exact flow
-> > in the code where it's placed.
-> 
-> The compiler can still reorder surrounding non-volatile code, but
-> reading exactly once is the subset of meaning that READ_ONCE() should
-> have.  Not assigning it any more meaning sounds good.
-> 
-> >> I consider this use to simplify future development:
-> >> We think now that READ_ONCE() is not needed, but vcpu->requests is still
-> >> volatile and future changes in code might make READ_ONCE() necessary.
-> >> Preemptively putting READ_ONCE() there saves us thinking or hard-to-find
-> >> bugs.
-> >> 
-> > 
-> > I'm always a bit sceptical about such reasoning as I think without a
-> > complete understanding of what needs to change when doing changes, we're
-> > likely to get it wrong anyway.
-> 
-> I think we cannot achieve and maintain a complete understanding, so
-> getting things wrong is just a matter of time.
-> 
-> It is almost impossible to break ordering of vcpu->requests, though.
-> 
-> >> > To me, READ_ONCE() indicates that there's some flow in the code where
-> >> > it's essential that the compiler doesn't generate multiple loads, but
-> >> > that we only see a momentary single-read snapshot of the value, and this
-> >> > doesn't seem to be the case.
-> >> 
-> >> The compiler can also squash multiple reads together, which is more
-> >> dangerous in this case as we would not notice a new requests.  Avoiding
-> >> READ_ONCE() requires a better knowledge of the compiler algorithms that
-> >> prove which variable can be optimized.
-> > 
-> > Isn't that covered by the memory barriers that imply compiler barriers
-> > that we (will) have between checking the mode and the requests variable?
-> 
-> It is, asm volatile ("" ::: "memory") is enough.
-> 
-> The minimal conditions that would require explicit barrier:
->  1) not having vcpu->mode(), because it cannot work without memory
->     barriers
->  2) the instruction that disables interrupts doesn't have "memory"
->     constraint  (the smp_rmb in between is not necessary here)
-> 
-> And of course, there would have to be no functions that would contain a
-> compiler barrier or their bodies remained unknown in between disabling
-> interrupts and checking requests ...
-> 
-> >> The difference is really minor and I agree that the comment is bad.
-> >> The only comment I'm happy with is nothing, though ... even "READ_ONCE()
-> >> is not necessary" is wrong as that might change without us noticing.
-> > 
-> > "READ_ONCE() is not necessary" while actually using READ_ONCE() is a
-> > terrible comment because it makes readers just doubt the correctness of
-> > the code.
-> > 
-> > Regardless of whether or not we end up using READ_ONCE(), I think we
-> > should document exactly what the requirements are for accessing this
-> > variable at this time, i.e. any assumption about preceding barriers or
-> > other flows of events that we rely on.
-> 
-> Makes sense.  My pitch at the documentation after dropping READ_ONCE():
+On Mon, Mar 27 2017 at 10:31:01 AM, Eric Auger <eric.auger@redhat.com> wrote:
+> Up to now the MAPD ITT_addr had been ignored. We will need it
+> for save/restore. Let's record it in the its_device struct.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+>
+> v3 -> v4:
+> - in vgic_its_cmd_handle_mapd, itt_addr directly is shifted
+> - correct ittaddr bitmask to support 48bit GPA
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index ddd2780..89a0db7 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -103,6 +103,7 @@ struct its_device {
+>  	/* the head for the list of ITTEs */
+>  	struct list_head itt_head;
+>  	u32 nb_eventid_bits;
+> +	gpa_t itt_addr;
+>  	u32 device_id;
+>  };
+>  
+> @@ -553,6 +554,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
+>  #define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
+>  #define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
+>  #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
+> +#define its_cmd_get_ittaddr(cmd)	its_cmd_mask_field(cmd, 2,  8, 47)
+>  #define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
+>  #define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
+>  
+> @@ -824,6 +826,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>  	u32 device_id = its_cmd_get_deviceid(its_cmd);
+>  	bool valid = its_cmd_get_validbit(its_cmd);
+>  	u8 nb_eventid_bits = its_cmd_get_size(its_cmd) + 1;
+> +	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd) << 8;
 
-I'm confused again, I thought you wanted to keep READ_ONCE().
+Same remark as previously. I'd rather have the macro returning something
+that is directly useful rather than having to shift afterwards.
 
-> 
->   /*
->    *  The return value of kvm_request_pending() is implicitly volatile
-
-why is that, actually?
-
->    *  and must be protected from reordering by the caller.
->    */
-
-Can we be specific about what that means?  (e.g. must be preceded by a
-full smp_mb() - or whatever the case is).
-
-Perhaps we should just let Drew respin at this point, in case he's
-confident about the right path, and then pick up from there?
+>  	struct its_device *device;
+>  
+>  	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
+> @@ -855,6 +858,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>  
+>  	device->device_id = device_id;
+>  	device->nb_eventid_bits = nb_eventid_bits;
+> +	device->itt_addr = itt_addr;
+>  
+>  	INIT_LIST_HEAD(&device->itt_head);
 
 Thanks,
--Christoffer
+
+	M.
+-- 
+Jazz is not dead. It just smells funny.
