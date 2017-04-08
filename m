@@ -1,25 +1,44 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 03/22] arm/arm64: vgic: turn vgic_find_mmio_region into public
-Date: Sat, 08 Apr 2017 11:06:22 +0100
-Message-ID: <86pogncixt.fsf@arm.com>
+Subject: Re: [PATCH v4 04/22] KVM: arm64: ITS: KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+ group
+Date: Sat, 08 Apr 2017 11:07:17 +0100
+Message-ID: <86lgrbciwa.fsf@arm.com>
 References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
-        <1490607072-21610-4-git-send-email-eric.auger@redhat.com>
+ <1490607072-21610-5-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1490607072-21610-4-git-send-email-eric.auger@redhat.com> (Eric
-        Auger's message of "Mon, 27 Mar 2017 11:30:53 +0200")
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3606340C2F
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Apr 2017 06:05:10 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8W6KGrR7KcMW for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  8 Apr 2017 06:05:09 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E08640C1C
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Apr 2017 06:05:09 -0400 (EDT)
+In-Reply-To: <1490607072-21610-5-git-send-email-eric.auger@redhat.com> (Eric
+ Auger's message of "Mon, 27 Mar 2017 11:30:54 +0200")
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 27 2017 at 10:30:53 AM, Eric Auger <eric.auger@redhat.com> wrote:
-> We plan to use vgic_find_mmio_region in vgic-its.c so let's
-> turn it into a public function.
+On Mon, Mar 27 2017 at 10:30:54 AM, Eric Auger <eric.auger@redhat.com> wrote:
+> The ITS KVM device exposes a new KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+> group which allows the userspace to save/restore ITS registers.
 >
-> Also let's take the opportunity to rename the region parameter
-> into regions to emphasize this latter is an array of regions.
+> At this stage the get/set/has operations are not yet implemented.
 >
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > Reviewed-by: Andre Przywara <andre.przywara@arm.com>
