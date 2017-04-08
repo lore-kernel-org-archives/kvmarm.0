@@ -1,36 +1,26 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: replace vcpu->arch.pause with a
- vcpu request
-Date: Sat, 8 Apr 2017 01:35:33 -0700
-Message-ID: <20170408083533.GA28739@lvm>
-References: <20170331160658.4331-1-drjones@redhat.com>
- <20170331160658.4331-5-drjones@redhat.com>
- <20170404160417.GN11752@cbox>
- <20170404175718.su4tjx3psyez3qee@kamzik.brq.redhat.com>
- <20170404190438.GF31208@cbox>
- <63209d09-0c45-0bb2-322b-e422f1360df7@redhat.com>
- <20170405070959.GA1526@cbox>
- <91ab3b0b-c30e-7a19-f60f-882d26388ef5@redhat.com>
- <20170406141443.GC27123@cbox>
- <b435db93-9d46-52d6-7aa7-458dbbc2b7ef@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 01/22] KVM: arm/arm64: Add vITS save/restore API
+ documentation
+Date: Sat, 08 Apr 2017 11:03:51 +0100
+Message-ID: <86y3vbcj20.fsf@arm.com>
+References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
+ <1490607072-21610-2-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7096740CD2
- for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Apr 2017 04:33:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D1D3A40CE4
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Apr 2017 06:01:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7rry0kQchHE9 for <kvmarm@lists.cs.columbia.edu>;
- Sat,  8 Apr 2017 04:33:17 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5DEBA40CD1
- for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Apr 2017 04:33:17 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id w64so6956627wma.0
- for <kvmarm@lists.cs.columbia.edu>; Sat, 08 Apr 2017 01:35:36 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <b435db93-9d46-52d6-7aa7-458dbbc2b7ef@redhat.com>
+ with ESMTP id xCB8dkMJLFSf for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  8 Apr 2017 06:01:52 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D34140CA2
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Apr 2017 06:01:51 -0400 (EDT)
+In-Reply-To: <1490607072-21610-2-git-send-email-eric.auger@redhat.com> (Eric
+ Auger's message of "Mon, 27 Mar 2017 11:30:51 +0200")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -40,56 +30,108 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: marc.zyngier@arm.com, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 07, 2017 at 07:47:29PM +0800, Paolo Bonzini wrote:
-> 
-> 
-> On 06/04/2017 22:14, Christoffer Dall wrote:
-> >> So it seems like there are no races after all in KVM/ARM code
-> >
-> > No races after Drew's fix has been applied to set vcpu->mode =
-> > IN_GUEST_MODE, before checking the pause flag, correct?  (I think that's
-> > what the spin model below is modeling).
-> 
-> Yes.  All of them include the vcpu->mode = IN_GUEST_MODE assignment and
-> (implicitly because spin is sequentially consistent) the memory barrier.
-> 
-> >> After this experiment, I think I like Drew's KVM_REQ_PAUSE more than I did
-> >> yesterday.  However, yet another alternative is to leave pause/power_off as
-> >> they are, while taking some inspiration from his patch to do some cleanups:
-> >>
-> >> 1) change the "if"
-> >>
-> >>                 if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
-> >>                         vcpu->arch.power_off || vcpu->arch.pause) {
-> >>
-> >> to test kvm_requests_pending instead of pause/power_off
-> >>
-> >> 2) clear KVM_REQ_VCPU_EXIT before the other "if":
-> >>
-> >>                 if (vcpu->arch.power_off || vcpu->arch.pause)
-> >>                         vcpu_sleep(vcpu);
-> >
-> > I like using requests as only requests from one thread to the VCPU
-> > thread, and not to maintain specific state about a VCPU.
-> > 
-> > The benefit of Drew's approach is that since these pieces of state are
-> > boolean, you can have just a single check in the critical path in the
-> > run loop instead of having to access multiple fields.
-> 
-> I think you'd still need two checks for KVM_REQ_PAUSE/KVM_REQ_POWEROFF:
-> one to check whether to sleep, and one to check whether to abort the
-> vmentry.
-> 
-> Pause and power_off could be merged into a single bitmask if necessary, too.
+On Mon, Mar 27 2017 at 10:30:51 AM, Eric Auger <eric.auger@redhat.com> wrote:
+> Add description for how to access vITS registers and how to flush/restore
+> vITS tables into/from memory
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+> v3 -> v4:
+> - take into account Peter's comments:
+>   - typos
+>   - KVM_DEV_ARM_VGIC_GRP_ITS_TABLES kvm_device_attr = 0
+>   - add a validity bit in DTE
+>   - document all fields in CTE and ITE
+>   - document ABI revision
+> - take into account Andre's comments:
+>   - document restrictions about GITS_CREADR writing and GITS_IIDR
+>   - document -EBUSY error if one or more VCPUS are runnning
+>   - document 64b registers only can be accessed with 64b access
+> - itt_addr field matches bits [51:8] of the itt_addr
+>
+> v1 -> v2:
+> - DTE and ITE now are 8 bytes
+> - DTE and ITE now indexed by deviceid/eventid
+> - use ITE name instead of ITTE
+> - mentions ITT_addr matches bits [51:8] of the actual address
+> - mentions LE layout
+> ---
+>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 118 +++++++++++++++++++++
+>  1 file changed, 118 insertions(+)
+>
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> index 6081a5b..0902d20 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> @@ -36,3 +36,121 @@ Groups:
+>      -ENXIO:  ITS not properly configured as required prior to setting
+>               this attribute
+>      -ENOMEM: Memory shortage when allocating ITS internal data
+> +
+> +  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+> +  Attributes:
+> +      The attr field of kvm_device_attr encodes the offset of the
+> +      ITS register, relative to the ITS control frame base address
+> +      (ITS_base).
+> +
+> +      kvm_device_attr.addr points to a __u64 value whatever the width
+> +      of the addressed register (32/64 bits). 64 bit registers can only
+> +      be accessed with full length.
+> +
+> +      Writes to read-only registers are ignored by the kernel except for:
+> +      - GITS_READR. It needs to be restored otherwise commands in the queue
+> +        will be re-executed after CWRITER setting. Writing this register is
+> +        allowed if the ITS is not enabled (GITS_CTLR.enable = 0). Also it
+> +        needs to be restored after GITS_CBASER since a write to GITS_CBASER
+> +        resets GITS_CREADR.
+> +      - GITS_IIDR. Its Revision field encodes the table layout ABI revision.
+> +
+> +      For other registers, getting or setting a register has the same
+> +      effect as reading/writing the register on real hardware.
+> +  Errors:
+> +    -ENXIO: Offset does not correspond to any supported register
+> +    -EFAULT: Invalid user pointer for attr->addr
+> +    -EINVAL: Offset is not 64-bit aligned
+> +    -EBUSY: one or more VCPUS are running
+> +
+> +  KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
+> +  Attributes
+> +       The attr field of kvm_device_attr must be zero.
+> +
+> +       request the flush-save/restore of the ITS tables, namely
+> +       the device table, the collection table, all the ITT tables,
+> +       the LPI pending tables. On save, the tables are flushed
+> +       into guest memory at the location provisioned by the guest
+> +       in GITS_BASER (device and collection tables), in the MAPD
+> +       command (ITT_addr), GICR_PENDBASERs (pending tables).
 
-True, a sort of flags.
+May I echo Andre's concern here? Seeing the GICR_PENDBASER registers
+here feels wrong. The pending table is a redistributor concept, and is
+local to it. Even more, it is perfectly possible to use the
+redistributors (and its pending tables) without an ITS by using the
+GICR_SETLPIR registers.
 
-I think at this point, I'll let Drew decide what looks cleanest when he
-writes up the next revision and review those.
+Granted, we do not support this (and I'm *not* looking forward to
+supporting it), but I would rather implement a redistributor flush than
+using the ITS to indirectly force it. That's not how the HW works, and I
+don't think we should deviate from it.
 
-Thanks for the thorough help and checking!
--Christoffer
+I appreciate this brings additional complexity to userspace (having to
+iterate over the vcpus or the redistributors is likely more costly than
+hitting the ITS which is likely to be unique), but sticking to the
+letter of the architecture is probably our best bet. Each time we tried
+to deviate from it, we've had to backtrack (and I'm using the royal "we"
+here).
+
+Any chance you could revisit this aspect?
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny.
