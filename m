@@ -1,165 +1,102 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 06/22] KVM: arm64: ITS: Implement vgic_its_has_attr_regs and attr_regs_access
-Date: Sat, 08 Apr 2017 11:24:28 +0100
-Message-ID: <86d1cnci3n.fsf@arm.com>
+Subject: Re: [PATCH v4 07/22] KVM: arm64: ITS: Implement vgic_mmio_uaccess_write_its_creadr
+Date: Sat, 08 Apr 2017 11:36:06 +0100
+Message-ID: <868tnbchk9.fsf@arm.com>
 References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
-        <1490607072-21610-7-git-send-email-eric.auger@redhat.com>
+        <1490607072-21610-8-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1490607072-21610-7-git-send-email-eric.auger@redhat.com> (Eric
-        Auger's message of "Mon, 27 Mar 2017 11:30:56 +0200")
+In-Reply-To: <1490607072-21610-8-git-send-email-eric.auger@redhat.com> (Eric
+        Auger's message of "Mon, 27 Mar 2017 11:30:57 +0200")
 Sender: kvm-owner@vger.kernel.org
 To: Eric Auger <eric.auger@redhat.com>
 Cc: eric.auger.pro@gmail.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 27 2017 at 10:30:56 AM, Eric Auger <eric.auger@redhat.com> wrote:
-> This patch implements vgic_its_has_attr_regs and vgic_its_attr_regs_access
-> upon the MMIO framework. VGIC ITS KVM device KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-> group becomes functional.
->
-> At least GITS_CREADR requires to differentiate a guest write action from a
-> user access. As such let's introduce a new uaccess_its_write
-> vgic_register_region callback.
+On Mon, Mar 27 2017 at 10:30:57 AM, Eric Auger <eric.auger@redhat.com> wrote:
+> GITS_CREADR needs to be restored so let's implement the associated
+> uaccess_write_its callback. The write only is allowed if the its
+> is disabled.
 >
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >
 > ---
 >
 > v3 -> v4:
-> - remove changes to the REGISTER_ITS_DESC macro. This will be handled in
->   subsequent patch with the introduction of a new REGISTER_ITS_DESC_UACCESS
->   macro
-> - fix IIDR access and add a comment wrt full length access
-> - handle endianness
-> - add kvm lock and vcpus lock
+> - REGISTER_ITS_DESC_UACCESS now introduced in this patch
+> - we now check the its is disabled
 > ---
->  virt/kvm/arm/vgic/vgic-its.c  | 78 +++++++++++++++++++++++++++++++++++++++++--
->  virt/kvm/arm/vgic/vgic-mmio.h |  9 +++--
->  2 files changed, 83 insertions(+), 4 deletions(-)
+>  virt/kvm/arm/vgic/vgic-its.c | 37 +++++++++++++++++++++++++++++++++++--
+>  1 file changed, 35 insertions(+), 2 deletions(-)
 >
 > diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index f687e91..9b9ea86 100644
+> index 9b9ea86..a5f3abe 100644
 > --- a/virt/kvm/arm/vgic/vgic-its.c
 > +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1469,14 +1469,88 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->  int vgic_its_has_attr_regs(struct kvm_device *dev,
->  			   struct kvm_device_attr *attr)
->  {
-> -	return -ENXIO;
-> +	const struct vgic_register_region *region;
-> +	struct vgic_io_device iodev = {
-> +		.regions = its_registers,
-> +		.nr_regions = ARRAY_SIZE(its_registers),
-> +	};
-> +	gpa_t offset = attr->attr;
-> +
-> +	region = vgic_find_mmio_region(iodev.regions,
-> +				       iodev.nr_regions,
-> +				       offset);
-> +	if (!region)
-> +		return -ENXIO;
-> +
-> +	return 0;
+> @@ -1213,6 +1213,28 @@ static unsigned long vgic_mmio_read_its_creadr(struct kvm *kvm,
+>  	return extract_bytes(its->creadr, addr & 0x7, len);
 >  }
 >  
->  int vgic_its_attr_regs_access(struct kvm_device *dev,
->  			      struct kvm_device_attr *attr,
->  			      u64 *reg, bool is_write)
->  {
-> -	return -ENXIO;
-> +	const struct vgic_register_region *region;
-> +	struct vgic_io_device iodev = {
-> +		.regions = its_registers,
-> +		.nr_regions = ARRAY_SIZE(its_registers),
-> +	};
-> +	struct vgic_its *its = dev->private;
-> +	gpa_t addr, offset = attr->attr;
-> +	unsigned int len;
-> +	unsigned long data = 0;
-> +	int ret = 0;
+> +static void vgic_mmio_uaccess_write_its_creadr(struct kvm *kvm,
+> +					       struct vgic_its *its,
+> +					       gpa_t addr, unsigned int len,
+> +					       unsigned long val)
+> +{
+> +	u32 reg;
 > +
-> +	/*
-> +	 * Among supported registers, only GITS_CTLR (0x0) and GITS_IIDR (0x4)
-> +	 * are 32 bits. Others are 64 bits.
-> +	 */
-> +	if ((offset < 0x8 && offset & 0x3) || (offset >= 0x8 && offset & 0x7))
-> +		return -EINVAL;
+> +	mutex_lock(&its->cmd_lock);
+> +
+> +	if (its->enabled)
+> +		goto out;
+> + 
+> +	reg = update_64bit_reg(its->creadr, addr & 7, len, val);
+> +	reg = ITS_CMD_OFFSET(reg);
+> +	if (reg >= ITS_CMD_BUFFER_SIZE(its->cbaser))
+> +		goto out;
+> +
+> +	its->creadr = reg;
 
-Can you use the actual register names instead of raw offsets? It's
-certainly be more readable.
+Careful. Here, you're loosing the "Stalled" bit. We do not implement
+support for it yet, but I wonder if we should preserve it. If not, we
+should at least document that we're purposely stripping that bit.
 
-> +
-> +	mutex_lock(&dev->kvm->lock);
-> +
-> +	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base)) {
-> +		ret = -ENXIO;
-> +		goto out;
-> +	}
-> +
-> +	region = vgic_find_mmio_region(iodev.regions,
-> +				       iodev.nr_regions,
-> +				       offset);
-> +	if (!region) {
-> +		ret = -ENXIO;
-> +		goto out;
-> +	}
-> +
-> +	if (!lock_all_vcpus(dev->kvm)) {
-> +		ret = -EBUSY;
-> +		goto out;
-> +	}
-> +
-> +	addr = its->vgic_its_base + offset;
-> +
-> +	/*
-> +	 * Only full length register accesses are supported although
-> +	 * the architecture spec theoretically allows upper/lower 32
-> +	 * bits to be accessed independently
-> +	 */
-> +	len = region->access_flags & VGIC_ACCESS_64bit ? 8 : 4;
-> +
-> +	if (is_write) {
-> +		data = vgic_data_mmio_bus_to_host(reg, len);
-> +		if (region->uaccess_its_write)
-> +			region->uaccess_its_write(dev->kvm, its, addr,
-> +						  len, data);
-> +		else
-> +			region->its_write(dev->kvm, its, addr, len, data);
-> +	} else {
-> +		data = region->its_read(dev->kvm, its, addr, len);
-> +		vgic_data_host_to_mmio_bus(reg, len, data);
-> +	}
-> +	unlock_all_vcpus(dev->kvm);
 > +out:
-> +	mutex_unlock(&dev->kvm->lock);
-> +	return ret;
+> +	mutex_unlock(&its->cmd_lock);
+> +}
+> +
+>  #define BASER_INDEX(addr) (((addr) / sizeof(u64)) & 0x7)
+>  static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm,
+>  					      struct vgic_its *its,
+> @@ -1317,6 +1339,16 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+>  	.its_write = wr,					\
 >  }
 >  
->  static int vgic_its_has_attr(struct kvm_device *dev,
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-> index 6eec91b..becc473 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.h
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
-> @@ -36,8 +36,13 @@ struct vgic_register_region {
->  	};
->  	unsigned long (*uaccess_read)(struct kvm_vcpu *vcpu, gpa_t addr,
->  				      unsigned int len);
-> -	void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
-> -			      unsigned int len, unsigned long val);
-> +	union {
-> +		void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
-> +				      unsigned int len, unsigned long val);
-> +		void (*uaccess_its_write)(struct kvm *kvm, struct vgic_its *its,
-> +					  gpa_t addr, unsigned int len,
-> +					  unsigned long val);
-> +	};
->  };
->  
->  extern struct kvm_io_device_ops kvm_io_gic_ops;
-
-Other that that, looks good to me
+> +#define REGISTER_ITS_DESC_UACCESS(off, rd, wr, uwr, length, acc)\
+> +{								\
+> +	.reg_offset = off,					\
+> +	.len = length,						\
+> +	.access_flags = acc,					\
+> +	.its_read = rd,						\
+> +	.its_write = wr,					\
+> +	.uaccess_its_write = uwr,				\
+> +}
+> +
+>  static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
+>  			      gpa_t addr, unsigned int len, unsigned long val)
+>  {
+> @@ -1339,8 +1371,9 @@ static struct vgic_register_region its_registers[] = {
+>  	REGISTER_ITS_DESC(GITS_CWRITER,
+>  		vgic_mmio_read_its_cwriter, vgic_mmio_write_its_cwriter, 8,
+>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+> -	REGISTER_ITS_DESC(GITS_CREADR,
+> -		vgic_mmio_read_its_creadr, its_mmio_write_wi, 8,
+> +	REGISTER_ITS_DESC_UACCESS(GITS_CREADR,
+> +		vgic_mmio_read_its_creadr, its_mmio_write_wi,
+> +		vgic_mmio_uaccess_write_its_creadr, 8,
+>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>  	REGISTER_ITS_DESC(GITS_BASER,
+>  		vgic_mmio_read_its_baser, vgic_mmio_write_its_baser, 0x40,
 
 Thanks,
 
