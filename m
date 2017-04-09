@@ -1,46 +1,70 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 1/9] KVM: add kvm_request_pending
-Date: Sat, 8 Apr 2017 15:32:00 -0400 (EDT)
-Message-ID: <925034633.12169627.1491679920960.JavaMail.zimbra@redhat.com>
-References: <20170331160658.4331-1-drjones@redhat.com> <20170404164120.xvlvyebvcqoci5cu@kamzik.brq.redhat.com> <20170405131049.GD6369@potion> <20170405173918.GA27123@cbox> <20170405202016.GG6369@potion> <20170406142535.GD27123@cbox> <20170407131537.GE23559@potion> <20170408182314.GD29201@lvm>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 13/22] KVM: arm64: ITS: KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
+ group
+Date: Sun, 09 Apr 2017 11:09:53 +0100
+Message-ID: <86h91xc2oe.fsf@arm.com>
+References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
+ <1490607072-21610-14-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170408182314.GD29201@lvm>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Christoffer Dall <cdall@linaro.org>, Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc zyngier <marc.zyngier@arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1F2E40D85
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  9 Apr 2017 06:08:06 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5AqkxEHdXicf for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  9 Apr 2017 06:08:05 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA84840D7A
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  9 Apr 2017 06:08:05 -0400 (EDT)
+In-Reply-To: <1490607072-21610-14-git-send-email-eric.auger@redhat.com> (Eric
+ Auger's message of "Mon, 27 Mar 2017 11:31:03 +0200")
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Mon, Mar 27 2017 at 10:31:03 AM, Eric Auger <eric.auger@redhat.com> wrote:
+> Introduce a new group aiming at saving/restoring the ITS
+> tables to/from the guest memory.
+>
+> We hold the vcpus lock during the save and restore to make
+> sure no vcpu is running.
+>
+> At this stage the functionality is not yet implemented. Only
+> the skeleton is put in place.
+>
+> The ABI revision supposed to have been set through IIDR user
+> write is checked before the table restoration. This guarantees
+> this vITS knows how to restore the saved tables.
 
-> > Makes sense.  My pitch at the documentation after dropping READ_ONCE():
-> 
-> I'm confused again, I thought you wanted to keep READ_ONCE().
-> 
-> > 
-> >   /*
-> >    *  The return value of kvm_request_pending() is implicitly volatile
-> 
-> why is that, actually?
-> 
-> >    *  and must be protected from reordering by the caller.
-> >    */
-> 
-> Can we be specific about what that means?  (e.g. must be preceded by a
-> full smp_mb() - or whatever the case is).
+This last point hints at the kernel side being able to deal with
+multiple versions of the ABI. As I mentioned before, this requires some
+clarification on what we plan to support, and whether or not we are able
+to deprecate ABIs in the long run
 
-You can play devil's advocate both ways and argue that READ_ONCE is
-better, or that it is unnecessary hence worse.  You can write good
-comments in either case.  That's how I read Radim's message.  But
-I think we all agree on keeping it in the end.
+One thing that is not clear to me is that although you want to be able
+to restore the vITS using a given ABI, should you be able to save it
+using that same ABI? Or does a restore/save cycle act as an ABI upgrade
+for this VM?
 
-> Perhaps we should just let Drew respin at this point, in case he's
-> confident about the right path, and then pick up from there?
+I'd also like to see some infrastructure in the code to support this, in
+the form of a per-ABI array of support functions (even if we only have
+one ABI for the time being). Although that's not required ATM, it would
+certainly halp me understanding what is ABI-specific and what's not.
 
-I agree.
+Thanks,
 
-In any case, the memory barrier is the important part, but
-adding READ_ONCE is self-documenting and I prefer to have it.
-
-Paolo
+	M.
+-- 
+Jazz is not dead. It just smells funny.
