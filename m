@@ -1,161 +1,187 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 01/22] KVM: arm/arm64: Add vITS save/restore API
- documentation
-Date: Mon, 10 Apr 2017 11:42:35 +0100
-Message-ID: <01750720-be65-a40d-185b-4700c211737a@arm.com>
+Subject: Re: [PATCH v4 20/22] KVM: arm64: ITS: ITT flush and restore
+Date: Mon, 10 Apr 2017 13:39:21 +0100
+Message-ID: <718afa1b-e0ad-f758-012a-8e0ac6a140b8@arm.com>
 References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
- <1490607072-21610-2-git-send-email-eric.auger@redhat.com>
- <86y3vbcj20.fsf@arm.com> <20170408131552.GA29201@lvm>
- <86y3vabycb.fsf@arm.com> <c4571a9a-46e1-441b-0162-29f75a24cb0d@redhat.com>
+ <1490607072-21610-21-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <c4571a9a-46e1-441b-0162-29f75a24cb0d@redhat.com>
+In-Reply-To: <1490607072-21610-21-git-send-email-eric.auger@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: eric.auger.pro@gmail.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/04/17 11:18, Auger Eric wrote:
-> Hi Marc, Christoffer,
+On 27/03/17 10:31, Eric Auger wrote:
+> Introduce routines to flush and restore device ITT and their
+> interrupt table entries (ITE).
 > 
-> On 08/04/2017 19:31, Marc Zyngier wrote:
->> On Sat, Apr 08 2017 at 02:15:52 PM, Christoffer Dall <christoffer.dall@linaro.org> wrote:
->>> On Sat, Apr 08, 2017 at 11:03:51AM +0100, Marc Zyngier wrote:
->>>> On Mon, Mar 27 2017 at 10:30:51 AM, Eric Auger <eric.auger@redhat.com> wrote:
->>>>> Add description for how to access vITS registers and how to flush/restore
->>>>> vITS tables into/from memory
->>>>>
->>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>>
->>>>> ---
->>>>> v3 -> v4:
->>>>> - take into account Peter's comments:
->>>>>   - typos
->>>>>   - KVM_DEV_ARM_VGIC_GRP_ITS_TABLES kvm_device_attr = 0
->>>>>   - add a validity bit in DTE
->>>>>   - document all fields in CTE and ITE
->>>>>   - document ABI revision
->>>>> - take into account Andre's comments:
->>>>>   - document restrictions about GITS_CREADR writing and GITS_IIDR
->>>>>   - document -EBUSY error if one or more VCPUS are runnning
->>>>>   - document 64b registers only can be accessed with 64b access
->>>>> - itt_addr field matches bits [51:8] of the itt_addr
->>>>>
->>>>> v1 -> v2:
->>>>> - DTE and ITE now are 8 bytes
->>>>> - DTE and ITE now indexed by deviceid/eventid
->>>>> - use ITE name instead of ITTE
->>>>> - mentions ITT_addr matches bits [51:8] of the actual address
->>>>> - mentions LE layout
->>>>> ---
->>>>>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 118 +++++++++++++++++++++
->>>>>  1 file changed, 118 insertions(+)
->>>>>
->>>>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>>>> index 6081a5b..0902d20 100644
->>>>> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>>>> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>>>> @@ -36,3 +36,121 @@ Groups:
->>>>>      -ENXIO:  ITS not properly configured as required prior to setting
->>>>>               this attribute
->>>>>      -ENOMEM: Memory shortage when allocating ITS internal data
->>>>> +
->>>>> +  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
->>>>> +  Attributes:
->>>>> +      The attr field of kvm_device_attr encodes the offset of the
->>>>> +      ITS register, relative to the ITS control frame base address
->>>>> +      (ITS_base).
->>>>> +
->>>>> +      kvm_device_attr.addr points to a __u64 value whatever the width
->>>>> +      of the addressed register (32/64 bits). 64 bit registers can only
->>>>> +      be accessed with full length.
->>>>> +
->>>>> +      Writes to read-only registers are ignored by the kernel except for:
->>>>> +      - GITS_READR. It needs to be restored otherwise commands in the queue
->>>>> +        will be re-executed after CWRITER setting. Writing this register is
->>>>> +        allowed if the ITS is not enabled (GITS_CTLR.enable = 0). Also it
->>>>> +        needs to be restored after GITS_CBASER since a write to GITS_CBASER
->>>>> +        resets GITS_CREADR.
->>>>> +      - GITS_IIDR. Its Revision field encodes the table layout ABI revision.
->>>>> +
->>>>> +      For other registers, getting or setting a register has the same
->>>>> +      effect as reading/writing the register on real hardware.
->>>>> +  Errors:
->>>>> +    -ENXIO: Offset does not correspond to any supported register
->>>>> +    -EFAULT: Invalid user pointer for attr->addr
->>>>> +    -EINVAL: Offset is not 64-bit aligned
->>>>> +    -EBUSY: one or more VCPUS are running
->>>>> +
->>>>> +  KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
->>>>> +  Attributes
->>>>> +       The attr field of kvm_device_attr must be zero.
->>>>> +
->>>>> +       request the flush-save/restore of the ITS tables, namely
->>>>> +       the device table, the collection table, all the ITT tables,
->>>>> +       the LPI pending tables. On save, the tables are flushed
->>>>> +       into guest memory at the location provisioned by the guest
->>>>> +       in GITS_BASER (device and collection tables), in the MAPD
->>>>> +       command (ITT_addr), GICR_PENDBASERs (pending tables).
->>>>
->>>> May I echo Andre's concern here? Seeing the GICR_PENDBASER registers
->>>> here feels wrong. The pending table is a redistributor concept, and is
->>>> local to it. Even more, it is perfectly possible to use the
->>>> redistributors (and its pending tables) without an ITS by using the
->>>> GICR_SETLPIR registers.
->>>>
->>>> Granted, we do not support this (and I'm *not* looking forward to
->>>> supporting it), but I would rather implement a redistributor flush than
->>>> using the ITS to indirectly force it. That's not how the HW works, and I
->>>> don't think we should deviate from it.
->>>>
->>>> I appreciate this brings additional complexity to userspace (having to
->>>> iterate over the vcpus or the redistributors is likely more costly than
->>>> hitting the ITS which is likely to be unique), but sticking to the
->>>> letter of the architecture is probably our best bet. Each time we tried
->>>> to deviate from it, we've had to backtrack.
->>>
->>> I agree.  I think the possibility of using LPIs without an ITS is the
->>> winning argument.
->>>
->>> However, I could see it being reasonable to have a single call that
->>> userspace can make on the vgic device to ask it to flush all the
->>> redistributors at the same time.  We defined the cpu sysreg interface
->>> via the vgic device as well, so I don't think we're breaking anything,
->>> and in fact, it may be good to have a single sync-point where the kernel
->>> can atomically say "all redistributors are flushed correctly" or
->>> "something bad happened".  Do we have any arguments for wanting to be
->>> able flush redistributors independently?
->>
->> Not as such. The redistributors may support implementation-specific ways
->> of ensuring synchronization with the PT (for power management purposes,
->> for example), but there is no architected way of ensuring it.
->>
->> So I agree that having a single synchronization hook for all
->> redistributors in the system is probably the right thing to do. This is
->> simple enough for userspace, and we already have the required code in
->> this series -- we just need to tie it to an additional property on the
->> GICv3 group.
->>
->> Eric: can you explore this and let us know if there is any issue we
->> haven't foreseen yet?
-> Yes I am going to investigate this. The extra complexity I foresee is
-> that I need to implement coarse mapping in the first kB of the pending
-> table to guess what LPI is pending and thus become independent on the
-> restoration of the ITS - which is the goal -.
+> The routines will be called on device table flush and
+> restore. They will become static in subsequent patches.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v3 -> v4:
+> - lookup_table and compute_next_eventid_offset become static in this
+>   patch
+> - remove static along with vgic_its_flush/restore_itt to avoid
+>   compilation warnings
+> - next field only computed with a shift (mask removed)
+> - handle the case where the last element has not been found
+> 
+> v2 -> v3:
+> - add return 0 in vgic_its_restore_ite (was in subsequent patch)
+> 
+> v2: creation
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 107 +++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 104 insertions(+), 3 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index b907e3c..02c0694 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1707,7 +1707,7 @@ u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
+>  	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
+>  }
+>  
+> -u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
+> +static u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
+>  {
+>  	struct list_head *e = &ite->ite_list;
+>  	struct its_ite *next;
+> @@ -1749,8 +1749,8 @@ typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *addr,
+>   *
+>   * Return: < 0 on error, 1 if last element identified, 0 otherwise
+>   */
+> -int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
+> -		 int start_id, entry_fn_t fn, void *opaque)
+> +static int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
+> +			int start_id, entry_fn_t fn, void *opaque)
+>  {
+>  	gpa_t gpa = base, top = base + size - 1;
+>  	unsigned long len = size;
+> @@ -1815,6 +1815,107 @@ static int vgic_its_restore_pending_tables(struct kvm *kvm)
+>  	return -ENXIO;
+>  }
+>  
+> +static int vgic_its_flush_ite(struct vgic_its *its, struct its_device *dev,
+> +			      struct its_ite *ite, gpa_t gpa)
+> +{
+> +	struct kvm *kvm = its->dev->kvm;
+> +	u32 next_offset;
+> +	u64 val;
+> +
+> +	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
+> +	val = ((u64)next_offset << 48) | ((u64)ite->lpi << 16) |
+> +		ite->collection->collection_id;
 
-I don't think you necessarily need a coarse map. When restoring the ITS
-tables, you can always read the pending bit when creating the LPI
-structure (it has been written to RAM at save time). Note that we
-already do something like this in vgic_enable_lpis().
+Same remark as before concerning the #define-ing of the encoding and the
+name of the function.
 
-If that proves to be too slow (because you have so many mapped
-interrupts that doing bit access is a huge waste of time), then you can
-implement a coarse map and reload the pending state independently of the
-LPI mapping creation.
+> +	val = cpu_to_le64(val);
+> +	return kvm_write_guest(kvm, gpa, &val, VITS_ESZ);
+> +}
+> +
+> +/**
+> + * vgic_its_restore_ite - restore an interrupt translation entry
+> + * @event_id: id used for indexing
+> + * @ptr: kernel VA where the 8 byte ITE is located
+> + * @opaque: pointer to the its_device
+> + * @next: id offset to the next entry
+> + */
+> +static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+> +				void *ptr, void *opaque, u32 *next)
+> +{
+> +	struct its_device *dev = (struct its_device *)opaque;
+> +	struct its_collection *collection;
+> +	struct kvm *kvm = its->dev->kvm;
+> +	u64 val, *p = (u64 *)ptr;
+> +	struct vgic_irq *irq;
+> +	u32 coll_id, lpi_id;
+> +	struct its_ite *ite;
+> +	int ret;
+> +
+> +	val = *p;
+> +	*next = 1;
+> +
+> +	val = le64_to_cpu(val);
+> +
+> +	coll_id = val & GENMASK_ULL(15, 0);
+> +	lpi_id = (val & GENMASK_ULL(47, 16)) >> 16;
+> +
+> +	if (!lpi_id)
+> +		return 0;
+> +
+> +	*next = val >> 48;
+> +
+> +	collection = find_collection(its, coll_id);
+> +	if (!collection)
+> +		return -EINVAL;
+> +
+> +	ret = vgic_its_alloc_ite(dev, &ite, collection,
+> +				  lpi_id, event_id);
+> +	if (ret)
+> +		return ret;
+> +
+> +	irq = vgic_add_lpi(kvm, lpi_id);
+> +	if (IS_ERR(irq))
+> +		return PTR_ERR(irq);
+> +	ite->irq = irq;
+> +
+> +	/* restore the configuration of the LPI */
+> +	ret = update_lpi_config(kvm, irq, NULL);
+> +	if (ret)
+> +		return ret;
+> +
+> +	update_affinity_ite(kvm, ite);
+> +	return 0;
+> +}
+> +
+> +int vgic_its_flush_itt(struct vgic_its *its, struct its_device *device)
+> +{
+> +	gpa_t base = device->itt_addr;
+> +	struct its_ite *ite;
+> +	int ret;
+> +
+> +	list_for_each_entry(ite, &device->itt_head, ite_list) {
+> +		gpa_t gpa = base + ite->event_id * VITS_ESZ;
+> +
+> +		ret = vgic_its_flush_ite(its, device, ite, gpa);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +	return 0;
+> +}
+> +
+> +int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+> +{
+> +	size_t max_size = BIT_ULL(dev->nb_eventid_bits) * VITS_ESZ;
+> +	gpa_t base = dev->itt_addr;
+> +	int ret;
+> +
+> +	ret =  lookup_table(its, base, max_size, VITS_ESZ, 0,
+> +			    vgic_its_restore_ite, dev);
+> +
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* if the last element has not been found we are in trouble */
+> +	return ret ? 0 : -EINVAL;
 
-In short, don't optimize prematurely! ;-)
+This makes me wonder. Can't lookup_table perform that check on its own
+and always return an error when something went wrong?
+
+> +}
+> +
+>  /**
+>   * vgic_its_flush_device_tables - flush the device table and all ITT
+>   * into guest RAM
+> 
 
 Thanks,
 
