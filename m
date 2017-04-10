@@ -1,26 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 17/22] KVM: arm64: ITS: Add infrastructure for table
- lookup
-Date: Sun, 09 Apr 2017 11:36:14 +0100
-Message-ID: <864lxxc1gh.fsf@arm.com>
-References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
- <1490607072-21610-18-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH 1/2] KVM: arm/arm64: vgic-v3: De-optimize VMCR save/restore
+ when emulating a GICv2
+Date: Mon, 10 Apr 2017 10:19:43 +0100
+Message-ID: <20170410091944.19963-2-marc.zyngier@arm.com>
+References: <20170410091944.19963-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7758840D6B
- for <kvmarm@lists.cs.columbia.edu>; Sun,  9 Apr 2017 06:34:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22D1340D55
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Apr 2017 05:17:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yw9+ONjaADVK for <kvmarm@lists.cs.columbia.edu>;
- Sun,  9 Apr 2017 06:34:00 -0400 (EDT)
+ with ESMTP id q8LopqYe1oUi for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Apr 2017 05:17:39 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C18240D2F
- for <kvmarm@lists.cs.columbia.edu>; Sun,  9 Apr 2017 06:33:59 -0400 (EDT)
-In-Reply-To: <1490607072-21610-18-git-send-email-eric.auger@redhat.com> (Eric
- Auger's message of "Mon, 27 Mar 2017 11:31:07 +0200")
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DEC7740C55
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Apr 2017 05:17:38 -0400 (EDT)
+In-Reply-To: <20170410091944.19963-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,170 +28,108 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 27 2017 at 10:31:07 AM, Eric Auger <eric.auger@redhat.com> wrote:
-> Add a generic lookup_table() helper whose role consists in
-> scanning a contiguous table located in guest RAM and applying
-> a callback on each entry. Entries can be handled as linked lists
-> since the callback may return an offset to the next entry and
-> also tell that an entry is the last one.
->
-> Helper functions also are added to compute the device/event ID
-> offset to the next DTE/ITE.
->
-> compute_next_devid_offset, compute_next_eventid_offset and
-> lookup_table will become static in subsequent patches
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
-> ---
->
-> v3 -> v4:
-> - remove static to avoid compilation warning
-> - correct size computation in looup_table()
-> - defines now encode the number of bits used for devid and eventid offsets
-> - use BIT() - 1 to encode the max offets
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 107 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 107 insertions(+)
->
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 7364b7d..8eaeba4 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -184,6 +184,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
->  #define VITS_ESZ 8
->  #define VITS_TYPER_IDBITS 16
->  #define VITS_TYPER_DEVBITS 16
-> +#define VITS_DTE_MAX_DEVID_OFFSET	(BIT(14) - 1)
-> +#define VITS_ITE_MAX_EVENTID_OFFSET	(BIT(16) - 1)
->  
->  /*
->   * Finds and returns a collection in the ITS collection table.
-> @@ -1686,6 +1688,111 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
->  	return ret;
->  }
->  
-> +u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
-> +{
-> +	struct list_head *e = &dev->dev_list;
-> +	struct its_device *next;
-> +	u32 next_offset;
-> +
-> +	if (e->next == h)
-> +		return 0;
-> +	next = list_entry(e->next, struct its_device, dev_list);
-> +	next_offset = next->device_id - dev->device_id;
-> +
-> +	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
-> +}
-> +
-> +u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
-> +{
-> +	struct list_head *e = &ite->ite_list;
-> +	struct its_ite *next;
-> +	u32 next_offset;
-> +
-> +	if (e->next == h)
-> +		return 0;
-> +	next = list_entry(e->next, struct its_ite, ite_list);
-> +	next_offset = next->event_id - ite->event_id;
-> +
-> +	return min_t(u32, next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
-> +}
-> +
-> +/**
-> + * entry_fn_t - Callback called on a table entry restore path
-> + * @its: its handle
-> + * @id: id of the entry
-> + * @addr: kernel VA of the entry
-> + * @opaque: pointer to an opaque data
-> + * @next_offset: minimal ID offset to the next entry. 0 if this
-> + * entry is the last one, 1 if the entry is invalid, >= 1 if an
-> + * entry's next_offset field was truly decoded
-> + *
-> + * Return: < 0 on error, 0 otherwise
-> + */
-> +typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *addr,
-> +			  void *opaque, u32 *next_offset);
-> +
-> +/**
-> + * lookup_table - scans a contiguous table in guest RAM and applies a function
-> + * to each entry
-> + *
-> + * @its: its handle
-> + * @base: base gpa of the table
-> + * @size: size of the table in bytes
-> + * @esz: entry size in bytes
-> + * @start_id: first entry's ID
-> + * @fn: function to apply on each entry
-> + *
-> + * Return: < 0 on error, 1 if last element identified, 0 otherwise
-> + */
-> +int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
-> +		 int start_id, entry_fn_t fn, void *opaque)
-> +{
-> +	gpa_t gpa = base, top = base + size - 1;
-> +	unsigned long len = size;
-> +	int ret, seg, offset = offset_in_page(gpa);
-> +	gfn_t gfn = gpa >> PAGE_SHIFT;
-> +	u32 id = start_id + (gpa - base)/esz;
-> +	struct kvm *kvm = its->dev->kvm;
-> +	kvm_pfn_t pfn;
-> +
-> +	while ((seg = next_segment(len, offset)) != 0) {
-> +		u32 next_offset;
-> +		bool writeable;
-> +		void *addr;
-> +
-> +		pfn = gfn_to_pfn_prot(kvm, gfn, true, &writeable);
-> +		if (is_error_noslot_pfn(pfn))
-> +			return -EINVAL;
-> +		addr = phys_to_virt((u64)pfn << PAGE_SHIFT);
-> +		addr += offset;
+When emulating a GICv2-on-GICv3, special care must be taken to only
+save/restore VMCR_EL2 when ICC_SRE_EL1.SRE is cleared. Otherwise,
+all Group-0 interrupts end-up being delivered as FIQ, which is
+probably not what the guest expects, as demonstrated here with
+an unhappy EFI:
 
-Why do we use the kernel mapping here? I'd have expected the use of
-kvm_read_guest and co rather than directly accessing the memory. What
-locks do we hold to ensure that the page cannot be evicted behind our
-back?
+	FIQ Exception at 0x000000013BD21CC4
 
-> +
-> +		while (seg > 0) {
-> +			size_t byte_offset;
-> +
-> +			ret = fn(its, id, addr, opaque, &next_offset);
-> +			if (ret < 0 || (!ret && !next_offset))
-> +				goto out;
-> +
-> +			byte_offset = next_offset * esz;
-> +
-> +			id += next_offset;
-> +			gpa += byte_offset;
-> +			addr += byte_offset;
-> +			seg -= byte_offset;
-> +		}
-> +		kvm_release_pfn_clean(pfn);
-> +
-> +		len = top - gpa + 1;
-> +		offset = offset_in_page(gpa);
-> +		gfn = gpa >> PAGE_SHIFT;
-> +		id = start_id + (gpa - base)/esz;
-> +	}
-> +	return 0;
-> +out:
-> +	kvm_release_pfn_clean(pfn);
-> +	return (ret < 0 ? ret : 1);
-> +}
-> +
->  /**
->   * vgic_its_flush_pending_tables - Flush the pending tables into guest RAM
->   */
+This means that we cannot perform the load/put trick when dealing
+with VMCR_EL2 (because the host has SRE set), and we have to deal
+with it in the world-switch.
 
-Thanks,
+Fortunately, this is not the most common case (modern guests should
+be able to deal with GICv3 directly), and the performance is not worse
+than what it was before the VMCR optimization.
 
-	M.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/hyp/vgic-v3-sr.c |  8 ++++++--
+ virt/kvm/arm/vgic/vgic.c      | 26 ++++++++++++++++++++------
+ 2 files changed, 26 insertions(+), 8 deletions(-)
+
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index 3d0b1ddb6929..91922c1eddc8 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -128,8 +128,10 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 	 * Make sure stores to the GIC via the memory mapped interface
+ 	 * are now visible to the system register interface.
+ 	 */
+-	if (!cpu_if->vgic_sre)
++	if (!cpu_if->vgic_sre) {
+ 		dsb(st);
++		cpu_if->vgic_vmcr = read_gicreg(ICH_VMCR_EL2);
++	}
+ 
+ 	if (used_lrs) {
+ 		int i;
+@@ -205,11 +207,13 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 	 * delivered as a FIQ to the guest, with potentially fatal
+ 	 * consequences. So we must make sure that ICC_SRE_EL1 has
+ 	 * been actually programmed with the value we want before
+-	 * starting to mess with the rest of the GIC.
++	 * starting to mess with the rest of the GIC, and VMCR_EL2 in
++	 * particular.
+ 	 */
+ 	if (!cpu_if->vgic_sre) {
+ 		write_gicreg(0, ICC_SRE_EL1);
+ 		isb();
++		write_gicreg(cpu_if->vgic_vmcr, ICH_VMCR_EL2);
+ 	}
+ 
+ 	val = read_gicreg(ICH_VTR_EL2);
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 3d0979c30721..32205f2ba6ff 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -667,10 +667,20 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu)
+ 	if (unlikely(!vgic_initialized(vcpu->kvm)))
+ 		return;
+ 
+-	if (kvm_vgic_global_state.type == VGIC_V2)
++	if (kvm_vgic_global_state.type == VGIC_V2) {
+ 		vgic_v2_load(vcpu);
+-	else
+-		vgic_v3_load(vcpu);
++	} else {
++		struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
++
++		/*
++		 * If dealing with a GICv2 emulation on GICv3,
++		 * VMCR_EL2.VFIQen is dependent on ICC_SRE_EL1.SRE,
++		 * and we have to perform the VMCR_EL2 save/restore in
++		 * the world switch.
++		 */
++		if (likely(cpu_if->vgic_sre))
++			vgic_v3_load(vcpu);
++	}
+ }
+ 
+ void kvm_vgic_put(struct kvm_vcpu *vcpu)
+@@ -678,10 +688,14 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu)
+ 	if (unlikely(!vgic_initialized(vcpu->kvm)))
+ 		return;
+ 
+-	if (kvm_vgic_global_state.type == VGIC_V2)
++	if (kvm_vgic_global_state.type == VGIC_V2) {
+ 		vgic_v2_put(vcpu);
+-	else
+-		vgic_v3_put(vcpu);
++	} else {
++		struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
++
++		if (likely(cpu_if->vgic_sre))
++			vgic_v3_put(vcpu);
++	}
+ }
+ 
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
 -- 
-Jazz is not dead. It just smells funny.
+2.11.0
