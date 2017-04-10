@@ -1,193 +1,154 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 18/22] KVM: arm64: ITS: Collection table save/restore
-Date: Mon, 10 Apr 2017 10:55:40 +0100
-Message-ID: <95a88e33-3cbc-9c4d-b76c-3cec5c4cc310@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v4 01/22] KVM: arm/arm64: Add vITS save/restore API
+ documentation
+Date: Mon, 10 Apr 2017 12:18:34 +0200
+Message-ID: <c4571a9a-46e1-441b-0162-29f75a24cb0d@redhat.com>
 References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
- <1490607072-21610-19-git-send-email-eric.auger@redhat.com>
+ <1490607072-21610-2-git-send-email-eric.auger@redhat.com>
+ <86y3vbcj20.fsf@arm.com> <20170408131552.GA29201@lvm>
+ <86y3vabycb.fsf@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1490607072-21610-19-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <86y3vabycb.fsf@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: eric.auger.pro@gmail.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 27/03/17 10:31, Eric Auger wrote:
-> The flush path copies the collection entries into guest RAM
-> at the GPA specified in the BASER register. This obviously
-> requires the BASER to be set. The last written element
-> is a dummy collection table entry.
+Hi Marc, Christoffer,
+
+On 08/04/2017 19:31, Marc Zyngier wrote:
+> On Sat, Apr 08 2017 at 02:15:52 PM, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+>> On Sat, Apr 08, 2017 at 11:03:51AM +0100, Marc Zyngier wrote:
+>>> On Mon, Mar 27 2017 at 10:30:51 AM, Eric Auger <eric.auger@redhat.com> wrote:
+>>>> Add description for how to access vITS registers and how to flush/restore
+>>>> vITS tables into/from memory
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>
+>>>> ---
+>>>> v3 -> v4:
+>>>> - take into account Peter's comments:
+>>>>   - typos
+>>>>   - KVM_DEV_ARM_VGIC_GRP_ITS_TABLES kvm_device_attr = 0
+>>>>   - add a validity bit in DTE
+>>>>   - document all fields in CTE and ITE
+>>>>   - document ABI revision
+>>>> - take into account Andre's comments:
+>>>>   - document restrictions about GITS_CREADR writing and GITS_IIDR
+>>>>   - document -EBUSY error if one or more VCPUS are runnning
+>>>>   - document 64b registers only can be accessed with 64b access
+>>>> - itt_addr field matches bits [51:8] of the itt_addr
+>>>>
+>>>> v1 -> v2:
+>>>> - DTE and ITE now are 8 bytes
+>>>> - DTE and ITE now indexed by deviceid/eventid
+>>>> - use ITE name instead of ITTE
+>>>> - mentions ITT_addr matches bits [51:8] of the actual address
+>>>> - mentions LE layout
+>>>> ---
+>>>>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 118 +++++++++++++++++++++
+>>>>  1 file changed, 118 insertions(+)
+>>>>
+>>>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+>>>> index 6081a5b..0902d20 100644
+>>>> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+>>>> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+>>>> @@ -36,3 +36,121 @@ Groups:
+>>>>      -ENXIO:  ITS not properly configured as required prior to setting
+>>>>               this attribute
+>>>>      -ENOMEM: Memory shortage when allocating ITS internal data
+>>>> +
+>>>> +  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+>>>> +  Attributes:
+>>>> +      The attr field of kvm_device_attr encodes the offset of the
+>>>> +      ITS register, relative to the ITS control frame base address
+>>>> +      (ITS_base).
+>>>> +
+>>>> +      kvm_device_attr.addr points to a __u64 value whatever the width
+>>>> +      of the addressed register (32/64 bits). 64 bit registers can only
+>>>> +      be accessed with full length.
+>>>> +
+>>>> +      Writes to read-only registers are ignored by the kernel except for:
+>>>> +      - GITS_READR. It needs to be restored otherwise commands in the queue
+>>>> +        will be re-executed after CWRITER setting. Writing this register is
+>>>> +        allowed if the ITS is not enabled (GITS_CTLR.enable = 0). Also it
+>>>> +        needs to be restored after GITS_CBASER since a write to GITS_CBASER
+>>>> +        resets GITS_CREADR.
+>>>> +      - GITS_IIDR. Its Revision field encodes the table layout ABI revision.
+>>>> +
+>>>> +      For other registers, getting or setting a register has the same
+>>>> +      effect as reading/writing the register on real hardware.
+>>>> +  Errors:
+>>>> +    -ENXIO: Offset does not correspond to any supported register
+>>>> +    -EFAULT: Invalid user pointer for attr->addr
+>>>> +    -EINVAL: Offset is not 64-bit aligned
+>>>> +    -EBUSY: one or more VCPUS are running
+>>>> +
+>>>> +  KVM_DEV_ARM_VGIC_GRP_ITS_TABLES
+>>>> +  Attributes
+>>>> +       The attr field of kvm_device_attr must be zero.
+>>>> +
+>>>> +       request the flush-save/restore of the ITS tables, namely
+>>>> +       the device table, the collection table, all the ITT tables,
+>>>> +       the LPI pending tables. On save, the tables are flushed
+>>>> +       into guest memory at the location provisioned by the guest
+>>>> +       in GITS_BASER (device and collection tables), in the MAPD
+>>>> +       command (ITT_addr), GICR_PENDBASERs (pending tables).
+>>>
+>>> May I echo Andre's concern here? Seeing the GICR_PENDBASER registers
+>>> here feels wrong. The pending table is a redistributor concept, and is
+>>> local to it. Even more, it is perfectly possible to use the
+>>> redistributors (and its pending tables) without an ITS by using the
+>>> GICR_SETLPIR registers.
+>>>
+>>> Granted, we do not support this (and I'm *not* looking forward to
+>>> supporting it), but I would rather implement a redistributor flush than
+>>> using the ITS to indirectly force it. That's not how the HW works, and I
+>>> don't think we should deviate from it.
+>>>
+>>> I appreciate this brings additional complexity to userspace (having to
+>>> iterate over the vcpus or the redistributors is likely more costly than
+>>> hitting the ITS which is likely to be unique), but sticking to the
+>>> letter of the architecture is probably our best bet. Each time we tried
+>>> to deviate from it, we've had to backtrack.
+>>
+>> I agree.  I think the possibility of using LPIs without an ITS is the
+>> winning argument.
+>>
+>> However, I could see it being reasonable to have a single call that
+>> userspace can make on the vgic device to ask it to flush all the
+>> redistributors at the same time.  We defined the cpu sysreg interface
+>> via the vgic device as well, so I don't think we're breaking anything,
+>> and in fact, it may be good to have a single sync-point where the kernel
+>> can atomically say "all redistributors are flushed correctly" or
+>> "something bad happened".  Do we have any arguments for wanting to be
+>> able flush redistributors independently?
 > 
-> We do not index by collection ID as the collection entry
-> can fit into 8 bytes while containing the collection ID.
+> Not as such. The redistributors may support implementation-specific ways
+> of ensuring synchronization with the PT (for power management purposes,
+> for example), but there is no architected way of ensuring it.
 > 
-> On restore path we re-allocate the collection objects.
+> So I agree that having a single synchronization hook for all
+> redistributors in the system is probably the right thing to do. This is
+> simple enough for userspace, and we already have the required code in
+> this series -- we just need to tie it to an additional property on the
+> GICv3 group.
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Eric: can you explore this and let us know if there is any issue we
+> haven't foreseen yet?
+Yes I am going to investigate this. The extra complexity I foresee is
+that I need to implement coarse mapping in the first kB of the pending
+table to guess what LPI is pending and thus become independent on the
+restoration of the ITS - which is the goal -.
+
+Thanks
+
+Eric
 > 
-> ---
+> Thanks,
 > 
-> v3 -> v4:
-> - replaced u64 *ptr by gpa_t gpa
-> - check the collection does not exist before allocating it
+> 	M.
 > 
-> v1 -> v2:
-> - reword commit message and directly use 8 as entry size
-> - no kvm parameter anymore
-> - add helper for flush/restore cte
-> - table size computed here
-> - add le64/cpu conversions
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 99 +++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 97 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 8eaeba4..df984b6 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1828,13 +1828,89 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
->  	return -ENXIO;
->  }
->  
-> +static int vgic_its_flush_cte(struct vgic_its *its,
-> +			      struct its_collection *collection, gpa_t gpa)
-
-Given that the pendent of this function is name ..._restore_..., should
-this be called ..._save_... ?
-
-> +{
-> +	u64 val;
-> +	int ret;
-> +
-> +	val = ((u64)1 << 63 | ((u64)collection->target_addr << 16) |
-> +	       collection->collection_id);
-
-Please provide some #defines that describe the encoding. This will be
-specially useful if we need to export this to userspace (KVM/TCG
-interoperability?).
-
-> +	val = cpu_to_le64(val);
-> +	ret = kvm_write_guest(its->dev->kvm, gpa, &val, 8);
-> +	return ret;
-> +}
-> +
-> +static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, bool *valid)
-> +{
-> +	struct its_collection *collection;
-> +	u32 target_addr;
-> +	u32 coll_id;
-> +	u64 val;
-> +	int ret;
-> +
-> +	*valid = false;
-> +
-> +	ret = kvm_read_guest(its->dev->kvm, gpa, &val, 8);
-> +	if (ret)
-> +		return ret;
-> +	val = le64_to_cpu(val);
-> +	*valid = val & BIT_ULL(63);
-> +
-> +	if (!*valid)
-> +		return 0;
-> +
-> +	target_addr = (u32)(val >> 16);
-
-u32?
-
-> +	coll_id = val & 0xFFFF;
-
-Same comment about the various shifts/masks.
-
-> +
-> +	collection = find_collection(its, coll_id);
-> +	if (collection)
-> +		return -EEXIST;
-> +	ret = vgic_its_alloc_collection(its, &collection, coll_id);
-> +	if (ret)
-> +		return ret;
-> +	collection->target_addr = target_addr;
-> +	return 0;
-> +}
-> +
->  /**
->   * vgic_its_flush_collection_table - flush the collection table into
->   * guest RAM
->   */
->  static int vgic_its_flush_collection_table(struct vgic_its *its)
->  {
-> -	return -ENXIO;
-> +	struct its_collection *collection;
-> +	u64 val;
-> +	gpa_t gpa;
-> +	size_t max_size, filled = 0;
-> +	int ret;
-> +
-> +	gpa = BASER_ADDRESS(its->baser_coll_table);
-> +	if (!gpa)
-> +		return 0;
-> +
-> +	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
-> +
-> +	list_for_each_entry(collection, &its->collection_list, coll_list) {
-> +		if (filled == max_size)
-> +			return -ENOSPC;
-> +		ret = vgic_its_flush_cte(its, collection, gpa);
-> +		if (ret)
-> +			return ret;
-> +		gpa += 8;
-> +		filled += 8;
-
-This "8" should be extracted from the BASER register itself (Entry_Size).
-
-> +	}
-> +
-> +	if (filled == max_size)
-> +		return 0;
-> +
-> +	/*
-> +	 * table is not fully filled, add a last dummy element
-> +	 * with valid bit unset
-> +	 */
-> +	val = 0;
-> +	ret = kvm_write_guest(its->dev->kvm, gpa, &val, 8);
-> +	return ret;
->  }
->  
->  /**
-> @@ -1844,7 +1920,26 @@ static int vgic_its_flush_collection_table(struct vgic_its *its)
->   */
->  static int vgic_its_restore_collection_table(struct vgic_its *its)
->  {
-> -	return -ENXIO;
-> +	size_t max_size, read = 0;
-> +	gpa_t gpa;
-> +	int ret;
-> +
-> +	gpa = BASER_ADDRESS(its->baser_coll_table);
-> +	if (!gpa)
-> +		return 0;
-> +
-> +	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
-> +
-> +	while (read < max_size) {
-> +		bool valid;
-> +
-> +		ret = vgic_its_restore_cte(its, gpa, &valid);
-> +		if (!valid || ret)
-> +			break;
-> +		gpa += 8;
-> +		read += 8;
-> +	}
-> +	return ret;
->  }
->  
->  /**
-> 
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
