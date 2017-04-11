@@ -1,107 +1,80 @@
-From: Borislav Petkov <bp-Gina5bIWoIWzQB+pC5nmwQ@public.gmane.org>
-Subject: Re: [PATCH V14 01/10] acpi: apei: read ack upon ghes record
- consumption
-Date: Tue, 11 Apr 2017 19:15:47 +0200
-Message-ID: <20170411171547.qntimdxnqmtf43ot@pd.tnic>
-References: <1490729440-32591-1-git-send-email-tbaicar@codeaurora.org>
- <1490729440-32591-2-git-send-email-tbaicar@codeaurora.org>
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH v2 1/9] KVM: add kvm_request_pending
+Date: Tue, 11 Apr 2017 23:06:44 +0200
+Message-ID: <20170411210644.GB32380@potion>
+References: <20170331160658.4331-1-drjones@redhat.com>
+ <20170404164120.xvlvyebvcqoci5cu@kamzik.brq.redhat.com>
+ <20170405131049.GD6369@potion> <20170405173918.GA27123@cbox>
+ <20170405202016.GG6369@potion> <20170406142535.GD27123@cbox>
+ <20170407131537.GE23559@potion> <20170408182314.GD29201@lvm>
+ <925034633.12169627.1491679920960.JavaMail.zimbra@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BEEA40C33
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Apr 2017 17:04:25 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id yLIblOq0fo12 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Apr 2017 17:04:24 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5972D40BE3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Apr 2017 17:04:23 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1490729440-32591-2-git-send-email-tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Cc: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, james.morse-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+In-Reply-To: <925034633.12169627.1491679920960.JavaMail.zimbra@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, marc zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 28, 2017 at 01:30:31PM -0600, Tyler Baicar wrote:
-> A RAS (Reliability, Availability, Serviceability) controller
-> may be a separate processor running in parallel with OS
-> execution, and may generate error records for consumption by
-> the OS. If the RAS controller produces multiple error records,
-> then they may be overwritten before the OS has consumed them.
+2017-04-08 15:32-0400, Paolo Bonzini:
+> > > Makes sense.  My pitch at the documentation after dropping READ_ONCE():
+> > 
+> > I'm confused again, I thought you wanted to keep READ_ONCE().
+> > 
+> > > 
+> > >   /*
+> > >    *  The return value of kvm_request_pending() is implicitly volatile
+> > 
+> > why is that, actually?
+
+"that" is the return value?
+  kvm_request_pending() is 'inline static' so the compiler can prove that
+  the function only returns vcpu->requests and that the surrounding code
+  doesn't change it, so various optimizations are possible.
+
+Or the implicitly volatile bit?
+  We know that vcpu->requests can change at any time without action of the
+  execution thread, which makes it volatile, but we don't tell that to the
+  compiler, hence implicit.
+  
+  READ_ONCE(vcpu->requests) is
+  
+    *(volatile unsigned long *)&vcpu->requests
+  
+  and makes it explicitly volatile.
+
+> > >    *  and must be protected from reordering by the caller.
+> > >    */
+> > 
+> > Can we be specific about what that means?  (e.g. must be preceded by a
+> > full smp_mb() - or whatever the case is).
 > 
-> The Generic Hardware Error Source (GHES) v2 structure
-> introduces the capability for the OS to acknowledge the
-> consumption of the error record generated by the RAS
-> controller. A RAS controller supporting GHESv2 shall wait for
-> the acknowledgment before writing a new error record, thus
-> eliminating the race condition.
-> 
-> Add support for parsing of GHESv2 sub-tables as well.
-> 
-> Signed-off-by: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-> CC: Jonathan (Zhixiong) Zhang <zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-> Reviewed-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-> ---
->  drivers/acpi/apei/ghes.c | 49 +++++++++++++++++++++++++++++++++++++++++++++---
->  drivers/acpi/apei/hest.c |  7 +++++--
->  include/acpi/ghes.h      |  5 ++++-
->  3 files changed, 55 insertions(+), 6 deletions(-)
+> You can play devil's advocate both ways and argue that READ_ONCE is
+> better, or that it is unnecessary hence worse.  You can write good
+> comments in either case.  That's how I read Radim's message.  But
+> I think we all agree on keeping it in the end.
 
-...
-
-> @@ -249,10 +254,18 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
->  	ghes = kzalloc(sizeof(*ghes), GFP_KERNEL);
->  	if (!ghes)
->  		return ERR_PTR(-ENOMEM);
-> +
->  	ghes->generic = generic;
-> +	if (IS_HEST_TYPE_GENERIC_V2(ghes)) {
-> +		rc = apei_map_generic_address(
-> +			&ghes->generic_v2->read_ack_register);
-
-Yeah, that linebreak just to keep the 80-cols rule makes the code ugly
-and hard to read.
-
-Please put that mapping and unmapping in wrappers called
-map_gen_v2(ghes) and unmap_gen_v2(ghes) or so, so that you can call them
-wherever needed. Thus should make the flow a bit more understandable
-what's going on and you won't have to repeat the unmapping lines in
-ghes_fini().
-
-> @@ -649,6 +669,23 @@ static void ghes_estatus_cache_add(
->  	rcu_read_unlock();
->  }
->  
-> +static int ghes_ack_error(struct acpi_hest_generic_v2 *generic_v2)
-> +{
-> +	int rc;
-> +	u64 val = 0;
-> +
-> +	rc = apei_read(&val, &generic_v2->read_ack_register);
-> +	if (rc)
-> +		return rc;
-> +	val &= generic_v2->read_ack_preserve <<
-> +		generic_v2->read_ack_register.bit_offset;
-> +	val |= generic_v2->read_ack_write <<
-> +		generic_v2->read_ack_register.bit_offset;
-
-Yeah, let them stick out, it more readable this way. Line spacing is
-helpful too:
-
-...
-        rc = apei_read(&val, &generic_v2->read_ack_register);
-        if (rc)
-                return rc;
-
-        val &= generic_v2->read_ack_preserve << generic_v2->read_ack_register.bit_offset;
-        val |= generic_v2->read_ack_write    << generic_v2->read_ack_register.bit_offset;
-
-        return apei_write(val, &generic_v2->read_ack_register);
-}
-
-> +	rc = apei_write(val, &generic_v2->read_ack_register);
-> +
-> +	return rc;
-> +}
-> +
->  static int ghes_proc(struct ghes *ghes)
->  {
->  	int rc;
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Exactly, I am in favor of READ_ONCE() as I don't like to keep the
+compiler informed, just wanted to cover all options, because they are
+not that different ... minute details are the hardest to decide. :)
