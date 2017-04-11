@@ -1,81 +1,202 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 08/22] KVM: arm64: ITS: Implement
- vgic_mmio_uaccess_write_its_iidr
-Date: Mon, 10 Apr 2017 17:17:11 +0200
-Message-ID: <42ca421f-3c36-2f67-1e39-ec071cea3649@redhat.com>
+Subject: Re: [PATCH v4 18/22] KVM: arm64: ITS: Collection table save/restore
+Date: Tue, 11 Apr 2017 11:57:46 +0200
+Message-ID: <3d5f7230-e55b-44b8-bc37-021d1784ee0e@redhat.com>
 References: <1490607072-21610-1-git-send-email-eric.auger@redhat.com>
- <1490607072-21610-9-git-send-email-eric.auger@redhat.com>
- <864lxzch9o.fsf@arm.com> <5f1423fd-8f73-364a-9cf7-b4310957e2fd@redhat.com>
- <74d62f62-c0eb-b7eb-4e3a-96b1b6d0d66d@arm.com>
+ <1490607072-21610-19-git-send-email-eric.auger@redhat.com>
+ <95a88e33-3cbc-9c4d-b76c-3cec5c4cc310@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <74d62f62-c0eb-b7eb-4e3a-96b1b6d0d66d@arm.com>
+In-Reply-To: <95a88e33-3cbc-9c4d-b76c-3cec5c4cc310@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, christoffer.dall@linaro.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+To: Marc Zyngier <marc.zyngier@arm.com>, eric.auger.pro@gmail.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Marc,
 
-On 10/04/2017 16:57, Marc Zyngier wrote:
-> On 10/04/17 15:32, Auger Eric wrote:
->> Hi Marc,
+On 10/04/2017 11:55, Marc Zyngier wrote:
+> On 27/03/17 10:31, Eric Auger wrote:
+>> The flush path copies the collection entries into guest RAM
+>> at the GPA specified in the BASER register. This obviously
+>> requires the BASER to be set. The last written element
+>> is a dummy collection table entry.
 >>
->> On 08/04/2017 12:42, Marc Zyngier wrote:
->>> On Mon, Mar 27 2017 at 10:30:58 AM, Eric Auger <eric.auger@redhat.com> wrote:
->>>> The GITS_IIDR revision field is used to encode the version of the
->>>> table layout (ABI). So we need to restore it to check the table
->>>> layout to be restored is compatible with the destination vITS.
->>>>
->>>> The user selected revision is stored in the user_revision field.
->>>> It will be compared against the REV num at table restoration time.
->>>
->>> Why isn't it sufficient to keep it GITS_IIDR RO and let userspace find
->>> out about the ABI revision that the kernel understands?
->>>
->>> Or are we planning on supporting multiple ABIs in the kernel?
->> Yes as discussed with Peter, the plan is to allow several ABIs. So the
->> userspace informs the destination about the ABI revision of the stored
->> tables (contained by the GITS_IIDR). If the destination KVM does not
->> support this ABI revision, table restore will fail.
->>  If so, do
->>> we have a deprecation policy/plan? I don't mind either way, but it would
->>> be good to document it...
->>>
->>> Maybe it is documented already and I missed it (which is perfectly
->>> possible!).
->> Well this is partly documented in
->> Documentation/virtual/kvm/devices/arm-vgic-its.txt. No plan to
->> deprecate. migration from KVM supporting v1 to KVM supporting V2 would
->> be possible but not the contrary.
+>> We do not index by collection ID as the collection entry
+>> can fit into 8 bytes while containing the collection ID.
 >>
->> Does it make sense?
+>> On restore path we re-allocate the collection objects.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v3 -> v4:
+>> - replaced u64 *ptr by gpa_t gpa
+>> - check the collection does not exist before allocating it
+>>
+>> v1 -> v2:
+>> - reword commit message and directly use 8 as entry size
+>> - no kvm parameter anymore
+>> - add helper for flush/restore cte
+>> - table size computed here
+>> - add le64/cpu conversions
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 99 +++++++++++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 97 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 8eaeba4..df984b6 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -1828,13 +1828,89 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+>>  	return -ENXIO;
+>>  }
+>>  
+>> +static int vgic_its_flush_cte(struct vgic_its *its,
+>> +			      struct its_collection *collection, gpa_t gpa)
 > 
-> Sort of. Say you have three systems: A and C, which only supports v1; B,
-> which supports v1 and v2. Let's say you migrate from A to B, and from B
-> to C. Is B mandated to be able to export the tables as v1 and v2? Or can
-> it restrict what it can export?
-At the moment migration from B to C will fail because source ABI rev =
-v2 > destination support ABI = v1.
+> Given that the pendent of this function is name ..._restore_..., should
+> this be called ..._save_... ?
+> 
+>> +{
+>> +	u64 val;
+>> +	int ret;
+>> +
+>> +	val = ((u64)1 << 63 | ((u64)collection->target_addr << 16) |
+>> +	       collection->collection_id);
+> 
+> Please provide some #defines that describe the encoding. This will be
+> specially useful if we need to export this to userspace (KVM/TCG
+> interoperability?).
+> 
+>> +	val = cpu_to_le64(val);
+>> +	ret = kvm_write_guest(its->dev->kvm, gpa, &val, 8);
+>> +	return ret;
+>> +}
+>> +
+>> +static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, bool *valid)
+>> +{
+>> +	struct its_collection *collection;
+>> +	u32 target_addr;
+>> +	u32 coll_id;
+>> +	u64 val;
+>> +	int ret;
+>> +
+>> +	*valid = false;
+>> +
+>> +	ret = kvm_read_guest(its->dev->kvm, gpa, &val, 8);
+>> +	if (ret)
+>> +		return ret;
+>> +	val = le64_to_cpu(val);
+>> +	*valid = val & BIT_ULL(63);
+>> +
+>> +	if (!*valid)
+>> +		return 0;
+>> +
+>> +	target_addr = (u32)(val >> 16);
+> 
+> u32?
+At the moment its_collection.target_addr is u32 and corresponds to the
+PE number. Only GITS_TYPER.PTA = 0 is supported.
 
-A (v1) -> B (v1 & v2): migration OK
-B (v1 & v2) -> C (v1): migration NOK
-
-What could be done if we want something clever is source KVM detects
-which ABI is sufficient and choose the lowest revision for the save. for
-instance if no vLPI choose rev1, otherwise rev2. rev2 typically is
-needed for vLPI support for nested as we need to save/restore vPE table
-and vLPIs in ITE (2x8 byte entries).
-
-The problem is that once you have migrated to B and you start playing
-with vLPIs and C do not know the table layout for vPE/vLPIs, you can't
-migrate anymore.
+Or do I miss something?
 
 Thanks
 
 Eric
+> 
+>> +	coll_id = val & 0xFFFF;
+> 
+> Same comment about the various shifts/masks.
+> 
+>> +
+>> +	collection = find_collection(its, coll_id);
+>> +	if (collection)
+>> +		return -EEXIST;
+>> +	ret = vgic_its_alloc_collection(its, &collection, coll_id);
+>> +	if (ret)
+>> +		return ret;
+>> +	collection->target_addr = target_addr;
+>> +	return 0;
+>> +}
+>> +
+>>  /**
+>>   * vgic_its_flush_collection_table - flush the collection table into
+>>   * guest RAM
+>>   */
+>>  static int vgic_its_flush_collection_table(struct vgic_its *its)
+>>  {
+>> -	return -ENXIO;
+>> +	struct its_collection *collection;
+>> +	u64 val;
+>> +	gpa_t gpa;
+>> +	size_t max_size, filled = 0;
+>> +	int ret;
+>> +
+>> +	gpa = BASER_ADDRESS(its->baser_coll_table);
+>> +	if (!gpa)
+>> +		return 0;
+>> +
+>> +	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
+>> +
+>> +	list_for_each_entry(collection, &its->collection_list, coll_list) {
+>> +		if (filled == max_size)
+>> +			return -ENOSPC;
+>> +		ret = vgic_its_flush_cte(its, collection, gpa);
+>> +		if (ret)
+>> +			return ret;
+>> +		gpa += 8;
+>> +		filled += 8;
+> 
+> This "8" should be extracted from the BASER register itself (Entry_Size).
+> 
+>> +	}
+>> +
+>> +	if (filled == max_size)
+>> +		return 0;
+>> +
+>> +	/*
+>> +	 * table is not fully filled, add a last dummy element
+>> +	 * with valid bit unset
+>> +	 */
+>> +	val = 0;
+>> +	ret = kvm_write_guest(its->dev->kvm, gpa, &val, 8);
+>> +	return ret;
+>>  }
+>>  
+>>  /**
+>> @@ -1844,7 +1920,26 @@ static int vgic_its_flush_collection_table(struct vgic_its *its)
+>>   */
+>>  static int vgic_its_restore_collection_table(struct vgic_its *its)
+>>  {
+>> -	return -ENXIO;
+>> +	size_t max_size, read = 0;
+>> +	gpa_t gpa;
+>> +	int ret;
+>> +
+>> +	gpa = BASER_ADDRESS(its->baser_coll_table);
+>> +	if (!gpa)
+>> +		return 0;
+>> +
+>> +	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
+>> +
+>> +	while (read < max_size) {
+>> +		bool valid;
+>> +
+>> +		ret = vgic_its_restore_cte(its, gpa, &valid);
+>> +		if (!valid || ret)
+>> +			break;
+>> +		gpa += 8;
+>> +		read += 8;
+>> +	}
+>> +	return ret;
+>>  }
+>>  
+>>  /**
+>>
 > 
 > Thanks,
 > 
