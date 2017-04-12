@@ -1,80 +1,71 @@
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH v2 1/9] KVM: add kvm_request_pending
-Date: Tue, 11 Apr 2017 23:06:44 +0200
-Message-ID: <20170411210644.GB32380@potion>
-References: <20170331160658.4331-1-drjones@redhat.com>
- <20170404164120.xvlvyebvcqoci5cu@kamzik.brq.redhat.com>
- <20170405131049.GD6369@potion> <20170405173918.GA27123@cbox>
- <20170405202016.GG6369@potion> <20170406142535.GD27123@cbox>
- <20170407131537.GE23559@potion> <20170408182314.GD29201@lvm>
- <925034633.12169627.1491679920960.JavaMail.zimbra@redhat.com>
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+Subject: Re: [PATCH v3 8/8] arm64: exception: check shared writable page in
+ SEI handler
+Date: Wed, 12 Apr 2017 16:35:07 +0800
+Message-ID: <5b914702-7262-54d5-2f64-0521a04add03@huawei.com>
+References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
+ <1490869877-118713-9-git-send-email-xiexiuqi@huawei.com>
+ <58E7B6BD.3000401@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BEEA40C33
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Apr 2017 17:04:25 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yLIblOq0fo12 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Apr 2017 17:04:24 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5972D40BE3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Apr 2017 17:04:23 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <925034633.12169627.1491679920960.JavaMail.zimbra@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, marc zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <58E7B6BD.3000401@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, fu.wei@linaro.org, rostedt@goodmis.org, hanjun.guo@linaro.org, shiju.jose@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, gengdongjiu@huawei.com, zhengqiang10@huawei.com, wuquanming@huawei.com, Wang Xiongfeng <wangxiongfengi2@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-2017-04-08 15:32-0400, Paolo Bonzini:
-> > > Makes sense.  My pitch at the documentation after dropping READ_ONCE():
-> > 
-> > I'm confused again, I thought you wanted to keep READ_ONCE().
-> > 
-> > > 
-> > >   /*
-> > >    *  The return value of kvm_request_pending() is implicitly volatile
-> > 
-> > why is that, actually?
+Hi James,
 
-"that" is the return value?
-  kvm_request_pending() is 'inline static' so the compiler can prove that
-  the function only returns vcpu->requests and that the surrounding code
-  doesn't change it, so various optimizations are possible.
 
-Or the implicitly volatile bit?
-  We know that vcpu->requests can change at any time without action of the
-  execution thread, which makes it volatile, but we don't tell that to the
-  compiler, hence implicit.
-  
-  READ_ONCE(vcpu->requests) is
-  
-    *(volatile unsigned long *)&vcpu->requests
-  
-  and makes it explicitly volatile.
-
-> > >    *  and must be protected from reordering by the caller.
-> > >    */
-> > 
-> > Can we be specific about what that means?  (e.g. must be preceded by a
-> > full smp_mb() - or whatever the case is).
+On 2017/4/7 23:56, James Morse wrote:
+> Hi Xie XiuQi,
 > 
-> You can play devil's advocate both ways and argue that READ_ONCE is
-> better, or that it is unnecessary hence worse.  You can write good
-> comments in either case.  That's how I read Radim's message.  But
-> I think we all agree on keeping it in the end.
-
-Exactly, I am in favor of READ_ONCE() as I don't like to keep the
-compiler informed, just wanted to cover all options, because they are
-not that different ... minute details are the hardest to decide. :)
+> On 30/03/17 11:31, Xie XiuQi wrote:
+>> From: Wang Xiongfeng <wangxiongfeng2@huawei.com>
+>>
+>> Since SEI is asynchronous, the error data has been consumed. So we must
+>> suppose that all the memory data current process can write are
+>> contaminated. If the process doesn't have shared writable pages, the
+>> process will be killed, and the system will continue running normally.
+>> Otherwise, the system must be terminated, because the error has been
+>> propagated to other processes running on other cores, and recursively
+>> the error may be propagated to several another processes.
+> 
+> This is pretty complicated. We can't guarantee that another CPU hasn't modified
+> the page tables while we do this, (so its racy). We can't guarantee that the
+> corrupt data hasn't been sent over the network or written to disk in the mean
+> time (so its not enough).
+> 
+> The scenario you have is a write of corrupt data to memory where another CPU
+> reading it doesn't know the value is corrupt.
+> 
+> The hardware gives us quite a lot of help containing errors. The RAS
+> specification (DDI 0587A) describes your scenario as error propagation in '2.1.2
+> Architectural error propagation', and then classifies it in '2.1.3
+> Architecturally infected, containable and uncontainable' as uncontained because
+> the value is no longer in the general-purpose registers. For uncontained errors
+> we should panic().
+> 
+> We shouldn't need to try to track errors after we get a notification as the
+> hardware has done this for us.
+> 
+Thanks for your comments. I think what you said is reasonable. We will remove this
+patch and use AET fields of ESR_ELx to determine whether we should kill current
+process or just panic.
+> 
+> Firmware-first does complicate this if events like this are not delivered using
+> a synchronous external abort, as Linux may have PSTATE.A masked preventing
+> SError Interrupts from being taken. It looks like PSTATE.A is masked much more
+> often than is necessary. I will look into cleaning this up.
+> 
+> 
+> Thanks,
+> 
+> James
+> 
+> .
+> 
+Thanks,
+Wang Xiongfeng
