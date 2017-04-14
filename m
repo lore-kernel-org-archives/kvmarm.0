@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v5 09/22] KVM: arm64: vgic-its: Introduce migration ABI infrastructure
-Date: Fri, 14 Apr 2017 12:15:21 +0200
-Message-ID: <1492164934-988-10-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v5 10/22] KVM: arm64: vgic-its: Implement vgic_mmio_uaccess_write_its_iidr
+Date: Fri, 14 Apr 2017 12:15:22 +0200
+Message-ID: <1492164934-988-11-git-send-email-eric.auger@redhat.com>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
@@ -10,228 +10,84 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We plan to support different migration ABIs, ie. characterizing
-the ITS table layout format in guest RAM. Typically a new ABI will
-be needed if vLPIs get supported for nested use case.
+The GITS_IIDR revision field is used to encode the migration ABI
+revision. So we need to restore it to check the table layout is
+readable by the destination.
 
-So let's introduce an array of supported ABIs (at the moment a single
-ABI is supported though). The following characteristics are foreseen
-to vary with the ABI: size of table entries, save/restore operation.
-
-By default the MAX_ABI_REV is applied on its creation. In subsequent
-patches we will introduce a way for the userspace to change the ABI
-in use.
-
-The entry sizes now are set according to the ABI version and not
-hardcoded anymore.
+By writing the IIDR, userspace thus force the ABI revision to be
+used and this msut be less or equal than the max revision KVM supports.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
+v4 -> v5
+- rename user_revision into abi_rev and REV into MAX_ABI_REV
+- IIDR reports abi_rev set by userspace if any.
+- If value set by userspace exceeds the max supported revision, an
+  error is reported.
+- add some defines
 
-v5: creation and squash KVM: arm64: ITS: Report the ITE size in
-    GITS_TYPER
+v4: creation
 ---
- include/kvm/arm_vgic.h             |  3 ++
- include/linux/irqchip/arm-gic-v3.h |  4 ++
- virt/kvm/arm/vgic/vgic-its.c       | 82 ++++++++++++++++++++++++++++++++++++--
- 3 files changed, 85 insertions(+), 4 deletions(-)
+ include/linux/irqchip/arm-gic-v3.h |  4 ++++
+ virt/kvm/arm/vgic/vgic-its.c       | 23 ++++++++++++++++++++---
+ 2 files changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index c0b3d99..285474a 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -162,6 +162,9 @@ struct vgic_its {
- 	u32			creadr;
- 	u32			cwriter;
- 
-+	/* migration ABI revision in use */
-+	u32			abi_rev;
-+
- 	/* Protects the device and collection lists */
- 	struct mutex		its_lock;
- 	struct list_head	device_list;
 diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 97cbca1..9648bad 100644
+index 9648bad..54c20bd 100644
 --- a/include/linux/irqchip/arm-gic-v3.h
 +++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -132,6 +132,8 @@
- #define GIC_BASER_SHAREABILITY(reg, type)				\
- 	(GIC_BASER_##type << reg##_SHAREABILITY_SHIFT)
+@@ -241,6 +241,10 @@
+ #define GITS_TYPER_PTA			(1UL << 19)
+ #define GITS_TYPER_HWCOLLCNT_SHIFT	24
  
-+#define GIC_ENCODE_SZ(n, w) (((unsigned long)(n) - 1) & GENMASK_ULL(((w) - 1), 0))
++#define GITS_IIDR_REV_SHIFT		12
++#define GITS_IIDR_REV(r)		(((r) >> GITS_IIDR_REV_SHIFT) & 0xf)
++#define GITS_IIDR_PRODUCTID_SHIFT	24
 +
- #define GICR_PROPBASER_SHAREABILITY_SHIFT		(10)
- #define GICR_PROPBASER_INNER_CACHEABILITY_SHIFT		(7)
- #define GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT		(56)
-@@ -232,6 +234,7 @@
- #define GITS_CTLR_QUIESCENT		(1U << 31)
- 
- #define GITS_TYPER_PLPIS		(1UL << 0)
-+#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
- #define GITS_TYPER_IDBITS_SHIFT		8
- #define GITS_TYPER_DEVBITS_SHIFT	13
- #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
-@@ -290,6 +293,7 @@
- #define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
- #define GITS_BASER_ENTRY_SIZE_SHIFT		(48)
- #define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
-+#define GITS_BASER_ENTRY_SIZE_MASK	GENMASK_ULL(52, 48)
- #define GITS_BASER_SHAREABILITY_SHIFT	(10)
- #define GITS_BASER_InnerShareable					\
- 	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
+ #define GITS_CBASER_VALID			(1ULL << 63)
+ #define GITS_CBASER_SHAREABILITY_SHIFT		(10)
+ #define GITS_CBASER_INNER_CACHEABILITY_SHIFT	(59)
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 79ed1c2..69ecfe4 100644
+index 69ecfe4..1b5797e 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -33,6 +33,12 @@
- #include "vgic.h"
- #include "vgic-mmio.h"
- 
-+/* Highest migration ABI revision supported by this code */
-+#define MAX_ABI_REV 0
-+
-+static int vgic_its_set_abi(struct vgic_its *its, int rev);
-+static const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its);
-+
- /*
-  * Creates a new (reference to a) struct vgic_irq for a given LPI.
-  * If this LPI is already mapped on another ITS, we increase its refcount
-@@ -123,6 +129,15 @@ struct its_ite {
- 	u32 event_id;
- };
- 
-+struct vgic_its_abi {
-+	int cte_esz;
-+	int dte_esz;
-+	int ite_esz;
-+	int (*save_tables)(struct vgic_its *its);
-+	int (*restore_tables)(struct vgic_its *its);
-+	int (*commit)(struct vgic_its *its);
-+};
-+
- /*
-  * Find and returns a device in the device table for an ITS.
-  * Must be called with the its_lock mutex held.
-@@ -364,6 +379,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
- 					      struct vgic_its *its,
- 					      gpa_t addr, unsigned int len)
+@@ -401,7 +401,23 @@ static unsigned long vgic_mmio_read_its_iidr(struct kvm *kvm,
+ 					     struct vgic_its *its,
+ 					     gpa_t addr, unsigned int len)
  {
-+	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
- 	u64 reg = GITS_TYPER_PLPIS;
- 
- 	/*
-@@ -376,6 +392,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
- 	 */
- 	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
- 	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
-+	reg |= GIC_ENCODE_SZ(abi->ite_esz, 4) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
- 
- 	return extract_bytes(reg, addr & 7, len);
- }
-@@ -1268,6 +1285,7 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
- 				      gpa_t addr, unsigned int len,
- 				      unsigned long val)
- {
-+	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
- 	u64 entry_size, device_type;
- 	u64 reg, *regptr, clearbits = 0;
- 
-@@ -1278,12 +1296,12 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
- 	switch (BASER_INDEX(addr)) {
- 	case 0:
- 		regptr = &its->baser_device_table;
--		entry_size = 8;
-+		entry_size = abi->dte_esz;
- 		device_type = GITS_BASER_TYPE_DEVICE;
- 		break;
- 	case 1:
- 		regptr = &its->baser_coll_table;
--		entry_size = 8;
-+		entry_size = abi->cte_esz;
- 		device_type = GITS_BASER_TYPE_COLLECTION;
- 		clearbits = GITS_BASER_INDIRECT;
- 		break;
-@@ -1425,7 +1443,6 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
- 	(GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWb)		| \
- 	 GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, SameAsInner)		| \
- 	 GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)		| \
--	 ((8ULL - 1) << GITS_BASER_ENTRY_SIZE_SHIFT)			| \
- 	 GITS_BASER_PAGE_SIZE_64K)
- 
- #define INITIAL_PROPBASER_VALUE						  \
-@@ -1465,7 +1482,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
- 
- 	dev->private = its;
- 
--	return 0;
-+	return vgic_its_set_abi(its, MAX_ABI_REV);
+-	return (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
++	return (PRODUCT_ID_KVM << GITS_IIDR_PRODUCTID_SHIFT) |
++	       (its->abi_rev << GITS_IIDR_REV_SHIFT) | IMPLEMENTER_ARM;
++}
++
++static int vgic_mmio_uaccess_write_its_iidr(struct kvm *kvm,
++					    struct vgic_its *its,
++					    gpa_t addr, unsigned int len,
++					    unsigned long val)
++{
++	u64 tmp = 0;
++
++	tmp = update_64bit_reg(tmp, addr & 3, len, val);
++	tmp = GITS_IIDR_REV(tmp);
++
++	if (tmp > MAX_ABI_REV)
++		return -EINVAL;
++	return vgic_its_set_abi(its, tmp);
  }
  
- static void vgic_its_destroy(struct kvm_device *kvm_dev)
-@@ -1592,6 +1609,63 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
- 	return ret;
- }
- 
-+/**
-+ * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
-+ * according to v0 ABI
-+ */
-+static int vgic_its_save_tables_v0(struct vgic_its *its)
-+{
-+	return -ENXIO;
-+}
-+
-+/**
-+ * vgic_its_restore_tables_v0 - Restore the ITS tables from guest RAM
-+ * to internal data structs according to V0 ABI
-+ *
-+ */
-+static int vgic_its_restore_tables_v0(struct vgic_its *its)
-+{
-+	return -ENXIO;
-+}
-+
-+static int vgic_its_commit_v0(struct vgic_its *its)
-+{
-+	const struct vgic_its_abi *abi;
-+
-+	abi = vgic_its_get_abi(its);
-+	its->baser_coll_table &= ~GITS_BASER_ENTRY_SIZE_MASK;
-+	its->baser_device_table &= ~GITS_BASER_ENTRY_SIZE_MASK;
-+
-+	its->baser_coll_table |= (GIC_ENCODE_SZ(abi->cte_esz, 5)
-+					<< GITS_BASER_ENTRY_SIZE_SHIFT);
-+
-+	its->baser_device_table |= (GIC_ENCODE_SZ(abi->dte_esz, 5)
-+					<< GITS_BASER_ENTRY_SIZE_SHIFT);
-+	return 0;
-+}
-+
-+static const struct vgic_its_abi abi[MAX_ABI_REV + 1] = {
-+	{.cte_esz = 8, .dte_esz = 8, .ite_esz = 8,
-+	 .save_tables = vgic_its_save_tables_v0,
-+	 .restore_tables = vgic_its_restore_tables_v0,
-+	 . commit = vgic_its_commit_v0,
-+	},
-+};
-+
-+inline const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its)
-+{
-+	return &abi[its->abi_rev];
-+}
-+
-+int vgic_its_set_abi(struct vgic_its *its, int rev)
-+{
-+	const struct vgic_its_abi *abi;
-+
-+	its->abi_rev = rev;
-+	abi = vgic_its_get_abi(its);
-+	return abi->commit(its);
-+}
-+
- static int vgic_its_has_attr(struct kvm_device *dev,
- 			     struct kvm_device_attr *attr)
- {
+ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+@@ -1382,8 +1398,9 @@ static struct vgic_register_region its_registers[] = {
+ 	REGISTER_ITS_DESC(GITS_CTLR,
+ 		vgic_mmio_read_its_ctlr, vgic_mmio_write_its_ctlr, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_ITS_DESC(GITS_IIDR,
+-		vgic_mmio_read_its_iidr, its_mmio_write_wi, 4,
++	REGISTER_ITS_DESC_UACCESS(GITS_IIDR,
++		vgic_mmio_read_its_iidr, its_mmio_write_wi,
++		vgic_mmio_uaccess_write_its_iidr, 4,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_ITS_DESC(GITS_TYPER,
+ 		vgic_mmio_read_its_typer, its_mmio_write_wi, 8,
 -- 
 2.5.5
