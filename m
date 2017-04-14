@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v5 15/22] KVM: arm64: vgic-its: vgic_its_alloc_ite/device
-Date: Fri, 14 Apr 2017 12:15:27 +0200
-Message-ID: <1492164934-988-16-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v5 16/22] KVM: arm64: vgic-its: Add infrastructure for table lookup
+Date: Fri, 14 Apr 2017 12:15:28 +0200
+Message-ID: <1492164934-988-17-git-send-email-eric.auger@redhat.com>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
@@ -10,143 +10,143 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add two new helpers to allocate an its ite and an its device.
-This will avoid duplication on restore path.
+Add a generic lookup_table() helper whose role consists in
+scanning a contiguous table located in guest RAM and applying
+a callback on each entry. Entries can be handled as linked lists
+since the callback may return an offset to the next entry and
+also tell that an entry is the last one.
+
+Helper functions also are added to compute the device/event ID
+offset to the next DTE/ITE.
+
+compute_next_devid_offset, compute_next_eventid_offset and
+lookup_table will become static in subsequent patches
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
 ---
-
 v4 -> v5:
-- add Marc's A-b
+- use kvm_read_guest
 
 v3 -> v4:
-- fix allocation
-- add comment about its_lock mutex hold
-
-v1 -> v2:
-- report itt_size fix and remove ITE_SIZE
-- s/itte/ite/g
+- remove static to avoid compilation warning
+- correct size computation in looup_table()
+- defines now encode the number of bits used for devid and eventid offsets
+- use BIT() - 1 to encode the max offets
 ---
- virt/kvm/arm/vgic/vgic-its.c | 73 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 50 insertions(+), 23 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 93 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 93 insertions(+)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 55267ab..56c5123 100644
+index 56c5123..c22b35d 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -742,6 +742,27 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
- 	kfree(collection);
+@@ -195,6 +195,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+ 
+ #define VITS_TYPER_IDBITS 16
+ #define VITS_TYPER_DEVBITS 16
++#define VITS_DTE_MAX_DEVID_OFFSET	(BIT(14) - 1)
++#define VITS_ITE_MAX_EVENTID_OFFSET	(BIT(16) - 1)
+ 
+ /*
+  * Finds and returns a collection in the ITS collection table.
+@@ -1674,6 +1676,97 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+ 	return ret;
  }
  
-+/* Must be called with its_lock mutex held */
-+static int vgic_its_alloc_ite(struct its_device *device,
-+			       struct its_ite **itep,
-+			       struct its_collection *collection,
-+			       u32 lpi_id, u32 event_id)
++u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
 +{
-+	struct its_ite *ite;
++	struct list_head *e = &dev->dev_list;
++	struct its_device *next;
++	u32 next_offset;
 +
-+	ite = kzalloc(sizeof(*ite), GFP_KERNEL);
-+	if (!ite)
-+		return -ENOMEM;
++	if (e->next == h)
++		return 0;
++	next = list_entry(e->next, struct its_device, dev_list);
++	next_offset = next->device_id - dev->device_id;
 +
-+	ite->event_id	= event_id;
-+	ite->collection = collection;
-+	ite->lpi = lpi_id;
-+
-+	list_add_tail(&ite->ite_list, &device->itt_head);
-+	*itep = ite;
-+	return 0;
++	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
 +}
 +
- /*
-  * The MAPTI and MAPI commands map LPIs to ITTEs.
-  * Must be called with its_lock mutex held.
-@@ -755,7 +776,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	struct its_ite *ite;
- 	struct its_device *device;
- 	struct its_collection *collection, *new_coll = NULL;
--	int lpi_nr;
-+	int lpi_nr, ret;
- 	struct vgic_irq *irq;
- 
- 	device = find_its_device(its, device_id);
-@@ -785,19 +806,13 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 		new_coll = collection;
- 	}
- 
--	ite = kzalloc(sizeof(struct its_ite), GFP_KERNEL);
--	if (!ite) {
-+	ret = vgic_its_alloc_ite(device, &ite, collection, lpi_nr, event_id);
-+	if (ret) {
- 		if (new_coll)
- 			vgic_its_free_collection(its, coll_id);
--		return -ENOMEM;
-+		return ret;
- 	}
- 
--	ite->event_id	= event_id;
--	list_add_tail(&ite->ite_list, &device->itt_head);
--
--	ite->collection = collection;
--	ite->lpi = lpi_nr;
--
- 	irq = vgic_add_lpi(kvm, lpi_nr);
- 	if (IS_ERR(irq)) {
- 		if (new_coll)
-@@ -836,6 +851,29 @@ static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
- 	kfree(device);
- }
- 
-+/* Must be called with its_lock mutex held */
-+static int vgic_its_alloc_device(struct vgic_its *its,
-+				 struct its_device **devp,
-+				 u32 device_id, gpa_t itt_addr,
-+				 u8 nb_eventid_bits)
++u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
 +{
-+	struct its_device *device;
++	struct list_head *e = &ite->ite_list;
++	struct its_ite *next;
++	u32 next_offset;
 +
-+	device = kzalloc(sizeof(*device), GFP_KERNEL);
-+	if (!device)
-+		return -ENOMEM;
++	if (e->next == h)
++		return 0;
++	next = list_entry(e->next, struct its_ite, ite_list);
++	next_offset = next->event_id - ite->event_id;
 +
-+	device->device_id = device_id;
-+	device->itt_addr = itt_addr;
-+	device->nb_eventid_bits = nb_eventid_bits;
-+	INIT_LIST_HEAD(&device->itt_head);
-+
-+	list_add_tail(&device->dev_list, &its->device_list);
-+	*devp = device;
-+
-+	return 0;
++	return min_t(u32, next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
 +}
 +
- /*
-  * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
-  * Must be called with the its_lock mutex held.
-@@ -872,19 +910,8 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	if (!valid)
- 		return 0;
- 
--	device = kzalloc(sizeof(struct its_device), GFP_KERNEL);
--	if (!device)
--		return -ENOMEM;
--
--	device->device_id = device_id;
--	device->nb_eventid_bits = nb_eventid_bits;
--	device->itt_addr = itt_addr;
--
--	INIT_LIST_HEAD(&device->itt_head);
--
--	list_add_tail(&device->dev_list, &its->device_list);
--
--	return 0;
-+	return vgic_its_alloc_device(its, &device, device_id,
-+				     itt_addr, nb_eventid_bits);
- }
- 
- /*
++/**
++ * entry_fn_t - Callback called on a table entry restore path
++ * @its: its handle
++ * @id: id of the entry
++ * @entry: pointer to the entry
++ * @opaque: pointer to an opaque data
++ * @next_offset: minimal ID offset to the next entry. 0 if this
++ * entry is the last one, 1 if the entry is invalid, >= 1 if an
++ * entry's next_offset field was truly decoded
++ *
++ * Return: < 0 on error, 0 otherwise
++ */
++typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
++			  void *opaque, u32 *next_offset);
++
++/**
++ * lookup_table - scan a contiguous table in guest RAM and applies a function
++ * to each entry
++ *
++ * @its: its handle
++ * @base: base gpa of the table
++ * @size: size of the table in bytes
++ * @esz: entry size in bytes
++ * @start_id: first entry's ID
++ * @fn: function to apply on each entry
++ *
++ * Return: < 0 on error, 1 if last element identified, 0 otherwise
++ */
++int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
++		 int start_id, entry_fn_t fn, void *opaque)
++{
++	void *entry = kzalloc(esz, GFP_KERNEL);
++	struct kvm *kvm = its->dev->kvm;
++	unsigned long len = size;
++	u32 id = start_id;
++	gpa_t gpa = base;
++	int ret;
++
++	while (len > 0) {
++		u32 next_offset;
++		size_t byte_offset;
++
++		ret = kvm_read_guest(kvm, gpa, entry, esz);
++		if (ret)
++			goto out;
++
++		ret = fn(its, id, entry, opaque, &next_offset);
++		if (ret < 0 || (!ret && !next_offset))
++			goto out;
++
++		byte_offset = next_offset * esz;
++		id += next_offset;
++		gpa += byte_offset;
++		len -= byte_offset;
++	}
++	kfree(entry);
++	return 0;
++
++out:
++	kfree(entry);
++	return (ret < 0 ? ret : 1);
++}
++
+ /**
+  * vgic_its_save_device_tables - Save the device table and all ITT
+  * into guest RAM
 -- 
 2.5.5
