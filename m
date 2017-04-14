@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v5 06/22] KVM: arm/arm64: vgic: expose (un)lock_all_vcpus
-Date: Fri, 14 Apr 2017 12:15:18 +0200
-Message-ID: <1492164934-988-7-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v5 07/22] KVM: arm64: vgic-its: Implement vgic_its_has_attr_regs and attr_regs_access
+Date: Fri, 14 Apr 2017 12:15:19 +0200
+Message-ID: <1492164934-988-8-git-send-email-eric.auger@redhat.com>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
@@ -10,52 +10,148 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We need to use those helpers in vgic-its.c so let's
-expose them in the private vgic header.
+This patch implements vgic_its_has_attr_regs and vgic_its_attr_regs_access
+upon the MMIO framework. VGIC ITS KVM device KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+group becomes functional.
+
+At least GITS_CREADR and GITS_IIDR require to differentiate a guest write
+action from a user access. As such let's introduce a new uaccess_its_write
+vgic_register_region callback.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
 ---
-
 v4 -> v5:
-- Add Marc's A-b
----
- virt/kvm/arm/vgic/vgic-kvm-device.c | 4 ++--
- virt/kvm/arm/vgic/vgic.h            | 3 +++
- 2 files changed, 5 insertions(+), 2 deletions(-)
+- use GITS_TYPER instead of offset 0x8
+- uaccess_its_write now can return an error
 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index d181d2b..859bfa8 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -259,13 +259,13 @@ static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
- 	}
- }
- 
--static void unlock_all_vcpus(struct kvm *kvm)
-+void unlock_all_vcpus(struct kvm *kvm)
+v3 -> v4:
+- remove changes to the REGISTER_ITS_DESC macro. This will be handled in
+  subsequent patch with the introduction of a new REGISTER_ITS_DESC_UACCESS
+  macro
+- fix IIDR access and add a comment wrt full length access
+- handle endianness
+- add kvm lock and vcpus lock
+---
+ virt/kvm/arm/vgic/vgic-its.c  | 79 +++++++++++++++++++++++++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-mmio.h |  9 +++--
+ 2 files changed, 84 insertions(+), 4 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index f687e91..a9a2c12 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1469,14 +1469,89 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+ int vgic_its_has_attr_regs(struct kvm_device *dev,
+ 			   struct kvm_device_attr *attr)
  {
- 	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
- }
- 
- /* Returns true if all vcpus were locked, false otherwise */
--static bool lock_all_vcpus(struct kvm *kvm)
-+bool lock_all_vcpus(struct kvm *kvm)
- {
- 	struct kvm_vcpu *tmp_vcpu;
- 	int c;
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 6cf557e..b87f1c6 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -184,4 +184,7 @@ int vgic_init(struct kvm *kvm);
- int vgic_debug_init(struct kvm *kvm);
- int vgic_debug_destroy(struct kvm *kvm);
- 
-+bool lock_all_vcpus(struct kvm *kvm);
-+void unlock_all_vcpus(struct kvm *kvm);
+-	return -ENXIO;
++	const struct vgic_register_region *region;
++	struct vgic_io_device iodev = {
++		.regions = its_registers,
++		.nr_regions = ARRAY_SIZE(its_registers),
++	};
++	gpa_t offset = attr->attr;
 +
- #endif
++	region = vgic_find_mmio_region(iodev.regions,
++				       iodev.nr_regions,
++				       offset);
++	if (!region)
++		return -ENXIO;
++
++	return 0;
+ }
+ 
+ int vgic_its_attr_regs_access(struct kvm_device *dev,
+ 			      struct kvm_device_attr *attr,
+ 			      u64 *reg, bool is_write)
+ {
+-	return -ENXIO;
++	const struct vgic_register_region *region;
++	struct vgic_io_device iodev = {
++		.regions = its_registers,
++		.nr_regions = ARRAY_SIZE(its_registers),
++	};
++	struct vgic_its *its = dev->private;
++	gpa_t addr, offset = attr->attr;
++	unsigned int len;
++	unsigned long data = 0;
++	int ret = 0;
++
++	/*
++	 * Among supported registers, only GITS_CTLR (0x0) and GITS_IIDR (0x4)
++	 * are 32 bits. Others are 64 bits.
++	 */
++	if ((offset < GITS_TYPER && offset & 0x3) ||
++	    (offset >= GITS_TYPER && offset & 0x7))
++		return -EINVAL;
++
++	mutex_lock(&dev->kvm->lock);
++
++	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base)) {
++		ret = -ENXIO;
++		goto out;
++	}
++
++	region = vgic_find_mmio_region(iodev.regions,
++				       iodev.nr_regions,
++				       offset);
++	if (!region) {
++		ret = -ENXIO;
++		goto out;
++	}
++
++	if (!lock_all_vcpus(dev->kvm)) {
++		ret = -EBUSY;
++		goto out;
++	}
++
++	addr = its->vgic_its_base + offset;
++
++	/*
++	 * Only full length register accesses are supported although
++	 * the architecture spec theoretically allows upper/lower 32
++	 * bits to be accessed independently
++	 */
++	len = region->access_flags & VGIC_ACCESS_64bit ? 8 : 4;
++
++	if (is_write) {
++		data = vgic_data_mmio_bus_to_host(reg, len);
++		if (region->uaccess_its_write)
++			ret = region->uaccess_its_write(dev->kvm, its, addr,
++							len, data);
++		else
++			region->its_write(dev->kvm, its, addr, len, data);
++	} else {
++		data = region->its_read(dev->kvm, its, addr, len);
++		vgic_data_host_to_mmio_bus(reg, len, data);
++	}
++	unlock_all_vcpus(dev->kvm);
++out:
++	mutex_unlock(&dev->kvm->lock);
++	return ret;
+ }
+ 
+ static int vgic_its_has_attr(struct kvm_device *dev,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 6eec91b..ea4171a 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -36,8 +36,13 @@ struct vgic_register_region {
+ 	};
+ 	unsigned long (*uaccess_read)(struct kvm_vcpu *vcpu, gpa_t addr,
+ 				      unsigned int len);
+-	void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
+-			      unsigned int len, unsigned long val);
++	union {
++		void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
++				      unsigned int len, unsigned long val);
++		int (*uaccess_its_write)(struct kvm *kvm, struct vgic_its *its,
++					 gpa_t addr, unsigned int len,
++					 unsigned long val);
++	};
+ };
+ 
+ extern struct kvm_io_device_ops kvm_io_gic_ops;
 -- 
 2.5.5
