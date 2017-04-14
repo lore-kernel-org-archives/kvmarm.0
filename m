@@ -1,250 +1,155 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v5 22/22] KVM: arm64: vgic-v3: KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
-Date: Fri, 14 Apr 2017 12:15:34 +0200
-Message-ID: <1492164934-988-23-git-send-email-eric.auger@redhat.com>
-References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+From: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Subject: Re: [PATCH v3 1/8] trace: ras: add ARM processor error information
+ trace event
+Date: Fri, 14 Apr 2017 14:36:06 -0600
+Message-ID: <32ca4e7e-eb5e-a4ff-33d6-68d06e9242fb@codeaurora.org>
+References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
+ <1490869877-118713-11-git-send-email-xiexiuqi@huawei.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <1490869877-118713-11-git-send-email-xiexiuqi@huawei.com>
+Content-Language: en-US
+Sender: linux-acpi-owner@vger.kernel.org
+To: Xie XiuQi <xiexiuqi@huawei.com>, christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, fu.wei@linaro.org, rostedt@goodmis.org, hanjun.guo@linaro.org, shiju.jose@huawei.com
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, gengdongjiu@huawei.com, zhengqiang10@huawei.com, wuquanming@huawei.com, wangxiongfeng2@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch adds a new attribute to GICV3 KVM device
-KVM_DEV_ARM_VGIC_GRP_CTRL group. This Allows the userspace to
-flush all GICR pending tables into guest RAM. At the moment
-we do not offer any restore control as the sync is implicit.
+On 3/30/2017 4:31 AM, Xie XiuQi wrote:
+> Add a new trace event for ARM processor error information, so that
+> the user will know what error occurred. With this information the
+> user may take appropriate action.
+>
+> These trace events are consistent with the ARM processor error
+> information table which defined in UEFI 2.6 spec section N.2.4.4.1.
+>
+> ---
+> v2: add trace enabled condition as Steven's suggestion.
+>      fix a typo.
+> ---
+>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> Cc: Tyler Baicar <tbaicar@codeaurora.org>
+> Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
+> ---
+...
+>   
+> +#define ARM_PROC_ERR_TYPE	\
+> +	EM ( CPER_ARM_INFO_TYPE_CACHE, "cache error" )	\
+> +	EM ( CPER_ARM_INFO_TYPE_TLB,  "TLB error" )	\
+> +	EM ( CPER_ARM_INFO_TYPE_BUS, "bus error" )	\
+> +	EMe ( CPER_ARM_INFO_TYPE_UARCH, "micro-architectural error" )
+> +
+> +#define ARM_PROC_ERR_FLAGS	\
+> +	EM ( CPER_ARM_INFO_FLAGS_FIRST, "First error captured" )	\
+> +	EM ( CPER_ARM_INFO_FLAGS_LAST,  "Last error captured" )	\
+> +	EM ( CPER_ARM_INFO_FLAGS_PROPAGATED, "Propagated" )	\
+> +	EMe ( CPER_ARM_INFO_FLAGS_OVERFLOW, "Overflow" )
+> +
+Hello Xie XiuQi,
 
-As we need the PENDBASER_ADDRESS() in vgic-v3, let's move its
-definition in the irqchip header. We restore the full length
-of the field, ie [51:16]. Same for PROPBASER_ADDRESS with full
-field length of [51:12].
+This isn't compiling for me because of these definitions. Here you are 
+using ARM_*, but below in the TP_printk you are using ARCH_*. The 
+compiler complains the ARCH_* ones are undefined:
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+./include/trace/../../include/ras/ras_event.h:278:37: error: 
+'ARCH_PROC_ERR_TYPE' undeclared (first use in this function)
+      __print_symbolic(__entry->type, ARCH_PROC_ERR_TYPE),
+./include/trace/../../include/ras/ras_event.h:280:38: error: 
+'ARCH_PROC_ERR_FLAGS' undeclared (first use in this function)
+      __print_symbolic(__entry->flags, ARCH_PROC_ERR_FLAGS),
 
----
-v4 -> v5:
-- move pending table save code/ctrl into VGICv3 instead of ITS
-- remove useless gpa_t cast
-- use the same optimization as in its_sync_lpi_pending_table
+> +/*
+> + * First define the enums in MM_ACTION_RESULT to be exported to userspace
+> + * via TRACE_DEFINE_ENUM().
+> + */
+> +#undef EM
+> +#undef EMe
+> +#define EM(a, b) TRACE_DEFINE_ENUM(a);
+> +#define EMe(a, b)	TRACE_DEFINE_ENUM(a);
+> +
+> +ARM_PROC_ERR_TYPE
+> +ARM_PROC_ERR_FLAGS
+Are the above two lines supposed to be here?
+> +
+> +/*
+> + * Now redefine the EM() and EMe() macros to map the enums to the strings
+> + * that will be printed in the output.
+> + */
+> +#undef EM
+> +#undef EMe
+> +#define EM(a, b)		{ a, b },
+> +#define EMe(a, b)	{ a, b }
+> +
+> +TRACE_EVENT(arm_proc_err,
+I think it would be better to keep this similar to the naming of the 
+current RAS trace events (right now we have mc_event, arm_event, 
+aer_event, etc.). I would suggest using "arm_err_info_event" since this 
+is handling the error information structures of the arm errors.
+> +
+> +	TP_PROTO(const struct cper_arm_err_info *err),
+> +
+> +	TP_ARGS(err),
+> +
+> +	TP_STRUCT__entry(
+> +		__field(u8, type)
+> +		__field(u16, multiple_error)
+> +		__field(u8, flags)
+> +		__field(u64, error_info)
+> +		__field(u64, virt_fault_addr)
+> +		__field(u64, physical_fault_addr)
+Validation bits should also be a part of this structure that way user 
+space tools will know which of these fields are valid.
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__entry->type = err->type;
+> +
+> +		if (err->validation_bits & CPER_ARM_INFO_VALID_MULTI_ERR)
+> +			__entry->multiple_error = err->multiple_error;
+> +		else
+> +			__entry->multiple_error = ~0;
+> +
+> +		if (err->validation_bits & CPER_ARM_INFO_VALID_FLAGS)
+> +			__entry->flags = err->flags;
+> +		else
+> +			__entry->flags = ~0;
+> +
+> +		if (err->validation_bits & CPER_ARM_INFO_VALID_ERR_INFO)
+> +			__entry->error_info = err->error_info;
+> +		else
+> +			__entry->error_info = 0ULL;
+> +
+> +		if (err->validation_bits & CPER_ARM_INFO_VALID_VIRT_ADDR)
+> +			__entry->virt_fault_addr = err->virt_fault_addr;
+> +		else
+> +			__entry->virt_fault_addr = 0ULL;
+> +
+> +		if (err->validation_bits & CPER_ARM_INFO_VALID_PHYSICAL_ADDR)
+> +			__entry->physical_fault_addr = err->physical_fault_addr;
+> +		else
+> +			__entry->physical_fault_addr = 0ULL;
+> +	),
+> +
+> +	TP_printk("ARM Processor Error: type %s; count: %u; flags: %s;"
+I think the "ARM Processor Error:" part of this should just be removed. 
+Here's the output with this removed and the trace event renamed to 
+arm_err_info_event. I think this looks much cleaner and matches the 
+style used with the arm_event.
 
-v3 -> v4:
-- remove the wrong comment about locking
-- pass kvm struct instead of its handle
-- add comment about restore method
-- remove GITR_PENDABASER.PTZ check
-- continue if target_vcpu == NULL
-- new locking strategy
+           <idle>-0     [020] .ns.   366.592434: arm_event: affinity 
+level: 2; MPIDR: 0000000000000000; MIDR: 00000000510f8000; running 
+state: 1; PSCI state: 0
+           <idle>-0     [020] .ns.   366.592437: arm_err_info_event: 
+type cache error; count: 0; flags: 0x3; error info: 0000000000c20058; 
+virtual address: 0000000000000000; physical address: 0000000000000000
 
-v1 -> v2:
-- do not care about the 1st KB which should be zeroed according to
-  the spec.
----
- arch/arm/include/uapi/asm/kvm.h     |  1 +
- arch/arm64/include/uapi/asm/kvm.h   |  1 +
- include/linux/irqchip/arm-gic-v3.h  |  2 ++
- virt/kvm/arm/vgic/vgic-its.c        |  6 ++---
- virt/kvm/arm/vgic/vgic-kvm-device.c | 20 ++++++++++++++
- virt/kvm/arm/vgic/vgic-v3.c         | 54 +++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h            |  1 +
- 7 files changed, 81 insertions(+), 4 deletions(-)
+Thanks,
+Tyler
 
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index 8e6563c..78fe803 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -202,6 +202,7 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
- #define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
- #define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
-+#define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
- 
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 1e35115..8a3758a 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -222,6 +222,7 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
- #define   KVM_DEV_ARM_ITS_SAVE_TABLES           1
- #define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
-+#define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
- 
- /* Device Control API on vcpu fd */
- #define KVM_ARM_VCPU_PMU_V3_CTRL	0
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 0c6798c..9d3932f 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -158,6 +158,7 @@
- #define GICR_PROPBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWaWb)
- 
- #define GICR_PROPBASER_IDBITS_MASK			(0x1f)
-+#define GICR_PROPBASER_ADDRESS(x)    ((x) & GENMASK_ULL(51, 12))
- 
- #define GICR_PENDBASER_SHAREABILITY_SHIFT		(10)
- #define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT		(7)
-@@ -183,6 +184,7 @@
- #define GICR_PENDBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWaWb)
- 
- #define GICR_PENDBASER_PTZ				BIT_ULL(62)
-+#define GICR_PENDBASER_ADDRESS(x)    ((x) & GENMASK_ULL(51, 16))
- 
- /*
-  * Re-Distributor registers, offsets from SGI_base
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index be848be..745c245 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -189,8 +189,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
-  */
- #define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
- #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
--#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
--#define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
- 
- #define GIC_LPI_OFFSET 8192
- 
-@@ -227,7 +225,7 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
- static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
- 			     struct kvm_vcpu *filter_vcpu)
- {
--	u64 propbase = PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
-+	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
- 	u8 prop;
- 	int ret;
- 
-@@ -339,7 +337,7 @@ static u32 max_lpis_propbaser(u64 propbaser)
-  */
- static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
- {
--	gpa_t pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+	gpa_t pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
- 	struct vgic_irq *irq;
- 	int last_byte_offset = -1;
- 	int ret = 0;
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 859bfa8..d48743c 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -580,6 +580,24 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
- 		reg = tmp32;
- 		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
-+		int ret;
-+
-+		switch (attr->attr) {
-+		case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
-+			mutex_lock(&dev->kvm->lock);
-+
-+			if (!lock_all_vcpus(dev->kvm)) {
-+				mutex_unlock(&dev->kvm->lock);
-+				return -EBUSY;
-+			}
-+			ret = vgic_v3_save_pending_tables(dev->kvm);
-+			unlock_all_vcpus(dev->kvm);
-+			mutex_unlock(&dev->kvm->lock);
-+			return ret;
-+		}
-+		break;
-+	}
- 	}
- 	return -ENXIO;
- }
-@@ -658,6 +676,8 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 		switch (attr->attr) {
- 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
- 			return 0;
-+		case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
-+			return 0;
- 		}
- 	}
- 	return -ENXIO;
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index be0f4c3..1f0977f 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -15,6 +15,7 @@
- #include <linux/irqchip/arm-gic-v3.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
-+//#include <linux/bitops.h>
- #include <kvm/arm_vgic.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_asm.h>
-@@ -252,6 +253,59 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
- 	vgic_v3->vgic_hcr = ICH_HCR_EN;
- }
- 
-+/**
-+ * vgic_its_save_pending_tables - Save the pending tables into guest RAM
-+ * kvm lock and all vcpu lock must be held
-+ */
-+int vgic_v3_save_pending_tables(struct kvm *kvm)
-+{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	int last_byte_offset = -1;
-+	struct vgic_irq *irq;
-+	int ret;
-+
-+	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-+		int byte_offset, bit_nr;
-+		struct kvm_vcpu *vcpu;
-+		gpa_t pendbase, ptr;
-+		bool stored;
-+		u8 val;
-+
-+		vcpu = irq->target_vcpu;
-+		if (!vcpu)
-+			continue;
-+
-+		pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+
-+		byte_offset = irq->intid / BITS_PER_BYTE;
-+		bit_nr = irq->intid % BITS_PER_BYTE;
-+		ptr = pendbase + byte_offset;
-+
-+		if (byte_offset != last_byte_offset) {
-+			ret = kvm_read_guest(kvm, ptr, &val, 1);
-+			if (ret)
-+				return ret;
-+			last_byte_offset = byte_offset;
-+		}
-+
-+		stored = val & bit_nr;
-+		if (stored == irq->pending_latch)
-+			continue;
-+
-+		if (irq->pending_latch)
-+			val |= 1 << bit_nr;
-+		else
-+			val &= ~(1 << bit_nr);
-+
-+		ret = kvm_write_guest(kvm, ptr, &val, 1);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+
- /* check for overlapping regions and for regions crossing the end of memory */
- static bool vgic_v3_check_base(struct kvm *kvm)
- {
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 9bc52ef..535c2fc 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -177,6 +177,7 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- void vgic_v3_enable(struct kvm_vcpu *vcpu);
- int vgic_v3_probe(const struct gic_kvm_info *info);
- int vgic_v3_map_resources(struct kvm *kvm);
-+int vgic_v3_save_pending_tables(struct kvm *kvm);
- int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
- 
- int vgic_register_its_iodevs(struct kvm *kvm);
 -- 
-2.5.5
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
+
