@@ -1,143 +1,158 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v5 00/22] vITS save/restore
-Date: Fri, 14 Apr 2017 12:15:12 +0200
-Message-ID: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v5 01/22] KVM: arm/arm64: Add ITS save/restore API documentation
+Date: Fri, 14 Apr 2017 12:15:13 +0200
+Message-ID: <1492164934-988-2-git-send-email-eric.auger@redhat.com>
+References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series specifies and implements an API aimed at saving and restoring
-the state of the in-kernel emulated ITS device.
+Add description for how to access ITS registers and how to save/restore
+ITS tables into/from memory.
 
-The ITS is programmed through registers and tables. Those latter
-are allocated by the guest. Their base address is programmed in
-registers or table entries before the ITS is enabled.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-The ITS is free to use some of them to flush its internal caches. This
-is likely to be used when entering low power state.
-
-Therefore, for save/restore use case, it looks natural to use this
-guest RAM allocated space to save the table related data. However,
-currently, The ITS in-kernel emulated device does not use all of those
-tables and for those it uses, it does not always sync them with its
-cached data. Additional sync must happen for:
-- the collection table
-- the device table
-- the per-device translation tables
-- the LPI pending tables.
-
-The LPI configation table and the command queues do not need extra
-syncs.
-
-Best Regards
-
-Eric
-
-Git: complete series available at
-https://github.com/eauger/linux/tree/v4.11-rc6-its-mig-v5
-
-* Testing:
-- on Cavium ThunderX using a virtio-net-pci guest,
-  virsh save/restore commands and virt-manager live migration.
-  Tested with 1 and 2 stage device table.
-
-History:
+---
 v4 -> v5:
-- user API changes:
-  - ITS table save/restore triggered through ITS KVM device
-    KVM_DEV_ARM_VGIC_GRP_CTRL group, KVM_DEV_ARM_ITS_SAVE_TABLES,
-    KVM_DEV_ARM_ITS_RESTORE_TABLES
-  - RDIST pending table flush triggered through GICV3 KVM device
-    KVM_DEV_ARM_VGIC_GRP_CTRL/KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
-- Introduce an ABI infrastructure, entry size report using this infra
-- IIDR reports ABI chosen set by userspace if any
-- pending table save moved to vgic-v3.c
-- use optimisation in pending table save
-- check target_addr when restore cte
-- pending table sync called from restore_tables
-- added KVM: arm64: vgic-its: Fix pending table sync
-- simplify loopup_table and use kvm_read_guest()
-- sort the device and ITE list on save
-- add defines for shifts and masks, GIC_ENCODE_SZ macro
+- take into account Christoffer's comments
+- pending table save on GICV3 side now
 
 v3 -> v4:
-- update the DTE format (ITT_addr 52 bit support, validity bit addition)
-- Document ABI revision and implement check
-- iidr save/restore (including a new patch for iidr user write access)
-- changed locking: kvm lock + vcpu lock
-- fix nb_eventid_bits mixup
-- 2 new patches aiming at exposing next_segment() and lock_all_vcpus()
-- rework errror handling of lookup_table functions
-
-- I took into account all Andre's comments/suggestions except:
-  - trigger the save/restore of pending tables from GICV3 KVM device
-    instead of ITS KVM device
-  - implement ITS flush/restore in KVM_DEV_ARM_VGIC_GRP_CTRL
-    ITS group
-
-See the ML replies for current justifications. In case other people
-strongly disagree of course I will change the code.
-
-v2 -> v3:
-- fix restore ITS ITT_addr bit masking
+- take into account Peter's comments:
+  - typos
+  - KVM_DEV_ARM_VGIC_GRP_ITS_TABLES kvm_device_attr = 0
+  - add a validity bit in DTE
+  - document all fields in CTE and ITE
+  - document ABI revision
+- take into account Andre's comments:
+  - document restrictions about GITS_CREADR writing and GITS_IIDR
+  - document -EBUSY error if one or more VCPUS are runnning
+  - document 64b registers only can be accessed with 64b access
+- itt_addr field matches bits [51:8] of the itt_addr
 
 v1 -> v2:
-- rebased on Vijaya's v11
-- all entries now are 8 byte large
-- devid/eventid indexing for device table and ITT
-- support 2 stage device table
-- common infra to read indexed tables
-- add cpu <-> le64 conversions
-- itte renamed into ite
-- do not care anymore about pending table 1st KB
-  (not needed at the moment for coarse mapping)
+- DTE and ITE now are 8 bytes
+- DTE and ITE now indexed by deviceid/eventid
+- use ITE name instead of ITTE
+- mentions ITT_addr matches bits [51:8] of the actual address
+- mentions LE layout
+---
+ Documentation/virtual/kvm/devices/arm-vgic-its.txt | 99 ++++++++++++++++++++++
+ 1 file changed, 99 insertions(+)
 
-RFC v1
-- creation
-
-
-
-Eric Auger (22):
-  KVM: arm/arm64: Add ITS save/restore API documentation
-  KVM: arm/arm64: Add GICV3 pending table save API documentation
-  KVM: arm/arm64: vgic-its: rename itte into ite
-  arm/arm64: vgic: turn vgic_find_mmio_region into public
-  KVM: arm64: vgic-its: KVM_DEV_ARM_VGIC_GRP_ITS_REGS group
-  KVM: arm/arm64: vgic: expose (un)lock_all_vcpus
-  KVM: arm64: vgic-its: Implement vgic_its_has_attr_regs and
-    attr_regs_access
-  KVM: arm64: vgic-its: Implement vgic_mmio_uaccess_write_its_creadr
-  KVM: arm64: vgic-its: Introduce migration ABI infrastructure
-  KVM: arm64: vgic-its: Implement vgic_mmio_uaccess_write_its_iidr
-  KVM: arm64: vgic-its: Interpret MAPD Size field and check related
-    errors
-  KVM: arm64: vgic-its: Interpret MAPD ITT_addr field
-  KVM: arm64: vgic-its: Check the device id matches TYPER DEVBITS range
-  KVM: arm64: vgic-its: KVM_DEV_ARM_ITS_SAVE/RESTORE_TABLES
-  KVM: arm64: vgic-its: vgic_its_alloc_ite/device
-  KVM: arm64: vgic-its: Add infrastructure for table lookup
-  KVM: arm64: vgic-its: Collection table save/restore
-  KVM: arm64: vgic-its: vgic_its_check_id returns the entry's GPA
-  KVM: arm64: vgic-its: ITT save and restore
-  KVM: arm64: vgic-its: Device table save/restore
-  KVM: arm64: vgic-its: Fix pending table sync
-  KVM: arm64: vgic-v3: KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
-
- Documentation/virtual/kvm/devices/arm-vgic-its.txt |   99 ++
- Documentation/virtual/kvm/devices/arm-vgic-v3.txt  |    6 +
- arch/arm/include/uapi/asm/kvm.h                    |    6 +-
- arch/arm64/include/uapi/asm/kvm.h                  |    6 +-
- include/kvm/arm_vgic.h                             |    3 +
- include/linux/irqchip/arm-gic-v3.h                 |   12 +
- virt/kvm/arm/vgic/vgic-its.c                       | 1126 +++++++++++++++++---
- virt/kvm/arm/vgic/vgic-kvm-device.c                |   24 +-
- virt/kvm/arm/vgic/vgic-mmio.c                      |   11 +-
- virt/kvm/arm/vgic/vgic-mmio.h                      |   14 +-
- virt/kvm/arm/vgic/vgic-v3.c                        |   54 +
- virt/kvm/arm/vgic/vgic.h                           |   24 +
- 12 files changed, 1251 insertions(+), 134 deletions(-)
-
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+index 6081a5b..b5f010d 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+@@ -32,7 +32,106 @@ Groups:
+     KVM_DEV_ARM_VGIC_CTRL_INIT
+       request the initialization of the ITS, no additional parameter in
+       kvm_device_attr.addr.
++
++    KVM_DEV_ARM_ITS_SAVE_TABLES
++      save the ITS table data into guest RAM, at the location provisioned
++      by the guest in corresponding registers/table entries.
++
++      The layout of the tables in guest memory defines an ABI. The entries
++      are laid out in little endian format as described in the last paragraph.
++
++    KVM_DEV_ARM_ITS_RESTORE_TABLES
++      restore the ITS tables from guest RAM to ITS internal structures.
++
++      The GICV3 must be restored before the ITS and all ITS registers but
++      the GITS_CTLR must be restored before restoring the ITS tables.
++
++      The GITS_IIDR read-only register must also be restored before
++      the table restore as the IIDR revision field encodes the ABI revision.
++
+   Errors:
+     -ENXIO:  ITS not properly configured as required prior to setting
+              this attribute
+     -ENOMEM: Memory shortage when allocating ITS internal data
++    -EINVAL: Inconsistent restored data
++    -EFAULT: Invalid guest ram access
++    -EBUSY:  One or more VCPUS are running
++
++  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
++  Attributes:
++      The attr field of kvm_device_attr encodes the offset of the
++      ITS register, relative to the ITS control frame base address
++      (ITS_base).
++
++      kvm_device_attr.addr points to a __u64 value whatever the width
++      of the addressed register (32/64 bits). 64 bit registers can only
++      be accessed with full length.
++
++      Writes to read-only registers are ignored by the kernel except for:
++      - GITS_READR. It needs to be restored otherwise commands in the queue
++        will be re-executed after restoring CWRITER. GITS_READR must be restored
++        before restoring the GITS_CTLR which is likely to enable the ITS.
++        Also it needs to be restored after GITS_CBASER since a write to
++        GITS_CBASER resets GITS_CREADR.
++      - GITS_IIDR. Its Revision field encodes the table layout ABI revision.
++        In the future we might implement direct injection of virtual LPIS.
++        This will require an upgrade of the table layout and an evolution of
++        the ABI. GITS_IIDR must be restored before the table restoration.
++
++      For other registers, getting or setting a register has the same
++      effect as reading/writing the register on real hardware.
++  Errors:
++    -ENXIO: Offset does not correspond to any supported register
++    -EFAULT: Invalid user pointer for attr->addr
++    -EINVAL: Offset is not 64-bit aligned
++    -EBUSY: one or more VCPUS are running
++
++ ITS Table ABI REV0:
++ -------------------
++
++ Revision 0 of the ABI only supports physical LPIs.
++
++ The device table and ITT are indexed by the deviceid and eventid,
++ respectively. The collection table is not indexed by collectionid:
++ CTE are written in the table in the order of collection creation. All
++ entries are 8 bytes.
++
++ Device Table Entry (DTE):
++
++ bits:     | 63| 62 ... 49 | 48 ... 5 | 4 ... 0 |
++ values:   | V |   next    | ITT_addr |  Size   |
++
++ where;
++ - V indicates whether the entry is valid. If not, other fields
++   are not meaningful.
++ - next: equals to 0 if this entry is the last one; otherwise it
++   corresponds to the deviceid offset to the next DTE, capped by
++   2^14 -1.
++ - ITT_addr matches bits [51:8] of the ITT address (256B aligned).
++ - Size specifies the supported number of bits for the deviceid,
++   minus one
++
++ Collection Table Entry (CTE):
++
++ bits:     | 63| 62 ..  52  | 51 ... 16 | 15  ...   0 |
++ values:   | V |    RES0    |  RDBase   |    ICID     |
++
++ where:
++ - V indicates whether the entry is valid. If not, other fields are
++   not meaningful.
++ - RES0: reserved field with Should-Be-Zero-or-Preserved behavior.
++ - RDBase is the PE number (GICR_TYPER.Processor_Number semantic),
++ - ICID is the collection ID
++
++ Interrupt Translation Entry (ITE):
++
++ bits:     | 63 ... 48 | 47 ... 16 | 15 ... 0 |
++ values:   |    next   |   pINTID  |  ICID    |
++
++ where:
++ - next: equals to 0 if this entry is the last one; otherwise it corresponds
++   to the eventid offset to the next ITE capped by 2^16 -1.
++ - pINTID is the physical LPI ID; if zero, it means the entry is not valid
++   and other fields are not meaningful.
++ - ICID is the collection ID
++
 -- 
 2.5.5
