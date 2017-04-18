@@ -1,31 +1,27 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: kvm/arm64: use-after-free in
- kvm_unmap_hva_handler/unmap_stage2_pmds
-Date: Tue, 18 Apr 2017 11:30:57 +0100
-Message-ID: <716307d8-5713-a832-7a1f-a805356fbf46@arm.com>
-References: <CAAeHK+yjKm3mO2h9M30t-V_PnMhXEM887_zESCSg6gkbzivPsQ@mail.gmail.com>
- <20f6c994-d83e-7a6f-9f13-f10287211a6c@arm.com>
- <9f473bb9-d0eb-6803-1263-75ffef0301fe@redhat.com>
- <CAAeHK+x8udHKq9xa1zkTO6ax5E8Dk32HYWfaT05FMchL2cr48g@mail.gmail.com>
- <1050c9d8-5813-5df9-29e5-3ab6e61b5de6@arm.com>
- <88715300-ef58-e7bd-81f5-95e0b9c9c533@arm.com>
- <20170413155045.GA8387@e107814-lin.cambridge.arm.com>
- <20170418083230.GA17866@leverpostej> <20170418090845.GC17866@leverpostej>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v3 7/8] arm64: exception: handle asynchronous SError
+ interrupt
+Date: Tue, 18 Apr 2017 11:51:50 +0100
+Message-ID: <58F5EFC6.5070601@arm.com>
+References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
+ <1490869877-118713-8-git-send-email-xiexiuqi@huawei.com>
+ <20170413105131.GD24027@leverpostej>
+ <d7a8884d-f6b7-69d0-2438-83c202926000@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38D704095A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Apr 2017 06:28:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7720C4095A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Apr 2017 06:49:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xmfV-RgocNku for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Apr 2017 06:28:25 -0400 (EDT)
+ with ESMTP id fcNhF0zZcfcp for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Apr 2017 06:49:42 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B528F40190
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Apr 2017 06:28:25 -0400 (EDT)
-In-Reply-To: <20170418090845.GC17866@leverpostej>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD3B040190
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Apr 2017 06:49:42 -0400 (EDT)
+In-Reply-To: <d7a8884d-f6b7-69d0-2438-83c202926000@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,62 +31,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andrey Konovalov <andreyknvl@google.com>, will.deacon@arm.com, linux-kernel@vger.kernel.org, kcc@google.com, syzkaller@googlegroups.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, dvyukov@google.com
+To: Xiongfeng Wang <wangxiongfeng2@huawei.com>, Mark Rutland <mark.rutland@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org, wuquanming@huawei.com, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, rostedt@goodmis.org, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, Wang Xiongfeng <wangxiongfengi2@huawei.com>, shiju.jose@huawei.com, zhengqiang10@huawei.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, hanjun.guo@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMTgvMDQvMTcgMTA6MDgsIE1hcmsgUnV0bGFuZCB3cm90ZToKPiBPbiBUdWUsIEFwciAxOCwg
-MjAxNyBhdCAwOTozMjozMUFNICswMTAwLCBNYXJrIFJ1dGxhbmQgd3JvdGU6Cj4+IEhpIFN1enVr
-aSwKPj4KPj4gT24gVGh1LCBBcHIgMTMsIDIwMTcgYXQgMDQ6NTA6NDZQTSArMDEwMCwgU3V6dWtp
-IEsuIFBvdWxvc2Ugd3JvdGU6Cj4+PiBrdm06IEhvbGQgcmVmZXJlbmNlIHRvIHRoZSB1c2VyIGFk
-ZHJlc3Mgc3BhY2UKPj4+Cj4+PiBUaGUgY29yZSBLVk0gY29kZSwgdXNlcyBtbWdyYWIvbW1kcm9w
-IHRvIHBpbiB0aGUgbW0gc3RydWN0IG9mIHRoZSB1c2VyCj4+PiBhcHBsaWNhdGlvbi4gbW1ncmFi
-IG9ubHkgZ3VhcmFudGVlcyB0aGF0IHRoZSBtbSBzdHJ1Y3QgaXMgYXZhaWxhYmxlLAo+Pj4gd2hp
-bGUgdGhlICJyZWFsIGFkZHJlc3Mgc3BhY2UiIChzZWUgRG9jdW1lbnRhdGlvbi92bS9hY3RpdmVf
-bW0udHh0KSBtYXkKPj4+IGJlIGRlc3Ryb3llZC4gU2luY2UgdGhlIEtWTSBkZXBlbmRzIG9uIHRo
-ZSB1c2VyIHNwYWNlIHBhZ2UgdGFibGVzIGZvcgo+Pj4gdGhlIEd1ZXN0IHBhZ2VzLCB3ZSBzaG91
-bGQgaW5zdGVhZCBkbyBhbiBtbWdldC9tbXB1dC4gRXZlbiB0aG91Z2gKPj4+IG1tZ2V0L21tcHV0
-IGlzIG5vdCBlbmNvdXJhZ2VkIGZvciB1c2VzIHdpdGggdW5ib3VuZGVkIHRpbWUsIHRoZSBLVk0K
-Pj4+IGlzIGZpbmUgdG8gZG8gc28sIGFzIHdlIGFyZSBkb2luZyBpdCBmcm9tIHRoZSBjb250ZXh0
-IG9mIHRoZSBzYW1lIHByb2Nlc3MuCj4+Pgo+Pj4gVGhpcyBhbHNvIHByZXZlbnRzIHRoZSByYWNl
-IGNvbmRpdGlvbiB3aGVyZSBtbXVfbm90aWZpZXJfcmVsZWFzZSgpIGNvdWxkCj4+PiBiZSBjYWxs
-ZWQgaW4gcGFyYWxsZWwgYW5kIG9uZSBpbnN0YW5jZSBjb3VsZCBlbmQgdXAgdXNpbmcgYSBmcmVl
-J2Qga3ZtCj4+PiBpbnN0YW5jZS4KPj4+Cj4+PiBDYzogTWFyayBSdXRsYW5kIDxtYXJrLnJ1dGxh
-bmRAYXJtLmNvbT4KPj4+IENjOiBQYW9sbyBCb256aW4gPHBib256aW5pQHJlZGhhdC5jb20+Cj4+
-PiBDYzogUmFkaW0gS3LEjW3DocWZIDxya3JjbWFyQHJlZGhhdC5jb20+Cj4+PiBDYzogTWFyYyBa
-eW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPj4+IENjOiBDaHJpc3RvZmZlciBEYWxsIDxj
-aHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc+Cj4+PiBDYzogYW5kcmV5a252bEBnb29nbGUuY29t
-Cj4+PiBTaWduZWQtb2ZmLWJ5OiBTdXp1a2kgSyBQb3Vsb3NlIDxzdXp1a2kucG91bG9zZUBhcm0u
-Y29tPgo+Pj4gLS0tCj4+PiAgdmlydC9rdm0va3ZtX21haW4uYyB8IDYgKysrLS0tCj4+PiAgMSBm
-aWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkKPj4+Cj4+PiBkaWZm
-IC0tZ2l0IGEvdmlydC9rdm0va3ZtX21haW4uYyBiL3ZpcnQva3ZtL2t2bV9tYWluLmMKPj4+IGlu
-ZGV4IDg4MjU3YjMuLjU1NTcxMmUgMTAwNjQ0Cj4+PiAtLS0gYS92aXJ0L2t2bS9rdm1fbWFpbi5j
-Cj4+PiArKysgYi92aXJ0L2t2bS9rdm1fbWFpbi5jCj4+PiBAQCAtNjEzLDcgKzYxMyw3IEBAIHN0
-YXRpYyBzdHJ1Y3Qga3ZtICprdm1fY3JlYXRlX3ZtKHVuc2lnbmVkIGxvbmcgdHlwZSkKPj4+ICAJ
-CXJldHVybiBFUlJfUFRSKC1FTk9NRU0pOwo+Pj4KPj4+ICAJc3Bpbl9sb2NrX2luaXQoJmt2bS0+
-bW11X2xvY2spOwo+Pj4gLQltbWdyYWIoY3VycmVudC0+bW0pOwo+Pj4gKwltbWdldChjdXJyZW50
-LT5tbSk7Cj4+PiAgCWt2bS0+bW0gPSBjdXJyZW50LT5tbTsKPj4+ICAJa3ZtX2V2ZW50ZmRfaW5p
-dChrdm0pOwo+Pj4gIAltdXRleF9pbml0KCZrdm0tPmxvY2spOwo+Pj4gQEAgLTY4NSw3ICs2ODUs
-NyBAQCBzdGF0aWMgc3RydWN0IGt2bSAqa3ZtX2NyZWF0ZV92bSh1bnNpZ25lZCBsb25nIHR5cGUp
-Cj4+PiAgCWZvciAoaSA9IDA7IGkgPCBLVk1fQUREUkVTU19TUEFDRV9OVU07IGkrKykKPj4+ICAJ
-CWt2bV9mcmVlX21lbXNsb3RzKGt2bSwga3ZtLT5tZW1zbG90c1tpXSk7Cj4+PiAgCWt2bV9hcmNo
-X2ZyZWVfdm0oa3ZtKTsKPj4+IC0JbW1kcm9wKGN1cnJlbnQtPm1tKTsKPj4+ICsJbW1wdXQoY3Vy
-cmVudC0+bW0pOwo+Pj4gIAlyZXR1cm4gRVJSX1BUUihyKTsKPj4+ICB9Cj4+Pgo+Pj4gQEAgLTc0
-Nyw3ICs3NDcsNyBAQCBzdGF0aWMgdm9pZCBrdm1fZGVzdHJveV92bShzdHJ1Y3Qga3ZtICprdm0p
-Cj4+PiAgCWt2bV9hcmNoX2ZyZWVfdm0oa3ZtKTsKPj4+ICAJcHJlZW1wdF9ub3RpZmllcl9kZWMo
-KTsKPj4+ICAJaGFyZHdhcmVfZGlzYWJsZV9hbGwoKTsKPj4+IC0JbW1kcm9wKG1tKTsKPj4+ICsJ
-bW1wdXQobW0pOwo+Pj4gIH0KPj4KPj4KPj4gQXMgYSBoZWFkcy11cCwgSSdtIHNlZWluZyB3aGF0
-IGxvb2tzIHRvIGJlIGEgS1ZNIG1lbW9yeSBsZWFrIHdpdGggdGhpcwo+PiBwYXRjaCBhcHBsaWVk
-IGF0b3Agb2YgbmV4dC0yMDE3MDQxMS4KPj4KPj4gSSBkb24ndCB5ZXQga25vdyBpZiB0aGlzIGlz
-IGEgcHJvYmxlbSB3aXRoIG5leHQtMjAxNzA0MTEgb3IgdGhpcyBwYXRjaAo+PiBpbiBwYXJ0aWN1
-bGFyIC0tIEkgd2lsbCB0cnkgdG8gdHJhY2sgdGhhdCBkb3duLiBJbiB0aGUgbWVhbiB0aW1lLCBp
-bmZvCj4+IGR1bXAgYmVsb3cuCgpUaGlzIGlzIGluZGVlZCBhIHNpZGUgZWZmZWN0IG9mIHRoZSBu
-ZXcgcGF0Y2guIFRoZSBWQ1BVIGRvZXNuJ3QgZ2V0IHJlbGVhc2VkCmNvbXBsZXRlbHksIGR1ZSB0
-byBhbiBtbWFwIGNvdW50IGhlbGQgb24gdGhlIFZDUFUgZmQsIGV2ZW4gd2hlbiB3ZSBjbG9zZSB0
-aGUKVkNQVSBmZC4gVGhpcyBrZWVwcyB0aGUgcmVmY291bnQgb24gdGhlIEtWTSBpbnN0YW5jZSB3
-aGljaCBpbiB0dXJuIGhvbGRzIHRoZQptbWFwIGNvdW50ICh3aXRoIHRoZSBuZXcgcGF0Y2gpLiBT
-byB0aGUgbW1hcCBjb3VudCBvbiBWQ1BVIHdpbGwgbmV2ZXIgZ2V0CnJlbGVhc2VkIGR1ZSB0byB0
-aGUgY2lyY3VsYXIgZGVwZW5kZW5jeSBoZXJlLiA6LSgKClN1enVraQpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
-bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
-bG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi Wang Xiongfeng,
+
+On 18/04/17 02:09, Xiongfeng Wang wrote:
+> I have some confusion about the RAS feature when VHE is enabled. Does RAS spec support
+> the situation when VHE is enabled. When VHE is disabled, the hyperviosr delegates the error
+> exception to EL1 by setting HCR_EL2.VSE to 1, and this will inject a virtual SEI into OS.
+
+(The ARM-ARM also requires the HCR_EL2.AMO to be set so that physical SError
+ Interrupts are taken to EL2, meaning EL1 can never receive a physical SError)
+
+
+> My understanding is that HCR_EL2.VSE is only used to inject a virtual SEI into EL1.
+
+... mine too ...
+
+> But when VHE is enabled, the host OS will run at EL2. We can't inject a virtual SEI into
+> host OS. I don't know if RAS spec can handle this situation.
+
+The host expects to receive physical SError Interrupts. The ARM-ARM doesn't
+describe a way to inject these as they are generated by the CPU.
+
+Am I right in thinking you want this to use SError Interrupts as an APEI
+notification? (This isn't a CPU thing so the RAS spec doesn't cover this use)
+
+This is straightforward for the hyper-visor to implement using Virtual SError.
+I don't think its not always feasible for the host as Physical SError is routed
+to EL3 by SCR_EL3.EA, meaning there is no hardware generated SError that can
+reach EL2. Another APEI notification mechanism may be more appropriate.
+
+EL3 may be able to 'fake' an SError by returning into the appropriate EL2 vector
+if the exception came from EL{0,1}, or from EL2 and PSTATE.A is clear.
+If the SError came from EL2 and the ESR_EL3.IESB bit is set, we can write an
+appropriate ESR into DISR.
+You cant use SError to cover all the possible RAS exceptions. We already have
+this problem using SEI if PSTATE.A was set and the exception was an imprecise
+abort from EL2. We can't return to the interrupted context and we can't deliver
+an SError to EL2 either.
+
+Setting SCR_EL3.EA allows firmware to handle these ugly corner cases. Notifying
+the OS is a separate problem where APEI's SEI may not always be the best choice.
+
+
+Thanks,
+
+James
