@@ -1,132 +1,209 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2] KVM: arm/arm64: vgic-v3: De-optimize VMCR
- save/restore when emulating a GICv2
-Date: Wed, 19 Apr 2017 16:45:16 +0200
-Message-ID: <20170419144516.GD4104@cbox>
-References: <20170419111526.21073-1-marc.zyngier@arm.com>
+From: Borislav Petkov <bp-Gina5bIWoIWzQB+pC5nmwQ@public.gmane.org>
+Subject: Re: [PATCH V15 01/11] acpi: apei: read ack upon ghes record
+ consumption
+Date: Wed, 19 Apr 2017 20:31:12 +0200
+Message-ID: <20170419183112.x7tmjzpoq7ds64s2@pd.tnic>
+References: <1492556723-9189-1-git-send-email-tbaicar@codeaurora.org>
+ <1492556723-9189-2-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 221A140C30
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Apr 2017 10:42:37 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rXUs9-rVYZeI for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Apr 2017 10:42:35 -0400 (EDT)
-Received: from mail-wr0-f170.google.com (mail-wr0-f170.google.com
- [209.85.128.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9406740C2D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Apr 2017 10:42:35 -0400 (EDT)
-Received: by mail-wr0-f170.google.com with SMTP id c55so17123718wrc.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Apr 2017 07:45:14 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20170419111526.21073-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <1492556723-9189-2-git-send-email-tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Cc: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, james.morse-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 19, 2017 at 12:15:26PM +0100, Marc Zyngier wrote:
-> When emulating a GICv2-on-GICv3, special care must be taken to only
-> save/restore VMCR_EL2 when ICC_SRE_EL1.SRE is cleared. Otherwise,
-> all Group-0 interrupts end-up being delivered as FIQ, which is
-> probably not what the guest expects, as demonstrated here with
-> an unhappy EFI:
+On Tue, Apr 18, 2017 at 05:05:13PM -0600, Tyler Baicar wrote:
+> A RAS (Reliability, Availability, Serviceability) controller
+> may be a separate processor running in parallel with OS
+> execution, and may generate error records for consumption by
+> the OS. If the RAS controller produces multiple error records,
+> then they may be overwritten before the OS has consumed them.
 > 
-> 	FIQ Exception at 0x000000013BD21CC4
+> The Generic Hardware Error Source (GHES) v2 structure
+> introduces the capability for the OS to acknowledge the
+> consumption of the error record generated by the RAS
+> controller. A RAS controller supporting GHESv2 shall wait for
+> the acknowledgment before writing a new error record, thus
+> eliminating the race condition.
 > 
-> This means that we cannot perform the load/put trick when dealing
-> with VMCR_EL2 (because the host has SRE set), and we have to deal
-> with it in the world-switch.
+> Add support for parsing of GHESv2 sub-tables as well.
 > 
-> Fortunately, this is not the most common case (modern guests should
-> be able to deal with GICv3 directly), and the performance is not worse
-> than what it was before the VMCR optimization.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
-
-I have applied both fixes.
-
-Thanks,
--Christoffer
-
+> Signed-off-by: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> CC: Jonathan (Zhixiong) Zhang <zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> Reviewed-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
 > ---
-> * From v1:
->   - Move vgic_sre testing from vgic_{load,put} to vgic_v3_{load,put}
+>  drivers/acpi/apei/ghes.c | 55 +++++++++++++++++++++++++++++++++++++++++++++---
+>  drivers/acpi/apei/hest.c |  7 ++++--
+>  include/acpi/ghes.h      |  5 ++++-
+>  3 files changed, 61 insertions(+), 6 deletions(-)
 > 
->  virt/kvm/arm/hyp/vgic-v3-sr.c |  8 ++++++--
->  virt/kvm/arm/vgic/vgic-v3.c   | 11 +++++++++--
->  2 files changed, 15 insertions(+), 4 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> index 3d0b1ddb6929..91922c1eddc8 100644
-> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> @@ -128,8 +128,10 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
->  	 * Make sure stores to the GIC via the memory mapped interface
->  	 * are now visible to the system register interface.
->  	 */
-> -	if (!cpu_if->vgic_sre)
-> +	if (!cpu_if->vgic_sre) {
->  		dsb(st);
-> +		cpu_if->vgic_vmcr = read_gicreg(ICH_VMCR_EL2);
-> +	}
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 79b3c9c..6d87ab7 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -46,6 +46,7 @@
+>  #include <linux/nmi.h>
+>  #include <linux/sched/clock.h>
 >  
->  	if (used_lrs) {
->  		int i;
-> @@ -205,11 +207,13 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
->  	 * delivered as a FIQ to the guest, with potentially fatal
->  	 * consequences. So we must make sure that ICC_SRE_EL1 has
->  	 * been actually programmed with the value we want before
-> -	 * starting to mess with the rest of the GIC.
-> +	 * starting to mess with the rest of the GIC, and VMCR_EL2 in
-> +	 * particular.
->  	 */
->  	if (!cpu_if->vgic_sre) {
->  		write_gicreg(0, ICC_SRE_EL1);
->  		isb();
-> +		write_gicreg(cpu_if->vgic_vmcr, ICH_VMCR_EL2);
+> +#include <acpi/actbl1.h>
+>  #include <acpi/ghes.h>
+>  #include <acpi/apei.h>
+>  #include <asm/tlbflush.h>
+> @@ -80,6 +81,10 @@
+>  	((struct acpi_hest_generic_status *)				\
+>  	 ((struct ghes_estatus_node *)(estatus_node) + 1))
+>  
+> +#define IS_HEST_TYPE_GENERIC_V2(ghes)				\
+> +	((struct acpi_hest_header *)ghes->generic)->type ==	\
+
+This is a nasty hack: casting the ghes->generic pointer to a pointer of its
+first member which is a acpi_hest_header.
+
+Why isn't this a nice inline function with proper dereferencing:
+
+static inline bool is_hest_type_generic_v2(struct ghes *ghes)
+{
+        return ghes->generic->header.type == ACPI_HEST_TYPE_GENERIC_ERROR_V2;
+}
+
+?
+
+Also, please integrate scripts/checkpatch.pl in your patch creation
+workflow. Some of the warnings/errors *actually* make sense.
+
+>  /*
+>   * This driver isn't really modular, however for the time being,
+>   * continuing to use module_param is the easiest way to remain
+> @@ -240,6 +245,17 @@ static int ghes_estatus_pool_expand(unsigned long len)
+>  	return 0;
+>  }
+>  
+> +static int map_gen_v2(struct ghes *ghes)
+> +{
+> +	return apei_map_generic_address(&ghes->generic_v2->read_ack_register);
+> +}
+> +
+> +static void unmap_gen_v2(struct ghes *ghes)
+> +{
+> +	apei_unmap_generic_address(&ghes->generic_v2->read_ack_register);
+> +	return;
+> +}
+
+Like this one, for example:
+
+WARNING: void function return statements are not generally useful
+#89: FILE: drivers/acpi/apei/ghes.c:257:
++       return;
++}
+
+> +
+>  static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+>  {
+>  	struct ghes *ghes;
+> @@ -249,10 +265,17 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+>  	ghes = kzalloc(sizeof(*ghes), GFP_KERNEL);
+>  	if (!ghes)
+>  		return ERR_PTR(-ENOMEM);
+> +
+>  	ghes->generic = generic;
+> +	if (IS_HEST_TYPE_GENERIC_V2(ghes)) {
+> +		rc = map_gen_v2(ghes);
+> +		if (rc)
+> +			goto err_free;
+> +	}
+> +
+>  	rc = apei_map_generic_address(&generic->error_status_address);
+>  	if (rc)
+> -		goto err_free;
+> +		goto err_unmap_read_ack_addr;
+>  	error_block_length = generic->error_block_length;
+>  	if (error_block_length > GHES_ESTATUS_MAX_SIZE) {
+>  		pr_warning(FW_WARN GHES_PFX
+> @@ -264,13 +287,16 @@ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
+>  	ghes->estatus = kmalloc(error_block_length, GFP_KERNEL);
+>  	if (!ghes->estatus) {
+>  		rc = -ENOMEM;
+> -		goto err_unmap;
+> +		goto err_unmap_status_addr;
 >  	}
 >  
->  	val = read_gicreg(ICH_VTR_EL2);
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index bc7010db9f4d..df1503650300 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -373,12 +373,19 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+>  	return ghes;
 >  
-> -	kvm_call_hyp(__vgic_v3_write_vmcr, cpu_if->vgic_vmcr);
-> +	/*
-> +	 * If dealing with a GICv2 emulation on GICv3, VMCR_EL2.VFIQen
-> +	 * is dependent on ICC_SRE_EL1.SRE, and we have to perform the
-> +	 * VMCR_EL2 save/restore in the world switch.
-> +	 */
-> +	if (likely(cpu_if->vgic_sre))
-> +		kvm_call_hyp(__vgic_v3_write_vmcr, cpu_if->vgic_vmcr);
+> -err_unmap:
+> +err_unmap_status_addr:
+>  	apei_unmap_generic_address(&generic->error_status_address);
+> +err_unmap_read_ack_addr:
+> +	if (IS_HEST_TYPE_GENERIC_V2(ghes))
+> +		unmap_gen_v2(ghes);
+>  err_free:
+>  	kfree(ghes);
+>  	return ERR_PTR(rc);
+> @@ -280,6 +306,8 @@ static void ghes_fini(struct ghes *ghes)
+>  {
+>  	kfree(ghes->estatus);
+>  	apei_unmap_generic_address(&ghes->generic->error_status_address);
+> +	if (IS_HEST_TYPE_GENERIC_V2(ghes))
+> +		unmap_gen_v2(ghes);
 >  }
 >  
->  void vgic_v3_put(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
->  
-> -	cpu_if->vgic_vmcr = kvm_call_hyp(__vgic_v3_read_vmcr);
-> +	if (likely(cpu_if->vgic_sre))
-> +		cpu_if->vgic_vmcr = kvm_call_hyp(__vgic_v3_read_vmcr);
+>  static inline int ghes_severity(int severity)
+> @@ -649,6 +677,21 @@ static void ghes_estatus_cache_add(
+>  	rcu_read_unlock();
 >  }
-> -- 
-> 2.11.0
-> 
+>  
+> +static int ghes_ack_error(struct acpi_hest_generic_v2 *generic_v2)
+
+If you name this function parameter to something shorter, say gv2, for
+example...
+
+> +{
+> +	int rc;
+> +	u64 val = 0;
+> +
+> +	rc = apei_read(&val, &generic_v2->read_ack_register);
+> +	if (rc)
+> +		return rc;
+> +
+> +	val &= generic_v2->read_ack_preserve << generic_v2->read_ack_register.bit_offset;
+> +	val |= generic_v2->read_ack_write << generic_v2->read_ack_register.bit_offset;
+
+... you can align those two nicely while remaining within the 80 cols width:
+
+        val &= gv2->read_ack_preserve << gv2->read_ack_register.bit_offset;
+        val |= gv2->read_ack_write    << gv2->read_ack_register.bit_offset;
+
+and make them readable at a quick glance.
+
+> +
+> +	return apei_write(val, &generic_v2->read_ack_register);
+> +}
+> +
+>  static int ghes_proc(struct ghes *ghes)
+>  {
+>  	int rc;
+> @@ -661,6 +704,12 @@ static int ghes_proc(struct ghes *ghes)
+>  			ghes_estatus_cache_add(ghes->generic, ghes->estatus);
+>  	}
+>  	ghes_do_proc(ghes, ghes->estatus);
+
+This needs a comment why v2 needs to ACK the error. The commit message
+is not necessarily something we'll find quickly in the future.
+
+> +
+> +	if (IS_HEST_TYPE_GENERIC_V2(ghes)) {
+> +		rc = ghes_ack_error(ghes->generic_v2);
+> +		if (rc)
+> +			return rc;
+> +	}
+>  out:
+>  	ghes_clear_estatus(ghes);
+>  	return rc;
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
