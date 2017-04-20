@@ -1,232 +1,135 @@
-From: Borislav Petkov <bp-Gina5bIWoIWzQB+pC5nmwQ@public.gmane.org>
-Subject: Re: [PATCH V15 02/11] ras: acpi/apei: cper: add support for generic
- data v3 structure
-Date: Thu, 20 Apr 2017 13:14:51 +0200
-Message-ID: <20170420111451.6mo4o2oulwal3j33@pd.tnic>
-References: <1492556723-9189-1-git-send-email-tbaicar@codeaurora.org>
- <1492556723-9189-3-git-send-email-tbaicar@codeaurora.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH] ARM: hyp-stub: Fix Thumb-2 compilation
+Date: Thu, 20 Apr 2017 13:23:06 +0200
+Message-ID: <20170420112306.GE4104@cbox>
+References: <20170420101620.1368-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5373E40EFE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Apr 2017 07:20:28 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id l2iViM4grIhb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Apr 2017 07:20:24 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E7FD40DE0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Apr 2017 07:20:24 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id w64so101295390wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Apr 2017 04:23:04 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1492556723-9189-3-git-send-email-tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Cc: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, james.morse-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+In-Reply-To: <20170420101620.1368-1-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Arnd Bergmann <arnd@arndb.de>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 18, 2017 at 05:05:14PM -0600, Tyler Baicar wrote:
-> The ACPI 6.1 spec adds a new version of the generic data structure.
-
-which data structure? HEST?
-
-> Add support to handle the new structure as well as properly verify
-> and iterate through the generic data entries.
+On Thu, Apr 20, 2017 at 11:16:20AM +0100, Marc Zyngier wrote:
+> The assembler defaults to emiting the short form of ADR, leading
+> to an out-of-range immediate. Using the wide version solves this
+> issue.
 > 
-> Signed-off-by: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-> CC: Jonathan (Zhixiong) Zhang <zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-> Reviewed-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
-> Reviewed-by: Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-
-This is clearly a new version of the patch so Reviewed-by tags don't
-apply anymore. Ditto for the next one. Remember to remove such tags in
-the future when the patches are changed non-trivially in a following
-iteration.
-
+> Fixes: bc845e4fbbbb ("ARM: KVM: Implement HVC_RESET_VECTORS stub hypercall in the init code")
+> Reported-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  drivers/acpi/apei/ghes.c    |  6 +++---
->  drivers/firmware/efi/cper.c | 37 ++++++++++++++++++++++---------------
->  include/acpi/ghes.h         | 22 ++++++++++++++++++++++
->  3 files changed, 47 insertions(+), 18 deletions(-)
+>  arch/arm/kernel/hyp-stub.S | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index 6d87ab7..dfb7dd2 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -429,7 +429,7 @@ static void ghes_handle_memory_failure(struct acpi_hest_generic_data *gdata, int
->  	int flags = -1;
->  	int sec_sev = ghes_severity(gdata->error_severity);
->  	struct cper_sec_mem_err *mem_err;
-> -	mem_err = (struct cper_sec_mem_err *)(gdata + 1);
-> +	mem_err = acpi_hest_get_payload(gdata);
-
-        struct cper_sec_mem_err *mem_err = acpi_hest_get_payload(gdata);
-
-while you're at it.
-
->  	if (!(mem_err->validation_bits & CPER_MEM_VALID_PA))
->  		return;
-> @@ -466,7 +466,7 @@ static void ghes_do_proc(struct ghes *ghes,
->  		if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
->  				 CPER_SEC_PLATFORM_MEM)) {
->  			struct cper_sec_mem_err *mem_err;
-> -			mem_err = (struct cper_sec_mem_err *)(gdata+1);
-> +			mem_err = acpi_hest_get_payload(gdata);
-
-Ditto
-
-+ add a \n here.
-
->  			ghes_edac_report_mem_error(ghes, sev, mem_err);
+> diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
+> index d8523cc47a54..ec7e7377d423 100644
+> --- a/arch/arm/kernel/hyp-stub.S
+> +++ b/arch/arm/kernel/hyp-stub.S
+> @@ -125,7 +125,7 @@ ENTRY(__hyp_stub_install_secondary)
+>   * (see safe_svcmode_maskall).
+>   */
+>  	@ Now install the hypervisor stub:
+> -	adr	r7, __hyp_stub_vectors
+> +	W(adr)	r7, __hyp_stub_vectors
+>  	mcr	p15, 4, r7, c12, c0, 0	@ set hypervisor vector base (HVBAR)
 >  
->  			arch_apei_report_mem_error(sev, mem_err);
-> @@ -476,7 +476,7 @@ static void ghes_do_proc(struct ghes *ghes,
->  		else if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
->  				      CPER_SEC_PCIE)) {
->  			struct cper_sec_pcie *pcie_err;
-> -			pcie_err = (struct cper_sec_pcie *)(gdata+1);
-> +			pcie_err = acpi_hest_get_payload(gdata);
+>  	@ Disable all traps, so we don't get any nasty surprise
+> -- 
+> 2.11.0
+> 
 
-Ditto.
+This fixes the compile, but I get this when booting it on TC2:
 
->  			if (sev == GHES_SEV_RECOVERABLE &&
->  			    sec_sev == GHES_SEV_RECOVERABLE &&
->  			    pcie_err->validation_bits & CPER_PCIE_VALID_DEVICE_ID &&
-> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
-> index d425374..8328a6f 100644
-> --- a/drivers/firmware/efi/cper.c
-> +++ b/drivers/firmware/efi/cper.c
-> @@ -32,6 +32,7 @@
->  #include <linux/acpi.h>
->  #include <linux/pci.h>
->  #include <linux/aer.h>
-> +#include <acpi/ghes.h>
->  
->  #define INDENT_SP	" "
->  
-> @@ -386,8 +387,9 @@ static void cper_print_pcie(const char *pfx, const struct cper_sec_pcie *pcie,
->  	pfx, pcie->bridge.secondary_status, pcie->bridge.control);
->  }
->  
-> -static void cper_estatus_print_section(
-> -	const char *pfx, const struct acpi_hest_generic_data *gdata, int sec_no)
-> +static void
-> +cper_estatus_print_section(const char *pfx, struct acpi_hest_generic_data *gdata,
-> +			   int sec_no)
->  {
->  	uuid_le *sec_type = (uuid_le *)gdata->section_type;
->  	__u16 severity;
-> @@ -403,14 +405,18 @@ static void cper_estatus_print_section(
->  
->  	snprintf(newpfx, sizeof(newpfx), "%s%s", pfx, INDENT_SP);
->  	if (!uuid_le_cmp(*sec_type, CPER_SEC_PROC_GENERIC)) {
-> -		struct cper_sec_proc_generic *proc_err = (void *)(gdata + 1);
-> +		struct cper_sec_proc_generic *proc_err;
-> +
-> +		proc_err = acpi_hest_get_payload(gdata);
+kvm [1]: 8-bit VMID
+kvm [1]: IDMAP page: 80201000
+kvm [1]: HYP VA range: 80000000:ffffffff
+kvm [1]: Hyp mode initialized successfully
+kvm [1]: vgic-v2@2c004000
+kvm [1]: vgic interrupt IRQ16
+kvm [1]: virtual timer IRQ19
+Kernel panic - not syncing:
+HYP panic: UNDEF PC:802010ac CPSR:800001da
+CPU: 0 PID: 0 Comm: swapper/0 Not tainted 4.11.0-rc3+ #140
+Hardware name: ARM-Versatile Express
+[<8021c5f1>] (unwind_backtrace) from [<802199eb>] (show_stack+0xb/0xc)
+[<802199eb>] (show_stack) from [<803ccc15>] (dump_stack+0x71/0x80)
+[<803ccc15>] (dump_stack) from [<80289467>] (panic+0xbb/0x1d4)
+[<80289467>] (panic) from [<8020b1f5>]
+(_kvm_arch_hardware_disable+0x11/0x20)
+[<8020b1f5>] (_kvm_arch_hardware_disable) from [<8026c497>]
+(flush_smp_call_function_queue+0x77/0x134)
+[<8026c497>] (flush_smp_call_function_queue) from [<8021b8f9>]
+(handle_IPI+0xd9/0x150)
+[<8021b8f9>] (handle_IPI) from [<80201425>] (gic_handle_irq+0x65/0x6c)
+[<80201425>] (gic_handle_irq) from [<8021a213>] (__irq_svc+0x53/0x7c)
+Exception stack(0x80a01f18 to 0x80a01f60)
+1f00:                                                       00000001
+00000000
+1f20: 80a01f70 802231c1 00000000 80a00000 00000000 80a03c80 80a03c34
+808445d8
+1f40: 80a01f70 80a03c88 805b31d1 80a01f68 80217ce1 80217ce2 40000033
+ffffffff
+[<8021a213>] (__irq_svc) from [<80217ce2>] (arch_cpu_idle+0x22/0x24)
+[<80217ce2>] (arch_cpu_idle) from [<8024ca89>] (do_idle+0xf9/0x158)
+[<8024ca89>] (do_idle) from [<8024ccaf>] (cpu_startup_entry+0x13/0x14)
+[<8024ccaf>] (cpu_startup_entry) from [<80800a4d>]
+(start_kernel+0x309/0x314)
+[<80800a4d>] (start_kernel) from [<80008095>] (0x80008095)
+CPU1: stopping
+CPU: 1 PID: 1 Comm: swapper/0 Not tainted 4.11.0-rc3+ #140
+Hardware name: ARM-Versatile Express
+[<8021c5f1>] (unwind_backtrace) from [<802199eb>] (show_stack+0xb/0xc)
+[<802199eb>] (show_stack) from [<803ccc15>] (dump_stack+0x71/0x80)
+[<803ccc15>] (dump_stack) from [<8021b95d>] (handle_IPI+0x13d/0x150)
+[<8021b95d>] (handle_IPI) from [<80201425>] (gic_handle_irq+0x65/0x6c)
+[<80201425>] (gic_handle_irq) from [<8021a213>] (__irq_svc+0x53/0x7c)
+Exception stack(0xeec47e20 to 0xeec47e68)
+7e20: 00000000 ef1a96dc 80000000 80000000 80a03de4 80a03cf8 ef1b5a84
+ef1b5a80
+7e40: 00000001 00000008 80a03de4 80845a00 00000000 eec47e70 8026c9ed
+8026ca02
+7e60: a0000033 ffffffff
+[<8021a213>] (__irq_svc) from [<8026ca02>]
+(smp_call_function_many+0x1aa/0x1f0)
+[<8026ca02>] (smp_call_function_many) from [<8026ca89>]
+(on_each_cpu+0x1d/0x30)
+[<8026ca89>] (on_each_cpu) from [<8020c369>] (kvm_arch_init+0x339/0x3fc)
+[<8020c369>] (kvm_arch_init) from [<80207149>] (kvm_init+0x11/0x214)
+[<80207149>] (kvm_init) from [<8020177d>] (do_one_initcall+0x2d/0x104)
+[<8020177d>] (do_one_initcall) from [<80800bed>]
+(kernel_init_freeable+0x195/0x208)
+[<80800bed>] (kernel_init_freeable) from [<805b2383>]
+(kernel_init+0x7/0xd4)
+[<805b2383>] (kernel_init) from [<80217361>] (ret_from_fork+0x11/0x30)
+SMP: failed to stop secondary CPUs
+---[ end Kernel panic - not syncing:
+HYP panic: UNDEF PC:802010ac CPSR:800001da
 
-Ditto.
 
->  		printk("%s""section_type: general processor error\n", newpfx);
->  		if (gdata->error_data_length >= sizeof(*proc_err))
->  			cper_print_proc_generic(newpfx, proc_err);
->  		else
->  			goto err_section_too_small;
->  	} else if (!uuid_le_cmp(*sec_type, CPER_SEC_PLATFORM_MEM)) {
-> -		struct cper_sec_mem_err *mem_err = (void *)(gdata + 1);
-> +		struct cper_sec_mem_err *mem_err;
-> +
-> +		mem_err = acpi_hest_get_payload(gdata);
-
-Ditto.
-
->  		printk("%s""section_type: memory error\n", newpfx);
->  		if (gdata->error_data_length >=
->  		    sizeof(struct cper_sec_mem_err_old))
-> @@ -419,7 +425,9 @@ static void cper_estatus_print_section(
->  		else
->  			goto err_section_too_small;
->  	} else if (!uuid_le_cmp(*sec_type, CPER_SEC_PCIE)) {
-> -		struct cper_sec_pcie *pcie = (void *)(gdata + 1);
-> +		struct cper_sec_pcie *pcie;
-> +
-> +		pcie = acpi_hest_get_payload(gdata);
-
-Ditto.
-
->  		printk("%s""section_type: PCIe error\n", newpfx);
->  		if (gdata->error_data_length >= sizeof(*pcie))
->  			cper_print_pcie(newpfx, pcie, gdata);
-> @@ -438,7 +446,7 @@ void cper_estatus_print(const char *pfx,
->  			const struct acpi_hest_generic_status *estatus)
->  {
->  	struct acpi_hest_generic_data *gdata;
-> -	unsigned int data_len, gedata_len;
-> +	unsigned int data_len;
->  	int sec_no = 0;
->  	char newpfx[64];
->  	__u16 severity;
-> @@ -452,11 +460,10 @@ void cper_estatus_print(const char *pfx,
->  	data_len = estatus->data_length;
->  	gdata = (struct acpi_hest_generic_data *)(estatus + 1);
->  	snprintf(newpfx, sizeof(newpfx), "%s%s", pfx, INDENT_SP);
-> -	while (data_len >= sizeof(*gdata)) {
-> -		gedata_len = gdata->error_data_length;
-
-<-- \n here while you're at it.
-
-We have to start making this code more readable. It looks write-only
-right now.
-
-> +	while (data_len >= acpi_hest_get_size(gdata)) {
->  		cper_estatus_print_section(newpfx, gdata, sec_no);
-> -		data_len -= gedata_len + sizeof(*gdata);
-> -		gdata = (void *)(gdata + 1) + gedata_len;
-> +		data_len -= acpi_hest_get_record_size(gdata);
-> +		gdata = acpi_hest_get_next(gdata);
->  		sec_no++;
->  	}
->  }
-> @@ -486,12 +493,12 @@ int cper_estatus_check(const struct acpi_hest_generic_status *estatus)
->  		return rc;
->  	data_len = estatus->data_length;
->  	gdata = (struct acpi_hest_generic_data *)(estatus + 1);
-> -	while (data_len >= sizeof(*gdata)) {
-> -		gedata_len = gdata->error_data_length;
-> -		if (gedata_len > data_len - sizeof(*gdata))
-
-Ditto.
-
-> +	while (data_len >= acpi_hest_get_size(gdata)) {
-> +		gedata_len = acpi_hest_get_error_length(gdata);
-> +		if (gedata_len > data_len - acpi_hest_get_size(gdata))
->  			return -EINVAL;
-
-<-- \n here too
-
-> -		data_len -= gedata_len + sizeof(*gdata);
-> -		gdata = (void *)(gdata + 1) + gedata_len;
-> +		data_len -= acpi_hest_get_record_size(gdata);
-> +		gdata = acpi_hest_get_next(gdata);
->  	}
->  	if (data_len)
->  		return -EINVAL;
-> diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
-> index 68f088a..b89361a 100644
-> --- a/include/acpi/ghes.h
-> +++ b/include/acpi/ghes.h
-> @@ -12,6 +12,20 @@
->  #define GHES_TO_CLEAR		0x0001
->  #define GHES_EXITING		0x0002
->  
-> +#define acpi_hest_get_error_length(gdata)	\
-> +	(((struct acpi_hest_generic_data *)(gdata))->error_data_length)
-> +#define acpi_hest_get_size(gdata)		\
-> +	((acpi_hest_get_version(gdata) >= 3) ?	\
-> +	sizeof(struct acpi_hest_generic_data_v300) :	\
-> +	sizeof(struct acpi_hest_generic_data))
-> +#define acpi_hest_get_record_size(gdata)	\
-> +	(acpi_hest_get_size(gdata) +		\
-> +	acpi_hest_get_error_length(gdata))
-> +#define acpi_hest_get_next(gdata)		\
-> +	((void *)(gdata) + acpi_hest_get_record_size(gdata))
-> +#define acpi_hest_get_version(gdata)			\
-> +	(gdata->revision >> 8)
-
-Make all those inline functions.
-
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Thanks,
+-Christoffer
