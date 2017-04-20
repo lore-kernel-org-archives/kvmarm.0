@@ -1,316 +1,338 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: kvm/arm64: use-after-free in
- kvm_unmap_hva_handler/unmap_stage2_pmds
-Date: Thu, 20 Apr 2017 17:40:55 +0100
-Message-ID: <20170420164055.GA26877@e107814-lin.cambridge.arm.com>
-References: <CAAeHK+yjKm3mO2h9M30t-V_PnMhXEM887_zESCSg6gkbzivPsQ@mail.gmail.com>
- <20f6c994-d83e-7a6f-9f13-f10287211a6c@arm.com>
- <9f473bb9-d0eb-6803-1263-75ffef0301fe@redhat.com>
- <CAAeHK+x8udHKq9xa1zkTO6ax5E8Dk32HYWfaT05FMchL2cr48g@mail.gmail.com>
- <1050c9d8-5813-5df9-29e5-3ab6e61b5de6@arm.com>
- <88715300-ef58-e7bd-81f5-95e0b9c9c533@arm.com>
- <20170413155045.GA8387@e107814-lin.cambridge.arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH] arm64: Add ASM modifier for xN register operands
+Date: Thu, 20 Apr 2017 11:30:53 -0700
+Message-ID: <20170420183053.718-1-mka@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170413155045.GA8387@e107814-lin.cambridge.arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Andrey Konovalov <andreyknvl@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: rkrcmar@redhat.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, dvyukov@google.com, mark.rutland@arm.com, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, will.deacon@arm.com, kcc@google.com, syzkaller@googlegroups.com
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, Vladimir Murzin <vladimir.murzin@arm.com>, Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Matthias Kaehlcke <mka@chromium.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 13, 2017 at 04:50:46PM +0100, Suzuki K. Poulose wrote:
-> On Thu, Apr 13, 2017 at 10:17:54AM +0100, Suzuki K Poulose wrote:
-> > On 12/04/17 19:43, Marc Zyngier wrote:
-> > > On 12/04/17 17:19, Andrey Konovalov wrote:
-> > >
-> > > Hi Andrey,
-> > >
-> > > > Apparently this wasn't fixed, I've got this report again on
-> > > > linux-next-c4e7b35a3 (Apr 11), which includes 8b3405e34 "kvm:
-> > > > arm/arm64: Fix locking for kvm_free_stage2_pgd".
-> > >
-> > > This looks like a different bug.
-> > >
-> > > >
-> > > > I now have a way to reproduce it, so I can test proposed patches. I
-> > > > don't have a simple C reproducer though.
-> > > >
-> > > > The bug happens when the following syzkaller program is executed:
-> > > >
-> > > > mmap(&(0x7f0000000000/0xc000)=nil, (0xc000), 0x3, 0x32, 0xffffffffffffffff, 0x0)
-> > > > unshare(0x400)
-> > > > perf_event_open(&(0x7f000002f000-0x78)={0x1, 0x78, 0x0, 0x0, 0x0, 0x0,
-> > > > 0x0, 0x6, 0x0, 0x0, 0xd34, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-> > > > 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, 0x0, 0xffffffff,
-> > > > 0xffffffffffffffff, 0x0)
-> > > > r0 = openat$kvm(0xffffffffffffff9c,
-> > > > &(0x7f000000c000-0x9)="2f6465762f6b766d00", 0x0, 0x0)
-> > > > ioctl$TIOCSBRK(0xffffffffffffffff, 0x5427)
-> > > > r1 = ioctl$KVM_CREATE_VM(r0, 0xae01, 0x0)
-> > > > syz_kvm_setup_cpu$arm64(r1, 0xffffffffffffffff,
-> > > > &(0x7f0000dc6000/0x18000)=nil, &(0x7f000000c000)=[{0x0,
-> > > > &(0x7f000000c000)="5ba3c16f533efbed09f8221253c73763327fadce2371813b45dd7f7982f84a873e4ae89a6c2bd1af83a6024c36a1ff518318",
-> > > > 0x32}], 0x1, 0x0, &(0x7f000000d000-0x10)=[@featur2={0x1, 0x3}], 0x1)
-> > >
-> > > Is that the only thing the program does? Or is there anything running in
-> > > parallel?
-> > >
-> > > > ==================================================================
-> > > > BUG: KASAN: use-after-free in arch_spin_is_locked
-> > > > include/linux/compiler.h:254 [inline]
-> > > > BUG: KASAN: use-after-free in unmap_stage2_range+0x990/0x9a8
-> > > > arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:295
-> > > > Read of size 8 at addr ffff800004476730 by task syz-executor/13106
-> > > >
-> > > > CPU: 1 PID: 13106 Comm: syz-executor Not tainted
-> > > > 4.11.0-rc6-next-20170411-xc2-11025-gc4e7b35a33d4-dirty #5
-> > > > Hardware name: Hardkernel ODROID-C2 (DT)
-> > > > Call trace:
-> > > > [<ffff20000808fd08>] dump_backtrace+0x0/0x440 arch/arm64/kernel/traps.c:505
-> > > > [<ffff2000080903c0>] show_stack+0x20/0x30 arch/arm64/kernel/traps.c:228
-> > > > [<ffff2000088df030>] __dump_stack lib/dump_stack.c:16 [inline]
-> > > > [<ffff2000088df030>] dump_stack+0x110/0x168 lib/dump_stack.c:52
-> > > > [<ffff200008406db8>] print_address_description+0x60/0x248 mm/kasan/report.c:252
-> > > > [<ffff2000084072c8>] kasan_report_error mm/kasan/report.c:351 [inline]
-> > > > [<ffff2000084072c8>] kasan_report+0x218/0x300 mm/kasan/report.c:408
-> > > > [<ffff200008407428>] __asan_report_load8_noabort+0x18/0x20 mm/kasan/report.c:429
-> > > > [<ffff2000080db1b8>] arch_spin_is_locked include/linux/compiler.h:254 [inline]
-> > >
-> > > This is the assert on the spinlock, and the memory is gone.
-> > >
-> > > > [<ffff2000080db1b8>] unmap_stage2_range+0x990/0x9a8
-> > > > arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:295
-> > > > [<ffff2000080db248>] kvm_free_stage2_pgd.part.16+0x30/0x98
-> > > > arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:842
-> > > > [<ffff2000080ddfb8>] kvm_free_stage2_pgd
-> > > > arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:838 [inline]
-> > >
-> > > But we've taken than lock here. There's only a handful of instructions
-> > > in between, and the memory can only go away if there is something
-> > > messing with us in parallel.
-> > >
-> > > > [<ffff2000080ddfb8>] kvm_arch_flush_shadow_all+0x40/0x58
-> > > > arch/arm64/kvm/../../../arch/arm/kvm/mmu.c:1895
-> > > > [<ffff2000080c379c>] kvm_mmu_notifier_release+0x154/0x1d0
-> > > > arch/arm64/kvm/../../../virt/kvm/kvm_main.c:472
-> > > > [<ffff2000083f2b60>] __mmu_notifier_release+0x1c0/0x3e0 mm/mmu_notifier.c:75
-> > > > [<ffff2000083a1fb4>] mmu_notifier_release
-> > > > include/linux/mmu_notifier.h:235 [inline]
-> > > > [<ffff2000083a1fb4>] exit_mmap+0x21c/0x288 mm/mmap.c:2941
-> > > > [<ffff20000810ecd4>] __mmput kernel/fork.c:888 [inline]
-> > > > [<ffff20000810ecd4>] mmput+0xdc/0x2e0 kernel/fork.c:910
-> > > > [<ffff20000811fda8>] exit_mm kernel/exit.c:557 [inline]
-> > > > [<ffff20000811fda8>] do_exit+0x648/0x2020 kernel/exit.c:865
-> > > > [<ffff2000081218b4>] do_group_exit+0xdc/0x260 kernel/exit.c:982
-> > > > [<ffff20000813adf0>] get_signal+0x358/0xf58 kernel/signal.c:2318
-> > > > [<ffff20000808de98>] do_signal+0x170/0xc10 arch/arm64/kernel/signal.c:370
-> > > > [<ffff20000808edb4>] do_notify_resume+0xe4/0x120 arch/arm64/kernel/signal.c:421
-> > > > [<ffff200008083e68>] work_pending+0x8/0x14
-> > >
-> > > So we're being serviced with a signal. Do you know if this signal is
-> > > generated by your syzkaller program? We could be racing between do_exit
-> > > triggered by a fatal signal (this trace) and the closing of the two file
-> > > descriptors (vcpu and vm).
-> > >
-> > > Paolo: does this look possible to you? I can't see what locking we have
-> > > that could prevent this race.
-> >
-> > On a quick look, I see two issues:
-> >
-> > 1) It looks like the mmu_notifier->ops.release could be called twice for a notifier,
-> > from mmu_notifier_unregister() and exit_mmap()->mmu_notifier_release(), which is
-> > causing the problem as above.
-> >
-> > This could possibly be avoided by swapping the order of the following operations
-> > in themmu_notifier_unregister():
-> >
-> >  a) Invoke ops->release under src_read_lock()
-> >  b) Delete the notifier from the list.
-> >
-> > which can prevent mmu_notifier_release() calling the ops->release() again, before
-> > we reach (b).
-> >
-> >
-> > 2) The core KVM code does an mmgrab()/mmdrop on the current->mm to pin the mm_struct. But
-> > this doesn't prevent the "real_address user space" from being destroyed. Since KVM
-> > actually depends on the user pages and page tables, it should really/also(?) use
-> > mmget()/mmput() (See Documentation/vm/active_mm.txt). I understand that mmget() shouldn't
-> > be used for pinning unbounded amount of time. But since we do it from within the same
-> > process context (like say threads), we should be safe to do so.
->
+Many inline assembly statements don't include the 'x' modifier when
+using xN registers as operands. This is perfectly valid, however it
+causes clang to raise warnings like this:
 
-Option 2 doesn't work, as it creates a circular dependency with exit_mmap vs kvm_destory_vm
-due to the mmap on VCPU (which prevents KVM from getting dropped). After a couple of trials
-at resolving this issue, we have something better to resolve it, below.
+warning: value size does not match register size specified by the
+  constraint and modifier [-Wasm-operand-widths]
+...
+arch/arm64/include/asm/barrier.h:62:23: note: expanded from macro
+  '__smp_store_release'
+    asm volatile ("stlr %1, %0"
 
-----8>----
+Add the modifier to keep clang happy.
 
-kvm: Fix mmu_notifier release race
-
-The KVM uses mmu_notifier (wherever available) to keep track
-of the changes to the mm of the guest. The guest shadow page
-tables are released when the VM exits via mmu_notifier->ops.release().
-There is a rare chance that the mmu_notifier->release could be
-called more than once via two different paths, which could end
-up in use-after-free of kvm instance.
-
-e.g:
-
-thread A                                        thread B
--------                                         --------------
-
- get_signal->                                   kvm_destroy_vm()->
- do_exit->                                        mmu_notifier_unregister->
- exit_mm->                                        kvm_arch_flush_shadow_all()->
- exit_mmap->                                      spin_lock(&kvm->mmu_lock)
- mmu_notifier_release->                           ....
-  kvm_arch_flush_shadow_all()->                   .....
-  ... spin_lock(&kvm->mmu_lock)                   .....
-                                                  spin_unlock(&kvm->mmu_lock)
-                                                kvm_arch_free_kvm()
-   *** use after free of kvm ***
-
-This patch attempts to solve the problem by holding a reference to the KVM
-for the mmu_notifier, which is dropped only from notifier->ops.release().
-This will ensure that the KVM struct is available till we reach the
-kvm_mmu_notifier_release, and the kvm_destroy_vm is called only from/after
-it. So, we can unregister the notifier with no_release option and hence
-avoiding the race above. However, we need to make sure that the KVM is
-freed only after the mmu_notifier has finished processing the notifier due to
-the following possible path of execution :
-
-mmu_notifier_release -> kvm_mmu_notifier_release -> kvm_put_kvm ->
-  kvm_destroy_vm -> kvm_arch_free_kvm
-
-Reported-by: andreyknvl@google.com
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Paolo Bonzin <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: andreyknvl@google.com
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Tested-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 ---
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 59 ++++++++++++++++++++++++++++++++++++++++++------
- 2 files changed, 53 insertions(+), 7 deletions(-)
+ arch/arm64/include/asm/arch_gicv3.h  |  2 +-
+ arch/arm64/include/asm/barrier.h     |  4 ++--
+ arch/arm64/include/asm/io.h          | 24 ++++++++++++------------
+ arch/arm64/include/asm/kvm_hyp.h     | 10 +++++-----
+ arch/arm64/include/asm/kvm_mmu.h     | 12 ++++++------
+ arch/arm64/include/asm/percpu.h      |  4 ++--
+ arch/arm64/include/asm/sysreg.h      |  4 ++--
+ arch/arm64/include/asm/uaccess.h     |  4 ++--
+ arch/arm64/kernel/armv8_deprecated.c |  4 ++--
+ arch/arm64/kernel/probes/kprobes.c   |  2 +-
+ arch/arm64/kvm/hyp/switch.c          |  4 ++--
+ 11 files changed, 37 insertions(+), 37 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d025074..561e968 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -424,6 +424,7 @@ struct kvm {
- 	struct mmu_notifier mmu_notifier;
- 	unsigned long mmu_notifier_seq;
- 	long mmu_notifier_count;
-+	struct rcu_head mmu_notifier_rcu;
- #endif
- 	long tlbs_dirty;
- 	struct list_head devices;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 88257b3..2c3fdd4 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -471,6 +471,7 @@ static void kvm_mmu_notifier_release(struct mmu_notifier *mn,
- 	idx = srcu_read_lock(&kvm->srcu);
- 	kvm_arch_flush_shadow_all(kvm);
- 	srcu_read_unlock(&kvm->srcu, idx);
-+	kvm_put_kvm(kvm);
- }
+diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
+index f37e3a21f6e7..ba54e5bee885 100644
+--- a/arch/arm64/include/asm/arch_gicv3.h
++++ b/arch/arm64/include/asm/arch_gicv3.h
+@@ -166,7 +166,7 @@ static inline void gic_write_sre(u32 val)
  
- static const struct mmu_notifier_ops kvm_mmu_notifier_ops = {
-@@ -486,8 +487,46 @@ static const struct mmu_notifier_ops kvm_mmu_notifier_ops = {
- 
- static int kvm_init_mmu_notifier(struct kvm *kvm)
+ static inline void gic_write_bpr1(u32 val)
  {
-+	int rc;
- 	kvm->mmu_notifier.ops = &kvm_mmu_notifier_ops;
--	return mmu_notifier_register(&kvm->mmu_notifier, current->mm);
-+	rc = mmu_notifier_register(&kvm->mmu_notifier, current->mm);
-+	/*
-+	 * We hold a reference to KVM here to make sure that the KVM
-+	 * doesn't get free'd before ops->release() completes.
-+	 */
-+	if (!rc)
-+		kvm_get_kvm(kvm);
-+	return rc;
-+}
-+
-+static void kvm_free_vm_rcu(struct rcu_head *rcu)
-+{
-+	struct kvm *kvm = container_of(rcu, struct kvm, mmu_notifier_rcu);
-+	kvm_arch_free_vm(kvm);
-+}
-+
-+static void kvm_flush_shadow_mmu(struct kvm *kvm)
-+{
-+	/*
-+	 * We hold a reference to kvm instance for mmu_notifier and is
-+	 * only released when ops->release() is called via exit_mmap path.
-+	 * So, when we reach here ops->release() has been called already, which
-+	 * flushes the shadow page tables. Hence there is no need to call the
-+	 * release() again when we unregister the notifier. However, we need
-+	 * to delay freeing up the kvm until the release() completes, since
-+	 * we could reach here via :
-+	 *  kvm_mmu_notifier_release() -> kvm_put_kvm() -> kvm_destroy_vm()
-+	 */
-+	mmu_notifier_unregister_no_release(&kvm->mmu_notifier, kvm->mm);
-+}
-+
-+static void kvm_free_vm(struct kvm *kvm)
-+{
-+	/*
-+	 * Wait until the mmu_notifier has finished the release().
-+	 * See comments above in kvm_flush_shadow_mmu.
-+	 */
-+	mmu_notifier_call_srcu(&kvm->mmu_notifier_rcu, kvm_free_vm_rcu);
+-	asm volatile("msr_s " __stringify(ICC_BPR1_EL1) ", %0" : : "r" (val));
++	asm volatile("msr_s " __stringify(ICC_BPR1_EL1) ", %x0" : : "r" (val));
  }
  
- #else  /* !(CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER) */
-@@ -497,6 +536,16 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
- 	return 0;
+ #define gic_read_typer(c)		readq_relaxed(c)
+diff --git a/arch/arm64/include/asm/barrier.h b/arch/arm64/include/asm/barrier.h
+index 4e0497f581a0..bc167eeda9e4 100644
+--- a/arch/arm64/include/asm/barrier.h
++++ b/arch/arm64/include/asm/barrier.h
+@@ -59,7 +59,7 @@ do {									\
+ 				: "=Q" (*p) : "r" (v) : "memory");	\
+ 		break;							\
+ 	case 8:								\
+-		asm volatile ("stlr %1, %0"				\
++		asm volatile ("stlr %x1, %0"				\
+ 				: "=Q" (*p) : "r" (v) : "memory");	\
+ 		break;							\
+ 	}								\
+@@ -86,7 +86,7 @@ do {									\
+ 			: "Q" (*p) : "memory");				\
+ 		break;							\
+ 	case 8:								\
+-		asm volatile ("ldar %0, %1"				\
++		asm volatile ("ldar %x0, %1"				\
+ 			: "=r" (*(__u64 *)__u.__c)			\
+ 			: "Q" (*p) : "memory");				\
+ 		break;							\
+diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+index 0c00c87bb9dd..021e1733da0c 100644
+--- a/arch/arm64/include/asm/io.h
++++ b/arch/arm64/include/asm/io.h
+@@ -39,33 +39,33 @@
+ #define __raw_writeb __raw_writeb
+ static inline void __raw_writeb(u8 val, volatile void __iomem *addr)
+ {
+-	asm volatile("strb %w0, [%1]" : : "rZ" (val), "r" (addr));
++	asm volatile("strb %w0, [%x1]" : : "rZ" (val), "r" (addr));
  }
  
-+static void kvm_flush_shadow_mmu(struct kvm *kvm)
-+{
-+	kvm_arch_flush_shadow_all(kvm);
-+}
-+
-+static void kvm_free_vm(struct kvm *kvm)
-+{
-+	kvm_arch_free_vm(kvm);
-+}
-+
- #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
+ #define __raw_writew __raw_writew
+ static inline void __raw_writew(u16 val, volatile void __iomem *addr)
+ {
+-	asm volatile("strh %w0, [%1]" : : "rZ" (val), "r" (addr));
++	asm volatile("strh %w0, [%x1]" : : "rZ" (val), "r" (addr));
+ }
  
- static struct kvm_memslots *kvm_alloc_memslots(void)
-@@ -733,18 +782,14 @@ static void kvm_destroy_vm(struct kvm *kvm)
- 		kvm->buses[i] = NULL;
- 	}
- 	kvm_coalesced_mmio_free(kvm);
--#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
--	mmu_notifier_unregister(&kvm->mmu_notifier, kvm->mm);
--#else
--	kvm_arch_flush_shadow_all(kvm);
--#endif
-+	kvm_flush_shadow_mmu(kvm);
- 	kvm_arch_destroy_vm(kvm);
- 	kvm_destroy_devices(kvm);
- 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
- 		kvm_free_memslots(kvm, kvm->memslots[i]);
- 	cleanup_srcu_struct(&kvm->irq_srcu);
- 	cleanup_srcu_struct(&kvm->srcu);
--	kvm_arch_free_vm(kvm);
-+	kvm_free_vm(kvm);
- 	preempt_notifier_dec();
- 	hardware_disable_all();
- 	mmdrop(mm);
+ #define __raw_writel __raw_writel
+ static inline void __raw_writel(u32 val, volatile void __iomem *addr)
+ {
+-	asm volatile("str %w0, [%1]" : : "rZ" (val), "r" (addr));
++	asm volatile("str %w0, [%x1]" : : "rZ" (val), "r" (addr));
+ }
+ 
+ #define __raw_writeq __raw_writeq
+ static inline void __raw_writeq(u64 val, volatile void __iomem *addr)
+ {
+-	asm volatile("str %x0, [%1]" : : "rZ" (val), "r" (addr));
++	asm volatile("str %x0, [%x1]" : : "rZ" (val), "r" (addr));
+ }
+ 
+ #define __raw_readb __raw_readb
+ static inline u8 __raw_readb(const volatile void __iomem *addr)
+ {
+ 	u8 val;
+-	asm volatile(ALTERNATIVE("ldrb %w0, [%1]",
+-				 "ldarb %w0, [%1]",
++	asm volatile(ALTERNATIVE("ldrb %w0, [%x1]",
++				 "ldarb %w0, [%x1]",
+ 				 ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE)
+ 		     : "=r" (val) : "r" (addr));
+ 	return val;
+@@ -76,8 +76,8 @@ static inline u16 __raw_readw(const volatile void __iomem *addr)
+ {
+ 	u16 val;
+ 
+-	asm volatile(ALTERNATIVE("ldrh %w0, [%1]",
+-				 "ldarh %w0, [%1]",
++	asm volatile(ALTERNATIVE("ldrh %w0, [%x1]",
++				 "ldarh %w0, [%x1]",
+ 				 ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE)
+ 		     : "=r" (val) : "r" (addr));
+ 	return val;
+@@ -87,8 +87,8 @@ static inline u16 __raw_readw(const volatile void __iomem *addr)
+ static inline u32 __raw_readl(const volatile void __iomem *addr)
+ {
+ 	u32 val;
+-	asm volatile(ALTERNATIVE("ldr %w0, [%1]",
+-				 "ldar %w0, [%1]",
++	asm volatile(ALTERNATIVE("ldr %w0, [%x1]",
++				 "ldar %w0, [%x1]",
+ 				 ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE)
+ 		     : "=r" (val) : "r" (addr));
+ 	return val;
+@@ -98,8 +98,8 @@ static inline u32 __raw_readl(const volatile void __iomem *addr)
+ static inline u64 __raw_readq(const volatile void __iomem *addr)
+ {
+ 	u64 val;
+-	asm volatile(ALTERNATIVE("ldr %0, [%1]",
+-				 "ldar %0, [%1]",
++	asm volatile(ALTERNATIVE("ldr %x0, [%x1]",
++				 "ldar %x0, [%x1]",
+ 				 ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE)
+ 		     : "=r" (val) : "r" (addr));
+ 	return val;
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index b18e852d27e8..ee872d9aded5 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -28,8 +28,8 @@
+ #define read_sysreg_elx(r,nvh,vh)					\
+ 	({								\
+ 		u64 reg;						\
+-		asm volatile(ALTERNATIVE("mrs %0, " __stringify(r##nvh),\
+-					 "mrs_s %0, " __stringify(r##vh),\
++		asm volatile(ALTERNATIVE("mrs %x0, " __stringify(r##nvh),\
++					 "mrs_s %x0, " __stringify(r##vh),\
+ 					 ARM64_HAS_VIRT_HOST_EXTN)	\
+ 			     : "=r" (reg));				\
+ 		reg;							\
+@@ -52,8 +52,8 @@
+ #define read_sysreg_el2(r)						\
+ 	({								\
+ 		u64 reg;						\
+-		asm volatile(ALTERNATIVE("mrs %0, " __stringify(r##_EL2),\
+-					 "mrs %0, " __stringify(r##_EL1),\
++		asm volatile(ALTERNATIVE("mrs %x0, " __stringify(r##_EL2),\
++					 "mrs %x0, " __stringify(r##_EL1),\
+ 					 ARM64_HAS_VIRT_HOST_EXTN)	\
+ 			     : "=r" (reg));				\
+ 		reg;							\
+@@ -115,7 +115,7 @@ typeof(orig) * __hyp_text fname(void)					\
+ {									\
+ 	typeof(alt) *val = orig;					\
+ 	asm volatile(ALTERNATIVE("nop		\n",			\
+-				 "mov	%0, %1	\n",			\
++				 "mov	%x0, %x1\n",			\
+ 				 cond)					\
+ 		     : "+r" (val) : "r" (alt));				\
+ 	return val;							\
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index ed1246014901..7692a13efe8e 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -115,13 +115,13 @@ alternative_else_nop_endif
+ 
+ static inline unsigned long __kern_hyp_va(unsigned long v)
+ {
+-	asm volatile(ALTERNATIVE("and %0, %0, %1",
++	asm volatile(ALTERNATIVE("and %x0, %x0, %1",
+ 				 "nop",
+ 				 ARM64_HAS_VIRT_HOST_EXTN)
+ 		     : "+r" (v)
+ 		     : "i" (HYP_PAGE_OFFSET_HIGH_MASK));
+ 	asm volatile(ALTERNATIVE("nop",
+-				 "and %0, %0, %1",
++				 "and %x0, %x0, %1",
+ 				 ARM64_HYP_OFFSET_LOW)
+ 		     : "+r" (v)
+ 		     : "i" (HYP_PAGE_OFFSET_LOW_MASK));
+@@ -181,10 +181,10 @@ static inline void kvm_set_s2pte_readonly(pte_t *pte)
+ 
+ 	asm volatile("//	kvm_set_s2pte_readonly\n"
+ 	"	prfm	pstl1strm, %2\n"
+-	"1:	ldxr	%0, %2\n"
+-	"	and	%0, %0, %3		// clear PTE_S2_RDWR\n"
+-	"	orr	%0, %0, %4		// set PTE_S2_RDONLY\n"
+-	"	stxr	%w1, %0, %2\n"
++	"1:	ldxr	%x0, %2\n"
++	"	and	%x0, %x0, %3		// clear PTE_S2_RDWR\n"
++	"	orr	%x0, %x0, %4		// set PTE_S2_RDONLY\n"
++	"	stxr	%w1, %x0, %2\n"
+ 	"	cbnz	%w1, 1b\n"
+ 	: "=&r" (pteval), "=&r" (tmp), "+Q" (pte_val(*pte))
+ 	: "L" (~PTE_S2_RDWR), "L" (PTE_S2_RDONLY));
+diff --git a/arch/arm64/include/asm/percpu.h b/arch/arm64/include/asm/percpu.h
+index 3bd498e4de4c..52be13171fec 100644
+--- a/arch/arm64/include/asm/percpu.h
++++ b/arch/arm64/include/asm/percpu.h
+@@ -20,7 +20,7 @@
+ 
+ static inline void set_my_cpu_offset(unsigned long off)
+ {
+-	asm volatile("msr tpidr_el1, %0" :: "r" (off) : "memory");
++	asm volatile("msr tpidr_el1, %x0" :: "r" (off) : "memory");
+ }
+ 
+ static inline unsigned long __my_cpu_offset(void)
+@@ -31,7 +31,7 @@ static inline unsigned long __my_cpu_offset(void)
+ 	 * We want to allow caching the value, so avoid using volatile and
+ 	 * instead use a fake stack read to hazard against barrier().
+ 	 */
+-	asm("mrs %0, tpidr_el1" : "=r" (off) :
++	asm("mrs %x0, tpidr_el1" : "=r" (off) :
+ 		"Q" (*(const unsigned long *)current_stack_pointer));
+ 
+ 	return off;
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index ac24b6e798b1..dd7768e114e3 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -309,7 +309,7 @@ asm(
+  */
+ #define read_sysreg(r) ({					\
+ 	u64 __val;						\
+-	asm volatile("mrs %0, " __stringify(r) : "=r" (__val));	\
++	asm volatile("mrs %x0, " __stringify(r) : "=r" (__val));	\
+ 	__val;							\
+ })
+ 
+@@ -329,7 +329,7 @@ asm(
+  */
+ #define read_sysreg_s(r) ({						\
+ 	u64 __val;							\
+-	asm volatile("mrs_s %0, " __stringify(r) : "=r" (__val));	\
++	asm volatile("mrs_s %x0, " __stringify(r) : "=r" (__val));	\
+ 	__val;								\
+ })
+ 
+diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
+index 5308d696311b..e806471e0934 100644
+--- a/arch/arm64/include/asm/uaccess.h
++++ b/arch/arm64/include/asm/uaccess.h
+@@ -256,7 +256,7 @@ do {									\
+ 			       (err), ARM64_HAS_UAO);			\
+ 		break;							\
+ 	case 8:								\
+-		__get_user_asm("ldr", "ldtr", "%",  __gu_val, (ptr),	\
++		__get_user_asm("ldr", "ldtr", "%x",  __gu_val, (ptr),	\
+ 			       (err), ARM64_HAS_UAO);			\
+ 		break;							\
+ 	default:							\
+@@ -323,7 +323,7 @@ do {									\
+ 			       (err), ARM64_HAS_UAO);			\
+ 		break;							\
+ 	case 8:								\
+-		__put_user_asm("str", "sttr", "%", __pu_val, (ptr),	\
++		__put_user_asm("str", "sttr", "%x", __pu_val, (ptr),	\
+ 			       (err), ARM64_HAS_UAO);			\
+ 		break;							\
+ 	default:							\
+diff --git a/arch/arm64/kernel/armv8_deprecated.c b/arch/arm64/kernel/armv8_deprecated.c
+index 657977e77ec8..a82d5259aab1 100644
+--- a/arch/arm64/kernel/armv8_deprecated.c
++++ b/arch/arm64/kernel/armv8_deprecated.c
+@@ -288,8 +288,8 @@ do {								\
+ 	uaccess_enable();					\
+ 	__asm__ __volatile__(					\
+ 	"	mov		%w3, %w7\n"			\
+-	"0:	ldxr"B"		%w2, [%4]\n"			\
+-	"1:	stxr"B"		%w0, %w1, [%4]\n"		\
++	"0:	ldxr"B"		%w2, [%x4]\n"			\
++	"1:	stxr"B"		%w0, %w1, [%x4]\n"		\
+ 	"	cbz		%w0, 2f\n"			\
+ 	"	sub		%w3, %w3, #1\n"			\
+ 	"	cbnz		%w3, 0b\n"			\
+diff --git a/arch/arm64/kernel/probes/kprobes.c b/arch/arm64/kernel/probes/kprobes.c
+index c5c45942fb6e..237b0e2e3364 100644
+--- a/arch/arm64/kernel/probes/kprobes.c
++++ b/arch/arm64/kernel/probes/kprobes.c
+@@ -495,7 +495,7 @@ void __kprobes jprobe_return(void)
+ 	 * -a special PC to identify it from the other kprobes.
+ 	 * -restore stack addr to original saved pt_regs
+ 	 */
+-	asm volatile("				mov sp, %0	\n"
++	asm volatile("				mov sp, %x0	\n"
+ 		     "jprobe_return_break:	brk %1		\n"
+ 		     :
+ 		     : "r" (kcb->jprobe_saved_regs.sp),
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index aede1658aeda..cf22fbe3cf06 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -212,7 +212,7 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ 	 * saved the guest context yet, and we may return early...
+ 	 */
+ 	par = read_sysreg(par_el1);
+-	asm volatile("at s1e1r, %0" : : "r" (far));
++	asm volatile("at s1e1r, %x0" : : "r" (far));
+ 	isb();
+ 
+ 	tmp = read_sysreg(par_el1);
+@@ -388,7 +388,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par)
+ 	 * making sure it is a kernel address and not a PC-relative
+ 	 * reference.
+ 	 */
+-	asm volatile("ldr %0, =__hyp_panic_string" : "=r" (str_va));
++	asm volatile("ldr %x0, =__hyp_panic_string" : "=r" (str_va));
+ 
+ 	__hyp_do_panic(str_va,
+ 		       spsr,  elr,
 -- 
-2.7.4
-
- 
+2.12.2.816.g2cccc81164-goog
