@@ -1,180 +1,150 @@
 From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
 Subject: Re: [PATCH v3 7/8] arm64: exception: handle asynchronous SError
  interrupt
-Date: Fri, 21 Apr 2017 18:46:48 +0800
-Message-ID: <1cf65f76-65ee-d98c-cf3e-a5e8ff63550d@huawei.com>
+Date: Fri, 21 Apr 2017 19:33:48 +0800
+Message-ID: <2bb41d98-553f-1361-e497-4095ddd501d0@huawei.com>
 References: <1490869877-118713-1-git-send-email-xiexiuqi@huawei.com>
  <1490869877-118713-8-git-send-email-xiexiuqi@huawei.com>
+ <20170413105131.GD24027@leverpostej>
+ <d7a8884d-f6b7-69d0-2438-83c202926000@huawei.com> <58F5EFC6.5070601@arm.com>
+ <e6502f82-108e-3f53-4791-515671e4d515@huawei.com> <58F876EB.2020805@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <1490869877-118713-8-git-send-email-xiexiuqi@huawei.com>
+In-Reply-To: <58F876EB.2020805@arm.com>
 Sender: linux-acpi-owner@vger.kernel.org
-To: Xie XiuQi <xiexiuqi@huawei.com>, christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, fu.wei@linaro.org, rostedt@goodmis.org, hanjun.guo@linaro.org, shiju.jose@huawei.com
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, gengdongjiu@huawei.com, zhengqiang10@huawei.com, wuquanming@huawei.com, Wang Xiongfeng <wangxiongfengi2@huawei.com>
+To: James Morse <james.morse@arm.com>, Mark Rutland <mark.rutland@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, fu.wei@linaro.org, rostedt@goodmis.org, hanjun.guo@linaro.org, shiju.jose@huawei.com, wuquanming@huawei.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, zhengqiang10@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi XiuQi,
+Hi James,
 
-On 2017/3/30 18:31, Xie XiuQi wrote:
-> Error Synchronization Barrier (ESB; part of the ARMv8.2 Extensions)
-> is used to synchronize Unrecoverable errors. That is, containable errors
-> architecturally consumed by the PE and not silently propagated.
-> 
-> With ESB it is generally possible to isolate an unrecoverable error
-> between two ESB instructions. So, it's possible to recovery from
-> unrecoverable errors reported by asynchronous SError interrupt.
-> 
-> If ARMv8.2 RAS Extension is not support, ESB is treated as a NOP.
-> 
-> Signed-off-by: Xie XiuQi <xiexiuqi@huawei.com>
-> Signed-off-by: Wang Xiongfeng <wangxiongfengi2@huawei.com>
-> ---
->  arch/arm64/Kconfig           | 16 ++++++++++
->  arch/arm64/include/asm/esr.h | 14 +++++++++
->  arch/arm64/kernel/entry.S    | 70 ++++++++++++++++++++++++++++++++++++++++++--
->  arch/arm64/kernel/traps.c    | 54 ++++++++++++++++++++++++++++++++--
->  4 files changed, 150 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 859a90e..7402175 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -911,6 +911,22 @@ endmenu
->  
->  menu "ARMv8.2 architectural features"
->  
-> +config ARM64_ESB
-> +	bool "Enable support for Error Synchronization Barrier (ESB)"
-> +	default n
-> +	help
-> +	  Error Synchronization Barrier (ESB; part of the ARMv8.2 Extensions)
-> +	  is used to synchronize Unrecoverable errors. That is, containable errors
-> +	  architecturally consumed by the PE and not silently propagated.
-> +
-> +	  Without ESB it is not generally possible to isolate an Unrecoverable
-> +	  error because it is not known which instruction generated the error.
-> +
-> +	  Selecting this option allows inject esb instruction before the exception
-> +	  change. If ARMv8.2 RAS Extension is not support, ESB is treated as a NOP.
-> +
-> +	  Note that ESB instruction can introduce slight overhead, so say N if unsure.
-> +
->  config ARM64_UAO
->  	bool "Enable support for User Access Override (UAO)"
->  	default y
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index f20c64a..22f9c90 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -106,6 +106,20 @@
->  #define ESR_ELx_AR 		(UL(1) << 14)
->  #define ESR_ELx_CM 		(UL(1) << 8)
->  
-> +#define ESR_Elx_DFSC_SEI	(0x11)
-> +
-> +#define ESR_ELx_AET_SHIFT	(10)
-> +#define ESR_ELx_AET_MAX		(7)
-> +#define ESR_ELx_AET_MASK	(UL(7) << ESR_ELx_AET_SHIFT)
-> +#define ESR_ELx_AET(esr)	(((esr) & ESR_ELx_AET_MASK) >> ESR_ELx_AET_SHIFT)
-> +
-> +#define ESR_ELx_AET_UC		(0)
-> +#define ESR_ELx_AET_UEU		(1)
-> +#define ESR_ELx_AET_UEO		(2)
-> +#define ESR_ELx_AET_UER		(3)
-> +#define ESR_ELx_AET_CE		(6)
-> +
-> +
->  /* ISS field definitions for exceptions taken in to Hyp */
->  #define ESR_ELx_CV		(UL(1) << 24)
->  #define ESR_ELx_COND_SHIFT	(20)
-> diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-> index 43512d4..d8a7306 100644
-> --- a/arch/arm64/kernel/entry.S
-> +++ b/arch/arm64/kernel/entry.S
-> @@ -69,7 +69,14 @@
->  #define BAD_FIQ		2
->  #define BAD_ERROR	3
->  
-> +	.arch_extension ras
-> +
->  	.macro	kernel_entry, el, regsize = 64
-because we also want to take SEI exception in kernel space, we may need to unmask SEI in kernel_entry.
-> +#ifdef CONFIG_ARM64_ESB
-> +	.if	\el == 0
-> +	esb
-> +	.endif
-> +#endif
->  	sub	sp, sp, #S_FRAME_SIZE
->  	.if	\regsize == 32
->  	mov	w0, w0				// zero upper 32 bits of x0
-> @@ -208,6 +215,7 @@ alternative_else_nop_endif
->  #endif
->  
->  	.if	\el == 0
-> +	msr	daifset, #0xF			// Set flags
->  	ldr	x23, [sp, #S_SP]		// load return stack pointer
->  	msr	sp_el0, x23
->  #ifdef CONFIG_ARM64_ERRATUM_845719
-> @@ -226,6 +234,15 @@ alternative_else_nop_endif
->  
->  	msr	elr_el1, x21			// set up the return data
->  	msr	spsr_el1, x22
-> +
-> +#ifdef CONFIG_ARM64_ESB
-> +	.if \el == 0
-> +	esb					// Error Synchronization Barrier
-> +	mrs	x21, disr_el1			// Check for deferred error
-> +	tbnz	x21, #31, el1_sei
-> +	.endif
-> +#endif
-> +
->  	ldp	x0, x1, [sp, #16 * 0]
->  	ldp	x2, x3, [sp, #16 * 1]
->  	ldp	x4, x5, [sp, #16 * 2]
-> @@ -318,7 +335,7 @@ ENTRY(vectors)
->  	ventry	el1_sync_invalid		// Synchronous EL1t
->  	ventry	el1_irq_invalid			// IRQ EL1t
->  	ventry	el1_fiq_invalid			// FIQ EL1t
-> -	ventry	el1_error_invalid		// Error EL1t
-> +	ventry	el1_error			// Error EL1t
->  
->  	ventry	el1_sync			// Synchronous EL1h
->  	ventry	el1_irq				// IRQ EL1h
-> @@ -328,7 +345,7 @@ ENTRY(vectors)
->  	ventry	el0_sync			// Synchronous 64-bit EL0
->  	ventry	el0_irq				// IRQ 64-bit EL0
->  	ventry	el0_fiq_invalid			// FIQ 64-bit EL0
-> -	ventry	el0_error_invalid		// Error 64-bit EL0
-> +	ventry	el0_error			// Error 64-bit EL0
+Thanks for your reply.
 
-for the situation 'Current EL with SPx', we also need to change the sError vector to el1_error.
->  
->  #ifdef CONFIG_COMPAT
->  	ventry	el0_sync_compat			// Synchronous 32-bit EL0
-> @@ -508,12 +525,31 @@ el1_preempt:
->  	ret	x24
->  #endif
->  
-> +	.align	6
-> +el1_error:
-> +	kernel_entry 1
-> +el1_sei:
-> +	/*
-> +	 * asynchronous SError interrupt from kernel
-> +	 */
-> +	mov	x0, sp
-> +	mrs	x1, esr_el1
-> +	mov	x2, #1				// exception level of SEI generated
-> +	b	do_sei
-> +ENDPROC(el1_error)
-> +
-> +
+On 2017/4/20 16:52, James Morse wrote:
+> Hi Wang Xiongfeng,
+> 
+> On 19/04/17 03:37, Xiongfeng Wang wrote:
+>> On 2017/4/18 18:51, James Morse wrote:
+>>> The host expects to receive physical SError Interrupts. The ARM-ARM doesn't
+>>> describe a way to inject these as they are generated by the CPU.
+>>>
+>>> Am I right in thinking you want this to use SError Interrupts as an APEI
+>>> notification? (This isn't a CPU thing so the RAS spec doesn't cover this use)
+>>
+>> Yes, using sei as an APEI notification is one part of my consideration. Another use is for ESB.
+>> RAS spec 6.5.3 'Example software sequences: Variant: asynchronous External Abort with ESB'
+>> describes the SEI recovery process when ESB is implemented.
+>>
+>> In this situation, SEI is routed to EL3 (SCR_EL3.EA = 1). When an SEI occurs in EL0 and not been taken immediately,
+>> and then an ESB instruction at SVC entry is executed, SEI is taken to EL3. The ESB at SVC entry is
+>> used for preventing the error propagating from user space to kernel space. The EL3 SEI handler collects
+> 
+>> the errors and fills in the APEI table, and then jump to EL2 SEI handler. EL2 SEI handler inject
+>> an vSEI into EL1 by setting HCR_EL2.VSE = 1, so that when returned to OS, an SEI is pending.
+> 
+> This step has confused me. How would this work with VHE where the host runs at
+> EL2 and there is nothing at Host:EL1?
 
+RAS spec 6.5.3 'Example software sequences: Variant: asynchronous External Abort with ESB'
+I don't know whether the step described in the section is designed for guest os or host os or both.
+Yes, it doesn't work with VHE where the host runs at EL2.
 
+>>From your description I assume you have some firmware resident at EL2.
+
+Our actual SEI step is planned as follows:
+Host OS:  EL0/EL1 -> EL3 -> EL0/EL1
+Guest OS:  EL0/EL1 -> EL3 -> EL2 -> EL0/EL1
+
+Our problem is that, when returning to EL0/EL1, whether we should jump to EL1 SEI vector or just return to where the SEI is taken from?
+In guest os situation, we can inject an vSEI and return to where the SEI is taken from.
+But in host os situation, we can't inject an vSEI (if we don't set HCR_EL2.AMO), so we have to jump to EL1 SEI vector.
+Then the process following ESB won't be executed becuase SEI is taken to EL3 from the ESB instruction in EL1, and when control
+is returned to OS, we are in EL1 SEI vector rather than the ESB instruction.
+
+It is ok to just ignore the process following the ESB instruction in el0_sync, because the process will be sent SIGBUS signal.
+But for el0_irq, the irq process following the ESB may should be executed because the irq is not related to the user process.
+
+If we set HCR_EL2.AMO when SCR_EL3.EA is set. We can still inject an vSEI into host OS in EL3.
+Physical SError won't be taken to EL2 because SCR_EL3.EA is set. But this may be too racy is
+not consistent with ARM rules.
+> 
+> 
+>> Then ESB is executed again, and DISR_EL1.A is set by hardware (2.4.4 ESB and virtual errors), so that
+>> the following process can be executed.
+> 
+> 
+>> So we want to inject a vSEI into OS, when control is returned from EL3/2 to OS, no matter whether
+>> it is on host OS or guest OS.
+> 
+> I disagree. With Linux/KVM you can't use Virtual SError to notify the host OS.
+> The host OS expects to receive Physical SError, these shouldn't be taken to EL2
+> unless a guest is running. Notifications from firmware that use SEA or SEI
+> should follow the routing rules in the ARM-ARM, which means they should never
+> reach a guest OS.
+
+Yes, I agree. When running the host os, exception should not be taken to EL2, because
+EL2 SEI vector always suppose that exception is taken from guest os and save
+guest context in the first place.
+> 
+> For VHE the host runs at EL2 and sets HCR_EL2.AMO. Any firmware notification
+> should come from EL3 to the host at EL2. The host may choose to notify the
+> guest, but this should always go via Qemu.
+> 
+> For non-VHE systems the host runs at EL1 and KVM lives at EL2 to do the world
+> switch. When KVM is running a guest it sets HCR_EL2.AMO, when it has switched
+> back to the host it clears it.
+> 
+> Notifications from EL3 that pretend to be SError should route SError to EL2 or
+> EL1 depending on HCR_EL2.AMO.
+> When KVM gets a Synchronous External Abort or an SError while a guest is running
+> it will switch back to the host and tell the handle_exit() code.  Again the host
+> may choose to notify the guest, but this should always go via Qemu.
+> 
+> The ARM-ARM pseudo code for the routing rules is in
+> AArch64.TakePhysicalSErrorException(). Firmware injecting fake SError should
+> behave exactly like this.
+> 
+> 
+> Newly appeared in the ARM-ARM is HCR_EL2.TEA, which takes Synchronous External
+> Aborts to EL2 (if SCR_EL3 hasn't claimed them). We should set/clear this bit
+> like we do HCR_EL2.AMO if the CPU has the RAS extensions.
+> 
+> 
+>>> You cant use SError to cover all the possible RAS exceptions. We already have
+>>> this problem using SEI if PSTATE.A was set and the exception was an imprecise
+>>> abort from EL2. We can't return to the interrupted context and we can't deliver
+>>> an SError to EL2 either.
+>>
+>> SEI came from EL2 and PSTATE.A is set. Is it the situation where VHE is enabled and CPU is running
+>> in kernel space. If SEI occurs in kernel space, can we just panic or shutdown.
+> 
+> firmware-panic? We can do a little better than that:
+> If the IESB bit is set in the ESR we can behave as if this were an ESB and have
+> firmware write an appropriate ESR to DISR_EL1 if PSTATE.A is set and the
+> exception came from EL2.
+
+This method may solve the problem I said above.
+Is IESB a new bit added int ESR in the newest RAS spec?
+> 
+> Linux should have an ESB in its __switch_to(), I've re-worked the daif masking
+> in entry.S so that PSTATE.A will always be unmasked here.
+> 
+> Other than these two cases, yes, this CPU really is wrecked. Firmware can power
+> it off via PSCI, and could notify another CPU about what happened. UEFI's table
+> 250 'Processor Generic Error Section' has a 'Processor ID' field, with a note
+> that on ARM this is the MPIDR_EL1. Table 260 'ARM Processor Error Section' has
+> something similar.
+> 
+> 
+> Thanks,
+> 
+> James
+> 
+> .
+> 
 Thanks,
 
 Wang Xiongfeng
-
 
