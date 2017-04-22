@@ -1,130 +1,201 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Date: Fri, 21 Apr 2017 14:05:35 -0700
-Message-ID: <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com>
-References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
- <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
- <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
- <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com> <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
+From: Alexander Graf <agraf@suse.de>
+Subject: Re: [PATCH v3] kvm: arm/arm64: Fix locking for kvm_free_stage2_pgd
+Date: Sat, 22 Apr 2017 02:28:44 +0200
+Message-ID: <febea966-3767-21ff-3c40-1a76d1399138@suse.de>
+References: <1491228763-23450-1-git-send-email-suzuki.poulose@arm.com>
+ <20170404101316.GF11752@cbox> <28bece63-9917-5f00-ccdf-fe663def500f@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <linux-kbuild-owner@vger.kernel.org>
-In-Reply-To: <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
-Sender: linux-kbuild-owner@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <28bece63-9917-5f00-ccdf-fe663def500f@arm.com>
+Sender: stable-owner@vger.kernel.org
+To: Suzuki K Poulose <Suzuki.Poulose@arm.com>, Christoffer Dall <cdall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, andreyknvl@google.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org, kcc@google.com, syzkaller@googlegroups.com, dvyukov@google.com, catalin.marinas@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 21, 2017 at 1:55 PM, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Thu, Apr 20, 2017 at 9:52 PM, Kees Cook <keescook@chromium.org> wrote:
->> On Thu, Apr 20, 2017 at 3:15 AM, Arnd Bergmann <arnd@arndb.de> wrote:
->>> On Sun, Apr 16, 2017 at 9:52 PM, Kees Cook <keescook@chromium.org> wrote:
->>>>>> The original gcc-4.3 release was in early 2008. If we decide to still
->>>>>> support that, we probably want the first 10 quirks in this series,
->>>>>> while gcc-4.6 (released in 2011) requires none of them.
->>>>
->>>> I'd be in support of raising the minimum to gcc 4.6. (I'd actually
->>>> prefer 4.7, just to avoid some 4.6 packaging issues, and for better
->>>> gcc plugin support.)
->>>>
->>>> I'm curious what gcc 4.6 binaries are common in the wild besides
->>>> old-stable Debian (unsupported in maybe a year from now?) and 12.04
->>>> Ubuntu (going fully unsupported in 2 weeks). It looks like 4.6 was
->>>> used only in Fedora 15 and 16 (both EOL).
->>>
->>> I think we are better off defining two versions: One that we know
->>> a lot of people care about, and we actively try to make that work
->>> well in all configurations (e.g. 4.6, 4.7 or 4.8), fixing all warnings
->>> we run into, and an older version that we try not to break
->>> intentionally (e.g. 3.4, 4.1 or 4.3) but that we only fix when
->>> someone actually runs into a problem they can't work around
->>> by upgrading to a more modern compiler.
+
+
+On 04.04.17 12:35, Suzuki K Poulose wrote:
+> Hi Christoffer,
+>
+> On 04/04/17 11:13, Christoffer Dall wrote:
+>> Hi Suzuki,
 >>
->> For "working well everywhere" I feel like 4.8 is the better of those
->> three (I'd prefer 4.9). I think we should avoid 4.6 -- it seems not
->> widely used.
+>> On Mon, Apr 03, 2017 at 03:12:43PM +0100, Suzuki K Poulose wrote:
+>>> In kvm_free_stage2_pgd() we don't hold the kvm->mmu_lock while calling
+>>> unmap_stage2_range() on the entire memory range for the guest. This
+>>> could
+>>> cause problems with other callers (e.g, munmap on a memslot) trying to
+>>> unmap a range. And since we have to unmap the entire Guest memory range
+>>> holding a spinlock, make sure we yield the lock if necessary, after we
+>>> unmap each PUD range.
+>>>
+>>> Fixes: commit d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
+>>> Cc: stable@vger.kernel.org # v3.10+
+>>> Cc: Paolo Bonzini <pbonzin@redhat.com>
+>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>>> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+>>> Cc: Mark Rutland <mark.rutland@arm.com>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> [ Avoid vCPU starvation and lockup detector warnings ]
+>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>
+>>
+>> This unfortunately fails to build on 32-bit ARM, and I also think we
+>> intended to check against S2_PGDIR_SIZE, not S2_PUD_SIZE.
 >
-> I suspect that 4.9 might be the one that actually works best
-> across architectures, and it contained some very significant
-> changes. In my testing gcc-5 tends to behave very similarly
-> to 4.9, and gcc-6 introduced a larger number of new warnings,
-> so that would clearly be too new for a recommended version.
+> Sorry about that, I didn't test the patch with arm32. I am fine the
+> patch below. And I agree that the name change does make things more
+> readable. See below for a hunk that I posted to the kbuild report.
 >
-> The suggestion of 4.9 or higher is appealing as a recommendation
-> because it matches what I would personally tell people:
+>>
+>> How about adding this to your patch (which includes a rename of
+>> S2_PGD_SIZE which is horribly confusing as it indicates the size of the
+>> first level stage-2 table itself, where S2_PGDIR_SIZE indicates the size
+>> of address space mapped by a single entry in the same table):
+>>
+>> diff --git a/arch/arm/include/asm/stage2_pgtable.h
+>> b/arch/arm/include/asm/stage2_pgtable.h
+>> index 460d616..c997f2d 100644
+>> --- a/arch/arm/include/asm/stage2_pgtable.h
+>> +++ b/arch/arm/include/asm/stage2_pgtable.h
+>> @@ -35,10 +35,13 @@
+>>
+>>  #define stage2_pud_huge(pud)            pud_huge(pud)
+>>
+>> +#define S2_PGDIR_SIZE                PGDIR_SIZE
+>> +#define S2_PGDIR_MASK                PGDIR_MASK
+>> +
+>>  /* Open coded p*d_addr_end that can deal with 64bit addresses */
+>>  static inline phys_addr_t stage2_pgd_addr_end(phys_addr_t addr,
+>> phys_addr_t end)
+>>  {
+>> -    phys_addr_t boundary = (addr + PGDIR_SIZE) & PGDIR_MASK;
+>> +    phys_addr_t boundary = (addr + S2_PGDIR_SIZE) & S2_PGDIR_MASK;
+>>
+>>      return (boundary - 1 < end - 1) ? boundary : end;
+>>  }
+>> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+>> index db94f3a..6e79a4c 100644
+>> --- a/arch/arm/kvm/mmu.c
+>> +++ b/arch/arm/kvm/mmu.c
+>> @@ -41,7 +41,7 @@ static unsigned long hyp_idmap_start;
+>>  static unsigned long hyp_idmap_end;
+>>  static phys_addr_t hyp_idmap_vector;
+>>
+>> -#define S2_PGD_SIZE    (PTRS_PER_S2_PGD * sizeof(pgd_t))
+>> +#define S2_PGD_TABLE_SIZE    (PTRS_PER_S2_PGD * sizeof(pgd_t))
+>>  #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
+>>
+>>  #define KVM_S2PTE_FLAG_IS_IOMAP        (1UL << 0)
+>> @@ -299,7 +299,7 @@ static void unmap_stage2_range(struct kvm *kvm,
+>> phys_addr_t start, u64 size)
+>>           * If the range is too large, release the kvm->mmu_lock
+>>           * to prevent starvation and lockup detector warnings.
+>>           */
+>> -        if (size > S2_PUD_SIZE)
+>> +        if (size > S2_PGDIR_SIZE)
+>>              cond_resched_lock(&kvm->mmu_lock);
+>>          next = stage2_pgd_addr_end(addr, end);
+>>          if (!stage2_pgd_none(*pgd))
+>> @@ -747,7 +747,7 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>>      }
+>>
+>>      /* Allocate the HW PGD, making sure that each page gets its own
+>> refcount */
+>> -    pgd = alloc_pages_exact(S2_PGD_SIZE, GFP_KERNEL | __GFP_ZERO);
+>> +    pgd = alloc_pages_exact(S2_PGD_TABLE_SIZE, GFP_KERNEL | __GFP_ZERO);
+>>      if (!pgd)
+>>          return -ENOMEM;
+>>
+>> @@ -843,7 +843,7 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
+>>      spin_unlock(&kvm->mmu_lock);
+>>
+>>      /* Free the HW pgd, one page at a time */
+>> -    free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
+>> +    free_pages_exact(kvm->arch.pgd, S2_PGD_TABLE_SIZE);
+>>      kvm->arch.pgd = NULL;
+>>  }
+>>
 >
-> - If you have gcc-4.9 or newer and you don't rely on any newer
->   features, there is no need to upgrade
-> - Wth gcc-4.8, the -Wmaybe-uninitialized warnings are now turned
->   off because they were too noisy, so upgrading is probably a good
->   idea even though the compiler is otherwise ok and in widespread
->   use
-> - gcc-4.6 and 4.7 are basically usable for building kernels, but the
->   warning output is often counterproductive, and the generated
->   object code may be noticeably worse.
-> - anything before gcc-4.6 is missing too many features to be
->   useful on ARM, but may still be fine on other architectures.
+> Btw, I have a different hunk to solve the problem, posted to the kbuild
+> report. I will post it here for the sake of capturing the discussion in
+> one place. The following hunk on top of the patch, changes the lock
+> release after we process one PGDIR entry. As for the first time
+> we enter the loop we haven't done much with the lock held, hence it may
+> make
+> sense to do it after the first round and we have more work to do.
 >
-> On the other hand, there is a noticeable difference in compile
-> speed, as a 5% slowdown compared to the previous release
-> apparently is not considered a regression. These are the times
-> I see for building ARM 'vexpress_defconfig':
->
-> gcc-4.4: real 0m47.269s user 11m48.576s
-> gcc-4.5: real 0m44.878s user 10m58.900s
-> gcc-4.6: real 0m44.621s user 11m34.716s
-> gcc-4.7: real 0m47.476s user 12m42.924s
-> gcc-4.8: real 0m48.494s user 13m19.736s
-> gcc-4.9: real 0m50.140s user 13m44.876s
-> gcc-5.x: real 0m51.302s user 14m05.564s
-> gcc-6.x: real 0m54.615s user 15m06.304s
-> gcc-7.x: real 0m56.008s user 15m44.720s
->
-> That is a factor of 1.5x in CPU cycles between slowest and
-> fastest, so there is clearly a benefit to keeping the old versions
-> around, but there is also no clear cut-off other thannoticing
-> that gcc-4.4 is slower than 4.5 in this particular
-> configuration.
->
->> For an old compiler... yikes. 3.4 sounds insane to me. :)
->
-> That was my initial thought as well. On ARM, it clearly is
-> insane, as even gcc-4.0 is unable to build any of the modern
-> defconfigs (lacking -mabi=aapcs, ICE when building vsprintf.c)
-> and even the patch I did to get gcc-4.1 to build is probably
-> too ugly to get merged, so to build any unpatched kernel after
-> linux-3.6 you need at least gcc-4.2, or even gcc-4.4 for the
-> ''defconfig' (gcc-4.3 if you disable vdso).
->
-> Then again, on x86, old cmpilers were claimed to be much better
-> supported. I just tried it out and found that no x86 defconfig kernel
-> since linux-3.2 could be built with gcc-3.4, probably not on any
-> other architecture either (it cannot have forward declarations
-> for inline functions and we have one in kernel/sched_fair.c).
->
-> I think that would be a really good argument for requiring
-> something newer ;-)
->
-> The linux-4.2 x86 defconfig could still be built with gcc-4.0, but
-> later kernels have several minor problems with that, and
-> require at least gcc-4.3.
->
-> If we are ok with this status quo, we could simply declare gcc-4.3
-> the absolute minimum version for the kernel, make gcc-4.9
-> the recommeded minimum version, and remove all workarounds
-> for gcc-4.2 or older.
+> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> index db94f3a..582a972 100644
+> --- a/arch/arm/kvm/mmu.c
+> +++ b/arch/arm/kvm/mmu.c
+> @@ -295,15 +295,15 @@ static void unmap_stage2_range(struct kvm *kvm,
+> phys_addr_t start, u64 size)
+>         assert_spin_locked(&kvm->mmu_lock);
+>         pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+>         do {
+> +               next = stage2_pgd_addr_end(addr, end);
+> +               if (!stage2_pgd_none(*pgd))
 
-I think starting with this would be a good first step. I'm not sure
-the best way to add "recommended minimum" to
-Documentation/process/changes.rst hmmm
+Just as heads up, I had this version applied to my tree by accident 
+(commit 8b3405e345b5a098101b0c31b264c812bba045d9 from Christoffer's 
+queue) and ran into a NULL pointer dereference:
 
-> If anyone has a good reason for gcc-4.0 through gcc-4.2, then
-> we would need a small number of patches to get them back
-> working with x86 defconfig.
+[223090.242280] Unable to handle kernel NULL pointer dereference at 
+virtual address 00000040
+[223090.262330] PC is at unmap_stage2_range+0x8c/0x428
+[223090.262332] LR is at kvm_unmap_hva_handler+0x2c/0x3c
+[223090.262531] Call trace:
+[223090.262533] [<ffff0000080adb78>] unmap_stage2_range+0x8c/0x428
+[223090.262535] [<ffff0000080adf40>] kvm_unmap_hva_handler+0x2c/0x3c
+[223090.262537] [<ffff0000080ace2c>] handle_hva_to_gpa+0xb0/0x104
+[223090.262539] [<ffff0000080af988>] kvm_unmap_hva+0x5c/0xbc
+[223090.262543] [<ffff0000080a2478>] 
+kvm_mmu_notifier_invalidate_page+0x50/0x8c
+[223090.262547] [<ffff0000082274f8>] 
+__mmu_notifier_invalidate_page+0x5c/0x84
+[223090.262551] [<ffff00000820b700>] try_to_unmap_one+0x1d0/0x4a0
+[223090.262553] [<ffff00000820c5c8>] rmap_walk+0x1cc/0x2e0
+[223090.262555] [<ffff00000820c90c>] try_to_unmap+0x74/0xa4
+[223090.262557] [<ffff000008230ce4>] migrate_pages+0x31c/0x5ac
+[223090.262561] [<ffff0000081f869c>] compact_zone+0x3fc/0x7ac
+[223090.262563] [<ffff0000081f8ae0>] compact_zone_order+0x94/0xb0
+[223090.262564] [<ffff0000081f91c0>] try_to_compact_pages+0x108/0x290
+[223090.262569] [<ffff0000081d5108>] __alloc_pages_direct_compact+0x70/0x1ac
+[223090.262571] [<ffff0000081d64a0>] __alloc_pages_nodemask+0x434/0x9f4
+[223090.262572] [<ffff0000082256f0>] alloc_pages_vma+0x230/0x254
+[223090.262574] [<ffff000008235e5c>] do_huge_pmd_anonymous_page+0x114/0x538
+[223090.262576] [<ffff000008201bec>] handle_mm_fault+0xd40/0x17a4
+[223090.262577] [<ffff0000081fb324>] __get_user_pages+0x12c/0x36c
+[223090.262578] [<ffff0000081fb804>] get_user_pages_unlocked+0xa4/0x1b8
+[223090.262579] [<ffff0000080a3ce8>] __gfn_to_pfn_memslot+0x280/0x31c
+[223090.262580] [<ffff0000080a3dd0>] gfn_to_pfn_prot+0x4c/0x5c
+[223090.262582] [<ffff0000080af3f8>] kvm_handle_guest_abort+0x240/0x774
+[223090.262584] [<ffff0000080b2bac>] handle_exit+0x11c/0x1ac
+[223090.262586] [<ffff0000080ab99c>] kvm_arch_vcpu_ioctl_run+0x31c/0x648
+[223090.262587] [<ffff0000080a1d78>] kvm_vcpu_ioctl+0x378/0x768
+[223090.262590] [<ffff00000825df5c>] do_vfs_ioctl+0x324/0x5a4
+[223090.262591] [<ffff00000825e26c>] SyS_ioctl+0x90/0xa4
+[223090.262595] [<ffff000008085d84>] el0_svc_naked+0x38/0x3c
 
--Kees
+0xffff0000080adb78 is in unmap_stage2_range (../arch/arm/kvm/mmu.c:260).
+255		pud_t *pud, *start_pud;
+256
+257		start_pud = pud = stage2_pud_offset(pgd, addr);
+258		do {
+259			next = stage2_pud_addr_end(addr, end);
+260			if (!stage2_pud_none(*pud)) {
+261				if (stage2_pud_huge(*pud)) {
+262					pud_t old_pud = *pud;
+263
+264					stage2_pud_clear(pud);
 
 
--- 
-Kees Cook
-Pixel Security
+So please beware that for some reason pud may become invalid after 
+rescheduling.
+
+
+Alex
