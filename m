@@ -1,24 +1,25 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 12/79] KVM: arm64: Use common physical timer sysreg definitions
-Date: Sun, 23 Apr 2017 19:08:22 +0200
-Message-ID: <20170423170929.27334-13-cdall@linaro.org>
+Subject: [PULL 09/79] KVM: arm64: Use common debug sysreg definitions
+Date: Sun, 23 Apr 2017 19:08:19 +0200
+Message-ID: <20170423170929.27334-10-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A364349C52
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6455549C65
  for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:06:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MKTabg7ElNIT for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:06:57 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B7F5649C89
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:06:57 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id w64so46372535wma.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:09:44 -0700 (PDT)
+ with ESMTP id kBym7QQCUtCe for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:06:56 -0400 (EDT)
+Received: from mail-wr0-f173.google.com (mail-wr0-f173.google.com
+ [209.85.128.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED3EC49CA0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:06:54 -0400 (EDT)
+Received: by mail-wr0-f173.google.com with SMTP id z52so37728609wrc.2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:09:41 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,40 +36,121 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Mark Rutland <mark.rutland@arm.com>
 
-Now that we have common definitions for the physical timer control
-registers, make the KVM code use these, simplifying the sys_reg_descs
-table.
+Now that we have common definitions for the debug register encodings,
+make the KVM code use these, simplifying the sys_reg_descs table.
+
+The table previously erroneously referred to MDCCSR_EL0 as MDCCSR_EL1.
+This is corrected (as is necessary in order to use the common sysreg
+definition).
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu
 ---
- arch/arm64/kvm/sys_regs.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 73 ++++++++++++++---------------------------------
+ 1 file changed, 21 insertions(+), 52 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 1f3062b..860707f 100644
+index 0e26f8c..5fa23fd 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1016,15 +1016,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b011),
- 	  NULL, reset_unknown, TPIDRRO_EL0 },
+@@ -793,17 +793,13 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
  
--	/* CNTP_TVAL_EL0 */
--	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b000),
--	  access_cntp_tval },
--	/* CNTP_CTL_EL0 */
--	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b001),
--	  access_cntp_ctl },
--	/* CNTP_CVAL_EL0 */
--	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b0010), Op2(0b010),
--	  access_cntp_cval },
-+	{ SYS_DESC(SYS_CNTP_TVAL_EL0), access_cntp_tval },
-+	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_cntp_ctl },
-+	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_cntp_cval },
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+-	/* DBGBVRn_EL1 */						\
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b100),	\
++	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+ 	  trap_bvr, reset_bvr, n, 0, get_bvr, set_bvr },		\
+-	/* DBGBCRn_EL1 */						\
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b101),	\
++	{ SYS_DESC(SYS_DBGBCRn_EL1(n)),					\
+ 	  trap_bcr, reset_bcr, n, 0, get_bcr, set_bcr },		\
+-	/* DBGWVRn_EL1 */						\
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b110),	\
++	{ SYS_DESC(SYS_DBGWVRn_EL1(n)),					\
+ 	  trap_wvr, reset_wvr, n, 0,  get_wvr, set_wvr },		\
+-	/* DBGWCRn_EL1 */						\
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b111),	\
++	{ SYS_DESC(SYS_DBGWCRn_EL1(n)),					\
+ 	  trap_wcr, reset_wcr, n, 0,  get_wcr, set_wcr }
  
- 	/* PMEVCNTRn_EL0 */
- 	PMU_PMEVCNTR_EL0(0),
+ /* Macro to expand the PMEVCNTRn_EL0 register */
+@@ -899,12 +895,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	DBG_BCR_BVR_WCR_WVR_EL1(0),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(1),
+-	/* MDCCINT_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b000),
+-	  trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
+-	/* MDSCR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm(0b0010), Op2(0b010),
+-	  trap_debug_regs, reset_val, MDSCR_EL1, 0 },
++	{ SYS_DESC(SYS_MDCCINT_EL1), trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
++	{ SYS_DESC(SYS_MDSCR_EL1), trap_debug_regs, reset_val, MDSCR_EL1, 0 },
+ 	DBG_BCR_BVR_WCR_WVR_EL1(2),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(3),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(4),
+@@ -920,44 +912,21 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	DBG_BCR_BVR_WCR_WVR_EL1(14),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(15),
+ 
+-	/* MDRAR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0001), CRm(0b0000), Op2(0b000),
+-	  trap_raz_wi },
+-	/* OSLAR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0001), CRm(0b0000), Op2(0b100),
+-	  trap_raz_wi },
+-	/* OSLSR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0001), CRm(0b0001), Op2(0b100),
+-	  trap_oslsr_el1 },
+-	/* OSDLR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0001), CRm(0b0011), Op2(0b100),
+-	  trap_raz_wi },
+-	/* DBGPRCR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0001), CRm(0b0100), Op2(0b100),
+-	  trap_raz_wi },
+-	/* DBGCLAIMSET_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0111), CRm(0b1000), Op2(0b110),
+-	  trap_raz_wi },
+-	/* DBGCLAIMCLR_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0111), CRm(0b1001), Op2(0b110),
+-	  trap_raz_wi },
+-	/* DBGAUTHSTATUS_EL1 */
+-	{ Op0(0b10), Op1(0b000), CRn(0b0111), CRm(0b1110), Op2(0b110),
+-	  trap_dbgauthstatus_el1 },
+-
+-	/* MDCCSR_EL1 */
+-	{ Op0(0b10), Op1(0b011), CRn(0b0000), CRm(0b0001), Op2(0b000),
+-	  trap_raz_wi },
+-	/* DBGDTR_EL0 */
+-	{ Op0(0b10), Op1(0b011), CRn(0b0000), CRm(0b0100), Op2(0b000),
+-	  trap_raz_wi },
+-	/* DBGDTR[TR]X_EL0 */
+-	{ Op0(0b10), Op1(0b011), CRn(0b0000), CRm(0b0101), Op2(0b000),
+-	  trap_raz_wi },
+-
+-	/* DBGVCR32_EL2 */
+-	{ Op0(0b10), Op1(0b100), CRn(0b0000), CRm(0b0111), Op2(0b000),
+-	  NULL, reset_val, DBGVCR32_EL2, 0 },
++	{ SYS_DESC(SYS_MDRAR_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_OSLAR_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1 },
++	{ SYS_DESC(SYS_OSDLR_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_DBGPRCR_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_DBGCLAIMSET_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
++
++	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
++	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
++	// DBGDTR[TR]X_EL0 share the same encoding
++	{ SYS_DESC(SYS_DBGDTRTX_EL0), trap_raz_wi },
++
++	{ SYS_DESC(SYS_DBGVCR32_EL2), NULL, reset_val, DBGVCR32_EL2, 0 },
+ 
+ 	/* MPIDR_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b0000), CRm(0b0000), Op2(0b101),
 -- 
 2.9.0
