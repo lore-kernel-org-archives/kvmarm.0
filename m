@@ -1,101 +1,96 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Date: Sat, 22 Apr 2017 17:30:07 +0200
-Message-ID: <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
-References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
- <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
- <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
- <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
- <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
- <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com> <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: [PULL 01/79] arm64: sysreg: sort by encoding
+Date: Sun, 23 Apr 2017 19:08:11 +0200
+Message-ID: <20170423170929.27334-2-cdall@linaro.org>
+References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <linux-kbuild-owner@vger.kernel.org>
-In-Reply-To: <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
-Sender: linux-kbuild-owner@vger.kernel.org
-To: "Maciej W. Rozycki" <macro@linux-mips.org>
-Cc: Kees Cook <keescook@chromium.org>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu, Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACC3F49C48
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:06:46 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id IkhpTISJcXk3 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:06:45 -0400 (EDT)
+Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 838D449C35
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:06:45 -0400 (EDT)
+Received: by mail-wm0-f47.google.com with SMTP id r190so50444101wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:09:31 -0700 (PDT)
+In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Apr 22, 2017 at 5:10 AM, Maciej W. Rozycki <macro@linux-mips.org> wrote:
-> On Fri, 21 Apr 2017, Kees Cook wrote:
->
->> > The linux-4.2 x86 defconfig could still be built with gcc-4.0, but
->> > later kernels have several minor problems with that, and
->> > require at least gcc-4.3.
->> >
->> > If we are ok with this status quo, we could simply declare gcc-4.3
->> > the absolute minimum version for the kernel, make gcc-4.9
->> > the recommeded minimum version, and remove all workarounds
->> > for gcc-4.2 or older.
->>
->> I think starting with this would be a good first step. I'm not sure
->> the best way to add "recommended minimum" to
->> Documentation/process/changes.rst hmmm
->
->  FWIW for some reasons (mainly the ability to avoid NPTL) I have stuck to
-> GCC 4.1.2 with some MIPS configurations and I've had no issues with that
-> compiler up to Linux 4.6.0, which is the last kernel version I have tried
-> with that compiler so far.  I could check if anything has regressed since
-> then I suppose.
+From: Mark Rutland <mark.rutland@arm.com>
 
-Interesting. This is also the same version that Geert mentioned using
-on m68k. I've tried some more x86 and mips builds now and found:
+Out sysreg definitions are largely (but not entirely) in ascending order
+of op0:op1:CRn:CRm:op2.
 
-- x86 defconfig broke because the i915 driver relies on gcc-4.3 behavior
-  for alignment attributes as of a few kernel versions ago for the sw_fence
-  mechanism:
-drivers/gpu/drm/i915/intel_display.c:14571: error: alignment may not
-be specified for 'intel_atomic_commit_ready'
+It would be preferable to enforce this sort, as this makes it easier to
+verify the set of encodings against documentation, and provides an
+obvious location for each addition in future, minimising conflicts.
 
-- With gcc-4.0 I also get a couple of BUILD_BUG_ON() triggering for
-  correct code that it doesn't always consider compile-time constant (on all
-  architectures), this is from x86 defconfig starting around linux-4.3:
-mm/built-in.o: In function `do_set_pmd':
-memory.c:(.text+0x34df5): undefined reference to `__compiletime_assert_3157'
-drivers/built-in.o: In function `cea_mode_alternate_timings':
-drm_edid.c:(.text+0x10858a): undefined reference to `__compiletime_assert_2641'
+This patch enforces this order, by moving the few items that break it.
+There should be no functional change.
 
-- gcc-4.0 has been broken for all MIPS configurations (but no other arch) since
-  commit 51b97e354ba9 ("kernel: use the gnu89 standard explicitly") in 3.18,
-  the problem still exists in stable/linux-3.18.y and mainline but would be
-  trivial to fix with a oneline patch if anyone had noticed this before me.
-arch/mips/kernel/vmlinux.lds.S:110:1: error: pasting "initcall0" and
-"." does not give a valid preprocessing token
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+---
+ arch/arm64/include/asm/sysreg.h | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-- The interprocedural optimization changes in gcc-4.3 mean that the
-  object code is a bit different, and we no longer expect the pre-gcc-4.3
-  behavior. This mostly results in warnings (e.g. maybe-uninitialized or
-  section mismatch) when the compiler and/or linker lacks the
-  information to see that the code is actually correct. On x86 I only
-  got one failure with gcc-4.1, on mips-gcc-4.1 I got this and a few
-  more depending on configuration:
-mm/built-in.o: In function `create_huge_pmd':
-memory.c:(.text+0x34e71): undefined reference to `do_huge_pmd_anonymous_page'
-
-The last one is the key here I think. The linker warnings and errors we
-run into here are all fairly easy to fix, but we will keep running into new
-ones since evidently nobody does regular builds checking for them, and
-they can appear randomly based on configuration for otherwise
-acceptable code. Today, most configurations I tried were broken because
-of this, and if things worked for you, you were either lucky that you didn't
-run into the same bugs (or that Geert fixed the ones you would have hit)
-or you had patches on top to work around them already.
-
-Based on what I found so far, gcc-4 can be pretty much ruled out from
-being the minimum version based on the number of failures I got.
-It's much better than 3.4 but much worse than 4.1 or 4.2 which seem
-fixable on MIPS and x86 at least, and may or may not work depending
-on configuration. So the best two possible (but conflicting) answers I
-have are
-
-a) There are known users on gcc-4.1, and we never break things that
-    work for users, so gcc-4.1 (or possibly 4.0 if a user shows up) would
-    be the minimum version.
-b) gcc-4.1 and 4.2 have too many problems, so users are better off
-    when we tell them to upgrade to something newer, and a minimum
-    version of gcc-4.3 has fewer surprises. We should remove all
-    workarounds for pre-gcc-4.3 compilers and just force a build error
-    message.
-
-      Arnd
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index ac24b6e..e6498ac 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -81,6 +81,14 @@
+ 
+ #endif	/* CONFIG_BROKEN_GAS_INST */
+ 
++#define REG_PSTATE_PAN_IMM		sys_reg(0, 0, 4, 0, 4)
++#define REG_PSTATE_UAO_IMM		sys_reg(0, 0, 4, 0, 3)
++
++#define SET_PSTATE_PAN(x) __emit_inst(0xd5000000 | REG_PSTATE_PAN_IMM |	\
++				      (!!x)<<8 | 0x1f)
++#define SET_PSTATE_UAO(x) __emit_inst(0xd5000000 | REG_PSTATE_UAO_IMM |	\
++				      (!!x)<<8 | 0x1f)
++
+ #define SYS_MIDR_EL1			sys_reg(3, 0, 0, 0, 0)
+ #define SYS_MPIDR_EL1			sys_reg(3, 0, 0, 0, 5)
+ #define SYS_REVIDR_EL1			sys_reg(3, 0, 0, 0, 6)
+@@ -118,17 +126,10 @@
+ #define SYS_ID_AA64MMFR1_EL1		sys_reg(3, 0, 0, 7, 1)
+ #define SYS_ID_AA64MMFR2_EL1		sys_reg(3, 0, 0, 7, 2)
+ 
+-#define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
+ #define SYS_CTR_EL0			sys_reg(3, 3, 0, 0, 1)
+ #define SYS_DCZID_EL0			sys_reg(3, 3, 0, 0, 7)
+ 
+-#define REG_PSTATE_PAN_IMM		sys_reg(0, 0, 4, 0, 4)
+-#define REG_PSTATE_UAO_IMM		sys_reg(0, 0, 4, 0, 3)
+-
+-#define SET_PSTATE_PAN(x) __emit_inst(0xd5000000 | REG_PSTATE_PAN_IMM |	\
+-				      (!!x)<<8 | 0x1f)
+-#define SET_PSTATE_UAO(x) __emit_inst(0xd5000000 | REG_PSTATE_UAO_IMM |	\
+-				      (!!x)<<8 | 0x1f)
++#define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
+ 
+ /* Common SCTLR_ELx flags. */
+ #define SCTLR_ELx_EE    (1 << 25)
+-- 
+2.9.0
