@@ -1,26 +1,25 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 55/79] ARM: KVM: Implement HVC_RESET_VECTORS stub hypercall in
- the init code
-Date: Sun, 23 Apr 2017 19:09:05 +0200
-Message-ID: <20170423170929.27334-56-cdall@linaro.org>
+Subject: [PULL 57/79] ARM: KVM: Allow the main HYP code to use the init hyp
+ stub implementation
+Date: Sun, 23 Apr 2017 19:09:07 +0200
+Message-ID: <20170423170929.27334-58-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6768449CB4
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C7C8A43C98
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EcKucIG4Pr59 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:07:44 -0400 (EDT)
-Received: from mail-wr0-f175.google.com (mail-wr0-f175.google.com
- [209.85.128.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6BAAC49CD7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:44 -0400 (EDT)
-Received: by mail-wr0-f175.google.com with SMTP id w50so55836706wrc.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:30 -0700 (PDT)
+ with ESMTP id 5nOL06L4Pk1z for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:07:46 -0400 (EDT)
+Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B30AD4121F
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:46 -0400 (EDT)
+Received: by mail-wm0-f43.google.com with SMTP id r190so50455220wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:33 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -37,12 +36,12 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-In order to restore HYP mode to its original condition, KVM currently
-implements __kvm_hyp_reset(). As we're moving towards a hyp-stub
-defined API, it becomes necessary to implement HVC_RESET_VECTORS.
+We now have a full hyp-stub implementation in the KVM init code,
+but the main KVM code only supports HVC_GET_VECTORS, which is not
+enough.
 
-This patch adds the HVC_RESET_VECTORS hypercall to the KVM init
-code, which so far lacked any form of hypercall support.
+Instead of reinventing the wheel, let's reuse the init implementation
+by branching to the idmap page when called with a hyp-stub hypercall.
 
 Tested-by: Keerthy <j-keerthy@ti.com>
 Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
@@ -50,107 +49,56 @@ Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm/include/asm/virt.h |  1 +
- arch/arm/kernel/hyp-stub.S  |  2 +-
- arch/arm/kvm/init.S         | 33 +++++++++++++++++++++++++++------
- 3 files changed, 29 insertions(+), 7 deletions(-)
+ arch/arm/kvm/hyp/hyp-entry.S | 29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
-index c5a2757..663adc0 100644
---- a/arch/arm/include/asm/virt.h
-+++ b/arch/arm/include/asm/virt.h
-@@ -54,6 +54,7 @@ static inline void sync_boot_mode(void)
+diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
+index 1f8db7d..a35baa8 100644
+--- a/arch/arm/kvm/hyp/hyp-entry.S
++++ b/arch/arm/kvm/hyp/hyp-entry.S
+@@ -126,11 +126,30 @@ hyp_hvc:
+ 	 */
+ 	pop	{r0, r1, r2}
  
- void __hyp_set_vectors(unsigned long phys_vector_base);
- unsigned long __hyp_get_vectors(void);
-+void __hyp_reset_vectors(void);
- #else
- #define __boot_cpu_mode	(SVC_MODE)
- #define sync_boot_mode()
-diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
-index e637854..675c50f 100644
---- a/arch/arm/kernel/hyp-stub.S
-+++ b/arch/arm/kernel/hyp-stub.S
-@@ -280,7 +280,7 @@ ENDPROC(__hyp_reset_vectors)
- #endif
- 
- .align 5
--__hyp_stub_vectors:
-+ENTRY(__hyp_stub_vectors)
- __hyp_stub_reset:	W(b)	.
- __hyp_stub_und:		W(b)	.
- __hyp_stub_svc:		W(b)	.
-diff --git a/arch/arm/kvm/init.S b/arch/arm/kvm/init.S
-index bf89c91..86a7008 100644
---- a/arch/arm/kvm/init.S
-+++ b/arch/arm/kvm/init.S
-@@ -23,6 +23,7 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/virt.h>
- 
- /********************************************************************
-  * Hypervisor initialization
-@@ -39,6 +40,10 @@
-  * - Setup the page tables
-  * - Enable the MMU
-  * - Profit! (or eret, if you only care about the code).
-+ *
-+ * Another possibility is to get a HYP stub hypercall.
-+ * We discriminate between the two by checking if r0 contains a value
-+ * that is less than HVC_STUB_HCALL_NR.
-  */
- 
- 	.text
-@@ -58,6 +63,10 @@ __kvm_hyp_init:
- 	W(b)	.
- 
- __do_hyp_init:
-+	@ Check for a stub hypercall
-+	cmp	r0, #HVC_STUB_HCALL_NR
-+	blo	__kvm_handle_stub_hvc
-+
- 	@ Set stack pointer
- 	mov	sp, r0
- 
-@@ -112,19 +121,31 @@ __do_hyp_init:
- 
- 	eret
- 
--	@ r0 : stub vectors address
-+ENTRY(__kvm_handle_stub_hvc)
-+	cmp	r0, #HVC_RESET_VECTORS
-+	bne	1f
- ENTRY(__kvm_hyp_reset)
- 	/* We're now in idmap, disable MMU */
- 	mrc	p15, 4, r1, c1, c0, 0	@ HSCTLR
--	ldr	r2, =(HSCTLR_M | HSCTLR_A | HSCTLR_C | HSCTLR_I)
--	bic	r1, r1, r2
-+	ldr	r0, =(HSCTLR_M | HSCTLR_A | HSCTLR_C | HSCTLR_I)
-+	bic	r1, r1, r0
- 	mcr	p15, 4, r1, c1, c0, 0	@ HSCTLR
- 
--	/* Install stub vectors */
--	mcr	p15, 4, r0, c12, c0, 0	@ HVBAR
--	isb
+-	/* Check for __hyp_get_vectors */
+-	cmp	r0, #HVC_GET_VECTORS
+-	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
+-	beq	1f
 +	/*
-+	 * Install stub vectors, using ardb's VA->PA trick.
++	 * Check if we have a kernel function, which is guaranteed to be
++	 * bigger than the maximum hyp stub hypercall
 +	 */
-+0:	adr	r0, 0b					@ PA(0)
-+	movw	r1, #:lower16:__hyp_stub_vectors - 0b   @ VA(stub) - VA(0)
-+	movt	r1, #:upper16:__hyp_stub_vectors - 0b
-+	add	r1, r1, r0				@ PA(stub)
-+	mcr	p15, 4, r1, c12, c0, 0	@ HVBAR
-+	b	exit
++	cmp	r0, #HVC_STUB_HCALL_NR
++	bhs	1f
+ 
++	/*
++	 * Not a kernel function, treat it as a stub hypercall.
++	 * Compute the physical address for __kvm_handle_stub_hvc
++	 * (as the code lives in the idmaped page) and branch there.
++	 * We hijack ip (r12) as a tmp register.
++	 */
++	push	{r1}
++	ldr	r1, =kimage_voffset
++	ldr	r1, [r1]
++	ldr	ip, =__kvm_handle_stub_hvc
++	sub	ip, ip, r1
++THUMB(	add	ip, ip, #1)
++	pop	{r1}
 +
-+1:	ldr	r0, =HVC_STUB_ERR
++	bx	ip
++
++1:
+ 	push	{lr}
  
-+exit:
- 	eret
-+ENDPROC(__kvm_handle_stub_hvc)
- ENDPROC(__kvm_hyp_reset)
+ 	mov	lr, r0
+@@ -142,7 +161,7 @@ THUMB(	orr	lr, #1)
+ 	blx	lr			@ Call the HYP function
  
- 	.ltorg
+ 	pop	{lr}
+-1:	eret
++	eret
+ 
+ guest_trap:
+ 	load_vcpu r0			@ Load VCPU pointer to r0
 -- 
 2.9.0
