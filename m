@@ -1,25 +1,25 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 59/79] ARM: KVM: Implement HVC_SOFT_RESTART in the init code
-Date: Sun, 23 Apr 2017 19:09:09 +0200
-Message-ID: <20170423170929.27334-60-cdall@linaro.org>
+Subject: [PULL 61/79] arm/arm64: KVM: Use __hyp_reset_vectors() directly
+Date: Sun, 23 Apr 2017 19:09:11 +0200
+Message-ID: <20170423170929.27334-62-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09A4D49D5E
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AB7749D4A
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id al-c-a0hPWqn for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:07:53 -0400 (EDT)
-Received: from mail-wr0-f171.google.com (mail-wr0-f171.google.com
- [209.85.128.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8151E49D0D
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:48 -0400 (EDT)
-Received: by mail-wr0-f171.google.com with SMTP id z109so79246655wrb.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:34 -0700 (PDT)
+ with ESMTP id nHAR14DL0e+U for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:07:54 -0400 (EDT)
+Received: from mail-wr0-f178.google.com (mail-wr0-f178.google.com
+ [209.85.128.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB18749D4B
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:50 -0400 (EDT)
+Received: by mail-wr0-f178.google.com with SMTP id z109so79246933wrb.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:37 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,45 +36,67 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-Another missing stub hypercall is HVC_SOFT_RESTART. It turns out
-that it is pretty easy to implement in terms of HVC_RESET_VECTORS
-(since it needs to turn the MMU off).
+__cpu_reset_hyp_mode doesn't need to be passed any argument now,
+as the hyp-stub implementations are self-contained, and is now
+reduced to just calling __hyp_reset_vectors(). Let's drop the
+wrapper and use the stub hypercall directly.
 
-Tested-by: Keerthy <j-keerthy@ti.com>
-Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm/kvm/init.S | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/arm/include/asm/kvm_host.h   | 6 ------
+ arch/arm/kvm/arm.c                | 3 +--
+ arch/arm64/include/asm/kvm_host.h | 6 ------
+ 3 files changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/arch/arm/kvm/init.S b/arch/arm/kvm/init.S
-index fb33609..e53360d 100644
---- a/arch/arm/kvm/init.S
-+++ b/arch/arm/kvm/init.S
-@@ -127,8 +127,22 @@ ENTRY(__kvm_handle_stub_hvc)
- 	mrc	p15, 4, r0, c12, c0, 0	@ get HVBAR
- 	b	exit
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index adea307..d488b88 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -270,12 +270,6 @@ static inline void __cpu_init_stage2(void)
+ 	kvm_call_hyp(__init_stage2_translation);
+ }
  
-+1:	cmp	r0, #HVC_SOFT_RESTART
-+	bne	1f
-+
-+	/* The target is expected in r1 */
-+	msr	ELR_hyp, r1
-+	mrs	r0, cpsr
-+	bic	r0, r0, #MODE_MASK
-+	orr	r0, r0, #HYP_MODE
-+THUMB(	orr	r0, r0, #PSR_T_BIT	)
-+	msr	spsr_cxsf, r0
-+	b	reset
-+
- 1:	cmp	r0, #HVC_RESET_VECTORS
- 	bne	1f
-+
-+reset:
- 	/* We're now in idmap, disable MMU */
- 	mrc	p15, 4, r1, c1, c0, 0	@ HSCTLR
- 	ldr	r0, =(HSCTLR_M | HSCTLR_A | HSCTLR_C | HSCTLR_I)
+-static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+-					phys_addr_t phys_idmap_start)
+-{
+-	__hyp_reset_vectors();
+-}
+-
+ static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+ 	return 0;
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 46fd375..c8f4fa6 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1130,8 +1130,7 @@ static void cpu_hyp_reinit(void)
+ static void cpu_hyp_reset(void)
+ {
+ 	if (!is_kernel_in_hyp_mode())
+-		__cpu_reset_hyp_mode(hyp_default_vectors,
+-				     kvm_get_idmap_start());
++		__hyp_reset_vectors();
+ }
+ 
+ static void _kvm_arch_hardware_enable(void *discard)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 0355dd1..578df18 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -362,12 +362,6 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+ 	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr);
+ }
+ 
+-static inline void __cpu_reset_hyp_mode(unsigned long vector_ptr,
+-					phys_addr_t phys_idmap_start)
+-{
+-	__hyp_reset_vectors();
+-}
+-
+ static inline void kvm_arch_hardware_unsetup(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
 -- 
 2.9.0
