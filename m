@@ -1,24 +1,24 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 64/79] ARM: decompressor: Remove __hyp_get_vectors usage
-Date: Sun, 23 Apr 2017 19:09:14 +0200
-Message-ID: <20170423170929.27334-65-cdall@linaro.org>
+Subject: [PULL 65/79] ARM: hyp-stub/KVM: Kill __hyp_get_vectors
+Date: Sun, 23 Apr 2017 19:09:15 +0200
+Message-ID: <20170423170929.27334-66-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B54EB49D0E
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E7D8749CED
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tnDz2zJnlJZh for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:07:56 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E18B149D4C
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:53 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id u65so7508521wmu.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:40 -0700 (PDT)
+ with ESMTP id ozZqzhpR-LeC for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:07:57 -0400 (EDT)
+Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 48FCD49D60
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:55 -0400 (EDT)
+Received: by mail-wm0-f43.google.com with SMTP id w64so46380609wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:41 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,53 +35,112 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-When the compressed image needs to be relocated to avoid being
-overwritten by the decompression process, we need to relocate
-the hyp vectors as well so that we can find them once the
-decompression has taken effect.
-
-For that, we perform the following calculation:
-	u32 v = __hyp_get_vectors();
-	v += offset;
-	__hyp_set_vectors(v);
-
-But we're guaranteed that the initial value of v as returned by
-__hyp_get_vectors is always __hyp_stub_vectors, because we have
-just set it by calling __hyp_stub_install.
-
-So let's remove the use of __hyp_get_vectors, and directly use
-__hyp_stub_vectors instead.
+Nobody is using __hyp_get_vectors anymore, so let's remove both
+implementations (hyp-stub and KVM).
 
 Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm/boot/compressed/head.S | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/virt.h | 10 ++++------
+ arch/arm/kernel/hyp-stub.S  | 13 +------------
+ arch/arm/kvm/init.S         |  7 +------
+ arch/arm/kvm/interrupts.S   |  4 ----
+ 4 files changed, 6 insertions(+), 28 deletions(-)
 
-diff --git a/arch/arm/boot/compressed/head.S b/arch/arm/boot/compressed/head.S
-index 9150f97..7c711ba 100644
---- a/arch/arm/boot/compressed/head.S
-+++ b/arch/arm/boot/compressed/head.S
-@@ -422,7 +422,17 @@ dtb_check_done:
- 		cmp	r0, #HYP_MODE
- 		bne	1f
+diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
+index 663adc0..141144f 100644
+--- a/arch/arm/include/asm/virt.h
++++ b/arch/arm/include/asm/virt.h
+@@ -53,7 +53,6 @@ static inline void sync_boot_mode(void)
+ }
  
--		bl	__hyp_get_vectors
-+		/*
-+		 * Compute the address of the hyp vectors after relocation.
-+		 * This requires some arithmetic since we cannot directly
-+		 * reference __hyp_stub_vectors in a PC-relative way.
-+		 * Call __hyp_set_vectors with the new address so that we
-+		 * can HVC again after the copy.
-+		 */
-+0:		adr	r0, 0b
-+		movw	r1, #:lower16:__hyp_stub_vectors - 0b
-+		movt	r1, #:upper16:__hyp_stub_vectors - 0b
-+		add	r0, r0, r1
- 		sub	r0, r0, r5
- 		add	r0, r0, r10
- 		bl	__hyp_set_vectors
+ void __hyp_set_vectors(unsigned long phys_vector_base);
+-unsigned long __hyp_get_vectors(void);
+ void __hyp_reset_vectors(void);
+ #else
+ #define __boot_cpu_mode	(SVC_MODE)
+@@ -99,12 +98,11 @@ extern char __hyp_text_end[];
+ 
+ /* Only assembly code should need those */
+ 
+-#define HVC_GET_VECTORS 0
+-#define HVC_SET_VECTORS 1
+-#define HVC_SOFT_RESTART 2
+-#define HVC_RESET_VECTORS 3
++#define HVC_SET_VECTORS 0
++#define HVC_SOFT_RESTART 1
++#define HVC_RESET_VECTORS 2
+ 
+-#define HVC_STUB_HCALL_NR 4
++#define HVC_STUB_HCALL_NR 3
+ 
+ #endif /* __ASSEMBLY__ */
+ 
+diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
+index 675c50f..918c64f 100644
+--- a/arch/arm/kernel/hyp-stub.S
++++ b/arch/arm/kernel/hyp-stub.S
+@@ -202,12 +202,7 @@ ARM_BE8(orr	r7, r7, #(1 << 25))     @ HSCTLR.EE
+ ENDPROC(__hyp_stub_install_secondary)
+ 
+ __hyp_stub_do_trap:
+-	teq	r0, #HVC_GET_VECTORS
+-	bne	1f
+-	mrc	p15, 4, r0, c12, c0, 0	@ get HVBAR
+-	b	__hyp_stub_exit
+-
+-1:	teq	r0, #HVC_SET_VECTORS
++	teq	r0, #HVC_SET_VECTORS
+ 	bne	1f
+ 	mcr	p15, 4, r1, c12, c0, 0	@ set HVBAR
+ 	b	__hyp_stub_exit
+@@ -247,12 +242,6 @@ ENDPROC(__hyp_stub_do_trap)
+  * so you will need to set that to something sensible at the new hypervisor's
+  * initialisation entry point.
+  */
+-ENTRY(__hyp_get_vectors)
+-	mov	r0, #HVC_GET_VECTORS
+-	__HVC(0)
+-	ret	lr
+-ENDPROC(__hyp_get_vectors)
+-
+ ENTRY(__hyp_set_vectors)
+ 	mov	r1, r0
+ 	mov	r0, #HVC_SET_VECTORS
+diff --git a/arch/arm/kvm/init.S b/arch/arm/kvm/init.S
+index e53360d..87bcd7a 100644
+--- a/arch/arm/kvm/init.S
++++ b/arch/arm/kvm/init.S
+@@ -122,12 +122,7 @@ __do_hyp_init:
+ 	eret
+ 
+ ENTRY(__kvm_handle_stub_hvc)
+-	cmp	r0, #HVC_GET_VECTORS
+-	bne	1f
+-	mrc	p15, 4, r0, c12, c0, 0	@ get HVBAR
+-	b	exit
+-
+-1:	cmp	r0, #HVC_SOFT_RESTART
++	cmp	r0, #HVC_SOFT_RESTART
+ 	bne	1f
+ 
+ 	/* The target is expected in r1 */
+diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+index b1bd316..80a1d6c 100644
+--- a/arch/arm/kvm/interrupts.S
++++ b/arch/arm/kvm/interrupts.S
+@@ -37,10 +37,6 @@
+  * in Hyp mode (see init_hyp_mode in arch/arm/kvm/arm.c).  Return values are
+  * passed in r0 (strictly 32bit).
+  *
+- * A function pointer with a value of 0xffffffff has a special meaning,
+- * and is used to implement __hyp_get_vectors in the same way as in
+- * arch/arm/kernel/hyp_stub.S.
+- *
+  * The calling convention follows the standard AAPCS:
+  *   r0 - r3: caller save
+  *   r12:     caller save
 -- 
 2.9.0
