@@ -1,24 +1,24 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 43/79] arm64: KVM: Implement HVC_GET_VECTORS in the init code
-Date: Sun, 23 Apr 2017 19:08:53 +0200
-Message-ID: <20170423170929.27334-44-cdall@linaro.org>
+Subject: [PULL 50/79] ARM: Update cpu_v7_reset documentation
+Date: Sun, 23 Apr 2017 19:09:00 +0200
+Message-ID: <20170423170929.27334-51-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F00549C67
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6829349D08
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XihirhQLgNR6 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:07:33 -0400 (EDT)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DFF5D49CA0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:30 -0400 (EDT)
-Received: by mail-wm0-f41.google.com with SMTP id r190so50452445wme.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:17 -0700 (PDT)
+ with ESMTP id E9YGZh-oDghQ for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:07:41 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 934B249C67
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:38 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id r190so50453845wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:25 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,34 +35,38 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-Now that we have an infrastructure to handle hypercalls in the KVM
-init code, let's implement HVC_GET_VECTORS there.
+cpu_v7_reset() now takes a second parameter indicating whether
+we should reboot in HYP or not. Update the documentation to
+reflect this.
 
+Tested-by: Keerthy <j-keerthy@ti.com>
+Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Reviewed-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm64/kvm/hyp-init.S | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/arm/mm/proc-v7.S | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 5e39ad5..fded932 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -124,7 +124,12 @@ __do_hyp_init:
- ENDPROC(__kvm_hyp_init)
+diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
+index 1846ca4..01d64c0 100644
+--- a/arch/arm/mm/proc-v7.S
++++ b/arch/arm/mm/proc-v7.S
+@@ -39,13 +39,14 @@ ENTRY(cpu_v7_proc_fin)
+ ENDPROC(cpu_v7_proc_fin)
  
- ENTRY(__kvm_handle_stub_hvc)
--	cmp	x0, #HVC_RESET_VECTORS
-+	cmp	x0, #HVC_GET_VECTORS
-+	b.ne	1f
-+	mrs	x0, vbar_el2
-+	b	exit
-+
-+1:	cmp	x0, #HVC_RESET_VECTORS
- 	b.ne	1f
- 	/*
- 	 * Reset kvm back to the hyp stub.
+ /*
+- *	cpu_v7_reset(loc)
++ *	cpu_v7_reset(loc, hyp)
+  *
+  *	Perform a soft reset of the system.  Put the CPU into the
+  *	same state as it would be if it had been reset, and branch
+  *	to what would be the reset vector.
+  *
+  *	- loc   - location to jump to for soft reset
++ *	- hyp   - indicate if restart occurs in HYP mode
+  *
+  *	This code must be executed using a flat identity mapping with
+  *      caches disabled.
 -- 
 2.9.0
