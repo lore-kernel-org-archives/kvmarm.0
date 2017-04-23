@@ -1,25 +1,25 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 75/79] KVM: arm/arm64: fix races in kvm_psci_vcpu_on
-Date: Sun, 23 Apr 2017 19:09:25 +0200
-Message-ID: <20170423170929.27334-76-cdall@linaro.org>
+Subject: [PULL 72/79] KVM: arm/arm64: Support arch timers with a userspace gic
+Date: Sun, 23 Apr 2017 19:09:22 +0200
+Message-ID: <20170423170929.27334-73-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BEA3349CC2
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:08:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 01CB049D8E
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:08:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id To2ScZOybK+L for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:08:09 -0400 (EDT)
-Received: from mail-wr0-f170.google.com (mail-wr0-f170.google.com
- [209.85.128.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 984E249D72
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:08:06 -0400 (EDT)
-Received: by mail-wr0-f170.google.com with SMTP id l50so5314694wrc.3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:52 -0700 (PDT)
+ with ESMTP id tuwtQHX3aYjd for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:08:06 -0400 (EDT)
+Received: from mail-wr0-f178.google.com (mail-wr0-f178.google.com
+ [209.85.128.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2014949D90
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:08:03 -0400 (EDT)
+Received: by mail-wr0-f178.google.com with SMTP id l50so5314308wrc.3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:49 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,74 +31,290 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andrew Jones <drjones@redhat.com>
+From: Alexander Graf <agraf@suse.de>
 
-Fix potential races in kvm_psci_vcpu_on() by taking the kvm->lock
-mutex.  In general, it's a bad idea to allow more than one PSCI_CPU_ON
-to process the same target VCPU at the same time.  One such problem
-that may arise is that one PSCI_CPU_ON could be resetting the target
-vcpu, which fills the entire sys_regs array with a temporary value
-including the MPIDR register, while another looks up the VCPU based
-on the MPIDR value, resulting in no target VCPU found.  Resolves both
-races found with the kvm-unit-tests/arm/psci unit test.
+If you're running with a userspace gic or other interrupt controller
+(that is no vgic in the kernel), then you have so far not been able to
+use the architected timers, because the output of the architected
+timers, which are driven inside the kernel, was a kernel-only construct
+between the arch timer code and the vgic.
 
+This patch implements the new KVM_CAP_ARM_USER_IRQ feature, where we use a
+side channel on the kvm_run structure, run->s.regs.device_irq_level, to
+always notify userspace of the timer output levels when using a userspace
+irqchip.
+
+This works by ensuring that before we enter the guest, if the timer
+output level has changed compared to what we last told userspace, we
+don't enter the guest, but instead return to userspace to notify it of
+the new level.  If we are exiting, because of an MMIO for example, and
+the level changed at the same time, the value is also updated and
+userspace can sample the line as it needs.  This is nicely achieved
+simply always updating the timer_irq_level field after the main run
+loop.
+
+Note that the kvm_timer_update_irq trace event is changed to show the
+host IRQ number for the timer instead of the guest IRQ number, because
+the kernel no longer know which IRQ userspace wires up the timer signal
+to.
+
+Also note that this patch implements all required functionality but does
+not yet advertise the capability.
+
+Reviewed-by: Alexander Graf <agraf@suse.de>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
-Reported-by: Levente Kurusa <lkurusa@redhat.com>
-Suggested-by: Christoffer Dall <cdall@linaro.org>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Alexander Graf <agraf@suse.de>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/kvm/psci.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ arch/arm/kvm/arm.c           |  18 +++----
+ include/kvm/arm_arch_timer.h |   2 +
+ virt/kvm/arm/arch_timer.c    | 122 +++++++++++++++++++++++++++++++++++--------
+ 3 files changed, 110 insertions(+), 32 deletions(-)
 
-diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
-index c2b1315..a08d7a9 100644
---- a/arch/arm/kvm/psci.c
-+++ b/arch/arm/kvm/psci.c
-@@ -208,9 +208,10 @@ int kvm_psci_version(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index c378502..ac6e57b 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -515,13 +515,7 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 			return ret;
+ 	}
  
- static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+-	/*
+-	 * Enable the arch timers only if we have an in-kernel VGIC
+-	 * and it has been properly initialized, since we cannot handle
+-	 * interrupts from the virtual timer with a userspace gic.
+-	 */
+-	if (irqchip_in_kernel(kvm) && vgic_initialized(kvm))
+-		ret = kvm_timer_enable(vcpu);
++	ret = kvm_timer_enable(vcpu);
+ 
+ 	return ret;
+ }
+@@ -640,9 +634,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		local_irq_disable();
+ 
+ 		/*
+-		 * Re-check atomic conditions
++		 * If we have a singal pending, or need to notify a userspace
++		 * irqchip about timer level changes, then we exit (and update
++		 * the timer level state in kvm_timer_update_run below).
+ 		 */
+-		if (signal_pending(current)) {
++		if (signal_pending(current) ||
++		    kvm_timer_should_notify_user(vcpu)) {
+ 			ret = -EINTR;
+ 			run->exit_reason = KVM_EXIT_INTR;
+ 		}
+@@ -714,6 +711,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		ret = handle_exit(vcpu, run, ret);
+ 	}
+ 
++	/* Tell userspace about in-kernel device output levels */
++	kvm_timer_update_run(vcpu);
++
+ 	if (vcpu->sigset_active)
+ 		sigprocmask(SIG_SETMASK, &sigsaved, NULL);
+ 	return ret;
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index fe797d6..295584f 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -63,6 +63,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
+ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
+ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
++bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
++void kvm_timer_update_run(struct kvm_vcpu *vcpu);
+ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu);
+ 
+ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *, u64 regid);
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 363f0d2..5dc2167 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -184,6 +184,27 @@ bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+ 	return cval <= now;
+ }
+ 
++/*
++ * Reflect the timer output level into the kvm_run structure
++ */
++void kvm_timer_update_run(struct kvm_vcpu *vcpu)
++{
++	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
++	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
++	struct kvm_sync_regs *regs = &vcpu->run->s.regs;
++
++	if (likely(irqchip_in_kernel(vcpu->kvm)))
++		return;
++
++	/* Populate the device bitmap with the timer states */
++	regs->device_irq_level &= ~(KVM_ARM_DEV_EL1_VTIMER |
++				    KVM_ARM_DEV_EL1_PTIMER);
++	if (vtimer->irq.level)
++		regs->device_irq_level |= KVM_ARM_DEV_EL1_VTIMER;
++	if (ptimer->irq.level)
++		regs->device_irq_level |= KVM_ARM_DEV_EL1_PTIMER;
++}
++
+ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 				 struct arch_timer_context *timer_ctx)
  {
--	int ret = 1;
-+	struct kvm *kvm = vcpu->kvm;
- 	unsigned long psci_fn = vcpu_get_reg(vcpu, 0) & ~((u32) 0);
- 	unsigned long val;
-+	int ret = 1;
+@@ -194,9 +215,12 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+ 				   timer_ctx->irq.level);
  
- 	switch (psci_fn) {
- 	case PSCI_0_2_FN_PSCI_VERSION:
-@@ -230,7 +231,9 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
- 		break;
- 	case PSCI_0_2_FN_CPU_ON:
- 	case PSCI_0_2_FN64_CPU_ON:
-+		mutex_lock(&kvm->lock);
- 		val = kvm_psci_vcpu_on(vcpu);
-+		mutex_unlock(&kvm->lock);
- 		break;
- 	case PSCI_0_2_FN_AFFINITY_INFO:
- 	case PSCI_0_2_FN64_AFFINITY_INFO:
-@@ -279,6 +282,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+-	ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, timer_ctx->irq.irq,
+-				  timer_ctx->irq.level);
+-	WARN_ON(ret);
++	if (likely(irqchip_in_kernel(vcpu->kvm))) {
++		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
++					  timer_ctx->irq.irq,
++					  timer_ctx->irq.level);
++		WARN_ON(ret);
++	}
+ }
  
- static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+ /*
+@@ -215,7 +239,7 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 	 * because the guest would never see the interrupt.  Instead wait
+ 	 * until we call this function from kvm_timer_flush_hwstate.
+ 	 */
+-	if (!timer->enabled)
++	if (unlikely(!timer->enabled))
+ 		return;
+ 
+ 	if (kvm_timer_should_fire(vtimer) != vtimer->irq.level)
+@@ -282,28 +306,12 @@ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+ 	timer_disarm(timer);
+ }
+ 
+-/**
+- * kvm_timer_flush_hwstate - prepare to move the virt timer to the cpu
+- * @vcpu: The vcpu pointer
+- *
+- * Check if the virtual timer has expired while we were running in the host,
+- * and inject an interrupt if that was the case.
+- */
+-void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
++static void kvm_timer_flush_hwstate_vgic(struct kvm_vcpu *vcpu)
  {
-+	struct kvm *kvm = vcpu->kvm;
- 	unsigned long psci_fn = vcpu_get_reg(vcpu, 0) & ~((u32) 0);
- 	unsigned long val;
+-	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	bool phys_active;
+ 	int ret;
  
-@@ -288,7 +292,9 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
- 		val = PSCI_RET_SUCCESS;
- 		break;
- 	case KVM_PSCI_FN_CPU_ON:
-+		mutex_lock(&kvm->lock);
- 		val = kvm_psci_vcpu_on(vcpu);
-+		mutex_unlock(&kvm->lock);
- 		break;
- 	default:
- 		val = PSCI_RET_NOT_SUPPORTED;
+-	if (unlikely(!timer->enabled))
+-		return;
+-
+-	kvm_timer_update_state(vcpu);
+-
+-	/* Set the background timer for the physical timer emulation. */
+-	kvm_timer_emulate(vcpu, vcpu_ptimer(vcpu));
+-
+ 	/*
+ 	* If we enter the guest with the virtual input level to the VGIC
+ 	* asserted, then we have already told the VGIC what we need to, and
+@@ -355,11 +363,72 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	vtimer->active_cleared_last = !phys_active;
+ }
+ 
++bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
++{
++	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
++	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
++	struct kvm_sync_regs *sregs = &vcpu->run->s.regs;
++	bool vlevel, plevel;
++
++	if (likely(irqchip_in_kernel(vcpu->kvm)))
++		return false;
++
++	vlevel = sregs->device_irq_level & KVM_ARM_DEV_EL1_VTIMER;
++	plevel = sregs->device_irq_level & KVM_ARM_DEV_EL1_PTIMER;
++
++	return vtimer->irq.level != vlevel ||
++	       ptimer->irq.level != plevel;
++}
++
++static void kvm_timer_flush_hwstate_user(struct kvm_vcpu *vcpu)
++{
++	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
++
++	/*
++	 * To prevent continuously exiting from the guest, we mask the
++	 * physical interrupt such that the guest can make forward progress.
++	 * Once we detect the output level being deasserted, we unmask the
++	 * interrupt again so that we exit from the guest when the timer
++	 * fires.
++	*/
++	if (vtimer->irq.level)
++		disable_percpu_irq(host_vtimer_irq);
++	else
++		enable_percpu_irq(host_vtimer_irq, 0);
++}
++
++/**
++ * kvm_timer_flush_hwstate - prepare timers before running the vcpu
++ * @vcpu: The vcpu pointer
++ *
++ * Check if the virtual timer has expired while we were running in the host,
++ * and inject an interrupt if that was the case, making sure the timer is
++ * masked or disabled on the host so that we keep executing.  Also schedule a
++ * software timer for the physical timer if it is enabled.
++ */
++void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
++{
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++
++	if (unlikely(!timer->enabled))
++		return;
++
++	kvm_timer_update_state(vcpu);
++
++	/* Set the background timer for the physical timer emulation. */
++	kvm_timer_emulate(vcpu, vcpu_ptimer(vcpu));
++
++	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
++		kvm_timer_flush_hwstate_user(vcpu);
++	else
++		kvm_timer_flush_hwstate_vgic(vcpu);
++}
++
+ /**
+  * kvm_timer_sync_hwstate - sync timer state from cpu
+  * @vcpu: The vcpu pointer
+  *
+- * Check if the virtual timer has expired while we were running in the guest,
++ * Check if any of the timers have expired while we were running in the guest,
+  * and inject an interrupt if that was the case.
+  */
+ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+@@ -559,6 +628,13 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 	if (timer->enabled)
+ 		return 0;
+ 
++	/* Without a VGIC we do not map virtual IRQs to physical IRQs */
++	if (!irqchip_in_kernel(vcpu->kvm))
++		goto no_vgic;
++
++	if (!vgic_initialized(vcpu->kvm))
++		return -ENODEV;
++
+ 	/*
+ 	 * Find the physical IRQ number corresponding to the host_vtimer_irq
+ 	 */
+@@ -582,8 +658,8 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 	if (ret)
+ 		return ret;
+ 
++no_vgic:
+ 	timer->enabled = 1;
+-
+ 	return 0;
+ }
+ 
 -- 
 2.9.0
