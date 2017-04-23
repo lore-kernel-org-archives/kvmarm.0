@@ -1,24 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 50/79] ARM: Update cpu_v7_reset documentation
-Date: Sun, 23 Apr 2017 19:09:00 +0200
-Message-ID: <20170423170929.27334-51-cdall@linaro.org>
+Subject: [PULL 53/79] ARM: hyp-stub: Define a return value for failed stub
+ calls
+Date: Sun, 23 Apr 2017 19:09:03 +0200
+Message-ID: <20170423170929.27334-54-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6829349D08
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E418C49C8F
  for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E9YGZh-oDghQ for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:07:41 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 934B249C67
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:38 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id r190so50453845wme.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:25 -0700 (PDT)
+ with ESMTP id oFx8kRhqGSnW for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:07:42 -0400 (EDT)
+Received: from mail-wr0-f174.google.com (mail-wr0-f174.google.com
+ [209.85.128.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2907249D0D
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:41 -0400 (EDT)
+Received: by mail-wr0-f174.google.com with SMTP id z109so79245736wrb.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:28 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,38 +37,39 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-cpu_v7_reset() now takes a second parameter indicating whether
-we should reboot in HYP or not. Update the documentation to
-reflect this.
+Define a standard return value to be returned when a hyp stub
+call fails.
 
-Tested-by: Keerthy <j-keerthy@ti.com>
-Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm/mm/proc-v7.S | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/virt.h | 2 ++
+ arch/arm/kernel/hyp-stub.S  | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
-index 1846ca4..01d64c0 100644
---- a/arch/arm/mm/proc-v7.S
-+++ b/arch/arm/mm/proc-v7.S
-@@ -39,13 +39,14 @@ ENTRY(cpu_v7_proc_fin)
- ENDPROC(cpu_v7_proc_fin)
+diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
+index 4ea16fc..c16f70d 100644
+--- a/arch/arm/include/asm/virt.h
++++ b/arch/arm/include/asm/virt.h
+@@ -104,4 +104,6 @@ extern char __hyp_text_end[];
  
- /*
-- *	cpu_v7_reset(loc)
-+ *	cpu_v7_reset(loc, hyp)
-  *
-  *	Perform a soft reset of the system.  Put the CPU into the
-  *	same state as it would be if it had been reset, and branch
-  *	to what would be the reset vector.
-  *
-  *	- loc   - location to jump to for soft reset
-+ *	- hyp   - indicate if restart occurs in HYP mode
-  *
-  *	This code must be executed using a flat identity mapping with
-  *      caches disabled.
+ #endif /* __ASSEMBLY__ */
+ 
++#define HVC_STUB_ERR	0xbadca11
++
+ #endif /* ! VIRT_H */
+diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
+index 15eaa14..b20ca88 100644
+--- a/arch/arm/kernel/hyp-stub.S
++++ b/arch/arm/kernel/hyp-stub.S
+@@ -216,7 +216,7 @@ __hyp_stub_do_trap:
+ 	bne	1f
+ 	bx	r1
+ 
+-1:	mov	r0, #-1
++1:	ldr	r0, =HVC_STUB_ERR
+ 
+ __hyp_stub_exit:
+ 	__ERET
 -- 
 2.9.0
