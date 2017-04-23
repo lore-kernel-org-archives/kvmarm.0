@@ -1,24 +1,24 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 36/79] arm64: hyp-stub: Stop pointlessly clobbering lr
-Date: Sun, 23 Apr 2017 19:08:46 +0200
-Message-ID: <20170423170929.27334-37-cdall@linaro.org>
+Subject: [PULL 29/79] arm64: KVM: PMU: Inject UNDEF on non-privileged accesses
+Date: Sun, 23 Apr 2017 19:08:39 +0200
+Message-ID: <20170423170929.27334-30-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D225449CBA
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2D8F49C66
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AAzs7Lur7COR for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:07:26 -0400 (EDT)
-Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 290C349CB5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:23 -0400 (EDT)
-Received: by mail-wm0-f51.google.com with SMTP id w64so46376130wma.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:09 -0700 (PDT)
+ with ESMTP id 4bpfha2Sx2P9 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:07:18 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 121FB49CAC
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:15 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id m123so50336384wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:02 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,44 +30,48 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-When entering the kernel hyp stub, we check whether or not we've
-made it here through an HVC instruction, clobbering lr (aka x30)
-in the process.
+access_pminten() and access_pmuserenr() can only be accessed when
+the CPU is in a priviledged mode. If it is not, let's inject an
+UNDEF exception.
 
-This is completely pointless, as HVC is the only way to get here
-(all traps to EL2 are disabled, no interrupt override is applied).
-
-So let's remove this bit of code whose only point is to corrupt
-a valuable register.
-
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm64/kernel/hyp-stub.S | 6 ------
- 1 file changed, 6 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index d3b5f75..e4215ad 100644
---- a/arch/arm64/kernel/hyp-stub.S
-+++ b/arch/arm64/kernel/hyp-stub.S
-@@ -55,12 +55,6 @@ ENDPROC(__hyp_stub_vectors)
- 	.align 11
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 750c129..d343c0f 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -709,8 +709,10 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	if (!kvm_arm_pmu_v3_ready(vcpu))
+ 		return trap_raz_wi(vcpu, p, r);
  
- el1_sync:
--	mrs	x30, esr_el2
--	lsr	x30, x30, #ESR_ELx_EC_SHIFT
--
--	cmp	x30, #ESR_ELx_EC_HVC64
--	b.ne	9f				// Not an HVC trap
--
- 	cmp	x0, #HVC_GET_VECTORS
- 	b.ne	1f
- 	mrs	x0, vbar_el2
+-	if (!vcpu_mode_priv(vcpu))
++	if (!vcpu_mode_priv(vcpu)) {
++		kvm_inject_undefined(vcpu);
+ 		return false;
++	}
+ 
+ 	if (p->is_write) {
+ 		u64 val = p->regval & mask;
+@@ -780,8 +782,10 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 		return trap_raz_wi(vcpu, p, r);
+ 
+ 	if (p->is_write) {
+-		if (!vcpu_mode_priv(vcpu))
++		if (!vcpu_mode_priv(vcpu)) {
++			kvm_inject_undefined(vcpu);
+ 			return false;
++		}
+ 
+ 		vcpu_sys_reg(vcpu, PMUSERENR_EL0) = p->regval
+ 						    & ARMV8_PMU_USERENR_MASK;
 -- 
 2.9.0
