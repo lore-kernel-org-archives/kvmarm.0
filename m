@@ -1,25 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 48/79] ARM: soft-reboot into same mode that we entered the
- kernel
-Date: Sun, 23 Apr 2017 19:08:58 +0200
-Message-ID: <20170423170929.27334-49-cdall@linaro.org>
+Subject: [PULL 55/79] ARM: KVM: Implement HVC_RESET_VECTORS stub hypercall in
+ the init code
+Date: Sun, 23 Apr 2017 19:09:05 +0200
+Message-ID: <20170423170929.27334-56-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A905649C79
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6768449CB4
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lHw1iJbJduma for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:07:40 -0400 (EDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A686A49CF7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:36 -0400 (EDT)
-Received: by mail-wm0-f50.google.com with SMTP id w64so46377826wma.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:23 -0700 (PDT)
+ with ESMTP id EcKucIG4Pr59 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:07:44 -0400 (EDT)
+Received: from mail-wr0-f175.google.com (mail-wr0-f175.google.com
+ [209.85.128.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6BAAC49CD7
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:44 -0400 (EDT)
+Received: by mail-wr0-f175.google.com with SMTP id w50so55836706wrc.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:30 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,149 +32,125 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Russell King <rmk+kernel@armlinux.org.uk>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Russell King <rmk+kernel@armlinux.org.uk>
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-When we soft-reboot (eg, kexec) from one kernel into the next, we need
-to ensure that we enter the new kernel in the same processor mode as
-when we were entered, so that (eg) the new kernel can install its own
-hypervisor - the old kernel's hypervisor will have been overwritten.
+In order to restore HYP mode to its original condition, KVM currently
+implements __kvm_hyp_reset(). As we're moving towards a hyp-stub
+defined API, it becomes necessary to implement HVC_RESET_VECTORS.
 
-In order to do this, we need to pass a flag to cpu_reset() so it knows
-what to do, and we need to modify the kernel's own hypervisor stub to
-allow it to handle a soft-reboot.
-
-As we are always guaranteed to install our own hypervisor if we're
-entered in HYP32 mode, and KVM will have moved itself out of the way
-on kexec/normal reboot, we can assume that our hypervisor is in place
-when we want to kexec, so changing our hypervisor API should not be a
-problem.
+This patch adds the HVC_RESET_VECTORS hypercall to the KVM init
+code, which so far lacked any form of hypercall support.
 
 Tested-by: Keerthy <j-keerthy@ti.com>
+Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm/include/asm/proc-fns.h |  4 ++--
- arch/arm/kernel/hyp-stub.S      | 13 +++++++++++++
- arch/arm/kernel/reboot.c        |  7 +++++--
- arch/arm/mm/proc-v7.S           | 12 ++++++++----
- 4 files changed, 28 insertions(+), 8 deletions(-)
+ arch/arm/include/asm/virt.h |  1 +
+ arch/arm/kernel/hyp-stub.S  |  2 +-
+ arch/arm/kvm/init.S         | 33 +++++++++++++++++++++++++++------
+ 3 files changed, 29 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm/include/asm/proc-fns.h b/arch/arm/include/asm/proc-fns.h
-index 8877ad5..f2e1af4 100644
---- a/arch/arm/include/asm/proc-fns.h
-+++ b/arch/arm/include/asm/proc-fns.h
-@@ -43,7 +43,7 @@ extern struct processor {
- 	/*
- 	 * Special stuff for a reset
- 	 */
--	void (*reset)(unsigned long addr) __attribute__((noreturn));
-+	void (*reset)(unsigned long addr, bool hvc) __attribute__((noreturn));
- 	/*
- 	 * Idle the processor
- 	 */
-@@ -88,7 +88,7 @@ extern void cpu_set_pte_ext(pte_t *ptep, pte_t pte);
- #else
- extern void cpu_set_pte_ext(pte_t *ptep, pte_t pte, unsigned int ext);
- #endif
--extern void cpu_reset(unsigned long addr) __attribute__((noreturn));
-+extern void cpu_reset(unsigned long addr, bool hvc) __attribute__((noreturn));
+diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
+index c5a2757..663adc0 100644
+--- a/arch/arm/include/asm/virt.h
++++ b/arch/arm/include/asm/virt.h
+@@ -54,6 +54,7 @@ static inline void sync_boot_mode(void)
  
- /* These three are private to arch/arm/kernel/suspend.c */
- extern void cpu_do_suspend(void *);
+ void __hyp_set_vectors(unsigned long phys_vector_base);
+ unsigned long __hyp_get_vectors(void);
++void __hyp_reset_vectors(void);
+ #else
+ #define __boot_cpu_mode	(SVC_MODE)
+ #define sync_boot_mode()
 diff --git a/arch/arm/kernel/hyp-stub.S b/arch/arm/kernel/hyp-stub.S
-index f3e9ba5..8291523 100644
+index e637854..675c50f 100644
 --- a/arch/arm/kernel/hyp-stub.S
 +++ b/arch/arm/kernel/hyp-stub.S
-@@ -24,6 +24,7 @@
+@@ -280,7 +280,7 @@ ENDPROC(__hyp_reset_vectors)
+ #endif
  
- #define HVC_GET_VECTORS 0
- #define HVC_SET_VECTORS 1
-+#define HVC_SOFT_RESTART 2
- 
- #ifndef ZIMAGE
- /*
-@@ -215,6 +216,10 @@ __hyp_stub_do_trap:
- 	mcr	p15, 4, r1, c12, c0, 0	@ set HVBAR
- 	b	__hyp_stub_exit
- 
-+1:	teq	r0, #HVC_SOFT_RESTART
-+	bne	1f
-+	bx	r3
-+
- 1:	mov	r0, #-1
- 
- __hyp_stub_exit:
-@@ -256,6 +261,14 @@ ENTRY(__hyp_set_vectors)
- 	ret	lr
- ENDPROC(__hyp_set_vectors)
- 
-+ENTRY(__hyp_soft_restart)
-+	mov	r3, r0
-+	mov	r0, #HVC_SOFT_RESTART
-+	__HVC(0)
-+	mov	r0, r3
-+	ret	lr
-+ENDPROC(__hyp_soft_restart)
-+
- #ifndef ZIMAGE
- .align 2
- .L__boot_cpu_mode_offset:
-diff --git a/arch/arm/kernel/reboot.c b/arch/arm/kernel/reboot.c
-index 3fa867a..3b2aa9a 100644
---- a/arch/arm/kernel/reboot.c
-+++ b/arch/arm/kernel/reboot.c
-@@ -12,10 +12,11 @@
- 
- #include <asm/cacheflush.h>
- #include <asm/idmap.h>
+ .align 5
+-__hyp_stub_vectors:
++ENTRY(__hyp_stub_vectors)
+ __hyp_stub_reset:	W(b)	.
+ __hyp_stub_und:		W(b)	.
+ __hyp_stub_svc:		W(b)	.
+diff --git a/arch/arm/kvm/init.S b/arch/arm/kvm/init.S
+index bf89c91..86a7008 100644
+--- a/arch/arm/kvm/init.S
++++ b/arch/arm/kvm/init.S
+@@ -23,6 +23,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_mmu.h>
 +#include <asm/virt.h>
  
- #include "reboot.h"
+ /********************************************************************
+  * Hypervisor initialization
+@@ -39,6 +40,10 @@
+  * - Setup the page tables
+  * - Enable the MMU
+  * - Profit! (or eret, if you only care about the code).
++ *
++ * Another possibility is to get a HYP stub hypercall.
++ * We discriminate between the two by checking if r0 contains a value
++ * that is less than HVC_STUB_HCALL_NR.
+  */
  
--typedef void (*phys_reset_t)(unsigned long);
-+typedef void (*phys_reset_t)(unsigned long, bool);
+ 	.text
+@@ -58,6 +63,10 @@ __kvm_hyp_init:
+ 	W(b)	.
  
- /*
-  * Function pointers to optional machine specific functions
-@@ -51,7 +52,9 @@ static void __soft_restart(void *addr)
- 
- 	/* Switch to the identity mapping. */
- 	phys_reset = (phys_reset_t)virt_to_idmap(cpu_reset);
--	phys_reset((unsigned long)addr);
+ __do_hyp_init:
++	@ Check for a stub hypercall
++	cmp	r0, #HVC_STUB_HCALL_NR
++	blo	__kvm_handle_stub_hvc
 +
-+	/* original stub should be restored by kvm */
-+	phys_reset((unsigned long)addr, is_hyp_mode_available());
+ 	@ Set stack pointer
+ 	mov	sp, r0
  
- 	/* Should never get here. */
- 	BUG();
-diff --git a/arch/arm/mm/proc-v7.S b/arch/arm/mm/proc-v7.S
-index d00d52c..1846ca4 100644
---- a/arch/arm/mm/proc-v7.S
-+++ b/arch/arm/mm/proc-v7.S
-@@ -53,11 +53,15 @@ ENDPROC(cpu_v7_proc_fin)
- 	.align	5
- 	.pushsection	.idmap.text, "ax"
- ENTRY(cpu_v7_reset)
--	mrc	p15, 0, r1, c1, c0, 0		@ ctrl register
--	bic	r1, r1, #0x1			@ ...............m
-- THUMB(	bic	r1, r1, #1 << 30 )		@ SCTLR.TE (Thumb exceptions)
--	mcr	p15, 0, r1, c1, c0, 0		@ disable MMU
-+	mrc	p15, 0, r2, c1, c0, 0		@ ctrl register
-+	bic	r2, r2, #0x1			@ ...............m
-+ THUMB(	bic	r2, r2, #1 << 30 )		@ SCTLR.TE (Thumb exceptions)
-+	mcr	p15, 0, r2, c1, c0, 0		@ disable MMU
- 	isb
-+#ifdef CONFIG_ARM_VIRT_EXT
-+	teq	r1, #0
-+	bne	__hyp_soft_restart
-+#endif
- 	bx	r0
- ENDPROC(cpu_v7_reset)
- 	.popsection
+@@ -112,19 +121,31 @@ __do_hyp_init:
+ 
+ 	eret
+ 
+-	@ r0 : stub vectors address
++ENTRY(__kvm_handle_stub_hvc)
++	cmp	r0, #HVC_RESET_VECTORS
++	bne	1f
+ ENTRY(__kvm_hyp_reset)
+ 	/* We're now in idmap, disable MMU */
+ 	mrc	p15, 4, r1, c1, c0, 0	@ HSCTLR
+-	ldr	r2, =(HSCTLR_M | HSCTLR_A | HSCTLR_C | HSCTLR_I)
+-	bic	r1, r1, r2
++	ldr	r0, =(HSCTLR_M | HSCTLR_A | HSCTLR_C | HSCTLR_I)
++	bic	r1, r1, r0
+ 	mcr	p15, 4, r1, c1, c0, 0	@ HSCTLR
+ 
+-	/* Install stub vectors */
+-	mcr	p15, 4, r0, c12, c0, 0	@ HVBAR
+-	isb
++	/*
++	 * Install stub vectors, using ardb's VA->PA trick.
++	 */
++0:	adr	r0, 0b					@ PA(0)
++	movw	r1, #:lower16:__hyp_stub_vectors - 0b   @ VA(stub) - VA(0)
++	movt	r1, #:upper16:__hyp_stub_vectors - 0b
++	add	r1, r1, r0				@ PA(stub)
++	mcr	p15, 4, r1, c12, c0, 0	@ HVBAR
++	b	exit
++
++1:	ldr	r0, =HVC_STUB_ERR
+ 
++exit:
+ 	eret
++ENDPROC(__kvm_handle_stub_hvc)
+ ENDPROC(__kvm_hyp_reset)
+ 
+ 	.ltorg
 -- 
 2.9.0
