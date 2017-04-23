@@ -1,26 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 73/79] KVM: arm/arm64: Report PMU overflow interrupts to
- userspace irqchip
-Date: Sun, 23 Apr 2017 19:09:23 +0200
-Message-ID: <20170423170929.27334-74-cdall@linaro.org>
+Subject: [PULL 70/79] KVM: arm/arm64: Cleanup the arch timer code's irqchip
+ checking
+Date: Sun, 23 Apr 2017 19:09:20 +0200
+Message-ID: <20170423170929.27334-71-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 93F2749DB2
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:08:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8659C49D82
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:08:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KYwSaANd093x for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:08:06 -0400 (EDT)
-Received: from mail-wr0-f171.google.com (mail-wr0-f171.google.com
- [209.85.128.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 016F440064
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:08:03 -0400 (EDT)
-Received: by mail-wr0-f171.google.com with SMTP id w50so55839619wrc.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:50 -0700 (PDT)
+ with ESMTP id 9YcKokFt0U+c for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:08:03 -0400 (EDT)
+Received: from mail-wr0-f182.google.com (mail-wr0-f182.google.com
+ [209.85.128.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B837149D20
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:08:00 -0400 (EDT)
+Received: by mail-wr0-f182.google.com with SMTP id w50so55839189wrc.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:47 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -37,145 +37,80 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-When not using an in-kernel VGIC, but instead emulating an interrupt
-controller in userspace, we should report the PMU overflow status to
-that userspace interrupt controller using the KVM_CAP_ARM_USER_IRQ
-feature.
+Currently we check if we have an in-kernel irqchip and if the vgic was
+properly implemented several places in the arch timer code.  But, we
+already predicate our enablement of the arm timers on having a valid
+and initialized gic, so we can simply check if the timers are enabled or
+not.
+
+This also gets rid of the ugly "error that's not an error but used to
+signal that the timer shouldn't poke the gic" construct we have.
 
 Reviewed-by: Alexander Graf <agraf@suse.de>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/kvm/arm.c        | 13 +++++++++----
- include/kvm/arm_pmu.h     |  7 +++++++
- virt/kvm/arm/arch_timer.c |  3 ---
- virt/kvm/arm/pmu.c        | 39 +++++++++++++++++++++++++++++++++++----
- 4 files changed, 51 insertions(+), 11 deletions(-)
+ virt/kvm/arm/arch_timer.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index ac6e57b..9eda293 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -635,11 +635,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- 		/*
- 		 * If we have a singal pending, or need to notify a userspace
--		 * irqchip about timer level changes, then we exit (and update
--		 * the timer level state in kvm_timer_update_run below).
-+		 * irqchip about timer or PMU level changes, then we exit (and
-+		 * update the timer level state in kvm_timer_update_run
-+		 * below).
- 		 */
- 		if (signal_pending(current) ||
--		    kvm_timer_should_notify_user(vcpu)) {
-+		    kvm_timer_should_notify_user(vcpu) ||
-+		    kvm_pmu_should_notify_user(vcpu)) {
- 			ret = -EINTR;
- 			run->exit_reason = KVM_EXIT_INTR;
- 		}
-@@ -712,7 +714,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	}
- 
- 	/* Tell userspace about in-kernel device output levels */
--	kvm_timer_update_run(vcpu);
-+	if (unlikely(!irqchip_in_kernel(vcpu->kvm))) {
-+		kvm_timer_update_run(vcpu);
-+		kvm_pmu_update_run(vcpu);
-+	}
- 
- 	if (vcpu->sigset_active)
- 		sigprocmask(SIG_SETMASK, &sigsaved, NULL);
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 92e7e97..1ab4633 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -50,6 +50,8 @@ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu);
- void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
-+bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcpu);
-+void kvm_pmu_update_run(struct kvm_vcpu *vcpu);
- void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
-@@ -85,6 +87,11 @@ static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
-+static inline bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
-+static inline void kvm_pmu_update_run(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 5dc2167..5976609 100644
+index 35d7100..363f0d2 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -193,9 +193,6 @@ void kvm_timer_update_run(struct kvm_vcpu *vcpu)
- 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 	struct kvm_sync_regs *regs = &vcpu->run->s.regs;
+@@ -189,8 +189,6 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ {
+ 	int ret;
  
--	if (likely(irqchip_in_kernel(vcpu->kvm)))
--		return;
+-	BUG_ON(!vgic_initialized(vcpu->kvm));
 -
- 	/* Populate the device bitmap with the timer states */
- 	regs->device_irq_level &= ~(KVM_ARM_DEV_EL1_VTIMER |
- 				    KVM_ARM_DEV_EL1_PTIMER);
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 69ccce3..4b43e7f 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -230,13 +230,44 @@ static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	overflow = !!kvm_pmu_overflow_status(vcpu);
--	if (pmu->irq_level != overflow) {
--		pmu->irq_level = overflow;
--		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
--				    pmu->irq_num, overflow);
-+	if (pmu->irq_level == overflow)
+ 	timer_ctx->active_cleared_last = false;
+ 	timer_ctx->irq.level = new_level;
+ 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+@@ -205,7 +203,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+  * Check if there was a change in the timer state (should we raise or lower
+  * the line level to the GIC).
+  */
+-static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
++static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+@@ -217,16 +215,14 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 	 * because the guest would never see the interrupt.  Instead wait
+ 	 * until we call this function from kvm_timer_flush_hwstate.
+ 	 */
+-	if (!vgic_initialized(vcpu->kvm) || !timer->enabled)
+-		return -ENODEV;
++	if (!timer->enabled)
 +		return;
-+
-+	pmu->irq_level = overflow;
-+
-+	if (likely(irqchip_in_kernel(vcpu->kvm))) {
-+		int ret;
-+		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-+					  pmu->irq_num, overflow);
-+		WARN_ON(ret);
- 	}
+ 
+ 	if (kvm_timer_should_fire(vtimer) != vtimer->irq.level)
+ 		kvm_timer_update_irq(vcpu, !vtimer->irq.level, vtimer);
+ 
+ 	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
+ 		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+-
+-	return 0;
  }
  
-+bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	struct kvm_sync_regs *sregs = &vcpu->run->s.regs;
-+	bool run_level = sregs->device_irq_level & KVM_ARM_DEV_PMU;
+ /* Schedule the background timer for the emulated timer. */
+@@ -295,13 +291,16 @@ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+  */
+ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+ {
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	bool phys_active;
+ 	int ret;
+ 
+-	if (kvm_timer_update_state(vcpu))
++	if (unlikely(!timer->enabled))
+ 		return;
+ 
++	kvm_timer_update_state(vcpu);
 +
-+	if (likely(irqchip_in_kernel(vcpu->kvm)))
-+		return false;
-+
-+	return pmu->irq_level != run_level;
-+}
-+
-+/*
-+ * Reflect the PMU overflow interrupt output level into the kvm_run structure
-+ */
-+void kvm_pmu_update_run(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_sync_regs *regs = &vcpu->run->s.regs;
-+
-+	/* Populate the timer bitmap for user space */
-+	regs->device_irq_level &= ~KVM_ARM_DEV_PMU;
-+	if (vcpu->arch.pmu.irq_level)
-+		regs->device_irq_level |= KVM_ARM_DEV_PMU;
-+}
-+
- /**
-  * kvm_pmu_flush_hwstate - flush pmu state to cpu
-  * @vcpu: The vcpu pointer
+ 	/* Set the background timer for the physical timer emulation. */
+ 	kvm_timer_emulate(vcpu, vcpu_ptimer(vcpu));
+ 
 -- 
 2.9.0
