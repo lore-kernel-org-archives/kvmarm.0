@@ -1,25 +1,25 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 44/79] arm64: KVM: Allow the main HYP code to use the init hyp
- stub implementation
-Date: Sun, 23 Apr 2017 19:08:54 +0200
-Message-ID: <20170423170929.27334-45-cdall@linaro.org>
+Subject: [PULL 42/79] arm64: KVM: Implement HVC_RESET_VECTORS stub hypercall
+ in the init code
+Date: Sun, 23 Apr 2017 19:08:52 +0200
+Message-ID: <20170423170929.27334-43-cdall@linaro.org>
 References: <20170423170929.27334-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F16449CD6
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29D0549CD6
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7l9esn40zqdf for <kvmarm@lists.cs.columbia.edu>;
- Sun, 23 Apr 2017 13:07:34 -0400 (EDT)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D264D49CFB
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:31 -0400 (EDT)
-Received: by mail-wm0-f43.google.com with SMTP id i137so1939547wmf.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:18 -0700 (PDT)
+ with ESMTP id wKP8REs2Fy7s for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Apr 2017 13:07:33 -0400 (EDT)
+Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B543B49C67
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 13:07:29 -0400 (EDT)
+Received: by mail-wm0-f54.google.com with SMTP id w64so46376949wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Apr 2017 10:10:16 -0700 (PDT)
 In-Reply-To: <20170423170929.27334-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,62 +36,68 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-We now have a full hyp-stub implementation in the KVM init code,
-but the main KVM code only supports HVC_GET_VECTORS, which is not
-enough.
+In order to restore HYP mode to its original condition, KVM currently
+implements __kvm_hyp_reset(). As we're moving towards a hyp-stub
+defined API, it becomes necessary to implement HVC_RESET_VECTORS.
 
-Instead of reinventing the wheel, let's reuse the init implementation
-by branching to the idmap page when called with a hyp-stub hypercall.
+This patch adds the HVC_RESET_VECTORS hypercall to the KVM init
+code, which so far lacked any form of hypercall support.
 
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm64/kvm/hyp/hyp-entry.S | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/hyp-init.S | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index d8ef788..4f34c59 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -87,10 +87,24 @@ alternative_endif
- 	/* Here, we're pretty sure the host called HVC. */
- 	ldp	x0, x1, [sp], #16
+diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
+index 6b29d3d..5e39ad5 100644
+--- a/arch/arm64/kvm/hyp-init.S
++++ b/arch/arm64/kvm/hyp-init.S
+@@ -22,6 +22,7 @@
+ #include <asm/kvm_mmu.h>
+ #include <asm/pgtable-hwdef.h>
+ #include <asm/sysreg.h>
++#include <asm/virt.h>
  
--	cmp	x0, #HVC_GET_VECTORS
--	b.ne	1f
--	mrs	x0, vbar_el2
--	b	2f
+ 	.text
+ 	.pushsection	.hyp.idmap.text, "ax"
+@@ -58,6 +59,9 @@ __invalid:
+ 	 * x2: HYP vectors
+ 	 */
+ __do_hyp_init:
 +	/* Check for a stub HVC call */
 +	cmp	x0, #HVC_STUB_HCALL_NR
-+	b.hs	1f
-+
-+	/*
-+	 * Compute the idmap address of __kvm_handle_stub_hvc and
-+	 * jump there. Since we use kimage_voffset, do not use the
-+	 * HYP VA for __kvm_handle_stub_hvc, but the kernel VA instead
-+	 * (by loading it from the constant pool).
-+	 *
-+	 * Preserve x0-x4, which may contain stub parameters.
-+	 */
-+	ldr	x5, =__kvm_handle_stub_hvc
-+	ldr_l	x6, kimage_voffset
-+
-+	/* x5 = __pa(x5) */
-+	sub	x5, x5, x6
-+	br	x5
++	b.lo	__kvm_handle_stub_hvc
  
- 1:
+ 	msr	ttbr0_el2, x0
+ 
+@@ -119,6 +123,9 @@ __do_hyp_init:
+ 	eret
+ ENDPROC(__kvm_hyp_init)
+ 
++ENTRY(__kvm_handle_stub_hvc)
++	cmp	x0, #HVC_RESET_VECTORS
++	b.ne	1f
  	/*
-@@ -99,7 +113,7 @@ alternative_endif
- 	kern_hyp_va	x0
- 	do_el2_call
+ 	 * Reset kvm back to the hyp stub.
+ 	 */
+@@ -133,9 +140,15 @@ ENTRY(__kvm_hyp_reset)
+ 	/* Install stub vectors */
+ 	adr_l	x0, __hyp_stub_vectors
+ 	msr	vbar_el2, x0
++	b	exit
  
--2:	eret
-+	eret
++1:	/* Bad stub call */
++	ldr	x0, =HVC_STUB_ERR
++
++exit:
+ 	eret
+ ENDPROC(__kvm_hyp_reset)
++ENDPROC(__kvm_handle_stub_hvc)
  
- el1_trap:
- 	/*
+ 	.ltorg
+ 
 -- 
 2.9.0
