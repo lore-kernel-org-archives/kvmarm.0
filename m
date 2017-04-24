@@ -1,26 +1,27 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH] arm64: Add ASM modifier for xN register operands
-Date: Mon, 24 Apr 2017 18:34:14 +0100
-Message-ID: <20170424173413.GW12323@arm.com>
-References: <20170420183053.718-1-mka@chromium.org>
- <20170424170009.GT12323@arm.com>
- <CAKv+Gu_Ms73qfFFjmhkwF9Rh2jBM6Cx9LfuSHPUnXv0GTR1z7w@mail.gmail.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH V15 04/11] efi: parse ARM processor error
+Date: Mon, 24 Apr 2017 19:52:40 +0200
+Message-ID: <20170424175240.3nvhbxzwicxnk6og@pd.tnic>
+References: <1492556723-9189-1-git-send-email-tbaicar@codeaurora.org>
+ <1492556723-9189-5-git-send-email-tbaicar@codeaurora.org>
+ <20170421175527.fjwnqd22jz7br5yu@pd.tnic>
+ <e54c9893-446f-9e77-b78b-2548d394719b@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 415B440DB8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 13:31:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F128C40D4C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 13:49:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id d0X4Xja5WCRG for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Apr 2017 13:31:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5278340D9D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 13:31:27 -0400 (EDT)
+ with ESMTP id 2Y1vy2laxaeb for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Apr 2017 13:49:55 -0400 (EDT)
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85F6B40D2F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 13:49:55 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_Ms73qfFFjmhkwF9Rh2jBM6Cx9LfuSHPUnXv0GTR1z7w@mail.gmail.com>
+In-Reply-To: <e54c9893-446f-9e77-b78b-2548d394719b@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,57 +31,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Grant Grundler <grundler@chromium.org>, Matthias Kaehlcke <mka@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Christoph Lameter <cl@linux.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: "Baicar, Tyler" <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, rafael@kernel.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, tony.luck@intel.com, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawe
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 24, 2017 at 06:22:51PM +0100, Ard Biesheuvel wrote:
-> On 24 April 2017 at 18:00, Will Deacon <will.deacon@arm.com> wrote:
-> > Hi Matthias,
-> >
-> > On Thu, Apr 20, 2017 at 11:30:53AM -0700, Matthias Kaehlcke wrote:
-> >> Many inline assembly statements don't include the 'x' modifier when
-> >> using xN registers as operands. This is perfectly valid, however it
-> >> causes clang to raise warnings like this:
-> >>
-> >> warning: value size does not match register size specified by the
-> >>   constraint and modifier [-Wasm-operand-widths]
-> >> ...
-> >> arch/arm64/include/asm/barrier.h:62:23: note: expanded from macro
-> >>   '__smp_store_release'
-> >>     asm volatile ("stlr %1, %0"
-> >
-> > If I understand this correctly, then the warning is emitted when we pass
-> > in a value smaller than 64-bit, but refer to %<n> without a modifier
-> > in the inline asm.
-> >
-> > However, if that's the case then I don't understand why:
-> >
-> >> diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-> >> index 0c00c87bb9dd..021e1733da0c 100644
-> >> --- a/arch/arm64/include/asm/io.h
-> >> +++ b/arch/arm64/include/asm/io.h
-> >> @@ -39,33 +39,33 @@
-> >>  #define __raw_writeb __raw_writeb
-> >>  static inline void __raw_writeb(u8 val, volatile void __iomem *addr)
-> >>  {
-> >> -     asm volatile("strb %w0, [%1]" : : "rZ" (val), "r" (addr));
-> >> +     asm volatile("strb %w0, [%x1]" : : "rZ" (val), "r" (addr));
-> >
-> > is necessary. addr is a pointer type, so is 64-bit.
-> >
-> > Given that the scattergun nature of this patch implies that you've been
-> > fixing the places where warnings are reported, then I'm confused as to
-> > why a warning is generated for the case above.
-> >
-> > What am I missing?
-> >
-> 
-> AIUI, Clang now always complains for missing register width modifiers,
-> not just for placeholders that resolve to a 32-bit (or smaller)
-> quantity.
+On Fri, Apr 21, 2017 at 12:22:09PM -0600, Baicar, Tyler wrote:
+> I guess it's not really needed. It just may be useful considering there can
+> be numerous error info structures, numerous context info structures, and a
+> variable length vendor information section. I can move this print to only in
+> the length check failure cases.
 
-Ok, in which case this patch is incomplete as there's a bunch of asm that
-isn't updated (e.g. spinlock.h).
+And? Why does the user care?
 
-Will
+I mean, it is good for debugging when you wanna see you're parsing the
+error info data properly but otherwise it doesn't improve the error
+reporting one bit.
+
+> Because these are part of the error information structure. I wouldn't think
+> FW would populate error information structures that are different versions
+> in the same processor error, but it could be possible from the spec (at
+> least once there are different versions of the table).
+
+Same argument as above.
+
+> There is an error information 64 bit value in the ARM processor error
+> information structure. (UEFI spec 2.6 table 261)
+
+So that's IP-dependent and explained in the following tables. Any plans
+on decoding that too?
+
+> Why's that? Dumping this vendor specific error information is similar to the
+> unrecognized CPER section reporting which is also meant for vendor specific
+> information https://lkml.org/lkml/2017/4/18/751
+
+And how do those naked bytes help the user understand the error happening?
+
+Even in your example you have:
+
+[  140.739210] {1}[Hardware Error]:   00000000: 4d415201 4d492031 453a4d45 435f4343  .RAM1 IMEM:ECC_C
+[  140.739214] {1}[Hardware Error]:   00000010: 53515f45 44525f42 00000000 00000000  E_QSB_RD........
+
+Which looks like some correctable ECC DRAM error and is actually begging
+to be decoded in a human-readable form. So let's do that completely and
+not dump partially decoded information.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
