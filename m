@@ -1,27 +1,38 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH V15 04/11] efi: parse ARM processor error
-Date: Mon, 24 Apr 2017 19:52:40 +0200
-Message-ID: <20170424175240.3nvhbxzwicxnk6og@pd.tnic>
-References: <1492556723-9189-1-git-send-email-tbaicar@codeaurora.org>
- <1492556723-9189-5-git-send-email-tbaicar@codeaurora.org>
- <20170421175527.fjwnqd22jz7br5yu@pd.tnic>
- <e54c9893-446f-9e77-b78b-2548d394719b@codeaurora.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
+Date: Mon, 24 Apr 2017 20:16:19 +0200
+Message-ID: <CAMuHMdWKngq9TAkjEAYscQRVzKpO63-XVcnjzEM0UNVX_1Ddhg@mail.gmail.com>
+References: <20161216105634.235457-1-arnd@arndb.de>
+ <3302470.IDcDrWa0u6@wuerfel>
+ <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
+ <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
+ <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
+ <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
+ <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com>
+ <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
+ <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
+ <CAMuHMdWTiurUSacddYXgW69=QwOrZDV3Zt2DezJauPy8j-GMHw@mail.gmail.com>
+ <CAK8P3a32Y0AiKyVaotYb14uZZ1jM=nwhFD1vyP56epW1Y9KqSw@mail.gmail.com>
+ <alpine.LFD.2.20.1704241249350.32200@eddie.linux-mips.org>
+ <CAK8P3a03BTEBgz87k_dhJuqzOYQm_S5FFDrFgcBAE5FCH-e=dQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F128C40D4C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 13:49:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2BE340DFB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 14:13:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2Y1vy2laxaeb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Apr 2017 13:49:55 -0400 (EDT)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85F6B40D2F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 13:49:55 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <e54c9893-446f-9e77-b78b-2548d394719b@codeaurora.org>
+ with ESMTP id 85bvNykgDaux for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Apr 2017 14:13:32 -0400 (EDT)
+Received: from mail-io0-f195.google.com (mail-io0-f195.google.com
+ [209.85.223.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 95C7E40D58
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 14:13:32 -0400 (EDT)
+Received: by mail-io0-f195.google.com with SMTP id k87so50667196ioi.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 11:16:20 -0700 (PDT)
+In-Reply-To: <CAK8P3a03BTEBgz87k_dhJuqzOYQm_S5FFDrFgcBAE5FCH-e=dQ@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,52 +42,50 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Baicar, Tyler" <tbaicar@codeaurora.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, rafael@kernel.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, tony.luck@intel.com, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju.jose@huawe
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-arch <linux-arch@vger.kernel.org>, Kees Cook <keescook@chromium.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, kernel-build-reports@lists.linaro.org, LKML <linux-kernel@vger.kernel.org>, Russell King <rmk+kernel@armlinux.org.uk>, "Maciej W. Rozycki" <macro@linux-mips.org>, Andrew Morton <akpm@linux-foundation.org>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 21, 2017 at 12:22:09PM -0600, Baicar, Tyler wrote:
-> I guess it's not really needed. It just may be useful considering there can
-> be numerous error info structures, numerous context info structures, and a
-> variable length vendor information section. I can move this print to only in
-> the length check failure cases.
+Hi Arnd,
 
-And? Why does the user care?
+On Mon, Apr 24, 2017 at 7:29 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+> On Mon, Apr 24, 2017 at 6:53 PM, Maciej W. Rozycki <macro@linux-mips.org> wrote:
+>> On Mon, 24 Apr 2017, Arnd Bergmann wrote:
+>>> > If there's no real good reason (brokenness) to deprecate gcc-4.1, I would not
+>>> > do it.I guess most people using old compilers know what they're doing.
+>>>
+>>> What I'm trying to find out first is whether "people regularly using 10+
+>>> year old compilers for the latest kernels" is a strict subset of "people in
+>>> Geert's household".
+>>
+>> Well I do not live with Geert TBH.
+>
+> Sorry about that, you had mentioned that you had used it recently, which should
+> have weighed more than my own results.
 
-I mean, it is good for debugging when you wanna see you're parsing the
-error info data properly but otherwise it doesn't improve the error
-reporting one bit.
+If you prefer to consider everyone who's been sleeping in the same room
+at one of the Oldenburg Linux meetings as part of my household, that's
+fine for me ;-)
 
-> Because these are part of the error information structure. I wouldn't think
-> FW would populate error information structures that are different versions
-> in the same processor error, but it could be possible from the spec (at
-> least once there are different versions of the table).
+> So it still fails, but only because of one compiler error that I can avoid by
+> disabling that driver, and you probably use a slightly patched compiler
+> version that doesn't have this particular bug, or it was a regression between
+> gcc-4.1.2 and 4.1.3.
 
-Same argument as above.
+Mine is also some patched version of 4.1.1, built from Ubuntu sources:
 
-> There is an error information 64 bit value in the ARM processor error
-> information structure. (UEFI spec 2.6 table 261)
+    gcc version 4.1.2 20061115 (prerelease) (Ubuntu 4.1.1-21)
 
-So that's IP-dependent and explained in the following tables. Any plans
-on decoding that too?
+These sources probably even contained the fixes to make gcc-4.1.1
+usable on CELL.
 
-> Why's that? Dumping this vendor specific error information is similar to the
-> unrecognized CPER section reporting which is also meant for vendor specific
-> information https://lkml.org/lkml/2017/4/18/751
+Gr{oetje,eeting}s,
 
-And how do those naked bytes help the user understand the error happening?
+                        Geert
 
-Even in your example you have:
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-[  140.739210] {1}[Hardware Error]:   00000000: 4d415201 4d492031 453a4d45 435f4343  .RAM1 IMEM:ECC_C
-[  140.739214] {1}[Hardware Error]:   00000010: 53515f45 44525f42 00000000 00000000  E_QSB_RD........
-
-Which looks like some correctable ECC DRAM error and is actually begging
-to be decoded in a human-readable form. So let's do that completely and
-not dump partially decoded information.
-
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
