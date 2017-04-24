@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 1/2] kvm: Fix mmu_notifier release race
-Date: Mon, 24 Apr 2017 11:10:23 +0100
-Message-ID: <1493028624-29837-2-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 2/2] kvm: arm/arm64: Fix race in resetting stage2 PGD
+Date: Mon, 24 Apr 2017 11:10:24 +0100
+Message-ID: <1493028624-29837-3-git-send-email-suzuki.poulose@arm.com>
 References: <1493028624-29837-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DE3A41145
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 06:09:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AEA7E43C7F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 06:09:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cWpn1b7li1-Q for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Apr 2017 06:09:27 -0400 (EDT)
+ with ESMTP id vCZgb5hUYC1V for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Apr 2017 06:09:28 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB1294104A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 06:09:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DCE3040DFB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 06:09:28 -0400 (EDT)
 In-Reply-To: <1493028624-29837-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,112 +31,52 @@ To: pbonzini@redhat.com
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIEtWTSB1c2VzIG1tdV9ub3RpZmllciAod2hlcmV2ZXIgYXZhaWxhYmxlKSB0byBrZWVwIHRy
-YWNrCm9mIHRoZSBjaGFuZ2VzIHRvIHRoZSBtbSBvZiB0aGUgZ3Vlc3QuIFRoZSBndWVzdCBzaGFk
-b3cgcGFnZQp0YWJsZXMgYXJlIHJlbGVhc2VkIHdoZW4gdGhlIFZNIGV4aXRzIHZpYSBtbXVfbm90
-aWZpZXItPm9wcy5yZWxlYXNlKCkuClRoZXJlIGlzIGEgcmFyZSBjaGFuY2UgdGhhdCB0aGUgbW11
-X25vdGlmaWVyLT5yZWxlYXNlIGNvdWxkIGJlCmNhbGxlZCBtb3JlIHRoYW4gb25jZSB2aWEgdHdv
-IGRpZmZlcmVudCBwYXRocywgd2hpY2ggY291bGQgZW5kCnVwIGluIHVzZS1hZnRlci1mcmVlIG9m
-IGt2bSBpbnN0YW5jZSAoc3VjaCBhcyBbMF0pLgoKZS5nOgoKdGhyZWFkIEEgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhyZWFkIEIKLS0tLS0tLSAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgLS0tLS0tLS0tLS0tLS0KCiBnZXRfc2lnbmFsLT4g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGt2bV9kZXN0cm95X3ZtKCktPgogZG9f
-ZXhpdC0+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG1tdV9ub3RpZmll
-cl91bnJlZ2lzdGVyLT4KIGV4aXRfbW0tPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBrdm1fYXJjaF9mbHVzaF9zaGFkb3dfYWxsKCktPgogZXhpdF9tbWFwLT4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNwaW5fbG9jaygma3ZtLT5tbXVfbG9jaykK
-IG1tdV9ub3RpZmllcl9yZWxlYXNlLT4gICAgICAgICAgICAgICAgICAgICAgICAgICAuLi4uCiAg
-a3ZtX2FyY2hfZmx1c2hfc2hhZG93X2FsbCgpLT4gICAgICAgICAgICAgICAgICAgLi4uLi4KICAu
-Li4gc3Bpbl9sb2NrKCZrdm0tPm1tdV9sb2NrKSAgICAgICAgICAgICAgICAgICAuLi4uLgogICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNwaW5fdW5sb2Nr
-KCZrdm0tPm1tdV9sb2NrKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBrdm1fYXJjaF9mcmVlX2t2bSgpCiAgICoqKiB1c2UgYWZ0ZXIgZnJlZSBvZiBrdm0g
-KioqCgpUaGlzIHBhdGNoIGF0dGVtcHRzIHRvIHNvbHZlIHRoZSBwcm9ibGVtIGJ5IGhvbGRpbmcg
-YSByZWZlcmVuY2UgdG8gdGhlIEtWTQpmb3IgdGhlIG1tdV9ub3RpZmllciwgd2hpY2ggaXMgZHJv
-cHBlZCBvbmx5IGZyb20gbm90aWZpZXItPm9wcy5yZWxlYXNlKCkuClRoaXMgd2lsbCBlbnN1cmUg
-dGhhdCB0aGUgS1ZNIHN0cnVjdCBpcyBhdmFpbGFibGUgdGlsbCB3ZSByZWFjaCB0aGUKa3ZtX21t
-dV9ub3RpZmllcl9yZWxlYXNlLCBhbmQgdGhlIGt2bV9kZXN0cm95X3ZtIGlzIGNhbGxlZCBvbmx5
-IGZyb20vYWZ0ZXIKaXQuIFNvLCB3ZSBjYW4gdW5yZWdpc3RlciB0aGUgbm90aWZpZXIgd2l0aCBu
-b19yZWxlYXNlIG9wdGlvbiBhbmQgaGVuY2UKYXZvaWRpbmcgdGhlIHJhY2UgYWJvdmUuIEhvd2V2
-ZXIsIHdlIG5lZWQgdG8gbWFrZSBzdXJlIHRoYXQgdGhlIEtWTSBpcwpmcmVlZCBvbmx5IGFmdGVy
-IHRoZSBtbXVfbm90aWZpZXIgaGFzIGZpbmlzaGVkIHByb2Nlc3NpbmcgdGhlIG5vdGlmaWVyIGR1
-ZSB0bwp0aGUgZm9sbG93aW5nIHBvc3NpYmxlIHBhdGggb2YgZXhlY3V0aW9uIDoKCm1tdV9ub3Rp
-Zmllcl9yZWxlYXNlIC0+IGt2bV9tbXVfbm90aWZpZXJfcmVsZWFzZSAtPiBrdm1fcHV0X2t2bSAt
-PgogIGt2bV9kZXN0cm95X3ZtIC0+IGt2bV9hcmNoX2ZyZWVfa3ZtCgpbMF0gaHR0cDovL2xrbWwu
-a2VybmVsLm9yZy9yL0NBQWVISyt4OHVkSEtxOXhhMXprVE82YXg1RThEazMySFlXZmFUMDVGTWNo
-TDJjcjQ4Z0BtYWlsLmdtYWlsLmNvbQoKRml4ZXM6IGNvbW1pdCA4NWRiMDZlNTE0NDIyICgiS1ZN
-OiBtbXVfbm90aWZpZXJzIHJlbGVhc2UgbWV0aG9kIikKUmVwb3J0ZWQtYnk6IGFuZHJleWtudmxA
-Z29vZ2xlLmNvbQpDYzogTWFyayBSdXRsYW5kIDxtYXJrLnJ1dGxhbmRAYXJtLmNvbT4KQ2M6IFBh
-b2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+CkNjOiBSYWRpbSBLcsSNbcOhxZkgPHJr
-cmNtYXJAcmVkaGF0LmNvbT4KQ2M6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+
-CkNjOiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc+CkNjOiBh
-bmRyZXlrbnZsQGdvb2dsZS5jb20KQ2M6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5j
-b20+ClRlc3RlZC1ieTogTWFyayBSdXRsYW5kIDxtYXJrLnJ1dGxhbmRAYXJtLmNvbT4KU2lnbmVk
-LW9mZi1ieTogU3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT4KLS0tCiBp
-bmNsdWRlL2xpbnV4L2t2bV9ob3N0LmggfCAgMSArCiB2aXJ0L2t2bS9rdm1fbWFpbi5jICAgICAg
-fCA1OSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0KIDIg
-ZmlsZXMgY2hhbmdlZCwgNTMgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkKCmRpZmYgLS1n
-aXQgYS9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmggYi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgK
-aW5kZXggZDAyNTA3NC4uNTYxZTk2OCAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51eC9rdm1faG9z
-dC5oCisrKyBiL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaApAQCAtNDI0LDYgKzQyNCw3IEBAIHN0
-cnVjdCBrdm0gewogCXN0cnVjdCBtbXVfbm90aWZpZXIgbW11X25vdGlmaWVyOwogCXVuc2lnbmVk
-IGxvbmcgbW11X25vdGlmaWVyX3NlcTsKIAlsb25nIG1tdV9ub3RpZmllcl9jb3VudDsKKwlzdHJ1
-Y3QgcmN1X2hlYWQgbW11X25vdGlmaWVyX3JjdTsKICNlbmRpZgogCWxvbmcgdGxic19kaXJ0eTsK
-IAlzdHJ1Y3QgbGlzdF9oZWFkIGRldmljZXM7CmRpZmYgLS1naXQgYS92aXJ0L2t2bS9rdm1fbWFp
-bi5jIGIvdmlydC9rdm0va3ZtX21haW4uYwppbmRleCA4ODI1N2IzLi4yYzNmZGQ0IDEwMDY0NAot
-LS0gYS92aXJ0L2t2bS9rdm1fbWFpbi5jCisrKyBiL3ZpcnQva3ZtL2t2bV9tYWluLmMKQEAgLTQ3
-MSw2ICs0NzEsNyBAQCBzdGF0aWMgdm9pZCBrdm1fbW11X25vdGlmaWVyX3JlbGVhc2Uoc3RydWN0
-IG1tdV9ub3RpZmllciAqbW4sCiAJaWR4ID0gc3JjdV9yZWFkX2xvY2soJmt2bS0+c3JjdSk7CiAJ
-a3ZtX2FyY2hfZmx1c2hfc2hhZG93X2FsbChrdm0pOwogCXNyY3VfcmVhZF91bmxvY2soJmt2bS0+
-c3JjdSwgaWR4KTsKKwlrdm1fcHV0X2t2bShrdm0pOwogfQogCiBzdGF0aWMgY29uc3Qgc3RydWN0
-IG1tdV9ub3RpZmllcl9vcHMga3ZtX21tdV9ub3RpZmllcl9vcHMgPSB7CkBAIC00ODYsOCArNDg3
-LDQ2IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgbW11X25vdGlmaWVyX29wcyBrdm1fbW11X25vdGlm
-aWVyX29wcyA9IHsKIAogc3RhdGljIGludCBrdm1faW5pdF9tbXVfbm90aWZpZXIoc3RydWN0IGt2
-bSAqa3ZtKQogeworCWludCByYzsKIAlrdm0tPm1tdV9ub3RpZmllci5vcHMgPSAma3ZtX21tdV9u
-b3RpZmllcl9vcHM7Ci0JcmV0dXJuIG1tdV9ub3RpZmllcl9yZWdpc3Rlcigma3ZtLT5tbXVfbm90
-aWZpZXIsIGN1cnJlbnQtPm1tKTsKKwlyYyA9IG1tdV9ub3RpZmllcl9yZWdpc3Rlcigma3ZtLT5t
-bXVfbm90aWZpZXIsIGN1cnJlbnQtPm1tKTsKKwkvKgorCSAqIFdlIGhvbGQgYSByZWZlcmVuY2Ug
-dG8gS1ZNIGhlcmUgdG8gbWFrZSBzdXJlIHRoYXQgdGhlIEtWTQorCSAqIGRvZXNuJ3QgZ2V0IGZy
-ZWUnZCBiZWZvcmUgb3BzLT5yZWxlYXNlKCkgY29tcGxldGVzLgorCSAqLworCWlmICghcmMpCisJ
-CWt2bV9nZXRfa3ZtKGt2bSk7CisJcmV0dXJuIHJjOworfQorCitzdGF0aWMgdm9pZCBrdm1fZnJl
-ZV92bV9yY3Uoc3RydWN0IHJjdV9oZWFkICpyY3UpCit7CisJc3RydWN0IGt2bSAqa3ZtID0gY29u
-dGFpbmVyX29mKHJjdSwgc3RydWN0IGt2bSwgbW11X25vdGlmaWVyX3JjdSk7CisJa3ZtX2FyY2hf
-ZnJlZV92bShrdm0pOworfQorCitzdGF0aWMgdm9pZCBrdm1fZmx1c2hfc2hhZG93X21tdShzdHJ1
-Y3Qga3ZtICprdm0pCit7CisJLyoKKwkgKiBXZSBob2xkIGEgcmVmZXJlbmNlIHRvIGt2bSBpbnN0
-YW5jZSBmb3IgbW11X25vdGlmaWVyIGFuZCBpcworCSAqIG9ubHkgcmVsZWFzZWQgd2hlbiBvcHMt
-PnJlbGVhc2UoKSBpcyBjYWxsZWQgdmlhIGV4aXRfbW1hcCBwYXRoLgorCSAqIFNvLCB3aGVuIHdl
-IHJlYWNoIGhlcmUgb3BzLT5yZWxlYXNlKCkgaGFzIGJlZW4gY2FsbGVkIGFscmVhZHksIHdoaWNo
-CisJICogZmx1c2hlcyB0aGUgc2hhZG93IHBhZ2UgdGFibGVzLiBIZW5jZSB0aGVyZSBpcyBubyBu
-ZWVkIHRvIGNhbGwgdGhlCisJICogcmVsZWFzZSgpIGFnYWluIHdoZW4gd2UgdW5yZWdpc3RlciB0
-aGUgbm90aWZpZXIuIEhvd2V2ZXIsIHdlIG5lZWQKKwkgKiB0byBkZWxheSBmcmVlaW5nIHVwIHRo
-ZSBrdm0gdW50aWwgdGhlIHJlbGVhc2UoKSBjb21wbGV0ZXMsIHNpbmNlCisJICogd2UgY291bGQg
-cmVhY2ggaGVyZSB2aWEgOgorCSAqICBrdm1fbW11X25vdGlmaWVyX3JlbGVhc2UoKSAtPiBrdm1f
-cHV0X2t2bSgpIC0+IGt2bV9kZXN0cm95X3ZtKCkKKwkgKi8KKwltbXVfbm90aWZpZXJfdW5yZWdp
-c3Rlcl9ub19yZWxlYXNlKCZrdm0tPm1tdV9ub3RpZmllciwga3ZtLT5tbSk7Cit9CisKK3N0YXRp
-YyB2b2lkIGt2bV9mcmVlX3ZtKHN0cnVjdCBrdm0gKmt2bSkKK3sKKwkvKgorCSAqIFdhaXQgdW50
-aWwgdGhlIG1tdV9ub3RpZmllciBoYXMgZmluaXNoZWQgdGhlIHJlbGVhc2UoKS4KKwkgKiBTZWUg
-Y29tbWVudHMgYWJvdmUgaW4ga3ZtX2ZsdXNoX3NoYWRvd19tbXUuCisJICovCisJbW11X25vdGlm
-aWVyX2NhbGxfc3JjdSgma3ZtLT5tbXVfbm90aWZpZXJfcmN1LCBrdm1fZnJlZV92bV9yY3UpOwog
-fQogCiAjZWxzZSAgLyogIShDT05GSUdfTU1VX05PVElGSUVSICYmIEtWTV9BUkNIX1dBTlRfTU1V
-X05PVElGSUVSKSAqLwpAQCAtNDk3LDYgKzUzNiwxNiBAQCBzdGF0aWMgaW50IGt2bV9pbml0X21t
-dV9ub3RpZmllcihzdHJ1Y3Qga3ZtICprdm0pCiAJcmV0dXJuIDA7CiB9CiAKK3N0YXRpYyB2b2lk
-IGt2bV9mbHVzaF9zaGFkb3dfbW11KHN0cnVjdCBrdm0gKmt2bSkKK3sKKwlrdm1fYXJjaF9mbHVz
-aF9zaGFkb3dfYWxsKGt2bSk7Cit9CisKK3N0YXRpYyB2b2lkIGt2bV9mcmVlX3ZtKHN0cnVjdCBr
-dm0gKmt2bSkKK3sKKwlrdm1fYXJjaF9mcmVlX3ZtKGt2bSk7Cit9CisKICNlbmRpZiAvKiBDT05G
-SUdfTU1VX05PVElGSUVSICYmIEtWTV9BUkNIX1dBTlRfTU1VX05PVElGSUVSICovCiAKIHN0YXRp
-YyBzdHJ1Y3Qga3ZtX21lbXNsb3RzICprdm1fYWxsb2NfbWVtc2xvdHModm9pZCkKQEAgLTczMywx
-OCArNzgyLDE0IEBAIHN0YXRpYyB2b2lkIGt2bV9kZXN0cm95X3ZtKHN0cnVjdCBrdm0gKmt2bSkK
-IAkJa3ZtLT5idXNlc1tpXSA9IE5VTEw7CiAJfQogCWt2bV9jb2FsZXNjZWRfbW1pb19mcmVlKGt2
-bSk7Ci0jaWYgZGVmaW5lZChDT05GSUdfTU1VX05PVElGSUVSKSAmJiBkZWZpbmVkKEtWTV9BUkNI
-X1dBTlRfTU1VX05PVElGSUVSKQotCW1tdV9ub3RpZmllcl91bnJlZ2lzdGVyKCZrdm0tPm1tdV9u
-b3RpZmllciwga3ZtLT5tbSk7Ci0jZWxzZQotCWt2bV9hcmNoX2ZsdXNoX3NoYWRvd19hbGwoa3Zt
-KTsKLSNlbmRpZgorCWt2bV9mbHVzaF9zaGFkb3dfbW11KGt2bSk7CiAJa3ZtX2FyY2hfZGVzdHJv
-eV92bShrdm0pOwogCWt2bV9kZXN0cm95X2RldmljZXMoa3ZtKTsKIAlmb3IgKGkgPSAwOyBpIDwg
-S1ZNX0FERFJFU1NfU1BBQ0VfTlVNOyBpKyspCiAJCWt2bV9mcmVlX21lbXNsb3RzKGt2bSwga3Zt
-LT5tZW1zbG90c1tpXSk7CiAJY2xlYW51cF9zcmN1X3N0cnVjdCgma3ZtLT5pcnFfc3JjdSk7CiAJ
-Y2xlYW51cF9zcmN1X3N0cnVjdCgma3ZtLT5zcmN1KTsKLQlrdm1fYXJjaF9mcmVlX3ZtKGt2bSk7
-CisJa3ZtX2ZyZWVfdm0oa3ZtKTsKIAlwcmVlbXB0X25vdGlmaWVyX2RlYygpOwogCWhhcmR3YXJl
-X2Rpc2FibGVfYWxsKCk7CiAJbW1kcm9wKG1tKTsKLS0gCjIuNy40CgpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
-bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
-bG1hbi9saXN0aW5mby9rdm1hcm0K
+In kvm_free_stage2_pgd() we check the stage2 PGD before holding
+the lock and proceed to take the lock if it is valid. And we unmap
+the page tables, followed by releasing the lock. We reset the PGD
+only after dropping this lock, which could cause a race condition
+where another thread waiting on the lock could potentially see that
+the PGD is still valid and proceed to perform a stage2 operation.
+
+This patch moves the stage2 PGD manipulation under the lock.
+
+Reported-by: Alexander Graf <agraf@suse.de>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ arch/arm/kvm/mmu.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 582a972..9c4026d 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -835,16 +835,18 @@ void stage2_unmap_vm(struct kvm *kvm)
+  */
+ void kvm_free_stage2_pgd(struct kvm *kvm)
+ {
+-	if (kvm->arch.pgd == NULL)
+-		return;
++	void *pgd = NULL;
+ 
+ 	spin_lock(&kvm->mmu_lock);
+-	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
++	if (kvm->arch.pgd) {
++		unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
++		pgd = kvm->arch.pgd;
++		kvm->arch.pgd = NULL;
++	}
+ 	spin_unlock(&kvm->mmu_lock);
+-
+ 	/* Free the HW pgd, one page at a time */
+-	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
+-	kvm->arch.pgd = NULL;
++	if (pgd)
++		free_pages_exact(pgd, S2_PGD_SIZE);
+ }
+ 
+ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+-- 
+2.7.4
