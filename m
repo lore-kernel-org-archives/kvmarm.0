@@ -1,60 +1,74 @@
-From: "Maciej W. Rozycki" <macro@linux-mips.org>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Date: Mon, 24 Apr 2017 17:53:37 +0100 (BST)
-Message-ID: <alpine.LFD.2.20.1704241249350.32200@eddie.linux-mips.org>
-References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel> <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com> <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com> <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
- <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com> <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com> <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org> <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
- <CAMuHMdWTiurUSacddYXgW69=QwOrZDV3Zt2DezJauPy8j-GMHw@mail.gmail.com> <CAK8P3a32Y0AiKyVaotYb14uZZ1jM=nwhFD1vyP56epW1Y9KqSw@mail.gmail.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH] arm64: Add ASM modifier for xN register operands
+Date: Mon, 24 Apr 2017 18:00:09 +0100
+Message-ID: <20170424170009.GT12323@arm.com>
+References: <20170420183053.718-1-mka@chromium.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <CAK8P3a32Y0AiKyVaotYb14uZZ1jM=nwhFD1vyP56epW1Y9KqSw@mail.gmail.com>
-Sender: linux-arch-owner@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook <keescook@chromium.org>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E7E7040C21
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 12:57:23 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6tHgRIzD3FAN for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Apr 2017 12:57:22 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C7ABF40C1D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 12:57:22 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20170420183053.718-1-mka@chromium.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-kernel@vger.kernel.org, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Grant Grundler <grundler@chromium.org>, linux-arm-kernel@lists.infradead.org, Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Christoph Lameter <cl@linux.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, 24 Apr 2017, Arnd Bergmann wrote:
+Hi Matthias,
 
-> > If there's no real good reason (brokenness) to deprecate gcc-4.1, I would not
-> > do it.I guess most people using old compilers know what they're doing.
+On Thu, Apr 20, 2017 at 11:30:53AM -0700, Matthias Kaehlcke wrote:
+> Many inline assembly statements don't include the 'x' modifier when
+> using xN registers as operands. This is perfectly valid, however it
+> causes clang to raise warnings like this:
 > 
-> What I'm trying to find out first is whether "people regularly using 10+
-> year old compilers for the latest kernels" is a strict subset of "people in
-> Geert's household".
+> warning: value size does not match register size specified by the
+>   constraint and modifier [-Wasm-operand-widths]
+> ...
+> arch/arm64/include/asm/barrier.h:62:23: note: expanded from macro
+>   '__smp_store_release'
+>     asm volatile ("stlr %1, %0"
 
- Well I do not live with Geert TBH.
+If I understand this correctly, then the warning is emitted when we pass
+in a value smaller than 64-bit, but refer to %<n> without a modifier
+in the inline asm.
 
-> Given that none of the three architectures I looked at (arm, mips, x86)
-> has successfully built any defconfig for a few years, it's quite possible
-> that it's just you ;-) The other architectures that were around 10 years
-> ago (so they might have someone who still has old toolchain binaries)
-> and that still exist today are alpha, cris, frv, ia64, m32r, parisc, powerpc,
-> s390, sh, sparc and xtensa. The first six are similar to m68k in that the
-> hardware is mostly obsolete and the ports are kept around to support
-> those old systems that might also use ancient toolchains, or new
-> toolchains may be unmaintained or buggy, which could be a reason
-> to keep 4.1 supported or at least try to find out if 4.1 (or even any other
-> version) still works at all.
+However, if that's the case then I don't understand why:
 
- Huh?
+> diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+> index 0c00c87bb9dd..021e1733da0c 100644
+> --- a/arch/arm64/include/asm/io.h
+> +++ b/arch/arm64/include/asm/io.h
+> @@ -39,33 +39,33 @@
+>  #define __raw_writeb __raw_writeb
+>  static inline void __raw_writeb(u8 val, volatile void __iomem *addr)
+>  {
+> -	asm volatile("strb %w0, [%1]" : : "rZ" (val), "r" (addr));
+> +	asm volatile("strb %w0, [%x1]" : : "rZ" (val), "r" (addr));
 
-$ git log -1
-commit 5a7ad1146caa895ad718a534399e38bd2ba721b7
-Author: Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sun Apr 23 16:53:00 2017 -0700
+is necessary. addr is a pointer type, so is 64-bit.
 
-    Linux 4.11-rc8
-$ /usr/bin/time make ARCH=mips CROSS_COMPILE=mipsel-linux- decstation_defconfig vmlinux >/dev/null 2>&1
-1014.19user 71.47system 19:33.24elapsed 92%CPU (0avgtext+0avgdata 
-0maxresident)k18764inputs+242504outputs (704major+9549837minor)pagefaults 0swaps
-$ mipsel-linux-gcc --version
-gcc (GCC) 4.1.2
-Copyright (C) 2006 Free Software Foundation, Inc.
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-$ 
+Given that the scattergun nature of this patch implies that you've been
+fixing the places where warnings are reported, then I'm confused as to
+why a warning is generated for the case above.
 
-Methinks it builds just fine.
+What am I missing?
 
-  Maciej
+Will
