@@ -1,107 +1,128 @@
-From: Daniel Lezcano <daniel.lezcano@linaro.org>
-Subject: Re: [PATCH V9 1/3] irq: Allow to pass the IRQF_TIMER flag with
- percpu irq request
-Date: Mon, 24 Apr 2017 21:59:48 +0200
-Message-ID: <20170424195948.GE2137@mai>
-References: <1493042494-14057-1-git-send-email-daniel.lezcano@linaro.org>
- <398f3f3d-c567-0f1f-1a43-9b8d5805d5fd@arm.com>
- <20170424185909.GD2137@mai>
- <92e2a022-93d4-d4f3-78af-c9b5d51bb867@arm.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
+Date: Mon, 24 Apr 2017 22:30:52 +0200
+Message-ID: <CAK8P3a0HQUqtL=9pgPEreQJaA0AksiR06B4oAwvbYnJeA-2i7w@mail.gmail.com>
+References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
+ <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
+ <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
+ <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
+ <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
+ <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com>
+ <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
+ <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
+ <CAMuHMdWTiurUSacddYXgW69=QwOrZDV3Zt2DezJauPy8j-GMHw@mail.gmail.com>
+ <CAK8P3a32Y0AiKyVaotYb14uZZ1jM=nwhFD1vyP56epW1Y9KqSw@mail.gmail.com>
+ <alpine.LFD.2.20.1704241249350.32200@eddie.linux-mips.org>
+ <CAK8P3a03BTEBgz87k_dhJuqzOYQm_S5FFDrFgcBAE5FCH-e=dQ@mail.gmail.com> <alpine.LFD.2.20.1704241908260.32200@eddie.linux-mips.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EB3A40DA5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 15:57:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0cXePA4yfbeP for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Apr 2017 15:57:05 -0400 (EDT)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4597040D88
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 15:57:05 -0400 (EDT)
-Received: by mail-wm0-f41.google.com with SMTP id w64so6091713wma.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Apr 2017 12:59:53 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <92e2a022-93d4-d4f3-78af-c9b5d51bb867@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-samsung-soc@vger.kernel.org, kernel@stlinux.com, kvm@vger.kernel.org, Vineet Gupta <vgupta@synopsys.com>, Patrice Chotard <patrice.chotard@st.com>, Krzysztof Kozlowski <krzk@kernel.org>, linux-kernel@vger.kernel.org, Javier Martinez Canillas <javier@osg.samsung.com>, Kukjin Kim <kgene@kernel.org>, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, tglx@linutronix.de, linux-snps-arc@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <alpine.LFD.2.20.1704241908260.32200@eddie.linux-mips.org>
+Sender: linux-arch-owner@vger.kernel.org
+To: "Maciej W. Rozycki" <macro@linux-mips.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook <keescook@chromium.org>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gTW9uLCBBcHIgMjQsIDIwMTcgYXQgMDg6MTQ6NTRQTSArMDEwMCwgTWFyYyBaeW5naWVyIHdy
-b3RlOgo+IE9uIDI0LzA0LzE3IDE5OjU5LCBEYW5pZWwgTGV6Y2FubyB3cm90ZToKPiA+IE9uIE1v
-biwgQXByIDI0LCAyMDE3IGF0IDA3OjQ2OjQzUE0gKzAxMDAsIE1hcmMgWnluZ2llciB3cm90ZToK
-PiA+PiBPbiAyNC8wNC8xNyAxNTowMSwgRGFuaWVsIExlemNhbm8gd3JvdGU6Cj4gPj4+IEluIHRo
-ZSBuZXh0IGNoYW5nZXMsIHdlIHRyYWNrIHdoZW4gdGhlIGludGVycnVwdHMgb2NjdXIgaW4gb3Jk
-ZXIgdG8KPiA+Pj4gc3RhdGlzdGljYWxseSBjb21wdXRlIHdoZW4gaXMgc3VwcG9zZWQgdG8gaGFw
-cGVuIHRoZSBuZXh0IGludGVycnVwdC4KPiA+Pj4KPiA+Pj4gSW4gYWxsIHRoZSBpbnRlcnJ1cHRp
-b25zLCBpdCBkb2VzIG5vdCBtYWtlIHNlbnNlIHRvIHN0b3JlIHRoZSB0aW1lciBpbnRlcnJ1cHQK
-PiA+Pj4gb2NjdXJlbmNlcyBhbmQgdHJ5IHRvIHByZWRpY3QgdGhlIG5leHQgaW50ZXJydXB0IGFz
-IHdoZW4ga25vdyB0aGUgZXhwaXJhdGlvbgo+ID4+PiB0aW1lLgo+ID4+Pgo+ID4+PiBUaGUgcmVx
-dWVzdF9pcnEoKSBoYXMgYSBpcnEgZmxhZ3MgcGFyYW1ldGVyIGFuZCB0aGUgdGltZXIgZHJpdmVy
-cyB1c2UgaXQgdG8KPiA+Pj4gcGFzcyB0aGUgSVJRRl9USU1FUiBmbGFnLCBsZXR0aW5nIHVzIGtu
-b3cgdGhlIGludGVycnVwdCBpcyBjb21pbmcgZnJvbSBhIHRpbWVyLgo+ID4+PiBCYXNlZCBvbiB0
-aGlzIGZsYWcsIHdlIGNhbiBkaXNjYXJkIHRoZXNlIGludGVycnVwdHMgd2hlbiB0cmFja2luZyB0
-aGVtLgo+ID4+Pgo+ID4+PiBCdXQsIHRoZSBBUEkgcmVxdWVzdF9wZXJjcHVfaXJxIGRvZXMgbm90
-IGFsbG93IHRvIHBhc3MgYSBmbGFnLCBoZW5jZSBzcGVjaWZ5aW5nCj4gPj4+IGlmIHRoZSBpbnRl
-cnJ1cHQgdHlwZSBpcyBhIHRpbWVyLgo+ID4+Pgo+ID4+PiBBZGQgYSBmdW5jdGlvbiByZXF1ZXN0
-X3BlcmNwdV9pcnFfZmxhZ3MoKSB3aGVyZSB3ZSBjYW4gc3BlY2lmeSB0aGUgZmxhZ3MuIFRoZQo+
-ID4+PiByZXF1ZXN0X3BlcmNwdV9pcnEoKSBmdW5jdGlvbiBpcyBjaGFuZ2VkIHRvIGJlIGEgd3Jh
-cHBlciB0bwo+ID4+PiByZXF1ZXN0X3BlcmNwdV9pcnFfZmxhZ3MoKSBwYXNzaW5nIGEgemVybyBm
-bGFnIHBhcmFtZXRlci4KPiA+Pj4KPiA+Pj4gQ2hhbmdlIHRoZSB0aW1lcnMgdXNpbmcgcmVxdWVz
-dF9wZXJjcHVfaXJxKCkgdG8gdXNlIHJlcXVlc3RfcGVyY3B1X2lycV9mbGFncygpCj4gPj4+IGlu
-c3RlYWQgd2l0aCB0aGUgSVJRRl9USU1FUiBmbGFnIHNldC4KPiA+Pj4KPiA+Pj4gRm9yIG5vdywg
-aW4gb3JkZXIgdG8gcHJldmVudCBhIG1pc3VzYWdlIG9mIHRoaXMgcGFyYW1ldGVyLCBvbmx5IHRo
-ZSBJUlFGX1RJTUVSCj4gPj4+IGZsYWcgKG9yIHplcm8pIGlzIGEgdmFsaWQgcGFyYW1ldGVyIHRv
-IGJlIHBhc3NlZCB0byB0aGUKPiA+Pj4gcmVxdWVzdF9wZXJjcHVfaXJxX2ZsYWdzKCkgZnVuY3Rp
-b24uCj4gPj4KPiA+PiBbLi4uXQo+ID4+Cj4gPj4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0v
-YXJjaF90aW1lci5jIGIvdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYwo+ID4+PiBpbmRleCAzNWQ3
-MTAwLi42MDJlMGE4IDEwMDY0NAo+ID4+PiAtLS0gYS92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5j
-Cj4gPj4+ICsrKyBiL3ZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMKPiA+Pj4gQEAgLTUyMyw4ICs1
-MjMsOSBAQCBpbnQga3ZtX3RpbWVyX2h5cF9pbml0KHZvaWQpCj4gPj4+ICAJCWhvc3RfdnRpbWVy
-X2lycV9mbGFncyA9IElSUUZfVFJJR0dFUl9MT1c7Cj4gPj4+ICAJfQo+ID4+PiAgCj4gPj4+IC0J
-ZXJyID0gcmVxdWVzdF9wZXJjcHVfaXJxKGhvc3RfdnRpbWVyX2lycSwga3ZtX2FyY2hfdGltZXJf
-aGFuZGxlciwKPiA+Pj4gLQkJCQkgImt2bSBndWVzdCB0aW1lciIsIGt2bV9nZXRfcnVubmluZ192
-Y3B1cygpKTsKPiA+Pj4gKwllcnIgPSByZXF1ZXN0X3BlcmNwdV9pcnFfZmxhZ3MoaG9zdF92dGlt
-ZXJfaXJxLCBrdm1fYXJjaF90aW1lcl9oYW5kbGVyLAo+ID4+PiArCQkJCSAgICAgICBJUlFGX1RJ
-TUVSLCAia3ZtIGd1ZXN0IHRpbWVyIiwKPiA+Pj4gKwkJCQkgICAgICAga3ZtX2dldF9ydW5uaW5n
-X3ZjcHVzKCkpOwo+ID4+PiAgCWlmIChlcnIpIHsKPiA+Pj4gIAkJa3ZtX2Vycigia3ZtX2FyY2hf
-dGltZXI6IGNhbid0IHJlcXVlc3QgaW50ZXJydXB0ICVkICglZClcbiIsCj4gPj4+ICAJCQlob3N0
-X3Z0aW1lcl9pcnEsIGVycik7Cj4gPj4+Cj4gPj4KPiA+PiBIb3cgaXMgdGhhdCB1c2VmdWw/IFRo
-aXMgdGltZXIgaXMgY29udHJvbGxlZCBieSB0aGUgZ3Vlc3QgT1MsIGFuZCBub3QKPiA+PiB0aGUg
-aG9zdCBrZXJuZWwuIENhbiB5b3UgZXhwbGFpbiBob3cgeW91IGludGVuZCB0byBtYWtlIHVzZSBv
-ZiB0aGF0Cj4gPj4gaW5mb3JtYXRpb24gaW4gdGhpcyBjYXNlPwo+ID4gCj4gPiBJc24ndCBpdCBh
-IHNvdXJjZSBvZiBpbnRlcnJ1cHRpb24gb24gdGhlIGhvc3Qga2VybmVsPwo+IAo+IE9ubHkgdG8g
-Y2F1c2UgYW4gZXhpdCBvZiB0aGUgVk0sIGFuZCBub3QgdW5kZXIgdGhlIGNvbnRyb2wgb2YgdGhl
-IGhvc3QuCj4gVGhpcyBpc24ndCB0cmlnZ2VyaW5nIGFueSB0aW1lciByZWxhdGVkIGFjdGlvbiBv
-biB0aGUgaG9zdCBjb2RlIGVpdGhlci4KPiAKPiBZb3VyIHBhdGNoIHNlcmllcyBzZWVtcyB0byBh
-c3N1bWUgc29tZSBraW5kIG9mIHByZWRpY3RhYmlsaXR5IG9mIHRoZQo+IHRpbWVyIGludGVycnVw
-dCwgd2hpY2ggY2FuIG1ha2Ugc2Vuc2Ugb24gdGhlIGhvc3QuIEhlcmUsIHRoaXMgaW50ZXJydXB0
-Cj4gaXMgc2hhcmVkIGFtb25nICphbGwqIGd1ZXN0cyBydW5uaW5nIG9uIHRoaXMgc3lzdGVtLgo+
-IAo+IE1heWJlIHlvdSBjb3VsZCBleHBsYWluIHdoeSB5b3UgdGhpbmsgdGhpcyBpbnRlcnJ1cHQg
-aXMgcmVsZXZhbnQgdG8gd2hhdAo+IHlvdSdyZSB0cnlpbmcgdG8gYWNoaWV2ZT8KCklmIHRoaXMg
-aW50ZXJydXB0IGRvZXMgbm90IGhhcHBlbiBvbiB0aGUgaG9zdCwgd2UgZG9uJ3QgY2FyZS4KClRo
-ZSBmbGFnIElSUUZfVElNRVIgaXMgdXNlZCBieSB0aGUgc3B1cmlvdXMgaXJxIGhhbmRsZXIgaW4g
-dGhlIHRyeV9vbmVfaXJxKCkKZnVuY3Rpb24uIEhvd2V2ZXIgdGhlIHBlciBjcHUgdGltZXIgaW50
-ZXJydXB0IHdpbGwgYmUgZGlzY2FyZGVkIGluIHRoZSBmdW5jdGlvbgpiZWZvcmUgYmVjYXVzZSBp
-dCBpcyBwZXIgY3B1LgoKSU1PLCBmb3IgY29uc2lzdGVuY3kgcmVhc29uLCBhZGRpbmcgdGhlIElS
-UUZfVElNRVIgbWFrZXMgc2Vuc2UuIE90aGVyIHRoYW4KdGhhdCwgYXMgdGhlIGludGVycnVwdCBp
-cyBub3QgaGFwcGVuaW5nIG9uIHRoZSBob3N0LCB0aGlzIGZsYWcgd29uJ3QgYmUgdXNlZC4KCkRv
-IHlvdSB3YW50IHRvIGRyb3AgdGhpcyBjaGFuZ2U/CgogIC0tIERhbmllbAoKCgotLSAKCiA8aHR0
-cDovL3d3dy5saW5hcm8ub3JnLz4gTGluYXJvLm9yZyDilIIgT3BlbiBzb3VyY2Ugc29mdHdhcmUg
-Zm9yIEFSTSBTb0NzCgpGb2xsb3cgTGluYXJvOiAgPGh0dHA6Ly93d3cuZmFjZWJvb2suY29tL3Bh
-Z2VzL0xpbmFybz4gRmFjZWJvb2sgfAo8aHR0cDovL3R3aXR0ZXIuY29tLyMhL2xpbmFyb29yZz4g
-VHdpdHRlciB8CjxodHRwOi8vd3d3LmxpbmFyby5vcmcvbGluYXJvLWJsb2cvPiBCbG9nCl9fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
-IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
-YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Mon, Apr 24, 2017 at 8:30 PM, Maciej W. Rozycki <macro@linux-mips.org> wrote:
+> On Mon, 24 Apr 2017, Arnd Bergmann wrote:
+>
+>>
+>> So it still fails, but only because of one compiler error that I can avoid by
+>> disabling that driver, and you probably use a slightly patched compiler
+>> version that doesn't have this particular bug, or it was a regression between
+>> gcc-4.1.2 and 4.1.3.
+>
+>  Umm, I didn't build modules, sorry, because I don't usually use them with
+> those systems.  However I have completed this step now and it also worked
+> just fine:
+>
+> $ ls -la crypto/drbg.o
+> -rw-r--r--  1 macro macro 14096 Apr 24 18:59 crypto/drbg.o
+> $ file crypto/drbg.o
+> crypto/drbg.o: ELF 32-bit LSB MIPS-I relocatable, MIPS, version 1 (SYSV), not stripped
+> $
+>
+> so you are likely right that either I have a patch applied to my 4.1.2
+> build that has somehow fixed the ICE or it is a 4.1.3 regression (or a bad
+> patch in your 4.1.3 build).
+
+Ok.
+
+>  BTW I do see these `may be used uninitialized' warnings just as Geert
+> does and even have a local patch, which I have neglected to submit, for a
+> 64-bit configuration (`decstation_defconfig' is 32-bit) where in a single
+> place -Werror turns it into a build failure.  I do not consider it a big
+> issue though, and might even wrap that patch up and submit sometime.
+
+I'd recommend dropping that -Werror from mips and the other few
+architectures that have it, or maybe wrapping it in a Kconfig symbol that
+is disabled by default. It would also take care of
+==> build/mips/bmips_be_defconfig/log <==
+cc1: warnings being treated as errors
+/git/arm-soc/arch/mips/bmips/setup.c:37: error: integer constant is
+too large for 'long' type
+
+As mentioned, we can also turn off the warnings by default and let
+Geert turn them on again:
+
+diff --git a/Makefile b/Makefile
+index 779302695453..2528f60fb9ab 100644
+--- a/Makefile
++++ b/Makefile
+@@ -647,8 +647,10 @@ KBUILD_CFLAGS   += -O2
+ endif
+ endif
+
+-KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
+-                                  $(call
+cc-disable-warning,maybe-uninitialized,))
++KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0408, \
++                                 $(call cc-disable-warning,uninitialized, \
++                                 $(call cc-ifversion, -lt, 0409, \
++                                 $(call
+cc-disable-warning,maybe-uninitialized,))))
+
+ # Tell gcc to never replace conditional load with a non-conditional one
+ KBUILD_CFLAGS += $(call cc-option,--param=allow-store-data-races=0)
+
+
+I've built the remaining defconfigs in the meantime (linux-4.11-rc8, gcc-4.1.3,
+ARCH=mips) and got 38 builds with warnings and 20 failed builds. There are
+at least six different build failures and only one ICE among them (only
+in decstation_defconfig). With gcc-4.3 this is only slightly better: 18
+failed build, 20 with warnings and 20 without warnings.
+
+With linux-4.3, I saw this failure on 32 defconfigs,
+and you fixed that in linux-4.7 with e49d38488515 ("MIPS: MSA: Fix a
+link error on `_init_msa_upper' with older GCC"):
+
+arch/mips/built-in.o: In function `enable_restore_fp_context':
+traps.c:(.text+0xbefc): undefined reference to `_init_msa_upper'
+traps.c:(.text+0xbfc0): undefined reference to `_init_msa_upper'
+
+With gcc-4.9, all mips defconfigs now build without warnings.
+
+For the other architectures in linux-4.11-rc8 can actually build with
+sparc-gcc-4.1, afaict this was a bug that impacted all compilers up to
+gcc-4.7 and a workaround was added recently. In turn, parisc-gcc-4.1
+no longer works on linux-4.11, so we still have only three architectures
+that can build their 'defconfig' with the old compiler, plus the majority
+of the mips config files.
+
+So while overall I still think that gcc-4.1 is rather broken, it seems that
+you have it well under control on both mips and m68k. It's possible
+that some other people use patched gcc-4.1 or only build special
+configurations on further architectures that I found to be broken
+with vanilla toolchains and the regular defconfig.
+
+How about this approach then:
+
+- To keep it simple, we update the README.rst to say that a minimum
+  gcc-4.3 is required, while recommending gcc-4.9 for all architectures
+- Support for gcc-4.0 and earlier gets removed from linux/compiler.h,
+  and instead we add a summary of what I found, explaining that
+  gcc-4.1 has active users on a few architectures.
+- We make the Makefile show a warning once during compilation for
+  gcc earlier than 4.3.
+
+        Arnd
