@@ -1,81 +1,42 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH V9 1/3] irq: Allow to pass the IRQF_TIMER flag with
- percpu irq request
-Date: Mon, 24 Apr 2017 20:33:38 +0200
-Message-ID: <20170424183338.xglbm6ytdrexlsdh@kozik-lap>
-References: <1493042494-14057-1-git-send-email-daniel.lezcano@linaro.org>
+From: David Daney <david.daney@cavium.com>
+Subject: [PATCH 1/2] arm64: Add MIDR values for Cavium cn83XX SoCs
+Date: Mon, 24 Apr 2017 11:42:49 -0700
+Message-ID: <20170424184250.667-2-david.daney@cavium.com>
+References: <20170424184250.667-1-david.daney@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1493042494-14057-1-git-send-email-daniel.lezcano@linaro.org>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-To: Daniel Lezcano <daniel.lezcano@linaro.org>
-Cc: tglx@linutronix.de, Mark Rutland <mark.rutland@arm.com>, Vineet Gupta <vgupta@synopsys.com>, Marc Zyngier <marc.zyngier@arm.com>, Patrice Chotard <patrice.chotard@st.com>, Kukjin Kim <kgene@kernel.org>, Javier Martinez Canillas <javier@osg.samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, kernel@stlinux.com, linux-samsung-soc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <20170424184250.667-1-david.daney@cavium.com>
+Sender: linux-doc-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Jonathan Corbet <corbet@lwn.net>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-kernel@vger.kernel.org, Robert Richter <rrichter@cavium.com>, David Daney <david.daney@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 24, 2017 at 04:01:31PM +0200, Daniel Lezcano wrote:
-> In the next changes, we track when the interrupts occur in order to
-> statistically compute when is supposed to happen the next interrupt.
-> 
-> In all the interruptions, it does not make sense to store the timer interrupt
-> occurences and try to predict the next interrupt as when know the expiration
-> time.
-> 
-> The request_irq() has a irq flags parameter and the timer drivers use it to
-> pass the IRQF_TIMER flag, letting us know the interrupt is coming from a timer.
-> Based on this flag, we can discard these interrupts when tracking them.
-> 
-> But, the API request_percpu_irq does not allow to pass a flag, hence specifying
-> if the interrupt type is a timer.
-> 
-> Add a function request_percpu_irq_flags() where we can specify the flags. The
-> request_percpu_irq() function is changed to be a wrapper to
-> request_percpu_irq_flags() passing a zero flag parameter.
-> 
-> Change the timers using request_percpu_irq() to use request_percpu_irq_flags()
-> instead with the IRQF_TIMER flag set.
-> 
-> For now, in order to prevent a misusage of this parameter, only the IRQF_TIMER
-> flag (or zero) is a valid parameter to be passed to the
-> request_percpu_irq_flags() function.
-> 
-> Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Vineet Gupta <vgupta@synopsys.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Patrice Chotard <patrice.chotard@st.com>
-> Cc: Kukjin Kim <kgene@kernel.org>
-> Cc: Krzysztof Kozlowski <krzk@kernel.org>
-> Cc: Javier Martinez Canillas <javier@osg.samsung.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> 
-> ---
-> Changelog:
-> 
->    V9:
-> 	- Clarified the patch description
-> 	- Fixed EXPORT_SYMBOL_GPL(request_percpu_irq_flags)
-> ---
->  arch/arm/kernel/smp_twd.c                |  3 ++-
->  drivers/clocksource/arc_timer.c          |  4 ++--
->  drivers/clocksource/arm_arch_timer.c     | 20 ++++++++++++--------
->  drivers/clocksource/arm_global_timer.c   |  4 ++--
->  drivers/clocksource/exynos_mct.c         |  7 ++++---
->  drivers/clocksource/qcom-timer.c         |  4 ++--
->  drivers/clocksource/time-armada-370-xp.c |  9 +++++----
->  drivers/clocksource/timer-nps.c          |  6 +++---
->  include/linux/interrupt.h                | 11 ++++++++++-
->  kernel/irq/manage.c                      | 15 ++++++++++-----
->  virt/kvm/arm/arch_timer.c                |  5 +++--
->  11 files changed, 55 insertions(+), 33 deletions(-)
->
+Signed-off-by: David Daney <david.daney@cavium.com>
+---
+ arch/arm64/include/asm/cputype.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-For exynos-mct:
-Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index 0984d1b..235e77d 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -86,6 +86,7 @@
+ 
+ #define CAVIUM_CPU_PART_THUNDERX	0x0A1
+ #define CAVIUM_CPU_PART_THUNDERX_81XX	0x0A2
++#define CAVIUM_CPU_PART_THUNDERX_83XX	0x0A3
+ 
+ #define BRCM_CPU_PART_VULCAN		0x516
+ 
+@@ -96,6 +97,7 @@
+ #define MIDR_CORTEX_A73 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A73)
+ #define MIDR_THUNDERX	MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
+ #define MIDR_THUNDERX_81XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_81XX)
++#define MIDR_THUNDERX_83XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_83XX)
+ #define MIDR_QCOM_FALKOR_V1 MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_FALKOR_V1)
+ 
+ #ifndef __ASSEMBLY__
+-- 
+2.7.4
 
-Best regards,
-Krzysztof
