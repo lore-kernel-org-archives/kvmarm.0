@@ -1,125 +1,170 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH V9 1/3] irq: Allow to pass the IRQF_TIMER flag with percpu
- irq request
-Date: Tue, 25 Apr 2017 08:38:56 +0100
-Message-ID: <16042494-2e67-e1a5-b9f6-af57e349d8a7@arm.com>
+From: Daniel Lezcano <daniel.lezcano@linaro.org>
+Subject: Re: [PATCH V9 1/3] irq: Allow to pass the IRQF_TIMER flag with
+ percpu irq request
+Date: Tue, 25 Apr 2017 10:34:51 +0200
+Message-ID: <20170425083451.GA16888@mai>
 References: <1493042494-14057-1-git-send-email-daniel.lezcano@linaro.org>
- <398f3f3d-c567-0f1f-1a43-9b8d5805d5fd@arm.com> <20170424185909.GD2137@mai>
- <92e2a022-93d4-d4f3-78af-c9b5d51bb867@arm.com> <20170424195948.GE2137@mai>
+ <398f3f3d-c567-0f1f-1a43-9b8d5805d5fd@arm.com>
+ <20170424185909.GD2137@mai>
+ <92e2a022-93d4-d4f3-78af-c9b5d51bb867@arm.com>
+ <20170424195948.GE2137@mai>
+ <16042494-2e67-e1a5-b9f6-af57e349d8a7@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170424195948.GE2137@mai>
-Sender: kvm-owner@vger.kernel.org
-To: Daniel Lezcano <daniel.lezcano@linaro.org>
-Cc: tglx@linutronix.de, Mark Rutland <mark.rutland@arm.com>, Vineet Gupta <vgupta@synopsys.com>, Patrice Chotard <patrice.chotard@st.com>, Kukjin Kim <kgene@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, Javier Martinez Canillas <javier@osg.samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, kernel@stlinux.com, linux-samsung-soc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0412840C55
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 04:32:14 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id xabaUcxN0cfM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Apr 2017 04:32:07 -0400 (EDT)
+Received: from mail-wr0-f178.google.com (mail-wr0-f178.google.com
+ [209.85.128.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 286CF40C54
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 04:32:06 -0400 (EDT)
+Received: by mail-wr0-f178.google.com with SMTP id l50so30692685wrc.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 01:34:56 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <16042494-2e67-e1a5-b9f6-af57e349d8a7@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-samsung-soc@vger.kernel.org, kernel@stlinux.com, kvm@vger.kernel.org, Vineet Gupta <vgupta@synopsys.com>, Patrice Chotard <patrice.chotard@st.com>, Krzysztof Kozlowski <krzk@kernel.org>, linux-kernel@vger.kernel.org, Javier Martinez Canillas <javier@osg.samsung.com>, Kukjin Kim <kgene@kernel.org>, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, tglx@linutronix.de, linux-snps-arc@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/04/17 20:59, Daniel Lezcano wrote:
-> On Mon, Apr 24, 2017 at 08:14:54PM +0100, Marc Zyngier wrote:
->> On 24/04/17 19:59, Daniel Lezcano wrote:
->>> On Mon, Apr 24, 2017 at 07:46:43PM +0100, Marc Zyngier wrote:
->>>> On 24/04/17 15:01, Daniel Lezcano wrote:
->>>>> In the next changes, we track when the interrupts occur in order to
->>>>> statistically compute when is supposed to happen the next interrupt.
->>>>>
->>>>> In all the interruptions, it does not make sense to store the timer interrupt
->>>>> occurences and try to predict the next interrupt as when know the expiration
->>>>> time.
->>>>>
->>>>> The request_irq() has a irq flags parameter and the timer drivers use it to
->>>>> pass the IRQF_TIMER flag, letting us know the interrupt is coming from a timer.
->>>>> Based on this flag, we can discard these interrupts when tracking them.
->>>>>
->>>>> But, the API request_percpu_irq does not allow to pass a flag, hence specifying
->>>>> if the interrupt type is a timer.
->>>>>
->>>>> Add a function request_percpu_irq_flags() where we can specify the flags. The
->>>>> request_percpu_irq() function is changed to be a wrapper to
->>>>> request_percpu_irq_flags() passing a zero flag parameter.
->>>>>
->>>>> Change the timers using request_percpu_irq() to use request_percpu_irq_flags()
->>>>> instead with the IRQF_TIMER flag set.
->>>>>
->>>>> For now, in order to prevent a misusage of this parameter, only the IRQF_TIMER
->>>>> flag (or zero) is a valid parameter to be passed to the
->>>>> request_percpu_irq_flags() function.
->>>>
->>>> [...]
->>>>
->>>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->>>>> index 35d7100..602e0a8 100644
->>>>> --- a/virt/kvm/arm/arch_timer.c
->>>>> +++ b/virt/kvm/arm/arch_timer.c
->>>>> @@ -523,8 +523,9 @@ int kvm_timer_hyp_init(void)
->>>>>  		host_vtimer_irq_flags = IRQF_TRIGGER_LOW;
->>>>>  	}
->>>>>  
->>>>> -	err = request_percpu_irq(host_vtimer_irq, kvm_arch_timer_handler,
->>>>> -				 "kvm guest timer", kvm_get_running_vcpus());
->>>>> +	err = request_percpu_irq_flags(host_vtimer_irq, kvm_arch_timer_handler,
->>>>> +				       IRQF_TIMER, "kvm guest timer",
->>>>> +				       kvm_get_running_vcpus());
->>>>>  	if (err) {
->>>>>  		kvm_err("kvm_arch_timer: can't request interrupt %d (%d)\n",
->>>>>  			host_vtimer_irq, err);
->>>>>
->>>>
->>>> How is that useful? This timer is controlled by the guest OS, and not
->>>> the host kernel. Can you explain how you intend to make use of that
->>>> information in this case?
->>>
->>> Isn't it a source of interruption on the host kernel?
->>
->> Only to cause an exit of the VM, and not under the control of the host.
->> This isn't triggering any timer related action on the host code either.
->>
->> Your patch series seems to assume some kind of predictability of the
->> timer interrupt, which can make sense on the host. Here, this interrupt
->> is shared among *all* guests running on this system.
->>
->> Maybe you could explain why you think this interrupt is relevant to what
->> you're trying to achieve?
-> 
-> If this interrupt does not happen on the host, we don't care.
-
-All interrupts happen on the host. There is no such thing as a HW 
-interrupt being directly delivered to a guest (at least so far). The 
-timer is under control of the guest, which uses as it sees fit. When 
-the HW timer expires, the interrupt fires on the host, which re-inject 
-the interrupt in the guest.
-
-> The flag IRQF_TIMER is used by the spurious irq handler in the try_one_irq()
-> function. However the per cpu timer interrupt will be discarded in the function
-> before because it is per cpu.
-
-Right. That's not because this is a timer, but because it is per-cpu. 
-So why do we need this IRQF_TIMER flag, instead of fixing try_one_irq()?
-
-> IMO, for consistency reason, adding the IRQF_TIMER makes sense. Other than
-> that, as the interrupt is not happening on the host, this flag won't be used.
-> 
-> Do you want to drop this change?
-
-No, I'd like to understand the above. Why isn't the following patch 
-doing the right thing?
-
-diff --git a/kernel/irq/spurious.c b/kernel/irq/spurious.c
-index 061ba7eed4ed..a4a81c6c7602 100644
---- a/kernel/irq/spurious.c
-+++ b/kernel/irq/spurious.c
-@@ -72,6 +72,7 @@ static int try_one_irq(struct irq_desc *desc, bool force)
- 	 * marked polled are excluded from polling.
- 	 */
- 	if (irq_settings_is_per_cpu(desc) ||
-+	    irq_settings_is_per_cpu_devid(desc) ||
- 	    irq_settings_is_nested_thread(desc) ||
- 	    irq_settings_is_polled(desc))
- 		goto out;
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+T24gVHVlLCBBcHIgMjUsIDIwMTcgYXQgMDg6Mzg6NTZBTSArMDEwMCwgTWFyYyBaeW5naWVyIHdy
+b3RlOgo+IE9uIDI0LzA0LzE3IDIwOjU5LCBEYW5pZWwgTGV6Y2FubyB3cm90ZToKPiA+IE9uIE1v
+biwgQXByIDI0LCAyMDE3IGF0IDA4OjE0OjU0UE0gKzAxMDAsIE1hcmMgWnluZ2llciB3cm90ZToK
+PiA+PiBPbiAyNC8wNC8xNyAxOTo1OSwgRGFuaWVsIExlemNhbm8gd3JvdGU6Cj4gPj4+IE9uIE1v
+biwgQXByIDI0LCAyMDE3IGF0IDA3OjQ2OjQzUE0gKzAxMDAsIE1hcmMgWnluZ2llciB3cm90ZToK
+PiA+Pj4+IE9uIDI0LzA0LzE3IDE1OjAxLCBEYW5pZWwgTGV6Y2FubyB3cm90ZToKPiA+Pj4+PiBJ
+biB0aGUgbmV4dCBjaGFuZ2VzLCB3ZSB0cmFjayB3aGVuIHRoZSBpbnRlcnJ1cHRzIG9jY3VyIGlu
+IG9yZGVyIHRvCj4gPj4+Pj4gc3RhdGlzdGljYWxseSBjb21wdXRlIHdoZW4gaXMgc3VwcG9zZWQg
+dG8gaGFwcGVuIHRoZSBuZXh0IGludGVycnVwdC4KPiA+Pj4+Pgo+ID4+Pj4+IEluIGFsbCB0aGUg
+aW50ZXJydXB0aW9ucywgaXQgZG9lcyBub3QgbWFrZSBzZW5zZSB0byBzdG9yZSB0aGUgdGltZXIg
+aW50ZXJydXB0Cj4gPj4+Pj4gb2NjdXJlbmNlcyBhbmQgdHJ5IHRvIHByZWRpY3QgdGhlIG5leHQg
+aW50ZXJydXB0IGFzIHdoZW4ga25vdyB0aGUgZXhwaXJhdGlvbgo+ID4+Pj4+IHRpbWUuCj4gPj4+
+Pj4KPiA+Pj4+PiBUaGUgcmVxdWVzdF9pcnEoKSBoYXMgYSBpcnEgZmxhZ3MgcGFyYW1ldGVyIGFu
+ZCB0aGUgdGltZXIgZHJpdmVycyB1c2UgaXQgdG8KPiA+Pj4+PiBwYXNzIHRoZSBJUlFGX1RJTUVS
+IGZsYWcsIGxldHRpbmcgdXMga25vdyB0aGUgaW50ZXJydXB0IGlzIGNvbWluZyBmcm9tIGEgdGlt
+ZXIuCj4gPj4+Pj4gQmFzZWQgb24gdGhpcyBmbGFnLCB3ZSBjYW4gZGlzY2FyZCB0aGVzZSBpbnRl
+cnJ1cHRzIHdoZW4gdHJhY2tpbmcgdGhlbS4KPiA+Pj4+Pgo+ID4+Pj4+IEJ1dCwgdGhlIEFQSSBy
+ZXF1ZXN0X3BlcmNwdV9pcnEgZG9lcyBub3QgYWxsb3cgdG8gcGFzcyBhIGZsYWcsIGhlbmNlIHNw
+ZWNpZnlpbmcKPiA+Pj4+PiBpZiB0aGUgaW50ZXJydXB0IHR5cGUgaXMgYSB0aW1lci4KPiA+Pj4+
+Pgo+ID4+Pj4+IEFkZCBhIGZ1bmN0aW9uIHJlcXVlc3RfcGVyY3B1X2lycV9mbGFncygpIHdoZXJl
+IHdlIGNhbiBzcGVjaWZ5IHRoZSBmbGFncy4gVGhlCj4gPj4+Pj4gcmVxdWVzdF9wZXJjcHVfaXJx
+KCkgZnVuY3Rpb24gaXMgY2hhbmdlZCB0byBiZSBhIHdyYXBwZXIgdG8KPiA+Pj4+PiByZXF1ZXN0
+X3BlcmNwdV9pcnFfZmxhZ3MoKSBwYXNzaW5nIGEgemVybyBmbGFnIHBhcmFtZXRlci4KPiA+Pj4+
+Pgo+ID4+Pj4+IENoYW5nZSB0aGUgdGltZXJzIHVzaW5nIHJlcXVlc3RfcGVyY3B1X2lycSgpIHRv
+IHVzZSByZXF1ZXN0X3BlcmNwdV9pcnFfZmxhZ3MoKQo+ID4+Pj4+IGluc3RlYWQgd2l0aCB0aGUg
+SVJRRl9USU1FUiBmbGFnIHNldC4KPiA+Pj4+Pgo+ID4+Pj4+IEZvciBub3csIGluIG9yZGVyIHRv
+IHByZXZlbnQgYSBtaXN1c2FnZSBvZiB0aGlzIHBhcmFtZXRlciwgb25seSB0aGUgSVJRRl9USU1F
+Ugo+ID4+Pj4+IGZsYWcgKG9yIHplcm8pIGlzIGEgdmFsaWQgcGFyYW1ldGVyIHRvIGJlIHBhc3Nl
+ZCB0byB0aGUKPiA+Pj4+PiByZXF1ZXN0X3BlcmNwdV9pcnFfZmxhZ3MoKSBmdW5jdGlvbi4KPiA+
+Pj4+Cj4gPj4+PiBbLi4uXQo+ID4+Pj4KPiA+Pj4+PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJt
+L2FyY2hfdGltZXIuYyBiL3ZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMKPiA+Pj4+PiBpbmRleCAz
+NWQ3MTAwLi42MDJlMGE4IDEwMDY0NAo+ID4+Pj4+IC0tLSBhL3ZpcnQva3ZtL2FybS9hcmNoX3Rp
+bWVyLmMKPiA+Pj4+PiArKysgYi92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jCj4gPj4+Pj4gQEAg
+LTUyMyw4ICs1MjMsOSBAQCBpbnQga3ZtX3RpbWVyX2h5cF9pbml0KHZvaWQpCj4gPj4+Pj4gIAkJ
+aG9zdF92dGltZXJfaXJxX2ZsYWdzID0gSVJRRl9UUklHR0VSX0xPVzsKPiA+Pj4+PiAgCX0KPiA+
+Pj4+PiAgCj4gPj4+Pj4gLQllcnIgPSByZXF1ZXN0X3BlcmNwdV9pcnEoaG9zdF92dGltZXJfaXJx
+LCBrdm1fYXJjaF90aW1lcl9oYW5kbGVyLAo+ID4+Pj4+IC0JCQkJICJrdm0gZ3Vlc3QgdGltZXIi
+LCBrdm1fZ2V0X3J1bm5pbmdfdmNwdXMoKSk7Cj4gPj4+Pj4gKwllcnIgPSByZXF1ZXN0X3BlcmNw
+dV9pcnFfZmxhZ3MoaG9zdF92dGltZXJfaXJxLCBrdm1fYXJjaF90aW1lcl9oYW5kbGVyLAo+ID4+
+Pj4+ICsJCQkJICAgICAgIElSUUZfVElNRVIsICJrdm0gZ3Vlc3QgdGltZXIiLAo+ID4+Pj4+ICsJ
+CQkJICAgICAgIGt2bV9nZXRfcnVubmluZ192Y3B1cygpKTsKPiA+Pj4+PiAgCWlmIChlcnIpIHsK
+PiA+Pj4+PiAgCQlrdm1fZXJyKCJrdm1fYXJjaF90aW1lcjogY2FuJ3QgcmVxdWVzdCBpbnRlcnJ1
+cHQgJWQgKCVkKVxuIiwKPiA+Pj4+PiAgCQkJaG9zdF92dGltZXJfaXJxLCBlcnIpOwo+ID4+Pj4+
+Cj4gPj4+Pgo+ID4+Pj4gSG93IGlzIHRoYXQgdXNlZnVsPyBUaGlzIHRpbWVyIGlzIGNvbnRyb2xs
+ZWQgYnkgdGhlIGd1ZXN0IE9TLCBhbmQgbm90Cj4gPj4+PiB0aGUgaG9zdCBrZXJuZWwuIENhbiB5
+b3UgZXhwbGFpbiBob3cgeW91IGludGVuZCB0byBtYWtlIHVzZSBvZiB0aGF0Cj4gPj4+PiBpbmZv
+cm1hdGlvbiBpbiB0aGlzIGNhc2U/Cj4gPj4+Cj4gPj4+IElzbid0IGl0IGEgc291cmNlIG9mIGlu
+dGVycnVwdGlvbiBvbiB0aGUgaG9zdCBrZXJuZWw/Cj4gPj4KPiA+PiBPbmx5IHRvIGNhdXNlIGFu
+IGV4aXQgb2YgdGhlIFZNLCBhbmQgbm90IHVuZGVyIHRoZSBjb250cm9sIG9mIHRoZSBob3N0Lgo+
+ID4+IFRoaXMgaXNuJ3QgdHJpZ2dlcmluZyBhbnkgdGltZXIgcmVsYXRlZCBhY3Rpb24gb24gdGhl
+IGhvc3QgY29kZSBlaXRoZXIuCj4gPj4KPiA+PiBZb3VyIHBhdGNoIHNlcmllcyBzZWVtcyB0byBh
+c3N1bWUgc29tZSBraW5kIG9mIHByZWRpY3RhYmlsaXR5IG9mIHRoZQo+ID4+IHRpbWVyIGludGVy
+cnVwdCwgd2hpY2ggY2FuIG1ha2Ugc2Vuc2Ugb24gdGhlIGhvc3QuIEhlcmUsIHRoaXMgaW50ZXJy
+dXB0Cj4gPj4gaXMgc2hhcmVkIGFtb25nICphbGwqIGd1ZXN0cyBydW5uaW5nIG9uIHRoaXMgc3lz
+dGVtLgo+ID4+Cj4gPj4gTWF5YmUgeW91IGNvdWxkIGV4cGxhaW4gd2h5IHlvdSB0aGluayB0aGlz
+IGludGVycnVwdCBpcyByZWxldmFudCB0byB3aGF0Cj4gPj4geW91J3JlIHRyeWluZyB0byBhY2hp
+ZXZlPwo+ID4gCj4gPiBJZiB0aGlzIGludGVycnVwdCBkb2VzIG5vdCBoYXBwZW4gb24gdGhlIGhv
+c3QsIHdlIGRvbid0IGNhcmUuCj4gCj4gQWxsIGludGVycnVwdHMgaGFwcGVuIG9uIHRoZSBob3N0
+LiBUaGVyZSBpcyBubyBzdWNoIHRoaW5nIGFzIGEgSFcgCj4gaW50ZXJydXB0IGJlaW5nIGRpcmVj
+dGx5IGRlbGl2ZXJlZCB0byBhIGd1ZXN0IChhdCBsZWFzdCBzbyBmYXIpLiBUaGUgCj4gdGltZXIg
+aXMgdW5kZXIgY29udHJvbCBvZiB0aGUgZ3Vlc3QsIHdoaWNoIHVzZXMgYXMgaXQgc2VlcyBmaXQu
+IFdoZW4gCj4gdGhlIEhXIHRpbWVyIGV4cGlyZXMsIHRoZSBpbnRlcnJ1cHQgZmlyZXMgb24gdGhl
+IGhvc3QsIHdoaWNoIHJlLWluamVjdCAKPiB0aGUgaW50ZXJydXB0IGluIHRoZSBndWVzdC4KCkFo
+LCB0aGFua3MgZm9yIHRoZSBjbGFyaWZpY2F0aW9uLiBJbnRlcmVzdGluZy4KCkhvdyBjYW4gdGhl
+IGhvc3Qga25vdyB3aGljaCBndWVzdCB0byByZS1pbmplY3QgdGhlIGludGVycnVwdD8KCj4gPiBU
+aGUgZmxhZyBJUlFGX1RJTUVSIGlzIHVzZWQgYnkgdGhlIHNwdXJpb3VzIGlycSBoYW5kbGVyIGlu
+IHRoZSB0cnlfb25lX2lycSgpCj4gPiBmdW5jdGlvbi4gSG93ZXZlciB0aGUgcGVyIGNwdSB0aW1l
+ciBpbnRlcnJ1cHQgd2lsbCBiZSBkaXNjYXJkZWQgaW4gdGhlIGZ1bmN0aW9uCj4gPiBiZWZvcmUg
+YmVjYXVzZSBpdCBpcyBwZXIgY3B1Lgo+IAo+IFJpZ2h0LiBUaGF0J3Mgbm90IGJlY2F1c2UgdGhp
+cyBpcyBhIHRpbWVyLCBidXQgYmVjYXVzZSBpdCBpcyBwZXItY3B1LiAKPiBTbyB3aHkgZG8gd2Ug
+bmVlZCB0aGlzIElSUUZfVElNRVIgZmxhZywgaW5zdGVhZCBvZiBmaXhpbmcgdHJ5X29uZV9pcnEo
+KT8KCldoZW4gYSB0aW1lciBpcyBub3QgcGVyIGNwdSwgKGVnLiByZXF1ZXN0X2lycSksIHdlIG5l
+ZWQgdGhpcyBmbGFnLCBubz8KCj4gPiBJTU8sIGZvciBjb25zaXN0ZW5jeSByZWFzb24sIGFkZGlu
+ZyB0aGUgSVJRRl9USU1FUiBtYWtlcyBzZW5zZS4gT3RoZXIgdGhhbgo+ID4gdGhhdCwgYXMgdGhl
+IGludGVycnVwdCBpcyBub3QgaGFwcGVuaW5nIG9uIHRoZSBob3N0LCB0aGlzIGZsYWcgd29uJ3Qg
+YmUgdXNlZC4KPiA+IAo+ID4gRG8geW91IHdhbnQgdG8gZHJvcCB0aGlzIGNoYW5nZT8KPiAKPiBO
+bywgSSdkIGxpa2UgdG8gdW5kZXJzdGFuZCB0aGUgYWJvdmUuIFdoeSBpc24ndCB0aGUgZm9sbG93
+aW5nIHBhdGNoIAo+IGRvaW5nIHRoZSByaWdodCB0aGluZz8KCkFjdHVhbGx5LCB0aGUgZXhwbGFu
+YXRpb24gaXMgaW4gdGhlIG5leHQgcGF0Y2ggb2YgdGhlIHNlcmllcyAoMi8zKQoKWyAuLi4gXQoK
+K3N0YXRpYyBpbmxpbmUgdm9pZCBzZXR1cF90aW1pbmdzKHN0cnVjdCBpcnFfZGVzYyAqZGVzYywg
+c3RydWN0IGlycWFjdGlvbiAqYWN0KQoreworCS8qCisJICogV2UgZG9uJ3QgbmVlZCB0aGUgbWVh
+c3VyZW1lbnQgYmVjYXVzZSB0aGUgaWRsZSBjb2RlIGFscmVhZHkKKwkgKiBrbm93cyB0aGUgbmV4
+dCBleHBpcnkgZXZlbnQuCisJICovCisJaWYgKGFjdC0+ZmxhZ3MgJiBfX0lSUUZfVElNRVIpCisJ
+CXJldHVybjsKKworCWRlc2MtPmlzdGF0ZSB8PSBJUlFTX1RJTUlOR1M7Cit9CgpbIC4uLiBdCgor
+LyoKKyAqIFRoZSBmdW5jdGlvbiByZWNvcmRfaXJxX3RpbWUgaXMgb25seSBjYWxsZWQgaW4gb25l
+IHBsYWNlIGluIHRoZQorICogaW50ZXJydXB0cyBoYW5kbGVyLiBXZSB3YW50IHRoaXMgZnVuY3Rp
+b24gYWx3YXlzIGlubGluZSBzbyB0aGUgY29kZQorICogaW5zaWRlIGlzIGVtYmVkZGVkIGluIHRo
+ZSBmdW5jdGlvbiBhbmQgdGhlIHN0YXRpYyBrZXkgYnJhbmNoaW5nCisgKiBjb2RlIGNhbiBhY3Qg
+YXQgdGhlIGhpZ2hlciBsZXZlbC4gV2l0aG91dCB0aGUgZXhwbGljaXQKKyAqIF9fYWx3YXlzX2lu
+bGluZSB3ZSBjYW4gZW5kIHVwIHdpdGggYSBmdW5jdGlvbiBjYWxsIGFuZCBhIHNtYWxsCisgKiBv
+dmVyaGVhZCBpbiB0aGUgaG90cGF0aCBmb3Igbm90aGluZy4KKyAqLworc3RhdGljIF9fYWx3YXlz
+X2lubGluZSB2b2lkIHJlY29yZF9pcnFfdGltZShzdHJ1Y3QgaXJxX2Rlc2MgKmRlc2MpCit7CisJ
+aWYgKCFzdGF0aWNfYnJhbmNoX2xpa2VseSgmaXJxX3RpbWluZ19lbmFibGVkKSkKKwkJcmV0dXJu
+OworCisJaWYgKGRlc2MtPmlzdGF0ZSAmIElSUVNfVElNSU5HUykgeworCQlzdHJ1Y3QgaXJxX3Rp
+bWluZ3MgKnRpbWluZ3MgPSB0aGlzX2NwdV9wdHIoJmlycV90aW1pbmdzKTsKKworCQl0aW1pbmdz
+LT52YWx1ZXNbdGltaW5ncy0+Y291bnQgJiBJUlFfVElNSU5HU19NQVNLXSA9CisJCQlpcnFfdGlt
+aW5nX2VuY29kZShsb2NhbF9jbG9jaygpLAorCQkJCQkgIGlycV9kZXNjX2dldF9pcnEoZGVzYykp
+OworCisJCXRpbWluZ3MtPmNvdW50Kys7CisJfQorfQoKWyAuLi7CoF0KClRoZSBwdXJwb3NlIGlz
+IHRvIHByZWRpY3QgdGhlIG5leHQgZXZlbnQgaW50ZXJydXB0cyBvbiB0aGUgc3lzdGVtIHdoaWNo
+IGFyZQpzb3VyY2Ugb2Ygd2FrZSB1cC4gRm9yIG5vdywgdGhpcyBwYXRjaHNldCBpcyBmb2N1c2Vk
+IG9uIGludGVycnVwdHMgKGRpc2NhcmRpbmcKdGltZXIgaW50ZXJydXB0cykuCgpUaGUgZm9sbG93
+aW5nIGFydGljbGUgZ2l2ZXMgbW9yZSBkZXRhaWxzOiBodHRwczovL2x3bi5uZXQvQXJ0aWNsZXMv
+NjczNjQxLwoKV2hlbiB0aGUgaW50ZXJydXB0IGlzIHNldHVwLCB3ZSB0YWcgaXQgZXhjZXB0IGlm
+IGl0IGlzIGEgdGltZXIuIFNvIHdpdGggdGhpcwpwYXRjaCB0aGVyZSBpcyBhbm90aGVyIHVzYWdl
+IG9mIHRoZSBJUlFGX1RJTUVSIHdoZXJlIHdlIHdpbGwgYmUgaWdub3JpbmcKaW50ZXJydXB0IGNv
+bWluZyBmcm9tIGEgdGltZXIuCgpBcyB0aGUgdGltZXIgaW50ZXJydXB0IGlzIGRlbGl2ZXJlZCB0
+byB0aGUgaG9zdCwgd2Ugc2hvdWxkIG5vdCBtZWFzdXJlIGl0IGFzIGl0CmlzIGEgdGltZXIgYW5k
+IHNldCB0aGlzIGZsYWcuCgpUaGUgbmVlZGVkIGluZm9ybWF0aW9uIGlzOiAid2hhdCBpcyB0aGUg
+ZWFybGllc3QgVk0gdGltZXI/Ii4gSWYgdGhpcwppbmZvcm1hdGlvbiBpcyBhbHJlYWR5IGF2YWls
+YWJsZSB0aGVuIHRoZXJlIGlzIG5vdGhpbmcgbW9yZSB0byBkbywgb3RoZXJ3aXNlIHdlCnNob3Vs
+ZCBhZGQgaXQgaW4gdGhlIGZ1dHVyZS4KCj4gZGlmZiAtLWdpdCBhL2tlcm5lbC9pcnEvc3B1cmlv
+dXMuYyBiL2tlcm5lbC9pcnEvc3B1cmlvdXMuYwo+IGluZGV4IDA2MWJhN2VlZDRlZC4uYTRhODFj
+NmM3NjAyIDEwMDY0NAo+IC0tLSBhL2tlcm5lbC9pcnEvc3B1cmlvdXMuYwo+ICsrKyBiL2tlcm5l
+bC9pcnEvc3B1cmlvdXMuYwo+IEBAIC03Miw2ICs3Miw3IEBAIHN0YXRpYyBpbnQgdHJ5X29uZV9p
+cnEoc3RydWN0IGlycV9kZXNjICpkZXNjLCBib29sIGZvcmNlKQo+ICAJICogbWFya2VkIHBvbGxl
+ZCBhcmUgZXhjbHVkZWQgZnJvbSBwb2xsaW5nLgo+ICAJICovCj4gIAlpZiAoaXJxX3NldHRpbmdz
+X2lzX3Blcl9jcHUoZGVzYykgfHwKPiArCSAgICBpcnFfc2V0dGluZ3NfaXNfcGVyX2NwdV9kZXZp
+ZChkZXNjKSB8fAo+ICAJICAgIGlycV9zZXR0aW5nc19pc19uZXN0ZWRfdGhyZWFkKGRlc2MpIHx8
+Cj4gIAkgICAgaXJxX3NldHRpbmdzX2lzX3BvbGxlZChkZXNjKSkKPiAgCQlnb3RvIG91dDsKPiAK
+PiBUaGFua3MsCj4gCj4gCU0uCj4gLS0gCj4gSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVs
+bHMgZnVubnkuLi4KCi0tIAoKIDxodHRwOi8vd3d3LmxpbmFyby5vcmcvPiBMaW5hcm8ub3JnIOKU
+giBPcGVuIHNvdXJjZSBzb2Z0d2FyZSBmb3IgQVJNIFNvQ3MKCkZvbGxvdyBMaW5hcm86ICA8aHR0
+cDovL3d3dy5mYWNlYm9vay5jb20vcGFnZXMvTGluYXJvPiBGYWNlYm9vayB8CjxodHRwOi8vdHdp
+dHRlci5jb20vIyEvbGluYXJvb3JnPiBUd2l0dGVyIHwKPGh0dHA6Ly93d3cubGluYXJvLm9yZy9s
+aW5hcm8tYmxvZy8+IEJsb2cKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
+Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
