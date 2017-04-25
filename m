@@ -1,154 +1,62 @@
-From: Daniel Lezcano <daniel.lezcano@linaro.org>
-Subject: Re: [PATCH V9 1/3] irq: Allow to pass the IRQF_TIMER flag with
- percpu irq request
-Date: Tue, 25 Apr 2017 11:49:27 +0200
-Message-ID: <20170425094927.GB16888@mai>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH V9 1/3] irq: Allow to pass the IRQF_TIMER flag with percpu
+ irq request
+Date: Tue, 25 Apr 2017 11:21:21 +0100
+Message-ID: <c98a5ff3-c2ea-5f94-d136-391bd7c224f3@arm.com>
 References: <1493042494-14057-1-git-send-email-daniel.lezcano@linaro.org>
- <398f3f3d-c567-0f1f-1a43-9b8d5805d5fd@arm.com>
- <20170424185909.GD2137@mai>
- <92e2a022-93d4-d4f3-78af-c9b5d51bb867@arm.com>
- <20170424195948.GE2137@mai>
- <16042494-2e67-e1a5-b9f6-af57e349d8a7@arm.com>
- <20170425083451.GA16888@mai>
- <f840e9d2-8aac-dc1d-6468-44f7658b55b1@arm.com>
+ <398f3f3d-c567-0f1f-1a43-9b8d5805d5fd@arm.com> <20170424185909.GD2137@mai>
+ <92e2a022-93d4-d4f3-78af-c9b5d51bb867@arm.com> <20170424195948.GE2137@mai>
+ <16042494-2e67-e1a5-b9f6-af57e349d8a7@arm.com> <20170425083451.GA16888@mai>
+ <f840e9d2-8aac-dc1d-6468-44f7658b55b1@arm.com> <20170425094927.GB16888@mai>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EACA40C9A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 05:46:45 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TLbk94S4x080 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Apr 2017 05:46:43 -0400 (EDT)
-Received: from mail-wr0-f174.google.com (mail-wr0-f174.google.com
- [209.85.128.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8FEEA40C51
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 05:46:43 -0400 (EDT)
-Received: by mail-wr0-f174.google.com with SMTP id w50so82306192wrc.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 02:49:33 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <f840e9d2-8aac-dc1d-6468-44f7658b55b1@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-samsung-soc@vger.kernel.org, kernel@stlinux.com, kvm@vger.kernel.org, Vineet Gupta <vgupta@synopsys.com>, Patrice Chotard <patrice.chotard@st.com>, Krzysztof Kozlowski <krzk@kernel.org>, linux-kernel@vger.kernel.org, Javier Martinez Canillas <javier@osg.samsung.com>, Kukjin Kim <kgene@kernel.org>, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, tglx@linutronix.de, linux-snps-arc@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <20170425094927.GB16888@mai>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+To: Daniel Lezcano <daniel.lezcano@linaro.org>
+Cc: tglx@linutronix.de, Mark Rutland <mark.rutland@arm.com>, Vineet Gupta <vgupta@synopsys.com>, Patrice Chotard <patrice.chotard@st.com>, Kukjin Kim <kgene@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, Javier Martinez Canillas <javier@osg.samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, kernel@stlinux.com, linux-samsung-soc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gVHVlLCBBcHIgMjUsIDIwMTcgYXQgMTA6MTA6MTJBTSArMDEwMCwgTWFyYyBaeW5naWVyIHdy
-b3RlOgoKW8KgLi4uIF0KCj4gPj4+PiBNYXliZSB5b3UgY291bGQgZXhwbGFpbiB3aHkgeW91IHRo
-aW5rIHRoaXMgaW50ZXJydXB0IGlzIHJlbGV2YW50IHRvIHdoYXQKPiA+Pj4+IHlvdSdyZSB0cnlp
-bmcgdG8gYWNoaWV2ZT8KPiA+Pj4KPiA+Pj4gSWYgdGhpcyBpbnRlcnJ1cHQgZG9lcyBub3QgaGFw
-cGVuIG9uIHRoZSBob3N0LCB3ZSBkb24ndCBjYXJlLgo+ID4+Cj4gPj4gQWxsIGludGVycnVwdHMg
-aGFwcGVuIG9uIHRoZSBob3N0LiBUaGVyZSBpcyBubyBzdWNoIHRoaW5nIGFzIGEgSFcgCj4gPj4g
-aW50ZXJydXB0IGJlaW5nIGRpcmVjdGx5IGRlbGl2ZXJlZCB0byBhIGd1ZXN0IChhdCBsZWFzdCBz
-byBmYXIpLiBUaGUgCj4gPj4gdGltZXIgaXMgdW5kZXIgY29udHJvbCBvZiB0aGUgZ3Vlc3QsIHdo
-aWNoIHVzZXMgYXMgaXQgc2VlcyBmaXQuIFdoZW4gCj4gPj4gdGhlIEhXIHRpbWVyIGV4cGlyZXMs
-IHRoZSBpbnRlcnJ1cHQgZmlyZXMgb24gdGhlIGhvc3QsIHdoaWNoIHJlLWluamVjdCAKPiA+PiB0
-aGUgaW50ZXJydXB0IGluIHRoZSBndWVzdC4KPiA+IAo+ID4gQWgsIHRoYW5rcyBmb3IgdGhlIGNs
-YXJpZmljYXRpb24uIEludGVyZXN0aW5nLgo+ID4gCj4gPiBIb3cgY2FuIHRoZSBob3N0IGtub3cg
-d2hpY2ggZ3Vlc3QgdG8gcmUtaW5qZWN0IHRoZSBpbnRlcnJ1cHQ/Cj4gCj4gVGhlIHRpbWVyIGNh
-biBvbmx5IGZpcmUgd2hlbiB0aGUgdmNwdSBpcyBydW5uaW5nLiBJZiBpdCBpcyBub3QgcnVubmlu
-ZywKPiBhIHNvZnR3YXJlIHRpbWVyIGlzIHF1ZXVlZCwgd2l0aCBhIHBvaW50ZXIgdG8gdGhlIHZj
-cHUgc3RydWN0LgoKSSBzZWUsIHRoYW5rcy4KCj4gPj4+IFRoZSBmbGFnIElSUUZfVElNRVIgaXMg
-dXNlZCBieSB0aGUgc3B1cmlvdXMgaXJxIGhhbmRsZXIgaW4gdGhlIHRyeV9vbmVfaXJxKCkKPiA+
-Pj4gZnVuY3Rpb24uIEhvd2V2ZXIgdGhlIHBlciBjcHUgdGltZXIgaW50ZXJydXB0IHdpbGwgYmUg
-ZGlzY2FyZGVkIGluIHRoZSBmdW5jdGlvbgo+ID4+PiBiZWZvcmUgYmVjYXVzZSBpdCBpcyBwZXIg
-Y3B1Lgo+ID4+Cj4gPj4gUmlnaHQuIFRoYXQncyBub3QgYmVjYXVzZSB0aGlzIGlzIGEgdGltZXIs
-IGJ1dCBiZWNhdXNlIGl0IGlzIHBlci1jcHUuIAo+ID4+IFNvIHdoeSBkbyB3ZSBuZWVkIHRoaXMg
-SVJRRl9USU1FUiBmbGFnLCBpbnN0ZWFkIG9mIGZpeGluZyB0cnlfb25lX2lycSgpPwo+ID4gCj4g
-PiBXaGVuIGEgdGltZXIgaXMgbm90IHBlciBjcHUsIChlZy4gcmVxdWVzdF9pcnEpLCB3ZSBuZWVk
-IHRoaXMgZmxhZywgbm8/Cj4gCj4gU3VyZSwgYnV0IGluIHRoaXMgc2VyaWVzLCB0aGV5IGFsbCBz
-ZWVtIHRvIGJlIHBlci1jcHUuCgpJIHRoaW5rIEkgd2FzIHVuY2xlYXIuIFdlIG5lZWQgdG8gdGFn
-IGFuIGludGVycnVwdCB3aXRoIElSUVNfVElNSU5HUyB0byByZWNvcmQKdGhlaXIgb2NjdXJlbmNl
-cyBidXQgZGlzY2FyZGluZyB0aGUgdGltZXJzIGludGVycnVwdC4gVGhhdCBpcyBkb25lIGJ5IGNo
-ZWNraW5nCmFnYWluc3QgSVJRRl9USU1FUiB3aGVuIHNldHRpbmcgdXAgYW4gaW50ZXJydXB0LgoK
-cmVxdWVzdF9pcnEoKSBoYXMgYSBmbGFnIHBhcmFtZXRlciB3aGljaCBoYXMgSVJRRl9USU1FUiBz
-ZXQgaW4gY2FzZSBvZiB0aGUKdGltZXJzLiByZXF1ZXN0X3BlcmNwdV9pcnEgaGFzIG5vIGZsYWcg
-cGFyYW1ldGVyLCBzbyBpdCBpcyBub3QgcG9zc2libGUgdG8KZGlzY2FyZCB0aGVzZSBpbnRlcnJ1
-cHRzIGFzIHRoZSBJUlFTX1RJTUlOR1Mgd2lsbCBiZSBzZXQuCgpJIGRvbid0IHVuZGVyc3RhbmQg
-aG93IHRoaXMgaXMgcmVsYXRlZCB0byB0aGUgdGhlIHRyeV9vbmVfaXJxKCkgZml4IHlvdSBhcmUK
-cHJvcG9zaW5nLiBBbSBJIG1pc3Npbmcgc29tZXRoaW5nPwoKUmVnYXJkaW5nIHlvdXIgZGVzY3Jp
-cHRpb24gYmVsb3csIHRoZSBob3N0IGhhcyBubyBjb250cm9sIGF0IGFsbCBvbiB0aGUgdmlydHVh
-bAp0aW1lciBhbmQgaXMgbm90IGFibGUgdG8ga25vdyB0aGUgbmV4dCBleHBpcmF0aW9uIHRpbWUs
-IHNvIEkgZG9uJ3Qgc2VlIHRoZQpwb2ludCB0byBhZGQgdGhlIElSUUZfVElNRVIgZmxhZyB0byB0
-aGUgdmlydHVhbCB0aW1lci4KCkkgd2lsbCByZXNlbmQgYSBuZXcgdmVyc2lvbiB3aXRob3V0IHRo
-aXMgY2hhbmdlIG9uIHRoZSB2aXJ0dWFsIHRpbWVyLgoKPiA+Pj4gSU1PLCBmb3IgY29uc2lzdGVu
-Y3kgcmVhc29uLCBhZGRpbmcgdGhlIElSUUZfVElNRVIgbWFrZXMgc2Vuc2UuIE90aGVyIHRoYW4K
-PiA+Pj4gdGhhdCwgYXMgdGhlIGludGVycnVwdCBpcyBub3QgaGFwcGVuaW5nIG9uIHRoZSBob3N0
-LCB0aGlzIGZsYWcgd29uJ3QgYmUgdXNlZC4KPiA+Pj4KPiA+Pj4gRG8geW91IHdhbnQgdG8gZHJv
-cCB0aGlzIGNoYW5nZT8KPiA+Pgo+ID4+IE5vLCBJJ2QgbGlrZSB0byB1bmRlcnN0YW5kIHRoZSBh
-Ym92ZS4gV2h5IGlzbid0IHRoZSBmb2xsb3dpbmcgcGF0Y2ggCj4gPj4gZG9pbmcgdGhlIHJpZ2h0
-IHRoaW5nPwo+ID4gCj4gPiBBY3R1YWxseSwgdGhlIGV4cGxhbmF0aW9uIGlzIGluIHRoZSBuZXh0
-IHBhdGNoIG9mIHRoZSBzZXJpZXMgKDIvMykKPiA+IAo+ID4gWyAuLi4gXQo+ID4gCj4gPiArc3Rh
-dGljIGlubGluZSB2b2lkIHNldHVwX3RpbWluZ3Moc3RydWN0IGlycV9kZXNjICpkZXNjLCBzdHJ1
-Y3QgaXJxYWN0aW9uICphY3QpCj4gPiArewo+ID4gKwkvKgo+ID4gKwkgKiBXZSBkb24ndCBuZWVk
-IHRoZSBtZWFzdXJlbWVudCBiZWNhdXNlIHRoZSBpZGxlIGNvZGUgYWxyZWFkeQo+ID4gKwkgKiBr
-bm93cyB0aGUgbmV4dCBleHBpcnkgZXZlbnQuCj4gPiArCSAqLwo+ID4gKwlpZiAoYWN0LT5mbGFn
-cyAmIF9fSVJRRl9USU1FUikKPiA+ICsJCXJldHVybjsKPiAKPiBBbmQgdGhhdCdzIHdoZXJlIHRo
-aXMgaXMgcmVhbGx5IHdyb25nIGZvciB0aGUgS1ZNIGd1ZXN0IHRpbWVyLiBBcyBJCj4gc2FpZCwg
-dGhpcyB0aW1lciBpcyB1bmRlciBjb21wbGV0ZSBjb250cm9sIG9mIHRoZSBndWVzdCwgYW5kIHRo
-ZSByZXN0IG9mCj4gdGhlIHN5c3RlbSBkb2Vzbid0IGtub3cgYWJvdXQgaXQuIEtWTSBpdHNlbGYg
-d2lsbCBvbmx5IGZpbmQgb3V0IHdoZW4gdGhlCj4gdmNwdSBkb2VzIGEgVk0gZXhpdCBmb3IgYSBy
-ZWFzb24gb3IgYW5vdGhlciwgYW5kIHdpbGwganVzdCBzYXZlL3Jlc3RvcmUKPiB0aGUgc3RhdGUg
-aW4gb3JkZXIgdG8gYmUgYWJsZSB0byBnaXZlIHRoZSB0aW1lciB0byBhbm90aGVyIGd1ZXN0Lgo+
-IAo+IFRoZSBpZGxlIGNvZGUgaXMgdmVyeSBtdWNoICpub3QqIGF3YXJlIG9mIGFueXRoaW5nIGNv
-bmNlcm5pbmcgdGhhdCBndWVzdAo+IHRpbWVyLgoKSnVzdCBmb3IgbXkgb3duIGN1cmlvc2l0eSwg
-aWYgdGhlcmUgYXJlIHR3byBWTSAoVk0xIGFuZCBWTTIpLiBWTTEgc2V0cyBhIHRpbWVyMQphdCA8
-dGltZT4gYW5kIGV4aXRzLCBWTTIgcnVucyBhbmQgc2V0cyBhIHRpbWVyMiBhdCA8dGltZStkZWx0
-YT4uCgpUaGUgdGltZXIxIGZvciBWTTEgaXMgc3VwcG9zZWQgdG8gZXhwaXJlIHdoaWxlIFZNMiBp
-cyBydW5uaW5nLiBJSVVDIHRoZSB2aXJ0dWFsCnRpbWVyIGlzIHVuZGVyIGNvbnRyb2wgb2YgVk0y
-IGFuZCB3aWxsIGV4cGlyZSBhdCA8dGltZStkZWx0YT4uCgpJcyB0aGUgaG9zdCB3YWtlIHVwIHdp
-dGggdGhlIFNXIHRpbWVyIGFuZCBzd2l0Y2ggaW4gVk0xIHdoaWNoIGluIHR1cm4gcmVzdG9yZXMK
-dGhlIHRpbWVyIGFuZCBqdW1wIGluIHRoZSB2aXJ0dWFsIHRpbWVyIGlycSBoYW5kbGVyPwogCj4g
-PiArCj4gPiArCWRlc2MtPmlzdGF0ZSB8PSBJUlFTX1RJTUlOR1M7Cj4gPiArfQo+ID4gCj4gPiBb
-IC4uLiBdCj4gPiAKPiA+ICsvKgo+ID4gKyAqIFRoZSBmdW5jdGlvbiByZWNvcmRfaXJxX3RpbWUg
-aXMgb25seSBjYWxsZWQgaW4gb25lIHBsYWNlIGluIHRoZQo+ID4gKyAqIGludGVycnVwdHMgaGFu
-ZGxlci4gV2Ugd2FudCB0aGlzIGZ1bmN0aW9uIGFsd2F5cyBpbmxpbmUgc28gdGhlIGNvZGUKPiA+
-ICsgKiBpbnNpZGUgaXMgZW1iZWRkZWQgaW4gdGhlIGZ1bmN0aW9uIGFuZCB0aGUgc3RhdGljIGtl
-eSBicmFuY2hpbmcKPiA+ICsgKiBjb2RlIGNhbiBhY3QgYXQgdGhlIGhpZ2hlciBsZXZlbC4gV2l0
-aG91dCB0aGUgZXhwbGljaXQKPiA+ICsgKiBfX2Fsd2F5c19pbmxpbmUgd2UgY2FuIGVuZCB1cCB3
-aXRoIGEgZnVuY3Rpb24gY2FsbCBhbmQgYSBzbWFsbAo+ID4gKyAqIG92ZXJoZWFkIGluIHRoZSBo
-b3RwYXRoIGZvciBub3RoaW5nLgo+ID4gKyAqLwo+ID4gK3N0YXRpYyBfX2Fsd2F5c19pbmxpbmUg
-dm9pZCByZWNvcmRfaXJxX3RpbWUoc3RydWN0IGlycV9kZXNjICpkZXNjKQo+ID4gK3sKPiA+ICsJ
-aWYgKCFzdGF0aWNfYnJhbmNoX2xpa2VseSgmaXJxX3RpbWluZ19lbmFibGVkKSkKPiA+ICsJCXJl
-dHVybjsKPiA+ICsKPiA+ICsJaWYgKGRlc2MtPmlzdGF0ZSAmIElSUVNfVElNSU5HUykgewo+ID4g
-KwkJc3RydWN0IGlycV90aW1pbmdzICp0aW1pbmdzID0gdGhpc19jcHVfcHRyKCZpcnFfdGltaW5n
-cyk7Cj4gPiArCj4gPiArCQl0aW1pbmdzLT52YWx1ZXNbdGltaW5ncy0+Y291bnQgJiBJUlFfVElN
-SU5HU19NQVNLXSA9Cj4gPiArCQkJaXJxX3RpbWluZ19lbmNvZGUobG9jYWxfY2xvY2soKSwKPiA+
-ICsJCQkJCSAgaXJxX2Rlc2NfZ2V0X2lycShkZXNjKSk7Cj4gPiArCj4gPiArCQl0aW1pbmdzLT5j
-b3VudCsrOwo+ID4gKwl9Cj4gPiArfQo+ID4gCj4gPiBbIC4uLiBdCj4gPiAKPiA+IFRoZSBwdXJw
-b3NlIGlzIHRvIHByZWRpY3QgdGhlIG5leHQgZXZlbnQgaW50ZXJydXB0cyBvbiB0aGUgc3lzdGVt
-IHdoaWNoIGFyZQo+ID4gc291cmNlIG9mIHdha2UgdXAuIEZvciBub3csIHRoaXMgcGF0Y2hzZXQg
-aXMgZm9jdXNlZCBvbiBpbnRlcnJ1cHRzIChkaXNjYXJkaW5nCj4gPiB0aW1lciBpbnRlcnJ1cHRz
-KS4KPiA+IAo+ID4gVGhlIGZvbGxvd2luZyBhcnRpY2xlIGdpdmVzIG1vcmUgZGV0YWlsczogaHR0
-cHM6Ly9sd24ubmV0L0FydGljbGVzLzY3MzY0MS8KPiA+IAo+ID4gV2hlbiB0aGUgaW50ZXJydXB0
-IGlzIHNldHVwLCB3ZSB0YWcgaXQgZXhjZXB0IGlmIGl0IGlzIGEgdGltZXIuIFNvIHdpdGggdGhp
-cwo+ID4gcGF0Y2ggdGhlcmUgaXMgYW5vdGhlciB1c2FnZSBvZiB0aGUgSVJRRl9USU1FUiB3aGVy
-ZSB3ZSB3aWxsIGJlIGlnbm9yaW5nCj4gPiBpbnRlcnJ1cHQgY29taW5nIGZyb20gYSB0aW1lci4K
-PiA+IAo+ID4gQXMgdGhlIHRpbWVyIGludGVycnVwdCBpcyBkZWxpdmVyZWQgdG8gdGhlIGhvc3Qs
-IHdlIHNob3VsZCBub3QgbWVhc3VyZSBpdCBhcyBpdAo+ID4gaXMgYSB0aW1lciBhbmQgc2V0IHRo
-aXMgZmxhZy4KPiA+IAo+ID4gVGhlIG5lZWRlZCBpbmZvcm1hdGlvbiBpczogIndoYXQgaXMgdGhl
-IGVhcmxpZXN0IFZNIHRpbWVyPyIuIElmIHRoaXMKPiA+IGluZm9ybWF0aW9uIGlzIGFscmVhZHkg
-YXZhaWxhYmxlIHRoZW4gdGhlcmUgaXMgbm90aGluZyBtb3JlIHRvIGRvLCBvdGhlcndpc2Ugd2UK
-PiA+IHNob3VsZCBhZGQgaXQgaW4gdGhlIGZ1dHVyZS4KPiAKPiBUaGlzIGluZm9ybWF0aW9uIGlz
-IG5vdCByZWFkaWx5IGF2YWlsYWJsZS4gWW91IGNhbiBvbmx5IGZpbmQgaXQgd2hlbiBpdAo+IGlz
-IHRvbyBsYXRlICh0aW1lciBoYXMgYWxyZWFkeSBmaXJlZCkgb3Igd2hlbiBpdCBpcyBub3QgcmVs
-ZXZhbnQgYW55bW9yZQo+IChndWVzdCBpcyBzbGVlcGluZyBhbmQgd2UndmUgcXVldWVkIGEgU1cg
-dGltZXIgZm9yIGl0KS4KPiAKPiBUaGFua3MsCj4gCj4gCU0uCj4gLS0gCj4gSmF6eiBpcyBub3Qg
-ZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KCi0tIAoKIDxodHRwOi8vd3d3LmxpbmFyby5v
-cmcvPiBMaW5hcm8ub3JnIOKUgiBPcGVuIHNvdXJjZSBzb2Z0d2FyZSBmb3IgQVJNIFNvQ3MKCkZv
-bGxvdyBMaW5hcm86ICA8aHR0cDovL3d3dy5mYWNlYm9vay5jb20vcGFnZXMvTGluYXJvPiBGYWNl
-Ym9vayB8CjxodHRwOi8vdHdpdHRlci5jb20vIyEvbGluYXJvb3JnPiBUd2l0dGVyIHwKPGh0dHA6
-Ly93d3cubGluYXJvLm9yZy9saW5hcm8tYmxvZy8+IEJsb2cKX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
-dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
-bGlzdGluZm8va3ZtYXJtCg==
+On 25/04/17 10:49, Daniel Lezcano wrote:
+> On Tue, Apr 25, 2017 at 10:10:12AM +0100, Marc Zyngier wrote:
+
+[...]
+
+>>> +static inline void setup_timings(struct irq_desc *desc, struct irqaction *act)
+>>> +{
+>>> +	/*
+>>> +	 * We don't need the measurement because the idle code already
+>>> +	 * knows the next expiry event.
+>>> +	 */
+>>> +	if (act->flags & __IRQF_TIMER)
+>>> +		return;
+>>
+>> And that's where this is really wrong for the KVM guest timer. As I
+>> said, this timer is under complete control of the guest, and the rest of
+>> the system doesn't know about it. KVM itself will only find out when the
+>> vcpu does a VM exit for a reason or another, and will just save/restore
+>> the state in order to be able to give the timer to another guest.
+>>
+>> The idle code is very much *not* aware of anything concerning that guest
+>> timer.
+> 
+> Just for my own curiosity, if there are two VM (VM1 and VM2). VM1 sets a timer1
+> at <time> and exits, VM2 runs and sets a timer2 at <time+delta>.
+> 
+> The timer1 for VM1 is supposed to expire while VM2 is running. IIUC the virtual
+> timer is under control of VM2 and will expire at <time+delta>.
+> 
+> Is the host wake up with the SW timer and switch in VM1 which in turn restores
+> the timer and jump in the virtual timer irq handler?
+
+Indeed. The SW timer causes VM1 to wake-up, either on the same CPU
+(preempting VM2) or on another. The timer is then restored with the
+pending virtual interrupt injected, and the guest does what it has to
+with it.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
