@@ -1,98 +1,135 @@
-From: Daniel Lezcano <daniel.lezcano@linaro.org>
-Subject: Re: [PATCH V9 1/3] irq: Allow to pass the IRQF_TIMER flag with percpu
- irq request
-Date: Tue, 25 Apr 2017 15:53:24 +0200
-Message-ID: <7581d0d6-85ae-dca8-d2d6-4993e2560894@linaro.org>
-References: <1493042494-14057-1-git-send-email-daniel.lezcano@linaro.org>
- <398f3f3d-c567-0f1f-1a43-9b8d5805d5fd@arm.com> <20170424185909.GD2137@mai>
- <92e2a022-93d4-d4f3-78af-c9b5d51bb867@arm.com> <20170424195948.GE2137@mai>
- <16042494-2e67-e1a5-b9f6-af57e349d8a7@arm.com> <20170425083451.GA16888@mai>
- <f840e9d2-8aac-dc1d-6468-44f7658b55b1@arm.com> <20170425094927.GB16888@mai>
- <c98a5ff3-c2ea-5f94-d136-391bd7c224f3@arm.com> <20170425125103.GC16888@mai>
- <a4faf3bb-1641-8b6d-3e15-9f8ef46c9411@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-Reply-To: <a4faf3bb-1641-8b6d-3e15-9f8ef46c9411@arm.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: tglx@linutronix.de, Mark Rutland <mark.rutland@arm.com>, Vineet Gupta <vgupta@synopsys.com>, Patrice Chotard <patrice.chotard@st.com>, Kukjin Kim <kgene@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, Javier Martinez Canillas <javier@osg.samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, kernel@stlinux.com, linux-samsung-soc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [kvmtool PATCH v10 00/15] kvmtool: arm: ITS emulation and GSI routing support
+Date: Tue, 25 Apr 2017 15:39:17 +0100
+Message-ID: <20170425143932.17235-1-andre.przywara@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/04/2017 15:22, Marc Zyngier wrote:
-> On 25/04/17 13:51, Daniel Lezcano wrote:
->> On Tue, Apr 25, 2017 at 11:21:21AM +0100, Marc Zyngier wrote:
->>> On 25/04/17 10:49, Daniel Lezcano wrote:
->>>> On Tue, Apr 25, 2017 at 10:10:12AM +0100, Marc Zyngier wrote:
->>>
->>> [...]
->>>
->>>>>> +static inline void setup_timings(struct irq_desc *desc, struct irqaction *act)
->>>>>> +{
->>>>>> +	/*
->>>>>> +	 * We don't need the measurement because the idle code already
->>>>>> +	 * knows the next expiry event.
->>>>>> +	 */
->>>>>> +	if (act->flags & __IRQF_TIMER)
->>>>>> +		return;
->>>>>
->>>>> And that's where this is really wrong for the KVM guest timer. As I
->>>>> said, this timer is under complete control of the guest, and the rest of
->>>>> the system doesn't know about it. KVM itself will only find out when the
->>>>> vcpu does a VM exit for a reason or another, and will just save/restore
->>>>> the state in order to be able to give the timer to another guest.
->>>>>
->>>>> The idle code is very much *not* aware of anything concerning that guest
->>>>> timer.
->>>>
->>>> Just for my own curiosity, if there are two VM (VM1 and VM2). VM1 sets a timer1
->>>> at <time> and exits, VM2 runs and sets a timer2 at <time+delta>.
->>>>
->>>> The timer1 for VM1 is supposed to expire while VM2 is running. IIUC the virtual
->>>> timer is under control of VM2 and will expire at <time+delta>.
->>>>
->>>> Is the host wake up with the SW timer and switch in VM1 which in turn restores
->>>> the timer and jump in the virtual timer irq handler?
->>>
->>> Indeed. The SW timer causes VM1 to wake-up, either on the same CPU
->>> (preempting VM2) or on another. The timer is then restored with the
->>> pending virtual interrupt injected, and the guest does what it has to
->>> with it.
->>
->> Thanks for clarification.
->>
->> So there is a virtual timer with real registers / interruption (waking up the
->> host) for the running VMs and SW timers for non-running VMs.
->>
->> What is the benefit of having such mechanism instead of real timers injecting
->> interrupts in the VM without the virtual timer + save/restore? Efficiency in
->> the running VMs when setting up timers (saving privileges change overhead)?
-> 
-> 
-> You can't dedicate HW resources to virtual CPUs. It just doesn't scale.
-> Also, injecting HW interrupts in a guest is pretty hard work, and for
-> multiple reasons:
->   - the host needs to be in control of interrupt delivery (don't hog the
-> CPU with guest interrupts)
->   - you want to be able to remap interrupts (id X on the host becomes id
-> Y on the guest),
->   - you want to deal with migrating vcpus,
->   - you want deliver an interrupt to a vcpu that is *not* running.
-> 
-> It *is* doable, but it is not cheap at all from a HW point of view.
+Hi,
 
+another update to the ITS emulation series for kvmtool.
+This addresses the comments Marc and Jean-Philippe had on the last
+version (thanks for that!): I moved the DevID feature detection to avoid
+static variables, rewrote the error path on creating IRQ routes and
+extended the MMIO reservation to cover the ITS doorbell page as well.
+Not sure if that's the right way to do, though.
+Also we now ignore writes to the PBA region, which is what the spec
+somewhat recommends.
+-------------------------------------------
 
-Ok, I see.
+This series teaches kvmtool how to support KVM's ITS emulation. Also
+(as this is somewhat related and has been co-developed) it enables GSI
+routing for ARM/ARM64, which allows IRQFDs to be used, for instance
+to use vhost_net. At the moment this is dependent on the guest
+using the ITS emulation, but GICv2M support may be added at a later time.
 
-Thanks!
+The first six patches are generic fixes and refactoring to pave the
+road for the rest of the patches. Most importantly patch 3/15 pulls
+the GSI routing code from x86 into generic code.
+Patch 7 updates the Linux headers to pull the new ITS and 32-bit
+GICv3 definitions in. This allows us to enable GICv3 emulation for 32-bit
+ARM and also get rid of some placeholder lines in patch 8.
+The following four patches add ITS emulation support. They reserve and
+register the required ITS register frame and populate a DT node with
+the necessary data. Also the patches add the required device ID to the
+KVM_SIGNAL_MSI ioctl.
+Patches 13 and 14 enable IRQ GSI routing for ARM/ARM64.
+This is needed to use IRQFDs, which is a prerequisite for vhost
+functionality, for instance. The code sets up the (dummy) SPI
+routing table and adds the device ID to the routing entry.
+The last patch finally enables the guest ITS support by extending the
+existing --irqchip= parameter to allow "--irqchip=gicv3-its".
 
-  -- Daniel
+These patches make use of the KVM kernel functionality merged into
+4.8-rc: both Eric's IRQ routing series and the ITS emulation.
+It can also be found in my kvmtool git repository [1].
 
+Cheers,
+Andre.
+
+[1] git://linux-arm.org/kvmtool.git (branch: its/v10)
+    http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/its/v10
+
+Changelog v9 ... v10:
+- [04/15]: ignore PBA writes
+- [06/15]: reorder error checking for clarity
+- [07/15]: update Linux headers with the latest HEAD (4.11-rc7+)
+- [09/15]: extend ITS MMIO frame to cover doorbell page
+- [11/15]: use actual function name in commit message
+- [12/15]: check KVM_CAP_MSI_DEVID capability once and store it in struct kvm
+- [14/15]: use stored KVM_CAP_MSI_DEVID capability
+
+Andre Przywara (14):
+  FDT: use static phandles
+  arm: use static DT phandle for the GIC
+  irq: move IRQ routing into irq.c
+  MSI-X: update GSI routing after changed MSI-X configuration
+  virtio: fix endianness check for vhost support
+  PCI: Only allocate IRQ routing entry when available
+  update public Linux headers for GICv3 ITS emulation
+  arm: allow creation of an MSI register frame region
+  arm: FDT: create MSI controller DT node
+  add kvm__supports_vm_extension()
+  PCI: inject PCI device ID on MSI injection
+  arm: setup SPI IRQ routing tables
+  extend GSI IRQ routing to take a device ID
+  arm64: enable GICv3-ITS emulation
+
+Vladimir Murzin (1):
+  arm: allow vGICv3 emulation
+
+ Makefile                                 |   4 +-
+ arm/aarch32/arm-cpu.c                    |   4 +-
+ arm/aarch32/include/asm/kvm.h            |  26 +++++-
+ arm/aarch32/include/kvm/fdt-arch.h       |   6 ++
+ arm/aarch32/include/kvm/kvm-arch.h       |   3 -
+ arm/aarch64/arm-cpu.c                    |   5 +-
+ arm/aarch64/include/asm/kvm.h            |  15 ++++
+ arm/aarch64/include/kvm/fdt-arch.h       |   6 ++
+ arm/aarch64/include/kvm/kvm-arch.h       |   3 -
+ arm/fdt.c                                |   9 +--
+ arm/gic.c                                | 134 ++++++++++++++++++++++++++++---
+ arm/include/arm-common/fdt-arch.h        |   6 ++
+ arm/include/arm-common/gic.h             |   3 +-
+ arm/include/arm-common/kvm-arch.h        |   2 +
+ arm/include/arm-common/kvm-config-arch.h |   2 +-
+ arm/include/arm-common/kvm-cpu-arch.h    |   3 +-
+ arm/include/arm-common/pci.h             |   2 +-
+ arm/irq.c                                |   9 ---
+ arm/pci.c                                |   9 ++-
+ hw/pci-shmem.c                           |   5 +-
+ include/kvm/fdt.h                        |   8 +-
+ include/kvm/irq.h                        |   8 +-
+ include/kvm/kvm.h                        |   2 +
+ include/kvm/virtio.h                     |   9 ++-
+ include/linux/kvm.h                      |  50 +++++++++++-
+ irq.c                                    | 127 +++++++++++++++++++++++++++++
+ kvm.c                                    |  28 +++++++
+ mips/include/asm/kvm.h                   |   2 +
+ mips/include/kvm/fdt-arch.h              |   6 ++
+ mips/irq.c                               |  10 ---
+ powerpc/include/asm/kvm.h                |  27 +++++++
+ powerpc/include/kvm/fdt-arch.h           |   6 ++
+ powerpc/irq.c                            |  31 -------
+ powerpc/kvm.c                            |   2 -
+ virtio/net.c                             |   2 +-
+ virtio/pci.c                             | 105 ++++++++++++++++++++----
+ x86/include/asm/kvm.h                    |   6 +-
+ x86/include/kvm/fdt-arch.h               |   6 ++
+ x86/irq.c                                |  45 ++---------
+ 39 files changed, 572 insertions(+), 164 deletions(-)
+ create mode 100644 arm/aarch32/include/kvm/fdt-arch.h
+ create mode 100644 arm/aarch64/include/kvm/fdt-arch.h
+ create mode 100644 arm/include/arm-common/fdt-arch.h
+ delete mode 100644 arm/irq.c
+ create mode 100644 mips/include/kvm/fdt-arch.h
+ delete mode 100644 mips/irq.c
+ create mode 100644 powerpc/include/kvm/fdt-arch.h
+ delete mode 100644 powerpc/irq.c
+ create mode 100644 x86/include/kvm/fdt-arch.h
 
 -- 
- <http://www.linaro.org/> Linaro.org │ Open source software for ARM SoCs
-
-Follow Linaro:  <http://www.facebook.com/pages/Linaro> Facebook |
-<http://twitter.com/#!/linaroorg> Twitter |
-<http://www.linaro.org/linaro-blog/> Blog
+2.9.0
