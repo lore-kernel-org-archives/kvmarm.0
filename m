@@ -1,8 +1,8 @@
 From: Daniel Lezcano <daniel.lezcano@linaro.org>
 Subject: Re: [PATCH V9 1/3] irq: Allow to pass the IRQF_TIMER flag with
  percpu irq request
-Date: Tue, 25 Apr 2017 14:51:03 +0200
-Message-ID: <20170425125103.GC16888@mai>
+Date: Tue, 25 Apr 2017 14:52:41 +0200
+Message-ID: <20170425125241.GD16888@mai>
 References: <1493042494-14057-1-git-send-email-daniel.lezcano@linaro.org>
  <398f3f3d-c567-0f1f-1a43-9b8d5805d5fd@arm.com>
  <20170424185909.GD2137@mai>
@@ -12,41 +12,26 @@ References: <1493042494-14057-1-git-send-email-daniel.lezcano@linaro.org>
  <20170425083451.GA16888@mai>
  <f840e9d2-8aac-dc1d-6468-44f7658b55b1@arm.com>
  <20170425094927.GB16888@mai>
- <c98a5ff3-c2ea-5f94-d136-391bd7c224f3@arm.com>
+ <20170425102230.GJ4104@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <c98a5ff3-c2ea-5f94-d136-391bd7c224f3@arm.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: tglx@linutronix.de, Mark Rutland <mark.rutland@arm.com>, Vineet Gupta <vgupta@synopsys.com>, Patrice Chotard <patrice.chotard@st.com>, Kukjin Kim <kgene@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, Javier Martinez Canillas <javier@osg.samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, kernel@stlinux.com, linux-samsung-soc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <20170425102230.GJ4104@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, tglx@linutronix.de, Mark Rutland <mark.rutland@arm.com>, Vineet Gupta <vgupta@synopsys.com>, Patrice Chotard <patrice.chotard@st.com>, Kukjin Kim <kgene@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, Javier Martinez Canillas <javier@osg.samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, kernel@stlinux.com, linux-samsung-soc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 25, 2017 at 11:21:21AM +0100, Marc Zyngier wrote:
-> On 25/04/17 10:49, Daniel Lezcano wrote:
-> > On Tue, Apr 25, 2017 at 10:10:12AM +0100, Marc Zyngier wrote:
+On Tue, Apr 25, 2017 at 12:22:30PM +0200, Christoffer Dall wrote:
+> On Tue, Apr 25, 2017 at 11:49:27AM +0200, Daniel Lezcano wrote:
 > 
 > [...]
 > 
-> >>> +static inline void setup_timings(struct irq_desc *desc, struct irqaction *act)
-> >>> +{
-> >>> +	/*
-> >>> +	 * We don't need the measurement because the idle code already
-> >>> +	 * knows the next expiry event.
-> >>> +	 */
-> >>> +	if (act->flags & __IRQF_TIMER)
-> >>> +		return;
-> >>
-> >> And that's where this is really wrong for the KVM guest timer. As I
-> >> said, this timer is under complete control of the guest, and the rest of
-> >> the system doesn't know about it. KVM itself will only find out when the
-> >> vcpu does a VM exit for a reason or another, and will just save/restore
-> >> the state in order to be able to give the timer to another guest.
-> >>
-> >> The idle code is very much *not* aware of anything concerning that guest
-> >> timer.
+> > > 
+> > > The idle code is very much *not* aware of anything concerning that guest
+> > > timer.
 > > 
 > > Just for my own curiosity, if there are two VM (VM1 and VM2). VM1 sets a timer1
 > > at <time> and exits, VM2 runs and sets a timer2 at <time+delta>.
@@ -56,20 +41,44 @@ On Tue, Apr 25, 2017 at 11:21:21AM +0100, Marc Zyngier wrote:
 > > 
 > > Is the host wake up with the SW timer and switch in VM1 which in turn restores
 > > the timer and jump in the virtual timer irq handler?
+> >  
+> The thing that may be missing here is that a VCPU thread (more of which
+> in a collection is a VM) is just a thread from the point of view of
+> Linux, and whether or not a guest schedules a timer, should not effect
+> the scheduler's decision to run a given thread, if the thread is
+> runnable.
 > 
-> Indeed. The SW timer causes VM1 to wake-up, either on the same CPU
-> (preempting VM2) or on another. The timer is then restored with the
-> pending virtual interrupt injected, and the guest does what it has to
-> with it.
+> Whenever we run a VCPU thread, we look at its timer state (in software)
+> and calculate if the guest should see a timer interrupt and inject such
+> a one (the hardware arch timer is not involved in this process at all).
+> 
+> We use timers in exactly two scenarios:
+> 
+>  1. The hardware arch timers are used to force an exit to the host when
+>     the guest programmed the timer, so we can do the calculation in
+>     software I mentioned above and inject a virtual software-generated
+>     interrupt when the guest expects to see one.
+> 
+>  2. The guest goes to sleep (WFI) but has programmed a timer to be woken
+>     up at some point.  KVM handles a WFI by blocking the VCPU thread,
+>     which basically means making the thread interruptible and putting it
+>     on a waitqueue.  In this case we schedule a software timer to make
+>     the thread runnable again when the software timer fires (and the
+>     scheduler runs that thread when it wants to after that).
+> 
+> If you have a VCPU thread from VM1 blocked, and you run a VCPU thread
+> from VM2, then the VCPU thread from VM2 will program the hardware arch
+> timer with the context of the VM2 VCPU thread while running, and this
+> has nothing to do with the VCPU thread from VM1 at this point, because
+> it relies on the host Linux time keeping infrastructure to become
+> runnable some time in the future, and running a guest naturally doesn't
+> mess with the host's time keeping.
+> 
+> Hope this helps,
 
-Thanks for clarification.
+Yes, definitively. Thanks for the detailed description.
 
-So there is a virtual timer with real registers / interruption (waking up the
-host) for the running VMs and SW timers for non-running VMs.
-
-What is the benefit of having such mechanism instead of real timers injecting
-interrupts in the VM without the virtual timer + save/restore? Efficiency in
-the running VMs when setting up timers (saving privileges change overhead)?
+  -- Daniel
 
 -- 
 
