@@ -1,59 +1,43 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v5 02/22] KVM: arm/arm64: Add GICV3 pending table save API documentation
-Date: Tue, 25 Apr 2017 11:43:32 +0100
-Message-ID: <CAFEAcA_0N9Jx5ym+=jjmxAzSaXPjt-m+gW1cq90of8Qhw3LOzg@mail.gmail.com>
-References: <1492164934-988-1-git-send-email-eric.auger@redhat.com> <1492164934-988-3-git-send-email-eric.auger@redhat.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH] arm64: Add ASM modifier for xN register operands
+Date: Tue, 25 Apr 2017 13:13:28 +0100
+Message-ID: <20170425121328.GH24484@arm.com>
+References: <20170420183053.718-1-mka@chromium.org>
+ <20170424170009.GT12323@arm.com>
+ <CAKv+Gu_Ms73qfFFjmhkwF9Rh2jBM6Cx9LfuSHPUnXv0GTR1z7w@mail.gmail.com>
+ <20170424173413.GW12323@arm.com>
+ <20170424191345.GM128305@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1492164934-988-3-git-send-email-eric.auger@redhat.com>
+Content-Disposition: inline
+In-Reply-To: <20170424191345.GM128305@google.com>
 Sender: kvm-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Vijaya Kumar K <vijayak@caviumnetworks.com>, "Kumar, Vijaya" <Vijaya.Kumar@cavium.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, "prasun.kapoor" <Prasun.Kapoor@cavium.com>, Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, Vladimir Murzin <vladimir.murzin@arm.com>, Mark Rutland <mark.rutland@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, KVM devel mailing list <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14 April 2017 at 11:15, Eric Auger <eric.auger@redhat.com> wrote:
-> Add description for how to save GICV3 LPI pending bit into
-> guest RAM pending tables.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
-> ---
-> v5: creation
-> ---
->  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> index c1a2461..9293b45 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> @@ -167,11 +167,17 @@ Groups:
->      KVM_DEV_ARM_VGIC_CTRL_INIT
->        request the initialization of the VGIC, no additional parameter in
->        kvm_device_attr.addr.
-> +    KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
-> +      save all LPI pending bits into guest RAM pending tables.
-> +
-> +      The first kB of the pending table is not altered by this operation.
->    Errors:
->      -ENXIO: VGIC not properly configured as required prior to calling
->       this attribute
->      -ENODEV: no online VCPU
->      -ENOMEM: memory shortage when allocating vgic internal data
-> +    -EFAULT: Invalid guest ram access
-> +    -EBUSY:  One or more VCPUS are running
->
->
->    KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
-> --
-> 2.5.5
+On Mon, Apr 24, 2017 at 12:13:45PM -0700, Matthias Kaehlcke wrote:
+> El Mon, Apr 24, 2017 at 06:34:14PM +0100 Will Deacon ha dit:
+> > On Mon, Apr 24, 2017 at 06:22:51PM +0100, Ard Biesheuvel wrote:
+> > > AIUI, Clang now always complains for missing register width modifiers,
+> > > not just for placeholders that resolve to a 32-bit (or smaller)
+> > > quantity.
+> > 
+> > Ok, in which case this patch is incomplete as there's a bunch of asm that
+> > isn't updated (e.g. spinlock.h).
+> 
+> Sorry, my grep pattern was a bit naive and didn't take multiline
+> inline assembly into account.
 
-When does the -EFAULT return happen? (if the guest points GITS_BASER<n>
-etc at invalid memory, presumably?) How does the QEMU migration code
-handle this case? Failing migration because the guest has done something
-silly doesn't seem too palatable, but trying to avoid that could be
-more effort than an obscure corner case really merits.
+Ah, right, so you were trying to fix everything but just missed stuff. Maybe
+it's best to grep for 'asm.*(' and filter out the false positives.
 
-thanks
--- PMM
+> If you are ok with adding modifiers everywhere I'll add the missing
+> bits, otherwise I'll rework the patch to only change the instances
+> where clang emits the warning.
+
+Fixing the issue everywhere is probably best. You might also need to look
+under drivers/.
+
+Will
