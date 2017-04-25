@@ -1,22 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvmtool PATCH v10 03/15] irq: move IRQ routing into irq.c
-Date: Tue, 25 Apr 2017 15:39:20 +0100
-Message-ID: <20170425143932.17235-4-andre.przywara@arm.com>
+Subject: [kvmtool PATCH v10 07/15] update public Linux headers for GICv3 ITS
+ emulation
+Date: Tue, 25 Apr 2017 15:39:24 +0100
+Message-ID: <20170425143932.17235-8-andre.przywara@arm.com>
 References: <20170425143932.17235-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBE5740C57
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D977A40CC6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8jZF3eyPcXBe for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Apr 2017 10:34:39 -0400 (EDT)
+ with ESMTP id 6Dz38IbTBtB9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Apr 2017 10:34:47 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A214840CB9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F7B540D88
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:45 -0400 (EDT)
 In-Reply-To: <20170425143932.17235-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,388 +32,334 @@ To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The current IRQ routing code in x86/irq.c is mostly implementing a
-generic KVM interface which other architectures may use too.
-Move the code to set up an MSI route into the generic irq.c file and
-guard it with the KVM_CAP_IRQ_ROUTING capability to return an error
-if the kernel does not support interrupt routing.
-This also removes the dummy implementations for all other
-architectures and only leaves the x86 specific code in x86/irq.c.
+The GICv3 ITS emulation brings some additions to the headers, so
+lets update kvmtool's version of the headers to Linux' v4.11-rc7-57.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- Makefile          |  4 +--
- arm/irq.c         |  9 ------
- hw/pci-shmem.c    |  2 ++
- include/kvm/irq.h |  5 ++++
- irq.c             | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- mips/irq.c        | 10 -------
- powerpc/irq.c     | 31 --------------------
- virtio/pci.c      | 21 +++++++++-----
- x86/irq.c         | 45 ++++------------------------
- 9 files changed, 114 insertions(+), 100 deletions(-)
- delete mode 100644 arm/irq.c
- delete mode 100644 mips/irq.c
- delete mode 100644 powerpc/irq.c
+ arm/aarch32/include/asm/kvm.h | 26 ++++++++++++++++++++--
+ arm/aarch64/include/asm/kvm.h | 15 +++++++++++++
+ include/linux/kvm.h           | 50 +++++++++++++++++++++++++++++++++++++++----
+ mips/include/asm/kvm.h        |  2 ++
+ powerpc/include/asm/kvm.h     | 27 +++++++++++++++++++++++
+ x86/include/asm/kvm.h         |  6 +++---
+ 6 files changed, 117 insertions(+), 9 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index eeb54a4..5771481 100644
---- a/Makefile
-+++ b/Makefile
-@@ -137,7 +137,6 @@ ifeq ($(ARCH), powerpc)
- 	DEFINES += -DCONFIG_PPC
- 	OBJS	+= powerpc/boot.o
- 	OBJS	+= powerpc/ioport.o
--	OBJS	+= powerpc/irq.o
- 	OBJS	+= powerpc/kvm.o
- 	OBJS	+= powerpc/cpu_info.o
- 	OBJS	+= powerpc/kvm-cpu.o
-@@ -152,7 +151,7 @@ ifeq ($(ARCH), powerpc)
- endif
+diff --git a/arm/aarch32/include/asm/kvm.h b/arm/aarch32/include/asm/kvm.h
+index df3f60c..6ebd3e6 100644
+--- a/arm/aarch32/include/asm/kvm.h
++++ b/arm/aarch32/include/asm/kvm.h
+@@ -84,6 +84,15 @@ struct kvm_regs {
+ #define KVM_VGIC_V2_DIST_SIZE		0x1000
+ #define KVM_VGIC_V2_CPU_SIZE		0x2000
  
- # ARM
--OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/ioport.o arm/irq.o \
-+OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/ioport.o \
- 			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o \
- 			   arm/pmu.o
- HDRS_ARM_COMMON		:= arm/include
-@@ -185,7 +184,6 @@ ifeq ($(ARCH),mips)
- 	ARCH_INCLUDE	:= mips/include
- 	OBJS		+= mips/kvm.o
- 	OBJS		+= mips/kvm-cpu.o
--	OBJS		+= mips/irq.o
- endif
- ###
++/* Supported VGICv3 address types  */
++#define KVM_VGIC_V3_ADDR_TYPE_DIST	2
++#define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
++#define KVM_VGIC_ITS_ADDR_TYPE		4
++
++#define KVM_VGIC_V3_DIST_SIZE		SZ_64K
++#define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
++#define KVM_VGIC_V3_ITS_SIZE		(2 * SZ_64K)
++
+ #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+ #define KVM_ARM_VCPU_PSCI_0_2		1 /* CPU uses PSCI v0.2 */
  
-diff --git a/arm/irq.c b/arm/irq.c
-deleted file mode 100644
-index d8f44df..0000000
---- a/arm/irq.c
-+++ /dev/null
-@@ -1,9 +0,0 @@
--#include "kvm/irq.h"
--#include "kvm/kvm.h"
--#include "kvm/util.h"
--
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
--{
--	die(__FUNCTION__);
--	return 0;
--}
-diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
-index a1c5ab7..7ce98cb 100644
---- a/hw/pci-shmem.c
-+++ b/hw/pci-shmem.c
-@@ -136,6 +136,8 @@ int pci_shmem__get_local_irqfd(struct kvm *kvm)
+@@ -139,8 +148,8 @@ struct kvm_arch_memory_slot {
+ #define ARM_CP15_REG64(...) __ARM_CP15_REG64(__VA_ARGS__)
  
- 		if (pci_shmem_pci_device.msix.ctrl & cpu_to_le16(PCI_MSIX_FLAGS_ENABLE)) {
- 			gsi = irq__add_msix_route(kvm, &msix_table[0].msg);
-+			if (gsi < 0)
-+				return gsi;
- 		} else {
- 			gsi = pci_shmem_pci_device.irq_line;
- 		}
-diff --git a/include/kvm/irq.h b/include/kvm/irq.h
-index 8a78e43..bb71521 100644
---- a/include/kvm/irq.h
-+++ b/include/kvm/irq.h
-@@ -10,11 +10,16 @@
+ #define KVM_REG_ARM_TIMER_CTL		ARM_CP15_REG32(0, 14, 3, 1)
+-#define KVM_REG_ARM_TIMER_CNT		ARM_CP15_REG64(1, 14) 
+-#define KVM_REG_ARM_TIMER_CVAL		ARM_CP15_REG64(3, 14) 
++#define KVM_REG_ARM_TIMER_CNT		ARM_CP15_REG64(1, 14)
++#define KVM_REG_ARM_TIMER_CVAL		ARM_CP15_REG64(3, 14)
  
- struct kvm;
+ /* Normal registers are mapped as coprocessor 16. */
+ #define KVM_REG_ARM_CORE		(0x0010 << KVM_REG_ARM_COPROC_SHIFT)
+@@ -172,10 +181,23 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_REGS	2
+ #define   KVM_DEV_ARM_VGIC_CPUID_SHIFT	32
+ #define   KVM_DEV_ARM_VGIC_CPUID_MASK	(0xffULL << KVM_DEV_ARM_VGIC_CPUID_SHIFT)
++#define   KVM_DEV_ARM_VGIC_V3_MPIDR_SHIFT 32
++#define   KVM_DEV_ARM_VGIC_V3_MPIDR_MASK \
++			(0xffffffffULL << KVM_DEV_ARM_VGIC_V3_MPIDR_SHIFT)
+ #define   KVM_DEV_ARM_VGIC_OFFSET_SHIFT	0
+ #define   KVM_DEV_ARM_VGIC_OFFSET_MASK	(0xffffffffULL << KVM_DEV_ARM_VGIC_OFFSET_SHIFT)
++#define   KVM_DEV_ARM_VGIC_SYSREG_INSTR_MASK (0xffff)
+ #define KVM_DEV_ARM_VGIC_GRP_NR_IRQS	3
+ #define KVM_DEV_ARM_VGIC_GRP_CTRL       4
++#define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
++#define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
++#define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
++#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
++#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
++			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
++#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK 0x3ff
++#define VGIC_LEVEL_INFO_LINE_LEVEL	0
++
+ #define   KVM_DEV_ARM_VGIC_CTRL_INIT    0
  
-+extern struct kvm_irq_routing *irq_routing;
-+extern int next_gsi;
-+
- int irq__alloc_line(void);
- int irq__get_nr_allocated_lines(void);
+ /* KVM_IRQ_LINE irq field index values */
+diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
+index f209ea1..c286035 100644
+--- a/arm/aarch64/include/asm/kvm.h
++++ b/arm/aarch64/include/asm/kvm.h
+@@ -87,9 +87,11 @@ struct kvm_regs {
+ /* Supported VGICv3 address types  */
+ #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+ #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
++#define KVM_VGIC_ITS_ADDR_TYPE		4
  
- int irq__init(struct kvm *kvm);
- int irq__exit(struct kvm *kvm);
-+
-+int irq__allocate_routing_entry(void);
- int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
+ #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+ #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
++#define KVM_VGIC_V3_ITS_SIZE		(2 * SZ_64K)
  
- #endif
-diff --git a/irq.c b/irq.c
-index 71eaa05..a742aa2 100644
---- a/irq.c
-+++ b/irq.c
-@@ -1,7 +1,19 @@
-+#include <stdlib.h>
-+#include <sys/ioctl.h>
-+#include <linux/types.h>
-+#include <linux/kvm.h>
-+#include <errno.h>
+ #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+ #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+@@ -199,10 +201,23 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_REGS	2
+ #define   KVM_DEV_ARM_VGIC_CPUID_SHIFT	32
+ #define   KVM_DEV_ARM_VGIC_CPUID_MASK	(0xffULL << KVM_DEV_ARM_VGIC_CPUID_SHIFT)
++#define   KVM_DEV_ARM_VGIC_V3_MPIDR_SHIFT 32
++#define   KVM_DEV_ARM_VGIC_V3_MPIDR_MASK \
++			(0xffffffffULL << KVM_DEV_ARM_VGIC_V3_MPIDR_SHIFT)
+ #define   KVM_DEV_ARM_VGIC_OFFSET_SHIFT	0
+ #define   KVM_DEV_ARM_VGIC_OFFSET_MASK	(0xffffffffULL << KVM_DEV_ARM_VGIC_OFFSET_SHIFT)
++#define   KVM_DEV_ARM_VGIC_SYSREG_INSTR_MASK (0xffff)
+ #define KVM_DEV_ARM_VGIC_GRP_NR_IRQS	3
+ #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
++#define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
++#define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
++#define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
++#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
++#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
++			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
++#define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK	0x3ff
++#define VGIC_LEVEL_INFO_LINE_LEVEL	0
 +
-+#include "kvm/kvm.h"
- #include "kvm/irq.h"
- #include "kvm/kvm-arch.h"
+ #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
  
- static u8 next_line = KVM_IRQ_OFFSET;
-+static int allocated_gsis = 0;
-+
-+int next_gsi;
-+
-+struct kvm_irq_routing *irq_routing = NULL;
+ /* Device Control API on vcpu fd */
+diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+index a7f1f80..f51d508 100644
+--- a/include/linux/kvm.h
++++ b/include/linux/kvm.h
+@@ -218,7 +218,8 @@ struct kvm_hyperv_exit {
+ struct kvm_run {
+ 	/* in */
+ 	__u8 request_interrupt_window;
+-	__u8 padding1[7];
++	__u8 immediate_exit;
++	__u8 padding1[6];
  
- int irq__alloc_line(void)
- {
-@@ -12,3 +24,78 @@ int irq__get_nr_allocated_lines(void)
- {
- 	return next_line - KVM_IRQ_OFFSET;
- }
-+
-+int irq__allocate_routing_entry(void)
-+{
-+	size_t table_size = sizeof(struct kvm_irq_routing);
-+	size_t old_size = table_size;
-+	int nr_entries = 0;
-+
-+	if (irq_routing)
-+		nr_entries = irq_routing->nr;
-+
-+	if (nr_entries < allocated_gsis)
-+		return 0;
-+
-+	old_size += sizeof(struct kvm_irq_routing_entry) * allocated_gsis;
-+	allocated_gsis = ALIGN(nr_entries + 1, 32);
-+	table_size += sizeof(struct kvm_irq_routing_entry) * allocated_gsis;
-+	irq_routing = realloc(irq_routing, table_size);
-+
-+	if (irq_routing == NULL)
-+		return -ENOMEM;
-+	memset((void *)irq_routing + old_size, 0, table_size - old_size);
-+
-+	irq_routing->nr = nr_entries;
-+	irq_routing->flags = 0;
-+
-+	return 0;
-+}
-+
-+static bool check_for_irq_routing(struct kvm *kvm)
-+{
-+	static int has_irq_routing = 0;
-+
-+	if (has_irq_routing == 0) {
-+		if (kvm__supports_extension(kvm, KVM_CAP_IRQ_ROUTING))
-+			has_irq_routing = 1;
-+		else
-+			has_irq_routing = -1;
-+	}
-+
-+	return has_irq_routing > 0;
-+}
-+
-+int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
-+{
-+	int r;
-+
-+	if (!check_for_irq_routing(kvm))
-+		return -ENXIO;
-+
-+	r = irq__allocate_routing_entry();
-+	if (r)
-+		return r;
-+
-+	irq_routing->entries[irq_routing->nr++] =
-+		(struct kvm_irq_routing_entry) {
-+			.gsi = next_gsi,
-+			.type = KVM_IRQ_ROUTING_MSI,
-+			.u.msi.address_hi = msg->address_hi,
-+			.u.msi.address_lo = msg->address_lo,
-+			.u.msi.data = msg->data,
-+		};
-+
-+	r = ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
-+	if (r)
-+		return r;
-+
-+	return next_gsi++;
-+}
-+
-+int __attribute__((weak)) irq__exit(struct kvm *kvm)
-+{
-+	free(irq_routing);
-+	return 0;
-+}
-+dev_base_exit(irq__exit);
-diff --git a/mips/irq.c b/mips/irq.c
-deleted file mode 100644
-index c1ff6bb..0000000
---- a/mips/irq.c
-+++ /dev/null
-@@ -1,10 +0,0 @@
--#include "kvm/irq.h"
--#include "kvm/kvm.h"
--
--#include <stdlib.h>
--
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
--{
--	pr_warning("irq__add_msix_route");
--	return 1;
--}
-diff --git a/powerpc/irq.c b/powerpc/irq.c
-deleted file mode 100644
-index 03f2fe7..0000000
---- a/powerpc/irq.c
-+++ /dev/null
-@@ -1,31 +0,0 @@
--/*
-- * PPC64 IRQ routines
-- *
-- * Copyright 2011 Matt Evans <matt@ozlabs.org>, IBM Corporation.
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms of the GNU General Public License version 2 as published
-- * by the Free Software Foundation.
-- */
--
--#include "kvm/devices.h"
--#include "kvm/irq.h"
--#include "kvm/kvm.h"
--#include "kvm/util.h"
--
--#include <linux/types.h>
--#include <linux/rbtree.h>
--#include <linux/list.h>
--#include <linux/kvm.h>
--#include <sys/ioctl.h>
--
--#include <stddef.h>
--#include <stdlib.h>
--
--#include "kvm/pci.h"
--
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
--{
--	die(__FUNCTION__);
--	return 0;
--}
-diff --git a/virtio/pci.c b/virtio/pci.c
-index 90fcd64..072e5b7 100644
---- a/virtio/pci.c
-+++ b/virtio/pci.c
-@@ -156,7 +156,8 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
- 					void *data, int size, int offset)
- {
- 	struct virtio_pci *vpci = vdev->virtio;
--	u32 config_offset, gsi, vec;
-+	u32 config_offset, vec;
-+	int gsi;
- 	int type = virtio__get_dev_specific_field(offset - 20, virtio_pci__msix_enabled(vpci),
- 							&config_offset);
- 	if (type == VIRTIO_PCI_O_MSIX) {
-@@ -166,21 +167,27 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
- 			if (vec == VIRTIO_MSI_NO_VECTOR)
- 				break;
+ 	/* out */
+ 	__u32 exit_reason;
+@@ -651,6 +652,9 @@ struct kvm_enable_cap {
+ };
  
--			gsi = irq__add_msix_route(kvm, &vpci->msix_table[vec].msg);
--
--			vpci->config_gsi = gsi;
-+			gsi = irq__add_msix_route(kvm,
-+						  &vpci->msix_table[vec].msg);
-+			if (gsi >= 0)
-+				vpci->config_gsi = gsi;
- 			break;
- 		case VIRTIO_MSI_QUEUE_VECTOR:
--			vec = vpci->vq_vector[vpci->queue_selector] = ioport__read16(data);
-+			vec = ioport__read16(data);
-+			vpci->vq_vector[vpci->queue_selector] = vec;
+ /* for KVM_PPC_GET_PVINFO */
++
++#define KVM_PPC_PVINFO_FLAGS_EV_IDLE   (1<<0)
++
+ struct kvm_ppc_pvinfo {
+ 	/* out */
+ 	__u32 flags;
+@@ -682,7 +686,12 @@ struct kvm_ppc_smmu_info {
+ 	struct kvm_ppc_one_seg_page_size sps[KVM_PPC_PAGE_SIZES_MAX_SZ];
+ };
  
- 			if (vec == VIRTIO_MSI_NO_VECTOR)
- 				break;
+-#define KVM_PPC_PVINFO_FLAGS_EV_IDLE   (1<<0)
++/* for KVM_PPC_RESIZE_HPT_{PREPARE,COMMIT} */
++struct kvm_ppc_resize_hpt {
++	__u64 flags;
++	__u32 shift;
++	__u32 pad;
++};
  
--			gsi = irq__add_msix_route(kvm, &vpci->msix_table[vec].msg);
-+			gsi = irq__add_msix_route(kvm,
-+						  &vpci->msix_table[vec].msg);
-+			if (gsi < 0)
-+				break;
- 			vpci->gsis[vpci->queue_selector] = gsi;
- 			if (vdev->ops->notify_vq_gsi)
- 				vdev->ops->notify_vq_gsi(kvm, vpci->dev,
--							vpci->queue_selector, gsi);
-+							 vpci->queue_selector,
-+							 gsi);
- 			break;
- 		};
+ #define KVMIO 0xAE
  
-diff --git a/x86/irq.c b/x86/irq.c
-index 72177e7..db465a1 100644
---- a/x86/irq.c
-+++ b/x86/irq.c
-@@ -11,20 +11,15 @@
- #include <stddef.h>
- #include <stdlib.h>
+@@ -865,6 +874,15 @@ struct kvm_ppc_smmu_info {
+ #define KVM_CAP_SPAPR_TCE_64 125
+ #define KVM_CAP_ARM_PMU_V3 126
+ #define KVM_CAP_VCPU_ATTRIBUTES 127
++#define KVM_CAP_MAX_VCPU_ID 128
++#define KVM_CAP_X2APIC_API 129
++#define KVM_CAP_S390_USER_INSTR0 130
++#define KVM_CAP_MSI_DEVID 131
++#define KVM_CAP_PPC_HTM 132
++#define KVM_CAP_SPAPR_RESIZE_HPT 133
++#define KVM_CAP_PPC_MMU_RADIX 134
++#define KVM_CAP_PPC_MMU_HASH_V3 135
++#define KVM_CAP_IMMEDIATE_EXIT 136
  
--#define IRQ_MAX_GSI			64
- #define IRQCHIP_MASTER			0
- #define IRQCHIP_SLAVE			1
- #define IRQCHIP_IOAPIC			2
+ #ifdef KVM_CAP_IRQ_ROUTING
  
--/* First 24 GSIs are routed between IRQCHIPs and IOAPICs */
--static u32 gsi = 24;
--
--struct kvm_irq_routing *irq_routing;
--
- static int irq__add_routing(u32 gsi, u32 type, u32 irqchip, u32 pin)
- {
--	if (gsi >= IRQ_MAX_GSI)
--		return -ENOSPC;
-+	int r = irq__allocate_routing_entry();
-+	if (r)
-+		return r;
+@@ -877,7 +895,10 @@ struct kvm_irq_routing_msi {
+ 	__u32 address_lo;
+ 	__u32 address_hi;
+ 	__u32 data;
+-	__u32 pad;
++	union {
++		__u32 pad;
++		__u32 devid;
++	};
+ };
  
- 	irq_routing->entries[irq_routing->nr++] =
- 		(struct kvm_irq_routing_entry) {
-@@ -41,11 +36,6 @@ int irq__init(struct kvm *kvm)
- {
- 	int i, r;
+ struct kvm_irq_routing_s390_adapter {
+@@ -964,12 +985,19 @@ struct kvm_irqfd {
+ 	__u8  pad[16];
+ };
  
--	irq_routing = calloc(sizeof(struct kvm_irq_routing) +
--			IRQ_MAX_GSI * sizeof(struct kvm_irq_routing_entry), 1);
--	if (irq_routing == NULL)
--		return -ENOMEM;
--
- 	/* Hook first 8 GSIs to master IRQCHIP */
- 	for (i = 0; i < 8; i++)
- 		if (i != 2)
-@@ -69,33 +59,8 @@ int irq__init(struct kvm *kvm)
- 		return errno;
- 	}
++/* For KVM_CAP_ADJUST_CLOCK */
++
++/* Do not use 1, KVM_CHECK_EXTENSION returned it before we had flags.  */
++#define KVM_CLOCK_TSC_STABLE		2
++
+ struct kvm_clock_data {
+ 	__u64 clock;
+ 	__u32 flags;
+ 	__u32 pad[9];
+ };
  
--	return 0;
--}
--dev_base_init(irq__init);
-+	next_gsi = i;
++/* For KVM_CAP_SW_TLB */
++
+ #define KVM_MMU_FSL_BOOKE_NOHV		0
+ #define KVM_MMU_FSL_BOOKE_HV		1
  
--int irq__exit(struct kvm *kvm)
--{
--	free(irq_routing);
- 	return 0;
- }
--dev_base_exit(irq__exit);
--
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
--{
--	int r;
--
--	irq_routing->entries[irq_routing->nr++] =
--		(struct kvm_irq_routing_entry) {
--			.gsi = gsi,
--			.type = KVM_IRQ_ROUTING_MSI,
--			.u.msi.address_hi = msg->address_hi,
--			.u.msi.address_lo = msg->address_lo,
--			.u.msi.data = msg->data,
--		};
--
--	r = ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
--	if (r)
--		return r;
--
--	return gsi++;
--}
-+dev_base_init(irq__init);
+@@ -1023,12 +1051,14 @@ struct kvm_one_reg {
+ 	__u64 addr;
+ };
+ 
++#define KVM_MSI_VALID_DEVID	(1U << 0)
+ struct kvm_msi {
+ 	__u32 address_lo;
+ 	__u32 address_hi;
+ 	__u32 data;
+ 	__u32 flags;
+-	__u8  pad[16];
++	__u32 devid;
++	__u8  pad[12];
+ };
+ 
+ struct kvm_arm_device_addr {
+@@ -1073,6 +1103,8 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_FLIC		KVM_DEV_TYPE_FLIC
+ 	KVM_DEV_TYPE_ARM_VGIC_V3,
+ #define KVM_DEV_TYPE_ARM_VGIC_V3	KVM_DEV_TYPE_ARM_VGIC_V3
++	KVM_DEV_TYPE_ARM_VGIC_ITS,
++#define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
+ 	KVM_DEV_TYPE_MAX,
+ };
+ 
+@@ -1167,6 +1199,13 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_ARM_SET_DEVICE_ADDR	  _IOW(KVMIO,  0xab, struct kvm_arm_device_addr)
+ /* Available with KVM_CAP_PPC_RTAS */
+ #define KVM_PPC_RTAS_DEFINE_TOKEN _IOW(KVMIO,  0xac, struct kvm_rtas_token_args)
++/* Available with KVM_CAP_SPAPR_RESIZE_HPT */
++#define KVM_PPC_RESIZE_HPT_PREPARE _IOR(KVMIO, 0xad, struct kvm_ppc_resize_hpt)
++#define KVM_PPC_RESIZE_HPT_COMMIT  _IOR(KVMIO, 0xae, struct kvm_ppc_resize_hpt)
++/* Available with KVM_CAP_PPC_RADIX_MMU or KVM_CAP_PPC_HASH_MMU_V3 */
++#define KVM_PPC_CONFIGURE_V3_MMU  _IOW(KVMIO,  0xaf, struct kvm_ppc_mmuv3_cfg)
++/* Available with KVM_CAP_PPC_RADIX_MMU */
++#define KVM_PPC_GET_RMMU_INFO	  _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
+ 
+ /* ioctl for vm fd */
+ #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+@@ -1312,4 +1351,7 @@ struct kvm_assigned_msix_entry {
+ 	__u16 padding[3];
+ };
+ 
++#define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
++#define KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK  (1ULL << 1)
++
+ #endif /* __LINUX_KVM_H */
+diff --git a/mips/include/asm/kvm.h b/mips/include/asm/kvm.h
+index 6985eb5..a8a0199 100644
+--- a/mips/include/asm/kvm.h
++++ b/mips/include/asm/kvm.h
+@@ -19,6 +19,8 @@
+  * Some parts derived from the x86 version of this file.
+  */
+ 
++#define __KVM_HAVE_READONLY_MEM
++
+ /*
+  * for KVM_GET_REGS and KVM_SET_REGS
+  *
+diff --git a/powerpc/include/asm/kvm.h b/powerpc/include/asm/kvm.h
+index c93cf35..4edbe4b 100644
+--- a/powerpc/include/asm/kvm.h
++++ b/powerpc/include/asm/kvm.h
+@@ -413,6 +413,26 @@ struct kvm_get_htab_header {
+ 	__u16	n_invalid;
+ };
+ 
++/* For KVM_PPC_CONFIGURE_V3_MMU */
++struct kvm_ppc_mmuv3_cfg {
++	__u64	flags;
++	__u64	process_table;	/* second doubleword of partition table entry */
++};
++
++/* Flag values for KVM_PPC_CONFIGURE_V3_MMU */
++#define KVM_PPC_MMUV3_RADIX	1	/* 1 = radix mode, 0 = HPT */
++#define KVM_PPC_MMUV3_GTSE	2	/* global translation shootdown enb. */
++
++/* For KVM_PPC_GET_RMMU_INFO */
++struct kvm_ppc_rmmu_info {
++	struct kvm_ppc_radix_geom {
++		__u8	page_shift;
++		__u8	level_bits[4];
++		__u8	pad[3];
++	}	geometries[8];
++	__u32	ap_encodings[8];
++};
++
+ /* Per-vcpu XICS interrupt controller state */
+ #define KVM_REG_PPC_ICP_STATE	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x8c)
+ 
+@@ -573,6 +593,10 @@ struct kvm_get_htab_header {
+ #define KVM_REG_PPC_SPRG9	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xba)
+ #define KVM_REG_PPC_DBSR	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbb)
+ 
++/* POWER9 registers */
++#define KVM_REG_PPC_TIDR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbc)
++#define KVM_REG_PPC_PSSCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbd)
++
+ /* Transactional Memory checkpointed state:
+  * This is all GPRs, all VSX regs and a subset of SPRs
+  */
+@@ -596,6 +620,7 @@ struct kvm_get_htab_header {
+ #define KVM_REG_PPC_TM_VSCR	(KVM_REG_PPC_TM | KVM_REG_SIZE_U32 | 0x67)
+ #define KVM_REG_PPC_TM_DSCR	(KVM_REG_PPC_TM | KVM_REG_SIZE_U64 | 0x68)
+ #define KVM_REG_PPC_TM_TAR	(KVM_REG_PPC_TM | KVM_REG_SIZE_U64 | 0x69)
++#define KVM_REG_PPC_TM_XER	(KVM_REG_PPC_TM | KVM_REG_SIZE_U64 | 0x6a)
+ 
+ /* PPC64 eXternal Interrupt Controller Specification */
+ #define KVM_DEV_XICS_GRP_SOURCES	1	/* 64-bit source attributes */
+@@ -608,5 +633,7 @@ struct kvm_get_htab_header {
+ #define  KVM_XICS_LEVEL_SENSITIVE	(1ULL << 40)
+ #define  KVM_XICS_MASKED		(1ULL << 41)
+ #define  KVM_XICS_PENDING		(1ULL << 42)
++#define  KVM_XICS_PRESENTED		(1ULL << 43)
++#define  KVM_XICS_QUEUED		(1ULL << 44)
+ 
+ #endif /* __LINUX_KVM_POWERPC_H */
+diff --git a/x86/include/asm/kvm.h b/x86/include/asm/kvm.h
+index cd54147..739c0c5 100644
+--- a/x86/include/asm/kvm.h
++++ b/x86/include/asm/kvm.h
+@@ -216,9 +216,9 @@ struct kvm_cpuid_entry2 {
+ 	__u32 padding[3];
+ };
+ 
+-#define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		BIT(0)
+-#define KVM_CPUID_FLAG_STATEFUL_FUNC		BIT(1)
+-#define KVM_CPUID_FLAG_STATE_READ_NEXT		BIT(2)
++#define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		(1 << 0)
++#define KVM_CPUID_FLAG_STATEFUL_FUNC		(1 << 1)
++#define KVM_CPUID_FLAG_STATE_READ_NEXT		(1 << 2)
+ 
+ /* for KVM_SET_CPUID2 */
+ struct kvm_cpuid2 {
 -- 
 2.9.0
