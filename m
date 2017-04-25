@@ -1,23 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvmtool PATCH v10 06/15] PCI: Only allocate IRQ routing entry when
- available
-Date: Tue, 25 Apr 2017 15:39:23 +0100
-Message-ID: <20170425143932.17235-7-andre.przywara@arm.com>
+Subject: [kvmtool PATCH v10 15/15] arm64: enable GICv3-ITS emulation
+Date: Tue, 25 Apr 2017 15:39:32 +0100
+Message-ID: <20170425143932.17235-16-andre.przywara@arm.com>
 References: <20170425143932.17235-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FE8A40DB8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 81DF040DAF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:35:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O9oElDenCBGy for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Apr 2017 10:34:47 -0400 (EDT)
+ with ESMTP id vGN9puBz8mLB for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Apr 2017 10:34:59 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E9E040CC6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92D5540F7A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:57 -0400 (EDT)
 In-Reply-To: <20170425143932.17235-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,66 +31,43 @@ To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If we need to inject an MSI into the guest, we rely at the moment on a
-working GSI MSI routing functionality. However we can get away without
-IRQ routing, if the host supports MSI injection via the KVM_SIGNAL_MSI
-ioctl.
-So we try the GSI routing first, but if that fails due to a missing
-IRQ routing functionality, we fall back to KVM_SIGNAL_MSI (if that is
-supported).
+With everything in place for the ITS emulation add a new option to the
+--irqchip parameter to allow the user to specify --irqchip=gicv3-its
+to enable the ITS emulation.
+This will trigger creating the FDT node and an ITS register frame to
+tell the kernel we want ITS emulation in the guest.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- virtio/pci.c | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
+ arm/gic.c                                | 2 ++
+ arm/include/arm-common/kvm-config-arch.h | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/virtio/pci.c b/virtio/pci.c
-index e9f36c7..04176c1 100644
---- a/virtio/pci.c
-+++ b/virtio/pci.c
-@@ -193,8 +193,20 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
+diff --git a/arm/gic.c b/arm/gic.c
+index d9c3175..9de6a9c 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -26,6 +26,8 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
+ 		*type = IRQCHIP_GICV2;
+ 	} else if (!strcmp(arg, "gicv3")) {
+ 		*type = IRQCHIP_GICV3;
++	} else if (!strcmp(arg, "gicv3-its")) {
++		*type = IRQCHIP_GICV3_ITS;
+ 	} else {
+ 		pr_err("irqchip: unknown type \"%s\"\n", arg);
+ 		return -1;
+diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
+index ed626b5..b48e720 100644
+--- a/arm/include/arm-common/kvm-config-arch.h
++++ b/arm/include/arm-common/kvm-config-arch.h
+@@ -27,7 +27,7 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset);
+ 		    "Force virtio devices to use PCI as their default "		\
+ 		    "transport"),						\
+         OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
+-		     "[gicv2|gicv3]",					\
++		     "[gicv2|gicv3|gicv3-its]",					\
+ 		     "Type of interrupt controller to emulate in the guest",	\
+ 		     irqchip_parser, NULL),
  
- 			gsi = irq__add_msix_route(kvm,
- 						  &vpci->msix_table[vec].msg);
--			if (gsi >= 0)
--				vpci->config_gsi = gsi;
-+			/*
-+			 * We don't need IRQ routing if we can use
-+			 * MSI injection via the KVM_SIGNAL_MSI ioctl.
-+			 */
-+			if (gsi == -ENXIO &&
-+			    vpci->features & VIRTIO_PCI_F_SIGNAL_MSI)
-+				break;
-+
-+			if (gsi < 0) {
-+				die("failed to configure MSIs");
-+				break;
-+			}
-+
-+			vpci->config_gsi = gsi;
- 			break;
- 		case VIRTIO_MSI_QUEUE_VECTOR:
- 			vec = ioport__read16(data);
-@@ -205,8 +217,19 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
- 
- 			gsi = irq__add_msix_route(kvm,
- 						  &vpci->msix_table[vec].msg);
--			if (gsi < 0)
-+			/*
-+			 * We don't need IRQ routing if we can use
-+			 * MSI injection via the KVM_SIGNAL_MSI ioctl.
-+			 */
-+			if (gsi == -ENXIO &&
-+			    vpci->features & VIRTIO_PCI_F_SIGNAL_MSI)
- 				break;
-+
-+			if (gsi < 0) {
-+				die("failed to configure MSIs");
-+				break;
-+			}
-+
- 			vpci->gsis[vpci->queue_selector] = gsi;
- 			if (vdev->ops->notify_vq_gsi)
- 				vdev->ops->notify_vq_gsi(kvm, vpci->dev,
 -- 
 2.9.0
