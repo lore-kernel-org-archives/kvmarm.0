@@ -1,23 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvmtool PATCH v10 09/15] arm: allow creation of an MSI register
- frame region
-Date: Tue, 25 Apr 2017 15:39:26 +0100
-Message-ID: <20170425143932.17235-10-andre.przywara@arm.com>
+Subject: [kvmtool PATCH v10 10/15] arm: FDT: create MSI controller DT node
+Date: Tue, 25 Apr 2017 15:39:27 +0100
+Message-ID: <20170425143932.17235-11-andre.przywara@arm.com>
 References: <20170425143932.17235-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 28BC840CA2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D0D2540EFD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NhuRdrFV7Gk2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Apr 2017 10:34:48 -0400 (EDT)
+ with ESMTP id Bl9CJ-qS4QUW for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Apr 2017 10:34:53 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26C4F40D8E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DC4E40DA6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:50 -0400 (EDT)
 In-Reply-To: <20170425143932.17235-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,147 +31,107 @@ To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICv3 ITS expects a separate 64K page to hold ITS registers.
-Add a function to reserve such a page in the guest's I/O memory and
-use that for the ITS vGIC type.
-To cover the 64K page with the MSI doorbell (which directly follows the
-page with the register frames), we reserve this as well, although
-the guest is never expected to write into this.
+The ARM GICv3 ITS requires a separate device tree node to describe
+the ITS. Add this as a child to the GIC interrupt controller node
+to let a guest discover and use the ITS if the user requests it.
+Since we now need to specify #address-cells for the GIC node, we
+have to add two zeroes to the interrupt map to match that.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/gic.c                    | 64 ++++++++++++++++++++++++++++++++++++++++++++
- arm/include/arm-common/gic.h |  1 +
- 2 files changed, 65 insertions(+)
+ arm/gic.c                         | 22 +++++++++++++++++++++-
+ arm/include/arm-common/fdt-arch.h |  2 +-
+ arm/pci.c                         |  5 +++++
+ 3 files changed, 27 insertions(+), 2 deletions(-)
 
 diff --git a/arm/gic.c b/arm/gic.c
-index 8479b89..95e26a9 100644
+index 95e26a9..056fd09 100644
 --- a/arm/gic.c
 +++ b/arm/gic.c
-@@ -8,10 +8,13 @@
- #include <linux/byteorder.h>
- #include <linux/kernel.h>
- #include <linux/kvm.h>
-+#include <linux/sizes.h>
+@@ -251,7 +251,8 @@ late_init(gic__init_gic)
  
- static int gic_fd = -1;
- static u64 gic_redists_base;
- static u64 gic_redists_size;
-+static u64 gic_msi_base;
-+static u64 gic_msi_size = 0;
- 
- int irqchip_parser(const struct option *opt, const char *arg, int unset)
+ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
  {
-@@ -29,6 +32,56 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
- 	return 0;
+-	const char *compatible;
++	const char *compatible, *msi_compatible = NULL;
++	u64 msi_prop[2];
+ 	u64 reg_prop[] = {
+ 		cpu_to_fdt64(ARM_GIC_DIST_BASE), cpu_to_fdt64(ARM_GIC_DIST_SIZE),
+ 		0, 0,				/* to be filled */
+@@ -263,6 +264,9 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
+ 		reg_prop[2] = cpu_to_fdt64(ARM_GIC_CPUI_BASE);
+ 		reg_prop[3] = cpu_to_fdt64(ARM_GIC_CPUI_SIZE);
+ 		break;
++	case IRQCHIP_GICV3_ITS:
++		msi_compatible = "arm,gic-v3-its";
++		/* fall-through */
+ 	case IRQCHIP_GICV3:
+ 		compatible = "arm,gic-v3";
+ 		reg_prop[2] = cpu_to_fdt64(gic_redists_base);
+@@ -278,6 +282,22 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
+ 	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
+ 	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
+ 	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_GIC));
++	_FDT(fdt_property_cell(fdt, "#address-cells", 2));
++	_FDT(fdt_property_cell(fdt, "#size-cells", 2));
++
++	if (msi_compatible) {
++		_FDT(fdt_property(fdt, "ranges", NULL, 0));
++
++		_FDT(fdt_begin_node(fdt, "msic"));
++		_FDT(fdt_property_string(fdt, "compatible", msi_compatible));
++		_FDT(fdt_property(fdt, "msi-controller", NULL, 0));
++		_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_MSI));
++		msi_prop[0] = cpu_to_fdt64(gic_msi_base);
++		msi_prop[1] = cpu_to_fdt64(gic_msi_size);
++		_FDT(fdt_property(fdt, "reg", msi_prop, sizeof(msi_prop)));
++		_FDT(fdt_end_node(fdt));
++	}
++
+ 	_FDT(fdt_end_node(fdt));
  }
  
-+static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr)
-+{
-+	struct kvm_create_device its_device = {
-+		.type = KVM_DEV_TYPE_ARM_VGIC_ITS,
-+		.flags	= 0,
-+	};
-+	struct kvm_device_attr its_attr = {
-+		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
-+		.attr	= KVM_VGIC_ITS_ADDR_TYPE,
-+		.addr	= (u64)(unsigned long)&its_frame_addr,
-+	};
-+	struct kvm_device_attr its_init_attr = {
-+		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
-+		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
-+	};
-+	int err;
-+
-+	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &its_device);
-+	if (err) {
-+		fprintf(stderr,
-+			"GICv3 ITS requested, but kernel does not support it.\n");
-+		fprintf(stderr, "Try --irqchip=gicv3 instead\n");
-+		return err;
-+	}
-+
-+	err = ioctl(its_device.fd, KVM_HAS_DEVICE_ATTR, &its_attr);
-+	if (err) {
-+		close(its_device.fd);
-+		its_device.fd = -1;
-+		return err;
-+	}
-+
-+	err = ioctl(its_device.fd, KVM_SET_DEVICE_ATTR, &its_attr);
-+	if (err)
-+		return err;
-+
-+	return ioctl(its_device.fd, KVM_SET_DEVICE_ATTR, &its_init_attr);
-+}
-+
-+static int gic__create_msi_frame(struct kvm *kvm, enum irqchip_type type,
-+				 u64 msi_frame_addr)
-+{
-+	switch (type) {
-+	case IRQCHIP_GICV3_ITS:
-+		return gic__create_its_frame(kvm, msi_frame_addr);
-+	default:	/* No MSI frame needed */
-+		return 0;
-+	}
-+}
-+
- static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- {
- 	int err;
-@@ -58,6 +111,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- 		dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
- 		break;
- 	case IRQCHIP_GICV3:
-+	case IRQCHIP_GICV3_ITS:
- 		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
- 		dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
- 		break;
-@@ -73,6 +127,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- 	case IRQCHIP_GICV2:
- 		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
- 		break;
-+	case IRQCHIP_GICV3_ITS:
- 	case IRQCHIP_GICV3:
- 		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
- 		break;
-@@ -84,6 +139,10 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- 	if (err)
- 		goto out_err;
+diff --git a/arm/include/arm-common/fdt-arch.h b/arm/include/arm-common/fdt-arch.h
+index 53ba633..60c2d40 100644
+--- a/arm/include/arm-common/fdt-arch.h
++++ b/arm/include/arm-common/fdt-arch.h
+@@ -1,6 +1,6 @@
+ #ifndef ARM__FDT_H
+ #define ARM__FDT_H
  
-+	err = gic__create_msi_frame(kvm, type, gic_msi_base);
-+	if (err)
-+		goto out_err;
-+
- 	return 0;
+-enum phandles {PHANDLE_RESERVED = 0, PHANDLE_GIC, PHANDLES_MAX};
++enum phandles {PHANDLE_RESERVED = 0, PHANDLE_GIC, PHANDLE_MSI, PHANDLES_MAX};
  
- out_err:
-@@ -127,9 +186,14 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
- 	switch (type) {
- 	case IRQCHIP_GICV2:
- 		break;
-+	case IRQCHIP_GICV3_ITS:
-+		/* We reserve the 64K page with the doorbell as well. */
-+		gic_msi_size = KVM_VGIC_V3_ITS_SIZE + SZ_64K;
-+		/* fall through */
- 	case IRQCHIP_GICV3:
- 		gic_redists_size = kvm->cfg.nrcpus * ARM_GIC_REDIST_SIZE;
- 		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
-+		gic_msi_base = gic_redists_base - gic_msi_size;
- 		break;
- 	default:
- 		return -ENODEV;
-diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
-index b43a180..433dd23 100644
---- a/arm/include/arm-common/gic.h
-+++ b/arm/include/arm-common/gic.h
-@@ -24,6 +24,7 @@
- enum irqchip_type {
- 	IRQCHIP_GICV2,
- 	IRQCHIP_GICV3,
-+	IRQCHIP_GICV3_ITS,
- };
+ #endif /* ARM__FDT_H */
+diff --git a/arm/pci.c b/arm/pci.c
+index d393c46..813df26 100644
+--- a/arm/pci.c
++++ b/arm/pci.c
+@@ -18,6 +18,8 @@ struct of_gic_irq {
+ struct of_interrupt_map_entry {
+ 	struct of_pci_irq_mask		pci_irq_mask;
+ 	u32				gic_phandle;
++	u32				gic_addr_hi;
++	u32				gic_addr_lo;
+ 	struct of_gic_irq		gic_irq;
+ } __attribute__((packed));
  
- struct kvm;
+@@ -65,6 +67,7 @@ void pci__generate_fdt_nodes(void *fdt)
+ 	_FDT(fdt_property(fdt, "bus-range", bus_range, sizeof(bus_range)));
+ 	_FDT(fdt_property(fdt, "reg", &cfg_reg_prop, sizeof(cfg_reg_prop)));
+ 	_FDT(fdt_property(fdt, "ranges", ranges, sizeof(ranges)));
++	_FDT(fdt_property_cell(fdt, "msi-parent", PHANDLE_MSI));
+ 
+ 	/* Generate the interrupt map ... */
+ 	dev_hdr = device__first_dev(DEVICE_BUS_PCI);
+@@ -85,6 +88,8 @@ void pci__generate_fdt_nodes(void *fdt)
+ 				.pci_pin	= cpu_to_fdt32(pin),
+ 			},
+ 			.gic_phandle	= cpu_to_fdt32(PHANDLE_GIC),
++			.gic_addr_hi	= 0,
++			.gic_addr_lo	= 0,
+ 			.gic_irq = {
+ 				.type	= cpu_to_fdt32(GIC_FDT_IRQ_TYPE_SPI),
+ 				.num	= cpu_to_fdt32(irq - GIC_SPI_IRQ_BASE),
 -- 
 2.9.0
