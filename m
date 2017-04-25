@@ -1,135 +1,212 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvmtool PATCH v10 00/15] kvmtool: arm: ITS emulation and GSI routing support
-Date: Tue, 25 Apr 2017 15:39:17 +0100
-Message-ID: <20170425143932.17235-1-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [kvmtool PATCH v10 01/15] FDT: use static phandles
+Date: Tue, 25 Apr 2017 15:39:18 +0100
+Message-ID: <20170425143932.17235-2-andre.przywara@arm.com>
+References: <20170425143932.17235-1-andre.przywara@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 37B6D40C8B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:40 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id q4IX1Af54-fz for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Apr 2017 10:34:35 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4906140C58
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:35 -0400 (EDT)
+In-Reply-To: <20170425143932.17235-1-andre.przywara@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+The current implementation of fdt__alloc_phandle() suffers from being
+implemented in a static inline function situated in a header file.
+This will only create expected results within a single compilation
+unit.
+It seems a bit over the top to use a function to allocate phandles,
+when at the end of the day a phandle is just a unique identifier.
+To simplify things - especially with upcoming patches - we just
+introduce an enum per architecture to hold all possible phandle sources
+and use that instead of the dynamic allocation.
 
-another update to the ITS emulation series for kvmtool.
-This addresses the comments Marc and Jean-Philippe had on the last
-version (thanks for that!): I moved the DevID feature detection to avoid
-static variables, rewrote the error path on creating IRQ routes and
-extended the MMIO reservation to cover the ITS doorbell page as well.
-Not sure if that's the right way to do, though.
-Also we now ignore writes to the PBA region, which is what the spec
-somewhat recommends.
--------------------------------------------
-
-This series teaches kvmtool how to support KVM's ITS emulation. Also
-(as this is somewhat related and has been co-developed) it enables GSI
-routing for ARM/ARM64, which allows IRQFDs to be used, for instance
-to use vhost_net. At the moment this is dependent on the guest
-using the ITS emulation, but GICv2M support may be added at a later time.
-
-The first six patches are generic fixes and refactoring to pave the
-road for the rest of the patches. Most importantly patch 3/15 pulls
-the GSI routing code from x86 into generic code.
-Patch 7 updates the Linux headers to pull the new ITS and 32-bit
-GICv3 definitions in. This allows us to enable GICv3 emulation for 32-bit
-ARM and also get rid of some placeholder lines in patch 8.
-The following four patches add ITS emulation support. They reserve and
-register the required ITS register frame and populate a DT node with
-the necessary data. Also the patches add the required device ID to the
-KVM_SIGNAL_MSI ioctl.
-Patches 13 and 14 enable IRQ GSI routing for ARM/ARM64.
-This is needed to use IRQFDs, which is a prerequisite for vhost
-functionality, for instance. The code sets up the (dummy) SPI
-routing table and adds the device ID to the routing entry.
-The last patch finally enables the guest ITS support by extending the
-existing --irqchip= parameter to allow "--irqchip=gicv3-its".
-
-These patches make use of the KVM kernel functionality merged into
-4.8-rc: both Eric's IRQ routing series and the ITS emulation.
-It can also be found in my kvmtool git repository [1].
-
-Cheers,
-Andre.
-
-[1] git://linux-arm.org/kvmtool.git (branch: its/v10)
-    http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/its/v10
-
-Changelog v9 ... v10:
-- [04/15]: ignore PBA writes
-- [06/15]: reorder error checking for clarity
-- [07/15]: update Linux headers with the latest HEAD (4.11-rc7+)
-- [09/15]: extend ITS MMIO frame to cover doorbell page
-- [11/15]: use actual function name in commit message
-- [12/15]: check KVM_CAP_MSI_DEVID capability once and store it in struct kvm
-- [14/15]: use stored KVM_CAP_MSI_DEVID capability
-
-Andre Przywara (14):
-  FDT: use static phandles
-  arm: use static DT phandle for the GIC
-  irq: move IRQ routing into irq.c
-  MSI-X: update GSI routing after changed MSI-X configuration
-  virtio: fix endianness check for vhost support
-  PCI: Only allocate IRQ routing entry when available
-  update public Linux headers for GICv3 ITS emulation
-  arm: allow creation of an MSI register frame region
-  arm: FDT: create MSI controller DT node
-  add kvm__supports_vm_extension()
-  PCI: inject PCI device ID on MSI injection
-  arm: setup SPI IRQ routing tables
-  extend GSI IRQ routing to take a device ID
-  arm64: enable GICv3-ITS emulation
-
-Vladimir Murzin (1):
-  arm: allow vGICv3 emulation
-
- Makefile                                 |   4 +-
- arm/aarch32/arm-cpu.c                    |   4 +-
- arm/aarch32/include/asm/kvm.h            |  26 +++++-
- arm/aarch32/include/kvm/fdt-arch.h       |   6 ++
- arm/aarch32/include/kvm/kvm-arch.h       |   3 -
- arm/aarch64/arm-cpu.c                    |   5 +-
- arm/aarch64/include/asm/kvm.h            |  15 ++++
- arm/aarch64/include/kvm/fdt-arch.h       |   6 ++
- arm/aarch64/include/kvm/kvm-arch.h       |   3 -
- arm/fdt.c                                |   9 +--
- arm/gic.c                                | 134 ++++++++++++++++++++++++++++---
- arm/include/arm-common/fdt-arch.h        |   6 ++
- arm/include/arm-common/gic.h             |   3 +-
- arm/include/arm-common/kvm-arch.h        |   2 +
- arm/include/arm-common/kvm-config-arch.h |   2 +-
- arm/include/arm-common/kvm-cpu-arch.h    |   3 +-
- arm/include/arm-common/pci.h             |   2 +-
- arm/irq.c                                |   9 ---
- arm/pci.c                                |   9 ++-
- hw/pci-shmem.c                           |   5 +-
- include/kvm/fdt.h                        |   8 +-
- include/kvm/irq.h                        |   8 +-
- include/kvm/kvm.h                        |   2 +
- include/kvm/virtio.h                     |   9 ++-
- include/linux/kvm.h                      |  50 +++++++++++-
- irq.c                                    | 127 +++++++++++++++++++++++++++++
- kvm.c                                    |  28 +++++++
- mips/include/asm/kvm.h                   |   2 +
- mips/include/kvm/fdt-arch.h              |   6 ++
- mips/irq.c                               |  10 ---
- powerpc/include/asm/kvm.h                |  27 +++++++
- powerpc/include/kvm/fdt-arch.h           |   6 ++
- powerpc/irq.c                            |  31 -------
- powerpc/kvm.c                            |   2 -
- virtio/net.c                             |   2 +-
- virtio/pci.c                             | 105 ++++++++++++++++++++----
- x86/include/asm/kvm.h                    |   6 +-
- x86/include/kvm/fdt-arch.h               |   6 ++
- x86/irq.c                                |  45 ++---------
- 39 files changed, 572 insertions(+), 164 deletions(-)
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arm/aarch32/include/kvm/fdt-arch.h | 6 ++++++
+ arm/aarch64/include/kvm/fdt-arch.h | 6 ++++++
+ arm/fdt.c                          | 7 +++----
+ arm/include/arm-common/fdt-arch.h  | 6 ++++++
+ include/kvm/fdt.h                  | 8 ++------
+ mips/include/kvm/fdt-arch.h        | 6 ++++++
+ powerpc/include/kvm/fdt-arch.h     | 6 ++++++
+ powerpc/kvm.c                      | 2 --
+ x86/include/kvm/fdt-arch.h         | 6 ++++++
+ 9 files changed, 41 insertions(+), 12 deletions(-)
  create mode 100644 arm/aarch32/include/kvm/fdt-arch.h
  create mode 100644 arm/aarch64/include/kvm/fdt-arch.h
  create mode 100644 arm/include/arm-common/fdt-arch.h
- delete mode 100644 arm/irq.c
  create mode 100644 mips/include/kvm/fdt-arch.h
- delete mode 100644 mips/irq.c
  create mode 100644 powerpc/include/kvm/fdt-arch.h
- delete mode 100644 powerpc/irq.c
  create mode 100644 x86/include/kvm/fdt-arch.h
 
+diff --git a/arm/aarch32/include/kvm/fdt-arch.h b/arm/aarch32/include/kvm/fdt-arch.h
+new file mode 100644
+index 0000000..e448bf1
+--- /dev/null
++++ b/arm/aarch32/include/kvm/fdt-arch.h
+@@ -0,0 +1,6 @@
++#ifndef KVM__KVM_FDT_H
++#define KVM__KVM_FDT_H
++
++#include "arm-common/fdt-arch.h"
++
++#endif /* KVM__KVM_FDT_H */
+diff --git a/arm/aarch64/include/kvm/fdt-arch.h b/arm/aarch64/include/kvm/fdt-arch.h
+new file mode 100644
+index 0000000..e448bf1
+--- /dev/null
++++ b/arm/aarch64/include/kvm/fdt-arch.h
+@@ -0,0 +1,6 @@
++#ifndef KVM__KVM_FDT_H
++#define KVM__KVM_FDT_H
++
++#include "arm-common/fdt-arch.h"
++
++#endif /* KVM__KVM_FDT_H */
+diff --git a/arm/fdt.c b/arm/fdt.c
+index 381d48f..bcd0c3a 100644
+--- a/arm/fdt.c
++++ b/arm/fdt.c
+@@ -114,7 +114,6 @@ static int setup_fdt(struct kvm *kvm)
+ {
+ 	struct device_header *dev_hdr;
+ 	u8 staging_fdt[FDT_MAX_SIZE];
+-	u32 gic_phandle		= fdt__alloc_phandle();
+ 	u64 mem_reg_prop[]	= {
+ 		cpu_to_fdt64(kvm->arch.memory_guest_start),
+ 		cpu_to_fdt64(kvm->ram_size),
+@@ -134,7 +133,7 @@ static int setup_fdt(struct kvm *kvm)
+ 
+ 	/* Header */
+ 	_FDT(fdt_begin_node(fdt, ""));
+-	_FDT(fdt_property_cell(fdt, "interrupt-parent", gic_phandle));
++	_FDT(fdt_property_cell(fdt, "interrupt-parent", PHANDLE_GIC));
+ 	_FDT(fdt_property_string(fdt, "compatible", "linux,dummy-virt"));
+ 	_FDT(fdt_property_cell(fdt, "#address-cells", 0x2));
+ 	_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
+@@ -166,7 +165,7 @@ static int setup_fdt(struct kvm *kvm)
+ 	/* CPU and peripherals (interrupt controller, timers, etc) */
+ 	generate_cpu_nodes(fdt, kvm);
+ 	if (generate_cpu_peripheral_fdt_nodes)
+-		generate_cpu_peripheral_fdt_nodes(fdt, kvm, gic_phandle);
++		generate_cpu_peripheral_fdt_nodes(fdt, kvm, PHANDLE_GIC);
+ 
+ 	/* Virtio MMIO devices */
+ 	dev_hdr = device__first_dev(DEVICE_BUS_MMIO);
+@@ -185,7 +184,7 @@ static int setup_fdt(struct kvm *kvm)
+ 	}
+ 
+ 	/* PCI host controller */
+-	pci__generate_fdt_nodes(fdt, gic_phandle);
++	pci__generate_fdt_nodes(fdt, PHANDLE_GIC);
+ 
+ 	/* PSCI firmware */
+ 	_FDT(fdt_begin_node(fdt, "psci"));
+diff --git a/arm/include/arm-common/fdt-arch.h b/arm/include/arm-common/fdt-arch.h
+new file mode 100644
+index 0000000..53ba633
+--- /dev/null
++++ b/arm/include/arm-common/fdt-arch.h
+@@ -0,0 +1,6 @@
++#ifndef ARM__FDT_H
++#define ARM__FDT_H
++
++enum phandles {PHANDLE_RESERVED = 0, PHANDLE_GIC, PHANDLES_MAX};
++
++#endif /* ARM__FDT_H */
+diff --git a/include/kvm/fdt.h b/include/kvm/fdt.h
+index 53d85a4..beadc7f 100644
+--- a/include/kvm/fdt.h
++++ b/include/kvm/fdt.h
+@@ -7,6 +7,8 @@
+ 
+ #include <linux/types.h>
+ 
++#include "kvm/fdt-arch.h"
++
+ #define FDT_MAX_SIZE	0x10000
+ 
+ /* Those definitions are generic FDT values for specifying IRQ
+@@ -33,10 +35,4 @@ enum irq_type {
+ 		}							\
+ 	} while (0)
+ 
+-static inline u32 fdt__alloc_phandle(void)
+-{
+-	static u32 phandle = 0;
+-	return ++phandle;
+-}
+-
+ #endif /* KVM__FDT_H */
+diff --git a/mips/include/kvm/fdt-arch.h b/mips/include/kvm/fdt-arch.h
+new file mode 100644
+index 0000000..b030245
+--- /dev/null
++++ b/mips/include/kvm/fdt-arch.h
+@@ -0,0 +1,6 @@
++#ifndef KVM__KVM_FDT_H
++#define KVM__KVM_FDT_H
++
++enum phandles {PHANDLE_RESERVED = 0, PHANDLES_MAX};
++
++#endif /* KVM__KVM_FDT_H */
+diff --git a/powerpc/include/kvm/fdt-arch.h b/powerpc/include/kvm/fdt-arch.h
+new file mode 100644
+index 0000000..d48c055
+--- /dev/null
++++ b/powerpc/include/kvm/fdt-arch.h
+@@ -0,0 +1,6 @@
++#ifndef KVM__KVM_FDT_H
++#define KVM__KVM_FDT_H
++
++enum phandles {PHANDLE_RESERVED = 0, PHANDLE_XICP, PHANDLES_MAX};
++
++#endif /* KVM__KVM_FDT_H */
+diff --git a/powerpc/kvm.c b/powerpc/kvm.c
+index 3c1596d..c738c1d 100644
+--- a/powerpc/kvm.c
++++ b/powerpc/kvm.c
+@@ -40,8 +40,6 @@
+ 
+ #define HUGETLBFS_PATH "/var/lib/hugetlbfs/global/pagesize-16MB/"
+ 
+-#define PHANDLE_XICP		0x00001111
+-
+ static char kern_cmdline[2048];
+ 
+ struct kvm_ext kvm_req_ext[] = {
+diff --git a/x86/include/kvm/fdt-arch.h b/x86/include/kvm/fdt-arch.h
+new file mode 100644
+index 0000000..eebd73f
+--- /dev/null
++++ b/x86/include/kvm/fdt-arch.h
+@@ -0,0 +1,6 @@
++#ifndef X86__FDT_ARCH_H
++#define X86__FDT_ARCH_H
++
++enum phandles {PHANDLE_RESERVED = 0, PHANDLES_MAX};
++
++#endif /* KVM__KVM_FDT_H */
 -- 
 2.9.0
