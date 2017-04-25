@@ -1,24 +1,26 @@
-From: James Morse <james.morse@arm.com>
-Subject: [PATCH 1/2] KVM: arm: Restore banked registers and physical timer
- access on hyp_panic()
-Date: Tue, 25 Apr 2017 18:02:44 +0100
-Message-ID: <20170425170245.4294-2-james.morse@arm.com>
-References: <20170425170245.4294-1-james.morse@arm.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH V15 06/11] acpi: apei: handle SEA notification type for
+ ARMv8
+Date: Tue, 25 Apr 2017 19:21:54 +0200
+Message-ID: <20170425172154.ggg56j52inf3522e@pd.tnic>
+References: <1492556723-9189-1-git-send-email-tbaicar@codeaurora.org>
+ <1492556723-9189-7-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5EA440C46
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 13:01:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B60040C74
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 13:19:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id whDAhxaSQTTw for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Apr 2017 13:01:00 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AEB8940CE6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 13:00:59 -0400 (EDT)
-In-Reply-To: <20170425170245.4294-1-james.morse@arm.com>
+ with ESMTP id t5AuN4h7p2zA for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Apr 2017 13:19:12 -0400 (EDT)
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58F4B40C54
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 13:19:12 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1492556723-9189-7-git-send-email-tbaicar@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,41 +30,46 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, rafael@kernel.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, tony.luck@intel.com, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When KVM panics, it hurridly restores the host context and parachutes
-into the host's panic() code. This looks like it was copied from arm64,
-the 32bit KVM panic code needs to restore the host's banked registers
-too.
+On Tue, Apr 18, 2017 at 05:05:18PM -0600, Tyler Baicar wrote:
+> ARM APEI extension proposal added SEA (Synchronous External Abort)
+> notification type for ARMv8.
+> Add a new GHES error source handling function for SEA. If an error
+> source's notification type is SEA, then this function can be registered
+> into the SEA exception handler. That way GHES will parse and report
+> SEA exceptions when they occur.
+> An SEA can interrupt code that had interrupts masked and is treated as
+> an NMI. To aid this the page of address space for mapping APEI buffers
+> while in_nmi() is always reserved, and ghes_ioremap_pfn_nmi() is
+> changed to use the helper methods to find the prot_t to map with in
+> the same way as ghes_ioremap_pfn_irq().
 
-At some point panic() touches the physical timer/counter, this will
-trap back to HYP. If we're lucky, we panic again.
+...
 
-Add a __timer_save_state() call to KVMs hyp_panic() path, this saves the
-guest registers and disables the traps for the host.
+> @@ -518,6 +520,17 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+>  	pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
+>  		inf->name, esr, addr);
+>  
+> +	/*
+> +	 * Synchronous aborts may interrupt code which had interrupts masked.
+> +	 * Before calling out into the wider kernel tell the interested
+> +	 * subsystems.
+> +	 */
+> +	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA)) {
+> +		nmi_enter();
+> +		ghes_notify_sea();
+> +		nmi_exit();
+> +	}
 
-Fixes: c36b6db5f3e4 ("ARM: KVM: Add panic handling code")
-Signed-off-by: James Morse <james.morse@arm.com>
----
- arch/arm/kvm/hyp/switch.c | 2 ++
- 1 file changed, 2 insertions(+)
+Well, the other GHES notification methods use a notifier:
+ghes_notify_sci, ghes_notify_nmi. You probably should do that too
+instead of calling straight into a driver from arch code.
 
-diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-index 92678b7bd046..c8f15bb5c8b3 100644
---- a/arch/arm/kvm/hyp/switch.c
-+++ b/arch/arm/kvm/hyp/switch.c
-@@ -235,8 +235,10 @@ void __hyp_text __noreturn __hyp_panic(int cause)
- 
- 		vcpu = (struct kvm_vcpu *)read_sysreg(HTPIDR);
- 		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+		__timer_save_state(vcpu);
- 		__deactivate_traps(vcpu);
- 		__deactivate_vm(vcpu);
-+		__banked_restore_state(host_ctxt);
- 		__sysreg_restore_state(host_ctxt);
- 	}
- 
 -- 
-2.10.1
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
