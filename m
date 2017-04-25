@@ -1,23 +1,27 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvmtool PATCH v10 14/15] extend GSI IRQ routing to take a device ID
-Date: Tue, 25 Apr 2017 15:39:31 +0100
-Message-ID: <20170425143932.17235-15-andre.przywara@arm.com>
-References: <20170425143932.17235-1-andre.przywara@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH 1/2] kvm: Fix mmu_notifier release race
+Date: Tue, 25 Apr 2017 17:37:06 +0200
+Message-ID: <20170425153706.GK4104@cbox>
+References: <1493028624-29837-1-git-send-email-suzuki.poulose@arm.com>
+ <1493028624-29837-2-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CFDE040DFB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78C9340C8B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 11:34:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yw+b8LAyfEqA for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Apr 2017 10:34:57 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C0AA40CD1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 10:34:56 -0400 (EDT)
-In-Reply-To: <20170425143932.17235-1-andre.przywara@arm.com>
+ with ESMTP id R+70U4ZVVj5A for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Apr 2017 11:34:18 -0400 (EDT)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6346340C46
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 11:34:18 -0400 (EDT)
+Received: by mail-wm0-f50.google.com with SMTP id u65so26282032wmu.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 08:37:08 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1493028624-29837-2-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,112 +31,125 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For ITS emulation we need the device ID along with the MSI payload
-and doorbell address to identify an MSI, so we need to put it in the
-GSI IRQ routing table too.
-There is a per-VM capability by which the kernel signals the need for
-a device ID, so check this and put the device ID into the routing
-table if needed.
-For PCI devices we take the bus/device/function triplet and and that
-to the routing setup call.
-
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- hw/pci-shmem.c    |  3 ++-
- include/kvm/irq.h |  2 +-
- irq.c             | 10 ++++++++--
- virtio/pci.c      |  6 ++++--
- 4 files changed, 15 insertions(+), 6 deletions(-)
-
-diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
-index 7ce98cb..512b5b0 100644
---- a/hw/pci-shmem.c
-+++ b/hw/pci-shmem.c
-@@ -135,7 +135,8 @@ int pci_shmem__get_local_irqfd(struct kvm *kvm)
- 			return fd;
- 
- 		if (pci_shmem_pci_device.msix.ctrl & cpu_to_le16(PCI_MSIX_FLAGS_ENABLE)) {
--			gsi = irq__add_msix_route(kvm, &msix_table[0].msg);
-+			gsi = irq__add_msix_route(kvm, &msix_table[0].msg,
-+						  pci_shmem_device.dev_num << 3);
- 			if (gsi < 0)
- 				return gsi;
- 		} else {
-diff --git a/include/kvm/irq.h b/include/kvm/irq.h
-index f35eb7e..ee059e3 100644
---- a/include/kvm/irq.h
-+++ b/include/kvm/irq.h
-@@ -20,7 +20,7 @@ int irq__init(struct kvm *kvm);
- int irq__exit(struct kvm *kvm);
- 
- int irq__allocate_routing_entry(void);
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
-+int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg, u32 device_id);
- void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
- 
- #endif
-diff --git a/irq.c b/irq.c
-index 6ec71c3..4404062 100644
---- a/irq.c
-+++ b/irq.c
-@@ -66,7 +66,7 @@ static bool check_for_irq_routing(struct kvm *kvm)
- 	return has_irq_routing > 0;
- }
- 
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
-+int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg, u32 device_id)
- {
- 	int r;
- 
-@@ -77,7 +77,7 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
- 	if (r)
- 		return r;
- 
--	irq_routing->entries[irq_routing->nr++] =
-+	irq_routing->entries[irq_routing->nr] =
- 		(struct kvm_irq_routing_entry) {
- 			.gsi = next_gsi,
- 			.type = KVM_IRQ_ROUTING_MSI,
-@@ -86,6 +86,12 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
- 			.u.msi.data = msg->data,
- 		};
- 
-+	if (kvm->msix_needs_devid) {
-+		irq_routing->entries[irq_routing->nr].flags = KVM_MSI_VALID_DEVID;
-+		irq_routing->entries[irq_routing->nr].u.msi.devid = device_id;
-+	}
-+	irq_routing->nr++;
-+
- 	r = ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
- 	if (r)
- 		return r;
-diff --git a/virtio/pci.c b/virtio/pci.c
-index f0e884c..46473b0 100644
---- a/virtio/pci.c
-+++ b/virtio/pci.c
-@@ -192,7 +192,8 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
- 				break;
- 
- 			gsi = irq__add_msix_route(kvm,
--						  &vpci->msix_table[vec].msg);
-+						  &vpci->msix_table[vec].msg,
-+						  vpci->dev_hdr.dev_num << 3);
- 			/*
- 			 * We don't need IRQ routing if we can use
- 			 * MSI injection via the KVM_SIGNAL_MSI ioctl.
-@@ -216,7 +217,8 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
- 				break;
- 
- 			gsi = irq__add_msix_route(kvm,
--						  &vpci->msix_table[vec].msg);
-+						  &vpci->msix_table[vec].msg,
-+						  vpci->dev_hdr.dev_num << 3);
- 			/*
- 			 * We don't need IRQ routing if we can use
- 			 * MSI injection via the KVM_SIGNAL_MSI ioctl.
--- 
-2.9.0
+T24gTW9uLCBBcHIgMjQsIDIwMTcgYXQgMTE6MTA6MjNBTSArMDEwMCwgU3V6dWtpIEsgUG91bG9z
+ZSB3cm90ZToKPiBUaGUgS1ZNIHVzZXMgbW11X25vdGlmaWVyICh3aGVyZXZlciBhdmFpbGFibGUp
+IHRvIGtlZXAgdHJhY2sKPiBvZiB0aGUgY2hhbmdlcyB0byB0aGUgbW0gb2YgdGhlIGd1ZXN0LiBU
+aGUgZ3Vlc3Qgc2hhZG93IHBhZ2UKPiB0YWJsZXMgYXJlIHJlbGVhc2VkIHdoZW4gdGhlIFZNIGV4
+aXRzIHZpYSBtbXVfbm90aWZpZXItPm9wcy5yZWxlYXNlKCkuCj4gVGhlcmUgaXMgYSByYXJlIGNo
+YW5jZSB0aGF0IHRoZSBtbXVfbm90aWZpZXItPnJlbGVhc2UgY291bGQgYmUKPiBjYWxsZWQgbW9y
+ZSB0aGFuIG9uY2UgdmlhIHR3byBkaWZmZXJlbnQgcGF0aHMsIHdoaWNoIGNvdWxkIGVuZAo+IHVw
+IGluIHVzZS1hZnRlci1mcmVlIG9mIGt2bSBpbnN0YW5jZSAoc3VjaCBhcyBbMF0pLgo+IAo+IGUu
+ZzoKPiAKPiB0aHJlYWQgQSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0
+aHJlYWQgQgo+IC0tLS0tLS0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IC0tLS0tLS0tLS0tLS0tCj4gCj4gIGdldF9zaWduYWwtPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAga3ZtX2Rlc3Ryb3lfdm0oKS0+Cj4gIGRvX2V4aXQtPiAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBtbXVfbm90aWZpZXJfdW5yZWdpc3Rlci0+Cj4gIGV4
+aXRfbW0tPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBrdm1fYXJjaF9m
+bHVzaF9zaGFkb3dfYWxsKCktPgo+ICBleGl0X21tYXAtPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgc3Bpbl9sb2NrKCZrdm0tPm1tdV9sb2NrKQo+ICBtbXVfbm90aWZpZXJf
+cmVsZWFzZS0+ICAgICAgICAgICAgICAgICAgICAgICAgICAgLi4uLgo+ICAga3ZtX2FyY2hfZmx1
+c2hfc2hhZG93X2FsbCgpLT4gICAgICAgICAgICAgICAgICAgLi4uLi4KPiAgIC4uLiBzcGluX2xv
+Y2soJmt2bS0+bW11X2xvY2spICAgICAgICAgICAgICAgICAgIC4uLi4uCj4gICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzcGluX3VubG9jaygma3ZtLT5t
+bXVfbG9jaykKPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBrdm1fYXJjaF9mcmVlX2t2bSgpCj4gICAgKioqIHVzZSBhZnRlciBmcmVlIG9mIGt2bSAqKioK
+PiAKPiBUaGlzIHBhdGNoIGF0dGVtcHRzIHRvIHNvbHZlIHRoZSBwcm9ibGVtIGJ5IGhvbGRpbmcg
+YSByZWZlcmVuY2UgdG8gdGhlIEtWTQo+IGZvciB0aGUgbW11X25vdGlmaWVyLCB3aGljaCBpcyBk
+cm9wcGVkIG9ubHkgZnJvbSBub3RpZmllci0+b3BzLnJlbGVhc2UoKS4KPiBUaGlzIHdpbGwgZW5z
+dXJlIHRoYXQgdGhlIEtWTSBzdHJ1Y3QgaXMgYXZhaWxhYmxlIHRpbGwgd2UgcmVhY2ggdGhlCj4g
+a3ZtX21tdV9ub3RpZmllcl9yZWxlYXNlLCBhbmQgdGhlIGt2bV9kZXN0cm95X3ZtIGlzIGNhbGxl
+ZCBvbmx5IGZyb20vYWZ0ZXIKPiBpdC4gU28sIHdlIGNhbiB1bnJlZ2lzdGVyIHRoZSBub3RpZmll
+ciB3aXRoIG5vX3JlbGVhc2Ugb3B0aW9uIGFuZCBoZW5jZQo+IGF2b2lkaW5nIHRoZSByYWNlIGFi
+b3ZlLiBIb3dldmVyLCB3ZSBuZWVkIHRvIG1ha2Ugc3VyZSB0aGF0IHRoZSBLVk0gaXMKPiBmcmVl
+ZCBvbmx5IGFmdGVyIHRoZSBtbXVfbm90aWZpZXIgaGFzIGZpbmlzaGVkIHByb2Nlc3NpbmcgdGhl
+IG5vdGlmaWVyIGR1ZSB0bwo+IHRoZSBmb2xsb3dpbmcgcG9zc2libGUgcGF0aCBvZiBleGVjdXRp
+b24gOgo+IAo+IG1tdV9ub3RpZmllcl9yZWxlYXNlIC0+IGt2bV9tbXVfbm90aWZpZXJfcmVsZWFz
+ZSAtPiBrdm1fcHV0X2t2bSAtPgo+ICAga3ZtX2Rlc3Ryb3lfdm0gLT4ga3ZtX2FyY2hfZnJlZV9r
+dm0KPiAKPiBbMF0gaHR0cDovL2xrbWwua2VybmVsLm9yZy9yL0NBQWVISyt4OHVkSEtxOXhhMXpr
+VE82YXg1RThEazMySFlXZmFUMDVGTWNoTDJjcjQ4Z0BtYWlsLmdtYWlsLmNvbQo+IAo+IEZpeGVz
+OiBjb21taXQgODVkYjA2ZTUxNDQyMiAoIktWTTogbW11X25vdGlmaWVycyByZWxlYXNlIG1ldGhv
+ZCIpCj4gUmVwb3J0ZWQtYnk6IGFuZHJleWtudmxAZ29vZ2xlLmNvbQo+IENjOiBNYXJrIFJ1dGxh
+bmQgPG1hcmsucnV0bGFuZEBhcm0uY29tPgo+IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUBy
+ZWRoYXQuY29tPgo+IENjOiBSYWRpbSBLcsSNbcOhxZkgPHJrcmNtYXJAcmVkaGF0LmNvbT4KPiBD
+YzogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPiBDYzogQ2hyaXN0b2ZmZXIg
+RGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgo+IENjOiBhbmRyZXlrbnZsQGdvb2ds
+ZS5jb20KPiBDYzogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPiBUZXN0ZWQt
+Ynk6IE1hcmsgUnV0bGFuZCA8bWFyay5ydXRsYW5kQGFybS5jb20+Cj4gU2lnbmVkLW9mZi1ieTog
+U3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT4KClRoaXMgbG9va3MgZ29v
+ZCB0byBtZSwgYnV0IHdlIHNob3VsZCBoYXZlIHNvbWUgS1ZNIGdlbmVyaWMgZXhwZXJ0cyBsb29r
+CmF0IGl0IGFzIHdlbGwuCgogUmV2aWV3ZWQtYnk6IENocmlzdG9mZmVyIERhbGwgPGNkYWxsQGxp
+bmFyby5vcmc+Cgo+IC0tLQo+ICBpbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmggfCAgMSArCj4gIHZp
+cnQva3ZtL2t2bV9tYWluLmMgICAgICB8IDU5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKy0tLS0tLQo+ICAyIGZpbGVzIGNoYW5nZWQsIDUzIGluc2VydGlvbnMoKyks
+IDcgZGVsZXRpb25zKC0pCj4gCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgva3ZtX2hvc3Qu
+aCBiL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaAo+IGluZGV4IGQwMjUwNzQuLjU2MWU5NjggMTAw
+NjQ0Cj4gLS0tIGEvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oCj4gKysrIGIvaW5jbHVkZS9saW51
+eC9rdm1faG9zdC5oCj4gQEAgLTQyNCw2ICs0MjQsNyBAQCBzdHJ1Y3Qga3ZtIHsKPiAgCXN0cnVj
+dCBtbXVfbm90aWZpZXIgbW11X25vdGlmaWVyOwo+ICAJdW5zaWduZWQgbG9uZyBtbXVfbm90aWZp
+ZXJfc2VxOwo+ICAJbG9uZyBtbXVfbm90aWZpZXJfY291bnQ7Cj4gKwlzdHJ1Y3QgcmN1X2hlYWQg
+bW11X25vdGlmaWVyX3JjdTsKPiAgI2VuZGlmCj4gIAlsb25nIHRsYnNfZGlydHk7Cj4gIAlzdHJ1
+Y3QgbGlzdF9oZWFkIGRldmljZXM7Cj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2t2bV9tYWluLmMg
+Yi92aXJ0L2t2bS9rdm1fbWFpbi5jCj4gaW5kZXggODgyNTdiMy4uMmMzZmRkNCAxMDA2NDQKPiAt
+LS0gYS92aXJ0L2t2bS9rdm1fbWFpbi5jCj4gKysrIGIvdmlydC9rdm0va3ZtX21haW4uYwo+IEBA
+IC00NzEsNiArNDcxLDcgQEAgc3RhdGljIHZvaWQga3ZtX21tdV9ub3RpZmllcl9yZWxlYXNlKHN0
+cnVjdCBtbXVfbm90aWZpZXIgKm1uLAo+ICAJaWR4ID0gc3JjdV9yZWFkX2xvY2soJmt2bS0+c3Jj
+dSk7Cj4gIAlrdm1fYXJjaF9mbHVzaF9zaGFkb3dfYWxsKGt2bSk7Cj4gIAlzcmN1X3JlYWRfdW5s
+b2NrKCZrdm0tPnNyY3UsIGlkeCk7Cj4gKwlrdm1fcHV0X2t2bShrdm0pOwo+ICB9Cj4gIAo+ICBz
+dGF0aWMgY29uc3Qgc3RydWN0IG1tdV9ub3RpZmllcl9vcHMga3ZtX21tdV9ub3RpZmllcl9vcHMg
+PSB7Cj4gQEAgLTQ4Niw4ICs0ODcsNDYgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBtbXVfbm90aWZp
+ZXJfb3BzIGt2bV9tbXVfbm90aWZpZXJfb3BzID0gewo+ICAKPiAgc3RhdGljIGludCBrdm1faW5p
+dF9tbXVfbm90aWZpZXIoc3RydWN0IGt2bSAqa3ZtKQo+ICB7Cj4gKwlpbnQgcmM7Cj4gIAlrdm0t
+Pm1tdV9ub3RpZmllci5vcHMgPSAma3ZtX21tdV9ub3RpZmllcl9vcHM7Cj4gLQlyZXR1cm4gbW11
+X25vdGlmaWVyX3JlZ2lzdGVyKCZrdm0tPm1tdV9ub3RpZmllciwgY3VycmVudC0+bW0pOwo+ICsJ
+cmMgPSBtbXVfbm90aWZpZXJfcmVnaXN0ZXIoJmt2bS0+bW11X25vdGlmaWVyLCBjdXJyZW50LT5t
+bSk7Cj4gKwkvKgo+ICsJICogV2UgaG9sZCBhIHJlZmVyZW5jZSB0byBLVk0gaGVyZSB0byBtYWtl
+IHN1cmUgdGhhdCB0aGUgS1ZNCj4gKwkgKiBkb2Vzbid0IGdldCBmcmVlJ2QgYmVmb3JlIG9wcy0+
+cmVsZWFzZSgpIGNvbXBsZXRlcy4KPiArCSAqLwo+ICsJaWYgKCFyYykKPiArCQlrdm1fZ2V0X2t2
+bShrdm0pOwo+ICsJcmV0dXJuIHJjOwo+ICt9Cj4gKwo+ICtzdGF0aWMgdm9pZCBrdm1fZnJlZV92
+bV9yY3Uoc3RydWN0IHJjdV9oZWFkICpyY3UpCj4gK3sKPiArCXN0cnVjdCBrdm0gKmt2bSA9IGNv
+bnRhaW5lcl9vZihyY3UsIHN0cnVjdCBrdm0sIG1tdV9ub3RpZmllcl9yY3UpOwo+ICsJa3ZtX2Fy
+Y2hfZnJlZV92bShrdm0pOwo+ICt9Cj4gKwo+ICtzdGF0aWMgdm9pZCBrdm1fZmx1c2hfc2hhZG93
+X21tdShzdHJ1Y3Qga3ZtICprdm0pCj4gK3sKPiArCS8qCj4gKwkgKiBXZSBob2xkIGEgcmVmZXJl
+bmNlIHRvIGt2bSBpbnN0YW5jZSBmb3IgbW11X25vdGlmaWVyIGFuZCBpcwo+ICsJICogb25seSBy
+ZWxlYXNlZCB3aGVuIG9wcy0+cmVsZWFzZSgpIGlzIGNhbGxlZCB2aWEgZXhpdF9tbWFwIHBhdGgu
+Cj4gKwkgKiBTbywgd2hlbiB3ZSByZWFjaCBoZXJlIG9wcy0+cmVsZWFzZSgpIGhhcyBiZWVuIGNh
+bGxlZCBhbHJlYWR5LCB3aGljaAo+ICsJICogZmx1c2hlcyB0aGUgc2hhZG93IHBhZ2UgdGFibGVz
+LiBIZW5jZSB0aGVyZSBpcyBubyBuZWVkIHRvIGNhbGwgdGhlCj4gKwkgKiByZWxlYXNlKCkgYWdh
+aW4gd2hlbiB3ZSB1bnJlZ2lzdGVyIHRoZSBub3RpZmllci4gSG93ZXZlciwgd2UgbmVlZAo+ICsJ
+ICogdG8gZGVsYXkgZnJlZWluZyB1cCB0aGUga3ZtIHVudGlsIHRoZSByZWxlYXNlKCkgY29tcGxl
+dGVzLCBzaW5jZQo+ICsJICogd2UgY291bGQgcmVhY2ggaGVyZSB2aWEgOgo+ICsJICogIGt2bV9t
+bXVfbm90aWZpZXJfcmVsZWFzZSgpIC0+IGt2bV9wdXRfa3ZtKCkgLT4ga3ZtX2Rlc3Ryb3lfdm0o
+KQo+ICsJICovCj4gKwltbXVfbm90aWZpZXJfdW5yZWdpc3Rlcl9ub19yZWxlYXNlKCZrdm0tPm1t
+dV9ub3RpZmllciwga3ZtLT5tbSk7Cj4gK30KPiArCj4gK3N0YXRpYyB2b2lkIGt2bV9mcmVlX3Zt
+KHN0cnVjdCBrdm0gKmt2bSkKPiArewo+ICsJLyoKPiArCSAqIFdhaXQgdW50aWwgdGhlIG1tdV9u
+b3RpZmllciBoYXMgZmluaXNoZWQgdGhlIHJlbGVhc2UoKS4KPiArCSAqIFNlZSBjb21tZW50cyBh
+Ym92ZSBpbiBrdm1fZmx1c2hfc2hhZG93X21tdS4KPiArCSAqLwo+ICsJbW11X25vdGlmaWVyX2Nh
+bGxfc3JjdSgma3ZtLT5tbXVfbm90aWZpZXJfcmN1LCBrdm1fZnJlZV92bV9yY3UpOwo+ICB9Cj4g
+IAo+ICAjZWxzZSAgLyogIShDT05GSUdfTU1VX05PVElGSUVSICYmIEtWTV9BUkNIX1dBTlRfTU1V
+X05PVElGSUVSKSAqLwo+IEBAIC00OTcsNiArNTM2LDE2IEBAIHN0YXRpYyBpbnQga3ZtX2luaXRf
+bW11X25vdGlmaWVyKHN0cnVjdCBrdm0gKmt2bSkKPiAgCXJldHVybiAwOwo+ICB9Cj4gIAo+ICtz
+dGF0aWMgdm9pZCBrdm1fZmx1c2hfc2hhZG93X21tdShzdHJ1Y3Qga3ZtICprdm0pCj4gK3sKPiAr
+CWt2bV9hcmNoX2ZsdXNoX3NoYWRvd19hbGwoa3ZtKTsKPiArfQo+ICsKPiArc3RhdGljIHZvaWQg
+a3ZtX2ZyZWVfdm0oc3RydWN0IGt2bSAqa3ZtKQo+ICt7Cj4gKwlrdm1fYXJjaF9mcmVlX3ZtKGt2
+bSk7Cj4gK30KPiArCj4gICNlbmRpZiAvKiBDT05GSUdfTU1VX05PVElGSUVSICYmIEtWTV9BUkNI
+X1dBTlRfTU1VX05PVElGSUVSICovCj4gIAo+ICBzdGF0aWMgc3RydWN0IGt2bV9tZW1zbG90cyAq
+a3ZtX2FsbG9jX21lbXNsb3RzKHZvaWQpCj4gQEAgLTczMywxOCArNzgyLDE0IEBAIHN0YXRpYyB2
+b2lkIGt2bV9kZXN0cm95X3ZtKHN0cnVjdCBrdm0gKmt2bSkKPiAgCQlrdm0tPmJ1c2VzW2ldID0g
+TlVMTDsKPiAgCX0KPiAgCWt2bV9jb2FsZXNjZWRfbW1pb19mcmVlKGt2bSk7Cj4gLSNpZiBkZWZp
+bmVkKENPTkZJR19NTVVfTk9USUZJRVIpICYmIGRlZmluZWQoS1ZNX0FSQ0hfV0FOVF9NTVVfTk9U
+SUZJRVIpCj4gLQltbXVfbm90aWZpZXJfdW5yZWdpc3Rlcigma3ZtLT5tbXVfbm90aWZpZXIsIGt2
+bS0+bW0pOwo+IC0jZWxzZQo+IC0Ja3ZtX2FyY2hfZmx1c2hfc2hhZG93X2FsbChrdm0pOwo+IC0j
+ZW5kaWYKPiArCWt2bV9mbHVzaF9zaGFkb3dfbW11KGt2bSk7Cj4gIAlrdm1fYXJjaF9kZXN0cm95
+X3ZtKGt2bSk7Cj4gIAlrdm1fZGVzdHJveV9kZXZpY2VzKGt2bSk7Cj4gIAlmb3IgKGkgPSAwOyBp
+IDwgS1ZNX0FERFJFU1NfU1BBQ0VfTlVNOyBpKyspCj4gIAkJa3ZtX2ZyZWVfbWVtc2xvdHMoa3Zt
+LCBrdm0tPm1lbXNsb3RzW2ldKTsKPiAgCWNsZWFudXBfc3JjdV9zdHJ1Y3QoJmt2bS0+aXJxX3Ny
+Y3UpOwo+ICAJY2xlYW51cF9zcmN1X3N0cnVjdCgma3ZtLT5zcmN1KTsKPiAtCWt2bV9hcmNoX2Zy
+ZWVfdm0oa3ZtKTsKPiArCWt2bV9mcmVlX3ZtKGt2bSk7Cj4gIAlwcmVlbXB0X25vdGlmaWVyX2Rl
+YygpOwo+ICAJaGFyZHdhcmVfZGlzYWJsZV9hbGwoKTsKPiAgCW1tZHJvcChtbSk7Cj4gLS0gCj4g
+Mi43LjQKPiAKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
+a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
+bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
