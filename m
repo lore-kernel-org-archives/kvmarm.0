@@ -1,27 +1,28 @@
 From: Prakash B <bjsprakash.linux@gmail.com>
-Subject: Re: [PATCH v5 15/22] KVM: arm64: vgic-its: vgic_its_alloc_ite/device
-Date: Wed, 26 Apr 2017 17:01:56 +0530
-Message-ID: <CACJhumeXYoo-wfOu5fRWV1q-fh0B3-A2igtP_FeC_Ho4f-=qvA@mail.gmail.com>
+Subject: Re: [PATCH v5 16/22] KVM: arm64: vgic-its: Add infrastructure for
+ table lookup
+Date: Wed, 26 Apr 2017 17:02:32 +0530
+Message-ID: <CACJhumept3RSD9cW4i_j6ww9naLHrLhCj0wBDrNDZ=JpKwLnQA@mail.gmail.com>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-16-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-17-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C26F40C32
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:29:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29DD640C2F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:29:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 94rCweLt62Dy for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Apr 2017 07:29:06 -0400 (EDT)
-Received: from mail-lf0-f67.google.com (mail-lf0-f67.google.com
- [209.85.215.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 782B940C2F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:29:06 -0400 (EDT)
-Received: by mail-lf0-f67.google.com with SMTP id 75so24517188lfs.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 04:31:58 -0700 (PDT)
-In-Reply-To: <1492164934-988-16-git-send-email-eric.auger@redhat.com>
+ with ESMTP id hJfP9DuJq7Sq for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Apr 2017 07:29:42 -0400 (EDT)
+Received: from mail-lf0-f66.google.com (mail-lf0-f66.google.com
+ [209.85.215.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30F1D40BE9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:29:42 -0400 (EDT)
+Received: by mail-lf0-f66.google.com with SMTP id 75so24519859lfs.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 04:32:33 -0700 (PDT)
+In-Reply-To: <1492164934-988-17-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,9 +37,17 @@ Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, Marc Zyngier <marc.zyngier@ar
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Fri, Apr 14, 2017 at 3:45 PM, Eric Auger <eric.auger@redhat.com> wrote:
-> Add two new helpers to allocate an its ite and an its device.
-> This will avoid duplication on restore path.
+> Add a generic lookup_table() helper whose role consists in
+> scanning a contiguous table located in guest RAM and applying
+> a callback on each entry. Entries can be handled as linked lists
+> since the callback may return an offset to the next entry and
+> also tell that an entry is the last one.
+>
+> Helper functions also are added to compute the device/event ID
+> offset to the next DTE/ITE.
+>
+> compute_next_devid_offset, compute_next_eventid_offset and
+> lookup_table will become static in subsequent patches
 >
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Tested-by: Prakash, Brahmajyosyula <Brahmajyosyula.Prakash@cavium.com>
