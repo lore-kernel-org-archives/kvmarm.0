@@ -1,27 +1,27 @@
 From: Prakash B <bjsprakash.linux@gmail.com>
-Subject: Re: [PATCH v5 20/22] KVM: arm64: vgic-its: Device table save/restore
-Date: Wed, 26 Apr 2017 17:04:39 +0530
-Message-ID: <CACJhume3UQUzKBAuQcqWPMWCPBG6oayARVBNU7Rwk1yD7CDPKg@mail.gmail.com>
+Subject: Re: [PATCH v5 21/22] KVM: arm64: vgic-its: Fix pending table sync
+Date: Wed, 26 Apr 2017 17:05:15 +0530
+Message-ID: <CACJhumdH=duE3qPqvH5yC2=Tvthk_dz4TqTaw-gy+oiZi9bYMQ@mail.gmail.com>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-21-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-22-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DCDA40C2F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:31:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EC8440C30
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:32:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wjsUlk3x6Ay0 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Apr 2017 07:31:49 -0400 (EDT)
-Received: from mail-lf0-f65.google.com (mail-lf0-f65.google.com
- [209.85.215.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B6CD40BDD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:31:49 -0400 (EDT)
-Received: by mail-lf0-f65.google.com with SMTP id 75so24528401lfs.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 04:34:40 -0700 (PDT)
-In-Reply-To: <1492164934-988-21-git-send-email-eric.auger@redhat.com>
+ with ESMTP id Ubd1IvQi+9u6 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Apr 2017 07:32:25 -0400 (EDT)
+Received: from mail-lf0-f67.google.com (mail-lf0-f67.google.com
+ [209.85.215.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2AB7940C2F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:32:25 -0400 (EDT)
+Received: by mail-lf0-f67.google.com with SMTP id 88so24527455lfr.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 04:35:16 -0700 (PDT)
+In-Reply-To: <1492164934-988-22-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,16 +36,18 @@ Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, Marc Zyngier <marc.zyngier@ar
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Fri, Apr 14, 2017 at 3:45 PM, Eric Auger <eric.auger@redhat.com> wrote:
-> This patch saves the device table entries into guest RAM.
-> Both flat table and 2 stage tables are supported. DeviceId
-> indexing is used.
+> In its_sync_lpi_pending_table() we currently ignore the
+> target_vcpu of the LPIs. We sync the pending bit found in
+> the vcpu pending table even if the LPI is not targeting it.
 >
-> For each device listed in the device table, we also save
-> the translation table using the vgic_its_save/restore_itt
-> routines.
+> Also in vgic_its_cmd_handle_invall() we are supposed to
+> read the config table data for the LPIs associated to the
+> collection ID. At the moment we refresh all LPI config
+> information.
 >
-> On restore, devices are re-allocated and their ite are
-> re-built.
+> This patch passes a vpcu to vgic_copy_lpi_list() so that
+> this latter returns a snapshot of the LPIs targeting this
+> CPU and only those.
 >
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Tested-by: Prakash, Brahmajyosyula <Brahmajyosyula.Prakash@cavium.com>
