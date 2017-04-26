@@ -1,25 +1,26 @@
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH 1/2] kvm: Fix mmu_notifier release race
-Date: Tue, 25 Apr 2017 20:49:05 +0200
-Message-ID: <20170425184904.GI5713@potion>
-References: <1493028624-29837-1-git-send-email-suzuki.poulose@arm.com>
- <1493028624-29837-2-git-send-email-suzuki.poulose@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 02/22] KVM: arm/arm64: Add GICV3 pending table save API
+ documentation
+Date: Wed, 26 Apr 2017 10:26:24 +0200
+Message-ID: <a5ab9181-8398-f62b-12f1-032961b12c28@redhat.com>
+References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-3-git-send-email-eric.auger@redhat.com>
+ <CAFEAcA_0N9Jx5ym+=jjmxAzSaXPjt-m+gW1cq90of8Qhw3LOzg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B9D3140C75
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 14:46:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50BE440C4A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 04:23:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hsCGbz1wmP5X for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Apr 2017 14:46:21 -0400 (EDT)
+ with ESMTP id rv1DFuoDVGbV for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Apr 2017 04:23:42 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0694A40C74
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Apr 2017 14:46:20 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <1493028624-29837-2-git-send-email-suzuki.poulose@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A21F40C22
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 04:23:41 -0400 (EDT)
+In-Reply-To: <CAFEAcA_0N9Jx5ym+=jjmxAzSaXPjt-m+gW1cq90of8Qhw3LOzg@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,64 +30,70 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "prasun.kapoor" <Prasun.Kapoor@cavium.com>, kvm-devel <kvm@vger.kernel.org>, Juan Quintela <quintela@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Kumar,
+ Vijaya" <Vijaya.Kumar@cavium.com>, Vijaya Kumar K <vijayak@caviumnetworks.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-2017-04-24 11:10+0100, Suzuki K Poulose:
-> The KVM uses mmu_notifier (wherever available) to keep track
-> of the changes to the mm of the guest. The guest shadow page
-> tables are released when the VM exits via mmu_notifier->ops.release().
-> There is a rare chance that the mmu_notifier->release could be
-> called more than once via two different paths, which could end
-> up in use-after-free of kvm instance (such as [0]).
+Hi Peter,
+
+On 25/04/2017 12:43, Peter Maydell wrote:
+> On 14 April 2017 at 11:15, Eric Auger <eric.auger@redhat.com> wrote:
+>> Add description for how to save GICV3 LPI pending bit into
+>> guest RAM pending tables.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v5: creation
+>> ---
+>>  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>> index c1a2461..9293b45 100644
+>> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+>> @@ -167,11 +167,17 @@ Groups:
+>>      KVM_DEV_ARM_VGIC_CTRL_INIT
+>>        request the initialization of the VGIC, no additional parameter in
+>>        kvm_device_attr.addr.
+>> +    KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
+>> +      save all LPI pending bits into guest RAM pending tables.
+>> +
+>> +      The first kB of the pending table is not altered by this operation.
+>>    Errors:
+>>      -ENXIO: VGIC not properly configured as required prior to calling
+>>       this attribute
+>>      -ENODEV: no online VCPU
+>>      -ENOMEM: memory shortage when allocating vgic internal data
+>> +    -EFAULT: Invalid guest ram access
+>> +    -EBUSY:  One or more VCPUS are running
+>>
+>>
+>>    KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
+>> --
+>> 2.5.5
 > 
-> e.g:
+> When does the -EFAULT return happen? (if the guest points GITS_BASER<n>
+> etc at invalid memory, presumably?)
+Yes that's correct, when GICR_PENDBASER contains a bad GPA.
+ How does the QEMU migration code
+> handle this case? Failing migration because the guest has done something
+> silly doesn't seem too palatable, but trying to avoid that could be
+> more effort than an obscure corner case really merits.
+The kvm_device_access will cause an abort() as for other errors returned
+by kvm_device_ioctl().
+
+Thanks
+
+Eric
 > 
-> thread A                                        thread B
-> -------                                         --------------
+> thanks
+> -- PMM
 > 
->  get_signal->                                   kvm_destroy_vm()->
->  do_exit->                                        mmu_notifier_unregister->
->  exit_mm->                                        kvm_arch_flush_shadow_all()->
->  exit_mmap->                                      spin_lock(&kvm->mmu_lock)
->  mmu_notifier_release->                           ....
->   kvm_arch_flush_shadow_all()->                   .....
->   ... spin_lock(&kvm->mmu_lock)                   .....
->                                                   spin_unlock(&kvm->mmu_lock)
->                                                 kvm_arch_free_kvm()
->    *** use after free of kvm ***
-
-I don't understand this race ...
-a piece of code in mmu_notifier_unregister() says:
-
-  	/*
-  	 * Wait for any running method to finish, of course including
-  	 * ->release if it was run by mmu_notifier_release instead of us.
-  	 */
-  	synchronize_srcu(&srcu);
-
-and code before that removes the notifier from the list, so it cannot be
-called after we pass this point.  mmu_notifier_release() does roughly
-the same and explains it as:
-
-  	/*
-  	 * synchronize_srcu here prevents mmu_notifier_release from returning to
-  	 * exit_mmap (which would proceed with freeing all pages in the mm)
-  	 * until the ->release method returns, if it was invoked by
-  	 * mmu_notifier_unregister.
-  	 *
-  	 * The mmu_notifier_mm can't go away from under us because one mm_count
-  	 * is held by exit_mmap.
-  	 */
-  	synchronize_srcu(&srcu);
-
-The call of mmu_notifier->release is protected by srcu in both cases and
-while it seems possible that mmu_notifier->release would be called
-twice, I don't see a combination that could result in use-after-free
-from mmu_notifier_release after mmu_notifier_unregister() has returned.
-
-Doesn't [2/2] solve the exact same issue (that the release method cannot
-be called twice in parallel)?
-
-Thanks.
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
