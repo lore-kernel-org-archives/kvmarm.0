@@ -1,28 +1,28 @@
 From: Prakash B <bjsprakash.linux@gmail.com>
-Subject: Re: [PATCH v5 07/22] KVM: arm64: vgic-its: Implement
- vgic_its_has_attr_regs and attr_regs_access
-Date: Wed, 26 Apr 2017 16:54:12 +0530
-Message-ID: <CACJhumcH+L1P-r4o5bHD7y5EoF-WPq3bAw0iXaqjUmnh7GQSoA@mail.gmail.com>
+Subject: Re: [PATCH v5 08/22] KVM: arm64: vgic-its: Implement
+ vgic_mmio_uaccess_write_its_creadr
+Date: Wed, 26 Apr 2017 16:54:53 +0530
+Message-ID: <CACJhumcnS-TS9GL7krxccMEjTwzGPo7y0OgAqbi9WSFXhWv1gw@mail.gmail.com>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-8-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-9-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 897CE40C2E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:21:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BC0540C2E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:22:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iPpoOQ1vVc9M for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Apr 2017 07:21:22 -0400 (EDT)
-Received: from mail-lf0-f65.google.com (mail-lf0-f65.google.com
- [209.85.215.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9780440C28
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:21:22 -0400 (EDT)
-Received: by mail-lf0-f65.google.com with SMTP id i3so24524550lfh.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 04:24:14 -0700 (PDT)
-In-Reply-To: <1492164934-988-8-git-send-email-eric.auger@redhat.com>
+ with ESMTP id 6pVExqdsYxm7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Apr 2017 07:22:03 -0400 (EDT)
+Received: from mail-lf0-f68.google.com (mail-lf0-f68.google.com
+ [209.85.215.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 234FE40C28
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 07:22:03 -0400 (EDT)
+Received: by mail-lf0-f68.google.com with SMTP id 75so24490511lfs.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Apr 2017 04:24:54 -0700 (PDT)
+In-Reply-To: <1492164934-988-9-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,13 +37,9 @@ Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, Marc Zyngier <marc.zyngier@ar
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Fri, Apr 14, 2017 at 3:45 PM, Eric Auger <eric.auger@redhat.com> wrote:
-> This patch implements vgic_its_has_attr_regs and vgic_its_attr_regs_access
-> upon the MMIO framework. VGIC ITS KVM device KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-> group becomes functional.
->
-> At least GITS_CREADR and GITS_IIDR require to differentiate a guest write
-> action from a user access. As such let's introduce a new uaccess_its_write
-> vgic_register_region callback.
+> GITS_CREADR needs to be restored so let's implement the associated
+> uaccess_write_its callback. The write only is allowed if the its
+> is disabled.
 >
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
