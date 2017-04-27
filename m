@@ -1,75 +1,78 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH] arm64: KVM: Fix decoding of Rt/Rt2 when trapping AArch32 CP accesses
-Date: Thu, 27 Apr 2017 19:06:48 +0100
-Message-ID: <20170427180648.25159-1-marc.zyngier@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v5 12/22] KVM: arm64: vgic-its: Interpret MAPD ITT_addr
+ field
+Date: Thu, 27 Apr 2017 11:09:11 -0700
+Message-ID: <20170427180911.GU50776@lvm>
+References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-13-git-send-email-eric.auger@redhat.com>
+ <20170427164356.GP50776@lvm>
+ <5f187dbf-6167-7bd3-4a8e-37545941d05c@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <5f187dbf-6167-7bd3-4a8e-37545941d05c@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Our 32bit CP14/15 handling inherited some of the ARMv7 code for handling
-the trapped system registers, completely missing the fact that the
-fields for Rt and Rt2 are now 5 bit wide, and not 4...
+On Thu, Apr 27, 2017 at 07:44:25PM +0200, Auger Eric wrote:
+> Hi,
+> 
+> On 27/04/2017 18:43, Christoffer Dall wrote:
+> > On Fri, Apr 14, 2017 at 12:15:24PM +0200, Eric Auger wrote:
+> >> Up to now the MAPD ITT_addr had been ignored. We will need it
+> >> for save/restore. Let's record it in the its_device struct.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>
+> >> ---
+> >> v4 -> v5:
+> >> - its_cmd_get_ittaddr macro now returns the actual ITT GPA
+> >>
+> >> v3 -> v4:
+> >> - in vgic_its_cmd_handle_mapd, itt_addr directly is shifted
+> >> - correct ittaddr bitmask to support 48bit GPA
+> >> ---
+> >>  virt/kvm/arm/vgic/vgic-its.c | 4 ++++
+> >>  1 file changed, 4 insertions(+)
+> >>
+> >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> >> index 0f3c8f3..757598d 100644
+> >> --- a/virt/kvm/arm/vgic/vgic-its.c
+> >> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> >> @@ -106,6 +106,7 @@ struct its_device {
+> >>  	/* the head for the list of ITTEs */
+> >>  	struct list_head itt_head;
+> >>  	u32 nb_eventid_bits;
+> >> +	gpa_t itt_addr;
+> >>  	u32 device_id;
+> >>  };
+> >>  
+> >> @@ -569,6 +570,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
+> >>  #define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
+> >>  #define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
+> >>  #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
+> >> +#define its_cmd_get_ittaddr(cmd)	(its_cmd_mask_field(cmd, 2,  8, 47) << 8)
+> > 
+> > Why 47?  The ITT_addr field is bits [51:8] unless I'm looking at
+> > something wrong?
+> 
+> Initially I limited to 48 bits since I found in the code:
+> 
+> /*
+>  * We only implement 48 bits of PA at the moment, although the ITS
+>  * supports more. Let's be restrictive here.
+>  */
+> #define BASER_ADDRESS(x)        ((x) & GENMASK_ULL(47, 16))
+> #define CBASER_ADDRESS(x)       ((x) & GENMASK_ULL(47, 12))
+> 
+> But practically as I encode the ITT addr field on 52 bits now in the DTE
+> there is no reason anymore.
 
-Let's fix it, and provide an accessor for the most common Rt case.
+Well, regardless, shouldn't you be bassing 44 to its_cmd_mask_field(),
+because you're shifting left 8 bits afterwards?
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/include/asm/kvm_emulate.h | 6 ++++++
- arch/arm64/kvm/sys_regs.c            | 8 ++++----
- 2 files changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index f5ea0ba70f07..fe39e6841326 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -240,6 +240,12 @@ static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
- 	return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_FSC_TYPE;
- }
- 
-+static inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
-+{
-+	u32 esr = kvm_vcpu_get_hsr(vcpu);
-+	return (esr & ESR_ELx_SYS64_ISS_RT_MASK) >> ESR_ELx_SYS64_ISS_RT_SHIFT;
-+}
-+
- static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
- {
- 	return vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index efbe9e8e7a78..0fe27024a2e1 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1529,8 +1529,8 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
- {
- 	struct sys_reg_params params;
- 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
--	int Rt = (hsr >> 5) & 0xf;
--	int Rt2 = (hsr >> 10) & 0xf;
-+	int Rt = kvm_vcpu_sys_get_rt(vcpu);
-+	int Rt2 = (hsr >> 10) & 0x1f;
- 
- 	params.is_aarch32 = true;
- 	params.is_32bit = false;
-@@ -1586,7 +1586,7 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
- {
- 	struct sys_reg_params params;
- 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
--	int Rt  = (hsr >> 5) & 0xf;
-+	int Rt  = kvm_vcpu_sys_get_rt(vcpu);
- 
- 	params.is_aarch32 = true;
- 	params.is_32bit = true;
-@@ -1688,7 +1688,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	struct sys_reg_params params;
- 	unsigned long esr = kvm_vcpu_get_hsr(vcpu);
--	int Rt = (esr >> 5) & 0x1f;
-+	int Rt = kvm_vcpu_sys_get_rt(vcpu);
- 	int ret;
- 
- 	trace_kvm_handle_sys_reg(esr);
--- 
-2.11.0
+Thanks,
+-Christoffer
