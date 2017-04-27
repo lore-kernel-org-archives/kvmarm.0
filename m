@@ -1,78 +1,117 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v5 03/22] KVM: arm/arm64: vgic-its: rename itte into ite
-Date: Thu, 27 Apr 2017 04:09:04 -0700
-Message-ID: <20170427110904.GI50776@lvm>
+Subject: Re: [PATCH v5 08/22] KVM: arm64: vgic-its: Implement
+ vgic_mmio_uaccess_write_its_creadr
+Date: Thu, 27 Apr 2017 04:27:25 -0700
+Message-ID: <20170427112725.GJ50776@lvm>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-4-git-send-email-eric.auger@redhat.com>
- <20170427090504.GC50776@lvm>
- <c32b8369-711c-1a1a-b3c1-bba2408ff003@arm.com>
- <82b7eb70-1705-8fc5-7ec1-12ba58418389@redhat.com>
+ <1492164934-988-9-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C20BF40D25
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 07:06:14 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TPZX8UcPHhdM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Apr 2017 07:06:13 -0400 (EDT)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4521D40D19
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 07:06:13 -0400 (EDT)
-Received: by mail-wm0-f41.google.com with SMTP id m123so14862255wma.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 04:09:06 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <82b7eb70-1705-8fc5-7ec1-12ba58418389@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, Andre Przywara <andre.przywara@arm.com>, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+In-Reply-To: <1492164934-988-9-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 27, 2017 at 11:40:16AM +0200, Auger Eric wrote:
-> Hi Christoffer, Andre,
+On Fri, Apr 14, 2017 at 12:15:20PM +0200, Eric Auger wrote:
+> GITS_CREADR needs to be restored so let's implement the associated
+> uaccess_write_its callback. The write only is allowed if the its
+> is disabled.
 > 
-> On 27/04/2017 11:20, Andre Przywara wrote:
-> > Hi,
-> > 
-> > On 27/04/17 10:05, Christoffer Dall wrote:
-> >> On Fri, Apr 14, 2017 at 12:15:15PM +0200, Eric Auger wrote:
-> >>> The actual abbreviation for the interrupt translation table entry
-> >>> is ITE. Let's rename all itte instances by ite.
-> >>
-> >> Is there really any confusion or problems with using itte?  This is a
-> >> lot of churn...
-> > 
-> > I tend to agree (just didn't dare to mention this before).
-> > I see that the spec speaks of "ITE", but the spelled out term hints more
-> > at ITTE (because it's a "translation table").
-> > Besides three letters tend to be more ambiguous than a four letter
-> > identifier.
-> > 
-> > Would adding a comment to the structure definition help?
-> > 
-> > But speaking of churn I am not sure how much more work dropping this
-> > patch now creates on Eric's side ...
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> I addressed one comment from Marc saying that ITTE was a wrong name and
-> he had a patch ready to rename them.
+> ---
+> v4 -> v5:
+> - keep Stalled bit
+> - vgic_mmio_uaccess_write_its_creadr can now return an error
 > 
-> see https://patchwork.kernel.org/patch/9513491/
+> v3 -> v4:
+> - REGISTER_ITS_DESC_UACCESS now introduced in this patch
+> - we now check the its is disabled
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 40 insertions(+), 2 deletions(-)
 > 
-> Renaming back would largely impact the other patches I am afraid
-> 
-Ok, it's fine, Marc likes the change, and Andre is happy that you are
-now responsible for all ITS bugs, and I'm happy if you're all happy.
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index a9a2c12..79ed1c2 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1213,6 +1213,33 @@ static unsigned long vgic_mmio_read_its_creadr(struct kvm *kvm,
+>  	return extract_bytes(its->creadr, addr & 0x7, len);
+>  }
+>  
+> +static int vgic_mmio_uaccess_write_its_creadr(struct kvm *kvm,
+> +					      struct vgic_its *its,
+> +					      gpa_t addr, unsigned int len,
+> +					      unsigned long val)
+> +{
+> +	int ret = 0;
+> +	u32 reg;
+> +
+> +	mutex_lock(&its->cmd_lock);
+> +
+> +	if (its->enabled) {
+> +		ret = -EBUSY;
+> +		goto out;
+> +	}
+> +
+> +	reg = update_64bit_reg(its->creadr, addr & 7, len, val);
 
-Let's keep this change :)
+you theoretically don't need this, since you prevent 32-bit accesses to
+this register, but I guess it doesn't hurt...
 
+> +	if (ITS_CMD_OFFSET(reg) >= ITS_CMD_BUFFER_SIZE(its->cbaser)) {
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+
+can the creadr value be unaligned to the command size?  I don't think
+you check that anywhere here?
+
+Thanks,
 -Christoffer
+
+> +
+> +	its->creadr = reg;
+> +out:
+> +	mutex_unlock(&its->cmd_lock);
+> +	return ret;
+> +}
+> +
+>  #define BASER_INDEX(addr) (((addr) / sizeof(u64)) & 0x7)
+>  static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm,
+>  					      struct vgic_its *its,
+> @@ -1317,6 +1344,16 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+>  	.its_write = wr,					\
+>  }
+>  
+> +#define REGISTER_ITS_DESC_UACCESS(off, rd, wr, uwr, length, acc)\
+> +{								\
+> +	.reg_offset = off,					\
+> +	.len = length,						\
+> +	.access_flags = acc,					\
+> +	.its_read = rd,						\
+> +	.its_write = wr,					\
+> +	.uaccess_its_write = uwr,				\
+> +}
+> +
+>  static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
+>  			      gpa_t addr, unsigned int len, unsigned long val)
+>  {
+> @@ -1339,8 +1376,9 @@ static struct vgic_register_region its_registers[] = {
+>  	REGISTER_ITS_DESC(GITS_CWRITER,
+>  		vgic_mmio_read_its_cwriter, vgic_mmio_write_its_cwriter, 8,
+>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+> -	REGISTER_ITS_DESC(GITS_CREADR,
+> -		vgic_mmio_read_its_creadr, its_mmio_write_wi, 8,
+> +	REGISTER_ITS_DESC_UACCESS(GITS_CREADR,
+> +		vgic_mmio_read_its_creadr, its_mmio_write_wi,
+> +		vgic_mmio_uaccess_write_its_creadr, 8,
+>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>  	REGISTER_ITS_DESC(GITS_BASER,
+>  		vgic_mmio_read_its_baser, vgic_mmio_write_its_baser, 0x40,
+> -- 
+> 2.5.5
+> 
