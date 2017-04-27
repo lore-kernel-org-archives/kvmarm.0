@@ -1,287 +1,189 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v5 09/22] KVM: arm64: vgic-its: Introduce migration ABI
- infrastructure
-Date: Thu, 27 Apr 2017 06:14:48 -0700
-Message-ID: <20170427131448.GK50776@lvm>
+Subject: Re: [PATCH v5 01/22] KVM: arm/arm64: Add ITS save/restore API
+ documentation
+Date: Thu, 27 Apr 2017 07:45:16 -0700
+Message-ID: <20170427144516.GL50776@lvm>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-10-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-2-git-send-email-eric.auger@redhat.com>
+ <20170426123120.GL4104@cbox>
+ <88a194fa-9143-960e-e0a6-6b5c388cef82@redhat.com>
+ <20170427085709.GB50776@lvm>
+ <db5d0eb9-67eb-8b9a-50ca-816d217b3f53@redhat.com>
+ <20170427110223.GH50776@lvm>
+ <d0aa6771-a8c3-276e-0f70-d709cdf678d6@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BD8E40F86
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 09:12:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6Mi3CzxNXcS5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Apr 2017 09:11:58 -0400 (EDT)
-Received: from mail-wr0-f181.google.com (mail-wr0-f181.google.com
- [209.85.128.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4265A40E02
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 09:11:58 -0400 (EDT)
-Received: by mail-wr0-f181.google.com with SMTP id l50so16940977wrc.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 06:14:51 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1492164934-988-10-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+In-Reply-To: <d0aa6771-a8c3-276e-0f70-d709cdf678d6@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Christoffer Dall <cdall@linaro.org>, drjones@redhat.com, kvm@vger.kernel.org, peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, Prasun.Kapoor@cavium.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 14, 2017 at 12:15:21PM +0200, Eric Auger wrote:
-> We plan to support different migration ABIs, ie. characterizing
-> the ITS table layout format in guest RAM. Typically a new ABI will
+Hi Eric,
 
-nit: s/Typically/For example,
-
-> be needed if vLPIs get supported for nested use case.
+On Thu, Apr 27, 2017 at 02:51:00PM +0200, Auger Eric wrote:
+> On 27/04/2017 13:02, Christoffer Dall wrote:
+> > On Thu, Apr 27, 2017 at 11:33:39AM +0200, Auger Eric wrote:
+> >> On 27/04/2017 10:57, Christoffer Dall wrote:
+> >>> On Wed, Apr 26, 2017 at 05:48:32PM +0200, Auger Eric wrote:
+> >>>> On 26/04/2017 14:31, Christoffer Dall wrote:
+> >>>>> On Fri, Apr 14, 2017 at 12:15:13PM +0200, Eric Auger wrote:
+> >>>>>> Add description for how to access ITS registers and how to save/restore
+> >>>>>> ITS tables into/from memory.
+> >>>>>>
+> >>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>>>>>
+> >>>>>> ---
+> >>>>>> v4 -> v5:
+> >>>>>> - take into account Christoffer's comments
+> >>>>>> - pending table save on GICV3 side now
+> >>>>>>
+> >>>>>> v3 -> v4:
+> >>>>>> - take into account Peter's comments:
+> >>>>>>   - typos
+> >>>>>>   - KVM_DEV_ARM_VGIC_GRP_ITS_TABLES kvm_device_attr = 0
+> >>>>>>   - add a validity bit in DTE
+> >>>>>>   - document all fields in CTE and ITE
+> >>>>>>   - document ABI revision
+> >>>>>> - take into account Andre's comments:
+> >>>>>>   - document restrictions about GITS_CREADR writing and GITS_IIDR
+> >>>>>>   - document -EBUSY error if one or more VCPUS are runnning
+> >>>>>>   - document 64b registers only can be accessed with 64b access
+> >>>>>> - itt_addr field matches bits [51:8] of the itt_addr
+> >>>>>>
+> >>>>>> v1 -> v2:
+> >>>>>> - DTE and ITE now are 8 bytes
+> >>>>>> - DTE and ITE now indexed by deviceid/eventid
+> >>>>>> - use ITE name instead of ITTE
+> >>>>>> - mentions ITT_addr matches bits [51:8] of the actual address
+> >>>>>> - mentions LE layout
+> >>>>>> ---
+> >>>>>>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 99 ++++++++++++++++++++++
+> >>>>>>  1 file changed, 99 insertions(+)
+> >>>>>>
+> >>>>>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> >>>>>> index 6081a5b..b5f010d 100644
+> >>>>>> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> >>>>>> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> >>>>>> @@ -32,7 +32,106 @@ Groups:
+> >>>>>>      KVM_DEV_ARM_VGIC_CTRL_INIT
+> >>>>>>        request the initialization of the ITS, no additional parameter in
+> >>>>>>        kvm_device_attr.addr.
+> >>>>>> +
+> >>>>>> +    KVM_DEV_ARM_ITS_SAVE_TABLES
+> >>>>>> +      save the ITS table data into guest RAM, at the location provisioned
+> >>>>>> +      by the guest in corresponding registers/table entries.
+> >>>>>> +
+> >>>>>> +      The layout of the tables in guest memory defines an ABI. The entries
+> >>>>>> +      are laid out in little endian format as described in the last paragraph.
+> >>>>>> +
+> >>>>>> +    KVM_DEV_ARM_ITS_RESTORE_TABLES
+> >>>>>> +      restore the ITS tables from guest RAM to ITS internal structures.
+> >>>>>> +
+> >>>>>> +      The GICV3 must be restored before the ITS and all ITS registers but
+> >>>>>> +      the GITS_CTLR must be restored before restoring the ITS tables.
+> >>>>>> +
+> >>>>>> +      The GITS_IIDR read-only register must also be restored before
+> >>>>>> +      the table restore as the IIDR revision field encodes the ABI revision.
+> >>>>>> +
+> >>>>>
+> >>>>> what is the expected sequence of operations.  For example, to restore
+> >>>>> the ITS, do I call KVM_DEV_ARM_VGIC_CTRL_INIT first, then restore all
+> >>>>> the memory and registers, and finally call KVM_DEV_ARM_ITS_RESTORE_TABLES?
+> >>>> Yes KVM_DEV_ARM_VGIC_CTRL_INIT comes first, then restore all registers
+> >>>> except GITS_CTLR, then table restore, then GITS_CTLR
+> >>>>>
+> >>>>> Is there any interaction between when you call KVM_DEV_ARM_ITS_RESTORE_TABLES
+> >>>>> and restore GITS_CTLR (which enables the ITS)?
+> >>>>
+> >>>> Yep, when GITS_CTLR is set, LPIs may be enabled and this on that event
+> >>>> that the pending table is read. But the whole pending table is not read
+> >>>> as we only iterate on registered LPIs. So the ITT must have been
+> >>>> restored previously.
+> >>>>
+> >>>> I became aware that the pending table sync is done twice, once in the
+> >>>> pending table restore,  and once in the GITS_CTLR restore. So if we
+> >>>> leave this order specification, I should be able to remove the sync on
+> >>>> table restore. This was the original reason why GITS_CTLR restore has
+> >>>> been done at the very end.
+> >>>
+> >>> I'm sorry, I'm a bit confused.  Do we not need
+> >>> KVM_DEV_ARM_ITS_RESTORE_TABLES at all then?
+> >>
+> >> Yes you do. I was talking about the RDIST pending table sync. The save
+> >> is explicit using GICV3 device KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES.
+> >> However the sync is implicit on GITS_CTLR restore if LPIs are enabled.
+> >> and today I do it also on ITS device KVM_DEV_ARM_ITS_RESTORE_TABLES
+> >> which is not requested I think since GITS_CTLR restore does it already.
+> > 
+> > Shouldn't restoring the pending tables happen when restoring some
+> > redeistributor state and not anything related to the ITS?
 > 
-> So let's introduce an array of supported ABIs (at the moment a single
-> ABI is supported though). The following characteristics are foreseen
-> to vary with the ABI: size of table entries, save/restore operation.
+> Marc wrote:
+> "
+> I don't think you necessarily need a coarse map. When restoring the ITS
+> tables, you can always read the pending bit when creating the LPI
+> structure (it has been written to RAM at save time). Note that we
+> already do something like this in vgic_enable_lpis().
+> "
 > 
-> By default the MAX_ABI_REV is applied on its creation. In subsequent
-> patches we will introduce a way for the userspace to change the ABI
-> in use.
+> This is currently what is implemented I think. the pending tables are
+> currently sync'ed on GITS_CTLR set (if LPI are enabled) + erroneously
+> also on on ITS table restore
 > 
-> The entry sizes now are set according to the ABI version and not
-> hardcoded anymore.
+> The problematic is: Either you know in advance which LPI INTIDare used
+> or you need to parse the whole pending table (possibly using the 1st kB
+> as coarse mapping).
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> If you don't know the LPI INTIDs in advance it is only possible to
+> restore the pending bit of pending LPIs. At that time you would
+> re-allocate those pending LPI (vgic_add_lpi) and when you restore the
+> ITS ITT you would do the same for those which were not pending. Looks
+> really heavy to me: coarse mapping + dual vgic_add_lpi path.
 > 
-> ---
+> Otherwise we would need to add another dependency between RDIST pending
+> table restore and ITS table restore but this looks even more weird, no?
 > 
-> v5: creation and squash KVM: arm64: ITS: Report the ITE size in
->     GITS_TYPER
-> ---
->  include/kvm/arm_vgic.h             |  3 ++
->  include/linux/irqchip/arm-gic-v3.h |  4 ++
->  virt/kvm/arm/vgic/vgic-its.c       | 82 ++++++++++++++++++++++++++++++++++++--
->  3 files changed, 85 insertions(+), 4 deletions(-)
 > 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index c0b3d99..285474a 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -162,6 +162,9 @@ struct vgic_its {
->  	u32			creadr;
->  	u32			cwriter;
->  
-> +	/* migration ABI revision in use */
-> +	u32			abi_rev;
-> +
->  	/* Protects the device and collection lists */
->  	struct mutex		its_lock;
->  	struct list_head	device_list;
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index 97cbca1..9648bad 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -132,6 +132,8 @@
->  #define GIC_BASER_SHAREABILITY(reg, type)				\
->  	(GIC_BASER_##type << reg##_SHAREABILITY_SHIFT)
->  
-> +#define GIC_ENCODE_SZ(n, w) (((unsigned long)(n) - 1) & GENMASK_ULL(((w) - 1), 0))
-> +
+So I just sat down with Andre and Marc and we tried to work through this
+and came up with the best scheme.  I apologize in advance for the
+one-way nature of this e-mail, and I am of course open to discussing the
+following proposal again if you do not agree.
 
-This is a very generic name.  Could you add a comment about what the
-idea is?
+What I think this document should say, is that the following ordering
+must be followed when restoring the GIC and the ITS:
 
->  #define GICR_PROPBASER_SHAREABILITY_SHIFT		(10)
->  #define GICR_PROPBASER_INNER_CACHEABILITY_SHIFT		(7)
->  #define GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT		(56)
-> @@ -232,6 +234,7 @@
->  #define GITS_CTLR_QUIESCENT		(1U << 31)
->  
->  #define GITS_TYPER_PLPIS		(1UL << 0)
-> +#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
->  #define GITS_TYPER_IDBITS_SHIFT		8
->  #define GITS_TYPER_DEVBITS_SHIFT	13
->  #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
-> @@ -290,6 +293,7 @@
->  #define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
->  #define GITS_BASER_ENTRY_SIZE_SHIFT		(48)
->  #define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
-> +#define GITS_BASER_ENTRY_SIZE_MASK	GENMASK_ULL(52, 48)
->  #define GITS_BASER_SHAREABILITY_SHIFT	(10)
->  #define GITS_BASER_InnerShareable					\
->  	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 79ed1c2..69ecfe4 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -33,6 +33,12 @@
->  #include "vgic.h"
->  #include "vgic-mmio.h"
->  
-> +/* Highest migration ABI revision supported by this code */
-> +#define MAX_ABI_REV 0
-> +
-> +static int vgic_its_set_abi(struct vgic_its *its, int rev);
-> +static const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its);
-> +
->  /*
->   * Creates a new (reference to a) struct vgic_irq for a given LPI.
->   * If this LPI is already mapped on another ITS, we increase its refcount
-> @@ -123,6 +129,15 @@ struct its_ite {
->  	u32 event_id;
->  };
->  
-> +struct vgic_its_abi {
-> +	int cte_esz;
-> +	int dte_esz;
-> +	int ite_esz;
-> +	int (*save_tables)(struct vgic_its *its);
-> +	int (*restore_tables)(struct vgic_its *its);
-> +	int (*commit)(struct vgic_its *its);
+  First, restore all guest memory
 
-Can you document what these functions do (especially the commit function
-seems to be internal and not be related to the ABI as such).
+  Second, restore ALL redistributors
 
-> +};
-> +
->  /*
->   * Find and returns a device in the device table for an ITS.
->   * Must be called with the its_lock mutex held.
-> @@ -364,6 +379,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
->  					      struct vgic_its *its,
->  					      gpa_t addr, unsigned int len)
->  {
-> +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
->  	u64 reg = GITS_TYPER_PLPIS;
->  
->  	/*
-> @@ -376,6 +392,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
->  	 */
->  	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
->  	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
-> +	reg |= GIC_ENCODE_SZ(abi->ite_esz, 4) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
->  
->  	return extract_bytes(reg, addr & 7, len);
->  }
-> @@ -1268,6 +1285,7 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
->  				      gpa_t addr, unsigned int len,
->  				      unsigned long val)
->  {
-> +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
->  	u64 entry_size, device_type;
->  	u64 reg, *regptr, clearbits = 0;
->  
-> @@ -1278,12 +1296,12 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
->  	switch (BASER_INDEX(addr)) {
->  	case 0:
->  		regptr = &its->baser_device_table;
-> -		entry_size = 8;
-> +		entry_size = abi->dte_esz;
->  		device_type = GITS_BASER_TYPE_DEVICE;
->  		break;
->  	case 1:
->  		regptr = &its->baser_coll_table;
-> -		entry_size = 8;
-> +		entry_size = abi->cte_esz;
->  		device_type = GITS_BASER_TYPE_COLLECTION;
->  		clearbits = GITS_BASER_INDIRECT;
->  		break;
-> @@ -1425,7 +1443,6 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
->  	(GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWb)		| \
->  	 GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, SameAsInner)		| \
->  	 GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)		| \
-> -	 ((8ULL - 1) << GITS_BASER_ENTRY_SIZE_SHIFT)			| \
->  	 GITS_BASER_PAGE_SIZE_64K)
->  
->  #define INITIAL_PROPBASER_VALUE						  \
-> @@ -1465,7 +1482,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
->  
->  	dev->private = its;
->  
-> -	return 0;
-> +	return vgic_its_set_abi(its, MAX_ABI_REV);
->  }
->  
->  static void vgic_its_destroy(struct kvm_device *kvm_dev)
-> @@ -1592,6 +1609,63 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
->  	return ret;
->  }
->  
-> +/**
-> + * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
-> + * according to v0 ABI
-> + */
-> +static int vgic_its_save_tables_v0(struct vgic_its *its)
-> +{
-> +	return -ENXIO;
-> +}
-> +
-> +/**
-> + * vgic_its_restore_tables_v0 - Restore the ITS tables from guest RAM
-> + * to internal data structs according to V0 ABI
-> + *
-> + */
-> +static int vgic_its_restore_tables_v0(struct vgic_its *its)
-> +{
-> +	return -ENXIO;
-> +}
-> +
-> +static int vgic_its_commit_v0(struct vgic_its *its)
-> +{
-> +	const struct vgic_its_abi *abi;
-> +
-> +	abi = vgic_its_get_abi(its);
-> +	its->baser_coll_table &= ~GITS_BASER_ENTRY_SIZE_MASK;
-> +	its->baser_device_table &= ~GITS_BASER_ENTRY_SIZE_MASK;
-> +
-> +	its->baser_coll_table |= (GIC_ENCODE_SZ(abi->cte_esz, 5)
-> +					<< GITS_BASER_ENTRY_SIZE_SHIFT);
-> +
-> +	its->baser_device_table |= (GIC_ENCODE_SZ(abi->dte_esz, 5)
-> +					<< GITS_BASER_ENTRY_SIZE_SHIFT);
-> +	return 0;
-> +}
-> +
-> +static const struct vgic_its_abi abi[MAX_ABI_REV + 1] = {
+  Third, restore the ITS, in the following order:
+    1. Initialize the ITS (KVM_DEV_ARM_VGIC_CTRL_INIT)
+    2. Restore GITS_CBASER
+    3. Restore all other GITS_ registers, except GITS_CTLR!
+    4. Load the ITS table data (KVM_DEV_ARM_ITS_RESTORE_TABLES)
+    5. Restore GITS_CTLR
 
-nit: can we name this its_table_abi_versions or something like that
-which is slightly more descriptive?
+The rationale is that we really want the redistributor and the ITS
+restore to be independent and follow the architecture.  This means that
+our ABI for the redistributor should still work without restoring an ITS
+(if we ever decide to support LPIs for KVM without the ITS).
 
-> +	{.cte_esz = 8, .dte_esz = 8, .ite_esz = 8,
-> +	 .save_tables = vgic_its_save_tables_v0,
-> +	 .restore_tables = vgic_its_restore_tables_v0,
-> +	 . commit = vgic_its_commit_v0,
+In terms of our current implementation this means that vgic_add_lpi()
+should ask the redistributor what the state of the LPI is (priority,
+enabled, pending).  I suggest you do the pending check by adding a
+function called something like vgic_v3_lpi_is_pending() which scans the
+bit in memory, clears the memory bit, and returns the value.  Clearing
+the pending bit in memory when moving it to the struct irq is nice,
+because you then don't have to clear out the entire pending table later
+and we don't keep 'consumed' data lying around.  This change should be
+implemented in its_sync_lpi_pending_table() as well, but note that you
+need never call that function in the normal restore path using this
+design.
 
-stray whitespace
-
-> +	},
-> +};
-> +
-> +inline const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its)
-> +{
-> +	return &abi[its->abi_rev];
-> +}
-> +
-> +int vgic_its_set_abi(struct vgic_its *its, int rev)
-> +{
-> +	const struct vgic_its_abi *abi;
-> +
-> +	its->abi_rev = rev;
-> +	abi = vgic_its_get_abi(its);
-> +	return abi->commit(its);
-> +}
-> +
->  static int vgic_its_has_attr(struct kvm_device *dev,
->  			     struct kvm_device_attr *attr)
->  {
-> -- 
-> 2.5.5
-> 
+I hope this makes sense.
 
 Thanks,
 -Christoffer
