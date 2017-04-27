@@ -1,131 +1,142 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v5 01/22] KVM: arm/arm64: Add ITS save/restore API
- documentation
-Date: Thu, 27 Apr 2017 04:02:23 -0700
-Message-ID: <20170427110223.GH50776@lvm>
-References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-2-git-send-email-eric.auger@redhat.com>
- <20170426123120.GL4104@cbox>
- <88a194fa-9143-960e-e0a6-6b5c388cef82@redhat.com>
- <20170427085709.GB50776@lvm>
- <db5d0eb9-67eb-8b9a-50ca-816d217b3f53@redhat.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2] arm64: Add ASM modifier for xN register operands
+Date: Thu, 27 Apr 2017 12:02:56 +0100
+Message-ID: <20170427110256.GC31337@leverpostej>
+References: <20170426214616.142580-1-mka@chromium.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EF1140CA1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 07:00:35 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id idXEXxZel7hL for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Apr 2017 07:00:34 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2ADA40C54
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 07:00:33 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <db5d0eb9-67eb-8b9a-50ca-816d217b3f53@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Christoffer Dall <cdall@linaro.org>, drjones@redhat.com, kvm@vger.kernel.org, peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, Prasun.Kapoor@cavium.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+In-Reply-To: <20170426214616.142580-1-mka@chromium.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Grant Grundler <grundler@chromium.org>, linux-arm-kernel@lists.infradead.org, Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Christoph Lameter <cl@linux.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 27, 2017 at 11:33:39AM +0200, Auger Eric wrote:
-> Hi Christoffer,
-> 
-> On 27/04/2017 10:57, Christoffer Dall wrote:
-> > On Wed, Apr 26, 2017 at 05:48:32PM +0200, Auger Eric wrote:
-> >> Hi Christoffer,
-> >>
-> >> On 26/04/2017 14:31, Christoffer Dall wrote:
-> >>> On Fri, Apr 14, 2017 at 12:15:13PM +0200, Eric Auger wrote:
-> >>>> Add description for how to access ITS registers and how to save/restore
-> >>>> ITS tables into/from memory.
-> >>>>
-> >>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>>>
-> >>>> ---
-> >>>> v4 -> v5:
-> >>>> - take into account Christoffer's comments
-> >>>> - pending table save on GICV3 side now
-> >>>>
-> >>>> v3 -> v4:
-> >>>> - take into account Peter's comments:
-> >>>>   - typos
-> >>>>   - KVM_DEV_ARM_VGIC_GRP_ITS_TABLES kvm_device_attr = 0
-> >>>>   - add a validity bit in DTE
-> >>>>   - document all fields in CTE and ITE
-> >>>>   - document ABI revision
-> >>>> - take into account Andre's comments:
-> >>>>   - document restrictions about GITS_CREADR writing and GITS_IIDR
-> >>>>   - document -EBUSY error if one or more VCPUS are runnning
-> >>>>   - document 64b registers only can be accessed with 64b access
-> >>>> - itt_addr field matches bits [51:8] of the itt_addr
-> >>>>
-> >>>> v1 -> v2:
-> >>>> - DTE and ITE now are 8 bytes
-> >>>> - DTE and ITE now indexed by deviceid/eventid
-> >>>> - use ITE name instead of ITTE
-> >>>> - mentions ITT_addr matches bits [51:8] of the actual address
-> >>>> - mentions LE layout
-> >>>> ---
-> >>>>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 99 ++++++++++++++++++++++
-> >>>>  1 file changed, 99 insertions(+)
-> >>>>
-> >>>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> >>>> index 6081a5b..b5f010d 100644
-> >>>> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> >>>> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-> >>>> @@ -32,7 +32,106 @@ Groups:
-> >>>>      KVM_DEV_ARM_VGIC_CTRL_INIT
-> >>>>        request the initialization of the ITS, no additional parameter in
-> >>>>        kvm_device_attr.addr.
-> >>>> +
-> >>>> +    KVM_DEV_ARM_ITS_SAVE_TABLES
-> >>>> +      save the ITS table data into guest RAM, at the location provisioned
-> >>>> +      by the guest in corresponding registers/table entries.
-> >>>> +
-> >>>> +      The layout of the tables in guest memory defines an ABI. The entries
-> >>>> +      are laid out in little endian format as described in the last paragraph.
-> >>>> +
-> >>>> +    KVM_DEV_ARM_ITS_RESTORE_TABLES
-> >>>> +      restore the ITS tables from guest RAM to ITS internal structures.
-> >>>> +
-> >>>> +      The GICV3 must be restored before the ITS and all ITS registers but
-> >>>> +      the GITS_CTLR must be restored before restoring the ITS tables.
-> >>>> +
-> >>>> +      The GITS_IIDR read-only register must also be restored before
-> >>>> +      the table restore as the IIDR revision field encodes the ABI revision.
-> >>>> +
-> >>>
-> >>> what is the expected sequence of operations.  For example, to restore
-> >>> the ITS, do I call KVM_DEV_ARM_VGIC_CTRL_INIT first, then restore all
-> >>> the memory and registers, and finally call KVM_DEV_ARM_ITS_RESTORE_TABLES?
-> >> Yes KVM_DEV_ARM_VGIC_CTRL_INIT comes first, then restore all registers
-> >> except GITS_CTLR, then table restore, then GITS_CTLR
-> >>>
-> >>> Is there any interaction between when you call KVM_DEV_ARM_ITS_RESTORE_TABLES
-> >>> and restore GITS_CTLR (which enables the ITS)?
-> >>
-> >> Yep, when GITS_CTLR is set, LPIs may be enabled and this on that event
-> >> that the pending table is read. But the whole pending table is not read
-> >> as we only iterate on registered LPIs. So the ITT must have been
-> >> restored previously.
-> >>
-> >> I became aware that the pending table sync is done twice, once in the
-> >> pending table restore,  and once in the GITS_CTLR restore. So if we
-> >> leave this order specification, I should be able to remove the sync on
-> >> table restore. This was the original reason why GITS_CTLR restore has
-> >> been done at the very end.
-> > 
-> > I'm sorry, I'm a bit confused.  Do we not need
-> > KVM_DEV_ARM_ITS_RESTORE_TABLES at all then?
-> 
-> Yes you do. I was talking about the RDIST pending table sync. The save
-> is explicit using GICV3 device KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES.
-> However the sync is implicit on GITS_CTLR restore if LPIs are enabled.
-> and today I do it also on ITS device KVM_DEV_ARM_ITS_RESTORE_TABLES
-> which is not requested I think since GITS_CTLR restore does it already.
+Hi,
 
-Shouldn't restoring the pending tables happen when restoring some
-redeistributor state and not anything related to the ITS?
+On Wed, Apr 26, 2017 at 02:46:16PM -0700, Matthias Kaehlcke wrote:
+> Many inline assembly statements don't include the 'x' modifier when
+> using xN registers as operands. This is perfectly valid, however it
+> causes clang to raise warnings like this:
+> 
+> warning: value size does not match register size specified by the
+>   constraint and modifier [-Wasm-operand-widths]
+> ...
+> arch/arm64/include/asm/barrier.h:62:23: note: expanded from macro
+>   '__smp_store_release'
+>     asm volatile ("stlr %1, %0"
+> 
+> Add the modifiers to keep clang happy.
+
+If we're going to make this consistent, it would make sense to similarly
+annotate 'w' regs. That will make it easier going forward to enforce a
+policy that registers are suitably annotated.
+
+Also, there's a risk that we silently mask a bug here, for which clang's
+warning is legitimate, so we need to review this very carefully...
 
 > 
-> KVM_DEV_ARM_ITS_RESTORE_TABLES restores all the ITS tables (device,
-> collection, ITT)
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
+> Changes in v2:
+> - also add modifiers to multiline ASM statements in include/asm/
+>   {atomic_ll_sc.h,irqflags.h,pgtable.h,uaccess.h,word-at-a-time.h}
+>   that were missed on v1
+> 
+>  arch/arm64/include/asm/arch_gicv3.h     |  2 +-
+>  arch/arm64/include/asm/atomic_ll_sc.h   | 36 ++++++++++++++++-----------------
+>  arch/arm64/include/asm/barrier.h        |  4 ++--
+>  arch/arm64/include/asm/io.h             | 24 +++++++++++-----------
+>  arch/arm64/include/asm/irqflags.h       | 10 ++++-----
+>  arch/arm64/include/asm/kvm_hyp.h        | 10 ++++-----
+>  arch/arm64/include/asm/kvm_mmu.h        | 12 +++++------
+>  arch/arm64/include/asm/percpu.h         |  4 ++--
+>  arch/arm64/include/asm/pgtable.h        | 20 +++++++++---------
+>  arch/arm64/include/asm/sysreg.h         |  4 ++--
+>  arch/arm64/include/asm/uaccess.h        | 14 ++++++-------
+>  arch/arm64/include/asm/word-at-a-time.h | 14 ++++++-------
+>  arch/arm64/kernel/armv8_deprecated.c    |  4 ++--
+>  arch/arm64/kernel/probes/kprobes.c      |  2 +-
+>  arch/arm64/kvm/hyp/switch.c             |  4 ++--
+>  15 files changed, 82 insertions(+), 82 deletions(-)
 
-Why do you need this if you anyway need to restore the CTLR as the last
-thing?  Just to make it absolutely clear when it happens, or is there
-something which has to happen between the CTLR and the RESTORE?
+... to that end, could you split these into a few patches?
+
+That way, knowledgeable people can focus their review on the code they
+understand.
+
+That doesn't need to be a patch per file; all the KVM bits can be
+collated in one patch, for example. However, the atomics, kvm, and
+uaccess+word-at-a-time bits should certainly be separate patches given
+their (existing) complexity.
+
+Otherwise, I have a couple of comments below.
+
+> diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
+> index f37e3a21f6e7..ba54e5bee885 100644
+> --- a/arch/arm64/include/asm/arch_gicv3.h
+> +++ b/arch/arm64/include/asm/arch_gicv3.h
+> @@ -166,7 +166,7 @@ static inline void gic_write_sre(u32 val)
+>  
+>  static inline void gic_write_bpr1(u32 val)
+>  {
+> -	asm volatile("msr_s " __stringify(ICC_BPR1_EL1) ", %0" : : "r" (val));
+> +	asm volatile("msr_s " __stringify(ICC_BPR1_EL1) ", %x0" : : "r" (val));
+>  }
+
+Please make this use write_sysreg_s() instead, i.e.
+
+static inline void gic_write_bpr1(u32 val)
+{
+	write_sysreg_s(var, ICC_BPR1_EL1);
+}
+
+... that uses the 'x' modifier internally, and it's what we do for the
+other GIC sysreg accesors.
+
+This accessor was missed by commit:
+
+  d44ffa5ae70a15a1 ("irqchip/gic-v3: Convert arm64 GIC accessors to {read,write}_sysreg_s")
+
+... because it was added concurrently by commitL
+
+  91ef84428a86b75a ("irqchip/gic-v3: Reset BPR during initialization")
+
+... i.e. it was not deliberately omitted.
+
+[...]
+
+> -	asm volatile("strb %w0, [%1]" : : "rZ" (val), "r" (addr));
+> +	asm volatile("strb %w0, [%x1]" : : "rZ" (val), "r" (addr));
+
+In general, the '[%xN]' pattern looks *very* suspicious to me. Any
+address must be 64-bit, so this would mask a legitimate warning.
+
+Given the prototype of this function the code if fine either way, but
+were we to refactor things (e.g. making this a macro), that might not be
+true.
+
+... so I'm not sure it make sense to alter instances used for addresses.
 
 Thanks,
--Christoffer
+Mark.
