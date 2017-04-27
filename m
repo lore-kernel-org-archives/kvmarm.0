@@ -1,110 +1,140 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v5 04/22] arm/arm64: vgic: turn vgic_find_mmio_region
- into public
-Date: Thu, 27 Apr 2017 02:07:24 -0700
-Message-ID: <20170427090724.GD50776@lvm>
+Subject: Re: [PATCH v5 05/22] KVM: arm64: vgic-its:
+ KVM_DEV_ARM_VGIC_GRP_ITS_REGS group
+Date: Thu, 27 Apr 2017 02:12:55 -0700
+Message-ID: <20170427091255.GE50776@lvm>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-5-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-6-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84A0C40EFE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 05:04:35 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zrqgauHnc4Zh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Apr 2017 05:04:34 -0400 (EDT)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 655F540E02
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 05:04:34 -0400 (EDT)
-Received: by mail-wm0-f43.google.com with SMTP id r190so11956813wme.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 02:07:27 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1492164934-988-5-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <1492164934-988-6-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
 To: Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 14, 2017 at 12:15:16PM +0200, Eric Auger wrote:
-> We plan to use vgic_find_mmio_region in vgic-its.c so let's
-> turn it into a public function.
+On Fri, Apr 14, 2017 at 12:15:17PM +0200, Eric Auger wrote:
+> The ITS KVM device exposes a new KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+> group which allows the userspace to save/restore ITS registers.
 > 
-> Also let's take the opportunity to rename the region parameter
-> into regions to emphasize this latter is an array of regions.
+> At this stage the get/set/has operations are not yet implemented.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 > Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
+
 > 
 > ---
 > v4 -> v5:
-> - add Marc's A-b
+> - Add Marc's A-b
 > 
 > v3 -> v4:
-> - rename region parameter into regions
-> - add Andre's R-b
+> - added Andre's R-b
 > ---
->  virt/kvm/arm/vgic/vgic-mmio.c | 11 +++++------
->  virt/kvm/arm/vgic/vgic-mmio.h |  5 +++++
->  2 files changed, 10 insertions(+), 6 deletions(-)
+>  arch/arm/include/uapi/asm/kvm.h   |  1 +
+>  arch/arm64/include/uapi/asm/kvm.h |  1 +
+>  virt/kvm/arm/vgic/vgic-its.c      | 36 +++++++++++++++++++++++++++++++++++-
+>  3 files changed, 37 insertions(+), 1 deletion(-)
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index 2a5db13..1c17b2a 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -446,13 +446,12 @@ static int match_region(const void *key, const void *elt)
+> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> index 6ebd3e6..4beb83b 100644
+> --- a/arch/arm/include/uapi/asm/kvm.h
+> +++ b/arch/arm/include/uapi/asm/kvm.h
+> @@ -192,6 +192,7 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
+>  #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+>  #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+> +#define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+>  			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index c286035..7e8dd69 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -212,6 +212,7 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
+>  #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+>  #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+> +#define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+>  			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 3ffcbbe..f687e91 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1466,6 +1466,19 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+>  	kfree(its);
+>  }
+>  
+> +int vgic_its_has_attr_regs(struct kvm_device *dev,
+> +			   struct kvm_device_attr *attr)
+> +{
+> +	return -ENXIO;
+> +}
+> +
+> +int vgic_its_attr_regs_access(struct kvm_device *dev,
+> +			      struct kvm_device_attr *attr,
+> +			      u64 *reg, bool is_write)
+> +{
+> +	return -ENXIO;
+> +}
+> +
+>  static int vgic_its_has_attr(struct kvm_device *dev,
+>  			     struct kvm_device_attr *attr)
+>  {
+> @@ -1482,6 +1495,8 @@ static int vgic_its_has_attr(struct kvm_device *dev,
+>  			return 0;
+>  		}
+>  		break;
+> +	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS:
+> +		return vgic_its_has_attr_regs(dev, attr);
+>  	}
+>  	return -ENXIO;
+>  }
+> @@ -1521,6 +1536,15 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+>  			return 0;
+>  		}
+>  		break;
+> +	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
+> +		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> +		u64 reg;
+> +
+> +		if (get_user(reg, uaddr))
+> +			return -EFAULT;
+> +
+> +		return vgic_its_attr_regs_access(dev, attr, &reg, true);
+> +	}
+>  	}
+>  	return -ENXIO;
+>  }
+> @@ -1541,10 +1565,20 @@ static int vgic_its_get_attr(struct kvm_device *dev,
+>  		if (copy_to_user(uaddr, &addr, sizeof(addr)))
+>  			return -EFAULT;
+>  		break;
+> +	}
+> +	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
+> +		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> +		u64 reg;
+> +		int ret;
+> +
+> +		ret = vgic_its_attr_regs_access(dev, attr, &reg, false);
+> +		if (ret)
+> +			return ret;
+> +		return put_user(reg, uaddr);
+> +	}
+>  	default:
+>  		return -ENXIO;
+>  	}
+> -	}
+>  
 >  	return 0;
 >  }
->  
-> -/* Find the proper register handler entry given a certain address offset. */
-> -static const struct vgic_register_region *
-> -vgic_find_mmio_region(const struct vgic_register_region *region, int nr_regions,
-> -		      unsigned int offset)
-> +const struct vgic_register_region *
-> +vgic_find_mmio_region(const struct vgic_register_region *regions,
-> +		      int nr_regions, unsigned int offset)
->  {
-> -	return bsearch((void *)(uintptr_t)offset, region, nr_regions,
-> -		       sizeof(region[0]), match_region);
-> +	return bsearch((void *)(uintptr_t)offset, regions, nr_regions,
-> +		       sizeof(regions[0]), match_region);
->  }
->  
->  void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-> index 98bb566..6eec91b 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.h
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
-> @@ -192,4 +192,9 @@ u64 vgic_sanitise_shareability(u64 reg);
->  u64 vgic_sanitise_field(u64 reg, u64 field_mask, int field_shift,
->  			u64 (*sanitise_fn)(u64));
->  
-> +/* Find the proper register handler entry given a certain address offset */
-
-
-nit: we don't usually comment the functions in the prototype in the
-header files but keep comments with the function implementation.
-
-But I don't care deeply about this.
-
-Acked-by: Christoffer Dall <cdall@linaro.org>
-
-> +const struct vgic_register_region *
-> +vgic_find_mmio_region(const struct vgic_register_region *regions,
-> +		      int nr_regions, unsigned int offset);
-> +
->  #endif
 > -- 
 > 2.5.5
 > 
