@@ -1,245 +1,147 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 01/22] KVM: arm/arm64: Add ITS save/restore API
- documentation
-Date: Thu, 27 Apr 2017 19:14:29 +0200
-Message-ID: <6227482e-1ef6-bb5f-156c-2a8e522f1a20@redhat.com>
+Subject: Re: [PATCH v5 11/22] KVM: arm64: vgic-its: Interpret MAPD Size field
+ and check related errors
+Date: Thu, 27 Apr 2017 19:15:27 +0200
+Message-ID: <bc81470d-b5b3-0b81-e845-7f3527ef0f6f@redhat.com>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-2-git-send-email-eric.auger@redhat.com>
- <20170426123120.GL4104@cbox>
- <88a194fa-9143-960e-e0a6-6b5c388cef82@redhat.com>
- <20170427085709.GB50776@lvm>
- <db5d0eb9-67eb-8b9a-50ca-816d217b3f53@redhat.com>
- <20170427110223.GH50776@lvm>
- <d0aa6771-a8c3-276e-0f70-d709cdf678d6@redhat.com>
- <20170427144516.GL50776@lvm>
- <c3dd2ad2-b068-f158-10d7-53e27bd2b1bf@redhat.com>
- <0551f729-2499-bf2b-7aac-6e56991de373@arm.com>
+ <1492164934-988-12-git-send-email-eric.auger@redhat.com>
+ <20170427162528.GN50776@lvm>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D98EA40064
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 13:11:44 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 50pwDfvNGn3A for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Apr 2017 13:11:43 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 69FAC40F9F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 13:11:43 -0400 (EDT)
-In-Reply-To: <0551f729-2499-bf2b-7aac-6e56991de373@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, pbonzini@redhat.com, Prasun.Kapoor@cavium.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170427162528.GN50776@lvm>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc, Christoffer,
-
-On 27/04/2017 18:23, Marc Zyngier wrote:
-> On 27/04/17 16:29, Auger Eric wrote:
+Hi,
+On 27/04/2017 18:25, Christoffer Dall wrote:
+> On Fri, Apr 14, 2017 at 12:15:23PM +0200, Eric Auger wrote:
+>> Up to now the MAPD's ITT size field has been ignored. It encodes
+>> the number of eventid bit minus 1. It should be used to check
+>> the eventid when a MAPTI command is issued on a device. Let's
+>> store the number of eventid bits in the its_device and do the
+>> check on MAPTI. Also make sure the ITT size field does
+>> not exceed the GITS_TYPER IDBITS field.
 >>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>
->> On 27/04/2017 16:45, Christoffer Dall wrote:
->>> Hi Eric,
->>>
->>> On Thu, Apr 27, 2017 at 02:51:00PM +0200, Auger Eric wrote:
->>>> On 27/04/2017 13:02, Christoffer Dall wrote:
->>>>> On Thu, Apr 27, 2017 at 11:33:39AM +0200, Auger Eric wrote:
->>>>>> On 27/04/2017 10:57, Christoffer Dall wrote:
->>>>>>> On Wed, Apr 26, 2017 at 05:48:32PM +0200, Auger Eric wrote:
->>>>>>>> On 26/04/2017 14:31, Christoffer Dall wrote:
->>>>>>>>> On Fri, Apr 14, 2017 at 12:15:13PM +0200, Eric Auger wrote:
->>>>>>>>>> Add description for how to access ITS registers and how to save/restore
->>>>>>>>>> ITS tables into/from memory.
->>>>>>>>>>
->>>>>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>>>>>>>
->>>>>>>>>> ---
->>>>>>>>>> v4 -> v5:
->>>>>>>>>> - take into account Christoffer's comments
->>>>>>>>>> - pending table save on GICV3 side now
->>>>>>>>>>
->>>>>>>>>> v3 -> v4:
->>>>>>>>>> - take into account Peter's comments:
->>>>>>>>>>   - typos
->>>>>>>>>>   - KVM_DEV_ARM_VGIC_GRP_ITS_TABLES kvm_device_attr = 0
->>>>>>>>>>   - add a validity bit in DTE
->>>>>>>>>>   - document all fields in CTE and ITE
->>>>>>>>>>   - document ABI revision
->>>>>>>>>> - take into account Andre's comments:
->>>>>>>>>>   - document restrictions about GITS_CREADR writing and GITS_IIDR
->>>>>>>>>>   - document -EBUSY error if one or more VCPUS are runnning
->>>>>>>>>>   - document 64b registers only can be accessed with 64b access
->>>>>>>>>> - itt_addr field matches bits [51:8] of the itt_addr
->>>>>>>>>>
->>>>>>>>>> v1 -> v2:
->>>>>>>>>> - DTE and ITE now are 8 bytes
->>>>>>>>>> - DTE and ITE now indexed by deviceid/eventid
->>>>>>>>>> - use ITE name instead of ITTE
->>>>>>>>>> - mentions ITT_addr matches bits [51:8] of the actual address
->>>>>>>>>> - mentions LE layout
->>>>>>>>>> ---
->>>>>>>>>>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 99 ++++++++++++++++++++++
->>>>>>>>>>  1 file changed, 99 insertions(+)
->>>>>>>>>>
->>>>>>>>>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>>>>>>>>> index 6081a5b..b5f010d 100644
->>>>>>>>>> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>>>>>>>>> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
->>>>>>>>>> @@ -32,7 +32,106 @@ Groups:
->>>>>>>>>>      KVM_DEV_ARM_VGIC_CTRL_INIT
->>>>>>>>>>        request the initialization of the ITS, no additional parameter in
->>>>>>>>>>        kvm_device_attr.addr.
->>>>>>>>>> +
->>>>>>>>>> +    KVM_DEV_ARM_ITS_SAVE_TABLES
->>>>>>>>>> +      save the ITS table data into guest RAM, at the location provisioned
->>>>>>>>>> +      by the guest in corresponding registers/table entries.
->>>>>>>>>> +
->>>>>>>>>> +      The layout of the tables in guest memory defines an ABI. The entries
->>>>>>>>>> +      are laid out in little endian format as described in the last paragraph.
->>>>>>>>>> +
->>>>>>>>>> +    KVM_DEV_ARM_ITS_RESTORE_TABLES
->>>>>>>>>> +      restore the ITS tables from guest RAM to ITS internal structures.
->>>>>>>>>> +
->>>>>>>>>> +      The GICV3 must be restored before the ITS and all ITS registers but
->>>>>>>>>> +      the GITS_CTLR must be restored before restoring the ITS tables.
->>>>>>>>>> +
->>>>>>>>>> +      The GITS_IIDR read-only register must also be restored before
->>>>>>>>>> +      the table restore as the IIDR revision field encodes the ABI revision.
->>>>>>>>>> +
->>>>>>>>>
->>>>>>>>> what is the expected sequence of operations.  For example, to restore
->>>>>>>>> the ITS, do I call KVM_DEV_ARM_VGIC_CTRL_INIT first, then restore all
->>>>>>>>> the memory and registers, and finally call KVM_DEV_ARM_ITS_RESTORE_TABLES?
->>>>>>>> Yes KVM_DEV_ARM_VGIC_CTRL_INIT comes first, then restore all registers
->>>>>>>> except GITS_CTLR, then table restore, then GITS_CTLR
->>>>>>>>>
->>>>>>>>> Is there any interaction between when you call KVM_DEV_ARM_ITS_RESTORE_TABLES
->>>>>>>>> and restore GITS_CTLR (which enables the ITS)?
->>>>>>>>
->>>>>>>> Yep, when GITS_CTLR is set, LPIs may be enabled and this on that event
->>>>>>>> that the pending table is read. But the whole pending table is not read
->>>>>>>> as we only iterate on registered LPIs. So the ITT must have been
->>>>>>>> restored previously.
->>>>>>>>
->>>>>>>> I became aware that the pending table sync is done twice, once in the
->>>>>>>> pending table restore,  and once in the GITS_CTLR restore. So if we
->>>>>>>> leave this order specification, I should be able to remove the sync on
->>>>>>>> table restore. This was the original reason why GITS_CTLR restore has
->>>>>>>> been done at the very end.
->>>>>>>
->>>>>>> I'm sorry, I'm a bit confused.  Do we not need
->>>>>>> KVM_DEV_ARM_ITS_RESTORE_TABLES at all then?
->>>>>>
->>>>>> Yes you do. I was talking about the RDIST pending table sync. The save
->>>>>> is explicit using GICV3 device KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES.
->>>>>> However the sync is implicit on GITS_CTLR restore if LPIs are enabled.
->>>>>> and today I do it also on ITS device KVM_DEV_ARM_ITS_RESTORE_TABLES
->>>>>> which is not requested I think since GITS_CTLR restore does it already.
->>>>>
->>>>> Shouldn't restoring the pending tables happen when restoring some
->>>>> redeistributor state and not anything related to the ITS?
->>>>
->>>> Marc wrote:
->>>> "
->>>> I don't think you necessarily need a coarse map. When restoring the ITS
->>>> tables, you can always read the pending bit when creating the LPI
->>>> structure (it has been written to RAM at save time). Note that we
->>>> already do something like this in vgic_enable_lpis().
->>>> "
->>>>
->>>> This is currently what is implemented I think. the pending tables are
->>>> currently sync'ed on GITS_CTLR set (if LPI are enabled) + erroneously
->>>> also on on ITS table restore
->>>>
->>>> The problematic is: Either you know in advance which LPI INTIDare used
->>>> or you need to parse the whole pending table (possibly using the 1st kB
->>>> as coarse mapping).
->>>>
->>>> If you don't know the LPI INTIDs in advance it is only possible to
->>>> restore the pending bit of pending LPIs. At that time you would
->>>> re-allocate those pending LPI (vgic_add_lpi) and when you restore the
->>>> ITS ITT you would do the same for those which were not pending. Looks
->>>> really heavy to me: coarse mapping + dual vgic_add_lpi path.
->>>>
->>>> Otherwise we would need to add another dependency between RDIST pending
->>>> table restore and ITS table restore but this looks even more weird, no?
->>>>
->>>>
->>> So I just sat down with Andre and Marc and we tried to work through this
->>> and came up with the best scheme.  I apologize in advance for the
->>> one-way nature of this e-mail, and I am of course open to discussing the
->>> following proposal again if you do not agree.
->>>
->>> What I think this document should say, is that the following ordering
->>> must be followed when restoring the GIC and the ITS:
->>>
->>>   First, restore all guest memory
->>>
->>>   Second, restore ALL redistributors
->>>
->>>   Third, restore the ITS, in the following order:
->>>     1. Initialize the ITS (KVM_DEV_ARM_VGIC_CTRL_INIT)
->>>     2. Restore GITS_CBASER
->>>     3. Restore all other GITS_ registers, except GITS_CTLR!
->>>     4. Load the ITS table data (KVM_DEV_ARM_ITS_RESTORE_TABLES)
->>>     5. Restore GITS_CTLR
->>>
->>> The rationale is that we really want the redistributor and the ITS
->>> restore to be independent and follow the architecture.  This means that
->>> our ABI for the redistributor should still work without restoring an ITS
->>> (if we ever decide to support LPIs for KVM without the ITS).
+>> ---
+>> v4 -> v5:
+>> - its_cmd_get_size macro now returns the actual number of eventid bits
+>> - use GIC_ENCODE_SZ macro to encode ID_bits
 >>
->> OK. Note I already mentioned that GICv3 must be restored before the ITS.
->> To me this comprised the RDIST.
+>> v3 -> v4:
+>> - VITS_TYPER_IDBITS set to 16 to be homogeneous with VITS_ESZ definition
+>>   and correct users
+>> - nb_eventid_bits correspond to the actual number of eventid bits
+>> ---
+>>  include/linux/irqchip/arm-gic-v3.h |  2 ++
+>>  virt/kvm/arm/vgic/vgic-its.c       | 15 ++++++++++++++-
+>>  2 files changed, 16 insertions(+), 1 deletion(-)
 >>
->> I understand the above description of the ordering comes in addition to
->> the existing text, right? in other words I keep the GITS_READR,
->> GITS_IIDR specific text as well as KVM_DEV_ARM_ITS_SAVE/RESTORE_TABLES
->> section.
->>
->>>
->>> In terms of our current implementation this means that vgic_add_lpi()
->>> should ask the redistributor what the state of the LPI is (priority,
->>> enabled, pending).
->> this practically means I move update_lpi_config call from
->> vgic_its_restore_ite to vgic_add_lpi(). OK
->>
->> However for getting the LPI pending state I must know which RDIST the
->> LPI is attached to. This is not known at LPI allocation time. Do I
->> misunderstand something?
+>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+>> index 54c20bd..0c6798c 100644
+>> --- a/include/linux/irqchip/arm-gic-v3.h
+>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>> @@ -345,9 +345,11 @@
+>>  #define E_ITS_INT_UNMAPPED_INTERRUPT		0x010307
+>>  #define E_ITS_CLEAR_UNMAPPED_INTERRUPT		0x010507
+>>  #define E_ITS_MAPD_DEVICE_OOR			0x010801
+>> +#define E_ITS_MAPD_ITTSIZE_OOR			0x010802
+>>  #define E_ITS_MAPC_PROCNUM_OOR			0x010902
+>>  #define E_ITS_MAPC_COLLECTION_OOR		0x010903
+>>  #define E_ITS_MAPTI_UNMAPPED_DEVICE		0x010a04
+>> +#define E_ITS_MAPTI_ID_OOR			0x010a05
+>>  #define E_ITS_MAPTI_PHYSICALID_OOR		0x010a06
+>>  #define E_ITS_INV_UNMAPPED_INTERRUPT		0x010c07
+>>  #define E_ITS_INVALL_UNMAPPED_COLLECTION	0x010d09
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 1b5797e..0f3c8f3 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -105,6 +105,7 @@ struct its_device {
+>>  
+>>  	/* the head for the list of ITTEs */
+>>  	struct list_head itt_head;
+>> +	u32 nb_eventid_bits;
 > 
-> Once you have rebuilt the ITS data structures and allocated the IRQ
-> structures, you should have a target_cpu field pointing to the right
-> vcpu. From there, you can surely find the corresponding redistributor
-> and the pending table.
-Yes that's understood but Christoffer said "vgic_add_lpi() should ask
-the redistributor what the state of the LPI is (priority,enabled,
-pending)." Fetching the properties is fine.
-
-vgic_add_lpi() is called before update_affinity_ite() which uses
-ite->irq and sets the target_vcpu.
-
-Well at least this requires some function reshape. I will investigate
-though.
-
-Thanks
+> what does nb_ mean?
+number ;-)
 
 Eric
 > 
-> BTW, we should document the fact that vcpus must have been created
-> before reloading the ITS (that's not completely obvious).
+>>  	u32 device_id;
+>>  };
+>>  
+>> @@ -191,6 +192,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+>>  
+>>  #define GIC_LPI_OFFSET 8192
+>>  
+>> +#define VITS_TYPER_IDBITS 16
+>> +
+>>  /*
+>>   * Finds and returns a collection in the ITS collection table.
+>>   * Must be called with the its_lock mutex held.
+>> @@ -391,7 +394,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+>>  	 * DevBits low - as least for the time being.
+>>  	 */
+>>  	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
+>> -	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
+>> +	reg |= GIC_ENCODE_SZ(VITS_TYPER_IDBITS, 5) << GITS_TYPER_IDBITS_SHIFT;
+>>  	reg |= GIC_ENCODE_SZ(abi->ite_esz, 4) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
+>>  
+>>  	return extract_bytes(reg, addr & 7, len);
+>> @@ -562,6 +565,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
+>>  
+>>  #define its_cmd_get_command(cmd)	its_cmd_mask_field(cmd, 0,  0,  8)
+>>  #define its_cmd_get_deviceid(cmd)	its_cmd_mask_field(cmd, 0, 32, 32)
+>> +#define its_cmd_get_size(cmd)		(its_cmd_mask_field(cmd, 1,  0,  5) + 1)
+>>  #define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
+>>  #define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
+>>  #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
+>> @@ -752,6 +756,9 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>>  	if (!device)
+>>  		return E_ITS_MAPTI_UNMAPPED_DEVICE;
+>>  
+>> +	if (event_id >= BIT_ULL(device->nb_eventid_bits))
+>> +		return E_ITS_MAPTI_ID_OOR;
+>> +
+>>  	if (its_cmd_get_command(its_cmd) == GITS_CMD_MAPTI)
+>>  		lpi_nr = its_cmd_get_physical_id(its_cmd);
+>>  	else
+>> @@ -832,11 +839,15 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>>  {
+>>  	u32 device_id = its_cmd_get_deviceid(its_cmd);
+>>  	bool valid = its_cmd_get_validbit(its_cmd);
+>> +	u8 nb_eventid_bits = its_cmd_get_size(its_cmd);
+>>  	struct its_device *device;
+>>  
+>>  	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
+>>  		return E_ITS_MAPD_DEVICE_OOR;
+>>  
+>> +	if (valid && nb_eventid_bits > VITS_TYPER_IDBITS)
+>> +		return E_ITS_MAPD_ITTSIZE_OOR;
+>> +
+>>  	device = find_its_device(its, device_id);
+>>  
+>>  	/*
+>> @@ -859,6 +870,8 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+>>  		return -ENOMEM;
+>>  
+>>  	device->device_id = device_id;
+>> +	device->nb_eventid_bits = nb_eventid_bits;
+>> +
+>>  	INIT_LIST_HEAD(&device->itt_head);
+>>  
+>>  	list_add_tail(&device->dev_list, &its->device_list);
+>> -- 
+>> 2.5.5
+>>
 > 
-> Thanks,
+> Otherwise:
 > 
-> 	M.
+> Reviewed-by: Christoffer Dall <cdall@linaro.org>
 > 
