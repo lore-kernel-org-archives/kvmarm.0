@@ -1,94 +1,202 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 12/22] KVM: arm64: vgic-its: Interpret MAPD ITT_addr
- field
-Date: Thu, 27 Apr 2017 21:18:50 +0200
-Message-ID: <6f7d1fdf-b40a-b851-6d2d-145487ae4e19@redhat.com>
+Subject: Re: [PATCH v5 16/22] KVM: arm64: vgic-its: Add infrastructure for
+ table lookup
+Date: Thu, 27 Apr 2017 21:24:57 +0200
+Message-ID: <58f99f7e-15ea-221d-e7ec-911f64148644@redhat.com>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-13-git-send-email-eric.auger@redhat.com>
- <20170427164356.GP50776@lvm>
- <5f187dbf-6167-7bd3-4a8e-37545941d05c@redhat.com>
- <20170427180911.GU50776@lvm>
+ <1492164934-988-17-git-send-email-eric.auger@redhat.com>
+ <20170427180641.GT50776@lvm>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170427180911.GU50776@lvm>
+In-Reply-To: <20170427180641.GT50776@lvm>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi,
 
-On 27/04/2017 20:09, Christoffer Dall wrote:
-> On Thu, Apr 27, 2017 at 07:44:25PM +0200, Auger Eric wrote:
->> Hi,
+On 27/04/2017 20:06, Christoffer Dall wrote:
+> On Fri, Apr 14, 2017 at 12:15:28PM +0200, Eric Auger wrote:
+>> Add a generic lookup_table() helper whose role consists in
+>> scanning a contiguous table located in guest RAM and applying
+>> a callback on each entry. Entries can be handled as linked lists
+>> since the callback may return an offset to the next entry and
+>> also tell that an entry is the last one.
 >>
->> On 27/04/2017 18:43, Christoffer Dall wrote:
->>> On Fri, Apr 14, 2017 at 12:15:24PM +0200, Eric Auger wrote:
->>>> Up to now the MAPD ITT_addr had been ignored. We will need it
->>>> for save/restore. Let's record it in the its_device struct.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>
->>>> ---
->>>> v4 -> v5:
->>>> - its_cmd_get_ittaddr macro now returns the actual ITT GPA
->>>>
->>>> v3 -> v4:
->>>> - in vgic_its_cmd_handle_mapd, itt_addr directly is shifted
->>>> - correct ittaddr bitmask to support 48bit GPA
->>>> ---
->>>>  virt/kvm/arm/vgic/vgic-its.c | 4 ++++
->>>>  1 file changed, 4 insertions(+)
->>>>
->>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>>> index 0f3c8f3..757598d 100644
->>>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>>> @@ -106,6 +106,7 @@ struct its_device {
->>>>  	/* the head for the list of ITTEs */
->>>>  	struct list_head itt_head;
->>>>  	u32 nb_eventid_bits;
->>>> +	gpa_t itt_addr;
->>>>  	u32 device_id;
->>>>  };
->>>>  
->>>> @@ -569,6 +570,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
->>>>  #define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
->>>>  #define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
->>>>  #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
->>>> +#define its_cmd_get_ittaddr(cmd)	(its_cmd_mask_field(cmd, 2,  8, 47) << 8)
->>>
->>> Why 47?  The ITT_addr field is bits [51:8] unless I'm looking at
->>> something wrong?
+>> Helper functions also are added to compute the device/event ID
+>> offset to the next DTE/ITE.
 >>
->> Initially I limited to 48 bits since I found in the code:
+>> compute_next_devid_offset, compute_next_eventid_offset and
+>> lookup_table will become static in subsequent patches
 >>
->> /*
->>  * We only implement 48 bits of PA at the moment, although the ITS
->>  * supports more. Let's be restrictive here.
->>  */
->> #define BASER_ADDRESS(x)        ((x) & GENMASK_ULL(47, 16))
->> #define CBASER_ADDRESS(x)       ((x) & GENMASK_ULL(47, 12))
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>
->> But practically as I encode the ITT addr field on 52 bits now in the DTE
->> there is no reason anymore.
+>> ---
+>> v4 -> v5:
+>> - use kvm_read_guest
+>>
+>> v3 -> v4:
+>> - remove static to avoid compilation warning
+>> - correct size computation in looup_table()
+>> - defines now encode the number of bits used for devid and eventid offsets
+>> - use BIT() - 1 to encode the max offets
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 93 ++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 93 insertions(+)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 56c5123..c22b35d 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -195,6 +195,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+>>  
+>>  #define VITS_TYPER_IDBITS 16
+>>  #define VITS_TYPER_DEVBITS 16
+>> +#define VITS_DTE_MAX_DEVID_OFFSET	(BIT(14) - 1)
+>> +#define VITS_ITE_MAX_EVENTID_OFFSET	(BIT(16) - 1)
+>>  
+>>  /*
+>>   * Finds and returns a collection in the ITS collection table.
+>> @@ -1674,6 +1676,97 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+>>  	return ret;
+>>  }
+>>  
+>> +u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
+>> +{
+>> +	struct list_head *e = &dev->dev_list;
+>> +	struct its_device *next;
+>> +	u32 next_offset;
+>> +
+>> +	if (e->next == h)
+>> +		return 0;
+>> +	next = list_entry(e->next, struct its_device, dev_list);
+>> +	next_offset = next->device_id - dev->device_id;
+>> +
+>> +	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
+>> +}
+>> +
+>> +u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
+>> +{
+>> +	struct list_head *e = &ite->ite_list;
+>> +	struct its_ite *next;
+>> +	u32 next_offset;
+>> +
+>> +	if (e->next == h)
+>> +		return 0;
+>> +	next = list_entry(e->next, struct its_ite, ite_list);
+>> +	next_offset = next->event_id - ite->event_id;
+>> +
+>> +	return min_t(u32, next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
+>> +}
+>> +
+>> +/**
+>> + * entry_fn_t - Callback called on a table entry restore path
+>> + * @its: its handle
+>> + * @id: id of the entry
+>> + * @entry: pointer to the entry
+>> + * @opaque: pointer to an opaque data
+>> + * @next_offset: minimal ID offset to the next entry. 0 if this
+>> + * entry is the last one, 1 if the entry is invalid, >= 1 if an
+>> + * entry's next_offset field was truly decoded
+>> + *
+>> + * Return: < 0 on error, 0 otherwise
+>> + */
+>> +typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
+>> +			  void *opaque, u32 *next_offset);
+>> +
+>> +/**
+>> + * lookup_table - scan a contiguous table in guest RAM and applies a function
+>> + * to each entry
+>> + *
+>> + * @its: its handle
+>> + * @base: base gpa of the table
+>> + * @size: size of the table in bytes
+>> + * @esz: entry size in bytes
+>> + * @start_id: first entry's ID
 > 
-> Well, regardless, shouldn't you be bassing 44 to its_cmd_mask_field(),
-> because you're shifting left 8 bits afterwards?
+> I'm a little confused.  Why is this not 0?
+Because this is meant to be called on a second-level table as well
+(device table). In that case the start ID != 0.
+> 
+>> + * @fn: function to apply on each entry
+>> + *
+>> + * Return: < 0 on error, 1 if last element identified, 0 otherwise
+> 
+> How can you scan the entire table and not find the last element?
+This happens on 2d level tables. The last element might be in another 2d
+level table.
+> 
+>> + */
+>> +int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
+>> +		 int start_id, entry_fn_t fn, void *opaque)
+> 
+> Is this really a lookup?  I think this should be called
+> 'scan_its_table'.
+ok no strong opinion here.
+> 
+>> +{
+>> +	void *entry = kzalloc(esz, GFP_KERNEL);
+>> +	struct kvm *kvm = its->dev->kvm;
+>> +	unsigned long len = size;
+>> +	u32 id = start_id;
+> 
+> why are ids u32 and not just an unsigned long?
+will change that.
+> 
+>> +	gpa_t gpa = base;
+>> +	int ret;
+>> +
+>> +	while (len > 0) {
+>> +		u32 next_offset;
+>> +		size_t byte_offset;
+>> +
+>> +		ret = kvm_read_guest(kvm, gpa, entry, esz);
+>> +		if (ret)
+>> +			goto out;
+>> +
+>> +		ret = fn(its, id, entry, opaque, &next_offset);
+>> +		if (ret < 0 || (!ret && !next_offset))
+>> +			goto out;
+>> +
+>> +		byte_offset = next_offset * esz;
+>> +		id += next_offset;
+>> +		gpa += byte_offset;
+>> +		len -= byte_offset;
+>> +	}
+>> +	kfree(entry);
+>> +	return 0;
+>> +
+> 
+> here you can just set 'ret = 0;'
+> 
+>> +out:
+>> +	kfree(entry);
+>> +	return (ret < 0 ? ret : 1);
+> 
+> and then here you can do 'return (ret <= 0 ? ret : 1)'
+> but I actually think it's nicer to just write:
+> 
+> 	if (ret <= 0)
+> 		return ret;
+> 	return 1;
+OK
 
-Hum yes that's correct. Andre already warned me against that mistake :-(
-
-Thanks
+thanks
 
 Eric
 > 
+>> +}
+>> +
+>>  /**
+>>   * vgic_its_save_device_tables - Save the device table and all ITT
+>>   * into guest RAM
+>> -- 
+>> 2.5.5
+>>
+> 
 > Thanks,
 > -Christoffer
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 > 
