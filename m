@@ -1,147 +1,271 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 11/22] KVM: arm64: vgic-its: Interpret MAPD Size field
- and check related errors
-Date: Thu, 27 Apr 2017 19:15:27 +0200
-Message-ID: <bc81470d-b5b3-0b81-e845-7f3527ef0f6f@redhat.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v5 14/22] KVM: arm64: vgic-its:
+ KVM_DEV_ARM_ITS_SAVE/RESTORE_TABLES
+Date: Thu, 27 Apr 2017 10:24:25 -0700
+Message-ID: <20170427172425.GR50776@lvm>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-12-git-send-email-eric.auger@redhat.com>
- <20170427162528.GN50776@lvm>
+ <1492164934-988-15-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170427162528.GN50776@lvm>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 344D041050
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 13:21:36 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id B7Gff+Y3hUoE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Apr 2017 13:21:34 -0400 (EDT)
+Received: from mail-wr0-f172.google.com (mail-wr0-f172.google.com
+ [209.85.128.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7183A41009
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 13:21:34 -0400 (EDT)
+Received: by mail-wr0-f172.google.com with SMTP id l9so21115413wre.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 10:24:27 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1492164934-988-15-git-send-email-eric.auger@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-On 27/04/2017 18:25, Christoffer Dall wrote:
-> On Fri, Apr 14, 2017 at 12:15:23PM +0200, Eric Auger wrote:
->> Up to now the MAPD's ITT size field has been ignored. It encodes
->> the number of eventid bit minus 1. It should be used to check
->> the eventid when a MAPTI command is issued on a device. Let's
->> store the number of eventid bits in the its_device and do the
->> check on MAPTI. Also make sure the ITT size field does
->> not exceed the GITS_TYPER IDBITS field.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v4 -> v5:
->> - its_cmd_get_size macro now returns the actual number of eventid bits
->> - use GIC_ENCODE_SZ macro to encode ID_bits
->>
->> v3 -> v4:
->> - VITS_TYPER_IDBITS set to 16 to be homogeneous with VITS_ESZ definition
->>   and correct users
->> - nb_eventid_bits correspond to the actual number of eventid bits
->> ---
->>  include/linux/irqchip/arm-gic-v3.h |  2 ++
->>  virt/kvm/arm/vgic/vgic-its.c       | 15 ++++++++++++++-
->>  2 files changed, 16 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
->> index 54c20bd..0c6798c 100644
->> --- a/include/linux/irqchip/arm-gic-v3.h
->> +++ b/include/linux/irqchip/arm-gic-v3.h
->> @@ -345,9 +345,11 @@
->>  #define E_ITS_INT_UNMAPPED_INTERRUPT		0x010307
->>  #define E_ITS_CLEAR_UNMAPPED_INTERRUPT		0x010507
->>  #define E_ITS_MAPD_DEVICE_OOR			0x010801
->> +#define E_ITS_MAPD_ITTSIZE_OOR			0x010802
->>  #define E_ITS_MAPC_PROCNUM_OOR			0x010902
->>  #define E_ITS_MAPC_COLLECTION_OOR		0x010903
->>  #define E_ITS_MAPTI_UNMAPPED_DEVICE		0x010a04
->> +#define E_ITS_MAPTI_ID_OOR			0x010a05
->>  #define E_ITS_MAPTI_PHYSICALID_OOR		0x010a06
->>  #define E_ITS_INV_UNMAPPED_INTERRUPT		0x010c07
->>  #define E_ITS_INVALL_UNMAPPED_COLLECTION	0x010d09
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 1b5797e..0f3c8f3 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -105,6 +105,7 @@ struct its_device {
->>  
->>  	/* the head for the list of ITTEs */
->>  	struct list_head itt_head;
->> +	u32 nb_eventid_bits;
+On Fri, Apr 14, 2017 at 12:15:26PM +0200, Eric Auger wrote:
+> Introduce new attributes in KVM_DEV_ARM_VGIC_GRP_CTRL group:
+> - KVM_DEV_ARM_ITS_SAVE_TABLES: saves the ITS tables into guest RAM
+> - KVM_DEV_ARM_ITS_RESTORE_TABLES: restores them into VGIC internal
+>   structures.
 > 
-> what does nb_ mean?
-number ;-)
+> We hold the vcpus lock during the save and restore to make
+> sure no vcpu is running.
+> 
+> At this stage the functionality is not yet implemented. Only
+> the skeleton is put in place.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v4 -> v5:
+> - use KVM_DEV_ARM_ITS_SAVE_TABLES and KVM_DEV_ARM_ITS_RESTORE_TABLES
+> - rename *flush* into *save*
+> - call its_sync_lpi_pending_table at the end of restore
+> - use abi framework
+> 
+> v3 -> v4:
+> - pass kvm struct handle to vgic_its_flush/restore_pending_tables
+> - take the kvm lock and vcpu locks
+> - ABI revision check
+> - check attr->attr is null
+> 
+> v1 -> v2:
+> - remove useless kvm parameter
+> ---
+>  arch/arm/include/uapi/asm/kvm.h   |   4 +-
+>  arch/arm64/include/uapi/asm/kvm.h |   4 +-
+>  virt/kvm/arm/vgic/vgic-its.c      | 108 ++++++++++++++++++++++++++++++++++++--
+>  3 files changed, 110 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> index 4beb83b..8e6563c 100644
+> --- a/arch/arm/include/uapi/asm/kvm.h
+> +++ b/arch/arm/include/uapi/asm/kvm.h
+> @@ -199,7 +199,9 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK 0x3ff
+>  #define VGIC_LEVEL_INFO_LINE_LEVEL	0
+>  
+> -#define   KVM_DEV_ARM_VGIC_CTRL_INIT    0
+> +#define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
+> +#define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
+> +#define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
+>  
+>  /* KVM_IRQ_LINE irq field index values */
+>  #define KVM_ARM_IRQ_TYPE_SHIFT		24
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 7e8dd69..1e35115 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -219,7 +219,9 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK	0x3ff
+>  #define VGIC_LEVEL_INFO_LINE_LEVEL	0
+>  
+> -#define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
+> +#define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
+> +#define   KVM_DEV_ARM_ITS_SAVE_TABLES           1
+> +#define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
+>  
+>  /* Device Control API on vcpu fd */
+>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index de1ed6d..55267ab 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1648,12 +1648,68 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+>  }
+>  
+>  /**
+> + * vgic_its_save_device_tables - Save the device table and all ITT
+> + * into guest RAM
+> + */
+> +static int vgic_its_save_device_tables(struct vgic_its *its)
+> +{
+> +	return -ENXIO;
+> +}
+> +
+> +/**
+> + * vgic_its_restore_device_tables - Restore the device table and all ITT
+> + * from guest RAM to internal data structs
+> + */
+> +static int vgic_its_restore_device_tables(struct vgic_its *its)
+> +{
+> +	return -ENXIO;
+> +}
+> +
+> +/**
+> + * vgic_its_save_collection_table - Save the collection table into
+> + * guest RAM
+> + */
+> +static int vgic_its_save_collection_table(struct vgic_its *its)
+> +{
+> +	return -ENXIO;
+> +}
+> +
+> +/**
+> + * vgic_its_restore_collection_table - reads the collection table
+> + * in guest memory and restores the ITS internal state. Requires the
+> + * BASER registers to be restored before.
+> + */
+> +static int vgic_its_restore_collection_table(struct vgic_its *its)
+> +{
+> +	return -ENXIO;
+> +}
+> +
+> +/**
+>   * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
+>   * according to v0 ABI
+>   */
+>  static int vgic_its_save_tables_v0(struct vgic_its *its)
+>  {
+> -	return -ENXIO;
+> +	struct kvm *kvm = its->dev->kvm;
+> +	int ret;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	if (!lock_all_vcpus(kvm)) {
+> +		mutex_unlock(&kvm->lock);
+> +		return -EBUSY;
+> +	}
+> +
+> +	ret = vgic_its_save_device_tables(its);
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret = vgic_its_save_collection_table(its);
+> +
+> +out:
+> +	unlock_all_vcpus(kvm);
+> +	mutex_unlock(&kvm->lock);
+> +	return ret;
+>  }
+>  
+>  /**
+> @@ -1663,7 +1719,41 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
+>   */
+>  static int vgic_its_restore_tables_v0(struct vgic_its *its)
+>  {
+> -	return -ENXIO;
+> +	struct kvm *kvm = its->dev->kvm;
+> +	struct kvm_vcpu *vcpu;
+> +	int ret, c;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	if (!lock_all_vcpus(kvm)) {
+> +		mutex_unlock(&kvm->lock);
+> +		return -EBUSY;
+> +	}
+> +
+> +	ret = vgic_its_restore_collection_table(its);
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret = vgic_its_restore_device_tables(its);
+> +
+> +	kvm_for_each_vcpu(c, vcpu, kvm) {
+> +		ret = its_sync_lpi_pending_table(vcpu);
+> +		if (ret)
+> +			break;
+> +	}
+> +
+> +out:
+> +	unlock_all_vcpus(kvm);
+> +	mutex_unlock(&kvm->lock);
+> +
+> +	if (ret)
+> +		return ret;
+> +
+> +	/*
+> +	 * On restore path, MSI injections can happen before the
+> +	 * first VCPU run so let's complete the GIC init here.
+> +	 */
+> +	return kvm_vgic_map_resources(its->dev->kvm);
 
-Eric
-> 
->>  	u32 device_id;
->>  };
->>  
->> @@ -191,6 +192,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
->>  
->>  #define GIC_LPI_OFFSET 8192
->>  
->> +#define VITS_TYPER_IDBITS 16
->> +
->>  /*
->>   * Finds and returns a collection in the ITS collection table.
->>   * Must be called with the its_lock mutex held.
->> @@ -391,7 +394,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
->>  	 * DevBits low - as least for the time being.
->>  	 */
->>  	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
->> -	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
->> +	reg |= GIC_ENCODE_SZ(VITS_TYPER_IDBITS, 5) << GITS_TYPER_IDBITS_SHIFT;
->>  	reg |= GIC_ENCODE_SZ(abi->ite_esz, 4) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
->>  
->>  	return extract_bytes(reg, addr & 7, len);
->> @@ -562,6 +565,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
->>  
->>  #define its_cmd_get_command(cmd)	its_cmd_mask_field(cmd, 0,  0,  8)
->>  #define its_cmd_get_deviceid(cmd)	its_cmd_mask_field(cmd, 0, 32, 32)
->> +#define its_cmd_get_size(cmd)		(its_cmd_mask_field(cmd, 1,  0,  5) + 1)
->>  #define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
->>  #define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
->>  #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
->> @@ -752,6 +756,9 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
->>  	if (!device)
->>  		return E_ITS_MAPTI_UNMAPPED_DEVICE;
->>  
->> +	if (event_id >= BIT_ULL(device->nb_eventid_bits))
->> +		return E_ITS_MAPTI_ID_OOR;
->> +
->>  	if (its_cmd_get_command(its_cmd) == GITS_CMD_MAPTI)
->>  		lpi_nr = its_cmd_get_physical_id(its_cmd);
->>  	else
->> @@ -832,11 +839,15 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->>  {
->>  	u32 device_id = its_cmd_get_deviceid(its_cmd);
->>  	bool valid = its_cmd_get_validbit(its_cmd);
->> +	u8 nb_eventid_bits = its_cmd_get_size(its_cmd);
->>  	struct its_device *device;
->>  
->>  	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
->>  		return E_ITS_MAPD_DEVICE_OOR;
->>  
->> +	if (valid && nb_eventid_bits > VITS_TYPER_IDBITS)
->> +		return E_ITS_MAPD_ITTSIZE_OOR;
->> +
->>  	device = find_its_device(its, device_id);
->>  
->>  	/*
->> @@ -859,6 +870,8 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->>  		return -ENOMEM;
->>  
->>  	device->device_id = device_id;
->> +	device->nb_eventid_bits = nb_eventid_bits;
->> +
->>  	INIT_LIST_HEAD(&device->itt_head);
->>  
->>  	list_add_tail(&device->dev_list, &its->device_list);
->> -- 
->> 2.5.5
->>
-> 
-> Otherwise:
-> 
-> Reviewed-by: Christoffer Dall <cdall@linaro.org>
+wait, this is supposed to run when everything else is done and just
+before running a VCPU, but now we run this way earlier?  Is that safe.
+It feels incredibly dangerous.
+
+Otherwise I'll wait with looking at this patch in more detail until you
+respin based on not doing the its_sync_lpi_pending_table() here anymore
+as a result of the ABI discussion.
+
+Thanks,
+-Christoffer
+
+>  }
+>  
+>  static int vgic_its_commit_v0(struct vgic_its *its)
+> @@ -1718,6 +1808,10 @@ static int vgic_its_has_attr(struct kvm_device *dev,
+>  		switch (attr->attr) {
+>  		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+>  			return 0;
+> +		case KVM_DEV_ARM_ITS_SAVE_TABLES:
+> +			return 0;
+> +		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
+> +			return 0;
+>  		}
+>  		break;
+>  	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS:
+> @@ -1753,14 +1847,20 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+>  
+>  		return 0;
+>  	}
+> -	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+> +	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
+> +		const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+> +
+>  		switch (attr->attr) {
+>  		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+>  			its->initialized = true;
+>  
+>  			return 0;
+> +		case KVM_DEV_ARM_ITS_SAVE_TABLES:
+> +			return abi->save_tables(its);
+> +		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
+> +			return abi->restore_tables(its);
+>  		}
+> -		break;
+> +	}
+>  	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
+>  		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+>  		u64 reg;
+> -- 
+> 2.5.5
 > 
