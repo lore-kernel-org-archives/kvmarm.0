@@ -1,26 +1,25 @@
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC kvm-unit-tests PATCH 4/8] Makefiles: use explicit path for
- including sub-Makefiles
-Date: Thu, 27 Apr 2017 17:54:44 +0200
-Message-ID: <328f9a03-d6ec-2d3a-af41-e107b4651fea@redhat.com>
+Subject: Re: [RFC kvm-unit-tests PATCH 5/8] Makefile: add explicit mkdir for
+ .o targets
+Date: Thu, 27 Apr 2017 17:57:36 +0200
+Message-ID: <a8eb190a-3487-1a89-0069-789b62860b3e@redhat.com>
 References: <20170406190727.5624-1-alex.bennee@linaro.org>
- <20170406190727.5624-5-alex.bennee@linaro.org>
- <20170407122010.umftrqr2qqd6g3q4@kamzik.brq.redhat.com>
+ <20170406190727.5624-6-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B985343C73
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 11:51:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D58043C73
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 11:54:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p28qIRsJg9cY for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Apr 2017 11:51:58 -0400 (EDT)
+ with ESMTP id MWxuNGHcG6M9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Apr 2017 11:54:49 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1BE3E43C6E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 11:51:57 -0400 (EDT)
-In-Reply-To: <20170407122010.umftrqr2qqd6g3q4@kamzik.brq.redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 52E7243C6E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 11:54:49 -0400 (EDT)
+In-Reply-To: <20170406190727.5624-6-alex.bennee@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,23 +29,26 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, drjones@redhat.com
 Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 07/04/2017 14:20, Andrew Jones wrote:
->> -LIBFDT_objdir = lib/libfdt
->> -LIBFDT_srcdir = lib/libfdt
->> +LIBFDT_objdir = $(SRCDIR)/lib/libfdt
->> +LIBFDT_srcdir = $(SRCDIR)/lib/libfdt
->>  LIBFDT_archive = $(LIBFDT_objdir)/libfdt.a
->>  LIBFDT_include = $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_INCLUDES))
->>  LIBFDT_version = $(addprefix $(LIBFDT_srcdir)/,$(LIBFDT_VERSION))
-> Can't we just do VPATH += $LIBFDT_srcdir instead?
-
-That would search for every file in the lib/libfdt subdirectory of the
-source directory, while here the desired prefix is just $(SRCDIR).
-
-Paolo
+CgpPbiAwNi8wNC8yMDE3IDIxOjA3LCBBbGV4IEJlbm7DqWUgd3JvdGU6Cj4gVGhpcyBpcyBmYWly
+bHkgZGlyZWN0IHdheSBvZiBlbnN1cmluZyB0aGUgdGFyZ2V0IGJ1aWxkIGRpcmVjdG9yaWVzIGFy
+ZQo+IGNyZWF0ZWQgYmVmb3JlIHdlIGJ1aWxkIGEgYmluYXJ5IGJsb2IuIG1rZGlyIC1wIGZhaWxz
+IGdyYWNlZnVsbHkgaWYKPiB0aGUgZGlyZWN0b3J5IGlzIGFscmVhZHkgdGhlcmUuCj4gCj4gU2ln
+bmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+IC0tLQo+
+ICBNYWtlZmlsZSB8IDUgKysrKysKPiAgMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKQo+
+IAo+IGRpZmYgLS1naXQgYS9NYWtlZmlsZSBiL01ha2VmaWxlCj4gaW5kZXggNzgxMTg2ZS4uNTY1
+OThkZiAxMDA2NDQKPiAtLS0gYS9NYWtlZmlsZQo+ICsrKyBiL01ha2VmaWxlCj4gQEAgLTc5LDgg
+Kzc5LDEzIEBAICQoTElCRkRUX2FyY2hpdmUpOiAkKGFkZHByZWZpeCAkKExJQkZEVF9vYmpkaXIp
+LywkKExJQkZEVF9PQkpTKSkKPiAgCSQoQVIpIHJjcyAkQCAkXgo+ICAKPiAgJS5vOiAlLlMKPiAr
+CW1rZGlyIC1wICQoZGlyICRAKQoKU2hvdWxkIHRoaXMgdXNlIEAgZm9yIGNsZWFubGluZXNzPwoK
+UGFvbG8KCj4gIAkkKENDKSAkKENGTEFHUykgLWMgLW5vc3RkbGliIC1vICRAICQ8Cj4gIAo+ICsl
+Lm86ICUuYwo+ICsJbWtkaXIgLXAgJChkaXIgJEApCj4gKwkkKENDKSAkKENGTEFHUykgLWMgLW8g
+JEAgJDwKPiArCj4gIC1pbmNsdWRlICovLiouZCAqLyovLiouZAo+ICAKPiAgYWxsOiAkKHNoZWxs
+IGdpdCAtQyAkKFNSQ0RJUikgcmV2LXBhcnNlIC0tdmVyaWZ5IC0tc2hvcnQ9OCBIRUFEID5idWls
+ZC1oZWFkIDI+L2Rldi9udWxsKQo+IApfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
+YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
+cm0K
