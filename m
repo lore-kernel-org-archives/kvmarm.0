@@ -1,457 +1,208 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 03/22] KVM: arm/arm64: vgic-its: rename itte into ite
-Date: Thu, 27 Apr 2017 11:40:16 +0200
-Message-ID: <82b7eb70-1705-8fc5-7ec1-12ba58418389@redhat.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v5 07/22] KVM: arm64: vgic-its: Implement
+ vgic_its_has_attr_regs and attr_regs_access
+Date: Thu, 27 Apr 2017 04:00:03 -0700
+Message-ID: <20170427110003.GG50776@lvm>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-4-git-send-email-eric.auger@redhat.com>
- <20170427090504.GC50776@lvm> <c32b8369-711c-1a1a-b3c1-bba2408ff003@arm.com>
+ <1492164934-988-8-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EA4040F9E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 05:37:31 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OnVZTzl-36w4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Apr 2017 05:37:29 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F98740D85
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Apr 2017 05:37:29 -0400 (EDT)
-In-Reply-To: <c32b8369-711c-1a1a-b3c1-bba2408ff003@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1492164934-988-8-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer, Andre,
-
-On 27/04/2017 11:20, Andre Przywara wrote:
-> Hi,
+On Fri, Apr 14, 2017 at 12:15:19PM +0200, Eric Auger wrote:
+> This patch implements vgic_its_has_attr_regs and vgic_its_attr_regs_access
+> upon the MMIO framework. VGIC ITS KVM device KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+> group becomes functional.
 > 
-> On 27/04/17 10:05, Christoffer Dall wrote:
->> On Fri, Apr 14, 2017 at 12:15:15PM +0200, Eric Auger wrote:
->>> The actual abbreviation for the interrupt translation table entry
->>> is ITE. Let's rename all itte instances by ite.
->>
->> Is there really any confusion or problems with using itte?  This is a
->> lot of churn...
+> At least GITS_CREADR and GITS_IIDR require to differentiate a guest write
+> action from a user access. As such let's introduce a new uaccess_its_write
+> vgic_register_region callback.
 > 
-> I tend to agree (just didn't dare to mention this before).
-> I see that the spec speaks of "ITE", but the spelled out term hints more
-> at ITTE (because it's a "translation table").
-> Besides three letters tend to be more ambiguous than a four letter
-> identifier.
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> Would adding a comment to the structure definition help?
+> ---
+> v4 -> v5:
+> - use GITS_TYPER instead of offset 0x8
+> - uaccess_its_write now can return an error
 > 
-> But speaking of churn I am not sure how much more work dropping this
-> patch now creates on Eric's side ...
-
-I addressed one comment from Marc saying that ITTE was a wrong name and
-he had a patch ready to rename them.
-
-see https://patchwork.kernel.org/patch/9513491/
-
-Renaming back would largely impact the other patches I am afraid
-
-Thanks
-
-Eric
+> v3 -> v4:
+> - remove changes to the REGISTER_ITS_DESC macro. This will be handled in
+>   subsequent patch with the introduction of a new REGISTER_ITS_DESC_UACCESS
+>   macro
+> - fix IIDR access and add a comment wrt full length access
+> - handle endianness
+> - add kvm lock and vcpus lock
+> ---
+>  virt/kvm/arm/vgic/vgic-its.c  | 79 +++++++++++++++++++++++++++++++++++++++++--
+>  virt/kvm/arm/vgic/vgic-mmio.h |  9 +++--
+>  2 files changed, 84 insertions(+), 4 deletions(-)
 > 
-> Cheers,
-> Andre.
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index f687e91..a9a2c12 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1469,14 +1469,89 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+>  int vgic_its_has_attr_regs(struct kvm_device *dev,
+>  			   struct kvm_device_attr *attr)
+>  {
+> -	return -ENXIO;
+> +	const struct vgic_register_region *region;
+> +	struct vgic_io_device iodev = {
+> +		.regions = its_registers,
+> +		.nr_regions = ARRAY_SIZE(its_registers),
+> +	};
+> +	gpa_t offset = attr->attr;
+> +
+> +	region = vgic_find_mmio_region(iodev.regions,
+> +				       iodev.nr_regions,
+> +				       offset);
+
+why do you need to define the iodev here?  Can't you just pass
+its_registers and ARRAY_SIZE(its_registers) directly?
+
+> +	if (!region)
+> +		return -ENXIO;
+> +
+> +	return 0;
+>  }
+>  
+>  int vgic_its_attr_regs_access(struct kvm_device *dev,
+>  			      struct kvm_device_attr *attr,
+>  			      u64 *reg, bool is_write)
+>  {
+> -	return -ENXIO;
+> +	const struct vgic_register_region *region;
+> +	struct vgic_io_device iodev = {
+> +		.regions = its_registers,
+> +		.nr_regions = ARRAY_SIZE(its_registers),
+> +	};
+> +	struct vgic_its *its = dev->private;
+> +	gpa_t addr, offset = attr->attr;
+> +	unsigned int len;
+> +	unsigned long data = 0;
+> +	int ret = 0;
+
+nit: you could structure this whole declaration block more nicely by
+having a separate line for the declaration and initialization of offset,
+and by moving the iodev declaration/initialization to the end.
+
+It might also be cleaner to do any non-zero initialization in a separate
+block following the declarations.
+
+> +
+> +	/*
+> +	 * Among supported registers, only GITS_CTLR (0x0) and GITS_IIDR (0x4)
+> +	 * are 32 bits. Others are 64 bits.
+> +	 */
+> +	if ((offset < GITS_TYPER && offset & 0x3) ||
+> +	    (offset >= GITS_TYPER && offset & 0x7))
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&dev->kvm->lock);
+> +
+> +	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base)) {
+> +		ret = -ENXIO;
+> +		goto out;
+> +	}
+> +
+> +	region = vgic_find_mmio_region(iodev.regions,
+> +				       iodev.nr_regions,
+> +				       offset);
+> +	if (!region) {
+> +		ret = -ENXIO;
+> +		goto out;
+> +	}
+> +
+> +	if (!lock_all_vcpus(dev->kvm)) {
+> +		ret = -EBUSY;
+> +		goto out;
+> +	}
+> +
+> +	addr = its->vgic_its_base + offset;
+> +
+> +	/*
+> +	 * Only full length register accesses are supported although
+> +	 * the architecture spec theoretically allows upper/lower 32
+
+does the spec allow 32-bit accesses, or only theoretically ?  :)
+
+> +	 * bits to be accessed independently
+> +	 */
+
+In any case, the comment is a bit confusing, because it seems to imply
+that we only support 64-bit accesses, but we do set the length below to
+4 or 8.
+
+Did you mean:
+
+	/* 
+	 * Althought the spec supports upper/lower 32-bit accesses to
+	 * 64-bit ITS registers, the userspace ABI requires 64-bit
+	 * accesses to all 64-bit wide registers.  We therefore only 32-bit
+	 * accesses to the GITS_CTLR, GITS_IIDR registers.
+	 */
+
+Also, I don't understand how this works with the ID registers?  For
+example, if userspace wants to read GITS_PIDR1 does it have to read
+GITS_PIDR0 as a 64-bit register and split it afterwards?  (that doesn't
+work with this implementation)
+
+> +	len = region->access_flags & VGIC_ACCESS_64bit ? 8 : 4;
+> +
+> +	if (is_write) {
+> +		data = vgic_data_mmio_bus_to_host(reg, len);
+
+I don't think we need this anymore; we no longer share the guest
+trapping MMIO path with uaccesses.
+
+> +		if (region->uaccess_its_write)
+> +			ret = region->uaccess_its_write(dev->kvm, its, addr,
+> +							len, data);
+> +		else
+> +			region->its_write(dev->kvm, its, addr, len, data);
+> +	} else {
+> +		data = region->its_read(dev->kvm, its, addr, len);
+> +		vgic_data_host_to_mmio_bus(reg, len, data);
+
+same here.
+
+> +	}
+> +	unlock_all_vcpus(dev->kvm);
+> +out:
+> +	mutex_unlock(&dev->kvm->lock);
+> +	return ret;
+>  }
+>  
+>  static int vgic_its_has_attr(struct kvm_device *dev,
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+> index 6eec91b..ea4171a 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.h
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
+> @@ -36,8 +36,13 @@ struct vgic_register_region {
+>  	};
+>  	unsigned long (*uaccess_read)(struct kvm_vcpu *vcpu, gpa_t addr,
+>  				      unsigned int len);
+> -	void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
+> -			      unsigned int len, unsigned long val);
+> +	union {
+> +		void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
+> +				      unsigned int len, unsigned long val);
+> +		int (*uaccess_its_write)(struct kvm *kvm, struct vgic_its *its,
+> +					 gpa_t addr, unsigned int len,
+> +					 unsigned long val);
+> +	};
+>  };
+>  
+>  extern struct kvm_io_device_ops kvm_io_gic_ops;
+> -- 
+> 2.5.5
 > 
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
->>>
->>> ---
->>>
->>> v5: Add Marc's A-b
->>> ---
->>>  virt/kvm/arm/vgic/vgic-its.c | 148 +++++++++++++++++++++----------------------
->>>  1 file changed, 74 insertions(+), 74 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index 8d1da1a..3ffcbbe 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -114,8 +114,8 @@ struct its_collection {
->>>  #define its_is_collection_mapped(coll) ((coll) && \
->>>  				((coll)->target_addr != COLLECTION_NOT_MAPPED))
->>>  
->>> -struct its_itte {
->>> -	struct list_head itte_list;
->>> +struct its_ite {
->>> +	struct list_head ite_list;
->>>  
->>>  	struct vgic_irq *irq;
->>>  	struct its_collection *collection;
->>> @@ -143,27 +143,27 @@ static struct its_device *find_its_device(struct vgic_its *its, u32 device_id)
->>>   * Device ID/Event ID pair on an ITS.
->>>   * Must be called with the its_lock mutex held.
->>>   */
->>> -static struct its_itte *find_itte(struct vgic_its *its, u32 device_id,
->>> +static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
->>>  				  u32 event_id)
->>>  {
->>>  	struct its_device *device;
->>> -	struct its_itte *itte;
->>> +	struct its_ite *ite;
->>>  
->>>  	device = find_its_device(its, device_id);
->>>  	if (device == NULL)
->>>  		return NULL;
->>>  
->>> -	list_for_each_entry(itte, &device->itt_head, itte_list)
->>> -		if (itte->event_id == event_id)
->>> -			return itte;
->>> +	list_for_each_entry(ite, &device->itt_head, ite_list)
->>> +		if (ite->event_id == event_id)
->>> +			return ite;
->>>  
->>>  	return NULL;
->>>  }
->>>  
->>>  /* To be used as an iterator this macro misses the enclosing parentheses */
->>> -#define for_each_lpi_its(dev, itte, its) \
->>> +#define for_each_lpi_its(dev, ite, its) \
->>>  	list_for_each_entry(dev, &(its)->device_list, dev_list) \
->>> -		list_for_each_entry(itte, &(dev)->itt_head, itte_list)
->>> +		list_for_each_entry(ite, &(dev)->itt_head, ite_list)
->>>  
->>>  /*
->>>   * We only implement 48 bits of PA at the moment, although the ITS
->>> @@ -270,18 +270,18 @@ static int vgic_copy_lpi_list(struct kvm *kvm, u32 **intid_ptr)
->>>   * Needs to be called whenever either the collection for a LPIs has
->>>   * changed or the collection itself got retargeted.
->>>   */
->>> -static void update_affinity_itte(struct kvm *kvm, struct its_itte *itte)
->>> +static void update_affinity_ite(struct kvm *kvm, struct its_ite *ite)
->>>  {
->>>  	struct kvm_vcpu *vcpu;
->>>  
->>> -	if (!its_is_collection_mapped(itte->collection))
->>> +	if (!its_is_collection_mapped(ite->collection))
->>>  		return;
->>>  
->>> -	vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
->>> +	vcpu = kvm_get_vcpu(kvm, ite->collection->target_addr);
->>>  
->>> -	spin_lock(&itte->irq->irq_lock);
->>> -	itte->irq->target_vcpu = vcpu;
->>> -	spin_unlock(&itte->irq->irq_lock);
->>> +	spin_lock(&ite->irq->irq_lock);
->>> +	ite->irq->target_vcpu = vcpu;
->>> +	spin_unlock(&ite->irq->irq_lock);
->>>  }
->>>  
->>>  /*
->>> @@ -292,13 +292,13 @@ static void update_affinity_collection(struct kvm *kvm, struct vgic_its *its,
->>>  				       struct its_collection *coll)
->>>  {
->>>  	struct its_device *device;
->>> -	struct its_itte *itte;
->>> +	struct its_ite *ite;
->>>  
->>> -	for_each_lpi_its(device, itte, its) {
->>> -		if (!itte->collection || coll != itte->collection)
->>> +	for_each_lpi_its(device, ite, its) {
->>> +		if (!ite->collection || coll != ite->collection)
->>>  			continue;
->>>  
->>> -		update_affinity_itte(kvm, itte);
->>> +		update_affinity_ite(kvm, ite);
->>>  	}
->>>  }
->>>  
->>> @@ -425,25 +425,25 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
->>>  				u32 devid, u32 eventid)
->>>  {
->>>  	struct kvm_vcpu *vcpu;
->>> -	struct its_itte *itte;
->>> +	struct its_ite *ite;
->>>  
->>>  	if (!its->enabled)
->>>  		return -EBUSY;
->>>  
->>> -	itte = find_itte(its, devid, eventid);
->>> -	if (!itte || !its_is_collection_mapped(itte->collection))
->>> +	ite = find_ite(its, devid, eventid);
->>> +	if (!ite || !its_is_collection_mapped(ite->collection))
->>>  		return E_ITS_INT_UNMAPPED_INTERRUPT;
->>>  
->>> -	vcpu = kvm_get_vcpu(kvm, itte->collection->target_addr);
->>> +	vcpu = kvm_get_vcpu(kvm, ite->collection->target_addr);
->>>  	if (!vcpu)
->>>  		return E_ITS_INT_UNMAPPED_INTERRUPT;
->>>  
->>>  	if (!vcpu->arch.vgic_cpu.lpis_enabled)
->>>  		return -EBUSY;
->>>  
->>> -	spin_lock(&itte->irq->irq_lock);
->>> -	itte->irq->pending_latch = true;
->>> -	vgic_queue_irq_unlock(kvm, itte->irq);
->>> +	spin_lock(&ite->irq->irq_lock);
->>> +	ite->irq->pending_latch = true;
->>> +	vgic_queue_irq_unlock(kvm, ite->irq);
->>>  
->>>  	return 0;
->>>  }
->>> @@ -511,15 +511,15 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
->>>  }
->>>  
->>>  /* Requires the its_lock to be held. */
->>> -static void its_free_itte(struct kvm *kvm, struct its_itte *itte)
->>> +static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
->>>  {
->>> -	list_del(&itte->itte_list);
->>> +	list_del(&ite->ite_list);
->>>  
->>>  	/* This put matches the get in vgic_add_lpi. */
->>> -	if (itte->irq)
->>> -		vgic_put_irq(kvm, itte->irq);
->>> +	if (ite->irq)
->>> +		vgic_put_irq(kvm, ite->irq);
->>>  
->>> -	kfree(itte);
->>> +	kfree(ite);
->>>  }
->>>  
->>>  static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
->>> @@ -544,17 +544,17 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
->>>  {
->>>  	u32 device_id = its_cmd_get_deviceid(its_cmd);
->>>  	u32 event_id = its_cmd_get_id(its_cmd);
->>> -	struct its_itte *itte;
->>> +	struct its_ite *ite;
->>>  
->>>  
->>> -	itte = find_itte(its, device_id, event_id);
->>> -	if (itte && itte->collection) {
->>> +	ite = find_ite(its, device_id, event_id);
->>> +	if (ite && ite->collection) {
->>>  		/*
->>>  		 * Though the spec talks about removing the pending state, we
->>>  		 * don't bother here since we clear the ITTE anyway and the
->>>  		 * pending state is a property of the ITTE struct.
->>>  		 */
->>> -		its_free_itte(kvm, itte);
->>> +		its_free_ite(kvm, ite);
->>>  		return 0;
->>>  	}
->>>  
->>> @@ -572,26 +572,26 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
->>>  	u32 event_id = its_cmd_get_id(its_cmd);
->>>  	u32 coll_id = its_cmd_get_collection(its_cmd);
->>>  	struct kvm_vcpu *vcpu;
->>> -	struct its_itte *itte;
->>> +	struct its_ite *ite;
->>>  	struct its_collection *collection;
->>>  
->>> -	itte = find_itte(its, device_id, event_id);
->>> -	if (!itte)
->>> +	ite = find_ite(its, device_id, event_id);
->>> +	if (!ite)
->>>  		return E_ITS_MOVI_UNMAPPED_INTERRUPT;
->>>  
->>> -	if (!its_is_collection_mapped(itte->collection))
->>> +	if (!its_is_collection_mapped(ite->collection))
->>>  		return E_ITS_MOVI_UNMAPPED_COLLECTION;
->>>  
->>>  	collection = find_collection(its, coll_id);
->>>  	if (!its_is_collection_mapped(collection))
->>>  		return E_ITS_MOVI_UNMAPPED_COLLECTION;
->>>  
->>> -	itte->collection = collection;
->>> +	ite->collection = collection;
->>>  	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
->>>  
->>> -	spin_lock(&itte->irq->irq_lock);
->>> -	itte->irq->target_vcpu = vcpu;
->>> -	spin_unlock(&itte->irq->irq_lock);
->>> +	spin_lock(&ite->irq->irq_lock);
->>> +	ite->irq->target_vcpu = vcpu;
->>> +	spin_unlock(&ite->irq->irq_lock);
->>>  
->>>  	return 0;
->>>  }
->>> @@ -679,7 +679,7 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
->>>  {
->>>  	struct its_collection *collection;
->>>  	struct its_device *device;
->>> -	struct its_itte *itte;
->>> +	struct its_ite *ite;
->>>  
->>>  	/*
->>>  	 * Clearing the mapping for that collection ID removes the
->>> @@ -690,10 +690,10 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
->>>  	if (!collection)
->>>  		return;
->>>  
->>> -	for_each_lpi_its(device, itte, its)
->>> -		if (itte->collection &&
->>> -		    itte->collection->collection_id == coll_id)
->>> -			itte->collection = NULL;
->>> +	for_each_lpi_its(device, ite, its)
->>> +		if (ite->collection &&
->>> +		    ite->collection->collection_id == coll_id)
->>> +			ite->collection = NULL;
->>>  
->>>  	list_del(&collection->coll_list);
->>>  	kfree(collection);
->>> @@ -709,7 +709,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
->>>  	u32 device_id = its_cmd_get_deviceid(its_cmd);
->>>  	u32 event_id = its_cmd_get_id(its_cmd);
->>>  	u32 coll_id = its_cmd_get_collection(its_cmd);
->>> -	struct its_itte *itte;
->>> +	struct its_ite *ite;
->>>  	struct its_device *device;
->>>  	struct its_collection *collection, *new_coll = NULL;
->>>  	int lpi_nr;
->>> @@ -728,7 +728,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
->>>  		return E_ITS_MAPTI_PHYSICALID_OOR;
->>>  
->>>  	/* If there is an existing mapping, behavior is UNPREDICTABLE. */
->>> -	if (find_itte(its, device_id, event_id))
->>> +	if (find_ite(its, device_id, event_id))
->>>  		return 0;
->>>  
->>>  	collection = find_collection(its, coll_id);
->>> @@ -739,36 +739,36 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
->>>  		new_coll = collection;
->>>  	}
->>>  
->>> -	itte = kzalloc(sizeof(struct its_itte), GFP_KERNEL);
->>> -	if (!itte) {
->>> +	ite = kzalloc(sizeof(struct its_ite), GFP_KERNEL);
->>> +	if (!ite) {
->>>  		if (new_coll)
->>>  			vgic_its_free_collection(its, coll_id);
->>>  		return -ENOMEM;
->>>  	}
->>>  
->>> -	itte->event_id	= event_id;
->>> -	list_add_tail(&itte->itte_list, &device->itt_head);
->>> +	ite->event_id	= event_id;
->>> +	list_add_tail(&ite->ite_list, &device->itt_head);
->>>  
->>> -	itte->collection = collection;
->>> -	itte->lpi = lpi_nr;
->>> +	ite->collection = collection;
->>> +	ite->lpi = lpi_nr;
->>>  
->>>  	irq = vgic_add_lpi(kvm, lpi_nr);
->>>  	if (IS_ERR(irq)) {
->>>  		if (new_coll)
->>>  			vgic_its_free_collection(its, coll_id);
->>> -		its_free_itte(kvm, itte);
->>> +		its_free_ite(kvm, ite);
->>>  		return PTR_ERR(irq);
->>>  	}
->>> -	itte->irq = irq;
->>> +	ite->irq = irq;
->>>  
->>> -	update_affinity_itte(kvm, itte);
->>> +	update_affinity_ite(kvm, ite);
->>>  
->>>  	/*
->>>  	 * We "cache" the configuration table entries in out struct vgic_irq's.
->>>  	 * However we only have those structs for mapped IRQs, so we read in
->>>  	 * the respective config data from memory here upon mapping the LPI.
->>>  	 */
->>> -	update_lpi_config(kvm, itte->irq, NULL);
->>> +	update_lpi_config(kvm, ite->irq, NULL);
->>>  
->>>  	return 0;
->>>  }
->>> @@ -776,15 +776,15 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
->>>  /* Requires the its_lock to be held. */
->>>  static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
->>>  {
->>> -	struct its_itte *itte, *temp;
->>> +	struct its_ite *ite, *temp;
->>>  
->>>  	/*
->>>  	 * The spec says that unmapping a device with still valid
->>>  	 * ITTEs associated is UNPREDICTABLE. We remove all ITTEs,
->>>  	 * since we cannot leave the memory unreferenced.
->>>  	 */
->>> -	list_for_each_entry_safe(itte, temp, &device->itt_head, itte_list)
->>> -		its_free_itte(kvm, itte);
->>> +	list_for_each_entry_safe(ite, temp, &device->itt_head, ite_list)
->>> +		its_free_ite(kvm, ite);
->>>  
->>>  	list_del(&device->dev_list);
->>>  	kfree(device);
->>> @@ -883,14 +883,14 @@ static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
->>>  {
->>>  	u32 device_id = its_cmd_get_deviceid(its_cmd);
->>>  	u32 event_id = its_cmd_get_id(its_cmd);
->>> -	struct its_itte *itte;
->>> +	struct its_ite *ite;
->>>  
->>>  
->>> -	itte = find_itte(its, device_id, event_id);
->>> -	if (!itte)
->>> +	ite = find_ite(its, device_id, event_id);
->>> +	if (!ite)
->>>  		return E_ITS_CLEAR_UNMAPPED_INTERRUPT;
->>>  
->>> -	itte->irq->pending_latch = false;
->>> +	ite->irq->pending_latch = false;
->>>  
->>>  	return 0;
->>>  }
->>> @@ -904,14 +904,14 @@ static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
->>>  {
->>>  	u32 device_id = its_cmd_get_deviceid(its_cmd);
->>>  	u32 event_id = its_cmd_get_id(its_cmd);
->>> -	struct its_itte *itte;
->>> +	struct its_ite *ite;
->>>  
->>>  
->>> -	itte = find_itte(its, device_id, event_id);
->>> -	if (!itte)
->>> +	ite = find_ite(its, device_id, event_id);
->>> +	if (!ite)
->>>  		return E_ITS_INV_UNMAPPED_INTERRUPT;
->>>  
->>> -	return update_lpi_config(kvm, itte->irq, NULL);
->>> +	return update_lpi_config(kvm, ite->irq, NULL);
->>>  }
->>>  
->>>  /*
->>> @@ -1435,7 +1435,7 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->>>  	struct kvm *kvm = kvm_dev->kvm;
->>>  	struct vgic_its *its = kvm_dev->private;
->>>  	struct its_device *dev;
->>> -	struct its_itte *itte;
->>> +	struct its_ite *ite;
->>>  	struct list_head *dev_cur, *dev_temp;
->>>  	struct list_head *cur, *temp;
->>>  
->>> @@ -1450,8 +1450,8 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->>>  	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
->>>  		dev = container_of(dev_cur, struct its_device, dev_list);
->>>  		list_for_each_safe(cur, temp, &dev->itt_head) {
->>> -			itte = (container_of(cur, struct its_itte, itte_list));
->>> -			its_free_itte(kvm, itte);
->>> +			ite = (container_of(cur, struct its_ite, ite_list));
->>> +			its_free_ite(kvm, ite);
->>>  		}
->>>  		list_del(dev_cur);
->>>  		kfree(dev);
->>> -- 
->>> 2.5.5
->>>
+
+Thanks,
+-Christoffer
