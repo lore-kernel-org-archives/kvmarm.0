@@ -1,208 +1,131 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v5 07/22] KVM: arm64: vgic-its: Implement
- vgic_its_has_attr_regs and attr_regs_access
-Date: Thu, 27 Apr 2017 04:00:03 -0700
-Message-ID: <20170427110003.GG50776@lvm>
+Subject: Re: [PATCH v5 01/22] KVM: arm/arm64: Add ITS save/restore API
+ documentation
+Date: Thu, 27 Apr 2017 04:02:23 -0700
+Message-ID: <20170427110223.GH50776@lvm>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-8-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-2-git-send-email-eric.auger@redhat.com>
+ <20170426123120.GL4104@cbox>
+ <88a194fa-9143-960e-e0a6-6b5c388cef82@redhat.com>
+ <20170427085709.GB50776@lvm>
+ <db5d0eb9-67eb-8b9a-50ca-816d217b3f53@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1492164934-988-8-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <db5d0eb9-67eb-8b9a-50ca-816d217b3f53@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Christoffer Dall <cdall@linaro.org>, drjones@redhat.com, kvm@vger.kernel.org, peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, Prasun.Kapoor@cavium.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 14, 2017 at 12:15:19PM +0200, Eric Auger wrote:
-> This patch implements vgic_its_has_attr_regs and vgic_its_attr_regs_access
-> upon the MMIO framework. VGIC ITS KVM device KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-> group becomes functional.
+On Thu, Apr 27, 2017 at 11:33:39AM +0200, Auger Eric wrote:
+> Hi Christoffer,
 > 
-> At least GITS_CREADR and GITS_IIDR require to differentiate a guest write
-> action from a user access. As such let's introduce a new uaccess_its_write
-> vgic_register_region callback.
+> On 27/04/2017 10:57, Christoffer Dall wrote:
+> > On Wed, Apr 26, 2017 at 05:48:32PM +0200, Auger Eric wrote:
+> >> Hi Christoffer,
+> >>
+> >> On 26/04/2017 14:31, Christoffer Dall wrote:
+> >>> On Fri, Apr 14, 2017 at 12:15:13PM +0200, Eric Auger wrote:
+> >>>> Add description for how to access ITS registers and how to save/restore
+> >>>> ITS tables into/from memory.
+> >>>>
+> >>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>>>
+> >>>> ---
+> >>>> v4 -> v5:
+> >>>> - take into account Christoffer's comments
+> >>>> - pending table save on GICV3 side now
+> >>>>
+> >>>> v3 -> v4:
+> >>>> - take into account Peter's comments:
+> >>>>   - typos
+> >>>>   - KVM_DEV_ARM_VGIC_GRP_ITS_TABLES kvm_device_attr = 0
+> >>>>   - add a validity bit in DTE
+> >>>>   - document all fields in CTE and ITE
+> >>>>   - document ABI revision
+> >>>> - take into account Andre's comments:
+> >>>>   - document restrictions about GITS_CREADR writing and GITS_IIDR
+> >>>>   - document -EBUSY error if one or more VCPUS are runnning
+> >>>>   - document 64b registers only can be accessed with 64b access
+> >>>> - itt_addr field matches bits [51:8] of the itt_addr
+> >>>>
+> >>>> v1 -> v2:
+> >>>> - DTE and ITE now are 8 bytes
+> >>>> - DTE and ITE now indexed by deviceid/eventid
+> >>>> - use ITE name instead of ITTE
+> >>>> - mentions ITT_addr matches bits [51:8] of the actual address
+> >>>> - mentions LE layout
+> >>>> ---
+> >>>>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 99 ++++++++++++++++++++++
+> >>>>  1 file changed, 99 insertions(+)
+> >>>>
+> >>>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> >>>> index 6081a5b..b5f010d 100644
+> >>>> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> >>>> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> >>>> @@ -32,7 +32,106 @@ Groups:
+> >>>>      KVM_DEV_ARM_VGIC_CTRL_INIT
+> >>>>        request the initialization of the ITS, no additional parameter in
+> >>>>        kvm_device_attr.addr.
+> >>>> +
+> >>>> +    KVM_DEV_ARM_ITS_SAVE_TABLES
+> >>>> +      save the ITS table data into guest RAM, at the location provisioned
+> >>>> +      by the guest in corresponding registers/table entries.
+> >>>> +
+> >>>> +      The layout of the tables in guest memory defines an ABI. The entries
+> >>>> +      are laid out in little endian format as described in the last paragraph.
+> >>>> +
+> >>>> +    KVM_DEV_ARM_ITS_RESTORE_TABLES
+> >>>> +      restore the ITS tables from guest RAM to ITS internal structures.
+> >>>> +
+> >>>> +      The GICV3 must be restored before the ITS and all ITS registers but
+> >>>> +      the GITS_CTLR must be restored before restoring the ITS tables.
+> >>>> +
+> >>>> +      The GITS_IIDR read-only register must also be restored before
+> >>>> +      the table restore as the IIDR revision field encodes the ABI revision.
+> >>>> +
+> >>>
+> >>> what is the expected sequence of operations.  For example, to restore
+> >>> the ITS, do I call KVM_DEV_ARM_VGIC_CTRL_INIT first, then restore all
+> >>> the memory and registers, and finally call KVM_DEV_ARM_ITS_RESTORE_TABLES?
+> >> Yes KVM_DEV_ARM_VGIC_CTRL_INIT comes first, then restore all registers
+> >> except GITS_CTLR, then table restore, then GITS_CTLR
+> >>>
+> >>> Is there any interaction between when you call KVM_DEV_ARM_ITS_RESTORE_TABLES
+> >>> and restore GITS_CTLR (which enables the ITS)?
+> >>
+> >> Yep, when GITS_CTLR is set, LPIs may be enabled and this on that event
+> >> that the pending table is read. But the whole pending table is not read
+> >> as we only iterate on registered LPIs. So the ITT must have been
+> >> restored previously.
+> >>
+> >> I became aware that the pending table sync is done twice, once in the
+> >> pending table restore,  and once in the GITS_CTLR restore. So if we
+> >> leave this order specification, I should be able to remove the sync on
+> >> table restore. This was the original reason why GITS_CTLR restore has
+> >> been done at the very end.
+> > 
+> > I'm sorry, I'm a bit confused.  Do we not need
+> > KVM_DEV_ARM_ITS_RESTORE_TABLES at all then?
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Yes you do. I was talking about the RDIST pending table sync. The save
+> is explicit using GICV3 device KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES.
+> However the sync is implicit on GITS_CTLR restore if LPIs are enabled.
+> and today I do it also on ITS device KVM_DEV_ARM_ITS_RESTORE_TABLES
+> which is not requested I think since GITS_CTLR restore does it already.
+
+Shouldn't restoring the pending tables happen when restoring some
+redeistributor state and not anything related to the ITS?
+
 > 
-> ---
-> v4 -> v5:
-> - use GITS_TYPER instead of offset 0x8
-> - uaccess_its_write now can return an error
-> 
-> v3 -> v4:
-> - remove changes to the REGISTER_ITS_DESC macro. This will be handled in
->   subsequent patch with the introduction of a new REGISTER_ITS_DESC_UACCESS
->   macro
-> - fix IIDR access and add a comment wrt full length access
-> - handle endianness
-> - add kvm lock and vcpus lock
-> ---
->  virt/kvm/arm/vgic/vgic-its.c  | 79 +++++++++++++++++++++++++++++++++++++++++--
->  virt/kvm/arm/vgic/vgic-mmio.h |  9 +++--
->  2 files changed, 84 insertions(+), 4 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index f687e91..a9a2c12 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1469,14 +1469,89 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->  int vgic_its_has_attr_regs(struct kvm_device *dev,
->  			   struct kvm_device_attr *attr)
->  {
-> -	return -ENXIO;
-> +	const struct vgic_register_region *region;
-> +	struct vgic_io_device iodev = {
-> +		.regions = its_registers,
-> +		.nr_regions = ARRAY_SIZE(its_registers),
-> +	};
-> +	gpa_t offset = attr->attr;
-> +
-> +	region = vgic_find_mmio_region(iodev.regions,
-> +				       iodev.nr_regions,
-> +				       offset);
+> KVM_DEV_ARM_ITS_RESTORE_TABLES restores all the ITS tables (device,
+> collection, ITT)
 
-why do you need to define the iodev here?  Can't you just pass
-its_registers and ARRAY_SIZE(its_registers) directly?
-
-> +	if (!region)
-> +		return -ENXIO;
-> +
-> +	return 0;
->  }
->  
->  int vgic_its_attr_regs_access(struct kvm_device *dev,
->  			      struct kvm_device_attr *attr,
->  			      u64 *reg, bool is_write)
->  {
-> -	return -ENXIO;
-> +	const struct vgic_register_region *region;
-> +	struct vgic_io_device iodev = {
-> +		.regions = its_registers,
-> +		.nr_regions = ARRAY_SIZE(its_registers),
-> +	};
-> +	struct vgic_its *its = dev->private;
-> +	gpa_t addr, offset = attr->attr;
-> +	unsigned int len;
-> +	unsigned long data = 0;
-> +	int ret = 0;
-
-nit: you could structure this whole declaration block more nicely by
-having a separate line for the declaration and initialization of offset,
-and by moving the iodev declaration/initialization to the end.
-
-It might also be cleaner to do any non-zero initialization in a separate
-block following the declarations.
-
-> +
-> +	/*
-> +	 * Among supported registers, only GITS_CTLR (0x0) and GITS_IIDR (0x4)
-> +	 * are 32 bits. Others are 64 bits.
-> +	 */
-> +	if ((offset < GITS_TYPER && offset & 0x3) ||
-> +	    (offset >= GITS_TYPER && offset & 0x7))
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&dev->kvm->lock);
-> +
-> +	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base)) {
-> +		ret = -ENXIO;
-> +		goto out;
-> +	}
-> +
-> +	region = vgic_find_mmio_region(iodev.regions,
-> +				       iodev.nr_regions,
-> +				       offset);
-> +	if (!region) {
-> +		ret = -ENXIO;
-> +		goto out;
-> +	}
-> +
-> +	if (!lock_all_vcpus(dev->kvm)) {
-> +		ret = -EBUSY;
-> +		goto out;
-> +	}
-> +
-> +	addr = its->vgic_its_base + offset;
-> +
-> +	/*
-> +	 * Only full length register accesses are supported although
-> +	 * the architecture spec theoretically allows upper/lower 32
-
-does the spec allow 32-bit accesses, or only theoretically ?  :)
-
-> +	 * bits to be accessed independently
-> +	 */
-
-In any case, the comment is a bit confusing, because it seems to imply
-that we only support 64-bit accesses, but we do set the length below to
-4 or 8.
-
-Did you mean:
-
-	/* 
-	 * Althought the spec supports upper/lower 32-bit accesses to
-	 * 64-bit ITS registers, the userspace ABI requires 64-bit
-	 * accesses to all 64-bit wide registers.  We therefore only 32-bit
-	 * accesses to the GITS_CTLR, GITS_IIDR registers.
-	 */
-
-Also, I don't understand how this works with the ID registers?  For
-example, if userspace wants to read GITS_PIDR1 does it have to read
-GITS_PIDR0 as a 64-bit register and split it afterwards?  (that doesn't
-work with this implementation)
-
-> +	len = region->access_flags & VGIC_ACCESS_64bit ? 8 : 4;
-> +
-> +	if (is_write) {
-> +		data = vgic_data_mmio_bus_to_host(reg, len);
-
-I don't think we need this anymore; we no longer share the guest
-trapping MMIO path with uaccesses.
-
-> +		if (region->uaccess_its_write)
-> +			ret = region->uaccess_its_write(dev->kvm, its, addr,
-> +							len, data);
-> +		else
-> +			region->its_write(dev->kvm, its, addr, len, data);
-> +	} else {
-> +		data = region->its_read(dev->kvm, its, addr, len);
-> +		vgic_data_host_to_mmio_bus(reg, len, data);
-
-same here.
-
-> +	}
-> +	unlock_all_vcpus(dev->kvm);
-> +out:
-> +	mutex_unlock(&dev->kvm->lock);
-> +	return ret;
->  }
->  
->  static int vgic_its_has_attr(struct kvm_device *dev,
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-> index 6eec91b..ea4171a 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.h
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
-> @@ -36,8 +36,13 @@ struct vgic_register_region {
->  	};
->  	unsigned long (*uaccess_read)(struct kvm_vcpu *vcpu, gpa_t addr,
->  				      unsigned int len);
-> -	void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
-> -			      unsigned int len, unsigned long val);
-> +	union {
-> +		void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
-> +				      unsigned int len, unsigned long val);
-> +		int (*uaccess_its_write)(struct kvm *kvm, struct vgic_its *its,
-> +					 gpa_t addr, unsigned int len,
-> +					 unsigned long val);
-> +	};
->  };
->  
->  extern struct kvm_io_device_ops kvm_io_gic_ops;
-> -- 
-> 2.5.5
-> 
+Why do you need this if you anyway need to restore the CTLR as the last
+thing?  Just to make it absolutely clear when it happens, or is there
+something which has to happen between the CTLR and the RESTORE?
 
 Thanks,
 -Christoffer
