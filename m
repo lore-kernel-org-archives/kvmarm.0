@@ -1,142 +1,147 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v5 16/22] KVM: arm64: vgic-its: Add infrastructure for
- table lookup
-Date: Fri, 28 Apr 2017 02:47:09 -0700
-Message-ID: <20170428094709.GA1439@lvm>
-References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-17-git-send-email-eric.auger@redhat.com>
- <20170427180641.GT50776@lvm>
- <58f99f7e-15ea-221d-e7ec-911f64148644@redhat.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2] arm64: Add ASM modifier for xN register operands
+Date: Fri, 28 Apr 2017 10:53:51 +0100
+Message-ID: <20170428095349.GA22161@leverpostej>
+References: <20170426214616.142580-1-mka@chromium.org>
+ <20170427110256.GC31337@leverpostej>
+ <20170427225221.GS128305@google.com>
+ <CAKv+Gu9s2t+Nt7JCcTxkr5BYSN05f_zxYkKzfrD-4owWQLvF_Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FF4940D77
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Apr 2017 05:51:34 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id nDrPqXqSc9ms for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Apr 2017 05:51:33 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D65D40D76
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Apr 2017 05:51:32 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <58f99f7e-15ea-221d-e7ec-911f64148644@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+In-Reply-To: <CAKv+Gu9s2t+Nt7JCcTxkr5BYSN05f_zxYkKzfrD-4owWQLvF_Q@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Grant Grundler <grundler@chromium.org>, Matthias Kaehlcke <mka@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Christoph Lameter <cl@linux.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 27, 2017 at 09:24:57PM +0200, Auger Eric wrote:
-> Hi,
+On Fri, Apr 28, 2017 at 08:18:52AM +0100, Ard Biesheuvel wrote:
+> On 27 April 2017 at 23:52, Matthias Kaehlcke <mka@chromium.org> wrote:
+> > El Thu, Apr 27, 2017 at 12:02:56PM +0100 Mark Rutland ha dit:
+> >> On Wed, Apr 26, 2017 at 02:46:16PM -0700, Matthias Kaehlcke wrote:
+
+> >> > -   asm volatile("strb %w0, [%1]" : : "rZ" (val), "r" (addr));
+> >> > +   asm volatile("strb %w0, [%x1]" : : "rZ" (val), "r" (addr));
+> >>
+> >> In general, the '[%xN]' pattern looks *very* suspicious to me. Any
+> >> address must be 64-bit, so this would mask a legitimate warning.
+> >>
+> >> Given the prototype of this function the code if fine either way, but
+> >> were we to refactor things (e.g. making this a macro), that might not be
+> >> true.
+> >>
+> >> ... so I'm not sure it make sense to alter instances used for addresses.
+> >
+> > Good point, I'll leave instances dealing with addresses untouched for now.
+> >
 > 
-> On 27/04/2017 20:06, Christoffer Dall wrote:
-> > On Fri, Apr 14, 2017 at 12:15:28PM +0200, Eric Auger wrote:
-> >> Add a generic lookup_table() helper whose role consists in
-> >> scanning a contiguous table located in guest RAM and applying
-> >> a callback on each entry. Entries can be handled as linked lists
-> >> since the callback may return an offset to the next entry and
-> >> also tell that an entry is the last one.
-> >>
-> >> Helper functions also are added to compute the device/event ID
-> >> offset to the next DTE/ITE.
-> >>
-> >> compute_next_devid_offset, compute_next_eventid_offset and
-> >> lookup_table will become static in subsequent patches
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >> v4 -> v5:
-> >> - use kvm_read_guest
-> >>
-> >> v3 -> v4:
-> >> - remove static to avoid compilation warning
-> >> - correct size computation in looup_table()
-> >> - defines now encode the number of bits used for devid and eventid offsets
-> >> - use BIT() - 1 to encode the max offets
-> >> ---
-> >>  virt/kvm/arm/vgic/vgic-its.c | 93 ++++++++++++++++++++++++++++++++++++++++++++
-> >>  1 file changed, 93 insertions(+)
-> >>
-> >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> >> index 56c5123..c22b35d 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-its.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> >> @@ -195,6 +195,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
-> >>  
-> >>  #define VITS_TYPER_IDBITS 16
-> >>  #define VITS_TYPER_DEVBITS 16
-> >> +#define VITS_DTE_MAX_DEVID_OFFSET	(BIT(14) - 1)
-> >> +#define VITS_ITE_MAX_EVENTID_OFFSET	(BIT(16) - 1)
-> >>  
-> >>  /*
-> >>   * Finds and returns a collection in the ITS collection table.
-> >> @@ -1674,6 +1676,97 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
-> >>  	return ret;
-> >>  }
-> >>  
-> >> +u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
-> >> +{
-> >> +	struct list_head *e = &dev->dev_list;
-> >> +	struct its_device *next;
-> >> +	u32 next_offset;
-> >> +
-> >> +	if (e->next == h)
-> >> +		return 0;
-> >> +	next = list_entry(e->next, struct its_device, dev_list);
-> >> +	next_offset = next->device_id - dev->device_id;
-> >> +
-> >> +	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
-> >> +}
-> >> +
-> >> +u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
-> >> +{
-> >> +	struct list_head *e = &ite->ite_list;
-> >> +	struct its_ite *next;
-> >> +	u32 next_offset;
-> >> +
-> >> +	if (e->next == h)
-> >> +		return 0;
-> >> +	next = list_entry(e->next, struct its_ite, ite_list);
-> >> +	next_offset = next->event_id - ite->event_id;
-> >> +
-> >> +	return min_t(u32, next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
-> >> +}
-> >> +
-> >> +/**
-> >> + * entry_fn_t - Callback called on a table entry restore path
-> >> + * @its: its handle
-> >> + * @id: id of the entry
-> >> + * @entry: pointer to the entry
-> >> + * @opaque: pointer to an opaque data
-> >> + * @next_offset: minimal ID offset to the next entry. 0 if this
-> >> + * entry is the last one, 1 if the entry is invalid, >= 1 if an
-> >> + * entry's next_offset field was truly decoded
-> >> + *
-> >> + * Return: < 0 on error, 0 otherwise
-> >> + */
-> >> +typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
-> >> +			  void *opaque, u32 *next_offset);
-> >> +
-> >> +/**
-> >> + * lookup_table - scan a contiguous table in guest RAM and applies a function
-> >> + * to each entry
-> >> + *
-> >> + * @its: its handle
-> >> + * @base: base gpa of the table
-> >> + * @size: size of the table in bytes
-> >> + * @esz: entry size in bytes
-> >> + * @start_id: first entry's ID
-> > 
-> > I'm a little confused.  Why is this not 0?
-> Because this is meant to be called on a second-level table as well
-> (device table). In that case the start ID != 0.
+> OK, I am confused now. We started this thread under the assumption
+> that all unqualified placeholders are warned about by Clang. Given
+> that this appears not to be the case, could we please first find out
+> what causes the warnings?
 
-Ah, ok, makes sense.  You could use the comment to explain that:
-  @start_id: The ID of the first entry in the table
-             (non-zero for second-level tables)
+Yes please.
 
-> > 
-> >> + * @fn: function to apply on each entry
-> >> + *
-> >> + * Return: < 0 on error, 1 if last element identified, 0 otherwise
-> > 
-> > How can you scan the entire table and not find the last element?
-> This happens on 2d level tables. The last element might be in another 2d
-> level table.
+> Is it necessary at all to add the x modifiers for 64-bit types?
 
-Ah, I think you should explain this so that the intended use is clear.
+Having delved a little deeper, I think this is actively harmful, and
+clang's warning indicates potential problems even when compiling with
+GCC.
+
+The below test simulates how we might write to control regs and so on,
+with a mov in asm simulating something like an msr.
+
+---->8----
+#include <stdio.h>
+
+static inline unsigned long generate_val(void)
+{
+        unsigned long val;
+
+        /* hide value generation from GCC */
+        asm (
+                "movn %0, #0"
+                : "=r" (val)
+        );
+
+        return val;
+}
+
+static inline unsigned long use_val_32(unsigned int in)
+{
+        unsigned long out;
+
+	/* simulate what we might write to a sysreg */
+        asm (
+                "mov %x0, %x1"
+                : "=r" (out)
+                : "r" (in)
+        );
+
+        return out;
+}
+
+int main(int argc, char *argv)
+{
+        printf("32-bit val is: 0x%016lx\n", use_val_32(generate_val()));
+
+        return 0;
+}
+---->8----
+
+Depending on optimization level, bits that we do not expect can flow through:
+
+$ gcc test.c -o test
+$ ./test
+32-bit val is: 0x00000000ffffffff
+$ gcc test.c -O1 -o test
+$ ./test
+32-bit val is: 0xffffffffffffffff
+$ gcc test.c -O2 -o test
+$ ./test
+32-bit val is: 0xffffffffffffffff
+
+... that could be disastrous depending on how the result was used.
+
+With "in" cast to an unsigned long, the compiler realises it needs to perform
+any necessary truncation itself:
+
+$ gcc test.c -o test
+$ ./test
+32-bit val is: 0x00000000ffffffff
+$ gcc test.c -O1 -o test
+$ ./test
+32-bit val is: 0x00000000ffffffff
+$ gcc test.c -O2 -o test
+$ ./test
+32-bit val is: 0x00000000ffffffff
+$ gcc test.c -O3 -o test
+$ ./test
+32-bit val is: 0x00000000ffffffff
+
+I think that the correct fix is to use intermediate 64-bit variables, or
+casts, so that the compiler *must* use an x register, and consequently
+guarantees that all 64-bits of the register are as we expect.
 
 Thanks,
--Christoffer
+Mark.
