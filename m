@@ -1,29 +1,25 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v2] arm64: Add ASM modifier for xN register operands
-Date: Fri, 28 Apr 2017 15:47:45 +0100
-Message-ID: <20170428144745.GR13675@arm.com>
-References: <20170426214616.142580-1-mka@chromium.org>
- <20170427110256.GC31337@leverpostej>
- <20170427225221.GS128305@google.com>
- <CAKv+Gu9s2t+Nt7JCcTxkr5BYSN05f_zxYkKzfrD-4owWQLvF_Q@mail.gmail.com>
- <20170428143333.GA5292@leverpostej>
- <CAKv+Gu8h46WS4dq9ge4VnmBTvo5L9RJYUSYXnVpJf+G+av6+dg@mail.gmail.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH 1/2] kvm: Fix mmu_notifier release race
+Date: Fri, 28 Apr 2017 18:20:04 +0100
+Message-ID: <611d0ad2-f907-d41c-cdc1-5977c247b104@arm.com>
+References: <1493028624-29837-1-git-send-email-suzuki.poulose@arm.com>
+ <1493028624-29837-2-git-send-email-suzuki.poulose@arm.com>
+ <20170425184904.GI5713@potion> <c1232b1d-ad82-794b-1b86-4d0cc0d4cd7f@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F3F3340DDC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Apr 2017 10:44:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 159BF43C90
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Apr 2017 13:17:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tHOggGhB4IE9 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Apr 2017 10:44:50 -0400 (EDT)
+ with ESMTP id CuYbIkfbqmlT for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Apr 2017 13:17:13 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B8C0240DDB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Apr 2017 10:44:50 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8h46WS4dq9ge4VnmBTvo5L9RJYUSYXnVpJf+G+av6+dg@mail.gmail.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85D1243C7F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Apr 2017 13:17:13 -0400 (EDT)
+In-Reply-To: <c1232b1d-ad82-794b-1b86-4d0cc0d4cd7f@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,41 +29,123 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Grant Grundler <grundler@chromium.org>, Matthias Kaehlcke <mka@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Christoph Lameter <cl@linux.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, Will Deacon <Will.Deacon@arm.com>, linux-kernel@vger.kernel.org, pbonzini@redhat.com, paulmck@linux.vnet.ibm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 28, 2017 at 03:43:56PM +0100, Ard Biesheuvel wrote:
-> On 28 April 2017 at 15:33, Mark Rutland <mark.rutland@arm.com> wrote:
-> > On Fri, Apr 28, 2017 at 08:18:52AM +0100, Ard Biesheuvel wrote:
-> OK, good. That is a departure from previous behavior of Clang, which
-> was causing build errors before due to the fact that msr/mrs
-> instructions involving 32-bit values must still use x registers.
-> 
-> > * If an operand type is 64 bits in size, clang will not produce a warning
-> >   regarding the operand size.
-> >
-> > * If an x or w modifier is used, clang will not produce a warning
-> >   regarding the operand size, regardless of whether it matches the
-> >   register size. Clang is happy for %wN to be used on a pointer type.
-> >
-> > * If an operand type is less than 64 bits in size, and neither an x or
-> >   w modifier is used, clang will produce a warning as above.
-> >
-> > * If an operand type is greater than 64 bits in size, clang encounters
-> >   an internal error.
-> >
-> > Given that, I think we *should not* use the x modifier to suppress this
-> > warning, as I think for those cases we have a potential bug as outlined
-> > in my prior reply.
-> >
-> > Instead, we should use a temporary 64-bit variable (or cast input
-> > operands to 64-bit), which avoids that and makes clang happy.
-> >
-> 
-> Yes, I think that makes sense.
-
-Likewise, we could even raise a feature request against GCC because these
-warnings actually sound useful. Thanks for getting to the bottom of this.
-
-Will
+T24gMjYvMDQvMTcgMTc6MDMsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4gT24gMjUvMDQvMTcg
+MTk6NDksIFJhZGltIEtyxI1tw6HFmSB3cm90ZToKPj4gMjAxNy0wNC0yNCAxMToxMCswMTAwLCBT
+dXp1a2kgSyBQb3Vsb3NlOgo+Pj4gVGhlIEtWTSB1c2VzIG1tdV9ub3RpZmllciAod2hlcmV2ZXIg
+YXZhaWxhYmxlKSB0byBrZWVwIHRyYWNrCj4+PiBvZiB0aGUgY2hhbmdlcyB0byB0aGUgbW0gb2Yg
+dGhlIGd1ZXN0LiBUaGUgZ3Vlc3Qgc2hhZG93IHBhZ2UKPj4+IHRhYmxlcyBhcmUgcmVsZWFzZWQg
+d2hlbiB0aGUgVk0gZXhpdHMgdmlhIG1tdV9ub3RpZmllci0+b3BzLnJlbGVhc2UoKS4KPj4+IFRo
+ZXJlIGlzIGEgcmFyZSBjaGFuY2UgdGhhdCB0aGUgbW11X25vdGlmaWVyLT5yZWxlYXNlIGNvdWxk
+IGJlCj4+PiBjYWxsZWQgbW9yZSB0aGFuIG9uY2UgdmlhIHR3byBkaWZmZXJlbnQgcGF0aHMsIHdo
+aWNoIGNvdWxkIGVuZAo+Pj4gdXAgaW4gdXNlLWFmdGVyLWZyZWUgb2Yga3ZtIGluc3RhbmNlIChz
+dWNoIGFzIFswXSkuCj4+Pgo+Pj4gZS5nOgo+Pj4KPj4+IHRocmVhZCBBICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHRocmVhZCBCCj4+PiAtLS0tLS0tICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAtLS0tLS0tLS0tLS0tLQo+Pj4KPj4+ICBnZXRf
+c2lnbmFsLT4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGt2bV9kZXN0cm95X3Zt
+KCktPgo+Pj4gIGRvX2V4aXQtPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBtbXVfbm90aWZpZXJfdW5yZWdpc3Rlci0+Cj4+PiAgZXhpdF9tbS0+ICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIGt2bV9hcmNoX2ZsdXNoX3NoYWRvd19hbGwoKS0+Cj4+
+PiAgZXhpdF9tbWFwLT4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNwaW5f
+bG9jaygma3ZtLT5tbXVfbG9jaykKPj4+ICBtbXVfbm90aWZpZXJfcmVsZWFzZS0+ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgLi4uLgo+Pj4gICBrdm1fYXJjaF9mbHVzaF9zaGFkb3dfYWxsKCkt
+PiAgICAgICAgICAgICAgICAgICAuLi4uLgo+Pj4gICAuLi4gc3Bpbl9sb2NrKCZrdm0tPm1tdV9s
+b2NrKSAgICAgICAgICAgICAgICAgICAuLi4uLgo+Pj4gICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBzcGluX3VubG9jaygma3ZtLT5tbXVfbG9jaykKPj4+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGt2bV9hcmNo
+X2ZyZWVfa3ZtKCkKPj4+ICAgICoqKiB1c2UgYWZ0ZXIgZnJlZSBvZiBrdm0gKioqCj4+Cj4+IEkg
+ZG9uJ3QgdW5kZXJzdGFuZCB0aGlzIHJhY2UgLi4uCj4+IGEgcGllY2Ugb2YgY29kZSBpbiBtbXVf
+bm90aWZpZXJfdW5yZWdpc3RlcigpIHNheXM6Cj4+Cj4+ICAgICAgIC8qCj4+ICAgICAgICAqIFdh
+aXQgZm9yIGFueSBydW5uaW5nIG1ldGhvZCB0byBmaW5pc2gsIG9mIGNvdXJzZSBpbmNsdWRpbmcK
+Pj4gICAgICAgICogLT5yZWxlYXNlIGlmIGl0IHdhcyBydW4gYnkgbW11X25vdGlmaWVyX3JlbGVh
+c2UgaW5zdGVhZCBvZiB1cy4KPj4gICAgICAgICovCj4+ICAgICAgIHN5bmNocm9uaXplX3NyY3Uo
+JnNyY3UpOwo+Pgo+PiBhbmQgY29kZSBiZWZvcmUgdGhhdCByZW1vdmVzIHRoZSBub3RpZmllciBm
+cm9tIHRoZSBsaXN0LCBzbyBpdCBjYW5ub3QgYmUKPj4gY2FsbGVkIGFmdGVyIHdlIHBhc3MgdGhp
+cyBwb2ludC4gIG1tdV9ub3RpZmllcl9yZWxlYXNlKCkgZG9lcyByb3VnaGx5Cj4+IHRoZSBzYW1l
+IGFuZCBleHBsYWlucyBpdCBhczoKPj4KPj4gICAgICAgLyoKPj4gICAgICAgICogc3luY2hyb25p
+emVfc3JjdSBoZXJlIHByZXZlbnRzIG1tdV9ub3RpZmllcl9yZWxlYXNlIGZyb20gcmV0dXJuaW5n
+IHRvCj4+ICAgICAgICAqIGV4aXRfbW1hcCAod2hpY2ggd291bGQgcHJvY2VlZCB3aXRoIGZyZWVp
+bmcgYWxsIHBhZ2VzIGluIHRoZSBtbSkKPj4gICAgICAgICogdW50aWwgdGhlIC0+cmVsZWFzZSBt
+ZXRob2QgcmV0dXJucywgaWYgaXQgd2FzIGludm9rZWQgYnkKPj4gICAgICAgICogbW11X25vdGlm
+aWVyX3VucmVnaXN0ZXIuCj4+ICAgICAgICAqCj4+ICAgICAgICAqIFRoZSBtbXVfbm90aWZpZXJf
+bW0gY2FuJ3QgZ28gYXdheSBmcm9tIHVuZGVyIHVzIGJlY2F1c2Ugb25lIG1tX2NvdW50Cj4+ICAg
+ICAgICAqIGlzIGhlbGQgYnkgZXhpdF9tbWFwLgo+PiAgICAgICAgKi8KPj4gICAgICAgc3luY2hy
+b25pemVfc3JjdSgmc3JjdSk7Cj4+Cj4+IFRoZSBjYWxsIG9mIG1tdV9ub3RpZmllci0+cmVsZWFz
+ZSBpcyBwcm90ZWN0ZWQgYnkgc3JjdSBpbiBib3RoIGNhc2VzIGFuZAo+PiB3aGlsZSBpdCBzZWVt
+cyBwb3NzaWJsZSB0aGF0IG1tdV9ub3RpZmllci0+cmVsZWFzZSB3b3VsZCBiZSBjYWxsZWQKPj4g
+dHdpY2UsIEkgZG9uJ3Qgc2VlIGEgY29tYmluYXRpb24gdGhhdCBjb3VsZCByZXN1bHQgaW4gdXNl
+LWFmdGVyLWZyZWUKPj4gZnJvbSBtbXVfbm90aWZpZXJfcmVsZWFzZSBhZnRlciBtbXVfbm90aWZp
+ZXJfdW5yZWdpc3RlcigpIGhhcyByZXR1cm5lZC4KPgo+IFRoYW5rcyBmb3IgYnJpbmdpbmcgaXQg
+dXAuIEV2ZW4gSSBhbSB3b25kZXJpbmcgd2h5IHRoaXMgaXMgdHJpZ2dlcmVkICEgKEJ1dCBpdAo+
+IGRvZXMgZ2V0IHRyaWdnZXJlZCBmb3Igc3VyZSAhISkKPgo+IFRoZSBvbmx5IGRpZmZlcmVuY2Ug
+SSBjYW4gc3BvdCB3aXRoIF91bnJlZ2lzdGVyICYgX3JlbGVhc2UgcGF0aHMgYXJlIHRoZSB3YXkK
+PiB3ZSB1c2Ugc3JjX3JlYWRfbG9jayBhY3Jvc3MgdGhlIGRlbGV0aW9uIG9mIHRoZSBlbnRyeSBm
+cm9tIHRoZSBsaXN0Lgo+Cj4gSW4gbW11X25vdGlmaWVyX3VucmVnaXN0ZXIoKSB3ZSBkbyA6Cj4K
+PiAgICAgICAgICAgICAgICAgaWQgPSBzcmN1X3JlYWRfbG9jaygmc3JjdSk7Cj4gICAgICAgICAg
+ICAgICAgIC8qCj4gICAgICAgICAgICAgICAgICAqIGV4aXRfbW1hcCB3aWxsIGJsb2NrIGluIG1t
+dV9ub3RpZmllcl9yZWxlYXNlIHRvIGd1YXJhbnRlZQo+ICAgICAgICAgICAgICAgICAgKiB0aGF0
+IC0+cmVsZWFzZSBpcyBjYWxsZWQgYmVmb3JlIGZyZWVpbmcgdGhlIHBhZ2VzLgo+ICAgICAgICAg
+ICAgICAgICAgKi8KPiAgICAgICAgICAgICAgICAgaWYgKG1uLT5vcHMtPnJlbGVhc2UpCj4gICAg
+ICAgICAgICAgICAgICAgICAgICAgbW4tPm9wcy0+cmVsZWFzZShtbiwgbW0pOwo+ICAgICAgICAg
+ICAgICAgICBzcmN1X3JlYWRfdW5sb2NrKCZzcmN1LCBpZCk7Cj4KPiAjIyBSZWxlYXNlcyB0aGUg
+c3JjdSBsb2NrIGhlcmUgYW5kIHRoZW4gZ29lcyBvbiB0byBncmFiIHRoZSBzcGluX2xvY2suCj4K
+PiAgICAgICAgICAgICAgICAgc3Bpbl9sb2NrKCZtbS0+bW11X25vdGlmaWVyX21tLT5sb2NrKTsK
+PiAgICAgICAgICAgICAgICAgLyoKPiAgICAgICAgICAgICAgICAgICogQ2FuIG5vdCB1c2UgbGlz
+dF9kZWxfcmN1KCkgc2luY2UgX19tbXVfbm90aWZpZXJfcmVsZWFzZQo+ICAgICAgICAgICAgICAg
+ICAgKiBjYW4gZGVsZXRlIGl0IGJlZm9yZSB3ZSBob2xkIHRoZSBsb2NrLgo+ICAgICAgICAgICAg
+ICAgICAgKi8KPiAgICAgICAgICAgICAgICAgaGxpc3RfZGVsX2luaXRfcmN1KCZtbi0+aGxpc3Qp
+Owo+ICAgICAgICAgICAgICAgICBzcGluX3VubG9jaygmbW0tPm1tdV9ub3RpZmllcl9tbS0+bG9j
+ayk7Cj4KPiBXaGlsZSBpbiBtbXVfbm90aWZpZXJfcmVsZWFzZSgpIHdlIGhvbGQgaXQgdW50aWwg
+dGhlIG5vZGUocykgYXJlIGRlbGV0ZWQgZnJvbSB0aGUKPiBsaXN0IDoKPiAgICAgICAgIC8qCj4g
+ICAgICAgICAgKiBTUkNVIGhlcmUgd2lsbCBibG9jayBtbXVfbm90aWZpZXJfdW5yZWdpc3RlciB1
+bnRpbAo+ICAgICAgICAgICogLT5yZWxlYXNlIHJldHVybnMuCj4gICAgICAgICAgKi8KPiAgICAg
+ICAgIGlkID0gc3JjdV9yZWFkX2xvY2soJnNyY3UpOwo+ICAgICAgICAgaGxpc3RfZm9yX2VhY2hf
+ZW50cnlfcmN1KG1uLCAmbW0tPm1tdV9ub3RpZmllcl9tbS0+bGlzdCwgaGxpc3QpCj4gICAgICAg
+ICAgICAgICAgIC8qCj4gICAgICAgICAgICAgICAgICAqIElmIC0+cmVsZWFzZSBydW5zIGJlZm9y
+ZSBtbXVfbm90aWZpZXJfdW5yZWdpc3RlciBpdCBtdXN0IGJlCj4gICAgICAgICAgICAgICAgICAq
+IGhhbmRsZWQsIGFzIGl0J3MgdGhlIG9ubHkgd2F5IGZvciB0aGUgZHJpdmVyIHRvIGZsdXNoIGFs
+bAo+ICAgICAgICAgICAgICAgICAgKiBleGlzdGluZyBzcHRlcyBhbmQgc3RvcCB0aGUgZHJpdmVy
+IGZyb20gZXN0YWJsaXNoaW5nIGFueSBtb3JlCj4gICAgICAgICAgICAgICAgICAqIHNwdGVzIGJl
+Zm9yZSBhbGwgdGhlIHBhZ2VzIGluIHRoZSBtbSBhcmUgZnJlZWQuCj4gICAgICAgICAgICAgICAg
+ICAqLwo+ICAgICAgICAgICAgICAgICBpZiAobW4tPm9wcy0+cmVsZWFzZSkKPiAgICAgICAgICAg
+ICAgICAgICAgICAgICBtbi0+b3BzLT5yZWxlYXNlKG1uLCBtbSk7Cj4KPiAgICAgICAgIHNwaW5f
+bG9jaygmbW0tPm1tdV9ub3RpZmllcl9tbS0+bG9jayk7Cj4gICAgICAgICB3aGlsZSAodW5saWtl
+bHkoIWhsaXN0X2VtcHR5KCZtbS0+bW11X25vdGlmaWVyX21tLT5saXN0KSkpIHsKPiAgICAgICAg
+ICAgICAgICAgbW4gPSBobGlzdF9lbnRyeShtbS0+bW11X25vdGlmaWVyX21tLT5saXN0LmZpcnN0
+LAo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cnVjdCBtbXVfbm90aWZpZXIs
+Cj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaGxpc3QpOwo+ICAgICAgICAgICAg
+ICAgICAvKgo+ICAgICAgICAgICAgICAgICAgKiBXZSBhcnJpdmVkIGJlZm9yZSBtbXVfbm90aWZp
+ZXJfdW5yZWdpc3RlciBzbwo+ICAgICAgICAgICAgICAgICAgKiBtbXVfbm90aWZpZXJfdW5yZWdp
+c3RlciB3aWxsIGRvIG5vdGhpbmcgb3RoZXIgdGhhbiB0byB3YWl0Cj4gICAgICAgICAgICAgICAg
+ICAqIGZvciAtPnJlbGVhc2UgdG8gZmluaXNoIGFuZCBmb3IgbW11X25vdGlmaWVyX3VucmVnaXN0
+ZXIgdG8KPiAgICAgICAgICAgICAgICAgICogcmV0dXJuLgo+ICAgICAgICAgICAgICAgICAgKi8K
+PiAgICAgICAgICAgICAgICAgaGxpc3RfZGVsX2luaXRfcmN1KCZtbi0+aGxpc3QpOwo+ICAgICAg
+ICAgfQo+ICAgICAgICAgc3Bpbl91bmxvY2soJm1tLT5tbXVfbm90aWZpZXJfbW0tPmxvY2spOwo+
+ICAgICAgICAgc3JjdV9yZWFkX3VubG9jaygmc3JjdSwgaWQpOwo+Cj4gIyMgVGhlIGxvY2sgaXMg
+cmVsZWFzZSBvbmx5IGFmdGVyIHRoZSBkZWxldGlvbiBvZiB0aGUgbm9kZS4KPgo+IEJvdGggYXJl
+IGZvbGxvd2VkIGJ5IGEgc3luY2hyb25pemVfc3JjdSgpLiBOb3csIEkgYW0gd29uZGVyaW5nIGlm
+IHRoZSB1bnJlZ2lzdGVyIHBhdGgKPiBjb3VsZCBwb3RlbnRpYWxseSBtaXNzIFNSQ1UgcmVhZCBs
+b2NrIGhlbGQgaW4gX3JlbGVhc2UoKSBwYXRoIGFuZCBnbyBvbnRvIGZpbmlzaCB0aGUKPiBzeW5j
+aHJvbml6ZV9zcmN1IGJlZm9yZSB0aGUgaXRlbSBpcyBkZWxldGVkID8gTWF5IGJlIHdlIHNob3Vs
+ZCBkbyB0aGUgcmVhZF91bmxvY2sKPiBhZnRlciB0aGUgZGVsZXRpb24gb2YgdGhlIG5vZGUgaW4g
+X3VucmVnaXN0ZXIgKGxpa2Ugd2UgZG8gaW4gdGhlIF9yZWxlYXNlKCkpID8KCkkgaGF2ZW4ndCBi
+ZWVuIGFibGUgdG8gcmVwcm9kdWNlIHRoZSBtbXVfbm90aWZpZXIgcmFjZSBjb25kaXRpb24sIHdo
+aWNoIGxlYWRzIHRvIEtWTQpmcmVlLCByZXBvcnRlZCBhdCBbMV0uIEkgd2lsbCBsZWF2ZSBpdCBy
+dW5uaW5nICh3aXRoIHRyYWNlcG9pbnRzL2Z0cmFjZSkgb3ZlciB0aGUKd2Vla2VuZC4KCj4KPj4K
+Pj4gRG9lc24ndCBbMi8yXSBzb2x2ZSB0aGUgZXhhY3Qgc2FtZSBpc3N1ZSAodGhhdCB0aGUgcmVs
+ZWFzZSBtZXRob2QgY2Fubm90Cj4+IGJlIGNhbGxlZCB0d2ljZSBpbiBwYXJhbGxlbCk/Cj4KPiBO
+b3QgcmVhbGx5LiBUaGlzIGNvdWxkIGJlIGEgcmFjZSBiZXR3ZWVuIGEgcmVsZWFzZSgpIGFuZCBv
+bmUgb2YgdGhlIG90aGVyIG5vdGlmaWVyCj4gY2FsbGJhY2tzLiBlLmcsIEluIFswXSwgd2Ugd2Vy
+ZSBoaXR0aW5nIGEgdXNlLWFmdGVyLWZyZWUgaW4ga3ZtX3VubWFwX2h2YSgpIHdoZXJlLAo+IHRo
+ZSB1bnJlZ2lzdGVyIGNvdWxkIGhhdmUgc3VjY2VlZGVkIGFuZCByZWxlYXNlZCB0aGUgS1ZNLgoK
+QnV0IEkgY2FuIHJlcHJvZHVjZSB0aGlzIHByb2JsZW0gWzBdLCBhbmQgd2UgbmVlZCB0aGUgWzIv
+Ml0gZm9yIGFybS9hcm02NC4KClswXSBodHRwOi8vbGttbC5rZXJuZWwub3JnL3IvZmViZWE5NjYt
+Mzc2Ny0yMWZmLTNjNDAtMWE3NmQxMzk5MTM4QHN1c2UuZGUKWzFdIGh0dHA6Ly9sa21sLmtlcm5l
+bC5vcmcvci9DQUFlSEsreDh1ZEhLcTl4YTF6a1RPNmF4NUU4RGszMkhZV2ZhVDA1Rk1jaEwyY3I0
+OGdAbWFpbC5nbWFpbC5jb20KCgpUaGFua3MKU3V6dWtpCl9fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3Rz
+LmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xp
+c3RpbmZvL2t2bWFybQo=
