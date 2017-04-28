@@ -1,26 +1,27 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH V15 07/11] acpi: apei: panic OS with fatal error status
- block
-Date: Fri, 28 Apr 2017 15:07:10 +0200
-Message-ID: <20170428130710.s7m7nk46xmobxgq5@pd.tnic>
-References: <1492556723-9189-1-git-send-email-tbaicar@codeaurora.org>
- <1492556723-9189-8-git-send-email-tbaicar@codeaurora.org>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2] arm64: Add ASM modifier for xN register operands
+Date: Fri, 28 Apr 2017 15:33:33 +0100
+Message-ID: <20170428143333.GA5292@leverpostej>
+References: <20170426214616.142580-1-mka@chromium.org>
+ <20170427110256.GC31337@leverpostej>
+ <20170427225221.GS128305@google.com>
+ <CAKv+Gu9s2t+Nt7JCcTxkr5BYSN05f_zxYkKzfrD-4owWQLvF_Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B993940D88
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Apr 2017 09:04:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A1F8041050
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Apr 2017 10:31:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8m-EjX4i6trU for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Apr 2017 09:04:23 -0400 (EDT)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F21540D77
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Apr 2017 09:04:23 -0400 (EDT)
+ with ESMTP id ecz-7u2b3BLn for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Apr 2017 10:31:19 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F4AA4100D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Apr 2017 10:31:18 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1492556723-9189-8-git-send-email-tbaicar@codeaurora.org>
+In-Reply-To: <CAKv+Gu9s2t+Nt7JCcTxkr5BYSN05f_zxYkKzfrD-4owWQLvF_Q@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,84 +31,107 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, rafael@kernel.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, tony.luck@intel.com, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Grant Grundler <grundler@chromium.org>, Matthias Kaehlcke <mka@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Christoph Lameter <cl@linux.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 18, 2017 at 05:05:19PM -0600, Tyler Baicar wrote:
-> From: "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>
+On Fri, Apr 28, 2017 at 08:18:52AM +0100, Ard Biesheuvel wrote:
+> On 27 April 2017 at 23:52, Matthias Kaehlcke <mka@chromium.org> wrote:
+> > El Thu, Apr 27, 2017 at 12:02:56PM +0100 Mark Rutland ha dit:
+> >> On Wed, Apr 26, 2017 at 02:46:16PM -0700, Matthias Kaehlcke wrote:
+> >> > Many inline assembly statements don't include the 'x' modifier when
+> >> > using xN registers as operands. This is perfectly valid, however it
+> >> > causes clang to raise warnings like this:
+> >> >
+> >> > warning: value size does not match register size specified by the
+> >> >   constraint and modifier [-Wasm-operand-widths]
+
+[...]
+
+> >> > -   asm volatile("strb %w0, [%1]" : : "rZ" (val), "r" (addr));
+> >> > +   asm volatile("strb %w0, [%x1]" : : "rZ" (val), "r" (addr));
+> >>
+> >> In general, the '[%xN]' pattern looks *very* suspicious to me. Any
+> >> address must be 64-bit, so this would mask a legitimate warning.
+> >>
+> >> Given the prototype of this function the code if fine either way, but
+> >> were we to refactor things (e.g. making this a macro), that might not be
+> >> true.
+> >>
+> >> ... so I'm not sure it make sense to alter instances used for addresses.
+> >
+> > Good point, I'll leave instances dealing with addresses untouched for now.
+> >
 > 
-> Even if an error status block's severity is fatal, the kernel does not
-> honor the severity level and panic.
-> 
-> With the firmware first model, the platform could inform the OS about a
-> fatal hardware error through the non-NMI GHES notification type. The OS
-> should panic when a hardware error record is received with this
-> severity.
-> 
-> Call panic() after CPER data in error status block is printed if
-> severity is fatal, before each error section is handled.
-> 
-> Signed-off-by: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
-> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
-> Reviewed-by: James Morse <james.morse@arm.com>
-> ---
->  drivers/acpi/apei/ghes.c | 19 ++++++++++++++-----
->  1 file changed, 14 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index 2d387f8..b91123f 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -134,6 +134,8 @@
->  static struct ghes_estatus_cache *ghes_estatus_caches[GHES_ESTATUS_CACHES_SIZE];
->  static atomic_t ghes_estatus_cache_alloced;
->  
-> +static int ghes_panic_timeout __read_mostly = 30;
-> +
->  static int ghes_ioremap_init(void)
->  {
->  	ghes_ioremap_area = __get_vm_area(PAGE_SIZE * GHES_IOREMAP_PAGES,
-> @@ -692,6 +694,13 @@ static int ghes_ack_error(struct acpi_hest_generic_v2 *generic_v2)
->  	return apei_write(val, &generic_v2->read_ack_register);
->  }
->  
-> +static void __ghes_call_panic(void)
+> OK, I am confused now. We started this thread under the assumption
+> that all unqualified placeholders are warned about by Clang. Given
+> that this appears not to be the case, could we please first find out
+> what causes the warnings? Is it necessary at all to add the x
+> modifiers for 64-bit types?
 
-__ghes_panic()
+FWIW, I grabbed a clang 4.0.0 binary and had a play.
 
-> +{
-> +	if (panic_timeout == 0)
+It looks like clang only warns when an operand is less than 64 bits
+wide, and there is no 'x' or 'w' modifier. Pointers a 64 bits wide, so
+never produce a warning.
 
-	if (!panic_timeout)
+As far as I can tell, applying to both integers and pointers:
 
-> +		panic_timeout = ghes_panic_timeout;
-> +	panic("Fatal hardware error!");
-> +}
-> +
->  static int ghes_proc(struct ghes *ghes)
->  {
->  	int rc;
-> @@ -699,6 +708,10 @@ static int ghes_proc(struct ghes *ghes)
->  	rc = ghes_read_estatus(ghes, 0);
->  	if (rc)
->  		goto out;
+* GCC and clang always treat %N as meaning xN for an r constraint, and
+  you need to use %wN to get wN.
 
-<---- newline here.
+* If an operand type is 64 bits in size, clang will not produce a warning
+  regarding the operand size.
 
-> +	if (ghes_severity(ghes->estatus->error_severity) >= GHES_SEV_PANIC) {
-> +		__ghes_print_estatus(KERN_EMERG, ghes->generic, ghes->estatus);
-> +		__ghes_call_panic();
-> +	}
+* If an x or w modifier is used, clang will not produce a warning
+  regarding the operand size, regardless of whether it matches the
+  register size. Clang is happy for %wN to be used on a pointer type.
 
-ditto.
+* If an operand type is less than 64 bits in size, and neither an x or
+  w modifier is used, clang will produce a warning as above.
 
->  	if (!ghes_estatus_cached(ghes->estatus)) {
->  		if (ghes_print_estatus(NULL, ghes->generic, ghes->estatus))
->  			ghes_estatus_cache_add(ghes->generic, ghes->estatus);
+* If an operand type is greater than 64 bits in size, clang encounters
+  an internal error.
 
--- 
-Regards/Gruss,
-    Boris.
+Given that, I think we *should not* use the x modifier to suppress this
+warning, as I think for those cases we have a potential bug as outlined
+in my prior reply.
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Instead, we should use a temporary 64-bit variable (or cast input
+operands to 64-bit), which avoids that and makes clang happy.
+
+I've included my test below. Note that clang will produce other errors for
+invalid asm (e.g. for mov w0, x0).
+
+Thanks,
+Mark.
+
+---->8----
+#define TEST(t, w1, w2)                 \
+t foo_##t##w1##_##w2(t a, t b)          \
+{                                       \
+        asm (                           \
+        "mov %" #w1 "0, %" #w2 "1"      \
+        : "=r" (a) : "r" (b)            \
+        );                              \
+                                        \
+        return a;                       \
+}
+
+#define TEST_TYPE(t)                    \
+        TEST(t,  ,  )                   \
+        TEST(t, w,  )                   \
+        TEST(t, w, w)                   \
+        TEST(t, w, x)                   \
+        TEST(t, x,  )                   \
+        TEST(t, x, w)                   \
+        TEST(t, x, x)                   \
+
+TEST_TYPE(int)
+
+TEST_TYPE(long)
+
+typedef long * longp;
+TEST_TYPE(longp)
+
+TEST_TYPE(__int128)
