@@ -1,18 +1,39 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [PATCH v5 16/22] KVM: arm64: vgic-its: Add infrastructure for
  table lookup
-Date: Sun, 30 Apr 2017 12:35:55 -0700
-Message-ID: <20170430193555.GB1670@lvm>
+Date: Sun, 30 Apr 2017 13:13:38 -0700
+Message-ID: <20170430201338.GC1670@lvm>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
  <1492164934-988-17-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACC4740C44
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Apr 2017 16:10:43 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3ZYJzCsncPra for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 30 Apr 2017 16:10:42 -0400 (EDT)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 27B5740C2E
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Apr 2017 16:10:41 -0400 (EDT)
+Received: by mail-wm0-f52.google.com with SMTP id w64so77474541wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Apr 2017 13:13:41 -0700 (PDT)
 Content-Disposition: inline
 In-Reply-To: <1492164934-988-17-git-send-email-eric.auger@redhat.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Fri, Apr 14, 2017 at 12:15:28PM +0200, Eric Auger wrote:
@@ -86,18 +107,12 @@ On Fri, Apr 14, 2017 at 12:15:28PM +0200, Eric Auger wrote:
 > +	next_offset = next->event_id - ite->event_id;
 > +
 > +	return min_t(u32, next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
-> +}
-> +
-> +/**
-> + * entry_fn_t - Callback called on a table entry restore path
-> + * @its: its handle
-> + * @id: id of the entry
-> + * @entry: pointer to the entry
-> + * @opaque: pointer to an opaque data
-> + * @next_offset: minimal ID offset to the next entry. 0 if this
-> + * entry is the last one, 1 if the entry is invalid, >= 1 if an
 
-eh, also, did you mean -1 if the entry is invalid?
+nit: in both of these functions you can avoid the extra e variable and
+maybe make this slightly more readable by using these two calls instead:
+
+list_is_last(&ite->ite_list, h);
+next = list_next_entry(ite, ite_list);
 
 Thanks,
 -Christoffer
