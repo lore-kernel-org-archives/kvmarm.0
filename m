@@ -1,39 +1,18 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [PATCH v5 16/22] KVM: arm64: vgic-its: Add infrastructure for
  table lookup
-Date: Sun, 30 Apr 2017 12:33:25 -0700
-Message-ID: <20170430193325.GA1670@lvm>
+Date: Sun, 30 Apr 2017 12:35:55 -0700
+Message-ID: <20170430193555.GB1670@lvm>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
  <1492164934-988-17-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63BCA40C58
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Apr 2017 15:30:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jDkq7xR4MixA for <kvmarm@lists.cs.columbia.edu>;
- Sun, 30 Apr 2017 15:30:28 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFF5840C56
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Apr 2017 15:30:28 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id m123so85215636wma.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Apr 2017 12:33:28 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
 In-Reply-To: <1492164934-988-17-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Fri, Apr 14, 2017 at 12:15:28PM +0200, Eric Auger wrote:
@@ -117,72 +96,8 @@ On Fri, Apr 14, 2017 at 12:15:28PM +0200, Eric Auger wrote:
 > + * @opaque: pointer to an opaque data
 > + * @next_offset: minimal ID offset to the next entry. 0 if this
 > + * entry is the last one, 1 if the entry is invalid, >= 1 if an
-> + * entry's next_offset field was truly decoded
-> + *
-> + * Return: < 0 on error, 0 otherwise
-> + */
-> +typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
-> +			  void *opaque, u32 *next_offset);
 
-Just noticed.  All the table entries are 64-bit long at this point,
-right?  So why not make entry a u64 * instead?  Could we end up with
-some endianness mess with using void pointers the way it is now?
+eh, also, did you mean -1 if the entry is invalid?
 
 Thanks,
 -Christoffer
-
-> +
-> +/**
-> + * lookup_table - scan a contiguous table in guest RAM and applies a function
-> + * to each entry
-> + *
-> + * @its: its handle
-> + * @base: base gpa of the table
-> + * @size: size of the table in bytes
-> + * @esz: entry size in bytes
-> + * @start_id: first entry's ID
-> + * @fn: function to apply on each entry
-> + *
-> + * Return: < 0 on error, 1 if last element identified, 0 otherwise
-> + */
-> +int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
-> +		 int start_id, entry_fn_t fn, void *opaque)
-> +{
-> +	void *entry = kzalloc(esz, GFP_KERNEL);
-> +	struct kvm *kvm = its->dev->kvm;
-> +	unsigned long len = size;
-> +	u32 id = start_id;
-> +	gpa_t gpa = base;
-> +	int ret;
-> +
-> +	while (len > 0) {
-> +		u32 next_offset;
-> +		size_t byte_offset;
-> +
-> +		ret = kvm_read_guest(kvm, gpa, entry, esz);
-> +		if (ret)
-> +			goto out;
-> +
-> +		ret = fn(its, id, entry, opaque, &next_offset);
-> +		if (ret < 0 || (!ret && !next_offset))
-> +			goto out;
-> +
-> +		byte_offset = next_offset * esz;
-> +		id += next_offset;
-> +		gpa += byte_offset;
-> +		len -= byte_offset;
-> +	}
-> +	kfree(entry);
-> +	return 0;
-> +
-> +out:
-> +	kfree(entry);
-> +	return (ret < 0 ? ret : 1);
-> +}
-> +
->  /**
->   * vgic_its_save_device_tables - Save the device table and all ITT
->   * into guest RAM
-> -- 
-> 2.5.5
-> 
