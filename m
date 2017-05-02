@@ -1,49 +1,71 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 0/5] KVM/ARM: Fixes for 4.12-rc1
-Date: Tue, 2 May 2017 16:00:49 +0100
-Message-ID: <c9f36b35-6a46-8ed8-0bb0-9c099f28d834@arm.com>
-References: <20170502133041.10980-1-marc.zyngier@arm.com>
- <75f031d5-d16e-6311-af44-f2c5af5bded4@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: arm: Restore banked registers and physical timer
+ access on hyp_panic()
+Date: Tue, 2 May 2017 16:24:10 +0100
+Message-ID: <c857a4c9-a5ea-f38a-8b22-837d621ee92b@arm.com>
+References: <20170425170245.4294-1-james.morse@arm.com>
+ <20170425170245.4294-2-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <75f031d5-d16e-6311-af44-f2c5af5bded4@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7782540B8C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 11:21:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QTe-8Y8O-qco for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 May 2017 11:21:10 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C5F440B5B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 11:21:10 -0400 (EDT)
+In-Reply-To: <20170425170245.4294-2-james.morse@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 02/05/17 15:44, Paolo Bonzini wrote:
+On 25/04/17 18:02, James Morse wrote:
+> When KVM panics, it hurridly restores the host context and parachutes
+> into the host's panic() code. This looks like it was copied from arm64,
+> the 32bit KVM panic code needs to restore the host's banked registers
+> too.
 > 
+> At some point panic() touches the physical timer/counter, this will
+> trap back to HYP. If we're lucky, we panic again.
 > 
-> On 02/05/2017 15:30, Marc Zyngier wrote:
->> Here's a handful of random fixes I've queued locally that didn't have
->> a chance to make it in 4.11.
->>
->> The first two patches avoid stack-protector messing with the HYP code,
->> as this ends up being a complete disaster.
->>
->> The following two patches fix a bug introduced in the new vgic, where
->> we may queue HW interrupts with the Pending+Active state, which is
->> illegal.
->>
->> The final patch fixes a misinterpretation of the spec, where we
->> compute the number of APxRn register based on the number of priorities
->> instead of using the number of preemption levels.
->>
->> I've tagged the first 4 patches for stable, given that we're doing
->> something potentially harmful. The last patch is more of a theoretical
->> issue at this stage, so probably need for a backport.
+> Add a __timer_save_state() call to KVMs hyp_panic() path, this saves the
+> guest registers and disables the traps for the host.
 > 
-> Would you like me to apply them, or are you looking for reviews and
-> going to send them in a pull request?
+> Fixes: c36b6db5f3e4 ("ARM: KVM: Add panic handling code")
+> Signed-off-by: James Morse <james.morse@arm.com>
+> ---
+>  arch/arm/kvm/hyp/switch.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> I can wait a couple days before sending my own pull request to Linus.
+> diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+> index 92678b7bd046..c8f15bb5c8b3 100644
+> --- a/arch/arm/kvm/hyp/switch.c
+> +++ b/arch/arm/kvm/hyp/switch.c
+> @@ -235,8 +235,10 @@ void __hyp_text __noreturn __hyp_panic(int cause)
+>  
+>  		vcpu = (struct kvm_vcpu *)read_sysreg(HTPIDR);
+>  		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +		__timer_save_state(vcpu);
+>  		__deactivate_traps(vcpu);
+>  		__deactivate_vm(vcpu);
+> +		__banked_restore_state(host_ctxt);
+>  		__sysreg_restore_state(host_ctxt);
+>  	}
 
-Christoffer is in charge of the tree at the moment, so I'll leave it up
-to him to decide. But my guess is that he will send a PR some time
-later, with the rest of the fixes that have been posted lately.
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
 Thanks,
 
