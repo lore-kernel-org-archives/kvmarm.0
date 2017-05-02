@@ -1,25 +1,25 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm: Restore banked registers and physical timer
- access on hyp_panic()
-Date: Tue, 2 May 2017 16:24:10 +0100
-Message-ID: <c857a4c9-a5ea-f38a-8b22-837d621ee92b@arm.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Restore host physical timer access on
+ hyp_panic()
+Date: Tue, 2 May 2017 16:25:44 +0100
+Message-ID: <be948ce2-19b1-f0f3-cce5-805ec334314b@arm.com>
 References: <20170425170245.4294-1-james.morse@arm.com>
- <20170425170245.4294-2-james.morse@arm.com>
+ <20170425170245.4294-3-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7782540B8C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 11:21:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50EA740B8C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 11:22:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QTe-8Y8O-qco for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 May 2017 11:21:10 -0400 (EDT)
+ with ESMTP id 1AB6VUDVLWUU for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 May 2017 11:22:44 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C5F440B5B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 11:21:10 -0400 (EDT)
-In-Reply-To: <20170425170245.4294-2-james.morse@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8A440B5B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 11:22:44 -0400 (EDT)
+In-Reply-To: <20170425170245.4294-3-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,36 +34,35 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 On 25/04/17 18:02, James Morse wrote:
 > When KVM panics, it hurridly restores the host context and parachutes
-> into the host's panic() code. This looks like it was copied from arm64,
-> the 32bit KVM panic code needs to restore the host's banked registers
-> too.
-> 
-> At some point panic() touches the physical timer/counter, this will
-> trap back to HYP. If we're lucky, we panic again.
+
+                      hurriedly?
+
+> into the host's panic() code. At some point panic() touches the physical
+> timer/counter. Unless we are an arm64 system with VHE, this traps back
+> to EL2. If we're lucky, we panic again.
 > 
 > Add a __timer_save_state() call to KVMs hyp_panic() path, this saves the
 > guest registers and disables the traps for the host.
 > 
-> Fixes: c36b6db5f3e4 ("ARM: KVM: Add panic handling code")
+> Fixes: 53fd5b6487e4 ("arm64: KVM: Add panic handling")
 > Signed-off-by: James Morse <james.morse@arm.com>
 > ---
->  arch/arm/kvm/hyp/switch.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  arch/arm64/kvm/hyp/switch.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-> index 92678b7bd046..c8f15bb5c8b3 100644
-> --- a/arch/arm/kvm/hyp/switch.c
-> +++ b/arch/arm/kvm/hyp/switch.c
-> @@ -235,8 +235,10 @@ void __hyp_text __noreturn __hyp_panic(int cause)
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index aede1658aeda..e5f089de6526 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -422,6 +422,7 @@ void __hyp_text __noreturn __hyp_panic(void)
 >  
->  		vcpu = (struct kvm_vcpu *)read_sysreg(HTPIDR);
+>  		vcpu = (struct kvm_vcpu *)read_sysreg(tpidr_el2);
 >  		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
 > +		__timer_save_state(vcpu);
 >  		__deactivate_traps(vcpu);
 >  		__deactivate_vm(vcpu);
-> +		__banked_restore_state(host_ctxt);
->  		__sysreg_restore_state(host_ctxt);
->  	}
+>  		__sysreg_restore_host_state(host_ctxt);
+> 
 
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
