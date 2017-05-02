@@ -1,123 +1,105 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v3 3/3] arm/arm64: signal SIBGUS and inject SEA Error
-Date: Tue, 02 May 2017 16:41:57 +0100
-Message-ID: <5908A8C5.2020407@arm.com>
-References: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com> <1493530677-4919-3-git-send-email-gengdongjiu@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 1/3] arm64: kvm: support kvmtool to detect RAS
+ extension feature
+Date: Tue, 2 May 2017 17:48:34 +0200
+Message-ID: <8d443da4-d17f-2487-10d5-b6c9639dc5a4@redhat.com>
+References: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
+ <20170502075631.GE16940@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1493530677-4919-3-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <20170502075631.GE16940@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, lersek@redhat.com, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com
+To: Christoffer Dall <cdall@linaro.org>, Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: james.morse@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, lersek@redhat.com, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dongjiu Geng,
-
-On 30/04/17 06:37, Dongjiu Geng wrote:
-> when happen SEA, deliver signal bus and handle the ioctl that
-> inject SEA abort to guest, so that guest can handle the SEA error.
-
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index 105b6ab..a96594f 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -20,8 +20,10 @@
-> @@ -1238,6 +1240,36 @@ static void coherent_cache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
->  	__coherent_cache_guest_page(vcpu, pfn, size);
->  }
->  
-> +static void kvm_send_signal(unsigned long address, bool hugetlb, bool hwpoison)
-> +{
-> +	siginfo_t info;
-> +
-> +	info.si_signo   = SIGBUS;
-> +	info.si_errno   = 0;
-> +	if (hwpoison)
-> +		info.si_code    = BUS_MCEERR_AR;
-> +	else
-> +		info.si_code    = 0;
-> +
-> +	info.si_addr    = (void __user *)address;
-> +	if (hugetlb)
-> +		info.si_addr_lsb = PMD_SHIFT;
-> +	else
-> +		info.si_addr_lsb = PAGE_SHIFT;
-> +
-> +	send_sig_info(SIGBUS, &info, current);
-> +}
-> +
-
-Punit reviewed the other version of this patch, this PMD_SHIFT is not the right
-thing to do, it needs a more accurate set of calls and shifts as there may be
-hugetlbfs pages other than PMD_SIZE.
-
-https://www.spinics.net/lists/arm-kernel/msg568919.html
-
-I haven't posted a new version of that patch because I was still hunting a bug
-in the hugepage/hwpoison code, even with Punit's fixes series I see -EFAULT
-returned to userspace instead of this hwpoison code being invoked.
-
-Please avoid duplicating functionality between patches, it wastes reviewers
-time, especially when we know there are problems with this approach.
 
 
-> +static void kvm_handle_bad_page(unsigned long address,
-> +					bool hugetlb, bool hwpoison)
-> +{
-> +	/* handle both hwpoison and other synchronous external Abort */
-> +	if (hwpoison)
-> +		kvm_send_signal(address, hugetlb, true);
-> +	else
-> +		kvm_send_signal(address, hugetlb, false);
-> +}
-
-Why the extra level of indirection? We only want to signal userspace like this
-from KVM for hwpoison. Signals for RAS related reasons should come from the bits
-of the kernel that decoded the error.
-
-(hwpoison for KVM is a corner case as Qemu's memory effectively has two users,
-Qemu and KVM. This isn't the example of how user-space gets signalled.)
-
-
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index b37446a..780e3c4 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -277,6 +277,13 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
->  	return -EINVAL;
->  }
->  
-> +int kvm_vcpu_ioctl_sea(struct kvm_vcpu *vcpu)
-> +{
-> +	kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> +
-> +	return 0;
-> +}
-
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index bb02909..1d2e2e7 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1306,6 +1306,7 @@ struct kvm_s390_ucas_mapping {
->  #define KVM_S390_GET_IRQ_STATE	  _IOW(KVMIO, 0xb6, struct kvm_s390_irq_state)
->  /* Available with KVM_CAP_X86_SMM */
->  #define KVM_SMI                   _IO(KVMIO,   0xb7)
-> +#define KVM_ARM_SEA               _IO(KVMIO,   0xb8)
->  
->  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
->  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+On 02/05/2017 09:56, Christoffer Dall wrote:
+> Hi Dongjiu,
 > 
+> Please send a cover letter for patch series with more than a single
+> patch.
+> 
+> The subject and description of these patches are also misleading.
+> Hopefully this is in no way tied to kvmtool, but to userspace
+> generically, for example also to be used by QEMU?
 
-Why do we need a userspace API for SEA? It can also be done by using
-KVM_{G,S}ET_ONE_REG to change the vcpu registers. The advantage of doing it this
-way is you can choose which ESR value to use.
+Yes, QEMU already has a similar capability on x86.
 
-Adding a new API call to do something you could do with an old one doesn't look
-right.
+Does ARM support background scrubbing of memory to detect errors?  If
+so, are there any plans to support action-optional SIGBUS on ARM?
 
+Paolo
 
-Thanks,
-
-James
+> On Sun, Apr 30, 2017 at 01:37:55PM +0800, Dongjiu Geng wrote:
+>> Handle kvmtool's detection for RAS extension, because sometimes
+>> the APP needs to know the CPU's capacity
+> 
+> the APP ?
+> 
+> the CPU's capacity?
+> 
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> ---
+>>  arch/arm64/kvm/reset.c   | 11 +++++++++++
+>>  include/uapi/linux/kvm.h |  1 +
+>>  2 files changed, 12 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+>> index d9e9697..1004039 100644
+>> --- a/arch/arm64/kvm/reset.c
+>> +++ b/arch/arm64/kvm/reset.c
+>> @@ -64,6 +64,14 @@ static bool cpu_has_32bit_el1(void)
+>>  	return !!(pfr0 & 0x20);
+>>  }
+>>  
+>> +static bool kvm_arm_support_ras_extension(void)
+>> +{
+>> +	u64 pfr0;
+>> +
+>> +	pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
+>> +	return !!(pfr0 & 0x10000000);
+>> +}
+>> +
+>>  /**
+>>   * kvm_arch_dev_ioctl_check_extension
+>>   *
+>> @@ -87,6 +95,9 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_ARM_PMU_V3:
+>>  		r = kvm_arm_support_pmu_v3();
+>>  		break;
+>> +	case KVM_CAP_ARM_RAS_EXTENSION:
+>> +		r = kvm_arm_support_ras_extension();
+>> +		break;
+> 
+> You need to document this capability and API in
+> Documentation/virtual/kvm/api.txt and explain how this works.
+> 
+> 
+> 
+>>  	case KVM_CAP_SET_GUEST_DEBUG:
+>>  	case KVM_CAP_VCPU_ATTRIBUTES:
+>>  		r = 1;
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index f51d508..27fe556 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -883,6 +883,7 @@ struct kvm_ppc_resize_hpt {
+>>  #define KVM_CAP_PPC_MMU_RADIX 134
+>>  #define KVM_CAP_PPC_MMU_HASH_V3 135
+>>  #define KVM_CAP_IMMEDIATE_EXIT 136
+>> +#define KVM_CAP_ARM_RAS_EXTENSION 137
+>>  
+>>  #ifdef KVM_CAP_IRQ_ROUTING
+>>  
+>> -- 
+>> 2.10.1
+>>
+> 
+> Thanks,
+> -Christoffer
+> 
