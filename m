@@ -1,55 +1,49 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/5] arm64: KVM: Do not use stack-protector to compile EL2
- code
-Date: Tue, 2 May 2017 15:50:17 +0100
-Message-ID: <334c4025-873d-d30c-534b-4194c78eb64b@arm.com>
+Subject: Re: [PATCH 0/5] KVM/ARM: Fixes for 4.12-rc1
+Date: Tue, 2 May 2017 16:00:49 +0100
+Message-ID: <c9f36b35-6a46-8ed8-0bb0-9c099f28d834@arm.com>
 References: <20170502133041.10980-1-marc.zyngier@arm.com>
- <20170502133041.10980-2-marc.zyngier@arm.com>
- <20170502144029.GB29224@e104818-lin.cambridge.arm.com>
+ <75f031d5-d16e-6311-af44-f2c5af5bded4@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170502144029.GB29224@e104818-lin.cambridge.arm.com>
+In-Reply-To: <75f031d5-d16e-6311-af44-f2c5af5bded4@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 02/05/17 15:40, Catalin Marinas wrote:
-> On Tue, May 02, 2017 at 02:30:37PM +0100, Marc Zyngier wrote:
->> We like living dangerously. Nothing explicitely forbids stack-protector
->> to be used in the EL2 code, while distributions routinely compile their
->> kernel with it. We're just lucky that no code actually triggers the
->> instrumentation.
->>
->> Let's not try our luck for much longer, and disable stack-protector
->> for code living at EL2.
->>
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/kvm/hyp/Makefile | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
->> index aaf42ae8d8c3..14c4e3b14bcb 100644
->> --- a/arch/arm64/kvm/hyp/Makefile
->> +++ b/arch/arm64/kvm/hyp/Makefile
->> @@ -2,6 +2,8 @@
->>  # Makefile for Kernel-based Virtual Machine module, HYP part
->>  #
->>  
->> +ccflags-y += -fno-stack-protector
->> +
+On 02/05/17 15:44, Paolo Bonzini wrote:
 > 
-> While you are at it, should we have a -fpic here as well? The hyp code
-> runs at a different location than the rest of the kernel.
+> 
+> On 02/05/2017 15:30, Marc Zyngier wrote:
+>> Here's a handful of random fixes I've queued locally that didn't have
+>> a chance to make it in 4.11.
+>>
+>> The first two patches avoid stack-protector messing with the HYP code,
+>> as this ends up being a complete disaster.
+>>
+>> The following two patches fix a bug introduced in the new vgic, where
+>> we may queue HW interrupts with the Pending+Active state, which is
+>> illegal.
+>>
+>> The final patch fixes a misinterpretation of the spec, where we
+>> compute the number of APxRn register based on the number of priorities
+>> instead of using the number of preemption levels.
+>>
+>> I've tagged the first 4 patches for stable, given that we're doing
+>> something potentially harmful. The last patch is more of a theoretical
+>> issue at this stage, so probably need for a backport.
+> 
+> Would you like me to apply them, or are you looking for reviews and
+> going to send them in a pull request?
+> 
+> I can wait a couple days before sending my own pull request to Linus.
 
-We definitely should. I've just tried this, and this doesn't seem to
-work very well. At least this seems to break our jump label
-implementation. I need to page in that part of the code base and see
-what happens.
+Christoffer is in charge of the tree at the moment, so I'll leave it up
+to him to decide. But my guess is that he will send a PR some time
+later, with the rest of the fixes that have been posted lately.
 
 Thanks,
 
