@@ -1,45 +1,48 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 4/5] KVM: arm/arm64: vgic-v3: Do not use Active+Pending state for a HW interrupt
-Date: Tue,  2 May 2017 14:30:40 +0100
-Message-ID: <20170502133041.10980-5-marc.zyngier@arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 1/5] arm64: KVM: Do not use stack-protector to compile
+ EL2 code
+Date: Tue, 2 May 2017 15:40:29 +0100
+Message-ID: <20170502144029.GB29224@e104818-lin.cambridge.arm.com>
 References: <20170502133041.10980-1-marc.zyngier@arm.com>
+ <20170502133041.10980-2-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170502133041.10980-1-marc.zyngier@arm.com>
+Content-Disposition: inline
+In-Reply-To: <20170502133041.10980-2-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When an interrupt is injected with the HW bit set (indicating that
-deactivation should be propagated to the physical distributor),
-special care must be taken so that we never mark the corresponding
-LR with the Active+Pending state (as the pending state is kept in
-the physycal distributor).
+On Tue, May 02, 2017 at 02:30:37PM +0100, Marc Zyngier wrote:
+> We like living dangerously. Nothing explicitely forbids stack-protector
+> to be used in the EL2 code, while distributions routinely compile their
+> kernel with it. We're just lucky that no code actually triggers the
+> instrumentation.
+> 
+> Let's not try our luck for much longer, and disable stack-protector
+> for code living at EL2.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/Makefile | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index aaf42ae8d8c3..14c4e3b14bcb 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -2,6 +2,8 @@
+>  # Makefile for Kernel-based Virtual Machine module, HYP part
+>  #
+>  
+> +ccflags-y += -fno-stack-protector
+> +
 
-Cc: stable@vger.kernel.org
-Fixes: 59529f69f504 ("KVM: arm/arm64: vgic-new: Add GICv3 world switch backend")
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/vgic/vgic-v3.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+While you are at it, should we have a -fpic here as well? The hyp code
+runs at a different location than the rest of the kernel.
 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index df1503650300..393779ebe87c 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -127,6 +127,13 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
- 	if (irq->hw) {
- 		val |= ICH_LR_HW;
- 		val |= ((u64)irq->hwintid) << ICH_LR_PHYS_ID_SHIFT;
-+		/*
-+		 * Never set pending+active on a HW interrupt, as the
-+		 * pending state is kept at the physical distributor
-+		 * level.
-+		 */
-+		if (irq->active && irq_is_pending(irq))
-+			val &= ~ICH_LR_PENDING_BIT;
- 	} else {
- 		if (irq->config == VGIC_CONFIG_LEVEL)
- 			val |= ICH_LR_EOI;
 -- 
-2.11.0
+Catalin
