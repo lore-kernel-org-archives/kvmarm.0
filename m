@@ -1,110 +1,110 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v5 18/22] KVM: arm64: vgic-its: vgic_its_check_id returns
- the entry's GPA
-Date: Tue, 2 May 2017 10:29:28 +0200
-Message-ID: <CAMJs5B9T0WFDTnBhkv9aFF-p=uG1wNLBHN6oagpEJ9G_MufOZg@mail.gmail.com>
-References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-19-git-send-email-eric.auger@redhat.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v3 1/3] arm64: kvm: support kvmtool to detect RAS
+ extension feature
+Date: Tue, 2 May 2017 19:05:42 +0800
+Message-ID: <c56b7b8f-3fa6-ed03-acb2-a2af1fcd5237@huawei.com>
+References: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
+ <20170502075631.GE16940@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5B9D40992
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 04:26:28 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BZQHv26MNV+C for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 May 2017 04:26:27 -0400 (EDT)
-Received: from mail-yw0-f180.google.com (mail-yw0-f180.google.com
- [209.85.161.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 492F840966
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 04:26:27 -0400 (EDT)
-Received: by mail-yw0-f180.google.com with SMTP id u70so65538678ywe.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 May 2017 01:29:29 -0700 (PDT)
-In-Reply-To: <1492164934-988-19-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "prasun.kapoor" <Prasun.Kapoor@cavium.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>, Vijaya Kumar K <vijayak@caviumnetworks.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, eric.auger.pro@gmail.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170502075631.GE16940@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: james.morse@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, lersek@redhat.com, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 14, 2017 at 12:15:30PM +0200, Eric Auger wrote:
-> As vgic_its_check_id() computes the device/collection entry's
-> GPA, let's return it so that new callers can retrieve it easily.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
+Hi Christoffer,
+   thanks for your review and comments
 
-Acked-by: Christoffer Dall <cdall@linaro.org>
+On 2017/5/2 15:56, Christoffer Dall wrote:
+> Hi Dongjiu,
+> 
+> Please send a cover letter for patch series with more than a single
+> patch.
+  OK, got it.
 
-> ---
-> v3 -> v4:
-> - check eaddr is not NULL to allow passing NULL eaddr parameter
->   to vgic_its_check_id
->
-> v2: new
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 484e541..35b2ca1 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -645,7 +645,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
->   * is actually valid (covered by a memslot and guest accessible).
->   * For this we have to read the respective first level entry.
->   */
-> -static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
-> +static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
-> +      gpa_t *eaddr)
->  {
->   int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
->   int index;
-> @@ -665,6 +666,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
->   addr = BASER_ADDRESS(baser) + id * esz;
->   gfn = addr >> PAGE_SHIFT;
->
-> + if (eaddr)
-> + *eaddr = addr;
->   return kvm_is_visible_gfn(its->dev->kvm, gfn);
->   }
->
-> @@ -697,6 +700,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
->   indirect_ptr += index * esz;
->   gfn = indirect_ptr >> PAGE_SHIFT;
->
-> + if (eaddr)
-> + *eaddr = indirect_ptr;
->   return kvm_is_visible_gfn(its->dev->kvm, gfn);
->  }
->
-> @@ -706,7 +711,7 @@ static int vgic_its_alloc_collection(struct vgic_its *its,
->  {
->   struct its_collection *collection;
->
-> - if (!vgic_its_check_id(its, its->baser_coll_table, coll_id))
-> + if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
->   return E_ITS_MAPC_COLLECTION_OOR;
->
->   collection = kzalloc(sizeof(*collection), GFP_KERNEL);
-> @@ -889,7 +894,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
->   gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
->   struct its_device *device;
->
-> - if (!vgic_its_check_id(its, its->baser_device_table, device_id))
-> + if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
->   return E_ITS_MAPD_DEVICE_OOR;
->
->   if (valid && nb_eventid_bits > VITS_TYPER_IDBITS)
-> --
-> 2.5.5
->
+> 
+> The subject and description of these patches are also misleading.
+> Hopefully this is in no way tied to kvmtool, but to userspace
+> generically, for example also to be used by QEMU?
+ yes, it is also used by QEMU, it should be userspace.
+
+
+> 
+> On Sun, Apr 30, 2017 at 01:37:55PM +0800, Dongjiu Geng wrote:
+>> Handle kvmtool's detection for RAS extension, because sometimes
+>> the APP needs to know the CPU's capacity
+> 
+> the APP ?
+> 
+> the CPU's capacity?
+  I will fix it.
+
+> 
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> ---
+>>  arch/arm64/kvm/reset.c   | 11 +++++++++++
+>>  include/uapi/linux/kvm.h |  1 +
+>>  2 files changed, 12 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+>> index d9e9697..1004039 100644
+>> --- a/arch/arm64/kvm/reset.c
+>> +++ b/arch/arm64/kvm/reset.c
+>> @@ -64,6 +64,14 @@ static bool cpu_has_32bit_el1(void)
+>>  	return !!(pfr0 & 0x20);
+>>  }
+>>  
+>> +static bool kvm_arm_support_ras_extension(void)
+>> +{
+>> +	u64 pfr0;
+>> +
+>> +	pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
+>> +	return !!(pfr0 & 0x10000000);
+>> +}
+>> +
+>>  /**
+>>   * kvm_arch_dev_ioctl_check_extension
+>>   *
+>> @@ -87,6 +95,9 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_ARM_PMU_V3:
+>>  		r = kvm_arm_support_pmu_v3();
+>>  		break;
+>> +	case KVM_CAP_ARM_RAS_EXTENSION:
+>> +		r = kvm_arm_support_ras_extension();
+>> +		break;
+> 
+> You need to document this capability and API in
+> Documentation/virtual/kvm/api.txt and explain how this works.
+  Ok, thanks for your suggestion.
+
+> 
+> 
+> 
+>>  	case KVM_CAP_SET_GUEST_DEBUG:
+>>  	case KVM_CAP_VCPU_ATTRIBUTES:
+>>  		r = 1;
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index f51d508..27fe556 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -883,6 +883,7 @@ struct kvm_ppc_resize_hpt {
+>>  #define KVM_CAP_PPC_MMU_RADIX 134
+>>  #define KVM_CAP_PPC_MMU_HASH_V3 135
+>>  #define KVM_CAP_IMMEDIATE_EXIT 136
+>> +#define KVM_CAP_ARM_RAS_EXTENSION 137
+>>  
+>>  #ifdef KVM_CAP_IRQ_ROUTING
+>>  
+>> -- 
+>> 2.10.1
+>>
+> 
+> Thanks,
+> -Christoffer
+> 
+> .
+> 
