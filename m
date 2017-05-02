@@ -1,26 +1,53 @@
-From: Jon Masters <jcm@jonmasters.org>
-Subject: Re: [PATCH 0/2] arm64: Workaround for Thunder KVM hang issues.
-Date: Mon, 1 May 2017 00:53:32 -0400
-Message-ID: <1863d70c-eb50-1368-2a51-56110be0f352@jonmasters.org>
-References: <20170424184250.667-1-david.daney@cavium.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH] arm64: KVM: Fix decoding of Rt/Rt2 when trapping AArch32
+ CP accesses
+Date: Tue, 2 May 2017 09:30:26 +0200
+Message-ID: <20170502073026.GD16940@cbox>
+References: <20170427180648.25159-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <20170424184250.667-1-david.daney@cavium.com>
-Sender: linux-doc-owner@vger.kernel.org
-To: David Daney <david.daney@cavium.com>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Jonathan Corbet <corbet@lwn.net>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-kernel@vger.kernel.org, Robert Richter <rrichter@cavium.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDE4F40B5E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 03:27:27 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id GI0Iy5blPoEY for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 May 2017 03:27:26 -0400 (EDT)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8647F40B3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 03:27:26 -0400 (EDT)
+Received: by mail-wm0-f52.google.com with SMTP id m123so9494663wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 02 May 2017 00:30:28 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170427180648.25159-1-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/24/2017 02:42 PM, David Daney wrote:
-> We have discovered in rare circumstances, guest execution may result
-> in host not receiving one or more interrupts.  This does not otherwise
-> affect guest or host execution and/or isolation.
+On Thu, Apr 27, 2017 at 07:06:48PM +0100, Marc Zyngier wrote:
+> Our 32bit CP14/15 handling inherited some of the ARMv7 code for handling
+> the trapped system registers, completely missing the fact that the
+> fields for Rt and Rt2 are now 5 bit wide, and not 4...
+> 
+> Let's fix it, and provide an accessor for the most common Rt case.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Thanks David. I have tested these and can confirm that a 4.11 machine
-previously experiencing an issue has stable VMs with these.
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
 
-Tested-by: Jon Masters <jcm@redhat.com>
+Aplied to kvmarm/queue.
 
-
+Thanks,
+-Christoffer
