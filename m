@@ -1,53 +1,93 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH] arm64: KVM: Fix decoding of Rt/Rt2 when trapping AArch32
- CP accesses
-Date: Tue, 2 May 2017 09:30:26 +0200
-Message-ID: <20170502073026.GD16940@cbox>
-References: <20170427180648.25159-1-marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 1/3] arm64: kvm: support kvmtool to detect RAS
+ extension feature
+Date: Tue, 2 May 2017 09:56:31 +0200
+Message-ID: <20170502075631.GE16940@cbox>
+References: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDE4F40B5E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 03:27:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GI0Iy5blPoEY for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 May 2017 03:27:26 -0400 (EDT)
-Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8647F40B3E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 03:27:26 -0400 (EDT)
-Received: by mail-wm0-f52.google.com with SMTP id m123so9494663wma.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 May 2017 00:30:28 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170427180648.25159-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: james.morse@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, lersek@redhat.com, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 27, 2017 at 07:06:48PM +0100, Marc Zyngier wrote:
-> Our 32bit CP14/15 handling inherited some of the ARMv7 code for handling
-> the trapped system registers, completely missing the fact that the
-> fields for Rt and Rt2 are now 5 bit wide, and not 4...
-> 
-> Let's fix it, and provide an accessor for the most common Rt case.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Hi Dongjiu,
 
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Please send a cover letter for patch series with more than a single
+patch.
 
-Aplied to kvmarm/queue.
+The subject and description of these patches are also misleading.
+Hopefully this is in no way tied to kvmtool, but to userspace
+generically, for example also to be used by QEMU?
+
+On Sun, Apr 30, 2017 at 01:37:55PM +0800, Dongjiu Geng wrote:
+> Handle kvmtool's detection for RAS extension, because sometimes
+> the APP needs to know the CPU's capacity
+
+the APP ?
+
+the CPU's capacity?
+
+> 
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> ---
+>  arch/arm64/kvm/reset.c   | 11 +++++++++++
+>  include/uapi/linux/kvm.h |  1 +
+>  2 files changed, 12 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index d9e9697..1004039 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -64,6 +64,14 @@ static bool cpu_has_32bit_el1(void)
+>  	return !!(pfr0 & 0x20);
+>  }
+>  
+> +static bool kvm_arm_support_ras_extension(void)
+> +{
+> +	u64 pfr0;
+> +
+> +	pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
+> +	return !!(pfr0 & 0x10000000);
+> +}
+> +
+>  /**
+>   * kvm_arch_dev_ioctl_check_extension
+>   *
+> @@ -87,6 +95,9 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_ARM_PMU_V3:
+>  		r = kvm_arm_support_pmu_v3();
+>  		break;
+> +	case KVM_CAP_ARM_RAS_EXTENSION:
+> +		r = kvm_arm_support_ras_extension();
+> +		break;
+
+You need to document this capability and API in
+Documentation/virtual/kvm/api.txt and explain how this works.
+
+
+
+>  	case KVM_CAP_SET_GUEST_DEBUG:
+>  	case KVM_CAP_VCPU_ATTRIBUTES:
+>  		r = 1;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index f51d508..27fe556 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -883,6 +883,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_PPC_MMU_RADIX 134
+>  #define KVM_CAP_PPC_MMU_HASH_V3 135
+>  #define KVM_CAP_IMMEDIATE_EXIT 136
+> +#define KVM_CAP_ARM_RAS_EXTENSION 137
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> -- 
+> 2.10.1
+> 
 
 Thanks,
 -Christoffer
