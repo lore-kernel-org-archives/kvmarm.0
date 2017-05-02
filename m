@@ -1,107 +1,47 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v3 1/3] arm64: kvm: support kvmtool to detect RAS
- extension feature
-Date: Tue, 2 May 2017 20:15:03 +0800
-Message-ID: <c3b355e7-0358-25ea-9617-80be489a3f83@huawei.com>
-References: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
- <20170502075631.GE16940@cbox>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170502075631.GE16940@cbox>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: james.morse@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, lersek@redhat.com, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, gengdongjiu <gengdongjiu@huawei.com>, linux-kernel@vger.kernel.org
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 0/5] KVM/ARM: Fixes for 4.12-rc1
+Date: Tue,  2 May 2017 14:30:36 +0100
+Message-ID: <20170502133041.10980-1-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
-   thanks for your review and comments.
+Here's a handful of random fixes I've queued locally that didn't have
+a chance to make it in 4.11.
 
-On 2017/5/2 15:56, Christoffer Dall wrote:
-> Hi Dongjiu,
-> 
-> Please send a cover letter for patch series with more than a single
-> patch.
- OK, got it.
+The first two patches avoid stack-protector messing with the HYP code,
+as this ends up being a complete disaster.
 
-> 
-> The subject and description of these patches are also misleading.
-> Hopefully this is in no way tied to kvmtool, but to userspace
-> generically, for example also to be used by QEMU?
-> 
-> On Sun, Apr 30, 2017 at 01:37:55PM +0800, Dongjiu Geng wrote:
->> Handle kvmtool's detection for RAS extension, because sometimes
->> the APP needs to know the CPU's capacity
-> 
-> the APP ?
-> 
-> the CPU's capacity?
-I will fix it.
+The following two patches fix a bug introduced in the new vgic, where
+we may queue HW interrupts with the Pending+Active state, which is
+illegal.
 
-> 
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->>  arch/arm64/kvm/reset.c   | 11 +++++++++++
->>  include/uapi/linux/kvm.h |  1 +
->>  2 files changed, 12 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->> index d9e9697..1004039 100644
->> --- a/arch/arm64/kvm/reset.c
->> +++ b/arch/arm64/kvm/reset.c
->> @@ -64,6 +64,14 @@ static bool cpu_has_32bit_el1(void)
->>  	return !!(pfr0 & 0x20);
->>  }
->>  
->> +static bool kvm_arm_support_ras_extension(void)
->> +{
->> +	u64 pfr0;
->> +
->> +	pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
->> +	return !!(pfr0 & 0x10000000);
->> +}
->> +
->>  /**
->>   * kvm_arch_dev_ioctl_check_extension
->>   *
->> @@ -87,6 +95,9 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
->>  	case KVM_CAP_ARM_PMU_V3:
->>  		r = kvm_arm_support_pmu_v3();
->>  		break;
->> +	case KVM_CAP_ARM_RAS_EXTENSION:
->> +		r = kvm_arm_support_ras_extension();
->> +		break;
-> 
-> You need to document this capability and API in
-> Documentation/virtual/kvm/api.txt and explain how this works.
- Ok, thanks for your suggestion.
+The final patch fixes a misinterpretation of the spec, where we
+compute the number of APxRn register based on the number of priorities
+instead of using the number of preemption levels.
 
-> 
-> 
-> 
->>  	case KVM_CAP_SET_GUEST_DEBUG:
->>  	case KVM_CAP_VCPU_ATTRIBUTES:
->>  		r = 1;
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index f51d508..27fe556 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -883,6 +883,7 @@ struct kvm_ppc_resize_hpt {
->>  #define KVM_CAP_PPC_MMU_RADIX 134
->>  #define KVM_CAP_PPC_MMU_HASH_V3 135
->>  #define KVM_CAP_IMMEDIATE_EXIT 136
->> +#define KVM_CAP_ARM_RAS_EXTENSION 137
->>  
->>  #ifdef KVM_CAP_IRQ_ROUTING
->>  
->> -- 
->> 2.10.1
->>
-> 
-> Thanks,
-> -Christoffer
-> 
-> .
-> 
+I've tagged the first 4 patches for stable, given that we're doing
+something potentially harmful. The last patch is more of a theoretical
+issue at this stage, so probably need for a backport.
+
+Marc Zyngier (5):
+  arm64: KVM: Do not use stack-protector to compile EL2 code
+  arm: KVM: Do not use stack-protector to compile HYP code
+  KVM: arm/arm64: vgic-v2: Do not use Active+Pending state for a HW
+    interrupt
+  KVM: arm/arm64: vgic-v3: Do not use Active+Pending state for a HW
+    interrupt
+  KVM: arm/arm64: vgic-v3: Use PREbits to infer the number of
+    ICH_APxRn_EL2 registers
+
+ arch/arm/kvm/hyp/Makefile     |  2 ++
+ arch/arm64/kvm/hyp/Makefile   |  2 ++
+ virt/kvm/arm/hyp/vgic-v3-sr.c | 18 +++++++++---------
+ virt/kvm/arm/vgic/vgic-v2.c   |  7 +++++++
+ virt/kvm/arm/vgic/vgic-v3.c   |  7 +++++++
+ 5 files changed, 27 insertions(+), 9 deletions(-)
+
+-- 
+2.11.0
