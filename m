@@ -1,73 +1,62 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Restore host physical timer access on
- hyp_panic()
-Date: Tue, 2 May 2017 16:25:44 +0100
-Message-ID: <be948ce2-19b1-f0f3-cce5-805ec334314b@arm.com>
-References: <20170425170245.4294-1-james.morse@arm.com>
- <20170425170245.4294-3-james.morse@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v3 1/3] arm64: kvm: support kvmtool to detect RAS extension
+ feature
+Date: Tue, 02 May 2017 16:29:00 +0100
+Message-ID: <5908A5BC.1060202@arm.com>
+References: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 50EA740B8C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 11:22:45 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1AB6VUDVLWUU for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 May 2017 11:22:44 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8A440B5B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 11:22:44 -0400 (EDT)
-In-Reply-To: <20170425170245.4294-3-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, lersek@redhat.com, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/04/17 18:02, James Morse wrote:
-> When KVM panics, it hurridly restores the host context and parachutes
+Hi Dongjiu Geng,
 
-                      hurriedly?
+On 30/04/17 06:37, Dongjiu Geng wrote:
+> Handle kvmtool's detection for RAS extension, because sometimes
+> the APP needs to know the CPU's capacity
 
-> into the host's panic() code. At some point panic() touches the physical
-> timer/counter. Unless we are an arm64 system with VHE, this traps back
-> to EL2. If we're lucky, we panic again.
-> 
-> Add a __timer_save_state() call to KVMs hyp_panic() path, this saves the
-> guest registers and disables the traps for the host.
-> 
-> Fixes: 53fd5b6487e4 ("arm64: KVM: Add panic handling")
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
->  arch/arm64/kvm/hyp/switch.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index aede1658aeda..e5f089de6526 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -422,6 +422,7 @@ void __hyp_text __noreturn __hyp_panic(void)
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index d9e9697..1004039 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -64,6 +64,14 @@ static bool cpu_has_32bit_el1(void)
+>  	return !!(pfr0 & 0x20);
+>  }
 >  
->  		vcpu = (struct kvm_vcpu *)read_sysreg(tpidr_el2);
->  		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> +		__timer_save_state(vcpu);
->  		__deactivate_traps(vcpu);
->  		__deactivate_vm(vcpu);
->  		__sysreg_restore_host_state(host_ctxt);
-> 
+> +static bool kvm_arm_support_ras_extension(void)
+> +{
+> +	u64 pfr0;
+> +
+> +	pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
+> +	return !!(pfr0 & 0x10000000);
+> +}
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Why are we telling user-space that the CPU has RAS extensions? EL0 can't do
+anything with this and the guest EL1 can detect it from the id registers.
+
+
+Are you using this to decide whether or not to generate a HEST for the guest?
+
+If Qemu/kvmtool supports handling memory-failure notifications from signals you
+should always generate a HEST. The GHES notification method could be anything
+Qemu can deliver to the guest using the KVM APIs. Notifications from Qemu to the
+guest don't depend on the RAS extensions. KVM has APIs for IRQ and SEA (you can
+use KVM_SET_ONE_REG).
+
+
+I think we need a new API for injecting SError for SEI from Qemu/kvmtool, but it
+shouldn't be related to the RAS extensions. All v8.0 CPUs have HCR_EL2.VSE, so
+we need to know KVM supports this API.
+
+Your later patch adds code to set VSESR to make virtual RAS SErrors work, I
+think we need to expose that to user-space.
+
 
 Thanks,
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+James
