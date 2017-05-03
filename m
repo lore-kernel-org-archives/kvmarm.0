@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 18/31] KVM: arm64: Enable GICv3 Group-1 sysreg trapping via
- command-line
-Date: Wed,  3 May 2017 11:45:53 +0100
-Message-ID: <20170503104606.19342-19-marc.zyngier@arm.com>
+Subject: [PATCH 16/31] KVM: arm64: vgic-v3: Add ICV_HPPIR1_EL1 handler
+Date: Wed,  3 May 2017 11:45:51 +0100
+Message-ID: <20170503104606.19342-17-marc.zyngier@arm.com>
 References: <20170503104606.19342-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 216D040C5A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 06:43:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0896540A80
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 06:43:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7Zdl3oGp3pZN for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 May 2017 06:43:39 -0400 (EDT)
+ with ESMTP id M15kypJL8aTc for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 May 2017 06:43:37 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A3E940C92
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 06:43:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C1C340C9F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 06:43:35 -0400 (EDT)
 In-Reply-To: <20170503104606.19342-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,43 +31,68 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we're able to safely handle Group-1 sysreg access, let's
-give the user the opportunity to enable it by passing a specific
-command-line option (vgic_v3.group1_trap).
+Add a handler for reading the guest's view of the ICV_HPPIR1_EL1
+register. This is a simple parsing of the available LRs, extracting the
+highest available interrupt.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-v3.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ arch/arm64/include/asm/sysreg.h |  1 +
+ virt/kvm/arm/hyp/vgic-v3-sr.c   | 23 +++++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 547b8374fb64..71ecf448ca49 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -324,6 +324,12 @@ int vgic_v3_map_resources(struct kvm *kvm)
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index aad46b8eea5e..bd000686194a 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -185,6 +185,7 @@
+ #define SYS_ICC_SGI1R_EL1		sys_reg(3, 0, 12, 11, 5)
+ #define SYS_ICC_IAR1_EL1		sys_reg(3, 0, 12, 12, 0)
+ #define SYS_ICC_EOIR1_EL1		sys_reg(3, 0, 12, 12, 1)
++#define SYS_ICC_HPPIR1_EL1		sys_reg(3, 0, 12, 12, 2)
+ #define SYS_ICC_BPR1_EL1		sys_reg(3, 0, 12, 12, 3)
+ #define SYS_ICC_CTLR_EL1		sys_reg(3, 0, 12, 12, 4)
+ #define SYS_ICC_SRE_EL1			sys_reg(3, 0, 12, 12, 5)
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index b6803989da1f..a521e105ade1 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -754,6 +754,26 @@ static void __hyp_text __vgic_v3_write_apxr3(struct kvm_vcpu *vcpu,
+ 	__vgic_v3_write_apxrn(vcpu, rt, 3);
+ }
  
- DEFINE_STATIC_KEY_FALSE(vgic_v3_cpuif_trap);
- 
-+static int __init early_group1_trap_cfg(char *buf)
++static void __hyp_text __vgic_v3_read_hppir(struct kvm_vcpu *vcpu,
++					    u32 vmcr, int rt)
 +{
-+	return strtobool(buf, &group1_trap);
++	u64 lr_val;
++	int lr, lr_grp, grp;
++
++	grp = __vgic_v3_get_group(vcpu);
++
++	lr = __vgic_v3_highest_priority_lr(vcpu, vmcr, &lr_val);
++	if (lr == -1)
++		goto spurious;
++
++	lr_grp = !!(lr_val & ICH_LR_GROUP);
++	if (lr_grp != grp)
++		lr_val = ICC_IAR1_EL1_SPURIOUS;
++
++spurious:
++	vcpu_set_reg(vcpu, rt, lr_val & ICH_LR_VIRTUAL_ID_MASK);
 +}
-+early_param("vgic_v3.group1_trap", early_group1_trap_cfg);
 +
- /**
-  * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
-  * @node:	pointer to the DT node
-@@ -375,6 +381,11 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
- 	if (kvm_vgic_global_state.vcpu_base == 0)
- 		kvm_info("disabling GICv2 emulation\n");
- 
-+	if (group1_trap) {
-+		kvm_info("GICv3 sysreg trapping enabled (reduced performance)\n");
-+		static_branch_enable(&vgic_v3_cpuif_trap);
-+	}
-+
- 	kvm_vgic_global_state.vctrl_base = NULL;
- 	kvm_vgic_global_state.type = VGIC_V3;
- 	kvm_vgic_global_state.max_gic_vcpus = VGIC_V3_MAX_CPUS;
+ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ {
+ 	int rt = kvm_vcpu_sys_get_rt(vcpu);
+@@ -816,6 +836,9 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 		else
+ 			fn = __vgic_v3_write_apxr3;
+ 		break;
++	case SYS_ICC_HPPIR1_EL1:
++		fn = __vgic_v3_read_hppir;
++		break;
+ 	default:
+ 		return 0;
+ 	}
 -- 
 2.11.0
