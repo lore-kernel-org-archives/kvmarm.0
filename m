@@ -1,137 +1,325 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v5 16/22] KVM: arm64: vgic-its: Add infrastructure for
- table lookup
-Date: Wed, 3 May 2017 16:38:26 +0200
-Message-ID: <20170503143826.GA28421@cbox>
+Subject: Re: [PATCH v5 20/22] KVM: arm64: vgic-its: Device table save/restore
+Date: Wed, 3 May 2017 17:29:49 +0200
+Message-ID: <20170503152949.GB28421@cbox>
 References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
- <1492164934-988-17-git-send-email-eric.auger@redhat.com>
- <20170430193325.GA1670@lvm>
- <8f162a7d-e629-5828-6230-f0b7b7a6f9db@redhat.com>
+ <1492164934-988-21-git-send-email-eric.auger@redhat.com>
+ <20170430205540.GC1499@lvm>
+ <9f446caa-d62c-1a01-b916-9531a8034989@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <8f162a7d-e629-5828-6230-f0b7b7a6f9db@redhat.com>
+In-Reply-To: <9f446caa-d62c-1a01-b916-9531a8034989@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 To: Auger Eric <eric.auger@redhat.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 03, 2017 at 03:40:34PM +0200, Auger Eric wrote:
+On Wed, May 03, 2017 at 04:07:45PM +0200, Auger Eric wrote:
 > Hi Christoffer,
-> 
-> On 30/04/2017 21:33, Christoffer Dall wrote:
-> > On Fri, Apr 14, 2017 at 12:15:28PM +0200, Eric Auger wrote:
-> >> Add a generic lookup_table() helper whose role consists in
-> >> scanning a contiguous table located in guest RAM and applying
-> >> a callback on each entry. Entries can be handled as linked lists
-> >> since the callback may return an offset to the next entry and
-> >> also tell that an entry is the last one.
+> On 30/04/2017 22:55, Christoffer Dall wrote:
+> > On Fri, Apr 14, 2017 at 12:15:32PM +0200, Eric Auger wrote:
+> >> This patch saves the device table entries into guest RAM.
+> >> Both flat table and 2 stage tables are supported. DeviceId
+> >> indexing is used.
 > >>
-> >> Helper functions also are added to compute the device/event ID
-> >> offset to the next DTE/ITE.
+> >> For each device listed in the device table, we also save
+> >> the translation table using the vgic_its_save/restore_itt
+> >> routines.
 > >>
-> >> compute_next_devid_offset, compute_next_eventid_offset and
-> >> lookup_table will become static in subsequent patches
+> >> On restore, devices are re-allocated and their ite are
+> >> re-built.
 > >>
 > >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > >>
 > >> ---
 > >> v4 -> v5:
-> >> - use kvm_read_guest
+> >> - sort the device list by deviceid on device table save
+> >> - use defines for shifts and masks
+> >> - use abi->dte_esz
+> >> - clatify entry sizes for L1 and L2 tables
 > >>
 > >> v3 -> v4:
-> >> - remove static to avoid compilation warning
-> >> - correct size computation in looup_table()
-> >> - defines now encode the number of bits used for devid and eventid offsets
-> >> - use BIT() - 1 to encode the max offets
+> >> - use the new proto for its_alloc_device
+> >> - compute_next_devid_offset, vgic_its_flush/restore_itt
+> >>   become static in this patch
+> >> - change in the DTE entry format with the introduction of the
+> >>   valid bit and next field width decrease; ittaddr encoded
+> >>   on its full range
+> >> - fix handle_l1_entry entry handling
+> >> - correct vgic_its_table_restore error handling
+> >>
+> >> v2 -> v3:
+> >> - fix itt_addr bitmask in vgic_its_restore_dte
+> >> - addition of return 0 in vgic_its_restore_ite moved to
+> >>   the ITE related patch
+> >>
+> >> v1 -> v2:
+> >> - use 8 byte format for DTE and ITE
+> >> - support 2 stage format
+> >> - remove kvm parameter
+> >> - ITT flush/restore moved in a separate patch
+> >> - use deviceid indexing
 > >> ---
-> >>  virt/kvm/arm/vgic/vgic-its.c | 93 ++++++++++++++++++++++++++++++++++++++++++++
-> >>  1 file changed, 93 insertions(+)
+> >>  virt/kvm/arm/vgic/vgic-its.c | 183 +++++++++++++++++++++++++++++++++++++++++--
+> >>  virt/kvm/arm/vgic/vgic.h     |   7 ++
+> >>  2 files changed, 185 insertions(+), 5 deletions(-)
 > >>
 > >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> >> index 56c5123..c22b35d 100644
+> >> index b02fc3f..86dfc6c 100644
 > >> --- a/virt/kvm/arm/vgic/vgic-its.c
 > >> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> >> @@ -195,6 +195,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
-> >>  
-> >>  #define VITS_TYPER_IDBITS 16
-> >>  #define VITS_TYPER_DEVBITS 16
-> >> +#define VITS_DTE_MAX_DEVID_OFFSET	(BIT(14) - 1)
-> >> +#define VITS_ITE_MAX_EVENTID_OFFSET	(BIT(16) - 1)
-> >>  
-> >>  /*
-> >>   * Finds and returns a collection in the ITS collection table.
-> >> @@ -1674,6 +1676,97 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+> >> @@ -1682,7 +1682,8 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
 > >>  	return ret;
 > >>  }
 > >>  
-> >> +u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
+> >> -u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
+> >> +static u32 compute_next_devid_offset(struct list_head *h,
+> >> +				     struct its_device *dev)
+> >>  {
+> >>  	struct list_head *e = &dev->dev_list;
+> >>  	struct its_device *next;
+> >> @@ -1858,7 +1859,7 @@ static int vgic_its_ite_cmp(void *priv, struct list_head *a,
+> >>  		return 1;
+> >>  }
+> >>  
+> >> -int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+> >> +static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+> >>  {
+> >>  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+> >>  	gpa_t base = device->itt_addr;
+> >> @@ -1877,7 +1878,7 @@ int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+> >>  	return 0;
+> >>  }
+> >>  
+> >> -int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+> >> +static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+> >>  {
+> >>  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+> >>  	gpa_t base = dev->itt_addr;
+> >> @@ -1895,12 +1896,161 @@ int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+> >>  }
+> >>  
+> >>  /**
+> >> + * vgic_its_save_dte - Save a device table entry at a given GPA
+> >> + *
+> >> + * @its: ITS handle
+> >> + * @dev: ITS device
+> >> + * @ptr: GPA
+> >> + */
+> >> +static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+> >> +			     gpa_t ptr, int dte_esz)
 > >> +{
-> >> +	struct list_head *e = &dev->dev_list;
-> >> +	struct its_device *next;
+> >> +	struct kvm *kvm = its->dev->kvm;
+> >> +	u64 val, itt_addr_field;
+> >> +	int ret;
 > >> +	u32 next_offset;
 > >> +
-> >> +	if (e->next == h)
-> >> +		return 0;
-> >> +	next = list_entry(e->next, struct its_device, dev_list);
-> >> +	next_offset = next->device_id - dev->device_id;
-> >> +
-> >> +	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
-> >> +}
-> >> +
-> >> +u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
-> >> +{
-> >> +	struct list_head *e = &ite->ite_list;
-> >> +	struct its_ite *next;
-> >> +	u32 next_offset;
-> >> +
-> >> +	if (e->next == h)
-> >> +		return 0;
-> >> +	next = list_entry(e->next, struct its_ite, ite_list);
-> >> +	next_offset = next->event_id - ite->event_id;
-> >> +
-> >> +	return min_t(u32, next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
+> >> +	itt_addr_field = dev->itt_addr >> 8;
+> >> +	next_offset = compute_next_devid_offset(&its->device_list, dev);
+> >> +	val = (1ULL << KVM_ITS_DTE_VALID_SHIFT |
+> >> +	       ((u64)next_offset << KVM_ITS_DTE_NEXT_SHIFT) |
+> > 
+> > I think this implies that the next field in your ABI points to the next
+> > offset, regardless of whether or not this is in a a level 2 or lavel 1
+> > table.  See more comments on this below (I reviewed this patch from the
+> > bottom up).
+> Not sure I understand your comment.
+> 
+> Doc says:
+>  - next: equals to 0 if this entry is the last one; otherwise it
+>    corresponds to the deviceid offset to the next DTE, capped by
+>    2^14 -1.
+> 
+> This is independent on 1 or 2 levels as we sort the devices by
+> deviceid's and compute the delta between those id.
+
+see below.
+
+> > 
+> > I have a feeling this wasn't tested with 2 level device tables.  Could
+> > that be true?
+> No this was tested with 1 & and 2 levels (I hacked the guest to force 2
+> levels). 1 test hole I have though is all my dte's currently belong to
+> the same 2d level page, ie. my deviceid are not scattered enough.
+> > 
+> >> +	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
+> >> +		(dev->nb_eventid_bits - 1));
+> >> +	val = cpu_to_le64(val);
+> >> +	ret = kvm_write_guest(kvm, ptr, &val, dte_esz);
+> >> +	return ret;
 > >> +}
 > >> +
 > >> +/**
-> >> + * entry_fn_t - Callback called on a table entry restore path
+> >> + * vgic_its_restore_dte - restore a device table entry
+> >> + *
 > >> + * @its: its handle
-> >> + * @id: id of the entry
-> >> + * @entry: pointer to the entry
-> >> + * @opaque: pointer to an opaque data
-> >> + * @next_offset: minimal ID offset to the next entry. 0 if this
-> >> + * entry is the last one, 1 if the entry is invalid, >= 1 if an
-> >> + * entry's next_offset field was truly decoded
+> >> + * @id: device id the DTE corresponds to
+> >> + * @ptr: kernel VA where the 8 byte DTE is located
+> >> + * @opaque: unused
+> >> + * @next: offset to the next valid device id
 > >> + *
 > >> + * Return: < 0 on error, 0 otherwise
 > >> + */
-> >> +typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
-> >> +			  void *opaque, u32 *next_offset);
+> >> +static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+> >> +				void *ptr, void *opaque, u32 *next)
+> >> +{
+> >> +	struct its_device *dev;
+> >> +	gpa_t itt_addr;
+> >> +	u8 nb_eventid_bits;
+> >> +	u64 entry = *(u64 *)ptr;
+> >> +	bool valid;
+> >> +	int ret;
+> >> +
+> >> +	entry = le64_to_cpu(entry);
+> >> +
+> >> +	valid = entry >> KVM_ITS_DTE_VALID_SHIFT;
+> >> +	nb_eventid_bits = (entry & KVM_ITS_DTE_SIZE_MASK) + 1;
+> >> +	itt_addr = ((entry & KVM_ITS_DTE_ITTADDR_MASK)
+> >> +			>> KVM_ITS_DTE_ITTADDR_SHIFT) << 8;
+> >> +	*next = 1;
+> >> +
+> >> +	if (!valid)
+> >> +		return 0;
+> >> +
+> >> +	/* dte entry is valid */
+> >> +	*next = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
+> >> +
+> >> +	ret = vgic_its_alloc_device(its, &dev, id,
+> >> +				    itt_addr, nb_eventid_bits);
+> >> +	if (ret)
+> >> +		return ret;
+> >> +	ret = vgic_its_restore_itt(its, dev);
+> >> +
+> >> +	return ret;
+> >> +}
+> >> +
+> >> +static int vgic_its_device_cmp(void *priv, struct list_head *a,
+> >> +			       struct list_head *b)
+> >> +{
+> >> +	struct its_device *deva = container_of(a, struct its_device, dev_list);
+> >> +	struct its_device *devb = container_of(b, struct its_device, dev_list);
+> >> +
+> >> +	if (deva->device_id < devb->device_id)
+> >> +		return -1;
+> >> +	else
+> >> +		return 1;
+> >> +}
+> >> +
+> >> +/**
+> >>   * vgic_its_save_device_tables - Save the device table and all ITT
+> >>   * into guest RAM
+> >> + *
+> >> + * L1/L2 handling is hidden by vgic_its_check_id() helper which directly
+> >> + * returns the GPA of the device entry
+> >>   */
+> >>  static int vgic_its_save_device_tables(struct vgic_its *its)
+> >>  {
+> >> -	return -ENXIO;
+> >> +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+> >> +	struct its_device *dev;
+> >> +	int dte_esz = abi->dte_esz;
+> >> +	u64 baser;
+> >> +
+> >> +	baser = its->baser_device_table;
+> >> +
+> >> +	list_sort(NULL, &its->device_list, vgic_its_device_cmp);
+> >> +
+> >> +	list_for_each_entry(dev, &its->device_list, dev_list) {
+> >> +		int ret;
+> >> +		gpa_t eaddr;
+> >> +
+> >> +		if (!vgic_its_check_id(its, baser,
+> >> +				       dev->device_id, &eaddr))
+> >> +			return -EINVAL;
+> >> +
+> >> +		ret = vgic_its_save_itt(its, dev);
+> >> +		if (ret)
+> >> +			return ret;
+> >> +
+> >> +		ret = vgic_its_save_dte(its, dev, eaddr, dte_esz);
+> >> +		if (ret)
+> >> +			return ret;
+> >> +	}
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +/**
+> >> + * handle_l1_entry - callback used for L1 entries (2 stage case)
+> >> + *
+> >> + * @its: its handle
+> >> + * @id: id
 > > 
-> > Just noticed.  All the table entries are 64-bit long at this point,
-> > right?  So why not make entry a u64 * instead?  Could we end up with
-> > some endianness mess with using void pointers the way it is now?
-> the size of the entry is ABI dependent while this infrastructure is
-> generic. 
+> > IIUC, this is actually the index of the entry in the L1 table.  I think
+> > this should be clarified.
+> yep
+> > 
+> >> + * @addr: kernel VA
+> >> + * @opaque: unused
+> >> + * @next_offset: offset to the next L1 entry: 0 if the last element
+> >> + * was found, 1 otherwise
+> >> + */
+> >> +static int handle_l1_entry(struct vgic_its *its, u32 id, void *addr,
+> >> +			   void *opaque, u32 *next_offset)
+> > 
+> > nit: shouldn't this be called handle_l1_device_table_entry ?
+> renamed into handle_l1_dte
+> > 
+> >> +{
+> >> +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+> >> +	int l2_start_id = id * (SZ_64K / GITS_LVL1_ENTRY_SIZE);
+> > 
+> > Hmmm, is this not actually supposed to be (SZ_64K / abi->dte_esz) ?
+> no because 1st level entries have a fixed size of GITS_LVL1_ENTRY_SIZE bytes
 
-Yes, for a single version of the ABI where all the entries are 64-bit.
+yes, but the ID you calculate is a result of how many IDs each 64K 2nd
+level table can hold, which depends on the size of each entry in the 2nd
+level table, right?  Or am I misunderstanding how this works completely.
 
-
-> In each of such function we use
+> > 
+> >> +	u64 entry = *(u64 *)addr;
+> >> +	int ret, ite_esz = abi->ite_esz;
+> > 
+> > Should this be ite_esz or dte_esz?
 > 
-> u64 entry = *(u64 *)addr;
-> and we do a le64_to_cpu(entry).
-> 
-> Do you see something wrong? Otherwise I would be tempted to leave as is.
+> you're correct. dte_esz should be used.
+> > 
+> >> +	gpa_t gpa;
+> > 
+> > nit: put declarations with initialization on separate lines.
+> OK
+> > 
+> >> +
+> >> +	entry = le64_to_cpu(entry);
+> >> +	*next_offset = 1;
+> > 
+> > I think you could attach a comment here saying that level 1 tables have
+> > to be scanned entirely.
+> added. note we exit as soon as the last element is found when scanning
+> l2 tables.
+> > 
+> > But this also reminds me.  Does that mean that the next field in the DTE
+> > in your documented ABI format points to the next DTE within that level-2
+> > table, or does it point across to different level-2 tables?  I think
+> > this needs to be clarified in the ABI unless I'm missing something.
+> see above comment on next_index semantic. In the doc I talk about
+> deviceid offset and not of table index.
 > 
 
-I don't think there's anything wrong with the current version, and
-you're right, this always points to an ITS data structure which is LE,
-so there shouldn't be a problem.  I always just quiver when I see void
-pointers cast to a type in the caller and callee.
+ok, I see, I was misled by the definition of lookup_table saying that it
+returns 1 if the last element is identified, which is only true when you
+actually find an element that is valid and where the next field is zero.
+I understood it to mean if it found the last item in the table it was
+scanning.  So it is implied that lookup table can be called in two
+levels and the return value indicates if the element was the last from
+the point of view of the highest level, not in the context the last
+instance was called.
 
-Just leave it for now.
+Note that it's further confusing that the handler function has the
+return value the other way around, where 0 means it's the last element.
+Perhaps you could make this much more readable by introducing a define
+for the return values.
 
 Thanks,
 -Christoffer
