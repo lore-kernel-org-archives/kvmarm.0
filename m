@@ -1,352 +1,333 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH 5/5] KVM: arm/arm64: Allow setting the timer IRQ numbers from
- userspace
-Date: Wed,  3 May 2017 20:33:00 +0200
-Message-ID: <20170503183300.4618-6-cdall@linaro.org>
-References: <20170503183300.4618-1-cdall@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 20/22] KVM: arm64: vgic-its: Device table save/restore
+Date: Wed, 3 May 2017 23:38:16 +0200
+Message-ID: <dad3d5f3-3aa6-ff24-5b30-1fe738e67850@redhat.com>
+References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-21-git-send-email-eric.auger@redhat.com>
+ <20170430205540.GC1499@lvm> <9f446caa-d62c-1a01-b916-9531a8034989@redhat.com>
+ <20170503152949.GB28421@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 66D2C40430
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 14:30:06 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Uxv6Y3gQ1hkh for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 May 2017 14:30:05 -0400 (EDT)
-Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6221740C4E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 14:30:03 -0400 (EDT)
-Received: by mail-wm0-f52.google.com with SMTP id u65so155652221wmu.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 03 May 2017 11:33:07 -0700 (PDT)
-In-Reply-To: <20170503183300.4618-1-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170503152949.GB28421@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-First we define an ABI using the vcpu devices that lets userspace set
-the interrupt numbers for the various timers on both the 32-bit and
-64-bit KVM/ARM implementations.
+Hi Christoffer,
 
-Second, we add the definitions for the groups and attributes introduced
-by the above ABI.  (We add the PMU define on the 32-bit side as well for
-symmetry and it may get used some day.)
+On 03/05/2017 17:29, Christoffer Dall wrote:
+> On Wed, May 03, 2017 at 04:07:45PM +0200, Auger Eric wrote:
+>> Hi Christoffer,
+>> On 30/04/2017 22:55, Christoffer Dall wrote:
+>>> On Fri, Apr 14, 2017 at 12:15:32PM +0200, Eric Auger wrote:
+>>>> This patch saves the device table entries into guest RAM.
+>>>> Both flat table and 2 stage tables are supported. DeviceId
+>>>> indexing is used.
+>>>>
+>>>> For each device listed in the device table, we also save
+>>>> the translation table using the vgic_its_save/restore_itt
+>>>> routines.
+>>>>
+>>>> On restore, devices are re-allocated and their ite are
+>>>> re-built.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>
+>>>> ---
+>>>> v4 -> v5:
+>>>> - sort the device list by deviceid on device table save
+>>>> - use defines for shifts and masks
+>>>> - use abi->dte_esz
+>>>> - clatify entry sizes for L1 and L2 tables
+>>>>
+>>>> v3 -> v4:
+>>>> - use the new proto for its_alloc_device
+>>>> - compute_next_devid_offset, vgic_its_flush/restore_itt
+>>>>   become static in this patch
+>>>> - change in the DTE entry format with the introduction of the
+>>>>   valid bit and next field width decrease; ittaddr encoded
+>>>>   on its full range
+>>>> - fix handle_l1_entry entry handling
+>>>> - correct vgic_its_table_restore error handling
+>>>>
+>>>> v2 -> v3:
+>>>> - fix itt_addr bitmask in vgic_its_restore_dte
+>>>> - addition of return 0 in vgic_its_restore_ite moved to
+>>>>   the ITE related patch
+>>>>
+>>>> v1 -> v2:
+>>>> - use 8 byte format for DTE and ITE
+>>>> - support 2 stage format
+>>>> - remove kvm parameter
+>>>> - ITT flush/restore moved in a separate patch
+>>>> - use deviceid indexing
+>>>> ---
+>>>>  virt/kvm/arm/vgic/vgic-its.c | 183 +++++++++++++++++++++++++++++++++++++++++--
+>>>>  virt/kvm/arm/vgic/vgic.h     |   7 ++
+>>>>  2 files changed, 185 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>>>> index b02fc3f..86dfc6c 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>>>> @@ -1682,7 +1682,8 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+>>>>  	return ret;
+>>>>  }
+>>>>  
+>>>> -u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
+>>>> +static u32 compute_next_devid_offset(struct list_head *h,
+>>>> +				     struct its_device *dev)
+>>>>  {
+>>>>  	struct list_head *e = &dev->dev_list;
+>>>>  	struct its_device *next;
+>>>> @@ -1858,7 +1859,7 @@ static int vgic_its_ite_cmp(void *priv, struct list_head *a,
+>>>>  		return 1;
+>>>>  }
+>>>>  
+>>>> -int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+>>>> +static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+>>>>  {
+>>>>  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+>>>>  	gpa_t base = device->itt_addr;
+>>>> @@ -1877,7 +1878,7 @@ int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+>>>>  	return 0;
+>>>>  }
+>>>>  
+>>>> -int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+>>>> +static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+>>>>  {
+>>>>  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+>>>>  	gpa_t base = dev->itt_addr;
+>>>> @@ -1895,12 +1896,161 @@ int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+>>>>  }
+>>>>  
+>>>>  /**
+>>>> + * vgic_its_save_dte - Save a device table entry at a given GPA
+>>>> + *
+>>>> + * @its: ITS handle
+>>>> + * @dev: ITS device
+>>>> + * @ptr: GPA
+>>>> + */
+>>>> +static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+>>>> +			     gpa_t ptr, int dte_esz)
+>>>> +{
+>>>> +	struct kvm *kvm = its->dev->kvm;
+>>>> +	u64 val, itt_addr_field;
+>>>> +	int ret;
+>>>> +	u32 next_offset;
+>>>> +
+>>>> +	itt_addr_field = dev->itt_addr >> 8;
+>>>> +	next_offset = compute_next_devid_offset(&its->device_list, dev);
+>>>> +	val = (1ULL << KVM_ITS_DTE_VALID_SHIFT |
+>>>> +	       ((u64)next_offset << KVM_ITS_DTE_NEXT_SHIFT) |
+>>>
+>>> I think this implies that the next field in your ABI points to the next
+>>> offset, regardless of whether or not this is in a a level 2 or lavel 1
+>>> table.  See more comments on this below (I reviewed this patch from the
+>>> bottom up).
+>> Not sure I understand your comment.
+>>
+>> Doc says:
+>>  - next: equals to 0 if this entry is the last one; otherwise it
+>>    corresponds to the deviceid offset to the next DTE, capped by
+>>    2^14 -1.
+>>
+>> This is independent on 1 or 2 levels as we sort the devices by
+>> deviceid's and compute the delta between those id.
+> 
+> see below.
+> 
+>>>
+>>> I have a feeling this wasn't tested with 2 level device tables.  Could
+>>> that be true?
+>> No this was tested with 1 & and 2 levels (I hacked the guest to force 2
+>> levels). 1 test hole I have though is all my dte's currently belong to
+>> the same 2d level page, ie. my deviceid are not scattered enough.
+>>>
+>>>> +	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
+>>>> +		(dev->nb_eventid_bits - 1));
+>>>> +	val = cpu_to_le64(val);
+>>>> +	ret = kvm_write_guest(kvm, ptr, &val, dte_esz);
+>>>> +	return ret;
+>>>> +}
+>>>> +
+>>>> +/**
+>>>> + * vgic_its_restore_dte - restore a device table entry
+>>>> + *
+>>>> + * @its: its handle
+>>>> + * @id: device id the DTE corresponds to
+>>>> + * @ptr: kernel VA where the 8 byte DTE is located
+>>>> + * @opaque: unused
+>>>> + * @next: offset to the next valid device id
+>>>> + *
+>>>> + * Return: < 0 on error, 0 otherwise
+>>>> + */
+>>>> +static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+>>>> +				void *ptr, void *opaque, u32 *next)
+>>>> +{
+>>>> +	struct its_device *dev;
+>>>> +	gpa_t itt_addr;
+>>>> +	u8 nb_eventid_bits;
+>>>> +	u64 entry = *(u64 *)ptr;
+>>>> +	bool valid;
+>>>> +	int ret;
+>>>> +
+>>>> +	entry = le64_to_cpu(entry);
+>>>> +
+>>>> +	valid = entry >> KVM_ITS_DTE_VALID_SHIFT;
+>>>> +	nb_eventid_bits = (entry & KVM_ITS_DTE_SIZE_MASK) + 1;
+>>>> +	itt_addr = ((entry & KVM_ITS_DTE_ITTADDR_MASK)
+>>>> +			>> KVM_ITS_DTE_ITTADDR_SHIFT) << 8;
+>>>> +	*next = 1;
+>>>> +
+>>>> +	if (!valid)
+>>>> +		return 0;
+>>>> +
+>>>> +	/* dte entry is valid */
+>>>> +	*next = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
+>>>> +
+>>>> +	ret = vgic_its_alloc_device(its, &dev, id,
+>>>> +				    itt_addr, nb_eventid_bits);
+>>>> +	if (ret)
+>>>> +		return ret;
+>>>> +	ret = vgic_its_restore_itt(its, dev);
+>>>> +
+>>>> +	return ret;
+>>>> +}
+>>>> +
+>>>> +static int vgic_its_device_cmp(void *priv, struct list_head *a,
+>>>> +			       struct list_head *b)
+>>>> +{
+>>>> +	struct its_device *deva = container_of(a, struct its_device, dev_list);
+>>>> +	struct its_device *devb = container_of(b, struct its_device, dev_list);
+>>>> +
+>>>> +	if (deva->device_id < devb->device_id)
+>>>> +		return -1;
+>>>> +	else
+>>>> +		return 1;
+>>>> +}
+>>>> +
+>>>> +/**
+>>>>   * vgic_its_save_device_tables - Save the device table and all ITT
+>>>>   * into guest RAM
+>>>> + *
+>>>> + * L1/L2 handling is hidden by vgic_its_check_id() helper which directly
+>>>> + * returns the GPA of the device entry
+>>>>   */
+>>>>  static int vgic_its_save_device_tables(struct vgic_its *its)
+>>>>  {
+>>>> -	return -ENXIO;
+>>>> +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+>>>> +	struct its_device *dev;
+>>>> +	int dte_esz = abi->dte_esz;
+>>>> +	u64 baser;
+>>>> +
+>>>> +	baser = its->baser_device_table;
+>>>> +
+>>>> +	list_sort(NULL, &its->device_list, vgic_its_device_cmp);
+>>>> +
+>>>> +	list_for_each_entry(dev, &its->device_list, dev_list) {
+>>>> +		int ret;
+>>>> +		gpa_t eaddr;
+>>>> +
+>>>> +		if (!vgic_its_check_id(its, baser,
+>>>> +				       dev->device_id, &eaddr))
+>>>> +			return -EINVAL;
+>>>> +
+>>>> +		ret = vgic_its_save_itt(its, dev);
+>>>> +		if (ret)
+>>>> +			return ret;
+>>>> +
+>>>> +		ret = vgic_its_save_dte(its, dev, eaddr, dte_esz);
+>>>> +		if (ret)
+>>>> +			return ret;
+>>>> +	}
+>>>> +	return 0;
+>>>> +}
+>>>> +
+>>>> +/**
+>>>> + * handle_l1_entry - callback used for L1 entries (2 stage case)
+>>>> + *
+>>>> + * @its: its handle
+>>>> + * @id: id
+>>>
+>>> IIUC, this is actually the index of the entry in the L1 table.  I think
+>>> this should be clarified.
+>> yep
+>>>
+>>>> + * @addr: kernel VA
+>>>> + * @opaque: unused
+>>>> + * @next_offset: offset to the next L1 entry: 0 if the last element
+>>>> + * was found, 1 otherwise
+>>>> + */
+>>>> +static int handle_l1_entry(struct vgic_its *its, u32 id, void *addr,
+>>>> +			   void *opaque, u32 *next_offset)
+>>>
+>>> nit: shouldn't this be called handle_l1_device_table_entry ?
+>> renamed into handle_l1_dte
+>>>
+>>>> +{
+>>>> +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+>>>> +	int l2_start_id = id * (SZ_64K / GITS_LVL1_ENTRY_SIZE);
+>>>
+>>> Hmmm, is this not actually supposed to be (SZ_64K / abi->dte_esz) ?
+>> no because 1st level entries have a fixed size of GITS_LVL1_ENTRY_SIZE bytes
+> 
+> yes, but the ID you calculate is a result of how many IDs each 64K 2nd
+> level table can hold, which depends on the size of each entry in the 2nd
+> level table, right?  Or am I misunderstanding how this works completely.
+Hum damn you're fully right. Thank you for insisting.
+GITS_LVL1_ENTRY_SIZE must be passed instead as l1_esz in lookup_table()
 
-Third, we set up the arch-specific vcpu device operation handlers to
-call into the timer code for anything related to the
-KVM_ARM_VCPU_TIMER_CTRL group.
-
-Fourth, we implement support for getting and setting the timer interrupt
-numbers using the above defined ABI in the arch timer code.
-
-Fifth, we introduce error checking upon enabling the arch timer (which
-is called when first running a VCPU) to check that all VCPUs are
-configured to use the same PPI for the timer (as mandated by the
-architecture) and that the virtual and physical timers are not
-configured to use the same IRQ number.
-
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
----
- Documentation/virtual/kvm/devices/vcpu.txt |  25 +++++++
- arch/arm/include/uapi/asm/kvm.h            |   8 +++
- arch/arm/kvm/guest.c                       |   9 +++
- arch/arm64/include/uapi/asm/kvm.h          |   3 +
- arch/arm64/kvm/guest.c                     |   9 +++
- include/kvm/arm_arch_timer.h               |   4 ++
- virt/kvm/arm/arch_timer.c                  | 104 +++++++++++++++++++++++++++++
- 7 files changed, 162 insertions(+)
-
-diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
-index 352af6e..013e3f1 100644
---- a/Documentation/virtual/kvm/devices/vcpu.txt
-+++ b/Documentation/virtual/kvm/devices/vcpu.txt
-@@ -35,3 +35,28 @@ Returns: -ENODEV: PMUv3 not supported or GIC not initialized
- Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
- virtual GIC implementation, this must be done after initializing the in-kernel
- irqchip.
-+
-+
-+2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
-+Architectures: ARM,ARM64
-+
-+2.1. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_VTIMER
-+2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_PTIMER
-+Parameters: in kvm_device_attr.addr the address for the timer interrupt is a
-+            pointer to an int
-+Returns: -EINVAL: Invalid timer interrupt number
-+         -EBUSY:  One or more VCPUs has already run
-+
-+A value describing the architected timer interrupt number when connected to an
-+in-kernel virtual GIC.  These must be a PPI (16 <= intid < 32).  If an
-+attribute is not set, a default value is applied (see below).
-+
-+KVM_ARM_VCPU_TIMER_IRQ_VTIMER: The EL1 virtual timer intid (default: 27)
-+KVM_ARM_VCPU_TIMER_IRQ_PTIMER: The EL1 physical timer intid (default: 30)
-+
-+Setting the same PPI for different timers will prevent the VCPUs from running.
-+Setting the interrupt number on a VCPU configures all VCPUs created at that
-+time to use the number provided for a given timer, overwriting any previously
-+configured values on other VCPUs.  Userspace should configure the interrupt
-+numbers on at least one VCPU after creating all VCPUs and before running any
-+VCPUs.
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index a5838d6..6a75ec4 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -200,6 +200,14 @@ struct kvm_arch_memory_slot {
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK 0x3ff
- #define VGIC_LEVEL_INFO_LINE_LEVEL	0
- 
-+/* Device Control API on vcpu fd */
-+#define KVM_ARM_VCPU_PMU_V3_CTRL	0
-+#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
-+#define   KVM_ARM_VCPU_PMU_V3_INIT	1
-+#define KVM_ARM_VCPU_TIMER_CTRL		1
-+#define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
-+#define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-+
- #define   KVM_DEV_ARM_VGIC_CTRL_INIT    0
- 
- /* KVM_IRQ_LINE irq field index values */
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index acea05e..1e0784e 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -308,6 +308,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
- 	int ret;
- 
- 	switch (attr->group) {
-+	case KVM_ARM_VCPU_TIMER_CTRL:
-+		ret = kvm_arm_timer_set_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -322,6 +325,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
- 	int ret;
- 
- 	switch (attr->group) {
-+	case KVM_ARM_VCPU_TIMER_CTRL:
-+		ret = kvm_arm_timer_get_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -336,6 +342,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 	int ret;
- 
- 	switch (attr->group) {
-+	case KVM_ARM_VCPU_TIMER_CTRL:
-+		ret = kvm_arm_timer_has_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index cd6bea4..fc64518 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -226,6 +226,9 @@ struct kvm_arch_memory_slot {
- #define KVM_ARM_VCPU_PMU_V3_CTRL	0
- #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
- #define   KVM_ARM_VCPU_PMU_V3_INIT	1
-+#define KVM_ARM_VCPU_TIMER_CTRL		1
-+#define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
-+#define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
- 
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index b37446a..5c7f657 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -390,6 +390,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_PMU_V3_CTRL:
- 		ret = kvm_arm_pmu_v3_set_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_TIMER_CTRL:
-+		ret = kvm_arm_timer_set_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -407,6 +410,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_PMU_V3_CTRL:
- 		ret = kvm_arm_pmu_v3_get_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_TIMER_CTRL:
-+		ret = kvm_arm_timer_get_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -424,6 +430,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_PMU_V3_CTRL:
- 		ret = kvm_arm_pmu_v3_has_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_TIMER_CTRL:
-+		ret = kvm_arm_timer_has_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index f1c967a..f0053f8 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -68,6 +68,10 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu);
- u64 kvm_arm_timer_get_reg(struct kvm_vcpu *, u64 regid);
- int kvm_arm_timer_set_reg(struct kvm_vcpu *, u64 regid, u64 value);
- 
-+int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
-+int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
-+int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
-+
- bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
- void kvm_timer_schedule(struct kvm_vcpu *vcpu);
- void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 6c5a064..d3d1dce 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -21,6 +21,7 @@
- #include <linux/kvm_host.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
-+#include <linux/uaccess.h>
- 
- #include <clocksource/arm_arch_timer.h>
- #include <asm/arch_timer.h>
-@@ -617,6 +618,28 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
- 	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
- }
- 
-+static bool timer_irqs_are_valid(struct kvm *kvm)
-+{
-+	struct kvm_vcpu *vcpu;
-+	int vtimer_irq, ptimer_irq;
-+	int i;
-+
-+	vcpu = kvm_get_vcpu(kvm, 0);
-+	vtimer_irq = vcpu_vtimer(vcpu)->irq.irq;
-+	ptimer_irq = vcpu_ptimer(vcpu)->irq.irq;
-+
-+	if (vtimer_irq == ptimer_irq)
-+		return false;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (vcpu_vtimer(vcpu)->irq.irq != vtimer_irq ||
-+		    vcpu_ptimer(vcpu)->irq.irq != ptimer_irq)
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
- int kvm_timer_enable(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-@@ -636,6 +659,11 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 	if (!vgic_initialized(vcpu->kvm))
- 		return -ENODEV;
- 
-+	if (!timer_irqs_are_valid(vcpu->kvm)) {
-+		kvm_debug("incorrectly configured timer irqs\n");
-+		return -EINVAL;
-+	}
-+
- 	/*
- 	 * Find the physical IRQ number corresponding to the host_vtimer_irq
- 	 */
-@@ -685,3 +713,79 @@ void kvm_timer_init_vhe(void)
- 	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
- 	write_sysreg(val, cnthctl_el2);
- }
-+
-+static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
-+{
-+	struct kvm_vcpu *vcpu;
-+	int i;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		vcpu_vtimer(vcpu)->irq.irq = vtimer_irq;
-+		vcpu_ptimer(vcpu)->irq.irq = ptimer_irq;
-+	}
-+}
-+
-+int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	int __user *uaddr = (int __user *)(long)attr->addr;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-+	int irq;
-+
-+	if (!irqchip_in_kernel(vcpu->kvm))
-+		return -EINVAL;
-+
-+	if (get_user(irq, uaddr))
-+		return -EFAULT;
-+
-+	if (!(irq_is_ppi(irq)))
-+		return -EINVAL;
-+
-+	if (vcpu->arch.timer_cpu.enabled)
-+		return -EBUSY;
-+
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
-+		set_timer_irqs(vcpu->kvm, irq, ptimer->irq.irq);
-+		break;
-+	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-+		set_timer_irqs(vcpu->kvm, vtimer->irq.irq, irq);
-+		break;
-+	default:
-+		return -ENXIO;
-+	}
-+
-+	return 0;
-+}
-+
-+int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	int __user *uaddr = (int __user *)(long)attr->addr;
-+	struct arch_timer_context *timer;
-+	int irq;
-+
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
-+		timer = vcpu_vtimer(vcpu);
-+		break;
-+	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-+		timer = vcpu_ptimer(vcpu);
-+		break;
-+	default:
-+		return -ENXIO;
-+	}
-+
-+	irq = timer->irq.irq;
-+	return put_user(irq, uaddr);
-+}
-+
-+int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
-+	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-+		return 0;
-+	}
-+
-+	return -ENXIO;
-+}
--- 
-2.9.0
+Eric
+> 
+>>>
+>>>> +	u64 entry = *(u64 *)addr;
+>>>> +	int ret, ite_esz = abi->ite_esz;
+>>>
+>>> Should this be ite_esz or dte_esz?
+>>
+>> you're correct. dte_esz should be used.
+>>>
+>>>> +	gpa_t gpa;
+>>>
+>>> nit: put declarations with initialization on separate lines.
+>> OK
+>>>
+>>>> +
+>>>> +	entry = le64_to_cpu(entry);
+>>>> +	*next_offset = 1;
+>>>
+>>> I think you could attach a comment here saying that level 1 tables have
+>>> to be scanned entirely.
+>> added. note we exit as soon as the last element is found when scanning
+>> l2 tables.
+>>>
+>>> But this also reminds me.  Does that mean that the next field in the DTE
+>>> in your documented ABI format points to the next DTE within that level-2
+>>> table, or does it point across to different level-2 tables?  I think
+>>> this needs to be clarified in the ABI unless I'm missing something.
+>> see above comment on next_index semantic. In the doc I talk about
+>> deviceid offset and not of table index.
+>>
+> 
+> ok, I see, I was misled by the definition of lookup_table saying that it
+> returns 1 if the last element is identified, which is only true when you
+> actually find an element that is valid and where the next field is zero.
+> I understood it to mean if it found the last item in the table it was
+> scanning.  So it is implied that lookup table can be called in two
+> levels and the return value indicates if the element was the last from
+> the point of view of the highest level, not in the context the last
+> instance was called.
+> 
+> Note that it's further confusing that the handler function has the
+> return value the other way around, where 0 means it's the last element.
+> Perhaps you could make this much more readable by introducing a define
+> for the return values.
+> 
+> Thanks,
+> -Christoffer
+> 
