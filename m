@@ -1,28 +1,26 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 4/5] KVM: arm/arm64: vgic-v3: Do not use Active+Pending
- state for a HW interrupt
-Date: Tue, 2 May 2017 22:56:45 +0200
-Message-ID: <20170502205645.GB4421@cbox>
-References: <20170502133041.10980-1-marc.zyngier@arm.com>
- <20170502133041.10980-5-marc.zyngier@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 16/22] KVM: arm64: vgic-its: Add infrastructure for
+ table lookup
+Date: Wed, 3 May 2017 08:53:36 +0200
+Message-ID: <303f2981-489e-ec38-ebaf-40d65429d820@redhat.com>
+References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-17-git-send-email-eric.auger@redhat.com>
+ <20170430193555.GB1670@lvm>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D3C540B40
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 16:53:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AF12140A6A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 02:50:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I9Xn1--MqI1A for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 May 2017 16:53:43 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A76640969
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 May 2017 16:53:43 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id n198so17200832wmg.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 May 2017 13:56:46 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170502133041.10980-5-marc.zyngier@arm.com>
+ with ESMTP id ZZxu1UJzufYq for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 May 2017 02:50:38 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9B19E40969
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 02:50:38 -0400 (EDT)
+In-Reply-To: <20170430193555.GB1670@lvm>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,45 +30,103 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 02, 2017 at 02:30:40PM +0100, Marc Zyngier wrote:
-> When an interrupt is injected with the HW bit set (indicating that
-> deactivation should be propagated to the physical distributor),
-> special care must be taken so that we never mark the corresponding
-> LR with the Active+Pending state (as the pending state is kept in
-> the physycal distributor).
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 59529f69f504 ("KVM: arm/arm64: vgic-new: Add GICv3 world switch backend")
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Hi Christoffer,
 
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
-
-> ---
->  virt/kvm/arm/vgic/vgic-v3.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+On 30/04/2017 21:35, Christoffer Dall wrote:
+> On Fri, Apr 14, 2017 at 12:15:28PM +0200, Eric Auger wrote:
+>> Add a generic lookup_table() helper whose role consists in
+>> scanning a contiguous table located in guest RAM and applying
+>> a callback on each entry. Entries can be handled as linked lists
+>> since the callback may return an offset to the next entry and
+>> also tell that an entry is the last one.
+>>
+>> Helper functions also are added to compute the device/event ID
+>> offset to the next DTE/ITE.
+>>
+>> compute_next_devid_offset, compute_next_eventid_offset and
+>> lookup_table will become static in subsequent patches
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v4 -> v5:
+>> - use kvm_read_guest
+>>
+>> v3 -> v4:
+>> - remove static to avoid compilation warning
+>> - correct size computation in looup_table()
+>> - defines now encode the number of bits used for devid and eventid offsets
+>> - use BIT() - 1 to encode the max offets
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 93 ++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 93 insertions(+)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 56c5123..c22b35d 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -195,6 +195,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+>>  
+>>  #define VITS_TYPER_IDBITS 16
+>>  #define VITS_TYPER_DEVBITS 16
+>> +#define VITS_DTE_MAX_DEVID_OFFSET	(BIT(14) - 1)
+>> +#define VITS_ITE_MAX_EVENTID_OFFSET	(BIT(16) - 1)
+>>  
+>>  /*
+>>   * Finds and returns a collection in the ITS collection table.
+>> @@ -1674,6 +1676,97 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+>>  	return ret;
+>>  }
+>>  
+>> +u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
+>> +{
+>> +	struct list_head *e = &dev->dev_list;
+>> +	struct its_device *next;
+>> +	u32 next_offset;
+>> +
+>> +	if (e->next == h)
+>> +		return 0;
+>> +	next = list_entry(e->next, struct its_device, dev_list);
+>> +	next_offset = next->device_id - dev->device_id;
+>> +
+>> +	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
+>> +}
+>> +
+>> +u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
+>> +{
+>> +	struct list_head *e = &ite->ite_list;
+>> +	struct its_ite *next;
+>> +	u32 next_offset;
+>> +
+>> +	if (e->next == h)
+>> +		return 0;
+>> +	next = list_entry(e->next, struct its_ite, ite_list);
+>> +	next_offset = next->event_id - ite->event_id;
+>> +
+>> +	return min_t(u32, next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
+>> +}
+>> +
+>> +/**
+>> + * entry_fn_t - Callback called on a table entry restore path
+>> + * @its: its handle
+>> + * @id: id of the entry
+>> + * @entry: pointer to the entry
+>> + * @opaque: pointer to an opaque data
+>> + * @next_offset: minimal ID offset to the next entry. 0 if this
+>> + * entry is the last one, 1 if the entry is invalid, >= 1 if an
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index df1503650300..393779ebe87c 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -127,6 +127,13 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
->  	if (irq->hw) {
->  		val |= ICH_LR_HW;
->  		val |= ((u64)irq->hwintid) << ICH_LR_PHYS_ID_SHIFT;
-> +		/*
-> +		 * Never set pending+active on a HW interrupt, as the
-> +		 * pending state is kept at the physical distributor
-> +		 * level.
-> +		 */
-> +		if (irq->active && irq_is_pending(irq))
-> +			val &= ~ICH_LR_PENDING_BIT;
->  	} else {
->  		if (irq->config == VGIC_CONFIG_LEVEL)
->  			val |= ICH_LR_EOI;
-> -- 
-> 2.11.0
+> eh, also, did you mean -1 if the entry is invalid?
+no in case the entry is invalid, we tell the caller that it must inspect
+the next entry, hence the next_offset = +1.
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> -Christoffer
 > 
