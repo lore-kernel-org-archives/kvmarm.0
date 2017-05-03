@@ -1,82 +1,137 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 2/2] kvm: arm/arm64: Fix use after free of stage2 page table
-Date: Wed,  3 May 2017 15:17:52 +0100
-Message-ID: <1493821072-29713-3-git-send-email-suzuki.poulose@arm.com>
-References: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v5 16/22] KVM: arm64: vgic-its: Add infrastructure for
+ table lookup
+Date: Wed, 3 May 2017 16:38:26 +0200
+Message-ID: <20170503143826.GA28421@cbox>
+References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-17-git-send-email-eric.auger@redhat.com>
+ <20170430193325.GA1670@lvm>
+ <8f162a7d-e629-5828-6230-f0b7b7a6f9db@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E565E40960
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 10:15:01 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tZ--twc5u4OV for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 May 2017 10:15:00 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E56440C2A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 10:15:00 -0400 (EDT)
-In-Reply-To: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <8f162a7d-e629-5828-6230-f0b7b7a6f9db@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-V2UgeWllbGQgdGhlIGt2bS0+bW11X2xvY2sgb2NjYXNzaW9uYWx5IHdoaWxlIHBlcmZvcm1pbmcg
-YW4gb3BlcmF0aW9uCihlLmcsIHVubWFwIG9yIHBlcm1pc3Npb24gY2hhbmdlcykgb24gYSBsYXJn
-ZSBhcmVhIG9mIHN0YWdlMiBtYXBwaW5ncy4KSG93ZXZlciB0aGlzIGNvdWxkIHBvc3NpYmx5IGNh
-dXNlIGFub3RoZXIgdGhyZWFkIHRvIGNsZWFyIGFuZCBmcmVlIHVwCnRoZSBzdGFnZTIgcGFnZSB0
-YWJsZXMgd2hpbGUgd2Ugd2VyZSB3YWl0aW5nIGZvciByZWdhaW5pbmcgdGhlIGxvY2sgYW5kCnRo
-dXMgdGhlIG9yaWdpbmFsIHRocmVhZCBjb3VsZCBlbmQgdXAgaW4gYWNjZXNzaW5nIG1lbW9yeSB0
-aGF0IHdhcwpmcmVlZC4gVGhpcyBwYXRjaCBmaXhlcyB0aGUgcHJvYmxlbSBieSBtYWtpbmcgc3Vy
-ZSB0aGF0IHRoZSBzdGFnZTIKcGFnZXRhYmxlIGlzIHN0aWxsIHZhbGlkIGFmdGVyIHdlIHJlZ2Fp
-biB0aGUgbG9jay4gVGhlIGZhY3QgdGhhdAptbXVfbm90aWZlci0+cmVsZWFzZSgpIGNvdWxkIGJl
-IGNhbGxlZCB0d2ljZSAodmlhIF9fbW11X25vdGlmaWVyX3JlbGVhc2UKYW5kIG1tdV9ub3RpZmll
-cl91bnJlZ3Npc3RlcikgZW5oYW5jZXMgdGhlIHBvc3NpYmlsaXR5IG9mIGhpdHRpbmcKdGhpcyBy
-YWNlIHdoZXJlIHRoZXJlIGFyZSB0d28gdGhyZWFkcyB0cnlpbmcgdG8gdW5tYXAgdGhlIGVudGly
-ZSBndWVzdApzaGFkb3cgcGFnZXMuCgpXaGlsZSBhdCBpdCwgY2xlYW51cCB0aGUgcmVkdWRhbnQg
-Y2hlY2tzIGFyb3VuZCBjb25kX3Jlc2NoZWRfbG9jayBpbgpzdGFnZTJfd3BfcmFuZ2UoKSwgYXMg
-Y29uZF9yZXNjaGVkX2xvY2sgYWxyZWFkeSBkb2VzIHRoZSBzYW1lIGNoZWNrcy4KCkNjOiBNYXJr
-IFJ1dGxhbmQgPG1hcmsucnV0bGFuZEBhcm0uY29tPgpDYzogUmFkaW0gS3LEjW3DocWZIDxya3Jj
-bWFyQHJlZGhhdC5jb20+CkNjOiBhbmRyZXlrbnZsQGdvb2dsZS5jb20KQ2M6IENocmlzdG9mZmVy
-IERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KQ2M6IE1hcmMgWnluZ2llciA8bWFy
-Yy56eW5naWVyQGFybS5jb20+CkNjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29t
-PgpTaWduZWQtb2ZmLWJ5OiBTdXp1a2kgSyBQb3Vsb3NlIDxzdXp1a2kucG91bG9zZUBhcm0uY29t
-PgotLS0KIGFyY2gvYXJtL2t2bS9tbXUuYyB8IDE3ICsrKysrKysrKysrKy0tLS0tCiAxIGZpbGUg
-Y2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9h
-cmNoL2FybS9rdm0vbW11LmMgYi9hcmNoL2FybS9rdm0vbW11LmMKaW5kZXggOTA5YTFhNy4uNWIz
-ZTBkYiAxMDA2NDQKLS0tIGEvYXJjaC9hcm0va3ZtL21tdS5jCisrKyBiL2FyY2gvYXJtL2t2bS9t
-bXUuYwpAQCAtMzAxLDkgKzMwMSwxNCBAQCBzdGF0aWMgdm9pZCB1bm1hcF9zdGFnZTJfcmFuZ2Uo
-c3RydWN0IGt2bSAqa3ZtLCBwaHlzX2FkZHJfdCBzdGFydCwgdTY0IHNpemUpCiAJCS8qCiAJCSAq
-IElmIHRoZSByYW5nZSBpcyB0b28gbGFyZ2UsIHJlbGVhc2UgdGhlIGt2bS0+bW11X2xvY2sKIAkJ
-ICogdG8gcHJldmVudCBzdGFydmF0aW9uIGFuZCBsb2NrdXAgZGV0ZWN0b3Igd2FybmluZ3MuCisJ
-CSAqIE1ha2Ugc3VyZSB0aGUgcGFnZSB0YWJsZSBpcyBzdGlsbCBhY3RpdmUgd2hlbiB3ZSByZWdh
-aW4KKwkJICogdGhlIGxvY2suCiAJCSAqLwotCQlpZiAobmV4dCAhPSBlbmQpCisJCWlmIChuZXh0
-ICE9IGVuZCkgewogCQkJY29uZF9yZXNjaGVkX2xvY2soJmt2bS0+bW11X2xvY2spOworCQkJaWYg
-KCFSRUFEX09OQ0Uoa3ZtLT5hcmNoLnBnZCkpCisJCQkJYnJlYWs7CisJCX0KIAl9IHdoaWxlIChw
-Z2QrKywgYWRkciA9IG5leHQsIGFkZHIgIT0gZW5kKTsKIH0KIApAQCAtMTE3MCwxMSArMTE3NSwx
-MyBAQCBzdGF0aWMgdm9pZCBzdGFnZTJfd3BfcmFuZ2Uoc3RydWN0IGt2bSAqa3ZtLCBwaHlzX2Fk
-ZHJfdCBhZGRyLCBwaHlzX2FkZHJfdCBlbmQpCiAJCSAqIGxhcmdlLiBPdGhlcndpc2UsIHdlIG1h
-eSBzZWUga2VybmVsIHBhbmljcyB3aXRoCiAJCSAqIENPTkZJR19ERVRFQ1RfSFVOR19UQVNLLCBD
-T05GSUdfTE9DS1VQX0RFVEVDVE9SLAogCQkgKiBDT05GSUdfTE9DS0RFUC4gQWRkaXRpb25hbGx5
-LCBob2xkaW5nIHRoZSBsb2NrIHRvbyBsb25nCi0JCSAqIHdpbGwgYWxzbyBzdGFydmUgb3RoZXIg
-dkNQVXMuCisJCSAqIHdpbGwgYWxzbyBzdGFydmUgb3RoZXIgdkNQVXMuIFdlIGhhdmUgdG8gYWxz
-byBtYWtlIHN1cmUKKwkJICogdGhhdCB0aGUgcGFnZSB0YWJsZXMgYXJlIG5vdCBmcmVlZCB3aGls
-ZSB3ZSByZWxlYXNlZAorCQkgKiB0aGUgbG9jay4KIAkJICovCi0JCWlmIChuZWVkX3Jlc2NoZWQo
-KSB8fCBzcGluX25lZWRicmVhaygma3ZtLT5tbXVfbG9jaykpCi0JCQljb25kX3Jlc2NoZWRfbG9j
-aygma3ZtLT5tbXVfbG9jayk7Ci0KKwkJY29uZF9yZXNjaGVkX2xvY2soJmt2bS0+bW11X2xvY2sp
-OworCQlpZiAoIVJFQURfT05DRShrdm0tPmFyY2gucGdkKSkKKwkJCWJyZWFrOwogCQluZXh0ID0g
-c3RhZ2UyX3BnZF9hZGRyX2VuZChhZGRyLCBlbmQpOwogCQlpZiAoc3RhZ2UyX3BnZF9wcmVzZW50
-KCpwZ2QpKQogCQkJc3RhZ2UyX3dwX3B1ZHMocGdkLCBhZGRyLCBuZXh0KTsKLS0gCjIuNy40Cgpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFp
-bGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5j
-b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On Wed, May 03, 2017 at 03:40:34PM +0200, Auger Eric wrote:
+> Hi Christoffer,
+> 
+> On 30/04/2017 21:33, Christoffer Dall wrote:
+> > On Fri, Apr 14, 2017 at 12:15:28PM +0200, Eric Auger wrote:
+> >> Add a generic lookup_table() helper whose role consists in
+> >> scanning a contiguous table located in guest RAM and applying
+> >> a callback on each entry. Entries can be handled as linked lists
+> >> since the callback may return an offset to the next entry and
+> >> also tell that an entry is the last one.
+> >>
+> >> Helper functions also are added to compute the device/event ID
+> >> offset to the next DTE/ITE.
+> >>
+> >> compute_next_devid_offset, compute_next_eventid_offset and
+> >> lookup_table will become static in subsequent patches
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>
+> >> ---
+> >> v4 -> v5:
+> >> - use kvm_read_guest
+> >>
+> >> v3 -> v4:
+> >> - remove static to avoid compilation warning
+> >> - correct size computation in looup_table()
+> >> - defines now encode the number of bits used for devid and eventid offsets
+> >> - use BIT() - 1 to encode the max offets
+> >> ---
+> >>  virt/kvm/arm/vgic/vgic-its.c | 93 ++++++++++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 93 insertions(+)
+> >>
+> >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> >> index 56c5123..c22b35d 100644
+> >> --- a/virt/kvm/arm/vgic/vgic-its.c
+> >> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> >> @@ -195,6 +195,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+> >>  
+> >>  #define VITS_TYPER_IDBITS 16
+> >>  #define VITS_TYPER_DEVBITS 16
+> >> +#define VITS_DTE_MAX_DEVID_OFFSET	(BIT(14) - 1)
+> >> +#define VITS_ITE_MAX_EVENTID_OFFSET	(BIT(16) - 1)
+> >>  
+> >>  /*
+> >>   * Finds and returns a collection in the ITS collection table.
+> >> @@ -1674,6 +1676,97 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+> >>  	return ret;
+> >>  }
+> >>  
+> >> +u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
+> >> +{
+> >> +	struct list_head *e = &dev->dev_list;
+> >> +	struct its_device *next;
+> >> +	u32 next_offset;
+> >> +
+> >> +	if (e->next == h)
+> >> +		return 0;
+> >> +	next = list_entry(e->next, struct its_device, dev_list);
+> >> +	next_offset = next->device_id - dev->device_id;
+> >> +
+> >> +	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
+> >> +}
+> >> +
+> >> +u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
+> >> +{
+> >> +	struct list_head *e = &ite->ite_list;
+> >> +	struct its_ite *next;
+> >> +	u32 next_offset;
+> >> +
+> >> +	if (e->next == h)
+> >> +		return 0;
+> >> +	next = list_entry(e->next, struct its_ite, ite_list);
+> >> +	next_offset = next->event_id - ite->event_id;
+> >> +
+> >> +	return min_t(u32, next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
+> >> +}
+> >> +
+> >> +/**
+> >> + * entry_fn_t - Callback called on a table entry restore path
+> >> + * @its: its handle
+> >> + * @id: id of the entry
+> >> + * @entry: pointer to the entry
+> >> + * @opaque: pointer to an opaque data
+> >> + * @next_offset: minimal ID offset to the next entry. 0 if this
+> >> + * entry is the last one, 1 if the entry is invalid, >= 1 if an
+> >> + * entry's next_offset field was truly decoded
+> >> + *
+> >> + * Return: < 0 on error, 0 otherwise
+> >> + */
+> >> +typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
+> >> +			  void *opaque, u32 *next_offset);
+> > 
+> > Just noticed.  All the table entries are 64-bit long at this point,
+> > right?  So why not make entry a u64 * instead?  Could we end up with
+> > some endianness mess with using void pointers the way it is now?
+> the size of the entry is ABI dependent while this infrastructure is
+> generic. 
+
+Yes, for a single version of the ABI where all the entries are 64-bit.
+
+
+> In each of such function we use
+> 
+> u64 entry = *(u64 *)addr;
+> and we do a le64_to_cpu(entry).
+> 
+> Do you see something wrong? Otherwise I would be tempted to leave as is.
+> 
+
+I don't think there's anything wrong with the current version, and
+you're right, this always points to an ITS data structure which is LE,
+so there shouldn't be a problem.  I always just quiver when I see void
+pointers cast to a type in the caller and callee.
+
+Just leave it for now.
+
+Thanks,
+-Christoffer
