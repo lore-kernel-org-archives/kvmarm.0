@@ -1,231 +1,106 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH 4/5] KVM: arm/arm64: Move timer IRQ default init to
- arch_timer.c
-Date: Wed,  3 May 2017 20:32:59 +0200
-Message-ID: <20170503183300.4618-5-cdall@linaro.org>
+Subject: [PATCH 2/5] KVM: arm: Handle VCPU device attributes in guest.c
+Date: Wed,  3 May 2017 20:32:57 +0200
+Message-ID: <20170503183300.4618-3-cdall@linaro.org>
 References: <20170503183300.4618-1-cdall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C4EEE40C2D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 14:30:05 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YRr3PCDtSFn3 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 May 2017 14:30:04 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7AD040A66
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 14:30:02 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id u65so155652055wmu.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 03 May 2017 11:33:07 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170503183300.4618-1-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently initialize the arch timer IRQ numbers from the reset code,
-presumably because we once intended to model multiple CPU or SoC types
-from within the kernel and have hard-coded reset values in the reset
-code.
-
-As we are moving towards userspace being in charge of more fine-grained
-CPU emulation and stitching together the pieces needed to emulate a
-particular type of CPU, we should no longer have a tight coupling
-between resetting a VCPU and setting IRQ numbers.
-
-Therefore, move the logic to define and use the default IRQ numbers to
-the timer code and set the IRQ number immediately when creating the
-VCPU.
+As we are about to support VCPU attributes to set the timer IRQ numbers
+in guest.c, move the static inlines for the VCPU attributes handlers
+from the header file to guest.c.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm/kvm/reset.c         | 16 +---------------
- arch/arm64/kvm/reset.c       | 16 +---------------
- include/kvm/arm_arch_timer.h |  4 +---
- virt/kvm/arm/arch_timer.c    | 28 ++++++++++++++++------------
- 4 files changed, 19 insertions(+), 45 deletions(-)
+ arch/arm/include/asm/kvm_host.h | 22 +++++++--------------
+ arch/arm/kvm/guest.c            | 42 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
-index 1da8b2d..5ed0c3e 100644
---- a/arch/arm/kvm/reset.c
-+++ b/arch/arm/kvm/reset.c
-@@ -37,16 +37,6 @@ static struct kvm_regs cortexa_regs_reset = {
- 	.usr_regs.ARM_cpsr = SVC_MODE | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT,
- };
- 
--static const struct kvm_irq_level cortexa_ptimer_irq = {
--	{ .irq = 30 },
--	.level = 1,
--};
--
--static const struct kvm_irq_level cortexa_vtimer_irq = {
--	{ .irq = 27 },
--	.level = 1,
--};
--
- 
- /*******************************************************************************
-  * Exported reset function
-@@ -62,16 +52,12 @@ static const struct kvm_irq_level cortexa_vtimer_irq = {
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_regs *reset_regs;
--	const struct kvm_irq_level *cpu_vtimer_irq;
--	const struct kvm_irq_level *cpu_ptimer_irq;
- 
- 	switch (vcpu->arch.target) {
- 	case KVM_ARM_TARGET_CORTEX_A7:
- 	case KVM_ARM_TARGET_CORTEX_A15:
- 		reset_regs = &cortexa_regs_reset;
- 		vcpu->arch.midr = read_cpuid_id();
--		cpu_vtimer_irq = &cortexa_vtimer_irq;
--		cpu_ptimer_irq = &cortexa_ptimer_irq;
- 		break;
- 	default:
- 		return -ENODEV;
-@@ -84,5 +70,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	kvm_reset_coprocs(vcpu);
- 
- 	/* Reset arch_timer context */
--	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq, cpu_ptimer_irq);
-+	return kvm_timer_vcpu_reset(vcpu);
- }
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index d9e9697..4942de2 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -46,16 +46,6 @@ static const struct kvm_regs default_regs_reset32 = {
- 			COMPAT_PSR_I_BIT | COMPAT_PSR_F_BIT),
- };
- 
--static const struct kvm_irq_level default_ptimer_irq = {
--	.irq	= 30,
--	.level	= 1,
--};
--
--static const struct kvm_irq_level default_vtimer_irq = {
--	.irq	= 27,
--	.level	= 1,
--};
--
- static bool cpu_has_32bit_el1(void)
- {
- 	u64 pfr0;
-@@ -108,8 +98,6 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
-  */
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- {
--	const struct kvm_irq_level *cpu_vtimer_irq;
--	const struct kvm_irq_level *cpu_ptimer_irq;
- 	const struct kvm_regs *cpu_reset;
- 
- 	switch (vcpu->arch.target) {
-@@ -122,8 +110,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 			cpu_reset = &default_regs_reset;
- 		}
- 
--		cpu_vtimer_irq = &default_vtimer_irq;
--		cpu_ptimer_irq = &default_ptimer_irq;
- 		break;
- 	}
- 
-@@ -137,5 +123,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	kvm_pmu_vcpu_reset(vcpu);
- 
- 	/* Reset timer */
--	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq, cpu_ptimer_irq);
-+	return kvm_timer_vcpu_reset(vcpu);
- }
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 295584f..f1c967a 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -57,9 +57,7 @@ struct arch_timer_cpu {
- 
- int kvm_timer_hyp_init(void);
- int kvm_timer_enable(struct kvm_vcpu *vcpu);
--int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
--			 const struct kvm_irq_level *virt_irq,
--			 const struct kvm_irq_level *phys_irq);
-+int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
- void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 5976609..6c5a064 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -35,6 +35,16 @@ static struct timecounter *timecounter;
- static unsigned int host_vtimer_irq;
- static u32 host_vtimer_irq_flags;
- 
-+static const struct kvm_irq_level default_ptimer_irq = {
-+	.irq	= 30,
-+	.level	= 1,
-+};
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index d488b88..0e8c233 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -292,20 +292,12 @@ static inline void kvm_arm_init_debug(void) {}
+ static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+-static inline int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+-					     struct kvm_device_attr *attr)
+-{
+-	return -ENXIO;
+-}
+-static inline int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+-					     struct kvm_device_attr *attr)
+-{
+-	return -ENXIO;
+-}
+-static inline int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+-					     struct kvm_device_attr *attr)
+-{
+-	return -ENXIO;
+-}
 +
-+static const struct kvm_irq_level default_vtimer_irq = {
-+	.irq	= 27,
-+	.level	= 1,
-+};
-+
- void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
++int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr);
++int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr);
++int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr);
+ 
+ #endif /* __ARM_KVM_HOST_H__ */
+diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+index fa6182a..acea05e 100644
+--- a/arch/arm/kvm/guest.c
++++ b/arch/arm/kvm/guest.c
+@@ -301,3 +301,45 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
  {
- 	vcpu_vtimer(vcpu)->active_cleared_last = false;
-@@ -445,23 +455,12 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- 	kvm_timer_update_state(vcpu);
+ 	return -EINVAL;
  }
- 
--int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
--			 const struct kvm_irq_level *virt_irq,
--			 const struct kvm_irq_level *phys_irq)
-+int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
- 	/*
--	 * The vcpu timer irq number cannot be determined in
--	 * kvm_timer_vcpu_init() because it is called much before
--	 * kvm_vcpu_set_target(). To handle this, we determine
--	 * vcpu timer irq number when the vcpu is reset.
--	 */
--	vtimer->irq.irq = virt_irq->irq;
--	ptimer->irq.irq = phys_irq->irq;
--
--	/*
- 	 * The bits in CNTV_CTL are architecturally reset to UNKNOWN for ARMv8
- 	 * and to 0 for ARMv7.  We provide an implementation that always
- 	 * resets the timer to be disabled and unmasked and is compliant with
-@@ -496,6 +495,8 @@ static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
- 	/* Synchronize cntvoff across all vtimers of a VM. */
- 	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
-@@ -504,6 +505,9 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	INIT_WORK(&timer->expired, kvm_timer_inject_irq_work);
- 	hrtimer_init(&timer->timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
- 	timer->timer.function = kvm_timer_expire;
 +
-+	vtimer->irq.irq = default_vtimer_irq.irq;
-+	ptimer->irq.irq = default_ptimer_irq.irq;
- }
- 
- static void kvm_timer_init_interrupt(void *info)
++int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr)
++{
++	int ret;
++
++	switch (attr->group) {
++	default:
++		ret = -ENXIO;
++		break;
++	}
++
++	return ret;
++}
++
++int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr)
++{
++	int ret;
++
++	switch (attr->group) {
++	default:
++		ret = -ENXIO;
++		break;
++	}
++
++	return ret;
++}
++
++int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr)
++{
++	int ret;
++
++	switch (attr->group) {
++	default:
++		ret = -ENXIO;
++		break;
++	}
++
++	return ret;
++}
 -- 
 2.9.0
