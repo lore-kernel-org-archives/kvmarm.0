@@ -1,109 +1,72 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH 1/5] KVM: arm64: Allow creating the PMU without the in-kernel GIC
-Date: Wed,  3 May 2017 20:32:56 +0200
-Message-ID: <20170503183300.4618-2-cdall@linaro.org>
+Subject: [PATCH 3/5] KVM: arm/arm64: Move irq_is_ppi() to header file
+Date: Wed,  3 May 2017 20:32:58 +0200
+Message-ID: <20170503183300.4618-4-cdall@linaro.org>
 References: <20170503183300.4618-1-cdall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C372E40430
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 14:30:01 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id OG5-JyBdlqMq for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 May 2017 14:30:01 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9AC240960
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 14:30:00 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id w64so155890873wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 03 May 2017 11:33:05 -0700 (PDT)
 In-Reply-To: <20170503183300.4618-1-cdall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since we got support for devices in userspace which allows reporting the
-PMU overflow output status to userspace, we should actually allow
-creating the PMU on systems without an in-kernel irqchip, which in turn
-requires us to slightly clarify error codes for the ABI and move things
-around for the initialization phase.
+We are about to need this define in the arch timer code as well so move
+it to a common location.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- Documentation/virtual/kvm/devices/vcpu.txt | 16 +++++++++-------
- virt/kvm/arm/pmu.c                         | 27 +++++++++++++++++----------
- 2 files changed, 26 insertions(+), 17 deletions(-)
+ include/kvm/arm_vgic.h | 2 ++
+ virt/kvm/arm/pmu.c     | 2 --
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
-index 02f5068..352af6e 100644
---- a/Documentation/virtual/kvm/devices/vcpu.txt
-+++ b/Documentation/virtual/kvm/devices/vcpu.txt
-@@ -16,7 +16,9 @@ Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt is a
- Returns: -EBUSY: The PMU overflow interrupt is already set
-          -ENXIO: The overflow interrupt not set when attempting to get it
-          -ENODEV: PMUv3 not supported
--         -EINVAL: Invalid PMU overflow interrupt number supplied
-+         -EINVAL: Invalid PMU overflow interrupt number supplied or
-+                  trying to set the IRQ number without using an in-kernel
-+                  irqchip.
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 26ed4fb..1541f5d 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -38,6 +38,8 @@
+ #define VGIC_MIN_LPI		8192
+ #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
  
- A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
- number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
-@@ -25,11 +27,11 @@ all vcpus, while as an SPI it must be a separate number per vcpu.
- 
- 1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
- Parameters: no additional parameter in kvm_device_attr.addr
--Returns: -ENODEV: PMUv3 not supported
--         -ENXIO: PMUv3 not properly configured as required prior to calling this
--                 attribute
-+Returns: -ENODEV: PMUv3 not supported or GIC not initialized
-+         -ENXIO: PMUv3 not properly configured or in-kernel irqchip not
-+                 conigured as required prior to calling this attribute
-          -EBUSY: PMUv3 already initialized
- 
--Request the initialization of the PMUv3.  This must be done after creating the
--in-kernel irqchip.  Creating a PMU with a userspace irqchip is currently not
--supported.
-+Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
-+virtual GIC implementation, this must be done after initializing the in-kernel
-+irqchip.
++#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
++
+ enum vgic_type {
+ 	VGIC_V2,		/* Good ol' GICv2 */
+ 	VGIC_V3,		/* New fancy GICv3 */
 diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 4b43e7f..f046b08 100644
+index f046b08..9b3e3ea 100644
 --- a/virt/kvm/arm/pmu.c
 +++ b/virt/kvm/arm/pmu.c
-@@ -456,21 +456,25 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
- 	if (!kvm_arm_support_pmu_v3())
- 		return -ENODEV;
+@@ -481,8 +481,6 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
  
--	/*
--	 * We currently require an in-kernel VGIC to use the PMU emulation,
--	 * because we do not support forwarding PMU overflow interrupts to
--	 * userspace yet.
--	 */
--	if (!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))
--		return -ENODEV;
+-#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
 -
--	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features) ||
--	    !kvm_arm_pmu_irq_initialized(vcpu))
-+	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
- 		return -ENXIO;
- 
- 	if (kvm_arm_pmu_v3_ready(vcpu))
- 		return -EBUSY;
- 
-+	if (irqchip_in_kernel(vcpu->kvm)) {
-+		/*
-+		 * If using the PMU with an in-kernel virtual GIC
-+		 * implementation, we require the GIC to be already
-+		 * initialized when initializing the PMU.
-+		 */
-+		if (!vgic_initialized(vcpu->kvm))
-+			return -ENODEV;
-+
-+		if (!kvm_arm_pmu_irq_initialized(vcpu))
-+			return -ENXIO;
-+	}
-+
- 	kvm_pmu_vcpu_reset(vcpu);
- 	vcpu->arch.pmu.ready = true;
- 
-@@ -512,6 +516,9 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 		int __user *uaddr = (int __user *)(long)attr->addr;
- 		int irq;
- 
-+		if (!irqchip_in_kernel(vcpu->kvm))
-+			return -EINVAL;
-+
- 		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
- 			return -ENODEV;
- 
+ /*
+  * For one VM the interrupt type must be same for each vcpu.
+  * As a PPI, the interrupt number is the same for all vcpus,
 -- 
 2.9.0
