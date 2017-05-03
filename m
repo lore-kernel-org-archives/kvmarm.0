@@ -1,22 +1,22 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v3 01/10] KVM: add kvm_request_pending
-Date: Wed,  3 May 2017 18:06:26 +0200
-Message-ID: <20170503160635.21669-2-drjones@redhat.com>
+Subject: [PATCH v3 03/10] KVM: arm/arm64: prepare to use vcpu requests
+Date: Wed,  3 May 2017 18:06:28 +0200
+Message-ID: <20170503160635.21669-4-drjones@redhat.com>
 References: <20170503160635.21669-1-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED22A40296
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 12:03:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D58CC40296
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 12:03:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9COL6JA0VQcj for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 May 2017 12:03:38 -0400 (EDT)
+ with ESMTP id G5QfAkoYotLL for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 May 2017 12:03:42 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DEDA40A66
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 12:03:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA6BF40C28
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 12:03:41 -0400 (EDT)
 In-Reply-To: <20170503160635.21669-1-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,80 +31,97 @@ To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: marc.zyngier@arm.com, cdall@linaro.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogUmFkaW0gS3LEjW3DocWZIDxya3JjbWFyQHJlZGhhdC5jb20+CgpBIGZpcnN0IHN0ZXAg
-aW4gdmNwdS0+cmVxdWVzdHMgZW5jYXBzdWxhdGlvbi4gIEFkZGl0aW9uYWxseSwgd2Ugbm93CnVz
-ZSBSRUFEX09OQ0UoKSB3aGVuIGFjY2Vzc2luZyB2Y3B1LT5yZXF1ZXN0cywgd2hpY2ggZW5zdXJl
-cyB3ZQphbHdheXMgbG9hZCB2Y3B1LT5yZXF1ZXN0cyB3aGVuIGl0J3MgYWNjZXNzZWQuICBUaGlz
-IGlzIGltcG9ydGFudCBhcwpvdGhlciB0aHJlYWRzIGNhbiBjaGFuZ2UgaXQgYW55IHRpbWUuICBB
-bHNvLCBSRUFEX09OQ0UoKSBkb2N1bWVudHMKdGhhdCB2Y3B1LT5yZXF1ZXN0cyBpcyB1c2VkIHdp
-dGggb3RoZXIgdGhyZWFkcywgbGlrZWx5IHJlcXVpcmluZwptZW1vcnkgYmFycmllcnMsIHdoaWNo
-IGl0IGRvZXMuCgpTaWduZWQtb2ZmLWJ5OiBSYWRpbSBLcsSNbcOhxZkgPHJrcmNtYXJAcmVkaGF0
-LmNvbT4KWyBEb2N1bWVudGVkIHRoZSBuZXcgdXNlIG9mIFJFQURfT05DRSgpLiBdClNpZ25lZC1v
-ZmYtYnk6IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPgotLS0KIGFyY2gvbWlwcy9r
-dm0vdHJhcF9lbXVsLmMgIHwgMiArLQogYXJjaC9wb3dlcnBjL2t2bS9ib29rZS5jICAgfCAyICst
-CiBhcmNoL3Bvd2VycGMva3ZtL3Bvd2VycGMuYyB8IDUgKystLS0KIGFyY2gvczM5MC9rdm0va3Zt
-LXMzOTAuYyAgIHwgMiArLQogYXJjaC94ODYva3ZtL3g4Ni5jICAgICAgICAgfCA0ICsrLS0KIGlu
-Y2x1ZGUvbGludXgva3ZtX2hvc3QuaCAgIHwgNSArKysrKwogNiBmaWxlcyBjaGFuZ2VkLCAxMiBp
-bnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvbWlwcy9rdm0v
-dHJhcF9lbXVsLmMgYi9hcmNoL21pcHMva3ZtL3RyYXBfZW11bC5jCmluZGV4IGIxZmE1M2IyNTJl
-YS4uOWFjOGIxZDYyNjQzIDEwMDY0NAotLS0gYS9hcmNoL21pcHMva3ZtL3RyYXBfZW11bC5jCisr
-KyBiL2FyY2gvbWlwcy9rdm0vdHJhcF9lbXVsLmMKQEAgLTEwMjksNyArMTAyOSw3IEBAIHN0YXRp
-YyB2b2lkIGt2bV90cmFwX2VtdWxfY2hlY2tfcmVxdWVzdHMoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
-LCBpbnQgY3B1LAogCXN0cnVjdCBtbV9zdHJ1Y3QgKm1tOwogCWludCBpOwogCi0JaWYgKGxpa2Vs
-eSghdmNwdS0+cmVxdWVzdHMpKQorCWlmIChsaWtlbHkoIWt2bV9yZXF1ZXN0X3BlbmRpbmcodmNw
-dSkpKQogCQlyZXR1cm47CiAKIAlpZiAoa3ZtX2NoZWNrX3JlcXVlc3QoS1ZNX1JFUV9UTEJfRkxV
-U0gsIHZjcHUpKSB7CmRpZmYgLS1naXQgYS9hcmNoL3Bvd2VycGMva3ZtL2Jvb2tlLmMgYi9hcmNo
-L3Bvd2VycGMva3ZtL2Jvb2tlLmMKaW5kZXggYWI5NjhmNjBkMTRjLi5jNDI3MjAyYjNjYmIgMTAw
-NjQ0Ci0tLSBhL2FyY2gvcG93ZXJwYy9rdm0vYm9va2UuYworKysgYi9hcmNoL3Bvd2VycGMva3Zt
-L2Jvb2tlLmMKQEAgLTY4Miw3ICs2ODIsNyBAQCBpbnQga3ZtcHBjX2NvcmVfcHJlcGFyZV90b19l
-bnRlcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAKIAlrdm1wcGNfY29yZV9jaGVja19leGNlcHRp
-b25zKHZjcHUpOwogCi0JaWYgKHZjcHUtPnJlcXVlc3RzKSB7CisJaWYgKGt2bV9yZXF1ZXN0X3Bl
-bmRpbmcodmNwdSkpIHsKIAkJLyogRXhjZXB0aW9uIGRlbGl2ZXJ5IHJhaXNlZCByZXF1ZXN0OyBz
-dGFydCBvdmVyICovCiAJCXJldHVybiAxOwogCX0KZGlmZiAtLWdpdCBhL2FyY2gvcG93ZXJwYy9r
-dm0vcG93ZXJwYy5jIGIvYXJjaC9wb3dlcnBjL2t2bS9wb3dlcnBjLmMKaW5kZXggMzc4ZWQ5Y2Vl
-MWY5Li4wY2UxYTIxOTk4NGUgMTAwNjQ0Ci0tLSBhL2FyY2gvcG93ZXJwYy9rdm0vcG93ZXJwYy5j
-CisrKyBiL2FyY2gvcG93ZXJwYy9rdm0vcG93ZXJwYy5jCkBAIC01Miw4ICs1Miw3IEBAIEVYUE9S
-VF9TWU1CT0xfR1BMKGt2bXBwY19wcl9vcHMpOwogCiBpbnQga3ZtX2FyY2hfdmNwdV9ydW5uYWJs
-ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnYpCiB7Ci0JcmV0dXJuICEhKHYtPmFyY2gucGVuZGluZ19leGNl
-cHRpb25zKSB8fAotCSAgICAgICB2LT5yZXF1ZXN0czsKKwlyZXR1cm4gISEodi0+YXJjaC5wZW5k
-aW5nX2V4Y2VwdGlvbnMpIHx8IGt2bV9yZXF1ZXN0X3BlbmRpbmcodik7CiB9CiAKIGludCBrdm1f
-YXJjaF92Y3B1X3Nob3VsZF9raWNrKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKQEAgLTEwNSw3ICsx
-MDQsNyBAQCBpbnQga3ZtcHBjX3ByZXBhcmVfdG9fZW50ZXIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
-KQogCQkgKi8KIAkJc21wX21iKCk7CiAKLQkJaWYgKHZjcHUtPnJlcXVlc3RzKSB7CisJCWlmIChr
-dm1fcmVxdWVzdF9wZW5kaW5nKHZjcHUpKSB7CiAJCQkvKiBNYWtlIHN1cmUgd2UgcHJvY2VzcyBy
-ZXF1ZXN0cyBwcmVlbXB0YWJsZSAqLwogCQkJbG9jYWxfaXJxX2VuYWJsZSgpOwogCQkJdHJhY2Vf
-a3ZtX2NoZWNrX3JlcXVlc3RzKHZjcHUpOwpkaWZmIC0tZ2l0IGEvYXJjaC9zMzkwL2t2bS9rdm0t
-czM5MC5jIGIvYXJjaC9zMzkwL2t2bS9rdm0tczM5MC5jCmluZGV4IDlhYjg5ZjczNjEyYS4uNjZj
-MzNlYjUzNzA3IDEwMDY0NAotLS0gYS9hcmNoL3MzOTAva3ZtL2t2bS1zMzkwLmMKKysrIGIvYXJj
-aC9zMzkwL2t2bS9rdm0tczM5MC5jCkBAIC0yMzk2LDcgKzIzOTYsNyBAQCBzdGF0aWMgaW50IGt2
-bV9zMzkwX2hhbmRsZV9yZXF1ZXN0cyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiB7CiByZXRyeToK
-IAlrdm1fczM5MF92Y3B1X3JlcXVlc3RfaGFuZGxlZCh2Y3B1KTsKLQlpZiAoIXZjcHUtPnJlcXVl
-c3RzKQorCWlmICgha3ZtX3JlcXVlc3RfcGVuZGluZyh2Y3B1KSkKIAkJcmV0dXJuIDA7CiAJLyoK
-IAkgKiBXZSB1c2UgTU1VX1JFTE9BRCBqdXN0IHRvIHJlLWFybSB0aGUgaXB0ZSBub3RpZmllciBm
-b3IgdGhlCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0veDg2LmMgYi9hcmNoL3g4Ni9rdm0veDg2
-LmMKaW5kZXggMDczMTc1ZTE0MDgzLi45MmU2NDNhZjg0OGUgMTAwNjQ0Ci0tLSBhL2FyY2gveDg2
-L2t2bS94ODYuYworKysgYi9hcmNoL3g4Ni9rdm0veDg2LmMKQEAgLTY3MjAsNyArNjcyMCw3IEBA
-IHN0YXRpYyBpbnQgdmNwdV9lbnRlcl9ndWVzdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAKIAli
-b29sIHJlcV9pbW1lZGlhdGVfZXhpdCA9IGZhbHNlOwogCi0JaWYgKHZjcHUtPnJlcXVlc3RzKSB7
-CisJaWYgKGt2bV9yZXF1ZXN0X3BlbmRpbmcodmNwdSkpIHsKIAkJaWYgKGt2bV9jaGVja19yZXF1
-ZXN0KEtWTV9SRVFfTU1VX1JFTE9BRCwgdmNwdSkpCiAJCQlrdm1fbW11X3VubG9hZCh2Y3B1KTsK
-IAkJaWYgKGt2bV9jaGVja19yZXF1ZXN0KEtWTV9SRVFfTUlHUkFURV9USU1FUiwgdmNwdSkpCkBA
-IC02ODg0LDcgKzY4ODQsNyBAQCBzdGF0aWMgaW50IHZjcHVfZW50ZXJfZ3Vlc3Qoc3RydWN0IGt2
-bV92Y3B1ICp2Y3B1KQogCQkJa3ZtX3g4Nl9vcHMtPnN5bmNfcGlyX3RvX2lycih2Y3B1KTsKIAl9
-CiAKLQlpZiAodmNwdS0+bW9kZSA9PSBFWElUSU5HX0dVRVNUX01PREUgfHwgdmNwdS0+cmVxdWVz
-dHMKKwlpZiAodmNwdS0+bW9kZSA9PSBFWElUSU5HX0dVRVNUX01PREUgfHwga3ZtX3JlcXVlc3Rf
-cGVuZGluZyh2Y3B1KQogCSAgICB8fCBuZWVkX3Jlc2NoZWQoKSB8fCBzaWduYWxfcGVuZGluZyhj
-dXJyZW50KSkgewogCQl2Y3B1LT5tb2RlID0gT1VUU0lERV9HVUVTVF9NT0RFOwogCQlzbXBfd21i
-KCk7CmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmggYi9pbmNsdWRlL2xpbnV4
-L2t2bV9ob3N0LmgKaW5kZXggOTRiMTIxNTRlNjdjLi5iMWY3ZDQwYTRjYTQgMTAwNjQ0Ci0tLSBh
-L2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaAorKysgYi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgK
-QEAgLTExMTEsNiArMTExMSwxMSBAQCBzdGF0aWMgaW5saW5lIHZvaWQga3ZtX21ha2VfcmVxdWVz
-dChpbnQgcmVxLCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJc2V0X2JpdChyZXEgJiBLVk1fUkVR
-VUVTVF9NQVNLLCAmdmNwdS0+cmVxdWVzdHMpOwogfQogCitzdGF0aWMgaW5saW5lIGJvb2wga3Zt
-X3JlcXVlc3RfcGVuZGluZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCit7CisJcmV0dXJuIFJFQURf
-T05DRSh2Y3B1LT5yZXF1ZXN0cyk7Cit9CisKIHN0YXRpYyBpbmxpbmUgYm9vbCBrdm1fdGVzdF9y
-ZXF1ZXN0KGludCByZXEsIHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIHsKIAlyZXR1cm4gdGVzdF9i
-aXQocmVxICYgS1ZNX1JFUVVFU1RfTUFTSywgJnZjcHUtPnJlcXVlc3RzKTsKLS0gCjIuOS4zCgpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFp
-bGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5j
-b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Make sure we don't leave vcpu requests we don't intend to
+handle later set in the request bitmap. If we don't clear
+them, then kvm_request_pending() may return true when we
+don't want it to. Also, make sure we set vcpu->mode at the
+appropriate time (before the last requests check) and with
+the appropriate barriers. See
+Documentation/virtual/kvm/vcpu-requests.rst
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ arch/arm/kvm/arm.c           | 14 ++++++++++++--
+ arch/arm/kvm/handle_exit.c   |  1 +
+ arch/arm/kvm/psci.c          |  1 +
+ arch/arm64/kvm/handle_exit.c |  1 +
+ 4 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 7941699a766d..47f6c7fdca96 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -552,6 +552,7 @@ void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
+ 
++	kvm_clear_request(KVM_REQ_VCPU_EXIT, vcpu);
+ 	vcpu->arch.pause = false;
+ 	swake_up(wq);
+ }
+@@ -653,8 +654,18 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			run->exit_reason = KVM_EXIT_INTR;
+ 		}
+ 
++		/*
++		 * Ensure we set mode to IN_GUEST_MODE after we disable
++		 * interrupts and before the final VCPU requests check.
++		 * See the comment in kvm_vcpu_exiting_guest_mode() and
++		 * Documentation/virtual/kvm/vcpu-requests.rst
++		 */
++		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
++
+ 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
+-			vcpu->arch.power_off || vcpu->arch.pause) {
++		    kvm_request_pending(vcpu) ||
++		    vcpu->arch.power_off || vcpu->arch.pause) {
++			vcpu->mode = OUTSIDE_GUEST_MODE;
+ 			local_irq_enable();
+ 			kvm_pmu_sync_hwstate(vcpu);
+ 			kvm_timer_sync_hwstate(vcpu);
+@@ -670,7 +681,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		 */
+ 		trace_kvm_entry(*vcpu_pc(vcpu));
+ 		guest_enter_irqoff();
+-		vcpu->mode = IN_GUEST_MODE;
+ 
+ 		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
+ 
+diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
+index 5fd7968cdae9..a2b4f7b82356 100644
+--- a/arch/arm/kvm/handle_exit.c
++++ b/arch/arm/kvm/handle_exit.c
+@@ -72,6 +72,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		trace_kvm_wfx(*vcpu_pc(vcpu), false);
+ 		vcpu->stat.wfi_exit_stat++;
+ 		kvm_vcpu_block(vcpu);
++		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 	}
+ 
+ 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
+index a08d7a93aebb..f68be2cc6256 100644
+--- a/arch/arm/kvm/psci.c
++++ b/arch/arm/kvm/psci.c
+@@ -57,6 +57,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+ 	 * for KVM will preserve the register state.
+ 	 */
+ 	kvm_vcpu_block(vcpu);
++	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 
+ 	return PSCI_RET_SUCCESS;
+ }
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index fa1b18e364fc..17d8a1677a0b 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -89,6 +89,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
+ 		vcpu->stat.wfi_exit_stat++;
+ 		kvm_vcpu_block(vcpu);
++		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+ 	}
+ 
+ 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+-- 
+2.9.3
