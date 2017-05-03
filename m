@@ -1,85 +1,86 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 07/31] KVM: arm/arm64: vgic-v3: Add accessors for the
- ICH_APxRn_EL2 registers
-Date: Wed, 3 May 2017 16:58:47 +0100
-Message-ID: <3b9ed468-71ac-786c-b587-27968c3f3af9@arm.com>
-References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <20170503104606.19342-8-marc.zyngier@arm.com>
- <20170503153201.GC4951@leverpostej>
+From: Andrew Jones <drjones@redhat.com>
+Subject: [PATCH v3 00/10] KVM: arm/arm64: race fixes and vcpu requests
+Date: Wed,  3 May 2017 18:06:25 +0200
+Message-ID: <20170503160635.21669-1-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170503153201.GC4951@leverpostej>
-Sender: kvm-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB1C740A66
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 12:03:37 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Hu88i1KgmdVF for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 May 2017 12:03:36 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 69AE240296
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 12:03:35 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: marc.zyngier@arm.com, cdall@linaro.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/05/17 16:32, Mark Rutland wrote:
-> On Wed, May 03, 2017 at 11:45:42AM +0100, Marc Zyngier wrote:
->> As we're about to access the Active Priority registers a lot more,
->> let's define accessors that take the register number as a parameter.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/hyp/vgic-v3-sr.c | 116 ++++++++++++++++++++++++++++++++++++------
->>  1 file changed, 100 insertions(+), 16 deletions(-)
->>
->> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
->> index 32c3295929b0..990d9d1e85d0 100644
->> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
->> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
->> @@ -118,6 +118,90 @@ static void __hyp_text __gic_v3_set_lr(u64 val, int lr)
->>  	}
->>  }
->>  
->> +static void __hyp_text __vgic_v3_write_ap0rn(u32 val, int n)
->> +{
->> +	switch (n) {
->> +	case 0:
->> +		write_gicreg(val, ICH_AP0R0_EL2);
->> +		break;
->> +	case 1:
->> +		write_gicreg(val, ICH_AP0R1_EL2);
->> +		break;
->> +	case 2:
->> +		write_gicreg(val, ICH_AP0R2_EL2);
->> +		break;
->> +	case 3:
->> +		write_gicreg(val, ICH_AP0R3_EL2);
->> +		break;
->> +	}
-> 
-> Is there any way we can get a build or runtime failure for an
-> out-of-bounds n value?
-
-I'd rather avoid runtime failure on this path, because that's pretty
-terminal. Build-time is a possibility, to some extent.
-
-> 
->> +}
-> 
-> Given this is used with a constant n, you could make this:
-> 
-> #define __vgic_v3_write_ap0rn(v, n) \
-> 	write_gicreg(v, ICH_AP0R##n##_EL2)
-> 
-> ... which should also give you a warning for an out-of-bounds n.
-> 
-> Similar could apply for the other helpers here.
-> 
-> That would require some function -> macro conversion in later patches
-> though, so I can understand if you're not keen on that.
-
-I don't mind reworking this if that makes it safer. But the real problem
-is that the register number and the group are not necessarily constants
-(see how this is used in __vgic_v3_get_highest_active_priority).
-
-I'll have a look at how I can make that look a bit better.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+VGhpcyBzZXJpZXMgZml4ZXMgc29tZSBoYXJkIHRvIHByb2R1Y2UgcmFjZXMgYnkgaW50cm9kdWNp
+bmcgdGhlIHVzZSBvZgp2Y3B1IHJlcXVlc3RzLiBJJ3ZlIHRlc3RlZCB0aGUgc2VyaWVzIG9uIGEg
+TXVzdGFuZyBhbmQgYSBUaHVuZGVyWCBhbmQKY29tcGlsZS10ZXN0ZWQgdGhlIEFSTSBiaXRzLgoK
+UGF0Y2ggMi8xMCBhZGRzIGRvY3VtZW50YXRpb24sIGFzLCBhdCBsZWFzdCBmb3IgbWUsIHVuZGVy
+c3RhbmRpbmcgdmNwdQpyZXF1ZXN0IGludGVycGxheSB3aXRoIHZjcHUga2lja3MgYW5kIHZjcHUg
+bW9kZSBhbmQgdGhlIG1lbW9yeSBiYXJyaWVycwp0aGF0IGludGVycGxheSBpbXBsaWVzLCBpcyBl
+eGhhdXN0aW5nLgoKdjM6CiAgLSBUaGUgZWFzaWVyIHRvIHJlcHJvZHVjZSBQU0NJIHJhY2VzIHBy
+ZXZpb3VzbHkgZml4ZWQgd2l0aCB0aGlzCiAgICBzZXJpZXMgd2VyZSBmaXhlZCBpbmRlcGVuZGVu
+dGx5IHdpdGggYSBkaWZmZXJlbnQgYXBwcm9hY2ggc3VnZ2VzdGVkCiAgICBieSBDaHJpc3RvZmZl
+clsxXS4KICAtIEJhc2VkIG9uIFJhZGltJ3MgbGF0ZXN0IHZjcHUgcmVxdWVzdCByZXdvcmsgc2Vy
+aWVzWzJdCiAgLSBSZXdyb3RlIHRoZSBkb2N1bWVudGF0aW9uIGFkZGluZyBtdWNoIG1vcmUgaW5m
+b3JtYXRpb24gYW5kCiAgICBpbmNvcnBvcmF0aW5nIENocmlzdG9mZmVyJ3MgY29tbWVudHMgZnJv
+bSB2Mi4KICAtIFJld29ya2VkIHRoZSBhcHByb2FjaCB0byBjb250cm9sbGluZyBwYXVzZSBhbmQg
+cG93ZXJfb2ZmIGJ5CiAgICByZXF1ZXN0cy4KICAtIENsZWFyIHJlcXVlc3QgZm9yIHBlbmRpbmcg
+aXJxIGluamVjdGlvbiBpbiB0aGUgY29ycmVjdCBwbGFjZSwgYXMKICAgIHBvaW50ZWQgb3V0IGJ5
+IENocmlzdG9mZmVyLgogIC0gUmViYXNlIHJlcXVpcmVkIHNvbWUgc2ltcGxlIGNoYW5nZXMgdG8g
+dGhlIFBNVSBjb2RlIHBhdGNoLgoKdjI6CiAgLSBObyBsb25nZXIgYmFzZWQgb24gUmFkaW0ncyB2
+Y3B1IHJlcXVlc3QgQVBJIHJld29ya1szXSwgZXhjZXB0IGZvcgogICAgaW5jbHVkaW5nICJhZGQg
+a3ZtX3JlcXVlc3RfcGVuZGluZyIgYXMgcGF0Y2ggMS8xMCBbZHJld10KICAtIEFkZGVkIHZjcHUg
+cmVxdWVzdCBkb2N1bWVudGF0aW9uIFtkcmV3XQogIC0gRHJvcHBlZCB0aGUgaW50cm9kdWN0aW9u
+IG9mIHVzZXIgc2V0dGFibGUgTVBJRFJzIFtDaHJpc3RvZmZlcl0KICAtIEFkZGVkIHZjcHUgcmVx
+dWVzdHMgdG8gYWxsIHJlcXVlc3QtbGVzcyB2Y3B1IGtpY2tzIFtDaHJpc3RvZmZlcl0KClsxXSBo
+dHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9hcm0ta2VybmVsL21zZzU3NzYzMC5odG1sClsy
+XSBodHRwOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2t2bS9tc2cxNDg4OTAuaHRtbApbM10gaHR0
+cHM6Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMva3ZtL21zZzE0NTU4OC5odG1sCgoKQW5kcmV3IEpv
+bmVzICg5KToKICBLVk06IEFkZCBkb2N1bWVudGF0aW9uIGZvciBWQ1BVIHJlcXVlc3RzCiAgS1ZN
+OiBhcm0vYXJtNjQ6IHByZXBhcmUgdG8gdXNlIHZjcHUgcmVxdWVzdHMKICBLVk06IGFybS9hcm02
+NDogdXNlIHZjcHUgcmVxdWVzdCBpbiBrdm1fYXJtX2hhbHRfdmNwdQogIEtWTTogYXJtL2FybTY0
+OiBkb24ndCBjbGVhciBleGl0IHJlcXVlc3QgZnJvbSBjYWxsZXIKICBLVk06IGFybS9hcm02NDog
+dXNlIHZjcHUgcmVxdWVzdHMgZm9yIHBvd2VyX29mZgogIEtWTTogYXJtL2FybTY0OiBvcHRpbWl6
+ZSBWQ1BVIFJVTgogIEtWTTogYXJtL2FybTY0OiBjaGFuZ2UgZXhpdCByZXF1ZXN0IHRvIHNsZWVw
+IHJlcXVlc3QKICBLVk06IGFybS9hcm02NDogdXNlIHZjcHUgcmVxdWVzdHMgZm9yIGlycSBpbmpl
+Y3Rpb24KICBLVk06IGFybS9hcm02NDogUE1VOiByZW1vdmUgcmVxdWVzdC1sZXNzIHZjcHUga2lj
+awoKUmFkaW0gS3LEjW3DocWZICgxKToKICBLVk06IGFkZCBrdm1fcmVxdWVzdF9wZW5kaW5nCgog
+RG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS92Y3B1LXJlcXVlc3RzLnJzdCB8IDI2OSArKysrKysr
+KysrKysrKysrKysrKysrKysrKysrCiBhcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAg
+ICAgICAgICAgIHwgICAzICstCiBhcmNoL2FybS9rdm0vYXJtLmMgICAgICAgICAgICAgICAgICAg
+ICAgICAgIHwgIDQ2ICsrKystCiBhcmNoL2FybS9rdm0vaGFuZGxlX2V4aXQuYyAgICAgICAgICAg
+ICAgICAgIHwgICAxICsKIGFyY2gvYXJtL2t2bS9wc2NpLmMgICAgICAgICAgICAgICAgICAgICAg
+ICAgfCAgIDggKy0KIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgICAgICAgICAg
+fCAgIDMgKy0KIGFyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgICAgICAgICAgICAgICAgfCAg
+IDEgKwogYXJjaC9taXBzL2t2bS90cmFwX2VtdWwuYyAgICAgICAgICAgICAgICAgICB8ICAgMiAr
+LQogYXJjaC9wb3dlcnBjL2t2bS9ib29rZS5jICAgICAgICAgICAgICAgICAgICB8ICAgMiArLQog
+YXJjaC9wb3dlcnBjL2t2bS9wb3dlcnBjLmMgICAgICAgICAgICAgICAgICB8ICAgNSArLQogYXJj
+aC9zMzkwL2t2bS9rdm0tczM5MC5jICAgICAgICAgICAgICAgICAgICB8ICAgMiArLQogYXJjaC94
+ODYva3ZtL3g4Ni5jICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgNCArLQogaW5jbHVkZS9s
+aW51eC9rdm1faG9zdC5oICAgICAgICAgICAgICAgICAgICB8ICAgNSArCiB2aXJ0L2t2bS9hcm0v
+YXJjaF90aW1lci5jICAgICAgICAgICAgICAgICAgIHwgICAxICsKIHZpcnQva3ZtL2FybS9wbXUu
+YyAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNDAgKystLS0KIHZpcnQva3ZtL2FybS92Z2lj
+L3ZnaWMuYyAgICAgICAgICAgICAgICAgICAgfCAgIDkgKy0KIDE2IGZpbGVzIGNoYW5nZWQsIDM1
+NyBpbnNlcnRpb25zKCspLCA0NCBkZWxldGlvbnMoLSkKIGNyZWF0ZSBtb2RlIDEwMDY0NCBEb2N1
+bWVudGF0aW9uL3ZpcnR1YWwva3ZtL3ZjcHUtcmVxdWVzdHMucnN0CgotLSAKMi45LjMKCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
+IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
+YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
