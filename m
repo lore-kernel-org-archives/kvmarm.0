@@ -1,152 +1,182 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH 1/2] kvm: Fix mmu_notifier release race
-Date: Wed, 3 May 2017 14:13:01 +0100
-Message-ID: <f732440f-bfad-f2f8-2524-037f03f31c10@arm.com>
-References: <1493028624-29837-1-git-send-email-suzuki.poulose@arm.com>
- <1493028624-29837-2-git-send-email-suzuki.poulose@arm.com>
- <20170425184904.GI5713@potion> <c1232b1d-ad82-794b-1b86-4d0cc0d4cd7f@arm.com>
- <611d0ad2-f907-d41c-cdc1-5977c247b104@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 16/22] KVM: arm64: vgic-its: Add infrastructure for
+ table lookup
+Date: Wed, 3 May 2017 15:40:34 +0200
+Message-ID: <8f162a7d-e629-5828-6230-f0b7b7a6f9db@redhat.com>
+References: <1492164934-988-1-git-send-email-eric.auger@redhat.com>
+ <1492164934-988-17-git-send-email-eric.auger@redhat.com>
+ <20170430193325.GA1670@lvm>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CB0640A74
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 09:10:04 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aaZucNs1Pocb for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 May 2017 09:10:02 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A752840A6A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 09:10:02 -0400 (EDT)
-In-Reply-To: <611d0ad2-f907-d41c-cdc1-5977c247b104@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, Will Deacon <Will.Deacon@arm.com>, linux-kernel@vger.kernel.org, pbonzini@redhat.com, paulmck@linux.vnet.ibm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170430193325.GA1670@lvm>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMjgvMDQvMTcgMTg6MjAsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4gT24gMjYvMDQvMTcg
-MTc6MDMsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4+IE9uIDI1LzA0LzE3IDE5OjQ5LCBSYWRp
-bSBLcsSNbcOhxZkgd3JvdGU6Cj4+PiAyMDE3LTA0LTI0IDExOjEwKzAxMDAsIFN1enVraSBLIFBv
-dWxvc2U6Cj4+Pj4gVGhlIEtWTSB1c2VzIG1tdV9ub3RpZmllciAod2hlcmV2ZXIgYXZhaWxhYmxl
-KSB0byBrZWVwIHRyYWNrCj4+Pj4gb2YgdGhlIGNoYW5nZXMgdG8gdGhlIG1tIG9mIHRoZSBndWVz
-dC4gVGhlIGd1ZXN0IHNoYWRvdyBwYWdlCj4+Pj4gdGFibGVzIGFyZSByZWxlYXNlZCB3aGVuIHRo
-ZSBWTSBleGl0cyB2aWEgbW11X25vdGlmaWVyLT5vcHMucmVsZWFzZSgpLgo+Pj4+IFRoZXJlIGlz
-IGEgcmFyZSBjaGFuY2UgdGhhdCB0aGUgbW11X25vdGlmaWVyLT5yZWxlYXNlIGNvdWxkIGJlCj4+
-Pj4gY2FsbGVkIG1vcmUgdGhhbiBvbmNlIHZpYSB0d28gZGlmZmVyZW50IHBhdGhzLCB3aGljaCBj
-b3VsZCBlbmQKPj4+PiB1cCBpbiB1c2UtYWZ0ZXItZnJlZSBvZiBrdm0gaW5zdGFuY2UgKHN1Y2gg
-YXMgWzBdKS4KPj4+Pgo+Pj4+IGUuZzoKPj4+Pgo+Pj4+IHRocmVhZCBBICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHRocmVhZCBCCj4+Pj4gLS0tLS0tLSAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLS0tLS0tLS0tLS0tLS0KPj4+Pgo+Pj4+ICBn
-ZXRfc2lnbmFsLT4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGt2bV9kZXN0cm95
-X3ZtKCktPgo+Pj4+ICBkb19leGl0LT4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgbW11X25vdGlmaWVyX3VucmVnaXN0ZXItPgo+Pj4+ICBleGl0X21tLT4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAga3ZtX2FyY2hfZmx1c2hfc2hhZG93X2FsbCgp
-LT4KPj4+PiAgZXhpdF9tbWFwLT4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHNwaW5fbG9jaygma3ZtLT5tbXVfbG9jaykKPj4+PiAgbW11X25vdGlmaWVyX3JlbGVhc2UtPiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIC4uLi4KPj4+PiAgIGt2bV9hcmNoX2ZsdXNoX3NoYWRv
-d19hbGwoKS0+ICAgICAgICAgICAgICAgICAgIC4uLi4uCj4+Pj4gICAuLi4gc3Bpbl9sb2NrKCZr
-dm0tPm1tdV9sb2NrKSAgICAgICAgICAgICAgICAgICAuLi4uLgo+Pj4+ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3Bpbl91bmxvY2soJmt2bS0+bW11
-X2xvY2spCj4+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAga3ZtX2FyY2hfZnJlZV9rdm0oKQo+Pj4+ICAgICoqKiB1c2UgYWZ0ZXIgZnJlZSBvZiBrdm0g
-KioqCj4+Pgo+Pj4gSSBkb24ndCB1bmRlcnN0YW5kIHRoaXMgcmFjZSAuLi4KPj4+IGEgcGllY2Ug
-b2YgY29kZSBpbiBtbXVfbm90aWZpZXJfdW5yZWdpc3RlcigpIHNheXM6Cj4+Pgo+Pj4gICAgICAg
-LyoKPj4+ICAgICAgICAqIFdhaXQgZm9yIGFueSBydW5uaW5nIG1ldGhvZCB0byBmaW5pc2gsIG9m
-IGNvdXJzZSBpbmNsdWRpbmcKPj4+ICAgICAgICAqIC0+cmVsZWFzZSBpZiBpdCB3YXMgcnVuIGJ5
-IG1tdV9ub3RpZmllcl9yZWxlYXNlIGluc3RlYWQgb2YgdXMuCj4+PiAgICAgICAgKi8KPj4+ICAg
-ICAgIHN5bmNocm9uaXplX3NyY3UoJnNyY3UpOwo+Pj4KPj4+IGFuZCBjb2RlIGJlZm9yZSB0aGF0
-IHJlbW92ZXMgdGhlIG5vdGlmaWVyIGZyb20gdGhlIGxpc3QsIHNvIGl0IGNhbm5vdCBiZQo+Pj4g
-Y2FsbGVkIGFmdGVyIHdlIHBhc3MgdGhpcyBwb2ludC4gIG1tdV9ub3RpZmllcl9yZWxlYXNlKCkg
-ZG9lcyByb3VnaGx5Cj4+PiB0aGUgc2FtZSBhbmQgZXhwbGFpbnMgaXQgYXM6Cj4+Pgo+Pj4gICAg
-ICAgLyoKPj4+ICAgICAgICAqIHN5bmNocm9uaXplX3NyY3UgaGVyZSBwcmV2ZW50cyBtbXVfbm90
-aWZpZXJfcmVsZWFzZSBmcm9tIHJldHVybmluZyB0bwo+Pj4gICAgICAgICogZXhpdF9tbWFwICh3
-aGljaCB3b3VsZCBwcm9jZWVkIHdpdGggZnJlZWluZyBhbGwgcGFnZXMgaW4gdGhlIG1tKQo+Pj4g
-ICAgICAgICogdW50aWwgdGhlIC0+cmVsZWFzZSBtZXRob2QgcmV0dXJucywgaWYgaXQgd2FzIGlu
-dm9rZWQgYnkKPj4+ICAgICAgICAqIG1tdV9ub3RpZmllcl91bnJlZ2lzdGVyLgo+Pj4gICAgICAg
-ICoKPj4+ICAgICAgICAqIFRoZSBtbXVfbm90aWZpZXJfbW0gY2FuJ3QgZ28gYXdheSBmcm9tIHVu
-ZGVyIHVzIGJlY2F1c2Ugb25lIG1tX2NvdW50Cj4+PiAgICAgICAgKiBpcyBoZWxkIGJ5IGV4aXRf
-bW1hcC4KPj4+ICAgICAgICAqLwo+Pj4gICAgICAgc3luY2hyb25pemVfc3JjdSgmc3JjdSk7Cj4+
-Pgo+Pj4gVGhlIGNhbGwgb2YgbW11X25vdGlmaWVyLT5yZWxlYXNlIGlzIHByb3RlY3RlZCBieSBz
-cmN1IGluIGJvdGggY2FzZXMgYW5kCj4+PiB3aGlsZSBpdCBzZWVtcyBwb3NzaWJsZSB0aGF0IG1t
-dV9ub3RpZmllci0+cmVsZWFzZSB3b3VsZCBiZSBjYWxsZWQKPj4+IHR3aWNlLCBJIGRvbid0IHNl
-ZSBhIGNvbWJpbmF0aW9uIHRoYXQgY291bGQgcmVzdWx0IGluIHVzZS1hZnRlci1mcmVlCj4+PiBm
-cm9tIG1tdV9ub3RpZmllcl9yZWxlYXNlIGFmdGVyIG1tdV9ub3RpZmllcl91bnJlZ2lzdGVyKCkg
-aGFzIHJldHVybmVkLgo+Pgo+PiBUaGFua3MgZm9yIGJyaW5naW5nIGl0IHVwLiBFdmVuIEkgYW0g
-d29uZGVyaW5nIHdoeSB0aGlzIGlzIHRyaWdnZXJlZCAhIChCdXQgaXQKPj4gZG9lcyBnZXQgdHJp
-Z2dlcmVkIGZvciBzdXJlICEhKQo+Pgo+PiBUaGUgb25seSBkaWZmZXJlbmNlIEkgY2FuIHNwb3Qg
-d2l0aCBfdW5yZWdpc3RlciAmIF9yZWxlYXNlIHBhdGhzIGFyZSB0aGUgd2F5Cj4+IHdlIHVzZSBz
-cmNfcmVhZF9sb2NrIGFjcm9zcyB0aGUgZGVsZXRpb24gb2YgdGhlIGVudHJ5IGZyb20gdGhlIGxp
-c3QuCj4+Cj4+IEluIG1tdV9ub3RpZmllcl91bnJlZ2lzdGVyKCkgd2UgZG8gOgo+Pgo+PiAgICAg
-ICAgICAgICAgICAgaWQgPSBzcmN1X3JlYWRfbG9jaygmc3JjdSk7Cj4+ICAgICAgICAgICAgICAg
-ICAvKgo+PiAgICAgICAgICAgICAgICAgICogZXhpdF9tbWFwIHdpbGwgYmxvY2sgaW4gbW11X25v
-dGlmaWVyX3JlbGVhc2UgdG8gZ3VhcmFudGVlCj4+ICAgICAgICAgICAgICAgICAgKiB0aGF0IC0+
-cmVsZWFzZSBpcyBjYWxsZWQgYmVmb3JlIGZyZWVpbmcgdGhlIHBhZ2VzLgo+PiAgICAgICAgICAg
-ICAgICAgICovCj4+ICAgICAgICAgICAgICAgICBpZiAobW4tPm9wcy0+cmVsZWFzZSkKPj4gICAg
-ICAgICAgICAgICAgICAgICAgICAgbW4tPm9wcy0+cmVsZWFzZShtbiwgbW0pOwo+PiAgICAgICAg
-ICAgICAgICAgc3JjdV9yZWFkX3VubG9jaygmc3JjdSwgaWQpOwo+Pgo+PiAjIyBSZWxlYXNlcyB0
-aGUgc3JjdSBsb2NrIGhlcmUgYW5kIHRoZW4gZ29lcyBvbiB0byBncmFiIHRoZSBzcGluX2xvY2su
-Cj4+Cj4+ICAgICAgICAgICAgICAgICBzcGluX2xvY2soJm1tLT5tbXVfbm90aWZpZXJfbW0tPmxv
-Y2spOwo+PiAgICAgICAgICAgICAgICAgLyoKPj4gICAgICAgICAgICAgICAgICAqIENhbiBub3Qg
-dXNlIGxpc3RfZGVsX3JjdSgpIHNpbmNlIF9fbW11X25vdGlmaWVyX3JlbGVhc2UKPj4gICAgICAg
-ICAgICAgICAgICAqIGNhbiBkZWxldGUgaXQgYmVmb3JlIHdlIGhvbGQgdGhlIGxvY2suCj4+ICAg
-ICAgICAgICAgICAgICAgKi8KPj4gICAgICAgICAgICAgICAgIGhsaXN0X2RlbF9pbml0X3JjdSgm
-bW4tPmhsaXN0KTsKPj4gICAgICAgICAgICAgICAgIHNwaW5fdW5sb2NrKCZtbS0+bW11X25vdGlm
-aWVyX21tLT5sb2NrKTsKPj4KPj4gV2hpbGUgaW4gbW11X25vdGlmaWVyX3JlbGVhc2UoKSB3ZSBo
-b2xkIGl0IHVudGlsIHRoZSBub2RlKHMpIGFyZSBkZWxldGVkIGZyb20gdGhlCj4+IGxpc3QgOgo+
-PiAgICAgICAgIC8qCj4+ICAgICAgICAgICogU1JDVSBoZXJlIHdpbGwgYmxvY2sgbW11X25vdGlm
-aWVyX3VucmVnaXN0ZXIgdW50aWwKPj4gICAgICAgICAgKiAtPnJlbGVhc2UgcmV0dXJucy4KPj4g
-ICAgICAgICAgKi8KPj4gICAgICAgICBpZCA9IHNyY3VfcmVhZF9sb2NrKCZzcmN1KTsKPj4gICAg
-ICAgICBobGlzdF9mb3JfZWFjaF9lbnRyeV9yY3UobW4sICZtbS0+bW11X25vdGlmaWVyX21tLT5s
-aXN0LCBobGlzdCkKPj4gICAgICAgICAgICAgICAgIC8qCj4+ICAgICAgICAgICAgICAgICAgKiBJ
-ZiAtPnJlbGVhc2UgcnVucyBiZWZvcmUgbW11X25vdGlmaWVyX3VucmVnaXN0ZXIgaXQgbXVzdCBi
-ZQo+PiAgICAgICAgICAgICAgICAgICogaGFuZGxlZCwgYXMgaXQncyB0aGUgb25seSB3YXkgZm9y
-IHRoZSBkcml2ZXIgdG8gZmx1c2ggYWxsCj4+ICAgICAgICAgICAgICAgICAgKiBleGlzdGluZyBz
-cHRlcyBhbmQgc3RvcCB0aGUgZHJpdmVyIGZyb20gZXN0YWJsaXNoaW5nIGFueSBtb3JlCj4+ICAg
-ICAgICAgICAgICAgICAgKiBzcHRlcyBiZWZvcmUgYWxsIHRoZSBwYWdlcyBpbiB0aGUgbW0gYXJl
-IGZyZWVkLgo+PiAgICAgICAgICAgICAgICAgICovCj4+ICAgICAgICAgICAgICAgICBpZiAobW4t
-Pm9wcy0+cmVsZWFzZSkKPj4gICAgICAgICAgICAgICAgICAgICAgICAgbW4tPm9wcy0+cmVsZWFz
-ZShtbiwgbW0pOwo+Pgo+PiAgICAgICAgIHNwaW5fbG9jaygmbW0tPm1tdV9ub3RpZmllcl9tbS0+
-bG9jayk7Cj4+ICAgICAgICAgd2hpbGUgKHVubGlrZWx5KCFobGlzdF9lbXB0eSgmbW0tPm1tdV9u
-b3RpZmllcl9tbS0+bGlzdCkpKSB7Cj4+ICAgICAgICAgICAgICAgICBtbiA9IGhsaXN0X2VudHJ5
-KG1tLT5tbXVfbm90aWZpZXJfbW0tPmxpc3QuZmlyc3QsCj4+ICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHN0cnVjdCBtbXVfbm90aWZpZXIsCj4+ICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIGhsaXN0KTsKPj4gICAgICAgICAgICAgICAgIC8qCj4+ICAgICAgICAgICAg
-ICAgICAgKiBXZSBhcnJpdmVkIGJlZm9yZSBtbXVfbm90aWZpZXJfdW5yZWdpc3RlciBzbwo+PiAg
-ICAgICAgICAgICAgICAgICogbW11X25vdGlmaWVyX3VucmVnaXN0ZXIgd2lsbCBkbyBub3RoaW5n
-IG90aGVyIHRoYW4gdG8gd2FpdAo+PiAgICAgICAgICAgICAgICAgICogZm9yIC0+cmVsZWFzZSB0
-byBmaW5pc2ggYW5kIGZvciBtbXVfbm90aWZpZXJfdW5yZWdpc3RlciB0bwo+PiAgICAgICAgICAg
-ICAgICAgICogcmV0dXJuLgo+PiAgICAgICAgICAgICAgICAgICovCj4+ICAgICAgICAgICAgICAg
-ICBobGlzdF9kZWxfaW5pdF9yY3UoJm1uLT5obGlzdCk7Cj4+ICAgICAgICAgfQo+PiAgICAgICAg
-IHNwaW5fdW5sb2NrKCZtbS0+bW11X25vdGlmaWVyX21tLT5sb2NrKTsKPj4gICAgICAgICBzcmN1
-X3JlYWRfdW5sb2NrKCZzcmN1LCBpZCk7Cj4+Cj4+ICMjIFRoZSBsb2NrIGlzIHJlbGVhc2Ugb25s
-eSBhZnRlciB0aGUgZGVsZXRpb24gb2YgdGhlIG5vZGUuCj4+Cj4+IEJvdGggYXJlIGZvbGxvd2Vk
-IGJ5IGEgc3luY2hyb25pemVfc3JjdSgpLiBOb3csIEkgYW0gd29uZGVyaW5nIGlmIHRoZSB1bnJl
-Z2lzdGVyIHBhdGgKPj4gY291bGQgcG90ZW50aWFsbHkgbWlzcyBTUkNVIHJlYWQgbG9jayBoZWxk
-IGluIF9yZWxlYXNlKCkgcGF0aCBhbmQgZ28gb250byBmaW5pc2ggdGhlCj4+IHN5bmNocm9uaXpl
-X3NyY3UgYmVmb3JlIHRoZSBpdGVtIGlzIGRlbGV0ZWQgPyBNYXkgYmUgd2Ugc2hvdWxkIGRvIHRo
-ZSByZWFkX3VubG9jawo+PiBhZnRlciB0aGUgZGVsZXRpb24gb2YgdGhlIG5vZGUgaW4gX3VucmVn
-aXN0ZXIgKGxpa2Ugd2UgZG8gaW4gdGhlIF9yZWxlYXNlKCkpID8KPgo+IEkgaGF2ZW4ndCBiZWVu
-IGFibGUgdG8gcmVwcm9kdWNlIHRoZSBtbXVfbm90aWZpZXIgcmFjZSBjb25kaXRpb24sIHdoaWNo
-IGxlYWRzIHRvIEtWTQo+IGZyZWUsIHJlcG9ydGVkIGF0IFsxXS4gSSB3aWxsIGxlYXZlIGl0IHJ1
-bm5pbmcgKHdpdGggdHJhY2Vwb2ludHMvZnRyYWNlKSBvdmVyIHRoZQo+IHdlZWtlbmQuCj4KCkkg
-Y291bGRuJ3QgcmVwcm9kdWNlIHRoZSBwcm9wb3NlZCAibW11X25vdGlmaWVyIHJhY2UiIHJlcG9y
-dGVkIGluIFswXS4KSG93ZXZlciBJIGZvdW5kIHNvbWUgb3RoZXIgdXNlLWFmdGVyLWZyZWUgY2Fz
-ZXMgaW4gdGhlIHVubWFwX3N0YWdlMl9yYW5nZSgpCmNvZGUgZHVlIHRvIHRoZSBpbnRyb2R1Y3Rp
-b24gb2YgY29uZF9yZXNjaGVkX2xvY2soKS4gSXQgbWF5IGJlIGp1c3QgdGhhdCB0aGUKSVAgcmVw
-b3J0ZWQgaW4gWzBdIHdhcyBmb3Igd3JvbmcgbGluZSBvZiBjb2RlID8gaS5lLCBhcmNoX3NwaW5f
-aXNfbG9ja2VkIGluc3RlYWQKb2YgdW5tYXBfc3RhZ2UyX3JhbmdlID8KQW55d2F5cywgSSB3aWxs
-IHNlbmQgYSBuZXcgdmVyc2lvbiBvZiB0aGUgcGF0Y2hlcyBpbiBhIHNlcGFyYXRlIHNlcmllcy4K
-ClswXSBodHRwczovL21hcmMuaW5mby8/bD1saW51eC1rZXJuZWwmbT0xNDkyMDEzOTkwMTg3OTEm
-dz0yCgpTdXp1a2kKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBz
-Oi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Christoffer,
+
+On 30/04/2017 21:33, Christoffer Dall wrote:
+> On Fri, Apr 14, 2017 at 12:15:28PM +0200, Eric Auger wrote:
+>> Add a generic lookup_table() helper whose role consists in
+>> scanning a contiguous table located in guest RAM and applying
+>> a callback on each entry. Entries can be handled as linked lists
+>> since the callback may return an offset to the next entry and
+>> also tell that an entry is the last one.
+>>
+>> Helper functions also are added to compute the device/event ID
+>> offset to the next DTE/ITE.
+>>
+>> compute_next_devid_offset, compute_next_eventid_offset and
+>> lookup_table will become static in subsequent patches
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v4 -> v5:
+>> - use kvm_read_guest
+>>
+>> v3 -> v4:
+>> - remove static to avoid compilation warning
+>> - correct size computation in looup_table()
+>> - defines now encode the number of bits used for devid and eventid offsets
+>> - use BIT() - 1 to encode the max offets
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 93 ++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 93 insertions(+)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 56c5123..c22b35d 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -195,6 +195,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+>>  
+>>  #define VITS_TYPER_IDBITS 16
+>>  #define VITS_TYPER_DEVBITS 16
+>> +#define VITS_DTE_MAX_DEVID_OFFSET	(BIT(14) - 1)
+>> +#define VITS_ITE_MAX_EVENTID_OFFSET	(BIT(16) - 1)
+>>  
+>>  /*
+>>   * Finds and returns a collection in the ITS collection table.
+>> @@ -1674,6 +1676,97 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+>>  	return ret;
+>>  }
+>>  
+>> +u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
+>> +{
+>> +	struct list_head *e = &dev->dev_list;
+>> +	struct its_device *next;
+>> +	u32 next_offset;
+>> +
+>> +	if (e->next == h)
+>> +		return 0;
+>> +	next = list_entry(e->next, struct its_device, dev_list);
+>> +	next_offset = next->device_id - dev->device_id;
+>> +
+>> +	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
+>> +}
+>> +
+>> +u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
+>> +{
+>> +	struct list_head *e = &ite->ite_list;
+>> +	struct its_ite *next;
+>> +	u32 next_offset;
+>> +
+>> +	if (e->next == h)
+>> +		return 0;
+>> +	next = list_entry(e->next, struct its_ite, ite_list);
+>> +	next_offset = next->event_id - ite->event_id;
+>> +
+>> +	return min_t(u32, next_offset, VITS_ITE_MAX_EVENTID_OFFSET);
+>> +}
+>> +
+>> +/**
+>> + * entry_fn_t - Callback called on a table entry restore path
+>> + * @its: its handle
+>> + * @id: id of the entry
+>> + * @entry: pointer to the entry
+>> + * @opaque: pointer to an opaque data
+>> + * @next_offset: minimal ID offset to the next entry. 0 if this
+>> + * entry is the last one, 1 if the entry is invalid, >= 1 if an
+>> + * entry's next_offset field was truly decoded
+>> + *
+>> + * Return: < 0 on error, 0 otherwise
+>> + */
+>> +typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
+>> +			  void *opaque, u32 *next_offset);
+> 
+> Just noticed.  All the table entries are 64-bit long at this point,
+> right?  So why not make entry a u64 * instead?  Could we end up with
+> some endianness mess with using void pointers the way it is now?
+the size of the entry is ABI dependent while this infrastructure is
+generic. In each of such function we use
+
+u64 entry = *(u64 *)addr;
+and we do a le64_to_cpu(entry).
+
+Do you see something wrong? Otherwise I would be tempted to leave as is.
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> -Christoffer
+> 
+>> +
+>> +/**
+>> + * lookup_table - scan a contiguous table in guest RAM and applies a function
+>> + * to each entry
+>> + *
+>> + * @its: its handle
+>> + * @base: base gpa of the table
+>> + * @size: size of the table in bytes
+>> + * @esz: entry size in bytes
+>> + * @start_id: first entry's ID
+>> + * @fn: function to apply on each entry
+>> + *
+>> + * Return: < 0 on error, 1 if last element identified, 0 otherwise
+>> + */
+>> +int lookup_table(struct vgic_its *its, gpa_t base, int size, int esz,
+>> +		 int start_id, entry_fn_t fn, void *opaque)
+>> +{
+>> +	void *entry = kzalloc(esz, GFP_KERNEL);
+>> +	struct kvm *kvm = its->dev->kvm;
+>> +	unsigned long len = size;
+>> +	u32 id = start_id;
+>> +	gpa_t gpa = base;
+>> +	int ret;
+>> +
+>> +	while (len > 0) {
+>> +		u32 next_offset;
+>> +		size_t byte_offset;
+>> +
+>> +		ret = kvm_read_guest(kvm, gpa, entry, esz);
+>> +		if (ret)
+>> +			goto out;
+>> +
+>> +		ret = fn(its, id, entry, opaque, &next_offset);
+>> +		if (ret < 0 || (!ret && !next_offset))
+>> +			goto out;
+>> +
+>> +		byte_offset = next_offset * esz;
+>> +		id += next_offset;
+>> +		gpa += byte_offset;
+>> +		len -= byte_offset;
+>> +	}
+>> +	kfree(entry);
+>> +	return 0;
+>> +
+>> +out:
+>> +	kfree(entry);
+>> +	return (ret < 0 ? ret : 1);
+>> +}
+>> +
+>>  /**
+>>   * vgic_its_save_device_tables - Save the device table and all ITT
+>>   * into guest RAM
+>> -- 
+>> 2.5.5
+>>
