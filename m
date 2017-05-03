@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 28/31] KVM: arm64: vgic-v3: Add ICV_CTLR_EL1 handler
-Date: Wed,  3 May 2017 11:46:03 +0100
-Message-ID: <20170503104606.19342-29-marc.zyngier@arm.com>
+Subject: [PATCH 31/31] KVM: arm64: vgic-v3: Log which GICv3 system registers
+ are trapped
+Date: Wed,  3 May 2017 11:46:06 +0100
+Message-ID: <20170503104606.19342-32-marc.zyngier@arm.com>
 References: <20170503104606.19342-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C4B140C4C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 06:43:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E4DF40D1A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 06:44:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZfHg0Uym55DR for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 May 2017 06:43:55 -0400 (EDT)
+ with ESMTP id dFvjNcBfY9w4 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 May 2017 06:44:01 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 469E840C58
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 06:43:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D959840C4F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 06:43:58 -0400 (EDT)
 In-Reply-To: <20170503104606.19342-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,78 +32,29 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a handler for reading/writing the guest's view of the ICV_CTLR_EL1
-register. only EOIMode and CBPR are of interest here, as all the other
-bits directly come from ICH_VTR_EL2 and are Read-Only.
+In order to facilitate debug, let's log which class of GICv3 system
+registers are trapped.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/hyp/vgic-v3-sr.c | 46 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ virt/kvm/arm/vgic/vgic-v3.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index 3a5f54f445b9..981201bf7a5e 100644
---- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -855,6 +855,46 @@ static void __hyp_text __vgic_v3_read_rpr(struct kvm_vcpu *vcpu,
- 	vcpu_set_reg(vcpu, rt, val);
- }
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 717219ab58a2..9110657b502c 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -407,7 +407,10 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+ #endif
  
-+static void __hyp_text __vgic_v3_read_ctlr(struct kvm_vcpu *vcpu,
-+					   u32 vmcr, int rt)
-+{
-+	u32 vtr, val;
-+
-+	vtr = read_gicreg(ICH_VTR_EL2);
-+	/* PRIbits */
-+	val = ((vtr >> 29) & 7) << ICC_CTLR_EL1_PRI_BITS_SHIFT;
-+	/* IDbits */
-+	val |= ((vtr >> 23) & 7) << ICC_CTLR_EL1_ID_BITS_SHIFT;
-+	/* SEIS */
-+	val |= ((vtr >> 22) & 1) << ICC_CTLR_EL1_SEIS_SHIFT;
-+	/* A3V */
-+	val |= ((vtr >> 21) & 1) << ICC_CTLR_EL1_A3V_SHIFT;
-+	/* EOImode */
-+	val |= ((vmcr & ICH_VMCR_EOIM_MASK) >> ICH_VMCR_EOIM_SHIFT) << ICC_CTLR_EL1_EOImode_SHIFT;
-+	/* CBPR */
-+	val |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
-+
-+	vcpu_set_reg(vcpu, rt, val);
-+}
-+
-+static void __hyp_text __vgic_v3_write_ctlr(struct kvm_vcpu *vcpu,
-+					    u32 vmcr, int rt)
-+{
-+	u32 val = vcpu_get_reg(vcpu, rt);
-+
-+	if (val & ICC_CTLR_EL1_CBPR_MASK)
-+		vmcr |= ICH_VMCR_CBPR_MASK;
-+	else
-+		vmcr &= ~ICH_VMCR_CBPR_MASK;
-+
-+	if (val & ICC_CTLR_EL1_EOImode_MASK)
-+		vmcr |= ICH_VMCR_EOIM_MASK;
-+	else
-+		vmcr &= ~ICH_VMCR_EOIM_MASK;
-+
-+	write_gicreg(vmcr, ICH_VMCR_EL2);
-+}
-+
- int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- {
- 	int rt = kvm_vcpu_sys_get_rt(vcpu);
-@@ -945,6 +985,12 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 	case SYS_ICC_RPR_EL1:
- 		fn = __vgic_v3_read_rpr;
- 		break;
-+	case SYS_ICC_CTLR_EL1:
-+		if (is_read)
-+			fn = __vgic_v3_read_ctlr;
-+		else
-+			fn = __vgic_v3_write_ctlr;
-+		break;
- 	default:
- 		return 0;
+ 	if (group0_trap || group1_trap || common_trap) {
+-		kvm_info("GICv3 sysreg trapping enabled (reduced performance)\n");
++		kvm_info("GICv3 sysreg trapping enabled ([%s%s%s], reduced performance)\n",
++			 group0_trap ? "G0" : "",
++			 group1_trap ? "G1" : "",
++			 common_trap ? "C"  : "");
+ 		static_branch_enable(&vgic_v3_cpuif_trap);
  	}
+ 
 -- 
 2.11.0
