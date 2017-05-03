@@ -1,52 +1,110 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCHv2 0/2] kvm: arm/arm64: Fixes for race conditions
-Date: Wed,  3 May 2017 15:17:50 +0100
-Message-ID: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 1/2] kvm: arm/arm64: Fix race in resetting stage2 PGD
+Date: Wed,  3 May 2017 15:17:51 +0100
+Message-ID: <1493821072-29713-2-git-send-email-suzuki.poulose@arm.com>
+References: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9048B40AF9
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 10:14:58 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0lDDmc4pVLJH for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 May 2017 10:14:57 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 51D6340960
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 May 2017 10:14:56 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: agraf@suse.de, andreyknvl@google.com, marc.zyngier@arm.com, mark.rutland@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, suzuki.poulose@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-These two patches fixes race conditions in the stage2 page table
-handling of the KVM on arm/arm64.
+In kvm_free_stage2_pgd() we check the stage2 PGD before holding
+the lock and proceed to take the lock if it is valid. And we unmap
+the page tables, followed by releasing the lock. We reset the PGD
+only after dropping this lock, which could cause a race condition
+where another thread waiting on or even holding the lock, could
+potentially see that the PGD is still valid and proceed to perform
+a stage2 operation and later encounter a NULL PGD.
 
-Applies on next-20170503.
+[223090.242280] Unable to handle kernel NULL pointer dereference at
+virtual address 00000040
+[223090.262330] PC is at unmap_stage2_range+0x8c/0x428
+[223090.262332] LR is at kvm_unmap_hva_handler+0x2c/0x3c
+[223090.262531] Call trace:
+[223090.262533] [<ffff0000080adb78>] unmap_stage2_range+0x8c/0x428
+[223090.262535] [<ffff0000080adf40>] kvm_unmap_hva_handler+0x2c/0x3c
+[223090.262537] [<ffff0000080ace2c>] handle_hva_to_gpa+0xb0/0x104
+[223090.262539] [<ffff0000080af988>] kvm_unmap_hva+0x5c/0xbc
+[223090.262543] [<ffff0000080a2478>]
+kvm_mmu_notifier_invalidate_page+0x50/0x8c
+[223090.262547] [<ffff0000082274f8>]
+__mmu_notifier_invalidate_page+0x5c/0x84
+[223090.262551] [<ffff00000820b700>] try_to_unmap_one+0x1d0/0x4a0
+[223090.262553] [<ffff00000820c5c8>] rmap_walk+0x1cc/0x2e0
+[223090.262555] [<ffff00000820c90c>] try_to_unmap+0x74/0xa4
+[223090.262557] [<ffff000008230ce4>] migrate_pages+0x31c/0x5ac
+[223090.262561] [<ffff0000081f869c>] compact_zone+0x3fc/0x7ac
+[223090.262563] [<ffff0000081f8ae0>] compact_zone_order+0x94/0xb0
+[223090.262564] [<ffff0000081f91c0>] try_to_compact_pages+0x108/0x290
+[223090.262569] [<ffff0000081d5108>] __alloc_pages_direct_compact+0x70/0x1ac
+[223090.262571] [<ffff0000081d64a0>] __alloc_pages_nodemask+0x434/0x9f4
+[223090.262572] [<ffff0000082256f0>] alloc_pages_vma+0x230/0x254
+[223090.262574] [<ffff000008235e5c>] do_huge_pmd_anonymous_page+0x114/0x538
+[223090.262576] [<ffff000008201bec>] handle_mm_fault+0xd40/0x17a4
+[223090.262577] [<ffff0000081fb324>] __get_user_pages+0x12c/0x36c
+[223090.262578] [<ffff0000081fb804>] get_user_pages_unlocked+0xa4/0x1b8
+[223090.262579] [<ffff0000080a3ce8>] __gfn_to_pfn_memslot+0x280/0x31c
+[223090.262580] [<ffff0000080a3dd0>] gfn_to_pfn_prot+0x4c/0x5c
+[223090.262582] [<ffff0000080af3f8>] kvm_handle_guest_abort+0x240/0x774
+[223090.262584] [<ffff0000080b2bac>] handle_exit+0x11c/0x1ac
+[223090.262586] [<ffff0000080ab99c>] kvm_arch_vcpu_ioctl_run+0x31c/0x648
+[223090.262587] [<ffff0000080a1d78>] kvm_vcpu_ioctl+0x378/0x768
+[223090.262590] [<ffff00000825df5c>] do_vfs_ioctl+0x324/0x5a4
+[223090.262591] [<ffff00000825e26c>] SyS_ioctl+0x90/0xa4
+[223090.262595] [<ffff000008085d84>] el0_svc_naked+0x38/0x3c
 
-Changes since v1:
- http://lists.infradead.org/pipermail/linux-arm-kernel/2017-April/502867.html
- - Dropped patch for fixing mmu_notifier race condition, which couldn't be
-   reproduced.
- - Added reviewed-by from Christoffer
- - Added new patch to fix another race condition
+This patch moves the stage2 PGD manipulation under the lock.
 
-Suzuki K Poulose (2):
-  kvm: arm/arm64: Fix race in resetting stage2 PGD
-  kvm: arm/arm64: Fix use after free of stage2 page table
+Reported-by: Alexander Graf <agraf@suse.de>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ arch/arm/kvm/mmu.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
- arch/arm/kvm/mmu.c | 33 ++++++++++++++++++++-------------
- 1 file changed, 20 insertions(+), 13 deletions(-)
-
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 313ee64..909a1a7 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -829,22 +829,22 @@ void stage2_unmap_vm(struct kvm *kvm)
+  * Walks the level-1 page table pointed to by kvm->arch.pgd and frees all
+  * underlying level-2 and level-3 tables before freeing the actual level-1 table
+  * and setting the struct pointer to NULL.
+- *
+- * Note we don't need locking here as this is only called when the VM is
+- * destroyed, which can only be done once.
+  */
+ void kvm_free_stage2_pgd(struct kvm *kvm)
+ {
+-	if (kvm->arch.pgd == NULL)
+-		return;
++	void *pgd = NULL;
+ 
+ 	spin_lock(&kvm->mmu_lock);
+-	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
++	if (kvm->arch.pgd) {
++		unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
++		pgd = kvm->arch.pgd;
++		kvm->arch.pgd = NULL;
++	}
+ 	spin_unlock(&kvm->mmu_lock);
+ 
+ 	/* Free the HW pgd, one page at a time */
+-	free_pages_exact(kvm->arch.pgd, S2_PGD_SIZE);
+-	kvm->arch.pgd = NULL;
++	if (pgd)
++		free_pages_exact(pgd, S2_PGD_SIZE);
+ }
+ 
+ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
 -- 
 2.7.4
