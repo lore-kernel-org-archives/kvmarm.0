@@ -1,198 +1,189 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v6 24/24] KVM: arm64: vgic-v3: KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
-Date: Thu,  4 May 2017 13:44:44 +0200
-Message-ID: <1493898284-29504-25-git-send-email-eric.auger@redhat.com>
-References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 09/10] KVM: arm/arm64: use vcpu requests for irq
+ injection
+Date: Thu, 4 May 2017 13:47:41 +0200
+Message-ID: <f5fbaba8-911e-7c2f-ba15-eca21b1f751a@redhat.com>
+References: <20170503160635.21669-1-drjones@redhat.com>
+ <20170503160635.21669-10-drjones@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <20170503160635.21669-10-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, bjsprakash.linux@gmail.com
+To: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: cdall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch adds a new attribute to GICV3 KVM device
-KVM_DEV_ARM_VGIC_GRP_CTRL group. This allows userspace to
-flush all GICR pending tables into guest RAM.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
----
-v5 -> v6:
-- fix stored
-- GICR_PEND/PROPBASER_ADDRESS were already introduced
+On 03/05/2017 18:06, Andrew Jones wrote:
+> Don't use request-less VCPU kicks when injecting IRQs, as a VCPU
+> kick meant to trigger the interrupt injection could be sent while
+> the VCPU is outside guest mode, which means no IPI is sent, and
+> after it has called kvm_vgic_flush_hwstate(), meaning it won't see
+> the updated GIC state until its next exit some time later for some
+> other reason.  The receiving VCPU only needs to check this request
+> in VCPU RUN to handle it.  By checking it, if it's pending, a
+> memory barrier will be issued that ensures all state is visible.
+> We still create a vcpu_req_irq_pending() function (which is a nop),
+> though, in order to allow us to use the standard request checking
+> pattern.
 
-v4 -> v5:
-- move pending table save code/ctrl into VGICv3 instead of ITS
-- remove useless gpa_t cast
-- use the same optimization as in its_sync_lpi_pending_table
+I wonder if you aren't just papering over this race:
 
-v3 -> v4:
-- remove the wrong comment about locking
-- pass kvm struct instead of its handle
-- add comment about restore method
-- remove GITR_PENDABASER.PTZ check
-- continue if target_vcpu == NULL
-- new locking strategy
+        /*
+         * If there are no virtual interrupts active or pending for this
+         * VCPU, then there is no work to do and we can bail out without
+         * taking any lock.  There is a potential race with someone injecting
+         * interrupts to the VCPU, but it is a benign race as the VCPU will
+         * either observe the new interrupt before or after doing this check,
+         * and introducing additional synchronization mechanism doesn't change
+         * this.
+         */
+        if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+                return;
 
-v1 -> v2:
-- do not care about the 1st KB which should be zeroed according to
-  the spec.
----
- arch/arm/include/uapi/asm/kvm.h     |  1 +
- arch/arm64/include/uapi/asm/kvm.h   |  1 +
- include/linux/irqchip/arm-gic-v3.h  |  1 +
- virt/kvm/arm/vgic/vgic-kvm-device.c | 20 +++++++++++++++
- virt/kvm/arm/vgic/vgic-v3.c         | 51 +++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h            |  1 +
- 6 files changed, 75 insertions(+)
+        spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
+        vgic_flush_lr_state(vcpu);
+        spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
 
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index 8e6563c..78fe803 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -202,6 +202,7 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
- #define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
- #define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
-+#define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
- 
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 1e35115..8a3758a 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -222,6 +222,7 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
- #define   KVM_DEV_ARM_ITS_SAVE_TABLES           1
- #define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
-+#define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
- 
- /* Device Control API on vcpu fd */
- #define KVM_ARM_VCPU_PMU_V3_CTRL	0
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index e09e5d7..347d26f 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -186,6 +186,7 @@
- #define GICR_PENDBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWaWb)
- 
- #define GICR_PENDBASER_PTZ				BIT_ULL(62)
-+#define GICR_PENDBASER_ADDRESS(x)    ((x) & GENMASK_ULL(51, 16))
- 
- /*
-  * Re-Distributor registers, offsets from SGI_base
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 859bfa8..d48743c 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -580,6 +580,24 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
- 		reg = tmp32;
- 		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
-+		int ret;
-+
-+		switch (attr->attr) {
-+		case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
-+			mutex_lock(&dev->kvm->lock);
-+
-+			if (!lock_all_vcpus(dev->kvm)) {
-+				mutex_unlock(&dev->kvm->lock);
-+				return -EBUSY;
-+			}
-+			ret = vgic_v3_save_pending_tables(dev->kvm);
-+			unlock_all_vcpus(dev->kvm);
-+			mutex_unlock(&dev->kvm->lock);
-+			return ret;
-+		}
-+		break;
-+	}
- 	}
- 	return -ENXIO;
- }
-@@ -658,6 +676,8 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 		switch (attr->attr) {
- 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
- 			return 0;
-+		case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
-+			return 0;
- 		}
- 	}
- 	return -ENXIO;
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 0d753ae..6ff6510 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -296,6 +296,57 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
- 	return 0;
- }
- 
-+/**
-+ * vgic_its_save_pending_tables - Save the pending tables into guest RAM
-+ * kvm lock and all vcpu lock must be held
-+ */
-+int vgic_v3_save_pending_tables(struct kvm *kvm)
-+{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	int last_byte_offset = -1;
-+	struct vgic_irq *irq;
-+	int ret;
-+
-+	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-+		int byte_offset, bit_nr;
-+		struct kvm_vcpu *vcpu;
-+		gpa_t pendbase, ptr;
-+		bool stored;
-+		u8 val;
-+
-+		vcpu = irq->target_vcpu;
-+		if (!vcpu)
-+			continue;
-+
-+		pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+
-+		byte_offset = irq->intid / BITS_PER_BYTE;
-+		bit_nr = irq->intid % BITS_PER_BYTE;
-+		ptr = pendbase + byte_offset;
-+
-+		if (byte_offset != last_byte_offset) {
-+			ret = kvm_read_guest(kvm, ptr, &val, 1);
-+			if (ret)
-+				return ret;
-+			last_byte_offset = byte_offset;
-+		}
-+
-+		stored = val & (1U << bit_nr);
-+		if (stored == irq->pending_latch)
-+			continue;
-+
-+		if (irq->pending_latch)
-+			val |= 1 << bit_nr;
-+		else
-+			val &= ~(1 << bit_nr);
-+
-+		ret = kvm_write_guest(kvm, ptr, &val, 1);
-+		if (ret)
-+			return ret;
-+	}
-+	return 0;
-+}
-+
- /* check for overlapping regions and for regions crossing the end of memory */
- static bool vgic_v3_check_base(struct kvm *kvm)
- {
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 92a8ca0..8de59a4 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -181,6 +181,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu);
- int vgic_v3_probe(const struct gic_kvm_info *info);
- int vgic_v3_map_resources(struct kvm *kvm);
- int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
-+int vgic_v3_save_pending_tables(struct kvm *kvm);
- int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
- 
- int vgic_register_its_iodevs(struct kvm *kvm);
--- 
-2.5.5
+not being so "benign" after all. :)  Maybe you can remove the if (list_empty()),
+and have kvm_arch_vcpu_ioctl_run do this instead:
+
+ 		if (kvm_request_pending(vcpu)) {
+ 			if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+ 				vcpu_req_sleep(vcpu);
+		}
+
+                preempt_disable();
+
+                kvm_pmu_flush_hwstate(vcpu);
+                kvm_timer_flush_hwstate(vcpu);
+
+		if (kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu))
+			kvm_vgic_flush_hwstate(vcpu);
+
+?
+
+Paolo
+
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h   |  1 +
+>  arch/arm/kvm/arm.c                | 12 ++++++++++++
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  virt/kvm/arm/arch_timer.c         |  1 +
+>  virt/kvm/arm/vgic/vgic.c          |  9 +++++++--
+>  5 files changed, 22 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 41669578b3df..7bf90aaf2e87 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -47,6 +47,7 @@
+>  
+>  #define KVM_REQ_SLEEP \
+>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_NO_WAKEUP | KVM_REQUEST_WAIT)
+> +#define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+>  
+>  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+>  int __attribute_const__ kvm_target_cpu(void);
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index d62e99885434..330064475914 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -581,6 +581,15 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+>  				       (!vcpu->arch.pause)));
+>  }
+>  
+> +static void vcpu_req_irq_pending(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * Nothing to do here. kvm_check_request() already issued a memory
+> +	 * barrier that pairs with kvm_make_request(), so all hardware state
+> +	 * we need to flush should now be visible.
+> +	 */
+> +}
+> +
+>  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+>  {
+>  	return vcpu->arch.target >= 0;
+> @@ -634,6 +643,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		if (kvm_request_pending(vcpu)) {
+>  			if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+>  				vcpu_req_sleep(vcpu);
+> +			if (kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu))
+> +				vcpu_req_irq_pending(vcpu);
+>  		}
+>  
+>  		/*
+> @@ -777,6 +788,7 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
+>  	 * trigger a world-switch round on the running physical CPU to set the
+>  	 * virtual IRQ/FIQ fields in the HCR appropriately.
+>  	 */
+> +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+>  	kvm_vcpu_kick(vcpu);
+>  
+>  	return 0;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 04c0f9d37386..2c33fef945fe 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -44,6 +44,7 @@
+>  
+>  #define KVM_REQ_SLEEP \
+>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_NO_WAKEUP | KVM_REQUEST_WAIT)
+> +#define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+>  
+>  int __attribute_const__ kvm_target_cpu(void);
+>  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 5976609ef27c..469b43315c0a 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -95,6 +95,7 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+>  	 * If the vcpu is blocked we want to wake it up so that it will see
+>  	 * the timer has expired when entering the guest.
+>  	 */
+> +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+>  	kvm_vcpu_kick(vcpu);
+>  }
+>  
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index 3d0979c30721..bdd4b3a953b5 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -283,8 +283,10 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
+>  		 * won't see this one until it exits for some other
+>  		 * reason.
+>  		 */
+> -		if (vcpu)
+> +		if (vcpu) {
+> +			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+>  			kvm_vcpu_kick(vcpu);
+> +		}
+>  		return false;
+>  	}
+>  
+> @@ -330,6 +332,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
+>  	spin_unlock(&irq->irq_lock);
+>  	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+>  
+> +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+>  	kvm_vcpu_kick(vcpu);
+>  
+>  	return true;
+> @@ -719,8 +722,10 @@ void vgic_kick_vcpus(struct kvm *kvm)
+>  	 * a good kick...
+>  	 */
+>  	kvm_for_each_vcpu(c, vcpu, kvm) {
+> -		if (kvm_vgic_vcpu_pending_irq(vcpu))
+> +		if (kvm_vgic_vcpu_pending_irq(vcpu)) {
+> +			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+>  			kvm_vcpu_kick(vcpu);
+> +		}
+>  	}
+>  }
+>  
+> 
