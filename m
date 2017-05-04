@@ -1,78 +1,112 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v6 02/24] KVM: arm/arm64: Add GICV3 pending table save
- API documentation
-Date: Thu, 4 May 2017 15:24:26 +0200
-Message-ID: <20170504132426.GO5923@cbox>
-References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
- <1493898284-29504-3-git-send-email-eric.auger@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v3 02/10] KVM: Add documentation for VCPU requests
+Date: Thu, 4 May 2017 15:31:21 +0200
+Message-ID: <20170504133121.tv2xdmorcmv23d4x@kamzik.brq.redhat.com>
+References: <20170503160635.21669-1-drjones@redhat.com>
+ <20170503160635.21669-3-drjones@redhat.com>
+ <a6f81568-57dc-931e-c7b1-36b0f6ac38d6@redhat.com>
+ <20170504120618.fa6xpr7uibfkaw6e@kamzik.brq.redhat.com>
+ <897c798f-24ab-96d6-e013-dc1a34c307b1@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E8F6240A86
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 09:21:24 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Irgbui-1c4U5 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 May 2017 09:21:23 -0400 (EDT)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0247F40A69
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 09:21:22 -0400 (EDT)
-Received: by mail-wm0-f41.google.com with SMTP id 142so11115094wma.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 May 2017 06:24:29 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1493898284-29504-3-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, bjsprakash.linux@gmail.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+In-Reply-To: <897c798f-24ab-96d6-e013-dc1a34c307b1@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, cdall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 04, 2017 at 01:44:22PM +0200, Eric Auger wrote:
-> Add description for how to save GICV3 LPI pending bit into
-> guest RAM pending tables.
+On Thu, May 04, 2017 at 02:51:39PM +0200, Paolo Bonzini wrote:
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
+> On 04/05/2017 14:06, Andrew Jones wrote:
+> >>> +VCPU threads may need to consider requests before and/or after calling
+> >>> +functions that may put them to sleep, e.g. kvm_vcpu_block().  Whether they
+> >>> +do or not, and, if they do, which requests need consideration, is
+> >>> +architecture dependent.  kvm_vcpu_block() calls kvm_arch_vcpu_runnable()
+> >>> +to check if it should awaken.  One reason to do so is to provide
+> >>> +architectures a function where requests may be checked if necessary.
+> >> What did you have in mind here?
+> > I was trying to point out vcpu request concerns with respect to sleeping
+> > vcpus, but to stay as general as possible. I can't really think of
+> > anything else to say here, other than to give some hypothetical example.
+> > For a while I was thinking I might check requests (kvm_request_pending())
+> > from the kvm_arch_vcpu_runnable() call for ARM, but then changed my mind
+> > on that - leaving it only checking the pause and power_off booleans.
+> > Anyway, I don't think the above paragraph is "wrong", but if it's
+> > confusing then I can change / remove it as people like. Just let me know
+> > how you'd like it changed :-)
+> 
+> I think the x86 scheme, where you only process requests once you have
+> decided you'll get IN_GUEST_MODE, is a good one.
+> 
+> That is, they _may_ check some requests in kvm_arch_vcpu_runnable but
+> not process them.
 
-Acked-by: Christoffer Dall <cdall@linaro.org>
+This was my thought too, but checking that there are pending requests
+seems like a valid reason to unblock - although only for certain requests.
 
-> ---
-> v5: creation
-> ---
->  Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 6 ++++++
->  1 file changed, 6 insertions(+)
 > 
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> index c1a2461..9293b45 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> @@ -167,11 +167,17 @@ Groups:
->      KVM_DEV_ARM_VGIC_CTRL_INIT
->        request the initialization of the VGIC, no additional parameter in
->        kvm_device_attr.addr.
-> +    KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
-> +      save all LPI pending bits into guest RAM pending tables.
-> +
-> +      The first kB of the pending table is not altered by this operation.
->    Errors:
->      -ENXIO: VGIC not properly configured as required prior to calling
->       this attribute
->      -ENODEV: no online VCPU
->      -ENOMEM: memory shortage when allocating vgic internal data
-> +    -EFAULT: Invalid guest ram access
-> +    -EBUSY:  One or more VCPUS are running
->  
->  
->    KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
-> -- 
-> 2.5.5
+> For ARM this would be:
 > 
+>                 if (vcpu->arch.power_off || vcpu->arch.pause) {
+>                         vcpu_sleep(vcpu);
+> 			ret = 0;
+> 		} else {
+> 			ret = vcpu_enter_guest(vcpu);
+> 		}
+> 
+> where vcpu_enter_guest is basically the "while (ret > 0)" loop in
+> kvm_arch_vcpu_ioctl_run:
+
+I'm not sure this refactoring is necessary, but I can experiment
+with it.
+
+> 
+> 
+>                 /*
+>                  * Check conditions before entering the guest
+>                  */
+>                 cond_resched();
+> 
+>                 update_vttbr(vcpu->kvm);
+>                 preempt_disable();
+> 		...
+>                 if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
+>                         vcpu->arch.power_off || vcpu->arch.pause) {
+
+This needs to check kvm_requests_pending(), like patch 3/10 adds.
+
+>                         local_irq_enable();
+>                         kvm_pmu_sync_hwstate(vcpu);
+>                         kvm_timer_sync_hwstate(vcpu);
+>                         kvm_vgic_sync_hwstate(vcpu);
+>                         preempt_enable();
+>                         return ret;
+>                 }
+> 		...
+>                 preempt_enable();
+>                 return handle_exit(vcpu, run, ret);
+> 
+> In your case, you don't need to check any request in
+> kvm_arch_vcpu_runnable, I think.
+
+Right. That was might final determination as well, so I don't check
+any requests there with this series. I still tried writing this paragraph
+to capture the general idea though, as I still think it's a valid idea to
+want to check for certain pending requests in kvm_arch_vcpu_runnable(),
+in order to know if a wakeup is necessary.
+
+> This split would also solve my review
+> doubt from "Re: [PATCH v3 05/10] KVM: arm/arm64: don't clear exit
+
+I haven't received your doubt yet. Problem with mail delivery? Or did
+you forget to send it :-)
+
+> request from caller".
+> 
+> Paolo
+
+Thanks,
+drew
