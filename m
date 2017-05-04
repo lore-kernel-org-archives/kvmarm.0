@@ -1,23 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v6 20/24] KVM: arm64: vgic-its: vgic_its_check_id returns the
- entry's GPA
-Date: Thu,  4 May 2017 13:44:40 +0200
-Message-ID: <1493898284-29504-21-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v6 22/24] KVM: arm64: vgic-its: ITT save and restore
+Date: Thu,  4 May 2017 13:44:42 +0200
+Message-ID: <1493898284-29504-23-git-send-email-eric.auger@redhat.com>
 References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 521B14095A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 07:43:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C49540BBB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 07:44:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DTHhgpYWkJBP for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 May 2017 07:43:55 -0400 (EDT)
+ with ESMTP id l1iMl8aRfuLE for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 May 2017 07:44:03 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6BC340190
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 07:43:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6098240C4C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 07:44:03 -0400 (EDT)
 In-Reply-To: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,74 +31,196 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, bjsprakash.linux@gmail.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As vgic_its_check_id() computes the device/collection entry's
-GPA, let's return it so that new callers can retrieve it easily.
+Implement routines to save and restore device ITT and their
+interrupt table entries (ITE).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Acked-by: Christoffer Dall <cdall@linaro.org>
 
 ---
 v5 -> v6:
-- add Christoffer's A-b
+- accomodate vgic_its_alloc_ite change of proto
+- check LPI ID on restore, check eventid offset
+- initializations on separate line
+- coming after device save/restore
+- add_lpi does config and pending bit sync
+
+v4 -> v5:
+- ITE are now sorted by eventid on the flush
+- rename *flush* into *save*
+- use macros for shits and masks
+- pass ite_esz to vgic_its_save_ite
 
 v3 -> v4:
-- check eaddr is not NULL to allow passing NULL eaddr parameter
-  to vgic_its_check_id
+- lookup_table and compute_next_eventid_offset become static in this
+  patch
+- remove static along with vgic_its_flush/restore_itt to avoid
+  compilation warnings
+- next field only computed with a shift (mask removed)
+- handle the case where the last element has not been found
 
-v2: new
+v2 -> v3:
+- add return 0 in vgic_its_restore_ite (was in subsequent patch)
+
+v2: creation
 ---
- virt/kvm/arm/vgic/vgic-its.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 116 +++++++++++++++++++++++++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic.h     |   4 ++
+ 2 files changed, 117 insertions(+), 3 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 6bef9147..a3ed52a 100644
+index c5b388d..376d963 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -668,7 +668,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
-  * is actually valid (covered by a memslot and guest accessible).
-  * For this we have to read the respective first level entry.
-  */
--static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
-+static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
-+			      gpa_t *eaddr)
- {
- 	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
-@@ -699,6 +700,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
- 		addr = BASER_ADDRESS(baser) + id * esz;
- 		gfn = addr >> PAGE_SHIFT;
- 
-+		if (eaddr)
-+			*eaddr = addr;
- 		return kvm_is_visible_gfn(its->dev->kvm, gfn);
- 	}
- 
-@@ -731,6 +734,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
- 	indirect_ptr += index * esz;
- 	gfn = indirect_ptr >> PAGE_SHIFT;
- 
-+	if (eaddr)
-+		*eaddr = indirect_ptr;
- 	return kvm_is_visible_gfn(its->dev->kvm, gfn);
+@@ -1716,7 +1716,7 @@ static u32 compute_next_devid_offset(struct list_head *h,
+ 	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
  }
  
-@@ -740,7 +745,7 @@ static int vgic_its_alloc_collection(struct vgic_its *its,
+-u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
++static u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
  {
- 	struct its_collection *collection;
+ 	struct its_ite *next;
+ 	u32 next_offset;
+@@ -1793,14 +1793,124 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
+ 	return ret;
+ }
  
--	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id))
-+	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
- 		return E_ITS_MAPC_COLLECTION_OOR;
++/**
++ * vgic_its_save_ite - Save an interrupt translation entry at @gpa
++ */
++static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
++			      struct its_ite *ite, gpa_t gpa, int ite_esz)
++{
++	struct kvm *kvm = its->dev->kvm;
++	u32 next_offset;
++	u64 val;
++
++	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
++	val = ((u64)next_offset << KVM_ITS_ITE_NEXT_SHIFT) |
++	       ((u64)ite->lpi << KVM_ITS_ITE_PINTID_SHIFT) |
++		ite->collection->collection_id;
++	val = cpu_to_le64(val);
++	return kvm_write_guest(kvm, gpa, &val, ite_esz);
++}
++
++/**
++ * vgic_its_restore_ite - restore an interrupt translation entry
++ * @event_id: id used for indexing
++ * @ptr: pointer to the ITE entry
++ * @opaque: pointer to the its_device
++ */
++static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
++				void *ptr, void *opaque)
++{
++	struct its_device *dev = (struct its_device *)opaque;
++	struct its_collection *collection;
++	struct kvm *kvm = its->dev->kvm;
++	struct kvm_vcpu *vcpu = NULL;
++	u64 val;
++	u64 *p = (u64 *)ptr;
++	struct vgic_irq *irq;
++	u32 coll_id, lpi_id;
++	struct its_ite *ite;
++	u32 offset;
++
++	val = *p;
++
++	val = le64_to_cpu(val);
++
++	coll_id = val & KVM_ITS_ITE_ICID_MASK;
++	lpi_id = (val & KVM_ITS_ITE_PINTID_MASK) >> KVM_ITS_ITE_PINTID_SHIFT;
++
++	if (!lpi_id)
++		return 1; /* invalid entry, no choice but to scan next entry */
++
++	if (lpi_id < VGIC_MIN_LPI)
++		return -EINVAL;
++
++	offset = val >> KVM_ITS_ITE_NEXT_SHIFT;
++	if (event_id + offset >= BIT_ULL(dev->num_eventid_bits))
++		return -EINVAL;
++
++	collection = find_collection(its, coll_id);
++	if (!collection)
++		return -EINVAL;
++
++	ite = vgic_its_alloc_ite(dev, collection, lpi_id, event_id);
++	if (IS_ERR(ite))
++		return PTR_ERR(ite);
++
++	if (its_is_collection_mapped(collection))
++		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
++
++	irq = vgic_add_lpi(kvm, lpi_id, vcpu);
++	if (IS_ERR(irq))
++		return PTR_ERR(irq);
++	ite->irq = irq;
++
++	return offset;
++}
++
++static int vgic_its_ite_cmp(void *priv, struct list_head *a,
++			    struct list_head *b)
++{
++	struct its_ite *itea = container_of(a, struct its_ite, ite_list);
++	struct its_ite *iteb = container_of(b, struct its_ite, ite_list);
++
++	if (itea->event_id < iteb->event_id)
++		return -1;
++	else
++		return 1;
++}
++
+ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+ {
+-	return -ENXIO;
++	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
++	gpa_t base = device->itt_addr;
++	struct its_ite *ite;
++	int ret;
++	int ite_esz = abi->ite_esz;
++
++	list_sort(NULL, &device->itt_head, vgic_its_ite_cmp);
++
++	list_for_each_entry(ite, &device->itt_head, ite_list) {
++		gpa_t gpa = base + ite->event_id * ite_esz;
++
++		ret = vgic_its_save_ite(its, device, ite, gpa, ite_esz);
++		if (ret)
++			return ret;
++	}
++	return 0;
+ }
  
- 	collection = kzalloc(sizeof(*collection), GFP_KERNEL);
-@@ -913,7 +918,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
- 	struct its_device *device;
+ static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
+ {
+-	return -ENXIO;
++	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
++	gpa_t base = dev->itt_addr;
++	int ret;
++	int ite_esz = abi->ite_esz;
++	size_t max_size = BIT_ULL(dev->num_eventid_bits) * ite_esz;
++
++	ret = scan_its_table(its, base, max_size, ite_esz, 0,
++			     vgic_its_restore_ite, dev);
++
++	return ret;
+ }
  
--	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
-+	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
- 		return E_ITS_MAPD_DEVICE_OOR;
- 
- 	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
+ /**
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index e896114..92a8ca0 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -81,6 +81,10 @@
+ #define KVM_ITS_CTE_VALID_MASK		BIT_ULL(63)
+ #define KVM_ITS_CTE_RDBASE_SHIFT	16
+ #define KVM_ITS_CTE_ICID_MASK		GENMASK_ULL(15, 0)
++#define KVM_ITS_ITE_NEXT_SHIFT		48
++#define KVM_ITS_ITE_PINTID_SHIFT	16
++#define KVM_ITS_ITE_PINTID_MASK		GENMASK_ULL(47, 16)
++#define KVM_ITS_ITE_ICID_MASK		GENMASK_ULL(15, 0)
+ #define KVM_ITS_DTE_VALID_SHIFT		63
+ #define KVM_ITS_DTE_VALID_MASK		BIT_ULL(63)
+ #define KVM_ITS_DTE_NEXT_SHIFT		49
 -- 
 2.5.5
