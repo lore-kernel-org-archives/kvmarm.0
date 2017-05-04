@@ -1,170 +1,157 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v6 07/24] KVM: arm64: vgic-its: Implement
- vgic_its_has_attr_regs and attr_regs_access
-Date: Thu, 4 May 2017 18:48:51 +0200
-Message-ID: <20170504164851.GQ5923@cbox>
-References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
- <1493898284-29504-8-git-send-email-eric.auger@redhat.com>
+From: gengdongjiu <gengdj.1984@gmail.com>
+Subject: Re: [PATCH v3 3/3] arm/arm64: signal SIBGUS and inject SEA Error
+Date: Fri, 5 May 2017 00:52:30 +0800
+Message-ID: <CAMj-D2BGTDKpOcMu2ip41_MTTj8VDwvs59Ds7yvLHcD8PeQzhg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1493898284-29504-8-git-send-email-eric.auger@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, bjsprakash.linux@gmail.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 371C440905
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 12:49:25 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Q02S8Or95aCb for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 May 2017 12:49:25 -0400 (EDT)
+Received: from mail-yb0-f196.google.com (mail-yb0-f196.google.com
+ [209.85.213.196])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0F0A040190
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 12:49:24 -0400 (EDT)
+Received: by mail-yb0-f196.google.com with SMTP id d72so733656ybh.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 May 2017 09:52:31 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Tyler Baicar <tbaicar@codeaurora.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, Len Brown <lenb@kernel.org>, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, Sandeepa Prabhu <sandeepa.s.prabhu@gmail.com>, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, Fu Wei <fu.wei@linaro.org>, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kerne
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 04, 2017 at 01:44:27PM +0200, Eric Auger wrote:
-> This patch implements vgic_its_has_attr_regs and vgic_its_attr_regs_access
-> upon the MMIO framework. VGIC ITS KVM device KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-> group becomes functional.
-> 
-> At least GITS_CREADR and GITS_IIDR require to differentiate a guest write
-> action from a user access. As such let's introduce a new uaccess_its_write
-> vgic_register_region callback.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> v6 -> v6:
-> - fix GITS_PIDR/CIDR accesses
-> - remove vgic_data_mmio_bus_to_host/vgic_data_host_to_mmio_bus
-> - 64b full reg access comment rewording
-> - vgic_its_attr_regs_access declaration block rework including
->   removal of iodev
-> 
-> v4 -> v5:
-> - use GITS_TYPER instead of offset 0x8
-> - uaccess_its_write now can return an error
-> 
-> v3 -> v4:
-> - remove changes to the REGISTER_ITS_DESC macro. This will be handled in
->   subsequent patch with the introduction of a new REGISTER_ITS_DESC_UACCESS
->   macro
-> - fix IIDR access and add a comment wrt full length access
-> - handle endianness
-> - add kvm lock and vcpus lock
-> ---
->  virt/kvm/arm/vgic/vgic-its.c  | 70 +++++++++++++++++++++++++++++++++++++++++--
->  virt/kvm/arm/vgic/vgic-mmio.h |  9 ++++--
->  2 files changed, 75 insertions(+), 4 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index f687e91..222fad5 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1469,14 +1469,80 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->  int vgic_its_has_attr_regs(struct kvm_device *dev,
->  			   struct kvm_device_attr *attr)
->  {
-> -	return -ENXIO;
-> +	const struct vgic_register_region *region;
-> +	gpa_t offset = attr->attr;
-> +
-> +	region = vgic_find_mmio_region(its_registers,
-> +				       ARRAY_SIZE(its_registers),
-> +				       offset);
-> +	if (!region)
-> +		return -ENXIO;
-> +
-> +	return 0;
->  }
->  
->  int vgic_its_attr_regs_access(struct kvm_device *dev,
->  			      struct kvm_device_attr *attr,
->  			      u64 *reg, bool is_write)
->  {
-> -	return -ENXIO;
-> +	const struct vgic_register_region *region;
-> +	struct vgic_its *its;
-> +	gpa_t addr, offset;
-> +	unsigned int len;
-> +	int align, ret = 0;
-> +
-> +	its = dev->private;
-> +	offset = attr->attr;
-> +
-> +	/*
-> +	 * Although the spec supports upper/lower 32-bit accesses to
-> +	 * 64-bit ITS registers, the userspace ABI requires 64-bit
-> +	 * accesses to all 64-bit wide registers. We therefore only
-> +	 * support 32-bit accesses to GITS_CTLR, GITS_IIDR and GITS ID
-> +	 * registers
-> +	 */
-> +	align = (offset < GITS_TYPER) || (offset >= GITS_PIDR4) ? 0x3 : 0x7;
-
-nit: this should be written out instead of using the ternary
-conditional.
-
-> +
-> +	if (offset & align)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&dev->kvm->lock);
-> +
-> +	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base)) {
-> +		ret = -ENXIO;
-> +		goto out;
-> +	}
-> +
-> +	region = vgic_find_mmio_region(its_registers,
-> +				       ARRAY_SIZE(its_registers),
-> +				       offset);
-> +	if (!region) {
-> +		ret = -ENXIO;
-> +		goto out;
-> +	}
-> +
-> +	if (!lock_all_vcpus(dev->kvm)) {
-> +		ret = -EBUSY;
-> +		goto out;
-> +	}
-> +
-> +	addr = its->vgic_its_base + offset;
-> +
-> +	len = region->access_flags & VGIC_ACCESS_64bit ? 8 : 4;
-> +
-> +	if (is_write) {
-> +		if (region->uaccess_its_write)
-> +			ret = region->uaccess_its_write(dev->kvm, its, addr,
-> +							len, *reg);
-> +		else
-> +			region->its_write(dev->kvm, its, addr, len, *reg);
-> +	} else {
-> +		*reg = region->its_read(dev->kvm, its, addr, len);
-> +	}
-> +	unlock_all_vcpus(dev->kvm);
-> +out:
-> +	mutex_unlock(&dev->kvm->lock);
-> +	return ret;
->  }
->  
->  static int vgic_its_has_attr(struct kvm_device *dev,
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-> index 6eec91b..ea4171a 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.h
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
-> @@ -36,8 +36,13 @@ struct vgic_register_region {
->  	};
->  	unsigned long (*uaccess_read)(struct kvm_vcpu *vcpu, gpa_t addr,
->  				      unsigned int len);
-> -	void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
-> -			      unsigned int len, unsigned long val);
-> +	union {
-> +		void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
-> +				      unsigned int len, unsigned long val);
-> +		int (*uaccess_its_write)(struct kvm *kvm, struct vgic_its *its,
-> +					 gpa_t addr, unsigned int len,
-> +					 unsigned long val);
-> +	};
->  };
->  
->  extern struct kvm_io_device_ops kvm_io_gic_ops;
-> -- 
-> 2.5.5
-> 
-
-Otherwise:
-
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
+RGVhciBKYW1lcywKICAgVGhhbmtzIGEgbG90IGZvciB5b3VyIHJldmlldyBhbmQgY29tbWVudHMu
+IEkgYW0gdmVyeSBzb3JyeSBmb3IgdGhlCmxhdGUgcmVzcG9uc2UuCgoKMjAxNy0wNS0wNCAyMzo0
+MiBHTVQrMDg6MDAgZ2VuZ2RvbmdqaXUgPGdlbmdkai4xOTg0QGdtYWlsLmNvbT46Cj4gIEhpIERv
+bmdqaXUgR2VuZywKPgo+IE9uIDMwLzA0LzE3IDA2OjM3LCBEb25naml1IEdlbmcgd3JvdGU6Cj4+
+IHdoZW4gaGFwcGVuIFNFQSwgZGVsaXZlciBzaWduYWwgYnVzIGFuZCBoYW5kbGUgdGhlIGlvY3Rs
+IHRoYXQKPj4gaW5qZWN0IFNFQSBhYm9ydCB0byBndWVzdCwgc28gdGhhdCBndWVzdCBjYW4gaGFu
+ZGxlIHRoZSBTRUEgZXJyb3IuCj4KPj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2t2bS9tbXUuYyBi
+L2FyY2gvYXJtL2t2bS9tbXUuYwo+PiBpbmRleCAxMDViNmFiLi5hOTY1OTRmIDEwMDY0NAo+PiAt
+LS0gYS9hcmNoL2FybS9rdm0vbW11LmMKPj4gKysrIGIvYXJjaC9hcm0va3ZtL21tdS5jCj4+IEBA
+IC0yMCw4ICsyMCwxMCBAQAo+PiBAQCAtMTIzOCw2ICsxMjQwLDM2IEBAIHN0YXRpYyB2b2lkIGNv
+aGVyZW50X2NhY2hlX2d1ZXN0X3BhZ2Uoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBrdm1fcGZuX3Qg
+cGZuLAo+PiAgIF9fY29oZXJlbnRfY2FjaGVfZ3Vlc3RfcGFnZSh2Y3B1LCBwZm4sIHNpemUpOwo+
+PiAgfQo+Pgo+PiArc3RhdGljIHZvaWQga3ZtX3NlbmRfc2lnbmFsKHVuc2lnbmVkIGxvbmcgYWRk
+cmVzcywgYm9vbCBodWdldGxiLCBib29sIGh3cG9pc29uKQo+PiArewo+PiArIHNpZ2luZm9fdCBp
+bmZvOwo+PiArCj4+ICsgaW5mby5zaV9zaWdubyAgID0gU0lHQlVTOwo+PiArIGluZm8uc2lfZXJy
+bm8gICA9IDA7Cj4+ICsgaWYgKGh3cG9pc29uKQo+PiArIGluZm8uc2lfY29kZSAgICA9IEJVU19N
+Q0VFUlJfQVI7Cj4+ICsgZWxzZQo+PiArIGluZm8uc2lfY29kZSAgICA9IDA7Cj4+ICsKPj4gKyBp
+bmZvLnNpX2FkZHIgICAgPSAodm9pZCBfX3VzZXIgKilhZGRyZXNzOwo+PiArIGlmIChodWdldGxi
+KQo+PiArIGluZm8uc2lfYWRkcl9sc2IgPSBQTURfU0hJRlQ7Cj4+ICsgZWxzZQo+PiArIGluZm8u
+c2lfYWRkcl9sc2IgPSBQQUdFX1NISUZUOwo+PiArCj4+ICsgc2VuZF9zaWdfaW5mbyhTSUdCVVMs
+ICZpbmZvLCBjdXJyZW50KTsKPj4gK30KPj4gKwo+IMKrICBbaGlkZSBwYXJ0IG9mIHF1b3RlXQo+
+Cj4gUHVuaXQgcmV2aWV3ZWQgdGhlIG90aGVyIHZlcnNpb24gb2YgdGhpcyBwYXRjaCwgdGhpcyBQ
+TURfU0hJRlQgaXMgbm90IHRoZSByaWdodAo+IHRoaW5nIHRvIGRvLCBpdCBuZWVkcyBhIG1vcmUg
+YWNjdXJhdGUgc2V0IG9mIGNhbGxzIGFuZCBzaGlmdHMgYXMgdGhlcmUgbWF5IGJlCj4gaHVnZXRs
+YmZzIHBhZ2VzIG90aGVyIHRoYW4gUE1EX1NJWkUuCj4KPiBodHRwczovL3d3dy5zcGluaWNzLm5l
+dC9saXN0cy9hcm0ta2VybmVsL21zZzU2ODkxOS5odG1sCj4KPiBJIGhhdmVuJ3QgcG9zdGVkIGEg
+bmV3IHZlcnNpb24gb2YgdGhhdCBwYXRjaCBiZWNhdXNlIEkgd2FzIHN0aWxsIGh1bnRpbmcgYSBi
+dWcKPiBpbiB0aGUgaHVnZXBhZ2UvaHdwb2lzb24gY29kZSwgZXZlbiB3aXRoIFB1bml0J3MgZml4
+ZXMgc2VyaWVzIEkgc2VlIC1FRkFVTFQKPiByZXR1cm5lZCB0byB1c2Vyc3BhY2UgaW5zdGVhZCBv
+ZiB0aGlzIGh3cG9pc29uIGNvZGUgYmVpbmcgaW52b2tlZC4KCiAgT2ssIGdvdCBpdCwgdGhhbmtz
+IGZvciB5b3VyIGluZm9ybWF0aW9uLgo+Cj4gUGxlYXNlIGF2b2lkIGR1cGxpY2F0aW5nIGZ1bmN0
+aW9uYWxpdHkgYmV0d2VlbiBwYXRjaGVzLCBpdCB3YXN0ZXMgcmV2aWV3ZXJzCj4gdGltZSwgZXNw
+ZWNpYWxseSB3aGVuIHdlIGtub3cgdGhlcmUgYXJlIHByb2JsZW1zIHdpdGggdGhpcyBhcHByb2Fj
+aC4KPgo+Cj4+ICtzdGF0aWMgdm9pZCBrdm1faGFuZGxlX2JhZF9wYWdlKHVuc2lnbmVkIGxvbmcg
+YWRkcmVzcywKPj4gKyBib29sIGh1Z2V0bGIsIGJvb2wgaHdwb2lzb24pCj4+ICt7Cj4+ICsgLyog
+aGFuZGxlIGJvdGggaHdwb2lzb24gYW5kIG90aGVyIHN5bmNocm9ub3VzIGV4dGVybmFsIEFib3J0
+ICovCj4+ICsgaWYgKGh3cG9pc29uKQo+PiArIGt2bV9zZW5kX3NpZ25hbChhZGRyZXNzLCBodWdl
+dGxiLCB0cnVlKTsKPj4gKyBlbHNlCj4+ICsga3ZtX3NlbmRfc2lnbmFsKGFkZHJlc3MsIGh1Z2V0
+bGIsIGZhbHNlKTsKPj4gK30KPgo+IFdoeSB0aGUgZXh0cmEgbGV2ZWwgb2YgaW5kaXJlY3Rpb24/
+IFdlIG9ubHkgd2FudCB0byBzaWduYWwgdXNlcnNwYWNlIGxpa2UgdGhpcwo+IGZyb20gS1ZNIGZv
+ciBod3BvaXNvbi4gU2lnbmFscyBmb3IgUkFTIHJlbGF0ZWQgcmVhc29ucyBzaG91bGQgY29tZSBm
+cm9tIHRoZSBiaXRzCj4gb2YgdGhlIGtlcm5lbCB0aGF0IGRlY29kZWQgdGhlIGVycm9yLgoKRm9y
+IHRoZSBTRUEsIHRoZSBhcmUgbWFpbHkgdHdvIHR5cGVzOgowYjAxMDAwMCBTeW5jaHJvbm91cyBF
+eHRlcm5hbCBBYm9ydCBvbiBtZW1vcnkgYWNjZXNzLgowYjAxMDF4eCBTeW5jaHJvbm91cyBFeHRl
+cm5hbCBBYm9ydCBvbiBwYWdlIHRhYmxlIHdhbGsuIERGU0NbMTowXQplbmNvZGUgdGhlIGxldmVs
+LgoKaHdwb2lzb24gc2hvdWxkIGJlbG9uZyB0byB0aGUgICJTeW5jaHJvbm91cyBFeHRlcm5hbCBB
+Ym9ydCBvbiBtZW1vcnkgYWNjZXNzIgppZiB0aGUgU0VBIHR5cGUgaXMgbm90IGh3cG9pc29uLCBz
+dWNoIGFzIHBhZ2UgdGFibGUgd2FsaywgZG8geW91IG1lYW4KS1ZNIGRvIG5vdCBkZWxpdmVyIHRo
+ZSBTSUdCVVM/CklmIHNvLCBob3cgdGhlIEtWTSBoYW5kbGUgdGhlIFNFQSB0eXBlIG90aGVyIHRo
+YW4gaHdwb2lzb24/Cgo+Cj4gKGh3cG9pc29uIGZvciBLVk0gaXMgYSBjb3JuZXIgY2FzZSBhcyBR
+ZW11J3MgbWVtb3J5IGVmZmVjdGl2ZWx5IGhhcyB0d28gdXNlcnMsCj4gUWVtdSBhbmQgS1ZNLiBU
+aGlzIGlzbid0IHRoZSBleGFtcGxlIG9mIGhvdyB1c2VyLXNwYWNlIGdldHMgc2lnbmFsbGVkLikK
+Pgo+Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9ndWVzdC5jIGIvYXJjaC9hcm02NC9r
+dm0vZ3Vlc3QuYwo+PiBpbmRleCBiMzc0NDZhLi43ODBlM2M0IDEwMDY0NAo+PiAtLS0gYS9hcmNo
+L2FybTY0L2t2bS9ndWVzdC5jCj4+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2d1ZXN0LmMKPj4gQEAg
+LTI3Nyw2ICsyNzcsMTMgQEAgaW50IGt2bV9hcmNoX3ZjcHVfaW9jdGxfc2V0X3NyZWdzKHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSwKPj4gICByZXR1cm4gLUVJTlZBTDsKPj4gIH0KPj4KPj4gK2ludCBr
+dm1fdmNwdV9pb2N0bF9zZWEoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+PiArewo+PiArIGt2bV9p
+bmplY3RfZGFidCh2Y3B1LCBrdm1fdmNwdV9nZXRfaGZhcih2Y3B1KSk7Cj4+ICsKPj4gKyByZXR1
+cm4gMDsKPj4gK30KPgo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oIGIv
+aW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCj4+IGluZGV4IGJiMDI5MDkuLjFkMmUyZTcgMTAwNjQ0
+Cj4+IC0tLSBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAo+PiArKysgYi9pbmNsdWRlL3VhcGkv
+bGludXgva3ZtLmgKPj4gQEAgLTEzMDYsNiArMTMwNiw3IEBAIHN0cnVjdCBrdm1fczM5MF91Y2Fz
+X21hcHBpbmcgewo+PiAgI2RlZmluZSBLVk1fUzM5MF9HRVRfSVJRX1NUQVRFICBfSU9XKEtWTUlP
+LCAweGI2LCBzdHJ1Y3Qga3ZtX3MzOTBfaXJxX3N0YXRlKQo+PiAgLyogQXZhaWxhYmxlIHdpdGgg
+S1ZNX0NBUF9YODZfU01NICovCj4+ICAjZGVmaW5lIEtWTV9TTUkgICAgICAgICAgICAgICAgICAg
+X0lPKEtWTUlPLCAgIDB4YjcpCj4+ICsjZGVmaW5lIEtWTV9BUk1fU0VBICAgICAgICAgICAgICAg
+X0lPKEtWTUlPLCAgIDB4YjgpCj4+Cj4+ICAjZGVmaW5lIEtWTV9ERVZfQVNTSUdOX0VOQUJMRV9J
+T01NVSAoMSA8PCAwKQo+PiAgI2RlZmluZSBLVk1fREVWX0FTU0lHTl9QQ0lfMl8zICgxIDw8IDEp
+Cj4+Cj4KPiBXaHkgZG8gd2UgbmVlZCBhIHVzZXJzcGFjZSBBUEkgZm9yIFNFQT8gSXQgY2FuIGFs
+c28gYmUgZG9uZSBieSB1c2luZwo+IEtWTV97RyxTfUVUX09ORV9SRUcgdG8gY2hhbmdlIHRoZSB2
+Y3B1IHJlZ2lzdGVycy4gVGhlIGFkdmFudGFnZSBvZiBkb2luZyBpdCB0aGlzCj4gd2F5IGlzIHlv
+dSBjYW4gY2hvb3NlIHdoaWNoIEVTUiB2YWx1ZSB0byB1c2UuCj4KPiBBZGRpbmcgYSBuZXcgQVBJ
+IGNhbGwgdG8gZG8gc29tZXRoaW5nIHlvdSBjb3VsZCBkbyB3aXRoIGFuIG9sZCBvbmUgZG9lc24n
+dCBsb29rCj4gcmlnaHQuCgpKYW1lcywgSSBjb25zaWRlcmVkIHlvdXIgc3VnZ2VzdGlvbiBiZWZv
+cmUgdGhhdCB1c2UgdGhlCktWTV97RyxTfUVUX09ORV9SRUcgdG8gY2hhbmdlIHRoZSB2Y3B1IHJl
+Z2lzdGVycy4gYnV0IEkgZm91bmQgaXQgZG9lcwpub3QgaGF2ZSBkaWZmZXJlbmNlIHRvIHVzZSB0
+aGUgYWxyZWFkIGV4aXN0ZWQgS1ZNIEFQSS4gIHNvIG1heSBiZQpjaGFuZ2luZyB0aGUgdmNwdSBy
+ZWdpc3RlcnMgaW4gcWVtdSB3aWxsIGR1cGxpY2F0ZSB3aXRoIHRoZSBLVk0gQVBJcy4KCmluamVj
+dGlvbiBhIFNFQSBpcyBubyBtb3JlIHRoYW4gc2V0dGluZyBzb21lIHJlZ2lzdGVyczogZWxyX2Vs
+MSwgUEMsClBTVEFURSwgU1BTUl9lbDEsIGZhcl9lbDEsIGVzcl9lbDEKSSBzZWVuIHRoaXMgS1ZN
+IEFQSSBkbyB0aGUgc2FtZSB0aGluZyBhcyBRZW11LiAgZG8geW91IGZvdW5kIGNhbGwgdGhpcwpB
+UEkgd2lsbCBoYXZlIGlzc3VlIGFuZCBuZWNlc3NhcnkgdG8gY2hvb3NlIGFub3RoZXIgRVNSIHZh
+bHVlPwoKSSBwYXN0ZWQgdGhlIGFscmVhZCBleGlzdGVkIEtWTSBBUEkgY29kZToKCnN0YXRpYyB2
+b2lkIGluamVjdF9hYnQ2NChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGJvb2wgaXNfaWFidCwgdW5z
+aWduZWQKbG9uZyBhZGRyKQp7CiB1bnNpZ25lZCBsb25nIGNwc3IgPSAqdmNwdV9jcHNyKHZjcHUp
+OwogYm9vbCBpc19hYXJjaDMyID0gdmNwdV9tb2RlX2lzXzMyYml0KHZjcHUpOwogdTMyIGVzciA9
+IDA7CiAqdmNwdV9lbHJfZWwxKHZjcHUpID0gKnZjcHVfcGModmNwdSk7CiAqdmNwdV9wYyh2Y3B1
+KSA9IGdldF9leGNlcHRfdmVjdG9yKHZjcHUsIGV4Y2VwdF90eXBlX3N5bmMpOwogKnZjcHVfY3Bz
+cih2Y3B1KSA9IFBTVEFURV9GQVVMVF9CSVRTXzY0OwogKnZjcHVfc3Bzcih2Y3B1KSA9IGNwc3I7
+CiB2Y3B1X3N5c19yZWcodmNwdSwgRkFSX0VMMSkgPSBhZGRyOwogLyoKICAqIEJ1aWxkIGFuIHtp
+LGR9YWJvcnQsIGRlcGVuZGluZyBvbiB0aGUgbGV2ZWwgYW5kIHRoZQogICogaW5zdHJ1Y3Rpb24g
+c2V0LiBSZXBvcnQgYW4gZXh0ZXJuYWwgc3luY2hyb25vdXMgYWJvcnQuCiAgKi8KIGlmIChrdm1f
+dmNwdV90cmFwX2lsX2lzMzJiaXQodmNwdSkpCiAgZXNyIHw9IEVTUl9FTHhfSUw7CiAvKgogICog
+SGVyZSwgdGhlIGd1ZXN0IHJ1bnMgaW4gQUFyY2g2NCBtb2RlIHdoZW4gaW4gRUwxLiBJZiB3ZSBn
+ZXQKICAqIGFuIEFBcmNoMzIgZmF1bHQsIGl0IG1lYW5zIHdlIG1hbmFnZWQgdG8gdHJhcCBhbiBF
+TDAgZmF1bHQuCiAgKi8KIGlmIChpc19hYXJjaDMyIHx8IChjcHNyICYgUFNSX01PREVfTUFTSykg
+PT0gUFNSX01PREVfRUwwdCkKICBlc3IgfD0gKEVTUl9FTHhfRUNfSUFCVF9MT1cgPDwgRVNSX0VM
+eF9FQ19TSElGVCk7CiBlbHNlCiAgZXNyIHw9IChFU1JfRUx4X0VDX0lBQlRfQ1VSIDw8IEVTUl9F
+THhfRUNfU0hJRlQpOwogaWYgKCFpc19pYWJ0KQogIGVzciB8PSBFU1JfRUx4X0VDX0RBQlRfTE9X
+IDw8IEVTUl9FTHhfRUNfU0hJRlQ7CiB2Y3B1X3N5c19yZWcodmNwdSwgRVNSX0VMMSkgPSBlc3Ig
+fCBFU1JfRUx4X0ZTQ19FWFRBQlQ7Cn0KCnN0YXRpYyB2b2lkIGluamVjdF9hYnQzMihzdHJ1Y3Qg
+a3ZtX3ZjcHUgKnZjcHUsIGJvb2wgaXNfcGFidCwKICAgIHVuc2lnbmVkIGxvbmcgYWRkcikKewog
+dTMyIHZlY3Rfb2Zmc2V0OwogdTMyICpmYXIsICpmc3I7CiBib29sIGlzX2xwYWU7CiBpZiAoaXNf
+cGFidCkgewogIHZlY3Rfb2Zmc2V0ID0gMTI7CiAgZmFyID0gJnZjcHVfY3AxNSh2Y3B1LCBjNl9J
+RkFSKTsKICBmc3IgPSAmdmNwdV9jcDE1KHZjcHUsIGM1X0lGU1IpOwogfSBlbHNlIHsgLyogIWlh
+YnQgKi8KICB2ZWN0X29mZnNldCA9IDE2OwogIGZhciA9ICZ2Y3B1X2NwMTUodmNwdSwgYzZfREZB
+Uik7CiAgZnNyID0gJnZjcHVfY3AxNSh2Y3B1LCBjNV9ERlNSKTsKIH0KIHByZXBhcmVfZmF1bHQz
+Mih2Y3B1LCBDT01QQVRfUFNSX01PREVfQUJUIHwgQ09NUEFUX1BTUl9BX0JJVCwgdmVjdF9vZmZz
+ZXQpOwogKmZhciA9IGFkZHI7CiAvKiBHaXZlIHRoZSBndWVzdCBhbiBJTVBMRU1FTlRBVElPTiBE
+RUZJTkVEIGV4Y2VwdGlvbiAqLwogaXNfbHBhZSA9ICh2Y3B1X2NwMTUodmNwdSwgYzJfVFRCQ1Ip
+ID4+IDMxKTsKIGlmIChpc19scGFlKQogICpmc3IgPSAxIDw8IDkgfCAweDM0OwogZWxzZQogICpm
+c3IgPSAweDE0Owp9CgoKLyoqCiAqIGt2bV9pbmplY3RfZGFidCAtIGluamVjdCBhIGRhdGEgYWJv
+cnQgaW50byB0aGUgZ3Vlc3QKICogQHZjcHU6IFRoZSBWQ1BVIHRvIHJlY2VpdmUgdGhlIHVuZGVm
+aW5lZCBleGNlcHRpb24KICogQGFkZHI6IFRoZSBhZGRyZXNzIHRvIHJlcG9ydCBpbiB0aGUgREZB
+UgogKgogKiBJdCBpcyBhc3N1bWVkIHRoYXQgdGhpcyBjb2RlIGlzIGNhbGxlZCBmcm9tIHRoZSBW
+Q1BVIHRocmVhZCBhbmQgdGhhdCB0aGUKICogVkNQVSB0aGVyZWZvcmUgaXMgbm90IGN1cnJlbnRs
+eSBleGVjdXRpbmcgZ3Vlc3QgY29kZS4KICovCnZvaWQga3ZtX2luamVjdF9kYWJ0KHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwgdW5zaWduZWQgbG9uZyBhZGRyKQp7CiBpZiAoISh2Y3B1LT5hcmNoLmhj
+cl9lbDIgJiBIQ1JfUlcpKQogIGluamVjdF9hYnQzMih2Y3B1LCBmYWxzZSwgYWRkcik7CiBlbHNl
+CiAgaW5qZWN0X2FidDY0KHZjcHUsIGZhbHNlLCBhZGRyKTsKfQoKCj4KPgo+IFRoYW5rcywKPgo+
+IEphbWVzCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
+bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
+c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
