@@ -1,26 +1,25 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v6 08/24] KVM: arm64: vgic-its: Implement
- vgic_mmio_uaccess_write_its_creadr
-Date: Thu, 4 May 2017 17:09:52 +0200
-Message-ID: <ae1f4231-7b5d-cc69-bbf6-49e637e8d37c@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v6 10/24] KVM: arm64: vgic-its: Implement
+ vgic_mmio_uaccess_write_its_iidr
+Date: Thu, 4 May 2017 16:39:26 +0100
+Message-ID: <d877c0e7-6147-f8d5-c3d6-d8dee36f97bb@arm.com>
 References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
- <1493898284-29504-9-git-send-email-eric.auger@redhat.com>
- <a58918e7-4e21-7783-28d2-c116e2b7a1e1@arm.com>
+ <1493898284-29504-11-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 976CF40969
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 11:06:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59D53405DA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 11:36:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h12eXbis2GMG for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 May 2017 11:06:52 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93CE1405DA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 11:06:52 -0400 (EDT)
-In-Reply-To: <a58918e7-4e21-7783-28d2-c116e2b7a1e1@arm.com>
+ with ESMTP id BxoeOHNCEXFk for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 May 2017 11:36:25 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09A2D40296
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 11:36:24 -0400 (EDT)
+In-Reply-To: <1493898284-29504-11-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,121 +29,102 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, eric.auger.pro@gmail.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: Prasun.Kapoor@cavium.com, quintela@redhat.com, dgilbert@redhat.com, bjsprakash.linux@gmail.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On 04/05/17 12:44, Eric Auger wrote:
+> The GITS_IIDR revision field is used to encode the migration ABI
+> revision. So we need to restore it to check the table layout is
+> readable by the destination.
+> 
+> By writing the IIDR, userspace thus forces the ABI revision to be
+> used and this must be less than or equal to the max revision KVM
+> supports.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> v5 -> v6:
+> - fix typos in the commit message
+> - dont't use update_64bit_reg anymore
+> 
+> v4 -> v5
+> - rename user_revision into abi_rev and REV into MAX_ABI_REV
+> - IIDR reports abi_rev set by userspace if any.
+> - If value set by userspace exceeds the max supported revision, an
+>   error is reported.
+> - add some defines
+> 
+> v4: creation
+> ---
+>  include/linux/irqchip/arm-gic-v3.h |  4 ++++
+>  virt/kvm/arm/vgic/vgic-its.c       | 20 +++++++++++++++++---
+>  2 files changed, 21 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index 81ebe43..59f1abd 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -242,6 +242,10 @@
+>  #define GITS_TYPER_PTA			(1UL << 19)
+>  #define GITS_TYPER_HWCOLLCNT_SHIFT	24
+>  
+> +#define GITS_IIDR_REV_SHIFT		12
+> +#define GITS_IIDR_REV(r)		(((r) >> GITS_IIDR_REV_SHIFT) & 0xf)
+> +#define GITS_IIDR_PRODUCTID_SHIFT	24
+> +
+>  #define GITS_CBASER_VALID			(1ULL << 63)
+>  #define GITS_CBASER_SHAREABILITY_SHIFT		(10)
+>  #define GITS_CBASER_INNER_CACHEABILITY_SHIFT	(59)
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index c336cce..072efbd 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -411,7 +411,20 @@ static unsigned long vgic_mmio_read_its_iidr(struct kvm *kvm,
+>  					     struct vgic_its *its,
+>  					     gpa_t addr, unsigned int len)
+>  {
+> -	return (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
+> +	return (PRODUCT_ID_KVM << GITS_IIDR_PRODUCTID_SHIFT) |
+> +	       (its->abi_rev << GITS_IIDR_REV_SHIFT) | IMPLEMENTER_ARM;
 
-On 04/05/2017 16:16, Marc Zyngier wrote:
-> On 04/05/17 12:44, Eric Auger wrote:
->> GITS_CREADR needs to be restored so let's implement the associated
->> uaccess_write_its callback. The write only is allowed if the its
->> is disabled.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v5 -> v6:
->> - remove usage of update_64bit_reg and check alignment of cmd offset
->>
->> v4 -> v5:
->> - keep Stalled bit
->> - vgic_mmio_uaccess_write_its_creadr can now return an error
->>
->> v3 -> v4:
->> - REGISTER_ITS_DESC_UACCESS now introduced in this patch
->> - we now check the its is disabled
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 43 +++++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 41 insertions(+), 2 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 222fad5..18588ef 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -1213,6 +1213,34 @@ static unsigned long vgic_mmio_read_its_creadr(struct kvm *kvm,
->>  	return extract_bytes(its->creadr, addr & 0x7, len);
->>  }
->>  
->> +static int vgic_mmio_uaccess_write_its_creadr(struct kvm *kvm,
->> +					      struct vgic_its *its,
->> +					      gpa_t addr, unsigned int len,
->> +					      unsigned long val)
->> +{
->> +	u32 cmd_offset;
->> +	int ret = 0;
->> +
->> +	mutex_lock(&its->cmd_lock);
->> +
->> +	if (its->enabled) {
->> +		ret = -EBUSY;
->> +		goto out;
->> +	}
->> +
->> +	cmd_offset = ITS_CMD_OFFSET(val);
->> +	if ((cmd_offset >= ITS_CMD_BUFFER_SIZE(its->cbaser)) ||
->> +	    (cmd_offset & 0x1F)) {
-> 
-> nit: In general, and for alignments that aren't completely obvious, you
-> can write something like IS_ALIGNED(cmd_offset, sizeof(struct its_cmd)).
-> 
-> Unfortunately, we don't have a struct its_cmd, and maybe we should fix
-> that at a later time.
-OK
-> 
->> +		ret = -EINVAL;
->> +		goto out;
->> +	}
->> +
->> +	its->creadr = val;
->> +out:
->> +	mutex_unlock(&its->cmd_lock);
->> +	return ret;
->> +}
->> +
->>  #define BASER_INDEX(addr) (((addr) / sizeof(u64)) & 0x7)
->>  static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm,
->>  					      struct vgic_its *its,
->> @@ -1317,6 +1345,16 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
->>  	.its_write = wr,					\
->>  }
->>  
->> +#define REGISTER_ITS_DESC_UACCESS(off, rd, wr, uwr, length, acc)\
->> +{								\
->> +	.reg_offset = off,					\
->> +	.len = length,						\
->> +	.access_flags = acc,					\
->> +	.its_read = rd,						\
->> +	.its_write = wr,					\
->> +	.uaccess_its_write = uwr,				\
->> +}
->> +
->>  static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
->>  			      gpa_t addr, unsigned int len, unsigned long val)
->>  {
->> @@ -1339,8 +1377,9 @@ static struct vgic_register_region its_registers[] = {
->>  	REGISTER_ITS_DESC(GITS_CWRITER,
->>  		vgic_mmio_read_its_cwriter, vgic_mmio_write_its_cwriter, 8,
->>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->> -	REGISTER_ITS_DESC(GITS_CREADR,
->> -		vgic_mmio_read_its_creadr, its_mmio_write_wi, 8,
->> +	REGISTER_ITS_DESC_UACCESS(GITS_CREADR,
->> +		vgic_mmio_read_its_creadr, its_mmio_write_wi,
->> +		vgic_mmio_uaccess_write_its_creadr, 8,
->>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->>  	REGISTER_ITS_DESC(GITS_BASER,
->>  		vgic_mmio_read_its_baser, vgic_mmio_write_its_baser, 0x40,
->>
-> 
-> Otherwise:
-> 
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Thanks!
+Given that abi_rev is a 32bit quantity, and the REV field only only 4
+bit wide, I'd feel safer with a mask somewhere...
 
-Eric
+And hopefully, we'll never have more than 16 ABIs! ;-)
+
+> +}
+> +
+> +static int vgic_mmio_uaccess_write_its_iidr(struct kvm *kvm,
+> +					    struct vgic_its *its,
+> +					    gpa_t addr, unsigned int len,
+> +					    unsigned long val)
+> +{
+> +	u32 rev = GITS_IIDR_REV(val);
+> +
+> +	if (rev > MAX_ABI_REV)
+> +		return -EINVAL;
+> +	return vgic_its_set_abi(its, rev);
+>  }
+>  
+>  static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+> @@ -1393,8 +1406,9 @@ static struct vgic_register_region its_registers[] = {
+>  	REGISTER_ITS_DESC(GITS_CTLR,
+>  		vgic_mmio_read_its_ctlr, vgic_mmio_write_its_ctlr, 4,
+>  		VGIC_ACCESS_32bit),
+> -	REGISTER_ITS_DESC(GITS_IIDR,
+> -		vgic_mmio_read_its_iidr, its_mmio_write_wi, 4,
+> +	REGISTER_ITS_DESC_UACCESS(GITS_IIDR,
+> +		vgic_mmio_read_its_iidr, its_mmio_write_wi,
+> +		vgic_mmio_uaccess_write_its_iidr, 4,
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_ITS_DESC(GITS_TYPER,
+>  		vgic_mmio_read_its_typer, its_mmio_write_wi, 8,
 > 
-> Thanks,
-> 
-> 	M.
-> 
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
