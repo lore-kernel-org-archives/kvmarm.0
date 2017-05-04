@@ -1,26 +1,26 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v6 07/24] KVM: arm64: vgic-its: Implement
- vgic_its_has_attr_regs and attr_regs_access
-Date: Thu, 4 May 2017 17:03:21 +0200
-Message-ID: <8c1761c8-0774-784a-2f1f-5e82d66e874e@redhat.com>
+Subject: Re: [PATCH v6 08/24] KVM: arm64: vgic-its: Implement
+ vgic_mmio_uaccess_write_its_creadr
+Date: Thu, 4 May 2017 17:09:52 +0200
+Message-ID: <ae1f4231-7b5d-cc69-bbf6-49e637e8d37c@redhat.com>
 References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
- <1493898284-29504-8-git-send-email-eric.auger@redhat.com>
- <74f1b53a-9d52-8e6a-1af7-39820ce1c709@arm.com>
+ <1493898284-29504-9-git-send-email-eric.auger@redhat.com>
+ <a58918e7-4e21-7783-28d2-c116e2b7a1e1@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E432940969
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 11:00:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 976CF40969
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 11:06:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OpSWaR7NUz60 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 May 2017 11:00:22 -0400 (EDT)
+ with ESMTP id h12eXbis2GMG for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 May 2017 11:06:52 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDF10405DA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 11:00:21 -0400 (EDT)
-In-Reply-To: <74f1b53a-9d52-8e6a-1af7-39820ce1c709@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93CE1405DA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 11:06:52 -0400 (EDT)
+In-Reply-To: <a58918e7-4e21-7783-28d2-c116e2b7a1e1@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,159 +36,113 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Marc,
 
-On 04/05/2017 16:04, Marc Zyngier wrote:
+On 04/05/2017 16:16, Marc Zyngier wrote:
 > On 04/05/17 12:44, Eric Auger wrote:
->> This patch implements vgic_its_has_attr_regs and vgic_its_attr_regs_access
->> upon the MMIO framework. VGIC ITS KVM device KVM_DEV_ARM_VGIC_GRP_ITS_REGS
->> group becomes functional.
->>
->> At least GITS_CREADR and GITS_IIDR require to differentiate a guest write
->> action from a user access. As such let's introduce a new uaccess_its_write
->> vgic_register_region callback.
+>> GITS_CREADR needs to be restored so let's implement the associated
+>> uaccess_write_its callback. The write only is allowed if the its
+>> is disabled.
 >>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>
 >> ---
->> v6 -> v6:
->> - fix GITS_PIDR/CIDR accesses
->> - remove vgic_data_mmio_bus_to_host/vgic_data_host_to_mmio_bus
->> - 64b full reg access comment rewording
->> - vgic_its_attr_regs_access declaration block rework including
->>   removal of iodev
+>> v5 -> v6:
+>> - remove usage of update_64bit_reg and check alignment of cmd offset
 >>
 >> v4 -> v5:
->> - use GITS_TYPER instead of offset 0x8
->> - uaccess_its_write now can return an error
+>> - keep Stalled bit
+>> - vgic_mmio_uaccess_write_its_creadr can now return an error
 >>
 >> v3 -> v4:
->> - remove changes to the REGISTER_ITS_DESC macro. This will be handled in
->>   subsequent patch with the introduction of a new REGISTER_ITS_DESC_UACCESS
->>   macro
->> - fix IIDR access and add a comment wrt full length access
->> - handle endianness
->> - add kvm lock and vcpus lock
+>> - REGISTER_ITS_DESC_UACCESS now introduced in this patch
+>> - we now check the its is disabled
 >> ---
->>  virt/kvm/arm/vgic/vgic-its.c  | 70 +++++++++++++++++++++++++++++++++++++++++--
->>  virt/kvm/arm/vgic/vgic-mmio.h |  9 ++++--
->>  2 files changed, 75 insertions(+), 4 deletions(-)
+>>  virt/kvm/arm/vgic/vgic-its.c | 43 +++++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 41 insertions(+), 2 deletions(-)
 >>
 >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index f687e91..222fad5 100644
+>> index 222fad5..18588ef 100644
 >> --- a/virt/kvm/arm/vgic/vgic-its.c
 >> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -1469,14 +1469,80 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->>  int vgic_its_has_attr_regs(struct kvm_device *dev,
->>  			   struct kvm_device_attr *attr)
->>  {
->> -	return -ENXIO;
->> +	const struct vgic_register_region *region;
->> +	gpa_t offset = attr->attr;
->> +
-> 
-> Shouldn't you check the alignment in the same way you do it below? It
-> seems a bit odd that one succeeds while the other fails with the same input.
-yes makes sense
-
-Thanks
-
-Eric
-> 
->> +	region = vgic_find_mmio_region(its_registers,
->> +				       ARRAY_SIZE(its_registers),
->> +				       offset);
->> +	if (!region)
->> +		return -ENXIO;
->> +
->> +	return 0;
+>> @@ -1213,6 +1213,34 @@ static unsigned long vgic_mmio_read_its_creadr(struct kvm *kvm,
+>>  	return extract_bytes(its->creadr, addr & 0x7, len);
 >>  }
 >>  
->>  int vgic_its_attr_regs_access(struct kvm_device *dev,
->>  			      struct kvm_device_attr *attr,
->>  			      u64 *reg, bool is_write)
->>  {
->> -	return -ENXIO;
->> +	const struct vgic_register_region *region;
->> +	struct vgic_its *its;
->> +	gpa_t addr, offset;
->> +	unsigned int len;
->> +	int align, ret = 0;
+>> +static int vgic_mmio_uaccess_write_its_creadr(struct kvm *kvm,
+>> +					      struct vgic_its *its,
+>> +					      gpa_t addr, unsigned int len,
+>> +					      unsigned long val)
+>> +{
+>> +	u32 cmd_offset;
+>> +	int ret = 0;
 >> +
->> +	its = dev->private;
->> +	offset = attr->attr;
+>> +	mutex_lock(&its->cmd_lock);
 >> +
->> +	/*
->> +	 * Although the spec supports upper/lower 32-bit accesses to
->> +	 * 64-bit ITS registers, the userspace ABI requires 64-bit
->> +	 * accesses to all 64-bit wide registers. We therefore only
->> +	 * support 32-bit accesses to GITS_CTLR, GITS_IIDR and GITS ID
->> +	 * registers
->> +	 */
->> +	align = (offset < GITS_TYPER) || (offset >= GITS_PIDR4) ? 0x3 : 0x7;
->> +
->> +	if (offset & align)
->> +		return -EINVAL;
->> +
->> +	mutex_lock(&dev->kvm->lock);
->> +
->> +	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base)) {
->> +		ret = -ENXIO;
->> +		goto out;
->> +	}
->> +
->> +	region = vgic_find_mmio_region(its_registers,
->> +				       ARRAY_SIZE(its_registers),
->> +				       offset);
->> +	if (!region) {
->> +		ret = -ENXIO;
->> +		goto out;
->> +	}
->> +
->> +	if (!lock_all_vcpus(dev->kvm)) {
+>> +	if (its->enabled) {
 >> +		ret = -EBUSY;
 >> +		goto out;
 >> +	}
 >> +
->> +	addr = its->vgic_its_base + offset;
->> +
->> +	len = region->access_flags & VGIC_ACCESS_64bit ? 8 : 4;
->> +
->> +	if (is_write) {
->> +		if (region->uaccess_its_write)
->> +			ret = region->uaccess_its_write(dev->kvm, its, addr,
->> +							len, *reg);
->> +		else
->> +			region->its_write(dev->kvm, its, addr, len, *reg);
->> +	} else {
->> +		*reg = region->its_read(dev->kvm, its, addr, len);
+>> +	cmd_offset = ITS_CMD_OFFSET(val);
+>> +	if ((cmd_offset >= ITS_CMD_BUFFER_SIZE(its->cbaser)) ||
+>> +	    (cmd_offset & 0x1F)) {
+> 
+> nit: In general, and for alignments that aren't completely obvious, you
+> can write something like IS_ALIGNED(cmd_offset, sizeof(struct its_cmd)).
+> 
+> Unfortunately, we don't have a struct its_cmd, and maybe we should fix
+> that at a later time.
+OK
+> 
+>> +		ret = -EINVAL;
+>> +		goto out;
 >> +	}
->> +	unlock_all_vcpus(dev->kvm);
+>> +
+>> +	its->creadr = val;
 >> +out:
->> +	mutex_unlock(&dev->kvm->lock);
+>> +	mutex_unlock(&its->cmd_lock);
 >> +	return ret;
+>> +}
+>> +
+>>  #define BASER_INDEX(addr) (((addr) / sizeof(u64)) & 0x7)
+>>  static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm,
+>>  					      struct vgic_its *its,
+>> @@ -1317,6 +1345,16 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+>>  	.its_write = wr,					\
 >>  }
 >>  
->>  static int vgic_its_has_attr(struct kvm_device *dev,
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
->> index 6eec91b..ea4171a 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio.h
->> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
->> @@ -36,8 +36,13 @@ struct vgic_register_region {
->>  	};
->>  	unsigned long (*uaccess_read)(struct kvm_vcpu *vcpu, gpa_t addr,
->>  				      unsigned int len);
->> -	void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
->> -			      unsigned int len, unsigned long val);
->> +	union {
->> +		void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
->> +				      unsigned int len, unsigned long val);
->> +		int (*uaccess_its_write)(struct kvm *kvm, struct vgic_its *its,
->> +					 gpa_t addr, unsigned int len,
->> +					 unsigned long val);
->> +	};
->>  };
->>  
->>  extern struct kvm_io_device_ops kvm_io_gic_ops;
+>> +#define REGISTER_ITS_DESC_UACCESS(off, rd, wr, uwr, length, acc)\
+>> +{								\
+>> +	.reg_offset = off,					\
+>> +	.len = length,						\
+>> +	.access_flags = acc,					\
+>> +	.its_read = rd,						\
+>> +	.its_write = wr,					\
+>> +	.uaccess_its_write = uwr,				\
+>> +}
+>> +
+>>  static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
+>>  			      gpa_t addr, unsigned int len, unsigned long val)
+>>  {
+>> @@ -1339,8 +1377,9 @@ static struct vgic_register_region its_registers[] = {
+>>  	REGISTER_ITS_DESC(GITS_CWRITER,
+>>  		vgic_mmio_read_its_cwriter, vgic_mmio_write_its_cwriter, 8,
+>>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>> -	REGISTER_ITS_DESC(GITS_CREADR,
+>> -		vgic_mmio_read_its_creadr, its_mmio_write_wi, 8,
+>> +	REGISTER_ITS_DESC_UACCESS(GITS_CREADR,
+>> +		vgic_mmio_read_its_creadr, its_mmio_write_wi,
+>> +		vgic_mmio_uaccess_write_its_creadr, 8,
+>>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>>  	REGISTER_ITS_DESC(GITS_BASER,
+>>  		vgic_mmio_read_its_baser, vgic_mmio_write_its_baser, 0x40,
 >>
+> 
+> Otherwise:
+> 
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Thanks!
+
+Eric
 > 
 > Thanks,
 > 
