@@ -1,210 +1,357 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 5/5] KVM: arm/arm64: Allow setting the timer IRQ numbers
- from userspace
-Date: Thu, 4 May 2017 13:22:25 +0200
-Message-ID: <20170504112225.GM5923@cbox>
-References: <20170503183300.4618-1-cdall@linaro.org>
- <20170503183300.4618-6-cdall@linaro.org>
- <b08c50b4-6aba-1a59-80f4-343cd906f1fa@arm.com>
- <20170504095918.GJ5923@cbox>
- <79ec69f2-d727-46ec-b1d5-4c535a904e63@arm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 02/10] KVM: Add documentation for VCPU requests
+Date: Thu, 4 May 2017 13:27:35 +0200
+Message-ID: <a6f81568-57dc-931e-c7b1-36b0f6ac38d6@redhat.com>
+References: <20170503160635.21669-1-drjones@redhat.com>
+ <20170503160635.21669-3-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <79ec69f2-d727-46ec-b1d5-4c535a904e63@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 25B2940BDA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 07:24:37 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id PhOS1Hi0epeI for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 May 2017 07:24:35 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BA2640190
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 07:24:35 -0400 (EDT)
+In-Reply-To: <20170503160635.21669-3-drjones@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: marc.zyngier@arm.com, cdall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 04, 2017 at 11:54:06AM +0100, Marc Zyngier wrote:
-> On 04/05/17 10:59, Christoffer Dall wrote:
-> > On Thu, May 04, 2017 at 10:34:32AM +0100, Marc Zyngier wrote:
-> >> On 03/05/17 19:33, Christoffer Dall wrote:
-> >>> First we define an ABI using the vcpu devices that lets userspace set
-> >>> the interrupt numbers for the various timers on both the 32-bit and
-> >>> 64-bit KVM/ARM implementations.
-> >>>
-> >>> Second, we add the definitions for the groups and attributes introduced
-> >>> by the above ABI.  (We add the PMU define on the 32-bit side as well for
-> >>> symmetry and it may get used some day.)
-> >>>
-> >>> Third, we set up the arch-specific vcpu device operation handlers to
-> >>> call into the timer code for anything related to the
-> >>> KVM_ARM_VCPU_TIMER_CTRL group.
-> >>>
-> >>> Fourth, we implement support for getting and setting the timer interrupt
-> >>> numbers using the above defined ABI in the arch timer code.
-> >>>
-> >>> Fifth, we introduce error checking upon enabling the arch timer (which
-> >>> is called when first running a VCPU) to check that all VCPUs are
-> >>> configured to use the same PPI for the timer (as mandated by the
-> >>> architecture) and that the virtual and physical timers are not
-> >>> configured to use the same IRQ number.
-> >>>
-> >>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> >>> ---
-> >>>  Documentation/virtual/kvm/devices/vcpu.txt |  25 +++++++
-> >>>  arch/arm/include/uapi/asm/kvm.h            |   8 +++
-> >>>  arch/arm/kvm/guest.c                       |   9 +++
-> >>>  arch/arm64/include/uapi/asm/kvm.h          |   3 +
-> >>>  arch/arm64/kvm/guest.c                     |   9 +++
-> >>>  include/kvm/arm_arch_timer.h               |   4 ++
-> >>>  virt/kvm/arm/arch_timer.c                  | 104 +++++++++++++++++++++++++++++
-> >>>  7 files changed, 162 insertions(+)
-> >>>
-> >>> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
-> >>> index 352af6e..013e3f1 100644
-> >>> --- a/Documentation/virtual/kvm/devices/vcpu.txt
-> >>> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
-> >>> @@ -35,3 +35,28 @@ Returns: -ENODEV: PMUv3 not supported or GIC not initialized
-> >>>  Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
-> >>>  virtual GIC implementation, this must be done after initializing the in-kernel
-> >>>  irqchip.
-> >>> +
-> >>> +
-> >>> +2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
-> >>> +Architectures: ARM,ARM64
-> >>> +
-> >>> +2.1. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_VTIMER
-> >>> +2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_PTIMER
-> >>> +Parameters: in kvm_device_attr.addr the address for the timer interrupt is a
-> >>> +            pointer to an int
-> >>> +Returns: -EINVAL: Invalid timer interrupt number
-> >>> +         -EBUSY:  One or more VCPUs has already run
-> >>> +
-> >>> +A value describing the architected timer interrupt number when connected to an
-> >>> +in-kernel virtual GIC.  These must be a PPI (16 <= intid < 32).  If an
-> >>> +attribute is not set, a default value is applied (see below).
-> >>> +
-> >>> +KVM_ARM_VCPU_TIMER_IRQ_VTIMER: The EL1 virtual timer intid (default: 27)
-> >>> +KVM_ARM_VCPU_TIMER_IRQ_PTIMER: The EL1 physical timer intid (default: 30)
-> >>
-> >> uber nit: my reading of the code is that the default is set at VCPU
-> >> creation time. So setting the attribute overrides the default, not that
-> >> the default is applied if no attribute is set (i.e. there is always a
-> >> valid value).
-> >>
-> > 
-> > uh, right, I don't see the distinction though, so not sure how to
-> > correct the text.
-> > 
-> > Would "Setting the attribute overrides the default values (see below)."
-> > work instead?
-> 
-> Looks good to me.
-> 
-> [...]
-> 
-> >>
-> >> Another issue that just popped in my head: how do we ensure that we
-> >> don't clash between the PMU and the timers? Yes, that's a foolish thing
-> >> to do, but that's no different from avoiding the same interrupt on the
-> >> timers...
-> >>
-> > Argh, good point.
-> > 
-> > So actually, nothing *really bad* happens from using the same IRQ number
-> > except that the VM gets confused.  However, it's living life dangerously
-> > because we use the HW bit for the vtimer, so we if ever start using it
-> > for other timers or the PMU, then you could end up in a situation where
-> > you unmap the phys mapping on behalf of another device, and the physical
-> > interrupt could be left in an active state.
-> > 
-> > On the other hand, the vtimer currently belongs only to VMs and we set
-> > the required physical active state before entering the VM, so maybe it
-> > doesn't matter.
-> 
-> So far, we always assume that there is never more than a single source
-> per interrupt. We'll end-up with weird behaviours because our line_level
-> field is not an OR of the various inputs, but a direct assignment
-> (device A and B raise the line, then A drops it -> B's interrupt is gone).
-> 
-> I think that only the guest will be confused by it, but accepting it may
-> be interpreted as "this should work correctly". Would documenting that
-> it is a bad idea be enough?
-> 
-> > Should we just forego these checks and let the user shoot itself in the
-> > foot if he/she wants to?
-> 
-> If the documentation is enough, why not. Otherwise, we need some form of
-> allocator. Boring. ;-)
-> 
 
-Well, it's not that bad really (untested):
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 1541f5d..122f9d3 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -121,6 +121,9 @@ struct vgic_irq {
- 	u8 source;			/* GICv2 SGIs only */
- 	u8 priority;
- 	enum vgic_irq_config config;	/* Level or edge */
-+
-+	void *owner;			/* Opaque pointer to reserve an interrupt
-+					   for in-kernel devices. */
- };
- 
- struct vgic_register_region;
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 3d0979c..7561d2d 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -429,6 +429,42 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
- }
- 
- /**
-+ * kvm_vgic_set_owner - Set the owner of an interrupt for a VM
-+ *
-+ * @kvm:    Pointer to the VM structure
-+ * @intid:  The virtual INTID identifying the interrupt (PPI or SPI)
-+ * @owner:  Opaque pointer to the owner
-+ *
-+ * Returns 0 if intid is not already used by another in-kernel device and the
-+ * owner is set, otherwise returns an error code.
-+ *
-+ * We only set the owner for VCPU 0 for PPIs.
-+ */
-+int kvm_vgic_set_owner(struct kvm *kvm, unsigned int intid, void *owner)
-+{
-+	struct vgic_irq *irq;
-+	struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, 0);
-+	int ret = 0;
-+
-+	if (!vgic_initialized(kvm))
-+		return -EAGAIN;
-+
-+	/* SGIs and LPIs cannot be wired up to any device */
-+	if (!irq_is_ppi(intid) && !vgic_valid_spi(kvm, intid))
-+		return -EINVAL;
-+
-+	irq = vgic_get_irq(kvm, vcpu, intid);
-+	spin_lock(&irq->irq_lock);
-+	if (irq->owner && irq->owner != owner)
-+		ret = -EEXIST;
-+	else
-+		irq->owner = owner;
-+	spin_unlock(&irq->irq_lock);
-+
-+	return ret;
-+}
-+
-+/**
-  * vgic_prune_ap_list - Remove non-relevant interrupts from the list
-  *
-  * @vcpu: The VCPU pointer
+On 03/05/2017 18:06, Andrew Jones wrote:
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  Documentation/virtual/kvm/vcpu-requests.rst | 269 ++++++++++++++++++++++++++++
 
-The problem is that it doesn't help that much, because userspace can
-still change the level of an IRQ which is connected to an in-kernel
-device, unless we also introduce checking the owner field in the
-injection path.
+I for one welcome our new reStructuredText overlords. :)
 
-I don't see it blowing up the host with/without an allocator, so I'm
-fine with documentation, but I can also include the above.
+Thanks for the excellent writeup.
 
-Thoughts?
+>  1 file changed, 269 insertions(+)
+>  create mode 100644 Documentation/virtual/kvm/vcpu-requests.rst
+> 
+> diff --git a/Documentation/virtual/kvm/vcpu-requests.rst b/Documentation/virtual/kvm/vcpu-requests.rst
+> new file mode 100644
+> index 000000000000..d74616d7999a
+> --- /dev/null
+> +++ b/Documentation/virtual/kvm/vcpu-requests.rst
+> @@ -0,0 +1,269 @@
+> +=================
+> +KVM VCPU Requests
+> +=================
+> +
+> +Overview
+> +========
+> +
+> +KVM supports an internal API enabling threads to request a VCPU thread to
+> +perform some activity.  For example, a thread may request a VCPU to flush
+> +its TLB with a VCPU request.  The API consists of the following functions::
+> +
+> +  /* Check if any requests are pending for VCPU @vcpu. */
+> +  bool kvm_request_pending(struct kvm_vcpu *vcpu);
+> +
+> +  /* Check if VCPU @vcpu has request @req pending. */
+> +  bool kvm_test_request(int req, struct kvm_vcpu *vcpu);
+> +
+> +  /* Clear request @req for VCPU @vcpu. */
+> +  void kvm_clear_request(int req, struct kvm_vcpu *vcpu);
+> +
+> +  /*
+> +   * Check if VCPU @vcpu has request @req pending. When the request is
+> +   * pending it will be cleared and a memory barrier, which pairs with
+> +   * another in kvm_make_request(), will be issued.
+> +   */
+> +  bool kvm_check_request(int req, struct kvm_vcpu *vcpu);
+> +
+> +  /*
+> +   * Make request @req of VCPU @vcpu. Issues a memory barrier, which pairs
+> +   * with another in kvm_check_request(), prior to setting the request.
+> +   */
+> +  void kvm_make_request(int req, struct kvm_vcpu *vcpu);
+> +
+> +  /* Make request @req of all VCPUs of the VM with struct kvm @kvm. */
+> +  bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
+> +
+> +Typically a requester wants the VCPU to perform the activity as soon
+> +as possible after making the request.  This means most requests
+> +(kvm_make_request() calls) are followed by a call to kvm_vcpu_kick(),
+> +and kvm_make_all_cpus_request() has the kicking of all VCPUs built
+> +into it.
+> +
+> +VCPU Kicks
+> +----------
+> +
+> +The goal of a VCPU kick is to bring a VCPU thread out of guest mode in
+> +order to perform some KVM maintenance.  To do so, an IPI is sent, forcing
+> +a guest mode exit.  However, a VCPU thread may not be in guest mode at the
+> +time of the kick.  Therefore, depending on the mode and state of the VCPU
+> +thread, there are two other actions a kick may take.  All three actions
+> +are listed below:
+> +
+> +1) Send an IPI.  This forces a guest mode exit.
+> +2) Waking a sleeping VCPU.  Sleeping VCPUs are VCPU threads outside guest
+> +   mode that wait on waitqueues.  Waking them removes the threads from
+> +   the waitqueues, allowing the threads to run again.  This behavior
+> +   may be suppressed, see KVM_REQUEST_NO_WAKEUP below.
+> +3) Nothing.  When the VCPU is not in guest mode and the VCPU thread is not
+> +   sleeping, then there is nothing to do.
+> +
+> +VCPU Mode
+> +---------
+> +
+> +VCPUs have a mode state, vcpu->mode, that is used to track whether the
+> +guest is running in guest mode or not, as well as some specific
+> +outside guest mode states.  The architecture may use vcpu->mode to ensure
+> +VCPU requests are seen by VCPUs (see "Ensuring Requests Are Seen"), as
+> +well as to avoid sending unnecessary IPIs (see "IPI Reduction"), and even
+> +to ensure IPI acknowledgements are waited upon (see "Waiting for
+> +Acknowledgements").  The following modes are defined:
+> +
+> +OUTSIDE_GUEST_MODE
+> +
+> +  The VCPU thread is outside guest mode.
+> +
+> +IN_GUEST_MODE
+> +
+> +  The VCPU thread is in guest mode.
+> +
+> +EXITING_GUEST_MODE
+> +
+> +  The VCPU thread is transitioning from IN_GUEST_MODE to
+> +  OUTSIDE_GUEST_MODE.
+> +
+> +READING_SHADOW_PAGE_TABLES
+> +
+> +  The VCPU thread is outside guest mode and wants certain VCPU requests,
+> +  namely KVM_REQ_TLB_FLUSH, to be delayed until it's done reading the
+> +  page tables.
 
-Thanks,
--Christoffer
+... but it wants the sender of certain VCPU requests, namely
+KVM_REQ_TLB_FLUSH to wait until the VCPU thread is done reading the page
+tables.
+
+> +VCPU Request Internals
+> +======================
+> +
+> +VCPU requests are simply bit indices of the vcpu->requests bitmap.  This
+> +means general bitops, like those documented in [atomic-ops]_ could also be
+> +used, e.g. ::
+> +
+> +  clear_bit(KVM_REQ_UNHALT & KVM_REQUEST_MASK, &vcpu->requests);
+> +
+> +However, VCPU request users should refrain from doing so, as it would
+> +break the abstraction.  The first 8 bits are reserved for architecture
+> +independent requests, all additional bits are available for architecture
+> +dependent requests.
+> +
+> +Architecture Independent Requests
+> +---------------------------------
+> +
+> +KVM_REQ_TLB_FLUSH
+> +
+> +  KVM's common MMU notifier may need to flush all of a guest's TLB
+> +  entries, calling kvm_flush_remote_tlbs() to do so.  Architectures that
+> +  choose to use the common kvm_flush_remote_tlbs() implementation will
+> +  need to handle this VCPU request.
+> +
+> +KVM_REQ_MMU_RELOAD
+> +
+> +  When shadow page tables are used and memory slots are removed it's
+> +  necessary to inform each VCPU to completely refresh the tables.  This
+> +  request is used for that.
+> +
+> +KVM_REQ_PENDING_TIMER
+> +
+> +  This request may be made from a timer handler run on the host on behalf
+> +  of a VCPU.  It informs the VCPU thread to inject a timer interrupt.
+> +
+> +KVM_REQ_UNHALT
+> +
+> +  This request may be made from the KVM common function kvm_vcpu_block(),
+> +  which is used to emulate an instruction that causes a CPU to halt until
+> +  one of an architectural specific set of events and/or interrupts is
+> +  received (determined by checking kvm_arch_vcpu_runnable()).  When that
+> +  event or interrupt arrives kvm_vcpu_block() makes the request.  This is
+> +  in contrast to when kvm_vcpu_block() returns due to any other reason,
+> +  such as a pending signal, which does not indicate the VCPU's halt
+> +  emulation should stop, and therefore does not make the request.
+> +
+> +KVM_REQUEST_MASK
+> +----------------
+> +
+> +VCPU requests should be masked by KVM_REQUEST_MASK before using them with
+> +bitops.  This is because only the lower 8 bits are used to represent the
+> +request's number.  The upper bits are reserved, and may be used as flags.
+
+The upper bits are used as flags.  Currently only two flags are defined.
+
+> +VCPU Request Flags
+> +------------------
+> +
+> +KVM_REQUEST_NO_WAKEUP
+> +
+> +  This flag is applied to a request that does not need immediate
+> +  attention.  When a request does not need immediate attention, and the
+> +  VCPU's thread is outside guest mode sleeping, then the thread is not
+> +  awaken by a kick.
+> +
+> +KVM_REQUEST_WAIT
+> +
+> +  When requests with this flag are made with kvm_make_all_cpus_request(),
+> +  then the caller will wait for each VCPU to acknowledge the IPI before
+> +  proceeding.
+> +
+> +VCPU Requests with Associated State
+> +===================================
+> +
+> +Requesters that want the receiving VCPU to handle new state need to ensure
+> +the newly written state is observable to the receiving VCPU thread's CPU
+> +by the time it observes the request.  This means a write memory barrier
+> +must be inserted after writing the new state and before setting the VCPU
+> +request bit.  Additionally, on the receiving VCPU thread's side, a
+> +corresponding read barrier must be inserted after reading the request bit
+> +and before proceeding to read the new state associated with it.  See
+> +scenario 3, Message and Flag, of [lwn-mb]_ and the kernel documentation
+> +[memory-barriers]_.
+> +
+> +The pair of functions, kvm_check_request() and kvm_make_request(), provide
+> +the memory barriers, allowing this requirement to be handled internally by
+> +the API.
+> +
+> +Ensuring Requests Are Seen
+> +==========================
+> +
+> +When making requests to VCPUs, we want to avoid the receiving VCPU
+> +executing in guest mode for an arbitrary long time without handling the
+> +request.  We can be sure this won't happen as long as we ensure the VCPU
+> +thread checks kvm_request_pending() before entering guest mode and that a
+> +kick will send an IPI when necessary.  Extra care must be taken to cover
+> +the period after the VCPU thread's last kvm_request_pending() check and
+> +before it has entered guest mode, as kick IPIs will only trigger VCPU run
+> +loops for VCPU threads that are in guest mode or at least have already
+> +disabled interrupts in order to prepare to enter guest mode.  This means
+> +that an optimized implementation (see "IPI Reduction") must be certain
+> +when it's safe to not send the IPI.  One solution, which all architectures
+> +except s390 apply, is to set vcpu->mode to IN_GUEST_MODE prior to the last
+> +kvm_request_pending() check and to rely on memory barrier guarantees.
+
+is to:
+
+- set vcpu->mode to IN_GUEST_MODE between disabling the interrupts and
+the last kvm_request_pending() check;
+
+- enable interrupts atomically when entering the guest.
+
+Then at the beginning of the next paragraph: "This solution also
+requires memory barriers to be placed carefully in both the sender of
+the IPI and the VCPU thread."
+
+Should vcpu->mode and IN_GUEST_MODE use monospaced font?  Likewise
+elsewhere in the document.
+
+
+> +With memory barriers we can exclude the possibility of a VCPU thread
+> +observing !kvm_request_pending() on its last check and then not receiving
+> +an IPI for the next request made of it, even if the request is made
+> +immediately after the check.  This is done by way of the Dekker memory
+> +barrier pattern (scenario 10 of [lwn-mb]_).  As the Dekker pattern
+> +requires two variables, this solution pairs vcpu->mode with
+> +vcpu->requests.  Substituting them into the pattern gives::
+> +
+> +  CPU1                                    CPU2
+> +  =================                       =================
+> +  local_irq_disable();
+> +  WRITE_ONCE(vcpu->mode, IN_GUEST_MODE);  kvm_make_request(REQ, vcpu);
+> +  smp_mb();                               smp_mb();
+> +  if (kvm_request_pending(vcpu)) {        if (READ_ONCE(vcpu->mode) ==
+> +                                              IN_GUEST_MODE) {
+> +      ...abort guest entry...                 ...send IPI...
+> +  }                                       }
+> +
+> +As stated above, the IPI is only useful for VCPU threads in guest mode or
+> +that have already disabled interrupts.  This is why this specific case of
+> +the Dekker pattern has been extended to disable interrupts before setting
+> +vcpu->mode to IN_GUEST_MODE.  WRITE_ONCE() and READ_ONCE() are used to
+> +pedantically implement the memory barrier pattern, guaranteeing the
+> +compiler doesn't interfere with vcpu->mode's carefully planned accesses.
+> +
+> +IPI Reduction
+> +-------------
+> +
+> +As only one IPI is needed to get a VCPU to check for any/all requests,
+> +then they may be coalesced.  This is easily done by having the first IPI
+> +sending kick also change the VCPU mode to something !IN_GUEST_MODE.  The
+> +transitional state, EXITING_GUEST_MODE, is used for this purpose.
+> +
+> +Waiting for Acknowledgements
+> +----------------------------
+> +
+> +Some requests, those with the KVM_REQUEST_WAIT flag set, require IPIs to
+> +be sent, and the acknowledgements to be waited upon, even when the target
+> +VCPU threads are in modes other than IN_GUEST_MODE.  For example, one case
+> +is when a target VCPU thread is in READING_SHADOW_PAGE_TABLES mode, which
+> +is set after disabling interrupts.  For these cases, the "should send an
+> +IPI" condition becomes READ_ONCE(vcpu->mode) != OUTSIDE_GUEST_MODE.
+> +
+> +Request-less VCPU Kicks
+> +-----------------------
+> +
+> +As the determination of whether or not to send an IPI depends on the
+> +two-variable Dekker memory barrier pattern, then it's clear that
+> +request-less VCPU kicks are almost never correct.  Without the assurance
+> +that a non-IPI generating kick will still result in an action by the
+> +receiving VCPU, as the final kvm_request_pending() check does for
+> +request-accompanying kicks, then the kick may not do anything useful at
+> +all.  If, for instance, a request-less kick was made to a VCPU that was
+> +just about to set its mode to IN_GUEST_MODE, meaning no IPI is sent, then
+> +the VCPU thread may continue its entry without actually having done
+> +whatever it was the kick was meant to initiate.
+
+One exception is x86's posted interrupt mechanism.  In this case,
+however, even the request-less VCPU kick is coupled with the same
+local_irq_disable()+smp_mb() pattern described above; the ON bit
+(Outstanding Notification) in the posted interrupt descriptor takes the
+role of vcpu->requests.  When sending a posted interrupt, PIR.ON is set
+before reading vcpu->mode; dually, in the VCPU thread,
+vmx_sync_pir_to_irr reads PIR after setting vcpu->mode to IN_GUEST_MODE.
+
+> +Additional Considerations
+> +=========================
+> +
+> +Sleeping VCPUs
+> +--------------
+> +
+> +VCPU threads may need to consider requests before and/or after calling
+> +functions that may put them to sleep, e.g. kvm_vcpu_block().  Whether they
+> +do or not, and, if they do, which requests need consideration, is
+> +architecture dependent.  kvm_vcpu_block() calls kvm_arch_vcpu_runnable()
+> +to check if it should awaken.  One reason to do so is to provide
+> +architectures a function where requests may be checked if necessary.
+
+What did you have in mind here?
+
+Paolo
+
+> +References
+> +==========
+> +
+> +.. [atomic-ops] Documentation/core-api/atomic_ops.rst
+> +.. [memory-barriers] Documentation/memory-barriers.txt
+> +.. [lwn-mb] https://lwn.net/Articles/573436/
+> 
