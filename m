@@ -1,63 +1,231 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Move shared files to virt/kvm/arm
-Date: Thu, 4 May 2017 15:07:03 +0200
-Message-ID: <dad57222-b97f-59f1-68cd-5ddfed69b078@redhat.com>
-References: <20170504123311.25252-1-cdall@linaro.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v6 01/24] KVM: arm/arm64: Add ITS save/restore API
+ documentation
+Date: Thu, 4 May 2017 15:23:21 +0200
+Message-ID: <20170504132321.GN5923@cbox>
+References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
+ <1493898284-29504-2-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B433F40296
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 09:04:04 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O-hfvUxMpqIL for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 May 2017 09:04:03 -0400 (EDT)
-Received: from mail-wm0-f68.google.com (mail-wm0-f68.google.com [74.125.82.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7EA5840190
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 09:04:02 -0400 (EDT)
-Received: by mail-wm0-f68.google.com with SMTP id y10so3214511wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 May 2017 06:07:08 -0700 (PDT)
-In-Reply-To: <20170504123311.25252-1-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1493898284-29504-2-git-send-email-eric.auger@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, bjsprakash.linux@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 04/05/2017 14:33, Christoffer Dall wrote:
-> For some time now we have been having a lot of shared functionality
-> between the arm and arm64 KVM support in arch/arm, which not only
-> required a horrible inter-arch reference from the Makefile in
-> arch/arm64/kvm, but also created confusion for newcomers to the code
-> base, as was recently seen on the mailing list.
+On Thu, May 04, 2017 at 01:44:21PM +0200, Eric Auger wrote:
+> Add description for how to access ITS registers and how to save/restore
+> ITS tables into/from memory.
 > 
-> Further, it causes confusion for things like cscope, which needs special
-> attention to index specific shared files for arm64 from the arm tree.
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> Move the shared files into virt/kvm/arm and move the trace points along
-> with it.  When moving the tracepoints we have to modify the way the vgic
-> creates definitions of the trace points, so we take the chance to
-> include the VGIC tracepoints in its very own special vgic trace.h file.
-> 
-> Signed-off-by: Christoffer Dall <cdall@linaro.org>
 > ---
-> Hi Marc,
+> v5 -> v6:
+> - add restoration ordering
+> - 256B -> 256 Byte aligned
+> - DTE Size is number of bits for the EVENTID
+> - s/GITS_READR/GITS_CREADR
 > 
-> What do you think of this?  If you like it, I think we should include it
-> for this merge window.
+> v4 -> v5:
+> - take into account Christoffer's comments
+> - pending table save on GICV3 side now
+> 
+> v3 -> v4:
+> - take into account Peter's comments:
+>   - typos
+>   - KVM_DEV_ARM_VGIC_GRP_ITS_TABLES kvm_device_attr = 0
+>   - add a validity bit in DTE
+>   - document all fields in CTE and ITE
+>   - document ABI revision
+> - take into account Andre's comments:
+>   - document restrictions about GITS_CREADR writing and GITS_IIDR
+>   - document -EBUSY error if one or more VCPUS are runnning
+>   - document 64b registers only can be accessed with 64b access
+> - itt_addr field matches bits [51:8] of the itt_addr
+> 
+> v1 -> v2:
+> - DTE and ITE now are 8 bytes
+> - DTE and ITE now indexed by deviceid/eventid
+> - use ITE name instead of ITTE
+> - mentions ITT_addr matches bits [51:8] of the actual address
+> - mentions LE layout
+> ---
+>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 117 +++++++++++++++++++++
+>  1 file changed, 117 insertions(+)
+> 
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> index 6081a5b..863c359 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> @@ -32,7 +32,124 @@ Groups:
+>      KVM_DEV_ARM_VGIC_CTRL_INIT
+>        request the initialization of the ITS, no additional parameter in
+>        kvm_device_attr.addr.
+> +
+> +    KVM_DEV_ARM_ITS_SAVE_TABLES
+> +      save the ITS table data into guest RAM, at the location provisioned
+> +      by the guest in corresponding registers/table entries.
+> +
+> +      The layout of the tables in guest memory defines an ABI. The entries
+> +      are laid out in little endian format as described in the last paragraph.
+> +
+> +    KVM_DEV_ARM_ITS_RESTORE_TABLES
+> +      restore the ITS tables from guest RAM to ITS internal structures.
+> +
+> +      The GICV3 must be restored before the ITS and all ITS registers but
+> +      the GITS_CTLR must be restored before restoring the ITS tables.
+> +
+> +      The GITS_IIDR read-only register must also be restored before
+> +      the table restore as the IIDR revision field encodes the ABI revision.
 
-Certainly no objection from me, in fact this should not be a problem
-even after -rc1.
+the table restore?  "before calling KVM_DEV_ARM_ITS_RESTORE_TABLES" ?
+(there's a potential confusion between calling this ioctl and simply
+restoring the memory containing the tables).
 
-Paolo
+> +
+> +      The expected ordering when restoring the GICv3/ITS is described in section
+> +      "ITS Restoration Sequence".
+> +
+>    Errors:
+>      -ENXIO:  ITS not properly configured as required prior to setting
+>               this attribute
+>      -ENOMEM: Memory shortage when allocating ITS internal data
+> +    -EINVAL: Inconsistent restored data
+> +    -EFAULT: Invalid guest ram access
+> +    -EBUSY:  One or more VCPUS are running
+> +
+> +  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+> +  Attributes:
+> +      The attr field of kvm_device_attr encodes the offset of the
+> +      ITS register, relative to the ITS control frame base address
+> +      (ITS_base).
+> +
+> +      kvm_device_attr.addr points to a __u64 value whatever the width
+> +      of the addressed register (32/64 bits). 64 bit registers can only
+> +      be accessed with full length.
+> +
+> +      Writes to read-only registers are ignored by the kernel except for:
+> +      - GITS_CREADR. It needs to be restored otherwise commands in the queue
+> +        will be re-executed after restoring CWRITER. GITS_CREADR must be
+> +        restored before restoring the GITS_CTLR which is likely to enable the
+> +        ITS. Also it needs to be restored after GITS_CBASER since a write to
+> +        GITS_CBASER resets GITS_CREADR.
+
+uber nit: s/needs to be/must be/g in all occurences above.
+
+> +      - GITS_IIDR. Its Revision field encodes the table layout ABI revision.
+
+s/Its/The/
+the revision of the table layout ABI.
+
+> +        In the future we might implement direct injection of virtual LPIS.
+
+LPIs
+
+> +        This will require an upgrade of the table layout and an evolution of
+> +        the ABI. GITS_IIDR must be restored before the table restoration.
+
+before calling KVM_DEV_ARM_ITS_RESTORE_TABLES.
+
+> +
+> +      For other registers, getting or setting a register has the same
+> +      effect as reading/writing the register on real hardware.
+> +  Errors:
+> +    -ENXIO: Offset does not correspond to any supported register
+> +    -EFAULT: Invalid user pointer for attr->addr
+> +    -EINVAL: Offset is not 64-bit aligned
+> +    -EBUSY: one or more VCPUS are running
+> +
+> + ITS Restoration Sequence:
+
+s/Restoration/restore/
+
+> + -------------------------
+> +
+> +The following ordering must be followed when restoring the GIC and the ITS:
+> +a) restore all guest memory and create vcpus
+> +b) initialize the GIC and ITS (KVM_DEV_ARM_VGIC_CTRL_INIT)
+
+are these really coupled or can you do everything related to the gic
+first, and then everything related to the ITS afterwards?
+
+> +c) provide GIC and ITS base addresses (KVM_DEV_ARM_VGIC_GRP_ADDR)
+
+same
+
+> +d) restore all redistributors
+> +e) restore the ITS in the following order:
+> +   1. Restore GITS_CBASER
+> +   2. Restore all other GITS_ registers, except GITS_CTLR!
+> +   3. Load the ITS table data (KVM_DEV_ARM_ITS_RESTORE_TABLES)
+> +   4. Restore GITS_CTLR
+> +f) start vcpus
+
+I would omit (f) from here.
+
+> +
+> + ITS Table ABI REV0:
+> + -------------------
+> +
+> + Revision 0 of the ABI only supports physical LPIs.
+> +
+> + The device table and ITT are indexed by the deviceid and eventid,
+> + respectively. The collection table is not indexed by collectionid:
+> + CTE are written in the table in the order of collection creation. All
+
+nit: CTEs
+
+> + entries are 8 bytes.
+> +
+> + Device Table Entry (DTE):
+> +
+> + bits:     | 63| 62 ... 49 | 48 ... 5 | 4 ... 0 |
+> + values:   | V |   next    | ITT_addr |  Size   |
+> +
+> + where;
+> + - V indicates whether the entry is valid. If not, other fields
+> +   are not meaningful.
+> + - next: equals to 0 if this entry is the last one; otherwise it
+> +   corresponds to the deviceid offset to the next DTE, capped by
+> +   2^14 -1.
+> + - ITT_addr matches bits [51:8] of the ITT address (256 Byte aligned).
+> + - Size specifies the supported number of bits for the eventid,
+> +   minus one
+> +
+> + Collection Table Entry (CTE):
+> +
+> + bits:     | 63| 62 ..  52  | 51 ... 16 | 15  ...   0 |
+> + values:   | V |    RES0    |  RDBase   |    ICID     |
+> +
+> + where:
+> + - V indicates whether the entry is valid. If not, other fields are
+> +   not meaningful.
+> + - RES0: reserved field with Should-Be-Zero-or-Preserved behavior.
+> + - RDBase is the PE number (GICR_TYPER.Processor_Number semantic),
+> + - ICID is the collection ID
+> +
+> + Interrupt Translation Entry (ITE):
+> +
+> + bits:     | 63 ... 48 | 47 ... 16 | 15 ... 0 |
+> + values:   |    next   |   pINTID  |  ICID    |
+> +
+> + where:
+> + - next: equals to 0 if this entry is the last one; otherwise it corresponds
+> +   to the eventid offset to the next ITE capped by 2^16 -1.
+> + - pINTID is the physical LPI ID; if zero, it means the entry is not valid
+> +   and other fields are not meaningful.
+> + - ICID is the collection ID
+> +
+> -- 
+> 2.5.5
+> 
+
+The only outstanding issue here is the restore order part.  I don't wont
+to specify a stronger order than absolutely necessary here.
+
+Otherwise this generally looks good.
+
+Thanks,
+-Christoffer
