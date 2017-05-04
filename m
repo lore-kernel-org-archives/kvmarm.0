@@ -1,107 +1,101 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v6 13/24] KVM: arm64: vgic-its: Check the device id
- matches TYPER DEVBITS range
-Date: Thu, 4 May 2017 19:19:23 +0200
-Message-ID: <20170504171923.GX5923@cbox>
-References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
- <1493898284-29504-14-git-send-email-eric.auger@redhat.com>
+From: gengdongjiu <gengdj.1984@gmail.com>
+Subject: Re: [PATCH v3 1/3] arm64: kvm: support kvmtool to detect RAS
+ extension feature
+Date: Fri, 5 May 2017 01:20:53 +0800
+Message-ID: <CAMj-D2BS7UHLC3DGM5i7fSRsqDKHmLYg79UV7sT6yHGFy5aYfw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1493898284-29504-14-git-send-email-eric.auger@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, bjsprakash.linux@gmail.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD85540190
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 13:17:48 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id wLrZKuxKNPtJ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 May 2017 13:17:47 -0400 (EDT)
+Received: from mail-yw0-f194.google.com (mail-yw0-f194.google.com
+ [209.85.161.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D52D140019
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 May 2017 13:17:47 -0400 (EDT)
+Received: by mail-yw0-f194.google.com with SMTP id 203so1459990ywe.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 May 2017 10:20:54 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, Len Brown <lenb@kernel.org>, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, Sandeepa Prabhu <sandeepa.s.prabhu@gmail.com>, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, Fu Wei <fu.wei@linaro.org>, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 04, 2017 at 01:44:33PM +0200, Eric Auger wrote:
-> On MAPD we currently check the device id can be stored in the device table.
-> Let's first check it can be encoded within the range defined by TYPER
-> DEVBITS.
-> 
-> Also check the collection ID belongs to the 16 bit range as GITS_TYPER
-> CIL field equals to 0.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v4 -> v5:
-> - use GIC_ENCODE_SZ macro
-> 
-> v3 -> v4:
-> - VITS_TYPER_DEVBITS set to 16 for homogeneity
-> - use BIT_ULL
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 25 ++++++++++++++++++++-----
->  1 file changed, 20 insertions(+), 5 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 6da548d..e7bb86a 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -204,6 +204,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
->  #define GIC_LPI_OFFSET 8192
->  
->  #define VITS_TYPER_IDBITS 16
-> +#define VITS_TYPER_DEVBITS 16
->  
->  /*
->   * Finds and returns a collection in the ITS collection table.
-> @@ -404,7 +405,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
->  	 * To avoid memory waste in the guest, we keep the number of IDBits and
->  	 * DevBits low - as least for the time being.
->  	 */
-> -	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
-> +	reg |= GIC_ENCODE_SZ(VITS_TYPER_DEVBITS, 5) << GITS_TYPER_DEVBITS_SHIFT;
->  	reg |= GIC_ENCODE_SZ(VITS_TYPER_IDBITS, 5) << GITS_TYPER_IDBITS_SHIFT;
->  	reg |= GIC_ENCODE_SZ(abi->ite_esz, 4) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
->  
-> @@ -646,16 +647,30 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
->   * Check whether an ID can be stored into the corresponding guest table.
->   * For a direct table this is pretty easy, but gets a bit nasty for
->   * indirect tables. We check whether the resulting guest physical address
-> - * is actually valid (covered by a memslot and guest accessbible).
-> + * is actually valid (covered by a memslot and guest accessible).
->   * For this we have to read the respective first level entry.
->   */
-> -static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
-> +static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
->  {
->  	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
-> +	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
-> +	int esz = GITS_BASER_ENTRY_SIZE(baser);
->  	int index;
-> -	u64 indirect_ptr;
->  	gfn_t gfn;
-> -	int esz = GITS_BASER_ENTRY_SIZE(baser);
-> +
-> +	switch (type) {
-> +	case GITS_BASER_TYPE_DEVICE:
-> +		if (id >= BIT_ULL(VITS_TYPER_DEVBITS))
-> +			return false;
-> +		break;
-> +	case GITS_BASER_TYPE_COLLECTION:
-> +		/* as GITS_TYPER.CID == 0, ITS supports 16-bit collection ID */
+Dear James,
 
-nit: GITS_TYPE.CIL
+>
+>  Hi Dongjiu Geng,
+>
+> On 30/04/17 06:37, Dongjiu Geng wrote:
+>> Handle kvmtool's detection for RAS extension, because sometimes
+>> the APP needs to know the CPU's capacity
+>
+>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+>> index d9e9697..1004039 100644
+>> --- a/arch/arm64/kvm/reset.c
+>> +++ b/arch/arm64/kvm/reset.c
+>> @@ -64,6 +64,14 @@ static bool cpu_has_32bit_el1(void)
+>>   return !!(pfr0 & 0x20);
+>>  }
+>>
+>> +static bool kvm_arm_support_ras_extension(void)
+>> +{
+>> + u64 pfr0;
+>> +
+>> + pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
+>> + return !!(pfr0 & 0x10000000);
+>> +}
+>
+> Why are we telling user-space that the CPU has RAS extensions? EL0 can't do
+> anything with this and the guest EL1 can detect it from the id registers.
+>
+>
+> Are you using this to decide whether or not to generate a HEST for the guest?
+
+James, yes, it is.  my current user-space qemu EL0 patches indeed will
+check the RAS  extensions.
+if has the RAS extensions. for SEA, userspace qemu will generate the
+CPER and inject the SEA to guest;
+for SEI,  userspace qemu sets the virtual SEI with the specified
+Syndrome(set the HCR_EL2.VSE and vsesr_el2 );
+if not have RAS extensions, Qemu does nothing
 
 
+>
+> If Qemu/kvmtool supports handling memory-failure notifications from signals you
+> should always generate a HEST. The GHES notification method could be anything
+> Qemu can deliver to the guest using the KVM APIs. Notifications from Qemu to the
+> guest don't depend on the RAS extensions. KVM has APIs for IRQ and SEA (you can
+> use KVM_SET_ONE_REG).
 
+I will consider your suggestion to  always generate a CPER instead of
+relying on the RAS extensions, thanks
+For this comments "SEA (you can use KVM_SET_ONE_REG)",  may be it will
+be duplicated with the existed KVM API  as I mentioned in another mail
+thread.I am considering that whether it is necessary to change the
+vcpu registers in the Qemu/KVMTools
 
-> +		if (id >= BIT_ULL(16))
-> +			return false;
-> +		break;
-> +	default:
-> +		return false;
-> +	}
->  
->  	if (!(baser & GITS_BASER_INDIRECT)) {
->  		phys_addr_t addr;
-> -- 
-> 2.5.5
-> 
-
-Otherwise:
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
+>
+>
+> I think we need a new API for injecting SError for SEI from Qemu/kvmtool, but it
+> shouldn't be related to the RAS extensions. All v8.0 CPUs have HCR_EL2.VSE, so
+> we need to know KVM supports this API.
+>
+> Your later patch adds code to set VSESR to make virtual RAS SErrors work, I
+> think we need to expose that to user-space.
+>
+>
+> Thanks,
+>
+> James
