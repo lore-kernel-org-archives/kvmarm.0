@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v6 15/24] KVM: arm64: vgic-its: Read config and pending bit in add_lpi()
-Date: Thu,  4 May 2017 13:44:35 +0200
-Message-ID: <1493898284-29504-16-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v6 16/24] KVM: arm64: vgic-its: KVM_DEV_ARM_ITS_SAVE/RESTORE_TABLES
+Date: Thu,  4 May 2017 13:44:36 +0200
+Message-ID: <1493898284-29504-17-git-send-email-eric.auger@redhat.com>
 References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
@@ -10,108 +10,216 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, marc.zyngier@arm.com, chris
 Cc: Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, bjsprakash.linux@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When creating the lpi we now ask the redistributor what is the state
-of the LPI (priority, enabled, pending).
+Introduce new attributes in KVM_DEV_ARM_VGIC_GRP_CTRL group:
+- KVM_DEV_ARM_ITS_SAVE_TABLES: saves the ITS tables into guest RAM
+- KVM_DEV_ARM_ITS_RESTORE_TABLES: restores them into VGIC internal
+  structures.
+
+We hold the vcpus lock during the save and restore to make
+sure no vcpu is running.
+
+At this stage the functionality is not yet implemented. Only
+the skeleton is put in place.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
+v5 -> v6:
+- remove the pending table sync from the ITS table restore
 
-v6: creation
+v4 -> v5:
+- use KVM_DEV_ARM_ITS_SAVE_TABLES and KVM_DEV_ARM_ITS_RESTORE_TABLES
+- rename *flush* into *save*
+- call its_sync_lpi_pending_table at the end of restore
+- use abi framework
+
+v3 -> v4:
+- pass kvm struct handle to vgic_its_flush/restore_pending_tables
+- take the kvm lock and vcpu locks
+- ABI revision check
+- check attr->attr is null
+
+v1 -> v2:
+- remove useless kvm parameter
 ---
- virt/kvm/arm/vgic/vgic-its.c | 35 ++++++++++++++++++++++++-----------
- 1 file changed, 24 insertions(+), 11 deletions(-)
+ arch/arm/include/uapi/asm/kvm.h   |   4 +-
+ arch/arm64/include/uapi/asm/kvm.h |   4 +-
+ virt/kvm/arm/vgic/vgic-its.c      | 101 ++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 103 insertions(+), 6 deletions(-)
 
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 4beb83b..8e6563c 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -199,7 +199,9 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK 0x3ff
+ #define VGIC_LEVEL_INFO_LINE_LEVEL	0
+ 
+-#define   KVM_DEV_ARM_VGIC_CTRL_INIT    0
++#define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
++#define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
++#define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
+ 
+ /* KVM_IRQ_LINE irq field index values */
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 7e8dd69..1e35115 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -219,7 +219,9 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK	0x3ff
+ #define VGIC_LEVEL_INFO_LINE_LEVEL	0
+ 
+-#define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
++#define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
++#define   KVM_DEV_ARM_ITS_SAVE_TABLES           1
++#define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
+ 
+ /* Device Control API on vcpu fd */
+ #define KVM_ARM_VCPU_PMU_V3_CTRL	0
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index f43ea30c..3ad615a 100644
+index 3ad615a..5b251dc 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -38,6 +38,8 @@
+@@ -1669,12 +1669,68 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+ }
  
- static int vgic_its_set_abi(struct vgic_its *its, int rev);
- static const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its);
-+static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
-+			     struct kvm_vcpu *filter_vcpu);
- 
- /*
-  * Creates a new (reference to a) struct vgic_irq for a given LPI.
-@@ -46,10 +48,12 @@ static const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its);
-  * If this is a "new" LPI, we allocate and initialize a new struct vgic_irq.
-  * This function returns a pointer to the _unlocked_ structure.
+ /**
++ * vgic_its_save_device_tables - Save the device table and all ITT
++ * into guest RAM
++ */
++static int vgic_its_save_device_tables(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_restore_device_tables - Restore the device table and all ITT
++ * from guest RAM to internal data structs
++ */
++static int vgic_its_restore_device_tables(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_save_collection_table - Save the collection table into
++ * guest RAM
++ */
++static int vgic_its_save_collection_table(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
++ * vgic_its_restore_collection_table - reads the collection table
++ * in guest memory and restores the ITS internal state. Requires the
++ * BASER registers to be restored before.
++ */
++static int vgic_its_restore_collection_table(struct vgic_its *its)
++{
++	return -ENXIO;
++}
++
++/**
+  * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
+  * according to v0 ABI
   */
--static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid)
-+static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
-+				     struct kvm_vcpu *vcpu)
+ static int vgic_its_save_tables_v0(struct vgic_its *its)
  {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 	struct vgic_irq *irq = vgic_get_irq(kvm, NULL, intid), *oldirq;
+-	return -ENXIO;
++	struct kvm *kvm = its->dev->kvm;
 +	int ret;
++
++	mutex_lock(&kvm->lock);
++
++	if (!lock_all_vcpus(kvm)) {
++		mutex_unlock(&kvm->lock);
++		return -EBUSY;
++	}
++
++	ret = vgic_its_save_device_tables(its);
++	if (ret)
++		goto out;
++
++	ret = vgic_its_save_collection_table(its);
++
++out:
++	unlock_all_vcpus(kvm);
++	mutex_unlock(&kvm->lock);
++	return ret;
+ }
  
- 	/* In this case there is no put, since we keep the reference. */
- 	if (irq)
-@@ -66,6 +70,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid)
- 	irq->config = VGIC_CONFIG_EDGE;
- 	kref_init(&irq->refcount);
- 	irq->intid = intid;
-+	irq->target_vcpu = vcpu;
- 
- 	spin_lock(&dist->lpi_list_lock);
- 
-@@ -97,6 +102,19 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid)
- out_unlock:
- 	spin_unlock(&dist->lpi_list_lock);
- 
+ /**
+@@ -1684,7 +1740,34 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
+  */
+ static int vgic_its_restore_tables_v0(struct vgic_its *its)
+ {
+-	return -ENXIO;
++	struct kvm *kvm = its->dev->kvm;
++	int ret;
++
++	mutex_lock(&kvm->lock);
++
++	if (!lock_all_vcpus(kvm)) {
++		mutex_unlock(&kvm->lock);
++		return -EBUSY;
++	}
++
++	ret = vgic_its_restore_collection_table(its);
++	if (ret)
++		goto out;
++
++	ret = vgic_its_restore_device_tables(its);
++
++out:
++	unlock_all_vcpus(kvm);
++	mutex_unlock(&kvm->lock);
++
++	if (ret)
++		return ret;
++
 +	/*
-+	 * We "cache" the configuration table entries in out struct vgic_irq's.
-+	 * However we only have those structs for mapped IRQs, so we read in
-+	 * the respective config data from memory here upon mapping the LPI.
++	 * On restore path, MSI injections can happen before the
++	 * first VCPU run so let's complete the GIC init here.
 +	 */
-+	ret = update_lpi_config(kvm, irq, NULL);
-+	if (ret)
-+		return ERR_PTR(ret);
-+
-+	ret = vgic_v3_lpi_sync_pending_status(kvm, irq);
-+	if (ret)
-+		return ERR_PTR(ret);
-+
- 	return irq;
++	return kvm_vgic_map_resources(its->dev->kvm);
  }
  
-@@ -769,6 +787,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	u32 event_id = its_cmd_get_id(its_cmd);
- 	u32 coll_id = its_cmd_get_collection(its_cmd);
- 	struct its_ite *ite;
-+	struct kvm_vcpu *vcpu = NULL;
- 	struct its_device *device;
- 	struct its_collection *collection, *new_coll = NULL;
- 	int lpi_nr;
-@@ -814,7 +833,10 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	ite->collection = collection;
- 	ite->lpi = lpi_nr;
+ static int vgic_its_commit_v0(struct vgic_its *its)
+@@ -1739,6 +1822,10 @@ static int vgic_its_has_attr(struct kvm_device *dev,
+ 		switch (attr->attr) {
+ 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+ 			return 0;
++		case KVM_DEV_ARM_ITS_SAVE_TABLES:
++			return 0;
++		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
++			return 0;
+ 		}
+ 		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS:
+@@ -1774,14 +1861,20 @@ static int vgic_its_set_attr(struct kvm_device *dev,
  
--	irq = vgic_add_lpi(kvm, lpi_nr);
-+	if (its_is_collection_mapped(collection))
-+		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
-+
-+	irq = vgic_add_lpi(kvm, lpi_nr, vcpu);
- 	if (IS_ERR(irq)) {
- 		if (new_coll)
- 			vgic_its_free_collection(its, coll_id);
-@@ -823,15 +845,6 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+ 		return 0;
  	}
- 	ite->irq = irq;
+-	case KVM_DEV_ARM_VGIC_GRP_CTRL:
++	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
++		const struct vgic_its_abi *abi = vgic_its_get_abi(its);
++
+ 		switch (attr->attr) {
+ 		case KVM_DEV_ARM_VGIC_CTRL_INIT:
+ 			its->initialized = true;
  
--	update_affinity_ite(kvm, ite);
--
--	/*
--	 * We "cache" the configuration table entries in out struct vgic_irq's.
--	 * However we only have those structs for mapped IRQs, so we read in
--	 * the respective config data from memory here upon mapping the LPI.
--	 */
--	update_lpi_config(kvm, ite->irq, NULL);
--
- 	return 0;
- }
- 
+ 			return 0;
++		case KVM_DEV_ARM_ITS_SAVE_TABLES:
++			return abi->save_tables(its);
++		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
++			return abi->restore_tables(its);
+ 		}
+-		break;
++	}
+ 	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
+ 		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+ 		u64 reg;
 -- 
 2.5.5
