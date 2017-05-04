@@ -1,244 +1,135 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 1/5] KVM: arm64: Allow creating the PMU without the
- in-kernel GIC
-Date: Thu, 4 May 2017 12:38:52 +0200
-Message-ID: <20170504103852.GK5923@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 5/5] KVM: arm/arm64: Allow setting the timer IRQ numbers
+ from userspace
+Date: Thu, 4 May 2017 11:54:06 +0100
+Message-ID: <79ec69f2-d727-46ec-b1d5-4c535a904e63@arm.com>
 References: <20170503183300.4618-1-cdall@linaro.org>
- <20170503183300.4618-2-cdall@linaro.org>
- <dcaefb19-6dab-a990-2e10-497d02b14242@arm.com>
- <20170504081337.GF5923@cbox>
- <db5a1fb7-e77e-b9f8-9be4-161e94279d10@arm.com>
- <20170504083845.GH5923@cbox>
- <17cb39a1-f0a9-a1f1-fef5-78379d99de2f@arm.com>
- <20170504094404.GI5923@cbox>
- <b680335b-6407-f778-84c1-6565a46ae7d0@arm.com>
+ <20170503183300.4618-6-cdall@linaro.org>
+ <b08c50b4-6aba-1a59-80f4-343cd906f1fa@arm.com> <20170504095918.GJ5923@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <b680335b-6407-f778-84c1-6565a46ae7d0@arm.com>
+In-Reply-To: <20170504095918.GJ5923@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
+To: Christoffer Dall <cdall@linaro.org>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 04, 2017 at 11:16:57AM +0100, Marc Zyngier wrote:
-> On 04/05/17 10:44, Christoffer Dall wrote:
-> > On Thu, May 04, 2017 at 10:05:43AM +0100, Marc Zyngier wrote:
-> >> On 04/05/17 09:38, Christoffer Dall wrote:
-> >>> On Thu, May 04, 2017 at 09:28:50AM +0100, Marc Zyngier wrote:
-> >>>> On 04/05/17 09:13, Christoffer Dall wrote:
-> >>>>> On Thu, May 04, 2017 at 09:09:47AM +0100, Marc Zyngier wrote:
-> >>>>>> On 03/05/17 19:32, Christoffer Dall wrote:
-> >>>>>>> Since we got support for devices in userspace which allows reporting the
-> >>>>>>> PMU overflow output status to userspace, we should actually allow
-> >>>>>>> creating the PMU on systems without an in-kernel irqchip, which in turn
-> >>>>>>> requires us to slightly clarify error codes for the ABI and move things
-> >>>>>>> around for the initialization phase.
-> >>>>>>>
-> >>>>>>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> >>>>>>> ---
-> >>>>>>>  Documentation/virtual/kvm/devices/vcpu.txt | 16 +++++++++-------
-> >>>>>>>  virt/kvm/arm/pmu.c                         | 27 +++++++++++++++++----------
-> >>>>>>>  2 files changed, 26 insertions(+), 17 deletions(-)
-> >>>>>>>
-> >>>>>>> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
-> >>>>>>> index 02f5068..352af6e 100644
-> >>>>>>> --- a/Documentation/virtual/kvm/devices/vcpu.txt
-> >>>>>>> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
-> >>>>>>> @@ -16,7 +16,9 @@ Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt is a
-> >>>>>>>  Returns: -EBUSY: The PMU overflow interrupt is already set
-> >>>>>>>           -ENXIO: The overflow interrupt not set when attempting to get it
-> >>>>>>>           -ENODEV: PMUv3 not supported
-> >>>>>>> -         -EINVAL: Invalid PMU overflow interrupt number supplied
-> >>>>>>> +         -EINVAL: Invalid PMU overflow interrupt number supplied or
-> >>>>>>> +                  trying to set the IRQ number without using an in-kernel
-> >>>>>>> +                  irqchip.
-> >>>>>>>  
-> >>>>>>>  A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
-> >>>>>>>  number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
-> >>>>>>> @@ -25,11 +27,11 @@ all vcpus, while as an SPI it must be a separate number per vcpu.
-> >>>>>>>  
-> >>>>>>>  1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
-> >>>>>>>  Parameters: no additional parameter in kvm_device_attr.addr
-> >>>>>>> -Returns: -ENODEV: PMUv3 not supported
-> >>>>>>> -         -ENXIO: PMUv3 not properly configured as required prior to calling this
-> >>>>>>> -                 attribute
-> >>>>>>> +Returns: -ENODEV: PMUv3 not supported or GIC not initialized
-> >>>>>>> +         -ENXIO: PMUv3 not properly configured or in-kernel irqchip not
-> >>>>>>> +                 conigured as required prior to calling this attribute
-> >>>>>>>           -EBUSY: PMUv3 already initialized
-> >>>>>>>  
-> >>>>>>> -Request the initialization of the PMUv3.  This must be done after creating the
-> >>>>>>> -in-kernel irqchip.  Creating a PMU with a userspace irqchip is currently not
-> >>>>>>> -supported.
-> >>>>>>> +Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
-> >>>>>>> +virtual GIC implementation, this must be done after initializing the in-kernel
-> >>>>>>> +irqchip.
-> >>>>>>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> >>>>>>> index 4b43e7f..f046b08 100644
-> >>>>>>> --- a/virt/kvm/arm/pmu.c
-> >>>>>>> +++ b/virt/kvm/arm/pmu.c
-> >>>>>>> @@ -456,21 +456,25 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
-> >>>>>>>  	if (!kvm_arm_support_pmu_v3())
-> >>>>>>>  		return -ENODEV;
-> >>>>>>>  
-> >>>>>>> -	/*
-> >>>>>>> -	 * We currently require an in-kernel VGIC to use the PMU emulation,
-> >>>>>>> -	 * because we do not support forwarding PMU overflow interrupts to
-> >>>>>>> -	 * userspace yet.
-> >>>>>>> -	 */
-> >>>>>>> -	if (!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))
-> >>>>>>> -		return -ENODEV;
-> >>>>>>> -
-> >>>>>>> -	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features) ||
-> >>>>>>> -	    !kvm_arm_pmu_irq_initialized(vcpu))
-> >>>>>>> +	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
-> >>>>>>>  		return -ENXIO;
-> >>>>>>>  
-> >>>>>>>  	if (kvm_arm_pmu_v3_ready(vcpu))
-> >>>>>>>  		return -EBUSY;
-> >>>>>>>  
-> >>>>>>> +	if (irqchip_in_kernel(vcpu->kvm)) {
-> >>>>>>> +		/*
-> >>>>>>> +		 * If using the PMU with an in-kernel virtual GIC
-> >>>>>>> +		 * implementation, we require the GIC to be already
-> >>>>>>> +		 * initialized when initializing the PMU.
-> >>>>>>> +		 */
-> >>>>>>> +		if (!vgic_initialized(vcpu->kvm))
-> >>>>>>> +			return -ENODEV;
-> >>>>>>> +
-> >>>>>>> +		if (!kvm_arm_pmu_irq_initialized(vcpu))
-> >>>>>>> +			return -ENXIO;
-> >>>>>>> +	}
-> >>>>>>> +
-> >>>>>>>  	kvm_pmu_vcpu_reset(vcpu);
-> >>>>>>>  	vcpu->arch.pmu.ready = true;
-> >>>>>>>  
-> >>>>>>> @@ -512,6 +516,9 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >>>>>>>  		int __user *uaddr = (int __user *)(long)attr->addr;
-> >>>>>>>  		int irq;
-> >>>>>>>  
-> >>>>>>> +		if (!irqchip_in_kernel(vcpu->kvm))
-> >>>>>>> +			return -EINVAL;
-> >>>>>>> +
-> >>>>>>
-> >>>>>> Shouldn't we fail the same way for {get,has}_attr? get_attr is going to
-> >>>>>> generate a -ENXIO, and has_attr is going to lie about the availability
-> >>>>>> of KVM_ARM_VCPU_PMU_V3_IRQ...
-> >>>>>>
-> >>>>>
-> >>>>> Here's the text from api.txt:
-> >>>>>
-> >>>>>   Tests whether a device supports a particular attribute.  A successful
-> >>>>>   return indicates the attribute is implemented.  It does not necessarily
-> >>>>>   indicate that the attribute can be read or written in the device's
-> >>>>>   current state.  "addr" is ignored.
-> >>>>>
-> >>>>> My interpretation therefore is that QEMU can use this ioctl to figure
-> >>>>> out if the feature is supported (sort of like a capability), but that
-> >>>>> doesn't mean that the configuration of the VM is such that the attribute
-> >>>>> can be get or set at that moment.
-> >>>>>
-> >>>>> For example, there will also alway be situations where you can get an
-> >>>>> attr, but not set an attr, what should the has_attr return then?
-> >>>>
-> >>>> My issue here is that whether we can get/set the interrupt or not is not
-> >>>> a function of the device itself, but of the way it is "wired". No matter
-> >>>> what "the device's current state" is, we'll never be able to get/set the
-> >>>> interrupt.
-> >>>>
-> >>>> I'd tend to err on the side of caution and return something that is
-> >>>> unambiguous, be maybe I have too strict an interpretation of the API.
-> >>>>
-> >>>
-> >>> Hmm, I see the has_attr as a method for userspace to discover "does this
-> >>> kernel have this feature".  If we make has_attr return a value depending
-> >>> on the VM having an in-kernel gic or not, we implicitly require
-> >>> userspace to create a VM with an in-kernel GIC to discover if this
-> >>> kernel has that feature, and therefore also impose an ordering
-> >>> requirement of figuring out the capabilities of the kernel (i.e. create
-> >>> the GIC before checking this API).
-> >>>
-> >>> I think QEMU should be able to do:
-> >>>
-> >>>   if (has_attr()) {
-> >>>      kvm_supports_set_timer_irq = true;
-> >>>      vtimer_irq = foo;
-> >>>   } else {
-> >>>      kvm_supports_set_timer_irq = false;
-> >>>      vtimer_irq = 27; /* default, we're stuck with it */
-> >>>   }
-> >>>
-> >>>   create_board_definition();
-> >>>   create_dt();
-> >>>   create_acpi();
-> >>>
-> >>>   /* do whatever */
-> >>>
-> >>>   if (kvm_supports_set_timer_irq && kvm_irqchip_in_kernel()) {
-> >>>   	kvm_arm_timer_set_irq(...);
-> >>>   }
-> >>>
-> >>> And all this should not be coupled to when we create the irqchip device.
-> >>>
-> >>> But I may be failing to see the case where the current implementation
-> >>> creates a problem for userspace, in which case we should document the
-> >>> ordering requirement.
-> >>
-> >> I'm not sure it would create any problem, at least not for the PMU
-> >> (there is no working code that would have created a PMU without an irqchip).
-> >>
-> >> It is just that we have a slightly diverging interpretation of what
-> >> has_attr means. You see it as "attribute that the device supports", and
-> >> I see it as "attribute that the device supports in this configuration".
-> >> I'm happy to use your semantics from now on.
-> > 
-> > In either case, we should make sure this is clear in the ABI.  I thought
-> > that the "It does not necessarily indicate that the attribute can be
-> > read or written in the device's current state." implied my
-> > interpretation, but maybe I'm missing some subtlety there?
+On 04/05/17 10:59, Christoffer Dall wrote:
+> On Thu, May 04, 2017 at 10:34:32AM +0100, Marc Zyngier wrote:
+>> On 03/05/17 19:33, Christoffer Dall wrote:
+>>> First we define an ABI using the vcpu devices that lets userspace set
+>>> the interrupt numbers for the various timers on both the 32-bit and
+>>> 64-bit KVM/ARM implementations.
+>>>
+>>> Second, we add the definitions for the groups and attributes introduced
+>>> by the above ABI.  (We add the PMU define on the 32-bit side as well for
+>>> symmetry and it may get used some day.)
+>>>
+>>> Third, we set up the arch-specific vcpu device operation handlers to
+>>> call into the timer code for anything related to the
+>>> KVM_ARM_VCPU_TIMER_CTRL group.
+>>>
+>>> Fourth, we implement support for getting and setting the timer interrupt
+>>> numbers using the above defined ABI in the arch timer code.
+>>>
+>>> Fifth, we introduce error checking upon enabling the arch timer (which
+>>> is called when first running a VCPU) to check that all VCPUs are
+>>> configured to use the same PPI for the timer (as mandated by the
+>>> architecture) and that the virtual and physical timers are not
+>>> configured to use the same IRQ number.
+>>>
+>>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+>>> ---
+>>>  Documentation/virtual/kvm/devices/vcpu.txt |  25 +++++++
+>>>  arch/arm/include/uapi/asm/kvm.h            |   8 +++
+>>>  arch/arm/kvm/guest.c                       |   9 +++
+>>>  arch/arm64/include/uapi/asm/kvm.h          |   3 +
+>>>  arch/arm64/kvm/guest.c                     |   9 +++
+>>>  include/kvm/arm_arch_timer.h               |   4 ++
+>>>  virt/kvm/arm/arch_timer.c                  | 104 +++++++++++++++++++++++++++++
+>>>  7 files changed, 162 insertions(+)
+>>>
+>>> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
+>>> index 352af6e..013e3f1 100644
+>>> --- a/Documentation/virtual/kvm/devices/vcpu.txt
+>>> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
+>>> @@ -35,3 +35,28 @@ Returns: -ENODEV: PMUv3 not supported or GIC not initialized
+>>>  Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
+>>>  virtual GIC implementation, this must be done after initializing the in-kernel
+>>>  irqchip.
+>>> +
+>>> +
+>>> +2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+>>> +Architectures: ARM,ARM64
+>>> +
+>>> +2.1. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_VTIMER
+>>> +2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_PTIMER
+>>> +Parameters: in kvm_device_attr.addr the address for the timer interrupt is a
+>>> +            pointer to an int
+>>> +Returns: -EINVAL: Invalid timer interrupt number
+>>> +         -EBUSY:  One or more VCPUs has already run
+>>> +
+>>> +A value describing the architected timer interrupt number when connected to an
+>>> +in-kernel virtual GIC.  These must be a PPI (16 <= intid < 32).  If an
+>>> +attribute is not set, a default value is applied (see below).
+>>> +
+>>> +KVM_ARM_VCPU_TIMER_IRQ_VTIMER: The EL1 virtual timer intid (default: 27)
+>>> +KVM_ARM_VCPU_TIMER_IRQ_PTIMER: The EL1 physical timer intid (default: 30)
+>>
+>> uber nit: my reading of the code is that the default is set at VCPU
+>> creation time. So setting the attribute overrides the default, not that
+>> the default is applied if no attribute is set (i.e. there is always a
+>> valid value).
+>>
 > 
-> Well, that's what I said above. The interrupt number is not a function
-> of the device state, but one of the integration of that device in the
-> system. The PMU itself is not concerned with an interrupt number, only
-> the GIC is.
+> uh, right, I don't see the distinction though, so not sure how to
+> correct the text.
 > 
-> > Do you think we should clarify the API?
-> 
-> Not sure. I admit my interpretation is a bit borderline. If I was brave,
-> I'd say that all the interrupt numbers should be a property of the GIC,
-> and not of the device. But that ship has sailed a while ago, and I'm
-> weak ;-).
-> 
-> More seriously, I don't think this is likely to cause any issue.
-> 
+> Would "Setting the attribute overrides the default values (see below)."
+> work instead?
 
-ok, I'll leave it as is then.
+Looks good to me.
 
-> > 
-> > By the way, I now realize that we are not maintining the same
-> > understanding between get/set_attr, which I really think we should, so
-> > I'll add the following:
-> > 
-> > 
-> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> > index 9b3e3ea..0cf62b7 100644
-> > --- a/virt/kvm/arm/pmu.c
-> > +++ b/virt/kvm/arm/pmu.c
-> > @@ -551,6 +551,9 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >  		int __user *uaddr = (int __user *)(long)attr->addr;
-> >  		int irq;
-> >  
-> > +		if (!irqchip_in_kernel(vcpu->kvm))
-> > +			return -EINVAL;
-> > +
-> >  		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
-> >  			return -ENODEV;
-> >  
+[...]
+
+>>
+>> Another issue that just popped in my head: how do we ensure that we
+>> don't clash between the PMU and the timers? Yes, that's a foolish thing
+>> to do, but that's no different from avoiding the same interrupt on the
+>> timers...
+>>
+> Argh, good point.
 > 
-> Looks good to me.
+> So actually, nothing *really bad* happens from using the same IRQ number
+> except that the VM gets confused.  However, it's living life dangerously
+> because we use the HW bit for the vtimer, so we if ever start using it
+> for other timers or the PMU, then you could end up in a situation where
+> you unmap the phys mapping on behalf of another device, and the physical
+> interrupt could be left in an active state.
 > 
+> On the other hand, the vtimer currently belongs only to VMs and we set
+> the required physical active state before entering the VM, so maybe it
+> doesn't matter.
+
+So far, we always assume that there is never more than a single source
+per interrupt. We'll end-up with weird behaviours because our line_level
+field is not an OR of the various inputs, but a direct assignment
+(device A and B raise the line, then A drops it -> B's interrupt is gone).
+
+I think that only the guest will be confused by it, but accepting it may
+be interpreted as "this should work correctly". Would documenting that
+it is a bad idea be enough?
+
+> Should we just forego these checks and let the user shoot itself in the
+> foot if he/she wants to?
+
+If the documentation is enough, why not. Otherwise, we need some form of
+allocator. Boring. ;-)
 
 Thanks,
--Christoffer
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
