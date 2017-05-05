@@ -1,136 +1,193 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v6 08/24] KVM: arm64: vgic-its: Implement
- vgic_mmio_uaccess_write_its_creadr
-Date: Fri, 5 May 2017 10:06:42 +0200
-Message-ID: <9e813cc0-1655-3b07-baaf-c348c7fc17f6@redhat.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v6 14/24] KVM: arm64: vgic-v3:
+ vgic_v3_lpi_sync_pending_status
+Date: Fri, 5 May 2017 01:11:13 -0700
+Message-ID: <20170505081113.GA1419@lvm>
 References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
- <1493898284-29504-9-git-send-email-eric.auger@redhat.com>
- <20170504170939.GS5923@cbox>
+ <1493898284-29504-15-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170504170939.GS5923@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, eric.auger.pro@gmail.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 064D840BDA
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 04:08:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WzLnLHMJNNBs for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 May 2017 04:08:09 -0400 (EDT)
+Received: from mail-lf0-f52.google.com (mail-lf0-f52.google.com
+ [209.85.215.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61E9940BD8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 04:08:09 -0400 (EDT)
+Received: by mail-lf0-f52.google.com with SMTP id r17so20519245lfg.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 05 May 2017 01:11:16 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1493898284-29504-15-git-send-email-eric.auger@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, bjsprakash.linux@gmail.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+On Thu, May 04, 2017 at 01:44:34PM +0200, Eric Auger wrote:
+> this new helper synchronizes the irq pending_latch
+> with the LPI pending bit status found in rdist pending table.
+> As the status is consumed, we reset the bit in pending table.
+> 
+> As we need the PENDBASER_ADDRESS() in vgic-v3, let's move its
+> definition in the irqchip header. We restore the full length
+> of the field, ie [51:16]. Same for PROPBASER_ADDRESS with full
+> field length of [51:12].
 
-On 04/05/2017 19:09, Christoffer Dall wrote:
-> On Thu, May 04, 2017 at 01:44:28PM +0200, Eric Auger wrote:
->> GITS_CREADR needs to be restored so let's implement the associated
->> uaccess_write_its callback. The write only is allowed if the its
->> is disabled.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v5 -> v6:
->> - remove usage of update_64bit_reg and check alignment of cmd offset
->>
->> v4 -> v5:
->> - keep Stalled bit
->> - vgic_mmio_uaccess_write_its_creadr can now return an error
->>
->> v3 -> v4:
->> - REGISTER_ITS_DESC_UACCESS now introduced in this patch
->> - we now check the its is disabled
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 43 +++++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 41 insertions(+), 2 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 222fad5..18588ef 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -1213,6 +1213,34 @@ static unsigned long vgic_mmio_read_its_creadr(struct kvm *kvm,
->>  	return extract_bytes(its->creadr, addr & 0x7, len);
->>  }
->>  
->> +static int vgic_mmio_uaccess_write_its_creadr(struct kvm *kvm,
->> +					      struct vgic_its *its,
->> +					      gpa_t addr, unsigned int len,
->> +					      unsigned long val)
->> +{
->> +	u32 cmd_offset;
->> +	int ret = 0;
->> +
->> +	mutex_lock(&its->cmd_lock);
->> +
->> +	if (its->enabled) {
->> +		ret = -EBUSY;
->> +		goto out;
->> +	}
->> +
->> +	cmd_offset = ITS_CMD_OFFSET(val);
->> +	if ((cmd_offset >= ITS_CMD_BUFFER_SIZE(its->cbaser)) ||
->> +	    (cmd_offset & 0x1F)) {
->> +		ret = -EINVAL;
->> +		goto out;
->> +	}
->> +
->> +	its->creadr = val;
-> 
-> do we let userspace decide the stalled bit or should we use
-> ITS_CMD_OFFSET() when assigning the field as well?
-yes better to use cmd_offset.
+why into irqchip and not just the vgic header file?
 
-Also the alignment check eventually can be removed as cmd_offset is
-[19:5] of the offset and bits [4:0] are 0
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v6: new
+> ---
+>  include/linux/irqchip/arm-gic-v3.h |  2 ++
+>  virt/kvm/arm/vgic/vgic-its.c       |  6 ++----
+>  virt/kvm/arm/vgic/vgic-v3.c        | 44 ++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h           |  1 +
+>  4 files changed, 49 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index 9519c7b..e09e5d7 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -159,6 +159,8 @@
+>  #define GICR_PROPBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWaWb)
+>  
+>  #define GICR_PROPBASER_IDBITS_MASK			(0x1f)
+> +#define GICR_PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
+> +#define GICR_PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
+>  
+>  #define GICR_PENDBASER_SHAREABILITY_SHIFT		(10)
+>  #define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT		(7)
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index e7bb86a..f43ea30c 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -198,8 +198,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+>   */
+>  #define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
+>  #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
+> -#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
+> -#define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
+>  
+>  #define GIC_LPI_OFFSET 8192
+>  
+> @@ -234,7 +232,7 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
+>  static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+>  			     struct kvm_vcpu *filter_vcpu)
+>  {
+> -	u64 propbase = PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
+> +	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
+>  	u8 prop;
+>  	int ret;
+>  
+> @@ -346,7 +344,7 @@ static u32 max_lpis_propbaser(u64 propbaser)
+>   */
+>  static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+>  {
+> -	gpa_t pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
+> +	gpa_t pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
+>  	struct vgic_irq *irq;
+>  	int last_byte_offset = -1;
+>  	int ret = 0;
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index be0f4c3..0d753ae 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -252,6 +252,50 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+>  	vgic_v3->vgic_hcr = ICH_HCR_EN;
+>  }
+>  
+> +int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	int byte_offset, bit_nr;
+> +	gpa_t pendbase, ptr;
+> +	bool status;
+> +	u8 val;
+> +	int ret;
+> +
+> +retry:
+> +	vcpu = irq->target_vcpu;
+> +	if (!vcpu)
+> +		return 0;
+> +
+> +	pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
+> +
+> +	byte_offset = irq->intid / BITS_PER_BYTE;
+> +	bit_nr = irq->intid % BITS_PER_BYTE;
+> +	ptr = pendbase + byte_offset;
+> +
+> +	ret = kvm_read_guest(kvm, ptr, &val, 1);
+> +	if (ret)
+> +		return ret;
+> +
+> +	status = val & (1 << bit_nr);
+> +
+> +	spin_lock(&irq->irq_lock);
+> +	if (irq->target_vcpu != vcpu) {
+> +		spin_unlock(&irq->irq_lock);
+> +		goto retry;
 
-Thanks
+Can the guest be continuously changing the configuration of the LPI and
+cause this function to be called, which will efficiently hog this CPU
+from the system, or am I being overly cautious here?
 
-Eric
-> 
->> +out:
->> +	mutex_unlock(&its->cmd_lock);
->> +	return ret;
->> +}
->> +
->>  #define BASER_INDEX(addr) (((addr) / sizeof(u64)) & 0x7)
->>  static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm,
->>  					      struct vgic_its *its,
->> @@ -1317,6 +1345,16 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
->>  	.its_write = wr,					\
->>  }
->>  
->> +#define REGISTER_ITS_DESC_UACCESS(off, rd, wr, uwr, length, acc)\
->> +{								\
->> +	.reg_offset = off,					\
->> +	.len = length,						\
->> +	.access_flags = acc,					\
->> +	.its_read = rd,						\
->> +	.its_write = wr,					\
->> +	.uaccess_its_write = uwr,				\
->> +}
->> +
->>  static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
->>  			      gpa_t addr, unsigned int len, unsigned long val)
->>  {
->> @@ -1339,8 +1377,9 @@ static struct vgic_register_region its_registers[] = {
->>  	REGISTER_ITS_DESC(GITS_CWRITER,
->>  		vgic_mmio_read_its_cwriter, vgic_mmio_write_its_cwriter, 8,
->>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->> -	REGISTER_ITS_DESC(GITS_CREADR,
->> -		vgic_mmio_read_its_creadr, its_mmio_write_wi, 8,
->> +	REGISTER_ITS_DESC_UACCESS(GITS_CREADR,
->> +		vgic_mmio_read_its_creadr, its_mmio_write_wi,
->> +		vgic_mmio_uaccess_write_its_creadr, 8,
->>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
->>  	REGISTER_ITS_DESC(GITS_BASER,
->>  		vgic_mmio_read_its_baser, vgic_mmio_write_its_baser, 0x40,
->> -- 
->> 2.5.5
->>
-> 
-> Otherwise:
-> 
-> Reviewed-by: Christoffer Dall <cdall@linaro.org>
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> +	}
+> +	irq->pending_latch = status;
+> +	vgic_queue_irq_unlock(vcpu->kvm, irq);
+> +
+> +	if (status) {
+> +		/* clear consumed data */
+> +		val &= ~(1 << bit_nr);
+> +		ret = kvm_write_guest(kvm, ptr, &val, 1);
+> +		if (ret)
+> +			return ret;
+
+Do we have a problem that if this is done twice within the same byte (on
+different LPIs) then the data could be strangely out of sync?
+
+Do we care?
+
+
+Thanks,
+-Christoffer
+
+> +	}
+> +	return 0;
+> +}
+> +
+>  /* check for overlapping regions and for regions crossing the end of memory */
+>  static bool vgic_v3_check_base(struct kvm *kvm)
+>  {
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index b87f1c6..309ab64 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -157,6 +157,7 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  void vgic_v3_enable(struct kvm_vcpu *vcpu);
+>  int vgic_v3_probe(const struct gic_kvm_info *info);
+>  int vgic_v3_map_resources(struct kvm *kvm);
+> +int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
+>  int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
+>  
+>  int vgic_register_its_iodevs(struct kvm *kvm);
+> -- 
+> 2.5.5
 > 
