@@ -1,246 +1,134 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v6 21/24] KVM: arm64: vgic-its: Device table save/restore
-Date: Fri, 5 May 2017 20:12:16 +0200
-Message-ID: <20170505181216.GZ5923@cbox>
-References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
- <1493898284-29504-22-git-send-email-eric.auger@redhat.com>
- <20170505124424.GH1419@lvm>
- <49f2669b-f3cb-d555-f376-dd4dad2f90fd@redhat.com>
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH V15 09/11] ras: acpi / apei: generate trace event for
+ unrecognized CPER section
+Date: Fri, 5 May 2017 14:44:04 -0400
+Message-ID: <20170505144404.724da229@gandalf.local.home>
+References: <1492556723-9189-1-git-send-email-tbaicar@codeaurora.org>
+ <1492556723-9189-10-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <49f2669b-f3cb-d555-f376-dd4dad2f90fd@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D2AA40AF9
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 14:41:07 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id n9IK9ce+GgmX for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 May 2017 14:41:06 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.136])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15D1740296
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 14:41:05 -0400 (EDT)
+In-Reply-To: <1492556723-9189-10-git-send-email-tbaicar@codeaurora.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, rafael@kernel.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, nkaje@codeaurora.org, bp@alien8.de, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, tony.luck@intel.com, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com, shiju
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 05, 2017 at 06:23:22PM +0200, Auger Eric wrote:
-> Hi Christoffer,
-> 
-> On 05/05/2017 14:44, Christoffer Dall wrote:
-> > On Thu, May 04, 2017 at 01:44:41PM +0200, Eric Auger wrote:
-> >> This patch saves the device table entries into guest RAM.
-> >> Both flat table and 2 stage tables are supported. DeviceId
-> >> indexing is used.
-> >>
-> >> For each device listed in the device table, we also save
-> >> the translation table using the vgic_its_save/restore_itt
-> >> routines. Those functions will be implemented in a subsequent
-> >> patch.
-> >>
-> >> On restore, devices are re-allocated and their itt are
-> >> re-built.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >> v5 -> v6:
-> >> - accomodate vgic_its_alloc_device change of proto
-> >> - define bit fields for L1 entries
-> >> - s/handle_l1_entry/handle_l1_dte
-> >> - s/ite_esz/dte_esz in handle_l1_dte
-> >> - check BASER valid bit
-> >> - s/nb_eventid_bits/num_eventid_bits
-> >> - new convention for returned values
-> >> - itt functions implemented in subsequent patch
-> >>
-> >> v4 -> v5:
-> >> - sort the device list by deviceid on device table save
-> >> - use defines for shifts and masks
-> >> - use abi->dte_esz
-> >> - clatify entry sizes for L1 and L2 tables
-> >>
-> >> v3 -> v4:
-> >> - use the new proto for its_alloc_device
-> >> - compute_next_devid_offset, vgic_its_flush/restore_itt
-> >>   become static in this patch
-> >> - change in the DTE entry format with the introduction of the
-> >>   valid bit and next field width decrease; ittaddr encoded
-> >>   on its full range
-> >> - fix handle_l1_entry entry handling
-> >> - correct vgic_its_table_restore error handling
-> >>
-> >> v2 -> v3:
-> >> - fix itt_addr bitmask in vgic_its_restore_dte
-> >> - addition of return 0 in vgic_its_restore_ite moved to
-> >>   the ITE related patch
-> >>
-> >> v1 -> v2:
-> >> - use 8 byte format for DTE and ITE
-> >> - support 2 stage format
-> >> - remove kvm parameter
-> >> - ITT flush/restore moved in a separate patch
-> >> - use deviceid indexing
-> >> ---
-> >>  virt/kvm/arm/vgic/vgic-its.c | 194 +++++++++++++++++++++++++++++++++++++++++--
-> >>  virt/kvm/arm/vgic/vgic.h     |  10 +++
-> >>  2 files changed, 199 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> >> index a3ed52a..c5b388d 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-its.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> >> @@ -23,6 +23,7 @@
-> >>  #include <linux/interrupt.h>
-> >>  #include <linux/list.h>
-> >>  #include <linux/uaccess.h>
-> >> +#include <linux/list_sort.h>
-> >>  
-> >>  #include <linux/irqchip/arm-gic-v3.h>
-> >>  
-> >> @@ -1701,7 +1702,8 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
-> >>  	return ret;
-> >>  }
-> >>  
-> >> -u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
-> >> +static u32 compute_next_devid_offset(struct list_head *h,
-> >> +				     struct its_device *dev)
-> >>  {
-> >>  	struct its_device *next;
-> >>  	u32 next_offset;
-> >> @@ -1755,8 +1757,8 @@ typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
-> >>   * Return: < 0 on error, 0 if last element was identified, 1 otherwise
-> >>   * (the last element may not be found on second level tables)
-> >>   */
-> >> -int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
-> >> -		   int start_id, entry_fn_t fn, void *opaque)
-> >> +static int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
-> >> +			  int start_id, entry_fn_t fn, void *opaque)
-> >>  {
-> >>  	void *entry = kzalloc(esz, GFP_KERNEL);
-> >>  	struct kvm *kvm = its->dev->kvm;
-> >> @@ -1791,13 +1793,171 @@ int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
-> >>  	return ret;
-> >>  }
-> >>  
-> >> +static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
-> >> +{
-> >> +	return -ENXIO;
-> >> +}
-> >> +
-> >> +static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
-> >> +{
-> >> +	return -ENXIO;
-> >> +}
-> >> +
-> >> +/**
-> >> + * vgic_its_save_dte - Save a device table entry at a given GPA
-> >> + *
-> >> + * @its: ITS handle
-> >> + * @dev: ITS device
-> >> + * @ptr: GPA
-> >> + */
-> >> +static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
-> >> +			     gpa_t ptr, int dte_esz)
-> >> +{
-> >> +	struct kvm *kvm = its->dev->kvm;
-> >> +	u64 val, itt_addr_field;
-> >> +	u32 next_offset;
-> >> +
-> >> +	itt_addr_field = dev->itt_addr >> 8;
-> >> +	next_offset = compute_next_devid_offset(&its->device_list, dev);
-> >> +	val = (1ULL << KVM_ITS_DTE_VALID_SHIFT |
-> >> +	       ((u64)next_offset << KVM_ITS_DTE_NEXT_SHIFT) |
-> >> +	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
-> >> +		(dev->num_eventid_bits - 1));
-> >> +	val = cpu_to_le64(val);
-> >> +	return kvm_write_guest(kvm, ptr, &val, dte_esz);
-> >> +}
-> >> +
-> >> +/**
-> >> + * vgic_its_restore_dte - restore a device table entry
-> >> + *
-> >> + * @its: its handle
-> >> + * @id: device id the DTE corresponds to
-> >> + * @ptr: kernel VA where the 8 byte DTE is located
-> >> + * @opaque: unused
-> >> + *
-> >> + * Return: < 0 on error, 0 if the dte is the last one, id offset to the
-> >> + * next dte otherwise
-> >> + */
-> >> +static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
-> >> +				void *ptr, void *opaque)
-> >> +{
-> >> +	struct its_device *dev;
-> >> +	gpa_t itt_addr;
-> >> +	u8 num_eventid_bits;
-> >> +	u64 entry = *(u64 *)ptr;
-> >> +	bool valid;
-> >> +	u32 offset;
-> >> +	int ret;
-> >> +
-> >> +	entry = le64_to_cpu(entry);
-> >> +
-> >> +	valid = entry >> KVM_ITS_DTE_VALID_SHIFT;
-> >> +	num_eventid_bits = (entry & KVM_ITS_DTE_SIZE_MASK) + 1;
-> >> +	itt_addr = ((entry & KVM_ITS_DTE_ITTADDR_MASK)
-> >> +			>> KVM_ITS_DTE_ITTADDR_SHIFT) << 8;
-> >> +
-> >> +	if (!valid)
-> >> +		return 1;
-> >> +
-> >> +	/* dte entry is valid */
-> >> +	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
-> >> +
-> >> +	dev = vgic_its_alloc_device(its, id, itt_addr, num_eventid_bits);
-> >> +	if (IS_ERR(dev))
-> >> +		return PTR_ERR(dev);
-> >> +
-> >> +	ret = vgic_its_restore_itt(its, dev);
-> >> +	if (ret)
-> >> +		return ret;
-> >> +
-> >> +	return offset;
-> >> +}
-> >> +
-> >> +static int vgic_its_device_cmp(void *priv, struct list_head *a,
-> >> +			       struct list_head *b)
-> >> +{
-> >> +	struct its_device *deva = container_of(a, struct its_device, dev_list);
-> >> +	struct its_device *devb = container_of(b, struct its_device, dev_list);
-> >> +
-> >> +	if (deva->device_id < devb->device_id)
-> >> +		return -1;
-> >> +	else
-> >> +		return 1;
-> >> +}
-> >> +
-> >>  /**
-> >>   * vgic_its_save_device_tables - Save the device table and all ITT
-> >>   * into guest RAM
-> >> + *
-> >> + * L1/L2 handling is hidden by vgic_its_check_id() helper which directly
-> >> + * returns the GPA of the device entry
-> >>   */
-> >>  static int vgic_its_save_device_tables(struct vgic_its *its)
-> >>  {
-> >> -	return -ENXIO;
-> >> +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-> >> +	struct its_device *dev;
-> >> +	int dte_esz = abi->dte_esz;
-> >> +	u64 baser;
-> >> +
-> >> +	baser = its->baser_device_table;
-> >> +
-> >> +	list_sort(NULL, &its->device_list, vgic_its_device_cmp);
-> > 
-> > this list is protected by the ITS mutex but you seem to be only holding
-> > the KVM mutex here, so don't we have a potential exploit here?
-> 
-> Updates to the device, ite list are done when running commands. As we
-> hold the KVM mutex, commands cannot run. Then there is
-> vgic_its_destroy() which happens on kvm_put_kvm when all users have
-> released their reference. So to me holding the kvm lock looks sufficient.
-> 
 
-But we don't hold the KVM mutex when running commands, we run the its
-mutex?  What am I missing?
+Sorry for the late reply. Borislav pinged me to look at this.
 
-Even worse, the vgic_its_trigger_msi also only takes the its->its_lock
-mutex (or rather its caller does) and that surely can run while we are
-saving the tables can it not?
 
-Thanks,
--Christoffer
+On Tue, 18 Apr 2017 17:05:21 -0600
+Tyler Baicar <tbaicar@codeaurora.org> wrote:
+
+
+
+> diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
+> index 1791a12..5861b6f 100644
+> --- a/include/ras/ras_event.h
+> +++ b/include/ras/ras_event.h
+> @@ -162,6 +162,51 @@
+>  );
+>  
+>  /*
+> + * Unknown Section Report
+> + *
+> + * This event is generated when hardware detected a hardware
+> + * error event, which may be of non-standard section as defined
+> + * in UEFI spec appendix "Common Platform Error Record", or may
+> + * be of sections for which TRACE_EVENT is not defined.
+> + *
+> + */
+> +TRACE_EVENT(unknown_sec_event,
+> +
+> +	TP_PROTO(const uuid_le *sec_type,
+> +		 const uuid_le *fru_id,
+> +		 const char *fru_text,
+> +		 const u8 sev,
+> +		 const u8 *err,
+> +		 const u32 len),
+> +
+> +	TP_ARGS(sec_type, fru_id, fru_text, sev, err, len),
+> +
+> +	TP_STRUCT__entry(
+> +		__array(char, sec_type, 16)
+> +		__array(char, fru_id, 16)
+> +		__string(fru_text, fru_text)
+> +		__field(u8, sev)
+> +		__field(u32, len)
+> +		__dynamic_array(u8, buf, len)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		memcpy(__entry->sec_type, sec_type, sizeof(uuid_le));
+> +		memcpy(__entry->fru_id, fru_id, sizeof(uuid_le));
+
+My only concern here is that you are using sizeof(uuid_le) into an
+array that is hardcoded as 16 bytes. I don't expect the size of uuid_le
+to ever change, but if it does, you just created an exploit.
+
+I would suggest having a macro about the size of uuid_le and use both
+here and include/uapi/linux/uuid.h.
+
+#define UUID_SIZE
+
+typedef struct {
+	__u8 b[UUID_SIZE];
+} uuid_le;
+
+And then we can just use UUID_SIZE safely here:
+
+	__array(char, sec_type, UUID_SIZE)
+
+[...]
+
+	memcpy(__entry->sec_type, sec_type, UUID_SIZE));
+
+Alternatively we could add in the C file that defines the tracepoints:
+
+BUILD_BUG(sizeof(uuid_le) > 16);
+
+But that's hacky.
+
+
+> +		__assign_str(fru_text, fru_text);
+> +		__entry->sev = sev;
+> +		__entry->len = len;
+> +		memcpy(__get_dynamic_array(buf), err, len);
+> +	),
+> +
+> +	TP_printk("severity: %d; sec type:%pU; FRU: %pU %s; data len:%d; raw data:%s",
+> +		  __entry->sev, __entry->sec_type,
+
+Hmm, I wonder if %pU is defined in the libtraceevent library?
+
+-- Steve
+
+> +		  __entry->fru_id, __get_str(fru_text),
+> +		  __entry->len,
+> +		  __print_hex(__get_dynamic_array(buf), __entry->len))
+> +);
+> +
+> +/*
+>   * PCIe AER Trace event
+>   *
+>   * These events are generated when hardware detects a corrected or
