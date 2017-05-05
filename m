@@ -1,142 +1,144 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH V15 09/11] ras: acpi / apei: generate trace event for
- unrecognized CPER section
-Date: Fri, 5 May 2017 19:53:33 +0200
-Message-ID: <20170505175333.h7exckpq2gkggkph@pd.tnic>
-References: <1492556723-9189-1-git-send-email-tbaicar@codeaurora.org>
- <1492556723-9189-10-git-send-email-tbaicar@codeaurora.org>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v6 15/24] KVM: arm64: vgic-its: Read config and pending
+ bit in add_lpi()
+Date: Fri, 5 May 2017 20:07:21 +0200
+Message-ID: <20170505180721.GY5923@cbox>
+References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
+ <1493898284-29504-16-git-send-email-eric.auger@redhat.com>
+ <20170505095708.GB1419@lvm>
+ <54aa52bb-dd92-e5a8-5c5c-353fc206d203@arm.com>
+ <ab5950dd-61a6-a6c2-1828-3df79e07296d@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC58A40AF9
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 13:50:46 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rUjMYnbjxqqU for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 May 2017 13:50:45 -0400 (EDT)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82E7140296
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 13:50:45 -0400 (EDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1492556723-9189-10-git-send-email-tbaicar@codeaurora.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, rafael@kernel.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, tony.luck@intel.com, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
+In-Reply-To: <ab5950dd-61a6-a6c2-1828-3df79e07296d@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 18, 2017 at 05:05:21PM -0600, Tyler Baicar wrote:
-> UEFI spec allows for non-standard section in Common Platform Error
-> Record. This is defined in section N.2.3 of UEFI version 2.5.
-
-If the spec calls it non-standard why are we calling it "unknown
-section"?
-
-> Currently if the CPER section's type (UUID) does not match with
-> any section type that the kernel knows how to parse, trace event
-> is not generated for such section. And thus user is not able to know
-> happening of such hardware error, including error record of
-> non-standard section.
-
-That's sentence sounds funny.
-
-> This commit generates a trace event which contains raw error data
-> for unrecognized CPER section.
-
-Never write "This commit" or "This patch" in your commit message -
-that's a given.
-
+On Fri, May 05, 2017 at 04:50:01PM +0200, Auger Eric wrote:
+> Hi,
 > 
-> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
-> CC: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
-> Tested-by: Shiju Jose <shiju.jose@huawei.com>
-> ---
->  drivers/acpi/apei/ghes.c | 27 +++++++++++++++++++++++----
->  drivers/ras/ras.c        |  1 +
->  include/ras/ras_event.h  | 45 +++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 69 insertions(+), 4 deletions(-)
+> On 05/05/2017 14:50, Marc Zyngier wrote:
+> > On 05/05/17 10:57, Christoffer Dall wrote:
+> >> On Thu, May 04, 2017 at 01:44:35PM +0200, Eric Auger wrote:
+> >>> When creating the lpi we now ask the redistributor what is the state
+> >>> of the LPI (priority, enabled, pending).
+> >>>
+> >>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>>
+> >>> ---
+> >>>
+> >>> v6: creation
+> >>> ---
+> >>>  virt/kvm/arm/vgic/vgic-its.c | 35 ++++++++++++++++++++++++-----------
+> >>>  1 file changed, 24 insertions(+), 11 deletions(-)
+> >>>
+> >>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> >>> index f43ea30c..3ad615a 100644
+> >>> --- a/virt/kvm/arm/vgic/vgic-its.c
+> >>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> >>> @@ -38,6 +38,8 @@
+> >>>  
+> >>>  static int vgic_its_set_abi(struct vgic_its *its, int rev);
+> >>>  static const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its);
+> >>> +static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+> >>> +			     struct kvm_vcpu *filter_vcpu);
+> >>>  
+> >>>  /*
+> >>>   * Creates a new (reference to a) struct vgic_irq for a given LPI.
+> >>> @@ -46,10 +48,12 @@ static const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its);
+> >>>   * If this is a "new" LPI, we allocate and initialize a new struct vgic_irq.
+> >>>   * This function returns a pointer to the _unlocked_ structure.
+> >>>   */
+> >>> -static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid)
+> >>> +static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+> >>> +				     struct kvm_vcpu *vcpu)
+> >>>  {
+> >>>  	struct vgic_dist *dist = &kvm->arch.vgic;
+> >>>  	struct vgic_irq *irq = vgic_get_irq(kvm, NULL, intid), *oldirq;
+> >>> +	int ret;
+> >>>  
+> >>>  	/* In this case there is no put, since we keep the reference. */
+> >>>  	if (irq)
+> >>> @@ -66,6 +70,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid)
+> >>>  	irq->config = VGIC_CONFIG_EDGE;
+> >>>  	kref_init(&irq->refcount);
+> >>>  	irq->intid = intid;
+> >>> +	irq->target_vcpu = vcpu;
+> >>>  
+> >>>  	spin_lock(&dist->lpi_list_lock);
+> >>>  
+> >>> @@ -97,6 +102,19 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid)
+> >>>  out_unlock:
+> >>>  	spin_unlock(&dist->lpi_list_lock);
+> >>>  
+> >>> +	/*
+> >>> +	 * We "cache" the configuration table entries in out struct vgic_irq's.
+> >>
+> >> s/out/our/ ?
+> >>
+> >>> +	 * However we only have those structs for mapped IRQs, so we read in
+> >>> +	 * the respective config data from memory here upon mapping the LPI.
+> >>> +	 */
+> >>> +	ret = update_lpi_config(kvm, irq, NULL);
+> >>> +	if (ret)
+> >>> +		return ERR_PTR(ret);
+> >>> +
+> >>> +	ret = vgic_v3_lpi_sync_pending_status(kvm, irq);
+> >>> +	if (ret)
+> >>> +		return ERR_PTR(ret);
+> >>> +
+> >>>  	return irq;
+> >>>  }
+> >>>  
+> >>> @@ -769,6 +787,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+> >>>  	u32 event_id = its_cmd_get_id(its_cmd);
+> >>>  	u32 coll_id = its_cmd_get_collection(its_cmd);
+> >>>  	struct its_ite *ite;
+> >>> +	struct kvm_vcpu *vcpu = NULL;
+> >>>  	struct its_device *device;
+> >>>  	struct its_collection *collection, *new_coll = NULL;
+> >>>  	int lpi_nr;
+> >>> @@ -814,7 +833,10 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+> >>>  	ite->collection = collection;
+> >>>  	ite->lpi = lpi_nr;
+> >>>  
+> >>> -	irq = vgic_add_lpi(kvm, lpi_nr);
+> >>> +	if (its_is_collection_mapped(collection))
+> >>> +		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+> >>> +
+> >>> +	irq = vgic_add_lpi(kvm, lpi_nr, vcpu);
+> >>
+> >> So, if we don't have the collection and therefore end up with irq->vcpu
+> >> == NULL, how do we ever read the pending bit from memory as the affinity
+> >> may later change?
+> >>
+> >> Is this a problem with our idea of only looking at the pending bit on
+> >> vgic_add_lpi, or does it just mean that we should sample the pending bit
+> >> whenever we move LPIs around to VCPUs and if the bit is set, then also
+> >> set the pennding_latch (if not already set), or what should happen here?
+> > 
+> > It means that we would need to sample that bit on MOVI and maybe MOVALL
+> > as well, but this feels a bit odd. How did that bit land there the first
+> > place?
 > 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index b91123f..3d9f63b 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -45,11 +45,13 @@
->  #include <linux/aer.h>
->  #include <linux/nmi.h>
->  #include <linux/sched/clock.h>
-> +#include <linux/uuid.h>
->  
->  #include <acpi/actbl1.h>
->  #include <acpi/ghes.h>
->  #include <acpi/apei.h>
->  #include <asm/tlbflush.h>
-> +#include <ras/ras_event.h>
->  
->  #include "apei-internal.h"
->  
-> @@ -461,12 +463,21 @@ static void ghes_do_proc(struct ghes *ghes,
->  {
->  	int sev, sec_sev;
->  	struct acpi_hest_generic_data *gdata;
-> +	uuid_le sec_type;
-> +	uuid_le *fru_id = &NULL_UUID_LE;
-> +	char *fru_text = "";
->  
->  	sev = ghes_severity(estatus->error_severity);
->  	apei_estatus_for_each_section(estatus, gdata) {
->  		sec_sev = ghes_severity(gdata->error_severity);
-> -		if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
-> -				 CPER_SEC_PLATFORM_MEM)) {
-> +		sec_type = *(uuid_le *)gdata->section_type;
-> +
-> +		if (gdata->validation_bits & CPER_SEC_VALID_FRU_ID)
-> +			fru_id = (uuid_le *)gdata->fru_id;
-> +		if (gdata->validation_bits & CPER_SEC_VALID_FRU_TEXT)
-> +			fru_text = gdata->fru_text;
-> +
-> +		if (!uuid_le_cmp(sec_type, CPER_SEC_PLATFORM_MEM)) {
->  			struct cper_sec_mem_err *mem_err;
->  			mem_err = acpi_hest_get_payload(gdata);
->  			ghes_edac_report_mem_error(ghes, sev, mem_err);
-> @@ -475,8 +486,7 @@ static void ghes_do_proc(struct ghes *ghes,
->  			ghes_handle_memory_failure(gdata, sev);
->  		}
->  #ifdef CONFIG_ACPI_APEI_PCIEAER
-> -		else if (!uuid_le_cmp(*(uuid_le *)gdata->section_type,
-> -				      CPER_SEC_PCIE)) {
-> +		else if (!uuid_le_cmp(sec_type, CPER_SEC_PCIE)) {
->  			struct cper_sec_pcie *pcie_err;
->  			pcie_err = acpi_hest_get_payload(gdata);
->  			if (sev == GHES_SEV_RECOVERABLE &&
-> @@ -507,6 +517,15 @@ static void ghes_do_proc(struct ghes *ghes,
->  
->  		}
->  #endif
-> +#ifdef CONFIG_RAS
-> +		else if (trace_unknown_sec_event_enabled()) {
-> +			void *unknown_err = acpi_hest_get_payload(gdata);
-> +
-> +			trace_unknown_sec_event(&sec_type,
-> +					fru_id, fru_text, sec_sev,
-> +					unknown_err, gdata->error_data_length);
-> +		}
-> +#endif
+> Without talking about save/restore, before this series the pending table
+> was sync'ed on RDIST LPI enable only and that's all. This is kept.
+> 
+> Now talking about save/restore, if we restore an LPI whose collection is
+> not attached to any RDIST, we can't sync at that time. The problem
+> exists if we check the pending bit on vgic_add_lpi or later, ie. at the
+> end of the ITS table restore process (as I did before). I don't see in
+> the spec we are supposed to read the pending table on MAPTI or MAPC.
+> 
 
-Put that in a function in ras.c along with a prototype for
-include/linux/ras.h for the !CONFIG_RAS case so that you can save
-yourself the ifdeffery in an already not really easy to read function.
+Good point.  If we don't have a collection for a translation that maps
+to an LPI then it must mean the mapping either never existed or was
+removed, and I don't see why we should have preserved any pending state
+after that.
 
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Thanks,
+-Christoffer
