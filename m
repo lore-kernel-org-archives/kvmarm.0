@@ -1,193 +1,291 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v6 14/24] KVM: arm64: vgic-v3:
- vgic_v3_lpi_sync_pending_status
-Date: Fri, 5 May 2017 01:11:13 -0700
-Message-ID: <20170505081113.GA1419@lvm>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v6 09/24] KVM: arm64: vgic-its: Introduce migration ABI
+ infrastructure
+Date: Fri, 5 May 2017 10:16:08 +0200
+Message-ID: <2b69826d-9c8a-0ee3-9061-5de4d5f9dc21@redhat.com>
 References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
- <1493898284-29504-15-git-send-email-eric.auger@redhat.com>
+ <1493898284-29504-10-git-send-email-eric.auger@redhat.com>
+ <20170504171301.GT5923@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 064D840BDA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 04:08:11 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WzLnLHMJNNBs for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 May 2017 04:08:09 -0400 (EDT)
-Received: from mail-lf0-f52.google.com (mail-lf0-f52.google.com
- [209.85.215.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61E9940BD8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 04:08:09 -0400 (EDT)
-Received: by mail-lf0-f52.google.com with SMTP id r17so20519245lfg.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 05 May 2017 01:11:16 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1493898284-29504-15-git-send-email-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, bjsprakash.linux@gmail.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170504171301.GT5923@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, marc.zyngier@arm.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, vijayak@caviumnetworks.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 04, 2017 at 01:44:34PM +0200, Eric Auger wrote:
-> this new helper synchronizes the irq pending_latch
-> with the LPI pending bit status found in rdist pending table.
-> As the status is consumed, we reset the bit in pending table.
+Hi Christoffer,
+
+On 04/05/2017 19:13, Christoffer Dall wrote:
+> On Thu, May 04, 2017 at 01:44:29PM +0200, Eric Auger wrote:
+>> We plan to support different migration ABIs, ie. characterizing
+>> the ITS table layout format in guest RAM. For example, a new ABI
+>> will be needed if vLPIs get supported for nested use case.
+>>
+>> So let's introduce an array of supported ABIs (at the moment a single
+>> ABI is supported though). The following characteristics are foreseen
+>> to vary with the ABI: size of table entries, save/restore operation,
+>> the way abi settings are applied.
+>>
+>> By default the MAX_ABI_REV is applied on its creation. In subsequent
+>> patches we will introduce a way for the userspace to change the ABI
+>> in use.
+>>
+>> The entry sizes now are set according to the ABI version and not
+>> hardcoded anymore.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v6 -> v7:
+>> - rename abi into its_table_abi_versions
+>> - kernel doc comments for struct vgic_its_abi
+>> - comment GIC_ENCODE_SZ
+>> - slighly rephrase the commit message
+>>
+>> v5: creation and squash KVM: arm64: ITS: Report the ITE size in
+>>     GITS_TYPER
+>> ---
+>>  include/kvm/arm_vgic.h             |  3 ++
+>>  include/linux/irqchip/arm-gic-v3.h |  5 +++
+>>  virt/kvm/arm/vgic/vgic-its.c       | 92 ++++++++++++++++++++++++++++++++++++--
+>>  3 files changed, 96 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index c0b3d99..285474a 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -162,6 +162,9 @@ struct vgic_its {
+>>  	u32			creadr;
+>>  	u32			cwriter;
+>>  
+>> +	/* migration ABI revision in use */
+>> +	u32			abi_rev;
+>> +
+>>  	/* Protects the device and collection lists */
+>>  	struct mutex		its_lock;
+>>  	struct list_head	device_list;
+>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+>> index 97cbca1..81ebe43 100644
+>> --- a/include/linux/irqchip/arm-gic-v3.h
+>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>> @@ -132,6 +132,9 @@
+>>  #define GIC_BASER_SHAREABILITY(reg, type)				\
+>>  	(GIC_BASER_##type << reg##_SHAREABILITY_SHIFT)
+>>  
+>> +/* encode a size field of width @w containing @n - 1 units */
+>> +#define GIC_ENCODE_SZ(n, w) (((unsigned long)(n) - 1) & GENMASK_ULL(((w) - 1), 0))
+>> +
+>>  #define GICR_PROPBASER_SHAREABILITY_SHIFT		(10)
+>>  #define GICR_PROPBASER_INNER_CACHEABILITY_SHIFT		(7)
+>>  #define GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT		(56)
+>> @@ -232,6 +235,7 @@
+>>  #define GITS_CTLR_QUIESCENT		(1U << 31)
+>>  
+>>  #define GITS_TYPER_PLPIS		(1UL << 0)
+>> +#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
+>>  #define GITS_TYPER_IDBITS_SHIFT		8
+>>  #define GITS_TYPER_DEVBITS_SHIFT	13
+>>  #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
+>> @@ -290,6 +294,7 @@
+>>  #define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
+>>  #define GITS_BASER_ENTRY_SIZE_SHIFT		(48)
+>>  #define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
+>> +#define GITS_BASER_ENTRY_SIZE_MASK	GENMASK_ULL(52, 48)
+>>  #define GITS_BASER_SHAREABILITY_SHIFT	(10)
+>>  #define GITS_BASER_InnerShareable					\
+>>  	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 18588ef..c336cce 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -33,6 +33,12 @@
+>>  #include "vgic.h"
+>>  #include "vgic-mmio.h"
+>>  
+>> +/* Highest migration ABI revision supported by this code */
+>> +#define MAX_ABI_REV 0
+>> +
+>> +static int vgic_its_set_abi(struct vgic_its *its, int rev);
+>> +static const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its);
+>> +
+>>  /*
+>>   * Creates a new (reference to a) struct vgic_irq for a given LPI.
+>>   * If this LPI is already mapped on another ITS, we increase its refcount
+>> @@ -123,6 +129,25 @@ struct its_ite {
+>>  	u32 event_id;
+>>  };
+>>  
+>> +/**
+>> + * struct vgic_its_abi - ITS abi ops and settings
+>> + * @cte_esz: collection table entry size
+>> + * @dte_esz: device table entry size
+>> + * @ite_esz: interrupt translation table entry size
+>> + * @save tables: save the ITS tables into guest RAM
+>> + * @restore_tables: restore the ITS internal structs from
+>> + * tables stored in guest RAM
 > 
-> As we need the PENDBASER_ADDRESS() in vgic-v3, let's move its
-> definition in the irqchip header. We restore the full length
-> of the field, ie [51:16]. Same for PROPBASER_ADDRESS with full
-> field length of [51:12].
+> nit: indent to align with the beginning of 'restore...'
+> 
+> 
+>> + * @commit: apply the ABI settings to the ITS
+> 
+> hmm, I already forgot what the commit function does, and reading this
+> text doesn't seem to help me, unfortunately.  When is this called, what
+> does it do?
+what about:
+ * @commit: initialize the registers which expose the ABI settings,
+ *  especially the entry sizes
 
-why into irqchip and not just the vgic header file?
+Thanks
+
+Eric
 
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Thanks,
+> -Christoffer
 > 
-> ---
+>> + */
+>> +struct vgic_its_abi {
+>> +	int cte_esz;
+>> +	int dte_esz;
+>> +	int ite_esz;
+>> +	int (*save_tables)(struct vgic_its *its);
+>> +	int (*restore_tables)(struct vgic_its *its);
+>> +	int (*commit)(struct vgic_its *its);
+>> +};
+>> +
+>>  /*
+>>   * Find and returns a device in the device table for an ITS.
+>>   * Must be called with the its_lock mutex held.
+>> @@ -364,6 +389,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+>>  					      struct vgic_its *its,
+>>  					      gpa_t addr, unsigned int len)
+>>  {
+>> +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+>>  	u64 reg = GITS_TYPER_PLPIS;
+>>  
+>>  	/*
+>> @@ -376,6 +402,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+>>  	 */
+>>  	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
+>>  	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
+>> +	reg |= GIC_ENCODE_SZ(abi->ite_esz, 4) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
+>>  
+>>  	return extract_bytes(reg, addr & 7, len);
+>>  }
+>> @@ -1269,6 +1296,7 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+>>  				      gpa_t addr, unsigned int len,
+>>  				      unsigned long val)
+>>  {
+>> +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+>>  	u64 entry_size, device_type;
+>>  	u64 reg, *regptr, clearbits = 0;
+>>  
+>> @@ -1279,12 +1307,12 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+>>  	switch (BASER_INDEX(addr)) {
+>>  	case 0:
+>>  		regptr = &its->baser_device_table;
+>> -		entry_size = 8;
+>> +		entry_size = abi->dte_esz;
+>>  		device_type = GITS_BASER_TYPE_DEVICE;
+>>  		break;
+>>  	case 1:
+>>  		regptr = &its->baser_coll_table;
+>> -		entry_size = 8;
+>> +		entry_size = abi->cte_esz;
+>>  		device_type = GITS_BASER_TYPE_COLLECTION;
+>>  		clearbits = GITS_BASER_INDIRECT;
+>>  		break;
+>> @@ -1426,7 +1454,6 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
+>>  	(GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWb)		| \
+>>  	 GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, SameAsInner)		| \
+>>  	 GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)		| \
+>> -	 ((8ULL - 1) << GITS_BASER_ENTRY_SIZE_SHIFT)			| \
+>>  	 GITS_BASER_PAGE_SIZE_64K)
+>>  
+>>  #define INITIAL_PROPBASER_VALUE						  \
+>> @@ -1466,7 +1493,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+>>  
+>>  	dev->private = its;
+>>  
+>> -	return 0;
+>> +	return vgic_its_set_abi(its, MAX_ABI_REV);
+>>  }
+>>  
+>>  static void vgic_its_destroy(struct kvm_device *kvm_dev)
+>> @@ -1584,6 +1611,63 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+>>  	return ret;
+>>  }
+>>  
+>> +/**
+>> + * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
+>> + * according to v0 ABI
+>> + */
+>> +static int vgic_its_save_tables_v0(struct vgic_its *its)
+>> +{
+>> +	return -ENXIO;
+>> +}
+>> +
+>> +/**
+>> + * vgic_its_restore_tables_v0 - Restore the ITS tables from guest RAM
+>> + * to internal data structs according to V0 ABI
+>> + *
+>> + */
+>> +static int vgic_its_restore_tables_v0(struct vgic_its *its)
+>> +{
+>> +	return -ENXIO;
+>> +}
+>> +
+>> +static int vgic_its_commit_v0(struct vgic_its *its)
+>> +{
+>> +	const struct vgic_its_abi *abi;
+>> +
+>> +	abi = vgic_its_get_abi(its);
+>> +	its->baser_coll_table &= ~GITS_BASER_ENTRY_SIZE_MASK;
+>> +	its->baser_device_table &= ~GITS_BASER_ENTRY_SIZE_MASK;
+>> +
+>> +	its->baser_coll_table |= (GIC_ENCODE_SZ(abi->cte_esz, 5)
+>> +					<< GITS_BASER_ENTRY_SIZE_SHIFT);
+>> +
+>> +	its->baser_device_table |= (GIC_ENCODE_SZ(abi->dte_esz, 5)
+>> +					<< GITS_BASER_ENTRY_SIZE_SHIFT);
+>> +	return 0;
+>> +}
+>> +
+>> +static const struct vgic_its_abi its_table_abi_versions[MAX_ABI_REV + 1] = {
+>> +	{.cte_esz = 8, .dte_esz = 8, .ite_esz = 8,
+>> +	 .save_tables = vgic_its_save_tables_v0,
+>> +	 .restore_tables = vgic_its_restore_tables_v0,
+>> +	 .commit = vgic_its_commit_v0,
+>> +	},
+>> +};
+>> +
+>> +inline const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its)
+>> +{
+>> +	return &its_table_abi_versions[its->abi_rev];
+>> +}
+>> +
+>> +int vgic_its_set_abi(struct vgic_its *its, int rev)
+>> +{
+>> +	const struct vgic_its_abi *abi;
+>> +
+>> +	its->abi_rev = rev;
+>> +	abi = vgic_its_get_abi(its);
+>> +	return abi->commit(its);
+>> +}
+>> +
+>>  static int vgic_its_has_attr(struct kvm_device *dev,
+>>  			     struct kvm_device_attr *attr)
+>>  {
+>> -- 
+>> 2.5.5
+>>
 > 
-> v6: new
-> ---
->  include/linux/irqchip/arm-gic-v3.h |  2 ++
->  virt/kvm/arm/vgic/vgic-its.c       |  6 ++----
->  virt/kvm/arm/vgic/vgic-v3.c        | 44 ++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.h           |  1 +
->  4 files changed, 49 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index 9519c7b..e09e5d7 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -159,6 +159,8 @@
->  #define GICR_PROPBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWaWb)
->  
->  #define GICR_PROPBASER_IDBITS_MASK			(0x1f)
-> +#define GICR_PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
-> +#define GICR_PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
->  
->  #define GICR_PENDBASER_SHAREABILITY_SHIFT		(10)
->  #define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT		(7)
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index e7bb86a..f43ea30c 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -198,8 +198,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
->   */
->  #define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
->  #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
-> -#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
-> -#define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
->  
->  #define GIC_LPI_OFFSET 8192
->  
-> @@ -234,7 +232,7 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
->  static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
->  			     struct kvm_vcpu *filter_vcpu)
->  {
-> -	u64 propbase = PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
-> +	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
->  	u8 prop;
->  	int ret;
->  
-> @@ -346,7 +344,7 @@ static u32 max_lpis_propbaser(u64 propbaser)
->   */
->  static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
->  {
-> -	gpa_t pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-> +	gpa_t pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
->  	struct vgic_irq *irq;
->  	int last_byte_offset = -1;
->  	int ret = 0;
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index be0f4c3..0d753ae 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -252,6 +252,50 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
->  	vgic_v3->vgic_hcr = ICH_HCR_EN;
->  }
->  
-> +int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	int byte_offset, bit_nr;
-> +	gpa_t pendbase, ptr;
-> +	bool status;
-> +	u8 val;
-> +	int ret;
-> +
-> +retry:
-> +	vcpu = irq->target_vcpu;
-> +	if (!vcpu)
-> +		return 0;
-> +
-> +	pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-> +
-> +	byte_offset = irq->intid / BITS_PER_BYTE;
-> +	bit_nr = irq->intid % BITS_PER_BYTE;
-> +	ptr = pendbase + byte_offset;
-> +
-> +	ret = kvm_read_guest(kvm, ptr, &val, 1);
-> +	if (ret)
-> +		return ret;
-> +
-> +	status = val & (1 << bit_nr);
-> +
-> +	spin_lock(&irq->irq_lock);
-> +	if (irq->target_vcpu != vcpu) {
-> +		spin_unlock(&irq->irq_lock);
-> +		goto retry;
-
-Can the guest be continuously changing the configuration of the LPI and
-cause this function to be called, which will efficiently hog this CPU
-from the system, or am I being overly cautious here?
-
-> +	}
-> +	irq->pending_latch = status;
-> +	vgic_queue_irq_unlock(vcpu->kvm, irq);
-> +
-> +	if (status) {
-> +		/* clear consumed data */
-> +		val &= ~(1 << bit_nr);
-> +		ret = kvm_write_guest(kvm, ptr, &val, 1);
-> +		if (ret)
-> +			return ret;
-
-Do we have a problem that if this is done twice within the same byte (on
-different LPIs) then the data could be strangely out of sync?
-
-Do we care?
-
-
-Thanks,
--Christoffer
-
-> +	}
-> +	return 0;
-> +}
-> +
->  /* check for overlapping regions and for regions crossing the end of memory */
->  static bool vgic_v3_check_base(struct kvm *kvm)
->  {
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index b87f1c6..309ab64 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -157,6 +157,7 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v3_enable(struct kvm_vcpu *vcpu);
->  int vgic_v3_probe(const struct gic_kvm_info *info);
->  int vgic_v3_map_resources(struct kvm *kvm);
-> +int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
->  int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
->  
->  int vgic_register_its_iodevs(struct kvm *kvm);
-> -- 
-> 2.5.5
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 > 
