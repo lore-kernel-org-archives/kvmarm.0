@@ -1,206 +1,203 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 14/24] KVM: arm64: vgic-v3:
- vgic_v3_lpi_sync_pending_status
-Date: Fri, 5 May 2017 11:35:29 +0100
-Message-ID: <df6557f5-0696-e0ed-4ecd-6ff043e24683@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v6 16/24] KVM: arm64: vgic-its:
+ KVM_DEV_ARM_ITS_SAVE/RESTORE_TABLES
+Date: Fri, 5 May 2017 04:55:07 -0700
+Message-ID: <20170505115507.GD1419@lvm>
 References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
- <1493898284-29504-15-git-send-email-eric.auger@redhat.com>
- <20170505081113.GA1419@lvm> <2a1f0e35-5a2a-bb60-1e8f-5b7a13bae58c@redhat.com>
- <2e240438-486a-e34b-0513-67d4e422e2b6@arm.com> <20170505101003.GC1419@lvm>
+ <1493898284-29504-17-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170505101003.GC1419@lvm>
+Content-Disposition: inline
+In-Reply-To: <1493898284-29504-17-git-send-email-eric.auger@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, bjsprakash.linux@gmail.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, bjsprakash.linux@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/05/17 11:10, Christoffer Dall wrote:
-> On Fri, May 05, 2017 at 10:59:09AM +0100, Marc Zyngier wrote:
->> On 05/05/17 10:45, Auger Eric wrote:
->>> Hi,
->>>
->>> On 05/05/2017 10:11, Christoffer Dall wrote:
->>>> On Thu, May 04, 2017 at 01:44:34PM +0200, Eric Auger wrote:
->>>>> this new helper synchronizes the irq pending_latch
->>>>> with the LPI pending bit status found in rdist pending table.
->>>>> As the status is consumed, we reset the bit in pending table.
->>>>>
->>>>> As we need the PENDBASER_ADDRESS() in vgic-v3, let's move its
->>>>> definition in the irqchip header. We restore the full length
->>>>> of the field, ie [51:16]. Same for PROPBASER_ADDRESS with full
->>>>> field length of [51:12].
->>>>
->>>> why into irqchip and not just the vgic header file?
->>> Well most register field shift/masks are located there. This may be
->>> useful as well for the ITS driver if power management gets implemented
->>
->> Yeah, I'm fine with that. Having all of the HW description in one single
->> place makes sense.
->>
->>>>
->>>>>
->>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>>
->>>>> ---
->>>>>
->>>>> v6: new
->>>>> ---
->>>>>  include/linux/irqchip/arm-gic-v3.h |  2 ++
->>>>>  virt/kvm/arm/vgic/vgic-its.c       |  6 ++----
->>>>>  virt/kvm/arm/vgic/vgic-v3.c        | 44 ++++++++++++++++++++++++++++++++++++++
->>>>>  virt/kvm/arm/vgic/vgic.h           |  1 +
->>>>>  4 files changed, 49 insertions(+), 4 deletions(-)
->>>>>
->>>>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
->>>>> index 9519c7b..e09e5d7 100644
->>>>> --- a/include/linux/irqchip/arm-gic-v3.h
->>>>> +++ b/include/linux/irqchip/arm-gic-v3.h
->>>>> @@ -159,6 +159,8 @@
->>>>>  #define GICR_PROPBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWaWb)
->>>>>  
->>>>>  #define GICR_PROPBASER_IDBITS_MASK			(0x1f)
->>>>> +#define GICR_PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
->>>>> +#define GICR_PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
->>>>>  
->>>>>  #define GICR_PENDBASER_SHAREABILITY_SHIFT		(10)
->>>>>  #define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT		(7)
->>>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>>>> index e7bb86a..f43ea30c 100644
->>>>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>>>> @@ -198,8 +198,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
->>>>>   */
->>>>>  #define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
->>>>>  #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
->>>>> -#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
->>>>> -#define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
->>>>>  
->>>>>  #define GIC_LPI_OFFSET 8192
->>>>>  
->>>>> @@ -234,7 +232,7 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
->>>>>  static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
->>>>>  			     struct kvm_vcpu *filter_vcpu)
->>>>>  {
->>>>> -	u64 propbase = PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
->>>>> +	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
->>>>>  	u8 prop;
->>>>>  	int ret;
->>>>>  
->>>>> @@ -346,7 +344,7 @@ static u32 max_lpis_propbaser(u64 propbaser)
->>>>>   */
->>>>>  static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
->>>>>  {
->>>>> -	gpa_t pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
->>>>> +	gpa_t pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
->>>>>  	struct vgic_irq *irq;
->>>>>  	int last_byte_offset = -1;
->>>>>  	int ret = 0;
->>>>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
->>>>> index be0f4c3..0d753ae 100644
->>>>> --- a/virt/kvm/arm/vgic/vgic-v3.c
->>>>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
->>>>> @@ -252,6 +252,50 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
->>>>>  	vgic_v3->vgic_hcr = ICH_HCR_EN;
->>>>>  }
->>>>>  
->>>>> +int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
->>>>> +{
->>>>> +	struct kvm_vcpu *vcpu;
->>>>> +	int byte_offset, bit_nr;
->>>>> +	gpa_t pendbase, ptr;
->>>>> +	bool status;
->>>>> +	u8 val;
->>>>> +	int ret;
->>>>> +
->>>>> +retry:
->>>>> +	vcpu = irq->target_vcpu;
->>>>> +	if (!vcpu)
->>>>> +		return 0;
->>>>> +
->>>>> +	pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
->>>>> +
->>>>> +	byte_offset = irq->intid / BITS_PER_BYTE;
->>>>> +	bit_nr = irq->intid % BITS_PER_BYTE;
->>>>> +	ptr = pendbase + byte_offset;
->>>>> +
->>>>> +	ret = kvm_read_guest(kvm, ptr, &val, 1);
->>>>> +	if (ret)
->>>>> +		return ret;
->>>>> +
->>>>> +	status = val & (1 << bit_nr);
->>>>> +
->>>>> +	spin_lock(&irq->irq_lock);
->>>>> +	if (irq->target_vcpu != vcpu) {
->>>>> +		spin_unlock(&irq->irq_lock);
->>>>> +		goto retry;
->>>>
->>>> Can the guest be continuously changing the configuration of the LPI and
->>>> cause this function to be called, which will efficiently hog this CPU
->>>> from the system, or am I being overly cautious here?
->>> Yes but on the other hand, there is a risk the target_vcpu has changed,
->>> isn't it? So the alternative you be to return -EBUSY. and caller, ie.
->>> its_add_lpi would return that error?
->>
->> For the guest to be changing the LPI configuration, it would take a
->> command to be issued. If there is a concern that we're racing against a
->> command, can we take the command queue mutex?
->>
+On Thu, May 04, 2017 at 01:44:36PM +0200, Eric Auger wrote:
+> Introduce new attributes in KVM_DEV_ARM_VGIC_GRP_CTRL group:
+> - KVM_DEV_ARM_ITS_SAVE_TABLES: saves the ITS tables into guest RAM
+> - KVM_DEV_ARM_ITS_RESTORE_TABLES: restores them into VGIC internal
+>   structures.
 > 
-> So this is a redistributor thing, not an ITS thing, so I'd prefer not
-> solving it that way.
-
-Indeed.
-
-> I was just thinking if we should do a limit of the number of times we'll
-> do this or check if we have a pending signal and just return, but
-> actually, I don't think this is a problem, because the path that keeps
-> changing the configuration will eventually run out of CPU resources and
-> this thread would have forward progress.
-
-Yes, assuming we're not holding any other spinlock on the same path.
-Looking at the code, we only seem to come here from handling MAPI/MAPTI,
-so we should be good.
-
->>>>
->>>>> +	}
->>>>> +	irq->pending_latch = status;
->>>>> +	vgic_queue_irq_unlock(vcpu->kvm, irq);
->>>>> +
->>>>> +	if (status) {
->>>>> +		/* clear consumed data */
->>>>> +		val &= ~(1 << bit_nr);
->>>>> +		ret = kvm_write_guest(kvm, ptr, &val, 1);
->>>>> +		if (ret)
->>>>> +			return ret;
->>>>
->>>> Do we have a problem that if this is done twice within the same byte (on
->>>> different LPIs) then the data could be strangely out of sync?
->>> Not sure I get what you mean here? I reset a single bit within the byte.
->>> Do you mean there could be a concurrency issue?
->>>
->>> In principle we are not obliged to reset the bit, right? Why do we care?
->>> The table will be updated on next pending table save.
->>
->> 1) the guest should never write to the pending table.
->> 2) if there is an interrupt being injected, it will be made pending in
->> the irq structure, and not in the PT.
+> We hold the vcpus lock during the save and restore to make
+> sure no vcpu is running.
 > 
-> If you have two separate cores running this function at the same time,
-> trying to clear each a bit in the same word, wouldn't you loose one of
-> the cleared bits?
+> At this stage the functionality is not yet implemented. Only
+> the skeleton is put in place.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> v5 -> v6:
+> - remove the pending table sync from the ITS table restore
+> 
+> v4 -> v5:
+> - use KVM_DEV_ARM_ITS_SAVE_TABLES and KVM_DEV_ARM_ITS_RESTORE_TABLES
+> - rename *flush* into *save*
+> - call its_sync_lpi_pending_table at the end of restore
+> - use abi framework
+> 
+> v3 -> v4:
+> - pass kvm struct handle to vgic_its_flush/restore_pending_tables
+> - take the kvm lock and vcpu locks
+> - ABI revision check
+> - check attr->attr is null
+> 
+> v1 -> v2:
+> - remove useless kvm parameter
+> ---
+>  arch/arm/include/uapi/asm/kvm.h   |   4 +-
+>  arch/arm64/include/uapi/asm/kvm.h |   4 +-
+>  virt/kvm/arm/vgic/vgic-its.c      | 101 ++++++++++++++++++++++++++++++++++++--
+>  3 files changed, 103 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> index 4beb83b..8e6563c 100644
+> --- a/arch/arm/include/uapi/asm/kvm.h
+> +++ b/arch/arm/include/uapi/asm/kvm.h
+> @@ -199,7 +199,9 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK 0x3ff
+>  #define VGIC_LEVEL_INFO_LINE_LEVEL	0
+>  
+> -#define   KVM_DEV_ARM_VGIC_CTRL_INIT    0
+> +#define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
+> +#define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
+> +#define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
+>  
+>  /* KVM_IRQ_LINE irq field index values */
+>  #define KVM_ARM_IRQ_TYPE_SHIFT		24
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 7e8dd69..1e35115 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -219,7 +219,9 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK	0x3ff
+>  #define VGIC_LEVEL_INFO_LINE_LEVEL	0
+>  
+> -#define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
+> +#define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
+> +#define   KVM_DEV_ARM_ITS_SAVE_TABLES           1
+> +#define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
+>  
+>  /* Device Control API on vcpu fd */
+>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 3ad615a..5b251dc 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1669,12 +1669,68 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
+>  }
+>  
+>  /**
+> + * vgic_its_save_device_tables - Save the device table and all ITT
+> + * into guest RAM
+> + */
+> +static int vgic_its_save_device_tables(struct vgic_its *its)
+> +{
+> +	return -ENXIO;
+> +}
+> +
+> +/**
+> + * vgic_its_restore_device_tables - Restore the device table and all ITT
+> + * from guest RAM to internal data structs
+> + */
+> +static int vgic_its_restore_device_tables(struct vgic_its *its)
+> +{
+> +	return -ENXIO;
+> +}
+> +
+> +/**
+> + * vgic_its_save_collection_table - Save the collection table into
+> + * guest RAM
+> + */
+> +static int vgic_its_save_collection_table(struct vgic_its *its)
+> +{
+> +	return -ENXIO;
+> +}
+> +
+> +/**
+> + * vgic_its_restore_collection_table - reads the collection table
+> + * in guest memory and restores the ITS internal state. Requires the
+> + * BASER registers to be restored before.
+> + */
+> +static int vgic_its_restore_collection_table(struct vgic_its *its)
+> +{
+> +	return -ENXIO;
+> +}
+> +
+> +/**
+>   * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
+>   * according to v0 ABI
+>   */
+>  static int vgic_its_save_tables_v0(struct vgic_its *its)
+>  {
+> -	return -ENXIO;
+> +	struct kvm *kvm = its->dev->kvm;
+> +	int ret;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	if (!lock_all_vcpus(kvm)) {
+> +		mutex_unlock(&kvm->lock);
+> +		return -EBUSY;
+> +	}
+> +
+> +	ret = vgic_its_save_device_tables(its);
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret = vgic_its_save_collection_table(its);
+> +
+> +out:
+> +	unlock_all_vcpus(kvm);
+> +	mutex_unlock(&kvm->lock);
+> +	return ret;
+>  }
+>  
+>  /**
+> @@ -1684,7 +1740,34 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
+>   */
+>  static int vgic_its_restore_tables_v0(struct vgic_its *its)
+>  {
+> -	return -ENXIO;
+> +	struct kvm *kvm = its->dev->kvm;
+> +	int ret;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	if (!lock_all_vcpus(kvm)) {
+> +		mutex_unlock(&kvm->lock);
+> +		return -EBUSY;
+> +	}
+> +
+> +	ret = vgic_its_restore_collection_table(its);
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret = vgic_its_restore_device_tables(its);
+> +
+> +out:
+> +	unlock_all_vcpus(kvm);
+> +	mutex_unlock(&kvm->lock);
+> +
+> +	if (ret)
+> +		return ret;
+> +
+> +	/*
+> +	 * On restore path, MSI injections can happen before the
+> +	 * first VCPU run so let's complete the GIC init here.
+> +	 */
+> +	return kvm_vgic_map_resources(its->dev->kvm);
 
-Ah, I see what you mean now (I was obviously looking at the wrong end of
-the problem).
+So not sure where we left this one in our other discussion.  I feel like
+this is a bit out of place currently, and registering the iodevs should
+rather be done when setting the base addresses used by that, but I think
+we can fix that later, or are we implying ordering towards userspace
+here?
 
-> Maybe that can never happen because the commands would be serialized and
-> we should be restoring the system in serial as well?
+Marc, any thoughts?
 
-I think that should be the case. What does it mean to do two restore in
-parallel? We should probably enforce this. Eric?
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks,
+-Christoffer
