@@ -1,25 +1,28 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH V15 08/11] efi: print unrecognized CPER section
-Date: Fri, 5 May 2017 15:27:17 +0200
-Message-ID: <20170505132717.zodffuha46f3q5sj@pd.tnic>
-References: <1492556723-9189-1-git-send-email-tbaicar@codeaurora.org>
- <1492556723-9189-9-git-send-email-tbaicar@codeaurora.org>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v6 14/24] KVM: arm64: vgic-v3:
+ vgic_v3_lpi_sync_pending_status
+Date: Fri, 5 May 2017 16:20:42 +0200
+Message-ID: <fdbe6b14-7a30-d0aa-0ac0-07e6db6586b8@redhat.com>
+References: <1493898284-29504-1-git-send-email-eric.auger@redhat.com>
+ <1493898284-29504-15-git-send-email-eric.auger@redhat.com>
+ <20170505081113.GA1419@lvm> <2a1f0e35-5a2a-bb60-1e8f-5b7a13bae58c@redhat.com>
+ <2e240438-486a-e34b-0513-67d4e422e2b6@arm.com> <20170505101003.GC1419@lvm>
+ <df6557f5-0696-e0ed-4ecd-6ff043e24683@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A2A0440B5E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 09:24:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCDF940A66
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 10:17:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k9Vg-VPLZjI4 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 May 2017 09:24:22 -0400 (EDT)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D884405DA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 09:24:22 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <1492556723-9189-9-git-send-email-tbaicar@codeaurora.org>
+ with ESMTP id dPqQdDAr9uxZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 May 2017 10:17:41 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A73540190
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 May 2017 10:17:41 -0400 (EDT)
+In-Reply-To: <df6557f5-0696-e0ed-4ecd-6ff043e24683@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,103 +32,204 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, will.deacon@arm.com, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, rafael@kernel.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, devel@acpica.org, tony.luck@intel.com, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bristot@redhat.com
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 18, 2017 at 05:05:20PM -0600, Tyler Baicar wrote:
-> UEFI spec allows for non-standard section in Common Platform Error
-> Record. This is defined in section N.2.3 of UEFI version 2.5.
+Hi Christoffer, Marc,
+
+On 05/05/2017 12:35, Marc Zyngier wrote:
+> On 05/05/17 11:10, Christoffer Dall wrote:
+>> On Fri, May 05, 2017 at 10:59:09AM +0100, Marc Zyngier wrote:
+>>> On 05/05/17 10:45, Auger Eric wrote:
+>>>> Hi,
+>>>>
+>>>> On 05/05/2017 10:11, Christoffer Dall wrote:
+>>>>> On Thu, May 04, 2017 at 01:44:34PM +0200, Eric Auger wrote:
+>>>>>> this new helper synchronizes the irq pending_latch
+>>>>>> with the LPI pending bit status found in rdist pending table.
+>>>>>> As the status is consumed, we reset the bit in pending table.
+>>>>>>
+>>>>>> As we need the PENDBASER_ADDRESS() in vgic-v3, let's move its
+>>>>>> definition in the irqchip header. We restore the full length
+>>>>>> of the field, ie [51:16]. Same for PROPBASER_ADDRESS with full
+>>>>>> field length of [51:12].
+>>>>>
+>>>>> why into irqchip and not just the vgic header file?
+>>>> Well most register field shift/masks are located there. This may be
+>>>> useful as well for the ITS driver if power management gets implemented
+>>>
+>>> Yeah, I'm fine with that. Having all of the HW description in one single
+>>> place makes sense.
+>>>
+>>>>>
+>>>>>>
+>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>>>
+>>>>>> ---
+>>>>>>
+>>>>>> v6: new
+>>>>>> ---
+>>>>>>  include/linux/irqchip/arm-gic-v3.h |  2 ++
+>>>>>>  virt/kvm/arm/vgic/vgic-its.c       |  6 ++----
+>>>>>>  virt/kvm/arm/vgic/vgic-v3.c        | 44 ++++++++++++++++++++++++++++++++++++++
+>>>>>>  virt/kvm/arm/vgic/vgic.h           |  1 +
+>>>>>>  4 files changed, 49 insertions(+), 4 deletions(-)
+>>>>>>
+>>>>>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+>>>>>> index 9519c7b..e09e5d7 100644
+>>>>>> --- a/include/linux/irqchip/arm-gic-v3.h
+>>>>>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>>>>>> @@ -159,6 +159,8 @@
+>>>>>>  #define GICR_PROPBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWaWb)
+>>>>>>  
+>>>>>>  #define GICR_PROPBASER_IDBITS_MASK			(0x1f)
+>>>>>> +#define GICR_PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
+>>>>>> +#define GICR_PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
+>>>>>>  
+>>>>>>  #define GICR_PENDBASER_SHAREABILITY_SHIFT		(10)
+>>>>>>  #define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT		(7)
+>>>>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>>>>>> index e7bb86a..f43ea30c 100644
+>>>>>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>>>>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>>>>>> @@ -198,8 +198,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+>>>>>>   */
+>>>>>>  #define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
+>>>>>>  #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
+>>>>>> -#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
+>>>>>> -#define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
+>>>>>>  
+>>>>>>  #define GIC_LPI_OFFSET 8192
+>>>>>>  
+>>>>>> @@ -234,7 +232,7 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
+>>>>>>  static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+>>>>>>  			     struct kvm_vcpu *filter_vcpu)
+>>>>>>  {
+>>>>>> -	u64 propbase = PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
+>>>>>> +	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
+>>>>>>  	u8 prop;
+>>>>>>  	int ret;
+>>>>>>  
+>>>>>> @@ -346,7 +344,7 @@ static u32 max_lpis_propbaser(u64 propbaser)
+>>>>>>   */
+>>>>>>  static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+>>>>>>  {
+>>>>>> -	gpa_t pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
+>>>>>> +	gpa_t pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
+>>>>>>  	struct vgic_irq *irq;
+>>>>>>  	int last_byte_offset = -1;
+>>>>>>  	int ret = 0;
+>>>>>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+>>>>>> index be0f4c3..0d753ae 100644
+>>>>>> --- a/virt/kvm/arm/vgic/vgic-v3.c
+>>>>>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+>>>>>> @@ -252,6 +252,50 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+>>>>>>  	vgic_v3->vgic_hcr = ICH_HCR_EN;
+>>>>>>  }
+>>>>>>  
+>>>>>> +int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+>>>>>> +{
+>>>>>> +	struct kvm_vcpu *vcpu;
+>>>>>> +	int byte_offset, bit_nr;
+>>>>>> +	gpa_t pendbase, ptr;
+>>>>>> +	bool status;
+>>>>>> +	u8 val;
+>>>>>> +	int ret;
+>>>>>> +
+>>>>>> +retry:
+>>>>>> +	vcpu = irq->target_vcpu;
+>>>>>> +	if (!vcpu)
+>>>>>> +		return 0;
+>>>>>> +
+>>>>>> +	pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
+>>>>>> +
+>>>>>> +	byte_offset = irq->intid / BITS_PER_BYTE;
+>>>>>> +	bit_nr = irq->intid % BITS_PER_BYTE;
+>>>>>> +	ptr = pendbase + byte_offset;
+>>>>>> +
+>>>>>> +	ret = kvm_read_guest(kvm, ptr, &val, 1);
+>>>>>> +	if (ret)
+>>>>>> +		return ret;
+>>>>>> +
+>>>>>> +	status = val & (1 << bit_nr);
+>>>>>> +
+>>>>>> +	spin_lock(&irq->irq_lock);
+>>>>>> +	if (irq->target_vcpu != vcpu) {
+>>>>>> +		spin_unlock(&irq->irq_lock);
+>>>>>> +		goto retry;
+>>>>>
+>>>>> Can the guest be continuously changing the configuration of the LPI and
+>>>>> cause this function to be called, which will efficiently hog this CPU
+>>>>> from the system, or am I being overly cautious here?
+>>>> Yes but on the other hand, there is a risk the target_vcpu has changed,
+>>>> isn't it? So the alternative you be to return -EBUSY. and caller, ie.
+>>>> its_add_lpi would return that error?
+>>>
+>>> For the guest to be changing the LPI configuration, it would take a
+>>> command to be issued. If there is a concern that we're racing against a
+>>> command, can we take the command queue mutex?
+>>>
+>>
+>> So this is a redistributor thing, not an ITS thing, so I'd prefer not
+>> solving it that way.
 > 
-> Currently if the CPER section's type (UUID) does not match with
-> one of the section types that the kernel knows how to parse, the
-> section is skipped. Therefore, user is not able to see
-> such CPER data, for instance, error record of non-standard section.
+> Indeed.
 > 
-> For above mentioned case, this change prints out the raw data in
-> hex in dmesg buffer.
-
-... because? We'd need the reason why we're not ignoring those errors
-anymore.
-
->  Data length is taken from Error Data length
-> field of Generic Error Data Entry.
+>> I was just thinking if we should do a limit of the number of times we'll
+>> do this or check if we have a pending signal and just return, but
+>> actually, I don't think this is a problem, because the path that keeps
+>> changing the configuration will eventually run out of CPU resources and
+>> this thread would have forward progress.
 > 
-> The following is a sample output from dmesg:
-> [  140.739180] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 2
-> [  140.739182] {1}[Hardware Error]: It has been corrected by h/w and requires no further action
-> [  140.739191] {1}[Hardware Error]: event severity: corrected
-> [  140.739196] {1}[Hardware Error]:  time: precise 2017-03-15 20:37:35
-> [  140.739197] {1}[Hardware Error]:  Error 0, type: corrected
-> [  140.739203] {1}[Hardware Error]:   section type: unknown, d2e2621c-f936-468d-0d84-15a4ed015c8b
-> [  140.739205] {1}[Hardware Error]:   section length: 568 (0x238)
-> [  140.739210] {1}[Hardware Error]:   00000000: 4d415201 4d492031 453a4d45 435f4343  .RAM1 IMEM:ECC_C
-> [  140.739214] {1}[Hardware Error]:   00000010: 53515f45 44525f42 00000000 00000000  E_QSB_RD........
-> [  140.739217] {1}[Hardware Error]:   00000020: 00000000 00000000 00000000 00000000  ................
-> [  140.739220] {1}[Hardware Error]:   00000030: 00000000 00000000 01010000 01010000  ................
-> [  140.739223] {1}[Hardware Error]:   00000040: 00000000 00000000 00000005 00000000  ................
-> [  140.739226] {1}[Hardware Error]:   00000050: 01010000 00000000 00000001 00dddd00  ................
-
-Kill all those prefixes:
-
-" Hardware error from APEI Generic Hardware Error Source: 2
-  It has been corrected by h/w and requires no further action
-  event severity: corrected
-   time: precise 2017-03-15 20:37:35
-   Error 0, type: corrected
-    section type: unknown, d2e2621c-f936-468d-0d84-15a4ed015c8b
-    section length: 568 (0x238)
-    00000000: 4d415201 4d492031 453a4d45 435f4343  .RAM1 IMEM:ECC_C
-    00000010: 53515f45 44525f42 00000000 00000000  E_QSB_RD........
-    00000020: 00000000 00000000 00000000 00000000  ................
-    00000030: 00000000 00000000 01010000 01010000  ................
-    00000040: 00000000 00000000 00000005 00000000  ................
-    00000050: 01010000 00000000 00000001 00dddd00  ................
-"
-
-to the important info only.
-
-
-> ...
+> Yes, assuming we're not holding any other spinlock on the same path.
+> Looking at the code, we only seem to come here from handling MAPI/MAPTI,
+> so we should be good.
 > 
-> The raw data from the error can then be decoded using vendor
-> specific tools.
+>>>>>
+>>>>>> +	}
+>>>>>> +	irq->pending_latch = status;
+>>>>>> +	vgic_queue_irq_unlock(vcpu->kvm, irq);
+>>>>>> +
+>>>>>> +	if (status) {
+>>>>>> +		/* clear consumed data */
+>>>>>> +		val &= ~(1 << bit_nr);
+>>>>>> +		ret = kvm_write_guest(kvm, ptr, &val, 1);
+>>>>>> +		if (ret)
+>>>>>> +			return ret;
+>>>>>
+>>>>> Do we have a problem that if this is done twice within the same byte (on
+>>>>> different LPIs) then the data could be strangely out of sync?
+>>>> Not sure I get what you mean here? I reset a single bit within the byte.
+>>>> Do you mean there could be a concurrency issue?
+>>>>
+>>>> In principle we are not obliged to reset the bit, right? Why do we care?
+>>>> The table will be updated on next pending table save.
+>>>
+>>> 1) the guest should never write to the pending table.
+>>> 2) if there is an interrupt being injected, it will be made pending in
+>>> the irq structure, and not in the PT.
+>>
+>> If you have tGwo separate cores running this function at the same time,
+>> trying to clear each a bit in the same word, wouldn't you loose one of
+>> the cleared bits?
 > 
-> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
-> CC: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
-> Reviewed-by: James Morse <james.morse@arm.com>
-> ---
->  drivers/firmware/efi/cper.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+> Ah, I see what you mean now (I was obviously looking at the wrong end of
+> the problem).
 > 
-> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
-> index f959185..610d31a 100644
-> --- a/drivers/firmware/efi/cper.c
-> +++ b/drivers/firmware/efi/cper.c
-> @@ -596,8 +596,16 @@ static void cper_estatus_timestamp(const char *pfx,
->  			cper_print_proc_arm(newpfx, arm_err);
->  		else
->  			goto err_section_too_small;
-> -	} else
-> -		printk("%s""section type: unknown, %pUl\n", newpfx, sec_type);
-> +	} else {
-> +		const void *unknown_err;
-> +
-> +		unknown_err = acpi_hest_get_payload(gdata);
+>> Maybe that can never happen because the commands would be serialized and
+>> we should be restoring the system in serial as well?
+> 
+> I think that should be the case. What does it mean to do two restore in
+> parallel? We should probably enforce this. Eric?
+We can't have 2 restores in parallel as we hold the kvm->lock all along.
+MAPI commands are serialized by its_cmd_lock. MAPI and restore cannot
+happen concurrently since vcpu is stopped and kvm_lock is held during
+GITS_CWRITER setting too. So my understanding is it can't have this race.
 
-Simply:
+Thanks
 
-	const void *err = acpi_hest_get_payload(gdata);
-
-Short and sweet.
-
-> +		printk("%ssection type: unknown, %pUl\n", newpfx, sec_type);
-> +		printk("%ssection length: %d (%#x)\n", newpfx,
-
-One number format is fine.
-
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Eric
+> 
+> 	M.
+> 
