@@ -1,69 +1,118 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3 06/10] KVM: arm/arm64: use vcpu requests for power_off
-Date: Sat, 6 May 2017 20:17:07 +0200
-Message-ID: <20170506181707.GC5923@cbox>
+Subject: Re: [PATCH v3 07/10] KVM: arm/arm64: optimize VCPU RUN
+Date: Sat, 6 May 2017 20:27:15 +0200
+Message-ID: <20170506182715.GD5923@cbox>
 References: <20170503160635.21669-1-drjones@redhat.com>
- <20170503160635.21669-7-drjones@redhat.com>
+ <20170503160635.21669-8-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170503160635.21669-7-drjones@redhat.com>
+In-Reply-To: <20170503160635.21669-8-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andrew Jones <drjones@redhat.com>
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 03, 2017 at 06:06:31PM +0200, Andrew Jones wrote:
-> System shutdown is currently using request-less VCPU kicks. This
-> leaves open a tiny race window, as it doesn't ensure the state
-> change to power_off is seen by a VCPU just about to enter guest
-> mode. VCPU requests, OTOH, are guaranteed to be seen (see "Ensuring
-> Requests Are Seen" of Documentation/virtual/kvm/vcpu-requests.rst)
-> This patch applies the EXIT request used by pause to power_off,
-> closing the race window and also allowing us to remove the final
-> check of power_off in VCPU RUN, as the final check for requests
-> is sufficient.
+On Wed, May 03, 2017 at 06:06:32PM +0200, Andrew Jones wrote:
+
+nit: can you make the subject of this patch a bit more specific?
+
+For example:  Optimize checking power_off flag in KVM_RUN
+
+> We can make a small optimization by not checking the state of
+> the power_off field on each run. This is done by treating
+> power_off like pause, only checking it when we get the EXIT
+> VCPU request. When a VCPU powers off another VCPU the EXIT
+> request is already made, so we just need to make sure the
+> request is also made on self power off. kvm_vcpu_kick() isn't
+> necessary for these cases, as the VCPU would just be kicking
+> itself, but we add it anyway as a self kick doesn't cost much,
+> and it makes the code more future-proof.
 > 
 > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  arch/arm/kvm/arm.c  | 3 +--
->  arch/arm/kvm/psci.c | 5 ++---
->  2 files changed, 3 insertions(+), 5 deletions(-)
+>  arch/arm/kvm/arm.c  | 16 ++++++++++------
+>  arch/arm/kvm/psci.c |  2 ++
+>  2 files changed, 12 insertions(+), 6 deletions(-)
 > 
 > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 7be0d9b0c63a..26d9d4d72853 100644
+> index 26d9d4d72853..24bbc7671d89 100644
 > --- a/arch/arm/kvm/arm.c
 > +++ b/arch/arm/kvm/arm.c
-> @@ -670,8 +670,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+> @@ -371,6 +371,13 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  	kvm_timer_vcpu_put(vcpu);
+>  }
 >  
->  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
-> -		    kvm_request_pending(vcpu) ||
-> -		    vcpu->arch.power_off) {
-> +		    kvm_request_pending(vcpu)) {
->  			vcpu->mode = OUTSIDE_GUEST_MODE;
->  			local_irq_enable();
->  			kvm_pmu_sync_hwstate(vcpu);
+> +static void vcpu_power_off(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.power_off = true;
+> +	kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
+> +	kvm_vcpu_kick(vcpu);
+> +}
+> +
+>  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>  				    struct kvm_mp_state *mp_state)
+>  {
+> @@ -390,7 +397,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  		vcpu->arch.power_off = false;
+>  		break;
+>  	case KVM_MP_STATE_STOPPED:
+> -		vcpu->arch.power_off = true;
+> +		vcpu_power_off(vcpu);
+>  		break;
+>  	default:
+>  		return -EINVAL;
+> @@ -626,14 +633,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  
+>  		if (kvm_request_pending(vcpu)) {
+>  			if (kvm_check_request(KVM_REQ_VCPU_EXIT, vcpu)) {
+> -				if (vcpu->arch.pause)
+> +				if (vcpu->arch.power_off || vcpu->arch.pause)
+>  					vcpu_sleep(vcpu);
+>  			}
+>  		}
+>  
+> -		if (vcpu->arch.power_off)
+> -			vcpu_sleep(vcpu);
+> -
+
+Hmmm, even though I just gave a reviewed-by on the pause side, I'm not
+realizing that I don't think this works.  Because you're now only
+checking requests in the vcpu loop, but the vcpu_sleep() function is
+implemented using swait_event_interruptible(), which can wake up if you
+have a pending signal for example, and then the loop can wrap around and
+you can run the VCPU even though you should be paused.  Am I missing
+something?
+
+Thanks,
+-Christoffer
+
+>  		/*
+>  		 * Preparing the interrupts to be injected also
+>  		 * involves poking the GIC, which must be done in a
+> @@ -903,7 +907,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	 * Handle the "start in power-off" case.
+>  	 */
+>  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+> -		vcpu->arch.power_off = true;
+> +		vcpu_power_off(vcpu);
+>  	else
+>  		vcpu->arch.power_off = false;
+>  
 > diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
-> index f68be2cc6256..f189d0ad30d5 100644
+> index f189d0ad30d5..4a436685c552 100644
 > --- a/arch/arm/kvm/psci.c
 > +++ b/arch/arm/kvm/psci.c
-> @@ -179,10 +179,9 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
->  	 * after this call is handled and before the VCPUs have been
->  	 * re-initialized.
->  	 */
-> -	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
-> +	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
->  		tmp->arch.power_off = true;
-> -		kvm_vcpu_kick(tmp);
-> -	}
-> +	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_VCPU_EXIT);
+> @@ -65,6 +65,8 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+>  static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+>  {
+>  	vcpu->arch.power_off = true;
+> +	kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
+> +	kvm_vcpu_kick(vcpu);
+>  }
 >  
->  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
->  	vcpu->run->system_event.type = type;
+>  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
 > -- 
 > 2.9.3
 > 
-
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
