@@ -1,30 +1,26 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v7 16/24] KVM: arm64: vgic-its:
- KVM_DEV_ARM_ITS_SAVE/RESTORE_TABLES
-Date: Sun, 7 May 2017 17:19:02 +0200
-Message-ID: <20170507151902.GA8519@cbox>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v7 01/24] KVM: arm/arm64: Add ITS save/restore API
+ documentation
+Date: Sun, 7 May 2017 19:05:59 +0200
+Message-ID: <c2e1492b-bfb3-d8de-ca7a-0f925093f713@redhat.com>
 References: <1494084283-12723-1-git-send-email-eric.auger@redhat.com>
- <1494084283-12723-17-git-send-email-eric.auger@redhat.com>
- <87lgq8kej5.fsf@on-the-bus.cambridge.arm.com>
- <87efw0ixli.fsf@on-the-bus.cambridge.arm.com>
+ <1494084283-12723-2-git-send-email-eric.auger@redhat.com>
+ <87inlclw4t.fsf@on-the-bus.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF69B40A69
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 11:15:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A968F40A69
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 13:02:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uohOUypw9lGF for <kvmarm@lists.cs.columbia.edu>;
- Sun,  7 May 2017 11:15:57 -0400 (EDT)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 265CF40992
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 11:15:56 -0400 (EDT)
-Received: by mail-wm0-f45.google.com with SMTP id b84so30008460wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 07 May 2017 08:19:08 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <87efw0ixli.fsf@on-the-bus.cambridge.arm.com>
+ with ESMTP id oDVQMyhqzTrj for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  7 May 2017 13:02:57 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A16F4095A
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 13:02:57 -0400 (EDT)
+In-Reply-To: <87inlclw4t.fsf@on-the-bus.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,123 +31,89 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, bjsprakash.linux@gmail.com, Vijaya.Kumar@cavium.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, May 07, 2017 at 02:51:37PM +0100, Marc Zyngier wrote:
-> On Sun, May 07 2017 at  2:00:30 pm BST, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> > On Sat, May 06 2017 at  4:24:35 pm BST, Eric Auger <eric.auger@redhat.com> wrote:
-> >> Introduce new attributes in KVM_DEV_ARM_VGIC_GRP_CTRL group:
-> >> - KVM_DEV_ARM_ITS_SAVE_TABLES: saves the ITS tables into guest RAM
-> >> - KVM_DEV_ARM_ITS_RESTORE_TABLES: restores them into VGIC internal
-> >>   structures.
-> >>
-> >> We hold the vcpus lock during the save and restore to make
-> >> sure no vcpu is running.
-> >>
-> >> At this stage the functionality is not yet implemented. Only
-> >> the skeleton is put in place.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >> v6 -> v7:
-> >> - also hold the its_lock on save and restore
-> >>
-> >> v5 -> v6:
-> >> - remove the pending table sync from the ITS table restore
-> >>
-> >> v4 -> v5:
-> >> - use KVM_DEV_ARM_ITS_SAVE_TABLES and KVM_DEV_ARM_ITS_RESTORE_TABLES
-> >> - rename *flush* into *save*
-> >> - call its_sync_lpi_pending_table at the end of restore
-> >> - use abi framework
-> >>
-> >> v3 -> v4:
-> >> - pass kvm struct handle to vgic_its_flush/restore_pending_tables
-> >> - take the kvm lock and vcpu locks
-> >> - ABI revision check
-> >> - check attr->attr is null
-> >>
-> >> v1 -> v2:
-> >> - remove useless kvm parameter
-> >> ---
-> >>  arch/arm/include/uapi/asm/kvm.h   |   4 +-
-> >>  arch/arm64/include/uapi/asm/kvm.h |   4 +-
-> >>  virt/kvm/arm/vgic/vgic-its.c      | 107 ++++++++++++++++++++++++++++++++++++--
-> >>  3 files changed, 109 insertions(+), 6 deletions(-)
-> >>
-> >
-> > [...]
-> >
-> >> @@ -1718,7 +1777,37 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
-> >>   */
-> >>  static int vgic_its_restore_tables_v0(struct vgic_its *its)
-> >>  {
-> >> -	return -ENXIO;
-> >> +	struct kvm *kvm = its->dev->kvm;
-> >> +	int ret;
-> >> +
-> >> +	mutex_lock(&kvm->lock);
-> >> +	mutex_lock(&its->its_lock);
-> >> +
-> >> +	if (!lock_all_vcpus(kvm)) {
-> >> +		mutex_unlock(&its->its_lock);
-> >> +		mutex_unlock(&kvm->lock);
-> >> +		return -EBUSY;
-> >> +	}
-> >> +
-> >> +	ret = vgic_its_restore_collection_table(its);
-> >> +	if (ret)
-> >> +		goto out;
-> >> +
-> >> +	ret = vgic_its_restore_device_tables(its);
-> >> +
-> >> +out:
-> >> +	unlock_all_vcpus(kvm);
-> >> +	mutex_unlock(&its->its_lock);
-> >> +	mutex_unlock(&kvm->lock);
-> >> +
-> >> +	if (ret)
-> >> +		return ret;
-> >> +
-> >> +	/*
-> >> +	 * On restore path, MSI injections can happen before the
-> >> +	 * first VCPU run so let's complete the GIC init here.
-> >> +	 */
-> >> +	return kvm_vgic_map_resources(its->dev->kvm);
-> >
-> > This one is still a rather sore spot, but I've lost track of what we can
-> > do about it. Until now, this would only happen on first run. But it
-> > looks like QEMU and KVM have different views of what "runable" is.
-> >
-> > I'm not sure there is a good way to solve this, unfortunately. From a
-> > device PoV, everything is ready and the fact that nothing is clocking
-> > the CPUs is very much irrelevant. I'm almost tempted to say that the
-> > map_resource() call in kvm_vcpu_first_run_init shouldn't be there, and
-> > that we're missing a synchronization point with userspace that would say
-> > "system is entierely configured", triggering the iodev registration.
-> >
-> > Oh well. At that point, and short of having something better to offer:
-> >
-> > Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-> >
-> > 	M.
-> 
-> Actually, there is a rather big problem here. This function is called on
-> a per-ITS basis. But once we have run map_resources *once*, any other
-> call becomes ineffective (vgic_ready() returns true). What happens to
-> the other ITSs? Can they still be successfully restored? Don't they
-> end-up with the same "blind spot" you've tried to close?
-> 
-I really think the only proper solution to this is to have map_resources
-do nothing at all on GICv3, and register the iodevs when the base
-addresses are set, and all that map_resources end up doing is to
-actually map stuff for GICv2 in the guest address space (the virtual CPU
-interface).
+Hi Marc,
 
-That way the initialization is tied to the data that makes the
-initialization possible, we don't need another sync point, it becomes
-ITS-specific, and migration should work.  Take two? :)
+On 07/05/2017 13:54, Marc Zyngier wrote:
+> On Sat, May 06 2017 at  4:24:20 pm BST, Eric Auger <eric.auger@redhat.com> wrote:
+>> Add description for how to access ITS registers and how to save/restore
+>> ITS tables into/from memory.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v6 -> v7:
+>> - rephrase ordering sequence + few cosmetic changes
+>>
+>> v5 -> v6:
+>> - add restoration ordering
+>> - 256B -> 256 Byte aligned
+>> - DTE Size is number of bits for the EVENTID
+>> - s/GITS_READR/GITS_CREADR
+>>
+>> v4 -> v5:
+>> - take into account Christoffer's comments
+>> - pending table save on GICV3 side now
+>>
+>> v3 -> v4:
+>> - take into account Peter's comments:
+>>   - typos
+>>   - KVM_DEV_ARM_VGIC_GRP_ITS_TABLES kvm_device_attr = 0
+>>   - add a validity bit in DTE
+>>   - document all fields in CTE and ITE
+>>   - document ABI revision
+>> - take into account Andre's comments:
+>>   - document restrictions about GITS_CREADR writing and GITS_IIDR
+>>   - document -EBUSY error if one or more VCPUS are runnning
+>>   - document 64b registers only can be accessed with 64b access
+>> - itt_addr field matches bits [51:8] of the itt_addr
+>>
+>> v1 -> v2:
+>> - DTE and ITE now are 8 bytes
+>> - DTE and ITE now indexed by deviceid/eventid
+>> - use ITE name instead of ITTE
+>> - mentions ITT_addr matches bits [51:8] of the actual address
+>> - mentions LE layout
+>> ---
+>>  Documentation/virtual/kvm/devices/arm-vgic-its.txt | 120 +++++++++++++++++++++
+>>  1 file changed, 120 insertions(+)
+>>
+>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+>> index 6081a5b..ba132e9 100644
+>> --- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+>> +++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+> [...]
+> 
+>> + ITS Table ABI REV0:
+>> + -------------------
+>> +
+>> + Revision 0 of the ABI only supports physical LPIs.
+> 
+> Nit: these are no more physical than any other interrupt that KVM deals
+> with. If you're hinting at the lack of GICv4 support, it wouldn't
+> necessarily invalidate this ABI. It is actually even likely that the ABI
+> could stay the same (until we start supporting GICv4 in a nested
+> configuration).
+I understood vLPI are associated to vPE and not to collections. As such
+ITE would need to be updated, wouldn't it?
+> 
+>> +
+>> + The device table and ITT are indexed by the deviceid and eventid,
+>> + respectively. The collection table is not indexed by collectionid:
+>> + CTEs are written in the table in the order of collection creation. All
+> 
+> Is this order really relevant? Can we relax it? Would something break if
+> collections were in a random order?
+Christoffer asked me to mention the exact storage order or at least I
+understood his comment that way. Nothing would break if we change the order.
 
--Christoffer
+Thanks
+
+Eric
+> 
+> Thanks,
+> 
+> 	M.
+> 
