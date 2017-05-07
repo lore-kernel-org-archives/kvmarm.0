@@ -1,25 +1,25 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v7 21/24] KVM: arm64: vgic-its: Device table save/restore
-Date: Sun, 7 May 2017 19:22:37 +0200
-Message-ID: <1890ba30-6621-dc48-5a28-c558d6f6819e@redhat.com>
+Subject: Re: [PATCH v7 22/24] KVM: arm64: vgic-its: ITT save and restore
+Date: Sun, 7 May 2017 19:24:04 +0200
+Message-ID: <d76ca195-0867-5693-fc66-355d90888c7f@redhat.com>
 References: <1494084283-12723-1-git-send-email-eric.auger@redhat.com>
- <1494084283-12723-22-git-send-email-eric.auger@redhat.com>
- <87zieoiyjy.fsf@on-the-bus.cambridge.arm.com>
+ <1494084283-12723-23-git-send-email-eric.auger@redhat.com>
+ <87shkgiy5m.fsf@on-the-bus.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA6E540969
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 13:19:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14F3E40962
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 13:21:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zQr294hVabUo for <kvmarm@lists.cs.columbia.edu>;
- Sun,  7 May 2017 13:19:31 -0400 (EDT)
+ with ESMTP id u4rAfUX+COhy for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  7 May 2017 13:20:59 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C584C4095A
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 13:19:31 -0400 (EDT)
-In-Reply-To: <87zieoiyjy.fsf@on-the-bus.cambridge.arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E7EF04095A
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 13:20:58 -0400 (EDT)
+In-Reply-To: <87shkgiy5m.fsf@on-the-bus.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,185 +33,140 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-On 07/05/2017 15:30, Marc Zyngier wrote:
-> On Sat, May 06 2017 at  4:24:40 pm BST, Eric Auger <eric.auger@redhat.com> wrote:
->> This patch saves the device table entries into guest RAM.
->> Both flat table and 2 stage tables are supported. DeviceId
->> indexing is used.
->>
->> For each device listed in the device table, we also save
->> the translation table using the vgic_its_save/restore_itt
->> routines. Those functions will be implemented in a subsequent
->> patch.
->>
->> On restore, devices are re-allocated and their itt are
->> re-built.
+
+
+On 07/05/2017 15:39, Marc Zyngier wrote:
+> On Sat, May 06 2017 at  4:24:41 pm BST, Eric Auger <eric.auger@redhat.com> wrote:
+>> Implement routines to save and restore device ITT and their
+>> interrupt table entries (ITE).
 >>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reviewed-by: Christoffer Dall <cdall@linaro.org>
 >>
 >> ---
+>> v6 -> v7:
+>> - added Christoffer's R-b
+>>
 >> v5 -> v6:
->> - accomodate vgic_its_alloc_device change of proto
->> - define bit fields for L1 entries
->> - s/handle_l1_entry/handle_l1_dte
->> - s/ite_esz/dte_esz in handle_l1_dte
->> - check BASER valid bit
->> - s/nb_eventid_bits/num_eventid_bits
->> - new convention for returned values
->> - itt functions implemented in subsequent patch
+>> - accomodate vgic_its_alloc_ite change of proto
+>> - check LPI ID on restore, check eventid offset
+>> - initializations on separate line
+>> - coming after device save/restore
+>> - add_lpi does config and pending bit sync
 >>
 >> v4 -> v5:
->> - sort the device list by deviceid on device table save
->> - use defines for shifts and masks
->> - use abi->dte_esz
->> - clatify entry sizes for L1 and L2 tables
+>> - ITE are now sorted by eventid on the flush
+>> - rename *flush* into *save*
+>> - use macros for shits and masks
+>> - pass ite_esz to vgic_its_save_ite
 >>
 >> v3 -> v4:
->> - use the new proto for its_alloc_device
->> - compute_next_devid_offset, vgic_its_flush/restore_itt
->>   become static in this patch
->> - change in the DTE entry format with the introduction of the
->>   valid bit and next field width decrease; ittaddr encoded
->>   on its full range
->> - fix handle_l1_entry entry handling
->> - correct vgic_its_table_restore error handling
+>> - lookup_table and compute_next_eventid_offset become static in this
+>>   patch
+>> - remove static along with vgic_its_flush/restore_itt to avoid
+>>   compilation warnings
+>> - next field only computed with a shift (mask removed)
+>> - handle the case where the last element has not been found
 >>
 >> v2 -> v3:
->> - fix itt_addr bitmask in vgic_its_restore_dte
->> - addition of return 0 in vgic_its_restore_ite moved to
->>   the ITE related patch
+>> - add return 0 in vgic_its_restore_ite (was in subsequent patch)
 >>
->> v1 -> v2:
->> - use 8 byte format for DTE and ITE
->> - support 2 stage format
->> - remove kvm parameter
->> - ITT flush/restore moved in a separate patch
->> - use deviceid indexing
+>> v2: creation
 >> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 194 +++++++++++++++++++++++++++++++++++++++++--
->>  virt/kvm/arm/vgic/vgic.h     |  10 +++
->>  2 files changed, 199 insertions(+), 5 deletions(-)
+>>  virt/kvm/arm/vgic/vgic-its.c | 116 +++++++++++++++++++++++++++++++++++++++++--
+>>  virt/kvm/arm/vgic/vgic.h     |   4 ++
+>>  2 files changed, 117 insertions(+), 3 deletions(-)
 >>
 >> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 90afc83..3dea626 100644
+>> index 3dea626..adb3d9e 100644
 >> --- a/virt/kvm/arm/vgic/vgic-its.c
 >> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -23,6 +23,7 @@
->>  #include <linux/interrupt.h>
->>  #include <linux/list.h>
->>  #include <linux/uaccess.h>
->> +#include <linux/list_sort.h>
->>  
->>  #include <linux/irqchip/arm-gic-v3.h>
->>  
->> @@ -1735,7 +1736,8 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
->>  	return ret;
+>> @@ -1750,7 +1750,7 @@ static u32 compute_next_devid_offset(struct list_head *h,
+>>  	return min_t(u32, next_offset, VITS_DTE_MAX_DEVID_OFFSET);
 >>  }
 >>  
->> -u32 compute_next_devid_offset(struct list_head *h, struct its_device *dev)
->> +static u32 compute_next_devid_offset(struct list_head *h,
->> +				     struct its_device *dev)
+>> -u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
+>> +static u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
 >>  {
->>  	struct its_device *next;
+>>  	struct its_ite *next;
 >>  	u32 next_offset;
->> @@ -1789,8 +1791,8 @@ typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
->>   * Return: < 0 on error, 0 if last element was identified, 1 otherwise
->>   * (the last element may not be found on second level tables)
->>   */
->> -int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
->> -		   int start_id, entry_fn_t fn, void *opaque)
->> +static int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
->> +			  int start_id, entry_fn_t fn, void *opaque)
->>  {
->>  	void *entry = kzalloc(esz, GFP_KERNEL);
->>  	struct kvm *kvm = its->dev->kvm;
->> @@ -1825,13 +1827,171 @@ int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
+>> @@ -1827,14 +1827,124 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
 >>  	return ret;
 >>  }
 >>  
->> +static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
->> +{
->> +	return -ENXIO;
->> +}
->> +
->> +static int vgic_its_restore_itt(struct vgic_its *its, struct its_device *dev)
->> +{
->> +	return -ENXIO;
->> +}
->> +
 >> +/**
->> + * vgic_its_save_dte - Save a device table entry at a given GPA
->> + *
->> + * @its: ITS handle
->> + * @dev: ITS device
->> + * @ptr: GPA
+>> + * vgic_its_save_ite - Save an interrupt translation entry at @gpa
 >> + */
->> +static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
->> +			     gpa_t ptr, int dte_esz)
+>> +static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+>> +			      struct its_ite *ite, gpa_t gpa, int ite_esz)
 >> +{
 >> +	struct kvm *kvm = its->dev->kvm;
->> +	u64 val, itt_addr_field;
 >> +	u32 next_offset;
+>> +	u64 val;
 >> +
->> +	itt_addr_field = dev->itt_addr >> 8;
->> +	next_offset = compute_next_devid_offset(&its->device_list, dev);
->> +	val = (1ULL << KVM_ITS_DTE_VALID_SHIFT |
->> +	       ((u64)next_offset << KVM_ITS_DTE_NEXT_SHIFT) |
->> +	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
->> +		(dev->num_eventid_bits - 1));
+>> +	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
+>> +	val = ((u64)next_offset << KVM_ITS_ITE_NEXT_SHIFT) |
+>> +	       ((u64)ite->lpi << KVM_ITS_ITE_PINTID_SHIFT) |
+>> +		ite->collection->collection_id;
 >> +	val = cpu_to_le64(val);
->> +	return kvm_write_guest(kvm, ptr, &val, dte_esz);
+>> +	return kvm_write_guest(kvm, gpa, &val, ite_esz);
 >> +}
 >> +
 >> +/**
->> + * vgic_its_restore_dte - restore a device table entry
->> + *
->> + * @its: its handle
->> + * @id: device id the DTE corresponds to
->> + * @ptr: kernel VA where the 8 byte DTE is located
->> + * @opaque: unused
->> + *
->> + * Return: < 0 on error, 0 if the dte is the last one, id offset to the
->> + * next dte otherwise
+>> + * vgic_its_restore_ite - restore an interrupt translation entry
+>> + * @event_id: id used for indexing
+>> + * @ptr: pointer to the ITE entry
+>> + * @opaque: pointer to the its_device
 >> + */
->> +static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+>> +static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
 >> +				void *ptr, void *opaque)
 >> +{
->> +	struct its_device *dev;
->> +	gpa_t itt_addr;
->> +	u8 num_eventid_bits;
->> +	u64 entry = *(u64 *)ptr;
->> +	bool valid;
+>> +	struct its_device *dev = (struct its_device *)opaque;
+>> +	struct its_collection *collection;
+>> +	struct kvm *kvm = its->dev->kvm;
+>> +	struct kvm_vcpu *vcpu = NULL;
+>> +	u64 val;
+>> +	u64 *p = (u64 *)ptr;
+>> +	struct vgic_irq *irq;
+>> +	u32 coll_id, lpi_id;
+>> +	struct its_ite *ite;
 >> +	u32 offset;
->> +	int ret;
 >> +
->> +	entry = le64_to_cpu(entry);
+>> +	val = *p;
 >> +
->> +	valid = entry >> KVM_ITS_DTE_VALID_SHIFT;
->> +	num_eventid_bits = (entry & KVM_ITS_DTE_SIZE_MASK) + 1;
->> +	itt_addr = ((entry & KVM_ITS_DTE_ITTADDR_MASK)
->> +			>> KVM_ITS_DTE_ITTADDR_SHIFT) << 8;
+>> +	val = le64_to_cpu(val);
 >> +
->> +	if (!valid)
->> +		return 1;
+>> +	coll_id = val & KVM_ITS_ITE_ICID_MASK;
+>> +	lpi_id = (val & KVM_ITS_ITE_PINTID_MASK) >> KVM_ITS_ITE_PINTID_SHIFT;
 >> +
->> +	/* dte entry is valid */
->> +	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
+>> +	if (!lpi_id)
+>> +		return 1; /* invalid entry, no choice but to scan next entry */
 >> +
->> +	dev = vgic_its_alloc_device(its, id, itt_addr, num_eventid_bits);
->> +	if (IS_ERR(dev))
->> +		return PTR_ERR(dev);
+>> +	if (lpi_id < VGIC_MIN_LPI)
+>> +		return -EINVAL;
 >> +
->> +	ret = vgic_its_restore_itt(its, dev);
->> +	if (ret)
->> +		return ret;
+>> +	offset = val >> KVM_ITS_ITE_NEXT_SHIFT;
+>> +	if (event_id + offset >= BIT_ULL(dev->num_eventid_bits))
+>> +		return -EINVAL;
+>> +
+>> +	collection = find_collection(its, coll_id);
+>> +	if (!collection)
+>> +		return -EINVAL;
+>> +
+>> +	ite = vgic_its_alloc_ite(dev, collection, lpi_id, event_id);
+>> +	if (IS_ERR(ite))
+>> +		return PTR_ERR(ite);
+>> +
+>> +	if (its_is_collection_mapped(collection))
+>> +		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+>> +
+>> +	irq = vgic_add_lpi(kvm, lpi_id, vcpu);
+>> +	if (IS_ERR(irq))
+>> +		return PTR_ERR(irq);
 > 
-> Shouldn't we free the device entry if the restore as failed?
-This is not totally obvious to me. the device creation is the result of
-MAPD. The ITT is populated by MAPI's. Besides vgic_its_destroy frees
-everything so I don't think there is any leak eventually. But if you
-prefer I will do it.
+> Same remark as the previous patch: the its_ite structure should be freed
+> on failure. Otherwise, I suspect we end0up leaking memory.
+also freed in vgic_its_destroy.
 
 Thanks
 
