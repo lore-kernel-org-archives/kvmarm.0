@@ -1,25 +1,26 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v7 23/24] KVM: arm64: vgic-its: Fix pending table sync
-Date: Sun, 07 May 2017 14:42:26 +0100
-Message-ID: <87o9v4iy0t.fsf@on-the-bus.cambridge.arm.com>
+Subject: Re: [PATCH v7 24/24] KVM: arm64: vgic-v3:
+ KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
+Date: Sun, 07 May 2017 14:44:11 +0100
+Message-ID: <87k25sixxw.fsf@on-the-bus.cambridge.arm.com>
 References: <1494084283-12723-1-git-send-email-eric.auger@redhat.com>
- <1494084283-12723-24-git-send-email-eric.auger@redhat.com>
+ <1494084283-12723-25-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E8AF40A7B
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 09:39:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA27540A7B
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 09:41:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Pm-9FuJvzN7d for <kvmarm@lists.cs.columbia.edu>;
- Sun,  7 May 2017 09:39:26 -0400 (EDT)
+ with ESMTP id gjJW0B6Hikn4 for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  7 May 2017 09:41:11 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4529240430
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 09:39:25 -0400 (EDT)
-In-Reply-To: <1494084283-12723-24-git-send-email-eric.auger@redhat.com> (Eric
- Auger's message of "Sat, 6 May 2017 17:24:42 +0200")
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A44FC40430
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  7 May 2017 09:41:11 -0400 (EDT)
+In-Reply-To: <1494084283-12723-25-git-send-email-eric.auger@redhat.com> (Eric
+ Auger's message of "Sat, 6 May 2017 17:24:43 +0200")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,19 +34,10 @@ To: Eric Auger <eric.auger@redhat.com>
 Cc: kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, vijayak@caviumnetworks.com, andre.przywara@arm.com, quintela@redhat.com, dgilbert@redhat.com, bjsprakash.linux@gmail.com, Vijaya.Kumar@cavium.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, May 06 2017 at  4:24:42 pm BST, Eric Auger <eric.auger@redhat.com> wrote:
-> In its_sync_lpi_pending_table() we currently ignore the
-> target_vcpu of the LPIs. We sync the pending bit found in
-> the vcpu pending table even if the LPI is not targeting it.
->
-> Also in vgic_its_cmd_handle_invall() we are supposed to
-> read the config table data for the LPIs associated to the
-> collection ID. At the moment we refresh all LPI config
-> information.
->
-> This patch passes a vpcu to vgic_copy_lpi_list() so that
-> this latter returns a snapshot of the LPIs targeting this
-> CPU and only those.
+On Sat, May 06 2017 at  4:24:43 pm BST, Eric Auger <eric.auger@redhat.com> wrote:
+> This patch adds a new attribute to GICV3 KVM device
+> KVM_DEV_ARM_VGIC_GRP_CTRL group. This allows userspace to
+> flush all GICR pending tables into guest RAM.
 >
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > Reviewed-by: Christoffer Dall <cdall@linaro.org>
