@@ -1,15 +1,14 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 4/8] KVM: arm/arm64: Make vgic_v3_check_base more broadly
- usable
-Date: Mon, 8 May 2017 18:13:01 +0200
-Message-ID: <6c92055f-a5b1-c3a8-2343-61205324880c@redhat.com>
+Subject: Re: [PATCH 5/8] KVM: arm/arm64: Slightly rework kvm_vgic_addr
+Date: Mon, 8 May 2017 18:19:05 +0200
+Message-ID: <1b0d1242-a4af-dc2e-5e87-dca0ddc2300e@redhat.com>
 References: <20170508115454.5075-1-cdall@linaro.org>
- <20170508115454.5075-5-cdall@linaro.org>
+ <20170508115454.5075-6-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170508115454.5075-5-cdall@linaro.org>
+In-Reply-To: <20170508115454.5075-6-cdall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
@@ -18,80 +17,85 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi Christoffer,
 
 On 08/05/2017 13:54, Christoffer Dall wrote:
-> As we are about to fiddle with the io device registration mechanism
-> let's be a little more careful in verifying the addresses we can ealier
-> on to provide error messages to the user at time related to him/her
-> setting overlapping addresses. 
-Above sentence would need some rewording.
- We still want to check a consistent
-> system before actually running the VM for the first time, so we make
-> vgic_v3_check_base available in the core vgic-v3 code as well as in the
-> other parts of the GICv3 code, namely the MMIO config code.
-> 
-> We also return true for undefined base addresses so that the function
-> can be used before all base addresses are set; all callers already check
-> for uninitialized addresses before calling this function.
+> As we are about to handle setting the address for the redistributor base
+> region separately from some of the other base addresses, let's rework
+> this function to leave a little more room for being flexible in what
+> each type of base address does.
 > 
 > Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> ---
->  virt/kvm/arm/vgic/vgic-v3.c | 18 ++++++++++++++----
->  virt/kvm/arm/vgic/vgic.h    |  1 +
->  2 files changed, 15 insertions(+), 4 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 12e52a0..b934e78 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -329,19 +329,29 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
->  	return 0;
->  }
->  
-> -/* check for overlapping regions and for regions crossing the end of memory */
-> -static bool vgic_v3_check_base(struct kvm *kvm)
-> +/*
-> + * Check for overlapping regions and for regions crossing the end of memory
-> + * for base addresses which have already been set.
-> + */
-> +bool vgic_v3_check_base(struct kvm *kvm)
->  {
->  	struct vgic_dist *d = &kvm->arch.vgic;
->  	gpa_t redist_size = KVM_VGIC_V3_REDIST_SIZE;
->  
->  	redist_size *= atomic_read(&kvm->online_vcpus);
->  
-> -	if (d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE < d->vgic_dist_base)
-> +	if (!IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) &&
-> +	    d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE < d->vgic_dist_base)
->  		return false;
-> -	if (d->vgic_redist_base + redist_size < d->vgic_redist_base)
-> +
-> +	if (!IS_VGIC_ADDR_UNDEF(d->vgic_redist_base) &&
-> +	    d->vgic_redist_base + redist_size < d->vgic_redist_base)
->  		return false;
->  
-> +	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base) &&
-> +	    IS_VGIC_ADDR_UNDEF(d->vgic_redist_base))
-> +		return true;
-> +
->  	if (d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE <= d->vgic_redist_base)
->  		return true;
-It is unclear to me if the dunction can be called if either of the
-address is unset?
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
 
 Eric
->  	if (d->vgic_redist_base + redist_size <= d->vgic_dist_base)
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index a2aeaa8..89eb935 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -175,6 +175,7 @@ int vgic_v3_map_resources(struct kvm *kvm);
->  int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
->  int vgic_v3_save_pending_tables(struct kvm *kvm);
->  int vgic_register_redist_iodevs(struct kvm *kvm);
-> +bool vgic_v3_check_base(struct kvm *kvm);
+
+> ---
+>  virt/kvm/arm/vgic/vgic-kvm-device.c | 22 +++++++++++++---------
+>  1 file changed, 13 insertions(+), 9 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> index d48743c..69ccfd5 100644
+> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> @@ -37,6 +37,14 @@ int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+>  	return 0;
+>  }
 >  
->  void vgic_v3_load(struct kvm_vcpu *vcpu);
->  void vgic_v3_put(struct kvm_vcpu *vcpu);
+> +static int vgic_check_type(struct kvm *kvm, int type_needed)
+> +{
+> +	if (kvm->arch.vgic.vgic_model != type_needed)
+> +		return -ENODEV;
+> +	else
+> +		return 0;
+> +}
+> +
+>  /**
+>   * kvm_vgic_addr - set or get vgic VM base addresses
+>   * @kvm:   pointer to the vm struct
+> @@ -57,40 +65,36 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+>  {
+>  	int r = 0;
+>  	struct vgic_dist *vgic = &kvm->arch.vgic;
+> -	int type_needed;
+>  	phys_addr_t *addr_ptr, alignment;
+>  
+>  	mutex_lock(&kvm->lock);
+>  	switch (type) {
+>  	case KVM_VGIC_V2_ADDR_TYPE_DIST:
+> -		type_needed = KVM_DEV_TYPE_ARM_VGIC_V2;
+> +		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
+>  		addr_ptr = &vgic->vgic_dist_base;
+>  		alignment = SZ_4K;
+>  		break;
+>  	case KVM_VGIC_V2_ADDR_TYPE_CPU:
+> -		type_needed = KVM_DEV_TYPE_ARM_VGIC_V2;
+> +		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
+>  		addr_ptr = &vgic->vgic_cpu_base;
+>  		alignment = SZ_4K;
+>  		break;
+>  	case KVM_VGIC_V3_ADDR_TYPE_DIST:
+> -		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
+> +		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
+>  		addr_ptr = &vgic->vgic_dist_base;
+>  		alignment = SZ_64K;
+>  		break;
+>  	case KVM_VGIC_V3_ADDR_TYPE_REDIST:
+> -		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
+> +		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
+>  		addr_ptr = &vgic->vgic_redist_base;
+>  		alignment = SZ_64K;
+>  		break;
+>  	default:
+>  		r = -ENODEV;
+> -		goto out;
+>  	}
+>  
+> -	if (vgic->vgic_model != type_needed) {
+> -		r = -ENODEV;
+> +	if (r)
+>  		goto out;
+> -	}
+>  
+>  	if (write) {
+>  		r = vgic_check_ioaddr(kvm, addr_ptr, *addr, alignment);
 > 
