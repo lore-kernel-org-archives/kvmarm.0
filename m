@@ -1,246 +1,60 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v7 16/24] KVM: arm64: vgic-its:
- KVM_DEV_ARM_ITS_SAVE/RESTORE_TABLES
-Date: Mon, 8 May 2017 14:29:35 +0200
-Message-ID: <20170508122935.GH28342@cbox>
-References: <1494084283-12723-1-git-send-email-eric.auger@redhat.com>
- <1494084283-12723-17-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [PATCH 9/8] KVM: arm/arm64: Don't call map_resources when restoring ITS tables
+Date: Mon,  8 May 2017 14:49:32 +0200
+Message-ID: <20170508124932.28399-1-cdall@linaro.org>
+References: <20170508115454.5075-1-cdall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1494084283-12723-17-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <20170508115454.5075-1-cdall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, vijayak@caviumnetworks.com, Vijaya.Kumar@cavium.com, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Prasun.Kapoor@cavium.com, drjones@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, bjsprakash.linux@gmail.com
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, May 06, 2017 at 05:24:35PM +0200, Eric Auger wrote:
-> Introduce new attributes in KVM_DEV_ARM_VGIC_GRP_CTRL group:
-> - KVM_DEV_ARM_ITS_SAVE_TABLES: saves the ITS tables into guest RAM
-> - KVM_DEV_ARM_ITS_RESTORE_TABLES: restores them into VGIC internal
->   structures.
-> 
-> We hold the vcpus lock during the save and restore to make
-> sure no vcpu is running.
-> 
-> At this stage the functionality is not yet implemented. Only
-> the skeleton is put in place.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+The only reason we called kvm_vgic_map_resources() when restoring the
+ITS tables was because we wanted to have the KVM iodevs registered in
+the KVM IO bus framework at the time when the ITS was restored such that
+a restored and active device can inject MSIs prior to otherwise calling
+kvm_vgic_map_resources() from the first run of a VCPU.
 
-[with the expectation that the map_resources thing is fixed later]
+Since we now register the KVM iodevs for the redestributors and ITS as
+soon as possible (when setting the base addresses), we no longer need
+this call and kvm_vgic_map_resources() is again called only when first
+running a VCPU.
 
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+Forgot to include this when posting the series, which was the whole
+point of the iodev rework in the first place.  Apologies about the
+confusing 9/8 subject thing.
 
-> 
-> ---
-> v6 -> v7:
-> - also hold the its_lock on save and restore
-> 
-> v5 -> v6:
-> - remove the pending table sync from the ITS table restore
-> 
-> v4 -> v5:
-> - use KVM_DEV_ARM_ITS_SAVE_TABLES and KVM_DEV_ARM_ITS_RESTORE_TABLES
-> - rename *flush* into *save*
-> - call its_sync_lpi_pending_table at the end of restore
-> - use abi framework
-> 
-> v3 -> v4:
-> - pass kvm struct handle to vgic_its_flush/restore_pending_tables
-> - take the kvm lock and vcpu locks
-> - ABI revision check
-> - check attr->attr is null
-> 
-> v1 -> v2:
-> - remove useless kvm parameter
-> ---
->  arch/arm/include/uapi/asm/kvm.h   |   4 +-
->  arch/arm64/include/uapi/asm/kvm.h |   4 +-
->  virt/kvm/arm/vgic/vgic-its.c      | 107 ++++++++++++++++++++++++++++++++++++--
->  3 files changed, 109 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-> index 4beb83b..8e6563c 100644
-> --- a/arch/arm/include/uapi/asm/kvm.h
-> +++ b/arch/arm/include/uapi/asm/kvm.h
-> @@ -199,7 +199,9 @@ struct kvm_arch_memory_slot {
->  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK 0x3ff
->  #define VGIC_LEVEL_INFO_LINE_LEVEL	0
->  
-> -#define   KVM_DEV_ARM_VGIC_CTRL_INIT    0
-> +#define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
-> +#define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
-> +#define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
->  
->  /* KVM_IRQ_LINE irq field index values */
->  #define KVM_ARM_IRQ_TYPE_SHIFT		24
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 7e8dd69..1e35115 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -219,7 +219,9 @@ struct kvm_arch_memory_slot {
->  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK	0x3ff
->  #define VGIC_LEVEL_INFO_LINE_LEVEL	0
->  
-> -#define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
-> +#define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
-> +#define   KVM_DEV_ARM_ITS_SAVE_TABLES           1
-> +#define   KVM_DEV_ARM_ITS_RESTORE_TABLES        2
->  
->  /* Device Control API on vcpu fd */
->  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index ffd0a80..cb7ae4c 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1703,12 +1703,71 @@ int vgic_its_attr_regs_access(struct kvm_device *dev,
->  }
->  
->  /**
-> + * vgic_its_save_device_tables - Save the device table and all ITT
-> + * into guest RAM
-> + */
-> +static int vgic_its_save_device_tables(struct vgic_its *its)
-> +{
-> +	return -ENXIO;
-> +}
-> +
-> +/**
-> + * vgic_its_restore_device_tables - Restore the device table and all ITT
-> + * from guest RAM to internal data structs
-> + */
-> +static int vgic_its_restore_device_tables(struct vgic_its *its)
-> +{
-> +	return -ENXIO;
-> +}
-> +
-> +/**
-> + * vgic_its_save_collection_table - Save the collection table into
-> + * guest RAM
-> + */
-> +static int vgic_its_save_collection_table(struct vgic_its *its)
-> +{
-> +	return -ENXIO;
-> +}
-> +
-> +/**
-> + * vgic_its_restore_collection_table - reads the collection table
-> + * in guest memory and restores the ITS internal state. Requires the
-> + * BASER registers to be restored before.
-> + */
-> +static int vgic_its_restore_collection_table(struct vgic_its *its)
-> +{
-> +	return -ENXIO;
-> +}
-> +
-> +/**
->   * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
->   * according to v0 ABI
->   */
->  static int vgic_its_save_tables_v0(struct vgic_its *its)
->  {
-> -	return -ENXIO;
-> +	struct kvm *kvm = its->dev->kvm;
-> +	int ret;
-> +
-> +	mutex_lock(&kvm->lock);
-> +	mutex_lock(&its->its_lock);
-> +
-> +	if (!lock_all_vcpus(kvm)) {
-> +		mutex_unlock(&its->its_lock);
-> +		mutex_unlock(&kvm->lock);
-> +		return -EBUSY;
-> +	}
-> +
-> +	ret = vgic_its_save_device_tables(its);
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret = vgic_its_save_collection_table(its);
-> +
-> +out:
-> +	unlock_all_vcpus(kvm);
-> +	mutex_unlock(&its->its_lock);
-> +	mutex_unlock(&kvm->lock);
-> +	return ret;
->  }
->  
->  /**
-> @@ -1718,7 +1777,37 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
->   */
->  static int vgic_its_restore_tables_v0(struct vgic_its *its)
->  {
-> -	return -ENXIO;
-> +	struct kvm *kvm = its->dev->kvm;
-> +	int ret;
-> +
-> +	mutex_lock(&kvm->lock);
-> +	mutex_lock(&its->its_lock);
-> +
-> +	if (!lock_all_vcpus(kvm)) {
-> +		mutex_unlock(&its->its_lock);
-> +		mutex_unlock(&kvm->lock);
-> +		return -EBUSY;
-> +	}
-> +
-> +	ret = vgic_its_restore_collection_table(its);
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret = vgic_its_restore_device_tables(its);
-> +
-> +out:
-> +	unlock_all_vcpus(kvm);
-> +	mutex_unlock(&its->its_lock);
-> +	mutex_unlock(&kvm->lock);
-> +
-> +	if (ret)
-> +		return ret;
-> +
-> +	/*
-> +	 * On restore path, MSI injections can happen before the
-> +	 * first VCPU run so let's complete the GIC init here.
-> +	 */
-> +	return kvm_vgic_map_resources(its->dev->kvm);
->  }
->  
->  static int vgic_its_commit_v0(struct vgic_its *its)
-> @@ -1751,6 +1840,10 @@ static int vgic_its_has_attr(struct kvm_device *dev,
->  		switch (attr->attr) {
->  		case KVM_DEV_ARM_VGIC_CTRL_INIT:
->  			return 0;
-> +		case KVM_DEV_ARM_ITS_SAVE_TABLES:
-> +			return 0;
-> +		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
-> +			return 0;
->  		}
->  		break;
->  	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS:
-> @@ -1786,14 +1879,20 @@ static int vgic_its_set_attr(struct kvm_device *dev,
->  
->  		return 0;
->  	}
-> -	case KVM_DEV_ARM_VGIC_GRP_CTRL:
-> +	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
-> +		const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-> +
->  		switch (attr->attr) {
->  		case KVM_DEV_ARM_VGIC_CTRL_INIT:
->  			its->initialized = true;
->  
->  			return 0;
-> +		case KVM_DEV_ARM_ITS_SAVE_TABLES:
-> +			return abi->save_tables(its);
-> +		case KVM_DEV_ARM_ITS_RESTORE_TABLES:
-> +			return abi->restore_tables(its);
->  		}
-> -		break;
-> +	}
->  	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
->  		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
->  		u64 reg;
-> -- 
-> 2.5.5
-> 
+ virt/kvm/arm/vgic/vgic-its.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 00f2990..9b67621 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -2316,20 +2316,12 @@ static int vgic_its_restore_tables_v0(struct vgic_its *its)
+ 		goto out;
+ 
+ 	ret = vgic_its_restore_device_tables(its);
+-
+ out:
+ 	unlock_all_vcpus(kvm);
+ 	mutex_unlock(&its->its_lock);
+ 	mutex_unlock(&kvm->lock);
+ 
+-	if (ret)
+-		return ret;
+-
+-	/*
+-	 * On restore path, MSI injections can happen before the
+-	 * first VCPU run so let's complete the GIC init here.
+-	 */
+-	return kvm_vgic_map_resources(its->dev->kvm);
++	return ret;
+ }
+ 
+ static int vgic_its_commit_v0(struct vgic_its *its)
+-- 
+2.9.0
