@@ -1,76 +1,120 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3 3/3] arm/arm64: signal SIBGUS and inject SEA Error
-Date: Mon, 8 May 2017 19:54:16 +0200
-Message-ID: <20170508175416.GA32234@cbox>
-References: <CAMj-D2BGTDKpOcMu2ip41_MTTj8VDwvs59Ds7yvLHcD8PeQzhg@mail.gmail.com>
- <5910AAA2.4030304@arm.com>
+Subject: Re: [PATCH 3/8] KVM: arm/arm64: Refactor vgic_register_redist_iodevs
+Date: Mon, 8 May 2017 20:38:19 +0200
+Message-ID: <20170508183819.GK28342@cbox>
+References: <20170508115454.5075-1-cdall@linaro.org>
+ <20170508115454.5075-4-cdall@linaro.org>
+ <b969f6d6-3a4f-b021-3bf7-5035eb7568b0@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-acpi-owner@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <5910AAA2.4030304@arm.com>
-Sender: linux-acpi-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: gengdongjiu <gengdj.1984@gmail.com>, Tyler Baicar <tbaicar@codeaurora.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, Len Brown <lenb@kernel.org>, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, Sandeepa Prabhu <sandeepa.s.prabhu@gmail.com>, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, Fu Wei <fu.wei@linaro.org>, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <b969f6d6-3a4f-b021-3bf7-5035eb7568b0@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, May 08, 2017 at 06:28:02PM +0100, James Morse wrote:
-
-[...]
-
+On Mon, May 08, 2017 at 06:03:14PM +0200, Auger Eric wrote:
+> Hi Christoffer,
 > 
-> 
-> >>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> >>> index bb02909..1d2e2e7 100644
-> >>> --- a/include/uapi/linux/kvm.h
-> >>> +++ b/include/uapi/linux/kvm.h
-> >>> @@ -1306,6 +1306,7 @@ struct kvm_s390_ucas_mapping {
-> >>>  #define KVM_S390_GET_IRQ_STATE  _IOW(KVMIO, 0xb6, struct kvm_s390_irq_state)
-> >>>  /* Available with KVM_CAP_X86_SMM */
-> >>>  #define KVM_SMI                   _IO(KVMIO,   0xb7)
-> >>> +#define KVM_ARM_SEA               _IO(KVMIO,   0xb8)
-> >>>
-> >>>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU (1 << 0)
-> >>>  #define KVM_DEV_ASSIGN_PCI_2_3 (1 << 1)
-> >>>
-> >>
-> >> Why do we need a userspace API for SEA? It can also be done by using
-> >> KVM_{G,S}ET_ONE_REG to change the vcpu registers. The advantage of doing it this
-> >> way is you can choose which ESR value to use.
-> >>
-> >> Adding a new API call to do something you could do with an old one doesn't look
-> >> right.
+> On 08/05/2017 13:54, Christoffer Dall wrote:
+> > Split out the function to register all the redistributor iodevs into a
+> > function that handles a single redistributor at a time in preparation
+> > for being able to call this per VCPU as these get created.
 > > 
-> > James, I considered your suggestion before that use the
-> > KVM_{G,S}ET_ONE_REG to change the vcpu registers. but I found it does
-> > not have difference to use the alread existed KVM API. 
-> 
-> (Only that is an in-kernel helper, not a published API)
-> 
-> 
-> > so may be
-> > changing the vcpu registers in qemu will duplicate with the KVM APIs.
-> 
-> That is true, but the alternative is a new API that doesn't do anything new, its
-> just more convenient.
-> 
-> Marc and Christoffer are the people to convince.
-> I argue the existing API is sufficient.
+> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > ---
+> >  virt/kvm/arm/vgic/vgic-mmio-v3.c | 108 ++++++++++++++++++++++++---------------
+> >  virt/kvm/arm/vgic/vgic-v3.c      |   2 +-
+> >  virt/kvm/arm/vgic/vgic.h         |   2 +-
+> >  3 files changed, 68 insertions(+), 44 deletions(-)
+> > 
+> > diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> > index 6afb3b4..1828ac7 100644
+> > --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> > +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> > @@ -556,61 +556,85 @@ unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev)
+> >  	return SZ_64K;
+> >  }
+> >  
+> > -int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
+> > +/**
+> > + * vgic_register_redist_iodev - register a single redist iodev
+> > + * @vcpu:    The VCPU to which the redistributor belongs
+> > + *
+> > + * Register a KVM iodev for this VCPU's redistributor using the address
+> > + * provided.
+> > + *
+> > + * Return 0 on success, -ERRNO otherwise.
+> > + */
+> > +static int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct kvm *kvm = vcpu->kvm;
+> > +	struct vgic_dist *vgic = &kvm->arch.vgic;
+> > +	struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
+> > +	struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
+> > +	gpa_t rd_base, sgi_base;
+> > +	int ret;
+> > +
+> > +	rd_base = vgic->vgic_redist_base + vcpu->vcpu_id * SZ_64K * 2;
+> Previously we had
+> gpa_t rd_base = redist_base_address + c * SZ_64K * 2; where c is the
+> index in the vcpu array. Now we use the vpcu_id instead of c. Aren't
+> they potentially different?
 > 
 
-I must admit I am losing track of exactly what this proposed API was
-supposed to do.
+Nicely spotted!
 
-However, if it's a question about setting up VCPU registers to a certain
-state and potentially modifying memory, then I think experience has
-shown us (psci) that emulating something in the kernel that userspace
-can have fine-grained control over is a bad idea, and should be left to
-userspace using as generic APIs as possible.
+They might be, theoretically.  I never realized this, but we have occurences
+of this assumption already, see kvm_pmu_update_state(), for example.
+Even worse, the ITS PE numbering is based on the vcpu_id, and not the
+index of the vcpu id (see vgic_mmio_read_v3r_typer).
 
-Furthermore, if I understand what injecting a SEA requires, it is very
-similar to resetting the CPU and loading data into guest memory, which
-QEMU already does today, and there is no reason to introduce additional
-APIs if it can be done using KVM_GET/SET_ONE_REG ioctls.
+So there are two issues, one is that we should change most occurences of
+kvm_get_vcpu() to kvm_get_vcpu_by_id() in our code (I'll write a patch
+for this).
+
+The second issue is that vcpu_id is not enforced to be contiguous so we
+may end up with a sparse redist frame, which obviously doesn't work, so
+I think I'll need to add the following:
+
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 2c14ad9..12eb26d 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -490,6 +490,17 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
+ 	return NULL;
+ }
+ 
++static inline int kvm_vcpu_get_idx(struct kvm_vcpu *vcpu)
++{
++	struct kvm_vcpu *tmp;
++	int idx;
++
++	kvm_for_each_vcpu(idx, tmp, vcpu->kvm)
++		if (tmp == vcpu)
++			return idx;
++	BUG();
++}
++
+ #define kvm_for_each_memslot(memslot, slots)	\
+ 	for (memslot = &slots->memslots[0];	\
+ 	      memslot < slots->memslots + KVM_MEM_SLOTS_NUM && memslot->npages;\
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 297557b..99da1a2 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -586,7 +586,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	if (!vgic_v3_check_base(kvm))
+ 		return -EINVAL;
+ 
+-	rd_base = vgic->vgic_redist_base + vcpu->vcpu_id * SZ_64K * 2;
++	rd_base = vgic->vgic_redist_base + kvm_vcpu_get_idx(vcpu) * SZ_64K * 2;
+ 	sgi_base = rd_base + SZ_64K;
+ 
+ 	kvm_iodevice_init(&rd_dev->dev, &kvm_io_gic_ops);
 
 Thanks,
 -Christoffer
