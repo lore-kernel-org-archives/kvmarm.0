@@ -1,104 +1,73 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH 7/8] KVM: arm/arm64: Register ITS iodev when setting base address
-Date: Mon,  8 May 2017 13:54:53 +0200
-Message-ID: <20170508115454.5075-8-cdall@linaro.org>
+Subject: [PATCH 2/8] KVM: arm/arm64: vgic: Rename kvm_vgic_vcpu_init to
+ kvm_vgic_vcpu_enable
+Date: Mon,  8 May 2017 13:54:48 +0200
+Message-ID: <20170508115454.5075-3-cdall@linaro.org>
 References: <20170508115454.5075-1-cdall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F43040C2E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 May 2017 07:51:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id B-XUHjJj6Kj4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 May 2017 07:51:50 -0400 (EDT)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11E4940BD2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 May 2017 07:51:49 -0400 (EDT)
+Received: by mail-wm0-f51.google.com with SMTP id 142so62136805wma.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 08 May 2017 04:55:03 -0700 (PDT)
 In-Reply-To: <20170508115454.5075-1-cdall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We have to register the ITS iodevice before running the VM, because in
-migration scenarios, we may be restoring a live device that wishes to
-inject MSIs before we get a chance to run the VM.
-
-All we need to register the ITS io device is the base address of the
-ITS, so we can simply register that when the base address of the ITS is
-set.
+This function really doesn't init anything, it enables the CPU
+interface, so name it as such, which gives us the name to use for actual
+init work later on.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 29 +----------------------------
- virt/kvm/arm/vgic/vgic-v3.c  |  8 --------
- virt/kvm/arm/vgic/vgic.h     |  1 -
- 3 files changed, 1 insertion(+), 37 deletions(-)
+ virt/kvm/arm/vgic/vgic-init.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 9f7105c..375c503 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -2390,7 +2390,7 @@ static int vgic_its_set_attr(struct kvm_device *dev,
- 
- 		its->vgic_its_base = addr;
- 
--		return 0;
-+		return vgic_register_its_iodev(dev->kvm, its);
- 	}
- 	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
- 		const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-@@ -2467,30 +2467,3 @@ int kvm_vgic_register_its_device(void)
- 	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
- 				       KVM_DEV_TYPE_ARM_VGIC_ITS);
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 87de048..0ea64a1 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -226,11 +226,7 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
+ 	return 0;
  }
--
--/*
-- * Registers all ITSes with the kvm_io_bus framework.
-- * To follow the existing VGIC initialization sequence, this has to be
-- * done as late as possible, just before the first VCPU runs.
+ 
+-/**
+- * kvm_vgic_vcpu_init() - Enable the VCPU interface
+- * @vcpu: the VCPU which's VGIC should be enabled
 - */
--int vgic_register_its_iodevs(struct kvm *kvm)
--{
--	struct kvm_device *dev;
--	int ret = 0;
--
--	list_for_each_entry(dev, &kvm->devices, vm_node) {
--		if (dev->ops != &kvm_arm_vgic_its_ops)
--			continue;
--
--		ret = vgic_register_its_iodev(kvm, dev->private);
--		if (ret)
--			return ret;
--		/*
--		 * We don't need to care about tearing down previously
--		 * registered ITSes, as the kvm_io_bus framework removes
--		 * them for us if the VM gets destroyed.
--		 */
--	}
--
--	return ret;
--}
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 4d51d1f..d77fcb3 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -396,14 +396,6 @@ int vgic_v3_map_resources(struct kvm *kvm)
- 		goto out;
- 	}
+-static void kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
++static void kvm_vgic_vcpu_enable(struct kvm_vcpu *vcpu)
+ {
+ 	if (kvm_vgic_global_state.type == VGIC_V2)
+ 		vgic_v2_enable(vcpu);
+@@ -269,7 +265,7 @@ int vgic_init(struct kvm *kvm)
+ 		dist->msis_require_devid = true;
  
--	if (vgic_has_its(kvm)) {
--		ret = vgic_register_its_iodevs(kvm);
--		if (ret) {
--			kvm_err("Unable to register VGIC ITS MMIO regions\n");
--			goto out;
--		}
--	}
--
- 	dist->ready = true;
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+-		kvm_vgic_vcpu_init(vcpu);
++		kvm_vgic_vcpu_enable(vcpu);
  
- out:
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 5f17eac..8ac7397 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -181,7 +181,6 @@ bool vgic_v3_check_base(struct kvm *kvm);
- void vgic_v3_load(struct kvm_vcpu *vcpu);
- void vgic_v3_put(struct kvm_vcpu *vcpu);
- 
--int vgic_register_its_iodevs(struct kvm *kvm);
- bool vgic_has_its(struct kvm *kvm);
- int kvm_vgic_register_its_device(void);
- void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+ 	ret = kvm_vgic_setup_default_irq_routing(kvm);
+ 	if (ret)
 -- 
 2.9.0
