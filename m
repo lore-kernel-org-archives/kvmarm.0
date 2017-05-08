@@ -1,25 +1,24 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH 1/8] KVM: arm/arm64: Clarification and relaxation to ITS
- save/restore ABI
-Date: Mon,  8 May 2017 13:54:47 +0200
-Message-ID: <20170508115454.5075-2-cdall@linaro.org>
+Subject: [PATCH 8/8] KVM: arm/arm64: vgic-its: Cleanup after failed ITT restore
+Date: Mon,  8 May 2017 13:54:54 +0200
+Message-ID: <20170508115454.5075-9-cdall@linaro.org>
 References: <20170508115454.5075-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B21740C7D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 May 2017 07:51:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3326D40C54
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 May 2017 07:51:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id haQqBjHIO42b for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 May 2017 07:51:49 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49F4B405DA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 May 2017 07:51:49 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id b84so51782759wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 08 May 2017 04:55:02 -0700 (PDT)
+ with ESMTP id n4o2WgQ5kXR7 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 May 2017 07:51:56 -0400 (EDT)
+Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2C07040C7D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 May 2017 07:51:55 -0400 (EDT)
+Received: by mail-wm0-f46.google.com with SMTP id m123so61992953wma.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 08 May 2017 04:55:08 -0700 (PDT)
 In-Reply-To: <20170508115454.5075-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,66 +33,85 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Clarify what is meant by the save/restore ABI only supporting virtual
-physical interrupts.
+When failing to restore the ITT for a DTE, we should remove the failed
+device entry from the list and free the object.
 
-Relax the requirement of the order that the collection entries are
-written in and be clear that there is no particular ordering enforced.
-
-Some cosmetic changes in the capitalization of ID names to align with
-the GICv3 manual and remove the empty line in the bottom of the patch.
+We slightly refactor vgic_its_destroy to be able to reuse the now
+separate vgic_its_free_dte() function.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- Documentation/virtual/kvm/devices/arm-vgic-its.txt | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 35 ++++++++++++++++++++++-------------
+ 1 file changed, 22 insertions(+), 13 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-index ba132e9..d405242 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-@@ -110,12 +110,14 @@ Then vcpus can be started.
-  ITS Table ABI REV0:
-  -------------------
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 375c503..00f2990 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1612,13 +1612,20 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 	return vgic_its_set_abi(its, NR_ITS_ABIS - 1);
+ }
  
-- Revision 0 of the ABI only supports physical LPIs.
-+ Revision 0 of the ABI only supports the features of a virtual GICv3, and does
-+ not support a virtual GICv4 with support for direct injection of virtual
-+ interrupts for nested hypervisors.
++static void vgic_its_free_dte(struct kvm *kvm, struct its_device *dev)
++{
++	struct its_ite *ite, *tmp;
++
++	list_for_each_entry_safe(ite, tmp, &dev->itt_head, ite_list)
++		its_free_ite(kvm, ite);
++	list_del(&dev->dev_list);
++	kfree(dev);
++}
++
+ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+ {
+ 	struct kvm *kvm = kvm_dev->kvm;
+ 	struct vgic_its *its = kvm_dev->private;
+-	struct its_device *dev;
+-	struct its_ite *ite;
+-	struct list_head *dev_cur, *dev_temp;
+ 	struct list_head *cur, *temp;
  
-- The device table and ITT are indexed by the deviceid and eventid,
-- respectively. The collection table is not indexed by collectionid:
-- CTEs are written in the table in the order of collection creation. All
-- entries are 8 bytes.
-+ The device table and ITT are indexed by the DeviceID and EventID,
-+ respectively. The collection table is not indexed by CollectionID, and the
-+ entries in the collection are listed in no particular order.
-+ All entries are 8 bytes.
+ 	/*
+@@ -1629,19 +1636,19 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+ 		return;
  
-  Device Table Entry (DTE):
+ 	mutex_lock(&its->its_lock);
+-	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
+-		dev = container_of(dev_cur, struct its_device, dev_list);
+-		list_for_each_safe(cur, temp, &dev->itt_head) {
+-			ite = (container_of(cur, struct its_ite, ite_list));
+-			its_free_ite(kvm, ite);
+-		}
+-		list_del(dev_cur);
+-		kfree(dev);
++	list_for_each_safe(cur, temp, &its->device_list) {
++		struct its_device *dev;
++
++		dev = list_entry(cur, struct its_device, dev_list);
++		vgic_its_free_dte(kvm, dev);
+ 	}
  
-@@ -126,10 +128,10 @@ Then vcpus can be started.
-  - V indicates whether the entry is valid. If not, other fields
-    are not meaningful.
-  - next: equals to 0 if this entry is the last one; otherwise it
--   corresponds to the deviceid offset to the next DTE, capped by
-+   corresponds to the DeviceID offset to the next DTE, capped by
-    2^14 -1.
-  - ITT_addr matches bits [51:8] of the ITT address (256 Byte aligned).
-- - Size specifies the supported number of bits for the eventid,
-+ - Size specifies the supported number of bits for the EventID,
-    minus one
+ 	list_for_each_safe(cur, temp, &its->collection_list) {
++		struct its_collection *coll;
++
++		coll = list_entry(cur, struct its_collection, coll_list);
+ 		list_del(cur);
+-		kfree(container_of(cur, struct its_collection, coll_list));
++		kfree(coll);
+ 	}
+ 	mutex_unlock(&its->its_lock);
  
-  Collection Table Entry (CTE):
-@@ -151,8 +153,7 @@ Then vcpus can be started.
+@@ -2011,8 +2018,10 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+ 		return PTR_ERR(dev);
  
-  where:
-  - next: equals to 0 if this entry is the last one; otherwise it corresponds
--   to the eventid offset to the next ITE capped by 2^16 -1.
-+   to the EventID offset to the next ITE capped by 2^16 -1.
-  - pINTID is the physical LPI ID; if zero, it means the entry is not valid
-    and other fields are not meaningful.
-  - ICID is the collection ID
--
+ 	ret = vgic_its_restore_itt(its, dev);
+-	if (ret)
++	if (ret) {
++		vgic_its_free_dte(its->dev->kvm, dev);
+ 		return ret;
++	}
+ 
+ 	return offset;
+ }
 -- 
 2.9.0
