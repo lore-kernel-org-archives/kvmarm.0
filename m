@@ -1,112 +1,104 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH 5/8] KVM: arm/arm64: Slightly rework kvm_vgic_addr
-Date: Mon,  8 May 2017 13:54:51 +0200
-Message-ID: <20170508115454.5075-6-cdall@linaro.org>
+Subject: [PATCH 7/8] KVM: arm/arm64: Register ITS iodev when setting base address
+Date: Mon,  8 May 2017 13:54:53 +0200
+Message-ID: <20170508115454.5075-8-cdall@linaro.org>
 References: <20170508115454.5075-1-cdall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C66140C30
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 May 2017 07:51:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zeujm0cBd5+j for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 May 2017 07:51:52 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E44E40C47
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 May 2017 07:51:52 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id u65so81766919wmu.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 08 May 2017 04:55:05 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170508115454.5075-1-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we are about to handle setting the address for the redistributor base
-region separately from some of the other base addresses, let's rework
-this function to leave a little more room for being flexible in what
-each type of base address does.
+We have to register the ITS iodevice before running the VM, because in
+migration scenarios, we may be restoring a live device that wishes to
+inject MSIs before we get a chance to run the VM.
+
+All we need to register the ITS io device is the base address of the
+ITS, so we can simply register that when the base address of the ITS is
+set.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-kvm-device.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 29 +----------------------------
+ virt/kvm/arm/vgic/vgic-v3.c  |  8 --------
+ virt/kvm/arm/vgic/vgic.h     |  1 -
+ 3 files changed, 1 insertion(+), 37 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index d48743c..69ccfd5 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -37,6 +37,14 @@ int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
- 	return 0;
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 9f7105c..375c503 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -2390,7 +2390,7 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+ 
+ 		its->vgic_its_base = addr;
+ 
+-		return 0;
++		return vgic_register_its_iodev(dev->kvm, its);
+ 	}
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
+ 		const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+@@ -2467,30 +2467,3 @@ int kvm_vgic_register_its_device(void)
+ 	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
+ 				       KVM_DEV_TYPE_ARM_VGIC_ITS);
  }
- 
-+static int vgic_check_type(struct kvm *kvm, int type_needed)
-+{
-+	if (kvm->arch.vgic.vgic_model != type_needed)
-+		return -ENODEV;
-+	else
-+		return 0;
-+}
-+
- /**
-  * kvm_vgic_addr - set or get vgic VM base addresses
-  * @kvm:   pointer to the vm struct
-@@ -57,40 +65,36 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- {
- 	int r = 0;
- 	struct vgic_dist *vgic = &kvm->arch.vgic;
--	int type_needed;
- 	phys_addr_t *addr_ptr, alignment;
- 
- 	mutex_lock(&kvm->lock);
- 	switch (type) {
- 	case KVM_VGIC_V2_ADDR_TYPE_DIST:
--		type_needed = KVM_DEV_TYPE_ARM_VGIC_V2;
-+		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
- 		addr_ptr = &vgic->vgic_dist_base;
- 		alignment = SZ_4K;
- 		break;
- 	case KVM_VGIC_V2_ADDR_TYPE_CPU:
--		type_needed = KVM_DEV_TYPE_ARM_VGIC_V2;
-+		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
- 		addr_ptr = &vgic->vgic_cpu_base;
- 		alignment = SZ_4K;
- 		break;
- 	case KVM_VGIC_V3_ADDR_TYPE_DIST:
--		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
-+		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
- 		addr_ptr = &vgic->vgic_dist_base;
- 		alignment = SZ_64K;
- 		break;
- 	case KVM_VGIC_V3_ADDR_TYPE_REDIST:
--		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
-+		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
- 		addr_ptr = &vgic->vgic_redist_base;
- 		alignment = SZ_64K;
- 		break;
- 	default:
- 		r = -ENODEV;
--		goto out;
+-
+-/*
+- * Registers all ITSes with the kvm_io_bus framework.
+- * To follow the existing VGIC initialization sequence, this has to be
+- * done as late as possible, just before the first VCPU runs.
+- */
+-int vgic_register_its_iodevs(struct kvm *kvm)
+-{
+-	struct kvm_device *dev;
+-	int ret = 0;
+-
+-	list_for_each_entry(dev, &kvm->devices, vm_node) {
+-		if (dev->ops != &kvm_arm_vgic_its_ops)
+-			continue;
+-
+-		ret = vgic_register_its_iodev(kvm, dev->private);
+-		if (ret)
+-			return ret;
+-		/*
+-		 * We don't need to care about tearing down previously
+-		 * registered ITSes, as the kvm_io_bus framework removes
+-		 * them for us if the VM gets destroyed.
+-		 */
+-	}
+-
+-	return ret;
+-}
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 4d51d1f..d77fcb3 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -396,14 +396,6 @@ int vgic_v3_map_resources(struct kvm *kvm)
+ 		goto out;
  	}
  
--	if (vgic->vgic_model != type_needed) {
--		r = -ENODEV;
-+	if (r)
- 		goto out;
+-	if (vgic_has_its(kvm)) {
+-		ret = vgic_register_its_iodevs(kvm);
+-		if (ret) {
+-			kvm_err("Unable to register VGIC ITS MMIO regions\n");
+-			goto out;
+-		}
 -	}
+-
+ 	dist->ready = true;
  
- 	if (write) {
- 		r = vgic_check_ioaddr(kvm, addr_ptr, *addr, alignment);
+ out:
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 5f17eac..8ac7397 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -181,7 +181,6 @@ bool vgic_v3_check_base(struct kvm *kvm);
+ void vgic_v3_load(struct kvm_vcpu *vcpu);
+ void vgic_v3_put(struct kvm_vcpu *vcpu);
+ 
+-int vgic_register_its_iodevs(struct kvm *kvm);
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
 -- 
 2.9.0
