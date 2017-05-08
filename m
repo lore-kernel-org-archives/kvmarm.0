@@ -1,126 +1,71 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 8/8] KVM: arm/arm64: vgic-its: Cleanup after failed ITT
- restore
-Date: Mon, 8 May 2017 19:20:59 +0200
-Message-ID: <3803961c-27ea-492a-21df-8b6a3b2e85c1@redhat.com>
+Subject: Re: [PATCH 9/8] KVM: arm/arm64: Don't call map_resources when
+ restoring ITS tables
+Date: Mon, 8 May 2017 19:22:34 +0200
+Message-ID: <7e35e7b8-dbca-4e1e-57f1-020aa5dbc228@redhat.com>
 References: <20170508115454.5075-1-cdall@linaro.org>
- <20170508115454.5075-9-cdall@linaro.org>
+ <20170508124932.28399-1-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF635408EB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 May 2017 13:17:50 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0lOhhdq0CEZM for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 May 2017 13:17:50 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 07C6640625
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 May 2017 13:17:49 -0400 (EDT)
-In-Reply-To: <20170508115454.5075-9-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170508124932.28399-1-cdall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Christoffer,
-On 08/05/2017 13:54, Christoffer Dall wrote:
-> When failing to restore the ITT for a DTE, we should remove the failed
-> device entry from the list and free the object.
+On 08/05/2017 14:49, Christoffer Dall wrote:
+> The only reason we called kvm_vgic_map_resources() when restoring the
+> ITS tables was because we wanted to have the KVM iodevs registered in
+> the KVM IO bus framework at the time when the ITS was restored such that
+> a restored and active device can inject MSIs prior to otherwise calling
+> kvm_vgic_map_resources() from the first run of a VCPU.
 > 
-> We slightly refactor vgic_its_destroy to be able to reuse the now
-> separate vgic_its_free_dte() function.
+> Since we now register the KVM iodevs for the redestributors and ITS as
+> soon as possible (when setting the base addresses), we no longer need
+> this call and kvm_vgic_map_resources() is again called only when first
+> running a VCPU.
 > 
 > Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 35 ++++++++++++++++++++++-------------
->  1 file changed, 22 insertions(+), 13 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 375c503..00f2990 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1612,13 +1612,20 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
->  	return vgic_its_set_abi(its, NR_ITS_ABIS - 1);
->  }
->  
-> +static void vgic_its_free_dte(struct kvm *kvm, struct its_device *dev)
-nit: I would rename this into vgic_its_free_device as this is the
-counterpart of vgic_its_alloc_device
-
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
 
 Eric
-> +{
-> +	struct its_ite *ite, *tmp;
-> +
-> +	list_for_each_entry_safe(ite, tmp, &dev->itt_head, ite_list)
-> +		its_free_ite(kvm, ite);
-> +	list_del(&dev->dev_list);
-> +	kfree(dev);
-> +}
-> +
->  static void vgic_its_destroy(struct kvm_device *kvm_dev)
->  {
->  	struct kvm *kvm = kvm_dev->kvm;
->  	struct vgic_its *its = kvm_dev->private;
-> -	struct its_device *dev;
-> -	struct its_ite *ite;
-> -	struct list_head *dev_cur, *dev_temp;
->  	struct list_head *cur, *temp;
+> ---
+> Forgot to include this when posting the series, which was the whole
+> point of the iodev rework in the first place.  Apologies about the
+> confusing 9/8 subject thing.
+> 
+>  virt/kvm/arm/vgic/vgic-its.c | 10 +---------
+>  1 file changed, 1 insertion(+), 9 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 00f2990..9b67621 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -2316,20 +2316,12 @@ static int vgic_its_restore_tables_v0(struct vgic_its *its)
+>  		goto out;
 >  
->  	/*
-> @@ -1629,19 +1636,19 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->  		return;
->  
->  	mutex_lock(&its->its_lock);
-> -	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
-> -		dev = container_of(dev_cur, struct its_device, dev_list);
-> -		list_for_each_safe(cur, temp, &dev->itt_head) {
-> -			ite = (container_of(cur, struct its_ite, ite_list));
-> -			its_free_ite(kvm, ite);
-> -		}
-> -		list_del(dev_cur);
-> -		kfree(dev);
-> +	list_for_each_safe(cur, temp, &its->device_list) {
-> +		struct its_device *dev;
-> +
-> +		dev = list_entry(cur, struct its_device, dev_list);
-> +		vgic_its_free_dte(kvm, dev);
->  	}
->  
->  	list_for_each_safe(cur, temp, &its->collection_list) {
-> +		struct its_collection *coll;
-> +
-> +		coll = list_entry(cur, struct its_collection, coll_list);
->  		list_del(cur);
-> -		kfree(container_of(cur, struct its_collection, coll_list));
-> +		kfree(coll);
->  	}
+>  	ret = vgic_its_restore_device_tables(its);
+> -
+>  out:
+>  	unlock_all_vcpus(kvm);
 >  	mutex_unlock(&its->its_lock);
+>  	mutex_unlock(&kvm->lock);
 >  
-> @@ -2011,8 +2018,10 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
->  		return PTR_ERR(dev);
->  
->  	ret = vgic_its_restore_itt(its, dev);
 > -	if (ret)
-> +	if (ret) {
-> +		vgic_its_free_dte(its->dev->kvm, dev);
->  		return ret;
-> +	}
->  
->  	return offset;
+> -		return ret;
+> -
+> -	/*
+> -	 * On restore path, MSI injections can happen before the
+> -	 * first VCPU run so let's complete the GIC init here.
+> -	 */
+> -	return kvm_vgic_map_resources(its->dev->kvm);
+> +	return ret;
 >  }
+>  
+>  static int vgic_its_commit_v0(struct vgic_its *its)
 > 
