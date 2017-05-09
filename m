@@ -1,25 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 19/37] KVM: arm64: vgic-its: vgic_its_alloc_ite/device
-Date: Tue,  9 May 2017 12:44:48 +0200
-Message-ID: <20170509104506.30929-20-cdall@linaro.org>
+Subject: [PULL 15/37] KVM: arm64: vgic-its: Check the device id matches TYPER
+ DEVBITS range
+Date: Tue,  9 May 2017 12:44:44 +0200
+Message-ID: <20170509104506.30929-16-cdall@linaro.org>
 References: <20170509104506.30929-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C21E40C2F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E17640B3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X9tUAa161yZY for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 May 2017 06:42:19 -0400 (EDT)
+ with ESMTP id XNh-sonrVPMd for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 May 2017 06:42:14 -0400 (EDT)
 Received: from mail-qk0-f170.google.com (mail-qk0-f170.google.com
  [209.85.220.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5879C40C32
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:16 -0400 (EDT)
-Received: by mail-qk0-f170.google.com with SMTP id a72so58964840qkj.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:31 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6838A40C45
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:12 -0400 (EDT)
+Received: by mail-qk0-f170.google.com with SMTP id a72so58963330qkj.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:27 -0700 (PDT)
 In-Reply-To: <20170509104506.30929-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,127 +37,75 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Eric Auger <eric.auger@redhat.com>
 
-Add two new helpers to allocate an its ite and an its device.
-This will avoid duplication on restore path.
+On MAPD we currently check the device id can be stored in the device table.
+Let's first check it can be encoded within the range defined by TYPER
+DEVBITS.
+
+Also check the collection ID belongs to the 16 bit range as GITS_TYPER
+CIL field equals to 0.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 68 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 47 insertions(+), 21 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 25 ++++++++++++++++++++-----
+ 1 file changed, 20 insertions(+), 5 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index cb7ae4c..737ba3c 100644
+index 7b95b73..bd1362e 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -802,6 +802,25 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
- 	kfree(collection);
- }
+@@ -227,6 +227,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+ #define GIC_LPI_OFFSET 8192
  
-+/* Must be called with its_lock mutex held */
-+static struct its_ite *vgic_its_alloc_ite(struct its_device *device,
-+					  struct its_collection *collection,
-+					  u32 lpi_id, u32 event_id)
-+{
-+	struct its_ite *ite;
-+
-+	ite = kzalloc(sizeof(*ite), GFP_KERNEL);
-+	if (!ite)
-+		return ERR_PTR(-ENOMEM);
-+
-+	ite->event_id	= event_id;
-+	ite->collection = collection;
-+	ite->lpi = lpi_id;
-+
-+	list_add_tail(&ite->ite_list, &device->itt_head);
-+	return ite;
-+}
-+
+ #define VITS_TYPER_IDBITS 16
++#define VITS_TYPER_DEVBITS 16
+ 
  /*
-  * The MAPTI and MAPI commands map LPIs to ITTEs.
-  * Must be called with its_lock mutex held.
-@@ -816,8 +835,8 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	struct kvm_vcpu *vcpu = NULL;
- 	struct its_device *device;
- 	struct its_collection *collection, *new_coll = NULL;
--	int lpi_nr;
- 	struct vgic_irq *irq;
-+	int lpi_nr;
+  * Finds and returns a collection in the ITS collection table.
+@@ -427,7 +428,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+ 	 * To avoid memory waste in the guest, we keep the number of IDBits and
+ 	 * DevBits low - as least for the time being.
+ 	 */
+-	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
++	reg |= GIC_ENCODE_SZ(VITS_TYPER_DEVBITS, 5) << GITS_TYPER_DEVBITS_SHIFT;
+ 	reg |= GIC_ENCODE_SZ(VITS_TYPER_IDBITS, 5) << GITS_TYPER_IDBITS_SHIFT;
+ 	reg |= GIC_ENCODE_SZ(abi->ite_esz, 4) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
  
- 	device = find_its_device(its, device_id);
- 	if (!device)
-@@ -846,19 +865,13 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 		new_coll = collection;
- 	}
- 
--	ite = kzalloc(sizeof(struct its_ite), GFP_KERNEL);
--	if (!ite) {
-+	ite = vgic_its_alloc_ite(device, collection, lpi_nr, event_id);
-+	if (IS_ERR(ite)) {
- 		if (new_coll)
- 			vgic_its_free_collection(its, coll_id);
--		return -ENOMEM;
-+		return PTR_ERR(ite);
- 	}
- 
--	ite->event_id	= event_id;
--	list_add_tail(&ite->ite_list, &device->itt_head);
--
--	ite->collection = collection;
--	ite->lpi = lpi_nr;
--
- 	if (its_is_collection_mapped(collection))
- 		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
- 
-@@ -891,6 +904,26 @@ static void vgic_its_unmap_device(struct kvm *kvm, struct its_device *device)
- 	kfree(device);
- }
- 
-+/* Must be called with its_lock mutex held */
-+static struct its_device *vgic_its_alloc_device(struct vgic_its *its,
-+						u32 device_id, gpa_t itt_addr,
-+						u8 num_eventid_bits)
-+{
-+	struct its_device *device;
+@@ -672,16 +673,30 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+  * Check whether an ID can be stored into the corresponding guest table.
+  * For a direct table this is pretty easy, but gets a bit nasty for
+  * indirect tables. We check whether the resulting guest physical address
+- * is actually valid (covered by a memslot and guest accessbible).
++ * is actually valid (covered by a memslot and guest accessible).
+  * For this we have to read the respective first level entry.
+  */
+-static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
++static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
+ {
+ 	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
++	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
++	int esz = GITS_BASER_ENTRY_SIZE(baser);
+ 	int index;
+-	u64 indirect_ptr;
+ 	gfn_t gfn;
+-	int esz = GITS_BASER_ENTRY_SIZE(baser);
 +
-+	device = kzalloc(sizeof(*device), GFP_KERNEL);
-+	if (!device)
-+		return ERR_PTR(-ENOMEM);
-+
-+	device->device_id = device_id;
-+	device->itt_addr = itt_addr;
-+	device->num_eventid_bits = num_eventid_bits;
-+	INIT_LIST_HEAD(&device->itt_head);
-+
-+	list_add_tail(&device->dev_list, &its->device_list);
-+	return device;
-+}
-+
- /*
-  * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
-  * Must be called with the its_lock mutex held.
-@@ -927,17 +960,10 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 	if (!valid)
- 		return 0;
++	switch (type) {
++	case GITS_BASER_TYPE_DEVICE:
++		if (id >= BIT_ULL(VITS_TYPER_DEVBITS))
++			return false;
++		break;
++	case GITS_BASER_TYPE_COLLECTION:
++		/* as GITS_TYPER.CIL == 0, ITS supports 16-bit collection ID */
++		if (id >= BIT_ULL(16))
++			return false;
++		break;
++	default:
++		return false;
++	}
  
--	device = kzalloc(sizeof(struct its_device), GFP_KERNEL);
--	if (!device)
--		return -ENOMEM;
--
--	device->device_id = device_id;
--	device->num_eventid_bits = num_eventid_bits;
--	device->itt_addr = itt_addr;
--
--	INIT_LIST_HEAD(&device->itt_head);
--
--	list_add_tail(&device->dev_list, &its->device_list);
-+	device = vgic_its_alloc_device(its, device_id, itt_addr,
-+				       num_eventid_bits);
-+	if (IS_ERR(device))
-+		return PTR_ERR(device);
- 
- 	return 0;
- }
+ 	if (!(baser & GITS_BASER_INDIRECT)) {
+ 		phys_addr_t addr;
 -- 
 2.9.0
