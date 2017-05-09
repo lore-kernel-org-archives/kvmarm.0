@@ -1,89 +1,24 @@
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v1 2/2] KVM: arm: rename pm_fake handler to trap_raz_wi
-Date: Wed, 10 May 2017 18:01:59 +0100
-Message-ID: <20170510170200.13285-3-alex.bennee@linaro.org>
-References: <20170510170200.13285-1-alex.bennee@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PULL 00/37] KVM/ARM Changes for v4.12 - Round 2
+Date: Tue, 9 May 2017 12:52:59 +0200
+Message-ID: <4d57c285-e0e4-7410-f113-0331d6c723a2@redhat.com>
+References: <20170509104506.30929-1-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99DFB40905
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 May 2017 12:58:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j0iF+I+KSJ+q for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 May 2017 12:57:59 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 90B6740C28
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 May 2017 12:57:59 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id m123so6406900wma.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 May 2017 10:01:16 -0700 (PDT)
-In-Reply-To: <20170510170200.13285-1-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: kvm@vger.kernel.org, Russell King <linux@armlinux.org.uk>, open list <linux-kernel@vger.kernel.org>, Zhichao Huang <zhichao.huang@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170509104506.30929-1-cdall@linaro.org>
+Content-Language: en-US
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogWmhpY2hhbyBIdWFuZyA8emhpY2hhby5odWFuZ0BsaW5hcm8ub3JnPgoKcG1fZmFrZSBk
-b2Vzbid0IHF1aXRlIGRlc2NyaWJlIHdoYXQgdGhlIGhhbmRsZXIgZG9lcyAoaWdub3Jpbmcgd3Jp
-dGVzCmFuZCByZXR1cm5pbmcgMCBmb3IgcmVhZHMpLgoKQXMgd2UncmUgYWJvdXQgdG8gdXNlIGl0
-IChhIGxvdCkgaW4gYSBkaWZmZXJlbnQgY29udGV4dCwgcmVuYW1lIGl0CndpdGggYSAoYWRtaXRl
-ZGx5IGNyeXB0aWMpIG5hbWUgdGhhdCBtYWtlIHNlbnNlIGZvciBhbGwgdXNlcnMuCgpTaWduZWQt
-b2ZmLWJ5OiBaaGljaGFvIEh1YW5nIDx6aGljaGFvLmh1YW5nQGxpbmFyby5vcmc+ClJldmlld2Vk
-LWJ5OiBBbGV4IEJlbm5lZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KQWNrZWQtYnk6IENocmlz
-dG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KU2lnbmVkLW9mZi1ieTog
-QWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgotLS0KIGFyY2gvYXJtL2t2bS9j
-b3Byb2MuYyB8IDMyICsrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hh
-bmdlZCwgMTYgaW5zZXJ0aW9ucygrKSwgMTYgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJj
-aC9hcm0va3ZtL2NvcHJvYy5jIGIvYXJjaC9hcm0va3ZtL2NvcHJvYy5jCmluZGV4IGIyMDUzMzkz
-YmIxZi4uNjkxOTM2M2NlN2NjIDEwMDY0NAotLS0gYS9hcmNoL2FybS9rdm0vY29wcm9jLmMKKysr
-IGIvYXJjaC9hcm0va3ZtL2NvcHJvYy5jCkBAIC0yNjAsNyArMjYwLDcgQEAgc3RhdGljIGJvb2wg
-YWNjZXNzX2dpY19zcmUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAogICogbXVzdCBhbHdheXMgc3Vw
-cG9ydCBQTUNDTlRSICh0aGUgY3ljbGUgY291bnRlcik6IHdlIGp1c3QgUkFaL1dJIGZvcgogICog
-YWxsIFBNIHJlZ2lzdGVycywgd2hpY2ggZG9lc24ndCBjcmFzaCB0aGUgZ3Vlc3Qga2VybmVsIGF0
-IGxlYXN0LgogICovCi1zdGF0aWMgYm9vbCBwbV9mYWtlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwK
-K3N0YXRpYyBib29sIHRyYXBfcmF6X3dpKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIAkJICAgIGNv
-bnN0IHN0cnVjdCBjb3Byb2NfcGFyYW1zICpwLAogCQkgICAgY29uc3Qgc3RydWN0IGNvcHJvY19y
-ZWcgKnIpCiB7CkBAIC0yNzAsMTkgKzI3MCwxOSBAQCBzdGF0aWMgYm9vbCBwbV9mYWtlKHN0cnVj
-dCBrdm1fdmNwdSAqdmNwdSwKIAkJcmV0dXJuIHJlYWRfemVybyh2Y3B1LCBwKTsKIH0KIAotI2Rl
-ZmluZSBhY2Nlc3NfcG1jciBwbV9mYWtlCi0jZGVmaW5lIGFjY2Vzc19wbWNudGVuc2V0IHBtX2Zh
-a2UKLSNkZWZpbmUgYWNjZXNzX3BtY250ZW5jbHIgcG1fZmFrZQotI2RlZmluZSBhY2Nlc3NfcG1v
-dnNyIHBtX2Zha2UKLSNkZWZpbmUgYWNjZXNzX3Btc2VsciBwbV9mYWtlCi0jZGVmaW5lIGFjY2Vz
-c19wbWNlaWQwIHBtX2Zha2UKLSNkZWZpbmUgYWNjZXNzX3BtY2VpZDEgcG1fZmFrZQotI2RlZmlu
-ZSBhY2Nlc3NfcG1jY250ciBwbV9mYWtlCi0jZGVmaW5lIGFjY2Vzc19wbXhldnR5cGVyIHBtX2Zh
-a2UKLSNkZWZpbmUgYWNjZXNzX3BteGV2Y250ciBwbV9mYWtlCi0jZGVmaW5lIGFjY2Vzc19wbXVz
-ZXJlbnIgcG1fZmFrZQotI2RlZmluZSBhY2Nlc3NfcG1pbnRlbnNldCBwbV9mYWtlCi0jZGVmaW5l
-IGFjY2Vzc19wbWludGVuY2xyIHBtX2Zha2UKKyNkZWZpbmUgYWNjZXNzX3BtY3IgdHJhcF9yYXpf
-d2kKKyNkZWZpbmUgYWNjZXNzX3BtY250ZW5zZXQgdHJhcF9yYXpfd2kKKyNkZWZpbmUgYWNjZXNz
-X3BtY250ZW5jbHIgdHJhcF9yYXpfd2kKKyNkZWZpbmUgYWNjZXNzX3Btb3ZzciB0cmFwX3Jhel93
-aQorI2RlZmluZSBhY2Nlc3NfcG1zZWxyIHRyYXBfcmF6X3dpCisjZGVmaW5lIGFjY2Vzc19wbWNl
-aWQwIHRyYXBfcmF6X3dpCisjZGVmaW5lIGFjY2Vzc19wbWNlaWQxIHRyYXBfcmF6X3dpCisjZGVm
-aW5lIGFjY2Vzc19wbWNjbnRyIHRyYXBfcmF6X3dpCisjZGVmaW5lIGFjY2Vzc19wbXhldnR5cGVy
-IHRyYXBfcmF6X3dpCisjZGVmaW5lIGFjY2Vzc19wbXhldmNudHIgdHJhcF9yYXpfd2kKKyNkZWZp
-bmUgYWNjZXNzX3BtdXNlcmVuciB0cmFwX3Jhel93aQorI2RlZmluZSBhY2Nlc3NfcG1pbnRlbnNl
-dCB0cmFwX3Jhel93aQorI2RlZmluZSBhY2Nlc3NfcG1pbnRlbmNsciB0cmFwX3Jhel93aQogCiAv
-KiBBcmNoaXRlY3RlZCBDUDE1IHJlZ2lzdGVycy4KICAqIENSbiBkZW5vdGVzIHRoZSBwcmltYXJ5
-IHJlZ2lzdGVyIG51bWJlciwgYnV0IGlzIGNvcGllZCB0byB0aGUgQ1JtIGluIHRoZQpAQCAtNTI3
-LDcgKzUyNyw3IEBAIHN0YXRpYyBpbnQga3ZtX2hhbmRsZV9jcF82NChzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4sCiAJCXJldHVybiBlbXVsYXRlX2NwMTUodmNwdSwg
-JnBhcmFtcyk7CiAKIAkvKiByYXpfd2kgY3AxNCAqLwotCSh2b2lkKXBtX2Zha2UodmNwdSwgJnBh
-cmFtcywgTlVMTCk7CisJKHZvaWQpdHJhcF9yYXpfd2kodmNwdSwgJnBhcmFtcywgTlVMTCk7CiAK
-IAkvKiBoYW5kbGVkICovCiAJa3ZtX3NraXBfaW5zdHIodmNwdSwga3ZtX3ZjcHVfdHJhcF9pbF9p
-czMyYml0KHZjcHUpKTsKQEAgLTU4Myw3ICs1ODMsNyBAQCBzdGF0aWMgaW50IGt2bV9oYW5kbGVf
-Y3BfMzIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3Qga3ZtX3J1biAqcnVuLAogCQlyZXR1
-cm4gZW11bGF0ZV9jcDE1KHZjcHUsICZwYXJhbXMpOwogCiAJLyogcmF6X3dpIGNwMTQgKi8KLQko
-dm9pZClwbV9mYWtlKHZjcHUsICZwYXJhbXMsIE5VTEwpOworCSh2b2lkKXRyYXBfcmF6X3dpKHZj
-cHUsICZwYXJhbXMsIE5VTEwpOwogCiAJLyogaGFuZGxlZCAqLwogCWt2bV9za2lwX2luc3RyKHZj
-cHUsIGt2bV92Y3B1X3RyYXBfaWxfaXMzMmJpdCh2Y3B1KSk7Ci0tIAoyLjExLjAKCl9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxp
-c3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlh
-LmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+
+
+On 09/05/2017 12:44, Christoffer Dall wrote:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.12-round2
+
+Pulled, thanks (locally only for now, should be on kernel.org later today).
+
+Paolo
