@@ -1,26 +1,25 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 01/37] arm64: KVM: Fix decoding of Rt/Rt2 when trapping AArch32
- CP accesses
-Date: Tue,  9 May 2017 12:44:30 +0200
-Message-ID: <20170509104506.30929-2-cdall@linaro.org>
+Subject: [PULL 03/37] KVM: arm/arm64: Add ITS save/restore API documentation
+Date: Tue,  9 May 2017 12:44:32 +0200
+Message-ID: <20170509104506.30929-4-cdall@linaro.org>
 References: <20170509104506.30929-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8275240430
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E60040C28
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5m9-0dtNoZPz for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 May 2017 06:41:59 -0400 (EDT)
+ with ESMTP id olgaKM5G+tPE for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 May 2017 06:42:01 -0400 (EDT)
 Received: from mail-qk0-f175.google.com (mail-qk0-f175.google.com
  [209.85.220.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A810C405DA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:41:59 -0400 (EDT)
-Received: by mail-qk0-f175.google.com with SMTP id y201so42658283qka.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:14 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 75A0940A80
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:01 -0400 (EDT)
+Received: by mail-qk0-f175.google.com with SMTP id y201so42658989qka.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:16 -0700 (PDT)
 In-Reply-To: <20170509104506.30929-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,75 +31,151 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Eric Auger <eric.auger@redhat.com>
 
-Our 32bit CP14/15 handling inherited some of the ARMv7 code for handling
-the trapped system registers, completely missing the fact that the
-fields for Rt and Rt2 are now 5 bit wide, and not 4...
+Add description for how to access ITS registers and how to save/restore
+ITS tables into/from memory.
 
-Let's fix it, and provide an accessor for the most common Rt case.
-
-Cc: stable@vger.kernel.org
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 6 ++++++
- arch/arm64/kvm/sys_regs.c            | 8 ++++----
- 2 files changed, 10 insertions(+), 4 deletions(-)
+ Documentation/virtual/kvm/devices/arm-vgic-its.txt | 120 +++++++++++++++++++++
+ 1 file changed, 120 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index f5ea0ba..fe39e68 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -240,6 +240,12 @@ static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
- 	return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_FSC_TYPE;
- }
- 
-+static inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
-+{
-+	u32 esr = kvm_vcpu_get_hsr(vcpu);
-+	return (esr & ESR_ELx_SYS64_ISS_RT_MASK) >> ESR_ELx_SYS64_ISS_RT_SHIFT;
-+}
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+index 6081a5b..ba132e9 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
+@@ -32,7 +32,127 @@ Groups:
+     KVM_DEV_ARM_VGIC_CTRL_INIT
+       request the initialization of the ITS, no additional parameter in
+       kvm_device_attr.addr.
 +
- static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
- {
- 	return vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 8ddcee6..ea9fbb5 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1529,8 +1529,8 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
- {
- 	struct sys_reg_params params;
- 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
--	int Rt = (hsr >> 5) & 0xf;
--	int Rt2 = (hsr >> 10) & 0xf;
-+	int Rt = kvm_vcpu_sys_get_rt(vcpu);
-+	int Rt2 = (hsr >> 10) & 0x1f;
- 
- 	params.is_aarch32 = true;
- 	params.is_32bit = false;
-@@ -1586,7 +1586,7 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
- {
- 	struct sys_reg_params params;
- 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
--	int Rt  = (hsr >> 5) & 0xf;
-+	int Rt  = kvm_vcpu_sys_get_rt(vcpu);
- 
- 	params.is_aarch32 = true;
- 	params.is_32bit = true;
-@@ -1688,7 +1688,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	struct sys_reg_params params;
- 	unsigned long esr = kvm_vcpu_get_hsr(vcpu);
--	int Rt = (esr >> 5) & 0x1f;
-+	int Rt = kvm_vcpu_sys_get_rt(vcpu);
- 	int ret;
- 
- 	trace_kvm_handle_sys_reg(esr);
++    KVM_DEV_ARM_ITS_SAVE_TABLES
++      save the ITS table data into guest RAM, at the location provisioned
++      by the guest in corresponding registers/table entries.
++
++      The layout of the tables in guest memory defines an ABI. The entries
++      are laid out in little endian format as described in the last paragraph.
++
++    KVM_DEV_ARM_ITS_RESTORE_TABLES
++      restore the ITS tables from guest RAM to ITS internal structures.
++
++      The GICV3 must be restored before the ITS and all ITS registers but
++      the GITS_CTLR must be restored before restoring the ITS tables.
++
++      The GITS_IIDR read-only register must also be restored before
++      calling KVM_DEV_ARM_ITS_RESTORE_TABLES as the IIDR revision field
++      encodes the ABI revision.
++
++      The expected ordering when restoring the GICv3/ITS is described in section
++      "ITS Restore Sequence".
++
+   Errors:
+     -ENXIO:  ITS not properly configured as required prior to setting
+              this attribute
+     -ENOMEM: Memory shortage when allocating ITS internal data
++    -EINVAL: Inconsistent restored data
++    -EFAULT: Invalid guest ram access
++    -EBUSY:  One or more VCPUS are running
++
++  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
++  Attributes:
++      The attr field of kvm_device_attr encodes the offset of the
++      ITS register, relative to the ITS control frame base address
++      (ITS_base).
++
++      kvm_device_attr.addr points to a __u64 value whatever the width
++      of the addressed register (32/64 bits). 64 bit registers can only
++      be accessed with full length.
++
++      Writes to read-only registers are ignored by the kernel except for:
++      - GITS_CREADR. It must be restored otherwise commands in the queue
++        will be re-executed after restoring CWRITER. GITS_CREADR must be
++        restored before restoring the GITS_CTLR which is likely to enable the
++        ITS. Also it must be restored after GITS_CBASER since a write to
++        GITS_CBASER resets GITS_CREADR.
++      - GITS_IIDR. The Revision field encodes the table layout ABI revision.
++        In the future we might implement direct injection of virtual LPIs.
++        This will require an upgrade of the table layout and an evolution of
++        the ABI. GITS_IIDR must be restored before calling
++        KVM_DEV_ARM_ITS_RESTORE_TABLES.
++
++      For other registers, getting or setting a register has the same
++      effect as reading/writing the register on real hardware.
++  Errors:
++    -ENXIO: Offset does not correspond to any supported register
++    -EFAULT: Invalid user pointer for attr->addr
++    -EINVAL: Offset is not 64-bit aligned
++    -EBUSY: one or more VCPUS are running
++
++ ITS Restore Sequence:
++ -------------------------
++
++The following ordering must be followed when restoring the GIC and the ITS:
++a) restore all guest memory and create vcpus
++b) restore all redistributors
++c) initialize the ITS and then provide its base address
++   (KVM_DEV_ARM_VGIC_CTRL_INIT, KVM_DEV_ARM_VGIC_GRP_ADDR)
++d) restore the ITS in the following order:
++   1. Restore GITS_CBASER
++   2. Restore all other GITS_ registers, except GITS_CTLR!
++   3. Load the ITS table data (KVM_DEV_ARM_ITS_RESTORE_TABLES)
++   4. Restore GITS_CTLR
++
++Then vcpus can be started.
++
++ ITS Table ABI REV0:
++ -------------------
++
++ Revision 0 of the ABI only supports physical LPIs.
++
++ The device table and ITT are indexed by the deviceid and eventid,
++ respectively. The collection table is not indexed by collectionid:
++ CTEs are written in the table in the order of collection creation. All
++ entries are 8 bytes.
++
++ Device Table Entry (DTE):
++
++ bits:     | 63| 62 ... 49 | 48 ... 5 | 4 ... 0 |
++ values:   | V |   next    | ITT_addr |  Size   |
++
++ where;
++ - V indicates whether the entry is valid. If not, other fields
++   are not meaningful.
++ - next: equals to 0 if this entry is the last one; otherwise it
++   corresponds to the deviceid offset to the next DTE, capped by
++   2^14 -1.
++ - ITT_addr matches bits [51:8] of the ITT address (256 Byte aligned).
++ - Size specifies the supported number of bits for the eventid,
++   minus one
++
++ Collection Table Entry (CTE):
++
++ bits:     | 63| 62 ..  52  | 51 ... 16 | 15  ...   0 |
++ values:   | V |    RES0    |  RDBase   |    ICID     |
++
++ where:
++ - V indicates whether the entry is valid. If not, other fields are
++   not meaningful.
++ - RES0: reserved field with Should-Be-Zero-or-Preserved behavior.
++ - RDBase is the PE number (GICR_TYPER.Processor_Number semantic),
++ - ICID is the collection ID
++
++ Interrupt Translation Entry (ITE):
++
++ bits:     | 63 ... 48 | 47 ... 16 | 15 ... 0 |
++ values:   |    next   |   pINTID  |  ICID    |
++
++ where:
++ - next: equals to 0 if this entry is the last one; otherwise it corresponds
++   to the eventid offset to the next ITE capped by 2^16 -1.
++ - pINTID is the physical LPI ID; if zero, it means the entry is not valid
++   and other fields are not meaningful.
++ - ICID is the collection ID
++
 -- 
 2.9.0
