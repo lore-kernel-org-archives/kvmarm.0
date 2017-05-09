@@ -1,146 +1,86 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 16/37] KVM: arm64: vgic-v3: vgic_v3_lpi_sync_pending_status
-Date: Tue,  9 May 2017 12:44:45 +0200
-Message-ID: <20170509104506.30929-17-cdall@linaro.org>
+Subject: [PULL 14/37] KVM: arm64: vgic-its: Interpret MAPD ITT_addr field
+Date: Tue,  9 May 2017 12:44:43 +0200
+Message-ID: <20170509104506.30929-15-cdall@linaro.org>
 References: <20170509104506.30929-1-cdall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C5AD40CE0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:15 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MRg+frFjDEG9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 May 2017 06:42:14 -0400 (EDT)
+Received: from mail-qk0-f176.google.com (mail-qk0-f176.google.com
+ [209.85.220.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 881DB40B3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:11 -0400 (EDT)
+Received: by mail-qk0-f176.google.com with SMTP id k74so75279937qke.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:26 -0700 (PDT)
 In-Reply-To: <20170509104506.30929-1-cdall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Eric Auger <eric.auger@redhat.com>
 
-this new helper synchronizes the irq pending_latch
-with the LPI pending bit status found in rdist pending table.
-As the status is consumed, we reset the bit in pending table.
-
-As we need the PENDBASER_ADDRESS() in vgic-v3, let's move its
-definition in the irqchip header. We restore the full length
-of the field, ie [51:16]. Same for PROPBASER_ADDRESS with full
-field length of [51:12].
+Up to now the MAPD ITT_addr had been ignored. We will need it
+for save/restore. Let's record it in the its_device struct.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h |  2 ++
- virt/kvm/arm/vgic/vgic-its.c       |  6 ++----
- virt/kvm/arm/vgic/vgic-v3.c        | 44 ++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h           |  1 +
- 4 files changed, 49 insertions(+), 4 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index be8bad0..fffb912 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -159,6 +159,8 @@
- #define GICR_PROPBASER_RaWaWb	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWaWb)
- 
- #define GICR_PROPBASER_IDBITS_MASK			(0x1f)
-+#define GICR_PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 12))
-+#define GICR_PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(51, 16))
- 
- #define GICR_PENDBASER_SHAREABILITY_SHIFT		(10)
- #define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT		(7)
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index bd1362e..3601790 100644
+index 031f6ab..7b95b73 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -221,8 +221,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
-  */
- #define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
- #define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
--#define PENDBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
--#define PROPBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
+@@ -104,6 +104,7 @@ struct its_device {
+ 	/* the head for the list of ITTEs */
+ 	struct list_head itt_head;
+ 	u32 num_eventid_bits;
++	gpa_t itt_addr;
+ 	u32 device_id;
+ };
  
- #define GIC_LPI_OFFSET 8192
+@@ -602,6 +603,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
+ #define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
+ #define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
+ #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
++#define its_cmd_get_ittaddr(cmd)	(its_cmd_mask_field(cmd, 2,  8, 44) << 8)
+ #define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
+ #define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
  
-@@ -257,7 +255,7 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
- static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
- 			     struct kvm_vcpu *filter_vcpu)
- {
--	u64 propbase = PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
-+	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
- 	u8 prop;
- 	int ret;
+@@ -873,6 +875,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	u32 device_id = its_cmd_get_deviceid(its_cmd);
+ 	bool valid = its_cmd_get_validbit(its_cmd);
+ 	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
++	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
+ 	struct its_device *device;
  
-@@ -369,7 +367,7 @@ static u32 max_lpis_propbaser(u64 propbaser)
-  */
- static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
- {
--	gpa_t pendbase = PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+	gpa_t pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
- 	struct vgic_irq *irq;
- 	int last_byte_offset = -1;
- 	int ret = 0;
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index df15036..9ae8add 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -234,6 +234,50 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
- 	vgic_v3->vgic_hcr = ICH_HCR_EN;
- }
+ 	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
+@@ -904,6 +907,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
  
-+int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
-+{
-+	struct kvm_vcpu *vcpu;
-+	int byte_offset, bit_nr;
-+	gpa_t pendbase, ptr;
-+	bool status;
-+	u8 val;
-+	int ret;
-+
-+retry:
-+	vcpu = irq->target_vcpu;
-+	if (!vcpu)
-+		return 0;
-+
-+	pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+
-+	byte_offset = irq->intid / BITS_PER_BYTE;
-+	bit_nr = irq->intid % BITS_PER_BYTE;
-+	ptr = pendbase + byte_offset;
-+
-+	ret = kvm_read_guest(kvm, ptr, &val, 1);
-+	if (ret)
-+		return ret;
-+
-+	status = val & (1 << bit_nr);
-+
-+	spin_lock(&irq->irq_lock);
-+	if (irq->target_vcpu != vcpu) {
-+		spin_unlock(&irq->irq_lock);
-+		goto retry;
-+	}
-+	irq->pending_latch = status;
-+	vgic_queue_irq_unlock(vcpu->kvm, irq);
-+
-+	if (status) {
-+		/* clear consumed data */
-+		val &= ~(1 << bit_nr);
-+		ret = kvm_write_guest(kvm, ptr, &val, 1);
-+		if (ret)
-+			return ret;
-+	}
-+	return 0;
-+}
-+
- /* check for overlapping regions and for regions crossing the end of memory */
- static bool vgic_v3_check_base(struct kvm *kvm)
- {
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index a48f33b..79768c8 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -149,6 +149,7 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- void vgic_v3_enable(struct kvm_vcpu *vcpu);
- int vgic_v3_probe(const struct gic_kvm_info *info);
- int vgic_v3_map_resources(struct kvm *kvm);
-+int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
- int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
+ 	device->device_id = device_id;
+ 	device->num_eventid_bits = num_eventid_bits;
++	device->itt_addr = itt_addr;
  
- void vgic_v3_load(struct kvm_vcpu *vcpu);
+ 	INIT_LIST_HEAD(&device->itt_head);
+ 
 -- 
 2.9.0
