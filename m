@@ -1,88 +1,119 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 12/37] KVM: arm64: vgic-its: Implement vgic_mmio_uaccess_write_its_iidr
-Date: Tue,  9 May 2017 12:44:41 +0200
-Message-ID: <20170509104506.30929-13-cdall@linaro.org>
+Subject: [PULL 10/37] KVM: arm64: vgic-its: Implement
+ vgic_mmio_uaccess_write_its_creadr
+Date: Tue,  9 May 2017 12:44:39 +0200
+Message-ID: <20170509104506.30929-11-cdall@linaro.org>
 References: <20170509104506.30929-1-cdall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77EDA40C4A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WFmxOIyJ-nu0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 May 2017 06:42:10 -0400 (EDT)
+Received: from mail-qk0-f178.google.com (mail-qk0-f178.google.com
+ [209.85.220.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2FE840B3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:07 -0400 (EDT)
+Received: by mail-qk0-f178.google.com with SMTP id a72so58961523qkj.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:22 -0700 (PDT)
 In-Reply-To: <20170509104506.30929-1-cdall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Eric Auger <eric.auger@redhat.com>
 
-The GITS_IIDR revision field is used to encode the migration ABI
-revision. So we need to restore it to check the table layout is
-readable by the destination.
-
-By writing the IIDR, userspace thus forces the ABI revision to be
-used and this must be less than or equal to the max revision KVM
-supports.
+GITS_CREADR needs to be restored so let's implement the associated
+uaccess_write_its callback. The write only is allowed if the its
+is disabled.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
 ---
- include/linux/irqchip/arm-gic-v3.h |  5 +++++
- virt/kvm/arm/vgic/vgic-its.c       | 23 ++++++++++++++++++++---
- 2 files changed, 25 insertions(+), 3 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 40 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 81ebe43..2eaea30 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -242,6 +242,11 @@
- #define GITS_TYPER_PTA			(1UL << 19)
- #define GITS_TYPER_HWCOLLCNT_SHIFT	24
- 
-+#define GITS_IIDR_REV_SHIFT		12
-+#define GITS_IIDR_REV_MASK		(0xf << GITS_IIDR_REV_SHIFT)
-+#define GITS_IIDR_REV(r)		(((r) >> GITS_IIDR_REV_SHIFT) & 0xf)
-+#define GITS_IIDR_PRODUCTID_SHIFT	24
-+
- #define GITS_CBASER_VALID			(1ULL << 63)
- #define GITS_CBASER_SHAREABILITY_SHIFT		(10)
- #define GITS_CBASER_INNER_CACHEABILITY_SHIFT	(59)
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4f6ea46..9338efb 100644
+index fd2660d..bf3ff09 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -434,7 +434,23 @@ static unsigned long vgic_mmio_read_its_iidr(struct kvm *kvm,
- 					     struct vgic_its *its,
- 					     gpa_t addr, unsigned int len)
- {
--	return (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-+	u32 val;
-+
-+	val = (its->abi_rev << GITS_IIDR_REV_SHIFT) & GITS_IIDR_REV_MASK;
-+	val |= (PRODUCT_ID_KVM << GITS_IIDR_PRODUCTID_SHIFT) | IMPLEMENTER_ARM;
-+	return val;
-+}
-+
-+static int vgic_mmio_uaccess_write_its_iidr(struct kvm *kvm,
-+					    struct vgic_its *its,
-+					    gpa_t addr, unsigned int len,
-+					    unsigned long val)
-+{
-+	u32 rev = GITS_IIDR_REV(val);
-+
-+	if (rev >= NR_ITS_ABIS)
-+		return -EINVAL;
-+	return vgic_its_set_abi(its, rev);
+@@ -1213,6 +1213,33 @@ static unsigned long vgic_mmio_read_its_creadr(struct kvm *kvm,
+ 	return extract_bytes(its->creadr, addr & 0x7, len);
  }
  
- static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
-@@ -1415,8 +1431,9 @@ static struct vgic_register_region its_registers[] = {
- 	REGISTER_ITS_DESC(GITS_CTLR,
- 		vgic_mmio_read_its_ctlr, vgic_mmio_write_its_ctlr, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_ITS_DESC(GITS_IIDR,
--		vgic_mmio_read_its_iidr, its_mmio_write_wi, 4,
-+	REGISTER_ITS_DESC_UACCESS(GITS_IIDR,
-+		vgic_mmio_read_its_iidr, its_mmio_write_wi,
-+		vgic_mmio_uaccess_write_its_iidr, 4,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_ITS_DESC(GITS_TYPER,
- 		vgic_mmio_read_its_typer, its_mmio_write_wi, 8,
++static int vgic_mmio_uaccess_write_its_creadr(struct kvm *kvm,
++					      struct vgic_its *its,
++					      gpa_t addr, unsigned int len,
++					      unsigned long val)
++{
++	u32 cmd_offset;
++	int ret = 0;
++
++	mutex_lock(&its->cmd_lock);
++
++	if (its->enabled) {
++		ret = -EBUSY;
++		goto out;
++	}
++
++	cmd_offset = ITS_CMD_OFFSET(val);
++	if (cmd_offset >= ITS_CMD_BUFFER_SIZE(its->cbaser)) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	its->creadr = cmd_offset;
++out:
++	mutex_unlock(&its->cmd_lock);
++	return ret;
++}
++
+ #define BASER_INDEX(addr) (((addr) / sizeof(u64)) & 0x7)
+ static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm,
+ 					      struct vgic_its *its,
+@@ -1317,6 +1344,16 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+ 	.its_write = wr,					\
+ }
+ 
++#define REGISTER_ITS_DESC_UACCESS(off, rd, wr, uwr, length, acc)\
++{								\
++	.reg_offset = off,					\
++	.len = length,						\
++	.access_flags = acc,					\
++	.its_read = rd,						\
++	.its_write = wr,					\
++	.uaccess_its_write = uwr,				\
++}
++
+ static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
+ 			      gpa_t addr, unsigned int len, unsigned long val)
+ {
+@@ -1339,8 +1376,9 @@ static struct vgic_register_region its_registers[] = {
+ 	REGISTER_ITS_DESC(GITS_CWRITER,
+ 		vgic_mmio_read_its_cwriter, vgic_mmio_write_its_cwriter, 8,
+ 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+-	REGISTER_ITS_DESC(GITS_CREADR,
+-		vgic_mmio_read_its_creadr, its_mmio_write_wi, 8,
++	REGISTER_ITS_DESC_UACCESS(GITS_CREADR,
++		vgic_mmio_read_its_creadr, its_mmio_write_wi,
++		vgic_mmio_uaccess_write_its_creadr, 8,
+ 		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+ 	REGISTER_ITS_DESC(GITS_BASER,
+ 		vgic_mmio_read_its_baser, vgic_mmio_write_its_baser, 0x40,
 -- 
 2.9.0
