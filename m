@@ -1,111 +1,178 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 15/37] KVM: arm64: vgic-its: Check the device id matches TYPER
- DEVBITS range
-Date: Tue,  9 May 2017 12:44:44 +0200
-Message-ID: <20170509104506.30929-16-cdall@linaro.org>
+Subject: [PULL 21/37] KVM: arm64: vgic-its: Collection table save/restore
+Date: Tue,  9 May 2017 12:44:50 +0200
+Message-ID: <20170509104506.30929-22-cdall@linaro.org>
 References: <20170509104506.30929-1-cdall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E17640B3E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:15 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XNh-sonrVPMd for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 May 2017 06:42:14 -0400 (EDT)
-Received: from mail-qk0-f170.google.com (mail-qk0-f170.google.com
- [209.85.220.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6838A40C45
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:12 -0400 (EDT)
-Received: by mail-qk0-f170.google.com with SMTP id a72so58963330qkj.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:27 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170509104506.30929-1-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Eric Auger <eric.auger@redhat.com>
 
-On MAPD we currently check the device id can be stored in the device table.
-Let's first check it can be encoded within the range defined by TYPER
-DEVBITS.
+The save path copies the collection entries into guest RAM
+at the GPA specified in the BASER register. This obviously
+requires the BASER to be set. The last written element is a
+dummy collection table entry.
 
-Also check the collection ID belongs to the 16 bit range as GITS_TYPER
-CIL field equals to 0.
+We do not index by collection ID as the collection entry
+can fit into 8 bytes while containing the collection ID.
+
+On restore path we re-allocate the collection objects.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 100 ++++++++++++++++++++++++++++++++++++++++++-
+ virt/kvm/arm/vgic/vgic.h     |   9 ++++
+ 2 files changed, 107 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 7b95b73..bd1362e 100644
+index d5c0057..5523f0a 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -227,6 +227,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
- #define GIC_LPI_OFFSET 8192
+@@ -1838,13 +1838,89 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+ 	return -ENXIO;
+ }
  
- #define VITS_TYPER_IDBITS 16
-+#define VITS_TYPER_DEVBITS 16
- 
- /*
-  * Finds and returns a collection in the ITS collection table.
-@@ -427,7 +428,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
- 	 * To avoid memory waste in the guest, we keep the number of IDBits and
- 	 * DevBits low - as least for the time being.
- 	 */
--	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
-+	reg |= GIC_ENCODE_SZ(VITS_TYPER_DEVBITS, 5) << GITS_TYPER_DEVBITS_SHIFT;
- 	reg |= GIC_ENCODE_SZ(VITS_TYPER_IDBITS, 5) << GITS_TYPER_IDBITS_SHIFT;
- 	reg |= GIC_ENCODE_SZ(abi->ite_esz, 4) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
- 
-@@ -672,16 +673,30 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
-  * Check whether an ID can be stored into the corresponding guest table.
-  * For a direct table this is pretty easy, but gets a bit nasty for
-  * indirect tables. We check whether the resulting guest physical address
-- * is actually valid (covered by a memslot and guest accessbible).
-+ * is actually valid (covered by a memslot and guest accessible).
-  * For this we have to read the respective first level entry.
-  */
--static bool vgic_its_check_id(struct vgic_its *its, u64 baser, int id)
-+static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
- {
- 	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
-+	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
-+	int esz = GITS_BASER_ENTRY_SIZE(baser);
- 	int index;
--	u64 indirect_ptr;
- 	gfn_t gfn;
--	int esz = GITS_BASER_ENTRY_SIZE(baser);
++static int vgic_its_save_cte(struct vgic_its *its,
++			     struct its_collection *collection,
++			     gpa_t gpa, int esz)
++{
++	u64 val;
 +
-+	switch (type) {
-+	case GITS_BASER_TYPE_DEVICE:
-+		if (id >= BIT_ULL(VITS_TYPER_DEVBITS))
-+			return false;
-+		break;
-+	case GITS_BASER_TYPE_COLLECTION:
-+		/* as GITS_TYPER.CIL == 0, ITS supports 16-bit collection ID */
-+		if (id >= BIT_ULL(16))
-+			return false;
-+		break;
-+	default:
-+		return false;
++	val = (1ULL << KVM_ITS_CTE_VALID_SHIFT |
++	       ((u64)collection->target_addr << KVM_ITS_CTE_RDBASE_SHIFT) |
++	       collection->collection_id);
++	val = cpu_to_le64(val);
++	return kvm_write_guest(its->dev->kvm, gpa, &val, esz);
++}
++
++static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
++{
++	struct its_collection *collection;
++	struct kvm *kvm = its->dev->kvm;
++	u32 target_addr, coll_id;
++	u64 val;
++	int ret;
++
++	BUG_ON(esz > sizeof(val));
++	ret = kvm_read_guest(kvm, gpa, &val, esz);
++	if (ret)
++		return ret;
++	val = le64_to_cpu(val);
++	if (!(val & KVM_ITS_CTE_VALID_MASK))
++		return 0;
++
++	target_addr = (u32)(val >> KVM_ITS_CTE_RDBASE_SHIFT);
++	coll_id = val & KVM_ITS_CTE_ICID_MASK;
++
++	if (target_addr >= atomic_read(&kvm->online_vcpus))
++		return -EINVAL;
++
++	collection = find_collection(its, coll_id);
++	if (collection)
++		return -EEXIST;
++	ret = vgic_its_alloc_collection(its, &collection, coll_id);
++	if (ret)
++		return ret;
++	collection->target_addr = target_addr;
++	return 1;
++}
++
+ /**
+  * vgic_its_save_collection_table - Save the collection table into
+  * guest RAM
+  */
+ static int vgic_its_save_collection_table(struct vgic_its *its)
+ {
+-	return -ENXIO;
++	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
++	struct its_collection *collection;
++	u64 val;
++	gpa_t gpa;
++	size_t max_size, filled = 0;
++	int ret, cte_esz = abi->cte_esz;
++
++	gpa = BASER_ADDRESS(its->baser_coll_table);
++	if (!gpa)
++		return 0;
++
++	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
++
++	list_for_each_entry(collection, &its->collection_list, coll_list) {
++		ret = vgic_its_save_cte(its, collection, gpa, cte_esz);
++		if (ret)
++			return ret;
++		gpa += cte_esz;
++		filled += cte_esz;
 +	}
++
++	if (filled == max_size)
++		return 0;
++
++	/*
++	 * table is not fully filled, add a last dummy element
++	 * with valid bit unset
++	 */
++	val = 0;
++	BUG_ON(cte_esz > sizeof(val));
++	ret = kvm_write_guest(its->dev->kvm, gpa, &val, cte_esz);
++	return ret;
+ }
  
- 	if (!(baser & GITS_BASER_INDIRECT)) {
- 		phys_addr_t addr;
+ /**
+@@ -1854,7 +1930,27 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
+  */
+ static int vgic_its_restore_collection_table(struct vgic_its *its)
+ {
+-	return -ENXIO;
++	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
++	int cte_esz = abi->cte_esz;
++	size_t max_size, read = 0;
++	gpa_t gpa;
++	int ret;
++
++	if (!(its->baser_coll_table & GITS_BASER_VALID))
++		return 0;
++
++	gpa = BASER_ADDRESS(its->baser_coll_table);
++
++	max_size = GITS_BASER_NR_PAGES(its->baser_coll_table) * SZ_64K;
++
++	while (read < max_size) {
++		ret = vgic_its_restore_cte(its, gpa, cte_esz);
++		if (ret <= 0)
++			break;
++		gpa += cte_esz;
++		read += cte_esz;
++	}
++	return ret;
+ }
+ 
+ /**
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 79768c8..757de7a 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -73,6 +73,15 @@
+ 				      KVM_REG_ARM_VGIC_SYSREG_CRM_MASK | \
+ 				      KVM_REG_ARM_VGIC_SYSREG_OP2_MASK)
+ 
++/*
++ * As per Documentation/virtual/kvm/devices/arm-vgic-its.txt,
++ * below macros are defined for ITS table entry encoding.
++ */
++#define KVM_ITS_CTE_VALID_SHIFT		63
++#define KVM_ITS_CTE_VALID_MASK		BIT_ULL(63)
++#define KVM_ITS_CTE_RDBASE_SHIFT	16
++#define KVM_ITS_CTE_ICID_MASK		GENMASK_ULL(15, 0)
++
+ static inline bool irq_is_pending(struct vgic_irq *irq)
+ {
+ 	if (irq->config == VGIC_CONFIG_EDGE)
 -- 
 2.9.0
