@@ -1,26 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 13/37] KVM: arm64: vgic-its: Interpret MAPD Size field and
- check related errors
-Date: Tue,  9 May 2017 12:44:42 +0200
-Message-ID: <20170509104506.30929-14-cdall@linaro.org>
+Subject: [PULL 09/37] KVM: arm64: vgic-its: Implement vgic_its_has_attr_regs
+ and attr_regs_access
+Date: Tue,  9 May 2017 12:44:38 +0200
+Message-ID: <20170509104506.30929-10-cdall@linaro.org>
 References: <20170509104506.30929-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DAEF40CE9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 713F640C35
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qA1V6-xeAuYb for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 May 2017 06:42:14 -0400 (EDT)
-Received: from mail-qk0-f171.google.com (mail-qk0-f171.google.com
- [209.85.220.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B85EB40C66
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:10 -0400 (EDT)
-Received: by mail-qk0-f171.google.com with SMTP id k74so75279550qke.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:25 -0700 (PDT)
+ with ESMTP id gpS123aRkOWK for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 May 2017 06:42:10 -0400 (EDT)
+Received: from mail-qk0-f179.google.com (mail-qk0-f179.google.com
+ [209.85.220.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EFDC240C28
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:06 -0400 (EDT)
+Received: by mail-qk0-f179.google.com with SMTP id u75so75010765qka.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:21 -0700 (PDT)
 In-Reply-To: <20170509104506.30929-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -37,109 +37,137 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Eric Auger <eric.auger@redhat.com>
 
-Up to now the MAPD's ITT size field has been ignored. It encodes
-the number of eventid bit minus 1. It should be used to check
-the eventid when a MAPTI command is issued on a device. Let's
-store the number of eventid bits in the its_device and do the
-check on MAPTI. Also make sure the ITT size field does
-not exceed the GITS_TYPER IDBITS field.
+This patch implements vgic_its_has_attr_regs and vgic_its_attr_regs_access
+upon the MMIO framework. VGIC ITS KVM device KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+group becomes functional.
+
+At least GITS_CREADR and GITS_IIDR require to differentiate a guest write
+action from a user access. As such let's introduce a new uaccess_its_write
+vgic_register_region callback.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h |  2 ++
- virt/kvm/arm/vgic/vgic-its.c       | 15 ++++++++++++++-
- 2 files changed, 16 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-its.c  | 79 +++++++++++++++++++++++++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-mmio.h |  9 +++--
+ 2 files changed, 84 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 2eaea30..be8bad0 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -347,9 +347,11 @@
- #define E_ITS_INT_UNMAPPED_INTERRUPT		0x010307
- #define E_ITS_CLEAR_UNMAPPED_INTERRUPT		0x010507
- #define E_ITS_MAPD_DEVICE_OOR			0x010801
-+#define E_ITS_MAPD_ITTSIZE_OOR			0x010802
- #define E_ITS_MAPC_PROCNUM_OOR			0x010902
- #define E_ITS_MAPC_COLLECTION_OOR		0x010903
- #define E_ITS_MAPTI_UNMAPPED_DEVICE		0x010a04
-+#define E_ITS_MAPTI_ID_OOR			0x010a05
- #define E_ITS_MAPTI_PHYSICALID_OOR		0x010a06
- #define E_ITS_INV_UNMAPPED_INTERRUPT		0x010c07
- #define E_ITS_INVALL_UNMAPPED_COLLECTION	0x010d09
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 9338efb..031f6ab 100644
+index f687e91..fd2660d 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -103,6 +103,7 @@ struct its_device {
+@@ -1469,14 +1469,89 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+ int vgic_its_has_attr_regs(struct kvm_device *dev,
+ 			   struct kvm_device_attr *attr)
+ {
+-	return -ENXIO;
++	const struct vgic_register_region *region;
++	gpa_t offset = attr->attr;
++	int align;
++
++	align = (offset < GITS_TYPER) || (offset >= GITS_PIDR4) ? 0x3 : 0x7;
++
++	if (offset & align)
++		return -EINVAL;
++
++	region = vgic_find_mmio_region(its_registers,
++				       ARRAY_SIZE(its_registers),
++				       offset);
++	if (!region)
++		return -ENXIO;
++
++	return 0;
+ }
  
- 	/* the head for the list of ITTEs */
- 	struct list_head itt_head;
-+	u32 num_eventid_bits;
- 	u32 device_id;
+ int vgic_its_attr_regs_access(struct kvm_device *dev,
+ 			      struct kvm_device_attr *attr,
+ 			      u64 *reg, bool is_write)
+ {
+-	return -ENXIO;
++	const struct vgic_register_region *region;
++	struct vgic_its *its;
++	gpa_t addr, offset;
++	unsigned int len;
++	int align, ret = 0;
++
++	its = dev->private;
++	offset = attr->attr;
++
++	/*
++	 * Although the spec supports upper/lower 32-bit accesses to
++	 * 64-bit ITS registers, the userspace ABI requires 64-bit
++	 * accesses to all 64-bit wide registers. We therefore only
++	 * support 32-bit accesses to GITS_CTLR, GITS_IIDR and GITS ID
++	 * registers
++	 */
++	if ((offset < GITS_TYPER) || (offset >= GITS_PIDR4))
++		align = 0x3;
++	else
++		align = 0x7;
++
++	if (offset & align)
++		return -EINVAL;
++
++	mutex_lock(&dev->kvm->lock);
++
++	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base)) {
++		ret = -ENXIO;
++		goto out;
++	}
++
++	region = vgic_find_mmio_region(its_registers,
++				       ARRAY_SIZE(its_registers),
++				       offset);
++	if (!region) {
++		ret = -ENXIO;
++		goto out;
++	}
++
++	if (!lock_all_vcpus(dev->kvm)) {
++		ret = -EBUSY;
++		goto out;
++	}
++
++	addr = its->vgic_its_base + offset;
++
++	len = region->access_flags & VGIC_ACCESS_64bit ? 8 : 4;
++
++	if (is_write) {
++		if (region->uaccess_its_write)
++			ret = region->uaccess_its_write(dev->kvm, its, addr,
++							len, *reg);
++		else
++			region->its_write(dev->kvm, its, addr, len, *reg);
++	} else {
++		*reg = region->its_read(dev->kvm, its, addr, len);
++	}
++	unlock_all_vcpus(dev->kvm);
++out:
++	mutex_unlock(&dev->kvm->lock);
++	return ret;
+ }
+ 
+ static int vgic_its_has_attr(struct kvm_device *dev,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 6eec91b..ea4171a 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -36,8 +36,13 @@ struct vgic_register_region {
+ 	};
+ 	unsigned long (*uaccess_read)(struct kvm_vcpu *vcpu, gpa_t addr,
+ 				      unsigned int len);
+-	void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
+-			      unsigned int len, unsigned long val);
++	union {
++		void (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
++				      unsigned int len, unsigned long val);
++		int (*uaccess_its_write)(struct kvm *kvm, struct vgic_its *its,
++					 gpa_t addr, unsigned int len,
++					 unsigned long val);
++	};
  };
  
-@@ -224,6 +225,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
- 
- #define GIC_LPI_OFFSET 8192
- 
-+#define VITS_TYPER_IDBITS 16
-+
- /*
-  * Finds and returns a collection in the ITS collection table.
-  * Must be called with the its_lock mutex held.
-@@ -424,7 +427,7 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
- 	 * DevBits low - as least for the time being.
- 	 */
- 	reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
--	reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
-+	reg |= GIC_ENCODE_SZ(VITS_TYPER_IDBITS, 5) << GITS_TYPER_IDBITS_SHIFT;
- 	reg |= GIC_ENCODE_SZ(abi->ite_esz, 4) << GITS_TYPER_ITT_ENTRY_SIZE_SHIFT;
- 
- 	return extract_bytes(reg, addr & 7, len);
-@@ -595,6 +598,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
- 
- #define its_cmd_get_command(cmd)	its_cmd_mask_field(cmd, 0,  0,  8)
- #define its_cmd_get_deviceid(cmd)	its_cmd_mask_field(cmd, 0, 32, 32)
-+#define its_cmd_get_size(cmd)		(its_cmd_mask_field(cmd, 1,  0,  5) + 1)
- #define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
- #define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
- #define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
-@@ -785,6 +789,9 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	if (!device)
- 		return E_ITS_MAPTI_UNMAPPED_DEVICE;
- 
-+	if (event_id >= BIT_ULL(device->num_eventid_bits))
-+		return E_ITS_MAPTI_ID_OOR;
-+
- 	if (its_cmd_get_command(its_cmd) == GITS_CMD_MAPTI)
- 		lpi_nr = its_cmd_get_physical_id(its_cmd);
- 	else
-@@ -865,11 +872,15 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- {
- 	u32 device_id = its_cmd_get_deviceid(its_cmd);
- 	bool valid = its_cmd_get_validbit(its_cmd);
-+	u8 num_eventid_bits = its_cmd_get_size(its_cmd);
- 	struct its_device *device;
- 
- 	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
- 		return E_ITS_MAPD_DEVICE_OOR;
- 
-+	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
-+		return E_ITS_MAPD_ITTSIZE_OOR;
-+
- 	device = find_its_device(its, device_id);
- 
- 	/*
-@@ -892,6 +903,8 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
- 		return -ENOMEM;
- 
- 	device->device_id = device_id;
-+	device->num_eventid_bits = num_eventid_bits;
-+
- 	INIT_LIST_HEAD(&device->itt_head);
- 
- 	list_add_tail(&device->dev_list, &its->device_list);
+ extern struct kvm_io_device_ops kvm_io_gic_ops;
 -- 
 2.9.0
