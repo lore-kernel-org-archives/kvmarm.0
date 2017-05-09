@@ -1,106 +1,114 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v3 05/10] KVM: arm/arm64: don't clear exit request from
- caller
-Date: Tue, 9 May 2017 19:17:06 +0200
-Message-ID: <20170509171706.huhsia6lasf46bo6@kamzik.brq.redhat.com>
-References: <20170503160635.21669-1-drjones@redhat.com>
- <20170503160635.21669-6-drjones@redhat.com>
- <20170506181256.GB5923@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 00/31] arm64: KVM: Mediate access to GICv3 sysregs at EL2
+Date: Tue, 9 May 2017 18:39:42 +0100
+Message-ID: <be454720-190b-8730-4c04-b4098b33df45@arm.com>
+References: <20170503104606.19342-1-marc.zyngier@arm.com>
+ <3f177b5e-e5c1-c681-1607-0a80c5aafba4@caviumnetworks.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170506181256.GB5923@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 995AE408EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 13:36:32 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id lJY3JvW6Esd4 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 May 2017 13:36:31 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 05C0040430
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 13:36:30 -0400 (EDT)
+In-Reply-To: <3f177b5e-e5c1-c681-1607-0a80c5aafba4@caviumnetworks.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: David Daney <ddaney@caviumnetworks.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, May 06, 2017 at 08:12:56PM +0200, Christoffer Dall wrote:
-> On Wed, May 03, 2017 at 06:06:30PM +0200, Andrew Jones wrote:
-> > VCPU requests that the receiver should handle should only be cleared
-> > by the receiver. 
+On 09/05/17 01:05, David Daney wrote:
+> On 05/03/2017 03:45 AM, Marc Zyngier wrote:
+>> [Apologies for posting this at the beginning of a merge window, but as
+>>   this is a rather hot topic, I'd rather put it out as soon as possible]
+>>
+>> Some systems have less than perfect GICv3 implementations, leading to
+>> all kind of ugly issues (guest hanging, host dying). In order to allow
+>> some level of diagnostic, and in some cases implement workarounds,
+>> this series enables the trapping of both Group-0, Group-1 and Common
+>> sysregs. Mediating the access at EL2 allows some form of sanity
+>> checking that the HW is sometimes sorely lacking.
+>>
+>> Instead of fully emulating a GICv3 CPU interface, we still use the
+>> existing HW (list registers, AP registers, VMCR...), which allows the
+>> code to be independent from the rest of the KVM code, and to cope with
+>> partial trapping.
+>>
+>> Of course, trapping has a cost, which is why this must be either
+>> enabled on the command line, or selected by another cpu capability
+>> (see Cavium erratum 30115). A quick test on an A57-based platform
+>> shows a 25% hit when repeatedly banging on the trapped registers,
+>> while normal workloads do not seem to suffer noticeably from such
+>> trapping (hackbench variance is in the usual noise, despite being very
+>> IPI happy).
+>>
+>> This has been tested on a dual socket Thundex-X and a Freescale LS-2085a.
+>>
+>> The first 6 patches are fixes, and only here for reference as they
+>> have already been posted separately. The rest of the patches implement
+>> Group-1, Group-0 and Common sysreg handlers, with the corresponding
+>> command line options. I've also taken the liberty to rebase David
+>> Daney's initial Cavium erratum 30115 workaround on top of this series,
+>> and included it here as a typical use case.
+>>
 > 
-> I cannot parse this sentence.
-
-I'll try again:
-
-VCPU requests should only be cleared by the receiving VCPUs.  The only
-exception is when a request is set as a side-effect.  In these cases
-the "requester" threads may clear the requests when it is sure the
-receiving VCPUs do not need to see them.
-
 > 
-> > Not only does this properly implement the protocol,
-> > but also avoids bugs where one VCPU clears another VCPU's request,
-> > before the receiving VCPU has had a chance to see it.
+> Thanks Marc for working on this.
 > 
-> Is this an actual race we have currently or just something thay may
-> happen later.  Im' not sure.
-
-Since ARM is just learning to handle VCPU requests, then it's not a bug
-now.  Actually, I think I should state this protocol (what I wrote above)
-in the document, and then I can just reference that here in this commit
-message as the justification for change.
-
+> I tested this series based on your git branch:
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/gicv3-cpuif-mediated-access
 > 
-> > ARM VCPUs
-> > currently only handle one request, EXIT, and handling it is achieved
-> > by checking pause to see if the VCPU should sleep.
+> This does indeed fix the problems we were seeing, so feel free to add:
 > 
-> This makes sense.  So forget my comment on the previous patch about
-> getting rid of the pause flag.
-
-Forgotten
-
+> Tested-by: David Daney <david.daney@cavium.com>
 > 
-> > 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  arch/arm/kvm/arm.c | 10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> > index 9174ed13135a..7be0d9b0c63a 100644
-> > --- a/arch/arm/kvm/arm.c
-> > +++ b/arch/arm/kvm/arm.c
-> > @@ -553,7 +553,6 @@ void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
-> >  
-> > -	kvm_clear_request(KVM_REQ_VCPU_EXIT, vcpu);
-> >  	vcpu->arch.pause = false;
-> >  	swake_up(wq);
-> >  }
-> > @@ -625,7 +624,14 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >  
-> >  		update_vttbr(vcpu->kvm);
-> >  
-> > -		if (vcpu->arch.power_off || vcpu->arch.pause)
-> > +		if (kvm_request_pending(vcpu)) {
-> > +			if (kvm_check_request(KVM_REQ_VCPU_EXIT, vcpu)) {
-> > +				if (vcpu->arch.pause)
-> > +					vcpu_sleep(vcpu);
-> > +			}
-> 
-> Can we factor out this bit to a separate function,
-> kvm_handle_vcpu_requests() or something like that?
+> to the entire series.
 
-Later patches make this look a bit better, but a function to bundle all
-the request handling up sounds good too. Will do.
+Thanks for having given it a go.
 
 > 
-> > +		}
-> > +
-> > +		if (vcpu->arch.power_off)
-> >  			vcpu_sleep(vcpu);
-> >  
-> >  		/*
-> > -- 
-> > 2.9.3
-> > 
-> Thanks,
-> -Christoffer
+> I would note that with these patches we see an occasional:
+> 
+> [ 3868.311491] Unexpected interrupt 4 on vcpu ffff801f57a6a020
+> [ 4262.063419] Unexpected interrupt 4 on vcpu ffff801f5b3dc040
+> [ 4262.063422] Unexpected interrupt 4 on vcpu ffff801f50972020
+> 
+> This is better than locking up the system, but I wonder if it indicates 
+> that improvement to the code is still possible.
+
+This warning occasionally shows up on the same platform even without
+these patches (it is just harder to trigger). This is an artefact of the
+way KVM treats the virtual timer, disabling it on exit and expecting it
+to immediately retired from the CPU interface. This works just fine on
+all systems, except for this platform where it seems to take a bit more
+time.
+
+Trapping things at EL2 introduces just enough additional latency that we
+end-up exiting with a pending interrupt more often than without the
+trapping, trigger this warning.
+
+The good news is twofold: this is completely harmless (we just get an
+extra interrupt on the host), and Christoffer is working on patches that
+will change the way we handle this so that we actually make use of that
+interrupt.
 
 Thanks,
-drew
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
