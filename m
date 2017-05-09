@@ -1,114 +1,141 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 00/31] arm64: KVM: Mediate access to GICv3 sysregs at EL2
-Date: Tue, 9 May 2017 18:39:42 +0100
-Message-ID: <be454720-190b-8730-4c04-b4098b33df45@arm.com>
-References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <3f177b5e-e5c1-c681-1607-0a80c5aafba4@caviumnetworks.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v3 07/10] KVM: arm/arm64: optimize VCPU RUN
+Date: Tue, 9 May 2017 19:40:57 +0200
+Message-ID: <20170509174057.kzjomkgxieqzlzag@kamzik.brq.redhat.com>
+References: <20170503160635.21669-1-drjones@redhat.com>
+ <20170503160635.21669-8-drjones@redhat.com>
+ <20170506182715.GD5923@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 995AE408EB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 13:36:32 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lJY3JvW6Esd4 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 May 2017 13:36:31 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 05C0040430
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 13:36:30 -0400 (EDT)
-In-Reply-To: <3f177b5e-e5c1-c681-1607-0a80c5aafba4@caviumnetworks.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: David Daney <ddaney@caviumnetworks.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170506182715.GD5923@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 09/05/17 01:05, David Daney wrote:
-> On 05/03/2017 03:45 AM, Marc Zyngier wrote:
->> [Apologies for posting this at the beginning of a merge window, but as
->>   this is a rather hot topic, I'd rather put it out as soon as possible]
->>
->> Some systems have less than perfect GICv3 implementations, leading to
->> all kind of ugly issues (guest hanging, host dying). In order to allow
->> some level of diagnostic, and in some cases implement workarounds,
->> this series enables the trapping of both Group-0, Group-1 and Common
->> sysregs. Mediating the access at EL2 allows some form of sanity
->> checking that the HW is sometimes sorely lacking.
->>
->> Instead of fully emulating a GICv3 CPU interface, we still use the
->> existing HW (list registers, AP registers, VMCR...), which allows the
->> code to be independent from the rest of the KVM code, and to cope with
->> partial trapping.
->>
->> Of course, trapping has a cost, which is why this must be either
->> enabled on the command line, or selected by another cpu capability
->> (see Cavium erratum 30115). A quick test on an A57-based platform
->> shows a 25% hit when repeatedly banging on the trapped registers,
->> while normal workloads do not seem to suffer noticeably from such
->> trapping (hackbench variance is in the usual noise, despite being very
->> IPI happy).
->>
->> This has been tested on a dual socket Thundex-X and a Freescale LS-2085a.
->>
->> The first 6 patches are fixes, and only here for reference as they
->> have already been posted separately. The rest of the patches implement
->> Group-1, Group-0 and Common sysreg handlers, with the corresponding
->> command line options. I've also taken the liberty to rebase David
->> Daney's initial Cavium erratum 30115 workaround on top of this series,
->> and included it here as a typical use case.
->>
+On Sat, May 06, 2017 at 08:27:15PM +0200, Christoffer Dall wrote:
+> On Wed, May 03, 2017 at 06:06:32PM +0200, Andrew Jones wrote:
 > 
+> nit: can you make the subject of this patch a bit more specific?
 > 
-> Thanks Marc for working on this.
-> 
-> I tested this series based on your git branch:
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/gicv3-cpuif-mediated-access
-> 
-> This does indeed fix the problems we were seeing, so feel free to add:
-> 
-> Tested-by: David Daney <david.daney@cavium.com>
-> 
-> to the entire series.
+> For example:  Optimize checking power_off flag in KVM_RUN
 
-Thanks for having given it a go.
+OK
 
 > 
-> I would note that with these patches we see an occasional:
+> > We can make a small optimization by not checking the state of
+> > the power_off field on each run. This is done by treating
+> > power_off like pause, only checking it when we get the EXIT
+> > VCPU request. When a VCPU powers off another VCPU the EXIT
+> > request is already made, so we just need to make sure the
+> > request is also made on self power off. kvm_vcpu_kick() isn't
+> > necessary for these cases, as the VCPU would just be kicking
+> > itself, but we add it anyway as a self kick doesn't cost much,
+> > and it makes the code more future-proof.
+> > 
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  arch/arm/kvm/arm.c  | 16 ++++++++++------
+> >  arch/arm/kvm/psci.c |  2 ++
+> >  2 files changed, 12 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> > index 26d9d4d72853..24bbc7671d89 100644
+> > --- a/arch/arm/kvm/arm.c
+> > +++ b/arch/arm/kvm/arm.c
+> > @@ -371,6 +371,13 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> >  	kvm_timer_vcpu_put(vcpu);
+> >  }
+> >  
+> > +static void vcpu_power_off(struct kvm_vcpu *vcpu)
+> > +{
+> > +	vcpu->arch.power_off = true;
+> > +	kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
+> > +	kvm_vcpu_kick(vcpu);
+> > +}
+> > +
+> >  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+> >  				    struct kvm_mp_state *mp_state)
+> >  {
+> > @@ -390,7 +397,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+> >  		vcpu->arch.power_off = false;
+> >  		break;
+> >  	case KVM_MP_STATE_STOPPED:
+> > -		vcpu->arch.power_off = true;
+> > +		vcpu_power_off(vcpu);
+> >  		break;
+> >  	default:
+> >  		return -EINVAL;
+> > @@ -626,14 +633,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> >  
+> >  		if (kvm_request_pending(vcpu)) {
+> >  			if (kvm_check_request(KVM_REQ_VCPU_EXIT, vcpu)) {
+> > -				if (vcpu->arch.pause)
+> > +				if (vcpu->arch.power_off || vcpu->arch.pause)
+> >  					vcpu_sleep(vcpu);
+> >  			}
+> >  		}
+> >  
+> > -		if (vcpu->arch.power_off)
+> > -			vcpu_sleep(vcpu);
+> > -
 > 
-> [ 3868.311491] Unexpected interrupt 4 on vcpu ffff801f57a6a020
-> [ 4262.063419] Unexpected interrupt 4 on vcpu ffff801f5b3dc040
-> [ 4262.063422] Unexpected interrupt 4 on vcpu ffff801f50972020
-> 
-> This is better than locking up the system, but I wonder if it indicates 
-> that improvement to the code is still possible.
+> Hmmm, even though I just gave a reviewed-by on the pause side, I'm not
+> realizing that I don't think this works.  Because you're now only
+> checking requests in the vcpu loop, but the vcpu_sleep() function is
+> implemented using swait_event_interruptible(), which can wake up if you
+> have a pending signal for example, and then the loop can wrap around and
+> you can run the VCPU even though you should be paused.  Am I missing
+> something?
 
-This warning occasionally shows up on the same platform even without
-these patches (it is just harder to trigger). This is an artefact of the
-way KVM treats the virtual timer, disabling it on exit and expecting it
-to immediately retired from the CPU interface. This works just fine on
-all systems, except for this platform where it seems to take a bit more
-time.
+Hmm, I think I missed something. I missed that swait_event_interruptible()
+doesn't check its condition again when awoken by a signal (which, as far
+as I can tell, is the only other way we can stop vcpu_sleep() while
+power_off and/or pause are true.  Had I noticed that, I could have
+addressed it in one of two ways:
 
-Trapping things at EL2 introduces just enough additional latency that we
-end-up exiting with a pending interrupt more often than without the
-trapping, trigger this warning.
-
-The good news is twofold: this is completely harmless (we just get an
-extra interrupt on the host), and Christoffer is working on patches that
-will change the way we handle this so that we actually make use of that
-interrupt.
+ 1) Leave power_off and pause in the condition that stops guest entry.
+    Easy to see we'll never enter guest mode with one or both set.
+    
+ 2) Add a comment somewhere to explain the subtle dependency vcpu_sleep()
+    has on the pending signal check done after its call and before the
+    condition that stops guest entry is run. (IOW, I don't think we have
+    a bug with this series, but we do have a non-commented subtlety.)
 
 Thanks,
+drew
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> 
+> Thanks,
+> -Christoffer
+> 
+> >  		/*
+> >  		 * Preparing the interrupts to be injected also
+> >  		 * involves poking the GIC, which must be done in a
+> > @@ -903,7 +907,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+> >  	 * Handle the "start in power-off" case.
+> >  	 */
+> >  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+> > -		vcpu->arch.power_off = true;
+> > +		vcpu_power_off(vcpu);
+> >  	else
+> >  		vcpu->arch.power_off = false;
+> >  
+> > diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
+> > index f189d0ad30d5..4a436685c552 100644
+> > --- a/arch/arm/kvm/psci.c
+> > +++ b/arch/arm/kvm/psci.c
+> > @@ -65,6 +65,8 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+> >  static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+> >  {
+> >  	vcpu->arch.power_off = true;
+> > +	kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
+> > +	kvm_vcpu_kick(vcpu);
+> >  }
+> >  
+> >  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> > -- 
+> > 2.9.3
+> > 
