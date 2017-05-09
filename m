@@ -1,87 +1,76 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 27/37] KVM: arm/arm64: Clarification and relaxation to ITS save/restore ABI
-Date: Tue,  9 May 2017 12:44:56 +0200
-Message-ID: <20170509104506.30929-28-cdall@linaro.org>
+Subject: [PULL 22/37] KVM: arm64: vgic-its: vgic_its_check_id returns the entry's GPA
+Date: Tue,  9 May 2017 12:44:51 +0200
+Message-ID: <20170509104506.30929-23-cdall@linaro.org>
 References: <20170509104506.30929-1-cdall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170509104506.30929-1-cdall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Clarify what is meant by the save/restore ABI only supporting virtual
-physical interrupts.
+From: Eric Auger <eric.auger@redhat.com>
 
-Relax the requirement of the order that the collection entries are
-written in and be clear that there is no particular ordering enforced.
+As vgic_its_check_id() computes the device/collection entry's
+GPA, let's return it so that new callers can retrieve it easily.
 
-Some cosmetic changes in the capitalization of ID names to align with
-the GICv3 manual and remove the empty line in the bottom of the patch.
-
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Acked-by: Christoffer Dall <cdall@linaro.org>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- Documentation/virtual/kvm/devices/arm-vgic-its.txt | 23 +++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic-its.txt b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-index ba132e9..eb06beb 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic-its.txt
-@@ -97,8 +97,8 @@ Groups:
- The following ordering must be followed when restoring the GIC and the ITS:
- a) restore all guest memory and create vcpus
- b) restore all redistributors
--c) initialize the ITS and then provide its base address
--   (KVM_DEV_ARM_VGIC_CTRL_INIT, KVM_DEV_ARM_VGIC_GRP_ADDR)
-+c) provide the its base address
-+   (KVM_DEV_ARM_VGIC_GRP_ADDR)
- d) restore the ITS in the following order:
-    1. Restore GITS_CBASER
-    2. Restore all other GITS_ registers, except GITS_CTLR!
-@@ -110,12 +110,14 @@ Then vcpus can be started.
-  ITS Table ABI REV0:
-  -------------------
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 5523f0a..90afc83 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -694,7 +694,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+  * is actually valid (covered by a memslot and guest accessible).
+  * For this we have to read the respective first level entry.
+  */
+-static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
++static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
++			      gpa_t *eaddr)
+ {
+ 	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
+ 	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
+@@ -725,6 +726,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
+ 		addr = BASER_ADDRESS(baser) + id * esz;
+ 		gfn = addr >> PAGE_SHIFT;
  
-- Revision 0 of the ABI only supports physical LPIs.
-+ Revision 0 of the ABI only supports the features of a virtual GICv3, and does
-+ not support a virtual GICv4 with support for direct injection of virtual
-+ interrupts for nested hypervisors.
++		if (eaddr)
++			*eaddr = addr;
+ 		return kvm_is_visible_gfn(its->dev->kvm, gfn);
+ 	}
  
-- The device table and ITT are indexed by the deviceid and eventid,
-- respectively. The collection table is not indexed by collectionid:
-- CTEs are written in the table in the order of collection creation. All
-- entries are 8 bytes.
-+ The device table and ITT are indexed by the DeviceID and EventID,
-+ respectively. The collection table is not indexed by CollectionID, and the
-+ entries in the collection are listed in no particular order.
-+ All entries are 8 bytes.
+@@ -757,6 +760,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id)
+ 	indirect_ptr += index * esz;
+ 	gfn = indirect_ptr >> PAGE_SHIFT;
  
-  Device Table Entry (DTE):
++	if (eaddr)
++		*eaddr = indirect_ptr;
+ 	return kvm_is_visible_gfn(its->dev->kvm, gfn);
+ }
  
-@@ -126,10 +128,10 @@ Then vcpus can be started.
-  - V indicates whether the entry is valid. If not, other fields
-    are not meaningful.
-  - next: equals to 0 if this entry is the last one; otherwise it
--   corresponds to the deviceid offset to the next DTE, capped by
-+   corresponds to the DeviceID offset to the next DTE, capped by
-    2^14 -1.
-  - ITT_addr matches bits [51:8] of the ITT address (256 Byte aligned).
-- - Size specifies the supported number of bits for the eventid,
-+ - Size specifies the supported number of bits for the EventID,
-    minus one
+@@ -766,7 +771,7 @@ static int vgic_its_alloc_collection(struct vgic_its *its,
+ {
+ 	struct its_collection *collection;
  
-  Collection Table Entry (CTE):
-@@ -151,8 +153,7 @@ Then vcpus can be started.
+-	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id))
++	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
+ 		return E_ITS_MAPC_COLLECTION_OOR;
  
-  where:
-  - next: equals to 0 if this entry is the last one; otherwise it corresponds
--   to the eventid offset to the next ITE capped by 2^16 -1.
-+   to the EventID offset to the next ITE capped by 2^16 -1.
-  - pINTID is the physical LPI ID; if zero, it means the entry is not valid
-    and other fields are not meaningful.
-  - ICID is the collection ID
--
+ 	collection = kzalloc(sizeof(*collection), GFP_KERNEL);
+@@ -939,7 +944,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
+ 	gpa_t itt_addr = its_cmd_get_ittaddr(its_cmd);
+ 	struct its_device *device;
+ 
+-	if (!vgic_its_check_id(its, its->baser_device_table, device_id))
++	if (!vgic_its_check_id(its, its->baser_device_table, device_id, NULL))
+ 		return E_ITS_MAPD_DEVICE_OOR;
+ 
+ 	if (valid && num_eventid_bits > VITS_TYPER_IDBITS)
 -- 
 2.9.0
