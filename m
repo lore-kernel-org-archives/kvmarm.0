@@ -1,81 +1,58 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v2 10/11] KVM: arm/arm64: Don't call map_resources when
- restoring ITS tables
-Date: Tue,  9 May 2017 10:56:17 +0200
-Message-ID: <20170509085618.28311-11-cdall@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v2 03/11] KVM: Add kvm_vcpu_get_idx to get vcpu index in
+ kvm->vcpus
+Date: Tue, 9 May 2017 11:44:24 +0200
+Message-ID: <0f3e3b18-2b62-58c6-ed82-9620943b568e@redhat.com>
 References: <20170509085618.28311-1-cdall@linaro.org>
+ <20170509085618.28311-4-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B28EA40C27
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 04:53:20 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dk3VhT+g1eO9 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 May 2017 04:53:20 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D1D740B5B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 04:53:19 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id 142so92908365wma.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 01:56:34 -0700 (PDT)
-In-Reply-To: <20170509085618.28311-1-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170509085618.28311-4-cdall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The only reason we called kvm_vgic_map_resources() when restoring the
-ITS tables was because we wanted to have the KVM iodevs registered in
-the KVM IO bus framework at the time when the ITS was restored such that
-a restored and active device can inject MSIs prior to otherwise calling
-kvm_vgic_map_resources() from the first run of a VCPU.
+Hi Christoffer,
 
-Since we now register the KVM iodevs for the redestributors and ITS as
-soon as possible (when setting the base addresses), we no longer need
-this call and kvm_vgic_map_resources() is again called only when first
-running a VCPU.
-
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
+On 09/05/2017 10:56, Christoffer Dall wrote:
+> There are occasional needs to use the index of vcpu in the kvm->vcpus
+> array to map something related to a VCPU.  For example, unlike the
+> vcpu->vcpu_id, the vcpu index is guaranteed to not be sparse across all
+> vcpus which is useful when allocating a memory area for each vcpu.
+> 
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
----
- virt/kvm/arm/vgic/vgic-its.c | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 89acaef..9aeaff0 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -2308,20 +2308,12 @@ static int vgic_its_restore_tables_v0(struct vgic_its *its)
- 		goto out;
- 
- 	ret = vgic_its_restore_device_tables(its);
--
- out:
- 	unlock_all_vcpus(kvm);
- 	mutex_unlock(&its->its_lock);
- 	mutex_unlock(&kvm->lock);
- 
--	if (ret)
--		return ret;
--
--	/*
--	 * On restore path, MSI injections can happen before the
--	 * first VCPU run so let's complete the GIC init here.
--	 */
--	return kvm_vgic_map_resources(its->dev->kvm);
-+	return ret;
- }
- 
- static int vgic_its_commit_v0(struct vgic_its *its)
--- 
-2.9.0
+Thanks
+
+Eric
+> ---
+>  include/linux/kvm_host.h | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 2c14ad9..12eb26d 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -490,6 +490,17 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
+>  	return NULL;
+>  }
+>  
+> +static inline int kvm_vcpu_get_idx(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_vcpu *tmp;
+> +	int idx;
+> +
+> +	kvm_for_each_vcpu(idx, tmp, vcpu->kvm)
+> +		if (tmp == vcpu)
+> +			return idx;
+> +	BUG();
+> +}
+> +
+>  #define kvm_for_each_memslot(memslot, slots)	\
+>  	for (memslot = &slots->memslots[0];	\
+>  	      memslot < slots->memslots + KVM_MEM_SLOTS_NUM && memslot->npages;\
+> 
