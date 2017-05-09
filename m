@@ -1,26 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 35/37] KVM: arm/arm64: Register ITS iodev when setting base
- address
-Date: Tue,  9 May 2017 12:45:04 +0200
-Message-ID: <20170509104506.30929-36-cdall@linaro.org>
+Subject: [PULL 37/37] KVM: arm/arm64: vgic-its: Cleanup after failed ITT
+ restore
+Date: Tue,  9 May 2017 12:45:06 +0200
+Message-ID: <20170509104506.30929-38-cdall@linaro.org>
 References: <20170509104506.30929-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AC7540DD3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E897740BAC
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K6LV+qvMPiFz for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 May 2017 06:42:38 -0400 (EDT)
-Received: from mail-qk0-f182.google.com (mail-qk0-f182.google.com
- [209.85.220.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4D3E640C56
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:31 -0400 (EDT)
-Received: by mail-qk0-f182.google.com with SMTP id y201so42670652qka.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:46 -0700 (PDT)
+ with ESMTP id yzB06Ut5crCq for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 May 2017 06:42:40 -0400 (EDT)
+Received: from mail-qk0-f174.google.com (mail-qk0-f174.google.com
+ [209.85.220.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 368B240DAF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 May 2017 06:42:33 -0400 (EDT)
+Received: by mail-qk0-f174.google.com with SMTP id k74so75288762qke.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 May 2017 03:45:48 -0700 (PDT)
 In-Reply-To: <20170509104506.30929-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,136 +35,86 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We have to register the ITS iodevice before running the VM, because in
-migration scenarios, we may be restoring a live device that wishes to
-inject MSIs before the VCPUs have started.
+When failing to restore the ITT for a DTE, we should remove the failed
+device entry from the list and free the object.
 
-All we need to register the ITS io device is the base address of the
-ITS, so we can simply register that when the base address of the ITS is
-set.
-
-  [ Code to fix concurrency issues when setting the ITS base address and
-    to fix the undef base address check written by Marc Zyngier ]
+We slightly refactor vgic_its_destroy to be able to reuse the now
+separate vgic_its_free_dte() function.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 44 ++++++++++----------------------------------
- virt/kvm/arm/vgic/vgic-v3.c  |  8 --------
- virt/kvm/arm/vgic/vgic.h     |  1 -
- 3 files changed, 10 insertions(+), 43 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 35 ++++++++++++++++++++++-------------
+ 1 file changed, 22 insertions(+), 13 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 18318c6..89acaef 100644
+index 9aeaff0..2dff288 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1540,14 +1540,19 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu)
- 		its_sync_lpi_pending_table(vcpu);
+@@ -1613,13 +1613,20 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 	return vgic_its_set_abi(its, NR_ITS_ABIS - 1);
  }
  
--static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
-+static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its,
-+				   u64 addr)
++static void vgic_its_free_device(struct kvm *kvm, struct its_device *dev)
++{
++	struct its_ite *ite, *tmp;
++
++	list_for_each_entry_safe(ite, tmp, &dev->itt_head, ite_list)
++		its_free_ite(kvm, ite);
++	list_del(&dev->dev_list);
++	kfree(dev);
++}
++
+ static void vgic_its_destroy(struct kvm_device *kvm_dev)
  {
- 	struct vgic_io_device *iodev = &its->iodev;
- 	int ret;
+ 	struct kvm *kvm = kvm_dev->kvm;
+ 	struct vgic_its *its = kvm_dev->private;
+-	struct its_device *dev;
+-	struct its_ite *ite;
+-	struct list_head *dev_cur, *dev_temp;
+ 	struct list_head *cur, *temp;
  
--	if (IS_VGIC_ADDR_UNDEF(its->vgic_its_base))
--		return -ENXIO;
-+	mutex_lock(&kvm->slots_lock);
-+	if (!IS_VGIC_ADDR_UNDEF(its->vgic_its_base)) {
-+		ret = -EBUSY;
-+		goto out;
+ 	/*
+@@ -1630,19 +1637,19 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+ 		return;
+ 
+ 	mutex_lock(&its->its_lock);
+-	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
+-		dev = container_of(dev_cur, struct its_device, dev_list);
+-		list_for_each_safe(cur, temp, &dev->itt_head) {
+-			ite = (container_of(cur, struct its_ite, ite_list));
+-			its_free_ite(kvm, ite);
+-		}
+-		list_del(dev_cur);
+-		kfree(dev);
++	list_for_each_safe(cur, temp, &its->device_list) {
++		struct its_device *dev;
++
++		dev = list_entry(cur, struct its_device, dev_list);
++		vgic_its_free_device(kvm, dev);
+ 	}
+ 
+ 	list_for_each_safe(cur, temp, &its->collection_list) {
++		struct its_collection *coll;
++
++		coll = list_entry(cur, struct its_collection, coll_list);
+ 		list_del(cur);
+-		kfree(container_of(cur, struct its_collection, coll_list));
++		kfree(coll);
+ 	}
+ 	mutex_unlock(&its->its_lock);
+ 
+@@ -2012,8 +2019,10 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+ 		return PTR_ERR(dev);
+ 
+ 	ret = vgic_its_restore_itt(its, dev);
+-	if (ret)
++	if (ret) {
++		vgic_its_free_device(its->dev->kvm, dev);
+ 		return ret;
 +	}
  
-+	its->vgic_its_base = addr;
- 	iodev->regions = its_registers;
- 	iodev->nr_regions = ARRAY_SIZE(its_registers);
- 	kvm_iodevice_init(&iodev->dev, &kvm_io_gic_ops);
-@@ -1555,9 +1560,9 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its)
- 	iodev->base_addr = its->vgic_its_base;
- 	iodev->iodev_type = IODEV_ITS;
- 	iodev->its = its;
--	mutex_lock(&kvm->slots_lock);
- 	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, iodev->base_addr,
- 				      KVM_VGIC_V3_ITS_SIZE, &iodev->dev);
-+out:
- 	mutex_unlock(&kvm->slots_lock);
- 
- 	return ret;
-@@ -2384,9 +2389,7 @@ static int vgic_its_set_attr(struct kvm_device *dev,
- 		if (ret)
- 			return ret;
- 
--		its->vgic_its_base = addr;
--
--		return 0;
-+		return vgic_register_its_iodev(dev->kvm, its, addr);
- 	}
- 	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
- 		const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-@@ -2462,30 +2465,3 @@ int kvm_vgic_register_its_device(void)
- 	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
- 				       KVM_DEV_TYPE_ARM_VGIC_ITS);
+ 	return offset;
  }
--
--/*
-- * Registers all ITSes with the kvm_io_bus framework.
-- * To follow the existing VGIC initialization sequence, this has to be
-- * done as late as possible, just before the first VCPU runs.
-- */
--int vgic_register_its_iodevs(struct kvm *kvm)
--{
--	struct kvm_device *dev;
--	int ret = 0;
--
--	list_for_each_entry(dev, &kvm->devices, vm_node) {
--		if (dev->ops != &kvm_arm_vgic_its_ops)
--			continue;
--
--		ret = vgic_register_its_iodev(kvm, dev->private);
--		if (ret)
--			return ret;
--		/*
--		 * We don't need to care about tearing down previously
--		 * registered ITSes, as the kvm_io_bus framework removes
--		 * them for us if the VM gets destroyed.
--		 */
--	}
--
--	return ret;
--}
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index bb35078..8fa737e 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -397,14 +397,6 @@ int vgic_v3_map_resources(struct kvm *kvm)
- 		goto out;
- 	}
- 
--	if (vgic_has_its(kvm)) {
--		ret = vgic_register_its_iodevs(kvm);
--		if (ret) {
--			kvm_err("Unable to register VGIC ITS MMIO regions\n");
--			goto out;
--		}
--	}
--
- 	dist->ready = true;
- 
- out:
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 5f17eac..8ac7397 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -181,7 +181,6 @@ bool vgic_v3_check_base(struct kvm *kvm);
- void vgic_v3_load(struct kvm_vcpu *vcpu);
- void vgic_v3_put(struct kvm_vcpu *vcpu);
- 
--int vgic_register_its_iodevs(struct kvm *kvm);
- bool vgic_has_its(struct kvm *kvm);
- int kvm_vgic_register_its_device(void);
- void vgic_enable_lpis(struct kvm_vcpu *vcpu);
 -- 
 2.9.0
