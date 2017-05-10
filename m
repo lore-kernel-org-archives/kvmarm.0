@@ -1,151 +1,170 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v3 07/10] KVM: arm/arm64: optimize VCPU RUN
-Date: Wed, 10 May 2017 10:20:13 +0200
-Message-ID: <20170510082013.euscpds2og52j3xe@kamzik.brq.redhat.com>
-References: <20170503160635.21669-1-drjones@redhat.com>
- <20170503160635.21669-8-drjones@redhat.com>
- <20170506182715.GD5923@cbox>
- <20170509174057.kzjomkgxieqzlzag@kamzik.brq.redhat.com>
- <20170509201347.GA1519@lvm>
- <20170510065815.luarxot5h7ucqeoz@kamzik.brq.redhat.com>
- <20170510080734.GA28721@cbox>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v3 3/3] arm/arm64: signal SIBGUS and inject SEA Error
+Date: Wed, 10 May 2017 16:44:53 +0800
+Message-ID: <75907fb5-440f-2cbe-762a-d139c4bfdd2d@huawei.com>
+References: <CAMj-D2BGTDKpOcMu2ip41_MTTj8VDwvs59Ds7yvLHcD8PeQzhg@mail.gmail.com>
+ <5910AAA2.4030304@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170510080734.GA28721@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <5910AAA2.4030304@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>, gengdongjiu <gengdj.1984@gmail.com>
+Cc: Tyler Baicar <tbaicar@codeaurora.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, Len Brown <lenb@kernel.org>, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, Sandeepa Prabhu <sandeepa.s.prabhu@gmail.com>, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, Fu Wei <fu.wei@linaro.org>, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infra
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 10, 2017 at 10:07:34AM +0200, Christoffer Dall wrote:
-> On Wed, May 10, 2017 at 08:58:15AM +0200, Andrew Jones wrote:
-> > On Tue, May 09, 2017 at 01:13:47PM -0700, Christoffer Dall wrote:
-> > > On Tue, May 09, 2017 at 07:40:57PM +0200, Andrew Jones wrote:
-> > > > On Sat, May 06, 2017 at 08:27:15PM +0200, Christoffer Dall wrote:
-> > > > > On Wed, May 03, 2017 at 06:06:32PM +0200, Andrew Jones wrote:
-> > > > > 
-> > > > > nit: can you make the subject of this patch a bit more specific?
-> > > > > 
-> > > > > For example:  Optimize checking power_off flag in KVM_RUN
-> > > > 
-> > > > OK
-> > > > 
-> > > > > 
-> > > > > > We can make a small optimization by not checking the state of
-> > > > > > the power_off field on each run. This is done by treating
-> > > > > > power_off like pause, only checking it when we get the EXIT
-> > > > > > VCPU request. When a VCPU powers off another VCPU the EXIT
-> > > > > > request is already made, so we just need to make sure the
-> > > > > > request is also made on self power off. kvm_vcpu_kick() isn't
-> > > > > > necessary for these cases, as the VCPU would just be kicking
-> > > > > > itself, but we add it anyway as a self kick doesn't cost much,
-> > > > > > and it makes the code more future-proof.
-> > > > > > 
-> > > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > > > ---
-> > > > > >  arch/arm/kvm/arm.c  | 16 ++++++++++------
-> > > > > >  arch/arm/kvm/psci.c |  2 ++
-> > > > > >  2 files changed, 12 insertions(+), 6 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> > > > > > index 26d9d4d72853..24bbc7671d89 100644
-> > > > > > --- a/arch/arm/kvm/arm.c
-> > > > > > +++ b/arch/arm/kvm/arm.c
-> > > > > > @@ -371,6 +371,13 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> > > > > >  	kvm_timer_vcpu_put(vcpu);
-> > > > > >  }
-> > > > > >  
-> > > > > > +static void vcpu_power_off(struct kvm_vcpu *vcpu)
-> > > > > > +{
-> > > > > > +	vcpu->arch.power_off = true;
-> > > > > > +	kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
-> > > > > > +	kvm_vcpu_kick(vcpu);
-> > > > > > +}
-> > > > > > +
-> > > > > >  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
-> > > > > >  				    struct kvm_mp_state *mp_state)
-> > > > > >  {
-> > > > > > @@ -390,7 +397,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
-> > > > > >  		vcpu->arch.power_off = false;
-> > > > > >  		break;
-> > > > > >  	case KVM_MP_STATE_STOPPED:
-> > > > > > -		vcpu->arch.power_off = true;
-> > > > > > +		vcpu_power_off(vcpu);
-> > > > > >  		break;
-> > > > > >  	default:
-> > > > > >  		return -EINVAL;
-> > > > > > @@ -626,14 +633,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> > > > > >  
-> > > > > >  		if (kvm_request_pending(vcpu)) {
-> > > > > >  			if (kvm_check_request(KVM_REQ_VCPU_EXIT, vcpu)) {
-> > > > > > -				if (vcpu->arch.pause)
-> > > > > > +				if (vcpu->arch.power_off || vcpu->arch.pause)
-> > > > > >  					vcpu_sleep(vcpu);
-> > > > > >  			}
-> > > > > >  		}
-> > > > > >  
-> > > > > > -		if (vcpu->arch.power_off)
-> > > > > > -			vcpu_sleep(vcpu);
-> > > > > > -
-> > > > > 
-> > > > > Hmmm, even though I just gave a reviewed-by on the pause side, I'm not
-> > > > > realizing that I don't think this works.  Because you're now only
-> > > > > checking requests in the vcpu loop, but the vcpu_sleep() function is
-> > > > > implemented using swait_event_interruptible(), which can wake up if you
-> > > > > have a pending signal for example, and then the loop can wrap around and
-> > > > > you can run the VCPU even though you should be paused.  Am I missing
-> > > > > something?
-> > > > 
-> > > > Hmm, I think I missed something. I missed that swait_event_interruptible()
-> > > > doesn't check its condition again when awoken by a signal (which, as far
-> > > > as I can tell, is the only other way we can stop vcpu_sleep() while
-> > > > power_off and/or pause are true.  Had I noticed that, I could have
-> > > > addressed it in one of two ways:
-> > > > 
-> > > >  1) Leave power_off and pause in the condition that stops guest entry.
-> > > >     Easy to see we'll never enter guest mode with one or both set.
-> > > >     
-> > > >  2) Add a comment somewhere to explain the subtle dependency vcpu_sleep()
-> > > >     has on the pending signal check done after its call and before the
-> > > >     condition that stops guest entry is run. (IOW, I don't think we have
-> > > >     a bug with this series, but we do have a non-commented subtlety.)
-> > > > 
-> > > 
-> > > But, then it can return to userspace and enter the kernel again, at
-> > > which time there will be no pending signal and no pending VCPU requests,
-> > > so the VCPU will enter the guest, but the pause flag can still be true
-> > > and it shouldn't enter the guest.  So I think there is a bug.
-> > 
-> > Ah, indeed.
-> > 
-> > > 
-> > > And I think the only nice way to solve it is to not clear the request
-> > > until the CPU is really not paused any more.
-> > 
-> > This would sort of circle back to the original approach of using the
-> > request bit as the state, but I've already convinced myself that that's
-> > too much abuse of VCPU requests to want to do it. (1) above would also
-> > work and also allow VCPU requests to be used as designed.
-> > 
-> > To tidy up the repeated 'vcpu->arch.power_off || vcpu->arch.pause'
-> > condition I think I'll just introduce a vcpu_should_sleep() to encapsulate
-> > it.
-> > 
-> 
-> Fair enough, but could we keep these two booleans as flags in a single
-> unsigned long on the vcpu struct then, so that we can do a single
-> check on them and call out to handle_run_flags or whatever, analogous to
-> how we handle requests?
+Hi James,
+  thanks a lot for your answer.
 
-Could do that.
+On 2017/5/9 1:28, James Morse wrote:
+> Hi gengdongjiu,
+> 
+> On 04/05/17 17:52, gengdongjiu wrote:
+>> 2017-05-04 23:42 GMT+08:00 gengdongjiu <gengdj.1984@gmail.com>:
+>>> On 30/04/17 06:37, Dongjiu Geng wrote:
+>>>> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+>>>> index 105b6ab..a96594f 100644
+>>>> --- a/arch/arm/kvm/mmu.c
+>>>> +++ b/arch/arm/kvm/mmu.c
+>>>> +static void kvm_handle_bad_page(unsigned long address,
+>>>> + bool hugetlb, bool hwpoison)
+>>>> +{
+>>>> + /* handle both hwpoison and other synchronous external Abort */
+>>>> + if (hwpoison)
+>>>> + kvm_send_signal(address, hugetlb, true);
+>>>> + else
+>>>> + kvm_send_signal(address, hugetlb, false);
+>>>> +}
+>>>
+>>> Why the extra level of indirection? We only want to signal userspace like this
+>>> from KVM for hwpoison. Signals for RAS related reasons should come from the bits
+>>> of the kernel that decoded the error.
+>>
+>> For the SEA, the are maily two types:
+>> 0b010000 Synchronous External Abort on memory access.
+>> 0b0101xx Synchronous External Abort on page table walk. DFSC[1:0]
+>> encode the level.
+> 
+> (KVM shouldn't have to make decisions about this)
+> 
+> 
+>> hwpoison should belong to the  "Synchronous External Abort on memory access"
+>> if the SEA type is not hwpoison, such as page table walk, do you mean
+>> KVM do not deliver the SIGBUS?
+> 
+> 
+> The flow of events should be SEI/SEA from firmware to the hosts's APEI code. KVM
+> should only be involved to get us back to the host if we were running a guest.
+> The APEI/hwpoison code may cause a set of processes to be sent signals. The code
+> in mm/memory-failure.c does this by walking the process rmaps using the physical
+> addresses in the CPER records.
+> 
+> We want user space to be sent signals as this can (and should) work in exactly
+> the same way on arm64 as it does on x86 or any other architecture. If a
+> web-browser can handle SIGBUS notifications for memory-corruption, it shouldn't
+> have to care what architecture it is running on.
+ Ok, James, understand.
 
 > 
-> The other way to do it would be to set the request on the VCPU itself
-> when returning from the sleep function if pause is still set...
+> So what is that KVM+SIGBUS patch about?...
+> 
+>>> (hwpoison for KVM is a corner case as Qemu's memory effectively has two users,
+>>> Qemu and KVM. This isn't the example of how user-space gets signalled.)
+> 
+> KVM creates guests as if they were additional users of Qemu's memory. The code
+> in mm/memory-failure.c may find that Qemu didn't have the affected page mapped
+> to user-space - but it may have been in use by stage2.
+> 
+> The KVM+SIGBUS patch hides this difference, meaning Qemu gets a signal when the
+> guest touches the hwpoison page as if Qemu had touched the page itself.
+> 
+> Signals from KVM is a corner case, for firmware-first decisions should happen in
+> the APEI code based on CPER records.
+> 
+> 
+>> If so, how the KVM handle the SEA type other than hwpoison?
+> 
+> To deliver to a guest? It shouldn't have to know, user space should use a KVM
+> API to drive this.
+> 
+> When received from hardware? It shouldn't have to care, these things should be
+> passed into the APEI code for handling. KVM just needs to put the host registers
+> back.
+Recently I confirmed with the hardware team. they said almost all the SEA errors have the
+Poison flag, so may be there is no need to consider other SEA errors other than  hwPoison.
+only consider SEA hwpoison errors can be enough.
 
-I like this suggestion more. I'll do that for v4.
+> 
+> 
+>>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>>>> index bb02909..1d2e2e7 100644
+>>>> --- a/include/uapi/linux/kvm.h
+>>>> +++ b/include/uapi/linux/kvm.h
+>>>> @@ -1306,6 +1306,7 @@ struct kvm_s390_ucas_mapping {
+>>>>  #define KVM_S390_GET_IRQ_STATE  _IOW(KVMIO, 0xb6, struct kvm_s390_irq_state)
+>>>>  /* Available with KVM_CAP_X86_SMM */
+>>>>  #define KVM_SMI                   _IO(KVMIO,   0xb7)
+>>>> +#define KVM_ARM_SEA               _IO(KVMIO,   0xb8)
+>>>>
+>>>>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU (1 << 0)
+>>>>  #define KVM_DEV_ASSIGN_PCI_2_3 (1 << 1)
+>>>>
+>>>
+>>> Why do we need a userspace API for SEA? It can also be done by using
+>>> KVM_{G,S}ET_ONE_REG to change the vcpu registers. The advantage of doing it this
+>>> way is you can choose which ESR value to use.
+>>>
+>>> Adding a new API call to do something you could do with an old one doesn't look
+>>> right.
+>>
+>> James, I considered your suggestion before that use the
+>> KVM_{G,S}ET_ONE_REG to change the vcpu registers. but I found it does
+>> not have difference to use the alread existed KVM API. 
+> 
+> (Only that is an in-kernel helper, not a published API)
 
-Thanks,
-drew
+yes, the kvm_inject_dabt is an in-kernel API.
+
+> 
+> 
+>> so may be
+>> changing the vcpu registers in qemu will duplicate with the KVM APIs.
+> 
+> That is true, but the alternative is a new API that doesn't do anything new, its
+> just more convenient.
+> 
+> Marc and Christoffer are the people to convince.
+> I argue the existing API is sufficient.
+> 
+> 
+>> injection a SEA is no more than setting some registers: elr_el1, PC,
+>> PSTATE, SPSR_el1, far_el1, esr_el1
+>> I seen this KVM API do the same thing as Qemu.  do you found call this
+>> API will have issue and necessary to choose another ESR value?
+> 
+> Should we let user-space pick the ESR to deliver to the guest? Yes, letting
+> user-space specify the ESR gives the most flexibility to do something clever in
+> the future. An obvious choice for SEA is between the external-abort and 'parity
+> or ECC error' codes. If we tell user-space which of these happened (I don't
+> think Linux does today) then Qemu can relay that information to the guest.
+
+may be the ESR is delivered by the KVM.
+(1) guest OS EL0 happen SEA due to hwpoison
+(2) CPU traps to EL3 firmware, and update the ESR_EL3
+(3) the EL3 firmware copies the ESR_EL3 to ESR_EL2
+(4) then jump to EL2 hypervisor, hypervisor uses the ESR_EL2 to inject the SEA.
+
+May be the esr_el2 can provide the accurate error information.
+or do you think user-space specify the ESR instead of esr_el2 is better?
+
+
+> 
+> 
+> 
+> Thanks,
+> 
+> James
+> 
+> .
+> 
