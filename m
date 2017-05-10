@@ -1,96 +1,157 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v3 1/3] arm64: kvm: support kvmtool to detect RAS
- extension feature
-Date: Wed, 10 May 2017 16:53:42 +0800
-Message-ID: <568977d3-d2d5-9bea-13dd-62d525274b69@huawei.com>
-References: <CAMj-D2BS7UHLC3DGM5i7fSRsqDKHmLYg79UV7sT6yHGFy5aYfw@mail.gmail.com>
- <5910AB5D.8060105@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 07/10] KVM: arm/arm64: optimize VCPU RUN
+Date: Wed, 10 May 2017 02:06:26 -0700
+Message-ID: <20170510090626.GA2339@lvm>
+References: <20170503160635.21669-1-drjones@redhat.com>
+ <20170503160635.21669-8-drjones@redhat.com>
+ <20170506182715.GD5923@cbox>
+ <20170509174057.kzjomkgxieqzlzag@kamzik.brq.redhat.com>
+ <20170509201347.GA1519@lvm>
+ <20170510065815.luarxot5h7ucqeoz@kamzik.brq.redhat.com>
+ <20170510080734.GA28721@cbox>
+ <20170510082013.euscpds2og52j3xe@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5910AB5D.8060105@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>, gengdongjiu <gengdj.1984@gmail.com>
-Cc: Tyler Baicar <tbaicar@codeaurora.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, Len Brown <lenb@kernel.org>, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, Sandeepa Prabhu <sandeepa.s.prabhu@gmail.com>, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, Fu Wei <fu.wei@linaro.org>, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infra
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170510082013.euscpds2og52j3xe@kamzik.brq.redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Dear, James
+On Wed, May 10, 2017 at 10:20:13AM +0200, Andrew Jones wrote:
+> On Wed, May 10, 2017 at 10:07:34AM +0200, Christoffer Dall wrote:
+> > On Wed, May 10, 2017 at 08:58:15AM +0200, Andrew Jones wrote:
+> > > On Tue, May 09, 2017 at 01:13:47PM -0700, Christoffer Dall wrote:
+> > > > On Tue, May 09, 2017 at 07:40:57PM +0200, Andrew Jones wrote:
+> > > > > On Sat, May 06, 2017 at 08:27:15PM +0200, Christoffer Dall wrote:
+> > > > > > On Wed, May 03, 2017 at 06:06:32PM +0200, Andrew Jones wrote:
+> > > > > > 
+> > > > > > nit: can you make the subject of this patch a bit more specific?
+> > > > > > 
+> > > > > > For example:  Optimize checking power_off flag in KVM_RUN
+> > > > > 
+> > > > > OK
+> > > > > 
+> > > > > > 
+> > > > > > > We can make a small optimization by not checking the state of
+> > > > > > > the power_off field on each run. This is done by treating
+> > > > > > > power_off like pause, only checking it when we get the EXIT
+> > > > > > > VCPU request. When a VCPU powers off another VCPU the EXIT
+> > > > > > > request is already made, so we just need to make sure the
+> > > > > > > request is also made on self power off. kvm_vcpu_kick() isn't
+> > > > > > > necessary for these cases, as the VCPU would just be kicking
+> > > > > > > itself, but we add it anyway as a self kick doesn't cost much,
+> > > > > > > and it makes the code more future-proof.
+> > > > > > > 
+> > > > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > > > > > ---
+> > > > > > >  arch/arm/kvm/arm.c  | 16 ++++++++++------
+> > > > > > >  arch/arm/kvm/psci.c |  2 ++
+> > > > > > >  2 files changed, 12 insertions(+), 6 deletions(-)
+> > > > > > > 
+> > > > > > > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> > > > > > > index 26d9d4d72853..24bbc7671d89 100644
+> > > > > > > --- a/arch/arm/kvm/arm.c
+> > > > > > > +++ b/arch/arm/kvm/arm.c
+> > > > > > > @@ -371,6 +371,13 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> > > > > > >  	kvm_timer_vcpu_put(vcpu);
+> > > > > > >  }
+> > > > > > >  
+> > > > > > > +static void vcpu_power_off(struct kvm_vcpu *vcpu)
+> > > > > > > +{
+> > > > > > > +	vcpu->arch.power_off = true;
+> > > > > > > +	kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
+> > > > > > > +	kvm_vcpu_kick(vcpu);
+> > > > > > > +}
+> > > > > > > +
+> > > > > > >  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+> > > > > > >  				    struct kvm_mp_state *mp_state)
+> > > > > > >  {
+> > > > > > > @@ -390,7 +397,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+> > > > > > >  		vcpu->arch.power_off = false;
+> > > > > > >  		break;
+> > > > > > >  	case KVM_MP_STATE_STOPPED:
+> > > > > > > -		vcpu->arch.power_off = true;
+> > > > > > > +		vcpu_power_off(vcpu);
+> > > > > > >  		break;
+> > > > > > >  	default:
+> > > > > > >  		return -EINVAL;
+> > > > > > > @@ -626,14 +633,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> > > > > > >  
+> > > > > > >  		if (kvm_request_pending(vcpu)) {
+> > > > > > >  			if (kvm_check_request(KVM_REQ_VCPU_EXIT, vcpu)) {
+> > > > > > > -				if (vcpu->arch.pause)
+> > > > > > > +				if (vcpu->arch.power_off || vcpu->arch.pause)
+> > > > > > >  					vcpu_sleep(vcpu);
+> > > > > > >  			}
+> > > > > > >  		}
+> > > > > > >  
+> > > > > > > -		if (vcpu->arch.power_off)
+> > > > > > > -			vcpu_sleep(vcpu);
+> > > > > > > -
+> > > > > > 
+> > > > > > Hmmm, even though I just gave a reviewed-by on the pause side, I'm not
+> > > > > > realizing that I don't think this works.  Because you're now only
+> > > > > > checking requests in the vcpu loop, but the vcpu_sleep() function is
+> > > > > > implemented using swait_event_interruptible(), which can wake up if you
+> > > > > > have a pending signal for example, and then the loop can wrap around and
+> > > > > > you can run the VCPU even though you should be paused.  Am I missing
+> > > > > > something?
+> > > > > 
+> > > > > Hmm, I think I missed something. I missed that swait_event_interruptible()
+> > > > > doesn't check its condition again when awoken by a signal (which, as far
+> > > > > as I can tell, is the only other way we can stop vcpu_sleep() while
+> > > > > power_off and/or pause are true.  Had I noticed that, I could have
+> > > > > addressed it in one of two ways:
+> > > > > 
+> > > > >  1) Leave power_off and pause in the condition that stops guest entry.
+> > > > >     Easy to see we'll never enter guest mode with one or both set.
+> > > > >     
+> > > > >  2) Add a comment somewhere to explain the subtle dependency vcpu_sleep()
+> > > > >     has on the pending signal check done after its call and before the
+> > > > >     condition that stops guest entry is run. (IOW, I don't think we have
+> > > > >     a bug with this series, but we do have a non-commented subtlety.)
+> > > > > 
+> > > > 
+> > > > But, then it can return to userspace and enter the kernel again, at
+> > > > which time there will be no pending signal and no pending VCPU requests,
+> > > > so the VCPU will enter the guest, but the pause flag can still be true
+> > > > and it shouldn't enter the guest.  So I think there is a bug.
+> > > 
+> > > Ah, indeed.
+> > > 
+> > > > 
+> > > > And I think the only nice way to solve it is to not clear the request
+> > > > until the CPU is really not paused any more.
+> > > 
+> > > This would sort of circle back to the original approach of using the
+> > > request bit as the state, but I've already convinced myself that that's
+> > > too much abuse of VCPU requests to want to do it. (1) above would also
+> > > work and also allow VCPU requests to be used as designed.
+> > > 
+> > > To tidy up the repeated 'vcpu->arch.power_off || vcpu->arch.pause'
+> > > condition I think I'll just introduce a vcpu_should_sleep() to encapsulate
+> > > it.
+> > > 
+> > 
+> > Fair enough, but could we keep these two booleans as flags in a single
+> > unsigned long on the vcpu struct then, so that we can do a single
+> > check on them and call out to handle_run_flags or whatever, analogous to
+> > how we handle requests?
+> 
+> Could do that.
+> 
+> > 
+> > The other way to do it would be to set the request on the VCPU itself
+> > when returning from the sleep function if pause is still set...
+> 
+> I like this suggestion more. I'll do that for v4.
+> 
+pause or power_off that is.
 
-On 2017/5/9 1:31, James Morse wrote:
-> Hi gengdongjiu,
-> 
-> On 04/05/17 18:20, gengdongjiu wrote:
->>> On 30/04/17 06:37, Dongjiu Geng wrote:
->>>> Handle kvmtool's detection for RAS extension, because sometimes
->>>> the APP needs to know the CPU's capacity
->>>
->>>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->>>> index d9e9697..1004039 100644
->>>> --- a/arch/arm64/kvm/reset.c
->>>> +++ b/arch/arm64/kvm/reset.c
->>>> @@ -64,6 +64,14 @@ static bool cpu_has_32bit_el1(void)
->>>>   return !!(pfr0 & 0x20);
->>>>  }
->>>>
->>>> +static bool kvm_arm_support_ras_extension(void)
->>>> +{
->>>> + u64 pfr0;
->>>> +
->>>> + pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
->>>> + return !!(pfr0 & 0x10000000);
->>>> +}
->>>
->>> Why are we telling user-space that the CPU has RAS extensions? EL0 can't do
->>> anything with this and the guest EL1 can detect it from the id registers.
->>>
->>>
->>> Are you using this to decide whether or not to generate a HEST for the guest?
->>
->> James, yes, it is.  my current user-space qemu EL0 patches indeed will
->> check the RAS  extensions.
->> if has the RAS extensions. for SEA, userspace qemu will generate the
->> CPER and inject the SEA to guest;
->> for SEI,  userspace qemu sets the virtual SEI with the specified
->> Syndrome(set the HCR_EL2.VSE and vsesr_el2 );
->> if not have RAS extensions, Qemu does nothing
-> 
-> But you can use APEI in a guest on CPUs without the RAS extensions: the host may
-> signal memory errors to Qemu for any number of reasons, user-space shouldn't
-> care how it knows. Examples are PCI-AER, any APEI event notified by polling or
-> one of the flavours of irq.
-> 
-> I would expect Qemu to generate a HEST based on its abilities, i.e. if it
-> supports any mechanism of notifying the guest about errors. Choosing the
-> mechanism then depends on the type of error.
-> 
-> Ideally the Qemu code for HEST/GHES/CPER generation code using some of the irqs
-> and polling could be shared with x86, as these should be possible using common
-> KVM APIs.
-Ok, got it.
+Cool, I'll look forward to seeing how that looks like.
 
-> 
-> 
->>> If Qemu/kvmtool supports handling memory-failure notifications from signals you
->>> should always generate a HEST. The GHES notification method could be anything
->>> Qemu can deliver to the guest using the KVM APIs. Notifications from Qemu to the
->>> guest don't depend on the RAS extensions. KVM has APIs for IRQ and SEA (you can
->>> use KVM_SET_ONE_REG).
->>
->> I will consider your suggestion to  always generate a CPER instead of
-> 
-> (generate a HEST, CPER are the runtime records. There are too many acronyms in
-> this space!)
-  thanks James's correction.
-
-> 
->> relying on the RAS extensions, thanks
-> 
-> 
-> Thanks,
-> 
-> James
-> 
-> 
-> .
-> 
+Thanks,
+-Christoffer
