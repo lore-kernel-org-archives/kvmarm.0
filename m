@@ -1,92 +1,59 @@
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 2/2] KVM: arm: rename pm_fake handler to trap_raz_wi
-Date: Thu, 11 May 2017 13:46:12 +0100
-Message-ID: <20170511124612.11212-3-alex.bennee@linaro.org>
-References: <20170511124612.11212-1-alex.bennee@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [RFC kvm-unit-tests PATCH 5/8] Makefile: add explicit mkdir for .o targets
+Date: Thu, 11 May 2017 16:30:24 +0100
+Message-ID: <87mvaj4din.fsf@linaro.org>
+References: <20170406190727.5624-1-alex.bennee@linaro.org> <20170406190727.5624-6-alex.bennee@linaro.org> <a8eb190a-3487-1a89-0069-789b62860b3e@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E962040BC4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 May 2017 08:42:11 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u1t05EIgrlSr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 May 2017 08:42:10 -0400 (EDT)
-Received: from mail-wr0-f175.google.com (mail-wr0-f175.google.com
- [209.85.128.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED55140C25
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 May 2017 08:42:09 -0400 (EDT)
-Received: by mail-wr0-f175.google.com with SMTP id l9so19679581wre.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 May 2017 05:45:28 -0700 (PDT)
-In-Reply-To: <20170511124612.11212-1-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: kvm@vger.kernel.org, Russell King <linux@armlinux.org.uk>, open list <linux-kernel@vger.kernel.org>, Zhichao Huang <zhichao.huang@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <a8eb190a-3487-1a89-0069-789b62860b3e@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: drjones@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogWmhpY2hhbyBIdWFuZyA8emhpY2hhby5odWFuZ0BsaW5hcm8ub3JnPgoKcG1fZmFrZSBk
-b2Vzbid0IHF1aXRlIGRlc2NyaWJlIHdoYXQgdGhlIGhhbmRsZXIgZG9lcyAoaWdub3Jpbmcgd3Jp
-dGVzCmFuZCByZXR1cm5pbmcgMCBmb3IgcmVhZHMpLgoKQXMgd2UncmUgYWJvdXQgdG8gdXNlIGl0
-IChhIGxvdCkgaW4gYSBkaWZmZXJlbnQgY29udGV4dCwgcmVuYW1lIGl0CndpdGggYSAoYWRtaXRl
-ZGx5IGNyeXB0aWMpIG5hbWUgdGhhdCBtYWtlIHNlbnNlIGZvciBhbGwgdXNlcnMuCgpTaWduZWQt
-b2ZmLWJ5OiBaaGljaGFvIEh1YW5nIDx6aGljaGFvLmh1YW5nQGxpbmFyby5vcmc+ClJldmlld2Vk
-LWJ5OiBBbGV4IEJlbm5lZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KQWNrZWQtYnk6IENocmlz
-dG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KQWNrZWQtYnk6IE1hcmMg
-WnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+ClNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOp
-ZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KCi0tLQp2MjoKICAtIGZpeCBtaW5vciBtZXJnZSBj
-b25mbGljdHMKICAtIGFkZCBtYXogYS1iCi0tLQogYXJjaC9hcm0va3ZtL2NvcHJvYy5jIHwgMzIg
-KysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAxNiBpbnNl
-cnRpb25zKCspLCAxNiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL2FybS9rdm0vY29w
-cm9jLmMgYi9hcmNoL2FybS9rdm0vY29wcm9jLmMKaW5kZXggYzNlZDZiZDVkZGYzLi4zMWJkOWJi
-MGI3NjUgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtL2t2bS9jb3Byb2MuYworKysgYi9hcmNoL2FybS9r
-dm0vY29wcm9jLmMKQEAgLTI2MCw3ICsyNjAsNyBAQCBzdGF0aWMgYm9vbCBhY2Nlc3NfZ2ljX3Ny
-ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCiAgKiBtdXN0IGFsd2F5cyBzdXBwb3J0IFBNQ0NOVFIg
-KHRoZSBjeWNsZSBjb3VudGVyKTogd2UganVzdCBSQVovV0kgZm9yCiAgKiBhbGwgUE0gcmVnaXN0
-ZXJzLCB3aGljaCBkb2Vzbid0IGNyYXNoIHRoZSBndWVzdCBrZXJuZWwgYXQgbGVhc3QuCiAgKi8K
-LXN0YXRpYyBib29sIHBtX2Zha2Uoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAorc3RhdGljIGJvb2wg
-dHJhcF9yYXpfd2koc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAogCQkgICAgY29uc3Qgc3RydWN0IGNv
-cHJvY19wYXJhbXMgKnAsCiAJCSAgICBjb25zdCBzdHJ1Y3QgY29wcm9jX3JlZyAqcikKIHsKQEAg
-LTI3MCwxOSArMjcwLDE5IEBAIHN0YXRpYyBib29sIHBtX2Zha2Uoc3RydWN0IGt2bV92Y3B1ICp2
-Y3B1LAogCQlyZXR1cm4gcmVhZF96ZXJvKHZjcHUsIHApOwogfQogCi0jZGVmaW5lIGFjY2Vzc19w
-bWNyIHBtX2Zha2UKLSNkZWZpbmUgYWNjZXNzX3BtY250ZW5zZXQgcG1fZmFrZQotI2RlZmluZSBh
-Y2Nlc3NfcG1jbnRlbmNsciBwbV9mYWtlCi0jZGVmaW5lIGFjY2Vzc19wbW92c3IgcG1fZmFrZQot
-I2RlZmluZSBhY2Nlc3NfcG1zZWxyIHBtX2Zha2UKLSNkZWZpbmUgYWNjZXNzX3BtY2VpZDAgcG1f
-ZmFrZQotI2RlZmluZSBhY2Nlc3NfcG1jZWlkMSBwbV9mYWtlCi0jZGVmaW5lIGFjY2Vzc19wbWNj
-bnRyIHBtX2Zha2UKLSNkZWZpbmUgYWNjZXNzX3BteGV2dHlwZXIgcG1fZmFrZQotI2RlZmluZSBh
-Y2Nlc3NfcG14ZXZjbnRyIHBtX2Zha2UKLSNkZWZpbmUgYWNjZXNzX3BtdXNlcmVuciBwbV9mYWtl
-Ci0jZGVmaW5lIGFjY2Vzc19wbWludGVuc2V0IHBtX2Zha2UKLSNkZWZpbmUgYWNjZXNzX3BtaW50
-ZW5jbHIgcG1fZmFrZQorI2RlZmluZSBhY2Nlc3NfcG1jciB0cmFwX3Jhel93aQorI2RlZmluZSBh
-Y2Nlc3NfcG1jbnRlbnNldCB0cmFwX3Jhel93aQorI2RlZmluZSBhY2Nlc3NfcG1jbnRlbmNsciB0
-cmFwX3Jhel93aQorI2RlZmluZSBhY2Nlc3NfcG1vdnNyIHRyYXBfcmF6X3dpCisjZGVmaW5lIGFj
-Y2Vzc19wbXNlbHIgdHJhcF9yYXpfd2kKKyNkZWZpbmUgYWNjZXNzX3BtY2VpZDAgdHJhcF9yYXpf
-d2kKKyNkZWZpbmUgYWNjZXNzX3BtY2VpZDEgdHJhcF9yYXpfd2kKKyNkZWZpbmUgYWNjZXNzX3Bt
-Y2NudHIgdHJhcF9yYXpfd2kKKyNkZWZpbmUgYWNjZXNzX3BteGV2dHlwZXIgdHJhcF9yYXpfd2kK
-KyNkZWZpbmUgYWNjZXNzX3BteGV2Y250ciB0cmFwX3Jhel93aQorI2RlZmluZSBhY2Nlc3NfcG11
-c2VyZW5yIHRyYXBfcmF6X3dpCisjZGVmaW5lIGFjY2Vzc19wbWludGVuc2V0IHRyYXBfcmF6X3dp
-CisjZGVmaW5lIGFjY2Vzc19wbWludGVuY2xyIHRyYXBfcmF6X3dpCiAKIC8qIEFyY2hpdGVjdGVk
-IENQMTUgcmVnaXN0ZXJzLgogICogQ1JuIGRlbm90ZXMgdGhlIHByaW1hcnkgcmVnaXN0ZXIgbnVt
-YmVyLCBidXQgaXMgY29waWVkIHRvIHRoZSBDUm0gaW4gdGhlCkBAIC01NDcsNyArNTQ3LDcgQEAg
-aW50IGt2bV9oYW5kbGVfY3AxNF82NChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1f
-cnVuICpydW4pCiAJc3RydWN0IGNvcHJvY19wYXJhbXMgcGFyYW1zID0gZGVjb2RlXzY0Yml0X2hz
-cih2Y3B1KTsKIAogCS8qIHJhel93aSBjcDE0ICovCi0JcG1fZmFrZSh2Y3B1LCAmcGFyYW1zLCBO
-VUxMKTsKKwl0cmFwX3Jhel93aSh2Y3B1LCAmcGFyYW1zLCBOVUxMKTsKIAogCS8qIGhhbmRsZWQg
-Ki8KIAlrdm1fc2tpcF9pbnN0cih2Y3B1LCBrdm1fdmNwdV90cmFwX2lsX2lzMzJiaXQodmNwdSkp
-OwpAQCAtNjAyLDcgKzYwMiw3IEBAIGludCBrdm1faGFuZGxlX2NwMTRfMzIoc3RydWN0IGt2bV92
-Y3B1ICp2Y3B1LCBzdHJ1Y3Qga3ZtX3J1biAqcnVuKQogCXN0cnVjdCBjb3Byb2NfcGFyYW1zIHBh
-cmFtcyA9IGRlY29kZV8zMmJpdF9oc3IodmNwdSk7CiAKIAkvKiByYXpfd2kgY3AxNCAqLwotCXBt
-X2Zha2UodmNwdSwgJnBhcmFtcywgTlVMTCk7CisJdHJhcF9yYXpfd2kodmNwdSwgJnBhcmFtcywg
-TlVMTCk7CiAKIAkvKiBoYW5kbGVkICovCiAJa3ZtX3NraXBfaW5zdHIodmNwdSwga3ZtX3ZjcHVf
-dHJhcF9pbF9pczMyYml0KHZjcHUpKTsKLS0gCjIuMTEuMAoKX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
-dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
-bGlzdGluZm8va3ZtYXJtCg==
+
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 06/04/2017 21:07, Alex Bennée wrote:
+>> This is fairly direct way of ensuring the target build directories are
+>> created before we build a binary blob. mkdir -p fails gracefully if
+>> the directory is already there.
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>  Makefile | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 781186e..56598df 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -79,8 +79,13 @@ $(LIBFDT_archive): $(addprefix $(LIBFDT_objdir)/,$(LIBFDT_OBJS))
+>>  	$(AR) rcs $@ $^
+>>
+>>  %.o: %.S
+>> +	mkdir -p $(dir $@)
+>
+> Should this use @ for cleanliness?
+
+I'm not sure I follow. Did you mean use $(@D) directly?
+
+>
+> Paolo
+>
+>>  	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
+>>
+>> +%.o: %.c
+>> +	mkdir -p $(dir $@)
+>> +	$(CC) $(CFLAGS) -c -o $@ $<
+>> +
+>>  -include */.*.d */*/.*.d
+>>
+>>  all: $(shell git -C $(SRCDIR) rev-parse --verify --short=8 HEAD >build-head 2>/dev/null)
+>>
+
+
+--
+Alex Bennée
