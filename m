@@ -1,153 +1,94 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 1/5] arm64: KVM: Do not use stack-protector to compile EL2 code
-Date: Thu, 11 May 2017 18:01:01 +0100
-Message-ID: <CAKv+Gu8js81AzSOrD5nv0BsdhnU5VdNTycktja6q49vpqy4AkA@mail.gmail.com>
-References: <20170502133041.10980-1-marc.zyngier@arm.com> <20170502133041.10980-2-marc.zyngier@arm.com>
- <20170502144029.GB29224@e104818-lin.cambridge.arm.com> <334c4025-873d-d30c-534b-4194c78eb64b@arm.com>
- <62f8cd12-7d1a-e31e-c318-c5b11560b549@arm.com> <CAKv+Gu-6nOtsk_8R3RC9je_DOjYcqabF+=DH-bBdnqTEi5BusQ@mail.gmail.com>
- <CAKv+Gu9q+3iqgwc9_tRkGcd2GnDoy8T47r5qj_fhNb3-h+Octw@mail.gmail.com> <7c15b5a7-5557-7615-802b-60bd7252115c@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/2] kvm: arm/arm64: Fix race in resetting stage2 PGD
+Date: Fri, 12 May 2017 10:12:06 +0100
+Message-ID: <91960d06-c0ff-38c3-4cab-6944cdb65766@arm.com>
+References: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
+ <1493821072-29713-2-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <7c15b5a7-5557-7615-802b-60bd7252115c@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, KVM devel mailing list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 828E640960
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 May 2017 05:08:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id pG-EcP1Zi-Qo for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 May 2017 05:08:50 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F64440187
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 May 2017 05:08:49 -0400 (EDT)
+In-Reply-To: <1493821072-29713-2-git-send-email-suzuki.poulose@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, christoffer.dall@linaro.org
+Cc: kvm@vger.kernel.org, andreyknvl@google.com, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11 May 2017 at 17:42, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On 11/05/17 17:36, Ard Biesheuvel wrote:
->> On 11 May 2017 at 17:11, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->>> On 11 May 2017 at 17:02, Marc Zyngier <marc.zyngier@arm.com> wrote:
->>>> On 02/05/17 15:50, Marc Zyngier wrote:
->>>>> On 02/05/17 15:40, Catalin Marinas wrote:
->>>>>> On Tue, May 02, 2017 at 02:30:37PM +0100, Marc Zyngier wrote:
->>>>>>> We like living dangerously. Nothing explicitely forbids stack-protector
->>>>>>> to be used in the EL2 code, while distributions routinely compile their
->>>>>>> kernel with it. We're just lucky that no code actually triggers the
->>>>>>> instrumentation.
->>>>>>>
->>>>>>> Let's not try our luck for much longer, and disable stack-protector
->>>>>>> for code living at EL2.
->>>>>>>
->>>>>>> Cc: stable@vger.kernel.org
->>>>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>>>>> ---
->>>>>>>  arch/arm64/kvm/hyp/Makefile | 2 ++
->>>>>>>  1 file changed, 2 insertions(+)
->>>>>>>
->>>>>>> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
->>>>>>> index aaf42ae8d8c3..14c4e3b14bcb 100644
->>>>>>> --- a/arch/arm64/kvm/hyp/Makefile
->>>>>>> +++ b/arch/arm64/kvm/hyp/Makefile
->>>>>>> @@ -2,6 +2,8 @@
->>>>>>>  # Makefile for Kernel-based Virtual Machine module, HYP part
->>>>>>>  #
->>>>>>>
->>>>>>> +ccflags-y += -fno-stack-protector
->>>>>>> +
->>>>>>
->>>>>> While you are at it, should we have a -fpic here as well? The hyp code
->>>>>> runs at a different location than the rest of the kernel.
->>>>>
->>>>> We definitely should. I've just tried this, and this doesn't seem to
->>>>> work very well. At least this seems to break our jump label
->>>>> implementation. I need to page in that part of the code base and see
->>>>> what happens.
->>>>
->>>> So here's the issue:
->>>>
->>>>   CC      arch/arm64/kvm/hyp/../../../../virt/kvm/arm/hyp/vgic-v3-sr.o
->>>> In file included from ./include/linux/jump_label.h:120:0,
->>>>                  from ./include/linux/dynamic_debug.h:5,
->>>>                  from ./include/linux/printk.h:329,
->>>>                  from ./include/linux/kernel.h:13,
->>>>                  from ./include/asm-generic/bug.h:15,
->>>>                  from ./arch/arm64/include/asm/bug.h:66,
->>>>                  from ./include/linux/bug.h:4,
->>>>                  from ./include/linux/mmdebug.h:4,
->>>>                  from ./include/linux/mm.h:8,
->>>>                  from ./arch/arm64/include/asm/cacheflush.h:22,
->>>>                  from ./arch/arm64/include/asm/arch_gicv3.h:27,
->>>>                  from ./include/linux/irqchip/arm-gic-v3.h:453,
->>>>                  from arch/arm64/kvm/hyp/../../../../virt/kvm/arm/hyp/vgic-v3-sr.c:19:
->>>> ./arch/arm64/include/asm/jump_label.h: In function '__vgic_v3_save_state':
->>>> ./arch/arm64/include/asm/jump_label.h:31:2: warning: asm operand 0 probably doesn't match constraints
->>>>   asm goto("1: nop\n\t"
->>>>   ^~~
->>>> ./arch/arm64/include/asm/jump_label.h:31:2: error: impossible constraint in 'asm'
->>>> ./arch/arm64/include/asm/jump_label.h: In function '__vgic_v3_restore_state':
->>>> ./arch/arm64/include/asm/jump_label.h:31:2: warning: asm operand 0 probably doesn't match constraints
->>>>   asm goto("1: nop\n\t"
->>>>   ^~~
->>>> scripts/Makefile.build:294: recipe for target 'arch/arm64/kvm/hyp/../../../../virt/kvm/arm/hyp/vgic-v3-sr.o' failed
->>>> make[1]: *** [arch/arm64/kvm/hyp/../../../../virt/kvm/arm/hyp/vgic-v3-sr.o] Error 1
->>>> Makefile:1664: recipe for target 'arch/arm64/kvm/hyp/' failed
->>>>
->>>> The corresponding code does this:
->>>>
->>>> static __always_inline bool arch_static_branch(struct static_key *key, bool branch)
->>>> {
->>>>         asm goto("1: nop\n\t"
->>>>                  ".pushsection __jump_table,  \"aw\"\n\t"
->>>>                  ".align 3\n\t"
->>>>                  ".quad 1b, %l[l_yes], %c0\n\t"
->>>>                  ".popsection\n\t"
->>>>                  :  :  "i"(&((char *)key)[branch]) :  : l_yes);
->>>>
->>>>         return false;
->>>> l_yes:
->>>>         return true;
->>>> }
->>>>
->>>> and the problem lies in the evaluation of "key", which probably
->>>> cannot be guaranteed a constant at that point. There is also the
->>>> issue that even if it was known, the branch cannot be easily
->>>> patched in from the rest of the kernel (how is the l_yes address
->>>> represented?).
->>>>
->>>> It looks to me like we either need to rewrite the whole of our
->>>> static key infrastructure to cope with PIC, or switch over to
->>>> the hyp_alternate_select() hack, which I'd rather avoid spreading
->>>> further.
->>>>
->>>> In the end, I wonder if that's even worth it...
->>>>
->>>
->>> Could you check if it builds with
->>>
->>>>                  ".long 1b - ., %l[l_yes] - ., %c0 - .\n\t"
->>>
->>> instead? We'd still need to update the code that interprets the
->>> __jump_table fields, but it changes the references into relative ones,
->>> which also reduces the size as a bonus.
->>
->> OK, strike that, this is more tricky than I thought. I am failing to
->> reproduce this locally, though. Which gcc and tree are you using?
->
-> That's current mainline + a number of patches which I don't think are
-> relevant to this discussion, and -fPIC added to
-> arch/arm64/kvm/hyp/Makefile. You should see it exploding in timer-sr.c
-> because of the has_vhe() helper.
->
-> GCC is "aarch64-linux-gnu-gcc (Linaro GCC 6.2-2016.11) 6.2.1 20161016".
->
-
-Nope, builds fine, with Linaro GCC 5.4.0 and 'ccflags-y += -fPIC'
-added to arch/arm64/kvm/hyp/Makefile.
-
-In any case, it is worth trying whether -fpie behaves differently: as
-per my other reply, aarch64 small model code is already mostly
-position independent anyway, and so -fpic (which is intended for
-dynamic linking under ELF preemption rules*) is more likely to emit
-absolute symbol references than ordinary code. -fpie is supposed to be
-the middle ground here, but I dismissed it for the EFI stub because I
-could not get it to work at the time.
-
-*) Preemption in ELF means any externally visible symbol can be
-overridden by the main executable, in which case the shared library
-must update all its internal references as well. In this particular
-case, if the key argument to arch_static_branch() refers to a static
-key that is part of an externally visible structure, its address is
-preemptible at load time, which I suspect may be causing the error you
-are seeing.
+T24gMDMvMDUvMTcgMTU6MTcsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4gSW4ga3ZtX2ZyZWVf
+c3RhZ2UyX3BnZCgpIHdlIGNoZWNrIHRoZSBzdGFnZTIgUEdEIGJlZm9yZSBob2xkaW5nCj4gdGhl
+IGxvY2sgYW5kIHByb2NlZWQgdG8gdGFrZSB0aGUgbG9jayBpZiBpdCBpcyB2YWxpZC4gQW5kIHdl
+IHVubWFwCj4gdGhlIHBhZ2UgdGFibGVzLCBmb2xsb3dlZCBieSByZWxlYXNpbmcgdGhlIGxvY2su
+IFdlIHJlc2V0IHRoZSBQR0QKPiBvbmx5IGFmdGVyIGRyb3BwaW5nIHRoaXMgbG9jaywgd2hpY2gg
+Y291bGQgY2F1c2UgYSByYWNlIGNvbmRpdGlvbgo+IHdoZXJlIGFub3RoZXIgdGhyZWFkIHdhaXRp
+bmcgb24gb3IgZXZlbiBob2xkaW5nIHRoZSBsb2NrLCBjb3VsZAo+IHBvdGVudGlhbGx5IHNlZSB0
+aGF0IHRoZSBQR0QgaXMgc3RpbGwgdmFsaWQgYW5kIHByb2NlZWQgdG8gcGVyZm9ybQo+IGEgc3Rh
+Z2UyIG9wZXJhdGlvbiBhbmQgbGF0ZXIgZW5jb3VudGVyIGEgTlVMTCBQR0QuCj4gCj4gWzIyMzA5
+MC4yNDIyODBdIFVuYWJsZSB0byBoYW5kbGUga2VybmVsIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5j
+ZSBhdAo+IHZpcnR1YWwgYWRkcmVzcyAwMDAwMDA0MAo+IFsyMjMwOTAuMjYyMzMwXSBQQyBpcyBh
+dCB1bm1hcF9zdGFnZTJfcmFuZ2UrMHg4Yy8weDQyOAo+IFsyMjMwOTAuMjYyMzMyXSBMUiBpcyBh
+dCBrdm1fdW5tYXBfaHZhX2hhbmRsZXIrMHgyYy8weDNjCj4gWzIyMzA5MC4yNjI1MzFdIENhbGwg
+dHJhY2U6Cj4gWzIyMzA5MC4yNjI1MzNdIFs8ZmZmZjAwMDAwODBhZGI3OD5dIHVubWFwX3N0YWdl
+Ml9yYW5nZSsweDhjLzB4NDI4Cj4gWzIyMzA5MC4yNjI1MzVdIFs8ZmZmZjAwMDAwODBhZGY0MD5d
+IGt2bV91bm1hcF9odmFfaGFuZGxlcisweDJjLzB4M2MKPiBbMjIzMDkwLjI2MjUzN10gWzxmZmZm
+MDAwMDA4MGFjZTJjPl0gaGFuZGxlX2h2YV90b19ncGErMHhiMC8weDEwNAo+IFsyMjMwOTAuMjYy
+NTM5XSBbPGZmZmYwMDAwMDgwYWY5ODg+XSBrdm1fdW5tYXBfaHZhKzB4NWMvMHhiYwo+IFsyMjMw
+OTAuMjYyNTQzXSBbPGZmZmYwMDAwMDgwYTI0Nzg+XQo+IGt2bV9tbXVfbm90aWZpZXJfaW52YWxp
+ZGF0ZV9wYWdlKzB4NTAvMHg4Ywo+IFsyMjMwOTAuMjYyNTQ3XSBbPGZmZmYwMDAwMDgyMjc0Zjg+
+XQo+IF9fbW11X25vdGlmaWVyX2ludmFsaWRhdGVfcGFnZSsweDVjLzB4ODQKPiBbMjIzMDkwLjI2
+MjU1MV0gWzxmZmZmMDAwMDA4MjBiNzAwPl0gdHJ5X3RvX3VubWFwX29uZSsweDFkMC8weDRhMAo+
+IFsyMjMwOTAuMjYyNTUzXSBbPGZmZmYwMDAwMDgyMGM1Yzg+XSBybWFwX3dhbGsrMHgxY2MvMHgy
+ZTAKPiBbMjIzMDkwLjI2MjU1NV0gWzxmZmZmMDAwMDA4MjBjOTBjPl0gdHJ5X3RvX3VubWFwKzB4
+NzQvMHhhNAo+IFsyMjMwOTAuMjYyNTU3XSBbPGZmZmYwMDAwMDgyMzBjZTQ+XSBtaWdyYXRlX3Bh
+Z2VzKzB4MzFjLzB4NWFjCj4gWzIyMzA5MC4yNjI1NjFdIFs8ZmZmZjAwMDAwODFmODY5Yz5dIGNv
+bXBhY3Rfem9uZSsweDNmYy8weDdhYwo+IFsyMjMwOTAuMjYyNTYzXSBbPGZmZmYwMDAwMDgxZjhh
+ZTA+XSBjb21wYWN0X3pvbmVfb3JkZXIrMHg5NC8weGIwCj4gWzIyMzA5MC4yNjI1NjRdIFs8ZmZm
+ZjAwMDAwODFmOTFjMD5dIHRyeV90b19jb21wYWN0X3BhZ2VzKzB4MTA4LzB4MjkwCj4gWzIyMzA5
+MC4yNjI1NjldIFs8ZmZmZjAwMDAwODFkNTEwOD5dIF9fYWxsb2NfcGFnZXNfZGlyZWN0X2NvbXBh
+Y3QrMHg3MC8weDFhYwo+IFsyMjMwOTAuMjYyNTcxXSBbPGZmZmYwMDAwMDgxZDY0YTA+XSBfX2Fs
+bG9jX3BhZ2VzX25vZGVtYXNrKzB4NDM0LzB4OWY0Cj4gWzIyMzA5MC4yNjI1NzJdIFs8ZmZmZjAw
+MDAwODIyNTZmMD5dIGFsbG9jX3BhZ2VzX3ZtYSsweDIzMC8weDI1NAo+IFsyMjMwOTAuMjYyNTc0
+XSBbPGZmZmYwMDAwMDgyMzVlNWM+XSBkb19odWdlX3BtZF9hbm9ueW1vdXNfcGFnZSsweDExNC8w
+eDUzOAo+IFsyMjMwOTAuMjYyNTc2XSBbPGZmZmYwMDAwMDgyMDFiZWM+XSBoYW5kbGVfbW1fZmF1
+bHQrMHhkNDAvMHgxN2E0Cj4gWzIyMzA5MC4yNjI1NzddIFs8ZmZmZjAwMDAwODFmYjMyND5dIF9f
+Z2V0X3VzZXJfcGFnZXMrMHgxMmMvMHgzNmMKPiBbMjIzMDkwLjI2MjU3OF0gWzxmZmZmMDAwMDA4
+MWZiODA0Pl0gZ2V0X3VzZXJfcGFnZXNfdW5sb2NrZWQrMHhhNC8weDFiOAo+IFsyMjMwOTAuMjYy
+NTc5XSBbPGZmZmYwMDAwMDgwYTNjZTg+XSBfX2dmbl90b19wZm5fbWVtc2xvdCsweDI4MC8weDMx
+Ywo+IFsyMjMwOTAuMjYyNTgwXSBbPGZmZmYwMDAwMDgwYTNkZDA+XSBnZm5fdG9fcGZuX3Byb3Qr
+MHg0Yy8weDVjCj4gWzIyMzA5MC4yNjI1ODJdIFs8ZmZmZjAwMDAwODBhZjNmOD5dIGt2bV9oYW5k
+bGVfZ3Vlc3RfYWJvcnQrMHgyNDAvMHg3NzQKPiBbMjIzMDkwLjI2MjU4NF0gWzxmZmZmMDAwMDA4
+MGIyYmFjPl0gaGFuZGxlX2V4aXQrMHgxMWMvMHgxYWMKPiBbMjIzMDkwLjI2MjU4Nl0gWzxmZmZm
+MDAwMDA4MGFiOTljPl0ga3ZtX2FyY2hfdmNwdV9pb2N0bF9ydW4rMHgzMWMvMHg2NDgKPiBbMjIz
+MDkwLjI2MjU4N10gWzxmZmZmMDAwMDA4MGExZDc4Pl0ga3ZtX3ZjcHVfaW9jdGwrMHgzNzgvMHg3
+NjgKPiBbMjIzMDkwLjI2MjU5MF0gWzxmZmZmMDAwMDA4MjVkZjVjPl0gZG9fdmZzX2lvY3RsKzB4
+MzI0LzB4NWE0Cj4gWzIyMzA5MC4yNjI1OTFdIFs8ZmZmZjAwMDAwODI1ZTI2Yz5dIFN5U19pb2N0
+bCsweDkwLzB4YTQKPiBbMjIzMDkwLjI2MjU5NV0gWzxmZmZmMDAwMDA4MDg1ZDg0Pl0gZWwwX3N2
+Y19uYWtlZCsweDM4LzB4M2MKPiAKPiBUaGlzIHBhdGNoIG1vdmVzIHRoZSBzdGFnZTIgUEdEIG1h
+bmlwdWxhdGlvbiB1bmRlciB0aGUgbG9jay4KPiAKPiBSZXBvcnRlZC1ieTogQWxleGFuZGVyIEdy
+YWYgPGFncmFmQHN1c2UuZGU+Cj4gQ2M6IE1hcmsgUnV0bGFuZCA8bWFyay5ydXRsYW5kQGFybS5j
+b20+Cj4gQ2M6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Cj4gQ2M6IFBhb2xv
+IEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+Cj4gQ2M6IFJhZGltIEtyxI1tw6HFmSA8cmty
+Y21hckByZWRoYXQuY29tPgo+IFJldmlld2VkLWJ5OiBDaHJpc3RvZmZlciBEYWxsIDxjZGFsbEBs
+aW5hcm8ub3JnPgo+IFNpZ25lZC1vZmYtYnk6IFN1enVraSBLIFBvdWxvc2UgPHN1enVraS5wb3Vs
+b3NlQGFybS5jb20+CgpSZXZpZXdlZC1ieTogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJt
+LmNvbT4KCglNLgotLSAKSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4K
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
+aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
