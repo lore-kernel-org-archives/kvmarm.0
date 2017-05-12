@@ -1,91 +1,64 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 2/2] kvm: arm/arm64: Fix use after free of stage2 page
- table
-Date: Fri, 12 May 2017 10:15:32 +0100
-Message-ID: <23e9374e-90d8-2240-58bc-15ff77d2d4ab@arm.com>
-References: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
- <1493821072-29713-3-git-send-email-suzuki.poulose@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FFB240A86
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 May 2017 05:12:17 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wvxlXpwSpek7 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 May 2017 05:12:15 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 783D740187
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 May 2017 05:12:15 -0400 (EDT)
-In-Reply-To: <1493821072-29713-3-git-send-email-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, andreyknvl@google.com, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] ARM: KVM: Fix tracepoint generation after move to virt/kvm/arm/
+Date: Fri, 12 May 2017 11:04:52 +0100
+Message-ID: <20170512100452.8245-1-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, arnd@arndb.de
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMDMvMDUvMTcgMTU6MTcsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4gV2UgeWllbGQgdGhl
-IGt2bS0+bW11X2xvY2sgb2NjYXNzaW9uYWx5IHdoaWxlIHBlcmZvcm1pbmcgYW4gb3BlcmF0aW9u
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb2NjYXNpb25hbGx5Cj4gKGUuZywgdW5tYXAg
-b3IgcGVybWlzc2lvbiBjaGFuZ2VzKSBvbiBhIGxhcmdlIGFyZWEgb2Ygc3RhZ2UyIG1hcHBpbmdz
-Lgo+IEhvd2V2ZXIgdGhpcyBjb3VsZCBwb3NzaWJseSBjYXVzZSBhbm90aGVyIHRocmVhZCB0byBj
-bGVhciBhbmQgZnJlZSB1cAo+IHRoZSBzdGFnZTIgcGFnZSB0YWJsZXMgd2hpbGUgd2Ugd2VyZSB3
-YWl0aW5nIGZvciByZWdhaW5pbmcgdGhlIGxvY2sgYW5kCj4gdGh1cyB0aGUgb3JpZ2luYWwgdGhy
-ZWFkIGNvdWxkIGVuZCB1cCBpbiBhY2Nlc3NpbmcgbWVtb3J5IHRoYXQgd2FzCj4gZnJlZWQuIFRo
-aXMgcGF0Y2ggZml4ZXMgdGhlIHByb2JsZW0gYnkgbWFraW5nIHN1cmUgdGhhdCB0aGUgc3RhZ2Uy
-Cj4gcGFnZXRhYmxlIGlzIHN0aWxsIHZhbGlkIGFmdGVyIHdlIHJlZ2FpbiB0aGUgbG9jay4gVGhl
-IGZhY3QgdGhhdAo+IG1tdV9ub3RpZmVyLT5yZWxlYXNlKCkgY291bGQgYmUgY2FsbGVkIHR3aWNl
-ICh2aWEgX19tbXVfbm90aWZpZXJfcmVsZWFzZQo+IGFuZCBtbXVfbm90aWZpZXJfdW5yZWdzaXN0
-ZXIpIGVuaGFuY2VzIHRoZSBwb3NzaWJpbGl0eSBvZiBoaXR0aW5nCiAgICAgICAgICAgICAgICAg
-ICB1bnJlZ2lzdGVyCj4gdGhpcyByYWNlIHdoZXJlIHRoZXJlIGFyZSB0d28gdGhyZWFkcyB0cnlp
-bmcgdG8gdW5tYXAgdGhlIGVudGlyZSBndWVzdAo+IHNoYWRvdyBwYWdlcy4KPiAKPiBXaGlsZSBh
-dCBpdCwgY2xlYW51cCB0aGUgcmVkdWRhbnQgY2hlY2tzIGFyb3VuZCBjb25kX3Jlc2NoZWRfbG9j
-ayBpbgogICAgICAgICAgICAgICAgICAgICAgICAgICByZWR1bmRhbnQKPiBzdGFnZTJfd3BfcmFu
-Z2UoKSwgYXMgY29uZF9yZXNjaGVkX2xvY2sgYWxyZWFkeSBkb2VzIHRoZSBzYW1lIGNoZWNrcy4K
-PiAKPiBDYzogTWFyayBSdXRsYW5kIDxtYXJrLnJ1dGxhbmRAYXJtLmNvbT4KPiBDYzogUmFkaW0g
-S3LEjW3DocWZIDxya3JjbWFyQHJlZGhhdC5jb20+Cj4gQ2M6IGFuZHJleWtudmxAZ29vZ2xlLmNv
-bQo+IENjOiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc+Cj4g
-Q2M6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Cj4gQ2M6IFBhb2xvIEJvbnpp
-bmkgPHBib256aW5pQHJlZGhhdC5jb20+Cj4gU2lnbmVkLW9mZi1ieTogU3V6dWtpIEsgUG91bG9z
-ZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT4KPiAtLS0KPiAgYXJjaC9hcm0va3ZtL21tdS5jIHwg
-MTcgKysrKysrKysrKysrLS0tLS0KPiAgMSBmaWxlIGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKyks
-IDUgZGVsZXRpb25zKC0pCj4gCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2t2bS9tbXUuYyBiL2Fy
-Y2gvYXJtL2t2bS9tbXUuYwo+IGluZGV4IDkwOWExYTcuLjViM2UwZGIgMTAwNjQ0Cj4gLS0tIGEv
-YXJjaC9hcm0va3ZtL21tdS5jCj4gKysrIGIvYXJjaC9hcm0va3ZtL21tdS5jCj4gQEAgLTMwMSw5
-ICszMDEsMTQgQEAgc3RhdGljIHZvaWQgdW5tYXBfc3RhZ2UyX3JhbmdlKHN0cnVjdCBrdm0gKmt2
-bSwgcGh5c19hZGRyX3Qgc3RhcnQsIHU2NCBzaXplKQo+ICAJCS8qCj4gIAkJICogSWYgdGhlIHJh
-bmdlIGlzIHRvbyBsYXJnZSwgcmVsZWFzZSB0aGUga3ZtLT5tbXVfbG9jawo+ICAJCSAqIHRvIHBy
-ZXZlbnQgc3RhcnZhdGlvbiBhbmQgbG9ja3VwIGRldGVjdG9yIHdhcm5pbmdzLgo+ICsJCSAqIE1h
-a2Ugc3VyZSB0aGUgcGFnZSB0YWJsZSBpcyBzdGlsbCBhY3RpdmUgd2hlbiB3ZSByZWdhaW4KPiAr
-CQkgKiB0aGUgbG9jay4KPiAgCQkgKi8KPiAtCQlpZiAobmV4dCAhPSBlbmQpCj4gKwkJaWYgKG5l
-eHQgIT0gZW5kKSB7Cj4gIAkJCWNvbmRfcmVzY2hlZF9sb2NrKCZrdm0tPm1tdV9sb2NrKTsKPiAr
-CQkJaWYgKCFSRUFEX09OQ0Uoa3ZtLT5hcmNoLnBnZCkpCj4gKwkJCQlicmVhazsKPiArCQl9Cj4g
-IAl9IHdoaWxlIChwZ2QrKywgYWRkciA9IG5leHQsIGFkZHIgIT0gZW5kKTsKPiAgfQo+ICAKPiBA
-QCAtMTE3MCwxMSArMTE3NSwxMyBAQCBzdGF0aWMgdm9pZCBzdGFnZTJfd3BfcmFuZ2Uoc3RydWN0
-IGt2bSAqa3ZtLCBwaHlzX2FkZHJfdCBhZGRyLCBwaHlzX2FkZHJfdCBlbmQpCj4gIAkJICogbGFy
-Z2UuIE90aGVyd2lzZSwgd2UgbWF5IHNlZSBrZXJuZWwgcGFuaWNzIHdpdGgKPiAgCQkgKiBDT05G
-SUdfREVURUNUX0hVTkdfVEFTSywgQ09ORklHX0xPQ0tVUF9ERVRFQ1RPUiwKPiAgCQkgKiBDT05G
-SUdfTE9DS0RFUC4gQWRkaXRpb25hbGx5LCBob2xkaW5nIHRoZSBsb2NrIHRvbyBsb25nCj4gLQkJ
-ICogd2lsbCBhbHNvIHN0YXJ2ZSBvdGhlciB2Q1BVcy4KPiArCQkgKiB3aWxsIGFsc28gc3RhcnZl
-IG90aGVyIHZDUFVzLiBXZSBoYXZlIHRvIGFsc28gbWFrZSBzdXJlCj4gKwkJICogdGhhdCB0aGUg
-cGFnZSB0YWJsZXMgYXJlIG5vdCBmcmVlZCB3aGlsZSB3ZSByZWxlYXNlZAo+ICsJCSAqIHRoZSBs
-b2NrLgo+ICAJCSAqLwo+IC0JCWlmIChuZWVkX3Jlc2NoZWQoKSB8fCBzcGluX25lZWRicmVhaygm
-a3ZtLT5tbXVfbG9jaykpCj4gLQkJCWNvbmRfcmVzY2hlZF9sb2NrKCZrdm0tPm1tdV9sb2NrKTsK
-PiAtCj4gKwkJY29uZF9yZXNjaGVkX2xvY2soJmt2bS0+bW11X2xvY2spOwo+ICsJCWlmICghUkVB
-RF9PTkNFKGt2bS0+YXJjaC5wZ2QpKQo+ICsJCQlicmVhazsKPiAgCQluZXh0ID0gc3RhZ2UyX3Bn
-ZF9hZGRyX2VuZChhZGRyLCBlbmQpOwo+ICAJCWlmIChzdGFnZTJfcGdkX3ByZXNlbnQoKnBnZCkp
-Cj4gIAkJCXN0YWdlMl93cF9wdWRzKHBnZCwgYWRkciwgbmV4dCk7Cj4gCgpSZXZpZXdlZC1ieTog
-TWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KClRoYW5rcywKCglNLgotLSAKSmF6
-eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
-bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
-YW4vbGlzdGluZm8va3ZtYXJtCg==
+Moving most of the shared code to virt/kvm/arm had for consequence
+that KVM/ARM doesn't build anymore, because the code that used to
+define the tracepoints is now somewhere else.
+
+Fix this by defining CREATE_TRACE_POINTS in coproc.c, and clean-up
+trace.h as well.
+
+Fixes: 35d2d5d490e2 ("KVM: arm/arm64: Move shared files to virt/kvm/arm")
+Reported-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/kvm/coproc.c | 1 +
+ arch/arm/kvm/trace.h  | 8 ++++----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index 2c14b69511e9..ac8d36da4d08 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -32,6 +32,7 @@
+ #include <asm/vfp.h>
+ #include "../vfp/vfpinstr.h"
+ 
++#define CREATE_TRACE_POINTS
+ #include "trace.h"
+ #include "coproc.h"
+ 
+diff --git a/arch/arm/kvm/trace.h b/arch/arm/kvm/trace.h
+index fc0943776db2..b0d10648c486 100644
+--- a/arch/arm/kvm/trace.h
++++ b/arch/arm/kvm/trace.h
+@@ -1,5 +1,5 @@
+-#if !defined(_TRACE_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
+-#define _TRACE_KVM_H
++#if !defined(_TRACE_ARM_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_ARM_KVM_H
+ 
+ #include <linux/tracepoint.h>
+ 
+@@ -74,10 +74,10 @@ TRACE_EVENT(kvm_hvc,
+ 		  __entry->vcpu_pc, __entry->r0, __entry->imm)
+ );
+ 
+-#endif /* _TRACE_KVM_H */
++#endif /* _TRACE_ARM_KVM_H */
+ 
+ #undef TRACE_INCLUDE_PATH
+-#define TRACE_INCLUDE_PATH arch/arm/kvm
++#define TRACE_INCLUDE_PATH .
+ #undef TRACE_INCLUDE_FILE
+ #define TRACE_INCLUDE_FILE trace
+ 
+-- 
+2.11.0
