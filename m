@@ -1,44 +1,101 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 0/5] KVM/ARM: Fixes for 4.12-rc1
-Date: Mon, 15 May 2017 11:33:27 +0200
-Message-ID: <20170515093327.GI9309@cbox>
-References: <20170502133041.10980-1-marc.zyngier@arm.com>
+Subject: Re: [PATCH 2/2] kvm: arm/arm64: Fix use after free of stage2 page
+ table
+Date: Mon, 15 May 2017 12:00:17 +0200
+Message-ID: <20170515100017.GJ9309@cbox>
+References: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
+ <1493821072-29713-3-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F2F140296
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 05:57:03 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id i+1fsystKGGD for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 May 2017 05:57:02 -0400 (EDT)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E4E8840187
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 05:57:01 -0400 (EDT)
+Received: by mail-wm0-f50.google.com with SMTP id d127so69674006wmf.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 03:00:27 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20170502133041.10980-1-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <1493821072-29713-3-git-send-email-suzuki.poulose@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On Tue, May 02, 2017 at 02:30:36PM +0100, Marc Zyngier wrote:
-> Here's a handful of random fixes I've queued locally that didn't have
-> a chance to make it in 4.11.
-> 
-> The first two patches avoid stack-protector messing with the HYP code,
-> as this ends up being a complete disaster.
-> 
-> The following two patches fix a bug introduced in the new vgic, where
-> we may queue HW interrupts with the Pending+Active state, which is
-> illegal.
-> 
-> The final patch fixes a misinterpretation of the spec, where we
-> compute the number of APxRn register based on the number of priorities
-> instead of using the number of preemption levels.
-> 
-> I've tagged the first 4 patches for stable, given that we're doing
-> something potentially harmful. The last patch is more of a theoretical
-> issue at this stage, so probably need for a backport.
-
-I've applied these to kvmarm/master including the initial patches to
-disable the stack-protecter for EL2/HYP.
-
-Once you figure out what to do with -fpic/-fpie/-mcmodel=small we can
-deal with that as follow-up patches.
-
-Thanks,
--Christoffer
+SGkgU3V6dWtpLAoKT24gV2VkLCBNYXkgMDMsIDIwMTcgYXQgMDM6MTc6NTJQTSArMDEwMCwgU3V6
+dWtpIEsgUG91bG9zZSB3cm90ZToKPiBXZSB5aWVsZCB0aGUga3ZtLT5tbXVfbG9jayBvY2Nhc3Np
+b25hbHkgd2hpbGUgcGVyZm9ybWluZyBhbiBvcGVyYXRpb24KPiAoZS5nLCB1bm1hcCBvciBwZXJt
+aXNzaW9uIGNoYW5nZXMpIG9uIGEgbGFyZ2UgYXJlYSBvZiBzdGFnZTIgbWFwcGluZ3MuCj4gSG93
+ZXZlciB0aGlzIGNvdWxkIHBvc3NpYmx5IGNhdXNlIGFub3RoZXIgdGhyZWFkIHRvIGNsZWFyIGFu
+ZCBmcmVlIHVwCj4gdGhlIHN0YWdlMiBwYWdlIHRhYmxlcyB3aGlsZSB3ZSB3ZXJlIHdhaXRpbmcg
+Zm9yIHJlZ2FpbmluZyB0aGUgbG9jayBhbmQKPiB0aHVzIHRoZSBvcmlnaW5hbCB0aHJlYWQgY291
+bGQgZW5kIHVwIGluIGFjY2Vzc2luZyBtZW1vcnkgdGhhdCB3YXMKPiBmcmVlZC4gVGhpcyBwYXRj
+aCBmaXhlcyB0aGUgcHJvYmxlbSBieSBtYWtpbmcgc3VyZSB0aGF0IHRoZSBzdGFnZTIKPiBwYWdl
+dGFibGUgaXMgc3RpbGwgdmFsaWQgYWZ0ZXIgd2UgcmVnYWluIHRoZSBsb2NrLiBUaGUgZmFjdCB0
+aGF0Cj4gbW11X25vdGlmZXItPnJlbGVhc2UoKSBjb3VsZCBiZSBjYWxsZWQgdHdpY2UgKHZpYSBf
+X21tdV9ub3RpZmllcl9yZWxlYXNlCj4gYW5kIG1tdV9ub3RpZmllcl91bnJlZ3Npc3RlcikgZW5o
+YW5jZXMgdGhlIHBvc3NpYmlsaXR5IG9mIGhpdHRpbmcKPiB0aGlzIHJhY2Ugd2hlcmUgdGhlcmUg
+YXJlIHR3byB0aHJlYWRzIHRyeWluZyB0byB1bm1hcCB0aGUgZW50aXJlIGd1ZXN0Cj4gc2hhZG93
+IHBhZ2VzLgo+IAo+IFdoaWxlIGF0IGl0LCBjbGVhbnVwIHRoZSByZWR1ZGFudCBjaGVja3MgYXJv
+dW5kIGNvbmRfcmVzY2hlZF9sb2NrIGluCj4gc3RhZ2UyX3dwX3JhbmdlKCksIGFzIGNvbmRfcmVz
+Y2hlZF9sb2NrIGFscmVhZHkgZG9lcyB0aGUgc2FtZSBjaGVja3MuCj4gCj4gQ2M6IE1hcmsgUnV0
+bGFuZCA8bWFyay5ydXRsYW5kQGFybS5jb20+Cj4gQ2M6IFJhZGltIEtyxI1tw6HFmSA8cmtyY21h
+ckByZWRoYXQuY29tPgo+IENjOiBhbmRyZXlrbnZsQGdvb2dsZS5jb20KPiBDYzogQ2hyaXN0b2Zm
+ZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgo+IENjOiBNYXJjIFp5bmdpZXIg
+PG1hcmMuenluZ2llckBhcm0uY29tPgo+IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRo
+YXQuY29tPgo+IFNpZ25lZC1vZmYtYnk6IFN1enVraSBLIFBvdWxvc2UgPHN1enVraS5wb3Vsb3Nl
+QGFybS5jb20+Cj4gLS0tCj4gIGFyY2gvYXJtL2t2bS9tbXUuYyB8IDE3ICsrKysrKysrKysrKy0t
+LS0tCj4gIDEgZmlsZSBjaGFuZ2VkLCAxMiBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQo+
+IAo+IGRpZmYgLS1naXQgYS9hcmNoL2FybS9rdm0vbW11LmMgYi9hcmNoL2FybS9rdm0vbW11LmMK
+PiBpbmRleCA5MDlhMWE3Li41YjNlMGRiIDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtL2t2bS9tbXUu
+Ywo+ICsrKyBiL2FyY2gvYXJtL2t2bS9tbXUuYwo+IEBAIC0zMDEsOSArMzAxLDE0IEBAIHN0YXRp
+YyB2b2lkIHVubWFwX3N0YWdlMl9yYW5nZShzdHJ1Y3Qga3ZtICprdm0sIHBoeXNfYWRkcl90IHN0
+YXJ0LCB1NjQgc2l6ZSkKPiAgCQkvKgo+ICAJCSAqIElmIHRoZSByYW5nZSBpcyB0b28gbGFyZ2Us
+IHJlbGVhc2UgdGhlIGt2bS0+bW11X2xvY2sKPiAgCQkgKiB0byBwcmV2ZW50IHN0YXJ2YXRpb24g
+YW5kIGxvY2t1cCBkZXRlY3RvciB3YXJuaW5ncy4KPiArCQkgKiBNYWtlIHN1cmUgdGhlIHBhZ2Ug
+dGFibGUgaXMgc3RpbGwgYWN0aXZlIHdoZW4gd2UgcmVnYWluCj4gKwkJICogdGhlIGxvY2suCj4g
+IAkJICovCj4gLQkJaWYgKG5leHQgIT0gZW5kKQo+ICsJCWlmIChuZXh0ICE9IGVuZCkgewo+ICAJ
+CQljb25kX3Jlc2NoZWRfbG9jaygma3ZtLT5tbXVfbG9jayk7Cj4gKwkJCWlmICghUkVBRF9PTkNF
+KGt2bS0+YXJjaC5wZ2QpKQo+ICsJCQkJYnJlYWs7Cj4gKwkJfQoKU28gSSBkb24ndCB0aGluayB0
+aGlzIGNoYW5nZSBpcyB3cm9uZywgYnV0IEkgd29uZGVyIGlmIGl0J3Mgc3VmZmljaWVudC4KRm9y
+IGV4YW1wbGUsIEkgY2FuIHNlZSB0aGF0IHRoaXMgZnVuY3Rpb24gaXMgY2FsbGVkIGZyb20KCnN0
+YWdlMl91bm1zcF92bQogLT4gc3RhZ2UyX3VubWFwX21lbXNsb3QKICAgLT4gdW5tYXBfc3RhZ2Uy
+X3JhbmdlCgphbmQKCmt2bV9hcmNoX2ZsdXNoX3NoYWRvd19tZW1zbG90CiAtPiB1bm1hcF9zdGFn
+ZTJfcmFuZ2UKCndoaWNoIG5ldmVyIGNoZWNrIGlmIHRoZSBwZ2QgcG9pbnRlciBpcyB2YWxpZCwg
+YW5kIGZpbmFsbHkKa3ZtX2ZyZWVfc3RhZ2UyX3BnZCBhbHNvIGNoZWNrcyB0aGUgcGdkIHBvaW50
+ZXIgb3V0c2lkZSBvZiBob2xkaW5nIHRoZQprdm0tPm1tdV9sb2NrIHNvIHdoeSBpcyB0aGlzIG5v
+dCByYWN5PwoKPiAgCX0gd2hpbGUgKHBnZCsrLCBhZGRyID0gbmV4dCwgYWRkciAhPSBlbmQpOwo+
+ICB9Cj4gIAo+IEBAIC0xMTcwLDExICsxMTc1LDEzIEBAIHN0YXRpYyB2b2lkIHN0YWdlMl93cF9y
+YW5nZShzdHJ1Y3Qga3ZtICprdm0sIHBoeXNfYWRkcl90IGFkZHIsIHBoeXNfYWRkcl90IGVuZCkK
+PiAgCQkgKiBsYXJnZS4gT3RoZXJ3aXNlLCB3ZSBtYXkgc2VlIGtlcm5lbCBwYW5pY3Mgd2l0aAo+
+ICAJCSAqIENPTkZJR19ERVRFQ1RfSFVOR19UQVNLLCBDT05GSUdfTE9DS1VQX0RFVEVDVE9SLAo+
+ICAJCSAqIENPTkZJR19MT0NLREVQLiBBZGRpdGlvbmFsbHksIGhvbGRpbmcgdGhlIGxvY2sgdG9v
+IGxvbmcKPiAtCQkgKiB3aWxsIGFsc28gc3RhcnZlIG90aGVyIHZDUFVzLgo+ICsJCSAqIHdpbGwg
+YWxzbyBzdGFydmUgb3RoZXIgdkNQVXMuIFdlIGhhdmUgdG8gYWxzbyBtYWtlIHN1cmUKPiArCQkg
+KiB0aGF0IHRoZSBwYWdlIHRhYmxlcyBhcmUgbm90IGZyZWVkIHdoaWxlIHdlIHJlbGVhc2VkCj4g
+KwkJICogdGhlIGxvY2suCj4gIAkJICovCj4gLQkJaWYgKG5lZWRfcmVzY2hlZCgpIHx8IHNwaW5f
+bmVlZGJyZWFrKCZrdm0tPm1tdV9sb2NrKSkKPiAtCQkJY29uZF9yZXNjaGVkX2xvY2soJmt2bS0+
+bW11X2xvY2spOwo+IC0KPiArCQljb25kX3Jlc2NoZWRfbG9jaygma3ZtLT5tbXVfbG9jayk7Cj4g
+KwkJaWYgKCFSRUFEX09OQ0Uoa3ZtLT5hcmNoLnBnZCkpCj4gKwkJCWJyZWFrOwoKSGVyZSBJIHN1
+cHBvc2UgeW91IGRvbid0IGhhdmUgdGhlIGlzc3VlIGJlY2FzZSB5b3UgY2hlY2sgdGhlIHBnZCBw
+b2ludGVyCmJlZm9yZSBkZXJlZmVuY2luZyBpdCBpbiBhbGwgY2FzZXMuCgpUaGFua3MsCi1DaHJp
+c3RvZmZlcgoKPiAgCQluZXh0ID0gc3RhZ2UyX3BnZF9hZGRyX2VuZChhZGRyLCBlbmQpOwo+ICAJ
+CWlmIChzdGFnZTJfcGdkX3ByZXNlbnQoKnBnZCkpCj4gIAkJCXN0YWdlMl93cF9wdWRzKHBnZCwg
+YWRkciwgbmV4dCk7Cj4gLS0gCj4gMi43LjQKPiAKX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
+Zm8va3ZtYXJtCg==
