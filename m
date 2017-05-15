@@ -1,101 +1,278 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 2/2] kvm: arm/arm64: Fix use after free of stage2 page
- table
-Date: Mon, 15 May 2017 12:00:17 +0200
-Message-ID: <20170515100017.GJ9309@cbox>
-References: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
- <1493821072-29713-3-git-send-email-suzuki.poulose@arm.com>
+Subject: Re: [PATCH v3 04/10] KVM: arm/arm64: use vcpu request in
+ kvm_arm_halt_vcpu
+Date: Mon, 15 May 2017 13:14:42 +0200
+Message-ID: <20170515111442.GA18755@cbox>
+References: <20170503160635.21669-1-drjones@redhat.com>
+ <20170503160635.21669-5-drjones@redhat.com>
+ <20170506180809.GA5923@cbox>
+ <20170509170251.eernp7sdl6tzchdp@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F2F140296
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 05:57:03 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i+1fsystKGGD for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 May 2017 05:57:02 -0400 (EDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E4E8840187
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 05:57:01 -0400 (EDT)
-Received: by mail-wm0-f50.google.com with SMTP id d127so69674006wmf.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 03:00:27 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1493821072-29713-3-git-send-email-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20170509170251.eernp7sdl6tzchdp@kamzik.brq.redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgU3V6dWtpLAoKT24gV2VkLCBNYXkgMDMsIDIwMTcgYXQgMDM6MTc6NTJQTSArMDEwMCwgU3V6
-dWtpIEsgUG91bG9zZSB3cm90ZToKPiBXZSB5aWVsZCB0aGUga3ZtLT5tbXVfbG9jayBvY2Nhc3Np
-b25hbHkgd2hpbGUgcGVyZm9ybWluZyBhbiBvcGVyYXRpb24KPiAoZS5nLCB1bm1hcCBvciBwZXJt
-aXNzaW9uIGNoYW5nZXMpIG9uIGEgbGFyZ2UgYXJlYSBvZiBzdGFnZTIgbWFwcGluZ3MuCj4gSG93
-ZXZlciB0aGlzIGNvdWxkIHBvc3NpYmx5IGNhdXNlIGFub3RoZXIgdGhyZWFkIHRvIGNsZWFyIGFu
-ZCBmcmVlIHVwCj4gdGhlIHN0YWdlMiBwYWdlIHRhYmxlcyB3aGlsZSB3ZSB3ZXJlIHdhaXRpbmcg
-Zm9yIHJlZ2FpbmluZyB0aGUgbG9jayBhbmQKPiB0aHVzIHRoZSBvcmlnaW5hbCB0aHJlYWQgY291
-bGQgZW5kIHVwIGluIGFjY2Vzc2luZyBtZW1vcnkgdGhhdCB3YXMKPiBmcmVlZC4gVGhpcyBwYXRj
-aCBmaXhlcyB0aGUgcHJvYmxlbSBieSBtYWtpbmcgc3VyZSB0aGF0IHRoZSBzdGFnZTIKPiBwYWdl
-dGFibGUgaXMgc3RpbGwgdmFsaWQgYWZ0ZXIgd2UgcmVnYWluIHRoZSBsb2NrLiBUaGUgZmFjdCB0
-aGF0Cj4gbW11X25vdGlmZXItPnJlbGVhc2UoKSBjb3VsZCBiZSBjYWxsZWQgdHdpY2UgKHZpYSBf
-X21tdV9ub3RpZmllcl9yZWxlYXNlCj4gYW5kIG1tdV9ub3RpZmllcl91bnJlZ3Npc3RlcikgZW5o
-YW5jZXMgdGhlIHBvc3NpYmlsaXR5IG9mIGhpdHRpbmcKPiB0aGlzIHJhY2Ugd2hlcmUgdGhlcmUg
-YXJlIHR3byB0aHJlYWRzIHRyeWluZyB0byB1bm1hcCB0aGUgZW50aXJlIGd1ZXN0Cj4gc2hhZG93
-IHBhZ2VzLgo+IAo+IFdoaWxlIGF0IGl0LCBjbGVhbnVwIHRoZSByZWR1ZGFudCBjaGVja3MgYXJv
-dW5kIGNvbmRfcmVzY2hlZF9sb2NrIGluCj4gc3RhZ2UyX3dwX3JhbmdlKCksIGFzIGNvbmRfcmVz
-Y2hlZF9sb2NrIGFscmVhZHkgZG9lcyB0aGUgc2FtZSBjaGVja3MuCj4gCj4gQ2M6IE1hcmsgUnV0
-bGFuZCA8bWFyay5ydXRsYW5kQGFybS5jb20+Cj4gQ2M6IFJhZGltIEtyxI1tw6HFmSA8cmtyY21h
-ckByZWRoYXQuY29tPgo+IENjOiBhbmRyZXlrbnZsQGdvb2dsZS5jb20KPiBDYzogQ2hyaXN0b2Zm
-ZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgo+IENjOiBNYXJjIFp5bmdpZXIg
-PG1hcmMuenluZ2llckBhcm0uY29tPgo+IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRo
-YXQuY29tPgo+IFNpZ25lZC1vZmYtYnk6IFN1enVraSBLIFBvdWxvc2UgPHN1enVraS5wb3Vsb3Nl
-QGFybS5jb20+Cj4gLS0tCj4gIGFyY2gvYXJtL2t2bS9tbXUuYyB8IDE3ICsrKysrKysrKysrKy0t
-LS0tCj4gIDEgZmlsZSBjaGFuZ2VkLCAxMiBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQo+
-IAo+IGRpZmYgLS1naXQgYS9hcmNoL2FybS9rdm0vbW11LmMgYi9hcmNoL2FybS9rdm0vbW11LmMK
-PiBpbmRleCA5MDlhMWE3Li41YjNlMGRiIDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtL2t2bS9tbXUu
-Ywo+ICsrKyBiL2FyY2gvYXJtL2t2bS9tbXUuYwo+IEBAIC0zMDEsOSArMzAxLDE0IEBAIHN0YXRp
-YyB2b2lkIHVubWFwX3N0YWdlMl9yYW5nZShzdHJ1Y3Qga3ZtICprdm0sIHBoeXNfYWRkcl90IHN0
-YXJ0LCB1NjQgc2l6ZSkKPiAgCQkvKgo+ICAJCSAqIElmIHRoZSByYW5nZSBpcyB0b28gbGFyZ2Us
-IHJlbGVhc2UgdGhlIGt2bS0+bW11X2xvY2sKPiAgCQkgKiB0byBwcmV2ZW50IHN0YXJ2YXRpb24g
-YW5kIGxvY2t1cCBkZXRlY3RvciB3YXJuaW5ncy4KPiArCQkgKiBNYWtlIHN1cmUgdGhlIHBhZ2Ug
-dGFibGUgaXMgc3RpbGwgYWN0aXZlIHdoZW4gd2UgcmVnYWluCj4gKwkJICogdGhlIGxvY2suCj4g
-IAkJICovCj4gLQkJaWYgKG5leHQgIT0gZW5kKQo+ICsJCWlmIChuZXh0ICE9IGVuZCkgewo+ICAJ
-CQljb25kX3Jlc2NoZWRfbG9jaygma3ZtLT5tbXVfbG9jayk7Cj4gKwkJCWlmICghUkVBRF9PTkNF
-KGt2bS0+YXJjaC5wZ2QpKQo+ICsJCQkJYnJlYWs7Cj4gKwkJfQoKU28gSSBkb24ndCB0aGluayB0
-aGlzIGNoYW5nZSBpcyB3cm9uZywgYnV0IEkgd29uZGVyIGlmIGl0J3Mgc3VmZmljaWVudC4KRm9y
-IGV4YW1wbGUsIEkgY2FuIHNlZSB0aGF0IHRoaXMgZnVuY3Rpb24gaXMgY2FsbGVkIGZyb20KCnN0
-YWdlMl91bm1zcF92bQogLT4gc3RhZ2UyX3VubWFwX21lbXNsb3QKICAgLT4gdW5tYXBfc3RhZ2Uy
-X3JhbmdlCgphbmQKCmt2bV9hcmNoX2ZsdXNoX3NoYWRvd19tZW1zbG90CiAtPiB1bm1hcF9zdGFn
-ZTJfcmFuZ2UKCndoaWNoIG5ldmVyIGNoZWNrIGlmIHRoZSBwZ2QgcG9pbnRlciBpcyB2YWxpZCwg
-YW5kIGZpbmFsbHkKa3ZtX2ZyZWVfc3RhZ2UyX3BnZCBhbHNvIGNoZWNrcyB0aGUgcGdkIHBvaW50
-ZXIgb3V0c2lkZSBvZiBob2xkaW5nIHRoZQprdm0tPm1tdV9sb2NrIHNvIHdoeSBpcyB0aGlzIG5v
-dCByYWN5PwoKPiAgCX0gd2hpbGUgKHBnZCsrLCBhZGRyID0gbmV4dCwgYWRkciAhPSBlbmQpOwo+
-ICB9Cj4gIAo+IEBAIC0xMTcwLDExICsxMTc1LDEzIEBAIHN0YXRpYyB2b2lkIHN0YWdlMl93cF9y
-YW5nZShzdHJ1Y3Qga3ZtICprdm0sIHBoeXNfYWRkcl90IGFkZHIsIHBoeXNfYWRkcl90IGVuZCkK
-PiAgCQkgKiBsYXJnZS4gT3RoZXJ3aXNlLCB3ZSBtYXkgc2VlIGtlcm5lbCBwYW5pY3Mgd2l0aAo+
-ICAJCSAqIENPTkZJR19ERVRFQ1RfSFVOR19UQVNLLCBDT05GSUdfTE9DS1VQX0RFVEVDVE9SLAo+
-ICAJCSAqIENPTkZJR19MT0NLREVQLiBBZGRpdGlvbmFsbHksIGhvbGRpbmcgdGhlIGxvY2sgdG9v
-IGxvbmcKPiAtCQkgKiB3aWxsIGFsc28gc3RhcnZlIG90aGVyIHZDUFVzLgo+ICsJCSAqIHdpbGwg
-YWxzbyBzdGFydmUgb3RoZXIgdkNQVXMuIFdlIGhhdmUgdG8gYWxzbyBtYWtlIHN1cmUKPiArCQkg
-KiB0aGF0IHRoZSBwYWdlIHRhYmxlcyBhcmUgbm90IGZyZWVkIHdoaWxlIHdlIHJlbGVhc2VkCj4g
-KwkJICogdGhlIGxvY2suCj4gIAkJICovCj4gLQkJaWYgKG5lZWRfcmVzY2hlZCgpIHx8IHNwaW5f
-bmVlZGJyZWFrKCZrdm0tPm1tdV9sb2NrKSkKPiAtCQkJY29uZF9yZXNjaGVkX2xvY2soJmt2bS0+
-bW11X2xvY2spOwo+IC0KPiArCQljb25kX3Jlc2NoZWRfbG9jaygma3ZtLT5tbXVfbG9jayk7Cj4g
-KwkJaWYgKCFSRUFEX09OQ0Uoa3ZtLT5hcmNoLnBnZCkpCj4gKwkJCWJyZWFrOwoKSGVyZSBJIHN1
-cHBvc2UgeW91IGRvbid0IGhhdmUgdGhlIGlzc3VlIGJlY2FzZSB5b3UgY2hlY2sgdGhlIHBnZCBw
-b2ludGVyCmJlZm9yZSBkZXJlZmVuY2luZyBpdCBpbiBhbGwgY2FzZXMuCgpUaGFua3MsCi1DaHJp
-c3RvZmZlcgoKPiAgCQluZXh0ID0gc3RhZ2UyX3BnZF9hZGRyX2VuZChhZGRyLCBlbmQpOwo+ICAJ
-CWlmIChzdGFnZTJfcGdkX3ByZXNlbnQoKnBnZCkpCj4gIAkJCXN0YWdlMl93cF9wdWRzKHBnZCwg
-YWRkciwgbmV4dCk7Cj4gLS0gCj4gMi43LjQKPiAKX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
-Zm8va3ZtYXJtCg==
+On Tue, May 09, 2017 at 07:02:51PM +0200, Andrew Jones wrote:
+> On Sat, May 06, 2017 at 08:08:09PM +0200, Christoffer Dall wrote:
+> > On Wed, May 03, 2017 at 06:06:29PM +0200, Andrew Jones wrote:
+> > > VCPU halting/resuming is partially implemented with VCPU requests.
+> > > When kvm_arm_halt_guest() is called all VCPUs get the EXIT request,
+> > > telling them to exit guest mode and look at the state of 'pause',
+> > > which will be true, telling them to sleep.  As ARM's VCPU RUN
+> > > implements the memory barrier pattern described in "Ensuring Requests
+> > > Are Seen" of Documentation/virtual/kvm/vcpu-requests.rst, there's
+> > > no way for a VCPU halted by kvm_arm_halt_guest() to miss the pause
+> > > state change.  However, before this patch, a single VCPU halted with
+> > > kvm_arm_halt_vcpu() did not get a request, opening a tiny race window.
+> > > This patch adds the request, closing the race window and also allowing
+> > > us to remove the final check of pause in VCPU RUN, as the final check
+> > > for requests is sufficient.
+> > > 
+> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > 
+> > > ---
+> > > 
+> > > I have two questions about the halting/resuming.
+> > > 
+> > > Question 1:
+> > > 
+> > > Do we even need kvm_arm_halt_vcpu()/kvm_arm_resume_vcpu()? It should
+> > > only be necessary if one VCPU can activate or inactivate the private
+> > > IRQs of another VCPU, right?  That doesn't seem like something that
+> > > should be possible, but I'm GIC-illiterate...
+> > 
+> > True, it shouldn't be possible.  I wonder if we were thinking of
+> > userspace access to the CPU-specific data, but we already ensure that no
+> > VCPUs are running at that time, so I don't think it should be necessary.
+> > 
+> > > 
+> > > Question 2:
+> > > 
+> > > It's not clear to me if we have another problem with halting/resuming
+> > > or not.  If it's possible for VCPU1 and VCPU2 to race in
+> > > vgic_mmio_write_s/cactive(), then the following scenario could occur,
+> > > leading to VCPU3 being in guest mode when it should not be.  Does the
+> > > hardware prohibit more than one VCPU entering trap handlers that lead
+> > > to these functions at the same time?  If not, then I guess pause needs
+> > > to be a counter instead of a boolean.
+> > > 
+> > >  VCPU1                 VCPU2                  VCPU3
+> > >  -----                 -----                  -----
+> > >                        VCPU3->pause = true;
+> > >                        halt(VCPU3);
+> > >                                               if (pause)
+> > >                                                 sleep();
+> > >  VCPU3->pause = true;
+> > >  halt(VCPU3);
+> > >                        VCPU3->pause = false;
+> > >                        resume(VCPU3);
+> > >                                               ...wake up...
+> > >                                               if (!pause)
+> > >                                                 Enter guest mode. Bad!
+> > >  VCPU3->pause = false;
+> > >  resume(VCPU3);
+> > > 
+> > > (Yes, the "Bad!" is there to both identify something we don't want
+> > >  occurring and to make fun of Trump's tweeting style.)
+> > 
+> > I think it's bad, and it might be even worse, because it could lead to a
+> > CPU looping forever in the host kernel, since there's no guarantee to
+> > exit from the VM in the other VCPU thread.
+> > 
+> > But I think simply taking the kvm->lock mutex to serialize the mmio
+> > active change operations should be sufficient.
+> > 
+> > If we agree on this I can send a patch with your reported by that fixes
+> > that issue, which gets rid of kvm_arm_halt_vcpu and requires you to
+> > modify your first patch to clear the KVM_REQ_VCPU_EXIT flag for each
+> > vcpu in kvm_arm_halt_guest instead and you can fold the remaining change
+> > from this patch into a patch that completely gets rid of the pause flag.
+> 
+> Yup, seems reasonable to me to lock the kvm mutex on a stop the guest type
+> action.
+> 
+> > 
+> > See untested patch draft at the end of this mail.
+> > 
+> > Thanks,
+> > -Christoffer
+> > 
+> > > ---
+> > >  arch/arm/kvm/arm.c | 3 ++-
+> > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> > > index 47f6c7fdca96..9174ed13135a 100644
+> > > --- a/arch/arm/kvm/arm.c
+> > > +++ b/arch/arm/kvm/arm.c
+> > > @@ -545,6 +545,7 @@ void kvm_arm_halt_guest(struct kvm *kvm)
+> > >  void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu)
+> > >  {
+> > >  	vcpu->arch.pause = true;
+> > > +	kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
+> > >  	kvm_vcpu_kick(vcpu);
+> > >  }
+> > >  
+> > > @@ -664,7 +665,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> > >  
+> > >  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
+> > >  		    kvm_request_pending(vcpu) ||
+> > > -		    vcpu->arch.power_off || vcpu->arch.pause) {
+> > > +		    vcpu->arch.power_off) {
+> > >  			vcpu->mode = OUTSIDE_GUEST_MODE;
+> > >  			local_irq_enable();
+> > >  			kvm_pmu_sync_hwstate(vcpu);
+> > > -- 
+> > > 2.9.3
+> > > 
+> > 
+> > 
+> > Untested draft patch:
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> > index d488b88..b77a3af 100644
+> > --- a/arch/arm/include/asm/kvm_host.h
+> > +++ b/arch/arm/include/asm/kvm_host.h
+> > @@ -234,8 +234,6 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+> >  struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
+> >  void kvm_arm_halt_guest(struct kvm *kvm);
+> >  void kvm_arm_resume_guest(struct kvm *kvm);
+> > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
+> > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
+> >  
+> >  int kvm_arm_copy_coproc_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+> >  unsigned long kvm_arm_num_coproc_regs(struct kvm_vcpu *vcpu);
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 578df18..7a38d5a 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -334,8 +334,6 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+> >  struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+> >  void kvm_arm_halt_guest(struct kvm *kvm);
+> >  void kvm_arm_resume_guest(struct kvm *kvm);
+> > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
+> > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
+> >  
+> >  u64 __kvm_call_hyp(void *hypfn, ...);
+> >  #define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__)
+> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > index 7941699..932788a 100644
+> > --- a/virt/kvm/arm/arm.c
+> > +++ b/virt/kvm/arm/arm.c
+> > @@ -542,27 +542,15 @@ void kvm_arm_halt_guest(struct kvm *kvm)
+> >  	kvm_make_all_cpus_request(kvm, KVM_REQ_VCPU_EXIT);
+> >  }
+> >  
+> > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu)
+> > -{
+> > -	vcpu->arch.pause = true;
+> > -	kvm_vcpu_kick(vcpu);
+> > -}
+> > -
+> > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
+> > -{
+> > -	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
+> > -
+> > -	vcpu->arch.pause = false;
+> > -	swake_up(wq);
+> > -}
+> > -
+> >  void kvm_arm_resume_guest(struct kvm *kvm)
+> >  {
+> >  	int i;
+> >  	struct kvm_vcpu *vcpu;
+> >  
+> > -	kvm_for_each_vcpu(i, vcpu, kvm)
+> > -		kvm_arm_resume_vcpu(vcpu);
+> > +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> > +		vcpu->arch.pause = false;
+> > +		swake_up(kvm_arch_vcpu_wq(vcpu));
+> > +	}
+> >  }
+> >  
+> >  static void vcpu_sleep(struct kvm_vcpu *vcpu)
+> > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> > index 2a5db13..c143add 100644
+> > --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> > +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> > @@ -231,23 +231,21 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+> >   * be migrated while we don't hold the IRQ locks and we don't want to be
+> >   * chasing moving targets.
+> >   *
+> > - * For private interrupts, we only have to make sure the single and only VCPU
+> > - * that can potentially queue the IRQ is stopped.
+> > + * For private interrupts we don't have to do anything because userspace
+> > + * accesses to the VGIC state already require all VCPUs to be stopped, and
+> > + * only the VCPU itself can modify its private interrupts active state, which
+> > + * guarantees that the VCPU is not running.
+> >   */
+> >  static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+> >  {
+> > -	if (intid < VGIC_NR_PRIVATE_IRQS)
+> > -		kvm_arm_halt_vcpu(vcpu);
+> > -	else
+> > +	if (intid > VGIC_NR_PRIVATE_IRQS)
+> >  		kvm_arm_halt_guest(vcpu->kvm);
+> >  }
+> >  
+> >  /* See vgic_change_active_prepare */
+> >  static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
+> >  {
+> > -	if (intid < VGIC_NR_PRIVATE_IRQS)
+> > -		kvm_arm_resume_vcpu(vcpu);
+> > -	else
+> > +	if (intid > VGIC_NR_PRIVATE_IRQS)
+> >  		kvm_arm_resume_guest(vcpu->kvm);
+> >  }
+> >  
+> > @@ -258,6 +256,7 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+> >  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+> >  	int i;
+> >  
+> > +	mutex_lock(&vcpu->kvm->lock);
+> >  	vgic_change_active_prepare(vcpu, intid);
+> >  	for_each_set_bit(i, &val, len * 8) {
+> >  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> > @@ -265,6 +264,7 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+> >  		vgic_put_irq(vcpu->kvm, irq);
+> >  	}
+> >  	vgic_change_active_finish(vcpu, intid);
+> > +	mutex_unlock(&vcpu->kvm->lock);
+> >  }
+> >  
+> >  void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+> > @@ -274,6 +274,7 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+> >  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+> >  	int i;
+> >  
+> > +	mutex_lock(&vcpu->kvm->lock);
+> >  	vgic_change_active_prepare(vcpu, intid);
+> >  	for_each_set_bit(i, &val, len * 8) {
+> >  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> > @@ -281,6 +282,7 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
+> >  		vgic_put_irq(vcpu->kvm, irq);
+> >  	}
+> >  	vgic_change_active_finish(vcpu, intid);
+> > +	mutex_unlock(&vcpu->kvm->lock);
+> >  }
+> >  
+> >  unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
+> 
+> Looks good to me. How about adding kvm->lock to the locking order comment
+> at the top of virt/kvm/arm/vgic/vgic.c too. With that, you can add my R-b
+> on the posting.
+> 
+> I'll rebase this series on your posting.
+> 
+
+FYI, this patch is now in kvmarm/queue.
+
+-Christoffer
+
+> Thanks,
+> drew
