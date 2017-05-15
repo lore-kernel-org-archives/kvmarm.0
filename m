@@ -1,31 +1,21 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 2/2] kvm: arm/arm64: Fix use after free of stage2 page
- table
-Date: Mon, 15 May 2017 19:43:37 +0200
-Message-ID: <20170515174337.GC18755@cbox>
-References: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
- <1493821072-29713-3-git-send-email-suzuki.poulose@arm.com>
- <20170515100017.GJ9309@cbox>
- <e8255936-1480-1306-edcb-5aef57271a5f@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH 00/11] arm64/firmware: Software Delegated Exception Interface
+Date: Mon, 15 May 2017 18:43:48 +0100
+Message-ID: <20170515174400.29735-1-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F96140905
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 13:40:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20E2440905
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 13:42:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nQzCR92jAyHa for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 May 2017 13:40:22 -0400 (EDT)
-Received: from mail-qk0-f170.google.com (mail-qk0-f170.google.com
- [209.85.220.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0ED2440187
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 13:40:21 -0400 (EDT)
-Received: by mail-qk0-f170.google.com with SMTP id y201so104377303qka.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 10:43:48 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <e8255936-1480-1306-edcb-5aef57271a5f@arm.com>
+ with ESMTP id 3TVvO52a3aih for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 May 2017 13:42:00 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62C3740187
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 13:42:00 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,73 +25,122 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: devicetree@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gTW9uLCBNYXkgMTUsIDIwMTcgYXQgMDI6MzY6NThQTSArMDEwMCwgU3V6dWtpIEsgUG91bG9z
-ZSB3cm90ZToKPiBPbiAxNS8wNS8xNyAxMTowMCwgQ2hyaXN0b2ZmZXIgRGFsbCB3cm90ZToKPiA+
-SGkgU3V6dWtpLAo+ID4KPiA+T24gV2VkLCBNYXkgMDMsIDIwMTcgYXQgMDM6MTc6NTJQTSArMDEw
-MCwgU3V6dWtpIEsgUG91bG9zZSB3cm90ZToKPiA+PldlIHlpZWxkIHRoZSBrdm0tPm1tdV9sb2Nr
-IG9jY2Fzc2lvbmFseSB3aGlsZSBwZXJmb3JtaW5nIGFuIG9wZXJhdGlvbgo+ID4+KGUuZywgdW5t
-YXAgb3IgcGVybWlzc2lvbiBjaGFuZ2VzKSBvbiBhIGxhcmdlIGFyZWEgb2Ygc3RhZ2UyIG1hcHBp
-bmdzLgo+ID4+SG93ZXZlciB0aGlzIGNvdWxkIHBvc3NpYmx5IGNhdXNlIGFub3RoZXIgdGhyZWFk
-IHRvIGNsZWFyIGFuZCBmcmVlIHVwCj4gPj50aGUgc3RhZ2UyIHBhZ2UgdGFibGVzIHdoaWxlIHdl
-IHdlcmUgd2FpdGluZyBmb3IgcmVnYWluaW5nIHRoZSBsb2NrIGFuZAo+ID4+dGh1cyB0aGUgb3Jp
-Z2luYWwgdGhyZWFkIGNvdWxkIGVuZCB1cCBpbiBhY2Nlc3NpbmcgbWVtb3J5IHRoYXQgd2FzCj4g
-Pj5mcmVlZC4gVGhpcyBwYXRjaCBmaXhlcyB0aGUgcHJvYmxlbSBieSBtYWtpbmcgc3VyZSB0aGF0
-IHRoZSBzdGFnZTIKPiA+PnBhZ2V0YWJsZSBpcyBzdGlsbCB2YWxpZCBhZnRlciB3ZSByZWdhaW4g
-dGhlIGxvY2suIFRoZSBmYWN0IHRoYXQKPiA+Pm1tdV9ub3RpZmVyLT5yZWxlYXNlKCkgY291bGQg
-YmUgY2FsbGVkIHR3aWNlICh2aWEgX19tbXVfbm90aWZpZXJfcmVsZWFzZQo+ID4+YW5kIG1tdV9u
-b3RpZmllcl91bnJlZ3Npc3RlcikgZW5oYW5jZXMgdGhlIHBvc3NpYmlsaXR5IG9mIGhpdHRpbmcK
-PiA+PnRoaXMgcmFjZSB3aGVyZSB0aGVyZSBhcmUgdHdvIHRocmVhZHMgdHJ5aW5nIHRvIHVubWFw
-IHRoZSBlbnRpcmUgZ3Vlc3QKPiA+PnNoYWRvdyBwYWdlcy4KPiA+Pgo+ID4+V2hpbGUgYXQgaXQs
-IGNsZWFudXAgdGhlIHJlZHVkYW50IGNoZWNrcyBhcm91bmQgY29uZF9yZXNjaGVkX2xvY2sgaW4K
-PiA+PnN0YWdlMl93cF9yYW5nZSgpLCBhcyBjb25kX3Jlc2NoZWRfbG9jayBhbHJlYWR5IGRvZXMg
-dGhlIHNhbWUgY2hlY2tzLgo+ID4+Cj4gPj5DYzogTWFyayBSdXRsYW5kIDxtYXJrLnJ1dGxhbmRA
-YXJtLmNvbT4KPiA+PkNjOiBSYWRpbSBLcsSNbcOhxZkgPHJrcmNtYXJAcmVkaGF0LmNvbT4KPiA+
-PkNjOiBhbmRyZXlrbnZsQGdvb2dsZS5jb20KPiA+PkNjOiBDaHJpc3RvZmZlciBEYWxsIDxjaHJp
-c3RvZmZlci5kYWxsQGxpbmFyby5vcmc+Cj4gPj5DYzogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdp
-ZXJAYXJtLmNvbT4KPiA+PkNjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPgo+
-ID4+U2lnbmVkLW9mZi1ieTogU3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNv
-bT4KPiA+Pi0tLQo+ID4+IGFyY2gvYXJtL2t2bS9tbXUuYyB8IDE3ICsrKysrKysrKysrKy0tLS0t
-Cj4gPj4gMSBmaWxlIGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKyksIDUgZGVsZXRpb25zKC0pCj4g
-Pj4KPiA+PmRpZmYgLS1naXQgYS9hcmNoL2FybS9rdm0vbW11LmMgYi9hcmNoL2FybS9rdm0vbW11
-LmMKPiA+PmluZGV4IDkwOWExYTcuLjViM2UwZGIgMTAwNjQ0Cj4gPj4tLS0gYS9hcmNoL2FybS9r
-dm0vbW11LmMKPiA+PisrKyBiL2FyY2gvYXJtL2t2bS9tbXUuYwo+ID4+QEAgLTMwMSw5ICszMDEs
-MTQgQEAgc3RhdGljIHZvaWQgdW5tYXBfc3RhZ2UyX3JhbmdlKHN0cnVjdCBrdm0gKmt2bSwgcGh5
-c19hZGRyX3Qgc3RhcnQsIHU2NCBzaXplKQo+ID4+IAkJLyoKPiA+PiAJCSAqIElmIHRoZSByYW5n
-ZSBpcyB0b28gbGFyZ2UsIHJlbGVhc2UgdGhlIGt2bS0+bW11X2xvY2sKPiA+PiAJCSAqIHRvIHBy
-ZXZlbnQgc3RhcnZhdGlvbiBhbmQgbG9ja3VwIGRldGVjdG9yIHdhcm5pbmdzLgo+ID4+KwkJICog
-TWFrZSBzdXJlIHRoZSBwYWdlIHRhYmxlIGlzIHN0aWxsIGFjdGl2ZSB3aGVuIHdlIHJlZ2Fpbgo+
-ID4+KwkJICogdGhlIGxvY2suCj4gPj4gCQkgKi8KPiA+Pi0JCWlmIChuZXh0ICE9IGVuZCkKPiA+
-PisJCWlmIChuZXh0ICE9IGVuZCkgewo+ID4+IAkJCWNvbmRfcmVzY2hlZF9sb2NrKCZrdm0tPm1t
-dV9sb2NrKTsKPiA+PisJCQlpZiAoIVJFQURfT05DRShrdm0tPmFyY2gucGdkKSkKPiA+PisJCQkJ
-YnJlYWs7Cj4gPj4rCQl9Cj4gPgo+ID5TbyBJIGRvbid0IHRoaW5rIHRoaXMgY2hhbmdlIGlzIHdy
-b25nLCBidXQgSSB3b25kZXIgaWYgaXQncyBzdWZmaWNpZW50Lgo+ID5Gb3IgZXhhbXBsZSwgSSBj
-YW4gc2VlIHRoYXQgdGhpcyBmdW5jdGlvbiBpcyBjYWxsZWQgZnJvbQo+ID4KPiA+c3RhZ2UyX3Vu
-bXNwX3ZtCj4gPiAtPiBzdGFnZTJfdW5tYXBfbWVtc2xvdAo+ID4gICAtPiB1bm1hcF9zdGFnZTJf
-cmFuZ2UKPiA+Cj4gPmFuZAo+ID4KPiA+a3ZtX2FyY2hfZmx1c2hfc2hhZG93X21lbXNsb3QKPiA+
-IC0+IHVubWFwX3N0YWdlMl9yYW5nZQo+ID4KPiA+d2hpY2ggbmV2ZXIgY2hlY2sgaWYgdGhlIHBn
-ZCBwb2ludGVyIGlzIHZhbGlkLAo+IAo+IFlvdSBhcmUgcmlnaHQuIFRob3NlIHR3byBjYWxsZXJz
-IGRvIG5vdCBjaGVjayBpdC4gV2UgY291bGQgZml4IGFsbCBvZiB0aGlzIGJ5IHNpbXBseQo+IG1v
-dmluZyB0aGUgY2hlY2sgdG8gdGhlIGJlZ2lubmluZyBvZiB0aGUgbG9vcC4KPiBpLmUsIHNvbWV0
-aGluZyBsaWtlIHRoaXMgOgo+IAo+IEBAIC0yOTUsNiArMjk1LDEyIEBAIHN0YXRpYyB2b2lkIHVu
-bWFwX3N0YWdlMl9yYW5nZShzdHJ1Y3Qga3ZtICprdm0sIHBoeXNfYWRkcl90IHN0YXJ0LCB1NjQg
-c2l6ZSkKPiAJYXNzZXJ0X3NwaW5fbG9ja2VkKCZrdm0tPm1tdV9sb2NrKTsKPiAJcGdkID0ga3Zt
-LT5hcmNoLnBnZCArIHN0YWdlMl9wZ2RfaW5kZXgoYWRkcik7Cj4gCWRvIHsKPiArCQkvKgo+ICsJ
-CSAqIE1ha2Ugc3VyZSB0aGUgcGFnZSB0YWJsZSBpcyBzdGlsbCBhY3RpdmUsIGFzIHdlIGNvdWxk
-Cj4gKwkJICogYW5vdGhlciB0aHJlYWQgY291bGQgaGF2ZSBwb3NzaWJseSBmcmVlZCB0aGUgcGFn
-ZSB0YWJsZS4KPiArCQkgKi8KPiArCQlpZiAoIVJFQURfT05DRShrdm0tPmFyY2gucGdkKSkKPiAr
-CQkJYnJlYWs7Cj4gCQluZXh0ID0gc3RhZ2UyX3BnZF9hZGRyX2VuZChhZGRyLCBlbmQpOwo+IAkJ
-aWYgKCFzdGFnZTJfcGdkX25vbmUoKnBnZCkpCj4gCQkJdW5tYXBfc3RhZ2UyX3B1ZHMoa3ZtLCBw
-Z2QsIGFkZHIsIG5leHQpOwo+IAo+IAo+IAo+IAo+ID5hbmQgZmluYWxseSwga3ZtX2ZyZWVfc3Rh
-Z2UyX3BnZCBhbHNvIGNoZWNrcyB0aGUgcGdkIHBvaW50ZXIgb3V0c2lkZSBvZiBob2xkaW5nIHRo
-ZQo+ID5rdm0tPm1tdV9sb2NrIHNvIHdoeSBpcyB0aGlzIG5vdCByYWN5Pwo+IAo+IFRoaXMgaGFz
-IGJlZW4gZml4ZWQgYnkgcGF0Y2ggMSBpbiB0aGUgc2VyaWVzLiBTbyBzaG91bGQgYmUgZmluZS4K
-PiAKPiAKPiBJIGNhbiByZXNwaW4gdGhlIHBhdGNoIHdpdGggdGhlIGNoYW5nZXMgaWYgeW91IGFy
-ZSBPSyB3aXRoIGl0Lgo+IApZZXMsIGFic29sdXRlbHkuICBJJ3ZlIGFscmVhZHkgYXBwbGllZCBw
-YXRjaCAxIHNvIG5vIG5lZWQgdG8gaW5jbHVkZQp0aGF0IGluIHlvdXIgcmVzcGluLgoKVGhhbmtz
-IQoKLUNocmlzdG9mZmVyCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpo
-dHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Hello!
+
+The Software Delegated Exception Interface (SDEI) is an ARM specification
+for registering callbacks from the platform firmware into the OS.
+This is intended to be used to implement firmware-first RAS notifications.
+
+The document is here:
+http://infocenter.arm.com/help/topic/com.arm.doc.den0054a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
+
+This series (juggles some registers with KVM+VHE, then) adds a DT binding to
+trigger probing of the interface and support for the SDEI API.
+A future version of the ACPI spec should add the necessary parts to enable this
+to be used as a GHES notification.
+
+
+SDEI runs between adjacent exception levels, so events will always be delivered
+to EL2 if firmware is at EL3. For VHE hosts we run the SDEI event handler
+behind KVM's back with all exceptions masked. Once the handler has done its
+work we return to the appropriate vbar+irq entry. This allows KVM to
+world-switch and deliver any signals sent by the handler to Qemu/kvmtool. We
+do the same thing if we interrupt host EL0. If we interrupted code with
+interrupts masked, we use a different API call to return to the interrupted
+context.
+
+What about non-VHE KVM? If you don't have VHE support and boot at EL2, the
+kernel drops to EL1. This driver will print an error message then give up. This
+is because events would still be delivered to EL2 hitting either KVM, or the
+hyp-stub. Supporting this is complicated, but because the main use-case is
+RAS, and ARM v8.2's RAS extensions imply v8.1's Virtual Host Extensions, we
+can assume all platforms with SDEI will support VHE too. (I have some ideas
+on how to support non-VHE if it turns out to be needed).
+
+
+Running the event handler behind VHE-KVM's back has some side effects: The
+event handler will blindly use any registers that are shared between the host
+and guest. The two that I think matter are TPIDR_EL1, and the debug state. The
+guest may have set MDSCR_EL1 so debug exceptions must remain masked. The
+guest's TPIDR_EL1 will be used by the event handler if it accesses per-cpu
+variables. This needs fixing. The first part of this series juggles KVMs use
+of TPIDR_EL2 so that we share it with the host on VHE systems. An equivalent
+change for 32bit is on my todo list. (one alternative to this is to have a
+parody world switch in the SDEI event handler, but this would mean special
+casing interrupted guests, and be an ABI link to KVM.)
+
+Causing a synchronous exception from an event handler will cause KVM to
+hyp-panic, but may silently succeed if the event didn't interrupt a guest.
+(I may WARN_ON() if this happens in a later patch). You because of this you
+should not kprobe anything that handles SDE events. Once we've called
+nmi_enter(), ftrace and friends should be safe.
+
+Is this another begins-with-S RAS mechanism for arm64? Yes.
+Why? Any notification delivered as an exception will overwrite the exception
+registers. This is fatal for the running thread if it happens during entry.S's
+kernel_enter or kernel_exit. Instead of adding masking and routing controls,
+events are delivered to a registered address at a fixed exception level and
+don't change the exception registers when delivered.
+
+This series can be retrieved from:
+git://linux-arm.org/linux-jm.git -b sdei/v1/base
+
+Questions and contradictions welcome!
+
+
+James Morse (11):
+  KVM: arm64: Store vcpu on the stack during __guest_enter()
+  KVM: arm/arm64: Convert kvm_host_cpu_state to a static per-cpu
+    allocation
+  KVM: arm64: Change hyp_panic()s dependency on tpidr_el2
+  arm64: alternatives: use tpidr_el2 on VHE hosts
+  arm64: KVM: Stop save/restoring host tpidr_el1 on VHE
+  dt-bindings: add devicetree binding for describing arm64 SDEI firmware
+  firmware: arm_sdei: Add driver for Software Delegated Exceptions
+  arm64: kernel: Add arch-specific SDEI entry code and CPU masking
+  firmware: arm_sdei: Add support for CPU and system power states
+  firmware: arm_sdei: add support for CPU private events
+  KVM: arm64: Delegate support for SDEI to userspace
+
+ Documentation/devicetree/bindings/arm/sdei.txt |   37 +
+ arch/arm64/Kconfig                             |    1 +
+ arch/arm64/include/asm/assembler.h             |    8 +
+ arch/arm64/include/asm/kvm_host.h              |    2 +
+ arch/arm64/include/asm/percpu.h                |   11 +-
+ arch/arm64/include/asm/processor.h             |    1 +
+ arch/arm64/include/asm/sdei.h                  |   45 +
+ arch/arm64/kernel/Makefile                     |    1 +
+ arch/arm64/kernel/asm-offsets.c                |    2 +
+ arch/arm64/kernel/cpufeature.c                 |   22 +
+ arch/arm64/kernel/entry.S                      |   68 ++
+ arch/arm64/kernel/sdei.c                       |  106 +++
+ arch/arm64/kernel/smp.c                        |    7 +
+ arch/arm64/kvm/handle_exit.c                   |   10 +-
+ arch/arm64/kvm/hyp-init.S                      |    4 +
+ arch/arm64/kvm/hyp/entry.S                     |   12 +-
+ arch/arm64/kvm/hyp/hyp-entry.S                 |   13 +-
+ arch/arm64/kvm/hyp/switch.c                    |   25 +-
+ arch/arm64/kvm/hyp/sysreg-sr.c                 |   16 +-
+ arch/arm64/mm/proc.S                           |    8 +
+ drivers/firmware/Kconfig                       |    8 +
+ drivers/firmware/Makefile                      |    1 +
+ drivers/firmware/arm_sdei.c                    | 1055 ++++++++++++++++++++++++
+ include/linux/cpuhotplug.h                     |    1 +
+ include/linux/sdei.h                           |  102 +++
+ include/uapi/linux/kvm.h                       |    1 +
+ include/uapi/linux/sdei.h                      |   91 ++
+ virt/kvm/arm/arm.c                             |   23 +-
+ 28 files changed, 1634 insertions(+), 47 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/arm/sdei.txt
+ create mode 100644 arch/arm64/include/asm/sdei.h
+ create mode 100644 arch/arm64/kernel/sdei.c
+ create mode 100644 drivers/firmware/arm_sdei.c
+ create mode 100644 include/linux/sdei.h
+ create mode 100644 include/uapi/linux/sdei.h
+
+-- 
+2.10.1
