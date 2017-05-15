@@ -1,27 +1,97 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 0/2] plug KVM ARMv7 debug leakage
-Date: Mon, 15 May 2017 14:30:00 +0200
-Message-ID: <20170515123000.GB18755@cbox>
-References: <20170511124612.11212-1-alex.bennee@linaro.org>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH 2/2] kvm: arm/arm64: Fix use after free of stage2 page
+ table
+Date: Mon, 15 May 2017 14:36:58 +0100
+Message-ID: <e8255936-1480-1306-edcb-5aef57271a5f@arm.com>
+References: <1493821072-29713-1-git-send-email-suzuki.poulose@arm.com>
+ <1493821072-29713-3-git-send-email-suzuki.poulose@arm.com>
+ <20170515100017.GJ9309@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170511124612.11212-1-alex.bennee@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAD2940296
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 09:33:38 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id iufri34ad4is for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 May 2017 09:33:37 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6686340190
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 09:33:37 -0400 (EDT)
+In-Reply-To: <20170515100017.GJ9309@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 11, 2017 at 01:46:10PM +0100, Alex Bennée wrote:
-> Hi,
-> 
-> This is pretty much v1 + comments from Marc and a minor re-factor of
-> the trap path to make it cleaner w.r.t. cp14/cp15 trapping.
-
-Thanks for these.
-
-I've applied them to kvmarm/master and cc'ed the first one to stable.
-
--Christoffer
+T24gMTUvMDUvMTcgMTE6MDAsIENocmlzdG9mZmVyIERhbGwgd3JvdGU6Cj4gSGkgU3V6dWtpLAo+
+Cj4gT24gV2VkLCBNYXkgMDMsIDIwMTcgYXQgMDM6MTc6NTJQTSArMDEwMCwgU3V6dWtpIEsgUG91
+bG9zZSB3cm90ZToKPj4gV2UgeWllbGQgdGhlIGt2bS0+bW11X2xvY2sgb2NjYXNzaW9uYWx5IHdo
+aWxlIHBlcmZvcm1pbmcgYW4gb3BlcmF0aW9uCj4+IChlLmcsIHVubWFwIG9yIHBlcm1pc3Npb24g
+Y2hhbmdlcykgb24gYSBsYXJnZSBhcmVhIG9mIHN0YWdlMiBtYXBwaW5ncy4KPj4gSG93ZXZlciB0
+aGlzIGNvdWxkIHBvc3NpYmx5IGNhdXNlIGFub3RoZXIgdGhyZWFkIHRvIGNsZWFyIGFuZCBmcmVl
+IHVwCj4+IHRoZSBzdGFnZTIgcGFnZSB0YWJsZXMgd2hpbGUgd2Ugd2VyZSB3YWl0aW5nIGZvciBy
+ZWdhaW5pbmcgdGhlIGxvY2sgYW5kCj4+IHRodXMgdGhlIG9yaWdpbmFsIHRocmVhZCBjb3VsZCBl
+bmQgdXAgaW4gYWNjZXNzaW5nIG1lbW9yeSB0aGF0IHdhcwo+PiBmcmVlZC4gVGhpcyBwYXRjaCBm
+aXhlcyB0aGUgcHJvYmxlbSBieSBtYWtpbmcgc3VyZSB0aGF0IHRoZSBzdGFnZTIKPj4gcGFnZXRh
+YmxlIGlzIHN0aWxsIHZhbGlkIGFmdGVyIHdlIHJlZ2FpbiB0aGUgbG9jay4gVGhlIGZhY3QgdGhh
+dAo+PiBtbXVfbm90aWZlci0+cmVsZWFzZSgpIGNvdWxkIGJlIGNhbGxlZCB0d2ljZSAodmlhIF9f
+bW11X25vdGlmaWVyX3JlbGVhc2UKPj4gYW5kIG1tdV9ub3RpZmllcl91bnJlZ3Npc3RlcikgZW5o
+YW5jZXMgdGhlIHBvc3NpYmlsaXR5IG9mIGhpdHRpbmcKPj4gdGhpcyByYWNlIHdoZXJlIHRoZXJl
+IGFyZSB0d28gdGhyZWFkcyB0cnlpbmcgdG8gdW5tYXAgdGhlIGVudGlyZSBndWVzdAo+PiBzaGFk
+b3cgcGFnZXMuCj4+Cj4+IFdoaWxlIGF0IGl0LCBjbGVhbnVwIHRoZSByZWR1ZGFudCBjaGVja3Mg
+YXJvdW5kIGNvbmRfcmVzY2hlZF9sb2NrIGluCj4+IHN0YWdlMl93cF9yYW5nZSgpLCBhcyBjb25k
+X3Jlc2NoZWRfbG9jayBhbHJlYWR5IGRvZXMgdGhlIHNhbWUgY2hlY2tzLgo+Pgo+PiBDYzogTWFy
+ayBSdXRsYW5kIDxtYXJrLnJ1dGxhbmRAYXJtLmNvbT4KPj4gQ2M6IFJhZGltIEtyxI1tw6HFmSA8
+cmtyY21hckByZWRoYXQuY29tPgo+PiBDYzogYW5kcmV5a252bEBnb29nbGUuY29tCj4+IENjOiBD
+aHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc+Cj4+IENjOiBNYXJj
+IFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgo+PiBDYzogUGFvbG8gQm9uemluaSA8cGJv
+bnppbmlAcmVkaGF0LmNvbT4KPj4gU2lnbmVkLW9mZi1ieTogU3V6dWtpIEsgUG91bG9zZSA8c3V6
+dWtpLnBvdWxvc2VAYXJtLmNvbT4KPj4gLS0tCj4+ICBhcmNoL2FybS9rdm0vbW11LmMgfCAxNyAr
+KysrKysrKysrKystLS0tLQo+PiAgMSBmaWxlIGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKyksIDUg
+ZGVsZXRpb25zKC0pCj4+Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybS9rdm0vbW11LmMgYi9hcmNo
+L2FybS9rdm0vbW11LmMKPj4gaW5kZXggOTA5YTFhNy4uNWIzZTBkYiAxMDA2NDQKPj4gLS0tIGEv
+YXJjaC9hcm0va3ZtL21tdS5jCj4+ICsrKyBiL2FyY2gvYXJtL2t2bS9tbXUuYwo+PiBAQCAtMzAx
+LDkgKzMwMSwxNCBAQCBzdGF0aWMgdm9pZCB1bm1hcF9zdGFnZTJfcmFuZ2Uoc3RydWN0IGt2bSAq
+a3ZtLCBwaHlzX2FkZHJfdCBzdGFydCwgdTY0IHNpemUpCj4+ICAJCS8qCj4+ICAJCSAqIElmIHRo
+ZSByYW5nZSBpcyB0b28gbGFyZ2UsIHJlbGVhc2UgdGhlIGt2bS0+bW11X2xvY2sKPj4gIAkJICog
+dG8gcHJldmVudCBzdGFydmF0aW9uIGFuZCBsb2NrdXAgZGV0ZWN0b3Igd2FybmluZ3MuCj4+ICsJ
+CSAqIE1ha2Ugc3VyZSB0aGUgcGFnZSB0YWJsZSBpcyBzdGlsbCBhY3RpdmUgd2hlbiB3ZSByZWdh
+aW4KPj4gKwkJICogdGhlIGxvY2suCj4+ICAJCSAqLwo+PiAtCQlpZiAobmV4dCAhPSBlbmQpCj4+
+ICsJCWlmIChuZXh0ICE9IGVuZCkgewo+PiAgCQkJY29uZF9yZXNjaGVkX2xvY2soJmt2bS0+bW11
+X2xvY2spOwo+PiArCQkJaWYgKCFSRUFEX09OQ0Uoa3ZtLT5hcmNoLnBnZCkpCj4+ICsJCQkJYnJl
+YWs7Cj4+ICsJCX0KPgo+IFNvIEkgZG9uJ3QgdGhpbmsgdGhpcyBjaGFuZ2UgaXMgd3JvbmcsIGJ1
+dCBJIHdvbmRlciBpZiBpdCdzIHN1ZmZpY2llbnQuCj4gRm9yIGV4YW1wbGUsIEkgY2FuIHNlZSB0
+aGF0IHRoaXMgZnVuY3Rpb24gaXMgY2FsbGVkIGZyb20KPgo+IHN0YWdlMl91bm1zcF92bQo+ICAt
+PiBzdGFnZTJfdW5tYXBfbWVtc2xvdAo+ICAgIC0+IHVubWFwX3N0YWdlMl9yYW5nZQo+Cj4gYW5k
+Cj4KPiBrdm1fYXJjaF9mbHVzaF9zaGFkb3dfbWVtc2xvdAo+ICAtPiB1bm1hcF9zdGFnZTJfcmFu
+Z2UKPgo+IHdoaWNoIG5ldmVyIGNoZWNrIGlmIHRoZSBwZ2QgcG9pbnRlciBpcyB2YWxpZCwKCllv
+dSBhcmUgcmlnaHQuIFRob3NlIHR3byBjYWxsZXJzIGRvIG5vdCBjaGVjayBpdC4gV2UgY291bGQg
+Zml4IGFsbCBvZiB0aGlzIGJ5IHNpbXBseQptb3ZpbmcgdGhlIGNoZWNrIHRvIHRoZSBiZWdpbm5p
+bmcgb2YgdGhlIGxvb3AuCmkuZSwgc29tZXRoaW5nIGxpa2UgdGhpcyA6CgpAQCAtMjk1LDYgKzI5
+NSwxMiBAQCBzdGF0aWMgdm9pZCB1bm1hcF9zdGFnZTJfcmFuZ2Uoc3RydWN0IGt2bSAqa3ZtLCBw
+aHlzX2FkZHJfdCBzdGFydCwgdTY0IHNpemUpCglhc3NlcnRfc3Bpbl9sb2NrZWQoJmt2bS0+bW11
+X2xvY2spOwoJcGdkID0ga3ZtLT5hcmNoLnBnZCArIHN0YWdlMl9wZ2RfaW5kZXgoYWRkcik7Cglk
+byB7CisJCS8qCisJCSAqIE1ha2Ugc3VyZSB0aGUgcGFnZSB0YWJsZSBpcyBzdGlsbCBhY3RpdmUs
+IGFzIHdlIGNvdWxkCisJCSAqIGFub3RoZXIgdGhyZWFkIGNvdWxkIGhhdmUgcG9zc2libHkgZnJl
+ZWQgdGhlIHBhZ2UgdGFibGUuCisJCSAqLworCQlpZiAoIVJFQURfT05DRShrdm0tPmFyY2gucGdk
+KSkKKwkJCWJyZWFrOwoJCW5leHQgPSBzdGFnZTJfcGdkX2FkZHJfZW5kKGFkZHIsIGVuZCk7CgkJ
+aWYgKCFzdGFnZTJfcGdkX25vbmUoKnBnZCkpCgkJCXVubWFwX3N0YWdlMl9wdWRzKGt2bSwgcGdk
+LCBhZGRyLCBuZXh0KTsKCgoKCj4gYW5kIGZpbmFsbHksIGt2bV9mcmVlX3N0YWdlMl9wZ2QgYWxz
+byBjaGVja3MgdGhlIHBnZCBwb2ludGVyIG91dHNpZGUgb2YgaG9sZGluZyB0aGUKPiBrdm0tPm1t
+dV9sb2NrIHNvIHdoeSBpcyB0aGlzIG5vdCByYWN5PwoKVGhpcyBoYXMgYmVlbiBmaXhlZCBieSBw
+YXRjaCAxIGluIHRoZSBzZXJpZXMuIFNvIHNob3VsZCBiZSBmaW5lLgoKCkkgY2FuIHJlc3BpbiB0
+aGUgcGF0Y2ggd2l0aCB0aGUgY2hhbmdlcyBpZiB5b3UgYXJlIE9LIHdpdGggaXQuCgpTdXp1a2kK
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
+YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
+LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
