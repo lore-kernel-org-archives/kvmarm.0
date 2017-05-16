@@ -1,22 +1,26 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3 2/2] kvm: arm/arm64: Fix use after free of stage2 page table
-Date: Tue, 16 May 2017 10:34:55 +0100
-Message-ID: <1494927295-29369-3-git-send-email-suzuki.poulose@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v3 0/2] kvm: arm/arm64: Fixes for race conditions
+Date: Tue, 16 May 2017 11:53:18 +0200
+Message-ID: <20170516095318.GA5259@cbox>
 References: <1494927295-29369-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EFFD340C1C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 05:31:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4B7D40948
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 05:50:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 77xnqW7gNKux for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 May 2017 05:31:47 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D11A240992
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 05:31:47 -0400 (EDT)
+ with ESMTP id lMqB3Ls-51aN for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 May 2017 05:50:01 -0400 (EDT)
+Received: from mail-qk0-f175.google.com (mail-qk0-f175.google.com
+ [209.85.220.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6AB19400E9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 05:50:01 -0400 (EDT)
+Received: by mail-qk0-f175.google.com with SMTP id a72so122590261qkj.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 02:53:28 -0700 (PDT)
+Content-Disposition: inline
 In-Reply-To: <1494927295-29369-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -27,57 +31,23 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, andreyknvl@google.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-V2UgeWllbGQgdGhlIGt2bS0+bW11X2xvY2sgb2NjYXNzaW9uYWx5IHdoaWxlIHBlcmZvcm1pbmcg
-YW4gb3BlcmF0aW9uCihlLmcsIHVubWFwIG9yIHBlcm1pc3Npb24gY2hhbmdlcykgb24gYSBsYXJn
-ZSBhcmVhIG9mIHN0YWdlMiBtYXBwaW5ncy4KSG93ZXZlciB0aGlzIGNvdWxkIHBvc3NpYmx5IGNh
-dXNlIGFub3RoZXIgdGhyZWFkIHRvIGNsZWFyIGFuZCBmcmVlIHVwCnRoZSBzdGFnZTIgcGFnZSB0
-YWJsZXMgd2hpbGUgd2Ugd2VyZSB3YWl0aW5nIGZvciByZWdhaW5pbmcgdGhlIGxvY2sgYW5kCnRo
-dXMgdGhlIG9yaWdpbmFsIHRocmVhZCBjb3VsZCBlbmQgdXAgaW4gYWNjZXNzaW5nIG1lbW9yeSB0
-aGF0IHdhcwpmcmVlZC4gVGhpcyBwYXRjaCBmaXhlcyB0aGUgcHJvYmxlbSBieSBtYWtpbmcgc3Vy
-ZSB0aGF0IHRoZSBzdGFnZTIKcGFnZXRhYmxlIGlzIHN0aWxsIHZhbGlkIGFmdGVyIHdlIHJlZ2Fp
-biB0aGUgbG9jay4gVGhlIGZhY3QgdGhhdAptbXVfbm90aWZlci0+cmVsZWFzZSgpIGNvdWxkIGJl
-IGNhbGxlZCB0d2ljZSAodmlhIF9fbW11X25vdGlmaWVyX3JlbGVhc2UKYW5kIG1tdV9ub3RpZmll
-cl91bnJlZ3Npc3RlcikgZW5oYW5jZXMgdGhlIHBvc3NpYmlsaXR5IG9mIGhpdHRpbmcKdGhpcyBy
-YWNlIHdoZXJlIHRoZXJlIGFyZSB0d28gdGhyZWFkcyB0cnlpbmcgdG8gdW5tYXAgdGhlIGVudGly
-ZSBndWVzdApzaGFkb3cgcGFnZXMuCgpXaGlsZSBhdCBpdCwgY2xlYW51cCB0aGUgcmVkdWRhbnQg
-Y2hlY2tzIGFyb3VuZCBjb25kX3Jlc2NoZWRfbG9jayBpbgpzdGFnZTJfd3BfcmFuZ2UoKSwgYXMg
-Y29uZF9yZXNjaGVkX2xvY2sgYWxyZWFkeSBkb2VzIHRoZSBzYW1lIGNoZWNrcy4KCkNjOiBNYXJr
-IFJ1dGxhbmQgPG1hcmsucnV0bGFuZEBhcm0uY29tPgpDYzogUmFkaW0gS3LEjW3DocWZIDxya3Jj
-bWFyQHJlZGhhdC5jb20+CkNjOiBhbmRyZXlrbnZsQGdvb2dsZS5jb20KQ2M6IENocmlzdG9mZmVy
-IERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KQ2M6IFBhb2xvIEJvbnppbmkgPHBi
-b256aW5pQHJlZGhhdC5jb20+CkFja2VkLWJ5OiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBh
-cm0uY29tPgpTaWduZWQtb2ZmLWJ5OiBTdXp1a2kgSyBQb3Vsb3NlIDxzdXp1a2kucG91bG9zZUBh
-cm0uY29tPgotLS0KIHZpcnQva3ZtL2FybS9tbXUuYyB8IDE3ICsrKysrKysrKysrKystLS0tCiAx
-IGZpbGUgY2hhbmdlZCwgMTMgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKCmRpZmYgLS1n
-aXQgYS92aXJ0L2t2bS9hcm0vbW11LmMgYi92aXJ0L2t2bS9hcm0vbW11LmMKaW5kZXggNzA0ZTM1
-Zi4uYTJkNjMyNCAxMDA2NDQKLS0tIGEvdmlydC9rdm0vYXJtL21tdS5jCisrKyBiL3ZpcnQva3Zt
-L2FybS9tbXUuYwpAQCAtMjk1LDYgKzI5NSwxMyBAQCBzdGF0aWMgdm9pZCB1bm1hcF9zdGFnZTJf
-cmFuZ2Uoc3RydWN0IGt2bSAqa3ZtLCBwaHlzX2FkZHJfdCBzdGFydCwgdTY0IHNpemUpCiAJYXNz
-ZXJ0X3NwaW5fbG9ja2VkKCZrdm0tPm1tdV9sb2NrKTsKIAlwZ2QgPSBrdm0tPmFyY2gucGdkICsg
-c3RhZ2UyX3BnZF9pbmRleChhZGRyKTsKIAlkbyB7CisJCS8qCisJCSAqIE1ha2Ugc3VyZSB0aGUg
-cGFnZSB0YWJsZSBpcyBzdGlsbCBhY3RpdmUsIGFzIGFub3RoZXIgdGhyZWFkCisJCSAqIGNvdWxk
-IGhhdmUgcG9zc2libHkgZnJlZWQgdGhlIHBhZ2UgdGFibGUsIHdoaWxlIHdlIHJlbGVhc2VkCisJ
-CSAqIHRoZSBsb2NrLgorCQkgKi8KKwkJaWYgKCFSRUFEX09OQ0Uoa3ZtLT5hcmNoLnBnZCkpCisJ
-CQlicmVhazsKIAkJbmV4dCA9IHN0YWdlMl9wZ2RfYWRkcl9lbmQoYWRkciwgZW5kKTsKIAkJaWYg
-KCFzdGFnZTJfcGdkX25vbmUoKnBnZCkpCiAJCQl1bm1hcF9zdGFnZTJfcHVkcyhrdm0sIHBnZCwg
-YWRkciwgbmV4dCk7CkBAIC0xMTcwLDExICsxMTc3LDEzIEBAIHN0YXRpYyB2b2lkIHN0YWdlMl93
-cF9yYW5nZShzdHJ1Y3Qga3ZtICprdm0sIHBoeXNfYWRkcl90IGFkZHIsIHBoeXNfYWRkcl90IGVu
-ZCkKIAkJICogbGFyZ2UuIE90aGVyd2lzZSwgd2UgbWF5IHNlZSBrZXJuZWwgcGFuaWNzIHdpdGgK
-IAkJICogQ09ORklHX0RFVEVDVF9IVU5HX1RBU0ssIENPTkZJR19MT0NLVVBfREVURUNUT1IsCiAJ
-CSAqIENPTkZJR19MT0NLREVQLiBBZGRpdGlvbmFsbHksIGhvbGRpbmcgdGhlIGxvY2sgdG9vIGxv
-bmcKLQkJICogd2lsbCBhbHNvIHN0YXJ2ZSBvdGhlciB2Q1BVcy4KKwkJICogd2lsbCBhbHNvIHN0
-YXJ2ZSBvdGhlciB2Q1BVcy4gV2UgaGF2ZSB0byBhbHNvIG1ha2Ugc3VyZQorCQkgKiB0aGF0IHRo
-ZSBwYWdlIHRhYmxlcyBhcmUgbm90IGZyZWVkIHdoaWxlIHdlIHJlbGVhc2VkCisJCSAqIHRoZSBs
-b2NrLgogCQkgKi8KLQkJaWYgKG5lZWRfcmVzY2hlZCgpIHx8IHNwaW5fbmVlZGJyZWFrKCZrdm0t
-Pm1tdV9sb2NrKSkKLQkJCWNvbmRfcmVzY2hlZF9sb2NrKCZrdm0tPm1tdV9sb2NrKTsKLQorCQlj
-b25kX3Jlc2NoZWRfbG9jaygma3ZtLT5tbXVfbG9jayk7CisJCWlmICghUkVBRF9PTkNFKGt2bS0+
-YXJjaC5wZ2QpKQorCQkJYnJlYWs7CiAJCW5leHQgPSBzdGFnZTJfcGdkX2FkZHJfZW5kKGFkZHIs
-IGVuZCk7CiAJCWlmIChzdGFnZTJfcGdkX3ByZXNlbnQoKnBnZCkpCiAJCQlzdGFnZTJfd3BfcHVk
-cyhwZ2QsIGFkZHIsIG5leHQpOwotLSAKMi43LjQKCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
-LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
-bmZvL2t2bWFybQo=
+On Tue, May 16, 2017 at 10:34:53AM +0100, Suzuki K Poulose wrote:
+> The patches fixes race conditions in stage2 pgd accesses.
+> 
+> Patch 1 is a fix up for the patch which has already been pushed to
+> kvmarm/master.
+> 
+> Patch 2 fixes a case where stage2 PGD could be free'd when we release
+> the kvm->mmu_lock to prevent VCPU starvation.
+> 
+> Applies on kvmarm/master tree
+
+Thanks for the rebase and fix.
+
+Applied to master, and for both patches::
+
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
