@@ -1,37 +1,73 @@
-From: "Baicar, Tyler" <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Subject: Re: [PATCH V16 08/11] efi: print unrecognized CPER section
-Date: Tue, 16 May 2017 11:16:21 -0600
-Message-ID: <e91cb902-c583-c3bc-b5d8-bd4291581341@codeaurora.org>
-References: <1494883680-25551-1-git-send-email-tbaicar@codeaurora.org>
- <1494883680-25551-9-git-send-email-tbaicar@codeaurora.org>
- <20170516142927.guxwc3gdgpqshpks@pd.tnic>
- <5a4a5b58-3e31-9fa5-091d-bb63437da9ab@codeaurora.org>
- <20170516165540.xnbxdhrqeiorqhc5@pd.tnic>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170516165540.xnbxdhrqeiorqhc5-fF5Pk5pvG8Y@public.gmane.org>
-Content-Language: en-US
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Borislav Petkov <bp-Gina5bIWoIWzQB+pC5nmwQ@public.gmane.org>
-Cc: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, james.morse-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Christoffer Dall <cdall@linaro.org>
+Subject: [PATCH v2 0/9] Userspace timer IRQ number control and PMU with userspace-gic
+Date: Tue, 16 May 2017 20:45:47 +0200
+Message-ID: <20170516184556.26785-1-cdall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 5/16/2017 10:55 AM, Borislav Petkov wrote:
-> On Tue, May 16, 2017 at 10:44:43AM -0600, Baicar, Tyler wrote:
->> I meant to respond to this comment after I sent the v16 patch series, but
->> you beat me to it :)
->>
->> These prefixes are common to all the GHES/CPER printing to the kernel logs.
-> I don't mean that - I meant to remove them from this particular example
-> in the commit message along with the timestamps. Because they are simply
-> useless there.
->
-> Of course they should stay in the actual printk calls.
-Ah, okay. I'll remove all that from the commit message.
+So far we have been getting away with letting the kernel choosing
+interrupt numbers for the timers in the kernel and we have crossed our
+fingers in hoping that the DT/ACPI provided by userspace matches with
+the interrupt number we use in the kernel for a given VCPU type.
+
+But as we are generally moving towards letting userspace be in more fine
+grained control of what is being emulated, let userspace decide the irq
+numbers for the timers.
+
+Slightly related, and therefore included in this series, we have
+recently added support for a userspace GIC while still supporting the
+generic timers and the PMU from inside the VM.  Unfortunately we forgot
+to rework the code to actually let userspace create the PMU device
+without creating an in-kernel GIC.
+
+Patches 6-9 could be omitted and still support the basic functionality
+targeted by this series if preferred.
+
+Tested on APM X-Gene, Thunder-X, and TC2.
+
+QEMU patches used for testing can be found here:
+
+https://git.linaro.org/people/christoffer.dall/qemu-arm.git timer-pmu-irqs
+
+Changes since v1:
+ - Rebased on v4.12-rc1
+ - Check for irqchip_in_kernel() in kvm_arm_pmu_v3_get_attr
+ - Slightly change the wording around default timer IRQs
+ - Add fix for the PMU IRQ setting that assumes an initialized vgic
+ - Introduce an allocator for IRQ lines so that in-kernel owned IRQ
+   lines cannot be signalled from userspace and such that an IRQ line
+   can only be assigned to a single device.
+
+Christoffer Dall (9):
+  KVM: arm64: Allow creating the PMU without the in-kernel GIC
+  KVM: arm: Handle VCPU device attributes in guest.c
+  KVM: arm/arm64: Move irq_is_ppi() to header file
+  KVM: arm/arm64: Move timer IRQ default init to arch_timer.c
+  KVM: arm/arm64: Allow setting the timer IRQ numbers from userspace
+  KVM: arm/arm64: Introduce an allocator for in-kernel irq lines
+  KVM: arm/arm64: Check if irq lines to the GIC are already used
+  KVM: arm/arm64: Disallow userspace control of in-kernel IRQ lines
+  KVM: arm/arm64: Don't assume initialized vgic when setting PMU IRQ
+
+ Documentation/virtual/kvm/devices/vcpu.txt |  41 +++++++--
+ arch/arm/include/asm/kvm_host.h            |  22 ++---
+ arch/arm/include/uapi/asm/kvm.h            |   8 ++
+ arch/arm/kvm/guest.c                       |  51 +++++++++++
+ arch/arm/kvm/reset.c                       |  16 +---
+ arch/arm64/include/uapi/asm/kvm.h          |   3 +
+ arch/arm64/kvm/guest.c                     |   9 ++
+ arch/arm64/kvm/reset.c                     |  16 +---
+ include/kvm/arm_arch_timer.h               |   8 +-
+ include/kvm/arm_vgic.h                     |  13 ++-
+ virt/kvm/arm/arch_timer.c                  | 137 ++++++++++++++++++++++++++---
+ virt/kvm/arm/arm.c                         |   4 +-
+ virt/kvm/arm/pmu.c                         |  44 ++++++---
+ virt/kvm/arm/vgic/vgic-irqfd.c             |   2 +-
+ virt/kvm/arm/vgic/vgic.c                   |  48 +++++++++-
+ 15 files changed, 330 insertions(+), 92 deletions(-)
 
 -- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+2.9.0
