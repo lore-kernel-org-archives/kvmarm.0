@@ -1,23 +1,22 @@
-From: Tyler Baicar <tbaicar@codeaurora.org>
-Subject: [PATCH V16 11/11] arm/arm64: KVM: add guest SEA support
-Date: Mon, 15 May 2017 15:28:00 -0600
-Message-ID: <1494883680-25551-12-git-send-email-tbaicar@codeaurora.org>
-References: <1494883680-25551-1-git-send-email-tbaicar@codeaurora.org>
+From: wanghaibin <wanghaibin.wang@huawei.com>
+Subject: [RFC PATCH] kvm: arm: vgic-v3: add the emulate GICC_CTLR layout
+ support for vmcr ctlr field.
+Date: Tue, 16 May 2017 09:19:26 +0800
+Message-ID: <1494897566-11744-1-git-send-email-wanghaibin.wang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 471ED40A69
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 17:25:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B266040960
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 21:16:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iC+3jfwk6Xos for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 May 2017 17:25:51 -0400 (EDT)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 22D5340960
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 17:25:51 -0400 (EDT)
-In-Reply-To: <1494883680-25551-1-git-send-email-tbaicar@codeaurora.org>
+ with ESMTP id 6qlHfMCKy5K1 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 May 2017 21:16:21 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F36CD40190
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 21:16:20 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,277 +26,110 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.kernel.org, Suzuki.Poulose@arm.com, punit.agrawal@arm.com, astone@redhat.com, harba@codeaurora.org, hanjun.gu
-Cc: Tyler Baicar <tbaicar@codeaurora.org>
+To: zhaoshenglong@huawei.com, wu.wubin@huawei.com, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently external aborts are unsupported by the guest abort
-handling. Add handling for SEAs so that the host kernel reports
-SEAs which occur in the guest kernel.
+Boot a virtual machine with the emulated GICv2 on the GICv3 hardware.
+Migrate the virtual machine will be successful, but the virtual machine will
+hang at the destination.
 
-When an SEA occurs in the guest kernel, the guest exits and is
-routed to kvm_handle_guest_abort(). Prior to this patch, a print
-message of an unsupported FSC would be printed and nothing else
-would happen. With this patch, the code gets routed to the APEI
-handling of SEAs in the host kernel to report the SEA information.
+The GICC_CTLR and ICC_CTLR_EL1 have the different layout. Currently, the set/get
+the VMCR interface just take vmcr ctlr field as the ICC_CTLR_EL1 layout.
+Should we consider the GICC_CTLR layout to avoid this problem?
 
-Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
 ---
- arch/arm/include/asm/kvm_arm.h       | 10 ++++++++++
- arch/arm/include/asm/system_misc.h   |  5 +++++
- arch/arm/kvm/mmu.c                   | 36 +++++++++++++++++++++++++++++++++---
- arch/arm64/include/asm/kvm_arm.h     | 10 ++++++++++
- arch/arm64/include/asm/system_misc.h |  2 ++
- arch/arm64/mm/fault.c                | 22 ++++++++++++++++++++--
- drivers/acpi/apei/ghes.c             | 17 +++++++++++------
- include/acpi/ghes.h                  |  2 +-
- 8 files changed, 92 insertions(+), 12 deletions(-)
+ include/linux/irqchip/arm-gic-v3.h |  2 ++
+ virt/kvm/arm/vgic/vgic-v3.c        | 48 ++++++++++++++++++++++++--------------
+ 2 files changed, 32 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-index a3f0b3d..ebf020b 100644
---- a/arch/arm/include/asm/kvm_arm.h
-+++ b/arch/arm/include/asm/kvm_arm.h
-@@ -187,6 +187,16 @@
- #define FSC_FAULT	(0x04)
- #define FSC_ACCESS	(0x08)
- #define FSC_PERM	(0x0c)
-+#define FSC_SEA		(0x10)
-+#define FSC_SEA_TTW0	(0x14)
-+#define FSC_SEA_TTW1	(0x15)
-+#define FSC_SEA_TTW2	(0x16)
-+#define FSC_SEA_TTW3	(0x17)
-+#define FSC_SECC	(0x18)
-+#define FSC_SECC_TTW0	(0x1c)
-+#define FSC_SECC_TTW1	(0x1d)
-+#define FSC_SECC_TTW2	(0x1e)
-+#define FSC_SECC_TTW3	(0x1f)
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 97cbca1..e40c711 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -403,6 +403,8 @@
+ #define ICH_HCR_EN			(1 << 0)
+ #define ICH_HCR_UIE			(1 << 1)
  
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~0xf)
-diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
-index a3d61ad..8c4a89f 100644
---- a/arch/arm/include/asm/system_misc.h
-+++ b/arch/arm/include/asm/system_misc.h
-@@ -22,6 +22,11 @@
- 
- extern unsigned int user_debug;
- 
-+static inline int handle_guest_sea(phys_addr_t addr, unsigned int esr)
-+{
-+	return -1;
-+}
-+
- #endif /* !__ASSEMBLY__ */
- 
- #endif /* __ASM_ARM_SYSTEM_MISC_H */
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 582a972..e247f73 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -29,6 +29,7 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/virt.h>
-+#include <asm/system_misc.h>
- 
- #include "trace.h"
- 
-@@ -1418,6 +1419,25 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 		kvm_set_pfn_accessed(pfn);
- }
- 
-+static bool is_abort_sea(unsigned long fault_status)
-+{
-+	switch (fault_status) {
-+	case FSC_SEA:
-+	case FSC_SEA_TTW0:
-+	case FSC_SEA_TTW1:
-+	case FSC_SEA_TTW2:
-+	case FSC_SEA_TTW3:
-+	case FSC_SECC:
-+	case FSC_SECC_TTW0:
-+	case FSC_SECC_TTW1:
-+	case FSC_SECC_TTW2:
-+	case FSC_SECC_TTW3:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
- /**
-  * kvm_handle_guest_abort - handles all 2nd stage aborts
-  * @vcpu:	the VCPU pointer
-@@ -1440,19 +1460,29 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	gfn_t gfn;
- 	int ret, idx;
- 
-+	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
-+
-+	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-+
-+	/*
-+	 * The host kernel will handle the synchronous external abort. There
-+	 * is no need to pass the error into the guest.
-+	 */
-+	if (is_abort_sea(fault_status)) {
-+		if (!handle_guest_sea(fault_ipa, kvm_vcpu_get_hsr(vcpu)))
-+			return 1;
-+	}
-+
- 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
- 	if (unlikely(!is_iabt && kvm_vcpu_dabt_isextabt(vcpu))) {
- 		kvm_inject_vabt(vcpu);
- 		return 1;
- 	}
- 
--	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
--
- 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_hsr(vcpu),
- 			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
- 
- 	/* Check the stage-2 fault is trans. fault or write fault */
--	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
- 	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
- 	    fault_status != FSC_ACCESS) {
- 		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 6e99978..61d694c 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -204,6 +204,16 @@
- #define FSC_FAULT	ESR_ELx_FSC_FAULT
- #define FSC_ACCESS	ESR_ELx_FSC_ACCESS
- #define FSC_PERM	ESR_ELx_FSC_PERM
-+#define FSC_SEA		ESR_ELx_FSC_EXTABT
-+#define FSC_SEA_TTW0	(0x14)
-+#define FSC_SEA_TTW1	(0x15)
-+#define FSC_SEA_TTW2	(0x16)
-+#define FSC_SEA_TTW3	(0x17)
-+#define FSC_SECC	(0x18)
-+#define FSC_SECC_TTW0	(0x1c)
-+#define FSC_SECC_TTW1	(0x1d)
-+#define FSC_SECC_TTW2	(0x1e)
-+#define FSC_SECC_TTW3	(0x1f)
- 
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
-diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
-index bc81243..95aa442 100644
---- a/arch/arm64/include/asm/system_misc.h
-+++ b/arch/arm64/include/asm/system_misc.h
-@@ -56,6 +56,8 @@ void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned int,
- 	__show_ratelimited;						\
- })
- 
-+int handle_guest_sea(phys_addr_t addr, unsigned int esr);
-+
- #endif	/* __ASSEMBLY__ */
- 
- #endif	/* __ASM_SYSTEM_MISC_H */
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index 6b5ffb7..8d88517 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -515,6 +515,7 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
++#define ICH_VMCR_CTLR_SHIFT		0
++#define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
+ #define ICH_VMCR_CBPR_SHIFT		4
+ #define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
+ #define ICH_VMCR_EOIM_SHIFT		9
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index be0f4c3..66defae 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -174,19 +174,25 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
+ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
  {
- 	struct siginfo info;
- 	const struct fault_info *inf;
-+	int ret = 0;
- 
- 	inf = esr_to_fault_info(esr);
- 	pr_err("Synchronous External Abort: %s (0x%08x) at 0x%016lx\n",
-@@ -529,7 +530,7 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
- 		if (interrupts_enabled(regs))
- 			nmi_enter();
- 
--		ghes_notify_sea();
-+		ret = ghes_notify_sea();
- 
- 		if (interrupts_enabled(regs))
- 			nmi_exit();
-@@ -544,7 +545,7 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
- 		info.si_addr  = (void __user *)addr;
- 	arm64_notify_die("", regs, &info, esr);
- 
--	return 0;
-+	return ret;
- }
- 
- static const struct fault_info fault_info[] = {
-@@ -615,6 +616,23 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
- };
- 
- /*
-+ * Handle Synchronous External Aborts that occur in a guest kernel.
-+ *
-+ * The return value will be zero if the SEA was successfully handled
-+ * and non-zero if there was an error processing the error or there was
-+ * no error to process.
-+ */
-+int handle_guest_sea(phys_addr_t addr, unsigned int esr)
-+{
-+	int ret = -ENOENT;
+ 	u32 vmcr;
++	u32 model = vcpu->kvm->arch.vgic.vgic_model;
 +
-+	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA))
-+		ret = ghes_notify_sea();
-+
-+	return ret;
-+}
-+
-+/*
-  * Dispatch a data abort to the relevant handler.
-  */
- asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 2dddb3b..a1cb286 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -817,17 +817,22 @@ static int ghes_notify_sci(struct notifier_block *this,
- #ifdef CONFIG_ACPI_APEI_SEA
- static LIST_HEAD(ghes_sea);
- 
--void ghes_notify_sea(void)
-+/*
-+ * Return 0 only if one of the SEA error sources successfully reported an error
-+ * record sent from the firmware.
-+ */
-+int ghes_notify_sea(void)
- {
- 	struct ghes *ghes;
-+	int ret = -ENOENT;
++	if (model == KVM_DEV_TYPE_ARM_VGIC_V2)
++		vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
++	else {
++		/*
++		 * Ignore the FIQen bit, because GIC emulation always implies
++		 * SRE=1 which means the vFIQEn bit is also RES1.
++		 */
++		vmcr = ((vmcrp->ctlr >> ICC_CTLR_EL1_EOImode_SHIFT) <<
++			 ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
++		vmcr |= (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
++		vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
++		vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
++	}
  
 -	/*
--	 * synchronize_rcu() will wait for nmi_exit(), so no need to
--	 * rcu_read_lock().
+-	 * Ignore the FIQen bit, because GIC emulation always implies
+-	 * SRE=1 which means the vFIQEn bit is also RES1.
 -	 */
-+	rcu_read_lock();
- 	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
--		ghes_proc(ghes);
-+		if (!ghes_proc(ghes))
-+			ret = 0;
- 	}
-+	rcu_read_unlock();
-+	return ret;
+-	vmcr = ((vmcrp->ctlr >> ICC_CTLR_EL1_EOImode_SHIFT) <<
+-		 ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
+-	vmcr |= (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
+ 	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
+ 	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
+ 	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
+-	vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
+-	vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
+ 
+ 	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
+ }
+@@ -194,19 +200,25 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ {
+ 	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
++	u32 model = vcpu->kvm->arch.vgic.vgic_model;
++
++	if (model == KVM_DEV_TYPE_ARM_VGIC_V2)
++		vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
++	else {
++		/*
++		 * Ignore the FIQen bit, because GIC emulation always implies
++		 * SRE=1 which means the vFIQEn bit is also RES1.
++		 */
++		vmcrp->ctlr = ((vmcr >> ICH_VMCR_EOIM_SHIFT) <<
++				ICC_CTLR_EL1_EOImode_SHIFT) & ICC_CTLR_EL1_EOImode_MASK;
++		vmcrp->ctlr |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
++		vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
++		vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
++	}
+ 
+-	/*
+-	 * Ignore the FIQen bit, because GIC emulation always implies
+-	 * SRE=1 which means the vFIQEn bit is also RES1.
+-	 */
+-	vmcrp->ctlr = ((vmcr >> ICH_VMCR_EOIM_SHIFT) <<
+-			ICC_CTLR_EL1_EOImode_SHIFT) & ICC_CTLR_EL1_EOImode_MASK;
+-	vmcrp->ctlr |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
+ 	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
+ 	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
+ 	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
+-	vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
+-	vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
  }
  
- static void ghes_sea_add(struct ghes *ghes)
-diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
-index 95305ae..9f26e01 100644
---- a/include/acpi/ghes.h
-+++ b/include/acpi/ghes.h
-@@ -113,6 +113,6 @@ static inline void *acpi_hest_get_next(struct acpi_hest_generic_data *gdata)
- 	return (void *)(gdata) + acpi_hest_get_record_size(gdata);
- }
- 
--void ghes_notify_sea(void);
-+int ghes_notify_sea(void);
- 
- #endif /* GHES_H */
+ #define INITIAL_PENDBASER_VALUE						  \
 -- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project.
+1.8.3.1
