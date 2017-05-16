@@ -1,25 +1,25 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v2 8/9] KVM: arm/arm64: Disallow userspace control of
- in-kernel IRQ lines
-Date: Tue, 16 May 2017 20:45:55 +0200
-Message-ID: <20170516184556.26785-9-cdall@linaro.org>
+Subject: [PATCH v2 5/9] KVM: arm/arm64: Allow setting the timer IRQ numbers
+ from userspace
+Date: Tue, 16 May 2017 20:45:52 +0200
+Message-ID: <20170516184556.26785-6-cdall@linaro.org>
 References: <20170516184556.26785-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0FA540C25
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 14:42:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A460340B58
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 14:42:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Jv+dIVcV1Biy for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 May 2017 14:42:58 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 87A3F40C35
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 14:42:56 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id d127so129521963wmf.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 11:46:24 -0700 (PDT)
+ with ESMTP id 4cZMdfRnhFv4 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 May 2017 14:42:56 -0400 (EDT)
+Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0AA9240C2F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 14:42:53 -0400 (EDT)
+Received: by mail-wm0-f47.google.com with SMTP id v15so102117668wmv.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 11:46:22 -0700 (PDT)
 In-Reply-To: <20170516184556.26785-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,149 +34,319 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When injecting an IRQ to the VGIC, you now have to present an owner
-token for that IRQ line to show that you are the owner of that line.
+First we define an ABI using the vcpu devices that lets userspace set
+the interrupt numbers for the various timers on both the 32-bit and
+64-bit KVM/ARM implementations.
 
-IRQ lines driven from userspace or via an irqfd do not have an owner and
-will simply pass a NULL pointer.
+Second, we add the definitions for the groups and attributes introduced
+by the above ABI.  (We add the PMU define on the 32-bit side as well for
+symmetry and it may get used some day.)
 
-Also get rid of the unused kvm_vgic_inject_mapped_irq prototype.
+Third, we set up the arch-specific vcpu device operation handlers to
+call into the timer code for anything related to the
+KVM_ARM_VCPU_TIMER_CTRL group.
+
+Fourth, we implement support for getting and setting the timer interrupt
+numbers using the above defined ABI in the arch timer code.
+
+Fifth, we introduce error checking upon enabling the arch timer (which
+is called when first running a VCPU) to check that all VCPUs are
+configured to use the same PPI for the timer (as mandated by the
+architecture) and that the virtual and physical timers are not
+configured to use the same IRQ number.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- include/kvm/arm_vgic.h         |  4 +---
- virt/kvm/arm/arch_timer.c      |  3 ++-
- virt/kvm/arm/arm.c             |  4 ++--
- virt/kvm/arm/pmu.c             |  3 ++-
- virt/kvm/arm/vgic/vgic-irqfd.c |  2 +-
- virt/kvm/arm/vgic/vgic.c       | 15 +++++++++++----
- 6 files changed, 19 insertions(+), 12 deletions(-)
+ Documentation/virtual/kvm/devices/vcpu.txt |  25 +++++++
+ arch/arm/include/uapi/asm/kvm.h            |   8 +++
+ arch/arm/kvm/guest.c                       |   9 +++
+ arch/arm64/include/uapi/asm/kvm.h          |   3 +
+ arch/arm64/kvm/guest.c                     |   9 +++
+ include/kvm/arm_arch_timer.h               |   4 ++
+ virt/kvm/arm/arch_timer.c                  | 104 +++++++++++++++++++++++++++++
+ 7 files changed, 162 insertions(+)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 5d5b345..131668f 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -300,9 +300,7 @@ int kvm_vgic_hyp_init(void);
- void kvm_vgic_init_cpu_hardware(void);
+diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
+index 352af6e..4800093 100644
+--- a/Documentation/virtual/kvm/devices/vcpu.txt
++++ b/Documentation/virtual/kvm/devices/vcpu.txt
+@@ -35,3 +35,28 @@ Returns: -ENODEV: PMUv3 not supported or GIC not initialized
+ Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
+ virtual GIC implementation, this must be done after initializing the in-kernel
+ irqchip.
++
++
++2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
++Architectures: ARM,ARM64
++
++2.1. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_VTIMER
++2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_PTIMER
++Parameters: in kvm_device_attr.addr the address for the timer interrupt is a
++            pointer to an int
++Returns: -EINVAL: Invalid timer interrupt number
++         -EBUSY:  One or more VCPUs has already run
++
++A value describing the architected timer interrupt number when connected to an
++in-kernel virtual GIC.  These must be a PPI (16 <= intid < 32).  Setting the
++attribute overrides the default values (see below).
++
++KVM_ARM_VCPU_TIMER_IRQ_VTIMER: The EL1 virtual timer intid (default: 27)
++KVM_ARM_VCPU_TIMER_IRQ_PTIMER: The EL1 physical timer intid (default: 30)
++
++Setting the same PPI for different timers will prevent the VCPUs from running.
++Setting the interrupt number on a VCPU configures all VCPUs created at that
++time to use the number provided for a given timer, overwriting any previously
++configured values on other VCPUs.  Userspace should configure the interrupt
++numbers on at least one VCPU after creating all VCPUs and before running any
++VCPUs.
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 5e3c673..5db2d4c 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -203,6 +203,14 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK 0x3ff
+ #define VGIC_LEVEL_INFO_LINE_LEVEL	0
  
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
--			bool level);
--int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
--			       bool level);
-+			bool level, void *owner);
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
- bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
++/* Device Control API on vcpu fd */
++#define KVM_ARM_VCPU_PMU_V3_CTRL	0
++#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
++#define   KVM_ARM_VCPU_PMU_V3_INIT	1
++#define KVM_ARM_VCPU_TIMER_CTRL		1
++#define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
++#define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
++
+ #define   KVM_DEV_ARM_VGIC_CTRL_INIT		0
+ #define   KVM_DEV_ARM_ITS_SAVE_TABLES		1
+ #define   KVM_DEV_ARM_ITS_RESTORE_TABLES	2
+diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+index acea05e..1e0784e 100644
+--- a/arch/arm/kvm/guest.c
++++ b/arch/arm/kvm/guest.c
+@@ -308,6 +308,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+ 	int ret;
+ 
+ 	switch (attr->group) {
++	case KVM_ARM_VCPU_TIMER_CTRL:
++		ret = kvm_arm_timer_set_attr(vcpu, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+@@ -322,6 +325,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+ 	int ret;
+ 
+ 	switch (attr->group) {
++	case KVM_ARM_VCPU_TIMER_CTRL:
++		ret = kvm_arm_timer_get_attr(vcpu, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+@@ -336,6 +342,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ 	int ret;
+ 
+ 	switch (attr->group) {
++	case KVM_ARM_VCPU_TIMER_CTRL:
++		ret = kvm_arm_timer_has_attr(vcpu, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 70eea2e..9f3ca24 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -232,6 +232,9 @@ struct kvm_arch_memory_slot {
+ #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+ #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+ #define   KVM_ARM_VCPU_PMU_V3_INIT	1
++#define KVM_ARM_VCPU_TIMER_CTRL		1
++#define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
++#define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+ 
+ /* KVM_IRQ_LINE irq field index values */
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index b37446a..5c7f657 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -390,6 +390,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+ 	case KVM_ARM_VCPU_PMU_V3_CTRL:
+ 		ret = kvm_arm_pmu_v3_set_attr(vcpu, attr);
+ 		break;
++	case KVM_ARM_VCPU_TIMER_CTRL:
++		ret = kvm_arm_timer_set_attr(vcpu, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+@@ -407,6 +410,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+ 	case KVM_ARM_VCPU_PMU_V3_CTRL:
+ 		ret = kvm_arm_pmu_v3_get_attr(vcpu, attr);
+ 		break;
++	case KVM_ARM_VCPU_TIMER_CTRL:
++		ret = kvm_arm_timer_get_attr(vcpu, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+@@ -424,6 +430,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ 	case KVM_ARM_VCPU_PMU_V3_CTRL:
+ 		ret = kvm_arm_pmu_v3_has_attr(vcpu, attr);
+ 		break;
++	case KVM_ARM_VCPU_TIMER_CTRL:
++		ret = kvm_arm_timer_has_attr(vcpu, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index f1c967a..f0053f8 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -68,6 +68,10 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu);
+ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *, u64 regid);
+ int kvm_arm_timer_set_reg(struct kvm_vcpu *, u64 regid, u64 value);
+ 
++int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
++int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
++int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
++
+ bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
+ void kvm_timer_schedule(struct kvm_vcpu *vcpu);
+ void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 528acf0..becd8e7 100644
+index 6c5a064..d3d1dce 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -226,7 +226,8 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 	if (likely(irqchip_in_kernel(vcpu->kvm))) {
- 		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
- 					  timer_ctx->irq.irq,
--					  timer_ctx->irq.level);
-+					  timer_ctx->irq.level,
-+					  timer_ctx);
- 		WARN_ON(ret);
- 	}
- }
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 3417e18..42cb9e8 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -806,7 +806,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 		if (irq_num < VGIC_NR_SGIS || irq_num >= VGIC_NR_PRIVATE_IRQS)
- 			return -EINVAL;
+@@ -21,6 +21,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/interrupt.h>
+ #include <linux/irq.h>
++#include <linux/uaccess.h>
  
--		return kvm_vgic_inject_irq(kvm, vcpu->vcpu_id, irq_num, level);
-+		return kvm_vgic_inject_irq(kvm, vcpu->vcpu_id, irq_num, level, NULL);
- 	case KVM_ARM_IRQ_TYPE_SPI:
- 		if (!irqchip_in_kernel(kvm))
- 			return -ENXIO;
-@@ -814,7 +814,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 		if (irq_num < VGIC_NR_PRIVATE_IRQS)
- 			return -EINVAL;
- 
--		return kvm_vgic_inject_irq(kvm, 0, irq_num, level);
-+		return kvm_vgic_inject_irq(kvm, 0, irq_num, level, NULL);
- 	}
- 
- 	return -EINVAL;
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index c354bd5..006a033 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -238,7 +238,8 @@ static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
- 	if (likely(irqchip_in_kernel(vcpu->kvm))) {
- 		int ret;
- 		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
--					  pmu->irq_num, overflow);
-+					  pmu->irq_num, overflow,
-+					  &vcpu->arch.pmu);
- 		WARN_ON(ret);
- 	}
- }
-diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
-index f138ed2..b7baf58 100644
---- a/virt/kvm/arm/vgic/vgic-irqfd.c
-+++ b/virt/kvm/arm/vgic/vgic-irqfd.c
-@@ -34,7 +34,7 @@ static int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
- 
- 	if (!vgic_valid_spi(kvm, spi_id))
- 		return -EINVAL;
--	return kvm_vgic_inject_irq(kvm, 0, spi_id, level);
-+	return kvm_vgic_inject_irq(kvm, 0, spi_id, level, NULL);
+ #include <clocksource/arm_arch_timer.h>
+ #include <asm/arch_timer.h>
+@@ -617,6 +618,28 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+ 	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
  }
  
- /**
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index e9e46f1..01dc4cd 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -234,10 +234,14 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
- 
- /*
-  * Only valid injection if changing level for level-triggered IRQs or for a
-- * rising edge.
-+ * rising edge, and in-kernel connected IRQ lines can only be controlled by
-+ * their owner.
-  */
--static bool vgic_validate_injection(struct vgic_irq *irq, bool level)
-+static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owner)
- {
-+	if (irq->owner != owner)
++static bool timer_irqs_are_valid(struct kvm *kvm)
++{
++	struct kvm_vcpu *vcpu;
++	int vtimer_irq, ptimer_irq;
++	int i;
++
++	vcpu = kvm_get_vcpu(kvm, 0);
++	vtimer_irq = vcpu_vtimer(vcpu)->irq.irq;
++	ptimer_irq = vcpu_ptimer(vcpu)->irq.irq;
++
++	if (vtimer_irq == ptimer_irq)
 +		return false;
 +
- 	switch (irq->config) {
- 	case VGIC_CONFIG_LEVEL:
- 		return irq->line_level != level;
-@@ -346,13 +350,16 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
-  *			      false: to ignore the call
-  *	     Level-sensitive  true:  raise the input signal
-  *			      false: lower the input signal
-+ * @owner:   The opaque pointer to the owner of the IRQ being raised to verify
-+ *           that the caller is allowed to inject this IRQ.  Userspace
-+ *           injections will have owner == NULL.
-  *
-  * The VGIC is not concerned with devices being active-LOW or active-HIGH for
-  * level-sensitive interrupts.  You can think of the level parameter as 1
-  * being HIGH and 0 being LOW and all devices being active-HIGH.
-  */
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
--			bool level)
-+			bool level, void *owner)
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		if (vcpu_vtimer(vcpu)->irq.irq != vtimer_irq ||
++		    vcpu_ptimer(vcpu)->irq.irq != ptimer_irq)
++			return false;
++	}
++
++	return true;
++}
++
+ int kvm_timer_enable(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_vcpu *vcpu;
- 	struct vgic_irq *irq;
-@@ -374,7 +381,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+@@ -636,6 +659,11 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 	if (!vgic_initialized(vcpu->kvm))
+ 		return -ENODEV;
  
- 	spin_lock(&irq->irq_lock);
- 
--	if (!vgic_validate_injection(irq, level)) {
-+	if (!vgic_validate_injection(irq, level, owner)) {
- 		/* Nothing to see here, move along... */
- 		spin_unlock(&irq->irq_lock);
- 		vgic_put_irq(kvm, irq);
++	if (!timer_irqs_are_valid(vcpu->kvm)) {
++		kvm_debug("incorrectly configured timer irqs\n");
++		return -EINVAL;
++	}
++
+ 	/*
+ 	 * Find the physical IRQ number corresponding to the host_vtimer_irq
+ 	 */
+@@ -685,3 +713,79 @@ void kvm_timer_init_vhe(void)
+ 	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
+ 	write_sysreg(val, cnthctl_el2);
+ }
++
++static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
++{
++	struct kvm_vcpu *vcpu;
++	int i;
++
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		vcpu_vtimer(vcpu)->irq.irq = vtimer_irq;
++		vcpu_ptimer(vcpu)->irq.irq = ptimer_irq;
++	}
++}
++
++int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++{
++	int __user *uaddr = (int __user *)(long)attr->addr;
++	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
++	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
++	int irq;
++
++	if (!irqchip_in_kernel(vcpu->kvm))
++		return -EINVAL;
++
++	if (get_user(irq, uaddr))
++		return -EFAULT;
++
++	if (!(irq_is_ppi(irq)))
++		return -EINVAL;
++
++	if (vcpu->arch.timer_cpu.enabled)
++		return -EBUSY;
++
++	switch (attr->attr) {
++	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
++		set_timer_irqs(vcpu->kvm, irq, ptimer->irq.irq);
++		break;
++	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
++		set_timer_irqs(vcpu->kvm, vtimer->irq.irq, irq);
++		break;
++	default:
++		return -ENXIO;
++	}
++
++	return 0;
++}
++
++int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++{
++	int __user *uaddr = (int __user *)(long)attr->addr;
++	struct arch_timer_context *timer;
++	int irq;
++
++	switch (attr->attr) {
++	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
++		timer = vcpu_vtimer(vcpu);
++		break;
++	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
++		timer = vcpu_ptimer(vcpu);
++		break;
++	default:
++		return -ENXIO;
++	}
++
++	irq = timer->irq.irq;
++	return put_user(irq, uaddr);
++}
++
++int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++{
++	switch (attr->attr) {
++	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
++	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
++		return 0;
++	}
++
++	return -ENXIO;
++}
 -- 
 2.9.0
