@@ -1,324 +1,247 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v3 04/10] KVM: arm/arm64: use vcpu request in
- kvm_arm_halt_vcpu
-Date: Tue, 16 May 2017 12:06:23 +0200
-Message-ID: <20170516100623.GB5259@cbox>
-References: <20170503160635.21669-1-drjones@redhat.com>
- <20170503160635.21669-5-drjones@redhat.com>
- <20170506180809.GA5923@cbox>
- <20170509170251.eernp7sdl6tzchdp@kamzik.brq.redhat.com>
- <20170515111442.GA18755@cbox>
- <20170516021733.gemnx4yxj6hjvylb@kamzik.brq.redhat.com>
+Subject: Re: [PATCH 5/5] KVM: arm/arm64: Allow setting the timer IRQ numbers
+ from userspace
+Date: Tue, 16 May 2017 12:38:39 +0200
+Message-ID: <20170516103839.GC5259@cbox>
+References: <20170503183300.4618-1-cdall@linaro.org>
+ <20170503183300.4618-6-cdall@linaro.org>
+ <b08c50b4-6aba-1a59-80f4-343cd906f1fa@arm.com>
+ <20170504095918.GJ5923@cbox>
+ <79ec69f2-d727-46ec-b1d5-4c535a904e63@arm.com>
+ <20170504112225.GM5923@cbox> <20170516065421.GE18755@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE0BD40BD2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 06:35:24 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id GtoA9cnueoie for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 May 2017 06:35:22 -0400 (EDT)
+Received: from mail-qk0-f179.google.com (mail-qk0-f179.google.com
+ [209.85.220.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 633B740625
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 06:35:21 -0400 (EDT)
+Received: by mail-qk0-f179.google.com with SMTP id a72so123686059qkj.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 03:38:49 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20170516021733.gemnx4yxj6hjvylb@kamzik.brq.redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
+In-Reply-To: <20170516065421.GE18755@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 16, 2017 at 04:17:33AM +0200, Andrew Jones wrote:
-> On Mon, May 15, 2017 at 01:14:42PM +0200, Christoffer Dall wrote:
-> > On Tue, May 09, 2017 at 07:02:51PM +0200, Andrew Jones wrote:
-> > > On Sat, May 06, 2017 at 08:08:09PM +0200, Christoffer Dall wrote:
-> > > > On Wed, May 03, 2017 at 06:06:29PM +0200, Andrew Jones wrote:
-> > > > > VCPU halting/resuming is partially implemented with VCPU requests.
-> > > > > When kvm_arm_halt_guest() is called all VCPUs get the EXIT request,
-> > > > > telling them to exit guest mode and look at the state of 'pause',
-> > > > > which will be true, telling them to sleep.  As ARM's VCPU RUN
-> > > > > implements the memory barrier pattern described in "Ensuring Requests
-> > > > > Are Seen" of Documentation/virtual/kvm/vcpu-requests.rst, there's
-> > > > > no way for a VCPU halted by kvm_arm_halt_guest() to miss the pause
-> > > > > state change.  However, before this patch, a single VCPU halted with
-> > > > > kvm_arm_halt_vcpu() did not get a request, opening a tiny race window.
-> > > > > This patch adds the request, closing the race window and also allowing
-> > > > > us to remove the final check of pause in VCPU RUN, as the final check
-> > > > > for requests is sufficient.
-> > > > > 
-> > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > > 
-> > > > > ---
-> > > > > 
-> > > > > I have two questions about the halting/resuming.
-> > > > > 
-> > > > > Question 1:
-> > > > > 
-> > > > > Do we even need kvm_arm_halt_vcpu()/kvm_arm_resume_vcpu()? It should
-> > > > > only be necessary if one VCPU can activate or inactivate the private
-> > > > > IRQs of another VCPU, right?  That doesn't seem like something that
-> > > > > should be possible, but I'm GIC-illiterate...
+On Tue, May 16, 2017 at 08:54:21AM +0200, Christoffer Dall wrote:
+> Hi Marc,
+> 
+> On Thu, May 04, 2017 at 01:22:25PM +0200, Christoffer Dall wrote:
+> > On Thu, May 04, 2017 at 11:54:06AM +0100, Marc Zyngier wrote:
+> > > On 04/05/17 10:59, Christoffer Dall wrote:
+> > > > On Thu, May 04, 2017 at 10:34:32AM +0100, Marc Zyngier wrote:
+> > > >> On 03/05/17 19:33, Christoffer Dall wrote:
+> > > >>> First we define an ABI using the vcpu devices that lets userspace set
+> > > >>> the interrupt numbers for the various timers on both the 32-bit and
+> > > >>> 64-bit KVM/ARM implementations.
+> > > >>>
+> > > >>> Second, we add the definitions for the groups and attributes introduced
+> > > >>> by the above ABI.  (We add the PMU define on the 32-bit side as well for
+> > > >>> symmetry and it may get used some day.)
+> > > >>>
+> > > >>> Third, we set up the arch-specific vcpu device operation handlers to
+> > > >>> call into the timer code for anything related to the
+> > > >>> KVM_ARM_VCPU_TIMER_CTRL group.
+> > > >>>
+> > > >>> Fourth, we implement support for getting and setting the timer interrupt
+> > > >>> numbers using the above defined ABI in the arch timer code.
+> > > >>>
+> > > >>> Fifth, we introduce error checking upon enabling the arch timer (which
+> > > >>> is called when first running a VCPU) to check that all VCPUs are
+> > > >>> configured to use the same PPI for the timer (as mandated by the
+> > > >>> architecture) and that the virtual and physical timers are not
+> > > >>> configured to use the same IRQ number.
+> > > >>>
+> > > >>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > > >>> ---
+> > > >>>  Documentation/virtual/kvm/devices/vcpu.txt |  25 +++++++
+> > > >>>  arch/arm/include/uapi/asm/kvm.h            |   8 +++
+> > > >>>  arch/arm/kvm/guest.c                       |   9 +++
+> > > >>>  arch/arm64/include/uapi/asm/kvm.h          |   3 +
+> > > >>>  arch/arm64/kvm/guest.c                     |   9 +++
+> > > >>>  include/kvm/arm_arch_timer.h               |   4 ++
+> > > >>>  virt/kvm/arm/arch_timer.c                  | 104 +++++++++++++++++++++++++++++
+> > > >>>  7 files changed, 162 insertions(+)
+> > > >>>
+> > > >>> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
+> > > >>> index 352af6e..013e3f1 100644
+> > > >>> --- a/Documentation/virtual/kvm/devices/vcpu.txt
+> > > >>> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
+> > > >>> @@ -35,3 +35,28 @@ Returns: -ENODEV: PMUv3 not supported or GIC not initialized
+> > > >>>  Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
+> > > >>>  virtual GIC implementation, this must be done after initializing the in-kernel
+> > > >>>  irqchip.
+> > > >>> +
+> > > >>> +
+> > > >>> +2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+> > > >>> +Architectures: ARM,ARM64
+> > > >>> +
+> > > >>> +2.1. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_VTIMER
+> > > >>> +2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_PTIMER
+> > > >>> +Parameters: in kvm_device_attr.addr the address for the timer interrupt is a
+> > > >>> +            pointer to an int
+> > > >>> +Returns: -EINVAL: Invalid timer interrupt number
+> > > >>> +         -EBUSY:  One or more VCPUs has already run
+> > > >>> +
+> > > >>> +A value describing the architected timer interrupt number when connected to an
+> > > >>> +in-kernel virtual GIC.  These must be a PPI (16 <= intid < 32).  If an
+> > > >>> +attribute is not set, a default value is applied (see below).
+> > > >>> +
+> > > >>> +KVM_ARM_VCPU_TIMER_IRQ_VTIMER: The EL1 virtual timer intid (default: 27)
+> > > >>> +KVM_ARM_VCPU_TIMER_IRQ_PTIMER: The EL1 physical timer intid (default: 30)
+> > > >>
+> > > >> uber nit: my reading of the code is that the default is set at VCPU
+> > > >> creation time. So setting the attribute overrides the default, not that
+> > > >> the default is applied if no attribute is set (i.e. there is always a
+> > > >> valid value).
+> > > >>
 > > > > 
-> > > > True, it shouldn't be possible.  I wonder if we were thinking of
-> > > > userspace access to the CPU-specific data, but we already ensure that no
-> > > > VCPUs are running at that time, so I don't think it should be necessary.
+> > > > uh, right, I don't see the distinction though, so not sure how to
+> > > > correct the text.
 > > > > 
-> > > > > 
-> > > > > Question 2:
-> > > > > 
-> > > > > It's not clear to me if we have another problem with halting/resuming
-> > > > > or not.  If it's possible for VCPU1 and VCPU2 to race in
-> > > > > vgic_mmio_write_s/cactive(), then the following scenario could occur,
-> > > > > leading to VCPU3 being in guest mode when it should not be.  Does the
-> > > > > hardware prohibit more than one VCPU entering trap handlers that lead
-> > > > > to these functions at the same time?  If not, then I guess pause needs
-> > > > > to be a counter instead of a boolean.
-> > > > > 
-> > > > >  VCPU1                 VCPU2                  VCPU3
-> > > > >  -----                 -----                  -----
-> > > > >                        VCPU3->pause = true;
-> > > > >                        halt(VCPU3);
-> > > > >                                               if (pause)
-> > > > >                                                 sleep();
-> > > > >  VCPU3->pause = true;
-> > > > >  halt(VCPU3);
-> > > > >                        VCPU3->pause = false;
-> > > > >                        resume(VCPU3);
-> > > > >                                               ...wake up...
-> > > > >                                               if (!pause)
-> > > > >                                                 Enter guest mode. Bad!
-> > > > >  VCPU3->pause = false;
-> > > > >  resume(VCPU3);
-> > > > > 
-> > > > > (Yes, the "Bad!" is there to both identify something we don't want
-> > > > >  occurring and to make fun of Trump's tweeting style.)
-> > > > 
-> > > > I think it's bad, and it might be even worse, because it could lead to a
-> > > > CPU looping forever in the host kernel, since there's no guarantee to
-> > > > exit from the VM in the other VCPU thread.
-> > > > 
-> > > > But I think simply taking the kvm->lock mutex to serialize the mmio
-> > > > active change operations should be sufficient.
-> > > > 
-> > > > If we agree on this I can send a patch with your reported by that fixes
-> > > > that issue, which gets rid of kvm_arm_halt_vcpu and requires you to
-> > > > modify your first patch to clear the KVM_REQ_VCPU_EXIT flag for each
-> > > > vcpu in kvm_arm_halt_guest instead and you can fold the remaining change
-> > > > from this patch into a patch that completely gets rid of the pause flag.
+> > > > Would "Setting the attribute overrides the default values (see below)."
+> > > > work instead?
 > > > 
-> > > Yup, seems reasonable to me to lock the kvm mutex on a stop the guest type
-> > > action.
+> > > Looks good to me.
 > > > 
-> > > > 
-> > > > See untested patch draft at the end of this mail.
-> > > > 
-> > > > Thanks,
-> > > > -Christoffer
-> > > > 
-> > > > > ---
-> > > > >  arch/arm/kvm/arm.c | 3 ++-
-> > > > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> > > > > index 47f6c7fdca96..9174ed13135a 100644
-> > > > > --- a/arch/arm/kvm/arm.c
-> > > > > +++ b/arch/arm/kvm/arm.c
-> > > > > @@ -545,6 +545,7 @@ void kvm_arm_halt_guest(struct kvm *kvm)
-> > > > >  void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu)
-> > > > >  {
-> > > > >  	vcpu->arch.pause = true;
-> > > > > +	kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
-> > > > >  	kvm_vcpu_kick(vcpu);
-> > > > >  }
-> > > > >  
-> > > > > @@ -664,7 +665,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> > > > >  
-> > > > >  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
-> > > > >  		    kvm_request_pending(vcpu) ||
-> > > > > -		    vcpu->arch.power_off || vcpu->arch.pause) {
-> > > > > +		    vcpu->arch.power_off) {
-> > > > >  			vcpu->mode = OUTSIDE_GUEST_MODE;
-> > > > >  			local_irq_enable();
-> > > > >  			kvm_pmu_sync_hwstate(vcpu);
-> > > > > -- 
-> > > > > 2.9.3
-> > > > > 
-> > > > 
-> > > > 
-> > > > Untested draft patch:
-> > > > 
-> > > > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> > > > index d488b88..b77a3af 100644
-> > > > --- a/arch/arm/include/asm/kvm_host.h
-> > > > +++ b/arch/arm/include/asm/kvm_host.h
-> > > > @@ -234,8 +234,6 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
-> > > >  struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
-> > > >  void kvm_arm_halt_guest(struct kvm *kvm);
-> > > >  void kvm_arm_resume_guest(struct kvm *kvm);
-> > > > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
-> > > > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
-> > > >  
-> > > >  int kvm_arm_copy_coproc_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
-> > > >  unsigned long kvm_arm_num_coproc_regs(struct kvm_vcpu *vcpu);
-> > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > > index 578df18..7a38d5a 100644
-> > > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > > @@ -334,8 +334,6 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
-> > > >  struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
-> > > >  void kvm_arm_halt_guest(struct kvm *kvm);
-> > > >  void kvm_arm_resume_guest(struct kvm *kvm);
-> > > > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
-> > > > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
-> > > >  
-> > > >  u64 __kvm_call_hyp(void *hypfn, ...);
-> > > >  #define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__)
-> > > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > > > index 7941699..932788a 100644
-> > > > --- a/virt/kvm/arm/arm.c
-> > > > +++ b/virt/kvm/arm/arm.c
-> > > > @@ -542,27 +542,15 @@ void kvm_arm_halt_guest(struct kvm *kvm)
-> > > >  	kvm_make_all_cpus_request(kvm, KVM_REQ_VCPU_EXIT);
-> > > >  }
-> > > >  
-> > > > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu)
-> > > > -{
-> > > > -	vcpu->arch.pause = true;
-> > > > -	kvm_vcpu_kick(vcpu);
-> > > > -}
-> > > > -
-> > > > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
-> > > > -{
-> > > > -	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
-> > > > -
-> > > > -	vcpu->arch.pause = false;
-> > > > -	swake_up(wq);
-> > > > -}
-> > > > -
-> > > >  void kvm_arm_resume_guest(struct kvm *kvm)
-> > > >  {
-> > > >  	int i;
-> > > >  	struct kvm_vcpu *vcpu;
-> > > >  
-> > > > -	kvm_for_each_vcpu(i, vcpu, kvm)
-> > > > -		kvm_arm_resume_vcpu(vcpu);
-> > > > +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> > > > +		vcpu->arch.pause = false;
-> > > > +		swake_up(kvm_arch_vcpu_wq(vcpu));
-> > > > +	}
-> > > >  }
-> > > >  
-> > > >  static void vcpu_sleep(struct kvm_vcpu *vcpu)
-> > > > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> > > > index 2a5db13..c143add 100644
-> > > > --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> > > > +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> > > > @@ -231,23 +231,21 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-> > > >   * be migrated while we don't hold the IRQ locks and we don't want to be
-> > > >   * chasing moving targets.
-> > > >   *
-> > > > - * For private interrupts, we only have to make sure the single and only VCPU
-> > > > - * that can potentially queue the IRQ is stopped.
-> > > > + * For private interrupts we don't have to do anything because userspace
-> > > > + * accesses to the VGIC state already require all VCPUs to be stopped, and
-> > > > + * only the VCPU itself can modify its private interrupts active state, which
-> > > > + * guarantees that the VCPU is not running.
-> > > >   */
-> > > >  static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
-> > > >  {
-> > > > -	if (intid < VGIC_NR_PRIVATE_IRQS)
-> > > > -		kvm_arm_halt_vcpu(vcpu);
-> > > > -	else
-> > > > +	if (intid > VGIC_NR_PRIVATE_IRQS)
-> > > >  		kvm_arm_halt_guest(vcpu->kvm);
-> > > >  }
-> > > >  
-> > > >  /* See vgic_change_active_prepare */
-> > > >  static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
-> > > >  {
-> > > > -	if (intid < VGIC_NR_PRIVATE_IRQS)
-> > > > -		kvm_arm_resume_vcpu(vcpu);
-> > > > -	else
-> > > > +	if (intid > VGIC_NR_PRIVATE_IRQS)
-> > > >  		kvm_arm_resume_guest(vcpu->kvm);
-> > > >  }
-> > > >  
-> > > > @@ -258,6 +256,7 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
-> > > >  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> > > >  	int i;
-> > > >  
-> > > > +	mutex_lock(&vcpu->kvm->lock);
-> > > >  	vgic_change_active_prepare(vcpu, intid);
-> > > >  	for_each_set_bit(i, &val, len * 8) {
-> > > >  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> > > > @@ -265,6 +264,7 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
-> > > >  		vgic_put_irq(vcpu->kvm, irq);
-> > > >  	}
-> > > >  	vgic_change_active_finish(vcpu, intid);
-> > > > +	mutex_unlock(&vcpu->kvm->lock);
-> > > >  }
-> > > >  
-> > > >  void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
-> > > > @@ -274,6 +274,7 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
-> > > >  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-> > > >  	int i;
-> > > >  
-> > > > +	mutex_lock(&vcpu->kvm->lock);
-> > > >  	vgic_change_active_prepare(vcpu, intid);
-> > > >  	for_each_set_bit(i, &val, len * 8) {
-> > > >  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> > > > @@ -281,6 +282,7 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
-> > > >  		vgic_put_irq(vcpu->kvm, irq);
-> > > >  	}
-> > > >  	vgic_change_active_finish(vcpu, intid);
-> > > > +	mutex_unlock(&vcpu->kvm->lock);
-> > > >  }
-> > > >  
-> > > >  unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
+> > > [...]
 > > > 
-> > > Looks good to me. How about adding kvm->lock to the locking order comment
-> > > at the top of virt/kvm/arm/vgic/vgic.c too. With that, you can add my R-b
-> > > on the posting.
+> > > >>
+> > > >> Another issue that just popped in my head: how do we ensure that we
+> > > >> don't clash between the PMU and the timers? Yes, that's a foolish thing
+> > > >> to do, but that's no different from avoiding the same interrupt on the
+> > > >> timers...
+> > > >>
+> > > > Argh, good point.
+> > > > 
+> > > > So actually, nothing *really bad* happens from using the same IRQ number
+> > > > except that the VM gets confused.  However, it's living life dangerously
+> > > > because we use the HW bit for the vtimer, so we if ever start using it
+> > > > for other timers or the PMU, then you could end up in a situation where
+> > > > you unmap the phys mapping on behalf of another device, and the physical
+> > > > interrupt could be left in an active state.
+> > > > 
+> > > > On the other hand, the vtimer currently belongs only to VMs and we set
+> > > > the required physical active state before entering the VM, so maybe it
+> > > > doesn't matter.
 > > > 
-> > > I'll rebase this series on your posting.
+> > > So far, we always assume that there is never more than a single source
+> > > per interrupt. We'll end-up with weird behaviours because our line_level
+> > > field is not an OR of the various inputs, but a direct assignment
+> > > (device A and B raise the line, then A drops it -> B's interrupt is gone).
+> > > 
+> > > I think that only the guest will be confused by it, but accepting it may
+> > > be interpreted as "this should work correctly". Would documenting that
+> > > it is a bad idea be enough?
+> > > 
+> > > > Should we just forego these checks and let the user shoot itself in the
+> > > > foot if he/she wants to?
+> > > 
+> > > If the documentation is enough, why not. Otherwise, we need some form of
+> > > allocator. Boring. ;-)
 > > > 
 > > 
-> > FYI, this patch is now in kvmarm/queue.
+> > Well, it's not that bad really (untested):
+> > 
+> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> > index 1541f5d..122f9d3 100644
+> > --- a/include/kvm/arm_vgic.h
+> > +++ b/include/kvm/arm_vgic.h
+> > @@ -121,6 +121,9 @@ struct vgic_irq {
+> >  	u8 source;			/* GICv2 SGIs only */
+> >  	u8 priority;
+> >  	enum vgic_irq_config config;	/* Level or edge */
+> > +
+> > +	void *owner;			/* Opaque pointer to reserve an interrupt
+> > +					   for in-kernel devices. */
+> >  };
+> >  
+> >  struct vgic_register_region;
+> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> > index 3d0979c..7561d2d 100644
+> > --- a/virt/kvm/arm/vgic/vgic.c
+> > +++ b/virt/kvm/arm/vgic/vgic.c
+> > @@ -429,6 +429,42 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+> >  }
+> >  
+> >  /**
+> > + * kvm_vgic_set_owner - Set the owner of an interrupt for a VM
+> > + *
+> > + * @kvm:    Pointer to the VM structure
+> > + * @intid:  The virtual INTID identifying the interrupt (PPI or SPI)
+> > + * @owner:  Opaque pointer to the owner
+> > + *
+> > + * Returns 0 if intid is not already used by another in-kernel device and the
+> > + * owner is set, otherwise returns an error code.
+> > + *
+> > + * We only set the owner for VCPU 0 for PPIs.
+> > + */
+> > +int kvm_vgic_set_owner(struct kvm *kvm, unsigned int intid, void *owner)
+> > +{
+> > +	struct vgic_irq *irq;
+> > +	struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, 0);
+> > +	int ret = 0;
+> > +
+> > +	if (!vgic_initialized(kvm))
+> > +		return -EAGAIN;
+> > +
+> > +	/* SGIs and LPIs cannot be wired up to any device */
+> > +	if (!irq_is_ppi(intid) && !vgic_valid_spi(kvm, intid))
+> > +		return -EINVAL;
+> > +
+> > +	irq = vgic_get_irq(kvm, vcpu, intid);
+> > +	spin_lock(&irq->irq_lock);
+> > +	if (irq->owner && irq->owner != owner)
+> > +		ret = -EEXIST;
+> > +	else
+> > +		irq->owner = owner;
+> > +	spin_unlock(&irq->irq_lock);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +/**
+> >   * vgic_prune_ap_list - Remove non-relevant interrupts from the list
+> >   *
+> >   * @vcpu: The VCPU pointer
+> > 
+> > The problem is that it doesn't help that much, because userspace can
+> > still change the level of an IRQ which is connected to an in-kernel
+> > device, unless we also introduce checking the owner field in the
+> > injection path.
+> > 
+> > I don't see it blowing up the host with/without an allocator, so I'm
+> > fine with documentation, but I can also include the above.
+> > 
+> > Thoughts?
+> > 
 > 
-> Just rebased the vcpu request series on it and tested. Bad news. This
-> patch immediately hangs the guest for me. Letting it sit for a couple
-> minutes gets the logs
+> I think we lost track of this series because it got stuck here.  I'm
+> tempted to just apply the series with the comment and without the owner
+> stuff posted above, and then we can fix it up later if it turns out
+> there's a problem.
 > 
-> [  243.691000] INFO: task qemu-kvm:1710 blocked for more than 120 seconds.
-> [  243.697591]       Not tainted 4.12.0-rc1+ #3
-> [  243.701860] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> [  243.709653] qemu-kvm        D    0  1710      1 0x00000200
-> [  243.715132] Call trace:
-> [  243.717575] [<ffff0000080857d8>] __switch_to+0x64/0x70
-> [  243.722707] [<ffff0000087b1dd4>] __schedule+0x31c/0x854
-> [  243.727909] [<ffff0000087b2340>] schedule+0x34/0x8c
-> [  243.732778] [<ffff0000087b26f8>] schedule_preempt_disabled+0x14/0x1c
-> [  243.739105] [<ffff0000087b3730>] __mutex_lock.isra.8+0x170/0x49c
-> [  243.745098] [<ffff0000087b3a80>] __mutex_lock_slowpath+0x24/0x30
-> [  243.751092] [<ffff0000087b3acc>] mutex_lock+0x40/0x4c
-> [  243.756123] [<ffff0000080baa2c>] vgic_mmio_write_cactive+0x40/0x14c
-> [  243.762370] [<ffff0000080bb694>] vgic_uaccess+0xd0/0x104
-> [  243.767662] [<ffff0000080bc100>] vgic_v2_dist_uaccess+0x70/0x94
-> [  243.773568] [<ffff0000080bdc48>] vgic_v2_attr_regs_access.isra.6+0x108/0x110
-> [  243.780587] [<ffff0000080bddec>] vgic_v2_set_attr+0xc4/0xd4
-> [  243.786148] [<ffff0000080a1028>] kvm_device_ioctl_attr+0x7c/0xc8
-> [  243.792143] [<ffff0000080a10f8>] kvm_device_ioctl+0x84/0xd4
-> [  243.797692] [<ffff00000829025c>] do_vfs_ioctl+0xcc/0x7b4
-> [  243.802988] [<ffff0000082909d4>] SyS_ioctl+0x90/0xa4
-> [  243.807933] [<ffff0000080834a0>] __sys_trace_return+0x0/0x4
-> 
-> I don't have kdump or support for live crash setup right now to see what
-> else is holding the lock. Unfortunately I don't have time to set it up
-> either, as I'll be out of the office from now through the rest of the
-> week.
-> 
-> I'll still post v4 of the vcpu request series now. I've smoke tested
-> it with the vgic_mmio_write_cactive/sactive locking removed.
-> 
-Duh, we were already holding the mutex when coming from the uaccess
-patch, and my testing was utterly flawed because I had forgotten that I
-had configured my grub boot default for a specific kernel, and thus I
-didn't actually test this patch when I thought I did.
 
-I've sent a small v2 series for that patch and removed it from
-kvmarm/queue.
+Actually, since people didn't formally ack these patches, I'm going to
+simply send out a new series.
 
-Thanks for the bug report.
-
+Thanks,
 -Christoffer
