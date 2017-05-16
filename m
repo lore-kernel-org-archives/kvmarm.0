@@ -1,171 +1,96 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v4 01/11] KVM: improve arch vcpu request defining
-Date: Tue, 16 May 2017 04:20:25 +0200
-Message-ID: <20170516022035.7674-2-drjones@redhat.com>
-References: <20170516022035.7674-1-drjones@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170516022035.7674-1-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PATCH v4 00/11] KVM: arm/arm64: race fixes and vcpu requests
+Date: Tue, 16 May 2017 04:20:24 +0200
+Message-ID: <20170516022035.7674-1-drjones@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A80A440992
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 22:17:14 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2plhCIC47uXI for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 May 2017 22:17:13 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A36040190
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 22:17:13 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: cdall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
+Cc: marc.zyngier@arm.com, cdall@linaro.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Marc Zyngier suggested that we define the arch specific VCPU request
-base, rather than requiring each arch to remember to start from 8.
-That suggestion, along with Radim Krcmar's recent VCPU request flag
-addition, snowballed into defining something of an arch VCPU request
-defining API.
-
-No functional change.
-
-(Looks like x86 is running out of arch VCPU request bits.  Maybe
- someday we'll need to extend to 64.)
-
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arch/arm/include/asm/kvm_host.h     |  3 ++-
- arch/arm64/include/asm/kvm_host.h   |  3 ++-
- arch/powerpc/include/asm/kvm_host.h |  4 ++--
- arch/s390/include/asm/kvm_host.h    |  6 ++---
- arch/x86/include/asm/kvm_host.h     | 47 ++++++++++++++++++++-----------------
- include/linux/kvm_host.h            |  7 ++++++
- 6 files changed, 41 insertions(+), 29 deletions(-)
-
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 12274d46df70..c556babe467c 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -44,7 +44,8 @@
- #define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
- #endif
- 
--#define KVM_REQ_VCPU_EXIT	(8 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+#define KVM_REQ_VCPU_EXIT \
-+	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- 
- u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
- int __attribute_const__ kvm_target_cpu(void);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 32cbe8a3bb0d..0ff991c9c66e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -41,7 +41,8 @@
- 
- #define KVM_VCPU_MAX_FEATURES 4
- 
--#define KVM_REQ_VCPU_EXIT	(8 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+#define KVM_REQ_VCPU_EXIT \
-+	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- 
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 9c51ac4b8f36..50e0bc9723cc 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -52,8 +52,8 @@
- #define KVM_IRQCHIP_NUM_PINS     256
- 
- /* PPC-specific vcpu->requests bit members */
--#define KVM_REQ_WATCHDOG           8
--#define KVM_REQ_EPR_EXIT           9
-+#define KVM_REQ_WATCHDOG	KVM_ARCH_REQ(0)
-+#define KVM_REQ_EPR_EXIT	KVM_ARCH_REQ(1)
- 
- #include <linux/mmu_notifier.h>
- 
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 426614a882a9..9c3bd94204ac 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -42,9 +42,9 @@
- #define KVM_HALT_POLL_NS_DEFAULT 80000
- 
- /* s390-specific vcpu->requests bit members */
--#define KVM_REQ_ENABLE_IBS         8
--#define KVM_REQ_DISABLE_IBS        9
--#define KVM_REQ_ICPT_OPEREXC       10
-+#define KVM_REQ_ENABLE_IBS	KVM_ARCH_REQ(0)
-+#define KVM_REQ_DISABLE_IBS	KVM_ARCH_REQ(1)
-+#define KVM_REQ_ICPT_OPEREXC	KVM_ARCH_REQ(2)
- 
- #define SIGP_CTRL_C		0x80
- #define SIGP_CTRL_SCN_MASK	0x3f
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 9c761fea0c98..563979976fab 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -48,28 +48,31 @@
- #define KVM_IRQCHIP_NUM_PINS  KVM_IOAPIC_NUM_PINS
- 
- /* x86-specific vcpu->requests bit members */
--#define KVM_REQ_MIGRATE_TIMER      8
--#define KVM_REQ_REPORT_TPR_ACCESS  9
--#define KVM_REQ_TRIPLE_FAULT      10
--#define KVM_REQ_MMU_SYNC          11
--#define KVM_REQ_CLOCK_UPDATE      12
--#define KVM_REQ_EVENT             14
--#define KVM_REQ_APF_HALT          15
--#define KVM_REQ_STEAL_UPDATE      16
--#define KVM_REQ_NMI               17
--#define KVM_REQ_PMU               18
--#define KVM_REQ_PMI               19
--#define KVM_REQ_SMI               20
--#define KVM_REQ_MASTERCLOCK_UPDATE 21
--#define KVM_REQ_MCLOCK_INPROGRESS (22 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
--#define KVM_REQ_SCAN_IOAPIC       (23 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
--#define KVM_REQ_GLOBAL_CLOCK_UPDATE 24
--#define KVM_REQ_APIC_PAGE_RELOAD  (25 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
--#define KVM_REQ_HV_CRASH          26
--#define KVM_REQ_IOAPIC_EOI_EXIT   27
--#define KVM_REQ_HV_RESET          28
--#define KVM_REQ_HV_EXIT           29
--#define KVM_REQ_HV_STIMER         30
-+#define KVM_REQ_MIGRATE_TIMER		KVM_ARCH_REQ(0)
-+#define KVM_REQ_REPORT_TPR_ACCESS	KVM_ARCH_REQ(1)
-+#define KVM_REQ_TRIPLE_FAULT		KVM_ARCH_REQ(2)
-+#define KVM_REQ_MMU_SYNC		KVM_ARCH_REQ(3)
-+#define KVM_REQ_CLOCK_UPDATE		KVM_ARCH_REQ(4)
-+#define KVM_REQ_EVENT			KVM_ARCH_REQ(6)
-+#define KVM_REQ_APF_HALT		KVM_ARCH_REQ(7)
-+#define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(8)
-+#define KVM_REQ_NMI			KVM_ARCH_REQ(9)
-+#define KVM_REQ_PMU			KVM_ARCH_REQ(10)
-+#define KVM_REQ_PMI			KVM_ARCH_REQ(11)
-+#define KVM_REQ_SMI			KVM_ARCH_REQ(12)
-+#define KVM_REQ_MASTERCLOCK_UPDATE	KVM_ARCH_REQ(13)
-+#define KVM_REQ_MCLOCK_INPROGRESS \
-+	KVM_ARCH_REQ_FLAGS(14, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+#define KVM_REQ_SCAN_IOAPIC \
-+	KVM_ARCH_REQ_FLAGS(15, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+#define KVM_REQ_GLOBAL_CLOCK_UPDATE	KVM_ARCH_REQ(16)
-+#define KVM_REQ_APIC_PAGE_RELOAD \
-+	KVM_ARCH_REQ_FLAGS(17, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+#define KVM_REQ_HV_CRASH		KVM_ARCH_REQ(18)
-+#define KVM_REQ_IOAPIC_EOI_EXIT		KVM_ARCH_REQ(19)
-+#define KVM_REQ_HV_RESET		KVM_ARCH_REQ(20)
-+#define KVM_REQ_HV_EXIT			KVM_ARCH_REQ(21)
-+#define KVM_REQ_HV_STIMER		KVM_ARCH_REQ(22)
- 
- #define CR0_RESERVED_BITS                                               \
- 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 8c0664309815..3724b51aab64 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -126,6 +126,13 @@ static inline bool is_error_page(struct page *page)
- #define KVM_REQ_MMU_RELOAD        (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_PENDING_TIMER     2
- #define KVM_REQ_UNHALT            3
-+#define KVM_REQUEST_ARCH_BASE     8
-+
-+#define KVM_ARCH_REQ_FLAGS(nr, flags) ({ \
-+	BUILD_BUG_ON((unsigned)(nr) >= 32 - KVM_REQUEST_ARCH_BASE); \
-+	(unsigned)(((nr) + KVM_REQUEST_ARCH_BASE) | (flags)); \
-+})
-+#define KVM_ARCH_REQ(nr)           KVM_ARCH_REQ_FLAGS(nr, 0)
- 
- #define KVM_USERSPACE_IRQ_SOURCE_ID		0
- #define KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID	1
--- 
-2.9.3
+VGhpcyBzZXJpZXMgZml4ZXMgc29tZSBoYXJkIHRvIHByb2R1Y2UgcmFjZXMgYnkgaW50cm9kdWNp
+bmcgdGhlIHVzZSBvZgp2Y3B1IHJlcXVlc3RzLiBJJ3ZlIHRlc3RlZCB0aGUgc2VyaWVzIG9uIGEg
+TXVzdGFuZyBhbmQgY29tcGlsZS10ZXN0ZWQKdGhlIEFSTSBiaXRzLgoKUGF0Y2ggMy8xMSBhZGRz
+IGRvY3VtZW50YXRpb24sIGFzLCBhdCBsZWFzdCBmb3IgbWUsIHVuZGVyc3RhbmRpbmcgdmNwdQpy
+ZXF1ZXN0IGludGVycGxheSB3aXRoIHZjcHUga2lja3MgYW5kIHZjcHUgbW9kZSBhbmQgdGhlIG1l
+bW9yeSBiYXJyaWVycwp0aGF0IGludGVycGxheSBpbXBsaWVzLCBpcyBleGhhdXN0aW5nLgoKdjQ6
+CiAgLSBSZWJhc2Ugb24gbGF0ZXN0IGt2bWFybS9xdWV1ZS4gTm8gbW9yZSBrdm1fYXJtX2hhbHQv
+cmVzdW1lX3ZjcHUKICAtIERvY3VtZW50YXRpb24gYWRkaXRpb25zL2NsYXJpZmljYXRpb25zIFtQ
+YW9sb10KICAtIGdvIGJhY2sgdG8gc2xlZXAgYWZ0ZXIgZ2V0dGluZyBhIHNpZ25hbCBbQ2hyaXN0
+b2ZmZXJdCiAgLSB0aW1lciBkb2Vzbid0IG5lZWQgYSB2Y3B1IHJlcXVlc3QsIGp1c3QgYSB3YWtl
+IHVwIFtDaHJpc3RvZmZlcl0KICAtIHBhdGNoIGRyb3BwaW5nL2FkZGluZy9yZXNodWZmbGluZyBm
+b3IgYWJvdmUgY2hhbmdlcwoKdjM6CiAgLSBUaGUgZWFzaWVyIHRvIHJlcHJvZHVjZSBQU0NJIHJh
+Y2VzIHByZXZpb3VzbHkgZml4ZWQgd2l0aCB0aGlzCiAgICBzZXJpZXMgd2VyZSBmaXhlZCBpbmRl
+cGVuZGVudGx5IHdpdGggYSBkaWZmZXJlbnQgYXBwcm9hY2ggc3VnZ2VzdGVkCiAgICBieSBDaHJp
+c3RvZmZlclsxXS4KICAtIEJhc2VkIG9uIFJhZGltJ3MgbGF0ZXN0IHZjcHUgcmVxdWVzdCByZXdv
+cmsgc2VyaWVzWzJdCiAgLSBSZXdyb3RlIHRoZSBkb2N1bWVudGF0aW9uIGFkZGluZyBtdWNoIG1v
+cmUgaW5mb3JtYXRpb24gYW5kCiAgICBpbmNvcnBvcmF0aW5nIENocmlzdG9mZmVyJ3MgY29tbWVu
+dHMgZnJvbSB2Mi4KICAtIFJld29ya2VkIHRoZSBhcHByb2FjaCB0byBjb250cm9sbGluZyBwYXVz
+ZSBhbmQgcG93ZXJfb2ZmIGJ5CiAgICByZXF1ZXN0cy4KICAtIENsZWFyIHJlcXVlc3QgZm9yIHBl
+bmRpbmcgaXJxIGluamVjdGlvbiBpbiB0aGUgY29ycmVjdCBwbGFjZSwgYXMKICAgIHBvaW50ZWQg
+b3V0IGJ5IENocmlzdG9mZmVyLgogIC0gUmViYXNlIHJlcXVpcmVkIHNvbWUgc2ltcGxlIGNoYW5n
+ZXMgdG8gdGhlIFBNVSBjb2RlIHBhdGNoLgoKdjI6CiAgLSBObyBsb25nZXIgYmFzZWQgb24gUmFk
+aW0ncyB2Y3B1IHJlcXVlc3QgQVBJIHJld29ya1szXSwgZXhjZXB0IGZvcgogICAgaW5jbHVkaW5n
+ICJhZGQga3ZtX3JlcXVlc3RfcGVuZGluZyIgYXMgcGF0Y2ggMS8xMCBbZHJld10KICAtIEFkZGVk
+IHZjcHUgcmVxdWVzdCBkb2N1bWVudGF0aW9uIFtkcmV3XQogIC0gRHJvcHBlZCB0aGUgaW50cm9k
+dWN0aW9uIG9mIHVzZXIgc2V0dGFibGUgTVBJRFJzIFtDaHJpc3RvZmZlcl0KICAtIEFkZGVkIHZj
+cHUgcmVxdWVzdHMgdG8gYWxsIHJlcXVlc3QtbGVzcyB2Y3B1IGtpY2tzIFtDaHJpc3RvZmZlcl0K
+ClsxXSBodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9hcm0ta2VybmVsL21zZzU3NzYzMC5o
+dG1sClsyXSBodHRwOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2t2bS9tc2cxNDg4OTAuaHRtbApb
+M10gaHR0cHM6Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMva3ZtL21zZzE0NTU4OC5odG1sCgoKQW5k
+cmV3IEpvbmVzICgxMCk6CiAgS1ZNOiBpbXByb3ZlIGFyY2ggdmNwdSByZXF1ZXN0IGRlZmluaW5n
+CiAgS1ZNOiBBZGQgZG9jdW1lbnRhdGlvbiBmb3IgVkNQVSByZXF1ZXN0cwogIEtWTTogYXJtL2Fy
+bTY0OiBwcm9wZXJseSB1c2UgdmNwdSByZXF1ZXN0cwogIEtWTTogYXJtL2FybTY0OiByZXBsYWNl
+IHBhdXNlIGNoZWNrcyB3aXRoIHZjcHUgcmVxdWVzdCBjaGVja3MKICBLVk06IGFybS9hcm02NDog
+dXNlIHZjcHUgcmVxdWVzdHMgZm9yIHBvd2VyX29mZgogIEtWTTogYXJtL2FybTY0OiBvcHRpbWl6
+ZSBWQ1BVIFJVTgogIEtWTTogYXJtL2FybTY0OiBjaGFuZ2UgZXhpdCByZXF1ZXN0IHRvIHNsZWVw
+IHJlcXVlc3QKICBLVk06IGFybS9hcm02NDogdXNlIHZjcHUgcmVxdWVzdHMgZm9yIGlycSBpbmpl
+Y3Rpb24KICBLVk06IGFybS9hcm02NDogUE1VOiByZW1vdmUgcmVxdWVzdC1sZXNzIHZjcHUga2lj
+awogIEtWTTogYXJtL2FybTY0OiB0aW1lcjogcmVtb3ZlIHJlcXVlc3QtbGVzcyB2Y3B1IGtpY2sK
+ClJhZGltIEtyxI1tw6HFmSAoMSk6CiAgS1ZNOiBhZGQga3ZtX3JlcXVlc3RfcGVuZGluZwoKIERv
+Y3VtZW50YXRpb24vdmlydHVhbC9rdm0vdmNwdS1yZXF1ZXN0cy5yc3QgfCAyOTkgKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKwogYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgICAg
+ICAgICAgICB8ICAgNCArLQogYXJjaC9hcm0va3ZtL2hhbmRsZV9leGl0LmMgICAgICAgICAgICAg
+ICAgICB8ICAgMSArCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICAgICAgICAg
+IHwgICA0ICstCiBhcmNoL2FybTY0L2t2bS9oYW5kbGVfZXhpdC5jICAgICAgICAgICAgICAgIHwg
+ICAxICsKIGFyY2gvbWlwcy9rdm0vdHJhcF9lbXVsLmMgICAgICAgICAgICAgICAgICAgfCAgIDIg
+Ky0KIGFyY2gvbWlwcy9rdm0vdnouYyAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0K
+IGFyY2gvcG93ZXJwYy9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgICAgICAgfCAgIDQgKy0KIGFy
+Y2gvcG93ZXJwYy9rdm0vYm9va2UuYyAgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0KIGFyY2gv
+cG93ZXJwYy9rdm0vcG93ZXJwYy5jICAgICAgICAgICAgICAgICAgfCAgIDUgKy0KIGFyY2gvczM5
+MC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgICAgICAgICAgfCAgIDYgKy0KIGFyY2gvczM5MC9r
+dm0va3ZtLXMzOTAuYyAgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0KIGFyY2gveDg2L2luY2x1
+ZGUvYXNtL2t2bV9ob3N0LmggICAgICAgICAgICAgfCAgNDcgKysrLS0KIGFyY2gveDg2L2t2bS94
+ODYuYyAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDQgKy0KIGluY2x1ZGUvbGludXgva3Zt
+X2hvc3QuaCAgICAgICAgICAgICAgICAgICAgfCAgMTIgKysKIHZpcnQva3ZtL2FybS9hcmNoX3Rp
+bWVyLmMgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0KIHZpcnQva3ZtL2FybS9hcm0uYyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgfCAgNTUgKysrKy0KIHZpcnQva3ZtL2FybS9wbXUuYyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgfCAgNDAgKystLQogdmlydC9rdm0vYXJtL3BzY2kuYyAgICAg
+ICAgICAgICAgICAgICAgICAgICB8ICAgOCArLQogdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy5jICAg
+ICAgICAgICAgICAgICAgICB8ICAgOSArLQogMjAgZmlsZXMgY2hhbmdlZCwgNDM2IGluc2VydGlv
+bnMoKyksIDczIGRlbGV0aW9ucygtKQogY3JlYXRlIG1vZGUgMTAwNjQ0IERvY3VtZW50YXRpb24v
+dmlydHVhbC9rdm0vdmNwdS1yZXF1ZXN0cy5yc3QKCi0tIAoyLjkuMwoKX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
+cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
+aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
