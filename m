@@ -1,96 +1,87 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v4 00/11] KVM: arm/arm64: race fixes and vcpu requests
-Date: Tue, 16 May 2017 04:20:24 +0200
-Message-ID: <20170516022035.7674-1-drjones@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A80A440992
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 22:17:14 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2plhCIC47uXI for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 May 2017 22:17:13 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A36040190
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 May 2017 22:17:13 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH v4 05/11] KVM: arm/arm64: replace pause checks with vcpu request checks
+Date: Tue, 16 May 2017 04:20:29 +0200
+Message-ID: <20170516022035.7674-6-drjones@redhat.com>
+References: <20170516022035.7674-1-drjones@redhat.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170516022035.7674-1-drjones@redhat.com>
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: marc.zyngier@arm.com, cdall@linaro.org, pbonzini@redhat.com
+Cc: cdall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBzZXJpZXMgZml4ZXMgc29tZSBoYXJkIHRvIHByb2R1Y2UgcmFjZXMgYnkgaW50cm9kdWNp
-bmcgdGhlIHVzZSBvZgp2Y3B1IHJlcXVlc3RzLiBJJ3ZlIHRlc3RlZCB0aGUgc2VyaWVzIG9uIGEg
-TXVzdGFuZyBhbmQgY29tcGlsZS10ZXN0ZWQKdGhlIEFSTSBiaXRzLgoKUGF0Y2ggMy8xMSBhZGRz
-IGRvY3VtZW50YXRpb24sIGFzLCBhdCBsZWFzdCBmb3IgbWUsIHVuZGVyc3RhbmRpbmcgdmNwdQpy
-ZXF1ZXN0IGludGVycGxheSB3aXRoIHZjcHUga2lja3MgYW5kIHZjcHUgbW9kZSBhbmQgdGhlIG1l
-bW9yeSBiYXJyaWVycwp0aGF0IGludGVycGxheSBpbXBsaWVzLCBpcyBleGhhdXN0aW5nLgoKdjQ6
-CiAgLSBSZWJhc2Ugb24gbGF0ZXN0IGt2bWFybS9xdWV1ZS4gTm8gbW9yZSBrdm1fYXJtX2hhbHQv
-cmVzdW1lX3ZjcHUKICAtIERvY3VtZW50YXRpb24gYWRkaXRpb25zL2NsYXJpZmljYXRpb25zIFtQ
-YW9sb10KICAtIGdvIGJhY2sgdG8gc2xlZXAgYWZ0ZXIgZ2V0dGluZyBhIHNpZ25hbCBbQ2hyaXN0
-b2ZmZXJdCiAgLSB0aW1lciBkb2Vzbid0IG5lZWQgYSB2Y3B1IHJlcXVlc3QsIGp1c3QgYSB3YWtl
-IHVwIFtDaHJpc3RvZmZlcl0KICAtIHBhdGNoIGRyb3BwaW5nL2FkZGluZy9yZXNodWZmbGluZyBm
-b3IgYWJvdmUgY2hhbmdlcwoKdjM6CiAgLSBUaGUgZWFzaWVyIHRvIHJlcHJvZHVjZSBQU0NJIHJh
-Y2VzIHByZXZpb3VzbHkgZml4ZWQgd2l0aCB0aGlzCiAgICBzZXJpZXMgd2VyZSBmaXhlZCBpbmRl
-cGVuZGVudGx5IHdpdGggYSBkaWZmZXJlbnQgYXBwcm9hY2ggc3VnZ2VzdGVkCiAgICBieSBDaHJp
-c3RvZmZlclsxXS4KICAtIEJhc2VkIG9uIFJhZGltJ3MgbGF0ZXN0IHZjcHUgcmVxdWVzdCByZXdv
-cmsgc2VyaWVzWzJdCiAgLSBSZXdyb3RlIHRoZSBkb2N1bWVudGF0aW9uIGFkZGluZyBtdWNoIG1v
-cmUgaW5mb3JtYXRpb24gYW5kCiAgICBpbmNvcnBvcmF0aW5nIENocmlzdG9mZmVyJ3MgY29tbWVu
-dHMgZnJvbSB2Mi4KICAtIFJld29ya2VkIHRoZSBhcHByb2FjaCB0byBjb250cm9sbGluZyBwYXVz
-ZSBhbmQgcG93ZXJfb2ZmIGJ5CiAgICByZXF1ZXN0cy4KICAtIENsZWFyIHJlcXVlc3QgZm9yIHBl
-bmRpbmcgaXJxIGluamVjdGlvbiBpbiB0aGUgY29ycmVjdCBwbGFjZSwgYXMKICAgIHBvaW50ZWQg
-b3V0IGJ5IENocmlzdG9mZmVyLgogIC0gUmViYXNlIHJlcXVpcmVkIHNvbWUgc2ltcGxlIGNoYW5n
-ZXMgdG8gdGhlIFBNVSBjb2RlIHBhdGNoLgoKdjI6CiAgLSBObyBsb25nZXIgYmFzZWQgb24gUmFk
-aW0ncyB2Y3B1IHJlcXVlc3QgQVBJIHJld29ya1szXSwgZXhjZXB0IGZvcgogICAgaW5jbHVkaW5n
-ICJhZGQga3ZtX3JlcXVlc3RfcGVuZGluZyIgYXMgcGF0Y2ggMS8xMCBbZHJld10KICAtIEFkZGVk
-IHZjcHUgcmVxdWVzdCBkb2N1bWVudGF0aW9uIFtkcmV3XQogIC0gRHJvcHBlZCB0aGUgaW50cm9k
-dWN0aW9uIG9mIHVzZXIgc2V0dGFibGUgTVBJRFJzIFtDaHJpc3RvZmZlcl0KICAtIEFkZGVkIHZj
-cHUgcmVxdWVzdHMgdG8gYWxsIHJlcXVlc3QtbGVzcyB2Y3B1IGtpY2tzIFtDaHJpc3RvZmZlcl0K
-ClsxXSBodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9hcm0ta2VybmVsL21zZzU3NzYzMC5o
-dG1sClsyXSBodHRwOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2t2bS9tc2cxNDg4OTAuaHRtbApb
-M10gaHR0cHM6Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMva3ZtL21zZzE0NTU4OC5odG1sCgoKQW5k
-cmV3IEpvbmVzICgxMCk6CiAgS1ZNOiBpbXByb3ZlIGFyY2ggdmNwdSByZXF1ZXN0IGRlZmluaW5n
-CiAgS1ZNOiBBZGQgZG9jdW1lbnRhdGlvbiBmb3IgVkNQVSByZXF1ZXN0cwogIEtWTTogYXJtL2Fy
-bTY0OiBwcm9wZXJseSB1c2UgdmNwdSByZXF1ZXN0cwogIEtWTTogYXJtL2FybTY0OiByZXBsYWNl
-IHBhdXNlIGNoZWNrcyB3aXRoIHZjcHUgcmVxdWVzdCBjaGVja3MKICBLVk06IGFybS9hcm02NDog
-dXNlIHZjcHUgcmVxdWVzdHMgZm9yIHBvd2VyX29mZgogIEtWTTogYXJtL2FybTY0OiBvcHRpbWl6
-ZSBWQ1BVIFJVTgogIEtWTTogYXJtL2FybTY0OiBjaGFuZ2UgZXhpdCByZXF1ZXN0IHRvIHNsZWVw
-IHJlcXVlc3QKICBLVk06IGFybS9hcm02NDogdXNlIHZjcHUgcmVxdWVzdHMgZm9yIGlycSBpbmpl
-Y3Rpb24KICBLVk06IGFybS9hcm02NDogUE1VOiByZW1vdmUgcmVxdWVzdC1sZXNzIHZjcHUga2lj
-awogIEtWTTogYXJtL2FybTY0OiB0aW1lcjogcmVtb3ZlIHJlcXVlc3QtbGVzcyB2Y3B1IGtpY2sK
-ClJhZGltIEtyxI1tw6HFmSAoMSk6CiAgS1ZNOiBhZGQga3ZtX3JlcXVlc3RfcGVuZGluZwoKIERv
-Y3VtZW50YXRpb24vdmlydHVhbC9rdm0vdmNwdS1yZXF1ZXN0cy5yc3QgfCAyOTkgKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKwogYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgICAg
-ICAgICAgICB8ICAgNCArLQogYXJjaC9hcm0va3ZtL2hhbmRsZV9leGl0LmMgICAgICAgICAgICAg
-ICAgICB8ICAgMSArCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICAgICAgICAg
-IHwgICA0ICstCiBhcmNoL2FybTY0L2t2bS9oYW5kbGVfZXhpdC5jICAgICAgICAgICAgICAgIHwg
-ICAxICsKIGFyY2gvbWlwcy9rdm0vdHJhcF9lbXVsLmMgICAgICAgICAgICAgICAgICAgfCAgIDIg
-Ky0KIGFyY2gvbWlwcy9rdm0vdnouYyAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0K
-IGFyY2gvcG93ZXJwYy9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgICAgICAgfCAgIDQgKy0KIGFy
-Y2gvcG93ZXJwYy9rdm0vYm9va2UuYyAgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0KIGFyY2gv
-cG93ZXJwYy9rdm0vcG93ZXJwYy5jICAgICAgICAgICAgICAgICAgfCAgIDUgKy0KIGFyY2gvczM5
-MC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgICAgICAgICAgfCAgIDYgKy0KIGFyY2gvczM5MC9r
-dm0va3ZtLXMzOTAuYyAgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0KIGFyY2gveDg2L2luY2x1
-ZGUvYXNtL2t2bV9ob3N0LmggICAgICAgICAgICAgfCAgNDcgKysrLS0KIGFyY2gveDg2L2t2bS94
-ODYuYyAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDQgKy0KIGluY2x1ZGUvbGludXgva3Zt
-X2hvc3QuaCAgICAgICAgICAgICAgICAgICAgfCAgMTIgKysKIHZpcnQva3ZtL2FybS9hcmNoX3Rp
-bWVyLmMgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0KIHZpcnQva3ZtL2FybS9hcm0uYyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfCAgNTUgKysrKy0KIHZpcnQva3ZtL2FybS9wbXUuYyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfCAgNDAgKystLQogdmlydC9rdm0vYXJtL3BzY2kuYyAgICAg
-ICAgICAgICAgICAgICAgICAgICB8ICAgOCArLQogdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy5jICAg
-ICAgICAgICAgICAgICAgICB8ICAgOSArLQogMjAgZmlsZXMgY2hhbmdlZCwgNDM2IGluc2VydGlv
-bnMoKyksIDczIGRlbGV0aW9ucygtKQogY3JlYXRlIG1vZGUgMTAwNjQ0IERvY3VtZW50YXRpb24v
-dmlydHVhbC9rdm0vdmNwdS1yZXF1ZXN0cy5yc3QKCi0tIAoyLjkuMwoKX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
-cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
-aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+The current use of KVM_REQ_VCPU_EXIT for pause is fine.  Even the
+requester clearing the request is OK, as this is the special case
+where the sole requesting thread and receiving VCPU are executing
+synchronously (see "Clearing Requests" in
+Documentation/virtual/kvm/vcpu-requests.rst) However, that's about
+to change, so let's ensure only the receiving VCPU clears the
+request. Additionally, by guaranteeing KVM_REQ_VCPU_EXIT is always
+set when pause is, we can avoid checking pause directly in VCPU RUN.
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ virt/kvm/arm/arm.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 138212605ad9..21a4db90073f 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -546,7 +546,6 @@ void kvm_arm_resume_guest(struct kvm *kvm)
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		vcpu->arch.pause = false;
+-		kvm_clear_request(KVM_REQ_VCPU_EXIT, vcpu);
+ 		swake_up(kvm_arch_vcpu_wq(vcpu));
+ 	}
+ }
+@@ -557,6 +556,11 @@ static void vcpu_sleep(struct kvm_vcpu *vcpu)
+ 
+ 	swait_event_interruptible(*wq, ((!vcpu->arch.power_off) &&
+ 				       (!vcpu->arch.pause)));
++
++	if (vcpu->arch.pause) {
++		/* Awaken to handle a signal, request we sleep again later. */
++		kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
++	}
+ }
+ 
+ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+@@ -564,6 +568,14 @@ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.target >= 0;
+ }
+ 
++static void check_vcpu_requests(struct kvm_vcpu *vcpu)
++{
++	if (kvm_request_pending(vcpu)) {
++		if (kvm_check_request(KVM_REQ_VCPU_EXIT, vcpu))
++			vcpu_sleep(vcpu);
++	}
++}
++
+ /**
+  * kvm_arch_vcpu_ioctl_run - the main VCPU run function to execute guest code
+  * @vcpu:	The VCPU pointer
+@@ -609,7 +621,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ 		update_vttbr(vcpu->kvm);
+ 
+-		if (vcpu->arch.power_off || vcpu->arch.pause)
++		check_vcpu_requests(vcpu);
++
++		if (vcpu->arch.power_off)
+ 			vcpu_sleep(vcpu);
+ 
+ 		/*
+@@ -649,7 +663,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
+ 		    kvm_request_pending(vcpu) ||
+-		    vcpu->arch.power_off || vcpu->arch.pause) {
++		    vcpu->arch.power_off) {
+ 			vcpu->mode = OUTSIDE_GUEST_MODE;
+ 			local_irq_enable();
+ 			kvm_pmu_sync_hwstate(vcpu);
+-- 
+2.9.3
