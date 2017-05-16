@@ -1,33 +1,25 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 5/5] KVM: arm/arm64: Allow setting the timer IRQ numbers
- from userspace
-Date: Tue, 16 May 2017 12:38:39 +0200
-Message-ID: <20170516103839.GC5259@cbox>
-References: <20170503183300.4618-1-cdall@linaro.org>
- <20170503183300.4618-6-cdall@linaro.org>
- <b08c50b4-6aba-1a59-80f4-343cd906f1fa@arm.com>
- <20170504095918.GJ5923@cbox>
- <79ec69f2-d727-46ec-b1d5-4c535a904e63@arm.com>
- <20170504112225.GM5923@cbox> <20170516065421.GE18755@cbox>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [PATCH v2 07/11] KVM: arm/arm64: Register iodevs when setting
+ redist base and creating VCPUs
+Date: Tue, 16 May 2017 12:23:52 +0100
+Message-ID: <de4eb037-2837-fe77-d5ee-514529bfcd99@arm.com>
+References: <20170509085618.28311-1-cdall@linaro.org>
+ <20170509085618.28311-8-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE0BD40BD2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 06:35:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 64DAE40625
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 07:17:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GtoA9cnueoie for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 May 2017 06:35:22 -0400 (EDT)
-Received: from mail-qk0-f179.google.com (mail-qk0-f179.google.com
- [209.85.220.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 633B740625
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 06:35:21 -0400 (EDT)
-Received: by mail-qk0-f179.google.com with SMTP id a72so123686059qkj.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 03:38:49 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170516065421.GE18755@cbox>
+ with ESMTP id jziDq2NNkAVW for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 May 2017 07:17:03 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D8E340190
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 May 2017 07:17:03 -0400 (EDT)
+In-Reply-To: <20170509085618.28311-8-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,211 +29,237 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 16, 2017 at 08:54:21AM +0200, Christoffer Dall wrote:
-> Hi Marc,
-> 
-> On Thu, May 04, 2017 at 01:22:25PM +0200, Christoffer Dall wrote:
-> > On Thu, May 04, 2017 at 11:54:06AM +0100, Marc Zyngier wrote:
-> > > On 04/05/17 10:59, Christoffer Dall wrote:
-> > > > On Thu, May 04, 2017 at 10:34:32AM +0100, Marc Zyngier wrote:
-> > > >> On 03/05/17 19:33, Christoffer Dall wrote:
-> > > >>> First we define an ABI using the vcpu devices that lets userspace set
-> > > >>> the interrupt numbers for the various timers on both the 32-bit and
-> > > >>> 64-bit KVM/ARM implementations.
-> > > >>>
-> > > >>> Second, we add the definitions for the groups and attributes introduced
-> > > >>> by the above ABI.  (We add the PMU define on the 32-bit side as well for
-> > > >>> symmetry and it may get used some day.)
-> > > >>>
-> > > >>> Third, we set up the arch-specific vcpu device operation handlers to
-> > > >>> call into the timer code for anything related to the
-> > > >>> KVM_ARM_VCPU_TIMER_CTRL group.
-> > > >>>
-> > > >>> Fourth, we implement support for getting and setting the timer interrupt
-> > > >>> numbers using the above defined ABI in the arch timer code.
-> > > >>>
-> > > >>> Fifth, we introduce error checking upon enabling the arch timer (which
-> > > >>> is called when first running a VCPU) to check that all VCPUs are
-> > > >>> configured to use the same PPI for the timer (as mandated by the
-> > > >>> architecture) and that the virtual and physical timers are not
-> > > >>> configured to use the same IRQ number.
-> > > >>>
-> > > >>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> > > >>> ---
-> > > >>>  Documentation/virtual/kvm/devices/vcpu.txt |  25 +++++++
-> > > >>>  arch/arm/include/uapi/asm/kvm.h            |   8 +++
-> > > >>>  arch/arm/kvm/guest.c                       |   9 +++
-> > > >>>  arch/arm64/include/uapi/asm/kvm.h          |   3 +
-> > > >>>  arch/arm64/kvm/guest.c                     |   9 +++
-> > > >>>  include/kvm/arm_arch_timer.h               |   4 ++
-> > > >>>  virt/kvm/arm/arch_timer.c                  | 104 +++++++++++++++++++++++++++++
-> > > >>>  7 files changed, 162 insertions(+)
-> > > >>>
-> > > >>> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
-> > > >>> index 352af6e..013e3f1 100644
-> > > >>> --- a/Documentation/virtual/kvm/devices/vcpu.txt
-> > > >>> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
-> > > >>> @@ -35,3 +35,28 @@ Returns: -ENODEV: PMUv3 not supported or GIC not initialized
-> > > >>>  Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
-> > > >>>  virtual GIC implementation, this must be done after initializing the in-kernel
-> > > >>>  irqchip.
-> > > >>> +
-> > > >>> +
-> > > >>> +2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
-> > > >>> +Architectures: ARM,ARM64
-> > > >>> +
-> > > >>> +2.1. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_VTIMER
-> > > >>> +2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_PTIMER
-> > > >>> +Parameters: in kvm_device_attr.addr the address for the timer interrupt is a
-> > > >>> +            pointer to an int
-> > > >>> +Returns: -EINVAL: Invalid timer interrupt number
-> > > >>> +         -EBUSY:  One or more VCPUs has already run
-> > > >>> +
-> > > >>> +A value describing the architected timer interrupt number when connected to an
-> > > >>> +in-kernel virtual GIC.  These must be a PPI (16 <= intid < 32).  If an
-> > > >>> +attribute is not set, a default value is applied (see below).
-> > > >>> +
-> > > >>> +KVM_ARM_VCPU_TIMER_IRQ_VTIMER: The EL1 virtual timer intid (default: 27)
-> > > >>> +KVM_ARM_VCPU_TIMER_IRQ_PTIMER: The EL1 physical timer intid (default: 30)
-> > > >>
-> > > >> uber nit: my reading of the code is that the default is set at VCPU
-> > > >> creation time. So setting the attribute overrides the default, not that
-> > > >> the default is applied if no attribute is set (i.e. there is always a
-> > > >> valid value).
-> > > >>
-> > > > 
-> > > > uh, right, I don't see the distinction though, so not sure how to
-> > > > correct the text.
-> > > > 
-> > > > Would "Setting the attribute overrides the default values (see below)."
-> > > > work instead?
-> > > 
-> > > Looks good to me.
-> > > 
-> > > [...]
-> > > 
-> > > >>
-> > > >> Another issue that just popped in my head: how do we ensure that we
-> > > >> don't clash between the PMU and the timers? Yes, that's a foolish thing
-> > > >> to do, but that's no different from avoiding the same interrupt on the
-> > > >> timers...
-> > > >>
-> > > > Argh, good point.
-> > > > 
-> > > > So actually, nothing *really bad* happens from using the same IRQ number
-> > > > except that the VM gets confused.  However, it's living life dangerously
-> > > > because we use the HW bit for the vtimer, so we if ever start using it
-> > > > for other timers or the PMU, then you could end up in a situation where
-> > > > you unmap the phys mapping on behalf of another device, and the physical
-> > > > interrupt could be left in an active state.
-> > > > 
-> > > > On the other hand, the vtimer currently belongs only to VMs and we set
-> > > > the required physical active state before entering the VM, so maybe it
-> > > > doesn't matter.
-> > > 
-> > > So far, we always assume that there is never more than a single source
-> > > per interrupt. We'll end-up with weird behaviours because our line_level
-> > > field is not an OR of the various inputs, but a direct assignment
-> > > (device A and B raise the line, then A drops it -> B's interrupt is gone).
-> > > 
-> > > I think that only the guest will be confused by it, but accepting it may
-> > > be interpreted as "this should work correctly". Would documenting that
-> > > it is a bad idea be enough?
-> > > 
-> > > > Should we just forego these checks and let the user shoot itself in the
-> > > > foot if he/she wants to?
-> > > 
-> > > If the documentation is enough, why not. Otherwise, we need some form of
-> > > allocator. Boring. ;-)
-> > > 
-> > 
-> > Well, it's not that bad really (untested):
-> > 
-> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> > index 1541f5d..122f9d3 100644
-> > --- a/include/kvm/arm_vgic.h
-> > +++ b/include/kvm/arm_vgic.h
-> > @@ -121,6 +121,9 @@ struct vgic_irq {
-> >  	u8 source;			/* GICv2 SGIs only */
-> >  	u8 priority;
-> >  	enum vgic_irq_config config;	/* Level or edge */
-> > +
-> > +	void *owner;			/* Opaque pointer to reserve an interrupt
-> > +					   for in-kernel devices. */
-> >  };
-> >  
-> >  struct vgic_register_region;
-> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> > index 3d0979c..7561d2d 100644
-> > --- a/virt/kvm/arm/vgic/vgic.c
-> > +++ b/virt/kvm/arm/vgic/vgic.c
-> > @@ -429,6 +429,42 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
-> >  }
-> >  
-> >  /**
-> > + * kvm_vgic_set_owner - Set the owner of an interrupt for a VM
-> > + *
-> > + * @kvm:    Pointer to the VM structure
-> > + * @intid:  The virtual INTID identifying the interrupt (PPI or SPI)
-> > + * @owner:  Opaque pointer to the owner
-> > + *
-> > + * Returns 0 if intid is not already used by another in-kernel device and the
-> > + * owner is set, otherwise returns an error code.
-> > + *
-> > + * We only set the owner for VCPU 0 for PPIs.
-> > + */
-> > +int kvm_vgic_set_owner(struct kvm *kvm, unsigned int intid, void *owner)
-> > +{
-> > +	struct vgic_irq *irq;
-> > +	struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, 0);
-> > +	int ret = 0;
-> > +
-> > +	if (!vgic_initialized(kvm))
-> > +		return -EAGAIN;
-> > +
-> > +	/* SGIs and LPIs cannot be wired up to any device */
-> > +	if (!irq_is_ppi(intid) && !vgic_valid_spi(kvm, intid))
-> > +		return -EINVAL;
-> > +
-> > +	irq = vgic_get_irq(kvm, vcpu, intid);
-> > +	spin_lock(&irq->irq_lock);
-> > +	if (irq->owner && irq->owner != owner)
-> > +		ret = -EEXIST;
-> > +	else
-> > +		irq->owner = owner;
-> > +	spin_unlock(&irq->irq_lock);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +/**
-> >   * vgic_prune_ap_list - Remove non-relevant interrupts from the list
-> >   *
-> >   * @vcpu: The VCPU pointer
-> > 
-> > The problem is that it doesn't help that much, because userspace can
-> > still change the level of an IRQ which is connected to an in-kernel
-> > device, unless we also introduce checking the owner field in the
-> > injection path.
-> > 
-> > I don't see it blowing up the host with/without an allocator, so I'm
-> > fine with documentation, but I can also include the above.
-> > 
-> > Thoughts?
-> > 
-> 
-> I think we lost track of this series because it got stuck here.  I'm
-> tempted to just apply the series with the comment and without the owner
-> stuff posted above, and then we can fix it up later if it turns out
-> there's a problem.
-> 
+Hi,
 
-Actually, since people didn't formally ack these patches, I'm going to
-simply send out a new series.
+On 09/05/17 09:56, Christoffer Dall wrote:
+> Instead of waiting with registering KVM iodevs until the first VCPU is
+> run, we can actually create the iodevs when the redist base address is
+> set.  The only downside is that we must now also check if we need to do
+> this for VCPUs which are created after creating the VGIC, because there
+> is no enforced ordering between creating the VGIC (and setting its base
+> addresses) and creating the VCPUs.
+
+This triggers a BUG(), when the order is VGIC init, then VCPU init (which
+is what kvmtool does).
+
+Issuing KVM_CREATE_VCPU after VGIC intialization produces the following calls:
+
+kvm_vm_ioctl_create_vcpu
+ kvm_arch_vcpu_create
+  kvm_vcpu_init
+   kvm_arch_vcpu_init
+    kvm_vgic_vcpu_init
+     vgic_register_redist_iodev
+      kvm_vcpu_get_idx
+       ... no VCPU registered yet in kvm->vcpus :(
+       BUG();
+
+ ... would later register vcpu:
+ kvm->vcpus[atomic_read(&kvm->online_vcpus)] = vcpu
+
+My quick fix is to move kvm_vgic_vcpu_init into kvm_arch_vcpu_postcreate,
+but it discards the return value of kvm_vgic_vcpu_init, so I don't know
+how to do it properly.
 
 Thanks,
--Christoffer
+Jean
+
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  include/kvm/arm_vgic.h              |  1 +
+>  virt/kvm/arm/arm.c                  |  2 +-
+>  virt/kvm/arm/vgic/vgic-init.c       | 21 ++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic-kvm-device.c |  7 +++++-
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c    | 43 +++++++++++++++++++++++++++++++++++--
+>  virt/kvm/arm/vgic/vgic-v3.c         |  6 ------
+>  virt/kvm/arm/vgic/vgic.h            |  3 ++-
+>  7 files changed, 72 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index fabcc64..4ff65ef 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -286,6 +286,7 @@ extern struct static_key_false vgic_v2_cpuif_trap;
+>  
+>  int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
+>  void kvm_vgic_early_init(struct kvm *kvm);
+> +int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu);
+>  int kvm_vgic_create(struct kvm *kvm, u32 type);
+>  void kvm_vgic_destroy(struct kvm *kvm);
+>  void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 7941699..9f6f522a4b 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -335,7 +335,7 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+>  
+>  	kvm_arm_reset_debug_ptr(vcpu);
+>  
+> -	return 0;
+> +	return kvm_vgic_vcpu_init(vcpu);
+>  }
+>  
+>  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index 0ea64a1..962bb57 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -226,6 +226,27 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
+>  	return 0;
+>  }
+>  
+> +/**
+> + * kvm_vgic_vcpu_init() - Register VCPU-specific KVM iodevs
+> + * @vcpu: pointer to the VCPU being created and initialized
+> + */
+> +int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+> +{
+> +	int ret = 0;
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +
+> +	if (!irqchip_in_kernel(vcpu->kvm))
+> +		return 0;
+> +
+> +	/*
+> +	 * If we are creating a VCPU with a GICv3 we must also register the
+> +	 * KVM io device for the redistributor that belongs to this VCPU.
+> +	 */
+> +	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> +		ret = vgic_register_redist_iodev(vcpu);
+> +	return ret;
+> +}
+> +
+>  static void kvm_vgic_vcpu_enable(struct kvm_vcpu *vcpu)
+>  {
+>  	if (kvm_vgic_global_state.type == VGIC_V2)
+> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> index 69ccfd5..10ae6f3 100644
+> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> @@ -86,8 +86,13 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+>  		break;
+>  	case KVM_VGIC_V3_ADDR_TYPE_REDIST:
+>  		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
+> +		if (r)
+> +			break;
+> +		if (write) {
+> +			r = vgic_v3_set_redist_base(kvm, *addr);
+> +			goto out;
+> +		}
+>  		addr_ptr = &vgic->vgic_redist_base;
+> -		alignment = SZ_64K;
+>  		break;
+>  	default:
+>  		r = -ENODEV;
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index 168269b..99da1a2 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -565,7 +565,7 @@ unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev)
+>   *
+>   * Return 0 on success, -ERRNO otherwise.
+>   */
+> -static int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+> +int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct vgic_dist *vgic = &kvm->arch.vgic;
+> @@ -574,6 +574,18 @@ static int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+>  	gpa_t rd_base, sgi_base;
+>  	int ret;
+>  
+> +	/*
+> +	 * We may be creating VCPUs before having set the base address for the
+> +	 * redistributor region, in which case we will come back to this
+> +	 * function for all VCPUs when the base address is set.  Just return
+> +	 * without doing any work for now.
+> +	 */
+> +	if (IS_VGIC_ADDR_UNDEF(vgic->vgic_redist_base))
+> +		return 0;
+> +
+> +	if (!vgic_v3_check_base(kvm))
+> +		return -EINVAL;
+> +
+>  	rd_base = vgic->vgic_redist_base + kvm_vcpu_get_idx(vcpu) * SZ_64K * 2;
+>  	sgi_base = rd_base + SZ_64K;
+>  
+> @@ -619,7 +631,7 @@ static void vgic_unregister_redist_iodev(struct kvm_vcpu *vcpu)
+>  	kvm_io_bus_unregister_dev(vcpu->kvm, KVM_MMIO_BUS, &sgi_dev->dev);
+>  }
+>  
+> -int vgic_register_redist_iodevs(struct kvm *kvm)
+> +static int vgic_register_all_redist_iodevs(struct kvm *kvm)
+>  {
+>  	struct kvm_vcpu *vcpu;
+>  	int c, ret = 0;
+> @@ -641,6 +653,33 @@ int vgic_register_redist_iodevs(struct kvm *kvm)
+>  	return ret;
+>  }
+>  
+> +int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr)
+> +{
+> +	struct vgic_dist *vgic = &kvm->arch.vgic;
+> +	int ret;
+> +
+> +	/* vgic_check_ioaddr makes sure we don't do this twice */
+> +	ret = vgic_check_ioaddr(kvm, &vgic->vgic_redist_base, addr, SZ_64K);
+> +	if (ret)
+> +		return ret;
+> +
+> +	vgic->vgic_redist_base = addr;
+> +	if (!vgic_v3_check_base(kvm)) {
+> +		vgic->vgic_redist_base = VGIC_ADDR_UNDEF;
+> +		return -EINVAL;
+> +	}
+> +
+> +	/*
+> +	 * Register iodevs for each existing VCPU.  Adding more VCPUs
+> +	 * afterwards will register the iodevs when needed.
+> +	 */
+> +	ret = vgic_register_all_redist_iodevs(kvm);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+>  int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+>  {
+>  	const struct vgic_register_region *region;
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 2d53d7a..bb35078 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -397,12 +397,6 @@ int vgic_v3_map_resources(struct kvm *kvm)
+>  		goto out;
+>  	}
+>  
+> -	ret = vgic_register_redist_iodevs(kvm);
+> -	if (ret) {
+> -		kvm_err("Unable to register VGICv3 redist MMIO regions\n");
+> -		goto out;
+> -	}
+> -
+>  	if (vgic_has_its(kvm)) {
+>  		ret = vgic_register_its_iodevs(kvm);
+>  		if (ret) {
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 89eb935..5f17eac 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -174,7 +174,8 @@ int vgic_v3_probe(const struct gic_kvm_info *info);
+>  int vgic_v3_map_resources(struct kvm *kvm);
+>  int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
+>  int vgic_v3_save_pending_tables(struct kvm *kvm);
+> -int vgic_register_redist_iodevs(struct kvm *kvm);
+> +int vgic_v3_set_redist_base(struct kvm *kvm, u64 addr);
+> +int vgic_register_redist_iodev(struct kvm_vcpu *vcpu);
+>  bool vgic_v3_check_base(struct kvm *kvm);
+>  
+>  void vgic_v3_load(struct kvm_vcpu *vcpu);
+> 
