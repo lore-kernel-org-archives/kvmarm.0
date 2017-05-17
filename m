@@ -1,106 +1,152 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 08/31] arm64: Add a facility to turn an ESR syndrome into
- a sysreg encoding
-Date: Wed, 17 May 2017 11:54:33 +0200
-Message-ID: <9a81564d-8bb3-36ea-f0f8-a61cbc7fb345@redhat.com>
-References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <20170503104606.19342-9-marc.zyngier@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v2 07/11] KVM: arm/arm64: Register iodevs when setting
+ redist base and creating VCPUs
+Date: Wed, 17 May 2017 13:18:27 +0200
+Message-ID: <20170517111827.GA11893@cbox>
+References: <20170509085618.28311-1-cdall@linaro.org>
+ <20170509085618.28311-8-cdall@linaro.org>
+ <de4eb037-2837-fe77-d5ee-514529bfcd99@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FF6540B8C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 May 2017 05:51:09 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IbobagD+Xq0J for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 May 2017 05:51:08 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3A0640A66
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 May 2017 05:51:08 -0400 (EDT)
-In-Reply-To: <20170503104606.19342-9-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <de4eb037-2837-fe77-d5ee-514529bfcd99@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Jean,
 
-On 03/05/2017 12:45, Marc Zyngier wrote:
-> It is often useful to compare an ESR syndrome reporting the trapping
-> of a system register with a value matching that system register.
+On Tue, May 16, 2017 at 12:23:52PM +0100, Jean-Philippe Brucker wrote:
+> Hi,
 > 
-> Since encoding both the sysreg and the ESR version seem to be a bit
-> overkill, let's add a set of macros that convert an ESR value into
-> the corresponding sysreg encoding.
+> On 09/05/17 09:56, Christoffer Dall wrote:
+> > Instead of waiting with registering KVM iodevs until the first VCPU is
+> > run, we can actually create the iodevs when the redist base address is
+> > set.  The only downside is that we must now also check if we need to do
+> > this for VCPUs which are created after creating the VGIC, because there
+> > is no enforced ordering between creating the VGIC (and setting its base
+> > addresses) and creating the VCPUs.
 > 
-> We handle both AArch32 and AArch64, taking advantage of identical
-> encodings between system registers and CP15 accessors.
+> This triggers a BUG(), when the order is VGIC init, then VCPU init (which
+> is what kvmtool does).
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/include/asm/esr.h | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
+> Issuing KVM_CREATE_VCPU after VGIC intialization produces the following calls:
 > 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index ad42e79a5d4d..db8f13137443 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -19,6 +19,7 @@
->  #define __ASM_ESR_H
->  
->  #include <asm/memory.h>
-> +#include <asm/sysreg.h>
->  
->  #define ESR_ELx_EC_UNKNOWN	(0x00)
->  #define ESR_ELx_EC_WFx		(0x01)
-> @@ -177,6 +178,30 @@
->  
->  #define ESR_ELx_SYS64_ISS_SYS_CNTVCT	(ESR_ELx_SYS64_ISS_SYS_VAL(3, 3, 2, 14, 0) | \
->  					 ESR_ELx_SYS64_ISS_DIR_READ)
-> +
-> +#define esr_sys64_to_sysreg(e)					\
-> +	sys_reg((((e) & ESR_ELx_SYS64_ISS_OP0_MASK) >>		\
-> +		 ESR_ELx_SYS64_ISS_OP0_SHIFT),			\
-> +		(((e) & ESR_ELx_SYS64_ISS_OP1_MASK) >>		\
-> +		 ESR_ELx_SYS64_ISS_OP1_SHIFT),			\
-> +		(((e) & ESR_ELx_SYS64_ISS_CRN_MASK) >>		\
-> +		 ESR_ELx_SYS64_ISS_CRN_SHIFT),			\
-> +		(((e) & ESR_ELx_SYS64_ISS_CRM_MASK) >>		\
-> +		 ESR_ELx_SYS64_ISS_CRM_SHIFT),			\
-> +		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
-> +		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
-> +
-> +#define esr_cp15_to_sysreg(e)					\
-> +	sys_reg(3,						\
-> +		(((e) & ESR_ELx_SYS64_ISS_OP1_MASK) >>		\
-> +		 ESR_ELx_SYS64_ISS_OP1_SHIFT),			\
-> +		(((e) & ESR_ELx_SYS64_ISS_CRN_MASK) >>		\
-> +		 ESR_ELx_SYS64_ISS_CRN_SHIFT),			\
-> +		(((e) & ESR_ELx_SYS64_ISS_CRM_MASK) >>		\
-> +		 ESR_ELx_SYS64_ISS_CRM_SHIFT),			\
-> +		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
-> +		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
-> +
->  #ifndef __ASSEMBLY__
->  #include <asm/types.h>
+> kvm_vm_ioctl_create_vcpu
+>  kvm_arch_vcpu_create
+>   kvm_vcpu_init
+>    kvm_arch_vcpu_init
+>     kvm_vgic_vcpu_init
+>      vgic_register_redist_iodev
+>       kvm_vcpu_get_idx
+>        ... no VCPU registered yet in kvm->vcpus :(
+>        BUG();
+> 
+>  ... would later register vcpu:
+>  kvm->vcpus[atomic_read(&kvm->online_vcpus)] = vcpu
+> 
+> My quick fix is to move kvm_vgic_vcpu_init into kvm_arch_vcpu_postcreate,
+> but it discards the return value of kvm_vgic_vcpu_init, so I don't know
+> how to do it properly.
+> 
 
-Needs a rebase on top
-9842119  arm64: Add CNTFRQ_EL0 trap handler
+Would you mind giving this patch a go with your setup?
 
-Otherwise
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+commit 7370dc8eefc9004923c2454c2f01c49850c8d94b (HEAD -> vcpu_idx_redist_bugfix)
+Author: Christoffer Dall <cdall@linaro.org>
+Date:   Wed May 17 13:12:51 2017 +0200
 
-Eric
+    KVM: arm/arm64: Fix bug when registering redist iodevs
+    
+    If userspace creates the VCPUs after initializing the VGIC, then we end
+    up in a situation where we trigger a bug in kvm_vcpu_get_idx(), because
+    it is called prior to adding the VCPU into the vcpus array on the VM.
+    
+    There is no tight coupling between the VCPU index and the area of the
+    redistributor region used for the VCPU, so we can simply ensure that all
+    creations of redistributors are serialized per VM, and increment an
+    offset when we successfully add a redistributor.
+    
+    The vgic_register_redist_iodev() function can be called from two paths:
+    vgic_redister_all_redist_iodev() which is called via the kvm_vgic_addr()
+    device attribute handler.  This patch already holds the kvm->lock mutex.
+    
+    The other path is via kvm_vgic_vcpu_init, which is called through a
+    longer chain from kvm_vm_ioctl_create_vcpu(), which releases the
+    kvm->lock mutex just before calling kvm_arch_vcpu_create(), so we can
+    simply take this mutex again later for our purposes.
+    
+    Signed-off-by: Christoffer Dall <cdall@linaro.org>
 
->  
-> 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 97b8d37..2304aeb 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -195,9 +195,13 @@ struct vgic_dist {
+ 		/* either a GICv2 CPU interface */
+ 		gpa_t			vgic_cpu_base;
+ 		/* or a number of GICv3 redistributor regions */
+-		gpa_t			vgic_redist_base;
++		struct {
++			gpa_t		vgic_redist_base;
++			gpa_t		vgic_redist_free_offset;
++		};
+ 	};
+ 
++
+ 	/* distributor enabled */
+ 	bool			enabled;
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index dc68e2e..3a0b899 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -242,8 +242,11 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 	 * If we are creating a VCPU with a GICv3 we must also register the
+ 	 * KVM io device for the redistributor that belongs to this VCPU.
+ 	 */
+-	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++		mutex_lock(&vcpu->kvm->lock);
+ 		ret = vgic_register_redist_iodev(vcpu);
++		mutex_unlock(&vcpu->kvm->lock);
++	}
+ 	return ret;
+ }
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 99da1a2..9b0f681 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -586,7 +586,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	if (!vgic_v3_check_base(kvm))
+ 		return -EINVAL;
+ 
+-	rd_base = vgic->vgic_redist_base + kvm_vcpu_get_idx(vcpu) * SZ_64K * 2;
++	rd_base = vgic->vgic_redist_base + vgic->vgic_redist_free_offset;
+ 	sgi_base = rd_base + SZ_64K;
+ 
+ 	kvm_iodevice_init(&rd_dev->dev, &kvm_io_gic_ops);
+@@ -615,11 +615,14 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, sgi_base,
+ 				      SZ_64K, &sgi_dev->dev);
+ 	mutex_unlock(&kvm->slots_lock);
+-	if (ret)
++	if (ret) {
+ 		kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
+ 					  &rd_dev->dev);
++		return ret;
++	}
+ 
+-	return ret;
++	vgic->vgic_redist_free_offset += 2 * SZ_64K;
++	return 0;
+ }
+ 
+ static void vgic_unregister_redist_iodev(struct kvm_vcpu *vcpu)
+
+
+Thanks,
+-Christoffer
