@@ -1,99 +1,88 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 09/13] KVM: arm: rename pm_fake handler to trap_raz_wi
-Date: Thu, 18 May 2017 11:47:18 +0200
-Message-ID: <20170518094722.9926-10-cdall@linaro.org>
+Subject: [PULL 13/13] KVM: arm/arm64: Hold slots_lock when unregistering kvm
+ io bus devices
+Date: Thu, 18 May 2017 11:47:22 +0200
+Message-ID: <20170518094722.9926-14-cdall@linaro.org>
 References: <20170518094722.9926-1-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2B2140C41
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 May 2017 05:44:20 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id l4yqIIlhHiJL for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 May 2017 05:44:20 -0400 (EDT)
+Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A463B40C8C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 May 2017 05:44:19 -0400 (EDT)
+Received: by mail-wm0-f54.google.com with SMTP id b84so195123078wmh.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 May 2017 02:47:50 -0700 (PDT)
 In-Reply-To: <20170518094722.9926-1-cdall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Zhichao Huang <zhichao.huang@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Zhichao Huang <zhichao.huang@linaro.org>
+We were not holding the kvm->slots_lock as required when calling
+kvm_io_bus_unregister_dev() as required.
 
-pm_fake doesn't quite describe what the handler does (ignoring writes
-and returning 0 for reads).
+This only affects the error path, but still, let's do our due
+diligence.
 
-As we're about to use it (a lot) in a different context, rename it
-with a (admitedly cryptic) name that make sense for all users.
-
-Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
-Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reported by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- arch/arm/kvm/coproc.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index 1403ffb..6d1d2e2 100644
---- a/arch/arm/kvm/coproc.c
-+++ b/arch/arm/kvm/coproc.c
-@@ -279,7 +279,7 @@ static bool access_gic_sre(struct kvm_vcpu *vcpu,
-  * must always support PMCCNTR (the cycle counter): we just RAZ/WI for
-  * all PM registers, which doesn't crash the guest kernel at least.
-  */
--static bool pm_fake(struct kvm_vcpu *vcpu,
-+static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 		    const struct coproc_params *p,
- 		    const struct coproc_reg *r)
- {
-@@ -289,19 +289,19 @@ static bool pm_fake(struct kvm_vcpu *vcpu,
- 		return read_zero(vcpu, p);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 9b0f681..201d5e2 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -614,15 +614,16 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	mutex_lock(&kvm->slots_lock);
+ 	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, sgi_base,
+ 				      SZ_64K, &sgi_dev->dev);
+-	mutex_unlock(&kvm->slots_lock);
+ 	if (ret) {
+ 		kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
+ 					  &rd_dev->dev);
+-		return ret;
++		goto out;
+ 	}
+ 
+ 	vgic->vgic_redist_free_offset += 2 * SZ_64K;
+-	return 0;
++out:
++	mutex_unlock(&kvm->slots_lock);
++	return ret;
  }
  
--#define access_pmcr pm_fake
--#define access_pmcntenset pm_fake
--#define access_pmcntenclr pm_fake
--#define access_pmovsr pm_fake
--#define access_pmselr pm_fake
--#define access_pmceid0 pm_fake
--#define access_pmceid1 pm_fake
--#define access_pmccntr pm_fake
--#define access_pmxevtyper pm_fake
--#define access_pmxevcntr pm_fake
--#define access_pmuserenr pm_fake
--#define access_pmintenset pm_fake
--#define access_pmintenclr pm_fake
-+#define access_pmcr trap_raz_wi
-+#define access_pmcntenset trap_raz_wi
-+#define access_pmcntenclr trap_raz_wi
-+#define access_pmovsr trap_raz_wi
-+#define access_pmselr trap_raz_wi
-+#define access_pmceid0 trap_raz_wi
-+#define access_pmceid1 trap_raz_wi
-+#define access_pmccntr trap_raz_wi
-+#define access_pmxevtyper trap_raz_wi
-+#define access_pmxevcntr trap_raz_wi
-+#define access_pmuserenr trap_raz_wi
-+#define access_pmintenset trap_raz_wi
-+#define access_pmintenclr trap_raz_wi
+ static void vgic_unregister_redist_iodev(struct kvm_vcpu *vcpu)
+@@ -647,10 +648,12 @@ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
  
- /* Architected CP15 registers.
-  * CRn denotes the primary register number, but is copied to the CRm in the
-@@ -566,7 +566,7 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	struct coproc_params params = decode_64bit_hsr(vcpu);
+ 	if (ret) {
+ 		/* The current c failed, so we start with the previous one. */
++		mutex_lock(&kvm->slots_lock);
+ 		for (c--; c >= 0; c--) {
+ 			vcpu = kvm_get_vcpu(kvm, c);
+ 			vgic_unregister_redist_iodev(vcpu);
+ 		}
++		mutex_unlock(&kvm->slots_lock);
+ 	}
  
- 	/* raz_wi cp14 */
--	pm_fake(vcpu, &params, NULL);
-+	trap_raz_wi(vcpu, &params, NULL);
- 
- 	/* handled */
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-@@ -621,7 +621,7 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	struct coproc_params params = decode_32bit_hsr(vcpu);
- 
- 	/* raz_wi cp14 */
--	pm_fake(vcpu, &params, NULL);
-+	trap_raz_wi(vcpu, &params, NULL);
- 
- 	/* handled */
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+ 	return ret;
 -- 
 2.9.0
