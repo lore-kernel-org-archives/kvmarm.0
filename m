@@ -1,87 +1,99 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PULL 11/13] kvm: arm/arm64: Fix use after free of stage2 page table
-Date: Thu, 18 May 2017 11:47:20 +0200
-Message-ID: <20170518094722.9926-12-cdall@linaro.org>
+Subject: [PULL 09/13] KVM: arm: rename pm_fake handler to trap_raz_wi
+Date: Thu, 18 May 2017 11:47:18 +0200
+Message-ID: <20170518094722.9926-10-cdall@linaro.org>
 References: <20170518094722.9926-1-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1853A40BBC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 May 2017 05:44:20 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YH22E1XINW+J for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 May 2017 05:44:19 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 27CC640C25
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 May 2017 05:44:17 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id d127so45811591wmf.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 May 2017 02:47:49 -0700 (PDT)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170518094722.9926-1-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, andreyknvl@google.com, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Zhichao Huang <zhichao.huang@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogU3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT4KCldlIHlpZWxk
-IHRoZSBrdm0tPm1tdV9sb2NrIG9jY2Fzc2lvbmFseSB3aGlsZSBwZXJmb3JtaW5nIGFuIG9wZXJh
-dGlvbgooZS5nLCB1bm1hcCBvciBwZXJtaXNzaW9uIGNoYW5nZXMpIG9uIGEgbGFyZ2UgYXJlYSBv
-ZiBzdGFnZTIgbWFwcGluZ3MuCkhvd2V2ZXIgdGhpcyBjb3VsZCBwb3NzaWJseSBjYXVzZSBhbm90
-aGVyIHRocmVhZCB0byBjbGVhciBhbmQgZnJlZSB1cAp0aGUgc3RhZ2UyIHBhZ2UgdGFibGVzIHdo
-aWxlIHdlIHdlcmUgd2FpdGluZyBmb3IgcmVnYWluaW5nIHRoZSBsb2NrIGFuZAp0aHVzIHRoZSBv
-cmlnaW5hbCB0aHJlYWQgY291bGQgZW5kIHVwIGluIGFjY2Vzc2luZyBtZW1vcnkgdGhhdCB3YXMK
-ZnJlZWQuIFRoaXMgcGF0Y2ggZml4ZXMgdGhlIHByb2JsZW0gYnkgbWFraW5nIHN1cmUgdGhhdCB0
-aGUgc3RhZ2UyCnBhZ2V0YWJsZSBpcyBzdGlsbCB2YWxpZCBhZnRlciB3ZSByZWdhaW4gdGhlIGxv
-Y2suIFRoZSBmYWN0IHRoYXQKbW11X25vdGlmZXItPnJlbGVhc2UoKSBjb3VsZCBiZSBjYWxsZWQg
-dHdpY2UgKHZpYSBfX21tdV9ub3RpZmllcl9yZWxlYXNlCmFuZCBtbXVfbm90aWZpZXJfdW5yZWdz
-aXN0ZXIpIGVuaGFuY2VzIHRoZSBwb3NzaWJpbGl0eSBvZiBoaXR0aW5nCnRoaXMgcmFjZSB3aGVy
-ZSB0aGVyZSBhcmUgdHdvIHRocmVhZHMgdHJ5aW5nIHRvIHVubWFwIHRoZSBlbnRpcmUgZ3Vlc3QK
-c2hhZG93IHBhZ2VzLgoKV2hpbGUgYXQgaXQsIGNsZWFudXAgdGhlIHJlZHVkYW50IGNoZWNrcyBh
-cm91bmQgY29uZF9yZXNjaGVkX2xvY2sgaW4Kc3RhZ2UyX3dwX3JhbmdlKCksIGFzIGNvbmRfcmVz
-Y2hlZF9sb2NrIGFscmVhZHkgZG9lcyB0aGUgc2FtZSBjaGVja3MuCgpDYzogTWFyayBSdXRsYW5k
-IDxtYXJrLnJ1dGxhbmRAYXJtLmNvbT4KQ2M6IFJhZGltIEtyxI1tw6HFmSA8cmtyY21hckByZWRo
-YXQuY29tPgpDYzogYW5kcmV5a252bEBnb29nbGUuY29tCkNjOiBQYW9sbyBCb256aW5pIDxwYm9u
-emluaUByZWRoYXQuY29tPgpDYzogc3RhYmxlQHZnZXIua2VybmVsLm9yZwpBY2tlZC1ieTogTWFy
-YyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KU2lnbmVkLW9mZi1ieTogU3V6dWtpIEsg
-UG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT4KUmV2aWV3ZWQtYnk6IENocmlzdG9mZmVy
-IERhbGwgPGNkYWxsQGxpbmFyby5vcmc+ClNpZ25lZC1vZmYtYnk6IENocmlzdG9mZmVyIERhbGwg
-PGNkYWxsQGxpbmFyby5vcmc+Ci0tLQogdmlydC9rdm0vYXJtL21tdS5jIHwgMTcgKysrKysrKysr
-KysrKy0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAxMyBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygt
-KQoKZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS9tbXUuYyBiL3ZpcnQva3ZtL2FybS9tbXUuYwpp
-bmRleCA3MDRlMzVmLi5hMmQ2MzI0IDEwMDY0NAotLS0gYS92aXJ0L2t2bS9hcm0vbW11LmMKKysr
-IGIvdmlydC9rdm0vYXJtL21tdS5jCkBAIC0yOTUsNiArMjk1LDEzIEBAIHN0YXRpYyB2b2lkIHVu
-bWFwX3N0YWdlMl9yYW5nZShzdHJ1Y3Qga3ZtICprdm0sIHBoeXNfYWRkcl90IHN0YXJ0LCB1NjQg
-c2l6ZSkKIAlhc3NlcnRfc3Bpbl9sb2NrZWQoJmt2bS0+bW11X2xvY2spOwogCXBnZCA9IGt2bS0+
-YXJjaC5wZ2QgKyBzdGFnZTJfcGdkX2luZGV4KGFkZHIpOwogCWRvIHsKKwkJLyoKKwkJICogTWFr
-ZSBzdXJlIHRoZSBwYWdlIHRhYmxlIGlzIHN0aWxsIGFjdGl2ZSwgYXMgYW5vdGhlciB0aHJlYWQK
-KwkJICogY291bGQgaGF2ZSBwb3NzaWJseSBmcmVlZCB0aGUgcGFnZSB0YWJsZSwgd2hpbGUgd2Ug
-cmVsZWFzZWQKKwkJICogdGhlIGxvY2suCisJCSAqLworCQlpZiAoIVJFQURfT05DRShrdm0tPmFy
-Y2gucGdkKSkKKwkJCWJyZWFrOwogCQluZXh0ID0gc3RhZ2UyX3BnZF9hZGRyX2VuZChhZGRyLCBl
-bmQpOwogCQlpZiAoIXN0YWdlMl9wZ2Rfbm9uZSgqcGdkKSkKIAkJCXVubWFwX3N0YWdlMl9wdWRz
-KGt2bSwgcGdkLCBhZGRyLCBuZXh0KTsKQEAgLTExNzAsMTEgKzExNzcsMTMgQEAgc3RhdGljIHZv
-aWQgc3RhZ2UyX3dwX3JhbmdlKHN0cnVjdCBrdm0gKmt2bSwgcGh5c19hZGRyX3QgYWRkciwgcGh5
-c19hZGRyX3QgZW5kKQogCQkgKiBsYXJnZS4gT3RoZXJ3aXNlLCB3ZSBtYXkgc2VlIGtlcm5lbCBw
-YW5pY3Mgd2l0aAogCQkgKiBDT05GSUdfREVURUNUX0hVTkdfVEFTSywgQ09ORklHX0xPQ0tVUF9E
-RVRFQ1RPUiwKIAkJICogQ09ORklHX0xPQ0tERVAuIEFkZGl0aW9uYWxseSwgaG9sZGluZyB0aGUg
-bG9jayB0b28gbG9uZwotCQkgKiB3aWxsIGFsc28gc3RhcnZlIG90aGVyIHZDUFVzLgorCQkgKiB3
-aWxsIGFsc28gc3RhcnZlIG90aGVyIHZDUFVzLiBXZSBoYXZlIHRvIGFsc28gbWFrZSBzdXJlCisJ
-CSAqIHRoYXQgdGhlIHBhZ2UgdGFibGVzIGFyZSBub3QgZnJlZWQgd2hpbGUgd2UgcmVsZWFzZWQK
-KwkJICogdGhlIGxvY2suCiAJCSAqLwotCQlpZiAobmVlZF9yZXNjaGVkKCkgfHwgc3Bpbl9uZWVk
-YnJlYWsoJmt2bS0+bW11X2xvY2spKQotCQkJY29uZF9yZXNjaGVkX2xvY2soJmt2bS0+bW11X2xv
-Y2spOwotCisJCWNvbmRfcmVzY2hlZF9sb2NrKCZrdm0tPm1tdV9sb2NrKTsKKwkJaWYgKCFSRUFE
-X09OQ0Uoa3ZtLT5hcmNoLnBnZCkpCisJCQlicmVhazsKIAkJbmV4dCA9IHN0YWdlMl9wZ2RfYWRk
-cl9lbmQoYWRkciwgZW5kKTsKIAkJaWYgKHN0YWdlMl9wZ2RfcHJlc2VudCgqcGdkKSkKIAkJCXN0
-YWdlMl93cF9wdWRzKHBnZCwgYWRkciwgbmV4dCk7Ci0tIAoyLjkuMAoKX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
-cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
-aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+From: Zhichao Huang <zhichao.huang@linaro.org>
+
+pm_fake doesn't quite describe what the handler does (ignoring writes
+and returning 0 for reads).
+
+As we're about to use it (a lot) in a different context, rename it
+with a (admitedly cryptic) name that make sense for all users.
+
+Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
+Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ arch/arm/kvm/coproc.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index 1403ffb..6d1d2e2 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -279,7 +279,7 @@ static bool access_gic_sre(struct kvm_vcpu *vcpu,
+  * must always support PMCCNTR (the cycle counter): we just RAZ/WI for
+  * all PM registers, which doesn't crash the guest kernel at least.
+  */
+-static bool pm_fake(struct kvm_vcpu *vcpu,
++static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+ 		    const struct coproc_params *p,
+ 		    const struct coproc_reg *r)
+ {
+@@ -289,19 +289,19 @@ static bool pm_fake(struct kvm_vcpu *vcpu,
+ 		return read_zero(vcpu, p);
+ }
+ 
+-#define access_pmcr pm_fake
+-#define access_pmcntenset pm_fake
+-#define access_pmcntenclr pm_fake
+-#define access_pmovsr pm_fake
+-#define access_pmselr pm_fake
+-#define access_pmceid0 pm_fake
+-#define access_pmceid1 pm_fake
+-#define access_pmccntr pm_fake
+-#define access_pmxevtyper pm_fake
+-#define access_pmxevcntr pm_fake
+-#define access_pmuserenr pm_fake
+-#define access_pmintenset pm_fake
+-#define access_pmintenclr pm_fake
++#define access_pmcr trap_raz_wi
++#define access_pmcntenset trap_raz_wi
++#define access_pmcntenclr trap_raz_wi
++#define access_pmovsr trap_raz_wi
++#define access_pmselr trap_raz_wi
++#define access_pmceid0 trap_raz_wi
++#define access_pmceid1 trap_raz_wi
++#define access_pmccntr trap_raz_wi
++#define access_pmxevtyper trap_raz_wi
++#define access_pmxevcntr trap_raz_wi
++#define access_pmuserenr trap_raz_wi
++#define access_pmintenset trap_raz_wi
++#define access_pmintenclr trap_raz_wi
+ 
+ /* Architected CP15 registers.
+  * CRn denotes the primary register number, but is copied to the CRm in the
+@@ -566,7 +566,7 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	struct coproc_params params = decode_64bit_hsr(vcpu);
+ 
+ 	/* raz_wi cp14 */
+-	pm_fake(vcpu, &params, NULL);
++	trap_raz_wi(vcpu, &params, NULL);
+ 
+ 	/* handled */
+ 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+@@ -621,7 +621,7 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	struct coproc_params params = decode_32bit_hsr(vcpu);
+ 
+ 	/* raz_wi cp14 */
+-	pm_fake(vcpu, &params, NULL);
++	trap_raz_wi(vcpu, &params, NULL);
+ 
+ 	/* handled */
+ 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+-- 
+2.9.0
