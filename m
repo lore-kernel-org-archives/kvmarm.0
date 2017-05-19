@@ -1,24 +1,23 @@
-From: wanghaibin <wanghaibin.wang@huawei.com>
-Subject: Re: [RFC PATCH] kvm: arm: vgic-v3: add the emulate GICC_CTLR layout
- support for vmcr ctlr field.
-Date: Fri, 19 May 2017 17:16:47 +0800
-Message-ID: <591EB7FF.3090809@huawei.com>
-References: <1494897566-11744-1-git-send-email-wanghaibin.wang@huawei.com>
+From: Raz <raziebe@gmail.com>
+Subject: Looking a bootloader code on Armv8a cpu
+Date: Fri, 19 May 2017 09:30:12 +0000
+Message-ID: <CAPB=Z-rn_VuWosp098cKrtEAwRuqD=1YhjhRJDfYfVbDcXqTSg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============1821658468020938491=="
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76AA9405DA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 May 2017 05:16:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A70E4405DA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 May 2017 05:27:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RBQP-+ul6pcf for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 May 2017 05:16:38 -0400 (EDT)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C99D840064
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 May 2017 05:16:37 -0400 (EDT)
-In-Reply-To: <1494897566-11744-1-git-send-email-wanghaibin.wang@huawei.com>
+ with ESMTP id Eex9z52UtXOG for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 May 2017 05:27:01 -0400 (EDT)
+Received: from mail-wr0-f178.google.com (mail-wr0-f178.google.com
+ [209.85.128.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E54940064
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 May 2017 05:27:01 -0400 (EDT)
+Received: by mail-wr0-f178.google.com with SMTP id z52so13230836wrc.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 May 2017 02:30:34 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,121 +27,39 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: wanghaibin <wanghaibin.wang@huawei.com>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2017/5/16 9:19, wanghaibin wrote:
+--===============1821658468020938491==
+Content-Type: multipart/alternative; boundary="f403045fc1ba47892e054fdd2c38"
 
-> Boot a virtual machine with the emulated GICv2 on the GICv3 hardware.
-> Migrate the virtual machine will be successful, but the virtual machine will
-> hang at the destination.
-> 
-> The GICC_CTLR and ICC_CTLR_EL1 have the different layout. Currently, the set/get
-> the VMCR interface just take vmcr ctlr field as the ICC_CTLR_EL1 layout.
-> Should we consider the GICC_CTLR layout to avoid this problem?
+--f403045fc1ba47892e054fdd2c38
+Content-Type: text/plain; charset="UTF-8"
+
+Hey
+
+I want to run a hypervisor on an Android smart phone. Where can I find a
+modified boot loader that can boot kvm on an Armv8a processor ?
 
 
-Ping ..
+Thank you
 
-BTW: I test this case on hisilicon D03 board, and it's like the commit (5fb247d79c04240dce86c842976cde1edde7f7ed)
-introduced this problem which doesn't consider the compatible of GICC_CTLR layoyut.
+--f403045fc1ba47892e054fdd2c38
+Content-Type: text/html; charset="UTF-8"
 
-+ the patch author Vijaya
+<div dir="ltr">Hey<br><br>I want to run a hypervisor on an Android smart phone. Where can I find a modified boot loader that can boot kvm on an Armv8a processor ?<br><br><br>Thank you</div>
 
-Thanks.
+--f403045fc1ba47892e054fdd2c38--
 
-> 
-> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
-> ---
->  include/linux/irqchip/arm-gic-v3.h |  2 ++
->  virt/kvm/arm/vgic/vgic-v3.c        | 48 ++++++++++++++++++++++++--------------
->  2 files changed, 32 insertions(+), 18 deletions(-)
-> 
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index 97cbca1..e40c711 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -403,6 +403,8 @@
->  #define ICH_HCR_EN			(1 << 0)
->  #define ICH_HCR_UIE			(1 << 1)
->  
-> +#define ICH_VMCR_CTLR_SHIFT		0
-> +#define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
->  #define ICH_VMCR_CBPR_SHIFT		4
->  #define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
->  #define ICH_VMCR_EOIM_SHIFT		9
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index be0f4c3..66defae 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -174,19 +174,25 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
->  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  {
->  	u32 vmcr;
-> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-> +
-> +	if (model == KVM_DEV_TYPE_ARM_VGIC_V2)
-> +		vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
-> +	else {
-> +		/*
-> +		 * Ignore the FIQen bit, because GIC emulation always implies
-> +		 * SRE=1 which means the vFIQEn bit is also RES1.
-> +		 */
-> +		vmcr = ((vmcrp->ctlr >> ICC_CTLR_EL1_EOImode_SHIFT) <<
-> +			 ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
-> +		vmcr |= (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
-> +		vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
-> +		vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
-> +	}
->  
-> -	/*
-> -	 * Ignore the FIQen bit, because GIC emulation always implies
-> -	 * SRE=1 which means the vFIQEn bit is also RES1.
-> -	 */
-> -	vmcr = ((vmcrp->ctlr >> ICC_CTLR_EL1_EOImode_SHIFT) <<
-> -		 ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
-> -	vmcr |= (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
->  	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
->  	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
->  	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
-> -	vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
-> -	vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
->  
->  	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
->  }
-> @@ -194,19 +200,25 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  {
->  	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
-> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-> +
-> +	if (model == KVM_DEV_TYPE_ARM_VGIC_V2)
-> +		vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
-> +	else {
-> +		/*
-> +		 * Ignore the FIQen bit, because GIC emulation always implies
-> +		 * SRE=1 which means the vFIQEn bit is also RES1.
-> +		 */
-> +		vmcrp->ctlr = ((vmcr >> ICH_VMCR_EOIM_SHIFT) <<
-> +				ICC_CTLR_EL1_EOImode_SHIFT) & ICC_CTLR_EL1_EOImode_MASK;
-> +		vmcrp->ctlr |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
-> +		vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
-> +		vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
-> +	}
->  
-> -	/*
-> -	 * Ignore the FIQen bit, because GIC emulation always implies
-> -	 * SRE=1 which means the vFIQEn bit is also RES1.
-> -	 */
-> -	vmcrp->ctlr = ((vmcr >> ICH_VMCR_EOIM_SHIFT) <<
-> -			ICC_CTLR_EL1_EOImode_SHIFT) & ICC_CTLR_EL1_EOImode_MASK;
-> -	vmcrp->ctlr |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
->  	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
->  	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
->  	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
-> -	vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
-> -	vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
->  }
->  
->  #define INITIAL_PENDBASER_VALUE						  \
+--===============1821658468020938491==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1821658468020938491==--
