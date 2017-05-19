@@ -1,29 +1,24 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH 06/11] dt-bindings: add devicetree binding for describing
- arm64 SDEI firmware
-Date: Thu, 18 May 2017 20:48:04 -0500
-Message-ID: <20170519014804.psr5i7qczpbsn3iv@rob-hp-laptop>
-References: <20170515174400.29735-1-james.morse@arm.com>
- <20170515174400.29735-7-james.morse@arm.com>
+From: wanghaibin <wanghaibin.wang@huawei.com>
+Subject: Re: [RFC PATCH] kvm: arm: vgic-v3: add the emulate GICC_CTLR layout
+ support for vmcr ctlr field.
+Date: Fri, 19 May 2017 17:16:47 +0800
+Message-ID: <591EB7FF.3090809@huawei.com>
+References: <1494897566-11744-1-git-send-email-wanghaibin.wang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 06AE7405DA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 May 2017 21:44:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76AA9405DA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 May 2017 05:16:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WcNDUvnSp7ak for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 May 2017 21:44:33 -0400 (EDT)
-Received: from mail-oi0-f68.google.com (mail-oi0-f68.google.com
- [209.85.218.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F67C400E9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 May 2017 21:44:33 -0400 (EDT)
-Received: by mail-oi0-f68.google.com with SMTP id w10so10261624oif.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 May 2017 18:48:06 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170515174400.29735-7-james.morse@arm.com>
+ with ESMTP id RBQP-+ul6pcf for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 May 2017 05:16:38 -0400 (EDT)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C99D840064
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 May 2017 05:16:37 -0400 (EDT)
+In-Reply-To: <1494897566-11744-1-git-send-email-wanghaibin.wang@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,81 +28,121 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: devicetree@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: wanghaibin <wanghaibin.wang@huawei.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, May 15, 2017 at 06:43:54PM +0100, James Morse wrote:
-> The Software Delegated Exception Interface (SDEI) is an ARM standard
-> for registering callbacks from the platform firmware into the OS.
-> This is typically used to implement RAS notifications.
+On 2017/5/16 9:19, wanghaibin wrote:
+
+> Boot a virtual machine with the emulated GICv2 on the GICv3 hardware.
+> Migrate the virtual machine will be successful, but the virtual machine will
+> hang at the destination.
 > 
-> Add a new devicetree binding to describe the SDE firmware interface.
+> The GICC_CTLR and ICC_CTLR_EL1 have the different layout. Currently, the set/get
+> the VMCR interface just take vmcr ctlr field as the ICC_CTLR_EL1 layout.
+> Should we consider the GICC_CTLR layout to avoid this problem?
+
+
+Ping ..
+
+BTW: I test this case on hisilicon D03 board, and it's like the commit (5fb247d79c04240dce86c842976cde1edde7f7ed)
+introduced this problem which doesn't consider the compatible of GICC_CTLR layoyut.
+
++ the patch author Vijaya
+
+Thanks.
+
 > 
-> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
 > ---
->  Documentation/devicetree/bindings/arm/sdei.txt | 37 ++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/arm/sdei.txt
+>  include/linux/irqchip/arm-gic-v3.h |  2 ++
+>  virt/kvm/arm/vgic/vgic-v3.c        | 48 ++++++++++++++++++++++++--------------
+>  2 files changed, 32 insertions(+), 18 deletions(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/arm/sdei.txt b/Documentation/devicetree/bindings/arm/sdei.txt
-> new file mode 100644
-> index 000000000000..69220d995286
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/arm/sdei.txt
-> @@ -0,0 +1,37 @@
-> +* Software Delegated Exception Interface (SDEI)
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index 97cbca1..e40c711 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -403,6 +403,8 @@
+>  #define ICH_HCR_EN			(1 << 0)
+>  #define ICH_HCR_UIE			(1 << 1)
+>  
+> +#define ICH_VMCR_CTLR_SHIFT		0
+> +#define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
+>  #define ICH_VMCR_CBPR_SHIFT		4
+>  #define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
+>  #define ICH_VMCR_EOIM_SHIFT		9
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index be0f4c3..66defae 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -174,19 +174,25 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
+>  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  {
+>  	u32 vmcr;
+> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
 > +
-> +Firmware implementing the SDEI functions described in ARM document number
-> +ARM DEN 0054A ("Software Delegated Exception Interface") can be used by
-> +Linux to receive notification of events such as those generated by
-> +firmware-first error handling.
-
-Why am I reviewing bindings for RAS firmware-first events which is a 
-server thing? Just curious.
-
+> +	if (model == KVM_DEV_TYPE_ARM_VGIC_V2)
+> +		vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
+> +	else {
+> +		/*
+> +		 * Ignore the FIQen bit, because GIC emulation always implies
+> +		 * SRE=1 which means the vFIQEn bit is also RES1.
+> +		 */
+> +		vmcr = ((vmcrp->ctlr >> ICC_CTLR_EL1_EOImode_SHIFT) <<
+> +			 ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
+> +		vmcr |= (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
+> +		vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
+> +		vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
+> +	}
+>  
+> -	/*
+> -	 * Ignore the FIQen bit, because GIC emulation always implies
+> -	 * SRE=1 which means the vFIQEn bit is also RES1.
+> -	 */
+> -	vmcr = ((vmcrp->ctlr >> ICC_CTLR_EL1_EOImode_SHIFT) <<
+> -		 ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
+> -	vmcr |= (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
+>  	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
+>  	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
+>  	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
+> -	vmcr |= (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
+> -	vmcr |= (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
+>  
+>  	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
+>  }
+> @@ -194,19 +200,25 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  {
+>  	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
+> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
 > +
-> +The interface provides a number of API functions for registering callbacks
-> +and enabling/disabling events. Functions are invoked by trapping to the
-> +privilege level of the SDEI firmware (specified as part of the binding
-> +below) and passing arguments in a manner similar to that specified by AAPCS:
-
-Shouldn't it be the ARM secure monitor call convention doc (forgot the 
-name) that you are following?
-
-> +
-> +	 r0		=> 32-bit Function ID / return value
-> +	{r1 - r3}	=> Parameters
-> +
-> +Note that the immediate field of the trapping instruction must be set
-> +to #0.
-> +
-> +The SDEI_EVENT_REGISTER function registers a callback in the kernel
-> +text to handle the specified event number.
-> +
-> +Main node required properties:
-> +
-> + - compatible    : should contain:
-> +	* "arm,sdei-1.0" : For implementations complying to SDEI version 1.x.
-> +
-> + - method        : The method of calling the SDEI firmware. Permitted
-> +                   values are:
-> +	* "smc" : SMC #0, with the register assignments specified in this
-> +	          binding.
-> +	* "hvc" : HVC #0, with the register assignments specified in this
-> +	          binding.
-
-When is ARM going to define a firmware interface to determine what 
-firmware interfaces are available?
-
-> +Example:
-> +	sdei {
-
-Please specify this should be a child node of /firmware node.
-
-> +		compatible	= "arm,sdei-1.0";
-> +		method		= "smc";
-> +	};
-> -- 
-> 2.10.1
-> 
+> +	if (model == KVM_DEV_TYPE_ARM_VGIC_V2)
+> +		vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
+> +	else {
+> +		/*
+> +		 * Ignore the FIQen bit, because GIC emulation always implies
+> +		 * SRE=1 which means the vFIQEn bit is also RES1.
+> +		 */
+> +		vmcrp->ctlr = ((vmcr >> ICH_VMCR_EOIM_SHIFT) <<
+> +				ICC_CTLR_EL1_EOImode_SHIFT) & ICC_CTLR_EL1_EOImode_MASK;
+> +		vmcrp->ctlr |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
+> +		vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
+> +		vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
+> +	}
+>  
+> -	/*
+> -	 * Ignore the FIQen bit, because GIC emulation always implies
+> -	 * SRE=1 which means the vFIQEn bit is also RES1.
+> -	 */
+> -	vmcrp->ctlr = ((vmcr >> ICH_VMCR_EOIM_SHIFT) <<
+> -			ICC_CTLR_EL1_EOImode_SHIFT) & ICC_CTLR_EL1_EOImode_MASK;
+> -	vmcrp->ctlr |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
+>  	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
+>  	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
+>  	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
+> -	vmcrp->grpen0 = (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
+> -	vmcrp->grpen1 = (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
+>  }
+>  
+>  #define INITIAL_PENDBASER_VALUE						  \
