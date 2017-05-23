@@ -1,363 +1,136 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH] kvm: arm: vgic-v3: add the emulate GICC_CTLR layout
- support for vmcr ctlr field.
-Date: Tue, 23 May 2017 17:33:46 +0100
-Message-ID: <4bad8907-3ead-151d-66a2-6ca8769a2f1a@arm.com>
-References: <1494897566-11744-1-git-send-email-wanghaibin.wang@huawei.com>
- <20170520121704.GB6319@cbox>
+Subject: Re: [PATCH v2 1/9] KVM: arm64: Allow creating the PMU without the
+ in-kernel GIC
+Date: Tue, 23 May 2017 17:52:01 +0100
+Message-ID: <51d0d9eb-3e72-2f37-3fac-89de28cea91b@arm.com>
+References: <20170516184556.26785-1-cdall@linaro.org>
+ <20170516184556.26785-2-cdall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FD1B40C17
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 May 2017 12:30:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HbIwiLVX6kMR for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 May 2017 12:30:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF37E40BBC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 May 2017 12:30:08 -0400 (EDT)
-In-Reply-To: <20170520121704.GB6319@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>, wanghaibin <wanghaibin.wang@huawei.com>
-Cc: kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170516184556.26785-2-cdall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Alexander Graf <agraf@suse.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 20/05/17 13:17, Christoffer Dall wrote:
-> Hi Wanghaibin,
+On 16/05/17 19:45, Christoffer Dall wrote:
+> Since we got support for devices in userspace which allows reporting the
+> PMU overflow output status to userspace, we should actually allow
+> creating the PMU on systems without an in-kernel irqchip, which in turn
+> requires us to slightly clarify error codes for the ABI and move things
+> around for the initialization phase.
 > 
-> On Tue, May 16, 2017 at 09:19:26AM +0800, wanghaibin wrote:
->> Boot a virtual machine with the emulated GICv2 on the GICv3 hardware.
->> Migrate the virtual machine will be successful, but the virtual machine will
->> hang at the destination.
->>
->> The GICC_CTLR and ICC_CTLR_EL1 have the different layout. Currently, the set/get
->> the VMCR interface just take vmcr ctlr field as the ICC_CTLR_EL1 layout.
->> Should we consider the GICC_CTLR layout to avoid this problem?
->>
->> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+> Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> ---
+>  Documentation/virtual/kvm/devices/vcpu.txt | 16 +++++++++-------
+>  virt/kvm/arm/pmu.c                         | 30 ++++++++++++++++++++----------
+>  2 files changed, 29 insertions(+), 17 deletions(-)
 > 
-> Nice find.
-> 
-> I agree with the problem, but I don't agree with your solution, because
-> it's really hard to figure out the mappings, I think.
-> 
-> How about this (untested) patch instead?  Could you test the migration
-> on your setup?
-> 
-> commit 7c94545b6801840364647d5deb81f47da5e1f547 (HEAD -> vmcr-gicv2on3-cleanup, kernelorg/vmcr-gicv2on3-cleanup)
-> Author: Christoffer Dall <cdall@linaro.org>
-> Date:   Sat May 20 14:12:34 2017 +0200
-> 
->     KVM: arm/arm64: Fix isues with GICv2 on GICv3 migration
->     
->     We have been a little loose with our intermediate VMCR representation
->     where we had a 'ctlr' field, but we failed to differentiate between the
->     GICv2 GICC_CTLR and ICC_CTLR_EL1 layouts, and therefore ended up mapping
->     the wrong bits into the individual fields of the ICH_VMCR_EL2 when
->     emulating a GICv2 on a GICv3 system.
->     
->     Fix this by using explicit fields for the VMCR bits instead.
->     
->     Cc: Marc Zyngier <marc.zyngier@arm.com>
->     Cc: Eric Auger <eric.auger@redhat.com>
->     Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
->     Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> 
-> diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
-> index 79f37e3..6260b69 100644
-> --- a/arch/arm64/kvm/vgic-sys-reg-v3.c
-> +++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
-> @@ -65,8 +65,8 @@ static bool access_gic_ctlr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  		 * Here set VMCR.CTLR in ICC_CTLR_EL1 layout.
->  		 * The vgic_set_vmcr() will convert to ICH_VMCR layout.
->  		 */
-> -		vmcr.ctlr = val & ICC_CTLR_EL1_CBPR_MASK;
-> -		vmcr.ctlr |= val & ICC_CTLR_EL1_EOImode_MASK;
-> +		vmcr.cbpr = (val & ICC_CTLR_EL1_CBPR_MASK) >> ICC_CTLR_EL1_CBPR_SHIFT;
-> +		vmcr.eoim = (val & ICC_CTLR_EL1_EOImode_MASK) >> ICC_CTLR_EL1_EOImode_SHIFT;
->  		vgic_set_vmcr(vcpu, &vmcr);
->  	} else {
->  		val = 0;
-> @@ -83,8 +83,8 @@ static bool access_gic_ctlr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  		 * The VMCR.CTLR value is in ICC_CTLR_EL1 layout.
->  		 * Extract it directly using ICC_CTLR_EL1 reg definitions.
->  		 */
-> -		val |= vmcr.ctlr & ICC_CTLR_EL1_CBPR_MASK;
-> -		val |= vmcr.ctlr & ICC_CTLR_EL1_EOImode_MASK;
-> +		val |= (vmcr.cbpr << ICC_CTLR_EL1_CBPR_SHIFT) & ICC_CTLR_EL1_CBPR_MASK;
-> +		val |= (vmcr.eoim << ICC_CTLR_EL1_EOImode_SHIFT) & ICC_CTLR_EL1_EOImode_MASK;
+> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
+> index 02f5068..352af6e 100644
+> --- a/Documentation/virtual/kvm/devices/vcpu.txt
+> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
+> @@ -16,7 +16,9 @@ Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt is a
+>  Returns: -EBUSY: The PMU overflow interrupt is already set
+>           -ENXIO: The overflow interrupt not set when attempting to get it
+>           -ENODEV: PMUv3 not supported
+> -         -EINVAL: Invalid PMU overflow interrupt number supplied
+> +         -EINVAL: Invalid PMU overflow interrupt number supplied or
+> +                  trying to set the IRQ number without using an in-kernel
+> +                  irqchip.
 >  
->  		p->regval = val;
->  	}
-> @@ -135,7 +135,7 @@ static bool access_gic_bpr1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  		p->regval = 0;
+>  A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
+>  number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
+> @@ -25,11 +27,11 @@ all vcpus, while as an SPI it must be a separate number per vcpu.
 >  
->  	vgic_get_vmcr(vcpu, &vmcr);
-> -	if (!((vmcr.ctlr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT)) {
-> +	if (!vmcr.cbpr) {
->  		if (p->is_write) {
->  			vmcr.abpr = (p->regval & ICC_BPR1_EL1_MASK) >>
->  				     ICC_BPR1_EL1_SHIFT;
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index fffb912..1fa293a 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -417,6 +417,10 @@
->  #define ICH_HCR_EN			(1 << 0)
->  #define ICH_HCR_UIE			(1 << 1)
->  
-> +#define ICH_VMCR_ACK_CTL_SHIFT		2
-> +#define ICH_VMCR_ACK_CTL_MASK		(1 << ICH_VMCR_ACK_CTL_SHIFT)
-> +#define ICH_VMCR_FIQ_EN_SHIFT		3
-> +#define ICH_VMCR_FIQ_EN_MASK		(1 << ICH_VMCR_FIQ_EN_SHIFT)
->  #define ICH_VMCR_CBPR_SHIFT		4
->  #define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
->  #define ICH_VMCR_EOIM_SHIFT		9
-> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
-> index dc30f3d..0baebcb 100644
-> --- a/include/linux/irqchip/arm-gic.h
-> +++ b/include/linux/irqchip/arm-gic.h
-> @@ -25,6 +25,11 @@
->  #define GICC_ENABLE			0x1
->  #define GICC_INT_PRI_THRESHOLD		0xf0
->  
-> +#define GIC_CPU_CTRL_EnableGrp0		(1 << 0)
-> +#define GIC_CPU_CTRL_EnableGrp1		(1 << 1)
-> +#define GIC_CPU_CTRL_AckCtl		(1 << 2)
-> +#define GIC_CPU_CTRL_FIQEn		(1 << 3)
-> +#define GIC_CPU_CTRL_CBPR		(1 << 4)
->  #define GIC_CPU_CTRL_EOImodeNS		(1 << 9)
->  
->  #define GICC_IAR_INT_ID_MASK		0x3ff
-> @@ -84,8 +89,19 @@
->  #define GICH_LR_EOI			(1 << 19)
->  #define GICH_LR_HW			(1 << 31)
->  
-> -#define GICH_VMCR_CTRL_SHIFT		0
-> -#define GICH_VMCR_CTRL_MASK		(0x21f << GICH_VMCR_CTRL_SHIFT)
-> +#define GICH_VMCR_ENABLE_GRP0_SHIFT	0
-> +#define GICH_VMCR_ENABLE_GRP0_MASK	(1 << GICH_VMCR_ENABLE_GRP0_SHIFT)
-> +#define GICH_VMCR_ENABLE_GRP1_SHIFT	1
-> +#define GICH_VMCR_ENABLE_GRP1_MASK	(1 << GICH_VMCR_ENABLE_GRP1_SHIFT)
-> +#define GICH_VMCR_ACK_CTL_SHIFT		2
-> +#define GICH_VMCR_ACK_CTL_MASK		(1 << GICH_VMCR_ACK_CTL_SHIFT)
-> +#define GICH_VMCR_FIQ_EN_SHIFT		3
-> +#define GICH_VMCR_FIQ_EN_MASK		(1 << GICH_VMCR_FIQ_EN_SHIFT)
-> +#define GICH_VMCR_CBPR_SHIFT		4
-> +#define GICH_VMCR_CBPR_MASK		(1 << GICH_VMCR_CBPR_SHIFT)
-> +#define GICH_VMCR_EOI_MODE_SHIFT	9
-> +#define GICH_VMCR_EOI_MODE_MASK		(1 << GICH_VMCR_EOI_MODE_SHIFT)
-> +
->  #define GICH_VMCR_PRIMASK_SHIFT		27
->  #define GICH_VMCR_PRIMASK_MASK		(0x1f << GICH_VMCR_PRIMASK_SHIFT)
->  #define GICH_VMCR_BINPOINT_SHIFT	21
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> index 0a4283e..0b71a46 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> @@ -226,7 +226,13 @@ static unsigned long vgic_mmio_read_vcpuif(struct kvm_vcpu *vcpu,
->  
->  	switch (addr & 0xff) {
->  	case GIC_CPU_CTRL:
-> -		val = vmcr.ctlr;
-> +		val = vmcr.grpen0 << __ffs(GIC_CPU_CTRL_EnableGrp0);
-> +		val |= vmcr.grpen1 << __ffs(GIC_CPU_CTRL_EnableGrp1);
-> +		val |= vmcr.ackctl << __ffs(GIC_CPU_CTRL_AckCtl);
-> +		val |= vmcr.fiqen << __ffs(GIC_CPU_CTRL_FIQEn);
-> +		val |= vmcr.cbpr << __ffs(GIC_CPU_CTRL_CBPR);
-> +		val |= vmcr.eoim << __ffs(GIC_CPU_CTRL_EOImodeNS);
+>  1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
+>  Parameters: no additional parameter in kvm_device_attr.addr
+> -Returns: -ENODEV: PMUv3 not supported
+> -         -ENXIO: PMUv3 not properly configured as required prior to calling this
+> -                 attribute
+> +Returns: -ENODEV: PMUv3 not supported or GIC not initialized
+> +         -ENXIO: PMUv3 not properly configured or in-kernel irqchip not
+> +                 conigured as required prior to calling this attribute
 
-Funky ;-) Should we try to standardize on one way or another of
-expressing the shift?
+                    configured
 
-> +
->  		break;
->  	case GIC_CPU_PRIMASK:
->  		/*
-> @@ -267,7 +273,13 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
+>           -EBUSY: PMUv3 already initialized
 >  
->  	switch (addr & 0xff) {
->  	case GIC_CPU_CTRL:
-> -		vmcr.ctlr = val;
-> +		vmcr.grpen0 = !!(val & GIC_CPU_CTRL_EnableGrp0);
-> +		vmcr.grpen1 = !!(val & GIC_CPU_CTRL_EnableGrp1);
-> +		vmcr.ackctl = !!(val & GIC_CPU_CTRL_AckCtl);
-> +		vmcr.fiqen = !!(val & GIC_CPU_CTRL_FIQEn);
-> +		vmcr.cbpr = !!(val & GIC_CPU_CTRL_CBPR);
-> +		vmcr.eoim = !!(val & GIC_CPU_CTRL_EOImodeNS);
-> +
->  		break;
->  	case GIC_CPU_PRIMASK:
->  		/*
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index 504b4bd..e4187e5 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -177,7 +177,18 @@ void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
->  	u32 vmcr;
->  
-> -	vmcr  = (vmcrp->ctlr << GICH_VMCR_CTRL_SHIFT) & GICH_VMCR_CTRL_MASK;
-> +	vmcr = (vmcrp->grpen0 << GICH_VMCR_ENABLE_GRP0_SHIFT) &
-> +		GICH_VMCR_ENABLE_GRP0_MASK;
-> +	vmcr |= (vmcrp->grpen1 << GICH_VMCR_ENABLE_GRP1_SHIFT) &
-> +		GICH_VMCR_ENABLE_GRP1_MASK;
-> +	vmcr |= (vmcrp->ackctl << GICH_VMCR_ACK_CTL_SHIFT) &
-> +		GICH_VMCR_ACK_CTL_MASK;
-> +	vmcr |= (vmcrp->fiqen << GICH_VMCR_FIQ_EN_SHIFT) &
-> +		GICH_VMCR_FIQ_EN_MASK;
-> +	vmcr |= (vmcrp->cbpr << GICH_VMCR_CBPR_SHIFT) &
-> +		GICH_VMCR_CBPR_MASK;
-> +	vmcr |= (vmcrp->eoim << GICH_VMCR_EOI_MODE_SHIFT) &
-> +		GICH_VMCR_EOI_MODE_MASK;
->  	vmcr |= (vmcrp->abpr << GICH_VMCR_ALIAS_BINPOINT_SHIFT) &
->  		GICH_VMCR_ALIAS_BINPOINT_MASK;
->  	vmcr |= (vmcrp->bpr << GICH_VMCR_BINPOINT_SHIFT) &
-> @@ -195,8 +206,19 @@ void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  
->  	vmcr = cpu_if->vgic_vmcr;
->  
-> -	vmcrp->ctlr = (vmcr & GICH_VMCR_CTRL_MASK) >>
-> -			GICH_VMCR_CTRL_SHIFT;
-> +	vmcrp->grpen0 = (vmcr & GICH_VMCR_ENABLE_GRP0_MASK) >>
-> +		GICH_VMCR_ENABLE_GRP0_SHIFT;
-> +	vmcrp->grpen1 = (vmcr & GICH_VMCR_ENABLE_GRP1_MASK) >>
-> +		GICH_VMCR_ENABLE_GRP1_SHIFT;
-> +	vmcrp->ackctl = (vmcr & GICH_VMCR_ACK_CTL_MASK) >>
-> +		GICH_VMCR_ACK_CTL_SHIFT;
-> +	vmcrp->fiqen = (vmcr & GICH_VMCR_FIQ_EN_MASK) >>
-> +		GICH_VMCR_FIQ_EN_SHIFT;
-> +	vmcrp->cbpr = (vmcr & GICH_VMCR_CBPR_MASK) >>
-> +		GICH_VMCR_CBPR_SHIFT;
-> +	vmcrp->eoim = (vmcr & GICH_VMCR_EOI_MODE_MASK) >>
-> +		GICH_VMCR_EOI_MODE_SHIFT;
-> +
->  	vmcrp->abpr = (vmcr & GICH_VMCR_ALIAS_BINPOINT_MASK) >>
->  			GICH_VMCR_ALIAS_BINPOINT_SHIFT;
->  	vmcrp->bpr  = (vmcr & GICH_VMCR_BINPOINT_MASK) >>
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 6fe3f00..051cbde 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -159,15 +159,24 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
->  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  {
->  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> -	u32 vmcr;
-> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-> +	u32 vmcr = 0;
-
-nit: drop the initialization...
-
+> -Request the initialization of the PMUv3.  This must be done after creating the
+> -in-kernel irqchip.  Creating a PMU with a userspace irqchip is currently not
+> -supported.
+> +Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
+> +virtual GIC implementation, this must be done after initializing the in-kernel
+> +irqchip.
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 4b43e7f..7209185 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -456,21 +456,25 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+>  	if (!kvm_arm_support_pmu_v3())
+>  		return -ENODEV;
 >  
 > -	/*
-> -	 * Ignore the FIQen bit, because GIC emulation always implies
-> -	 * SRE=1 which means the vFIQEn bit is also RES1.
+> -	 * We currently require an in-kernel VGIC to use the PMU emulation,
+> -	 * because we do not support forwarding PMU overflow interrupts to
+> -	 * userspace yet.
 > -	 */
-> -	vmcr = ((vmcrp->ctlr >> ICC_CTLR_EL1_EOImode_SHIFT) <<
-> -		 ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
-> -	vmcr |= (vmcrp->ctlr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
-> +	if (model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> +		vmcr |= (vmcrp->ackctl << ICH_VMCR_ACK_CTL_SHIFT) &
-> +			ICH_VMCR_ACK_CTL_MASK;
-
-... and make this a strict assignment instead of an or?
-
-> +		vmcr |= (vmcrp->fiqen << ICH_VMCR_FIQ_EN_SHIFT) &
-> +			ICH_VMCR_FIQ_EN_MASK;
-> +	} else {
+> -	if (!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))
+> -		return -ENODEV;
+> -
+> -	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features) ||
+> -	    !kvm_arm_pmu_irq_initialized(vcpu))
+> +	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>  		return -ENXIO;
+>  
+>  	if (kvm_arm_pmu_v3_ready(vcpu))
+>  		return -EBUSY;
+>  
+> +	if (irqchip_in_kernel(vcpu->kvm)) {
 > +		/*
-> +		 * When emulating GICv3 on GICv3 with SRE=1 on the
-> +		 * VFIQEn bit is RES1 and the VAckCtl bit is RES0.
+> +		 * If using the PMU with an in-kernel virtual GIC
+> +		 * implementation, we require the GIC to be already
+> +		 * initialized when initializing the PMU.
 > +		 */
-> +		vmcr = ICH_VMCR_FIQ_EN_MASK;
+> +		if (!vgic_initialized(vcpu->kvm))
+> +			return -ENODEV;
+> +
+> +		if (!kvm_arm_pmu_irq_initialized(vcpu))
+> +			return -ENXIO;
 > +	}
 > +
-> +	vmcr |= (vmcrp->cbpr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
-> +	vmcr |= (vmcrp->eoim << ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
->  	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
->  	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
->  	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
-> @@ -180,17 +189,27 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  {
->  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
->  	u32 vmcr;
->  
->  	vmcr = cpu_if->vgic_vmcr;
->  
-> -	/*
-> -	 * Ignore the FIQen bit, because GIC emulation always implies
-> -	 * SRE=1 which means the vFIQEn bit is also RES1.
-> -	 */
-> -	vmcrp->ctlr = ((vmcr >> ICH_VMCR_EOIM_SHIFT) <<
-> -			ICC_CTLR_EL1_EOImode_SHIFT) & ICC_CTLR_EL1_EOImode_MASK;
-> -	vmcrp->ctlr |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
-> +	if (model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> +		vmcrp->ackctl = (vmcr & ICH_VMCR_ACK_CTL_MASK) >>
-> +			ICH_VMCR_ACK_CTL_SHIFT;
-> +		vmcrp->fiqen = (vmcr & ICH_VMCR_FIQ_EN_MASK) >>
-> +			ICH_VMCR_FIQ_EN_SHIFT;
-> +	} else {
-> +		/*
-> +		 * When emulating GICv3 on GICv3 with SRE=1 on the
-> +		 * VFIQEn bit is RES1 and the VAckCtl bit is RES0.
-> +		 */
-> +		vmcrp->fiqen = 1;
-> +		vmcrp->ackctl = 0;
-> +	}
-> +
-> +	vmcrp->cbpr = (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
-> +	vmcrp->eoim = (vmcr & ICH_VMCR_EOIM_MASK) >> ICH_VMCR_EOIM_SHIFT;
->  	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
->  	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
->  	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index da83e4c..bba7fa2 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -111,14 +111,18 @@ static inline bool irq_is_pending(struct vgic_irq *irq)
->   * registers regardless of the hardware backed GIC used.
->   */
->  struct vgic_vmcr {
-> -	u32	ctlr;
-> +	u32	grpen0;
-> +	u32	grpen1;
-> +
-> +	u32	ackctl;
-> +	u32	fiqen;
-> +	u32	cbpr;
-> +	u32	eoim;
-> +
->  	u32	abpr;
->  	u32	bpr;
->  	u32	pmr;  /* Priority mask field in the GICC_PMR and
->  		       * ICC_PMR_EL1 priority field format */
-> -	/* Below member variable are valid only for GICv3 */
-> -	u32	grpen0;
-> -	u32	grpen1;
->  };
->  
->  struct vgic_reg_attr {
 
-Other than the couple of nits above, this looks pretty good. I've given
-it a go on my LS2085 with both v2 and v3 guests, save/restoring in a
-loop, and it worked nicely enough. Worth backporting to 4.11-stable.
+Do we also need to prevent a vgic to be created if the PMU has been
+initialized beforehand?
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Tested-by: Marc Zyngier <marc.zyngier@arm.com>
+>  	kvm_pmu_vcpu_reset(vcpu);
+>  	vcpu->arch.pmu.ready = true;
+>  
+> @@ -512,6 +516,9 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  		int __user *uaddr = (int __user *)(long)attr->addr;
+>  		int irq;
+>  
+> +		if (!irqchip_in_kernel(vcpu->kvm))
+> +			return -EINVAL;
+> +
+>  		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>  			return -ENODEV;
+>  
+> @@ -546,6 +553,9 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  		int __user *uaddr = (int __user *)(long)attr->addr;
+>  		int irq;
+>  
+> +		if (!irqchip_in_kernel(vcpu->kvm))
+> +			return -EINVAL;
+> +
+>  		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>  			return -ENODEV;
+>  
+> 
+
+Thanks,
 
 	M.
 -- 
