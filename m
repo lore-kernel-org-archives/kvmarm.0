@@ -1,213 +1,184 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 13/31] KVM: arm64: vgic-v3: Add ICV_IAR1_EL1 handler
-Date: Tue, 23 May 2017 09:22:55 +0200
-Message-ID: <3a6d4461-4e85-6e87-7bfb-57437745bdf0@redhat.com>
-References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <20170503104606.19342-14-marc.zyngier@arm.com>
- <9c11669c-ea66-bbe1-093d-907bcd190bab@redhat.com>
- <81c9f8bc-8913-3e00-5360-1c61c9399854@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v2 3/3] KVM: arm/arm64: Simplify active_change_prepare
+ and plug race
+Date: Tue, 23 May 2017 10:43:29 +0200
+Message-ID: <20170523084329.GC6319@cbox>
+References: <20170516100431.4101-1-cdall@linaro.org>
+ <20170516100431.4101-4-cdall@linaro.org>
+ <9a412ed2-70ea-b651-dd75-18d723ee8b71@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <81c9f8bc-8913-3e00-5360-1c61c9399854@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E08E140A80
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 May 2017 04:40:04 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Kdf+8OGS+wPE for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 May 2017 04:40:03 -0400 (EDT)
+Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 57DCB400E9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 May 2017 04:40:03 -0400 (EDT)
+Received: by mail-wm0-f43.google.com with SMTP id e127so17123330wmg.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 May 2017 01:43:43 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <9a412ed2-70ea-b651-dd75-18d723ee8b71@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+On Mon, May 22, 2017 at 04:30:22PM +0100, Marc Zyngier wrote:
+> On 16/05/17 11:04, Christoffer Dall wrote:
+> > We don't need to stop a specific VCPU when changing the active state,
+> > because private IRQs can only be modified by a running VCPU for the
+> > VCPU itself and it is therefore already stopped.
+> > 
+> > However, it is also possible for two VCPUs to be modifying the active
+> > state of SPIs at the same time, which can cause the thread being stuck
+> > in the loop that checks other VCPU threads for a potentially very long
+> > time, or to modify the active state of a running VCPU.  Fix this by
+> > serializing all accesses to setting and clearing the active state of
+> > interrupts using the KVM mutex.
+> > 
+> > Reported-by: Andrew Jones <drjones@redhat.com>
+> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > ---
+> >  arch/arm/include/asm/kvm_host.h   |  2 --
+> >  arch/arm64/include/asm/kvm_host.h |  2 --
+> >  virt/kvm/arm/arm.c                | 20 ++++----------------
+> >  virt/kvm/arm/vgic/vgic-mmio.c     | 18 ++++++++++--------
+> >  virt/kvm/arm/vgic/vgic.c          | 11 ++++++-----
+> >  5 files changed, 20 insertions(+), 33 deletions(-)
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> > index f0e6657..12274d4 100644
+> > --- a/arch/arm/include/asm/kvm_host.h
+> > +++ b/arch/arm/include/asm/kvm_host.h
+> > @@ -233,8 +233,6 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+> >  struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
+> >  void kvm_arm_halt_guest(struct kvm *kvm);
+> >  void kvm_arm_resume_guest(struct kvm *kvm);
+> > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
+> > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
+> >  
+> >  int kvm_arm_copy_coproc_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+> >  unsigned long kvm_arm_num_coproc_regs(struct kvm_vcpu *vcpu);
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 5e19165..32cbe8a 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -333,8 +333,6 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+> >  struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+> >  void kvm_arm_halt_guest(struct kvm *kvm);
+> >  void kvm_arm_resume_guest(struct kvm *kvm);
+> > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
+> > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
+> >  
+> >  u64 __kvm_call_hyp(void *hypfn, ...);
+> >  #define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__)
+> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > index 3417e18..3c387fd 100644
+> > --- a/virt/kvm/arm/arm.c
+> > +++ b/virt/kvm/arm/arm.c
+> > @@ -539,27 +539,15 @@ void kvm_arm_halt_guest(struct kvm *kvm)
+> >  	kvm_make_all_cpus_request(kvm, KVM_REQ_VCPU_EXIT);
+> >  }
+> >  
+> > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu)
+> > -{
+> > -	vcpu->arch.pause = true;
+> > -	kvm_vcpu_kick(vcpu);
+> > -}
+> > -
+> > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
+> > -{
+> > -	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
+> > -
+> > -	vcpu->arch.pause = false;
+> > -	swake_up(wq);
+> > -}
+> > -
+> >  void kvm_arm_resume_guest(struct kvm *kvm)
+> >  {
+> >  	int i;
+> >  	struct kvm_vcpu *vcpu;
+> >  
+> > -	kvm_for_each_vcpu(i, vcpu, kvm)
+> > -		kvm_arm_resume_vcpu(vcpu);
+> > +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> > +		vcpu->arch.pause = false;
+> > +		swake_up(kvm_arch_vcpu_wq(vcpu));
+> > +	}
+> >  }
+> >  
+> >  static void vcpu_sleep(struct kvm_vcpu *vcpu)
+> > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> > index 64cbcb4..c1e4bdd 100644
+> > --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> > +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> > @@ -231,23 +231,21 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+> >   * be migrated while we don't hold the IRQ locks and we don't want to be
+> >   * chasing moving targets.
+> >   *
+> > - * For private interrupts, we only have to make sure the single and only VCPU
+> > - * that can potentially queue the IRQ is stopped.
+> > + * For private interrupts we don't have to do anything because userspace
+> > + * accesses to the VGIC state already require all VCPUs to be stopped, and
+> > + * only the VCPU itself can modify its private interrupts active state, which
+> > + * guarantees that the VCPU is not running.
+> >   */
+> >  static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+> >  {
+> > -	if (intid < VGIC_NR_PRIVATE_IRQS)
+> > -		kvm_arm_halt_vcpu(vcpu);
+> > -	else
+> > +	if (intid > VGIC_NR_PRIVATE_IRQS)
+> >  		kvm_arm_halt_guest(vcpu->kvm);
+> >  }
+> >  
+> >  /* See vgic_change_active_prepare */
+> >  static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
+> >  {
+> > -	if (intid < VGIC_NR_PRIVATE_IRQS)
+> > -		kvm_arm_resume_vcpu(vcpu);
+> > -	else
+> > +	if (intid > VGIC_NR_PRIVATE_IRQS)
+> >  		kvm_arm_resume_guest(vcpu->kvm);
+> >  }
+> >  
+> > @@ -271,11 +269,13 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+> >  {
+> >  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+> >  
+> > +	mutex_lock(&vcpu->kvm->lock);
+> >  	vgic_change_active_prepare(vcpu, intid);
+> >  
+> >  	__vgic_mmio_write_cactive(vcpu, addr, len, val);
+> >  
+> >  	vgic_change_active_finish(vcpu, intid);
+> > +	mutex_unlock(&vcpu->kvm->lock);
+> 
+> Any reason not to move the lock/unlock calls to prepare/finish? Also, do
+> we need to take that mutex if intid is a PPI?
 
-On 22/05/2017 19:52, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> On 18/05/17 08:41, Auger Eric wrote:
->> Hi Marc,
->>
->> On 03/05/2017 12:45, Marc Zyngier wrote:
->>> Add a handler for reading the guest's view of the ICC_IAR1_EL1
->>> register. This involves finding the highest priority Group-1
->>> interrupt, checking against both PMR and the active group
->>> priority, activating the interrupt and setting the group
->>> priority as active.
->>>
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> ---
->>>  include/linux/irqchip/arm-gic-v3.h |   1 +
->>>  virt/kvm/arm/hyp/vgic-v3-sr.c      | 134 +++++++++++++++++++++++++++++++++++++
->>>  2 files changed, 135 insertions(+)
->>>
->>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
->>> index 97cbca19430d..7610ea4e8337 100644
->>> --- a/include/linux/irqchip/arm-gic-v3.h
->>> +++ b/include/linux/irqchip/arm-gic-v3.h
->>> @@ -391,6 +391,7 @@
->>>  #define ICH_LR_PHYS_ID_SHIFT		32
->>>  #define ICH_LR_PHYS_ID_MASK		(0x3ffULL << ICH_LR_PHYS_ID_SHIFT)
->>>  #define ICH_LR_PRIORITY_SHIFT		48
->>> +#define ICH_LR_PRIORITY_MASK		(0xffULL << ICH_LR_PRIORITY_SHIFT)
->>>  
->>>  /* These are for GICv2 emulation only */
->>>  #define GICH_LR_VIRTUALID		(0x3ffUL << 0)
->>> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
->>> index 473ef22508e6..49aad1de3ac8 100644
->>> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
->>> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
->>> @@ -375,6 +375,77 @@ void __hyp_text __vgic_v3_write_vmcr(u32 vmcr)
->>>  
->>>  #ifdef CONFIG_ARM64
->>>  
->>> +static int __hyp_text __vgic_v3_get_group(struct kvm_vcpu *vcpu)
->>> +{
->>> +	u32 esr = kvm_vcpu_get_hsr(vcpu);
->>> +	u8 crm = (esr & ESR_ELx_SYS64_ISS_CRM_MASK) >> ESR_ELx_SYS64_ISS_CRM_SHIFT;
->>> +
->>> +	return crm != 8;
->>> +}
->>> +
->>> +#define GICv3_IDLE_PRIORITY	0xff
->>> +
->>> +static int __hyp_text __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu,
->>> +						    u32 vmcr,
->>> +						    u64 *lr_val)
->>> +{
->>> +	unsigned int used_lrs = vcpu->arch.vgic_cpu.used_lrs;
->>> +	u8 priority = GICv3_IDLE_PRIORITY;
->>> +	int i, lr = -1;
->>> +
->>> +	for (i = 0; i < used_lrs; i++) {
->>> +		u64 val = __gic_v3_get_lr(i);
->>> +		u8 lr_prio = (val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
->>> +
->>> +		/* Not pending in the state? */
->>> +		if ((val & ICH_LR_STATE) != ICH_LR_PENDING_BIT)
->>> +			continue;
->>> +
->>> +		/* Group-0 interrupt, but Group-0 disabled? */
->>> +		if (!(val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_ENG0_MASK))
->>> +			continue;
->>> +
->>> +		/* Group-1 interrupt, but Group-1 disabled? */
->>> +		if ((val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_ENG1_MASK))
->>> +			continue;
->>> +
->>> +		/* Not the highest priority? */
->>> +		if (lr_prio >= priority)
->>> +			continue;
->>> +
->>> +		/* This is a candidate */
->>> +		priority = lr_prio;
->>> +		*lr_val = val;
->>> +		lr = i;
->>> +	}
->>> +
->>> +	if (lr == -1)
->>> +		*lr_val = ICC_IAR1_EL1_SPURIOUS;
->>> +
->>> +	return lr;
->>> +}
->>> +
->>> +static int __hyp_text __vgic_v3_get_highest_active_priority(void)
->>> +{
->>> +	u8 nr_pre_bits = vtr_to_nr_pre_bits(read_gicreg(ICH_VTR_EL2));
->>> +	u8 nr_aprs = 1 << (nr_pre_bits - 5);
->> s/nr_aprs/nr_apr_regs ?
-> 
-> Sure, I can do that if that helps.
-> 
->>> +	u32 hap = 0;
->>> +	int i;
->>> +
->>> +	for (i = 0; i < nr_aprs; i++) {
->>> +		u32 val;
->>> +
->>> +		val  = __vgic_v3_read_ap0rn(i);
->>> +		val |= __vgic_v3_read_ap1rn(i);
->>> +		if (val)
->>> +			return (hap + __ffs(val)) << (8 - nr_pre_bits);
->> here don't we need to shift by the actual number of subpriority bits?
->> isn't nr_pre_bits the max implemented preemption bits but not
->> necessarily the actual chosen number set by bpr?
-> 
-> Hmmm. I don't think that works. If you did that, you could end-up in a
-> bizarre situation where you can completely miss the current active
-> priority. Try for example:
-> 
-> 	nr_pre_bits=5
-> 	set BPR1=3 (5 preemption bits)
-> 	read IAR, interrupt priority = 0x10, set bit 2 in AP1R0
-> 	set BPR=4 (4 preemption bits)
-> 
-> With this setting, you've changed the active priority from being 0x10
-> (with BPR1=3) to being 8. This is wrong, as this should be an invariant.
-> 
-> The only way to avoid this unfortunate state of affair is to always
-> normalize the active priority to always be stored as if BPR had its
-> smallest possible value (which happens to be nr_pre_bits).
+I guess we strictly don't need to take the mutex if it's a PPI, no.
 
-Hum ok. I get your point now and that looks correct to me too. Maybe a
-small comment for subsequent readers would avoid the same question.
-> 
->>> +
->>> +		hap += 32;
->>> +	}
->>> +
->>> +	return GICv3_IDLE_PRIORITY;
->>> +}
->>> +
->>>  static unsigned int __hyp_text __vgic_v3_get_bpr0(u32 vmcr)
->>>  {
->>>  	return (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
->>> @@ -395,6 +466,66 @@ static unsigned int __hyp_text __vgic_v3_get_bpr1(u32 vmcr)
->>>  	return bpr;
->>>  }
->>>  
->> Would be nice to have a short doc comment.
->> I understand this zeros the subpriority field in the priority value, is
->> it correct? pseudocode PriorityGroup()?
-> 
-> Yes, I should probably add some references to the pseudocode.
-> 
->>> +static u8 __hyp_text __vgic_v3_pri_to_pre(u8 pri, u32 vmcr, int grp)
->>> +{
->>> +	unsigned int bpr;
->>> +
->>> +	if (!grp)
->>> +		bpr = __vgic_v3_get_bpr0(vmcr) + 1;
->>> +	else
->>> +		bpr = __vgic_v3_get_bpr1(vmcr);
->>> +
->>> +	return pri & (GENMASK(7, 0) << bpr);
->>  & GENMASK(7, bpr)?
-> 
-> Not sure about that. If grp==0, bpr can range from 1 to 8. If it is 8,
-> what is the meaning of GENMASK(7,8)?
+But I actually preferred this symmetry because you can easily tell we
+don't have a bug (famous last words) by locking and unlocking the mutex
+in the same function.
 
-OK forget it ;-)
-> 
->>> +}
->>> +
->>> +static void __hyp_text __vgic_v3_set_active_priority(u8 pre)
->>> +{
->>> +	u8 nr_pre_bits = vtr_to_nr_pre_bits(read_gicreg(ICH_VTR_EL2));
->>> +	u8 hap = pre >> (8 - nr_pre_bits);
->> Could you add a comment about what is hap. I tend to think it is the
->> group priority but then I don't get why we don't shift by 8 -bpr
-> 
-> "hap" stands for Highest Active Priority. And for the reasons describer
-> above, we need to normalize it, irrespective of the BPR.
-> 
-> Does it make sense?
+I don't feel strongly about it though, so I can move it if you prefer
+it.
 
-yes it does.
-
-So Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
-> 
-> Thanks,
-> 
-> 	M.
-> 
+Thanks,
+-Christoffer
