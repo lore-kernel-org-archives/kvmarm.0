@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH 05/10] VFIO: pci: Introduce direct EOI INTx interrupt handler
-Date: Wed, 24 May 2017 22:13:18 +0200
-Message-ID: <1495656803-28011-6-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH 06/10] irqbypass: Add a private field in the producer
+Date: Wed, 24 May 2017 22:13:19 +0200
+Message-ID: <1495656803-28011-7-git-send-email-eric.auger@redhat.com>
 References: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 553DE40C25
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 16:10:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6AEF40A66
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 16:10:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PCJNKTQzxKC8 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 May 2017 16:10:13 -0400 (EDT)
+ with ESMTP id m0Dr2oFSbQiH for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 May 2017 16:10:18 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E27A40A74
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 16:10:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 41FE840992
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 16:10:18 -0400 (EDT)
 In-Reply-To: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,99 +30,35 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We add two new fields in vfio_pci_irq_ctx struct: deoi and handler.
-If deoi is set, this means the physical IRQ attached to the virtual
-IRQ is directly deactivated by the guest and the VFIO driver does
-not need to disable the physical IRQ and mask it at VFIO level.
-
-The handler pointer is set accordingly and a wrapper handler is
-introduced that calls the chosen handler function.
+The producer callbacks may need to use a private data
+stored in the producer structure.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 ---
- drivers/vfio/pci/vfio_pci_intrs.c   | 32 ++++++++++++++++++++++++++------
- drivers/vfio/pci/vfio_pci_private.h |  2 ++
- 2 files changed, 28 insertions(+), 6 deletions(-)
+ include/linux/irqbypass.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index d4d377b..06aa713 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -121,11 +121,8 @@ void vfio_pci_intx_unmask(struct vfio_pci_device *vdev)
- static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
- {
- 	struct vfio_pci_device *vdev = dev_id;
--	unsigned long flags;
- 	int ret = IRQ_NONE;
- 
--	spin_lock_irqsave(&vdev->irqlock, flags);
--
- 	if (!vdev->pci_2_3) {
- 		disable_irq_nosync(vdev->pdev->irq);
- 		vdev->ctx[0].automasked = true;
-@@ -137,14 +134,33 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
- 		ret = IRQ_HANDLED;
- 	}
- 
--	spin_unlock_irqrestore(&vdev->irqlock, flags);
--
- 	if (ret == IRQ_HANDLED)
- 		vfio_send_intx_eventfd(vdev, NULL);
- 
- 	return ret;
- }
- 
-+static irqreturn_t vfio_intx_handler_deoi(int irq, void *dev_id)
-+{
-+	struct vfio_pci_device *vdev = dev_id;
-+
-+	vfio_send_intx_eventfd(vdev, NULL);
-+	return IRQ_HANDLED;
-+}
-+
-+static irqreturn_t vfio_intx_wrapper_handler(int irq, void *dev_id)
-+{
-+	struct vfio_pci_device *vdev = dev_id;
-+	unsigned long flags;
-+	irqreturn_t ret;
-+
-+	spin_lock_irqsave(&vdev->irqlock, flags);
-+	ret = vdev->ctx[0].handler(irq, dev_id);
-+	spin_unlock_irqrestore(&vdev->irqlock, flags);
-+
-+	return ret;
-+}
-+
- static int vfio_intx_enable(struct vfio_pci_device *vdev)
- {
- 	if (!is_irq_none(vdev))
-@@ -208,7 +224,11 @@ static int vfio_intx_set_signal(struct vfio_pci_device *vdev, int fd)
- 	if (!vdev->pci_2_3)
- 		irqflags = 0;
- 
--	ret = request_irq(pdev->irq, vfio_intx_handler,
-+	if (vdev->ctx[0].deoi)
-+		vdev->ctx[0].handler = vfio_intx_handler_deoi;
-+	else
-+		vdev->ctx[0].handler = vfio_intx_handler;
-+	ret = request_irq(pdev->irq, vfio_intx_wrapper_handler,
- 			  irqflags, vdev->ctx[0].name, vdev);
- 	if (ret) {
- 		vdev->ctx[0].trigger = NULL;
-diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-index f7f1101..5cfe59a 100644
---- a/drivers/vfio/pci/vfio_pci_private.h
-+++ b/drivers/vfio/pci/vfio_pci_private.h
-@@ -36,6 +36,8 @@ struct vfio_pci_irq_ctx {
- 	char			*name;
- 	bool			masked;
- 	bool			automasked;
-+	bool			deoi;
-+	irqreturn_t		(*handler)(int irq, void *dev_id);
- 	struct irq_bypass_producer	producer;
- };
- 
+diff --git a/include/linux/irqbypass.h b/include/linux/irqbypass.h
+index f0f5d26..7f18f1b 100644
+--- a/include/linux/irqbypass.h
++++ b/include/linux/irqbypass.h
+@@ -35,6 +35,7 @@ struct irq_bypass_consumer;
+  * struct irq_bypass_producer - IRQ bypass producer definition
+  * @node: IRQ bypass manager private list management
+  * @token: opaque token to match between producer and consumer (non-NULL)
++ * @private: private data that may be used by producer callbacks (optional)
+  * @irq: Linux IRQ number for the producer device
+  * @add_consumer: Connect the IRQ producer to an IRQ consumer (optional)
+  * @del_consumer: Disconnect the IRQ producer from an IRQ consumer (optional)
+@@ -48,6 +49,7 @@ struct irq_bypass_consumer;
+ struct irq_bypass_producer {
+ 	struct list_head node;
+ 	void *token;
++	void *private;
+ 	int irq;
+ 	int (*add_consumer)(struct irq_bypass_producer *,
+ 			    struct irq_bypass_consumer *);
 -- 
 2.5.5
