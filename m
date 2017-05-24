@@ -1,214 +1,106 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 1/9] KVM: arm64: Allow creating the PMU without the
- in-kernel GIC
-Date: Wed, 24 May 2017 17:37:03 +0100
-Message-ID: <aa9a9339-0850-d4e2-0814-60437f4673bc@arm.com>
-References: <20170516184556.26785-1-cdall@linaro.org>
- <20170516184556.26785-2-cdall@linaro.org>
- <51d0d9eb-3e72-2f37-3fac-89de28cea91b@arm.com> <20170524083805.GA7991@cbox>
- <4cf8f05e-1af1-eaed-151f-54e7a60d7b63@arm.com> <20170524114534.GB7991@cbox>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EC114095A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 12:33:35 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yeMzzobX4Vpo for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 May 2017 12:33:34 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0914640948
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 12:33:34 -0400 (EDT)
-In-Reply-To: <20170524114534.GB7991@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH 00/10] ARM/ARM64 Direct EOI setup for VFIO wired interrupts
+Date: Wed, 24 May 2017 22:13:13 +0200
+Message-ID: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/05/17 12:45, Christoffer Dall wrote:
-> On Wed, May 24, 2017 at 10:16:56AM +0100, Marc Zyngier wrote:
->> On 24/05/17 09:38, Christoffer Dall wrote:
->>> On Tue, May 23, 2017 at 05:52:01PM +0100, Marc Zyngier wrote:
->>>> On 16/05/17 19:45, Christoffer Dall wrote:
->>>>> Since we got support for devices in userspace which allows reporting the
->>>>> PMU overflow output status to userspace, we should actually allow
->>>>> creating the PMU on systems without an in-kernel irqchip, which in turn
->>>>> requires us to slightly clarify error codes for the ABI and move things
->>>>> around for the initialization phase.
->>>>>
->>>>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
->>>>> ---
->>>>>  Documentation/virtual/kvm/devices/vcpu.txt | 16 +++++++++-------
->>>>>  virt/kvm/arm/pmu.c                         | 30 ++++++++++++++++++++----------
->>>>>  2 files changed, 29 insertions(+), 17 deletions(-)
->>>>>
->>>>> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
->>>>> index 02f5068..352af6e 100644
->>>>> --- a/Documentation/virtual/kvm/devices/vcpu.txt
->>>>> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
->>>>> @@ -16,7 +16,9 @@ Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt is a
->>>>>  Returns: -EBUSY: The PMU overflow interrupt is already set
->>>>>           -ENXIO: The overflow interrupt not set when attempting to get it
->>>>>           -ENODEV: PMUv3 not supported
->>>>> -         -EINVAL: Invalid PMU overflow interrupt number supplied
->>>>> +         -EINVAL: Invalid PMU overflow interrupt number supplied or
->>>>> +                  trying to set the IRQ number without using an in-kernel
->>>>> +                  irqchip.
->>>>>  
->>>>>  A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
->>>>>  number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
->>>>> @@ -25,11 +27,11 @@ all vcpus, while as an SPI it must be a separate number per vcpu.
->>>>>  
->>>>>  1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
->>>>>  Parameters: no additional parameter in kvm_device_attr.addr
->>>>> -Returns: -ENODEV: PMUv3 not supported
->>>>> -         -ENXIO: PMUv3 not properly configured as required prior to calling this
->>>>> -                 attribute
->>>>> +Returns: -ENODEV: PMUv3 not supported or GIC not initialized
->>>>> +         -ENXIO: PMUv3 not properly configured or in-kernel irqchip not
->>>>> +                 conigured as required prior to calling this attribute
->>>>
->>>>                     configured
->>>>
->>>>>           -EBUSY: PMUv3 already initialized
->>>>>  
->>>>> -Request the initialization of the PMUv3.  This must be done after creating the
->>>>> -in-kernel irqchip.  Creating a PMU with a userspace irqchip is currently not
->>>>> -supported.
->>>>> +Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
->>>>> +virtual GIC implementation, this must be done after initializing the in-kernel
->>>>> +irqchip.
->>>>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
->>>>> index 4b43e7f..7209185 100644
->>>>> --- a/virt/kvm/arm/pmu.c
->>>>> +++ b/virt/kvm/arm/pmu.c
->>>>> @@ -456,21 +456,25 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
->>>>>  	if (!kvm_arm_support_pmu_v3())
->>>>>  		return -ENODEV;
->>>>>  
->>>>> -	/*
->>>>> -	 * We currently require an in-kernel VGIC to use the PMU emulation,
->>>>> -	 * because we do not support forwarding PMU overflow interrupts to
->>>>> -	 * userspace yet.
->>>>> -	 */
->>>>> -	if (!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))
->>>>> -		return -ENODEV;
->>>>> -
->>>>> -	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features) ||
->>>>> -	    !kvm_arm_pmu_irq_initialized(vcpu))
->>>>> +	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
->>>>>  		return -ENXIO;
->>>>>  
->>>>>  	if (kvm_arm_pmu_v3_ready(vcpu))
->>>>>  		return -EBUSY;
->>>>>  
->>>>> +	if (irqchip_in_kernel(vcpu->kvm)) {
->>>>> +		/*
->>>>> +		 * If using the PMU with an in-kernel virtual GIC
->>>>> +		 * implementation, we require the GIC to be already
->>>>> +		 * initialized when initializing the PMU.
->>>>> +		 */
->>>>> +		if (!vgic_initialized(vcpu->kvm))
->>>>> +			return -ENODEV;
->>>>> +
->>>>> +		if (!kvm_arm_pmu_irq_initialized(vcpu))
->>>>> +			return -ENXIO;
->>>>> +	}
->>>>> +
->>>>
->>>> Do we also need to prevent a vgic to be created if the PMU has been
->>>> initialized beforehand?
->>>>
->>>
->>> Sigh.  We probably have to.
->>>
->>> I don't like having a cross-VGIC-PMU check, but we could do something
->>> like setting a flag on the kvm struct so that irqchip_in_user() always
->>> return true, and if that is set, it is not possible to create the VGIC.
->>>
->>> Alternatively we can make the PMU init a no-op, and try to enable it via
->>> the first-vcpu-run path, like the timer, and check that everything lines
->>> up then (i.e. you have in-kernel irqchip with a non-conflicting irq
->>> number or you have a userspace irqchip).
->>
->> I like this second solution better, as it gives us a common approach to
->> similar problems.
-> 
-> Yes, but on the other hand it's a bit like the lazy init stuff, where we
-> defer things to happen at some point in time, and the whole PMU init
-> thing was to avoid that.  On the first hand, it seems to work well for
-> lots of things, so why not...
+This series allows to optimize the deactivation of virtual interrupts
+associated to vfio device wired physical interrupts (non MSI).
 
-The main problem is that we now have lots of things that can be
-configured in arbitrary orders. We can either check the consistency of
-the current configuration at each step, or delay it until we are ready
-to run, and then check everything in one go.
+This is a revival of "[PATCH v4 00/13] ARM IRQ forward control based on
+IRQ bypass manager" (https://lkml.org/lkml/2015/11/19/351) whose development
+was stalled due to dependency on new VGIC design and drop of priority.
 
-Overall, this is the same set of checks. We just need to decide which
-way we want to go, and stick with it. Which is of course easier said
-than done... ;-)
+Without that optimization the deactivation of the physical IRQ is performed
+by the host. Also for level sensitive interrupts, The VFIO driver disables
+the physical IRQ. The deactivation of the virtual IRQ by the guest is trapped
+and the physical IRQ gets re-enabled at that time.
 
-> 
->> Would that also help with not having to implement the
->> allocator you introduced in patches 6-9 (which I haven't reviewed yet)?
->>
-> 
-> Not really.  I mean, we could add some cross calls between the timer and
-> PMU code, but I think that's fairly disgusting, and it doesn't prevent
-> userspace from fiddling with an interrupt signal used in the kernel
-> anyway.
-> 
-> With patchs 6-9, I feel like we should take one of two overall stands;
-> either we don't care that userspace can wire things up share an
-> interrupt line, even with in-kernel driven devices, as it would be the
-> equivalent of putting an OR gate before the GIC in hardware (not that I
-> recommend anyone doing that), or we should implement the full story and
-> prevent userspace from ever shooting itself in the foot.
+The ARM GIC supports direct EOI for virtual interrupts directly mapped
+ to physical interrupts. When this mode is set, the host does not
+deactivate the physical interrupt anymore, but simply drops the
+interrupt priority on EOI. When the guest deactivates the virtual IRQ,
+the GIC automatically deactivates the physical IRQ. This avoids a world
+switch on deactivation.
 
-Having had a quick look at 6-9, I'm hesitant (again). On one hand, the
-each patch is fairly simple and not very invasive, but on the other
-hand, the result is a tiny bit ugly (all these "owner" parameters passed
-around).
+This series sets direct EOI mode on ARM/ARM64 for shared peripheral
+interrupts. This relies on a negotiation between the vfio driver and
+KVM/irqfd though the irq bypass manager.
 
-So the real question is still: does anything break on the host if
-userspace configures something in a nonsensical way? My main concern is
-the effect of having the virtual PMU sharing a line with the virtual
-timer, which has the HW bit set. So let's assume that for a minute:
+The setup sequence is:
 
-- PMU interrupt is asserted
-- Timer interrupt is not asserted
-- We inject the shared intid with the HW bit set, and the hwintid of the
-virtual timer.
-- We do *not* set the active bit on the redistributor (because the timer
-code has noticed we don't need to)
+preamble:
+- disable the physical IRQ
+- halt guest execution
+forwarding setting:
+- program the VFIO driver for forwarding (select the right physical
+  interrupt handler)
+- program the VGIC and IRQCHIP for forwarding
+postamble:
+- resume guest execution
+- enable the physical IRQ
 
-When the guest does EOI the interrupt, it will propagate into the
-physical distributor, and deactivate... I don't know what, since we
-don't have an active interrupt there.
+When destroying the optimized path the following sequence is executed:
+- preamble
+- unset forwarding at VGIC and IRQCHIP level
+- unset forwarding at VFIO level
+- postamble
 
-Things become even uglier if the timer fires between the activation of
-the virtual interrupt and its EOI. The PMU interrupt EOI ends up
-deactivating the timer on the physical distributor, leading to the timer
-firing again... At that stage, I think things get pretty bad, as we've
-lost track of the state.
+The injection still is based on irqfd triggering. For level sensitive
+interrupts though, the resamplefd is not triggered anymore since
+deactivation is not trapped by KVM.
 
-That being said, I don't think we break anything on the host, but the
-above seem disturbing enough that we don't want to let it happen. So I
-guess that patches 6-9 are actually required. I guess I'll finish
-reviewing this tomorrow, as I'm already at the beer festival... ;-)
+This was tested with:
+- AMD Seattle xgmac platform device assignment
+- Cavium ThunderX PCIe device assignment with pci=nomsi (INTx)
+- Also MSI non regression was tested on ARM
 
-Thanks,
+The series can be fount at:
+https://github.com/eauger/linux/tree/v4.12-rc2-deoi-v5
 
-	M.
+It is based on 4.12-rc2
+
+Best Regards
+
+Eric
+
+Eric Auger (10):
+  vfio: platform: Add automasked field to vfio_platform_irq
+  VFIO: platform: Introduce direct EOI interrupt handler
+  VFIO: platform: Direct EOI irq bypass for ARM/ARM64
+  VFIO: pci: Add automasked field to vfio_pci_irq_ctx
+  VFIO: pci: Introduce direct EOI INTx interrupt handler
+  irqbypass: Add a private field in the producer
+  VFIO: pci: Direct EOI irq bypass for ARM/ARM64
+  KVM: arm/arm64: vgic: Handle unshared mapped interrupts
+  KVM: arm/arm64: vgic: Implement forwarding setting
+  KVM: arm/arm64: register DEOI irq bypass consumer on ARM/ARM64
+
+ arch/arm/kvm/Kconfig                             |   3 +
+ arch/arm64/kvm/Kconfig                           |   3 +
+ drivers/vfio/pci/Kconfig                         |   4 +
+ drivers/vfio/pci/Makefile                        |   1 +
+ drivers/vfio/pci/vfio_pci_intrs.c                |  78 +++++++++---
+ drivers/vfio/pci/vfio_pci_irq_bypass.c           | 134 ++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_private.h              |  35 ++++++
+ drivers/vfio/platform/Kconfig                    |   5 +
+ drivers/vfio/platform/Makefile                   |   2 +-
+ drivers/vfio/platform/vfio_platform_irq.c        |  53 ++++++--
+ drivers/vfio/platform/vfio_platform_irq_bypass.c | 114 +++++++++++++++++
+ drivers/vfio/platform/vfio_platform_private.h    |  26 ++++
+ include/kvm/arm_vgic.h                           |   9 +-
+ include/linux/irqbypass.h                        |   2 +
+ virt/kvm/arm/arch_timer.c                        |   3 +-
+ virt/kvm/arm/arm.c                               |  42 +++++++
+ virt/kvm/arm/vgic/vgic.c                         | 149 ++++++++++++++++++++++-
+ virt/kvm/arm/vgic/vgic.h                         |   9 +-
+ 18 files changed, 632 insertions(+), 40 deletions(-)
+ create mode 100644 drivers/vfio/pci/vfio_pci_irq_bypass.c
+ create mode 100644 drivers/vfio/platform/vfio_platform_irq_bypass.c
+
 -- 
-Jazz is not dead. It just smells funny...
+2.5.5
