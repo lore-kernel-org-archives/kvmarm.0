@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH 06/10] irqbypass: Add a private field in the producer
-Date: Wed, 24 May 2017 22:13:19 +0200
-Message-ID: <1495656803-28011-7-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH 04/10] VFIO: pci: Add automasked field to vfio_pci_irq_ctx
+Date: Wed, 24 May 2017 22:13:17 +0200
+Message-ID: <1495656803-28011-5-git-send-email-eric.auger@redhat.com>
 References: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6AEF40A66
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 16:10:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AD4140A66
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 16:10:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id m0Dr2oFSbQiH for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 May 2017 16:10:18 -0400 (EDT)
+ with ESMTP id T-AQ06VDWOBM for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 May 2017 16:10:10 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 41FE840992
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 16:10:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FB4840962
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 16:10:10 -0400 (EDT)
 In-Reply-To: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,35 +30,74 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The producer callbacks may need to use a private data
-stored in the producer structure.
+For direct EOI modality we will need to differentiate a userspace
+masking from the IRQ handler auto-masking.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
----
- include/linux/irqbypass.h | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/vfio/pci/vfio_pci_intrs.c   | 15 +++++++++------
+ drivers/vfio/pci/vfio_pci_private.h |  1 +
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/irqbypass.h b/include/linux/irqbypass.h
-index f0f5d26..7f18f1b 100644
---- a/include/linux/irqbypass.h
-+++ b/include/linux/irqbypass.h
-@@ -35,6 +35,7 @@ struct irq_bypass_consumer;
-  * struct irq_bypass_producer - IRQ bypass producer definition
-  * @node: IRQ bypass manager private list management
-  * @token: opaque token to match between producer and consumer (non-NULL)
-+ * @private: private data that may be used by producer callbacks (optional)
-  * @irq: Linux IRQ number for the producer device
-  * @add_consumer: Connect the IRQ producer to an IRQ consumer (optional)
-  * @del_consumer: Disconnect the IRQ producer from an IRQ consumer (optional)
-@@ -48,6 +49,7 @@ struct irq_bypass_consumer;
- struct irq_bypass_producer {
- 	struct list_head node;
- 	void *token;
-+	void *private;
- 	int irq;
- 	int (*add_consumer)(struct irq_bypass_producer *,
- 			    struct irq_bypass_consumer *);
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 1c46045..d4d377b 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -52,7 +52,7 @@ void vfio_pci_intx_mask(struct vfio_pci_device *vdev)
+ 	if (unlikely(!is_intx(vdev))) {
+ 		if (vdev->pci_2_3)
+ 			pci_intx(pdev, 0);
+-	} else if (!vdev->ctx[0].masked) {
++	} else if (!vdev->ctx[0].masked && !vdev->ctx[0].automasked) {
+ 		/*
+ 		 * Can't use check_and_mask here because we always want to
+ 		 * mask, not just when something is pending.
+@@ -90,7 +90,8 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
+ 	if (unlikely(!is_intx(vdev))) {
+ 		if (vdev->pci_2_3)
+ 			pci_intx(pdev, 1);
+-	} else if (vdev->ctx[0].masked && !vdev->virq_disabled) {
++	} else if ((vdev->ctx[0].masked || vdev->ctx[0].automasked) &&
++			!vdev->virq_disabled) {
+ 		/*
+ 		 * A pending interrupt here would immediately trigger,
+ 		 * but we can avoid that overhead by just re-sending
+@@ -103,6 +104,7 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
+ 			enable_irq(pdev->irq);
+ 
+ 		vdev->ctx[0].masked = (ret > 0);
++		vdev->ctx[0].automasked = (ret > 0);
+ 	}
+ 
+ 	spin_unlock_irqrestore(&vdev->irqlock, flags);
+@@ -126,11 +128,12 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
+ 
+ 	if (!vdev->pci_2_3) {
+ 		disable_irq_nosync(vdev->pdev->irq);
+-		vdev->ctx[0].masked = true;
++		vdev->ctx[0].automasked = true;
+ 		ret = IRQ_HANDLED;
+-	} else if (!vdev->ctx[0].masked &&  /* may be shared */
+-		   pci_check_and_mask_intx(vdev->pdev)) {
+-		vdev->ctx[0].masked = true;
++	} else if (!vdev->ctx[0].masked && !vdev->ctx[0].automasked &&
++			pci_check_and_mask_intx(vdev->pdev)) {
++		 /* shared INTx */
++		vdev->ctx[0].automasked = true;
+ 		ret = IRQ_HANDLED;
+ 	}
+ 
+diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+index f561ac1..f7f1101 100644
+--- a/drivers/vfio/pci/vfio_pci_private.h
++++ b/drivers/vfio/pci/vfio_pci_private.h
+@@ -35,6 +35,7 @@ struct vfio_pci_irq_ctx {
+ 	struct virqfd		*mask;
+ 	char			*name;
+ 	bool			masked;
++	bool			automasked;
+ 	struct irq_bypass_producer	producer;
+ };
+ 
 -- 
 2.5.5
