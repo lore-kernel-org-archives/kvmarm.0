@@ -1,106 +1,104 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH 00/10] ARM/ARM64 Direct EOI setup for VFIO wired interrupts
-Date: Wed, 24 May 2017 22:13:13 +0200
-Message-ID: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Subject: [PATCH 01/10] vfio: platform: Add automasked field to
+ vfio_platform_irq
+Date: Wed, 24 May 2017 22:13:14 +0200
+Message-ID: <1495656803-28011-2-git-send-email-eric.auger@redhat.com>
+References: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B683140C5B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 16:09:57 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3zHjf+giB6wu for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 May 2017 16:09:57 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C48840992
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 May 2017 16:09:56 -0400 (EDT)
+In-Reply-To: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series allows to optimize the deactivation of virtual interrupts
-associated to vfio device wired physical interrupts (non MSI).
+For direct EOI modality we will need to differentiate a userspace
+masking from the IRQ handler auto-masking.
 
-This is a revival of "[PATCH v4 00/13] ARM IRQ forward control based on
-IRQ bypass manager" (https://lkml.org/lkml/2015/11/19/351) whose development
-was stalled due to dependency on new VGIC design and drop of priority.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ drivers/vfio/platform/vfio_platform_irq.c     | 10 ++++++----
+ drivers/vfio/platform/vfio_platform_private.h |  1 +
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
-Without that optimization the deactivation of the physical IRQ is performed
-by the host. Also for level sensitive interrupts, The VFIO driver disables
-the physical IRQ. The deactivation of the virtual IRQ by the guest is trapped
-and the physical IRQ gets re-enabled at that time.
-
-The ARM GIC supports direct EOI for virtual interrupts directly mapped
- to physical interrupts. When this mode is set, the host does not
-deactivate the physical interrupt anymore, but simply drops the
-interrupt priority on EOI. When the guest deactivates the virtual IRQ,
-the GIC automatically deactivates the physical IRQ. This avoids a world
-switch on deactivation.
-
-This series sets direct EOI mode on ARM/ARM64 for shared peripheral
-interrupts. This relies on a negotiation between the vfio driver and
-KVM/irqfd though the irq bypass manager.
-
-The setup sequence is:
-
-preamble:
-- disable the physical IRQ
-- halt guest execution
-forwarding setting:
-- program the VFIO driver for forwarding (select the right physical
-  interrupt handler)
-- program the VGIC and IRQCHIP for forwarding
-postamble:
-- resume guest execution
-- enable the physical IRQ
-
-When destroying the optimized path the following sequence is executed:
-- preamble
-- unset forwarding at VGIC and IRQCHIP level
-- unset forwarding at VFIO level
-- postamble
-
-The injection still is based on irqfd triggering. For level sensitive
-interrupts though, the resamplefd is not triggered anymore since
-deactivation is not trapped by KVM.
-
-This was tested with:
-- AMD Seattle xgmac platform device assignment
-- Cavium ThunderX PCIe device assignment with pci=nomsi (INTx)
-- Also MSI non regression was tested on ARM
-
-The series can be fount at:
-https://github.com/eauger/linux/tree/v4.12-rc2-deoi-v5
-
-It is based on 4.12-rc2
-
-Best Regards
-
-Eric
-
-Eric Auger (10):
-  vfio: platform: Add automasked field to vfio_platform_irq
-  VFIO: platform: Introduce direct EOI interrupt handler
-  VFIO: platform: Direct EOI irq bypass for ARM/ARM64
-  VFIO: pci: Add automasked field to vfio_pci_irq_ctx
-  VFIO: pci: Introduce direct EOI INTx interrupt handler
-  irqbypass: Add a private field in the producer
-  VFIO: pci: Direct EOI irq bypass for ARM/ARM64
-  KVM: arm/arm64: vgic: Handle unshared mapped interrupts
-  KVM: arm/arm64: vgic: Implement forwarding setting
-  KVM: arm/arm64: register DEOI irq bypass consumer on ARM/ARM64
-
- arch/arm/kvm/Kconfig                             |   3 +
- arch/arm64/kvm/Kconfig                           |   3 +
- drivers/vfio/pci/Kconfig                         |   4 +
- drivers/vfio/pci/Makefile                        |   1 +
- drivers/vfio/pci/vfio_pci_intrs.c                |  78 +++++++++---
- drivers/vfio/pci/vfio_pci_irq_bypass.c           | 134 ++++++++++++++++++++
- drivers/vfio/pci/vfio_pci_private.h              |  35 ++++++
- drivers/vfio/platform/Kconfig                    |   5 +
- drivers/vfio/platform/Makefile                   |   2 +-
- drivers/vfio/platform/vfio_platform_irq.c        |  53 ++++++--
- drivers/vfio/platform/vfio_platform_irq_bypass.c | 114 +++++++++++++++++
- drivers/vfio/platform/vfio_platform_private.h    |  26 ++++
- include/kvm/arm_vgic.h                           |   9 +-
- include/linux/irqbypass.h                        |   2 +
- virt/kvm/arm/arch_timer.c                        |   3 +-
- virt/kvm/arm/arm.c                               |  42 +++++++
- virt/kvm/arm/vgic/vgic.c                         | 149 ++++++++++++++++++++++-
- virt/kvm/arm/vgic/vgic.h                         |   9 +-
- 18 files changed, 632 insertions(+), 40 deletions(-)
- create mode 100644 drivers/vfio/pci/vfio_pci_irq_bypass.c
- create mode 100644 drivers/vfio/platform/vfio_platform_irq_bypass.c
-
+diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
+index 46d4750..831f0b0 100644
+--- a/drivers/vfio/platform/vfio_platform_irq.c
++++ b/drivers/vfio/platform/vfio_platform_irq.c
+@@ -29,7 +29,7 @@ static void vfio_platform_mask(struct vfio_platform_irq *irq_ctx)
+ 
+ 	spin_lock_irqsave(&irq_ctx->lock, flags);
+ 
+-	if (!irq_ctx->masked) {
++	if (!irq_ctx->masked && !irq_ctx->automasked) {
+ 		disable_irq_nosync(irq_ctx->hwirq);
+ 		irq_ctx->masked = true;
+ 	}
+@@ -89,9 +89,10 @@ static void vfio_platform_unmask(struct vfio_platform_irq *irq_ctx)
+ 
+ 	spin_lock_irqsave(&irq_ctx->lock, flags);
+ 
+-	if (irq_ctx->masked) {
++	if (irq_ctx->masked || irq_ctx->automasked) {
+ 		enable_irq(irq_ctx->hwirq);
+ 		irq_ctx->masked = false;
++		irq_ctx->automasked = false;
+ 	}
+ 
+ 	spin_unlock_irqrestore(&irq_ctx->lock, flags);
+@@ -152,12 +153,12 @@ static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
+ 
+ 	spin_lock_irqsave(&irq_ctx->lock, flags);
+ 
+-	if (!irq_ctx->masked) {
++	if (!irq_ctx->masked && !irq_ctx->automasked) {
+ 		ret = IRQ_HANDLED;
+ 
+ 		/* automask maskable interrupts */
+ 		disable_irq_nosync(irq_ctx->hwirq);
+-		irq_ctx->masked = true;
++		irq_ctx->automasked = true;
+ 	}
+ 
+ 	spin_unlock_irqrestore(&irq_ctx->lock, flags);
+@@ -315,6 +316,7 @@ int vfio_platform_irq_init(struct vfio_platform_device *vdev)
+ 		vdev->irqs[i].count = 1;
+ 		vdev->irqs[i].hwirq = hwirq;
+ 		vdev->irqs[i].masked = false;
++		vdev->irqs[i].automasked = false;
+ 	}
+ 
+ 	vdev->num_irqs = cnt;
+diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
+index 85ffe5d..8a3cfa9 100644
+--- a/drivers/vfio/platform/vfio_platform_private.h
++++ b/drivers/vfio/platform/vfio_platform_private.h
+@@ -34,6 +34,7 @@ struct vfio_platform_irq {
+ 	char			*name;
+ 	struct eventfd_ctx	*trigger;
+ 	bool			masked;
++	bool			automasked;
+ 	spinlock_t		lock;
+ 	struct virqfd		*unmask;
+ 	struct virqfd		*mask;
 -- 
 2.5.5
