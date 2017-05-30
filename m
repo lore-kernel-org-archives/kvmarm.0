@@ -1,108 +1,79 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 20/31] KVM: arm64: vgic-v3: Add ICV_IGNREN0_EL1 handler
-Date: Tue, 30 May 2017 11:48:13 +0200
-Message-ID: <5a1d09b9-1b7f-e71b-db62-36574ca15ca7@redhat.com>
+Subject: Re: [PATCH 22/31] KVM: arm64: vgic-v3: Enable trapping of Group-0
+ system registers
+Date: Tue, 30 May 2017 11:48:15 +0200
+Message-ID: <58415158-a732-16a4-4e4a-a5341529e2e5@redhat.com>
 References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <20170503104606.19342-21-marc.zyngier@arm.com>
+ <20170503104606.19342-23-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A838C40430
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 May 2017 05:44:25 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tzFbgKnJWtAU for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 May 2017 05:44:24 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFB7040C4B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 May 2017 05:44:24 -0400 (EDT)
-In-Reply-To: <20170503104606.19342-21-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170503104606.19342-23-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi,
 
 On 03/05/2017 12:45, Marc Zyngier wrote:
-> Add a handler for reading/writing the guest's view of the ICC_IGRPEN0_EL1
-> register, which is located in the ICH_VMCR_EL2.VENG0 field.
+> In order to be able to trap Group-0 GICv3 system registers, we need to
+> set ICH_HCR_EL2.TALL0 begore entering the guest. This is conditionnaly
+> done after having restored the guest's state, and cleared on exit.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+
+> ---
+>  include/linux/irqchip/arm-gic-v3.h | 1 +
+>  virt/kvm/arm/vgic/vgic-v3.c        | 5 ++++-
+>  2 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index a1739843343e..7fef09bcf7b1 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -403,6 +403,7 @@
+>  
+>  #define ICH_HCR_EN			(1 << 0)
+>  #define ICH_HCR_UIE			(1 << 1)
+> +#define ICH_HCR_TALL0			(1 << 11)
+>  #define ICH_HCR_TALL1			(1 << 12)
+>  #define ICH_HCR_EOIcount_SHIFT		27
+>  #define ICH_HCR_EOIcount_MASK		(0x1f << ICH_HCR_EOIcount_SHIFT)
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 71ecf448ca49..812f179a6931 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -21,6 +21,7 @@
+>  
+>  #include "vgic.h"
+>  
+> +static bool group0_trap;
+>  static bool group1_trap;
+>  
+>  void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+> @@ -241,6 +242,8 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+>  
+>  	/* Get the show on the road... */
+>  	vgic_v3->vgic_hcr = ICH_HCR_EN;
+> +	if (group0_trap)
+> +		vgic_v3->vgic_hcr |= ICH_HCR_TALL0;
+Hum ok, now I get why you use the bool, sorry ;-)
+
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
-> ---
->  arch/arm64/include/asm/sysreg.h |  1 +
->  virt/kvm/arm/hyp/vgic-v3-sr.c   | 23 +++++++++++++++++++++++
->  2 files changed, 24 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index d20be0b28ca4..ba93bc7ac8e4 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -190,6 +190,7 @@
->  #define SYS_ICC_BPR1_EL1		sys_reg(3, 0, 12, 12, 3)
->  #define SYS_ICC_CTLR_EL1		sys_reg(3, 0, 12, 12, 4)
->  #define SYS_ICC_SRE_EL1			sys_reg(3, 0, 12, 12, 5)
-> +#define SYS_ICC_GRPEN0_EL1		sys_reg(3, 0, 12, 12, 6)
->  #define SYS_ICC_GRPEN1_EL1		sys_reg(3, 0, 12, 12, 7)
->  
->  #define SYS_CONTEXTIDR_EL1		sys_reg(3, 0, 13, 0, 1)
-> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> index b21bb0c77ec2..77d5d12389ec 100644
-> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> @@ -649,11 +649,28 @@ static void __hyp_text __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int
->  	__vgic_v3_clear_active_lr(lr, lr_val);
+>  	if (group1_trap)
+>  		vgic_v3->vgic_hcr |= ICH_HCR_TALL1;
 >  }
+> @@ -381,7 +384,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+>  	if (kvm_vgic_global_state.vcpu_base == 0)
+>  		kvm_info("disabling GICv2 emulation\n");
 >  
-> +static void __hyp_text __vgic_v3_read_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-> +{
-> +	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG0_MASK));
-> +}
-> +
->  static void __hyp_text __vgic_v3_read_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
->  {
->  	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG1_MASK));
->  }
->  
-> +static void __hyp_text __vgic_v3_write_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-> +{
-> +	u64 val = vcpu_get_reg(vcpu, rt);
-> +
-> +	if (val & 1)
-> +		vmcr |= ICH_VMCR_ENG0_MASK;
-> +	else
-> +		vmcr &= ~ICH_VMCR_ENG0_MASK;
-> +
-> +	__vgic_v3_write_vmcr(vmcr);
-> +}
-> +
->  static void __hyp_text __vgic_v3_write_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
->  {
->  	u64 val = vcpu_get_reg(vcpu, rt);
-> @@ -876,6 +893,12 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
->  	case SYS_ICC_HPPIR1_EL1:
->  		fn = __vgic_v3_read_hppir;
->  		break;
-> +	case SYS_ICC_GRPEN0_EL1:
-> +		if (is_read)
-> +			fn = __vgic_v3_read_igrpen0;
-> +		else
-> +			fn = __vgic_v3_write_igrpen0;
-> +		break;
->  	case SYS_ICC_BPR0_EL1:
->  		if (is_read)
->  			fn = __vgic_v3_read_bpr0;
+> -	if (group1_trap) {
+> +	if (group0_trap || group1_trap) {
+>  		kvm_info("GICv3 sysreg trapping enabled (reduced performance)\n");
+>  		static_branch_enable(&vgic_v3_cpuif_trap);
+>  	}
 > 
