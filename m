@@ -1,159 +1,86 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 09/10] KVM: arm/arm64: vgic: Implement forwarding setting
-Date: Tue, 30 May 2017 16:03:15 +0200
-Message-ID: <6f1d4d51-c35f-7ec7-48b9-a38e2b0196b6@redhat.com>
-References: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
- <1495656803-28011-10-git-send-email-eric.auger@redhat.com>
- <877f14lp76.fsf@arm.com> <9192256c-157b-2112-b8ef-e7815ad14e7d@redhat.com>
- <534fb830-4b38-e146-ed77-d64b7c6a8c22@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 15/31] KVM: arm64: vgic-v3: Add ICV_AP1Rn_EL1 handler
+Date: Tue, 30 May 2017 15:21:37 +0100
+Message-ID: <054e7899-52b6-d509-8f73-f226d5fbeff8@arm.com>
+References: <20170503104606.19342-1-marc.zyngier@arm.com>
+ <20170503104606.19342-16-marc.zyngier@arm.com>
+ <b672d790-738b-df50-06fc-8b72c7692abe@redhat.com>
+ <e07081cf-82c5-0878-52f9-930f1727574d@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <534fb830-4b38-e146-ed77-d64b7c6a8c22@arm.com>
+In-Reply-To: <e07081cf-82c5-0878-52f9-930f1727574d@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, pbonzini@redhat.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com
+To: Auger Eric <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Eric,
 
-On 30/05/2017 15:17, Marc Zyngier wrote:
-> On 30/05/17 13:54, Auger Eric wrote:
->> Hi,
+On 30/05/17 09:02, Auger Eric wrote:
+> Hi Marc,
+> 
+> On 30/05/2017 09:48, Auger Eric wrote:
+>> H Marc,
 >>
->> On 25/05/2017 21:19, Marc Zyngier wrote:
->>> On Wed, May 24 2017 at 10:13:22 pm BST, Eric Auger <eric.auger@redhat.com> wrote:
->>>> Implements kvm_vgic_[set|unset]_forwarding.
->>>>
->>>> Handle low-level VGIC programming and consistent irqchip
->>>> programming.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>
->>>> ---
->>>> ---
->>>>  include/kvm/arm_vgic.h   |   5 +++
->>>>  virt/kvm/arm/vgic/vgic.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++
->>>>  2 files changed, 110 insertions(+)
->>>>
->>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->>>> index 695ebc7..7ddac8a 100644
->>>> --- a/include/kvm/arm_vgic.h
->>>> +++ b/include/kvm/arm_vgic.h
->>>> @@ -343,4 +343,9 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
->>>>   */
->>>>  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
->>>>  
->>>> +int kvm_vgic_set_forwarding(struct kvm *kvm, unsigned int irq,
->>>> +			    unsigned int virt_irq);
->>>> +void kvm_vgic_unset_forwarding(struct kvm *kvm, unsigned int irq,
->>>> +			       unsigned int virt_irq);
+>> On 03/05/2017 12:45, Marc Zyngier wrote:
+>>> Add a handler for reading/writing the guest's view of the ICV_AP1Rn_EL1
+>>> registers. We just map them to the corresponding ICH_AP1Rn_EL2 registers.
 >>>
->>> nit: the name of the variables do not match that of the function
->>> definition, and are much clearer there.
+>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> ---
+>>>  arch/arm64/include/asm/sysreg.h |  1 +
+>>>  virt/kvm/arm/hyp/vgic-v3-sr.c   | 94 +++++++++++++++++++++++++++++++++++++++++
+>>>  2 files changed, 95 insertions(+)
 >>>
->>>> +
->>>>  #endif /* __KVM_ARM_VGIC_H */
->>>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->>>> index aa0618c..c2add8d 100644
->>>> --- a/virt/kvm/arm/vgic/vgic.c
->>>> +++ b/virt/kvm/arm/vgic/vgic.c
->>>> @@ -17,6 +17,8 @@
->>>>  #include <linux/kvm.h>
->>>>  #include <linux/kvm_host.h>
->>>>  #include <linux/list_sort.h>
->>>> +#include <linux/interrupt.h>
->>>> +#include <linux/irq.h>
->>>>  
->>>>  #include "vgic.h"
->>>>  
->>>> @@ -771,3 +773,106 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
->>>>  	return map_is_active;
->>>>  }
->>>>  
->>>> +/**
->>>> + * kvm_vgic_set_forwarding - Set IRQ forwarding
->>>> + *
->>>> + * @kvm: kvm handle
->>>> + * @host_irq: the host linux IRQ
->>>> + * @vintid: the virtual INTID
->>>> + *
->>>> + * This function must be called when the IRQ is not active:
->>>> + * ie. not active at GIC level and not currently under injection
->>>> + * into the guest using the unforwarded mode. The physical IRQ must
->>>> + * be disabled and all vCPUs must have been exited and prevented
->>>> + * from being re-entered.
->>>> + */
->>>> +int kvm_vgic_set_forwarding(struct kvm *kvm, unsigned int host_irq,
->>>> +			    unsigned int vintid)
->>>> +{
->>>> +	struct kvm_vcpu *vcpu;
->>>> +	struct vgic_irq *irq;
->>>> +	struct irq_desc *desc;
->>>> +	struct irq_data *data;
->>>> +	unsigned int pintid;
->>>> +	int ret = 0;
->>>> +
->>>> +
->>>> +	kvm_debug("%s host linux irq=%d vintid=%d\n",
->>>> +		  __func__, host_irq, vintid);
->>>> +
->>>> +	if (!vgic_valid_spi(kvm, vintid))
->>>> +		return 0;
->>>> +
->>>> +	/* find the INTID corresponding to @host_irq */
->>>> +	desc = irq_to_desc(host_irq);
->>>> +	if (!desc) {
->>>> +		kvm_err("%s: no interrupt descriptor\n", __func__);
->>>> +		return -EINVAL;
->>>> +	}
->>>> +
->>>> +	data = irq_desc_get_irq_data(desc);
->>>> +	while (data->parent_data)
->>>> +		data = data->parent_data;
->>>> +
->>>> +	pintid = data->hwirq;
->>>> +
->>>> +	irq = vgic_get_irq(kvm, NULL, vintid);
->>>> +
->>>> +	spin_lock(&irq->irq_lock);
->>>> +
->>>> +	vcpu = irq->target_vcpu;
->>>> +
->>>> +	if (!vcpu) {
->>>> +		ret = -EAGAIN;
->>>> +		goto unlock;
->>>> +	}
->>>> +
->>>> +	irq_set_vcpu_affinity(host_irq, vcpu);
->>>> +
->>>> +	irq->hw = true;
->>>> +	irq->hwintid = pintid;
->>>> +	irq->host_irq = host_irq;
->>>
->>> This feels like a duplication of kvm_vgic_map_phys_irq(), specially if
->>> you move the pintid discovery there. Can we somehow unify them?
->> Sure. At the beginning it was just a matter of irq_lock I did not want
->> to release.
->>
->> I was somehow embarrassed by the vcpu param of irq_set_vcpu_affinity.
->> Shall we really test target_vcpu. The actual value is unused for SPI so
->> shouldn't we simply use something != NULL.
-> 
-> I guess that for the time being, this would be good enough. But GICv4
-> requires some actual tracking of the affinity, so we may have to bite
-> the bullet already, and decide that the interrupt is always affine to a
-> vcpu.
-> 
-> Does this have any userspace visible impact?
-I don't see any.
+>>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+>>> index 15c142ce991c..aad46b8eea5e 100644
+>>> --- a/arch/arm64/include/asm/sysreg.h
+>>> +++ b/arch/arm64/include/asm/sysreg.h
+>>> @@ -180,6 +180,7 @@
+>>>  
+>>>  #define SYS_VBAR_EL1			sys_reg(3, 0, 12, 0, 0)
+>>>  
+>>> +#define SYS_ICC_AP1Rn_EL1(n)		sys_reg(3, 0, 12, 9, n)
+>>>  #define SYS_ICC_DIR_EL1			sys_reg(3, 0, 12, 11, 1)
+>>>  #define SYS_ICC_SGI1R_EL1		sys_reg(3, 0, 12, 11, 5)
+>>>  #define SYS_ICC_IAR1_EL1		sys_reg(3, 0, 12, 12, 0)
+>>> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+>>> index a76351b3ad66..b6803989da1f 100644
+>>> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
+>>> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+>>> @@ -684,6 +684,76 @@ static void __hyp_text __vgic_v3_write_bpr1(struct kvm_vcpu *vcpu, u32 vmcr, int
+>>>  	__vgic_v3_write_vmcr(vmcr);
+>>>  }
+>>>  
+>>> +static void __hyp_text __vgic_v3_read_apxrn(struct kvm_vcpu *vcpu, int rt, int n)
+>> Shouldn't you test somewhere that n is correct given the number of
+>> implemented priority bits
 
-Thanks
+If n is invalid, then the corresponding system register access will have
+UNDEFed at EL1, irrespective of the trapping (UNDEF has a higher
+priority than trapping, unfortunately).
 
-Eric
+>>> +{
+>>> +	u32 val;
+>>> +
+>>> +	if (!__vgic_v3_get_group(vcpu))
+>> I don't really get how an access to AP1Rn can end up in AP0Rn. I am not
+>> able to find any related description in the spec?
+> Forget that one. This is simply a generic helper and an access from NS
+> world will access the AP1Rn reg.
+
+It is not really S vs NS here, since the guest is probably aware it is
+running non-secure. The GICv3 architecture allows the guest to have its
+own Group0 interrupts (reported as FIQ).
+
+> so besides the comment on "n" check,
 > 
-> Thanks,
-> 
-> 	M.
-> 
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks!
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
