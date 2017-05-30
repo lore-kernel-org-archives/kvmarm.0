@@ -1,131 +1,162 @@
-From: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [edk2] [Qemu-devel] [PATCH v3 1/4] ACPI: Add APEI GHES Table
- Generation support
-Date: Mon, 29 May 2017 18:03:20 +0200
-Message-ID: <3a791060-170d-9eb7-b2c4-f1cdbb55501f@redhat.com>
-References: <0184EA26B2509940AA629AE1405DD7F2014105CD@DGGEMA503-MBS.china.huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH 15/31] KVM: arm64: vgic-v3: Add ICV_AP1Rn_EL1 handler
+Date: Tue, 30 May 2017 09:48:24 +0200
+Message-ID: <b672d790-738b-df50-06fc-8b72c7692abe@redhat.com>
+References: <20170503104606.19342-1-marc.zyngier@arm.com>
+ <20170503104606.19342-16-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <edk2-devel-bounces@lists.01.org>
-In-Reply-To: <0184EA26B2509940AA629AE1405DD7F2014105CD@DGGEMA503-MBS.china.huawei.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.01.org/mailman/options/edk2-devel>,
- <mailto:edk2-devel-request@lists.01.org?subject=unsubscribe>
-List-Archive: <http://lists.01.org/pipermail/edk2-devel/>
-List-Post: <mailto:edk2-devel@lists.01.org>
-List-Help: <mailto:edk2-devel-request@lists.01.org?subject=help>
-List-Subscribe: <https://lists.01.org/mailman/listinfo/edk2-devel>,
- <mailto:edk2-devel-request@lists.01.org?subject=subscribe>
-Errors-To: edk2-devel-bounces@lists.01.org
-Sender: "edk2-devel" <edk2-devel-bounces@lists.01.org>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: Michael Tsirkin <mtsirkin@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Wuquanming <wuquanming@huawei.com>, "wangxiongfeng (C)" <wangxiongfeng2@huawei.com>, Christoffer Dall <cdall@linaro.org>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "Leif.Lindholm@linaro.com" <Leif.Lindholm@linaro.com>, Huangshaoyu <huangshaoyu@huawei.com>, "vladimir.murzin@arm.com" <vladimir.murzin@arm.com>, Xiexiuqi <xiexiuqi@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, "andre.przywara@arm.com" <andre.przywara@arm.com>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, "nd@arm.com" <nd@arm.com>, linux-arm-kernel@lis
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170503104606.19342-16-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+H Marc,
 
-did you remove me from the To: / Cc: list intentionally, or was that an
-oversight? I caught your message in my list folders only by luck.
+On 03/05/2017 12:45, Marc Zyngier wrote:
+> Add a handler for reading/writing the guest's view of the ICV_AP1Rn_EL1
+> registers. We just map them to the corresponding ICH_AP1Rn_EL2 registers.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/sysreg.h |  1 +
+>  virt/kvm/arm/hyp/vgic-v3-sr.c   | 94 +++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 95 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 15c142ce991c..aad46b8eea5e 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -180,6 +180,7 @@
+>  
+>  #define SYS_VBAR_EL1			sys_reg(3, 0, 12, 0, 0)
+>  
+> +#define SYS_ICC_AP1Rn_EL1(n)		sys_reg(3, 0, 12, 9, n)
+>  #define SYS_ICC_DIR_EL1			sys_reg(3, 0, 12, 11, 1)
+>  #define SYS_ICC_SGI1R_EL1		sys_reg(3, 0, 12, 11, 5)
+>  #define SYS_ICC_IAR1_EL1		sys_reg(3, 0, 12, 12, 0)
+> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+> index a76351b3ad66..b6803989da1f 100644
+> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
+> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+> @@ -684,6 +684,76 @@ static void __hyp_text __vgic_v3_write_bpr1(struct kvm_vcpu *vcpu, u32 vmcr, int
+>  	__vgic_v3_write_vmcr(vmcr);
+>  }
+>  
+> +static void __hyp_text __vgic_v3_read_apxrn(struct kvm_vcpu *vcpu, int rt, int n)
+Shouldn't you test somewhere that n is correct given the number of
+implemented priority bits
+> +{
+> +	u32 val;
+> +
+> +	if (!__vgic_v3_get_group(vcpu))
+I don't really get how an access to AP1Rn can end up in AP0Rn. I am not
+able to find any related description in the spec?
 
-Some followup below:
+Thanks
 
-On 05/29/17 17:27, gengdongjiu wrote:
+Eric
+> +		val = __vgic_v3_read_ap0rn(n);
 
->> (46) What is "physical_addr" good for? Below I can only see an 
->> assignment to it, in ghes_update_guest(). Where is the field read?
-
-> this "physical_addr" address is the physical error address in the
-> CPER. such as the physical address that happen hwpoison, this address
-> is delivered by the KVM and QEMU transfer this address to physical.
-I understand that in the ghes_update_guest() function, you accept a
-parameter called "physical_address", and you pass it on to
-ghes_generate_cper_record(). That makes sense, yes.
-
-However, you also assign the same value to "ges.physical_addr". And that
-structure field is never read. So my point is that the
-"GhesErrorState.physical_addr" field is superfluous and should be removed.
-
-I checked the other three patches in the series and they don't seem to
-read that structure member either. Correct me if I'm wrong.
-
->> (55) What happens if you run out of the preallocated memory?
-
-> if it run out of the preallocated memory. it will overwrite other 
-> error source. every block's size is fixed. so it does not easy
-> dynamically extend the size if it is overflow. Anyway I will add a
-> error report if it happens overwrite.
-I understand (and agree) that dynamic allocation is not possible here.
-
-But that doesn't justify overwriting the error status data block that
-belongs to a different data source. (Worse, if this happens with the
-last error status data block, for error source 10, you could overwrite
-memory that belongs to the OS.)
-
-If an error status data block becomes full, then we should either wrap
-back to the start of the same data block, or else stop forwarding errors
-for that error source.
-
-Does the ACPI spec say anything about this? I.e., about the case when
-the system runs out of the memory that was reserved for recording
-hardware errors?
-
->>>> +
->>>> +    mem_err = (struct cper_sec_mem_err *) (gdata + 1);
->>>> +
->>>> +    /* In order to simplify simulation, hardcode the CPER section to memory
->>>> +     * section.
->>>> +     */
->>>> +    mem_err->validation_bits |= CPER_MEM_VALID_ERROR_TYPE;
->>>> +    mem_err->error_type = 3;
->>
->> (58) Is this supposed to stand for "Multi-bit ECC" (from "N.2.5 Memory 
->> Error Section" in UEFI 2.6)? Should we have a macro for that?
-
-> Yes, it is. What do you mean a macro?
-
-A #define for the integer value 3.
-
-> For all the errors that happen in the guest OS, in order to simulate
-> easy, I abstract all the error section to memory section, even though
-> the error section is processor or other section.
-Why is that a valid thing to do? (I'm not doubting it is valid, I'm just
-asking.) Will that not confuse the ACPI subsystem of the guest OS?
-
-> I do not know whether do you have some suggestion for that.
-Well I would have thought (without any expertise on the subject) that
-hardware errors from the host side should be mapped to the guest more or
-less "type correct". IOW, it looks strange that, say, a CPU error is
-reported as a memory error. But this is just an uneducated guess.
-
->>>> +    mem_err->validation_bits |= CPER_MEM_VALID_CARD | CPER_MEM_VALID_MODULE |
->>>> +            CPER_MEM_VALID_BANK | CPER_MEM_VALID_ROW |
->>>> +            CPER_MEM_VALID_COLUMN | CPER_MEM_VALID_BIT_POSITION;
->>>> +    mem_err->card = 1;
->>>> +    mem_err->module = 2;
->>>> +    mem_err->bank = 3;
->>>> +    mem_err->row = 1;
->>>> +    mem_err->column = 2;
->>>> +    mem_err->bit_pos = 5;
->>
->> (60) I have no idea where these values come from.
-
-> For all the errors that happen in the guest OS, in order to simulate
-> easy, I abstract all the error section to memory section, and hard
-> code the memory section error value as above.
-Sure, but why is that safe? Will the guest OS not want to do something
-about these error details? If we are feeding the guest OS invalid error
-details, will that not lead to confusion?
-
->> (64) What does "reqr" stand for?
-> It stand for the request size.
-Can you please call it "req_size" or something similar? The English
-expression
-
-  request size
-
-contains only one "r" letter, so it's hard to understand where the
-second "r" in "reqr" comes from.
-
-Thanks,
-Laszlo
+> +	else
+> +		val = __vgic_v3_read_ap1rn(n);
+> +
+> +	vcpu_set_reg(vcpu, rt, val);
+> +}
+> +
+> +static void __hyp_text __vgic_v3_write_apxrn(struct kvm_vcpu *vcpu, int rt, int n)
+> +{
+> +	u32 val = vcpu_get_reg(vcpu, rt);
+> +
+> +	if (!__vgic_v3_get_group(vcpu))
+> +		__vgic_v3_write_ap0rn(val, n);
+> +	else
+> +		__vgic_v3_write_ap1rn(val, n);
+> +}
+> +
+> +static void __hyp_text __vgic_v3_read_apxr0(struct kvm_vcpu *vcpu,
+> +					    u32 vmcr, int rt)
+> +{
+> +	__vgic_v3_read_apxrn(vcpu, rt, 0);
+> +}
+> +
+> +static void __hyp_text __vgic_v3_read_apxr1(struct kvm_vcpu *vcpu,
+> +					    u32 vmcr, int rt)
+> +{
+> +	__vgic_v3_read_apxrn(vcpu, rt, 1);
+> +}
+> +
+> +static void __hyp_text __vgic_v3_read_apxr2(struct kvm_vcpu *vcpu,
+> +					    u32 vmcr, int rt)
+> +{
+> +	__vgic_v3_read_apxrn(vcpu, rt, 2);
+> +}
+> +
+> +static void __hyp_text __vgic_v3_read_apxr3(struct kvm_vcpu *vcpu,
+> +					    u32 vmcr, int rt)
+> +{
+> +	__vgic_v3_read_apxrn(vcpu, rt, 3);
+> +}
+> +
+> +static void __hyp_text __vgic_v3_write_apxr0(struct kvm_vcpu *vcpu,
+> +					     u32 vmcr, int rt)
+> +{
+> +	__vgic_v3_write_apxrn(vcpu, rt, 0);
+> +}
+> +
+> +static void __hyp_text __vgic_v3_write_apxr1(struct kvm_vcpu *vcpu,
+> +					     u32 vmcr, int rt)
+> +{
+> +	__vgic_v3_write_apxrn(vcpu, rt, 1);
+> +}
+> +
+> +static void __hyp_text __vgic_v3_write_apxr2(struct kvm_vcpu *vcpu,
+> +					     u32 vmcr, int rt)
+> +{
+> +	__vgic_v3_write_apxrn(vcpu, rt, 2);
+> +}
+> +
+> +static void __hyp_text __vgic_v3_write_apxr3(struct kvm_vcpu *vcpu,
+> +					     u32 vmcr, int rt)
+> +{
+> +	__vgic_v3_write_apxrn(vcpu, rt, 3);
+> +}
+> +
+>  int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+>  {
+>  	int rt = kvm_vcpu_sys_get_rt(vcpu);
+> @@ -722,6 +792,30 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+>  		else
+>  			fn = __vgic_v3_write_bpr1;
+>  		break;
+> +	case SYS_ICC_AP1Rn_EL1(0):
+> +		if (is_read)
+> +			fn = __vgic_v3_read_apxr0;
+> +		else
+> +			fn = __vgic_v3_write_apxr0;
+> +		break;
+> +	case SYS_ICC_AP1Rn_EL1(1):
+> +		if (is_read)
+> +			fn = __vgic_v3_read_apxr1;
+> +		else
+> +			fn = __vgic_v3_write_apxr1;
+> +		break;
+> +	case SYS_ICC_AP1Rn_EL1(2):
+> +		if (is_read)
+> +			fn = __vgic_v3_read_apxr2;
+> +		else
+> +			fn = __vgic_v3_write_apxr2;
+> +		break;
+> +	case SYS_ICC_AP1Rn_EL1(3):
+> +		if (is_read)
+> +			fn = __vgic_v3_read_apxr3;
+> +		else
+> +			fn = __vgic_v3_write_apxr3;
+> +		break;
+>  	default:
+>  		return 0;
+>  	}
+> 
