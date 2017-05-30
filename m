@@ -1,24 +1,24 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 21/31] KVM: arm64: vgic-v3: Add misc Group-0 handlers
-Date: Tue, 30 May 2017 11:48:12 +0200
-Message-ID: <abfe283f-4681-e95c-fa9e-08fc32bd2f28@redhat.com>
+Subject: Re: [PATCH 20/31] KVM: arm64: vgic-v3: Add ICV_IGNREN0_EL1 handler
+Date: Tue, 30 May 2017 11:48:13 +0200
+Message-ID: <5a1d09b9-1b7f-e71b-db62-36574ca15ca7@redhat.com>
 References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <20170503104606.19342-22-marc.zyngier@arm.com>
+ <20170503104606.19342-21-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4556940430
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A838C40430
  for <kvmarm@lists.cs.columbia.edu>; Tue, 30 May 2017 05:44:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hbEl6Kl4w1Lc for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id tzFbgKnJWtAU for <kvmarm@lists.cs.columbia.edu>;
  Tue, 30 May 2017 05:44:24 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 44625405DA
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFB7040C4B
  for <kvmarm@lists.cs.columbia.edu>; Tue, 30 May 2017 05:44:24 -0400 (EDT)
-In-Reply-To: <20170503104606.19342-22-marc.zyngier@arm.com>
+In-Reply-To: <20170503104606.19342-21-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,85 +35,74 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi,
 
 On 03/05/2017 12:45, Marc Zyngier wrote:
-> A number of Group-0 registers can be handled by the same accessors
-> as that of Group-1, so let's add the required system register encodings
-> and catch them in the dispatching function.
+> Add a handler for reading/writing the guest's view of the ICC_IGRPEN0_EL1
+> register, which is located in the ICH_VMCR_EL2.VENG0 field.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
 > ---
->  arch/arm64/include/asm/sysreg.h | 4 ++++
->  virt/kvm/arm/hyp/vgic-v3-sr.c   | 7 +++++++
->  2 files changed, 11 insertions(+)
+>  arch/arm64/include/asm/sysreg.h |  1 +
+>  virt/kvm/arm/hyp/vgic-v3-sr.c   | 23 +++++++++++++++++++++++
+>  2 files changed, 24 insertions(+)
 > 
 > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index ba93bc7ac8e4..9971c5c435a7 100644
+> index d20be0b28ca4..ba93bc7ac8e4 100644
 > --- a/arch/arm64/include/asm/sysreg.h
 > +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -180,7 +180,11 @@
+> @@ -190,6 +190,7 @@
+>  #define SYS_ICC_BPR1_EL1		sys_reg(3, 0, 12, 12, 3)
+>  #define SYS_ICC_CTLR_EL1		sys_reg(3, 0, 12, 12, 4)
+>  #define SYS_ICC_SRE_EL1			sys_reg(3, 0, 12, 12, 5)
+> +#define SYS_ICC_GRPEN0_EL1		sys_reg(3, 0, 12, 12, 6)
+>  #define SYS_ICC_GRPEN1_EL1		sys_reg(3, 0, 12, 12, 7)
 >  
->  #define SYS_VBAR_EL1			sys_reg(3, 0, 12, 0, 0)
->  
-> +#define SYS_ICC_IAR0_EL1		sys_reg(3, 0, 12, 8, 0)
-> +#define SYS_ICC_EOIR0_EL1		sys_reg(3, 0, 12, 8, 1)
-> +#define SYS_ICC_HPPIR0_EL1		sys_reg(3, 0, 12, 8, 2)
->  #define SYS_ICC_BPR0_EL1		sys_reg(3, 0, 12, 8, 3)
-> +#define SYS_ICC_AP0Rn_EL1(n)		sys_reg(3, 0, 12, 8, 4 | n)
->  #define SYS_ICC_AP1Rn_EL1(n)		sys_reg(3, 0, 12, 9, n)
->  #define SYS_ICC_DIR_EL1			sys_reg(3, 0, 12, 11, 1)
->  #define SYS_ICC_SGI1R_EL1		sys_reg(3, 0, 12, 11, 5)
+>  #define SYS_CONTEXTIDR_EL1		sys_reg(3, 0, 13, 0, 1)
 > diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> index 77d5d12389ec..9c639f57268b 100644
+> index b21bb0c77ec2..77d5d12389ec 100644
 > --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
 > +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> @@ -848,9 +848,11 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
->  	is_read = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ;
+> @@ -649,11 +649,28 @@ static void __hyp_text __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int
+>  	__vgic_v3_clear_active_lr(lr, lr_val);
+>  }
 >  
->  	switch (sysreg) {
-> +	case SYS_ICC_IAR0_EL1:
->  	case SYS_ICC_IAR1_EL1:
->  		fn = __vgic_v3_read_iar;
->  		break;
-> +	case SYS_ICC_EOIR0_EL1:
->  	case SYS_ICC_EOIR1_EL1:
->  		fn = __vgic_v3_write_eoir;
->  		break;
-> @@ -866,30 +868,35 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
->  		else
->  			fn = __vgic_v3_write_bpr1;
->  		break;
-> +	case SYS_ICC_AP0Rn_EL1(0):
->  	case SYS_ICC_AP1Rn_EL1(0):
->  		if (is_read)
->  			fn = __vgic_v3_read_apxr0;
->  		else
->  			fn = __vgic_v3_write_apxr0;
->  		break;
-> +	case SYS_ICC_AP0Rn_EL1(1):
->  	case SYS_ICC_AP1Rn_EL1(1):
->  		if (is_read)
->  			fn = __vgic_v3_read_apxr1;
->  		else
->  			fn = __vgic_v3_write_apxr1;
->  		break;
-> +	case SYS_ICC_AP0Rn_EL1(2):
->  	case SYS_ICC_AP1Rn_EL1(2):
->  		if (is_read)
->  			fn = __vgic_v3_read_apxr2;
->  		else
->  			fn = __vgic_v3_write_apxr2;
->  		break;
-> +	case SYS_ICC_AP0Rn_EL1(3):
->  	case SYS_ICC_AP1Rn_EL1(3):
->  		if (is_read)
->  			fn = __vgic_v3_read_apxr3;
->  		else
->  			fn = __vgic_v3_write_apxr3;
->  		break;
-> +	case SYS_ICC_HPPIR0_EL1:
+> +static void __hyp_text __vgic_v3_read_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+> +{
+> +	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG0_MASK));
+> +}
+> +
+>  static void __hyp_text __vgic_v3_read_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+>  {
+>  	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG1_MASK));
+>  }
+>  
+> +static void __hyp_text __vgic_v3_write_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+> +{
+> +	u64 val = vcpu_get_reg(vcpu, rt);
+> +
+> +	if (val & 1)
+> +		vmcr |= ICH_VMCR_ENG0_MASK;
+> +	else
+> +		vmcr &= ~ICH_VMCR_ENG0_MASK;
+> +
+> +	__vgic_v3_write_vmcr(vmcr);
+> +}
+> +
+>  static void __hyp_text __vgic_v3_write_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+>  {
+>  	u64 val = vcpu_get_reg(vcpu, rt);
+> @@ -876,6 +893,12 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
 >  	case SYS_ICC_HPPIR1_EL1:
 >  		fn = __vgic_v3_read_hppir;
 >  		break;
+> +	case SYS_ICC_GRPEN0_EL1:
+> +		if (is_read)
+> +			fn = __vgic_v3_read_igrpen0;
+> +		else
+> +			fn = __vgic_v3_write_igrpen0;
+> +		break;
+>  	case SYS_ICC_BPR0_EL1:
+>  		if (is_read)
+>  			fn = __vgic_v3_read_bpr0;
 > 
