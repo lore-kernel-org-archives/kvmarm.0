@@ -1,96 +1,92 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 28/31] KVM: arm64: vgic-v3: Add ICV_CTLR_EL1 handler
-Date: Tue, 30 May 2017 12:27:30 +0200
-Message-ID: <d08e9041-4033-d70a-495b-0773ec5d0687@redhat.com>
+Subject: Re: [PATCH 29/31] KVM: arm64: vgic-v3: Add ICV_PMR_EL1 handler
+Date: Tue, 30 May 2017 12:34:43 +0200
+Message-ID: <d3b3785d-9cfe-ac53-e0e3-59fae60ef6a6@redhat.com>
 References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <20170503104606.19342-29-marc.zyngier@arm.com>
+ <20170503104606.19342-30-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170503104606.19342-29-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6449640B58
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 May 2017 06:30:55 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id FI-eR4CbPXhY for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 May 2017 06:30:54 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B134240948
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 May 2017 06:30:54 -0400 (EDT)
+In-Reply-To: <20170503104606.19342-30-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi,
 
 On 03/05/2017 12:46, Marc Zyngier wrote:
-> Add a handler for reading/writing the guest's view of the ICV_CTLR_EL1
-> register. only EOIMode and CBPR are of interest here, as all the other
-> bits directly come from ICH_VTR_EL2 and are Read-Only.
+> Add a handler for reading/writing the guest's view of the ICC_PMR_EL1
+> register, which is located in the ICH_VMCR_EL2.VPMR field.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks
-
 Eric
 > ---
->  virt/kvm/arm/hyp/vgic-v3-sr.c | 46 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
+>  virt/kvm/arm/hyp/vgic-v3-sr.c | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
 > 
 > diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> index 3a5f54f445b9..981201bf7a5e 100644
+> index 981201bf7a5e..4fbeeb54704e 100644
 > --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
 > +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> @@ -855,6 +855,46 @@ static void __hyp_text __vgic_v3_read_rpr(struct kvm_vcpu *vcpu,
->  	vcpu_set_reg(vcpu, rt, val);
+> @@ -848,6 +848,27 @@ static void __hyp_text __vgic_v3_read_hppir(struct kvm_vcpu *vcpu,
+>  	vcpu_set_reg(vcpu, rt, lr_val & ICH_LR_VIRTUAL_ID_MASK);
 >  }
 >  
-> +static void __hyp_text __vgic_v3_read_ctlr(struct kvm_vcpu *vcpu,
-> +					   u32 vmcr, int rt)
+> +static void __hyp_text __vgic_v3_read_pmr(struct kvm_vcpu *vcpu,
+> +					  u32 vmcr, int rt)
 > +{
-> +	u32 vtr, val;
-> +
-> +	vtr = read_gicreg(ICH_VTR_EL2);
-> +	/* PRIbits */
-> +	val = ((vtr >> 29) & 7) << ICC_CTLR_EL1_PRI_BITS_SHIFT;
-> +	/* IDbits */
-> +	val |= ((vtr >> 23) & 7) << ICC_CTLR_EL1_ID_BITS_SHIFT;
-> +	/* SEIS */
-> +	val |= ((vtr >> 22) & 1) << ICC_CTLR_EL1_SEIS_SHIFT;
-> +	/* A3V */
-> +	val |= ((vtr >> 21) & 1) << ICC_CTLR_EL1_A3V_SHIFT;
-> +	/* EOImode */
-> +	val |= ((vmcr & ICH_VMCR_EOIM_MASK) >> ICH_VMCR_EOIM_SHIFT) << ICC_CTLR_EL1_EOImode_SHIFT;
-> +	/* CBPR */
-> +	val |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
-> +
-> +	vcpu_set_reg(vcpu, rt, val);
+> +	vmcr &= ICH_VMCR_PMR_MASK;
+> +	vmcr >>= ICH_VMCR_PMR_SHIFT;
+> +	vcpu_set_reg(vcpu, rt, vmcr);
 > +}
 > +
-> +static void __hyp_text __vgic_v3_write_ctlr(struct kvm_vcpu *vcpu,
-> +					    u32 vmcr, int rt)
+> +static void __hyp_text __vgic_v3_write_pmr(struct kvm_vcpu *vcpu,
+> +					   u32 vmcr, int rt)
 > +{
 > +	u32 val = vcpu_get_reg(vcpu, rt);
 > +
-> +	if (val & ICC_CTLR_EL1_CBPR_MASK)
-> +		vmcr |= ICH_VMCR_CBPR_MASK;
-> +	else
-> +		vmcr &= ~ICH_VMCR_CBPR_MASK;
-> +
-> +	if (val & ICC_CTLR_EL1_EOImode_MASK)
-> +		vmcr |= ICH_VMCR_EOIM_MASK;
-> +	else
-> +		vmcr &= ~ICH_VMCR_EOIM_MASK;
+> +	val <<= ICH_VMCR_PMR_SHIFT;
+> +	val &= ICH_VMCR_PMR_MASK;
+> +	vmcr &= ~ICH_VMCR_PMR_MASK;
+> +	vmcr |= val;
 > +
 > +	write_gicreg(vmcr, ICH_VMCR_EL2);
 > +}
 > +
->  int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+>  static void __hyp_text __vgic_v3_read_rpr(struct kvm_vcpu *vcpu,
+>  					  u32 vmcr, int rt)
 >  {
->  	int rt = kvm_vcpu_sys_get_rt(vcpu);
-> @@ -945,6 +985,12 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
->  	case SYS_ICC_RPR_EL1:
->  		fn = __vgic_v3_read_rpr;
+> @@ -991,6 +1012,12 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+>  		else
+>  			fn = __vgic_v3_write_ctlr;
 >  		break;
-> +	case SYS_ICC_CTLR_EL1:
+> +	case SYS_ICC_PMR_EL1:
 > +		if (is_read)
-> +			fn = __vgic_v3_read_ctlr;
+> +			fn = __vgic_v3_read_pmr;
 > +		else
-> +			fn = __vgic_v3_write_ctlr;
+> +			fn = __vgic_v3_write_pmr;
 > +		break;
 >  	default:
 >  		return 0;
