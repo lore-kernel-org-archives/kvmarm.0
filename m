@@ -1,60 +1,94 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 26/31] KVM: arm64: vgic-v3: Add ICV_DIR_EL1 handler
-Date: Tue, 30 May 2017 15:45:07 +0100
-Message-ID: <8d3be8d8-87d8-8126-7855-17381eb095dc@arm.com>
+Subject: Re: [PATCH 07/31] KVM: arm/arm64: vgic-v3: Add accessors for the
+ ICH_APxRn_EL2 registers
+Date: Tue, 30 May 2017 17:17:01 +0100
+Message-ID: <dcf371d4-f3d7-be1c-789a-22eb5509a729@arm.com>
 References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <20170503104606.19342-27-marc.zyngier@arm.com>
- <6c34b576-a0d2-6e7d-b363-349a5319dcf6@redhat.com>
+ <20170503104606.19342-8-marc.zyngier@arm.com>
+ <20170503153201.GC4951@leverpostej>
+ <3b9ed468-71ac-786c-b587-27968c3f3af9@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <6c34b576-a0d2-6e7d-b363-349a5319dcf6@redhat.com>
+In-Reply-To: <3b9ed468-71ac-786c-b587-27968c3f3af9@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 30/05/17 11:15, Auger Eric wrote:
-> Marc,
-> 
-> On 03/05/2017 12:46, Marc Zyngier wrote:
->> Add a handler for writing the guest's view of the ICC_DIR_EL1
->> register, performing the deactivation of an interrupt if EOImode
->> is set ot 1.
+On 03/05/17 16:58, Marc Zyngier wrote:
+> On 03/05/17 16:32, Mark Rutland wrote:
+>> On Wed, May 03, 2017 at 11:45:42AM +0100, Marc Zyngier wrote:
+>>> As we're about to access the Active Priority registers a lot more,
+>>> let's define accessors that take the register number as a parameter.
+>>>
+>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> ---
+>>>  virt/kvm/arm/hyp/vgic-v3-sr.c | 116 ++++++++++++++++++++++++++++++++++++------
+>>>  1 file changed, 100 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+>>> index 32c3295929b0..990d9d1e85d0 100644
+>>> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
+>>> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+>>> @@ -118,6 +118,90 @@ static void __hyp_text __gic_v3_set_lr(u64 val, int lr)
+>>>  	}
+>>>  }
+>>>  
+>>> +static void __hyp_text __vgic_v3_write_ap0rn(u32 val, int n)
+>>> +{
+>>> +	switch (n) {
+>>> +	case 0:
+>>> +		write_gicreg(val, ICH_AP0R0_EL2);
+>>> +		break;
+>>> +	case 1:
+>>> +		write_gicreg(val, ICH_AP0R1_EL2);
+>>> +		break;
+>>> +	case 2:
+>>> +		write_gicreg(val, ICH_AP0R2_EL2);
+>>> +		break;
+>>> +	case 3:
+>>> +		write_gicreg(val, ICH_AP0R3_EL2);
+>>> +		break;
+>>> +	}
 >>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/hyp/vgic-v3-sr.c | 23 +++++++++++++++++++++++
->>  1 file changed, 23 insertions(+)
->>
->> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
->> index 9c639f57268b..563dd2d16c59 100644
->> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
->> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
->> @@ -612,6 +612,26 @@ static void __hyp_text __vgic_v3_bump_eoicount(void)
->>  	write_gicreg(hcr, ICH_HCR_EL2);
->>  }
->>  
->> +static void __hyp_text __vgic_v3_write_dir(struct kvm_vcpu *vcpu,
->> +					   u32 vmcr, int rt)
->> +{
->> +	u32 vid = vcpu_get_reg(vcpu, rt);
->> +	u64 lr_val;
->> +	int lr;
->> +
->> +	/* No deactivate to be performed on an LPI */
->> +	if (vid >= VGIC_MIN_LPI)
->> +		return;
+>> Is there any way we can get a build or runtime failure for an
+>> out-of-bounds n value?
 > 
-> don't you need to test the EOImode first? Spec says:
-> "
-> When EOImode == ‘0’. GICv3 implementations must ignore such writes. In
-> systems supporting system error generation, an implementation might
-> generate an SEI.
-> "
+> I'd rather avoid runtime failure on this path, because that's pretty
+> terminal. Build-time is a possibility, to some extent.
+> 
+>>
+>>> +}
+>>
+>> Given this is used with a constant n, you could make this:
+>>
+>> #define __vgic_v3_write_ap0rn(v, n) \
+>> 	write_gicreg(v, ICH_AP0R##n##_EL2)
+>>
+>> ... which should also give you a warning for an out-of-bounds n.
+>>
+>> Similar could apply for the other helpers here.
+>>
+>> That would require some function -> macro conversion in later patches
+>> though, so I can understand if you're not keen on that.
+> 
+> I don't mind reworking this if that makes it safer. But the real problem
+> is that the register number and the group are not necessarily constants
+> (see how this is used in __vgic_v3_get_highest_active_priority).
+> 
+> I'll have a look at how I can make that look a bit better.
 
-Ah, very good point! Thanks for the heads up!
+So I had another look at that, and I'm not sure there is any way to make
+it really nicer, other than expanding all of the apxrn accessors to deal
+with non constant x and n (which makes the code look really awful).
+
+I'm pretty confident that it is nigh impossible to get x or n out of
+bounds so unless someone shouts, I plan on keeping this code mostly
+unchanged for the next repost.
+
+Thanks,
 
 	M.
 -- 
