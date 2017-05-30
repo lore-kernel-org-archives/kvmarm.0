@@ -1,87 +1,107 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 16/31] KVM: arm64: vgic-v3: Add ICV_HPPIR1_EL1 handler
-Date: Tue, 30 May 2017 10:05:18 +0200
-Message-ID: <b72a2478-2cc6-254c-45f9-095639dc3c5e@redhat.com>
+Subject: Re: [PATCH 17/31] KVM: arm64: vgic-v3: Enable trapping of Group-1
+ system registers
+Date: Tue, 30 May 2017 11:07:59 +0200
+Message-ID: <bf094e11-1555-a1bf-5655-9093867adb90@redhat.com>
 References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <20170503104606.19342-17-marc.zyngier@arm.com>
+ <20170503104606.19342-18-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170503104606.19342-17-marc.zyngier@arm.com>
+In-Reply-To: <20170503104606.19342-18-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Marc,
+
 On 03/05/2017 12:45, Marc Zyngier wrote:
-> Add a handler for reading the guest's view of the ICV_HPPIR1_EL1
-> register. This is a simple parsing of the available LRs, extracting the
-> highest available interrupt.
+> In order to be able to trap Group-1 GICv3 system registers, we need to
+> set ICH_HCR_EL2.TALL1 begore entering the guest. This is conditionnaly
+before, conditionally
+> done after having restored the guest's state, and cleared on exit.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  include/linux/irqchip/arm-gic-v3.h | 1 +
+>  virt/kvm/arm/hyp/vgic-v3-sr.c      | 7 +++++++
+>  virt/kvm/arm/vgic/vgic-v3.c        | 4 ++++
+>  3 files changed, 12 insertions(+)
+> 
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index c56d9bc2c904..a1739843343e 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -403,6 +403,7 @@
+>  
+>  #define ICH_HCR_EN			(1 << 0)
+>  #define ICH_HCR_UIE			(1 << 1)
+> +#define ICH_HCR_TALL1			(1 << 12)
+>  #define ICH_HCR_EOIcount_SHIFT		27
+>  #define ICH_HCR_EOIcount_MASK		(0x1f << ICH_HCR_EOIcount_SHIFT)
+>  
+> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+> index a521e105ade1..a27671b1e9af 100644
+> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
+> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+> @@ -257,6 +257,9 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+>  			cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
+>  		}
+>  	} else {
+> +		if (static_branch_unlikely(&vgic_v3_cpuif_trap))
+> +			write_gicreg(0, ICH_HCR_EL2);
+Not directly related to this patch but this is not obvious to me why we
+reset the ICH_HCR_EL2 only when used_lrs != 0.
+> +
+>  		cpu_if->vgic_elrsr = 0xffff;
+>  		cpu_if->vgic_ap0r[0] = 0;
+>  		cpu_if->vgic_ap0r[1] = 0;
+> @@ -329,6 +332,10 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+>  
+>  		for (i = 0; i < used_lrs; i++)
+>  			__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
+> +	} else {
+> +		/* Always write ICH_HCR_EL2 to enable trapping */
+"always" is a bit weird as this is conditional
+> +		if (static_branch_unlikely(&vgic_v3_cpuif_trap))
+> +			write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
+and same question here. Why don't we always restore the ICH_HCR_EL2.
+Assuming when exiting the guest the vCPU I/F was enabled and used_lrs=0,
+when restoring don't we leave the vCPU I/F disabled? I must miss
+something but I don't find who is re-enabling the vCPU I/F in that case?
+>  	}
+>  
+>  	/*
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 063526443781..547b8374fb64 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -21,6 +21,8 @@
+>  
+>  #include "vgic.h"
+>  
+> +static bool group1_trap;
+> +
+>  void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+> @@ -239,6 +241,8 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+>  
+>  	/* Get the show on the road... */
+>  	vgic_v3->vgic_hcr = ICH_HCR_EN;
+> +	if (group1_trap)
+I don't remember the rationale behind using the bool here and using
+static_branch_unlikely in the other cases.
+
+May be good to squash the next patch to understand how group1_trap is set.
 
 Thanks
 
 Eric
-> ---
->  arch/arm64/include/asm/sysreg.h |  1 +
->  virt/kvm/arm/hyp/vgic-v3-sr.c   | 23 +++++++++++++++++++++++
->  2 files changed, 24 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index aad46b8eea5e..bd000686194a 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -185,6 +185,7 @@
->  #define SYS_ICC_SGI1R_EL1		sys_reg(3, 0, 12, 11, 5)
->  #define SYS_ICC_IAR1_EL1		sys_reg(3, 0, 12, 12, 0)
->  #define SYS_ICC_EOIR1_EL1		sys_reg(3, 0, 12, 12, 1)
-> +#define SYS_ICC_HPPIR1_EL1		sys_reg(3, 0, 12, 12, 2)
->  #define SYS_ICC_BPR1_EL1		sys_reg(3, 0, 12, 12, 3)
->  #define SYS_ICC_CTLR_EL1		sys_reg(3, 0, 12, 12, 4)
->  #define SYS_ICC_SRE_EL1			sys_reg(3, 0, 12, 12, 5)
-> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> index b6803989da1f..a521e105ade1 100644
-> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> @@ -754,6 +754,26 @@ static void __hyp_text __vgic_v3_write_apxr3(struct kvm_vcpu *vcpu,
->  	__vgic_v3_write_apxrn(vcpu, rt, 3);
+> +		vgic_v3->vgic_hcr |= ICH_HCR_TALL1;
 >  }
 >  
-> +static void __hyp_text __vgic_v3_read_hppir(struct kvm_vcpu *vcpu,
-> +					    u32 vmcr, int rt)
-> +{
-> +	u64 lr_val;
-> +	int lr, lr_grp, grp;
-> +
-> +	grp = __vgic_v3_get_group(vcpu);
-> +
-> +	lr = __vgic_v3_highest_priority_lr(vcpu, vmcr, &lr_val);
-> +	if (lr == -1)
-> +		goto spurious;
-> +
-> +	lr_grp = !!(lr_val & ICH_LR_GROUP);
-> +	if (lr_grp != grp)
-> +		lr_val = ICC_IAR1_EL1_SPURIOUS;
-> +
-> +spurious:
-> +	vcpu_set_reg(vcpu, rt, lr_val & ICH_LR_VIRTUAL_ID_MASK);
-> +}
-> +
->  int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
->  {
->  	int rt = kvm_vcpu_sys_get_rt(vcpu);
-> @@ -816,6 +836,9 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
->  		else
->  			fn = __vgic_v3_write_apxr3;
->  		break;
-> +	case SYS_ICC_HPPIR1_EL1:
-> +		fn = __vgic_v3_read_hppir;
-> +		break;
->  	default:
->  		return 0;
->  	}
+>  /* check for overlapping regions and for regions crossing the end of memory */
 > 
