@@ -1,77 +1,142 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 07/31] KVM: arm/arm64: vgic-v3: Add accessors for the
- ICH_APxRn_EL2 registers
-Date: Tue, 30 May 2017 17:42:07 +0100
-Message-ID: <20170530164206.GB16541@leverpostej>
-References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <20170503104606.19342-8-marc.zyngier@arm.com>
- <20170503153201.GC4951@leverpostej>
- <3b9ed468-71ac-786c-b587-27968c3f3af9@arm.com>
- <dcf371d4-f3d7-be1c-789a-22eb5509a729@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [edk2] [Qemu-devel] [PATCH v3 1/4] ACPI: Add APEI GHES Table
+ Generation support
+Date: Wed, 31 May 2017 10:13:38 +0800
+Message-ID: <80b71fec-cd6d-fed7-1a86-195deffcdbb0@huawei.com>
+References: <0184EA26B2509940AA629AE1405DD7F2014105CD@DGGEMA503-MBS.china.huawei.com>
+ <3a791060-170d-9eb7-b2c4-f1cdbb55501f@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <dcf371d4-f3d7-be1c-789a-22eb5509a729@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <edk2-devel-bounces@lists.01.org>
+In-Reply-To: <3a791060-170d-9eb7-b2c4-f1cdbb55501f@redhat.com>
+List-Unsubscribe: <https://lists.01.org/mailman/options/edk2-devel>,
+ <mailto:edk2-devel-request@lists.01.org?subject=unsubscribe>
+List-Archive: <http://lists.01.org/pipermail/edk2-devel/>
+List-Post: <mailto:edk2-devel@lists.01.org>
+List-Help: <mailto:edk2-devel-request@lists.01.org?subject=help>
+List-Subscribe: <https://lists.01.org/mailman/listinfo/edk2-devel>,
+ <mailto:edk2-devel-request@lists.01.org?subject=subscribe>
+Errors-To: edk2-devel-bounces@lists.01.org
+Sender: "edk2-devel" <edk2-devel-bounces@lists.01.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Michael Tsirkin <mtsirkin@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Wuquanming <wuquanming@huawei.com>, "wangxiongfeng (C)" <wangxiongfeng2@huawei.com>, Christoffer Dall <cdall@linaro.org>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "Leif.Lindholm@linaro.com" <Leif.Lindholm@linaro.com>, Huangshaoyu <huangshaoyu@huawei.com>, "vladimir.murzin@arm.com" <vladimir.murzin@arm.com>, Xiexiuqi <xiexiuqi@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, "andre.przywara@arm.com" <andre.przywara@arm.com>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, "nd@arm.com" <nd@arm.com>, linux-arm-kernel@lis
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 30, 2017 at 05:17:01PM +0100, Marc Zyngier wrote:
-> On 03/05/17 16:58, Marc Zyngier wrote:
-> > On 03/05/17 16:32, Mark Rutland wrote:
-> >> On Wed, May 03, 2017 at 11:45:42AM +0100, Marc Zyngier wrote:
-> >>> +static void __hyp_text __vgic_v3_write_ap0rn(u32 val, int n)
-> >>> +{
-> >>> +	switch (n) {
-> >>> +	case 0:
-> >>> +		write_gicreg(val, ICH_AP0R0_EL2);
-> >>> +		break;
-> >>> +	case 1:
-> >>> +		write_gicreg(val, ICH_AP0R1_EL2);
-> >>> +		break;
-> >>> +	case 2:
-> >>> +		write_gicreg(val, ICH_AP0R2_EL2);
-> >>> +		break;
-> >>> +	case 3:
-> >>> +		write_gicreg(val, ICH_AP0R3_EL2);
-> >>> +		break;
-> >>> +	}
-> >>
-> >> Is there any way we can get a build or runtime failure for an
-> >> out-of-bounds n value?
-> > 
-> > I'd rather avoid runtime failure on this path, because that's pretty
-> > terminal. Build-time is a possibility, to some extent.
+Laszlo,
+   very sorry for that, it was my mistake that missing your name.
+when I reply mail, I copy the "CC" list to the mail reply list, but forget to copy the "To" list.
+I will check your comments in detailed later and reply you. thanks again.
 
-> >> Given this is used with a constant n, you could make this:
-> >>
-> >> #define __vgic_v3_write_ap0rn(v, n) \
-> >> 	write_gicreg(v, ICH_AP0R##n##_EL2)
-> >>
-> >> ... which should also give you a warning for an out-of-bounds n.
-> >>
-> >> Similar could apply for the other helpers here.
-> >>
-> >> That would require some function -> macro conversion in later patches
-> >> though, so I can understand if you're not keen on that.
-> > 
-> > I don't mind reworking this if that makes it safer. But the real problem
-> > is that the register number and the group are not necessarily constants
-> > (see how this is used in __vgic_v3_get_highest_active_priority).
-> > 
-> > I'll have a look at how I can make that look a bit better.
+
+
+On 2017/5/30 0:03, Laszlo Ersek wrote:
+> Hi,
 > 
-> So I had another look at that, and I'm not sure there is any way to make
-> it really nicer, other than expanding all of the apxrn accessors to deal
-> with non constant x and n (which makes the code look really awful).
+> did you remove me from the To: / Cc: list intentionally, or was that an
+> oversight? I caught your message in my list folders only by luck.
 > 
-> I'm pretty confident that it is nigh impossible to get x or n out of
-> bounds so unless someone shouts, I plan on keeping this code mostly
-> unchanged for the next repost.
-
-Fair enough, thanks for taking a look anyhow.
-
-Thanks,
-Mark.
+> Some followup below:
+> 
+> On 05/29/17 17:27, gengdongjiu wrote:
+> 
+>>> (46) What is "physical_addr" good for? Below I can only see an 
+>>> assignment to it, in ghes_update_guest(). Where is the field read?
+> 
+>> this "physical_addr" address is the physical error address in the
+>> CPER. such as the physical address that happen hwpoison, this address
+>> is delivered by the KVM and QEMU transfer this address to physical.
+> I understand that in the ghes_update_guest() function, you accept a
+> parameter called "physical_address", and you pass it on to
+> ghes_generate_cper_record(). That makes sense, yes.
+> 
+> However, you also assign the same value to "ges.physical_addr". And that
+> structure field is never read. So my point is that the
+> "GhesErrorState.physical_addr" field is superfluous and should be removed.
+> 
+> I checked the other three patches in the series and they don't seem to
+> read that structure member either. Correct me if I'm wrong.
+> 
+>>> (55) What happens if you run out of the preallocated memory?
+> 
+>> if it run out of the preallocated memory. it will overwrite other 
+>> error source. every block's size is fixed. so it does not easy
+>> dynamically extend the size if it is overflow. Anyway I will add a
+>> error report if it happens overwrite.
+> I understand (and agree) that dynamic allocation is not possible here.
+> 
+> But that doesn't justify overwriting the error status data block that
+> belongs to a different data source. (Worse, if this happens with the
+> last error status data block, for error source 10, you could overwrite
+> memory that belongs to the OS.)
+> 
+> If an error status data block becomes full, then we should either wrap
+> back to the start of the same data block, or else stop forwarding errors
+> for that error source.
+> 
+> Does the ACPI spec say anything about this? I.e., about the case when
+> the system runs out of the memory that was reserved for recording
+> hardware errors?
+> 
+>>>>> +
+>>>>> +    mem_err = (struct cper_sec_mem_err *) (gdata + 1);
+>>>>> +
+>>>>> +    /* In order to simplify simulation, hardcode the CPER section to memory
+>>>>> +     * section.
+>>>>> +     */
+>>>>> +    mem_err->validation_bits |= CPER_MEM_VALID_ERROR_TYPE;
+>>>>> +    mem_err->error_type = 3;
+>>>
+>>> (58) Is this supposed to stand for "Multi-bit ECC" (from "N.2.5 Memory 
+>>> Error Section" in UEFI 2.6)? Should we have a macro for that?
+> 
+>> Yes, it is. What do you mean a macro?
+> 
+> A #define for the integer value 3.
+> 
+>> For all the errors that happen in the guest OS, in order to simulate
+>> easy, I abstract all the error section to memory section, even though
+>> the error section is processor or other section.
+> Why is that a valid thing to do? (I'm not doubting it is valid, I'm just
+> asking.) Will that not confuse the ACPI subsystem of the guest OS?
+> 
+>> I do not know whether do you have some suggestion for that.
+> Well I would have thought (without any expertise on the subject) that
+> hardware errors from the host side should be mapped to the guest more or
+> less "type correct". IOW, it looks strange that, say, a CPU error is
+> reported as a memory error. But this is just an uneducated guess.
+> 
+>>>>> +    mem_err->validation_bits |= CPER_MEM_VALID_CARD | CPER_MEM_VALID_MODULE |
+>>>>> +            CPER_MEM_VALID_BANK | CPER_MEM_VALID_ROW |
+>>>>> +            CPER_MEM_VALID_COLUMN | CPER_MEM_VALID_BIT_POSITION;
+>>>>> +    mem_err->card = 1;
+>>>>> +    mem_err->module = 2;
+>>>>> +    mem_err->bank = 3;
+>>>>> +    mem_err->row = 1;
+>>>>> +    mem_err->column = 2;
+>>>>> +    mem_err->bit_pos = 5;
+>>>
+>>> (60) I have no idea where these values come from.
+> 
+>> For all the errors that happen in the guest OS, in order to simulate
+>> easy, I abstract all the error section to memory section, and hard
+>> code the memory section error value as above.
+> Sure, but why is that safe? Will the guest OS not want to do something
+> about these error details? If we are feeding the guest OS invalid error
+> details, will that not lead to confusion?
+> 
+>>> (64) What does "reqr" stand for?
+>> It stand for the request size.
+> Can you please call it "req_size" or something similar? The English
+> expression
+> 
+>   request size
+> 
+> contains only one "r" letter, so it's hard to understand where the
+> second "r" in "reqr" comes from.
+> 
+> Thanks,
+> Laszlo
+> 
+> .
+> 
