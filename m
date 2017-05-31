@@ -1,248 +1,138 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 14/31] KVM: arm64: vgic-v3: Add ICV_EOIR1_EL1 handler
-Date: Wed, 31 May 2017 08:33:05 +0200
-Message-ID: <0dabccc1-ffa2-0ee1-71a4-71390791f056@redhat.com>
+Subject: Re: [PATCH 17/31] KVM: arm64: vgic-v3: Enable trapping of Group-1
+ system registers
+Date: Wed, 31 May 2017 08:43:12 +0200
+Message-ID: <fb99e0dd-c4ae-98b5-a46a-90f78120535d@redhat.com>
 References: <20170503104606.19342-1-marc.zyngier@arm.com>
- <20170503104606.19342-15-marc.zyngier@arm.com>
- <c3baec82-20c6-c948-9cb8-8247802cbff5@redhat.com>
- <2eb7f08f-bb47-cd7b-e631-3d42c35336ee@arm.com>
+ <20170503104606.19342-18-marc.zyngier@arm.com>
+ <bf094e11-1555-a1bf-5655-9093867adb90@redhat.com>
+ <47409634-110c-eb5c-1bbc-2ee9dea4f3d4@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C98CE40C47
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 May 2017 02:29:16 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J2Gqyiyj17cX for <kvmarm@lists.cs.columbia.edu>;
- Wed, 31 May 2017 02:29:15 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8501B40625
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 May 2017 02:29:15 -0400 (EDT)
-In-Reply-To: <2eb7f08f-bb47-cd7b-e631-3d42c35336ee@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <47409634-110c-eb5c-1bbc-2ee9dea4f3d4@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Marc,
 
-On 30/05/2017 16:24, Marc Zyngier wrote:
-> On 30/05/17 08:48, Auger Eric wrote:
->> Hi Marc
+On 30/05/2017 16:32, Marc Zyngier wrote:
+> On 30/05/17 10:07, Auger Eric wrote:
+>> Hi Marc,
 >>
 >> On 03/05/2017 12:45, Marc Zyngier wrote:
->>> Add a handler for writing the guest's view of the ICC_EOIR1_EL1
->>> register. This involves dropping the priority of the interrupt,
->>> and deactivating it if required (EOImode == 0).
+>>> In order to be able to trap Group-1 GICv3 system registers, we need to
+>>> set ICH_HCR_EL2.TALL1 begore entering the guest. This is conditionnaly
+>> before, conditionally
+>>> done after having restored the guest's state, and cleared on exit.
 >>>
 >>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >>> ---
->>>  include/linux/irqchip/arm-gic-v3.h |   2 +
->>>  virt/kvm/arm/hyp/vgic-v3-sr.c      | 119 +++++++++++++++++++++++++++++++++++++
->>>  2 files changed, 121 insertions(+)
+>>>  include/linux/irqchip/arm-gic-v3.h | 1 +
+>>>  virt/kvm/arm/hyp/vgic-v3-sr.c      | 7 +++++++
+>>>  virt/kvm/arm/vgic/vgic-v3.c        | 4 ++++
+>>>  3 files changed, 12 insertions(+)
 >>>
 >>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
->>> index 7610ea4e8337..c56d9bc2c904 100644
+>>> index c56d9bc2c904..a1739843343e 100644
 >>> --- a/include/linux/irqchip/arm-gic-v3.h
 >>> +++ b/include/linux/irqchip/arm-gic-v3.h
->>> @@ -403,6 +403,8 @@
+>>> @@ -403,6 +403,7 @@
 >>>  
 >>>  #define ICH_HCR_EN			(1 << 0)
 >>>  #define ICH_HCR_UIE			(1 << 1)
->>> +#define ICH_HCR_EOIcount_SHIFT		27
->>> +#define ICH_HCR_EOIcount_MASK		(0x1f << ICH_HCR_EOIcount_SHIFT)
+>>> +#define ICH_HCR_TALL1			(1 << 12)
+>>>  #define ICH_HCR_EOIcount_SHIFT		27
+>>>  #define ICH_HCR_EOIcount_MASK		(0x1f << ICH_HCR_EOIcount_SHIFT)
 >>>  
->>>  #define ICH_VMCR_CBPR_SHIFT		4
->>>  #define ICH_VMCR_CBPR_MASK		(1 << ICH_VMCR_CBPR_SHIFT)
 >>> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
->>> index 49aad1de3ac8..a76351b3ad66 100644
+>>> index a521e105ade1..a27671b1e9af 100644
 >>> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
 >>> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
->>> @@ -425,6 +425,26 @@ static int __hyp_text __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu,
->>>  	return lr;
->>>  }
->>>  
->>> +static int __hyp_text __vgic_v3_find_active_lr(struct kvm_vcpu *vcpu,
->>> +					       int intid, u64 *lr_val)
->>> +{
->>> +	unsigned int used_lrs = vcpu->arch.vgic_cpu.used_lrs;
->>> +	int i;
->>> +
->>> +	for (i = 0; i < used_lrs; i++) {
->>> +		u64 val = __gic_v3_get_lr(i);
->>> +
->>> +		if ((val & ICH_LR_VIRTUAL_ID_MASK) == intid &&
->>> +		    (val & ICH_LR_ACTIVE_BIT)) {
->> I guess it is safe because we don't have yet virtual interrupts directly
->> mapped to phys IRQs, besides timer one?
+>>> @@ -257,6 +257,9 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+>>>  			cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
+>>>  		}
+>>>  	} else {
+>>> +		if (static_branch_unlikely(&vgic_v3_cpuif_trap))
+>>> +			write_gicreg(0, ICH_HCR_EL2);
+>> Not directly related to this patch but this is not obvious to me why we
+>> reset the ICH_HCR_EL2 only when used_lrs != 0.
 > 
-> What would that change? I don't see how having a HW interrupt here would
-> be unsafe... Am I missing something?
-I was thinking about the case of an HW mapped interrupt whose active
-state must be observed at distributor level - as I understood the spec -
-and not at LR level.
+> That's because if there is no interrupt to inject, then we've never
+> enabled the virtual CPU interface, and we've only configured VMCR.
+> 
+>>> +
+>>>  		cpu_if->vgic_elrsr = 0xffff;
+>>>  		cpu_if->vgic_ap0r[0] = 0;
+>>>  		cpu_if->vgic_ap0r[1] = 0;
+>>> @@ -329,6 +332,10 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+>>>  
+>>>  		for (i = 0; i < used_lrs; i++)
+>>>  			__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
+>>> +	} else {
+>>> +		/* Always write ICH_HCR_EL2 to enable trapping */
+>> "always" is a bit weird as this is conditional
+> 
+> Ah, true. How about:
+> 		/*
+>                  * If we don't have any interrupt to inject, but that
+> 		 * trapping is enabled, write the ICH_HCR_EL2 config.
+> 		 */
+yes thanks
+> 
+>>> +		if (static_branch_unlikely(&vgic_v3_cpuif_trap))
+>>> +			write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
+>> and same question here. Why don't we always restore the ICH_HCR_EL2.
+>> Assuming when exiting the guest the vCPU I/F was enabled and used_lrs=0,
+> 
+> That case doesn't exist. The only case where we enable the virtual cpuif
+> is when we have something to inject (hence used_lrs != 0).
 
-Thanks
+I got it. Thanks for the explanation.
 
 Eric
 > 
->>> +			*lr_val = val;
->>> +			return i;
->>> +		}
->>> +	}
->>> +
->>> +	*lr_val = ICC_IAR1_EL1_SPURIOUS;
->>> +	return -1;
->>> +}
->>> +
->>>  static int __hyp_text __vgic_v3_get_highest_active_priority(void)
->>>  {
->>>  	u8 nr_pre_bits = vtr_to_nr_pre_bits(read_gicreg(ICH_VTR_EL2));
->>> @@ -490,6 +510,44 @@ static void __hyp_text __vgic_v3_set_active_priority(u8 pre)
->>>  	__vgic_v3_write_ap1rn(val | bit, apr);
->>>  }
+>> when restoring don't we leave the vCPU I/F disabled? I must miss
+>> something but I don't find who is re-enabling the vCPU I/F in that case?
+> 
+> See above. This case shouldn't exist, and is only introduced here for
+> the benefit of the trapping.
+> 
+>>>  	}
 >>>  
->>> +static int __hyp_text __vgic_v3_clear_highest_active_priority(void)
->>> +{
->>> +	u8 nr_pre_bits = vtr_to_nr_pre_bits(read_gicreg(ICH_VTR_EL2));
->>> +	u8 nr_aprs = 1 << (nr_pre_bits - 5);
->> may be worth to introduce a macro to compute the number of APRn regs.
->> This may be more understandable.
-> 
-> Sure, will do.
-> 
->>> +	u32 hap = 0;
->>> +	int i;
->>> +
->>> +	for (i = 0; i < nr_aprs; i++) {
->>> +		u32 ap0, ap1;
->>> +		int c0, c1;
->>> +
->>> +		ap0 = __vgic_v3_read_ap0rn(i);
->>> +		ap1 = __vgic_v3_read_ap1rn(i);
->>> +		if (!ap0 && !ap1) {
->>> +			hap += 32;
->>> +			continue;
->>> +		}
->>> +
->>> +		c0 = ap0 ? __ffs(ap0) : 32;
->>> +		c1 = ap1 ? __ffs(ap1) : 32;
->>> +
->>> +		/* Always clear the LSB, which is the highest priority */
->>> +		if (c0 < c1) {
->>> +			ap0 &= ap0 - 1;
->>> +			__vgic_v3_write_ap0rn(ap0, i);
->>> +			hap += c0;
->>> +		} else {
->>> +			ap1 &= ap1 - 1;
->>> +			__vgic_v3_write_ap1rn(ap1, i);
->>> +			hap += c1;
->>> +		}
->>> +
->>> +		return hap << (8 - nr_pre_bits);
->>> +	}
->>> +
->>> +	return GICv3_IDLE_PRIORITY;
->>> +}
->>> +
->>>  static void __hyp_text __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
->>>  {
->>>  	u64 lr_val;
->>> @@ -526,6 +584,64 @@ static void __hyp_text __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u32 vmcr, int r
->>>  	vcpu_set_reg(vcpu, rt, ICC_IAR1_EL1_SPURIOUS);
->>>  }
+>>>  	/*
+>>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+>>> index 063526443781..547b8374fb64 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-v3.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+>>> @@ -21,6 +21,8 @@
 >>>  
->>> +static void __hyp_text __vgic_v3_clear_active_lr(int lr, u64 lr_val)
->>> +{
->>> +	lr_val &= ~ICH_LR_ACTIVE_BIT;
->>> +	if (lr_val & ICH_LR_HW) {
->>> +		u32 pid;
->> nit: insert a line
-> 
-> OK.
-> 
->>> +		pid = (lr_val & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
->>> +		gic_write_dir(pid);
->>> +	}
+>>>  #include "vgic.h"
+>>>  
+>>> +static bool group1_trap;
 >>> +
->>> +	__gic_v3_set_lr(lr_val, lr);
->>> +}
->>> +
->>> +static void __hyp_text __vgic_v3_bump_eoicount(void)
->>> +{
->>> +	u32 hcr;
->>> +
->>> +	hcr = read_gicreg(ICH_HCR_EL2);
->>> +	hcr += 1 << ICH_HCR_EOIcount_SHIFT;
->>> +	write_gicreg(hcr, ICH_HCR_EL2);
->>> +}
->>> +
->>> +static void __hyp_text __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
->>> +{
->>> +	u32 vid = vcpu_get_reg(vcpu, rt);
->>> +	u64 lr_val;
->>> +	u8 lr_prio, act_prio;
->>> +	int lr, grp;
->>> +
->>> +	grp = __vgic_v3_get_group(vcpu);
->>> +
->>> +	/* Drop priority in any case */
->>> +	act_prio = __vgic_v3_clear_highest_active_priority();
->>> +
->>> +	/* If EOIing an LPI, no deactivate to be performed */
->>> +	if (vid >= VGIC_MIN_LPI)
->>> +		return;
->>> +
->>> +	/* EOImode == 1, nothing to be done here */
->>> +	if (vmcr & ICH_VMCR_EOIM_MASK)
->>> +		return;
->>> +
->>> +	lr = __vgic_v3_find_active_lr(vcpu, vid, &lr_val);
->>> +	if (lr == -1) {
->>> +		__vgic_v3_bump_eoicount();
->>> +		return;
->>> +	}
->>> +
->>> +	lr_prio = (lr_val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
->>> +
->>> +	/* If priorities or group do not match, the guest has fscked-up. */
->>> +	if (grp != !!(lr_val & ICH_LR_GROUP) ||
->>> +	    __vgic_v3_pri_to_pre(lr_prio, vmcr, grp) != act_prio)
->>> +		return;
->>> +
->>> +	/* Let's now perform the deactivation */
->>> +	__vgic_v3_clear_active_lr(lr, lr_val);
->>> +}
->>> +
->>>  static void __hyp_text __vgic_v3_read_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+>>>  void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
 >>>  {
->>>  	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG1_MASK));
->>> @@ -591,6 +707,9 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
->>>  	case SYS_ICC_IAR1_EL1:
->>>  		fn = __vgic_v3_read_iar;
->>>  		break;
->>> +	case SYS_ICC_EOIR1_EL1:
->>> +		fn = __vgic_v3_write_eoir;
->>> +		break;
->>>  	case SYS_ICC_GRPEN1_EL1:
->>>  		if (is_read)
->>>  			fn = __vgic_v3_read_igrpen1;
->>
->> Looks good to me
->>
->> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>>>  	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+>>> @@ -239,6 +241,8 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+>>>  
+>>>  	/* Get the show on the road... */
+>>>  	vgic_v3->vgic_hcr = ICH_HCR_EN;
+>>> +	if (group1_trap)
+>> I don't remember the rationale behind using the bool here and using
+>> static_branch_unlikely in the other cases.
 > 
-> Thanks!
+> That's just the initial config path, before setting the static key.
+> 
+>>
+>> May be good to squash the next patch to understand how group1_trap is set.
+> 
+> Sure, I'll have a look at that.
+> 
+> Thanks,
 > 
 > 	M.
 > 
