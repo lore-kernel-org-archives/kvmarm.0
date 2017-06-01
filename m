@@ -1,91 +1,180 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 00/25] arm64: KVM: Mediate access to GICv3 sysregs at EL2
-Date: Thu,  1 Jun 2017 11:20:52 +0100
-Message-ID: <20170601102117.17750-1-marc.zyngier@arm.com>
+Subject: [PATCH v2 02/25] KVM: arm/arm64: vgic-v3: Add accessors for the ICH_APxRn_EL2 registers
+Date: Thu,  1 Jun 2017 11:20:54 +0100
+Message-ID: <20170601102117.17750-3-marc.zyngier@arm.com>
+References: <20170601102117.17750-1-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170601102117.17750-1-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, Robert Richter <rrichter@cavium.com>, Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Some systems have less than perfect GICv3 implementations, leading to
-all kind of ugly issues (guest hanging, host dying). In order to allow
-some level of diagnostic, and in some cases implement workarounds,
-this series enables the trapping of both Group-0, Group-1 and Common
-sysregs. Mediating the access at EL2 allows some form of sanity
-checking that the HW is sometimes sorely lacking.
+As we're about to access the Active Priority registers a lot more,
+let's define accessors that take the register number as a parameter.
 
-Instead of fully emulating a GICv3 CPU interface, we still use the
-existing HW (list registers, AP registers, VMCR...), which allows the
-code to be independent from the rest of the KVM code, and to cope with
-partial trapping.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/hyp/vgic-v3-sr.c | 116 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 100 insertions(+), 16 deletions(-)
 
-Of course, trapping has a cost, which is why this must be either
-enabled on the command line, or selected by another cpu capability
-(see Cavium erratum 30115). A quick test on an A57-based platform
-shows a 25% hit when repeatedly banging on the trapped registers,
-while normal workloads do not seem to suffer noticeably from such
-trapping (hackbench variance is in the usual noise, despite being very
-IPI happy).
-
-This has been tested on a dual socket Thundex-X and a Freescale LS-2085a.
-
-I've taken the liberty to rebase David Daney's initial Cavium erratum
-30115 workaround on top of this series, and included it here as a
-typical use case.
-
-- From v1:
-  * Fix bug in DIR handling which would have performed a deactivation even
-    when EOImode==0
-  * Some minor cleanups and clarifications.
-  * All the initial fixes have already been merged.
-  * Rebased on 4.12-rc3.
-
-David Daney (2):
-  arm64: Add MIDR values for Cavium cn83XX SoCs
-  arm64: Add workaround for Cavium Thunder erratum 30115
-
-Marc Zyngier (23):
-  arm64: Add a facility to turn an ESR syndrome into a sysreg encoding
-  KVM: arm/arm64: vgic-v3: Add accessors for the ICH_APxRn_EL2 registers
-  KVM: arm64: Make kvm_condition_valid32() accessible from EL2
-  KVM: arm64: vgic-v3: Add hook to handle guest GICv3 sysreg accesses at
-    EL2
-  KVM: arm64: vgic-v3: Add ICV_BPR1_EL1 handler
-  KVM: arm64: vgic-v3: Add ICV_IGRPEN1_EL1 handler
-  KVM: arm64: vgic-v3: Add ICV_IAR1_EL1 handler
-  KVM: arm64: vgic-v3: Add ICV_EOIR1_EL1 handler
-  KVM: arm64: vgic-v3: Add ICV_AP1Rn_EL1 handler
-  KVM: arm64: vgic-v3: Add ICV_HPPIR1_EL1 handler
-  KVM: arm64: vgic-v3: Enable trapping of Group-1 system registers
-  KVM: arm64: Enable GICv3 Group-1 sysreg trapping via command-line
-  KVM: arm64: vgic-v3: Add ICV_BPR0_EL1 handler
-  KVM: arm64: vgic-v3: Add ICV_IGNREN0_EL1 handler
-  KVM: arm64: vgic-v3: Add misc Group-0 handlers
-  KVM: arm64: vgic-v3: Enable trapping of Group-0 system registers
-  KVM: arm64: Enable GICv3 Group-0 sysreg trapping via command-line
-  KVM: arm64: vgic-v3: Add ICV_DIR_EL1 handler
-  KVM: arm64: vgic-v3: Add ICV_RPR_EL1 handler
-  KVM: arm64: vgic-v3: Add ICV_CTLR_EL1 handler
-  KVM: arm64: vgic-v3: Add ICV_PMR_EL1 handler
-  KVM: arm64: Enable GICv3 common sysreg trapping via command-line
-  KVM: arm64: vgic-v3: Log which GICv3 system registers are trapped
-
- Documentation/arm64/silicon-errata.txt |   1 +
- arch/arm64/Kconfig                     |  11 +
- arch/arm64/include/asm/cpucaps.h       |   3 +-
- arch/arm64/include/asm/cputype.h       |   2 +
- arch/arm64/include/asm/esr.h           |  24 +
- arch/arm64/include/asm/kvm_hyp.h       |   1 +
- arch/arm64/include/asm/sysreg.h        |   9 +
- arch/arm64/kernel/cpu_errata.c         |  21 +
- arch/arm64/kvm/hyp/switch.c            |  14 +
- include/kvm/arm_vgic.h                 |   1 +
- include/linux/irqchip/arm-gic-v3.h     |   6 +
- virt/kvm/arm/aarch32.c                 |   2 +-
- virt/kvm/arm/hyp/vgic-v3-sr.c          | 803 ++++++++++++++++++++++++++++++++-
- virt/kvm/arm/vgic/vgic-v3.c            |  45 ++
- 14 files changed, 925 insertions(+), 18 deletions(-)
-
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index 32c3295929b0..990d9d1e85d0 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -118,6 +118,90 @@ static void __hyp_text __gic_v3_set_lr(u64 val, int lr)
+ 	}
+ }
+ 
++static void __hyp_text __vgic_v3_write_ap0rn(u32 val, int n)
++{
++	switch (n) {
++	case 0:
++		write_gicreg(val, ICH_AP0R0_EL2);
++		break;
++	case 1:
++		write_gicreg(val, ICH_AP0R1_EL2);
++		break;
++	case 2:
++		write_gicreg(val, ICH_AP0R2_EL2);
++		break;
++	case 3:
++		write_gicreg(val, ICH_AP0R3_EL2);
++		break;
++	}
++}
++
++static void __hyp_text __vgic_v3_write_ap1rn(u32 val, int n)
++{
++	switch (n) {
++	case 0:
++		write_gicreg(val, ICH_AP1R0_EL2);
++		break;
++	case 1:
++		write_gicreg(val, ICH_AP1R1_EL2);
++		break;
++	case 2:
++		write_gicreg(val, ICH_AP1R2_EL2);
++		break;
++	case 3:
++		write_gicreg(val, ICH_AP1R3_EL2);
++		break;
++	}
++}
++
++static u32 __hyp_text __vgic_v3_read_ap0rn(int n)
++{
++	u32 val;
++
++	switch (n) {
++	case 0:
++		val = read_gicreg(ICH_AP0R0_EL2);
++		break;
++	case 1:
++		val = read_gicreg(ICH_AP0R1_EL2);
++		break;
++	case 2:
++		val = read_gicreg(ICH_AP0R2_EL2);
++		break;
++	case 3:
++		val = read_gicreg(ICH_AP0R3_EL2);
++		break;
++	default:
++		unreachable();
++	}
++
++	return val;
++}
++
++static u32 __hyp_text __vgic_v3_read_ap1rn(int n)
++{
++	u32 val;
++
++	switch (n) {
++	case 0:
++		val = read_gicreg(ICH_AP1R0_EL2);
++		break;
++	case 1:
++		val = read_gicreg(ICH_AP1R1_EL2);
++		break;
++	case 2:
++		val = read_gicreg(ICH_AP1R2_EL2);
++		break;
++	case 3:
++		val = read_gicreg(ICH_AP1R3_EL2);
++		break;
++	default:
++		unreachable();
++	}
++
++	return val;
++}
++
+ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+@@ -154,22 +238,22 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 
+ 		switch (nr_pre_bits) {
+ 		case 7:
+-			cpu_if->vgic_ap0r[3] = read_gicreg(ICH_AP0R3_EL2);
+-			cpu_if->vgic_ap0r[2] = read_gicreg(ICH_AP0R2_EL2);
++			cpu_if->vgic_ap0r[3] = __vgic_v3_read_ap0rn(3);
++			cpu_if->vgic_ap0r[2] = __vgic_v3_read_ap0rn(2);
+ 		case 6:
+-			cpu_if->vgic_ap0r[1] = read_gicreg(ICH_AP0R1_EL2);
++			cpu_if->vgic_ap0r[1] = __vgic_v3_read_ap0rn(1);
+ 		default:
+-			cpu_if->vgic_ap0r[0] = read_gicreg(ICH_AP0R0_EL2);
++			cpu_if->vgic_ap0r[0] = __vgic_v3_read_ap0rn(0);
+ 		}
+ 
+ 		switch (nr_pre_bits) {
+ 		case 7:
+-			cpu_if->vgic_ap1r[3] = read_gicreg(ICH_AP1R3_EL2);
+-			cpu_if->vgic_ap1r[2] = read_gicreg(ICH_AP1R2_EL2);
++			cpu_if->vgic_ap1r[3] = __vgic_v3_read_ap1rn(3);
++			cpu_if->vgic_ap1r[2] = __vgic_v3_read_ap1rn(2);
+ 		case 6:
+-			cpu_if->vgic_ap1r[1] = read_gicreg(ICH_AP1R1_EL2);
++			cpu_if->vgic_ap1r[1] = __vgic_v3_read_ap1rn(1);
+ 		default:
+-			cpu_if->vgic_ap1r[0] = read_gicreg(ICH_AP1R0_EL2);
++			cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
+ 		}
+ 	} else {
+ 		cpu_if->vgic_elrsr = 0xffff;
+@@ -224,22 +308,22 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 
+ 		switch (nr_pre_bits) {
+ 		case 7:
+-			write_gicreg(cpu_if->vgic_ap0r[3], ICH_AP0R3_EL2);
+-			write_gicreg(cpu_if->vgic_ap0r[2], ICH_AP0R2_EL2);
++			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[3], 3);
++			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[2], 2);
+ 		case 6:
+-			write_gicreg(cpu_if->vgic_ap0r[1], ICH_AP0R1_EL2);
++			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[1], 1);
+ 		default:
+-			write_gicreg(cpu_if->vgic_ap0r[0], ICH_AP0R0_EL2);
++			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[0], 0);
+ 		}
+ 
+ 		switch (nr_pre_bits) {
+ 		case 7:
+-			write_gicreg(cpu_if->vgic_ap1r[3], ICH_AP1R3_EL2);
+-			write_gicreg(cpu_if->vgic_ap1r[2], ICH_AP1R2_EL2);
++			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[3], 3);
++			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[2], 2);
+ 		case 6:
+-			write_gicreg(cpu_if->vgic_ap1r[1], ICH_AP1R1_EL2);
++			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[1], 1);
+ 		default:
+-			write_gicreg(cpu_if->vgic_ap1r[0], ICH_AP1R0_EL2);
++			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[0], 0);
+ 		}
+ 
+ 		for (i = 0; i < used_lrs; i++)
 -- 
 2.11.0
