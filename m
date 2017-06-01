@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 17/25] KVM: arm64: Enable GICv3 Group-0 sysreg trapping via
- command-line
-Date: Thu,  1 Jun 2017 11:21:09 +0100
-Message-ID: <20170601102117.17750-18-marc.zyngier@arm.com>
+Subject: [PATCH v2 20/25] KVM: arm64: vgic-v3: Add ICV_DIR_EL1 handler
+Date: Thu,  1 Jun 2017 11:21:12 +0100
+Message-ID: <20170601102117.17750-21-marc.zyngier@arm.com>
 References: <20170601102117.17750-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2740D40CD4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:18:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E57A40BBC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:18:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0CsHKR5VqXng for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Jun 2017 06:18:03 -0400 (EDT)
+ with ESMTP id kDUsXgFL6duC for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Jun 2017 06:18:06 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 371DC40CA1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:18:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 938D540D1A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:18:06 -0400 (EDT)
 In-Reply-To: <20170601102117.17750-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,31 +31,59 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we're able to safely handle Group-0 sysreg access, let's
-give the user the opportunity to enable it by passing a specific
-command-line option (vgic_v3.group0_trap).
+Add a handler for writing the guest's view of the ICC_DIR_EL1
+register, performing the deactivation of an interrupt if EOImode
+is set ot 1.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-v3.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ virt/kvm/arm/hyp/vgic-v3-sr.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 7525216ef988..1486ce25edcb 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -419,6 +419,12 @@ int vgic_v3_map_resources(struct kvm *kvm)
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index 5ff788d308ee..b86a0776c407 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -634,6 +634,30 @@ static void __hyp_text __vgic_v3_bump_eoicount(void)
+ 	write_gicreg(hcr, ICH_HCR_EL2);
+ }
  
- DEFINE_STATIC_KEY_FALSE(vgic_v3_cpuif_trap);
- 
-+static int __init early_group0_trap_cfg(char *buf)
++static void __hyp_text __vgic_v3_write_dir(struct kvm_vcpu *vcpu,
++					   u32 vmcr, int rt)
 +{
-+	return strtobool(buf, &group0_trap);
-+}
-+early_param("vgic_v3.group0_trap", early_group0_trap_cfg);
++	u32 vid = vcpu_get_reg(vcpu, rt);
++	u64 lr_val;
++	int lr;
 +
- static int __init early_group1_trap_cfg(char *buf)
++	/* EOImode == 0, nothing to be done here */
++	if (!(vmcr & ICH_VMCR_EOIM_MASK))
++		return;
++
++	/* No deactivate to be performed on an LPI */
++	if (vid >= VGIC_MIN_LPI)
++		return;
++
++	lr = __vgic_v3_find_active_lr(vcpu, vid, &lr_val);
++	if (lr == -1) {
++		__vgic_v3_bump_eoicount();
++		return;
++	}
++
++	__vgic_v3_clear_active_lr(lr, lr_val);
++}
++
+ static void __hyp_text __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
  {
- 	return strtobool(buf, &group1_trap);
+ 	u32 vid = vcpu_get_reg(vcpu, rt);
+@@ -936,6 +960,9 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 		else
+ 			fn = __vgic_v3_write_bpr0;
+ 		break;
++	case SYS_ICC_DIR_EL1:
++		fn = __vgic_v3_write_dir;
++		break;
+ 	default:
+ 		return 0;
+ 	}
 -- 
 2.11.0
