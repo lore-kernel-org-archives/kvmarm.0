@@ -1,7 +1,7 @@
 From: Christoffer Dall <cdall@linaro.org>
 Subject: Re: [PATCH v4 06/11] KVM: arm/arm64: use vcpu requests for power_off
-Date: Thu, 1 Jun 2017 12:35:12 +0200
-Message-ID: <20170601103512.GE20919@cbox>
+Date: Thu, 1 Jun 2017 12:35:17 +0200
+Message-ID: <20170601103517.GF20919@cbox>
 References: <20170516022035.7674-1-drjones@redhat.com>
  <20170516022035.7674-7-drjones@redhat.com>
 Mime-Version: 1.0
@@ -9,18 +9,17 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E25940430
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:31:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EAFA40C50
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:31:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 78PtkEycAmwJ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Jun 2017 06:31:31 -0400 (EDT)
-Received: from mail-lf0-f41.google.com (mail-lf0-f41.google.com
- [209.85.215.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D52F40C47
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:31:30 -0400 (EDT)
-Received: by mail-lf0-f41.google.com with SMTP id c184so19186653lfe.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Jun 2017 03:35:27 -0700 (PDT)
+ with ESMTP id LxRnlZYdSqPC for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Jun 2017 06:31:35 -0400 (EDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B5E5F40905
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:31:35 -0400 (EDT)
+Received: by mail-wm0-f44.google.com with SMTP id b84so152869568wmh.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Jun 2017 03:35:32 -0700 (PDT)
 Content-Disposition: inline
 In-Reply-To: <20170516022035.7674-7-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
