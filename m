@@ -1,221 +1,180 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 1/9] KVM: arm64: Allow creating the PMU without the
- in-kernel GIC
-Date: Thu, 1 Jun 2017 12:53:49 +0200
-Message-ID: <20170601105349.GJ20919@cbox>
-References: <20170516184556.26785-1-cdall@linaro.org>
- <20170516184556.26785-2-cdall@linaro.org>
- <51d0d9eb-3e72-2f37-3fac-89de28cea91b@arm.com>
- <20170524083805.GA7991@cbox>
- <4cf8f05e-1af1-eaed-151f-54e7a60d7b63@arm.com>
- <20170524114534.GB7991@cbox>
- <aa9a9339-0850-d4e2-0814-60437f4673bc@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v4 09/11] KVM: arm/arm64: use vcpu requests for irq
+ injection
+Date: Thu, 1 Jun 2017 12:59:21 +0200
+Message-ID: <20170601105921.ggkuxft6nb32yio5@kamzik.brq.redhat.com>
+References: <20170516022035.7674-1-drjones@redhat.com>
+ <20170516022035.7674-10-drjones@redhat.com>
+ <20170601103533.GI20919@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <aa9a9339-0850-d4e2-0814-60437f4673bc@arm.com>
+In-Reply-To: <20170601103533.GI20919@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Alexander Graf <agraf@suse.de>
+To: Christoffer Dall <cdall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 24, 2017 at 05:37:03PM +0100, Marc Zyngier wrote:
-> On 24/05/17 12:45, Christoffer Dall wrote:
-> > On Wed, May 24, 2017 at 10:16:56AM +0100, Marc Zyngier wrote:
-> >> On 24/05/17 09:38, Christoffer Dall wrote:
-> >>> On Tue, May 23, 2017 at 05:52:01PM +0100, Marc Zyngier wrote:
-> >>>> On 16/05/17 19:45, Christoffer Dall wrote:
-> >>>>> Since we got support for devices in userspace which allows reporting the
-> >>>>> PMU overflow output status to userspace, we should actually allow
-> >>>>> creating the PMU on systems without an in-kernel irqchip, which in turn
-> >>>>> requires us to slightly clarify error codes for the ABI and move things
-> >>>>> around for the initialization phase.
-> >>>>>
-> >>>>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> >>>>> ---
-> >>>>>  Documentation/virtual/kvm/devices/vcpu.txt | 16 +++++++++-------
-> >>>>>  virt/kvm/arm/pmu.c                         | 30 ++++++++++++++++++++----------
-> >>>>>  2 files changed, 29 insertions(+), 17 deletions(-)
-> >>>>>
-> >>>>> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
-> >>>>> index 02f5068..352af6e 100644
-> >>>>> --- a/Documentation/virtual/kvm/devices/vcpu.txt
-> >>>>> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
-> >>>>> @@ -16,7 +16,9 @@ Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt is a
-> >>>>>  Returns: -EBUSY: The PMU overflow interrupt is already set
-> >>>>>           -ENXIO: The overflow interrupt not set when attempting to get it
-> >>>>>           -ENODEV: PMUv3 not supported
-> >>>>> -         -EINVAL: Invalid PMU overflow interrupt number supplied
-> >>>>> +         -EINVAL: Invalid PMU overflow interrupt number supplied or
-> >>>>> +                  trying to set the IRQ number without using an in-kernel
-> >>>>> +                  irqchip.
-> >>>>>  
-> >>>>>  A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
-> >>>>>  number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
-> >>>>> @@ -25,11 +27,11 @@ all vcpus, while as an SPI it must be a separate number per vcpu.
-> >>>>>  
-> >>>>>  1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
-> >>>>>  Parameters: no additional parameter in kvm_device_attr.addr
-> >>>>> -Returns: -ENODEV: PMUv3 not supported
-> >>>>> -         -ENXIO: PMUv3 not properly configured as required prior to calling this
-> >>>>> -                 attribute
-> >>>>> +Returns: -ENODEV: PMUv3 not supported or GIC not initialized
-> >>>>> +         -ENXIO: PMUv3 not properly configured or in-kernel irqchip not
-> >>>>> +                 conigured as required prior to calling this attribute
-> >>>>
-> >>>>                     configured
-> >>>>
-> >>>>>           -EBUSY: PMUv3 already initialized
-> >>>>>  
-> >>>>> -Request the initialization of the PMUv3.  This must be done after creating the
-> >>>>> -in-kernel irqchip.  Creating a PMU with a userspace irqchip is currently not
-> >>>>> -supported.
-> >>>>> +Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
-> >>>>> +virtual GIC implementation, this must be done after initializing the in-kernel
-> >>>>> +irqchip.
-> >>>>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> >>>>> index 4b43e7f..7209185 100644
-> >>>>> --- a/virt/kvm/arm/pmu.c
-> >>>>> +++ b/virt/kvm/arm/pmu.c
-> >>>>> @@ -456,21 +456,25 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
-> >>>>>  	if (!kvm_arm_support_pmu_v3())
-> >>>>>  		return -ENODEV;
-> >>>>>  
-> >>>>> -	/*
-> >>>>> -	 * We currently require an in-kernel VGIC to use the PMU emulation,
-> >>>>> -	 * because we do not support forwarding PMU overflow interrupts to
-> >>>>> -	 * userspace yet.
-> >>>>> -	 */
-> >>>>> -	if (!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))
-> >>>>> -		return -ENODEV;
-> >>>>> -
-> >>>>> -	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features) ||
-> >>>>> -	    !kvm_arm_pmu_irq_initialized(vcpu))
-> >>>>> +	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
-> >>>>>  		return -ENXIO;
-> >>>>>  
-> >>>>>  	if (kvm_arm_pmu_v3_ready(vcpu))
-> >>>>>  		return -EBUSY;
-> >>>>>  
-> >>>>> +	if (irqchip_in_kernel(vcpu->kvm)) {
-> >>>>> +		/*
-> >>>>> +		 * If using the PMU with an in-kernel virtual GIC
-> >>>>> +		 * implementation, we require the GIC to be already
-> >>>>> +		 * initialized when initializing the PMU.
-> >>>>> +		 */
-> >>>>> +		if (!vgic_initialized(vcpu->kvm))
-> >>>>> +			return -ENODEV;
-> >>>>> +
-> >>>>> +		if (!kvm_arm_pmu_irq_initialized(vcpu))
-> >>>>> +			return -ENXIO;
-> >>>>> +	}
-> >>>>> +
-> >>>>
-> >>>> Do we also need to prevent a vgic to be created if the PMU has been
-> >>>> initialized beforehand?
-> >>>>
-> >>>
-> >>> Sigh.  We probably have to.
-> >>>
-> >>> I don't like having a cross-VGIC-PMU check, but we could do something
-> >>> like setting a flag on the kvm struct so that irqchip_in_user() always
-> >>> return true, and if that is set, it is not possible to create the VGIC.
-> >>>
-> >>> Alternatively we can make the PMU init a no-op, and try to enable it via
-> >>> the first-vcpu-run path, like the timer, and check that everything lines
-> >>> up then (i.e. you have in-kernel irqchip with a non-conflicting irq
-> >>> number or you have a userspace irqchip).
-> >>
-> >> I like this second solution better, as it gives us a common approach to
-> >> similar problems.
+On Thu, Jun 01, 2017 at 12:35:33PM +0200, Christoffer Dall wrote:
+> On Tue, May 16, 2017 at 04:20:33AM +0200, Andrew Jones wrote:
+> > Don't use request-less VCPU kicks when injecting IRQs, as a VCPU
+> > kick meant to trigger the interrupt injection could be sent while
+> > the VCPU is outside guest mode, which means no IPI is sent, and
+> > after it has called kvm_vgic_flush_hwstate(), meaning it won't see
+> > the updated GIC state until its next exit some time later for some
+> > other reason.  The receiving VCPU only needs to check this request
+> > in VCPU RUN to handle it.  By checking it, if it's pending, a
+> > memory barrier will be issued that ensures all state is visible.
+> > We still create a vcpu_req_irq_pending() function (which is a nop),
+> > though, in order to allow us to use the standard request checking
+> > pattern.
 > > 
-> > Yes, but on the other hand it's a bit like the lazy init stuff, where we
-> > defer things to happen at some point in time, and the whole PMU init
-> > thing was to avoid that.  On the first hand, it seems to work well for
-> > lots of things, so why not...
-> 
-> The main problem is that we now have lots of things that can be
-> configured in arbitrary orders. We can either check the consistency of
-> the current configuration at each step, or delay it until we are ready
-> to run, and then check everything in one go.
-> 
-> Overall, this is the same set of checks. We just need to decide which
-> way we want to go, and stick with it. Which is of course easier said
-> than done... ;-)
-> 
-
-Coming back to this, I agree with you, that we should check things when
-we first start running.
-
-Raising an error when trying to do something is slightly more user
-friendly (you have a better hint of where the error comes from), but I'm
-not convinced we already have that info at hand.
-
-I think at this point we just have to make sure everything is consistent
-before we run the VM.
-
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  arch/arm/include/asm/kvm_host.h   |  1 +
+> >  arch/arm64/include/asm/kvm_host.h |  1 +
+> >  virt/kvm/arm/arm.c                | 12 ++++++++++++
+> >  virt/kvm/arm/vgic/vgic.c          |  9 +++++++--
+> >  4 files changed, 21 insertions(+), 2 deletions(-)
 > > 
-> >> Would that also help with not having to implement the
-> >> allocator you introduced in patches 6-9 (which I haven't reviewed yet)?
-> >>
+> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> > index fdd644c01c89..00ad56ee6455 100644
+> > --- a/arch/arm/include/asm/kvm_host.h
+> > +++ b/arch/arm/include/asm/kvm_host.h
+> > @@ -46,6 +46,7 @@
+> >  
+> >  #define KVM_REQ_SLEEP \
+> >  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> > +#define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+> >  
+> >  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+> >  int __attribute_const__ kvm_target_cpu(void);
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 9bd0d1040de9..0c4fd1f46e10 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -43,6 +43,7 @@
+> >  
+> >  #define KVM_REQ_SLEEP \
+> >  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> > +#define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+> >  
+> >  int __attribute_const__ kvm_target_cpu(void);
+> >  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > index ddc833987dfb..73a75ca91e41 100644
+> > --- a/virt/kvm/arm/arm.c
+> > +++ b/virt/kvm/arm/arm.c
+> > @@ -570,6 +570,15 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+> >  	}
+> >  }
+> >  
+> > +static void vcpu_req_irq_pending(struct kvm_vcpu *vcpu)
+> > +{
+> > +	/*
+> > +	 * Nothing to do here. kvm_check_request() already issued a memory
+> > +	 * barrier that pairs with kvm_make_request(), so all hardware state
+> > +	 * we need to flush should now be visible.
+> > +	 */
+> 
+> I don't understand this comment :(
+
+We need a kvm_check_request() to pair with a requesting VCPU's setting
+of virtual irq state and call of kvm_make_request(). The requester's
+kvm_make_request() ensures the target VCPU executes VCPU RUN, and the
+barriers wrapped in kvm_check/make_request() ensure that when VCPU RUN
+calls kvm_vgic_flush_hwstate() that the virtual irq state set by the
+requester is visible to the target VCPU.
+
+But you knew all that already :-) So, maybe I just need to replace
+'all hardware state we need to flush should now be visible.' with
+'the virtual irq state is now visible.'?
+
+> 
+> And I don't much like this empty function either.
+> 
+> 
+> > +}
+> > +
+> >  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+> >  {
+> >  	return vcpu->arch.target >= 0;
+> > @@ -580,6 +589,8 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+> >  	if (kvm_request_pending(vcpu)) {
+> >  		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+> >  			vcpu_req_sleep(vcpu);
+> > +		if (kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu))
+> > +			vcpu_req_irq_pending(vcpu);
+> 
+> 
+> Can we just do:
+> 		/* 
+> 		 * Clear IRQ_PENDING requests that were made to
+> 		 * guarantee that a VCPU sees new virtual interrupts.
+> 		 */
+> 		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
+> 
+> ?
+
+I won't insist, but I prefer the empty function to breaking the pattern
+of this if-sequence, and also to the calling of a function named "check"
+without considering its return value.
+
+> 
+> >  	}
+> >  }
+> >  
+> > @@ -771,6 +782,7 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
+> >  	 * trigger a world-switch round on the running physical CPU to set the
+> >  	 * virtual IRQ/FIQ fields in the HCR appropriately.
+> >  	 */
+> > +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> >  	kvm_vcpu_kick(vcpu);
+> >  
+> >  	return 0;
+> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> > index aea080a2c443..c66feaca2a5d 100644
+> > --- a/virt/kvm/arm/vgic/vgic.c
+> > +++ b/virt/kvm/arm/vgic/vgic.c
+> > @@ -286,8 +286,10 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
+> >  		 * won't see this one until it exits for some other
+> >  		 * reason.
+> >  		 */
+> > -		if (vcpu)
+> > +		if (vcpu) {
+> > +			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> >  			kvm_vcpu_kick(vcpu);
+> > +		}
+> >  		return false;
+> >  	}
+> >  
+> > @@ -333,6 +335,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
+> >  	spin_unlock(&irq->irq_lock);
+> >  	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+> >  
+> > +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> >  	kvm_vcpu_kick(vcpu);
+> >  
+> >  	return true;
+> > @@ -722,8 +725,10 @@ void vgic_kick_vcpus(struct kvm *kvm)
+> >  	 * a good kick...
+> >  	 */
+> >  	kvm_for_each_vcpu(c, vcpu, kvm) {
+> > -		if (kvm_vgic_vcpu_pending_irq(vcpu))
+> > +		if (kvm_vgic_vcpu_pending_irq(vcpu)) {
+> > +			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> >  			kvm_vcpu_kick(vcpu);
+> > +		}
+> >  	}
+> >  }
+> >  
+> > -- 
+> > 2.9.3
 > > 
-> > Not really.  I mean, we could add some cross calls between the timer and
-> > PMU code, but I think that's fairly disgusting, and it doesn't prevent
-> > userspace from fiddling with an interrupt signal used in the kernel
-> > anyway.
-> > 
-> > With patchs 6-9, I feel like we should take one of two overall stands;
-> > either we don't care that userspace can wire things up share an
-> > interrupt line, even with in-kernel driven devices, as it would be the
-> > equivalent of putting an OR gate before the GIC in hardware (not that I
-> > recommend anyone doing that), or we should implement the full story and
-> > prevent userspace from ever shooting itself in the foot.
+> Otherwise:
 > 
-> Having had a quick look at 6-9, I'm hesitant (again). On one hand, the
-> each patch is fairly simple and not very invasive, but on the other
-> hand, the result is a tiny bit ugly (all these "owner" parameters passed
-> around).
+> Reviewed-by: Christoffer Dall <cdall@linaro.org>
 
-I'm open to sugestions on how to make it more clean.
-
-> 
-> So the real question is still: does anything break on the host if
-> userspace configures something in a nonsensical way? My main concern is
-> the effect of having the virtual PMU sharing a line with the virtual
-> timer, which has the HW bit set. So let's assume that for a minute:
-> 
-> - PMU interrupt is asserted
-> - Timer interrupt is not asserted
-> - We inject the shared intid with the HW bit set, and the hwintid of the
-> virtual timer.
-> - We do *not* set the active bit on the redistributor (because the timer
-> code has noticed we don't need to)
-> 
-> When the guest does EOI the interrupt, it will propagate into the
-> physical distributor, and deactivate... I don't know what, since we
-> don't have an active interrupt there.
-
-I believe the spec explicitly says that this is a programming error and
-that OS code should never allow this.
-
-> 
-> Things become even uglier if the timer fires between the activation of
-> the virtual interrupt and its EOI. The PMU interrupt EOI ends up
-> deactivating the timer on the physical distributor, leading to the timer
-> firing again... At that stage, I think things get pretty bad, as we've
-> lost track of the state.
-
-Yeah, not nice.
-
-I think this interaction also can happen if we let userspace set the
-timer irq state using KVM_IRQ_LINE (as we already do), right?
-
-> 
-> That being said, I don't think we break anything on the host, but the
-> above seem disturbing enough that we don't want to let it happen. So I
-> guess that patches 6-9 are actually required.
-
-I agree, I think we need it, unfortunately.
-
--Christoffer
+Thanks,
+drew
