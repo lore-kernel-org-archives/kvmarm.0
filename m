@@ -1,26 +1,26 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 05/10] VFIO: pci: Introduce direct EOI INTx interrupt
- handler
-Date: Thu, 1 Jun 2017 22:40:19 +0200
-Message-ID: <ba7d07c1-4349-5c24-ec19-d372ade25432@redhat.com>
-References: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
- <1495656803-28011-6-git-send-email-eric.auger@redhat.com>
- <20170531122419.07e3f26d@w520.home>
+From: David Daney <ddaney@caviumnetworks.com>
+Subject: Re: [PATCH v2 00/25] arm64: KVM: Mediate access to GICv3 sysregs at
+ EL2
+Date: Thu, 1 Jun 2017 14:00:21 -0700
+Message-ID: <7dd609ce-6f7b-2a12-fa06-4ce1c6ba6ebe@caviumnetworks.com>
+References: <20170601102117.17750-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38D1640C58
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 16:36:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C2F9940C4A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 16:56:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0+3tjp2t8K7P for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Jun 2017 16:36:33 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05ACB40625
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 16:36:32 -0400 (EDT)
-In-Reply-To: <20170531122419.07e3f26d@w520.home>
+ with ESMTP id DvMpB9QmIqa8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Jun 2017 16:56:29 -0400 (EDT)
+Received: from NAM02-CY1-obe.outbound.protection.outlook.com
+ (mail-cys01nam02on0072.outbound.protection.outlook.com [104.47.37.72])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7B9F40625
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 16:56:28 -0400 (EDT)
+In-Reply-To: <20170601102117.17750-1-marc.zyngier@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,145 +30,101 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Alex,
-
-On 31/05/2017 20:24, Alex Williamson wrote:
-> On Wed, 24 May 2017 22:13:18 +0200
-> Eric Auger <eric.auger@redhat.com> wrote:
+On 06/01/2017 03:20 AM, Marc Zyngier wrote:
+> Some systems have less than perfect GICv3 implementations, leading to
+> all kind of ugly issues (guest hanging, host dying). In order to allow
+> some level of diagnostic, and in some cases implement workarounds,
+> this series enables the trapping of both Group-0, Group-1 and Common
+> sysregs. Mediating the access at EL2 allows some form of sanity
+> checking that the HW is sometimes sorely lacking.
 > 
->> We add two new fields in vfio_pci_irq_ctx struct: deoi and handler.
->> If deoi is set, this means the physical IRQ attached to the virtual
->> IRQ is directly deactivated by the guest and the VFIO driver does
->> not need to disable the physical IRQ and mask it at VFIO level.
->>
->> The handler pointer is set accordingly and a wrapper handler is
->> introduced that calls the chosen handler function.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> ---
->>  drivers/vfio/pci/vfio_pci_intrs.c   | 32 ++++++++++++++++++++++++++------
->>  drivers/vfio/pci/vfio_pci_private.h |  2 ++
->>  2 files changed, 28 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
->> index d4d377b..06aa713 100644
->> --- a/drivers/vfio/pci/vfio_pci_intrs.c
->> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
->> @@ -121,11 +121,8 @@ void vfio_pci_intx_unmask(struct vfio_pci_device *vdev)
->>  static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
->>  {
->>  	struct vfio_pci_device *vdev = dev_id;
->> -	unsigned long flags;
->>  	int ret = IRQ_NONE;
->>  
->> -	spin_lock_irqsave(&vdev->irqlock, flags);
->> -
->>  	if (!vdev->pci_2_3) {
->>  		disable_irq_nosync(vdev->pdev->irq);
->>  		vdev->ctx[0].automasked = true;
->> @@ -137,14 +134,33 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
->>  		ret = IRQ_HANDLED;
->>  	}
->>  
->> -	spin_unlock_irqrestore(&vdev->irqlock, flags);
->> -
->>  	if (ret == IRQ_HANDLED)
->>  		vfio_send_intx_eventfd(vdev, NULL);
->>  
->>  	return ret;
->>  }
->>  
->> +static irqreturn_t vfio_intx_handler_deoi(int irq, void *dev_id)
->> +{
->> +	struct vfio_pci_device *vdev = dev_id;
->> +
->> +	vfio_send_intx_eventfd(vdev, NULL);
->> +	return IRQ_HANDLED;
->> +}
->> +
->> +static irqreturn_t vfio_intx_wrapper_handler(int irq, void *dev_id)
->> +{
->> +	struct vfio_pci_device *vdev = dev_id;
->> +	unsigned long flags;
->> +	irqreturn_t ret;
->> +
->> +	spin_lock_irqsave(&vdev->irqlock, flags);
->> +	ret = vdev->ctx[0].handler(irq, dev_id);
->> +	spin_unlock_irqrestore(&vdev->irqlock, flags);
->> +
->> +	return ret;
->> +}
->> +
->>  static int vfio_intx_enable(struct vfio_pci_device *vdev)
->>  {
->>  	if (!is_irq_none(vdev))
->> @@ -208,7 +224,11 @@ static int vfio_intx_set_signal(struct vfio_pci_device *vdev, int fd)
->>  	if (!vdev->pci_2_3)
->>  		irqflags = 0;
->>  
->> -	ret = request_irq(pdev->irq, vfio_intx_handler,
->> +	if (vdev->ctx[0].deoi)
->> +		vdev->ctx[0].handler = vfio_intx_handler_deoi;
->> +	else
->> +		vdev->ctx[0].handler = vfio_intx_handler;
->> +	ret = request_irq(pdev->irq, vfio_intx_wrapper_handler,
->>  			  irqflags, vdev->ctx[0].name, vdev);
+> Instead of fully emulating a GICv3 CPU interface, we still use the
+> existing HW (list registers, AP registers, VMCR...), which allows the
+> code to be independent from the rest of the KVM code, and to cope with
+> partial trapping.
 > 
+> Of course, trapping has a cost, which is why this must be either
+> enabled on the command line, or selected by another cpu capability
+> (see Cavium erratum 30115). A quick test on an A57-based platform
+> shows a 25% hit when repeatedly banging on the trapped registers,
+> while normal workloads do not seem to suffer noticeably from such
+> trapping (hackbench variance is in the usual noise, despite being very
+> IPI happy).
 > 
-> Here's where I think we don't account for irqflags properly.  If we get
-> a shared interrupt here, then enabling direct EOI needs to be disabled
-> or else we'll starve other devices sharing the interrupt.  In practice,
-> I wonder if this makes PCI direct EOI a useful feature.  We could try
-> to get an exclusive interrupt and fallback to shared, but any time we
-> get an exclusive interrupt we're more prone to conflicts with other
-> devices.  I might have two VMs that share an interrupt and now it's a
-> race that only the first to setup an IRQ can work.  Worse, one of those
-> VMs might be fully booted and switched to MSI and now it's just a
-> matter of time until they reboot in the right way to generate a
-> conflict.  I might also have two devices in the same VM that share an
-> IRQ and now I can't start the VM at all because the second device can
-> no longer get an interrupt.  This is the same problem we have with the
-> nointxmask flag, it's a useful debugging feature but since the masking
-> is done at the APIC/GIC rather than the device, much like here, it's not
-> very practical for more than debugging and isolating specific devices
-> as requiring APIC/GIC level masking.  I'm not sure how to proceed on the
-> PCI side here. Thanks,
-
-Thanks for the review.
-
-I share you concerns about shared interrupts. I need to spend some
-additional time reading the VFIO code related to those and that part of
-the PCIe spec too.
-
-Maybe we shall introduce the IRQ bypass based DEOI setup only for
-platform devices. I know those are not much used at the moment but this
-at least prepares for GICv4 direct injection.
-
-Thanks
-
-Eric
+> This has been tested on a dual socket Thundex-X and a Freescale LS-2085a.
 > 
-> Alex
+> I've taken the liberty to rebase David Daney's initial Cavium erratum
+> 30115 workaround on top of this series, and included it here as a
+> typical use case.
+
+I pulled this from:
+
+ 
+https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/gicv3-cpuif-mediated-access
+
+this morning at commit	58c1763c5aa6223ab3d04e0c183a31eb0aef832e
+
+Entire series tested by and
+
+Acked-by: David Daney <david.daney@cavium.com>
+
+Thanks again.
+
 > 
->>  	if (ret) {
->>  		vdev->ctx[0].trigger = NULL;
->> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
->> index f7f1101..5cfe59a 100644
->> --- a/drivers/vfio/pci/vfio_pci_private.h
->> +++ b/drivers/vfio/pci/vfio_pci_private.h
->> @@ -36,6 +36,8 @@ struct vfio_pci_irq_ctx {
->>  	char			*name;
->>  	bool			masked;
->>  	bool			automasked;
->> +	bool			deoi;
->> +	irqreturn_t		(*handler)(int irq, void *dev_id);
->>  	struct irq_bypass_producer	producer;
->>  };
->>  
+> - From v1:
+>    * Fix bug in DIR handling which would have performed a deactivation even
+>      when EOImode==0
+>    * Some minor cleanups and clarifications.
+>    * All the initial fixes have already been merged.
+>    * Rebased on 4.12-rc3.
+> 
+> David Daney (2):
+>    arm64: Add MIDR values for Cavium cn83XX SoCs
+>    arm64: Add workaround for Cavium Thunder erratum 30115
+> 
+> Marc Zyngier (23):
+>    arm64: Add a facility to turn an ESR syndrome into a sysreg encoding
+>    KVM: arm/arm64: vgic-v3: Add accessors for the ICH_APxRn_EL2 registers
+>    KVM: arm64: Make kvm_condition_valid32() accessible from EL2
+>    KVM: arm64: vgic-v3: Add hook to handle guest GICv3 sysreg accesses at
+>      EL2
+>    KVM: arm64: vgic-v3: Add ICV_BPR1_EL1 handler
+>    KVM: arm64: vgic-v3: Add ICV_IGRPEN1_EL1 handler
+>    KVM: arm64: vgic-v3: Add ICV_IAR1_EL1 handler
+>    KVM: arm64: vgic-v3: Add ICV_EOIR1_EL1 handler
+>    KVM: arm64: vgic-v3: Add ICV_AP1Rn_EL1 handler
+>    KVM: arm64: vgic-v3: Add ICV_HPPIR1_EL1 handler
+>    KVM: arm64: vgic-v3: Enable trapping of Group-1 system registers
+>    KVM: arm64: Enable GICv3 Group-1 sysreg trapping via command-line
+>    KVM: arm64: vgic-v3: Add ICV_BPR0_EL1 handler
+>    KVM: arm64: vgic-v3: Add ICV_IGNREN0_EL1 handler
+>    KVM: arm64: vgic-v3: Add misc Group-0 handlers
+>    KVM: arm64: vgic-v3: Enable trapping of Group-0 system registers
+>    KVM: arm64: Enable GICv3 Group-0 sysreg trapping via command-line
+>    KVM: arm64: vgic-v3: Add ICV_DIR_EL1 handler
+>    KVM: arm64: vgic-v3: Add ICV_RPR_EL1 handler
+>    KVM: arm64: vgic-v3: Add ICV_CTLR_EL1 handler
+>    KVM: arm64: vgic-v3: Add ICV_PMR_EL1 handler
+>    KVM: arm64: Enable GICv3 common sysreg trapping via command-line
+>    KVM: arm64: vgic-v3: Log which GICv3 system registers are trapped
+> 
+>   Documentation/arm64/silicon-errata.txt |   1 +
+>   arch/arm64/Kconfig                     |  11 +
+>   arch/arm64/include/asm/cpucaps.h       |   3 +-
+>   arch/arm64/include/asm/cputype.h       |   2 +
+>   arch/arm64/include/asm/esr.h           |  24 +
+>   arch/arm64/include/asm/kvm_hyp.h       |   1 +
+>   arch/arm64/include/asm/sysreg.h        |   9 +
+>   arch/arm64/kernel/cpu_errata.c         |  21 +
+>   arch/arm64/kvm/hyp/switch.c            |  14 +
+>   include/kvm/arm_vgic.h                 |   1 +
+>   include/linux/irqchip/arm-gic-v3.h     |   6 +
+>   virt/kvm/arm/aarch32.c                 |   2 +-
+>   virt/kvm/arm/hyp/vgic-v3-sr.c          | 803 ++++++++++++++++++++++++++++++++-
+>   virt/kvm/arm/vgic/vgic-v3.c            |  45 ++
+>   14 files changed, 925 insertions(+), 18 deletions(-)
 > 
