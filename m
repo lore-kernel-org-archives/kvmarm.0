@@ -1,172 +1,201 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 09/11] KVM: arm/arm64: use vcpu requests for irq
- injection
-Date: Thu, 1 Jun 2017 15:53:05 +0200
-Message-ID: <20170601135305.GM20919@cbox>
-References: <20170516022035.7674-1-drjones@redhat.com>
- <20170516022035.7674-10-drjones@redhat.com>
- <20170601103533.GI20919@cbox>
- <20170601105921.ggkuxft6nb32yio5@kamzik.brq.redhat.com>
- <20170601132716.GL20919@cbox>
- <20170601133843.qvzz6pvfmgasghx7@kamzik.brq.redhat.com>
+From: Bandan Das <bsd@redhat.com>
+Subject: Re: [RFC 07/55] KVM: arm/arm64: Add virtual EL2 state emulation framework
+Date: Thu, 01 Jun 2017 16:05:49 -0400
+Message-ID: <jpg37bj1nj6.fsf@linux.bootlegged.copy>
+References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
+        <1483943091-1364-8-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 96D4040296
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 09:49:26 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QTYMWlPvPV0y for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Jun 2017 09:49:25 -0400 (EDT)
-Received: from mail-lf0-f45.google.com (mail-lf0-f45.google.com
- [209.85.215.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E737540064
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 09:49:24 -0400 (EDT)
-Received: by mail-lf0-f45.google.com with SMTP id a136so12602448lfa.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Jun 2017 06:53:21 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170601133843.qvzz6pvfmgasghx7@kamzik.brq.redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1483943091-1364-8-git-send-email-jintack@cs.columbia.edu>
+        (Jintack Lim's message of "Mon, 9 Jan 2017 01:24:03 -0500")
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, vladimir.murzin@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, andre.przywara@arm.com, eric.auger@redhat.com, anna-maria@linutronix.de, shihwei@cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jun 01, 2017 at 03:38:43PM +0200, Andrew Jones wrote:
-> On Thu, Jun 01, 2017 at 03:27:16PM +0200, Christoffer Dall wrote:
-> > On Thu, Jun 01, 2017 at 12:59:21PM +0200, Andrew Jones wrote:
-> > > On Thu, Jun 01, 2017 at 12:35:33PM +0200, Christoffer Dall wrote:
-> > > > On Tue, May 16, 2017 at 04:20:33AM +0200, Andrew Jones wrote:
-> > > > > Don't use request-less VCPU kicks when injecting IRQs, as a VCPU
-> > > > > kick meant to trigger the interrupt injection could be sent while
-> > > > > the VCPU is outside guest mode, which means no IPI is sent, and
-> > > > > after it has called kvm_vgic_flush_hwstate(), meaning it won't see
-> > > > > the updated GIC state until its next exit some time later for some
-> > > > > other reason.  The receiving VCPU only needs to check this request
-> > > > > in VCPU RUN to handle it.  By checking it, if it's pending, a
-> > > > > memory barrier will be issued that ensures all state is visible.
-> > > > > We still create a vcpu_req_irq_pending() function (which is a nop),
-> > > > > though, in order to allow us to use the standard request checking
-> > > > > pattern.
-> > > > > 
-> > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > > ---
-> > > > >  arch/arm/include/asm/kvm_host.h   |  1 +
-> > > > >  arch/arm64/include/asm/kvm_host.h |  1 +
-> > > > >  virt/kvm/arm/arm.c                | 12 ++++++++++++
-> > > > >  virt/kvm/arm/vgic/vgic.c          |  9 +++++++--
-> > > > >  4 files changed, 21 insertions(+), 2 deletions(-)
-> > > > > 
-> > > > > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> > > > > index fdd644c01c89..00ad56ee6455 100644
-> > > > > --- a/arch/arm/include/asm/kvm_host.h
-> > > > > +++ b/arch/arm/include/asm/kvm_host.h
-> > > > > @@ -46,6 +46,7 @@
-> > > > >  
-> > > > >  #define KVM_REQ_SLEEP \
-> > > > >  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> > > > > +#define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
-> > > > >  
-> > > > >  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
-> > > > >  int __attribute_const__ kvm_target_cpu(void);
-> > > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > > > index 9bd0d1040de9..0c4fd1f46e10 100644
-> > > > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > > > @@ -43,6 +43,7 @@
-> > > > >  
-> > > > >  #define KVM_REQ_SLEEP \
-> > > > >  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> > > > > +#define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
-> > > > >  
-> > > > >  int __attribute_const__ kvm_target_cpu(void);
-> > > > >  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-> > > > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > > > > index ddc833987dfb..73a75ca91e41 100644
-> > > > > --- a/virt/kvm/arm/arm.c
-> > > > > +++ b/virt/kvm/arm/arm.c
-> > > > > @@ -570,6 +570,15 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
-> > > > >  	}
-> > > > >  }
-> > > > >  
-> > > > > +static void vcpu_req_irq_pending(struct kvm_vcpu *vcpu)
-> > > > > +{
-> > > > > +	/*
-> > > > > +	 * Nothing to do here. kvm_check_request() already issued a memory
-> > > > > +	 * barrier that pairs with kvm_make_request(), so all hardware state
-> > > > > +	 * we need to flush should now be visible.
-> > > > > +	 */
-> > > > 
-> > > > I don't understand this comment :(
-> > > 
-> > > We need a kvm_check_request() to pair with a requesting VCPU's setting
-> > > of virtual irq state and call of kvm_make_request(). The requester's
-> > > kvm_make_request() ensures the target VCPU executes VCPU RUN, and the
-> > > barriers wrapped in kvm_check/make_request() ensure that when VCPU RUN
-> > > calls kvm_vgic_flush_hwstate() that the virtual irq state set by the
-> > > requester is visible to the target VCPU.
-> > > 
-> > > But you knew all that already :-) So, maybe I just need to replace
-> > > 'all hardware state we need to flush should now be visible.' with
-> > > 'the virtual irq state is now visible.'?
-> > > 
-> > 
-> > Yes, the hardware state is definitely vague here, but I also feel like
-> > you're trying to repeat parts of the documentation here, and it's better
-> > to just refer to the complete documentation for the how the barreirs
-> > etc. work, and just explain why you don't need to do anything, yet still
-> > have a vcpu request.
-> > 
-> > Which is why I suggested the alternative comment below instead ;)
-> > 
-> > > > 
-> > > > And I don't much like this empty function either.
-> > > > 
-> > > > 
-> > > > > +}
-> > > > > +
-> > > > >  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
-> > > > >  {
-> > > > >  	return vcpu->arch.target >= 0;
-> > > > > @@ -580,6 +589,8 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
-> > > > >  	if (kvm_request_pending(vcpu)) {
-> > > > >  		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
-> > > > >  			vcpu_req_sleep(vcpu);
-> > > > > +		if (kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu))
-> > > > > +			vcpu_req_irq_pending(vcpu);
-> > > > 
-> > > > 
-> > > > Can we just do:
-> > > > 		/* 
-> > > > 		 * Clear IRQ_PENDING requests that were made to
-> > > > 		 * guarantee that a VCPU sees new virtual interrupts.
-> > > > 		 */
-> > > > 		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
-> > > > 
-> > > > ?
-> > > 
-> > > I won't insist, but I prefer the empty function to breaking the pattern
-> > > of this if-sequence, and also to the calling of a function named "check"
-> > > without considering its return value.
-> > 
-> > I like scratching our OCD as much as the next reviewer, but I think my
-> > version more clearly expresses the purpose, which is more important than
-> > having multiple identically-looking statements.
-> > 
-> > Thanks,
-> > -Christoffer
-> 
-> I'll take your suggestion, and hopefully my OCD won't keep me up at night.
-> I'll get v5 tested and sent tomorrow.
-> 
-Thanks Drew!
--Christoffer
+Jintack Lim <jintack@cs.columbia.edu> writes:
+...
+> +/**
+> + * kvm_arm_setup_shadow_state -- prepare shadow state based on emulated mode
+> + * @vcpu: The VCPU pointer
+> + */
+> +void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+> +
+> +	ctxt->hw_pstate = *vcpu_cpsr(vcpu);
+> +	ctxt->hw_sys_regs = ctxt->sys_regs;
+> +	ctxt->hw_sp_el1 = ctxt->gp_regs.sp_el1;
+> +}
+> +
+> +/**
+> + * kvm_arm_restore_shadow_state -- write back shadow state from guest
+> + * @vcpu: The VCPU pointer
+> + */
+> +void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+> +
+> +	*vcpu_cpsr(vcpu) = ctxt->hw_pstate;
+> +	ctxt->gp_regs.sp_el1 = ctxt->hw_sp_el1;
+> +}
+> +
+> +void kvm_arm_init_cpu_context(kvm_cpu_context_t *cpu_ctxt)
+> +{
+> +	cpu_ctxt->hw_sys_regs = &cpu_ctxt->sys_regs[0];
+> +}
+
+
+IIUC, the *_shadow_state() functions will set hw_* pointers to
+either point to the "real" state or the shadow state to manage L2 ?
+Maybe, it might make sense to make these function names a little more
+generic since they are not dealing with setting the shadow state
+alone.
+
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index 9341376..f2a1b32 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/kvm_host.h>
+>  
+>  #include <asm/kvm_asm.h>
+> +#include <asm/kvm_emulate.h>
+>  #include <asm/kvm_hyp.h>
+>  
+>  /* Yes, this does nothing, on purpose */
+> @@ -33,37 +34,41 @@ static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
+>  
+>  static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+> -	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+> -	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+> -	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
+> -	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+> +	u64 *sys_regs = kern_hyp_va(ctxt->hw_sys_regs);
+> +
+> +	sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+> +	sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+> +	sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+> +	sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
+> +	sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+>  	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+>  	ctxt->gp_regs.regs.pc		= read_sysreg_el2(elr);
+> -	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(spsr);
+> +	ctxt->hw_pstate			= read_sysreg_el2(spsr);
+>  }
+>  
+>  static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+> -	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+> -	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
+> -	ctxt->sys_regs[CPACR_EL1]	= read_sysreg_el1(cpacr);
+> -	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg_el1(ttbr0);
+> -	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg_el1(ttbr1);
+> -	ctxt->sys_regs[TCR_EL1]		= read_sysreg_el1(tcr);
+> -	ctxt->sys_regs[ESR_EL1]		= read_sysreg_el1(esr);
+> -	ctxt->sys_regs[AFSR0_EL1]	= read_sysreg_el1(afsr0);
+> -	ctxt->sys_regs[AFSR1_EL1]	= read_sysreg_el1(afsr1);
+> -	ctxt->sys_regs[FAR_EL1]		= read_sysreg_el1(far);
+> -	ctxt->sys_regs[MAIR_EL1]	= read_sysreg_el1(mair);
+> -	ctxt->sys_regs[VBAR_EL1]	= read_sysreg_el1(vbar);
+> -	ctxt->sys_regs[CONTEXTIDR_EL1]	= read_sysreg_el1(contextidr);
+> -	ctxt->sys_regs[AMAIR_EL1]	= read_sysreg_el1(amair);
+> -	ctxt->sys_regs[CNTKCTL_EL1]	= read_sysreg_el1(cntkctl);
+> -	ctxt->sys_regs[PAR_EL1]		= read_sysreg(par_el1);
+> -
+> -	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
+> +	u64 *sys_regs = kern_hyp_va(ctxt->hw_sys_regs);
+> +
+> +	sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+> +	sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+> +	sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
+> +	sys_regs[CPACR_EL1]	= read_sysreg_el1(cpacr);
+> +	sys_regs[TTBR0_EL1]	= read_sysreg_el1(ttbr0);
+> +	sys_regs[TTBR1_EL1]	= read_sysreg_el1(ttbr1);
+> +	sys_regs[TCR_EL1]	= read_sysreg_el1(tcr);
+> +	sys_regs[ESR_EL1]	= read_sysreg_el1(esr);
+> +	sys_regs[AFSR0_EL1]	= read_sysreg_el1(afsr0);
+> +	sys_regs[AFSR1_EL1]	= read_sysreg_el1(afsr1);
+> +	sys_regs[FAR_EL1]	= read_sysreg_el1(far);
+> +	sys_regs[MAIR_EL1]	= read_sysreg_el1(mair);
+> +	sys_regs[VBAR_EL1]	= read_sysreg_el1(vbar);
+> +	sys_regs[CONTEXTIDR_EL1]	= read_sysreg_el1(contextidr);
+> +	sys_regs[AMAIR_EL1]	= read_sysreg_el1(amair);
+> +	sys_regs[CNTKCTL_EL1]	= read_sysreg_el1(cntkctl);
+> +	sys_regs[PAR_EL1]		= read_sysreg(par_el1);
+> +
+> +	ctxt->hw_sp_el1			= read_sysreg(sp_el1);
+>  	ctxt->gp_regs.elr_el1		= read_sysreg_el1(elr);
+>  	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
+>  }
+> @@ -86,37 +91,41 @@ void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
+>  
+>  static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
+> -	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
+> -	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
+> -	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
+> -	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
+> +	u64 *sys_regs = kern_hyp_va(ctxt->hw_sys_regs);
+> +
+> +	write_sysreg(sys_regs[ACTLR_EL1],	  actlr_el1);
+> +	write_sysreg(sys_regs[TPIDR_EL0],	  tpidr_el0);
+> +	write_sysreg(sys_regs[TPIDRRO_EL0],	tpidrro_el0);
+> +	write_sysreg(sys_regs[TPIDR_EL1],	  tpidr_el1);
+> +	write_sysreg(sys_regs[MDSCR_EL1],	  mdscr_el1);
+>  	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+>  	write_sysreg_el2(ctxt->gp_regs.regs.pc,	  elr);
+> -	write_sysreg_el2(ctxt->gp_regs.regs.pstate, spsr);
+> +	write_sysreg_el2(ctxt->hw_pstate,	  spsr);
+>  }
+>  
+>  static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
+> -	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
+> -	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	sctlr);
+> -	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	cpacr);
+> -	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	ttbr0);
+> -	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	ttbr1);
+> -	write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	tcr);
+> -	write_sysreg_el1(ctxt->sys_regs[ESR_EL1],	esr);
+> -	write_sysreg_el1(ctxt->sys_regs[AFSR0_EL1],	afsr0);
+> -	write_sysreg_el1(ctxt->sys_regs[AFSR1_EL1],	afsr1);
+> -	write_sysreg_el1(ctxt->sys_regs[FAR_EL1],	far);
+> -	write_sysreg_el1(ctxt->sys_regs[MAIR_EL1],	mair);
+> -	write_sysreg_el1(ctxt->sys_regs[VBAR_EL1],	vbar);
+> -	write_sysreg_el1(ctxt->sys_regs[CONTEXTIDR_EL1],contextidr);
+> -	write_sysreg_el1(ctxt->sys_regs[AMAIR_EL1],	amair);
+> -	write_sysreg_el1(ctxt->sys_regs[CNTKCTL_EL1], 	cntkctl);
+> -	write_sysreg(ctxt->sys_regs[PAR_EL1],		par_el1);
+> -
+> -	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
+> +	u64 *sys_regs = kern_hyp_va(ctxt->hw_sys_regs);
+> +
+> +	write_sysreg(sys_regs[MPIDR_EL1],	vmpidr_el2);
+> +	write_sysreg(sys_regs[CSSELR_EL1],	csselr_el1);
+> +	write_sysreg_el1(sys_regs[SCTLR_EL1],	sctlr);
+> +	write_sysreg_el1(sys_regs[CPACR_EL1],	cpacr);
+> +	write_sysreg_el1(sys_regs[TTBR0_EL1],	ttbr0);
+> +	write_sysreg_el1(sys_regs[TTBR1_EL1],	ttbr1);
+> +	write_sysreg_el1(sys_regs[TCR_EL1],	tcr);
+> +	write_sysreg_el1(sys_regs[ESR_EL1],	esr);
+> +	write_sysreg_el1(sys_regs[AFSR0_EL1],	afsr0);
+> +	write_sysreg_el1(sys_regs[AFSR1_EL1],	afsr1);
+> +	write_sysreg_el1(sys_regs[FAR_EL1],	far);
+> +	write_sysreg_el1(sys_regs[MAIR_EL1],	mair);
+> +	write_sysreg_el1(sys_regs[VBAR_EL1],	vbar);
+> +	write_sysreg_el1(sys_regs[CONTEXTIDR_EL1], contextidr);
+> +	write_sysreg_el1(sys_regs[AMAIR_EL1],	amair);
+> +	write_sysreg_el1(sys_regs[CNTKCTL_EL1], cntkctl);
+> +	write_sysreg(sys_regs[PAR_EL1],		par_el1);
+> +
+> +	write_sysreg(ctxt->hw_sp_el1,			sp_el1);
+>  	write_sysreg_el1(ctxt->gp_regs.elr_el1,		elr);
+>  	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
+>  }
