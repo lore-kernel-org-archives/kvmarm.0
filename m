@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 22/25] KVM: arm64: vgic-v3: Add ICV_CTLR_EL1 handler
-Date: Thu,  1 Jun 2017 11:21:14 +0100
-Message-ID: <20170601102117.17750-23-marc.zyngier@arm.com>
+Subject: [PATCH v2 19/25] arm64: Add workaround for Cavium Thunder erratum
+ 30115
+Date: Thu,  1 Jun 2017 11:21:11 +0100
+Message-ID: <20170601102117.17750-20-marc.zyngier@arm.com>
 References: <20170601102117.17750-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64D1A40C26
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:18:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B92540BC5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:18:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KkNMzkdBdX27 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Jun 2017 06:18:11 -0400 (EDT)
+ with ESMTP id r6P7LKUEw9Fe for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Jun 2017 06:18:04 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3209A40CE6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:18:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C77FC40CD4
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:18:04 -0400 (EDT)
 In-Reply-To: <20170601102117.17750-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,79 +32,123 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a handler for reading/writing the guest's view of the ICV_CTLR_EL1
-register. only EOIMode and CBPR are of interest here, as all the other
-bits directly come from ICH_VTR_EL2 and are Read-Only.
+From: David Daney <david.daney@cavium.com>
+
+Some Cavium Thunder CPUs suffer a problem where a KVM guest may
+inadvertently cause the host kernel to quit receiving interrupts.
+
+Use the Group-0/1 trapping in order to deal with it.
+
+[maz]: Adapted patch to the Group-0/1 trapping, reworked commit log
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: David Daney <david.daney@cavium.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/hyp/vgic-v3-sr.c | 46 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ Documentation/arm64/silicon-errata.txt |  1 +
+ arch/arm64/Kconfig                     | 11 +++++++++++
+ arch/arm64/include/asm/cpucaps.h       |  3 ++-
+ arch/arm64/kernel/cpu_errata.c         | 21 +++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c            |  7 +++++++
+ 5 files changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index cac9d563d97d..3a5749e6c797 100644
---- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -881,6 +881,46 @@ static void __hyp_text __vgic_v3_read_rpr(struct kvm_vcpu *vcpu,
- 	vcpu_set_reg(vcpu, rt, val);
- }
+diff --git a/Documentation/arm64/silicon-errata.txt b/Documentation/arm64/silicon-errata.txt
+index 10f2dddbf449..f5f93dca54b7 100644
+--- a/Documentation/arm64/silicon-errata.txt
++++ b/Documentation/arm64/silicon-errata.txt
+@@ -62,6 +62,7 @@ stable kernels.
+ | Cavium         | ThunderX GICv3  | #23154          | CAVIUM_ERRATUM_23154        |
+ | Cavium         | ThunderX Core   | #27456          | CAVIUM_ERRATUM_27456        |
+ | Cavium         | ThunderX SMMUv2 | #27704          | N/A                         |
++| Cavium         | ThunderX Core   | #30115          | CAVIUM_ERRATUM_30115        |
+ |                |                 |                 |                             |
+ | Freescale/NXP  | LS2080A/LS1043A | A-008585        | FSL_ERRATUM_A008585         |
+ |                |                 |                 |                             |
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 3dcd7ec69bca..0950b21e4d17 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -480,6 +480,17 @@ config CAVIUM_ERRATUM_27456
  
-+static void __hyp_text __vgic_v3_read_ctlr(struct kvm_vcpu *vcpu,
-+					   u32 vmcr, int rt)
-+{
-+	u32 vtr, val;
+ 	  If unsure, say Y.
+ 
++config CAVIUM_ERRATUM_30115
++	bool "Cavium erratum 30115: Guest may disable interrupts in host"
++	default y
++	help
++	  On ThunderX T88 pass 1.x through 2.2, T81 pass 1.0 through
++	  1.2, and T83 Pass 1.0, KVM guest execution may disable
++	  interrupts in host. Trapping GICv3 group-1 accesses sidesteps
++	  the issue.
 +
-+	vtr = read_gicreg(ICH_VTR_EL2);
-+	/* PRIbits */
-+	val = ((vtr >> 29) & 7) << ICC_CTLR_EL1_PRI_BITS_SHIFT;
-+	/* IDbits */
-+	val |= ((vtr >> 23) & 7) << ICC_CTLR_EL1_ID_BITS_SHIFT;
-+	/* SEIS */
-+	val |= ((vtr >> 22) & 1) << ICC_CTLR_EL1_SEIS_SHIFT;
-+	/* A3V */
-+	val |= ((vtr >> 21) & 1) << ICC_CTLR_EL1_A3V_SHIFT;
-+	/* EOImode */
-+	val |= ((vmcr & ICH_VMCR_EOIM_MASK) >> ICH_VMCR_EOIM_SHIFT) << ICC_CTLR_EL1_EOImode_SHIFT;
-+	/* CBPR */
-+	val |= (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
++	  If unsure, say Y.
 +
-+	vcpu_set_reg(vcpu, rt, val);
-+}
+ config QCOM_FALKOR_ERRATUM_1003
+ 	bool "Falkor E1003: Incorrect translation due to ASID change"
+ 	default y
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index b3aab8a17868..8d2272c6822c 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -38,7 +38,8 @@
+ #define ARM64_WORKAROUND_REPEAT_TLBI		17
+ #define ARM64_WORKAROUND_QCOM_FALKOR_E1003	18
+ #define ARM64_WORKAROUND_858921			19
++#define ARM64_WORKAROUND_CAVIUM_30115		20
+ 
+-#define ARM64_NCAPS				20
++#define ARM64_NCAPS				21
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index 2ed2a7657711..0e27f86ee709 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -133,6 +133,27 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 		MIDR_RANGE(MIDR_THUNDERX_81XX, 0x00, 0x00),
+ 	},
+ #endif
++#ifdef CONFIG_CAVIUM_ERRATUM_30115
++	{
++	/* Cavium ThunderX, T88 pass 1.x - 2.2 */
++		.desc = "Cavium erratum 30115",
++		.capability = ARM64_WORKAROUND_CAVIUM_30115,
++		MIDR_RANGE(MIDR_THUNDERX, 0x00,
++			   (1 << MIDR_VARIANT_SHIFT) | 2),
++	},
++	{
++	/* Cavium ThunderX, T81 pass 1.0 - 1.2 */
++		.desc = "Cavium erratum 30115",
++		.capability = ARM64_WORKAROUND_CAVIUM_30115,
++		MIDR_RANGE(MIDR_THUNDERX_81XX, 0x00, 0x02),
++	},
++	{
++	/* Cavium ThunderX, T83 pass 1.0 */
++		.desc = "Cavium erratum 30115",
++		.capability = ARM64_WORKAROUND_CAVIUM_30115,
++		MIDR_RANGE(MIDR_THUNDERX_83XX, 0x00, 0x00),
++	},
++#endif
+ 	{
+ 		.desc = "Mismatched cache line size",
+ 		.capability = ARM64_MISMATCHED_CACHE_LINE_SIZE,
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 1486ce25edcb..062be1fe95b5 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -482,6 +482,13 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+ 	if (kvm_vgic_global_state.vcpu_base == 0)
+ 		kvm_info("disabling GICv2 emulation\n");
+ 
++#ifdef CONFIG_ARM64
++	if (cpus_have_const_cap(ARM64_WORKAROUND_CAVIUM_30115)) {
++		group0_trap = true;
++		group1_trap = true;
++	}
++#endif
 +
-+static void __hyp_text __vgic_v3_write_ctlr(struct kvm_vcpu *vcpu,
-+					    u32 vmcr, int rt)
-+{
-+	u32 val = vcpu_get_reg(vcpu, rt);
-+
-+	if (val & ICC_CTLR_EL1_CBPR_MASK)
-+		vmcr |= ICH_VMCR_CBPR_MASK;
-+	else
-+		vmcr &= ~ICH_VMCR_CBPR_MASK;
-+
-+	if (val & ICC_CTLR_EL1_EOImode_MASK)
-+		vmcr |= ICH_VMCR_EOIM_MASK;
-+	else
-+		vmcr &= ~ICH_VMCR_EOIM_MASK;
-+
-+	write_gicreg(vmcr, ICH_VMCR_EL2);
-+}
-+
- int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- {
- 	int rt;
-@@ -973,6 +1013,12 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 	case SYS_ICC_RPR_EL1:
- 		fn = __vgic_v3_read_rpr;
- 		break;
-+	case SYS_ICC_CTLR_EL1:
-+		if (is_read)
-+			fn = __vgic_v3_read_ctlr;
-+		else
-+			fn = __vgic_v3_write_ctlr;
-+		break;
- 	default:
- 		return 0;
- 	}
+ 	if (group0_trap || group1_trap) {
+ 		kvm_info("GICv3 sysreg trapping enabled (reduced performance)\n");
+ 		static_branch_enable(&vgic_v3_cpuif_trap);
 -- 
 2.11.0
