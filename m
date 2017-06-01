@@ -1,179 +1,224 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v4 09/11] KVM: arm/arm64: use vcpu requests for irq
- injection
-Date: Thu, 1 Jun 2017 12:35:33 +0200
-Message-ID: <20170601103533.GI20919@cbox>
-References: <20170516022035.7674-1-drjones@redhat.com>
- <20170516022035.7674-10-drjones@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 03/10] VFIO: platform: Direct EOI irq bypass for ARM/ARM64
+Date: Thu, 1 Jun 2017 11:49:11 +0100
+Message-ID: <4a9649db-11b7-fc1e-52d5-8087df049d96@arm.com>
+References: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
+ <1495656803-28011-4-git-send-email-eric.auger@redhat.com>
+ <20170531122048.68bd231e@w520.home>
+ <d119739d-b448-f4b2-0118-ca1e792285b7@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D0EEC4095A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:31:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RArd6JDxuse2 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Jun 2017 06:31:52 -0400 (EDT)
-Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B083840948
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 06:31:51 -0400 (EDT)
-Received: by mail-wm0-f52.google.com with SMTP id b84so152878902wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Jun 2017 03:35:48 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170516022035.7674-10-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <d119739d-b448-f4b2-0118-ca1e792285b7@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 16, 2017 at 04:20:33AM +0200, Andrew Jones wrote:
-> Don't use request-less VCPU kicks when injecting IRQs, as a VCPU
-> kick meant to trigger the interrupt injection could be sent while
-> the VCPU is outside guest mode, which means no IPI is sent, and
-> after it has called kvm_vgic_flush_hwstate(), meaning it won't see
-> the updated GIC state until its next exit some time later for some
-> other reason.  The receiving VCPU only needs to check this request
-> in VCPU RUN to handle it.  By checking it, if it's pending, a
-> memory barrier will be issued that ensures all state is visible.
-> We still create a vcpu_req_irq_pending() function (which is a nop),
-> though, in order to allow us to use the standard request checking
-> pattern.
+Hi Eric,
+
+On 31/05/17 20:31, Auger Eric wrote:
+> Hi Alex, Marc,
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  arch/arm/include/asm/kvm_host.h   |  1 +
->  arch/arm64/include/asm/kvm_host.h |  1 +
->  virt/kvm/arm/arm.c                | 12 ++++++++++++
->  virt/kvm/arm/vgic/vgic.c          |  9 +++++++--
->  4 files changed, 21 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index fdd644c01c89..00ad56ee6455 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -46,6 +46,7 @@
->  
->  #define KVM_REQ_SLEEP \
->  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> +#define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->  
->  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
->  int __attribute_const__ kvm_target_cpu(void);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 9bd0d1040de9..0c4fd1f46e10 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -43,6 +43,7 @@
->  
->  #define KVM_REQ_SLEEP \
->  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> +#define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->  
->  int __attribute_const__ kvm_target_cpu(void);
->  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index ddc833987dfb..73a75ca91e41 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -570,6 +570,15 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> +static void vcpu_req_irq_pending(struct kvm_vcpu *vcpu)
-> +{
-> +	/*
-> +	 * Nothing to do here. kvm_check_request() already issued a memory
-> +	 * barrier that pairs with kvm_make_request(), so all hardware state
-> +	 * we need to flush should now be visible.
-> +	 */
+> On 31/05/2017 20:20, Alex Williamson wrote:
+>> On Wed, 24 May 2017 22:13:16 +0200
+>> Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>>> This patch adds the registration/unregistration of an
+>>> irq_bypass_producer for vfio platform device interrupts.
+>>>
+>>> Its callbacks handle the direct EOI modality on VFIO side.
+>>>
+>>> - stop/start: disable/enable the host irq
+>>> - add/del consumer: set the VFIO Direct EOI mode, ie. select the
+>>>   adapted physical IRQ handler (automasked or not automasked).
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>
+>>> ---
+>>> ---
+>>>  drivers/vfio/platform/Kconfig                    |   5 +
+>>>  drivers/vfio/platform/Makefile                   |   2 +-
+>>>  drivers/vfio/platform/vfio_platform_irq.c        |  19 ++++
+>>>  drivers/vfio/platform/vfio_platform_irq_bypass.c | 114 +++++++++++++++++++++++
+>>>  drivers/vfio/platform/vfio_platform_private.h    |  23 +++++
+>>>  5 files changed, 162 insertions(+), 1 deletion(-)
+>>>  create mode 100644 drivers/vfio/platform/vfio_platform_irq_bypass.c
+>>>
+>>> diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
+>>> index bb30128..33ec3d9 100644
+>>> --- a/drivers/vfio/platform/Kconfig
+>>> +++ b/drivers/vfio/platform/Kconfig
+>>> @@ -2,6 +2,7 @@ config VFIO_PLATFORM
+>>>  	tristate "VFIO support for platform devices"
+>>>  	depends on VFIO && EVENTFD && (ARM || ARM64)
+>>>  	select VFIO_VIRQFD
+>>> +	select IRQ_BYPASS_MANAGER
+>>>  	help
+>>>  	  Support for platform devices with VFIO. This is required to make
+>>>  	  use of platform devices present on the system using the VFIO
+>>> @@ -19,4 +20,8 @@ config VFIO_AMBA
+>>>  
+>>>  	  If you don't know what to do here, say N.
+>>>  
+>>> +config VFIO_PLATFORM_IRQ_BYPASS_DEOI
+>>> +	depends on VFIO_PLATFORM
+>>> +	def_bool y
+>>> +
+>>>  source "drivers/vfio/platform/reset/Kconfig"
+>>> diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
+>>> index 41a6224..324f3e7 100644
+>>> --- a/drivers/vfio/platform/Makefile
+>>> +++ b/drivers/vfio/platform/Makefile
+>>> @@ -1,4 +1,4 @@
+>>> -vfio-platform-base-y := vfio_platform_common.o vfio_platform_irq.o
+>>> +vfio-platform-base-y := vfio_platform_common.o vfio_platform_irq.o vfio_platform_irq_bypass.o
+>>>  vfio-platform-y := vfio_platform.o
+>>>  
+>>>  obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
+>>> diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
+>>> index 2f82459..5b70c8e 100644
+>>> --- a/drivers/vfio/platform/vfio_platform_irq.c
+>>> +++ b/drivers/vfio/platform/vfio_platform_irq.c
+>>> @@ -20,6 +20,7 @@
+>>>  #include <linux/types.h>
+>>>  #include <linux/vfio.h>
+>>>  #include <linux/irq.h>
+>>> +#include <linux/irqbypass.h>
+>>>  
+>>>  #include "vfio_platform_private.h"
+>>>  
+>>> @@ -186,6 +187,19 @@ static irqreturn_t vfio_wrapper_handler(int irq, void *dev_id)
+>>>  	return ret;
+>>>  }
+>>>  
+>>> +/* must be called with irq_ctx->lock held */
+>>> +int vfio_platform_set_deoi(struct vfio_platform_irq *irq_ctx, bool deoi)
+>>> +{
+>>> +	irq_ctx->deoi = deoi;
+>>> +
+>>> +	if (!deoi && (irq_ctx->flags & VFIO_IRQ_INFO_AUTOMASKED))
+>>> +		irq_ctx->handler = vfio_automasked_irq_handler;
+>>> +	else
+>>> +		irq_ctx->handler = vfio_irq_handler;
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>>  static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+>>>  			    int fd, irq_handler_t handler)
+>>>  {
+>>> @@ -196,6 +210,7 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+>>>  	if (irq->trigger) {
+>>>  		irq_clear_status_flags(irq->hwirq, IRQ_NOAUTOEN);
+>>>  		free_irq(irq->hwirq, irq);
+>>> +		irq_bypass_unregister_producer(&irq->producer);
+>>>  		kfree(irq->name);
+>>>  		eventfd_ctx_put(irq->trigger);
+>>>  		irq->trigger = NULL;
+>>> @@ -227,6 +242,10 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+>>>  		return ret;
+>>>  	}
+>>>  
+>>> +	if (vfio_platform_has_deoi())
+>>> +		vfio_platform_register_deoi_producer(vdev, irq,
+>>> +						     trigger, irq->hwirq);
+>>> +
+>>>  	if (!irq->masked)
+>>>  		enable_irq(irq->hwirq);
+>>>  
+>>> diff --git a/drivers/vfio/platform/vfio_platform_irq_bypass.c b/drivers/vfio/platform/vfio_platform_irq_bypass.c
+>>> new file mode 100644
+>>> index 0000000..436902c
+>>> --- /dev/null
+>>> +++ b/drivers/vfio/platform/vfio_platform_irq_bypass.c
+>>> @@ -0,0 +1,114 @@
+>>> +/*
+>>> + * VFIO platform device irqbypass callback implementation for DEOI
+>>> + *
+>>> + * Copyright (C) 2017 Red Hat, Inc.  All rights reserved.
+>>> + * Author: Eric Auger <eric.auger@redhat.com>
+>>> + *
+>>> + * This program is free software; you can redistribute it and/or modify
+>>> + * it under the terms of the GNU General Public License, version 2, as
+>>> + * published by the Free Software Foundation.
+>>> + *
+>>> + * This program is distributed in the hope that it will be useful,
+>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>> + * GNU General Public License for more details.
+>>> + */
+>>> +
+>>> +#include <linux/err.h>
+>>> +#include <linux/device.h>
+>>> +#include <linux/irq.h>
+>>> +#include <linux/irqbypass.h>
+>>> +#include "vfio_platform_private.h"
+>>> +
+>>> +#ifdef CONFIG_VFIO_PLATFORM_IRQ_BYPASS_DEOI
+>>> +
+>>> +static void irq_bypass_deoi_start(struct irq_bypass_producer *prod)
+>>> +{
+>>> +	enable_irq(prod->irq);
+>>> +}
+>>> +
+>>> +static void irq_bypass_deoi_stop(struct irq_bypass_producer *prod)
+>>> +{
+>>> +	disable_irq(prod->irq);
+>>> +}
+>>> +
+>>> +/**
+>>> + * irq_bypass_deoi_add_consumer - turns irq direct EOI on
+>>> + *
+>>> + * The linux irq is disabled when the function is called.
+>>> + * The operation succeeds only if the irq is not active at irqchip level
+>>> + * and the irq is not automasked at VFIO level, meaning the IRQ is under
+>>> + * injection into the guest.
+>>> + */
+>>> +static int irq_bypass_deoi_add_consumer(struct irq_bypass_producer *prod,
+>>> +					struct irq_bypass_consumer *cons)
+>>> +{
+>>> +	struct vfio_platform_irq *irq_ctx =
+>>> +		container_of(prod, struct vfio_platform_irq, producer);
+>>> +	unsigned long flags;
+>>> +	bool active;
+>>> +	int ret;
+>>> +
+>>> +	spin_lock_irqsave(&irq_ctx->lock, flags);
+>>> +
+>>> +	ret = irq_get_irqchip_state(irq_ctx->hwirq, IRQCHIP_STATE_ACTIVE,
+>>> +				    &active);
+>>> +	if (ret)
+>>> +		goto out;
+>>> +
+>>> +	if (active || irq_ctx->automasked) {
+>>> +		ret = -EAGAIN;
+>>> +		goto out;
+>>> +	}
+>>> +
+>>> +	if (!(irq_get_trigger_type(irq_ctx->hwirq) & IRQ_TYPE_LEVEL_MASK))
+>>> +		goto out;
+>>
+>> Not sure why this wouldn't return -EINVAL;
+> At the moment direct EOI is also set up for edge sensitive IRQs. This
+> means the deactivation of the IRQ will happen later through guest
+> virtual interrupt deactivation but somehow isn't it more accurate wrt
+> the passthrough? Marc, what is your opinion? GIC spec does not seem to
+> restrict this mode to level sensitive interrupts or am I mistajen?
 
-I don't understand this comment :(
+My preference would be to handle edge interrupts the same way as level
+(setting deoi to true). The rational is that in the case of a screaming
+interrupt, forwarding it will prevent subsequent interrupts from
+knocking the VM out of the CPU (the active state at the physical level
+will prevent the interrupt from being observed).
 
-And I don't much like this empty function either.
+This would make the VM behave just like it would on bare metal, where
+the new edges would only be observed once the initial interrupt has been
+deactivated.
 
+Thanks,
 
-> +}
-> +
->  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
->  {
->  	return vcpu->arch.target >= 0;
-> @@ -580,6 +589,8 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
->  	if (kvm_request_pending(vcpu)) {
->  		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
->  			vcpu_req_sleep(vcpu);
-> +		if (kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu))
-> +			vcpu_req_irq_pending(vcpu);
-
-
-Can we just do:
-		/* 
-		 * Clear IRQ_PENDING requests that were made to
-		 * guarantee that a VCPU sees new virtual interrupts.
-		 */
-		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
-
-?
-
->  	}
->  }
->  
-> @@ -771,6 +782,7 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
->  	 * trigger a world-switch round on the running physical CPU to set the
->  	 * virtual IRQ/FIQ fields in the HCR appropriately.
->  	 */
-> +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
->  	kvm_vcpu_kick(vcpu);
->  
->  	return 0;
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index aea080a2c443..c66feaca2a5d 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -286,8 +286,10 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
->  		 * won't see this one until it exits for some other
->  		 * reason.
->  		 */
-> -		if (vcpu)
-> +		if (vcpu) {
-> +			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
->  			kvm_vcpu_kick(vcpu);
-> +		}
->  		return false;
->  	}
->  
-> @@ -333,6 +335,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq)
->  	spin_unlock(&irq->irq_lock);
->  	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
->  
-> +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
->  	kvm_vcpu_kick(vcpu);
->  
->  	return true;
-> @@ -722,8 +725,10 @@ void vgic_kick_vcpus(struct kvm *kvm)
->  	 * a good kick...
->  	 */
->  	kvm_for_each_vcpu(c, vcpu, kvm) {
-> -		if (kvm_vgic_vcpu_pending_irq(vcpu))
-> +		if (kvm_vgic_vcpu_pending_irq(vcpu)) {
-> +			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
->  			kvm_vcpu_kick(vcpu);
-> +		}
->  	}
->  }
->  
-> -- 
-> 2.9.3
-> 
-Otherwise:
-
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
+	M.
+-- 
+Jazz is not dead. It just smells funny...
