@@ -1,25 +1,25 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 00/25] arm64: KVM: Mediate access to GICv3 sysregs at
- EL2
-Date: Fri, 2 Jun 2017 10:11:56 +0100
-Message-ID: <941a29e4-9652-ee40-1d46-a5f06288cc7b@arm.com>
-References: <20170601102117.17750-1-marc.zyngier@arm.com>
- <7dd609ce-6f7b-2a12-fa06-4ce1c6ba6ebe@caviumnetworks.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v2] KVM: arm/arm64: Signal SIGBUS when stage2 discovers
+ hwpoison memory
+Date: Fri, 02 Jun 2017 11:16:10 +0100
+Message-ID: <59313AEA.2060705@arm.com>
+References: <20170524163250.29281-1-james.morse@arm.com>
+ <20170601222235.GN20919@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73CF840C4F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 05:08:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63FF540C58
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 06:13:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nbQaPsFblsta for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Jun 2017 05:08:02 -0400 (EDT)
+ with ESMTP id nbdMNptjRnAR for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Jun 2017 06:12:57 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BDCE40960
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 05:08:01 -0400 (EDT)
-In-Reply-To: <7dd609ce-6f7b-2a12-fa06-4ce1c6ba6ebe@caviumnetworks.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A782E40960
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 06:12:57 -0400 (EDT)
+In-Reply-To: <20170601222235.GN20919@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,54 +29,63 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: David Daney <ddaney@caviumnetworks.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/06/17 22:00, David Daney wrote:
-> On 06/01/2017 03:20 AM, Marc Zyngier wrote:
->> Some systems have less than perfect GICv3 implementations, leading to
->> all kind of ugly issues (guest hanging, host dying). In order to allow
->> some level of diagnostic, and in some cases implement workarounds,
->> this series enables the trapping of both Group-0, Group-1 and Common
->> sysregs. Mediating the access at EL2 allows some form of sanity
->> checking that the HW is sometimes sorely lacking.
->>
->> Instead of fully emulating a GICv3 CPU interface, we still use the
->> existing HW (list registers, AP registers, VMCR...), which allows the
->> code to be independent from the rest of the KVM code, and to cope with
->> partial trapping.
->>
->> Of course, trapping has a cost, which is why this must be either
->> enabled on the command line, or selected by another cpu capability
->> (see Cavium erratum 30115). A quick test on an A57-based platform
->> shows a 25% hit when repeatedly banging on the trapped registers,
->> while normal workloads do not seem to suffer noticeably from such
->> trapping (hackbench variance is in the usual noise, despite being very
->> IPI happy).
->>
->> This has been tested on a dual socket Thundex-X and a Freescale LS-2085a.
->>
->> I've taken the liberty to rebase David Daney's initial Cavium erratum
->> 30115 workaround on top of this series, and included it here as a
->> typical use case.
-> 
-> I pulled this from:
-> 
->  
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/gicv3-cpuif-mediated-access
-> 
-> this morning at commit	58c1763c5aa6223ab3d04e0c183a31eb0aef832e
-> 
-> Entire series tested by and
-> 
-> Acked-by: David Daney <david.daney@cavium.com>
+Hi Christoffer,
 
-Thanks David. May I ask what particular system this was tested on (just
-so that I have a additional reference point)?
+On 01/06/17 23:22, Christoffer Dall wrote:
+> On Wed, May 24, 2017 at 05:32:50PM +0100, James Morse wrote:
+>> Once we enable ARCH_SUPPORTS_MEMORY_FAILURE on arm64, notifications for
+>> broken memory can call memory_failure() in mm/memory-failure.c to deliver
+>> SIGBUS to any user space process using the page, and notify all the
+>> in-kernel users.
+>>
+>> If the page corresponded with guest memory, KVM will unmap this page
+>> from its stage2 page tables. The user space process that allocated
+>> this memory may have never touched this page in which case it may not
+>> be mapped meaning SIGBUS won't be delivered.
 
-Cheers,
+> Sorry, I don't remember, what is the scenario where KVM can have a
+> mapping in stage 2 without there being a corresponding mapping for user
+> space?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+(looks like I mean more than one thing by mapping... oops.)
+
+Mapping in that there is a physical page for this user-space address, but when
+qemu first touches it, it will be faulted in as its not been touched before.
+
+(rambling on:)
+When mm/memory_failure.c:memory_failure() walks the rmap for the poisoned page
+it doesn't find qemu, so no user-space processes gets signalled.
+
+If qemu were to touch the page, fixup_user_fault() will return -EHWPOISON and we
+deliver sigbus to qemu.
+
+This doesn't happen when the guest touches the page as kvm's core code maps
+-EHWPOISON to KVM_PFN_ERR_HWPOISON, which the arm/arm64 kvm code ignores and
+drops -EFAULT on userspace instead.
+
+
+>> This works well until a guest accesses that page, and KVM discovers
+>> pfn == KVM_PFN_ERR_HWPOISON when it comes to process the stage2 fault.
+>>
+>> Do as x86 does, and deliver the SIGBUS when we discover
+>> KVM_PFN_ERR_HWPOISON. Use the stage2 mapping size as the si_addr_lsb
+> 
+> But this part about the stage 2 mapping size is not what the code does.
+> It uses the granularity of the mmap region, if I'm not mistaken.
+
+Yes. This is what I got wrong last time, Punit put me right, but I forgot to
+update the commit message.
+
+I will change this 'Use the'... sentence in v3 to:
+> Use the hugepage size as si_addr_lsb if this vma was allocated as a hugepage.
+> Transparent hugepages will be split by memory_failure() before we see them
+> here.
+
+
+Thanks,
+
+James
