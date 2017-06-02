@@ -1,26 +1,25 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC 08/55] KVM: arm64: Set virtual EL2 context depending on the
- guest exception level
-Date: Fri, 2 Jun 2017 09:48:43 +0100
-Message-ID: <178e3aaf-dd25-9590-35d7-c1f2705a5c06@arm.com>
-References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <1483943091-1364-9-git-send-email-jintack@cs.columbia.edu>
- <jpgtw3zzcee.fsf@linux.bootlegged.copy>
+Subject: Re: [PATCH v2 00/25] arm64: KVM: Mediate access to GICv3 sysregs at
+ EL2
+Date: Fri, 2 Jun 2017 10:11:56 +0100
+Message-ID: <941a29e4-9652-ee40-1d46-a5f06288cc7b@arm.com>
+References: <20170601102117.17750-1-marc.zyngier@arm.com>
+ <7dd609ce-6f7b-2a12-fa06-4ce1c6ba6ebe@caviumnetworks.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7806040C5B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 04:44:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73CF840C4F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 05:08:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s8hDBKcF877t for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Jun 2017 04:44:50 -0400 (EDT)
+ with ESMTP id nbQaPsFblsta for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Jun 2017 05:08:02 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CFF9040BD8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 04:44:50 -0400 (EDT)
-In-Reply-To: <jpgtw3zzcee.fsf@linux.bootlegged.copy>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BDCE40960
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 05:08:01 -0400 (EDT)
+In-Reply-To: <7dd609ce-6f7b-2a12-fa06-4ce1c6ba6ebe@caviumnetworks.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,59 +29,53 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Bandan Das <bsd@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com
+To: David Daney <ddaney@caviumnetworks.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/06/17 21:22, Bandan Das wrote:
-> Jintack Lim <jintack@cs.columbia.edu> writes:
-> 
->> From: Christoffer Dall <christoffer.dall@linaro.org>
+On 01/06/17 22:00, David Daney wrote:
+> On 06/01/2017 03:20 AM, Marc Zyngier wrote:
+>> Some systems have less than perfect GICv3 implementations, leading to
+>> all kind of ugly issues (guest hanging, host dying). In order to allow
+>> some level of diagnostic, and in some cases implement workarounds,
+>> this series enables the trapping of both Group-0, Group-1 and Common
+>> sysregs. Mediating the access at EL2 allows some form of sanity
+>> checking that the HW is sometimes sorely lacking.
 >>
->> Set up virutal EL2 context to hardware if the guest exception level is
->> EL2.
+>> Instead of fully emulating a GICv3 CPU interface, we still use the
+>> existing HW (list registers, AP registers, VMCR...), which allows the
+>> code to be independent from the rest of the KVM code, and to cope with
+>> partial trapping.
 >>
->> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
->> ---
->>  arch/arm64/kvm/context.c | 32 ++++++++++++++++++++++++++------
->>  1 file changed, 26 insertions(+), 6 deletions(-)
+>> Of course, trapping has a cost, which is why this must be either
+>> enabled on the command line, or selected by another cpu capability
+>> (see Cavium erratum 30115). A quick test on an A57-based platform
+>> shows a 25% hit when repeatedly banging on the trapped registers,
+>> while normal workloads do not seem to suffer noticeably from such
+>> trapping (hackbench variance is in the usual noise, despite being very
+>> IPI happy).
 >>
->> diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
->> index 320afc6..acb4b1e 100644
->> --- a/arch/arm64/kvm/context.c
->> +++ b/arch/arm64/kvm/context.c
->> @@ -25,10 +25,25 @@
->>  void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
->>  {
->>  	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
->> +	if (unlikely(vcpu_mode_el2(vcpu))) {
->> +		ctxt->hw_pstate = *vcpu_cpsr(vcpu) & ~PSR_MODE_MASK;
->>  
->> -	ctxt->hw_pstate = *vcpu_cpsr(vcpu);
->> -	ctxt->hw_sys_regs = ctxt->sys_regs;
->> -	ctxt->hw_sp_el1 = ctxt->gp_regs.sp_el1;
->> +		/*
->> +		 * We emulate virtual EL2 mode in hardware EL1 mode using the
->> +		 * same stack pointer mode as the guest expects.
->> +		 */
->> +		if ((*vcpu_cpsr(vcpu) & PSR_MODE_MASK) == PSR_MODE_EL2h)
->> +			ctxt->hw_pstate |= PSR_MODE_EL1h;
->> +		else
->> +			ctxt->hw_pstate |= PSR_MODE_EL1t;
->> +
+>> This has been tested on a dual socket Thundex-X and a Freescale LS-2085a.
+>>
+>> I've taken the liberty to rebase David Daney's initial Cavium erratum
+>> 30115 workaround on top of this series, and included it here as a
+>> typical use case.
 > 
-> I see vcpu_mode(el2) does
-> return mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t;
+> I pulled this from:
 > 
-> I can't seem to find this, what's the difference between
-> the modes: PSR_MODE_EL2h/EL2t ?
+>  
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/gicv3-cpuif-mediated-access
+> 
+> this morning at commit	58c1763c5aa6223ab3d04e0c183a31eb0aef832e
+> 
+> Entire series tested by and
+> 
+> Acked-by: David Daney <david.daney@cavium.com>
 
-The difference is the stack pointer that is getting used. When the CPU
-is at ELxh, it uses SPx at ELx. When at ELxt, it uses SP0 (the userspace
-stack pointer). See the definition of SPSR_EL2 in the ARMv8 ARM.
+Thanks David. May I ask what particular system this was tested on (just
+so that I have a additional reference point)?
 
-Thanks,
+Cheers,
 
 	M.
 -- 
