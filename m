@@ -1,40 +1,60 @@
-From: Mathieu Poirier <mathieu.poirier@linaro.org>
-Subject: Vexpress TC2 no longer booting on v4.12-rc1
-Date: Fri, 2 Jun 2017 16:16:59 -0600
-Message-ID: <CANLsYkz3dcVArStN2GJguYfJbWc_4dC4vvTE1KVtYpVWipEYjg@mail.gmail.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: Vexpress TC2 no longer booting on v4.12-rc1
+Date: Fri, 2 Jun 2017 23:24:50 +0100
+Message-ID: <20170602222449.GB4902@n2100.armlinux.org.uk>
+References: <CANLsYkz3dcVArStN2GJguYfJbWc_4dC4vvTE1KVtYpVWipEYjg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: kvm@vger.kernel.org, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF8BD40C5A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 18:21:08 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3Cv3brXt9Ptx for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Jun 2017 18:21:05 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AEA9F4095A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 18:21:05 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <CANLsYkz3dcVArStN2GJguYfJbWc_4dC4vvTE1KVtYpVWipEYjg@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Good afternoon Russell and friends,
+On Fri, Jun 02, 2017 at 04:16:59PM -0600, Mathieu Poirier wrote:
+> Good afternoon Russell and friends,
+> 
+> I noticed that my vexpress-TC2 platform stopped booting when moving to
+> kernel v4.12-rc1 (same with -rc2 and 3).  The last time things worked
+> properly was on v4.11.  I did a bisect between v4.11 and v4.12-rc1 and
+> ended up on [1], hence this email.
+> 
+> Since CONFIG_ARM_VIRT_EXT is selected by  default I removed the
+> "#ifdef CONFIG_ARM_VIRT_EXT" section in the last hunk of the patch and
+> the system sprung up to life again.
 
-I noticed that my vexpress-TC2 platform stopped booting when moving to
-kernel v4.12-rc1 (same with -rc2 and 3).  The last time things worked
-properly was on v4.11.  I did a bisect between v4.11 and v4.12-rc1 and
-ended up on [1], hence this email.
+Hmm, this doesn't make much sense.  The code in last hunk of the patch
+you refer to should only get run during system shutdown, not during
+system boot, so I think something else is going on...
 
-Since CONFIG_ARM_VIRT_EXT is selected by  default I removed the
-"#ifdef CONFIG_ARM_VIRT_EXT" section in the last hunk of the patch and
-the system sprung up to life again.
+Please could you test again, this time rather than removing the #ifdef,
+add two "mov r0, r0" there?  (So replacing the two instructions that
+removing the ifdef would have exposed.)
 
-Compiler: arm-linux-gnueabi-gcc (Ubuntu/Linaro 5.4.0-6ubuntu1~16.04.4)
-5.4.0 20160609
-Kernel command line: console=ttyAMA0,38400 loglevel=8 root=/dev/sda2 rootwait
-U-boot:
- ## Flattened Device Tree blob at 82000000
-   Booting using the fdt blob at 0x82000000
-   Loading Ramdisk to 9fcea000, end 9feea6d1 ... OK
-   Loading Device Tree to 9fce2000, end 9fce9ad8 ... OK
+Thanks.
 
-I'm not sure what else you need at this time - simply get back to me
-with what I'm missing and I'll be happy to provided.  I'm also
-offering to test patches.
-
-Many thanks,
-Mathieu
-
-[1]. 9da5ac236de6 ARM: soft-reboot into same mode that we entered the kernel
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
