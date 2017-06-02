@@ -1,27 +1,27 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2] KVM: arm/arm64: Signal SIGBUS when stage2 discovers
- hwpoison memory
-Date: Fri, 2 Jun 2017 00:22:35 +0200
-Message-ID: <20170601222235.GN20919@cbox>
-References: <20170524163250.29281-1-james.morse@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 05/10] VFIO: pci: Introduce direct EOI INTx interrupt
+ handler
+Date: Fri, 2 Jun 2017 09:41:34 +0100
+Message-ID: <4dc0ca5e-cd73-944b-77b4-6822c5289348@arm.com>
+References: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
+ <1495656803-28011-6-git-send-email-eric.auger@redhat.com>
+ <20170531122419.07e3f26d@w520.home>
+ <ba7d07c1-4349-5c24-ec19-d372ade25432@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A267640C4A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 18:18:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B75BD40C50
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 04:37:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rao0tutB2eRZ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Jun 2017 18:18:54 -0400 (EDT)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0678940625
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jun 2017 18:18:53 -0400 (EDT)
-Received: by mail-wm0-f45.google.com with SMTP id d127so5789423wmf.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Jun 2017 15:22:51 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170524163250.29281-1-james.morse@arm.com>
+ with ESMTP id FVzJci7xvohx for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Jun 2017 04:37:40 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39BF940BD8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 04:37:40 -0400 (EDT)
+In-Reply-To: <ba7d07c1-4349-5c24-ec19-d372ade25432@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,114 +31,139 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Auger Eric <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 24, 2017 at 05:32:50PM +0100, James Morse wrote:
-> Once we enable ARCH_SUPPORTS_MEMORY_FAILURE on arm64, notifications for
-> broken memory can call memory_failure() in mm/memory-failure.c to deliver
-> SIGBUS to any user space process using the page, and notify all the
-> in-kernel users.
+On 01/06/17 21:40, Auger Eric wrote:
+> Hi Alex,
 > 
-> If the page corresponded with guest memory, KVM will unmap this page
-> from its stage2 page tables. The user space process that allocated
-> this memory may have never touched this page in which case it may not
-> be mapped meaning SIGBUS won't be delivered.
-
-Sorry, I don't remember, what is the scenario where KVM can have a
-mapping in stage 2 without there being a corresponding mapping for user
-space?
-
+> On 31/05/2017 20:24, Alex Williamson wrote:
+>> On Wed, 24 May 2017 22:13:18 +0200
+>> Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>>> We add two new fields in vfio_pci_irq_ctx struct: deoi and handler.
+>>> If deoi is set, this means the physical IRQ attached to the virtual
+>>> IRQ is directly deactivated by the guest and the VFIO driver does
+>>> not need to disable the physical IRQ and mask it at VFIO level.
+>>>
+>>> The handler pointer is set accordingly and a wrapper handler is
+>>> introduced that calls the chosen handler function.
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>
+>>> ---
+>>> ---
+>>>  drivers/vfio/pci/vfio_pci_intrs.c   | 32 ++++++++++++++++++++++++++------
+>>>  drivers/vfio/pci/vfio_pci_private.h |  2 ++
+>>>  2 files changed, 28 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+>>> index d4d377b..06aa713 100644
+>>> --- a/drivers/vfio/pci/vfio_pci_intrs.c
+>>> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+>>> @@ -121,11 +121,8 @@ void vfio_pci_intx_unmask(struct vfio_pci_device *vdev)
+>>>  static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
+>>>  {
+>>>  	struct vfio_pci_device *vdev = dev_id;
+>>> -	unsigned long flags;
+>>>  	int ret = IRQ_NONE;
+>>>  
+>>> -	spin_lock_irqsave(&vdev->irqlock, flags);
+>>> -
+>>>  	if (!vdev->pci_2_3) {
+>>>  		disable_irq_nosync(vdev->pdev->irq);
+>>>  		vdev->ctx[0].automasked = true;
+>>> @@ -137,14 +134,33 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
+>>>  		ret = IRQ_HANDLED;
+>>>  	}
+>>>  
+>>> -	spin_unlock_irqrestore(&vdev->irqlock, flags);
+>>> -
+>>>  	if (ret == IRQ_HANDLED)
+>>>  		vfio_send_intx_eventfd(vdev, NULL);
+>>>  
+>>>  	return ret;
+>>>  }
+>>>  
+>>> +static irqreturn_t vfio_intx_handler_deoi(int irq, void *dev_id)
+>>> +{
+>>> +	struct vfio_pci_device *vdev = dev_id;
+>>> +
+>>> +	vfio_send_intx_eventfd(vdev, NULL);
+>>> +	return IRQ_HANDLED;
+>>> +}
+>>> +
+>>> +static irqreturn_t vfio_intx_wrapper_handler(int irq, void *dev_id)
+>>> +{
+>>> +	struct vfio_pci_device *vdev = dev_id;
+>>> +	unsigned long flags;
+>>> +	irqreturn_t ret;
+>>> +
+>>> +	spin_lock_irqsave(&vdev->irqlock, flags);
+>>> +	ret = vdev->ctx[0].handler(irq, dev_id);
+>>> +	spin_unlock_irqrestore(&vdev->irqlock, flags);
+>>> +
+>>> +	return ret;
+>>> +}
+>>> +
+>>>  static int vfio_intx_enable(struct vfio_pci_device *vdev)
+>>>  {
+>>>  	if (!is_irq_none(vdev))
+>>> @@ -208,7 +224,11 @@ static int vfio_intx_set_signal(struct vfio_pci_device *vdev, int fd)
+>>>  	if (!vdev->pci_2_3)
+>>>  		irqflags = 0;
+>>>  
+>>> -	ret = request_irq(pdev->irq, vfio_intx_handler,
+>>> +	if (vdev->ctx[0].deoi)
+>>> +		vdev->ctx[0].handler = vfio_intx_handler_deoi;
+>>> +	else
+>>> +		vdev->ctx[0].handler = vfio_intx_handler;
+>>> +	ret = request_irq(pdev->irq, vfio_intx_wrapper_handler,
+>>>  			  irqflags, vdev->ctx[0].name, vdev);
+>>
+>>
+>> Here's where I think we don't account for irqflags properly.  If we get
+>> a shared interrupt here, then enabling direct EOI needs to be disabled
+>> or else we'll starve other devices sharing the interrupt.  In practice,
+>> I wonder if this makes PCI direct EOI a useful feature.  We could try
+>> to get an exclusive interrupt and fallback to shared, but any time we
+>> get an exclusive interrupt we're more prone to conflicts with other
+>> devices.  I might have two VMs that share an interrupt and now it's a
+>> race that only the first to setup an IRQ can work.  Worse, one of those
+>> VMs might be fully booted and switched to MSI and now it's just a
+>> matter of time until they reboot in the right way to generate a
+>> conflict.  I might also have two devices in the same VM that share an
+>> IRQ and now I can't start the VM at all because the second device can
+>> no longer get an interrupt.  This is the same problem we have with the
+>> nointxmask flag, it's a useful debugging feature but since the masking
+>> is done at the APIC/GIC rather than the device, much like here, it's not
+>> very practical for more than debugging and isolating specific devices
+>> as requiring APIC/GIC level masking.  I'm not sure how to proceed on the
+>> PCI side here. Thanks,
 > 
-> This works well until a guest accesses that page, and KVM discovers
-> pfn == KVM_PFN_ERR_HWPOISON when it comes to process the stage2 fault.
+> Thanks for the review.
 > 
-> Do as x86 does, and deliver the SIGBUS when we discover
-> KVM_PFN_ERR_HWPOISON. Use the stage2 mapping size as the si_addr_lsb
+> I share you concerns about shared interrupts. I need to spend some
+> additional time reading the VFIO code related to those and that part of
+> the PCIe spec too.
+> 
+> Maybe we shall introduce the IRQ bypass based DEOI setup only for
+> platform devices. I know those are not much used at the moment but this
+> at least prepares for GICv4 direct injection.
 
-But this part about the stage 2 mapping size is not what the code does.
-It uses the granularity of the mmap region, if I'm not mistaken.
+I think that'd be good enough, unless we can ensure that we only engage
+the Direct EOI feature when PCI legacy interrupts are not shared. The
+system I have here (AMD Seattle) seem to have one set of INTx per PCIe
+port, so the above would definitely work on it. But I understand that
+there is not a guarantee at all.
 
-I lost track of what the right thing was, can you remind me?
+Maybe the "nointxmask" flag is not that bad a solution in that case. It
+would clearly outline that the user knows the platform is safe, and that
+we can use the Direct EOI feature.
 
 Thanks,
--Christoffer
 
-
-> as this matches the user space mapping size.
-> 
-> Cc: Punit Agrawal <punit.agrawal@arm.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> 
-> ---
-> This will be needed once we enable ARCH_SUPPORTS_MEMORY_FAILURE for
-> arm64[0]. It is harmless until then as KVM_PFN_ERR_HWPOISON will
-> never be seen.
-> 
-> Changes since v1:
->  * Pass the vma to kvm_send_hwpoison_signal(), used Punit's huge_page_shift()
->    calculation to find the block size.
->  * ... tested against hugepage not transparent huge page ...
-> 
-> Today we will inherit some existing breakage between KVM, hugepages
-> and hwpoison. Patch at [1].
-> 
-> 
-> [0] https://www.spinics.net/lists/arm-kernel/msg581657.html
-> [1] https://marc.info/?l=linux-mm&m=149564219918427&w=2
-> 
->  virt/kvm/arm/mmu.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 313ee646480f..eaa29aeb7c5b 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -20,6 +20,7 @@
->  #include <linux/kvm_host.h>
->  #include <linux/io.h>
->  #include <linux/hugetlb.h>
-> +#include <linux/sched/signal.h>
->  #include <trace/events/kvm.h>
->  #include <asm/pgalloc.h>
->  #include <asm/cacheflush.h>
-> @@ -1249,6 +1250,24 @@ static void coherent_cache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
->  	__coherent_cache_guest_page(vcpu, pfn, size);
->  }
->  
-> +static void kvm_send_hwpoison_signal(unsigned long address,
-> +				     struct vm_area_struct *vma)
-> +{
-> +	siginfo_t info;
-> +
-> +	info.si_signo   = SIGBUS;
-> +	info.si_errno   = 0;
-> +	info.si_code    = BUS_MCEERR_AR;
-> +	info.si_addr    = (void __user *)address;
-> +
-> +	if (is_vm_hugetlb_page(vma))
-> +		info.si_addr_lsb = huge_page_shift(hstate_vma(vma));
-> +	else
-> +		info.si_addr_lsb = PAGE_SHIFT;
-> +
-> +	send_sig_info(SIGBUS, &info, current);
-> +}
-> +
->  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			  struct kvm_memory_slot *memslot, unsigned long hva,
->  			  unsigned long fault_status)
-> @@ -1318,6 +1337,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	smp_rmb();
->  
->  	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
-> +	if (pfn == KVM_PFN_ERR_HWPOISON) {
-> +		kvm_send_hwpoison_signal(hva, vma);
-> +		return 0;
-> +	}
->  	if (is_error_noslot_pfn(pfn))
->  		return -EFAULT;
->  
-> -- 
-> 2.11.0
-> 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
