@@ -1,60 +1,78 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: Vexpress TC2 no longer booting on v4.12-rc1
-Date: Fri, 2 Jun 2017 23:24:50 +0100
-Message-ID: <20170602222449.GB4902@n2100.armlinux.org.uk>
-References: <CANLsYkz3dcVArStN2GJguYfJbWc_4dC4vvTE1KVtYpVWipEYjg@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] ACPI: Add APEI GHES Table Generation
+ support
+Date: Sat, 3 Jun 2017 14:01:45 +0200
+Message-ID: <e90c5fb8-e68b-a620-9023-f4fcfdd68e97@redhat.com>
+References: <1493530506-26833-1-git-send-email-gengdongjiu@huawei.com>
+ <4dde45bb-a730-82b1-dc49-ad00a6b73d85@redhat.com>
+ <accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF8BD40C5A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 18:21:08 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3Cv3brXt9Ptx for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Jun 2017 18:21:05 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AEA9F4095A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jun 2017 18:21:05 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <CANLsYkz3dcVArStN2GJguYfJbWc_4dC4vvTE1KVtYpVWipEYjg@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mathieu Poirier <mathieu.poirier@linaro.org>
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com>
+Content-Language: en-US
+Sender: kvm-owner@vger.kernel.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: james.morse@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, wangxiongfeng2@huawei.com, xiexiuqi@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jun 02, 2017 at 04:16:59PM -0600, Mathieu Poirier wrote:
-> Good afternoon Russell and friends,
+On 05/22/17 16:23, Laszlo Ersek wrote:
+> Keeping some context:
 > 
-> I noticed that my vexpress-TC2 platform stopped booting when moving to
-> kernel v4.12-rc1 (same with -rc2 and 3).  The last time things worked
-> properly was on v4.11.  I did a bisect between v4.11 and v4.12-rc1 and
-> ended up on [1], hence this email.
+> On 05/12/17 23:00, Laszlo Ersek wrote:
+>> On 04/30/17 07:35, Dongjiu Geng wrote:
+
+> (68) In the code below, you are not taking an "OVMF header probe
+> suppressor" into account.
 > 
-> Since CONFIG_ARM_VIRT_EXT is selected by  default I removed the
-> "#ifdef CONFIG_ARM_VIRT_EXT" section in the last hunk of the patch and
-> the system sprung up to life again.
+> But, we have already planned to replace that quirk with a separate,
+> dedicated allocation hint or command, so I'm not going to describe what
+> an "OVMF header probe suppressor" is; instead, I'll describe the
+> replacement for it.
+> 
+> [...]
 
-Hmm, this doesn't make much sense.  The code in last hunk of the patch
-you refer to should only get run during system shutdown, not during
-system boot, so I think something else is going on...
+So, the NOACPI allocation hint is a no-go at the moment, based on the
+discussion in the following threads:
 
-Please could you test again, this time rather than removing the #ifdef,
-add two "mov r0, r0" there?  (So replacing the two instructions that
-removing the ifdef would have exposed.)
+http://mid.mail-archive.com/20170601112241.2580-1-ard.biesheuvel@linaro.org
 
-Thanks.
+http://mid.mail-archive.com/c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com
 
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+Therefore the header probe suppression remains necessary.
+
+In this case, it is not hard to do, you just have to reorder the
+following two ADD_POINTER additions a bit:
+
+>>> +
+>>> +        bios_linker_loader_add_pointer(linker, GHES_ERRORS_FW_CFG_FILE,
+>>> +                                sizeof(uint64_t) * i, sizeof(uint64_t),
+>>> +                                GHES_ERRORS_FW_CFG_FILE,
+>>> +                                MAX_ERROR_SOURCE_COUNT_V6 * sizeof(uint64_t) +
+>>> +                                i * MAX_RAW_DATA_LENGTH);
+
+This one should be moved out to a separate loop, after the current loop.
+
+>>> +        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+>>> +                    address_registers_offset
+>>> +                    + i * sizeof(AcpiGenericHardwareErrorSource),
+>>> +                    sizeof(uint32_t), GHES_ERRORS_FW_CFG_FILE,
+>>> +                    i * sizeof(uint64_t));
+
+This one should be kept in the first (i.e., current) loop.
+
+The idea is, when you first point the HEST/GHES_n entries in
+ACPI_BUILD_TABLE_FILE to the "address registers" in
+GHES_ERRORS_FW_CFG_FILE, all those address registers will still be
+zero-filled. This will fail the ACPI table header probe in
+OvmfPkg/AcpiPlatformDxe, which is what we want.
+
+After this is done, the address registers in GHES_ERRORS_FW_CFG_FILE
+should be pointed to the error status data blocks in the same fw_cfg
+blob, in a separate loop. (Those error status data blocks will again be
+zero-filled, so no ACPI table headers will be mistakenly recognized in
+them.)
+
+Thanks
+Laszlo
