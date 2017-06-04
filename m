@@ -1,78 +1,172 @@
-From: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] ACPI: Add APEI GHES Table Generation
- support
-Date: Sat, 3 Jun 2017 14:01:45 +0200
-Message-ID: <e90c5fb8-e68b-a620-9023-f4fcfdd68e97@redhat.com>
-References: <1493530506-26833-1-git-send-email-gengdongjiu@huawei.com>
- <4dde45bb-a730-82b1-dc49-ad00a6b73d85@redhat.com>
- <accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v2 3/3] KVM: arm/arm64: Simplify active_change_prepare
+ and plug race
+Date: Sun, 4 Jun 2017 10:15:57 +0200
+Message-ID: <20170604081557.rhda3xp34mgkf7ow@hawk.localdomain>
+References: <20170516100431.4101-1-cdall@linaro.org>
+ <20170516100431.4101-4-cdall@linaro.org>
+ <9a412ed2-70ea-b651-dd75-18d723ee8b71@arm.com>
+ <20170523084329.GC6319@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20170523084329.GC6319@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: james.morse@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, wangxiongfeng2@huawei.com, xiexiuqi@huawei.com
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Eric Auger <eric.auger@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/22/17 16:23, Laszlo Ersek wrote:
-> Keeping some context:
+On Tue, May 23, 2017 at 10:43:29AM +0200, Christoffer Dall wrote:
+> On Mon, May 22, 2017 at 04:30:22PM +0100, Marc Zyngier wrote:
+> > On 16/05/17 11:04, Christoffer Dall wrote:
+> > > We don't need to stop a specific VCPU when changing the active state,
+> > > because private IRQs can only be modified by a running VCPU for the
+> > > VCPU itself and it is therefore already stopped.
+> > > 
+> > > However, it is also possible for two VCPUs to be modifying the active
+> > > state of SPIs at the same time, which can cause the thread being stuck
+> > > in the loop that checks other VCPU threads for a potentially very long
+> > > time, or to modify the active state of a running VCPU.  Fix this by
+> > > serializing all accesses to setting and clearing the active state of
+> > > interrupts using the KVM mutex.
+> > > 
+> > > Reported-by: Andrew Jones <drjones@redhat.com>
+> > > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > > ---
+> > >  arch/arm/include/asm/kvm_host.h   |  2 --
+> > >  arch/arm64/include/asm/kvm_host.h |  2 --
+> > >  virt/kvm/arm/arm.c                | 20 ++++----------------
+> > >  virt/kvm/arm/vgic/vgic-mmio.c     | 18 ++++++++++--------
+> > >  virt/kvm/arm/vgic/vgic.c          | 11 ++++++-----
+> > >  5 files changed, 20 insertions(+), 33 deletions(-)
+> > > 
+> > > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> > > index f0e6657..12274d4 100644
+> > > --- a/arch/arm/include/asm/kvm_host.h
+> > > +++ b/arch/arm/include/asm/kvm_host.h
+> > > @@ -233,8 +233,6 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+> > >  struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
+> > >  void kvm_arm_halt_guest(struct kvm *kvm);
+> > >  void kvm_arm_resume_guest(struct kvm *kvm);
+> > > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
+> > > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
+> > >  
+> > >  int kvm_arm_copy_coproc_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+> > >  unsigned long kvm_arm_num_coproc_regs(struct kvm_vcpu *vcpu);
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 5e19165..32cbe8a 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -333,8 +333,6 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
+> > >  struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+> > >  void kvm_arm_halt_guest(struct kvm *kvm);
+> > >  void kvm_arm_resume_guest(struct kvm *kvm);
+> > > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
+> > > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
+> > >  
+> > >  u64 __kvm_call_hyp(void *hypfn, ...);
+> > >  #define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__)
+> > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > > index 3417e18..3c387fd 100644
+> > > --- a/virt/kvm/arm/arm.c
+> > > +++ b/virt/kvm/arm/arm.c
+> > > @@ -539,27 +539,15 @@ void kvm_arm_halt_guest(struct kvm *kvm)
+> > >  	kvm_make_all_cpus_request(kvm, KVM_REQ_VCPU_EXIT);
+> > >  }
+> > >  
+> > > -void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu)
+> > > -{
+> > > -	vcpu->arch.pause = true;
+> > > -	kvm_vcpu_kick(vcpu);
+> > > -}
+> > > -
+> > > -void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
+> > > -{
+> > > -	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
+> > > -
+> > > -	vcpu->arch.pause = false;
+> > > -	swake_up(wq);
+> > > -}
+> > > -
+> > >  void kvm_arm_resume_guest(struct kvm *kvm)
+> > >  {
+> > >  	int i;
+> > >  	struct kvm_vcpu *vcpu;
+> > >  
+> > > -	kvm_for_each_vcpu(i, vcpu, kvm)
+> > > -		kvm_arm_resume_vcpu(vcpu);
+> > > +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> > > +		vcpu->arch.pause = false;
+> > > +		swake_up(kvm_arch_vcpu_wq(vcpu));
+> > > +	}
+> > >  }
+> > >  
+> > >  static void vcpu_sleep(struct kvm_vcpu *vcpu)
+> > > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> > > index 64cbcb4..c1e4bdd 100644
+> > > --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> > > +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> > > @@ -231,23 +231,21 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+> > >   * be migrated while we don't hold the IRQ locks and we don't want to be
+> > >   * chasing moving targets.
+> > >   *
+> > > - * For private interrupts, we only have to make sure the single and only VCPU
+> > > - * that can potentially queue the IRQ is stopped.
+> > > + * For private interrupts we don't have to do anything because userspace
+> > > + * accesses to the VGIC state already require all VCPUs to be stopped, and
+> > > + * only the VCPU itself can modify its private interrupts active state, which
+> > > + * guarantees that the VCPU is not running.
+> > >   */
+> > >  static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+> > >  {
+> > > -	if (intid < VGIC_NR_PRIVATE_IRQS)
+> > > -		kvm_arm_halt_vcpu(vcpu);
+> > > -	else
+> > > +	if (intid > VGIC_NR_PRIVATE_IRQS)
+> > >  		kvm_arm_halt_guest(vcpu->kvm);
+> > >  }
+> > >  
+> > >  /* See vgic_change_active_prepare */
+> > >  static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
+> > >  {
+> > > -	if (intid < VGIC_NR_PRIVATE_IRQS)
+> > > -		kvm_arm_resume_vcpu(vcpu);
+> > > -	else
+> > > +	if (intid > VGIC_NR_PRIVATE_IRQS)
+> > >  		kvm_arm_resume_guest(vcpu->kvm);
+> > >  }
+> > >  
+> > > @@ -271,11 +269,13 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+> > >  {
+> > >  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+> > >  
+> > > +	mutex_lock(&vcpu->kvm->lock);
+> > >  	vgic_change_active_prepare(vcpu, intid);
+> > >  
+> > >  	__vgic_mmio_write_cactive(vcpu, addr, len, val);
+> > >  
+> > >  	vgic_change_active_finish(vcpu, intid);
+> > > +	mutex_unlock(&vcpu->kvm->lock);
+> > 
+> > Any reason not to move the lock/unlock calls to prepare/finish? Also, do
+> > we need to take that mutex if intid is a PPI?
 > 
-> On 05/12/17 23:00, Laszlo Ersek wrote:
->> On 04/30/17 07:35, Dongjiu Geng wrote:
-
-> (68) In the code below, you are not taking an "OVMF header probe
-> suppressor" into account.
+> I guess we strictly don't need to take the mutex if it's a PPI, no.
 > 
-> But, we have already planned to replace that quirk with a separate,
-> dedicated allocation hint or command, so I'm not going to describe what
-> an "OVMF header probe suppressor" is; instead, I'll describe the
-> replacement for it.
+> But I actually preferred this symmetry because you can easily tell we
+> don't have a bug (famous last words) by locking and unlocking the mutex
+> in the same function.
 > 
-> [...]
+> I don't feel strongly about it though, so I can move it if you prefer
+> it.
 
-So, the NOACPI allocation hint is a no-go at the moment, based on the
-discussion in the following threads:
+Actually we must move the locking into the prepare/finish functions, in
+order to tuck them into the VGIC_NR_PRIVATE_IRQS conditions. Otherwise,
+with gicv3, when userspace accesses ISACTIVER0/ICACTIVER0, which are
+SGI_base offsets, then the vgic_v3_sgibase_registers table is used. That
+table doesn't provide the uaccess functions, so we try to lock twice
+again.
 
-http://mid.mail-archive.com/20170601112241.2580-1-ard.biesheuvel@linaro.org
-
-http://mid.mail-archive.com/c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com
-
-Therefore the header probe suppression remains necessary.
-
-In this case, it is not hard to do, you just have to reorder the
-following two ADD_POINTER additions a bit:
-
->>> +
->>> +        bios_linker_loader_add_pointer(linker, GHES_ERRORS_FW_CFG_FILE,
->>> +                                sizeof(uint64_t) * i, sizeof(uint64_t),
->>> +                                GHES_ERRORS_FW_CFG_FILE,
->>> +                                MAX_ERROR_SOURCE_COUNT_V6 * sizeof(uint64_t) +
->>> +                                i * MAX_RAW_DATA_LENGTH);
-
-This one should be moved out to a separate loop, after the current loop.
-
->>> +        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->>> +                    address_registers_offset
->>> +                    + i * sizeof(AcpiGenericHardwareErrorSource),
->>> +                    sizeof(uint32_t), GHES_ERRORS_FW_CFG_FILE,
->>> +                    i * sizeof(uint64_t));
-
-This one should be kept in the first (i.e., current) loop.
-
-The idea is, when you first point the HEST/GHES_n entries in
-ACPI_BUILD_TABLE_FILE to the "address registers" in
-GHES_ERRORS_FW_CFG_FILE, all those address registers will still be
-zero-filled. This will fail the ACPI table header probe in
-OvmfPkg/AcpiPlatformDxe, which is what we want.
-
-After this is done, the address registers in GHES_ERRORS_FW_CFG_FILE
-should be pointed to the error status data blocks in the same fw_cfg
-blob, in a separate loop. (Those error status data blocks will again be
-zero-filled, so no ACPI table headers will be mistakenly recognized in
-them.)
-
-Thanks
-Laszlo
+Thanks,
+drew
