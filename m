@@ -1,97 +1,172 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v5 00/11] KVM: arm/arm64: race fixes and vcpu requests
-Date: Sun,  4 Jun 2017 14:43:50 +0200
-Message-ID: <20170604124401.24902-1-drjones@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH v5 01/11] KVM: improve arch vcpu request defining
+Date: Sun,  4 Jun 2017 14:43:51 +0200
+Message-ID: <20170604124401.24902-2-drjones@redhat.com>
+References: <20170604124401.24902-1-drjones@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170604124401.24902-1-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: cdall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series fixes some hard to produce races by introducing the use of
-vcpu requests. I've tested the series on a Mustang and ThunderX and
-compile-tested the ARM bits.
+Marc Zyngier suggested that we define the arch specific VCPU request
+base, rather than requiring each arch to remember to start from 8.
+That suggestion, along with Radim Krcmar's recent VCPU request flag
+addition, snowballed into defining something of an arch VCPU request
+defining API.
 
-Patch 3/11 adds documentation, as, at least for me, understanding vcpu
-request interplay with vcpu kicks and vcpu mode and the memory barriers
-that interplay implies, is exhausting.
+No functional change.
 
-v5:
-  - Christoffer's doc clarification suggestions
-  - Use kvm_vcpu_wake_up() [Christoffer]
+(Looks like x86 is running out of arch VCPU request bits.  Maybe
+ someday we'll need to extend to 64.)
 
-v4:
-  - Rebase on latest kvmarm/queue. No more kvm_arm_halt/resume_vcpu
-  - Documentation additions/clarifications [Paolo]
-  - go back to sleep after getting a signal [Christoffer]
-  - timer doesn't need a vcpu request, just a wake up [Christoffer]
-  - patch dropping/adding/reshuffling for above changes
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Acked-by: Christoffer Dall <cdall@linaro.org>
+---
+ arch/arm/include/asm/kvm_host.h     |  3 ++-
+ arch/arm64/include/asm/kvm_host.h   |  3 ++-
+ arch/powerpc/include/asm/kvm_host.h |  4 ++--
+ arch/s390/include/asm/kvm_host.h    |  6 ++---
+ arch/x86/include/asm/kvm_host.h     | 47 ++++++++++++++++++++-----------------
+ include/linux/kvm_host.h            |  7 ++++++
+ 6 files changed, 41 insertions(+), 29 deletions(-)
 
-v3:
-  - The easier to reproduce PSCI races previously fixed with this
-    series were fixed independently with a different approach suggested
-    by Christoffer[1].
-  - Based on Radim's latest vcpu request rework series[2]
-  - Rewrote the documentation adding much more information and
-    incorporating Christoffer's comments from v2.
-  - Reworked the approach to controlling pause and power_off by
-    requests.
-  - Clear request for pending irq injection in the correct place, as
-    pointed out by Christoffer.
-  - Rebase required some simple changes to the PMU code patch.
-
-v2:
-  - No longer based on Radim's vcpu request API rework[3], except for
-    including "add kvm_request_pending" as patch 1/10 [drew]
-  - Added vcpu request documentation [drew]
-  - Dropped the introduction of user settable MPIDRs [Christoffer]
-  - Added vcpu requests to all request-less vcpu kicks [Christoffer]
-
-[1] https://www.spinics.net/lists/arm-kernel/msg577630.html
-[2] http://www.spinics.net/lists/kvm/msg148890.html
-[3] https://www.spinics.net/lists/kvm/msg145588.html
-
-
-Andrew Jones (10):
-  KVM: improve arch vcpu request defining
-  KVM: Add documentation for VCPU requests
-  KVM: arm/arm64: properly use vcpu requests
-  KVM: arm/arm64: replace pause checks with vcpu request checks
-  KVM: arm/arm64: use vcpu requests for power_off
-  KVM: arm/arm64: optimize VCPU RUN
-  KVM: arm/arm64: change exit request to sleep request
-  KVM: arm/arm64: use vcpu requests for irq injection
-  KVM: arm/arm64: PMU: remove request-less vcpu kick
-  KVM: arm/arm64: timer: remove request-less vcpu kick
-
-Radim Krčmář (1):
-  KVM: add kvm_request_pending
-
- Documentation/virtual/kvm/vcpu-requests.rst | 307 ++++++++++++++++++++++++++++
- arch/arm/include/asm/kvm_host.h             |   4 +-
- arch/arm/kvm/handle_exit.c                  |   1 +
- arch/arm64/include/asm/kvm_host.h           |   4 +-
- arch/arm64/kvm/handle_exit.c                |   1 +
- arch/mips/kvm/trap_emul.c                   |   2 +-
- arch/mips/kvm/vz.c                          |   2 +-
- arch/powerpc/include/asm/kvm_host.h         |   4 +-
- arch/powerpc/kvm/booke.c                    |   2 +-
- arch/powerpc/kvm/powerpc.c                  |   5 +-
- arch/s390/include/asm/kvm_host.h            |   6 +-
- arch/s390/kvm/kvm-s390.c                    |   2 +-
- arch/x86/include/asm/kvm_host.h             |  47 +++--
- arch/x86/kvm/x86.c                          |   4 +-
- include/linux/kvm_host.h                    |  12 ++
- virt/kvm/arm/arch_timer.c                   |   2 +-
- virt/kvm/arm/arm.c                          |  50 ++++-
- virt/kvm/arm/pmu.c                          |  40 ++--
- virt/kvm/arm/psci.c                         |   8 +-
- virt/kvm/arm/vgic/vgic.c                    |   9 +-
- 20 files changed, 439 insertions(+), 73 deletions(-)
- create mode 100644 Documentation/virtual/kvm/vcpu-requests.rst
-
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 12274d46df70..c556babe467c 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -44,7 +44,8 @@
+ #define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
+ #endif
+ 
+-#define KVM_REQ_VCPU_EXIT	(8 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_VCPU_EXIT \
++	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ 
+ u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+ int __attribute_const__ kvm_target_cpu(void);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 32cbe8a3bb0d..0ff991c9c66e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -41,7 +41,8 @@
+ 
+ #define KVM_VCPU_MAX_FEATURES 4
+ 
+-#define KVM_REQ_VCPU_EXIT	(8 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_VCPU_EXIT \
++	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ 
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 9c51ac4b8f36..50e0bc9723cc 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -52,8 +52,8 @@
+ #define KVM_IRQCHIP_NUM_PINS     256
+ 
+ /* PPC-specific vcpu->requests bit members */
+-#define KVM_REQ_WATCHDOG           8
+-#define KVM_REQ_EPR_EXIT           9
++#define KVM_REQ_WATCHDOG	KVM_ARCH_REQ(0)
++#define KVM_REQ_EPR_EXIT	KVM_ARCH_REQ(1)
+ 
+ #include <linux/mmu_notifier.h>
+ 
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 426614a882a9..9c3bd94204ac 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -42,9 +42,9 @@
+ #define KVM_HALT_POLL_NS_DEFAULT 80000
+ 
+ /* s390-specific vcpu->requests bit members */
+-#define KVM_REQ_ENABLE_IBS         8
+-#define KVM_REQ_DISABLE_IBS        9
+-#define KVM_REQ_ICPT_OPEREXC       10
++#define KVM_REQ_ENABLE_IBS	KVM_ARCH_REQ(0)
++#define KVM_REQ_DISABLE_IBS	KVM_ARCH_REQ(1)
++#define KVM_REQ_ICPT_OPEREXC	KVM_ARCH_REQ(2)
+ 
+ #define SIGP_CTRL_C		0x80
+ #define SIGP_CTRL_SCN_MASK	0x3f
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 9c761fea0c98..563979976fab 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -48,28 +48,31 @@
+ #define KVM_IRQCHIP_NUM_PINS  KVM_IOAPIC_NUM_PINS
+ 
+ /* x86-specific vcpu->requests bit members */
+-#define KVM_REQ_MIGRATE_TIMER      8
+-#define KVM_REQ_REPORT_TPR_ACCESS  9
+-#define KVM_REQ_TRIPLE_FAULT      10
+-#define KVM_REQ_MMU_SYNC          11
+-#define KVM_REQ_CLOCK_UPDATE      12
+-#define KVM_REQ_EVENT             14
+-#define KVM_REQ_APF_HALT          15
+-#define KVM_REQ_STEAL_UPDATE      16
+-#define KVM_REQ_NMI               17
+-#define KVM_REQ_PMU               18
+-#define KVM_REQ_PMI               19
+-#define KVM_REQ_SMI               20
+-#define KVM_REQ_MASTERCLOCK_UPDATE 21
+-#define KVM_REQ_MCLOCK_INPROGRESS (22 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+-#define KVM_REQ_SCAN_IOAPIC       (23 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+-#define KVM_REQ_GLOBAL_CLOCK_UPDATE 24
+-#define KVM_REQ_APIC_PAGE_RELOAD  (25 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+-#define KVM_REQ_HV_CRASH          26
+-#define KVM_REQ_IOAPIC_EOI_EXIT   27
+-#define KVM_REQ_HV_RESET          28
+-#define KVM_REQ_HV_EXIT           29
+-#define KVM_REQ_HV_STIMER         30
++#define KVM_REQ_MIGRATE_TIMER		KVM_ARCH_REQ(0)
++#define KVM_REQ_REPORT_TPR_ACCESS	KVM_ARCH_REQ(1)
++#define KVM_REQ_TRIPLE_FAULT		KVM_ARCH_REQ(2)
++#define KVM_REQ_MMU_SYNC		KVM_ARCH_REQ(3)
++#define KVM_REQ_CLOCK_UPDATE		KVM_ARCH_REQ(4)
++#define KVM_REQ_EVENT			KVM_ARCH_REQ(6)
++#define KVM_REQ_APF_HALT		KVM_ARCH_REQ(7)
++#define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(8)
++#define KVM_REQ_NMI			KVM_ARCH_REQ(9)
++#define KVM_REQ_PMU			KVM_ARCH_REQ(10)
++#define KVM_REQ_PMI			KVM_ARCH_REQ(11)
++#define KVM_REQ_SMI			KVM_ARCH_REQ(12)
++#define KVM_REQ_MASTERCLOCK_UPDATE	KVM_ARCH_REQ(13)
++#define KVM_REQ_MCLOCK_INPROGRESS \
++	KVM_ARCH_REQ_FLAGS(14, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_SCAN_IOAPIC \
++	KVM_ARCH_REQ_FLAGS(15, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_GLOBAL_CLOCK_UPDATE	KVM_ARCH_REQ(16)
++#define KVM_REQ_APIC_PAGE_RELOAD \
++	KVM_ARCH_REQ_FLAGS(17, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_HV_CRASH		KVM_ARCH_REQ(18)
++#define KVM_REQ_IOAPIC_EOI_EXIT		KVM_ARCH_REQ(19)
++#define KVM_REQ_HV_RESET		KVM_ARCH_REQ(20)
++#define KVM_REQ_HV_EXIT			KVM_ARCH_REQ(21)
++#define KVM_REQ_HV_STIMER		KVM_ARCH_REQ(22)
+ 
+ #define CR0_RESERVED_BITS                                               \
+ 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 8c0664309815..3724b51aab64 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -126,6 +126,13 @@ static inline bool is_error_page(struct page *page)
+ #define KVM_REQ_MMU_RELOAD        (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_PENDING_TIMER     2
+ #define KVM_REQ_UNHALT            3
++#define KVM_REQUEST_ARCH_BASE     8
++
++#define KVM_ARCH_REQ_FLAGS(nr, flags) ({ \
++	BUILD_BUG_ON((unsigned)(nr) >= 32 - KVM_REQUEST_ARCH_BASE); \
++	(unsigned)(((nr) + KVM_REQUEST_ARCH_BASE) | (flags)); \
++})
++#define KVM_ARCH_REQ(nr)           KVM_ARCH_REQ_FLAGS(nr, 0)
+ 
+ #define KVM_USERSPACE_IRQ_SOURCE_ID		0
+ #define KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID	1
 -- 
 2.9.4
