@@ -1,27 +1,27 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2 05/25] KVM: arm64: vgic-v3: Add ICV_BPR1_EL1 handler
-Date: Sun, 4 Jun 2017 22:25:28 +0200
-Message-ID: <20170604202528.GH9464@cbox>
-References: <20170601102117.17750-1-marc.zyngier@arm.com>
- <20170601102117.17750-6-marc.zyngier@arm.com>
+From: Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: Vexpress TC2 no longer booting on v4.12-rc1
+Date: Sun, 4 Jun 2017 19:47:15 -0600
+Message-ID: <CANLsYkxmnfnCCCqowFjFDSryRkg=TKiTyjKL=VQnJYCyNJ5SgQ@mail.gmail.com>
+References: <CANLsYkz3dcVArStN2GJguYfJbWc_4dC4vvTE1KVtYpVWipEYjg@mail.gmail.com>
+ <20170602222449.GB4902@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD75A40C4A
- for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Jun 2017 16:21:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9771A40C4B
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Jun 2017 21:43:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YYx7k7JNFiF9 for <kvmarm@lists.cs.columbia.edu>;
- Sun,  4 Jun 2017 16:21:42 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2F1840BBC
- for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Jun 2017 16:21:42 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id b84so59390696wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 04 Jun 2017 13:25:45 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170601102117.17750-6-marc.zyngier@arm.com>
+ with ESMTP id Y+ArcwIX8VvU for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  4 Jun 2017 21:43:14 -0400 (EDT)
+Received: from mail-lf0-f46.google.com (mail-lf0-f46.google.com
+ [209.85.215.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6CD9640C26
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Jun 2017 21:43:14 -0400 (EDT)
+Received: by mail-lf0-f46.google.com with SMTP id o83so16184179lff.3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 04 Jun 2017 18:47:17 -0700 (PDT)
+In-Reply-To: <20170602222449.GB4902@n2100.armlinux.org.uk>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,109 +31,38 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jun 01, 2017 at 11:20:57AM +0100, Marc Zyngier wrote:
-> Add a handler for reading/writing the guest's view of the ICC_BPR1_EL1
-> register, which is located in the ICH_VMCR_EL2.BPR1 field.
-> 
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/hyp/vgic-v3-sr.c | 51 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> index 943bf11252d9..6254eaf72a77 100644
-> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-> @@ -375,6 +375,51 @@ void __hyp_text __vgic_v3_write_vmcr(u32 vmcr)
->  
->  #ifdef CONFIG_ARM64
->  
-> +static unsigned int __hyp_text __vgic_v3_get_bpr0(u32 vmcr)
-> +{
-> +	return (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
-> +}
-> +
-> +static unsigned int __hyp_text __vgic_v3_get_bpr1(u32 vmcr)
-> +{
-> +	unsigned int bpr;
-> +
-> +	if (vmcr & ICH_VMCR_CBPR_MASK) {
-> +		bpr = __vgic_v3_get_bpr0(vmcr);
-> +		if (bpr < 7)
-> +			bpr++;
-> +	} else {
-> +		bpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
-> +	}
-> +
-> +	return bpr;
-> +}
-> +
-> +static void __hyp_text __vgic_v3_read_bpr1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-> +{
-> +	vcpu_set_reg(vcpu, rt, __vgic_v3_get_bpr1(vmcr));
-> +}
-> +
-> +static void __hyp_text __vgic_v3_write_bpr1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-> +{
-> +	u64 val = vcpu_get_reg(vcpu, rt);
-> +	u8 bpr_min = 8 - vtr_to_nr_pre_bits(read_gicreg(ICH_VTR_EL2));
+On 2 June 2017 at 16:24, Russell King - ARM Linux <linux@armlinux.org.uk> wrote:
+> On Fri, Jun 02, 2017 at 04:16:59PM -0600, Mathieu Poirier wrote:
+>> Good afternoon Russell and friends,
+>>
+>> I noticed that my vexpress-TC2 platform stopped booting when moving to
+>> kernel v4.12-rc1 (same with -rc2 and 3).  The last time things worked
+>> properly was on v4.11.  I did a bisect between v4.11 and v4.12-rc1 and
+>> ended up on [1], hence this email.
+>>
+>> Since CONFIG_ARM_VIRT_EXT is selected by  default I removed the
+>> "#ifdef CONFIG_ARM_VIRT_EXT" section in the last hunk of the patch and
+>> the system sprung up to life again.
+>
+> Hmm, this doesn't make much sense.  The code in last hunk of the patch
+> you refer to should only get run during system shutdown, not during
+> system boot, so I think something else is going on...
+>
+> Please could you test again, this time rather than removing the #ifdef,
+> add two "mov r0, r0" there?  (So replacing the two instructions that
+> removing the ifdef would have exposed.)
 
-I can't seem to find where this behavior is documented, is it that 8 is
-the theoretical max, and it's the upper preemption levels that apply, so
-it must be 8 - number supported?
+That works - by replacing the original code with a couple of "mov r0,
+r0" the system is able to boot again.
 
-> +
-> +	if (vmcr & ICH_VMCR_CBPR_MASK)
-> +		return;
-> +
-> +	/* Enforce BPR limiting */
-> +	if (val < bpr_min)
-> +		val = bpr_min;
-
-Are we not implying that the reset value here also means bpr_min?  I
-also can't seem to find this behavior in the spec and it appears we rely
-on the underlying hardware to set a reset value (by setting vmcr=0 on
-first run).  Could this result in a guest observing one reset value,
-writing 0 to this register, and observing another one?
-
-> +
-> +	val <<= ICH_VMCR_BPR1_SHIFT;
-> +	val &= ICH_VMCR_BPR1_MASK;
-> +	vmcr &= ~ICH_VMCR_BPR1_MASK;
-> +	vmcr |= val;
-> +
-> +	__vgic_v3_write_vmcr(vmcr);
-> +}
-> +
->  int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
->  {
->  	int rt;
-> @@ -397,6 +442,12 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
->  	is_read = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ;
->  
->  	switch (sysreg) {
-> +	case SYS_ICC_BPR1_EL1:
-> +		if (is_read)
-> +			fn = __vgic_v3_read_bpr1;
-> +		else
-> +			fn = __vgic_v3_write_bpr1;
-> +		break;
-
-Did you consider a lookup table with the sysreg encoding, the read
-function, and the right function as each entry?  It may compress the
-code a bit, but I'm not sure if it's nicer or worth it.
-
->  	default:
->  		return 0;
->  	}
-> -- 
-> 2.11.0
-> 
-
-Thanks,
--Christoffer
+>
+> Thanks.
+>
+> --
+> RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+> FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+> according to speedtest.net.
