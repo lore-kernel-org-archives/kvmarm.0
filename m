@@ -1,25 +1,29 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] kvm: arm/arm64: vgic: Fix the sequence principle about
- vgic save/restore.
-Date: Tue, 6 Jun 2017 09:34:03 +0100
-Message-ID: <bc080925-adbf-3d13-bd0a-6b5ee834c85c@arm.com>
-References: <1496658604-20036-1-git-send-email-wanghaibin.wang@huawei.com>
- <e8c54af6-c774-a37e-a14f-04d422fe5234@arm.com> <59362027.4020302@huawei.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH V17 02/11] ras: acpi/apei: cper: add support for generic
+ data v3 structure
+Date: Tue, 6 Jun 2017 09:22:15 +0000
+Message-ID: <CAKv+Gu-JVeR7DJa-tMhNXtfv2tQGB67H+m=raqBj5X48n9oKPw@mail.gmail.com>
+References: <1495225933-4410-1-git-send-email-tbaicar@codeaurora.org>
+ <1495225933-4410-3-git-send-email-tbaicar@codeaurora.org>
+ <20170602141338.GJ6371@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56FFC40BE3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Jun 2017 04:30:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BC6D40969
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Jun 2017 05:18:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WG988FsSL5mF for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Jun 2017 04:30:02 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21B7140962
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Jun 2017 04:30:01 -0400 (EDT)
-In-Reply-To: <59362027.4020302@huawei.com>
+ with ESMTP id A+VtkxrCn2NH for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Jun 2017 05:18:10 -0400 (EDT)
+Received: from mail-it0-f43.google.com (mail-it0-f43.google.com
+ [209.85.214.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 89B7240962
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Jun 2017 05:18:10 -0400 (EDT)
+Received: by mail-it0-f43.google.com with SMTP id m47so102800255iti.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Jun 2017 02:22:16 -0700 (PDT)
+In-Reply-To: <20170602141338.GJ6371@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,53 +33,27 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: wanghaibin <wanghaibin.wang@huawei.com>
-Cc: cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+To: Will Deacon <will.deacon@arm.com>
+Cc: "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, KVM devel mailing list <kvm@vger.kernel.org>, Matt Fleming <matt@codeblueprint.co.uk>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Robert Moore <robert.moore@intel.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Lv Zheng <lv.zheng@intel.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Fu Wei <fu.wei@linaro.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>, Russell King <linux@armlinux.org.uk>, gengdongjiu@huawei.com, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, eun.taik.lee@samsung.com, shijie.huang@arm.com, Laura Abbott <labbott@redhat.com>, Len Brown <lenb@kernel.org>, harba@codeaurora.org, John Garry <john.garry@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.ag>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/06/17 04:23, wanghaibin wrote:
-> On 2017/6/5 21:56, Marc Zyngier wrote:
-> 
->> On 05/06/17 11:30, wanghaibin wrote:
->>> At present, take GICv3 as as an example, our implementation is that, the operation
->>> of the recovery ICH_HCR register is prior to the recovery of ICH_LRn registers in vgic
->>> state restore. Thus, the ICH_LRn registers are 0, and if ICH_HCR.UIE is configured to 1,
->>> a large number of unnecessary maintenance interrupts will be triggered.
+On 2 June 2017 at 14:13, Will Deacon <will.deacon@arm.com> wrote:
+> On Fri, May 19, 2017 at 02:32:04PM -0600, Tyler Baicar wrote:
+>> The ACPI 6.1 spec adds a new revision of the generic error data
+>> entry structure. Add support to handle the new structure as well
+>> as properly verify and iterate through the generic data entries.
 >>
->> Is that a theoretical problem? Or something you've actually observed?
-> 
-> 
-> I observed this problem with that boot a android vm (with 4 vcpus) on my hisilicon D03 board (4 LRs support).
-> Boot the android vm will failed because of any virtual interrupts can't deliver to the vm timely.
-> 
-> I watched the maintenance interrupt (/proc/interrupts, GICv3 hwirq:25), and the number can up to 200000+ per second.
-> (sorry for my express fault, the large number of unnecessary maintenance interrupts means this).
+>> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+>> CC: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+>> ---
+>>  drivers/acpi/apei/ghes.c    | 11 +++++------
+>>  drivers/firmware/efi/cper.c | 37 ++++++++++++++++++++++---------------
+>>  include/acpi/ghes.h         | 36 ++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 63 insertions(+), 21 deletions(-)
+>
+> Given that Boris and Rafael are ok with this series, it makes sense to
+> take this via arm64, but I need an ack from Ard or Matt on the EFI changes
+> in this patch and the subsequent one.
+>
 
-That's really odd, as we disable that interrupt before exiting HYP (you
-should never see that counter increasing). So either your GIC is
-incredibly slow (it fails to retire the interrupt in a timely manner),
-or it is configured as an Edge interrupt (and thus cannot be retired).
-
-Could you please investigate the last point? Also, do you see warnings
-from the virtual timer (something about unexpected interrupts)?
-
-> 
->>
->> At the point where we restore the vgic state, interrupts are disabled.
->> And by the time we enter the guest, we fully expect the HW to be in a
->> stable state, and no spurious interrupt would be delivered.
-> 
-> 
-> At that point where restore the vgic state,  it's true that interrupts are disabled (local_irq_disable),
-> but in my opinion, here maybe a maintenance interrupt pending at physical redist (at that point it can be delivered).
-> and it will be delivered at the moment that current vcpu's ctxt restore and entry (eret, here, PSTATE.I maybe unmask).
-> Thus, the vcpu will be kicked out immediately. At the next vgic state restore point, go round and begin again.
-
-I understand what happens when the interrupt is observed, but I want to
-understand why it is observed.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
