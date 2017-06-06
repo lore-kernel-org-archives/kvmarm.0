@@ -1,14 +1,14 @@
 From: Christoffer Dall <cdall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH 11/11] KVM: arm64: Delegate support for SDEI to userspace
-Date: Tue, 6 Jun 2017 21:58:35 +0200
-Message-ID: <20170606195835.GL9464@cbox>
+Subject: Re: [PATCH 00/11] arm64/firmware: Software Delegated Exception
+ Interface
+Date: Tue, 6 Jun 2017 21:59:44 +0200
+Message-ID: <20170606195944.GM9464@cbox>
 References: <20170515174400.29735-1-james.morse@arm.com>
- <20170515174400.29735-12-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20170515174400.29735-12-james.morse-5wv7dgnIgG8@public.gmane.org>
+In-Reply-To: <20170515174400.29735-1-james.morse-5wv7dgnIgG8@public.gmane.org>
 Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
 Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -16,122 +16,133 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi James,
 
-On Mon, May 15, 2017 at 06:43:59PM +0100, James Morse wrote:
-> The Software Delegated Exception Interface allows firmware to notify
-> the OS of system events by returning into registered handlers, even
-> if the OS has interrupts masked.
+On Mon, May 15, 2017 at 06:43:48PM +0100, James Morse wrote:
+> Hello!
 > 
-> While we could support this in KVM, we would need to expose an API for
-> the user space hypervisor to inject events, (and decide what to do it
-
-'the user space hypervisor' ?
-
-s/it/if/
-
-> the event isn't registered or all the CPUs have SDE events masked). We
-> already have an API for guest 'hypercalls', so use this to push the
-> problem onto userspace.
+> The Software Delegated Exception Interface (SDEI) is an ARM specification
+> for registering callbacks from the platform firmware into the OS.
+> This is intended to be used to implement firmware-first RAS notifications.
 > 
-> Advertise a new capability 'KVM_CAP_ARM_SDEI_1_0' and when any SDEI
-> call comes in, exit to userspace with exit_reason = KVM_EXIT_HYPERCALL.
-
-Documentation/virtual/kvm/api.txt says this is unused.
-
-We should add something there to say that this is now used for arm64,
-and the api doc also suggests that the hypercall struct in kvm_run has
-some meaningful data for this exit.
-
-Have we checked that the guest can't provoke QEMU to do something weird
-by causing this exit on arm64 currently (given that we always enable
-this handling of SDEI calls)?
-
+> The document is here:
+> http://infocenter.arm.com/help/topic/com.arm.doc.den0054a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
 > 
-> N.B. There is no enable/feature bit for SDEI exits as telling the guest
-> the interface exists via DT/ACPI should be sufficient.
+> This series (juggles some registers with KVM+VHE, then) adds a DT binding to
+> trigger probing of the interface and support for the SDEI API.
+> A future version of the ACPI spec should add the necessary parts to enable this
+> to be used as a GHES notification.
 > 
-> Signed-off-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
 > 
-> ---
-> While I'm in here, why does KVM_CAP_ARM_SET_DEVICE_ADDR have a separate
-> entry for r=1;break?
+> SDEI runs between adjacent exception levels, so events will always be delivered
+> to EL2 if firmware is at EL3. For VHE hosts we run the SDEI event handler
+> behind KVM's back with all exceptions masked. Once the handler has done its
+> work we return to the appropriate vbar+irq entry. This allows KVM to
+> world-switch and deliver any signals sent by the handler to Qemu/kvmtool. We
+> do the same thing if we interrupt host EL0. If we interrupted code with
+> interrupts masked, we use a different API call to return to the interrupted
+> context.
 > 
->  arch/arm64/kvm/handle_exit.c | 10 +++++++++-
->  include/uapi/linux/kvm.h     |  1 +
->  virt/kvm/arm/arm.c           |  5 +++--
->  3 files changed, 13 insertions(+), 3 deletions(-)
+> What about non-VHE KVM? If you don't have VHE support and boot at EL2, the
+> kernel drops to EL1. This driver will print an error message then give up. This
+> is because events would still be delivered to EL2 hitting either KVM, or the
+> hyp-stub. Supporting this is complicated, but because the main use-case is
+> RAS, and ARM v8.2's RAS extensions imply v8.1's Virtual Host Extensions, we
+> can assume all platforms with SDEI will support VHE too. (I have some ideas
+> on how to support non-VHE if it turns out to be needed).
 > 
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index fa1b18e364fc..2bed62fbdc00 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -21,6 +21,7 @@
->  
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
-> +#include <linux/sdei.h>
->  
->  #include <asm/esr.h>
->  #include <asm/kvm_asm.h>
-> @@ -42,7 +43,14 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  			    kvm_vcpu_hvc_get_imm(vcpu));
->  	vcpu->stat.hvc_exit_stat++;
->  
-> -	ret = kvm_psci_call(vcpu);
-> +	if (IS_SDEI_CALL(vcpu_get_reg(vcpu, 0))) {
-> +		/* SDEI is handled by userspace */
-> +		run->exit_reason = KVM_EXIT_HYPERCALL;
-> +		ret = 0;
-> +	} else {
-> +		ret = kvm_psci_call(vcpu);
-> +	}
-> +
->  	if (ret < 0) {
->  		kvm_inject_undefined(vcpu);
->  		return 1;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 577429a95ad8..e9ebfed9d624 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -895,6 +895,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_SPAPR_TCE_VFIO 142
->  #define KVM_CAP_X86_GUEST_MWAIT 143
->  #define KVM_CAP_ARM_USER_IRQ 144
-> +#define KVM_CAP_ARM_SDEI_1_0 145
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 3a776ec99181..0bf2d923483c 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -206,8 +206,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_READONLY_MEM:
->  	case KVM_CAP_MP_STATE:
->  	case KVM_CAP_IMMEDIATE_EXIT:
-> -		r = 1;
-> -		break;
-> +#ifdef CONFIG_ARM_SDE_INTERFACE
-> +	case KVM_CAP_ARM_SDEI_1_0:
-> +#endif
+> 
+> Running the event handler behind VHE-KVM's back has some side effects: The
+> event handler will blindly use any registers that are shared between the host
+> and guest. The two that I think matter are TPIDR_EL1, and the debug state. The
+> guest may have set MDSCR_EL1 so debug exceptions must remain masked. The
+> guest's TPIDR_EL1 will be used by the event handler if it accesses per-cpu
+> variables. This needs fixing. The first part of this series juggles KVMs use
+> of TPIDR_EL2 so that we share it with the host on VHE systems. An equivalent
+> change for 32bit is on my todo list. (one alternative to this is to have a
+> parody world switch in the SDEI event handler, but this would mean special
+> casing interrupted guests, and be an ABI link to KVM.)
+> 
+> Causing a synchronous exception from an event handler will cause KVM to
+> hyp-panic, but may silently succeed if the event didn't interrupt a guest.
+> (I may WARN_ON() if this happens in a later patch). You because of this you
 
-What's the point of conditionally supporting this based on the config
-option when the rest of the KVM functionality does not depend on the
-CONFIG_ARM_SDE_INTERFACE functionality?
+The last sentence here doesn't make much sense to me.
 
-Could a user want to play with SDEI calls in a VM without the host
-having the proper support, or is that never relevant?
-
-
->  	case KVM_CAP_ARM_SET_DEVICE_ADDR:
->  		r = 1;
->  		break;
-> -- 
-> 2.10.1
+> should not kprobe anything that handles SDE events. Once we've called
+> nmi_enter(), ftrace and friends should be safe.
 > 
+> Is this another begins-with-S RAS mechanism for arm64? Yes.
+> Why? Any notification delivered as an exception will overwrite the exception
+> registers. This is fatal for the running thread if it happens during entry.S's
+> kernel_enter or kernel_exit. Instead of adding masking and routing controls,
+> events are delivered to a registered address at a fixed exception level and
+> don't change the exception registers when delivered.
+> 
+> This series can be retrieved from:
+> git://linux-arm.org/linux-jm.git -b sdei/v1/base
+> 
+> Questions and contradictions welcome!
+> 
+
+For the rest of the KVM part it looks mostly good to me, besides the
+points I raised in the individual patches.
 
 Thanks,
 -Christoffer
 
+> 
+> James Morse (11):
+>   KVM: arm64: Store vcpu on the stack during __guest_enter()
+>   KVM: arm/arm64: Convert kvm_host_cpu_state to a static per-cpu
+>     allocation
+>   KVM: arm64: Change hyp_panic()s dependency on tpidr_el2
+>   arm64: alternatives: use tpidr_el2 on VHE hosts
+>   arm64: KVM: Stop save/restoring host tpidr_el1 on VHE
+>   dt-bindings: add devicetree binding for describing arm64 SDEI firmware
+>   firmware: arm_sdei: Add driver for Software Delegated Exceptions
+>   arm64: kernel: Add arch-specific SDEI entry code and CPU masking
+>   firmware: arm_sdei: Add support for CPU and system power states
+>   firmware: arm_sdei: add support for CPU private events
+>   KVM: arm64: Delegate support for SDEI to userspace
+> 
+>  Documentation/devicetree/bindings/arm/sdei.txt |   37 +
+>  arch/arm64/Kconfig                             |    1 +
+>  arch/arm64/include/asm/assembler.h             |    8 +
+>  arch/arm64/include/asm/kvm_host.h              |    2 +
+>  arch/arm64/include/asm/percpu.h                |   11 +-
+>  arch/arm64/include/asm/processor.h             |    1 +
+>  arch/arm64/include/asm/sdei.h                  |   45 +
+>  arch/arm64/kernel/Makefile                     |    1 +
+>  arch/arm64/kernel/asm-offsets.c                |    2 +
+>  arch/arm64/kernel/cpufeature.c                 |   22 +
+>  arch/arm64/kernel/entry.S                      |   68 ++
+>  arch/arm64/kernel/sdei.c                       |  106 +++
+>  arch/arm64/kernel/smp.c                        |    7 +
+>  arch/arm64/kvm/handle_exit.c                   |   10 +-
+>  arch/arm64/kvm/hyp-init.S                      |    4 +
+>  arch/arm64/kvm/hyp/entry.S                     |   12 +-
+>  arch/arm64/kvm/hyp/hyp-entry.S                 |   13 +-
+>  arch/arm64/kvm/hyp/switch.c                    |   25 +-
+>  arch/arm64/kvm/hyp/sysreg-sr.c                 |   16 +-
+>  arch/arm64/mm/proc.S                           |    8 +
+>  drivers/firmware/Kconfig                       |    8 +
+>  drivers/firmware/Makefile                      |    1 +
+>  drivers/firmware/arm_sdei.c                    | 1055 ++++++++++++++++++++++++
+>  include/linux/cpuhotplug.h                     |    1 +
+>  include/linux/sdei.h                           |  102 +++
+>  include/uapi/linux/kvm.h                       |    1 +
+>  include/uapi/linux/sdei.h                      |   91 ++
+>  virt/kvm/arm/arm.c                             |   23 +-
+>  28 files changed, 1634 insertions(+), 47 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/arm/sdei.txt
+>  create mode 100644 arch/arm64/include/asm/sdei.h
+>  create mode 100644 arch/arm64/kernel/sdei.c
+>  create mode 100644 drivers/firmware/arm_sdei.c
+>  create mode 100644 include/linux/sdei.h
+>  create mode 100644 include/uapi/linux/sdei.h
+> 
+> -- 
+> 2.10.1
+> 
 --
 To unsubscribe from this list: send the line "unsubscribe devicetree" in
 the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
