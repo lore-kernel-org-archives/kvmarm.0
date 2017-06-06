@@ -1,28 +1,26 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH V17 03/11] cper: add timestamp print to CPER status
- printing
-Date: Tue, 6 Jun 2017 09:25:55 +0000
-Message-ID: <CAKv+Gu8C+8gBA6cvmVjnRKBZnSVDbNghwd62KOAANGvm9PL8iQ@mail.gmail.com>
-References: <1495225933-4410-1-git-send-email-tbaicar@codeaurora.org>
- <1495225933-4410-4-git-send-email-tbaicar@codeaurora.org>
+From: wanghaibin <wanghaibin.wang@huawei.com>
+Subject: Re: [PATCH] kvm: arm/arm64: vgic: Fix the sequence principle about
+ vgic save/restore.
+Date: Tue, 6 Jun 2017 17:29:54 +0800
+Message-ID: <59367612.3000401@huawei.com>
+References: <1496658604-20036-1-git-send-email-wanghaibin.wang@huawei.com>
+ <e8c54af6-c774-a37e-a14f-04d422fe5234@arm.com> <59362027.4020302@huawei.com>
+ <bc080925-adbf-3d13-bd0a-6b5ee834c85c@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8315640969
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Jun 2017 05:21:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2E4740C49
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Jun 2017 05:27:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K8YuQKkVJeWv for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Jun 2017 05:21:51 -0400 (EDT)
-Received: from mail-it0-f45.google.com (mail-it0-f45.google.com
- [209.85.214.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C19940962
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Jun 2017 05:21:51 -0400 (EDT)
-Received: by mail-it0-f45.google.com with SMTP id r63so104084654itc.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Jun 2017 02:25:56 -0700 (PDT)
-In-Reply-To: <1495225933-4410-4-git-send-email-tbaicar@codeaurora.org>
+ with ESMTP id C1LFqPWWl55D for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Jun 2017 05:27:55 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA8BF40962
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Jun 2017 05:27:54 -0400 (EDT)
+In-Reply-To: <bc080925-adbf-3d13-bd0a-6b5ee834c85c@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,81 +30,70 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <tbaicar@codeaurora.org>
-Cc: "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, KVM devel mailing list <kvm@vger.kernel.org>, Matt Fleming <matt@codeblueprint.co.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Robert Moore <robert.moore@intel.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Lv Zheng <lv.zheng@intel.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Fu Wei <fu.wei@linaro.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>, Russell King <linux@armlinux.org.uk>, gengdongjiu@huawei.com, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, eun.taik.lee@samsung.com, shijie.huang@arm.com, Laura Abbott <labbott@redhat.com>, Len Brown <lenb@kernel.org>, harba@codeaurora.org, John Garry <john.garry@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawa>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 19 May 2017 at 21:32, Tyler Baicar <tbaicar@codeaurora.org> wrote:
-> The ACPI 6.1 spec added a timestamp to the generic error data
-> entry structure. Print the timestamp out when printing out the
-> error information.
->
-> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
-> CC: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+On 2017/6/6 16:34, Marc Zyngier wrote:
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> On 06/06/17 04:23, wanghaibin wrote:
+>> On 2017/6/5 21:56, Marc Zyngier wrote:
+>>
+>>> On 05/06/17 11:30, wanghaibin wrote:
+>>>> At present, take GICv3 as as an example, our implementation is that, the operation
+>>>> of the recovery ICH_HCR register is prior to the recovery of ICH_LRn registers in vgic
+>>>> state restore. Thus, the ICH_LRn registers are 0, and if ICH_HCR.UIE is configured to 1,
+>>>> a large number of unnecessary maintenance interrupts will be triggered.
+>>>
+>>> Is that a theoretical problem? Or something you've actually observed?
+>>
+>>
+>> I observed this problem with that boot a android vm (with 4 vcpus) on my hisilicon D03 board (4 LRs support).
+>> Boot the android vm will failed because of any virtual interrupts can't deliver to the vm timely.
+>>
+>> I watched the maintenance interrupt (/proc/interrupts, GICv3 hwirq:25), and the number can up to 200000+ per second.
+>> (sorry for my express fault, the large number of unnecessary maintenance interrupts means this).
+> 
+> That's really odd, as we disable that interrupt before exiting HYP (you
+> should never see that counter increasing). So either your GIC is
+> incredibly slow (it fails to retire the interrupt in a timely manner),
+> or it is configured as an Edge interrupt (and thus cannot be retired).
+> 
+> Could you please investigate the last point? Also, do you see warnings
+> from the virtual timer (something about unexpected interrupts)?
 
-> ---
->  drivers/firmware/efi/cper.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
->
-> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
-> index 9024757..229cf92 100644
-> --- a/drivers/firmware/efi/cper.c
-> +++ b/drivers/firmware/efi/cper.c
-> @@ -32,6 +32,8 @@
->  #include <linux/acpi.h>
->  #include <linux/pci.h>
->  #include <linux/aer.h>
-> +#include <linux/printk.h>
-> +#include <linux/bcd.h>
->  #include <acpi/ghes.h>
->
->  #define INDENT_SP      " "
-> @@ -387,6 +389,27 @@ static void cper_print_pcie(const char *pfx, const struct cper_sec_pcie *pcie,
->         pfx, pcie->bridge.secondary_status, pcie->bridge.control);
->  }
->
-> +static void cper_print_tstamp(const char *pfx,
-> +                                  struct acpi_hest_generic_data_v300 *gdata)
-> +{
-> +       __u8 hour, min, sec, day, mon, year, century, *timestamp;
-> +
-> +       if (gdata->validation_bits & ACPI_HEST_GEN_VALID_TIMESTAMP) {
-> +               timestamp = (__u8 *)&(gdata->time_stamp);
-> +               sec       = bcd2bin(timestamp[0]);
-> +               min       = bcd2bin(timestamp[1]);
-> +               hour      = bcd2bin(timestamp[2]);
-> +               day       = bcd2bin(timestamp[4]);
-> +               mon       = bcd2bin(timestamp[5]);
-> +               year      = bcd2bin(timestamp[6]);
-> +               century   = bcd2bin(timestamp[7]);
-> +
-> +               printk("%s%ststamp: %02d%02d-%02d-%02d %02d:%02d:%02d\n", pfx,
-> +                      (timestamp[3] & 0x1 ? "precise " : "imprecise "),
-> +                      century, year, mon, day, hour, min, sec);
-> +       }
-> +}
-> +
->  static void
->  cper_estatus_print_section(const char *pfx, struct acpi_hest_generic_data *gdata,
->                            int sec_no)
-> @@ -395,6 +418,9 @@ static void cper_print_pcie(const char *pfx, const struct cper_sec_pcie *pcie,
->         __u16 severity;
->         char newpfx[64];
->
-> +       if (acpi_hest_get_version(gdata) >= 3)
-> +               cper_print_tstamp(pfx, (struct acpi_hest_generic_data_v300 *)gdata);
-> +
->         severity = gdata->error_severity;
->         printk("%s""Error %d, type: %s\n", pfx, sec_no,
->                cper_severity_str(severity));
-> --
-> Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-> Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
-> a Linux Foundation Collaborative Project.
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-efi" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Yes, just like your said, it's a known defect on hisilicon D03 board,
+and the that counter of maintenance interrupt does not increase on hisilicon D05 board.
+
+> 
+>>
+>>>
+>>> At the point where we restore the vgic state, interrupts are disabled.
+>>> And by the time we enter the guest, we fully expect the HW to be in a
+>>> stable state, and no spurious interrupt would be delivered.
+>>
+>>
+>> At that point where restore the vgic state,  it's true that interrupts are disabled (local_irq_disable),
+>> but in my opinion, here maybe a maintenance interrupt pending at physical redist (at that point it can be delivered).
+>> and it will be delivered at the moment that current vcpu's ctxt restore and entry (eret, here, PSTATE.I maybe unmask).
+>> Thus, the vcpu will be kicked out immediately. At the next vgic state restore point, go round and begin again.
+> 
+> I understand what happens when the interrupt is observed, but I want to
+> understand why it is observed.
+
+
+The ICH_HCR_EL2.UIE, spec says that:
+Underflow Interrupt Enable. Enables the signaling of a maintenance interrupt when the List
+registers are empty, or hold only one valid entry.
+
+After the commit (b40c4892) , we clear the ICH_LRn when save the vgic state.
+At next vgic restore point, if ICH_HCR_EL2.UIE = 1,  and ICH_LRn is all clear,
+I think here will be a maintenance interrupt triggered when ICH_HCR restore early than ICH_LRn restore.
+
+Thanks.
+
+> 
+> Thanks,
+> 
+> 	M.
