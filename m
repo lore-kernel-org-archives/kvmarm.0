@@ -1,58 +1,145 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 3/3] arm: KVM: Allow unaligned accesses at HYP
-Date: Tue, 6 Jun 2017 22:09:45 +0200
-Message-ID: <20170606200945.GR9464@cbox>
-References: <20170606180835.14421-1-marc.zyngier@arm.com>
- <20170606180835.14421-4-marc.zyngier@arm.com>
+From: Bandan Das <bsd@redhat.com>
+Subject: Re: [RFC 10/55] KVM: arm64: Synchronize EL1 system registers on
+ virtual EL2 entry and exit
+Date: Tue, 06 Jun 2017 16:16:52 -0400
+Message-ID: <jpgy3t4dg7f.fsf@linux.bootlegged.copy>
+References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
+ <1483943091-1364-11-git-send-email-jintack@cs.columbia.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170606180835.14421-4-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, Alexander Graf <agraf@suse.de>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39AA940C4E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Jun 2017 16:12:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id wuqN4KyfJVDa for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Jun 2017 16:12:53 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 02E1A4095A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Jun 2017 16:12:52 -0400 (EDT)
+In-Reply-To: <1483943091-1364-11-git-send-email-jintack@cs.columbia.edu>
+ (Jintack Lim's message of "Mon, 9 Jan 2017 01:24:06 -0500")
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, andre.przywara@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jun 06, 2017 at 07:08:35PM +0100, Marc Zyngier wrote:
-> We currently have the HSCTLR.A bit set, trapping unaligned accesses
-> at HYP, but we're not really prepared to deal with it.
-> 
-> Since the rest of the kernel is pretty happy about that, let's follow
-> its example and set HSCTLR.A to zero. Modern CPUs don't really care.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Jintack Lim <jintack@cs.columbia.edu> writes:
 
-Acked-by: Christoffer Dall <cdall@linaro.org>
-
+> From: Christoffer Dall <christoffer.dall@linaro.org>
+>
+> When running in virtual EL2 we use the shadow EL1 systerm register array
+> for the save/restore process, so that hardware and especially the memory
+> subsystem behaves as code written for EL2 expects while really running
+> in EL1.
+>
+> This works great for EL1 system register accesses that we trap, because
+> these accesses will be written into the virtual state for the EL1 system
+> registers used when eventually switching the VCPU mode to EL1.
+>
+> However, there was a collection of EL1 system registers which we do not
+> trap, and as a consequence all save/restore operations of these
+> registers were happening locally in the shadow array, with no benefit to
+> software actually running in virtual EL1 at all.
+>
+> To fix this, simply synchronize the shadow and real EL1 state for these
+> registers on entry/exit to/from virtual EL2 state.
+>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 > ---
->  arch/arm/kvm/init.S | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/init.S b/arch/arm/kvm/init.S
-> index 570ed4a9c261..5386528665b5 100644
-> --- a/arch/arm/kvm/init.S
-> +++ b/arch/arm/kvm/init.S
-> @@ -104,7 +104,6 @@ __do_hyp_init:
->  	@  - Write permission implies XN: disabled
->  	@  - Instruction cache: enabled
->  	@  - Data/Unified cache: enabled
-> -	@  - Memory alignment checks: enabled
->  	@  - MMU: enabled (this code must be run from an identity mapping)
->  	mrc	p15, 4, r0, c1, c0, 0	@ HSCR
->  	ldr	r2, =HSCTLR_MASK
-> @@ -112,8 +111,8 @@ __do_hyp_init:
->  	mrc	p15, 0, r1, c1, c0, 0	@ SCTLR
->  	ldr	r2, =(HSCTLR_EE | HSCTLR_FI | HSCTLR_I | HSCTLR_C)
->  	and	r1, r1, r2
-> - ARM(	ldr	r2, =(HSCTLR_M | HSCTLR_A)			)
-> - THUMB(	ldr	r2, =(HSCTLR_M | HSCTLR_A | HSCTLR_TE)		)
-> + ARM(	ldr	r2, =(HSCTLR_M)					)
-> + THUMB(	ldr	r2, =(HSCTLR_M | HSCTLR_TE)			)
->  	orr	r1, r1, r2
->  	orr	r0, r0, r1
->  	mcr	p15, 4, r0, c1, c0, 0	@ HSCR
-> -- 
-> 2.11.0
-> 
+>  arch/arm64/kvm/context.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 47 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
+> index 2e9e386..0025dd9 100644
+> --- a/arch/arm64/kvm/context.c
+> +++ b/arch/arm64/kvm/context.c
+> @@ -88,6 +88,51 @@ static void create_shadow_el1_sysregs(struct kvm_vcpu *vcpu)
+>  	s_sys_regs[CPACR_EL1] = cptr_el2_to_cpacr_el1(el2_regs[CPTR_EL2]);
+>  }
+>  
+> +/*
+> + * List of EL1 registers which we allow the virtual EL2 mode to access
+> + * directly without trapping and which haven't been paravirtualized.
+> + *
+> + * Probably CNTKCTL_EL1 should not be copied but be accessed via trap. Because,
+> + * the guest hypervisor running in EL1 can be affected by event streams
+> + * configured via CNTKCTL_EL1, which it does not expect. We don't have a
+> + * mechanism to trap on CNTKCTL_EL1 as of now (v8.3), keep it in here instead.
+> + */
+> +static const int el1_non_trap_regs[] = {
+> +	CNTKCTL_EL1,
+> +	CSSELR_EL1,
+> +	PAR_EL1,
+> +	TPIDR_EL0,
+> +	TPIDR_EL1,
+> +	TPIDRRO_EL0
+> +};
+> +
+
+Do we trap on all register accesses in the non-nested case +
+all accesses to the memory access registers ? I am trying to
+understand how we decide what registers to trap on. For example,
+shouldn't accesses to CSSELR_EL1, the cache size selection register
+be trapped ?
+
+Bandan
+
+
+> +/**
+> + * sync_shadow_el1_state - Going to/from the virtual EL2 state, sync state
+> + * @vcpu:	The VCPU pointer
+> + * @setup:	True, if on the way to the guest (called from setup)
+> + *		False, if returning form the guet (calld from restore)
+> + *
+> + * Some EL1 registers are accessed directly by the virtual EL2 mode because
+> + * they in no way affect execution state in virtual EL2.   However, we must
+> + * still ensure that virtual EL2 observes the same state of the EL1 registers
+> + * as the normal VM's EL1 mode, so copy this state as needed on setup/restore.
+> + */
+> +static void sync_shadow_el1_state(struct kvm_vcpu *vcpu, bool setup)
+> +{
+> +	u64 *sys_regs = vcpu->arch.ctxt.sys_regs;
+> +	u64 *s_sys_regs = vcpu->arch.ctxt.shadow_sys_regs;
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(el1_non_trap_regs); i++) {
+> +		const int sr = el1_non_trap_regs[i];
+> +
+> +		if (setup)
+> +			s_sys_regs[sr] = sys_regs[sr];
+> +		else
+> +			sys_regs[sr] = s_sys_regs[sr];
+> +	}
+> +}
+> +
+>  /**
+>   * kvm_arm_setup_shadow_state -- prepare shadow state based on emulated mode
+>   * @vcpu: The VCPU pointer
+> @@ -107,6 +152,7 @@ void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
+>  		else
+>  			ctxt->hw_pstate |= PSR_MODE_EL1t;
+>  
+> +		sync_shadow_el1_state(vcpu, true);
+>  		create_shadow_el1_sysregs(vcpu);
+>  		ctxt->hw_sys_regs = ctxt->shadow_sys_regs;
+>  		ctxt->hw_sp_el1 = ctxt->el2_regs[SP_EL2];
+> @@ -125,6 +171,7 @@ void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+>  	if (unlikely(vcpu_mode_el2(vcpu))) {
+> +		sync_shadow_el1_state(vcpu, false);
+>  		*vcpu_cpsr(vcpu) &= PSR_MODE_MASK;
+>  		*vcpu_cpsr(vcpu) |= ctxt->hw_pstate & ~PSR_MODE_MASK;
+>  		ctxt->el2_regs[SP_EL2] = ctxt->hw_sp_el1;
