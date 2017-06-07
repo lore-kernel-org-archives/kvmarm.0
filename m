@@ -1,29 +1,27 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH 2/3] arm64: KVM: Allow unaligned accesses at EL2
-Date: Wed, 7 Jun 2017 11:56:46 +0200
-Message-ID: <20170607095646.GD24481@cbox>
-References: <20170606180835.14421-1-marc.zyngier@arm.com>
- <20170606180835.14421-3-marc.zyngier@arm.com>
- <20170606200912.GQ9464@cbox>
- <73f039f7-7597-fd34-367c-1cc6fdda3673@arm.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH V17 08/11] efi: print unrecognized CPER section
+Date: Wed, 7 Jun 2017 10:08:13 +0000
+Message-ID: <CAKv+Gu8DjAnd5SSPchZnL+ZAK_MckgCveC8K3gVHbQy4zCnhbA@mail.gmail.com>
+References: <1495225933-4410-1-git-send-email-tbaicar@codeaurora.org>
+ <1495225933-4410-9-git-send-email-tbaicar@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C0E640A74
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Jun 2017 05:52:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 755484095A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Jun 2017 06:04:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0smH595-+r14 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Jun 2017 05:52:52 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97A5840905
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Jun 2017 05:52:52 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id d73so7378801wma.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Jun 2017 02:56:59 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <73f039f7-7597-fd34-367c-1cc6fdda3673@arm.com>
+ with ESMTP id kVgwbjqqCzTD for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Jun 2017 06:04:07 -0400 (EDT)
+Received: from mail-it0-f48.google.com (mail-it0-f48.google.com
+ [209.85.214.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 24A5940905
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Jun 2017 06:04:06 -0400 (EDT)
+Received: by mail-it0-f48.google.com with SMTP id m47so4624896iti.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Jun 2017 03:08:14 -0700 (PDT)
+In-Reply-To: <1495225933-4410-9-git-send-email-tbaicar@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,36 +31,82 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Tyler Baicar <tbaicar@codeaurora.org>
+Cc: "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, KVM devel mailing list <kvm@vger.kernel.org>, Matt Fleming <matt@codeblueprint.co.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Robert Moore <robert.moore@intel.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Lv Zheng <lv.zheng@intel.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Fu Wei <fu.wei@linaro.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Jonathan (Zhixiong) Zhang" <zjzhang@codeaurora.org>, Russell King <linux@armlinux.org.uk>, gengdongjiu@huawei.com, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, eun.taik.lee@samsung.com, shijie.huang@arm.com, Laura Abbott <labbott@redhat.com>, Len Brown <lenb@kernel.org>, harba@codeaurora.org, John Garry <john.garry@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawa>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jun 07, 2017 at 10:16:29AM +0100, Marc Zyngier wrote:
-> On 06/06/17 21:09, Christoffer Dall wrote:
-> > On Tue, Jun 06, 2017 at 07:08:34PM +0100, Marc Zyngier wrote:
-> >> We currently have the SCTLR_EL2.A bit set, trapping unaligned accesses
-> >> at EL2, but we're not really prepared to deal with it. So far, this
-> >> has been unnoticed, until GCC 7 started emitting those (in particular
-> >> 64bit writes on a 32bit boundary).
-> >>
-> >> Since the rest of the kernel is pretty happy about that, let's follow
-> >> its example and set SCTLR_EL2.A to zero. Modern CPUs don't really
-> >> care.
-> > 
-> > Why do we set the A flag via SCTLR_ELx_FLAGS in the first place, only to
-> > drop that flag later on for both EL1 and EL2 ?
-> 
-> That flag is always cleared at EL1, never set. Actually, only EL2 uses
-> that macro to *set* flags. An alternative would be to do away with the
-> macro and use the individual flags, like the 32bit side does.
-> 
-> What do you think?
-> 
-I don't understand why the A bit is part of SCTLR_ELx_FLAGS then?  Is it
-used as a mask, is that why?
+On 19 May 2017 at 21:32, Tyler Baicar <tbaicar@codeaurora.org> wrote:
+> UEFI spec allows for non-standard section in Common Platform Error
+> Record. This is defined in section N.2.3 of UEFI version 2.5.
+>
+> Currently if the CPER section's type (UUID) does not match with
+> one of the section types that the kernel knows how to parse, the
+> section is skipped. Therefore, user is not able to see
+> such CPER data, for instance, error record of non-standard section.
+>
+> This change prints out the raw data in hex in the dmesg buffer so
+> that non-standard sections are reported to the user. Non-standard
+> section type errors should be reported to the user because these
+> can include errors which are vendor specific. The data length is
+> taken from Error Data length field of Generic Error Data Entry.
+>
+> The following is a sample output from dmesg:
+>  Hardware error from APEI Generic Hardware Error Source: 2
+>  It has been corrected by h/w and requires no further action
+>  event severity: corrected
+>   time: precise 2017-03-15 20:37:35
+>   Error 0, type: corrected
+>    section type: unknown, d2e2621c-f936-468d-0d84-15a4ed015c8b
+>    section length: 0x238
+>    00000000: 4d415201 4d492031 453a4d45 435f4343  .RAM1 IMEM:ECC_C
+>    00000010: 53515f45 44525f42 00000000 00000000  E_QSB_RD........
+>    00000020: 00000000 00000000 00000000 00000000  ................
+>    00000030: 00000000 00000000 01010000 01010000  ................
+>    00000040: 00000000 00000000 00000005 00000000  ................
+>    00000050: 01010000 00000000 00000001 00dddd00  ................
+> ...
+>
+> The raw data from the error can then be decoded using vendor
+> specific tools.
+>
+> Signed-off-by: Tyler Baicar <tbaicar@codeaurora.org>
+> CC: Jonathan (Zhixiong) Zhang <zjzhang@codeaurora.org>
+> Reviewed-by: James Morse <james.morse@arm.com>
 
-In terms of these patches, I think we should apply these, because they
-solve the problem and do the same thing.
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Thanks,
--Christoffer
+> ---
+>  drivers/firmware/efi/cper.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/firmware/efi/cper.c b/drivers/firmware/efi/cper.c
+> index eac0854..d5a5855 100644
+> --- a/drivers/firmware/efi/cper.c
+> +++ b/drivers/firmware/efi/cper.c
+> @@ -585,8 +585,15 @@ static void cper_print_tstamp(const char *pfx,
+>                 else
+>                         goto err_section_too_small;
+>  #endif
+> -       } else
+> -               printk("%s""section type: unknown, %pUl\n", newpfx, sec_type);
+> +       } else {
+> +               const void *err = acpi_hest_get_payload(gdata);
+> +
+> +               printk("%ssection type: unknown, %pUl\n", newpfx, sec_type);
+> +               printk("%ssection length: %#x\n", newpfx,
+> +                      gdata->error_data_length);
+> +               print_hex_dump(newpfx, "", DUMP_PREFIX_OFFSET, 16, 4, err,
+> +                              gdata->error_data_length, true);
+> +       }
+>
+>         return;
+>
+> --
+> Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+> Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+> a Linux Foundation Collaborative Project.
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-efi" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
