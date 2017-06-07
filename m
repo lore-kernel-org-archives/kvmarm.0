@@ -1,26 +1,25 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v2] KVM: arm/arm64: Signal SIGBUS when stage2 discovers
- hwpoison memory
-Date: Wed, 07 Jun 2017 10:41:23 +0100
-Message-ID: <5937CA43.7060108@arm.com>
-References: <20170524163250.29281-1-james.morse@arm.com>
- <20170601222235.GN20919@cbox> <59313AEA.2060705@arm.com>
- <20170602104345.GA397@cbox>
+Subject: Re: [PATCH 00/11] arm64/firmware: Software Delegated Exception
+ Interface
+Date: Wed, 07 Jun 2017 10:45:32 +0100
+Message-ID: <5937CB3C.6040800@arm.com>
+References: <20170515174400.29735-1-james.morse@arm.com>
+ <20170606195944.GM9464@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83A1C40A74
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Jun 2017 05:38:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F39040A74
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Jun 2017 05:42:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pAqNJC9FKc+s for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Jun 2017 05:38:03 -0400 (EDT)
+ with ESMTP id 4g85pNRPuKyW for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Jun 2017 05:42:12 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 27E0140905
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Jun 2017 05:38:02 -0400 (EDT)
-In-Reply-To: <20170602104345.GA397@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A137440905
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Jun 2017 05:42:12 -0400 (EDT)
+In-Reply-To: <20170606195944.GM9464@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,86 +30,46 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <cdall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: devicetree@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Christoffer,
 
-On 02/06/17 11:43, Christoffer Dall wrote:
-> On Fri, Jun 02, 2017 at 11:16:10AM +0100, James Morse wrote:
->> On 01/06/17 23:22, Christoffer Dall wrote:
->>> On Wed, May 24, 2017 at 05:32:50PM +0100, James Morse wrote:
->>>> Once we enable ARCH_SUPPORTS_MEMORY_FAILURE on arm64, notifications for
->>>> broken memory can call memory_failure() in mm/memory-failure.c to deliver
->>>> SIGBUS to any user space process using the page, and notify all the
->>>> in-kernel users.
->>>>
->>>> If the page corresponded with guest memory, KVM will unmap this page
->>>> from its stage2 page tables. The user space process that allocated
->>>> this memory may have never touched this page in which case it may not
->>>> be mapped meaning SIGBUS won't be delivered.
+On 06/06/17 20:59, Christoffer Dall wrote:
+> On Mon, May 15, 2017 at 06:43:48PM +0100, James Morse wrote:
+>> Running the event handler behind VHE-KVM's back has some side effects: The
+>> event handler will blindly use any registers that are shared between the host
+>> and guest. The two that I think matter are TPIDR_EL1, and the debug state. The
+>> guest may have set MDSCR_EL1 so debug exceptions must remain masked. The
+>> guest's TPIDR_EL1 will be used by the event handler if it accesses per-cpu
+>> variables. This needs fixing. The first part of this series juggles KVMs use
+>> of TPIDR_EL2 so that we share it with the host on VHE systems. An equivalent
+>> change for 32bit is on my todo list. (one alternative to this is to have a
+>> parody world switch in the SDEI event handler, but this would mean special
+>> casing interrupted guests, and be an ABI link to KVM.)
 >>
->>> Sorry, I don't remember, what is the scenario where KVM can have a
->>> mapping in stage 2 without there being a corresponding mapping for user
->>> space?
->>
->> (looks like I mean more than one thing by mapping... oops.)
->>
->> Mapping in that there is a physical page for this user-space address, but when
->> qemu first touches it, it will be faulted in as its not been touched before.
+>> Causing a synchronous exception from an event handler will cause KVM to
+>> hyp-panic, but may silently succeed if the event didn't interrupt a guest.
+>> (I may WARN_ON() if this happens in a later patch). You because of this you
 > 
-> So that's where I still get confused.  When KVM faults in the page on
-> behalf of an initial VM access, it calls get_user_pages() (or something
-> equivalent through a series of indirections like gfn_to_pfn_prot()), and
-> wouldn't that create the equivalent mapping in the normal user space
-> page table?
-> 
-> (I may be forgetting some important detail here though).
+> The last sentence here doesn't make much sense to me.
 
-I evidently stopped before I got to the bottom of this, the commit message is
-based on the way I first hit this (physical address not found in any rmaps:
-nothing signalled). Maybe there is another bug, or I hit a bug that has been
-fixed. I will go back to reproducing this.
-(I think we still need the patch if a guest is allowed to keep running while
-parts of its memory are hwpoisoned)
+If this interrupts a VHE-guest, KVM's hyp-vectors remain in vbar_el2. If we then
+take a synchronous exception, KVM will assume this happened during world switch
+and panic.
+In contrast if you didn't interrupt a guest, the kernel vectors are in vbar_el2,
+so the fault will be handled.
 
-You're right this should behave the same as a fault from user-space, on arm64
-this path is roughly:
-> do_page_fault()
-> __do_page_fault()
-> handle_mm_fault()
-> __handle_mm_fault()
-> handle_pte_fault()
-
-__handle_mm_fault() then allocates pud/pmd and calls handle_pte_fault() .. which
-disappears back into the jungle.
-
-On a stage2 fault from a guest, the path is roughly:
-> kvm_handle_guest_abort()
-> user_mem_abort()
-> gfn_to_pfn_prot()
-> hva_to_pfn()
-> hva_to_pfn_slow()
-> get_user_pages_unlocked()
-> __get_user_pages_unlocked()
-> __get_user_pages_locked()
-> __get_user_pages()
-> faultin_page()
-> handle_mm_fault()
-
->From where the path/behaviour should be the same as the fault through arch code.
-
-FOLL_POPULATE is a red-herring, it doesn't seem to mean anything unless
-FOLL_MLOCK is set too.
+This 'silently succeed' only occurred to me when writing the cover-letter,
+(hence its probably worded badly). I plan to catch it by save-restoring the
+exception registers, and warning if they've changed as this would hyp-panic if
+you interrupted a guest.
 
 
-> Right, I figured it was just the commit message that needed updating.
-> 
-> Sorry about being pedantic, but having a misleading record of this
-> change is guaranteed to confuse me in the future.
+> For the rest of the KVM part it looks mostly good to me, besides the
+> points I raised in the individual patches.
 
-If it's wrong it needs fixing. I'm a fan of pedantry in all its forms!
-
+Thanks for taking a look!
 
 
 Thanks,
