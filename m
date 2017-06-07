@@ -1,153 +1,110 @@
-From: Jintack Lim <jintack.lim@linaro.org>
-Subject: Re: [RFC 10/55] KVM: arm64: Synchronize EL1 system registers on
- virtual EL2 entry and exit
-Date: Wed, 7 Jun 2017 00:26:06 -0400
-Message-ID: <CAHyh4xidZ1e_VoLN5hbtQ5RnFabbAYNKxFK1ccVdgTHUxmzPXQ@mail.gmail.com>
-References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <1483943091-1364-11-git-send-email-jintack@cs.columbia.edu> <jpgy3t4dg7f.fsf@linux.bootlegged.copy>
+From: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH 06/11] dt-bindings: add devicetree binding for describing
+ arm64 SDEI firmware
+Date: Wed, 07 Jun 2017 09:28:41 +0100
+Message-ID: <5937B939.5090707@arm.com>
+References: <20170515174400.29735-1-james.morse@arm.com> <20170515174400.29735-7-james.morse@arm.com> <20170519014804.psr5i7qczpbsn3iv@rob-hp-laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <jpgy3t4dg7f.fsf@linux.bootlegged.copy>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Bandan Das <bsd@redhat.com>
-Cc: KVM General <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170519014804.psr5i7qczpbsn3iv@rob-hp-laptop>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Cc: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Bandan,
+Hi Rob,
 
-On Tue, Jun 6, 2017 at 4:16 PM, Bandan Das <bsd@redhat.com> wrote:
-> Jintack Lim <jintack@cs.columbia.edu> writes:
->
->> From: Christoffer Dall <christoffer.dall@linaro.org>
+On 19/05/17 02:48, Rob Herring wrote:
+> On Mon, May 15, 2017 at 06:43:54PM +0100, James Morse wrote:
+>> The Software Delegated Exception Interface (SDEI) is an ARM standard
+>> for registering callbacks from the platform firmware into the OS.
+>> This is typically used to implement RAS notifications.
 >>
->> When running in virtual EL2 we use the shadow EL1 systerm register array
->> for the save/restore process, so that hardware and especially the memory
->> subsystem behaves as code written for EL2 expects while really running
->> in EL1.
->>
->> This works great for EL1 system register accesses that we trap, because
->> these accesses will be written into the virtual state for the EL1 system
->> registers used when eventually switching the VCPU mode to EL1.
->>
->> However, there was a collection of EL1 system registers which we do not
->> trap, and as a consequence all save/restore operations of these
->> registers were happening locally in the shadow array, with no benefit to
->> software actually running in virtual EL1 at all.
->>
->> To fix this, simply synchronize the shadow and real EL1 state for these
->> registers on entry/exit to/from virtual EL2 state.
->>
->> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
->> ---
->>  arch/arm64/kvm/context.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 47 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/context.c b/arch/arm64/kvm/context.c
->> index 2e9e386..0025dd9 100644
->> --- a/arch/arm64/kvm/context.c
->> +++ b/arch/arm64/kvm/context.c
->> @@ -88,6 +88,51 @@ static void create_shadow_el1_sysregs(struct kvm_vcpu *vcpu)
->>       s_sys_regs[CPACR_EL1] = cptr_el2_to_cpacr_el1(el2_regs[CPTR_EL2]);
->>  }
->>
->> +/*
->> + * List of EL1 registers which we allow the virtual EL2 mode to access
->> + * directly without trapping and which haven't been paravirtualized.
->> + *
->> + * Probably CNTKCTL_EL1 should not be copied but be accessed via trap. Because,
->> + * the guest hypervisor running in EL1 can be affected by event streams
->> + * configured via CNTKCTL_EL1, which it does not expect. We don't have a
->> + * mechanism to trap on CNTKCTL_EL1 as of now (v8.3), keep it in here instead.
->> + */
->> +static const int el1_non_trap_regs[] = {
->> +     CNTKCTL_EL1,
->> +     CSSELR_EL1,
->> +     PAR_EL1,
->> +     TPIDR_EL0,
->> +     TPIDR_EL1,
->> +     TPIDRRO_EL0
->> +};
+>> Add a new devicetree binding to describe the SDE firmware interface.
+
+>> diff --git a/Documentation/devicetree/bindings/arm/sdei.txt b/Documentation/devicetree/bindings/arm/sdei.txt
+>> new file mode 100644
+>> index 000000000000..69220d995286
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/arm/sdei.txt
+>> @@ -0,0 +1,37 @@
+>> +* Software Delegated Exception Interface (SDEI)
 >> +
->
-> Do we trap on all register accesses in the non-nested case +
-> all accesses to the memory access registers ? I am trying to
-> understand how we decide what registers to trap on. For example,
-> shouldn't accesses to CSSELR_EL1, the cache size selection register
-> be trapped ?
+>> +Firmware implementing the SDEI functions described in ARM document number
+>> +ARM DEN 0054A ("Software Delegated Exception Interface") can be used by
+>> +Linux to receive notification of events such as those generated by
+>> +firmware-first error handling.
+> 
+> Why am I reviewing bindings for RAS firmware-first events which is a 
+> server thing? Just curious.
 
-So, the principle is that we trap on EL1 register accesses from the
-virtual EL2 if those EL1 register accesses without trap make the guest
-hypervisor's execution different from what it should be if it really
-runs in EL2. (e.g. A write operation to TTBR0_EL1 from the guest
-hypervisor without trap will change the guest hypervisor's page table
-base. However, if a hypervisor runs in EL2, this operation only
-affects the software running in EL1, not itself.)
+I did a bad job of explaining it: SDEI ended up being a general-purpose event
+notification mechanism, one of the API calls in the spec lets an IRQ be 'bound'
+to an event so its delivered to firmware, then via SDEI possibly interrupting
+code that has IRQs masked.
 
-For non-nested case, this patch does not introduce any additional
-traps since there's no virtual EL2 state.
+(I will add some similar text...)
 
-For CSSELR_EL1 case, this register can be used at any exception level
-other than EL0 and its behavior is the same whether it is executed in
-EL1 or EL2. In other words, the guest hypervisor can interact with
-this register in EL1 just the way a non-nesting hypervisor would do in
-EL2.
+>> +
+>> +The interface provides a number of API functions for registering callbacks
+>> +and enabling/disabling events. Functions are invoked by trapping to the
+>> +privilege level of the SDEI firmware (specified as part of the binding
+>> +below) and passing arguments in a manner similar to that specified by AAPCS:
+> 
+> Shouldn't it be the ARM secure monitor call convention doc (forgot the 
+> name) that you are following?
+
+SMCCC... yes, that would make more sense, I just copied the PSCI binding.
+
+'similar to .. AAPCS' should be come 'specified by SMCCC'.
+
+
+>> +
+>> +	 r0		=> 32-bit Function ID / return value
+>> +	{r1 - r3}	=> Parameters
+>> +
+>> +Note that the immediate field of the trapping instruction must be set
+>> +to #0.
+>> +
+>> +The SDEI_EVENT_REGISTER function registers a callback in the kernel
+>> +text to handle the specified event number.
+>> +
+>> +Main node required properties:
+>> +
+>> + - compatible    : should contain:
+>> +	* "arm,sdei-1.0" : For implementations complying to SDEI version 1.x.
+>> +
+>> + - method        : The method of calling the SDEI firmware. Permitted
+>> +                   values are:
+>> +	* "smc" : SMC #0, with the register assignments specified in this
+>> +	          binding.
+>> +	* "hvc" : HVC #0, with the register assignments specified in this
+>> +	          binding.
+> 
+> When is ARM going to define a firmware interface to determine what 
+> firmware interfaces are available?
+
+Ideally the _version() calls could be probed, but SMCCC has:
+> The Unknown Function Identifier must not be used to discover the presence, or
+> lack of, an SMC or HVC Function.
+
+So I think we're stuck with doing it like this...
+
+
+>> +Example:
+>> +	sdei {
+> 
+> Please specify this should be a child node of /firmware node.
+
+Sure,
+
 
 Thanks,
-Jintack
 
->
-> Bandan
->
->
->> +/**
->> + * sync_shadow_el1_state - Going to/from the virtual EL2 state, sync state
->> + * @vcpu:    The VCPU pointer
->> + * @setup:   True, if on the way to the guest (called from setup)
->> + *           False, if returning form the guet (calld from restore)
->> + *
->> + * Some EL1 registers are accessed directly by the virtual EL2 mode because
->> + * they in no way affect execution state in virtual EL2.   However, we must
->> + * still ensure that virtual EL2 observes the same state of the EL1 registers
->> + * as the normal VM's EL1 mode, so copy this state as needed on setup/restore.
->> + */
->> +static void sync_shadow_el1_state(struct kvm_vcpu *vcpu, bool setup)
->> +{
->> +     u64 *sys_regs = vcpu->arch.ctxt.sys_regs;
->> +     u64 *s_sys_regs = vcpu->arch.ctxt.shadow_sys_regs;
->> +     int i;
->> +
->> +     for (i = 0; i < ARRAY_SIZE(el1_non_trap_regs); i++) {
->> +             const int sr = el1_non_trap_regs[i];
->> +
->> +             if (setup)
->> +                     s_sys_regs[sr] = sys_regs[sr];
->> +             else
->> +                     sys_regs[sr] = s_sys_regs[sr];
->> +     }
->> +}
->> +
->>  /**
->>   * kvm_arm_setup_shadow_state -- prepare shadow state based on emulated mode
->>   * @vcpu: The VCPU pointer
->> @@ -107,6 +152,7 @@ void kvm_arm_setup_shadow_state(struct kvm_vcpu *vcpu)
->>               else
->>                       ctxt->hw_pstate |= PSR_MODE_EL1t;
->>
->> +             sync_shadow_el1_state(vcpu, true);
->>               create_shadow_el1_sysregs(vcpu);
->>               ctxt->hw_sys_regs = ctxt->shadow_sys_regs;
->>               ctxt->hw_sp_el1 = ctxt->el2_regs[SP_EL2];
->> @@ -125,6 +171,7 @@ void kvm_arm_restore_shadow_state(struct kvm_vcpu *vcpu)
->>  {
->>       struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
->>       if (unlikely(vcpu_mode_el2(vcpu))) {
->> +             sync_shadow_el1_state(vcpu, false);
->>               *vcpu_cpsr(vcpu) &= PSR_MODE_MASK;
->>               *vcpu_cpsr(vcpu) |= ctxt->hw_pstate & ~PSR_MODE_MASK;
->>               ctxt->el2_regs[SP_EL2] = ctxt->hw_sp_el1;
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+James
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
