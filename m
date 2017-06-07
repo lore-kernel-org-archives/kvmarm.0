@@ -1,39 +1,49 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 2/3] arm64: KVM: Allow unaligned accesses at EL2
-Date: Wed, 7 Jun 2017 10:16:29 +0100
-Message-ID: <73f039f7-7597-fd34-367c-1cc6fdda3673@arm.com>
-References: <20170606180835.14421-1-marc.zyngier@arm.com>
- <20170606180835.14421-3-marc.zyngier@arm.com> <20170606200912.GQ9464@cbox>
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PULL 0/3] KVM/ARM Fixes for v4.12-rc5
+Date: Wed, 7 Jun 2017 11:24:09 +0200
+Message-ID: <20170607092408.GB12387@potion>
+References: <20170606135629.31664-1-cdall@linaro.org>
+ <20170606202130.GS9464@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170606200912.GQ9464@cbox>
-Sender: kvm-owner@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 113F240A74
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Jun 2017 05:20:07 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Nnrn2DShGs-u for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Jun 2017 05:20:06 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E22240905
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Jun 2017 05:20:06 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20170606202130.GS9464@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <cdall@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, Alexander Graf <agraf@suse.de>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/06/17 21:09, Christoffer Dall wrote:
-> On Tue, Jun 06, 2017 at 07:08:34PM +0100, Marc Zyngier wrote:
->> We currently have the SCTLR_EL2.A bit set, trapping unaligned accesses
->> at EL2, but we're not really prepared to deal with it. So far, this
->> has been unnoticed, until GCC 7 started emitting those (in particular
->> 64bit writes on a 32bit boundary).
->>
->> Since the rest of the kernel is pretty happy about that, let's follow
->> its example and set SCTLR_EL2.A to zero. Modern CPUs don't really
->> care.
+2017-06-06 22:21+0200, Christoffer Dall:
+> On Tue, Jun 06, 2017 at 03:56:26PM +0200, Christoffer Dall wrote:
+> > Hi Radim and Paolo,
+> > 
+> > Three additional fixes for KVM/ARM for v4.12.
 > 
-> Why do we set the A flag via SCTLR_ELx_FLAGS in the first place, only to
-> drop that flag later on for both EL1 and EL2 ?
+> We didn't expect three additional fixes to pop up so quickly, so I'm
+> going to send another pull request tomorrow.
+> 
+> Please hold off on applying this one if you haven't done so already.
+> 
+> Sorry about that.
 
-That flag is always cleared at EL1, never set. Actually, only EL2 uses
-that macro to *set* flags. An alternative would be to do away with the
-macro and use the individual flags, like the 32bit side does.
-
-What do you think?
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+No problem, I only had it applied locally.
