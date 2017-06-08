@@ -1,55 +1,113 @@
-From: Alexander Graf <agraf@suse.de>
-Subject: Re: [PATCH v2 00/25] arm64: KVM: Mediate access to GICv3 sysregs at
- EL2
-Date: Thu, 8 Jun 2017 16:35:01 +0200
-Message-ID: <615c301e-faa7-ab31-24f2-8000b6a6fc21@suse.de>
-References: <20170601102117.17750-1-marc.zyngier@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v3 6/9] KVM: arm/arm64: Introduce an allocator for
+ in-kernel irq lines
+Date: Thu, 8 Jun 2017 16:59:38 +0200
+Message-ID: <20170608145938.GA6378@cbox>
+References: <20170608133446.3875-1-cdall@linaro.org>
+ <20170608133446.3875-7-cdall@linaro.org>
+ <87bmpyine0.fsf@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170601102117.17750-1-marc.zyngier@arm.com>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <87bmpyine0.fsf@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 01.06.17 12:20, Marc Zyngier wrote:
-> Some systems have less than perfect GICv3 implementations, leading to
-> all kind of ugly issues (guest hanging, host dying). In order to allow
-> some level of diagnostic, and in some cases implement workarounds,
-> this series enables the trapping of both Group-0, Group-1 and Common
-> sysregs. Mediating the access at EL2 allows some form of sanity
-> checking that the HW is sometimes sorely lacking.
+On Thu, Jun 08, 2017 at 03:07:19PM +0100, Marc Zyngier wrote:
+> On Thu, Jun 08 2017 at  3:34:43 pm BST, Christoffer Dall <cdall@linaro.org> wrote:
+> > Having multiple devices being able to signal the same interrupt line is
+> > very confusing and almost certainly guarantees a configuration error.
+> >
+> > Therefore, introduce a very simple allocator which allows a device to
+> > claim an interrupt line from the vgic for a given VM.
+> >
+> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > ---
+> >  include/kvm/arm_vgic.h   |  5 +++++
+> >  virt/kvm/arm/vgic/vgic.c | 33 +++++++++++++++++++++++++++++++++
+> >  2 files changed, 38 insertions(+)
+> >
+> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> > index dde59fb..5d5b345 100644
+> > --- a/include/kvm/arm_vgic.h
+> > +++ b/include/kvm/arm_vgic.h
+> > @@ -121,6 +121,9 @@ struct vgic_irq {
+> >  	u8 source;			/* GICv2 SGIs only */
+> >  	u8 priority;
+> >  	enum vgic_irq_config config;	/* Level or edge */
+> > +
+> > +	void *owner;			/* Opaque pointer to reserve an interrupt
+> > +					   for in-kernel devices. */
+> >  };
+> >  
+> >  struct vgic_register_region;
+> > @@ -340,4 +343,6 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
+> >   */
+> >  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
+> >  
+> > +int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner);
+> > +
+> >  #endif /* __KVM_ARM_VGIC_H */
+> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> > index c66feac..9628945 100644
+> > --- a/virt/kvm/arm/vgic/vgic.c
+> > +++ b/virt/kvm/arm/vgic/vgic.c
+> > @@ -435,6 +435,39 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+> >  }
+> >  
+> >  /**
+> > + * kvm_vgic_set_owner - Set the owner of an interrupt for a VM
+> > + *
+> > + * @vcpu:   Pointer to the VCPU (used for PPIs)
+> > + * @intid:  The virtual INTID identifying the interrupt (PPI or SPI)
+> > + * @owner:  Opaque pointer to the owner
+> > + *
+> > + * Returns 0 if intid is not already used by another in-kernel device and the
+> > + * owner is set, otherwise returns an error code.
+> > + */
+> > +int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner)
+> > +{
+> > +	struct vgic_irq *irq;
+> > +	int ret = 0;
+> > +
+> > +	if (!vgic_initialized(vcpu->kvm))
+> > +		return -EAGAIN;
+> > +
+> > +	/* SGIs and LPIs cannot be wired up to any device */
+> > +	if (!irq_is_ppi(intid) && !vgic_valid_spi(vcpu->kvm, intid))
+> > +		return -EINVAL;
+> > +
+> > +	irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+> > +	spin_lock(&irq->irq_lock);
+> > +	if (irq->owner && irq->owner != owner)
+> > +		ret = -EEXIST;
+> > +	else
+> > +		irq->owner = owner;
 > 
-> Instead of fully emulating a GICv3 CPU interface, we still use the
-> existing HW (list registers, AP registers, VMCR...), which allows the
-> code to be independent from the rest of the KVM code, and to cope with
-> partial trapping.
+> Is there any case where you'd end-up setting the owner multiple times?
+> Or is that just convenient?
 > 
-> Of course, trapping has a cost, which is why this must be either
-> enabled on the command line, or selected by another cpu capability
-> (see Cavium erratum 30115). A quick test on an A57-based platform
-> shows a 25% hit when repeatedly banging on the trapped registers,
-> while normal workloads do not seem to suffer noticeably from such
-> trapping (hackbench variance is in the usual noise, despite being very
-> IPI happy).
+
+I think the timer code ended up doing that in some sequence, but maybe
+not.  In any case, I'm not sure if it makes much of a difference?
+
+> > +	spin_unlock(&irq->irq_lock);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +/**
+> >   * vgic_prune_ap_list - Remove non-relevant interrupts from the list
+> >   *
+> >   * @vcpu: The VCPU pointer
 > 
-> This has been tested on a dual socket Thundex-X and a Freescale LS-2085a.
+> Otherwise,
 > 
-> I've taken the liberty to rebase David Daney's initial Cavium erratum
-> 30115 workaround on top of this series, and included it here as a
-> typical use case.
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> 
 
-I've run this patch set on an affected ThunderX system and indeed not 
-seen any hangs. I have seen lost guest USB keyboard events which might 
-point at interrupt problems or not, but let's assume it's a different 
-issue for now.
-
-Tested-by: Alexander Graf <agraf@suse.de>
-
-
-Alex
+Thanks,
+-Christoffer
