@@ -1,91 +1,55 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 9/9] KVM: arm/arm64: Don't assume initialized vgic when
- setting PMU IRQ
-Date: Thu, 08 Jun 2017 15:35:05 +0100
-Message-ID: <87y3t2h7ja.fsf@arm.com>
-References: <20170608133446.3875-1-cdall@linaro.org>
- <20170608133446.3875-10-cdall@linaro.org>
+From: Alexander Graf <agraf@suse.de>
+Subject: Re: [PATCH v2 00/25] arm64: KVM: Mediate access to GICv3 sysregs at
+ EL2
+Date: Thu, 8 Jun 2017 16:35:01 +0200
+Message-ID: <615c301e-faa7-ab31-24f2-8000b6a6fc21@suse.de>
+References: <20170601102117.17750-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9051340BE3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Jun 2017 10:31:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qEE9btpsoe8R for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Jun 2017 10:30:59 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BB4940A74
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Jun 2017 10:30:59 -0400 (EDT)
-In-Reply-To: <20170608133446.3875-10-cdall@linaro.org> (Christoffer Dall's
- message of "Thu, 8 Jun 2017 15:34:46 +0200")
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170601102117.17750-1-marc.zyngier@arm.com>
+Content-Language: en-US
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jun 08 2017 at  3:34:46 pm BST, Christoffer Dall <cdall@linaro.org> wrote:
-> The PMU IRQ number is set through the VCPU device's KVM_SET_DEVICE_ATTR
-> ioctl handler for the KVM_ARM_VCPU_PMU_V3_IRQ attribute, but there is no
-> enforced or stated requirement that this must happen after initializing
-> the VGIC.  As a result, calling vgic_valid_spi() which relies on the
-> nr_spis being set during the VGIC init can incorrectly fail.
->
-> Introduce irq_is_spi, which determines if an IRQ number is within the
-> SPI range without verifying it against the actual VGIC properties.
->
-> Signed-off-by: Christoffer Dall <cdall@linaro.org>
-> ---
->  include/kvm/arm_vgic.h | 2 ++
->  virt/kvm/arm/pmu.c     | 2 +-
->  2 files changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 131668f..a2ae9d2 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -39,6 +39,8 @@
->  #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
->  
->  #define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
-> +#define irq_is_spi(irq) ((irq) >= VGIC_NR_PRIVATE_IRQS && \
-> +			 (irq) <= VGIC_MAX_SPI)
->  
->  enum vgic_type {
->  	VGIC_V2,		/* Good ol' GICv2 */
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index 26a42a9..87cb325 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -547,7 +547,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  			return -EFAULT;
->  
->  		/* The PMU overflow interrupt can be a PPI or a valid SPI. */
-> -		if (!(irq_is_ppi(irq) || vgic_valid_spi(vcpu->kvm, irq)))
-> +		if (!(irq_is_ppi(irq) || irq_is_spi(irq)))
->  			return -EINVAL;
->  
->  		if (!pmu_irq_is_valid(vcpu->kvm, irq))
 
-Does it mean that we can now fail an injection if the SPI is out of the
-range of configured SPIs?
 
-If that's the case, the WARN_ON() in kvm_pmu_update_state() is going to
-fire badly, and that's going to be ugly. Should we add a check for this
-case in kvm_arm_pmu_v3_init()?
+On 01.06.17 12:20, Marc Zyngier wrote:
+> Some systems have less than perfect GICv3 implementations, leading to
+> all kind of ugly issues (guest hanging, host dying). In order to allow
+> some level of diagnostic, and in some cases implement workarounds,
+> this series enables the trapping of both Group-0, Group-1 and Common
+> sysregs. Mediating the access at EL2 allows some form of sanity
+> checking that the HW is sometimes sorely lacking.
+> 
+> Instead of fully emulating a GICv3 CPU interface, we still use the
+> existing HW (list registers, AP registers, VMCR...), which allows the
+> code to be independent from the rest of the KVM code, and to cope with
+> partial trapping.
+> 
+> Of course, trapping has a cost, which is why this must be either
+> enabled on the command line, or selected by another cpu capability
+> (see Cavium erratum 30115). A quick test on an A57-based platform
+> shows a 25% hit when repeatedly banging on the trapped registers,
+> while normal workloads do not seem to suffer noticeably from such
+> trapping (hackbench variance is in the usual noise, despite being very
+> IPI happy).
+> 
+> This has been tested on a dual socket Thundex-X and a Freescale LS-2085a.
+> 
+> I've taken the liberty to rebase David Daney's initial Cavium erratum
+> 30115 workaround on top of this series, and included it here as a
+> typical use case.
 
-Thanks,
+I've run this patch set on an affected ThunderX system and indeed not 
+seen any hangs. I have seen lost guest USB keyboard events which might 
+point at interrupt problems or not, but let's assume it's a different 
+issue for now.
 
-	M.
--- 
-Jazz is not dead, it just smell funny.
+Tested-by: Alexander Graf <agraf@suse.de>
+
+
+Alex
