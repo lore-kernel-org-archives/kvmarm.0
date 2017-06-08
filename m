@@ -1,24 +1,26 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [PATCH v3 0/9] Userspace timer IRQ number control and PMU with
- userspace-gic
-Date: Thu,  8 Jun 2017 15:34:37 +0200
-Message-ID: <20170608133446.3875-1-cdall@linaro.org>
+Subject: [PATCH v3 6/9] KVM: arm/arm64: Introduce an allocator for in-kernel
+ irq lines
+Date: Thu,  8 Jun 2017 15:34:43 +0200
+Message-ID: <20170608133446.3875-7-cdall@linaro.org>
+References: <20170608133446.3875-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5D4940C50
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Jun 2017 09:30:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B5C340430
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Jun 2017 09:30:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 418HqyBcOvXp for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Jun 2017 09:30:41 -0400 (EDT)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1316340430
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Jun 2017 09:30:40 -0400 (EDT)
-Received: by mail-wm0-f43.google.com with SMTP id d73so31212556wma.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Jun 2017 06:34:50 -0700 (PDT)
+ with ESMTP id hdE3PqEQ2z4g for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Jun 2017 09:30:47 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D45E40C92
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Jun 2017 09:30:46 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id n195so31271785wmg.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Jun 2017 06:34:56 -0700 (PDT)
+In-Reply-To: <20170608133446.3875-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,75 +34,82 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <cdall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far we have been getting away with letting the kernel choosing
-interrupt numbers for the timers in the kernel and we have crossed our
-fingers in hoping that the DT/ACPI provided by userspace matches with
-the interrupt number we use in the kernel for a given VCPU type.
+Having multiple devices being able to signal the same interrupt line is
+very confusing and almost certainly guarantees a configuration error.
 
-But as we are generally moving towards letting userspace be in more fine
-grained control of what is being emulated, let userspace decide the irq
-numbers for the timers.
+Therefore, introduce a very simple allocator which allows a device to
+claim an interrupt line from the vgic for a given VM.
 
-Slightly related, and therefore included in this series, we have
-recently added support for a userspace GIC while still supporting the
-generic timers and the PMU from inside the VM.  Unfortunately we forgot
-to rework the code to actually let userspace create the PMU device
-without creating an in-kernel GIC.
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ include/kvm/arm_vgic.h   |  5 +++++
+ virt/kvm/arm/vgic/vgic.c | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
 
-Patches 6-9 could be omitted and still support the basic functionality
-targeted by this series if preferred.
-
-Tested on APM X-Gene, Thunder-X, and TC2.
-
-QEMU patches used for testing can be found here:
-
-https://git.linaro.org/people/christoffer.dall/qemu-arm.git timer-pmu-irqs
-
-Changes since v2:
- - Grammer change
- - Move PMU irq consistency check to when we are about to run a VCPU,
-   ensuring that we do not allow an unconfigure irq line with an
-   in-kernel gic.
- - Rebased on kvmarm/queue.
- - Acked reviewed-by and acked-by from Marc on some patches
-
-Changes since v1:
- - Rebased on v4.12-rc1
- - Check for irqchip_in_kernel() in kvm_arm_pmu_v3_get_attr
- - Slightly change the wording around default timer IRQs
- - Add fix for the PMU IRQ setting that assumes an initialized vgic
- - Introduce an allocator for IRQ lines so that in-kernel owned IRQ
-   lines cannot be signalled from userspace and such that an IRQ line
-   can only be assigned to a single device.
-
-Christoffer Dall (9):
-  KVM: arm64: Allow creating the PMU without the in-kernel GIC
-  KVM: arm: Handle VCPU device attributes in guest.c
-  KVM: arm/arm64: Move irq_is_ppi() to header file
-  KVM: arm/arm64: Move timer IRQ default init to arch_timer.c
-  KVM: arm/arm64: Allow setting the timer IRQ numbers from userspace
-  KVM: arm/arm64: Introduce an allocator for in-kernel irq lines
-  KVM: arm/arm64: Check if irq lines to the GIC are already used
-  KVM: arm/arm64: Disallow userspace control of in-kernel IRQ lines
-  KVM: arm/arm64: Don't assume initialized vgic when setting PMU IRQ
-
- Documentation/virtual/kvm/devices/vcpu.txt |  41 +++++++--
- arch/arm/include/asm/kvm_host.h            |  22 ++---
- arch/arm/include/uapi/asm/kvm.h            |   8 ++
- arch/arm/kvm/guest.c                       |  51 +++++++++++
- arch/arm/kvm/reset.c                       |  16 +---
- arch/arm64/include/uapi/asm/kvm.h          |   3 +
- arch/arm64/kvm/guest.c                     |   9 ++
- arch/arm64/kvm/reset.c                     |  16 +---
- include/kvm/arm_arch_timer.h               |   8 +-
- include/kvm/arm_pmu.h                      |   6 ++
- include/kvm/arm_vgic.h                     |  13 ++-
- virt/kvm/arm/arch_timer.c                  | 137 ++++++++++++++++++++++++++---
- virt/kvm/arm/arm.c                         |   8 +-
- virt/kvm/arm/pmu.c                         |  65 ++++++++++----
- virt/kvm/arm/vgic/vgic-irqfd.c             |   2 +-
- virt/kvm/arm/vgic/vgic.c                   |  48 +++++++++-
- 16 files changed, 359 insertions(+), 94 deletions(-)
-
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index dde59fb..5d5b345 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -121,6 +121,9 @@ struct vgic_irq {
+ 	u8 source;			/* GICv2 SGIs only */
+ 	u8 priority;
+ 	enum vgic_irq_config config;	/* Level or edge */
++
++	void *owner;			/* Opaque pointer to reserve an interrupt
++					   for in-kernel devices. */
+ };
+ 
+ struct vgic_register_region;
+@@ -340,4 +343,6 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
+  */
+ int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
+ 
++int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner);
++
+ #endif /* __KVM_ARM_VGIC_H */
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index c66feac..9628945 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -435,6 +435,39 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+ }
+ 
+ /**
++ * kvm_vgic_set_owner - Set the owner of an interrupt for a VM
++ *
++ * @vcpu:   Pointer to the VCPU (used for PPIs)
++ * @intid:  The virtual INTID identifying the interrupt (PPI or SPI)
++ * @owner:  Opaque pointer to the owner
++ *
++ * Returns 0 if intid is not already used by another in-kernel device and the
++ * owner is set, otherwise returns an error code.
++ */
++int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner)
++{
++	struct vgic_irq *irq;
++	int ret = 0;
++
++	if (!vgic_initialized(vcpu->kvm))
++		return -EAGAIN;
++
++	/* SGIs and LPIs cannot be wired up to any device */
++	if (!irq_is_ppi(intid) && !vgic_valid_spi(vcpu->kvm, intid))
++		return -EINVAL;
++
++	irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
++	spin_lock(&irq->irq_lock);
++	if (irq->owner && irq->owner != owner)
++		ret = -EEXIST;
++	else
++		irq->owner = owner;
++	spin_unlock(&irq->irq_lock);
++
++	return ret;
++}
++
++/**
+  * vgic_prune_ap_list - Remove non-relevant interrupts from the list
+  *
+  * @vcpu: The VCPU pointer
 -- 
 2.9.0
