@@ -1,122 +1,112 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 6/9] KVM: arm/arm64: Introduce an allocator for
- in-kernel irq lines
-Date: Thu, 8 Jun 2017 16:09:31 +0100
-Message-ID: <125804d9-8022-cb4a-deac-84d1b144f486@arm.com>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [PATCH v3 9/9] KVM: arm/arm64: Don't assume initialized vgic
+ when setting PMU IRQ
+Date: Thu, 8 Jun 2017 17:18:18 +0200
+Message-ID: <20170608151818.GB6378@cbox>
 References: <20170608133446.3875-1-cdall@linaro.org>
- <20170608133446.3875-7-cdall@linaro.org> <87bmpyine0.fsf@arm.com>
- <20170608145938.GA6378@cbox>
+ <20170608133446.3875-10-cdall@linaro.org>
+ <87y3t2h7ja.fsf@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E153D40A66
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Jun 2017 11:05:26 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id l+BSBAS6FzBE for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Jun 2017 11:05:25 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A4B8405DA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Jun 2017 11:05:25 -0400 (EDT)
-In-Reply-To: <20170608145938.GA6378@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <87y3t2h7ja.fsf@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/06/17 15:59, Christoffer Dall wrote:
-> On Thu, Jun 08, 2017 at 03:07:19PM +0100, Marc Zyngier wrote:
->> On Thu, Jun 08 2017 at  3:34:43 pm BST, Christoffer Dall <cdall@linaro.org> wrote:
->>> Having multiple devices being able to signal the same interrupt line is
->>> very confusing and almost certainly guarantees a configuration error.
->>>
->>> Therefore, introduce a very simple allocator which allows a device to
->>> claim an interrupt line from the vgic for a given VM.
->>>
->>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
->>> ---
->>>  include/kvm/arm_vgic.h   |  5 +++++
->>>  virt/kvm/arm/vgic/vgic.c | 33 +++++++++++++++++++++++++++++++++
->>>  2 files changed, 38 insertions(+)
->>>
->>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->>> index dde59fb..5d5b345 100644
->>> --- a/include/kvm/arm_vgic.h
->>> +++ b/include/kvm/arm_vgic.h
->>> @@ -121,6 +121,9 @@ struct vgic_irq {
->>>  	u8 source;			/* GICv2 SGIs only */
->>>  	u8 priority;
->>>  	enum vgic_irq_config config;	/* Level or edge */
->>> +
->>> +	void *owner;			/* Opaque pointer to reserve an interrupt
->>> +					   for in-kernel devices. */
->>>  };
->>>  
->>>  struct vgic_register_region;
->>> @@ -340,4 +343,6 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
->>>   */
->>>  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
->>>  
->>> +int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner);
->>> +
->>>  #endif /* __KVM_ARM_VGIC_H */
->>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->>> index c66feac..9628945 100644
->>> --- a/virt/kvm/arm/vgic/vgic.c
->>> +++ b/virt/kvm/arm/vgic/vgic.c
->>> @@ -435,6 +435,39 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
->>>  }
->>>  
->>>  /**
->>> + * kvm_vgic_set_owner - Set the owner of an interrupt for a VM
->>> + *
->>> + * @vcpu:   Pointer to the VCPU (used for PPIs)
->>> + * @intid:  The virtual INTID identifying the interrupt (PPI or SPI)
->>> + * @owner:  Opaque pointer to the owner
->>> + *
->>> + * Returns 0 if intid is not already used by another in-kernel device and the
->>> + * owner is set, otherwise returns an error code.
->>> + */
->>> +int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner)
->>> +{
->>> +	struct vgic_irq *irq;
->>> +	int ret = 0;
->>> +
->>> +	if (!vgic_initialized(vcpu->kvm))
->>> +		return -EAGAIN;
->>> +
->>> +	/* SGIs and LPIs cannot be wired up to any device */
->>> +	if (!irq_is_ppi(intid) && !vgic_valid_spi(vcpu->kvm, intid))
->>> +		return -EINVAL;
->>> +
->>> +	irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
->>> +	spin_lock(&irq->irq_lock);
->>> +	if (irq->owner && irq->owner != owner)
->>> +		ret = -EEXIST;
->>> +	else
->>> +		irq->owner = owner;
->>
->> Is there any case where you'd end-up setting the owner multiple times?
->> Or is that just convenient?
->>
+On Thu, Jun 08, 2017 at 03:35:05PM +0100, Marc Zyngier wrote:
+> On Thu, Jun 08 2017 at  3:34:46 pm BST, Christoffer Dall <cdall@linaro.org> wrote:
+> > The PMU IRQ number is set through the VCPU device's KVM_SET_DEVICE_ATTR
+> > ioctl handler for the KVM_ARM_VCPU_PMU_V3_IRQ attribute, but there is no
+> > enforced or stated requirement that this must happen after initializing
+> > the VGIC.  As a result, calling vgic_valid_spi() which relies on the
+> > nr_spis being set during the VGIC init can incorrectly fail.
+> >
+> > Introduce irq_is_spi, which determines if an IRQ number is within the
+> > SPI range without verifying it against the actual VGIC properties.
+> >
+> > Signed-off-by: Christoffer Dall <cdall@linaro.org>
+> > ---
+> >  include/kvm/arm_vgic.h | 2 ++
+> >  virt/kvm/arm/pmu.c     | 2 +-
+> >  2 files changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> > index 131668f..a2ae9d2 100644
+> > --- a/include/kvm/arm_vgic.h
+> > +++ b/include/kvm/arm_vgic.h
+> > @@ -39,6 +39,8 @@
+> >  #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
+> >  
+> >  #define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
+> > +#define irq_is_spi(irq) ((irq) >= VGIC_NR_PRIVATE_IRQS && \
+> > +			 (irq) <= VGIC_MAX_SPI)
+> >  
+> >  enum vgic_type {
+> >  	VGIC_V2,		/* Good ol' GICv2 */
+> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> > index 26a42a9..87cb325 100644
+> > --- a/virt/kvm/arm/pmu.c
+> > +++ b/virt/kvm/arm/pmu.c
+> > @@ -547,7 +547,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> >  			return -EFAULT;
+> >  
+> >  		/* The PMU overflow interrupt can be a PPI or a valid SPI. */
+> > -		if (!(irq_is_ppi(irq) || vgic_valid_spi(vcpu->kvm, irq)))
+> > +		if (!(irq_is_ppi(irq) || irq_is_spi(irq)))
+> >  			return -EINVAL;
+> >  
+> >  		if (!pmu_irq_is_valid(vcpu->kvm, irq))
 > 
-> I think the timer code ended up doing that in some sequence, but maybe
-> not.  In any case, I'm not sure if it makes much of a difference?
+> Does it mean that we can now fail an injection if the SPI is out of the
+> range of configured SPIs?
+> 
+> If that's the case, the WARN_ON() in kvm_pmu_update_state() is going to
+> fire badly, and that's going to be ugly. Should we add a check for this
+> case in kvm_arm_pmu_v3_init()?
+> 
 
-None whatsoever.
+Yes, we should.  How about this fixup?
+
+
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 5dbaa2c7..fc8a723 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -458,10 +458,24 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
+ 	/*
+ 	 * A valid interrupt configuration for the PMU is either to have a
+ 	 * properly configured interrupt number and using an in-kernel
+-	 * irqchip, or to neither set an IRQ nor create an in-kernel irqchip.
++	 * irqchip, or to not have an in-kernel GIC and not set an IRQ.
+ 	 */
+-	if (kvm_arm_pmu_irq_initialized(vcpu) != irqchip_in_kernel(vcpu->kvm))
+-		return -EINVAL;
++	if (irqchip_in_kernel(vcpu->kvm)) {
++		int irq = vcpu->arch.pmu.irq_num;
++		if (!kvm_arm_pmu_irq_initialized(vcpu))
++			return -EINVAL;
++
++		/*
++		 * If we are using an in-kernel vgic, at this point we know
++		 * the vgic will be initialized, so we can check the PMU irq
++		 * number against the dimensions of the vgic and make sure
++		 * it's valid.
++		 */
++		if (!irq_is_ppi(irq) && !vgic_valid_spi(vcpu->kvm, irq))
++			return -EINVAL;
++	} else if (kvm_arm_pmu_irq_initialized(vcpu)) {
++		   return -EINVAL;
++	}
+ 
+ 	kvm_pmu_vcpu_reset(vcpu);
+ 	vcpu->arch.pmu.ready = true;
+
+
+If you're happy with that, I'll just squash that into the current patch
+before applying the series.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-Christoffer
