@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 18/27] arm64: Add MIDR values for Cavium cn83XX SoCs
-Date: Fri,  9 Jun 2017 12:49:47 +0100
-Message-ID: <20170609114956.25963-19-marc.zyngier@arm.com>
+Subject: [PATCH v3 14/27] KVM: arm64: vgic-v3: Add ICV_IGNREN0_EL1 handler
+Date: Fri,  9 Jun 2017 12:49:43 +0100
+Message-ID: <20170609114956.25963-15-marc.zyngier@arm.com>
 References: <20170609114956.25963-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 469D140BC5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Jun 2017 07:46:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 737FA40C90
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Jun 2017 07:46:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KRWmVUYqYjiw for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Jun 2017 07:46:26 -0400 (EDT)
+ with ESMTP id DLLRSZ64xiJG for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Jun 2017 07:46:20 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 86F8740C25
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Jun 2017 07:46:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ED5C40D7F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Jun 2017 07:46:19 -0400 (EDT)
 In-Reply-To: <20170609114956.25963-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,37 +31,76 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Robert Richter <rrichter@cavium.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: David Daney <david.daney@cavium.com>
+Add a handler for reading/writing the guest's view of the ICC_IGRPEN0_EL1
+register, which is located in the ICH_VMCR_EL2.VENG0 field.
 
 Tested-by: Alexander Graf <agraf@suse.de>
 Acked-by: David Daney <david.daney@cavium.com>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: David Daney <david.daney@cavium.com>
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/cputype.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/include/asm/sysreg.h |  1 +
+ virt/kvm/arm/hyp/vgic-v3-sr.c   | 23 +++++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-index 0984d1b3a8f2..235e77d98261 100644
---- a/arch/arm64/include/asm/cputype.h
-+++ b/arch/arm64/include/asm/cputype.h
-@@ -86,6 +86,7 @@
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index d20be0b28ca4..ba93bc7ac8e4 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -190,6 +190,7 @@
+ #define SYS_ICC_BPR1_EL1		sys_reg(3, 0, 12, 12, 3)
+ #define SYS_ICC_CTLR_EL1		sys_reg(3, 0, 12, 12, 4)
+ #define SYS_ICC_SRE_EL1			sys_reg(3, 0, 12, 12, 5)
++#define SYS_ICC_GRPEN0_EL1		sys_reg(3, 0, 12, 12, 6)
+ #define SYS_ICC_GRPEN1_EL1		sys_reg(3, 0, 12, 12, 7)
  
- #define CAVIUM_CPU_PART_THUNDERX	0x0A1
- #define CAVIUM_CPU_PART_THUNDERX_81XX	0x0A2
-+#define CAVIUM_CPU_PART_THUNDERX_83XX	0x0A3
+ #define SYS_CONTEXTIDR_EL1		sys_reg(3, 0, 13, 0, 1)
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index f53908cc981c..45927762bf14 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -689,11 +689,28 @@ static void __hyp_text __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int
+ 	__vgic_v3_clear_active_lr(lr, lr_val);
+ }
  
- #define BRCM_CPU_PART_VULCAN		0x516
++static void __hyp_text __vgic_v3_read_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
++{
++	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG0_MASK));
++}
++
+ static void __hyp_text __vgic_v3_read_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+ {
+ 	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG1_MASK));
+ }
  
-@@ -96,6 +97,7 @@
- #define MIDR_CORTEX_A73 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A73)
- #define MIDR_THUNDERX	MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
- #define MIDR_THUNDERX_81XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_81XX)
-+#define MIDR_THUNDERX_83XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_83XX)
- #define MIDR_QCOM_FALKOR_V1 MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_FALKOR_V1)
- 
- #ifndef __ASSEMBLY__
++static void __hyp_text __vgic_v3_write_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
++{
++	u64 val = vcpu_get_reg(vcpu, rt);
++
++	if (val & 1)
++		vmcr |= ICH_VMCR_ENG0_MASK;
++	else
++		vmcr &= ~ICH_VMCR_ENG0_MASK;
++
++	__vgic_v3_write_vmcr(vmcr);
++}
++
+ static void __hyp_text __vgic_v3_write_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+ {
+ 	u64 val = vcpu_get_reg(vcpu, rt);
+@@ -910,6 +927,12 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 	case SYS_ICC_HPPIR1_EL1:
+ 		fn = __vgic_v3_read_hppir;
+ 		break;
++	case SYS_ICC_GRPEN0_EL1:
++		if (is_read)
++			fn = __vgic_v3_read_igrpen0;
++		else
++			fn = __vgic_v3_write_igrpen0;
++		break;
+ 	case SYS_ICC_BPR0_EL1:
+ 		if (is_read)
+ 			fn = __vgic_v3_read_bpr0;
 -- 
 2.11.0
