@@ -1,120 +1,39 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 9/9] KVM: arm/arm64: Don't assume initialized vgic when
- setting PMU IRQ
-Date: Thu, 8 Jun 2017 16:40:29 +0100
-Message-ID: <5aacc2c4-aa13-3b5e-6255-558268f86660@arm.com>
-References: <20170608133446.3875-1-cdall@linaro.org>
- <20170608133446.3875-10-cdall@linaro.org> <87y3t2h7ja.fsf@arm.com>
- <20170608151818.GB6378@cbox>
+From: Hu Huajun <huhuajun@huawei.com>
+Subject: [PATCH] KVM: ARM64: fix phy counter access failure in guest.
+Date: Sat, 10 Jun 2017 00:22:20 +0800
+Message-ID: <20170609162220.1460-1-huhuajun@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170608151818.GB6378@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com, rkrcmar@redhat.com
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, songwenjun@huawei.com, gengdongjiu@huawei.com, huhuajun@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/06/17 16:18, Christoffer Dall wrote:
-> On Thu, Jun 08, 2017 at 03:35:05PM +0100, Marc Zyngier wrote:
->> On Thu, Jun 08 2017 at  3:34:46 pm BST, Christoffer Dall <cdall@linaro.org> wrote:
->>> The PMU IRQ number is set through the VCPU device's KVM_SET_DEVICE_ATTR
->>> ioctl handler for the KVM_ARM_VCPU_PMU_V3_IRQ attribute, but there is no
->>> enforced or stated requirement that this must happen after initializing
->>> the VGIC.  As a result, calling vgic_valid_spi() which relies on the
->>> nr_spis being set during the VGIC init can incorrectly fail.
->>>
->>> Introduce irq_is_spi, which determines if an IRQ number is within the
->>> SPI range without verifying it against the actual VGIC properties.
->>>
->>> Signed-off-by: Christoffer Dall <cdall@linaro.org>
->>> ---
->>>  include/kvm/arm_vgic.h | 2 ++
->>>  virt/kvm/arm/pmu.c     | 2 +-
->>>  2 files changed, 3 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->>> index 131668f..a2ae9d2 100644
->>> --- a/include/kvm/arm_vgic.h
->>> +++ b/include/kvm/arm_vgic.h
->>> @@ -39,6 +39,8 @@
->>>  #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
->>>  
->>>  #define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
->>> +#define irq_is_spi(irq) ((irq) >= VGIC_NR_PRIVATE_IRQS && \
->>> +			 (irq) <= VGIC_MAX_SPI)
->>>  
->>>  enum vgic_type {
->>>  	VGIC_V2,		/* Good ol' GICv2 */
->>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
->>> index 26a42a9..87cb325 100644
->>> --- a/virt/kvm/arm/pmu.c
->>> +++ b/virt/kvm/arm/pmu.c
->>> @@ -547,7 +547,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>>  			return -EFAULT;
->>>  
->>>  		/* The PMU overflow interrupt can be a PPI or a valid SPI. */
->>> -		if (!(irq_is_ppi(irq) || vgic_valid_spi(vcpu->kvm, irq)))
->>> +		if (!(irq_is_ppi(irq) || irq_is_spi(irq)))
->>>  			return -EINVAL;
->>>  
->>>  		if (!pmu_irq_is_valid(vcpu->kvm, irq))
->>
->> Does it mean that we can now fail an injection if the SPI is out of the
->> range of configured SPIs?
->>
->> If that's the case, the WARN_ON() in kvm_pmu_update_state() is going to
->> fire badly, and that's going to be ugly. Should we add a check for this
->> case in kvm_arm_pmu_v3_init()?
->>
-> 
-> Yes, we should.  How about this fixup?
-> 
-> 
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index 5dbaa2c7..fc8a723 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -458,10 +458,24 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
->  	/*
->  	 * A valid interrupt configuration for the PMU is either to have a
->  	 * properly configured interrupt number and using an in-kernel
-> -	 * irqchip, or to neither set an IRQ nor create an in-kernel irqchip.
-> +	 * irqchip, or to not have an in-kernel GIC and not set an IRQ.
->  	 */
-> -	if (kvm_arm_pmu_irq_initialized(vcpu) != irqchip_in_kernel(vcpu->kvm))
-> -		return -EINVAL;
-> +	if (irqchip_in_kernel(vcpu->kvm)) {
-> +		int irq = vcpu->arch.pmu.irq_num;
-> +		if (!kvm_arm_pmu_irq_initialized(vcpu))
-> +			return -EINVAL;
-> +
-> +		/*
-> +		 * If we are using an in-kernel vgic, at this point we know
-> +		 * the vgic will be initialized, so we can check the PMU irq
-> +		 * number against the dimensions of the vgic and make sure
-> +		 * it's valid.
-> +		 */
-> +		if (!irq_is_ppi(irq) && !vgic_valid_spi(vcpu->kvm, irq))
-> +			return -EINVAL;
-> +	} else if (kvm_arm_pmu_irq_initialized(vcpu)) {
-> +		   return -EINVAL;
-> +	}
->  
->  	kvm_pmu_vcpu_reset(vcpu);
->  	vcpu->arch.pmu.ready = true;
-> 
-> 
-> If you're happy with that, I'll just squash that into the current patch
-> before applying the series.
+When reading the cntpct_el0 in guest with VHE (Virtual Host Extension)
+enabled in host, the "Unsupported guest sys_reg access" error reported.
+The reason is cnthctl_el2.EL1PCTEN is not enabled, which is expected
+to be done in kvm_timer_init_vhe(). The problem is kvm_timer_init_vhe
+is called by cpu_init_hyp_mode, and which is called when VHE is disabled.
+This patch calls kvm_timer_init_vhe() to enable cnthctl_el2.EL1PCTEN
+in cpu_hyp_reinit().
 
-Yup, looks good to me! For the squashed version:
+Signed-off-by: Hu Huajun <huhuajun@huawei.com>
+---
+ virt/kvm/arm/arm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Thanks,
-
-	M.
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 3417e18..b703741 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1137,6 +1137,7 @@ static void cpu_hyp_reinit(void)
+ 		 * event was cancelled before the CPU was reset.
+ 		 */
+ 		__cpu_init_stage2();
++		kvm_timer_init_vhe();
+ 	} else {
+ 		cpu_init_hyp_mode(NULL);
+ 	}
 -- 
-Jazz is not dead. It just smells funny...
+2.10.1
