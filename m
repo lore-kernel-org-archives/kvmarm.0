@@ -1,23 +1,23 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 7/8] virt: irqbypass: Add a type field to the irqbypass
- producer
-Date: Thu, 15 Jun 2017 14:52:39 +0200
-Message-ID: <1497531160-29162-8-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v2 8/8] KVM: arm/arm64: register DEOI irq bypass consumer on
+ ARM/ARM64
+Date: Thu, 15 Jun 2017 14:52:40 +0200
+Message-ID: <1497531160-29162-9-git-send-email-eric.auger@redhat.com>
 References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4B0140D77
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jun 2017 08:50:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4091940D19
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jun 2017 08:51:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AAQKJfY6nrVY for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Jun 2017 08:50:55 -0400 (EDT)
+ with ESMTP id 4TtUGTvFsovU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Jun 2017 08:51:01 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB36E40D68
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jun 2017 08:50:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BDD340D11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jun 2017 08:51:01 -0400 (EDT)
 In-Reply-To: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,78 +31,140 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On ARM, we are about to introduce a vfio-platform producer. The
-associated architecture specific consumer only is compatible with
-this producer and does not work with the dummy vfio-pci msi producer.
+This patch selects IRQ_BYPASS_MANAGER and HAVE_KVM_IRQ_BYPASS
+configs for ARM/ARM64.
 
-Adding a type to the producer allows to easily discriminate between
-producers instead of complexifying things by analyzing the interrupt
-type.
+kvm_arch_has_irq_bypass() now is implemented and returns true.
+As a consequence the irq bypass consumer will be registered for
+ARM/ARM64 with Direct EOI/IRQ forwarding callbacks:
+
+- stop/start: halt/resume guest execution
+- add/del_producer: set/unset forwarding/DEOI at vgic/irqchip level
+
+The consumer currently only works with a VFIO_PLATFORM producer.
+In other cases, start/stop do nothing and return without error
+to avoid outputting a spurious warning.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
-v2: new
+v1 -> v2:
+- check the type of the producer to avoid attachement with VFIO-PCI
+  dummy MSI producer
 ---
- drivers/vfio/pci/vfio_pci_intrs.c                | 1 +
- drivers/vfio/platform/vfio_platform_irq_bypass.c | 1 +
- include/linux/irqbypass.h                        | 7 +++++++
- 3 files changed, 9 insertions(+)
+ arch/arm/kvm/Kconfig   |  3 +++
+ arch/arm64/kvm/Kconfig |  3 +++
+ virt/kvm/arm/arm.c     | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 54 insertions(+)
 
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 1c46045..40a6b21 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -343,6 +343,7 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_device *vdev,
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 90d0176..4e2b192 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -3,6 +3,7 @@
+ #
  
- 	vdev->ctx[vector].producer.token = trigger;
- 	vdev->ctx[vector].producer.irq = irq;
-+	vdev->ctx[vector].producer.type = IRQ_BYPASS_VFIO_PCI_MSI;
- 	ret = irq_bypass_register_producer(&vdev->ctx[vector].producer);
- 	if (unlikely(ret))
- 		dev_info(&pdev->dev,
-diff --git a/drivers/vfio/platform/vfio_platform_irq_bypass.c b/drivers/vfio/platform/vfio_platform_irq_bypass.c
-index 692b081..603b4b3 100644
---- a/drivers/vfio/platform/vfio_platform_irq_bypass.c
-+++ b/drivers/vfio/platform/vfio_platform_irq_bypass.c
-@@ -102,6 +102,7 @@ void vfio_platform_register_deoi_producer(struct vfio_platform_device *vdev,
+ source "virt/kvm/Kconfig"
++source "virt/lib/Kconfig"
  
- 	prod->token =		trigger;
- 	prod->irq =		host_irq;
-+	prod->type =		IRQ_BYPASS_VFIO_PLATFORM;
- 	prod->add_consumer =	irq_bypass_deoi_add_consumer;
- 	prod->del_consumer =	irq_bypass_deoi_del_consumer;
- 	prod->stop =		irq_bypass_deoi_stop;
-diff --git a/include/linux/irqbypass.h b/include/linux/irqbypass.h
-index f0f5d26..331c19a 100644
---- a/include/linux/irqbypass.h
-+++ b/include/linux/irqbypass.h
-@@ -31,11 +31,17 @@ struct irq_bypass_consumer;
-  * are not supported.
-  */
+ menuconfig VIRTUALIZATION
+ 	bool "Virtualization"
+@@ -35,6 +36,8 @@ config KVM
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	select HAVE_KVM_MSI
++	select IRQ_BYPASS_MANAGER
++	select HAVE_KVM_IRQ_BYPASS
+ 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 52cb7ad..7e0d6e6 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -3,6 +3,7 @@
+ #
  
-+enum irq_bypass_producer_type {
-+	IRQ_BYPASS_VFIO_PCI_MSI,
-+	IRQ_BYPASS_VFIO_PLATFORM,
-+};
+ source "virt/kvm/Kconfig"
++source "virt/lib/Kconfig"
+ 
+ menuconfig VIRTUALIZATION
+ 	bool "Virtualization"
+@@ -35,6 +36,8 @@ config KVM
+ 	select HAVE_KVM_MSI
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
++	select IRQ_BYPASS_MANAGER
++	select HAVE_KVM_IRQ_BYPASS
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+ 	  We don't support KVM with 16K page tables yet, due to the multiple
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 3417e18..58871f8 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -27,6 +27,8 @@
+ #include <linux/mman.h>
+ #include <linux/sched.h>
+ #include <linux/kvm.h>
++#include <linux/kvm_irqfd.h>
++#include <linux/irqbypass.h>
+ #include <trace/events/kvm.h>
+ #include <kvm/arm_pmu.h>
+ 
+@@ -1420,6 +1422,52 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
+ 	return NULL;
+ }
+ 
++bool kvm_arch_has_irq_bypass(void)
++{
++	return true;
++}
++
++int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
++				      struct irq_bypass_producer *prod)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	if (prod->type != IRQ_BYPASS_VFIO_PLATFORM)
++		return 0;
++
++	return kvm_vgic_set_forwarding(irqfd->kvm, prod->irq,
++				       irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
++}
++void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
++				      struct irq_bypass_producer *prod)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	if (prod->type != IRQ_BYPASS_VFIO_PLATFORM)
++		return;
++
++	kvm_vgic_unset_forwarding(irqfd->kvm, prod->irq,
++				  irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
++}
++
++void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	kvm_arm_halt_guest(irqfd->kvm);
++}
++
++void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *cons)
++{
++	struct kvm_kernel_irqfd *irqfd =
++		container_of(cons, struct kvm_kernel_irqfd, consumer);
++
++	kvm_arm_resume_guest(irqfd->kvm);
++}
 +
  /**
-  * struct irq_bypass_producer - IRQ bypass producer definition
-  * @node: IRQ bypass manager private list management
-  * @token: opaque token to match between producer and consumer (non-NULL)
-  * @irq: Linux IRQ number for the producer device
-+ * @type: type of the producer to easily assess interoperability with consumer
-  * @add_consumer: Connect the IRQ producer to an IRQ consumer (optional)
-  * @del_consumer: Disconnect the IRQ producer from an IRQ consumer (optional)
-  * @stop: Perform any quiesce operations necessary prior to add/del (optional)
-@@ -49,6 +55,7 @@ struct irq_bypass_producer {
- 	struct list_head node;
- 	void *token;
- 	int irq;
-+	enum irq_bypass_producer_type type;
- 	int (*add_consumer)(struct irq_bypass_producer *,
- 			    struct irq_bypass_consumer *);
- 	void (*del_consumer)(struct irq_bypass_producer *,
+  * Initialize Hyp-mode and memory mappings on all CPUs.
+  */
 -- 
 2.5.5
