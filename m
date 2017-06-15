@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 2/8] VFIO: platform: Introduce direct EOI interrupt handler
-Date: Thu, 15 Jun 2017 14:52:34 +0200
-Message-ID: <1497531160-29162-3-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v2 3/8] VFIO: platform: Direct EOI irq bypass for ARM/ARM64
+Date: Thu, 15 Jun 2017 14:52:35 +0200
+Message-ID: <1497531160-29162-4-git-send-email-eric.auger@redhat.com>
 References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
@@ -10,108 +10,289 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.or
 Cc: drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We add two new fields in vfio_platform_irq: deoi and handler.
+This patch adds the registration/unregistration of an
+irq_bypass_producer for vfio platform device interrupts.
 
-If deoi is set, this means the physical IRQ attached to the virtual
-IRQ is directly deactivated by the guest and the VFIO driver does
-not need to disable the physical IRQ and mask it at VFIO level.
+Its callbacks handle the direct EOI modality on VFIO side.
 
-The handler pointer points to either the automasked or "deoi" handler.
-This latter is the same as the one used for edge sensitive IRQs.
-A wrapper handler is introduced that calls the chosen handler function.
-
-The irq lock is taken/released in the wrapper handler. eventfd_signal
-can be called in regions not allowed to sleep.
+- stop/start: disable/enable the host irq
+- add/del consumer: set the VFIO Direct EOI mode, ie. select the
+  adapted physical IRQ handler (automasked or not automasked).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
 v1 -> v2:
-- fix a weird indentation
+- add a comment explaining we allow direct EOI for edge sensitive
+  interrupts without modifying the physical IRQ handler.
 ---
- drivers/vfio/platform/vfio_platform_irq.c     | 23 ++++++++++++++++-------
- drivers/vfio/platform/vfio_platform_private.h |  2 ++
- 2 files changed, 18 insertions(+), 7 deletions(-)
+ drivers/vfio/platform/Kconfig                    |   5 +
+ drivers/vfio/platform/Makefile                   |   2 +-
+ drivers/vfio/platform/vfio_platform_irq.c        |  19 ++++
+ drivers/vfio/platform/vfio_platform_irq_bypass.c | 118 +++++++++++++++++++++++
+ drivers/vfio/platform/vfio_platform_private.h    |  22 +++++
+ 5 files changed, 165 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/vfio/platform/vfio_platform_irq_bypass.c
 
+diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
+index bb30128..33ec3d9 100644
+--- a/drivers/vfio/platform/Kconfig
++++ b/drivers/vfio/platform/Kconfig
+@@ -2,6 +2,7 @@ config VFIO_PLATFORM
+ 	tristate "VFIO support for platform devices"
+ 	depends on VFIO && EVENTFD && (ARM || ARM64)
+ 	select VFIO_VIRQFD
++	select IRQ_BYPASS_MANAGER
+ 	help
+ 	  Support for platform devices with VFIO. This is required to make
+ 	  use of platform devices present on the system using the VFIO
+@@ -19,4 +20,8 @@ config VFIO_AMBA
+ 
+ 	  If you don't know what to do here, say N.
+ 
++config VFIO_PLATFORM_IRQ_BYPASS_DEOI
++	depends on VFIO_PLATFORM
++	def_bool y
++
+ source "drivers/vfio/platform/reset/Kconfig"
+diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
+index 41a6224..324f3e7 100644
+--- a/drivers/vfio/platform/Makefile
++++ b/drivers/vfio/platform/Makefile
+@@ -1,4 +1,4 @@
+-vfio-platform-base-y := vfio_platform_common.o vfio_platform_irq.o
++vfio-platform-base-y := vfio_platform_common.o vfio_platform_irq.o vfio_platform_irq_bypass.o
+ vfio-platform-y := vfio_platform.o
+ 
+ obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
 diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
-index 6740dbe..0228a96 100644
+index 0228a96..452dc3d 100644
 --- a/drivers/vfio/platform/vfio_platform_irq.c
 +++ b/drivers/vfio/platform/vfio_platform_irq.c
-@@ -148,11 +148,8 @@ static int vfio_platform_set_irq_unmask(struct vfio_platform_device *vdev,
- static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
- {
- 	struct vfio_platform_irq *irq_ctx = dev_id;
--	unsigned long flags;
- 	int ret = IRQ_NONE;
+@@ -20,6 +20,7 @@
+ #include <linux/types.h>
+ #include <linux/vfio.h>
+ #include <linux/irq.h>
++#include <linux/irqbypass.h>
  
--	spin_lock_irqsave(&irq_ctx->lock, flags);
--
- 	if (!is_masked(irq_ctx)) {
- 		ret = IRQ_HANDLED;
+ #include "vfio_platform_private.h"
  
-@@ -161,8 +158,6 @@ static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
- 		irq_ctx->automasked = true;
- 	}
- 
--	spin_unlock_irqrestore(&irq_ctx->lock, flags);
--
- 	if (ret == IRQ_HANDLED)
- 		eventfd_signal(irq_ctx->trigger, 1);
- 
-@@ -178,6 +173,19 @@ static irqreturn_t vfio_irq_handler(int irq, void *dev_id)
- 	return IRQ_HANDLED;
+@@ -186,6 +187,19 @@ static irqreturn_t vfio_wrapper_handler(int irq, void *dev_id)
+ 	return ret;
  }
  
-+static irqreturn_t vfio_wrapper_handler(int irq, void *dev_id)
++/* must be called with irq_ctx->lock held */
++int vfio_platform_set_deoi(struct vfio_platform_irq *irq_ctx, bool deoi)
 +{
-+	struct vfio_platform_irq *irq_ctx = dev_id;
-+	unsigned long flags;
-+	irqreturn_t ret;
++	irq_ctx->deoi = deoi;
 +
-+	spin_lock_irqsave(&irq_ctx->lock, flags);
-+	ret = irq_ctx->handler(irq, dev_id);
-+	spin_unlock_irqrestore(&irq_ctx->lock, flags);
++	if (!deoi && (irq_ctx->flags & VFIO_IRQ_INFO_AUTOMASKED))
++		irq_ctx->handler = vfio_automasked_irq_handler;
++	else
++		irq_ctx->handler = vfio_irq_handler;
 +
-+	return ret;
++	return 0;
 +}
 +
  static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
  			    int fd, irq_handler_t handler)
  {
-@@ -208,9 +216,10 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+@@ -196,6 +210,7 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+ 	if (irq->trigger) {
+ 		irq_clear_status_flags(irq->hwirq, IRQ_NOAUTOEN);
+ 		free_irq(irq->hwirq, irq);
++		irq_bypass_unregister_producer(&irq->producer);
+ 		kfree(irq->name);
+ 		eventfd_ctx_put(irq->trigger);
+ 		irq->trigger = NULL;
+@@ -227,6 +242,10 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+ 		return ret;
  	}
  
- 	irq->trigger = trigger;
-+	irq->handler = handler;
++	if (vfio_platform_has_deoi())
++		vfio_platform_register_deoi_producer(vdev, irq,
++						     trigger, irq->hwirq);
++
+ 	if (!irq->usermasked)
+ 		enable_irq(irq->hwirq);
  
- 	irq_set_status_flags(irq->hwirq, IRQ_NOAUTOEN);
--	ret = request_irq(irq->hwirq, handler, 0, irq->name, irq);
-+	ret = request_irq(irq->hwirq, vfio_wrapper_handler, 0, irq->name, irq);
- 	if (ret) {
- 		kfree(irq->name);
- 		eventfd_ctx_put(trigger);
-@@ -232,7 +241,7 @@ static int vfio_platform_set_irq_trigger(struct vfio_platform_device *vdev,
- 	struct vfio_platform_irq *irq = &vdev->irqs[index];
- 	irq_handler_t handler;
- 
--	if (vdev->irqs[index].flags & VFIO_IRQ_INFO_AUTOMASKED)
-+	if (vdev->irqs[index].flags & VFIO_IRQ_INFO_AUTOMASKED && !irq->deoi)
- 		handler = vfio_automasked_irq_handler;
- 	else
- 		handler = vfio_irq_handler;
+diff --git a/drivers/vfio/platform/vfio_platform_irq_bypass.c b/drivers/vfio/platform/vfio_platform_irq_bypass.c
+new file mode 100644
+index 0000000..692b081
+--- /dev/null
++++ b/drivers/vfio/platform/vfio_platform_irq_bypass.c
+@@ -0,0 +1,118 @@
++/*
++ * VFIO platform device irqbypass callback implementation for DEOI
++ *
++ * Copyright (C) 2017 Red Hat, Inc.  All rights reserved.
++ * Author: Eric Auger <eric.auger@redhat.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License, version 2, as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#include <linux/err.h>
++#include <linux/device.h>
++#include <linux/irq.h>
++#include <linux/irqbypass.h>
++#include "vfio_platform_private.h"
++
++#ifdef CONFIG_VFIO_PLATFORM_IRQ_BYPASS_DEOI
++
++static void irq_bypass_deoi_start(struct irq_bypass_producer *prod)
++{
++	enable_irq(prod->irq);
++}
++
++static void irq_bypass_deoi_stop(struct irq_bypass_producer *prod)
++{
++	disable_irq(prod->irq);
++}
++
++/**
++ * irq_bypass_deoi_add_consumer - turns irq direct EOI on
++ *
++ * The linux irq is disabled when the function is called.
++ * The operation succeeds only if the irq is not active at irqchip level
++ * and the irq is not automasked at VFIO level, meaning the IRQ is under
++ * injection into the guest.
++ */
++static int irq_bypass_deoi_add_consumer(struct irq_bypass_producer *prod,
++					struct irq_bypass_consumer *cons)
++{
++	struct vfio_platform_irq *irq_ctx =
++		container_of(prod, struct vfio_platform_irq, producer);
++	unsigned long flags;
++	bool active;
++	int ret;
++
++	spin_lock_irqsave(&irq_ctx->lock, flags);
++
++	ret = irq_get_irqchip_state(irq_ctx->hwirq, IRQCHIP_STATE_ACTIVE,
++				    &active);
++	if (ret)
++		goto out;
++
++	if (active || irq_ctx->automasked) {
++		ret = -EAGAIN;
++		goto out;
++	}
++
++	/*
++	 * Direct EOI is enabled for edge sensitive interrupts without any
++	 * change with respect to the physical interrupt handler
++	 */
++	if (!(irq_get_trigger_type(irq_ctx->hwirq) & IRQ_TYPE_LEVEL_MASK))
++		goto out;
++
++	ret = vfio_platform_set_deoi(irq_ctx, true);
++out:
++	spin_unlock_irqrestore(&irq_ctx->lock, flags);
++	return ret;
++}
++
++static void irq_bypass_deoi_del_consumer(struct irq_bypass_producer *prod,
++					 struct irq_bypass_consumer *cons)
++{
++	struct vfio_platform_irq *irq_ctx =
++		container_of(prod, struct vfio_platform_irq, producer);
++	unsigned long flags;
++
++	spin_lock_irqsave(&irq_ctx->lock, flags);
++	if (irq_get_trigger_type(irq_ctx->hwirq) & IRQ_TYPE_LEVEL_MASK)
++		vfio_platform_set_deoi(irq_ctx, false);
++	spin_unlock_irqrestore(&irq_ctx->lock, flags);
++}
++
++bool vfio_platform_has_deoi(void)
++{
++	return true;
++}
++
++void vfio_platform_register_deoi_producer(struct vfio_platform_device *vdev,
++					  struct vfio_platform_irq *irq,
++					  struct eventfd_ctx *trigger,
++					  unsigned int host_irq)
++{
++	struct irq_bypass_producer *prod = &irq->producer;
++	int ret;
++
++	prod->token =		trigger;
++	prod->irq =		host_irq;
++	prod->add_consumer =	irq_bypass_deoi_add_consumer;
++	prod->del_consumer =	irq_bypass_deoi_del_consumer;
++	prod->stop =		irq_bypass_deoi_stop;
++	prod->start =		irq_bypass_deoi_start;
++
++	ret = irq_bypass_register_producer(prod);
++	if (unlikely(ret))
++		dev_info(vdev->device,
++			 "irq bypass producer (token %p) registration fails: %d\n",
++			 prod->token, ret);
++}
++
++#endif
++
 diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-index e8db291..66a9ef5 100644
+index 66a9ef5..ab85c58 100644
 --- a/drivers/vfio/platform/vfio_platform_private.h
 +++ b/drivers/vfio/platform/vfio_platform_private.h
-@@ -38,6 +38,8 @@ struct vfio_platform_irq {
- 	spinlock_t		lock;
- 	struct virqfd		*unmask;
+@@ -17,6 +17,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/interrupt.h>
++#include <linux/irqbypass.h>
+ 
+ #define VFIO_PLATFORM_OFFSET_SHIFT   40
+ #define VFIO_PLATFORM_OFFSET_MASK (((u64)(1) << VFIO_PLATFORM_OFFSET_SHIFT) - 1)
+@@ -40,6 +41,7 @@ struct vfio_platform_irq {
  	struct virqfd		*mask;
-+	bool			deoi;
-+	irqreturn_t		(*handler)(int irq, void *dev_id);
+ 	bool			deoi;
+ 	irqreturn_t		(*handler)(int irq, void *dev_id);
++	struct irq_bypass_producer producer;
  };
  
  struct vfio_platform_region {
+@@ -102,12 +104,32 @@ extern int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+ 					unsigned start, unsigned count,
+ 					void *data);
+ 
++extern int vfio_platform_set_deoi(struct vfio_platform_irq *irq_ctx, bool deoi);
++
+ extern void __vfio_platform_register_reset(struct vfio_platform_reset_node *n);
+ extern void vfio_platform_unregister_reset(const char *compat,
+ 					   vfio_platform_reset_fn_t fn);
+ 
+ #define is_masked(irq) ((irq)->usermasked || (irq)->automasked)
+ 
++#ifdef CONFIG_VFIO_PLATFORM_IRQ_BYPASS_DEOI
++bool vfio_platform_has_deoi(void);
++void vfio_platform_register_deoi_producer(struct vfio_platform_device *vdev,
++					  struct vfio_platform_irq *irq,
++					  struct eventfd_ctx *trigger,
++					  unsigned int host_irq);
++#else
++static inline bool vfio_platform_has_deoi(void)
++{
++	return false;
++}
++static inline
++void vfio_platform_register_deoi_producer(struct vfio_platform_device *vdev,
++					  struct vfio_platform_irq *irq,
++					  struct eventfd_ctx *trigger,
++					  unsigned int host_irq) {}
++#endif
++
+ #define vfio_platform_register_reset(__compat, __reset)		\
+ static struct vfio_platform_reset_node __reset ## _node = {	\
+ 	.owner = THIS_MODULE,					\
 -- 
 2.5.5
