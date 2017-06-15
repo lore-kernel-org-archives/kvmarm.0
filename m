@@ -1,165 +1,106 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 05/10] VFIO: pci: Introduce direct EOI INTx interrupt
- handler
-Date: Wed, 14 Jun 2017 09:41:43 +0100
-Message-ID: <2b261afe-0176-f6e8-4d0e-f7c77821ec38@arm.com>
-References: <1495656803-28011-1-git-send-email-eric.auger@redhat.com>
- <1495656803-28011-6-git-send-email-eric.auger@redhat.com>
- <20170531122419.07e3f26d@w520.home>
- <c10ccb32-8b1f-c916-7e8d-270efcf3ef89@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F03D40CD5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Jun 2017 04:37:29 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TgMs-I9LMUCR for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Jun 2017 04:37:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC2C040CD2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Jun 2017 04:37:27 -0400 (EDT)
-In-Reply-To: <c10ccb32-8b1f-c916-7e8d-270efcf3ef89@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v2 0/8] ARM/ARM64 Direct EOI setup for VFIO platform interrupts
+Date: Thu, 15 Jun 2017 14:52:32 +0200
+Message-ID: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14/06/17 09:07, Auger Eric wrote:
-> Hi Alex, Marc,
-> 
-> On 31/05/2017 20:24, Alex Williamson wrote:
->> On Wed, 24 May 2017 22:13:18 +0200
->> Eric Auger <eric.auger@redhat.com> wrote:
->>
->>> We add two new fields in vfio_pci_irq_ctx struct: deoi and handler.
->>> If deoi is set, this means the physical IRQ attached to the virtual
->>> IRQ is directly deactivated by the guest and the VFIO driver does
->>> not need to disable the physical IRQ and mask it at VFIO level.
->>>
->>> The handler pointer is set accordingly and a wrapper handler is
->>> introduced that calls the chosen handler function.
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>
->>> ---
->>> ---
->>>  drivers/vfio/pci/vfio_pci_intrs.c   | 32 ++++++++++++++++++++++++++------
->>>  drivers/vfio/pci/vfio_pci_private.h |  2 ++
->>>  2 files changed, 28 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
->>> index d4d377b..06aa713 100644
->>> --- a/drivers/vfio/pci/vfio_pci_intrs.c
->>> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
->>> @@ -121,11 +121,8 @@ void vfio_pci_intx_unmask(struct vfio_pci_device *vdev)
->>>  static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
->>>  {
->>>  	struct vfio_pci_device *vdev = dev_id;
->>> -	unsigned long flags;
->>>  	int ret = IRQ_NONE;
->>>  
->>> -	spin_lock_irqsave(&vdev->irqlock, flags);
->>> -
->>>  	if (!vdev->pci_2_3) {
->>>  		disable_irq_nosync(vdev->pdev->irq);
->>>  		vdev->ctx[0].automasked = true;
->>> @@ -137,14 +134,33 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
->>>  		ret = IRQ_HANDLED;
->>>  	}
->>>  
->>> -	spin_unlock_irqrestore(&vdev->irqlock, flags);
->>> -
->>>  	if (ret == IRQ_HANDLED)
->>>  		vfio_send_intx_eventfd(vdev, NULL);
->>>  
->>>  	return ret;
->>>  }
->>>  
->>> +static irqreturn_t vfio_intx_handler_deoi(int irq, void *dev_id)
->>> +{
->>> +	struct vfio_pci_device *vdev = dev_id;
->>> +
->>> +	vfio_send_intx_eventfd(vdev, NULL);
->>> +	return IRQ_HANDLED;
->>> +}
->>> +
->>> +static irqreturn_t vfio_intx_wrapper_handler(int irq, void *dev_id)
->>> +{
->>> +	struct vfio_pci_device *vdev = dev_id;
->>> +	unsigned long flags;
->>> +	irqreturn_t ret;
->>> +
->>> +	spin_lock_irqsave(&vdev->irqlock, flags);
->>> +	ret = vdev->ctx[0].handler(irq, dev_id);
->>> +	spin_unlock_irqrestore(&vdev->irqlock, flags);
->>> +
->>> +	return ret;
->>> +}
->>> +
->>>  static int vfio_intx_enable(struct vfio_pci_device *vdev)
->>>  {
->>>  	if (!is_irq_none(vdev))
->>> @@ -208,7 +224,11 @@ static int vfio_intx_set_signal(struct vfio_pci_device *vdev, int fd)
->>>  	if (!vdev->pci_2_3)
->>>  		irqflags = 0;
->>>  
->>> -	ret = request_irq(pdev->irq, vfio_intx_handler,
->>> +	if (vdev->ctx[0].deoi)
->>> +		vdev->ctx[0].handler = vfio_intx_handler_deoi;
->>> +	else
->>> +		vdev->ctx[0].handler = vfio_intx_handler;
->>> +	ret = request_irq(pdev->irq, vfio_intx_wrapper_handler,
->>>  			  irqflags, vdev->ctx[0].name, vdev);
->>
->>
->> Here's where I think we don't account for irqflags properly.  If we get
->> a shared interrupt here, then enabling direct EOI needs to be disabled
->> or else we'll starve other devices sharing the interrupt.  In practice,
->> I wonder if this makes PCI direct EOI a useful feature.  We could try
->> to get an exclusive interrupt and fallback to shared, but any time we
->> get an exclusive interrupt we're more prone to conflicts with other
->> devices.  I might have two VMs that share an interrupt and now it's a
->> race that only the first to setup an IRQ can work.  Worse, one of those
->> VMs might be fully booted and switched to MSI and now it's just a
->> matter of time until they reboot in the right way to generate a
->> conflict.  I might also have two devices in the same VM that share an
->> IRQ and now I can't start the VM at all because the second device can
->> no longer get an interrupt.  This is the same problem we have with the
->> nointxmask flag, it's a useful debugging feature but since the masking
->> is done at the APIC/GIC rather than the device, much like here, it's not
->> very practical for more than debugging and isolating specific devices
->> as requiring APIC/GIC level masking.  I'm not sure how to proceed on the
->> PCI side here. Thanks,
-> 
-> So I agree Direct EOI with shared interrupts is a total mess as
-> - if the interrupt is not for VFIO, the physical interrupt will not be
-> deactivated
-> - if the interrupt is for VFIO, the physical interrupt will be
-> deactivated through guest virtual interrupt deactivation before
-> subsequent physical handlers complete their execution.
-> 
-> By the way, reading
-> "http://vfio.blogspot.fr/2014/09/vfio-interrupts-and-how-to-coax-windows.html"
-> was really helpful!
-> 
-> So I suggest I drop the feature for VFIO-PCI INTx and respin with
-> vfio-platform only. This series then mostly prepares for GICv4 integration.
+This series allows to optimize the deactivation of virtual interrupts
+associated to vfio platform device interrupts.
 
-Agreed. That's probably good enough for the time being.
+This is a revival of "[PATCH v4 00/13] ARM IRQ forward control based on
+IRQ bypass manager" (https://lkml.org/lkml/2015/11/19/351) whose development
+was stalled due to dependency on new VGIC design and drop of priority.
 
-Thanks,
+Without that optimization the deactivation of the physical IRQ is performed
+by the host. Also for level sensitive interrupts, The VFIO driver disables
+the physical IRQ. The deactivation of the virtual IRQ by the guest is trapped
+and the physical IRQ gets re-enabled at that time.
 
-	M.
+The ARM GIC supports direct EOI for virtual interrupts directly mapped
+to physical interrupts. When this mode is set, the host does not
+deactivate the physical interrupt anymore, but simply drops the
+interrupt priority on EOI. When the guest deactivates the virtual IRQ,
+the GIC automatically deactivates the physical IRQ. This avoids a world
+switch on deactivation.
+
+This series sets direct EOI mode on ARM/ARM64 for vfio platform interrupts.
+This relies on a negotiation between the vfio platform driver and KVM/irqfd
+though the irq bypass manager.
+
+The setup sequence is:
+
+preamble:
+- disable the physical IRQ
+- halt guest execution
+forwarding setting:
+- program the VFIO driver for forwarding (select the right physical
+  interrupt handler)
+- program the VGIC and IRQCHIP for forwarding
+postamble:
+- resume guest execution
+- enable the physical IRQ
+
+When destroying the optimized path the following sequence is executed:
+- preamble
+- unset forwarding at VGIC and IRQCHIP level
+- unset forwarding at VFIO level
+- postamble
+
+The injection still is based on irqfd triggering. For level sensitive
+interrupts though, the resamplefd is not triggered anymore since
+deactivation is not trapped by KVM.
+
+This was tested with:
+- AMD Seattle xgmac platform device assignment
+- Also MSI non regression was tested
+
+The series can be fount at:
+https://github.com/eauger/linux/tree/v4.12-rc5-deoi-v2
+
+It is based on 4.12-rc5
+
+Best Regards
+
+Eric
+
+History:
+v1 -> v2:
+- drop VFIO-PCI INTx support due to shared interrupt incompatibility
+- introduce a producer type
+- restructured kvm_vgic_[set|unset]_forwarding for reuse in forwarding
+  setting
+
+
+Eric Auger (8):
+  VFIO: platform: Differentiate auto-masking from user masking
+  VFIO: platform: Introduce direct EOI interrupt handler
+  VFIO: platform: Direct EOI irq bypass for ARM/ARM64
+  KVM: arm/arm64: vgic: restructure kvm_vgic_(un)map_phys_irq
+  KVM: arm/arm64: vgic: Handle mapped level sensitive SPIs
+  KVM: arm/arm64: vgic: Implement forwarding setting
+  virt: irqbypass: Add a type field to the irqbypass producer
+  KVM: arm/arm64: register DEOI irq bypass consumer on ARM/ARM64
+
+ arch/arm/kvm/Kconfig                             |   3 +
+ arch/arm64/kvm/Kconfig                           |   3 +
+ drivers/vfio/pci/vfio_pci_intrs.c                |   1 +
+ drivers/vfio/platform/Kconfig                    |   5 +
+ drivers/vfio/platform/Makefile                   |   2 +-
+ drivers/vfio/platform/vfio_platform_irq.c        |  60 ++++++---
+ drivers/vfio/platform/vfio_platform_irq_bypass.c | 119 ++++++++++++++++
+ drivers/vfio/platform/vfio_platform_private.h    |  30 ++++-
+ include/kvm/arm_vgic.h                           |  13 +-
+ include/linux/irqbypass.h                        |   7 +
+ virt/kvm/arm/arch_timer.c                        |  24 +---
+ virt/kvm/arm/arm.c                               |  48 +++++++
+ virt/kvm/arm/vgic/vgic.c                         | 164 ++++++++++++++++++++---
+ virt/kvm/arm/vgic/vgic.h                         |   7 +-
+ 14 files changed, 425 insertions(+), 61 deletions(-)
+ create mode 100644 drivers/vfio/platform/vfio_platform_irq_bypass.c
+
 -- 
-Jazz is not dead. It just smells funny...
+2.5.5
