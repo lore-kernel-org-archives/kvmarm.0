@@ -1,298 +1,223 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 3/8] VFIO: platform: Direct EOI irq bypass for ARM/ARM64
-Date: Thu, 15 Jun 2017 14:52:35 +0200
-Message-ID: <1497531160-29162-4-git-send-email-eric.auger@redhat.com>
+Subject: [PATCH v2 4/8] KVM: arm/arm64: vgic: restructure
+ kvm_vgic_(un)map_phys_irq
+Date: Thu, 15 Jun 2017 14:52:36 +0200
+Message-ID: <1497531160-29162-5-git-send-email-eric.auger@redhat.com>
 References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B211840D4A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jun 2017 08:50:32 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Wm5kLrApOraE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Jun 2017 08:50:31 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3E5E40D9D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jun 2017 08:50:31 -0400 (EDT)
 In-Reply-To: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: drjones@redhat.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch adds the registration/unregistration of an
-irq_bypass_producer for vfio platform device interrupts.
+We want to reuse the core of the map/unmap functions for IRQ
+forwarding. Let's move the computation of the hwirq in
+kvm_vgic_map_phys_irq and pass the linux IRQ as parameter.
+the host_irq is added to struct vgic_irq.
 
-Its callbacks handle the direct EOI modality on VFIO side.
-
-- stop/start: disable/enable the host irq
-- add/del consumer: set the VFIO Direct EOI mode, ie. select the
-  adapted physical IRQ handler (automasked or not automasked).
+We introduce kvm_vgic_map/unmap_irq which take a struct vgic_irq
+handle as a parameter.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
+ include/kvm/arm_vgic.h    |  8 ++++---
+ virt/kvm/arm/arch_timer.c | 24 +------------------
+ virt/kvm/arm/vgic/vgic.c  | 60 +++++++++++++++++++++++++++++++++++------------
+ 3 files changed, 51 insertions(+), 41 deletions(-)
 
-v1 -> v2:
-- add a comment explaining we allow direct EOI for edge sensitive
-  interrupts without modifying the physical IRQ handler.
----
- drivers/vfio/platform/Kconfig                    |   5 +
- drivers/vfio/platform/Makefile                   |   2 +-
- drivers/vfio/platform/vfio_platform_irq.c        |  19 ++++
- drivers/vfio/platform/vfio_platform_irq_bypass.c | 118 +++++++++++++++++++++++
- drivers/vfio/platform/vfio_platform_private.h    |  22 +++++
- 5 files changed, 165 insertions(+), 1 deletion(-)
- create mode 100644 drivers/vfio/platform/vfio_platform_irq_bypass.c
-
-diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
-index bb30128..33ec3d9 100644
---- a/drivers/vfio/platform/Kconfig
-+++ b/drivers/vfio/platform/Kconfig
-@@ -2,6 +2,7 @@ config VFIO_PLATFORM
- 	tristate "VFIO support for platform devices"
- 	depends on VFIO && EVENTFD && (ARM || ARM64)
- 	select VFIO_VIRQFD
-+	select IRQ_BYPASS_MANAGER
- 	help
- 	  Support for platform devices with VFIO. This is required to make
- 	  use of platform devices present on the system using the VFIO
-@@ -19,4 +20,8 @@ config VFIO_AMBA
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index ef71858..cceb31d 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -112,6 +112,7 @@ struct vgic_irq {
+ 	bool hw;			/* Tied to HW IRQ */
+ 	struct kref refcount;		/* Used for LPIs */
+ 	u32 hwintid;			/* HW INTID number */
++	unsigned int host_irq;		/* linux irq corresponding to hwintid */
+ 	union {
+ 		u8 targets;			/* GICv2 target VCPUs mask */
+ 		u32 mpidr;			/* GICv3 target VCPU */
+@@ -301,9 +302,10 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level);
+ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			       bool level);
+-int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
+-int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+-bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
++int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
++			  u32 vintid);
++int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
++bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
  
- 	  If you don't know what to do here, say N.
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
  
-+config VFIO_PLATFORM_IRQ_BYPASS_DEOI
-+	depends on VFIO_PLATFORM
-+	def_bool y
-+
- source "drivers/vfio/platform/reset/Kconfig"
-diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
-index 41a6224..324f3e7 100644
---- a/drivers/vfio/platform/Makefile
-+++ b/drivers/vfio/platform/Makefile
-@@ -1,4 +1,4 @@
--vfio-platform-base-y := vfio_platform_common.o vfio_platform_irq.o
-+vfio-platform-base-y := vfio_platform_common.o vfio_platform_irq.o vfio_platform_irq_bypass.o
- vfio-platform-y := vfio_platform.o
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 5976609..57a30ab 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -617,9 +617,6 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+-	struct irq_desc *desc;
+-	struct irq_data *data;
+-	int phys_irq;
+ 	int ret;
  
- obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
-diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
-index 0228a96..452dc3d 100644
---- a/drivers/vfio/platform/vfio_platform_irq.c
-+++ b/drivers/vfio/platform/vfio_platform_irq.c
-@@ -20,6 +20,7 @@
- #include <linux/types.h>
- #include <linux/vfio.h>
- #include <linux/irq.h>
-+#include <linux/irqbypass.h>
+ 	if (timer->enabled)
+@@ -632,26 +629,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 	if (!vgic_initialized(vcpu->kvm))
+ 		return -ENODEV;
  
- #include "vfio_platform_private.h"
+-	/*
+-	 * Find the physical IRQ number corresponding to the host_vtimer_irq
+-	 */
+-	desc = irq_to_desc(host_vtimer_irq);
+-	if (!desc) {
+-		kvm_err("%s: no interrupt descriptor\n", __func__);
+-		return -EINVAL;
+-	}
+-
+-	data = irq_desc_get_irq_data(desc);
+-	while (data->parent_data)
+-		data = data->parent_data;
+-
+-	phys_irq = data->hwirq;
+-
+-	/*
+-	 * Tell the VGIC that the virtual interrupt is tied to a
+-	 * physical interrupt. We do that once per VCPU.
+-	 */
+-	ret = kvm_vgic_map_phys_irq(vcpu, vtimer->irq.irq, phys_irq);
++	ret = kvm_vgic_map_phys_irq(vcpu, host_vtimer_irq, vtimer->irq.irq);
+ 	if (ret)
+ 		return ret;
  
-@@ -186,6 +187,19 @@ static irqreturn_t vfio_wrapper_handler(int irq, void *dev_id)
- 	return ret;
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 83b24d2..075f073 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -17,6 +17,8 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <linux/list_sort.h>
++#include <linux/interrupt.h>
++#include <linux/irq.h>
+ 
+ #include "vgic.h"
+ 
+@@ -392,38 +394,66 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 	return 0;
  }
  
-+/* must be called with irq_ctx->lock held */
-+int vfio_platform_set_deoi(struct vfio_platform_irq *irq_ctx, bool deoi)
-+{
-+	irq_ctx->deoi = deoi;
-+
-+	if (!deoi && (irq_ctx->flags & VFIO_IRQ_INFO_AUTOMASKED))
-+		irq_ctx->handler = vfio_automasked_irq_handler;
-+	else
-+		irq_ctx->handler = vfio_irq_handler;
-+
+-int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq)
++/* @irq->irq_lock must be held */
++static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
++			    unsigned int host_irq)
+ {
+-	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
++	struct irq_desc *desc;
++	struct irq_data *data;
+ 
+-	BUG_ON(!irq);
+-
+-	spin_lock(&irq->irq_lock);
++	/*
++	 * Find the physical IRQ number corresponding to @host_irq
++	 */
++	desc = irq_to_desc(host_irq);
++	if (!desc) {
++		kvm_err("%s: no interrupt descriptor\n", __func__);
++		return -EINVAL;
++	}
++	data = irq_desc_get_irq_data(desc);
++	while (data->parent_data)
++		data = data->parent_data;
+ 
+ 	irq->hw = true;
+-	irq->hwintid = phys_irq;
++	irq->host_irq = host_irq;
++	irq->hwintid = data->hwirq;
 +	return 0;
 +}
 +
- static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
- 			    int fd, irq_handler_t handler)
- {
-@@ -196,6 +210,7 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
- 	if (irq->trigger) {
- 		irq_clear_status_flags(irq->hwirq, IRQ_NOAUTOEN);
- 		free_irq(irq->hwirq, irq);
-+		irq_bypass_unregister_producer(&irq->producer);
- 		kfree(irq->name);
- 		eventfd_ctx_put(irq->trigger);
- 		irq->trigger = NULL;
-@@ -227,6 +242,10 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
- 		return ret;
- 	}
- 
-+	if (vfio_platform_has_deoi())
-+		vfio_platform_register_deoi_producer(vdev, irq,
-+						     trigger, irq->hwirq);
-+
- 	if (!irq->usermasked)
- 		enable_irq(irq->hwirq);
- 
-diff --git a/drivers/vfio/platform/vfio_platform_irq_bypass.c b/drivers/vfio/platform/vfio_platform_irq_bypass.c
-new file mode 100644
-index 0000000..692b081
---- /dev/null
-+++ b/drivers/vfio/platform/vfio_platform_irq_bypass.c
-@@ -0,0 +1,118 @@
-+/*
-+ * VFIO platform device irqbypass callback implementation for DEOI
-+ *
-+ * Copyright (C) 2017 Red Hat, Inc.  All rights reserved.
-+ * Author: Eric Auger <eric.auger@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License, version 2, as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ */
-+
-+#include <linux/err.h>
-+#include <linux/device.h>
-+#include <linux/irq.h>
-+#include <linux/irqbypass.h>
-+#include "vfio_platform_private.h"
-+
-+#ifdef CONFIG_VFIO_PLATFORM_IRQ_BYPASS_DEOI
-+
-+static void irq_bypass_deoi_start(struct irq_bypass_producer *prod)
++/* @irq->irq_lock must be held */
++static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
 +{
-+	enable_irq(prod->irq);
++	irq->hw = false;
++	irq->hwintid = 0;
 +}
 +
-+static void irq_bypass_deoi_stop(struct irq_bypass_producer *prod)
++int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
++			  u32 vintid)
 +{
-+	disable_irq(prod->irq);
-+}
-+
-+/**
-+ * irq_bypass_deoi_add_consumer - turns irq direct EOI on
-+ *
-+ * The linux irq is disabled when the function is called.
-+ * The operation succeeds only if the irq is not active at irqchip level
-+ * and the irq is not automasked at VFIO level, meaning the IRQ is under
-+ * injection into the guest.
-+ */
-+static int irq_bypass_deoi_add_consumer(struct irq_bypass_producer *prod,
-+					struct irq_bypass_consumer *cons)
-+{
-+	struct vfio_platform_irq *irq_ctx =
-+		container_of(prod, struct vfio_platform_irq, producer);
-+	unsigned long flags;
-+	bool active;
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
 +	int ret;
+ 
++	BUG_ON(!irq);
 +
-+	spin_lock_irqsave(&irq_ctx->lock, flags);
-+
-+	ret = irq_get_irqchip_state(irq_ctx->hwirq, IRQCHIP_STATE_ACTIVE,
-+				    &active);
-+	if (ret)
-+		goto out;
-+
-+	if (active || irq_ctx->automasked) {
-+		ret = -EAGAIN;
-+		goto out;
-+	}
-+
-+	/*
-+	 * Direct EOI is enabled for edge sensitive interrupts without any
-+	 * change with respect to the physical interrupt handler
-+	 */
-+	if (!(irq_get_trigger_type(irq_ctx->hwirq) & IRQ_TYPE_LEVEL_MASK))
-+		goto out;
-+
-+	ret = vfio_platform_set_deoi(irq_ctx, true);
-+out:
-+	spin_unlock_irqrestore(&irq_ctx->lock, flags);
++	spin_lock(&irq->irq_lock);
++	ret = kvm_vgic_map_irq(vcpu, irq, host_irq);
+ 	spin_unlock(&irq->irq_lock);
+ 	vgic_put_irq(vcpu->kvm, irq);
+ 
+-	return 0;
 +	return ret;
-+}
-+
-+static void irq_bypass_deoi_del_consumer(struct irq_bypass_producer *prod,
-+					 struct irq_bypass_consumer *cons)
-+{
-+	struct vfio_platform_irq *irq_ctx =
-+		container_of(prod, struct vfio_platform_irq, producer);
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&irq_ctx->lock, flags);
-+	if (irq_get_trigger_type(irq_ctx->hwirq) & IRQ_TYPE_LEVEL_MASK)
-+		vfio_platform_set_deoi(irq_ctx, false);
-+	spin_unlock_irqrestore(&irq_ctx->lock, flags);
-+}
-+
-+bool vfio_platform_has_deoi(void)
-+{
-+	return true;
-+}
-+
-+void vfio_platform_register_deoi_producer(struct vfio_platform_device *vdev,
-+					  struct vfio_platform_irq *irq,
-+					  struct eventfd_ctx *trigger,
-+					  unsigned int host_irq)
-+{
-+	struct irq_bypass_producer *prod = &irq->producer;
-+	int ret;
-+
-+	prod->token =		trigger;
-+	prod->irq =		host_irq;
-+	prod->add_consumer =	irq_bypass_deoi_add_consumer;
-+	prod->del_consumer =	irq_bypass_deoi_del_consumer;
-+	prod->stop =		irq_bypass_deoi_stop;
-+	prod->start =		irq_bypass_deoi_start;
-+
-+	ret = irq_bypass_register_producer(prod);
-+	if (unlikely(ret))
-+		dev_info(vdev->device,
-+			 "irq bypass producer (token %p) registration fails: %d\n",
-+			 prod->token, ret);
-+}
-+
-+#endif
-+
-diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-index 66a9ef5..ab85c58 100644
---- a/drivers/vfio/platform/vfio_platform_private.h
-+++ b/drivers/vfio/platform/vfio_platform_private.h
-@@ -17,6 +17,7 @@
+ }
  
- #include <linux/types.h>
- #include <linux/interrupt.h>
-+#include <linux/irqbypass.h>
+-int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
++int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
+ {
+ 	struct vgic_irq *irq;
  
- #define VFIO_PLATFORM_OFFSET_SHIFT   40
- #define VFIO_PLATFORM_OFFSET_MASK (((u64)(1) << VFIO_PLATFORM_OFFSET_SHIFT) - 1)
-@@ -40,6 +41,7 @@ struct vfio_platform_irq {
- 	struct virqfd		*mask;
- 	bool			deoi;
- 	irqreturn_t		(*handler)(int irq, void *dev_id);
-+	struct irq_bypass_producer producer;
- };
+ 	if (!vgic_initialized(vcpu->kvm))
+ 		return -EAGAIN;
  
- struct vfio_platform_region {
-@@ -102,12 +104,32 @@ extern int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
- 					unsigned start, unsigned count,
- 					void *data);
+-	irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
++	irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+ 	BUG_ON(!irq);
  
-+extern int vfio_platform_set_deoi(struct vfio_platform_irq *irq_ctx, bool deoi);
-+
- extern void __vfio_platform_register_reset(struct vfio_platform_reset_node *n);
- extern void vfio_platform_unregister_reset(const char *compat,
- 					   vfio_platform_reset_fn_t fn);
+ 	spin_lock(&irq->irq_lock);
+-
+-	irq->hw = false;
+-	irq->hwintid = 0;
+-
++	kvm_vgic_unmap_irq(irq);
+ 	spin_unlock(&irq->irq_lock);
+ 	vgic_put_irq(vcpu->kvm, irq);
  
- #define is_masked(irq) ((irq)->usermasked || (irq)->automasked)
+@@ -726,9 +756,9 @@ void vgic_kick_vcpus(struct kvm *kvm)
+ 	}
+ }
  
-+#ifdef CONFIG_VFIO_PLATFORM_IRQ_BYPASS_DEOI
-+bool vfio_platform_has_deoi(void);
-+void vfio_platform_register_deoi_producer(struct vfio_platform_device *vdev,
-+					  struct vfio_platform_irq *irq,
-+					  struct eventfd_ctx *trigger,
-+					  unsigned int host_irq);
-+#else
-+static inline bool vfio_platform_has_deoi(void)
-+{
-+	return false;
-+}
-+static inline
-+void vfio_platform_register_deoi_producer(struct vfio_platform_device *vdev,
-+					  struct vfio_platform_irq *irq,
-+					  struct eventfd_ctx *trigger,
-+					  unsigned int host_irq) {}
-+#endif
-+
- #define vfio_platform_register_reset(__compat, __reset)		\
- static struct vfio_platform_reset_node __reset ## _node = {	\
- 	.owner = THIS_MODULE,					\
+-bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
++bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
+ {
+-	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+ 	bool map_is_active;
+ 
+ 	spin_lock(&irq->irq_lock);
 -- 
 2.5.5
