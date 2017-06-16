@@ -1,24 +1,26 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 8/8] KVM: arm/arm64: register DEOI irq bypass consumer on
- ARM/ARM64
-Date: Thu, 15 Jun 2017 14:52:40 +0200
-Message-ID: <1497531160-29162-9-git-send-email-eric.auger@redhat.com>
-References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v2] KVM: arm/arm64: Signal SIGBUS when stage2 discovers
+ hwpoison memory
+Date: Fri, 16 Jun 2017 12:32:13 +0100
+Message-ID: <5943C1BD.9040301@arm.com>
+References: <20170524163250.29281-1-james.morse@arm.com>
+ <20170601222235.GN20919@cbox> <59313AEA.2060705@arm.com>
+ <20170602104345.GA397@cbox> <5937CA43.7060108@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4091940D19
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jun 2017 08:51:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9675A40D1D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Jun 2017 07:28:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4TtUGTvFsovU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Jun 2017 08:51:01 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BDD340D11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jun 2017 08:51:01 -0400 (EDT)
-In-Reply-To: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
+ with ESMTP id NdSbDfIadlsj for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Jun 2017 07:28:39 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7422640D17
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Jun 2017 07:28:38 -0400 (EDT)
+In-Reply-To: <5937CA43.7060108@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,143 +30,46 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch selects IRQ_BYPASS_MANAGER and HAVE_KVM_IRQ_BYPASS
-configs for ARM/ARM64.
+Hi Christoffer,
 
-kvm_arch_has_irq_bypass() now is implemented and returns true.
-As a consequence the irq bypass consumer will be registered for
-ARM/ARM64 with Direct EOI/IRQ forwarding callbacks:
+On 07/06/17 10:41, James Morse wrote:
+> I evidently stopped before I got to the bottom of this, the commit message is
+> based on the way I first hit this
 
-- stop/start: halt/resume guest execution
-- add/del_producer: set/unset forwarding/DEOI at vgic/irqchip level
+I've worked out where I went wrong with this. memory_failure()/hwpoison has two
+'modes', early and late. My testing was broken for 'early', but caused both to
+happen at the same time, leading to this confusion.
 
-The consumer currently only works with a VFIO_PLATFORM producer.
-In other cases, start/stop do nothing and return without error
-to avoid outputting a spurious warning.
+The affected page was mapped and found in the rmap, it then gets unmapped by
+memory_failure(), which then skipped the early notification because the flags
+were wrong. Meanwhile the late notification fires at the same time on another CPU.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+So, from the top:
+-----%<-----
+memory_failure() has two modes, early and late. Early is used by
+machine-managers like Qemu to receive a notification when a memory error is
+notified to the host. These can then be relayed to the guest before the affected
+page is accessed. To enable this, the process must set PR_MCE_KILL_EARLY in
+PR_MCE_KILL_SET using the prctl() syscall.
 
----
+Once the early notification has been handled, nothing stops the machine-manager
+or guest from accessing the affected page. If the machine-manager does this the
+page will fail to be mapped and SIGBUS will be sent. This patch adds the
+equivalent path for when the guest accesses the page, sending SIGBUS to the
+machine-manager.
 
-v1 -> v2:
-- check the type of the producer to avoid attachement with VFIO-PCI
-  dummy MSI producer
----
- arch/arm/kvm/Kconfig   |  3 +++
- arch/arm64/kvm/Kconfig |  3 +++
- virt/kvm/arm/arm.c     | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 54 insertions(+)
+These two signals can be distinguished by the machine-manager using their
+si_code: BUS_MCEERR_AO for 'action optional' early notifications, and
+BUS_MCEERR_AR for 'action required' synchronous/late notifications.
+-----%<-----
 
-diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-index 90d0176..4e2b192 100644
---- a/arch/arm/kvm/Kconfig
-+++ b/arch/arm/kvm/Kconfig
-@@ -3,6 +3,7 @@
- #
- 
- source "virt/kvm/Kconfig"
-+source "virt/lib/Kconfig"
- 
- menuconfig VIRTUALIZATION
- 	bool "Virtualization"
-@@ -35,6 +36,8 @@ config KVM
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_IRQ_ROUTING
- 	select HAVE_KVM_MSI
-+	select IRQ_BYPASS_MANAGER
-+	select HAVE_KVM_IRQ_BYPASS
- 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
- 	---help---
- 	  Support hosting virtualized guest machines.
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 52cb7ad..7e0d6e6 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -3,6 +3,7 @@
- #
- 
- source "virt/kvm/Kconfig"
-+source "virt/lib/Kconfig"
- 
- menuconfig VIRTUALIZATION
- 	bool "Virtualization"
-@@ -35,6 +36,8 @@ config KVM
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_IRQ_ROUTING
-+	select IRQ_BYPASS_MANAGER
-+	select HAVE_KVM_IRQ_BYPASS
- 	---help---
- 	  Support hosting virtualized guest machines.
- 	  We don't support KVM with 16K page tables yet, due to the multiple
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 3417e18..58871f8 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -27,6 +27,8 @@
- #include <linux/mman.h>
- #include <linux/sched.h>
- #include <linux/kvm.h>
-+#include <linux/kvm_irqfd.h>
-+#include <linux/irqbypass.h>
- #include <trace/events/kvm.h>
- #include <kvm/arm_pmu.h>
- 
-@@ -1420,6 +1422,52 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
- 	return NULL;
- }
- 
-+bool kvm_arch_has_irq_bypass(void)
-+{
-+	return true;
-+}
-+
-+int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
-+				      struct irq_bypass_producer *prod)
-+{
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(cons, struct kvm_kernel_irqfd, consumer);
-+
-+	if (prod->type != IRQ_BYPASS_VFIO_PLATFORM)
-+		return 0;
-+
-+	return kvm_vgic_set_forwarding(irqfd->kvm, prod->irq,
-+				       irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
-+}
-+void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
-+				      struct irq_bypass_producer *prod)
-+{
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(cons, struct kvm_kernel_irqfd, consumer);
-+
-+	if (prod->type != IRQ_BYPASS_VFIO_PLATFORM)
-+		return;
-+
-+	kvm_vgic_unset_forwarding(irqfd->kvm, prod->irq,
-+				  irqfd->gsi + VGIC_NR_PRIVATE_IRQS);
-+}
-+
-+void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
-+{
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(cons, struct kvm_kernel_irqfd, consumer);
-+
-+	kvm_arm_halt_guest(irqfd->kvm);
-+}
-+
-+void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *cons)
-+{
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(cons, struct kvm_kernel_irqfd, consumer);
-+
-+	kvm_arm_resume_guest(irqfd->kvm);
-+}
-+
- /**
-  * Initialize Hyp-mode and memory mappings on all CPUs.
-  */
--- 
-2.5.5
+If this clears everything up I will post a v3 with the above as the commit message.
+
+
+Thanks!
+
+James
