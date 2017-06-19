@@ -1,26 +1,26 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH 09/33] irqchip/gic-v3-its: Split out property table
- allocation
-Date: Mon, 19 Jun 2017 16:42:15 +0100
-Message-ID: <a0fe6356-72fc-edb9-6751-0494d2d53321@arm.com>
+Subject: Re: [RFC PATCH 15/33] irqchip/gic-v4: Add management structure
+ definitions
+Date: Mon, 19 Jun 2017 16:48:55 +0100
+Message-ID: <829aa384-f6cc-4906-27a2-7d4c3c42726a@arm.com>
 References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-10-git-send-email-marc.zyngier@arm.com>
- <c98bf0f6-884a-3851-aefc-571b0cbce703@redhat.com>
+ <1484648454-21216-16-git-send-email-marc.zyngier@arm.com>
+ <d5ebd612-96f0-943e-df01-28251c77c327@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4421940A69
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jun 2017 11:37:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CCA140A69
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jun 2017 11:44:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1TMYALpRObGL for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jun 2017 11:37:48 -0400 (EDT)
+ with ESMTP id r1fYoOihubow for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jun 2017 11:44:29 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23AE140A66
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jun 2017 11:37:48 -0400 (EDT)
-In-Reply-To: <c98bf0f6-884a-3851-aefc-571b0cbce703@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC82140A66
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jun 2017 11:44:28 -0400 (EDT)
+In-Reply-To: <d5ebd612-96f0-943e-df01-28251c77c327@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,45 +34,81 @@ To: Auger Eric <eric.auger@redhat.com>, linux-kernel@vger.kernel.org, linux-arm-
 Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/02/17 06:15, Auger Eric wrote:
-> Hi Marc,
+On 16/03/17 08:58, Auger Eric wrote:
+> Hi,
+> 
 > On 17/01/2017 11:20, Marc Zyngier wrote:
->> Move the LPI property table allocation into its own function, as
->> this is going to be required for those associated with VMs in
->> the future.
+>> Add a bunch of GICv4-specific data structures that will get used in
+>> subsequent patches.
 >>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->>  drivers/irqchip/irq-gic-v3-its.c | 28 ++++++++++++++++++----------
->>  1 file changed, 18 insertions(+), 10 deletions(-)
+>>  include/linux/irqchip/arm-gic-v4.h | 92 ++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 92 insertions(+)
+>>  create mode 100644 include/linux/irqchip/arm-gic-v4.h
 >>
->> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
->> index b28fb19..c92ff4d 100644
->> --- a/drivers/irqchip/irq-gic-v3-its.c
->> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -889,15 +889,31 @@ static void its_lpi_free(struct event_lpi_map *map)
->>  	kfree(map->col_map);
->>  }
->>  
->> +static struct page *its_allocate_prop_table(gfp_t gfp_flags)
->> +{
->> +	struct page *prop_page;
+>> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+>> new file mode 100644
+>> index 0000000..6e9c2b3
+>> --- /dev/null
+>> +++ b/include/linux/irqchip/arm-gic-v4.h
+>> @@ -0,0 +1,92 @@
+>> +/*
+>> + * Copyright (C) 2016 ARM Limited, All Rights Reserved.
+>> + * Author: Marc Zyngier <marc.zyngier@arm.com>
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License
+>> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>> + */
 >> +
->> +	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
->> +	if (!prop_page)
->> +		return NULL;
+>> +#ifndef __LINUX_IRQCHIP_ARM_GIC_V4_H
+>> +#define __LINUX_IRQCHIP_ARM_GIC_V4_H
 >> +
->> +	/* Priority 0xa0, Group-1, disabled */
->> +	memset(page_address(prop_page),
->> +	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
->> +	       LPI_PROPBASE_SZ);
+>> +/* Embedded in kvm.arch */
+>> +struct its_vm {
+>> +	struct irq_domain	*domain;
+>> +	struct page		*vprop_page;
+>> +	irq_hw_number_t		db_lpi_base;
+>> +	unsigned long		*db_bitmap;
+>> +	int			nr_db_lpis;
+>> +};
 >> +
->> +	/* Make sure the GIC will observe the written configuration */
->> +	gic_flush_dcache_to_poc(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
-> s/gic_rdists->prop_page/prop_page.
+>> +/* Embedded in kvm_vcpu.arch */
+>> +struct its_vpe {
+>> +	struct page 		*vpt_page;
+>> +	struct its_vm		*its_vm;
+>> +	irq_hw_number_t		vpe_db_lpi;
+>> +	u16			col_idx;
+> the role of the collection id remains obscure to me. Are collections
+> still used for VLPIs? On VMAPTI the vPE is directly provided whereas on
+> MAPTI we used the collection indirection to the actual PE, right? So
+> what is it used for?
 
-Yeah, this doesn't hit on the model, bizarrely. Oh well... Thanks for
-spotting this.
+Nothing to do with VMAPTI. With VMAPP, you need to provide the target
+address (either the processor number or the redist base address). Since
+I don't really want to expose these gory details, I've settled on using
+the collection id as an identifier for the target address (see how VMAPP
+is implemented).
+
+>> +	u16			vpe_id;
+>> +	bool			idai;
+>> +	bool			pending_last;
+> where is it used?
+
+That's to be used in the hypervisor to indicate that an interrupt is
+actually pending when scheduling the vPE out. This can also be updated
+by KVM itself when receiving a doorbell interrupt.
+
+Thanks,
 
 	M.
 -- 
