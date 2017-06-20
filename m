@@ -1,115 +1,38 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH 15/33] irqchip/gic-v4: Add management structure
- definitions
-Date: Mon, 19 Jun 2017 16:48:55 +0100
-Message-ID: <829aa384-f6cc-4906-27a2-7d4c3c42726a@arm.com>
-References: <1484648454-21216-1-git-send-email-marc.zyngier@arm.com>
- <1484648454-21216-16-git-send-email-marc.zyngier@arm.com>
- <d5ebd612-96f0-943e-df01-28251c77c327@redhat.com>
+From: Robert Richter <robert.richter-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH V17 00/11] Add UEFI 2.6 and ACPI 6.1 updates for RAS on
+ ARM64
+Date: Tue, 20 Jun 2017 08:34:39 +0200
+Message-ID: <20170620063439.GS658@rric.localdomain>
+References: <1495225933-4410-1-git-send-email-tbaicar@codeaurora.org>
+ <20170607115012.GZ30263@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CCA140A69
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jun 2017 11:44:31 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r1fYoOihubow for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jun 2017 11:44:29 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC82140A66
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jun 2017 11:44:28 -0400 (EDT)
-In-Reply-To: <d5ebd612-96f0-943e-df01-28251c77c327@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20170607115012.GZ30263-5wv7dgnIgG8@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
+Cc: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, james.morse-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi@vger.
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/03/17 08:58, Auger Eric wrote:
-> Hi,
-> 
-> On 17/01/2017 11:20, Marc Zyngier wrote:
->> Add a bunch of GICv4-specific data structures that will get used in
->> subsequent patches.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  include/linux/irqchip/arm-gic-v4.h | 92 ++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 92 insertions(+)
->>  create mode 100644 include/linux/irqchip/arm-gic-v4.h
->>
->> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
->> new file mode 100644
->> index 0000000..6e9c2b3
->> --- /dev/null
->> +++ b/include/linux/irqchip/arm-gic-v4.h
->> @@ -0,0 +1,92 @@
->> +/*
->> + * Copyright (C) 2016 ARM Limited, All Rights Reserved.
->> + * Author: Marc Zyngier <marc.zyngier@arm.com>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License
->> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#ifndef __LINUX_IRQCHIP_ARM_GIC_V4_H
->> +#define __LINUX_IRQCHIP_ARM_GIC_V4_H
->> +
->> +/* Embedded in kvm.arch */
->> +struct its_vm {
->> +	struct irq_domain	*domain;
->> +	struct page		*vprop_page;
->> +	irq_hw_number_t		db_lpi_base;
->> +	unsigned long		*db_bitmap;
->> +	int			nr_db_lpis;
->> +};
->> +
->> +/* Embedded in kvm_vcpu.arch */
->> +struct its_vpe {
->> +	struct page 		*vpt_page;
->> +	struct its_vm		*its_vm;
->> +	irq_hw_number_t		vpe_db_lpi;
->> +	u16			col_idx;
-> the role of the collection id remains obscure to me. Are collections
-> still used for VLPIs? On VMAPTI the vPE is directly provided whereas on
-> MAPTI we used the collection indirection to the actual PE, right? So
-> what is it used for?
+Will,
 
-Nothing to do with VMAPTI. With VMAPP, you need to provide the target
-address (either the processor number or the redist base address). Since
-I don't really want to expose these gory details, I've settled on using
-the collection id as an identifier for the target address (see how VMAPP
-is implemented).
+On 07.06.17 12:50:12, Will Deacon wrote:
 
->> +	u16			vpe_id;
->> +	bool			idai;
->> +	bool			pending_last;
-> where is it used?
+> Thanks, I've pushed this out as:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/ras-apei
+>
+> which I'll merge into for-next/core (and therefore linux-next) either the
+> end of this week or the beginning of next week. Please take a look if you
+> get a chance.
 
-That's to be used in the hypervisor to indicate that an interrupt is
-actually pending when scheduling the vPE out. This can also be updated
-by KVM itself when receiving a doorbell interrupt.
+any reason why there was a roll back of for-next/core?
+
+ + 0870f692c2ed...e27c7fa015d6 for-next/core -> arm64/for-next/core  (forced update)
+
+Is it because for-next/ras-apei goes through tip?
 
 Thanks,
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-Robert
