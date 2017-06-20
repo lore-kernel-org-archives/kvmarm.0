@@ -1,27 +1,22 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH V17 00/11] Add UEFI 2.6 and ACPI 6.1 updates for RAS on
- ARM64
-Date: Tue, 20 Jun 2017 09:49:32 +0100
-Message-ID: <20170620084931.GB30664@arm.com>
-References: <1495225933-4410-1-git-send-email-tbaicar@codeaurora.org>
- <20170607115012.GZ30263@arm.com>
- <20170620063439.GS658@rric.localdomain>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH v3] KVM: arm/arm64: Signal SIGBUS when stage2 discovers
+ hwpoison memory
+Date: Tue, 20 Jun 2017 17:11:48 +0100
+Message-ID: <20170620161148.31653-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9013E40C50
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jun 2017 04:44:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EE4040C50
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jun 2017 12:08:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7T4Tjx1HIrZ5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Jun 2017 04:44:50 -0400 (EDT)
+ with ESMTP id HYd+pKLBmwIf for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Jun 2017 12:08:12 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 603BA40430
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jun 2017 04:44:50 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20170620063439.GS658@rric.localdomain>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A67704095A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jun 2017 12:08:12 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,35 +26,105 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Robert Richter <robert.richter@cavium.com>
-Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, matt@codeblueprint.co.uk, catalin.marinas@arm.com, Tyler Baicar <tbaicar@codeaurora.org>, robert.moore@intel.com, paul.gortmaker@windriver.com, lv.zheng@intel.com, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, rafael@kernel.org, zjzhang@codeaurora.org, linux@armlinux.org.uk, gengdongjiu@huawei.com, linux-acpi@vger.kernel.org, eun.taik.lee@samsung.com, shijie.huang@arm.com, labbott@redhat.com, lenb@kernel.org, harba@codeaurora.org, john.garry@huawei.com, marc.zyngier@arm.com, punit.agrawal@arm.com, rostedt@goodmis.org, nkaje@codeaurora.org, bp@alien8.de, sandeepa.s.prabhu@gmail.com, linux-arm-kernel@lists.infradead.org, tony.luck@intel.com, rjw@rjwysocki.net, rruigrok@codeaurora.org, linux-kernel@vger.kernel.org, astone@redhat.com, hanjun.guo@linaro.org, joe@perches.com, pbonzini@redhat.com, akpm@linux-foundation.org, bri
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Robert,
+Once we enable ARCH_SUPPORTS_MEMORY_FAILURE on arm64, notifications for
+broken memory can call memory_failure() in mm/memory-failure.c to offline
+pages of memory, possibly signalling user space processes and notifying all
+the in-kernel users.
 
-On Tue, Jun 20, 2017 at 08:34:39AM +0200, Robert Richter wrote:
-> On 07.06.17 12:50:12, Will Deacon wrote:
-> 
-> > Thanks, I've pushed this out as:
-> >
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/ras-apei
-> >
-> > which I'll merge into for-next/core (and therefore linux-next) either the
-> > end of this week or the beginning of next week. Please take a look if you
-> > get a chance.
-> 
-> any reason why there was a roll back of for-next/core?
-> 
->  + 0870f692c2ed...e27c7fa015d6 for-next/core -> arm64/for-next/core  (forced update)
-> 
-> Is it because for-next/ras-apei goes through tip?
+memory_failure() has two modes, early and late. Early is used by
+machine-managers like Qemu to receive a notification when a memory error is
+notified to the host. These can then be relayed to the guest before the
+affected page is accessed. To enable this, the process must set
+PR_MCE_KILL_EARLY in PR_MCE_KILL_SET using the prctl() syscall.
 
-No, it's because the RAS stuff ran into horrible conflicts with the UUID
-tree:
+Once the early notification has been handled, nothing stops the
+machine-manager or guest from accessing the affected page. If the
+machine-manager does this the page will fail to be mapped and SIGBUS will
+be sent. This patch adds the equivalent path for when the guest accesses
+the page, sending SIGBUS to the machine-manager.
 
-https://lkml.org/lkml/2017/6/16/22
+These two signals can be distinguished by the machine-manager using their
+si_code: BUS_MCEERR_AO for 'action optional' early notifications, and
+BUS_MCEERR_AR for 'action required' synchronous/late notifications.
 
-Tyler should be rebasing that soon, so hopefully I can requeue that stuff
-this week.
+Do as x86 does, and deliver the SIGBUS when we discover pfn ==
+KVM_PFN_ERR_HWPOISON. Use the hugepage size as si_addr_lsb if this vma was
+allocated as a hugepage. Transparent hugepages will be split by
+memory_failure() before we see them here.
 
-Will
+Cc: Punit Agrawal <punit.agrawal@arm.com>
+Signed-off-by: James Morse <james.morse@arm.com>
+
+---
+arm64 has ARCH_SUPPORTS_MEMORY_FAILURE in linux-next, so can enable
+MEMORY_FAILURE. This patch will build without those changes as
+KVM_PFN_ERR_HWPOISON is always defined.
+
+Changes since v2:
+ * Just the commit message.
+
+Changes since v1:
+ * Pass the vma to kvm_send_hwpoison_signal(), used Punit's huge_page_shift()
+   calculation to find the block size.
+ * ... tested against hugepage not transparent huge page ...
+
+
+[0] https://www.spinics.net/lists/arm-kernel/msg581657.html
+
+ virt/kvm/arm/mmu.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 313ee646480f..eaa29aeb7c5b 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -20,6 +20,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/io.h>
+ #include <linux/hugetlb.h>
++#include <linux/sched/signal.h>
+ #include <trace/events/kvm.h>
+ #include <asm/pgalloc.h>
+ #include <asm/cacheflush.h>
+@@ -1249,6 +1250,24 @@ static void coherent_cache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
+ 	__coherent_cache_guest_page(vcpu, pfn, size);
+ }
+ 
++static void kvm_send_hwpoison_signal(unsigned long address,
++				     struct vm_area_struct *vma)
++{
++	siginfo_t info;
++
++	info.si_signo   = SIGBUS;
++	info.si_errno   = 0;
++	info.si_code    = BUS_MCEERR_AR;
++	info.si_addr    = (void __user *)address;
++
++	if (is_vm_hugetlb_page(vma))
++		info.si_addr_lsb = huge_page_shift(hstate_vma(vma));
++	else
++		info.si_addr_lsb = PAGE_SHIFT;
++
++	send_sig_info(SIGBUS, &info, current);
++}
++
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  struct kvm_memory_slot *memslot, unsigned long hva,
+ 			  unsigned long fault_status)
+@@ -1318,6 +1337,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	smp_rmb();
+ 
+ 	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
++	if (pfn == KVM_PFN_ERR_HWPOISON) {
++		kvm_send_hwpoison_signal(hva, vma);
++		return 0;
++	}
+ 	if (is_error_noslot_pfn(pfn))
+ 		return -EFAULT;
+ 
+-- 
+2.11.0
