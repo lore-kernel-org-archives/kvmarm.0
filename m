@@ -1,116 +1,50 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v2] KVM: arm/arm64: Signal SIGBUS when stage2 discovers
- hwpoison memory
-Date: Wed, 21 Jun 2017 13:44:53 +0100
-Message-ID: <594A6A45.60909@arm.com>
-References: <20170524163250.29281-1-james.morse@arm.com>
- <3dbafd74-57f2-e724-ace2-0f84abb57e59@huawei.com> <594A4205.70201@arm.com>
- <3a02e425-5782-dad4-efda-fdc5df73dcf7@huawei.com>
+From: Robert Richter <robert.richter@cavium.com>
+Subject: Re: [PATCH V17 00/11] Add UEFI 2.6 and ACPI 6.1 updates for RAS on
+ ARM64
+Date: Wed, 21 Jun 2017 15:00:25 +0200
+Message-ID: <20170621130025.GD16981@rric.localdomain>
+References: <1495225933-4410-1-git-send-email-tbaicar@codeaurora.org>
+ <20170607115012.GZ30263@arm.com>
+ <20170620063439.GS658@rric.localdomain>
+ <20170620084931.GB30664@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F283940625
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jun 2017 08:41:13 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FivQYNgo6Oa5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Jun 2017 08:41:12 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9043E40190
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jun 2017 08:41:12 -0400 (EDT)
-In-Reply-To: <3a02e425-5782-dad4-efda-fdc5df73dcf7@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: wuquanming <wuquanming@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, Achin Gupta <Achin.Gupta@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Huangshaoyu <huangshaoyu@huawei.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-acpi-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170620084931.GB30664@arm.com>
+Sender: linux-acpi-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Tyler Baicar <tbaicar@codeaurora.org>, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, catalin.marinas@arm.com, rjw@rjwysocki.net, lenb@kernel.org, matt@codeblueprint.co.uk, robert.moore@intel.com, lv.zheng@intel.com, nkaje@codeaurora.org, zjzhang@codeaurora.org, mark.rutland@arm.com, james.morse@arm.com, akpm@linux-foundation.org, eun.taik.lee@samsung.com, sandeepa.s.prabhu@gmail.com, labbott@redhat.com, shijie.huang@arm.com, rruigrok@codeaurora.org, paul.gortmaker@windriver.com, tn@semihalf.com, fu.wei@linaro.org, rostedt@goodmis.org, bristot@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-efi@vger.
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgZ2VuZ2RvbmdqaXUsCgpPbiAyMS8wNi8xNyAxMTo1OSwgZ2VuZ2RvbmdqaXUgd3JvdGU6Cj4g
-T24gMjAxNy82LzIxIDE3OjUzLCBKYW1lcyBNb3JzZSB3cm90ZToKPj4gSSB0aGluayB3ZSBkaXNj
-dXNzZWQgdGhpcyBiZWZvcmVbMF0sIHlvdXIgQ1BVIGhhcyBhIGZlYXR1cmUgY2FsbGVkICdod3Bv
-aXNvbicKPj4gdGhhdCBpcyB1c2VzIHRvIHN1cHBvcnQgUkFTLiBMaW51eCBhbHNvIGhhcyBhIGZl
-YXR1cmUgY2FsbGVkICdod3BvaXNvbicgWzFdWzJdLAo+PiB3aGljaCBoYW5kbGVzIHRoZSBvZmZs
-aW5lLWluZyBvZiBtZW1vcnkgcGFnZXMgd2hlbiBpdCByZWNlaXZlcyBhIG5vdGlmaWNhdGlvbgo+
-PiB0aHJvdWdoIEFQRUkuIEkndmUgdHJpZWQgdG8gY2FsbCB0aGlzIG1lbW9yeV9mYWlsdXJlKCkg
-dG8gYXZvaWQgdGhpcyBjb25mdXNpb24uCj4+Cj4+IFRoaXMgcGF0Y2ggaXMgdG8gaGFuZGxlIHN0
-YWdlMiBmYXVsdHMgd2hlbiB0aGUgcGFnZSB3YXMgcmVtb3ZlZCBmcm9tIHRoZSBzdGFnZTIKPj4g
-bWFwcGluZyBieSB0aGUgbWVtb3J5X2ZhaWx1cmUoKSBjb2RlLiB2MyBvZiB0aGlzIHBhdGNoWzNd
-IGRvZXMgYSBtdWNoIGJldHRlciBqb2IKPj4gb2YgZGVzY3JpYmluZyB0aGlzLgo+Pgo+PiAoLi4u
-IEkgZG9uJ3QgdGhpbmsgeW91ciBxdWVzdGlvbiBpcyByZWxhdGVkIHRvIHRoaXMgcGF0Y2ggLi4u
-KQo+IAo+IEkga25vdyB5b3VyIG1lYW5pbmcgYWJvdXQgdGhlIExpbnV4ICdod3BvaXNvbicgZmVh
-dHVyZS4KCk9rYXksIEkgYXNzdW1lIHdlIGFyZSBhbHNvIHRhbGtpbmcgYWJvdXQgZmlybXdhcmUt
-Zmlyc3QgUkFTIGV2ZW50cyBhbmQgeW91ciBBUEVJCm5vdGlmaWNhdGlvbnMgdXNlIFNFQS4KCgpJ
-IHRoaW5rIHdlIGFyZSBsb29raW5nIGF0IGRpZmZlcmVudCBwYXJ0cyBvZiB0aGUgY29kZSwgaGVy
-ZSBpcyB3aGF0IEkgc2VlIHNob3VsZApoYXBwZW46CgpGb3IgYSBTeW5jaHJvbm91cyBFeHRlcm5h
-bCBBYm9ydCB0aGUgRVNSIHtELEl9RlNDIGJpdHMgd2lsbCBiZSBpbiB0aGUgcmFuZ2UgdGhhdApp
-bmRpY2F0ZXMgYW4gZXh0ZXJuYWwgYWJvcnQuIEZvciBhIGRhdGE6ZXh0ZXJuYWwtYWJvcnQga3Zt
-X2hhbmRsZV9ndWVzdF9hYm9ydCgpCndpbGwgbWF0Y2hlcyB0aGlzIHdpdGgga3ZtX3ZjcHVfZGFi
-dF9pc2V4dGFidCgpIGFuZCBtYWtlcyBubyBmdXJ0aGVyIGF0dGVtcHQgdG8KaGFuZGxlIHRoZSBm
-YXVsdC4KClR5bGVyJ3MgUkFTIHNlcmllcyBhZGRlZCBhbiBlYXJsaWVyIGNoZWNrOgo+IC8qCj4g
-ICogVGhlIGhvc3Qga2VybmVsIHdpbGwgaGFuZGxlIHRoZSBzeW5jaHJvbm91cyBleHRlcm5hbCBh
-Ym9ydC4gVGhlcmUKPiAgKiBpcyBubyBuZWVkIHRvIHBhc3MgdGhlIGVycm9yIGludG8gdGhlIGd1
-ZXN0Lgo+ICAqLwo+IGlmIChpc19hYm9ydF9zZWEoZmF1bHRfc3RhdHVzKSkgewo+IAlpZiAoIWhh
-bmRsZV9ndWVzdF9zZWEoZmF1bHRfaXBhLCBrdm1fdmNwdV9nZXRfaHNyKHZjcHUpKSkKPiAJCXJl
-dHVybiAxOwo+4oCDfQo+CgpUaGlzIGdvZXMgb24gdG8gY2FsbCBnaGVzX25vdGlmeV9zZWEoKSB3
-aGljaCB3aWxsIGhhbmRsZSB0aGUgZXJyb3IgYW5kIGNhdXNlIEtWTQp0byBleGl0IHRoaXMgZnVu
-Y3Rpb24uIEtWTSBtYWtlcyBubyBmdXJ0aGVyIGF0dGVtcHQgdG8gaGFuZGxlIHRoZSBmYXVsdCBh
-cyBBUEVJCnNob3VsZCBoYXZlIGRvbmUgZXZlcnl0aGluZyBuZWNlc3NhcnkuIEtWTSB3aWxsIHJl
-LWVudGVyIHRoZSBndWVzdCwgdW5sZXNzIHRoZXJlCmFyZSBzaWduYWxzIHBlbmRpbmcuCgooWW91
-J3JlIHJpZ2h0IHRoYXQgaGVyZSB0aGUgZmF1bHRfaXBhIGlzIHRoZSB3cm9uZyB0aGluZyB0byBw
-YXNzLCBidXQKaGFuZGxlX2d1ZXN0X3NlYSgpIGRvZXNuJ3QgdXNlIGl0Li4uKQoKV2UgZG8gbmVl
-ZCB0byBlbmFibGUgSENSX0VMMi5URUEgd2hpY2ggd2FzIGFkZGVkIHdpdGggdjguMnMgUkFTIGV4
-dGVuc2lvbnMsIGJ1dAp0aGUgY3B1ZmVhdHVyZSBwYXRjaCBpcyBhIHByZS1yZXF1aXNpdGUuCgoK
-PiBMZXQgc2VlIHRoZSBjb2RlIHRoYXQgaG93IHRvIGdldCB0aGUgInBmbiIKPiAKPiAvLy9nZXQg
-dGhlIHBmbgo+IGZhdWx0X2lwYSA9IGt2bV92Y3B1X2dldF9mYXVsdF9pcGEodmNwdSk7Cj4gZ2Zu
-ID0gZmF1bHRfaXBhID4+IFBBR0VfU0hJRlQ7Cj4gcGZuID0gZ2ZuX3RvX3Bmbl9wcm90KGt2bSwg
-Z2ZuLCB3cml0ZV9mYXVsdCwgJndyaXRhYmxlKTsKCj4gQXMgc2hvd24gaW4gYWJvdmUgY29kZSwg
-d2hlbiBoYXBwZW4gU0VBLCB0aGUgZmF1bHRfaXBhIGlzIGdvdCBmcm9tIHRoZSBIUEZBUl9FTDIg
-cmVnaXN0ZXIuCj4gaWYgdGhlIEhQRkFSX0VMMiBkb2VzIG5vdCByZWNvcmQgdGhlIElQQS4gdGhl
-IGZhdWx0X2lwYSBpcyB6ZXJvLCB0aGVuIGdmbiBpcyB6ZXJvLCBzbyB0aGUgcGZuIGlzIHVua25v
-d24uCgo+IHNvIGJlbG93IGp1ZGdlbWVudCBhbHdheXMgZmFsc2UgYWx0aG91Z2ggZmlybXdhcmUg
-bm90aWZ5IHRoZSBtZW1vcnlfZmFpbHVyZSB0aHJvdWdoIEFQRUksIGJlY2F1c2Ugd2UgZG8gbm90
-IGdldCB0aGUgcmlnaHQgZmF1bHQgbWVtb3J5IHBhZ2UuCj4gdXNpbmcgdGhpcyBBUEkgImt2bV92
-Y3B1X2dldF9mYXVsdF9pcGEiIGNhbiBub3QgZ2V0IHRoZSByaWdodCBmYXVsdCBtZW1vcnkgcGFn
-ZSBpZiBjcHUgZG9lcyBub3QgdXBkYXRlIHRoZSBIUEZBUl9FTDIuCgpUaGUgcGF0aCB0byB0aGUg
-YmVsb3cgY29kZSB0aGF0IHVzZXMgZmF1bHRfaXBhLT5nZm4tPnBmbi0+aHZhIGlzOgprdm1faGFu
-ZGxlX2d1ZXN0X2Fib3J0KCkKdXNlcl9tZW1fYWJvcnQoKQprdm1fc2VuZF9od3BvaXNvbl9zaWdu
-YWwoKS4KCkJ1dCBmb3IgYW4gZXh0ZXJuYWwgYWJvcnQgZHVlIHRvIFJBUyB3ZSBuZXZlciBnZXQg
-cGFzdCBrdm1faGFuZGxlX2d1ZXN0X2Fib3J0KCkKYXMgd2UgY2FsbCBvdXQgdG8gdGhlIEFQRUkg
-Z2hlcyB0byBoYW5kbGUgdGhlIFJBUyBlcnJvciBpbnN0ZWFkLgoKRm9yIGEgZGF0YSBleHRlcm5h
-bCBhYm9ydCB0aGF0IHdhc24ndCBkdWUgdG8gUkFTIHdlIHN0aWxsIGRvbid0IGdldCBoZXJlIGFz
-IEtWTQp3aWxsIGhpdCB0aGUgdmNwdSB3aXRoIGt2bV9pbmplY3RfdmFidCgpIGluc3RlYWQuCgoK
-PiArCWlmIChwZm4gPT0gS1ZNX1BGTl9FUlJfSFdQT0lTT04pIHsKPiArCQlrdm1fc2VuZF9od3Bv
-aXNvbl9zaWduYWwoaHZhLCB2bWEpOwo+ICsJCXJldHVybiAwOwo+ICsJfQoKQXJlIHlvdSBzZWVp
-bmcgYSBndWVzdCByZXBlYXRlZGx5IHRyaWdnZXIgZXh0ZXJuYWwtYWJvcnQgb24gdGhlIHNhbWUg
-YWRkcmVzcz8KSWYgc28sIGNhbiB5b3UgYWRkIGRlYnVnIG1lc3NhZ2VzIHRvIGNoZWNrIGlmIGhh
-bmRsZV9ndWVzdF9zZWEoKSBpcyBjYWxsZWQ/IERvZXMKaXQgZmluZCB3b3JrIHRvIGRvPyBJZiBz
-byBrdm1faGFuZGxlX2d1ZXN0X2Fib3J0KCkgc2hvdWxkIGV4aXQuCkRvIHlvdXIgQ1BFUiByZWNv
-cmRzIGNhdXNlIG1lbW9yeV9mYWlsdXJlKCkgdG8gYmUgcnVuPwpEb2VzIHRyeV90b191bm1hcCgp
-IGluIGh3cG9pc29uX3VzZXJfbWFwcGluZ3MoKSBydW4gYW5kIHN1Y2NlZWQ/IElmIHNvIHRoZQpm
-YXVsdHkgcGFnZSBzaG91bGQgYmUgdW5tYXBwZWQgZnJvbSBzdGFnZTIsIGZyb20gbm93IG9uIHRo
-ZSBndWVzdCBzaG91bGQgb25seQp0cmlnZ2VyIG5vcm1hbCBzdGFnZTIgZmF1bHRzIGZvciB0aGlz
-IGFkZHJlc3MuCgpIb3cgZG9lcyB5b3VyIGZpcm13YXJlIGNob29zZSB0byByb3V0ZSBpbmplY3Rl
-ZC1FeHRlcm5hbC1BYm9ydHMgZm9yIEFQRUkKbm90aWZpY2F0aW9ucz8gRG8gd2UgbmVlZCB0byBl
-bmFibGUgSENSX0VMMi5URUEgdG8gbWFrZSB0aGlzIHdvcmsgcHJvcGVybHk/CgoKPiBzbyBtYXkg
-YmUgeW91IG5lZWQgdG8gZG91YmxlIGNvbmZpcm0gdGhhdCB3aGV0aGVyIGFybXY4LjAvYXJtdjgu
-MiAgc3RhbmRhcmQKPiBDUFUgY2FuIGFsd2F5cyB1cGRhdGUgdGhlICBIUEZBUl9FTDIgcmVnaXN0
-ZXJzLgoKSSBkb24ndCBrbm93IHdoYXQgdGhlIENQVXMgZG8sIGJ1dCB0aGUgQVJNLUFSTSBhbGxv
-d3MgdGhlIEZBUiB0byBiZSBub3QtdmFsaWQKZm9yIHNvbWUgZXh0ZXJuYWwgYWJvcnRzLiBUaGlz
-IGlzIGluZGljYXRlZCBieSB0aGUgRmFyLW5vdC1WYWxpZCBiaXQgaW4gdGhlIEVTUi4KCldpdGgg
-ZmlybXdhcmUtZmlyc3QgUkFTIHRoZSBvbmx5IGV4dGVybmFsIGFib3J0cyB0aGF0IExpbnV4IHNo
-b3VsZCBzZWUgYXJlIFNFQQpBUEVJIG5vdGlmaWNhdGlvbnMuIFdlIHNob3VsZG4ndCBleHBlY3Qg
-ZmlybXdhcmUgdG8gc2V0IG11Y2ggYmV5b25kIHRoZSBtaW5pbXVtCmZvciB0aGVzZS4gVGhlIEtW
-TSBjb2RlIHRvdWNoZWQgYnkgdGhpcyBwYXRjaCBzaG91bGRuJ3QgcnVuIGZvciBhbiBBUEVJCm5v
-dGlmaWNhdGlvbi4KCgpUaGFua3MsCgpKYW1lcwoKX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
-Zm8va3ZtYXJtCg==
+On 20.06.17 09:49:32, Will Deacon wrote:
+> Hi Robert,
+> 
+> On Tue, Jun 20, 2017 at 08:34:39AM +0200, Robert Richter wrote:
+> > On 07.06.17 12:50:12, Will Deacon wrote:
+> > 
+> > > Thanks, I've pushed this out as:
+> > >
+> > >   git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/ras-apei
+> > >
+> > > which I'll merge into for-next/core (and therefore linux-next) either the
+> > > end of this week or the beginning of next week. Please take a look if you
+> > > get a chance.
+> > 
+> > any reason why there was a roll back of for-next/core?
+> > 
+> >  + 0870f692c2ed...e27c7fa015d6 for-next/core -> arm64/for-next/core  (forced update)
+> > 
+> > Is it because for-next/ras-apei goes through tip?
+> 
+> No, it's because the RAS stuff ran into horrible conflicts with the UUID
+> tree:
+> 
+> https://lkml.org/lkml/2017/6/16/22
+> 
+> Tyler should be rebasing that soon, so hopefully I can requeue that stuff
+> this week.
+
+Note there are also conflicts with tip-ras from Borsis' tree.
+
+-Robert
