@@ -1,57 +1,330 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v4 2/3] arm64: kvm: route synchronous external abort exceptions to el2
-Date: Mon, 26 Jun 2017 20:45:56 +0800
-Message-ID: <1498481156-23572-1-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v4 3/3] arm64: kvm: inject SError with user space specified syndrome
+Date: Mon, 26 Jun 2017 20:46:39 +0800
+Message-ID: <1498481199-24118-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Return-path: <linux-doc-owner@vger.kernel.org>
-Sender: linux-doc-owner@vger.kernel.org
-To: marc.zyngier@arm.com, james.morse@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, wuquanming@huawei.com, huangshaoyu@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, linux@armlinux.org.uk, will.deacon@arm.com, suzuki.poulose@arm.com
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: marc.zyngier@arm.com, james.morse@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, wuquanming@huawei.com, huangshaoyu@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, linux@armlinux.org.uk, will.deacon@arm.com, suzuki.poulose@arm.com, huhuajun@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In the firmware-first RAS solution, guest OS receives an synchronous
-external abort, then trapped to EL3 by SCR_EL3.EA. Firmware inspects
-the HCR_EL2.TEA and chooses the target to send APEI's SEA notification.
-If the SCR_EL3.EA is set, delegates the error exception to the hypervisor,
-otherwise it delegates to the guest OS kernel
+when SError happen, kvm notifies user space to record the CPER,
+user space specifies and passes the contents of ESR_EL1 on taking
+a virtual SError interrupt to KVM, KVM enables virtual system
+error or asynchronous abort with this specifies syndrome. This
+patch modify the world-switch to restore VSESR_EL2, VSESR_EL2
+saves the virtual SError syndrome, it becomes the ESR_EL1 value when
+HCR_EL2.VSE injects an SError. This register is added by the
+RAS Extensions.
+
+Changes since v3:
+(1) Move restore VSESR_EL2 value logic to a helper method
+(2) In the world-switch, not save VSESR_EL2, because no one cares the
+    old VSESR_EL2 value
+(3) Add a new KVM_ARM_SEI ioctl to set the VSESR_EL2 value and pend
+    a virtual system error
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Quanming Wu <wuquanming@huawei.com>
 ---
- arch/arm64/include/asm/kvm_arm.h     | 2 ++
- arch/arm64/include/asm/kvm_emulate.h | 7 +++++++
- 2 files changed, 9 insertions(+)
+ Documentation/virtual/kvm/api.txt    | 10 ++++++++++
+ arch/arm/include/asm/kvm_host.h      |  1 +
+ arch/arm/kvm/arm.c                   |  7 +++++++
+ arch/arm/kvm/guest.c                 |  5 +++++
+ arch/arm64/include/asm/esr.h         |  2 ++
+ arch/arm64/include/asm/kvm_emulate.h | 10 ++++++++++
+ arch/arm64/include/asm/kvm_host.h    |  2 ++
+ arch/arm64/include/asm/sysreg.h      |  3 +++
+ arch/arm64/kvm/guest.c               | 14 ++++++++++++++
+ arch/arm64/kvm/handle_exit.c         | 25 +++++++++++++++++++------
+ arch/arm64/kvm/hyp/switch.c          | 14 ++++++++++++++
+ include/uapi/linux/kvm.h             |  8 ++++++++
+ 12 files changed, 95 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 61d694c..1188272 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -23,6 +23,8 @@
- #include <asm/types.h>
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 3c248f7..852ac55 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -3377,6 +3377,16 @@ struct kvm_ppc_resize_hpt {
+ 	__u32 pad;
+ };
  
- /* Hyp Configuration Register (HCR) bits */
-+#define HCR_TEA		(UL(1) << 37)
-+#define HCR_TERR	(UL(1) << 36)
- #define HCR_E2H		(UL(1) << 34)
- #define HCR_ID		(UL(1) << 33)
- #define HCR_CD		(UL(1) << 32)
++4.104 KVM_ARM_SEI
++
++Capability: KVM_EXIT_SERROR_INTR
++Architectures: arm/arm64
++Type: vcpu ioctl
++Parameters: u64 (syndrome)
++Returns: 0 in case of success
++
++Pend an virtual system error or asynchronous abort with user space specified.
++
+ 5. The kvm_run structure
+ ------------------------
+ 
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 31ee468..566292a 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -244,6 +244,7 @@ int kvm_arm_coproc_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
+ 
+ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		int exception_index);
++int kvm_vcpu_ioctl_sei(struct kvm_vcpu *vcpu, u64 *syndrome);
+ 
+ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+ 				       unsigned long hyp_stack_ptr,
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 96dba7c..583294f 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -987,6 +987,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			return -EFAULT;
+ 		return kvm_arm_vcpu_has_attr(vcpu, &attr);
+ 	}
++	case KVM_ARM_SEI: {
++		u64 syndrome;
++
++		if (copy_from_user(&syndrome, argp, sizeof(syndrome)))
++			return -EFAULT;
++		return kvm_vcpu_ioctl_sei(vcpu, &syndrome);
++	}
+ 	default:
+ 		return -EINVAL;
+ 	}
+diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+index fa6182a..72505bf 100644
+--- a/arch/arm/kvm/guest.c
++++ b/arch/arm/kvm/guest.c
+@@ -248,6 +248,11 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ 	return -EINVAL;
+ }
+ 
++int kvm_vcpu_ioctl_sei(struct kvm_vcpu *vcpu, u64 *syndrome)
++{
++	return 0;
++}
++
+ int __attribute_const__ kvm_target_cpu(void)
+ {
+ 	switch (read_cpuid_part()) {
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 22f9c90..d009c99 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -127,6 +127,8 @@
+ #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+ #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
+ 
++#define VSESR_ELx_IDS_ISS_MASK    ((1UL << 25) - 1)
++
+ /* ESR value templates for specific events */
+ 
+ /* BRK instruction trap from AArch64 state */
 diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index f5ea0ba..5f64ab2 100644
+index 5f64ab2..93dc3d1 100644
 --- a/arch/arm64/include/asm/kvm_emulate.h
 +++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -47,6 +47,13 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
- 	if (is_kernel_in_hyp_mode())
- 		vcpu->arch.hcr_el2 |= HCR_E2H;
-+	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
-+		/* route synchronous external abort exceptions to EL2 */
-+		vcpu->arch.hcr_el2 |= HCR_TEA;
-+		/* trap error record accesses */
-+		vcpu->arch.hcr_el2 |= HCR_TERR;
-+	}
-+
- 	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
+@@ -155,6 +155,16 @@ static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.fault.esr_el2;
  }
+ 
++static inline u32 kvm_vcpu_get_vsesr(const struct kvm_vcpu *vcpu)
++{
++		return vcpu->arch.fault.vsesr_el2;
++}
++
++static inline void kvm_vcpu_set_vsesr(struct kvm_vcpu *vcpu, unsigned long val)
++{
++		vcpu->arch.fault.vsesr_el2 = val;
++}
++
+ static inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+ {
+ 	u32 esr = kvm_vcpu_get_hsr(vcpu);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e7705e7..b6242fb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -86,6 +86,7 @@ struct kvm_vcpu_fault_info {
+ 	u32 esr_el2;		/* Hyp Syndrom Register */
+ 	u64 far_el2;		/* Hyp Fault Address Register */
+ 	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
++	u32 vsesr_el2;		/* Virtual SError Exception Syndrome Register */
+ };
+ 
+ /*
+@@ -385,6 +386,7 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+ 			       struct kvm_device_attr *attr);
+ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ 			       struct kvm_device_attr *attr);
++int kvm_vcpu_ioctl_sei(struct kvm_vcpu *vcpu, u64 *syndrome);
+ 
+ static inline void __cpu_init_stage2(void)
+ {
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 32964c7..3af6907 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -125,6 +125,9 @@
+ #define REG_PSTATE_PAN_IMM		sys_reg(0, 0, 4, 0, 4)
+ #define REG_PSTATE_UAO_IMM		sys_reg(0, 0, 4, 0, 3)
+ 
++/* virtual SError exception syndrome register in armv8.2 */
++#define REG_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
++
+ #define SET_PSTATE_PAN(x) __emit_inst(0xd5000000 | REG_PSTATE_PAN_IMM |	\
+ 				      (!!x)<<8 | 0x1f)
+ #define SET_PSTATE_UAO(x) __emit_inst(0xd5000000 | REG_PSTATE_UAO_IMM |	\
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index b37446a..21c20b0 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -277,6 +277,20 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ 	return -EINVAL;
+ }
+ 
++int kvm_vcpu_ioctl_sei(struct kvm_vcpu *vcpu, u64 *syndrome)
++{
++	u64 reg = *syndrome;
++
++	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && reg)
++		/* set vsesr_el2[24:0] with value that user space specified */
++		kvm_vcpu_set_vsesr(vcpu, reg & VSESR_ELx_IDS_ISS_MASK);
++
++	/* inject virtual system Error or asynchronous abort */
++	kvm_inject_vabt(vcpu);
++
++	return 0;
++}
++
+ int __attribute_const__ kvm_target_cpu(void)
+ {
+ 	unsigned long implementor = read_cpuid_implementor();
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index c89d83a..23c02c2 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -180,7 +180,11 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
+ 
+ static int kvm_handle_guest_sei(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+-	unsigned long fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
++	unsigned long hva, fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
++	struct kvm_memory_slot *memslot;
++	int hsr, ret = 1;
++	bool writable;
++	gfn_t gfn;
+ 
+ 	if (handle_guest_sei((unsigned long)fault_ipa,
+ 				kvm_vcpu_get_hsr(vcpu))) {
+@@ -190,9 +194,20 @@ static int kvm_handle_guest_sei(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 				(unsigned long)kvm_vcpu_get_hsr(vcpu));
+ 
+ 		kvm_inject_vabt(vcpu);
++	} else {
++		hsr = kvm_vcpu_get_hsr(vcpu);
++
++		gfn = fault_ipa >> PAGE_SHIFT;
++		memslot = gfn_to_memslot(vcpu->kvm, gfn);
++		hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
++
++		run->exit_reason = KVM_EXIT_SERROR_INTR;
++		run->serror_intr.syndrome_info = hsr;
++		run->serror_intr.address = hva;
++		ret = 0;
+ 	}
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ /*
+@@ -218,8 +233,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 			*vcpu_pc(vcpu) -= adj;
+ 		}
+ 
+-		kvm_handle_guest_sei(vcpu, run);
+-		return 1;
++		return kvm_handle_guest_sei(vcpu, run);
+ 	}
+ 
+ 	exception_index = ARM_EXCEPTION_CODE(exception_index);
+@@ -228,8 +242,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 	case ARM_EXCEPTION_IRQ:
+ 		return 1;
+ 	case ARM_EXCEPTION_EL1_SERROR:
+-		kvm_handle_guest_sei(vcpu, run);
+-		return 1;
++		return kvm_handle_guest_sei(vcpu, run);
+ 	case ARM_EXCEPTION_TRAP:
+ 		/*
+ 		 * See ARM ARM B1.14.1: "Hyp traps on instructions
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index aede165..6d17c97 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -67,6 +67,13 @@ static hyp_alternate_select(__activate_traps_arch,
+ 			    __activate_traps_nvhe, __activate_traps_vhe,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 
++static void __hyp_text __sysreg_set_vsesr(struct kvm_vcpu *vcpu)
++{
++	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) &&
++			(vcpu->arch.hcr_el2 & HCR_VSE))
++		write_sysreg_s(vcpu->arch.fault.vsesr_el2, REG_VSESR_EL2);
++}
++
+ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+@@ -86,6 +93,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 		isb();
+ 	}
+ 	write_sysreg(val, hcr_el2);
++
++	/*
++	 * If the virtual SError interrupt is taken to EL1 using AArch64,
++	 * then VSESR_EL2 provides the syndrome value reported in ESR_EL1.
++	 */
++	__sysreg_set_vsesr(vcpu);
++
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+ 	/*
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 27fe556..ab91fe3 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -205,6 +205,7 @@ struct kvm_hyperv_exit {
+ #define KVM_EXIT_S390_STSI        25
+ #define KVM_EXIT_IOAPIC_EOI       26
+ #define KVM_EXIT_HYPERV           27
++#define KVM_EXIT_SERROR_INTR      28
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -360,6 +361,11 @@ struct kvm_run {
+ 		struct {
+ 			__u8 vector;
+ 		} eoi;
++		/* KVM_EXIT_SERROR_INTR */
++		struct {
++			__u32 syndrome_info;
++			__u64 address;
++		} serror_intr;
+ 		/* KVM_EXIT_HYPERV */
+ 		struct kvm_hyperv_exit hyperv;
+ 		/* Fix the size of the union. */
+@@ -1301,6 +1307,8 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_S390_GET_IRQ_STATE	  _IOW(KVMIO, 0xb6, struct kvm_s390_irq_state)
+ /* Available with KVM_CAP_X86_SMM */
+ #define KVM_SMI                   _IO(KVMIO,   0xb7)
++/* Available with KVM_EXIT_SERROR_INTR */
++#define KVM_ARM_SEI               _IO(KVMIO,   0xb8)
+ 
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
 -- 
 2.10.1
-
