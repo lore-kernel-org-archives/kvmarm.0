@@ -1,330 +1,144 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v4 3/3] arm64: kvm: inject SError with user space specified syndrome
-Date: Mon, 26 Jun 2017 20:46:39 +0800
-Message-ID: <1498481199-24118-1-git-send-email-gengdongjiu@huawei.com>
+From: Jintack Lim <jintack.lim@linaro.org>
+Subject: Re: [RFC 06/55] KVM: arm64: Add EL2 execution context for nesting
+Date: Mon, 26 Jun 2017 10:33:23 -0400
+Message-ID: <CAHyh4xjOvAgqQ+WLD3SHyNHXOFSuoKGu4sV+GaFm-LdEcoGYwA@mail.gmail.com>
+References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
+ <1483943091-1364-7-git-send-email-jintack@cs.columbia.edu> <20170222111017.GB26976@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20170222111017.GB26976@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: marc.zyngier@arm.com, james.morse@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, wuquanming@huawei.com, huangshaoyu@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, gengdongjiu@huawei.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, linux@armlinux.org.uk, will.deacon@arm.com, suzuki.poulose@arm.com, huhuajun@huawei.com
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, vladimir.murzin@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, anna-maria@linutronix.de, Shih-Wei Li <shihwei@cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, KVM General <kvm@vger.kernel.org>, lkml
 List-Id: kvmarm@lists.cs.columbia.edu
 
-when SError happen, kvm notifies user space to record the CPER,
-user space specifies and passes the contents of ESR_EL1 on taking
-a virtual SError interrupt to KVM, KVM enables virtual system
-error or asynchronous abort with this specifies syndrome. This
-patch modify the world-switch to restore VSESR_EL2, VSESR_EL2
-saves the virtual SError syndrome, it becomes the ESR_EL1 value when
-HCR_EL2.VSE injects an SError. This register is added by the
-RAS Extensions.
+Hi Christoffer,
 
-Changes since v3:
-(1) Move restore VSESR_EL2 value logic to a helper method
-(2) In the world-switch, not save VSESR_EL2, because no one cares the
-    old VSESR_EL2 value
-(3) Add a new KVM_ARM_SEI ioctl to set the VSESR_EL2 value and pend
-    a virtual system error
+On Wed, Feb 22, 2017 at 6:10 AM, Christoffer Dall <cdall@linaro.org> wrote:
+> On Mon, Jan 09, 2017 at 01:24:02AM -0500, Jintack Lim wrote:
+>> With the nested virtualization support, the context of the guest
+>> includes EL2 register states. The host manages a set of virtual EL2
+>> registers.  In addition to that, the guest hypervisor supposed to run in
+>> EL2 is now deprivilaged and runs in EL1. So, the host also manages a set
+>> of shadow system registers to be able to run the guest hypervisor in
+>> EL1.
+>>
+>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>> ---
+>>  arch/arm64/include/asm/kvm_host.h | 54 +++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 54 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index c0c8b02..ed78d73 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -146,6 +146,42 @@ enum vcpu_sysreg {
+>>       NR_SYS_REGS     /* Nothing after this line! */
+>>  };
+>>
+>> +enum el2_regs {
+>> +     ELR_EL2,
+>> +     SPSR_EL2,
+>> +     SP_EL2,
+>> +     AMAIR_EL2,
+>> +     MAIR_EL2,
+>> +     TCR_EL2,
+>> +     TTBR0_EL2,
+>> +     VTCR_EL2,
+>> +     VTTBR_EL2,
+>> +     VMPIDR_EL2,
+>> +     VPIDR_EL2,      /* 10 */
+>> +     MDCR_EL2,
+>> +     CNTHCTL_EL2,
+>> +     CNTHP_CTL_EL2,
+>> +     CNTHP_CVAL_EL2,
+>> +     CNTHP_TVAL_EL2,
+>> +     CNTVOFF_EL2,
+>> +     ACTLR_EL2,
+>> +     AFSR0_EL2,
+>> +     AFSR1_EL2,
+>> +     CPTR_EL2,       /* 20 */
+>> +     ESR_EL2,
+>> +     FAR_EL2,
+>> +     HACR_EL2,
+>> +     HCR_EL2,
+>> +     HPFAR_EL2,
+>> +     HSTR_EL2,
+>> +     RMR_EL2,
+>> +     RVBAR_EL2,
+>> +     SCTLR_EL2,
+>> +     TPIDR_EL2,      /* 30 */
+>> +     VBAR_EL2,
+>> +     NR_EL2_REGS     /* Nothing after this line! */
+>> +};
+>
+> Why do we have a separate enum and array for the EL2 regs and not simply
+> expand vcpu_sysreg ?
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Quanming Wu <wuquanming@huawei.com>
----
- Documentation/virtual/kvm/api.txt    | 10 ++++++++++
- arch/arm/include/asm/kvm_host.h      |  1 +
- arch/arm/kvm/arm.c                   |  7 +++++++
- arch/arm/kvm/guest.c                 |  5 +++++
- arch/arm64/include/asm/esr.h         |  2 ++
- arch/arm64/include/asm/kvm_emulate.h | 10 ++++++++++
- arch/arm64/include/asm/kvm_host.h    |  2 ++
- arch/arm64/include/asm/sysreg.h      |  3 +++
- arch/arm64/kvm/guest.c               | 14 ++++++++++++++
- arch/arm64/kvm/handle_exit.c         | 25 +++++++++++++++++++------
- arch/arm64/kvm/hyp/switch.c          | 14 ++++++++++++++
- include/uapi/linux/kvm.h             |  8 ++++++++
- 12 files changed, 95 insertions(+), 6 deletions(-)
+We can expand vcpu_sysreg for the EL2 system registers. For SP_EL2,
+SPSR_EL2, and ELR_EL2, where is the good place to locate them?.
+SP_EL1, SPSR_EL1, and ELR_EL1 registers are saved in the kvm_regs
+structure instead of sysregs[], so I wonder it's better to put them in
+kvm_regs, too.
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 3c248f7..852ac55 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -3377,6 +3377,16 @@ struct kvm_ppc_resize_hpt {
- 	__u32 pad;
- };
- 
-+4.104 KVM_ARM_SEI
-+
-+Capability: KVM_EXIT_SERROR_INTR
-+Architectures: arm/arm64
-+Type: vcpu ioctl
-+Parameters: u64 (syndrome)
-+Returns: 0 in case of success
-+
-+Pend an virtual system error or asynchronous abort with user space specified.
-+
- 5. The kvm_run structure
- ------------------------
- 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 31ee468..566292a 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -244,6 +244,7 @@ int kvm_arm_coproc_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
- 
- int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		int exception_index);
-+int kvm_vcpu_ioctl_sei(struct kvm_vcpu *vcpu, u64 *syndrome);
- 
- static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
- 				       unsigned long hyp_stack_ptr,
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 96dba7c..583294f 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -987,6 +987,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 			return -EFAULT;
- 		return kvm_arm_vcpu_has_attr(vcpu, &attr);
- 	}
-+	case KVM_ARM_SEI: {
-+		u64 syndrome;
-+
-+		if (copy_from_user(&syndrome, argp, sizeof(syndrome)))
-+			return -EFAULT;
-+		return kvm_vcpu_ioctl_sei(vcpu, &syndrome);
-+	}
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index fa6182a..72505bf 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -248,6 +248,11 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
- 	return -EINVAL;
- }
- 
-+int kvm_vcpu_ioctl_sei(struct kvm_vcpu *vcpu, u64 *syndrome)
-+{
-+	return 0;
-+}
-+
- int __attribute_const__ kvm_target_cpu(void)
- {
- 	switch (read_cpuid_part()) {
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 22f9c90..d009c99 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -127,6 +127,8 @@
- #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
- #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
- 
-+#define VSESR_ELx_IDS_ISS_MASK    ((1UL << 25) - 1)
-+
- /* ESR value templates for specific events */
- 
- /* BRK instruction trap from AArch64 state */
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 5f64ab2..93dc3d1 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -155,6 +155,16 @@ static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
- 	return vcpu->arch.fault.esr_el2;
- }
- 
-+static inline u32 kvm_vcpu_get_vsesr(const struct kvm_vcpu *vcpu)
-+{
-+		return vcpu->arch.fault.vsesr_el2;
-+}
-+
-+static inline void kvm_vcpu_set_vsesr(struct kvm_vcpu *vcpu, unsigned long val)
-+{
-+		vcpu->arch.fault.vsesr_el2 = val;
-+}
-+
- static inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
- {
- 	u32 esr = kvm_vcpu_get_hsr(vcpu);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e7705e7..b6242fb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -86,6 +86,7 @@ struct kvm_vcpu_fault_info {
- 	u32 esr_el2;		/* Hyp Syndrom Register */
- 	u64 far_el2;		/* Hyp Fault Address Register */
- 	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
-+	u32 vsesr_el2;		/* Virtual SError Exception Syndrome Register */
- };
- 
- /*
-@@ -385,6 +386,7 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
- 			       struct kvm_device_attr *attr);
- int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 			       struct kvm_device_attr *attr);
-+int kvm_vcpu_ioctl_sei(struct kvm_vcpu *vcpu, u64 *syndrome);
- 
- static inline void __cpu_init_stage2(void)
- {
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 32964c7..3af6907 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -125,6 +125,9 @@
- #define REG_PSTATE_PAN_IMM		sys_reg(0, 0, 4, 0, 4)
- #define REG_PSTATE_UAO_IMM		sys_reg(0, 0, 4, 0, 3)
- 
-+/* virtual SError exception syndrome register in armv8.2 */
-+#define REG_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
-+
- #define SET_PSTATE_PAN(x) __emit_inst(0xd5000000 | REG_PSTATE_PAN_IMM |	\
- 				      (!!x)<<8 | 0x1f)
- #define SET_PSTATE_UAO(x) __emit_inst(0xd5000000 | REG_PSTATE_UAO_IMM |	\
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index b37446a..21c20b0 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -277,6 +277,20 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
- 	return -EINVAL;
- }
- 
-+int kvm_vcpu_ioctl_sei(struct kvm_vcpu *vcpu, u64 *syndrome)
-+{
-+	u64 reg = *syndrome;
-+
-+	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && reg)
-+		/* set vsesr_el2[24:0] with value that user space specified */
-+		kvm_vcpu_set_vsesr(vcpu, reg & VSESR_ELx_IDS_ISS_MASK);
-+
-+	/* inject virtual system Error or asynchronous abort */
-+	kvm_inject_vabt(vcpu);
-+
-+	return 0;
-+}
-+
- int __attribute_const__ kvm_target_cpu(void)
- {
- 	unsigned long implementor = read_cpuid_implementor();
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index c89d83a..23c02c2 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -180,7 +180,11 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
- 
- static int kvm_handle_guest_sei(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
--	unsigned long fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-+	unsigned long hva, fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-+	struct kvm_memory_slot *memslot;
-+	int hsr, ret = 1;
-+	bool writable;
-+	gfn_t gfn;
- 
- 	if (handle_guest_sei((unsigned long)fault_ipa,
- 				kvm_vcpu_get_hsr(vcpu))) {
-@@ -190,9 +194,20 @@ static int kvm_handle_guest_sei(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 				(unsigned long)kvm_vcpu_get_hsr(vcpu));
- 
- 		kvm_inject_vabt(vcpu);
-+	} else {
-+		hsr = kvm_vcpu_get_hsr(vcpu);
-+
-+		gfn = fault_ipa >> PAGE_SHIFT;
-+		memslot = gfn_to_memslot(vcpu->kvm, gfn);
-+		hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
-+
-+		run->exit_reason = KVM_EXIT_SERROR_INTR;
-+		run->serror_intr.syndrome_info = hsr;
-+		run->serror_intr.address = hva;
-+		ret = 0;
- 	}
- 
--	return 0;
-+	return ret;
- }
- 
- /*
-@@ -218,8 +233,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 			*vcpu_pc(vcpu) -= adj;
- 		}
- 
--		kvm_handle_guest_sei(vcpu, run);
--		return 1;
-+		return kvm_handle_guest_sei(vcpu, run);
- 	}
- 
- 	exception_index = ARM_EXCEPTION_CODE(exception_index);
-@@ -228,8 +242,7 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	case ARM_EXCEPTION_IRQ:
- 		return 1;
- 	case ARM_EXCEPTION_EL1_SERROR:
--		kvm_handle_guest_sei(vcpu, run);
--		return 1;
-+		return kvm_handle_guest_sei(vcpu, run);
- 	case ARM_EXCEPTION_TRAP:
- 		/*
- 		 * See ARM ARM B1.14.1: "Hyp traps on instructions
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index aede165..6d17c97 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -67,6 +67,13 @@ static hyp_alternate_select(__activate_traps_arch,
- 			    __activate_traps_nvhe, __activate_traps_vhe,
- 			    ARM64_HAS_VIRT_HOST_EXTN);
- 
-+static void __hyp_text __sysreg_set_vsesr(struct kvm_vcpu *vcpu)
-+{
-+	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) &&
-+			(vcpu->arch.hcr_el2 & HCR_VSE))
-+		write_sysreg_s(vcpu->arch.fault.vsesr_el2, REG_VSESR_EL2);
-+}
-+
- static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
-@@ -86,6 +93,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 		isb();
- 	}
- 	write_sysreg(val, hcr_el2);
-+
-+	/*
-+	 * If the virtual SError interrupt is taken to EL1 using AArch64,
-+	 * then VSESR_EL2 provides the syndrome value reported in ESR_EL1.
-+	 */
-+	__sysreg_set_vsesr(vcpu);
-+
- 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
- 	write_sysreg(1 << 15, hstr_el2);
- 	/*
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 27fe556..ab91fe3 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -205,6 +205,7 @@ struct kvm_hyperv_exit {
- #define KVM_EXIT_S390_STSI        25
- #define KVM_EXIT_IOAPIC_EOI       26
- #define KVM_EXIT_HYPERV           27
-+#define KVM_EXIT_SERROR_INTR      28
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -360,6 +361,11 @@ struct kvm_run {
- 		struct {
- 			__u8 vector;
- 		} eoi;
-+		/* KVM_EXIT_SERROR_INTR */
-+		struct {
-+			__u32 syndrome_info;
-+			__u64 address;
-+		} serror_intr;
- 		/* KVM_EXIT_HYPERV */
- 		struct kvm_hyperv_exit hyperv;
- 		/* Fix the size of the union. */
-@@ -1301,6 +1307,8 @@ struct kvm_s390_ucas_mapping {
- #define KVM_S390_GET_IRQ_STATE	  _IOW(KVMIO, 0xb6, struct kvm_s390_irq_state)
- /* Available with KVM_CAP_X86_SMM */
- #define KVM_SMI                   _IO(KVMIO,   0xb7)
-+/* Available with KVM_EXIT_SERROR_INTR */
-+#define KVM_ARM_SEI               _IO(KVMIO,   0xb8)
- 
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
--- 
-2.10.1
+BTW, what's the reason that those EL1 registers are in kvm_regs
+instead of sysregs[] in the first place?
+
+>
+>> +
+>>  /* 32bit mapping */
+>>  #define c0_MPIDR     (MPIDR_EL1 * 2) /* MultiProcessor ID Register */
+>>  #define c0_CSSELR    (CSSELR_EL1 * 2)/* Cache Size Selection Register */
+>> @@ -193,6 +229,23 @@ struct kvm_cpu_context {
+>>               u64 sys_regs[NR_SYS_REGS];
+>>               u32 copro[NR_COPRO_REGS];
+>>       };
+>> +
+>> +     u64 el2_regs[NR_EL2_REGS];         /* only used for nesting */
+>> +     u64 shadow_sys_regs[NR_SYS_REGS];  /* only used for virtual EL2 */
+>> +
+>> +     /*
+>> +      * hw_* will be used when switching to a VM. They point to either
+>> +      * the virtual EL2 or EL1/EL0 context depending on vcpu mode.
+>
+> don't they either point to the shadow sys regs or the the normal EL1
+> sysregs?
+
+Ah, this is a general comment for all three members below.
+
+>
+>> +      */
+>> +
+>> +     /* pointing shadow_sys_regs or sys_regs */
+>
+> that's what this comment seems to indicate, so there's some duplicity
+> here.
+
+And this comment is for hw_sys_regs specifically.
+
+>
+>> +     u64 *hw_sys_regs;
+>> +
+>> +     /* copy of either gp_regs.sp_el1 or el2_regs[SP_EL2] */
+>> +     u64 hw_sp_el1;
+>> +
+>> +     /* pstate written to SPSR_EL2 */
+>> +     u64 hw_pstate;
+>>  };
+>>
+>>  typedef struct kvm_cpu_context kvm_cpu_context_t;
+>> @@ -277,6 +330,7 @@ struct kvm_vcpu_arch {
+>>
+>>  #define vcpu_gp_regs(v)              (&(v)->arch.ctxt.gp_regs)
+>>  #define vcpu_sys_reg(v,r)    ((v)->arch.ctxt.sys_regs[(r)])
+>> +#define vcpu_el2_reg(v, r)   ((v)->arch.ctxt.el2_regs[(r)])
+>>  /*
+>>   * CP14 and CP15 live in the same array, as they are backed by the
+>>   * same system registers.
+>> --
+>> 1.9.1
+>>
+>>
+>
