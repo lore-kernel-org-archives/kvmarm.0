@@ -1,143 +1,193 @@
-From: Jintack Lim <jintack.lim@linaro.org>
-Subject: Re: [RFC 21/55] KVM: arm64: Forward HVC instruction to the guest
- hypervisor
-Date: Mon, 26 Jun 2017 11:21:25 -0400
-Message-ID: <CAHyh4xjG8_dOOe-eqQmAogDHDnQPCUQ-2Kccz9=6NmL0_+9TAA@mail.gmail.com>
-References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <1483943091-1364-22-git-send-email-jintack@cs.columbia.edu>
- <20170222114758.GM26976@cbox>
+From: Roman Storozhenko <romeusmeister@gmail.com>
+Subject: [PATCH] KVM: Replaces 'unsigned' with 'unsigned int' in the codebase
+Date: Tue, 27 Jun 2017 12:54:01 +0300
+Message-ID: <20170627095401.GA19864@home>
+Reply-To: 'Roman Storozhenko <romeusmeister@gmail.com>, '@home
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20170222114758.GM26976@cbox>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <cdall@linaro.org>
-Cc: mark.rutland@arm.com, KVM General <kvm@vger.kernel.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, arm-mail-list <linux-arm-kernel@lists.infradead.org>, vladimir.murzin@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kevin.brodsky@arm.com, Eric Auger <eric.auger@redhat.com>, wcohen@redhat.com, anna-maria@linutronix.de, shankerd@codeaurora.org, geoff@infradead.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, james.morse@arm.com, Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: kvm-owner@vger.kernel.org
+To: kvm@vger.kernel.org
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 22, 2017 at 6:47 AM, Christoffer Dall <cdall@linaro.org> wrote:
-> On Mon, Jan 09, 2017 at 01:24:17AM -0500, Jintack Lim wrote:
->> Forward exceptions due to hvc instruction to the guest hypervisor.
->>
->> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
->> ---
->>  arch/arm64/include/asm/kvm_nested.h |  5 +++++
->>  arch/arm64/kvm/Makefile             |  1 +
->>  arch/arm64/kvm/handle_exit.c        | 11 +++++++++++
->>  arch/arm64/kvm/handle_exit_nested.c | 27 +++++++++++++++++++++++++++
->>  4 files changed, 44 insertions(+)
->>  create mode 100644 arch/arm64/include/asm/kvm_nested.h
->>  create mode 100644 arch/arm64/kvm/handle_exit_nested.c
->>
->> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
->> new file mode 100644
->> index 0000000..620b4d3
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/kvm_nested.h
->> @@ -0,0 +1,5 @@
->> +#ifndef __ARM64_KVM_NESTED_H__
->> +#define __ARM64_KVM_NESTED_H__
->> +
->> +int handle_hvc_nested(struct kvm_vcpu *vcpu);
->> +#endif
->> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> index b342bdd..9c35e9a 100644
->> --- a/arch/arm64/kvm/Makefile
->> +++ b/arch/arm64/kvm/Makefile
->> @@ -35,4 +35,5 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
->>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
->>
->> +kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += handle_exit_nested.o
->>  kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += emulate-nested.o
->> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->> index a891684..208be16 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -29,6 +29,10 @@
->>  #include <asm/kvm_mmu.h>
->>  #include <asm/kvm_psci.h>
->>
->> +#ifdef CONFIG_KVM_ARM_NESTED_HYP
->> +#include <asm/kvm_nested.h>
->> +#endif
->> +
->>  #define CREATE_TRACE_POINTS
->>  #include "trace.h"
->>
->> @@ -42,6 +46,13 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>                           kvm_vcpu_hvc_get_imm(vcpu));
->>       vcpu->stat.hvc_exit_stat++;
->>
->> +#ifdef CONFIG_KVM_ARM_NESTED_HYP
->> +     ret = handle_hvc_nested(vcpu);
->> +     if (ret < 0 && ret != -EINVAL)
->> +             return ret;
->> +     else if (ret >= 0)
->> +             return ret;
->> +#endif
->>       ret = kvm_psci_call(vcpu);
->>       if (ret < 0) {
->>               kvm_inject_undefined(vcpu);
->> diff --git a/arch/arm64/kvm/handle_exit_nested.c b/arch/arm64/kvm/handle_exit_nested.c
->> new file mode 100644
->> index 0000000..a6ce23b
->> --- /dev/null
->> +++ b/arch/arm64/kvm/handle_exit_nested.c
->> @@ -0,0 +1,27 @@
->> +/*
->> + * Copyright (C) 2016 - Columbia University
->> + * Author: Jintack Lim <jintack@cs.columbia.edu>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License
->> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#include <linux/kvm.h>
->> +#include <linux/kvm_host.h>
->> +
->> +#include <asm/kvm_emulate.h>
->> +
->> +/* We forward all hvc instruction to the guest hypervisor. */
->> +int handle_hvc_nested(struct kvm_vcpu *vcpu)
->> +{
->> +     return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
->> +}
->
-> I don't understand the logic here or in the caller above.  Do we really
-> forward *all" hvc calls to the guest hypervisor now, so that we no
-> longer support any hypercalls from the VM?  That seems a little rough
-> and probably requires some more discussions.
+Signed-off-by: Roman Storozhenko <romeusmeister@gmail.com>
+---
+ virt/kvm/arm/arm.c        |  2 +-
+ virt/kvm/coalesced_mmio.c |  2 +-
+ virt/kvm/eventfd.c        | 10 ++++++----
+ virt/kvm/irqchip.c        |  7 ++++---
+ virt/kvm/kvm_main.c       | 16 ++++++++--------
+ 5 files changed, 20 insertions(+), 17 deletions(-)
 
-So I think if we run a VM with the EL2 support, then all hvc calls
-from the VM should be forwarded to the virtual EL2.
-
-I may miss something obvious, so can you (or anyone) come up with some
-cases that the host hypervisor needs to directly handle hvc from the
-VM with the EL2 support?
-
-Thanks,
-Jintack
-
->
-> Thanks,
-> -Christoffer
->
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index a39a1e1..dbe402f 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -992,7 +992,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	case KVM_GET_REG_LIST: {
+ 		struct kvm_reg_list __user *user_list = argp;
+ 		struct kvm_reg_list reg_list;
+-		unsigned n;
++		unsigned int n;
+ 
+ 		if (unlikely(!kvm_vcpu_initialized(vcpu)))
+ 			return -ENOEXEC;
+diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+index 571c1ce..805dfbb 100644
+--- a/virt/kvm/coalesced_mmio.c
++++ b/virt/kvm/coalesced_mmio.c
+@@ -42,7 +42,7 @@ static int coalesced_mmio_in_range(struct kvm_coalesced_mmio_dev *dev,
+ static int coalesced_mmio_has_room(struct kvm_coalesced_mmio_dev *dev)
+ {
+ 	struct kvm_coalesced_mmio_ring *ring;
+-	unsigned avail;
++	unsigned int avail;
+ 
+ 	/* Are we able to batch it ? */
+ 
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index 9120edf..0359ed7 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -184,14 +184,14 @@ int __attribute__((weak)) kvm_arch_set_irq_inatomic(
+  * Called with wqh->lock held and interrupts disabled
+  */
+ static int
+-irqfd_wakeup(wait_queue_entry_t *wait, unsigned mode, int sync, void *key)
++irqfd_wakeup(wait_queue_entry_t *wait, unsigned int mode, int sync, void *key)
+ {
+ 	struct kvm_kernel_irqfd *irqfd =
+ 		container_of(wait, struct kvm_kernel_irqfd, wait);
+ 	unsigned long flags = (unsigned long)key;
+ 	struct kvm_kernel_irq_routing_entry irq;
+ 	struct kvm *kvm = irqfd->kvm;
+-	unsigned seq;
++	unsigned int seq;
+ 	int idx;
+ 
+ 	if (flags & POLLIN) {
+@@ -440,7 +440,8 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+ 	return ret;
+ }
+ 
+-bool kvm_irq_has_notifier(struct kvm *kvm, unsigned irqchip, unsigned pin)
++bool kvm_irq_has_notifier(struct kvm *kvm, unsigned int irqchip,
++			  unsigned int pin)
+ {
+ 	struct kvm_irq_ack_notifier *kian;
+ 	int gsi, idx;
+@@ -471,7 +472,8 @@ void kvm_notify_acked_gsi(struct kvm *kvm, int gsi)
+ 			kian->irq_acked(kian);
+ }
+ 
+-void kvm_notify_acked_irq(struct kvm *kvm, unsigned irqchip, unsigned pin)
++void kvm_notify_acked_irq(struct kvm *kvm, unsigned int irqchip,
++			  unsigned int pin)
+ {
+ 	int gsi, idx;
+ 
+diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+index 31e40c9..f073ecf 100644
+--- a/virt/kvm/irqchip.c
++++ b/virt/kvm/irqchip.c
+@@ -50,7 +50,8 @@ int kvm_irq_map_gsi(struct kvm *kvm,
+ 	return n;
+ }
+ 
+-int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
++int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned int irqchip,
++			 unsigned int pin)
+ {
+ 	struct kvm_irq_routing_table *irq_rt;
+ 
+@@ -179,8 +180,8 @@ bool __weak kvm_arch_can_set_irq_routing(struct kvm *kvm)
+ 
+ int kvm_set_irq_routing(struct kvm *kvm,
+ 			const struct kvm_irq_routing_entry *ue,
+-			unsigned nr,
+-			unsigned flags)
++			unsigned int nr,
++			unsigned int flags)
+ {
+ 	struct kvm_irq_routing_table *new, *old;
+ 	struct kvm_kernel_irq_routing_entry *e;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3863cf7..0906847 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -166,7 +166,7 @@ void vcpu_put(struct kvm_vcpu *vcpu)
+ EXPORT_SYMBOL_GPL(vcpu_put);
+ 
+ /* TODO: merge with kvm_arch_vcpu_should_kick */
+-static bool kvm_request_needs_ipi(struct kvm_vcpu *vcpu, unsigned req)
++static bool kvm_request_needs_ipi(struct kvm_vcpu *vcpu, unsigned int req)
+ {
+ 	int mode = kvm_vcpu_exiting_guest_mode(vcpu);
+ 
+@@ -252,7 +252,7 @@ void kvm_reload_remote_mmus(struct kvm *kvm)
+ 	kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
+ }
+ 
+-int kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
++int kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned int id)
+ {
+ 	struct page *page;
+ 	int r;
+@@ -2230,7 +2230,7 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	me = get_cpu();
+-	if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
++	if (cpu != me && (unsigned int)cpu < nr_cpu_ids && cpu_online(cpu))
+ 		if (kvm_arch_vcpu_should_kick(vcpu))
+ 			smp_send_reschedule(cpu);
+ 	put_cpu();
+@@ -3766,7 +3766,7 @@ static const struct file_operations *stat_fops_per_vm[] = {
+ 
+ static int vm_stat_get(void *_offset, u64 *val)
+ {
+-	unsigned offset = (long)_offset;
++	unsigned int offset = (long)_offset;
+ 	struct kvm *kvm;
+ 	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 	u64 tmp_val;
+@@ -3784,7 +3784,7 @@ static int vm_stat_get(void *_offset, u64 *val)
+ 
+ static int vm_stat_clear(void *_offset, u64 val)
+ {
+-	unsigned offset = (long)_offset;
++	unsigned int offset = (long)_offset;
+ 	struct kvm *kvm;
+ 	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 
+@@ -3805,7 +3805,7 @@ DEFINE_SIMPLE_ATTRIBUTE(vm_stat_fops, vm_stat_get, vm_stat_clear, "%llu\n");
+ 
+ static int vcpu_stat_get(void *_offset, u64 *val)
+ {
+-	unsigned offset = (long)_offset;
++	unsigned int offset = (long)_offset;
+ 	struct kvm *kvm;
+ 	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 	u64 tmp_val;
+@@ -3823,7 +3823,7 @@ static int vcpu_stat_get(void *_offset, u64 *val)
+ 
+ static int vcpu_stat_clear(void *_offset, u64 val)
+ {
+-	unsigned offset = (long)_offset;
++	unsigned int offset = (long)_offset;
+ 	struct kvm *kvm;
+ 	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 
+@@ -3921,7 +3921,7 @@ static void kvm_sched_out(struct preempt_notifier *pn,
+ 	kvm_arch_vcpu_put(vcpu);
+ }
+ 
+-int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
++int kvm_init(void *opaque, unsigned int vcpu_size, unsigned int vcpu_align,
+ 		  struct module *module)
+ {
+ 	int r;
+-- 
+2.7.4
