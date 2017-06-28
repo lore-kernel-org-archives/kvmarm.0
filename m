@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 29/52] irqchip/gic-v4: Add per-VM VPE domain creation
-Date: Wed, 28 Jun 2017 16:03:48 +0100
-Message-ID: <20170628150411.15846-30-marc.zyngier@arm.com>
+Subject: [PATCH v2 27/52] irqchip/gic-v3-its: Support VPE doorbell
+ invalidation even when !DirectLPI
+Date: Wed, 28 Jun 2017 16:03:46 +0100
+Message-ID: <20170628150411.15846-28-marc.zyngier@arm.com>
 References: <20170628150411.15846-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EEE749BFF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15E9949C1A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gs3h38ULZweV for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jun 2017 11:05:19 -0400 (EDT)
+ with ESMTP id 4hZ9KYILt9YC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jun 2017 11:05:16 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2910640FA5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BEC6A40FA5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:14 -0400 (EDT)
 In-Reply-To: <20170628150411.15846-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,93 +32,121 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When creating a VM, it is very convenient to have an irq domain
-containing all the doorbell interrupts associated with that VM
-(each interrupt representing a VPE).
+When we don't have the DirectLPI feature, we must work around the
+architecture shortcomings to be able to perform the required
+invalidation.
+
+For this, we create a fake device whose sole purpose is to
+provide a way to issue a map/inv/unmap sequence (and the corresponding
+sync operations). That's 6 commands and a full serialization point
+to be able to do this.
+
+You just have to hope the hypervisor won't do that too often...
 
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v4.c       | 58 ++++++++++++++++++++++++++++++++++++++
- include/linux/irqchip/arm-gic-v4.h |  3 ++
- 2 files changed, 61 insertions(+)
- create mode 100644 drivers/irqchip/irq-gic-v4.c
+ drivers/irqchip/irq-gic-v3-its.c | 66 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 63 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-new file mode 100644
-index 000000000000..2ea12baf2e53
---- /dev/null
-+++ b/drivers/irqchip/irq-gic-v4.c
-@@ -0,0 +1,58 @@
-+/*
-+ * Copyright (C) 2016 ARM Limited, All Rights Reserved.
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <linux/interrupt.h>
-+#include <linux/irq.h>
-+#include <linux/irqdomain.h>
-+#include <linux/msi.h>
-+
-+#include <linux/irqchip/arm-gic-v4.h>
-+
-+static struct irq_domain *gic_domain;
-+static const struct irq_domain_ops *vpe_domain_ops;
-+
-+int its_alloc_vcpu_irqs(struct its_vm *vm)
-+{
-+	int vpe_base_irq, i;
-+
-+	vm->domain = irq_domain_create_hierarchy(gic_domain, 0, vm->nr_vpes,
-+						 NULL, vpe_domain_ops, vm);
-+	if (!vm->domain)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < vm->nr_vpes; i++) {
-+		vm->vpes[i]->its_vm = vm;
-+		vm->vpes[i]->idai = true;
-+	}
-+
-+	vpe_base_irq = __irq_domain_alloc_irqs(vm->domain, -1, vm->nr_vpes,
-+					       NUMA_NO_NODE, vm,
-+					       false, NULL);
-+	if (vpe_base_irq <= 0)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < vm->nr_vpes; i++)
-+		vm->vpes[i]->irq = vpe_base_irq + i;
-+
-+	return 0;
-+}
-+
-+void its_free_vcpu_irqs(struct its_vm *vm)
-+{
-+	irq_domain_free_irqs(vm->vpes[0]->irq, vm->nr_vpes);
-+	irq_domain_remove(vm->domain);
-+}
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index 4cac48e220da..7474a981ed6d 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -88,4 +88,7 @@ struct its_cmd_info {
- 	};
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 64893f0427f2..4979916cd3d7 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -138,6 +138,9 @@ struct its_device {
+ 	u32			device_id;
  };
  
-+int its_alloc_vcpu_irqs(struct its_vm *vm);
-+void its_free_vcpu_irqs(struct its_vm *vm);
++static struct its_device *vpe_proxy_dev;
++static DEFINE_RAW_SPINLOCK(vpe_proxy_dev_lock);
 +
- #endif
+ static LIST_HEAD(its_nodes);
+ static DEFINE_SPINLOCK(its_lock);
+ static struct rdists *gic_rdists;
+@@ -2074,6 +2077,14 @@ static int its_msi_prepare(struct irq_domain *domain, struct device *dev,
+ 	msi_info = msi_get_domain_info(domain);
+ 	its = msi_info->data;
+ 
++	if (its->is_v4 && !gic_rdists->has_direct_lpi &&
++	    dev_id == vpe_proxy_dev->device_id) {
++		/* Bad luck. Get yourself a better implementation */
++		WARN_ONCE(1, "DevId %x clashes with GICv4 VPE proxy device\n",
++			  dev_id);
++		return -EINVAL;
++	}
++
+ 	its_dev = its_find_device(its, dev_id);
+ 	if (its_dev) {
+ 		/*
+@@ -2318,10 +2329,38 @@ static int its_vpe_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
+ static void its_vpe_send_inv(struct irq_data *d)
+ {
+ 	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+-	void __iomem *rdbase;
+ 
+-	rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
+-	gic_write_invlpir(d->hwirq, rdbase + GICR_INVLPIR);
++	if (gic_rdists->has_direct_lpi) {
++		void __iomem *rdbase;
++
++		rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
++		gic_write_invlpir(d->hwirq, rdbase + GICR_INVLPIR);
++	} else {
++		/*
++		 * This is insane.
++		 *
++		 * If a GICv4 doesn't implement Direct LPIs, the only
++		 * way to perform an invalidate is to use a fake
++		 * device to issue a MAP/INV/UNMAP sequence. Since
++		 * each of these commands has a sync operation, this
++		 * is really fast. Not.
++		 *
++		 * We always use event 0, and thus serialize all VPE
++		 * invalidations in the system.
++		 *
++		 * Broken by design(tm).
++		 */
++		unsigned long flags;
++
++		raw_spin_lock_irqsave(&vpe_proxy_dev_lock, flags);
++
++		vpe_proxy_dev->event_map.col_map[0] = vpe->col_idx;
++		its_send_mapti(vpe_proxy_dev, vpe->vpe_db_lpi, 0);
++		its_send_inv(vpe_proxy_dev, 0);
++		its_send_discard(vpe_proxy_dev, 0);
++
++		raw_spin_unlock_irqrestore(&vpe_proxy_dev_lock, flags);
++	}
+ }
+ 
+ static void its_vpe_mask_irq(struct irq_data *d)
+@@ -2616,6 +2655,27 @@ static int its_init_domain(struct fwnode_handle *handle, struct its_node *its)
+ 
+ static int its_init_vpe_domain(void)
+ {
++	struct its_node *its;
++	u32 devid;
++
++	if (gic_rdists->has_direct_lpi) {
++		pr_info("ITS: Using DirectLPI for VPE invalidation\n");
++		return 0;
++	}
++
++	/* Any ITS will do, even if not v4 */
++	its = list_first_entry(&its_nodes, struct its_node, entry);
++
++	/* Use the last possible DevID */
++	devid = GENMASK(its->device_ids - 1, 0);
++	vpe_proxy_dev = its_create_device(its, devid, 1);
++	if (!vpe_proxy_dev) {
++		pr_err("ITS: Can't allocate GICv4 proxy device\n");
++		return -ENODEV;
++	}
++
++	pr_info("ITS: Allocated DevID %x as GICv4 proxy device\n", devid);
++
+ 	return 0;
+ }
+ 
 -- 
 2.11.0
