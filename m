@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 21/52] irqchip/gic-v3-its: Add VPE irq domain [de]activation
-Date: Wed, 28 Jun 2017 16:03:40 +0100
-Message-ID: <20170628150411.15846-22-marc.zyngier@arm.com>
+Subject: [PATCH v2 26/52] irqchip/gic-v3-its: Add VPE interrupt masking
+Date: Wed, 28 Jun 2017 16:03:45 +0100
+Message-ID: <20170628150411.15846-27-marc.zyngier@arm.com>
 References: <20170628150411.15846-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C357E41260
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2DFA43C75
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rbhXaPS-PjW0 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jun 2017 11:05:05 -0400 (EDT)
+ with ESMTP id 3G-9VUjalN9A for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jun 2017 11:05:14 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 526D943C70
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A749849C2A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:12 -0400 (EDT)
 In-Reply-To: <20170628150411.15846-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,159 +31,97 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On activation, a VPE is mapped using the VMAPP command, followed
-by a VINVALL for a good measure. On deactivation, the VPE is
-simply unmapped.
+When masking/unmasking a doorbell interrupt, it is necessary
+to issue an invalidation to the corresponding redistributor.
+We use the DirectLPI feature by writting directly to the corresponding
+redistributor.
 
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 102 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 102 insertions(+)
+ arch/arm/include/asm/arch_gicv3.h   |  5 +++++
+ arch/arm64/include/asm/arch_gicv3.h |  1 +
+ drivers/irqchip/irq-gic-v3-its.c    | 26 +++++++++++++++++++++++++-
+ 3 files changed, 31 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm/include/asm/arch_gicv3.h b/arch/arm/include/asm/arch_gicv3.h
+index 8d45e88feac9..0735888fe42e 100644
+--- a/arch/arm/include/asm/arch_gicv3.h
++++ b/arch/arm/include/asm/arch_gicv3.h
+@@ -276,6 +276,11 @@ static inline u64 __gic_readq_nonatomic(const volatile void __iomem *addr)
+ #define gicr_write_pendbaser(v, c)	__gic_writeq_nonatomic(v, c)
+ 
+ /*
++ * GICR_INVLPIR - only the lower bits are significant
++ */
++#define gic_write_invlpir(v, c)		writel_relaxed(lower_32_bits(v), c)
++
++/*
+  * GITS_TYPER is an ID register and doesn't need atomicity.
+  */
+ #define gits_read_typer(c)		__gic_readq_nonatomic(c)
+diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
+index 0d2a53457c30..019128dd37e4 100644
+--- a/arch/arm64/include/asm/arch_gicv3.h
++++ b/arch/arm64/include/asm/arch_gicv3.h
+@@ -116,6 +116,7 @@ static inline void gic_write_bpr1(u32 val)
+ 
+ #define gic_read_typer(c)		readq_relaxed(c)
+ #define gic_write_irouter(v, c)		writeq_relaxed(v, c)
++#define gic_write_invlpir(v, c)		writeq_relaxed(v, c)
+ 
+ #define gic_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
+ 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 58f3b19ec462..276602efdfa0 100644
+index 281eed031e01..64893f0427f2 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -217,6 +217,16 @@ struct its_cmd_desc {
+@@ -969,12 +969,12 @@ static inline u32 its_get_event_id(struct irq_data *d)
  
- 		struct {
- 			struct its_vpe *vpe;
-+		} its_vinvall_cmd;
-+
-+		struct {
-+			struct its_vpe *vpe;
-+			struct its_collection *col;
-+			bool valid;
-+		} its_vmapp_cmd;
-+
-+		struct {
-+			struct its_vpe *vpe;
- 			struct its_device *dev;
- 			u32 virt_id;
- 			u32 event_id;
-@@ -320,6 +330,16 @@ static void its_encode_db_valid(struct its_cmd_block *cmd, bool db_valid)
- 	its_mask_encode(&cmd->raw_cmd[2], db_valid, 0, 0);
- }
- 
-+static void its_encode_vpt_addr(struct its_cmd_block *cmd, u64 vpt_pa)
-+{
-+	its_mask_encode(&cmd->raw_cmd[3], vpt_pa >> 16, 50, 16);
-+}
-+
-+static void its_encode_vpt_size(struct its_cmd_block *cmd, u8 vpt_size)
-+{
-+	its_mask_encode(&cmd->raw_cmd[3], vpt_size, 4, 0);
-+}
-+
- static inline void its_fixup_cmd(struct its_cmd_block *cmd)
+ static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
  {
- 	/* Let's fixup BE commands */
-@@ -478,6 +498,36 @@ static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
- 	return NULL;
+-	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+ 	irq_hw_number_t hwirq;
+ 	struct page *prop_page;
+ 	u8 *cfg;
+ 
+ 	if (irqd_is_forwarded_to_vcpu(d)) {
++		struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+ 		u32 event = its_get_event_id(d);
+ 
+ 		prop_page = its_dev->event_map.vm->vprop_page;
+@@ -2315,8 +2315,32 @@ static int its_vpe_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
+ 	}
  }
  
-+static struct its_vpe *its_build_vinvall_cmd(struct its_cmd_block *cmd,
-+					     struct its_cmd_desc *desc)
-+{
-+	its_encode_cmd(cmd, GITS_CMD_VINVALL);
-+	its_encode_vpeid(cmd, desc->its_vinvall_cmd.vpe->vpe_id);
-+
-+	its_fixup_cmd(cmd);
-+
-+	return desc->its_vinvall_cmd.vpe;
-+}
-+
-+static struct its_vpe *its_build_vmapp_cmd(struct its_cmd_block *cmd,
-+					   struct its_cmd_desc *desc)
-+{
-+	unsigned long vpt_addr;
-+
-+	vpt_addr = virt_to_phys(page_address(desc->its_vmapp_cmd.vpe->vpt_page));
-+
-+	its_encode_cmd(cmd, GITS_CMD_VMAPP);
-+	its_encode_vpeid(cmd, desc->its_vmapp_cmd.vpe->vpe_id);
-+	its_encode_valid(cmd, desc->its_vmapp_cmd.valid);
-+	its_encode_target(cmd, desc->its_vmapp_cmd.col->target_address);
-+	its_encode_vpt_addr(cmd, vpt_addr);
-+	its_encode_vpt_size(cmd, LPI_NRBITS - 1);
-+
-+	its_fixup_cmd(cmd);
-+
-+	return desc->its_vmapp_cmd.vpe;
-+}
-+
- static struct its_vpe *its_build_vmapti_cmd(struct its_cmd_block *cmd,
- 					    struct its_cmd_desc *desc)
- {
-@@ -799,6 +849,37 @@ static void its_send_vmovi(struct its_device *dev, u32 id)
- 	its_send_single_vcommand(dev->its, its_build_vmovi_cmd, &desc);
- }
- 
-+static void its_send_vmapp(struct its_vpe *vpe, bool valid)
-+{
-+	struct its_cmd_desc desc;
-+	struct its_node *its;
-+
-+	desc.its_vmapp_cmd.vpe = vpe;
-+	desc.its_vmapp_cmd.valid = valid;
-+
-+	list_for_each_entry(its, &its_nodes, entry) {
-+		if (!its->is_v4)
-+			continue;
-+
-+		desc.its_vmapp_cmd.col = &its->collections[vpe->col_idx];
-+		its_send_single_vcommand(its, its_build_vmapp_cmd, &desc);
-+	}
-+}
-+
-+static void its_send_vinvall(struct its_vpe *vpe)
-+{
-+	struct its_cmd_desc desc;
-+	struct its_node *its;
-+
-+	desc.its_vinvall_cmd.vpe = vpe;
-+
-+	list_for_each_entry(its, &its_nodes, entry) {
-+		if (!its->is_v4)
-+			continue;
-+		its_send_single_vcommand(its, its_build_vinvall_cmd, &desc);
-+	}
-+}
-+
- /*
-  * irqchip functions - assumes MSI, mostly.
-  */
-@@ -2194,9 +2275,30 @@ static int its_vpe_irq_domain_alloc(struct irq_domain *domain, unsigned int virq
- 	return err;
- }
- 
-+static void its_vpe_irq_domain_activate(struct irq_domain *domain,
-+					struct irq_data *d)
++static void its_vpe_send_inv(struct irq_data *d)
 +{
 +	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
++	void __iomem *rdbase;
 +
-+	/* Map the VPE to the first possible CPU */
-+	vpe->col_idx = cpumask_first(cpu_online_mask);
-+	its_send_vmapp(vpe, true);
-+	its_send_vinvall(vpe);
++	rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
++	gic_write_invlpir(d->hwirq, rdbase + GICR_INVLPIR);
 +}
 +
-+static void its_vpe_irq_domain_deactivate(struct irq_domain *domain,
-+					  struct irq_data *d)
++static void its_vpe_mask_irq(struct irq_data *d)
 +{
-+	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-+
-+	its_send_vmapp(vpe, false);
++	lpi_write_config(d, LPI_PROP_ENABLED, 0);
++	its_vpe_send_inv(d);
 +}
 +
- static const struct irq_domain_ops its_vpe_domain_ops = {
- 	.alloc			= its_vpe_irq_domain_alloc,
- 	.free			= its_vpe_irq_domain_free,
-+	.activate		= its_vpe_irq_domain_activate,
-+	.deactivate		= its_vpe_irq_domain_deactivate,
++static void its_vpe_unmask_irq(struct irq_data *d)
++{
++	lpi_write_config(d, 0, LPI_PROP_ENABLED);
++	its_vpe_send_inv(d);
++}
++
+ static struct irq_chip its_vpe_irq_chip = {
+ 	.name			= "GICv4-vpe",
++	.irq_mask		= its_vpe_mask_irq,
++	.irq_unmask		= its_vpe_unmask_irq,
++	.irq_eoi		= irq_chip_eoi_parent,
+ 	.irq_set_affinity	= its_vpe_set_affinity,
+ 	.irq_set_vcpu_affinity	= its_vpe_set_vcpu_affinity,
  };
- 
- static int its_force_quiescent(void __iomem *base)
 -- 
 2.11.0
