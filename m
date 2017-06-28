@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 11/52] irqchip/gic-v3-its: Rework LPI freeing
-Date: Wed, 28 Jun 2017 16:03:30 +0100
-Message-ID: <20170628150411.15846-12-marc.zyngier@arm.com>
+Subject: [PATCH v2 13/52] irqchip/gic-v3-its: Generalize LPI configuration
+Date: Wed, 28 Jun 2017 16:03:32 +0100
+Message-ID: <20170628150411.15846-14-marc.zyngier@arm.com>
 References: <20170628150411.15846-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 45ECD40EFD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AF07540EFE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mkr4UDPimT6P for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jun 2017 11:04:48 -0400 (EDT)
+ with ESMTP id cna8YwT1egzO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jun 2017 11:04:50 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBC0B40F9F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AA3840EF9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:50 -0400 (EDT)
 In-Reply-To: <20170628150411.15846-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,60 +31,71 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Rework LPI deallocation so that it can be reused by the v4 support
-code.
+We're are going to need to change a bit more than just the enable
+bit in the LPI property table in the future. So let's change the
+LPI configuration funtion to take a set of bits to be cleared,
+and a set of bits to be set.
+
+This way, we'll be able to use it when a guest updates an LPI
+property (priority, for example).
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index d6f9ccb36f4d..3011403438c3 100644
+index 40682f2a5e1f..25e53958a618 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -873,16 +873,15 @@ static unsigned long *its_lpi_alloc_chunks(int nr_irqs, int *base, int *nr_ids)
- 	return bitmap;
+@@ -680,17 +680,18 @@ static inline u32 its_get_event_id(struct irq_data *d)
+ 	return d->hwirq - its_dev->event_map.lpi_base;
  }
  
--static void its_lpi_free(struct event_lpi_map *map)
-+static void its_lpi_free_chunks(unsigned long *bitmap, int base, int nr_ids)
+-static void lpi_set_config(struct irq_data *d, bool enable)
++static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
  {
--	int base = map->lpi_base;
--	int nr_ids = map->nr_lpis;
- 	int lpi;
+ 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+ 	irq_hw_number_t hwirq = d->hwirq;
+-	u32 id = its_get_event_id(d);
+-	u8 *cfg = page_address(gic_rdists->prop_page) + hwirq - 8192;
++	struct page *prop_page;
++	u8 *cfg;
  
- 	spin_lock(&lpi_lock);
- 
- 	for (lpi = base; lpi < (base + nr_ids); lpi += IRQS_PER_CHUNK) {
- 		int chunk = its_lpi_to_chunk(lpi);
+-	if (enable)
+-		*cfg |= LPI_PROP_ENABLED;
+-	else
+-		*cfg &= ~LPI_PROP_ENABLED;
++	prop_page = gic_rdists->prop_page;
 +
- 		BUG_ON(chunk > lpi_chunks);
- 		if (test_bit(chunk, lpi_bitmap)) {
- 			clear_bit(chunk, lpi_bitmap);
-@@ -893,8 +892,7 @@ static void its_lpi_free(struct event_lpi_map *map)
++	cfg = page_address(prop_page) + hwirq - 8192;
++	*cfg &= ~clr;
++	*cfg |= set;
  
- 	spin_unlock(&lpi_lock);
- 
--	kfree(map->lpi_map);
--	kfree(map->col_map);
-+	kfree(bitmap);
+ 	/*
+ 	 * Make the above write visible to the redistributors.
+@@ -701,17 +702,17 @@ static void lpi_set_config(struct irq_data *d, bool enable)
+ 		gic_flush_dcache_to_poc(cfg, sizeof(*cfg));
+ 	else
+ 		dsb(ishst);
+-	its_send_inv(its_dev, id);
++	its_send_inv(its_dev, its_get_event_id(d));
  }
  
- static struct page *its_allocate_prop_table(gfp_t gfp_flags)
-@@ -1665,7 +1663,10 @@ static void its_irq_domain_free(struct irq_domain *domain, unsigned int virq,
- 	/* If all interrupts have been freed, start mopping the floor */
- 	if (bitmap_empty(its_dev->event_map.lpi_map,
- 			 its_dev->event_map.nr_lpis)) {
--		its_lpi_free(&its_dev->event_map);
-+		its_lpi_free_chunks(its_dev->event_map.lpi_map,
-+				    its_dev->event_map.lpi_base,
-+				    its_dev->event_map.nr_lpis);
-+		kfree(its_dev->event_map.col_map);
+ static void its_mask_irq(struct irq_data *d)
+ {
+-	lpi_set_config(d, false);
++	lpi_update_config(d, LPI_PROP_ENABLED, 0);
+ }
  
- 		/* Unmap device/itt */
- 		its_send_mapd(its_dev, 0);
+ static void its_unmask_irq(struct irq_data *d)
+ {
+-	lpi_set_config(d, true);
++	lpi_update_config(d, 0, LPI_PROP_ENABLED);
+ }
+ 
+ static int its_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
 -- 
 2.11.0
