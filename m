@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 38/52] KVM: arm/arm64: GICv4: Wire init/teardown of per-VM
- support
-Date: Wed, 28 Jun 2017 16:03:57 +0100
-Message-ID: <20170628150411.15846-39-marc.zyngier@arm.com>
+Subject: [PATCH v2 35/52] KVM: arm/arm64: vgic: Move kvm_vgic_destroy call
+ around
+Date: Wed, 28 Jun 2017 16:03:54 +0100
+Message-ID: <20170628150411.15846-36-marc.zyngier@arm.com>
 References: <20170628150411.15846-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A43940EFE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9FF349C1B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WopKCHJQurfR for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jun 2017 11:05:33 -0400 (EDT)
+ with ESMTP id uQKkDlanEsTp for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jun 2017 11:05:29 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3ED9849C43
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F46C41172
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:28 -0400 (EDT)
 In-Reply-To: <20170628150411.15846-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,43 +32,39 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Should the HW support GICv4 and an ITS being associated with this
-VM, let's init the its_vm and its_vpe structures.
+The way we call kvm_vgic_destroy is a bit bizarre. We call it
+*after* having freed the vcpus, which sort of defeats the point
+of cleaning up things before that point.
+
+Let's move kvm_vgic_destroy towards the beginning of kvm_arch_destroy_vm,
+which seems more sensible.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-init.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ virt/kvm/arm/arm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 3a0b8999f011..0de1f0d986d4 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -285,8 +285,14 @@ int vgic_init(struct kvm *kvm)
- 	if (ret)
- 		goto out;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 7846a578db1a..ebab6c29e3be 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -177,6 +177,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ {
+ 	int i;
  
--	if (vgic_has_its(kvm))
-+	if (vgic_has_its(kvm)) {
- 		dist->msis_require_devid = true;
-+		if (kvm_vgic_global_state.has_gicv4) {
-+			ret = vgic_v4_init(kvm);
-+			if (ret)
-+				goto out;
-+		}
-+	}
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm)
- 		kvm_vgic_vcpu_enable(vcpu);
-@@ -323,6 +329,9 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- 
- 	kfree(dist->spis);
- 	dist->nr_spis = 0;
++	kvm_vgic_destroy(kvm);
 +
-+	if (kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm))
-+		vgic_v4_teardown(kvm);
+ 	free_percpu(kvm->arch.last_vcpu_ran);
+ 	kvm->arch.last_vcpu_ran = NULL;
+ 
+@@ -186,8 +188,6 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 			kvm->vcpus[i] = NULL;
+ 		}
+ 	}
+-
+-	kvm_vgic_destroy(kvm);
  }
  
- void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
 -- 
 2.11.0
