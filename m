@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 07/52] irqchip/gic-v3-its: Implement irq_set_irqchip_state
- for pending state
-Date: Wed, 28 Jun 2017 16:03:26 +0100
-Message-ID: <20170628150411.15846-8-marc.zyngier@arm.com>
+Subject: [PATCH v2 06/52] irqchip/gic-v3-its: Macro-ize its_send_single_command
+Date: Wed, 28 Jun 2017 16:03:25 +0100
+Message-ID: <20170628150411.15846-7-marc.zyngier@arm.com>
 References: <20170628150411.15846-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD69D43C7B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F0C740EFE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zKhH9GYKCZOO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jun 2017 11:04:40 -0400 (EDT)
+ with ESMTP id UX9zuDIiOAO3 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jun 2017 11:04:39 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5722D4113E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EA3041002
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:38 -0400 (EDT)
 In-Reply-To: <20170628150411.15846-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,132 +31,121 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Allow the pending state of an LPI to be set or cleared via
-irq_set_irqchip_state.
+Most ITS commands do operate on a collection object, and require
+a SYNC command to be performed on that collection in order to
+guarantee the execution of the first command.
 
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+With GICv4 ITS, another set of commands perform similar operations
+on a VPE object, and a VSYNC operations must be executed to guarantee
+their execution.
+
+Given the similarities (post a command, perform a synchronization
+operation on a sync object), it makes sense to reuse the same
+mechanism for both class of commands.
+
+Let's start with turning its_send_single_command into a huge macro
+that performs the bulk of the work, and a set of helpers that
+make this macro usable for the GICv3 ITS commands.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 78 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+ drivers/irqchip/irq-gic-v3-its.c | 84 ++++++++++++++++++++++------------------
+ 1 file changed, 47 insertions(+), 37 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index bbf7bb89aa62..391b87572549 100644
+index 006a5259609d..bbf7bb89aa62 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -169,6 +169,11 @@ struct its_cmd_desc {
- 		struct {
- 			struct its_device *dev;
- 			u32 event_id;
-+		} its_clear_cmd;
-+
-+		struct {
-+			struct its_device *dev;
-+			u32 event_id;
- 		} its_int_cmd;
- 
- 		struct {
-@@ -382,6 +387,40 @@ static struct its_collection *its_build_inv_cmd(struct its_cmd_block *cmd,
- 	return col;
+@@ -490,43 +490,53 @@ static void its_wait_for_range_completion(struct its_node *its,
+ 	}
  }
  
-+static struct its_collection *its_build_int_cmd(struct its_cmd_block *cmd,
-+						struct its_cmd_desc *desc)
-+{
-+	struct its_collection *col;
-+
-+	col = dev_event_to_col(desc->its_int_cmd.dev,
-+			       desc->its_int_cmd.event_id);
-+
-+	its_encode_cmd(cmd, GITS_CMD_INT);
-+	its_encode_devid(cmd, desc->its_int_cmd.dev->device_id);
-+	its_encode_event_id(cmd, desc->its_int_cmd.event_id);
-+
-+	its_fixup_cmd(cmd);
-+
-+	return col;
+-static void its_send_single_command(struct its_node *its,
+-				    its_cmd_builder_t builder,
+-				    struct its_cmd_desc *desc)
+-{
+-	struct its_cmd_block *cmd, *sync_cmd, *next_cmd;
+-	struct its_collection *sync_col;
+-	unsigned long flags;
+-
+-	raw_spin_lock_irqsave(&its->lock, flags);
+-
+-	cmd = its_allocate_entry(its);
+-	if (!cmd) {		/* We're soooooo screewed... */
+-		pr_err_ratelimited("ITS can't allocate, dropping command\n");
+-		raw_spin_unlock_irqrestore(&its->lock, flags);
+-		return;
+-	}
+-	sync_col = builder(cmd, desc);
+-	its_flush_cmd(its, cmd);
+-
+-	if (sync_col) {
+-		sync_cmd = its_allocate_entry(its);
+-		if (!sync_cmd) {
+-			pr_err_ratelimited("ITS can't SYNC, skipping\n");
+-			goto post;
+-		}
+-		its_encode_cmd(sync_cmd, GITS_CMD_SYNC);
+-		its_encode_target(sync_cmd, sync_col->target_address);
+-		its_fixup_cmd(sync_cmd);
+-		its_flush_cmd(its, sync_cmd);
+-	}
+-
+-post:
+-	next_cmd = its_post_commands(its);
+-	raw_spin_unlock_irqrestore(&its->lock, flags);
+-
+-	its_wait_for_range_completion(its, cmd, next_cmd);
+-}
++/* Warning, macro hell follows */
++#define BUILD_SINGLE_CMD_FUNC(name, buildtype, synctype, buildfn)	\
++void name(struct its_node *its,						\
++	  buildtype builder,						\
++	  struct its_cmd_desc *desc)					\
++{									\
++	struct its_cmd_block *cmd, *sync_cmd, *next_cmd;		\
++	synctype *sync_obj;						\
++	unsigned long flags;						\
++									\
++	raw_spin_lock_irqsave(&its->lock, flags);			\
++									\
++	cmd = its_allocate_entry(its);					\
++	if (!cmd) {		/* We're soooooo screewed... */		\
++		raw_spin_unlock_irqrestore(&its->lock, flags);		\
++		return;							\
++	}								\
++	sync_obj = builder(cmd, desc);					\
++	its_flush_cmd(its, cmd);					\
++									\
++	if (sync_obj) {							\
++		sync_cmd = its_allocate_entry(its);			\
++		if (!sync_cmd)						\
++			goto post;					\
++									\
++		buildfn(sync_cmd, sync_obj);				\
++		its_flush_cmd(its, sync_cmd);				\
++	}								\
++									\
++post:									\
++	next_cmd = its_post_commands(its);				\
++	raw_spin_unlock_irqrestore(&its->lock, flags);			\
++									\
++	its_wait_for_range_completion(its, cmd, next_cmd);		\
 +}
 +
-+static struct its_collection *its_build_clear_cmd(struct its_cmd_block *cmd,
-+						  struct its_cmd_desc *desc)
++static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
++			       struct its_collection *sync_col)
 +{
-+	struct its_collection *col;
++	its_encode_cmd(sync_cmd, GITS_CMD_SYNC);
++	its_encode_target(sync_cmd, sync_col->target_address);
 +
-+	col = dev_event_to_col(desc->its_clear_cmd.dev,
-+			       desc->its_clear_cmd.event_id);
-+
-+	its_encode_cmd(cmd, GITS_CMD_CLEAR);
-+	its_encode_devid(cmd, desc->its_clear_cmd.dev->device_id);
-+	its_encode_event_id(cmd, desc->its_clear_cmd.event_id);
-+
-+	its_fixup_cmd(cmd);
-+
-+	return col;
++	its_fixup_cmd(sync_cmd);
 +}
 +
- static struct its_collection *its_build_invall_cmd(struct its_cmd_block *cmd,
- 						   struct its_cmd_desc *desc)
- {
-@@ -538,6 +577,26 @@ static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
- static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t,
- 			     struct its_collection, its_build_sync_cmd)
++static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t,
++			     struct its_collection, its_build_sync_cmd)
  
-+static void its_send_int(struct its_device *dev, u32 event_id)
-+{
-+	struct its_cmd_desc desc;
-+
-+	desc.its_int_cmd.dev = dev;
-+	desc.its_int_cmd.event_id = event_id;
-+
-+	its_send_single_command(dev->its, its_build_int_cmd, &desc);
-+}
-+
-+static void its_send_clear(struct its_device *dev, u32 event_id)
-+{
-+	struct its_cmd_desc desc;
-+
-+	desc.its_clear_cmd.dev = dev;
-+	desc.its_clear_cmd.event_id = event_id;
-+
-+	its_send_single_command(dev->its, its_build_clear_cmd, &desc);
-+}
-+
  static void its_send_inv(struct its_device *dev, u32 event_id)
  {
- 	struct its_cmd_desc desc;
-@@ -701,6 +760,24 @@ static void its_irq_compose_msi_msg(struct irq_data *d, struct msi_msg *msg)
- 	iommu_dma_map_msi_msg(d->irq, msg);
- }
- 
-+static int its_irq_set_irqchip_state(struct irq_data *d,
-+				     enum irqchip_irq_state which,
-+				     bool state)
-+{
-+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-+	u32 event = its_get_event_id(d);
-+
-+	if (which != IRQCHIP_STATE_PENDING)
-+		return -EINVAL;
-+
-+	if (state)
-+		its_send_int(its_dev, event);
-+	else
-+		its_send_clear(its_dev, event);
-+
-+	return 0;
-+}
-+
- static struct irq_chip its_irq_chip = {
- 	.name			= "ITS",
- 	.irq_mask		= its_mask_irq,
-@@ -708,6 +785,7 @@ static struct irq_chip its_irq_chip = {
- 	.irq_eoi		= irq_chip_eoi_parent,
- 	.irq_set_affinity	= its_set_affinity,
- 	.irq_compose_msi_msg	= its_irq_compose_msi_msg,
-+	.irq_set_irqchip_state	= its_irq_set_irqchip_state,
- };
- 
- /*
 -- 
 2.11.0
