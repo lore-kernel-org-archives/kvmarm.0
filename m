@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 44/52] KVM: arm/arm64: GICv4: Handle MOVALL applied to a vPE
-Date: Wed, 28 Jun 2017 16:04:03 +0100
-Message-ID: <20170628150411.15846-45-marc.zyngier@arm.com>
+Subject: [PATCH v2 46/52] KVM: arm/arm64: GICv4: Handle INVALL applied to a vPE
+Date: Wed, 28 Jun 2017 16:04:05 +0100
+Message-ID: <20170628150411.15846-47-marc.zyngier@arm.com>
 References: <20170628150411.15846-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D79A143C9B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE65243C9B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QDL5b2ihbs1M for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jun 2017 11:05:44 -0400 (EDT)
+ with ESMTP id B5QGjJt4rNJL for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jun 2017 11:05:46 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4618449C3A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C70C49C3A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:46 -0400 (EDT)
 In-Reply-To: <20170628150411.15846-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,75 +31,78 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The current implementation of MOVALL doesn't allow us to call
-into the core ITS code as we hold a number of spinlocks.
-
-Let's try a method used in other parts of the code, were we copy
-the intids of the candicate interrupts, and then do whatever
-we need to do with them outside of the critical section.
-
-This allows us to move the interrupts one by one, at the expense
-of a bit of CPU time. Who cares? MOVALL is such a stupid command
-anyway...
+Since when updating the properties one LPI at a time, there is no
+need to perform an INV each time we read one. Instead, we rely
+on the final VINVALL that gets sent to the ITS to do the work.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 27 ++++++++++++++++++++-------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 21a7b3f00107..b40f46e5a79d 100644
+index 2015246ab9f9..b0790ca5e933 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1147,11 +1147,12 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
- static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
- 				      u64 *its_cmd)
+@@ -38,7 +38,7 @@ static int vgic_its_save_tables_v0(struct vgic_its *its);
+ static int vgic_its_restore_tables_v0(struct vgic_its *its);
+ static int vgic_its_commit_v0(struct vgic_its *its);
+ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+-			     struct kvm_vcpu *filter_vcpu);
++			     struct kvm_vcpu *filter_vcpu, bool needs_inv);
+ 
+ /*
+  * Creates a new (reference to a) struct vgic_irq for a given LPI.
+@@ -106,7 +106,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	 * However we only have those structs for mapped IRQs, so we read in
+ 	 * the respective config data from memory here upon mapping the LPI.
+ 	 */
+-	ret = update_lpi_config(kvm, irq, NULL);
++	ret = update_lpi_config(kvm, irq, NULL, false);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+@@ -274,7 +274,7 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
+  * VCPU. Unconditionally applies if filter_vcpu is NULL.
+  */
+ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+-			     struct kvm_vcpu *filter_vcpu)
++			     struct kvm_vcpu *filter_vcpu, bool needs_inv)
  {
--	struct vgic_dist *dist = &kvm->arch.vgic;
- 	u32 target1_addr = its_cmd_get_target_addr(its_cmd);
- 	u32 target2_addr = its_cmd_mask_field(its_cmd, 3, 16, 32);
- 	struct kvm_vcpu *vcpu1, *vcpu2;
- 	struct vgic_irq *irq;
-+	u32 *intids;
-+	int irq_count, i;
+ 	u64 propbase = GICR_PROPBASER_ADDRESS(kvm->arch.vgic.propbaser);
+ 	u8 prop;
+@@ -298,7 +298,7 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+ 	}
  
- 	if (target1_addr >= atomic_read(&kvm->online_vcpus) ||
- 	    target2_addr >= atomic_read(&kvm->online_vcpus))
-@@ -1163,19 +1164,31 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
- 	vcpu1 = kvm_get_vcpu(kvm, target1_addr);
- 	vcpu2 = kvm_get_vcpu(kvm, target2_addr);
+ 	if (irq->hw)
+-		return its_prop_update_vlpi(irq->host_irq, prop, true);
++		return its_prop_update_vlpi(irq->host_irq, prop, needs_inv);
  
--	spin_lock(&dist->lpi_list_lock);
-+	irq_count = vgic_copy_lpi_list(vcpu1, &intids);
-+	if (irq_count < 0)
-+		return irq_count;
+ 	return 0;
+ }
+@@ -1095,7 +1095,7 @@ static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
+ 	if (!ite)
+ 		return E_ITS_INV_UNMAPPED_INTERRUPT;
  
--	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
--		spin_lock(&irq->irq_lock);
-+	for (i = 0; i < irq_count; i++) {
-+		irq = vgic_get_irq(kvm, NULL, intids[i]);
-+		if (!irq)
-+			continue;
+-	return update_lpi_config(kvm, ite->irq, NULL);
++	return update_lpi_config(kvm, ite->irq, NULL, true);
+ }
  
- 		if (irq->target_vcpu == vcpu1)
- 			irq->target_vcpu = vcpu2;
+ /*
+@@ -1130,12 +1130,15 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
+ 		irq = vgic_get_irq(kvm, NULL, intids[i]);
+ 		if (!irq)
+ 			continue;
+-		update_lpi_config(kvm, irq, vcpu);
++		update_lpi_config(kvm, irq, vcpu, false);
+ 		vgic_put_irq(kvm, irq);
+ 	}
  
--		spin_unlock(&irq->irq_lock);
--	}
-+		if (irq->hw) {
-+			struct its_vlpi_map map;
+ 	kfree(intids);
  
--	spin_unlock(&dist->lpi_list_lock);
-+			if (!its_get_vlpi(irq->host_irq, &map)) {
-+				map.vpe_idx = vcpu2->vcpu_id;
-+				its_map_vlpi(irq->host_irq, &map);
-+			}
-+		}
- 
-+		vgic_put_irq(kvm, irq);
-+	}
++	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm)
++		its_invall_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe);
 +
-+	kfree(intids);
  	return 0;
  }
  
