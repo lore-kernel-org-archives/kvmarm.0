@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 06/52] irqchip/gic-v3-its: Macro-ize its_send_single_command
-Date: Wed, 28 Jun 2017 16:03:25 +0100
-Message-ID: <20170628150411.15846-7-marc.zyngier@arm.com>
+Subject: [PATCH v2 08/52] irqchip/gic-v3-its: Split out property table
+ allocation
+Date: Wed, 28 Jun 2017 16:03:27 +0100
+Message-ID: <20170628150411.15846-9-marc.zyngier@arm.com>
 References: <20170628150411.15846-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F0C740EFE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B649E40DCE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UX9zuDIiOAO3 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jun 2017 11:04:39 -0400 (EDT)
+ with ESMTP id YiTezgSifaca for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jun 2017 11:04:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EA3041002
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CAFCB41058
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:41 -0400 (EDT)
 In-Reply-To: <20170628150411.15846-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,121 +32,69 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Most ITS commands do operate on a collection object, and require
-a SYNC command to be performed on that collection in order to
-guarantee the execution of the first command.
+Move the LPI property table allocation into its own function, as
+this is going to be required for those associated with VMs in
+the future.
 
-With GICv4 ITS, another set of commands perform similar operations
-on a VPE object, and a VSYNC operations must be executed to guarantee
-their execution.
-
-Given the similarities (post a command, perform a synchronization
-operation on a sync object), it makes sense to reuse the same
-mechanism for both class of commands.
-
-Let's start with turning its_send_single_command into a huge macro
-that performs the bulk of the work, and a set of helpers that
-make this macro usable for the GICv3 ITS commands.
-
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 84 ++++++++++++++++++++++------------------
- 1 file changed, 47 insertions(+), 37 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 006a5259609d..bbf7bb89aa62 100644
+index 391b87572549..2feecdf40216 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -490,43 +490,53 @@ static void its_wait_for_range_completion(struct its_node *its,
- 	}
+@@ -897,15 +897,31 @@ static void its_lpi_free(struct event_lpi_map *map)
+ 	kfree(map->col_map);
  }
  
--static void its_send_single_command(struct its_node *its,
--				    its_cmd_builder_t builder,
--				    struct its_cmd_desc *desc)
--{
--	struct its_cmd_block *cmd, *sync_cmd, *next_cmd;
--	struct its_collection *sync_col;
--	unsigned long flags;
--
--	raw_spin_lock_irqsave(&its->lock, flags);
--
--	cmd = its_allocate_entry(its);
--	if (!cmd) {		/* We're soooooo screewed... */
--		pr_err_ratelimited("ITS can't allocate, dropping command\n");
--		raw_spin_unlock_irqrestore(&its->lock, flags);
--		return;
--	}
--	sync_col = builder(cmd, desc);
--	its_flush_cmd(its, cmd);
--
--	if (sync_col) {
--		sync_cmd = its_allocate_entry(its);
--		if (!sync_cmd) {
--			pr_err_ratelimited("ITS can't SYNC, skipping\n");
--			goto post;
--		}
--		its_encode_cmd(sync_cmd, GITS_CMD_SYNC);
--		its_encode_target(sync_cmd, sync_col->target_address);
--		its_fixup_cmd(sync_cmd);
--		its_flush_cmd(its, sync_cmd);
--	}
--
--post:
--	next_cmd = its_post_commands(its);
--	raw_spin_unlock_irqrestore(&its->lock, flags);
--
--	its_wait_for_range_completion(its, cmd, next_cmd);
--}
-+/* Warning, macro hell follows */
-+#define BUILD_SINGLE_CMD_FUNC(name, buildtype, synctype, buildfn)	\
-+void name(struct its_node *its,						\
-+	  buildtype builder,						\
-+	  struct its_cmd_desc *desc)					\
-+{									\
-+	struct its_cmd_block *cmd, *sync_cmd, *next_cmd;		\
-+	synctype *sync_obj;						\
-+	unsigned long flags;						\
-+									\
-+	raw_spin_lock_irqsave(&its->lock, flags);			\
-+									\
-+	cmd = its_allocate_entry(its);					\
-+	if (!cmd) {		/* We're soooooo screewed... */		\
-+		raw_spin_unlock_irqrestore(&its->lock, flags);		\
-+		return;							\
-+	}								\
-+	sync_obj = builder(cmd, desc);					\
-+	its_flush_cmd(its, cmd);					\
-+									\
-+	if (sync_obj) {							\
-+		sync_cmd = its_allocate_entry(its);			\
-+		if (!sync_cmd)						\
-+			goto post;					\
-+									\
-+		buildfn(sync_cmd, sync_obj);				\
-+		its_flush_cmd(its, sync_cmd);				\
-+	}								\
-+									\
-+post:									\
-+	next_cmd = its_post_commands(its);				\
-+	raw_spin_unlock_irqrestore(&its->lock, flags);			\
-+									\
-+	its_wait_for_range_completion(its, cmd, next_cmd);		\
-+}
-+
-+static void its_build_sync_cmd(struct its_cmd_block *sync_cmd,
-+			       struct its_collection *sync_col)
++static struct page *its_allocate_prop_table(gfp_t gfp_flags)
 +{
-+	its_encode_cmd(sync_cmd, GITS_CMD_SYNC);
-+	its_encode_target(sync_cmd, sync_col->target_address);
++	struct page *prop_page;
 +
-+	its_fixup_cmd(sync_cmd);
-+}
++	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
++	if (!prop_page)
++		return NULL;
 +
-+static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t,
-+			     struct its_collection, its_build_sync_cmd)
++	/* Priority 0xa0, Group-1, disabled */
++	memset(page_address(prop_page),
++	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
++	       LPI_PROPBASE_SZ);
++
++	/* Make sure the GIC will observe the written configuration */
++	gic_flush_dcache_to_poc(page_address(prop_page), LPI_PROPBASE_SZ);
  
- static void its_send_inv(struct its_device *dev, u32 event_id)
++	return prop_page;
++}
+ 
+ 
+ static int __init its_alloc_lpi_tables(void)
  {
+ 	phys_addr_t paddr;
+ 
+-	gic_rdists->prop_page = alloc_pages(GFP_NOWAIT,
+-					   get_order(LPI_PROPBASE_SZ));
++	gic_rdists->prop_page = its_allocate_prop_table(GFP_NOWAIT);
+ 	if (!gic_rdists->prop_page) {
+ 		pr_err("Failed to allocate PROPBASE\n");
+ 		return -ENOMEM;
+@@ -914,14 +930,6 @@ static int __init its_alloc_lpi_tables(void)
+ 	paddr = page_to_phys(gic_rdists->prop_page);
+ 	pr_info("GIC: using LPI property table @%pa\n", &paddr);
+ 
+-	/* Priority 0xa0, Group-1, disabled */
+-	memset(page_address(gic_rdists->prop_page),
+-	       LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1,
+-	       LPI_PROPBASE_SZ);
+-
+-	/* Make sure the GIC will observe the written configuration */
+-	gic_flush_dcache_to_poc(page_address(gic_rdists->prop_page), LPI_PROPBASE_SZ);
+-
+ 	return 0;
+ }
+ 
 -- 
 2.11.0
