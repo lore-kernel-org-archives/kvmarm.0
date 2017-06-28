@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 19/52] irqchip/gic-v3-its: Add VPE domain infrastructure
-Date: Wed, 28 Jun 2017 16:03:38 +0100
-Message-ID: <20170628150411.15846-20-marc.zyngier@arm.com>
+Subject: [PATCH v2 22/52] irqchip/gic-v3-its: Add VPENDBASER/VPROPBASER
+ accessors
+Date: Wed, 28 Jun 2017 16:03:41 +0100
+Message-ID: <20170628150411.15846-23-marc.zyngier@arm.com>
 References: <20170628150411.15846-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF7E943C7F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DCF9B43C9B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JYhssjz2NQqv for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jun 2017 11:05:04 -0400 (EDT)
+ with ESMTP id vkYhj7QuE9Sl for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jun 2017 11:05:07 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E798E49BF7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F014649C0F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:05 -0400 (EDT)
 In-Reply-To: <20170628150411.15846-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,70 +32,87 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add the basic GICv4 VPE (vcpu in GICv4 parlance) infrastructure
-(irqchip, irq domain) that is going to be populated in the following
-patches.
+V{PEND,PROP}BASER being 64bit registers, they need some ad-hoc
+accessors on 32bit, specially given that VPENDBASER contains
+a Valid bit, making the access a bit convoluted.
 
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ arch/arm/include/asm/arch_gicv3.h   | 28 ++++++++++++++++++++++++++++
+ arch/arm64/include/asm/arch_gicv3.h |  5 +++++
+ include/linux/irqchip/arm-gic-v3.h  |  5 +++++
+ 3 files changed, 38 insertions(+)
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 2e5e0499a0e6..0fd799c88d18 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -2023,6 +2023,13 @@ static const struct irq_domain_ops its_domain_ops = {
- 	.deactivate		= its_irq_domain_deactivate,
- };
+diff --git a/arch/arm/include/asm/arch_gicv3.h b/arch/arm/include/asm/arch_gicv3.h
+index 27475904e096..8d45e88feac9 100644
+--- a/arch/arm/include/asm/arch_gicv3.h
++++ b/arch/arm/include/asm/arch_gicv3.h
+@@ -291,5 +291,33 @@ static inline u64 __gic_readq_nonatomic(const volatile void __iomem *addr)
+  */
+ #define gits_write_cwriter(v, c)	__gic_writeq_nonatomic(v, c)
  
-+static struct irq_chip its_vpe_irq_chip = {
-+	.name			= "GICv4-vpe",
-+};
++/*
++ * GITS_VPROPBASER - hi and lo bits may be accessed independently.
++ */
++#define gits_write_vpropbaser(v, c)	__gic_writeq_nonatomic(v, c)
 +
-+static const struct irq_domain_ops its_vpe_domain_ops = {
-+};
-+
- static int its_force_quiescent(void __iomem *base)
- {
- 	u32 count = 1000000;	/* 1s */
-@@ -2139,6 +2146,11 @@ static int its_init_domain(struct fwnode_handle *handle, struct its_node *its)
- 	return 0;
- }
- 
-+static int its_init_vpe_domain(void)
++/*
++ * GITS_VPENDBASER - the Valid bit must be cleared before changing
++ * anything else.
++ */
++static inline void gits_write_vpendbaser(u64 val, void * __iomem addr)
 +{
-+	return 0;
-+}
++	u32 tmp;
 +
- static int __init its_compute_its_list_map(struct resource *res,
- 					   void __iomem *its_base)
- {
-@@ -2404,6 +2416,8 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
- 		    struct irq_domain *parent_domain)
- {
- 	struct device_node *of_node;
-+	struct its_node *its;
-+	bool has_v4 = false;
- 
- 	its_parent = parent_domain;
- 	of_node = to_of_node(handle);
-@@ -2421,5 +2435,15 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
- 	its_alloc_lpi_tables();
- 	its_lpi_init(rdists->id_bits);
- 
-+	list_for_each_entry(its, &its_nodes, entry)
-+		has_v4 |= its->is_v4;
-+
-+	if (has_v4 & rdists->has_vlpis) {
-+		if (its_init_vpe_domain()) {
-+			rdists->has_vlpis = false;
-+			pr_err("ITS: Disabling GICv4 support\n");
-+		}
++	tmp = readl_relaxed(addr + 4);
++	if (tmp & (GICR_VPENDBASER_Valid >> 32)) {
++		tmp &= ~(GICR_VPENDBASER_Valid >> 32);
++		writel_relaxed(tmp, addr + 4);
 +	}
 +
- 	return 0;
- }
++	/*
++	 * Use the fact that __gic_writeq_nonatomic writes the second
++	 * half of the 64bit quantity after the first.
++	 */
++	__gic_writeq_nonatomic(val, addr);
++}
++
++#define gits_read_vpendbaser(c)		__gic_readq_nonatomic(c)
++
+ #endif /* !__ASSEMBLY__ */
+ #endif /* !__ASM_ARCH_GICV3_H */
+diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
+index 8cef47fa2218..0d2a53457c30 100644
+--- a/arch/arm64/include/asm/arch_gicv3.h
++++ b/arch/arm64/include/asm/arch_gicv3.h
+@@ -133,5 +133,10 @@ static inline void gic_write_bpr1(u32 val)
+ #define gicr_write_pendbaser(v, c)	writeq_relaxed(v, c)
+ #define gicr_read_pendbaser(c)		readq_relaxed(c)
+ 
++#define gits_write_vpropbaser(v, c)	writeq_relaxed(v, c)
++
++#define gits_write_vpendbaser(v, c)	writeq_relaxed(v, c)
++#define gits_read_vpendbaser(c)		readq_relaxed(c)
++
+ #endif /* __ASSEMBLY__ */
+ #endif /* __ASM_ARCH_GICV3_H */
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 7c6fd8f3e36c..17ba0d732f12 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -212,6 +212,11 @@
+ #define LPI_PROP_GROUP1			(1 << 1)
+ #define LPI_PROP_ENABLED		(1 << 0)
+ 
++#define GICR_VPENDBASER_Dirty		(1ULL << 60)
++#define GICR_VPENDBASER_PendingLast	(1ULL << 61)
++#define GICR_VPENDBASER_IDAI		(1ULL << 62)
++#define GICR_VPENDBASER_Valid		(1ULL << 63)
++
+ /*
+  * ITS registers, offsets from ITS_base
+  */
 -- 
 2.11.0
