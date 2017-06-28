@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 30/52] irqchip/gic-v4: Add VPE command interface
-Date: Wed, 28 Jun 2017 16:03:49 +0100
-Message-ID: <20170628150411.15846-31-marc.zyngier@arm.com>
+Subject: [PATCH v2 31/52] irqchip/gic-v4: Add VLPI configuration interface
+Date: Wed, 28 Jun 2017 16:03:50 +0100
+Message-ID: <20170628150411.15846-32-marc.zyngier@arm.com>
 References: <20170628150411.15846-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B88740FA5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B4A640DF9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZaUk9lA0ai-i for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jun 2017 11:05:20 -0400 (EDT)
+ with ESMTP id u8duGbhYKrLt for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jun 2017 11:05:22 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D014649C25
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82D0949C26
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:05:21 -0400 (EDT)
 In-Reply-To: <20170628150411.15846-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,60 +31,78 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add the required interfaces to schedule a VPE and perform a
-VINVALL command.
+Add the required interfaces to map, unmap and update a VLPI.
 
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v4.c       | 25 +++++++++++++++++++++++++
- include/linux/irqchip/arm-gic-v4.h |  2 ++
- 2 files changed, 27 insertions(+)
+ drivers/irqchip/irq-gic-v4.c       | 42 ++++++++++++++++++++++++++++++++++++++
+ include/linux/irqchip/arm-gic-v4.h |  4 ++++
+ 2 files changed, 46 insertions(+)
 
 diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-index 2ea12baf2e53..3c5ad70193ed 100644
+index 3c5ad70193ed..697d9dc1e005 100644
 --- a/drivers/irqchip/irq-gic-v4.c
 +++ b/drivers/irqchip/irq-gic-v4.c
-@@ -56,3 +56,28 @@ void its_free_vcpu_irqs(struct its_vm *vm)
- 	irq_domain_free_irqs(vm->vpes[0]->irq, vm->nr_vpes);
- 	irq_domain_remove(vm->domain);
+@@ -81,3 +81,45 @@ int its_invall_vpe(struct its_vpe *vpe)
+ 
+ 	return its_send_vpe_cmd(vpe, &info);
  }
 +
-+static int its_send_vpe_cmd(struct its_vpe *vpe, struct its_cmd_info *info)
-+{
-+	return irq_set_vcpu_affinity(vpe->irq, info);
-+}
-+
-+int its_schedule_vpe(struct its_vpe *vpe, bool on)
-+{
-+	struct its_cmd_info info;
-+
-+	WARN_ON(preemptible());
-+
-+	info.cmd_type = on ? SCHEDULE_VPE : DESCHEDULE_VPE;
-+
-+	return its_send_vpe_cmd(vpe, &info);
-+}
-+
-+int its_invall_vpe(struct its_vpe *vpe)
++int its_map_vlpi(int irq, struct its_vlpi_map *map)
 +{
 +	struct its_cmd_info info = {
-+		.cmd_type = INVALL_VPE,
++		.cmd_type = MAP_VLPI,
++		.map      = map,
 +	};
 +
-+	return its_send_vpe_cmd(vpe, &info);
++	/*
++	 * The host will never see that interrupt firing again, so it
++	 * is vital that we don't do any lazy masking.
++	 */
++	irq_set_status_flags(irq, IRQ_DISABLE_UNLAZY);
++
++	return irq_set_vcpu_affinity(irq, &info);
++}
++
++int its_get_vlpi(int irq, struct its_vlpi_map *map)
++{
++	struct its_cmd_info info = {
++		.cmd_type = GET_VLPI,
++		.map      = map,
++	};
++
++	return irq_set_vcpu_affinity(irq, &info);
++}
++
++int its_unmap_vlpi(int irq)
++{
++	irq_clear_status_flags(irq, IRQ_DISABLE_UNLAZY);
++	return irq_set_vcpu_affinity(irq, NULL);
++}
++
++int its_prop_update_vlpi(int irq, u8 config, bool inv)
++{
++	struct its_cmd_info info = {
++		.cmd_type = inv ? PROP_UPDATE_AND_INV_VLPI : PROP_UPDATE_VLPI,
++		.config   = config,
++	};
++
++	return irq_set_vcpu_affinity(irq, &info);
 +}
 diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index 7474a981ed6d..97bb97a11fef 100644
+index 97bb97a11fef..843c9ff29269 100644
 --- a/include/linux/irqchip/arm-gic-v4.h
 +++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -90,5 +90,7 @@ struct its_cmd_info {
- 
- int its_alloc_vcpu_irqs(struct its_vm *vm);
+@@ -92,5 +92,9 @@ int its_alloc_vcpu_irqs(struct its_vm *vm);
  void its_free_vcpu_irqs(struct its_vm *vm);
-+int its_schedule_vpe(struct its_vpe *vpe, bool on);
-+int its_invall_vpe(struct its_vpe *vpe);
+ int its_schedule_vpe(struct its_vpe *vpe, bool on);
+ int its_invall_vpe(struct its_vpe *vpe);
++int its_map_vlpi(int irq, struct its_vlpi_map *map);
++int its_get_vlpi(int irq, struct its_vlpi_map *map);
++int its_unmap_vlpi(int irq);
++int its_prop_update_vlpi(int irq, u8 config, bool inv);
  
  #endif
 -- 
