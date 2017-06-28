@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 10/52] irqchip/gic-v3-its: Split out pending table
- allocation
-Date: Wed, 28 Jun 2017 16:03:29 +0100
-Message-ID: <20170628150411.15846-11-marc.zyngier@arm.com>
+Subject: [PATCH v2 11/52] irqchip/gic-v3-its: Rework LPI freeing
+Date: Wed, 28 Jun 2017 16:03:30 +0100
+Message-ID: <20170628150411.15846-12-marc.zyngier@arm.com>
 References: <20170628150411.15846-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A64540DFF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 45ECD40EFD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tRPLGsvgBWuI for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jun 2017 11:04:46 -0400 (EDT)
+ with ESMTP id Mkr4UDPimT6P for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jun 2017 11:04:48 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26EE74113E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBC0B40F9F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jun 2017 11:04:46 -0400 (EDT)
 In-Reply-To: <20170628150411.15846-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,68 +31,60 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: Jason Cooper <jason@lakedaemon.net>, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Just as for the property table, let's move the pending table
-allocation to a separate function.
+Rework LPI deallocation so that it can be reused by the v4 support
+code.
 
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 29 ++++++++++++++++++++---------
- 1 file changed, 20 insertions(+), 9 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 27f57c528026..d6f9ccb36f4d 100644
+index d6f9ccb36f4d..3011403438c3 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -1199,6 +1199,24 @@ static int its_alloc_collections(struct its_node *its)
- 	return 0;
+@@ -873,16 +873,15 @@ static unsigned long *its_lpi_alloc_chunks(int nr_irqs, int *base, int *nr_ids)
+ 	return bitmap;
  }
  
-+static struct page *its_allocate_pending_table(gfp_t gfp_flags)
-+{
-+	struct page *pend_page;
-+	/*
-+	 * The pending pages have to be at least 64kB aligned,
-+	 * hence the 'max(LPI_PENDBASE_SZ, SZ_64K)' below.
-+	 */
-+	pend_page = alloc_pages(gfp_flags | __GFP_ZERO,
-+				get_order(max(LPI_PENDBASE_SZ, SZ_64K)));
-+	if (!pend_page)
-+		return NULL;
-+
-+	/* Make sure the GIC will observe the zero-ed page */
-+	gic_flush_dcache_to_poc(page_address(pend_page), LPI_PENDBASE_SZ);
-+
-+	return pend_page;
-+}
-+
- static void its_cpu_init_lpis(void)
+-static void its_lpi_free(struct event_lpi_map *map)
++static void its_lpi_free_chunks(unsigned long *bitmap, int base, int nr_ids)
  {
- 	void __iomem *rbase = gic_data_rdist_rd_base();
-@@ -1209,21 +1227,14 @@ static void its_cpu_init_lpis(void)
- 	pend_page = gic_data_rdist()->pend_page;
- 	if (!pend_page) {
- 		phys_addr_t paddr;
--		/*
--		 * The pending pages have to be at least 64kB aligned,
--		 * hence the 'max(LPI_PENDBASE_SZ, SZ_64K)' below.
--		 */
--		pend_page = alloc_pages(GFP_NOWAIT | __GFP_ZERO,
--					get_order(max(LPI_PENDBASE_SZ, SZ_64K)));
-+
-+		pend_page = its_allocate_pending_table(GFP_NOWAIT);
- 		if (!pend_page) {
- 			pr_err("Failed to allocate PENDBASE for CPU%d\n",
- 			       smp_processor_id());
- 			return;
- 		}
+-	int base = map->lpi_base;
+-	int nr_ids = map->nr_lpis;
+ 	int lpi;
  
--		/* Make sure the GIC will observe the zero-ed page */
--		gic_flush_dcache_to_poc(page_address(pend_page), LPI_PENDBASE_SZ);
--
- 		paddr = page_to_phys(pend_page);
- 		pr_info("CPU%d: using LPI pending table @%pa\n",
- 			smp_processor_id(), &paddr);
+ 	spin_lock(&lpi_lock);
+ 
+ 	for (lpi = base; lpi < (base + nr_ids); lpi += IRQS_PER_CHUNK) {
+ 		int chunk = its_lpi_to_chunk(lpi);
++
+ 		BUG_ON(chunk > lpi_chunks);
+ 		if (test_bit(chunk, lpi_bitmap)) {
+ 			clear_bit(chunk, lpi_bitmap);
+@@ -893,8 +892,7 @@ static void its_lpi_free(struct event_lpi_map *map)
+ 
+ 	spin_unlock(&lpi_lock);
+ 
+-	kfree(map->lpi_map);
+-	kfree(map->col_map);
++	kfree(bitmap);
+ }
+ 
+ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
+@@ -1665,7 +1663,10 @@ static void its_irq_domain_free(struct irq_domain *domain, unsigned int virq,
+ 	/* If all interrupts have been freed, start mopping the floor */
+ 	if (bitmap_empty(its_dev->event_map.lpi_map,
+ 			 its_dev->event_map.nr_lpis)) {
+-		its_lpi_free(&its_dev->event_map);
++		its_lpi_free_chunks(its_dev->event_map.lpi_map,
++				    its_dev->event_map.lpi_base,
++				    its_dev->event_map.nr_lpis);
++		kfree(its_dev->event_map.col_map);
+ 
+ 		/* Unmap device/itt */
+ 		its_send_mapd(its_dev, 0);
 -- 
 2.11.0
