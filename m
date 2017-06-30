@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 23/58] KVM: arm/arm64: Introduce an allocator for in-kernel
- irq lines
-Date: Fri, 30 Jun 2017 09:44:39 +0100
-Message-ID: <20170630084514.6779-24-marc.zyngier@arm.com>
+Subject: [PATCH 28/58] KVM: arm/arm64: vgic-v3: Add accessors for the
+ ICH_APxRn_EL2 registers
+Date: Fri, 30 Jun 2017 09:44:44 +0100
+Message-ID: <20170630084514.6779-29-marc.zyngier@arm.com>
 References: <20170630084514.6779-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09898408EB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A27340D55
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fWExkabDd9-2 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jun 2017 04:46:33 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 45A0C40D55
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:32 -0400 (EDT)
+ with ESMTP id t4U09DwtOoDA for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Jun 2017 04:46:44 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BFC8F40D16
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:44 -0400 (EDT)
 In-Reply-To: <20170630084514.6779-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,85 +32,174 @@ To: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzin
 Cc: Christoffer Dall <cdall@linaro.org>, Stefan Traby <stefan@hello-penguin.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Hu Huajun <huhuajun@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <cdall@linaro.org>
+As we're about to access the Active Priority registers a lot more,
+let's define accessors that take the register number as a parameter.
 
-Having multiple devices being able to signal the same interrupt line is
-very confusing and almost certainly guarantees a configuration error.
-
-Therefore, introduce a very simple allocator which allows a device to
-claim an interrupt line from the vgic for a given VM.
-
+Tested-by: Alexander Graf <agraf@suse.de>
+Acked-by: David Daney <david.daney@cavium.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/kvm/arm_vgic.h   |  5 +++++
- virt/kvm/arm/vgic/vgic.c | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+ virt/kvm/arm/hyp/vgic-v3-sr.c | 116 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 100 insertions(+), 16 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index dde59fbc5f80..5d5b34534ce9 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -121,6 +121,9 @@ struct vgic_irq {
- 	u8 source;			/* GICv2 SGIs only */
- 	u8 priority;
- 	enum vgic_irq_config config;	/* Level or edge */
-+
-+	void *owner;			/* Opaque pointer to reserve an interrupt
-+					   for in-kernel devices. */
- };
- 
- struct vgic_register_region;
-@@ -340,4 +343,6 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
-  */
- int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
- 
-+int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner);
-+
- #endif /* __KVM_ARM_VGIC_H */
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index c66feaca2a5d..9628945234e4 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -435,6 +435,39 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index 87940364570b..3dd8f0c4419e 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -118,6 +118,90 @@ static void __hyp_text __gic_v3_set_lr(u64 val, int lr)
+ 	}
  }
  
- /**
-+ * kvm_vgic_set_owner - Set the owner of an interrupt for a VM
-+ *
-+ * @vcpu:   Pointer to the VCPU (used for PPIs)
-+ * @intid:  The virtual INTID identifying the interrupt (PPI or SPI)
-+ * @owner:  Opaque pointer to the owner
-+ *
-+ * Returns 0 if intid is not already used by another in-kernel device and the
-+ * owner is set, otherwise returns an error code.
-+ */
-+int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner)
++static void __hyp_text __vgic_v3_write_ap0rn(u32 val, int n)
 +{
-+	struct vgic_irq *irq;
-+	int ret = 0;
-+
-+	if (!vgic_initialized(vcpu->kvm))
-+		return -EAGAIN;
-+
-+	/* SGIs and LPIs cannot be wired up to any device */
-+	if (!irq_is_ppi(intid) && !vgic_valid_spi(vcpu->kvm, intid))
-+		return -EINVAL;
-+
-+	irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
-+	spin_lock(&irq->irq_lock);
-+	if (irq->owner && irq->owner != owner)
-+		ret = -EEXIST;
-+	else
-+		irq->owner = owner;
-+	spin_unlock(&irq->irq_lock);
-+
-+	return ret;
++	switch (n) {
++	case 0:
++		write_gicreg(val, ICH_AP0R0_EL2);
++		break;
++	case 1:
++		write_gicreg(val, ICH_AP0R1_EL2);
++		break;
++	case 2:
++		write_gicreg(val, ICH_AP0R2_EL2);
++		break;
++	case 3:
++		write_gicreg(val, ICH_AP0R3_EL2);
++		break;
++	}
 +}
 +
-+/**
-  * vgic_prune_ap_list - Remove non-relevant interrupts from the list
-  *
-  * @vcpu: The VCPU pointer
++static void __hyp_text __vgic_v3_write_ap1rn(u32 val, int n)
++{
++	switch (n) {
++	case 0:
++		write_gicreg(val, ICH_AP1R0_EL2);
++		break;
++	case 1:
++		write_gicreg(val, ICH_AP1R1_EL2);
++		break;
++	case 2:
++		write_gicreg(val, ICH_AP1R2_EL2);
++		break;
++	case 3:
++		write_gicreg(val, ICH_AP1R3_EL2);
++		break;
++	}
++}
++
++static u32 __hyp_text __vgic_v3_read_ap0rn(int n)
++{
++	u32 val;
++
++	switch (n) {
++	case 0:
++		val = read_gicreg(ICH_AP0R0_EL2);
++		break;
++	case 1:
++		val = read_gicreg(ICH_AP0R1_EL2);
++		break;
++	case 2:
++		val = read_gicreg(ICH_AP0R2_EL2);
++		break;
++	case 3:
++		val = read_gicreg(ICH_AP0R3_EL2);
++		break;
++	default:
++		unreachable();
++	}
++
++	return val;
++}
++
++static u32 __hyp_text __vgic_v3_read_ap1rn(int n)
++{
++	u32 val;
++
++	switch (n) {
++	case 0:
++		val = read_gicreg(ICH_AP1R0_EL2);
++		break;
++	case 1:
++		val = read_gicreg(ICH_AP1R1_EL2);
++		break;
++	case 2:
++		val = read_gicreg(ICH_AP1R2_EL2);
++		break;
++	case 3:
++		val = read_gicreg(ICH_AP1R3_EL2);
++		break;
++	default:
++		unreachable();
++	}
++
++	return val;
++}
++
+ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+@@ -154,22 +238,22 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 
+ 		switch (nr_pre_bits) {
+ 		case 7:
+-			cpu_if->vgic_ap0r[3] = read_gicreg(ICH_AP0R3_EL2);
+-			cpu_if->vgic_ap0r[2] = read_gicreg(ICH_AP0R2_EL2);
++			cpu_if->vgic_ap0r[3] = __vgic_v3_read_ap0rn(3);
++			cpu_if->vgic_ap0r[2] = __vgic_v3_read_ap0rn(2);
+ 		case 6:
+-			cpu_if->vgic_ap0r[1] = read_gicreg(ICH_AP0R1_EL2);
++			cpu_if->vgic_ap0r[1] = __vgic_v3_read_ap0rn(1);
+ 		default:
+-			cpu_if->vgic_ap0r[0] = read_gicreg(ICH_AP0R0_EL2);
++			cpu_if->vgic_ap0r[0] = __vgic_v3_read_ap0rn(0);
+ 		}
+ 
+ 		switch (nr_pre_bits) {
+ 		case 7:
+-			cpu_if->vgic_ap1r[3] = read_gicreg(ICH_AP1R3_EL2);
+-			cpu_if->vgic_ap1r[2] = read_gicreg(ICH_AP1R2_EL2);
++			cpu_if->vgic_ap1r[3] = __vgic_v3_read_ap1rn(3);
++			cpu_if->vgic_ap1r[2] = __vgic_v3_read_ap1rn(2);
+ 		case 6:
+-			cpu_if->vgic_ap1r[1] = read_gicreg(ICH_AP1R1_EL2);
++			cpu_if->vgic_ap1r[1] = __vgic_v3_read_ap1rn(1);
+ 		default:
+-			cpu_if->vgic_ap1r[0] = read_gicreg(ICH_AP1R0_EL2);
++			cpu_if->vgic_ap1r[0] = __vgic_v3_read_ap1rn(0);
+ 		}
+ 	} else {
+ 		cpu_if->vgic_elrsr = 0xffff;
+@@ -224,22 +308,22 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 
+ 		switch (nr_pre_bits) {
+ 		case 7:
+-			write_gicreg(cpu_if->vgic_ap0r[3], ICH_AP0R3_EL2);
+-			write_gicreg(cpu_if->vgic_ap0r[2], ICH_AP0R2_EL2);
++			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[3], 3);
++			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[2], 2);
+ 		case 6:
+-			write_gicreg(cpu_if->vgic_ap0r[1], ICH_AP0R1_EL2);
++			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[1], 1);
+ 		default:
+-			write_gicreg(cpu_if->vgic_ap0r[0], ICH_AP0R0_EL2);
++			__vgic_v3_write_ap0rn(cpu_if->vgic_ap0r[0], 0);
+ 		}
+ 
+ 		switch (nr_pre_bits) {
+ 		case 7:
+-			write_gicreg(cpu_if->vgic_ap1r[3], ICH_AP1R3_EL2);
+-			write_gicreg(cpu_if->vgic_ap1r[2], ICH_AP1R2_EL2);
++			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[3], 3);
++			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[2], 2);
+ 		case 6:
+-			write_gicreg(cpu_if->vgic_ap1r[1], ICH_AP1R1_EL2);
++			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[1], 1);
+ 		default:
+-			write_gicreg(cpu_if->vgic_ap1r[0], ICH_AP1R0_EL2);
++			__vgic_v3_write_ap1rn(cpu_if->vgic_ap1r[0], 0);
+ 		}
+ 
+ 		for (i = 0; i < used_lrs; i++)
 -- 
 2.11.0
