@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 55/58] arm64/kvm: vgic: use SYS_DESC()
-Date: Fri, 30 Jun 2017 09:45:11 +0100
-Message-ID: <20170630084514.6779-56-marc.zyngier@arm.com>
+Subject: [PATCH 57/58] KVM: arm/arm64: Signal SIGBUS when stage2 discovers
+ hwpoison memory
+Date: Fri, 30 Jun 2017 09:45:13 +0100
+Message-ID: <20170630084514.6779-58-marc.zyngier@arm.com>
 References: <20170630084514.6779-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F2EAF40DB8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:47:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1542040D38
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:48:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2ckwI5nNq9L7 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jun 2017 04:47:52 -0400 (EDT)
+ with ESMTP id i7nzeSjOoTKu for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Jun 2017 04:47:59 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A3A0C40E2D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:47:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3FD740EFE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:47:57 -0400 (EDT)
 In-Reply-To: <20170630084514.6779-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,101 +32,88 @@ To: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzin
 Cc: Christoffer Dall <cdall@linaro.org>, Stefan Traby <stefan@hello-penguin.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Hu Huajun <huhuajun@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Mark Rutland <mark.rutland@arm.com>
+From: James Morse <james.morse@arm.com>
 
-Almost all of the arm64 KVM code uses the sysreg mnemonics for AArch64
-register descriptions. Move the last straggler over.
+Once we enable ARCH_SUPPORTS_MEMORY_FAILURE on arm64, notifications for
+broken memory can call memory_failure() in mm/memory-failure.c to offline
+pages of memory, possibly signalling user space processes and notifying all
+the in-kernel users.
 
-To match what we do for SYS_ICH_AP*R*_EL2, the SYS_ICC_AP*R*_EL1
-mnemonics are expanded in <asm/sysreg.h>.
+memory_failure() has two modes, early and late. Early is used by
+machine-managers like Qemu to receive a notification when a memory error is
+notified to the host. These can then be relayed to the guest before the
+affected page is accessed. To enable this, the process must set
+PR_MCE_KILL_EARLY in PR_MCE_KILL_SET using the prctl() syscall.
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
-Acked-by: Christoffer Dall <cdall@linaro.org>
-Acked-by: Will Deacon <will.deacon@arm.com>
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
+Once the early notification has been handled, nothing stops the
+machine-manager or guest from accessing the affected page. If the
+machine-manager does this the page will fail to be mapped and SIGBUS will
+be sent. This patch adds the equivalent path for when the guest accesses
+the page, sending SIGBUS to the machine-manager.
+
+These two signals can be distinguished by the machine-manager using their
+si_code: BUS_MCEERR_AO for 'action optional' early notifications, and
+BUS_MCEERR_AR for 'action required' synchronous/late notifications.
+
+Do as x86 does, and deliver the SIGBUS when we discover pfn ==
+KVM_PFN_ERR_HWPOISON. Use the hugepage size as si_addr_lsb if this vma was
+allocated as a hugepage. Transparent hugepages will be split by
+memory_failure() before we see them here.
+
+Cc: Punit Agrawal <punit.agrawal@arm.com>
+Signed-off-by: James Morse <james.morse@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/sysreg.h  |  8 +++++++
- arch/arm64/kvm/vgic-sys-reg-v3.c | 45 ++++++++++++++--------------------------
- 2 files changed, 23 insertions(+), 30 deletions(-)
+ virt/kvm/arm/mmu.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 00d493ba8dbd..040b607cb682 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -185,7 +185,15 @@
- #define SYS_ICC_HPPIR0_EL1		sys_reg(3, 0, 12, 8, 2)
- #define SYS_ICC_BPR0_EL1		sys_reg(3, 0, 12, 8, 3)
- #define SYS_ICC_AP0Rn_EL1(n)		sys_reg(3, 0, 12, 8, 4 | n)
-+#define SYS_ICC_AP0R0_EL1		SYS_ICC_AP0Rn_EL1(0)
-+#define SYS_ICC_AP0R1_EL1		SYS_ICC_AP0Rn_EL1(1)
-+#define SYS_ICC_AP0R2_EL1		SYS_ICC_AP0Rn_EL1(2)
-+#define SYS_ICC_AP0R3_EL1		SYS_ICC_AP0Rn_EL1(3)
- #define SYS_ICC_AP1Rn_EL1(n)		sys_reg(3, 0, 12, 9, n)
-+#define SYS_ICC_AP1R0_EL1		SYS_ICC_AP1Rn_EL1(0)
-+#define SYS_ICC_AP1R1_EL1		SYS_ICC_AP1Rn_EL1(1)
-+#define SYS_ICC_AP1R2_EL1		SYS_ICC_AP1Rn_EL1(2)
-+#define SYS_ICC_AP1R3_EL1		SYS_ICC_AP1Rn_EL1(3)
- #define SYS_ICC_DIR_EL1			sys_reg(3, 0, 12, 11, 1)
- #define SYS_ICC_RPR_EL1			sys_reg(3, 0, 12, 11, 3)
- #define SYS_ICC_SGI1R_EL1		sys_reg(3, 0, 12, 11, 5)
-diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
-index 5fb3cc9e8f52..116786d2e8e8 100644
---- a/arch/arm64/kvm/vgic-sys-reg-v3.c
-+++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
-@@ -268,36 +268,21 @@ static bool access_gic_sre(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return true;
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index e2e5effba2a9..f2d5b6cf06ae 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -20,6 +20,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/io.h>
+ #include <linux/hugetlb.h>
++#include <linux/sched/signal.h>
+ #include <trace/events/kvm.h>
+ #include <asm/pgalloc.h>
+ #include <asm/cacheflush.h>
+@@ -1261,6 +1262,24 @@ static void coherent_cache_guest_page(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
+ 	__coherent_cache_guest_page(vcpu, pfn, size);
  }
- static const struct sys_reg_desc gic_v3_icc_reg_descs[] = {
--	/* ICC_PMR_EL1 */
--	{ Op0(3), Op1(0), CRn(4), CRm(6), Op2(0), access_gic_pmr },
--	/* ICC_BPR0_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(8), Op2(3), access_gic_bpr0 },
--	/* ICC_AP0R0_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(8), Op2(4), access_gic_ap0r },
--	/* ICC_AP0R1_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(8), Op2(5), access_gic_ap0r },
--	/* ICC_AP0R2_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(8), Op2(6), access_gic_ap0r },
--	/* ICC_AP0R3_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(8), Op2(7), access_gic_ap0r },
--	/* ICC_AP1R0_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(9), Op2(0), access_gic_ap1r },
--	/* ICC_AP1R1_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(9), Op2(1), access_gic_ap1r },
--	/* ICC_AP1R2_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(9), Op2(2), access_gic_ap1r },
--	/* ICC_AP1R3_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(9), Op2(3), access_gic_ap1r },
--	/* ICC_BPR1_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(12), Op2(3), access_gic_bpr1 },
--	/* ICC_CTLR_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(12), Op2(4), access_gic_ctlr },
--	/* ICC_SRE_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(12), Op2(5), access_gic_sre },
--	/* ICC_IGRPEN0_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(12), Op2(6), access_gic_grpen0 },
--	/* ICC_IGRPEN1_EL1 */
--	{ Op0(3), Op1(0), CRn(12), CRm(12), Op2(7), access_gic_grpen1 },
-+	{ SYS_DESC(SYS_ICC_PMR_EL1), access_gic_pmr },
-+	{ SYS_DESC(SYS_ICC_BPR0_EL1), access_gic_bpr0 },
-+	{ SYS_DESC(SYS_ICC_AP0R0_EL1), access_gic_ap0r },
-+	{ SYS_DESC(SYS_ICC_AP0R1_EL1), access_gic_ap0r },
-+	{ SYS_DESC(SYS_ICC_AP0R2_EL1), access_gic_ap0r },
-+	{ SYS_DESC(SYS_ICC_AP0R3_EL1), access_gic_ap0r },
-+	{ SYS_DESC(SYS_ICC_AP1R0_EL1), access_gic_ap1r },
-+	{ SYS_DESC(SYS_ICC_AP1R1_EL1), access_gic_ap1r },
-+	{ SYS_DESC(SYS_ICC_AP1R2_EL1), access_gic_ap1r },
-+	{ SYS_DESC(SYS_ICC_AP1R3_EL1), access_gic_ap1r },
-+	{ SYS_DESC(SYS_ICC_BPR1_EL1), access_gic_bpr1 },
-+	{ SYS_DESC(SYS_ICC_CTLR_EL1), access_gic_ctlr },
-+	{ SYS_DESC(SYS_ICC_SRE_EL1), access_gic_sre },
-+	{ SYS_DESC(SYS_ICC_IGRPEN0_EL1), access_gic_grpen0 },
-+	{ SYS_DESC(SYS_ICC_IGRPEN1_EL1), access_gic_grpen1 },
- };
  
- int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
++static void kvm_send_hwpoison_signal(unsigned long address,
++				     struct vm_area_struct *vma)
++{
++	siginfo_t info;
++
++	info.si_signo   = SIGBUS;
++	info.si_errno   = 0;
++	info.si_code    = BUS_MCEERR_AR;
++	info.si_addr    = (void __user *)address;
++
++	if (is_vm_hugetlb_page(vma))
++		info.si_addr_lsb = huge_page_shift(hstate_vma(vma));
++	else
++		info.si_addr_lsb = PAGE_SHIFT;
++
++	send_sig_info(SIGBUS, &info, current);
++}
++
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  struct kvm_memory_slot *memslot, unsigned long hva,
+ 			  unsigned long fault_status)
+@@ -1330,6 +1349,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	smp_rmb();
+ 
+ 	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
++	if (pfn == KVM_PFN_ERR_HWPOISON) {
++		kvm_send_hwpoison_signal(hva, vma);
++		return 0;
++	}
+ 	if (is_error_noslot_pfn(pfn))
+ 		return -EFAULT;
+ 
 -- 
 2.11.0
