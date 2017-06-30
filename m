@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 06/58] KVM: arm/arm64: Use uaccess functions for GICv3
- {sc}active
-Date: Fri, 30 Jun 2017 09:44:22 +0100
-Message-ID: <20170630084514.6779-7-marc.zyngier@arm.com>
+Subject: [PATCH 07/58] KVM: improve arch vcpu request defining
+Date: Fri, 30 Jun 2017 09:44:23 +0100
+Message-ID: <20170630084514.6779-8-marc.zyngier@arm.com>
 References: <20170630084514.6779-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12E6440D77
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:45:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A77BA40D85
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:45:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CNkB6A4Nczlg for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jun 2017 04:45:50 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A99F840DF2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:45:49 -0400 (EDT)
+ with ESMTP id zHkXLfxNzj6L for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Jun 2017 04:45:52 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34D4740D17
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:45:52 -0400 (EDT)
 In-Reply-To: <20170630084514.6779-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,43 +31,166 @@ To: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzin
 Cc: Christoffer Dall <cdall@linaro.org>, Stefan Traby <stefan@hello-penguin.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Hu Huajun <huhuajun@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <cdall@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
 
-We recently rewrote the sactive and cactive handlers to take the kvm
-lock for guest accesses to these registers.  However, when accessed from
-userspace this lock is already held.  Unfortunately we forgot to change
-the private accessors for GICv3, because these are redistributor
-registers and not distributor registers.
+Marc Zyngier suggested that we define the arch specific VCPU request
+base, rather than requiring each arch to remember to start from 8.
+That suggestion, along with Radim Krcmar's recent VCPU request flag
+addition, snowballed into defining something of an arch VCPU request
+defining API.
 
+No functional change.
+
+(Looks like x86 is running out of arch VCPU request bits.  Maybe
+ someday we'll need to extend to 64.)
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Acked-by: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ arch/arm/include/asm/kvm_host.h     |  3 ++-
+ arch/arm64/include/asm/kvm_host.h   |  3 ++-
+ arch/powerpc/include/asm/kvm_host.h |  4 ++--
+ arch/s390/include/asm/kvm_host.h    |  6 ++---
+ arch/x86/include/asm/kvm_host.h     | 47 ++++++++++++++++++++-----------------
+ include/linux/kvm_host.h            |  7 ++++++
+ 6 files changed, 41 insertions(+), 29 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 23c0d56436a7..e25567a93dd5 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -528,12 +528,14 @@ static const struct vgic_register_region vgic_v3_sgibase_registers[] = {
- 		vgic_mmio_read_pending, vgic_mmio_write_cpending,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_ISACTIVER0,
--		vgic_mmio_read_active, vgic_mmio_write_sactive, 4,
--		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICR_ICACTIVER0,
--		vgic_mmio_read_active, vgic_mmio_write_cactive, 4,
--		VGIC_ACCESS_32bit),
-+	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ISACTIVER0,
-+		vgic_mmio_read_active, vgic_mmio_write_sactive,
-+		NULL, vgic_mmio_uaccess_write_sactive,
-+		4, VGIC_ACCESS_32bit),
-+	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ICACTIVER0,
-+		vgic_mmio_read_active, vgic_mmio_write_cactive,
-+		NULL, vgic_mmio_uaccess_write_cactive,
-+		4, VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GICR_IPRIORITYR0,
- 		vgic_mmio_read_priority, vgic_mmio_write_priority, 32,
- 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 12274d46df70..c556babe467c 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -44,7 +44,8 @@
+ #define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
+ #endif
+ 
+-#define KVM_REQ_VCPU_EXIT	(8 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_VCPU_EXIT \
++	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ 
+ u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+ int __attribute_const__ kvm_target_cpu(void);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 32cbe8a3bb0d..0ff991c9c66e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -41,7 +41,8 @@
+ 
+ #define KVM_VCPU_MAX_FEATURES 4
+ 
+-#define KVM_REQ_VCPU_EXIT	(8 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_VCPU_EXIT \
++	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ 
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 9c51ac4b8f36..50e0bc9723cc 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -52,8 +52,8 @@
+ #define KVM_IRQCHIP_NUM_PINS     256
+ 
+ /* PPC-specific vcpu->requests bit members */
+-#define KVM_REQ_WATCHDOG           8
+-#define KVM_REQ_EPR_EXIT           9
++#define KVM_REQ_WATCHDOG	KVM_ARCH_REQ(0)
++#define KVM_REQ_EPR_EXIT	KVM_ARCH_REQ(1)
+ 
+ #include <linux/mmu_notifier.h>
+ 
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 426614a882a9..9c3bd94204ac 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -42,9 +42,9 @@
+ #define KVM_HALT_POLL_NS_DEFAULT 80000
+ 
+ /* s390-specific vcpu->requests bit members */
+-#define KVM_REQ_ENABLE_IBS         8
+-#define KVM_REQ_DISABLE_IBS        9
+-#define KVM_REQ_ICPT_OPEREXC       10
++#define KVM_REQ_ENABLE_IBS	KVM_ARCH_REQ(0)
++#define KVM_REQ_DISABLE_IBS	KVM_ARCH_REQ(1)
++#define KVM_REQ_ICPT_OPEREXC	KVM_ARCH_REQ(2)
+ 
+ #define SIGP_CTRL_C		0x80
+ #define SIGP_CTRL_SCN_MASK	0x3f
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 9c761fea0c98..563979976fab 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -48,28 +48,31 @@
+ #define KVM_IRQCHIP_NUM_PINS  KVM_IOAPIC_NUM_PINS
+ 
+ /* x86-specific vcpu->requests bit members */
+-#define KVM_REQ_MIGRATE_TIMER      8
+-#define KVM_REQ_REPORT_TPR_ACCESS  9
+-#define KVM_REQ_TRIPLE_FAULT      10
+-#define KVM_REQ_MMU_SYNC          11
+-#define KVM_REQ_CLOCK_UPDATE      12
+-#define KVM_REQ_EVENT             14
+-#define KVM_REQ_APF_HALT          15
+-#define KVM_REQ_STEAL_UPDATE      16
+-#define KVM_REQ_NMI               17
+-#define KVM_REQ_PMU               18
+-#define KVM_REQ_PMI               19
+-#define KVM_REQ_SMI               20
+-#define KVM_REQ_MASTERCLOCK_UPDATE 21
+-#define KVM_REQ_MCLOCK_INPROGRESS (22 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+-#define KVM_REQ_SCAN_IOAPIC       (23 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+-#define KVM_REQ_GLOBAL_CLOCK_UPDATE 24
+-#define KVM_REQ_APIC_PAGE_RELOAD  (25 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+-#define KVM_REQ_HV_CRASH          26
+-#define KVM_REQ_IOAPIC_EOI_EXIT   27
+-#define KVM_REQ_HV_RESET          28
+-#define KVM_REQ_HV_EXIT           29
+-#define KVM_REQ_HV_STIMER         30
++#define KVM_REQ_MIGRATE_TIMER		KVM_ARCH_REQ(0)
++#define KVM_REQ_REPORT_TPR_ACCESS	KVM_ARCH_REQ(1)
++#define KVM_REQ_TRIPLE_FAULT		KVM_ARCH_REQ(2)
++#define KVM_REQ_MMU_SYNC		KVM_ARCH_REQ(3)
++#define KVM_REQ_CLOCK_UPDATE		KVM_ARCH_REQ(4)
++#define KVM_REQ_EVENT			KVM_ARCH_REQ(6)
++#define KVM_REQ_APF_HALT		KVM_ARCH_REQ(7)
++#define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(8)
++#define KVM_REQ_NMI			KVM_ARCH_REQ(9)
++#define KVM_REQ_PMU			KVM_ARCH_REQ(10)
++#define KVM_REQ_PMI			KVM_ARCH_REQ(11)
++#define KVM_REQ_SMI			KVM_ARCH_REQ(12)
++#define KVM_REQ_MASTERCLOCK_UPDATE	KVM_ARCH_REQ(13)
++#define KVM_REQ_MCLOCK_INPROGRESS \
++	KVM_ARCH_REQ_FLAGS(14, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_SCAN_IOAPIC \
++	KVM_ARCH_REQ_FLAGS(15, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_GLOBAL_CLOCK_UPDATE	KVM_ARCH_REQ(16)
++#define KVM_REQ_APIC_PAGE_RELOAD \
++	KVM_ARCH_REQ_FLAGS(17, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_HV_CRASH		KVM_ARCH_REQ(18)
++#define KVM_REQ_IOAPIC_EOI_EXIT		KVM_ARCH_REQ(19)
++#define KVM_REQ_HV_RESET		KVM_ARCH_REQ(20)
++#define KVM_REQ_HV_EXIT			KVM_ARCH_REQ(21)
++#define KVM_REQ_HV_STIMER		KVM_ARCH_REQ(22)
+ 
+ #define CR0_RESERVED_BITS                                               \
+ 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 8c0664309815..3724b51aab64 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -126,6 +126,13 @@ static inline bool is_error_page(struct page *page)
+ #define KVM_REQ_MMU_RELOAD        (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_PENDING_TIMER     2
+ #define KVM_REQ_UNHALT            3
++#define KVM_REQUEST_ARCH_BASE     8
++
++#define KVM_ARCH_REQ_FLAGS(nr, flags) ({ \
++	BUILD_BUG_ON((unsigned)(nr) >= 32 - KVM_REQUEST_ARCH_BASE); \
++	(unsigned)(((nr) + KVM_REQUEST_ARCH_BASE) | (flags)); \
++})
++#define KVM_ARCH_REQ(nr)           KVM_ARCH_REQ_FLAGS(nr, 0)
+ 
+ #define KVM_USERSPACE_IRQ_SOURCE_ID		0
+ #define KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID	1
 -- 
 2.11.0
