@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 08/58] KVM: add kvm_request_pending
-Date: Fri, 30 Jun 2017 09:44:24 +0100
-Message-ID: <20170630084514.6779-9-marc.zyngier@arm.com>
+Subject: [PATCH 13/58] KVM: arm/arm64: optimize VCPU RUN
+Date: Fri, 30 Jun 2017 09:44:29 +0100
+Message-ID: <20170630084514.6779-14-marc.zyngier@arm.com>
 References: <20170630084514.6779-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AAE4E40EF9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:45:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85FAB40DEC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v2vgk6Zi8Jva for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jun 2017 04:45:55 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AEF5540D16
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:45:54 -0400 (EDT)
+ with ESMTP id I4XG86t7W44V for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Jun 2017 04:46:07 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C6BF40DC6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:07 -0400 (EDT)
 In-Reply-To: <20170630084514.6779-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,90 +31,103 @@ To: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzin
 Cc: Christoffer Dall <cdall@linaro.org>, Stefan Traby <stefan@hello-penguin.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Hu Huajun <huhuajun@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogUmFkaW0gS3LEjW3DocWZIDxya3JjbWFyQHJlZGhhdC5jb20+CgpBIGZpcnN0IHN0ZXAg
-aW4gdmNwdS0+cmVxdWVzdHMgZW5jYXBzdWxhdGlvbi4gIEFkZGl0aW9uYWxseSwgd2Ugbm93CnVz
-ZSBSRUFEX09OQ0UoKSB3aGVuIGFjY2Vzc2luZyB2Y3B1LT5yZXF1ZXN0cywgd2hpY2ggZW5zdXJl
-cyB3ZQphbHdheXMgbG9hZCB2Y3B1LT5yZXF1ZXN0cyB3aGVuIGl0J3MgYWNjZXNzZWQuICBUaGlz
-IGlzIGltcG9ydGFudCBhcwpvdGhlciB0aHJlYWRzIGNhbiBjaGFuZ2UgaXQgYW55IHRpbWUuICBB
-bHNvLCBSRUFEX09OQ0UoKSBkb2N1bWVudHMKdGhhdCB2Y3B1LT5yZXF1ZXN0cyBpcyB1c2VkIHdp
-dGggb3RoZXIgdGhyZWFkcywgbGlrZWx5IHJlcXVpcmluZwptZW1vcnkgYmFycmllcnMsIHdoaWNo
-IGl0IGRvZXMuCgpTaWduZWQtb2ZmLWJ5OiBSYWRpbSBLcsSNbcOhxZkgPHJrcmNtYXJAcmVkaGF0
-LmNvbT4KWyBEb2N1bWVudGVkIHRoZSBuZXcgdXNlIG9mIFJFQURfT05DRSgpIGFuZCBjb252ZXJ0
-ZWQgYW5vdGhlciBjaGVjawogIGluIGFyY2gvbWlwcy9rdm0vdnouYyBdClNpZ25lZC1vZmYtYnk6
-IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPgpBY2tlZC1ieTogQ2hyaXN0b2ZmZXIg
-RGFsbCA8Y2RhbGxAbGluYXJvLm9yZz4KU2lnbmVkLW9mZi1ieTogQ2hyaXN0b2ZmZXIgRGFsbCA8
-Y2RhbGxAbGluYXJvLm9yZz4KLS0tCiBhcmNoL21pcHMva3ZtL3RyYXBfZW11bC5jICB8IDIgKy0K
-IGFyY2gvbWlwcy9rdm0vdnouYyAgICAgICAgIHwgMiArLQogYXJjaC9wb3dlcnBjL2t2bS9ib29r
-ZS5jICAgfCAyICstCiBhcmNoL3Bvd2VycGMva3ZtL3Bvd2VycGMuYyB8IDUgKystLS0KIGFyY2gv
-czM5MC9rdm0va3ZtLXMzOTAuYyAgIHwgMiArLQogYXJjaC94ODYva3ZtL3g4Ni5jICAgICAgICAg
-fCA0ICsrLS0KIGluY2x1ZGUvbGludXgva3ZtX2hvc3QuaCAgIHwgNSArKysrKwogNyBmaWxlcyBj
-aGFuZ2VkLCAxMyBpbnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2Fy
-Y2gvbWlwcy9rdm0vdHJhcF9lbXVsLmMgYi9hcmNoL21pcHMva3ZtL3RyYXBfZW11bC5jCmluZGV4
-IGE1NjM3NTlmZDE0Mi4uNmEwZDcwNDBkODgyIDEwMDY0NAotLS0gYS9hcmNoL21pcHMva3ZtL3Ry
-YXBfZW11bC5jCisrKyBiL2FyY2gvbWlwcy9rdm0vdHJhcF9lbXVsLmMKQEAgLTEwOTQsNyArMTA5
-NCw3IEBAIHN0YXRpYyB2b2lkIGt2bV90cmFwX2VtdWxfY2hlY2tfcmVxdWVzdHMoc3RydWN0IGt2
-bV92Y3B1ICp2Y3B1LCBpbnQgY3B1LAogCXN0cnVjdCBtbV9zdHJ1Y3QgKm1tOwogCWludCBpOwog
-Ci0JaWYgKGxpa2VseSghdmNwdS0+cmVxdWVzdHMpKQorCWlmIChsaWtlbHkoIWt2bV9yZXF1ZXN0
-X3BlbmRpbmcodmNwdSkpKQogCQlyZXR1cm47CiAKIAlpZiAoa3ZtX2NoZWNrX3JlcXVlc3QoS1ZN
-X1JFUV9UTEJfRkxVU0gsIHZjcHUpKSB7CmRpZmYgLS1naXQgYS9hcmNoL21pcHMva3ZtL3Z6LmMg
-Yi9hcmNoL21pcHMva3ZtL3Z6LmMKaW5kZXggNzFkODg1NmFkZTY0Li43NDgwNTAzNWVkYzggMTAw
-NjQ0Ci0tLSBhL2FyY2gvbWlwcy9rdm0vdnouYworKysgYi9hcmNoL21pcHMva3ZtL3Z6LmMKQEAg
-LTIzMzcsNyArMjMzNyw3IEBAIHN0YXRpYyBpbnQga3ZtX3Z6X2NoZWNrX3JlcXVlc3RzKHN0cnVj
-dCBrdm1fdmNwdSAqdmNwdSwgaW50IGNwdSkKIAlpbnQgcmV0ID0gMDsKIAlpbnQgaTsKIAotCWlm
-ICghdmNwdS0+cmVxdWVzdHMpCisJaWYgKCFrdm1fcmVxdWVzdF9wZW5kaW5nKHZjcHUpKQogCQly
-ZXR1cm4gMDsKIAogCWlmIChrdm1fY2hlY2tfcmVxdWVzdChLVk1fUkVRX1RMQl9GTFVTSCwgdmNw
-dSkpIHsKZGlmZiAtLWdpdCBhL2FyY2gvcG93ZXJwYy9rdm0vYm9va2UuYyBiL2FyY2gvcG93ZXJw
-Yy9rdm0vYm9va2UuYwppbmRleCAzZWFhYzM4MDk5NzcuLjA3MWI4N2VlNjgyZiAxMDA2NDQKLS0t
-IGEvYXJjaC9wb3dlcnBjL2t2bS9ib29rZS5jCisrKyBiL2FyY2gvcG93ZXJwYy9rdm0vYm9va2Uu
-YwpAQCAtNjg3LDcgKzY4Nyw3IEBAIGludCBrdm1wcGNfY29yZV9wcmVwYXJlX3RvX2VudGVyKHN0
-cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAogCWt2bXBwY19jb3JlX2NoZWNrX2V4Y2VwdGlvbnModmNw
-dSk7CiAKLQlpZiAodmNwdS0+cmVxdWVzdHMpIHsKKwlpZiAoa3ZtX3JlcXVlc3RfcGVuZGluZyh2
-Y3B1KSkgewogCQkvKiBFeGNlcHRpb24gZGVsaXZlcnkgcmFpc2VkIHJlcXVlc3Q7IHN0YXJ0IG92
-ZXIgKi8KIAkJcmV0dXJuIDE7CiAJfQpkaWZmIC0tZ2l0IGEvYXJjaC9wb3dlcnBjL2t2bS9wb3dl
-cnBjLmMgYi9hcmNoL3Bvd2VycGMva3ZtL3Bvd2VycGMuYwppbmRleCBmN2NmMmNkNTY0ZWYuLmZk
-NjRmMDg3NzM3YyAxMDA2NDQKLS0tIGEvYXJjaC9wb3dlcnBjL2t2bS9wb3dlcnBjLmMKKysrIGIv
-YXJjaC9wb3dlcnBjL2t2bS9wb3dlcnBjLmMKQEAgLTU1LDggKzU1LDcgQEAgRVhQT1JUX1NZTUJP
-TF9HUEwoa3ZtcHBjX3ByX29wcyk7CiAKIGludCBrdm1fYXJjaF92Y3B1X3J1bm5hYmxlKHN0cnVj
-dCBrdm1fdmNwdSAqdikKIHsKLQlyZXR1cm4gISEodi0+YXJjaC5wZW5kaW5nX2V4Y2VwdGlvbnMp
-IHx8Ci0JICAgICAgIHYtPnJlcXVlc3RzOworCXJldHVybiAhISh2LT5hcmNoLnBlbmRpbmdfZXhj
-ZXB0aW9ucykgfHwga3ZtX3JlcXVlc3RfcGVuZGluZyh2KTsKIH0KIAogaW50IGt2bV9hcmNoX3Zj
-cHVfc2hvdWxkX2tpY2soc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQpAQCAtMTA4LDcgKzEwNyw3IEBA
-IGludCBrdm1wcGNfcHJlcGFyZV90b19lbnRlcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJCSAq
-LwogCQlzbXBfbWIoKTsKIAotCQlpZiAodmNwdS0+cmVxdWVzdHMpIHsKKwkJaWYgKGt2bV9yZXF1
-ZXN0X3BlbmRpbmcodmNwdSkpIHsKIAkJCS8qIE1ha2Ugc3VyZSB3ZSBwcm9jZXNzIHJlcXVlc3Rz
-IHByZWVtcHRhYmxlICovCiAJCQlsb2NhbF9pcnFfZW5hYmxlKCk7CiAJCQl0cmFjZV9rdm1fY2hl
-Y2tfcmVxdWVzdHModmNwdSk7CmRpZmYgLS1naXQgYS9hcmNoL3MzOTAva3ZtL2t2bS1zMzkwLmMg
-Yi9hcmNoL3MzOTAva3ZtL2t2bS1zMzkwLmMKaW5kZXggNjg5YWM0ODM2MWM2Li5hZDQxZTBmYTNh
-MjEgMTAwNjQ0Ci0tLSBhL2FyY2gvczM5MC9rdm0va3ZtLXMzOTAuYworKysgYi9hcmNoL3MzOTAv
-a3ZtL2t2bS1zMzkwLmMKQEAgLTI0NDAsNyArMjQ0MCw3IEBAIHN0YXRpYyBpbnQga3ZtX3MzOTBf
-aGFuZGxlX3JlcXVlc3RzKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIHsKIHJldHJ5OgogCWt2bV9z
-MzkwX3ZjcHVfcmVxdWVzdF9oYW5kbGVkKHZjcHUpOwotCWlmICghdmNwdS0+cmVxdWVzdHMpCisJ
-aWYgKCFrdm1fcmVxdWVzdF9wZW5kaW5nKHZjcHUpKQogCQlyZXR1cm4gMDsKIAkvKgogCSAqIFdl
-IHVzZSBNTVVfUkVMT0FEIGp1c3QgdG8gcmUtYXJtIHRoZSBpcHRlIG5vdGlmaWVyIGZvciB0aGUK
-ZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS94ODYuYyBiL2FyY2gveDg2L2t2bS94ODYuYwppbmRl
-eCA0NjRkYTkzNmM1M2QuLmY4MTA2MDUxODYzNSAxMDA2NDQKLS0tIGEvYXJjaC94ODYva3ZtL3g4
-Ni5jCisrKyBiL2FyY2gveDg2L2t2bS94ODYuYwpAQCAtNjcxMCw3ICs2NzEwLDcgQEAgc3RhdGlj
-IGludCB2Y3B1X2VudGVyX2d1ZXN0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAogCWJvb2wgcmVx
-X2ltbWVkaWF0ZV9leGl0ID0gZmFsc2U7CiAKLQlpZiAodmNwdS0+cmVxdWVzdHMpIHsKKwlpZiAo
-a3ZtX3JlcXVlc3RfcGVuZGluZyh2Y3B1KSkgewogCQlpZiAoa3ZtX2NoZWNrX3JlcXVlc3QoS1ZN
-X1JFUV9NTVVfUkVMT0FELCB2Y3B1KSkKIAkJCWt2bV9tbXVfdW5sb2FkKHZjcHUpOwogCQlpZiAo
-a3ZtX2NoZWNrX3JlcXVlc3QoS1ZNX1JFUV9NSUdSQVRFX1RJTUVSLCB2Y3B1KSkKQEAgLTY4NzQs
-NyArNjg3NCw3IEBAIHN0YXRpYyBpbnQgdmNwdV9lbnRlcl9ndWVzdChzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUpCiAJCQlrdm1feDg2X29wcy0+c3luY19waXJfdG9faXJyKHZjcHUpOwogCX0KIAotCWlm
-ICh2Y3B1LT5tb2RlID09IEVYSVRJTkdfR1VFU1RfTU9ERSB8fCB2Y3B1LT5yZXF1ZXN0cworCWlm
-ICh2Y3B1LT5tb2RlID09IEVYSVRJTkdfR1VFU1RfTU9ERSB8fCBrdm1fcmVxdWVzdF9wZW5kaW5n
-KHZjcHUpCiAJICAgIHx8IG5lZWRfcmVzY2hlZCgpIHx8IHNpZ25hbF9wZW5kaW5nKGN1cnJlbnQp
-KSB7CiAJCXZjcHUtPm1vZGUgPSBPVVRTSURFX0dVRVNUX01PREU7CiAJCXNtcF93bWIoKTsKZGlm
-ZiAtLWdpdCBhL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaCBiL2luY2x1ZGUvbGludXgva3ZtX2hv
-c3QuaAppbmRleCAzNzI0YjUxYWFiNjQuLjBiNTBlN2IzNWVkNCAxMDA2NDQKLS0tIGEvaW5jbHVk
-ZS9saW51eC9rdm1faG9zdC5oCisrKyBiL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaApAQCAtMTEw
-NSw2ICsxMTA1LDExIEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fbWFrZV9yZXF1ZXN0KGludCBy
-ZXEsIHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAlzZXRfYml0KHJlcSAmIEtWTV9SRVFVRVNUX01B
-U0ssICZ2Y3B1LT5yZXF1ZXN0cyk7CiB9CiAKK3N0YXRpYyBpbmxpbmUgYm9vbCBrdm1fcmVxdWVz
-dF9wZW5kaW5nKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKK3sKKwlyZXR1cm4gUkVBRF9PTkNFKHZj
-cHUtPnJlcXVlc3RzKTsKK30KKwogc3RhdGljIGlubGluZSBib29sIGt2bV90ZXN0X3JlcXVlc3Qo
-aW50IHJlcSwgc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogewogCXJldHVybiB0ZXN0X2JpdChyZXEg
-JiBLVk1fUkVRVUVTVF9NQVNLLCAmdmNwdS0+cmVxdWVzdHMpOwotLSAKMi4xMS4wCgpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBs
-aXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJp
-YS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+From: Andrew Jones <drjones@redhat.com>
+
+We can make a small optimization by not checking the state of
+the power_off field on each run. This is done by treating
+power_off like pause, only checking it when we get the EXIT
+VCPU request. When a VCPU powers off another VCPU the EXIT
+request is already made, so we just need to make sure the
+request is also made on self power off. kvm_vcpu_kick() isn't
+necessary for these cases, as the VCPU would just be kicking
+itself, but we add it anyway as a self kick doesn't cost much,
+and it makes the code more future-proof.
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Christoffer Dall <cdall@linaro.org>
+---
+ virt/kvm/arm/arm.c  | 19 +++++++++++--------
+ virt/kvm/arm/psci.c |  2 ++
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 21a4db90073f..9379b1d75ad3 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -368,6 +368,13 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ 	kvm_timer_vcpu_put(vcpu);
+ }
+ 
++static void vcpu_power_off(struct kvm_vcpu *vcpu)
++{
++	vcpu->arch.power_off = true;
++	kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
++	kvm_vcpu_kick(vcpu);
++}
++
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
+ {
+@@ -387,7 +394,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ 		vcpu->arch.power_off = false;
+ 		break;
+ 	case KVM_MP_STATE_STOPPED:
+-		vcpu->arch.power_off = true;
++		vcpu_power_off(vcpu);
+ 		break;
+ 	default:
+ 		return -EINVAL;
+@@ -557,7 +564,7 @@ static void vcpu_sleep(struct kvm_vcpu *vcpu)
+ 	swait_event_interruptible(*wq, ((!vcpu->arch.power_off) &&
+ 				       (!vcpu->arch.pause)));
+ 
+-	if (vcpu->arch.pause) {
++	if (vcpu->arch.power_off || vcpu->arch.pause) {
+ 		/* Awaken to handle a signal, request we sleep again later. */
+ 		kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
+ 	}
+@@ -623,9 +630,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ 		check_vcpu_requests(vcpu);
+ 
+-		if (vcpu->arch.power_off)
+-			vcpu_sleep(vcpu);
+-
+ 		/*
+ 		 * Preparing the interrupts to be injected also
+ 		 * involves poking the GIC, which must be done in a
+@@ -662,8 +666,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+ 
+ 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
+-		    kvm_request_pending(vcpu) ||
+-		    vcpu->arch.power_off) {
++		    kvm_request_pending(vcpu)) {
+ 			vcpu->mode = OUTSIDE_GUEST_MODE;
+ 			local_irq_enable();
+ 			kvm_pmu_sync_hwstate(vcpu);
+@@ -896,7 +899,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+ 	 * Handle the "start in power-off" case.
+ 	 */
+ 	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+-		vcpu->arch.power_off = true;
++		vcpu_power_off(vcpu);
+ 	else
+ 		vcpu->arch.power_off = false;
+ 
+diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+index f189d0ad30d5..4a436685c552 100644
+--- a/virt/kvm/arm/psci.c
++++ b/virt/kvm/arm/psci.c
+@@ -65,6 +65,8 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+ static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.power_off = true;
++	kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
++	kvm_vcpu_kick(vcpu);
+ }
+ 
+ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+-- 
+2.11.0
