@@ -1,184 +1,74 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 05/58] KVM: arm/arm64: Simplify active_change_prepare and plug race
-Date: Fri, 30 Jun 2017 09:44:21 +0100
-Message-ID: <20170630084514.6779-6-marc.zyngier@arm.com>
+Subject: [PATCH 06/58] KVM: arm/arm64: Use uaccess functions for GICv3
+ {sc}active
+Date: Fri, 30 Jun 2017 09:44:22 +0100
+Message-ID: <20170630084514.6779-7-marc.zyngier@arm.com>
 References: <20170630084514.6779-1-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12E6440D77
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:45:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CNkB6A4Nczlg for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Jun 2017 04:45:50 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A99F840DF2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:45:49 -0400 (EDT)
 In-Reply-To: <20170630084514.6779-1-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Alexander Graf <agraf@suse.de>, Andrew Jones <drjones@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@linaro.org>, David Daney <david.daney@cavium.com>, Eric Auger <eric.auger@redhat.com>, Hu Huajun <huhuajun@huawei.com>, James Morse <james.morse@arm.com>, Mark Rutland <mark.rutland@arm.com>, Stefan Traby <stefan@hello-penguin.com>
+Cc: Christoffer Dall <cdall@linaro.org>, Stefan Traby <stefan@hello-penguin.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Hu Huajun <huhuajun@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <cdall@linaro.org>
 
-We don't need to stop a specific VCPU when changing the active state,
-because private IRQs can only be modified by a running VCPU for the
-VCPU itself and it is therefore already stopped.
+We recently rewrote the sactive and cactive handlers to take the kvm
+lock for guest accesses to these registers.  However, when accessed from
+userspace this lock is already held.  Unfortunately we forgot to change
+the private accessors for GICv3, because these are redistributor
+registers and not distributor registers.
 
-However, it is also possible for two VCPUs to be modifying the active
-state of SPIs at the same time, which can cause the thread being stuck
-in the loop that checks other VCPU threads for a potentially very long
-time, or to modify the active state of a running VCPU.  Fix this by
-serializing all accesses to setting and clearing the active state of
-interrupts using the KVM mutex.
-
-Reported-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   |  2 --
- arch/arm64/include/asm/kvm_host.h |  2 --
- virt/kvm/arm/arm.c                | 20 ++++----------------
- virt/kvm/arm/vgic/vgic-mmio.c     | 18 ++++++++++--------
- virt/kvm/arm/vgic/vgic.c          | 11 ++++++-----
- 5 files changed, 20 insertions(+), 33 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index f0e66577ce05..12274d46df70 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -233,8 +233,6 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
- struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
- void kvm_arm_halt_guest(struct kvm *kvm);
- void kvm_arm_resume_guest(struct kvm *kvm);
--void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
--void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
- 
- int kvm_arm_copy_coproc_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
- unsigned long kvm_arm_num_coproc_regs(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 5e19165c5fa8..32cbe8a3bb0d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -333,8 +333,6 @@ struct kvm_vcpu *kvm_arm_get_running_vcpu(void);
- struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
- void kvm_arm_halt_guest(struct kvm *kvm);
- void kvm_arm_resume_guest(struct kvm *kvm);
--void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu);
--void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu);
- 
- u64 __kvm_call_hyp(void *hypfn, ...);
- #define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__)
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 3417e184c8e1..3c387fdc4a9e 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -539,27 +539,15 @@ void kvm_arm_halt_guest(struct kvm *kvm)
- 	kvm_make_all_cpus_request(kvm, KVM_REQ_VCPU_EXIT);
- }
- 
--void kvm_arm_halt_vcpu(struct kvm_vcpu *vcpu)
--{
--	vcpu->arch.pause = true;
--	kvm_vcpu_kick(vcpu);
--}
--
--void kvm_arm_resume_vcpu(struct kvm_vcpu *vcpu)
--{
--	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
--
--	vcpu->arch.pause = false;
--	swake_up(wq);
--}
--
- void kvm_arm_resume_guest(struct kvm *kvm)
- {
- 	int i;
- 	struct kvm_vcpu *vcpu;
- 
--	kvm_for_each_vcpu(i, vcpu, kvm)
--		kvm_arm_resume_vcpu(vcpu);
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		vcpu->arch.pause = false;
-+		swake_up(kvm_arch_vcpu_wq(vcpu));
-+	}
- }
- 
- static void vcpu_sleep(struct kvm_vcpu *vcpu)
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 64cbcb4c47d0..c1e4bdd66131 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -231,23 +231,21 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
-  * be migrated while we don't hold the IRQ locks and we don't want to be
-  * chasing moving targets.
-  *
-- * For private interrupts, we only have to make sure the single and only VCPU
-- * that can potentially queue the IRQ is stopped.
-+ * For private interrupts we don't have to do anything because userspace
-+ * accesses to the VGIC state already require all VCPUs to be stopped, and
-+ * only the VCPU itself can modify its private interrupts active state, which
-+ * guarantees that the VCPU is not running.
-  */
- static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
- {
--	if (intid < VGIC_NR_PRIVATE_IRQS)
--		kvm_arm_halt_vcpu(vcpu);
--	else
-+	if (intid > VGIC_NR_PRIVATE_IRQS)
- 		kvm_arm_halt_guest(vcpu->kvm);
- }
- 
- /* See vgic_change_active_prepare */
- static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
- {
--	if (intid < VGIC_NR_PRIVATE_IRQS)
--		kvm_arm_resume_vcpu(vcpu);
--	else
-+	if (intid > VGIC_NR_PRIVATE_IRQS)
- 		kvm_arm_resume_guest(vcpu->kvm);
- }
- 
-@@ -271,11 +269,13 @@ void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
- {
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 
-+	mutex_lock(&vcpu->kvm->lock);
- 	vgic_change_active_prepare(vcpu, intid);
- 
- 	__vgic_mmio_write_cactive(vcpu, addr, len, val);
- 
- 	vgic_change_active_finish(vcpu, intid);
-+	mutex_unlock(&vcpu->kvm->lock);
- }
- 
- void vgic_mmio_uaccess_write_cactive(struct kvm_vcpu *vcpu,
-@@ -305,11 +305,13 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
- {
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 
-+	mutex_lock(&vcpu->kvm->lock);
- 	vgic_change_active_prepare(vcpu, intid);
- 
- 	__vgic_mmio_write_sactive(vcpu, addr, len, val);
- 
- 	vgic_change_active_finish(vcpu, intid);
-+	mutex_unlock(&vcpu->kvm->lock);
- }
- 
- void vgic_mmio_uaccess_write_sactive(struct kvm_vcpu *vcpu,
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 83b24d20ff8f..aea080a2c443 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -35,11 +35,12 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
- 
- /*
-  * Locking order is always:
-- * its->cmd_lock (mutex)
-- *   its->its_lock (mutex)
-- *     vgic_cpu->ap_list_lock
-- *       kvm->lpi_list_lock
-- *         vgic_irq->irq_lock
-+ * kvm->lock (mutex)
-+ *   its->cmd_lock (mutex)
-+ *     its->its_lock (mutex)
-+ *       vgic_cpu->ap_list_lock
-+ *         kvm->lpi_list_lock
-+ *           vgic_irq->irq_lock
-  *
-  * If you need to take multiple locks, always take the upper lock first,
-  * then the lower ones, e.g. first take the its_lock, then the irq_lock.
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 23c0d56436a7..e25567a93dd5 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -528,12 +528,14 @@ static const struct vgic_register_region vgic_v3_sgibase_registers[] = {
+ 		vgic_mmio_read_pending, vgic_mmio_write_cpending,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(GICR_ISACTIVER0,
+-		vgic_mmio_read_active, vgic_mmio_write_sactive, 4,
+-		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(GICR_ICACTIVER0,
+-		vgic_mmio_read_active, vgic_mmio_write_cactive, 4,
+-		VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ISACTIVER0,
++		vgic_mmio_read_active, vgic_mmio_write_sactive,
++		NULL, vgic_mmio_uaccess_write_sactive,
++		4, VGIC_ACCESS_32bit),
++	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ICACTIVER0,
++		vgic_mmio_read_active, vgic_mmio_write_cactive,
++		NULL, vgic_mmio_uaccess_write_cactive,
++		4, VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH(GICR_IPRIORITYR0,
+ 		vgic_mmio_read_priority, vgic_mmio_write_priority, 32,
+ 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
 -- 
 2.11.0
