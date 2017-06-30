@@ -1,42 +1,86 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [GIT PULL] KVM/ARM updates for 4.13
-Date: Fri, 30 Jun 2017 12:39:18 +0200
-Message-ID: <2b454fca-7db7-9a05-200d-5f9f0588f42a@redhat.com>
-References: <20170630084514.6779-1-marc.zyngier@arm.com>
+From: "Baicar, Tyler" <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Subject: Re: [PATCH V17 01/11] acpi: apei: read ack upon ghes record
+ consumption
+Date: Fri, 30 Jun 2017 10:47:17 -0600
+Message-ID: <fc05bd05-274d-3491-bbf8-f38dc0a16e49@codeaurora.org>
+References: <1495225933-4410-1-git-send-email-tbaicar@codeaurora.org>
+ <1495225933-4410-2-git-send-email-tbaicar@codeaurora.org>
+ <20170630101043.GZ658@rric.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EFD340D29
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 06:39:18 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IcFWss2yM09E for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jun 2017 06:39:17 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7421540D1A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 06:39:17 -0400 (EDT)
-In-Reply-To: <20170630084514.6779-1-marc.zyngier@arm.com>
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170630101043.GZ658-vWBEXY7mpu582hYKe6nXyg@public.gmane.org>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: Christoffer Dall <cdall@linaro.org>, Stefan Traby <stefan@hello-penguin.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Hu Huajun <huhuajun@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Robert Richter <robert.richter-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org>
+Cc: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, rkrcmar-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org, lenb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org, robert.moore-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, lv.zheng-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, nkaje-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, james.morse-5wv7dgnIgG8@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, eun.taik.lee-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, sandeepa.s.prabhu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, labbott-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shijie.huang-5wv7dgnIgG8@public.gmane.org, rruigrok-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, paul.gortmaker-CWA4WttNNZF54TAoqtyWWQ@public.gmane.org, tn-nYOzD4b6Jr9Wk0Htik3J/w@public.gmane.org, fu.wei-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org, bristot-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 6/30/2017 4:10 AM, Robert Richter wrote:
+> Tyler,
+>
+> On 19.05.17 14:32:03, Tyler Baicar wrote:
+>> A RAS (Reliability, Availability, Serviceability) controller
+>> may be a separate processor running in parallel with OS
+>> execution, and may generate error records for consumption by
+>> the OS. If the RAS controller produces multiple error records,
+>> then they may be overwritten before the OS has consumed them.
+>>
+>> The Generic Hardware Error Source (GHES) v2 structure
+>> introduces the capability for the OS to acknowledge the
+>> consumption of the error record generated by the RAS
+>> controller. A RAS controller supporting GHESv2 shall wait for
+>> the acknowledgment before writing a new error record, thus
+>> eliminating the race condition.
+>>
+>> Add support for parsing of GHESv2 sub-tables as well.
+>>
+>> Signed-off-by: Tyler Baicar <tbaicar-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+>> CC: Jonathan (Zhixiong) Zhang <zjzhang-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+>> Reviewed-by: James Morse <james.morse-5wv7dgnIgG8@public.gmane.org>
+>> ---
+>>   drivers/acpi/apei/ghes.c | 59 +++++++++++++++++++++++++++++++++++++++++++++---
+>>   drivers/acpi/apei/hest.c |  7 ++++--
+>>   include/acpi/ghes.h      |  5 +++-
+>>   3 files changed, 65 insertions(+), 6 deletions(-)
+>>   static int ghes_proc(struct ghes *ghes)
+>>   {
+>>   	int rc;
+>> @@ -661,6 +704,16 @@ static int ghes_proc(struct ghes *ghes)
+>>   			ghes_estatus_cache_add(ghes->generic, ghes->estatus);
+>>   	}
+>>   	ghes_do_proc(ghes, ghes->estatus);
+>> +
+>> +	/*
+>> +	 * GHESv2 type HEST entries introduce support for error acknowledgment,
+>> +	 * so only acknowledge the error if this support is present.
+>> +	 */
+>> +	if (is_hest_type_generic_v2(ghes)) {
+>> +		rc = ghes_ack_error(ghes->generic_v2);
+>> +		if (rc)
+>> +			return rc;
+>> +	}
+>>   out:
+>>   	ghes_clear_estatus(ghes);
+>>   	return rc;
+> was there any specific reason why the ack is sent before clearing the
+> block status? Spec says the ack should be sent at last.
+>
+> Also, the block is never cleared if ghes_ack_error() returns an error.
+> IMO we should fall through and clear the block status (this will
+> change anyway if the bloc status is cleared first).
+Hello Robert,
 
+Thank you for pointing this out. I will send a patch to move the ack 
+after the ghes_clear_estatus. This is probably the right thing to do 
+since right now if the FW populates an invalid estatus, we will fail to 
+read the estatus, jump to 'out:', and never send the ack.
 
-On 30/06/2017 10:44, Marc Zyngier wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-for-4.13
+Thanks,
+Tyler
 
-Pulled, thanks.
-
-Paolo
+-- 
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
