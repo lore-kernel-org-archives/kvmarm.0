@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 19/58] KVM: arm: Handle VCPU device attributes in guest.c
-Date: Fri, 30 Jun 2017 09:44:35 +0100
-Message-ID: <20170630084514.6779-20-marc.zyngier@arm.com>
+Subject: [PATCH 20/58] KVM: arm/arm64: Move irq_is_ppi() to header file
+Date: Fri, 30 Jun 2017 09:44:36 +0100
+Message-ID: <20170630084514.6779-21-marc.zyngier@arm.com>
 References: <20170630084514.6779-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ACD540D29
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E2A6D40D1A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EPieWQkGIc5M for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jun 2017 04:46:22 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4345440D8B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:22 -0400 (EDT)
+ with ESMTP id yZVC7x1Yjxxh for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Jun 2017 04:46:24 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF80340427
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:24 -0400 (EDT)
 In-Reply-To: <20170630084514.6779-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,98 +33,41 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <cdall@linaro.org>
 
-As we are about to support VCPU attributes to set the timer IRQ numbers
-in guest.c, move the static inlines for the VCPU attributes handlers
-from the header file to guest.c.
+We are about to need this define in the arch timer code as well so move
+it to a common location.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h | 22 +++++++--------------
- arch/arm/kvm/guest.c            | 42 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+), 15 deletions(-)
+ include/kvm/arm_vgic.h | 2 ++
+ virt/kvm/arm/pmu.c     | 2 --
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 00ad56ee6455..127e2dd2e21c 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -291,20 +291,12 @@ static inline void kvm_arm_init_debug(void) {}
- static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
--static inline int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
--					     struct kvm_device_attr *attr)
--{
--	return -ENXIO;
--}
--static inline int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
--					     struct kvm_device_attr *attr)
--{
--	return -ENXIO;
--}
--static inline int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
--					     struct kvm_device_attr *attr)
--{
--	return -ENXIO;
--}
-+
-+int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr);
-+int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr);
-+int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 97b8d3728b31..dde59fbc5f80 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -38,6 +38,8 @@
+ #define VGIC_MIN_LPI		8192
+ #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
  
- #endif /* __ARM_KVM_HOST_H__ */
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index fa6182a40941..acea05e9db4e 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -301,3 +301,45 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
- {
- 	return -EINVAL;
++#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
++
+ enum vgic_type {
+ 	VGIC_V2,		/* Good ol' GICv2 */
+ 	VGIC_V3,		/* New fancy GICv3 */
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 96a9cab39982..574feff55a6c 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -496,8 +496,6 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+ 	return 0;
  }
-+
-+int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr)
-+{
-+	int ret;
-+
-+	switch (attr->group) {
-+	default:
-+		ret = -ENXIO;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr)
-+{
-+	int ret;
-+
-+	switch (attr->group) {
-+	default:
-+		ret = -ENXIO;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr)
-+{
-+	int ret;
-+
-+	switch (attr->group) {
-+	default:
-+		ret = -ENXIO;
-+		break;
-+	}
-+
-+	return ret;
-+}
+ 
+-#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
+-
+ /*
+  * For one VM the interrupt type must be same for each vcpu.
+  * As a PPI, the interrupt number is the same for all vcpus,
 -- 
 2.11.0
