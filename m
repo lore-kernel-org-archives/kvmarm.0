@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 53/58] KVM: arm64: Log an error if trapping a
- write-to-read-only GICv3 access
-Date: Fri, 30 Jun 2017 09:45:09 +0100
-Message-ID: <20170630084514.6779-54-marc.zyngier@arm.com>
+Subject: [PATCH 52/58] KVM: arm64: Log an error if trapping a
+ read-from-write-only GICv3 access
+Date: Fri, 30 Jun 2017 09:45:08 +0100
+Message-ID: <20170630084514.6779-53-marc.zyngier@arm.com>
 References: <20170630084514.6779-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6AD040D38
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:47:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B50440DAC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:47:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BKs9REUA7jQe for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jun 2017 04:47:47 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A86AE40D44
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:47:47 -0400 (EDT)
+ with ESMTP id PPhQNTa8Hj00 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Jun 2017 04:47:46 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 256CF40D1D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:47:45 -0400 (EDT)
 In-Reply-To: <20170630084514.6779-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,7 +32,7 @@ To: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzin
 Cc: Christoffer Dall <cdall@linaro.org>, Stefan Traby <stefan@hello-penguin.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Hu Huajun <huhuajun@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-A write-to-read-only GICv3 access should UNDEF at EL1. But since
+A read-from-write-only GICv3 access should UNDEF at EL1. But since
 we're in complete paranoia-land with broken CPUs, let's assume the
 worse and gracefully handle the case.
 
@@ -40,77 +40,83 @@ Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c     | 15 +++++++++++++++
- virt/kvm/arm/hyp/vgic-v3-sr.c |  6 ++++++
- 2 files changed, 21 insertions(+)
+ arch/arm64/kvm/sys_regs.c     | 12 ++++++++----
+ virt/kvm/arm/hyp/vgic-v3-sr.c |  4 ++++
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 8d51c075966d..77862881ae86 100644
+index 0fe27024a2e1..8d51c075966d 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -65,6 +65,16 @@ static bool read_from_write_only(struct kvm_vcpu *vcpu,
- 	return false;
- }
+@@ -56,7 +56,8 @@
+  */
  
-+static bool write_to_read_only(struct kvm_vcpu *vcpu,
-+			       struct sys_reg_params *params,
-+			       const struct sys_reg_desc *r)
-+{
-+	WARN_ONCE(1, "Unexpected sys_reg write to read-only register\n");
-+	print_sys_reg_instr(params);
-+	kvm_inject_undefined(vcpu);
-+	return false;
-+}
-+
- /* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
- static u32 cache_levels;
+ static bool read_from_write_only(struct kvm_vcpu *vcpu,
+-				 const struct sys_reg_params *params)
++				 struct sys_reg_params *params,
++				 const struct sys_reg_desc *r)
+ {
+ 	WARN_ONCE(1, "Unexpected sys_reg read to write-only register\n");
+ 	print_sys_reg_instr(params);
+@@ -93,7 +94,7 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+ 			const struct sys_reg_desc *r)
+ {
+ 	if (!p->is_write)
+-		return read_from_write_only(vcpu, p);
++		return read_from_write_only(vcpu, p, r);
  
-@@ -954,10 +964,15 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	kvm_set_way_flush(vcpu);
+ 	return true;
+@@ -135,7 +136,7 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
+ 			   const struct sys_reg_desc *r)
+ {
+ 	if (!p->is_write)
+-		return read_from_write_only(vcpu, p);
++		return read_from_write_only(vcpu, p, r);
+ 
+ 	vgic_v3_dispatch_sgi(vcpu, p->regval);
+ 
+@@ -773,7 +774,7 @@ static bool access_pmswinc(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 		return trap_raz_wi(vcpu, p, r);
+ 
+ 	if (!p->is_write)
+-		return read_from_write_only(vcpu, p);
++		return read_from_write_only(vcpu, p, r);
+ 
+ 	if (pmu_write_swinc_el0_disabled(vcpu))
+ 		return false;
+@@ -953,7 +954,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
  	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
  
-+	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
- 	{ SYS_DESC(SYS_ICC_EOIR0_EL1), read_from_write_only },
-+	{ SYS_DESC(SYS_ICC_HPPIR0_EL1), write_to_read_only },
- 	{ SYS_DESC(SYS_ICC_DIR_EL1), read_from_write_only },
-+	{ SYS_DESC(SYS_ICC_RPR_EL1), write_to_read_only },
++	{ SYS_DESC(SYS_ICC_EOIR0_EL1), read_from_write_only },
++	{ SYS_DESC(SYS_ICC_DIR_EL1), read_from_write_only },
  	{ SYS_DESC(SYS_ICC_SGI1R_EL1), access_gic_sgi },
-+	{ SYS_DESC(SYS_ICC_IAR1_EL1), write_to_read_only },
- 	{ SYS_DESC(SYS_ICC_EOIR1_EL1), read_from_write_only },
-+	{ SYS_DESC(SYS_ICC_HPPIR1_EL1), write_to_read_only },
++	{ SYS_DESC(SYS_ICC_EOIR1_EL1), read_from_write_only },
  	{ SYS_DESC(SYS_ICC_SRE_EL1), access_gic_sre },
  
  	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
 diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index b26ce58b012a..79e3c2d3b754 100644
+index 15b557697086..b26ce58b012a 100644
 --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
 +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -976,6 +976,8 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 	switch (sysreg) {
- 	case SYS_ICC_IAR0_EL1:
- 	case SYS_ICC_IAR1_EL1:
-+		if (unlikely(!is_read))
-+			return 0;
- 		fn = __vgic_v3_read_iar;
+@@ -980,6 +980,8 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
  		break;
  	case SYS_ICC_EOIR0_EL1:
-@@ -1026,6 +1028,8 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 		break;
- 	case SYS_ICC_HPPIR0_EL1:
- 	case SYS_ICC_HPPIR1_EL1:
-+		if (unlikely(!is_read))
+ 	case SYS_ICC_EOIR1_EL1:
++		if (unlikely(is_read))
 +			return 0;
- 		fn = __vgic_v3_read_hppir;
+ 		fn = __vgic_v3_write_eoir;
  		break;
- 	case SYS_ICC_GRPEN0_EL1:
-@@ -1046,6 +1050,8 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 	case SYS_ICC_GRPEN1_EL1:
+@@ -1039,6 +1041,8 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 			fn = __vgic_v3_write_bpr0;
+ 		break;
+ 	case SYS_ICC_DIR_EL1:
++		if (unlikely(is_read))
++			return 0;
  		fn = __vgic_v3_write_dir;
  		break;
  	case SYS_ICC_RPR_EL1:
-+		if (unlikely(!is_read))
-+			return 0;
- 		fn = __vgic_v3_read_rpr;
- 		break;
- 	case SYS_ICC_CTLR_EL1:
 -- 
 2.11.0
