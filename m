@@ -1,135 +1,91 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 10/58] KVM: arm/arm64: properly use vcpu requests
-Date: Fri, 30 Jun 2017 09:44:26 +0100
-Message-ID: <20170630084514.6779-11-marc.zyngier@arm.com>
+Subject: [PATCH 11/58] KVM: arm/arm64: replace pause checks with vcpu request checks
+Date: Fri, 30 Jun 2017 09:44:27 +0100
+Message-ID: <20170630084514.6779-12-marc.zyngier@arm.com>
 References: <20170630084514.6779-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE9FD40D7A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:01 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RNn1EWtIq8V2 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jun 2017 04:46:00 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAE4F40E2C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:45:59 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20170630084514.6779-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Christoffer Dall <cdall@linaro.org>, Stefan Traby <stefan@hello-penguin.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Hu Huajun <huhuajun@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Alexander Graf <agraf@suse.de>, Andrew Jones <drjones@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <cdall@linaro.org>, David Daney <david.daney@cavium.com>, Eric Auger <eric.auger@redhat.com>, Hu Huajun <huhuajun@huawei.com>, James Morse <james.morse@arm.com>, Mark Rutland <mark.rutland@arm.com>, Stefan Traby <stefan@hello-penguin.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Andrew Jones <drjones@redhat.com>
 
-arm/arm64 already has one VCPU request used when setting pause,
-but it doesn't properly check requests in VCPU RUN. Check it
-and also make sure we set vcpu->mode at the appropriate time
-(before the check) and with the appropriate barriers. See
-Documentation/virtual/kvm/vcpu-requests.rst. Also make sure we
-don't leave any vcpu requests we don't intend to handle later
-set in the request bitmap. If we don't clear them, then
-kvm_request_pending() may return true when it shouldn't.
-
-Using VCPU requests properly fixes a small race where pause
-could get set just as a VCPU was entering guest mode.
+The current use of KVM_REQ_VCPU_EXIT for pause is fine.  Even the
+requester clearing the request is OK, as this is the special case
+where the sole requesting thread and receiving VCPU are executing
+synchronously (see "Clearing Requests" in
+Documentation/virtual/kvm/vcpu-requests.rst) However, that's about
+to change, so let's ensure only the receiving VCPU clears the
+request. Additionally, by guaranteeing KVM_REQ_VCPU_EXIT is always
+set when pause is, we can avoid checking pause directly in VCPU RUN.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- arch/arm/kvm/handle_exit.c   |  1 +
- arch/arm64/kvm/handle_exit.c |  1 +
- virt/kvm/arm/arm.c           | 14 ++++++++++++--
- virt/kvm/arm/psci.c          |  1 +
- 4 files changed, 15 insertions(+), 2 deletions(-)
+ virt/kvm/arm/arm.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
-index 5fd7968cdae9..a2b4f7b82356 100644
---- a/arch/arm/kvm/handle_exit.c
-+++ b/arch/arm/kvm/handle_exit.c
-@@ -72,6 +72,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		trace_kvm_wfx(*vcpu_pc(vcpu), false);
- 		vcpu->stat.wfi_exit_stat++;
- 		kvm_vcpu_block(vcpu);
-+		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 	}
- 
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index fa1b18e364fc..17d8a1677a0b 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -89,6 +89,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
- 		vcpu->stat.wfi_exit_stat++;
- 		kvm_vcpu_block(vcpu);
-+		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 	}
- 
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
 diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 3c387fdc4a9e..138212605ad9 100644
+index 138212605ad9..21a4db90073f 100644
 --- a/virt/kvm/arm/arm.c
 +++ b/virt/kvm/arm/arm.c
-@@ -546,6 +546,7 @@ void kvm_arm_resume_guest(struct kvm *kvm)
+@@ -546,7 +546,6 @@ void kvm_arm_resume_guest(struct kvm *kvm)
  
  	kvm_for_each_vcpu(i, vcpu, kvm) {
  		vcpu->arch.pause = false;
-+		kvm_clear_request(KVM_REQ_VCPU_EXIT, vcpu);
+-		kvm_clear_request(KVM_REQ_VCPU_EXIT, vcpu);
  		swake_up(kvm_arch_vcpu_wq(vcpu));
  	}
  }
-@@ -638,8 +639,18 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 			run->exit_reason = KVM_EXIT_INTR;
- 		}
+@@ -557,6 +556,11 @@ static void vcpu_sleep(struct kvm_vcpu *vcpu)
  
-+		/*
-+		 * Ensure we set mode to IN_GUEST_MODE after we disable
-+		 * interrupts and before the final VCPU requests check.
-+		 * See the comment in kvm_vcpu_exiting_guest_mode() and
-+		 * Documentation/virtual/kvm/vcpu-requests.rst
-+		 */
-+		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+ 	swait_event_interruptible(*wq, ((!vcpu->arch.power_off) &&
+ 				       (!vcpu->arch.pause)));
 +
++	if (vcpu->arch.pause) {
++		/* Awaken to handle a signal, request we sleep again later. */
++		kvm_make_request(KVM_REQ_VCPU_EXIT, vcpu);
++	}
+ }
+ 
+ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+@@ -564,6 +568,14 @@ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.target >= 0;
+ }
+ 
++static void check_vcpu_requests(struct kvm_vcpu *vcpu)
++{
++	if (kvm_request_pending(vcpu)) {
++		if (kvm_check_request(KVM_REQ_VCPU_EXIT, vcpu))
++			vcpu_sleep(vcpu);
++	}
++}
++
+ /**
+  * kvm_arch_vcpu_ioctl_run - the main VCPU run function to execute guest code
+  * @vcpu:	The VCPU pointer
+@@ -609,7 +621,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ 		update_vttbr(vcpu->kvm);
+ 
+-		if (vcpu->arch.power_off || vcpu->arch.pause)
++		check_vcpu_requests(vcpu);
++
++		if (vcpu->arch.power_off)
+ 			vcpu_sleep(vcpu);
+ 
+ 		/*
+@@ -649,7 +663,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
--			vcpu->arch.power_off || vcpu->arch.pause) {
-+		    kvm_request_pending(vcpu) ||
-+		    vcpu->arch.power_off || vcpu->arch.pause) {
-+			vcpu->mode = OUTSIDE_GUEST_MODE;
+ 		    kvm_request_pending(vcpu) ||
+-		    vcpu->arch.power_off || vcpu->arch.pause) {
++		    vcpu->arch.power_off) {
+ 			vcpu->mode = OUTSIDE_GUEST_MODE;
  			local_irq_enable();
  			kvm_pmu_sync_hwstate(vcpu);
- 			kvm_timer_sync_hwstate(vcpu);
-@@ -655,7 +666,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 */
- 		trace_kvm_entry(*vcpu_pc(vcpu));
- 		guest_enter_irqoff();
--		vcpu->mode = IN_GUEST_MODE;
- 
- 		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
- 
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index a08d7a93aebb..f68be2cc6256 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -57,6 +57,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
- 	 * for KVM will preserve the register state.
- 	 */
- 	kvm_vcpu_block(vcpu);
-+	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 
- 	return PSCI_RET_SUCCESS;
- }
 -- 
 2.11.0
