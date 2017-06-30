@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 34/58] KVM: arm64: vgic-v3: Add ICV_EOIR1_EL1 handler
-Date: Fri, 30 Jun 2017 09:44:50 +0100
-Message-ID: <20170630084514.6779-35-marc.zyngier@arm.com>
+Subject: [PATCH 32/58] KVM: arm64: vgic-v3: Add ICV_IGRPEN1_EL1 handler
+Date: Fri, 30 Jun 2017 09:44:48 +0100
+Message-ID: <20170630084514.6779-33-marc.zyngier@arm.com>
 References: <20170630084514.6779-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1357940D6B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:47:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC13140DD3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9uIIdaG-p6IS for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jun 2017 04:46:59 -0400 (EDT)
+ with ESMTP id D0VoMcGD5Qim for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Jun 2017 04:46:54 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C22B040DA5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C043440D5B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jun 2017 04:46:54 -0400 (EDT)
 In-Reply-To: <20170630084514.6779-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,185 +31,59 @@ To: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Paolo Bonzin
 Cc: Christoffer Dall <cdall@linaro.org>, Stefan Traby <stefan@hello-penguin.com>, kvm@vger.kernel.org, David Daney <david.daney@cavium.com>, Catalin Marinas <catalin.marinas@arm.com>, Hu Huajun <huhuajun@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a handler for writing the guest's view of the ICC_EOIR1_EL1
-register. This involves dropping the priority of the interrupt,
-and deactivating it if required (EOImode == 0).
+Add a handler for reading/writing the guest's view of the ICC_IGRPEN1_EL1
+register, which is located in the ICH_VMCR_EL2.VENG1 field.
 
 Tested-by: Alexander Graf <agraf@suse.de>
 Acked-by: David Daney <david.daney@cavium.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- include/linux/irqchip/arm-gic-v3.h |   2 +
- virt/kvm/arm/hyp/vgic-v3-sr.c      | 120 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 122 insertions(+)
+ virt/kvm/arm/hyp/vgic-v3-sr.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index d70668fae003..1f458ac6f494 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -417,6 +417,8 @@
- 
- #define ICH_HCR_EN			(1 << 0)
- #define ICH_HCR_UIE			(1 << 1)
-+#define ICH_HCR_EOIcount_SHIFT		27
-+#define ICH_HCR_EOIcount_MASK		(0x1f << ICH_HCR_EOIcount_SHIFT)
- 
- #define ICH_VMCR_ACK_CTL_SHIFT		2
- #define ICH_VMCR_ACK_CTL_MASK		(1 << ICH_VMCR_ACK_CTL_SHIFT)
 diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index 5a20f8d5bada..e9ff99112c4d 100644
+index fe021abc8b51..25f09721241f 100644
 --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
 +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -432,6 +432,26 @@ static int __hyp_text __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu,
- 	return lr;
+@@ -401,6 +401,23 @@ static unsigned int __hyp_text __vgic_v3_get_bpr1(u32 vmcr)
+ 	return bpr;
  }
  
-+static int __hyp_text __vgic_v3_find_active_lr(struct kvm_vcpu *vcpu,
-+					       int intid, u64 *lr_val)
++static void __hyp_text __vgic_v3_read_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
 +{
-+	unsigned int used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-+	int i;
-+
-+	for (i = 0; i < used_lrs; i++) {
-+		u64 val = __gic_v3_get_lr(i);
-+
-+		if ((val & ICH_LR_VIRTUAL_ID_MASK) == intid &&
-+		    (val & ICH_LR_ACTIVE_BIT)) {
-+			*lr_val = val;
-+			return i;
-+		}
-+	}
-+
-+	*lr_val = ICC_IAR1_EL1_SPURIOUS;
-+	return -1;
++	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG1_MASK));
 +}
 +
- static int __hyp_text __vgic_v3_get_highest_active_priority(void)
++static void __hyp_text __vgic_v3_write_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
++{
++	u64 val = vcpu_get_reg(vcpu, rt);
++
++	if (val & 1)
++		vmcr |= ICH_VMCR_ENG1_MASK;
++	else
++		vmcr &= ~ICH_VMCR_ENG1_MASK;
++
++	__vgic_v3_write_vmcr(vmcr);
++}
++
+ static void __hyp_text __vgic_v3_read_bpr1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
  {
- 	u8 nr_apr_regs = vtr_to_nr_apr_regs(read_gicreg(ICH_VTR_EL2));
-@@ -525,6 +545,44 @@ static void __hyp_text __vgic_v3_set_active_priority(u8 pri, u32 vmcr, int grp)
- 	}
- }
+ 	vcpu_set_reg(vcpu, rt, __vgic_v3_get_bpr1(vmcr));
+@@ -448,6 +465,12 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 	is_read = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ;
  
-+static int __hyp_text __vgic_v3_clear_highest_active_priority(void)
-+{
-+	u8 nr_apr_regs = vtr_to_nr_apr_regs(read_gicreg(ICH_VTR_EL2));
-+	u32 hap = 0;
-+	int i;
-+
-+	for (i = 0; i < nr_apr_regs; i++) {
-+		u32 ap0, ap1;
-+		int c0, c1;
-+
-+		ap0 = __vgic_v3_read_ap0rn(i);
-+		ap1 = __vgic_v3_read_ap1rn(i);
-+		if (!ap0 && !ap1) {
-+			hap += 32;
-+			continue;
-+		}
-+
-+		c0 = ap0 ? __ffs(ap0) : 32;
-+		c1 = ap1 ? __ffs(ap1) : 32;
-+
-+		/* Always clear the LSB, which is the highest priority */
-+		if (c0 < c1) {
-+			ap0 &= ~BIT(c0);
-+			__vgic_v3_write_ap0rn(ap0, i);
-+			hap += c0;
-+		} else {
-+			ap1 &= ~BIT(c1);
-+			__vgic_v3_write_ap1rn(ap1, i);
-+			hap += c1;
-+		}
-+
-+		/* Rescale to 8 bits of priority */
-+		return hap << __vgic_v3_bpr_min();
-+	}
-+
-+	return GICv3_IDLE_PRIORITY;
-+}
-+
- static void __hyp_text __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u64 lr_val;
-@@ -561,6 +619,65 @@ static void __hyp_text __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u32 vmcr, int r
- 	vcpu_set_reg(vcpu, rt, ICC_IAR1_EL1_SPURIOUS);
- }
- 
-+static void __hyp_text __vgic_v3_clear_active_lr(int lr, u64 lr_val)
-+{
-+	lr_val &= ~ICH_LR_ACTIVE_BIT;
-+	if (lr_val & ICH_LR_HW) {
-+		u32 pid;
-+
-+		pid = (lr_val & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
-+		gic_write_dir(pid);
-+	}
-+
-+	__gic_v3_set_lr(lr_val, lr);
-+}
-+
-+static void __hyp_text __vgic_v3_bump_eoicount(void)
-+{
-+	u32 hcr;
-+
-+	hcr = read_gicreg(ICH_HCR_EL2);
-+	hcr += 1 << ICH_HCR_EOIcount_SHIFT;
-+	write_gicreg(hcr, ICH_HCR_EL2);
-+}
-+
-+static void __hyp_text __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+{
-+	u32 vid = vcpu_get_reg(vcpu, rt);
-+	u64 lr_val;
-+	u8 lr_prio, act_prio;
-+	int lr, grp;
-+
-+	grp = __vgic_v3_get_group(vcpu);
-+
-+	/* Drop priority in any case */
-+	act_prio = __vgic_v3_clear_highest_active_priority();
-+
-+	/* If EOIing an LPI, no deactivate to be performed */
-+	if (vid >= VGIC_MIN_LPI)
-+		return;
-+
-+	/* EOImode == 1, nothing to be done here */
-+	if (vmcr & ICH_VMCR_EOIM_MASK)
-+		return;
-+
-+	lr = __vgic_v3_find_active_lr(vcpu, vid, &lr_val);
-+	if (lr == -1) {
-+		__vgic_v3_bump_eoicount();
-+		return;
-+	}
-+
-+	lr_prio = (lr_val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
-+
-+	/* If priorities or group do not match, the guest has fscked-up. */
-+	if (grp != !!(lr_val & ICH_LR_GROUP) ||
-+	    __vgic_v3_pri_to_pre(lr_prio, vmcr, grp) != act_prio)
-+		return;
-+
-+	/* Let's now perform the deactivation */
-+	__vgic_v3_clear_active_lr(lr, lr_val);
-+}
-+
- static void __hyp_text __vgic_v3_read_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG1_MASK));
-@@ -628,6 +745,9 @@ int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 	case SYS_ICC_IAR1_EL1:
- 		fn = __vgic_v3_read_iar;
- 		break;
-+	case SYS_ICC_EOIR1_EL1:
-+		fn = __vgic_v3_write_eoir;
+ 	switch (sysreg) {
++	case SYS_ICC_GRPEN1_EL1:
++		if (is_read)
++			fn = __vgic_v3_read_igrpen1;
++		else
++			fn = __vgic_v3_write_igrpen1;
 +		break;
- 	case SYS_ICC_GRPEN1_EL1:
+ 	case SYS_ICC_BPR1_EL1:
  		if (is_read)
- 			fn = __vgic_v3_read_igrpen1;
+ 			fn = __vgic_v3_read_bpr1;
 -- 
 2.11.0
