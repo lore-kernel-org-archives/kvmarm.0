@@ -1,23 +1,26 @@
-From: Raz <raziebe@gmail.com>
-Subject: How to trap a real interrupt to EL2 ?
-Date: Mon, 3 Jul 2017 21:56:06 +0000
-Message-ID: <CAPB=Z-o0-fGEvaxmwUVnSUTUAVWa0GgWupaaFcjJNecpeX3mrQ@mail.gmail.com>
+From: Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Handle hva aging while destroying the vm
+Date: Tue, 4 Jul 2017 01:41:49 +0200
+Message-ID: <20170703234149.GE5738@redhat.com>
+References: <1498231319-199734-1-git-send-email-agraf@suse.de>
+ <20170703080313.GB4066@cbox>
+ <a7921cdb-a5e5-8fc0-92d5-807f07c59069@suse.de>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============3069263808638318271=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1390C40D38
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jul 2017 17:56:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E7CC40CA7
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jul 2017 19:41:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DFNxGgCqAALt for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Jul 2017 17:56:09 -0400 (EDT)
-Received: from mail-lf0-f53.google.com (mail-lf0-f53.google.com
- [209.85.215.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A6DD40D25
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jul 2017 17:56:08 -0400 (EDT)
-Received: by mail-lf0-f53.google.com with SMTP id b207so109088003lfg.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 03 Jul 2017 14:56:28 -0700 (PDT)
+ with ESMTP id uBVlrEvoka50 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Jul 2017 19:41:32 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2285440A80
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jul 2017 19:41:31 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <a7921cdb-a5e5-8fc0-92d5-807f07c59069@suse.de>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,49 +30,78 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+To: Alexander Graf <agraf@suse.de>
+Cc: Christoffer Dall <cdall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============3069263808638318271==
-Content-Type: multipart/alternative; boundary="001a11c108ecb20f5d055370d648"
+Hello,
 
---001a11c108ecb20f5d055370d648
-Content-Type: text/plain; charset="UTF-8"
+On Mon, Jul 03, 2017 at 10:48:03AM +0200, Alexander Graf wrote:
+> On 07/03/2017 10:03 AM, Christoffer Dall wrote:
+> > Hi Alex,
+> >
+> > On Fri, Jun 23, 2017 at 05:21:59PM +0200, Alexander Graf wrote:
+> >> If we want to age an HVA while the VM is getting destroyed, we have a
+> >> tiny race window during which we may end up dereferencing an invalid
+> >> kvm->arch.pgd value.
+> >>
+> >>     CPU0               CPU1
+> >>
+> >>     kvm_age_hva()
+> >>                        kvm_mmu_notifier_release()
+> >>                        kvm_arch_flush_shadow_all()
+> >>                        kvm_free_stage2_pgd()
+> >>                        <grab mmu_lock>
+> >>     stage2_get_pmd()
+> >>     <wait for mmu_lock>
+> >>                        set kvm->arch.pgd = 0
+> >>                        <free mmu_lock>
+> >>     <grab mmu_lock>
+> >>     stage2_get_pud()
+> >>     <access kvm->arch.pgd>
+> >>     <use incorrect value>
+> > I don't think this sequence, can happen, but I think kvm_age_hva() can
+> > be called with the mmu_lock held and kvm->pgd already being NULL.
+> >
+> > Is that possible for the mmu notifiers to be calling clear(_flush)_young
+> > while also calling notifier_release?
+> 
+> I *think* the aging happens completely orthogonally to release. But 
+> let's ask Andrea - I'm sure he knows :).
 
-Hey
+I think the sequence can happen. All mmu notifier methods are flushed
+out of CPUs only through synchronize_srcu() which is called as the
+last step in __mmu_notifier_release/unregister. Only after _unregister
+returns you're sure kvm_age_hva cannot run anymore, until that point
+it can still run. Even during exit_mmap->mmu_notifier_release it can
+still run if invoked through rmap walks.
 
-I am trying to trap any real IRQ  into EL2.
-I created a thin hypervisor with mmu enabled and set hcr_el2 as follows:
-hcr_el2= HCR_IMO  | HCR_VM | HCR_RW.
+So while the ->release method runs, all other mmu notifier methods
+could be still invoked concurrently.
 
+mmu notifier methods are only protected by srcu to prevent the mmu
+notifier structure to be freed from under them, but there's no
+additional locking to serialize them (except for the synchronize_srcu
+that happens as the last step of mmu_notifier_release/unregister, well
+after they may have called the ->release method).
 
-Now it seems that once I set hcr_el2 to the above value and then exit from
-EL2 I immediately jump back to EL2.
+There's also a comment about it in __mmu_notifier_release:
 
-Any idea why ?
+ * runs with mm_users == 0. Other tasks may still invoke mmu notifiers
+ * in parallel despite there being no task using this mm any more,
+ * through the vmas outside of the exit_mmap context, such as with
+ * vmtruncate. This serializes against mmu_notifier_unregister with
 
---001a11c108ecb20f5d055370d648
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+And in the mmu_notifier_unregister too:
 
-<div dir=3D"ltr"><div><div><div><div>Hey<br><br></div>I am trying to trap a=
-ny real IRQ=C2=A0 into EL2. <br>I created a thin hypervisor with mmu enable=
-d and set hcr_el2 as follows: <br>hcr_el2=3D HCR_IMO=C2=A0 | HCR_VM | HCR_R=
-W.<br><br><br></div>Now it seems that once I set hcr_el2 to the above value=
- and then exit from EL2 I immediately jump back to EL2.<br></div><br></div>=
-Any idea why ?<br><br><br></div>
+ * calling mmu_notifier_unregister. ->release or any other notifier
+ * method may be invoked concurrently with mmu_notifier_unregister,
+ * and only after mmu_notifier_unregister returned we're guaranteed
+ * that ->release or any other method can't run anymore.
 
---001a11c108ecb20f5d055370d648--
+Even ->release could in theory run concurrently against itself if
+mmu_notifier_unregister runs concurrently with mmu_notifier_release
+but that's purely theoretical possibility.
 
---===============3069263808638318271==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============3069263808638318271==--
+Thanks,
+Andrea
