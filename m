@@ -1,105 +1,109 @@
-From: Alexander Graf <agraf@suse.de>
-Subject: Re: [PATCH] KVM: arm/arm64: Handle hva aging while destroying the vm
-Date: Mon, 3 Jul 2017 10:48:03 +0200
-Message-ID: <a7921cdb-a5e5-8fc0-92d5-807f07c59069@suse.de>
-References: <1498231319-199734-1-git-send-email-agraf@suse.de>
- <20170703080313.GB4066@cbox>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: [RFC 06/55] KVM: arm64: Add EL2 execution context for nesting
+Date: Mon, 3 Jul 2017 11:03:44 +0200
+Message-ID: <20170703090344.GF4066@cbox>
+References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
+ <1483943091-1364-7-git-send-email-jintack@cs.columbia.edu>
+ <20170222111017.GB26976@cbox>
+ <CAHyh4xjOvAgqQ+WLD3SHyNHXOFSuoKGu4sV+GaFm-LdEcoGYwA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E75C40D5E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jul 2017 04:47:48 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2hip654pijuv for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Jul 2017 04:47:47 -0400 (EDT)
-Received: from mx1.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2AB17408EB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jul 2017 04:47:47 -0400 (EDT)
-In-Reply-To: <20170703080313.GB4066@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAHyh4xjOvAgqQ+WLD3SHyNHXOFSuoKGu4sV+GaFm-LdEcoGYwA@mail.gmail.com>
+Sender: kvm-owner@vger.kernel.org
+To: Jintack Lim <jintack.lim@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, vladimir.murzin@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, anna-maria@linutronix.de, Shih-Wei Li <shihwei@cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, KVM General <kvm@vger.kernel.org>, lkml
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/03/2017 10:03 AM, Christoffer Dall wrote:
-> Hi Alex,
->
-> On Fri, Jun 23, 2017 at 05:21:59PM +0200, Alexander Graf wrote:
->> If we want to age an HVA while the VM is getting destroyed, we have a
->> tiny race window during which we may end up dereferencing an invalid
->> kvm->arch.pgd value.
->>
->>     CPU0               CPU1
->>
->>     kvm_age_hva()
->>                        kvm_mmu_notifier_release()
->>                        kvm_arch_flush_shadow_all()
->>                        kvm_free_stage2_pgd()
->>                        <grab mmu_lock>
->>     stage2_get_pmd()
->>     <wait for mmu_lock>
->>                        set kvm->arch.pgd = 0
->>                        <free mmu_lock>
->>     <grab mmu_lock>
->>     stage2_get_pud()
->>     <access kvm->arch.pgd>
->>     <use incorrect value>
-> I don't think this sequence, can happen, but I think kvm_age_hva() can
-> be called with the mmu_lock held and kvm->pgd already being NULL.
->
-> Is that possible for the mmu notifiers to be calling clear(_flush)_young
-> while also calling notifier_release?
+On Mon, Jun 26, 2017 at 10:33:23AM -0400, Jintack Lim wrote:
+> Hi Christoffer,
+> 
+> On Wed, Feb 22, 2017 at 6:10 AM, Christoffer Dall <cdall@linaro.org> wrote:
+> > On Mon, Jan 09, 2017 at 01:24:02AM -0500, Jintack Lim wrote:
+> >> With the nested virtualization support, the context of the guest
+> >> includes EL2 register states. The host manages a set of virtual EL2
+> >> registers.  In addition to that, the guest hypervisor supposed to run in
+> >> EL2 is now deprivilaged and runs in EL1. So, the host also manages a set
+> >> of shadow system registers to be able to run the guest hypervisor in
+> >> EL1.
+> >>
+> >> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+> >> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >> ---
+> >>  arch/arm64/include/asm/kvm_host.h | 54 +++++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 54 insertions(+)
+> >>
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >> index c0c8b02..ed78d73 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -146,6 +146,42 @@ enum vcpu_sysreg {
+> >>       NR_SYS_REGS     /* Nothing after this line! */
+> >>  };
+> >>
+> >> +enum el2_regs {
+> >> +     ELR_EL2,
+> >> +     SPSR_EL2,
+> >> +     SP_EL2,
+> >> +     AMAIR_EL2,
+> >> +     MAIR_EL2,
+> >> +     TCR_EL2,
+> >> +     TTBR0_EL2,
+> >> +     VTCR_EL2,
+> >> +     VTTBR_EL2,
+> >> +     VMPIDR_EL2,
+> >> +     VPIDR_EL2,      /* 10 */
+> >> +     MDCR_EL2,
+> >> +     CNTHCTL_EL2,
+> >> +     CNTHP_CTL_EL2,
+> >> +     CNTHP_CVAL_EL2,
+> >> +     CNTHP_TVAL_EL2,
+> >> +     CNTVOFF_EL2,
+> >> +     ACTLR_EL2,
+> >> +     AFSR0_EL2,
+> >> +     AFSR1_EL2,
+> >> +     CPTR_EL2,       /* 20 */
+> >> +     ESR_EL2,
+> >> +     FAR_EL2,
+> >> +     HACR_EL2,
+> >> +     HCR_EL2,
+> >> +     HPFAR_EL2,
+> >> +     HSTR_EL2,
+> >> +     RMR_EL2,
+> >> +     RVBAR_EL2,
+> >> +     SCTLR_EL2,
+> >> +     TPIDR_EL2,      /* 30 */
+> >> +     VBAR_EL2,
+> >> +     NR_EL2_REGS     /* Nothing after this line! */
+> >> +};
+> >
+> > Why do we have a separate enum and array for the EL2 regs and not simply
+> > expand vcpu_sysreg ?
+> 
+> We can expand vcpu_sysreg for the EL2 system registers. For SP_EL2,
+> SPSR_EL2, and ELR_EL2, where is the good place to locate them?.
+> SP_EL1, SPSR_EL1, and ELR_EL1 registers are saved in the kvm_regs
+> structure instead of sysregs[], so I wonder it's better to put them in
+> kvm_regs, too.
+> 
+> BTW, what's the reason that those EL1 registers are in kvm_regs
+> instead of sysregs[] in the first place?
+> 
 
-I *think* the aging happens completely orthogonally to release. But 
-let's ask Andrea - I'm sure he knows :).
+This has mostly to do with the way we export things to userspace, and
+for historical reasons.
 
+So we should either expand kvm_regs with the non-sysregs EL2 registers
+and expand sys_regs with the EL2 sysregs, or we should put everything
+EL2 into an EL2 array.  I feel like the first solution will fit more
+nicely into the current design, but I don't have a very strong
+preference.
 
-Alex
+You should look at the KVM_{GET,SET}_ONE_REG API definition and think
+about how your choice will fit with this.
 
->
-> If so, the patch below looks good to me.
->
-> Thanks,
-> -Christoffer
->
->
->> This patch adds a check for that case.
->>
->> Signed-off-by: Alexander Graf <agraf@suse.de>
->> ---
->>   virt/kvm/arm/mmu.c | 4 ++++
->>   1 file changed, 4 insertions(+)
->>
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index f2d5b6c..227931f 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -861,6 +861,10 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
->>   	pgd_t *pgd;
->>   	pud_t *pud;
->>   
->> +	/* Do we clash with kvm_free_stage2_pgd()? */
->> +	if (!kvm->arch.pgd)
->> +		return NULL;
->> +
->>   	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
->>   	if (WARN_ON(stage2_pgd_none(*pgd))) {
->>   		if (!cache)
->> -- 
->> 1.8.5.6
->>
->> _______________________________________________
->> kvmarm mailing list
->> kvmarm@lists.cs.columbia.edu
->> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Marc, any preference?
+
+Thanks,
+-Christoffer
