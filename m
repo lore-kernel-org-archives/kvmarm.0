@@ -1,179 +1,131 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [RFC 21/55] KVM: arm64: Forward HVC instruction to the guest
- hypervisor
-Date: Mon, 3 Jul 2017 11:31:56 +0200
-Message-ID: <20170703093156.m3ds2orbjcyooaag@kamzik.brq.redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC 06/55] KVM: arm64: Add EL2 execution context for nesting
+Date: Mon, 3 Jul 2017 10:32:45 +0100
+Message-ID: <9714b524-eb95-d9af-f394-5a71b3eb7f75@arm.com>
 References: <1483943091-1364-1-git-send-email-jintack@cs.columbia.edu>
- <1483943091-1364-22-git-send-email-jintack@cs.columbia.edu>
- <20170222114758.GM26976@cbox>
- <CAHyh4xjG8_dOOe-eqQmAogDHDnQPCUQ-2Kccz9=6NmL0_+9TAA@mail.gmail.com>
- <20170703090850.GG4066@cbox>
+ <1483943091-1364-7-git-send-email-jintack@cs.columbia.edu>
+ <20170222111017.GB26976@cbox>
+ <CAHyh4xjOvAgqQ+WLD3SHyNHXOFSuoKGu4sV+GaFm-LdEcoGYwA@mail.gmail.com>
+ <20170703090344.GF4066@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A47440CE9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jul 2017 05:31:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BbtO6BiIS97O for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Jul 2017 05:31:50 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 88016408EB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jul 2017 05:31:49 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20170703090850.GG4066@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <cdall@linaro.org>
-Cc: KVM General <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Shih-Wei Li <shihwei@cs.columbia.edu>, lorenzo.pieralisi@arm.com, linux@armlinux.org.uk, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kevin.brodsky@arm.com, wcohen@redhat.com, anna-maria@linutronix.de, geoff@infradead.org, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170703090344.GF4066@cbox>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>, Jintack Lim <jintack.lim@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux@armlinux.org.uk, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, vladimir.murzin@arm.com, Suzuki K Poulose <suzuki.poulose@arm.com>, mark.rutland@arm.com, james.morse@arm.com, lorenzo.pieralisi@arm.com, kevin.brodsky@arm.com, wcohen@redhat.com, shankerd@codeaurora.org, geoff@infradead.org, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, anna-maria@linutronix.de, Shih-Wei Li <shihwei@cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, KVM General <kvm@vger.kernel.org>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 03, 2017 at 11:08:50AM +0200, Christoffer Dall wrote:
-> On Mon, Jun 26, 2017 at 11:21:25AM -0400, Jintack Lim wrote:
-> > On Wed, Feb 22, 2017 at 6:47 AM, Christoffer Dall <cdall@linaro.org> wrote:
-> > > On Mon, Jan 09, 2017 at 01:24:17AM -0500, Jintack Lim wrote:
-> > >> Forward exceptions due to hvc instruction to the guest hypervisor.
-> > >>
-> > >> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-> > >> ---
-> > >>  arch/arm64/include/asm/kvm_nested.h |  5 +++++
-> > >>  arch/arm64/kvm/Makefile             |  1 +
-> > >>  arch/arm64/kvm/handle_exit.c        | 11 +++++++++++
-> > >>  arch/arm64/kvm/handle_exit_nested.c | 27 +++++++++++++++++++++++++++
-> > >>  4 files changed, 44 insertions(+)
-> > >>  create mode 100644 arch/arm64/include/asm/kvm_nested.h
-> > >>  create mode 100644 arch/arm64/kvm/handle_exit_nested.c
-> > >>
-> > >> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> > >> new file mode 100644
-> > >> index 0000000..620b4d3
-> > >> --- /dev/null
-> > >> +++ b/arch/arm64/include/asm/kvm_nested.h
-> > >> @@ -0,0 +1,5 @@
-> > >> +#ifndef __ARM64_KVM_NESTED_H__
-> > >> +#define __ARM64_KVM_NESTED_H__
-> > >> +
-> > >> +int handle_hvc_nested(struct kvm_vcpu *vcpu);
-> > >> +#endif
-> > >> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> > >> index b342bdd..9c35e9a 100644
-> > >> --- a/arch/arm64/kvm/Makefile
-> > >> +++ b/arch/arm64/kvm/Makefile
-> > >> @@ -35,4 +35,5 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
-> > >>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
-> > >>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
-> > >>
-> > >> +kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += handle_exit_nested.o
-> > >>  kvm-$(CONFIG_KVM_ARM_NESTED_HYP) += emulate-nested.o
-> > >> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> > >> index a891684..208be16 100644
-> > >> --- a/arch/arm64/kvm/handle_exit.c
-> > >> +++ b/arch/arm64/kvm/handle_exit.c
-> > >> @@ -29,6 +29,10 @@
-> > >>  #include <asm/kvm_mmu.h>
-> > >>  #include <asm/kvm_psci.h>
-> > >>
-> > >> +#ifdef CONFIG_KVM_ARM_NESTED_HYP
-> > >> +#include <asm/kvm_nested.h>
-> > >> +#endif
-> > >> +
-> > >>  #define CREATE_TRACE_POINTS
-> > >>  #include "trace.h"
-> > >>
-> > >> @@ -42,6 +46,13 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> > >>                           kvm_vcpu_hvc_get_imm(vcpu));
-> > >>       vcpu->stat.hvc_exit_stat++;
-> > >>
-> > >> +#ifdef CONFIG_KVM_ARM_NESTED_HYP
-> > >> +     ret = handle_hvc_nested(vcpu);
-> > >> +     if (ret < 0 && ret != -EINVAL)
-> > >> +             return ret;
-> > >> +     else if (ret >= 0)
-> > >> +             return ret;
-> > >> +#endif
-> > >>       ret = kvm_psci_call(vcpu);
-> > >>       if (ret < 0) {
-> > >>               kvm_inject_undefined(vcpu);
-> > >> diff --git a/arch/arm64/kvm/handle_exit_nested.c b/arch/arm64/kvm/handle_exit_nested.c
-> > >> new file mode 100644
-> > >> index 0000000..a6ce23b
-> > >> --- /dev/null
-> > >> +++ b/arch/arm64/kvm/handle_exit_nested.c
-> > >> @@ -0,0 +1,27 @@
-> > >> +/*
-> > >> + * Copyright (C) 2016 - Columbia University
-> > >> + * Author: Jintack Lim <jintack@cs.columbia.edu>
-> > >> + *
-> > >> + * This program is free software; you can redistribute it and/or modify
-> > >> + * it under the terms of the GNU General Public License version 2 as
-> > >> + * published by the Free Software Foundation.
-> > >> + *
-> > >> + * This program is distributed in the hope that it will be useful,
-> > >> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > >> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > >> + * GNU General Public License for more details.
-> > >> + *
-> > >> + * You should have received a copy of the GNU General Public License
-> > >> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> > >> + */
-> > >> +
-> > >> +#include <linux/kvm.h>
-> > >> +#include <linux/kvm_host.h>
-> > >> +
-> > >> +#include <asm/kvm_emulate.h>
-> > >> +
-> > >> +/* We forward all hvc instruction to the guest hypervisor. */
-> > >> +int handle_hvc_nested(struct kvm_vcpu *vcpu)
-> > >> +{
-> > >> +     return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-> > >> +}
-> > >
-> > > I don't understand the logic here or in the caller above.  Do we really
-> > > forward *all" hvc calls to the guest hypervisor now, so that we no
-> > > longer support any hypercalls from the VM?  That seems a little rough
-> > > and probably requires some more discussions.
-> > 
-> > So I think if we run a VM with the EL2 support, then all hvc calls
-> > from the VM should be forwarded to the virtual EL2.
+On 03/07/17 10:03, Christoffer Dall wrote:
+> On Mon, Jun 26, 2017 at 10:33:23AM -0400, Jintack Lim wrote:
+>> Hi Christoffer,
+>>
+>> On Wed, Feb 22, 2017 at 6:10 AM, Christoffer Dall <cdall@linaro.org> wrote:
+>>> On Mon, Jan 09, 2017 at 01:24:02AM -0500, Jintack Lim wrote:
+>>>> With the nested virtualization support, the context of the guest
+>>>> includes EL2 register states. The host manages a set of virtual EL2
+>>>> registers.  In addition to that, the guest hypervisor supposed to run in
+>>>> EL2 is now deprivilaged and runs in EL1. So, the host also manages a set
+>>>> of shadow system registers to be able to run the guest hypervisor in
+>>>> EL1.
+>>>>
+>>>> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+>>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>>>> ---
+>>>>  arch/arm64/include/asm/kvm_host.h | 54 +++++++++++++++++++++++++++++++++++++++
+>>>>  1 file changed, 54 insertions(+)
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>>> index c0c8b02..ed78d73 100644
+>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>> @@ -146,6 +146,42 @@ enum vcpu_sysreg {
+>>>>       NR_SYS_REGS     /* Nothing after this line! */
+>>>>  };
+>>>>
+>>>> +enum el2_regs {
+>>>> +     ELR_EL2,
+>>>> +     SPSR_EL2,
+>>>> +     SP_EL2,
+>>>> +     AMAIR_EL2,
+>>>> +     MAIR_EL2,
+>>>> +     TCR_EL2,
+>>>> +     TTBR0_EL2,
+>>>> +     VTCR_EL2,
+>>>> +     VTTBR_EL2,
+>>>> +     VMPIDR_EL2,
+>>>> +     VPIDR_EL2,      /* 10 */
+>>>> +     MDCR_EL2,
+>>>> +     CNTHCTL_EL2,
+>>>> +     CNTHP_CTL_EL2,
+>>>> +     CNTHP_CVAL_EL2,
+>>>> +     CNTHP_TVAL_EL2,
+>>>> +     CNTVOFF_EL2,
+>>>> +     ACTLR_EL2,
+>>>> +     AFSR0_EL2,
+>>>> +     AFSR1_EL2,
+>>>> +     CPTR_EL2,       /* 20 */
+>>>> +     ESR_EL2,
+>>>> +     FAR_EL2,
+>>>> +     HACR_EL2,
+>>>> +     HCR_EL2,
+>>>> +     HPFAR_EL2,
+>>>> +     HSTR_EL2,
+>>>> +     RMR_EL2,
+>>>> +     RVBAR_EL2,
+>>>> +     SCTLR_EL2,
+>>>> +     TPIDR_EL2,      /* 30 */
+>>>> +     VBAR_EL2,
+>>>> +     NR_EL2_REGS     /* Nothing after this line! */
+>>>> +};
+>>>
+>>> Why do we have a separate enum and array for the EL2 regs and not simply
+>>> expand vcpu_sysreg ?
+>>
+>> We can expand vcpu_sysreg for the EL2 system registers. For SP_EL2,
+>> SPSR_EL2, and ELR_EL2, where is the good place to locate them?.
+>> SP_EL1, SPSR_EL1, and ELR_EL1 registers are saved in the kvm_regs
+>> structure instead of sysregs[], so I wonder it's better to put them in
+>> kvm_regs, too.
+>>
+>> BTW, what's the reason that those EL1 registers are in kvm_regs
+>> instead of sysregs[] in the first place?
+>>
 > 
-> But do we actually check if the guest has EL2 here?  It seems you cann
-> handle_hvc_nested unconditionally when you have
-> OCNFIG_KVM_ARM_NESTED_HYP.  I think that's what threw me off when first
-> reading your patch.
+> This has mostly to do with the way we export things to userspace, and
+> for historical reasons.
 > 
-> > 
-> > I may miss something obvious, so can you (or anyone) come up with some
-> > cases that the host hypervisor needs to directly handle hvc from the
-> > VM with the EL2 support?
-> > 
+> So we should either expand kvm_regs with the non-sysregs EL2 registers
+> and expand sys_regs with the EL2 sysregs, or we should put everything
+> EL2 into an EL2 array.  I feel like the first solution will fit more
+> nicely into the current design, but I don't have a very strong
+> preference.
 > 
-> So I'm a little unsure what to say here.  On one hand you are absolutely
-> correct, that architecturally if we emulated virtual EL2, then all
-> hypercalls are handled by the virtual EL2 (even hypercalls from virtual
-> EL2 which should become self-hypercalls).
+> You should look at the KVM_{GET,SET}_ONE_REG API definition and think
+> about how your choice will fit with this.
 > 
-> On the other hand, an enlightened guest may want to use hypercalls to
-> the hypervisor for some reason, but that would require some numbering
-> scheme to separate the two concepts.
+> Marc, any preference?
 
-Yes, I've been thinking that a KVM generic vcpu needs to be enlightened,
-and to use a hypercall to get the host cpu's errata. If we head down that
-road, then even a vcpu emulating EL2 would need to be able to this.
+My worry is that by changing kvm_regs, we're touching a userspace
+visible structure. I'm not sure we can avoid it, but I'd like to avoid
+putting too much there (SPSR_EL2 and ELR_EL2 should be enough). I just
+had a panic moment when realizing that this structure is not versioned,
+but the whole ONE_REG API seems to save us from a complete disaster.
 
-> 
-> Do we currently have support for the guest to use SMC calls for PSCI
-> when it has virtual EL2?
+Overall, having kvm_regs as a UAPI visible thing retrospectively strikes
+me as a dangerous design, as we cannot easily expand it. Maybe we should
+consider having a kvm_regs_v2 that embeds kvm_regs, and not directly
+expose it to userspace (but instead expose the indexes in that
+structure)? Userspace that knows how to deal with EL2 will use the new
+indexes, while existing SW will carry on using the EL1/EL0 version.
 
-Yup, that's already supported by QEMU and the guest kernel.
+sysregs are easier to deal with, as they are visible through their
+encoding, and we can place the anywhere we want. sys_regs is as good a
+location as any.
 
-Thanks,
-drew
+Thoughts?
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
