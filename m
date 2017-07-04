@@ -1,116 +1,61 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: Handle hva aging while destroying the vm
-Date: Tue, 4 Jul 2017 10:35:42 +0200
-Message-ID: <20170704083542.GK4066@cbox>
-References: <1498231319-199734-1-git-send-email-agraf@suse.de>
- <20170703080313.GB4066@cbox>
- <a7921cdb-a5e5-8fc0-92d5-807f07c59069@suse.de>
- <20170703234149.GE5738@redhat.com>
+Subject: Re: [PATCH v4 1/3] arm64: kvm: support user space to detect RAS
+ extension feature
+Date: Tue, 4 Jul 2017 10:40:57 +0200
+Message-ID: <20170704084057.GL4066@cbox>
+References: <1498481143-23183-1-git-send-email-gengdongjiu@huawei.com>
+ <20170703082126.GC4066@cbox>
+ <dd9cf101-2ca9-f349-292e-f48204abe929@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C44240D43
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jul 2017 04:35:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id N23Q8bxSE24j for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jul 2017 04:35:26 -0400 (EDT)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D6C040960
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jul 2017 04:35:26 -0400 (EDT)
-Received: by mail-wm0-f41.google.com with SMTP id w126so188612022wme.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Jul 2017 01:35:46 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170703234149.GE5738@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrea Arcangeli <aarcange@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <dd9cf101-2ca9-f349-292e-f48204abe929@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: marc.zyngier@arm.com, james.morse@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, wuquanming@huawei.com, huangshaoyu@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, rkrcmar@redhat.com, corbet@lwn.net, catalin.marinas@arm.com, linux@armlinux.org.uk, will.deacon@arm.com, suzuki.poulose@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 04, 2017 at 01:41:49AM +0200, Andrea Arcangeli wrote:
-> Hello,
+Hi Dongjiu,
+
+On Tue, Jul 04, 2017 at 03:04:54PM +0800, gengdongjiu wrote:
+> Hi Christoffer,
 > 
-> On Mon, Jul 03, 2017 at 10:48:03AM +0200, Alexander Graf wrote:
-> > On 07/03/2017 10:03 AM, Christoffer Dall wrote:
-> > > Hi Alex,
-> > >
-> > > On Fri, Jun 23, 2017 at 05:21:59PM +0200, Alexander Graf wrote:
-> > >> If we want to age an HVA while the VM is getting destroyed, we have a
-> > >> tiny race window during which we may end up dereferencing an invalid
-> > >> kvm->arch.pgd value.
-> > >>
-> > >>     CPU0               CPU1
-> > >>
-> > >>     kvm_age_hva()
-> > >>                        kvm_mmu_notifier_release()
-> > >>                        kvm_arch_flush_shadow_all()
-> > >>                        kvm_free_stage2_pgd()
-> > >>                        <grab mmu_lock>
-> > >>     stage2_get_pmd()
-> > >>     <wait for mmu_lock>
-> > >>                        set kvm->arch.pgd = 0
-> > >>                        <free mmu_lock>
-> > >>     <grab mmu_lock>
-> > >>     stage2_get_pud()
-> > >>     <access kvm->arch.pgd>
-> > >>     <use incorrect value>
-> > > I don't think this sequence, can happen, but I think kvm_age_hva() can
-> > > be called with the mmu_lock held and kvm->pgd already being NULL.
-> > >
-> > > Is that possible for the mmu notifiers to be calling clear(_flush)_young
-> > > while also calling notifier_release?
+> On 2017/7/3 16:21, Christoffer Dall wrote:
+> > On Mon, Jun 26, 2017 at 08:45:43PM +0800, Dongjiu Geng wrote:
+> >> Handle userspace's detection for RAS extension, because sometimes
+> >> the userspace needs to know the CPU's capacity
 > > 
-> > I *think* the aging happens completely orthogonally to release. But 
-> > let's ask Andrea - I'm sure he knows :).
+> > Why?  Can you please provide some more rationale.
 > 
-> I think the sequence can happen. All mmu notifier methods are flushed
-> out of CPUs only through synchronize_srcu() which is called as the
-> last step in __mmu_notifier_release/unregister. Only after _unregister
-> returns you're sure kvm_age_hva cannot run anymore, until that point
-> it can still run. Even during exit_mmap->mmu_notifier_release it can
-> still run if invoked through rmap walks.
+> userspace mainly want to know whether CPU has RAS extension capability to decide whether need to specify the syndrome value.
+> if have, userspace specify the syndrome value. otherwise, not specify the value.
 > 
-> So while the ->release method runs, all other mmu notifier methods
-> could be still invoked concurrently.
+> James ever suggest not want userspace to know the capability, and let KVM to judge the RAS extension capability.
 > 
-> mmu notifier methods are only protected by srcu to prevent the mmu
-> notifier structure to be freed from under them, but there's no
-> additional locking to serialize them (except for the synchronize_srcu
-> that happens as the last step of mmu_notifier_release/unregister, well
-> after they may have called the ->release method).
+> but I consider it again, userspace know the RAS extension capability may be better, which can avoid KVM return error if
+> CPU does not support RAS extension.
+
+So first of all, while I appreciate your efforts to explain your
+rationale here, I am also asking you to provide a more comprehensive
+commit message for the next version of the patch.
+
 > 
-> There's also a comment about it in __mmu_notifier_release:
-> 
->  * runs with mm_users == 0. Other tasks may still invoke mmu notifiers
->  * in parallel despite there being no task using this mm any more,
->  * through the vmas outside of the exit_mmap context, such as with
->  * vmtruncate. This serializes against mmu_notifier_unregister with
-> 
-> And in the mmu_notifier_unregister too:
-> 
->  * calling mmu_notifier_unregister. ->release or any other notifier
->  * method may be invoked concurrently with mmu_notifier_unregister,
->  * and only after mmu_notifier_unregister returned we're guaranteed
->  * that ->release or any other method can't run anymore.
-> 
-> Even ->release could in theory run concurrently against itself if
-> mmu_notifier_unregister runs concurrently with mmu_notifier_release
-> but that's purely theoretical possibility.
+> could you give me some suggestion that whether let userspace to know the RAS extension capability?
 > 
 
-Thanks for the clarification.
+I haven't thought much about it, but there are unanswered questions to
+me.  For example, does the type and capabilities of the guest in any way
+affect whether or not this features should be available?  Are there any
+concerns with respect to migration?
 
-So Alex, I think you just need to fix the commit message of this patch.
+And then the point I raised below, which is that this KVM-specific ioctl
+is returning a hardware property of the CPU (the one the ioctl happens
+to run on - what happens on a heterogeneous system?), but not really
+what KVM can and cannot do.  At the very least this should be based on
+a more generic in-kernel functionality, which reports the capabilities
+of a system to KVM, and KVM could then tell userspace if it has a
+certain capability.
 
-Thanks,
+Hope this helps,
 -Christoffer
