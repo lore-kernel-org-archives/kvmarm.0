@@ -1,111 +1,53 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 5/8] KVM: arm/arm64: vgic: Handle mapped level
- sensitive SPIs
-Date: Tue, 4 Jul 2017 13:15:40 +0100
-Message-ID: <f21e17b7-9437-ca96-6847-91e7ecee3af4@arm.com>
-References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
- <1497531160-29162-6-git-send-email-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1497531160-29162-6-git-send-email-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, christoffer.dall@linaro.org
-Cc: drjones@redhat.com, wei@redhat.com
+From: Andrew Jones <drjones@redhat.com>
+Subject: [PATCH kvm-unit-tests 0/2] arm64: add vtimer test
+Date: Tue,  4 Jul 2017 15:58:36 +0200
+Message-ID: <20170704135838.9061-1-drjones@redhat.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: agraf@suse.de, cdall@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+Add a test for the vtimer. I've tested on
+ accel=tcg
+ accel=kvm,kernel-irqchip=on  : on thunderx, seattle, and mustang
+ accel=kvm,kernel-irqchip=off : on thunderx and mustang
 
-On 15/06/17 13:52, Eric Auger wrote:
-> Currently, the line level of unmapped level sensitive SPIs is
-> toggled down by the maintenance IRQ handler/resamplefd mechanism.
-> 
-> As mapped SPI completion is not trapped, we cannot rely on this
-> mechanism and the line level needs to be observed at distributor
-> level instead.
-> 
-> This patch handles the physical IRQ case in vgic_validate_injection
-> and get the line level of a mapped SPI at distributor level.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v1 -> v2:
-> - renamed is_unshared_mapped into is_mapped_spi
-> - changes to kvm_vgic_map_phys_irq moved in the previous patch
-> - make vgic_validate_injection more readable
-> - reword the commit message
-> ---
->  virt/kvm/arm/vgic/vgic.c | 16 ++++++++++++++--
->  virt/kvm/arm/vgic/vgic.h |  7 ++++++-
->  2 files changed, 20 insertions(+), 3 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index 075f073..2e35ac7 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -139,6 +139,17 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->  	kfree(irq);
->  }
->  
-> +bool irq_line_level(struct vgic_irq *irq)
-> +{
-> +	bool line_level = irq->line_level;
-> +
-> +	if (unlikely(is_mapped_spi(irq)))
-> +		WARN_ON(irq_get_irqchip_state(irq->host_irq,
-> +					      IRQCHIP_STATE_PENDING,
-> +					      &line_level));
-> +	return line_level;
-> +}
-> +
->  /**
->   * kvm_vgic_target_oracle - compute the target vcpu for an irq
->   *
-> @@ -236,13 +247,14 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
->  
->  /*
->   * Only valid injection if changing level for level-triggered IRQs or for a
-> - * rising edge.
-> + * rising edge. Injection of virtual interrupts associated to physical
-> + * interrupts always is valid.
->   */
->  static bool vgic_validate_injection(struct vgic_irq *irq, bool level)
->  {
->  	switch (irq->config) {
->  	case VGIC_CONFIG_LEVEL:
-> -		return irq->line_level != level;
-> +		return (irq->line_level != level || unlikely(is_mapped_spi(irq)));
->  	case VGIC_CONFIG_EDGE:
->  		return level;
->  	}
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index bba7fa2..da254ae 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -96,14 +96,19 @@
->  /* we only support 64 kB translation table page size */
->  #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
->  
-> +bool irq_line_level(struct vgic_irq *irq);
-> +
->  static inline bool irq_is_pending(struct vgic_irq *irq)
->  {
->  	if (irq->config == VGIC_CONFIG_EDGE)
->  		return irq->pending_latch;
->  	else
-> -		return irq->pending_latch || irq->line_level;
-> +		return irq->pending_latch || irq_line_level(irq);
+It works everywhere without modification except on mustang. My mustang
+seems to have a hardware problem requiring bit 31 of CNTV_CVAL_EL0
+to be clear before attempting to enable (setting CNTV_CTL_EL0.ENABLE),
+otherwise the VCPU hangs... My mustang's CNTV_CVAL_EL0 also has the
+strange issue of not being able to set the upper 8 bits.  Well, fixing
+hardware is outside my job description, so "oh, well..." If you hit
+the same problem, try the hack below, which allows tests to run and
+pass for me.
 
-I'm a bit concerned that an edge interrupt doesn't take the distributor
-state into account here. Why is that so? Once an SPI is forwarded to a
-guest, a large part of the edge vs level differences move into the HW,
-and are not that different anymore from a SW PoV.
+diff --git a/arm/timer.c b/arm/timer.c
+index 89f4c9400ab69..18b8c4773c92f 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -73,7 +73,7 @@ static void test_vtimer(void)
+ 	report_prefix_push("vtimer-busy-loop");
+ 
+ 	/* Enable the timer */
+-	write_sysreg(~0, cntv_cval_el0);
++	write_sysreg(~0 & ~(1<<31), cntv_cval_el0);
+ 	isb();
+ 	write_sysreg(CNTV_CTL_ENABLE, cntv_ctl_el0);
+ 
 
-Thanks,
+Alexander Graf (1):
+  arm64: add vtimer test
 
-	M.
+Andrew Jones (1):
+  arm64: timer: check for vtimer interrupt
+
+ arm/Makefile.arm64 |   2 +-
+ arm/timer.c        | 134 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg  |   6 +++
+ lib/arm/asm/gic.h  |   4 ++
+ 4 files changed, 145 insertions(+), 1 deletion(-)
+ create mode 100644 arm/timer.c
+
 -- 
-Jazz is not dead. It just smells funny...
+2.9.4
