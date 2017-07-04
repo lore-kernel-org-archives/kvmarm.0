@@ -1,72 +1,82 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH kvm-unit-tests 2/2] arm64: timer: check for vtimer interrupt
-Date: Tue,  4 Jul 2017 15:58:38 +0200
-Message-ID: <20170704135838.9061-3-drjones@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests 0/2] arm64: add vtimer test
+Date: Tue, 4 Jul 2017 19:29:39 +0200
+Message-ID: <85cdaadf-1980-6de5-326a-8976c2236ddd@redhat.com>
 References: <20170704135838.9061-1-drjones@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 161F840D2F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jul 2017 13:29:23 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id SYqcDRRbFTG9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jul 2017 13:29:22 -0400 (EDT)
+Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0CBE440D1D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jul 2017 13:29:21 -0400 (EDT)
+Received: by mail-wm0-f66.google.com with SMTP id j85so27697623wmj.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Jul 2017 10:29:43 -0700 (PDT)
 In-Reply-To: <20170704135838.9061-1-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: agraf@suse.de, cdall@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: cdall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arm/timer.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+On 04/07/2017 15:58, Andrew Jones wrote:
+> Add a test for the vtimer. I've tested on
+>  accel=tcg
+>  accel=kvm,kernel-irqchip=on  : on thunderx, seattle, and mustang
+>  accel=kvm,kernel-irqchip=off : on thunderx and mustang
+> 
+> It works everywhere without modification except on mustang. My mustang
+> seems to have a hardware problem requiring bit 31 of CNTV_CVAL_EL0
+> to be clear before attempting to enable (setting CNTV_CTL_EL0.ENABLE),
+> otherwise the VCPU hangs... My mustang's CNTV_CVAL_EL0 also has the
+> strange issue of not being able to set the upper 8 bits.  Well, fixing
+> hardware is outside my job description, so "oh, well..." If you hit
+> the same problem, try the hack below, which allows tests to run and
+> pass for me.
 
-diff --git a/arm/timer.c b/arm/timer.c
-index ec110ee08d97..89f4c9400ab6 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -17,6 +17,21 @@
- 
- static u32 vtimer_irq, vtimer_irq_flags;
- static void *gic_ispendr;
-+static bool vtimer_irq_received;
-+
-+static void irq_handler(struct pt_regs *regs)
-+{
-+	u32 irqstat = gic_read_iar();
-+	u32 irqnr = gic_iar_irqnr(irqstat);
-+
-+	if (irqnr != GICC_INT_SPURIOUS)
-+		gic_write_eoir(irqstat);
-+
-+	if (irqnr == PPI(vtimer_irq)) {
-+		write_sysreg(CNTV_CTL_IMASK, cntv_ctl_el0);
-+		++vtimer_irq_received;
-+	}
-+}
- 
- static bool gic_vtimer_pending(void)
- {
-@@ -64,7 +79,7 @@ static void test_vtimer(void)
- 
- 	report("not pending before", !gic_vtimer_pending());
- 	report("latency within 10 ms", test_cval_10msec());
--	report("pending after", gic_vtimer_pending());
-+	report("interrupt received", vtimer_irq_received);
- 
- 	/* Disable the timer again */
- 	write_sysreg(0, cntv_ctl_el0);
-@@ -92,12 +107,17 @@ static void test_init(void)
- 
- 	switch (gic_version()) {
- 	case 2:
-+		writel(1 << PPI(vtimer_irq), gicv2_dist_base() + GICD_ISENABLER + 0);
- 		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
- 		break;
- 	case 3:
-+		writel(1 << PPI(vtimer_irq), gicv3_sgi_base() + GICR_ISENABLER0);
- 		gic_ispendr = gicv3_sgi_base() + GICD_ISPENDR;
- 		break;
- 	}
-+
-+	install_irq_handler(EL1H_IRQ, irq_handler);
-+	local_irq_enable();
- }
- 
- int main(void)
--- 
-2.9.4
+Applied and pushed, thanks.
+
+Paolo
+
+> diff --git a/arm/timer.c b/arm/timer.c
+> index 89f4c9400ab69..18b8c4773c92f 100644
+> --- a/arm/timer.c
+> +++ b/arm/timer.c
+> @@ -73,7 +73,7 @@ static void test_vtimer(void)
+>  	report_prefix_push("vtimer-busy-loop");
+>  
+>  	/* Enable the timer */
+> -	write_sysreg(~0, cntv_cval_el0);
+> +	write_sysreg(~0 & ~(1<<31), cntv_cval_el0);
+>  	isb();
+>  	write_sysreg(CNTV_CTL_ENABLE, cntv_ctl_el0);
+>  
+> 
+> Alexander Graf (1):
+>   arm64: add vtimer test
+> 
+> Andrew Jones (1):
+>   arm64: timer: check for vtimer interrupt
+> 
+>  arm/Makefile.arm64 |   2 +-
+>  arm/timer.c        | 134 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg  |   6 +++
+>  lib/arm/asm/gic.h  |   4 ++
+>  4 files changed, 145 insertions(+), 1 deletion(-)
+>  create mode 100644 arm/timer.c
+> 
