@@ -1,70 +1,72 @@
 From: Joe Perches <joe@perches.com>
-Subject: [PATCH 00/18] treewide: Move storage class before
-	return type
-Date: Wed,  5 Jul 2017 13:02:09 -0700
-Message-ID: <cover.1499284835.git.joe@perches.com>
+Subject: [PATCH 02/18] ARM: KVM: Move asmlinkage before type
+Date: Wed,  5 Jul 2017 13:02:11 -0700
+Message-ID: <005b8e120650c6a13b541e420f4e3605603fe9e6.1499284835.git.joe@perches.com>
+References: <cover.1499284835.git.joe@perches.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <alsa-devel-bounces@alsa-project.org>
-List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
-List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
-List-Post: <mailto:alsa-devel@alsa-project.org>
-List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
-List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
-Errors-To: alsa-devel-bounces@alsa-project.org
-Sender: alsa-devel-bounces@alsa-project.org
-To: Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-m68k@lists.linux-m68k.org, linux-efi@vger.kernel.org, linux-s390@vger.kernel.org, linux-serial@vger.kernel.org, linux-ia64@vger.kernel.org, linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-omap@vger.kernel.org, alsa-devel@alsa-project.org
-Cc: linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, linux-cris-kernel@axis.com, linux-sh@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D726C40D14
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jul 2017 16:02:19 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QZG+IpJLWZlC for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Jul 2017 16:02:19 -0400 (EDT)
+Received: from smtprelay.hostedemail.com (smtprelay0029.hostedemail.com
+ [216.40.44.29])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2818540C5A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jul 2017 16:02:19 -0400 (EDT)
+In-Reply-To: <cover.1499284835.git.joe@perches.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Morton <akpm@linux-foundation.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Move the inline/asmlinkage keywords before the return types
-Add a checkpatch test for this too.
+asmlinkage is either 'extern "C"' or blank.
 
-Joe Perches (18):
-  checkpatch: improve the STORAGE_CLASS test
-  ARM: KVM: Move asmlinkage before type
-  ARM: HP Jornada 7XX: Move inline before return type
-  CRIS: gpio: Move inline before return type
-  FRV: tlbflush: Move asmlinkage before return type
-  ia64: Move inline before return type
-  ia64: sn: pci: Move inline before type
-  m68k: coldfire: Move inline before return type
-  MIPS: SMP: Move asmlinkage before return type
-  sh: Move inline before return type
-  x86/efi: Move asmlinkage before return type
-  drivers: s390: Move static and inline before return type
-  drivers: tty: serial: Move inline before return type
-  USB: serial: safe_serial: Move __inline__ before return type
-  video: fbdev: intelfb: Move inline before return type
-  video: fbdev: omap: Move inline before return type
-  ARM: samsung: usb-ohci: Move inline before return type
-  ALSA: opl4: Move inline before return type
+Move the uses of asmlinkage before the return types to be similar
+to the rest of the kernel.
 
- arch/arm/include/asm/kvm_hyp.h                 |  8 ++++----
- arch/arm/mach-sa1100/jornada720_ssp.c          |  2 +-
- arch/cris/arch-v10/drivers/gpio.c              |  4 ++--
- arch/frv/include/asm/tlbflush.h                |  8 ++++----
- arch/ia64/kernel/mca.c                         |  2 +-
- arch/ia64/sn/pci/pcibr/pcibr_ate.c             |  2 +-
- arch/ia64/sn/pci/tioce_provider.c              |  4 ++--
- arch/m68k/coldfire/intc-simr.c                 |  4 ++--
- arch/mips/include/asm/smp.h                    |  2 +-
- arch/sh/mm/cache-sh5.c                         |  2 +-
- arch/x86/include/asm/efi.h                     |  4 ++--
- drivers/s390/net/ctcm_main.c                   |  2 +-
- drivers/s390/net/qeth_l3_main.c                |  2 +-
- drivers/tty/serial/ioc3_serial.c               |  4 ++--
- drivers/tty/serial/ioc4_serial.c               |  4 ++--
- drivers/usb/serial/safe_serial.c               |  2 +-
- drivers/video/fbdev/intelfb/intelfbdrv.c       |  2 +-
- drivers/video/fbdev/omap/lcdc.c                |  6 +++---
- include/linux/platform_data/usb-ohci-s3c2410.h |  2 +-
- scripts/checkpatch.pl                          | 12 ++++++++++--
- sound/drivers/opl4/opl4_lib.c                  |  2 +-
- 21 files changed, 44 insertions(+), 36 deletions(-)
+Signed-off-by: Joe Perches <joe@perches.com>
+---
+ arch/arm/include/asm/kvm_hyp.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
+index 58508900c4bb..14b5903f0224 100644
+--- a/arch/arm/include/asm/kvm_hyp.h
++++ b/arch/arm/include/asm/kvm_hyp.h
+@@ -110,8 +110,8 @@ void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
+ void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
+ void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
+ 
+-void asmlinkage __vfp_save_state(struct vfp_hard_struct *vfp);
+-void asmlinkage __vfp_restore_state(struct vfp_hard_struct *vfp);
++asmlinkage void __vfp_save_state(struct vfp_hard_struct *vfp);
++asmlinkage void __vfp_restore_state(struct vfp_hard_struct *vfp);
+ static inline bool __vfp_enabled(void)
+ {
+ 	return !(read_sysreg(HCPTR) & (HCPTR_TCP(11) | HCPTR_TCP(10)));
+@@ -120,8 +120,8 @@ static inline bool __vfp_enabled(void)
+ void __hyp_text __banked_save_state(struct kvm_cpu_context *ctxt);
+ void __hyp_text __banked_restore_state(struct kvm_cpu_context *ctxt);
+ 
+-int asmlinkage __guest_enter(struct kvm_vcpu *vcpu,
++asmlinkage int __guest_enter(struct kvm_vcpu *vcpu,
+ 			     struct kvm_cpu_context *host);
+-int asmlinkage __hyp_do_panic(const char *, int, u32);
++asmlinkage int __hyp_do_panic(const char *, int, u32);
+ 
+ #endif /* __ARM_KVM_HYP_H__ */
 -- 
 2.10.0.rc2.1.g053435c
