@@ -1,21 +1,28 @@
-From: Alexander Graf <agraf@suse.de>
-Subject: [PATCH v2] KVM: arm/arm64: Handle hva aging while destroying the vm
-Date: Wed,  5 Jul 2017 08:20:31 +0200
-Message-ID: <1499235631-141725-1-git-send-email-agraf@suse.de>
+From: Christoffer Dall <cdall@linaro.org>
+Subject: Re: How to trap a real interrupt to EL2 ?
+Date: Wed, 5 Jul 2017 08:23:34 +0200
+Message-ID: <20170705062334.GA18106@cbox>
+References: <CAPB=Z-o0-fGEvaxmwUVnSUTUAVWa0GgWupaaFcjJNecpeX3mrQ@mail.gmail.com>
+ <20170704111212.GQ4066@cbox>
+ <CAPB=Z-oZtJyOewtAMsK7iSWnhrhv5iX90HmV0FMj_E5DHy7d-g@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41B5F40A80
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jul 2017 02:19:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C951E40A80
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jul 2017 02:23:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jcBCLJ5+tyyV for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Jul 2017 02:19:47 -0400 (EDT)
-Received: from mx1.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DB3D40427
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jul 2017 02:19:47 -0400 (EDT)
+ with ESMTP id 3ACmPN+aNFPx for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Jul 2017 02:23:17 -0400 (EDT)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1156240427
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jul 2017 02:23:16 -0400 (EDT)
+Received: by mail-wm0-f48.google.com with SMTP id 62so212420511wmw.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Jul 2017 23:23:39 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CAPB=Z-oZtJyOewtAMsK7iSWnhrhv5iX90HmV0FMj_E5DHy7d-g@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,48 +32,68 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+To: Raz <raziebe@gmail.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The kvm_age_hva callback may be called all the way concurrently while
-kvm_mmu_notifier_release() is running.
+On Tue, Jul 04, 2017 at 07:32:37PM +0000, Raz wrote:
+> The entry woken in the vector is IRQ 64-bit EL1 ( same as el1_irq in
+> kvn/hyp.S ).
+> ESR_EL2.EC =  0x16 -" HVC executed in EL2".  It does not change.
 
-The release function sets kvm->arch.pgd = NULL which the aging function
-however implicitly relies on in stage2_get_pud(). That means they can
-race and the aging function may dereference a NULL pgd pointer.
+ESR_EL2 doesn't say anything meaningful if you're taking an asynchronous
+exception, like the IRQ.
 
-This patch adds a check for that case, so that we leave the aging
-function silently.
+> 
+> Jintack
+> CPSR.I is 1 , but I do not think I can just clear it, if that what you
+> mean...
 
-Cc: stable@vger.kernel.org
-Fixes: 293f29363 ("kvm-arm: Unmap shadow pagetables properly")
-Signed-off-by: Alexander Graf <agraf@suse.de>
+CPSR.I will mask virtual interrupts at EL1 when HCR_EL2.IMO is set, not
+physical interrupts.
 
----
+The only way to run code in EL1 when having the IMO bit set and
+interrupts arriving would involve either actually handling those
+interrupts at EL2, or taking more drastic measures like disabling
+physical interrupts entirely by disabling the interrupt controller or
+something like that.
 
-v1 -> v2:
+> 
+> Chrtistoph
 
-  - Fix commit message
-  - Add Fixes and stable tags
----
- virt/kvm/arm/mmu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ *Christoffer*
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index f2d5b6c..227931f 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -861,6 +861,10 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	pgd_t *pgd;
- 	pud_t *pud;
- 
-+	/* Do we clash with kvm_free_stage2_pgd()? */
-+	if (!kvm->arch.pgd)
-+		return NULL;
-+
- 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	if (WARN_ON(stage2_pgd_none(*pgd))) {
- 		if (!cache)
--- 
-1.8.5.6
+> 
+> You deactivate traps in kvm_vcpu_return( called from el1_irq).
+> Does it mean we cannot exit-enter the hypervisor when hcr_el2.IMO is
+> enabled ?
+
+Not sure what you're asking, but the deactivate_traps function is a
+result of the split-mode virtualization design of KVM, where we have two
+modes of running things in EL1, either the host hypervisor, or the VM.
+Therefore, when we run the VM, we enable traps on all sorts of things to
+EL2, and when we go back to the host, we disable those traps again,
+making EL1 for the host more privileged.
+
+In terms of IRQs, what we do in practice is:
+
+  disable_interrupts(); /* sets CPSR.I.  HCR_EL2.IMO is 0 here. */
+  jump_to_el2();
+  enable_traps(); /* set HCR_EL2.IMO = 1 */
+  jump_to_vm_in_el1();
+  handle_exception_from_vm();
+  disable_traps(); /* set HCR_EL2.IMO = 0 */
+  return_to_host_el1(); /* CPSR.I is still set */
+  enable_interrupts(); /* clears CPSR.I.  Raises new exception, now
+                          handled at EL1 by Linux default mechanism */
+
+Overall, I recommend you study the ARM Architecture Reference Manual
+(ARM ARM) more closely to understand how the hardware works, and you can
+also read one of these to get a better understanding of how the KVM design
+works:
+
+http://www.cs.columbia.edu/~cdall/pubs/asplos019-dall.pdf
+https://lwn.net/Articles/557132/
+
+Hope this helps,
+-Christoffer
