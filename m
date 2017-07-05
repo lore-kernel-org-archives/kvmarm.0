@@ -1,25 +1,21 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v2] KVM: arm/arm64: Handle hva aging while destroying the
- vm
-Date: Wed, 5 Jul 2017 09:57:00 +0100
-Message-ID: <20170705085700.GA16881@e107814-lin.cambridge.arm.com>
-References: <1499235631-141725-1-git-send-email-agraf@suse.de>
+From: wanghaibin <wanghaibin.wang@huawei.com>
+Subject: [PATCH 0/4] kvm: arm/arm64: vgic: vGICv2 GICC_APRn uaccess support.
+Date: Wed, 5 Jul 2017 19:23:25 +0800
+Message-ID: <1499253809-17584-1-git-send-email-wanghaibin.wang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C799640D43
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jul 2017 04:57:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BEE5740D7A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jul 2017 07:23:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LDEFTcdOEj6Z for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Jul 2017 04:57:01 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 75E8C40296
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jul 2017 04:57:01 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <1499235631-141725-1-git-send-email-agraf@suse.de>
+ with ESMTP id VniavfUy2Lms for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Jul 2017 07:23:54 -0400 (EDT)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A9B4240296
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jul 2017 07:23:52 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,96 +25,64 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Graf <agraf@suse.de>
-Cc: Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: cdall@linaro.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
+Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Alex,
+In the case (GICv2 on GICv3 migration), I did the test on my board as follow:
+vm boot => migrate to destination => shutdown at destination => start at destination 
+=> migrate back to source ... go round and begin again;
 
-On Wed, Jul 05, 2017 at 08:20:31AM +0200, Alexander Graf wrote:
-> The kvm_age_hva callback may be called all the way concurrently while
-> kvm_mmu_notifier_release() is running.
-> 
-> The release function sets kvm->arch.pgd = NULL which the aging function
-> however implicitly relies on in stage2_get_pud(). That means they can
-> race and the aging function may dereference a NULL pgd pointer.
-> 
-> This patch adds a check for that case, so that we leave the aging
-> function silently.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 293f29363 ("kvm-arm: Unmap shadow pagetables properly")
-> Signed-off-by: Alexander Graf <agraf@suse.de>
-> 
-> ---
-> 
-> v1 -> v2:
-> 
->   - Fix commit message
->   - Add Fixes and stable tags
-> ---
->  virt/kvm/arm/mmu.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index f2d5b6c..227931f 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -861,6 +861,10 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
->  	pgd_t *pgd;
->  	pud_t *pud;
->  
-> +	/* Do we clash with kvm_free_stage2_pgd()? */
-> +	if (!kvm->arch.pgd)
-> +		return NULL;
-> +
+I tested many times, but unlucky, there maybe failed by accident when shutdown the vm 
+at destination. (GICv3 on GICv3 migration, 1000+ times, That's OK).
+while failed,  we can watch the interrupts in the vm, some vcpus of the vm can not 
+receive the virt timer interrupt. And, these vcpus will 100% with top tool at host.
 
-I think this check should be moved up in the chain. We call kvm_age_hva(), with
-the kvm->mmu_lock held and we don't release it till we reach here. So, ideally,
-if we find the PGD is null when we reach kvm_age_hva(), we could simply return
-there, like we do for other call backs from the KVM mmu_notifier.
+vgic_state debug file at destination shows(a active virt timer interrupt) that:
+VCPU 0 TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID
+---------------------------------------------------------------
+            ....................
+       PPI   25      0 000001        0        1   0 160      -1
+       PPI   26      0 000001        0        1   0 160      -1
+       PPI   27      0 011111       27        1   0 160       0
 
 
-----8>----
+I added log to print ICH* registers for VCPU0 at destination:
+**HCR:0x1, VMCR:0xf0ec0001,SRE:0x0, ELRSR:0xe**
+-----AP0R:0: 0x0------
+-----AP0R:1: 0x0------
+-----AP0R:2: 0x0------
+-----AP0R:3: 0x0------
+-----AP1R:0: 0x0------
+-----AP1R:1: 0x0------
+-----AP1R:2: 0x0------
+-----AP1R:3: 0x0------
+-----LR:0: 0xa0a0001b0000001b------
+-----LR:1: 0x0------
+-----LR:2: 0x0------
+-----LR:3: 0x0------
 
-kvm-arm: Handle hva aging while destroying vm
+and the ICH_AP1R0 value is 0x10000 at source.
 
-The mmu_notifier_release() callback of KVM triggers cleaning up
-the stage2 page table on kvm-arm. However there could be other
-notifier callbacks in parallel with the mmu_notifier_release(),
-which could cause the call backs ending up in an empty stage2
-page table. Make sure we check it for all the notifier callbacks.
+At present, QEMU have supproted GICC_APRn put/set interface for emulated GICv2,
+and kvm does not support the uaccess interface. This patchset try to support this.
 
-Reported-by: Alex Graf <agraf@suse.de>
-Cc: Christoffer Dall <cdall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: stable@vger.kernel.org
-Fixes: commit 293f29363 ("kvm-arm: Unmap shadow pagetables properly")
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- virt/kvm/arm/mmu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+BTW: patch 1 is untested cause I don't have the GICv2 hardware board on hand, sorry.
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index e2e5eff..db1c7b2 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1665,12 +1665,16 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *
- 
- int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
- {
-+	if (!kvm->arch.pgd)
-+		return 0;
- 	trace_kvm_age_hva(start, end);
- 	return handle_hva_to_gpa(kvm, start, end, kvm_age_hva_handler, NULL);
- }
- 
- int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
- {
-+	if (!kvm->arch.pgd)
-+		return 0;
- 	trace_kvm_test_age_hva(hva);
- 	return handle_hva_to_gpa(kvm, hva, hva, kvm_test_age_hva_handler, NULL);
- }
+wanghaibin (4):
+  kvm: arm/arm64: vgic-v2: Add GICH_APR accessors for GICv2
+  kvm: arm/arm64: vgic-v3: add ICH_AP[01]Rn accessors for GICv3
+  kvm: arm/arm64: vgic: Implement the vGICv2 GICC_APRn uaccess
+    interface.
+  kvm: arm/arm64: vgic: clean up vGICv3 ICC_APRn sysreg uaccess
+
+ arch/arm64/kvm/vgic-sys-reg-v3.c | 25 +++++--------------------
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 22 ++++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-mmio.c    | 28 ++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v2.c      | 21 +++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c      | 20 ++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h         |  7 +++++++
+ 6 files changed, 101 insertions(+), 22 deletions(-)
+
 -- 
-2.7.5
+1.8.3.1
