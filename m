@@ -1,25 +1,25 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/4] kvm: arm/arm64: vgic-v2: Add GICH_APR accessors for
- GICv2
-Date: Thu, 6 Jul 2017 17:13:52 +0100
-Message-ID: <33bd7cd2-b49e-187b-b2fc-d020ff35aeb6@arm.com>
+Subject: Re: [PATCH 2/4] kvm: arm/arm64: vgic-v3: add ICH_AP[01]Rn accessors
+ for GICv3
+Date: Thu, 6 Jul 2017 17:18:31 +0100
+Message-ID: <e6d0fddb-dc66-f356-786b-1dc6563695d5@arm.com>
 References: <1499253809-17584-1-git-send-email-wanghaibin.wang@huawei.com>
- <1499253809-17584-2-git-send-email-wanghaibin.wang@huawei.com>
+ <1499253809-17584-3-git-send-email-wanghaibin.wang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 16DB140D55
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 12:13:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7796840D88
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 12:18:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TTWQGB3izHGH for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Jul 2017 12:13:30 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2503940D4A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 12:13:29 -0400 (EDT)
-In-Reply-To: <1499253809-17584-2-git-send-email-wanghaibin.wang@huawei.com>
+ with ESMTP id DFXy880JbN7x for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Jul 2017 12:18:09 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4532940D4A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 12:18:08 -0400 (EDT)
+In-Reply-To: <1499253809-17584-3-git-send-email-wanghaibin.wang@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,74 +34,70 @@ Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 05/07/17 12:23, wanghaibin wrote:
-> For GICv2, there are at most 5 priority bits are implemented in
-> GICH_LR<n>.Priority, so we only need to be concerned with GICH_APR0.
-> The other GICH_APRn access can be treated as raz/wi.
+> Compared to GICv2 hardware, GICv3 support ICH_AP[01]Rn for Group [01]
+> interrupts.
 
-What is this "other" GICH_APRn?
+This doesn't describe what the patch is trying to achieve.
 
-> 
-> Attention: This patch is untest!
 > 
 > Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
 > ---
->  virt/kvm/arm/vgic/vgic-v2.c | 21 +++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic-v3.c | 20 ++++++++++++++++++++
 >  virt/kvm/arm/vgic/vgic.h    |  2 ++
->  2 files changed, 23 insertions(+)
+>  2 files changed, 22 insertions(+)
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index e4187e5..11d3b73 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -172,6 +172,27 @@ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr)
->  	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = 0;
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 030248e..361da71 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -156,6 +156,26 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
+>  	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr] = 0;
 >  }
 >  
-> +void vgic_v2_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val)
-> +{
-> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> +
-> +	if (idx == 0)
-> +		cpu_if->vgic_apr = val;
-> +	else
-> +		WARN_ON(val);
+> +void vgic_v3_set_apr(struct kvm_vcpu *vcpu, u8 apr, u32 idx, u32 val)
 
-If treated as WI, why do you WARN here? Also, given that there is only
-one register for the active priorities, I don't really see the point in
-having this "idx" parameter.
+The "apr" parameter is actually the group number, and should be exposed
+as such.
+
+> +{
+> +	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+> +
+> +	if (apr)
+> +		cpu_if->vgic_ap1r[idx] = val;
+> +	else
+> +		cpu_if->vgic_ap0r[idx] = val;
+
+How do you guarantee that you're not accessing outside of this GIC's
+preemption capability?
 
 > +}
 > +
-> +u32 vgic_v2_get_apr(struct kvm_vcpu *vcpu, u32 idx)
+> +u32 vgic_v3_get_apr(struct kvm_vcpu *vcpu, u8 apr, u32 idx)
 > +{
-> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
 > +
-> +	if (idx == 0)
-> +		return cpu_if->vgic_apr;
+> +	if (apr)
+> +		return cpu_if->vgic_ap1r[idx];
 > +	else
-> +		return 0;
+> +		return cpu_if->vgic_ap0r[idx];
 > +}
 > +
-> +
-
-Extra whitespace.
-
->  void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
 >  {
->  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+>  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
 > diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index bba7fa2..8791b9a 100644
+> index 8791b9a..91d66ec 100644
 > --- a/virt/kvm/arm/vgic/vgic.h
 > +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -155,6 +155,8 @@ int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
->  			 int offset, u32 *val);
->  int vgic_v2_cpuif_uaccess(struct kvm_vcpu *vcpu, bool is_write,
->  			  int offset, u32 *val);
-> +void vgic_v2_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val);
-> +u32 vgic_v2_get_apr(struct kvm_vcpu *vcpu, u32 idx);
->  void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v2_enable(struct kvm_vcpu *vcpu);
+> @@ -181,6 +181,8 @@ static inline void vgic_get_irq_kref(struct vgic_irq *irq)
+>  void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+>  void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
+>  void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
+> +void vgic_v3_set_apr(struct kvm_vcpu *vcpu, u8 apr, u32 idx, u32 val);
+> +u32 vgic_v3_get_apr(struct kvm_vcpu *vcpu, u8 apr, u32 idx);
+>  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  void vgic_v3_enable(struct kvm_vcpu *vcpu);
 > 
 
 Thanks,
