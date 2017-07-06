@@ -1,93 +1,111 @@
-From: Christoffer Dall <cdall@linaro.org>
-Subject: Re: [PATCH v2] KVM: arm/arm64: Handle hva aging while destroying the
- vm
-Date: Thu, 6 Jul 2017 11:43:48 +0200
-Message-ID: <20170706094348.GF18106@cbox>
-References: <1499235631-141725-1-git-send-email-agraf@suse.de>
- <20170705085700.GA16881@e107814-lin.cambridge.arm.com>
- <f8794311-ddec-fdb4-9ef2-2e2c05ca7467@suse.de>
- <20170706074513.GC18106@cbox>
- <20170706093126.GJ5738@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/4] kvm: arm/arm64: vgic-v2: Add GICH_APR accessors for
+ GICv2
+Date: Thu, 6 Jul 2017 17:13:52 +0100
+Message-ID: <33bd7cd2-b49e-187b-b2fc-d020ff35aeb6@arm.com>
+References: <1499253809-17584-1-git-send-email-wanghaibin.wang@huawei.com>
+ <1499253809-17584-2-git-send-email-wanghaibin.wang@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170706093126.GJ5738@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Andrea Arcangeli <aarcange@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 16DB140D55
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 12:13:36 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id TTWQGB3izHGH for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Jul 2017 12:13:30 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2503940D4A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 12:13:29 -0400 (EDT)
+In-Reply-To: <1499253809-17584-2-git-send-email-wanghaibin.wang@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: wanghaibin <wanghaibin.wang@huawei.com>, cdall@linaro.org, kvmarm@lists.cs.columbia.edu
+Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andrea,
+On 05/07/17 12:23, wanghaibin wrote:
+> For GICv2, there are at most 5 priority bits are implemented in
+> GICH_LR<n>.Priority, so we only need to be concerned with GICH_APR0.
+> The other GICH_APRn access can be treated as raz/wi.
 
-On Thu, Jul 06, 2017 at 11:31:26AM +0200, Andrea Arcangeli wrote:
-> Hello,
-> 
-> On Thu, Jul 06, 2017 at 09:45:13AM +0200, Christoffer Dall wrote:
-> > Let's look at the callers to stage2_get_pmd, which is the only caller of
-> > stage2_get_pud, where the problem was observed:
-> > 
-> >   user_mem_abort
-> >    -> stage2_set_pmd_huge
-> >       -> stage2_get_pmd
-> >   
-> >   user_mem_abort
-> >    -> stage2_set_pte
-> >       -> stage2_get_pmd
-> > 
-> >   handle_access_fault
-> >    -> stage2_get_pmd
-> > 
-> > For the above three functions, pgd cannot ever be NULL, because this is
-> > running in the context of a VCPU thread, which means the reference on
-> > the VM fd must not reach zero, so no need to call that here.
-> 
-> Just a minor nitpick: the !pgd bypass is necessary before the KVM fd
-> technically reaches zero.
-> 
-> exit_mm->mmput->exit_mmap() will invoke the __mmu_notifier_release
-> even if the KVM fd isn't zero yet.
-
-But is exit_mm possible when you have VCPU *threads* running in the VCPU
-KVM_RUN ioctl ?
+What is this "other" GICH_APRn?
 
 > 
-> This is because the secondary MMU page faults must be shutdown before
-> freeing the guest RAM (nothing can call handle_mm_fault or any
-> get_user_pages after mm->mm_users == 0), regardless if
-> mmu_notifier_unregister hasn't been called yet (i.e. if the /dev/kvm
-> fd is still open).
+> Attention: This patch is untest!
 > 
-> Usually the fd is closed immediately after exit_mmap, as exit_files is
-> called shortly after exit_mm() but there's a common window where the
-> fd is still open but the !pgd check is already necessary (plus the fd
-> could in theory be passed to other processes).
+> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-v2.c | 21 +++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h    |  2 ++
+>  2 files changed, 23 insertions(+)
 > 
-> > using the kvm->mmu_lock() and understanding that this only happens when
-> > mmu notifiers call into the KVM MMU code outside the context of the VM.
-> 
-> Agreed.
-> 
-> The other arches don't need any special check to serialize against
-> kvm_mmu_notifier_release, they're just looking up shadow pagetables
-> through spte rmap (and they'll find nothing if
-> kvm_mmu_notifier_release already run).
-> 
-> In theory it would make more sense to put the overhead in the slow
-> path by adding a mutex to the mmu_notifier struct and then using that
-> to solve the race between mmu_notifier_release and
-> mmu_notifier_unregister, and then to hlist_del_init to unhash the mmu
-> notifier and then to call synchronize_srcu, before calling ->release
-> while holding some mutex. However that's going to be marginally slower
-> for the other arches.
-> 
-> In practice I doubt this is measurable and getting away with one less
-> mutex in mmu notifier_release vs mmu_notifier_unregister sounds
-> simpler but comments welcome...
-> 
+> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> index e4187e5..11d3b73 100644
+> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> @@ -172,6 +172,27 @@ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr)
+>  	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = 0;
+>  }
+>  
+> +void vgic_v2_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val)
+> +{
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +
+> +	if (idx == 0)
+> +		cpu_if->vgic_apr = val;
+> +	else
+> +		WARN_ON(val);
 
-I think just checking the pgd pointer under the mmu_lock is completely
-fine for arm/arm64, as long as we understand what's going on.
+If treated as WI, why do you WARN here? Also, given that there is only
+one register for the active priorities, I don't really see the point in
+having this "idx" parameter.
+
+> +}
+> +
+> +u32 vgic_v2_get_apr(struct kvm_vcpu *vcpu, u32 idx)
+> +{
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +
+> +	if (idx == 0)
+> +		return cpu_if->vgic_apr;
+> +	else
+> +		return 0;
+> +}
+> +
+> +
+
+Extra whitespace.
+
+>  void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>  {
+>  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index bba7fa2..8791b9a 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -155,6 +155,8 @@ int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>  			 int offset, u32 *val);
+>  int vgic_v2_cpuif_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>  			  int offset, u32 *val);
+> +void vgic_v2_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val);
+> +u32 vgic_v2_get_apr(struct kvm_vcpu *vcpu, u32 idx);
+>  void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  void vgic_v2_enable(struct kvm_vcpu *vcpu);
+> 
 
 Thanks,
--Christoffer
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
