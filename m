@@ -1,27 +1,25 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v4 3/3] arm64: kvm: inject SError with user space specified
- syndrome
-Date: Thu, 06 Jul 2017 17:39:24 +0100
-Message-ID: <595E67BC.6050707@arm.com>
-References: <1498481199-24118-1-git-send-email-gengdongjiu@huawei.com>
- <20170703083903.GE4066@cbox>
- <429e4a67-3795-1449-f0b1-12df3012629a@huawei.com> <595B6A8A.1050809@arm.com>
- <b2b80fd0-4a8f-d605-590e-17785eee2e8b@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 3/4] kvm: arm/arm64: vgic: Implement the vGICv2 GICC_APRn
+ uaccess interface.
+Date: Thu, 6 Jul 2017 17:53:55 +0100
+Message-ID: <f93b71df-1047-7058-6a10-fcc5543ea35f@arm.com>
+References: <1499253809-17584-1-git-send-email-wanghaibin.wang@huawei.com>
+ <1499253809-17584-4-git-send-email-wanghaibin.wang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC92440D14
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 12:40:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CD3340D14
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 12:53:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eghqmZJ7boCs for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Jul 2017 12:40:00 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 616DF40D11
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 12:39:59 -0400 (EDT)
-In-Reply-To: <b2b80fd0-4a8f-d605-590e-17785eee2e8b@huawei.com>
+ with ESMTP id y38Xnu-qD03N for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Jul 2017 12:53:32 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A878440D11
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 12:53:32 -0400 (EDT)
+In-Reply-To: <1499253809-17584-4-git-send-email-wanghaibin.wang@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,126 +29,136 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: Christoffer Dall <cdall@linaro.org>, wuquanming@huawei.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, corbet@lwn.net, will.deacon@arm.com, linux-kernel@vger.kernel.org, linux@armlinux.org.uk, Gaozhihui <zhihui.gao@huawei.com>, huangshaoyu@huawei.com, huhuajun@huawei.com, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel@lists.infradead.org
+To: wanghaibin <wanghaibin.wang@huawei.com>, cdall@linaro.org, kvmarm@lists.cs.columbia.edu
+Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi gengdongjiu,
-
-On 05/07/17 09:14, gengdongjiu wrote:
-> On 2017/7/4 18:14, James Morse wrote:
->> Can you give us a specific example of an error you are trying to handle?
-
-> For example:
-> guest OS user space accesses device type memory, but happen SError. because the
-> SError is asynchronous faults, it does not take immediately. when guest OS call "SVC" to enter guest os
-> kernel space, the ESB instruction(Error Synchronization Barrier) will defter this SError. so the SError happen immediately.
-
-Ah, this isn't necessarily a 'RAS notification' SError/SEI, it may be a
-'vanilla', v8.0 SError.
-
-You've given a guest access to a physical device (how?), the guest has done
-something, which caused the device to respond with SError.
-
-Do you have a specific use-case for this? What is the ESR? What kinds of CPER
-records does firmware generate? (if any)
-
-
-We have to be careful here as devices can still generate asynchronous-interrupts
-using SError, these aren't contained by ESB barriers. For these we should fall
-back to KVM's v8.0 SError behaviour. KVM can tell them apart as the APEI code
-doesn't claim the SError as an SEI notification, and with the RAS extensions the
-ESR has the 'IDS' bit set.
-
-
->> How would a non-KVM user space process handle the error?
-
-> it is indeed, non-KVM user space can not get the notification from hypervisor or host kernel. thanks for the pointing out
-> do you mean still Signal SIGBUS from memory_failure?
-
-No, I was assuming this was a RAS notification SEI, (because your patch 1/3 of
-touched the RAS cpu-features) being given to user space to handle.
-
-Instead, can I ask how the host should handle this SError if it had accessed the
-device itself?
-
-
-I agree device pass-through is going to be a special case for KVM, but before
-the host can deliver a device RAS error into the guest that was using the
-device, it needs to fully understand what the error means:
-
-The error may mean that the careful configuration that makes device-passthrough
-safe no longer works, letting the guest continue to access the device may let it
-damage another guest or the hyper visor.
-
-
-We may need a way for the host RAS code to identify the driver responsible, to
-handle the device error, or delegate it if that's appropriate.
-
-
-[...]
-
->> So (a): a physical-CPU hardware error occurs, and then (c) we tell Qemu/kvmtool
->> via a KVM-specific API.
->>
->> Don't do this, it doesn't work for non-KVM users. You are exposing host-specific
->> implementation details to user space. What if I discover the same error via a
->> Polling GHES, or one of the IRQ flavours?
-
-> James, you mainly concern the way that "tell Qemu/kvmtool via a KVM-specific API", right?
-> so how about still delivered SIGBUS same as the SEA(Synchronous External Abort)?
-
-> by the way, what is your meaning of below words?
->  >"What if I discover the same error via a Polling GHES, or one of the IRQ flavours?"
-
-This was my mistaken assumption that you were passing an APEI RAS SEI
-notification to user space via a KVM specific API. This wouldn't work for
-applications not using KVM, or notifications not using SEI.
-
-Here I was asking what happens if the notification used NOTIFY_POLL or
-NOTIFY_IRQ (instead of NOTIFY_SEI) in the GHES, but this isn't relevant as it
-doesn't look like this is a APEI RAS notification.
-
-[...]
-
-
->> If there is another type of CPER record where we should notify userspace, please
->> do it from mm/memory-failure.c, drivers/acpi/apei/ghes.c or
->> drivers/firmware/efi/cper.c. These should consider all user-space applications,
->> not just users of KVM, and not just on arm64.
+On 05/07/17 12:23, wanghaibin wrote:
+> Access GICV_APRn hardware register, SPEC says:
 > 
-> here I have a question, in the "drivers/acpi/apei/ghes.c" code, it only handle the memory section of CPER.
+> When System register access is disabled for EL2, these registers access GICH_APR<n>,
+> and all active priorities for virtual machines are held in GICH_APR<n> regardless of
+> interrupt group.
+> When System register access is enabled for EL2, these registers access ICH_AP1R<n>_EL2,
+> and all active priorities for virtual machines are held in ICH_AP1R<n>_EL2 regardless
+> of interrupt group.
+> 
+> Accordingly, the following two cases are implemented:
+> (1) GICv2 on GICv2, uaccess GICC_APRn info from GICH_APRn, and,
+> (2) GICv2 on GICv3, uaccess GICC_APRn info from ICH_AP1Rn.
+> 
+> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 22 ++++++++++++++++++++--
+>  virt/kvm/arm/vgic/vgic-mmio.c    | 28 ++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h         |  3 +++
+>  3 files changed, 51 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> index 63e0bbd..176b93f 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> @@ -303,6 +303,23 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
+>  	vgic_set_vmcr(vcpu, &vmcr);
+>  }
+>  
+> +static unsigned long vgic_v2_uaccess_read_activeprio(struct kvm_vcpu *vcpu,
+> +						     gpa_t addr, unsigned int len)
+> +{
+> +	u32 idx = (addr & 0x0c) / sizeof(u32);
+> +
+> +	return vgic_get_apr(vcpu, 0, idx);
+> +}
+> +
+> +static void vgic_v2_uaccess_write_activeprio(struct kvm_vcpu *vcpu,
+> +					     gpa_t addr, unsigned int len,
+> +					     unsigned long val)
+> +{
+> +       u32 idx = (addr & 0x0c) / sizeof(u32);
+> +
+> +       return vgic_set_apr(vcpu, 0, idx, val);
+> +}
+> +
+>  static const struct vgic_register_region vgic_v2_dist_registers[] = {
+>  	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
+>  		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
+> @@ -361,8 +378,9 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
+>  	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ALIAS_BINPOINT,
+>  		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
+>  		VGIC_ACCESS_32bit),
+> -	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ACTIVEPRIO,
+> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
+> +	REGISTER_DESC_WITH_LENGTH_UACCESS(GIC_CPU_ACTIVEPRIO,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi,
+> +		vgic_v2_uaccess_read_activeprio, vgic_v2_uaccess_write_activeprio, 16,
 
-Yes, we are certainly missing processing for the other record types.
+This 16 feels wrong. I now see why you had this index in the first
+patch. I think it begs the questions of what we're emulating. Are we
+showing a virtual GICv2 with only 5 bits of priority? Or something else?
 
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH(GIC_CPU_IDENT,
+>  		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index 1c17b2a..42fe00d 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -454,6 +454,34 @@ static int match_region(const void *key, const void *elt)
+>  		       sizeof(regions[0]), match_region);
+>  }
+>  
+> +void vgic_set_apr(struct kvm_vcpu *vcpu, u8 apr, u32 idx, u32 val)
 
-> if the section type of CPER is processor, it will not notify user-space. so only let userspace handle the memory section is reasonable?
+Same remark as before about "apr".
 
-I think the only errors that user-space can know more than the kernel are memory
-errors. These are the only RAS errors we should expect user space to handle. All
-the others fall into either 'corrected by the kernel' or 'fatal for userspace -
-SIGKILL'.
-
-
->> For memory errors we already have BUS_MCEERR_AR - action-required, and
->> BUS_MCEERR_AO - action-optional.
->>
->> For a TLB error, (Table 250 of UEFI 2.6), what is Qemu expected to do? Linux has
->> to classify the error and handle it as far as possible. In most cases the error
->> is either handled (no notification required), or fatal. Memory errors are the
->> only example I've found so far where an application can do additional work to
->> handle the error.
-
->   James, only memory errors needs application to do additional work. UEFI spec mentioned that?
-
-No, its my observation based on the record types. Memory is the only thing an
-application can change. Everything else belongs to the kernel.
-For a corrupt page of anonymous memory, there is nothing the kernel can do, but
-report the data lost. The application (e.g. web browser) may know what the
-corrupt data was, and if/how it can retrieve it again. This isn't true of
-Processor/Cache/TLB/PCIe errors, which cover the other CPER records.
-
+> +{
+> +	u32 vgic_model = vcpu->kvm->arch.vgic.vgic_model;
+> +
+> +	if (kvm_vgic_global_state.type == VGIC_V2)
+> +		vgic_v2_set_apr(vcpu, idx, val);
+> +	else {
+> +		if (vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
+> +			vgic_v3_set_apr(vcpu, 1, idx, val);
+> +		else
+> +			vgic_v3_set_apr(vcpu, apr, idx, val);
+> +	}
+> +}
+> +
+> +u32 vgic_get_apr(struct kvm_vcpu *vcpu, u8 apr, u32 idx)
+> +{
+> +	u32 vgic_model = vcpu->kvm->arch.vgic.vgic_model;
+> +
+> +	if (kvm_vgic_global_state.type == VGIC_V2)
+> +		return vgic_v2_get_apr(vcpu, idx);
+> +	else {
+> +		if (vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
+> +			return vgic_v3_get_apr(vcpu, 1, idx);
+> +		else
+> +			return vgic_v3_get_apr(vcpu, apr, idx);
+> +	}
+> +}
+> +
+>  void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+>  {
+>  	if (kvm_vgic_global_state.type == VGIC_V2)
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 91d66ec..3cdc448 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -213,6 +213,9 @@ int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+>  int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>  				    u32 intid, u64 *val);
+>  int kvm_register_vgic_device(unsigned long type);
+> +
+> +void vgic_set_apr(struct kvm_vcpu *vcpu, u8 apr, u32 idx, u32 val);
+> +u32 vgic_get_apr(struct kvm_vcpu *vcpu, u8 apr, u32 idx);
+>  void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>  int vgic_lazy_init(struct kvm *kvm);
+> 
 
 Thanks,
 
-James
+	M.
+-- 
+Jazz is not dead. It just smells funny...
