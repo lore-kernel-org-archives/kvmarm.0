@@ -1,134 +1,81 @@
-From: Christoffer Dall <cdall@linaro.org>
+From: Andrea Arcangeli <aarcange@redhat.com>
 Subject: Re: [PATCH v2] KVM: arm/arm64: Handle hva aging while destroying the
  vm
-Date: Thu, 6 Jul 2017 10:14:08 +0200
-Message-ID: <20170706081408.GD18106@cbox>
+Date: Thu, 6 Jul 2017 11:31:26 +0200
+Message-ID: <20170706093126.GJ5738@redhat.com>
 References: <1499235631-141725-1-git-send-email-agraf@suse.de>
  <20170705085700.GA16881@e107814-lin.cambridge.arm.com>
+ <f8794311-ddec-fdb4-9ef2-2e2c05ca7467@suse.de>
+ <20170706074513.GC18106@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0887340D14
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 04:13:52 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1KLv8vun66pz for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Jul 2017 04:13:50 -0400 (EDT)
-Received: from mail-lf0-f49.google.com (mail-lf0-f49.google.com
- [209.85.215.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 992B540A86
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jul 2017 04:13:50 -0400 (EDT)
-Received: by mail-lf0-f49.google.com with SMTP id b207so7167370lfg.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Jul 2017 01:14:15 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <stable-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170705085700.GA16881@e107814-lin.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20170706074513.GC18106@cbox>
+Sender: stable-owner@vger.kernel.org
+To: Christoffer Dall <cdall@linaro.org>
+Cc: Alexander Graf <agraf@suse.de>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 05, 2017 at 09:57:00AM +0100, Suzuki K Poulose wrote:
-> Hi Alex,
-> 
-> On Wed, Jul 05, 2017 at 08:20:31AM +0200, Alexander Graf wrote:
-> > The kvm_age_hva callback may be called all the way concurrently while
-> > kvm_mmu_notifier_release() is running.
-> > 
-> > The release function sets kvm->arch.pgd = NULL which the aging function
-> > however implicitly relies on in stage2_get_pud(). That means they can
-> > race and the aging function may dereference a NULL pgd pointer.
-> > 
-> > This patch adds a check for that case, so that we leave the aging
-> > function silently.
-> > 
-> > Cc: stable@vger.kernel.org
-> > Fixes: 293f29363 ("kvm-arm: Unmap shadow pagetables properly")
-> > Signed-off-by: Alexander Graf <agraf@suse.de>
-> > 
-> > ---
-> > 
-> > v1 -> v2:
-> > 
-> >   - Fix commit message
-> >   - Add Fixes and stable tags
-> > ---
-> >  virt/kvm/arm/mmu.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> > index f2d5b6c..227931f 100644
-> > --- a/virt/kvm/arm/mmu.c
-> > +++ b/virt/kvm/arm/mmu.c
-> > @@ -861,6 +861,10 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
-> >  	pgd_t *pgd;
-> >  	pud_t *pud;
-> >  
-> > +	/* Do we clash with kvm_free_stage2_pgd()? */
-> > +	if (!kvm->arch.pgd)
-> > +		return NULL;
-> > +
-> 
-> I think this check should be moved up in the chain. We call kvm_age_hva(), with
-> the kvm->mmu_lock held and we don't release it till we reach here. So, ideally,
-> if we find the PGD is null when we reach kvm_age_hva(), we could simply return
-> there, like we do for other call backs from the KVM mmu_notifier.
-> 
-> 
-> ----8>----
-> 
-> kvm-arm: Handle hva aging while destroying vm
-> 
-> The mmu_notifier_release() callback of KVM triggers cleaning up
-> the stage2 page table on kvm-arm. However there could be other
-> notifier callbacks in parallel with the mmu_notifier_release(),
-> which could cause the call backs ending up in an empty stage2
-> page table. Make sure we check it for all the notifier callbacks.
-> 
-> Reported-by: Alex Graf <agraf@suse.de>
-> Cc: Christoffer Dall <cdall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: stable@vger.kernel.org
-> Fixes: commit 293f29363 ("kvm-arm: Unmap shadow pagetables properly")
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  virt/kvm/arm/mmu.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index e2e5eff..db1c7b2 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1665,12 +1665,16 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *
->  
->  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
->  {
-> +	if (!kvm->arch.pgd)
-> +		return 0;
->  	trace_kvm_age_hva(start, end);
->  	return handle_hva_to_gpa(kvm, start, end, kvm_age_hva_handler, NULL);
->  }
->  
->  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
->  {
-> +	if (!kvm->arch.pgd)
-> +		return 0;
->  	trace_kvm_test_age_hva(hva);
->  	return handle_hva_to_gpa(kvm, hva, hva, kvm_test_age_hva_handler, NULL);
->  }
-> -- 
-> 2.7.5
-> 
+Hello,
 
-For this patch:
+On Thu, Jul 06, 2017 at 09:45:13AM +0200, Christoffer Dall wrote:
+> Let's look at the callers to stage2_get_pmd, which is the only caller of
+> stage2_get_pud, where the problem was observed:
+> 
+>   user_mem_abort
+>    -> stage2_set_pmd_huge
+>       -> stage2_get_pmd
+>   
+>   user_mem_abort
+>    -> stage2_set_pte
+>       -> stage2_get_pmd
+> 
+>   handle_access_fault
+>    -> stage2_get_pmd
+> 
+> For the above three functions, pgd cannot ever be NULL, because this is
+> running in the context of a VCPU thread, which means the reference on
+> the VM fd must not reach zero, so no need to call that here.
 
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Just a minor nitpick: the !pgd bypass is necessary before the KVM fd
+technically reaches zero.
+
+exit_mm->mmput->exit_mmap() will invoke the __mmu_notifier_release
+even if the KVM fd isn't zero yet.
+
+This is because the secondary MMU page faults must be shutdown before
+freeing the guest RAM (nothing can call handle_mm_fault or any
+get_user_pages after mm->mm_users == 0), regardless if
+mmu_notifier_unregister hasn't been called yet (i.e. if the /dev/kvm
+fd is still open).
+
+Usually the fd is closed immediately after exit_mmap, as exit_files is
+called shortly after exit_mm() but there's a common window where the
+fd is still open but the !pgd check is already necessary (plus the fd
+could in theory be passed to other processes).
+
+> using the kvm->mmu_lock() and understanding that this only happens when
+> mmu notifiers call into the KVM MMU code outside the context of the VM.
+
+Agreed.
+
+The other arches don't need any special check to serialize against
+kvm_mmu_notifier_release, they're just looking up shadow pagetables
+through spte rmap (and they'll find nothing if
+kvm_mmu_notifier_release already run).
+
+In theory it would make more sense to put the overhead in the slow
+path by adding a mutex to the mmu_notifier struct and then using that
+to solve the race between mmu_notifier_release and
+mmu_notifier_unregister, and then to hlist_del_init to unhash the mmu
+notifier and then to call synchronize_srcu, before calling ->release
+while holding some mutex. However that's going to be marginally slower
+for the other arches.
+
+In practice I doubt this is measurable and getting away with one less
+mutex in mmu notifier_release vs mmu_notifier_unregister sounds
+simpler but comments welcome...
+
+Thanks,
+Andrea
