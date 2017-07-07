@@ -1,26 +1,26 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 5/8] KVM: arm/arm64: vgic: Handle mapped level
- sensitive SPIs
-Date: Fri, 7 Jul 2017 09:41:42 +0200
-Message-ID: <6a177b08-1871-c5b1-6ece-404017dfd23c@redhat.com>
-References: <1497531160-29162-1-git-send-email-eric.auger@redhat.com>
- <1497531160-29162-6-git-send-email-eric.auger@redhat.com>
- <f21e17b7-9437-ca96-6847-91e7ecee3af4@arm.com>
+From: wanghaibin <wanghaibin.wang@huawei.com>
+Subject: Re: [PATCH 3/4] kvm: arm/arm64: vgic: Implement the vGICv2 GICC_APRn
+ uaccess interface.
+Date: Fri, 7 Jul 2017 16:28:04 +0800
+Message-ID: <595F4614.6000400@huawei.com>
+References: <1499253809-17584-1-git-send-email-wanghaibin.wang@huawei.com>
+ <1499253809-17584-4-git-send-email-wanghaibin.wang@huawei.com>
+ <f93b71df-1047-7058-6a10-fcc5543ea35f@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FE2940D16
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 03:41:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6089E40CE6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 04:28:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9MZxBLvGjvTO for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jul 2017 03:41:25 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FC3540187
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 03:41:24 -0400 (EDT)
-In-Reply-To: <f21e17b7-9437-ca96-6847-91e7ecee3af4@arm.com>
+ with ESMTP id J0C17c2pmR5O for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jul 2017 04:28:19 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8F4140427
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 04:28:10 -0400 (EDT)
+In-Reply-To: <f93b71df-1047-7058-6a10-fcc5543ea35f@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,115 +30,113 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, pbonzini@redhat.com, christoffer.dall@linaro.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 04/07/2017 14:15, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> On 15/06/17 13:52, Eric Auger wrote:
->> Currently, the line level of unmapped level sensitive SPIs is
->> toggled down by the maintenance IRQ handler/resamplefd mechanism.
->>
->> As mapped SPI completion is not trapped, we cannot rely on this
->> mechanism and the line level needs to be observed at distributor
->> level instead.
->>
->> This patch handles the physical IRQ case in vgic_validate_injection
->> and get the line level of a mapped SPI at distributor level.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v1 -> v2:
->> - renamed is_unshared_mapped into is_mapped_spi
->> - changes to kvm_vgic_map_phys_irq moved in the previous patch
->> - make vgic_validate_injection more readable
->> - reword the commit message
->> ---
->>  virt/kvm/arm/vgic/vgic.c | 16 ++++++++++++++--
->>  virt/kvm/arm/vgic/vgic.h |  7 ++++++-
->>  2 files changed, 20 insertions(+), 3 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->> index 075f073..2e35ac7 100644
->> --- a/virt/kvm/arm/vgic/vgic.c
->> +++ b/virt/kvm/arm/vgic/vgic.c
->> @@ -139,6 +139,17 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->>  	kfree(irq);
->>  }
->>  
->> +bool irq_line_level(struct vgic_irq *irq)
->> +{
->> +	bool line_level = irq->line_level;
->> +
->> +	if (unlikely(is_mapped_spi(irq)))
->> +		WARN_ON(irq_get_irqchip_state(irq->host_irq,
->> +					      IRQCHIP_STATE_PENDING,
->> +					      &line_level));
->> +	return line_level;
->> +}
->> +
->>  /**
->>   * kvm_vgic_target_oracle - compute the target vcpu for an irq
->>   *
->> @@ -236,13 +247,14 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
->>  
->>  /*
->>   * Only valid injection if changing level for level-triggered IRQs or for a
->> - * rising edge.
->> + * rising edge. Injection of virtual interrupts associated to physical
->> + * interrupts always is valid.
->>   */
->>  static bool vgic_validate_injection(struct vgic_irq *irq, bool level)
->>  {
->>  	switch (irq->config) {
->>  	case VGIC_CONFIG_LEVEL:
->> -		return irq->line_level != level;
->> +		return (irq->line_level != level || unlikely(is_mapped_spi(irq)));
->>  	case VGIC_CONFIG_EDGE:
->>  		return level;
->>  	}
->> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
->> index bba7fa2..da254ae 100644
->> --- a/virt/kvm/arm/vgic/vgic.h
->> +++ b/virt/kvm/arm/vgic/vgic.h
->> @@ -96,14 +96,19 @@
->>  /* we only support 64 kB translation table page size */
->>  #define KVM_ITS_L1E_ADDR_MASK		GENMASK_ULL(51, 16)
->>  
->> +bool irq_line_level(struct vgic_irq *irq);
->> +
->>  static inline bool irq_is_pending(struct vgic_irq *irq)
->>  {
->>  	if (irq->config == VGIC_CONFIG_EDGE)
->>  		return irq->pending_latch;
->>  	else
->> -		return irq->pending_latch || irq->line_level;
->> +		return irq->pending_latch || irq_line_level(irq);
-> 
-> I'm a bit concerned that an edge interrupt doesn't take the distributor
-> state into account here. Why is that so? Once an SPI is forwarded to a
-> guest, a large part of the edge vs level differences move into the HW,
-> and are not that different anymore from a SW PoV.
-
-As pointed out by Christoffer in https://lkml.org/lkml/2017/6/8/322,
-isn't it a bit risky in general to poke the physical state instead of
-the virtual state. For level sensitive, to me we don't really have many
-other alternatives. For edge, we are not obliged to.
-
-Don't we have situations, due to the lazy disable approach, where the
-physical IRQ hits, enters the genirq handler and the actual handler is
-not called, ie. the virtual IRQ is not injected?
-
-Thanks
-
-Eric
-> 
-> Thanks,
-> 
-> 	M.
-> 
+T24gMjAxNy83LzcgMDo1MywgTWFyYyBaeW5naWVyIHdyb3RlOgoKPiBPbiAwNS8wNy8xNyAxMjoy
+Mywgd2FuZ2hhaWJpbiB3cm90ZToKPj4gQWNjZXNzIEdJQ1ZfQVBSbiBoYXJkd2FyZSByZWdpc3Rl
+ciwgU1BFQyBzYXlzOgo+Pgo+PiBXaGVuIFN5c3RlbSByZWdpc3RlciBhY2Nlc3MgaXMgZGlzYWJs
+ZWQgZm9yIEVMMiwgdGhlc2UgcmVnaXN0ZXJzIGFjY2VzcyBHSUNIX0FQUjxuPiwKPj4gYW5kIGFs
+bCBhY3RpdmUgcHJpb3JpdGllcyBmb3IgdmlydHVhbCBtYWNoaW5lcyBhcmUgaGVsZCBpbiBHSUNI
+X0FQUjxuPiByZWdhcmRsZXNzIG9mCj4+IGludGVycnVwdCBncm91cC4KPj4gV2hlbiBTeXN0ZW0g
+cmVnaXN0ZXIgYWNjZXNzIGlzIGVuYWJsZWQgZm9yIEVMMiwgdGhlc2UgcmVnaXN0ZXJzIGFjY2Vz
+cyBJQ0hfQVAxUjxuPl9FTDIsCj4+IGFuZCBhbGwgYWN0aXZlIHByaW9yaXRpZXMgZm9yIHZpcnR1
+YWwgbWFjaGluZXMgYXJlIGhlbGQgaW4gSUNIX0FQMVI8bj5fRUwyIHJlZ2FyZGxlc3MKPj4gb2Yg
+aW50ZXJydXB0IGdyb3VwLgo+Pgo+PiBBY2NvcmRpbmdseSwgdGhlIGZvbGxvd2luZyB0d28gY2Fz
+ZXMgYXJlIGltcGxlbWVudGVkOgo+PiAoMSkgR0lDdjIgb24gR0lDdjIsIHVhY2Nlc3MgR0lDQ19B
+UFJuIGluZm8gZnJvbSBHSUNIX0FQUm4sIGFuZCwKPj4gKDIpIEdJQ3YyIG9uIEdJQ3YzLCB1YWNj
+ZXNzIEdJQ0NfQVBSbiBpbmZvIGZyb20gSUNIX0FQMVJuLgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiB3
+YW5naGFpYmluIDx3YW5naGFpYmluLndhbmdAaHVhd2VpLmNvbT4KPj4gLS0tCj4+ICB2aXJ0L2t2
+bS9hcm0vdmdpYy92Z2ljLW1taW8tdjIuYyB8IDIyICsrKysrKysrKysrKysrKysrKysrLS0KPj4g
+IHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtbW1pby5jICAgIHwgMjggKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKwo+PiAgdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy5oICAgICAgICAgfCAgMyArKysK
+Pj4gIDMgZmlsZXMgY2hhbmdlZCwgNTEgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKPj4K
+Pj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtbW1pby12Mi5jIGIvdmlydC9r
+dm0vYXJtL3ZnaWMvdmdpYy1tbWlvLXYyLmMKPj4gaW5kZXggNjNlMGJiZC4uMTc2YjkzZiAxMDA2
+NDQKPj4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLXYyLmMKPj4gKysrIGIvdmly
+dC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLXYyLmMKPj4gQEAgLTMwMyw2ICszMDMsMjMgQEAgc3Rh
+dGljIHZvaWQgdmdpY19tbWlvX3dyaXRlX3ZjcHVpZihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4+
+ICAJdmdpY19zZXRfdm1jcih2Y3B1LCAmdm1jcik7Cj4+ICB9Cj4+ICAKPj4gK3N0YXRpYyB1bnNp
+Z25lZCBsb25nIHZnaWNfdjJfdWFjY2Vzc19yZWFkX2FjdGl2ZXByaW8oc3RydWN0IGt2bV92Y3B1
+ICp2Y3B1LAo+PiArCQkJCQkJICAgICBncGFfdCBhZGRyLCB1bnNpZ25lZCBpbnQgbGVuKQo+PiAr
+ewo+PiArCXUzMiBpZHggPSAoYWRkciAmIDB4MGMpIC8gc2l6ZW9mKHUzMik7Cj4+ICsKPj4gKwly
+ZXR1cm4gdmdpY19nZXRfYXByKHZjcHUsIDAsIGlkeCk7Cj4+ICt9Cj4+ICsKPj4gK3N0YXRpYyB2
+b2lkIHZnaWNfdjJfdWFjY2Vzc193cml0ZV9hY3RpdmVwcmlvKHN0cnVjdCBrdm1fdmNwdSAqdmNw
+dSwKPj4gKwkJCQkJICAgICBncGFfdCBhZGRyLCB1bnNpZ25lZCBpbnQgbGVuLAo+PiArCQkJCQkg
+ICAgIHVuc2lnbmVkIGxvbmcgdmFsKQo+PiArewo+PiArICAgICAgIHUzMiBpZHggPSAoYWRkciAm
+IDB4MGMpIC8gc2l6ZW9mKHUzMik7Cj4+ICsKPj4gKyAgICAgICByZXR1cm4gdmdpY19zZXRfYXBy
+KHZjcHUsIDAsIGlkeCwgdmFsKTsKPj4gK30KPj4gKwo+PiAgc3RhdGljIGNvbnN0IHN0cnVjdCB2
+Z2ljX3JlZ2lzdGVyX3JlZ2lvbiB2Z2ljX3YyX2Rpc3RfcmVnaXN0ZXJzW10gPSB7Cj4+ICAJUkVH
+SVNURVJfREVTQ19XSVRIX0xFTkdUSChHSUNfRElTVF9DVFJMLAo+PiAgCQl2Z2ljX21taW9fcmVh
+ZF92Ml9taXNjLCB2Z2ljX21taW9fd3JpdGVfdjJfbWlzYywgMTIsCj4+IEBAIC0zNjEsOCArMzc4
+LDkgQEAgc3RhdGljIHZvaWQgdmdpY19tbWlvX3dyaXRlX3ZjcHVpZihzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUsCj4+ICAJUkVHSVNURVJfREVTQ19XSVRIX0xFTkdUSChHSUNfQ1BVX0FMSUFTX0JJTlBP
+SU5ULAo+PiAgCQl2Z2ljX21taW9fcmVhZF92Y3B1aWYsIHZnaWNfbW1pb193cml0ZV92Y3B1aWYs
+IDQsCj4+ICAJCVZHSUNfQUNDRVNTXzMyYml0KSwKPj4gLQlSRUdJU1RFUl9ERVNDX1dJVEhfTEVO
+R1RIKEdJQ19DUFVfQUNUSVZFUFJJTywKPj4gLQkJdmdpY19tbWlvX3JlYWRfcmF6LCB2Z2ljX21t
+aW9fd3JpdGVfd2ksIDE2LAo+PiArCVJFR0lTVEVSX0RFU0NfV0lUSF9MRU5HVEhfVUFDQ0VTUyhH
+SUNfQ1BVX0FDVElWRVBSSU8sCj4+ICsJCXZnaWNfbW1pb19yZWFkX3JheiwgdmdpY19tbWlvX3dy
+aXRlX3dpLAo+PiArCQl2Z2ljX3YyX3VhY2Nlc3NfcmVhZF9hY3RpdmVwcmlvLCB2Z2ljX3YyX3Vh
+Y2Nlc3Nfd3JpdGVfYWN0aXZlcHJpbywgMTYsCj4gCj4gVGhpcyAxNiBmZWVscyB3cm9uZy4gSSBu
+b3cgc2VlIHdoeSB5b3UgaGFkIHRoaXMgaW5kZXggaW4gdGhlIGZpcnN0Cj4gcGF0Y2guIEkgdGhp
+bmsgaXQgYmVncyB0aGUgcXVlc3Rpb25zIG9mIHdoYXQgd2UncmUgZW11bGF0aW5nLiBBcmUgd2UK
+PiBzaG93aW5nIGEgdmlydHVhbCBHSUN2MiB3aXRoIG9ubHkgNSBiaXRzIG9mIHByaW9yaXR5PyBP
+ciBzb21ldGhpbmcgZWxzZT8KCgpIaSwgTWFyYzoKCkF0IHByZXNlbnQsIFllcywgSSB0aGluayBp
+dCdzIG9ubHkgNSBiaXRzIG9mIHByaW9yaXR5IHRvIHNob3cgZm9yIEdJQ3YyLgoKQnV077yMIHRo
+ZSBRRU1VIGdpY2MgYXByIHB1dC9nZXQgYWNjZXNzIGNvZGUganVzdCBsaWtlOgoKICAgICAgICAv
+KiBzLT5hcHJbbl1bY3B1XSAtPiBHSUNDX0FQUm4gKi8KICAgICAgICBmb3IgKGkgPSAwOyBpIDwg
+NDsgaSsrKSB7CiAgICAgICAgICAgIHJlZyA9IHMtPmFwcltpXVtjcHVdOwogICAgICAgICAgICBr
+dm1fZ2ljY19hY2Nlc3MocywgMHhkMCArIGkgKiA0LCBjcHUsICZyZWcsIHRydWUpOwogICAgICAg
+IH0KCkl0IGdldC9wdXQgYWxsIGdpY2MgYXByIHJlZ2lzdGVycyAodGhlIHNwZWMgaW1wbGVtZW50
+IEdJQ0NfQVBSPG4+IChuID0gMCAtIDMpIHRvIHByb3ZpZGVzIGluZm9ybWF0aW9uIGFib3V0Cmlu
+dGVycnVwdCBhY3RpdmUgcHJpb3JpdGllcyksIFNvIEkgdGhpbmsgdGhlIDE2IGlzIGNvcnJlY3Qu
+CgoKQlRXOiAgSSBub3RpY2UgdGhhdCB3ZSBzaG93IHRoZSA1IHByaW9yaXR5IGJpdHMgYnkgVkdJ
+Q19QUklfQklUUyB0byBmaWx0ZXIgZW11bGF0ZSB3cml0ZSBHSUNEX0lQUklPUklUWVJuIGJpdHMg
+77yIdmdpY19tbWlvX3dyaXRlX3ByaW9yaXR577yJCmJvdGggZW11bGF0ZSBHSUN2MiBhbmQgZW11
+bGF0ZSBHSUN2My4KClNob3VsZCB3ZSBjYW5jZWwgdGhpcyBsaW1pdCB3aGVuIChHSUN2MiBvbiBH
+SUN2MykgYW5kIChHSUN2MyBvbiBHSUN2MykgPwpJIHRoaW5rIHdlIGNhbiBzaG93IHRoZSBiaXRz
+IHdoaWNoIHRoZSBoYXJkd2FyZSBJQ0hfVlRSX0VMMi5QUkliaXRzIHN1cHBvcnQgd2hlbiB0aGUg
+aGFyZHdhcmUgaXMgR0lDdjMgdG8gYXZvaWQgcHJpb3JpdHkgYml0cyBsb3N0LgoKClRoYW5rcy4K
+Cj4gCj4+ICAJCVZHSUNfQUNDRVNTXzMyYml0KSwKPj4gIAlSRUdJU1RFUl9ERVNDX1dJVEhfTEVO
+R1RIKEdJQ19DUFVfSURFTlQsCj4+ICAJCXZnaWNfbW1pb19yZWFkX3ZjcHVpZiwgdmdpY19tbWlv
+X3dyaXRlX3ZjcHVpZiwgNCwKPj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMt
+bW1pby5jIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLmMKPj4gaW5kZXggMWMxN2IyYS4u
+NDJmZTAwZCAxMDA2NDQKPj4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLmMKPj4g
+KysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLmMKPj4gQEAgLTQ1NCw2ICs0NTQsMzQg
+QEAgc3RhdGljIGludCBtYXRjaF9yZWdpb24oY29uc3Qgdm9pZCAqa2V5LCBjb25zdCB2b2lkICpl
+bHQpCj4+ICAJCSAgICAgICBzaXplb2YocmVnaW9uc1swXSksIG1hdGNoX3JlZ2lvbik7Cj4+ICB9
+Cj4+ICAKPj4gK3ZvaWQgdmdpY19zZXRfYXByKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTggYXBy
+LCB1MzIgaWR4LCB1MzIgdmFsKQo+IAo+IFNhbWUgcmVtYXJrIGFzIGJlZm9yZSBhYm91dCAiYXBy
+Ii4KPiAKPj4gK3sKPj4gKwl1MzIgdmdpY19tb2RlbCA9IHZjcHUtPmt2bS0+YXJjaC52Z2ljLnZn
+aWNfbW9kZWw7Cj4+ICsKPj4gKwlpZiAoa3ZtX3ZnaWNfZ2xvYmFsX3N0YXRlLnR5cGUgPT0gVkdJ
+Q19WMikKPj4gKwkJdmdpY192Ml9zZXRfYXByKHZjcHUsIGlkeCwgdmFsKTsKPj4gKwllbHNlIHsK
+Pj4gKwkJaWYgKHZnaWNfbW9kZWwgPT0gS1ZNX0RFVl9UWVBFX0FSTV9WR0lDX1YyKQo+PiArCQkJ
+dmdpY192M19zZXRfYXByKHZjcHUsIDEsIGlkeCwgdmFsKTsKPj4gKwkJZWxzZQo+PiArCQkJdmdp
+Y192M19zZXRfYXByKHZjcHUsIGFwciwgaWR4LCB2YWwpOwo+PiArCX0KPj4gK30KPj4gKwo+PiAr
+dTMyIHZnaWNfZ2V0X2FwcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU4IGFwciwgdTMyIGlkeCkK
+Pj4gK3sKPj4gKwl1MzIgdmdpY19tb2RlbCA9IHZjcHUtPmt2bS0+YXJjaC52Z2ljLnZnaWNfbW9k
+ZWw7Cj4+ICsKPj4gKwlpZiAoa3ZtX3ZnaWNfZ2xvYmFsX3N0YXRlLnR5cGUgPT0gVkdJQ19WMikK
+Pj4gKwkJcmV0dXJuIHZnaWNfdjJfZ2V0X2Fwcih2Y3B1LCBpZHgpOwo+PiArCWVsc2Ugewo+PiAr
+CQlpZiAodmdpY19tb2RlbCA9PSBLVk1fREVWX1RZUEVfQVJNX1ZHSUNfVjIpCj4+ICsJCQlyZXR1
+cm4gdmdpY192M19nZXRfYXByKHZjcHUsIDEsIGlkeCk7Cj4+ICsJCWVsc2UKPj4gKwkJCXJldHVy
+biB2Z2ljX3YzX2dldF9hcHIodmNwdSwgYXByLCBpZHgpOwo+PiArCX0KPj4gK30KPj4gKwo+PiAg
+dm9pZCB2Z2ljX3NldF92bWNyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IHZnaWNfdm1j
+ciAqdm1jcikKPj4gIHsKPj4gIAlpZiAoa3ZtX3ZnaWNfZ2xvYmFsX3N0YXRlLnR5cGUgPT0gVkdJ
+Q19WMikKPj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMuaCBiL3ZpcnQva3Zt
+L2FybS92Z2ljL3ZnaWMuaAo+PiBpbmRleCA5MWQ2NmVjLi4zY2RjNDQ4IDEwMDY0NAo+PiAtLS0g
+YS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLmgKPj4gKysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdp
+Yy5oCj4+IEBAIC0yMTMsNiArMjEzLDkgQEAgaW50IHZnaWNfdjNfaGFzX2NwdV9zeXNyZWdzX2F0
+dHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBib29sIGlzX3dyaXRlLCB1NjQgaWQsCj4+ICBpbnQg
+dmdpY192M19saW5lX2xldmVsX2luZm9fdWFjY2VzcyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGJv
+b2wgaXNfd3JpdGUsCj4+ICAJCQkJICAgIHUzMiBpbnRpZCwgdTY0ICp2YWwpOwo+PiAgaW50IGt2
+bV9yZWdpc3Rlcl92Z2ljX2RldmljZSh1bnNpZ25lZCBsb25nIHR5cGUpOwo+PiArCj4+ICt2b2lk
+IHZnaWNfc2V0X2FwcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU4IGFwciwgdTMyIGlkeCwgdTMy
+IHZhbCk7Cj4+ICt1MzIgdmdpY19nZXRfYXByKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTggYXBy
+LCB1MzIgaWR4KTsKPj4gIHZvaWQgdmdpY19zZXRfdm1jcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
+IHN0cnVjdCB2Z2ljX3ZtY3IgKnZtY3IpOwo+PiAgdm9pZCB2Z2ljX2dldF92bWNyKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwgc3RydWN0IHZnaWNfdm1jciAqdm1jcik7Cj4+ICBpbnQgdmdpY19sYXp5
+X2luaXQoc3RydWN0IGt2bSAqa3ZtKTsKPj4KPiAKPiBUaGFua3MsCj4gCj4gCU0uCgoKCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
+IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
+YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
