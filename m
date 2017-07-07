@@ -1,26 +1,27 @@
-From: wanghaibin <wanghaibin.wang@huawei.com>
-Subject: Re: [PATCH 3/4] kvm: arm/arm64: vgic: Implement the vGICv2 GICC_APRn
- uaccess interface.
-Date: Fri, 7 Jul 2017 16:28:04 +0800
-Message-ID: <595F4614.6000400@huawei.com>
-References: <1499253809-17584-1-git-send-email-wanghaibin.wang@huawei.com>
- <1499253809-17584-4-git-send-email-wanghaibin.wang@huawei.com>
- <f93b71df-1047-7058-6a10-fcc5543ea35f@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] ACPI: Add APEI GHES Table Generation
+ support
+Date: Fri, 7 Jul 2017 16:32:09 +0800
+Message-ID: <dbbab7f6-18c4-9b6c-799e-8267797a31bd@huawei.com>
+References: <1493530506-26833-1-git-send-email-gengdongjiu@huawei.com>
+ <4dde45bb-a730-82b1-dc49-ad00a6b73d85@redhat.com>
+ <accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com>
+ <e90c5fb8-e68b-a620-9023-f4fcfdd68e97@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6089E40CE6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 04:28:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A3D1F40CE6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 04:32:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J0C17c2pmR5O for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jul 2017 04:28:19 -0400 (EDT)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8F4140427
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 04:28:10 -0400 (EDT)
-In-Reply-To: <f93b71df-1047-7058-6a10-fcc5543ea35f@arm.com>
+ with ESMTP id FGohKL4LVjLc for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jul 2017 04:32:24 -0400 (EDT)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 88AC640427
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 04:32:22 -0400 (EDT)
+In-Reply-To: <e90c5fb8-e68b-a620-9023-f4fcfdd68e97@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,113 +31,103 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: mtsirkin@redhat.com, kvm@vger.kernel.org, tbaicar@codeaurora.org, qemu-devel@nongnu.org, wangxiongfeng2@huawei.com, ben@skyportsystems.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, huangshaoyu@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, marc.zyngier@arm.com, qemu-arm@nongnu.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org, imammedo@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMjAxNy83LzcgMDo1MywgTWFyYyBaeW5naWVyIHdyb3RlOgoKPiBPbiAwNS8wNy8xNyAxMjoy
-Mywgd2FuZ2hhaWJpbiB3cm90ZToKPj4gQWNjZXNzIEdJQ1ZfQVBSbiBoYXJkd2FyZSByZWdpc3Rl
-ciwgU1BFQyBzYXlzOgo+Pgo+PiBXaGVuIFN5c3RlbSByZWdpc3RlciBhY2Nlc3MgaXMgZGlzYWJs
-ZWQgZm9yIEVMMiwgdGhlc2UgcmVnaXN0ZXJzIGFjY2VzcyBHSUNIX0FQUjxuPiwKPj4gYW5kIGFs
-bCBhY3RpdmUgcHJpb3JpdGllcyBmb3IgdmlydHVhbCBtYWNoaW5lcyBhcmUgaGVsZCBpbiBHSUNI
-X0FQUjxuPiByZWdhcmRsZXNzIG9mCj4+IGludGVycnVwdCBncm91cC4KPj4gV2hlbiBTeXN0ZW0g
-cmVnaXN0ZXIgYWNjZXNzIGlzIGVuYWJsZWQgZm9yIEVMMiwgdGhlc2UgcmVnaXN0ZXJzIGFjY2Vz
-cyBJQ0hfQVAxUjxuPl9FTDIsCj4+IGFuZCBhbGwgYWN0aXZlIHByaW9yaXRpZXMgZm9yIHZpcnR1
-YWwgbWFjaGluZXMgYXJlIGhlbGQgaW4gSUNIX0FQMVI8bj5fRUwyIHJlZ2FyZGxlc3MKPj4gb2Yg
-aW50ZXJydXB0IGdyb3VwLgo+Pgo+PiBBY2NvcmRpbmdseSwgdGhlIGZvbGxvd2luZyB0d28gY2Fz
-ZXMgYXJlIGltcGxlbWVudGVkOgo+PiAoMSkgR0lDdjIgb24gR0lDdjIsIHVhY2Nlc3MgR0lDQ19B
-UFJuIGluZm8gZnJvbSBHSUNIX0FQUm4sIGFuZCwKPj4gKDIpIEdJQ3YyIG9uIEdJQ3YzLCB1YWNj
-ZXNzIEdJQ0NfQVBSbiBpbmZvIGZyb20gSUNIX0FQMVJuLgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiB3
-YW5naGFpYmluIDx3YW5naGFpYmluLndhbmdAaHVhd2VpLmNvbT4KPj4gLS0tCj4+ICB2aXJ0L2t2
-bS9hcm0vdmdpYy92Z2ljLW1taW8tdjIuYyB8IDIyICsrKysrKysrKysrKysrKysrKysrLS0KPj4g
-IHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtbW1pby5jICAgIHwgMjggKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKwo+PiAgdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy5oICAgICAgICAgfCAgMyArKysK
-Pj4gIDMgZmlsZXMgY2hhbmdlZCwgNTEgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKPj4K
-Pj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtbW1pby12Mi5jIGIvdmlydC9r
-dm0vYXJtL3ZnaWMvdmdpYy1tbWlvLXYyLmMKPj4gaW5kZXggNjNlMGJiZC4uMTc2YjkzZiAxMDA2
-NDQKPj4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLXYyLmMKPj4gKysrIGIvdmly
-dC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLXYyLmMKPj4gQEAgLTMwMyw2ICszMDMsMjMgQEAgc3Rh
-dGljIHZvaWQgdmdpY19tbWlvX3dyaXRlX3ZjcHVpZihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4+
-ICAJdmdpY19zZXRfdm1jcih2Y3B1LCAmdm1jcik7Cj4+ICB9Cj4+ICAKPj4gK3N0YXRpYyB1bnNp
-Z25lZCBsb25nIHZnaWNfdjJfdWFjY2Vzc19yZWFkX2FjdGl2ZXByaW8oc3RydWN0IGt2bV92Y3B1
-ICp2Y3B1LAo+PiArCQkJCQkJICAgICBncGFfdCBhZGRyLCB1bnNpZ25lZCBpbnQgbGVuKQo+PiAr
-ewo+PiArCXUzMiBpZHggPSAoYWRkciAmIDB4MGMpIC8gc2l6ZW9mKHUzMik7Cj4+ICsKPj4gKwly
-ZXR1cm4gdmdpY19nZXRfYXByKHZjcHUsIDAsIGlkeCk7Cj4+ICt9Cj4+ICsKPj4gK3N0YXRpYyB2
-b2lkIHZnaWNfdjJfdWFjY2Vzc193cml0ZV9hY3RpdmVwcmlvKHN0cnVjdCBrdm1fdmNwdSAqdmNw
-dSwKPj4gKwkJCQkJICAgICBncGFfdCBhZGRyLCB1bnNpZ25lZCBpbnQgbGVuLAo+PiArCQkJCQkg
-ICAgIHVuc2lnbmVkIGxvbmcgdmFsKQo+PiArewo+PiArICAgICAgIHUzMiBpZHggPSAoYWRkciAm
-IDB4MGMpIC8gc2l6ZW9mKHUzMik7Cj4+ICsKPj4gKyAgICAgICByZXR1cm4gdmdpY19zZXRfYXBy
-KHZjcHUsIDAsIGlkeCwgdmFsKTsKPj4gK30KPj4gKwo+PiAgc3RhdGljIGNvbnN0IHN0cnVjdCB2
-Z2ljX3JlZ2lzdGVyX3JlZ2lvbiB2Z2ljX3YyX2Rpc3RfcmVnaXN0ZXJzW10gPSB7Cj4+ICAJUkVH
-SVNURVJfREVTQ19XSVRIX0xFTkdUSChHSUNfRElTVF9DVFJMLAo+PiAgCQl2Z2ljX21taW9fcmVh
-ZF92Ml9taXNjLCB2Z2ljX21taW9fd3JpdGVfdjJfbWlzYywgMTIsCj4+IEBAIC0zNjEsOCArMzc4
-LDkgQEAgc3RhdGljIHZvaWQgdmdpY19tbWlvX3dyaXRlX3ZjcHVpZihzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUsCj4+ICAJUkVHSVNURVJfREVTQ19XSVRIX0xFTkdUSChHSUNfQ1BVX0FMSUFTX0JJTlBP
-SU5ULAo+PiAgCQl2Z2ljX21taW9fcmVhZF92Y3B1aWYsIHZnaWNfbW1pb193cml0ZV92Y3B1aWYs
-IDQsCj4+ICAJCVZHSUNfQUNDRVNTXzMyYml0KSwKPj4gLQlSRUdJU1RFUl9ERVNDX1dJVEhfTEVO
-R1RIKEdJQ19DUFVfQUNUSVZFUFJJTywKPj4gLQkJdmdpY19tbWlvX3JlYWRfcmF6LCB2Z2ljX21t
-aW9fd3JpdGVfd2ksIDE2LAo+PiArCVJFR0lTVEVSX0RFU0NfV0lUSF9MRU5HVEhfVUFDQ0VTUyhH
-SUNfQ1BVX0FDVElWRVBSSU8sCj4+ICsJCXZnaWNfbW1pb19yZWFkX3JheiwgdmdpY19tbWlvX3dy
-aXRlX3dpLAo+PiArCQl2Z2ljX3YyX3VhY2Nlc3NfcmVhZF9hY3RpdmVwcmlvLCB2Z2ljX3YyX3Vh
-Y2Nlc3Nfd3JpdGVfYWN0aXZlcHJpbywgMTYsCj4gCj4gVGhpcyAxNiBmZWVscyB3cm9uZy4gSSBu
-b3cgc2VlIHdoeSB5b3UgaGFkIHRoaXMgaW5kZXggaW4gdGhlIGZpcnN0Cj4gcGF0Y2guIEkgdGhp
-bmsgaXQgYmVncyB0aGUgcXVlc3Rpb25zIG9mIHdoYXQgd2UncmUgZW11bGF0aW5nLiBBcmUgd2UK
-PiBzaG93aW5nIGEgdmlydHVhbCBHSUN2MiB3aXRoIG9ubHkgNSBiaXRzIG9mIHByaW9yaXR5PyBP
-ciBzb21ldGhpbmcgZWxzZT8KCgpIaSwgTWFyYzoKCkF0IHByZXNlbnQsIFllcywgSSB0aGluayBp
-dCdzIG9ubHkgNSBiaXRzIG9mIHByaW9yaXR5IHRvIHNob3cgZm9yIEdJQ3YyLgoKQnV077yMIHRo
-ZSBRRU1VIGdpY2MgYXByIHB1dC9nZXQgYWNjZXNzIGNvZGUganVzdCBsaWtlOgoKICAgICAgICAv
-KiBzLT5hcHJbbl1bY3B1XSAtPiBHSUNDX0FQUm4gKi8KICAgICAgICBmb3IgKGkgPSAwOyBpIDwg
-NDsgaSsrKSB7CiAgICAgICAgICAgIHJlZyA9IHMtPmFwcltpXVtjcHVdOwogICAgICAgICAgICBr
-dm1fZ2ljY19hY2Nlc3MocywgMHhkMCArIGkgKiA0LCBjcHUsICZyZWcsIHRydWUpOwogICAgICAg
-IH0KCkl0IGdldC9wdXQgYWxsIGdpY2MgYXByIHJlZ2lzdGVycyAodGhlIHNwZWMgaW1wbGVtZW50
-IEdJQ0NfQVBSPG4+IChuID0gMCAtIDMpIHRvIHByb3ZpZGVzIGluZm9ybWF0aW9uIGFib3V0Cmlu
-dGVycnVwdCBhY3RpdmUgcHJpb3JpdGllcyksIFNvIEkgdGhpbmsgdGhlIDE2IGlzIGNvcnJlY3Qu
-CgoKQlRXOiAgSSBub3RpY2UgdGhhdCB3ZSBzaG93IHRoZSA1IHByaW9yaXR5IGJpdHMgYnkgVkdJ
-Q19QUklfQklUUyB0byBmaWx0ZXIgZW11bGF0ZSB3cml0ZSBHSUNEX0lQUklPUklUWVJuIGJpdHMg
-77yIdmdpY19tbWlvX3dyaXRlX3ByaW9yaXR577yJCmJvdGggZW11bGF0ZSBHSUN2MiBhbmQgZW11
-bGF0ZSBHSUN2My4KClNob3VsZCB3ZSBjYW5jZWwgdGhpcyBsaW1pdCB3aGVuIChHSUN2MiBvbiBH
-SUN2MykgYW5kIChHSUN2MyBvbiBHSUN2MykgPwpJIHRoaW5rIHdlIGNhbiBzaG93IHRoZSBiaXRz
-IHdoaWNoIHRoZSBoYXJkd2FyZSBJQ0hfVlRSX0VMMi5QUkliaXRzIHN1cHBvcnQgd2hlbiB0aGUg
-aGFyZHdhcmUgaXMgR0lDdjMgdG8gYXZvaWQgcHJpb3JpdHkgYml0cyBsb3N0LgoKClRoYW5rcy4K
-Cj4gCj4+ICAJCVZHSUNfQUNDRVNTXzMyYml0KSwKPj4gIAlSRUdJU1RFUl9ERVNDX1dJVEhfTEVO
-R1RIKEdJQ19DUFVfSURFTlQsCj4+ICAJCXZnaWNfbW1pb19yZWFkX3ZjcHVpZiwgdmdpY19tbWlv
-X3dyaXRlX3ZjcHVpZiwgNCwKPj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMt
-bW1pby5jIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLmMKPj4gaW5kZXggMWMxN2IyYS4u
-NDJmZTAwZCAxMDA2NDQKPj4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLmMKPj4g
-KysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLmMKPj4gQEAgLTQ1NCw2ICs0NTQsMzQg
-QEAgc3RhdGljIGludCBtYXRjaF9yZWdpb24oY29uc3Qgdm9pZCAqa2V5LCBjb25zdCB2b2lkICpl
-bHQpCj4+ICAJCSAgICAgICBzaXplb2YocmVnaW9uc1swXSksIG1hdGNoX3JlZ2lvbik7Cj4+ICB9
-Cj4+ICAKPj4gK3ZvaWQgdmdpY19zZXRfYXByKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTggYXBy
-LCB1MzIgaWR4LCB1MzIgdmFsKQo+IAo+IFNhbWUgcmVtYXJrIGFzIGJlZm9yZSBhYm91dCAiYXBy
-Ii4KPiAKPj4gK3sKPj4gKwl1MzIgdmdpY19tb2RlbCA9IHZjcHUtPmt2bS0+YXJjaC52Z2ljLnZn
-aWNfbW9kZWw7Cj4+ICsKPj4gKwlpZiAoa3ZtX3ZnaWNfZ2xvYmFsX3N0YXRlLnR5cGUgPT0gVkdJ
-Q19WMikKPj4gKwkJdmdpY192Ml9zZXRfYXByKHZjcHUsIGlkeCwgdmFsKTsKPj4gKwllbHNlIHsK
-Pj4gKwkJaWYgKHZnaWNfbW9kZWwgPT0gS1ZNX0RFVl9UWVBFX0FSTV9WR0lDX1YyKQo+PiArCQkJ
-dmdpY192M19zZXRfYXByKHZjcHUsIDEsIGlkeCwgdmFsKTsKPj4gKwkJZWxzZQo+PiArCQkJdmdp
-Y192M19zZXRfYXByKHZjcHUsIGFwciwgaWR4LCB2YWwpOwo+PiArCX0KPj4gK30KPj4gKwo+PiAr
-dTMyIHZnaWNfZ2V0X2FwcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU4IGFwciwgdTMyIGlkeCkK
-Pj4gK3sKPj4gKwl1MzIgdmdpY19tb2RlbCA9IHZjcHUtPmt2bS0+YXJjaC52Z2ljLnZnaWNfbW9k
-ZWw7Cj4+ICsKPj4gKwlpZiAoa3ZtX3ZnaWNfZ2xvYmFsX3N0YXRlLnR5cGUgPT0gVkdJQ19WMikK
-Pj4gKwkJcmV0dXJuIHZnaWNfdjJfZ2V0X2Fwcih2Y3B1LCBpZHgpOwo+PiArCWVsc2Ugewo+PiAr
-CQlpZiAodmdpY19tb2RlbCA9PSBLVk1fREVWX1RZUEVfQVJNX1ZHSUNfVjIpCj4+ICsJCQlyZXR1
-cm4gdmdpY192M19nZXRfYXByKHZjcHUsIDEsIGlkeCk7Cj4+ICsJCWVsc2UKPj4gKwkJCXJldHVy
-biB2Z2ljX3YzX2dldF9hcHIodmNwdSwgYXByLCBpZHgpOwo+PiArCX0KPj4gK30KPj4gKwo+PiAg
-dm9pZCB2Z2ljX3NldF92bWNyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IHZnaWNfdm1j
-ciAqdm1jcikKPj4gIHsKPj4gIAlpZiAoa3ZtX3ZnaWNfZ2xvYmFsX3N0YXRlLnR5cGUgPT0gVkdJ
-Q19WMikKPj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMuaCBiL3ZpcnQva3Zt
-L2FybS92Z2ljL3ZnaWMuaAo+PiBpbmRleCA5MWQ2NmVjLi4zY2RjNDQ4IDEwMDY0NAo+PiAtLS0g
-YS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLmgKPj4gKysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdp
-Yy5oCj4+IEBAIC0yMTMsNiArMjEzLDkgQEAgaW50IHZnaWNfdjNfaGFzX2NwdV9zeXNyZWdzX2F0
-dHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBib29sIGlzX3dyaXRlLCB1NjQgaWQsCj4+ICBpbnQg
-dmdpY192M19saW5lX2xldmVsX2luZm9fdWFjY2VzcyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGJv
-b2wgaXNfd3JpdGUsCj4+ICAJCQkJICAgIHUzMiBpbnRpZCwgdTY0ICp2YWwpOwo+PiAgaW50IGt2
-bV9yZWdpc3Rlcl92Z2ljX2RldmljZSh1bnNpZ25lZCBsb25nIHR5cGUpOwo+PiArCj4+ICt2b2lk
-IHZnaWNfc2V0X2FwcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU4IGFwciwgdTMyIGlkeCwgdTMy
-IHZhbCk7Cj4+ICt1MzIgdmdpY19nZXRfYXByKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTggYXBy
-LCB1MzIgaWR4KTsKPj4gIHZvaWQgdmdpY19zZXRfdm1jcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
-IHN0cnVjdCB2Z2ljX3ZtY3IgKnZtY3IpOwo+PiAgdm9pZCB2Z2ljX2dldF92bWNyKHN0cnVjdCBr
-dm1fdmNwdSAqdmNwdSwgc3RydWN0IHZnaWNfdm1jciAqdm1jcik7Cj4+ICBpbnQgdmdpY19sYXp5
-X2luaXQoc3RydWN0IGt2bSAqa3ZtKTsKPj4KPiAKPiBUaGFua3MsCj4gCj4gCU0uCgoKCl9fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
-IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
-YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Hi Laszlo,
+   sorry for my late response.
+
+On 2017/6/3 20:01, Laszlo Ersek wrote:
+> On 05/22/17 16:23, Laszlo Ersek wrote:
+>> Keeping some context:
+>>
+>> On 05/12/17 23:00, Laszlo Ersek wrote:
+>>> On 04/30/17 07:35, Dongjiu Geng wrote:
+> 
+>> (68) In the code below, you are not taking an "OVMF header probe
+>> suppressor" into account.
+>>
+>> But, we have already planned to replace that quirk with a separate,
+>> dedicated allocation hint or command, so I'm not going to describe what
+>> an "OVMF header probe suppressor" is; instead, I'll describe the
+>> replacement for it.
+>>
+>> [...]
+> 
+> So, the NOACPI allocation hint is a no-go at the moment, based on the
+> discussion in the following threads:
+> 
+> http://mid.mail-archive.com/20170601112241.2580-1-ard.biesheuvel@linaro.org
+> 
+> http://mid.mail-archive.com/c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com
+> 
+> Therefore the header probe suppression remains necessary.
+> 
+> In this case, it is not hard to do, you just have to reorder the
+> following two ADD_POINTER additions a bit:
+ Ok, it is no problem.
+
+> 
+>>>> +
+>>>> +        bios_linker_loader_add_pointer(linker, GHES_ERRORS_FW_CFG_FILE,
+>>>> +                                sizeof(uint64_t) * i, sizeof(uint64_t),
+>>>> +                                GHES_ERRORS_FW_CFG_FILE,
+>>>> +                                MAX_ERROR_SOURCE_COUNT_V6 * sizeof(uint64_t) +
+>>>> +                                i * MAX_RAW_DATA_LENGTH);
+> 
+> This one should be moved out to a separate loop, after the current loop.
+> 
+>>>> +        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+>>>> +                    address_registers_offset
+>>>> +                    + i * sizeof(AcpiGenericHardwareErrorSource),
+>>>> +                    sizeof(uint32_t), GHES_ERRORS_FW_CFG_FILE,
+>>>> +                    i * sizeof(uint64_t));
+> 
+> This one should be kept in the first (i.e., current) loop.
+> 
+> The idea is, when you first point the HEST/GHES_n entries in
+> ACPI_BUILD_TABLE_FILE to the "address registers" in
+> GHES_ERRORS_FW_CFG_FILE, all those address registers will still be
+> zero-filled. This will fail the ACPI table header probe in
+> OvmfPkg/AcpiPlatformDxe, which is what we want.
+> 
+> After this is done, the address registers in GHES_ERRORS_FW_CFG_FILE
+> should be pointed to the error status data blocks in the same fw_cfg
+> blob, in a separate loop. (Those error status data blocks will again be
+> zero-filled, so no ACPI table headers will be mistakenly recognized in
+> them.)
+I understand your idear. but I have a question:
+how about we exchange the two function's place, such as shown below:
+then it still meets ours needs, the change is easy.
+For every loop:
+(1)when patch address in ACPI_BUILD_TABLE_FILE to the "address registers", the address register is zero-filed.
+(2)when patch address in GHES_ERRORS_FW_CFG_FILE to the error status data blocks, the error status data block is still zero-filed.
+
+    for (i = 0; i < GHES_ACPI_HEST_NOTIFY_RESERVED; i++) {
+        .....................................
+        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+                    address_registers_offset
+                    + i * sizeof(AcpiGenericHardwareErrorSource),
+                    sizeof(uint32_t), GHES_ERRORS_FW_CFG_FILE,
+                    i * sizeof(uint64_t));
+
+
+        bios_linker_loader_add_pointer(linker, GHES_ERRORS_FW_CFG_FILE,
+                                sizeof(uint64_t) * i, sizeof(uint64_t),
+                                GHES_ERRORS_FW_CFG_FILE,
+                                MAX_ERROR_SOURCE_COUNT_V6 * sizeof(uint64_t) +
+                                i * MAX_RAW_DATA_LENGTH);
+	.........................................
+
+     }
+
+thanks
+
+> 
+> Thanks
+> Laszlo
+> 
+> 
+> .
+> 
