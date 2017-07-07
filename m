@@ -1,27 +1,26 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] ACPI: Add APEI GHES Table Generation
- support
-Date: Fri, 7 Jul 2017 16:32:09 +0800
-Message-ID: <dbbab7f6-18c4-9b6c-799e-8267797a31bd@huawei.com>
-References: <1493530506-26833-1-git-send-email-gengdongjiu@huawei.com>
- <4dde45bb-a730-82b1-dc49-ad00a6b73d85@redhat.com>
- <accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com>
- <e90c5fb8-e68b-a620-9023-f4fcfdd68e97@redhat.com>
+From: wanghaibin <wanghaibin.wang@huawei.com>
+Subject: Re: [PATCH 1/4] kvm: arm/arm64: vgic-v2: Add GICH_APR accessors for
+ GICv2
+Date: Fri, 7 Jul 2017 16:37:18 +0800
+Message-ID: <595F483E.9080001@huawei.com>
+References: <1499253809-17584-1-git-send-email-wanghaibin.wang@huawei.com>
+ <1499253809-17584-2-git-send-email-wanghaibin.wang@huawei.com>
+ <33bd7cd2-b49e-187b-b2fc-d020ff35aeb6@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A3D1F40CE6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 04:32:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E59CC40CE6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 04:37:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FGohKL4LVjLc for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jul 2017 04:32:24 -0400 (EDT)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 88AC640427
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 04:32:22 -0400 (EDT)
-In-Reply-To: <e90c5fb8-e68b-a620-9023-f4fcfdd68e97@redhat.com>
+ with ESMTP id BOGnRWVoEdyE for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jul 2017 04:37:19 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 797F340CE0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jul 2017 04:37:14 -0400 (EDT)
+In-Reply-To: <33bd7cd2-b49e-187b-b2fc-d020ff35aeb6@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,103 +30,99 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: mtsirkin@redhat.com, kvm@vger.kernel.org, tbaicar@codeaurora.org, qemu-devel@nongnu.org, wangxiongfeng2@huawei.com, ben@skyportsystems.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, huangshaoyu@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, marc.zyngier@arm.com, qemu-arm@nongnu.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org, imammedo@redhat.com
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: cdall@linaro.org, kvmarm@lists.cs.columbia.edu, wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Laszlo,
-   sorry for my late response.
+On 2017/7/7 0:13, Marc Zyngier wrote:
 
-On 2017/6/3 20:01, Laszlo Ersek wrote:
-> On 05/22/17 16:23, Laszlo Ersek wrote:
->> Keeping some context:
+> On 05/07/17 12:23, wanghaibin wrote:
+>> For GICv2, there are at most 5 priority bits are implemented in
+>> GICH_LR<n>.Priority, so we only need to be concerned with GICH_APR0.
+>> The other GICH_APRn access can be treated as raz/wi.
+> 
+> What is this "other" GICH_APRn?
+> 
 >>
->> On 05/12/17 23:00, Laszlo Ersek wrote:
->>> On 04/30/17 07:35, Dongjiu Geng wrote:
-> 
->> (68) In the code below, you are not taking an "OVMF header probe
->> suppressor" into account.
+>> Attention: This patch is untest!
 >>
->> But, we have already planned to replace that quirk with a separate,
->> dedicated allocation hint or command, so I'm not going to describe what
->> an "OVMF header probe suppressor" is; instead, I'll describe the
->> replacement for it.
+>> Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
+>> ---
+>>  virt/kvm/arm/vgic/vgic-v2.c | 21 +++++++++++++++++++++
+>>  virt/kvm/arm/vgic/vgic.h    |  2 ++
+>>  2 files changed, 23 insertions(+)
 >>
->> [...]
+>> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+>> index e4187e5..11d3b73 100644
+>> --- a/virt/kvm/arm/vgic/vgic-v2.c
+>> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+>> @@ -172,6 +172,27 @@ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr)
+>>  	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = 0;
+>>  }
+>>  
+>> +void vgic_v2_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val)
+>> +{
+>> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+>> +
+>> +	if (idx == 0)
+>> +		cpu_if->vgic_apr = val;
+>> +	else
+>> +		WARN_ON(val);
 > 
-> So, the NOACPI allocation hint is a no-go at the moment, based on the
-> discussion in the following threads:
+> If treated as WI, why do you WARN here? Also, given that there is only
+> one register for the active priorities, I don't really see the point in
+> having this "idx" parameter.
 > 
-> http://mid.mail-archive.com/20170601112241.2580-1-ard.biesheuvel@linaro.org
-> 
-> http://mid.mail-archive.com/c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com
-> 
-> Therefore the header probe suppression remains necessary.
-> 
-> In this case, it is not hard to do, you just have to reorder the
-> following two ADD_POINTER additions a bit:
- Ok, it is no problem.
 
-> 
->>>> +
->>>> +        bios_linker_loader_add_pointer(linker, GHES_ERRORS_FW_CFG_FILE,
->>>> +                                sizeof(uint64_t) * i, sizeof(uint64_t),
->>>> +                                GHES_ERRORS_FW_CFG_FILE,
->>>> +                                MAX_ERROR_SOURCE_COUNT_V6 * sizeof(uint64_t) +
->>>> +                                i * MAX_RAW_DATA_LENGTH);
-> 
-> This one should be moved out to a separate loop, after the current loop.
-> 
->>>> +        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->>>> +                    address_registers_offset
->>>> +                    + i * sizeof(AcpiGenericHardwareErrorSource),
->>>> +                    sizeof(uint32_t), GHES_ERRORS_FW_CFG_FILE,
->>>> +                    i * sizeof(uint64_t));
-> 
-> This one should be kept in the first (i.e., current) loop.
-> 
-> The idea is, when you first point the HEST/GHES_n entries in
-> ACPI_BUILD_TABLE_FILE to the "address registers" in
-> GHES_ERRORS_FW_CFG_FILE, all those address registers will still be
-> zero-filled. This will fail the ACPI table header probe in
-> OvmfPkg/AcpiPlatformDxe, which is what we want.
-> 
-> After this is done, the address registers in GHES_ERRORS_FW_CFG_FILE
-> should be pointed to the error status data blocks in the same fw_cfg
-> blob, in a separate loop. (Those error status data blocks will again be
-> zero-filled, so no ACPI table headers will be mistakenly recognized in
-> them.)
-I understand your idear. but I have a question:
-how about we exchange the two function's place, such as shown below:
-then it still meets ours needs, the change is easy.
-For every loop:
-(1)when patch address in ACPI_BUILD_TABLE_FILE to the "address registers", the address register is zero-filed.
-(2)when patch address in GHES_ERRORS_FW_CFG_FILE to the error status data blocks, the error status data block is still zero-filed.
+About idx parameter, the patch3 will reply.
 
-    for (i = 0; i < GHES_ACPI_HEST_NOTIFY_RESERVED; i++) {
-        .....................................
-        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-                    address_registers_offset
-                    + i * sizeof(AcpiGenericHardwareErrorSource),
-                    sizeof(uint32_t), GHES_ERRORS_FW_CFG_FILE,
-                    i * sizeof(uint64_t));
+About WARN_ON, GICv2 on GICv2, we just show 5 priority bits currently.
+If uaccess set apr[1/2/3] with non-zero value, there must be something wrong,  here take a warning.
+
+Of course, this can be deleted.
+
+Thanks.
+
+>> +}
+>> +
+>> +u32 vgic_v2_get_apr(struct kvm_vcpu *vcpu, u32 idx)
+>> +{
+>> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+>> +
+>> +	if (idx == 0)
+>> +		return cpu_if->vgic_apr;
+>> +	else
+>> +		return 0;
+>> +}
+>> +
+>> +
+> 
+> Extra whitespace.
 
 
-        bios_linker_loader_add_pointer(linker, GHES_ERRORS_FW_CFG_FILE,
-                                sizeof(uint64_t) * i, sizeof(uint64_t),
-                                GHES_ERRORS_FW_CFG_FILE,
-                                MAX_ERROR_SOURCE_COUNT_V6 * sizeof(uint64_t) +
-                                i * MAX_RAW_DATA_LENGTH);
-	.........................................
+will fix.
 
-     }
-
-thanks
+Thanks.
 
 > 
-> Thanks
-> Laszlo
+>>  void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+>>  {
+>>  	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+>> index bba7fa2..8791b9a 100644
+>> --- a/virt/kvm/arm/vgic/vgic.h
+>> +++ b/virt/kvm/arm/vgic/vgic.h
+>> @@ -155,6 +155,8 @@ int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>>  			 int offset, u32 *val);
+>>  int vgic_v2_cpuif_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+>>  			  int offset, u32 *val);
+>> +void vgic_v2_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val);
+>> +u32 vgic_v2_get_apr(struct kvm_vcpu *vcpu, u32 idx);
+>>  void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>>  void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+>>  void vgic_v2_enable(struct kvm_vcpu *vcpu);
+>>
 > 
+> Thanks,
 > 
-> .
-> 
+> 	M.
