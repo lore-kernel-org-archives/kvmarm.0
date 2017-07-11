@@ -1,26 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 38/52] KVM: arm/arm64: GICv4: Wire init/teardown of
- per-VM support
-Date: Mon, 10 Jul 2017 17:34:30 +0100
-Message-ID: <4dcb1494-fe1f-2ace-2d1e-521b1dddc585@arm.com>
-References: <20170628150411.15846-1-marc.zyngier@arm.com>
- <20170628150411.15846-39-marc.zyngier@arm.com>
- <738d2df9-c2b0-1444-8940-1027cf6fdd46@codeaurora.org>
+Subject: Re: [PATCH] KVM: arm/arm64: Fix bug in advertising KVM_CAP_MSI_DEVID
+ capability
+Date: Tue, 11 Jul 2017 17:35:25 +0100
+Message-ID: <f5342680-2085-1e3a-d9c4-fe1c63dd07fd@arm.com>
+References: <1499521710-27494-1-git-send-email-shankerd@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C133640CE9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jul 2017 12:34:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77F2940FA2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jul 2017 12:34:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fW1v0W29x6fx for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Jul 2017 12:34:01 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 81F2A40A86
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jul 2017 12:34:01 -0400 (EDT)
-In-Reply-To: <738d2df9-c2b0-1444-8940-1027cf6fdd46@codeaurora.org>
+ with ESMTP id rPtgcwz9z3nC for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Jul 2017 12:34:54 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A44240D1A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jul 2017 12:34:54 -0400 (EDT)
+In-Reply-To: <1499521710-27494-1-git-send-email-shankerd@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,100 +28,58 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: shankerd@codeaurora.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+To: Shanker Donthineni <shankerd@codeaurora.org>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm <kvm@vger.kernel.org>, Andre Przywara <andre.przywara@arm.com>, linux-kernel <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/07/17 12:26, Shanker Donthineni wrote:
-> Hi Marc,
+On 08/07/17 14:48, Shanker Donthineni wrote:
+> Commit 0e4e82f154e3 ("KVM: arm64: vgic-its: Enable ITS emulation as
+> a virtual MSI controller") tried to advertise KVM_CAP_MSI_DEVID, but
+> the code logic was not updating the dist->msis_require_devid field
+> correctly. If hypervisor tool creates the ITS device after VGIC
+> initialization then we don't advertise KVM_CAP_MSI_DEVID capability.
 > 
-> On 06/28/2017 10:03 AM, Marc Zyngier wrote:
->> Should the HW support GICv4 and an ITS being associated with this
->> VM, let's init the its_vm and its_vpe structures.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-init.c | 11 ++++++++++-
->>  1 file changed, 10 insertions(+), 1 deletion(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
->> index 3a0b8999f011..0de1f0d986d4 100644
->> --- a/virt/kvm/arm/vgic/vgic-init.c
->> +++ b/virt/kvm/arm/vgic/vgic-init.c
->> @@ -285,8 +285,14 @@ int vgic_init(struct kvm *kvm)
->>  	if (ret)
->>  		goto out;
->>  
->> -	if (vgic_has_its(kvm))
->> +	if (vgic_has_its(kvm)) {
->>  		dist->msis_require_devid = true;
->> +		if (kvm_vgic_global_state.has_gicv4) {
->> +			ret = vgic_v4_init(kvm);
->> +			if (ret)
->> +				goto out;
->> +		}
+> Update the field msis_require_devid to true inside vgic_its_create()
+> to fix the issue.
 > 
-> This is not quite right, ITS virtual device may not be initialized at the time of 
-> calling vgic-init(). This change breaks the existing KVM functionality with QEMU
-> hypervisor tool. In later patches, code assumes vgic_v4_init(kvm) was called when
-> vgic_has_its(kvm) returns a true value. 
+> Fixes: 0e4e82f154e3 ("vgic-its: Enable ITS emulation as a virtual MSI controller")
+> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+> ---
+>  virt/kvm/arm/vgic/vgic-init.c | 3 ---
+>  virt/kvm/arm/vgic/vgic-its.c  | 1 +
+>  2 files changed, 1 insertion(+), 3 deletions(-)
 > 
-> The right change would be move this logic to inside vgic_its_create() something like this.
-> 
->  --- a/virt/kvm/arm/vgic/vgic-init.c
->  +++ b/virt/kvm/arm/vgic/vgic-init.c
->  @@ -285,14 +285,8 @@ int vgic_init(struct kvm *kvm)
->          if (ret)
->                  goto out;
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index 3a0b899..5801261 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -285,9 +285,6 @@ int vgic_init(struct kvm *kvm)
+>  	if (ret)
+>  		goto out;
 >  
->  -       if (vgic_has_its(kvm)) { 
->  +       if (vgic_has_its(kvm))
->                  dist->msis_require_devid = true;
->  -               if (kvm_vgic_global_state.has_gicv4) {
->  -                       ret = vgic_v4_init(kvm);
->  -                       if (ret)
->  -                               goto out;
->  -               }
->  -       }
+> -	if (vgic_has_its(kvm))
+> -		dist->msis_require_devid = true;
+> -
+>  	kvm_for_each_vcpu(i, vcpu, kvm)
+>  		kvm_vgic_vcpu_enable(vcpu);
 >  
->          kvm_for_each_vcpu(i, vcpu, kvm)
->                  kvm_vgic_vcpu_enable(vcpu);
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 2dff288..aa6b68d 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -1598,6 +1598,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+>  	INIT_LIST_HEAD(&its->device_list);
+>  	INIT_LIST_HEAD(&its->collection_list);
+>  
+> +	dev->kvm->arch.vgic.msis_require_devid = true;
+>  	dev->kvm->arch.vgic.has_its = true;
+>  	its->enabled = false;
+>  	its->dev = dev;
 > 
->  --- a/virt/kvm/arm/vgic/vgic-its.c
->  +++ b/virt/kvm/arm/vgic/vgic-its.c
->  @@ -1637,6 +1637,7 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct
->   static int vgic_its_create(struct kvm_device *dev, u32 type)
->   {
->          struct vgic_its *its;
->  +       int ret;
->  
->          if (type != KVM_DEV_TYPE_ARM_VGIC_ITS) 
->                  return -ENODEV;
->  @@ -1657,6 +1658,12 @@ static int vgic_its_create(struct kvm_device *dev, u32 ty
->          its->enabled = false;
->          its->dev = dev;
->   
->  +       if (kvm_vgic_global_state.has_gicv4) {
->  +               ret = vgic_v4_init(dev->kvm);
->  +               if (ret)
->  +                       return -ENOMEM;
->  +       }
->  +
 
-This approach is pretty busted if you have more than a single virtual
-ITS, as you now leak memory from the VPE array and IRQ domain allocations.
+Seems sensible to me. Unless someone screams, I'll queue it for post -rc1.
 
-Also, there is no guarantee that we've created all vcpus by the time we
-create an ITS, so this approach fails as well ("create vcpu 1, create
-ITS, create vcpu 2, init vgic" is a valid sequence).
-
-I guess we need to call vgic_v4_init() on both vgic_init() and
-its_create(), and only perform the GICv4 init if the vgic has already
-been initialized.
-
-Or we simply restrict the order to be vgic_init() last, and fix
-userspace to respect that order. Not enabling GICv4 won't break SW. It
-may even be faster.
+Thanks,
 
 	M.
 -- 
