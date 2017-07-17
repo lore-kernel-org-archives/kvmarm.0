@@ -1,25 +1,24 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [RFC PATCH v2 12/19] KVM: arm/arm64: Set VCPU affinity for virt timer
- irq
-Date: Mon, 17 Jul 2017 16:27:11 +0200
-Message-ID: <20170717142718.13853-13-cdall@linaro.org>
+Subject: [RFC PATCH v2 19/19] KVM: arm/arm64: Rework kvm_timer_should_fire
+Date: Mon, 17 Jul 2017 16:27:18 +0200
+Message-ID: <20170717142718.13853-20-cdall@linaro.org>
 References: <20170717142718.13853-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD5DF40CE9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56FCD412C2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:27:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DG-d3ANTt0w9 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jul 2017 10:26:54 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 036F649C18
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:50 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id b134so49979209wma.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 07:27:37 -0700 (PDT)
+ with ESMTP id 3rzS7LFmjV9x for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Jul 2017 10:27:01 -0400 (EDT)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B9C3E49C4C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:57 -0400 (EDT)
+Received: by mail-wm0-f42.google.com with SMTP id w126so77801826wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 07:27:44 -0700 (PDT)
 In-Reply-To: <20170717142718.13853-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,39 +33,102 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we are about to take physical interrupts for the virtual timer on the
-host but want to leave those active while running the VM (and let the VM
-deactivate them), we need to set the vtimer PPI affinity accordingly.
+kvm_timer_should_fire() can be called in two different situations from
+the kvm_vcpu_block().
+
+The first case is before calling kvm_timer_schedule(), used for wait
+polling, and in this case the VCPU thread is running and the timer state
+is loaded onto the hardware so all we have to do is check if the virtual
+interrupt lines are asserted, becasue the timer interrupt handler
+functions will raise those lines as appropriate.
+
+The second case is inside the wait loop of kvm_vcpu_block(), where we
+have already called kvm_timer_schedule() and therefore the hardware will
+be disabled and the software view of the timer state is up to date
+(timer->loaded is false), and so we can simply check if the timer should
+fire by looking at the software state.
 
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- virt/kvm/arm/arch_timer.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ include/kvm/arm_arch_timer.h |  3 ++-
+ virt/kvm/arm/arch_timer.c    | 22 +++++++++++++++++++++-
+ virt/kvm/arm/arm.c           |  3 +--
+ 3 files changed, 24 insertions(+), 4 deletions(-)
 
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index af29563..250db34 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -73,7 +73,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ 
+-bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
++bool kvm_timer_is_pending(struct kvm_vcpu *vcpu);
++
+ void kvm_timer_schedule(struct kvm_vcpu *vcpu);
+ void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
+ 
 diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 4254f88..4275f8f 100644
+index f92459a..1d0cd3a 100644
 --- a/virt/kvm/arm/arch_timer.c
 +++ b/virt/kvm/arm/arch_timer.c
-@@ -650,11 +650,20 @@ int kvm_timer_hyp_init(void)
- 		return err;
- 	}
+@@ -49,6 +49,7 @@ static const struct kvm_irq_level default_vtimer_irq = {
+ static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx);
+ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 				 struct arch_timer_context *timer_ctx);
++static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx);
  
-+	err = irq_set_vcpu_affinity(host_vtimer_irq, kvm_get_running_vcpus());
-+	if (err) {
-+		kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
-+		goto out_free_irq;
-+	}
-+
- 	kvm_info("virtual timer IRQ%d\n", host_vtimer_irq);
- 
- 	cpuhp_setup_state(CPUHP_AP_KVM_ARM_TIMER_STARTING,
- 			  "kvm/arm/timer:starting", kvm_timer_starting_cpu,
- 			  kvm_timer_dying_cpu);
-+	return 0;
-+out_free_irq:
-+	free_percpu_irq(host_vtimer_irq, kvm_get_running_vcpus());
- 	return err;
+ u64 kvm_phys_timer_read(void)
+ {
+@@ -223,7 +224,7 @@ static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
+ 	return HRTIMER_NORESTART;
  }
  
+-bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
++static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+ {
+ 	u64 cval, now;
+ 
+@@ -236,6 +237,25 @@ bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+ 	return cval <= now;
+ }
+ 
++bool kvm_timer_is_pending(struct kvm_vcpu *vcpu)
++{
++	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
++	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
++
++	if (vtimer->irq.level || ptimer->irq.level)
++		return true;
++
++	/*
++	 * When this is called from withing the wait loop of kvm_vcpu_block(),
++	 * the software view of the timer state is up to date (timer->loaded
++	 * is false), and so we can simply check if the timer should fire now.
++	 */
++	if (!vtimer->loaded && kvm_timer_should_fire(vtimer))
++		return true;
++
++	return kvm_timer_should_fire(ptimer);
++}
++
+ /*
+  * Reflect the timer output level into the kvm_run structure
+  */
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 6322605..1ea9980 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -307,8 +307,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 
+ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ {
+-	return kvm_timer_should_fire(vcpu_vtimer(vcpu)) ||
+-	       kvm_timer_should_fire(vcpu_ptimer(vcpu));
++	return kvm_timer_is_pending(vcpu);
+ }
+ 
+ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
 -- 
 2.9.0
