@@ -1,196 +1,274 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [RFC PATCH v2 17/19] KVM: arm/arm64: Avoid phys timer emulation in
- vcpu entry/exit
-Date: Mon, 17 Jul 2017 16:27:16 +0200
-Message-ID: <20170717142718.13853-18-cdall@linaro.org>
-References: <20170717142718.13853-1-cdall@linaro.org>
+Subject: Re: [PATCH v2] KVM: arm/arm64: Handle hva aging while destroying the vm
+Date: Mon, 17 Jul 2017 16:45:10 +0200
+Message-ID: <CAMJs5B-RVCTYOF6wb6A4Qt21cdcf+hLJLBbK5G9iMYbCven0SA@mail.gmail.com>
+References: <1499235631-141725-1-git-send-email-agraf@suse.de>
+ <20170705085700.GA16881@e107814-lin.cambridge.arm.com> <f8794311-ddec-fdb4-9ef2-2e2c05ca7467@suse.de>
+ <20170706074513.GC18106@cbox> <18e7012c-a095-ecfa-470c-cf81177698a1@arm.com>
+ <20170706094205.GE18106@cbox> <5cb34cc0-27c1-c011-a8d4-c991e47141c3@arm.com>
+ <20170716195658.GA31432@cbox> <e77266ae-6695-a1a2-f96a-b92c97a900c7@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AF2D49C2A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:27:01 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8C+FJwGILpsT for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jul 2017 10:27:00 -0400 (EDT)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D200349C12
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:55 -0400 (EDT)
-Received: by mail-wm0-f47.google.com with SMTP id b134so49981678wma.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 07:27:42 -0700 (PDT)
-In-Reply-To: <20170717142718.13853-1-cdall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <e77266ae-6695-a1a2-f96a-b92c97a900c7@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Cc: Alexander Graf <agraf@suse.de>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrea Arcangeli <aarcange@redhat.com>, Stable <stable@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no need to schedule and cancel a hrtimer when entering and
-exiting the guest, because we know when the physical timer is going to
-fire when the guest programs it, and we can simply program the hrtimer
-at that point.
+On Mon, Jul 17, 2017 at 3:03 PM, Suzuki K Poulose
+<Suzuki.Poulose@arm.com> wrote:
+> On 16/07/17 20:56, Christoffer Dall wrote:
+>>
+>> On Fri, Jul 14, 2017 at 05:40:48PM +0100, Suzuki K Poulose wrote:
+>>>
+>>> On 06/07/17 10:42, Christoffer Dall wrote:
+>>>>
+>>>> On Thu, Jul 06, 2017 at 10:34:58AM +0100, Suzuki K Poulose wrote:
+>>>>>
+>>>>> On 06/07/17 08:45, Christoffer Dall wrote:
+>>>>>>
+>>>>>> On Thu, Jul 06, 2017 at 09:07:49AM +0200, Alexander Graf wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>>
+>>>>>>> On 05.07.17 10:57, Suzuki K Poulose wrote:
+>>>>>>>>
+>>>>>>>> Hi Alex,
+>>>>>>>>
+>>>>>>>> On Wed, Jul 05, 2017 at 08:20:31AM +0200, Alexander Graf wrote:
+>>>>>>>>>
+>>>>>>>>> The kvm_age_hva callback may be called all the way concurrently
+>>>>>>>>> while
+>>>>>>>>> kvm_mmu_notifier_release() is running.
+>>>>>>>>>
+>>>>>>>>> The release function sets kvm->arch.pgd = NULL which the aging
+>>>>>>>>> function
+>>>>>>>>> however implicitly relies on in stage2_get_pud(). That means they
+>>>>>>>>> can
+>>>>>>>>> race and the aging function may dereference a NULL pgd pointer.
+>>>>>>>>>
+>>>>>>>>> This patch adds a check for that case, so that we leave the aging
+>>>>>>>>> function silently.
+>>>>>>>>>
+>>>>>>>>> Cc: stable@vger.kernel.org
+>>>>>>>>> Fixes: 293f29363 ("kvm-arm: Unmap shadow pagetables properly")
+>>>>>>>>> Signed-off-by: Alexander Graf <agraf@suse.de>
+>>>>>>>>>
+>>>>>>>>> ---
+>>>>>>>>>
+>>>>>>>>> v1 -> v2:
+>>>>>>>>>
+>>>>>>>>> - Fix commit message
+>>>>>>>>> - Add Fixes and stable tags
+>>>>>>>>> ---
+>>>>>>>>> virt/kvm/arm/mmu.c | 4 ++++
+>>>>>>>>> 1 file changed, 4 insertions(+)
+>>>>>>>>>
+>>>>>>>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>>>>>>>>> index f2d5b6c..227931f 100644
+>>>>>>>>> --- a/virt/kvm/arm/mmu.c
+>>>>>>>>> +++ b/virt/kvm/arm/mmu.c
+>>>>>>>>> @@ -861,6 +861,10 @@ static pud_t *stage2_get_pud(struct kvm *kvm,
+>>>>>>>>> struct kvm_mmu_memory_cache *cache
+>>>>>>>>>         pgd_t *pgd;
+>>>>>>>>>         pud_t *pud;
+>>>>>>>>> +       /* Do we clash with kvm_free_stage2_pgd()? */
+>>>>>>>>> +       if (!kvm->arch.pgd)
+>>>>>>>>> +               return NULL;
+>>>>>>>>> +
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> I think this check should be moved up in the chain. We call
+>>>>>>>> kvm_age_hva(), with
+>>>>>>>> the kvm->mmu_lock held and we don't release it till we reach here.
+>>>>>>>> So, ideally,
+>>>>>>>> if we find the PGD is null when we reach kvm_age_hva(), we could
+>>>>>>>> simply return
+>>>>>>>> there, like we do for other call backs from the KVM mmu_notifier.
+>>>>>>>
+>>>>>>>
+>>>>>>> That probably works too - I'm not sure which version is more
+>>>>>>> consistent as well as more maintainable in the long run. I'll leave
+>>>>>>> the call here to Christoffer.
+>>>>>>>
+>>>>>>
+>>>>>> Let's look at the callers to stage2_get_pmd, which is the only caller
+>>>>>> of
+>>>>>> stage2_get_pud, where the problem was observed:
+>>>>>>
+>>>>>> user_mem_abort
+>>>>>>  -> stage2_set_pmd_huge
+>>>>>>     -> stage2_get_pmd
+>>>>>>
+>>>>>> user_mem_abort
+>>>>>>  -> stage2_set_pte
+>>>>>>     -> stage2_get_pmd
+>>>>>>
+>>>>>> handle_access_fault
+>>>>>>  -> stage2_get_pmd
+>>>>>>
+>>>>>> For the above three functions, pgd cannot ever be NULL, because this
+>>>>>> is
+>>>>>> running in the context of a VCPU thread, which means the reference on
+>>>>>> the VM fd must not reach zero, so no need to call that here.
+>>>>>
+>>>>>
+>>>>> I think there is some problem here.  See below for more information.
+>>>>>
+>>>>>>
+>>>>>> kvm_set_spte_handler
+>>>>>>  -> stage2_set_pte
+>>>>>>     -> stage2_get_pmd
+>>>>>>
+>>>>>> This is called from kvm_set_spte_hva, which is one of the MMU
+>>>>>> notifiers,
+>>>>>> so it can race similarly kvm_age_hva and kvm_test_age_hva, but it
+>>>>>> already checks for !kvm->arch.pgd.
+>>>>>>
+>>>>>> kvm_phys_addr_ioremap
+>>>>>>  -> stage2_set_pte
+>>>>>>     -> stage2_get_pmd
+>>>>>>
+>>>>>> This is called from two places: (1) The VGIC code (as part of
+>>>>>> vgic_v2_map_resources) and can only be called in the context of
+>>>>>> running
+>>>>>> a VCPU, so the pgd cannot be null by virtue of the same argument as
+>>>>>> for
+>>>>>> user_mem_abort. (2) kvm_arch_prepare_memory_region calls
+>>>>>> kvm_phys_addr_ioremap, which is a VM ioctl so similarly, I cannot see
+>>>>>> how the VM can be in the middle of being freed while handling ioctls
+>>>>>> on
+>>>>>> the fd.  Therefore, following the same argument, this should be safe
+>>>>>> as
+>>>>>> well.
+>>>>>>
+>>>>>> kvm_age_hva_handler and kvm_test_age_hva_handler
+>>>>>>  -> stage2_get_pmd
+>>>>>>
+>>>>>> Handled by the patch proposed by Suzuki.
+>>>>>>
+>>>>>> What does all that tell us?  First, it should give us some comfort
+>>>>>> that we
+>>>>>> don't have more races of this kind.  Second, it teels us that there
+>>>>>> are
+>>>>>> a number of different and not-obvious call paths to stage2_pet_pud,
+>>>>>> which could be an argument to simply check the pgd whenever it's
+>>>>>> called,
+>>>>>> despite the minor runtime overhead.  On the other hand, the check
+>>>>>> itself
+>>>>>> is only valid knowing that we synchronize against kvm_free_stage2_pgd
+>>>>>> using the kvm->mmu_lock() and understanding that this only happens
+>>>>>> when
+>>>>>> mmu notifiers call into the KVM MMU code outside the context of the
+>>>>>> VM.
+>>>>>>
+>>>>>> The last consideration is the winning argument for me to put the check
+>>>>>> in kvm_age_hva_handler and kvm_test_age_hva_handler, but I think it's
+>>>>>> important that we document why it's only these three high-level
+>>>>>> callers
+>>>>>> (incl. kvm_set_spte_handler) that need the check, either in the code
+>>>>>> or
+>>>>>> in the commit message.
+>>>>>
+>>>>>
+>>>>> The only way we end up freeing the stage-2 PGD is via the
+>>>>> mmu_notifier_release(),
+>>>>> which could be triggered via two different paths.
+>>>>>
+>>>>> 1) kvm_destroy_vm(), where all the VM resources has been released and
+>>>>> the
+>>>>> refcount on the KVM instances are dropped, via kvm_put_kvm().
+>>>>>
+>>>>> kvm_put_kvm()
+>>>>> kvm_destroy_vm()
+>>>>>   mmu_notifier_unregsiter
+>>>>>     mmu_notifier_ops->release()
+>>>>>       kvm_arch_flush_shadow_all
+>>>>>         kvm_free_stage2_pgd -> free the page table with the mmu_lock
+>>>>> held
+>>>>>                                occasionally releasing it to avoid
+>>>>> contention.
+>>>>> or
+>>>>>
+>>>>> 2) do_signal -> get_signal -> do_group_exit - >
+>>>>>     do_exit
+>>>>>        exit_mm
+>>>>>         mmput => __mmput
+>>>>>           exit_mmap
+>>>>>             mmu_notifier_release
+>>>>>                mmu_notifier_ops->release
+>>>>>                 kvm_arch_flush_shadow_all
+>>>>>                   kvm_free_stage2_pgd
+>>>>>
+>>>>> In the first case, all references to the VM are dropped and hence none
+>>>>> of the
+>>>>> VCPU could still be executing.
+>>>>>
+>>>>> However, in the second case it may not be. So we have a potential
+>>>>> problem with
+>>>>> the VCPU trying to run even when the pages were unmapped. I think the
+>>>>> root cause
+>>>>> of all these issues boils down to the assumption that KVM holds a
+>>>>> reference to
+>>>>> MM (which is not necessarily the user space mapping. i.e mmgrab vs
+>>>>> mmget).
+>>>>> I am not sure if the VCPU should hold a reference to the mmaps to make
+>>>>> sure
+>>>>> it is safe to run. That way, the mmap stays until the VCPU eventually
+>>>>> exits
+>>>>> and we are safe all the way around.
+>>>>
+>>>>
+>>>> Hmmm, my assumption is that if a VCPU is running, it means there is a
+>>>> VCPU thread that shares the struct mm which is running, so I don't
+>>>> understand how mmput would be able to call exit_mmap in the scenario
+>>>> above?
+>>>>
+>>>> So the distinction here is that I don't assume that the VCPU fd holds a
+>>>> reference to the mm, but I assume that the (running) VCPU thread does.
+>>>> Is this incorrect?
+>>>
+>>>
+>>> Sorry, I lost this thread in between.
+>>
+>>
+>> No worries.
+>>
+>>>
+>>> Hmm. You're right. The VCPU should have a refcount on mmap and it
+>>> shouldn't
+>>> do anything with the mmu if it has dropped it. I was confused based on an
+>>> old bug report,[ See the description of commit 293f293637b55d "kvm-arm:
+>>> Unmap shadow pagetables
+>>>  properly"], which was fixed.
+>>>
+>>
+>
+> This keeps haunting me :(. I happened to look at another report from Alex
+> back in April,
+> where a VCPU ends up in an mmu_notifier call back after the PGD was free'd !
+> So it does
+> look like you could end up in freeing the stage2 page table and yet another
+> VCPU could
+> be running.
+>
+> See : https://lkml.org/lkml/2017/4/21/820
+>
+> I am trying to see if I can reproduce the hypothesis.
+>
+I would also very much like to get to the bottom of this, and at the
+very least try to get a valid explanation as to how a thread can be
+*running* for a process where there are zero references to the struct
+mm?
 
-Now when the register modifications from the guest go through the
-kvm_arm_timer_set/get_reg functions, which always call
-kvm_timer_update_state(), we can simply consider the timer state in this
-function and schedule and cancel the timers as needed.
+I guess I am asking where this mmput() can happen for a perfectly
+running thread, which hasn't processes signals or exited itself yet.
 
-This avoids looking at the physical timer emulation state when entering
-and exiting the VCPU, allowing for faster servicing of the VM when
-needed.
+The dump you reference above seems to indicate that it's happening
+under memory pressure and trying to unmap memory from the VM to
+allocate memory to the VM, but all seems to be happening within a VCPU
+thread, or am I reading this wrong?
 
-Signed-off-by: Christoffer Dall <cdall@linaro.org>
----
- virt/kvm/arm/arch_timer.c | 75 ++++++++++++++++++++++++++++++++---------------
- 1 file changed, 51 insertions(+), 24 deletions(-)
-
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 1f82c21..aa18a5d 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -199,7 +199,27 @@ static enum hrtimer_restart kvm_bg_timer_expire(struct hrtimer *hrt)
- 
- static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
- {
--	WARN(1, "Timer only used to ensure guest exit - unexpected event.");
-+	struct arch_timer_context *ptimer;
-+	struct arch_timer_cpu *timer;
-+	struct kvm_vcpu *vcpu;
-+	u64 ns;
-+
-+	timer = container_of(hrt, struct arch_timer_cpu, phys_timer);
-+	vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
-+	ptimer = vcpu_ptimer(vcpu);
-+
-+	/*
-+	 * Check that the timer has really expired from the guest's
-+	 * PoV (NTP on the host may have forced it to expire
-+	 * early). If not ready, schedule for a later time.
-+	 */
-+	ns = kvm_timer_compute_delta(ptimer);
-+	if (unlikely(ns)) {
-+		hrtimer_forward_now(hrt, ns_to_ktime(ns));
-+		return HRTIMER_RESTART;
-+	}
-+
-+	kvm_timer_update_irq(vcpu, true, ptimer);
- 	return HRTIMER_NORESTART;
- }
- 
-@@ -253,24 +273,28 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- }
- 
- /* Schedule the background timer for the emulated timer. */
--static void phys_timer_emulate(struct kvm_vcpu *vcpu,
--			      struct arch_timer_context *timer_ctx)
-+static void phys_timer_emulate(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
--	if (kvm_timer_should_fire(timer_ctx))
--		return;
--
--	if (!kvm_timer_irq_can_fire(timer_ctx))
-+	/*
-+	 * If the timer can fire now we have just raised the IRQ line and we
-+	 * don't need to have a soft timer scheduled for the future.  If the
-+	 * timer cannot fire at all, then we also don't need a soft timer.
-+	 */
-+	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
-+		soft_timer_cancel(&timer->phys_timer, NULL);
- 		return;
-+	}
- 
--	/*  The timer has not yet expired, schedule a background timer */
--	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
-+	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(ptimer));
- }
- 
- /*
-- * Check if there was a change in the timer state (should we raise or lower
-- * the line level to the GIC).
-+ * Check if there was a change in the timer state, so that we should either
-+ * raise or lower the line level to the GIC or schedule a background timer to
-+ * emulate the physical timer.
-  */
- static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- {
-@@ -292,6 +316,8 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 
- 	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
- 		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
-+
-+	phys_timer_emulate(vcpu);
- }
- 
- static void vtimer_save_state(struct kvm_vcpu *vcpu)
-@@ -445,6 +471,9 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 
- 	if (has_vhe())
- 		disable_el1_phys_timer_access();
-+
-+	/* Set the background timer for the physical timer emulation. */
-+	phys_timer_emulate(vcpu);
- }
- 
- bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
-@@ -480,12 +509,6 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 
- 	if (unlikely(!timer->enabled))
- 		return;
--
--	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
--		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
--
--	/* Set the background timer for the physical timer emulation. */
--	phys_timer_emulate(vcpu, vcpu_ptimer(vcpu));
- }
- 
- void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
-@@ -500,6 +523,17 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 
- 	vtimer_save_state(vcpu);
- 
-+	/*
-+	 * Cancel the physical timer emulation, because the only case where we
-+	 * need it after a vcpu_put is in the context of a sleeping VCPU, and
-+	 * in that case we already factor in the deadline for the physical
-+	 * timer when scheduling the bg_timer.
-+	 *
-+	 * In any case, we re-schedule the hrtimer for the physical timer when
-+	 * coming back to the VCPU thread in kvm_timer_vcpu_load().
-+	 */
-+	soft_timer_cancel(&timer->phys_timer, NULL);
-+
- 	set_cntvoff(0);
- }
- 
-@@ -536,16 +570,9 @@ static void unmask_vtimer_irq(struct kvm_vcpu *vcpu)
-  */
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- {
--	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
- 	/*
--	 * This is to cancel the background timer for the physical timer
--	 * emulation if it is set.
--	 */
--	soft_timer_cancel(&timer->phys_timer, NULL);
--
--	/*
- 	 * If we entered the guest with the vtimer output asserted we have to
- 	 * check if the guest has modified the timer so that we should lower
- 	 * the line at this point.
--- 
-2.9.0
+Thanks,
+-Christoffer
