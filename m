@@ -1,24 +1,21 @@
 From: wanghaibin <wanghaibin.wang@huawei.com>
-Subject: [PATCH v2 1/4] kvm: arm/arm64: vgic: Implement the vGICv2 GICC_APRn
- uaccess interface.
-Date: Mon, 17 Jul 2017 18:23:29 +0800
-Message-ID: <1500287012-16996-2-git-send-email-wanghaibin.wang@huawei.com>
-References: <1500287012-16996-1-git-send-email-wanghaibin.wang@huawei.com>
+Subject: [PATCH v2 0/4] kvm: arm/arm64: vgic: APRn uaccess support.
+Date: Mon, 17 Jul 2017 18:23:28 +0800
+Message-ID: <1500287012-16996-1-git-send-email-wanghaibin.wang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0C4B49BFA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 06:25:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1F3D40D1A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 06:25:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gxeD44xAieMz for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jul 2017 06:25:42 -0400 (EDT)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B65940D1A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 06:25:40 -0400 (EDT)
-In-Reply-To: <1500287012-16996-1-git-send-email-wanghaibin.wang@huawei.com>
+ with ESMTP id I32yiE-wP8HQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Jul 2017 06:25:38 -0400 (EDT)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11DC540017
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 06:25:37 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,93 +29,26 @@ To: cdall@linaro.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 Cc: wu.wubin@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The SPEC defined GICC_APR<n> (n = 0-3, 32-bit per register) to provide
-information about interrupt active priorities for GICv2, and the user
-access will traverse all of these registers no matter how many
-priority levels we supported.
+v2: Split the patch again to make it easier for review
+    some fixes were proposed by Marc
 
-So we have to implement the uaccess interface cover all of these registers.
+v1: the problem describe:
+https://lists.cs.columbia.edu/pipermail/kvmarm/2017-July/026295.html
 
-Signed-off-by: wanghaibin <wanghaibin.wang@huawei.com>
----
+wanghaibin (4):
+  kvm: arm/arm64: vgic: Implement the vGICv2 GICC_APRn uaccess
+    interface.
+  kvm: arm/arm64: vgic-v2: Add GICH_APRn accessors for GICv2
+  kvm: arm/arm64: vgic-v3: add ICH_AP[01]Rn accessors for GICv3
+  kvm: arm/arm64: vgic: clean up vGICv3 ICC_APRn sysreg uaccess
+
+ arch/arm64/kvm/vgic-sys-reg-v3.c | 25 +++++--------------------
  virt/kvm/arm/vgic/vgic-mmio-v2.c | 22 ++++++++++++++++++++--
- virt/kvm/arm/vgic/vgic-mmio.c    |  9 +++++++++
- virt/kvm/arm/vgic/vgic.h         |  3 +++
- 3 files changed, 32 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio.c    | 28 ++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v2.c      | 18 ++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c      | 20 ++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h         |  7 +++++++
+ 6 files changed, 98 insertions(+), 22 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 63e0bbd..832f403 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -303,6 +303,23 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
- 	vgic_set_vmcr(vcpu, &vmcr);
- }
- 
-+static unsigned long vgic_v2_uaccess_read_activeprio(struct kvm_vcpu *vcpu,
-+						     gpa_t addr, unsigned int len)
-+{
-+	u32 idx = (addr & 0x0c) / sizeof(u32);
-+
-+	return vgic_get_apr(vcpu, idx);
-+}
-+
-+static void vgic_v2_uaccess_write_activeprio(struct kvm_vcpu *vcpu,
-+					     gpa_t addr, unsigned int len,
-+					     unsigned long val)
-+{
-+       u32 idx = (addr & 0x0c) / sizeof(u32);
-+
-+       return vgic_set_apr(vcpu, idx, val);
-+}
-+
- static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
- 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
-@@ -361,8 +378,9 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
- 	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ALIAS_BINPOINT,
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
- 		VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GIC_CPU_ACTIVEPRIO,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 16,
-+	REGISTER_DESC_WITH_LENGTH_UACCESS(GIC_CPU_ACTIVEPRIO,
-+		vgic_mmio_read_raz, vgic_mmio_write_wi,
-+		vgic_v2_uaccess_read_activeprio, vgic_v2_uaccess_write_activeprio, 16,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_LENGTH(GIC_CPU_IDENT,
- 		vgic_mmio_read_vcpuif, vgic_mmio_write_vcpuif, 4,
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 1c17b2a..deed781 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -454,6 +454,15 @@ static int match_region(const void *key, const void *elt)
- 		       sizeof(regions[0]), match_region);
- }
- 
-+void vgic_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val)
-+{
-+}
-+
-+u32 vgic_get_apr(struct kvm_vcpu *vcpu, u32 idx)
-+{
-+	return 0;
-+}
-+
- void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
- {
- 	if (kvm_vgic_global_state.type == VGIC_V2)
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index bba7fa2..c2be5b7 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -209,6 +209,9 @@ int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
- int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 				    u32 intid, u64 *val);
- int kvm_register_vgic_device(unsigned long type);
-+
-+void vgic_set_apr(struct kvm_vcpu *vcpu, u32 idx, u32 val);
-+u32 vgic_get_apr(struct kvm_vcpu *vcpu, u32 idx);
- void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- int vgic_lazy_init(struct kvm *kvm);
 -- 
 1.8.3.1
