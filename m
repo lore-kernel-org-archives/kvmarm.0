@@ -1,25 +1,25 @@
 From: Christoffer Dall <cdall@linaro.org>
-Subject: [RFC PATCH v2 08/19] KVM: arm/arm64: Use separate timer for phys
- timer emulation
-Date: Mon, 17 Jul 2017 16:27:07 +0200
-Message-ID: <20170717142718.13853-9-cdall@linaro.org>
+Subject: [RFC PATCH v2 05/19] KVM: arm/arm64: Check that system supports split
+ eoi/deactivate
+Date: Mon, 17 Jul 2017 16:27:04 +0200
+Message-ID: <20170717142718.13853-6-cdall@linaro.org>
 References: <20170717142718.13853-1-cdall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6117949C2B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 337F040D16
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NL1O6VVL2E1T for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jul 2017 10:26:47 -0400 (EDT)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A5F649C11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:47 -0400 (EDT)
-Received: by mail-wm0-f46.google.com with SMTP id t70so22786721wmt.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 07:27:34 -0700 (PDT)
+ with ESMTP id lY4VnTI6JKCH for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Jul 2017 10:26:44 -0400 (EDT)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 574F649C09
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 10:26:44 -0400 (EDT)
+Received: by mail-wm0-f41.google.com with SMTP id w126so77795299wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jul 2017 07:27:30 -0700 (PDT)
 In-Reply-To: <20170717142718.13853-1-cdall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,106 +34,72 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@linaro.org>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We were using the same hrtimer for emulating the physical timer and for
-making sure a blocking VCPU thread would be eventually woken up.  That
-worked fine in the previous arch timer design, but as we are about to
-actually use the soft timer expire function for the physical timer
-emulation, change the logic to use a dedicated hrtimer.
+Some systems without proper firmware and/or hardware description data
+don't support the split EOI and deactivate operation.
 
-This has the added benefit of not having to cancel any work in the sync
-path, which in turn allows us to run the flush and sync with IRQs
-disabled.
+On such systems, we cannot leave the physical interrupt active after the
+timer handler on the host has run, so we cannot support KVM with an
+in-kernel GIC with the timer changes we about to introduce.
 
+This patch makes sure that trying to initialize the KVM GIC code will
+fail on such systems.
+
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <cdall@linaro.org>
 ---
- include/kvm/arm_arch_timer.h |  3 +++
- virt/kvm/arm/arch_timer.c    | 18 ++++++++++++++----
- 2 files changed, 17 insertions(+), 4 deletions(-)
+ drivers/irqchip/irq-gic.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index dcbb2e1..16887c0 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -47,6 +47,9 @@ struct arch_timer_cpu {
- 	/* Work queued with the above timer expires */
- 	struct work_struct		expired;
- 
-+	/* Physical timer emulation */
-+	struct hrtimer			phys_timer;
-+
- 	/* Background timer active */
- 	bool				armed;
- 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index c2e8326..7f87099 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -178,6 +178,12 @@ static enum hrtimer_restart kvm_bg_timer_expire(struct hrtimer *hrt)
- 	return HRTIMER_NORESTART;
+diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+index 090991f..b7e4fed 100644
+--- a/drivers/irqchip/irq-gic.c
++++ b/drivers/irqchip/irq-gic.c
+@@ -1391,7 +1391,8 @@ int gic_of_init_child(struct device *dev, struct gic_chip_data **gic, int irq)
+ 	return 0;
  }
  
-+static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
-+{
-+	WARN(1, "Timer only used to ensure guest exit - unexpected event.");
-+	return HRTIMER_NORESTART;
-+}
-+
- bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+-static void __init gic_of_setup_kvm_info(struct device_node *node)
++static void __init gic_of_setup_kvm_info(struct device_node *node,
++					 bool supports_deactivate)
  {
- 	u64 cval, now;
-@@ -255,7 +261,7 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- }
- 
- /* Schedule the background timer for the emulated timer. */
--static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
-+static void phys_timer_emulate(struct kvm_vcpu *vcpu,
- 			      struct arch_timer_context *timer_ctx)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-@@ -267,7 +273,7 @@ static void kvm_timer_emulate(struct kvm_vcpu *vcpu,
+ 	int ret;
+ 	struct resource *vctrl_res = &gic_v2_kvm_info.vctrl;
+@@ -1411,6 +1412,9 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+ 	if (ret)
  		return;
  
- 	/*  The timer has not yet expired, schedule a background timer */
--	soft_timer_start(&timer->bg_timer, kvm_timer_compute_delta(timer_ctx));
-+	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(timer_ctx));
- }
- 
- /*
-@@ -424,7 +430,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	kvm_timer_update_state(vcpu);
- 
- 	/* Set the background timer for the physical timer emulation. */
--	kvm_timer_emulate(vcpu, vcpu_ptimer(vcpu));
-+	phys_timer_emulate(vcpu, vcpu_ptimer(vcpu));
- 
- 	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
- 		kvm_timer_flush_hwstate_user(vcpu);
-@@ -447,7 +453,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- 	 * This is to cancel the background timer for the physical timer
- 	 * emulation if it is set.
- 	 */
--	soft_timer_cancel(&timer->bg_timer, &timer->expired);
-+	soft_timer_cancel(&timer->phys_timer, NULL);
- 
- 	/*
- 	 * The guest could have modified the timer registers or the timer
-@@ -507,6 +513,9 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
- 	timer->bg_timer.function = kvm_bg_timer_expire;
- 
-+	hrtimer_init(&timer->phys_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
-+	timer->phys_timer.function = kvm_phys_timer_expire;
++	if (!supports_deactivate)
++		return;
 +
- 	vtimer->irq.irq = default_vtimer_irq.irq;
- 	ptimer->irq.irq = default_ptimer_irq.irq;
- }
-@@ -615,6 +624,7 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
- 	soft_timer_cancel(&timer->bg_timer, &timer->expired);
-+	soft_timer_cancel(&timer->phys_timer, NULL);
- 	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
+ 	gic_set_kvm_info(&gic_v2_kvm_info);
  }
  
+@@ -1419,6 +1423,7 @@ gic_of_init(struct device_node *node, struct device_node *parent)
+ {
+ 	struct gic_chip_data *gic;
+ 	int irq, ret;
++	bool has_eoimode;
+ 
+ 	if (WARN_ON(!node))
+ 		return -ENODEV;
+@@ -1436,7 +1441,8 @@ gic_of_init(struct device_node *node, struct device_node *parent)
+ 	 * Disable split EOI/Deactivate if either HYP is not available
+ 	 * or the CPU interface is too small.
+ 	 */
+-	if (gic_cnt == 0 && !gic_check_eoimode(node, &gic->raw_cpu_base))
++	has_eoimode = gic_check_eoimode(node, &gic->raw_cpu_base);
++	if (gic_cnt == 0 && !has_eoimode)
+ 		static_key_slow_dec(&supports_deactivate);
+ 
+ 	ret = __gic_init_bases(gic, -1, &node->fwnode);
+@@ -1447,7 +1453,7 @@ gic_of_init(struct device_node *node, struct device_node *parent)
+ 
+ 	if (!gic_cnt) {
+ 		gic_init_physaddr(node);
+-		gic_of_setup_kvm_info(node);
++		gic_of_setup_kvm_info(node, has_eoimode);
+ 	}
+ 
+ 	if (parent) {
 -- 
 2.9.0
